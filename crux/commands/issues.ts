@@ -15,16 +15,35 @@
  *   crux gh issues close <N> [--reason] Close an issue with an optional comment
  */
 
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { join, dirname } from 'path';
-import { createLogger, type Colors } from '../lib/output.ts';
+import { readFileSync } from 'fs';
+import { createLogger } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
 import { getAgentSessionByBranch, updateAgentSession, PR_OUTCOMES, type PrOutcome } from '../lib/wiki-server/agent-sessions.ts';
-import { LABELS, LABEL_META } from '../lib/labels.ts';
+import { LABELS } from '../lib/labels.ts';
+
+import type { GitHubIssueResponse, RankedIssue, ModelName } from '../lib/issues/types.ts';
+import {
+  CLAUDE_WORKING_LABEL,
+  SKIP_LABELS,
+  MODEL_NAMES,
+  MODEL_LABEL_PREFIX,
+} from '../lib/issues/types.ts';
+import { scoreIssue, issuePriority, isBlocked, rankIssues } from '../lib/issues/scoring.ts';
+import { tokenize, scoreMatch } from '../lib/issues/search.ts';
+import { findPotentialDuplicates } from '../lib/issues/dedup.ts';
+import {
+  checkIssueSections,
+  buildIssueBody,
+  mergeSections,
+  formatScoreBreakdown,
+  formatIssueRow,
+} from '../lib/issues/formatting.ts';
+import { extractModel, applyModelLabel, isValidModel } from '../lib/issues/models.ts';
+import { DAILY_CREATE_LIMIT, getCreatesToday, recordCreate } from '../lib/issues/rate-limit.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -38,52 +57,6 @@ function readFileFlag(path: string | undefined): string | null {
     const msg = e instanceof Error ? e.message : String(e);
     throw new Error(`Error reading file ${path}: ${msg}`);
   }
-}
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface GitHubIssueResponse {
-  number: number;
-  title: string;
-  body: string | null;
-  labels: Array<{ name: string }>;
-  created_at: string;
-  updated_at: string;
-  html_url: string;
-  pull_request?: unknown;
-}
-
-interface GitHubLabelResponse {
-  name: string;
-}
-
-interface ScoreBreakdown {
-  priority: number;
-  bugBonus: number;
-  claudeReadyBonus: number;
-  effortAdjustment: number;
-  recencyBonus: number;
-  ageBonus: number;
-  total: number;
-}
-
-interface RankedIssue {
-  number: number;
-  title: string;
-  body: string;
-  labels: string[];
-  createdAt: string;
-  updatedAt: string;
-  url: string;
-  priority: number; // 0 = highest (legacy compat)
-  score: number; // higher = better
-  scoreBreakdown: ScoreBreakdown;
-  inProgress: boolean;
-  blocked: boolean;
-  recommendedModel: ModelName | null;
-  missingSections: string[]; // empty = well-formatted
 }
 
 interface CommandOptions extends BaseOptions {
@@ -103,224 +76,17 @@ interface CommandOptions extends BaseOptions {
 }
 
 // ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const CLAUDE_WORKING_LABEL = LABELS.AGENT_WORKING;
-const CLAUDE_WORKING_COLOR = LABEL_META[LABELS.AGENT_WORKING].color;
-const CLAUDE_WORKING_DESC = LABEL_META[LABELS.AGENT_WORKING].description;
-
-const SKIP_LABELS = new Set(['wontfix', 'on-hold', 'invalid', 'duplicate', "won't fix"]);
-
-/** Labels that indicate an issue is blocked or waiting */
-const BLOCKED_LABELS = new Set([
-  'blocked',
-  'waiting',
-  'needs-info',
-  'needs-response',
-  'needs-discussion',
-  'waiting-for-upstream',
-  'stalled',
-]);
-
-/** Patterns in issue body that suggest blocking */
-const BLOCKED_BODY_PATTERNS = [
-  /\bblocked by\b/i,
-  /\bwaiting (for|on)\b/i,
-  /\bdepends on #\d+/i,
-];
-
-// ---------------------------------------------------------------------------
-// Model extraction
-// ---------------------------------------------------------------------------
-
-/** Recognized model names for issue recommendations */
-const MODEL_NAMES = ['haiku', 'sonnet', 'opus'] as const;
-type ModelName = (typeof MODEL_NAMES)[number];
-
-/**
- * Extract recommended model from labels, issue title, or body (in priority order).
- * Looks for:
- *   - Labels: model:haiku, model:sonnet, model:opus (primary — machine-readable)
- *   - Body: "## Recommended Model" section header + model name (legacy)
- *   - Title: [haiku], [sonnet], [opus] suffix (legacy)
- */
-function extractModel(title: string, body: string, labels: string[] = []): ModelName | null {
-  // Check labels first: model:haiku, model:sonnet, model:opus
-  for (const label of labels) {
-    const m = label.match(/^model:(haiku|sonnet|opus)$/i);
-    if (m) return m[1].toLowerCase() as ModelName;
-  }
-
-  // Check body: look for "## Recommended Model" section header + model name
-  // Handles blank lines between header and value (e.g., "## Recommended Model\n\n**Sonnet**...")
-  const sectionMatch = body.match(/##\s+recommended\s+model[^\n]*\n[\s\S]{0,10}?(haiku|sonnet|opus)/i);
-  if (sectionMatch) return sectionMatch[1].toLowerCase() as ModelName;
-
-  // Check title: [haiku], [sonnet], [opus]
-  const titleMatch = title.match(/\[(haiku|sonnet|opus)\]/i);
-  if (titleMatch) return titleMatch[1].toLowerCase() as ModelName;
-
-  return null;
-}
-
-/**
- * Check whether an issue body has required sections for a well-formatted issue.
- * Returns a list of missing section names.
- */
-function checkIssueSections(title: string, body: string, labels: string[] = []): string[] {
-  const missing: string[] = [];
-
-  // Must have a non-trivial body
-  if (body.trim().length < 80) {
-    return ['body (too short or empty)'];
-  }
-
-  // Must have a problem/description section
-  const hasProblem =
-    /##\s+(problem|summary|description|context|background)/i.test(body) ||
-    body.trim().length > 300; // long freeform body counts
-  if (!hasProblem) missing.push('## Problem / ## Summary section');
-
-  // Must have acceptance criteria or checkboxes
-  const hasCriteria =
-    /##\s+(acceptance\s+criteria|ac|success\s+criteria|definition\s+of\s+done)/i.test(body) ||
-    /- \[ \]/.test(body);
-  if (!hasCriteria) missing.push('Acceptance Criteria (## section or - [ ] checkboxes)');
-
-  // Must have model recommendation (label, body section, or title tag)
-  const hasModel = extractModel(title, body, labels) !== null;
-  if (!hasModel) missing.push('Recommended Model (model:haiku/sonnet/opus label, ## section, or [model] in title)');
-
-  return missing;
-}
-
-/** Labels indicating this is a bug report */
-const BUG_LABELS = new Set(['bug', 'defect', 'regression', 'crash', 'fix']);
-
-/** Labels indicating effort level */
-const HIGH_EFFORT_LABELS = new Set(['effort:high', 'large', 'epic', 'size:xl', 'size:l']);
-const LOW_EFFORT_LABELS = new Set(['effort:low', 'small', 'size:xs', 'size:s', 'good first issue', 'easy']);
-
-/** Label for human-curated "well-scoped for AI" issues */
-const CLAUDE_READY_LABEL = 'claude-ready';
-
-/** Labels that specify the recommended AI model */
-const MODEL_LABEL_PREFIX = 'model:';
-const MODEL_LABEL_COLORS: Record<ModelName, string> = {
-  haiku: '1d76db',   // blue
-  sonnet: 'e4e669',  // yellow
-  opus: '7057ff',    // purple
-};
-const MODEL_LABEL_DESCS: Record<ModelName, string> = {
-  haiku: 'Recommended for Claude Haiku (fast, cheap)',
-  sonnet: 'Recommended for Claude Sonnet (balanced)',
-  opus: 'Recommended for Claude Opus (complex tasks)',
-};
-
-/** Priority label → base score */
-const PRIORITY_SCORES: Record<string, number> = {
-  P0: 1000,
-  p0: 1000,
-  'priority:critical': 1000,
-  P1: 500,
-  p1: 500,
-  'priority:high': 500,
-  P2: 200,
-  p2: 200,
-  'priority:medium': 200,
-  P3: 100,
-  p3: 100,
-  'priority:low': 100,
-};
-
-/** Legacy priority order (lower = higher priority) — kept for RankedIssue.priority */
-const PRIORITY_LABELS: Record<string, number> = {
-  P0: 0,
-  p0: 0,
-  'priority:critical': 0,
-  P1: 1,
-  p1: 1,
-  'priority:high': 1,
-  P2: 2,
-  p2: 2,
-  'priority:medium': 2,
-  P3: 3,
-  p3: 3,
-  'priority:low': 3,
-};
-
-// ---------------------------------------------------------------------------
-// Scoring
-// ---------------------------------------------------------------------------
-
-function issuePriority(labels: string[]): number {
-  let best = 99;
-  for (const label of labels) {
-    const p = PRIORITY_LABELS[label];
-    if (p !== undefined && p < best) best = p;
-  }
-  return best;
-}
-
-function scoreIssue(labels: string[], body: string, createdAt: string, updatedAt: string): ScoreBreakdown {
-  // 1. Priority base score
-  let priorityScore = 50; // unlabeled default
-  for (const label of labels) {
-    const s = PRIORITY_SCORES[label];
-    if (s !== undefined && s > priorityScore) priorityScore = s;
-  }
-
-  // 2. Bug bonus (+50 for bugs — concrete failures are actionable)
-  const bugBonus = labels.some(l => BUG_LABELS.has(l)) ? 50 : 0;
-
-  // 3. Claude-ready multiplier (1.5×, applied after other bonuses)
-  const isClaudeReady = labels.includes(CLAUDE_READY_LABEL);
-
-  // 4. Effort adjustment
-  let effortAdjustment = 0;
-  if (labels.some(l => LOW_EFFORT_LABELS.has(l))) effortAdjustment = +20;
-  else if (labels.some(l => HIGH_EFFORT_LABELS.has(l))) effortAdjustment = -20;
-
-  // 5. Recency bonus (+15 if updated within 7 days — someone cares about it)
-  const daysSinceUpdate = (Date.now() - new Date(updatedAt).getTime()) / (1000 * 60 * 60 * 24);
-  const recencyBonus = daysSinceUpdate <= 7 ? 15 : 0;
-
-  // 6. Age bonus (older issues get up to +10 — avoid starvation)
-  const daysSinceCreate = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
-  const ageBonus = Math.min(10, Math.floor(daysSinceCreate / 30)); // +1 per month, cap 10
-
-  const baseTotal = priorityScore + bugBonus + effortAdjustment + recencyBonus + ageBonus;
-  const claudeReadyBonus = isClaudeReady ? Math.round(baseTotal * 0.5) : 0;
-  const total = baseTotal + claudeReadyBonus;
-
-  return {
-    priority: priorityScore,
-    bugBonus,
-    claudeReadyBonus,
-    effortAdjustment,
-    recencyBonus,
-    ageBonus,
-    total,
-  };
-}
-
-function isBlocked(labels: string[], body: string): boolean {
-  if (labels.some(l => BLOCKED_LABELS.has(l))) return true;
-  return BLOCKED_BODY_PATTERNS.some(p => p.test(body));
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
+// GitHub helpers
 // ---------------------------------------------------------------------------
 
 async function ensureLabelExists(): Promise<void> {
   try {
-    await githubApi<GitHubLabelResponse>(
+    await githubApi<{ name: string }>(
       `/repos/${REPO}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`
     );
   } catch {
     // Label doesn't exist — create it
+    const { CLAUDE_WORKING_COLOR, CLAUDE_WORKING_DESC } = await import('../lib/issues/types.ts');
     await githubApi(`/repos/${REPO}/labels`, {
       method: 'POST',
       body: {
@@ -328,36 +94,6 @@ async function ensureLabelExists(): Promise<void> {
         color: CLAUDE_WORKING_COLOR,
         description: CLAUDE_WORKING_DESC,
       },
-    });
-  }
-}
-
-/** Ensure model:X GitHub label exists, then apply it to an issue (replacing any existing model label). */
-async function applyModelLabel(issueNum: number, model: ModelName, existingLabels: string[]): Promise<void> {
-  const labelName = `${MODEL_LABEL_PREFIX}${model}`;
-
-  // Ensure label exists in repo
-  try {
-    await githubApi<GitHubLabelResponse>(`/repos/${REPO}/labels/${encodeURIComponent(labelName)}`);
-  } catch {
-    await githubApi(`/repos/${REPO}/labels`, {
-      method: 'POST',
-      body: { name: labelName, color: MODEL_LABEL_COLORS[model], description: MODEL_LABEL_DESCS[model] },
-    });
-  }
-
-  // Remove any existing model:X labels on this issue
-  for (const l of existingLabels) {
-    if (l.startsWith(MODEL_LABEL_PREFIX) && l !== labelName) {
-      await githubApi(`/repos/${REPO}/issues/${issueNum}/labels/${encodeURIComponent(l)}`, { method: 'DELETE' });
-    }
-  }
-
-  // Apply the new label (no-op if already present)
-  if (!existingLabels.includes(labelName)) {
-    await githubApi(`/repos/${REPO}/issues/${issueNum}/labels`, {
-      method: 'POST',
-      body: { labels: [labelName] },
     });
   }
 }
@@ -392,73 +128,6 @@ async function fetchOpenIssues(): Promise<RankedIssue[]> {
       };
     })
     .filter(i => !i.labels.some(l => SKIP_LABELS.has(l)));
-}
-
-function rankIssues(issues: RankedIssue[]): RankedIssue[] {
-  return [...issues].sort((a, b) => {
-    // Higher score = higher priority
-    if (a.score !== b.score) return b.score - a.score;
-    // Tiebreak: older issues first
-    return a.createdAt.localeCompare(b.createdAt);
-  });
-}
-
-function formatScoreBreakdown(bd: ScoreBreakdown, c: Colors): string {
-  const parts: string[] = [];
-  parts.push(`priority:${bd.priority}`);
-  if (bd.bugBonus) parts.push(`bug:+${bd.bugBonus}`);
-  if (bd.claudeReadyBonus) parts.push(`claude-ready:+${bd.claudeReadyBonus}`);
-  if (bd.effortAdjustment > 0) parts.push(`effort:+${bd.effortAdjustment}`);
-  if (bd.effortAdjustment < 0) parts.push(`effort:${bd.effortAdjustment}`);
-  if (bd.recencyBonus) parts.push(`recent:+${bd.recencyBonus}`);
-  if (bd.ageBonus) parts.push(`age:+${bd.ageBonus}`);
-  return `${c.dim}[score:${bd.total} = ${parts.join(' ')}]${c.reset}`;
-}
-
-const MODEL_COLORS: Record<ModelName, string> = {
-  haiku: '\x1b[36m',   // cyan
-  sonnet: '\x1b[33m',  // yellow
-  opus: '\x1b[35m',    // magenta
-};
-
-function formatIssueRow(issue: RankedIssue, c: Colors, showScores = false): string {
-  const priorityLabel = issue.priority < 99 ? `P${issue.priority}` : '  ';
-  const inProgressMark = issue.inProgress ? `${c.yellow}[${CLAUDE_WORKING_LABEL}]${c.reset} ` : '';
-  const blockedMark = issue.blocked ? `${c.red}[blocked]${c.reset} ` : '';
-  const claudeReadyMark = issue.labels.includes(CLAUDE_READY_LABEL) ? `${c.green}[claude-ready]${c.reset} ` : '';
-  const labelStr = issue.labels
-    .filter(l => l !== CLAUDE_WORKING_LABEL && l !== CLAUDE_READY_LABEL && !l.startsWith(MODEL_LABEL_PREFIX))
-    .map(l => `${c.dim}${l}${c.reset}`)
-    .join(' ');
-
-  // Model badge
-  let modelBadge = '';
-  if (issue.recommendedModel) {
-    const modelColor = MODEL_COLORS[issue.recommendedModel];
-    modelBadge = ` ${modelColor}[${issue.recommendedModel}]${c.reset}`;
-  }
-
-  // Format warning for missing sections (dim, only shown with --scores or when explicitly formatting)
-  const warningStr = issue.missingSections.length > 0
-    ? `${c.dim}  ⚠ missing: ${issue.missingSections.join(', ')}${c.reset}`
-    : '';
-
-  let row =
-    `  ${c.cyan}#${String(issue.number).padEnd(5)}${c.reset}` +
-    `${c.bold}[${priorityLabel}]${c.reset} ` +
-    `${inProgressMark}${blockedMark}${claudeReadyMark}${issue.title}${modelBadge}` +
-    (labelStr ? `\n         ${labelStr}` : '') +
-    `  ${c.dim}(${issue.createdAt})${c.reset}`;
-
-  if (showScores) {
-    row += `\n         ${formatScoreBreakdown(issue.scoreBreakdown, c)}`;
-  }
-
-  if (warningStr) {
-    row += `\n         ${warningStr}`;
-  }
-
-  return row;
 }
 
 // ---------------------------------------------------------------------------
@@ -605,105 +274,6 @@ async function next(_args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
- * Build a structured issue body from template parameters.
- */
-function buildIssueBody(opts: {
-  problem?: string;
-  fix?: string;
-  depends?: string;
-  criteria?: string;
-  model?: string;
-  cost?: string;
-  file?: string;
-  evidence?: string;
-}): string {
-  const sections: string[] = [];
-
-  if (opts.problem) {
-    sections.push(`## Problem\n\n${opts.problem}`);
-  }
-
-  // Evidence section — file path and/or concrete observation
-  const evidenceParts: string[] = [];
-  if (opts.file) evidenceParts.push(`**File:** \`${opts.file}\``);
-  if (opts.evidence) evidenceParts.push(opts.evidence);
-  if (evidenceParts.length > 0) {
-    sections.push(`## Evidence\n\n${evidenceParts.join('\n\n')}`);
-  }
-
-  if (opts.fix) {
-    sections.push(`## Proposed Fix\n\n${opts.fix}`);
-  }
-
-  // Dependencies (only add section if explicitly specified)
-  const depsRaw = opts.depends ? opts.depends.split(',').map(d => d.trim()).filter(Boolean) : [];
-  if (depsRaw.length > 0) {
-    const depLinks = depsRaw.map(d => `#${d.replace('#', '')}`).join(', ');
-    sections.push(`## Dependencies\n\nDepends on: ${depLinks}`);
-  }
-
-  // Recommended Model
-  if (opts.model) {
-    const modelName = opts.model.toLowerCase();
-    const costNote = opts.cost ? ` Estimated cost: ${opts.cost}.` : '';
-    sections.push(`## Recommended Model\n\n**${modelName.charAt(0).toUpperCase() + modelName.slice(1)}** — well-scoped for this model.${costNote}`);
-  }
-
-  // Acceptance Criteria
-  if (opts.criteria) {
-    const items = opts.criteria.split('|').map(s => s.trim()).filter(Boolean);
-    const checklist = items.map(item => `- [ ] ${item}`).join('\n');
-    sections.push(`## Acceptance Criteria\n\n${checklist}`);
-  }
-
-  return sections.join('\n\n');
-}
-
-// ---------------------------------------------------------------------------
-// Issue creation rate limiting
-// ---------------------------------------------------------------------------
-
-const DAILY_CREATE_LIMIT = 2;
-const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../.claude/issue-creates.json');
-
-interface RateLimitRecord {
-  timestamps: string[]; // ISO date strings of issue creation times
-}
-
-/**
- * Check how many issues have been created today (in UTC). Returns the count.
- */
-function getCreatestoday(): number {
-  const today = new Date().toISOString().slice(0, 10);
-  try {
-    if (!existsSync(RATE_LIMIT_FILE)) return 0;
-    const data: RateLimitRecord = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
-    return data.timestamps.filter(t => t.startsWith(today)).length;
-  } catch {
-    return 0;
-  }
-}
-
-/**
- * Record that an issue was just created.
- */
-function recordCreate(): void {
-  const now = new Date().toISOString();
-  const today = now.slice(0, 10);
-  let data: RateLimitRecord = { timestamps: [] };
-  try {
-    if (existsSync(RATE_LIMIT_FILE)) {
-      data = JSON.parse(readFileSync(RATE_LIMIT_FILE, 'utf-8'));
-    }
-  } catch { /* start fresh */ }
-  // Keep only timestamps from the last 7 days (self-cleaning)
-  const cutoff = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
-  data.timestamps = data.timestamps.filter(t => t.slice(0, 10) >= cutoff);
-  data.timestamps.push(now);
-  writeFileSync(RATE_LIMIT_FILE, JSON.stringify(data, null, 2) + '\n');
-}
-
-/**
  * Create a new GitHub issue.
  */
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -720,7 +290,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 
   // Rate limit: max DAILY_CREATE_LIMIT issues per day (prevents tracker flood)
   if (!options['no-limit'] && !options.noLimit) {
-    const todayCount = getCreatestoday();
+    const todayCount = getCreatesToday();
     if (todayCount >= DAILY_CREATE_LIMIT) {
       return {
         output:
@@ -751,7 +321,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const effectiveProblem = problemFromFile ?? (options.problem as string | undefined);
 
   // Validate model if specified
-  if (options.model && !(MODEL_NAMES as ReadonlyArray<string>).includes((options.model as string).toLowerCase())) {
+  if (options.model && !isValidModel(options.model as string)) {
     return {
       output: `${c.red}Invalid --model value: "${options.model}". Must be one of: ${MODEL_NAMES.join(', ')}${c.reset}\n`,
       exitCode: 1,
@@ -775,7 +345,6 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   }
 
   // Require evidence of an observed problem (prevents speculative issue filing).
-  // Must reference a specific file or describe a concrete observation.
   if (!options.draft && !effectiveBody) {
     const hasEvidence = effectiveProblem || options.file || options.evidence;
     if (!hasEvidence) {
@@ -792,9 +361,6 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  // --body-file / --body provides the raw body and takes precedence.
-  // Structured args (--problem, --model, --criteria, etc.) build a template body only
-  // when no raw body is provided.  --model still applies the label even with --body-file.
   let body: string;
   if (effectiveBody) {
     body = effectiveBody;
@@ -817,7 +383,6 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   }
 
   // Evidence validation: advisory warning if issue body lacks concrete evidence
-  // (does not block creation — just prints a nudge)
   let evidenceWarning = '';
   if (body && !options.draft) {
     const hasCodeFence = /```/.test(body);
@@ -844,7 +409,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     },
   });
 
-  // Record creation for rate limiting (non-fatal — don't break create if file write fails)
+  // Record creation for rate limiting (non-fatal)
   try { recordCreate(); } catch { /* ignore — rate limiting is advisory */ }
 
   // Apply model label if --model was specified
@@ -862,7 +427,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   } catch { /* non-fatal — label might not exist yet */ }
 
   let output = '';
-  const todayCount = getCreatestoday();
+  const todayCount = getCreatesToday();
   output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
   if (todayCount >= DAILY_CREATE_LIMIT - 1) {
     output += `  ${c.yellow}⚠ ${todayCount}/${DAILY_CREATE_LIMIT} daily issue limit used${c.reset}\n`;
@@ -888,8 +453,6 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 
 /**
  * Signal start of work: post a comment and add the agent:working label.
- * Blocks if another active agent is already working on the same issue
- * (use --force to override).
  */
 async function start(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1049,7 +612,7 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
     }
   }
 
-  // Record PR URL, outcome, and fix-chain in the agent session (best-effort — don't fail if wiki-server is down)
+  // Record PR URL, outcome, and fix-chain in the agent session (best-effort)
   let sessionUpdated = false;
   const branch = currentBranch();
   if (branch && (prUrl || prOutcome !== undefined || fixesPrUrl)) {
@@ -1064,7 +627,6 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
         sessionUpdated = updateResult.ok;
       }
     } catch (err) {
-      // Best-effort: wiki-server may be unavailable. Log and continue.
       const msg = err instanceof Error ? err.message : String(err);
       log.warn(`Could not update agent session: ${msg}`);
     }
@@ -1090,10 +652,6 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
 
 /**
  * Detect stale agent:working labels and potential duplicate issues.
- *
- * Checks:
- * 1. Issues with `agent:working` whose associated branches don't exist on remote
- * 2. Issues with very similar titles (potential duplicates)
  */
 async function cleanup(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1110,14 +668,10 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
     output += `${c.bold}Checking ${inProgress.length} ${CLAUDE_WORKING_LABEL} issue(s) for stale labels...${c.reset}\n\n`;
 
     for (const issue of inProgress) {
-      // Look for a branch reference in comments
-      // Fetch all comments (asc order) so we don't miss old start-comments
-      // on busy issues that have accumulated many comments since (#630)
       const comments = await githubApi<Array<{ body: string; created_at: string }>>(
         `/repos/${REPO}/issues/${issue.number}/comments?per_page=100&sort=created&direction=asc`
       );
 
-      // Extract branch name from the start comment pattern
       const branchPattern = /\*\*Branch:\*\*\s*`([^`]+)`/;
       let branchName: string | null = null;
       for (const comment of comments) {
@@ -1146,7 +700,6 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
         problemCount++;
 
         if (fix) {
-          // Remove the stale label
           try {
             await githubApi(
               `/repos/${REPO}/issues/${issue.number}/labels/${encodeURIComponent(CLAUDE_WORKING_LABEL)}`,
@@ -1154,7 +707,6 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
             );
           } catch { /* 404 is fine */ }
 
-          // Post a comment
           await githubApi(`/repos/${REPO}/issues/${issue.number}/comments`, {
             method: 'POST',
             body: {
@@ -1201,59 +753,7 @@ async function cleanup(_args: string[], options: CommandOptions): Promise<Comman
 }
 
 /**
- * Find issue pairs with similar titles using word overlap (Jaccard similarity).
- */
-function findPotentialDuplicates(issues: RankedIssue[]): Array<{ a: RankedIssue; b: RankedIssue; similarity: number }> {
-  const THRESHOLD = 0.55;
-  const results: Array<{ a: RankedIssue; b: RankedIssue; similarity: number }> = [];
-
-  // Stopwords to exclude from comparison
-  const stopwords = new Set([
-    'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
-    'add', 'fix', 'update', 'all', 'with', 'from', 'new', '--', '—', '-',
-  ]);
-
-  function tokenize(title: string): Set<string> {
-    return new Set(
-      title.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .split(/\s+/)
-        .filter(w => w.length > 2 && !stopwords.has(w))
-    );
-  }
-
-  function jaccard(a: Set<string>, b: Set<string>): number {
-    if (a.size === 0 && b.size === 0) return 0;
-    const intersection = new Set([...a].filter(x => b.has(x)));
-    const union = new Set([...a, ...b]);
-    return intersection.size / union.size;
-  }
-
-  const tokenized = issues.map(i => ({ issue: i, tokens: tokenize(i.title) }));
-
-  for (let i = 0; i < tokenized.length; i++) {
-    for (let j = i + 1; j < tokenized.length; j++) {
-      const sim = jaccard(tokenized[i].tokens, tokenized[j].tokens);
-      if (sim >= THRESHOLD) {
-        results.push({
-          a: tokenized[i].issue,
-          b: tokenized[j].issue,
-          similarity: sim,
-        });
-      }
-    }
-  }
-
-  return results.sort((a, b) => b.similarity - a.similarity);
-}
-
-/**
  * Search open (and optionally closed) issues for potential matches to a query.
- * Used by agents before filing new issues to avoid duplicates.
- *
- * Scoring: Uses combined title + body token overlap with title weighting (2x).
- * Short domain terms (CI, DX, PR, ID) are preserved. Basic stemming strips
- * common suffixes so "validates" matches "validation".
  */
 async function search(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1271,81 +771,6 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   const includeClosed = Boolean(options.closed);
   const threshold = parseFloat((options.threshold as string) || '0.35');
 
-  // Only truly semantic-free words. Domain-relevant verbs (add, fix, remove) are kept
-  // because "add entity" and "remove entity" mean opposite things.
-  const stopwords = new Set([
-    'a', 'an', 'the', 'and', 'or', 'to', 'for', 'of', 'in', 'on', 'is', 'are',
-    'all', 'with', 'from', '--', '—', '-',
-    'this', 'that', 'not', 'but', 'has', 'have', 'should', 'would', 'could',
-    'when', 'where', 'how', 'what', 'why', 'does', 'been', 'being',
-  ]);
-
-  // Short domain terms that should NOT be filtered by length
-  const shortTerms = new Set(['ci', 'dx', 'pr', 'id', 'ui', 'db', 'api', 'css', 'rpc', 'mdx', 'tsx', 'sql']);
-
-  /** Crude suffix stemming — good enough for dedup, no dependencies needed. */
-  function stem(word: string): string {
-    if (word.length <= 4) return word;
-    // Order matters: longest suffixes first
-    return word
-      .replace(/ations?$/, 'ate')
-      .replace(/tion$/, 't')
-      .replace(/sion$/, 's')
-      .replace(/ment$/, '')
-      .replace(/ness$/, '')
-      .replace(/ies$/, 'y')
-      .replace(/ous$/, '')
-      .replace(/ing$/, '')
-      .replace(/able$/, '')
-      .replace(/ive$/, '')
-      .replace(/ful$/, '')
-      .replace(/ers?$/, '')
-      .replace(/ors?$/, '')
-      .replace(/ed$/, '')
-      .replace(/ly$/, '')
-      .replace(/s$/, '');
-  }
-
-  function tokenize(text: string): Set<string> {
-    return new Set(
-      text.toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .split(/\s+/)
-        .filter(w => (w.length > 1 && shortTerms.has(w)) || (w.length > 2 && !stopwords.has(w)))
-        .map(stem)
-    );
-  }
-
-  /**
-   * Score how well a query matches a target issue.
-   *
-   * Uses query-weighted overlap (what fraction of query tokens appear in target?)
-   * with title matches worth 2x body matches, plus a penalty for single-token
-   * queries to avoid false "100%" matches.
-   */
-  function score(queryTokens: Set<string>, titleTokens: Set<string>, bodyTokens: Set<string>): number {
-    if (queryTokens.size === 0) return 0;
-
-    let weightedMatches = 0;
-    for (const token of queryTokens) {
-      if (titleTokens.has(token)) {
-        weightedMatches += 1.0; // title match: full weight
-      } else if (bodyTokens.has(token)) {
-        weightedMatches += 0.5; // body-only match: half weight
-      }
-    }
-
-    let raw = weightedMatches / queryTokens.size;
-
-    // Penalize single-token queries: they match too broadly.
-    // A single token matching the title still scores 0.7 max, not 1.0.
-    if (queryTokens.size === 1) {
-      raw *= 0.7;
-    }
-
-    return Math.min(raw, 1.0);
-  }
-
   const queryTokens = tokenize(query);
   if (queryTokens.size === 0) {
     return {
@@ -1362,8 +787,8 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
 
   for (const issue of openIssues) {
     const titleTokens = tokenize(issue.title);
-    const bodyTokens = tokenize(issue.body.slice(0, 1500)); // first 1500 chars of body
-    const s = score(queryTokens, titleTokens, bodyTokens);
+    const bodyTokens = tokenize(issue.body.slice(0, 1500));
+    const s = scoreMatch(queryTokens, titleTokens, bodyTokens);
     if (s >= threshold) {
       matches.push({ number: issue.number, title: issue.title, url: issue.url, state: 'open', score: s, labels: issue.labels });
     }
@@ -1377,11 +802,10 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
         `/search/issues?q=${searchQuery}&per_page=20`
       );
       for (const item of searchResults.items) {
-        // Skip if already matched as open
         if (matches.some(m => m.number === item.number)) continue;
         const titleTokens = tokenize(item.title);
         const bodyTokens = tokenize((item.body || '').slice(0, 1500));
-        const s = score(queryTokens, titleTokens, bodyTokens);
+        const s = scoreMatch(queryTokens, titleTokens, bodyTokens);
         if (s >= threshold) {
           matches.push({
             number: item.number,
@@ -1394,7 +818,7 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
         }
       }
     } catch {
-      // Search API failure is non-fatal — open issue results are still useful
+      // Search API failure is non-fatal
     }
   }
 
@@ -1413,7 +837,6 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
       output += `${c.dim}Tip: Use --closed to also search closed issues.${c.reset}\n`;
     }
   } else {
-    // Classify match quality
     const strongMatches = matches.filter(m => m.score >= 0.6);
     const weakMatches = matches.filter(m => m.score < 0.6);
 
@@ -1456,11 +879,7 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
 }
 
 /**
- * Post a comment on an existing issue. Used by agents to add context to
- * issues they encounter during a session rather than filing duplicates.
- *
- * Validates the issue exists and is open before posting. Appends session
- * attribution (branch name) so comments are traceable to specific sessions.
+ * Post a comment on an existing issue.
  */
 async function comment(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1475,7 +894,6 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
     };
   }
 
-  // Message is everything after the issue number
   const bodyFromFile = readFileFlag(options['body-file'] as string | undefined);
   const message = bodyFromFile || args.slice(1).join(' ').trim() || (options.body as string) || '';
   if (!message) {
@@ -1487,7 +905,6 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
     };
   }
 
-  // Validate issue exists
   let issue: GitHubIssueResponse;
   try {
     issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
@@ -1505,12 +922,10 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
     };
   }
 
-  // Add session attribution
   const branch = currentBranch();
   const attribution = branch ? `\n\n---\n*From session on branch \`${branch}\`*` : '';
   const fullBody = message + attribution;
 
-  // Post the comment
   await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
     method: 'POST',
     body: { body: fullBody },
@@ -1547,10 +962,8 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
-  // Fetch issue details
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
 
-  // Post a closing comment if reason or duplicate provided
   if (reason || duplicateOf) {
     let body = '';
     if (duplicateOf) {
@@ -1565,7 +978,6 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
     });
   }
 
-  // Add duplicate label if closing as duplicate
   if (duplicateOf) {
     await githubApi(`/repos/${REPO}/issues/${issueNum}/labels`, {
       method: 'POST',
@@ -1573,7 +985,6 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
     });
   }
 
-  // Close the issue
   await githubApi(`/repos/${REPO}/issues/${issueNum}`, {
     method: 'PATCH',
     body: {
@@ -1582,7 +993,6 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
     },
   });
 
-  // Remove agent:working label if present
   const labels = (issue.labels || []).map(l => l.name);
   if (labels.includes(CLAUDE_WORKING_LABEL)) {
     try {
@@ -1602,57 +1012,6 @@ async function close(args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 /**
- * Merge new sections into an existing issue body.
- * Sections with the same heading (e.g. "## Problem") are replaced in-place.
- * New sections that don't exist in the original are appended.
- */
-function mergeSections(existing: string, incoming: string): string {
-  // Split a markdown body into sections keyed by heading
-  function parseSections(text: string): { key: string; raw: string }[] {
-    const sections: { key: string; raw: string }[] = [];
-    const lines = text.split('\n');
-    let currentKey = '';
-    let currentLines: string[] = [];
-
-    for (const line of lines) {
-      const headingMatch = line.match(/^##\s+(.+)/);
-      if (headingMatch) {
-        if (currentKey || currentLines.length > 0) {
-          sections.push({ key: currentKey, raw: currentLines.join('\n') });
-        }
-        currentKey = headingMatch[1].trim().toLowerCase();
-        currentLines = [line];
-      } else {
-        currentLines.push(line);
-      }
-    }
-    if (currentKey || currentLines.length > 0) {
-      sections.push({ key: currentKey, raw: currentLines.join('\n') });
-    }
-    return sections;
-  }
-
-  const existingSections = parseSections(existing);
-  const incomingSections = parseSections(incoming);
-  const existingKeys = new Set(existingSections.map(s => s.key));
-
-  // Replace existing sections that match, collect new ones
-  const result = existingSections.map(section => {
-    const replacement = incomingSections.find(s => s.key && s.key === section.key);
-    return replacement ? replacement.raw : section.raw;
-  });
-
-  // Append sections that don't exist in the original
-  for (const section of incomingSections) {
-    if (section.key && !existingKeys.has(section.key)) {
-      result.push(section.raw);
-    }
-  }
-
-  return result.join('\n\n');
-}
-
-/**
  * Update the body of an existing issue using structured template args.
  */
 async function updateBody(args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1661,23 +1020,19 @@ async function updateBody(args: string[], options: CommandOptions): Promise<Comm
 
   const issueNum = parseRequiredInt(args[0]);
   if (!issueNum) {
-return {
+    return {
       output: `${c.red}Usage: crux gh issues update-body <issue-number> [--body-file=path] [--model=haiku|sonnet|opus] [--problem="..."] [--fix="..."] [--depends=N,M] [--criteria="item1|item2"] [--cost="~$2-4"]${c.reset}\n`,
       exitCode: 1,
     };
   }
 
-  // Validate model if specified
-  if (options.model && !(MODEL_NAMES as ReadonlyArray<string>).includes((options.model as string).toLowerCase())) {
+  if (options.model && !isValidModel(options.model as string)) {
     return {
       output: `${c.red}Invalid --model value: "${options.model}". Must be one of: ${MODEL_NAMES.join(', ')}${c.reset}\n`,
       exitCode: 1,
     };
   }
 
-  // --body-file sets the raw body directly (no merge). Useful when the body
-  // contains ## headings that would confuse the section-based merge logic.
-  // --problem-file takes precedence over --problem (avoids shell expansion)
   let bodyFromFile: string | undefined;
   let problemFromFile: string | undefined;
   try {
@@ -1689,14 +1044,12 @@ return {
 
   const effectiveProblem = problemFromFile ?? (options.problem as string | undefined);
 
-  // Fetch existing issue
   const issue = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${issueNum}`);
   const existingBody = (issue.body || '').trim();
 
   let combinedBody: string;
 
   if (bodyFromFile) {
-    // --body-file: set raw body directly, skip merge
     combinedBody = bodyFromFile;
   } else {
     const newBody = buildIssueBody({
@@ -1715,8 +1068,6 @@ return {
       };
     }
 
-    // Merge sections into existing body: replace existing sections in-place,
-    // append new sections that don't already exist (#622)
     combinedBody = existingBody
       ? mergeSections(existingBody, newBody)
       : newBody;
@@ -1727,7 +1078,6 @@ return {
     body: { body: combinedBody },
   });
 
-  // Apply model label if --model was specified
   const existingLabels = (issue.labels || []).map((l: { name: string }) => l.name);
   if (options.model) {
     const modelName = (options.model as string).toLowerCase() as ModelName;
@@ -1756,11 +1106,6 @@ return {
 
 /**
  * Lint GitHub issues for formatting compliance.
- * Checks: non-empty body, Problem section, Acceptance Criteria, Recommended Model.
- *
- * Usage:
- *   crux gh issues lint        Lint all open issues
- *   crux gh issues lint <N>    Lint a single issue
  */
 async function lint(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -1771,14 +1116,12 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
   const singleNum = parseRequiredInt(args[0]);
 
   if (singleNum) {
-    // Single issue
     const i = await githubApi<GitHubIssueResponse>(`/repos/${REPO}/issues/${singleNum}`);
     if (i.pull_request) {
       return { output: `${c.red}#${singleNum} is a pull request, not an issue.${c.reset}\n`, exitCode: 1 };
     }
     issuesToCheck = [{ number: i.number, title: i.title, body: (i.body || '').trim(), labels: (i.labels || []).map(l => l.name), url: i.html_url }];
   } else {
-    // All open issues
     const issues = await fetchOpenIssues();
     issuesToCheck = issues.map(i => ({ number: i.number, title: i.title, body: i.body, labels: i.labels, url: i.url }));
   }
@@ -1800,7 +1143,6 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
     results.push({ number: issue.number, title: issue.title, url: issue.url, pass: missing.length === 0, model, missing });
   }
 
-  // JSON output (#624)
   if (options.json) {
     const passCount = results.filter(r => r.pass).length;
     const failCount = results.filter(r => !r.pass).length;
@@ -1850,10 +1192,6 @@ async function lint(args: string[], options: CommandOptions): Promise<CommandRes
 
   return { output, exitCode: failCount > 0 ? 1 : 0 };
 }
-
-// ---------------------------------------------------------------------------
-// update-title
-// ---------------------------------------------------------------------------
 
 /**
  * Update the title of an existing issue.
