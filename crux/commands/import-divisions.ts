@@ -656,6 +656,74 @@ const DIVISIONS: DivisionDef[] = [
     notes:
       "AI safety evaluations focused on detecting deceptive and scheming behaviors in frontier models. Published influential research on in-context scheming in 2024.",
   },
+
+  // ---- ARIA (Advanced Research and Invention Agency) ----
+  {
+    idSeed: "div|aria|safeguarded-ai",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "Safeguarded AI Programme",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2023",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "ARIA's flagship AI safety programme, led by David 'davidad' Dalrymple. GBP 59M committed to develop AI systems with mathematical safety guarantees through formal verification.",
+  },
+  {
+    idSeed: "div|aria|ta1-1-theory",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "TA1.1 — Theory (Scaffolding)",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2024",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "22 projects focused on mathematical representations and formal semantics for world-models, specifications, and proofs. Covers category theory, probabilistic logic, and formal verification foundations.",
+  },
+  {
+    idSeed: "div|aria|ta1-2-platform",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "TA1.2 + TA1.3 — Platform (Backend + HCI)",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2024",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "GBP 14.2M across 8 projects. TA1.2 (backend): proof checking, automated reasoning, GPU optimization. TA1.3 (human-computer interface): collaborative modeling, type-theoretic environments.",
+  },
+  {
+    idSeed: "div|aria|ta1-4-sociotechnical",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "TA1.4 — Sociotechnical Integration",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2024",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "GBP 3.4M across 6 teams. Law-following AI, formal models of society, governance models, privacy-preserving verification, preference aggregation, and deliberative AI specifications.",
+  },
+  {
+    idSeed: "div|aria|ta2-ml",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "TA2 — Machine Learning",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2024",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "Phase 1: GBP 1M across 3 teams. Phase 2 (GBP 18M) redirected — ARIA pivoting away from TA2 as originally planned, expanding TA1 ambition instead.",
+  },
+  {
+    idSeed: "div|aria|ta3-applications",
+    parentOrgId: ORG_IDS.ARIA,
+    name: "TA3 — Real-World Applications",
+    divisionType: "program-area",
+    status: "active",
+    startDate: "2024",
+    source: "https://www.aria.org.uk/programme-safeguarded-ai/",
+    notes:
+      "GBP 4.9M across 9 teams. Applications in energy grid, automated driving, clinical trials, logistics, biopharmaceuticals, and telecom. Phase 2 cancelled; Phase 1 projects continue to completion.",
+  },
 ];
 
 // ---------------------------------------------------------------------------
