@@ -21,7 +21,7 @@ export function findTodoComments(): CruftItem[] {
     for (const line of todoOutput.split('\n').filter(Boolean)) {
       const match = line.match(/^([^:]+):(\d+):(.+)$/);
       if (match) {
-        if (match[1].includes('.test.') || match[1].includes('maintain.ts')) continue;
+        if (match[1].includes('.test.') || match[1].includes('maintain.ts') || match[1].includes('cruft-detection.ts')) continue;
         if (match[3].includes('pattern:') || match[3].includes('Pattern') || match[3].includes("'TODO")) continue;
         items.push({
           type: 'todo',

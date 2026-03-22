@@ -43,8 +43,8 @@ export function collectHealthMetrics(): HealthMetrics {
   const metrics: HealthMetrics = {
     date: new Date().toISOString().slice(0, 10),
     todoCount: grepCount('TODO', dirs),
-    fixmeCount: grepCount('FIXME\\\\|HACK\\\\|XXX', dirs),
-    anyTypeCount: grepCount(': any\\\\b\\\\|as any\\\\b', dirs),
+    fixmeCount: grepCount('FIXME\\|HACK\\|XXX', dirs),
+    anyTypeCount: grepCount(': any\\b\\|as any\\b', dirs),
     largeFiles: [],
     largeFileCount: 0,
     testFileCount: 0,
@@ -96,7 +96,7 @@ export function collectHealthMetrics(): HealthMetrics {
 
   // Skipped tests
   metrics.skippedTests = grepCount(
-    'it\\.skip\\\\|describe\\.skip\\\\|test\\.skip',
+    'it\\.skip\\|describe\\.skip\\|test\\.skip',
     'crux/ apps/web/src/ apps/wiki-server/src/',
   );
 

@@ -4,7 +4,7 @@
  * Pure functions for computing issue priority scores used by list/next/cleanup commands.
  */
 
-import type { ScoreBreakdown } from './types.ts';
+import type { ScoreBreakdown, RankedIssue } from './types.ts';
 import {
   PRIORITY_SCORES,
   PRIORITY_LABELS,
@@ -71,8 +71,6 @@ export function isBlocked(labels: string[], body: string): boolean {
   if (labels.some(l => BLOCKED_LABELS.has(l))) return true;
   return BLOCKED_BODY_PATTERNS.some(p => p.test(body));
 }
-
-import type { RankedIssue } from './types.ts';
 
 export function rankIssues(issues: RankedIssue[]): RankedIssue[] {
   return [...issues].sort((a, b) => {

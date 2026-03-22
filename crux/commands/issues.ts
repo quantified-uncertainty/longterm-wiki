@@ -28,6 +28,8 @@ import { LABELS } from '../lib/labels.ts';
 import type { GitHubIssueResponse, RankedIssue, ModelName } from '../lib/issues/types.ts';
 import {
   CLAUDE_WORKING_LABEL,
+  CLAUDE_WORKING_COLOR,
+  CLAUDE_WORKING_DESC,
   SKIP_LABELS,
   MODEL_NAMES,
   MODEL_LABEL_PREFIX,
@@ -86,7 +88,6 @@ async function ensureLabelExists(): Promise<void> {
     );
   } catch {
     // Label doesn't exist — create it
-    const { CLAUDE_WORKING_COLOR, CLAUDE_WORKING_DESC } = await import('../lib/issues/types.ts');
     await githubApi(`/repos/${REPO}/labels`, {
       method: 'POST',
       body: {
