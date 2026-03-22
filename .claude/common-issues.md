@@ -143,3 +143,14 @@ The `.githooks/pre-push` hook runs `crux w validate gate`, which re-runs the ful
 ---
 
 _Add new issues below as they're discovered. Group by category._
+
+---
+
+## Entity References
+
+### EntityLink must use E-numbers, not slugs — breaks main CI
+`<EntityLink id="some-slug">` fails at build time if the entity has a numeric wiki ID (E-number). Always use `<EntityLink id="E123">` format. Using slug-based IDs (e.g. `id="anthropic"`) causes build failures that break main CI.
+
+**Pattern**: When creating or improving pages that reference entities, look up the entity's `wikiId` (e.g. `E42`) from `data/entities/*.yaml` and use that. Run `pnpm crux w validate gate --fix` to catch these before committing.
+
+**Observed**: PRs #2960, #2961 both fixed CI breakage from slug-based EntityLink IDs on the same day (2026-03-22). This is a recurring pattern.
