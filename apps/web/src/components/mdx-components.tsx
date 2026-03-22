@@ -76,7 +76,6 @@ import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
-import { FactBaseVerificationsContent } from "@/app/internal/factbase-verifications/factbase-verifications-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
@@ -85,7 +84,6 @@ import { ThingsContent } from "@/app/internal/things/things-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
 import { EntityMatrixContent } from "@/app/internal/entity-matrix/entity-matrix-content";
 import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
-import { VerificationCoverageContent } from "@/app/internal/verification-coverage/verification-coverage-content";
 import { EntityVerificationsContent } from "@/app/internal/entity-verifications/entity-verifications-content";
 
 // Ported stub components — high priority
@@ -243,8 +241,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
-  FactBaseVerificationsContent,
-  KbVerificationsContent: FactBaseVerificationsContent, // backwards compat alias
   GrantsDashboardContent,
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,
@@ -253,7 +249,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   AgentActivityContent,
   EntityMatrixContent,
   EntityProfileContent,
-  VerificationCoverageContent,
   EntityVerificationsContent,
 
   // Table view components
