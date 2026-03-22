@@ -194,6 +194,13 @@ const sessionsApp = new Hono()
 
         if (d.pages.length > 0) {
           const intIdMap = await resolvePageIntIds(tx, d.pages);
+          const droppedSlugs = d.pages.filter((slug) => intIdMap.get(slug) == null);
+          if (droppedSlugs.length > 0) {
+            logger.warn(
+              { droppedSlugs, sessionTitle: d.title },
+              `Dropped ${droppedSlugs.length} unresolvable page slug(s) from session`
+            );
+          }
           const resolved = d.pages
             .map((slug) => ({ sessionId: session.id, pageId: intIdMap.get(slug)! }))
             .filter((v) => v.pageId != null);
@@ -255,6 +262,7 @@ const sessionsApp = new Hono()
           sessionId: number;
           pageId: number;
         }> = [];
+        const batchDroppedSlugs: string[] = [];
         for (let i = 0; i < items.length; i++) {
           const d = items[i];
           const sessionId = upsertedRows[i].id;
@@ -262,8 +270,16 @@ const sessionsApp = new Hono()
             const intId = intIdMap.get(slug);
             if (intId != null) {
               allPageAssociations.push({ sessionId, pageId: intId });
+            } else {
+              batchDroppedSlugs.push(slug);
             }
           }
+        }
+        if (batchDroppedSlugs.length > 0) {
+          logger.warn(
+            { droppedSlugs: batchDroppedSlugs, itemCount: items.length },
+            `Dropped ${batchDroppedSlugs.length} unresolvable page slug(s) from session batch`
+          );
         }
         if (allPageAssociations.length > 0) {
           await tx

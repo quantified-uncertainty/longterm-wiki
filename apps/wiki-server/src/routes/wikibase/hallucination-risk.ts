@@ -391,19 +391,21 @@ const hallucinationRiskApp = new Hono()
     let rows: RiskPageDbRow[];
 
     if (useMatView) {
-      // Use materialized view — simple indexed queries, no DISTINCT ON
+      // Use materialized view — JOIN wiki_pages to convert integer page_id back to text slug
       rows = level
         ? await rawDb<RiskPageDbRow[]>`
-            SELECT page_id, score, level, factors, integrity_issues, computed_at
-            FROM hallucination_risk_latest
-            WHERE level = ${level}
-            ORDER BY score DESC
+            SELECT wp.slug AS page_id, hrl.score, hrl.level, hrl.factors, hrl.integrity_issues, hrl.computed_at
+            FROM hallucination_risk_latest hrl
+            JOIN wiki_pages wp ON wp.id = hrl.page_id
+            WHERE hrl.level = ${level}
+            ORDER BY hrl.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `
         : await rawDb<RiskPageDbRow[]>`
-            SELECT page_id, score, level, factors, integrity_issues, computed_at
-            FROM hallucination_risk_latest
-            ORDER BY score DESC
+            SELECT wp.slug AS page_id, hrl.score, hrl.level, hrl.factors, hrl.integrity_issues, hrl.computed_at
+            FROM hallucination_risk_latest hrl
+            JOIN wiki_pages wp ON wp.id = hrl.page_id
+            ORDER BY hrl.score DESC
             LIMIT ${limit} OFFSET ${offset}
           `;
     } else {

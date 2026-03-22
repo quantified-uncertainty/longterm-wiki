@@ -1,5 +1,10 @@
 -- Phase D3+E: Swap wiki_pages PK from text to integer + rename all _int columns
 --
+-- WARNING: Between running this script and deploying the new code,
+-- the wiki-server will return 500 errors for any requests touching
+-- renamed columns. Minimize this window by deploying immediately after.
+-- Consider putting the server in maintenance mode during migration.
+--
 -- Run this via psql BEFORE deploying the Phase D3+E code changes.
 -- Use: PGOPTIONS="-c statement_timeout=0" psql "$PRODUCTION_DB_URL" -f scripts/phase-d3e-pk-swap.sql
 --
@@ -27,6 +32,16 @@ ALTER TABLE agent_session_pages ADD PRIMARY KEY (agent_session_id, page_id);
 -- ============================================================
 -- 2. Swap wiki_pages PK from text to integer
 -- ============================================================
+
+-- Pre-validate: abort if any wiki_pages rows have NULL integer_id
+DO $$
+DECLARE null_count INTEGER;
+BEGIN
+  SELECT count(*) INTO null_count FROM wiki_pages WHERE integer_id IS NULL;
+  IF null_count > 0 THEN
+    RAISE EXCEPTION 'ABORT: % wiki_pages rows have NULL integer_id — backfill required before PK swap', null_count;
+  END IF;
+END $$;
 
 -- Drop text PK
 ALTER TABLE wiki_pages DROP CONSTRAINT wiki_pages_pkey;
@@ -90,6 +105,9 @@ ALTER TABLE wikibase_page_assessments RENAME COLUMN page_id_int TO page_id;
 
 -- _archived_claim_page_references (archived table)
 ALTER TABLE _archived_claim_page_references RENAME COLUMN page_id_int TO page_id;
+
+-- _archived_statement_page_references (archived table)
+ALTER TABLE _archived_statement_page_references RENAME COLUMN page_id_int TO page_id;
 
 -- ============================================================
 -- 4. Add FK from agent_session_pages.page_id → wiki_pages.id (integer)
