@@ -13,13 +13,15 @@
  *   crux tb verify-records --source=deterministic       # Structural checks only (no LLM)
  */
 
+import { readFileSync, existsSync } from 'fs';
+import { join } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { createLlmClient, MODELS } from '../lib/llm.ts';
 import { submitBatch, pollBatch, getBatchResults, extractBatchResultText } from '../lib/anthropic-batch.ts';
 import type { BatchRequest } from '../lib/anthropic-batch.ts';
-import { buildEntityMatcher } from '../lib/grant-import/entity-matcher.ts';
 import { getTableConfig } from './table-registry.ts';
 import { calculateCost } from '../lib/pricing.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -82,6 +84,34 @@ interface GenericRecord {
 // ---------------------------------------------------------------------------
 
 /**
+ * Build a set of known stableIds from database.json for entity existence checks.
+ * Unlike the entity matcher (which is keyed by name/slug), this indexes by stableId.
+ */
+function buildStableIdSet(): Set<string> {
+  const ids = new Set<string>();
+  const dbPath = join(PROJECT_ROOT, 'apps/web/src/data/database.json');
+  if (!existsSync(dbPath)) return ids;
+
+  try {
+    const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
+    // Index from typedEntities
+    for (const e of (db.typedEntities || []) as Array<{ stableId?: string }>) {
+      if (e.stableId) ids.add(e.stableId);
+    }
+    // Index from idRegistry
+    const registry = db.idRegistry?.stableIdBySlug as Record<string, string> | undefined;
+    if (registry) {
+      for (const stableId of Object.values(registry)) {
+        ids.add(stableId);
+      }
+    }
+  } catch {
+    // Non-critical — existence check will be skipped
+  }
+  return ids;
+}
+
+/**
  * Run structural/deterministic checks on records. No LLM needed.
  */
 export function runDeterministicChecks(
@@ -89,7 +119,7 @@ export function runDeterministicChecks(
   records: GenericRecord[],
 ): VerificationIssue[] {
   const issues: VerificationIssue[] = [];
-  const matcher = buildEntityMatcher();
+  const knownIds = buildStableIdSet();
 
   for (const rec of records) {
     // Missing source URL
@@ -123,15 +153,16 @@ export function runDeterministicChecks(
         });
       }
 
-      // Check if the entity actually exists
-      const match = matcher.match(val);
-      if (!match) {
+      // Check if the entity stableId exists in database.json.
+      // Note: entities created by ensure-entities/create-entity only exist in PG,
+      // not in YAML. If knownIds is empty (no database.json), skip this check.
+      if (knownIds.size > 0 && !knownIds.has(val)) {
         issues.push({
           recordId: rec.id,
           table,
           field,
-          severity: 'warning',
-          message: `Entity "${val}" in field "${field}" not found in entity matcher`,
+          severity: 'info',
+          message: `Entity "${val}" in field "${field}" not in local database.json (may exist in PG only)`,
           source: 'deterministic',
         });
       }

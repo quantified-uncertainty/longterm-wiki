@@ -1,17 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// Mock the entity matcher before importing verify module
-vi.mock('../lib/grant-import/entity-matcher.ts', () => ({
-  buildEntityMatcher: () => ({
-    match: (id: string) => {
-      // Simulate some known entities
-      const known: Record<string, { stableId: string; slug: string; name: string }> = {
-        'VoNqoBJkyg': { stableId: 'VoNqoBJkyg', slug: 'anthropic', name: 'Anthropic' },
-        'X9kLm2pR7w': { stableId: 'X9kLm2pR7w', slug: 'dario-amodei', name: 'Dario Amodei' },
-      };
-      return known[id] || null;
-    },
-  }),
+// Mock the content-types module to provide PROJECT_ROOT
+vi.mock('../lib/content-types.ts', () => ({
+  PROJECT_ROOT: '/nonexistent-test-root',
 }));
 
 import { runDeterministicChecks } from './verify.ts';
@@ -49,14 +40,15 @@ describe('runDeterministicChecks', () => {
     expect(slugIssues.some(i => i.field === 'personId')).toBe(true);
   });
 
-  it('flags unresolvable entity references', () => {
+  it('skips entity existence check when database.json is not available', () => {
+    // With mocked PROJECT_ROOT pointing to nonexistent dir, knownIds is empty
+    // so the entity existence check is skipped entirely
     const records = [
       { id: 'rec-1', personId: 'NONEXISTENT', organizationId: 'VoNqoBJkyg', role: 'CTO', source: 'https://x.com' },
     ];
     const issues = runDeterministicChecks('personnel', records);
-    const entityIssues = issues.filter(i => i.message.includes('not found'));
-    expect(entityIssues.length).toBe(1);
-    expect(entityIssues[0].field).toBe('personId');
+    const entityIssues = issues.filter(i => i.message.includes('not in local'));
+    expect(entityIssues.length).toBe(0); // Skipped because knownIds is empty
   });
 
   it('flags implausible dates', () => {
