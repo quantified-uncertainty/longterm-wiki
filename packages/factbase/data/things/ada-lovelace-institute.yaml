@@ -1,0 +1,38 @@
+entity: BgSnHHzV6g
+facts:
+  - id: f_Dn2rT7xR4a
+    property: founded-date
+    value: "2018"
+    source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
+    notes: "Established in early 2018 by the Nuffield Foundation"
+
+  - id: f_Fq8gK3sW5b
+    property: headquarters
+    value: "London, England"
+    source: https://www.adalovelaceinstitute.org/about/
+    notes: "28 Bedford Square, London WC1B 3JS"
+
+  - id: f_Hw1vL6tN9c
+    property: total-funding
+    value: 6.5e+6
+    asOf: 2018-01
+    source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
+    notes: "Nuffield Foundation committed GBP 5 million (~USD 6.5M at 2018 rates) over five years to establish the institute."
+
+  - id: f_Jy4cJ7mQ3d
+    property: legal-structure
+    value: "Independent research institute"
+    source: https://www.adalovelaceinstitute.org/about/
+    notes: "Established by the Nuffield Foundation in collaboration with the Alan Turing Institute, Royal Society, British Academy, and others"
+
+  - id: f_Lz8dR2wK6e
+    property: website
+    value: "https://www.adalovelaceinstitute.org/"
+    source: https://www.adalovelaceinstitute.org/
+    notes: "Official website"
+
+  - id: f_Nw5aH9vB1f
+    property: description
+    value: "UK-based independent research institute ensuring data and AI work for people and society. Conducts research on AI ethics, rights, and governance through a multidisciplinary team of legal, policy, social science, and technology experts. Established by the Nuffield Foundation with partners including the Alan Turing Institute and Royal Society."
+    asOf: 2026-03
+    source: https://www.adalovelaceinstitute.org/about/

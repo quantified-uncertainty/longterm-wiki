@@ -1,0 +1,45 @@
+entity: 5RV1WNLBCg
+facts:
+  - id: f_Am3nT8xR5a
+    property: founded-date
+    value: "1910-11-25"
+    source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
+    notes: "Established November 25, 1910 by Andrew Carnegie with a $10 million gift"
+
+  - id: f_Cp7gK2sW4b
+    property: headquarters
+    value: "Washington, DC"
+    source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
+    notes: "Moved from New York to Washington, DC in 1970; additional offices in Beirut, Berlin, Brussels, and New Delhi"
+
+  - id: f_Eq1vL5tN8c
+    property: headcount
+    value: 170
+    asOf: 2025-06
+    source: https://carnegieendowment.org/about
+    notes: "Approximately 170 experts across global offices"
+
+  - id: f_Gw3cJ6mQ2d
+    property: revenue
+    value: 5.76e+7
+    asOf: 2025-06
+    source: https://projects.propublica.org/nonprofits/organizations/130552040
+    notes: "Revenue from FY2025 IRS Form 990 filing (~$57.6M). Previous year FY2023 was ~$59.9M."
+
+  - id: f_Iy7dR9wK6e
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
+    notes: "Private, nonprofit think tank"
+
+  - id: f_Kz5aH1vB3f
+    property: website
+    value: "https://carnegieendowment.org/"
+    source: https://carnegieendowment.org/
+    notes: "Official website"
+
+  - id: f_Mn4bP8tR7g
+    property: description
+    value: "Global think tank with the Technology and International Affairs Program studying AI, cybersecurity, biotechnology, and the information environment. Carnegie's AI work focuses on international AI governance, science-based policy, and anticipating both short-term (2-5 year) and medium-term (5-10 year) AI security challenges."
+    asOf: 2026-03
+    source: https://carnegieendowment.org/programs/technology-and-international-affairs/artificial-intelligence
