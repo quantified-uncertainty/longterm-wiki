@@ -48,9 +48,11 @@ CREATE TABLE IF NOT EXISTS verification_verdicts (
   next_check_due TIMESTAMPTZ,            -- for auto-recheck scheduling
   last_computed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (record_type, record_id, COALESCE(field_name, ''))
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Expression-based unique constraint (PG doesn't support COALESCE in PRIMARY KEY)
+CREATE UNIQUE INDEX IF NOT EXISTS idx_vv_pk ON verification_verdicts (record_type, record_id, COALESCE(field_name, ''));
 
 CREATE INDEX IF NOT EXISTS idx_vv_verdict ON verification_verdicts (verdict);
 CREATE INDEX IF NOT EXISTS idx_vv_recheck ON verification_verdicts (needs_recheck);
