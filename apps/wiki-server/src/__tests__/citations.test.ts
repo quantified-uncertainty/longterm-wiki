@@ -129,7 +129,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_quotes: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_quotes") && q.includes("do update")) {
-    // Phase D3+E: Params: page_id (integer), footnote, url, ...
+    // Params: page_id (integer), footnote, url, ...
     const COLS = 14;
     const numRows = params.length / COLS;
     const rows: QuoteRow[] = [];
@@ -193,7 +193,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: UPDATE ... accuracy_verdict ---
-  // Phase D3+E: WHERE now uses page_id (params[5]) instead of page_id (text).
   if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("accuracy_verdict")) {
     const verdict = params[0] as string | null;
     const score = params[1] as number | null;
@@ -217,7 +216,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: UPDATE ... quote_verified ---
-  // Phase D3+E: WHERE now uses page_id (params[3]) instead of page_id (text).
   if (q.startsWith("update") && q.includes("citation_quotes") && q.includes("quote_verified")) {
     const quoteVerified = params[0] as boolean;
     const method = params[1] as string | null;
@@ -244,7 +242,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .filter((r) => r.quoteVerified === true && r.verificationScore != null && (r.verificationScore as number) < threshold)
       .sort((a, b) => (a.verificationScore as number) - (b.verificationScore as number))
       .map((r) => ({
-        // Phase D3+E: slug derived from page_id via LEFT JOIN wiki_pages
+        // slug derived from page_id via LEFT JOIN wiki_pages
         slug: slugFromIntId(r.pageId as number) ?? `page-${r.pageId}`, footnote: r.footnote, url: r.url,
         claim_text: r.claimText, verification_score: r.verificationScore,
       }));
@@ -262,7 +260,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: SELECT * ... WHERE page_id ORDER BY footnote [LIMIT] ---
-  // Phase D3+E: params[0] is intId (number), params[1] is limit (if present).
   if (q.includes("citation_quotes") && q.includes("where") && q.includes("order by") && !q.includes("group by")) {
     const intId = params[0] as number;
     const limit = (params[1] as number) || 1000;
@@ -274,7 +271,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY, no LIMIT) ---
-  // Phase D3+E: health endpoint queries by page_id (integer), params[0] is intId.
   if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by") && !q.includes("limit")) {
     if (params.length === 1) {
       const intId = params[0] as number;
@@ -287,7 +283,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: SELECT WHERE LIMIT (no ORDER BY) — GET /quotes/:pageId/:footnote ---
-  // Phase D3+E: params[0]=intId, params[1]=footnote. LIMIT 1 is always used; params[2] is not read.
+  // params[0]=intId, params[1]=footnote
   if (q.includes("citation_quotes") && q.includes("where") && q.includes("limit") && !q.includes("order by") && !q.includes("count(*)") && !q.includes("group by")) {
     const intId = params[0] as number;
     const footnote = params[1] as number;
@@ -301,7 +297,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("citation_quotes") && q.includes("order by") && q.includes("limit") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by")) {
     const limit = (params[0] as number) || 100;
     const offset = (params[1] as number) || 0;
-    // Phase D3+E: order by page_id (integer)
     const all = Array.from(quotesStore.values()).sort((a, b) => {
       const pc = (a.pageId as number) - (b.pageId as number);
       return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
@@ -334,7 +329,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const verified = all.filter((r) => r.quoteVerified === true).length;
     const scores = all.filter((r) => r.verificationScore != null).map((r) => r.verificationScore as number);
     const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-    // Phase D3+E: count(distinct page_id)
     const pages = new Set(all.map((r) => r.pageId));
     return [{
       count: all.length,
@@ -352,7 +346,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Accuracy-snapshot aggregation (GROUP BY + HAVING + not_verifiable) ---
-  // Phase D3+E: accuracy-snapshot selects page_id + slug (via LEFT JOIN wiki_pages), plus detailed counts
+  // Accuracy-snapshot aggregation: selects page_id + slug (via LEFT JOIN wiki_pages), plus detailed counts
   if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having") && q.includes("not_verifiable")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
@@ -380,7 +374,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Accuracy summary (GROUP BY + HAVING, no not_verifiable) ---
-  // Phase D3+E: groupBy wikiPages.slug with LEFT JOIN wiki_pages
+  // Accuracy summary: groupBy wikiPages.slug with LEFT JOIN wiki_pages
   if (q.includes("citation_quotes") && q.includes("group by") && q.includes("having")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
@@ -430,7 +424,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Accuracy-dashboard full select (LEFT JOIN wiki_pages, ORDER BY, no GROUP BY, no WHERE) ---
-  // Phase D3+E: accuracy-dashboard does explicit select with pageIdSlug: wikiPages.slug via LEFT JOIN
+  // Accuracy-dashboard: explicit select with pageIdSlug via LEFT JOIN wiki_pages
   if (q.includes("citation_quotes") && q.includes("wiki_pages") && q.includes("order by") && !q.includes("group by") && !q.includes("where") && !q.includes("count")) {
     return Array.from(quotesStore.values())
       .sort((a, b) => {
@@ -457,7 +451,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_quotes: Page stats (GROUP BY without HAVING) ---
-  // Phase D3+E: groupBy wikiPages.slug with LEFT JOIN wiki_pages
+  // Page stats: groupBy wikiPages.slug with LEFT JOIN wiki_pages
   if (q.includes("citation_quotes") && q.includes("group by") && !q.includes("having")) {
     const byPage = new Map<string, QuoteRow[]>();
     for (const r of quotesStore.values()) {
@@ -482,7 +476,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- citation_accuracy_snapshots: INSERT (supports multi-row) ---
   if (q.includes("insert into") && q.includes("citation_accuracy_snapshots")) {
-    // Phase D3+E: params: page_id (integer), total_citations, ...
+    // Params: page_id (integer), total_citations, ...
     const COLS = 9;
     const numRows = params.length / COLS;
     const rows: SnapshotRow[] = [];
@@ -575,7 +569,6 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- citation_accuracy_snapshots: SELECT with WHERE ---
-  // Phase D3+E: params[0] is intId (number), params[1] is limit (if present).
   if (q.includes("citation_accuracy_snapshots") && q.includes("where") && !q.includes("group by")) {
     const intId = params[0] as number;
     const limit = (params[1] as number) || 1000;

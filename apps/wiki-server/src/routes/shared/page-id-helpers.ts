@@ -1,8 +1,6 @@
 /**
- * Shared helpers for the wiki_pages integer PK migration (Phase 4a, #1498).
- *
- * Provides functions to resolve page slugs to integer IDs for dual-write
- * and to auto-allocate entity IDs for new pages during sync.
+ * Shared helpers for resolving page slugs to integer IDs
+ * and auto-allocating entity IDs for new pages during sync.
  */
 
 import { eq, inArray, sql } from "drizzle-orm";

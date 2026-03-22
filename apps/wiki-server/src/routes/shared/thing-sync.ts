@@ -1,5 +1,5 @@
 /**
- * Shared dual-write helper for upserting things from domain sync handlers.
+ * Shared helper for upserting things from domain sync handlers.
  *
  * Domain routes call `upsertThingsInTx(tx, items)` inside their existing
  * transaction to keep the things table in sync without duplicating upsert logic.
@@ -138,7 +138,7 @@ export interface ThingSyncInput {
  * Upsert things rows inside an existing transaction.
  * Uses ON CONFLICT (source_table, source_id) DO UPDATE to keep things in sync.
  * Skips parentThingId in the UPDATE set — it's backfilled by migration 0087
- * and rarely changes, keeping dual-write lean.
+ * and rarely changes, keeping the upsert lean.
  */
 export async function upsertThingsInTx(
   tx: DbOrTx,

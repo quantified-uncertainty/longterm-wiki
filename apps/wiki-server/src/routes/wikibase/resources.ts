@@ -284,7 +284,7 @@ async function upsertResource(
 
   // Upsert citations (cited_by)
   if (d.citedBy && d.citedBy.length > 0) {
-    // Phase D2a: resolve slugs to integer IDs before touching existing rows
+    // Resolve slugs to integer IDs before touching existing rows
     const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     const unresolvedPageIds = d.citedBy.filter((pageId) => !citedByIntIdMap.has(pageId));
     if (unresolvedPageIds.length > 0) {
@@ -447,7 +447,7 @@ const resourcesApp = new Hono()
     let results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
-        // Phase 4a: pre-resolve all citedBy page IDs in one batch query
+        // Pre-resolve all citedBy page IDs in one batch query
         const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];
         const intIdMap = allCitedByIds.length > 0
           ? await resolvePageIntIds(tx, allCitedByIds)
@@ -708,7 +708,7 @@ const resourcesApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json({ resources: [] });
 
@@ -846,7 +846,7 @@ const resourcesApp = new Hono()
   .get("/citations/all", async (c) => {
     const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
-    // Phase D2a: JOIN wiki_pages to recover slug from page_id
+    // JOIN wiki_pages to recover slug from integer page ID
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
@@ -967,7 +967,7 @@ const resourcesApp = new Hono()
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
-      // Phase D2a: JOIN wiki_pages to recover slug from page_id
+      // JOIN wiki_pages to recover slug from integer page ID
       db.select({ pageId: wikiPages.slug })
         .from(resourceCitations)
         .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
@@ -1315,7 +1315,7 @@ const resourcesApp = new Hono()
     }
 
     // Also fetch citations and sub-table data
-    // Phase D2a: JOIN wiki_pages to recover slug from page_id
+    // JOIN wiki_pages to recover slug from integer page ID
     const [citations, paperRows, forumRows, policyRows] = await Promise.all([
       db.select({ pageId: wikiPages.slug })
         .from(resourceCitations)

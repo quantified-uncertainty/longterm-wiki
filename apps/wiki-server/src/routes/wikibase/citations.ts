@@ -80,7 +80,6 @@ const CleanupQuery = z.object({
 /** Build the values object for a citation quote upsert. */
 function quoteValues(d: UpsertQuoteData, pageIdInt: number) {
   return {
-    // Phase D2a: no longer writing page_id_old; integer only
     pageId: pageIdInt,
     footnote: d.footnote,
     url: d.url ?? null,
@@ -109,7 +108,6 @@ function upsertQuote(
     .insert(citationQuotes)
     .values(vals)
     .onConflictDoUpdate({
-      // Phase D2a: ON CONFLICT on integer column (requires citation_quotes_page_id_footnote_unique index)
       target: [citationQuotes.pageId, citationQuotes.footnote],
       set: { ...vals, updatedAt: sql`now()` },
     })
@@ -188,7 +186,7 @@ const citationsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json(computePageHealth(pageId, []));
 
@@ -226,7 +224,7 @@ const citationsApp = new Hono()
       }
     }
 
-    // Phase D2a: resolve page slug to integer ID (integer-only write)
+    // Resolve page slug to integer ID
     const singlePageIdInt = await resolvePageIntId(db, parsed.pageId);
     if (singlePageIdInt === null) {
       return validationError(c, `Could not resolve integer ID for page: ${parsed.pageId}`);
@@ -276,7 +274,7 @@ const citationsApp = new Hono()
     let results;
     try {
       results = await db.transaction(async (tx) => {
-        // Phase D2a: resolve page slugs to integer IDs (integer-only write, inside tx for consistency)
+        // Resolve page slugs to integer IDs inside tx for consistency
         const batchIntIdMap = await resolvePageIntIds(tx, pageIds);
         return await tx
           .insert(citationQuotes)
@@ -630,7 +628,7 @@ const citationsApp = new Hono()
     const db = getDrizzleDb();
 
     // Compute per-page accuracy stats from current citation_quotes data
-    // Phase D2a: group by pageIdInt and LEFT JOIN wiki_pages to get slug
+    // Group by pageId and LEFT JOIN wiki_pages to get slug
     const pageStats = await db.select({
       pageId: citationQuotes.pageId,
       pageSlug: wikiPages.slug,

@@ -167,7 +167,6 @@ const linksApp = new Hono()
       }
 
       // Batch upsert — on conflict (source, target, type) update weight + relationship
-      // Phase D2a: write only integer columns (source_id_old / target_id_old dropped)
       for (let i = 0; i < links.length; i += 500) {
         const batch = links.slice(i, i + 500);
 
@@ -201,7 +200,7 @@ const linksApp = new Hono()
     const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
-    // Phase 4b: resolve slug to integer and query by target_id
+    // Resolve slug to integer ID
     const db = getDrizzleDb();
     const targetIntId = await resolvePageIntId(db, targetId);
     if (targetIntId === null) {
@@ -256,7 +255,7 @@ const linksApp = new Hono()
     const { limit } = c.req.valid("query");
     const rawDb = getDb();
 
-    // Phase 4b: resolve slug to integer and query by source_id / target_id
+    // Resolve slug to integer ID
     const db = getDrizzleDb();
     const entityIntId = await resolvePageIntId(db, entityId);
     if (entityIntId === null) {
@@ -404,7 +403,7 @@ const linksApp = new Hono()
     const rawDb = getDb();
     const MAX_GRAPH_EDGES = 500;
 
-    // Phase 4b: resolve slug to integer and query by source_id / target_id
+    // Resolve slug to integer ID
     const graphDb = getDrizzleDb();
     const graphEntityIntId = await resolvePageIntId(graphDb, entityId);
     if (graphEntityIntId === null) {

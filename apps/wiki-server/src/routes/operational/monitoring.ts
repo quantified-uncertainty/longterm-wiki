@@ -527,7 +527,7 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_facts,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_summaries,
-      -- Phase D2a: page_id is now the authoritative column. Flag rows where it's NULL or orphaned.
+      -- Flag citation rows where page_id is NULL or orphaned.
       (SELECT count(*)
          FROM citation_quotes cq
         WHERE cq.page_id IS NULL

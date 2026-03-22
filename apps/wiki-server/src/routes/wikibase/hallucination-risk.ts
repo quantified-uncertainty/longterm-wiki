@@ -201,7 +201,7 @@ const hallucinationRiskApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
+    // Resolve slug to integer ID
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
@@ -221,7 +221,6 @@ const hallucinationRiskApp = new Hono()
       });
 
     const row = firstOrThrow(rows, "hallucination risk snapshot insert");
-    // pageId derived from input (page_id_old column no longer written)
     return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
@@ -237,7 +236,7 @@ const hallucinationRiskApp = new Hono()
     const { snapshots } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase D2a: resolve slugs to integer IDs (no longer dual-writing page_id_old)
+    // Resolve slugs to integer IDs
     const pageIds = [...new Set(snapshots.map((d) => d.pageId))];
     const intIdMap = await resolvePageIntIds(db, pageIds);
 
@@ -283,7 +282,7 @@ const hallucinationRiskApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, page_id);
     if (intId === null) return c.json({ pageId: page_id, snapshots: [] });
 

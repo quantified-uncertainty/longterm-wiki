@@ -77,7 +77,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- entities: tsvector search (search_vector @@ to_tsquery) ---
-  // Phase D3+E: search now uses buildTsvectorSearchCondition first.
+  // Search uses buildTsvectorSearchCondition first.
   // The SQL contains "search_vector", "to_tsquery", and "@@".
   // MUST come before ILIKE since ILIKE is the fallback when tsquery can't be built.
   if (q.includes('"entities"') && q.includes("search_vector") && q.includes("to_tsquery")) {

@@ -149,7 +149,7 @@ function createMockSql() {
 
     // ---- INSERT INTO edit_logs (supports multi-row) ----
     if (q.includes("insert into") && q.includes("edit_logs")) {
-      // Phase D3+E: Drizzle sends positional params: page_id, date, tool, agency, requested_by, note per row
+      // Drizzle sends positional params: page_id, date, tool, agency, requested_by, note per row
       const COLS = 6;
       const numRows = params.length / COLS;
       const rows: EditLogRow[] = [];
@@ -180,7 +180,6 @@ function createMockSql() {
     // inside `count(distinct "edit_logs"."page_id")` as "page_id".
     if (q.includes("count(distinct") && q.includes("page_id") && q.includes("edit_logs")) {
       const uniquePages = new Set(editStore.map((e) => e.pageId).filter((v) => v !== null));
-      // Phase D3+E: count(distinct page_id) — extractColumns finds "page_id"
       return [{ page_id: uniquePages.size }];
     }
 
@@ -213,7 +212,6 @@ function createMockSql() {
           grouped[e.pageSlug] = e.date;
         }
       }
-      // Phase D3+E: route returns { page_id, latest_date } via JOIN wiki_pages
       return Object.entries(grouped).map(([page_id, date]) => ({ page_id, latest_date: date }));
     }
 
@@ -226,7 +224,6 @@ function createMockSql() {
           grouped[e.pageSlug] = e.date;
         }
       }
-      // Phase D3+E: route returns { page_id, earliest_date } via JOIN wiki_pages
       return Object.entries(grouped).map(([page_id, date]) => ({ page_id, earliest_date: date }));
     }
 
@@ -242,7 +239,6 @@ function createMockSql() {
     }
 
     // ---- SELECT ... WHERE page_id = $1 ORDER BY date, id ----
-    // Phase D3+E: reads use page_id integer column
     // Exclude queries with LIMIT (those are the paginated /all endpoint)
     if (q.includes("edit_logs") && q.includes("where") && q.includes("page_id") && !q.includes("limit")) {
       const intId = params[0] as number;
