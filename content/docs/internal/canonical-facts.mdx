@@ -207,7 +207,11 @@ born:    !date 2023-06-15  # ✓ { type: "date", value: "2023-06-15" }
 
 1. Add the entry to the appropriate `packages/kb/data/things/<entity>.yaml` file
 2. Run `pnpm build` to rebuild
-3. Reference in MDX with `<FBF entity="entity" property="property" />`
+3. Reference in MDX:
+
+```mdx
+<FBF entity="entity" property="property" />
+```
 
 ## Updating Facts
 

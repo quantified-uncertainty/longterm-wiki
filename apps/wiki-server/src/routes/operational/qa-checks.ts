@@ -55,6 +55,13 @@ const ENTITY_TYPE_TO_DIRECTORY: Record<string, string> = {
   "research-area": "research-areas",
 };
 
+function sqlInList(values: string[]) {
+  return sql.join(
+    values.map((v) => sql`${v}`),
+    sql`, `,
+  );
+}
+
 const qaChecksApp = new Hono()
   // ---- POST / (record a single check) ----
   .post("/", async (c) => {
@@ -210,7 +217,7 @@ const qaChecksApp = new Hono()
           MAX(checked_at)::text AS last_checked,
           COUNT(*)::int AS check_count
         FROM qa_page_checks
-        WHERE page_url = ANY(${indexUrls})
+        WHERE page_url IN (${sqlInList(indexUrls)})
         GROUP BY page_url
       `)) as Array<{
         page_url: string;
@@ -261,7 +268,7 @@ const qaChecksApp = new Hono()
       SELECT entity_type, COUNT(*)::int AS total
       FROM things
       WHERE thing_type = 'entity'
-        AND entity_type = ANY(${entityTypes})
+        AND entity_type IN (${sqlInList(entityTypes)})
       GROUP BY entity_type
     `)) as Array<{ entity_type: string; total: number }>;
 
