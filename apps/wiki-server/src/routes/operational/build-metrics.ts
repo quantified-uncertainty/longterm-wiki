@@ -168,7 +168,7 @@ const buildMetricsApp = new Hono()
             updated_at = now()
         FROM jsonb_to_recordset(${json}::jsonb)
           AS v("intId" int, passing int, total int, items text)
-        WHERE wp.integer_id = v."intId"
+        WHERE wp.id = v."intId"
       `,
       "Coverage metrics",
     );
@@ -205,7 +205,7 @@ const buildMetricsApp = new Hono()
             updated_at = now()
         FROM jsonb_to_recordset(${json}::jsonb)
           AS v("intId" int, "updateFrequency" int, "daysSinceUpdate" int, "daysUntilDue" int, staleness real, priority real)
-        WHERE wp.integer_id = v."intId"
+        WHERE wp.id = v."intId"
       `,
       "Schedule metrics",
     );
@@ -238,7 +238,7 @@ const buildMetricsApp = new Hono()
             updated_at = now()
         FROM jsonb_to_recordset(${json}::jsonb)
           AS v("intId" int, "readerRank" int, "researchRank" int, "recommendedScore" real)
-        WHERE wp.integer_id = v."intId"
+        WHERE wp.id = v."intId"
       `,
       "Rankings",
     );
@@ -281,8 +281,8 @@ const buildMetricsApp = new Hono()
             (p) => intIdMap.has(p.pageId) && intIdMap.has(p.similarPageId)
           )
           .map((p) => ({
-            pageIdInt: intIdMap.get(p.pageId)!,
-            similarPageIdInt: intIdMap.get(p.similarPageId)!,
+            pageId: intIdMap.get(p.pageId)!,
+            similarPageId: intIdMap.get(p.similarPageId)!,
             similarity: p.similarity,
             rank: p.rank,
           }));
@@ -290,12 +290,12 @@ const buildMetricsApp = new Hono()
         if (values.length === 0) continue;
 
         await tx`
-          INSERT INTO wikibase_page_similarity (page_id_int, similar_page_id_int, similarity, rank, synced_at)
-          SELECT v."pageIdInt", v."similarPageIdInt", v.similarity, v.rank, now()
+          INSERT INTO wikibase_page_similarity (page_id, similar_page_id, similarity, rank, synced_at)
+          SELECT v."pageId", v."similarPageId", v.similarity, v.rank, now()
           FROM jsonb_to_recordset(${JSON.stringify(values)}::jsonb)
-            AS v("pageIdInt" int, "similarPageIdInt" int, similarity int, rank int)
-          ON CONFLICT (page_id_int, rank)
-          DO UPDATE SET similar_page_id_int = EXCLUDED.similar_page_id_int,
+            AS v("pageId" int, "similarPageId" int, similarity int, rank int)
+          ON CONFLICT (page_id, rank)
+          DO UPDATE SET similar_page_id = EXCLUDED.similar_page_id,
                         similarity = EXCLUDED.similarity,
                         synced_at = now()
         `;
@@ -342,7 +342,7 @@ const buildMetricsApp = new Hono()
     >`
       SELECT
         COUNT(*)::int AS total_pairs,
-        COUNT(DISTINCT page_id_int)::int AS unique_pages,
+        COUNT(DISTINCT page_id)::int AS unique_pages,
         COALESCE(ROUND(AVG(similarity)::numeric, 1), 0) AS avg_similarity
       FROM wikibase_page_similarity
     `;

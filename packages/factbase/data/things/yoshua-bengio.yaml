@@ -2,7 +2,7 @@ entity: nGFBXZeM3d
 facts:
   - id: f_ymkhC4xtr2
     property: employed-by
-    value: "Mila - Quebec AI Institute"
+    value: !ref alE9l9RI99
     asOf: 2017-01
     source: https://mila.quebec/en/person/bengio-yoshua
     notes: "Scientific Director of Mila (formerly Montreal Institute for Learning Algorithms); professor at Universit\u00E9 de Montr\u00E9al"

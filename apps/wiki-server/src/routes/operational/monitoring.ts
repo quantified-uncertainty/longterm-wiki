@@ -527,22 +527,22 @@ async function fetchIntegritySummary(rawDb: ReturnType<typeof getDb>) {
     SELECT
       (SELECT count(*) FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_facts,
       (SELECT count(*) FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL))::int AS dangling_summaries,
-      -- Phase D2a: page_id_int is now the authoritative column. Flag rows where it's NULL or orphaned.
+      -- Phase D2a: page_id is now the authoritative column. Flag rows where it's NULL or orphaned.
       (SELECT count(*)
          FROM citation_quotes cq
-        WHERE cq.page_id_int IS NULL
+        WHERE cq.page_id IS NULL
            OR NOT EXISTS (
              SELECT 1
                FROM wiki_pages wp
-              WHERE wp.integer_id = cq.page_id_int
+              WHERE wp.id = cq.page_id
            ))::int AS dangling_citations,
       (SELECT count(*)
          FROM edit_logs el
-        WHERE el.page_id_int IS NULL
+        WHERE el.page_id IS NULL
            OR NOT EXISTS (
              SELECT 1
                FROM wiki_pages wp
-              WHERE wp.integer_id = el.page_id_int
+              WHERE wp.id = el.page_id
            ))::int AS dangling_edit_logs
   `;
 

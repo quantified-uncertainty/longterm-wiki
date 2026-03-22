@@ -9,7 +9,7 @@ const slugIntIdMap = new Map<string, number>();
 
 // wiki_pages rows (simplified for testing)
 interface WikiPageRow {
-  integer_id: number;
+  id: number;
   coverage_passing: number | null;
   coverage_total: number | null;
   coverage_items: string | null;
@@ -28,8 +28,8 @@ let wikiPagesStore: Map<number, WikiPageRow>;
 // similarity rows
 interface SimilarityRow {
   id: number;
-  page_id_int: number;
-  similar_page_id_int: number;
+  page_id: number;
+  similar_page_id: number;
   similarity: number;
   rank: number;
 }
@@ -115,24 +115,24 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("insert into wikibase_page_similarity") && q.includes("jsonb_to_recordset")) {
     const jsonStr = typeof params[0] === "string" ? params[0] : JSON.stringify(params[0]);
     const values = JSON.parse(jsonStr) as Array<{
-      pageIdInt: number;
-      similarPageIdInt: number;
+      pageId: number;
+      similarPageId: number;
       similarity: number;
       rank: number;
     }>;
 
     for (const v of values) {
       const existing = similarityStore.find(
-        (r) => r.page_id_int === v.pageIdInt && r.rank === v.rank
+        (r) => r.page_id === v.pageId && r.rank === v.rank
       );
       if (existing) {
-        existing.similar_page_id_int = v.similarPageIdInt;
+        existing.similar_page_id = v.similarPageId;
         existing.similarity = v.similarity;
       } else {
         similarityStore.push({
           id: nextSimilarityId++,
-          page_id_int: v.pageIdInt,
-          similar_page_id_int: v.similarPageIdInt,
+          page_id: v.pageId,
+          similar_page_id: v.similarPageId,
           similarity: v.similarity,
           rank: v.rank,
         });
@@ -166,7 +166,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   if (q.includes("wikibase_page_similarity") && q.includes("count")) {
-    const uniquePages = new Set(similarityStore.map((r) => r.page_id_int));
+    const uniquePages = new Set(similarityStore.map((r) => r.page_id));
     return [{
       total_pairs: similarityStore.length,
       unique_pages: uniquePages.size,
@@ -194,7 +194,7 @@ beforeEach(async () => {
   for (const slug of ["page-alpha", "page-beta", "page-gamma"]) {
     const intId = getIntIdForSlug(slug);
     wikiPagesStore.set(intId, {
-      integer_id: intId,
+      id: intId,
       coverage_passing: null,
       coverage_total: null,
       coverage_items: null,

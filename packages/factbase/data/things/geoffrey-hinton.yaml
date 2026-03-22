@@ -63,7 +63,7 @@ facts:
 
   - id: f_fQhNdXYo9w
     property: employed-by
-    value: "University of Toronto"
+    value: !ref G4vgO5B8oA
     asOf: "1987"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
     notes: "Joined University of Toronto in 1987; held joint position with Google from 2013"

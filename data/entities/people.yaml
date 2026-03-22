@@ -2813,3 +2813,133 @@
       url: https://forum.effectivealtruism.org/users/misha_yagudin
   lastUpdated: 2026-03
 
+- id: tom-brown
+  stableId: 4CY8YJCrM7
+  type: person
+  title: Tom Brown
+  description: >-
+    Co-founder of Anthropic. Previously at OpenAI where he was lead author on the GPT-3
+    paper. Researcher focused on large language models.
+  customFields:
+    - label: Role
+      value: Co-founder, Anthropic
+  tags:
+    - ai
+
+- id: sid-black
+  stableId: kLIpOZtU1n
+  type: person
+  title: Sid Black
+  description: >-
+    Co-founder of Conjecture, an AI safety company. Previously contributed to EleutherAI,
+    an open-source AI research collective.
+  customFields:
+    - label: Role
+      value: Co-founder, Conjecture
+  tags:
+    - ai
+
+- id: gabriel-alfour
+  stableId: n0d7I3OAej
+  type: person
+  title: Gabriel Alfour
+  description: >-
+    Co-founder of Conjecture, an AI safety company focused on alignment research.
+  customFields:
+    - label: Role
+      value: Co-founder, Conjecture
+  tags:
+    - ai
+
+- id: wojciech-zaremba
+  stableId: bkQV-vwEmE
+  type: person
+  title: Wojciech Zaremba
+  description: >-
+    Co-founder of OpenAI. Research scientist focused on robotics and machine learning.
+    Leads OpenAI's robotics research efforts.
+  customFields:
+    - label: Role
+      value: Co-founder, OpenAI
+  tags:
+    - ai
+
+- id: john-schulman
+  stableId: ZocUS6ej6S
+  type: person
+  title: John Schulman
+  description: >-
+    Co-founder of OpenAI. Researcher known for foundational work on reinforcement learning,
+    including Proximal Policy Optimization (PPO) and TRPO. Joined Anthropic in 2024.
+  customFields:
+    - label: Role
+      value: Co-founder, OpenAI
+  tags:
+    - ai
+
+- id: nikolai-eroshenko
+  stableId: CBNE3Hszkr
+  type: person
+  title: Nikolai Eroshenko
+  description: >-
+    Co-founder of Red Queen Bio, a biosecurity company working on AI-powered biological
+    threat detection and defense.
+  customFields:
+    - label: Role
+      value: Co-founder, Red Queen Bio
+  tags:
+    - biosecurity
+
+- id: hannu-rajaniemi
+  stableId: 9VlZhCkPBE
+  type: person
+  title: Hannu Rajaniemi
+  description: >-
+    Co-founder of Red Queen Bio. Science fiction author and entrepreneur with a PhD in
+    mathematical physics from the University of Edinburgh. Previously co-founded HelixNano.
+  customFields:
+    - label: Role
+      value: Co-founder, Red Queen Bio
+  tags:
+    - biosecurity
+
+- id: nate-thomas
+  stableId: R8tDuupBTt
+  type: person
+  title: Nate Thomas
+  description: >-
+    Co-founder of Redwood Research, a nonprofit AI safety research lab focused on
+    alignment and interpretability.
+  customFields:
+    - label: Role
+      value: Co-founder, Redwood Research
+  tags:
+    - ai
+
+- id: daniel-gross
+  stableId: "-kU8m3AFTq"
+  type: person
+  title: Daniel Gross
+  description: >-
+    Co-founder of Safe Superintelligence Inc (SSI) alongside Ilya Sutskever. Previously
+    led AI initiatives at Apple and co-founded Pioneer, a startup accelerator.
+    Investor in numerous AI companies.
+  customFields:
+    - label: Role
+      value: Co-founder, SSI
+  tags:
+    - ai
+
+- id: daniel-levy
+  stableId: vIgoE1BeAk
+  type: person
+  title: Daniel Levy
+  description: >-
+    Co-founder of Safe Superintelligence Inc (SSI) alongside Ilya Sutskever and Daniel Gross.
+    Previously a researcher at OpenAI.
+  customFields:
+    - label: Role
+      value: Co-founder, SSI
+  tags:
+    - ai
+

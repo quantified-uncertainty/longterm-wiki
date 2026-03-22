@@ -2,7 +2,7 @@ entity: IQvWHA3OiF
 facts:
   - id: f_1dHuIat2Xt
     property: employed-by
-    value: "University of Oxford"
+    value: !ref 18K3KG3bpg
     asOf: 2005-01
     source: https://nickbostrom.com/
     notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI closed in April 2024"

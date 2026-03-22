@@ -2,7 +2,7 @@ entity: ZxUirlzHke
 facts:
   - id: f_xSvwobPnd7
     property: employed-by
-    value: "UC Berkeley"
+    value: !ref ksqqi7fyeA
     asOf: 1986-01
     source: https://people.eecs.berkeley.edu/~russell/
     notes: "Professor of Computer Science at UC Berkeley since 1986; founder of Center for Human-Compatible AI (CHAI)"

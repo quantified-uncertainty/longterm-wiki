@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { eq, desc, and, lt, count, sql, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { agentSessions, agentSessionPages } from "../../schema.js";
+import { agentSessions, agentSessionPages, wikiPages } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -16,7 +16,7 @@ import {
   DateStringSchema,
 } from "../../api-types.js";
 import { z } from "zod";
-import { resolvePageIntIds } from "../shared/page-id-helpers.js";
+import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 
 // ---- Parsers ----
 
@@ -214,11 +214,12 @@ const agentSessionsApp = new Hono()
         if (pages.length > 0) {
           const uniquePages = [...new Set(pages)];
           const intIdMap = await resolvePageIntIds(tx, uniquePages);
-          await tx.insert(agentSessionPages).values(
-            uniquePages.map((pageId) => ({
-              agentSessionId: id, pageId, pageIdInt: intIdMap.get(pageId) ?? null,
-            }))
-          );
+          const resolved = uniquePages
+            .map((slug) => ({ agentSessionId: id, pageId: intIdMap.get(slug)! }))
+            .filter((v) => v.pageId != null);
+          if (resolved.length > 0) {
+            await tx.insert(agentSessionPages).values(resolved);
+          }
         }
       }
       return rows[0];
@@ -252,12 +253,16 @@ const agentSessionsApp = new Hono()
     const [rows, pageRows] = await Promise.all([
       db.select().from(agentSessions).where(inArray(agentSessions.id, sessionIds))
         .orderBy(desc(agentSessions.date), desc(agentSessions.id)),
-      db.select().from(agentSessionPages).where(inArray(agentSessionPages.agentSessionId, sessionIds)),
+      db.select({ agentSessionId: agentSessionPages.agentSessionId, pageSlug: wikiPages.slug })
+        .from(agentSessionPages)
+        .leftJoin(wikiPages, eq(wikiPages.id, agentSessionPages.pageId))
+        .where(inArray(agentSessionPages.agentSessionId, sessionIds)),
     ]);
     const pageMap = new Map<number, string[]>();
     for (const row of pageRows) {
+      if (!row.pageSlug) continue;
       const existing = pageMap.get(row.agentSessionId) || [];
-      existing.push(row.pageId);
+      existing.push(row.pageSlug);
       pageMap.set(row.agentSessionId, existing);
     }
     return c.json({ sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])) });
@@ -266,19 +271,25 @@ const agentSessionsApp = new Hono()
     const pageId = c.req.query("page_id");
     if (!pageId) return validationError(c, "page_id query parameter is required");
     const db = getDrizzleDb();
+    // Resolve slug to integer ID for lookup
+    const intId = await resolvePageIntId(db, pageId);
+    if (intId === null) return c.json({ sessions: [] });
     const aspRows = await db.select({ agentSessionId: agentSessionPages.agentSessionId })
-      .from(agentSessionPages).where(eq(agentSessionPages.pageId, pageId));
+      .from(agentSessionPages).where(eq(agentSessionPages.pageId, intId));
     if (aspRows.length === 0) return c.json({ sessions: [] });
     const sessionIds = aspRows.map((r) => r.agentSessionId);
     const rows = await db.select().from(agentSessions)
       .where(inArray(agentSessions.id, sessionIds))
       .orderBy(desc(agentSessions.date), desc(agentSessions.id));
-    const allPageRows = await db.select().from(agentSessionPages)
+    const allPageRows = await db.select({ agentSessionId: agentSessionPages.agentSessionId, pageSlug: wikiPages.slug })
+      .from(agentSessionPages)
+      .leftJoin(wikiPages, eq(wikiPages.id, agentSessionPages.pageId))
       .where(inArray(agentSessionPages.agentSessionId, sessionIds));
     const pageMap = new Map<number, string[]>();
     for (const row of allPageRows) {
+      if (!row.pageSlug) continue;
       const existing = pageMap.get(row.agentSessionId) || [];
-      existing.push(row.pageId);
+      existing.push(row.pageSlug);
       pageMap.set(row.agentSessionId, existing);
     }
     return c.json({ sessions: rows.map((r) => mapSessionRow(r, pageMap.get(r.id) || [])) });

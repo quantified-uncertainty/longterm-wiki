@@ -51,7 +51,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 /** Result row shape after JOIN with wiki_pages to recover slug. */
 type ResultWithSlug = {
   runId: number | bigint;
-  pageSlug: string | null; // from LEFT JOIN wiki_pages — null only if page_id_int has no matching wiki page
+  pageSlug: string | null; // COALESCE(page_id_old, wiki_pages.id) — non-null for all Phase B+ rows
   status: string;
   tier: string | null;
   durationMs: number | null;
@@ -178,7 +178,7 @@ const autoUpdateRunsApp = new Hono()
         await tx.insert(autoUpdateResults).values(
           d.results.map((r) => ({
             runId: run.id,
-            pageIdInt: intIdMap.get(r.pageId) ?? null,
+            pageId: intIdMap.get(r.pageId) ?? null,
             status: r.status,
             tier: r.tier ?? null,
             durationMs: r.durationMs ?? null,
@@ -216,7 +216,7 @@ const autoUpdateRunsApp = new Hono()
 
     // Fetch all results for the page of runs in a single query.
     // LEFT JOIN wiki_pages to recover slug for rows written after Phase D2a
-    // (page_id_old no longer written; fall back to wiki_pages.id via page_id_int).
+    // (page_id_old no longer written; fall back to wiki_pages.id via page_id).
     const runIds = rows.map((r) => r.id);
     const resultsByRun = new Map<number, ResultWithSlug[]>();
 
@@ -224,14 +224,14 @@ const autoUpdateRunsApp = new Hono()
       const allResults = await db
         .select({
           runId: autoUpdateResults.runId,
-          pageSlug: wikiPages.id,
+          pageSlug: wikiPages.slug,
           status: autoUpdateResults.status,
           tier: autoUpdateResults.tier,
           durationMs: autoUpdateResults.durationMs,
           errorMessage: autoUpdateResults.errorMessage,
         })
         .from(autoUpdateResults)
-        .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
+        .leftJoin(wikiPages, eq(autoUpdateResults.pageId, wikiPages.id))
         .where(inArray(autoUpdateResults.runId, runIds));
 
       for (const result of allResults) {
@@ -319,14 +319,14 @@ const autoUpdateRunsApp = new Hono()
     const results = await db
       .select({
         runId: autoUpdateResults.runId,
-        pageSlug: wikiPages.id,
+        pageSlug: wikiPages.slug,
         status: autoUpdateResults.status,
         tier: autoUpdateResults.tier,
         durationMs: autoUpdateResults.durationMs,
         errorMessage: autoUpdateResults.errorMessage,
       })
       .from(autoUpdateResults)
-      .leftJoin(wikiPages, eq(autoUpdateResults.pageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(autoUpdateResults.pageId, wikiPages.id))
       .where(eq(autoUpdateResults.runId, r.id));
 
     return c.json(formatRunEntry(r, results));

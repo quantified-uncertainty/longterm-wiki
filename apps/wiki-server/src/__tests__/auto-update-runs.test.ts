@@ -76,7 +76,7 @@ function resultToSqlRow(r: ResultRow): Record<string, unknown> {
   return {
     id: r.id,
     run_id: r.runId,
-    page_id_int: r.pageIdInt,
+    page_id: r.pageId,
     status: r.status,
     tier: r.tier,
     duration_ms: r.durationMs,
@@ -146,18 +146,18 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_results (supports multi-row) ----
   if (q.includes("insert into") && q.includes("auto_update_results")) {
-    // Phase D2a: removed page_id_old — params: run_id, page_id_int, status, tier, duration_ms, error_message
+    // Phase D3+E: params: run_id, page_id, status, tier, duration_ms, error_message
     const COLS = 6;
     const numRows = params.length / COLS;
     const rows: ResultRow[] = [];
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
-      const pageIdInt = params[o + 1] as number | null;
-      const pageSlug = slugFromIntId(pageIdInt);
+      const pageId = params[o + 1] as number | null;
+      const pageSlug = slugFromIntId(pageId);
       const row: ResultRow = {
         id: nextResultId++,
         runId: params[o] as number,
-        pageIdInt: pageIdInt,
+        pageId: pageId,
         pageSlug: pageSlug,
         status: params[o + 2] as string,
         tier: params[o + 3] as string | null,
@@ -171,8 +171,8 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
-  // Phase D2b: query LEFT JOINs wiki_pages and selects wiki_pages.id for the slug.
-  // extractColumns finds "id" for "wiki_pages"."id".
+  // Phase D3+E: query uses COALESCE + LEFT JOIN wiki_pages. extractColumns finds
+  // "id" for the COALESCE expression, so we remap "id" to the page slug.
   if (
     q.includes("auto_update_results") &&
     q.includes("where") &&
@@ -183,8 +183,8 @@ const dispatch: SqlDispatcher = (query, params) => {
       .filter((r) => runIds.includes(r.runId))
       .map((r) => ({
         run_id: r.runId,
-        // "id" is what extractColumns finds for "wiki_pages"."id"
-        id: slugFromIntId(r.pageIdInt) ?? null,
+        // "slug" matches wikiPages.slug in the LEFT JOIN — extractColumns picks up "slug"
+        slug: slugFromIntId(r.pageId) ?? null,
         status: r.status,
         tier: r.tier,
         duration_ms: r.durationMs,

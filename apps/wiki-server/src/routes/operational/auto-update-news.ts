@@ -94,8 +94,7 @@ const autoUpdateNewsApp = new Hono()
             relevanceScore: d.relevanceScore ?? null,
             topicsJson: d.topics.length > 0 ? d.topics : null,
             entitiesJson: d.entities.length > 0 ? d.entities : null,
-            // Phase D2a: no longer writing routedToPageId (page_id_old); integer only
-            routedToPageIdInt: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null,
+            routedToPageId: d.routedToPageId ? (intIdMap.get(d.routedToPageId) ?? null) : null,
             routedToPageTitle: d.routedToPageTitle ?? null,
             routedTier: d.routedTier ?? null,
           }))
@@ -119,7 +118,7 @@ const autoUpdateNewsApp = new Hono()
         routedToPageSlug: wikiPages.slug,
       })
       .from(autoUpdateNewsItems)
-      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageId, wikiPages.id))
       .where(eq(autoUpdateNewsItems.runId, runId))
       .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
@@ -143,7 +142,7 @@ const autoUpdateNewsApp = new Hono()
       })
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
-      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageId, wikiPages.id))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
       .limit(limit)
       .offset(offset);
@@ -169,7 +168,7 @@ const autoUpdateNewsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by routed_to_page_id_int
+    // Phase 4b: resolve slug to integer and query by routed_to_page_id
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json({ items: [] });
 
@@ -180,7 +179,7 @@ const autoUpdateNewsApp = new Hono()
       })
       .from(autoUpdateNewsItems)
       .innerJoin(autoUpdateRuns, eq(autoUpdateNewsItems.runId, autoUpdateRuns.id))
-      .where(eq(autoUpdateNewsItems.routedToPageIdInt, intId))
+      .where(eq(autoUpdateNewsItems.routedToPageId, intId))
       .orderBy(desc(autoUpdateRuns.date), desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id));
 
     // All results are routed to pageId (the URL param) — pass it directly as the slug override
@@ -221,7 +220,7 @@ const autoUpdateNewsApp = new Hono()
         routedToPageSlug: wikiPages.slug,
       })
       .from(autoUpdateNewsItems)
-      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageIdInt, wikiPages.integerIdCol))
+      .leftJoin(wikiPages, eq(autoUpdateNewsItems.routedToPageId, wikiPages.id))
       .where(inArray(autoUpdateNewsItems.runId, runIds))
       .orderBy(desc(autoUpdateNewsItems.relevanceScore), desc(autoUpdateNewsItems.id))
       .limit(maxItems);
