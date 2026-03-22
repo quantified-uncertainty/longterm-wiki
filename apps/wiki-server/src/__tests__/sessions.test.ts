@@ -29,7 +29,7 @@ let sessionStore: Array<{
 let sessionPageStore: Array<{
   session_id: number;
   page_slug: string;  // synthetic — slug for convenience
-  page_id: number | null;  // Phase D3+E: integer FK (was page_id_int)
+  page_id: number | null;
 }> = [];
 
 let nextSlugIntId = 1000;
@@ -234,7 +234,7 @@ vi.mock("../db.js", async () => {
 
     // ---- INSERT INTO session_pages (supports multi-row) ----
     if (q.includes("insert into") && q.includes("session_pages")) {
-      const COLS = 2; // Phase D3+E: session_id, page_id (integer only — page_slug removed)
+      const COLS = 2; // session_id, page_id
       const numRows = params.length / COLS;
       const rows = [];
       for (let i = 0; i < numRows; i++) {
@@ -299,7 +299,7 @@ vi.mock("../db.js", async () => {
     }
 
     // ---- SELECT FROM session_pages LEFT JOIN wiki_pages WHERE session_id IN ($1, $2, ...) ----
-    // Phase D3+E: by-page and page-changes routes LEFT JOIN wiki_pages to recover slug.
+    // LEFT JOIN wiki_pages to recover slug.
     // extractColumns finds "session_id" and "slug" — mock must return { session_id, slug }.
     if (q.includes("session_pages") && q.includes("wiki_pages") && (q.includes("any(") || q.includes(" in ("))) {
       const ids = params.map(Number);
@@ -318,7 +318,7 @@ vi.mock("../db.js", async () => {
       return sessionPageStore.filter((r) => ids.includes(r.session_id));
     }
 
-    // ---- SELECT FROM session_pages WHERE page_id = $1 (Phase D3+E) ----
+    // ---- SELECT FROM session_pages WHERE page_id = $1 ----
     if (q.includes("session_pages") && q.includes("where") && q.includes("page_id") && !q.includes("any(") && !q.includes(" in (")) {
       const intId = params[0] as number;
       return sessionPageStore.filter((r) => r.page_id === intId);

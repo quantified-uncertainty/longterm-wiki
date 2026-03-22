@@ -65,7 +65,7 @@ const artifactsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase D2a: resolve slug to integer ID (no longer dual-writing page_id_old)
+    // Resolve slug to integer ID
     const pageIdInt = await resolvePageIntId(db, d.pageId);
 
     const rows = await db
@@ -100,7 +100,6 @@ const artifactsApp = new Hono()
       });
 
     const row = rows[0];
-    // pageId derived from input (page_id_old column no longer written)
     return c.json({ ...row, pageId: d.pageId }, 201);
   })
 
@@ -112,7 +111,7 @@ const artifactsApp = new Hono()
     const { page_id, limit } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, page_id);
     if (intId === null) return c.json({ entries: [] });
 
@@ -135,7 +134,7 @@ const artifactsApp = new Hono()
     const { limit, offset } = parsed.data;
     const db = getDrizzleDb();
 
-    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
+    // JOIN wiki_pages to recover slug from integer page ID
     const rows = await db
       .select({
         run: pageImproveRuns,
@@ -199,7 +198,7 @@ const artifactsApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // SELECT with wiki_pages JOIN to recover slug for rows written after Phase D2a
+    // JOIN wiki_pages to recover slug from integer page ID
     const rows = await db
       .select({
         run: pageImproveRuns,

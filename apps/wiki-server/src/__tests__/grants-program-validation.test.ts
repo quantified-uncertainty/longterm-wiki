@@ -40,7 +40,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- things: INSERT (dual-write) ---
+  // --- things: INSERT ---
   if (q.includes("insert into") && q.includes('"things"')) {
     return [];
   }

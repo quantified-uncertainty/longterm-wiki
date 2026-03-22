@@ -146,7 +146,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO auto_update_results (supports multi-row) ----
   if (q.includes("insert into") && q.includes("auto_update_results")) {
-    // Phase D3+E: params: run_id, page_id, status, tier, duration_ms, error_message
+    // Params: run_id, page_id, status, tier, duration_ms, error_message
     const COLS = 6;
     const numRows = params.length / COLS;
     const rows: ResultRow[] = [];
@@ -171,7 +171,7 @@ const dispatch: SqlDispatcher = (query, params) => {
   }
 
   // ---- SELECT ... FROM auto_update_results WHERE run_id IN (...) ----
-  // Phase D3+E: query uses COALESCE + LEFT JOIN wiki_pages. extractColumns finds
+  // Query uses COALESCE + LEFT JOIN wiki_pages. extractColumns finds
   // "id" for the COALESCE expression, so we remap "id" to the page slug.
   if (
     q.includes("auto_update_results") &&

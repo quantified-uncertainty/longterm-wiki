@@ -67,7 +67,7 @@ const autoUpdateNewsApp = new Hono()
     const db = getDrizzleDb();
 
     const results = await db.transaction(async (tx) => {
-      // Phase D2a: resolve routed page slugs to integer IDs (inside tx for consistency)
+      // Resolve routed page slugs to integer IDs (inside tx for consistency)
       const routedPageIds = items
         .map((d) => d.routedToPageId)
         .filter((id): id is string => id != null);
@@ -111,7 +111,7 @@ const autoUpdateNewsApp = new Hono()
     if (isNaN(runId)) return validationError(c, "runId must be an integer");
 
     const db = getDrizzleDb();
-    // LEFT JOIN wiki_pages to recover routedToPageId slug for rows written after Phase D2a
+    // LEFT JOIN wiki_pages to recover routedToPageId slug
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
@@ -133,7 +133,7 @@ const autoUpdateNewsApp = new Hono()
     const { limit, offset } = parsed.data;
     const db = getDrizzleDb();
 
-    // Join with runs to get the run date; LEFT JOIN wiki_pages to recover slug after Phase D2a
+    // Join with runs to get the run date; LEFT JOIN wiki_pages to recover slug
     const rows = await db
       .select({
         item: autoUpdateNewsItems,
@@ -168,7 +168,7 @@ const autoUpdateNewsApp = new Hono()
     const pageId = c.req.param("pageId");
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by routed_to_page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json({ items: [] });
 

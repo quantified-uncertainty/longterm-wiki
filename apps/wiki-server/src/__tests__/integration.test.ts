@@ -274,7 +274,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     const rows = await db
       .insert(citationQuotes)
       .values({
-        pageId: 100, // Phase D3+E: integer PK
+        pageId: 100,
         footnote: 1,
         claimText: "Test claim",
         url: "https://example.com",
@@ -319,7 +319,6 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
       .insert(citationQuotes)
       .values(vals)
       .onConflictDoUpdate({
-        // Phase D3+E: ON CONFLICT on integer column
         target: [citationQuotes.pageId, citationQuotes.footnote],
         set: { ...vals, updatedAt: sql`now()` },
       })

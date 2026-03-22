@@ -975,6 +975,7 @@ export type SaveArtifacts = z.infer<typeof SaveArtifactsSchema>;
 // ---------------------------------------------------------------------------
 
 export const SyncPageSchema = z.object({
+  /** The page slug (e.g., "anthropic"). Maps to wiki_pages.slug in the DB. */
   id: z.string().min(1).max(300),
   wikiId: z.string().max(20).nullable().optional(),
   title: z.string().min(1).max(500),

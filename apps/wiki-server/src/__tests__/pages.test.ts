@@ -72,7 +72,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- wiki_pages: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes("wiki_pages")) {
-    const COLS = 27; // Phase D3+E: id (integer PK), wiki_id, slug, title, ... (old text id + integer_id merged into id)
+    const COLS = 27; // id (integer PK), wiki_id, slug, title, ...
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -126,7 +126,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- wiki_pages: Full-text search via search_vector (prefix tsquery or plain) ---
-  // Phase D3+E: route uses `slug AS id` in the raw SQL SELECT, so `id` = the slug string.
+  // Route uses `slug AS id` in the raw SQL SELECT, so `id` = the slug string.
   if (q.includes("search_vector") && (q.includes("to_tsquery") || q.includes("plainto_tsquery")) && !q.includes("update")) {
     // First param is the tsquery string (e.g. "anthropic:*" for prefix search)
     const rawQuery = params[0] as string;
@@ -154,7 +154,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- wiki_pages: Trigram similarity fallback search ---
-  // Phase D3+E: route uses `slug AS id` in the raw SQL SELECT.
+  // Route uses `slug AS id` in the raw SQL SELECT.
   if (q.includes("similarity") && q.includes("wiki_pages") && !q.includes("update")) {
     const searchQuery = params[0] as string;
     const limit = (params[1] as number) || 20;

@@ -47,7 +47,6 @@ function resetStore() {
 
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
 function getLatestByPage() {
-  // Phase D3+E: group by pageId (integer)
   const latestByPage = new Map<number, HrsRow>();
   for (const r of riskStore) {
     if (r.pageId == null) continue;
@@ -98,7 +97,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("insert into") &&
     q.includes("hallucination_risk_snapshots")
   ) {
-    // Phase D3+E: params: page_id, score, level, factors, integrity_issues
+    // Params: page_id, score, level, factors, integrity_issues
     const PARAMS_PER_ROW = 5;
     const rowCount = Math.max(1, Math.floor(params.length / PARAMS_PER_ROW));
     const results: HrsRow[] = [];
@@ -274,7 +273,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }));
   }
 
-  // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT (Phase D3+E) ----
+  // ---- SELECT ... WHERE page_id = $1 ORDER BY computed_at DESC LIMIT ----
   if (
     q.includes("hallucination_risk_snapshots") &&
     q.includes("where") &&
@@ -306,7 +305,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    // Group by pageId (Phase D3+E: partition key is now COALESCE(page_id, -1))
+    // Group by pageId (partition key is COALESCE(page_id, -1))
     const byPage = new Map<number, typeof riskStore>();
     for (const r of riskStore) {
       const key = r.pageId ?? -1;

@@ -231,7 +231,7 @@ const sessionsApp = new Hono()
     let results;
     try {
       results = await db.transaction(async (tx) => {
-        // Phase 4a: pre-collect all page IDs and resolve in one batch query
+        // Pre-collect all page IDs and resolve in one batch query
         const allPageIds = [...new Set(items.flatMap((d) => d.pages))];
         const intIdMap = allPageIds.length > 0
           ? await resolvePageIntIds(tx, allPageIds)
@@ -353,7 +353,7 @@ const sessionsApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Phase 4b: resolve slug to integer and query by page_id
+    // Resolve slug to integer ID
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return c.json({ sessions: [] });
 
