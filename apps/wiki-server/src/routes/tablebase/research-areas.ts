@@ -26,6 +26,10 @@ import {
 
 const MAX_PAGE_SIZE = 200;
 
+// Max possible standard deviation for a 1-10 scale (bimodal 50/50 split at extremes).
+// Used to normalize stdDev into a 0-1 "model agreement" metric.
+const MAX_SCORE_STDDEV = 4.5;
+
 const VALID_STATUSES = [
   "active",
   "emerging",
@@ -799,7 +803,7 @@ const researchAreasApp = new Hono()
         z.object({
           researchAreaId: z.string().min(1).max(200),
           dimension: z.string().min(1).max(100),
-          score: z.number().min(0).max(10),
+          score: z.number().min(1).max(10),
           confidence: z.number().min(0).max(1).optional(),
           reasoning: z.string().max(5000).optional(),
           evaluatorType: z.enum(["llm", "human"]).default("llm"),
@@ -833,7 +837,7 @@ const researchAreasApp = new Hono()
             reasoning: item.reasoning ?? null,
             evaluatorType: item.evaluatorType,
             evaluatorId: item.evaluatorId,
-            promptVersion: item.promptVersion ?? null,
+            promptVersion: item.promptVersion ?? "",
             evaluatedAt: now,
           })
           .onConflictDoUpdate({
@@ -884,10 +888,8 @@ const researchAreasApp = new Hono()
 
     await db.transaction(async (tx) => {
       for (const row of aggregated) {
-        // Model agreement = 1 - (stdDev / maxPossibleStdDev)
-        // For a 1-10 scale, max stdDev ≈ 4.5 (all 1s and 10s)
         const stdDev = row.stdDev ?? 0;
-        const modelAgreement = Math.max(0, 1 - stdDev / 4.5);
+        const modelAgreement = Math.max(0, 1 - stdDev / MAX_SCORE_STDDEV);
 
         await tx
           .insert(researchAreaScores)

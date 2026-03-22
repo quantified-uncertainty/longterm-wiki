@@ -2558,7 +2558,7 @@ export const researchAreaEvaluations = pgTable(
     reasoning: text("reasoning"),
     evaluatorType: text("evaluator_type").notNull().default("llm"), // 'llm' | 'human'
     evaluatorId: text("evaluator_id").notNull(), // model ID or user identifier
-    promptVersion: text("prompt_version"),
+    promptVersion: text("prompt_version").notNull().default(""),
     evaluatedAt: timestamp("evaluated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

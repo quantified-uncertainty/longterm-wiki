@@ -12,15 +12,15 @@ CREATE TABLE IF NOT EXISTS research_area_evaluations (
   reasoning TEXT,                        -- brief justification for the score
   evaluator_type TEXT NOT NULL DEFAULT 'llm',  -- 'llm' | 'human'
   evaluator_id TEXT NOT NULL,           -- model ID ('claude-sonnet-4-6') or user identifier
-  prompt_version TEXT,                  -- versioned prompt hash for reproducibility
+  prompt_version TEXT NOT NULL DEFAULT '',  -- versioned prompt hash for reproducibility (NOT NULL to enable UNIQUE)
   evaluated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(research_area_id, dimension, evaluator_id, prompt_version)
 );
 
-CREATE INDEX idx_rae_area ON research_area_evaluations(research_area_id);
-CREATE INDEX idx_rae_dimension ON research_area_evaluations(dimension);
-CREATE INDEX idx_rae_evaluator ON research_area_evaluations(evaluator_id);
+CREATE INDEX IF NOT EXISTS idx_rae_area ON research_area_evaluations(research_area_id);
+CREATE INDEX IF NOT EXISTS idx_rae_dimension ON research_area_evaluations(dimension);
+CREATE INDEX IF NOT EXISTS idx_rae_evaluator ON research_area_evaluations(evaluator_id);
 
 -- Aggregated consensus scores (computed from evaluations)
 CREATE TABLE IF NOT EXISTS research_area_scores (
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS research_area_scores (
   PRIMARY KEY (research_area_id, dimension)
 );
 
-CREATE INDEX idx_ras_dimension ON research_area_scores(dimension);
+CREATE INDEX IF NOT EXISTS idx_ras_dimension ON research_area_scores(dimension);
 
 -- Valid dimensions registry (so we can enumerate them in the UI)
 CREATE TABLE IF NOT EXISTS evaluation_dimensions (
