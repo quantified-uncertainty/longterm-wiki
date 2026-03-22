@@ -1,8 +1,24 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc } from "drizzle-orm";
+import {
+  eq,
+  and,
+  count,
+  sql,
+  desc,
+  inArray,
+  countDistinct,
+} from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { sourceCheckEvidence, sourceCheckVerdicts } from "../../schema.js";
+import {
+  sourceCheckEvidence,
+  sourceCheckVerdicts,
+  personnel,
+  entities,
+  divisions,
+  things,
+} from "../../schema.js";
 import {
   zv,
   parseJsonBody,
@@ -72,6 +88,20 @@ const VerdictsQuery = z.object({
 const EvidenceQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const ResolveNamesQuery = z.object({
+  record_type: z.string().min(1).max(50),
+  record_ids: z
+    .string()
+    .min(1)
+    .max(10000)
+    .transform((v) =>
+      v
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean)
+    ),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -461,6 +491,140 @@ const sourceChecksApp = new Hono()
     }
 
     return c.json({ ok: true }, 200);
+  })
+
+  // ---- GET /resolve-names ----
+  .get("/resolve-names", zv("query", ResolveNamesQuery), async (c) => {
+    const { record_type, record_ids } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    if (record_ids.length === 0) {
+      return c.json({ names: {} as Record<string, string> });
+    }
+
+    const names: Record<string, string> = {};
+
+    if (record_type === "personnel") {
+      // Personnel: join with entities to get person name + org name
+      const personEntity = alias(entities, "person_entity");
+      const orgEntity = alias(entities, "org_entity");
+
+      const rows = await db
+        .select({
+          id: personnel.id,
+          personDisplayName: personnel.personDisplayName,
+          personEntityTitle: personEntity.title,
+          orgDisplayName: personnel.orgDisplayName,
+          orgEntityTitle: orgEntity.title,
+        })
+        .from(personnel)
+        .leftJoin(
+          personEntity,
+          eq(personEntity.stableId, personnel.personEntityId)
+        )
+        .leftJoin(orgEntity, eq(orgEntity.stableId, personnel.orgEntityId))
+        .where(inArray(personnel.id, record_ids));
+
+      for (const row of rows) {
+        const personName =
+          row.personDisplayName ?? row.personEntityTitle ?? "Unknown";
+        const orgName = row.orgDisplayName ?? row.orgEntityTitle;
+        names[row.id] = orgName ? `${personName} @ ${orgName}` : personName;
+      }
+    } else if (record_type === "division") {
+      const rows = await db
+        .select({ id: divisions.id, name: divisions.name })
+        .from(divisions)
+        .where(inArray(divisions.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = row.name;
+      }
+    } else {
+      // Generic fallback: use the things table
+      const rows = await db
+        .select({
+          sourceId: things.sourceId,
+          title: things.title,
+        })
+        .from(things)
+        .where(
+          and(
+            eq(things.sourceTable, record_type),
+            inArray(things.sourceId, record_ids)
+          )
+        );
+
+      for (const row of rows) {
+        names[row.sourceId] = row.title;
+      }
+    }
+
+    return c.json({ names });
+  })
+
+  // ---- GET /coverage ----
+  .get("/coverage", async (c) => {
+    const db = getDrizzleDb();
+
+    // Count total records per table using raw SQL UNION ALL
+    interface TableCountRow {
+      table_name: string;
+      total: number;
+    }
+
+    const tableCounts = (await db.execute(sql`
+      SELECT 'personnel' AS table_name, count(*)::int AS total FROM personnel
+      UNION ALL
+      SELECT 'division', count(*)::int FROM divisions
+      UNION ALL
+      SELECT 'grant', count(*)::int FROM grants
+      UNION ALL
+      SELECT 'funding-round', count(*)::int FROM funding_rounds
+      UNION ALL
+      SELECT 'investment', count(*)::int FROM investments
+      UNION ALL
+      SELECT 'funding-program', count(*)::int FROM funding_programs
+      UNION ALL
+      SELECT 'publication', count(*)::int FROM publications
+    `)) as unknown as TableCountRow[];
+
+    const totalsByType: Record<string, number> = {};
+    for (const row of tableCounts) {
+      totalsByType[row.table_name] = row.total;
+    }
+
+    // Count distinct verified records per record_type from verification_verdicts
+    const verifiedRows = await db
+      .select({
+        recordType: sourceCheckVerdicts.recordType,
+        verified: countDistinct(sourceCheckVerdicts.recordId),
+      })
+      .from(sourceCheckVerdicts)
+      .groupBy(sourceCheckVerdicts.recordType);
+
+    const verifiedByType: Record<string, number> = {};
+    for (const row of verifiedRows) {
+      verifiedByType[row.recordType] = row.verified;
+    }
+
+    // Merge into coverage array — include all known types
+    const allTypes = new Set([
+      ...Object.keys(totalsByType),
+      ...Object.keys(verifiedByType),
+    ]);
+
+    const coverage = Array.from(allTypes)
+      .map((recordType) => {
+        const total = totalsByType[recordType] ?? 0;
+        const verified = verifiedByType[recordType] ?? 0;
+        const percentage =
+          total > 0 ? Math.round((verified / total) * 10000) / 100 : 0;
+        return { recordType, total, verified, percentage };
+      })
+      .sort((a, b) => a.recordType.localeCompare(b.recordType));
+
+    return c.json({ coverage });
   });
 
 // ---- Exports ----
