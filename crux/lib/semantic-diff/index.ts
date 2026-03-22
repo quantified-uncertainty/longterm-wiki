@@ -160,6 +160,22 @@ function computeAssessment(
 }
 
 // ---------------------------------------------------------------------------
+// LLM gating
+// ---------------------------------------------------------------------------
+
+/**
+ * Determine whether LLM contradiction checking should run.
+ * Returns true only when changed/added claims include numeric, temporal,
+ * or keyValue-bearing claims — where contradictions are most likely
+ * and rule-based checks alone are insufficient.
+ */
+export function shouldUseLlmContradictions(claims: ExtractedClaim[]): boolean {
+  return claims.some(
+    c => c.type === 'numeric' || c.type === 'temporal' || c.keyValue != null
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main pipeline
 // ---------------------------------------------------------------------------
 
@@ -251,13 +267,23 @@ export async function runSemanticDiff(
         .map(e => e.newClaim!),
     ];
 
+    // Gate LLM contradiction checks: only run when claims include numeric/temporal data.
+    // Rule-based checks (numeric/temporal pattern matching) always run regardless.
+    // This avoids ~60% of unnecessary Haiku calls on prose-heavy pages.
+    const hasNumericOrTemporalClaims = shouldUseLlmContradictions(newAndChangedClaims);
+    const effectiveUseLlm = useLlmContradictions && hasNumericOrTemporalClaims;
+
+    if (!hasNumericOrTemporalClaims && useLlmContradictions && verbose) {
+      console.log('[semantic-diff] Skipping LLM contradiction check — no numeric/temporal claims in changes');
+    }
+
     if (newAndChangedClaims.length > 0 && beforeClaims.length > 0) {
       try {
         if (verbose) console.log(`[semantic-diff] Checking ${newAndChangedClaims.length} new/changed claims for contradictions...`);
         contradictionResult = await checkContradictions(
           newAndChangedClaims,
           beforeClaims,
-          { useLlm: useLlmContradictions },
+          { useLlm: effectiveUseLlm },
         );
         if (verbose) {
           console.log(

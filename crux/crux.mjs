@@ -163,6 +163,7 @@ const domains = {
   'backfill-pr-outcomes': backfillPrOutcomesCommands,
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: verifyEntityCommands,
+  'verify-records': verifyOrchestrateCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
