@@ -18,24 +18,14 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import {
-  detectPaywall,
-  isUnverifiableDomain,
-  classifyFetchError,
-  type SourceFetchErrorType,
-} from '../lib/search/paywall-detection.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import {
   VALID_RECORD_TYPES,
   VALID_SOURCE_CHECK_VERDICTS,
   type RecordType,
   type SourceCheckVerdict,
 } from '../../apps/wiki-server/src/api-types.ts';
-
-// ── Constants ────────────────────────────────────────────────────────
-
-const MAX_CONTENT_LENGTH = 8000;
-const FETCH_TIMEOUT_MS = 15_000;
+import { fetchSourceContent } from '../lib/source-check/fetch-source.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -254,102 +244,6 @@ function buildRecordToVerify(recordType: RecordType, item: Record<string, unknow
   }
 }
 
-// ── Source fetching ──────────────────────────────────────────────────
-
-interface FetchSourceResult {
-  content: string | null;
-  errorType?: SourceFetchErrorType;
-  errorMessage?: string;
-}
-
-async function fetchSourceContent(url: string): Promise<FetchSourceResult> {
-  if (!url.startsWith('https://')) {
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Non-HTTPS URL' };
-  }
-
-  // SSRF protection
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === 'localhost' || host === '127.0.0.1' || host === '[::1]' ||
-      host === '0.0.0.0' || host.endsWith('.local') || host.endsWith('.internal') ||
-      /^10\./.test(host) || /^172\.(1[6-9]|2\d|3[01])\./.test(host) ||
-      /^192\.168\./.test(host) || /^169\.254\./.test(host)
-    ) {
-      return { content: null, errorType: 'access_denied', errorMessage: 'Private host blocked' };
-    }
-  } catch {
-    return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid URL' };
-  }
-
-  if (isUnverifiableDomain(url)) {
-    return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
-  }
-
-  // Try wiki-server citation_content cache
-  try {
-    const result = await getCitationContentByUrl(url);
-    if (result.ok && result.data) {
-      const cached = result.data as Record<string, unknown>;
-      const content = cached.fullText as string | null;
-      if (content && content.length > 0) {
-        if (detectPaywall(content)) {
-          return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
-        }
-        return { content: content.slice(0, MAX_CONTENT_LENGTH) };
-      }
-    }
-  } catch {
-    // Fall through to direct fetch
-  }
-
-  // Direct fetch
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': 'LongtermWiki-RecordVerifier/1.0',
-        'Accept': 'text/html,application/xhtml+xml,text/plain',
-      },
-    });
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      const errorType = classifyFetchError(response.status, null, null, url);
-      return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
-    }
-
-    const html = await response.text();
-    const text = html
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/&amp;/g, '&')
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'")
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, MAX_CONTENT_LENGTH);
-
-    if (detectPaywall(text)) {
-      return { content: text, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
-    }
-
-    return { content: text };
-  } catch (e: unknown) {
-    if (e instanceof DOMException && e.name === 'AbortError') {
-      return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
-    }
-    return { content: null, errorType: 'fetch_error', errorMessage: e instanceof Error ? e.message : String(e) };
-  }
-}
-
 // ── LLM verification ────────────────────────────────────────────────
 
 function buildPrompt(record: RecordToVerify, sourceText: string): string {
@@ -395,7 +289,10 @@ async function verifySingleRecord(
   record: RecordToVerify,
   client: ReturnType<typeof createLlmClient>,
 ): Promise<SourceCheckResult | SourceCheckError> {
-  const fetchResult = await fetchSourceContent(record.sourceUrl);
+  const fetchResult = await fetchSourceContent(record.sourceUrl, {
+    userAgent: 'LongtermWiki-RecordVerifier/1.0',
+    logPrefix: '[record-source-check]',
+  });
   if (!fetchResult.content) {
     return {
       recordType: record.recordType,
