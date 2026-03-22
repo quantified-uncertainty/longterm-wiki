@@ -215,8 +215,8 @@ async function main() {
   }
 
   // Cross-reference citation URLs against the Resources system
-  const resourceMatches: { footnote: number; url: string; resourceId: string; resourceTitle: string }[] = [];
-  const noResourceMatch: { footnote: number; url: string }[] = [];
+  const resourceMatches: { footnote: string; url: string; resourceId: string; resourceTitle: string }[] = [];
+  const noResourceMatch: { footnote: string; url: string }[] = [];
 
   for (const cit of archive.citations) {
     const resource = getResourceByUrl(cit.url);

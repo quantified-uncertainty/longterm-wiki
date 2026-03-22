@@ -26,8 +26,8 @@ import { fetchSource, type FetchedSource } from '../search/source-fetcher.ts';
 export type VerificationStatus = 'verified' | 'broken' | 'unverifiable' | 'pending';
 
 export interface CitationRecord {
-  /** Footnote number, e.g. 1 for [^1] */
-  footnote: number;
+  /** Footnote identifier, e.g. "1" for [^1], "rc-fec0" for [^rc-fec0] */
+  footnote: string;
   /** The citation URL */
   url: string;
   /** The title text from the footnote definition, e.g. [Title](url) → Title */
@@ -62,7 +62,8 @@ export interface CitationArchiveFile {
 
 /** Raw citation extracted from MDX content (before verification) */
 export interface ExtractedCitation {
-  footnote: number;
+  /** Footnote identifier: "1" for [^1], "rc-fec0" for [^rc-fec0], "kb-abc" for [^kb-abc] */
+  footnote: string;
   url: string;
   linkText: string;
   claimContext: string;
@@ -145,17 +146,18 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
   const citations: ExtractedCitation[] = [];
 
   // Step 1: Parse footnote definitions
-  const footnoteDefinitions = new Map<number, { url: string; linkText: string; defLine: number }>();
+  // Supports numeric [^1], resource [^rc-XXXX], knowledge-base [^kb-...], and claim [^cr-XXXX] IDs
+  const FOOTNOTE_ID = '[\\w][\\w-]*'; // word char, then word chars or hyphens
+  const footnoteDefinitions = new Map<string, { url: string; linkText: string; defLine: number }>();
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // Pattern 1: [^N]: [Title](URL) optional-description
-    // Captures: (1) footnote number, (2) link title, (3) URL, (4) optional trailing text
-    const titledMatch = line.match(/^\[\^(\d+)\]:\s*\[([^\]]*)\]\((https?:\/\/[^)]+)\)(?:\s+(.+))?/);
+    // Pattern 1: [^ID]: [Title](URL) optional-description
+    const titledMatch = line.match(new RegExp(`^\\[\\^(${FOOTNOTE_ID})\\]:\\s*\\[([^\\]]*)\\]\\((https?:\\/\\/[^)]+)\\)(?:\\s+(.+))?`));
     if (titledMatch) {
       const desc = titledMatch[4]?.trim();
-      footnoteDefinitions.set(parseInt(titledMatch[1], 10), {
+      footnoteDefinitions.set(titledMatch[1], {
         url: titledMatch[3],
         linkText: titledMatch[2] + (desc ? ` — ${desc}` : ''),
         defLine: i,
@@ -163,16 +165,15 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 2: [^N]: ...text... [Title](URL) ...text...
+    // Pattern 2: [^ID]: ...text... [Title](URL) ...text...
     // Academic style: Author, "[Title](URL)," Source, Year.
-    // The link is embedded within descriptive text, not at the start.
-    const embeddedMatch = line.match(/^\[\^(\d+)\]:\s*(.+?)\[([^\]]*)\]\((https?:\/\/[^)]+)\)(.*)/);
+    const embeddedMatch = line.match(new RegExp(`^\\[\\^(${FOOTNOTE_ID})\\]:\\s*(.+?)\\[([^\\]]*)\\]\\((https?:\\/\\/[^)]+)\\)(.*)`));
     if (embeddedMatch) {
       const prefix = embeddedMatch[2].trim();
       const linkTitle = embeddedMatch[3];
       const suffix = embeddedMatch[5]?.trim().replace(/^[,.]?\s*/, '') || '';
       const fullText = [prefix, linkTitle, suffix].filter(Boolean).join(' — ').replace(/\s+/g, ' ').trim();
-      footnoteDefinitions.set(parseInt(embeddedMatch[1], 10), {
+      footnoteDefinitions.set(embeddedMatch[1], {
         url: embeddedMatch[4],
         linkText: fullText || linkTitle,
         defLine: i,
@@ -180,14 +181,11 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 3: [^N]: Descriptive text https://bare-url
-    // Text followed by a bare URL (common in academic citations and informal footnotes)
-    // e.g. [^1]: TransformerLens GitHub repository: https://github.com/...
-    // e.g. [^3]: Author et al. (2021). "Title." Journal. https://example.com/paper
-    const textThenUrlMatch = line.match(/^\[\^(\d+)\]:\s*(.+?)\s+(https?:\/\/[^\s]+)\s*$/);
+    // Pattern 3: [^ID]: Descriptive text https://bare-url
+    const textThenUrlMatch = line.match(new RegExp(`^\\[\\^(${FOOTNOTE_ID})\\]:\\s*(.+?)\\s+(https?:\\/\\/[^\\s]+)\\s*$`));
     if (textThenUrlMatch) {
       const description = textThenUrlMatch[2].replace(/[:.]\s*$/, '').trim();
-      footnoteDefinitions.set(parseInt(textThenUrlMatch[1], 10), {
+      footnoteDefinitions.set(textThenUrlMatch[1], {
         url: textThenUrlMatch[3],
         linkText: description,
         defLine: i,
@@ -195,11 +193,10 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
       continue;
     }
 
-    // Pattern 4: [^N]: URL (bare URL, no title)
-    // Captures: (1) footnote number, (2) URL
-    const bareMatch = line.match(/^\[\^(\d+)\]:\s*(https?:\/\/[^\s]+)/);
+    // Pattern 4: [^ID]: URL (bare URL, no title)
+    const bareMatch = line.match(new RegExp(`^\\[\\^(${FOOTNOTE_ID})\\]:\\s*(https?:\\/\\/[^\\s]+)`));
     if (bareMatch) {
-      footnoteDefinitions.set(parseInt(bareMatch[1], 10), {
+      footnoteDefinitions.set(bareMatch[1], {
         url: bareMatch[2],
         linkText: '',
         defLine: i,
@@ -209,14 +206,16 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
   }
 
   // Step 2: For each footnote, find where it's referenced and capture context
-  for (const [footnoteNum, def] of footnoteDefinitions) {
-    const refPattern = new RegExp(`\\[\\^${footnoteNum}\\](?!:)`, 'g');
+  for (const [footnoteId, def] of footnoteDefinitions) {
+    // Escape special regex chars in footnote ID (e.g. hyphens are literal in IDs)
+    const escapedId = footnoteId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const refPattern = new RegExp(`\\[\\^${escapedId}\\](?!:)`, 'g');
     let claimContext = '';
     let refLine = 0;
 
     for (let i = 0; i < lines.length; i++) {
       // Skip footnote definition lines
-      if (lines[i].trim().startsWith(`[^${footnoteNum}]:`)) continue;
+      if (lines[i].trim().startsWith(`[^${footnoteId}]:`)) continue;
 
       if (refPattern.test(lines[i])) {
         refLine = i + 1; // 1-indexed
@@ -236,12 +235,11 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
     }
 
     if (!claimContext) {
-      // Fallback: use text around the definition if no reference found
       claimContext = `(footnote definition only, no inline reference found)`;
     }
 
     citations.push({
-      footnote: footnoteNum,
+      footnote: footnoteId,
       url: def.url,
       linkText: def.linkText,
       claimContext,
@@ -249,8 +247,13 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
     });
   }
 
-  // Sort by footnote number
-  citations.sort((a, b) => a.footnote - b.footnote);
+  // Sort: numeric IDs first (by number), then string IDs alphabetically
+  citations.sort((a, b) => {
+    const aNum = /^\d+$/.test(a.footnote) ? parseInt(a.footnote, 10) : Infinity;
+    const bNum = /^\d+$/.test(b.footnote) ? parseInt(b.footnote, 10) : Infinity;
+    if (aNum !== Infinity || bNum !== Infinity) return aNum - bNum;
+    return a.footnote.localeCompare(b.footnote);
+  });
 
   return citations;
 }
@@ -260,20 +263,24 @@ export function extractCitationsFromContent(body: string): ExtractedCitation[] {
 // ---------------------------------------------------------------------------
 
 /**
- * Extract the specific sentence containing a footnote reference [^N].
+ * Extract the specific sentence containing a footnote reference [^ID].
  *
  * Unlike `extractCitationsFromContent()` which captures ~300 chars of surrounding
  * context, this function isolates just the sentence(s) containing the footnote
  * marker. This is better input for LLM quote extraction.
+ *
+ * @param footnoteId - The footnote identifier (e.g. "1", "rc-fec0", "kb-abc")
  */
-export function extractClaimSentence(body: string, footnoteNum: number): string {
+export function extractClaimSentence(body: string, footnoteId: string | number): string {
+  const id = String(footnoteId);
+  const escapedId = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const lines = body.split('\n');
-  const refPattern = new RegExp(`\\[\\^${footnoteNum}\\](?!:)`);
+  const refPattern = new RegExp(`\\[\\^${escapedId}\\](?!:)`);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     // Skip footnote definition lines
-    if (line.trim().startsWith(`[^${footnoteNum}]:`)) continue;
+    if (line.trim().startsWith(`[^${id}]:`)) continue;
 
     if (refPattern.test(line)) {
       const trimmed = line.trim();
@@ -323,7 +330,7 @@ export function extractClaimSentence(body: string, footnoteNum: number): string 
 
         return itemLines
           .join(' ')
-          .replace(/\[\^\d+\]/g, '') // Strip footnote markers
+          .replace(/\[\^[\w][\w-]*\]/g, '') // Strip footnote markers
           .replace(/\s+/g, ' ')
           .trim();
       }
@@ -351,13 +358,13 @@ export function extractClaimSentence(body: string, footnoteNum: number): string 
       const sentences = paragraph.split(/(?<=[.!?])\s+/);
 
       // Find the sentence(s) containing the footnote marker
-      const refRegex = new RegExp(`\\[\\^${footnoteNum}\\]`);
+      const refRegex = new RegExp(`\\[\\^${escapedId}\\]`);
       const matchingSentences = sentences.filter((s) => refRegex.test(s));
 
       if (matchingSentences.length > 0) {
         return matchingSentences
           .join(' ')
-          .replace(/\[\^\d+\]/g, '') // Strip footnote markers for cleaner claim text
+          .replace(/\[\^[\w][\w-]*\]/g, '') // Strip footnote markers for cleaner claim text
           .replace(/\s+/g, ' ')
           .trim();
       }
