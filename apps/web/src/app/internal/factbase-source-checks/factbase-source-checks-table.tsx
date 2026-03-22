@@ -215,21 +215,24 @@ type DetailCache = Record<string, {
 }>;
 
 function ExpandedSourceCheckDetail({
-  factId,
+  recordType,
+  recordId,
   cache,
   onLoad,
 }: {
-  factId: string;
+  recordType: string;
+  recordId: string;
   cache: DetailCache;
-  onLoad: (factId: string) => void;
+  onLoad: (recordType: string, recordId: string) => void;
 }) {
-  const entry = cache[factId];
+  const key = `${recordType}:${recordId}`;
+  const entry = cache[key];
 
   useEffect(() => {
     if (!entry) {
-      onLoad(factId);
+      onLoad(recordType, recordId);
     }
-  }, [factId, entry, onLoad]);
+  }, [recordType, recordId, entry, onLoad]);
 
   if (!entry || entry.status === "loading") {
     return (
@@ -246,7 +249,7 @@ function ExpandedSourceCheckDetail({
         <span>Failed to load details: {entry.error}</span>
         <button
           type="button"
-          onClick={() => onLoad(factId)}
+          onClick={() => onLoad(recordType, recordId)}
           className="inline-flex items-center gap-1 rounded-md border border-red-300 px-2 py-1 text-xs text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
         >
           <RotateCcw className="h-3 w-3" />
@@ -392,15 +395,16 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
   });
 
   const fetchDetail = useCallback(
-    async (factId: string) => {
+    async (recordType: string, recordId: string) => {
+      const key = `${recordType}:${recordId}`;
       setDetailCache((prev) => ({
         ...prev,
-        [factId]: { status: "loading" },
+        [key]: { status: "loading" },
       }));
 
       try {
         const res = await fetch(
-          `/api/verification-detail?recordType=fact&recordId=${encodeURIComponent(factId)}`
+          `/api/verification-detail?recordType=${encodeURIComponent(recordType)}&recordId=${encodeURIComponent(recordId)}`
         );
         if (!res.ok) {
           throw new Error(`Server returned ${res.status} ${res.statusText}`);
@@ -408,15 +412,15 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
         const json = await res.json();
         setDetailCache((prev) => ({
           ...prev,
-          [factId]: { status: "loaded", data: json },
+          [key]: { status: "loaded", data: json },
         }));
       } catch (e) {
         const message =
           e instanceof Error ? e.message : String(e);
-        console.warn(`Failed to fetch verdict detail for ${factId}: ${message}`);
+        console.warn(`Failed to fetch verdict detail for ${key}: ${message}`);
         setDetailCache((prev) => ({
           ...prev,
-          [factId]: { status: "error", error: message },
+          [key]: { status: "error", error: message },
         }));
       }
     },
@@ -486,7 +490,8 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
           if (!row.getIsExpanded()) return null;
           return (
             <ExpandedSourceCheckDetail
-              factId={row.original.recordId}
+              recordType={row.original.recordType}
+              recordId={row.original.recordId}
               cache={detailCache}
               onLoad={fetchDetail}
             />
