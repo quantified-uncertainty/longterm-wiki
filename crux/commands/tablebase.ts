@@ -42,6 +42,8 @@ interface CommandOptions extends BaseOptions {
   type?: string;
   description?: string;
   recordsFile?: string;
+  model?: string;
+  source?: string;
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -128,7 +130,8 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
   }
 
   const dryRun = !!options.dryRun;
-  const result = await runEnrichmentAgent(task, { dryRun });
+  const model = options.model as string | undefined;
+  const result = await runEnrichmentAgent(task, { dryRun, model });
 
   if (!dryRun) {
     const { markTaskDone } = await import('../tablebase/task-ranker.ts');
@@ -831,6 +834,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
   const maxTasks = options.max ? parseInt(options.max as string, 10) : 5;
   const budgetDollars = options.budget ? parseFloat(options.budget as string) : 30;
   const dryRun = !!options.dryRun;
+  const model = options.model as string | undefined; // "haiku", "sonnet", "opus", or "auto"
 
   const taskTypes = options.taskType
     ? [options.taskType as TaskType].filter(t => TASK_TYPES.includes(t as TaskType))
@@ -843,6 +847,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     dryRun,
     taskTypes,
     entityTypes,
+    model,
   });
 
   if (options.ci) {
@@ -860,6 +865,31 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
 // ---------------------------------------------------------------------------
 
 const PERSONNEL_SYNC_BATCH_SIZE = 200;
+
+// ---------------------------------------------------------------------------
+// verify-records: Batch verification of enriched records
+// ---------------------------------------------------------------------------
+
+async function verifyRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { verifyRecords, formatVerificationReport } = await import('../tablebase/verify.ts');
+
+  const table = options.table as string | undefined;
+  if (!table) {
+    return { exitCode: 1, output: 'Usage: crux tb verify-records --table=<personnel|funding-rounds|investments|benchmark-results> [--source=deterministic|batch|all] [--limit=N] [--model=haiku]' };
+  }
+
+  const limit = options.limit ? parseInt(options.limit as string, 10) : undefined;
+  const source = (options.source as 'deterministic' | 'batch' | 'all') || 'all';
+  const model = options.model as string | undefined;
+
+  const result = await verifyRecords({ table, limit, source, model });
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+  }
+
+  return { exitCode: 0, output: formatVerificationReport(result) };
+}
 
 async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const { extractAllCareers } = await import('../lib/career-import/extract.ts');
@@ -963,6 +993,7 @@ export const commands = {
   'ensure-entities': ensureEntitiesCommand,
   'fetch-page': fetchPageCommand,
   verify: verifyCommand,
+  'verify-records': verifyRecordsCommand,
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
   default: scanCommand,
@@ -997,6 +1028,7 @@ Commands:
   create-entity  Create a new entity (person, org, etc.) with allocated ID
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
+  verify-records Batch-verify records using deterministic checks + Batch API
   sync-careers   Sync FactBase career data to the personnel table
 
   Backfill (consolidated from backfill-* domains):
@@ -1024,6 +1056,7 @@ Options:
   --dry-run                 Run agent without writing to database
   --max=N                   Max tasks for loop (default: 5)
   --budget=N                Budget limit in USD for loop (default: 30)
+  --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
   --ci                      JSON output
 
@@ -1045,6 +1078,11 @@ Examples:
   crux tb tablebase next-task --format=json                # JSON for scripting
   crux tb tablebase improve abc123def --dry-run            # Test run without writing
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
+  crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
+  crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
+  crux tb tablebase verify-records --table=personnel --source=deterministic  # Fast structural checks
+  crux tb tablebase verify-records --table=personnel --source=batch --limit=100  # LLM verify 100 records
+  crux tb tablebase verify-records --table=personnel --source=all   # Full verification
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records

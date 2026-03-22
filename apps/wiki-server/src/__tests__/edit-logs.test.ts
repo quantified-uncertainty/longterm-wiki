@@ -128,11 +128,10 @@ function createMockSql() {
       return [{ last_value: 0, is_called: false }];
     }
 
-    // ---- entity_ids: SELECT for page-id-helpers resolvePageIntId(s) ----
-    if (q.includes("entity_ids") && q.includes("where") && q.includes("slug")) {
-      // Allocating on first use mirrors production where all page slugs have entity_ids.
-      // Phase C verified zero NULLs, so every slug encountered here will have an ID.
-      return params.map((p) => ({ wiki_id: getIntIdForSlug(String(p)), slug: p }));
+    // ---- wiki_pages: SELECT for page-id-helpers resolvePageIntId(s) ----
+    if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && !q.includes("as id")) {
+      // Allocating on first use mirrors production where all page slugs have wiki_pages rows.
+      return params.map((p) => ({ id: getIntIdForSlug(String(p)), slug: p }));
     }
 
     // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----

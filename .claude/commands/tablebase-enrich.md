@@ -6,6 +6,23 @@ Enrich structured data (personnel, funding rounds, investments, benchmarks) usin
 
 **Do NOT run `/agent-session-start`** — this skill manages its own workflow.
 
+## Model Tiering
+
+Different task types have different complexity. Use the right model for the job:
+
+| Task Type | Recommended Model | Why |
+|-----------|------------------|-----|
+| `personnel-enrichment` | **Sonnet** | Complex: role disambiguation, date extraction, deciding who's "key" vs minor |
+| `grant-grantee-backfill` | **Sonnet** | Entity resolution requires judgment |
+| `funding-round-research` | **Haiku** | Structured financial data, straightforward extraction |
+| `investment-linking` | **Haiku** | Structured financial data |
+| `benchmark-result-fill` | **Haiku** | Numeric lookup, low ambiguity |
+
+When running the API-billed loop, use `--model=auto` to automatically tier:
+```bash
+pnpm crux tb loop --model=auto --max=20 --budget=15
+```
+
 ## The loop
 
 Repeat this cycle up to 5 times:
@@ -94,6 +111,30 @@ Go back to Step 1.
 - Cross-reference key facts across 2+ sources when possible.
 - If you can only find a year, use `YYYY` — don't guess month/day.
 - `roleType` must be: `key-person`, `board`, or `career`.
+
+## Verification
+
+After completing a batch of enrichment tasks, run verification to catch errors:
+
+```bash
+# Fast structural checks (no API cost, ~10 seconds)
+pnpm crux tb verify-records --table=personnel --source=deterministic
+
+# Full verification with LLM cross-check via Batch API (~$0.01-0.03 per 100 records)
+pnpm crux tb verify-records --table=personnel --source=all --limit=200
+```
+
+Verification catches: missing sources, invalid entity references, implausible dates, duplicate records, and (with LLM) suspicious role/date combinations. Run `--source=deterministic` after every enrichment batch. Run `--source=all` periodically (e.g., weekly) for deeper quality assurance.
+
+## Cost Comparison
+
+| Mode | Cost per task | Best for |
+|------|-------------|----------|
+| **Subscription (this skill)** | $0 (uses Max sub time) | Interactive research, small batches |
+| **API loop (haiku)** | ~$0.05-0.15 | High-volume simple tasks (benchmarks, investments) |
+| **API loop (sonnet)** | ~$0.20-0.35 | Complex tasks (personnel, grants) |
+| **API loop (auto)** | ~$0.10-0.25 avg | Mixed workloads — tiers automatically |
+| **Verification batch** | ~$0.01-0.03/100 records | Post-enrichment quality check |
 
 ## At the end
 

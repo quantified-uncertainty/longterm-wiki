@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, or, count, sql, desc, isNull, like } from "drizzle-orm";
+import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { personnel, entities } from "../../schema.js";
@@ -14,6 +14,19 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+
+// ---- Helpers: SQL ----
+
+/**
+ * Build a parameterized SQL value list for use with `IN (...)`.
+ * See entities.ts for full docs on why ANY() doesn't work with Drizzle sql tag.
+ */
+function sqlInList(values: string[]) {
+  return sql.join(
+    values.map((v) => sql`${v}`),
+    sql`, `,
+  );
+}
 
 // ---- Constants ----
 
@@ -366,7 +379,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         });
 
       // Post-sync: resolve entity FKs for newly synced rows
+      // NOTE: Use IN (sqlInList()) not ANY() — Drizzle expands JS arrays as
+      // value-lists which breaks ANY() (see entities.ts sqlInList docs).
       const syncedIds = items.map((i) => i.id);
+      const idList = sqlInList(syncedIds);
       await tx.execute(sql`
         UPDATE personnel p SET person_entity_id = e.stable_id
         FROM entities e
@@ -374,7 +390,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           AND e.entity_type = 'person'
           AND p.person_entity_id IS NULL
           AND p.person_id NOT LIKE 'new:%'
-          AND p.id = ANY(${syncedIds})
+          AND p.id IN (${idList})
       `);
       await tx.execute(sql`
         UPDATE personnel p SET org_entity_id = e.stable_id
@@ -382,7 +398,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         WHERE (e.stable_id = p.organization_id OR e.id = p.organization_id)
           AND e.entity_type = 'organization'
           AND p.org_entity_id IS NULL
-          AND p.id = ANY(${syncedIds})
+          AND p.id IN (${idList})
       `);
       // Backfill display names for new: prefix and unresolved personIds
       await tx.execute(sql`
@@ -390,7 +406,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           person_display_name = trim(substring(person_id FROM 5))
         WHERE person_id LIKE 'new:%'
           AND person_display_name IS NULL
-          AND id = ANY(${syncedIds})
+          AND id IN (${idList})
       `);
       await tx.execute(sql`
         UPDATE personnel SET
@@ -398,7 +414,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         WHERE person_entity_id IS NULL
           AND person_display_name IS NULL
           AND NOT (person_id ~ '^[A-Za-z0-9]{10}$' AND person_id ~ '[A-Z]')
-          AND id = ANY(${syncedIds})
+          AND id IN (${idList})
       `);
 
       // Dual-write to things table with resolved names
@@ -413,7 +429,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           source: personnel.source,
         })
         .from(personnel)
-        .where(sql`${personnel.id} = ANY(${syncedIds})`);
+        .where(inArray(personnel.id, syncedIds));
 
       // Build a map of stableId -> title for resolved person entities
       const resolvedPersonIds = resolvedItems
@@ -424,7 +440,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         const personEntities = await tx
           .select({ stableId: entities.stableId, title: entities.title })
           .from(entities)
-          .where(sql`${entities.stableId} = ANY(${resolvedPersonIds})`);
+          .where(inArray(entities.stableId, resolvedPersonIds));
         personTitleMap = new Map(
           personEntities
             .filter((e) => e.stableId)

@@ -902,9 +902,12 @@
       type: person
     - id: 73qTEkYyWA
       type: safety-agenda
+    - id: XqjV4mbMXQ
+      type: organization
+      relationship: research
   customFields:
     - label: Role
-      value: Scientific Director of Mila, Professor
+      value: Scientific Director of Mila, Professor; Scientific Director of ARIA Safeguarded AI (since Aug 2024)
     - label: Known For
       value: Deep learning pioneer, now AI safety advocate
   sources:
@@ -2942,4 +2945,45 @@
       value: Co-founder, SSI
   tags:
     - ai
+
+- id: david-dalrymple
+  stableId: SQlb1r5EzN
+  type: person
+  title: David Dalrymple
+  website: https://davidad.org
+  relatedEntries:
+    - id: XqjV4mbMXQ
+      type: organization
+      relationship: leads-to
+    - id: MEt9F7f50w
+      type: approach
+      relationship: leads-to
+  sources:
+    - title: davidad's CV
+      url: https://davidad.org/davidad_cv.pdf
+    - title: "ARIA Safeguarded AI Programme"
+      url: https://www.aria.org.uk/programme-safeguarded-ai/
+    - title: "Towards Guaranteed Safe AI (arXiv)"
+      url: https://arxiv.org/abs/2405.06624
+    - title: "Programme Thesis on LessWrong"
+      url: https://www.lesswrong.com/posts/qweXJ6v9heSn4wvdk/davidad-s-provably-safe-ai-architecture-aria-s-programme
+  description: >-
+    David "davidad" Dalrymple is a Programme Director at the UK's Advanced Research +
+    Invention Agency (ARIA), where he leads the GBP 59 million Safeguarded AI programme
+    aiming to develop AI systems with mathematical safety guarantees through formal
+    verification. The youngest-ever MIT graduate degree recipient at age 16, he previously
+    co-invented Filecoin and worked at Protocol Labs. Lead author of "Towards Guaranteed
+    Safe AI" (2024) with co-authors including Yoshua Bengio, Stuart Russell, Max Tegmark,
+    and Sanjit Seshia, proposing a framework of world models, safety specifications, and
+    verifiers for provably safe AI systems.
+  customFields:
+    - label: Role
+      value: Programme Director, ARIA Safeguarded AI
+    - label: Known For
+      value: Provably safe AI agenda, Guaranteed Safe AI framework, ARIA Safeguarded AI programme
+  tags:
+    - formal-methods
+    - provably-safe-ai
+    - ai-safety
+    - formal-verification
 

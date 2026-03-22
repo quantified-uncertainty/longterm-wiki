@@ -267,15 +267,12 @@ export function getInternalNav(): NavSection[] {
         { label: "Things", href: internalHref("things-dashboard") },
         { label: "Entity Matrix", href: internalHref("entity-matrix-dashboard") },
         { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
-        { label: "Verification Coverage", href: internalHref("verification-coverage-dashboard") },
-        { label: "Entity Verifications", href: internalHref("entity-verifications-dashboard") },
+        { label: "Verifications", href: internalHref("entity-verifications-dashboard") },
       ],
     },
     {
       title: "Citations",
       items: [
-        { label: "Fact Dashboard", href: internalHref("fact-dashboard") },
-        { label: "FactBase Verifications", href: internalHref("kb-fact-verifications-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },

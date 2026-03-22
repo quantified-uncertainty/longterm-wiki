@@ -63,6 +63,13 @@ export const PROGRAM_IDS = {
   ACX_2022: progId("prog|acx|grants-2022"),
   ACX_2023: progId("prog|acx|grants-2023"),
   ACX_2025: progId("prog|acx|grants-2025"),
+
+  // ARIA Safeguarded AI Programme
+  ARIA_TA1_1: progId("prog|aria|ta1-1-theory"),
+  ARIA_TA1_2_3: progId("prog|aria|ta1-2-3-platform"),
+  ARIA_TA1_4: progId("prog|aria|ta1-4-sociotechnical"),
+  ARIA_TA2: progId("prog|aria|ta2-ml"),
+  ARIA_TA3: progId("prog|aria|ta3-applications"),
 } as const;
 
 // ---------------------------------------------------------------------------

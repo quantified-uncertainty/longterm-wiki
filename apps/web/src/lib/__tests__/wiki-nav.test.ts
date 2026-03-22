@@ -202,13 +202,12 @@ describe("getInternalNav (mocked data)", () => {
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
-  it("fact dashboard is in Citations section", () => {
+  it("citation accuracy is in Citations section", () => {
     const sections = getInternalNav();
     const citations = sections.find(s => s.title === "Citations")!;
 
-    const factItem = citations.items.find(i => i.label === "Fact Dashboard");
-    expect(factItem).toBeDefined();
-    expect(factItem!.href).toBe("/wiki/E898");
+    const item = citations.items.find(i => i.label === "Citation Accuracy");
+    expect(item).toBeDefined();
   });
 
   it("all dashboard items use /wiki/E<id> hrefs", () => {
@@ -227,7 +226,7 @@ describe("getInternalNav (mocked data)", () => {
 
     const monitoringLabels = [
       "Citation Accuracy", "Citation Content",
-      "Hallucination Risk", "Hallucination Evals", "Fact Dashboard",
+      "Hallucination Risk", "Hallucination Evals",
     ];
     for (const label of monitoringLabels) {
       const item = citations.items.find(i => i.label === label);

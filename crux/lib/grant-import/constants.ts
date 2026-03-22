@@ -33,6 +33,7 @@ export const FUNDER_IDS = {
   TEMPLETON_FOUNDATION: "W3UAlnscAg",
   CIFF: "Z6vKggPBaA",
   BEZOS_EARTH_FUND: "fVMqY7vpMA",
+  ARIA: "XqjV4mbMXQ",
 } as const;
 
 /**
