@@ -22,6 +22,7 @@ import { FOOTNOTE_REF_RE } from '../../lib/patterns.ts';
 import { createDbEntriesForRcFootnotes } from '../../lib/convert-new-footnotes.ts';
 import { isBiographicalPage } from '../../lib/page-analysis.ts';
 import { validateMdxContent } from '../../lib/validation/validate-mdx-content.ts';
+import { validatePipelineResources } from '../../lib/validation/validate-resource-refs.ts';
 import { ValidationEngine } from '../../lib/validation/validation-engine.ts';
 import {
   analyzePhase, researchPhase, improvePhase, improveSectionsPhase,
@@ -383,6 +384,20 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
   }
 
   if (dryRun) {
+    // Resource ref validation in dry-run mode: report but don't modify temp file
+    try {
+      const resourceValidation = await validatePipelineResources(
+        fs.readFileSync(finalPath, 'utf-8'),
+        { log },
+      );
+      if (resourceValidation.refs.brokenRefs > 0) {
+        console.log(`Resource refs: ${resourceValidation.refs.brokenRefs} broken (would be auto-fixed on --apply)`);
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('resource-validation', `Warning: resource ref check failed: ${error.message}`);
+    }
+
     console.log('\nTo apply changes:');
     console.log(`  cp "${finalPath}" "${filePath}"`);
     console.log('\nOr review the diff:');
@@ -406,6 +421,18 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
     // final write. The improve phase already calls ensureFrontmatterFields, but
     // later phases (enrich, validate auto-fixes, gap-fill) can re-modify content.
     contentToApply = ensureFrontmatterFields(originalContent, contentToApply);
+
+    // Resource reference validation: check <R id="..."> tags resolve to real resources.
+    // Runs BEFORE semantic diff so that broken-ref fixes are included in the diff analysis.
+    try {
+      const resourceValidation = await validatePipelineResources(contentToApply, { log });
+      if (resourceValidation.refs.changed) {
+        contentToApply = resourceValidation.refs.fixedContent;
+      }
+    } catch (err: unknown) {
+      const error = err instanceof Error ? err : new Error(String(err));
+      log('resource-validation', `Warning: resource ref validation failed (non-blocking): ${error.message}`);
+    }
 
     // Semantic diff: analyze factual claim changes for safety audit.
     // Runs BEFORE writing to disk so that 'block' assessments can prevent bad writes.
