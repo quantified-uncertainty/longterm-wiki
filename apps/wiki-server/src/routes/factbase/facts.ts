@@ -318,6 +318,60 @@ const factsApp = new Hono()
     }
 
     return c.json({ upserted });
+  })
+
+  // ---- GET /export ----
+  // Returns all facts grouped by entity ID, matching the SerializedKB.facts format.
+  // Used by build-data.mjs to export PG facts → factbase-data.json.
+  .get("/export", async (c) => {
+    const db = getDrizzleDb();
+
+    const allFacts = await db
+      .select()
+      .from(facts)
+      .orderBy(asc(facts.entityId), asc(facts.asOf));
+
+    // Group by entity ID
+    const grouped: Record<string, Array<{
+      id: string;
+      subjectId: string;
+      propertyId: string;
+      value: { type: string; value: unknown; low?: number; high?: number };
+      asOf: string | null;
+      validEnd?: string;
+      source: string | null;
+      notes: string | null;
+      measure?: string;
+    }>> = {};
+
+    for (const f of allFacts) {
+      if (!grouped[f.entityId]) grouped[f.entityId] = [];
+
+      // Reconstruct the Fact value shape from PG columns
+      const value: { type: string; value: unknown; low?: number; high?: number } = {
+        type: f.format ?? "text",
+        value: f.numeric != null ? f.numeric : f.value,
+      };
+      if (f.low != null) value.low = f.low;
+      if (f.high != null) value.high = f.high;
+
+      grouped[f.entityId].push({
+        id: f.factId,
+        subjectId: f.entityId,
+        propertyId: f.measure ?? f.factId,
+        value,
+        asOf: f.asOf,
+        source: f.source,
+        notes: f.note,
+        ...(f.measure && { measure: f.measure }),
+      });
+    }
+
+    return c.json({
+      facts: grouped,
+      total: allFacts.length,
+      entities: Object.keys(grouped).length,
+    });
   });
 
 // ---- Exports ----

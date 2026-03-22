@@ -51,6 +51,7 @@ import {
   fetchBenchmarkResults,
   fetchResearchAreas,
   fetchRecordVerdicts,
+  fetchFactBaseFromServer,
   fetchPolicyStakeholderIds,
   syncPolicyStakeholders,
   fetchResourcesFromPG,
@@ -567,15 +568,50 @@ async function main() {
   database.pathRegistry = pathRegistry;
   console.log(`  pathRegistry: ${Object.keys(pathRegistry).length} paths mapped`);
 
-  // Load FactBase (structured facts graph) from packages/factbase
-  // Build entity map from TableBase entities for injection into FactBase loader
+  // Load FactBase facts — prefer PG (source of truth) with YAML fallback.
+  // PG facts are loaded via wiki-server /api/facts/export endpoint.
+  // YAML is the fallback for local dev without wiki-server.
   const factbaseDataDir = join(REPO_ROOT, 'packages', 'factbase', 'data');
-  if (existsSync(factbaseDataDir)) {
+
+  // Try PG first (when wiki-server is available)
+  let pgFacts = null;
+  if (!CONTENT_ONLY) {
+    pgFacts = await fetchFactBaseFromServer();
+  }
+
+  if (pgFacts) {
+    // PG-primary path: load properties/schemas from YAML, facts from PG
     const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
 
-    // Build TableBase entity map keyed by stableId for FactBase entity injection
-    // Canonicalize entity types (e.g. "lab" -> "organization", "researcher" -> "person")
-    // since transformEntities() runs later and raw YAML types may still be present here.
+    const tableBaseEntityMap = new Map();
+    for (const entity of entities) {
+      if (entity.stableId) {
+        tableBaseEntityMap.set(entity.stableId, {
+          id: entity.stableId,
+          stableId: entity.stableId,
+          type: resolveEntityType(entity.type) || entity.type,
+          name: entity.title || entity.id,
+          ...(entity.wikiId && { wikiPageId: entity.wikiId, wikiId: entity.wikiId }),
+        });
+      }
+    }
+
+    // Still need to load YAML for properties and schemas (metadata)
+    const { graph, filenameMap } = await loadKB(factbaseDataDir, {
+      entities: tableBaseEntityMap,
+    });
+    const serializedKB = serialize(graph, filenameMap);
+
+    // Replace YAML facts with PG facts (PG is source of truth)
+    serializedKB.facts = pgFacts;
+    database.kb = serializedKB;
+
+    const factGroupCount = Object.keys(pgFacts).length;
+    console.log(`  kb: ${factGroupCount} fact groups from PG (properties/schemas from YAML)`);
+  } else if (existsSync(factbaseDataDir)) {
+    // YAML fallback path: load everything from local YAML files
+    const { loadKB, serialize } = await import('../../../packages/factbase/src/index.ts');
+
     const tableBaseEntityMap = new Map();
     for (const entity of entities) {
       if (entity.stableId) {
@@ -595,7 +631,7 @@ async function main() {
     const serializedKB = serialize(graph, filenameMap);
     database.kb = serializedKB;
     const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
+    console.log(`  kb: ${factCount} fact groups from YAML (PG unavailable, fallback)`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }
