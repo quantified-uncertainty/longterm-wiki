@@ -77,6 +77,16 @@ const dispatch: SqlDispatcher = (query, params) => {
     }));
   }
 
+  // ---- DELETE/INSERT agent_session_entities ----
+  if (q.includes("agent_session_entities")) {
+    return [];
+  }
+
+  // ---- DELETE/INSERT agent_session_pages ----
+  if (q.includes("agent_session_pages")) {
+    return [];
+  }
+
   // ---- INSERT INTO agent_sessions ----
   if (q.includes("insert into") && q.includes("agent_sessions")) {
     const row = {
@@ -622,6 +632,24 @@ describe("Agent Sessions API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.reviewed).toBe(true);
+    });
+
+    it("accepts entities array of stableIds", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        entities: ["Tz48rTriBg", "mK9pX3rQ7n"],
+      });
+      expect(res.status).toBe(200);
+    });
+
+    it("rejects entities with wrong-length stableIds", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        entities: ["short"],
+      });
+      expect(res.status).toBe(400);
     });
   });
 

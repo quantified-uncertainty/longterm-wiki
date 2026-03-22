@@ -1061,6 +1061,8 @@ export const UpdateAgentSessionSchema = z.object({
   reviewed: z.boolean().nullable().optional(),
   /** Page IDs touched in this session — replaces agent_session_pages when provided */
   pages: z.array(z.string().min(1).max(200)).optional(),
+  /** Entity stableIds touched in this session — replaces agent_session_entities when provided */
+  entities: z.array(z.string().length(10)).optional(),
 });
 export type UpdateAgentSession = z.infer<typeof UpdateAgentSessionSchema>;
 

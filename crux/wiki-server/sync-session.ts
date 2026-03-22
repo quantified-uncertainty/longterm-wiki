@@ -39,6 +39,7 @@ interface SessionApiEntry {
   recommendationsJson: unknown[] | undefined;
   reviewed: boolean | undefined;
   pages: string[];
+  entities: string[] | undefined;
 }
 
 interface YamlSession {
@@ -51,6 +52,7 @@ interface YamlSession {
   cost?: string;
   pr?: number | string;
   pages?: string[];
+  entities?: string[];
   issues?: unknown[];
   learnings?: unknown[];
   recommendations?: unknown[];
@@ -124,6 +126,9 @@ export function parseSessionYaml(filePath: string): SessionApiEntry | null {
       : undefined,
     reviewed: typeof parsed.reviewed === 'boolean' ? parsed.reviewed : undefined,
     pages,
+    entities: Array.isArray(parsed.entities)
+      ? parsed.entities.filter((id) => typeof id === 'string' && id.length === 10)
+      : undefined,
   };
 }
 
@@ -160,6 +165,7 @@ export async function syncSessionFile(filePath: string): Promise<ApiResult<true>
     reviewed: entry.reviewed ?? null,
     status: 'completed' as const,
     pages: entry.pages ?? [],
+    entities: entry.entities,
   };
 
   const result = await updateAgentSession(agentSessionResult.data.id, updates);
