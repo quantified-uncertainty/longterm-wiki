@@ -389,7 +389,7 @@ const sourceChecksApp = new Hono()
 
     // Try update first
     const updated = await db
-      .update(verificationVerdicts)
+      .update(sourceCheckVerdicts)
       .set({
         entityId: entityIdVal,
         verdict: body.verdict,
@@ -403,17 +403,17 @@ const sourceChecksApp = new Hono()
       })
       .where(
         and(
-          eq(verificationVerdicts.recordType, body.recordType),
-          eq(verificationVerdicts.recordId, body.recordId),
-          sql`COALESCE(${verificationVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+          eq(sourceCheckVerdicts.recordType, body.recordType),
+          eq(sourceCheckVerdicts.recordId, body.recordId),
+          sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
         )
       )
-      .returning({ recordId: verificationVerdicts.recordId });
+      .returning({ recordId: sourceCheckVerdicts.recordId });
 
     if (updated.length === 0) {
       try {
         await db
-          .insert(verificationVerdicts)
+          .insert(sourceCheckVerdicts)
           .values({
             recordType: body.recordType,
             recordId: body.recordId,
@@ -435,7 +435,7 @@ const sourceChecksApp = new Hono()
         const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
         if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
           await db
-            .update(verificationVerdicts)
+            .update(sourceCheckVerdicts)
             .set({
               entityId: entityIdVal,
               verdict: body.verdict,
@@ -449,9 +449,9 @@ const sourceChecksApp = new Hono()
             })
             .where(
               and(
-                eq(verificationVerdicts.recordType, body.recordType),
-                eq(verificationVerdicts.recordId, body.recordId),
-                sql`COALESCE(${verificationVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+                eq(sourceCheckVerdicts.recordType, body.recordType),
+                eq(sourceCheckVerdicts.recordId, body.recordId),
+                sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
               )
             );
         } else {

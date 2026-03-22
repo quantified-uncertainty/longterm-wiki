@@ -109,7 +109,15 @@ export async function enrichForumsCommand(
 
   console.log(`  Found ${forumResources.length} forum post resources`);
 
-  const toProcess = forumResources.slice(0, limit);
+  // Skip already-enriched/reviewed resources so we progress through the backlog
+  // instead of re-processing the same first N resources every run.
+  const unenriched = forumResources.filter((r) => {
+    const s = r.enrichment_status;
+    return !s || s === 'pending' || s === 'fetched' || s === 'classified';
+  });
+  console.log(`  ${unenriched.length} need enrichment (${forumResources.length - unenriched.length} already enriched/reviewed)`);
+
+  const toProcess = unenriched.slice(0, limit);
   let enriched = 0;
   let failed = 0;
 

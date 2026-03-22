@@ -21,7 +21,7 @@ if [ -f "$CHECKLIST" ]; then
 fi
 
 # Read the file path from stdin JSON
-FILE_PATH=$(jq -r '.tool_input.file_path // empty' < /dev/stdin 2>/dev/null || true)
+FILE_PATH=$(cat 2>/dev/null | jq -r '.tool_input.file_path // empty' 2>/dev/null || true)
 
 # Allow edits to .claude/ files (plan files, memory, settings, etc.)
 if [[ "$FILE_PATH" == *"/.claude/"* ]] || [[ "$FILE_PATH" == *".claude/"* ]]; then
