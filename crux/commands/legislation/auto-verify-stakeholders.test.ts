@@ -78,11 +78,11 @@ describe('crux w auto-verify-stakeholders --dry-run', () => {
     // Check specific thing ID formats
     const elonEntry = data.find((d) => d.stakeholderName === 'Elon Musk');
     expect(elonEntry).toBeDefined();
-    expect(elonEntry!.thingId).toBe('policy-stakeholder:california-sb1047:elon-musk');
+    expect(elonEntry!.thingId).toBe('california-sb1047:elon-musk');
 
     const openaiEntry = data.find((d) => d.stakeholderName === 'OpenAI');
     expect(openaiEntry).toBeDefined();
-    expect(openaiEntry!.thingId).toBe('policy-stakeholder:california-sb1047:openai');
+    expect(openaiEntry!.thingId).toBe('california-sb1047:openai');
   });
 
   it('only includes stakeholders with source URLs', async () => {
