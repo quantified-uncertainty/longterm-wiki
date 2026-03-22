@@ -883,6 +883,13 @@
       "when": 1780473600000,
       "tag": "0125_create_entity_recommended_resources",
       "breakpoints": true
+    },
+    {
+      "idx": 126,
+      "version": "7",
+      "when": 1780560000000,
+      "tag": "0126_fix_coefficient_giving_source_urls",
+      "breakpoints": true
     }
   ]
 }

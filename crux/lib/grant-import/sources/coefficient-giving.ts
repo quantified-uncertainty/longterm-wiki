@@ -14,7 +14,7 @@ const CG_CSV_PATH = "/tmp/coefficient-giving-grants.csv";
 export const source: GrantSource = {
   id: "coefficient-giving",
   name: "Coefficient Giving",
-  sourceUrl: "https://coefficientgiving.org/grants/",
+  sourceUrl: "https://coefficientgiving.org/funds/",
 
   ensureData() {
     downloadIfMissing(CG_CSV_URL, CG_CSV_PATH, "Coefficient Giving CSV");
