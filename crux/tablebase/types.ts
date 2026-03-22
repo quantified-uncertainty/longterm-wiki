@@ -96,4 +96,18 @@ export interface LoopOptions {
   dryRun: boolean;
   taskTypes?: TaskType[];
   entityTypes?: string[];
+  /** Override the LLM model (e.g., "haiku", "sonnet", "opus"). Default: sonnet. */
+  model?: string;
 }
+
+/**
+ * Recommended model per task type, optimized for cost vs quality.
+ * Simple structured lookups → haiku; complex research → sonnet.
+ */
+export const TASK_TYPE_RECOMMENDED_MODEL: Record<TaskType, string> = {
+  "benchmark-result-fill": "haiku",
+  "investment-linking": "haiku",
+  "funding-round-research": "haiku",
+  "grant-grantee-backfill": "sonnet",
+  "personnel-enrichment": "sonnet",
+};

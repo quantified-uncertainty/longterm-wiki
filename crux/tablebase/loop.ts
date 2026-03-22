@@ -6,6 +6,7 @@
  */
 
 import type { LoopOptions, TaskResult, EnrichmentTask } from './types.ts';
+import { TASK_TYPE_RECOMMENDED_MODEL } from './types.ts';
 import { runFullScan } from './scanner.ts';
 import { rankTasks, loadExclusionList, markTaskDone } from './task-ranker.ts';
 import { runEnrichmentAgent } from './agent.ts';
@@ -78,7 +79,12 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
     console.log(`${'═'.repeat(60)}`);
 
     try {
-      const result = await runEnrichmentAgent(task, { dryRun: options.dryRun });
+      // Model selection: explicit --model flag > auto-tier by task type > default sonnet
+      const model = options.model === 'auto'
+        ? TASK_TYPE_RECOMMENDED_MODEL[task.taskType]
+        : options.model;
+
+      const result = await runEnrichmentAgent(task, { dryRun: options.dryRun, model });
       results.push(result);
       totalCost += result.cost;
 
