@@ -133,9 +133,11 @@ interface ManifoldMarketResponse {
 async function fetchManifoldQuestion(
   platformQuestionId: string
 ): Promise<SnapshotData | null> {
-  // Manifold question IDs from discovery are in "user/slug" format
-  // The API uses the slug directly
-  const url = `https://api.manifold.markets/v0/slug/${encodeURIComponent(platformQuestionId)}`;
+  // Discovery stores IDs as "user/slug" or just "slug" — API needs just the slug
+  const slug = platformQuestionId.includes("/")
+    ? platformQuestionId.split("/").pop()!
+    : platformQuestionId;
+  const url = `https://api.manifold.markets/v0/slug/${encodeURIComponent(slug)}`;
 
   try {
     const response = await fetch(url, {
