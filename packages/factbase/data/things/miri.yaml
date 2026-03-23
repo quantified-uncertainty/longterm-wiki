@@ -38,7 +38,7 @@ facts:
     value: 5.5e+7
     asOf: "2025"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Estimated cumulative funding raised 2000-2025. Major known sources: Open Philanthropy/Coefficient Giving ~$14.8M (2016-2020), Vitalik Buterin Ethereum donation ~$15M (2021), SFF grants (multiple rounds), FLI ~$250K (2015), and individual donors. ProPublica 990 filings show $25.6M revenue in 2021 alone. Previously understated at $15M (SFF grants only)."
+    notes: "Estimated cumulative funding raised 2000-2025 based on summing 990 revenue filings. Major known sources: Open Philanthropy/Coefficient Giving ~$14.8M (2016-2020), Vitalik Buterin Ethereum donation ~$15M (2021), SFF grants (multiple rounds), FLI ~$250K (2015), and individual donors. Note: ProPublica shows ~$16.5M net assets as of 2024, which reflects current holdings not cumulative funding raised."
 
   - id: f_DgTzpJumMg
     property: revenue

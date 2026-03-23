@@ -9,15 +9,16 @@ facts:
 
   - id: f_8UM2NKwdUA
     property: headquarters
-    value: "Austin, TX"
+    value: "Palo Alto, CA"
     source: https://x.ai/about
-    notes: "Headquartered in Austin; operates a massive GPU cluster ('Colossus') in
-      Memphis, TN"
+    notes: "Headquartered in Palo Alto per x.ai; operates a massive GPU cluster ('Colossus') in Memphis, TN. Previously listed as Austin, TX."
 
   - id: f_2O4rOQsrZg
     property: legal-structure
-    value: "Private company"
+    value: "Subsidiary of SpaceX"
+    validStart: 2026-02
     source: https://x.ai/about
+    notes: "xAI was acquired by SpaceX in February 2026; previously operated as an independent private company"
 
   - id: f_qr3MjbUa4Q
     property: founded-by
@@ -91,11 +92,11 @@ facts:
     notes: "Grok monthly active users; nearly doubled since Q1 2025"
 
   - id: f_XLWbsNoong
-    property: user-count
-    value: 6e+7
+    property: cumulative-downloads
+    value: 3e+7
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
-    notes: "Grok cumulative downloads since launch"
+    notes: "Grok cumulative downloads since launch; previously listed as 60M in error. See f_5bVJIucEHg for monthly active users."
 
   - id: f_FSDfBi1tjw
     property: product-revenue
