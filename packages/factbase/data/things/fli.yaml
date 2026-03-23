@@ -88,3 +88,75 @@ facts:
     value: "AI Safety Index published biannually (Summer 2025, Winter 2025). Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter 2025 finding: no company has adequate guardrails for catastrophic misuse."
     asOf: 2025-12
     source: https://futureoflife.org/ai-safety-index-winter-2025/
+
+  - id: f_fli_headcount
+    property: headcount
+    value: "29"
+    asOf: 2025
+    source: https://futureoflife.org/about-us/our-people/
+    notes: "29 named team members on People page: Policy (16), Futures (3), Communications (4), Operations & Grants (5), plus CEO"
+
+  - id: f_fli_musk_donation
+    property: grant-received
+    value: "10000000"
+    unit: USD
+    asOf: 2015
+    source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
+    notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on AI safety"
+
+  - id: f_fli_buterin_donation
+    property: grant-received
+    value: "665800000"
+    unit: USD
+    asOf: 2021
+    source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
+    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Buterin confirmed ~$500M was actually cashed out (March 2026). Majority transferred to a donor-advised fund."
+
+  - id: f_fli_ein
+    property: legal-identifier
+    value: "47-1052538 (EIN)"
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "IRS 501(c)(3) nonprofit"
+
+  - id: f_fli_revenue_2024
+    property: revenue
+    value: "21273381"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
+
+  - id: f_fli_expenses_2024
+    property: annual-expenses
+    value: "17399051"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
+
+  - id: f_fli_revenue_2021
+    property: revenue
+    value: "549531672"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
+
+  - id: f_fli_flare
+    property: subsidiary
+    value: "Future of Life Action and Research, Inc. (FLARE) — 501(c)(4) advocacy arm"
+    asOf: 2025
+    source: https://futureoflife.org/about-us/
+    notes: "Newer advocacy entity being established; enables political lobbying not allowed under 501(c)(3)"
+
+  - id: f_fli_asilomar
+    property: campaign
+    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Stuart Russell, Elon Musk, and Demis Hassabis."
+    asOf: 2017-01
+    source: https://futureoflife.org/open-letter/ai-principles/
+
+  - id: f_fli_pause_letter
+    property: campaign
+    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve Wozniak, Elon Musk."
+    asOf: 2023-03
+    source: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
