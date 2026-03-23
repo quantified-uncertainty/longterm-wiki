@@ -991,14 +991,14 @@ async function marketsDiscoverCommand(args: string[], options: CommandOptions): 
   }
   return discoverMarkets(entitySlug, {
     dryRun: options.dryRun ?? false,
-    model: (options.model as string) ?? undefined,
+    model: typeof options.model === 'string' ? options.model : undefined,
   });
 }
 
 async function marketsFetchCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const { fetchMarketSnapshots } = await import('../tablebase/market-fetcher.ts');
   return fetchMarketSnapshots({
-    platform: (options.source as string) ?? undefined,
+    platform: typeof options.source === 'string' ? options.source : undefined,
     entitySlug: args[0] ?? undefined,
     dryRun: options.dryRun ?? false,
   });

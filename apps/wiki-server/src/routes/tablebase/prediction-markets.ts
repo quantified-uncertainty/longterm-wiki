@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, desc, asc, sql, gte, lte } from "drizzle-orm";
+import { eq, and, count, desc, asc, sql, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import {
@@ -479,25 +479,23 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
       upserted = allVals.length;
 
-      // Denormalize latest probability onto the question record
-      // for each question that received new snapshots
+      // Denormalize latest probability onto the question records in bulk.
+      // Uses a single UPDATE...FROM subquery instead of N+1 sequential queries.
       const questionIds = [...new Set(items.map((i) => i.questionId))];
-      for (const qId of questionIds) {
-        const [latest] = await tx
-          .select({ probability: predictionMarketSnapshots.probability })
-          .from(predictionMarketSnapshots)
-          .where(eq(predictionMarketSnapshots.questionId, qId))
-          .orderBy(desc(predictionMarketSnapshots.date))
-          .limit(1);
-        if (latest) {
-          await tx
-            .update(predictionMarketQuestions)
-            .set({
-              currentProbability: latest.probability,
-              updatedAt: sql`now()`,
-            })
-            .where(eq(predictionMarketQuestions.id, qId));
-        }
+      if (questionIds.length > 0) {
+        await tx.execute(sql`
+          UPDATE prediction_market_questions q
+          SET current_probability = sub.probability,
+              updated_at = now()
+          FROM (
+            SELECT DISTINCT ON (question_id)
+              question_id, probability
+            FROM prediction_market_snapshots
+            WHERE question_id = ANY(${questionIds})
+            ORDER BY question_id, date DESC
+          ) sub
+          WHERE q.id = sub.question_id
+        `);
       }
     });
 

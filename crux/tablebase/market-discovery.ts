@@ -88,19 +88,21 @@ export async function discoverMarkets(
 ): Promise<CommandResult> {
   const { dryRun = false, model = MODELS.sonnet } = options;
 
-  // Resolve entity
-  const resolveResult = await apiRequest<{
-    stableId: string;
-    title: string;
-    slug: string;
-  }>("GET", `/api/entities/resolve/${encodeURIComponent(entitySlug)}`);
-
+  // Resolve entity via search API
   let entityName = entitySlug;
   let stableId: string | null = null;
 
-  if (resolveResult.ok) {
-    entityName = resolveResult.data.title;
-    stableId = resolveResult.data.stableId;
+  const searchResult = await apiRequest<{
+    results: Array<{ id: string; stableId: string; title: string; entityType: string }>;
+  }>("GET", `/api/entities/search?q=${encodeURIComponent(entitySlug)}&limit=5`);
+
+  if (searchResult.ok && searchResult.data.results.length > 0) {
+    const exact = searchResult.data.results.find(
+      (r) => r.id === entitySlug || r.stableId === entitySlug
+    );
+    const match = exact ?? searchResult.data.results[0];
+    entityName = match.title;
+    stableId = match.stableId;
   } else {
     console.warn(
       `Could not resolve entity "${entitySlug}", using as display name.`
@@ -198,18 +200,42 @@ export async function discoverMarkets(
     (input: Record<string, unknown>) => Promise<string>
   > = {
     submit_questions: async (input) => {
-      const questions = input.questions as DiscoveredQuestion[];
-      if (!Array.isArray(questions) || questions.length === 0) {
+      const rawQuestions = input.questions;
+      if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
         return "No questions provided.";
       }
 
-      allDiscovered.push(...questions);
+      // Validate each question at runtime — LLM output may not conform
+      const valid: DiscoveredQuestion[] = [];
+      for (const q of rawQuestions) {
+        if (
+          typeof q === "object" &&
+          q !== null &&
+          typeof q.platform === "string" &&
+          typeof q.platformQuestionId === "string" &&
+          typeof q.questionText === "string" &&
+          typeof q.questionUrl === "string" &&
+          typeof q.questionType === "string"
+        ) {
+          valid.push(q as DiscoveredQuestion);
+        } else {
+          console.warn(
+            `[market-discovery] Skipping malformed question: ${JSON.stringify(q).slice(0, 100)}`
+          );
+        }
+      }
 
-      return `Received ${questions.length} questions. Continue searching other platforms if you haven't yet.`;
+      if (valid.length === 0) {
+        return "All questions were malformed. Please ensure each has platform, platformQuestionId, questionText, questionUrl, and questionType.";
+      }
+
+      allDiscovered.push(...valid);
+
+      return `Received ${valid.length} valid questions (${rawQuestions.length - valid.length} skipped). Continue searching other platforms if you haven't yet.`;
     },
   };
 
-  const serverTools = [{ type: "web_search_20250305" as const, max_uses: 20 }];
+  const serverTools = [{ type: "web_search_20250305" as const, name: "web_search", max_uses: 20 }];
 
   const userPrompt = buildUserPrompt(entityName, entitySlug, stableId);
 
