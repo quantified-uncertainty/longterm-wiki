@@ -98,51 +98,92 @@ function buildFootnoteMap(rawContent: string): FootnoteMap {
 }
 
 /**
- * Check if a claim's source context appears near a footnote in the original text.
+ * Build a list of cleaned text from sentences that contain footnotes.
+ * Strips MDX components, footnote markers, and formatting to get clean text
+ * that can be compared against extracted claims.
+ */
+function extractFootnotedSentences(rawContent: string): string[] {
+  // Strip frontmatter
+  let text = rawContent.replace(/^---[\s\S]*?---\n/, '');
+
+  const paragraphs = text.split(/\n\n+/);
+  const results: string[] = [];
+
+  for (const para of paragraphs) {
+    // Skip footnote definitions, imports, headings
+    if (/^\[\^[\w:.-]+\]:/.test(para.trim())) continue;
+    if (/^(?:import|export)\s/.test(para.trim())) continue;
+    if (/^#{1,6}\s/.test(para.trim())) continue;
+    if (!/\[\^[\w:.-]+\]/.test(para)) continue;
+
+    // Clean the paragraph text: strip components, footnotes, formatting
+    const clean = para
+      .replace(/<[^>]+>/g, '')             // strip JSX/HTML tags
+      .replace(/<\/[^>]+>/g, '')           // strip closing tags
+      .replace(/\[\^[\w:.-]+\]/g, '')      // strip footnote refs
+      .replace(/\*\*([^*]+)\*\*/g, '$1')   // strip bold
+      .replace(/\*([^*]+)\*/g, '$1')       // strip italic
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // strip links, keep text
+      .replace(/\\(\$)/g, '$1')            // unescape dollars
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+
+    if (clean.length > 15) {
+      results.push(clean);
+    }
+  }
+
+  return results;
+}
+
+/**
+ * Check if a claim appears in text that has footnotes in the original source.
  *
- * Strategy: take key phrases from the claim text, search for them in the raw
- * content, and check if a footnote reference appears within ~100 chars after.
+ * Strategy: compare claim content against cleaned footnoted paragraphs.
+ * Uses multiple signals: keyValue, numbers, and distinctive word sequences.
  */
 function claimHasCitation(
   claim: ExtractedClaim,
-  rawContent: string,
+  footnotedParagraphs: string[],
 ): boolean {
-  // Use the claim's keyValue or a distinctive phrase from the claim text
+  const claimLower = claim.text.toLowerCase();
+
+  // Build distinctive search terms from the claim
   const searchTerms: string[] = [];
 
-  if (claim.keyValue && claim.keyValue.length > 3) {
-    searchTerms.push(claim.keyValue);
+  // keyValue is typically the most distinctive
+  if (claim.keyValue && claim.keyValue.length > 2) {
+    searchTerms.push(claim.keyValue.toLowerCase());
   }
 
-  // Take the first substantive phrase (skip common words)
-  const words = claim.text.split(/\s+/).filter(w => w.length > 3);
+  // Numbers are very distinctive
+  const numbers = claimLower.match(/\d[\d,.]+/g);
+  if (numbers) {
+    for (const num of numbers) {
+      if (num.length >= 2) searchTerms.push(num);
+    }
+  }
+
+  // Multi-word phrases from the claim
+  const words = claimLower.split(/\s+/).filter(w => w.length > 4);
   if (words.length >= 3) {
-    // Use a 3-word window from the middle of the claim
-    const mid = Math.floor(words.length / 2);
-    searchTerms.push(words.slice(Math.max(0, mid - 1), mid + 2).join(' '));
-  }
-
-  // Also try the sourceContext if available
-  if (claim.sourceContext && claim.sourceContext.length > 20) {
-    const contextWords = claim.sourceContext.split(/\s+/).filter(w => w.length > 3);
-    if (contextWords.length >= 2) {
-      searchTerms.push(contextWords.slice(0, 3).join(' '));
+    for (let i = 0; i < Math.min(words.length - 2, 3); i++) {
+      searchTerms.push(words.slice(i, i + 3).join(' '));
     }
   }
 
-  const contentLower = rawContent.toLowerCase();
-  const footnoteNearby = /\[\^[\w:.-]+\]/;
+  if (searchTerms.length === 0) return false;
 
-  for (const term of searchTerms) {
-    const termLower = term.toLowerCase();
-    const idx = contentLower.indexOf(termLower);
-    if (idx === -1) continue;
-
-    // Check if there's a footnote within 150 chars after this term
-    const after = rawContent.slice(idx, idx + termLower.length + 150);
-    if (footnoteNearby.test(after)) {
-      return true;
+  for (const paragraph of footnotedParagraphs) {
+    let matches = 0;
+    for (const term of searchTerms) {
+      if (paragraph.includes(term)) matches++;
     }
+    // 2+ term matches = high confidence it's the same fact
+    if (matches >= 2) return true;
+    // 1 match on keyValue alone is sufficient (e.g., "$380 billion")
+    if (matches >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase()) return true;
   }
 
   return false;
@@ -268,6 +309,7 @@ export async function verifyPageCommand(
 ): Promise<CommandResult> {
   const mode = options.deep ? 'deep' : options.quick ? 'quick' : 'standard';
   const budget = Number(options.budget) || 2;
+  const limit = Number(options.limit) || 0; // 0 = no limit
   const startTime = Date.now();
 
   // Load page
@@ -291,15 +333,14 @@ export async function verifyPageCommand(
     };
   }
 
-  // Step 2: Classify cited vs uncited by checking if claim text appears near a footnote
+  // Step 2: Classify cited vs uncited by checking if claim content appears in footnoted text
   console.log('  [2/4] Classifying cited vs uncited...');
   const footnoteMap = buildFootnoteMap(page.content);
-  // Strip frontmatter for raw content search
-  const rawContent = page.content.replace(/^---[\s\S]*?---\n/, '');
+  const footnotedParagraphs = extractFootnotedSentences(page.content);
 
   const classifiedClaims: ClaimWithCitation[] = claims.map(claim => ({
     ...claim,
-    hasCitation: claimHasCitation(claim, rawContent),
+    hasCitation: claimHasCitation(claim, footnotedParagraphs),
     checkWorthy: isCheckWorthy(claim),
   }));
 
@@ -346,7 +387,8 @@ export async function verifyPageCommand(
       console.log(`         Budget limit reached ($${budget}), skipping remaining claims`);
     }
 
-    if (shouldVerify && costTracker.totalCost < budget && !budgetExhausted) {
+    const underLimit = limit === 0 || verifiedCount < limit;
+    if (shouldVerify && costTracker.totalCost < budget && !budgetExhausted && underLimit) {
       const verified = await verifyClaimAgainstWeb(claim, client, costTracker);
       verifiedClaims.push(verified);
       verifiedCount++;
