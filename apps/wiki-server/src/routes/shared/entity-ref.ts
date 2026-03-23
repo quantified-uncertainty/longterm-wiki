@@ -21,6 +21,9 @@ export interface EntityRef {
  */
 export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
+/** Matches pure numeric IDs (legacy database PKs like "175", "335"). */
+const NUMERIC_ID_PATTERN = /^\d+$/;
+
 /**
  * Format an entity reference from joined query results.
  *
@@ -37,11 +40,12 @@ export function formatEntityRef(
   displayName: string | null,
   rawId: string | null,
 ): EntityRef {
-  // Name priority: entity title > display name > humanized raw ID (skip bare stableIds)
+  // Name priority: entity title > display name > humanized raw ID
+  // Skip bare stableIds and numeric database PKs — neither are human-readable
   const name =
     entityTitle ??
     displayName ??
-    (rawId && !STABLE_ID_PATTERN.test(rawId) ? rawId : null);
+    (rawId && !STABLE_ID_PATTERN.test(rawId) && !NUMERIC_ID_PATTERN.test(rawId) ? rawId : null);
 
   return {
     entityId: entityId ?? null,

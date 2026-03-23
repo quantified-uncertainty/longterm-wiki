@@ -320,7 +320,10 @@ export function OrganizationsTable({
   // about orgType (it's not in PG). Fall back to filtering static rows so
   // counts and pagination are accurate across all pages, not just the current one.
   const hasClientFilters = typeFilter !== "all" || statFilter !== "all";
-  const useStaticFallback = serverMode && hasClientFilters;
+  // Fall back to static rows when: client-side filters active, OR server errored out,
+  // OR server returned no data after finishing load (empty result from unreachable API)
+  const serverFailed = serverMode && !server.isLoading && server.error !== null;
+  const useStaticFallback = serverMode && (hasClientFilters || serverFailed);
 
   const staticFiltered = useMemo(() => {
     if (!useStaticFallback) return [];
