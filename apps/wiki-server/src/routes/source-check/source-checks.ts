@@ -562,7 +562,7 @@ const sourceChecksApp = new Hono()
         .where(inArray(entities.stableId, record_ids));
 
       for (const row of rows) {
-        if (row.stableId) {
+        if (row.stableId && row.title) {
           names[row.stableId] = row.title;
         }
       }
