@@ -3068,3 +3068,79 @@ export const dataQualitySnapshots = pgTable(
     index("idx_dqs_captured").on(table.capturedAt),
   ]
 );
+
+// ── Bluesky Data Source ────────────────────────────────────────────────
+//
+// Tracks Bluesky (AT Protocol) accounts and their posts for use as a
+// structured data source.  Posts can be linked to entities and resources.
+
+/** Tracked Bluesky accounts. */
+export const blueskyAccounts = pgTable(
+  "bluesky_accounts",
+  {
+    /** Decentralized Identifier — AT Protocol primary key */
+    did: text("did").primaryKey(),
+    handle: text("handle").notNull(),
+    displayName: text("display_name"),
+    description: text("description"),
+    followerCount: integer("follower_count"),
+    postCount: integer("post_count"),
+    /** FK to entities.stable_id — links this account to a wiki entity */
+    entityStableId: text("entity_stable_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Freeform tags for filtering (e.g. ["ai-safety", "policy"]) */
+    relevanceTags: jsonb("relevance_tags").$type<string[]>(),
+    lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ba_handle").on(table.handle),
+    index("idx_ba_entity").on(table.entityStableId),
+  ]
+);
+
+/** Individual Bluesky posts fetched from tracked accounts. */
+export const blueskyPosts = pgTable(
+  "bluesky_posts",
+  {
+    /** AT Protocol URI (at://did/app.bsky.feed.post/...) */
+    uri: text("uri").primaryKey(),
+    /** Content-hash identifier */
+    cid: text("cid"),
+    accountDid: text("account_did")
+      .notNull()
+      .references(() => blueskyAccounts.did, { onDelete: "cascade" }),
+    text: text("text"),
+    postedAt: timestamp("posted_at", { withTimezone: true }).notNull(),
+    likeCount: integer("like_count"),
+    repostCount: integer("repost_count"),
+    replyCount: integer("reply_count"),
+    quoteCount: integer("quote_count"),
+    /** URL embedded in the post (from record.embed.external.uri) */
+    embeddedUrl: text("embedded_url"),
+    /** Title of the embedded link */
+    embeddedTitle: text("embedded_title"),
+    /** URI of the post this is replying to */
+    replyToUri: text("reply_to_uri"),
+    /** FK to resources — links this post to a known resource by embedded URL */
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    /** Entity stableIds this post is about */
+    entityStableIds: jsonb("entity_stable_ids").$type<string[]>(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    index("idx_bp_account_did").on(table.accountDid),
+    index("idx_bp_posted_at").on(table.postedAt),
+    index("idx_bp_embedded_url").on(table.embeddedUrl),
+    index("idx_bp_resource_id").on(table.resourceId),
+  ]
+);
