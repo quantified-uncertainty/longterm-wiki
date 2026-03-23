@@ -206,8 +206,18 @@ async function fetchPolymarketQuestion(
     }
 
     const market = data[0];
-    // outcomePrices[0] = Yes probability as string
-    const yesPrice = market.outcomePrices?.[0];
+    // outcomePrices can be a JSON string like '["0.815", "0.185"]' or an actual array
+    let prices: string[] = [];
+    if (typeof market.outcomePrices === "string") {
+      try {
+        prices = JSON.parse(market.outcomePrices);
+      } catch {
+        prices = [];
+      }
+    } else if (Array.isArray(market.outcomePrices)) {
+      prices = market.outcomePrices;
+    }
+    const yesPrice = prices[0];
     const probability = yesPrice ? parseFloat(yesPrice) : null;
 
     return {
