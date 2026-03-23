@@ -884,21 +884,19 @@ const entitiesApp = new Hono()
           metadata: clearStubIfEnriched(e),
         }));
 
-        // Clear stale rows where the slug (id) was reassigned to a different stableId.
-        // Without this, the INSERT ON CONFLICT (stableId) can't handle the unique
-        // constraint on id when a slug moved between entities.
-        // Note: Drizzle sql`` expands arrays as value-lists, not Pg arrays,
-        // so use inArray/notInArray instead of raw ANY/ALL.
-        const batchSlugs = allVals.map((v) => v.id);
-        const batchStableIds = allVals.map((v) => v.stableId);
-        await tx
-          .delete(entities)
-          .where(
-            and(
-              inArray(entities.id, batchSlugs),
-              notInArray(entities.stableId, batchStableIds),
-            )
-          );
+        // Clear stale rows where the slug (id) is claimed by a different stableId
+        // than what the batch expects. Build a per-slug lookup for precise matching.
+        const slugToStableId = new Map(allVals.map((v) => [v.id, v.stableId]));
+        for (const [slug, expectedStableId] of slugToStableId) {
+          await tx
+            .delete(entities)
+            .where(
+              and(
+                eq(entities.id, slug),
+                sql`${entities.stableId} != ${expectedStableId}`,
+              )
+            );
+        }
 
         await tx
           .insert(entities)
