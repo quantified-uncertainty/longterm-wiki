@@ -14,13 +14,13 @@ export type VerdictRow = RpcSourceCheckVerdictRow;
 // ── Data loading ──────────────────────────────────────────────────────────────
 
 async function loadStats(): Promise<FetchResult<RpcSourceChecksStatsResult>> {
-  return fetchDetailed<RpcSourceChecksStatsResult>("/api/source-checks/stats");
+  return fetchDetailed<RpcSourceChecksStatsResult>("/api/verifications/stats");
 }
 
 async function loadVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsResult>> {
   // Load all verdicts — the stats are also unfiltered, so table and stats must match
   return fetchDetailed<RpcSourceChecksVerdictsResult>(
-    "/api/source-checks/verdicts?limit=200"
+    "/api/verifications/verdicts?record_type=fact&limit=200"
   );
 }
 

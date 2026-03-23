@@ -12,7 +12,7 @@ import {
   type SortingState,
   type ColumnFiltersState,
 } from "@tanstack/react-table";
-import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw } from "lucide-react";
+import { ChevronRight, ChevronLeft, Loader2, Search, RotateCcw, ExternalLink } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 import type { VerdictRow } from "./factbase-source-checks-content";
@@ -278,7 +278,7 @@ function ExpandedSourceCheckDetail({
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-border/40 text-left text-muted-foreground">
-              <th className="py-1.5 pr-3 font-medium">Resource</th>
+              <th className="py-1.5 pr-3 font-medium">Source</th>
               <th className="py-1.5 pr-3 font-medium">Verdict</th>
               <th className="py-1.5 pr-3 font-medium">Confidence</th>
               <th className="py-1.5 pr-3 font-medium">Extracted Value</th>
@@ -291,8 +291,24 @@ function ExpandedSourceCheckDetail({
           <tbody>
             {evidence.map((v) => (
               <tr key={v.id} className="border-b border-border/20 last:border-0">
-                <td className="py-1.5 pr-3 font-mono text-muted-foreground">
-                  {v.resourceId}
+                <td className="py-1.5 pr-3 max-w-[200px]">
+                  {v.sourceUrl ? (
+                    <a
+                      href={v.sourceUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400"
+                    >
+                      <ExternalLink className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{(() => { try { return new URL(v.sourceUrl).hostname; } catch { return v.sourceUrl; } })()}</span>
+                    </a>
+                  ) : v.resourceId ? (
+                    <span className="font-mono text-muted-foreground truncate block" title={v.resourceId}>
+                      {v.resourceId}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
                 </td>
                 <td className="py-1.5 pr-3">
                   <VerdictBadge verdict={v.verdict} />

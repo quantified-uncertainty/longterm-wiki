@@ -925,6 +925,20 @@
       "when": 1780992000000,
       "tag": "0131_rename_verification_to_source_check",
       "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1781078400000,
+      "tag": "0132_research_area_evaluations",
+      "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1781164800000,
+      "tag": "0133_create_secondary_market_prices",
+      "breakpoints": true
     }
   ]
 }

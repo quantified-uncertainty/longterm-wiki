@@ -17,6 +17,7 @@ import {
   apiRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
+import { RESEARCH_AREAS } from "../data/research-areas-seed.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -497,6 +498,94 @@ async function showStats(): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Seed: Sync all research areas from seed data
+// ---------------------------------------------------------------------------
+
+async function seed(dryRun: boolean): Promise<void> {
+  // Show summary by cluster
+  const byCluster = new Map<string, number>();
+  for (const area of RESEARCH_AREAS) {
+    byCluster.set(area.cluster, (byCluster.get(area.cluster) ?? 0) + 1);
+  }
+
+  console.log(`=== Research Areas Seed Data ===`);
+  console.log(`  Total areas: ${RESEARCH_AREAS.length}\n`);
+  console.log("By cluster:");
+  for (const [cluster, count] of [...byCluster.entries()].sort()) {
+    console.log(`  ${count.toString().padStart(3)}  ${cluster}`);
+  }
+
+  // Show hierarchy
+  const parents = RESEARCH_AREAS.filter((a) => !a.parentAreaId);
+  const children = RESEARCH_AREAS.filter((a) => a.parentAreaId);
+  console.log(`\n  Top-level areas: ${parents.length}`);
+  console.log(`  Sub-areas:       ${children.length}\n`);
+
+  if (dryRun) {
+    console.log("Dry run — listing all areas:\n");
+    for (const area of RESEARCH_AREAS) {
+      const indent = area.parentAreaId ? "    " : "  ";
+      const parent = area.parentAreaId ? ` (child of ${area.parentAreaId})` : "";
+      console.log(`${indent}${area.id} — ${area.title} [${area.status}]${parent}`);
+    }
+    console.log(
+      `\nDry run complete. Use without --dry-run to sync ${RESEARCH_AREAS.length} areas to wiki-server.`
+    );
+    return;
+  }
+
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    throw new Error(
+      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+    );
+  }
+
+  // Sync in batches (API allows max 200)
+  const BATCH_SIZE = 200;
+  let totalUpserted = 0;
+
+  for (let i = 0; i < RESEARCH_AREAS.length; i += BATCH_SIZE) {
+    const batch = RESEARCH_AREAS.slice(i, i + BATCH_SIZE);
+    const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+    const totalBatches = Math.ceil(RESEARCH_AREAS.length / BATCH_SIZE);
+
+    console.log(`Syncing batch ${batchNum}/${totalBatches} (${batch.length} areas)...`);
+
+    // Note: the sync endpoint preserves existing wikiId values on conflict,
+    // so we don't set wikiId here — existing YAML-linked areas keep their wikiIds.
+    const result = await batchedRequest<{ upserted: number }>(
+      "POST",
+      "/api/research-areas/sync",
+      {
+        items: batch.map((a) => ({
+          id: a.id,
+          title: a.title,
+          description: a.description,
+          status: a.status,
+          cluster: a.cluster,
+          parentAreaId: a.parentAreaId ?? null,
+          firstProposed: a.firstProposed ?? null,
+          firstProposedYear: a.firstProposedYear ?? null,
+          tags: a.tags,
+          metadata: {},
+        })),
+      }
+    );
+
+    if (!result.ok) {
+      throw new Error(`Failed to sync batch ${batchNum}: ${result.message}`);
+    }
+
+    totalUpserted += result.data.upserted;
+    console.log(`  -> ${result.data.upserted} upserted`);
+  }
+
+  console.log(`\nTotal upserted: ${totalUpserted}`);
+  console.log("Done. Run 'pnpm crux w research-areas stats' to verify.");
+}
+
+// ---------------------------------------------------------------------------
 // Crux command exports
 // ---------------------------------------------------------------------------
 
@@ -535,7 +624,17 @@ async function statsCommand(
   return { exitCode: 0 };
 }
 
+async function seedCommand(
+  _args: string[],
+  options: Record<string, unknown>
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options["dry-run"];
+  await seed(dryRun);
+  return { exitCode: 0 };
+}
+
 export const commands = {
+  seed: seedCommand,
   "link-grants": linkGrantsCommand,
   "backfill-papers": backfillPapersCommand,
   "discover-orgs": discoverOrgsCommand,
@@ -545,15 +644,18 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Research Areas — Link grants, backfill papers, discover orgs, and show stats
+Research Areas — Seed, link grants, backfill papers, discover orgs, and show stats
 
 Commands:
+  seed [--dry-run]             Sync all ~50 research areas from seed data to wiki-server
   link-grants [--dry-run]      Match all grants to research areas and sync links
   backfill-papers [--dry-run]  Backfill papers from resource citations on wiki pages
   discover-orgs [--dry-run]    Discover orgs from grant data (funders + grantees)
   stats                        Show coverage stats (default)
 
 Examples:
+  pnpm crux w research-areas seed --dry-run
+  pnpm crux w research-areas seed
   pnpm crux w research-areas stats
   pnpm crux w research-areas link-grants --dry-run
   pnpm crux w research-areas link-grants

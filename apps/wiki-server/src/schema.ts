@@ -1878,6 +1878,78 @@ export const equityPositions = pgTable(
 );
 
 /**
+ * Secondary Market Prices — tracks private company valuations across
+ * secondary/derivatives market platforms over time.
+ *
+ * Each row is one observation: a platform's price for a company on a given date.
+ * Multiple platforms may have different prices on the same date.
+ */
+export const secondaryMarketPrices = pgTable(
+  "secondary_market_prices",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** Legacy company ID (entity slug). Kept for migration compat. */
+    companyId: text("company_id").notNull(),
+    /** FK to entities.stable_id for the company. Null when unresolved. */
+    companyEntityId: text("company_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback when company doesn't have an entity. */
+    companyDisplayName: text("company_display_name"),
+    /** Platform identifier: ventuals, forge, hiive, upmarket, premier-alternatives, notice */
+    platform: text("platform").notNull(),
+    /** Observation date: YYYY-MM-DD or YYYY-MM */
+    date: text("date").notNull(),
+    /** Per-share price in USD (nullable; not all platforms report this) */
+    pricePerShare: numeric("price_per_share"),
+    /** Implied company valuation in USD */
+    impliedValuation: numeric("implied_valuation"),
+    /** Lower bound of implied valuation if range */
+    impliedValuationLow: numeric("implied_valuation_low"),
+    /** Upper bound of implied valuation if range */
+    impliedValuationHigh: numeric("implied_valuation_high"),
+    /** Trading volume in USD (nullable) */
+    volume: numeric("volume"),
+    /** Open interest for derivatives platforms (nullable) */
+    openInterest: numeric("open_interest"),
+    /** Best bid per share (nullable) */
+    bidPrice: numeric("bid_price"),
+    /** Best ask per share (nullable) */
+    askPrice: numeric("ask_price"),
+    /** Bid-ask spread as percentage (nullable) */
+    spreadPercent: numeric("spread_percent"),
+    /** Price type: mark, oracle, last_trade, indicative, bid, ask, mid */
+    priceType: text("price_type").notNull().default("last_trade"),
+    /** URL to the platform page */
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_smp_company").on(table.companyId),
+    index("idx_smp_company_entity").on(table.companyEntityId),
+    index("idx_smp_platform").on(table.platform),
+    index("idx_smp_date").on(table.date),
+    index("idx_smp_company_date").on(table.companyEntityId, table.date),
+    uniqueIndex("idx_smp_unique").on(
+      table.companyId,
+      table.platform,
+      table.date,
+      table.priceType
+    ),
+  ]
+);
+
+/**
  * Divisions — organizational sub-units (funds, teams, departments, labs, program areas).
  */
 export const divisions = pgTable(
@@ -2535,6 +2607,93 @@ export const grantResearchAreas = pgTable(
     index("idx_gra_area").on(table.researchAreaId),
   ]
 );
+
+// ── Research Area Evaluations ─────────────────────────────────────────────
+//
+// LLM-scored (or human-scored) dimensions for cross-area comparison.
+// Individual evaluations accumulate per (area, dimension, evaluator).
+// Consensus scores are computed periodically and cached in research_area_scores.
+
+/**
+ * Individual evaluation of a research area on a specific dimension.
+ */
+export const researchAreaEvaluations = pgTable(
+  "research_area_evaluations",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    dimension: text("dimension").notNull(),
+    score: doublePrecision("score").notNull(), // 1-10 scale
+    confidence: doublePrecision("confidence"), // 0-1
+    reasoning: text("reasoning"),
+    evaluatorType: text("evaluator_type").notNull().default("llm"), // 'llm' | 'human'
+    evaluatorId: text("evaluator_id").notNull(), // model ID or user identifier
+    promptVersion: text("prompt_version").notNull().default(""),
+    evaluatedAt: timestamp("evaluated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_rae_unique").on(
+      table.researchAreaId,
+      table.dimension,
+      table.evaluatorId,
+      table.promptVersion
+    ),
+    index("idx_rae_area").on(table.researchAreaId),
+    index("idx_rae_dimension").on(table.dimension),
+    index("idx_rae_evaluator").on(table.evaluatorId),
+  ]
+);
+
+/**
+ * Aggregated consensus scores (computed from evaluations).
+ */
+export const researchAreaScores = pgTable(
+  "research_area_scores",
+  {
+    researchAreaId: text("research_area_id")
+      .notNull()
+      .references(() => researchAreas.id, { onDelete: "cascade" }),
+    dimension: text("dimension").notNull(),
+    meanScore: doublePrecision("mean_score").notNull(),
+    medianScore: doublePrecision("median_score"),
+    stdDev: doublePrecision("std_dev"),
+    minScore: doublePrecision("min_score"),
+    maxScore: doublePrecision("max_score"),
+    numEvaluators: integer("num_evaluators").notNull().default(0),
+    modelAgreement: doublePrecision("model_agreement"), // 0-1; 1 = perfect agreement
+    lastComputed: timestamp("last_computed", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.researchAreaId, table.dimension] }),
+    index("idx_ras_dimension").on(table.dimension),
+  ]
+);
+
+/**
+ * Registry of valid evaluation dimensions.
+ */
+export const evaluationDimensions = pgTable("evaluation_dimensions", {
+  id: text("id").primaryKey(),
+  label: text("label").notNull(),
+  description: text("description"),
+  category: text("category"), // 'prioritization' | 'field-health' | 'impact'
+  scaleMin: doublePrecision("scale_min").notNull().default(1),
+  scaleMax: doublePrecision("scale_max").notNull().default(10),
+  higherIsBetter: boolean("higher_is_better").notNull().default(true),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
 
 /**
  * Wikibase page similarity — top-N most similar pages per page.
