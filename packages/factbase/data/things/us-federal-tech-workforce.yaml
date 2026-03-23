@@ -21,7 +21,7 @@ facts:
     value: 17000
     asOf: 2025-12
     source: https://federalnewsnetwork.com/workforce/2026/01/how-staffing-cuts-in-2025-transformed-the-federal-workforce/
-    notes: "17,000+ IT and telecom workers left federal service in 2025 (8,910 deferred resignation, 435 RIF)"
+    notes: "17,000+ IT and telecom workers left federal service in 2025 (8,910 deferred resignation, 435 RIF, remainder via voluntary resignation/retirement/attrition)"
 
   # ── IT workforce age demographics ──────────────────────────────
   - id: f_fedtech_retire
