@@ -58,26 +58,38 @@ interface MetaculusApiResponse {
   active_state?: string;
 }
 
-async function fetchMetaculusQuestion(
-  platformQuestionId: string
-): Promise<{
+type SnapshotData = {
   probability: number | null;
   probabilityLow: number | null;
   probabilityHigh: number | null;
   numForecasters: number | null;
-} | null> {
+};
+
+async function fetchMetaculusQuestion(
+  platformQuestionId: string
+): Promise<SnapshotData | null> {
+  const token = process.env.METACULUS_API_TOKEN;
   const url = `https://www.metaculus.com/api2/questions/${platformQuestionId}/`;
 
   try {
+    const headers: Record<string, string> = {
+      Accept: "application/json",
+      "User-Agent": "longtermwiki/1.0",
+    };
+    if (token) {
+      headers.Authorization = `Token ${token}`;
+    }
+
     const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": "longtermwiki/1.0",
-      },
+      headers,
       signal: AbortSignal.timeout(15_000),
     });
 
     if (!response.ok) {
+      if (response.status === 403 && !token) {
+        // Only warn once about missing token
+        return null;
+      }
       console.warn(
         `  Metaculus API returned ${response.status} for question ${platformQuestionId}`
       );
@@ -86,7 +98,6 @@ async function fetchMetaculusQuestion(
 
     const data = (await response.json()) as MetaculusApiResponse;
 
-    // Metaculus API v2 nests predictions in different places depending on version
     const cp =
       data.community_prediction ?? data.question?.community_prediction;
     const median = cp?.full?.q2 ?? cp?.q2 ?? null;
@@ -104,6 +115,52 @@ async function fetchMetaculusQuestion(
   } catch (err) {
     console.warn(
       `  Failed to fetch Metaculus question ${platformQuestionId}: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+    return null;
+  }
+}
+
+interface ManifoldMarketResponse {
+  id: string;
+  probability?: number;
+  totalLiquidity?: number;
+  volume?: number;
+  uniqueBettorCount?: number;
+}
+
+async function fetchManifoldQuestion(
+  platformQuestionId: string
+): Promise<SnapshotData | null> {
+  // Manifold question IDs from discovery are in "user/slug" format
+  // The API uses the slug directly
+  const url = `https://api.manifold.markets/v0/slug/${encodeURIComponent(platformQuestionId)}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!response.ok) {
+      console.warn(
+        `  Manifold API returned ${response.status} for ${platformQuestionId}`
+      );
+      return null;
+    }
+
+    const data = (await response.json()) as ManifoldMarketResponse;
+
+    return {
+      probability: data.probability ?? null,
+      probabilityLow: null,
+      probabilityHigh: null,
+      numForecasters: data.uniqueBettorCount ?? null,
+    };
+  } catch (err) {
+    console.warn(
+      `  Failed to fetch Manifold market ${platformQuestionId}: ${
         err instanceof Error ? err.message : String(err)
       }`
     );
@@ -165,40 +222,61 @@ export async function fetchMarketSnapshots(
 
   let fetchedCount = 0;
   let skippedCount = 0;
+  let metaculusAuthWarned = false;
 
-  for (let i = 0; i < questions.length; i++) {
-    const q = questions[i];
+  const supportedPlatforms = new Set(["metaculus", "manifold"]);
+  const supported = questions.filter((q) => supportedPlatforms.has(q.platform));
+  const unsupported = questions.length - supported.length;
+
+  if (unsupported > 0) {
+    console.log(`  (${unsupported} questions on unsupported platforms skipped)`);
+  }
+
+  for (let i = 0; i < supported.length; i++) {
+    const q = supported[i];
+    let result: SnapshotData | null = null;
+    let sourceUrl: string | null = null;
+
     if (q.platform === "metaculus") {
-      // Rate-limit: 1 request per 1.5s to avoid Metaculus 429s
-      if (i > 0) await new Promise((r) => setTimeout(r, 1500));
-      const result = await fetchMetaculusQuestion(q.platformQuestionId);
-      if (result && result.probability != null) {
-        snapshots.push({
-          id: generateId(`pms|${q.id}|${today}`),
-          questionId: q.id,
-          date: today,
-          probability: result.probability,
-          probabilityLow: result.probabilityLow,
-          probabilityHigh: result.probabilityHigh,
-          numForecasters: result.numForecasters,
-          volume: null,
-          openInterest: null,
-          communityPrediction: result.probability,
-          source: `https://www.metaculus.com/api2/questions/${q.platformQuestionId}/`,
-        });
-        fetchedCount++;
-        console.log(
-          `  ✓ ${q.platformQuestionId}: ${(result.probability * 100).toFixed(1)}% (${result.numForecasters ?? "?"} forecasters)`
-        );
-      } else {
-        skippedCount++;
+      if (!process.env.METACULUS_API_TOKEN && !metaculusAuthWarned) {
+        console.warn("  ⚠ METACULUS_API_TOKEN not set — Metaculus questions will be skipped (API requires auth)");
+        metaculusAuthWarned = true;
       }
-    } else {
-      // Other platforms not yet supported
-      skippedCount++;
+      if (!process.env.METACULUS_API_TOKEN) {
+        skippedCount++;
+        continue;
+      }
+      // Rate-limit: 1 request per 1.5s to avoid 429s
+      if (i > 0) await new Promise((r) => setTimeout(r, 1500));
+      result = await fetchMetaculusQuestion(q.platformQuestionId);
+      sourceUrl = `https://www.metaculus.com/questions/${q.platformQuestionId}/`;
+    } else if (q.platform === "manifold") {
+      // Rate-limit: 1 request per 0.5s
+      if (i > 0) await new Promise((r) => setTimeout(r, 500));
+      result = await fetchManifoldQuestion(q.platformQuestionId);
+      sourceUrl = `https://manifold.markets/${q.platformQuestionId}`;
+    }
+
+    if (result && result.probability != null) {
+      snapshots.push({
+        id: generateId(`pms|${q.id}|${today}`),
+        questionId: q.id,
+        date: today,
+        probability: result.probability,
+        probabilityLow: result.probabilityLow,
+        probabilityHigh: result.probabilityHigh,
+        numForecasters: result.numForecasters,
+        volume: null,
+        openInterest: null,
+        communityPrediction: result.probability,
+        source: sourceUrl,
+      });
+      fetchedCount++;
       console.log(
-        `  ⏭ Skipping ${q.platform} question ${q.platformQuestionId} (platform not yet supported)`
+        `  ✓ [${q.platform}] ${q.platformQuestionId}: ${(result.probability * 100).toFixed(1)}% (${result.numForecasters ?? "?"} forecasters)`
       );
+    } else {
+      skippedCount++;
     }
   }
 
