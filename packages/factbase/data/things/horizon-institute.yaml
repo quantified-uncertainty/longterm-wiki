@@ -1,0 +1,62 @@
+entity: lsx48oPDVQ
+facts:
+  # ── Fellows placed ─────────────────────────────────────────────
+  - id: f_horizon_placed_01
+    property: fellows-placed
+    value: 150
+    asOf: 2025-12
+    source: https://horizonpublicservice.org/horizons-2025-year-in-review/
+    notes: "150+ early- and mid-career professionals placed into emerging technology policy across 3 years"
+
+  # ── Cohort sizes ───────────────────────────────────────────────
+  - id: f_horizon_cohort_01
+    property: cohort-size
+    value: 27
+    asOf: 2025-01
+    source: https://horizonpublicservice.org/horizons-2025-year-in-review/
+    notes: "2025 cohort; largest at time of selection"
+
+  # ── Funding ────────────────────────────────────────────────────
+  - id: f_horizon_fund_01
+    property: grant-received
+    value: 2.9e+6
+    asOf: 2022-01
+    source: https://www.founderspledge.com/research/horizon-institute-for-public-service
+    notes: "Seed funding from Open Philanthropy"
+
+  - id: f_horizon_fund_02
+    property: grant-received
+    value: 1.18e+7
+    asOf: 2023-01
+    source: https://www.founderspledge.com/research/horizon-institute-for-public-service
+    notes: "From Good Ventures (Dustin Moskovitz / Cari Tuna)"
+
+  # ── Fellow compensation ────────────────────────────────────────
+  - id: f_horizon_stipend
+    property: fellow-stipend
+    value: 113000
+    asOf: 2025-01
+    source: https://horizonpublicservice.org/horizon-fellowship-applicant-faqs/
+    notes: "Annual stipend for fellows; $75K for junior fellows; plus $15K health/professional development"
+
+  # ── Placement rate ─────────────────────────────────────────────
+  - id: f_horizon_placement
+    property: placement-rate
+    value: 1.0
+    asOf: 2025-12
+    source: https://horizonpublicservice.org/horizons-2025-year-in-review/
+    notes: "100% fellow placement rate at host organizations"
+
+  - id: f_horizon_retention
+    property: alumni-retention-rate
+    value: 0.9
+    asOf: 2025-12
+    source: https://horizonpublicservice.org/horizons-2025-year-in-review/
+    notes: "90%+ of alumni transitioned to full-time roles in policy/government"
+
+  # ── Founding ───────────────────────────────────────────────────
+  - id: f_horizon_founded
+    property: founded-date
+    value: "2022"
+    source: https://horizonpublicservice.org/about-us/
+    notes: "Founded by Remco Zwetsloot (ex-CSET Georgetown) and Joan Gass"

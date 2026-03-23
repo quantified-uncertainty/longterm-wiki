@@ -1,0 +1,23 @@
+entity: ufdntmiWtQ
+facts:
+  # ── Founding ───────────────────────────────────────────────────
+  - id: f_cfa_founded
+    property: founded-date
+    value: "2010"
+    source: https://codeforamerica.org
+    notes: "Founded by Jennifer Pahlka"
+
+  # ── Scale ──────────────────────────────────────────────────────
+  - id: f_cfa_agencies
+    property: agencies-served
+    value: 100
+    asOf: 2025-01
+    source: https://codeforamerica.org
+    notes: "Helps over 100 government agencies improve digital service delivery"
+
+  # ── Founder role ───────────────────────────────────────────────
+  - id: f_cfa_founder
+    property: founded-by
+    value: "Jennifer Pahlka"
+    source: https://codeforamerica.org
+    notes: "Pahlka also served as U.S. Deputy CTO under Obama and helped establish USDS"

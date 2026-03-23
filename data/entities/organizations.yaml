@@ -1143,6 +1143,232 @@
     - india
   lastUpdated: 2026-03
 
+- id: us-digital-service
+  stableId: dbqoxdZuUw
+  wikiId: E2019
+  type: organization
+  orgType: government
+  title: U.S. Digital Service (USDS)
+  website: https://www.usds.gov
+  founded: "2014"
+  headquarters: Washington, D.C.
+  description: >-
+    White House technology unit founded in 2014 following the Healthcare.gov rescue. Brings top
+    technologists into government for fixed terms to work on critical digital services. Renamed
+    to "U.S. DOGE Service" in January 2025 under the Trump administration; staffing fell from
+    ~230 to ~50-89 employees. By late 2025, began hiring again.
+  relatedEntries:
+    - id: WVHl7Ya8oQ
+      type: organization
+    - id: ufdntmiWtQ
+      type: organization
+    - id: 2avSHj60sQ
+      type: organization
+  sources:
+    - title: USDS 2024 Impact Report
+      url: https://www.usds.gov/impact-report
+    - title: 21 Technologists Quit USDS (FedScoop)
+      url: https://fedscoop.com/usds-workers-quit-doge-tech-elon-musk/
+    - title: USDS Wikipedia
+      url: https://en.wikipedia.org/wiki/United_States_Digital_Service
+  tags:
+    - civic-tech
+    - government-digital-services
+    - govtech
+    - state-capacity
+  lastUpdated: 2026-03
+
+- id: 18f
+  stableId: WVHl7Ya8oQ
+  wikiId: E2020
+  type: organization
+  orgType: government
+  title: 18F
+  website: https://18f.gsa.gov
+  founded: "2014"
+  headquarters: Washington, D.C.
+  description: >-
+    GSA digital services team founded in 2014 providing agile development and user-centered
+    design to federal agencies. Built open-source tools and trained government technologists.
+    85% of departing staff in 2023 moved to other government tech positions. Eliminated entirely
+    on February 28, 2025 as part of DOGE-driven GSA cuts; ~85 employees laid off. 80 former
+    staff filed a class-action claiming retaliation.
+  relatedEntries:
+    - id: dbqoxdZuUw
+      type: organization
+    - id: ufdntmiWtQ
+      type: organization
+  sources:
+    - title: How 18F Transformed Government Technology (The Conversation)
+      url: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
+    - title: GSA Eliminates 18F (Nextgov)
+      url: https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/
+    - title: 18F Retaliation Claim (Federal News Network)
+      url: https://federalnewsnetwork.com/workforce/2025/05/gsa-shutting-down-18f-was-retaliation-by-doge-former-staff-claim-in-appeal-for-their-jobs-back/
+    - title: Alt18F on Bluesky (unofficial alumni account, 60K followers)
+      url: https://bsky.app/profile/alt18f.bsky.social
+    - title: 18F Alumni Website
+      url: https://18f.org/
+  tags:
+    - civic-tech
+    - government-digital-services
+    - govtech
+    - state-capacity
+    - open-source
+  lastUpdated: 2026-03
+
+- id: horizon-institute
+  stableId: lsx48oPDVQ
+  wikiId: E2021
+  type: organization
+  orgType: other
+  title: Horizon Institute for Public Service
+  website: https://horizonpublicservice.org
+  founded: "2022"
+  headquarters: Washington, D.C.
+  description: >-
+    Nonprofit fellowship program placing AI, biotech, and emerging technology experts into
+    federal agencies, congressional offices, and think tanks. Founded by Remco Zwetsloot
+    (ex-CSET) and Joan Gass. Seed-funded by Open Philanthropy ($2.9M) with $11.8M from Good
+    Ventures in 2023. Has placed 150+ professionals into emerging technology policy roles across
+    three years, with 90%+ transitioning to full-time policy/government positions. Expanding to
+    state-level fellowships (Texas) and new Career Accelerator program.
+  relatedEntries:
+    - id: NifCYhN75w
+      type: organization
+    - id: hQ4Rdnaihw
+      type: organization
+    - id: lvsDuyzPcg
+      type: organization
+  sources:
+    - title: Horizon Institute Website
+      url: https://horizonpublicservice.org
+    - title: Horizon 2025 Year in Review
+      url: https://horizonpublicservice.org/horizons-2025-year-in-review/
+    - title: Founders Pledge - Horizon Institute
+      url: https://www.founderspledge.com/research/horizon-institute-for-public-service
+    - title: Chronicle of Philanthropy - Can a Nonprofit Help Lawmakers Understand A.I.?
+      url: https://www.philanthropy.com/article/can-a-nonprofit-help-lawmakers-understand-a-i
+  tags:
+    - civic-tech
+    - ai-policy
+    - fellowship
+    - talent-pipeline
+    - effective-altruism
+    - state-capacity
+  lastUpdated: 2026-03
+
+- id: code-for-america
+  stableId: ufdntmiWtQ
+  wikiId: E2022
+  type: organization
+  orgType: other
+  title: Code for America
+  website: https://codeforamerica.org
+  founded: "2010"
+  headquarters: San Francisco, CA
+  description: >-
+    Nonprofit founded in 2010 by Jennifer Pahlka to help government agencies improve digital
+    service delivery. Pioneered the model of bringing technology talent into government for
+    tours of duty. Works with 100+ government agencies. Pahlka later served as U.S. Deputy
+    Chief Technology Officer and helped establish USDS.
+  relatedEntries:
+    - id: dbqoxdZuUw
+      type: organization
+    - id: WVHl7Ya8oQ
+      type: organization
+    - id: 2avSHj60sQ
+      type: organization
+  sources:
+    - title: Code for America Website
+      url: https://codeforamerica.org
+  tags:
+    - civic-tech
+    - government-digital-services
+    - govtech
+    - state-capacity
+  lastUpdated: 2026-03
+
+- id: techcongress
+  stableId: P9vjxmKQ3w
+  type: organization
+  orgType: other
+  title: TechCongress
+  website: https://techcongress.io
+  founded: "2016"
+  headquarters: Washington, D.C.
+  description: >-
+    Fellowship program placing technologists in congressional offices. 123 fellows placed to
+    date; bipartisan placements across Democratic and Republican offices. Recruiting up to 20
+    for 2026 cohort. Stipend ~$73,500/year.
+  tags:
+    - civic-tech
+    - fellowship
+    - talent-pipeline
+    - congressional-tech
+  lastUpdated: 2026-03
+
+- id: us-digital-corps
+  stableId: Kx8mRtWn4w
+  type: organization
+  orgType: government
+  title: U.S. Digital Corps
+  website: https://digitalcorps.gsa.gov
+  founded: "2022"
+  description: >-
+    Two-year fellowship for early-career technologists at federal agencies. Five tracks: software
+    engineering, data science, product management, design, cybersecurity. 2024 cohort was 70
+    fellows. 95% retention among the inaugural 2022 cohort. Part of GSA Technology Transformation
+    Services.
+  tags:
+    - civic-tech
+    - fellowship
+    - talent-pipeline
+    - government-digital-services
+  lastUpdated: 2026-03
+
+- id: nava-pbc
+  stableId: Hd6vLpWm2w
+  type: organization
+  orgType: other
+  title: Nava PBC
+  website: https://www.navapbc.com
+  founded: "2014"
+  description: >-
+    Public benefit corporation building government technology, born from the Healthcare.gov
+    rescue effort. Demonstrates that private entities can work on government technology problems
+    while maintaining a mission-driven focus.
+  relatedEntries:
+    - id: dbqoxdZuUw
+      type: organization
+  tags:
+    - civic-tech
+    - govtech
+    - public-benefit
+  lastUpdated: 2026-03
+
+- id: us-digital-response
+  stableId: Qw7nFtYp5w
+  type: organization
+  orgType: other
+  title: U.S. Digital Response
+  website: https://www.usdigitalresponse.org
+  founded: "2020"
+  description: >-
+    Nonprofit co-founded by Jennifer Pahlka during the COVID-19 pandemic to deploy volunteer
+    technologists to help government agencies respond to crises. Demonstrates potential for
+    rapid civic tech capacity mobilization during emergencies.
+  relatedEntries:
+    - id: ufdntmiWtQ
+      type: organization
+    - id: dbqoxdZuUw
+      type: organization
+  tags:
+    - civic-tech
+    - govtech
+    - crisis-response
+  lastUpdated: 2026-03
+
 - id: aria-uk
   stableId: XqjV4mbMXQ
   wikiId: E1997
