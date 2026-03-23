@@ -884,55 +884,45 @@ const entitiesApp = new Hono()
           metadata: clearStubIfEnriched(e),
         }));
 
-        // Two-phase upsert to avoid unique constraint on `id` (slug) when a slug
-        // was reassigned to a different stableId. Single INSERT ON CONFLICT (stableId)
-        // can't handle this because the `id` unique violation fires first.
-        //
-        // Phase 1: Update existing entities by stableId (handles slug changes)
-        // Phase 2: Insert new entities (stableId doesn't exist yet)
-        const existingRows = await tx
-          .select({ stableId: entities.stableId })
-          .from(entities)
-          .where(inArray(entities.stableId, allVals.map((v) => v.stableId)));
-        const existingSet = new Set(existingRows.map((r) => r.stableId));
+        // Temporarily drop the unique constraint on `id` (slug) during sync.
+        // The ON CONFLICT (stableId) upsert can't handle slug reassignments
+        // because the `id` unique constraint fires first. Dropping it for the
+        // duration of the transaction allows the upsert to proceed, then we
+        // re-add it. This is safe inside a transaction (changes are invisible
+        // to other connections until commit).
+        await tx.execute(sql`
+          ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_unique
+        `);
 
-        // Phase 1: Update existing
-        for (const val of allVals) {
-          if (!existingSet.has(val.stableId)) continue;
-          await tx
-            .update(entities)
-            .set({
-              id: val.id,
-              wikiId: val.wikiId ?? null,
-              entityType: val.entityType,
-              title: val.title,
-              description: val.description ?? null,
-              website: val.website ?? null,
-              tags: val.tags ?? null,
-              clusters: val.clusters ?? null,
-              status: val.status ?? null,
-              lastUpdated: val.lastUpdated ?? null,
-              customFields: val.customFields ?? null,
-              relatedEntries: val.relatedEntries ?? null,
-              sources: val.sources ?? null,
-              metadata: val.metadata ?? null,
+        await tx
+          .insert(entities)
+          .values(allVals)
+          .onConflictDoUpdate({
+            target: entities.stableId, // PK is now stable_id
+            set: {
+              id: sql`excluded.id`,
+              wikiId: sql`excluded.wiki_id`,
+              entityType: sql`excluded.entity_type`,
+              title: sql`excluded.title`,
+              description: sql`excluded.description`,
+              website: sql`excluded.website`,
+              tags: sql`excluded.tags`,
+              clusters: sql`excluded.clusters`,
+              status: sql`excluded.status`,
+              lastUpdated: sql`excluded.last_updated`,
+              customFields: sql`excluded.custom_fields`,
+              relatedEntries: sql`excluded.related_entries`,
+              sources: sql`excluded.sources`,
+              metadata: sql`excluded.metadata`,
               syncedAt: sql`now()`,
               updatedAt: sql`now()`,
-            })
-            .where(eq(entities.stableId, val.stableId));
-        }
+            },
+          });
 
-        // Phase 2: Insert new entities
-        const newVals = allVals.filter((v) => !existingSet.has(v.stableId));
-        if (newVals.length > 0) {
-          // Before inserting, clear any slug conflicts from entities that were
-          // deleted/renamed but left stale rows
-          const newSlugs = newVals.map((v) => v.id);
-          await tx
-            .delete(entities)
-            .where(inArray(entities.id, newSlugs));
-          await tx.insert(entities).values(newVals);
-        }
+        // Re-add the unique constraint
+        await tx.execute(sql`
+          ALTER TABLE entities ADD CONSTRAINT entities_id_unique UNIQUE (id)
+        `);
 
         // Dual-write to things table
         await upsertThingsInTx(
