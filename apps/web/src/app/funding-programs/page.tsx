@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
-import { getTypedEntityById } from "@/data/tablebase";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { parseFundingProgram } from "./[id]/program-data";
@@ -55,6 +55,7 @@ export default function FundingProgramsPage() {
       status: p.status,
       source: p.source,
       description: p.description,
+      verdict: getRecordVerdict("funding-program", String(p.key)),
     };
   });
 
