@@ -6,6 +6,7 @@
  * - Verdict validation against allowed values
  */
 
+import { z } from 'zod';
 import { callLlm, MODELS, type createLlmClient } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import {
@@ -13,6 +14,13 @@ import {
   type SourceCheckVerdict,
 } from '../../../apps/wiki-server/src/api-types.ts';
 import type { LlmSourceCheckResult } from './types.ts';
+
+const LlmResponseSchema = z.object({
+  verdict: z.string().default('unverifiable'),
+  confidence: z.number().min(0).max(1).default(0.5),
+  extracted_value: z.string().default(''),
+  reasoning: z.string().default(''),
+});
 
 /**
  * Call the LLM to source-check a claim/record against source text.
@@ -35,22 +43,26 @@ export async function callLlmForSourceCheck(
     retryLabel,
   });
 
-  const parsed = parseJsonResponse(result.text) as {
-    verdict: string;
-    confidence: number;
-    extracted_value: string;
-    reasoning: string;
-  };
+  const raw = parseJsonResponse(result.text);
+  const parsed = LlmResponseSchema.safeParse(raw);
+  if (!parsed.success) {
+    return {
+      verdict: 'unverifiable',
+      confidence: 0.5,
+      extractedValue: '',
+      reasoning: `LLM response failed validation: ${parsed.error.message}`,
+    };
+  }
 
-  const verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.verdict)
-    ? parsed.verdict
+  const verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.data.verdict)
+    ? parsed.data.verdict
     : 'unverifiable';
 
   return {
     verdict,
-    confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
-    extractedValue: parsed.extracted_value ?? '',
-    reasoning: parsed.reasoning ?? '',
+    confidence: parsed.data.confidence,
+    extractedValue: parsed.data.extracted_value,
+    reasoning: parsed.data.reasoning,
   };
 }
 

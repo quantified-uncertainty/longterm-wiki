@@ -420,6 +420,7 @@ export default async function LegislationDetailPage({
                     title={provision.title}
                     description={provision.description}
                     billSection={provision.billSection}
+                    details={provision.details}
                     billQuote={provision.billQuote}
                     amendmentNotes={provision.amendmentNotes}
                     fullTextUrl={entity.fullTextUrl}

@@ -210,7 +210,7 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { limit, offset, platform, dateFrom, dateTo } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const conditions = [eq(secondaryMarketPrices.companyId, resolvedId)];
+    const conditions = [eq(secondaryMarketPrices.companyEntityId, resolvedId)];
     if (platform) conditions.push(eq(secondaryMarketPrices.platform, platform));
     if (dateFrom) conditions.push(gte(secondaryMarketPrices.date, dateFrom));
     if (dateTo) conditions.push(lte(secondaryMarketPrices.date, dateTo));
@@ -251,7 +251,7 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .select(joinedSelect)
       .from(secondaryMarketPrices)
       .leftJoin(companyEntity, eq(secondaryMarketPrices.companyEntityId, companyEntity.stableId))
-      .where(eq(secondaryMarketPrices.companyId, resolvedId))
+      .where(eq(secondaryMarketPrices.companyEntityId, resolvedId))
       .orderBy(desc(secondaryMarketPrices.date), secondaryMarketPrices.platform)
       .limit(50);
 
@@ -269,8 +269,11 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .map((r) => r.price.impliedValuation)
       .filter((v): v is string => v != null)
       .map(Number);
-    const median = valuations.length > 0
-      ? valuations.sort((a, b) => a - b)[Math.floor(valuations.length / 2)]
+    const sorted = valuations.length > 0 ? [...valuations].sort((a, b) => a - b) : [];
+    const median = sorted.length > 0
+      ? sorted.length % 2 === 1
+        ? sorted[Math.floor(sorted.length / 2)]
+        : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
       : null;
     const min = valuations.length > 0 ? Math.min(...valuations) : null;
     const max = valuations.length > 0 ? Math.max(...valuations) : null;
@@ -283,7 +286,7 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
         medianValuation: median,
         minValuation: min,
         maxValuation: max,
-        dispersionPercent: median && min && max
+        dispersionPercent: median != null && min != null && max != null
           ? Math.round(((max - min) / median) * 100)
           : null,
       },
@@ -296,7 +299,7 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { platform, priceType, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const conditions = [eq(secondaryMarketPrices.companyId, resolvedId)];
+    const conditions = [eq(secondaryMarketPrices.companyEntityId, resolvedId)];
     if (platform) conditions.push(eq(secondaryMarketPrices.platform, platform));
     if (priceType) conditions.push(eq(secondaryMarketPrices.priceType, priceType));
 
