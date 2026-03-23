@@ -924,7 +924,28 @@ const entitiesApp = new Hono()
         upserted = allVals.length;
       });
     } catch (err) {
-      return dbError(c, "entities sync", err, { entityCount: items.length });
+      // Detailed error logging — the dbError response was missing detail field
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const errCause = err instanceof Error && err.cause
+        ? (err.cause instanceof Error ? err.cause.message : String(err.cause))
+        : "no-cause";
+      const errName = err instanceof Error ? err.constructor.name : typeof err;
+      const entityIds = items.map((e) => e.id).join(", ");
+      logger.error({
+        errName,
+        errMsg,
+        errCause,
+        entityCount: items.length,
+        entityIds: entityIds.slice(0, 500),
+        stack: err instanceof Error ? err.stack?.slice(0, 500) : undefined,
+      }, "entities sync DETAILED error");
+      // Return the detail inline so we can see it in the sync client
+      return c.json({
+        error: "database_error",
+        message: `entities sync failed`,
+        detail: `${errName}: ${errMsg}`,
+        cause: errCause,
+      }, 500);
     }
 
     return c.json({ upserted });
