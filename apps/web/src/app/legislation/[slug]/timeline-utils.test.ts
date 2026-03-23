@@ -270,6 +270,172 @@ describe("buildUnifiedTimeline", () => {
     ).toBe("Third");
   });
 
+  it("matches votes to month-only milestones when vote has a day-precise date", () => {
+    // Milestone "April 2024" → sortDate "2024-04-01"
+    // Vote "April 15, 2024" → sortDate "2024-04-15"
+    // Difference is 14 days — exceeds old 1-day tolerance but should match
+    // because the milestone is month-granularity and the vote falls within that month.
+    const milestones = makeMilestones(
+      ["Introduced", "January 2024"],
+      ["Passed Committee", "April 2024"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "Senate Floor",
+        date: "April 15, 2024",
+        result: "Passed",
+        ayes: 32,
+        noes: 1,
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    // Vote should merge into "Passed Committee" milestone (same month)
+    expect(result.milestones[1].vote).toBeDefined();
+    expect(result.milestones[1].vote!.ayes).toBe(32);
+    // No "Unmatched events" synthetic milestone
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+  });
+
+  it("matches Governor chamber to Signed milestone", () => {
+    const milestones = makeMilestones(
+      ["Introduced", "March 2025"],
+      ["Passed Legislature", "June 12, 2025"],
+      ["Signed", "December 19, 2025"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "Governor",
+        date: "December 19, 2025",
+        result: "Signed",
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    // Governor vote should merge into "Signed" milestone
+    expect(result.milestones[2].vote).toBeDefined();
+    expect(result.milestones[2].vote!.result).toBe("Signed");
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+  });
+
+  it("matches Summit chamber to Signed milestone for international agreements", () => {
+    const milestones = makeMilestones(
+      ["Signed", "November 2, 2023"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "Summit",
+        date: "November 2, 2023",
+        result: "Signed by 28 countries + EU",
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    expect(result.milestones[0].vote).toBeDefined();
+    expect(result.milestones[0].vote!.result).toBe("Signed by 28 countries + EU");
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+  });
+
+  it("matches European Parliament chambers to appropriate milestones", () => {
+    const milestones = makeMilestones(
+      ["Proposed", "April 21, 2021"],
+      ["Parliament Committee Vote", "May 11, 2023"],
+      ["Parliament Final Vote", "March 13, 2024"],
+      ["Council Adoption", "May 21, 2024"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "IMCO-LIBE Committees (Joint)",
+        date: "May 11, 2023",
+        result: "Passed",
+        ayes: 84,
+        noes: 7,
+      },
+      {
+        chamber: "European Parliament (Final Adoption)",
+        date: "March 13, 2024",
+        result: "Passed",
+        ayes: 523,
+        noes: 46,
+      },
+      {
+        chamber: "Council of the European Union",
+        date: "May 21, 2024",
+        result: "Adopted unanimously",
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    // All votes should match by date proximity — no unmatched events
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+    // Committee vote matches Parliament Committee Vote (same date)
+    expect(result.milestones[1].vote).toBeDefined();
+    expect(result.milestones[1].vote!.ayes).toBe(84);
+    // Final Adoption matches Parliament Final Vote (same date)
+    expect(result.milestones[2].vote).toBeDefined();
+    expect(result.milestones[2].vote!.ayes).toBe(523);
+    // Council vote matches Council Adoption (same date)
+    expect(result.milestones[3].vote).toBeDefined();
+  });
+
+  it("attaches truly unmatched votes to nearest milestone instead of creating Unmatched events", () => {
+    // Even when a vote can't match by label or date, it should go to
+    // the nearest milestone by date, not an "Unmatched events" bucket.
+    const milestones = makeMilestones(
+      ["Introduced", "January 2024"],
+      ["Enacted", "December 2024"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "Obscure Body",
+        date: "July 15, 2024",
+        result: "Approved",
+        ayes: 10,
+        noes: 3,
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    // Should NEVER produce "Unmatched events"
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+    // Vote should be a child of "Introduced" (the preceding milestone)
+    const introVotes = result.milestones[0].children.filter(
+      (c) => c.type === "vote"
+    );
+    expect(introVotes).toHaveLength(1);
+  });
+
+  it("attaches votes before first milestone to the first milestone (not Unmatched events)", () => {
+    const milestones = makeMilestones(
+      ["Introduced", "June 2024"],
+      ["Enacted", "December 2024"]
+    );
+    const votes: RawVote[] = [
+      {
+        chamber: "Advisory Committee",
+        date: "March 15, 2024",
+        result: "Recommended",
+        ayes: 8,
+        noes: 1,
+      },
+    ];
+    const result = buildUnifiedTimeline(milestones, votes, [], []);
+    // No "Unmatched events" — attach to nearest milestone (first one)
+    expect(result.milestones.every((m) => m.label !== "Unmatched events")).toBe(
+      true
+    );
+    // Should be a child of "Introduced" (nearest milestone)
+    const introVotes = result.milestones[0].children.filter(
+      (c) => c.type === "vote"
+    );
+    expect(introVotes).toHaveLength(1);
+  });
+
   it("handles full SB 1047-like scenario", () => {
     const milestones = makeMilestones(
       ["Introduced", "February 2024"],
