@@ -183,7 +183,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 1, output: 'Usage: crux tb tablebase submit --table=<table> --records-file=<path>\n       echo \'[...]\' | crux tb tablebase submit --table=<table>' };
   }
 
-  const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'publications'];
+  const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'publications', 'divisions'];
   if (!validTables.includes(table)) {
     return { exitCode: 1, output: `Invalid table: ${table}. Valid: ${validTables.join(', ')}` };
   }
