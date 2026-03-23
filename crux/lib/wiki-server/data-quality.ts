@@ -4,7 +4,7 @@
  * Uses Hono RPC inferred types from the server route.
  */
 
-import type { hc, InferResponseType } from "hono/client";
+import { type hc, type InferResponseType } from "hono/client";
 import type { DataQualityRoute } from "../../../apps/wiki-server/src/routes/operational/data-quality.js";
 import { apiRequest } from "./client.ts";
 

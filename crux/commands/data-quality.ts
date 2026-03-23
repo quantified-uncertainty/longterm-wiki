@@ -53,7 +53,7 @@ export const commands: Record<
 > = {
   async snapshot(_args, options) {
     const json = !!options.json;
-    console.log("Capturing data quality snapshot...");
+    if (!json) console.log("Capturing data quality snapshot...");
     const result = await captureSnapshot();
     if (!result.ok) {
       const msg = `Failed to capture snapshot: ${result.message}`;
@@ -71,6 +71,13 @@ export const commands: Record<
   async history(_args, options) {
     const json = !!options.json;
     const limit = options.limit ? parseInt(String(options.limit), 10) : 10;
+
+    if (isNaN(limit) || limit < 1) {
+      const msg = "--limit must be a positive integer";
+      if (json) return { output: JSON.stringify({ error: msg }), exitCode: 1 };
+      console.error(msg);
+      return { output: "", exitCode: 1 };
+    }
 
     const result = await getSnapshotHistory({ limit });
     if (!result.ok) {

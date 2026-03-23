@@ -1,3 +1,4 @@
+import { Card, CardContent } from "@/components/ui/card";
 import {
   fetchDetailed,
   type FetchResult,
@@ -21,11 +22,13 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border bg-card p-4">
-      <div className="text-sm text-muted-foreground">{label}</div>
-      <div className="text-2xl font-bold">{value}</div>
-      {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
-    </div>
+    <Card className="p-4">
+      <CardContent className="p-0">
+        <div className="text-sm text-muted-foreground">{label}</div>
+        <div className="text-2xl font-bold">{value}</div>
+        {sub && <div className="text-xs text-muted-foreground">{sub}</div>}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -156,9 +159,11 @@ function VerdictBadge({
   color: string;
 }) {
   return (
-    <div className="rounded border p-3 text-center">
-      <div className={`text-xl font-bold ${color}`}>{count}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-    </div>
+    <Card className="p-3 text-center">
+      <CardContent className="p-0">
+        <div className={`text-xl font-bold ${color}`}>{count}</div>
+        <div className="text-xs text-muted-foreground">{label}</div>
+      </CardContent>
+    </Card>
   );
 }
