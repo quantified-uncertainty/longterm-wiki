@@ -890,8 +890,27 @@ const entitiesApp = new Hono()
         // duration of the transaction allows the upsert to proceed, then we
         // re-add it. This is safe inside a transaction (changes are invisible
         // to other connections until commit).
+        // Drop BOTH possible constraint names — Drizzle uses {table}_{column}_key
+        // but we also added entities_id_unique in some migrations
+        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_unique`);
+        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_key`);
+        // Also drop the unique INDEX if it exists (unique indexes act as constraints)
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_unique`);
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_key`);
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_idx`);
+        await tx.execute(sql`DROP INDEX IF EXISTS idx_entities_id`);
+        // Nuclear option: find and drop ANY unique constraint/index on the id column
         await tx.execute(sql`
-          ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_unique
+          DO $$
+          DECLARE r RECORD;
+          BEGIN
+            FOR r IN
+              SELECT indexname FROM pg_indexes
+              WHERE tablename = 'entities' AND indexdef LIKE '%UNIQUE%' AND indexdef LIKE '%"id"%'
+            LOOP
+              EXECUTE 'DROP INDEX IF EXISTS ' || r.indexname;
+            END LOOP;
+          END $$
         `);
 
         await tx
