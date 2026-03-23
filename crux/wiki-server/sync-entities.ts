@@ -32,7 +32,9 @@ const EXPERTS_FILE = join(PROJECT_ROOT, "data/experts.yaml");
 const PEOPLE_RESOURCES_FILE = join(PROJECT_ROOT, "data/people-resources.yaml");
 
 // --- Configuration ---
-const DEFAULT_BATCH_SIZE = 100;
+// Reduced from 100 to 50 — batches of 100 can exceed the 30s statement_timeout
+// when entities have many FK cascade checks (facts, claims, personnel tables).
+const DEFAULT_BATCH_SIZE = 50;
 
 // --- Types ---
 
