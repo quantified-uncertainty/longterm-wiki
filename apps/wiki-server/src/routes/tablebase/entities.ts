@@ -828,6 +828,7 @@ const entitiesApp = new Hono()
     const { entities: items } = c.req.valid("json");
     const db = getDrizzleDb();
 
+
     // Validate relatedEntries references: strip out references to entities
     // that don't exist (either in this batch or in PG). This allows the sync
     // to proceed even when entities reference each other across batches.
@@ -862,6 +863,9 @@ const entitiesApp = new Hono()
 
     try {
       await db.transaction(async (tx) => {
+        // Increase statement_timeout for bulk sync — default 30s is too tight
+        // for batches of 100 entities with FK cascade checks on referencing tables.
+        await tx.execute(sql`SET LOCAL statement_timeout = '120000'`); // 2 min
         const allVals = items.map((e) => ({
           id: e.id,
           wikiId: e.wikiId ?? null,
