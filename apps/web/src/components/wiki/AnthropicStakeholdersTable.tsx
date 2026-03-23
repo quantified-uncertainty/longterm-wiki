@@ -76,11 +76,18 @@ function resolveHolderName(holderSlug: string): string {
 }
 
 export async function AnthropicStakeholdersTable() {
-  // Get latest valuation from KB — fail-closed if missing (KB is authoritative)
-  const valuationFact = getKBLatest("anthropic", "valuation");
+  // Get latest valuation from KB — try both slug and FactBase entity ID
+  const valuationFact =
+    getKBLatest("anthropic", "valuation") ??
+    getKBLatest("mK9pX3rQ7n", "valuation");
 
   if (!valuationFact || valuationFact.value.type !== "number") {
-    throw new Error("Missing numeric KB valuation for anthropic");
+    // Graceful fallback: render without valuation-dependent data
+    return (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4 text-sm text-amber-800 dark:text-amber-200">
+        Anthropic stakeholder data is temporarily unavailable (valuation fact not found in FactBase).
+      </div>
+    );
   }
 
   const valuation = valuationFact.value.value;
