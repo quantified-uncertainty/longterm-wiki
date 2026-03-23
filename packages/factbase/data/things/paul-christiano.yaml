@@ -6,14 +6,16 @@ facts:
     asOf: 2017-01
     validEnd: 2021-10
     source: https://paulfchristiano.com/
-    notes: "Researcher at OpenAI from 2017 to 2021; led alignment research including RLHF work"
+    notes: "Researcher at OpenAI from 2017 to 2021; led alignment research including
+      RLHF work"
 
   - id: f_qPXcXJF3Uv
     property: employed-by
     value: !ref QsXVXtQ0zE
     asOf: 2021-10
     source: https://alignment.org/
-    notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from day-to-day operations in 2023 due to a brain injury"
+    notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from
+      day-to-day operations in 2023 due to a brain injury"
 
   - id: f_rvwYSk7eFi
     property: role
@@ -34,7 +36,9 @@ facts:
 
   - id: f_pC4fG5hI6j
     property: notable-for
-    value: "Pioneer of RLHF and AI alignment research; founder of Alignment Research Center (ARC); key theorist of iterated amplification and eliciting latent knowledge"
+    value: "Pioneer of RLHF and AI alignment research; founder of Alignment Research
+      Center (ARC); key theorist of iterated amplification and eliciting latent
+      knowledge"
     source: https://en.wikipedia.org/wiki/Paul_Christiano
 
   - id: f_pC7kL8mN9o
@@ -59,11 +63,18 @@ facts:
     value: "Head of AI Safety, US AI Safety Institute"
     asOf: 2024-08
     source: https://www.nist.gov/people/paul-christiano
-    notes: "Publicly announced as Head of AI Safety at the U.S. AI Safety Institute (under NIST) in August 2024"
+    notes: "Publicly announced as Head of AI Safety at the U.S. AI Safety Institute
+      (under NIST) in August 2024"
 
   - id: f_He1SsMRfAw
     property: employed-by
     value: us-aisi
     asOf: 2024-08
     source: https://www.nist.gov/people/paul-christiano
-    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain injury; joined US AISI in August 2024"
+    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain
+      injury; joined US AISI in August 2024"
+  - id: X0XbB0w92w
+    property: website
+    value: https://paulfchristiano.com/
+    source: https://www.wikidata.org/wiki/Q64769299
+    notes: From Wikidata Q64769299

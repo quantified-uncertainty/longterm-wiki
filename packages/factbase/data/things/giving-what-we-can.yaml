@@ -23,3 +23,18 @@ facts:
     value: "2009"
     source: https://www.wikidata.org/wiki/Q5565874
     notes: From Wikidata Q5565874
+  - id: QypAzxj6fg
+    property: website
+    value: http://www.givingwhatwecan.org/
+    source: https://www.wikidata.org/wiki/Q5565874
+    notes: From Wikidata Q5565874
+  - id: dBgOVVeE3g
+    property: founded-by-name
+    value: Toby Ord
+    source: https://www.wikidata.org/wiki/Q5565874
+    notes: From Wikidata Q5565874; text value (not entity ref)
+  - id: YuInPkBgpQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Giving_What_We_Can
+    source: https://www.wikidata.org/wiki/Q5565874
+    notes: From Wikidata Q5565874

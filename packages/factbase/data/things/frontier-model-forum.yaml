@@ -2,7 +2,18 @@ entity: LgiqvRCrvg
 facts:
   - id: f_rUwCV8MR4g
     property: description
-    value: Industry-led non-profit organization promoting self-governance in frontier AI safety through collaborative
-      frameworks, research funding, and best practices development.
+    value: Industry-led non-profit organization promoting self-governance in
+      frontier AI safety through collaborative frameworks, research funding, and
+      best practices development.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 7rbp3wjwzQ
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q131896166
+    notes: From Wikidata Q131896166
+  - id: 7LRkkDB2gw
+    property: website
+    value: https://www.frontiermodelforum.org
+    source: https://www.wikidata.org/wiki/Q131896166
+    notes: From Wikidata Q131896166

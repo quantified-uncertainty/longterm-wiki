@@ -6,3 +6,8 @@ facts:
     asOf: "2025"
     source: https://manifund.org/about/regranting
     notes: "2025 AI safety regranting pool with first 10 regrantors announced"
+  - id: zDFMv6QsZA
+    property: website
+    value: https://manifund.org/
+    source: https://www.wikidata.org/wiki/Q131604174
+    notes: From Wikidata Q131604174

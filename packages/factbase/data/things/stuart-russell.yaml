@@ -5,14 +5,16 @@ facts:
     value: !ref ksqqi7fyeA
     asOf: 1986-01
     source: https://people.eecs.berkeley.edu/~russell/
-    notes: "Professor of Computer Science at UC Berkeley since 1986; founder of Center for Human-Compatible AI (CHAI)"
+    notes: "Professor of Computer Science at UC Berkeley since 1986; founder of
+      Center for Human-Compatible AI (CHAI)"
 
   - id: f_hlx9NqiojX
     property: role
     value: "Professor of Computer Science, UC Berkeley; Founder of CHAI"
     asOf: 1986-01
     source: https://people.eecs.berkeley.edu/~russell/
-    notes: "Co-author of 'Artificial Intelligence: A Modern Approach', the standard AI textbook; author of 'Human Compatible' (2019)"
+    notes: "Co-author of 'Artificial Intelligence: A Modern Approach', the standard
+      AI textbook; author of 'Human Compatible' (2019)"
 
   - id: f_iRPcKCTGM3
     property: born-year
@@ -22,13 +24,15 @@ facts:
 
   - id: f_sR1aB2cD3e
     property: education
-    value: "PhD in Computer Science, Stanford University; BA in Physics, University of Oxford (First Class Honours)"
+    value: "PhD in Computer Science, Stanford University; BA in Physics, University
+      of Oxford (First Class Honours)"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
     notes: "PhD supervised by Michael Genesereth"
 
   - id: f_sR4fG5hI6j
     property: notable-for
-    value: "Co-author of 'AI: A Modern Approach' (the standard AI textbook); founder of CHAI at UC Berkeley; leading advocate for provably beneficial AI"
+    value: "Co-author of 'AI: A Modern Approach' (the standard AI textbook); founder
+      of CHAI at UC Berkeley; leading advocate for provably beneficial AI"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
 
   - id: f_sR7kL8mN9o
@@ -47,3 +51,8 @@ facts:
   - id: f_ytjh35xr0n
     property: google-scholar
     value: "https://scholar.google.com/citations?user=2oy3OXYAAAAJ"
+  - id: PFHjRT4Ekw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Stuart_Russell_(politician)
+    source: https://www.wikidata.org/wiki/Q7627055
+    notes: From Wikidata Q7627055

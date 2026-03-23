@@ -24,3 +24,13 @@ facts:
     value: http://www.foundersfund.com
     source: https://www.wikidata.org/wiki/Q1439864
     notes: From Wikidata Q1439864
+  - id: OaDrdtnc6g
+    property: founded-by-name
+    value: Peter Thiel
+    source: https://www.wikidata.org/wiki/Q1439864
+    notes: From Wikidata Q1439864; text value (not entity ref)
+  - id: U51RWZpy7A
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Founders_Fund
+    source: https://www.wikidata.org/wiki/Q1439864
+    notes: From Wikidata Q1439864

@@ -24,3 +24,28 @@ facts:
     value: https://www.hewlett.org/
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
+  - id: bdjZOfS6gw
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
+  - id: 5XnKPmzfTw
+    property: revenue
+    value: 289396942
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
+  - id: 2SqQmCnUhw
+    property: founded-by-name
+    value: William Redington Hewlett
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412; text value (not entity ref)
+  - id: X4y81AG3GQ
+    property: legal-structure
+    value: foundation
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412
+  - id: e8TdBohfLA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Hewlett_Foundation
+    source: https://www.wikidata.org/wiki/Q1288412
+    notes: From Wikidata Q1288412

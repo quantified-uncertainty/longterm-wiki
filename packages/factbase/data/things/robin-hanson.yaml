@@ -28,7 +28,10 @@ facts:
 
   - id: f_rH6tN2pQ2v
     property: notable-for
-    value: "Pioneered prediction markets (since 1988); invented Logarithmic Market Scoring Rule (LMSR); proposed futarchy governance; originated Great Filter hypothesis; authored The Age of Em and The Elephant in the Brain; 5,200+ citations"
+    value: "Pioneered prediction markets (since 1988); invented Logarithmic Market
+      Scoring Rule (LMSR); proposed futarchy governance; originated Great Filter
+      hypothesis; authored The Age of Em and The Elephant in the Brain; 5,200+
+      citations"
     asOf: 2026-03
     notes: Enriched from wiki page
 
@@ -40,5 +43,12 @@ facts:
 
   - id: f_rHcY8fL8kA
     property: education
-    value: "B.S. Physics, UC Irvine (1981); M.S. Physics and M.A. Conceptual Foundations of Science, University of Chicago (1984); Ph.D. Social Science, Caltech (1997)"
+    value: "B.S. Physics, UC Irvine (1981); M.S. Physics and M.A. Conceptual
+      Foundations of Science, University of Chicago (1984); Ph.D. Social
+      Science, Caltech (1997)"
     notes: Enriched from wiki page
+  - id: zgze2RX90w
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Robin_Hanson_(swimmer)
+    source: https://www.wikidata.org/wiki/Q106923078
+    notes: From Wikidata Q106923078

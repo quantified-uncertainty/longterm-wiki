@@ -12,7 +12,8 @@ facts:
     value: "CEO & Co-founder, Conjecture"
     asOf: 2022-03
     source: https://www.conjecture.dev/
-    notes: "Prominent public advocate for AI safety; testified before UK Parliament and EU; frequent media commentator"
+    notes: "Prominent public advocate for AI safety; testified before UK Parliament
+      and EU; frequent media commentator"
 
   - id: f_2HGntp6Jt1
     property: born-year
@@ -21,7 +22,8 @@ facts:
 
   - id: f_cL1aB2cD3e
     property: notable-for
-    value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety advocate; testified before UK Parliament and EU on AI risks"
+    value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety
+      advocate; testified before UK Parliament and EU on AI risks"
     source: https://en.wikipedia.org/wiki/Connor_Leahy
 
   - id: f_cL4fG5hI6j
@@ -35,4 +37,10 @@ facts:
     asOf: "2020"
     validEnd: "2022"
     source: https://www.eleuther.ai/
-    notes: "Co-founded EleutherAI, an open-source AI research collective; developed GPT-NeoX and GPT-J"
+    notes: "Co-founded EleutherAI, an open-source AI research collective; developed
+      GPT-NeoX and GPT-J"
+  - id: V5EttM7ikA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Connor_Leahy
+    source: https://www.wikidata.org/wiki/Q130469388
+    notes: From Wikidata Q130469388

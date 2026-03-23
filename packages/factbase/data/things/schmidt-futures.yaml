@@ -24,3 +24,18 @@ facts:
     value: https://www.schmidtfutures.com/
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
+  - id: Vr6RToBMLw
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691
+  - id: kKB72pHlAA
+    property: founded-by-name
+    value: Eric Schmidt
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691; text value (not entity ref)
+  - id: DnM70bx8Kg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Schmidt_Futures
+    source: https://www.wikidata.org/wiki/Q111146691
+    notes: From Wikidata Q111146691

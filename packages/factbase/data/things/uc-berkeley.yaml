@@ -1,2 +1,53 @@
 entity: ksqqi7fyeA
-facts: []
+facts:
+  [
+    {
+        id: gvQJ7MTMjQ,
+        property: founded-date,
+        value: 1868-03,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: NcwpkZ0nQw,
+        property: headquarters,
+        value: Berkeley,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: slDarNUoJg,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: 1JbzAI70Jg,
+        property: website,
+        value: https://berkeley.edu,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: ntPsaYaYfA,
+        property: headcount,
+        value: 12122,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: joST7zinwQ,
+        property: parent-organization,
+        value: University of California,
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      },
+    {
+        id: abAQ68E4xA,
+        property: wikipedia-url,
+        value: "https://en.wikipedia.org/wiki/University_of_California,_Berkeley",
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: From Wikidata Q168756
+      }
+  ]

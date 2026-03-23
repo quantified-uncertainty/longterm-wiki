@@ -1,2 +1,7 @@
 entity: xakL6BzSla
-facts: []
+facts:
+  - id: 6bTbB5qWMg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Asana_(software)
+    source: https://www.wikidata.org/wiki/Q4803821
+    notes: From Wikidata Q4803821 (Asana software company, corrected from yoga Q466797)

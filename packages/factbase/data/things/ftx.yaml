@@ -24,3 +24,28 @@ facts:
     value: St. John's
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
+  - id: 4fVL3kiYyg
+    property: country
+    value: Antigua and Barbuda
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780
+  - id: CsM3WtgIFg
+    property: website
+    value: https://ftx.com/
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780
+  - id: 0JwIlwk0SQ
+    property: ceo
+    value: Sam Bankman-Fried
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780
+  - id: gwWDJDYXbA
+    property: founded-by-name
+    value: Sam Bankman-Fried
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780; text value (not entity ref)
+  - id: 7d2BrI4gDQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/FTX
+    source: https://www.wikidata.org/wiki/Q108864780
+    notes: From Wikidata Q108864780

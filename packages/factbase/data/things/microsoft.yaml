@@ -2,8 +2,25 @@ entity: OIY5gaPpBA
 facts:
   - id: f_1yvvPWOHUQ
     property: description
-    value: Microsoft invested $80B+ in AI infrastructure (FY2025) with a restructured $135B stake (27%) in OpenAI,
-      generating $13B AI revenue run rate (175% YoY growth) and 16 percentage points of Azure's 39% growth. GitHub
-      Copilot reached 20M users generating 46% of code, while responsible AI framework conduc
+    value: Microsoft invested $80B+ in AI infrastructure (FY2025) with a
+      restructured $135B stake (27%) in OpenAI, generating $13B AI revenue run
+      rate (175% YoY growth) and 16 percentage points of Azure's 39% growth.
+      GitHub Copilot reached 20M users generating 46% of code, while responsible
+      AI framework conduc
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: c0xlY3hLXA
+    property: ceo
+    value: Mustafa Süleyman
+    source: https://www.wikidata.org/wiki/Q125891217
+    notes: From Wikidata Q125891217
+  - id: NwtFtR1Ygg
+    property: parent-organization
+    value: Microsoft
+    source: https://www.wikidata.org/wiki/Q125891217
+    notes: From Wikidata Q125891217
+  - id: LWY3bMZ4GA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Microsoft_AI
+    source: https://www.wikidata.org/wiki/Q125891217
+    notes: From Wikidata Q125891217

@@ -19,3 +19,13 @@ facts:
     value: https://www.longview.org/
     source: https://www.wikidata.org/wiki/Q126277820
     notes: From Wikidata Q126277820
+  - id: hzk6bK3REA
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q126277820
+    notes: From Wikidata Q126277820
+  - id: 4Ncez877ig
+    property: founded-by-name
+    value: Natalie Cargill
+    source: https://www.wikidata.org/wiki/Q126277820
+    notes: From Wikidata Q126277820; text value (not entity ref)

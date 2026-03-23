@@ -5,14 +5,16 @@ facts:
     value: !ref 1LcLlMGLbw
     asOf: 2015-12
     source: https://openai.com/about
-    notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in 2019 when capped-profit entity was created"
+    notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in
+      2019 when capped-profit entity was created"
 
   - id: f_WLIAavRzUQ
     property: role
     value: "CEO"
     asOf: 2019-03
     source: https://openai.com/about
-    notes: "Briefly fired by the board on November 17, 2023; reinstated November 22, 2023 after employee revolt and Microsoft intervention"
+    notes: "Briefly fired by the board on November 17, 2023; reinstated November 22,
+      2023 after employee revolt and Microsoft intervention"
 
   - id: f_ZfbfHkh9Uw
     property: born-year
@@ -25,17 +27,20 @@ facts:
     asOf: "2014"
     validEnd: "2019"
     source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
-    notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to focus on OpenAI full-time"
+    notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to
+      focus on OpenAI full-time"
 
   - id: f_aR3kT8mW5q
     property: education
-    value: "Studied computer science at Stanford University (dropped out after sophomore year)"
+    value: "Studied computer science at Stanford University (dropped out after
+      sophomore year)"
     source: https://en.wikipedia.org/wiki/Sam_Altman
     notes: "Dropped out to work on Loopt, his first startup"
 
   - id: f_bN7vQ2xJ4p
     property: notable-for
-    value: "CEO of OpenAI; previously president of Y Combinator; central figure in the commercialization of large language models"
+    value: "CEO of OpenAI; previously president of Y Combinator; central figure in
+      the commercialization of large language models"
     source: https://en.wikipedia.org/wiki/Sam_Altman
 
   - id: f_cM6wP9rK3s
@@ -61,12 +66,13 @@ facts:
     asOf: "2005"
     validEnd: "2012"
     source: https://en.wikipedia.org/wiki/Loopt
-    notes: "Location-based social networking app; acquired by Green Dot Corporation for $43.4M in 2012"
+    notes: "Location-based social networking app; acquired by Green Dot Corporation
+      for $43.4M in 2012"
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_U5suM3Dqcg
     property: net-worth
-    value: 2.8e9
+    value: 2.8e+9
     asOf: "2024"
     notes: "Investment portfolio value per WSJ investigation."
 
@@ -90,8 +96,14 @@ facts:
 
   - id: f_kmBIoQdLEQ
     property: description
-    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter threatening to quit"
+    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter
+      threatening to quit"
 
   - id: f_7lQ4XtaMBQ
     property: description
     value: "Personal investment in Helion Energy: $375M"
+  - id: 9rqwdozDvA
+    property: website
+    value: https://blog.samaltman.com/
+    source: https://www.wikidata.org/wiki/Q7407093
+    notes: From Wikidata Q7407093

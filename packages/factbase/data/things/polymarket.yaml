@@ -2,8 +2,30 @@ entity: fRo2H0Q2xQ
 facts:
   - id: f_aUf0i5YixA
     property: description
-    value: This is a comprehensive overview of Polymarket as a prediction market platform, covering its history, mechanics,
-      and accuracy, but has minimal relevance to AI safety beyond brief mentions in the EA/forecasting section. While
-      well-documented, it primarily serves as general reference material about a
+    value: This is a comprehensive overview of Polymarket as a prediction market
+      platform, covering its history, mechanics, and accuracy, but has minimal
+      relevance to AI safety beyond brief mentions in the EA/forecasting
+      section. While well-documented, it primarily serves as general reference
+      material about a
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: d52KI9HX7g
+    property: founded-date
+    value: 2020-01
+    source: https://www.wikidata.org/wiki/Q123502863
+    notes: From Wikidata Q123502863
+  - id: d2HlpX3XYQ
+    property: website
+    value: https://polymarket.com
+    source: https://www.wikidata.org/wiki/Q123502863
+    notes: From Wikidata Q123502863
+  - id: ISXiftGEEA
+    property: founded-by-name
+    value: Shayne Coplan
+    source: https://www.wikidata.org/wiki/Q123502863
+    notes: From Wikidata Q123502863; text value (not entity ref)
+  - id: OBtcNfD36Q
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Polymarket
+    source: https://www.wikidata.org/wiki/Q123502863
+    notes: From Wikidata Q123502863

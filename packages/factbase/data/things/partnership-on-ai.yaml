@@ -4,7 +4,8 @@ facts:
     property: founded-date
     value: "2016-09-28"
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
-    notes: "Publicly announced September 28, 2016 with founding members Amazon, Facebook, Google, DeepMind, Microsoft, and IBM"
+    notes: "Publicly announced September 28, 2016 with founding members Amazon,
+      Facebook, Google, DeepMind, Microsoft, and IBM"
 
   - id: f_Cj7vN2xQ4b
     property: headquarters
@@ -33,6 +34,24 @@ facts:
 
   - id: f_Nr1hJ8vX5f
     property: description
-    value: "Multi-stakeholder organization bringing together academics, civil society, industry, and media to advance understanding of AI technologies. Founded by six major tech companies, PAI now has over 100 partner organizations and focuses on responsible AI practices and guidelines."
+    value: "Multi-stakeholder organization bringing together academics, civil
+      society, industry, and media to advance understanding of AI technologies.
+      Founded by six major tech companies, PAI now has over 100 partner
+      organizations and focuses on responsible AI practices and guidelines."
     asOf: 2026-03
     source: https://partnershiponai.org/about/
+  - id: hoogixWPXg
+    property: website
+    value: https://www.partnershiponai.org
+    source: https://www.wikidata.org/wiki/Q27057835
+    notes: From Wikidata Q27057835
+  - id: THMYIbF2Iw
+    property: founded-by-name
+    value: Apple Inc.
+    source: https://www.wikidata.org/wiki/Q27057835
+    notes: From Wikidata Q27057835; text value (not entity ref)
+  - id: d67bPtkj3w
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Partnership_on_AI
+    source: https://www.wikidata.org/wiki/Q27057835
+    notes: From Wikidata Q27057835

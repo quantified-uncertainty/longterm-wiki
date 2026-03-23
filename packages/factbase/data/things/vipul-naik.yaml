@@ -29,7 +29,10 @@ facts:
 
   - id: f_vN6tN2pQ6v
     property: notable-for
-    value: "Created Donations List Website tracking $72.8B in philanthropic donations; funded ~$255K in contract research for EA knowledge infrastructure; two-time International Mathematical Olympiad silver medalist; former MIRI researcher"
+    value: "Created Donations List Website tracking $72.8B in philanthropic
+      donations; funded ~$255K in contract research for EA knowledge
+      infrastructure; two-time International Mathematical Olympiad silver
+      medalist; former MIRI researcher"
     asOf: 2026-03
     notes: Enriched from wiki page
 
@@ -40,5 +43,12 @@ facts:
 
   - id: f_vNcY8fL2kA
     property: education
-    value: "Ph.D. Mathematics, University of Chicago (2013); B.Sc. Mathematics and Computer Science, Chennai Mathematical Institute; two-time IMO silver medalist (2003, 2004)"
+    value: "Ph.D. Mathematics, University of Chicago (2013); B.Sc. Mathematics and
+      Computer Science, Chennai Mathematical Institute; two-time IMO silver
+      medalist (2003, 2004)"
     notes: Enriched from wiki page
+  - id: QW5q8pj8DQ
+    property: website
+    value: http://www.cmi.ac.in/~vipul/
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772
