@@ -73,7 +73,8 @@ export function dbError(
     ...(context ?? {}),
     err: err instanceof Error ? err.message : String(err),
   }, `${operation} failed`);
-  return c.json({ error: "database_error", message: `${operation} failed` }, 500);
+  const detail = err instanceof Error ? err.message : String(err);
+  return c.json({ error: "database_error", message: `${operation} failed`, detail }, 500);
 }
 
 /** Extract the first row from a query result, throwing if empty. */
