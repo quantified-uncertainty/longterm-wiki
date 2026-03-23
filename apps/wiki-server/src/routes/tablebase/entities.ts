@@ -884,6 +884,17 @@ const entitiesApp = new Hono()
           metadata: clearStubIfEnriched(e),
         }));
 
+        // Clear stale rows where the slug (id) was reassigned to a different stableId.
+        // Without this, the INSERT ON CONFLICT (stableId) can't handle the unique
+        // constraint on id when a slug moved between entities.
+        const batchSlugs = allVals.map((v) => v.id);
+        const batchStableIds = allVals.map((v) => v.stableId);
+        await tx.execute(sql`
+          DELETE FROM entities
+          WHERE id = ANY(${batchSlugs})
+            AND stable_id != ALL(${batchStableIds})
+        `);
+
         await tx
           .insert(entities)
           .values(allVals)
