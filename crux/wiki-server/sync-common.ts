@@ -175,7 +175,14 @@ export async function fetchWithRetry(
 
       // 5xx — retry
       const body = await res.text().catch(() => "");
-      lastError = new Error(`HTTP ${res.status}: ${body.slice(0, 1000)}`);
+      // Parse out the cause/detail from JSON responses to avoid truncating the SQL query
+      let errorSummary = body.slice(0, 500);
+      try {
+        const parsed = JSON.parse(body);
+        if (parsed.cause) errorSummary = `${parsed.message} | cause: ${parsed.cause}`;
+        else if (parsed.detail) errorSummary = `${parsed.message} | detail: ${String(parsed.detail).slice(-500)}`;
+      } catch { /* not JSON */ }
+      lastError = new Error(`HTTP ${res.status}: ${errorSummary}`);
     } catch (err) {
       lastError = err;
     }
