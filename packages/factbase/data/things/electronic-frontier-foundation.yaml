@@ -42,3 +42,9 @@ facts:
     value: "Argued privacy protections should not depend on decisions of a few powerful AI companies, analyzing Anthropic-DOD conflict"
     asOf: 2026-03
     source: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
+
+  - id: f_eff_uaw_v_state
+    property: litigation
+    value: "UAW v. U.S. Department of State (S.D.N.Y., filed Oct 16, 2025) — EFF represents UAW, CWA, AFT (with Muslim Advocates) challenging mass social media surveillance of visa holders using AI. Alleges First Amendment and APA violations. Seeks injunction and record purge."
+    asOf: 2025-10
+    source: https://www.eff.org/cases/united-auto-workers-v-us-department-state
