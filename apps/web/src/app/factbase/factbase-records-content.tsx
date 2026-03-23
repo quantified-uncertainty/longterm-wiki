@@ -59,7 +59,7 @@ export function FBRecordsExplorerContent() {
 
   // Sort by entity name then collection
   rows.sort((a, b) => {
-    const cmp = a.entityName.localeCompare(b.entityName);
+    const cmp = (a.entityName ?? "").localeCompare(b.entityName ?? "");
     return cmp !== 0 ? cmp : a.collection.localeCompare(b.collection);
   });
 
