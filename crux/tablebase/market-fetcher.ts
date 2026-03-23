@@ -166,8 +166,11 @@ export async function fetchMarketSnapshots(
   let fetchedCount = 0;
   let skippedCount = 0;
 
-  for (const q of questions) {
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i];
     if (q.platform === "metaculus") {
+      // Rate-limit: 1 request per 1.5s to avoid Metaculus 429s
+      if (i > 0) await new Promise((r) => setTimeout(r, 1500));
       const result = await fetchMetaculusQuestion(q.platformQuestionId);
       if (result && result.probability != null) {
         snapshots.push({
