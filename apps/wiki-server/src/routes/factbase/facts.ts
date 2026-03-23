@@ -59,9 +59,65 @@ function formatFact(f: typeof facts.$inferSelect) {
     source: f.source,
     format: f.format,
     formatDivisor: f.formatDivisor,
+    sourceQuote: f.sourceQuote,
+    usdEquivalent: f.usdEquivalent,
+    exchangeRate: f.exchangeRate,
+    exchangeRateDate: f.exchangeRateDate,
+    dollarYear: f.dollarYear,
     syncedAt: f.syncedAt,
     createdAt: f.createdAt,
     updatedAt: f.updatedAt,
+  };
+}
+
+/**
+ * Reconstruct a FactValue discriminated union from flat PG columns.
+ */
+function reconstructFactValue(row: typeof facts.$inferSelect) {
+  switch (row.format) {
+    case "number":
+      return { type: "number" as const, value: row.numeric ?? 0 };
+    case "text":
+      return { type: "text" as const, value: row.value ?? "" };
+    case "date":
+      return { type: "date" as const, value: row.value ?? "" };
+    case "boolean":
+      return { type: "boolean" as const, value: row.value === "true" };
+    case "ref":
+      return { type: "ref" as const, value: row.value ?? "" };
+    case "refs":
+      return { type: "refs" as const, value: row.value ? row.value.split(", ") : [] };
+    case "range":
+      return { type: "range" as const, low: row.low ?? 0, high: row.high ?? 0 };
+    case "min":
+      return { type: "min" as const, value: row.numeric ?? 0 };
+    case "json":
+      return { type: "json" as const, value: row.value ? JSON.parse(row.value) : null };
+    default:
+      return { type: "text" as const, value: row.value ?? "" };
+  }
+}
+
+/**
+ * Convert a PG facts row into the KB Fact shape used by SerializedKB.
+ * Omits `unit` (comes from Property) and `derivedFrom` (display-only, not stored in PG).
+ */
+function pgRowToFact(row: typeof facts.$inferSelect) {
+  return {
+    id: row.factId,
+    subjectId: row.entityId,
+    propertyId: row.measure ?? "",
+    value: reconstructFactValue(row),
+    ...(row.asOf != null && { asOf: row.asOf }),
+    ...(row.validEnd != null && { validEnd: row.validEnd }),
+    ...(row.source != null && { source: row.source }),
+    ...(row.sourceQuote != null && { sourceQuote: row.sourceQuote }),
+    ...(row.note != null && { notes: row.note }),
+    ...(row.currency != null && { currency: row.currency }),
+    ...(row.usdEquivalent != null && { usdEquivalent: row.usdEquivalent }),
+    ...(row.exchangeRate != null && { exchangeRate: row.exchangeRate }),
+    ...(row.exchangeRateDate != null && { exchangeRateDate: row.exchangeRateDate }),
+    ...(row.dollarYear != null && { dollarYear: row.dollarYear }),
   };
 }
 
@@ -204,6 +260,25 @@ const factsApp = new Hono()
     });
   })
 
+  // ---- GET /export ----
+  // Returns all facts grouped by entityId, reconstructed into the KB Fact shape
+  // (FactValue discriminated union). Used by build-data.mjs to read facts from
+  // PG instead of YAML.
+  .get("/export", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = await db.select().from(facts).orderBy(asc(facts.entityId), asc(facts.factId));
+
+    const grouped: Record<string, object[]> = {};
+    for (const row of rows) {
+      const fact = pgRowToFact(row);
+      if (!grouped[row.entityId]) grouped[row.entityId] = [];
+      grouped[row.entityId].push(fact);
+    }
+
+    return c.json({ facts: grouped, total: rows.length });
+  })
+
   // ---- POST /sync ----
   // Uses manual JSON parsing to preserve the "invalid_json" error code
   // for malformed request bodies.
@@ -278,6 +353,11 @@ const factsApp = new Hono()
           source: f.source ?? null,
           format: f.format ?? null,
           formatDivisor: f.formatDivisor ?? null,
+          sourceQuote: f.sourceQuote ?? null,
+          usdEquivalent: f.usdEquivalent ?? null,
+          exchangeRate: f.exchangeRate ?? null,
+          exchangeRateDate: f.exchangeRateDate ?? null,
+          dollarYear: f.dollarYear ?? null,
         }));
 
         await tx
@@ -300,6 +380,11 @@ const factsApp = new Hono()
               source: sql`excluded.source`,
               format: sql`excluded.format`,
               formatDivisor: sql`excluded.format_divisor`,
+              sourceQuote: sql`excluded.source_quote`,
+              usdEquivalent: sql`excluded.usd_equivalent`,
+              exchangeRate: sql`excluded.exchange_rate`,
+              exchangeRateDate: sql`excluded.exchange_rate_date`,
+              dollarYear: sql`excluded.dollar_year`,
               syncedAt: sql`now()`,
               updatedAt: sql`now()`,
             },

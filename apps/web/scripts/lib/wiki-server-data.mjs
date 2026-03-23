@@ -1083,6 +1083,36 @@ function normalizePGEntityId(id) {
   return STALE_ENTITY_ID_MAP[id] ?? id;
 }
 
+/**
+ * Fetch all facts from PG via the wiki-server /api/facts/export endpoint.
+ * Returns facts grouped by entityId in the KB Fact shape, or null if unavailable.
+ */
+export async function fetchFactsFromPG() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  kb-facts-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return null;
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const resp = await fetch(`${serverUrl}/api/facts/export`, {
+      headers,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!resp.ok) {
+      console.warn(`  kb-facts-pg: failed (HTTP ${resp.status})`);
+      return null;
+    }
+    const data = await resp.json();
+    return data.facts ?? null;
+  } catch (err) {
+    console.warn(`  kb-facts-pg: failed (${err.message})`);
+    return null;
+  }
+}
+
 export async function mergePGRecordsIntoKB(kb) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
