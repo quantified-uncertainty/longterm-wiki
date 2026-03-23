@@ -299,7 +299,7 @@ describe("preprocessReferences", () => {
 
     const { content: result, referenceMap } = preprocessReferences(content, refData);
 
-    expect(result).toContain("[^1]: Claim reference cr-missing (data unavailable — rebuild with wiki-server access)");
+    expect(result).toContain("[^1]: Claim reference cr-missing");
     expect(referenceMap.get(1)?.data).toBeNull();
     expect(referenceMap.get(1)?.kind).toBe("claim");
   });
@@ -310,7 +310,7 @@ describe("preprocessReferences", () => {
 
     const { content: result, referenceMap } = preprocessReferences(content, refData);
 
-    expect(result).toContain("[^1]: Citation rc-missing (data unavailable — rebuild with wiki-server access)");
+    expect(result).toContain("[^1]: Citation rc-missing");
     expect(referenceMap.get(1)?.data).toBeNull();
     expect(referenceMap.get(1)?.kind).toBe("citation");
   });
@@ -585,7 +585,7 @@ describe("preprocessReferences", () => {
       refData
     );
 
-    expect(result).toContain("[^1]: KB fact f_missing (data unavailable)");
+    expect(result).toContain("[^1]: KB fact f_missing");
     expect(referenceMap.get(1)?.data).toBeNull();
     expect(referenceMap.get(1)?.kind).toBe("kb");
   });

@@ -1520,7 +1520,7 @@ export async function buildPageReferenceIndex() {
       if (!res.ok) {
         console.log(`  pageReferenceIndex: server returned ${res.status} (attempt ${i + 1}/${retryTimeouts.length})`);
         if (i < retryTimeouts.length - 1) continue;
-        console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+        console.warn('  ⚠ pageReferenceIndex: all attempts failed — citation footnotes will show reference IDs only');
         wikiServerWarningCount++;
         return {};
       }
@@ -1531,14 +1531,14 @@ export async function buildPageReferenceIndex() {
       console.log(`  pageReferenceIndex: ${pageCount} pages, ${data.totalClaimRefs} claim refs, ${data.totalCitations} citations`);
 
       if (pageCount === 0 && data.totalCitations === 0) {
-        console.warn('  ⚠ pageReferenceIndex: server returned 0 pages — citations will show "data unavailable"');
+        console.warn('  ⚠ pageReferenceIndex: server returned 0 pages — citation footnotes will show reference IDs only');
       }
 
       return pages;
     } catch (err) {
       console.log(`  pageReferenceIndex: ${err.message || 'server unavailable'} (attempt ${i + 1}/${retryTimeouts.length})`);
       if (i < retryTimeouts.length - 1) continue;
-      console.warn('  ⚠ pageReferenceIndex: all attempts failed — citations will show "data unavailable"');
+      console.warn('  ⚠ pageReferenceIndex: all attempts failed — citation footnotes will show reference IDs only');
       wikiServerWarningCount++;
       return {};
     }
