@@ -31,9 +31,13 @@ export async function GET(request: NextRequest) {
     if (entityId && entityId.trim() && entityId !== "*") {
       params.set("entity_id", entityId.trim());
     }
-    const rawLimit = parseInt(request.nextUrl.searchParams.get("limit") ?? "200", 10);
-    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 200) : 200;
+    const rawLimit = parseInt(request.nextUrl.searchParams.get("limit") ?? "500", 10);
+    const limit = Number.isFinite(rawLimit) ? Math.min(Math.max(rawLimit, 1), 5000) : 500;
     params.set("limit", String(limit));
+    const rawOffset = parseInt(request.nextUrl.searchParams.get("offset") ?? "0", 10);
+    if (Number.isFinite(rawOffset) && rawOffset > 0) {
+      params.set("offset", String(rawOffset));
+    }
     const recordType = request.nextUrl.searchParams.get("record_type");
     if (recordType && recordType.length <= 50) params.set("record_type", recordType);
     const verdict = request.nextUrl.searchParams.get("verdict");
