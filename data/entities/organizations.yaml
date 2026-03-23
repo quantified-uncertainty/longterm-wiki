@@ -6784,3 +6784,234 @@
   description: >-
     Donor-advised fund specializing in libertarian and free-market causes.
   lastUpdated: 2026-03
+
+# --- EA/AI safety grantee organizations ---
+- id: wild-animal-initiative
+  stableId: mHrz7Y-rOx
+  type: organization
+  orgType: generic
+  title: Wild Animal Initiative
+  website: https://www.wildanimalinitiative.org
+  description: >-
+    Research nonprofit focused on wild animal welfare, studying the lives of
+    wild animals and identifying ways to improve their well-being. Funded by
+    EA Funds and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: mercy-for-animals
+  stableId: 8C_NZjRH28
+  type: organization
+  orgType: generic
+  title: Mercy For Animals
+  website: https://mercyforanimals.org
+  description: >-
+    International animal advocacy nonprofit focused on ending factory farming.
+    Conducts undercover investigations, corporate campaigns, and policy advocacy.
+    Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: constellation
+  stableId: jwe4re7Ggo
+  type: organization
+  orgType: generic
+  title: Constellation
+  website: https://constellation.org
+  description: >-
+    Co-working and community space for AI safety researchers in Berkeley, CA.
+    Provides office space and community infrastructure for the AI safety ecosystem.
+    Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: animal-equality
+  stableId: IkwNqat1cE
+  type: organization
+  orgType: generic
+  title: Animal Equality
+  website: https://animalequality.org
+  description: >-
+    International animal rights nonprofit conducting investigations and
+    corporate campaigns to reduce animal suffering in factory farming.
+  lastUpdated: 2026-03
+
+- id: openmined
+  stableId: AOJewfN502
+  type: organization
+  orgType: generic
+  title: OpenMined
+  website: https://openmined.org
+  description: >-
+    Open-source community focused on privacy-preserving AI and data science.
+    Develops tools for federated learning, differential privacy, and encrypted
+    computation. Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: ai-objectives-institute
+  stableId: 71VWCgxV5P
+  type: organization
+  orgType: generic
+  title: AI Objectives Institute
+  website: https://ai-objectives.org
+  description: >-
+    Research organization working on AI alignment through mechanism design and
+    cooperative AI. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: timaeus
+  stableId: AzwQTQCMeo
+  type: organization
+  orgType: generic
+  title: Timaeus
+  website: https://timaeus.co
+  description: >-
+    AI safety research organization focused on mechanistic interpretability
+    and developmental interpretability. Studies how neural networks form
+    internal representations during training. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: pibbss
+  stableId: PXcUg7YICV
+  type: organization
+  orgType: generic
+  title: PIBBSS
+  aliases:
+    - Principles of Intelligent Behavior in Biological and Social Systems
+  website: https://pibbss.ai
+  description: >-
+    Research fellowship program bringing researchers from diverse fields
+    (biology, neuroscience, social science) to work on AI alignment problems.
+    Funded by SFF and EA Funds.
+  lastUpdated: 2026-03
+
+- id: arkose
+  stableId: fj1DZJhxWy
+  type: organization
+  orgType: generic
+  title: Arkose
+  description: >-
+    AI safety research organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: civai
+  stableId: vG0nGlCWRn
+  type: organization
+  orgType: generic
+  title: Civic AI Security Program (CivAI)
+  description: >-
+    Program focused on the intersection of AI safety and civic security.
+    Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: idais
+  stableId: zkWlTLfxuO
+  type: organization
+  orgType: generic
+  title: International Dialogues on AI Safety (IDAIS)
+  description: >-
+    Initiative bringing together international stakeholders for dialogue on
+    AI safety governance and policy coordination.
+  lastUpdated: 2026-03
+
+- id: alter
+  stableId: 8a5BiFe1nv
+  type: organization
+  orgType: generic
+  title: Association for Long Term Existence and Resilience (ALTER)
+  description: >-
+    Academic research and advocacy organization investigating AI alignment
+    and existential risk. Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: center-for-election-science
+  stableId: gBpjt2fx66
+  type: organization
+  orgType: generic
+  title: The Center for Election Science
+  website: https://electionscience.org
+  description: >-
+    Nonprofit advancing approval voting and other voting method reforms.
+    Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: shrimp-welfare-project
+  stableId: uFuJxNjpYD
+  type: organization
+  orgType: generic
+  title: Shrimp Welfare Project
+  website: https://www.shrimpwelfareproject.org
+  description: >-
+    Charity focused on improving welfare of farmed shrimp, one of the most
+    numerous farmed animals. Funded by EA Funds.
+  lastUpdated: 2026-03
+
+- id: fortify-health
+  stableId: XCK8EEC7tz
+  type: organization
+  orgType: generic
+  title: Fortify Health
+  website: https://www.fortifyhealth.global
+  description: >-
+    Global health nonprofit working on large-scale food fortification programs
+    to reduce micronutrient deficiencies. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: pure-earth
+  stableId: 3xDXLwV3lg
+  type: organization
+  orgType: generic
+  title: Pure Earth
+  website: https://www.pureearth.org
+  description: >-
+    Nonprofit working to solve pollution problems in low and middle-income
+    countries. Focus on lead and toxic pollution. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: aquatic-life-institute
+  stableId: NDTZImcMyY
+  type: organization
+  orgType: generic
+  title: Aquatic Life Institute
+  website: https://ali.fish
+  description: >-
+    Research and advocacy organization focused on the welfare of aquatic
+    animals. Works on fish welfare standards and aquaculture practices.
+    EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: just-impact
+  stableId: pwbWtmWHkT
+  type: organization
+  orgType: generic
+  title: Just Impact
+  description: >-
+    Fiscal sponsor and project incubator. Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: lead-exposure-action-fund
+  stableId: rCn5M6JO7K
+  type: organization
+  orgType: generic
+  title: Lead Exposure Action Fund (LEAF)
+  description: >-
+    Fund dedicated to reducing childhood lead exposure worldwide. Seeded
+    with \$125M from Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: encode-ai
+  stableId: BVYHXX_LvA
+  type: organization
+  orgType: generic
+  title: Encode AI Corporation
+  description: >-
+    AI safety organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: california-yimby
+  stableId: yU5rKw_sAa
+  type: organization
+  orgType: generic
+  title: California YIMBY
+  website: https://cayimby.org
+  description: >-
+    Housing advocacy organization promoting pro-housing policy reform in
+    California. Open Philanthropy grantee.
+  lastUpdated: 2026-03
