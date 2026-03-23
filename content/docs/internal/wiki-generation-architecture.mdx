@@ -5,10 +5,10 @@ description: Architecture proposal for scalable, high-quality wiki page generati
 sidebar:
   order: 35
 subcategory: architecture
-lastEdited: 2026-03-09
+lastEdited: 2026-03-23
 createdAt: 2026-02-16
 evergreen: false
-summary: Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks.
+summary: Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine, Loki/OpenFactVerification, GPT-Researcher, RefChecker), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks.
 ---
 import { Mermaid } from '@components/wiki';
 
@@ -128,6 +128,39 @@ The pattern: Researcher -> Writer -> Editor -> Specialist, with each agent optim
 [SemanticCite](https://arxiv.org/html/2511.16198v1) proposes a pipeline for citation verification: extract claims, retrieve source passages via hybrid search, classify support level (SUPPORTED / PARTIALLY SUPPORTED / UNSUPPORTED / UNCERTAIN). Their fine-tuned models achieve competitive performance with commercial systems.
 
 **Relevance**: We already have a verify-sources phase, but it's coarse-grained. Per-claim verification with confidence scoring would significantly improve citation quality.
+
+### Loki / OpenFactVerification (2024-2025)
+
+[Loki](https://github.com/Libr-AI/OpenFactVerification) ([Li et al., COLING 2025](https://arxiv.org/abs/2410.01794)) is an MIT-licensed five-step fact verification pipeline:
+
+1. **Decomposer**: Breaks text into atomic claims -- each "concise (\<15 words) and self-contained", no vague references, at least one claim per sentence
+2. **Checkworthiness Identifier**: Filters out subjective/opinion claims (e.g., "X has a vast campus" rejected because "vast" is subjective)
+3. **Query Generator**: Converts claims into optimized keyword-focused search queries (not raw claims, which yield biased results)
+4. **Evidence Retriever**: 3 search queries per claim via Serper API (\$0.001/search), top 5 results with snippets, optional NLI ranking
+5. **Claim Verifier**: LLM evaluates evidence against each claim. Verdicts: supported/refuted/insufficient evidence
+
+**Key results**: F1 0.85 on true claims with GPT-4o, 8.3s per sample (async parallelization), roughly \$0.02-0.05 per claim set.
+
+**Relevance to us**: We already have the claim extraction step (`semantic-diff/claim-extractor.ts`) and per-citation verification (`citation-audit` phase, `fb source-check`). But our existing verification only checks claims against their **already-cited URLs**. The gaps Loki addresses:
+- **Uncited prose claims**: Factual assertions with no footnote that neither `citation-audit` nor `fb source-check` touches
+- **Independent corroboration**: Searching the *web* for evidence rather than re-checking the same cited URL (catches stale or misleading sources)
+- **Checkworthiness filtering**: Reducing cost/false positives by skipping subjective or trivially true claims before verification
+
+See [Discussion #3087](https://github.com/quantified-uncertainty/longterm-wiki/discussions/3087) for detailed experiment proposals.
+
+### GPT-Researcher (2024-2026)
+
+[GPT-Researcher](https://github.com/assafelovic/gpt-researcher) (18k+ stars) uses a planner-executor-publisher architecture for autonomous web research with citations. Ranked #1 among open-source systems in Carnegie Mellon's DeepResearchGym benchmark.
+
+Key pattern: **iterative research with gap analysis**. After initial research, the system analyzes what questions remain unanswered, generates follow-up queries, retrieves additional evidence, and repeats. The "deep research" mode uses tree-like recursive exploration (~5 min, ≈\$0.40 with o3-mini).
+
+**Relevance**: Our auto-update pipeline does single-pass research (RSS fetch -> digest -> route -> improve). Adding a gap-analysis loop between research and writing would produce deeper research for the same page-update budget. This is a prompt-engineering change, not a new dependency.
+
+### Amazon RefChecker (2024)
+
+[RefChecker](https://github.com/amazon-science/RefChecker) decomposes LLM output into knowledge triplets `(subject, predicate, object)` and checks each against reference documents. More granular than sentence-level claims -- "Anthropic, founded in 2021 by Dario Amodei, has 1,500 employees" yields three independent triplets.
+
+**Relevance**: Our claim extractor uses free-text claims with typed `keyValue` fields, which is less structured but more natural for wiki prose. The triplet approach may catch more errors per sentence but at higher extraction cost. Worth a comparison experiment but likely marginal over our existing approach.
 
 ### Anthropic Multi-Agent Research System (2025)
 
@@ -646,6 +679,9 @@ pnpm crux content create "Topic" --tier=standard  # defaults to v2
 | **Self-Refine** | Generate-feedback-refine loop | V3 reviewer triggers targeted re-passes |
 | **Self-Refine** | Specific, actionable feedback | Reviewer produces per-section scores, not vague "improve" |
 | **SemanticCite** | Per-claim citation verification | V1 classifies each claim's support level |
+| **Loki** | Checkworthiness filtering before verification | Skip subjective/vague claims to reduce cost and false positives |
+| **Loki** | Web evidence search for uncited claims | Find sources for claims that have no footnote |
+| **GPT-Researcher** | Iterative research with gap analysis | Research -> identify gaps -> targeted follow-up queries -> repeat |
 | **Anthropic Research** | Orchestrator + parallel subagents | Orchestrator plans, specialists execute (potentially in parallel) |
 | **Anthropic Research** | Expensive orchestrator, cheap workers | Opus for orchestrator/writer/reviewer, Sonnet/Haiku for research/verification |
 
@@ -693,8 +729,9 @@ A page with good prose but no diagrams gets diagram tools. A page with bad sourc
 | `source-fetcher` | Fetch URL → clean markdown + relevant excerpts | `crux citations verify` (upgraded) | \$0 (no LLM) |
 | `research-agent` | Multi-source search → structured facts with quotes | `crux research <topic>` | \$1-3 |
 | `source-cache` | Persistent store of fetched sources + extracted facts | Reused across runs | \$0 |
-| `claim-verifier` | Check if source supports a specific claim | Per-citation in auditor | \$0.01/claim (Haiku) |
+| `claim-verifier` | Check if source supports a specific claim (Loki-inspired: decompose, filter check-worthy, search web, verify) | Per-citation in auditor | \$0.01/claim (Haiku) |
 | `citation-auditor` | Independent verification of all citations on a page | `crux citations audit <id>` | \$0.10-0.30 |
+| `uncited-claim-finder` | Identify prose claims with no footnote, search web for evidence (Loki gap) | `crux verify uncited <id>` | \$0.30-0.60/page |
 
 **Content Writing:**
 
