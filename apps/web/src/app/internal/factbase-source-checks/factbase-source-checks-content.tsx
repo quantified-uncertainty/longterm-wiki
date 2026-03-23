@@ -17,11 +17,33 @@ async function loadStats(): Promise<FetchResult<RpcSourceChecksStatsResult>> {
   return fetchDetailed<RpcSourceChecksStatsResult>("/api/verifications/stats");
 }
 
-async function loadVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsResult>> {
-  // Load all verdicts — the stats are also unfiltered, so table and stats must match
-  return fetchDetailed<RpcSourceChecksVerdictsResult>(
-    "/api/verifications/verdicts?record_type=fact&limit=200"
-  );
+async function loadAllVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsResult>> {
+  // Paginate through all fact verdicts in batches of 200 (server max page size)
+  const PAGE_SIZE = 200;
+  let offset = 0;
+  let allVerdicts: RpcSourceCheckVerdictRow[] = [];
+  let total = 0;
+
+  while (true) {
+    const result = await fetchDetailed<RpcSourceChecksVerdictsResult>(
+      `/api/verifications/verdicts?record_type=fact&limit=${PAGE_SIZE}&offset=${offset}`
+    );
+    if (!result.ok) return result;
+
+    const page = result.data.verdicts ?? [];
+    allVerdicts = [...allVerdicts, ...page];
+    const reportedTotal = result.data.total;
+    total = reportedTotal ?? allVerdicts.length;
+    if (
+      (reportedTotal != null && allVerdicts.length >= reportedTotal) ||
+      page.length < PAGE_SIZE
+    ) {
+      break;
+    }
+    offset += PAGE_SIZE;
+  }
+
+  return { ok: true as const, data: { verdicts: allVerdicts, total } };
 }
 
 // ── Stat card ─────────────────────────────────────────────────────────────────
@@ -72,7 +94,7 @@ const BAR_COLORS: Record<string, string> = {
 export async function FactBaseSourceChecksContent() {
   const [statsResult, verdictsResult] = await Promise.all([
     loadStats(),
-    loadVerdicts(),
+    loadAllVerdicts(),
   ]);
 
   const hasApi = statsResult.ok && verdictsResult.ok;

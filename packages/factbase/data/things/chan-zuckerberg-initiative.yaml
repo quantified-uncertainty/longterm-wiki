@@ -40,7 +40,8 @@ facts:
     value: 805
     asOf: "2026"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
-    notes: "Approximately 805 employees after laying off ~70 (~8% of ~875 workforce) to refocus on AI-biomedical research"
+    notes: "Approximately 805 employees after laying off ~70 (~8% of ~875 workforce)
+      to refocus on AI-biomedical research"
   - id: m7Lq9YLiqw
     property: founded-date
     value: "2015"
@@ -54,5 +55,25 @@ facts:
   - id: euDjDvv50g
     property: website
     value: https://chanzuckerberg.com/
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
+  - id: HGikJLLWEQ
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
+  - id: Ts2N71qCVA
+    property: founded-by-name
+    value: Mark Zuckerberg
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039; text value (not entity ref)
+  - id: 9saf9wrWBA
+    property: legal-structure
+    value: limited liability company
+    source: https://www.wikidata.org/wiki/Q21623039
+    notes: From Wikidata Q21623039
+  - id: GOGmnvoaDA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039

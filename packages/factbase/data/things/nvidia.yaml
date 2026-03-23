@@ -28,3 +28,48 @@ facts:
     asOf: 2025-02
     source: https://www.wikidata.org/wiki/Q182477
     notes: From Wikidata Q182477 (as of 2025-02)
+  - id: 8sAetcpxoA
+    property: headquarters
+    value: California
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: 5QgzUmYH8A
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: BWicjYEpPQ
+    property: website
+    value: https://www.nvidia.com/
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: svJV9CIAnQ
+    property: ceo
+    value: Jensen Huang
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: xdjVLzA1Cw
+    property: headcount
+    value: 13775
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: NGXYO8BmVA
+    property: revenue
+    value: 215938000000
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: wj5ax7elqw
+    property: founded-by-name
+    value: Jensen Huang
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477; text value (not entity ref)
+  - id: 66Lc0vx1oA
+    property: legal-structure
+    value: public company
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477
+  - id: ZnJlOwxniw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Nvidia
+    source: https://www.wikidata.org/wiki/Q182477
+    notes: From Wikidata Q182477

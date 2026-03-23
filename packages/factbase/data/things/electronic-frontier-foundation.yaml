@@ -1,0 +1,50 @@
+entity: H4tplAyDRX
+facts:
+  - id: f_CeubDlJujw
+    property: founded-date
+    value: "1990-07"
+    source: https://www.eff.org/about/history
+    notes: "Founded July 1990 by John Gilmore, John Perry Barlow, Mitch Kapor"
+
+  - id: f_iiJDAyiPZg
+    property: headquarters
+    value: "815 Eddy Street, San Francisco, CA"
+    source: https://www.eff.org/about
+
+  - id: f_SOKVCVHlDw
+    property: employee-count
+    value: "100"
+    asOf: 2024
+    source: https://www.eff.org/about
+    notes: "Approximately 100 staff — lawyers, activists, technologists"
+
+  - id: f_eff_ed_transition
+    property: leadership
+    value: "Cindy Cohn serving as Executive Director; successor search underway via Russell Reynolds Associates"
+    asOf: 2025-11
+    source: https://www.eff.org/deeplinks/2025/11/what-eff-needs-new-executive-director
+    notes: "Announced November 2025; departure timeline not specified"
+
+  - id: f_eff_axon_investigation
+    property: investigation
+    value: "Investigated Axon's 'Draft One' AI-written police report product, designed to hinder audits"
+    asOf: 2025
+    source: https://www.eff.org/press/releases/eff-investigation-ai-product-police-reports-designed-hinder-audits
+
+  - id: f_eff_openai_pentagon
+    property: analysis
+    value: "Published analysis criticizing OpenAI's Pentagon deal for inadequate safeguards against AI-powered surveillance"
+    asOf: 2026-03
+    source: https://www.eff.org/deeplinks/2026/03/weasel-words-openais-pentagon-deal-wont-stop-ai-powered-surveillance
+
+  - id: f_eff_anthropic_dod
+    property: analysis
+    value: "Argued privacy protections should not depend on decisions of a few powerful AI companies, analyzing Anthropic-DOD conflict"
+    asOf: 2026-03
+    source: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
+
+  - id: f_eff_uaw_v_state
+    property: litigation
+    value: "UAW v. U.S. Department of State (S.D.N.Y., filed Oct 16, 2025) — EFF represents UAW, CWA, AFT (with Muslim Advocates) challenging mass social media surveillance of visa holders using AI. Alleges First Amendment and APA violations. Seeks injunction and record purge."
+    asOf: 2025-10
+    source: https://www.eff.org/cases/united-auto-workers-v-us-department-state

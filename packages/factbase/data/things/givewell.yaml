@@ -22,3 +22,33 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q5565607
     notes: From Wikidata Q5565607
+  - id: SYcghskvMQ
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607
+  - id: t9nIA8v3UQ
+    property: website
+    value: https://www.givewell.org/
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607
+  - id: JYF4S3yEAA
+    property: revenue
+    value: 1346284
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607
+  - id: weNxifIMDA
+    property: founded-by-name
+    value: Holden Karnofsky
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607; text value (not entity ref)
+  - id: Ob41dY8YZA
+    property: legal-structure
+    value: charitable organization
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607
+  - id: 5SLuTTtZOQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/GiveWell
+    source: https://www.wikidata.org/wiki/Q5565607
+    notes: From Wikidata Q5565607

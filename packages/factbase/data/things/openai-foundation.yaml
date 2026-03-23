@@ -28,3 +28,33 @@ facts:
     value: https://openai.com/
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
+  - id: 5yvbOUe2wg
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: 7ei2c6jvhw
+    property: ceo
+    value: Sam Altman
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: KQAvp27Iqw
+    property: revenue
+    value: 5363248
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: 0xO09yP1HA
+    property: founded-by-name
+    value: Elon Musk
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200; text value (not entity ref)
+  - id: ZhZrIyWn1A
+    property: legal-structure
+    value: 501(c)(3) organization
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: AiRENlHCFw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/OpenAI
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200

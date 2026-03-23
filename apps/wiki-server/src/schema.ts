@@ -805,8 +805,8 @@ export const entities = pgTable(
  * Facts — read mirror of FactBase YAML (packages/factbase/data/things/).
  *
  * Stores individual facts tied to entities, including timeseries data
- * (grouped by measure). FactBase YAML stays authoritative; this table is
- * a queryable read mirror for the API.
+ * (grouped by measure). PG is the authoritative source for facts;
+ * YAML is synced here and the build pipeline reads from PG.
  *
  * Naming note: "facts" in this table are FactBase structured triples. This
  * is distinct from the legacy data/facts/*.yaml system (which is deprecated
@@ -836,6 +836,11 @@ export const facts = pgTable(
     source: text("source"), // URL to source
     format: text("format"),
     formatDivisor: real("format_divisor"),
+    sourceQuote: text("source_quote"),
+    usdEquivalent: real("usd_equivalent"),
+    exchangeRate: real("exchange_rate"),
+    exchangeRateDate: text("exchange_rate_date"),
+    dollarYear: integer("dollar_year"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

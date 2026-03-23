@@ -17,3 +17,8 @@ facts:
     value: https://www.longtermresilience.org/
     source: https://www.wikidata.org/wiki/Q126286020
     notes: From Wikidata Q126286020
+  - id: r3RBlzFQIw
+    property: country
+    value: United Kingdom
+    source: https://www.wikidata.org/wiki/Q126286020
+    notes: From Wikidata Q126286020

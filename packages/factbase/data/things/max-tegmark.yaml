@@ -28,7 +28,9 @@ facts:
 
   - id: f_mT6tN2pQ3v
     property: notable-for
-    value: "Co-founded Future of Life Institute; developed 23 Asilomar AI Principles; organized 2023 AI pause letter with 30,000+ signatories; author of Life 3.0 (NYT bestseller); TIME 100 Most Influential in AI 2023"
+    value: "Co-founded Future of Life Institute; developed 23 Asilomar AI
+      Principles; organized 2023 AI pause letter with 30,000+ signatories;
+      author of Life 3.0 (NYT bestseller); TIME 100 Most Influential in AI 2023"
     asOf: 2026-03
     notes: Enriched from wiki page
 
@@ -46,6 +48,18 @@ facts:
 
   - id: f_mTfB4gN5mD
     property: education
-    value: "B.A. Economics, Stockholm School of Economics; B.Sc. Physics, Royal Institute of Technology; M.A. Physics, UC Berkeley (1992); Ph.D. Physics, UC Berkeley (1994)"
+    value: "B.A. Economics, Stockholm School of Economics; B.Sc. Physics, Royal
+      Institute of Technology; M.A. Physics, UC Berkeley (1992); Ph.D. Physics,
+      UC Berkeley (1994)"
     source: https://en.wikipedia.org/wiki/Max_Tegmark
     notes: Enriched from wiki page
+  - id: pLOXwvLYQA
+    property: website
+    value: http://space.mit.edu/home/tegmark/
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321
+  - id: WyBpDjl6zQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Max_Tegmark
+    source: https://www.wikidata.org/wiki/Q2076321
+    notes: From Wikidata Q2076321

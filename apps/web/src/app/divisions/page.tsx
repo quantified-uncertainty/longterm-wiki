@@ -3,6 +3,7 @@ import {
   getAllKBRecords,
   getKBRecords,
 } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import {
   parseDivision,
   resolveEntityLink,
@@ -94,6 +95,7 @@ export default function DivisionsPage() {
         status: division.status,
         href,
         hasData: false, // computed below
+        verdict: getRecordVerdict("division", String(division.key)),
       },
       record,
     });

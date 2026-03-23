@@ -4,27 +4,31 @@ facts:
     property: founded-date
     value: "2024-02"
     source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
-    notes: "Commission Decision of 24 January 2024; published in Official Journal 14 February 2024; entered into force 21 February 2024"
+    notes: "Commission Decision of 24 January 2024; published in Official Journal 14
+      February 2024; entered into force 21 February 2024"
 
   - id: f_axGtTJnm8O
     property: headquarters
     value: "Brussels, Belgium"
     source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
-    notes: "Part of DG CNECT (Communications Networks, Content and Technology) within the European Commission"
+    notes: "Part of DG CNECT (Communications Networks, Content and Technology)
+      within the European Commission"
 
   - id: f_uRZtWLDynr
     property: headcount
     value: 100
     asOf: 2024-02
     source: https://www.euronews.com/next/2024/02/01/commissions-staffing-and-financing-of-ai-office-raises-eyebrows-in-capitals
-    notes: "Planned ~100 staff: 80 new hires plus 20 transferred from within the Commission, per Feb 2024 announcement"
+    notes: "Planned ~100 staff: 80 new hires plus 20 transferred from within the
+      Commission, per Feb 2024 announcement"
 
   - id: f_yhq1V8cJkV
     property: description
     value: >-
-      The European Commission's dedicated office for AI governance, responsible for enforcing
-      the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI
-      policy. Consists of 6 units and 2 advisors. Part of DG CNECT within the Commission.
+      The European Commission's dedicated office for AI governance, responsible
+      for enforcing the EU AI Act, developing standards and codes of practice,
+      and coordinating EU-wide AI policy. Consists of 6 units and 2 advisors.
+      Part of DG CNECT within the Commission.
     asOf: 2025-12
     source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
 
@@ -32,4 +36,35 @@ facts:
     property: legal-structure
     value: "EU Commission body (within DG CNECT)"
     source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
-    notes: "Established by Commission Decision; funded through reshuffled Digital Europe Programme budget"
+    notes: "Established by Commission Decision; funded through reshuffled Digital
+      Europe Programme budget"
+  - id: QQrzPtGH0w
+    property: headquarters
+    value: Brussels
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125
+  - id: gxxSwS0ymQ
+    property: country
+    value: Belgium
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125
+  - id: gh0MhdbGhQ
+    property: website
+    value: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125
+  - id: 3BswWAVZmw
+    property: headcount
+    value: 140
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125
+  - id: GCOQU9oHeg
+    property: parent-organization
+    value: European Commission
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125
+  - id: U2CL0dO1Rg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
+    source: https://www.wikidata.org/wiki/Q135841125
+    notes: From Wikidata Q135841125

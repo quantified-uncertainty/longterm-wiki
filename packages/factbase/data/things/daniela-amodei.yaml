@@ -19,7 +19,8 @@ facts:
     value: !ref mK9pX3rQ7n
     asOf: 2021-01
     source: https://anthropic.com/company
-    notes: "Co-founded Anthropic in January 2021 with Dario Amodei and others; serves as President"
+    notes: "Co-founded Anthropic in January 2021 with Dario Amodei and others;
+      serves as President"
 
   - id: f_oo5LmrgGtw
     property: role
@@ -41,5 +42,10 @@ facts:
   - id: lXJBrUMv9A
     property: education
     value: University of California, Santa Cruz
+    source: https://www.wikidata.org/wiki/Q119721378
+    notes: From Wikidata Q119721378
+  - id: 7kJpzBCn0A
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Daniela_Amodei
     source: https://www.wikidata.org/wiki/Q119721378
     notes: From Wikidata Q119721378

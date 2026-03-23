@@ -24,3 +24,23 @@ facts:
     value: http://rationality.org/
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
+  - id: TeH17fNnzA
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499
+  - id: HAVjae4bPw
+    property: founded-by-name
+    value: Julia Galef
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499; text value (not entity ref)
+  - id: fRUew7gOUA
+    property: legal-structure
+    value: 501(c)(3) organization
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499
+  - id: K8PNstngNQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Center_for_Applied_Rationality
+    source: https://www.wikidata.org/wiki/Q20715499
+    notes: From Wikidata Q20715499

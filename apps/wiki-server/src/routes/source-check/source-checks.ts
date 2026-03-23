@@ -569,12 +569,7 @@ const sourceChecksApp = new Hono()
     const db = getDrizzleDb();
 
     // Count total records per table using raw SQL UNION ALL
-    interface TableCountRow {
-      table_name: string;
-      total: number;
-    }
-
-    const tableCounts = (await db.execute(sql`
+    const tableCountResult = await db.execute(sql`
       SELECT 'personnel' AS table_name, count(*)::int AS total FROM personnel
       UNION ALL
       SELECT 'division', count(*)::int FROM divisions
@@ -588,11 +583,24 @@ const sourceChecksApp = new Hono()
       SELECT 'funding-program', count(*)::int FROM funding_programs
       UNION ALL
       SELECT 'publication', count(*)::int FROM publications
-    `)) as unknown as TableCountRow[];
+      UNION ALL
+      SELECT 'secondary-market-price', count(*)::int FROM secondary_market_prices
+      UNION ALL
+      SELECT 'equity-position', count(*)::int FROM equity_positions
+      UNION ALL
+      SELECT 'entity-event', count(*)::int FROM entity_events
+      UNION ALL
+      SELECT 'entity-assessment', count(*)::int FROM entity_assessments
+      UNION ALL
+      SELECT 'benchmark-result', count(*)::int FROM benchmark_results
+      UNION ALL
+      SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
+    `);
 
     const totalsByType: Record<string, number> = {};
-    for (const row of tableCounts) {
-      totalsByType[row.table_name] = row.total;
+    for (const row of tableCountResult) {
+      const r = row as { table_name: string; total: number };
+      totalsByType[r.table_name] = r.total;
     }
 
     // Count distinct verified records per record_type from verification_verdicts

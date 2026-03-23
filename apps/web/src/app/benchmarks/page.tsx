@@ -6,6 +6,7 @@ import type { MatrixBenchmark, MatrixModel, ScoreGrid } from "./comparison-matri
 import { BenchmarksView } from "./benchmarks-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
 
 export const metadata: Metadata = {
   title: "AI Benchmarks",
@@ -52,11 +53,23 @@ interface StatDef {
 
 // ── API-first data loading ────────────────────────────────────────────────
 
+/** Resolve a maintainer value that may be a raw entity ID to a display name. */
+function resolveMaintainer(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const resolved = resolveEntityName(raw);
+  // resolveEntityName returns "Unknown" for bare stableIds/numeric IDs — suppress those
+  return resolved.name === "Unknown" ? null : resolved.name;
+}
+
 function apiEntityToRow(
   e: DirectoryEntity,
   modelsCount: number,
 ): BenchmarkRow {
   const meta = e.metadata ?? {};
+  // Check resolvedRefs first (server-resolved), then resolve locally
+  const rawMaintainer = (meta.maintainer as string | undefined) ?? null;
+  const resolvedRef = rawMaintainer ? e.resolvedRefs?.[rawMaintainer] : null;
+  const maintainer = resolvedRef?.name ?? resolveMaintainer(rawMaintainer);
   return {
     id: e.id,
     title: e.title,
@@ -65,7 +78,7 @@ function apiEntityToRow(
     scoringMethod: (meta.scoringMethod as string | undefined) ?? null,
     higherIsBetter: (meta.higherIsBetter as boolean | undefined) ?? true,
     introducedDate: (meta.introducedDate as string | undefined) ?? null,
-    maintainer: (meta.maintainer as string | undefined) ?? null,
+    maintainer,
     description: e.description ?? null,
     modelsCount,
   };
@@ -115,7 +128,7 @@ function loadFromLocal(): BenchmarksPageData {
       scoringMethod: entity.scoringMethod ?? null,
       higherIsBetter: entity.higherIsBetter,
       introducedDate: entity.introducedDate ?? null,
-      maintainer: entity.maintainer ?? null,
+      maintainer: resolveMaintainer(entity.maintainer),
       description: entity.description ?? null,
       modelsCount: results.length,
     };

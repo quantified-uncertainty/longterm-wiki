@@ -24,3 +24,33 @@ facts:
     value: https://cepi.net
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
+  - id: 3r0RH77IGw
+    property: country
+    value: Norway
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: I9DU3joyAw
+    property: ceo
+    value: John-Arne Røttingen
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: hCXagEudpg
+    property: revenue
+    value: 1273354629
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: 48NiUaWaAg
+    property: founded-by-name
+    value: Japan
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033; text value (not entity ref)
+  - id: A3B2wfSpXA
+    property: legal-structure
+    value: forening/lag/innretning
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033
+  - id: LfFGsap2rA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
+    source: https://www.wikidata.org/wiki/Q27133033
+    notes: From Wikidata Q27133033

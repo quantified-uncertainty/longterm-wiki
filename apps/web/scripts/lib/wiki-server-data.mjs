@@ -804,13 +804,14 @@ function fundingRoundRowToRecordEntry(row) {
   // Embed the server-side-resolved company name so the frontend can display it
   // even when companyRef.entityId is null (legacy numeric companyId rows).
   if (row.companyRef?.name) fields.company_name = row.companyRef.name;
+  else if (row.companyResolvedName && !/^\d+$/.test(row.companyResolvedName)) fields.company_name = row.companyResolvedName;
 
   const entry = {
     key: row.id,
     schema: 'funding-round',
     // Prefer companyRef.entityId (proper stableId FK) over legacy companyId for entity resolution.
-    // Falls back to companyId for backward compatibility.
-    ownerEntityId: row.companyRef?.entityId ?? row.companyId,
+    // Falls back to companyId only if it looks like a slug (not a numeric DB PK).
+    ownerEntityId: row.companyRef?.entityId ?? (/^\d+$/.test(row.companyId) ? null : row.companyId),
     fields,
   };
   // Embed resolved lead investor display name from entity ref
@@ -1081,6 +1082,36 @@ const STALE_ENTITY_ID_MAP = {
 function normalizePGEntityId(id) {
   if (!id) return id;
   return STALE_ENTITY_ID_MAP[id] ?? id;
+}
+
+/**
+ * Fetch all facts from PG via the wiki-server /api/facts/export endpoint.
+ * Returns facts grouped by entityId in the KB Fact shape, or null if unavailable.
+ */
+export async function fetchFactsFromPG() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  kb-facts-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return null;
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const resp = await fetch(`${serverUrl}/api/facts/export`, {
+      headers,
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (!resp.ok) {
+      console.warn(`  kb-facts-pg: failed (HTTP ${resp.status})`);
+      return null;
+    }
+    const data = await resp.json();
+    return data.facts ?? null;
+  } catch (err) {
+    console.warn(`  kb-facts-pg: failed (${err.message})`);
+    return null;
+  }
 }
 
 export async function mergePGRecordsIntoKB(kb) {

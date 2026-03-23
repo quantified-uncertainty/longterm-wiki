@@ -1,0 +1,53 @@
+entity: 3xDXLwV3lg
+facts:
+  [
+    {
+        id: dUuULTZ7Lw,
+        property: founded-date,
+        value: 1999-01,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: AGmko4usfQ,
+        property: headquarters,
+        value: New York City,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: GiTaCeYkWQ,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: tOGOXwtbXg,
+        property: website,
+        value: http://www.pureearth.org,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: XkyMqYZGww,
+        property: revenue,
+        value: 1510616,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: LIyDWr009Q,
+        property: legal-structure,
+        value: 501(c)(3) organization,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      },
+    {
+        id: FBuHTMnvpg,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Pure_Earth,
+        source: https://www.wikidata.org/wiki/Q145590,
+        notes: From Wikidata Q145590
+      }
+  ]

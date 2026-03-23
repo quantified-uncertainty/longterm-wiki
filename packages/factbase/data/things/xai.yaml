@@ -4,7 +4,8 @@ facts:
     property: founded-date
     value: 2023-07
     source: https://x.ai/about
-    notes: "Publicly launched and commonly cited as founded July 2023; incorporated earlier (March 2023) but operated in stealth until public announcement"
+    notes: "Publicly launched and commonly cited as founded July 2023; incorporated
+      earlier (March 2023) but operated in stealth until public announcement"
 
   - id: f_8UM2NKwdUA
     property: headquarters
@@ -36,7 +37,8 @@ facts:
     value: 5e+10
     asOf: 2024-12
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
-    notes: "Post-money valuation at Series C close (December 2024). Earlier Series B in May 2024 was at $24B."
+    notes: "Post-money valuation at Series C close (December 2024). Earlier Series B
+      in May 2024 was at $24B."
 
   - id: f_CvDHaporPw
     property: valuation
@@ -147,3 +149,8 @@ facts:
     value: https://x.ai
     source: https://www.wikidata.org/wiki/Q120599684
     notes: From Wikidata Q120599684
+  - id: CECaNwYCxA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/XAI_(company)
+    source: https://www.wikidata.org/wiki/Q120599684
+    notes: From Wikidata Q120599684 (corrected from mismatched Q40890078)

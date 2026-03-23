@@ -17,10 +17,11 @@ facts:
   - id: f_2a2wV4u2y5
     property: description
     value: >-
-      AI safety advisory firm that provides briefings, training, and risk assessments to
-      government officials. Authored the first-ever AI action plan commissioned by the U.S.
-      State Department ('Defense in Depth'), released March 2024. Has trained hundreds of
-      Department of Defense staff including senior executives, generals, and admirals.
+      AI safety advisory firm that provides briefings, training, and risk
+      assessments to government officials. Authored the first-ever AI action
+      plan commissioned by the U.S. State Department ('Defense in Depth'),
+      released March 2024. Has trained hundreds of Department of Defense staff
+      including senior executives, generals, and admirals.
     asOf: 2025-12
     source: https://www.gladstone.ai/about
 
@@ -38,10 +39,26 @@ facts:
     value: 250000
     asOf: 2024-03
     source: https://time.com/6898967/ai-extinction-national-security-risks-report/
-    notes: "Federal contract worth $250,000 from U.S. State Department for the 'Defense in Depth' report, commissioned November 2022"
+    notes: "Federal contract worth $250,000 from U.S. State Department for the
+      'Defense in Depth' report, commissioned November 2022"
 
   - id: f_9Wvj44C569
     property: legal-structure
     value: "Private company"
     source: https://www.gladstone.ai/about
     notes: "Independent firm; no outside funding taken as of 2024"
+  - id: VGiXRbHUpQ
+    property: country
+    value: Australia
+    source: https://www.wikidata.org/wiki/Q3275488
+    notes: From Wikidata Q3275488
+  - id: 2DCPrPn3gA
+    property: website
+    value: http://www.gladstone.qld.gov.au/web/guest/gladstone-airport
+    source: https://www.wikidata.org/wiki/Q3275488
+    notes: From Wikidata Q3275488
+  - id: gWYCsiq2Rw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Gladstone_Airport
+    source: https://www.wikidata.org/wiki/Q3275488
+    notes: From Wikidata Q3275488

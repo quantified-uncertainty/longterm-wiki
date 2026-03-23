@@ -832,6 +832,11 @@ export const SyncFactSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   format: z.string().max(100).nullable().optional(),
   formatDivisor: z.number().nullable().optional(),
+  sourceQuote: z.string().max(5000).nullable().optional(),
+  usdEquivalent: z.number().nullable().optional(),
+  exchangeRate: z.number().nullable().optional(),
+  exchangeRateDate: z.string().max(20).nullable().optional(),
+  dollarYear: z.number().int().nullable().optional(),
 });
 export type SyncFact = z.infer<typeof SyncFactSchema>;
 

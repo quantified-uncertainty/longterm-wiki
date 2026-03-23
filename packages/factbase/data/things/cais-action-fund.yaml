@@ -1,0 +1,47 @@
+entity: 0HsrqIftUg
+facts:
+  - id: f_caisaf_founded
+    property: founded-date
+    value: "2022"
+    source: https://action.safe.ai
+    notes: "Sister organization to Center for AI Safety"
+
+  - id: f_caisaf_hq
+    property: headquarters
+    value: "Washington, DC"
+    source: https://action.safe.ai
+    notes: "DC-based policy arm; CAIS itself is in San Francisco"
+
+  - id: f_caisaf_focus
+    property: description
+    value: "Bipartisan policy advocacy organization focused on AI national security risks. Translates technical AI safety concerns from CAIS research into legislative and policy proposals."
+    asOf: 2026-03
+    source: https://action.safe.ai
+
+  - id: f_caisaf_lobbying_2024
+    property: lobbying-spend
+    value: "490000"
+    unit: USD
+    asOf: 2024
+    source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2024&id=D000110584
+    notes: "Total 2024 federal lobbying ~$490K (in-house $270K + Akin Gump $160K + Michael Best $60K). Verified from Senate LDA filings."
+
+  - id: f_caisaf_lobbying_2025
+    property: lobbying-spend
+    value: "420000"
+    unit: USD
+    asOf: 2025
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+AI+Safety+Action+Fund
+    notes: "Total 2025 federal lobbying ~$420K (in-house $310K + Michael Best $110K). Verified from Senate LDA."
+
+  - id: f_caisaf_sb1047
+    property: campaign
+    value: "Co-sponsor of California SB 1047 (Safe and Secure Innovation for Frontier AI Models Act) alongside Encode Justice and Economic Security Action California"
+    asOf: 2024
+    source: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+
+  - id: f_caisaf_defense_proposals
+    property: campaign
+    value: "Submitted 15 proposals to congressional offices for adding AI safety measures to defense and general funding bills"
+    asOf: 2024
+    source: https://newsletter.safe.ai/p/ai-safety-newsletter-35-lobbying

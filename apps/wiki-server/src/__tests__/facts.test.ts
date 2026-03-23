@@ -34,7 +34,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- facts: INSERT ... ON CONFLICT DO UPDATE (supports multi-row) ---
   if (q.includes("insert into") && q.includes('"facts"')) {
-    const COLS = 16;
+    const COLS = 21;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();

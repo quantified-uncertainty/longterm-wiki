@@ -10,7 +10,8 @@ facts:
 
   - id: f_JOFyWsItEQ
     property: notable-for
-    value: "Former Director of AI at Tesla, former OpenAI researcher; founded Eureka Labs; influential AI educator and researcher"
+    value: "Former Director of AI at Tesla, former OpenAI researcher; founded Eureka
+      Labs; influential AI educator and researcher"
 
   - id: f_v81HDaRKqg
     property: education
@@ -23,4 +24,8 @@ facts:
   - id: f_PPWIIFBj8w
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Andrej_Karpathy"
-
+  - id: l6TAsnmfwQ
+    property: website
+    value: https://karpathy.ai/
+    source: https://www.wikidata.org/wiki/Q56037405
+    notes: From Wikidata Q56037405

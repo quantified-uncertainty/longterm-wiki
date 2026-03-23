@@ -23,12 +23,13 @@ export function ProvisionCard({
   title,
   description,
   billSection,
+  details,
   billQuote,
   amendmentNotes,
   fullTextUrl,
 }: ProvisionCardProps) {
   const [open, setOpen] = useState(false);
-  const hasExpandableContent = !!(billQuote || amendmentNotes);
+  const hasExpandableContent = !!(details || billQuote || amendmentNotes);
 
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
@@ -77,6 +78,12 @@ export function ProvisionCard({
         <CollapsibleContent>
           <div className="px-4 pb-4 pt-1 ml-[26px] space-y-2.5">
             <div className="border-t border-border/50 pt-2.5" />
+
+            {details && (
+              <p className="text-[13px] text-foreground/80 leading-[1.7]">
+                {details}
+              </p>
+            )}
 
             {billQuote && (
               <div className="rounded-md bg-muted/40 px-3.5 py-2.5">

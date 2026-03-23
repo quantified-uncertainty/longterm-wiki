@@ -24,3 +24,33 @@ facts:
     value: https://www.macfound.org/
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
+  - id: s2svxs5ctw
+    property: founded-date
+    value: 1970-01
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: yWgyL14yNw
+    property: headquarters
+    value: Illinois
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: 7GFtAvNI9A
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: ODOCozjfXw
+    property: founded-by-name
+    value: John D. MacArthur
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691; text value (not entity ref)
+  - id: L1q2419zug
+    property: legal-structure
+    value: charity
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691
+  - id: E8BH8m5QLA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/MacArthur_Foundation
+    source: https://www.wikidata.org/wiki/Q1424691
+    notes: From Wikidata Q1424691

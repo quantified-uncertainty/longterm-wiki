@@ -47,6 +47,7 @@ import {
   buildCitationStatsMap,
   buildCitationQuotesBundle,
   mergePGRecordsIntoKB,
+  fetchFactsFromPG,
   fetchAssessments,
   fetchBenchmarkResults,
   fetchResearchAreas,
@@ -595,9 +596,25 @@ async function main() {
       entities: tableBaseEntityMap,
     });
     const serializedKB = serialize(graph, filenameMap);
+
+    // Try to load facts from PG (authoritative source) instead of YAML
+    if (!CONTENT_ONLY) {
+      const pgFacts = await fetchFactsFromPG();
+      if (pgFacts) {
+        const pgEntityCount = Object.keys(pgFacts).length;
+        const pgFactCount = Object.values(pgFacts).reduce((sum, arr) => sum + arr.length, 0);
+        serializedKB.facts = pgFacts;
+        console.log(`  kb: ${pgEntityCount} entities, ${pgFactCount} facts from PG (properties/schemas from YAML)`);
+      } else {
+        const factCount = Object.keys(serializedKB.facts ?? {}).length;
+        console.log(`  kb: ${factCount} fact groups from YAML fallback (${tableBaseEntityMap.size} TableBase entities injected)`);
+      }
+    } else {
+      const factCount = Object.keys(serializedKB.facts ?? {}).length;
+      console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
+    }
+
     database.kb = serializedKB;
-    const factCount = Object.keys(serializedKB.facts ?? {}).length;
-    console.log(`  kb: ${factCount} fact groups (${tableBaseEntityMap.size} TableBase entities injected, entities owned by TableBase)`);
   } else {
     console.warn('  kb: skipped (data directory not found at packages/factbase/data)');
   }

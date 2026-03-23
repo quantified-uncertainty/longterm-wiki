@@ -854,9 +854,12 @@
     - title: UK AI Safety Institute Announcements
       url: https://www.gov.uk/search/news-and-communications?organisations%5B%5D=ai-safety-institute
   description: >-
-    The UK AI Safety Institute (UK AISI) is a government organization established in 2023 to advance AI safety through
-    research, evaluation, and international coordination. Created in the wake of the first AI Safety Summit hosted by
-    the UK government, AISI represents the UK's commitment to being a global leader in AI safety and governance.
+    The UK AI Safety Institute, renamed to "AI Security Institute" on February 14, 2025 by Science
+    Secretary Peter Kyle at Munich Security Conference. Focus shifted from broad existential/alignment
+    safety to near-term national security risks: cybersecurity, CBRN, fraud, child exploitation.
+    New criminal misuse team (joint with Home Office) and partnership with Defence Science and
+    Technology Laboratory (Dstl). Signed MoU with Anthropic to explore AI in public services.
+    Established 2023 at Bletchley Park AI Safety Summit.
   tags:
     - governance
     - government-ai-safety
@@ -935,9 +938,11 @@
   title: Japan AI Safety Institute
   website: https://aisi.go.jp/en/
   description: >-
-    Japan's national AI safety institute, established in February 2024 under the Ministry of Economy, Trade and
-    Industry (METI). Focuses on AI standards research and evaluation frameworks. Part of the international AISI
-    network established through the Seoul Declaration.
+    Japan's national AI safety institute, established February 2024 under the Ministry of Economy,
+    Trade and Industry (METI). Published "Guide to Evaluation Perspectives on AI Safety" (updated
+    to v1.10, March 2025). Staffing target: ~200 staff (signaled by PM). Focuses on safety
+    evaluation frameworks and international alignment on testing practices with UK and US
+    counterparts. Part of the international AISI network.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -964,9 +969,10 @@
   title: Singapore AI Safety Institute
   website: https://aisi.gov.sg/
   description: >-
-    Singapore's national AI safety testing institute, established in February 2024 under the Infocomm Media
-    Development Authority (IMDA). Focuses on testing frameworks and regional AI safety coordination in Southeast
-    Asia.
+    Singapore's national AI safety testing institute, designated May 22, 2024 at AI Seoul Summit.
+    Hosted by Digital Trust Centre (DTC) at Nanyang Technological University. Led by Professor
+    Lam Kwok Yen. Funded with S\$50 million initial grant from IMDA and National Research Foundation.
+    Focuses on GenAI evaluations and collaboration with US and UK AISIs.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -991,8 +997,11 @@
   title: Canadian AI Safety Institute
   website: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
   description: >-
-    Canada's national AI safety institute, launched in November 2024 at the Seoul AI Safety Summit. Received
-    C$50M (~$37M USD) in initial pledged funding from the Canadian government.
+    Canada's national AI safety institute, launched November 12, 2024. Budget: C\$50 million over
+    five years (part of C\$2.4 billion 2024 federal AI investment). First Executive Director:
+    Dr. Elissa Strome (appointed February 2025, formerly of CIFAR). Led by Innovation, Science
+    and Economic Development Canada (ISED), with NRC and CIFAR research partnership. Focuses on
+    science of AI safety, positioned as technical body for testing/assurance.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -1007,6 +1016,133 @@
     - ai-safety
     - international
   lastUpdated: 2026-03
+
+- id: france-inesia
+  stableId: h1iLYfDY7E
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: "INESIA (France National Institute for AI Evaluation and Security)"
+  website: https://www.inria.fr
+  founded: '2025'
+  headquarters: Paris, France
+  description: >-
+    French national AI safety institute announced at the Paris AI Action Summit, February 2025.
+    Partnership between ANSSI (cybersecurity agency), Inria (research institute), LNE (national
+    testing laboratory), and PEReN (digital regulation platform) — not a new legal entity but
+    a coordination framework. Published joint testing exercises on advanced AI models (July 2025).
+    First INESIA Scientific Days held at Inria Paris (July 2025). Unveiled 2026-2027 roadmap.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Inria INESIA Roadmap
+      url: https://www.inria.fr/en/ai-security-and-sovereignty-inesia-unveils-its-roadmap-2026-2027
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - france
+  lastUpdated: 2026-03
+
+- id: south-korea-aisi
+  stableId: 3t2i7Ncxt5
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: South Korea AI Safety Institute
+  founded: '2026'
+  headquarters: South Korea
+  description: >-
+    South Korean AI safety institute established via the AI Basic Act (passed December 2024,
+    effective January 22, 2026). Dedicated research centre for evaluating advanced AI models,
+    developing safety benchmarks, and assessing deepfake and cybersecurity threats. South Korea's
+    AI Basic Act is the second comprehensive AI regulatory framework after the EU AI Act.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Cooley Analysis of South Korea AI Basic Act
+      url: https://www.cooley.com/news/insight/2026/2026-01-27-south-koreas-ai-basic-act-overview-and-key-takeaways
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - south-korea
+  lastUpdated: 2026-03
+
+- id: australia-aisi
+  stableId: tN1LcjRQpc
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Australian AI Safety Institute
+  website: https://www.industry.gov.au/science-technology-and-innovation/technology/artificial-intelligence/ai-safety-science
+  founded: '2025'
+  headquarters: Australia
+  description: >-
+    Australian AI safety institute announced in 2025, operational early 2026. Budget: A\$29.9
+    million. Three streams: research, engineering, policy/governance. Sits within government as
+    a technical/coordination hub alongside existing regulators and the National AI Centre.
+    Recruiting founding team (General Manager + Head of AI Safety Research and Testing) in late
+    2025/early 2026.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Department of Industry
+      url: https://www.industry.gov.au/science-technology-and-innovation/technology/artificial-intelligence/ai-safety-science
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - australia
+  lastUpdated: 2026-03
+
+- id: india-aisi
+  stableId: MItFJ7FBWk
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: IndiaAI Safety Institute
+  website: https://indiaai.gov.in
+  founded: '2026'
+  headquarters: New Delhi, India
+  description: >-
+    Indian AI safety institute announced January 2025, formally launched February 2026 at
+    India AI Impact Summit. Hub-and-spoke model under IndiaAI Mission, partnering with IITs
+    and private sector. Initial budget: Rs 20 crore from IndiaAI Mission Safe and Trusted
+    Pillar. Dedicated mechanism for ethical, safe, and responsible deployment of AI systems.
+    India also hosted the AI Impact Summit (Feb 2026) with 92 countries endorsing the New
+    Delhi Declaration and over USD 200 billion in AI investment commitments announced.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: IndiaAI Announcement
+      url: https://indiaai.gov.in/article/india-takes-the-lead-establishing-the-indiaai-safety-institute-for-responsible-ai-innovation
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - international
+    - india
+  lastUpdated: 2026-03
+
 - id: aria-uk
   stableId: XqjV4mbMXQ
   wikiId: E1997
@@ -1747,15 +1883,30 @@
   orgType: safety-org
   title: Council on Strategic Risks
   website: https://councilonstrategicrisks.org/
+  founded: '2017'
+  headquarters: Washington, DC
   description: >-
-    The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that
-    focuses on climate-security intersections, strategic weapons, and ecological
-    risks through three research centers. While the organization claims
-    nonpartisan status, its left-leaning funding sources and critical stance
-    toward certain administrations may limit perceived objectivity.
+    DC-based nonprofit founded in 2017 by Francesco Femia and Caitlin Werrell. Led by CEO
+    Mallory Stewart, with Catherine Dill (VP Programs) and Scott Stinson (COO). Board chaired
+    by Sherri Goodman. Focuses on climate-security, strategic weapons, and ecological risks.
+    Launched AI & National Security Convergence Fellowship (November 2025 - July 2026): 7-month
+    "bootcamp"-style fellowship for mid-career professionals (10+ years experience) covering
+    AI evolution, superintelligence scenarios, and military integration. Also houses the Center
+    for Climate and Security. Program expense ratio: 94%.
   clusters:
     - ai-safety
-  lastUpdated: 2026-02
+    - governance
+  tags:
+    - national-security
+    - ai-governance
+    - climate-security
+    - fellowship
+  sources:
+    - title: CSR Website
+      url: https://councilonstrategicrisks.org/about/
+    - title: AI Fellowship Announcement
+      url: https://councilonstrategicrisks.org/2025/09/24/call-for-applications-ai-national-security-convergence-fellowship/
+  lastUpdated: 2026-03
 - id: cser
   stableId: Qns43S795w
   wikiId: E523
@@ -4450,11 +4601,32 @@
   orgType: safety-org
   title: Institute for AI Policy and Strategy
   website: https://www.iaps.ai
+  founded: '2024'
+  headquarters: Washington, DC
   description: >-
-    Research institute focused on AI governance and policy.
+    AI policy think tank founded in 2024, headquartered in the Washington, DC metro area. Led by
+    Jennifer Marron (Executive Director), Brianna Rosen (Research Director, Frontier Security),
+    Amanda El-Dakhakhni (Director), Zoe Williams (Managing Director), and Renan Araujo (Director
+    of Programs). Runs the AI Policy Fellowship program (fully funded, multiple cohorts). Research
+    spans implications from current models to potential AGI/superintelligence. Explicitly nonpartisan
+    with emphasis on intellectual independence. Funded by Open Philanthropy, Survival and Flourishing
+    Fund, and others. Actively hiring Director of Government Affairs and Policy Director as of
+    March 2026. Primary intervention types: policy research,
+    fellowship programs, talent development.
   tags:
     - ai-governance
     - policy
+    - research
+    - fellowship
+    - ai-safety
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: IAPS Website
+      url: https://www.iaps.ai
+    - title: IAPS Team
+      url: https://www.iaps.ai/our-team
   lastUpdated: 2026-03
 
 - id: niskanen-center
@@ -5445,15 +5617,29 @@
   orgType: safety-org
   title: Encode Justice
   website: https://encodejustice.org
+  founded: '2020'
   description: >-
-    Youth-led AI accountability organization. Co-source of California SB 1047.
-    Supported California SB 1047.
+    Youth-led AI accountability organization founded in July 2020 by Sneha Revanur (Founder and
+    President; named to TIME 100 AI list). Approximately 600 student members across 40 countries.
+    Rebranded to "Encode" to reflect broadened scope. Published the "AI 2030 Plan" with 5 calls
+    to action and 22 specific goals including AI disclosure in political ads, data ownership
+    rights, and prohibition on automated weapons of mass destruction. Active in advocacy to
+    Congress and White House OSTP. Co-source and supporter of California SB 1047.
+    Primary intervention types: youth-led advocacy, public campaigns, policy recommendations.
   relatedEntries:
     - id: XcGTez1oFw
       type: policy
   tags:
     - ai-governance
     - ai-safety
+    - youth-advocacy
+    - policy-advocacy
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Encode Justice Website
+      url: https://encodejustice.org
   lastUpdated: 2026-03
 
 - id: imbue
@@ -6056,16 +6242,30 @@
   summaryPage: safety-orgs-overview
   title: AI Now Institute
   website: https://ainowinstitute.org
+  founded: '2017'
+  headquarters: New York, NY
   description: >-
-    Research institute founded in 2017 at New York University, pioneering research on the social
-    implications of AI. Known for annual reports mapping AI industry power concentration,
-    algorithmic bias research, and advocacy against unregulated facial recognition and surveillance.
-    Founded by Meredith Whittaker and Kate Crawford.
+    Research institute founded in 2017 at New York University (affiliated across 6 NYU faculties),
+    pioneering research on AI and concentrated power. Co-Executive Directors Amba Kak and Sarah
+    Myers West (Kak named TIME 100 Most Influential in AI, 2024; addressed UN General Assembly on
+    AI governance). Known for annual AI landscape reports, algorithmic bias research, and advocacy
+    against unregulated facial recognition and surveillance. Originally co-founded by Meredith
+    Whittaker and Kate Crawford. Funded by Open Society Foundations, Ford Foundation, Mozilla
+    Foundation, Omidyar/Luminate, and MacArthur Foundation (\$2M via Humanity AI). Primary
+    intervention types: research, policy advocacy.
   tags:
     - ai-governance
     - ai-policy
     - algorithmic-accountability
     - ai-ethics
+    - power-concentration
+    - research
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: AI Now Institute About
+      url: https://ainowinstitute.org/about
   lastUpdated: 2026-03
 
 - id: partnership-on-ai
@@ -6076,11 +6276,15 @@
   summaryPage: safety-orgs-overview
   title: Partnership on AI
   website: https://partnershiponai.org
+  founded: '2016'
+  headquarters: San Francisco, CA
   description: >-
     Multi-stakeholder nonprofit founded in 2016 by Amazon, Apple, DeepMind, Google, IBM, Meta, and
-    Microsoft to advance responsible AI practices. Now includes 100+ partners across industry, civil
-    society, and academia. Develops best practices, guidelines, and frameworks for responsible AI
-    development and deployment, with major workstreams on synthetic media, AI and labor, and safety.
+    Microsoft to advance responsible AI practices. Led by CEO Rebecca Finlay (since October 2021).
+    126 partner organizations across academia, civil society, and industry in 16 countries (as of
+    2024). Develops best practices, guidelines, and frameworks for responsible AI development and
+    deployment, with major workstreams on synthetic media governance, AI assurance ecosystems, and
+    community engagement. Funded by industry membership fees and Ford Foundation grants.
   tags:
     - ai-governance
     - ai-policy
@@ -6112,15 +6316,22 @@
   summaryPage: safety-orgs-overview
   title: AI Policy Institute
   website: https://theaipi.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
     Washington DC-based policy advocacy organization founded in 2023, focused on channeling public
     concern about AI into effective governance. Conducts polling on AI attitudes, engages with
     policymakers and media, and advocates for responsible AI development. Works on issues including
-    deepfakes, autonomous AI agents, and AI safety standards.
+    deepfakes, autonomous AI agents, and AI safety standards. Led by Daniel Colson (Co-founder
+    and Executive Director). Also operates as "The AI Policy Network."
   tags:
     - ai-governance
     - ai-policy
     - advocacy
+    - polling
+  clusters:
+    - ai-safety
+    - governance
   lastUpdated: 2026-03
 
 - id: americans-for-responsible-innovation
@@ -6131,16 +6342,29 @@
   summaryPage: safety-orgs-overview
   title: Americans for Responsible Innovation
   website: https://responsibleinnovation.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
-    Washington DC-based AI policy organization founded in 2023 with significant funding from
-    effective altruism-aligned donors including Dustin Moskovitz. Focuses on building bipartisan
-    support for AI safety legislation in Congress. Has become one of the major players influencing
-    AI policy on Capitol Hill, with a focus on catastrophic risk prevention.
+    Washington DC-based AI policy organization founded in late 2023 with significant funding from
+    effective altruism-aligned donors including Dustin Moskovitz. Led by Brad Carson (President,
+    former Congressman) and Eric Gastfriend (Executive Director). Focuses on building bipartisan
+    support for AI safety legislation in Congress, advocating for regulation analogous to other
+    industries. One of the major players influencing AI policy on Capitol Hill, with a focus on
+    catastrophic risk prevention.
   tags:
     - ai-governance
     - ai-policy
     - advocacy
     - ea-community
+    - lobbying
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: ARI Website
+      url: https://ari.us/
+    - title: ARI About
+      url: https://ari.us/about-us/
   lastUpdated: 2026-03
 
 - id: brookings-ai
@@ -6218,16 +6442,30 @@
   summaryPage: safety-orgs-overview
   title: Center for AI Policy
   website: https://www.centeraipolicy.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
-    Non-partisan nonprofit founded in 2023 that worked with Congress from June 2023 through May
-    2025 to promote legislative solutions to catastrophic risks from advanced AI. Focused on
-    bipartisan engagement with Congressional offices on AI safety policy. Ceased most active
-    operations in 2025 due to funding constraints.
+    Non-partisan 501(c)(4) nonprofit founded in June 2023 that worked with Congress through May
+    2025 to promote legislative solutions to catastrophic risks from advanced AI. Led by Executive
+    Director Jason Green-Lowe with 2 registered lobbyists. Total lobbying spend: $483,720
+    (cumulative through Q1 2025). Ceased most active operations around May 2025 due to funding
+    constraints (cash reserves ~$150K). Focused on bipartisan engagement with Congressional
+    offices on AI safety policy. Primary intervention type: direct congressional lobbying.
   tags:
     - ai-governance
     - ai-policy
-    - advocacy
+    - lobbying
     - defunct
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Center for AI Policy Website
+      url: https://www.centeraipolicy.org
+    - title: CAIP Shutdown Announcement (LessWrong)
+      url: https://www.lesswrong.com/posts/Ed3naAyEEe7zZvzsj/the-center-for-ai-policy-has-shut-down
+    - title: OpenSecrets Profile
+      url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
   lastUpdated: 2026-03
 
 - id: center-for-democracy-and-technology
@@ -6644,4 +6882,947 @@
     - computational-law
     - law-as-code
     - academic
+  lastUpdated: 2026-03
+
+# --- New funder organizations (Vipul Naik multi-donor import) ---
+- id: sloan-foundation
+  stableId: lI8DgWtPyD
+  type: organization
+  orgType: funder
+  title: Alfred P. Sloan Foundation
+  website: https://sloan.org
+  description: >-
+    Philanthropic nonprofit founded in 1934 by Alfred P. Sloan Jr. Makes grants
+    in science, technology, engineering, mathematics, and economics.
+  lastUpdated: 2026-03
+
+- id: thiel-foundation
+  stableId: 0SkH1jbTRu
+  type: organization
+  orgType: funder
+  title: Thiel Foundation
+  website: https://thielfoundation.org
+  description: >-
+    Foundation created by Peter Thiel supporting science, technology, and
+    long-term thinking. Best known for the Thiel Fellowship.
+  lastUpdated: 2026-03
+
+- id: knight-foundation
+  stableId: BAGFs8P6WP
+  type: organization
+  orgType: funder
+  title: John S. and James L. Knight Foundation
+  website: https://knightfoundation.org
+  description: >-
+    Major US foundation focused on journalism, media, and informed communities.
+  lastUpdated: 2026-03
+
+- id: kellogg-foundation
+  stableId: 1SqvvamQqq
+  type: organization
+  orgType: funder
+  title: W. K. Kellogg Foundation
+  website: https://www.wkkf.org
+  description: >-
+    One of the largest philanthropic foundations in the US, founded in 1930.
+    Focuses on children, families, and communities.
+  lastUpdated: 2026-03
+
+- id: pineapple-fund
+  stableId: wTnEjSfIeP
+  type: organization
+  orgType: funder
+  title: Pineapple Fund
+  website: https://pineapplefund.org
+  description: >-
+    Charitable fund created in 2017 by an anonymous Bitcoin donor who donated
+    5,057 BTC (approximately \$55M) to various charities.
+  lastUpdated: 2026-03
+
+- id: google-org
+  stableId: J2DYTkMiRA
+  type: organization
+  orgType: funder
+  title: Google.org
+  website: https://www.google.org
+  description: >-
+    Google's philanthropic arm providing over \$100M annually in grants.
+  lastUpdated: 2026-03
+
+- id: lilly-endowment
+  stableId: kxVSuuHN7j
+  type: organization
+  orgType: funder
+  title: Lilly Endowment
+  website: https://lillyendowment.org
+  description: >-
+    Private philanthropic foundation in Indianapolis created in 1937. One of the
+    largest private foundations in the US.
+  lastUpdated: 2026-03
+
+- id: mellon-foundation
+  stableId: MIie9_9BSq
+  type: organization
+  orgType: funder
+  title: Andrew W. Mellon Foundation
+  website: https://mellon.org
+  description: >-
+    Major US foundation supporting arts, culture, higher education, and humanities.
+  lastUpdated: 2026-03
+
+- id: walton-family-foundation
+  stableId: gk4_-AGcTd
+  type: organization
+  orgType: funder
+  title: Walton Family Foundation
+  website: https://www.waltonfamilyfoundation.org
+  description: >-
+    Foundation established by Walmart founders Sam and Helen Walton. Focuses on
+    K-12 education reform, environmental conservation, and community development.
+  lastUpdated: 2026-03
+
+- id: barr-foundation
+  stableId: RfxfdsVA3R
+  type: organization
+  orgType: funder
+  title: Barr Foundation
+  website: https://www.barrfoundation.org
+  description: >-
+    Private foundation based in Boston focusing on climate, education, and arts.
+  lastUpdated: 2026-03
+
+- id: sandler-foundation
+  stableId: EPY-YnX6K8
+  type: organization
+  orgType: funder
+  title: Sandler Foundation
+  website: https://www.sandlerfoundation.org
+  description: >-
+    San Francisco-based foundation supporting scientific research, civil liberties,
+    human rights, and economic equality.
+  lastUpdated: 2026-03
+
+- id: surdna-foundation
+  stableId: 6wJ85FrPfi
+  type: organization
+  orgType: funder
+  title: Surdna Foundation
+  website: https://www.surdna.org
+  description: >-
+    Family foundation established in 1917 focused on sustainable environments,
+    strong local economies, and thriving cultures.
+  lastUpdated: 2026-03
+
+- id: donorstrust
+  stableId: rY6Rdleg5f
+  type: organization
+  orgType: funder
+  title: DonorsTrust
+  website: https://www.donorstrust.org
+  description: >-
+    Donor-advised fund specializing in libertarian and free-market causes.
+  lastUpdated: 2026-03
+
+# --- EA/AI safety grantee organizations ---
+- id: wild-animal-initiative
+  stableId: mHrz7Y-rOx
+  type: organization
+  orgType: generic
+  title: Wild Animal Initiative
+  website: https://www.wildanimalinitiative.org
+  description: >-
+    Research nonprofit focused on wild animal welfare, studying the lives of
+    wild animals and identifying ways to improve their well-being. Funded by
+    EA Funds and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: mercy-for-animals
+  stableId: 8C_NZjRH28
+  type: organization
+  orgType: generic
+  title: Mercy For Animals
+  website: https://mercyforanimals.org
+  description: >-
+    International animal advocacy nonprofit focused on ending factory farming.
+    Conducts undercover investigations, corporate campaigns, and policy advocacy.
+    Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: constellation
+  stableId: jwe4re7Ggo
+  type: organization
+  orgType: generic
+  title: Constellation
+  website: https://constellation.org
+  description: >-
+    Co-working and community space for AI safety researchers in Berkeley, CA.
+    Provides office space and community infrastructure for the AI safety ecosystem.
+    Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: animal-equality
+  stableId: IkwNqat1cE
+  type: organization
+  orgType: generic
+  title: Animal Equality
+  website: https://animalequality.org
+  description: >-
+    International animal rights nonprofit conducting investigations and
+    corporate campaigns to reduce animal suffering in factory farming.
+  lastUpdated: 2026-03
+
+- id: openmined
+  stableId: AOJewfN502
+  type: organization
+  orgType: generic
+  title: OpenMined
+  website: https://openmined.org
+  description: >-
+    Open-source community focused on privacy-preserving AI and data science.
+    Develops tools for federated learning, differential privacy, and encrypted
+    computation. Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: ai-objectives-institute
+  stableId: 71VWCgxV5P
+  type: organization
+  orgType: generic
+  title: AI Objectives Institute
+  website: https://ai-objectives.org
+  description: >-
+    Research organization working on AI alignment through mechanism design and
+    cooperative AI. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: timaeus
+  stableId: AzwQTQCMeo
+  type: organization
+  orgType: generic
+  title: Timaeus
+  website: https://timaeus.co
+  description: >-
+    AI safety research organization focused on mechanistic interpretability
+    and developmental interpretability. Studies how neural networks form
+    internal representations during training. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: pibbss
+  stableId: PXcUg7YICV
+  type: organization
+  orgType: generic
+  title: PIBBSS
+  aliases:
+    - Principles of Intelligent Behavior in Biological and Social Systems
+  website: https://pibbss.ai
+  description: >-
+    Research fellowship program bringing researchers from diverse fields
+    (biology, neuroscience, social science) to work on AI alignment problems.
+    Funded by SFF and EA Funds.
+  lastUpdated: 2026-03
+
+- id: arkose
+  stableId: fj1DZJhxWy
+  type: organization
+  orgType: generic
+  title: Arkose
+  description: >-
+    AI safety research organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: civai
+  stableId: vG0nGlCWRn
+  type: organization
+  orgType: generic
+  title: Civic AI Security Program (CivAI)
+  description: >-
+    Program focused on the intersection of AI safety and civic security.
+    Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: idais
+  stableId: zkWlTLfxuO
+  type: organization
+  orgType: generic
+  title: International Dialogues on AI Safety (IDAIS)
+  description: >-
+    Initiative bringing together international stakeholders for dialogue on
+    AI safety governance and policy coordination.
+  lastUpdated: 2026-03
+
+- id: alter
+  stableId: 8a5BiFe1nv
+  type: organization
+  orgType: generic
+  title: Association for Long Term Existence and Resilience (ALTER)
+  description: >-
+    Academic research and advocacy organization investigating AI alignment
+    and existential risk. Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: center-for-election-science
+  stableId: gBpjt2fx66
+  type: organization
+  orgType: generic
+  title: The Center for Election Science
+  website: https://electionscience.org
+  description: >-
+    Nonprofit advancing approval voting and other voting method reforms.
+    Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: shrimp-welfare-project
+  stableId: uFuJxNjpYD
+  type: organization
+  orgType: generic
+  title: Shrimp Welfare Project
+  website: https://www.shrimpwelfareproject.org
+  description: >-
+    Charity focused on improving welfare of farmed shrimp, one of the most
+    numerous farmed animals. Funded by EA Funds.
+  lastUpdated: 2026-03
+
+- id: fortify-health
+  stableId: XCK8EEC7tz
+  type: organization
+  orgType: generic
+  title: Fortify Health
+  website: https://www.fortifyhealth.global
+  description: >-
+    Global health nonprofit working on large-scale food fortification programs
+    to reduce micronutrient deficiencies. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: pure-earth
+  stableId: 3xDXLwV3lg
+  type: organization
+  orgType: generic
+  title: Pure Earth
+  website: https://www.pureearth.org
+  description: >-
+    Nonprofit working to solve pollution problems in low and middle-income
+    countries. Focus on lead and toxic pollution. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: aquatic-life-institute
+  stableId: NDTZImcMyY
+  type: organization
+  orgType: generic
+  title: Aquatic Life Institute
+  website: https://ali.fish
+  description: >-
+    Research and advocacy organization focused on the welfare of aquatic
+    animals. Works on fish welfare standards and aquaculture practices.
+    EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: just-impact
+  stableId: pwbWtmWHkT
+  type: organization
+  orgType: generic
+  title: Just Impact
+  description: >-
+    Fiscal sponsor and project incubator. Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: lead-exposure-action-fund
+  stableId: rCn5M6JO7K
+  type: organization
+  orgType: generic
+  title: Lead Exposure Action Fund (LEAF)
+  description: >-
+    Fund dedicated to reducing childhood lead exposure worldwide. Seeded
+    with \$125M from Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: encode-ai
+  stableId: BVYHXX_LvA
+  type: organization
+  orgType: generic
+  title: Encode AI Corporation
+  description: >-
+    AI safety organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: california-yimby
+  stableId: yU5rKw_sAa
+  type: organization
+  orgType: generic
+  title: California YIMBY
+  website: https://cayimby.org
+  description: >-
+    Housing advocacy organization promoting pro-housing policy reform in
+    California. Open Philanthropy grantee.
+# --- Anti-authoritarianism & AI policy cluster (added 2026-03) ---
+
+- id: aclu
+  stableId: 7DpEvy5wQr
+  type: organization
+  orgType: generic
+  title: American Civil Liberties Union (ACLU)
+  website: https://www.aclu.org
+  founded: '1920'
+  headquarters: New York, NY
+  description: >-
+    Nonprofit civil liberties organization founded in 1920, with approximately 1,400 staff
+    nationally. ACLU Foundation revenue approximately $307 million (FY 2024-2025); combined
+    with 501(c)(4) entity, total budget is larger. Has an active AI and technology
+    program challenging government and corporate AI deployments that threaten civil rights.
+    Key AI-related activities include FOIA litigation against the NSA over AI in surveillance
+    programs (filed April 2024), FOIA requests to 40+ federal agencies seeking records on DOGE's
+    unrestricted access to sensitive personal data, and multiple challenges to government
+    facial recognition deployments. Publicly opposed the Trump administration's December 2025
+    executive order preempting state AI regulation and the March 2025 AI Action Plan. Primary
+    intervention types: litigation, legislative advocacy, public education.
+  tags:
+    - civil-liberties
+    - ai-governance
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - digital-rights
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: ACLU Website
+      url: https://www.aclu.org
+    - title: ACLU AI Accountability Program
+      url: https://www.aclu.org/issues/racial-justice/accountability-in-artificial-intelligence
+    - title: ACLU v. NSA FOIA Lawsuit
+      url: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
+    - title: ACLU Statement on Trump AI Executive Order
+      url: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
+  lastUpdated: 2026-03
+
+- id: electronic-frontier-foundation
+  stableId: H4tplAyDRX
+  type: organization
+  orgType: generic
+  title: Electronic Frontier Foundation (EFF)
+  website: https://www.eff.org
+  founded: '1990'
+  headquarters: San Francisco, CA
+  description: >-
+    Digital rights nonprofit founded in July 1990 by John Gilmore, John Perry Barlow, and Mitch Kapor.
+    Approximately 100 staff (lawyers, activists, technologists). Budget approximately $24 million
+    (2021 figure; more recent not publicly confirmed). Led by Cindy Cohn (Executive Director;
+    successor search underway as of late 2025). Active on AI surveillance, AI-generated content, and AI copyright issues.
+    Investigated Axon's AI-written police reports and Flock Safety's mass surveillance ALPR network.
+    Published analyses of OpenAI's Pentagon deal and the Anthropic-DOD conflict, arguing privacy
+    protections shouldn't depend on corporate discretion. Advocates against government use of AI
+    for bulk surveillance. Primary intervention types: litigation, policy advocacy, technology
+    development, public education.
+  tags:
+    - digital-rights
+    - ai-governance
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - privacy
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: EFF Website
+      url: https://www.eff.org
+    - title: EFF AI Issues
+      url: https://www.eff.org/issues/ai
+    - title: EFF on OpenAI Pentagon Deal
+      url: https://www.eff.org/deeplinks/2026/03/weasel-words-openais-pentagon-deal-wont-stop-ai-powered-surveillance
+    - title: EFF on Anthropic-DOD Conflict
+      url: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
+  lastUpdated: 2026-03
+
+- id: brennan-center
+  stableId: 2KkS7mnw7K
+  type: organization
+  orgType: generic
+  title: Brennan Center for Justice
+  website: https://www.brennancenter.org
+  founded: '1995'
+  headquarters: New York, NY
+  description: >-
+    Nonpartisan law and policy institute at NYU School of Law, founded in 1995. Revenue approximately
+    $58 million (FY 2023-2024) with 180+ staff (attorneys, scholars, communications professionals).
+    Led by Michael Waldman (President and CEO). Maintains a comprehensive AI Legislation Tracker
+    covering all US states. Published "Agenda to Strengthen U.S. Democracy in the Age of AI"
+    with federal and state policy recommendations. Policing & Technology Program investigates AI
+    surveillance technologies including facial recognition, social media monitoring, and predictive
+    policing. Democracy Futures Project focuses on democratic resilience against emerging threats
+    including AI. Primary intervention types: research, litigation, policy advocacy.
+  tags:
+    - democracy
+    - ai-governance
+    - research
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - policy-advocacy
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: Brennan Center Website
+      url: https://www.brennancenter.org
+    - title: AI Legislation Tracker
+      url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+    - title: Agenda to Strengthen US Democracy in the Age of AI
+      url: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
+  lastUpdated: 2026-03
+
+- id: epic-privacy
+  stableId: Ygxw8JVW8X
+  type: organization
+  orgType: generic
+  title: Electronic Privacy Information Center (EPIC)
+  website: https://epic.org
+  founded: '1994'
+  headquarters: Washington, DC
+  description: >-
+    Independent nonprofit research center focused on privacy and civil liberties, founded in 1994.
+    Led by Alan Butler (Executive Director and President, since 2020). 97% Charity Navigator score.
+    Runs an AI & Human Rights Project that advocates for transparent, equitable AI regulation
+    through litigation, FOIA requests, legislative advocacy, and comments to decision-makers.
+    Active in housing AI litigation, state AI policy tracking, and commercial AI oversight.
+    Executive Director has testified before the Senate Judiciary Subcommittee on privacy and AI.
+    Primary intervention types: litigation, advocacy, FOIA requests, legislative testimony.
+  tags:
+    - privacy
+    - ai-governance
+    - litigation
+    - civil-liberties
+    - digital-rights
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: EPIC Website
+      url: https://epic.org
+    - title: EPIC AI & Human Rights
+      url: https://epic.org/issues/ai/
+  lastUpdated: 2026-03
+
+- id: protect-democracy
+  stableId: xxHyEDGp4Y
+  type: organization
+  orgType: generic
+  title: Protect Democracy
+  website: https://protectdemocracy.org
+  founded: '2017'
+  headquarters: Washington, DC
+  description: >-
+    Cross-partisan nonprofit founded in early 2017 to prevent American democracy from declining
+    into a more authoritarian form of government. Led by Ian Bassin (Co-founder and Executive
+    Director). 100+ staff (lawyers, strategists, other professionals). Created the AI for
+    Democracy Action Lab (AI-DAL), which brings together tech innovators, legal/policy experts,
+    software engineers, and nonprofit leaders to defend against AI threats to democracy and develop
+    pro-democracy AI applications. Filed 100+ lawsuits challenging authoritarian actions. In July
+    2025, sued to block USDA's demand for personal data of millions of Americans, framing it as
+    part of a federal "panopticon" of AI-enabled surveillance. Published "The Authoritarian
+    Playbook for 2025" detailing how authoritarians use technology. Primary intervention types:
+    litigation, legislative advocacy, policy research, technology tools.
+  tags:
+    - democracy
+    - anti-authoritarianism
+    - litigation
+    - ai-governance
+    - surveillance
+    - policy-advocacy
+  clusters:
+    - governance
+  sources:
+    - title: Protect Democracy Website
+      url: https://protectdemocracy.org
+    - title: AI for Democracy Action Lab
+      url: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
+  lastUpdated: 2026-03
+
+- id: democracy-forward
+  stableId: yTlRworV1V
+  type: organization
+  orgType: generic
+  title: Democracy Forward
+  website: https://democracyforward.org
+  founded: '2017'
+  headquarters: Washington, DC
+  description: >-
+    Legal nonprofit founded in 2017 that uses the courts to challenge government actions that
+    undermine democratic principles. Led by Skye L. Perryman (President and CEO). Launched an
+    appellate litigation practice in August 2025 with approximately 12 lawyers. Filed FOIA
+    lawsuits against HUD and State Department seeking records about Trump administration use of
+    generative AI to rewrite rules, monitor employees, and target visa holders (March 2025).
+    Separate FOIA lawsuit against OPM, GSA, HUD, and OMB compelling disclosure of AI use in
+    deregulation agenda. Tracks specific concerns: AI used to flag visa holders based on social
+    media posts, identify federal workers for termination, and propose mass regulatory repeals.
+    Primary intervention types: litigation (FOIA, administrative law challenges).
+  tags:
+    - democracy
+    - anti-authoritarianism
+    - litigation
+    - ai-governance
+    - foia
+    - government-accountability
+  clusters:
+    - governance
+  sources:
+    - title: Democracy Forward Website
+      url: https://democracyforward.org
+    - title: Democracy Forward AI FOIA Lawsuit
+      url: https://democracyforward.org/updates/foia-ai-lawsuit/
+    - title: Democracy Forward AI Deregulation Lawsuit
+      url: https://democracyforward.org/updates/ai-deregulation/
+  lastUpdated: 2026-03
+
+- id: cais-action-fund
+  stableId: 0HsrqIftUg
+  type: organization
+  orgType: safety-org
+  title: Center for AI Safety Action Fund
+  website: https://action.safe.ai
+  founded: '2022'
+  headquarters: Washington, DC
+  description: >-
+    Policy advocacy arm of the Center for AI Safety, focused on bipartisan engagement with
+    policymakers on AI national security risks. Sister organization to CAIS (San Francisco-based
+    technical safety research org founded by Dan Hendrycks and Oliver Zhang). CAIS Action Fund
+    operates from Washington, DC to translate technical AI safety concerns into legislative and
+    policy proposals. Works at the intersection of AI safety research and government engagement.
+    Primary intervention types: policy advocacy, bipartisan lobbying.
+  tags:
+    - ai-safety
+    - ai-governance
+    - policy-advocacy
+    - lobbying
+    - national-security
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: CnTLlp3VqA
+      type: organization
+      relationship: related
+  sources:
+    - title: CAIS Action Fund Website
+      url: https://action.safe.ai
+  lastUpdated: 2026-03
+
+- id: freedom-house
+  stableId: pFJhncfgor
+  type: organization
+  orgType: generic
+  title: Freedom House
+  website: https://freedomhouse.org
+  founded: '1941'
+  headquarters: Washington, DC
+  description: >-
+    Independent watchdog organization founded in 1941, dedicated to the expansion of freedom and
+    democracy around the world. Publishes annual Freedom in the World and Freedom on the Net
+    reports, which document global trends in political rights, civil liberties, and internet
+    freedom. Freedom on the Net 2025 documented the 15th consecutive year of internet freedom
+    decline globally. Reported specifically on the Trump administration's use of AI-enabled
+    immigration surveillance. Significantly impacted in 2025 by Trump administration foreign
+    aid freezes that disrupted Freedom House programs in multiple countries. Primary intervention
+    types: research, monitoring,
+    advocacy, capacity building.
+  tags:
+    - democracy
+    - freedom-monitoring
+    - internet-freedom
+    - surveillance
+    - international
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: Freedom House Website
+      url: https://freedomhouse.org
+    - title: "Freedom on the Net 2025: United States"
+      url: https://freedomhouse.org/country/united-states/freedom-net/2025
+    - title: "Trump's Immigration Crackdown Built on AI Surveillance"
+      url: https://freedomhouse.org/article/trumps-immigration-crackdown-built-ai-surveillance-and-disregard-due-process
+  lastUpdated: 2026-03
+
+- id: mozilla-foundation
+  stableId: DK0GbGg7Kf
+  type: organization
+  orgType: funder
+  title: Mozilla Foundation
+  website: https://www.mozillafoundation.org
+  founded: '2003'
+  headquarters: San Francisco, CA
+  description: >-
+    Nonprofit foundation behind the Firefox browser, with growing AI governance programs.
+    Approximately 20% of expenditure on trustworthy, open-source AI. Key AI programs include
+    the Democracy x AI Cohort (2026): 12-month incubator for 10 projects at \$50K each, with
+    two finalists receiving \$300K total. Runs Mozilla Fellows Program for AI governance leaders.
+    Mozilla Ventures operates as an impact venture fund for open-source AI startups. Founding
+    member of the Humanity AI coalition (\$500M, 5-year initiative). Primary intervention types:
+    grantmaking, incubation, venture investment, advocacy.
+  tags:
+    - ai-governance
+    - open-source
+    - democracy
+    - grantmaking
+    - trustworthy-ai
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: Mozilla Foundation Website
+      url: https://www.mozillafoundation.org
+    - title: Democracy x AI Cohort
+      url: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
+  lastUpdated: 2026-03
+
+- id: access-now
+  stableId: DHWH2M0Ega
+  type: organization
+  orgType: generic
+  title: Access Now
+  website: https://www.accessnow.org
+  founded: '2009'
+  headquarters: New York, NY
+  description: >-
+    International digital rights organization founded in 2009. Annual revenue approximately
+    \$15M (as of 2025). Led by Executive Director Alejandro Mayoral Banos (succeeded Brett
+    Solomon who served 2009-2024). AI governance work rooted in human rights law. Led coalition
+    of 110+ civil society organizations in EU AI Act advocacy on transparency safeguards.
+    Research covers LLM privacy risks and surveillance of migrants. Co-Executive Director
+    Amba Kak (of AI Now Institute) was named TIME 100 Most Influential in AI (2024).
+    Primary intervention types: advocacy, policy, digital rights.
+  tags:
+    - digital-rights
+    - ai-governance
+    - human-rights
+    - eu-ai-act
+    - international
+    - surveillance
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: Access Now Website
+      url: https://www.accessnow.org
+    - title: Access Now AI and Human Rights
+      url: https://www.accessnow.org/ai-and-human-rights/
+  lastUpdated: 2026-03
+
+- id: algorithmwatch
+  stableId: hyxooEhMZl
+  type: organization
+  orgType: generic
+  title: AlgorithmWatch
+  website: https://algorithmwatch.org
+  founded: '2017'
+  headquarters: Berlin, Germany
+  description: >-
+    Nonprofit research and advocacy organization focused on algorithmic accountability, founded
+    in 2017. Also has a Zurich office. Co-founded and led by Executive Director Matthias Spielkamp.
+    Conducts investigative research and journalism on AI surveillance and discrimination, with
+    focus on EU AI Act implementation. Runs the Algorithmic Accountability Reporting Fellowship
+    (2025-2026 cohort: 8 fellows at EUR 7,400 each, covering surveillance and AI-driven intimate
+    image abuse). Primary intervention types: investigative research, journalism, policy advocacy.
+  tags:
+    - algorithmic-accountability
+    - ai-governance
+    - journalism
+    - eu-ai-act
+    - surveillance
+    - research
+  clusters:
+    - governance
+  sources:
+    - title: AlgorithmWatch Website
+      url: https://algorithmwatch.org
+    - title: AlgorithmWatch Fellowship
+      url: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/
+  lastUpdated: 2026-03
+
+- id: algorithmic-justice-league
+  stableId: UyAH46sPFN
+  type: organization
+  orgType: generic
+  title: Algorithmic Justice League
+  website: https://www.ajl.org
+  founded: '2016'
+  headquarters: Cambridge, MA
+  description: >-
+    Nonprofit founded in 2016 by Dr. Joy Buolamwini to raise awareness about the impacts and
+    harms of AI. Key programs include the Freedom Flyers Campaign investigating TSA facial
+    recognition at 250+ US airports (produced "Comply To Fly?" report), and the CRASH Project
+    (Community Reporting of Algorithmic System Harms, launched July 2020) which operates
+    bug-bounty programs for algorithmic bias. Funded by Ford Foundation, MacArthur Foundation,
+    Sloan Foundation, Rockefeller Foundation, and Mozilla Foundation. Buolamwini elected to
+    NAACP Legal Defense Fund Board (2025). Primary intervention types: public awareness,
+    advocacy, community-driven auditing.
+  tags:
+    - algorithmic-accountability
+    - ai-governance
+    - facial-recognition
+    - bias
+    - advocacy
+    - civil-rights
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: AJL Website
+      url: https://www.ajl.org
+    - title: AJL Comply to Fly Report
+      url: https://www.ajl.org/flyreport
+  lastUpdated: 2026-03
+
+- id: center-for-humane-technology
+  stableId: m9jtyXlqXT
+  type: organization
+  orgType: generic
+  title: Center for Humane Technology
+  website: https://www.humanetech.com
+  founded: '2018'
+  headquarters: San Francisco, CA
+  description: >-
+    Nonprofit co-founded in 2018 by Tristan Harris and Aza Raskin to realign technology with
+    humanity's best interests. Annual revenue approximately \$1.8M (2025) with 25-28 employees
+    across 3 continents. Key programs include "AI and What Makes Us Human" initiative (launching
+    2026), supporting litigation against anthropomorphic AI chatbot design, and the "Your
+    Undivided Attention" podcast. Signatory of FLI's Pro-Human AI Declaration (March 2026).
+    Primary intervention types: public advocacy, narrative-shaping, policy engagement.
+  tags:
+    - ai-governance
+    - humane-technology
+    - advocacy
+    - public-awareness
+    - ai-ethics
+  clusters:
+    - governance
+  sources:
+    - title: Center for Humane Technology Website
+      url: https://www.humanetech.com
+  lastUpdated: 2026-03
+
+- id: revolving-door-project
+  stableId: mY8BbBqKFc
+  type: organization
+  orgType: generic
+  title: Revolving Door Project
+  website: https://therevolvingdoorproject.org
+  headquarters: Washington, DC
+  description: >-
+    Government accountability project (of the Goodnation Foundation) led by Executive Director
+    Jeff Hauser. Funded by Democracy Fund. Maintains the "Tracking Uses of AI in the Trump
+    Administration" tracker, which documents: AI replacing federal workers (148,000+ employees
+    lost since Trump took office), CMS AI-powered Medicare preapprovals, State Department "Catch
+    and Revoke" AI surveillance of visa holders, ICE AI-powered license plate scanning, and DOE
+    offering public lands for AI data centers. Published "The Chatbotification of the Federal
+    Government" report. Primary intervention types: investigative research, media campaigns,
+    government accountability.
+  tags:
+    - government-accountability
+    - ai-governance
+    - surveillance
+    - anti-authoritarianism
+    - trump-administration
+    - investigative-research
+  clusters:
+    - governance
+  sources:
+    - title: Revolving Door Project Website
+      url: https://therevolvingdoorproject.org
+    - title: Tracking AI in the Trump Administration
+      url: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
+  lastUpdated: 2026-03
+
+- id: tech-oversight-project
+  stableId: inudUfk9Ix
+  type: organization
+  orgType: generic
+  title: Tech Oversight Project
+  website: https://techoversight.org
+  founded: '2022'
+  headquarters: Washington, DC
+  description: >-
+    Tech watchdog nonprofit founded January 2022, led by Executive Director Sacha Haworth
+    (previously DCCC, House Majority PAC, American Bridge 21st Century). Funded 100% by
+    philanthropy — Omidyar Network and Economic Security Project Action. Describes itself as
+    "the only tech watchdog dedicated solely to research, rapid response, and aggressive media
+    tactics." Covers antitrust, online safety, privacy, and AI regulation. Also operates "Tech
+    Oversight California" for state-level work. Member of the Digital Democracy Project. Primary
+    intervention types: communications campaigns, policy advocacy, media tactics.
+  tags:
+    - ai-governance
+    - tech-accountability
+    - media-campaigns
+    - advocacy
+    - antitrust
+  clusters:
+    - governance
+    - governance
+  sources:
+    - title: Tech Oversight Project Website
+      url: https://techoversight.org
+    - title: Tech Oversight Project About
+      url: https://techoversight.org/about-us/
+  lastUpdated: 2026-03
+
+- id: pauseai
+  stableId: qtXe9VykMz
+  type: organization
+  orgType: generic
+  title: PauseAI
+  website: https://pauseai.info
+  description: >-
+    Grassroots movement demanding a pause on frontier AI development. Local groups in 30+ cities
+    worldwide. Activities include tabling, protesting, and grassroots lobbying. Signatory of
+    FLI's Pro-Human AI Declaration (March 2026). Primary intervention types: grassroots
+    activism, public protest, lobbying.
+  tags:
+    - ai-safety
+    - grassroots
+    - advocacy
+    - pause-ai
+  clusters:
+    - ai-safety
+  sources:
+    - title: PauseAI Website
+      url: https://pauseai.info
+  lastUpdated: 2026-03
+
+- id: humanity-ai-coalition
+  stableId: 7WxlhX0LBn
+  type: organization
+  orgType: funder
+  title: Humanity AI
+  website: https://humanityai.org
+  founded: '2025'
+  headquarters: Washington, DC
+  description: >-
+    \$500 million, 5-year philanthropic initiative launched August 14, 2025 to build a
+    people-centered future for AI. Jointly led by Omidyar Network and MacArthur Foundation.
+    Founding members include Doris Duke Foundation, Ford Foundation, Lumina Foundation, Kapor
+    Foundation, Mellon Foundation, Mozilla Foundation, Siegel Family Endowment, and David and
+    Lucile Packard Foundation. Five focus areas: democracy, education, humanities and culture,
+    labor and economy, and security. Aligned grantmaking began fall 2025; pooled fund grants
+    planned for 2026. The largest coordinated philanthropic initiative focused on AI and society.
+  tags:
+    - ai-governance
+    - philanthropy
+    - democracy
+    - coalition
+  clusters:
+    - governance
+  relatedEntries:
+    - id: tWHbSbUBVg
+      type: organization
+      relationship: related
+    - id: j83jDvR3Cg
+      type: organization
+      relationship: related
+    - id: DK0GbGg7Kf
+      type: organization
+      relationship: related
+  sources:
+    - title: Humanity AI Launch Announcement (MacArthur)
+      url: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+    - title: Humanity AI (Mellon Foundation)
+      url: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
   lastUpdated: 2026-03

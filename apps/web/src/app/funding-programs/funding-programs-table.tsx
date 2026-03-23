@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
+import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFPRows, type SortDir } from "./funding-programs-sort";
 import { FP_STATUS_COLORS, PROGRAM_TYPE_LABELS } from "./funding-programs-constants";
@@ -23,6 +25,8 @@ export interface FundingProgramListRow {
   status: string | null;
   source: string | null;
   description: string | null;
+  /** Source-check verification verdict, if available */
+  verdict: RecordVerdict | null;
 }
 
 type SortKey = "name" | "organization" | "type" | "budget" | "status" | "deadline";
@@ -337,6 +341,7 @@ export function FundingProgramsListTable({
                 onSort={handleSort}
                 className="text-center"
               />
+              <th className="text-center py-2.5 px-3 font-medium">Verified</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -419,6 +424,11 @@ export function FundingProgramsListTable({
                   ) : (
                     <span className="text-muted-foreground/40">{"\u2014"}</span>
                   )}
+                </td>
+
+                {/* Verified */}
+                <td className="py-2.5 px-3 text-center">
+                  <SourceCheckBadge verdict={row.verdict} />
                 </td>
               </tr>
             ))}

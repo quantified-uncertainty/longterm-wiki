@@ -36,3 +36,8 @@ facts:
     value: https://www.conjecture.org
     source: https://www.wikidata.org/wiki/Q130712629
     notes: From Wikidata Q130712629
+  - id: tUbXDGqqew
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Conjecture
+    source: https://www.wikidata.org/wiki/Q319141
+    notes: From Wikidata Q319141

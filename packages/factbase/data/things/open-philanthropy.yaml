@@ -2,7 +2,12 @@ entity: NifCYhN75w
 facts:
   - id: f_n7p8kOo2Tw
     property: description
-    value: Open Philanthropy rebranded to Coefficient Giving in November 2025. See the Coefficient Giving page for current
-      information.
+    value: Open Philanthropy rebranded to Coefficient Giving in November 2025. See
+      the Coefficient Giving page for current information.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: oT6jWFtI9A
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Open_philanthropy_(doctrine)
+    source: https://www.wikidata.org/wiki/Q7096163
+    notes: From Wikidata Q7096163

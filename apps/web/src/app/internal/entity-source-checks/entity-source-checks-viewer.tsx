@@ -364,19 +364,29 @@ export function EntitySourceChecksViewer() {
   const [filterType, setFilterType] = useState("all");
   const [filterVerdict, setFilterVerdict] = useState("all");
 
-  // Load all verdicts on mount, then resolve names
+  // Load all verdicts on mount (paginated), then resolve names
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/entity-verifications-proxy?limit=200");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        const rows = data.verdicts ?? [];
-        setVerdicts(rows);
+        const PAGE_SIZE = 200;
+        let offset = 0;
+        let allVerdicts: VerdictRow[] = [];
+        while (true) {
+          const res = await fetch(`/api/entity-verifications-proxy?limit=${PAGE_SIZE}&offset=${offset}`);
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          const page = data.verdicts ?? [];
+          allVerdicts = [...allVerdicts, ...page];
+          const total = data.total as number | undefined;
+          if (total !== undefined && allVerdicts.length >= total) break;
+          if (page.length < PAGE_SIZE) break;
+          offset += PAGE_SIZE;
+        }
+        setVerdicts(allVerdicts);
 
         // Resolve names in background (non-blocking)
-        if (rows.length > 0) {
-          resolveRecordNames(rows).then(
+        if (allVerdicts.length > 0) {
+          resolveRecordNames(allVerdicts).then(
             (names) => setRecordNames(names),
             (e) => console.warn(`[entity-verifications] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
           );
@@ -456,8 +466,9 @@ export function EntitySourceChecksViewer() {
   const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
 
   // Stats
-  const avgConfidence = verdicts.length > 0
-    ? verdicts.reduce((s, v) => s + (v.confidence ?? 0), 0) / verdicts.length : 0;
+  const withConfidence = verdicts.filter((v) => v.confidence != null);
+  const avgConfidence = withConfidence.length > 0
+    ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
   const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
 
   if (isLoading) {

@@ -154,3 +154,21 @@ _Add new issues below as they're discovered. Group by category._
 **Pattern**: When creating or improving pages that reference entities, look up the entity's `wikiId` (e.g. `E42`) from `data/entities/*.yaml` and use that. Run `pnpm crux w validate gate --fix` to catch these before committing.
 
 **Observed**: PRs #2960, #2961 both fixed CI breakage from slug-based EntityLink IDs on the same day (2026-03-22). This is a recurring pattern.
+
+---
+
+## Database Migrations
+
+### Migration journal tag index conflicts break main CI
+When multiple feature branches each add a Drizzle migration and are merged in sequence, the migration journal (`apps/wiki-server/drizzle/meta/_journal.json`) can end up with duplicate `idx` values or wrong sequential indices. This causes the wiki-server to fail on startup and breaks all CI.
+
+**Fix**: Find the conflicting entry (search for duplicate idx values in `_journal.json`), correct the `idx`, and rename the `.sql` file prefix to match. See PRs #2967, #3029 for examples.
+
+**Prevention**: After merging a PR that adds a migration, immediately check that `_journal.json` has no duplicate indices before opening the next migration PR.
+
+### wikiId collisions break main CI build (!! RECURRING)
+Adding a new entity with a `wikiId` that's already used by another entity causes `next build` to fail. Three CI breakages in two days (PRs #2948, #2958, #3027 on 2026-03-21/22).
+
+**Fix**: Run `pnpm crux w validate gate` to detect collisions. Use `pnpm crux tb ids allocate <slug>` to get a guaranteed-unique ID.
+
+**Prevention**: Always allocate IDs with `crux tb ids allocate` rather than manually picking a number. Never reuse an ID from a "deprecated" page. The gate check detects collisions — run it before committing any new entity.

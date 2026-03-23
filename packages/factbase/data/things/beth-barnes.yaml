@@ -2,7 +2,8 @@ entity: ZvfLhIm7pw
 facts:
   - id: f_RrAkR6GYlQ
     property: description
-    value: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
+    value: AI safety researcher, founder of METR (formerly ARC Evals). Focus on
+      evaluating dangerous AI capabilities.
     asOf: 2026-03
     notes: Migrated from old entity system
 
@@ -14,7 +15,9 @@ facts:
 
   - id: f_bB6tN2pQ4v
     property: notable-for
-    value: "Founded METR (formerly ARC Evals), pioneering dangerous capability evaluations for frontier AI models; led pre-deployment evaluations of GPT-4 and Claude"
+    value: "Founded METR (formerly ARC Evals), pioneering dangerous capability
+      evaluations for frontier AI models; led pre-deployment evaluations of
+      GPT-4 and Claude"
     asOf: 2026-03
     notes: Enriched from entity description
 
@@ -28,3 +31,8 @@ facts:
     property: education
     value: "Studied at University of Oxford"
     notes: Enriched from public information
+  - id: 0DCdIYPlfQ
+    property: website
+    value: https://barnes.page
+    source: https://www.wikidata.org/wiki/Q137382688
+    notes: From Wikidata Q137382688

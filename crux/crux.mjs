@@ -104,6 +104,7 @@ import * as pagesCommands from './commands/pages.ts';
 import * as legislationCommands from './commands/legislation.ts';
 import * as extractStructuredDataCommands from './commands/extract-structured-data.ts';
 import * as verifyConsistencyCommands from './commands/verify-consistency.ts';
+import * as wikidataEnrichCommands from './commands/wikidata-enrich.ts';
 
 const domains = {
   validate: validateCommands,
@@ -172,6 +173,7 @@ const domains = {
   legislation: legislationCommands,
   'extract-structured-data': extractStructuredDataCommands,
   'verify-consistency': verifyConsistencyCommands,
+  'wikidata-enrich': wikidataEnrichCommands,
 };
 
 const shortcutMap = buildShortcutMap();

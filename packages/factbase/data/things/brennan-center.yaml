@@ -1,0 +1,46 @@
+entity: 2KkS7mnw7K
+facts:
+  - id: f_D2RZvH5j1w
+    property: founded-date
+    value: "1995"
+    source: https://www.brennancenter.org/about
+    notes: "Founded 1995 at NYU School of Law"
+
+  - id: f_ZLxIVY8SBQ
+    property: annual-revenue
+    value: "57900000"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/133988199
+    notes: "Approximately $57.9M (FY 2023-2024)"
+
+  - id: f_trbZTG1zGA
+    property: employee-count
+    value: "180"
+    asOf: 2024
+    source: https://www.brennancenter.org/about/leadership
+    notes: "180+ staff (attorneys, scholars, communications professionals)"
+
+  - id: f_Q8SPI26msQ
+    property: headquarters
+    value: "NYU School of Law, New York, NY"
+    source: https://www.brennancenter.org/about
+    notes: "Also has a Washington, DC office"
+
+  - id: f_brennan_ai_tracker
+    property: project
+    value: "Maintains comprehensive AI Legislation Tracker covering all US states"
+    asOf: 2026-03
+    source: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+
+  - id: f_brennan_ai_democracy_agenda
+    property: publication
+    value: "Published 'Agenda to Strengthen U.S. Democracy in the Age of AI' with federal and state policy recommendations"
+    asOf: 2025
+    source: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
+
+  - id: f_brennan_leadership
+    property: leadership
+    value: "Michael Waldman serves as President and CEO"
+    asOf: 2026-03
+    source: https://www.brennancenter.org/about/leadership

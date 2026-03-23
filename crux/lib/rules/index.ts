@@ -95,6 +95,9 @@ import { noExecSyncRule } from './no-exec-sync.ts';
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
 import { kbfRefsRule } from './factbase-refs.ts';
 
+// Source-check verdict warnings (advisory)
+import { sourceCheckVerdictsRule } from './source-check-verdicts.ts';
+
 // Deprecated component detection
 import { noDeprecatedComponentsRule } from './no-deprecated-components.ts';
 
@@ -183,6 +186,7 @@ export {
   noExecSyncRule,
   resourceRefIntegrityRule,
   kbfRefsRule,
+  sourceCheckVerdictsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
@@ -250,6 +254,7 @@ export const allRules: Rule[] = [
   noExecSyncRule,
   resourceRefIntegrityRule,
   kbfRefsRule,
+  sourceCheckVerdictsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,

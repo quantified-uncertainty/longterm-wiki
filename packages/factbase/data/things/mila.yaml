@@ -1,2 +1,39 @@
 entity: alE9l9RI99
-facts: []
+facts:
+  [
+    {
+        id: emktiVeULg,
+        property: founded-date,
+        value: 1993-01,
+        source: https://www.wikidata.org/wiki/Q67182995,
+        notes: From Wikidata Q67182995
+      },
+    {
+        id: huCMbMKbcw,
+        property: country,
+        value: Canada,
+        source: https://www.wikidata.org/wiki/Q67182995,
+        notes: From Wikidata Q67182995
+      },
+    {
+        id: 5yI4XKVN9A,
+        property: website,
+        value: https://mila.quebec/,
+        source: https://www.wikidata.org/wiki/Q67182995,
+        notes: From Wikidata Q67182995
+      },
+    {
+        id: OAMOuNIqMA,
+        property: founded-by-name,
+        value: Yoshua Bengio,
+        source: https://www.wikidata.org/wiki/Q67182995,
+        notes: From Wikidata Q67182995; text value (not entity ref)
+      },
+    {
+        id: rtGErKZpLA,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Mila_(research_institute),
+        source: https://www.wikidata.org/wiki/Q67182995,
+        notes: From Wikidata Q67182995
+      }
+  ]

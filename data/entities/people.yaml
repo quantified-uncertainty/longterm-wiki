@@ -953,7 +953,6 @@
   type: person
   title: Elon Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
-  status: stub
   relatedEntries:
     - id: GLXKjYAEKw
       type: organization
@@ -971,7 +970,6 @@
   type: person
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
-  status: stub
   relatedEntries:
     - id: rQEkFJxS5w
       type: organization
@@ -2988,3 +2986,15 @@
     - ai-safety
     - formal-verification
 
+- id: vitalik-buterin
+  stableId: iEEm0cZ3tn
+  type: person
+  title: Vitalik Buterin
+  description: >-
+    Co-founder of Ethereum and major philanthropic donor. Has given over
+    \$1.5B to charity including MIRI, SENS Research Foundation, GiveDirectly,
+    and various EA-aligned organizations.
+  tags:
+    - crypto
+    - effective-altruism
+    - philanthropy

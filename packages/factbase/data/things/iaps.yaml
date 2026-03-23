@@ -24,10 +24,11 @@ facts:
   - id: f_iHjUY97NNp
     property: description
     value: >-
-      Nonpartisan think tank producing policy research on implications of frontier AI, from
-      today's most advanced models to potential AGI and superintelligence. Focus areas include
-      frontier security, compute policy, and international strategy. Remote-first organization
-      with DC-area presence.
+      Nonpartisan think tank producing policy research on implications of
+      frontier AI, from today's most advanced models to potential AGI and
+      superintelligence. Focus areas include frontier security, compute policy,
+      and international strategy. Remote-first organization with DC-area
+      presence.
     asOf: 2025-12
     source: https://www.iaps.ai
 
@@ -35,3 +36,66 @@ facts:
     property: legal-structure
     value: "Nonprofit think tank"
     source: https://www.idealist.org/en/nonprofit/a25d86f3f3904984bdc5f745721222d1-institute-for-ai-policy-and-strategy-washington
+  - id: bKMnaItDAQ
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q131901373
+    notes: From Wikidata Q131901373
+  - id: kfxIbtifMw
+    property: website
+    value: https://www.iaps.ai/
+    source: https://www.wikidata.org/wiki/Q131901373
+    notes: From Wikidata Q131901373
+
+  - id: f_iaps_leadership
+    property: leadership
+    value: "Jennifer Marron (Executive Director), Brianna Rosen (Research Director, Frontier Security), Amanda El-Dakhakhni (Director), Zoe Williams (Managing Director), Renan Araujo (Director of Programs)"
+    asOf: 2026-03
+    source: https://www.iaps.ai/our-team
+
+  - id: f_iaps_funding_policy
+    property: funding-policy
+    value: "Emphasizes intellectual independence; funded by Open Philanthropy, Survival and Flourishing Fund, allied governments, and individual donors"
+    asOf: 2025
+    source: https://www.iaps.ai/governance-history-independence-funding
+    notes: "Discloses funders publicly; maintains editorial independence"
+
+  - id: f_iaps_fellowship
+    property: program
+    value: "AI Policy Fellowship — 2025 cohort: 29 fellows from 5,600+ applicants (Sept-Nov 2025, DC). 2026 summer cohort: June-August, $15,000 stipend ($22,000 Senior Fellows). Alumni placed at RAND, Institute for Progress, Center for Health Security."
+    asOf: 2026-03
+    source: https://www.iaps.ai/2025-ai-policy-fellows
+
+  - id: f_iaps_sff_2025
+    property: grant-received
+    value: "572000"
+    unit: USD
+    asOf: 2025
+    source: https://survivalandflourishing.fund/2025/recommendations
+    notes: "SFF 2025 grant"
+
+  - id: f_iaps_sff_2024
+    property: grant-received
+    value: "183000"
+    unit: USD
+    asOf: 2024
+    source: https://survivalandflourishing.fund/2024/recommendations
+    notes: "SFF 2024 grant"
+
+  - id: f_iaps_agent_governance
+    property: publication
+    value: "AI Agent Governance: A Field Guide (April 2025) — 63-page playbook for governing AI agents, five-part taxonomy of interventions"
+    asOf: 2025-04
+    source: https://www.iaps.ai/research/ai-agent-governance
+
+  - id: f_iaps_chip_smuggling
+    property: publication
+    value: "Countering AI Chip Smuggling (June 2025, joint with CNAS) — estimates 10,000 to several hundred thousand chips smuggled to China in 2024"
+    asOf: 2025-06
+    source: https://www.cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority
+
+  - id: f_iaps_media
+    property: media-coverage
+    value: "40+ features in the Economist, NYT, Real Clear Politics, TIME in 2025"
+    asOf: 2025
+    source: https://www.iaps.ai/news/iaps2025yearinreview

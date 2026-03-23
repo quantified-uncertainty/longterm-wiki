@@ -2,8 +2,14 @@ entity: bmxLNyfK3A
 facts:
   - id: f_F9gpuJW2AA
     property: description
-    value: Claude Opus 4 was released May 22, 2025 alongside Sonnet 4. Described as the world's best coding model at launch,
-      capable of autonomous coding for up to 7 hours. Scored 72.5% on SWE-bench Verified. Priced at $15/$75 per million
-      tokens with a 200K token context window.
+    value: Claude Opus 4 was released May 22, 2025 alongside Sonnet 4. Described as
+      the world's best coding model at launch, capable of autonomous coding for
+      up to 7 hours. Scored 72.5% on SWE-bench Verified. Priced at $15/$75 per
+      million tokens with a 200K token context window.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: yW1qMq9xxQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Claude_Opus_4
+    source: https://www.wikidata.org/wiki/Q134885159
+    notes: From Wikidata Q134885159
