@@ -43,3 +43,28 @@ facts:
     value: "One of the oldest and most influential American think tanks. Its Artificial Intelligence and Emerging Technology Initiative conducts interdisciplinary research on AI governance, convenes diverse stakeholders, and publishes policy recommendations on responsible AI development."
     asOf: 2026-03
     source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
+
+  - id: f_brookings_aiet_founded
+    property: program-founded
+    value: "2018"
+    source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
+    notes: "The AI and Emerging Technology Initiative launched in 2018 as part of Brookings Governance Studies"
+
+  - id: f_brookings_revenue
+    property: revenue
+    value: "100000000"
+    unit: USD
+    asOf: 2024
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+    notes: "Approximate annual operating expenses for the full Brookings Institution (~$100M)"
+
+  - id: f_brookings_country
+    property: country
+    value: United States
+    source: https://en.wikipedia.org/wiki/Brookings_Institution
+
+  - id: f_brookings_techtank
+    property: publication
+    value: "TechTank — regular blog series on technology policy, covering AI regulation, workforce impacts, privacy, and platform governance. One of the most-read policy blogs in DC."
+    asOf: 2025
+    source: https://www.brookings.edu/series/techtank/

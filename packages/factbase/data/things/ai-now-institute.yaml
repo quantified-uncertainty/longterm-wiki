@@ -66,3 +66,88 @@ facts:
     value: https://en.wikipedia.org/wiki/AI_Now_Institute
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948
+
+  - id: f_ainow_independence
+    property: independence-date
+    value: "2022"
+    source: https://en.wikipedia.org/wiki/AI_Now_Institute
+    notes: "AI Now left NYU in mid-2022 to become an independent nonprofit research institute"
+
+  - id: f_ainow_co_exec_directors
+    property: key-person
+    value:
+      - amba-kak
+      - sarah-myers-west
+    asOf: 2023
+    source: https://ainowinstitute.org/about
+    notes: "Amba Kak and Sarah Myers West serve as Co-Executive Directors since 2023"
+
+  - id: f_ainow_no_corp_funding
+    property: funding-policy
+    value: "Refuses corporate and tech industry funding since 2022"
+    asOf: 2022
+    source: https://ainowinstitute.org/about
+    notes: "Distinctive policy — one of few AI research orgs that explicitly declines industry funding"
+
+  - id: f_ainow_report_2017
+    property: publication
+    value: "AI Now 2017 Report — first annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
+    asOf: 2017
+    source: https://ainowinstitute.org/publication/ai-now-2017-report
+    notes: "Inaugural annual landscape report"
+
+  - id: f_ainow_report_2018
+    property: publication
+    value: "AI Now 2018 Report — expanded analysis of AI accountability gaps, bias in automated decision systems, and surveillance technologies"
+    asOf: 2018
+    source: https://ainowinstitute.org/publication/ai-now-2018-report
+
+  - id: f_ainow_report_2019
+    property: publication
+    value: "AI Now 2019 Report — focused on facial recognition regulation, algorithmic accountability legislation, and climate impacts of AI"
+    asOf: 2019
+    source: https://ainowinstitute.org/publication/ai-now-2019-report
+
+  - id: f_ainow_funder_osf
+    property: funder
+    value: "Open Society Foundations"
+    source: https://ainowinstitute.org/about
+    notes: "One of AI Now's primary funders"
+
+  - id: f_ainow_funder_ford
+    property: funder
+    value: "Ford Foundation"
+    source: https://ainowinstitute.org/about
+    notes: "Major funder of AI Now"
+
+  - id: f_ainow_funder_mozilla
+    property: funder
+    value: "Mozilla Foundation"
+    source: https://ainowinstitute.org/about
+    notes: "Funder of AI Now"
+
+  - id: f_ainow_funder_macarthur
+    property: grant-received
+    value: "2000000"
+    unit: USD
+    asOf: 2026-02
+    source: https://www.macfound.org/press/press-releases/10-million-to-advance-ai-by-and-for-people
+    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security and AI"
+
+  - id: f_ainow_funder_luminate
+    property: funder
+    value: "Omidyar Network / Luminate"
+    source: https://ainowinstitute.org/about
+
+  - id: f_ainow_facial_recognition
+    property: policy-influence
+    value: "Advocated for facial recognition moratoriums; influenced bans in multiple US cities (San Francisco 2019, Portland 2020, and others)"
+    asOf: 2020
+    source: https://en.wikipedia.org/wiki/AI_Now_Institute
+    notes: "One of AI Now's most concrete policy wins"
+
+  - id: f_ainow_time_100
+    property: recognition
+    value: "Co-Executive Director Amba Kak named to TIME 100 Most Influential People in AI (2024)"
+    asOf: 2024
+    source: https://time.com/collection/time100-ai-2024/

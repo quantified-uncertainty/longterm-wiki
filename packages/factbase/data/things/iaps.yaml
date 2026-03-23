@@ -8,9 +8,9 @@ facts:
 
   - id: f_5oWjk3601I
     property: headquarters
-    value: "Washington, DC"
+    value: "San Francisco, CA"
     source: https://www.iaps.ai/contact
-    notes: "Washington, DC metro area; remote-first organization"
+    notes: "Remote-first organization; primary office in San Francisco per contact page. DC-area presence for policy work."
 
   - id: f_6a13OgG0xh
     property: headcount

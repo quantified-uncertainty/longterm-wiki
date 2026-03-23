@@ -35,6 +35,7 @@ interface CommandOptions extends BaseOptions {
   dryRun?: boolean;
   skipEntityValidation?: boolean;
   fix?: boolean;
+  apply?: boolean;
   max?: string;
   budget?: string;
   taskType?: string;
@@ -991,17 +992,42 @@ async function marketsDiscoverCommand(args: string[], options: CommandOptions): 
   }
   return discoverMarkets(entitySlug, {
     dryRun: options.dryRun ?? false,
-    model: (options.model as string) ?? undefined,
+    model: typeof options.model === 'string' ? options.model : undefined,
   });
 }
 
 async function marketsFetchCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
   const { fetchMarketSnapshots } = await import('../tablebase/market-fetcher.ts');
   return fetchMarketSnapshots({
-    platform: (options.source as string) ?? undefined,
+    platform: typeof options.source === 'string' ? options.source : undefined,
     entitySlug: args[0] ?? undefined,
     dryRun: options.dryRun ?? false,
   });
+}
+
+async function normalizeIdsCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { normalizeIds } = await import('../tablebase/normalize-ids.ts');
+  const result = await normalizeIds(!!options.apply, { quiet: !!options.ci });
+
+  if (options.ci) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify({
+        personnelChecked: result.personnelChecked,
+        grantsChecked: result.grantsChecked,
+        fixesFound: result.fixes.length,
+        unresolved: result.unresolved.length,
+        applied: result.applied,
+        fixes: result.fixes,
+        unresolvedItems: result.unresolved,
+      }, null, 2),
+    };
+  }
+
+  return {
+    exitCode: result.unresolved.length > 0 ? 1 : 0,
+    output: '',
+  };
 }
 
 export const commands = {
@@ -1040,6 +1066,8 @@ export const commands = {
   // Market data commands
   'markets-discover': marketsDiscoverCommand,
   'markets-fetch': marketsFetchCommand,
+  // ID normalization
+  'normalize-ids': normalizeIdsCommand,
 };
 
 export function getHelp(): string {
@@ -1059,6 +1087,7 @@ Commands:
   existing       Query existing records for an entity (for Claude Code skill)
   source-check-records Batch source-check records using deterministic checks + Batch API
   sync-careers   Sync FactBase career data to the personnel table
+  normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
 
   Backfill (consolidated from backfill-* domains):
   backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
@@ -1116,6 +1145,8 @@ Examples:
   crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
   crux tb tablebase source-check-records --table=personnel --source=batch --limit=100  # LLM check 100 records
   crux tb tablebase source-check-records --table=personnel --source=all   # Full source-check
+  crux tb tablebase normalize-ids                            # Dry-run: show slug-based IDs
+  crux tb tablebase normalize-ids --apply                    # Fix slug-based IDs
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records

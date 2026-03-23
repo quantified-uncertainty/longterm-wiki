@@ -5626,6 +5626,7 @@
 
 - id: trump-eo-14179
   stableId: PYEZ6G1Fbz
+  wikiId: E2601
   type: policy
   summaryPage: governance-overview
   title: "Executive Order 14179: Removing Barriers to American Leadership in AI"
@@ -5651,12 +5652,33 @@
         Orders review and rescission of all policies conflicting with pro-innovation AI
         stance. Directs OMB to revise memoranda M-24-10 and M-24-18 within 60 days.
       category: Deregulation
+  stakeholders:
+    - name: CSET (Georgetown)
+      position: neutral
+      importance: medium
+      reason: Published detailed analysis of the EO's implications for AI governance
+      source: https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/
+    - name: Tech industry (general)
+      position: support
+      importance: high
+      reason: Industry broadly welcomed the deregulatory approach and revocation of Biden-era compute reporting requirements
+    - name: AI safety researchers
+      position: oppose
+      importance: medium
+      reason: Concerned about loss of compute reporting thresholds and dissolution of safety-focused mandates from EO 14110
+    - name: US Senate (bipartisan)
+      position: mixed
+      importance: high
+      reason: Senate rejected AI preemption moratorium in One Big Beautiful Bill Act due to bipartisan concerns about eroding state consumer protection authority
+  relatedEntries:
+    - id: us-executive-order
+      type: policy
   description: >-
     First major AI executive order of the Trump second term, signed January 23, 2025. Revokes
     Biden's comprehensive AI executive order (EO 14110) and replaces it with a deregulatory,
     pro-innovation framework. Mandated a 180-day AI Action Plan and review of all existing AI
-    policies. The resulting Action Plan was released July 23, 2025, accompanied by three
-    additional executive orders on data center permitting, unbiased AI principles, and
+    policies. The resulting Action Plan ("Winning the Race") was released July 23, 2025, accompanied
+    by three additional executive orders on data center permitting, unbiased AI principles, and
     scientific AI acceleration.
   tags:
     - executive-order
@@ -5668,10 +5690,15 @@
   sources:
     - title: Federal Register
       url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Executive_Order_14179
+    - title: CSET Analysis
+      url: https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/
   lastUpdated: 2026-03
 
 - id: trump-ai-preemption-eo
   stableId: 1h93jgFv4l
+  wikiId: E2602
   type: policy
   summaryPage: governance-overview
   title: "EO: Ensuring a National Policy Framework for AI (State Preemption)"
@@ -5734,6 +5761,7 @@
 
 - id: trump-ai-framework-2026
   stableId: 7rafBo4OER
+  wikiId: E2603
   type: policy
   summaryPage: governance-overview
   title: National AI Legislative Framework (White House, March 2026)
@@ -5762,11 +5790,44 @@
     - title: Workforce Development
       description: Educating Americans and workforce development for AI era
       category: Education
+  stakeholders:
+    - name: Michael Kratsios
+      position: support
+      importance: high
+      role: Assistant to the President for Science and Technology
+      reason: >-
+        Said the framework "will unleash American ingenuity to win the global AI race,
+        delivering breakthroughs that create jobs, lower costs, and improve lives"
+      source: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
+    - name: Alliance for Secure AI
+      position: oppose
+      importance: medium
+      reason: >-
+        CEO Brendan Steinhauser said the proposed regulations provide "no path to accountability"
+        for harms caused by AI
+    - name: Public First Action (Anthropic-backed)
+      position: oppose
+      importance: medium
+      reason: >-
+        Brad Carson said the plan echoes the lack of regulation in the social media industry
+        and lacks substance
+    - name: 50 Republican House Members
+      position: oppose
+      importance: high
+      reason: >-
+        Sent letter in March 2026 calling state regulation efforts important for holding
+        tech industry accountable; opposed blanket federal preemption
+    - name: R Street Institute
+      position: support
+      importance: medium
+      reason: Praised the pro-innovation, national-framework approach
+      source: https://www.rstreet.org/commentary/white-house-ai-legislative-vision-stresses-need-for-a-pro-innovation-national-framework/
   description: >-
-    Legislative blueprint released March 20, 2026. Six guiding principles for Congress. Urges
-    Congress to preempt state AI laws and adopt "light-touch" regulatory approach. Leaves
-    AI/copyright fair-use questions to courts. Not law itself — a framework for congressional
-    action.
+    Legislative blueprint released March 20, 2026. Seven sections covering child safety,
+    energy/infrastructure, intellectual property, free speech, innovation, workforce, and
+    federal preemption. Urges Congress to preempt state AI laws and adopt "light-touch"
+    regulatory approach. Leaves AI/copyright fair-use questions to courts. Not law itself — a
+    framework for congressional action.
   tags:
     - legislative-framework
     - federal-policy
@@ -5777,10 +5838,17 @@
   sources:
     - title: White House Announcement
       url: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
+    - title: CNN Coverage
+      url: https://www.cnn.com/2026/03/20/tech/white-house-ai-framework
+    - title: CNBC Coverage
+      url: https://www.cnbc.com/2026/03/20/trump-ai-policy-framework.html
+    - title: Sullivan & Cromwell Analysis
+      url: https://www.sullcrom.com/insights/memo/2026/March/White-House-Releases-National-Policy-Framework-AI
   lastUpdated: 2026-03
 
 - id: take-it-down-act
   stableId: Nq8e8nItph
+  wikiId: E2604
   type: policy
   summaryPage: governance-overview
   title: TAKE IT DOWN Act
@@ -5817,6 +5885,44 @@
     Criminalizes nonconsensual intimate images (including AI deepfakes) and requires platforms
     to remove them within 48 hours. Passed with overwhelming bipartisan support (House 409-2,
     Senate unanimous).
+  stakeholders:
+    - name: Senator Ted Cruz
+      position: support
+      importance: high
+      role: Lead sponsor
+      reason: Co-authored and championed the legislation
+      source: https://www.congress.gov/bill/119th-congress/senate-bill/146
+    - name: Senator Amy Klobuchar
+      position: support
+      importance: high
+      role: Co-sponsor
+      reason: Called passage "a major victory for victims of online abuse"
+      source: https://www.klobuchar.senate.gov/public/index.cfm/2025/5/klobuchar-s-bipartisan-take-it-down-act-signed-into-law
+    - name: RAINN
+      position: support
+      importance: medium
+      reason: Testified in House hearing supporting the legislation as protection for victims
+      source: https://rainn.org/federal-legislation/take-it-down-act/
+    - name: Electronic Frontier Foundation
+      position: oppose
+      importance: medium
+      reason: >-
+        Argued the bill "gives powerful people a new legal tool to force online platforms
+        to remove lawful speech that they simply don't like"
+      source: https://www.eff.org/deeplinks/2025/12/politicians-rushed-through-online-speech-solution-victims-deserve-better
+    - name: Center for Democracy & Technology
+      position: oppose
+      importance: medium
+      reason: Raised First Amendment concerns over vague takedown requirements and potential for abuse of false takedown requests
+    - name: First Lady Melania Trump
+      position: support
+      importance: medium
+      reason: Publicly championed the bill as protection for children and victims
+  keyPoliticians:
+    - name: Senator Ted Cruz
+      role: Lead sponsor
+    - name: Senator Amy Klobuchar
+      role: Co-sponsor
   tags:
     - deepfakes
     - nonconsensual-images
@@ -5830,6 +5936,10 @@
       url: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
     - title: White House Signing Statement
       url: https://www.whitehouse.gov/articles/2025/05/icymi-president-trump-signs-take-it-down-act-into-law/
+    - title: EFF Analysis
+      url: https://www.eff.org/deeplinks/2025/12/politicians-rushed-through-online-speech-solution-victims-deserve-better
+    - title: IAPP Overview
+      url: https://iapp.org/news/a/take-it-down-act-the-next-bipartisan-us-federal-privacy-ai-law
   lastUpdated: 2026-03
 
 - id: ai-lead-act
@@ -5926,6 +6036,7 @@
 
 - id: paris-ai-summit
   stableId: Fghn4m4ekW
+  wikiId: E2605
   type: policy
   summaryPage: governance-overview
   title: Paris AI Action Summit (February 2025)
@@ -6153,6 +6264,7 @@
 
 - id: indiana-ai-healthcare
   stableId: I8mbdJyUjs
+  wikiId: E2036
   type: policy
   summaryPage: governance-overview
   title: "Indiana AI Healthcare Disclosure"

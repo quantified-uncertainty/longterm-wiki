@@ -76,11 +76,9 @@ facts:
     notes: "150+ staff after rebrand to Coefficient Giving (November 2025)"
   - id: 6cG2oupsZg
     property: founded-date
-    value: "2014"
+    value: "2017-06"
     source: https://www.wikidata.org/wiki/Q25345685
-    notes: "Grantmaking began 2014 as Open Philanthropy Project within GiveWell;
-      independent LLC June 2017; rebranded from Open Philanthropy to Coefficient
-      Giving November 2025"
+    notes: "Became independent LLC in June 2017 (previously operated as Open Philanthropy Project within GiveWell from 2014). Rebranded from Open Philanthropy to Coefficient Giving in November 2025."
   - id: Dyf2V67PFg
     property: headquarters
     value: San Francisco

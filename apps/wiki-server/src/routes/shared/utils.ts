@@ -68,12 +68,22 @@ export function dbError(
   err: unknown,
   context?: Record<string, unknown>
 ) {
+  // Extract the deepest error message — Drizzle wraps PG errors in cause chains
+  const extractMessage = (e: unknown): string => {
+    if (e instanceof Error) {
+      if (e.cause) return `${e.message} | cause: ${extractMessage(e.cause)}`;
+      return e.message;
+    }
+    return String(e);
+  };
+  const detail = extractMessage(err);
   logger.error({
     operation,
     ...(context ?? {}),
-    err: err instanceof Error ? err.message : String(err),
+    err: detail,
+    stack: err instanceof Error ? err.stack : undefined,
   }, `${operation} failed`);
-  return c.json({ error: "database_error", message: `${operation} failed` }, 500);
+  return c.json({ error: "database_error", message: `${operation} failed`, detail: detail || "no-error-detail-extracted" }, 500);
 }
 
 /** Extract the first row from a query result, throwing if empty. */

@@ -472,12 +472,12 @@
   wikiId: E162
   type: person
   title: Ian Hogarth
-  description: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
+  description: AI investor and writer; former Chair of the UK AI Safety Institute (2023-2025).
   customFields:
     - label: Role
-      value: Chair
+      value: AI investor and writer; former Chair, UK AI Safety Institute
     - label: Known For
-      value: Leading UK AI Safety Institute, AI investor and writer
+      value: Former Chair of UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
   stableId: eYrBgMLJDw
   wikiId: E163
@@ -662,7 +662,7 @@
       type: person
   customFields:
     - label: Role
-      value: Professor of Philosophy, University of Oxford
+      value: Founder and Principal Researcher, Macrostrategy Research Initiative
     - label: Known For
       value: Superintelligence, existential risk research, simulation hypothesis
   sources:
@@ -2842,6 +2842,7 @@
 
 - id: gabriel-alfour
   stableId: n0d7I3OAej
+  wikiId: E2100
   type: person
   title: Gabriel Alfour
   description: >-
@@ -2998,3 +2999,246 @@
     - crypto
     - effective-altruism
     - philanthropy
+
+# --- GovAI personnel ---
+
+- id: ben-garfinkel
+  stableId: aAaiRGmdG1
+  type: person
+  title: Ben Garfinkel
+  relatedEntries:
+    - id: XLLyzaEaCA
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: GovAI Team Page
+      url: https://www.governance.ai/team
+  description: >-
+    Director of the Centre for the Governance of AI (GovAI). Previously a
+    Research Fellow at the Future of Humanity Institute (FHI) at Oxford
+    University, where he worked on AI governance and existential risk.
+    Became Director of GovAI after its transition to independence.
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: markus-anderljung
+  stableId: 1nsWegMiR3
+  type: person
+  title: Markus Anderljung
+  relatedEntries:
+    - id: XLLyzaEaCA
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: GovAI Team Page
+      url: https://www.governance.ai/team
+  description: >-
+    Head of Policy at the Centre for the Governance of AI (GovAI).
+    Lead author of "Frontier AI Regulation: Managing Emerging Risks to
+    Public Safety" (2023) and co-author of "Computing Power and the
+    Governance of Artificial Intelligence" (2024). Previously at the
+    Future of Humanity Institute.
+  tags:
+    - ai-governance
+    - ai-policy
+    - compute-governance
+
+- id: emma-bluemke
+  stableId: wKx_yCn-EJ
+  type: person
+  title: Emma Bluemke
+  relatedEntries:
+    - id: XLLyzaEaCA
+      type: organization
+      relationship: related
+  sources:
+    - title: GovAI Team Page
+      url: https://www.governance.ai/team
+  description: >-
+    Research Manager at the Centre for the Governance of AI (GovAI).
+  tags:
+    - ai-governance
+
+- id: anton-korinek
+  stableId: evoWfReU6W
+  type: person
+  title: Anton Korinek
+  relatedEntries:
+    - id: XLLyzaEaCA
+      type: organization
+      relationship: related
+  sources:
+    - title: Anton Korinek at UVA
+      url: https://www.antonkorinek.com/
+  description: >-
+    Professor of Economics at the University of Virginia and Economics
+    of AI Lead at GovAI. Research focuses on the economic implications
+    of AI, macroeconomic policy for transformative AI, and AI governance.
+    Also affiliated with the Brookings Institution and NBER.
+  tags:
+    - ai-governance
+    - economics
+    - ai-policy
+
+# --- AI Now Institute personnel ---
+
+- id: amba-kak
+  stableId: mZrTkx_RXk
+  type: person
+  title: Amba Kak
+  relatedEntries:
+    - id: VJacG0VE2w
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: AI Now Institute Team
+      url: https://ainowinstitute.org/people
+  description: >-
+    Co-Executive Director of the AI Now Institute. Named to TIME's
+    100 Most Influential People in AI (2024). Addressed the UN General
+    Assembly on AI governance. Previously at Mozilla Foundation and the
+    Indian government's IT ministry. Legal and policy expert focusing on
+    AI governance, competition, and digital rights.
+  tags:
+    - ai-governance
+    - ai-policy
+    - digital-rights
+
+- id: sarah-myers-west
+  stableId: PHcf_t-yuY
+  type: person
+  title: Sarah Myers West
+  relatedEntries:
+    - id: VJacG0VE2w
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: AI Now Institute Team
+      url: https://ainowinstitute.org/people
+  description: >-
+    Co-Executive Director of the AI Now Institute. Previously a
+    postdoctoral researcher at AI Now and a Senior AI Policy Analyst
+    at the Federal Trade Commission (FTC). Research focuses on AI
+    governance, data practices, and institutional accountability.
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: kate-crawford
+  stableId: 77SnPuPnk8
+  type: person
+  title: Kate Crawford
+  relatedEntries:
+    - id: VJacG0VE2w
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: Kate Crawford Website
+      url: https://www.katecrawford.net/
+    - title: "Atlas of AI (Yale University Press)"
+      url: https://yalebooks.yale.edu/book/9780300264630/atlas-of-ai/
+  description: >-
+    Co-founder of the AI Now Institute and Research Professor at USC
+    Annenberg. Previously a Principal Researcher at Microsoft Research
+    (2006-2021). Author of "Atlas of AI" (2021), a landmark book on
+    AI's material and social impacts. Senior Fellow at the Oxford
+    Internet Institute.
+  tags:
+    - ai-governance
+    - ai-ethics
+    - research
+
+- id: meredith-whittaker
+  stableId: DnWz-y8BuY
+  type: person
+  title: Meredith Whittaker
+  relatedEntries:
+    - id: VJacG0VE2w
+      type: organization
+      relationship: leads-to
+  sources:
+    - title: Signal Foundation
+      url: https://signal.org/
+    - title: AI Now Institute
+      url: https://ainowinstitute.org/
+  description: >-
+    Co-founder of the AI Now Institute and President of the Signal
+    Foundation. Previously at Google for 13 years, where she founded
+    Google's Open Research group and led internal organizing against
+    Project Maven and workplace conditions. Known for advocacy on
+    AI accountability and tech worker rights.
+  tags:
+    - ai-governance
+    - ai-ethics
+    - privacy
+
+- id: heidy-khlaaf
+  stableId: npfho6p1QL
+  type: person
+  title: Heidy Khlaaf
+  relatedEntries:
+    - id: VJacG0VE2w
+      type: organization
+      relationship: related
+  sources:
+    - title: AI Now Institute About
+      url: https://ainowinstitute.org/about
+  description: >-
+    Chief AI Scientist at the AI Now Institute. PhD in Computer Science from
+    UCL. Previously Engineering Director of AI Assurance at Trail of Bits.
+    Led safety evaluation of Codex at OpenAI and pioneered the field of AI
+    Safety Engineering. Led cyber evaluations for the launch of UK AISI.
+    Named TIME 100 AI 2025 and MIT Technology Review Innovators Under 35.
+  tags:
+    - ai-safety
+    - ai-governance
+    - cybersecurity
+
+# --- CAIS personnel ---
+
+- id: thomas-woodside
+  stableId: KfgopYXMo8
+  type: person
+  title: Thomas Woodside
+  relatedEntries:
+    - id: y4bieqSeag
+      type: organization
+      relationship: related
+  description: >-
+    Policy Director at the Center for AI Safety (CAIS). Works on AI policy
+    and governance, including compute governance and safety standards.
+  tags:
+    - ai-safety
+    - ai-policy
+
+- id: andy-zou
+  stableId: SIfbuDzvcU
+  type: person
+  title: Andy Zou
+  relatedEntries:
+    - id: y4bieqSeag
+      type: organization
+      relationship: related
+  description: >-
+    Research scientist at the Center for AI Safety (CAIS). Lead author
+    of "Universal and Transferable Adversarial Attacks on Aligned Language
+    Models" and co-author of representation engineering research.
+  tags:
+    - ai-safety
+    - adversarial-robustness
+
+- id: mantas-mazeika
+  stableId: j4eeIGYdY2
+  type: person
+  title: Mantas Mazeika
+  relatedEntries:
+    - id: y4bieqSeag
+      type: organization
+      relationship: related
+  description: >-
+    Research scientist at the Center for AI Safety (CAIS). Co-author of
+    the WMDP benchmark and HarmBench papers on evaluating AI safety.
+  tags:
+    - ai-safety
+    - benchmarks

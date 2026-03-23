@@ -562,7 +562,7 @@
       url: https://governance.ai/research
   description: >-
     The Centre for the Governance of AI (GovAI) is a research organization focused on AI policy and governance.
-    Originally part of the Future of Humanity Institute at Oxford, GovAI became independent in 2023 when FHI closed.
+    Originally part of the Future of Humanity Institute at Oxford, GovAI began operating independently in 2021 and formally incorporated as a separate entity before FHI closed in April 2024.
   tags:
     - governance
     - compute-governance
@@ -7993,6 +7993,7 @@
 
 - id: pauseai
   stableId: qtXe9VykMz
+  wikiId: E2101
   type: organization
   orgType: generic
   title: PauseAI

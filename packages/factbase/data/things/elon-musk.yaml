@@ -45,10 +45,10 @@ facts:
 
   - id: f_eM7kL8mN9o
     property: net-worth
-    value: 330e9
-    asOf: 2025-03
+    value: 650e9
+    asOf: 2026-03
     source: https://www.bloomberg.com/billionaires/
-    notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires Index estimate"
+    notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires Index estimate as of March 2026"
 
   - id: f_SxwgL1y46Q
     property: social-media

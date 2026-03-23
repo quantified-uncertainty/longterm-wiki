@@ -22,11 +22,11 @@ facts:
     notes: "86% of 2025 grants went to AI safety/governance; up from ~50% in 2019"
 
   - id: f_bUXNUigmsw
-    property: total-funding
+    property: program-budget
     value: 16e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/speculation-grants
-    notes: "Speculation Grants total budget across ~35 grantors; up from $4M initially"
+    notes: "Speculation Grants total budget across ~35 grantors; up from $4M initially. Distinct from SFF's main total-funding figure."
 
   - id: f_MS2cGoMp1g
     property: revenue

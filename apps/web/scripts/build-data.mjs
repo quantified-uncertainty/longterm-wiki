@@ -31,7 +31,7 @@ import { buildUrlToResourceMap } from './lib/unconverted-links.mjs';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
 import { computeStats } from './lib/statistics.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
-import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
+import { scanFrontmatterEntities, collectPageWikiIds } from './lib/frontmatter-scanner.mjs';
 import { parseAllSessionLogs } from './lib/session-log-parser.mjs';
 import { fetchBranchToPrMap, enrichWithPrNumbers, fetchPrItems } from './lib/github-pr-lookup.mjs';
 import { computePageCoverage } from '../../../crux/lib/page-coverage.ts';
@@ -514,7 +514,9 @@ async function main() {
   // =========================================================================
   // ID REGISTRY — derive from wikiId fields in source files (YAML + MDX)
   // =========================================================================
-  const { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId: nextIdInit } = buildIdRegistry(entities);
+  // Collect page wikiIds so fallback assignment skips IDs already claimed by pages
+  const reservedPageWikiIds = collectPageWikiIds(CONTENT_DIR);
+  const { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId: nextIdInit } = buildIdRegistry(entities, reservedPageWikiIds);
   let nextId = nextIdInit;
   // Build stableId → slug mapping from YAML entities (for entity resolution
   // in directory pages where ownerEntityId is a stableId rather than a slug)
