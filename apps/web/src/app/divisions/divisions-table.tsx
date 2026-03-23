@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
+import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
   DIVISION_TYPE_COLORS,
@@ -22,6 +24,8 @@ export interface DivisionRow {
   href: string | null;
   /** Whether this division has meaningful data (personnel, grants, programs, lead, etc.) */
   hasData: boolean;
+  /** Source-check verification verdict, if available */
+  verdict: RecordVerdict | null;
 }
 
 export interface TypeSummary {
@@ -190,6 +194,7 @@ export function DivisionsTable({
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Type</th>
                 <th className="text-left py-2.5 px-3 font-medium">Status</th>
+                <th className="text-center py-2.5 px-3 font-medium">Verified</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -246,6 +251,9 @@ export function DivisionsTable({
                         {titleCase(row.status)}
                       </span>
                     )}
+                  </td>
+                  <td className="py-2 px-3 text-center">
+                    <SourceCheckBadge verdict={row.verdict} />
                   </td>
                 </tr>
               ))}
