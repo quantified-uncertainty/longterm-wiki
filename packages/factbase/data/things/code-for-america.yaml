@@ -18,6 +18,7 @@ facts:
   # ── Founder role ───────────────────────────────────────────────
   - id: f_jJ6lESgNPs
     property: founded-by
-    value: "Jennifer Pahlka"
+    value:
+      - !ref GwMzWw7fpA
     source: https://codeforamerica.org
-    notes: "Pahlka also served as U.S. Deputy CTO under Obama and helped establish USDS"
+    notes: "Jennifer Pahlka; also served as U.S. Deputy CTO under Obama and helped establish USDS"

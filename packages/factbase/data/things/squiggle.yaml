@@ -20,5 +20,5 @@ facts:
   - id: f_uRq5zW8bLc
     property: founded-by
     value:
-      - quri
+      - !ref Khej79OA8g
     notes: Created by QURI (Quantified Uncertainty Research Institute)

@@ -19,5 +19,5 @@ facts:
   - id: f_fAw1CN4iIj
     property: founded-by
     value:
-      - quri
+      - !ref Khej79OA8g
     notes: Created at QURI by Nuno Sempere with Ozzie Gooen

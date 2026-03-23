@@ -35,7 +35,7 @@ facts:
   - id: f_Alru3kK8mb
     property: key-person
     value:
-      - dan-hendrycks
+      - !ref VoNqoBJkyg
     asOf: 2025
     source: https://www.safe.ai/about
     notes: "Dan Hendrycks serves as Executive & Research Director"

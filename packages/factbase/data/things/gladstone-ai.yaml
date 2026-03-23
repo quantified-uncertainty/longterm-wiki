@@ -9,8 +9,8 @@ facts:
   - id: f_jAh3sxgAw5
     property: founded-by
     value:
-      - jeremie-harris
-      - edouard-harris
+      - !ref aJOiUj35UA
+      - !ref 7lQpdb5nDg
     source: https://www.gladstone.ai/about
     notes: "Brothers with backgrounds in physics and AI startups; Y Combinator alumni"
 

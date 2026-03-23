@@ -62,8 +62,8 @@ facts:
   - id: f_jiXzOc53q8
     property: key-person
     value:
-      - fei-fei-li
-      - john-etchemendy
+      - !ref QzcX3bShmQ
+      - !ref rhgfPZYXTw
     asOf: 2024
     source: https://hai.stanford.edu/about
     notes: "Co-directors since founding in 2019"

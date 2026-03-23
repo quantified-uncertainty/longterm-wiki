@@ -3242,3 +3242,57 @@
   tags:
     - ai-safety
     - benchmarks
+
+- id: esben-kran
+  stableId: HwM6OF6Ewg
+  type: person
+  title: Esben Kran
+  description: >-
+    Founder of Apart Research, an AI safety research organization that
+    accelerates safety research through hackathons, fellowships, and
+    collaborative sprints. Based in Copenhagen, Denmark.
+  tags:
+    - ai-safety
+
+- id: jeremie-harris
+  stableId: aJOiUj35UA
+  type: person
+  title: Jeremie Harris
+  description: >-
+    Co-founder and CEO of Gladstone AI, an AI safety advisory firm that
+    provides briefings, training, and risk assessments to government and
+    enterprise clients. Y Combinator alumnus.
+  tags:
+    - ai-safety
+    - ai-governance
+
+- id: edouard-harris
+  stableId: 7lQpdb5nDg
+  type: person
+  title: Edouard Harris
+  description: >-
+    Co-founder and CTO of Gladstone AI. Background in physics and AI
+    startups. Y Combinator alumnus.
+  tags:
+    - ai-safety
+
+- id: john-etchemendy
+  stableId: rhgfPZYXTw
+  type: person
+  title: John Etchemendy
+  description: >-
+    Co-director of the Stanford Institute for Human-Centered Artificial
+    Intelligence (HAI) since its founding in 2019. Former Provost of
+    Stanford University. Philosopher and logician.
+  tags:
+    - ai-governance
+
+- id: jennifer-pahlka
+  stableId: GwMzWw7fpA
+  type: person
+  title: Jennifer Pahlka
+  description: >-
+    Founder of Code for America. Former US Deputy Chief Technology Officer
+    under President Obama. Helped establish the US Digital Service (USDS).
+  tags:
+    - civic-tech

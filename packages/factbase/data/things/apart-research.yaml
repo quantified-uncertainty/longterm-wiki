@@ -38,6 +38,6 @@ facts:
   - id: f_LMWMZbT6an
     property: founded-by
     value:
-      - esben-kran
+      - !ref HwM6OF6Ewg
     source: https://apartresearch.com/person/esben-kran
     notes: "Founded by Esben Kran at age 22 after leaving grad school"
