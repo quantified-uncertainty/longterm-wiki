@@ -84,3 +84,33 @@ export function scanFrontmatterEntities(yamlEntityIds, contentDir) {
 
   return autoEntities;
 }
+
+/**
+ * Collect all wikiIds declared in MDX page frontmatter.
+ * Used to reserve these IDs during fallback entity ID assignment.
+ *
+ * @param {string} contentDir - Path to the content directory
+ * @returns {Set<string>} Set of wikiId values found in page frontmatter
+ */
+export function collectPageWikiIds(contentDir) {
+  const wikiIds = new Set();
+
+  function scanDir(dir) {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir)) {
+      const fullPath = join(dir, entry);
+      if (statSync(fullPath).isDirectory()) {
+        scanDir(fullPath);
+      } else if (entry.endsWith('.mdx') || entry.endsWith('.md')) {
+        const content = readFileSync(fullPath, 'utf-8');
+        const fm = extractFrontmatter(content);
+        if (fm.wikiId) {
+          wikiIds.add(fm.wikiId);
+        }
+      }
+    }
+  }
+
+  scanDir(contentDir);
+  return wikiIds;
+}

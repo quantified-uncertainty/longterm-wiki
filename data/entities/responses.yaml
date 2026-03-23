@@ -6153,6 +6153,7 @@
 
 - id: indiana-ai-healthcare
   stableId: I8mbdJyUjs
+  wikiId: E2036
   type: policy
   summaryPage: governance-overview
   title: "Indiana AI Healthcare Disclosure"

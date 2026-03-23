@@ -88,3 +88,52 @@ facts:
     value: "AI Safety Index published biannually (Summer 2025, Winter 2025). Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter 2025 finding: no company has adequate guardrails for catastrophic misuse."
     asOf: 2025-12
     source: https://futureoflife.org/ai-safety-index-winter-2025/
+
+  - id: f_fli_headcount
+    property: headcount
+    value: "34"
+    asOf: 2024
+    source: https://futureoflife.org/about-us/
+    notes: "20+ full-time staff; total ~34 including fellows and part-time"
+
+  - id: f_fli_musk_donation
+    property: grant-received
+    value: "10000000"
+    unit: USD
+    asOf: 2015
+    source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
+    notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on AI safety"
+
+  - id: f_fli_buterin_donation
+    property: grant-received
+    value: "665800000"
+    unit: USD
+    asOf: 2021
+    source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
+    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Liquidated over time — actual cash realized likely lower."
+
+  - id: f_fli_ein
+    property: legal-identifier
+    value: "47-1052538 (EIN)"
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "IRS 501(c)(3) nonprofit"
+
+  - id: f_fli_revenue_2022
+    property: revenue
+    value: "34200000"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Includes investment gains from Buterin donation liquidation."
+
+  - id: f_fli_asilomar
+    property: campaign
+    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Stuart Russell, Elon Musk, and Demis Hassabis."
+    asOf: 2017-01
+    source: https://futureoflife.org/open-letter/ai-principles/
+
+  - id: f_fli_pause_letter
+    property: campaign
+    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve Wozniak, Elon Musk."
+    asOf: 2023-03
+    source: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
