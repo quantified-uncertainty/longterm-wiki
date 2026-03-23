@@ -4450,11 +4450,32 @@
   orgType: safety-org
   title: Institute for AI Policy and Strategy
   website: https://www.iaps.ai
+  founded: '2024'
+  headquarters: Washington, DC
   description: >-
-    Research institute focused on AI governance and policy.
+    AI policy think tank founded in 2024, headquartered in the Washington, DC metro area. Led by
+    Jennifer Marron (Executive Director), Brianna Rosen (Research Director, Frontier Security),
+    Amanda El-Dakhakhni (Director), Zoe Williams (Managing Director), and Renan Araujo (Director
+    of Programs). Runs the AI Policy Fellowship program (fully funded, multiple cohorts). Research
+    spans implications from current models to potential AGI/superintelligence. Explicitly nonpartisan
+    with emphasis on intellectual independence. Funded by Open Philanthropy, Survival and Flourishing
+    Fund, and others. Actively hiring Director of Government Affairs and Policy Director as of
+    March 2026. Primary intervention types: policy research,
+    fellowship programs, talent development.
   tags:
     - ai-governance
     - policy
+    - research
+    - fellowship
+    - ai-safety
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: IAPS Website
+      url: https://www.iaps.ai
+    - title: IAPS Team
+      url: https://www.iaps.ai/our-team
   lastUpdated: 2026-03
 
 - id: niskanen-center
@@ -5445,15 +5466,29 @@
   orgType: safety-org
   title: Encode Justice
   website: https://encodejustice.org
+  founded: '2020'
   description: >-
-    Youth-led AI accountability organization. Co-source of California SB 1047.
-    Supported California SB 1047.
+    Youth-led AI accountability organization founded in July 2020 by Sneha Revanur (Founder and
+    President; named to TIME 100 AI list). Approximately 600 student members across 40 countries.
+    Rebranded to "Encode" to reflect broadened scope. Published the "AI 2030 Plan" with 5 calls
+    to action and 22 specific goals including AI disclosure in political ads, data ownership
+    rights, and prohibition on automated weapons of mass destruction. Active in advocacy to
+    Congress and White House OSTP. Co-source and supporter of California SB 1047.
+    Primary intervention types: youth-led advocacy, public campaigns, policy recommendations.
   relatedEntries:
     - id: XcGTez1oFw
       type: policy
   tags:
     - ai-governance
     - ai-safety
+    - youth-advocacy
+    - policy-advocacy
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Encode Justice Website
+      url: https://encodejustice.org
   lastUpdated: 2026-03
 
 - id: imbue
@@ -6112,15 +6147,22 @@
   summaryPage: safety-orgs-overview
   title: AI Policy Institute
   website: https://theaipi.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
     Washington DC-based policy advocacy organization founded in 2023, focused on channeling public
     concern about AI into effective governance. Conducts polling on AI attitudes, engages with
     policymakers and media, and advocates for responsible AI development. Works on issues including
-    deepfakes, autonomous AI agents, and AI safety standards.
+    deepfakes, autonomous AI agents, and AI safety standards. Led by Daniel Colson (Co-founder
+    and Executive Director). Also operates as "The AI Policy Network."
   tags:
     - ai-governance
     - ai-policy
     - advocacy
+    - polling
+  clusters:
+    - ai-safety
+    - governance
   lastUpdated: 2026-03
 
 - id: americans-for-responsible-innovation
@@ -6131,16 +6173,29 @@
   summaryPage: safety-orgs-overview
   title: Americans for Responsible Innovation
   website: https://responsibleinnovation.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
-    Washington DC-based AI policy organization founded in 2023 with significant funding from
-    effective altruism-aligned donors including Dustin Moskovitz. Focuses on building bipartisan
-    support for AI safety legislation in Congress. Has become one of the major players influencing
-    AI policy on Capitol Hill, with a focus on catastrophic risk prevention.
+    Washington DC-based AI policy organization founded in late 2023 with significant funding from
+    effective altruism-aligned donors including Dustin Moskovitz. Led by Brad Carson (President,
+    former Congressman) and Eric Gastfriend (Executive Director). Focuses on building bipartisan
+    support for AI safety legislation in Congress, advocating for regulation analogous to other
+    industries. One of the major players influencing AI policy on Capitol Hill, with a focus on
+    catastrophic risk prevention.
   tags:
     - ai-governance
     - ai-policy
     - advocacy
     - ea-community
+    - lobbying
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: ARI Website
+      url: https://ari.us/
+    - title: ARI About
+      url: https://ari.us/about-us/
   lastUpdated: 2026-03
 
 - id: brookings-ai
@@ -6218,16 +6273,30 @@
   summaryPage: safety-orgs-overview
   title: Center for AI Policy
   website: https://www.centeraipolicy.org
+  founded: '2023'
+  headquarters: Washington, DC
   description: >-
-    Non-partisan nonprofit founded in 2023 that worked with Congress from June 2023 through May
-    2025 to promote legislative solutions to catastrophic risks from advanced AI. Focused on
-    bipartisan engagement with Congressional offices on AI safety policy. Ceased most active
-    operations in 2025 due to funding constraints.
+    Non-partisan 501(c)(4) nonprofit founded in June 2023 that worked with Congress through May
+    2025 to promote legislative solutions to catastrophic risks from advanced AI. Led by Executive
+    Director Jason Green-Lowe with 2 registered lobbyists. Total lobbying spend: $483,720
+    (cumulative through Q1 2025). Ceased most active operations around May 2025 due to funding
+    constraints (cash reserves ~$150K). Focused on bipartisan engagement with Congressional
+    offices on AI safety policy. Primary intervention type: direct congressional lobbying.
   tags:
     - ai-governance
     - ai-policy
-    - advocacy
+    - lobbying
     - defunct
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Center for AI Policy Website
+      url: https://www.centeraipolicy.org
+    - title: CAIP Shutdown Announcement (LessWrong)
+      url: https://www.lesswrong.com/posts/Ed3naAyEEe7zZvzsj/the-center-for-ai-policy-has-shut-down
+    - title: OpenSecrets Profile
+      url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
   lastUpdated: 2026-03
 
 - id: center-for-democracy-and-technology
@@ -7014,4 +7083,292 @@
   description: >-
     Housing advocacy organization promoting pro-housing policy reform in
     California. Open Philanthropy grantee.
+# --- Anti-authoritarianism & AI policy cluster (added 2026-03) ---
+
+- id: aclu
+  stableId: 7DpEvy5wQr
+  type: organization
+  orgType: generic
+  title: American Civil Liberties Union (ACLU)
+  website: https://www.aclu.org
+  founded: '1920'
+  headquarters: New York, NY
+  description: >-
+    Nonprofit civil liberties organization founded in 1920, with approximately 1,400 staff
+    nationally. ACLU Foundation revenue approximately $307 million (FY 2024-2025); combined
+    with 501(c)(4) entity, total budget is larger. Has an active AI and technology
+    program challenging government and corporate AI deployments that threaten civil rights.
+    Key AI-related activities include FOIA litigation against the NSA over AI in surveillance
+    programs (filed April 2024), lawsuits against Social Security Administration and VA over
+    DOGE's unrestricted access to sensitive personal data, and multiple challenges to government
+    facial recognition deployments. Publicly opposed the Trump administration's December 2025
+    executive order preempting state AI regulation and the March 2025 AI Action Plan. Primary
+    intervention types: litigation, legislative advocacy, public education.
+  tags:
+    - civil-liberties
+    - ai-governance
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - digital-rights
+  clusters:
+    - governance
+    - democracy-defense
+  sources:
+    - title: ACLU Website
+      url: https://www.aclu.org
+    - title: ACLU AI Accountability Program
+      url: https://www.aclu.org/issues/racial-justice/accountability-in-artificial-intelligence
+    - title: ACLU v. NSA FOIA Lawsuit
+      url: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
+    - title: ACLU Statement on Trump AI Executive Order
+      url: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
+  lastUpdated: 2026-03
+
+- id: electronic-frontier-foundation
+  stableId: H4tplAyDRX
+  type: organization
+  orgType: generic
+  title: Electronic Frontier Foundation (EFF)
+  website: https://www.eff.org
+  founded: '1990'
+  headquarters: San Francisco, CA
+  description: >-
+    Digital rights nonprofit founded in July 1990 by John Gilmore, John Perry Barlow, and Mitch Kapor.
+    Approximately 100 staff (lawyers, activists, technologists). Budget approximately $24 million
+    (2021 figure; more recent not publicly confirmed). Led by Cindy Cohn (Executive Director;
+    successor search underway as of late 2025). Active on AI surveillance, AI-generated content, and AI copyright issues.
+    Investigated Axon's AI-written police reports and Flock Safety's mass surveillance ALPR network.
+    Published analyses of OpenAI's Pentagon deal and the Anthropic-DOD conflict, arguing privacy
+    protections shouldn't depend on corporate discretion. Advocates against government use of AI
+    for bulk surveillance. Primary intervention types: litigation, policy advocacy, technology
+    development, public education.
+  tags:
+    - digital-rights
+    - ai-governance
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - privacy
+  clusters:
+    - governance
+    - democracy-defense
+  sources:
+    - title: EFF Website
+      url: https://www.eff.org
+    - title: EFF AI Issues
+      url: https://www.eff.org/issues/ai
+    - title: EFF on OpenAI Pentagon Deal
+      url: https://www.eff.org/deeplinks/2026/03/weasel-words-openais-pentagon-deal-wont-stop-ai-powered-surveillance
+    - title: EFF on Anthropic-DOD Conflict
+      url: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
+  lastUpdated: 2026-03
+
+- id: brennan-center
+  stableId: 2KkS7mnw7K
+  type: organization
+  orgType: generic
+  title: Brennan Center for Justice
+  website: https://www.brennancenter.org
+  founded: '1995'
+  headquarters: New York, NY
+  description: >-
+    Nonpartisan law and policy institute at NYU School of Law, founded in 1995. Revenue approximately
+    $58 million (FY 2023-2024) with 180+ staff (attorneys, scholars, communications professionals).
+    Led by Michael Waldman (President and CEO). Maintains a comprehensive AI Legislation Tracker
+    covering all US states. Published "Agenda to Strengthen U.S. Democracy in the Age of AI"
+    with federal and state policy recommendations. Policing & Technology Program investigates AI
+    surveillance technologies including facial recognition, social media monitoring, and predictive
+    policing. Democracy Futures Project focuses on democratic resilience against emerging threats
+    including AI. Primary intervention types: research, litigation, policy advocacy.
+  tags:
+    - democracy
+    - ai-governance
+    - research
+    - litigation
+    - surveillance
+    - anti-authoritarianism
+    - policy-advocacy
+  clusters:
+    - governance
+    - democracy-defense
+  sources:
+    - title: Brennan Center Website
+      url: https://www.brennancenter.org
+    - title: AI Legislation Tracker
+      url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+    - title: Agenda to Strengthen US Democracy in the Age of AI
+      url: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
+  lastUpdated: 2026-03
+
+- id: epic-privacy
+  stableId: Ygxw8JVW8X
+  type: organization
+  orgType: generic
+  title: Electronic Privacy Information Center (EPIC)
+  website: https://epic.org
+  founded: '1994'
+  headquarters: Washington, DC
+  description: >-
+    Independent nonprofit research center focused on privacy and civil liberties, founded in 1994.
+    Led by Alan Butler (Executive Director and President, since 2020). 97% Charity Navigator score.
+    Runs an AI & Human Rights Project that advocates for transparent, equitable AI regulation
+    through litigation, FOIA requests, legislative advocacy, and comments to decision-makers.
+    Active in housing AI litigation, state AI policy tracking, and commercial AI oversight.
+    Executive Director has testified before the Senate Judiciary Subcommittee on privacy and AI.
+    Primary intervention types: litigation, advocacy, FOIA requests, legislative testimony.
+  tags:
+    - privacy
+    - ai-governance
+    - litigation
+    - civil-liberties
+    - digital-rights
+  clusters:
+    - governance
+    - democracy-defense
+  sources:
+    - title: EPIC Website
+      url: https://epic.org
+    - title: EPIC AI & Human Rights
+      url: https://epic.org/issues/ai/
+  lastUpdated: 2026-03
+
+- id: protect-democracy
+  stableId: xxHyEDGp4Y
+  type: organization
+  orgType: generic
+  title: Protect Democracy
+  website: https://protectdemocracy.org
+  founded: '2017'
+  headquarters: Washington, DC
+  description: >-
+    Cross-partisan nonprofit founded in early 2017 to prevent American democracy from declining
+    into a more authoritarian form of government. Led by Ian Bassin (Co-founder and Executive
+    Director). 100+ staff (lawyers, strategists, other professionals). Created the AI for
+    Democracy Action Lab (AI-DAL), which brings together tech innovators, legal/policy experts,
+    software engineers, and nonprofit leaders to defend against AI threats to democracy and develop
+    pro-democracy AI applications. Filed 100+ lawsuits challenging authoritarian actions. In July
+    2025, sued to block USDA's demand for personal data of millions of Americans, framing it as
+    part of a federal "panopticon" of AI-enabled surveillance. Published "The Authoritarian
+    Playbook for 2025" detailing how authoritarians use technology. Primary intervention types:
+    litigation, legislative advocacy, policy research, technology tools.
+  tags:
+    - democracy
+    - anti-authoritarianism
+    - litigation
+    - ai-governance
+    - surveillance
+    - policy-advocacy
+  clusters:
+    - democracy-defense
+  sources:
+    - title: Protect Democracy Website
+      url: https://protectdemocracy.org
+    - title: AI for Democracy Action Lab
+      url: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
+  lastUpdated: 2026-03
+
+- id: democracy-forward
+  stableId: yTlRworV1V
+  type: organization
+  orgType: generic
+  title: Democracy Forward
+  website: https://democracyforward.org
+  founded: '2017'
+  headquarters: Washington, DC
+  description: >-
+    Legal nonprofit founded in 2017 that uses the courts to challenge government actions that
+    undermine democratic principles. Led by Skye L. Perryman (President and CEO). Launched an
+    appellate litigation practice in August 2025 with approximately 12 lawyers. Filed FOIA
+    lawsuits against HUD and State Department seeking records about Trump administration use of
+    generative AI to rewrite rules, monitor employees, and target visa holders (March 2025).
+    Separate FOIA lawsuit against OPM, GSA, HUD, and OMB compelling disclosure of AI use in
+    deregulation agenda. Tracks specific concerns: AI used to flag visa holders based on social
+    media posts, identify federal workers for termination, and propose mass regulatory repeals.
+    Primary intervention types: litigation (FOIA, administrative law challenges).
+  tags:
+    - democracy
+    - anti-authoritarianism
+    - litigation
+    - ai-governance
+    - foia
+    - government-accountability
+  clusters:
+    - democracy-defense
+  sources:
+    - title: Democracy Forward Website
+      url: https://democracyforward.org
+    - title: Democracy Forward AI FOIA Lawsuit
+      url: https://democracyforward.org/updates/foia-ai-lawsuit/
+    - title: Democracy Forward AI Deregulation Lawsuit
+      url: https://democracyforward.org/updates/ai-deregulation/
+  lastUpdated: 2026-03
+
+- id: cais-action-fund
+  stableId: 0HsrqIftUg
+  type: organization
+  orgType: safety-org
+  title: Center for AI Safety Action Fund
+  website: https://action.safe.ai
+  founded: '2022'
+  headquarters: Washington, DC
+  description: >-
+    Policy advocacy arm of the Center for AI Safety, focused on bipartisan engagement with
+    policymakers on AI national security risks. Sister organization to CAIS (San Francisco-based
+    technical safety research org founded by Dan Hendrycks and Oliver Zhang). CAIS Action Fund
+    operates from Washington, DC to translate technical AI safety concerns into legislative and
+    policy proposals. Works at the intersection of AI safety research and government engagement.
+    Primary intervention types: policy advocacy, bipartisan lobbying.
+  tags:
+    - ai-safety
+    - ai-governance
+    - policy-advocacy
+    - lobbying
+    - national-security
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: CnTLlp3VqA
+      type: organization
+      relationship: related
+  sources:
+    - title: CAIS Action Fund Website
+      url: https://action.safe.ai
+  lastUpdated: 2026-03
+
+- id: freedom-house
+  stableId: pFJhncfgor
+  type: organization
+  orgType: generic
+  title: Freedom House
+  website: https://freedomhouse.org
+  founded: '1941'
+  headquarters: Washington, DC
+  description: >-
+    Independent watchdog organization founded in 1941, dedicated to the expansion of freedom and
+    democracy around the world. Publishes annual Freedom in the World and Freedom on the Net
+    reports, which document global trends in political rights, civil liberties, and internet
+    freedom. Freedom on the Net 2025 documented the 15th consecutive year of internet freedom
+    decline globally. Reported specifically on the Trump administration's use of AI-enabled
+    immigration surveillance. Significantly impacted in 2025 by Trump administration foreign
+    aid freezes that disrupted Freedom House programs in multiple countries. Primary intervention
+    types: research, monitoring,
+    advocacy, capacity building.
+  tags:
+    - democracy
+    - freedom-monitoring
+    - internet-freedom
+    - surveillance
+    - international
+  clusters:
+    - governance
+    - democracy-defense
+  sources:
+    - title: Freedom House Website
+      url: https://freedomhouse.org
+    - title: "Freedom on the Net 2025: United States"
+      url: https://freedomhouse.org/country/united-states/freedom-net/2025
+    - title: "Trump's Immigration Crackdown Built on AI Surveillance"
+      url: https://freedomhouse.org/article/trumps-immigration-crackdown-built-ai-surveillance-and-disregard-due-process
   lastUpdated: 2026-03

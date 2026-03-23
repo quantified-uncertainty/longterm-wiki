@@ -46,3 +46,22 @@ facts:
     value: https://www.iaps.ai/
     source: https://www.wikidata.org/wiki/Q131901373
     notes: From Wikidata Q131901373
+
+  - id: f_iaps_leadership
+    property: leadership
+    value: "Jennifer Marron (Executive Director), Brianna Rosen (Research Director, Frontier Security), Amanda El-Dakhakhni (Director), Zoe Williams (Managing Director), Renan Araujo (Director of Programs)"
+    asOf: 2026-03
+    source: https://www.iaps.ai/our-team
+
+  - id: f_iaps_funding_policy
+    property: funding-policy
+    value: "Emphasizes intellectual independence; funded by Open Philanthropy, Survival and Flourishing Fund, allied governments, and individual donors"
+    asOf: 2025
+    source: https://www.iaps.ai/governance-history-independence-funding
+    notes: "Discloses funders publicly; maintains editorial independence"
+
+  - id: f_iaps_fellowship
+    property: program
+    value: "AI Policy Fellowship — fully funded fellowship program with multiple cohorts"
+    asOf: 2026-03
+    source: https://www.iaps.ai

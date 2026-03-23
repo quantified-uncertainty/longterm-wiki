@@ -1,0 +1,19 @@
+entity: 0HsrqIftUg
+facts:
+  - id: f_caisaf_founded
+    property: founded-date
+    value: "2022"
+    source: https://action.safe.ai
+    notes: "Sister organization to Center for AI Safety"
+
+  - id: f_caisaf_hq
+    property: headquarters
+    value: "Washington, DC"
+    source: https://action.safe.ai
+    notes: "DC-based policy arm; CAIS itself is in San Francisco"
+
+  - id: f_caisaf_focus
+    property: description
+    value: "Bipartisan policy advocacy organization focused on AI national security risks. Translates technical AI safety concerns from CAIS research into legislative and policy proposals."
+    asOf: 2026-03
+    source: https://action.safe.ai
