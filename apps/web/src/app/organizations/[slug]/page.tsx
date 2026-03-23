@@ -88,6 +88,7 @@ import {
   hasMarketData,
   getMarketDataCount,
   MarketDataSection,
+  MarketHighlights,
 } from "./market-data-section";
 
 // Client-side tabs
@@ -162,6 +163,12 @@ export default async function OrgProfilePage({
   }
 
   const data = loadOrgPageData(entity, slug);
+
+  // ── Fetch PG data (personnel + market data) in parallel ──
+  const [pgPersonnelRows, marketData] = await Promise.all([
+    fetchPgPersonnel(entity.id),
+    fetchMarketData(entity.id),
+  ]);
 
   // ── Build tabs from available data ──────────────────────────────────
 
@@ -241,18 +248,15 @@ export default async function OrgProfilePage({
         <DivisionsOverview divisions={data.divisions} leadResolved={data.divisionLeadResolved} members={data.divisionMembers} />
       )}
 
+      {/* Prediction Market Highlights */}
+      {hasMarketData(marketData) && <MarketHighlights data={marketData} />}
+
       {/* Related Wiki Pages */}
       <RelatedPages entityId={slug} entity={{ entityType: "organization" }} />
     </div>
   );
 
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
-
-  // ── Fetch PG data (personnel + market data) in parallel ──
-  const [pgPersonnelRows, marketData] = await Promise.all([
-    fetchPgPersonnel(entity.id),
-    fetchMarketData(entity.id),
-  ]);
 
   // ── People tab: key personnel + board + PG personnel data ──
   const pgEntries = pgPersonnelToEntries(pgPersonnelRows);

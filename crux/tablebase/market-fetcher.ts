@@ -170,6 +170,62 @@ async function fetchManifoldQuestion(
   }
 }
 
+interface PolymarketGammaResponse {
+  slug: string;
+  question: string;
+  outcomePrices: string[]; // ["0.815", "0.185"] for [Yes, No]
+  outcomes: string[];
+  volume: number;
+  liquidity: string;
+  active: boolean;
+  closed: boolean;
+}
+
+async function fetchPolymarketQuestion(
+  platformQuestionId: string
+): Promise<SnapshotData | null> {
+  const url = `https://gamma-api.polymarket.com/markets?slug=${encodeURIComponent(platformQuestionId)}`;
+
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(15_000),
+    });
+
+    if (!response.ok) {
+      console.warn(
+        `  Polymarket API returned ${response.status} for ${platformQuestionId}`
+      );
+      return null;
+    }
+
+    const data = (await response.json()) as PolymarketGammaResponse[];
+    if (data.length === 0) {
+      console.warn(`  Polymarket: no market found for slug "${platformQuestionId}"`);
+      return null;
+    }
+
+    const market = data[0];
+    // outcomePrices[0] = Yes probability as string
+    const yesPrice = market.outcomePrices?.[0];
+    const probability = yesPrice ? parseFloat(yesPrice) : null;
+
+    return {
+      probability,
+      probabilityLow: null,
+      probabilityHigh: null,
+      numForecasters: null, // Polymarket doesn't expose trader count via Gamma
+    };
+  } catch (err) {
+    console.warn(
+      `  Failed to fetch Polymarket market ${platformQuestionId}: ${
+        err instanceof Error ? err.message : String(err)
+      }`
+    );
+    return null;
+  }
+}
+
 export async function fetchMarketSnapshots(
   options: FetchOptions
 ): Promise<CommandResult> {
@@ -226,7 +282,7 @@ export async function fetchMarketSnapshots(
   let skippedCount = 0;
   let metaculusAuthWarned = false;
 
-  const supportedPlatforms = new Set(["metaculus", "manifold"]);
+  const supportedPlatforms = new Set(["metaculus", "manifold", "polymarket"]);
   const supported = questions.filter((q) => supportedPlatforms.has(q.platform));
   const unsupported = questions.length - supported.length;
 
@@ -257,6 +313,11 @@ export async function fetchMarketSnapshots(
       if (i > 0) await new Promise((r) => setTimeout(r, 500));
       result = await fetchManifoldQuestion(q.platformQuestionId);
       sourceUrl = `https://manifold.markets/${q.platformQuestionId}`;
+    } else if (q.platform === "polymarket") {
+      // Rate-limit: 1 request per 0.5s
+      if (i > 0) await new Promise((r) => setTimeout(r, 500));
+      result = await fetchPolymarketQuestion(q.platformQuestionId);
+      sourceUrl = `https://polymarket.com/event/${q.platformQuestionId}`;
     }
 
     if (result && result.probability != null) {

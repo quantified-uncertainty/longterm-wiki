@@ -386,3 +386,85 @@ function MiniStat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+// ── Overview Highlights ──────────────────────────────────────────────
+// Compact widget for the Overview tab showing top prediction market questions.
+
+/** Pick the most interesting questions to highlight on the Overview tab. */
+function pickHighlights(
+  questions: RpcPredictionQuestion[],
+  maxCount = 6
+): RpcPredictionQuestion[] {
+  const active = questions.filter((q) => !q.isResolved && q.currentProbability != null);
+  // Prioritize: high-category questions first, then by how "interesting" the probability is
+  // (closer to 50% = more uncertain = more interesting)
+  const scored = active.map((q) => {
+    const p = q.currentProbability!;
+    const interestingness = 1 - Math.abs(p - 0.5) * 2; // 0 at extremes, 1 at 50%
+    const categoryBoost =
+      q.category === "valuation" || q.category === "ipo" || q.category === "safety"
+        ? 0.3
+        : 0;
+    return { q, score: interestingness + categoryBoost };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, maxCount).map((s) => s.q);
+}
+
+/**
+ * Compact prediction market highlights for the Overview tab.
+ * Shows top questions as a small table without full chrome.
+ */
+export function MarketHighlights({ data }: { data: MarketData }) {
+  const questions = data.predictionQuestions?.questions ?? [];
+  const active = questions.filter((q) => !q.isResolved);
+  if (active.length === 0) return null;
+
+  const highlights = pickHighlights(active);
+
+  return (
+    <section>
+      <div className="flex items-center gap-3 mb-3">
+        <h3 className="text-sm font-bold tracking-tight">Prediction Markets</h3>
+        <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+          {active.length} active
+        </span>
+      </div>
+      <div className="grid gap-2">
+        {highlights.map((q) => (
+          <div
+            key={q.id}
+            className="flex items-center gap-3 py-1.5 px-2 rounded-lg border border-border/40 bg-card/50 hover:bg-muted/30 transition-colors"
+          >
+            <div className="flex-shrink-0 w-14 text-center">
+              {q.currentProbability != null ? (
+                <ProbabilityBadge probability={q.currentProbability} />
+              ) : (
+                <span className="text-xs text-muted-foreground">–</span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              {q.questionUrl ? (
+                <a
+                  href={q.questionUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs leading-snug text-foreground hover:text-primary transition-colors line-clamp-2"
+                >
+                  {q.questionText}
+                </a>
+              ) : (
+                <span className="text-xs leading-snug line-clamp-2">
+                  {q.questionText}
+                </span>
+              )}
+            </div>
+            <div className="flex-shrink-0 text-[10px] text-muted-foreground">
+              {PLATFORM_LABELS[q.platform] ?? q.platform}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
