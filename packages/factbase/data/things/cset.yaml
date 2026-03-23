@@ -36,3 +36,48 @@ facts:
     asOf: 2023-12
     source: https://cset.georgetown.edu/article/bis-2023-update-explainer/
     notes: "By Dohmen, Feldgoise"
+
+  - id: f_cset_founded
+    property: founded-date
+    value: "2019-01"
+    source: https://cset.georgetown.edu/about-us/
+    notes: "Founded January 2019 with $55M Open Philanthropy grant"
+
+  - id: f_cset_hq
+    property: headquarters
+    value: "Georgetown University, Washington, DC"
+    source: https://cset.georgetown.edu/about-us/
+
+  - id: f_cset_staff
+    property: employee-count
+    value: "50"
+    asOf: 2026
+    source: https://cset.georgetown.edu/team/
+    notes: "Approximately 50 staff across analysis, data science, ETO, translations, and operations"
+
+  - id: f_cset_eto
+    property: program
+    value: "Emerging Technology Observatory (ETO) — 10 public tools and 8 datasets for tracking emerging technology trends, including AI patent clusters, AGORA (AI legislation tracker), and Country Activity Tracker"
+    source: https://cset.georgetown.edu/about-us/
+
+  - id: f_cset_cyberai
+    property: program
+    value: "CyberAI Project — $5M Hewlett Foundation-funded program examining the intersection of AI, cybersecurity, and geopolitics"
+    source: https://cset.georgetown.edu/article/cset-receives-2-million-grant-to-fund-new-cyberai-project/
+
+  - id: f_cset_translations
+    property: program
+    value: "Chinese Policy Translations Program — translates Chinese government AI and technology policy documents into English, led by Ben Murphy. Major source of English-language Chinese AI policy intelligence for US policymakers."
+    source: https://cset.georgetown.edu/team/
+
+  - id: f_cset_leadership
+    property: leadership
+    value: "Helen Toner serving as Interim Executive Director (former OpenAI board member). Mallory Stewart is CEO (former State Dept assistant secretary). Jason Matheny was founding director (now RAND CEO)."
+    asOf: 2026-03
+    source: https://cset.georgetown.edu/team/
+
+  - id: f_cset_hewlett
+    property: grant-received
+    value: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"
+    asOf: 2022
+    source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
