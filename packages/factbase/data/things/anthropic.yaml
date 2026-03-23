@@ -201,20 +201,20 @@ facts:
   - id: f_J3yAxRJ05k
     property: headcount
     value:
-      - 1500
-      - 2000
+      - 1100
+      - 1300
     asOf: 2025-03
     source: https://electroiq.com/stats/anthropic-statistics/
-    notes: "Rapid growth period; hiring across engineering, sales, policy"
+    notes: "Sources report ~1,097 employees in early 2025; company planned to double by year-end"
 
   - id: f_arY5X2VqcY
     property: headcount
     value:
-      - 2500
-      - 3500
+      - 1500
+      - 2000
     asOf: 2025-09
-    source: https://electroiq.com/stats/anthropic-statistics/
-    notes: "Estimate at time of Series F; international expansion underway"
+    source: https://www.cnbc.com/2025/09/26/anthropic-series-f-funding.html
+    notes: "At Series F announcement; tripling international headcount was announced but not yet completed"
 
   - id: f_BdGi5l9dOg
     property: headcount
