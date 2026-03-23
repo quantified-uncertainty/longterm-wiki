@@ -29,3 +29,25 @@ facts:
     value: "Non-partisan advocacy organization that worked with Congress from June 2023 through mid-2025 to promote commonsense solutions to catastrophic risks from advanced AI. Co-founded by Thomas Larsen (Director of Strategy) and led by Executive Director Jason Green-Lowe. Has ceased most active operations due to funding constraints but continues its Policy Advocacy Network and legislative review service."
     asOf: 2026-03
     source: https://www.centeraipolicy.org/about
+
+  - id: f_caip_lobbying_2024
+    property: lobbying-spend
+    value: "281964"
+    unit: USD
+    asOf: 2024
+    source: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
+    notes: "2024 in-house federal lobbying. Lobbyists: Jason Green-Lowe, Jakub Stanger Kraus, Martin Spitzer. Verified from Senate LDA."
+
+  - id: f_caip_sff_2024
+    property: grant-received
+    value: "288000"
+    unit: USD
+    asOf: 2024
+    source: https://survivalandflourishing.fund/2024/recommendations
+    notes: "SFF 2024 grant for general support"
+
+  - id: f_caip_shutdown
+    property: organizational-status
+    value: "Ceased most active operations around May 2025 due to funding constraints. Cash reserves approximately $150K at shutdown."
+    asOf: 2025-05
+    source: https://www.lesswrong.com/posts/Ed3naAyEEe7zZvzsj/the-center-for-ai-policy-has-shut-down

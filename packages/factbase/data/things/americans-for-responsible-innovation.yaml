@@ -29,3 +29,39 @@ facts:
     value: "Nonprofit policy advocacy organization focused on helping U.S. policymakers develop governance frameworks for AI and emerging technologies. Founded by former Congressman Brad Carson (President) and tech entrepreneur Eric Gastfriend (Executive Director). Advisory board includes Stanford's Erik Brynjolfsson and former NTIA administrator Diane Rinaldo."
     asOf: 2026-03
     source: https://ari.us/about-us/
+
+  - id: f_ari_lobbying_2024
+    property: lobbying-spend
+    value: "1080000"
+    unit: USD
+    asOf: 2024
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
+    notes: "Total 2024 federal lobbying ~$1.08M (in-house $700K + external firms $380K). Verified from Senate LDA filings."
+
+  - id: f_ari_lobbying_2025
+    property: lobbying-spend
+    value: "2110000"
+    unit: USD
+    asOf: 2025
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
+    notes: "Total 2025 federal lobbying ~$2.11M. Largest pro-safety AI lobbying spender. Verified from Senate LDA."
+
+  - id: f_ari_pac_2024
+    property: pac-fundraising
+    value: "91661"
+    unit: USD
+    asOf: 2024
+    source: https://www.opensecrets.org/political-action-committees-pacs/americans-for-responsible-innovation/C00873356/summary/2024
+    notes: "Hybrid PAC raised $91,661; contributed $60,300 to federal candidates"
+
+  - id: f_ari_aisi_coalition
+    property: campaign
+    value: "Co-led (with ITI) coalition of 60+ companies, universities, and nonprofits calling on Congress to codify US AI Safety Institute within NIST"
+    asOf: 2024-10
+    source: https://www.itic.org/news-events/news-releases/iti-and-ari-lead-coalition-of-over-60-companies-universities-and-non-profits-calling-on-congress-to-enact-ai-safety-institute-legislation-this-year
+
+  - id: f_ari_state_preemption_letter
+    property: campaign
+    value: "Co-organized letter signed by 260 bipartisan state lawmakers from 50 states (130R, 129D, 1I) opposing federal ban on state AI regulation"
+    asOf: 2025
+    source: https://www.transparencycoalition.ai/news/bipartisan-lawmakers-from-50-states-tell-congress-dont-stop-us-from-acting-on-ai

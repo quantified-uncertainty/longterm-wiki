@@ -46,3 +46,45 @@ facts:
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2024
+
+  - id: f_fli_lobbying_2024
+    property: lobbying-spend
+    value: "310000"
+    unit: USD
+    asOf: 2024
+    source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2025&id=D000087562
+    notes: "US federal lobbying via Dentons: $310K in 2024. Verified from Senate LDA filings."
+
+  - id: f_fli_lobbying_2025
+    property: lobbying-spend
+    value: "360000"
+    unit: USD
+    asOf: 2025
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Future+of+Life+Institute
+    notes: "US federal lobbying via Dentons: $360K in 2025 ($90K/quarter). Verified from Senate LDA."
+
+  - id: f_fli_eu_lobbying
+    property: lobbying-spend
+    value: "273176"
+    unit: EUR
+    asOf: 2024
+    source: https://www.lobbyfacts.eu/datacard/future-of-life-institute?rid=787064543128-10
+    notes: "EU advocacy spend (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
+
+  - id: f_fli_pro_human_declaration
+    property: campaign
+    value: "Pro-Human AI Declaration (March 2026): 5 pillars, 40+ signatory organizations (AFL-CIO to Congress of Christian Leaders), individual signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph Nader"
+    asOf: 2026-03
+    source: https://humanstatement.org/
+
+  - id: f_fli_superintelligence_statement
+    property: campaign
+    value: "Superintelligence Prohibition Statement (October 2025): calls for prohibition on superintelligence development until 'broad scientific consensus on safety'; 800+ signatories including Geoffrey Hinton, Yoshua Bengio, Steve Wozniak"
+    asOf: 2025-10
+    source: https://superintelligence-statement.org/
+
+  - id: f_fli_safety_index
+    property: publication
+    value: "AI Safety Index published biannually (Summer 2025, Winter 2025). Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter 2025 finding: no company has adequate guardrails for catastrophic misuse."
+    asOf: 2025-12
+    source: https://futureoflife.org/ai-safety-index-winter-2025/
