@@ -73,6 +73,13 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncMethod: 'POST',
     syncBodyKey: 'items',
   },
+  divisions: {
+    fetchByEntityPath: (id) => `/api/divisions/by-org/${encodeURIComponent(id)}`,
+    resultKey: 'divisions',
+    syncPath: '/api/divisions/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form
