@@ -175,7 +175,7 @@ export async function fetchWithRetry(
 
       // 5xx — retry
       const body = await res.text().catch(() => "");
-      lastError = new Error(`HTTP ${res.status}: ${body.slice(0, 200)}`);
+      lastError = new Error(`HTTP ${res.status}: ${body.slice(0, 1000)}`);
     } catch (err) {
       lastError = err;
     }
