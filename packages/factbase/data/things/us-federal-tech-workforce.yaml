@@ -1,0 +1,63 @@
+entity: SrRJXshFlw
+facts:
+  # ── Federal workforce totals ───────────────────────────────────
+  - id: f_fedtech_wf_01
+    property: federal-civilian-workforce
+    value: 3.015e+6
+    asOf: 2025-01
+    source: https://www.bloomberg.com/news/articles/2025-12-10/federal-workforce-s-toll-after-a-year-of-doge-and-trump-317-000
+    notes: "Federal civilian workforce at start of 2025, before DOGE cuts"
+
+  - id: f_fedtech_wf_02
+    property: federal-civilian-workforce
+    value: 2.744e+6
+    asOf: 2025-12
+    source: https://www.bloomberg.com/news/articles/2025-12-10/federal-workforce-s-toll-after-a-year-of-doge-and-trump-317-000
+    notes: "After 317,000+ left in 2025; largest peacetime workforce cut on record"
+
+  # ── IT workforce losses ────────────────────────────────────────
+  - id: f_fedtech_it_loss
+    property: it-workers-departed
+    value: 17000
+    asOf: 2025-12
+    source: https://federalnewsnetwork.com/workforce/2026/01/how-staffing-cuts-in-2025-transformed-the-federal-workforce/
+    notes: "17,000+ IT and telecom workers left federal service in 2025 (8,910 deferred resignation, 435 RIF)"
+
+  # ── IT workforce age demographics ──────────────────────────────
+  - id: f_fedtech_retire
+    property: it-retirement-eligible-pct
+    value: 0.4
+    asOf: 2025-12
+    source: https://federalnewsnetwork.com/workforce/2026/03/after-deep-staffing-cuts-agencies-seek-mix-of-hiring-and-ai-tools-to-rebuild-capacity/
+    notes: "Over 40% of federal IT professionals are now eligible for retirement"
+
+  - id: f_fedtech_young_pct
+    property: under-30-pct
+    value: 0.07
+    asOf: 2025-12
+    source: https://federalnewsnetwork.com/workforce/2026/03/after-deep-staffing-cuts-agencies-seek-mix-of-hiring-and-ai-tools-to-rebuild-capacity/
+    notes: "~7% of gov workforce under 30 vs ~22% in private sector"
+
+  # ── Federal AI R&D spending ────────────────────────────────────
+  - id: f_fedtech_ai_rd
+    property: federal-ai-rd-spending
+    value: 3.3e+9
+    asOf: 2025-01
+    source: https://federalbudgetiq.com/insights/federal-ai-and-it-research-and-development-spending-analysis/
+    notes: "FY2025: $1.95B core AI + $1.36B crosscut = $3.3B total federal AI R&D"
+
+  # ── DoD AI budget ──────────────────────────────────────────────
+  - id: f_fedtech_dod_ai
+    property: dod-ai-budget-request
+    value: 1.34e+10
+    asOf: 2026-01
+    source: https://defensescoop.com/2025/12/08/emil-michael-dod-deliver-ai-at-scale-under-trump/
+    notes: "DoD FY2026 request for autonomy and AI systems"
+
+  # ── Tech Force program ─────────────────────────────────────────
+  - id: f_fedtech_techforce
+    property: tech-force-target
+    value: 1000
+    asOf: 2025-12
+    source: https://news.clearancejobs.com/2025/12/17/inside-the-u-s-tech-force-what-the-federal-governments-ai-hiring-push-means/
+    notes: "U.S. Tech Force targeting 1,000 technologists per annual cohort, $150-200K salary, 2-year terms"

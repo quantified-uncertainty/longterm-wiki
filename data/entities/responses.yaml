@@ -6673,3 +6673,32 @@
     - title: Freedom on the Net 2025
       url: https://freedomhouse.org/country/united-states/freedom-net/2025
   lastUpdated: 2026-03
+
+- id: us-government-technology-workforce
+  stableId: SrRJXshFlw
+  wikiId: E2018
+  type: analysis
+  title: US Government Technology Workforce
+  description: >-
+    Overview of US federal technology and AI talent capacity, from the civic tech era (USDS, 18F,
+    Code for America) through DOGE disruptions to rebuilding efforts (Tech Force). Covers specific
+    staffing numbers, talent pipeline programs (Horizon Institute, TechCongress, Digital Corps),
+    federal AI spending, and implications for AI governance.
+  relatedEntries:
+    - id: y8Ib2pmieA
+      type: concept
+    - id: dbqoxdZuUw
+      type: organization
+    - id: WVHl7Ya8oQ
+      type: organization
+    - id: lsx48oPDVQ
+      type: organization
+    - id: ufdntmiWtQ
+      type: organization
+  tags:
+    - state-capacity
+    - civic-tech
+    - ai-governance
+    - government-digital-services
+    - talent-pipeline
+  lastUpdated: 2026-03

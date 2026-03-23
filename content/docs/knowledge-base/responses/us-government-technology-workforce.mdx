@@ -1,0 +1,182 @@
+---
+wikiId: E2018
+title: US Government Technology Workforce
+description: The state of US federal technology and AI talent capacity, from the civic tech era through DOGE disruptions to rebuilding efforts
+sidebar:
+  order: 50
+subcategory: governance
+lastEdited: 2026-03-23
+createdAt: 2026-03-23
+update_frequency: 90
+summary: Comprehensive overview of US government software and AI workforce capacity, covering the civic tech ecosystem (USDS, 18F, Code for America), DOGE-era disruptions that eliminated much of this capacity in 2025, talent pipeline programs (Horizon Institute, TechCongress, U.S. Digital Corps), and rebuilding efforts (Tech Force). Documents specific staffing numbers, funding, and the implications for AI governance.
+clusters:
+  - governance
+  - ai-safety
+---
+import { EntityLink, DataInfoBox, FBF } from '@components/wiki';
+
+<DataInfoBox>
+| Dimension | Assessment |
+|-----------|------------|
+| **Core Challenge** | Federal government lacks sufficient technical talent to govern AI effectively |
+| **Peak Civic Tech Workforce** | USDS ≈230, 18F ~85, plus Digital Corps, PIF (2024) |
+| **Post-DOGE Workforce** | USDS ≈50-89, 18F eliminated, 317,000+ federal workers left overall (2025) |
+| **Key Pipeline Programs** | Horizon Institute (150+ placed), TechCongress (123 fellows), U.S. Digital Corps (70/year) |
+| **Rebuilding Effort** | U.S. Tech Force targeting 1,000/year at \$150-200K (launched Dec 2025) |
+| **Federal AI R&D Spending** | \$3.3B (FY2025); DoD alone requesting \$13.4B for AI (FY2026) |
+| **Structural Gap** | 40%+ of federal IT workers retirement-eligible; only 7% under 30 |
+</DataInfoBox>
+
+## Overview
+
+The US federal government's capacity to develop, deploy, and govern AI systems depends on its ability to attract and retain technical talent. This page documents the specific organizations, programs, staffing levels, and funding that constitute this capacity — and how dramatically it changed in 2025.
+
+The story has three phases: a decade-long buildup of civic tech capacity (2014-2024), rapid destruction of much of that capacity under DOGE (early 2025), and nascent rebuilding efforts (late 2025-2026). The implications for <EntityLink id="E154" name="governance-policy">AI governance</EntityLink> are significant: the same government that needs to oversee increasingly powerful AI systems lost much of its technical workforce in 2025, and the replacement programs prioritize different skills and relationships than what was dismantled.
+
+For the broader analytical framing, see <EntityLink id="E852" name="state-capacity-ai-governance">State Capacity and AI Governance</EntityLink>.
+
+## The Civic Tech Ecosystem (2010-2024)
+
+### Founding Organizations
+
+A network of organizations emerged over a decade to build federal technology capacity:
+
+**<EntityLink id="E2022" name="code-for-america">Code for America</EntityLink>** (founded 2010) pioneered the model of bringing technology talent into government, working with 100+ agencies. Founder Jennifer Pahlka later served as U.S. Deputy CTO and helped establish USDS.[^cfa]
+
+**<EntityLink id="E2019" name="us-digital-service">U.S. Digital Service (USDS)</EntityLink>** (founded 2014) was created as a White House unit following the Healthcare.gov rescue. It brought top technologists into government for fixed terms, growing to ~230 employees by late 2024. Over its history, USDS deployed 700+ term-limited technology experts across 31 federal agencies.[^usds-impact]
+
+**<EntityLink id="E2020" name="18f">18F</EntityLink>** (founded 2014) operated within GSA as an internal technology consultancy. It charged agencies \$250/hour and was largely self-funding. Critically, 85% of departing 18F staff in 2023 moved to other government technology positions — it served as a training pipeline, not just a service provider.[^18f-conversation]
+
+**Nava PBC** (founded 2014) demonstrated that public benefit corporations could build government technology with mission-driven focus, born from the same Healthcare.gov rescue effort.
+
+**U.S. Digital Response** (founded 2020) deployed volunteer technologists during COVID, co-founded by Pahlka, showing the potential for rapid civic tech mobilization during crises.
+
+### Talent Pipeline Programs
+
+Several fellowship programs feed technical talent into government:
+
+**<EntityLink id="E2021" name="horizon-institute">Horizon Institute for Public Service</EntityLink>** (founded 2022) has placed 150+ early- and mid-career professionals into emerging technology policy roles across federal agencies, congressional offices, and think tanks. Founded by Remco Zwetsloot (ex-<EntityLink id="E524" name="cset">CSET</EntityLink>) and Joan Gass, it was seed-funded by <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink> (\$2.9M) and received \$11.8M from Good Ventures in 2023. Fellows receive \$113,000/year. Uniquely, it covers all three placement types: executive branch, Congress, and think tanks. 90%+ of alumni transition to full-time policy/government roles.[^horizon-review]
+
+**TechCongress** (founded 2016) has placed 123 fellows into congressional offices, with bipartisan placements across Democratic and Republican offices. Recruiting up to 20 for 2026.[^techcongress]
+
+**U.S. Digital Corps** (founded 2022) places early-career technologists in federal agencies across five tracks: software engineering, data science, product management, design, and cybersecurity. The 2024 cohort included 70 fellows, with 95% retention among the inaugural 2022 cohort.[^digital-corps]
+
+**Presidential Innovation Fellows (PIF)** brings mid-to-senior technologists into the executive branch for 1-2 year terms at GS-15 equivalent salary.
+
+## The 2025 DOGE Disruption
+
+### Timeline
+
+The Department of Government Efficiency (DOGE) initiative dismantled much of this capacity in weeks:
+
+- **January 20, 2025**: Trump signed an executive order renaming USDS to the "U.S. DOGE Service," moving it from OMB to the White House Chief of Staff. Existing employees were "re-interviewed."[^usds-reinterview]
+- **February 14, 2025**: Several dozen USDS employees fired via email ("USDS no longer has a need for your services"). Estimates range from 29-50 terminated.[^usds-dismissed]
+- **February 25, 2025**: 21 additional USDS employees resigned in protest, stating DOGE demands "are not compatible with the mission" and they refused to "jeopardize Americans' sensitive data."[^usds-quit]
+- **February 28, 2025**: 18F eliminated entirely. GSA TTS Director Thomas Shedd emailed staff at 1:00 AM informing them their positions were terminated. ~85 employees laid off.[^18f-eliminated]
+- **May 2025**: 80 former 18F employees filed a class-action appeal with the Merit Systems Protection Board, claiming the shutdown was retaliation for political beliefs and whistleblowing about DOGE's improper access to government systems.[^18f-lawsuit]
+
+### Scale of Impact
+
+USDS staffing fell from ~230 to an estimated 50-89 employees. 18F went from ~85 to zero. But the disruption extended far beyond civic tech:
+
+- **317,000+ federal employees** left government service in 2025 — the largest peacetime workforce reduction on record. The civilian workforce fell from ~3.015 million to ~2.744 million.[^bloomberg-317k]
+- **17,000+ IT and telecommunications workers** departed (8,910 via deferred resignation, 435 via RIF).[^fednet-staffing]
+- The **IRS lost ~25% of its workforce**, including about a quarter of its tech employees.[^npr-doge]
+- Workers under 30 fell from 8.9% to 7.9% of the federal workforce — the youngest workers left fastest.[^fednet-staffing]
+
+### Policy Changes
+
+Alongside workforce cuts, the administration shifted AI policy orientation:
+
+- **Biden's EO 14110** (the most comprehensive US AI governance order, requiring safety evaluations and reporting frameworks) was revoked on January 20, 2025.[^eo-revoked]
+- **NIST's AI Safety Institute** was renamed to the "Center for AI Standards and Innovation" (CAISI) in June 2025, dropping "safety" from its name and shifting focus to national security risks and competitiveness.[^caisi-rename]
+- A **December 2025 executive order** preempted state AI regulations in favor of a federal framework.
+
+## Rebuilding Efforts (Late 2025-2026)
+
+### U.S. Tech Force
+
+By September 2025, the acting head of the U.S. DOGE Service acknowledged "we need to hire and empower great talent in government" and "there's not enough tech talent here."[^doge-hire] In December 2025, the administration launched the **U.S. Tech Force**:
+
+- **Target**: 1,000 technologists per annual cohort
+- **Salary**: \$150,000-\$200,000 (GS-13/GS-14)
+- **Terms**: 2-4 year temporary contracts
+- **Focus**: Software engineers, data scientists, AI specialists
+- **Partners**: ~20-30 private companies including Palantir, Meta, Oracle, xAI, Microsoft, Apple, Nvidia, and OpenAI
+- First candidates released to agencies in March 2026.[^techforce]
+
+A separate **Science Fellows Program** targets 250 hires in Spring 2026.
+
+### Horizon Institute Expansion
+
+<EntityLink id="E2021" name="horizon-institute">Horizon Institute</EntityLink> continues expanding despite the disruption. Its model is somewhat insulated from executive branch workforce reductions because it places fellows into Congress and think tanks as well as agencies. 2026 plans include the largest fellowship class yet, an inaugural AI Policy Leaders Network cohort, scaling the Career Accelerator to 100+ participants/year, and a new partnership with the Texas legislature for state-level tech policy fellowships.[^horizon-review]
+
+### AI Talent Act
+
+The bipartisan **AI Talent Act** (H.R. 6573, introduced December 2025) would establish agency-level tech and AI talent teams, enable skills-based hiring, allow agencies to share qualified candidate lists, and create a central OPM team for pooled hiring.[^ai-talent-act]
+
+## Federal AI Spending and Contractor Ecosystem
+
+Federal AI spending is growing rapidly even as the internal workforce shrinks:
+
+- **Federal AI R&D**: \$3.3 billion in FY2025 (\$1.95B core AI + \$1.36B crosscut)[^fed-ai-budget]
+- **DoD AI**: \$13.4 billion requested for FY2026 for autonomy and AI systems[^dod-ai]
+- **Total federal IT budget**: ≈\$75 billion for FY2025
+
+The gap between spending and internal capacity pushes work to contractors. Key players include:
+
+- **Palantir**: \$10 billion, 10-year Army Enterprise Agreement (July 2025); increasingly described as "unavoidable in AI infrastructure" for federal agencies[^palantir]
+- **Booz Allen Hamilton**: \$1.6 billion DIA contract for counter-WMD intelligence; tripled its venture fund to \$300 million targeting government AI investments
+- **Accenture Federal Services**: Named Palantir's preferred implementation partner for US government; training 1,000 professionals on Palantir platforms
+
+## Structural Challenges
+
+Several structural factors make federal tech talent recruitment persistently difficult:
+
+**Demographics**: Over 40% of federal IT professionals are now eligible for retirement, creating a "silver tsunami." Only ~7% of the federal workforce is under 30, compared to ~22% in the private sector.[^fednet-rebuild]
+
+**Compensation gap**: Tech Force offers \$150-200K, competitive for early career but well below the \$300-500K+ that senior AI/ML specialists command in the private sector.
+
+**Hiring speed**: Federal hiring processes typically take months. Security clearance requirements add more time. The private sector can hire in weeks.
+
+**Institutional knowledge**: The experienced technologists who understood both government operations and modern technology practices — the core competency of USDS and 18F — cannot be replaced by early-career recruits from the private sector, regardless of their technical skills. USDS historically preferred technologists with 10+ years of experience for good reason.
+
+## Key Uncertainties
+
+**Can capacity be rebuilt?** The civic tech ecosystem took over a decade to establish and was significantly disrupted in months. Whether the replacement programs (Tech Force, expanded fellowships) can recreate comparable institutional capacity is unclear.
+
+**Contractor dependency**: As internal capacity shrinks and spending grows, government becomes increasingly dependent on contractors for AI work. This raises questions about conflicts of interest, vendor lock-in, and whether government retains sufficient expertise to be an informed buyer.
+
+**Political sustainability**: Government tech capacity has been buffeted by political transitions — built under Obama, maintained under Trump 1.0, expanded under Biden, disrupted under Trump 2.0. This volatility makes it difficult to build durable institutions.
+
+**Scale adequacy**: Ezra Klein has estimated government needs ~300 excellent AI experts in advisory, regulatory, and auditing roles.[^klein] Tech Force's 1,000 target is larger but focused on different (more junior, more implementation-oriented) roles. Whether either number is adequate for governing transformative AI systems is debatable.
+
+**Horizon and EA-adjacent programs**: The Horizon Institute's EA funding connections have drawn media scrutiny.[^wa-examiner] Whether this creates political vulnerability or perception issues for the program's continued growth is an open question.
+
+## Sources
+
+[^cfa]: [Code for America](https://codeforamerica.org) — organizational website and mission description
+[^usds-impact]: [USDS 2024 Impact Report](https://www.usds.gov/impact-report) — staffing and deployment data
+[^18f-conversation]: [How 18F Transformed Government Technology and Why Its Elimination Matters](https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333) — The Conversation, 2025
+[^usds-reinterview]: [U.S. Digital Service employees re-interviewed under DOGE transition](https://www.nextgov.com/people/2025/01/us-digital-service-employees-are-being-re-interviewed-under-doge-transition/402423/) — Nextgov/FCW, January 2025
+[^usds-dismissed]: [Dozens of employees at U.S. DOGE Service dismissed](https://www.nextgov.com/people/2025/02/dozens-employees-us-doge-service-dismissed/403053/) — Nextgov/FCW, February 2025
+[^usds-quit]: [21 technologists quit USDS, saying DOGE demands 'are not compatible with the mission'](https://fedscoop.com/usds-workers-quit-doge-tech-elon-musk/) — FedScoop, February 2025
+[^18f-eliminated]: [GSA eliminates 18F](https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/) — Nextgov/FCW, March 2025
+[^18f-lawsuit]: [GSA shutting down 18F was 'retaliation' by DOGE, former staff claim](https://federalnewsnetwork.com/workforce/2025/05/gsa-shutting-down-18f-was-retaliation-by-doge-former-staff-claim-in-appeal-for-their-jobs-back/) — Federal News Network, May 2025
+[^bloomberg-317k]: [Federal workforce's toll after a year of DOGE and Trump: 317,000](https://www.bloomberg.com/news/articles/2025-12-10/federal-workforce-s-toll-after-a-year-of-doge-and-trump-317-000) — Bloomberg, December 2025
+[^fednet-staffing]: [How staffing cuts in 2025 transformed the federal workforce](https://federalnewsnetwork.com/workforce/2026/01/how-staffing-cuts-in-2025-transformed-the-federal-workforce/) — Federal News Network, January 2026
+[^npr-doge]: [DOGE cuts to federal government staffing and spending](https://www.npr.org/2025/10/01/nx-s1-5558298/doge-fiscal-year-savings-budget-rehired-government-shutdown) — NPR, October 2025
+[^eo-revoked]: [President Trump Revokes Biden Administration's AI EO](https://www.wiley.law/alert-President-Trump-Revokes-Biden-Administrations-AI-EO-What-To-Know) — Wiley, January 2025
+[^caisi-rename]: [NIST AI Safety Institute renamed CAISI](https://www.ciodive.com/news/Trump-US-AI-Safety-Institute-CAISI-rebrand/749988/) — CIO Dive, June 2025
+[^doge-hire]: [After federal workforce cuts, DOGE chief says 'we need to hire'](https://federalnewsnetwork.com/it-modernization/2025/09/after-federal-workforce-cuts-doge-chief-says-we-need-to-hire/) — Federal News Network, September 2025
+[^techforce]: [Inside the U.S. Tech Force](https://news.clearancejobs.com/2025/12/17/inside-the-u-s-tech-force-what-the-federal-governments-ai-hiring-push-means/) — ClearanceJobs, December 2025
+[^horizon-review]: [Horizon's 2025 Year in Review](https://horizonpublicservice.org/horizons-2025-year-in-review/) — Horizon Institute for Public Service
+[^techcongress]: [TechCongress Fellowship](https://techcongress.io) — organizational website
+[^digital-corps]: [U.S. Digital Corps](https://digitalcorps.gsa.gov/) — official site
+[^ai-talent-act]: [AI Tech Talent Agency Hiring Bill](https://fedscoop.com/ai-tech-talent-agency-hiring-senate-house-bill/) — FedScoop, December 2025
+[^fed-ai-budget]: [Federal AI and IT R&D Spending Analysis](https://federalbudgetiq.com/insights/federal-ai-and-it-research-and-development-spending-analysis/) — Federal Budget IQ
+[^dod-ai]: [Emil Michael: DoD deliver AI at scale under Trump](https://defensescoop.com/2025/12/08/emil-michael-dod-deliver-ai-at-scale-under-trump/) — DefenseScoop, December 2025
+[^palantir]: [Government's embrace of Palantir](https://fedscoop.com/palantir-federal-agencies-government-data/) — FedScoop
+[^fednet-rebuild]: [After deep staffing cuts, agencies seek mix of hiring and AI tools to rebuild capacity](https://federalnewsnetwork.com/workforce/2026/03/after-deep-staffing-cuts-agencies-seek-mix-of-hiring-and-ai-tools-to-rebuild-capacity/) — Federal News Network, March 2026
+[^klein]: Ezra Klein, estimate cited in multiple discussions of AI governance capacity needs
+[^wa-examiner]: [EA-linked nonprofit placed fellows in key government offices](https://www.washingtonexaminer.com/news/3874805/effective-altruism-linked-nonprofit-placed-fellows-in-key-government-offices-secured-influence/) — Washington Examiner
