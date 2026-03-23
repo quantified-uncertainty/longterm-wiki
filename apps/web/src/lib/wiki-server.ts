@@ -177,6 +177,8 @@ import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
 import type { PersonnelRoute } from "@wiki-server/personnel-route";
+import type { PredictionMarketsRoute } from "@wiki-server/prediction-markets-route";
+import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-prices-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -323,4 +325,31 @@ export type RpcPersonnelByEntityResult = InferResponseType<PersonnelClient['by-e
 
 /** A single personnel row from the by-entity endpoint */
 export type RpcPersonnelRow = RpcPersonnelByEntityResult['personnel'][number];
+
+// ============================================================================
+// Hono RPC client — Prediction Markets API
+// ============================================================================
+
+type PredictionMarketsClient = ReturnType<typeof hc<PredictionMarketsRoute>>;
+
+/** Inferred response type for GET /api/prediction-markets/questions/by-entity/:entityId */
+export type RpcPredictionQuestionsByEntityResult = InferResponseType<PredictionMarketsClient['questions']['by-entity'][':entityId']['$get'], 200>;
+
+/** A single prediction market question row */
+export type RpcPredictionQuestion = RpcPredictionQuestionsByEntityResult['questions'][number];
+
+/** Inferred response type for GET /api/prediction-markets/snapshots/timeseries/:questionId */
+export type RpcPredictionSnapshotsTimeseriesResult = InferResponseType<PredictionMarketsClient['snapshots']['timeseries'][':questionId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Secondary Market Prices API
+// ============================================================================
+
+type SecondaryMarketPricesClient = ReturnType<typeof hc<SecondaryMarketPricesRoute>>;
+
+/** Inferred response type for GET /api/secondary-market-prices/latest/:entityId */
+export type RpcSecondaryMarketLatestResult = InferResponseType<SecondaryMarketPricesClient['latest'][':entityId']['$get'], 200>;
+
+/** Inferred response type for GET /api/secondary-market-prices/timeseries/:entityId */
+export type RpcSecondaryMarketTimeseriesResult = InferResponseType<SecondaryMarketPricesClient['timeseries'][':entityId']['$get'], 200>;
 

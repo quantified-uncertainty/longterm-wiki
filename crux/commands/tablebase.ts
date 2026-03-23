@@ -979,6 +979,27 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   };
 }
 
+async function marketsDiscoverCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { discoverMarkets } = await import('../tablebase/market-discovery.ts');
+  const entitySlug = args[0];
+  if (!entitySlug) {
+    return { exitCode: 1, output: 'Usage: crux tb markets-discover <entity-slug-or-stableId>' };
+  }
+  return discoverMarkets(entitySlug, {
+    dryRun: options.dryRun ?? false,
+    model: (options.model as string) ?? undefined,
+  });
+}
+
+async function marketsFetchCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { fetchMarketSnapshots } = await import('../tablebase/market-fetcher.ts');
+  return fetchMarketSnapshots({
+    platform: (options.source as string) ?? undefined,
+    entitySlug: args[0] ?? undefined,
+    dryRun: options.dryRun ?? false,
+  });
+}
+
 export const commands = {
   scan: scanCommand,
   gaps: gapsCommand,
@@ -1012,6 +1033,9 @@ export const commands = {
   'import-divisions-sync': importDivisionsCommands.sync,
   'import-funding-programs': importFundingProgramsCommands.default,
   'import-funding-programs-sync': importFundingProgramsCommands.sync,
+  // Market data commands
+  'markets-discover': marketsDiscoverCommand,
+  'markets-fetch': marketsFetchCommand,
 };
 
 export function getHelp(): string {
@@ -1047,6 +1071,10 @@ Commands:
   import-divisions-sync       Sync divisions to wiki-server
   import-funding-programs     List known funding programs (default)
   import-funding-programs-sync  Sync programs to wiki-server
+
+  Market data:
+  markets-discover <entity>   Discover prediction market questions via LLM agent
+  markets-fetch [entity]      Fetch latest snapshots from platform APIs (Metaculus, etc.)
 
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing

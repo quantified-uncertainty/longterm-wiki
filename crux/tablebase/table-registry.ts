@@ -52,12 +52,28 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncMethod: 'POST',
     syncBodyKey: 'items',
   },
+  'prediction-market-questions': {
+    fetchByEntityPath: (id) => `/api/prediction-markets/questions/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'questions',
+    syncPath: '/api/prediction-markets/questions/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+  },
+  'secondary-market-prices': {
+    fetchByEntityPath: (id) => `/api/secondary-market-prices/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'prices',
+    syncPath: '/api/secondary-market-prices/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form
 const TABLE_ALIASES: Record<string, string> = {
   funding_rounds: 'funding-rounds',
   benchmark_results: 'benchmark-results',
+  prediction_market_questions: 'prediction-market-questions',
+  secondary_market_prices: 'secondary-market-prices',
 };
 
 export function getTableConfig(table: string): TableConfig | null {
