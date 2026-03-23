@@ -30,7 +30,7 @@ facts:
     asOf: 2026-03
     source: https://www.centeraipolicy.org/about
 
-  - id: f_caip_lobbying_2024
+  - id: f_gXQzCR6lTO
     property: lobbying-spend
     value: "281964"
     unit: USD
@@ -38,7 +38,7 @@ facts:
     source: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
     notes: "2024 in-house federal lobbying. Lobbyists: Jason Green-Lowe, Jakub Stanger Kraus, Martin Spitzer. Verified from Senate LDA."
 
-  - id: f_caip_sff_2024
+  - id: f_6YetHpmHhR
     property: grant-received
     value: "288000"
     unit: USD
@@ -46,7 +46,7 @@ facts:
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant for general support"
 
-  - id: f_caip_shutdown
+  - id: f_MiZzb2dkTh
     property: organizational-status
     value: "Ceased most active operations around May 2025 due to funding constraints. Cash reserves approximately $150K at shutdown."
     asOf: 2025-05

@@ -47,7 +47,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2024
 
-  - id: f_fli_lobbying_2024
+  - id: f_vm1oBsIh14
     property: lobbying-spend
     value: "310000"
     unit: USD
@@ -55,7 +55,7 @@ facts:
     source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2025&id=D000087562
     notes: "US federal lobbying via Dentons: $310K in 2024. Verified from Senate LDA filings."
 
-  - id: f_fli_lobbying_2025
+  - id: f_h4e6LBhlmR
     property: lobbying-spend
     value: "360000"
     unit: USD
@@ -63,7 +63,7 @@ facts:
     source: https://lda.senate.gov/filings/public/filing/search/?client=Future+of+Life+Institute
     notes: "US federal lobbying via Dentons: $360K in 2025 ($90K/quarter). Verified from Senate LDA."
 
-  - id: f_fli_eu_lobbying
+  - id: f_LA81LD1WDK
     property: lobbying-spend
     value: "446619"
     unit: EUR
@@ -71,32 +71,32 @@ facts:
     source: https://www.lobbyfacts.eu/datacard/future-of-life-institute?rid=787064543128-10
     notes: "EU advocacy spend EUR 446,619 (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
 
-  - id: f_fli_pro_human_declaration
+  - id: f_UuGWvCoFVs
     property: campaign
     value: "Pro-Human AI Declaration (March 2026): 5 pillars, 150+ signatory organizations (AFL-CIO to Congress of Christian Leaders), individual signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph Nader"
     asOf: 2026-03
     source: https://humanstatement.org/
 
-  - id: f_fli_superintelligence_statement
+  - id: f_KMfmkTzWNL
     property: campaign
     value: "Superintelligence Prohibition Statement (October 2025): calls for prohibition on superintelligence development until 'broad scientific consensus on safety'; 69,000+ signatories including Geoffrey Hinton, Yoshua Bengio, Steve Wozniak"
     asOf: 2025-10
     source: https://superintelligence-statement.org/
 
-  - id: f_fli_safety_index
+  - id: f_EkPWWD2ipv
     property: publication
     value: "AI Safety Index published biannually (Summer 2025, Winter 2025). Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter 2025 finding: no company has adequate guardrails for catastrophic misuse."
     asOf: 2025-12
     source: https://futureoflife.org/ai-safety-index-winter-2025/
 
-  - id: f_fli_headcount
+  - id: f_iMTwhUJoEg
     property: headcount
     value: "29"
     asOf: 2025
     source: https://futureoflife.org/about-us/our-people/
     notes: "29 named team members on People page: Policy (16), Futures (3), Communications (4), Operations & Grants (5), plus CEO"
 
-  - id: f_fli_musk_donation
+  - id: f_s83tI9sEe6
     property: grant-received
     value: "10000000"
     unit: USD
@@ -104,7 +104,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
     notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on AI safety"
 
-  - id: f_fli_buterin_donation
+  - id: f_2PAHN0Iwku
     property: grant-received
     value: "665800000"
     unit: USD
@@ -112,13 +112,13 @@ facts:
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
     notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Buterin confirmed ~$500M was actually cashed out (March 2026). Majority transferred to a donor-advised fund."
 
-  - id: f_fli_ein
+  - id: f_75y1H4K4ln
     property: legal-identifier
     value: "47-1052538 (EIN)"
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "IRS 501(c)(3) nonprofit"
 
-  - id: f_fli_revenue_2024
+  - id: f_feRFvTG4CX
     property: revenue
     value: "21273381"
     unit: USD
@@ -126,7 +126,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
 
-  - id: f_fli_expenses_2024
+  - id: f_A8f0X4bXW4
     property: annual-expenses
     value: "17399051"
     unit: USD
@@ -134,7 +134,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
 
-  - id: f_fli_revenue_2021
+  - id: f_Gz4uyRC44r
     property: revenue
     value: "549531672"
     unit: USD
@@ -142,20 +142,20 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
 
-  - id: f_fli_flare
+  - id: f_1tGoi9N3Fi
     property: subsidiary
     value: "Future of Life Action and Research, Inc. (FLARE) — 501(c)(4) advocacy arm"
     asOf: 2025
     source: https://futureoflife.org/about-us/
     notes: "Newer advocacy entity being established; enables political lobbying not allowed under 501(c)(3)"
 
-  - id: f_fli_asilomar
+  - id: f_PWTfxjV4X6
     property: campaign
     value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Stuart Russell, Elon Musk, and Demis Hassabis."
     asOf: 2017-01
     source: https://futureoflife.org/open-letter/ai-principles/
 
-  - id: f_fli_pause_letter
+  - id: f_ewg1hQG7EQ
     property: campaign
     value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve Wozniak, Elon Musk."
     asOf: 2023-03

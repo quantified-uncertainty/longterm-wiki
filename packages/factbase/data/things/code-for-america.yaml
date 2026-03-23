@@ -1,14 +1,14 @@
 entity: ufdntmiWtQ
 facts:
   # ── Founding ───────────────────────────────────────────────────
-  - id: f_cfa_founded
+  - id: f_95BWQvdhFZ
     property: founded-date
     value: "2010"
     source: https://codeforamerica.org
     notes: "Founded by Jennifer Pahlka"
 
   # ── Scale ──────────────────────────────────────────────────────
-  - id: f_cfa_agencies
+  - id: f_HP66HDaMfu
     property: agencies-served
     value: 100
     asOf: 2025-01
@@ -16,7 +16,7 @@ facts:
     notes: "Helps over 100 government agencies improve digital service delivery"
 
   # ── Founder role ───────────────────────────────────────────────
-  - id: f_cfa_founder
+  - id: f_jJ6lESgNPs
     property: founded-by
     value: "Jennifer Pahlka"
     source: https://codeforamerica.org

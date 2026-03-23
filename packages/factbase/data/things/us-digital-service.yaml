@@ -1,28 +1,28 @@
 entity: dbqoxdZuUw
 facts:
   # ── Headcount time series ──────────────────────────────────────
-  - id: f_usds_hc_01
+  - id: f_8VhnkFtQjm
     property: headcount
     value: 230
     asOf: 2024-10
     source: https://www.usds.gov/impact-report
     notes: "USDS 2024 Impact Report; approximate staffing at peak"
 
-  - id: f_usds_hc_02
+  - id: f_GqBMKO3RVF
     property: headcount
     value: 89
     asOf: 2025-02
     source: https://www.nextgov.com/people/2025/02/dozens-employees-us-doge-service-dismissed/403053/
     notes: "After DOGE re-interviews and firings; before protest resignations"
 
-  - id: f_usds_hc_03
+  - id: f_Z3iEZdCeWb
     property: headcount
     value: 50
     asOf: 2025-03
     source: https://fedscoop.com/usds-workers-quit-doge-tech-elon-musk/
     notes: "Estimated after 21 employees resigned in protest on Feb 25, 2025"
 
-  - id: f_usds_hc_04
+  - id: f_soLZ43THVC
     property: headcount
     value: 89
     asOf: 2025-09
@@ -30,14 +30,14 @@ facts:
     notes: "FY2025 reported staffing; DOGE chief acknowledged need to hire more"
 
   # ── Budget ─────────────────────────────────────────────────────
-  - id: f_usds_budget_01
+  - id: f_KwpzwFZjG5
     property: annual-budget
     value: 2e+7
     asOf: 2025-01
     source: https://federalnewsnetwork.com/it-modernization/2025/09/after-federal-workforce-cuts-doge-chief-says-we-need-to-hire/
     notes: "FY2025 budget of $20M"
 
-  - id: f_usds_budget_02
+  - id: f_7VT6qCIxe7
     property: annual-budget
     value: 4.5e+7
     asOf: 2026-01
@@ -45,14 +45,14 @@ facts:
     notes: "Planned FY2026 budget increase to $45M"
 
   # ── Founding ───────────────────────────────────────────────────
-  - id: f_usds_founded
+  - id: f_0vu85ZPtAO
     property: founded-date
     value: "2014-08"
     source: https://en.wikipedia.org/wiki/United_States_Digital_Service
     notes: "Founded following the Healthcare.gov rescue; part of Executive Office of the President"
 
   # ── Key events ─────────────────────────────────────────────────
-  - id: f_usds_renamed
+  - id: f_qG9UxtAkA0
     property: key-event
     value: "Renamed to U.S. DOGE Service"
     asOf: 2025-01

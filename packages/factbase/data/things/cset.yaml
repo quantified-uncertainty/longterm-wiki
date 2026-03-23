@@ -8,7 +8,7 @@ facts:
     asOf: 2026-03
     notes: Migrated from old entity system
 
-  - id: f_cset_op_total
+  - id: f_bhVFcp5tGp
     property: cumulative-funding
     value: "100000000"
     unit: USD
@@ -16,67 +16,67 @@ facts:
     source: https://cset.georgetown.edu/article/new-grant-agreement-boosts-cset-funding-to-more-than-100-million-over-five-years/
     notes: "Total Open Philanthropy/Coefficient Giving funding >$100M over 5 years (founding $55M 2019 + $42M renewal 2021 + additional grants)"
 
-  - id: f_cset_china_military_ai
+  - id: f_9Y54gOBxZU
     property: publication
     value: "China's Military AI Wish List (Feb 2026) — examined thousands of Chinese-language PLA procurement requests (2023-2024), revealing AI priorities in command, control, communications, intelligence, and targeting"
     asOf: 2026-02
     source: https://cset.georgetown.edu/publication/chinas-military-ai-wish-list/
     notes: "By Probasco, Bresnick, McFaul"
 
-  - id: f_cset_ai_gov_frontier
+  - id: f_Dx9D0sCeeb
     property: publication
     value: "AI Governance at the Frontier: Unpacking Foundational Assumptions (Nov 2025) — dissects five governance proposals, offers analytic framework based on four guiding questions"
     asOf: 2025-11
     source: https://cset.georgetown.edu/publication/ai-governance-at-the-frontier/
     notes: "By Narayanan, Ji, Venkatram, Luong"
 
-  - id: f_cset_export_controls
+  - id: f_bnVpOgB52u
     property: publication
     value: "A Bigger Yard, A Higher Fence (Dec 2023) — analyzes expanded US export controls on advanced computing chips, examining 100+ relevant chips"
     asOf: 2023-12
     source: https://cset.georgetown.edu/article/bis-2023-update-explainer/
     notes: "By Dohmen, Feldgoise"
 
-  - id: f_cset_founded
+  - id: f_W1suqx3PKN
     property: founded-date
     value: "2019-01"
     source: https://cset.georgetown.edu/about-us/
     notes: "Founded January 2019 with $55M Open Philanthropy grant"
 
-  - id: f_cset_hq
+  - id: f_ZJyNizm93P
     property: headquarters
     value: "Georgetown University, Washington, DC"
     source: https://cset.georgetown.edu/about-us/
 
-  - id: f_cset_staff
+  - id: f_EDYvEEi5Rk
     property: employee-count
     value: "50"
     asOf: 2026
     source: https://cset.georgetown.edu/team/
     notes: "Approximately 50 staff across analysis, data science, ETO, translations, and operations"
 
-  - id: f_cset_eto
+  - id: f_TvwrDAkCZm
     property: program
     value: "Emerging Technology Observatory (ETO) — 10 public tools and 8 datasets for tracking emerging technology trends, including AI patent clusters, AGORA (AI legislation tracker), and Country Activity Tracker"
     source: https://cset.georgetown.edu/about-us/
 
-  - id: f_cset_cyberai
+  - id: f_6hiba4OWK7
     property: program
     value: "CyberAI Project — $5M Hewlett Foundation-funded program examining the intersection of AI, cybersecurity, and geopolitics"
     source: https://cset.georgetown.edu/article/cset-receives-2-million-grant-to-fund-new-cyberai-project/
 
-  - id: f_cset_translations
+  - id: f_RtJB5XxjsA
     property: program
     value: "Chinese Policy Translations Program — translates Chinese government AI and technology policy documents into English, led by Ben Murphy. Major source of English-language Chinese AI policy intelligence for US policymakers."
     source: https://cset.georgetown.edu/team/
 
-  - id: f_cset_leadership
+  - id: f_pobqaMrCKO
     property: leadership
     value: "Helen Toner serving as Interim Executive Director (former OpenAI board member). Mallory Stewart is CEO (former State Dept assistant secretary). Jason Matheny was founding director (now RAND CEO)."
     asOf: 2026-03
     source: https://cset.georgetown.edu/team/
 
-  - id: f_cset_hewlett
+  - id: f_QGx6d8Eut1
     property: grant-received
     value: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"
     asOf: 2022

@@ -26,28 +26,28 @@ facts:
     value: "125 Broad Street, New York, NY"
     source: https://www.aclu.org/about
 
-  - id: f_aclu_nsa_foia
+  - id: f_EboYLGtPqS
     property: litigation
     value: "ACLU v. NSA — FOIA lawsuit seeking records about NSA use of AI in surveillance programs"
     asOf: 2024-04
     source: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
     notes: "Filed April 2024 after NSA failed to release records on AI use in spy programs"
 
-  - id: f_aclu_doge_lawsuit
+  - id: f_z8Enea407O
     property: foia-campaign
     value: "Filed FOIA requests with 40+ federal agencies (including SSA, VA, OPM) seeking records on DOGE's unrestricted access to databases containing PII, financial, and healthcare data"
     asOf: 2025
     source: https://www.aclu.org/press-releases/aclu-seeks-records-on-doges-unrestricted-access-to-americans-data-urges-congress-to-step-up
     notes: "FOIA requests to 40+ agencies plus letters to Congress"
 
-  - id: f_aclu_trump_eo_opposition
+  - id: f_evA8xqWi5I
     property: policy-position
     value: "Publicly opposed Trump administration December 2025 executive order preempting state AI regulation"
     asOf: 2025-12
     source: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
     notes: "Called executive order unconstitutional"
 
-  - id: f_aclu_ai_action_plan
+  - id: f_FpG8BtUSCD
     property: policy-position
     value: "Formally opposed Trump administration AI Action Plan for thwarting state-level AI protections"
     asOf: 2025-07

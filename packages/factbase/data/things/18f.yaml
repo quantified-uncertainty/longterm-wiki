@@ -1,14 +1,14 @@
 entity: WVHl7Ya8oQ
 facts:
   # ── Headcount time series ──────────────────────────────────────
-  - id: f_18f_hc_01
+  - id: f_jnZSM4djE6
     property: headcount
     value: 85
     asOf: 2025-02
     source: https://digitalchew.com/2025/03/04/federal-tech-office-18f-shuts-down-85-employees-laid-off/
     notes: "Staff at time of shutdown; had been over 100 at peak"
 
-  - id: f_18f_hc_02
+  - id: f_JOOAfnEGZM
     property: headcount
     value: 0
     asOf: 2025-03
@@ -16,14 +16,14 @@ facts:
     notes: "Eliminated entirely on February 28/March 1, 2025"
 
   # ── Founding ───────────────────────────────────────────────────
-  - id: f_18f_founded
+  - id: f_qitBEUD8xO
     property: founded-date
     value: "2014-03"
     source: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
     notes: "Founded within GSA; named after GSA's address at 1800 F Street NW"
 
   # ── Financial model ────────────────────────────────────────────
-  - id: f_18f_rate
+  - id: f_ykUcR7cNwI
     property: billing-rate
     value: 250
     asOf: 2024-12
@@ -31,7 +31,7 @@ facts:
     notes: "Charged agencies $250/hour; was largely self-funding"
 
   # ── Alumni retention ───────────────────────────────────────────
-  - id: f_18f_alumni
+  - id: f_1773Lol7HT
     property: gov-retention-rate
     value: 0.85
     asOf: 2023-12
@@ -39,14 +39,14 @@ facts:
     notes: "85% of departing 18F staff in 2023 moved to other government technology positions"
 
   # ── Key events ─────────────────────────────────────────────────
-  - id: f_18f_shutdown
+  - id: f_RextZoJHAJ
     property: key-event
     value: "Eliminated by DOGE; all staff received RIF notices"
     asOf: 2025-03
     source: https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/
     notes: "GSA TTS Director Thomas Shedd emailed staff at 1:00 AM informing them positions were terminated"
 
-  - id: f_18f_lawsuit
+  - id: f_9hjyq30lVS
     property: key-event
     value: "80 former employees filed class-action appeal with MSPB"
     asOf: 2025-05
