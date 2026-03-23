@@ -164,10 +164,17 @@ export async function upsertThingsInTx(
     .insert(things)
     .values(allVals)
     .onConflictDoUpdate({
-      target: [things.sourceTable, things.sourceId],
+      // Use PK (id) as conflict target, not (source_table, source_id).
+      // When an entity's stableId already exists in things from a different
+      // source (e.g., grants), the PK conflict fires before the composite
+      // unique constraint, causing the insert to fail. Using the PK ensures
+      // the upsert always works regardless of source_table.
+      target: things.id,
       set: {
         title: sql`excluded.title`,
         thingType: sql`excluded.thing_type`,
+        sourceTable: sql`excluded.source_table`,
+        sourceId: sql`excluded.source_id`,
         entityType: sql`excluded.entity_type`,
         description: sql`excluded.description`,
         sourceUrl: sql`excluded.source_url`,
