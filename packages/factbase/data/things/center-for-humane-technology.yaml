@@ -1,0 +1,71 @@
+entity: m9jtyXlqXT
+facts:
+  - id: f_cht_founded
+    property: founded-date
+    value: "2018"
+    source: https://www.humanetech.com
+    notes: "Co-founded in 2018 by Tristan Harris and Aza Raskin; groundwork from 2013"
+
+  - id: f_cht_hq
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://www.humanetech.com
+
+  - id: f_cht_revenue
+    property: annual-revenue
+    value: "1800000"
+    unit: USD
+    asOf: 2025
+    source: https://www.humanetech.com
+    notes: "Approximately $1.8M annual revenue"
+
+  - id: f_cht_staff
+    property: employee-count
+    value: "25"
+    asOf: 2025
+    source: https://www.humanetech.com
+    notes: "25-28 employees across 3 continents"
+
+  - id: f_cht_pro_human
+    property: coalition-membership
+    value: "Signatory of FLI Pro-Human AI Declaration (March 2026)"
+    asOf: 2026-03
+    source: https://humanstatement.org/
+
+  - id: f_cht_lobbying_2024
+    property: lobbying-spend
+    value: "320000"
+    unit: USD
+    asOf: 2024
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
+    notes: "Federal lobbying via Holland & Knight LLP: $80K/quarter consistently since Q3 2023. Verified from Senate LDA."
+
+  - id: f_cht_lobbying_2025
+    property: lobbying-spend
+    value: "320000"
+    unit: USD
+    asOf: 2025
+    source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
+    notes: "Same $80K/quarter pattern through Holland & Knight"
+
+  - id: f_cht_sff_2025
+    property: grant-received
+    value: "468000"
+    unit: USD
+    asOf: 2025
+    source: https://survivalandflourishing.fund/2025/recommendations
+    notes: "SFF 2025 grant for general support"
+
+  - id: f_cht_podcast
+    property: media-reach
+    value: "Your Undivided Attention podcast: 25+ million total downloads, 151 episodes, part of TED Audio Collective"
+    asOf: 2026
+    source: https://www.humanetech.com/podcast
+
+  - id: f_cht_990_revenue
+    property: annual-revenue
+    value: "3580000"
+    unit: USD
+    asOf: 2024
+    source: https://www.humanetech.com
+    notes: "Most recent 990: revenue $3.58M, expenses $6.33M, net assets $6.01M, grants distributed $395K"

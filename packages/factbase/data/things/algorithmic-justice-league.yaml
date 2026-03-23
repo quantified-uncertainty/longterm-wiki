@@ -1,0 +1,30 @@
+entity: UyAH46sPFN
+facts:
+  - id: f_ajl_founded
+    property: founded-date
+    value: "2016"
+    source: https://www.ajl.org/about
+    notes: "Founded 2016 by Dr. Joy Buolamwini"
+
+  - id: f_ajl_hq
+    property: headquarters
+    value: "Cambridge, MA"
+    source: https://www.ajl.org/about
+
+  - id: f_ajl_tsa_investigation
+    property: project
+    value: "Freedom Flyers Campaign investigating TSA facial recognition at 250+ US airports; published 'Comply To Fly?' report"
+    asOf: 2025
+    source: https://www.ajl.org/flyreport
+
+  - id: f_ajl_crash
+    property: project
+    value: "CRASH Project (Community Reporting of Algorithmic System Harms) — bug-bounty programs for algorithmic bias, launched July 2020"
+    asOf: 2020-07
+    source: https://www.ajl.org
+
+  - id: f_ajl_buolamwini_naacp
+    property: leadership-recognition
+    value: "Dr. Joy Buolamwini elected to NAACP Legal Defense Fund Board"
+    asOf: 2025
+    source: https://www.ajl.org

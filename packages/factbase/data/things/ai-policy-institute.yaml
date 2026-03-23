@@ -10,22 +10,43 @@ facts:
     property: headquarters
     value: "Washington, DC"
     source: https://theaipi.org/about/
-    notes: "Policy advocacy nonprofit based in Washington, DC"
 
   - id: f_Xt2yH7wK5c
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://theaipi.org/about/
-    notes: "Research and advocacy non-profit"
-
-  - id: f_Qm6dF1sN9e
-    property: website
-    value: "https://theaipi.org/"
-    source: https://theaipi.org/
-    notes: "Official website"
 
   - id: f_Bw4gC8rZ3f
     property: description
     value: "Research and advocacy nonprofit focused on seeking political solutions to catastrophic risks from emerging AI technology, known for conducting public opinion polling on AI policy issues."
     asOf: 2026-03
     source: https://theaipi.org/about/
+
+  - id: f_aipi_sff_2025
+    property: grant-received
+    value: "1635000"
+    unit: USD
+    asOf: 2025
+    source: https://survivalandflourishing.fund/2025/recommendations
+    notes: "SFF 2025 grant: $1,635,000 for general support"
+
+  - id: f_aipi_sff_2024
+    property: grant-received
+    value: "142000"
+    unit: USD
+    asOf: 2024
+    source: https://survivalandflourishing.fund/2024/recommendations
+    notes: "SFF 2024 grant: $142,000 for general support"
+
+  - id: f_aipi_poll_catastrophic
+    property: polling-finding
+    value: "83% of Americans believe AI could accidentally cause a catastrophic event; 77% say government should do more to regulate AI; 73% believe AI companies should be liable for harms"
+    asOf: 2024
+    source: https://theaipi.org/
+    notes: "Aggregate findings across multiple AIPI polls 2023-2024"
+
+  - id: f_aipi_poll_china
+    property: polling-finding
+    value: "Three out of four voters skeptical of 'race China' arguments for AI deregulation; 76% prefer candidates supporting AI regulation"
+    asOf: 2024
+    source: https://time.com/6996090/ai-china-american-voters-poll/

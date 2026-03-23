@@ -1,0 +1,58 @@
+entity: xxHyEDGp4Y
+facts:
+  - id: f_fNjFtPQSuQ
+    property: founded-date
+    value: "2017"
+    source: https://en.wikipedia.org/wiki/Protect_Democracy
+    notes: "Founded in early 2017"
+
+  - id: f_1Mqq9p4LHQ
+    property: employee-count
+    value: "100"
+    asOf: 2025
+    source: https://protectdemocracy.org/about/
+    notes: "100+ staff (lawyers, strategists, other professionals)"
+
+  - id: f_AavMjo7v7g
+    property: lawsuits-filed
+    value: "100"
+    asOf: 2025
+    source: https://protectdemocracy.org
+    notes: "100+ lawsuits filed challenging authoritarian actions"
+
+  - id: f_pd_ai_dal
+    property: project
+    value: "AI for Democracy Action Lab (AI-DAL) — brings together tech innovators, legal/policy experts, software engineers, and nonprofit leaders to defend against AI threats to democracy"
+    asOf: 2025
+    source: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
+
+  - id: f_pd_snap_lawsuit
+    property: litigation
+    value: "Sued to block USDA's demand for personal data of millions of SNAP recipients, framing it as part of a federal 'panopticon' of AI-enabled surveillance"
+    asOf: 2025-07
+    source: https://protectdemocracy.org
+    notes: "Filed July 2025"
+
+  - id: f_pd_leadership
+    property: leadership
+    value: "Ian Bassin serves as Co-founder and Executive Director"
+    asOf: 2026-03
+    source: https://protectdemocracy.org/about/
+
+  - id: f_pd_snap_docket
+    property: litigation-detail
+    value: "Pallek v. Rollins (1:25-cv-01650, D.D.C., Judge Jia M. Cobb) — Plaintiffs include SNAP recipients, MAZON, EPIC. Counsel: National Student Legal Defense Network, Protect Democracy, National Center for Law and Economic Justice. USDA demanded SSNs and addresses of all SNAP recipients since Jan 2020. Plaintiffs filed TRO (July 17, 2025), motion for summary judgment (Aug 29, 2025)."
+    asOf: 2025-09
+    source: https://epic.org/documents/pallek-v-rollins/
+
+  - id: f_pd_voteshield
+    property: program
+    value: "VoteShield platform: uses ML to review voter registration databases for unusual changes and malicious activity. Coverage: 120+ million voter records across 24 states (as of March 2023)."
+    asOf: 2023-03
+    source: https://www.voteshield.us/
+
+  - id: f_pd_authoritarian_playbook
+    property: publication
+    value: "The Authoritarian Playbook for 2025 — published by affiliated 501(c)(4), details how technology amplifies authoritarian tactics. Co-led by Rosa Brooks (Georgetown), Barton Gellman, Nils Gilman. Included tabletop exercises (May-June 2024) simulating authoritarian scenarios."
+    asOf: 2024
+    source: https://www.authoritarianplaybook2025.org/

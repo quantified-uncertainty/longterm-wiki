@@ -7,3 +7,32 @@ facts:
       operates the Emerging Technology Observatory with 10 public tools and 8 datasets.
     asOf: 2026-03
     notes: Migrated from old entity system
+
+  - id: f_cset_op_total
+    property: cumulative-funding
+    value: "100000000"
+    unit: USD
+    asOf: 2025
+    source: https://cset.georgetown.edu/article/new-grant-agreement-boosts-cset-funding-to-more-than-100-million-over-five-years/
+    notes: "Total Open Philanthropy/Coefficient Giving funding >$100M over 5 years (founding $55M 2019 + $42M renewal 2021 + additional grants)"
+
+  - id: f_cset_china_military_ai
+    property: publication
+    value: "China's Military AI Wish List (Feb 2026) — examined thousands of Chinese-language PLA procurement requests (2023-2024), revealing AI priorities in command, control, communications, intelligence, and targeting"
+    asOf: 2026-02
+    source: https://cset.georgetown.edu/publication/chinas-military-ai-wish-list/
+    notes: "By Probasco, Bresnick, McFaul"
+
+  - id: f_cset_ai_gov_frontier
+    property: publication
+    value: "AI Governance at the Frontier: Unpacking Foundational Assumptions (Nov 2025) — dissects five governance proposals, offers analytic framework based on four guiding questions"
+    asOf: 2025-11
+    source: https://cset.georgetown.edu/publication/ai-governance-at-the-frontier/
+    notes: "By Narayanan, Ji, Venkatram, Luong"
+
+  - id: f_cset_export_controls
+    property: publication
+    value: "A Bigger Yard, A Higher Fence (Dec 2023) — analyzes expanded US export controls on advanced computing chips, examining 100+ relevant chips"
+    asOf: 2023-12
+    source: https://cset.georgetown.edu/article/bis-2023-update-explainer/
+    notes: "By Dohmen, Feldgoise"

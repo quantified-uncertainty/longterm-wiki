@@ -1,0 +1,36 @@
+entity: yTlRworV1V
+facts:
+  - id: f_tjK3GJTnOA
+    property: founded-date
+    value: "2017"
+    source: https://democracyforward.org/about/
+    notes: "Founded in 2017"
+
+  - id: f_ixLgM3sWwA
+    property: headquarters
+    value: "Washington, DC"
+    source: https://democracyforward.org/about/
+
+  - id: f_df_leadership
+    property: leadership
+    value: "Skye L. Perryman serves as President and CEO"
+    asOf: 2026-03
+    source: https://democracyforward.org/about/
+
+  - id: f_df_appellate_practice
+    property: program
+    value: "Launched appellate litigation practice in August 2025 with approximately 12 lawyers"
+    asOf: 2025-08
+    source: https://democracyforward.org
+
+  - id: f_df_ai_foia_hud
+    property: litigation
+    value: "Filed FOIA lawsuit against HUD and State Department seeking records about Trump administration use of generative AI to rewrite rules, monitor employees, and target visa holders"
+    asOf: 2025-03
+    source: https://democracyforward.org/updates/foia-ai-lawsuit/
+
+  - id: f_df_ai_foia_deregulation
+    property: litigation
+    value: "Filed FOIA lawsuit against OPM, GSA, HUD, and OMB compelling disclosure of AI use in the Trump administration's deregulation agenda"
+    asOf: 2025
+    source: https://democracyforward.org/updates/ai-deregulation/

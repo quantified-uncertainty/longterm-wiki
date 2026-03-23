@@ -5621,3 +5621,1055 @@
     Technical and procedural strategies to ground AI-generated content in verified information and reduce factual
     errors in wiki articles, covering RAG, verification techniques, prompt engineering, and human oversight.
   lastUpdated: 2026-02
+
+# --- Trump administration AI policy + new federal/international legislation (2025-2026) ---
+
+- id: trump-eo-14179
+  stableId: PYEZ6G1Fbz
+  type: policy
+  summaryPage: governance-overview
+  title: "Executive Order 14179: Removing Barriers to American Leadership in AI"
+  introduced: '2025-01-23'
+  policyStatus: enacted
+  author: President Donald Trump
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+  provisions:
+    - title: Revocation of Biden EO 14110
+      description: >-
+        Revokes Executive Order 14110 (October 2023) and all policies, directives, and
+        regulations issued pursuant to it.
+      category: Revocation
+    - title: AI Action Plan
+      description: >-
+        Directs development of a 180-day AI Action Plan to sustain and enhance America's
+        AI dominance. Resulted in "Winning the Race" released July 23, 2025.
+      category: Policy development
+    - title: Regulatory Review
+      description: >-
+        Orders review and rescission of all policies conflicting with pro-innovation AI
+        stance. Directs OMB to revise memoranda M-24-10 and M-24-18 within 60 days.
+      category: Deregulation
+  description: >-
+    First major AI executive order of the Trump second term, signed January 23, 2025. Revokes
+    Biden's comprehensive AI executive order (EO 14110) and replaces it with a deregulatory,
+    pro-innovation framework. Mandated a 180-day AI Action Plan and review of all existing AI
+    policies. The resulting Action Plan was released July 23, 2025, accompanied by three
+    additional executive orders on data center permitting, unbiased AI principles, and
+    scientific AI acceleration.
+  tags:
+    - executive-order
+    - deregulation
+    - federal-policy
+    - trump-administration
+  clusters:
+    - governance
+  sources:
+    - title: Federal Register
+      url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+  lastUpdated: 2026-03
+
+- id: trump-ai-preemption-eo
+  stableId: 1h93jgFv4l
+  type: policy
+  summaryPage: governance-overview
+  title: "EO: Ensuring a National Policy Framework for AI (State Preemption)"
+  introduced: '2025-12-11'
+  policyStatus: enacted
+  author: President Donald Trump
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+  provisions:
+    - title: AI Litigation Task Force
+      description: >-
+        Directs AG to establish AI Litigation Task Force within 30 days to challenge state
+        AI laws on interstate commerce, federal preemption, and First Amendment grounds.
+        Established January 9, 2026 by AG Bondi.
+      category: Enforcement
+    - title: State Law Evaluation
+      description: >-
+        Commerce Secretary must publish evaluation of "onerous" state AI laws within 90 days.
+      category: Review
+    - title: Federal Reporting Standard
+      description: >-
+        FCC directed to consider federal AI reporting/disclosure standard that preempts
+        conflicting state laws.
+      category: Standardization
+    - title: BEAD Funding Withholding
+      description: >-
+        Withholds BEAD broadband funding from states with targeted AI regulations.
+      category: Financial pressure
+  stakeholders:
+    - name: 36 State Attorneys General Coalition
+      position: oppose
+      importance: high
+      reason: Formed bipartisan coalition opposing federal preemption of state AI regulatory authority
+    - name: American Civil Liberties Union
+      entityId: 7DpEvy5wQr
+      position: oppose
+      importance: medium
+      reason: Called executive order unconstitutional
+  description: >-
+    Executive order signed December 11, 2025 directing federal agencies to challenge state AI
+    laws deemed inconsistent with federal policy. Does NOT itself overturn state law — only
+    Congress or courts can do that. Established DOJ AI Litigation Task Force (Jan 9, 2026).
+    Triggered bipartisan opposition: 36 state AGs formed coalition, governors of CA/CO/NY
+    issued defiant statements, Congress had twice rejected preemption provisions.
+  tags:
+    - executive-order
+    - preemption
+    - state-regulation
+    - trump-administration
+    - federal-state-conflict
+  clusters:
+    - governance
+  sources:
+    - title: White House
+      url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    - title: Ropes & Gray Analysis
+      url: https://www.ropesgray.com/en/insights/alerts/2025/12/trump-attempts-to-preempt-state-ai-regulation-through-executive-order
+  lastUpdated: 2026-03
+
+- id: trump-ai-framework-2026
+  stableId: 7rafBo4OER
+  type: policy
+  summaryPage: governance-overview
+  title: National AI Legislative Framework (White House, March 2026)
+  introduced: '2026-03-20'
+  policyStatus: proposed
+  author: White House
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/wp-content/uploads/2026/03/03.20.26-National-Policy-Framework-for-Artificial-Intelligence-Legislative-Recommendations.pdf
+  provisions:
+    - title: Protecting Children
+      description: Protecting children and empowering parents from AI harms
+      category: Children's safety
+    - title: Safeguarding Communities
+      description: Safeguarding communities from AI-related risks
+      category: Public safety
+    - title: Intellectual Property
+      description: Respecting intellectual property rights in AI training and outputs
+      category: IP protection
+    - title: Free Speech
+      description: Preventing censorship and protecting free speech in AI systems
+      category: First Amendment
+    - title: Innovation
+      description: Enabling innovation and ensuring US AI dominance
+      category: Competitiveness
+    - title: Workforce Development
+      description: Educating Americans and workforce development for AI era
+      category: Education
+  description: >-
+    Legislative blueprint released March 20, 2026. Six guiding principles for Congress. Urges
+    Congress to preempt state AI laws and adopt "light-touch" regulatory approach. Leaves
+    AI/copyright fair-use questions to courts. Not law itself — a framework for congressional
+    action.
+  tags:
+    - legislative-framework
+    - federal-policy
+    - trump-administration
+    - preemption
+  clusters:
+    - governance
+  sources:
+    - title: White House Announcement
+      url: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
+  lastUpdated: 2026-03
+
+- id: take-it-down-act
+  stableId: Nq8e8nItph
+  type: policy
+  summaryPage: governance-overview
+  title: TAKE IT DOWN Act
+  introduced: '2025-01'
+  policyStatus: enacted
+  author: Senator Ted Cruz
+  scope: National
+  billNumber: S.146
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
+  provisions:
+    - title: Criminalization of Nonconsensual Intimate Images
+      description: >-
+        Criminalizes knowingly publishing nonconsensual intimate images including AI deepfakes.
+        Up to 3 years imprisonment for sharing intimate depictions of minors.
+      category: Criminal penalties
+    - title: Platform Takedown Requirements
+      description: >-
+        Platforms must establish notice-and-takedown process and remove flagged content within
+        48 hours of valid notice. Compliance procedures required within 1 year.
+      category: Platform obligations
+    - title: Safe Harbor
+      description: Safe harbor for good-faith platform removal actions.
+      category: Platform protections
+  votes:
+    - chamber: House
+      result: Passed
+      ayes: 409
+      noes: 2
+    - chamber: Senate
+      result: Passed unanimously
+  description: >-
+    First federal law specifically addressing AI-generated deepfakes, signed May 19, 2025.
+    Criminalizes nonconsensual intimate images (including AI deepfakes) and requires platforms
+    to remove them within 48 hours. Passed with overwhelming bipartisan support (House 409-2,
+    Senate unanimous).
+  tags:
+    - deepfakes
+    - nonconsensual-images
+    - platform-regulation
+    - federal-law
+    - bipartisan
+  clusters:
+    - governance
+  sources:
+    - title: Congress.gov Bill Text
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
+    - title: White House Signing Statement
+      url: https://www.whitehouse.gov/articles/2025/05/icymi-president-trump-signs-take-it-down-act-into-law/
+  lastUpdated: 2026-03
+
+- id: ai-lead-act
+  stableId: JCdMGaEZOj
+  type: policy
+  summaryPage: governance-overview
+  title: AI LEAD Act (AI Liability Standards)
+  introduced: '2025-09-29'
+  policyStatus: proposed
+  author: Senator Dick Durbin and Senator Josh Hawley
+  scope: National
+  billNumber: S.2937
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/2937
+  provisions:
+    - title: Developer Liability
+      description: >-
+        AI developers liable for harm if they fail to demonstrate reasonable care, provide
+        inadequate warnings, or products are defective.
+      category: Liability
+    - title: Deployer Liability
+      description: >-
+        AI deployers liable if they materially alter AI systems or misuse them causing harm.
+      category: Liability
+    - title: Anti-Waiver
+      description: Prohibits contracts that unreasonably limit AI liability.
+      category: Consumer protection
+    - title: Foreign Developer Registry
+      description: >-
+        Foreign AI developers must designate US-based agents; public registry maintained by AG.
+      category: Enforcement
+  description: >-
+    Bipartisan bill introduced September 29, 2025, establishing product liability standards for
+    AI systems. Sponsored by Senators Durbin (D-IL) and Hawley (R-MO). Referred to Committee
+    on the Judiciary.
+  tags:
+    - ai-liability
+    - product-liability
+    - bipartisan
+    - federal-legislation
+  clusters:
+    - governance
+  sources:
+    - title: Congress.gov
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/2937
+    - title: National Law Review Analysis
+      url: https://natlawreview.com/article/new-federal-legislation-proposes-product-liability-standards-ai-systems
+  lastUpdated: 2026-03
+
+- id: ai-risk-evaluation-act
+  stableId: ZpeTfyauLM
+  type: policy
+  summaryPage: governance-overview
+  title: AI Risk Evaluation Act
+  introduced: '2025-09-29'
+  policyStatus: proposed
+  author: Senator Josh Hawley and Senator Richard Blumenthal
+  scope: National
+  billNumber: S.2938
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/2938/text
+  provisions:
+    - title: DOE Advanced AI Evaluation Program
+      description: >-
+        DOE must establish Advanced AI Evaluation Program within 90 days with mandatory
+        participation by advanced AI developers.
+      category: Evaluation
+    - title: Adversarial Testing
+      description: >-
+        Red teams matching real-world jailbreaking techniques. Tests cover weaponization
+        potential, self-replication, scheming behaviors, autonomous decision-making.
+      category: Testing
+    - title: Penalties
+      description: At least \$1M/day for non-compliance with evaluation requirements.
+      category: Enforcement
+  description: >-
+    Bipartisan bill introduced September 29, 2025 by Senators Hawley (R-MO) and Blumenthal
+    (D-CT). Would require DOE to establish mandatory AI evaluation program with adversarial
+    testing. Notable for \$1M/day non-compliance penalty and focus on dangerous capabilities.
+    7-year program duration. Referred to Commerce Committee.
+  tags:
+    - ai-evaluation
+    - mandatory-testing
+    - dangerous-capabilities
+    - bipartisan
+    - federal-legislation
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Congress.gov Bill Text
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/2938/text
+  lastUpdated: 2026-03
+
+- id: paris-ai-summit
+  stableId: Fghn4m4ekW
+  type: policy
+  summaryPage: governance-overview
+  title: Paris AI Action Summit (February 2025)
+  introduced: '2025-02-10'
+  policyStatus: active
+  author: President Macron and PM Modi (co-chairs)
+  scope: International
+  jurisdiction: International
+  provisions:
+    - title: AI for People and Planet Declaration
+      description: >-
+        Declaration on inclusive and sustainable AI signed by 61 countries. US and UK
+        refused to sign.
+      category: International agreement
+    - title: Current AI Foundation
+      description: >-
+        Launched "Current AI" foundation with \$400M endowment backed by 9 governments to
+        support AI public goods, open-source tools, and datasets.
+      category: Infrastructure
+  description: >-
+    International AI summit held February 10-11, 2025 at Grand Palais, Paris. 61 countries
+    signed declaration on inclusive AI. Notable for US and UK refusal to sign. Launched the
+    Current AI foundation with \$400M endowment. Anthropic CEO Dario Amodei called it a
+    "missed opportunity" for AI safety.
+  tags:
+    - international
+    - summit
+    - ai-governance
+    - us-refusal
+  clusters:
+    - governance
+  sources:
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/AI_Action_Summit
+  lastUpdated: 2026-03
+
+- id: un-ai-governance-resolution
+  stableId: TNWEEemXQd
+  type: policy
+  summaryPage: governance-overview
+  title: UN General Assembly AI Governance Resolution (August 2025)
+  introduced: '2025-08-26'
+  policyStatus: enacted
+  author: UN General Assembly
+  scope: International
+  jurisdiction: International
+  provisions:
+    - title: International Scientific Panel on AI
+      description: >-
+        Established Independent International Scientific Panel on AI with 40 experts to
+        issue annual evidence-based assessments of AI risks, opportunities, and impacts.
+      category: Scientific assessment
+    - title: Global Dialogue on AI Governance
+      description: >-
+        Annual inclusive forum for states and stakeholders. First meeting July 2026 in
+        Geneva, second 2027 in New York.
+      category: International cooperation
+  description: >-
+    UN General Assembly resolution adopted August 26, 2025 establishing two new AI governance
+    bodies. US explicitly rejected "centralized control and global governance" of AI at UN
+    Security Council. China supported framework, aligned with developing countries.
+  tags:
+    - international
+    - united-nations
+    - ai-governance
+    - scientific-panel
+  clusters:
+    - governance
+  sources:
+    - title: UN Press Release
+      url: https://press.un.org/en/2025/sgsm22776.doc.htm
+    - title: WEF Explainer
+      url: https://www.weforum.org/stories/2025/10/un-new-ai-governance-bodies/
+  lastUpdated: 2026-03
+
+# --- State-level AI legislation (2025) ---
+
+- id: utah-sb226
+  stableId: yxyu4w3Xup
+  type: policy
+  summaryPage: governance-overview
+  title: "Utah SB 226: AI Consumer Protection Amendments"
+  introduced: '2025-01'
+  policyStatus: enacted
+  author: Utah State Legislature
+  scope: State
+  billNumber: SB 226
+  jurisdiction: Utah
+  provisions:
+    - title: Narrowed Disclosure Requirements
+      description: >-
+        Narrows AI disclosure requirements to situations where consumer explicitly asks
+        if AI is used. Limits disclosure mandates for regulated occupations to "high-risk
+        AI interactions" involving sensitive personal data.
+      category: Disclosure
+    - title: AI Self-Disclosure Safe Harbor
+      description: >-
+        Safe harbor if the AI system itself discloses it is nonhuman at the outset of
+        the interaction.
+      category: Safe harbor
+    - title: Enforcement
+      description: >-
+        Empowers Division of Consumer Protection with enforcement authority.
+      category: Enforcement
+  description: >-
+    Signed March 2025, effective May 7, 2025. Refines Utah's AI transparency framework by
+    narrowing disclosure requirements to explicit consumer requests and high-risk interactions.
+    Represents a lighter-touch approach compared to Colorado and California AI regulation.
+  tags:
+    - state-legislation
+    - ai-disclosure
+    - consumer-protection
+    - utah
+  clusters:
+    - governance
+  sources:
+    - title: Utah Legislature
+      url: https://le.utah.gov/~2025/bills/static/SB0226.html
+    - title: Perkins Coie Analysis
+      url: https://perkinscoie.com/insights/update/new-utah-ai-laws-change-disclosure-requirements-and-identity-protections-target
+  lastUpdated: 2026-03
+
+- id: illinois-ai-employment
+  stableId: ijQ2GcsXAQ
+  type: policy
+  summaryPage: governance-overview
+  title: "Illinois HB 3773: AI Employment Discrimination"
+  introduced: '2025'
+  policyStatus: enacted
+  author: Illinois General Assembly
+  scope: State
+  billNumber: HB 3773
+  jurisdiction: Illinois
+  provisions:
+    - title: AI Discrimination Prohibition
+      description: >-
+        Prohibits employer use of AI that discriminates against protected classes in
+        employment decisions. Amends the Illinois Human Rights Act.
+      category: Employment
+  description: >-
+    Amends the Illinois Human Rights Act to prohibit employer use of AI systems that
+    discriminate against protected classes in employment decisions. One of the first state
+    laws specifically targeting AI-driven employment discrimination.
+  tags:
+    - state-legislation
+    - employment
+    - discrimination
+    - illinois
+  clusters:
+    - governance
+  sources:
+    - title: NCSL AI Legislation Tracker
+      url: https://www.ncsl.org/technology-and-communication/artificial-intelligence-2025-legislation
+  lastUpdated: 2026-03
+
+- id: arkansas-ai-laws
+  stableId: Tt1wXsEjKw
+  type: policy
+  summaryPage: governance-overview
+  title: "Arkansas AI Laws (HB 1958 & HB 1876)"
+  introduced: '2025'
+  policyStatus: enacted
+  author: Arkansas General Assembly
+  scope: State
+  jurisdiction: Arkansas
+  provisions:
+    - title: Public Entity AI Policies (HB 1958)
+      description: >-
+        Requires public entities to develop comprehensive AI use policies.
+      category: Government use
+      billSection: HB 1958
+    - title: AI Output Ownership (HB 1876)
+      description: >-
+        Establishes ownership rights over content generated by generative AI — individuals
+        who provide input own the output, provided it doesn't infringe copyrights.
+      category: Intellectual property
+      billSection: HB 1876
+  description: >-
+    Two AI laws signed by Governor Sarah Huckabee Sanders. HB 1958 requires public entities
+    to develop AI use policies. HB 1876 establishes that individuals who provide input to
+    generative AI own the output (subject to copyright). Notable for being one of the first
+    state laws addressing AI-generated content ownership.
+  tags:
+    - state-legislation
+    - government-ai-use
+    - ip-ownership
+    - arkansas
+  clusters:
+    - governance
+  sources:
+    - title: King & Spalding Analysis
+      url: https://www.kslaw.com/news-and-insights/new-state-ai-laws-are-effective-on-january-1-2026-but-a-new-executive-order-signals-disruption
+  lastUpdated: 2026-03
+
+- id: kentucky-ai-governance
+  stableId: TVA6XJDdOO
+  type: policy
+  summaryPage: governance-overview
+  title: "Kentucky SB 4: AI Governance"
+  introduced: '2025'
+  policyStatus: enacted
+  author: Kentucky General Assembly
+  scope: State
+  billNumber: SB 4
+  jurisdiction: Kentucky
+  provisions:
+    - title: State AI Policy Standards
+      description: >-
+        Directs the Commonwealth Office of Technology to create policy standards governing
+        AI use in state government.
+      category: Government use
+  description: >-
+    Directs Kentucky's Commonwealth Office of Technology to develop policy standards for
+    AI use across state government. Part of the wave of state-level AI governance laws in 2025.
+  tags:
+    - state-legislation
+    - government-ai-use
+    - kentucky
+  clusters:
+    - governance
+  sources:
+    - title: White & Case Analysis
+      url: https://www.whitecase.com/insight-alert/california-kentucky-tracking-rise-state-ai-laws-2025
+  lastUpdated: 2026-03
+
+- id: indiana-ai-healthcare
+  stableId: I8mbdJyUjs
+  type: policy
+  summaryPage: governance-overview
+  title: "Indiana AI Healthcare Disclosure"
+  introduced: '2025'
+  policyStatus: enacted
+  author: Indiana General Assembly
+  scope: State
+  jurisdiction: Indiana
+  provisions:
+    - title: Healthcare AI Disclosure
+      description: >-
+        Requires healthcare professionals to disclose to patients if AI was used in
+        healthcare decisions or communications. Similar requirements for health insurers.
+      category: Healthcare transparency
+  description: >-
+    Requires healthcare professionals and insurers to disclose AI use in healthcare decisions
+    and patient communications. One of the first state laws targeting AI transparency in
+    healthcare specifically.
+  tags:
+    - state-legislation
+    - healthcare
+    - ai-disclosure
+    - indiana
+  clusters:
+    - governance
+  sources:
+    - title: IAPP Analysis
+      url: https://iapp.org/news/a/us-state-ai-legislation-reviewing-the-2025-session
+  lastUpdated: 2026-03
+
+- id: tennessee-ai-mental-health
+  stableId: CfUOvtha9O
+  type: policy
+  summaryPage: governance-overview
+  title: "Tennessee AI Mental Health Professionals Ban"
+  introduced: '2025'
+  policyStatus: enacted
+  author: Tennessee General Assembly
+  scope: State
+  jurisdiction: Tennessee
+  provisions:
+    - title: AI Mental Health Professional Ban
+      description: >-
+        Prohibits AI systems from representing themselves as qualified mental health
+        professionals.
+      category: Professional standards
+  votes:
+    - chamber: Senate
+      result: Passed unanimously
+  description: >-
+    Prohibits AI systems from representing themselves as qualified mental health professionals.
+    Passed Tennessee Senate unanimously. Responds to concerns about AI companion chatbots
+    providing mental health advice without qualification.
+  tags:
+    - state-legislation
+    - mental-health
+    - ai-chatbots
+    - tennessee
+  clusters:
+    - governance
+  sources:
+    - title: FPF Analysis
+      url: https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/
+  lastUpdated: 2026-03
+
+- id: california-sb243
+  stableId: 38lWEn2OYr
+  type: policy
+  summaryPage: governance-overview
+  title: "California SB 243: Companion Chatbot Regulation"
+  introduced: '2025'
+  policyStatus: enacted
+  author: California Legislature
+  scope: State
+  billNumber: SB 243
+  jurisdiction: California
+  provisions:
+    - title: AI Companion Chatbot Disclosure
+      description: >-
+        Requires operators to disclose when users interact with AI rather than humans.
+        Applies to AI systems "capable of meeting a user's social needs."
+      category: Disclosure
+  description: >-
+    Regulates AI companion chatbots in California. Requires operators to disclose when users
+    interact with AI rather than humans. Applies to systems designed to meet users' social
+    needs. Part of California's continued leadership in state AI regulation despite federal
+    preemption pressure.
+  tags:
+    - state-legislation
+    - ai-chatbots
+    - disclosure
+    - california
+    - companion-ai
+  clusters:
+    - governance
+  sources:
+    - title: Transparency Coalition Report
+      url: https://www.transparencycoalition.ai/news/transparency-coalition-publishes-2025-state-ai-legislation-report
+  lastUpdated: 2026-03
+
+- id: washington-ai-chatbot
+  stableId: 7xjjFPltc4
+  type: policy
+  summaryPage: governance-overview
+  title: "Washington AI Chatbot Safety Bills (SB 5984 / HB 2225)"
+  introduced: '2025'
+  policyStatus: pending
+  author: Washington State Legislature
+  scope: State
+  billNumber: SB 5984 / HB 2225
+  jurisdiction: Washington
+  provisions:
+    - title: Companion Chatbot Safety
+      description: >-
+        Companion chatbot safety regulations with disclosure requirements. HB 2225 passed
+        House 69-28; SB 5984 passed Senate and advanced through House committee.
+      category: Safety
+  votes:
+    - chamber: House
+      result: Passed
+      ayes: 69
+      noes: 28
+      details: HB 2225
+    - chamber: Senate
+      result: Passed
+      details: SB 5984
+  description: >-
+    Companion bills advancing through both chambers of Washington legislature. HB 2225 passed
+    House 69-28; SB 5984 passed Senate and advanced through House committee. Both address AI
+    chatbot safety with disclosure requirements.
+  tags:
+    - state-legislation
+    - ai-chatbots
+    - safety
+    - washington
+  clusters:
+    - governance
+  sources:
+    - title: IAPP Analysis
+      url: https://iapp.org/news/a/five-trends-in-the-new-state-ai-legislative-session
+  lastUpdated: 2026-03
+
+# --- Additional federal legislation (2025-2026) ---
+
+- id: defiance-act
+  stableId: XOxFEPaf90
+  type: policy
+  summaryPage: governance-overview
+  title: DEFIANCE Act
+  introduced: '2025'
+  policyStatus: pending
+  author: Senator Dick Durbin and Senator Lindsey Graham
+  scope: National
+  billNumber: S.1837
+  jurisdiction: United States
+  provisions:
+    - title: Civil Right of Action
+      description: >-
+        Creates federal civil right of action for victims of nonconsensual sexually
+        explicit deepfakes.
+      category: Civil remedies
+    - title: Damages
+      description: >-
+        Liquidated damages up to \$150,000 (\$250,000 if linked to sexual
+        assault/stalking/harassment).
+      category: Damages
+    - title: Privacy Protections
+      description: >-
+        Plaintiffs may use pseudonyms to protect identity.
+      category: Victim protection
+  votes:
+    - chamber: Senate
+      date: '2026-01-13'
+      result: Passed unanimously
+  description: >-
+    Bipartisan bill creating a federal civil cause of action for victims of nonconsensual
+    sexually explicit deepfakes. Sponsored by Senators Durbin (D-IL) and Graham (R-SC).
+    Passed Senate unanimously January 13, 2026. Held at desk in the House; not yet law.
+    Complements the TAKE IT DOWN Act (criminal penalties) with civil remedies.
+  tags:
+    - deepfakes
+    - civil-remedies
+    - bipartisan
+    - federal-legislation
+    - victim-protection
+  clusters:
+    - governance
+  sources:
+    - title: Congress.gov
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/1837/text
+    - title: Roll Call Coverage
+      url: https://rollcall.com/2026/01/13/senate-passes-bill-targeting-nonconsensual-deepfake-images/
+  lastUpdated: 2026-03
+
+- id: blackburn-trump-america-ai
+  stableId: Qz9kfJzEP7
+  type: policy
+  summaryPage: governance-overview
+  title: "TRUMP AMERICA AI Act (Blackburn Discussion Draft)"
+  introduced: '2026-03-18'
+  policyStatus: proposed
+  author: Senator Marsha Blackburn
+  scope: National
+  jurisdiction: United States
+  provisions:
+    - title: Federal AI Framework
+      description: >-
+        Comprehensive federal AI framework combining KOSA and NO FAKES Act provisions.
+      category: Comprehensive
+    - title: State Preemption
+      description: >-
+        Preempts state AI laws broadly, but preserves "generally applicable" state/local AI
+        laws and allows states to exceed federal standards for children's safety.
+      category: Preemption
+    - title: Copyright and AI Training
+      description: >-
+        Makes unauthorized use of copyrighted works in AI training NOT fair use under the
+        Copyright Act.
+      category: Intellectual property
+    - title: Digital Likeness Protections
+      description: >-
+        Incorporates digital likeness protections from NO FAKES Act.
+      category: Individual rights
+  description: >-
+    Discussion draft released March 18, 2026 by Senator Blackburn (R-TN). Ambitious attempt
+    at comprehensive federal AI framework combining children's safety (KOSA), digital likeness
+    (NO FAKES), copyright (anti-fair-use for training), and broad federal preemption of state
+    laws. Not yet formally introduced as a bill. Released two days before the White House
+    National AI Legislative Framework.
+  tags:
+    - federal-legislation
+    - comprehensive-framework
+    - preemption
+    - copyright
+    - children-safety
+    - discussion-draft
+  clusters:
+    - governance
+  sources:
+    - title: Blackburn Press Release
+      url: https://www.blackburn.senate.gov/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/3b3b6458-b6c7-478b-9859-374949586765
+    - title: IAPP Analysis
+      url: https://iapp.org/news/a/us-sen-blackburn-proposes-ai-framework-to-protect-children-copyrights
+    - title: National Law Review Analysis
+      url: https://natlawreview.com/article/proposed-senate-bill-could-bring-sweeping-changes-ai-liability-section-230-and
+  lastUpdated: 2026-03
+
+# --- Intervention taxonomy approaches ---
+
+- id: ai-litigation-democracy
+  stableId: Zl0fiVceDA
+  type: approach
+  title: AI Litigation as Democratic Defense
+  description: >-
+    Using courts to challenge government and corporate AI deployments that threaten democratic
+    governance, civil rights, and privacy. Includes FOIA litigation to compel transparency about
+    government AI use, constitutional challenges to AI-enabled surveillance, product liability
+    suits against harmful AI systems, and challenges to federal preemption of state AI regulation.
+    Key practitioners: ACLU (NSA AI FOIA, DOGE data access), Democracy Forward (FOIA on federal
+    AI use for deregulation and employee monitoring), Protect Democracy (SNAP data "panopticon"
+    suit), EFF (AI surveillance investigations), EPIC (housing AI litigation). The 36-state AG
+    coalition opposing federal preemption represents the largest coordinated legal response.
+    Litigation serves both direct (blocking harmful deployments) and indirect (establishing
+    precedent, forcing disclosure) functions. The December 2025 Trump state preemption EO and
+    January 2026 DOJ AI Litigation Task Force created an adversarial dynamic where both
+    pro-regulation and anti-regulation sides are using courts simultaneously.
+  tags:
+    - litigation
+    - democracy
+    - civil-liberties
+    - foia
+    - intervention-type
+  clusters:
+    - governance
+    - governance
+  relatedEntries:
+    - id: 7DpEvy5wQr
+      type: organization
+      relationship: related
+    - id: yTlRworV1V
+      type: organization
+      relationship: related
+    - id: xxHyEDGp4Y
+      type: organization
+      relationship: related
+    - id: H4tplAyDRX
+      type: organization
+      relationship: related
+    - id: Ygxw8JVW8X
+      type: organization
+      relationship: related
+  sources:
+    - title: Democracy Forward FOIA AI Lawsuit
+      url: https://democracyforward.org/updates/foia-ai-lawsuit/
+    - title: ACLU v. NSA FOIA
+      url: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
+    - title: DOJ AI Litigation Task Force
+      url: https://www.justice.gov/ag/media/1422986/dl?inline=
+  lastUpdated: 2026-03
+
+- id: ai-policy-lobbying
+  stableId: RQVmYNQrbD
+  type: approach
+  title: AI Safety Policy Lobbying
+  description: >-
+    Direct engagement with legislators and executive branch officials to shape AI regulation
+    and safety policy. Spans the spectrum from EA-aligned catastrophic risk prevention to
+    broader AI accountability advocacy. Key organizations operate in two clusters. The AI
+    safety / longtermist cluster includes Americans for Responsible Innovation (bipartisan
+    congressional lobbying, EA-funded), AI Policy Institute (public opinion polling + advocacy),
+    Center for AI Policy (shut down May 2025, \$484K total lobbying spend), CAIS Action Fund
+    (translating technical safety research to policy), and IAPS (fellowship pipeline). The
+    broader AI accountability cluster includes Access Now (led 110+ org EU AI Act coalition),
+    Encode Justice (youth-led advocacy to Congress/OSTP), and FLI (Pro-Human AI Declaration
+    with 150+ org coalition, EU AI Act advocacy). Lobbying effectiveness varies: direct
+    congressional engagement (ARI, CAIP) is high-touch but expensive per-contact; coalition
+    lobbying (Access Now, FLI) scales better internationally; public opinion campaigning (AIPI)
+    builds political cover for legislators. The collapse of CAIP due to funding suggests the
+    field is underfunded relative to industry lobbying. Verified lobbying data (Senate LDA,
+    2025): all six pro-safety orgs with federal filings combined spent roughly \$3.4M — less
+    than Meta spends in a single quarter (\$26.3M total 2025). 774 organizations lobbied on
+    AI in 2025, with 82% representing corporate interests. ARI is the largest pro-safety AI
+    lobbying spender at \$2.1M/year.
+  tags:
+    - lobbying
+    - policy-advocacy
+    - ai-safety
+    - intervention-type
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: IFjdCevnFg
+      type: organization
+      relationship: related
+    - id: w7mwNxGtCQ
+      type: organization
+      relationship: related
+    - id: V3NJg9djng
+      type: organization
+      relationship: related
+    - id: 0HsrqIftUg
+      type: organization
+      relationship: related
+    - id: NI4hqOL33A
+      type: organization
+      relationship: related
+    - id: DHWH2M0Ega
+      type: organization
+      relationship: related
+    - id: etCe7rcH1g
+      type: organization
+      relationship: related
+    - id: d9sWZtyVwg
+      type: organization
+      relationship: related
+  sources:
+    - title: OpenSecrets - Center for AI Policy
+      url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
+    - title: ARI About
+      url: https://ari.us/about-us/
+  lastUpdated: 2026-03
+
+- id: grassroots-ai-activism
+  stableId: 6mDLLUdlQb
+  type: approach
+  title: Grassroots AI Safety and Democracy Activism
+  description: >-
+    Bottom-up movements mobilizing public concern about AI into organized political action.
+    Includes protest movements (PauseAI, with groups in 30+ cities), youth-led advocacy
+    (Encode Justice, 600 members in 40 countries), narrative-shaping organizations (Center
+    for Humane Technology, "Your Undivided Attention" podcast), and cross-partisan coalition
+    building (FLI's Pro-Human AI Declaration, signed by groups ranging from AFL-CIO to
+    Congress of Christian Leaders, with individual signatories including Steve Bannon and Ralph
+    Nader). Also includes Humans First (CAIS-incubated bipartisan anti-AI-replacement campaign,
+    though contested as astroturf by some critics). Mozilla's Democracy x AI Cohort (\$50K per
+    project, 10 projects) represents funder investment in grassroots AI-democracy tools. FLI
+    polling (Feb 2026, n=1,004) showed overwhelming public preference for "pro-human" AI
+    approach over minimal regulation, suggesting grassroots campaigning has a receptive audience.
+    Primary strengths: political cover for legislators, bipartisan framing, media attention.
+    Primary weakness: limited policy specificity, risk of being outspent by industry campaigns.
+  tags:
+    - grassroots
+    - activism
+    - public-opinion
+    - coalition-building
+    - intervention-type
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: qtXe9VykMz
+      type: organization
+      relationship: related
+    - id: etCe7rcH1g
+      type: organization
+      relationship: related
+    - id: m9jtyXlqXT
+      type: organization
+      relationship: related
+    - id: d9sWZtyVwg
+      type: organization
+      relationship: related
+    - id: DK0GbGg7Kf
+      type: organization
+      relationship: supports
+  sources:
+    - title: FLI Pro-Human AI Declaration
+      url: https://humanstatement.org/
+    - title: Mozilla Democracy x AI Cohort
+      url: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
+  lastUpdated: 2026-03
+
+- id: ai-governance-research
+  stableId: jjCh8xw39l
+  type: approach
+  title: AI Governance Research and Analysis
+  description: >-
+    Academic and think tank research informing AI policy development. Ranges from technical
+    governance (compute governance, hardware-enabled mechanisms) to political-institutional
+    analysis (state capacity, regulatory design) to rights-based frameworks (algorithmic
+    accountability, AI and human rights). Key institutions by focus: Technical governance —
+    GovAI (compute governance, international strategy), IAPS (frontier security, fellowship
+    pipeline). Rights and accountability — AI Now Institute (power concentration, annual
+    landscape reports), AlgorithmWatch (algorithmic accountability journalism, EU focus),
+    Algorithmic Justice League (bias auditing, TSA facial recognition). Policy design —
+    Brennan Center (AI legislation tracking across all states, democracy and AI agenda),
+    Brookings AI (most-cited DC think tank on AI policy), RAND (defense and national security
+    AI), Carnegie AI (international affairs and AI geopolitics), Stanford HAI (AI Index,
+    200+ affiliated faculty). CDT bridges research and advocacy via its AI Governance Lab.
+    Research effectiveness depends on translation to policy — GovAI and Brennan Center have
+    among the highest cited-by-policymakers ratios in the field.
+  tags:
+    - research
+    - think-tank
+    - governance-design
+    - intervention-type
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: XLLyzaEaCA
+      type: organization
+      relationship: related
+    - id: NI4hqOL33A
+      type: organization
+      relationship: related
+    - id: VJacG0VE2w
+      type: organization
+      relationship: related
+    - id: hyxooEhMZl
+      type: organization
+      relationship: related
+    - id: UyAH46sPFN
+      type: organization
+      relationship: related
+    - id: 2KkS7mnw7K
+      type: organization
+      relationship: related
+    - id: XkqcWk46oQ
+      type: organization
+      relationship: related
+  sources:
+    - title: Brennan Center AI Legislation Tracker
+      url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+    - title: GovAI Website
+      url: https://governance.ai
+  lastUpdated: 2026-03
+
+- id: government-ai-monitoring
+  stableId: bidMivQo1W
+  type: approach
+  title: Government AI Use Monitoring
+  description: >-
+    Systematic tracking and transparency efforts focused on how governments deploy AI systems,
+    particularly for surveillance, enforcement, and decision-making that affects citizens'
+    rights. Became critically important in 2025-2026 as the Trump administration rapidly
+    expanded government AI use (nearly 3,000 AI use cases across 29 agencies in 2025, a 75%
+    increase over 2024). Key practitioners: Revolving Door Project (comprehensive "Tracking
+    Uses of AI in the Trump Administration" tracker covering DOGE AI, CMS Medicare AI, ICE
+    surveillance, State Department visa AI), Freedom House (Freedom on the Net annual reports,
+    15th consecutive year of internet freedom decline; specific reporting on AI-enabled
+    immigration enforcement), Brennan Center (policing and technology program, AI and national
+    security research series), and Tech Oversight Project (rapid-response media campaigns on
+    tech accountability). FOIA litigation (Democracy Forward, ACLU) serves as an enforcement
+    mechanism when voluntary transparency fails. The Revolving Door Project tracker is currently
+    the most comprehensive single-source inventory of government AI deployments. State-level
+    monitoring is thinner — the Brennan Center tracker covers state legislation but not state
+    government AI deployments.
+  tags:
+    - government-monitoring
+    - transparency
+    - surveillance
+    - accountability
+    - intervention-type
+  clusters:
+    - governance
+    - governance
+  relatedEntries:
+    - id: mY8BbBqKFc
+      type: organization
+      relationship: related
+    - id: pFJhncfgor
+      type: organization
+      relationship: related
+    - id: 2KkS7mnw7K
+      type: organization
+      relationship: related
+    - id: inudUfk9Ix
+      type: organization
+      relationship: related
+    - id: yTlRworV1V
+      type: organization
+      relationship: supports
+  sources:
+    - title: Revolving Door Project AI Tracker
+      url: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
+    - title: Freedom on the Net 2025
+      url: https://freedomhouse.org/country/united-states/freedom-net/2025
+  lastUpdated: 2026-03

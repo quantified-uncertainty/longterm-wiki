@@ -26,3 +26,49 @@ facts:
     value: https://www.governance.ai
     source: https://www.wikidata.org/wiki/Q116455360
     notes: From Wikidata Q116455360
+
+  - id: f_govai_op_2023
+    property: grant-received
+    value: "2800000"
+    unit: USD
+    asOf: 2023
+    source: https://www.openphilanthropy.org/grants/centre-for-the-governance-of-ai-general-support-2/
+    notes: "Open Philanthropy general support grant, 2023. Original URL now redirects to coefficientgiving.org."
+
+  - id: f_govai_op_2024
+    property: grant-received
+    value: "2500000"
+    unit: USD
+    asOf: 2024
+    source: https://www.openphilanthropy.org/grants/govai-general-support-2024/
+    notes: "Open Philanthropy general support grant, 2024"
+
+  - id: f_govai_op_2025
+    property: grant-received
+    value: "2995207"
+    unit: USD
+    asOf: 2025-02
+    source: https://www.openphilanthropy.org/grants/govai-general-support-february-2025/
+    notes: "Open Philanthropy general support grant, February 2025"
+
+  - id: f_govai_sff_2025
+    property: grant-received
+    value: "756000"
+    unit: USD
+    asOf: 2025
+    source: https://survivalandflourishing.fund/2025/recommendations
+    notes: "SFF 2025 grant for general support"
+
+  - id: f_govai_compute_paper
+    property: publication
+    value: "Computing Power and the Governance of Artificial Intelligence — argues compute is the most governable AI pillar, proposes international monitoring mechanisms"
+    asOf: 2024-02
+    source: https://arxiv.org/abs/2402.08797
+    notes: "By Sastry, Heim, Anderljung et al. (19 co-authors)"
+
+  - id: f_govai_frontier_reg
+    property: publication
+    value: "Frontier AI Regulation: Managing Emerging Risks to Public Safety — proposes three regulatory building blocks: standards, registration/reporting, compliance mechanisms"
+    asOf: 2023-07
+    source: https://arxiv.org/abs/2307.03718
+    notes: "By Anderljung et al. (24 co-authors)"
