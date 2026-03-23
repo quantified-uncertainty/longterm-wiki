@@ -6262,7 +6262,7 @@
     - research
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: AI Now Institute About
       url: https://ainowinstitute.org/about
@@ -7282,7 +7282,7 @@
     - digital-rights
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: ACLU Website
       url: https://www.aclu.org
@@ -7321,7 +7321,7 @@
     - privacy
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: EFF Website
       url: https://www.eff.org
@@ -7360,7 +7360,7 @@
     - policy-advocacy
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: Brennan Center Website
       url: https://www.brennancenter.org
@@ -7394,7 +7394,7 @@
     - digital-rights
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: EPIC Website
       url: https://epic.org
@@ -7429,7 +7429,7 @@
     - surveillance
     - policy-advocacy
   clusters:
-    - democracy-defense
+    - governance
   sources:
     - title: Protect Democracy Website
       url: https://protectdemocracy.org
@@ -7463,7 +7463,7 @@
     - foia
     - government-accountability
   clusters:
-    - democracy-defense
+    - governance
   sources:
     - title: Democracy Forward Website
       url: https://democracyforward.org
@@ -7532,7 +7532,7 @@
     - international
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: Freedom House Website
       url: https://freedomhouse.org
@@ -7566,7 +7566,7 @@
     - trustworthy-ai
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: Mozilla Foundation Website
       url: https://www.mozillafoundation.org
@@ -7599,7 +7599,7 @@
     - surveillance
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: Access Now Website
       url: https://www.accessnow.org
@@ -7664,7 +7664,7 @@
     - civil-rights
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: AJL Website
       url: https://www.ajl.org
@@ -7724,7 +7724,7 @@
     - trump-administration
     - investigative-research
   clusters:
-    - democracy-defense
+    - governance
   sources:
     - title: Revolving Door Project Website
       url: https://therevolvingdoorproject.org
@@ -7756,7 +7756,7 @@
     - antitrust
   clusters:
     - governance
-    - democracy-defense
+    - governance
   sources:
     - title: Tech Oversight Project Website
       url: https://techoversight.org

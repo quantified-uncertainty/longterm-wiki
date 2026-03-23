@@ -6426,7 +6426,7 @@
     - foia
     - intervention-type
   clusters:
-    - democracy-defense
+    - governance
     - governance
   relatedEntries:
     - id: 7DpEvy5wQr
@@ -6542,7 +6542,7 @@
     - intervention-type
   clusters:
     - ai-safety
-    - democracy-defense
+    - governance
   relatedEntries:
     - id: qtXe9VykMz
       type: organization
@@ -6649,7 +6649,7 @@
     - accountability
     - intervention-type
   clusters:
-    - democracy-defense
+    - governance
     - governance
   relatedEntries:
     - id: mY8BbBqKFc
