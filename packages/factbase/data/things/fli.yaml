@@ -65,21 +65,21 @@ facts:
 
   - id: f_fli_eu_lobbying
     property: lobbying-spend
-    value: "273176"
+    value: "446619"
     unit: EUR
     asOf: 2024
     source: https://www.lobbyfacts.eu/datacard/future-of-life-institute?rid=787064543128-10
-    notes: "EU advocacy spend (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
+    notes: "EU advocacy spend EUR 446,619 (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
 
   - id: f_fli_pro_human_declaration
     property: campaign
-    value: "Pro-Human AI Declaration (March 2026): 5 pillars, 40+ signatory organizations (AFL-CIO to Congress of Christian Leaders), individual signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph Nader"
+    value: "Pro-Human AI Declaration (March 2026): 5 pillars, 150+ signatory organizations (AFL-CIO to Congress of Christian Leaders), individual signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph Nader"
     asOf: 2026-03
     source: https://humanstatement.org/
 
   - id: f_fli_superintelligence_statement
     property: campaign
-    value: "Superintelligence Prohibition Statement (October 2025): calls for prohibition on superintelligence development until 'broad scientific consensus on safety'; 800+ signatories including Geoffrey Hinton, Yoshua Bengio, Steve Wozniak"
+    value: "Superintelligence Prohibition Statement (October 2025): calls for prohibition on superintelligence development until 'broad scientific consensus on safety'; 69,000+ signatories including Geoffrey Hinton, Yoshua Bengio, Steve Wozniak"
     asOf: 2025-10
     source: https://superintelligence-statement.org/
 

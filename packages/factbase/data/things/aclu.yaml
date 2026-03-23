@@ -34,11 +34,11 @@ facts:
     notes: "Filed April 2024 after NSA failed to release records on AI use in spy programs"
 
   - id: f_aclu_doge_lawsuit
-    property: litigation
-    value: "Sued Social Security Administration and VA over DOGE unrestricted access to sensitive personal data"
+    property: foia-campaign
+    value: "Filed FOIA requests with 40+ federal agencies (including SSA, VA, OPM) seeking records on DOGE's unrestricted access to databases containing PII, financial, and healthcare data"
     asOf: 2025
     source: https://www.aclu.org/press-releases/aclu-seeks-records-on-doges-unrestricted-access-to-americans-data-urges-congress-to-step-up
-    notes: "FOIA requests and litigation challenging DOGE data access"
+    notes: "FOIA requests to 40+ agencies plus letters to Congress"
 
   - id: f_aclu_trump_eo_opposition
     property: policy-position

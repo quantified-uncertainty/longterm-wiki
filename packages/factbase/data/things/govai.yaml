@@ -29,11 +29,11 @@ facts:
 
   - id: f_govai_op_2023
     property: grant-received
-    value: "3000000"
+    value: "2800000"
     unit: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/centre-for-the-governance-of-ai-general-support-2/
-    notes: "Open Philanthropy general support grant, 2023"
+    notes: "Open Philanthropy general support grant, 2023. Original URL now redirects to coefficientgiving.org."
 
   - id: f_govai_op_2024
     property: grant-received

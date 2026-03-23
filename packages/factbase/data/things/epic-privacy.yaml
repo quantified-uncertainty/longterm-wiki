@@ -18,8 +18,8 @@ facts:
     source: https://epic.org/about/
 
   - id: f_epic_ai_project
-    property: project
-    value: "AI & Human Rights Project — advocates for transparent, equitable AI regulation through litigation, FOIA requests, legislative advocacy, and comments to decision-makers"
+    property: program
+    value: "AI & Human Rights Program — advocates for transparent, equitable AI regulation through litigation, FOIA requests, legislative advocacy, and comments to decision-makers"
     asOf: 2026-03
     source: https://epic.org/issues/ai/
 

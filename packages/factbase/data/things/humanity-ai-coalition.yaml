@@ -16,9 +16,10 @@ facts:
 
   - id: f_hai_co_chairs
     property: governance
-    value: "Co-chaired by Omidyar Network and MacArthur Foundation"
+    value: "Jointly led by Omidyar Network and MacArthur Foundation"
     asOf: 2025
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+    notes: "Both organizations' presidents featured prominently; source does not use formal 'co-chair' designation"
 
   - id: f_hai_members
     property: founding-members
