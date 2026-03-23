@@ -33,6 +33,7 @@ interface CommandOptions extends BaseOptions {
   format?: string;
   ci?: boolean;
   dryRun?: boolean;
+  skipEntityValidation?: boolean;
   fix?: boolean;
   max?: string;
   budget?: string;
@@ -182,7 +183,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 1, output: 'Usage: crux tb tablebase submit --table=<table> --records-file=<path>\n       echo \'[...]\' | crux tb tablebase submit --table=<table>' };
   }
 
-  const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'];
+  const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'publications'];
   if (!validTables.includes(table)) {
     return { exitCode: 1, output: `Invalid table: ${table}. Valid: ${validTables.join(', ')}` };
   }
@@ -240,8 +241,11 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   const tableConfig = getTableConfig(table);
   if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
 
+  const syncPath = options.skipEntityValidation
+    ? `${tableConfig.syncPath}?skipEntityValidation=true`
+    : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    tableConfig.syncMethod, tableConfig.syncPath, { [tableConfig.syncBodyKey]: records },
+    tableConfig.syncMethod, syncPath, { [tableConfig.syncBodyKey]: records },
   );
 
   if (!result.ok) {
