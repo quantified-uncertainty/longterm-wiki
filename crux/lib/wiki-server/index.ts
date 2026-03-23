@@ -216,3 +216,10 @@ export {
   isConfigured as isIdServerConfigured,
 } from './ids.ts';
 export type { AllocatedId, IdListResult } from './ids.ts';
+
+// Source Checks
+export {
+  getVerdictsByType,
+  getContradictedEntityIds,
+} from './source-checks.ts';
+export type { VerdictEntry, VerdictsResponse } from './source-checks.ts';

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
+import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
 import {
@@ -119,10 +121,13 @@ export default function FundingRoundsPage() {
                   Lead Investor
                 </th>
                 <th className="text-center py-2.5 px-3 font-medium">Date</th>
+                <th className="text-center py-2.5 px-3 font-medium">Verified</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
-              {rows.map((row) => (
+              {rows.map((row) => {
+                const verdict = getRecordVerdict("funding-round", String(row.key));
+                return (
                 <tr
                   key={row.key}
                   className="hover:bg-muted/20 transition-colors"
@@ -187,8 +192,12 @@ export default function FundingRoundsPage() {
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                     {row.date ? formatKBDate(row.date) : ""}
                   </td>
+                  <td className="py-2 px-3 text-center">
+                    <SourceCheckBadge verdict={verdict} />
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
