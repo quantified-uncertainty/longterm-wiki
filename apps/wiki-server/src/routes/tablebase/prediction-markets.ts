@@ -483,19 +483,17 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       // Uses a single UPDATE...FROM subquery instead of N+1 sequential queries.
       const questionIds = [...new Set(items.map((i) => i.questionId))];
       if (questionIds.length > 0) {
-        await tx.execute(sql`
-          UPDATE prediction_market_questions q
-          SET current_probability = sub.probability,
-              updated_at = now()
-          FROM (
-            SELECT DISTINCT ON (question_id)
-              question_id, probability
-            FROM prediction_market_snapshots
-            WHERE question_id = ANY(${questionIds})
-            ORDER BY question_id, date DESC
-          ) sub
-          WHERE q.id = sub.question_id
-        `);
+        await tx
+          .update(predictionMarketQuestions)
+          .set({
+            currentProbability: sql`(
+              SELECT probability FROM prediction_market_snapshots
+              WHERE question_id = ${predictionMarketQuestions.id}
+              ORDER BY date DESC LIMIT 1
+            )`,
+            updatedAt: sql`now()`,
+          })
+          .where(inArray(predictionMarketQuestions.id, questionIds));
       }
     });
 
