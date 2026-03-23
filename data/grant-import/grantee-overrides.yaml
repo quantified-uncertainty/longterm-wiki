@@ -446,3 +446,16 @@ overrides:
   "Lindus Health / University of Oxford": "university-of-oxford"
   "Heriot-Watt University / University of Strathclyde": "heriot-watt-university"
   "Zeroth Research / Fondazione Bruno Kessler": "zeroth-research"
+
+  # --- SFF unmatched grantees ---
+  "AI Policy Institute (AIPI)": "ai-policy-institute"
+  "Principles of Intelligent Behavior in Biological and Social Systems (PIBBSS)": "pibbss"
+  "PIBBSS": "pibbss"
+
+  # --- EA Funds unmatched grantees ---
+  "Against Malaria Foundation (AMF)": "against-malaria-foundation"
+  "Malaria Consortium - 8/25/2022": "malaria-consortium"
+  "The Humane League UK (THL UK)": "humane-league"
+
+  # --- Vipul Naik large foundation grantees ---
+  "University of California at Berkeley": "uc-berkeley"

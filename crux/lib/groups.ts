@@ -62,6 +62,7 @@ export const GROUPS: Record<string, GroupDef> = {
     description: 'FactBase — structured facts with temporal data & provenance',
     domains: [
       'factbase',
+      'wikidata-enrich',
     ],
     flattened: ['factbase'],
   },

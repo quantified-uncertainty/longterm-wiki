@@ -2988,3 +2988,15 @@
     - ai-safety
     - formal-verification
 
+- id: vitalik-buterin
+  stableId: iEEm0cZ3tn
+  type: person
+  title: Vitalik Buterin
+  description: >-
+    Co-founder of Ethereum and major philanthropic donor. Has given over
+    \$1.5B to charity including MIRI, SENS Research Foundation, GiveDirectly,
+    and various EA-aligned organizations.
+  tags:
+    - crypto
+    - effective-altruism
+    - philanthropy

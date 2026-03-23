@@ -6645,3 +6645,142 @@
     - law-as-code
     - academic
   lastUpdated: 2026-03
+
+# --- New funder organizations (Vipul Naik multi-donor import) ---
+- id: sloan-foundation
+  stableId: lI8DgWtPyD
+  type: organization
+  orgType: funder
+  title: Alfred P. Sloan Foundation
+  website: https://sloan.org
+  description: >-
+    Philanthropic nonprofit founded in 1934 by Alfred P. Sloan Jr. Makes grants
+    in science, technology, engineering, mathematics, and economics.
+  lastUpdated: 2026-03
+
+- id: thiel-foundation
+  stableId: 0SkH1jbTRu
+  type: organization
+  orgType: funder
+  title: Thiel Foundation
+  website: https://thielfoundation.org
+  description: >-
+    Foundation created by Peter Thiel supporting science, technology, and
+    long-term thinking. Best known for the Thiel Fellowship.
+  lastUpdated: 2026-03
+
+- id: knight-foundation
+  stableId: BAGFs8P6WP
+  type: organization
+  orgType: funder
+  title: John S. and James L. Knight Foundation
+  website: https://knightfoundation.org
+  description: >-
+    Major US foundation focused on journalism, media, and informed communities.
+  lastUpdated: 2026-03
+
+- id: kellogg-foundation
+  stableId: 1SqvvamQqq
+  type: organization
+  orgType: funder
+  title: W. K. Kellogg Foundation
+  website: https://www.wkkf.org
+  description: >-
+    One of the largest philanthropic foundations in the US, founded in 1930.
+    Focuses on children, families, and communities.
+  lastUpdated: 2026-03
+
+- id: pineapple-fund
+  stableId: wTnEjSfIeP
+  type: organization
+  orgType: funder
+  title: Pineapple Fund
+  website: https://pineapplefund.org
+  description: >-
+    Charitable fund created in 2017 by an anonymous Bitcoin donor who donated
+    5,057 BTC (approximately \$55M) to various charities.
+  lastUpdated: 2026-03
+
+- id: google-org
+  stableId: J2DYTkMiRA
+  type: organization
+  orgType: funder
+  title: Google.org
+  website: https://www.google.org
+  description: >-
+    Google's philanthropic arm providing over \$100M annually in grants.
+  lastUpdated: 2026-03
+
+- id: lilly-endowment
+  stableId: kxVSuuHN7j
+  type: organization
+  orgType: funder
+  title: Lilly Endowment
+  website: https://lillyendowment.org
+  description: >-
+    Private philanthropic foundation in Indianapolis created in 1937. One of the
+    largest private foundations in the US.
+  lastUpdated: 2026-03
+
+- id: mellon-foundation
+  stableId: MIie9_9BSq
+  type: organization
+  orgType: funder
+  title: Andrew W. Mellon Foundation
+  website: https://mellon.org
+  description: >-
+    Major US foundation supporting arts, culture, higher education, and humanities.
+  lastUpdated: 2026-03
+
+- id: walton-family-foundation
+  stableId: gk4_-AGcTd
+  type: organization
+  orgType: funder
+  title: Walton Family Foundation
+  website: https://www.waltonfamilyfoundation.org
+  description: >-
+    Foundation established by Walmart founders Sam and Helen Walton. Focuses on
+    K-12 education reform, environmental conservation, and community development.
+  lastUpdated: 2026-03
+
+- id: barr-foundation
+  stableId: RfxfdsVA3R
+  type: organization
+  orgType: funder
+  title: Barr Foundation
+  website: https://www.barrfoundation.org
+  description: >-
+    Private foundation based in Boston focusing on climate, education, and arts.
+  lastUpdated: 2026-03
+
+- id: sandler-foundation
+  stableId: EPY-YnX6K8
+  type: organization
+  orgType: funder
+  title: Sandler Foundation
+  website: https://www.sandlerfoundation.org
+  description: >-
+    San Francisco-based foundation supporting scientific research, civil liberties,
+    human rights, and economic equality.
+  lastUpdated: 2026-03
+
+- id: surdna-foundation
+  stableId: 6wJ85FrPfi
+  type: organization
+  orgType: funder
+  title: Surdna Foundation
+  website: https://www.surdna.org
+  description: >-
+    Family foundation established in 1917 focused on sustainable environments,
+    strong local economies, and thriving cultures.
+  lastUpdated: 2026-03
+
+- id: donorstrust
+  stableId: rY6Rdleg5f
+  type: organization
+  orgType: funder
+  title: DonorsTrust
+  website: https://www.donorstrust.org
+  description: >-
+    Donor-advised fund specializing in libertarian and free-market causes.
+  lastUpdated: 2026-03
