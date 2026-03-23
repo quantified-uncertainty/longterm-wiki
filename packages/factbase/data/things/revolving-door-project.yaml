@@ -1,0 +1,30 @@
+entity: mY8BbBqKFc
+facts:
+  - id: f_rdp_hq
+    property: headquarters
+    value: "Washington, DC"
+    source: https://therevolvingdoorproject.org
+
+  - id: f_rdp_leadership
+    property: leadership
+    value: "Jeff Hauser serves as Executive Director"
+    asOf: 2026-03
+    source: https://therevolvingdoorproject.org
+
+  - id: f_rdp_structure
+    property: legal-structure
+    value: "Project of the Goodnation Foundation"
+    source: https://www.influencewatch.org/organization/revolving-door-project/
+
+  - id: f_rdp_ai_tracker
+    property: project
+    value: "Tracking Uses of AI in the Trump Administration — documents AI replacing federal workers, CMS AI-powered Medicare preapprovals, State Department 'Catch and Revoke' AI surveillance, ICE AI license plate scanning, DOE AI data center siting"
+    asOf: 2026-03
+    source: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
+
+  - id: f_rdp_fed_workers
+    property: statistic
+    value: "148,000+ federal employees lost since Trump took office"
+    asOf: 2026-03
+    source: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
+    notes: "Figure from their tracker; includes AI-driven workforce reductions"

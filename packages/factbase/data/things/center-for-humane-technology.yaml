@@ -1,0 +1,33 @@
+entity: m9jtyXlqXT
+facts:
+  - id: f_cht_founded
+    property: founded-date
+    value: "2018"
+    source: https://www.humanetech.com
+    notes: "Co-founded in 2018 by Tristan Harris and Aza Raskin; groundwork from 2013"
+
+  - id: f_cht_hq
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://www.humanetech.com
+
+  - id: f_cht_revenue
+    property: annual-revenue
+    value: "1800000"
+    unit: USD
+    asOf: 2025
+    source: https://www.humanetech.com
+    notes: "Approximately $1.8M annual revenue"
+
+  - id: f_cht_staff
+    property: employee-count
+    value: "25"
+    asOf: 2025
+    source: https://www.humanetech.com
+    notes: "25-28 employees across 3 continents"
+
+  - id: f_cht_pro_human
+    property: coalition-membership
+    value: "Signatory of FLI Pro-Human AI Declaration (March 2026)"
+    asOf: 2026-03
+    source: https://humanstatement.org/

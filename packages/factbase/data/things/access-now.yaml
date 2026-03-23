@@ -1,0 +1,32 @@
+entity: DHWH2M0Ega
+facts:
+  - id: f_an_founded
+    property: founded-date
+    value: "2009"
+    source: https://www.accessnow.org/about-us/
+    notes: "Founded 2009"
+
+  - id: f_an_hq
+    property: headquarters
+    value: "New York, NY"
+    source: https://www.accessnow.org/about-us/
+
+  - id: f_an_revenue
+    property: annual-revenue
+    value: "15000000"
+    unit: USD
+    asOf: 2025
+    source: https://en.wikipedia.org/wiki/Access_Now
+    notes: "Approximately $15M annual revenue"
+
+  - id: f_an_leadership
+    property: leadership
+    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett Solomon who served 2009-2024)"
+    asOf: 2025
+    source: https://www.accessnow.org/about-us/
+
+  - id: f_an_eu_ai_act
+    property: campaign
+    value: "Led coalition of 110+ civil society organizations in EU AI Act advocacy on transparency safeguards"
+    asOf: 2024
+    source: https://www.accessnow.org/ai-and-human-rights/

@@ -1,0 +1,33 @@
+entity: 7WxlhX0LBn
+facts:
+  - id: f_hai_launched
+    property: founded-date
+    value: "2025-08-14"
+    source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+    notes: "Launched August 14, 2025"
+
+  - id: f_hai_total_commitment
+    property: total-funding
+    value: "500000000"
+    unit: USD
+    asOf: 2025-08
+    source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+    notes: "$500M over 5 years"
+
+  - id: f_hai_co_chairs
+    property: governance
+    value: "Co-chaired by Omidyar Network and MacArthur Foundation"
+    asOf: 2025
+    source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
+
+  - id: f_hai_members
+    property: founding-members
+    value: "Doris Duke Foundation, Ford Foundation, Lumina Foundation, Kapor Foundation, Mellon Foundation, Mozilla Foundation, Siegel Family Endowment, David and Lucile Packard Foundation"
+    asOf: 2025-08
+    source: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
+
+  - id: f_hai_focus_areas
+    property: focus-areas
+    value: "Democracy, education, humanities and culture, labor and economy, security"
+    asOf: 2025
+    source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
