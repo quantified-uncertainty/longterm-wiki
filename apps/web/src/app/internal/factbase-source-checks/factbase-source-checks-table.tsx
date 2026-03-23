@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import type { ColumnDef, ExpandedState } from "@tanstack/react-table";
 import {
   useReactTable,
@@ -356,17 +356,23 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
   const [filterVerdict, setFilterVerdict] = useState<string>("all");
   const [detailCache, setDetailCache] = useState<DetailCache>({});
 
-  // Compute unique verdicts for filter buttons
-  const verdictCounts = new Map<string, number>();
-  for (const row of data) {
-    verdictCounts.set(row.verdict, (verdictCounts.get(row.verdict) ?? 0) + 1);
-  }
-  const verdictTypes = [...verdictCounts.keys()].sort();
+  // Memoize to keep stable references — unstable `data` passed to useReactTable
+  // triggers autoResetPageIndex on every render, causing an infinite loop.
+  const { verdictCounts, verdictTypes } = useMemo(() => {
+    const vc = new Map<string, number>();
+    for (const row of data) {
+      vc.set(row.verdict, (vc.get(row.verdict) ?? 0) + 1);
+    }
+    return { verdictCounts: vc, verdictTypes: [...vc.keys()].sort() };
+  }, [data]);
 
-  const filtered =
-    filterVerdict === "all"
-      ? data
-      : data.filter((d) => d.verdict === filterVerdict);
+  const filtered = useMemo(
+    () =>
+      filterVerdict === "all"
+        ? data
+        : data.filter((d) => d.verdict === filterVerdict),
+    [data, filterVerdict]
+  );
 
   // Table state
   const [sorting, setSorting] = useState<SortingState>([
@@ -408,6 +414,8 @@ export function FactBaseSourceChecksTable({ data }: { data: VerdictRow[] }) {
       expanded,
       pagination,
     },
+    autoResetPageIndex: false,
+    autoResetExpanded: false,
   });
 
   const fetchDetail = useCallback(

@@ -399,19 +399,29 @@ export function EntitySourceChecksViewer() {
     })();
   }, []);
 
-  // Compute filter options from data
-  const typeCounts = new Map<string, number>();
-  const verdictCounts = new Map<string, number>();
-  for (const v of verdicts) {
-    typeCounts.set(v.recordType, (typeCounts.get(v.recordType) ?? 0) + 1);
-    verdictCounts.set(v.verdict, (verdictCounts.get(v.verdict) ?? 0) + 1);
-  }
+  // Memoize filter options and filtered data to keep stable references.
+  // Without memoization, `filtered` is a new array every render, which
+  // TanStack Table treats as a data change — triggering autoResetPageIndex
+  // on every render and causing an infinite re-render loop that freezes the page.
+  const { typeCounts, verdictCounts } = useMemo(() => {
+    const tc = new Map<string, number>();
+    const vc = new Map<string, number>();
+    for (const v of verdicts) {
+      tc.set(v.recordType, (tc.get(v.recordType) ?? 0) + 1);
+      vc.set(v.verdict, (vc.get(v.verdict) ?? 0) + 1);
+    }
+    return { typeCounts: tc, verdictCounts: vc };
+  }, [verdicts]);
 
-  const filtered = verdicts.filter((v) => {
-    if (filterType !== "all" && v.recordType !== filterType) return false;
-    if (filterVerdict !== "all" && v.verdict !== filterVerdict) return false;
-    return true;
-  });
+  const filtered = useMemo(
+    () =>
+      verdicts.filter((v) => {
+        if (filterType !== "all" && v.recordType !== filterType) return false;
+        if (filterVerdict !== "all" && v.verdict !== filterVerdict) return false;
+        return true;
+      }),
+    [verdicts, filterType, filterVerdict]
+  );
 
   // Memoize columns so they update when record names are resolved
   const columns = useMemo(() => buildColumns(recordNames), [recordNames]);
@@ -441,6 +451,11 @@ export function EntitySourceChecksViewer() {
     onPaginationChange: setPagination,
     globalFilterFn: "includesString",
     state: { sorting, globalFilter, expanded, pagination },
+    // Disable auto-resets — this component manages pagination reset
+    // explicitly via its own useEffect. Without this, any state change
+    // could trigger auto-resets that fight with controlled state.
+    autoResetPageIndex: false,
+    autoResetExpanded: false,
   });
 
   const fetchDetail = useCallback(async (recordType: string, recordId: string) => {
