@@ -514,7 +514,20 @@ async function main() {
   // =========================================================================
   // ID REGISTRY — derive from wikiId fields in source files (YAML + MDX)
   // =========================================================================
-  const { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId: nextIdInit } = buildIdRegistry(entities);
+  // Pre-scan MDX frontmatter for wikiIds so auto-assignment skips page-claimed IDs
+  const reservedPageIds = new Set();
+  function scanMdxWikiIds(dir) {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) { scanMdxWikiIds(full); continue; }
+      if (!entry.name.endsWith('.mdx')) continue;
+      const raw = readFileSync(full, 'utf8');
+      const match = raw.match(/^wikiId:\s*(E\d+)/m);
+      if (match) reservedPageIds.add(match[1]);
+    }
+  }
+  scanMdxWikiIds(CONTENT_DIR);
+  const { slugToWikiId, wikiIdToSlug, byStableId, stableIdBySlug, nextId: nextIdInit } = buildIdRegistry(entities, reservedPageIds);
   let nextId = nextIdInit;
   // Build stableId → slug mapping from YAML entities (for entity resolution
   // in directory pages where ownerEntityId is a stableId rather than a slug)

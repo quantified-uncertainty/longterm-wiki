@@ -10,9 +10,10 @@
 /**
  * Build initial ID registry from entities.
  * @param {Array<{id: string, wikiId?: string, stableId?: string}>} entities
+ * @param {Set<string>} [reservedIds] - wikiIds to skip during auto-assignment (e.g., MDX page IDs)
  * @returns {{ slugToWikiId: Record<string, string>, wikiIdToSlug: Record<string, string>, byStableId: Record<string, string>, stableIdBySlug: Record<string, string>, nextId: number }}
  */
-export function buildIdRegistry(entities) {
+export function buildIdRegistry(entities, reservedIds) {
   const slugToWikiId = {};
   const wikiIdToSlug = {};
   const byStableId = {};
@@ -51,9 +52,12 @@ export function buildIdRegistry(entities) {
   }
 
   // Assign fallback IDs to entities without one (local dev only)
+  // Skip IDs reserved by MDX pages to avoid entity/page collisions
+  const reserved = reservedIds || new Set();
   let newAssignments = 0;
   for (const entity of entities) {
     if (!entity.wikiId) {
+      while (reserved.has(`E${nextId}`)) nextId++;
       const numId = `E${nextId}`;
       entity.wikiId = numId;
       wikiIdToSlug[numId] = entity.id;

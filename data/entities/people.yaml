@@ -472,12 +472,12 @@
   wikiId: E162
   type: person
   title: Ian Hogarth
-  description: Chair of the UK AI Safety Institute, AI investor, and author of influential writing on frontier AI risks.
+  description: AI investor and writer; former Chair of the UK AI Safety Institute (2023-2025).
   customFields:
     - label: Role
-      value: Chair
+      value: AI investor and writer; former Chair, UK AI Safety Institute
     - label: Known For
-      value: Leading UK AI Safety Institute, AI investor and writer
+      value: Former Chair of UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
   stableId: eYrBgMLJDw
   wikiId: E163
@@ -662,7 +662,7 @@
       type: person
   customFields:
     - label: Role
-      value: Professor of Philosophy, University of Oxford
+      value: Founder and Principal Researcher, Macrostrategy Research Initiative
     - label: Known For
       value: Superintelligence, existential risk research, simulation hypothesis
   sources:
@@ -2842,6 +2842,7 @@
 
 - id: gabriel-alfour
   stableId: n0d7I3OAej
+  wikiId: E2100
   type: person
   title: Gabriel Alfour
   description: >-

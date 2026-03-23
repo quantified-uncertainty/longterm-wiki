@@ -4,6 +4,7 @@ facts:
     property: employed-by
     value: !ref 18K3KG3bpg
     asOf: 2005-01
+    validEnd: 2024-04
     source: https://nickbostrom.com/
     notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI
       closed in April 2024"
@@ -12,9 +13,17 @@ facts:
     property: role
     value: "Professor of Philosophy, University of Oxford; Founder of FHI"
     asOf: 2005-01
+    validEnd: 2024-04
     source: https://nickbostrom.com/
     notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which
       catalyzed mainstream concern about AI existential risk"
+
+  - id: f_nBcurrentRole
+    property: role
+    value: "Founder and Principal Researcher, Macrostrategy Research Initiative"
+    asOf: 2024-05
+    source: https://nickbostrom.com/
+    notes: "Founded after FHI closure in April 2024"
 
   - id: f_YhxyxeHHdA
     property: born-year
