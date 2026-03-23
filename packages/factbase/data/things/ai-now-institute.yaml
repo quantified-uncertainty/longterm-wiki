@@ -127,11 +127,12 @@ facts:
     notes: "Funder of AI Now"
 
   - id: f_ainow_funder_macarthur
-    property: funder
-    value: "MacArthur Foundation"
-    asOf: 2023
-    source: https://ainowinstitute.org/about
-    notes: "$2M via Humanity AI initiative"
+    property: grant-received
+    value: "2000000"
+    unit: USD
+    asOf: 2026-02
+    source: https://www.macfound.org/press/press-releases/10-million-to-advance-ai-by-and-for-people
+    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security and AI"
 
   - id: f_ainow_funder_luminate
     property: funder

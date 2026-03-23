@@ -14,9 +14,9 @@ facts:
     value: https://governance.ai
   - id: 0zEc4GQdHQ
     property: founded-date
-    value: 2017-01
-    source: https://www.wikidata.org/wiki/Q116455360
-    notes: From Wikidata Q116455360
+    value: "2016"
+    source: https://www.governance.ai/about-us
+    notes: "Founded 2016 at Yale University as the Governance of AI Program by Allan Dafoe; moved to Oxford FHI in 2018"
   - id: CVcvM45M6Q
     property: country
     value: United Kingdom
@@ -99,11 +99,11 @@ facts:
   - id: f_govai_headcount
     property: headcount
     value:
-      - 15
-      - 20
+      - 40
+      - 45
     asOf: 2025
-    source: https://www.governance.ai/team
-    notes: "Estimated from team page; includes research staff, policy team, and operations"
+    source: https://www.governance.ai/people
+    notes: "~40-45 named team members on People page including leadership, senior researchers, research fellows, research scholars, and operations staff"
 
   - id: f_govai_fellowship
     property: program
@@ -136,3 +136,37 @@ facts:
     value: "Risk Thresholds for Frontier AI — proposes framework for when frontier AI capabilities warrant regulatory intervention"
     asOf: 2024
     source: https://arxiv.org/abs/2311.14368
+
+  - id: f_govai_uk_incorporation
+    property: legal-identifier
+    value: "UK Companies House #15883729 (Company Limited by Guarantee)"
+    asOf: 2024-08-07
+    source: https://find-and-update.company-information.service.gov.uk/company/15883729
+    notes: "GovAI UK formally incorporated August 7, 2024. Registered address: Third Floor, 20 Old Bailey, London, EC4M 7AN"
+
+  - id: f_govai_us_ein
+    property: legal-identifier
+    value: "US 501(c)(3) EIN: 99-4000294"
+    source: https://www.governance.ai/about-us
+    notes: "GovAI US entity is a 501(c)(3) nonprofit"
+
+  - id: f_govai_eu_lobbying
+    property: lobbying-spend
+    value: "EU Transparency Register ID: 644024391866-32"
+    asOf: 2024-05
+    source: https://www.lobbyfacts.eu/datacard/the-centre-for-the-governance-of-ai?rid=644024391866-32
+    notes: "Registered May 2024; 3 lobbyists / 1.1 FTE focused on EU AI Act Code of Practice"
+
+  - id: f_govai_total_op_funding
+    property: total-funding
+    value: "13300000"
+    unit: USD
+    asOf: 2025
+    source: https://www.openphilanthropy.org/grants/?q=govai
+    notes: "Total identified Open Philanthropy/Coefficient Giving funding ~$13.3M+ across multiple grants 2020-2025"
+
+  - id: f_govai_advisory_board
+    property: advisory-board
+    value: "Ajeya Cotra, Allan Dafoe, Helen Toner, Tasha McCauley, Toby Ord"
+    asOf: 2025
+    source: https://www.governance.ai/people

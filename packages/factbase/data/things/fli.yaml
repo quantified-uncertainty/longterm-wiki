@@ -91,10 +91,10 @@ facts:
 
   - id: f_fli_headcount
     property: headcount
-    value: "34"
-    asOf: 2024
-    source: https://futureoflife.org/about-us/
-    notes: "20+ full-time staff; total ~34 including fellows and part-time"
+    value: "29"
+    asOf: 2025
+    source: https://futureoflife.org/about-us/our-people/
+    notes: "29 named team members on People page: Policy (16), Futures (3), Communications (4), Operations & Grants (5), plus CEO"
 
   - id: f_fli_musk_donation
     property: grant-received
@@ -110,7 +110,7 @@ facts:
     unit: USD
     asOf: 2021
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
-    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Liquidated over time — actual cash realized likely lower."
+    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Buterin confirmed ~$500M was actually cashed out (March 2026). Majority transferred to a donor-advised fund."
 
   - id: f_fli_ein
     property: legal-identifier
@@ -118,13 +118,36 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "IRS 501(c)(3) nonprofit"
 
-  - id: f_fli_revenue_2022
+  - id: f_fli_revenue_2024
     property: revenue
-    value: "34200000"
+    value: "21273381"
     unit: USD
-    asOf: 2022
+    asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
-    notes: "From IRS Form 990. Includes investment gains from Buterin donation liquidation."
+    notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
+
+  - id: f_fli_expenses_2024
+    property: annual-expenses
+    value: "17399051"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
+
+  - id: f_fli_revenue_2021
+    property: revenue
+    value: "549531672"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
+
+  - id: f_fli_flare
+    property: subsidiary
+    value: "Future of Life Action and Research, Inc. (FLARE) — 501(c)(4) advocacy arm"
+    asOf: 2025
+    source: https://futureoflife.org/about-us/
+    notes: "Newer advocacy entity being established; enables political lobbying not allowed under 501(c)(3)"
 
   - id: f_fli_asilomar
     property: campaign

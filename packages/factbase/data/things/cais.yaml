@@ -60,21 +60,56 @@ facts:
     source: https://www.mlsafety.org/
     notes: "Key field-building program"
 
-  - id: f_cais_op_grant_2022
-    property: grant-received
-    value: "8000000"
+  - id: f_cais_revenue_2024
+    property: revenue
+    value: "10235085"
     unit: USD
-    asOf: 2022
-    source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support/
-    notes: "Open Philanthropy general support grant to CAIS, 2022"
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990. EIN: 88-1751310."
+
+  - id: f_cais_revenue_2023
+    property: revenue
+    value: "16089191"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990"
+
+  - id: f_cais_expenses_2024
+    property: annual-expenses
+    value: "7163607"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
 
   - id: f_cais_op_grant_2023
     property: grant-received
-    value: "4000000"
+    value: "8500000"
     unit: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/
     notes: "Open Philanthropy general support grant to CAIS, 2023"
+
+  - id: f_cais_sff_2024
+    property: grant-received
+    value: "2767000"
+    unit: USD
+    asOf: 2024
+    source: https://survivalandflourishing.fund/2024/recommendations
+    notes: "SFF 2024: $1,146K to CAIS Inc + $1,621K to CAIS Action Fund = $2,767K total"
+
+  - id: f_cais_hendrycks_salary
+    property: compensation
+    value: "Dan Hendrycks takes $1 annual salary as Executive Director"
+    asOf: 2025
+    source: https://safe.ai/about
+
+  - id: f_cais_board
+    property: board-member
+    value: "Jaan Tallinn"
+    asOf: 2024
+    source: https://washingtonainetwork.com/2024/07/29/center-for-ai-safety-hosts-dc-launch-event/
 
   - id: f_cais_pub_mmlu
     property: publication
