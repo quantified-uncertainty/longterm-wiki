@@ -7,7 +7,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 
-export const DAILY_CREATE_LIMIT = 2;
+/** Threshold for soft warning — not a hard limit */
+export const DAILY_CREATE_LIMIT = 5;
 const RATE_LIMIT_FILE = join(dirname(new URL(import.meta.url).pathname), '../../../.claude/issue-creates.json');
 
 interface RateLimitRecord {
