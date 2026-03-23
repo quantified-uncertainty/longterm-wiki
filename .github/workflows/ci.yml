@@ -215,7 +215,9 @@ jobs:
       - name: Build Next.js
         run: cd apps/web && pnpm build
         env:
-          SKIP_PREBUILD: "1"
+          # Don't skip prebuild — let Next.js rebuild data from scratch so CI
+          # generates the same page set as Vercel. Without this, CI may test
+          # fewer pages than Vercel, missing prerender errors. See #3075.
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
