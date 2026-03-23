@@ -26,3 +26,4 @@ export { entityAssessmentsRoute, type EntityAssessmentsRoute } from "./entity-as
 export { publicationsRoute, type PublicationsRoute } from "./publications.js";
 export { websiteSourcesRoute, type WebsiteSourcesRoute } from "./website-sources.js";
 export { secondaryMarketPricesRoute, type SecondaryMarketPricesRoute } from "./secondary-market-prices.js";
+export { predictionMarketsRoute, type PredictionMarketsRoute } from "./prediction-markets.js";

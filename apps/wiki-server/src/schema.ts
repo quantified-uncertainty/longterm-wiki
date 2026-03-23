@@ -2904,3 +2904,119 @@ export const policyStakeholders = pgTable(
     index("idx_ps_position").on(table.position),
   ]
 );
+
+// ── Prediction Market Questions ──────────────────────────────────────────
+//
+// Tracks prediction market questions linked to wiki entities.
+// Each row represents one question on one platform (Metaculus, Polymarket, Manifold).
+// Probability snapshots are stored in a companion table for time-series analysis.
+
+export const predictionMarketQuestions = pgTable(
+  "prediction_market_questions",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** Platform: metaculus, polymarket, manifold */
+    platform: text("platform").notNull(),
+    /** Platform's native question ID (e.g., Metaculus question number) */
+    platformQuestionId: text("platform_question_id").notNull(),
+    /** FK to entities.stable_id for the linked wiki entity */
+    entityId: text("entity_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** Display name fallback when entity doesn't exist */
+    entityDisplayName: text("entity_display_name"),
+    /** Full question text */
+    questionText: text("question_text").notNull(),
+    /** Permalink to the question on the platform */
+    questionUrl: text("question_url"),
+    /** Expected resolution date (YYYY-MM-DD) */
+    resolutionDate: text("resolution_date"),
+    /** Resolution criteria description */
+    resolutionCriteria: text("resolution_criteria"),
+    /** Question type: binary, numeric, multiple_choice */
+    questionType: text("question_type").notNull().default("binary"),
+    /** Topic category: valuation, ipo, safety, timeline, regulation, capability, etc. */
+    category: text("category"),
+    /** Whether the question has resolved */
+    isResolved: boolean("is_resolved").notNull().default(false),
+    /** Actual resolution value (0/1 for binary, numeric for range) */
+    resolutionValue: numeric("resolution_value"),
+    /** Notes about the resolution */
+    resolutionNotes: text("resolution_notes"),
+    /** Denormalized latest probability (0-1) for quick display */
+    currentProbability: numeric("current_probability"),
+    /** How this question was discovered: manual, llm_agent, api_search */
+    discoveryMethod: text("discovery_method"),
+    /** Source URL or reference for discovery */
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_pmq_platform_id").on(
+      table.platform,
+      table.platformQuestionId
+    ),
+    index("idx_pmq_entity").on(table.entityId),
+    index("idx_pmq_platform").on(table.platform),
+    index("idx_pmq_resolved").on(table.isResolved),
+    index("idx_pmq_category").on(table.category),
+  ]
+);
+
+// ── Prediction Market Snapshots ──────────────────────────────────────────
+//
+// Time-series observations of prediction market probabilities.
+// Each row is one snapshot: a question's probability on a given date.
+// Used for charting probability trends over time.
+
+export const predictionMarketSnapshots = pgTable(
+  "prediction_market_snapshots",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to prediction_market_questions.id */
+    questionId: varchar("question_id", { length: 10 })
+      .notNull()
+      .references(() => predictionMarketQuestions.id, { onDelete: "cascade" }),
+    /** Observation date: YYYY-MM-DD */
+    date: text("date").notNull(),
+    /** Probability (0.0 to 1.0) for binary questions */
+    probability: numeric("probability"),
+    /** Lower CI bound (e.g., Metaculus 25th percentile) */
+    probabilityLow: numeric("probability_low"),
+    /** Upper CI bound (e.g., Metaculus 75th percentile) */
+    probabilityHigh: numeric("probability_high"),
+    /** Number of forecasters at snapshot time */
+    numForecasters: integer("num_forecasters"),
+    /** Trading volume in USD (Polymarket) */
+    volume: numeric("volume"),
+    /** Open interest in USD (Polymarket) */
+    openInterest: numeric("open_interest"),
+    /** Community aggregated prediction (may differ from probability) */
+    communityPrediction: numeric("community_prediction"),
+    /** Source: API endpoint or URL */
+    source: text("source"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_pms_question_date").on(table.questionId, table.date),
+    index("idx_pms_question").on(table.questionId),
+    index("idx_pms_date").on(table.date),
+  ]
+);

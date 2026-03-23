@@ -946,6 +946,13 @@
       "when": 1781251200000,
       "tag": "0134_facts_pg_primary_remaining_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 135,
+      "version": "7",
+      "when": 1781337600000,
+      "tag": "0135_create_prediction_market_tables",
+      "breakpoints": true
     }
   ]
 }
