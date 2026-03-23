@@ -9,31 +9,9 @@
  * pipeline proceeds without this context.
  */
 
-import { apiRequest } from './wiki-server/client.ts';
 import { loadDatabase } from './content-types.ts';
-
-/** Shape of a single verdict from the wiki-server API. */
-interface SourceCheckVerdict {
-  recordType: string;
-  recordId: string;
-  fieldName: string | null;
-  entityId: string | null;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number | null;
-  needsRecheck: boolean;
-  nextCheckDue: string | null;
-  lastComputedAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
-
-/** Response shape from GET /api/source-checks/verdicts. */
-interface VerdictsResponse {
-  verdicts: SourceCheckVerdict[];
-  total: number;
-}
+import { getVerdictsByType, type VerdictEntry, type VerdictsResponse } from './wiki-server/source-checks.ts';
+import { apiRequest } from './wiki-server/client.ts';
 
 /** Verdicts that are actionable for the improve pipeline. */
 const ACTIONABLE_VERDICTS = ['contradicted', 'outdated'] as const;
@@ -77,19 +55,23 @@ function resolveStableId(pageId: string): string[] {
  */
 async function fetchActionableVerdicts(
   pageId: string,
-): Promise<SourceCheckVerdict[] | null> {
+): Promise<VerdictEntry[] | null> {
   const entityIds = resolveStableId(pageId);
-  const allVerdicts: SourceCheckVerdict[] = [];
+  const allVerdicts: VerdictEntry[] = [];
 
-  for (const entityId of entityIds) {
-    for (const verdict of ACTIONABLE_VERDICTS) {
-      const result = await apiRequest<VerdictsResponse>(
+  // Fetch all combinations in parallel (typically 2-3 entity IDs × 2 verdict types = 4-6 requests)
+  const fetches = entityIds.flatMap((entityId) =>
+    ACTIONABLE_VERDICTS.map((verdict) =>
+      apiRequest<VerdictsResponse>(
         'GET',
         `/api/source-checks/verdicts?entity_id=${encodeURIComponent(entityId)}&verdict=${verdict}&limit=50`,
-      );
-      if (result.ok) {
-        allVerdicts.push(...result.data.verdicts);
-      }
+      )
+    )
+  );
+  const results = await Promise.all(fetches);
+  for (const result of results) {
+    if (result.ok) {
+      allVerdicts.push(...result.data.verdicts);
     }
   }
 
@@ -97,7 +79,7 @@ async function fetchActionableVerdicts(
 
   // Deduplicate by (recordType, recordId, fieldName) in case multiple entity IDs matched
   const seen = new Set<string>();
-  const deduped: SourceCheckVerdict[] = [];
+  const deduped: VerdictEntry[] = [];
   for (const v of allVerdicts) {
     const key = `${v.recordType}:${v.recordId}:${v.fieldName ?? ''}`;
     if (!seen.has(key)) {
@@ -112,7 +94,7 @@ async function fetchActionableVerdicts(
 /**
  * Format a single verdict as a concise bullet point for the LLM.
  */
-function formatVerdict(v: SourceCheckVerdict): string {
+function formatVerdict(v: VerdictEntry): string {
   const confidence = v.confidence != null ? ` (confidence: ${(v.confidence * 100).toFixed(0)}%)` : '';
   const field = v.fieldName ? ` [field: ${v.fieldName}]` : '';
   const reasoning = v.reasoning

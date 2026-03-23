@@ -9,11 +9,10 @@
  * be resolved, the filter passes all pages through (no filtering).
  */
 
-import { readdirSync, readFileSync, existsSync } from 'fs';
-import { join, extname } from 'path';
-import { parse as parseYaml } from 'yaml';
+import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getContradictedEntityIds } from '../lib/wiki-server/source-checks.ts';
+import { loadEntityRegistry } from '../validate/validate-kb-entity-slugs.ts';
 import type { PageUpdate } from './types.ts';
 
 // ── Entity slug → stableId mapping ─────────────────────────────────────────
@@ -27,44 +26,15 @@ export interface EntityMapping {
 
 /**
  * Load entity ID mappings directly from YAML files in data/entities/.
- * This avoids depending on database.json (which requires a build step).
+ * Delegates to the shared loadEntityRegistry() utility.
  */
 export function loadEntityMappings(): EntityMapping {
   const entitiesDir = join(PROJECT_ROOT, 'data', 'entities');
-  const slugToStableId = new Map<string, string>();
-  const stableIdToSlug = new Map<string, string>();
-
-  if (!existsSync(entitiesDir)) return { slugToStableId, stableIdToSlug };
-
-  const files = readdirSync(entitiesDir).filter(
-    (f) => extname(f) === '.yaml' || extname(f) === '.yml',
-  );
-
-  for (const filename of files) {
-    const filePath = join(entitiesDir, filename);
-    let parsed: unknown;
-    try {
-      parsed = parseYaml(readFileSync(filePath, 'utf-8'));
-    } catch {
-      continue; // Skip files with parse errors
-    }
-
-    if (!Array.isArray(parsed)) continue;
-
-    for (const entry of parsed) {
-      if (
-        entry &&
-        typeof entry === 'object' &&
-        typeof entry.id === 'string' &&
-        typeof entry.stableId === 'string'
-      ) {
-        slugToStableId.set(entry.id, entry.stableId);
-        stableIdToSlug.set(entry.stableId, entry.id);
-      }
-    }
-  }
-
-  return { slugToStableId, stableIdToSlug };
+  const registry = loadEntityRegistry(entitiesDir);
+  return {
+    slugToStableId: registry.slugToStableId,
+    stableIdToSlug: registry.stableIdToSlug,
+  };
 }
 
 // ── Filter result ──────────────────────────────────────────────────────────
@@ -75,7 +45,7 @@ export interface SourceCheckFilterResult {
   /** Pages that were skipped due to contradicted verdicts */
   skipped: Array<{
     pageUpdate: PageUpdate;
-    contradictedCount: number;
+    reason: string;
   }>;
 }
 
@@ -153,7 +123,7 @@ export async function filterBySourceCheckVerdicts(
       const stableId = slugToStableId.get(update.pageId);
 
       if (stableId && contradictedStableIds.has(stableId)) {
-        skipped.push({ pageUpdate: update, contradictedCount: 1 });
+        skipped.push({ pageUpdate: update, reason: 'Entity has contradicted source-check verdicts' });
         console.log(
           `[auto-update] Skipping page "${update.pageTitle}" (${update.pageId}): entity has contradicted source-check verdicts`,
         );

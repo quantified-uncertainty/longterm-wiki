@@ -22,6 +22,7 @@ import { benchmarksRoute } from "./routes/tablebase/benchmarks.js";
 import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
 import { secondaryMarketPricesRoute } from "./routes/tablebase/secondary-market-prices.js";
+import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js";
 
 // Unified source-check system (replaces factbase-verifications + record-verifications)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
@@ -190,6 +191,7 @@ export function createApp() {
   app.route("/api/investments", investmentsRoute);
   app.route("/api/equity-positions", equityPositionsRoute);
   app.route("/api/secondary-market-prices", secondaryMarketPricesRoute);
+  app.route("/api/prediction-markets", predictionMarketsRoute);
   app.route("/api/divisions", divisionsRoute);
   app.route("/api/division-personnel", divisionPersonnelRoute);
   app.route("/api/funding-programs", fundingProgramsRoute);

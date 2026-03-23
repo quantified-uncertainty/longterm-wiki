@@ -82,6 +82,14 @@ import {
   type PersonEntry,
 } from "./people-section";
 
+// Market data section — secondary market prices + prediction markets
+import {
+  fetchMarketData,
+  hasMarketData,
+  getMarketDataCount,
+  MarketDataSection,
+} from "./market-data-section";
+
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
 
@@ -240,9 +248,13 @@ export default async function OrgProfilePage({
 
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
 
+  // ── Fetch PG data (personnel + market data) in parallel ──
+  const [pgPersonnelRows, marketData] = await Promise.all([
+    fetchPgPersonnel(entity.id),
+    fetchMarketData(entity.id),
+  ]);
+
   // ── People tab: key personnel + board + PG personnel data ──
-  // Fetch PG personnel data (ISR-compatible, returns [] if unavailable)
-  const pgPersonnelRows = await fetchPgPersonnel(entity.id);
   const pgEntries = pgPersonnelToEntries(pgPersonnelRows);
 
   const hasPeopleData =
@@ -437,6 +449,16 @@ export default async function OrgProfilePage({
           )}
         </div>
       ),
+    });
+  }
+
+  // ── Market Data tab: secondary market prices + prediction markets ──
+  if (hasMarketData(marketData)) {
+    tabs.push({
+      id: "market-data",
+      label: "Market Data",
+      count: getMarketDataCount(marketData),
+      content: <MarketDataSection data={marketData} />,
     });
   }
 
