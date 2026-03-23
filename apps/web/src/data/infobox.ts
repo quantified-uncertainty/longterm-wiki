@@ -43,7 +43,7 @@ export function getChildPagesForOverview(overviewId: string): ChildPageEntry[] {
   }
 
   // Sort alphabetically by title
-  children.sort((a, b) => a.title.localeCompare(b.title));
+  children.sort((a, b) => (a.title ?? "").localeCompare(b.title ?? ""));
   return children;
 }
 
