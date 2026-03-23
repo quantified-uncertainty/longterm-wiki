@@ -32,8 +32,14 @@ async function loadAllVerdicts(): Promise<FetchResult<RpcSourceChecksVerdictsRes
 
     const page = result.data.verdicts ?? [];
     allVerdicts = [...allVerdicts, ...page];
-    total = result.data.total ?? allVerdicts.length;
-    if (allVerdicts.length >= total || page.length < PAGE_SIZE) break;
+    const reportedTotal = result.data.total;
+    total = reportedTotal ?? allVerdicts.length;
+    if (
+      (reportedTotal != null && allVerdicts.length >= reportedTotal) ||
+      page.length < PAGE_SIZE
+    ) {
+      break;
+    }
     offset += PAGE_SIZE;
   }
 
