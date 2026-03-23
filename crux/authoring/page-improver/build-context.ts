@@ -68,20 +68,33 @@ export async function buildImproveContext(
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
-  // Load KB facts for the entity associated with this page
-  log('improve', 'Loading KB facts for entity...');
+  // Load KB facts and source-check verdicts in parallel (independent I/O)
+  log('improve', 'Loading KB facts and source-check verdicts...');
+  const [kbResult, sourceCheckResult] = await Promise.allSettled([
+    buildKbContextForPage(page.id, page.path),
+    buildSourceCheckContext(page.id),
+  ]);
+
   let kbContext: string | null = null;
-  try {
-    kbContext = await buildKbContextForPage(page.id, page.path);
-    if (kbContext) {
-      const lineCount = kbContext.split('\n').length;
-      log('improve', `  Found KB entity with ${lineCount} lines of structured facts`);
-    } else {
-      log('improve', '  No KB entity found for this page (or entity has no facts)');
-    }
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    log('improve', `  KB context load failed: ${error.message} — continuing without KB context`);
+  if (kbResult.status === 'fulfilled' && kbResult.value) {
+    kbContext = kbResult.value;
+    const lineCount = kbContext.split('\n').length;
+    log('improve', `  Found KB entity with ${lineCount} lines of structured facts`);
+  } else if (kbResult.status === 'rejected') {
+    log('improve', `  KB context load failed: ${kbResult.reason instanceof Error ? kbResult.reason.message : String(kbResult.reason)} — continuing without`);
+  } else {
+    log('improve', '  No KB entity found for this page (or entity has no facts)');
+  }
+
+  let sourceCheckContext: string | null = null;
+  if (sourceCheckResult.status === 'fulfilled' && sourceCheckResult.value) {
+    sourceCheckContext = sourceCheckResult.value;
+    const lineCount = sourceCheckContext.split('\n').filter(Boolean).length;
+    log('improve', `  Found ${lineCount} source-check warnings for this entity`);
+  } else if (sourceCheckResult.status === 'rejected') {
+    log('improve', `  Source-check context load failed: ${sourceCheckResult.reason instanceof Error ? sourceCheckResult.reason.message : String(sourceCheckResult.reason)} — continuing without`);
+  } else {
+    log('improve', '  No actionable source-check verdicts found');
   }
 
   // Resolve template for this page (explicit frontmatter > entity type inference)
@@ -94,22 +107,6 @@ export async function buildImproveContext(
   if (template) {
     templateContext = formatTemplateForPrompt(template);
     log('improve', `  Using template: ${template.name}`);
-  }
-
-  // Fetch source-check verdicts (contradicted/outdated) for this entity
-  log('improve', 'Loading source-check verdicts...');
-  let sourceCheckContext: string | null = null;
-  try {
-    sourceCheckContext = await buildSourceCheckContext(page.id);
-    if (sourceCheckContext) {
-      const lineCount = sourceCheckContext.split('\n').filter(Boolean).length;
-      log('improve', `  Found ${lineCount} source-check warnings for this entity`);
-    } else {
-      log('improve', '  No actionable source-check verdicts found');
-    }
-  } catch (err: unknown) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    log('improve', `  Source-check context load failed: ${error.message} — continuing without`);
   }
 
   const prompt = IMPROVE_PROMPT({
