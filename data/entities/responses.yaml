@@ -6431,19 +6431,19 @@
   relatedEntries:
     - id: 7DpEvy5wQr
       type: organization
-      relationship: practices
+      relationship: related
     - id: yTlRworV1V
       type: organization
-      relationship: practices
+      relationship: related
     - id: xxHyEDGp4Y
       type: organization
-      relationship: practices
+      relationship: related
     - id: H4tplAyDRX
       type: organization
-      relationship: practices
+      relationship: related
     - id: Ygxw8JVW8X
       type: organization
-      relationship: practices
+      relationship: related
   sources:
     - title: Democracy Forward FOIA AI Lawsuit
       url: https://democracyforward.org/updates/foia-ai-lawsuit/
@@ -6487,28 +6487,28 @@
   relatedEntries:
     - id: IFjdCevnFg
       type: organization
-      relationship: practices
+      relationship: related
     - id: w7mwNxGtCQ
       type: organization
-      relationship: practices
+      relationship: related
     - id: V3NJg9djng
       type: organization
-      relationship: practices
+      relationship: related
     - id: 0HsrqIftUg
       type: organization
-      relationship: practices
+      relationship: related
     - id: NI4hqOL33A
       type: organization
-      relationship: practices
+      relationship: related
     - id: DHWH2M0Ega
       type: organization
-      relationship: practices
+      relationship: related
     - id: etCe7rcH1g
       type: organization
-      relationship: practices
+      relationship: related
     - id: d9sWZtyVwg
       type: organization
-      relationship: practices
+      relationship: related
   sources:
     - title: OpenSecrets - Center for AI Policy
       url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
@@ -6546,16 +6546,16 @@
   relatedEntries:
     - id: qtXe9VykMz
       type: organization
-      relationship: practices
+      relationship: related
     - id: etCe7rcH1g
       type: organization
-      relationship: practices
+      relationship: related
     - id: m9jtyXlqXT
       type: organization
-      relationship: practices
+      relationship: related
     - id: d9sWZtyVwg
       type: organization
-      relationship: practices
+      relationship: related
     - id: DK0GbGg7Kf
       type: organization
       relationship: supports
@@ -6596,25 +6596,25 @@
   relatedEntries:
     - id: XLLyzaEaCA
       type: organization
-      relationship: practices
+      relationship: related
     - id: NI4hqOL33A
       type: organization
-      relationship: practices
+      relationship: related
     - id: VJacG0VE2w
       type: organization
-      relationship: practices
+      relationship: related
     - id: hyxooEhMZl
       type: organization
-      relationship: practices
+      relationship: related
     - id: UyAH46sPFN
       type: organization
-      relationship: practices
+      relationship: related
     - id: 2KkS7mnw7K
       type: organization
-      relationship: practices
+      relationship: related
     - id: XkqcWk46oQ
       type: organization
-      relationship: practices
+      relationship: related
   sources:
     - title: Brennan Center AI Legislation Tracker
       url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
@@ -6654,16 +6654,16 @@
   relatedEntries:
     - id: mY8BbBqKFc
       type: organization
-      relationship: practices
+      relationship: related
     - id: pFJhncfgor
       type: organization
-      relationship: practices
+      relationship: related
     - id: 2KkS7mnw7K
       type: organization
-      relationship: practices
+      relationship: related
     - id: inudUfk9Ix
       type: organization
-      relationship: practices
+      relationship: related
     - id: yTlRworV1V
       type: organization
       relationship: supports
