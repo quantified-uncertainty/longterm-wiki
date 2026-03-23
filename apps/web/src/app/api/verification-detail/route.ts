@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${config.serverUrl}/api/source-checks/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+    const url = `${config.serverUrl}/api/verifications/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(10000),

@@ -40,7 +40,7 @@ export async function storeSourceCheckEvidence(params: {
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
     'POST',
-    '/api/source-checks/evidence',
+    '/api/verifications/evidence',
     body,
   );
 
@@ -74,7 +74,7 @@ export async function storeAggregateVerdict(params: {
 
   const response = await apiRequest<{ ok: boolean }>(
     'POST',
-    '/api/source-checks/verdicts',
+    '/api/verifications/verdicts',
     body,
   );
 

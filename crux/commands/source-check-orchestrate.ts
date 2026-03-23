@@ -249,7 +249,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/source-checks/verdicts?record_type=fact&limit=5000');
+    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=5000');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -289,7 +289,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
           needsRecheck?: boolean;
         }>;
         total: number;
-      }>('GET', `/api/source-checks/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+      }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
       if (!response.ok || !response.data) break;
 
@@ -1276,7 +1276,7 @@ async function statsCommand(): Promise<CommandResult> {
     by_type: Record<string, number>;
     needs_recheck: number;
     avg_confidence: number;
-  }>('GET', '/api/source-checks/stats');
+  }>('GET', '/api/verifications/stats');
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
