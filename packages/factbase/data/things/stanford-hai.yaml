@@ -14,10 +14,12 @@ facts:
 
   - id: f_Fq1vL5tN9c
     property: headcount
-    value: 91
+    value:
+      - 51
+      - 200
     asOf: 2025-06
     source: https://contactout.com/company/stanford-institute-for-human-centered-artificial-hai-3889
-    notes: "Approximately 91 employees including staff, faculty, and fellows"
+    notes: "Source lists 51-200 employees including staff, faculty, and fellows"
 
   - id: f_Jy7dR9wK2e
     property: website

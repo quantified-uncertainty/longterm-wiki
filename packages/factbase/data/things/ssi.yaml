@@ -66,10 +66,10 @@ facts:
 
   - id: f_H1fxwtcsOQ
     property: headcount
-    value: 20
+    value: 50
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
-    notes: "Approximate headcount; described as a 'lean, cracked team'"
+    notes: "Approximately 50 employees per Wikipedia; grew from initial ~10 at founding"
   - id: leszJt1HxA
     property: website
     value: https://ssi.inc/

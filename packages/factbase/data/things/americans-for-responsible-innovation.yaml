@@ -14,9 +14,9 @@ facts:
 
   - id: f_Nq3vL9tN1c
     property: legal-structure
-    value: "501(c)(3) nonprofit"
+    value: "501(c)(4) nonprofit"
     source: https://ari.us/about-us/
-    notes: "Nonprofit policy advocacy organization"
+    notes: "501(c)(4) policy advocacy organization; also operates a separate 501(c)(3) research arm and a hybrid PAC"
 
   - id: f_Pw7cJ2mQ5d
     property: website
