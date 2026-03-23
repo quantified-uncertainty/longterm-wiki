@@ -614,6 +614,10 @@ export function getFactBaseSlugMap(): Record<string, string> {
 const STATIC_SLUG_ALIASES: Record<string, string> = {
   "center-for-ai-safety": "cais",
   "survival-and-flourishing-fund": "sff",
+  "gpqa": "gpqa-diamond",
+  "math": "math-benchmark",
+  "mistral-large": "mistral-large-2",
+  "alignment-research-center": "arc",
 };
 
 /**

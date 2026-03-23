@@ -465,8 +465,8 @@
       date: "2023"
 - id: nick-bostrom
   name: Nick Bostrom
-  affiliation: fhi
-  role: Professor of Philosophy, University of Oxford
+  affiliation: macrostrategy-research-initiative
+  role: Founder and Principal Researcher, Macrostrategy Research Initiative
   website: https://nickbostrom.com
   knownFor:
     - Superintelligence
@@ -720,8 +720,8 @@
 
 - id: ian-hogarth
   name: Ian Hogarth
-  affiliation: uk-aisi
-  role: Chair
+  affiliation: independent
+  role: AI investor and writer; former Chair, UK AI Safety Institute
   knownFor:
     - Leading UK AI Safety Institute
     - AI investor and writer
