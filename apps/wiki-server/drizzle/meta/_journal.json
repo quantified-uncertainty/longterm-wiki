@@ -953,6 +953,13 @@
       "when": 1781337600000,
       "tag": "0135_create_prediction_market_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 136,
+      "version": "7",
+      "when": 1781424000000,
+      "tag": "0136_create_data_quality_snapshots",
+      "breakpoints": true
     }
   ]
 }
