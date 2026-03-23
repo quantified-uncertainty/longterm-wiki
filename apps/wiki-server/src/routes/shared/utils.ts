@@ -83,7 +83,7 @@ export function dbError(
     err: detail,
     stack: err instanceof Error ? err.stack : undefined,
   }, `${operation} failed`);
-  return c.json({ error: "database_error", message: `${operation} failed`, detail }, 500);
+  return c.json({ error: "database_error", message: `${operation} failed`, detail: detail || "no-error-detail-extracted" }, 500);
 }
 
 /** Extract the first row from a query result, throwing if empty. */
