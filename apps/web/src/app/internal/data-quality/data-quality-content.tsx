@@ -5,7 +5,7 @@ import {
   type RpcDataQualityHistoryResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { DataQualityTable } from "./data-quality-table";
+import { DataQualityTable } from "@/app/internal/data-quality/data-quality-table";
 
 function formatPercent(part: number, total: number): string {
   if (total === 0) return "N/A";

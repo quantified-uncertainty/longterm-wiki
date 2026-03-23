@@ -36,6 +36,7 @@ function makeConfig(): Config {
       githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
       snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
       sessionSweep: { enabled: true, schedule: "0 */4 * * *" },
+      dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
     },
   };
 }

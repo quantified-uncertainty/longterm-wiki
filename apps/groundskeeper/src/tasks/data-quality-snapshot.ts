@@ -44,13 +44,16 @@ export async function dataQualitySnapshot(
     }
 
     const data = (await res.json()) as {
-      id: number;
-      verdicts_total?: number;
-      verdicts_contradicted?: number;
+      snapshot: {
+        id: number;
+        verdictsTotal?: number;
+        verdictsContradicted?: number;
+      };
     };
 
-    const summary = `Snapshot #${data.id} captured (verdicts: ${data.verdicts_total ?? "?"})`;
-    logger.info({ snapshotId: data.id }, summary);
+    const snap = data.snapshot;
+    const summary = `Snapshot #${snap.id} captured (verdicts: ${snap.verdictsTotal ?? "?"})`;
+    logger.info({ snapshotId: snap.id }, summary);
     return { success: true, summary };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);

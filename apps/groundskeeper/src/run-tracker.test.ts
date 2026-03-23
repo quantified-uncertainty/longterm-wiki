@@ -29,6 +29,7 @@ function makeConfig(runLogPath: string): Config {
       githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
       snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
+      dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
     },
   };
 }
