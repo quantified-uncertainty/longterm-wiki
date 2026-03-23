@@ -289,17 +289,13 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     };
   }
 
-  // Rate limit: max DAILY_CREATE_LIMIT issues per day (prevents tracker flood)
-  if (!options['no-limit'] && !options.noLimit) {
+  // Soft warning when creating many issues in a day
+  {
     const todayCount = getCreatesToday();
     if (todayCount >= DAILY_CREATE_LIMIT) {
-      return {
-        output:
-          `${c.red}Daily issue creation limit reached (${DAILY_CREATE_LIMIT}/day).${c.reset}\n` +
-          `${c.dim}You've created ${todayCount} issues today. This limit prevents tracker flood.\n` +
-          `If this is genuinely important, use --no-limit to override.${c.reset}\n`,
-        exitCode: 1,
-      };
+      process.stderr.write(
+        `${c.yellow}⚠ You've created ${todayCount} issues today. Consider batching remaining items into one umbrella issue.${c.reset}\n`
+      );
     }
   }
 
@@ -430,8 +426,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   let output = '';
   const todayCount = getCreatesToday();
   output += `${c.green}✓${c.reset} Created issue #${issue.number}: ${issue.title}\n`;
-  if (todayCount >= DAILY_CREATE_LIMIT - 1) {
-    output += `  ${c.yellow}⚠ ${todayCount}/${DAILY_CREATE_LIMIT} daily issue limit used${c.reset}\n`;
+  if (todayCount >= DAILY_CREATE_LIMIT) {
+    output += `  ${c.dim}(${todayCount} issues created today)${c.reset}\n`;
   }
   output += `  ${c.cyan}${issue.html_url}${c.reset}\n`;
   const appliedLabels = options.model ? [...labels, `${MODEL_LABEL_PREFIX}${(options.model as string).toLowerCase()}`] : labels;
