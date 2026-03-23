@@ -64,90 +64,58 @@ export const sourceCheckVerdictsRule = createRule({
   check(_content: ContentFile[], _engine: ValidationEngine): Issue[] {
     const issues: Issue[] = [];
 
-    // ── Record verdicts ──────────────────────────────────────────────────
-    const recordVerdicts = loadJsonSafe<Record<string, RecordVerdict>>(RECORD_VERDICTS_FILE);
+    /** Format a truncated list: "a, b, c (and 7 more)" */
+    function truncatedList(items: string[], max = 10): string {
+      const listed = items.slice(0, max).join(', ');
+      return items.length > max ? `${listed} (and ${items.length - max} more)` : listed;
+    }
 
-    if (recordVerdicts) {
-      // Group problematic verdicts by verdict type for a cleaner summary
-      const contradicted: string[] = [];
-      const outdated: string[] = [];
+    /** Collect keys matching target verdicts from a record map and emit warnings. */
+    function collectVerdictWarnings<V>(
+      data: Record<string, V>,
+      targets: { verdict: string; getVerdict: (v: V) => string; label: string }[],
+      file: string,
+    ): void {
+      const buckets = new Map<string, string[]>();
+      for (const t of targets) buckets.set(t.verdict, []);
 
-      for (const [key, rv] of Object.entries(recordVerdicts)) {
-        if (rv.verdict === 'contradicted') {
-          contradicted.push(key);
-        } else if (rv.verdict === 'outdated') {
-          outdated.push(key);
+      for (const [key, val] of Object.entries(data)) {
+        for (const t of targets) {
+          if (t.getVerdict(val) === t.verdict) {
+            buckets.get(t.verdict)!.push(key);
+          }
         }
       }
 
-      if (contradicted.length > 0) {
-        // Cap the listed keys to avoid overwhelming output
-        const listed = contradicted.slice(0, 10).join(', ');
-        const suffix = contradicted.length > 10
-          ? ` (and ${contradicted.length - 10} more)`
-          : '';
-        issues.push(new Issue({
-          rule: 'source-check-verdicts',
-          file: RECORD_VERDICTS_FILE,
-          message: `${contradicted.length} record(s) have contradicted source-check verdicts: ${listed}${suffix}`,
-          severity: Severity.WARNING,
-        }));
+      for (const t of targets) {
+        const keys = buckets.get(t.verdict)!;
+        if (keys.length > 0) {
+          issues.push(new Issue({
+            rule: 'source-check-verdicts',
+            file,
+            message: `${keys.length} ${t.label}: ${truncatedList(keys)}`,
+            severity: Severity.WARNING,
+          }));
+        }
       }
+    }
 
-      if (outdated.length > 0) {
-        const listed = outdated.slice(0, 10).join(', ');
-        const suffix = outdated.length > 10
-          ? ` (and ${outdated.length - 10} more)`
-          : '';
-        issues.push(new Issue({
-          rule: 'source-check-verdicts',
-          file: RECORD_VERDICTS_FILE,
-          message: `${outdated.length} record(s) have outdated source-check verdicts: ${listed}${suffix}`,
-          severity: Severity.WARNING,
-        }));
-      }
+    // ── Record verdicts ──────────────────────────────────────────────────
+    const recordVerdicts = loadJsonSafe<Record<string, RecordVerdict>>(RECORD_VERDICTS_FILE);
+    if (recordVerdicts) {
+      collectVerdictWarnings(recordVerdicts, [
+        { verdict: 'contradicted', getVerdict: (rv) => rv.verdict, label: 'record(s) have contradicted source-check verdicts' },
+        { verdict: 'outdated', getVerdict: (rv) => rv.verdict, label: 'record(s) have outdated source-check verdicts' },
+      ], RECORD_VERDICTS_FILE);
     }
 
     // ── KB fact verdicts ─────────────────────────────────────────────────
     const kbVerdicts = loadJsonSafe<Record<string, string>>(KB_FACT_VERIFICATION_FILE);
-
     if (kbVerdicts) {
-      const inaccurate: string[] = [];
-      const unsupported: string[] = [];
-
-      for (const [factId, verdict] of Object.entries(kbVerdicts)) {
-        if (verdict === 'inaccurate') {
-          inaccurate.push(factId);
-        } else if (verdict === 'unsupported') {
-          unsupported.push(factId);
-        }
-      }
-
-      if (inaccurate.length > 0) {
-        const listed = inaccurate.slice(0, 10).join(', ');
-        const suffix = inaccurate.length > 10
-          ? ` (and ${inaccurate.length - 10} more)`
-          : '';
-        issues.push(new Issue({
-          rule: 'source-check-verdicts',
-          file: KB_FACT_VERIFICATION_FILE,
-          message: `${inaccurate.length} FactBase fact(s) have inaccurate citation verdicts: ${listed}${suffix}`,
-          severity: Severity.WARNING,
-        }));
-      }
-
-      if (unsupported.length > 0) {
-        const listed = unsupported.slice(0, 10).join(', ');
-        const suffix = unsupported.length > 10
-          ? ` (and ${unsupported.length - 10} more)`
-          : '';
-        issues.push(new Issue({
-          rule: 'source-check-verdicts',
-          file: KB_FACT_VERIFICATION_FILE,
-          message: `${unsupported.length} FactBase fact(s) have unsupported citation verdicts: ${listed}${suffix}`,
-          severity: Severity.WARNING,
-        }));
-      }
+      collectVerdictWarnings(kbVerdicts, [
+        { verdict: 'inaccurate', getVerdict: (v) => v, label: 'FactBase fact(s) have inaccurate citation verdicts' },
+        { verdict: 'unsupported', getVerdict: (v) => v, label: 'FactBase fact(s) have unsupported citation verdicts' },
+      ], KB_FACT_VERIFICATION_FILE);
     }
 
     return issues;

@@ -52,11 +52,17 @@ export async function getContradictedEntityIds(): Promise<Set<string>> {
 
   if (!result.ok) {
     // Best-effort: wiki-server unavailable → proceed without filtering
+    console.warn(`[source-checks] Failed to fetch contradicted verdicts: ${result.message}`);
     return new Set();
   }
 
+  const { verdicts, total } = result.data;
+  if (total > verdicts.length) {
+    console.warn(`[source-checks] Fetched ${verdicts.length}/${total} contradicted verdicts — some entities may not be filtered`);
+  }
+
   const entityIds = new Set<string>();
-  for (const verdict of result.data.verdicts) {
+  for (const verdict of verdicts) {
     if (verdict.entityId) {
       entityIds.add(verdict.entityId);
     }
