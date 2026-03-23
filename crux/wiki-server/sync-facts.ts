@@ -108,6 +108,11 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
     source: fact.source ?? null,
     format: fact.value.type,
     formatDivisor: property?.display?.divisor ?? null,
+    sourceQuote: fact.sourceQuote ?? null,
+    usdEquivalent: fact.usdEquivalent ?? null,
+    exchangeRate: fact.exchangeRate ?? null,
+    exchangeRateDate: fact.exchangeRateDate ?? null,
+    dollarYear: fact.dollarYear ?? null,
   };
 }
 
