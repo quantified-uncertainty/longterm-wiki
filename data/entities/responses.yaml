@@ -5621,3 +5621,382 @@
     Technical and procedural strategies to ground AI-generated content in verified information and reduce factual
     errors in wiki articles, covering RAG, verification techniques, prompt engineering, and human oversight.
   lastUpdated: 2026-02
+
+# --- Trump administration AI policy + new federal/international legislation (2025-2026) ---
+
+- id: trump-eo-14179
+  stableId: PYEZ6G1Fbz
+  type: policy
+  summaryPage: governance-overview
+  title: "Executive Order 14179: Removing Barriers to American Leadership in AI"
+  introduced: '2025-01-23'
+  policyStatus: enacted
+  author: President Donald Trump
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+  provisions:
+    - title: Revocation of Biden EO 14110
+      description: >-
+        Revokes Executive Order 14110 (October 2023) and all policies, directives, and
+        regulations issued pursuant to it.
+      category: Revocation
+    - title: AI Action Plan
+      description: >-
+        Directs development of a 180-day AI Action Plan to sustain and enhance America's
+        AI dominance. Resulted in "Winning the Race" released July 23, 2025.
+      category: Policy development
+    - title: Regulatory Review
+      description: >-
+        Orders review and rescission of all policies conflicting with pro-innovation AI
+        stance. Directs OMB to revise memoranda M-24-10 and M-24-18 within 60 days.
+      category: Deregulation
+  description: >-
+    First major AI executive order of the Trump second term, signed January 23, 2025. Revokes
+    Biden's comprehensive AI executive order (EO 14110) and replaces it with a deregulatory,
+    pro-innovation framework. Mandated a 180-day AI Action Plan and review of all existing AI
+    policies. The resulting Action Plan was released July 23, 2025, accompanied by three
+    additional executive orders on data center permitting, unbiased AI principles, and
+    scientific AI acceleration.
+  tags:
+    - executive-order
+    - deregulation
+    - federal-policy
+    - trump-administration
+  clusters:
+    - governance
+  sources:
+    - title: Federal Register
+      url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
+  lastUpdated: 2026-03
+
+- id: trump-ai-preemption-eo
+  stableId: 1h93jgFv4l
+  type: policy
+  summaryPage: governance-overview
+  title: "EO: Ensuring a National Policy Framework for AI (State Preemption)"
+  introduced: '2025-12-11'
+  policyStatus: enacted
+  author: President Donald Trump
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+  provisions:
+    - title: AI Litigation Task Force
+      description: >-
+        Directs AG to establish AI Litigation Task Force within 30 days to challenge state
+        AI laws on interstate commerce, federal preemption, and First Amendment grounds.
+        Established January 9, 2026 by AG Bondi.
+      category: Enforcement
+    - title: State Law Evaluation
+      description: >-
+        Commerce Secretary must publish evaluation of "onerous" state AI laws within 90 days.
+      category: Review
+    - title: Federal Reporting Standard
+      description: >-
+        FCC directed to consider federal AI reporting/disclosure standard that preempts
+        conflicting state laws.
+      category: Standardization
+    - title: BEAD Funding Withholding
+      description: >-
+        Withholds BEAD broadband funding from states with targeted AI regulations.
+      category: Financial pressure
+  stakeholders:
+    - name: 36 State Attorneys General Coalition
+      position: oppose
+      importance: high
+      reason: Formed bipartisan coalition opposing federal preemption of state AI regulatory authority
+    - name: American Civil Liberties Union
+      entityId: 7DpEvy5wQr
+      position: oppose
+      importance: medium
+      reason: Called executive order unconstitutional
+  description: >-
+    Executive order signed December 11, 2025 directing federal agencies to challenge state AI
+    laws deemed inconsistent with federal policy. Does NOT itself overturn state law — only
+    Congress or courts can do that. Established DOJ AI Litigation Task Force (Jan 9, 2026).
+    Triggered bipartisan opposition: 36 state AGs formed coalition, governors of CA/CO/NY
+    issued defiant statements, Congress had twice rejected preemption provisions.
+  tags:
+    - executive-order
+    - preemption
+    - state-regulation
+    - trump-administration
+    - federal-state-conflict
+  clusters:
+    - governance
+  sources:
+    - title: White House
+      url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
+    - title: Ropes & Gray Analysis
+      url: https://www.ropesgray.com/en/insights/alerts/2025/12/trump-attempts-to-preempt-state-ai-regulation-through-executive-order
+  lastUpdated: 2026-03
+
+- id: trump-ai-framework-2026
+  stableId: 7rafBo4OER
+  type: policy
+  summaryPage: governance-overview
+  title: National AI Legislative Framework (White House, March 2026)
+  introduced: '2026-03-20'
+  policyStatus: proposed
+  author: White House
+  scope: National
+  jurisdiction: United States
+  fullTextUrl: https://www.whitehouse.gov/wp-content/uploads/2026/03/03.20.26-National-Policy-Framework-for-Artificial-Intelligence-Legislative-Recommendations.pdf
+  provisions:
+    - title: Protecting Children
+      description: Protecting children and empowering parents from AI harms
+      category: Children's safety
+    - title: Safeguarding Communities
+      description: Safeguarding communities from AI-related risks
+      category: Public safety
+    - title: Intellectual Property
+      description: Respecting intellectual property rights in AI training and outputs
+      category: IP protection
+    - title: Free Speech
+      description: Preventing censorship and protecting free speech in AI systems
+      category: First Amendment
+    - title: Innovation
+      description: Enabling innovation and ensuring US AI dominance
+      category: Competitiveness
+    - title: Workforce Development
+      description: Educating Americans and workforce development for AI era
+      category: Education
+  description: >-
+    Legislative blueprint released March 20, 2026. Six guiding principles for Congress. Urges
+    Congress to preempt state AI laws and adopt "light-touch" regulatory approach. Leaves
+    AI/copyright fair-use questions to courts. Not law itself — a framework for congressional
+    action.
+  tags:
+    - legislative-framework
+    - federal-policy
+    - trump-administration
+    - preemption
+  clusters:
+    - governance
+  sources:
+    - title: White House Announcement
+      url: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
+  lastUpdated: 2026-03
+
+- id: take-it-down-act
+  stableId: Nq8e8nItph
+  type: policy
+  summaryPage: governance-overview
+  title: TAKE IT DOWN Act
+  introduced: '2025-01'
+  policyStatus: enacted
+  author: Senator Ted Cruz
+  scope: National
+  billNumber: S.146
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
+  provisions:
+    - title: Criminalization of Nonconsensual Intimate Images
+      description: >-
+        Criminalizes knowingly publishing nonconsensual intimate images including AI deepfakes.
+        Up to 3 years imprisonment for sharing intimate depictions of minors.
+      category: Criminal penalties
+    - title: Platform Takedown Requirements
+      description: >-
+        Platforms must establish notice-and-takedown process and remove flagged content within
+        48 hours of valid notice. Compliance procedures required within 1 year.
+      category: Platform obligations
+    - title: Safe Harbor
+      description: Safe harbor for good-faith platform removal actions.
+      category: Platform protections
+  votes:
+    - chamber: House
+      result: Passed
+      ayes: 409
+      noes: 2
+    - chamber: Senate
+      result: Passed unanimously
+  description: >-
+    First federal law specifically addressing AI-generated deepfakes, signed May 19, 2025.
+    Criminalizes nonconsensual intimate images (including AI deepfakes) and requires platforms
+    to remove them within 48 hours. Passed with overwhelming bipartisan support (House 409-2,
+    Senate unanimous).
+  tags:
+    - deepfakes
+    - nonconsensual-images
+    - platform-regulation
+    - federal-law
+    - bipartisan
+  clusters:
+    - governance
+  sources:
+    - title: Congress.gov Bill Text
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
+    - title: White House Signing Statement
+      url: https://www.whitehouse.gov/articles/2025/05/icymi-president-trump-signs-take-it-down-act-into-law/
+  lastUpdated: 2026-03
+
+- id: ai-lead-act
+  stableId: JCdMGaEZOj
+  type: policy
+  summaryPage: governance-overview
+  title: AI LEAD Act (AI Liability Standards)
+  introduced: '2025-09-29'
+  policyStatus: proposed
+  author: Senator Dick Durbin and Senator Josh Hawley
+  scope: National
+  billNumber: S.2937
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/2937
+  provisions:
+    - title: Developer Liability
+      description: >-
+        AI developers liable for harm if they fail to demonstrate reasonable care, provide
+        inadequate warnings, or products are defective.
+      category: Liability
+    - title: Deployer Liability
+      description: >-
+        AI deployers liable if they materially alter AI systems or misuse them causing harm.
+      category: Liability
+    - title: Anti-Waiver
+      description: Prohibits contracts that unreasonably limit AI liability.
+      category: Consumer protection
+    - title: Foreign Developer Registry
+      description: >-
+        Foreign AI developers must designate US-based agents; public registry maintained by AG.
+      category: Enforcement
+  description: >-
+    Bipartisan bill introduced September 29, 2025, establishing product liability standards for
+    AI systems. Sponsored by Senators Durbin (D-IL) and Hawley (R-MO). Referred to Committee
+    on the Judiciary.
+  tags:
+    - ai-liability
+    - product-liability
+    - bipartisan
+    - federal-legislation
+  clusters:
+    - governance
+  sources:
+    - title: Congress.gov
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/2937
+    - title: National Law Review Analysis
+      url: https://natlawreview.com/article/new-federal-legislation-proposes-product-liability-standards-ai-systems
+  lastUpdated: 2026-03
+
+- id: ai-risk-evaluation-act
+  stableId: ZpeTfyauLM
+  type: policy
+  summaryPage: governance-overview
+  title: AI Risk Evaluation Act
+  introduced: '2025-09-29'
+  policyStatus: proposed
+  author: Senator Josh Hawley and Senator Richard Blumenthal
+  scope: National
+  billNumber: S.2938
+  jurisdiction: United States
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/2938/text
+  provisions:
+    - title: DOE Advanced AI Evaluation Program
+      description: >-
+        DOE must establish Advanced AI Evaluation Program within 90 days with mandatory
+        participation by advanced AI developers.
+      category: Evaluation
+    - title: Adversarial Testing
+      description: >-
+        Red teams matching real-world jailbreaking techniques. Tests cover weaponization
+        potential, self-replication, scheming behaviors, autonomous decision-making.
+      category: Testing
+    - title: Penalties
+      description: At least \$1M/day for non-compliance with evaluation requirements.
+      category: Enforcement
+  description: >-
+    Bipartisan bill introduced September 29, 2025 by Senators Hawley (R-MO) and Blumenthal
+    (D-CT). Would require DOE to establish mandatory AI evaluation program with adversarial
+    testing. Notable for \$1M/day non-compliance penalty and focus on dangerous capabilities.
+    7-year program duration. Referred to Commerce Committee.
+  tags:
+    - ai-evaluation
+    - mandatory-testing
+    - dangerous-capabilities
+    - bipartisan
+    - federal-legislation
+  clusters:
+    - ai-safety
+    - governance
+  sources:
+    - title: Congress.gov Bill Text
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/2938/text
+  lastUpdated: 2026-03
+
+- id: paris-ai-summit
+  stableId: Fghn4m4ekW
+  type: policy
+  summaryPage: governance-overview
+  title: Paris AI Action Summit (February 2025)
+  introduced: '2025-02-10'
+  policyStatus: active
+  author: President Macron and PM Modi (co-chairs)
+  scope: International
+  jurisdiction: International
+  provisions:
+    - title: AI for People and Planet Declaration
+      description: >-
+        Declaration on inclusive and sustainable AI signed by 61 countries. US and UK
+        refused to sign.
+      category: International agreement
+    - title: Current AI Foundation
+      description: >-
+        Launched "Current AI" foundation with \$400M endowment backed by 9 governments to
+        support AI public goods, open-source tools, and datasets.
+      category: Infrastructure
+  description: >-
+    International AI summit held February 10-11, 2025 at Grand Palais, Paris. 61 countries
+    signed declaration on inclusive AI. Notable for US and UK refusal to sign. Launched the
+    Current AI foundation with \$400M endowment. Anthropic CEO Dario Amodei called it a
+    "missed opportunity" for AI safety.
+  tags:
+    - international
+    - summit
+    - ai-governance
+    - us-refusal
+  clusters:
+    - governance
+  sources:
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/AI_Action_Summit
+  lastUpdated: 2026-03
+
+- id: un-ai-governance-resolution
+  stableId: TNWEEemXQd
+  type: policy
+  summaryPage: governance-overview
+  title: UN General Assembly AI Governance Resolution (August 2025)
+  introduced: '2025-08-26'
+  policyStatus: enacted
+  author: UN General Assembly
+  scope: International
+  jurisdiction: International
+  provisions:
+    - title: International Scientific Panel on AI
+      description: >-
+        Established Independent International Scientific Panel on AI with 40 experts to
+        issue annual evidence-based assessments of AI risks, opportunities, and impacts.
+      category: Scientific assessment
+    - title: Global Dialogue on AI Governance
+      description: >-
+        Annual inclusive forum for states and stakeholders. First meeting July 2026 in
+        Geneva, second 2027 in New York.
+      category: International cooperation
+  description: >-
+    UN General Assembly resolution adopted August 26, 2025 establishing two new AI governance
+    bodies. US explicitly rejected "centralized control and global governance" of AI at UN
+    Security Council. China supported framework, aligned with developing countries.
+  tags:
+    - international
+    - united-nations
+    - ai-governance
+    - scientific-panel
+  clusters:
+    - governance
+  sources:
+    - title: UN Press Release
+      url: https://press.un.org/en/2025/sgsm22776.doc.htm
+    - title: WEF Explainer
+      url: https://www.weforum.org/stories/2025/10/un-new-ai-governance-bodies/
+  lastUpdated: 2026-03
