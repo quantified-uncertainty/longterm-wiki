@@ -5,14 +5,16 @@ facts:
     value: !ref 18K3KG3bpg
     asOf: 2005-01
     source: https://nickbostrom.com/
-    notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI closed in April 2024"
+    notes: "Founded the Future of Humanity Institute (FHI) at Oxford in 2005; FHI
+      closed in April 2024"
 
   - id: f_F5iVdik64y
     property: role
     value: "Professor of Philosophy, University of Oxford; Founder of FHI"
     asOf: 2005-01
     source: https://nickbostrom.com/
-    notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which catalyzed mainstream concern about AI existential risk"
+    notes: "Author of 'Superintelligence: Paths, Dangers, Strategies' (2014), which
+      catalyzed mainstream concern about AI existential risk"
 
   - id: f_YhxyxeHHdA
     property: born-year
@@ -22,13 +24,17 @@ facts:
 
   - id: f_nB1aB2cD3e
     property: education
-    value: "PhD in Philosophy, London School of Economics; MA in Philosophy and Physics, Stockholm University; MSc in Computational Neuroscience, King's College London"
+    value: "PhD in Philosophy, London School of Economics; MA in Philosophy and
+      Physics, Stockholm University; MSc in Computational Neuroscience, King's
+      College London"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
     notes: "One of the most extensively educated figures in AI safety"
 
   - id: f_nB4fG5hI6j
     property: notable-for
-    value: "Author of 'Superintelligence'; founder of FHI at Oxford; pioneer of existential risk studies; influential philosopher on AI risk, simulation argument, and anthropic reasoning"
+    value: "Author of 'Superintelligence'; founder of FHI at Oxford; pioneer of
+      existential risk studies; influential philosopher on AI risk, simulation
+      argument, and anthropic reasoning"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
 
   - id: f_nB7kL8mN9o
@@ -47,3 +53,8 @@ facts:
   - id: f_ikrzfocsqt
     property: google-scholar
     value: "https://scholar.google.com/citations?user=gk5PjEkAAAAJ"
+  - id: hkj1tbdjsw
+    property: website
+    value: https://www.nickbostrom.com
+    source: https://www.wikidata.org/wiki/Q460475
+    notes: From Wikidata Q460475

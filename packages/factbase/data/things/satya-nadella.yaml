@@ -14,13 +14,19 @@ facts:
 
   - id: f_ogkKZjCfQg
     property: notable-for
-    value: "CEO of Microsoft; led Microsoft's multi-billion dollar investment in OpenAI; shaped enterprise AI strategy"
+    value: "CEO of Microsoft; led Microsoft's multi-billion dollar investment in
+      OpenAI; shaped enterprise AI strategy"
 
   - id: f_O4q4Gx1XHQ
     property: education
-    value: "MS in Computer Science, University of Wisconsin-Milwaukee; MBA, University of Chicago"
+    value: "MS in Computer Science, University of Wisconsin-Milwaukee; MBA,
+      University of Chicago"
 
   - id: f_ZwHcneamiw
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Satya_Nadella"
-
+  - id: a0yZGfv11Q
+    property: website
+    value: https://news.microsoft.com/exec/satya-nadella/
+    source: https://www.wikidata.org/wiki/Q7426870
+    notes: From Wikidata Q7426870

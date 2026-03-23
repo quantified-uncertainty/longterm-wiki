@@ -24,3 +24,8 @@ facts:
     value: Crystal Springs Uplands School; Massachusetts Institute of Technology
     source: https://www.wikidata.org/wiki/Q106543540
     notes: From Wikidata Q106543540
+  - id: 2jiar0CMUQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Sam_Bankman-Fried
+    source: https://www.wikidata.org/wiki/Q106543540
+    notes: From Wikidata Q106543540

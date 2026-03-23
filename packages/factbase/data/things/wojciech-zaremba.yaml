@@ -1,2 +1,18 @@
 entity: 4eNHxKcml1
-facts: []
+facts:
+  [
+    {
+        id: aL2XFx9meQ,
+        property: website,
+        value: https://wojzaremba.com/,
+        source: https://www.wikidata.org/wiki/Q27733815,
+        notes: From Wikidata Q27733815
+      },
+    {
+        id: CHUKAFYC6Q,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Wojciech_Zaremba,
+        source: https://www.wikidata.org/wiki/Q27733815,
+        notes: From Wikidata Q27733815
+      }
+  ]

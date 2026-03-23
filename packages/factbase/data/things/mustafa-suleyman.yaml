@@ -14,9 +14,14 @@ facts:
 
   - id: f_65egajgbIQ
     property: notable-for
-    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI; advocate for AI safety and governance"
+    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI;
+      advocate for AI safety and governance"
 
   - id: f_ufd9nJBdCA
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
-
+  - id: lwbM3fLU2Q
+    property: website
+    value: https://the-coming-wave.com
+    source: https://www.wikidata.org/wiki/Q16847797
+    notes: From Wikidata Q16847797

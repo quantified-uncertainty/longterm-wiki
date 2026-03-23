@@ -1,0 +1,53 @@
+entity: MIie9_9BSq
+facts:
+  [
+    {
+        id: QtGkQoMsxg,
+        property: founded-date,
+        value: 1969-01,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      },
+    {
+        id: fatyr58V0A,
+        property: headquarters,
+        value: New York City,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      },
+    {
+        id: SwCZBHckWQ,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      },
+    {
+        id: VgD8r2I8qA,
+        property: website,
+        value: http://www.mellon.org/,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      },
+    {
+        id: p78aOl0eQw,
+        property: founded-by-name,
+        value: Ailsa Mellon Bruce,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812; text value (not entity ref)
+      },
+    {
+        id: cGuqhtGg4g,
+        property: legal-structure,
+        value: foundation,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      },
+    {
+        id: pKcUcgDnMA,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Andrew_W._Mellon_Foundation,
+        source: https://www.wikidata.org/wiki/Q4758812,
+        notes: From Wikidata Q4758812
+      }
+  ]

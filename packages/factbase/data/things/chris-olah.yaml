@@ -12,7 +12,8 @@ facts:
     value: "Co-founder, Interpretability"
     asOf: 2021-01
     source: https://anthropic.com/company
-    notes: "Pioneer of neural network interpretability; created Distill.pub and the Circuits research thread"
+    notes: "Pioneer of neural network interpretability; created Distill.pub and the
+      Circuits research thread"
 
   - id: f_RewqjBXgsA
     property: employed-by
@@ -26,7 +27,8 @@ facts:
     value: !ref A4XoubikkQ
     asOf: "2015"
     validEnd: "2018"
-    notes: "Research scientist at Google Brain (prior to DeepMind merger); published influential work on neural network visualization"
+    notes: "Research scientist at Google Brain (prior to DeepMind merger); published
+      influential work on neural network visualization"
 
   - id: f_cO1aB2cD3e
     property: education
@@ -36,7 +38,9 @@ facts:
 
   - id: f_cO4fG5hI6j
     property: notable-for
-    value: "Pioneer of neural network interpretability and visualization; co-founder of Anthropic; creator of Distill.pub and the Circuits thread at Transformer Circuits"
+    value: "Pioneer of neural network interpretability and visualization; co-founder
+      of Anthropic; creator of Distill.pub and the Circuits thread at
+      Transformer Circuits"
     source: https://colah.github.io/
 
   - id: f_cO7kL8mN9o
@@ -55,3 +59,13 @@ facts:
   - id: f_s2rmoloko5
     property: google-scholar
     value: "https://scholar.google.com/citations?user=vKAKE1gAAAAJ"
+  - id: VRzfPxd0og
+    property: website
+    value: https://colah.github.io.
+    source: https://www.wikidata.org/wiki/Q50358648
+    notes: From Wikidata Q50358648
+  - id: v9IV1EJ1GA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Chris_Olah
+    source: https://www.wikidata.org/wiki/Q50358648
+    notes: From Wikidata Q50358648

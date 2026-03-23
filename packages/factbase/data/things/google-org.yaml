@@ -1,0 +1,32 @@
+entity: J2DYTkMiRA
+facts:
+  [
+    {
+        id: nf0DJFbftg,
+        property: founded-date,
+        value: 2005-01,
+        source: https://www.wikidata.org/wiki/Q1377855,
+        notes: From Wikidata Q1377855
+      },
+    {
+        id: gXKFeDsvAg,
+        property: website,
+        value: http://www.google.org/,
+        source: https://www.wikidata.org/wiki/Q1377855,
+        notes: From Wikidata Q1377855
+      },
+    {
+        id: PDr4UDWxpg,
+        property: parent-organization,
+        value: Google,
+        source: https://www.wikidata.org/wiki/Q1377855,
+        notes: From Wikidata Q1377855
+      },
+    {
+        id: yclKzKmtgQ,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Google.org,
+        source: https://www.wikidata.org/wiki/Q1377855,
+        notes: From Wikidata Q1377855
+      }
+  ]

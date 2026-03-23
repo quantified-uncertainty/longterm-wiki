@@ -52,21 +52,27 @@ facts:
     asOf: 2024-10
     validEnd: 2025-03
     source: https://openai.com/index/openai-announces-a-new-funding-round/
-    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B in prior rounds. Superseded by SoftBank $40B round in March 2025."
+    notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive
+      Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B
+      in prior rounds. Superseded by SoftBank $40B round in March 2025."
 
   - id: f_Sb4nW9mT7a
     property: total-funding
     value: 5.79e+10
     asOf: 2025-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
-    notes: "Cumulative funding after SoftBank's $40B round (March 2025) at a $300B valuation, bringing total to approximately $57.9B. Round co-led by SoftBank ($15B from third parties, $15B from SoftBank directly, with additional participants)."
+    notes: "Cumulative funding after SoftBank's $40B round (March 2025) at a $300B
+      valuation, bringing total to approximately $57.9B. Round co-led by
+      SoftBank ($15B from third parties, $15B from SoftBank directly, with
+      additional participants)."
 
   - id: f_m5b6R9pIby
     property: total-funding
     value: 5.79e+10
     asOf: 2025-03
     source: https://www.reuters.com/technology/openai-closes-40-billion-funding-round-softbank-2025-03-31/
-    notes: "Cumulative funding after $40B SoftBank-led round in March 2025 at $300B valuation, bringing total to ~$57.9B"
+    notes: "Cumulative funding after $40B SoftBank-led round in March 2025 at $300B
+      valuation, bringing total to ~$57.9B"
 
   - id: f_b56n3kcD2g
     property: valuation
@@ -111,7 +117,8 @@ facts:
     value: 4e+8
     asOf: 2025-02
     source: https://openai.com/index/400-million-users/
-    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO Sam Altman"
+    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO
+      Sam Altman"
 
   - id: f_o1tcwe2T0w
     property: headcount
@@ -171,5 +178,45 @@ facts:
   - id: EdV4qjV9fA
     property: website
     value: https://openai.com/
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: oV0lgodIsQ
+    property: headquarters
+    value: San Francisco
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: vyFXipPEhg
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: q4DTDRk4lg
+    property: ceo
+    value: Sam Altman
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: JU8dVl7ViQ
+    property: headcount
+    value: 375
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: hf1lYXbYXQ
+    property: revenue
+    value: 5363248
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: zn71ZtJN2A
+    property: founded-by-name
+    value: Elon Musk
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200; text value (not entity ref)
+  - id: Jjf6iAusCA
+    property: legal-structure
+    value: 501(c)(3) organization
+    source: https://www.wikidata.org/wiki/Q21708200
+    notes: From Wikidata Q21708200
+  - id: Zuy0wq0iZw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/OpenAI
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200

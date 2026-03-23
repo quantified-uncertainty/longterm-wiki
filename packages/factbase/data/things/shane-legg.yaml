@@ -2,7 +2,8 @@ entity: muueuPOHfg
 facts:
   - id: f_r70UvkiMgQ
     property: description
-    value: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of machine superintelligence research.
+    value: Co-founder and Chief AGI Scientist at Google DeepMind, early pioneer of
+      machine superintelligence research.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_BbpmsSq6zg
@@ -17,7 +18,8 @@ facts:
 
   - id: f_sL2nLw9pYr
     property: notable-for
-    value: "Co-founding DeepMind; Early work on AGI; Machine super intelligence thesis"
+    value: "Co-founding DeepMind; Early work on AGI; Machine super intelligence
+      thesis"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
 
@@ -30,5 +32,10 @@ facts:
   - id: CSAKC0XVnA
     property: education
     value: Dalle Molle Institute for Artificial Intelligence Research
+    source: https://www.wikidata.org/wiki/Q22278829
+    notes: From Wikidata Q22278829
+  - id: U1X5HaKSTw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Shane_Legg
     source: https://www.wikidata.org/wiki/Q22278829
     notes: From Wikidata Q22278829

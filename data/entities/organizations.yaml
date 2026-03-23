@@ -6645,3 +6645,373 @@
     - law-as-code
     - academic
   lastUpdated: 2026-03
+
+# --- New funder organizations (Vipul Naik multi-donor import) ---
+- id: sloan-foundation
+  stableId: lI8DgWtPyD
+  type: organization
+  orgType: funder
+  title: Alfred P. Sloan Foundation
+  website: https://sloan.org
+  description: >-
+    Philanthropic nonprofit founded in 1934 by Alfred P. Sloan Jr. Makes grants
+    in science, technology, engineering, mathematics, and economics.
+  lastUpdated: 2026-03
+
+- id: thiel-foundation
+  stableId: 0SkH1jbTRu
+  type: organization
+  orgType: funder
+  title: Thiel Foundation
+  website: https://thielfoundation.org
+  description: >-
+    Foundation created by Peter Thiel supporting science, technology, and
+    long-term thinking. Best known for the Thiel Fellowship.
+  lastUpdated: 2026-03
+
+- id: knight-foundation
+  stableId: BAGFs8P6WP
+  type: organization
+  orgType: funder
+  title: John S. and James L. Knight Foundation
+  website: https://knightfoundation.org
+  description: >-
+    Major US foundation focused on journalism, media, and informed communities.
+  lastUpdated: 2026-03
+
+- id: kellogg-foundation
+  stableId: 1SqvvamQqq
+  type: organization
+  orgType: funder
+  title: W. K. Kellogg Foundation
+  website: https://www.wkkf.org
+  description: >-
+    One of the largest philanthropic foundations in the US, founded in 1930.
+    Focuses on children, families, and communities.
+  lastUpdated: 2026-03
+
+- id: pineapple-fund
+  stableId: wTnEjSfIeP
+  type: organization
+  orgType: funder
+  title: Pineapple Fund
+  website: https://pineapplefund.org
+  description: >-
+    Charitable fund created in 2017 by an anonymous Bitcoin donor who donated
+    5,057 BTC (approximately \$55M) to various charities.
+  lastUpdated: 2026-03
+
+- id: google-org
+  stableId: J2DYTkMiRA
+  type: organization
+  orgType: funder
+  title: Google.org
+  website: https://www.google.org
+  description: >-
+    Google's philanthropic arm providing over \$100M annually in grants.
+  lastUpdated: 2026-03
+
+- id: lilly-endowment
+  stableId: kxVSuuHN7j
+  type: organization
+  orgType: funder
+  title: Lilly Endowment
+  website: https://lillyendowment.org
+  description: >-
+    Private philanthropic foundation in Indianapolis created in 1937. One of the
+    largest private foundations in the US.
+  lastUpdated: 2026-03
+
+- id: mellon-foundation
+  stableId: MIie9_9BSq
+  type: organization
+  orgType: funder
+  title: Andrew W. Mellon Foundation
+  website: https://mellon.org
+  description: >-
+    Major US foundation supporting arts, culture, higher education, and humanities.
+  lastUpdated: 2026-03
+
+- id: walton-family-foundation
+  stableId: gk4_-AGcTd
+  type: organization
+  orgType: funder
+  title: Walton Family Foundation
+  website: https://www.waltonfamilyfoundation.org
+  description: >-
+    Foundation established by Walmart founders Sam and Helen Walton. Focuses on
+    K-12 education reform, environmental conservation, and community development.
+  lastUpdated: 2026-03
+
+- id: barr-foundation
+  stableId: RfxfdsVA3R
+  type: organization
+  orgType: funder
+  title: Barr Foundation
+  website: https://www.barrfoundation.org
+  description: >-
+    Private foundation based in Boston focusing on climate, education, and arts.
+  lastUpdated: 2026-03
+
+- id: sandler-foundation
+  stableId: EPY-YnX6K8
+  type: organization
+  orgType: funder
+  title: Sandler Foundation
+  website: https://www.sandlerfoundation.org
+  description: >-
+    San Francisco-based foundation supporting scientific research, civil liberties,
+    human rights, and economic equality.
+  lastUpdated: 2026-03
+
+- id: surdna-foundation
+  stableId: 6wJ85FrPfi
+  type: organization
+  orgType: funder
+  title: Surdna Foundation
+  website: https://www.surdna.org
+  description: >-
+    Family foundation established in 1917 focused on sustainable environments,
+    strong local economies, and thriving cultures.
+  lastUpdated: 2026-03
+
+- id: donorstrust
+  stableId: rY6Rdleg5f
+  type: organization
+  orgType: funder
+  title: DonorsTrust
+  website: https://www.donorstrust.org
+  description: >-
+    Donor-advised fund specializing in libertarian and free-market causes.
+  lastUpdated: 2026-03
+
+# --- EA/AI safety grantee organizations ---
+- id: wild-animal-initiative
+  stableId: mHrz7Y-rOx
+  type: organization
+  orgType: generic
+  title: Wild Animal Initiative
+  website: https://www.wildanimalinitiative.org
+  description: >-
+    Research nonprofit focused on wild animal welfare, studying the lives of
+    wild animals and identifying ways to improve their well-being. Funded by
+    EA Funds and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: mercy-for-animals
+  stableId: 8C_NZjRH28
+  type: organization
+  orgType: generic
+  title: Mercy For Animals
+  website: https://mercyforanimals.org
+  description: >-
+    International animal advocacy nonprofit focused on ending factory farming.
+    Conducts undercover investigations, corporate campaigns, and policy advocacy.
+    Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: constellation
+  stableId: jwe4re7Ggo
+  type: organization
+  orgType: generic
+  title: Constellation
+  website: https://constellation.org
+  description: >-
+    Co-working and community space for AI safety researchers in Berkeley, CA.
+    Provides office space and community infrastructure for the AI safety ecosystem.
+    Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: animal-equality
+  stableId: IkwNqat1cE
+  type: organization
+  orgType: generic
+  title: Animal Equality
+  website: https://animalequality.org
+  description: >-
+    International animal rights nonprofit conducting investigations and
+    corporate campaigns to reduce animal suffering in factory farming.
+  lastUpdated: 2026-03
+
+- id: openmined
+  stableId: AOJewfN502
+  type: organization
+  orgType: generic
+  title: OpenMined
+  website: https://openmined.org
+  description: >-
+    Open-source community focused on privacy-preserving AI and data science.
+    Develops tools for federated learning, differential privacy, and encrypted
+    computation. Funded by Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: ai-objectives-institute
+  stableId: 71VWCgxV5P
+  type: organization
+  orgType: generic
+  title: AI Objectives Institute
+  website: https://ai-objectives.org
+  description: >-
+    Research organization working on AI alignment through mechanism design and
+    cooperative AI. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: timaeus
+  stableId: AzwQTQCMeo
+  type: organization
+  orgType: generic
+  title: Timaeus
+  website: https://timaeus.co
+  description: >-
+    AI safety research organization focused on mechanistic interpretability
+    and developmental interpretability. Studies how neural networks form
+    internal representations during training. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: pibbss
+  stableId: PXcUg7YICV
+  type: organization
+  orgType: generic
+  title: PIBBSS
+  aliases:
+    - Principles of Intelligent Behavior in Biological and Social Systems
+  website: https://pibbss.ai
+  description: >-
+    Research fellowship program bringing researchers from diverse fields
+    (biology, neuroscience, social science) to work on AI alignment problems.
+    Funded by SFF and EA Funds.
+  lastUpdated: 2026-03
+
+- id: arkose
+  stableId: fj1DZJhxWy
+  type: organization
+  orgType: generic
+  title: Arkose
+  description: >-
+    AI safety research organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: civai
+  stableId: vG0nGlCWRn
+  type: organization
+  orgType: generic
+  title: Civic AI Security Program (CivAI)
+  description: >-
+    Program focused on the intersection of AI safety and civic security.
+    Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: idais
+  stableId: zkWlTLfxuO
+  type: organization
+  orgType: generic
+  title: International Dialogues on AI Safety (IDAIS)
+  description: >-
+    Initiative bringing together international stakeholders for dialogue on
+    AI safety governance and policy coordination.
+  lastUpdated: 2026-03
+
+- id: alter
+  stableId: 8a5BiFe1nv
+  type: organization
+  orgType: generic
+  title: Association for Long Term Existence and Resilience (ALTER)
+  description: >-
+    Academic research and advocacy organization investigating AI alignment
+    and existential risk. Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: center-for-election-science
+  stableId: gBpjt2fx66
+  type: organization
+  orgType: generic
+  title: The Center for Election Science
+  website: https://electionscience.org
+  description: >-
+    Nonprofit advancing approval voting and other voting method reforms.
+    Funded by SFF and Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: shrimp-welfare-project
+  stableId: uFuJxNjpYD
+  type: organization
+  orgType: generic
+  title: Shrimp Welfare Project
+  website: https://www.shrimpwelfareproject.org
+  description: >-
+    Charity focused on improving welfare of farmed shrimp, one of the most
+    numerous farmed animals. Funded by EA Funds.
+  lastUpdated: 2026-03
+
+- id: fortify-health
+  stableId: XCK8EEC7tz
+  type: organization
+  orgType: generic
+  title: Fortify Health
+  website: https://www.fortifyhealth.global
+  description: >-
+    Global health nonprofit working on large-scale food fortification programs
+    to reduce micronutrient deficiencies. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: pure-earth
+  stableId: 3xDXLwV3lg
+  type: organization
+  orgType: generic
+  title: Pure Earth
+  website: https://www.pureearth.org
+  description: >-
+    Nonprofit working to solve pollution problems in low and middle-income
+    countries. Focus on lead and toxic pollution. EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: aquatic-life-institute
+  stableId: NDTZImcMyY
+  type: organization
+  orgType: generic
+  title: Aquatic Life Institute
+  website: https://ali.fish
+  description: >-
+    Research and advocacy organization focused on the welfare of aquatic
+    animals. Works on fish welfare standards and aquaculture practices.
+    EA Funds grantee.
+  lastUpdated: 2026-03
+
+- id: just-impact
+  stableId: pwbWtmWHkT
+  type: organization
+  orgType: generic
+  title: Just Impact
+  description: >-
+    Fiscal sponsor and project incubator. Major Open Philanthropy grantee.
+  lastUpdated: 2026-03
+
+- id: lead-exposure-action-fund
+  stableId: rCn5M6JO7K
+  type: organization
+  orgType: generic
+  title: Lead Exposure Action Fund (LEAF)
+  description: >-
+    Fund dedicated to reducing childhood lead exposure worldwide. Seeded
+    with \$125M from Open Philanthropy.
+  lastUpdated: 2026-03
+
+- id: encode-ai
+  stableId: BVYHXX_LvA
+  type: organization
+  orgType: generic
+  title: Encode AI Corporation
+  description: >-
+    AI safety organization. Funded by SFF.
+  lastUpdated: 2026-03
+
+- id: california-yimby
+  stableId: yU5rKw_sAa
+  type: organization
+  orgType: generic
+  title: California YIMBY
+  website: https://cayimby.org
+  description: >-
+    Housing advocacy organization promoting pro-housing policy reform in
+    California. Open Philanthropy grantee.
+  lastUpdated: 2026-03

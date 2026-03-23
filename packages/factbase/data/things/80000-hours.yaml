@@ -24,3 +24,18 @@ facts:
     value: https://80000hours.org/
     source: https://www.wikidata.org/wiki/Q4644323
     notes: From Wikidata Q4644323
+  - id: NfdBivfIWg
+    property: country
+    value: United Kingdom
+    source: https://www.wikidata.org/wiki/Q4644323
+    notes: From Wikidata Q4644323
+  - id: uC0I8h3pvQ
+    property: founded-by-name
+    value: William MacAskill
+    source: https://www.wikidata.org/wiki/Q4644323
+    notes: From Wikidata Q4644323; text value (not entity ref)
+  - id: LvdjVIo2LA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/80,000_Hours
+    source: https://www.wikidata.org/wiki/Q4644323
+    notes: From Wikidata Q4644323

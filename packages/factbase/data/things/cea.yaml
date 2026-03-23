@@ -18,3 +18,33 @@ facts:
     value: https://www.centreforeffectivealtruism.org
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
+  - id: v9zixRsSuw
+    property: country
+    value: United Kingdom
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186
+  - id: 7mPjnjpTxw
+    property: headcount
+    value: 11
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186
+  - id: 5HTMUS41Og
+    property: revenue
+    value: 3507482
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186
+  - id: JSQ9yIXGYA
+    property: founded-by-name
+    value: Toby Ord
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186; text value (not entity ref)
+  - id: 3whP78Mbcw
+    property: legal-structure
+    value: charitable organization
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186
+  - id: a19hs5hVqA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
+    source: https://www.wikidata.org/wiki/Q58844186
+    notes: From Wikidata Q58844186

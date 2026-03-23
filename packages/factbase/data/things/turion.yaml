@@ -2,8 +2,15 @@ entity: wixiIVSZdg
 facts:
   - id: f_t6iCdIf3ow
     property: description
-    value: Point72's Turion hedge fund, launched October 2024 with $150M seed capital, manages ~$3B focused on AI
-      hardware/semiconductors and returned ~30% in 2025 (14.2% in Q4 2024). The fund represents one of several major
-      AI-focused hedge funds launched 2024-2025, with concentrated exposure to semiconductor
+    value: Point72's Turion hedge fund, launched October 2024 with $150M seed
+      capital, manages ~$3B focused on AI hardware/semiconductors and returned
+      ~30% in 2025 (14.2% in Q4 2024). The fund represents one of several major
+      AI-focused hedge funds launched 2024-2025, with concentrated exposure to
+      semiconductor
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: ucIHM8zOpw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Turion_(botany)
+    source: https://www.wikidata.org/wiki/Q943947
+    notes: From Wikidata Q943947

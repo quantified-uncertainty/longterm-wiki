@@ -10,7 +10,8 @@ facts:
 
   - id: f_3NUOYZSdQw
     property: notable-for
-    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI team; AI ethics and fairness researcher"
+    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI
+      team; AI ethics and fairness researcher"
 
   - id: f_hfbDHNUaWg
     property: education
@@ -19,4 +20,8 @@ facts:
   - id: f_seF7GHtJYg
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Timnit_Gebru"
-
+  - id: UaVuC5M83A
+    property: website
+    value: https://ai.stanford.edu/~tgebru/
+    source: https://www.wikidata.org/wiki/Q59753117
+    notes: From Wikidata Q59753117

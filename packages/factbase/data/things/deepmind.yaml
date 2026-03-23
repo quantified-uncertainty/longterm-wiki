@@ -67,3 +67,43 @@ facts:
     value: https://deepmind.google/
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
+  - id: F2JXn1Rz4g
+    property: founded-date
+    value: 2010-01
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: XU5I96vsPw
+    property: headquarters
+    value: London
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: RYUAwpW0fA
+    property: country
+    value: United Kingdom
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: mZo3jiRTlQ
+    property: headcount
+    value: 10000
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: lSlD6Ap3og
+    property: parent-organization
+    value: Alphabet Inc.
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: 0F2WsLKJJQ
+    property: founded-by-name
+    value: Demis Hassabis
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006; text value (not entity ref)
+  - id: B6E2nTTFlA
+    property: legal-structure
+    value: subsidiary company
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006
+  - id: hoTB7Pu7xw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Google_DeepMind
+    source: https://www.wikidata.org/wiki/Q15733006
+    notes: From Wikidata Q15733006

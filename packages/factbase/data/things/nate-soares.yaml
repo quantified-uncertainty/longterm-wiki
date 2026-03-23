@@ -37,3 +37,8 @@ facts:
     value: 1989
     source: https://www.wikidata.org/wiki/Q136721135
     notes: From Wikidata Q136721135
+  - id: 43N4j7y4PA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Nate_Soares
+    source: https://www.wikidata.org/wiki/Q136721135
+    notes: From Wikidata Q136721135

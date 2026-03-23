@@ -24,10 +24,11 @@ facts:
   - id: f_iHjUY97NNp
     property: description
     value: >-
-      Nonpartisan think tank producing policy research on implications of frontier AI, from
-      today's most advanced models to potential AGI and superintelligence. Focus areas include
-      frontier security, compute policy, and international strategy. Remote-first organization
-      with DC-area presence.
+      Nonpartisan think tank producing policy research on implications of
+      frontier AI, from today's most advanced models to potential AGI and
+      superintelligence. Focus areas include frontier security, compute policy,
+      and international strategy. Remote-first organization with DC-area
+      presence.
     asOf: 2025-12
     source: https://www.iaps.ai
 
@@ -35,3 +36,13 @@ facts:
     property: legal-structure
     value: "Nonprofit think tank"
     source: https://www.idealist.org/en/nonprofit/a25d86f3f3904984bdc5f745721222d1-institute-for-ai-policy-and-strategy-washington
+  - id: bKMnaItDAQ
+    property: country
+    value: United States
+    source: https://www.wikidata.org/wiki/Q131901373
+    notes: From Wikidata Q131901373
+  - id: kfxIbtifMw
+    property: website
+    value: https://www.iaps.ai/
+    source: https://www.wikidata.org/wiki/Q131901373
+    notes: From Wikidata Q131901373

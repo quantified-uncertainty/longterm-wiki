@@ -1,0 +1,25 @@
+entity: 0SkH1jbTRu
+facts:
+  [
+    {
+        id: WELm0IokEQ,
+        property: website,
+        value: http://thielfoundation.org,
+        source: https://www.wikidata.org/wiki/Q17098689,
+        notes: From Wikidata Q17098689
+      },
+    {
+        id: ZApnh66vkQ,
+        property: legal-structure,
+        value: foundation,
+        source: https://www.wikidata.org/wiki/Q17098689,
+        notes: From Wikidata Q17098689
+      },
+    {
+        id: gNRivVEYsw,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Thiel_Foundation,
+        source: https://www.wikidata.org/wiki/Q17098689,
+        notes: From Wikidata Q17098689
+      }
+  ]

@@ -2,8 +2,20 @@ entity: k4IPgRP98A
 facts:
   - id: f_tsumVdflJQ
     property: description
-    value: EA Global is a series of selective conferences organized by the Centre for Effective Altruism that connects
-      committed EA practitioners to collaborate on global challenges, with AI safety becoming increasingly prominent
-      (53% of 2024 survey respondents identified it as most pressing). The conferences
+    value: EA Global is a series of selective conferences organized by the Centre
+      for Effective Altruism that connects committed EA practitioners to
+      collaborate on global challenges, with AI safety becoming increasingly
+      prominent (53% of 2024 survey respondents identified it as most pressing).
+      The conferences
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: XsVIIxGvKg
+    property: website
+    value: https://www.eaglobal.org
+    source: https://www.wikidata.org/wiki/Q24949667
+    notes: From Wikidata Q24949667
+  - id: fszg30SsDw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Effective_Altruism_Global
+    source: https://www.wikidata.org/wiki/Q24949667
+    notes: From Wikidata Q24949667

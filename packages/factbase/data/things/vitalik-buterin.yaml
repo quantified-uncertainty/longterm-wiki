@@ -1,0 +1,18 @@
+entity: iEEm0cZ3tn
+facts:
+  [
+    {
+        id: 8bP1lGt0zw,
+        property: website,
+        value: https://vitalik.ca/,
+        source: https://www.wikidata.org/wiki/Q16197959,
+        notes: From Wikidata Q16197959
+      },
+    {
+        id: TjHdKcT9uQ,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Vitalik_Buterin,
+        source: https://www.wikidata.org/wiki/Q16197959,
+        notes: From Wikidata Q16197959
+      }
+  ]

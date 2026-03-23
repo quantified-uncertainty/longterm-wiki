@@ -1,0 +1,53 @@
+entity: 1SqvvamQqq
+facts:
+  [
+    {
+        id: XiZVt7TVXA,
+        property: founded-date,
+        value: 1930-01,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      },
+    {
+        id: mYZ7ETznrQ,
+        property: headquarters,
+        value: Battle Creek,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      },
+    {
+        id: fpx9PlYkHA,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      },
+    {
+        id: 9IS1nKi1Mg,
+        property: website,
+        value: http://www.wkkf.org/,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      },
+    {
+        id: uiyd1YnP5A,
+        property: founded-by-name,
+        value: Will Keith Kellogg,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762; text value (not entity ref)
+      },
+    {
+        id: UZPEEIcAwg,
+        property: legal-structure,
+        value: foundation,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      },
+    {
+        id: g9TzEKTF8Q,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/W._K._Kellogg_Foundation,
+        source: https://www.wikidata.org/wiki/Q7945762,
+        notes: From Wikidata Q7945762
+      }
+  ]
