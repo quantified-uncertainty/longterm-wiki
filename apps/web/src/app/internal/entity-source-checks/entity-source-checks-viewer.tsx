@@ -466,8 +466,9 @@ export function EntitySourceChecksViewer() {
   const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
 
   // Stats
-  const avgConfidence = verdicts.length > 0
-    ? verdicts.reduce((s, v) => s + (v.confidence ?? 0), 0) / verdicts.length : 0;
+  const withConfidence = verdicts.filter((v) => v.confidence != null);
+  const avgConfidence = withConfidence.length > 0
+    ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
   const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
 
   if (isLoading) {

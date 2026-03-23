@@ -32,6 +32,9 @@ export function resolveEntityId(paramName = "entityId"): MiddlewareHandler {
     }
     const db = getDrizzleDb();
     const resolved = await resolveEntityStableId(db, raw);
+    if (!resolved) {
+      return c.json({ error: `Entity not found: ${raw}` }, 404);
+    }
     c.set("resolvedEntityId", resolved);
     await next();
   };

@@ -953,7 +953,6 @@
   type: person
   title: Elon Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
-  status: stub
   relatedEntries:
     - id: GLXKjYAEKw
       type: organization
@@ -971,7 +970,6 @@
   type: person
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
-  status: stub
   relatedEntries:
     - id: rQEkFJxS5w
       type: organization
