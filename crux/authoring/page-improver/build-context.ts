@@ -10,6 +10,7 @@
 
 import { buildEntityLookupForContent } from '../../lib/entity-lookup.ts';
 import { buildKbContextForPage } from '../../lib/factbase-context.ts';
+import { buildSourceCheckContext } from '../../lib/source-check-context.ts';
 import { resolveTemplate, formatTemplateForPrompt } from '../../lib/content/page-templates.ts';
 import { getPageType } from '../../lib/page-analysis.ts';
 import { IMPROVE_PROMPT } from './phases/prompts.ts';
@@ -27,6 +28,8 @@ export interface ImproveContext {
   templateContext: string | null;
   /** Objectivity context (alerts + issues) from analysis. */
   objectivityContext: string;
+  /** Source-check verdict context (contradicted/outdated claims), or null if unavailable. */
+  sourceCheckContext: string | null;
 }
 
 export interface BuildImproveContextOptions {
@@ -93,6 +96,22 @@ export async function buildImproveContext(
     log('improve', `  Using template: ${template.name}`);
   }
 
+  // Fetch source-check verdicts (contradicted/outdated) for this entity
+  log('improve', 'Loading source-check verdicts...');
+  let sourceCheckContext: string | null = null;
+  try {
+    sourceCheckContext = await buildSourceCheckContext(page.id);
+    if (sourceCheckContext) {
+      const lineCount = sourceCheckContext.split('\n').filter(Boolean).length;
+      log('improve', `  Found ${lineCount} source-check warnings for this entity`);
+    } else {
+      log('improve', '  No actionable source-check verdicts found');
+    }
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    log('improve', `  Source-check context load failed: ${error.message} — continuing without`);
+  }
+
   const prompt = IMPROVE_PROMPT({
     page, filePath, importPath, directions,
     analysis, research, objectivityContext,
@@ -100,6 +119,7 @@ export async function buildImproveContext(
     claimsContext: null,
     gapAnalysisContext: null,
     kbContext, tier, templateContext,
+    sourceCheckContext,
   });
 
   return {
@@ -108,5 +128,6 @@ export async function buildImproveContext(
     kbContext,
     templateContext,
     objectivityContext,
+    sourceCheckContext,
   };
 }
