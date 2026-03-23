@@ -854,9 +854,12 @@
     - title: UK AI Safety Institute Announcements
       url: https://www.gov.uk/search/news-and-communications?organisations%5B%5D=ai-safety-institute
   description: >-
-    The UK AI Safety Institute (UK AISI) is a government organization established in 2023 to advance AI safety through
-    research, evaluation, and international coordination. Created in the wake of the first AI Safety Summit hosted by
-    the UK government, AISI represents the UK's commitment to being a global leader in AI safety and governance.
+    The UK AI Safety Institute, renamed to "AI Security Institute" on February 14, 2025 by Science
+    Secretary Peter Kyle at Munich Security Conference. Focus shifted from broad existential/alignment
+    safety to near-term national security risks: cybersecurity, CBRN, fraud, child exploitation.
+    New criminal misuse team (joint with Home Office) and partnership with Defence Science and
+    Technology Laboratory (Dstl). Signed MoU with Anthropic to explore AI in public services.
+    Established 2023 at Bletchley Park AI Safety Summit.
   tags:
     - governance
     - government-ai-safety
@@ -935,9 +938,11 @@
   title: Japan AI Safety Institute
   website: https://aisi.go.jp/en/
   description: >-
-    Japan's national AI safety institute, established in February 2024 under the Ministry of Economy, Trade and
-    Industry (METI). Focuses on AI standards research and evaluation frameworks. Part of the international AISI
-    network established through the Seoul Declaration.
+    Japan's national AI safety institute, established February 2024 under the Ministry of Economy,
+    Trade and Industry (METI). Published "Guide to Evaluation Perspectives on AI Safety" (updated
+    to v1.10, March 2025). Staffing target: ~200 staff (signaled by PM). Focuses on safety
+    evaluation frameworks and international alignment on testing practices with UK and US
+    counterparts. Part of the international AISI network.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -964,9 +969,10 @@
   title: Singapore AI Safety Institute
   website: https://aisi.gov.sg/
   description: >-
-    Singapore's national AI safety testing institute, established in February 2024 under the Infocomm Media
-    Development Authority (IMDA). Focuses on testing frameworks and regional AI safety coordination in Southeast
-    Asia.
+    Singapore's national AI safety testing institute, designated May 22, 2024 at AI Seoul Summit.
+    Hosted by Digital Trust Centre (DTC) at Nanyang Technological University. Led by Professor
+    Lam Kwok Yen. Funded with S\$50 million initial grant from IMDA and National Research Foundation.
+    Focuses on GenAI evaluations and collaboration with US and UK AISIs.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -991,8 +997,11 @@
   title: Canadian AI Safety Institute
   website: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
   description: >-
-    Canada's national AI safety institute, launched in November 2024 at the Seoul AI Safety Summit. Received
-    C$50M (~$37M USD) in initial pledged funding from the Canadian government.
+    Canada's national AI safety institute, launched November 12, 2024. Budget: C\$50 million over
+    five years (part of C\$2.4 billion 2024 federal AI investment). First Executive Director:
+    Dr. Elissa Strome (appointed February 2025, formerly of CIFAR). Led by Innovation, Science
+    and Economic Development Canada (ISED), with NRC and CIFAR research partnership. Focuses on
+    science of AI safety, positioned as technical body for testing/assurance.
   relatedEntries:
     - id: fYyAxYlHDQ
       type: organization
@@ -1007,6 +1016,133 @@
     - ai-safety
     - international
   lastUpdated: 2026-03
+
+- id: france-inesia
+  stableId: h1iLYfDY7E
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: "INESIA (France National Institute for AI Evaluation and Security)"
+  website: https://www.inria.fr
+  founded: '2025'
+  headquarters: Paris, France
+  description: >-
+    French national AI safety institute announced at the Paris AI Action Summit, February 2025.
+    Partnership between ANSSI (cybersecurity agency), Inria (research institute), LNE (national
+    testing laboratory), and PEReN (digital regulation platform) — not a new legal entity but
+    a coordination framework. Published joint testing exercises on advanced AI models (July 2025).
+    First INESIA Scientific Days held at Inria Paris (July 2025). Unveiled 2026-2027 roadmap.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Inria INESIA Roadmap
+      url: https://www.inria.fr/en/ai-security-and-sovereignty-inesia-unveils-its-roadmap-2026-2027
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - france
+  lastUpdated: 2026-03
+
+- id: south-korea-aisi
+  stableId: 3t2i7Ncxt5
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: South Korea AI Safety Institute
+  founded: '2026'
+  headquarters: South Korea
+  description: >-
+    South Korean AI safety institute established via the AI Basic Act (passed December 2024,
+    effective January 22, 2026). Dedicated research centre for evaluating advanced AI models,
+    developing safety benchmarks, and assessing deepfake and cybersecurity threats. South Korea's
+    AI Basic Act is the second comprehensive AI regulatory framework after the EU AI Act.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Cooley Analysis of South Korea AI Basic Act
+      url: https://www.cooley.com/news/insight/2026/2026-01-27-south-koreas-ai-basic-act-overview-and-key-takeaways
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - south-korea
+  lastUpdated: 2026-03
+
+- id: australia-aisi
+  stableId: tN1LcjRQpc
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: Australian AI Safety Institute
+  website: https://www.industry.gov.au/science-technology-and-innovation/technology/artificial-intelligence/ai-safety-science
+  founded: '2025'
+  headquarters: Australia
+  description: >-
+    Australian AI safety institute announced in 2025, operational early 2026. Budget: A\$29.9
+    million. Three streams: research, engineering, policy/governance. Sits within government as
+    a technical/coordination hub alongside existing regulators and the National AI Centre.
+    Recruiting founding team (General Manager + Head of AI Safety Research and Testing) in late
+    2025/early 2026.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: Department of Industry
+      url: https://www.industry.gov.au/science-technology-and-innovation/technology/artificial-intelligence/ai-safety-science
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - evaluations
+    - international
+    - australia
+  lastUpdated: 2026-03
+
+- id: india-aisi
+  stableId: MItFJ7FBWk
+  type: organization
+  orgType: government
+  summaryPage: government-orgs-overview
+  title: IndiaAI Safety Institute
+  website: https://indiaai.gov.in
+  founded: '2026'
+  headquarters: New Delhi, India
+  description: >-
+    Indian AI safety institute announced January 2025, formally launched February 2026 at
+    India AI Impact Summit. Hub-and-spoke model under IndiaAI Mission, partnering with IITs
+    and private sector. Initial budget: Rs 20 crore from IndiaAI Mission Safe and Trusted
+    Pillar. Dedicated mechanism for ethical, safe, and responsible deployment of AI systems.
+    India also hosted the AI Impact Summit (Feb 2026) with 92 countries endorsing the New
+    Delhi Declaration and over USD 200 billion in AI investment commitments announced.
+  relatedEntries:
+    - id: fYyAxYlHDQ
+      type: organization
+    - id: aX0jkoaekQ
+      type: organization
+  sources:
+    - title: IndiaAI Announcement
+      url: https://indiaai.gov.in/article/india-takes-the-lead-establishing-the-indiaai-safety-institute-for-responsible-ai-innovation
+  tags:
+    - governance
+    - government-oversight
+    - ai-safety
+    - international
+    - india
+  lastUpdated: 2026-03
+
 - id: aria-uk
   stableId: XqjV4mbMXQ
   wikiId: E1997
