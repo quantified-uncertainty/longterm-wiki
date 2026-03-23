@@ -1,0 +1,53 @@
+entity: kxVSuuHN7j
+facts:
+  [
+    {
+        id: U27BLHcUJg,
+        property: headquarters,
+        value: Indianapolis,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      },
+    {
+        id: EJIFdmYjqQ,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      },
+    {
+        id: rDrpW6RW6A,
+        property: website,
+        value: http://www.lillyendowment.org/,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      },
+    {
+        id: pChq5JKrfw,
+        property: revenue,
+        value: 284122066,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      },
+    {
+        id: thbqt8IZTQ,
+        property: founded-by-name,
+        value: "Josiah K. Lilly, Sr.",
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359; text value (not entity ref)
+      },
+    {
+        id: iHoZaUlzYQ,
+        property: legal-structure,
+        value: 501(c)(3) organization,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      },
+    {
+        id: 8rb9oDM8kg,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Lilly_Endowment,
+        source: https://www.wikidata.org/wiki/Q6548359,
+        notes: From Wikidata Q6548359
+      }
+  ]

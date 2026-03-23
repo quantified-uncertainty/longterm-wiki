@@ -2,8 +2,14 @@ entity: 3cgL7jNlgw
 facts:
   - id: f_46rp7yfOsw
     property: description
-    value: Claude Sonnet 4 was released May 22, 2025, marking the transition to the Claude 4 generation with a new naming
-      convention. Scored 72.7% on SWE-bench Verified. Priced at $3/$15 per million tokens with a 200K token context
-      window (1M beta added later).
+    value: Claude Sonnet 4 was released May 22, 2025, marking the transition to the
+      Claude 4 generation with a new naming convention. Scored 72.7% on
+      SWE-bench Verified. Priced at $3/$15 per million tokens with a 200K token
+      context window (1M beta added later).
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: 86oH5OgmbA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Claude_Sonnet_4
+    source: https://www.wikidata.org/wiki/Q134885150
+    notes: From Wikidata Q134885150

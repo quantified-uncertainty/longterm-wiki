@@ -1,0 +1,53 @@
+entity: BAGFs8P6WP
+facts:
+  [
+    {
+        id: gbF9OI3fCw,
+        property: founded-date,
+        value: 1950-12,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      },
+    {
+        id: ep0LJR3Ubw,
+        property: headquarters,
+        value: Miami,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      },
+    {
+        id: KAW9EFhJMQ,
+        property: country,
+        value: United States,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      },
+    {
+        id: mkdotw1PRw,
+        property: website,
+        value: http://knightfoundation.org/,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      },
+    {
+        id: bxtHFpNHbw,
+        property: founded-by-name,
+        value: John S. Knight,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434; text value (not entity ref)
+      },
+    {
+        id: 7PC6Qs5VYQ,
+        property: legal-structure,
+        value: foundation,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      },
+    {
+        id: eTovHJp36A,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Knight_Foundation,
+        source: https://www.wikidata.org/wiki/Q6256434,
+        notes: From Wikidata Q6256434
+      }
+  ]

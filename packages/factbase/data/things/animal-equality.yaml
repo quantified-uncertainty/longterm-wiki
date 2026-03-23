@@ -1,0 +1,32 @@
+entity: IkwNqat1cE
+facts:
+  [
+    {
+        id: PoqbXOoEVA,
+        property: founded-date,
+        value: 2006-01,
+        source: https://www.wikidata.org/wiki/Q3286916,
+        notes: From Wikidata Q3286916
+      },
+    {
+        id: j5IN8aDCPQ,
+        property: headquarters,
+        value: Spain,
+        source: https://www.wikidata.org/wiki/Q3286916,
+        notes: From Wikidata Q3286916
+      },
+    {
+        id: 0UtJfDOskA,
+        property: country,
+        value: Spain,
+        source: https://www.wikidata.org/wiki/Q3286916,
+        notes: From Wikidata Q3286916
+      },
+    {
+        id: FP0sBVnpmA,
+        property: website,
+        value: https://animalequality.org,
+        source: https://www.wikidata.org/wiki/Q3286916,
+        notes: From Wikidata Q3286916
+      }
+  ]
