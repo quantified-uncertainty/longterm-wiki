@@ -7220,7 +7220,7 @@
   lastUpdated: 2026-03
 
 - id: mellon-foundation
-  stableId: MIie9_9BSq
+  stableId: Ni1A9uFQ9S
   type: organization
   orgType: funder
   title: Andrew W. Mellon Foundation
@@ -7230,7 +7230,7 @@
   lastUpdated: 2026-03
 
 - id: walton-family-foundation
-  stableId: gk4_-AGcTd
+  stableId: OEr0rtfTAU
   type: organization
   orgType: funder
   title: Walton Family Foundation
@@ -7251,7 +7251,7 @@
   lastUpdated: 2026-03
 
 - id: sandler-foundation
-  stableId: EPY-YnX6K8
+  stableId: B1GYdbJuD9
   type: organization
   orgType: funder
   title: Sandler Foundation
@@ -7284,7 +7284,7 @@
 
 # --- EA/AI safety grantee organizations ---
 - id: wild-animal-initiative
-  stableId: mHrz7Y-rOx
+  stableId: 2OLJZcF1pW
   type: organization
   orgType: generic
   title: Wild Animal Initiative
@@ -7296,7 +7296,7 @@
   lastUpdated: 2026-03
 
 - id: mercy-for-animals
-  stableId: 8C_NZjRH28
+  stableId: u2j7u53L8S
   type: organization
   orgType: generic
   title: Mercy For Animals
@@ -7494,7 +7494,7 @@
   lastUpdated: 2026-03
 
 - id: encode-ai
-  stableId: BVYHXX_LvA
+  stableId: J6bv0LEEgY
   type: organization
   orgType: generic
   title: Encode AI Corporation
@@ -7503,7 +7503,7 @@
   lastUpdated: 2026-03
 
 - id: california-yimby
-  stableId: yU5rKw_sAa
+  stableId: pwHtwwEByZ
   type: organization
   orgType: generic
   title: California YIMBY
