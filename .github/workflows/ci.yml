@@ -176,7 +176,33 @@ jobs:
         run: |
           pnpm crux validate || echo "::warning::Validation has pre-existing failures (non-blocking)"
 
-      # --- Next.js build (most expensive step) ---
+  # ---------------------------------------------------------------------------
+  # Phase 2b: Next.js build (runs in parallel with validate + test)
+  # ---------------------------------------------------------------------------
+  build-nextjs:
+    needs: [build-data]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download build data
+        uses: actions/download-artifact@v4
+        with:
+          name: build-data
+          path: apps/web/src/data
 
       - name: Restore Next.js build cache
         uses: actions/cache@v4
@@ -194,7 +220,7 @@ jobs:
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
   # ---------------------------------------------------------------------------
-  # Phase 2b: Type checks + Tests (runs in parallel with validate job)
+  # Phase 2c: Type checks + Tests (runs in parallel with validate + build)
   # ---------------------------------------------------------------------------
   test:
     needs: [build-data]
@@ -283,17 +309,19 @@ jobs:
   # Gate: preserves the 'ci' job name for branch protection rules
   # ---------------------------------------------------------------------------
   ci:
-    needs: [validate, test, build-data]
+    needs: [build-data, validate, build-nextjs, test]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs passed
         run: |
-          echo "build-data: ${{ needs.build-data.result }}"
-          echo "validate:   ${{ needs.validate.result }}"
-          echo "test:       ${{ needs.test.result }}"
+          echo "build-data:   ${{ needs.build-data.result }}"
+          echo "validate:     ${{ needs.validate.result }}"
+          echo "build-nextjs: ${{ needs.build-nextjs.result }}"
+          echo "test:         ${{ needs.test.result }}"
           if [[ "${{ needs.build-data.result }}" != "success" ]] || \
              [[ "${{ needs.validate.result }}" != "success" ]] || \
+             [[ "${{ needs.build-nextjs.result }}" != "success" ]] || \
              [[ "${{ needs.test.result }}" != "success" ]]; then
             echo "::error::One or more CI jobs failed"
             exit 1
