@@ -47,6 +47,7 @@ export const VALID_RECORD_TYPES = [
   "entity-event",
   "entity-assessment",
   "secondary-market-price",
+  "citation",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
