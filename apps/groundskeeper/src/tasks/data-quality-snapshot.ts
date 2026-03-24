@@ -21,8 +21,17 @@ export async function dataQualitySnapshot(
 ): Promise<{ success: boolean; summary?: string }> {
   const apiKey = getWikiServerApiKey();
   if (!apiKey) {
-    logger.warn("LONGTERMWIKI_SERVER_API_KEY is not set — skipping snapshot.");
-    return { success: true, summary: "Skipped: no API key configured" };
+    const isProd = process.env["WIKI_SERVER_ENV"] === "prod";
+    const keyName = isProd
+      ? "PROD_LONGTERMWIKI_SERVER_API_KEY"
+      : "LONGTERMWIKI_SERVER_API_KEY";
+    const summary = `Missing ${keyName}`;
+    if (isProd) {
+      logger.error(`${summary} — snapshot not attempted.`);
+      return { success: false, summary };
+    }
+    logger.warn(`${summary} — skipping snapshot.`);
+    return { success: true, summary: `Skipped: ${summary}` };
   }
 
   const url = `${config.wikiServerUrl}/api/data-quality`;
@@ -44,7 +53,7 @@ export async function dataQualitySnapshot(
     }
 
     const data = (await res.json()) as {
-      snapshot: {
+      snapshot?: {
         id: number;
         verdictsTotal?: number;
         verdictsContradicted?: number;
@@ -52,6 +61,11 @@ export async function dataQualitySnapshot(
     };
 
     const snap = data.snapshot;
+    if (!snap || typeof snap.id !== "number") {
+      logger.error({ body: data }, "Snapshot response schema mismatch");
+      return { success: false, summary: "Invalid snapshot response schema" };
+    }
+
     const summary = `Snapshot #${snap.id} captured (verdicts: ${snap.verdictsTotal ?? "?"})`;
     logger.info({ snapshotId: snap.id }, summary);
     return { success: true, summary };
