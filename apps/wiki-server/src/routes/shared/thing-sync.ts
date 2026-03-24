@@ -160,6 +160,20 @@ export async function upsertThingsInTx(
     parentTitle: item.parentTitle ?? null,
   }));
 
+  // Temporarily drop the unique index on (source_table, source_id) to handle
+  // cases where an entity's stableId changed but its slug stayed the same.
+  // The old things row has id=old_stableId, source_id=slug. The new row has
+  // id=new_stableId, source_id=slug. The ON CONFLICT (id) can't resolve this.
+  await tx.execute(sql`DROP INDEX IF EXISTS idx_things_source_unique`);
+  await tx.execute(sql`
+    DO $$ DECLARE r RECORD; BEGIN
+      FOR r IN SELECT indexname FROM pg_indexes
+        WHERE tablename = 'things' AND indexdef LIKE '%UNIQUE%'
+          AND indexdef LIKE '%source_table%' AND indexdef LIKE '%source_id%'
+      LOOP EXECUTE 'DROP INDEX IF EXISTS ' || r.indexname; END LOOP;
+    END $$
+  `);
+
   await tx
     .insert(things)
     .values(allVals)
@@ -184,4 +198,9 @@ export async function upsertThingsInTx(
         updatedAt: sql`now()`,
       },
     });
+
+  // Re-create the unique index
+  await tx.execute(sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_things_source_unique ON things (source_table, source_id)
+  `);
 }
