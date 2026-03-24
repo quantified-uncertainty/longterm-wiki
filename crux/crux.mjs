@@ -106,6 +106,7 @@ import * as extractStructuredDataCommands from './commands/extract-structured-da
 import * as verifyConsistencyCommands from './commands/verify-consistency.ts';
 import * as wikidataEnrichCommands from './commands/wikidata-enrich.ts';
 import * as dataQualityCommands from './commands/data-quality.ts';
+import * as blueskyCommands from './commands/bluesky.ts';
 
 const domains = {
   validate: validateCommands,
@@ -176,6 +177,7 @@ const domains = {
   'verify-consistency': verifyConsistencyCommands,
   'wikidata-enrich': wikidataEnrichCommands,
   quality: dataQualityCommands,
+  bluesky: blueskyCommands,
 };
 
 const shortcutMap = buildShortcutMap();
