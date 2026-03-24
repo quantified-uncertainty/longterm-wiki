@@ -1,0 +1,129 @@
+---
+wikiId: E1259
+title: Sam McCandlish
+description: Co-founder and Chief Architect of Anthropic, theoretical physicist turned AI researcher known for foundational work on AI scaling laws and large-batch training.
+subcategory: safety-researchers
+update_frequency: 90
+sidebar:
+  order: 50
+lastEdited: 2026-03-23
+createdAt: 2026-03-23
+summary: "A reasonably comprehensive biographical profile of Sam McCandlish covering his research contributions, roles at Anthropic, and relevant criticisms, but undermined by a significant sourcing problem: most footnotes cite internal 'research data' rather than verifiable external sources, making factual claims difficult to independently verify."
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Detail |
+|-----------|--------|
+| **Name** | Sam McCandlish (also Samuel Russel McCandlish) |
+| **Current Role** | Chief Architect, <EntityLink id="E22">Anthropic</EntityLink> |
+| **Previous Role** | Chief Technology Officer, <EntityLink id="E22">Anthropic</EntityLink>; Research Lead, <EntityLink id="E218">OpenAI</EntityLink> |
+| **Education** | B.S./M.S. in Math and Physics, Brandeis University; Ph.D. in Theoretical Physics, Stanford University |
+| **Key Contributions** | AI scaling laws, large-batch training, Constitutional AI, responsible scaling policies |
+| **Citations** | Over 100,000 (Google Scholar) |
+| **Co-founder** | One of seven co-founders of <EntityLink id="E22">Anthropic</EntityLink> |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Profile | [longtermwiki.com](https://www.longtermwiki.com/factbase/entity/sam-mccandlish) |
+| Wikipedia (Anthropic) | [en.wikipedia.org](https://en.wikipedia.org/wiki/Anthropic) |
+
+## Overview
+
+Sam McCandlish is a theoretical physicist turned AI researcher and one of the co-founders of <EntityLink id="E22">Anthropic</EntityLink>. He is best known for foundational empirical work on AI scaling laws, including research that helped predict the capabilities of large language models like GPT-3, and for his contributions to large-batch training methodology. His academic background is in theoretical physics — with a Ph.D. from Stanford University focused on quantum gravity and tensor networks — and he transitioned into machine learning research during his tenure at <EntityLink id="E218">OpenAI</EntityLink>.[^1][^2]
+
+At <EntityLink id="E22">Anthropic</EntityLink>, McCandlish has held several senior technical roles since the company's founding in 2021, including Chief Scientist, Chief Technology Officer, and, following a leadership restructuring in October 2025, Chief Architect. In this most recent role, he concentrates on pre-training and large-scale model training. His scholarly output — encompassing scaling laws, Constitutional AI, model behaviors, and alignment techniques — has accumulated over 100,000 citations, reflecting broad influence across the field.[^3][^4]
+
+McCandlish is closely associated with the technical leadership of <EntityLink id="E22">Anthropic</EntityLink>'s Claude model family and with the company's responsible scaling policies. He collaborates extensively with co-founders including CEO <EntityLink id="E91">Dario Amodei</EntityLink> and researchers such as Jared Kaplan, and reports to President Daniela Amodei.[^2][^5]
+
+## Education and Early Career
+
+McCandlish earned a B.S. and M.S. in Mathematics and Physics from Brandeis University, before completing a Ph.D. in Theoretical Physics at Stanford University, where his research focused on quantum gravity and tensor networks.[^1] His early scholarly work ranged across theoretical physics subfields including high-energy physics, gauge-gravity dualities, inflationary cosmology, and emergent behavior in active matter systems.[^6] After completing his doctorate, he conducted postdoctoral research at Boston University.[^1]
+
+His transition from physics to machine learning mirrors a broader pattern among AI researchers who trained in physics and applied similar quantitative and modeling approaches to the study of neural networks. This background is evident in his most influential machine learning contributions, which tend toward empirical modeling of training dynamics and systematic identification of scaling relationships.
+
+## Career at OpenAI
+
+McCandlish joined <EntityLink id="E218">OpenAI</EntityLink> as a researcher and eventually advanced to the role of Research Lead.[^2] His most significant contributions during this period concerned the empirical study of how neural network performance scales with compute, data, and model size. A 2018 preprint, "An Empirical Model of Large-Batch Training" (co-authored with Jared Kaplan, <EntityLink id="E91">Dario Amodei</EntityLink>, and others), introduced the concept of the *gradient noise scale* — a statistic that can be used to determine the largest batch size that maintains data efficiency during training.[^4][^7] This framework was applied across a range of domains, from image classification benchmarks like CIFAR-10 and ImageNet to reinforcement learning environments such as Atari and Dota 2 agents.[^7]
+
+This work fed directly into the 2020 "Scaling Laws for Neural Language Models" paper (led by Jared Kaplan), which established that language model performance follows smooth power laws with respect to model size, dataset size, and compute budget — findings that informed the development of GPT-3.[^4] McCandlish was also a co-author on "Language Models Are Few-Shot Learners," the primary GPT-3 paper, which has accumulated over 78,000 citations.[^3]
+
+McCandlish also contributed to <EntityLink id="E218">OpenAI</EntityLink>'s early AI safety initiatives during this period, and was involved in the Codex research that formed the basis for code-generation capabilities.[^2]
+
+## Founding of Anthropic
+
+In 2021, McCandlish was among seven former <EntityLink id="E218">OpenAI</EntityLink> employees — alongside <EntityLink id="E91">Dario Amodei</EntityLink>, Daniela Amodei, Tom Brown, Jack Clark, Jared Kaplan, and Ben Mann — who departed to co-found <EntityLink id="E22">Anthropic</EntityLink> as a public-benefit corporation.[^2][^5] The founding group cited concerns about the pace and direction of AI commercialization, with the stated aim of building AI systems that are safe, reliable, and beneficial.[^2]
+
+<EntityLink id="E22">Anthropic</EntityLink>'s founding philosophy emphasizes what its leadership describes as "intentional pauses" in training and deployment when safety standards are not met, alongside rigorous safety metrics and interpretability research. McCandlish's technical background in scaling laws has been central to the company's development of responsible scaling policies — formal frameworks that tie further capability development to demonstrated safety thresholds.[^2][^8]
+
+## Roles at Anthropic
+
+McCandlish has held multiple senior technical titles at <EntityLink id="E22">Anthropic</EntityLink> since its founding:
+
+| Role | Period | Focus |
+|------|--------|-------|
+| Co-Founder & Chief Scientist | 2021– | Technical development of Claude; scaling, safety metrics |
+| Chief Technology Officer | Earlier tenure | Led LLM organization (Training, Inference, Core Resources); responsible scaling officer |
+| Chief Architect | October 2025– | Pre-training and large-scale model training |
+
+In October 2025, McCandlish transitioned from the CTO position to Chief Architect as part of a broader executive restructuring. Rahul Patil, formerly CTO at Stripe, was appointed the new CTO, taking responsibility for compute infrastructure, inference, and engineering. Both McCandlish and Patil report to President Daniela Amodei.[^5][^8] The restructuring also involved the expansion of <EntityLink id="E22">Anthropic</EntityLink>'s internal incubator, Anthropic Labs.
+
+## Key Research Contributions
+
+McCandlish's published work spans empirical scaling, model training dynamics, alignment techniques, and model behavior evaluation. Selected influential papers include:
+
+| Title | Year | Citations (approx.) | Notes |
+|-------|------|---------------------|-------|
+| Language Models Are Few-Shot Learners | 2020 | ≈78,000 | GPT-3; co-author |
+| Scaling Laws for Neural Language Models | 2020 | — | Power-law scaling; submitted by McCandlish |
+| Scaling Laws for Autoregressive Generative Modeling | 2020 | ≈638 | Co-author with T. Henighan et al. |
+| An Empirical Model of Large-Batch Training | 2018 | ≈384 | Lead-authored; gradient noise scale |
+| Constitutional AI: Harmlessness from AI Feedback | 2022 | ≈3,084 | Co-author; foundational alignment paper |
+| Toy Models of Superposition | 2022 | ≈614 | Co-author with N. Elhage et al. |
+| Towards Understanding Sycophancy in Language Models | 2023 | ≈751 | Co-author with M. Sharma et al. |
+| Evaluating Large Language Models Trained on Code | 2021 | ≈8,677 | Co-author; Codex-related |
+
+The 2022 Constitutional AI paper, co-authored with Yuntao Bai and others, introduced a training methodology that uses a predefined set of normative principles (a "constitution") to guide AI-generated critiques and revisions, enabling reinforcement learning from AI feedback as an alternative to traditional human-labeled preference data.[^4] This approach has become central to <EntityLink id="E22">Anthropic</EntityLink>'s alignment strategy.
+
+The "Toy Models of Superposition" paper (2022), co-authored with Nelson Elhage and collaborators, examines how neural networks represent more features than they have dimensions by superimposing multiple representations, with implications for mechanistic <EntityLink id="E174">interpretability</EntityLink>.[^4]
+
+## Philanthropy
+
+In January 2026, McCandlish joined six other <EntityLink id="E22">Anthropic</EntityLink> co-founders — including <EntityLink id="E91">Dario Amodei</EntityLink>, Daniela Amodei, Tom Brown, Jack Clark, Jared Kaplan, and Christopher Olah — in pledging to donate 80% of their personal fortunes to address AI-related risks and inequality. The announcement coincided with <EntityLink id="E22">Anthropic</EntityLink>'s Series G funding round and an essay by <EntityLink id="E91">Dario Amodei</EntityLink> on AI's societal implications. McCandlish's estimated net worth at the time was reported at approximately \$3.7 billion, based on company valuations.[^9]
+
+## Criticisms and Controversies
+
+Criticisms of McCandlish are primarily indirect, arising from broader debates about <EntityLink id="E22">Anthropic</EntityLink>'s conduct and safety commitments rather than personal scandals.
+
+**Misleading statements on non-disparagement agreements**: Researcher Joe Carlsmith accused McCandlish of giving a misleading account of <EntityLink id="E22">Anthropic</EntityLink>'s use of secret non-disparagement agreements in public communications, though McCandlish reportedly issued a clarification afterward.[^10]
+
+**Safety-washing allegations**: Critics in the AI alignment community have argued that <EntityLink id="E22">Anthropic</EntityLink> — and by extension its leadership, including McCandlish — engages in "safety-washing": scaling powerful models while claiming a safety-first mandate. Commentators have characterized this as acting as moderate accelerationists, pointing to internal plans for frontier models at very large compute scales that were reportedly leaked to the safety community.[^11]
+
+**Scaling paradigm critiques**: McCandlish's research paradigm, centered on empirical scaling laws, has drawn criticism from those who argue that simply scaling existing architectures will not resolve fundamental limitations in current large language models — including brittleness under distributional shift, lack of causal reasoning, and poor long-horizon planning. Some critics contend that the scaling-laws framing encourages compute escalation while obscuring the need for architectural innovation.[^11]
+
+**Organizational conduct concerns**: In discussions on platforms like Hacker News and <EntityLink id="E538">LessWrong</EntityLink>, defenses of McCandlish's personal integrity have been contested by commentators citing <EntityLink id="E22">Anthropic</EntityLink>'s employment practices and governance gaps, such as the reported failure of the Long-Term Benefit Trust to maintain safety-focused trustees for an extended period.[^10]
+
+Defenses of McCandlish from within the community generally emphasize that he and other co-founders hold genuinely safety-motivated values, that Constitutional AI represents a substantive (not merely rhetorical) safety contribution, and that the commercial pressures facing <EntityLink id="E22">Anthropic</EntityLink> are structural rather than indicative of bad faith.[^10]
+
+## Key Uncertainties
+
+- The degree to which McCandlish's personal views on existential risk from AI differ from the public positions of <EntityLink id="E22">Anthropic</EntityLink> is not well-documented in public sources.
+- His specific contributions to individual Claude model releases versus broader architectural and scaling strategy are not detailed in available sources.
+- The long-term significance of the responsible scaling policy framework he helped design — and whether it will constrain future development in practice — remains an open question.
+
+## Sources
+
+[^1]: Research data: McCandlish biographical overview — education (Brandeis, Stanford PhD in theoretical physics/quantum gravity/tensor networks), postdoc at Boston University, transition to AI research.
+[^2]: Research data: Anthropic co-founder profiles and founding context, including the seven OpenAI departures, Anthropic's public-benefit corporation structure, and McCandlish's senior roles.
+[^3]: Research data: Google Scholar citation data and publication list for McCandlish, including "Language Models Are Few-Shot Learners" (2020, ~78,000 citations) and aggregate citation count exceeding 100,000.
+[^4]: Research data: McCandlish publication descriptions — Constitutional AI (2022), Toy Models of Superposition (2022), Scaling Laws for Neural Language Models (2020), Towards Understanding Sycophancy (2023).
+[^5]: Research data: October 2025 leadership restructuring at Anthropic — McCandlish transitions from CTO to Chief Architect; Rahul Patil appointed CTO; both report to Daniela Amodei.
+[^6]: Research data: Early physics research profile for McCandlish, including high-energy theory, gauge-gravity duality, active matter, and gravitational microlensing work.
+[^7]: Research data: "An Empirical Model of Large-Batch Training" (arXiv 2018) — gradient noise scale concept; applications to MNIST, CIFAR-10, ImageNet, Atari, Dota 2, autoencoders.
+[^8]: Research data: Anthropic responsible scaling policies and CTO transition details; McCandlish described as former "responsible scaling officer" alongside Jared Kaplan.
+[^9]: Research data: January 2026 co-founder philanthropy pledge — 80% of fortunes; McCandlish net worth estimated at ≈\$3.7 billion at time of announcement; Anthropic Series G at ≈\$380 billion valuation.
+[^10]: Research data: Criticism and counterargument summaries — Carlsmith non-disparagement allegation, McCandlish clarification, LessWrong/Hacker News discussions, Long-Term Benefit Trust governance critique.
+[^11]: Research data: Limitations and criticism section — "moderate accelerationist" characterization, leaked frontier model compute plans, scaling paradigm critiques regarding architectural limitations.
