@@ -171,14 +171,15 @@ export async function upsertThingsInTx(
   const sourceTable = allVals[0]?.sourceTable;
 
   if (sourceTable) {
-    // Delete things with matching (source_table, source_id) but DIFFERENT id
+    // Delete ALL things with matching (source_table, source_id) — they'll be
+    // re-inserted by the upsert below. Simpler than trying to skip rows whose
+    // id is already in the batch (edge cases with cross-referenced stableIds).
     await tx
       .delete(things)
       .where(
         and(
           eq(things.sourceTable, sourceTable),
           inArray(things.sourceId, batchSourceIds),
-          notInArray(things.id, batchIds),
         )
       );
   }
