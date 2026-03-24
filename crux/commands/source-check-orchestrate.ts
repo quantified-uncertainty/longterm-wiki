@@ -392,6 +392,11 @@ async function collectRecordItems(
       case 'investment': apiPath = '/api/investments/all'; break;
       case 'equity-position': apiPath = '/api/equity-positions/all'; break;
       case 'policy-stakeholder': apiPath = '/api/policy-stakeholders/all'; break;
+      case 'publication': apiPath = '/api/publications/all'; break;
+      case 'benchmark-result': apiPath = '/api/benchmark-results/all'; break;
+      case 'entity-event': apiPath = '/api/entity-events/all'; break;
+      case 'entity-assessment': apiPath = '/api/entity-assessments/all'; break;
+      case 'secondary-market-price': apiPath = '/api/secondary-market-prices/all'; break;
       default: continue; // Skip unknown record types
     }
 
@@ -407,11 +412,14 @@ async function collectRecordItems(
       const rawItems = (
         data.items ?? data.grants ?? data.personnel ?? data.divisions ??
         data.programs ?? data.rounds ?? data.investments ?? data.positions ??
+        data.publications ?? data.benchmarkResults ?? data.events ??
+        data.assessments ?? data.prices ??
         (Array.isArray(data) ? data : [])
       ) as Record<string, unknown>[];
 
       for (const item of rawItems) {
-        const source = item.source;
+        // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result)
+        const source = item.source ?? item.sourceUrl;
         if (typeof source !== 'string' || !source) continue;
 
         const id = String(item.id ?? '');
@@ -562,8 +570,13 @@ function computeRecordPriority(
     'personnel': 25,
     'funding-round': 20,
     'investment': 20,
+    'publication': 18,
+    'secondary-market-price': 18,
+    'benchmark-result': 15,
     'division': 15,
     'funding-program': 15,
+    'entity-event': 12,
+    'entity-assessment': 10,
     'equity-position': 10,
     'policy-stakeholder': 10,
   };
@@ -610,6 +623,38 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
       const name = resolveName(item, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId');
       return `Stakeholder: ${name} (${strOrNull(item, 'stance') ?? 'unknown'})`;
     }
+    case 'publication': {
+      const title = str(item, 'title');
+      const authors = strOrNull(item, 'authors') ?? 'unknown authors';
+      const year = strOrNull(item, 'publishedDate') ?? 'unknown year';
+      return `Publication: ${title} by ${authors} (${year})`;
+    }
+    case 'benchmark-result': {
+      const benchmarkId = str(item, 'benchmarkId');
+      const modelId = str(item, 'modelId');
+      const score = numOrNull(item, 'score');
+      return `Benchmark Result: ${modelId} on ${benchmarkId} = ${score ?? 'N/A'}`;
+    }
+    case 'entity-event': {
+      const title = str(item, 'title');
+      const eventType = strOrNull(item, 'eventType') ?? 'unknown';
+      const date = strOrNull(item, 'date') ?? 'unknown date';
+      return `Entity Event: ${title} (${eventType}, ${date})`;
+    }
+    case 'entity-assessment': {
+      const dimension = str(item, 'dimension');
+      const rating = str(item, 'rating');
+      const entityId = strOrNull(item, 'entityId') ?? 'unknown';
+      return `Assessment: ${entityId} / ${dimension} = ${rating}`;
+    }
+    case 'secondary-market-price': {
+      const company = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+      const platform = str(item, 'platform');
+      const date = strOrNull(item, 'date') ?? 'unknown date';
+      const valuation = numOrNull(item, 'impliedValuation');
+      const valuationStr = valuation != null ? ` ($${(valuation / 1e9).toFixed(1)}B)` : '';
+      return `Market Price: ${company} on ${platform} (${date})${valuationStr}`;
+    }
   }
 }
 
@@ -643,6 +688,48 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
       return { stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') };
     case 'policy-stakeholder':
       return { stance: strOrNull(item, 'stance'), role: strOrNull(item, 'role') };
+    case 'publication':
+      return {
+        title: str(item, 'title'),
+        authors: strOrNull(item, 'authors'),
+        publishedDate: strOrNull(item, 'publishedDate'),
+        url: strOrNull(item, 'url'),
+        venue: strOrNull(item, 'venue'),
+        publicationType: strOrNull(item, 'publicationType'),
+      };
+    case 'benchmark-result':
+      return {
+        benchmarkId: str(item, 'benchmarkId'),
+        modelId: str(item, 'modelId'),
+        score: numOrNull(item, 'score'),
+        unit: strOrNull(item, 'unit'),
+        date: strOrNull(item, 'date'),
+      };
+    case 'entity-event':
+      return {
+        title: str(item, 'title'),
+        eventType: str(item, 'eventType'),
+        date: strOrNull(item, 'date'),
+        entityId: strOrNull(item, 'entityId'),
+        significance: strOrNull(item, 'significance'),
+      };
+    case 'entity-assessment':
+      return {
+        entityId: strOrNull(item, 'entityId'),
+        dimension: str(item, 'dimension'),
+        rating: str(item, 'rating'),
+        assessor: strOrNull(item, 'assessor'),
+        assessedAt: strOrNull(item, 'assessedAt'),
+      };
+    case 'secondary-market-price':
+      return {
+        company: resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId'),
+        platform: str(item, 'platform'),
+        date: strOrNull(item, 'date'),
+        impliedValuation: numOrNull(item, 'impliedValuation'),
+        pricePerShare: numOrNull(item, 'pricePerShare'),
+        priceType: strOrNull(item, 'priceType'),
+      };
   }
 }
 
@@ -1322,6 +1409,16 @@ const RECORD_TYPE_MAP: Record<string, RecordType> = {
   investments: 'investment',
   'equity-position': 'equity-position',
   'equity-positions': 'equity-position',
+  publication: 'publication',
+  publications: 'publication',
+  'benchmark-result': 'benchmark-result',
+  'benchmark-results': 'benchmark-result',
+  'entity-event': 'entity-event',
+  'entity-events': 'entity-event',
+  'entity-assessment': 'entity-assessment',
+  'entity-assessments': 'entity-assessment',
+  'secondary-market-price': 'secondary-market-price',
+  'secondary-market-prices': 'secondary-market-price',
 };
 
 /**
@@ -1387,6 +1484,11 @@ Usage:
   crux tb verify funding-rounds            Verify funding rounds
   crux tb verify investments               Verify investments
   crux tb verify equity-positions          Verify equity positions
+  crux tb verify publications              Verify publications
+  crux tb verify benchmark-results         Verify benchmark results
+  crux tb verify entity-events             Verify entity events
+  crux tb verify entity-assessments        Verify entity assessments
+  crux tb verify secondary-market-prices   Verify secondary market prices
 
 Options:
   --budget=N             Max dollars to spend on LLM calls (est. ~$0.01/item)
