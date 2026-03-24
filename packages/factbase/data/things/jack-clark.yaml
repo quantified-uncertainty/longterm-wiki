@@ -1,18 +1,41 @@
 entity: YqSmRNVRAg
 facts:
-  - id: f_5QqO5k4Svg
-    property: employed-by
+  - id: "f_5QqO5k4Svg"
+    property: "employed-by"
     value: !ref mK9pX3rQ7n
-
-  - id: f_L3xtvNteFQ
-    property: role
+  - id: "f_L3xtvNteFQ"
+    property: "role"
     value: "Co-founder"
-
-  - id: f_utfXyxaqTw
-    property: born-year
+  - id: "f_utfXyxaqTw"
+    property: "born-year"
     value: 1988
-
-  - id: f_y6ELYGnAGQ
-    property: notable-for
-    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy advocate"
-
+  - id: "f_y6ELYGnAGQ"
+    property: "notable-for"
+    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy
+      advocate"
+  - id: "y8taTCE1rg"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2016"
+    validEnd: "2021-01"
+    source: "https://en.wikipedia.org/wiki/Jack_Clark_(technologist)"
+    notes: "First policy director at OpenAI; authored the AI Index report before joining"
+  - id: "vSu5bv4ogw"
+    property: "role"
+    value: "Policy Director"
+    asOf: "2016"
+    validEnd: "2021-01"
+    source: "https://en.wikipedia.org/wiki/Jack_Clark_(technologist)"
+    notes: "First policy director at OpenAI; authored the AI Index report before joining"
+  - id: "ziV3410emA"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; leads policy and societal impacts work"
+  - id: "nEHFYsxryA"
+    property: "role"
+    value: "Co-founder, Head of Policy"
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; leads policy and societal impacts work"

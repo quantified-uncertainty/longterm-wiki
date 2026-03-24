@@ -1,0 +1,14 @@
+entity: XvvppfgBPw
+facts:
+  - id: "0ue6PyFlmQ"
+    property: "employed-by"
+    value: !ref d9sWZtyVwg
+    asOf: "2020"
+    source: "https://futureoflife.org/"
+    notes: "Leads FLI's policy and research programs; physician-scientist by training"
+  - id: "4FkZKEYCPQ"
+    property: "role"
+    value: "Director"
+    asOf: "2020"
+    source: "https://futureoflife.org/"
+    notes: "Leads FLI's policy and research programs; physician-scientist by training"

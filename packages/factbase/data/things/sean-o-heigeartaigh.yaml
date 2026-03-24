@@ -1,0 +1,14 @@
+entity: YsjgB5Gy0g
+facts:
+  - id: "iAyvu0IO7A"
+    property: "employed-by"
+    value: !ref Qns43S795w
+    asOf: "2016"
+    source: "https://www.cser.ac.uk/"
+    notes: "Executive Director of CSER at University of Cambridge; genomics PhD by training"
+  - id: "EcEeLKse5Q"
+    property: "role"
+    value: "Executive Director"
+    asOf: "2016"
+    source: "https://www.cser.ac.uk/"
+    notes: "Executive Director of CSER at University of Cambridge; genomics PhD by training"

@@ -1,11 +1,13 @@
 entity: kLIpOZtU1n
 facts:
-  [
-    {
-        id: PvkcN5Hd4g,
-        property: wikipedia-url,
-        value: https://en.wikipedia.org/wiki/Sid_Blackie,
-        source: https://www.wikidata.org/wiki/Q7507746,
-        notes: From Wikidata Q7507746
-      }
-  ]
+  - id: "PvkcN5Hd4g"
+    property: "wikipedia-url"
+    value: "https://en.wikipedia.org/wiki/Sid_Blackie"
+    source: "https://www.wikidata.org/wiki/Q7507746"
+    notes: "From Wikidata Q7507746"
+  - id: "u6FkZ5M1EQ"
+    property: "role"
+    value: "Co-founder & Core Contributor"
+    asOf: "2020"
+    source: "https://www.eleuther.ai/"
+    notes: "At EleutherAI. Co-founded EleutherAI; open-source AI research collective that created GPT-NeoX and The Pile"

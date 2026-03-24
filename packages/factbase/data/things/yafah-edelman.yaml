@@ -1,0 +1,14 @@
+entity: ZrowXa4u4w
+facts:
+  - id: "ji4mcmsSBw"
+    property: "employed-by"
+    value: !ref cBPkzcVBBQ
+    asOf: "2022"
+    source: "https://epochai.org/"
+    notes: "Research at Epoch AI"
+  - id: "Pj1uSC3gLQ"
+    property: "role"
+    value: "Researcher"
+    asOf: "2022"
+    source: "https://epochai.org/"
+    notes: "Research at Epoch AI"

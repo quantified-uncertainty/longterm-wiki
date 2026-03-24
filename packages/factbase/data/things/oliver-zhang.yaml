@@ -1,0 +1,14 @@
+entity: TnHMQ4cMOw
+facts:
+  - id: "VAJg0FxLiw"
+    property: "employed-by"
+    value: !ref cBPkzcVBBQ
+    asOf: "2023"
+    source: "https://epochai.org/"
+    notes: "Research at Epoch AI on compute and AI development trends"
+  - id: "OB9V3e0eaA"
+    property: "role"
+    value: "Researcher"
+    asOf: "2023"
+    source: "https://epochai.org/"
+    notes: "Research at Epoch AI on compute and AI development trends"

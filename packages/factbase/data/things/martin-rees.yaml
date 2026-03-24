@@ -1,0 +1,14 @@
+entity: WlwcDX4nYA
+facts:
+  - id: "aDbsVVA5ug"
+    property: "employed-by"
+    value: !ref xfad5FwoTA
+    asOf: "1972"
+    source: "https://en.wikipedia.org/wiki/Martin_Rees"
+    notes: "Co-founded CSER; author of 'Our Final Hour'; Astronomer Royal since 1995"
+  - id: "Vy8VksY9Og"
+    property: "role"
+    value: "Astronomer Royal, Professor"
+    asOf: "1972"
+    source: "https://en.wikipedia.org/wiki/Martin_Rees"
+    notes: "Co-founded CSER; author of 'Our Final Hour'; Astronomer Royal since 1995"

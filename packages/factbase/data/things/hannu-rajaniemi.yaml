@@ -1,2 +1,14 @@
 entity: 9VlZhCkPBE
-facts: []
+facts:
+  - id: "IVCYxeN21w"
+    property: "employed-by"
+    value: !ref 0u4J70VqFY
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "CEO of Conjecture; theoretical physicist and sci-fi author; founded HelixNano biotech"
+  - id: "bJXa0kJ9ww"
+    property: "role"
+    value: "CEO"
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "CEO of Conjecture; theoretical physicist and sci-fi author; founded HelixNano biotech"

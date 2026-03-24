@@ -1,14 +1,37 @@
 entity: FB9xXKFuqg
 facts:
-  - id: f_HjIWrNNPuQ
-    property: role
+  - id: "f_HjIWrNNPuQ"
+    property: "role"
     value: "AI Governance Researcher"
-
-  - id: f_b1ZhBzul2g
-    property: notable-for
+  - id: "f_b1ZhBzul2g"
+    property: "notable-for"
     value: "AI governance researcher; formerly at OpenAI and DeepMind; influential writer on AI alignment and x-risk"
-
-  - id: f_pSYvSFqMVA
-    property: education
+  - id: "f_pSYvSFqMVA"
+    property: "education"
     value: "PhD candidate, University of Cambridge"
-
+  - id: "54PsisYVXQ"
+    property: "employed-by"
+    value: !ref A4XoubikkQ
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://www.richardcngo.com/"
+    notes: "Worked on AI safety research at DeepMind"
+  - id: "etILIWRKIg"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://www.richardcngo.com/"
+    notes: "Worked on AI safety research at DeepMind"
+  - id: "8F6Fo3FD7w"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2023"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI to work on AI governance and safety strategy"
+  - id: "wVPvfwYkjg"
+    property: "role"
+    value: "Researcher, Governance"
+    asOf: "2023"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI to work on AI governance and safety strategy"

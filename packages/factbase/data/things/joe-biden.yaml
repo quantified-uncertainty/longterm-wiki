@@ -1,0 +1,9 @@
+entity: 6kAEE9sPCg
+facts:
+  - id: "0unFlLH9GQ"
+    property: "role"
+    value: "President"
+    asOf: "2021-01"
+    validEnd: "2025-01"
+    source: "https://en.wikipedia.org/wiki/Joe_Biden"
+    notes: "At United States Government. Signed Executive Order 14110 on AI safety (Oct 2023); established US AISI"

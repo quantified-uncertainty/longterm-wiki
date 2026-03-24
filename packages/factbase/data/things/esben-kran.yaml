@@ -1,2 +1,14 @@
 entity: HwM6OF6Ewg
-facts: []
+facts:
+  - id: "yLgBnLOf6g"
+    property: "employed-by"
+    value: !ref 5WqgebIWFQ
+    asOf: "2022"
+    source: "https://www.apartresearch.com/"
+    notes: "Founded Apart Research; organizes AI safety hackathons and research sprints"
+  - id: "2zF3nS2eiw"
+    property: "role"
+    value: "Co-founder & CEO"
+    asOf: "2022"
+    source: "https://www.apartresearch.com/"
+    notes: "Founded Apart Research; organizes AI safety hackathons and research sprints"

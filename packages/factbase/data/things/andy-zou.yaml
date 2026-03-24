@@ -1,0 +1,22 @@
+entity: SIfbuDzvcU
+facts:
+  - id: "jpZfP8WAJA"
+    property: "employed-by"
+    value: !ref ksqqi7fyeA
+    asOf: "2021"
+    validEnd: "2024"
+    source: "https://andyzou.com/"
+    notes: "PhD in AI safety; co-authored the universal adversarial attacks paper (GCG attack); also affiliated with CMU"
+  - id: "YjzMwfdbDw"
+    property: "role"
+    value: "PhD Student"
+    asOf: "2021"
+    validEnd: "2024"
+    source: "https://andyzou.com/"
+    notes: "PhD in AI safety; co-authored the universal adversarial attacks paper (GCG attack); also affiliated with CMU"
+  - id: "jlxOq41Bjw"
+    property: "role"
+    value: "Co-founder"
+    asOf: "2024"
+    source: "https://grayswan.ai/"
+    notes: "At Gray Swan AI. Co-founded Gray Swan AI to commercialize AI red-teaming and safety tools"

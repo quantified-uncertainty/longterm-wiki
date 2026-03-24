@@ -1,2 +1,14 @@
 entity: aJOiUj35UA
-facts: []
+facts:
+  - id: "iSIq4hY7ZA"
+    property: "employed-by"
+    value: !ref HkfUxsbBLQ
+    asOf: "2022"
+    source: "https://www.gladstone.ai/"
+    notes: "Co-founded Gladstone AI; authored US government report on AI risks commissioned by the State Department"
+  - id: "5mGQJCpN7Q"
+    property: "role"
+    value: "Co-founder & CEO"
+    asOf: "2022"
+    source: "https://www.gladstone.ai/"
+    notes: "Co-founded Gladstone AI; authored US government report on AI risks commissioned by the State Department"

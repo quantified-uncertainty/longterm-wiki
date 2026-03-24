@@ -1,0 +1,28 @@
+entity: SQlb1r5EzN
+facts:
+  - id: "rcLRXRvfig"
+    property: "employed-by"
+    value: !ref A4XoubikkQ
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://davidad.org/"
+    notes: "Worked on safety-relevant research at DeepMind"
+  - id: "LCHvtmvNrw"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://davidad.org/"
+    notes: "Worked on safety-relevant research at DeepMind"
+  - id: "OnH6biBpdw"
+    property: "employed-by"
+    value: !ref XqjV4mbMXQ
+    asOf: "2023"
+    source: "https://www.aria.org.uk/"
+    notes: "Leads the 'Safeguarded AI' programme at ARIA; developing formal verification approaches to AI safety"
+  - id: "25n1YuHr1w"
+    property: "role"
+    value: "Programme Director"
+    asOf: "2023"
+    source: "https://www.aria.org.uk/"
+    notes: "Leads the 'Safeguarded AI' programme at ARIA; developing formal verification approaches to AI safety"

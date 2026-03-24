@@ -1,2 +1,14 @@
 entity: n0d7I3OAej
-facts: []
+facts:
+  - id: "RQAoZivRDA"
+    property: "employed-by"
+    value: !ref 0u4J70VqFY
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "Technical researcher at Conjecture"
+  - id: "xEmIGiYj0w"
+    property: "role"
+    value: "Researcher"
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "Technical researcher at Conjecture"

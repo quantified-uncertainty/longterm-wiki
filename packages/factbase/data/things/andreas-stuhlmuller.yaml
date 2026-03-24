@@ -1,0 +1,16 @@
+entity: SqupPjf6AJ
+facts:
+  - id: "UVRHkaWNIQ"
+    property: "employed-by"
+    value: !ref 2VexoROapg
+    asOf: "2018"
+    source: "https://elicit.com/"
+    notes: "Founded Ought (2018), rebranded to Elicit; builds AI research assistant tools; PhD from Stanford on
+      probabilistic programming"
+  - id: "pudZTg7NsQ"
+    property: "role"
+    value: "Founder & CEO"
+    asOf: "2018"
+    source: "https://elicit.com/"
+    notes: "Founded Ought (2018), rebranded to Elicit; builds AI research assistant tools; PhD from Stanford on
+      probabilistic programming"

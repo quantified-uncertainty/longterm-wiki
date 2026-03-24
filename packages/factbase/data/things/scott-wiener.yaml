@@ -1,0 +1,9 @@
+entity: HLc6VrCh5w
+facts:
+  - id: "TQrbOrtrwg"
+    property: "role"
+    value: "Senator, District 11"
+    asOf: "2016"
+    source: "https://en.wikipedia.org/wiki/Scott_Wiener"
+    notes: "At California State Senate. Author of SB 1047 (the California AI safety bill); key figure in state-level AI
+      regulation"

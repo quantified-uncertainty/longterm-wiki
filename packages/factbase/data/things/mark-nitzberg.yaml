@@ -1,0 +1,14 @@
+entity: 0bmt4zJZVg
+facts:
+  - id: "5AvtZ2vSsQ"
+    property: "employed-by"
+    value: !ref ksqqi7fyeA
+    asOf: "2016"
+    source: "https://humancompatible.ai/"
+    notes: "Executive Director of CHAI under Stuart Russell"
+  - id: "kWhsReWgwQ"
+    property: "role"
+    value: "Executive Director, Berkeley CHAI"
+    asOf: "2016"
+    source: "https://humancompatible.ai/"
+    notes: "Executive Director of CHAI under Stuart Russell"

@@ -1,0 +1,14 @@
+entity: 4ZKddwff5g
+facts:
+  - id: "uIjFb0hxjw"
+    property: "employed-by"
+    value: !ref gNsqAes7Dw
+    asOf: "2017"
+    source: "https://www.centreforeffectivealtruism.org/"
+    notes: "Runs CEA operations; key organizational infrastructure"
+  - id: "mpokeirhYw"
+    property: "role"
+    value: "Operations Director"
+    asOf: "2017"
+    source: "https://www.centreforeffectivealtruism.org/"
+    notes: "Runs CEA operations; key organizational infrastructure"

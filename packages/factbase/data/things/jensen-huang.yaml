@@ -1,22 +1,31 @@
 entity: So79iNy2sQ
 facts:
-  - id: f_DramxKdLqw
-    property: employed-by
+  - id: "f_DramxKdLqw"
+    property: "employed-by"
     value: !ref UvpZCnW3wA
-
-  - id: f_eW0ePM2xXQ
-    property: role
+  - id: "f_eW0ePM2xXQ"
+    property: "role"
     value: "CEO"
-
-  - id: f_QNd3zfa3yw
-    property: born-year
+  - id: "f_QNd3zfa3yw"
+    property: "born-year"
     value: 1963
-
-  - id: f_uWhqL9PqsQ
-    property: notable-for
+  - id: "f_uWhqL9PqsQ"
+    property: "notable-for"
     value: "CEO and co-founder of NVIDIA; architect of the GPU computing revolution that enabled modern AI"
-
-  - id: f_3HyDX4rAcA
-    property: wikipedia-url
+  - id: "f_3HyDX4rAcA"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Jensen_Huang"
-
+  - id: "lHj1AArw5Q"
+    property: "employed-by"
+    value: !ref UvpZCnW3wA
+    asOf: "1993"
+    source: "https://en.wikipedia.org/wiki/Jensen_Huang"
+    notes: "Co-founded Nvidia; GPU monopoly powers most AI training; key infrastructure provider for AI safety and
+      capabilities research"
+  - id: "1LYvoLxqwQ"
+    property: "role"
+    value: "Co-founder & CEO"
+    asOf: "1993"
+    source: "https://en.wikipedia.org/wiki/Jensen_Huang"
+    notes: "Co-founded Nvidia; GPU monopoly powers most AI training; key infrastructure provider for AI safety and
+      capabilities research"

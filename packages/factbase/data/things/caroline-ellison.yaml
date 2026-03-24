@@ -1,0 +1,16 @@
+entity: U7QD93Xjug
+facts:
+  - id: "vJo9Ge0fuw"
+    property: "role"
+    value: "Trader"
+    asOf: "2017"
+    validEnd: "2018"
+    source: "https://en.wikipedia.org/wiki/Caroline_Ellison"
+    notes: "At Jane Street. Quantitative trader; met SBF at Jane Street"
+  - id: "rrgkmAaiPg"
+    property: "role"
+    value: "CEO"
+    asOf: "2021"
+    validEnd: "2022-11"
+    source: "https://en.wikipedia.org/wiki/Caroline_Ellison"
+    notes: "At Alameda Research. CEO of Alameda Research; pleaded guilty to fraud charges in the FTX collapse"

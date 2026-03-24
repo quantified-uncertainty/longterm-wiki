@@ -1,0 +1,14 @@
+entity: KnHneaUKew
+facts:
+  - id: "so2WiQS1qg"
+    property: "employed-by"
+    value: !ref 0u4J70VqFY
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "Technical researcher at Conjecture"
+  - id: "zJKJiWzvcg"
+    property: "role"
+    value: "Researcher"
+    asOf: "2022"
+    source: "https://conjecture.dev/"
+    notes: "Technical researcher at Conjecture"

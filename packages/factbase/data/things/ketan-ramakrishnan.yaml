@@ -1,0 +1,14 @@
+entity: u7QD93Xjug
+facts:
+  - id: "GxBKL0vEAQ"
+    property: "employed-by"
+    value: !ref hvg9ecR3nA
+    asOf: "2020"
+    source: "https://80000hours.org/"
+    notes: "Career advising related to AI safety; EA community member"
+  - id: "WkjuMQLVvQ"
+    property: "role"
+    value: "Advisor"
+    asOf: "2020"
+    source: "https://80000hours.org/"
+    notes: "Career advising related to AI safety; EA community member"

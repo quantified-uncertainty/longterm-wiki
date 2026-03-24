@@ -1,0 +1,14 @@
+entity: OsJT0ukTmw
+facts:
+  - id: "mRYT7lx15w"
+    property: "employed-by"
+    value: !ref gNsqAes7Dw
+    asOf: "2016"
+    source: "https://www.centreforeffectivealtruism.org/"
+    notes: "Key figure in EA community health and integrity; community mediator"
+  - id: "kQm7nuxNKg"
+    property: "role"
+    value: "Community Liaison, then Head of Community Health"
+    asOf: "2016"
+    source: "https://www.centreforeffectivealtruism.org/"
+    notes: "Key figure in EA community health and integrity; community mediator"

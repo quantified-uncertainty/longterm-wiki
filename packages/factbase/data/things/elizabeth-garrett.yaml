@@ -1,0 +1,14 @@
+entity: rWMi3jrTCQ
+facts:
+  - id: "3iJgEDv4sQ"
+    property: "employed-by"
+    value: !ref NifCYhN75w
+    asOf: "2019"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Works on AI safety grantmaking"
+  - id: "Z0PNpMcDrQ"
+    property: "role"
+    value: "Program Officer"
+    asOf: "2019"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Works on AI safety grantmaking"

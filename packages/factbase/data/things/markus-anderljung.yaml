@@ -1,2 +1,28 @@
 entity: 1nsWegMiR3
-facts: []
+facts:
+  - id: "ttL9dS7QJg"
+    property: "employed-by"
+    value: !ref XLLyzaEaCA
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://www.governance.ai/"
+    notes: "Led policy work at GovAI"
+  - id: "K8OfJoknPQ"
+    property: "role"
+    value: "Head of Policy"
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://www.governance.ai/"
+    notes: "Led policy work at GovAI"
+  - id: "JI2WDbSzgA"
+    property: "employed-by"
+    value: !ref y4bieqSeag
+    asOf: "2023"
+    source: "https://safe.ai/"
+    notes: "Leads policy research at CAIS"
+  - id: "R117BnHj2w"
+    property: "role"
+    value: "Policy Director"
+    asOf: "2023"
+    source: "https://safe.ai/"
+    notes: "Leads policy research at CAIS"

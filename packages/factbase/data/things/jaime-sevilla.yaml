@@ -1,0 +1,14 @@
+entity: g7Hg6qBW6A
+facts:
+  - id: "3fMqarsUpQ"
+    property: "employed-by"
+    value: !ref cBPkzcVBBQ
+    asOf: "2022"
+    source: "https://epochai.org/"
+    notes: "Founded Epoch AI; publishes influential research on compute trends, AI timelines, and training cost estimates"
+  - id: "vAVSnnnGVg"
+    property: "role"
+    value: "Founder & Director"
+    asOf: "2022"
+    source: "https://epochai.org/"
+    notes: "Founded Epoch AI; publishes influential research on compute trends, AI timelines, and training cost estimates"

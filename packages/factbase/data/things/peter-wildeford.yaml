@@ -1,0 +1,14 @@
+entity: mIbKwQ4ZwQ
+facts:
+  - id: "SiQLFGF8JQ"
+    property: "employed-by"
+    value: !ref t0p43V5oLA
+    asOf: "2018"
+    source: "https://rethinkpriorities.org/"
+    notes: "Co-founded Rethink Priorities; focused on AI governance research and EA cause prioritization"
+  - id: "Nln1Pwp0sQ"
+    property: "role"
+    value: "Co-founder & Co-CEO"
+    asOf: "2018"
+    source: "https://rethinkpriorities.org/"
+    notes: "Co-founded Rethink Priorities; focused on AI governance research and EA cause prioritization"

@@ -1,2 +1,14 @@
 entity: lCvbYl5SE0
-facts: []
+facts:
+  - id: "BMLCjD5sPQ"
+    property: "employed-by"
+    value: !ref VJacG0VE2w
+    asOf: "2022"
+    source: "https://ainowinstitute.org/"
+    notes: "Co-leads operations at AI Now; previously researcher at Google"
+  - id: "DfbfPm8y7A"
+    property: "role"
+    value: "Managing Director"
+    asOf: "2022"
+    source: "https://ainowinstitute.org/"
+    notes: "Co-leads operations at AI Now; previously researcher at Google"

@@ -1,18 +1,24 @@
 entity: 4eNHxKcml1
 facts:
-  [
-    {
-        id: aL2XFx9meQ,
-        property: website,
-        value: https://wojzaremba.com/,
-        source: https://www.wikidata.org/wiki/Q27733815,
-        notes: From Wikidata Q27733815
-      },
-    {
-        id: CHUKAFYC6Q,
-        property: wikipedia-url,
-        value: https://en.wikipedia.org/wiki/Wojciech_Zaremba,
-        source: https://www.wikidata.org/wiki/Q27733815,
-        notes: From Wikidata Q27733815
-      }
-  ]
+  - id: "aL2XFx9meQ"
+    property: "website"
+    value: "https://wojzaremba.com/"
+    source: "https://www.wikidata.org/wiki/Q27733815"
+    notes: "From Wikidata Q27733815"
+  - id: "CHUKAFYC6Q"
+    property: "wikipedia-url"
+    value: "https://en.wikipedia.org/wiki/Wojciech_Zaremba"
+    source: "https://www.wikidata.org/wiki/Q27733815"
+    notes: "From Wikidata Q27733815"
+  - id: "CDZF7qeFNQ"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2015-12"
+    source: "https://en.wikipedia.org/wiki/Wojciech_Zaremba"
+    notes: "Co-founded OpenAI; leads the Codex/coding intelligence team"
+  - id: "anSdnu8F5Q"
+    property: "role"
+    value: "Co-founder, Head of Codex"
+    asOf: "2015-12"
+    source: "https://en.wikipedia.org/wiki/Wojciech_Zaremba"
+    notes: "Co-founded OpenAI; leads the Codex/coding intelligence team"

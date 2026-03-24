@@ -1,71 +1,67 @@
 entity: p1P9oQwB6w
 facts:
-  - id: f_ai1K4HXqHA
-    property: description
-    value: >-
-      Will MacAskill is a Scottish moral philosopher and a central figure in the
-      effective altruism (EA) movement. In 2009, he co-founded Giving What We
-      Can with Toby Ord, encouraging members to pledge 10% of their income to
-      highly effective charities. He also co-founded the Centre for Effective
-      Altruism and 80,000 Hours in 2011. His 2015 book "Doing Good Better"
-      popularized EA principles, and his 2022 book "What We Owe the Future" made
-      the case for longtermism—the view that we should give significant weight
-      to future generations—bringing widespread attention to existential risk
-      and AI safety. He left his Associate Professor position at Oxford in 2024
-      to become Senior Research Fellow at Forethought, focusing on AGI
-      preparedness, space governance, and AI rights.
-    asOf: 2026-03
-    notes: Updated to reflect current role at Forethought (left Oxford 2024)
-
-  - id: f_zFKfTWKs8w
-    property: website
-    value: https://www.willmacaskill.com/
-
-  - id: f_wM1rKz8mXq
-    property: role
+  - id: "f_ai1K4HXqHA"
+    property: "description"
+    value: "Will MacAskill is a Scottish moral philosopher and a central figure in the effective altruism (EA) movement. In
+      2009, he co-founded Giving What We Can with Toby Ord, encouraging members to pledge 10% of their income to highly
+      effective charities. He also co-founded the Centre for Effective Altruism and 80,000 Hours in 2011. His 2015 book
+      \"Doing Good Better\" popularized EA principles, and his 2022 book \"What We Owe the Future\" made the case for
+      longtermism—the view that we should give significant weight to future generations—bringing widespread attention to
+      existential risk and AI safety. He left his Associate Professor position at Oxford in 2024 to become Senior
+      Research Fellow at Forethought, focusing on AGI preparedness, space governance, and AI rights."
+    asOf: "2026-03"
+    notes: "Updated to reflect current role at Forethought (left Oxford 2024)"
+  - id: "f_zFKfTWKs8w"
+    property: "website"
+    value: "https://www.willmacaskill.com/"
+  - id: "f_wM1rKz8mXq"
+    property: "role"
     value: "Senior Research Fellow, Forethought"
     asOf: "2024-01"
-    source: https://www.forethought.org/people/william-macaskill
+    source: "https://www.forethought.org/people/william-macaskill"
     notes: "Left Oxford Associate Professor position in 2024; now at Forethought"
-
-  - id: f_wM2nLw9pYr
-    property: notable-for
-    value: "Co-founder of effective altruism movement; longtermism; \"What We Owe
-      the Future\" (2022); Giving What We Can; 80,000 Hours"
+  - id: "f_wM2nLw9pYr"
+    property: "notable-for"
+    value: "Co-founder of effective altruism movement; longtermism; \"What We Owe the Future\" (2022); Giving What We Can;
+      80,000 Hours"
     asOf: "2026-03"
-
-  - id: f_wM3eBy7xZt
-    property: employed-by
+  - id: "f_wM3eBy7xZt"
+    property: "employed-by"
     value: !ref tdb16DLlLb
     asOf: "2024-01"
-    source: https://www.forethought.org/people/william-macaskill
-    notes: "Senior Research Fellow at Forethought since 2024; previously Associate
-      Professor at University of Oxford"
-
-  - id: f_wM4bY1987x
-    property: born-year
+    source: "https://www.forethought.org/people/william-macaskill"
+    notes: "Senior Research Fellow at Forethought since 2024; previously Associate Professor at University of Oxford"
+  - id: "f_wM4bY1987x"
+    property: "born-year"
     value: 1987
-    source: https://en.wikipedia.org/wiki/William_MacAskill
+    source: "https://en.wikipedia.org/wiki/William_MacAskill"
     notes: "Born 24 March 1987 in Glasgow, Scotland"
-
-  - id: f_wM5eD2014o
-    property: education
-    value: "DPhil in Philosophy, St. Anne's College, Oxford (2014); BA, Cambridge;
-      studied at Princeton"
-    source: https://en.wikipedia.org/wiki/William_MacAskill
-    notes: "Youngest person appointed as Associate Professor of Philosophy at time
-      of appointment"
-
-  - id: f_wM6sM0twit
-    property: social-media
+  - id: "f_wM5eD2014o"
+    property: "education"
+    value: "DPhil in Philosophy, St. Anne's College, Oxford (2014); BA, Cambridge; studied at Princeton"
+    source: "https://en.wikipedia.org/wiki/William_MacAskill"
+    notes: "Youngest person appointed as Associate Professor of Philosophy at time of appointment"
+  - id: "f_wM6sM0twit"
+    property: "social-media"
     value: "@willmacaskill"
-    source: https://x.com/willmacaskill
-
-  - id: f_wM7wK1wiki
-    property: wikipedia-url
+    source: "https://x.com/willmacaskill"
+  - id: "f_wM7wK1wiki"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/William_MacAskill"
-  - id: 7ed0lGSHyA
-    property: website
-    value: http://www.williammacaskill.com/
-    source: https://www.wikidata.org/wiki/Q20684655
-    notes: From Wikidata Q20684655
+  - id: "7ed0lGSHyA"
+    property: "website"
+    value: "http://www.williammacaskill.com/"
+    source: "https://www.wikidata.org/wiki/Q20684655"
+    notes: "From Wikidata Q20684655"
+  - id: "jrc9Dfjccg"
+    property: "employed-by"
+    value: !ref 18K3KG3bpg
+    asOf: "2014"
+    source: "https://en.wikipedia.org/wiki/William_MacAskill"
+    notes: "Co-founded effective altruism movement; author of 'What We Owe the Future'; on leave since FTX collapse"
+  - id: "aQVjtvzHLw"
+    property: "role"
+    value: "Associate Professor of Philosophy"
+    asOf: "2014"
+    source: "https://en.wikipedia.org/wiki/William_MacAskill"
+    notes: "Co-founded effective altruism movement; author of 'What We Owe the Future'; on leave since FTX collapse"

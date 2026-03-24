@@ -1,0 +1,14 @@
+entity: VBDv1fiH9g
+facts:
+  - id: "evOZmyMdEw"
+    property: "employed-by"
+    value: !ref hvg9ecR3nA
+    asOf: "2019"
+    source: "https://80000hours.org/"
+    notes: "Leads 80K's one-on-one career advisory team"
+  - id: "Ot07RloQNw"
+    property: "role"
+    value: "Head of Advising"
+    asOf: "2019"
+    source: "https://80000hours.org/"
+    notes: "Leads 80K's one-on-one career advisory team"

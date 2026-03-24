@@ -1,2 +1,28 @@
 entity: aAaiRGmdG1
-facts: []
+facts:
+  - id: "10jUe8vbUQ"
+    property: "employed-by"
+    value: !ref Zmw9nfUYWA
+    asOf: "2017"
+    validEnd: "2021"
+    source: "https://www.governance.ai/"
+    notes: "AI governance researcher at FHI"
+  - id: "t6WWAZenPw"
+    property: "role"
+    value: "Research Fellow"
+    asOf: "2017"
+    validEnd: "2021"
+    source: "https://www.governance.ai/"
+    notes: "AI governance researcher at FHI"
+  - id: "d8DWzVv5Fg"
+    property: "employed-by"
+    value: !ref XLLyzaEaCA
+    asOf: "2021"
+    source: "https://www.governance.ai/"
+    notes: "Became director when GovAI became independent from FHI; leads governance research"
+  - id: "FE8z014nIw"
+    property: "role"
+    value: "Director"
+    asOf: "2021"
+    source: "https://www.governance.ai/"
+    notes: "Became director when GovAI became independent from FHI; leads governance research"

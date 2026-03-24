@@ -1,18 +1,26 @@
 entity: OxXXTxtbrA
 facts:
-  - id: f_mTxD5bcYgw
-    property: role
+  - id: "f_mTxD5bcYgw"
+    property: "role"
     value: "CEO"
-
-  - id: f_1TD2ftGDkg
-    property: born-year
+  - id: "f_1TD2ftGDkg"
+    property: "born-year"
     value: 1984
-
-  - id: f_YbXRRr8Bcw
-    property: notable-for
+  - id: "f_YbXRRr8Bcw"
+    property: "notable-for"
     value: "CEO of Meta; leads Meta AI and open-source Llama model development; advocate for open-source AI"
-
-  - id: f_RRcNwwrZzQ
-    property: wikipedia-url
+  - id: "f_RRcNwwrZzQ"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
-
+  - id: "oQlzKeOnVw"
+    property: "employed-by"
+    value: !ref tt0f5PYDCw
+    asOf: "2004"
+    source: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
+    notes: "Founded Facebook/Meta; major investor in open-source AI (Llama models); advocates for open AI development"
+  - id: "5L11T7Mn1w"
+    property: "role"
+    value: "Founder & CEO"
+    asOf: "2004"
+    source: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
+    notes: "Founded Facebook/Meta; major investor in open-source AI (Llama models); advocates for open AI development"

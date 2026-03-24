@@ -1,2 +1,14 @@
 entity: rhgfPZYXTw
-facts: []
+facts:
+  - id: "yB2jAN1l7w"
+    property: "employed-by"
+    value: !ref YPE80Sx2VA
+    asOf: "2019"
+    source: "https://hai.stanford.edu/"
+    notes: "Co-founded Stanford Institute for Human-Centered AI with Fei-Fei Li; former Stanford Provost"
+  - id: "A7R2umfQwA"
+    property: "role"
+    value: "Co-Director"
+    asOf: "2019"
+    source: "https://hai.stanford.edu/"
+    notes: "Co-founded Stanford Institute for Human-Centered AI with Fei-Fei Li; former Stanford Provost"

@@ -1,63 +1,66 @@
 entity: cMbVUVK29Q
 facts:
-  - id: f_y9K773heIw
-    property: employed-by
+  - id: "f_y9K773heIw"
+    property: "employed-by"
     value: !ref tt0f5PYDCw
-    asOf: 2013-12
-    source: https://ai.meta.com/people/yann-lecun/
+    asOf: "2013-12"
+    source: "https://ai.meta.com/people/yann-lecun/"
     notes: "Joined Facebook AI Research (FAIR) as founding director in December 2013; became Chief AI Scientist at Meta"
-
-  - id: f_DQUCjz4rhQ
-    property: role
+  - id: "f_DQUCjz4rhQ"
+    property: "role"
     value: "Chief AI Scientist"
     asOf: "2018"
-    source: https://ai.meta.com/people/yann-lecun/
+    source: "https://ai.meta.com/people/yann-lecun/"
     notes: "Turing Award 2018 (shared with Yoshua Bengio and Geoffrey Hinton) for work on deep learning"
-
-  - id: f_A9r9tPNCOQ
-    property: born-year
+  - id: "f_A9r9tPNCOQ"
+    property: "born-year"
     value: 1960
     notes: "Born July 8, 1960 in Soisy-sous-Montmorency, France"
-
-  - id: f_yL1aB2cD3e
-    property: education
-    value: "PhD in Computer Science, Universit\u00E9 Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
-    source: https://en.wikipedia.org/wiki/Yann_LeCun
+  - id: "f_yL1aB2cD3e"
+    property: "education"
+    value: "PhD in Computer Science, Université Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
     notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with Geoffrey Hinton"
-
-  - id: f_yL4fG5hI6j
-    property: notable-for
-    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
-    source: https://en.wikipedia.org/wiki/Yann_LeCun
-
-  - id: f_yL7kL8mN9o
-    property: social-media
+  - id: "f_yL4fG5hI6j"
+    property: "notable-for"
+    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of
+      AGI existential risk"
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
+  - id: "f_yL7kL8mN9o"
+    property: "social-media"
     value: "@ylecun"
-    source: https://x.com/ylecun
-
-  - id: f_38uo2p1lbe
-    property: wikipedia-url
+    source: "https://x.com/ylecun"
+  - id: "f_38uo2p1lbe"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Yann_LeCun"
-
-  - id: f_4bmkyq2hx6
-    property: google-scholar
+  - id: "f_4bmkyq2hx6"
+    property: "google-scholar"
     value: "https://scholar.google.com/citations?user=WLN3QrAAAAAJ"
-
-  - id: f_4eqnc2klts
-    property: website
+  - id: "f_4eqnc2klts"
+    property: "website"
     value: "http://yann.lecun.com"
-
-  - id: f_4vHT9Lh28Q
-    property: role
+  - id: "f_4vHT9Lh28Q"
+    property: "role"
     value: "Research Scientist"
     asOf: "1988"
     validEnd: "2003"
-    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
     notes: "At AT&T Bell Laboratories, then AT&T Labs-Research; developed LeNet for handwritten digit recognition"
-
-  - id: f_rDiSYw96dg
-    property: role
+  - id: "f_rDiSYw96dg"
+    property: "role"
     value: "Silver Professor of Computer Science"
     asOf: "2003"
-    source: https://en.wikipedia.org/wiki/Yann_LeCun
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
     notes: "At New York University's Courant Institute; founded the NYU Center for Data Science"
+  - id: "o27zabS6Ug"
+    property: "employed-by"
+    value: !ref tt0f5PYDCw
+    asOf: "2013"
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
+    notes: "Founded Facebook AI Research (FAIR); Turing Award winner (2018) with Hinton and Bengio; prominent AI risk skeptic"
+  - id: "8bKYjLlCaA"
+    property: "role"
+    value: "VP & Chief AI Scientist"
+    asOf: "2013"
+    source: "https://en.wikipedia.org/wiki/Yann_LeCun"
+    notes: "Founded Facebook AI Research (FAIR); Turing Award winner (2018) with Hinton and Bengio; prominent AI risk skeptic"

@@ -1,0 +1,14 @@
+entity: LWYBcu2iSQ
+facts:
+  - id: "9WKaJwoPcA"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2023"
+    source: "https://anthropic.com/"
+    notes: "Chief of Staff to Dario Amodei; previously worked on policy; authored 'My Last 5 Years of Work' essay"
+  - id: "yGCudlvjxw"
+    property: "role"
+    value: "Chief of Staff to CEO"
+    asOf: "2023"
+    source: "https://anthropic.com/"
+    notes: "Chief of Staff to Dario Amodei; previously worked on policy; authored 'My Last 5 Years of Work' essay"

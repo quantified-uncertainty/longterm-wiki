@@ -1,18 +1,40 @@
 entity: x16GL4gP2A
 facts:
-  - id: f_1f8OrwS6Gw
-    property: employed-by
+  - id: "f_1f8OrwS6Gw"
+    property: "employed-by"
     value: !ref mK9pX3rQ7n
-
-  - id: f_cErwsdUACw
-    property: role
+  - id: "f_cErwsdUACw"
+    property: "role"
     value: "Co-founder"
-
-  - id: f_clGvV7hzcA
-    property: notable-for
+  - id: "f_clGvV7hzcA"
+    property: "notable-for"
     value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of neural scaling laws research"
-
-  - id: f_h7OOErJfYQ
-    property: education
+  - id: "f_h7OOErJfYQ"
+    property: "education"
     value: "PhD in Physics, Stanford University"
-
+  - id: "518O1txnSQ"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2019"
+    validEnd: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Led scaling laws research at OpenAI; co-authored 'Scaling Laws for Neural Language Models'"
+  - id: "jp3NzZCDYQ"
+    property: "role"
+    value: "Researcher"
+    asOf: "2019"
+    validEnd: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Led scaling laws research at OpenAI; co-authored 'Scaling Laws for Neural Language Models'"
+  - id: "f2V2rC9wKQ"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; continued scaling laws research"
+  - id: "evMuOPcnCA"
+    property: "role"
+    value: "Co-founder"
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; continued scaling laws research"

@@ -1,22 +1,36 @@
 entity: QzcX3bShmQ
 facts:
-  - id: f_RObNpFN8Eg
-    property: role
+  - id: "f_RObNpFN8Eg"
+    property: "role"
     value: "Professor and Co-Director, Stanford HAI"
-
-  - id: f_Tz7Zi9bQUw
-    property: born-year
+  - id: "f_Tz7Zi9bQUw"
+    property: "born-year"
     value: 1976
-
-  - id: f_QB41VrylJQ
-    property: notable-for
+  - id: "f_QB41VrylJQ"
+    property: "notable-for"
     value: "Stanford professor; creator of ImageNet; co-director of Stanford Human-Centered AI Institute (HAI)"
-
-  - id: f_6jSJH4dKkg
-    property: education
+  - id: "f_6jSJH4dKkg"
+    property: "education"
     value: "PhD in Electrical Engineering, Caltech"
-
-  - id: f_JTMGj07W7Q
-    property: wikipedia-url
+  - id: "f_JTMGj07W7Q"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
-
+  - id: "HkwDQpDAnA"
+    property: "employed-by"
+    value: !ref ngrgdfqafw
+    asOf: "2009"
+    source: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
+    notes: "Co-director of Stanford HAI; created ImageNet; Sequoia Professor of CS"
+  - id: "NHA5gAR8aw"
+    property: "role"
+    value: "Professor of Computer Science"
+    asOf: "2009"
+    source: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
+    notes: "Co-director of Stanford HAI; created ImageNet; Sequoia Professor of CS"
+  - id: "KfVeMIhJSw"
+    property: "role"
+    value: "VP & Chief Scientist of AI/ML"
+    asOf: "2017"
+    validEnd: "2018"
+    source: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
+    notes: "At Google Cloud. Led AI strategy at Google Cloud on sabbatical from Stanford"

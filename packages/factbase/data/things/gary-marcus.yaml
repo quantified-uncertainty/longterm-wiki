@@ -1,45 +1,62 @@
 entity: ILx7EzDqXQ
 facts:
-  - id: f_zftBN1DOUQ
-    property: description
-    value: Cognitive scientist and AI critic, known for skepticism of deep
-      learning's path to AGI and advocacy for hybrid AI approaches.
-    asOf: 2026-03
-    notes: Migrated from old entity system
-  - id: hk6mZOlXog
-    property: born-year
+  - id: "f_zftBN1DOUQ"
+    property: "description"
+    value: "Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid
+      AI approaches."
+    asOf: "2026-03"
+    notes: "Migrated from old entity system"
+  - id: "hk6mZOlXog"
+    property: "born-year"
     value: 1970
-    source: https://www.wikidata.org/wiki/Q3348133
-    notes: From Wikidata Q3348133
-  - id: VIvvKLpe7A
-    property: education
-    value: Massachusetts Institute of Technology; Hampshire College; Johns Hopkins
-      Center for Talented Youth
-    source: https://www.wikidata.org/wiki/Q3348133
-    notes: From Wikidata Q3348133
-
-  - id: f_gM3rK7mW4x
-    property: role
+    source: "https://www.wikidata.org/wiki/Q3348133"
+    notes: "From Wikidata Q3348133"
+  - id: "VIvvKLpe7A"
+    property: "education"
+    value: "Massachusetts Institute of Technology; Hampshire College; Johns Hopkins Center for Talented Youth"
+    source: "https://www.wikidata.org/wiki/Q3348133"
+    notes: "From Wikidata Q3348133"
+  - id: "f_gM3rK7mW4x"
+    property: "role"
     value: "Professor Emeritus of Psychology and Neural Science"
-    asOf: 2026-03
-    source: https://en.wikipedia.org/wiki/Gary_Marcus
-    notes: Enriched from public information; NYU faculty
-
-  - id: f_gM6tN2pQ8v
-    property: notable-for
-    value: "Prominent AI critic skeptical of deep learning as path to AGI; advocate for hybrid neurosymbolic AI approaches; author of Rebooting AI and Kluge; founder of Geometric Intelligence (acquired by Uber)"
-    asOf: 2026-03
-    source: https://en.wikipedia.org/wiki/Gary_Marcus
-    notes: Enriched from public information
-
-  - id: f_gM9wS5jH2d
-    property: born-year
+    asOf: "2026-03"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Enriched from public information; NYU faculty"
+  - id: "f_gM6tN2pQ8v"
+    property: "notable-for"
+    value: "Prominent AI critic skeptical of deep learning as path to AGI; advocate for hybrid neurosymbolic AI approaches;
+      author of Rebooting AI and Kluge; founder of Geometric Intelligence (acquired by Uber)"
+    asOf: "2026-03"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Enriched from public information"
+  - id: "f_gM9wS5jH2d"
+    property: "born-year"
     value: 1970
-    source: https://en.wikipedia.org/wiki/Gary_Marcus
-    notes: Born February 8, 1970
-
-  - id: f_gMcY8fL5kA
-    property: education
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Born February 8, 1970"
+  - id: "f_gMcY8fL5kA"
+    property: "education"
     value: "Ph.D. in Brain and Cognitive Sciences, MIT (1993); B.A. from Hampshire College"
-    source: https://en.wikipedia.org/wiki/Gary_Marcus
-    notes: Enriched from public information; studied under Steven Pinker at MIT
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Enriched from public information; studied under Steven Pinker at MIT"
+  - id: "jOoUwmezaQ"
+    property: "employed-by"
+    value: !ref 5IBy869q9Q
+    asOf: "1995"
+    validEnd: "2023"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Professor Emeritus; founded the NYU Center for Language and Music"
+  - id: "zD38tmVyaQ"
+    property: "role"
+    value: "Professor of Psychology & Neural Science"
+    asOf: "1995"
+    validEnd: "2023"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Professor Emeritus; founded the NYU Center for Language and Music"
+  - id: "0ohI54GuOQ"
+    property: "role"
+    value: "Director of AI"
+    asOf: "2016-12"
+    validEnd: "2017-03"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "At Uber AI Labs. Uber acquired his startup Geometric Intelligence; brief tenure running Uber AI"

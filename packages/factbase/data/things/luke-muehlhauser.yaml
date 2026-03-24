@@ -1,10 +1,34 @@
 entity: TclWePCJ7w
 facts:
-  - id: f_oXdOBNJysw
-    property: role
+  - id: "f_oXdOBNJysw"
+    property: "role"
     value: "Independent Researcher"
-
-  - id: f_yFiXtoJMDg
-    property: notable-for
+  - id: "f_yFiXtoJMDg"
+    property: "notable-for"
     value: "Former Executive Director of MIRI; former GiveWell/Open Philanthropy researcher on AI risk"
-
+  - id: "cf6BH4951g"
+    property: "employed-by"
+    value: !ref puAffUjWSS
+    asOf: "2012"
+    validEnd: "2017"
+    source: "https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute"
+    notes: "Led MIRI through significant growth in funding and staff"
+  - id: "a6k4LfbaQA"
+    property: "role"
+    value: "Executive Director"
+    asOf: "2012"
+    validEnd: "2017"
+    source: "https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute"
+    notes: "Led MIRI through significant growth in funding and staff"
+  - id: "ZnzhPcf21A"
+    property: "employed-by"
+    value: !ref NifCYhN75w
+    asOf: "2017"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Focused on AI policy, global catastrophic risk analysis, and grantmaking strategy"
+  - id: "d9WHfU49OQ"
+    property: "role"
+    value: "Senior Research Analyst"
+    asOf: "2017"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Focused on AI policy, global catastrophic risk analysis, and grantmaking strategy"
