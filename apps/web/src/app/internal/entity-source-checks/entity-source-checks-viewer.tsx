@@ -60,7 +60,7 @@ interface EvidenceRow {
   checkedAt: string | null;
 }
 
-// ── Verdict styling ─────────────────────────────────────────────────────
+// ── Verdict styling & priority ──────────────────────────────────────────
 
 const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600" },
@@ -69,6 +69,16 @@ const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   partial: { bg: "bg-amber-400/15", text: "text-amber-500" },
   unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500" },
   unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
+};
+
+/** Sort priority: most actionable verdicts first. Lower = higher priority. */
+const VERDICT_PRIORITY: Record<string, number> = {
+  contradicted: 0,
+  outdated: 1,
+  partial: 2,
+  unverifiable: 3,
+  confirmed: 4,
+  unchecked: 5,
 };
 
 function VerdictBadge({ verdict }: { verdict: string }) {
@@ -106,6 +116,7 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
     {
       accessorKey: "recordType",
       header: ({ column }) => <SortableHeader column={column}>Type</SortableHeader>,
+      size: 80,
       cell: ({ row }) => (
         <span className="text-xs font-medium capitalize">{row.original.recordType}</span>
       ),
@@ -116,9 +127,17 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
       cell: ({ row }) => {
         const id = row.original.entityId;
         if (!id) return <span className="text-xs text-muted-foreground">-</span>;
+        const resolvedName = names[id];
+        if (resolvedName) {
+          return (
+            <span className="text-xs font-medium" title={`${resolvedName} (${id})`}>
+              {resolvedName.length > 28 ? resolvedName.slice(0, 26) + "…" : resolvedName}
+            </span>
+          );
+        }
         return (
           <span className="text-xs font-mono text-muted-foreground" title={id}>
-            {id.length > 12 ? id.slice(0, 10) + "..." : id}
+            {id.length > 12 ? id.slice(0, 10) + "…" : id}
           </span>
         );
       },
@@ -131,19 +150,14 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
         const resolvedName = names[row.original.recordId];
         if (resolvedName) {
           return (
-            <div className="flex flex-col gap-0.5">
-              <span className="text-xs font-medium" title={resolvedName}>
-                {resolvedName.length > 30 ? resolvedName.slice(0, 28) + "..." : resolvedName}
-              </span>
-              <span className="text-[10px] font-mono text-muted-foreground" title={row.original.recordId}>
-                {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
-              </span>
-            </div>
+            <span className="text-xs font-medium" title={`${resolvedName} (${row.original.recordId})`}>
+              {resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName}
+            </span>
           );
         }
         return (
           <span className="text-xs font-mono text-muted-foreground" title={row.original.recordId}>
-            {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "..." : row.original.recordId}
+            {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "…" : row.original.recordId}
           </span>
         );
       },
@@ -152,11 +166,15 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
     {
       accessorKey: "verdict",
       header: ({ column }) => <SortableHeader column={column}>Verdict</SortableHeader>,
+      size: 100,
+      sortingFn: (a, b) =>
+        (VERDICT_PRIORITY[a.original.verdict] ?? 99) - (VERDICT_PRIORITY[b.original.verdict] ?? 99),
       cell: ({ row }) => <VerdictBadge verdict={row.original.verdict} />,
     },
     {
       accessorKey: "confidence",
-      header: ({ column }) => <SortableHeader column={column}>Confidence</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column}>Conf.</SortableHeader>,
+      size: 70,
       cell: ({ row }) => {
         const c = row.original.confidence;
         if (c == null) return <span className="text-xs text-muted-foreground">-</span>;
@@ -170,30 +188,16 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
         const r = row.original.reasoning;
         if (!r) return <span className="text-xs text-muted-foreground">-</span>;
         return (
-          <span className="text-xs text-muted-foreground line-clamp-2 max-w-[300px]" title={r}>
+          <span className="text-xs text-muted-foreground line-clamp-2" title={r}>
             {r}
           </span>
         );
       },
     },
     {
-      accessorKey: "sourcesChecked",
-      header: ({ column }) => <SortableHeader column={column}>Sources</SortableHeader>,
-      cell: ({ row }) => <span className="text-sm tabular-nums">{row.original.sourcesChecked}</span>,
-    },
-    {
-      accessorKey: "needsRecheck",
-      header: ({ column }) => <SortableHeader column={column}>Recheck</SortableHeader>,
-      cell: ({ row }) =>
-        row.original.needsRecheck ? (
-          <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">yes</span>
-        ) : (
-          <span className="text-xs text-muted-foreground">no</span>
-        ),
-    },
-    {
       accessorKey: "lastComputedAt",
-      header: ({ column }) => <SortableHeader column={column}>Last Checked</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column}>Checked</SortableHeader>,
+      size: 90,
       cell: ({ row }) => {
         const d = row.original.lastComputedAt;
         if (!d) return <span className="text-xs text-muted-foreground">-</span>;
@@ -306,14 +310,15 @@ function ExpandedDetail({
 type NameMap = Record<string, string>;
 
 /**
- * Batch-resolve record IDs to human-readable names via the proxy API.
+ * Batch-resolve record IDs and entity IDs to human-readable names via the proxy API.
  * Groups IDs by record type and makes one request per type.
- * Returns a flat map of recordId -> name.
+ * Also resolves entityId stableIds as record_type=entity.
+ * Returns a flat map of id -> name.
  */
-async function resolveRecordNames(
+async function resolveNames(
   verdicts: VerdictRow[]
 ): Promise<NameMap> {
-  // Group unique IDs by record type
+  // Group unique record IDs by record type
   const byType = new Map<string, Set<string>>();
   for (const v of verdicts) {
     const existing = byType.get(v.recordType);
@@ -321,6 +326,15 @@ async function resolveRecordNames(
       existing.add(v.recordId);
     } else {
       byType.set(v.recordType, new Set([v.recordId]));
+    }
+    // Also collect entity IDs for resolution
+    if (v.entityId) {
+      const entitySet = byType.get("entity");
+      if (entitySet) {
+        entitySet.add(v.entityId);
+      } else {
+        byType.set("entity", new Set([v.entityId]));
+      }
     }
   }
 
@@ -343,7 +357,7 @@ async function resolveRecordNames(
       }
     } catch (e) {
       // Non-critical: display falls back to raw ID
-      console.warn(`[entity-verifications] Failed to resolve names for ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
+      console.warn(`[entity-source-checks] Failed to resolve names for ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
     }
   });
 
@@ -386,9 +400,9 @@ export function EntitySourceChecksViewer() {
 
         // Resolve names in background (non-blocking)
         if (allVerdicts.length > 0) {
-          resolveRecordNames(allVerdicts).then(
+          resolveNames(allVerdicts).then(
             (names) => setRecordNames(names),
-            (e) => console.warn(`[entity-verifications] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
+            (e) => console.warn(`[entity-source-checks] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
           );
         }
       } catch (e) {
@@ -426,8 +440,8 @@ export function EntitySourceChecksViewer() {
   // Memoize columns so they update when record names are resolved
   const columns = useMemo(() => buildColumns(recordNames), [recordNames]);
 
-  // Table state
-  const [sorting, setSorting] = useState<SortingState>([{ id: "lastComputedAt", desc: true }]);
+  // Table state — default sort by verdict (actionable items first: contradicted > outdated > partial > ...)
+  const [sorting, setSorting] = useState<SortingState>([{ id: "verdict", desc: false }]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 100 });
@@ -484,7 +498,8 @@ export function EntitySourceChecksViewer() {
   const withConfidence = verdicts.filter((v) => v.confidence != null);
   const avgConfidence = withConfidence.length > 0
     ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
-  const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
+  const contradictedCount = verdicts.filter((v) => v.verdict === "contradicted").length;
+  const outdatedCount = verdicts.filter((v) => v.verdict === "outdated").length;
 
   if (isLoading) {
     return (
@@ -515,12 +530,12 @@ export function EntitySourceChecksViewer() {
           <p className="text-2xl font-bold tabular-nums">{avgConfidence > 0 ? `${Math.round(avgConfidence * 100)}%` : "N/A"}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
-          <p className={cn("text-2xl font-bold tabular-nums", needsRecheck > 0 ? "text-amber-600" : "")}>{needsRecheck}</p>
+          <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
+          <p className={cn("text-2xl font-bold tabular-nums", contradictedCount > 0 ? "text-red-600" : "")}>{contradictedCount}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Record Types</p>
-          <p className="text-2xl font-bold tabular-nums">{typeCounts.size}</p>
+          <p className="text-xs text-muted-foreground mb-1">Outdated</p>
+          <p className={cn("text-2xl font-bold tabular-nums", outdatedCount > 0 ? "text-amber-600" : "")}>{outdatedCount}</p>
         </div>
       </div>
 
@@ -548,10 +563,15 @@ export function EntitySourceChecksViewer() {
           </button>
           {[...verdictCounts.entries()].sort(([, a], [, b]) => b - a).map(([v, count]) => {
             const style = VERDICT_STYLES[v] || VERDICT_STYLES.unchecked;
+            const isActive = filterVerdict === v;
             return (
               <button key={v} onClick={() => setFilterVerdict(v)}
-                className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                  filterVerdict === v ? `${style.bg} ${style.text}` : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  isActive
+                    ? `${style.bg} ${style.text}`
+                    : "bg-muted text-muted-foreground hover:bg-muted/80",
+                )}>
                 {v} ({count})
               </button>
             );
