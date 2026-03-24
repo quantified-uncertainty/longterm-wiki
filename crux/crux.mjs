@@ -95,6 +95,7 @@ import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-i
 import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as verifyOrchestrateCommands from './commands/source-check-orchestrate.ts';
+import * as sourceCheckRecheckCommands from './commands/source-check-recheck.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
@@ -167,6 +168,7 @@ const domains = {
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: verifyEntityCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
+  'source-check-recheck': sourceCheckRecheckCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,

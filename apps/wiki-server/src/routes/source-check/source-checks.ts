@@ -3,9 +3,11 @@ import { z } from "zod";
 import {
   eq,
   and,
+  or,
   count,
   sql,
   desc,
+  lte,
   inArray,
   countDistinct,
 } from "drizzle-orm";
@@ -95,6 +97,13 @@ const VerdictsQuery = z.object({
 const EvidenceQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const DueForRecheckQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+  record_type: z.string().max(50).optional(),
+  min_priority: z.coerce.number().optional(),
 });
 
 const ResolveNamesQuery = z.object({
@@ -730,6 +739,94 @@ const sourceChecksApp = new Hono()
       .sort((a, b) => a.recordType.localeCompare(b.recordType));
 
     return c.json({ coverage });
+  })
+
+  // ---- GET /due-for-recheck ----
+  .get("/due-for-recheck", zv("query", DueForRecheckQuery), async (c) => {
+    const { limit, offset, record_type, min_priority } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Build priority CASE expression based on verdict severity
+    const priorityExpr = sql<number>`CASE ${sourceCheckVerdicts.verdict}
+      WHEN 'contradicted' THEN 100
+      WHEN 'outdated' THEN 80
+      WHEN 'partial' THEN 50
+      WHEN 'unverifiable' THEN 30
+      WHEN 'confirmed' THEN 10
+      ELSE 0
+    END`;
+
+    // Items are due for recheck when:
+    // 1. next_check_due <= NOW(), or
+    // 2. needs_recheck = true
+    const dueConditions = or(
+      lte(sourceCheckVerdicts.nextCheckDue, sql`NOW()`),
+      eq(sourceCheckVerdicts.needsRecheck, true),
+    );
+
+    const conditions = [dueConditions];
+    if (record_type) {
+      conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+    }
+
+    const whereClause = and(...conditions);
+
+    // Fetch rows with computed priority
+    const rows = await db
+      .select({
+        recordType: sourceCheckVerdicts.recordType,
+        recordId: sourceCheckVerdicts.recordId,
+        fieldName: sourceCheckVerdicts.fieldName,
+        entityId: sourceCheckVerdicts.entityId,
+        verdict: sourceCheckVerdicts.verdict,
+        confidence: sourceCheckVerdicts.confidence,
+        reasoning: sourceCheckVerdicts.reasoning,
+        sourcesChecked: sourceCheckVerdicts.sourcesChecked,
+        needsRecheck: sourceCheckVerdicts.needsRecheck,
+        nextCheckDue: sourceCheckVerdicts.nextCheckDue,
+        lastComputedAt: sourceCheckVerdicts.lastComputedAt,
+        createdAt: sourceCheckVerdicts.createdAt,
+        updatedAt: sourceCheckVerdicts.updatedAt,
+        priority: priorityExpr,
+      })
+      .from(sourceCheckVerdicts)
+      .where(whereClause)
+      .orderBy(sql`${priorityExpr} DESC`, desc(sourceCheckVerdicts.lastComputedAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Apply min_priority filter in-app (simpler than adding it to the SQL WHERE
+    // since the CASE expression would need to be repeated)
+    const filtered = min_priority !== undefined
+      ? rows.filter((r) => r.priority >= min_priority)
+      : rows;
+
+    // Count total matching rows
+    const countResult = await db
+      .select({ count: count() })
+      .from(sourceCheckVerdicts)
+      .where(whereClause);
+    const total = countResult[0].count;
+
+    return c.json({
+      items: filtered.map((r) => ({
+        recordType: r.recordType,
+        recordId: r.recordId,
+        fieldName: r.fieldName,
+        entityId: r.entityId,
+        verdict: r.verdict,
+        confidence: r.confidence,
+        reasoning: r.reasoning,
+        sourcesChecked: r.sourcesChecked,
+        needsRecheck: r.needsRecheck,
+        nextCheckDue: r.nextCheckDue,
+        lastComputedAt: r.lastComputedAt,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+        priority: r.priority,
+      })),
+      total,
+    });
   });
 
 // ---- Exports ----
