@@ -8184,7 +8184,7 @@
 - id: eleutherai
   stableId: FnlNF9s98n
   type: organization
-  orgType: safety-org
+  orgType: generic
   title: EleutherAI
   website: https://www.eleuther.ai
   description: >-
@@ -8217,7 +8217,7 @@
 - id: ethereum-foundation
   stableId: eYI7y4bKdq
   type: organization
-  orgType: funder
+  orgType: generic
   title: Ethereum Foundation
   website: https://ethereum.org
   description: >-
@@ -8323,7 +8323,7 @@
 - id: craft-ventures
   stableId: MZVf6KA9Oa
   type: organization
-  orgType: funder
+  orgType: generic
   title: Craft Ventures
   website: https://www.craftventures.com
   description: >-
