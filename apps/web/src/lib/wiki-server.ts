@@ -233,6 +233,12 @@ export type RpcSourceChecksVerdictsResult = InferResponseType<SourceChecksClient
 /** A single verdict row from the verdicts list */
 export type RpcSourceCheckVerdictRow = RpcSourceChecksVerdictsResult['verdicts'][number];
 
+/** Inferred response type for GET /api/source-checks/verdicts/:recordType/:recordId */
+export type RpcSourceCheckDetailResult = InferResponseType<SourceChecksClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
+
+/** Inferred response type for GET /api/source-checks/resolve-names */
+export type RpcSourceChecksResolveNamesResult = InferResponseType<SourceChecksClient['resolve-names']['$get'], 200>;
+
 // ============================================================================
 // Hono RPC client — Grants API
 // ============================================================================
