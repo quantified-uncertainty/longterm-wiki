@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc } from "drizzle-orm";
+import { eq, count, desc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { benchmarkResults, benchmarks } from "../../schema.js";
 import {
@@ -154,12 +154,35 @@ const benchmarkResultsApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "benchmarkId", ids: parsed.data.items.map((i) => i.benchmarkId) },
-      { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
-    ]);
-    if (refError) return refError;
+    // Validate FK references before inserting.
+    // benchmarkId references the `benchmarks` table (not entities), so check it separately.
+    // modelId references entities.stable_id, so use the standard entity validation.
+    const skip = c.req.query("skipEntityValidation") === "true";
+    if (!skip) {
+      // Check benchmarkIds against the benchmarks table
+      const benchmarkIds = [...new Set(parsed.data.items.map((i) => i.benchmarkId).filter(Boolean))];
+      if (benchmarkIds.length > 0) {
+        const placeholders = benchmarkIds.map((id) => sql`${id}`);
+        const inList = sql.join(placeholders, sql`, `);
+        const found = await db.execute<{ id: string }>(sql`
+          SELECT id FROM benchmarks WHERE id IN (${inList})
+        `);
+        const foundSet = new Set(found.map((r) => r.id));
+        const missing = benchmarkIds.filter((id) => !foundSet.has(id));
+        if (missing.length > 0) {
+          return validationError(
+            c,
+            `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
+          );
+        }
+      }
+
+      // Check modelIds against the entities table
+      const modelRefError = await validateEntityRefs(c, db, [
+        { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
+      ]);
+      if (modelRefError) return modelRefError;
+    }
 
     const now = new Date();
     let upserted = 0;
