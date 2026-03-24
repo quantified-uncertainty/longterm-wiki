@@ -52,3 +52,33 @@ export function formatRecordType(type: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+/**
+ * Get the URL for the source record's detail page.
+ * Returns null if no detail page exists for this record type.
+ */
+export function getRecordHref(recordType: string, recordId: string): string | null {
+  switch (recordType) {
+    case "fact":
+      return `/factbase/fact/${recordId}`;
+    case "wiki-page":
+      return `/wiki/${recordId}`;
+    case "grant":
+      return `/grants/${recordId}`;
+    case "publication":
+      return `/publications/${recordId}`;
+    case "investment":
+      return `/investments/${recordId}`;
+    case "funding-round":
+      return `/funding-rounds/${recordId}`;
+    case "division":
+      return `/divisions/${recordId}`;
+    default:
+      return null;
+  }
+}
+
+/** Get the URL for the source-check detail page. */
+export function getSourceCheckHref(recordType: string, recordId: string): string {
+  return `/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+}

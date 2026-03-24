@@ -19,6 +19,7 @@ import {
   ChevronLeft,
   ExternalLink,
   RotateCcw,
+  ArrowUpRight,
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
@@ -230,6 +231,20 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
         if (!d) return <span className="text-xs text-muted-foreground">-</span>;
         return <span className="text-xs text-muted-foreground tabular-nums">{new Date(d).toLocaleDateString()}</span>;
       },
+    },
+    {
+      id: "detail",
+      size: 36,
+      header: () => null,
+      cell: ({ row }) => (
+        <a
+          href={`/source-checks/${encodeURIComponent(row.original.recordType)}/${encodeURIComponent(row.original.recordId)}`}
+          className="p-1 rounded hover:bg-muted transition-colors inline-flex"
+          title="View source check detail"
+        >
+          <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground" />
+        </a>
+      ),
     },
   ];
 }
