@@ -110,7 +110,7 @@ function expandToggleColumn(): ColumnDef<VerdictRow> {
   };
 }
 
-function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
+function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
   return [
     expandToggleColumn(),
     {
@@ -128,16 +128,20 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
         const id = row.original.entityId;
         if (!id) return <span className="text-xs text-muted-foreground">-</span>;
         const resolvedName = names[id];
-        if (resolvedName) {
+        const href = hrefs[id];
+        const display = resolvedName
+          ? (resolvedName.length > 28 ? resolvedName.slice(0, 26) + "…" : resolvedName)
+          : (id.length > 12 ? id.slice(0, 10) + "…" : id);
+        if (href) {
           return (
-            <span className="text-xs font-medium" title={`${resolvedName} (${id})`}>
-              {resolvedName.length > 28 ? resolvedName.slice(0, 26) + "…" : resolvedName}
-            </span>
+            <a href={href} className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" title={resolvedName || id}>
+              {display}
+            </a>
           );
         }
         return (
-          <span className="text-xs font-mono text-muted-foreground" title={id}>
-            {id.length > 12 ? id.slice(0, 10) + "…" : id}
+          <span className={cn("text-xs", resolvedName ? "font-medium" : "font-mono text-muted-foreground")} title={resolvedName || id}>
+            {display}
           </span>
         );
       },
@@ -145,19 +149,42 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
     },
     {
       accessorKey: "recordId",
-      header: ({ column }) => <SortableHeader column={column}>Record</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column}>Field</SortableHeader>,
       cell: ({ row }) => {
         const resolvedName = names[row.original.recordId];
+        const recordId = row.original.recordId;
+        // For facts, link to the factbase page
+        const isFact = row.original.recordType === "fact";
+        const factHref = isFact ? `/factbase/fact/${recordId}` : null;
+
         if (resolvedName) {
+          const display = resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName;
+          if (factHref) {
+            return (
+              <a href={factHref} className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" title={resolvedName}>
+                {display}
+              </a>
+            );
+          }
           return (
-            <span className="text-xs font-medium" title={`${resolvedName} (${row.original.recordId})`}>
-              {resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName}
+            <span className="text-xs font-medium" title={`${resolvedName} (${recordId})`}>
+              {display}
             </span>
           );
         }
+
+        // Fallback: show raw ID, linked for facts
+        const idDisplay = recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId;
+        if (factHref) {
+          return (
+            <a href={factHref} className="text-xs font-mono text-blue-600/70 hover:underline dark:text-blue-400/70" title={recordId}>
+              {idDisplay}
+            </a>
+          );
+        }
         return (
-          <span className="text-xs font-mono text-muted-foreground" title={row.original.recordId}>
-            {row.original.recordId.length > 15 ? row.original.recordId.slice(0, 12) + "…" : row.original.recordId}
+          <span className="text-xs font-mono text-muted-foreground" title={recordId}>
+            {idDisplay}
           </span>
         );
       },
@@ -308,16 +335,21 @@ function ExpandedDetail({
 // ── Name resolution ──────────────────────────────────────────────────────
 
 type NameMap = Record<string, string>;
+type HrefMap = Record<string, string>;
+
+interface ResolvedData {
+  names: NameMap;
+  hrefs: HrefMap;
+}
 
 /**
  * Batch-resolve record IDs and entity IDs to human-readable names via the proxy API.
  * Groups IDs by record type and makes one request per type.
- * Also resolves entityId stableIds as record_type=entity.
- * Returns a flat map of id -> name.
+ * Also resolves entityId stableIds as record_type=entity (with wiki page hrefs).
  */
 async function resolveNames(
   verdicts: VerdictRow[]
-): Promise<NameMap> {
+): Promise<ResolvedData> {
   // Group unique record IDs by record type
   const byType = new Map<string, Set<string>>();
   for (const v of verdicts) {
@@ -338,7 +370,8 @@ async function resolveNames(
     }
   }
 
-  const result: NameMap = {};
+  const names: NameMap = {};
+  const hrefs: HrefMap = {};
 
   // Fetch names for each record type in parallel
   const fetches = [...byType.entries()].map(async ([recordType, ids]) => {
@@ -349,10 +382,14 @@ async function resolveNames(
       );
       if (!res.ok) return;
       const data = await res.json();
-      const names = data.names as Record<string, string> | undefined;
-      if (names) {
-        for (const [id, name] of Object.entries(names)) {
-          result[id] = name;
+      if (data.names) {
+        for (const [id, name] of Object.entries(data.names as Record<string, string>)) {
+          names[id] = name;
+        }
+      }
+      if (data.hrefs) {
+        for (const [id, href] of Object.entries(data.hrefs as Record<string, string>)) {
+          hrefs[id] = href;
         }
       }
     } catch (e) {
@@ -362,7 +399,7 @@ async function resolveNames(
   });
 
   await Promise.all(fetches);
-  return result;
+  return { names, hrefs };
 }
 
 // ── Main viewer ────────────────────────────────────────────────────────────
@@ -373,6 +410,7 @@ export function EntitySourceChecksViewer() {
   const [error, setError] = useState<string | null>(null);
   const [detailCache, setDetailCache] = useState<DetailCache>({});
   const [recordNames, setRecordNames] = useState<NameMap>({});
+  const [entityHrefs, setEntityHrefs] = useState<HrefMap>({});
 
   // Filter state
   const [filterType, setFilterType] = useState("all");
@@ -401,7 +439,7 @@ export function EntitySourceChecksViewer() {
         // Resolve names in background (non-blocking)
         if (allVerdicts.length > 0) {
           resolveNames(allVerdicts).then(
-            (names) => setRecordNames(names),
+            ({ names, hrefs }) => { setRecordNames(names); setEntityHrefs(hrefs); },
             (e) => console.warn(`[entity-source-checks] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
           );
         }
@@ -437,8 +475,8 @@ export function EntitySourceChecksViewer() {
     [verdicts, filterType, filterVerdict]
   );
 
-  // Memoize columns so they update when record names are resolved
-  const columns = useMemo(() => buildColumns(recordNames), [recordNames]);
+  // Memoize columns so they update when record names / hrefs are resolved
+  const columns = useMemo(() => buildColumns(recordNames, entityHrefs), [recordNames, entityHrefs]);
 
   // Table state — default sort by verdict (actionable items first: contradicted > outdated > partial > ...)
   const [sorting, setSorting] = useState<SortingState>([{ id: "verdict", desc: false }]);
