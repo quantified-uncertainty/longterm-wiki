@@ -102,3 +102,4 @@ crux/evals/results/
 
 # Design docs — committed for review. Gitignore removed intentionally.
 .matrix-improved.txt
+.playwright-mcp/
