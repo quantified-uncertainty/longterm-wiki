@@ -12,6 +12,7 @@ import type {
 import {
   VerdictBadge,
   formatRecordType,
+  getRecordHref,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ export async function generateMetadata({
   return {
     title: `${title} | Longterm Wiki`,
     description: `Source verification details for ${name ?? recordId} (${formatRecordType(recordType)}).`,
+    robots: { index: false },
   };
 }
 
@@ -115,6 +117,17 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           <span className="font-mono">{recordId}</span>
         </div>
         <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
+        {(() => {
+          const recordHref = getRecordHref(recordType, recordId);
+          return recordHref ? (
+            <Link
+              href={recordHref}
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+            >
+              View {formatRecordType(recordType).toLowerCase()} record &rarr;
+            </Link>
+          ) : null;
+        })()}
       </div>
 
       {/* Verdict summary cards */}
