@@ -5,7 +5,7 @@
  * transaction to keep the things table in sync without duplicating upsert logic.
  */
 
-import { sql, inArray, or } from "drizzle-orm";
+import { sql, inArray, notInArray, and, eq, or } from "drizzle-orm";
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
@@ -160,29 +160,33 @@ export async function upsertThingsInTx(
     parentTitle: item.parentTitle ?? null,
   }));
 
-  // Temporarily drop the unique index on (source_table, source_id) to handle
-  // cases where an entity's stableId changed but its slug stayed the same.
-  // The old things row has id=old_stableId, source_id=slug. The new row has
-  // id=new_stableId, source_id=slug. The ON CONFLICT (id) can't resolve this.
-  await tx.execute(sql`DROP INDEX IF EXISTS idx_things_source_unique`);
-  await tx.execute(sql`
-    DO $$ DECLARE r RECORD; BEGIN
-      FOR r IN SELECT indexname FROM pg_indexes
-        WHERE tablename = 'things' AND indexdef LIKE '%UNIQUE%'
-          AND indexdef LIKE '%source_table%' AND indexdef LIKE '%source_id%'
-      LOOP EXECUTE 'DROP INDEX IF EXISTS ' || r.indexname; END LOOP;
-    END $$
-  `);
+  // Delete stale things rows that would conflict with the batch.
+  // Two conflicts can occur:
+  // 1. PK conflict: a thing with the same id exists from a different source
+  // 2. Unique index conflict: a thing with the same (source_table, source_id) exists
+  //    but with a different id (e.g., entity stableId changed)
+  // Delete both types before inserting.
+  const batchIds = allVals.map((v) => v.id);
+  const batchSourceIds = allVals.map((v) => v.sourceId);
+  const sourceTable = allVals[0]?.sourceTable;
+
+  if (sourceTable) {
+    // Delete things with matching (source_table, source_id) but DIFFERENT id
+    await tx
+      .delete(things)
+      .where(
+        and(
+          eq(things.sourceTable, sourceTable),
+          inArray(things.sourceId, batchSourceIds),
+          notInArray(things.id, batchIds),
+        )
+      );
+  }
 
   await tx
     .insert(things)
     .values(allVals)
     .onConflictDoUpdate({
-      // Use PK (id) as conflict target, not (source_table, source_id).
-      // When an entity's stableId already exists in things from a different
-      // source (e.g., grants), the PK conflict fires before the composite
-      // unique constraint, causing the insert to fail. Using the PK ensures
-      // the upsert always works regardless of source_table.
       target: things.id,
       set: {
         title: sql`excluded.title`,
@@ -198,9 +202,4 @@ export async function upsertThingsInTx(
         updatedAt: sql`now()`,
       },
     });
-
-  // Re-create the unique index
-  await tx.execute(sql`
-    CREATE UNIQUE INDEX IF NOT EXISTS idx_things_source_unique ON things (source_table, source_id)
-  `);
 }
