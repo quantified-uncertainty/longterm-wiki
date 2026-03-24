@@ -42,6 +42,11 @@ export const VALID_RECORD_TYPES = [
   "investment",
   "equity-position",
   "policy-stakeholder",
+  "publication",
+  "benchmark-result",
+  "entity-event",
+  "entity-assessment",
+  "secondary-market-price",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];

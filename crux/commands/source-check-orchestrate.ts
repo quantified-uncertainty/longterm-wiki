@@ -392,6 +392,11 @@ async function collectRecordItems(
       case 'investment': apiPath = '/api/investments/all'; break;
       case 'equity-position': apiPath = '/api/equity-positions/all'; break;
       case 'policy-stakeholder': apiPath = '/api/policy-stakeholders/all'; break;
+      case 'publication': apiPath = '/api/publications/all'; break;
+      case 'benchmark-result': apiPath = '/api/benchmark-results/all'; break;
+      case 'entity-event': apiPath = '/api/entity-events/all'; break;
+      case 'entity-assessment': apiPath = '/api/entity-assessments/all'; break;
+      case 'secondary-market-price': apiPath = '/api/secondary-market-prices/all'; break;
       default: continue; // Skip unknown record types
     }
 
@@ -407,6 +412,8 @@ async function collectRecordItems(
       const rawItems = (
         data.items ?? data.grants ?? data.personnel ?? data.divisions ??
         data.programs ?? data.rounds ?? data.investments ?? data.positions ??
+        data.publications ?? data.benchmarkResults ?? data.events ??
+        data.assessments ?? data.prices ??
         (Array.isArray(data) ? data : [])
       ) as Record<string, unknown>[];
 
@@ -566,6 +573,11 @@ function computeRecordPriority(
     'funding-program': 15,
     'equity-position': 10,
     'policy-stakeholder': 10,
+    'publication': 15,
+    'benchmark-result': 10,
+    'entity-event': 15,
+    'entity-assessment': 10,
+    'secondary-market-price': 10,
   };
   priority += recordTypePriority[recordType] ?? 0;
 
@@ -610,6 +622,27 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
       const name = resolveName(item, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId');
       return `Stakeholder: ${name} (${strOrNull(item, 'stance') ?? 'unknown'})`;
     }
+    case 'publication':
+      return `Publication: ${str(item, 'title')}`;
+    case 'benchmark-result': {
+      const model = strOrNull(item, 'modelId') ?? 'unknown model';
+      const benchmark = strOrNull(item, 'benchmarkId') ?? 'unknown benchmark';
+      const score = numOrNull(item, 'score');
+      return `Benchmark Result: ${model} on ${benchmark} (score: ${score ?? '?'})`;
+    }
+    case 'entity-event':
+      return `Event: ${str(item, 'title')} (${strOrNull(item, 'date') ?? 'no date'})`;
+    case 'entity-assessment': {
+      const dimension = strOrNull(item, 'dimension') ?? 'unknown';
+      const entityId = strOrNull(item, 'entityId') ?? 'unknown';
+      return `Assessment: ${dimension} for ${entityId} (${strOrNull(item, 'rating') ?? 'no rating'})`;
+    }
+    case 'secondary-market-price': {
+      const company = strOrNull(item, 'companyDisplayName') ?? strOrNull(item, 'companyId') ?? 'unknown';
+      const platform = strOrNull(item, 'platform') ?? 'unknown';
+      const date = strOrNull(item, 'date') ?? 'no date';
+      return `Secondary Market Price: ${company} on ${platform} (${date})`;
+    }
   }
 }
 
@@ -643,6 +676,16 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
       return { stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') };
     case 'policy-stakeholder':
       return { stance: strOrNull(item, 'stance'), role: strOrNull(item, 'role') };
+    case 'publication':
+      return { title: str(item, 'title'), authors: strOrNull(item, 'authors'), venue: strOrNull(item, 'venue'), publishedDate: strOrNull(item, 'publishedDate') };
+    case 'benchmark-result':
+      return { modelId: strOrNull(item, 'modelId'), benchmarkId: strOrNull(item, 'benchmarkId'), score: numOrNull(item, 'score'), date: strOrNull(item, 'date') };
+    case 'entity-event':
+      return { title: str(item, 'title'), date: strOrNull(item, 'date'), eventType: strOrNull(item, 'eventType'), description: strOrNull(item, 'description') };
+    case 'entity-assessment':
+      return { dimension: strOrNull(item, 'dimension'), rating: strOrNull(item, 'rating'), assessor: strOrNull(item, 'assessor'), assessedAt: strOrNull(item, 'assessedAt') };
+    case 'secondary-market-price':
+      return { company: strOrNull(item, 'companyDisplayName') ?? strOrNull(item, 'companyId'), platform: strOrNull(item, 'platform'), date: strOrNull(item, 'date'), impliedValuation: strOrNull(item, 'impliedValuation') };
   }
 }
 
