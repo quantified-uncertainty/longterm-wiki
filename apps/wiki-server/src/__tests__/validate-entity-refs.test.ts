@@ -5,9 +5,11 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory stores simulating Postgres ----
 
 let entitiesStore: Map<string, Record<string, unknown>>;
+let benchmarksStore: Map<string, Record<string, unknown>>;
 
 function resetStores() {
   entitiesStore = new Map();
+  benchmarksStore = new Map();
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -25,6 +27,13 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         return false;
       })
       .map((p) => ({ ref: p }));
+  }
+
+  // --- benchmark-results validation: SELECT id FROM benchmarks WHERE id IN (...) ---
+  if (q.includes("from benchmarks") && q.includes("where") && q.includes(" in ")) {
+    return params
+      .filter((p) => benchmarksStore.has(p as string))
+      .map((p) => ({ id: p }));
   }
 
   // --- ref-check: SELECT id FROM entities WHERE id IN (...) ---
@@ -125,6 +134,10 @@ function seedEntity(id: string, stableId: string | null = null) {
     created_at: new Date(),
     updated_at: new Date(),
   });
+}
+
+function seedBenchmark(id: string) {
+  benchmarksStore.set(id, { id, slug: id, name: `Benchmark ${id}` });
 }
 
 describe("Entity FK validation", () => {
@@ -345,8 +358,9 @@ describe("Entity FK validation", () => {
   // ---- Benchmark results sync ----
 
   describe("POST /api/benchmark-results/sync", () => {
-    it("rejects when benchmarkId does not exist", async () => {
+    it("rejects when benchmarkId does not exist in benchmarks table", async () => {
       seedEntity("model-gpt4", "stb_model01");
+      // Note: NOT seeding a benchmark — should fail
 
       const res = await postJson(app, "/api/benchmark-results/sync", {
         items: [
@@ -361,13 +375,12 @@ describe("Entity FK validation", () => {
 
       expect(res.status).toBe(400);
       const body = await res.json();
-      expect(body.message).toContain("benchmarkId");
       expect(body.message).toContain("nonexistent-benchmark");
     });
 
-    it("accepts when both benchmarkId and modelId exist", async () => {
-      seedEntity("benchmark-mmlu", "stb_bench01");
-      seedEntity("model-gpt4", "stb_model01");
+    it("accepts when benchmarkId exists in benchmarks table and modelId in entities", async () => {
+      seedBenchmark("benchmark-mmlu"); // seed in benchmarks table
+      seedEntity("model-gpt4", "stb_model01"); // seed in entities table
 
       const res = await postJson(app, "/api/benchmark-results/sync", {
         items: [
