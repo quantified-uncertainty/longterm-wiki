@@ -60,7 +60,7 @@ interface EvidenceRow {
   checkedAt: string | null;
 }
 
-// ── Verdict styling ─────────────────────────────────────────────────────
+// ── Verdict styling & priority ──────────────────────────────────────────
 
 const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600" },
@@ -69,6 +69,16 @@ const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   partial: { bg: "bg-amber-400/15", text: "text-amber-500" },
   unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500" },
   unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
+};
+
+/** Sort priority: most actionable verdicts first. Lower = higher priority. */
+const VERDICT_PRIORITY: Record<string, number> = {
+  contradicted: 0,
+  outdated: 1,
+  partial: 2,
+  unverifiable: 3,
+  confirmed: 4,
+  unchecked: 5,
 };
 
 function VerdictBadge({ verdict }: { verdict: string }) {
@@ -157,6 +167,8 @@ function buildColumns(names: NameMap): ColumnDef<VerdictRow>[] {
       accessorKey: "verdict",
       header: ({ column }) => <SortableHeader column={column}>Verdict</SortableHeader>,
       size: 100,
+      sortingFn: (a, b) =>
+        (VERDICT_PRIORITY[a.original.verdict] ?? 99) - (VERDICT_PRIORITY[b.original.verdict] ?? 99),
       cell: ({ row }) => <VerdictBadge verdict={row.original.verdict} />,
     },
     {
@@ -428,8 +440,8 @@ export function EntitySourceChecksViewer() {
   // Memoize columns so they update when record names are resolved
   const columns = useMemo(() => buildColumns(recordNames), [recordNames]);
 
-  // Table state
-  const [sorting, setSorting] = useState<SortingState>([{ id: "lastComputedAt", desc: true }]);
+  // Table state — default sort by verdict (actionable items first: contradicted > outdated > partial > ...)
+  const [sorting, setSorting] = useState<SortingState>([{ id: "verdict", desc: false }]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [expanded, setExpanded] = useState<ExpandedState>({});
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 100 });
@@ -486,7 +498,8 @@ export function EntitySourceChecksViewer() {
   const withConfidence = verdicts.filter((v) => v.confidence != null);
   const avgConfidence = withConfidence.length > 0
     ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
-  const needsRecheck = verdicts.filter((v) => v.needsRecheck).length;
+  const contradictedCount = verdicts.filter((v) => v.verdict === "contradicted").length;
+  const outdatedCount = verdicts.filter((v) => v.verdict === "outdated").length;
 
   if (isLoading) {
     return (
@@ -517,12 +530,12 @@ export function EntitySourceChecksViewer() {
           <p className="text-2xl font-bold tabular-nums">{avgConfidence > 0 ? `${Math.round(avgConfidence * 100)}%` : "N/A"}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
-          <p className={cn("text-2xl font-bold tabular-nums", needsRecheck > 0 ? "text-amber-600" : "")}>{needsRecheck}</p>
+          <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
+          <p className={cn("text-2xl font-bold tabular-nums", contradictedCount > 0 ? "text-red-600" : "")}>{contradictedCount}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Record Types</p>
-          <p className="text-2xl font-bold tabular-nums">{typeCounts.size}</p>
+          <p className="text-xs text-muted-foreground mb-1">Outdated</p>
+          <p className={cn("text-2xl font-bold tabular-nums", outdatedCount > 0 ? "text-amber-600" : "")}>{outdatedCount}</p>
         </div>
       </div>
 
@@ -550,10 +563,15 @@ export function EntitySourceChecksViewer() {
           </button>
           {[...verdictCounts.entries()].sort(([, a], [, b]) => b - a).map(([v, count]) => {
             const style = VERDICT_STYLES[v] || VERDICT_STYLES.unchecked;
+            const isActive = filterVerdict === v;
             return (
               <button key={v} onClick={() => setFilterVerdict(v)}
-                className={cn("px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                  filterVerdict === v ? `${style.bg} ${style.text}` : "bg-muted text-muted-foreground hover:bg-muted/80")}>
+                className={cn(
+                  "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
+                  isActive
+                    ? `${style.bg} ${style.text}`
+                    : "bg-muted text-muted-foreground hover:bg-muted/80",
+                )}>
                 {v} ({count})
               </button>
             );
