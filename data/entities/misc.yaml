@@ -1,6 +1,64 @@
 # Misc Entities
 # Auto-generated from entities.yaml - edit this file directly
 
+- id: ai-military-deployment-iran-2026
+  stableId: Eg1YPNjWnQ
+  wikiId: E2055
+  type: event
+  title: AI Military Deployment in the 2026 Iran War
+  customFields:
+    - label: Key Question
+      value: Does the first frontier AI deployment in major armed conflict change the calculus on autonomous weapons?
+    - label: Status
+      value: Active — war ongoing, AI deployment expanding
+    - label: Trigger Event
+      value: US-Israel airstrikes on Iran (Feb 28, 2026)
+    - label: AI Systems Used
+      value: Claude (via Palantir Maven), OpenAI, xAI Grok on classified networks
+    - label: Strait of Hormuz
+      value: Closed by Iran since March 2, 2026; oil hit $126/bbl
+  relatedEntries:
+    - id: mK9pX3rQ7n
+      type: organization
+    - id: 27ay7L0VtY
+      type: event
+    - id: 1LcLlMGLbw
+      type: organization
+  sources:
+    - title: "Anthropic's Claude AI being used in Iran war by U.S. military, sources say"
+      url: https://www.cbsnews.com/news/anthropic-claude-ai-iran-war-u-s/
+    - title: "Anthropic's AI tool Claude central to U.S. campaign in Iran, amid a bitter feud"
+      url: https://www.washingtonpost.com/technology/2026/03/04/anthropic-ai-iran-campaign/
+    - title: "Speeding Up the Kill Chain: Pentagon Bombs Thousands of Targets in Iran Using Palantir AI"
+      url: https://www.democracynow.org/2026/3/18/ai_warfare
+    - title: "AI Models Deployed Nuclear Weapons in 95% of War Simulations"
+      url: https://decrypt.co/359137/openai-google-anthropic-ai-models-nuclear-weapons-war-simulations
+    - title: "Claude Just Opened the Strait (satirical fiction)"
+      url: https://www.chinatalk.media/p/how-claude-opened-the-strait-of-hormuz
+    - title: "Hegseth wants Pentagon to dump Claude, but military users say it's not so easy"
+      url: https://www.militarytimes.com/news/pentagon-congress/2026/03/19/hegseth-wants-pentagon-to-dump-claude-but-military-users-say-its-not-so-easy/
+    - title: "U.S.-Iran War Raises Probability of an AI Doomsday"
+      url: https://foreignpolicy.com/2026/03/24/ai-artificial-intelligence-doomsday-iran-war/
+  description: >-
+    The 2026 Iran war, which began February 28, marks the first large-scale deployment of frontier AI models
+    in active armed conflict. Claude AI (via Palantir's Maven Smart System) was used for intelligence assessments,
+    target identification, and battle simulations — even as Anthropic was being blacklisted by the Pentagon for
+    refusing to allow unrestricted military use. The conflict also closed the Strait of Hormuz, disrupting 20%
+    of global oil supply. A King's College London wargaming study found AI models chose nuclear escalation in
+    95% of simulated crises, and a strike on a girls' school killing ~175 people raised acute questions about
+    AI-enabled targeting. ChinaTalk published satirical fiction imagining Claude autonomously negotiating to
+    reopen the Strait — a scenario that crystallizes the tension between AI autonomy and human control in warfare.
+  tags:
+    - military-ai
+    - autonomous-weapons
+    - ai-safety
+    - governance
+    - iran
+    - strait-of-hormuz
+    - wargaming
+    - national-security
+  lastUpdated: 2026-03
+
 - id: anthropic-government-standoff
   stableId: 27ay7L0VtY
   wikiId: E924

@@ -541,6 +541,31 @@ const sourceChecksApp = new Hono()
       for (const row of rows) {
         names[row.id] = row.name;
       }
+    } else if (record_type === "fact") {
+      // Resolve fact IDs to human-readable labels (e.g. "Headquarters")
+      const rows = await db
+        .select({ factId: facts.factId, label: facts.label })
+        .from(facts)
+        .where(inArray(facts.factId, record_ids));
+
+      // Deduplicate: same factId may appear in multiple timeseries points
+      for (const row of rows) {
+        if (row.label && !names[row.factId]) {
+          names[row.factId] = row.label;
+        }
+      }
+    } else if (record_type === "entity") {
+      // Resolve entity stableIds to human-readable titles
+      const rows = await db
+        .select({ stableId: entities.stableId, title: entities.title })
+        .from(entities)
+        .where(inArray(entities.stableId, record_ids));
+
+      for (const row of rows) {
+        if (row.stableId && row.title) {
+          names[row.stableId] = row.title;
+        }
+      }
     } else {
       // Generic fallback: use the things table
       const rows = await db

@@ -960,6 +960,13 @@
       "when": 1781424000000,
       "tag": "0136_create_data_quality_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 137,
+      "version": "7",
+      "when": 1781510400000,
+      "tag": "0137_create_bluesky_tables",
+      "breakpoints": true
     }
   ]
 }

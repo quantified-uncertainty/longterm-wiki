@@ -3806,6 +3806,53 @@
       type: approach
   lastUpdated: 2026-02
 
+- id: hardware-mechanisms-international-ai-agreements
+  stableId: eBvdqfZEsg
+  wikiId: E2053
+  type: analysis
+  title: Hardware Mechanisms for International AI Agreements
+  description: >-
+    Technical taxonomy of hardware-based AI verification mechanisms—location attestation, TEEs,
+    compute metering, interconnect limits, chip tracking, and remote disablement—mapped to
+    specific governance agreement types with R&D readiness assessments. Most mechanisms at
+    TRL 2–5, with geopolitical buy-in as the central challenge.
+  tags:
+    - hardware-governance
+    - international-agreements
+    - verification
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: international-regimes
+      type: concept
+    - id: monitoring
+      type: approach
+    - id: export-controls
+      type: policy
+  lastUpdated: 2026-03
+
+- id: ai-chip-governance-supply-chain
+  stableId: wwLbcayLXw
+  wikiId: E2054
+  type: concept
+  title: AI Chip Governance Supply Chain
+  description: >-
+    Overview of the semiconductor supply chain as it relates to AI governance, covering key
+    chokepoints (TSMC, ASML, Nvidia), export controls, hardware-enabled governance proposals,
+    industry stances, investment levels, and funding gaps for governance R&D.
+  tags:
+    - hardware-governance
+    - supply-chain
+    - semiconductors
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: compute-governance
+      type: concept
+    - id: export-controls
+      type: policy
+  lastUpdated: 2026-03
+
 - id: thresholds
   stableId: 3OTN6TAzhw
   wikiId: E465

@@ -884,34 +884,22 @@ const entitiesApp = new Hono()
           metadata: clearStubIfEnriched(e),
         }));
 
-        // Temporarily drop the unique constraint on `id` (slug) during sync.
-        // The ON CONFLICT (stableId) upsert can't handle slug reassignments
-        // because the `id` unique constraint fires first. Dropping it for the
-        // duration of the transaction allows the upsert to proceed, then we
-        // re-add it. This is safe inside a transaction (changes are invisible
-        // to other connections until commit).
-        // Drop BOTH possible constraint names — Drizzle uses {table}_{column}_key
-        // but we also added entities_id_unique in some migrations
-        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_unique`);
-        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_key`);
-        // Also drop the unique INDEX if it exists (unique indexes act as constraints)
-        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_unique`);
-        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_key`);
-        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_idx`);
-        await tx.execute(sql`DROP INDEX IF EXISTS idx_entities_id`);
-        // Nuclear option: find and drop ANY unique constraint/index on the id column
-        await tx.execute(sql`
-          DO $$
-          DECLARE r RECORD;
-          BEGIN
-            FOR r IN
-              SELECT indexname FROM pg_indexes
-              WHERE tablename = 'entities' AND indexdef LIKE '%UNIQUE%' AND indexdef LIKE '%"id"%'
-            LOOP
-              EXECUTE 'DROP INDEX IF EXISTS ' || r.indexname;
-            END LOOP;
-          END $$
-        `);
+        // Upsert entities using raw SQL INSERT ... ON CONFLICT to avoid the
+        // slug-reassignment issue. The previous approach tried to DROP the
+        // unique constraint on `id` temporarily, but that fails when other
+        // tables have FK references to entities.id (claims, statements).
+        //
+        // Instead: clear stale slugs first, then upsert on stableId (PK).
+        // If a slug was reassigned to a different stableId, the old row's
+        // slug is set to a placeholder so the new row can claim it.
+        const slugToStableId = new Map(allVals.map((v) => [v.id, v.stableId]));
+        for (const [slug, stableId] of slugToStableId) {
+          // If another entity currently holds this slug, clear it
+          await tx.execute(sql`
+            UPDATE entities SET id = stable_id
+            WHERE id = ${slug} AND stable_id != ${stableId}
+          `);
+        }
 
         await tx
           .insert(entities)
@@ -937,11 +925,6 @@ const entitiesApp = new Hono()
               updatedAt: sql`now()`,
             },
           });
-
-        // Re-add the unique constraint
-        await tx.execute(sql`
-          ALTER TABLE entities ADD CONSTRAINT entities_id_unique UNIQUE (id)
-        `);
 
         // Dual-write to things table
         await upsertThingsInTx(
