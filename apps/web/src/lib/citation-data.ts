@@ -2,6 +2,7 @@ import { getLocalCitationQuotes } from "@/data";
 import type {
   AccuracyVerdict,
 } from "@wiki-server/api-types";
+import { fetchDetailed } from "./wiki-server";
 
 
 /**
@@ -115,6 +116,115 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
 /** Citation quote with page context */
 export interface CrossPageCitationQuote extends CitationQuote {
   pageId: string;
+}
+
+// ---------------------------------------------------------------------------
+// Unified Source-Check Verdicts
+// ---------------------------------------------------------------------------
+
+/**
+ * Source-check verdict for a citation, from the unified source_check_verdicts table.
+ * Uses the unified verdict vocabulary (confirmed/contradicted/unverifiable/outdated/partial).
+ */
+export interface SourceCheckCitationVerdict {
+  recordId: string;
+  verdict: string;
+  confidence: number | null;
+  reasoning: string | null;
+  lastComputedAt: string | null;
+}
+
+/**
+ * Fetch unified source-check verdicts for a page's citations.
+ *
+ * Queries the wiki-server for source_check_verdicts with recordType='citation'
+ * and recordId prefix matching the page slug.
+ *
+ * This is a server-side function — only call from Server Components or
+ * server-side data fetching. Returns an empty array if the wiki-server
+ * is unavailable.
+ *
+ * NOTE: Currently fetches up to 200 citation verdicts and filters client-side.
+ * If citation count exceeds 200, add a server-side record_id prefix filter.
+ */
+export async function getSourceCheckVerdicts(
+  pageSlug: string,
+): Promise<SourceCheckCitationVerdict[]> {
+  const result = await fetchDetailed<{
+    verdicts: Array<{
+      recordType: string;
+      recordId: string;
+      verdict: string;
+      confidence: number | null;
+      reasoning: string | null;
+      lastComputedAt: string | null;
+    }>;
+    total: number;
+  }>(`/api/verifications/verdicts?record_type=citation&limit=200`);
+
+  if (!result.ok) return [];
+
+  // Filter to verdicts matching this page's citations (recordId starts with "page:<slug>:")
+  const prefix = `page:${pageSlug}:`;
+  return result.data.verdicts
+    .filter((v) => v.recordId.startsWith(prefix))
+    .map((v) => ({
+      recordId: v.recordId,
+      verdict: v.verdict,
+      confidence: v.confidence,
+      reasoning: v.reasoning,
+      lastComputedAt: v.lastComputedAt,
+    }));
+}
+
+/**
+ * Compute citation health summary from unified source-check verdicts.
+ *
+ * Maps the unified verdict vocabulary back to the CitationHealthSummary shape
+ * so the CitationHealthBanner can use either data source.
+ */
+export function computeHealthFromSourceCheck(
+  verdicts: SourceCheckCitationVerdict[],
+  totalCitations: number,
+): CitationHealthSummary {
+  let accurate = 0;
+  let inaccurate = 0;
+  let unsupported = 0;
+  let minorIssues = 0;
+
+  for (const v of verdicts) {
+    switch (v.verdict) {
+      case "confirmed":
+        accurate++;
+        break;
+      case "contradicted":
+        inaccurate++;
+        break;
+      case "unverifiable":
+        unsupported++;
+        break;
+      case "partial":
+        minorIssues++;
+        break;
+      case "outdated":
+        // outdated maps to minor issues for display purposes
+        minorIssues++;
+        break;
+    }
+  }
+
+  const checked = accurate + inaccurate + unsupported + minorIssues;
+  const unchecked = totalCitations - checked;
+
+  return {
+    total: totalCitations,
+    verified: 0,
+    accurate,
+    inaccurate,
+    unsupported,
+    minorIssues,
+    unchecked: Math.max(0, unchecked),
+  };
 }
 
 /**

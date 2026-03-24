@@ -35,7 +35,7 @@ import type { RefMapEntry as PreprocessorRefMapEntry, KBFactRefData } from "@/li
 import { getDomain } from "@/components/wiki/resource-utils";
 import { formatFactValueForFootnote } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
-import { getCitationQuotes, computeCitationHealth } from "@/lib/citation-data";
+import { getCitationQuotes, computeCitationHealth, getSourceCheckVerdicts, computeHealthFromSourceCheck } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
@@ -349,6 +349,14 @@ async function ContentView({
       })()
     : pageData?.citationHealth ?? undefined;
 
+  // Try unified source-check verdicts first; fall back to citation_quotes
+  const sourceCheckVerdicts = !isInternal ? await getSourceCheckVerdicts(slug) : [];
+  const citationHealthSummary = sourceCheckVerdicts.length > 0
+    ? computeHealthFromSourceCheck(sourceCheckVerdicts, citationQuotes?.length ?? 0)
+    : citationQuotes && citationQuotes.length > 0
+      ? computeCitationHealth(citationQuotes)
+      : null;
+
   return (
     <InfoBoxVisibilityProvider>
       {!isInternal && <JsonLd pageData={pageData} title={page.frontmatter.title} slug={slug} />}
@@ -365,8 +373,8 @@ async function ContentView({
           hallucinationRisk={pageData?.hallucinationRisk}
         />
       )}
-      {!isInternal && citationQuotes && citationQuotes.length > 0 && (
-        <CitationHealthBanner health={computeCitationHealth(citationQuotes)} />
+      {!isInternal && citationHealthSummary && citationHealthSummary.total > 0 && (
+        <CitationHealthBanner health={citationHealthSummary} />
       )}
       {/* PageStatus rendered above article so it spans full width (not squeezed by info box) */}
       <PageStatus
