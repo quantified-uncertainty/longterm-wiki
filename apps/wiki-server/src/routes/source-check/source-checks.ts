@@ -19,6 +19,12 @@ import {
   divisions,
   things,
   facts,
+  publications,
+  benchmarkResults,
+  benchmarks,
+  entityEvents,
+  entityAssessments,
+  secondaryMarketPrices,
 } from "../../schema.js";
 import {
   zv,
@@ -565,6 +571,71 @@ const sourceChecksApp = new Hono()
         if (row.stableId && row.title) {
           names[row.stableId] = row.title;
         }
+      }
+    } else if (record_type === "publication") {
+      const rows = await db
+        .select({ id: publications.id, title: publications.title })
+        .from(publications)
+        .where(inArray(publications.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = row.title;
+      }
+    } else if (record_type === "benchmark-result") {
+      const rows = await db
+        .select({
+          id: benchmarkResults.id,
+          benchmarkName: benchmarks.name,
+          modelId: benchmarkResults.modelId,
+          score: benchmarkResults.score,
+        })
+        .from(benchmarkResults)
+        .leftJoin(benchmarks, eq(benchmarks.id, benchmarkResults.benchmarkId))
+        .where(inArray(benchmarkResults.id, record_ids));
+
+      for (const row of rows) {
+        const bmName = row.benchmarkName ?? "Unknown benchmark";
+        const score = row.score != null ? String(row.score) : "?";
+        names[row.id] = `${row.modelId} / ${bmName}: ${score}`;
+      }
+    } else if (record_type === "entity-event") {
+      const rows = await db
+        .select({ id: entityEvents.id, title: entityEvents.title })
+        .from(entityEvents)
+        .where(inArray(entityEvents.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = row.title;
+      }
+    } else if (record_type === "entity-assessment") {
+      const rows = await db
+        .select({
+          id: entityAssessments.id,
+          dimension: entityAssessments.dimension,
+          entityId: entityAssessments.entityId,
+          rating: entityAssessments.rating,
+        })
+        .from(entityAssessments)
+        .where(inArray(entityAssessments.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = `${row.dimension} (${row.entityId}): ${row.rating}`;
+      }
+    } else if (record_type === "secondary-market-price") {
+      const rows = await db
+        .select({
+          id: secondaryMarketPrices.id,
+          companyDisplayName: secondaryMarketPrices.companyDisplayName,
+          companyId: secondaryMarketPrices.companyId,
+          date: secondaryMarketPrices.date,
+          platform: secondaryMarketPrices.platform,
+        })
+        .from(secondaryMarketPrices)
+        .where(inArray(secondaryMarketPrices.id, record_ids));
+
+      for (const row of rows) {
+        const company = row.companyDisplayName ?? row.companyId;
+        names[row.id] = `${company} (${row.platform}) ${row.date}`;
       }
     } else {
       // Generic fallback: use the things table
