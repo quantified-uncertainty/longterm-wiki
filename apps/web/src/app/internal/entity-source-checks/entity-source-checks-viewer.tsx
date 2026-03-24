@@ -367,8 +367,16 @@ async function resolveNames(
 
 // ── Main viewer ────────────────────────────────────────────────────────────
 
+interface CoverageRow {
+  recordType: string;
+  total: number;
+  verified: number;
+  percentage: number;
+}
+
 export function EntitySourceChecksViewer() {
   const [verdicts, setVerdicts] = useState<VerdictRow[]>([]);
+  const [coverageData, setCoverageData] = useState<CoverageRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [detailCache, setDetailCache] = useState<DetailCache>({});
@@ -382,6 +390,18 @@ export function EntitySourceChecksViewer() {
   useEffect(() => {
     (async () => {
       try {
+        // Fetch verdicts and coverage in parallel
+        const coveragePromise = fetch("/api/verification-coverage-proxy")
+          .then(async (res) => {
+            if (!res.ok) return [];
+            const data = await res.json();
+            return (data.coverage ?? []) as CoverageRow[];
+          })
+          .catch((e) => {
+            console.warn(`[entity-source-checks] Coverage fetch failed: ${e instanceof Error ? e.message : String(e)}`);
+            return [] as CoverageRow[];
+          });
+
         const PAGE_SIZE = 200;
         let offset = 0;
         let allVerdicts: VerdictRow[] = [];
@@ -397,6 +417,9 @@ export function EntitySourceChecksViewer() {
           offset += PAGE_SIZE;
         }
         setVerdicts(allVerdicts);
+
+        const coverageResult = await coveragePromise;
+        setCoverageData(coverageResult);
 
         // Resolve names in background (non-blocking)
         if (allVerdicts.length > 0) {
@@ -499,7 +522,14 @@ export function EntitySourceChecksViewer() {
   const avgConfidence = withConfidence.length > 0
     ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
   const contradictedCount = verdicts.filter((v) => v.verdict === "contradicted").length;
-  const outdatedCount = verdicts.filter((v) => v.verdict === "outdated").length;
+  const needsRecheckCount = verdicts.filter((v) => v.needsRecheck).length;
+
+  // Coverage stats
+  const totalRecords = coverageData.reduce((sum, r) => sum + r.total, 0);
+  const totalVerified = coverageData.reduce((sum, r) => sum + r.verified, 0);
+  const overallCoveragePct = totalRecords > 0
+    ? Math.round((totalVerified / totalRecords) * 100)
+    : 0;
 
   if (isLoading) {
     return (
@@ -520,7 +550,21 @@ export function EntitySourceChecksViewer() {
   return (
     <div className="not-prose">
       {/* Stats cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+        {totalRecords > 0 && (
+          <div className="rounded-lg border border-border/60 p-4">
+            <p className="text-xs text-muted-foreground mb-1">Total Records</p>
+            <p className="text-2xl font-bold tabular-nums">{totalRecords.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground mt-1">{coverageData.length} record types</p>
+          </div>
+        )}
+        {totalRecords > 0 && (
+          <div className="rounded-lg border border-border/60 p-4">
+            <p className="text-xs text-muted-foreground mb-1">Verified</p>
+            <p className={cn("text-2xl font-bold tabular-nums", overallCoveragePct < 50 ? "text-amber-600" : "text-emerald-600")}>{overallCoveragePct}%</p>
+            <p className="text-xs text-muted-foreground mt-1">{totalVerified.toLocaleString()} / {totalRecords.toLocaleString()}</p>
+          </div>
+        )}
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
           <p className="text-2xl font-bold tabular-nums">{verdicts.length}</p>
@@ -534,8 +578,8 @@ export function EntitySourceChecksViewer() {
           <p className={cn("text-2xl font-bold tabular-nums", contradictedCount > 0 ? "text-red-600" : "")}>{contradictedCount}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Outdated</p>
-          <p className={cn("text-2xl font-bold tabular-nums", outdatedCount > 0 ? "text-amber-600" : "")}>{outdatedCount}</p>
+          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
+          <p className={cn("text-2xl font-bold tabular-nums", needsRecheckCount > 0 ? "text-amber-600" : "")}>{needsRecheckCount}</p>
         </div>
       </div>
 
