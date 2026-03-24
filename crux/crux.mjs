@@ -98,6 +98,7 @@ import * as verifyOrchestrateCommands from './commands/source-check-orchestrate.
 import * as sourceCheckRecheckCommands from './commands/source-check-recheck.ts';
 import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
+import * as sourceCheckWikiPagesCommands from './commands/source-check-wiki-pages.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
@@ -171,6 +172,7 @@ const domains = {
   'verify-orchestrate': verifyOrchestrateCommands,
   'source-check-recheck': sourceCheckRecheckCommands,
   'migrate-citations': migrateCitationsCommands,
+  'source-check-wiki-pages': sourceCheckWikiPagesCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,

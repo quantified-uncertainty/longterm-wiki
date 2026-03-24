@@ -680,6 +680,16 @@ const sourceChecksApp = new Hono()
           names[p.recordId] = `${pageTitle} - Footnote ${p.footnote}`;
         }
       }
+    } else if (record_type === "wiki-page") {
+      // Resolve page slugs to page titles
+      const rows = await db
+        .select({ slug: wikiPages.slug, title: wikiPages.title })
+        .from(wikiPages)
+        .where(inArray(wikiPages.slug, record_ids));
+
+      for (const row of rows) {
+        names[row.slug] = row.title;
+      }
     } else {
       // Generic fallback: use the things table
       const rows = await db
@@ -736,6 +746,8 @@ const sourceChecksApp = new Hono()
       SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
       UNION ALL
       SELECT 'citation', count(*)::int FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+      UNION ALL
+      SELECT 'wiki-page', count(*)::int FROM wiki_pages
     `);
 
     const totalsByType: Record<string, number> = {};
