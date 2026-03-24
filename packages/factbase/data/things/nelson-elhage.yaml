@@ -1,16 +1,2 @@
 entity: J6DJn3s6Di
-facts:
-  - id: "Un2osCYGwg"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2021"
-    source: "https://anthropic.com/"
-    notes: "Key contributor to mechanistic interpretability research; co-authored 'Toy Models of Superposition' and other
-      foundational interpretability papers"
-  - id: "jgG9TvToHA"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2021"
-    source: "https://anthropic.com/"
-    notes: "Key contributor to mechanistic interpretability research; co-authored 'Toy Models of Superposition' and other
-      foundational interpretability papers"
+facts: []

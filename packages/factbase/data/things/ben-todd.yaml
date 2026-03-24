@@ -1,14 +1,2 @@
 entity: LTnHWq06v7
-facts:
-  - id: "fILPS12SxA"
-    property: "employed-by"
-    value: !ref hvg9ecR3nA
-    asOf: "2011"
-    source: "https://80000hours.org/"
-    notes: "Co-founded 80,000 Hours; wrote the 80,000 Hours book on career advice for impact"
-  - id: "WNHvau17qg"
-    property: "role"
-    value: "Co-founder & CEO"
-    asOf: "2011"
-    source: "https://80000hours.org/"
-    notes: "Co-founded 80,000 Hours; wrote the 80,000 Hours book on career advice for impact"
+facts: []

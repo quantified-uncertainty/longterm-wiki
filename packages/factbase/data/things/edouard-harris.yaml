@@ -1,14 +1,2 @@
 entity: 7lQpdb5nDg
-facts:
-  - id: "GdLoCauoMA"
-    property: "employed-by"
-    value: !ref HkfUxsbBLQ
-    asOf: "2022"
-    source: "https://www.gladstone.ai/"
-    notes: "Co-founded Gladstone AI with brother Jeremie Harris"
-  - id: "vO3b4FU9yg"
-    property: "role"
-    value: "Co-founder & CTO"
-    asOf: "2022"
-    source: "https://www.gladstone.ai/"
-    notes: "Co-founded Gladstone AI with brother Jeremie Harris"
+facts: []

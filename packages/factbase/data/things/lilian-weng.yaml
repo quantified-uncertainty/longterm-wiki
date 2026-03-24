@@ -1,14 +1,2 @@
 entity: Xln342A6WT
-facts:
-  - id: "4iMZboJPRA"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2018"
-    source: "https://lilianweng.github.io/"
-    notes: "Previously led safety systems team; known for influential technical blog posts (Lil'Log)"
-  - id: "7t7iyEt7Kw"
-    property: "role"
-    value: "VP of Research"
-    asOf: "2018"
-    source: "https://lilianweng.github.io/"
-    notes: "Previously led safety systems team; known for influential technical blog posts (Lil'Log)"
+facts: []

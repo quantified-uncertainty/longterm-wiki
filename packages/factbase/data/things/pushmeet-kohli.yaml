@@ -1,28 +1,2 @@
 entity: 6T8nglIbo6
-facts:
-  - id: "yLfHVfdzNA"
-    property: "employed-by"
-    value: !ref OIY5gaPpBA
-    asOf: "2007"
-    validEnd: "2017"
-    source: "https://scholar.google.com/citations?user=mGSJSbcAAAAJ"
-    notes: "Worked on computer vision and ML at Microsoft Research Cambridge"
-  - id: "am5AQe5dOA"
-    property: "role"
-    value: "Principal Researcher"
-    asOf: "2007"
-    validEnd: "2017"
-    source: "https://scholar.google.com/citations?user=mGSJSbcAAAAJ"
-    notes: "Worked on computer vision and ML at Microsoft Research Cambridge"
-  - id: "uBvNdZgqfQ"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2017"
-    source: "https://deepmind.google/"
-    notes: "Leads the AI for Science and AI Safety teams at DeepMind"
-  - id: "obHtiT30gg"
-    property: "role"
-    value: "VP of Research, AI Safety"
-    asOf: "2017"
-    source: "https://deepmind.google/"
-    notes: "Leads the AI for Science and AI Safety teams at DeepMind"
+facts: []

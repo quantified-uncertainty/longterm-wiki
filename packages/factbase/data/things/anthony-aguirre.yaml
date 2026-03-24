@@ -1,26 +1,2 @@
 entity: dVQzYIAN3A
-facts:
-  - id: "ktQWVrrsmw"
-    property: "role"
-    value: "Professor of Physics"
-    asOf: "2004"
-    source: "https://en.wikipedia.org/wiki/Anthony_Aguirre"
-    notes: "At UC Santa Cruz. Cosmologist; co-founded FLI and Metaculus"
-  - id: "6S9Fm5oxFg"
-    property: "employed-by"
-    value: !ref d9sWZtyVwg
-    asOf: "2014"
-    source: "https://futureoflife.org/"
-    notes: "Co-founded FLI with Max Tegmark and Jaan Tallinn"
-  - id: "EtAw4EdL0w"
-    property: "role"
-    value: "Co-founder & Board Chair"
-    asOf: "2014"
-    source: "https://futureoflife.org/"
-    notes: "Co-founded FLI with Max Tegmark and Jaan Tallinn"
-  - id: "977zSUjFWw"
-    property: "employed-by"
-    value: !ref OKO1q9NQaT
-    asOf: "2004"
-    source: "https://en.wikipedia.org/wiki/Anthony_Aguirre"
-    notes: "Cosmologist; co-founded FLI and Metaculus"
+facts: []

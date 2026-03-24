@@ -1,16 +1,2 @@
 entity: npfho6p1QL
-facts:
-  - id: "pEkER4Obeg"
-    property: "role"
-    value: "Engineering Director, AI Assurance"
-    asOf: "2023"
-    source: "https://www.trailofbits.com/"
-    notes: "At Trail of Bits. Leads AI assurance engineering; previously at Adolus and UCL; expert in formal verification
-      and safety-critical systems"
-  - id: "aRKSlHvk8A"
-    property: "employed-by"
-    value: !ref c1q7QvDw90
-    asOf: "2023"
-    source: "https://www.trailofbits.com/"
-    notes: "Leads AI assurance engineering; previously at Adolus and UCL; expert in formal verification and safety-critical
-      systems"
+facts: []

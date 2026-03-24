@@ -1,8 +1,5 @@
 entity: APUqKVNaAA
 facts:
-  - id: "f_jlUhiO2JNg"
-    property: "role"
-    value: "CEO"
   - id: "f_6X5fU4J1hQ"
     property: "born-year"
     value: 1972
@@ -15,16 +12,3 @@ facts:
   - id: "f_wDkX9vRf2A"
     property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Sundar_Pichai"
-  - id: "Cz5G9dPWSw"
-    property: "role"
-    value: "CEO"
-    asOf: "2015"
-    source: "https://en.wikipedia.org/wiki/Sundar_Pichai"
-    notes: "At Google / Alphabet. CEO of Google (2015) and Alphabet (2019); oversees DeepMind, Google Brain merger, and
-      Gemini development"
-  - id: "Msx4NPEymg"
-    property: "employed-by"
-    value: !ref cMNszJMTPX
-    asOf: "2015"
-    source: "https://en.wikipedia.org/wiki/Sundar_Pichai"
-    notes: "CEO of Google (2015) and Alphabet (2019); oversees DeepMind, Google Brain merger, and Gemini development"

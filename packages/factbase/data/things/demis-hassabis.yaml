@@ -1,18 +1,5 @@
 entity: Aqcyu3onCA
 facts:
-  - id: f_86Rr7EPOYw
-    property: employed-by
-    value: !ref A4XoubikkQ
-    asOf: 2010-09
-    source: https://deepmind.google/about/
-    notes: "Co-founded DeepMind in September 2010; became CEO of Google DeepMind after the 2023 merger with Google Brain"
-
-  - id: f_Z0rg1G6BZw
-    property: role
-    value: "CEO"
-    asOf: 2010-09
-    source: https://deepmind.google/about/
-
   - id: f_Kw56YLSHSQ
     property: born-year
     value: 1976
@@ -42,9 +29,3 @@ facts:
     property: google-scholar
     value: "https://scholar.google.com/citations?user=tdb0t88AAAAJ"
 
-  - id: f_i5dpgqJDXg
-    property: role
-    value: "CEO, Google DeepMind"
-    asOf: 2023-04
-    source: https://deepmind.google/about/
-    notes: "Title changed after DeepMind merged with Google Brain in April 2023; also VP at Google/Alphabet"

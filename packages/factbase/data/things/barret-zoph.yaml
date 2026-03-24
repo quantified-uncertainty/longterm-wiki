@@ -1,28 +1,2 @@
 entity: np58j65k7U
-facts:
-  - id: "qhMGgkFpzg"
-    property: "employed-by"
-    value: !ref AZmSQxCAlk
-    asOf: "2016"
-    validEnd: "2022"
-    source: "https://en.wikipedia.org/wiki/Barret_Zoph"
-    notes: "Pioneered neural architecture search (NAS); created EfficientNet"
-  - id: "bOQuo9qHpA"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2016"
-    validEnd: "2022"
-    source: "https://en.wikipedia.org/wiki/Barret_Zoph"
-    notes: "Pioneered neural architecture search (NAS); created EfficientNet"
-  - id: "7CzuZlulrw"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2022"
-    source: "https://openai.com/"
-    notes: "VP of Research at OpenAI; leads post-training and GPT development"
-  - id: "PWblKLzaJA"
-    property: "role"
-    value: "VP of Research"
-    asOf: "2022"
-    source: "https://openai.com/"
-    notes: "VP of Research at OpenAI; leads post-training and GPT development"
+facts: []

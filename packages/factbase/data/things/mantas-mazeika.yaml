@@ -1,14 +1,2 @@
 entity: j4eeIGYdY2
-facts:
-  - id: "dKRHG4h5uw"
-    property: "employed-by"
-    value: !ref y4bieqSeag
-    asOf: "2022"
-    source: "https://safe.ai/"
-    notes: "Researcher at CAIS; works on AI safety benchmarks and red-teaming"
-  - id: "16QQp5NqwA"
-    property: "role"
-    value: "Researcher"
-    asOf: "2022"
-    source: "https://safe.ai/"
-    notes: "Researcher at CAIS; works on AI safety benchmarks and red-teaming"
+facts: []

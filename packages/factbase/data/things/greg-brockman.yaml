@@ -1,24 +1,5 @@
 entity: Yq4s2cI7ng
 facts:
-  - id: "f_tZxixtemow"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2015-12"
-    source: "https://openai.com/blog/introducing-openai"
-    notes: "Co-founded OpenAI December 2015; took leave of absence August 2024 but still listed as President"
-  - id: "f_NqlyTekRKg"
-    property: "role"
-    value: "Co-founder & CTO"
-    asOf: "2015-12"
-    validEnd: "2017-05"
-    source: "https://openai.com/blog/introducing-openai"
-    notes: "Initially served as CTO at OpenAI's founding"
-  - id: "f_gBpresRole"
-    property: "role"
-    value: "Co-founder & President"
-    asOf: "2017-05"
-    source: "https://openai.com/"
-    notes: "Transitioned from CTO to President; took leave of absence August 2024 but still listed as President"
   - id: "f_qVoWltsFvw"
     property: "born-year"
     value: 1988
@@ -28,11 +9,3 @@ facts:
     value: "Harvard University; Massachusetts Institute of Technology; Red River High School; University of North Dakota"
     source: "https://www.wikidata.org/wiki/Q100604534"
     notes: "From Wikidata Q100604534"
-  - id: "ced1Nqg2qg"
-    property: "role"
-    value: "Co-founder & President"
-    asOf: "2015-12"
-    validEnd: "2024-08"
-    source: "https://en.wikipedia.org/wiki/Greg_Brockman"
-    notes: "Co-founded OpenAI; served as CTO then President; resigned during Nov 2023 board crisis, returned, then took
-      extended leave in 2024; departed August 2024"

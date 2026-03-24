@@ -1,14 +1,2 @@
 entity: UpD99xMWKS
-facts:
-  - id: "kwS5tofI3Q"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2012"
-    source: "https://deepmind.google/"
-    notes: "One of the earliest DeepMind employees; leads research direction across the organization"
-  - id: "SO9Y7BX6EQ"
-    property: "role"
-    value: "VP of Research"
-    asOf: "2012"
-    source: "https://deepmind.google/"
-    notes: "One of the earliest DeepMind employees; leads research direction across the organization"
+facts: []

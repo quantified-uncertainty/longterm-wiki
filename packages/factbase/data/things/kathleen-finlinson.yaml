@@ -1,14 +1,2 @@
 entity: q607cJo21g
-facts:
-  - id: "mzdu6YT6mQ"
-    property: "employed-by"
-    value: !ref d9sWZtyVwg
-    asOf: "2020"
-    source: "https://futureoflife.org/"
-    notes: "Operations team at FLI"
-  - id: "3Kir8O4tLw"
-    property: "role"
-    value: "Operations"
-    asOf: "2020"
-    source: "https://futureoflife.org/"
-    notes: "Operations team at FLI"
+facts: []

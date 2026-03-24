@@ -1,28 +1,2 @@
 entity: HE9dREUB6G
-facts:
-  - id: "HgIRNHKHLA"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2019"
-    validEnd: "2023"
-    source: "https://x.com/saborneuk"
-    notes: "Worked on large language model training at DeepMind"
-  - id: "qiMzGGBORA"
-    property: "role"
-    value: "Research Engineer"
-    asOf: "2019"
-    validEnd: "2023"
-    source: "https://x.com/saborneuk"
-    notes: "Worked on large language model training at DeepMind"
-  - id: "i3md0kuoeQ"
-    property: "employed-by"
-    value: !ref GLXKjYAEKw
-    asOf: "2023"
-    source: "https://x.ai/"
-    notes: "Joined xAI; worked on Grok model development"
-  - id: "WImcM7dO3w"
-    property: "role"
-    value: "Researcher"
-    asOf: "2023"
-    source: "https://x.ai/"
-    notes: "Joined xAI; worked on Grok model development"
+facts: []

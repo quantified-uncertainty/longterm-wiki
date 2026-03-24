@@ -1,14 +1,2 @@
 entity: wKx_yCn-EJ
-facts:
-  - id: "0mOvO05krA"
-    property: "employed-by"
-    value: !ref XLLyzaEaCA
-    asOf: "2022"
-    source: "https://www.governance.ai/"
-    notes: "Research at GovAI on AI governance and policy"
-  - id: "8RIbLnCYBg"
-    property: "role"
-    value: "Researcher"
-    asOf: "2022"
-    source: "https://www.governance.ai/"
-    notes: "Research at GovAI on AI governance and policy"
+facts: []

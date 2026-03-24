@@ -1,8 +1,5 @@
 entity: C20cHdGiHQ
 facts:
-  - id: "f_3RwfPS8yPQ"
-    property: "role"
-    value: "Assistant Professor"
   - id: "f_lBbGuQqwmg"
     property: "born-year"
     value: 1989
@@ -16,17 +13,3 @@ facts:
   - id: "f_VzmoBlD3AA"
     property: "website"
     value: "https://jsteinhardt.stat.berkeley.edu"
-  - id: "R7RzCG4qhA"
-    property: "employed-by"
-    value: !ref ksqqi7fyeA
-    asOf: "2019"
-    source: "https://jsteinhardt.stat.berkeley.edu/"
-    notes: "Leads the Berkeley AI Safety research group; runs the ML Safety Scholars program; works on robustness and
-      alignment"
-  - id: "wDCZkpdrVg"
-    property: "role"
-    value: "Assistant Professor of Statistics"
-    asOf: "2019"
-    source: "https://jsteinhardt.stat.berkeley.edu/"
-    notes: "Leads the Berkeley AI Safety research group; runs the ML Safety Scholars program; works on robustness and
-      alignment"

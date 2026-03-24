@@ -1,24 +1,2 @@
 entity: FDJkqelsHQ
-facts:
-  - id: "eG4l8mtIfQ"
-    property: "employed-by"
-    value: !ref cMNszJMTPX
-    asOf: "2016"
-    validEnd: "2021-02"
-    source: "https://en.wikipedia.org/wiki/Margaret_Mitchell_(scientist)"
-    notes: "Co-led Google's Ethical AI team; created model cards framework; fired February 2021 after Timnit Gebru
-      controversy"
-  - id: "MtY43X2xFw"
-    property: "role"
-    value: "Research Scientist, Ethical AI Co-lead"
-    asOf: "2016"
-    validEnd: "2021-02"
-    source: "https://en.wikipedia.org/wiki/Margaret_Mitchell_(scientist)"
-    notes: "Co-led Google's Ethical AI team; created model cards framework; fired February 2021 after Timnit Gebru
-      controversy"
-  - id: "SNWTkpjQ7Q"
-    property: "role"
-    value: "Chief Ethics Scientist"
-    asOf: "2021"
-    source: "https://huggingface.co/"
-    notes: "Leads ethical AI work at Hugging Face; continues model cards and responsible AI research"
+facts: []

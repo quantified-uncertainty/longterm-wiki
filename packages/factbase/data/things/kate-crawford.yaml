@@ -1,14 +1,2 @@
 entity: 77SnPuPnk8
-facts:
-  - id: "gNzhHaqkFg"
-    property: "employed-by"
-    value: !ref VJacG0VE2w
-    asOf: "2017"
-    source: "https://ainowinstitute.org/"
-    notes: "Co-founded AI Now at NYU; focus on social implications of AI; author of 'Atlas of AI'"
-  - id: "hy2gSqt76Q"
-    property: "role"
-    value: "Co-founder & Senior Research Scientist"
-    asOf: "2017"
-    source: "https://ainowinstitute.org/"
-    notes: "Co-founded AI Now at NYU; focus on social implications of AI; author of 'Atlas of AI'"
+facts: []

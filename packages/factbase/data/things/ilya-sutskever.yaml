@@ -1,33 +1,5 @@
 entity: eYrBgMLJDw
 facts:
-  - id: f_qfd3qL21HQ
-    property: employed-by
-    value: !ref 1LcLlMGLbw
-    asOf: 2015-12
-    validEnd: 2024-06
-    source: https://openai.com/blog/introducing-openai
-    notes: "Co-founded OpenAI in December 2015; served as Chief Scientist until departing June 2024"
-
-  - id: f_58HUz4jCeA
-    property: role
-    value: "Co-founder & Chief Scientist"
-    asOf: 2015-12
-    validEnd: 2024-06
-    source: https://openai.com/blog/introducing-openai
-
-  - id: f_QtqNoKoBgw
-    property: employed-by
-    value: !ref 1OSiYOaWVL
-    asOf: 2024-06
-    source: https://ssi.inc
-    notes: "Co-founded Safe Superintelligence Inc (SSI) in June 2024 with Daniel Gross and Daniel Levy"
-
-  - id: f_rDk51er7Jw
-    property: role
-    value: "Co-founder & Chief Scientist"
-    asOf: 2024-06
-    source: https://ssi.inc
-
   - id: f_D7v4CpKtMw
     property: born-year
     value: 1985
@@ -57,18 +29,3 @@ facts:
     property: google-scholar
     value: "https://scholar.google.com/citations?user=x04W_mMAAAAJ"
 
-  - id: f_h3HeIqbtpA
-    property: employed-by
-    value: !ref AZmSQxCAlk
-    asOf: 2012-11
-    validEnd: 2015-12
-    source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    notes: "Research scientist at Google Brain (predates 2023 merger into Google DeepMind); worked with Geoffrey Hinton after the DNNresearch acquisition"
-
-  - id: f_oNoknPJnkQ
-    property: role
-    value: "Research Scientist"
-    asOf: 2012-11
-    validEnd: 2015-12
-    source: https://en.wikipedia.org/wiki/Ilya_Sutskever
-    notes: "At Google Brain, before co-founding OpenAI"

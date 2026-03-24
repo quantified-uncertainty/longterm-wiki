@@ -1,28 +1,2 @@
 entity: GRrd7Z857X
-facts:
-  - id: "xfvrKSkv1A"
-    property: "employed-by"
-    value: !ref XLLyzaEaCA
-    asOf: "2018"
-    validEnd: "2022"
-    source: "https://www.governance.ai/"
-    notes: "Led governance research at GovAI at Oxford"
-  - id: "Fxgjfd4evg"
-    property: "role"
-    value: "Research Lead"
-    asOf: "2018"
-    validEnd: "2022"
-    source: "https://www.governance.ai/"
-    notes: "Led governance research at GovAI at Oxford"
-  - id: "cckWn7DbdA"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2022"
-    source: "https://openai.com/"
-    notes: "Heads policy team at OpenAI; previously ran preparedness work"
-  - id: "GWAdxr69JA"
-    property: "role"
-    value: "Head of Policy"
-    asOf: "2022"
-    source: "https://openai.com/"
-    notes: "Heads policy team at OpenAI; previously ran preparedness work"
+facts: []

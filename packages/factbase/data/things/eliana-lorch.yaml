@@ -1,28 +1,2 @@
 entity: SlWMsuNIes
-facts:
-  - id: "6uDWDG1kMg"
-    property: "employed-by"
-    value: !ref cMNszJMTPX
-    asOf: "2018"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked at Google on ML research"
-  - id: "9JmQ5bJQYQ"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2018"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked at Google on ML research"
-  - id: "ELNbc0YZ0A"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on interpretability and safety research at Anthropic"
-  - id: "G5oXeOGkxg"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on interpretability and safety research at Anthropic"
+facts: []

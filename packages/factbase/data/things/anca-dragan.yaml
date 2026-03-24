@@ -1,28 +1,2 @@
 entity: 1YOwxSaDsd
-facts:
-  - id: "70EBVTcdiQ"
-    property: "employed-by"
-    value: !ref ksqqi7fyeA
-    asOf: "2016"
-    validEnd: "2023"
-    source: "https://people.eecs.berkeley.edu/~anca/"
-    notes: "Led InterACT lab; core member of CHAI under Stuart Russell; expert in value alignment"
-  - id: "nNKMugTebA"
-    property: "role"
-    value: "Assistant Professor of EECS"
-    asOf: "2016"
-    validEnd: "2023"
-    source: "https://people.eecs.berkeley.edu/~anca/"
-    notes: "Led InterACT lab; core member of CHAI under Stuart Russell; expert in value alignment"
-  - id: "dcAVcRPyug"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2023"
-    source: "https://deepmind.google/"
-    notes: "Joined DeepMind to lead safety-relevant research"
-  - id: "3yzoE3WAsA"
-    property: "role"
-    value: "Research Director"
-    asOf: "2023"
-    source: "https://deepmind.google/"
-    notes: "Joined DeepMind to lead safety-relevant research"
+facts: []

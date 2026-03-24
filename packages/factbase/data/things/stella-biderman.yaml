@@ -1,14 +1,2 @@
 entity: rCdvuJ9MKD
-facts:
-  - id: "UJ8CT3hyfA"
-    property: "employed-by"
-    value: !ref FnlNF9s98n
-    asOf: "2020"
-    source: "https://www.eleuther.ai/"
-    notes: "Co-leads EleutherAI; ML researcher focused on open-source AI and NLP"
-  - id: "T5y8rBtgOg"
-    property: "role"
-    value: "Executive Director"
-    asOf: "2020"
-    source: "https://www.eleuther.ai/"
-    notes: "Co-leads EleutherAI; ML researcher focused on open-source AI and NLP"
+facts: []

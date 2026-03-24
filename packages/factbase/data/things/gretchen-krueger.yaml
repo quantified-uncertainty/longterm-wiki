@@ -1,14 +1,2 @@
 entity: e6evfi0zqE
-facts:
-  - id: "BJihSSAyUw"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2019"
-    source: "https://openai.com/"
-    notes: "Works on AI governance and responsible release practices at OpenAI"
-  - id: "29MCkpnOFw"
-    property: "role"
-    value: "Policy Researcher"
-    asOf: "2019"
-    source: "https://openai.com/"
-    notes: "Works on AI governance and responsible release practices at OpenAI"
+facts: []

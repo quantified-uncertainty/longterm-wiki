@@ -7,11 +7,6 @@ facts:
       communities. While well-sourced with 47 citations, the page functions as r"
     asOf: "2026-03"
     notes: "Migrated from old entity system"
-  - id: "f_gw3rK7mW6x"
-    property: "role"
-    value: "Independent Researcher and Writer"
-    asOf: "2026-03"
-    notes: "Enriched from wiki page; pseudonymous, maintains gwern.net"
   - id: "f_gw6tN2pQ9v"
     property: "notable-for"
     value: "Early advocate of AI scaling hypothesis predicting AGI by 2030; maintains gwern.net as comprehensive research
@@ -20,10 +15,3 @@ facts:
     asOf: "2026-03"
     source: "https://gwern.net"
     notes: "Enriched from wiki page; pseudonymous researcher, no born-year added"
-  - id: "wOjW61dLyQ"
-    property: "role"
-    value: "Independent Researcher & Writer"
-    asOf: "2009"
-    source: "https://gwern.net/"
-    notes: "Prolific independent researcher covering AI scaling, technology forecasting, statistics; early proponent of
-      scaling hypothesis"

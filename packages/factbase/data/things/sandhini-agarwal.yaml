@@ -1,14 +1,2 @@
 entity: cP9Zh9P6eQ
-facts:
-  - id: "XgitSLca7w"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2020"
-    source: "https://openai.com/"
-    notes: "Works on AI safety policy and responsible deployment at OpenAI"
-  - id: "IhtvJPmL5w"
-    property: "role"
-    value: "Policy Researcher"
-    asOf: "2020"
-    source: "https://openai.com/"
-    notes: "Works on AI safety policy and responsible deployment at OpenAI"
+facts: []

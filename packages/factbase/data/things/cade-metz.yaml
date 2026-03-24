@@ -1,8 +1,2 @@
 entity: lMRdlZKHUI
-facts:
-  - id: "i3giZQLx4g"
-    property: "role"
-    value: "Technology Reporter"
-    asOf: "2017"
-    source: "https://www.nytimes.com/"
-    notes: "Covers AI labs and the people behind AI; author of 'Genius Makers'"
+facts: []

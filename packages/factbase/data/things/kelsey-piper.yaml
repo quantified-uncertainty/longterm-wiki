@@ -1,8 +1,2 @@
 entity: 3QSnX97Qv1
-facts:
-  - id: "6D8PV8qCJA"
-    property: "role"
-    value: "Journalist, Future Perfect"
-    asOf: "2018"
-    source: "https://www.vox.com/authors/kelsey-piper"
-    notes: "Covers AI safety, effective altruism, and emerging technology for Vox's Future Perfect vertical"
+facts: []

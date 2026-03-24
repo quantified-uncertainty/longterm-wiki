@@ -1,16 +1,2 @@
 entity: 75vgQ9g8K0
-facts:
-  - id: "X54cdeUr4w"
-    property: "employed-by"
-    value: !ref cMNszJMTPX
-    asOf: "1999"
-    source: "https://en.wikipedia.org/wiki/Jeff_Dean"
-    notes: "Co-founded Google Brain with Andrew Ng; led development of TensorFlow, TPUs; key architect of Google's AI
-      infrastructure"
-  - id: "afLflmFWMw"
-    property: "role"
-    value: "Chief Scientist, Google DeepMind (formerly SVP of Google AI)"
-    asOf: "1999"
-    source: "https://en.wikipedia.org/wiki/Jeff_Dean"
-    notes: "Co-founded Google Brain with Andrew Ng; led development of TensorFlow, TPUs; key architect of Google's AI
-      infrastructure"
+facts: []

@@ -17,12 +17,6 @@ facts:
     value: "Yale University; University of British Columbia"
     source: "https://www.wikidata.org/wiki/Q2086480"
     notes: "From Wikidata Q2086480"
-  - id: "f_pT3rK7mW5x"
-    property: "role"
-    value: "Leonore Annenberg University Professor"
-    asOf: "2010-12"
-    notes: "Enriched from wiki page; cross-appointed at Wharton School and School of Arts and Sciences, University of
-      Pennsylvania"
   - id: "f_pT6tN2pQ1v"
     property: "notable-for"
     value: "Pioneered science of superforecasting; authored Expert Political Judgment (2005) and Superforecasting (2015);
@@ -30,11 +24,6 @@ facts:
       intelligence analysts by 60-85%"
     asOf: "2026-03"
     notes: "Enriched from wiki page"
-  - id: "f_pT9wS5jH4d"
-    property: "employed-by"
-    value: !ref Zx7ckq6syw
-    asOf: "2011-01"
-    notes: "Enriched from wiki page; co-founded Good Judgment Project and Good Judgment Inc."
   - id: "f_pTfB4gN7mD"
     property: "education"
     value: "B.A. Psychology, University of British Columbia (1975); M.A. Psychology (1976); Ph.D. Psychology, Yale
@@ -45,17 +34,3 @@ facts:
     value: "https://en.wikipedia.org/wiki/Philip_E._Tetlock"
     source: "https://www.wikidata.org/wiki/Q2086480"
     notes: "From Wikidata Q2086480"
-  - id: "NTyBawLnfw"
-    property: "role"
-    value: "Professor of Psychology & Political Science"
-    asOf: "2011"
-    source: "https://en.wikipedia.org/wiki/Philip_E._Tetlock"
-    notes: "At University of Pennsylvania. Leads the Good Judgment Project; pioneered superforecasting research; applies
-      forecasting methods to AI risk assessment"
-  - id: "ZkeATyk6Rg"
-    property: "employed-by"
-    value: !ref fwWLWc3zlo
-    asOf: "2011"
-    source: "https://en.wikipedia.org/wiki/Philip_E._Tetlock"
-    notes: "Leads the Good Judgment Project; pioneered superforecasting research; applies forecasting methods to AI risk
-      assessment"

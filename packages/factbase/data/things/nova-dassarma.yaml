@@ -1,28 +1,2 @@
 entity: loCJ9k9JUl
-facts:
-  - id: "m7YbhbDx7g"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2019"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked on safety research at DeepMind"
-  - id: "nCk6SdC0sg"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2019"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked on safety research at DeepMind"
-  - id: "pkCRgOrxWg"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on AI safety research at Anthropic"
-  - id: "dSV2ygCJJw"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on AI safety research at Anthropic"
+facts: []

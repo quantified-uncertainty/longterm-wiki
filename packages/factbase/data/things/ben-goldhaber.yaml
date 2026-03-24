@@ -1,14 +1,2 @@
 entity: 0tQftJKP4Q
-facts:
-  - id: "5aIm3KTFSQ"
-    property: "employed-by"
-    value: !ref 7E2ylGl7Ug
-    asOf: "2023"
-    source: "https://lighthaven.space/"
-    notes: "Co-founded Lighthaven event venue in Berkeley; hosts rationality and AI safety workshops"
-  - id: "kpLia9LL6g"
-    property: "role"
-    value: "Co-founder"
-    asOf: "2023"
-    source: "https://lighthaven.space/"
-    notes: "Co-founded Lighthaven event venue in Berkeley; hosts rationality and AI safety workshops"
+facts: []

@@ -1,14 +1,2 @@
 entity: R8tDuupBTt
-facts:
-  - id: "wlvlv2wK8w"
-    property: "employed-by"
-    value: !ref rQEkFJxS5w
-    asOf: "2023"
-    source: "https://metr.org/"
-    notes: "Works at METR (Model Evaluation and Threat Research)"
-  - id: "l6YAHsbabw"
-    property: "role"
-    value: "Operations"
-    asOf: "2023"
-    source: "https://metr.org/"
-    notes: "Works at METR (Model Evaluation and Threat Research)"
+facts: []

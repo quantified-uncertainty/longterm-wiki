@@ -1,28 +1,2 @@
 entity: ZocUS6ej6S
-facts:
-  - id: "HsBXi7GrGA"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2015-12"
-    validEnd: "2024-08"
-    source: "https://en.wikipedia.org/wiki/John_Schulman"
-    notes: "Co-founded OpenAI; created PPO algorithm; led alignment research and RLHF efforts; led post-training team"
-  - id: "E8t4d4px8w"
-    property: "role"
-    value: "Co-founder, Head of Alignment"
-    asOf: "2015-12"
-    validEnd: "2024-08"
-    source: "https://en.wikipedia.org/wiki/John_Schulman"
-    notes: "Co-founded OpenAI; created PPO algorithm; led alignment research and RLHF efforts; led post-training team"
-  - id: "YnEgcitaOA"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2024-08"
-    source: "https://www.anthropic.com"
-    notes: "Joined Anthropic in August 2024 to focus on AI alignment research"
-  - id: "IMHb5fY13g"
-    property: "role"
-    value: "Researcher"
-    asOf: "2024-08"
-    source: "https://www.anthropic.com"
-    notes: "Joined Anthropic in August 2024 to focus on AI alignment research"
+facts: []

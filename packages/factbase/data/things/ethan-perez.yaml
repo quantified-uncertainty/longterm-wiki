@@ -1,28 +1,2 @@
 entity: ncKwPfn8tD
-facts:
-  - id: "Ezfx92yYGw"
-    property: "employed-by"
-    value: !ref 5IBy869q9Q
-    asOf: "2019"
-    validEnd: "2023"
-    source: "https://ethanperez.net/"
-    notes: "PhD on LLM safety and red-teaming"
-  - id: "7O9naGuC5w"
-    property: "role"
-    value: "PhD Student"
-    asOf: "2019"
-    validEnd: "2023"
-    source: "https://ethanperez.net/"
-    notes: "PhD on LLM safety and red-teaming"
-  - id: "m56sksUZsQ"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2023"
-    source: "https://anthropic.com/"
-    notes: "Works on red-teaming, model evaluation, and safety research"
-  - id: "6HWSYJUBmA"
-    property: "role"
-    value: "Researcher"
-    asOf: "2023"
-    source: "https://anthropic.com/"
-    notes: "Works on red-teaming, model evaluation, and safety research"
+facts: []

@@ -6,25 +6,11 @@ facts:
     asOf: 2026-03
     notes: Stepped down as Chair in 2025
 
-  - id: f_iH1rKz8mXq
-    property: role
-    value: "Chair"
-    asOf: "2023-06"
-    validEnd: "2025"
-    notes: "Chair of UK AISI from June 2023; stepped down in 2025"
-
   - id: f_iH2nLw9pYr
     property: notable-for
     value: "Former Chair of UK AI Safety Institute; AI investor and writer"
     asOf: "2026-03"
     notes: "Updated to reflect former role"
-
-  - id: f_iH3oMx0qZs
-    property: employed-by
-    value: !ref aX0jkoaekQ
-    asOf: "2023-06"
-    validEnd: "2025"
-    notes: "Stepped down from UK AISI Chair in 2025"
 
   - id: hrtg6bcLOA
     property: education

@@ -1,16 +1,2 @@
 entity: GwMzWw7fpA
-facts:
-  - id: "kmVJqTQEiQ"
-    property: "employed-by"
-    value: !ref ufdntmiWtQ
-    asOf: "2009"
-    validEnd: "2020"
-    source: "https://en.wikipedia.org/wiki/Jennifer_Pahlka"
-    notes: "Founded Code for America; pioneered civic technology movement"
-  - id: "T18JEg0aUg"
-    property: "role"
-    value: "Founder & Executive Director"
-    asOf: "2009"
-    validEnd: "2020"
-    source: "https://en.wikipedia.org/wiki/Jennifer_Pahlka"
-    notes: "Founded Code for America; pioneered civic technology movement"
+facts: []

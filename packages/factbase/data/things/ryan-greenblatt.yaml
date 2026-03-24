@@ -1,28 +1,2 @@
 entity: lkJlFaIeQb
-facts:
-  - id: "50lSQ3iFLA"
-    property: "employed-by"
-    value: !ref dwMzc9WzPa
-    asOf: "2021"
-    validEnd: "2023"
-    source: "https://www.redwoodresearch.org/"
-    notes: "AI alignment research at Redwood"
-  - id: "K8d1kwRTag"
-    property: "role"
-    value: "Researcher"
-    asOf: "2021"
-    validEnd: "2023"
-    source: "https://www.redwoodresearch.org/"
-    notes: "AI alignment research at Redwood"
-  - id: "Gmev43uoew"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2023"
-    source: "https://openai.com/"
-    notes: "Works on alignment research; key contributor to control and safety evaluations"
-  - id: "8y9rhZnW5A"
-    property: "role"
-    value: "Alignment Researcher"
-    asOf: "2023"
-    source: "https://openai.com/"
-    notes: "Works on alignment research; key contributor to control and safety evaluations"
+facts: []

@@ -1,14 +1,2 @@
 entity: e6c93VvfY3
-facts:
-  - id: "XhRBzjKDwg"
-    property: "employed-by"
-    value: !ref BEKEqQDmkQ
-    asOf: "2017"
-    source: "https://www.lesswrong.com/"
-    notes: "Rebuilt LessWrong as a modern platform; runs Lightcone Infrastructure; key rationalist community builder"
-  - id: "wkdaGktsZA"
-    property: "role"
-    value: "Co-founder & CEO"
-    asOf: "2017"
-    source: "https://www.lesswrong.com/"
-    notes: "Rebuilt LessWrong as a modern platform; runs Lightcone Infrastructure; key rationalist community builder"
+facts: []

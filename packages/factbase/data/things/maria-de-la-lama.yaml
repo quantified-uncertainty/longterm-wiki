@@ -1,14 +1,2 @@
 entity: BoXCNeZK3w
-facts:
-  - id: "6l9kUuu9sg"
-    property: "employed-by"
-    value: !ref cBPkzcVBBQ
-    asOf: "2022"
-    source: "https://epochai.org/"
-    notes: "Research at Epoch AI on AI compute trends and timelines"
-  - id: "6xHjG31dkQ"
-    property: "role"
-    value: "Researcher"
-    asOf: "2022"
-    source: "https://epochai.org/"
-    notes: "Research at Epoch AI on AI compute trends and timelines"
+facts: []

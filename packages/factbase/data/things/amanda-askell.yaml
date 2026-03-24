@@ -1,14 +1,2 @@
 entity: 2qcak72NwQ
-facts:
-  - id: "Zg72at0r7w"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2021"
-    source: "https://anthropic.com/"
-    notes: "Leads Claude's character and personality work; philosopher by training; previously worked on AI ethics"
-  - id: "8liumSV6NA"
-    property: "role"
-    value: "Character Lead"
-    asOf: "2021"
-    source: "https://anthropic.com/"
-    notes: "Leads Claude's character and personality work; philosopher by training; previously worked on AI ethics"
+facts: []

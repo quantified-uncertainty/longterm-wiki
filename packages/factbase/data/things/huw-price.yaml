@@ -1,14 +1,2 @@
 entity: T6SowQJJbg
-facts:
-  - id: "F2ZDU0B7bg"
-    property: "employed-by"
-    value: !ref xfad5FwoTA
-    asOf: "2011"
-    source: "https://en.wikipedia.org/wiki/Huw_Price"
-    notes: "Co-founded the Centre for the Study of Existential Risk (CSER) with Martin Rees and Jaan Tallinn"
-  - id: "6OCLebxIuw"
-    property: "role"
-    value: "Bertrand Russell Professor of Philosophy"
-    asOf: "2011"
-    source: "https://en.wikipedia.org/wiki/Huw_Price"
-    notes: "Co-founded the Centre for the Study of Existential Risk (CSER) with Martin Rees and Jaan Tallinn"
+facts: []

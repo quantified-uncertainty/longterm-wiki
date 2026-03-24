@@ -1,14 +1,2 @@
 entity: xTqcQVprIH
-facts:
-  - id: "5nuWq7y6kg"
-    property: "employed-by"
-    value: !ref VJacG0VE2w
-    asOf: "2022"
-    source: "https://ainowinstitute.org/"
-    notes: "Leads AI Now; focus on AI policy and accountability"
-  - id: "BXaRGHprGQ"
-    property: "role"
-    value: "Executive Director"
-    asOf: "2022"
-    source: "https://ainowinstitute.org/"
-    notes: "Leads AI Now; focus on AI policy and accountability"
+facts: []

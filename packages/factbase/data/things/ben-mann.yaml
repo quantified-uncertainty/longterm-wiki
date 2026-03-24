@@ -1,28 +1,2 @@
 entity: mO6vu4wGaZ
-facts:
-  - id: "CXBKpysp5w"
-    property: "employed-by"
-    value: !ref cMNszJMTPX
-    asOf: "2017"
-    validEnd: "2021-01"
-    source: "https://anthropic.com/company"
-    notes: "Software engineer at Google before co-founding Anthropic"
-  - id: "eQ0hDQ1A3w"
-    property: "role"
-    value: "Software Engineer"
-    asOf: "2017"
-    validEnd: "2021-01"
-    source: "https://anthropic.com/company"
-    notes: "Software engineer at Google before co-founding Anthropic"
-  - id: "LnOLFR1nXA"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2021-01"
-    source: "https://anthropic.com/company"
-    notes: "Co-founded Anthropic; leads core infrastructure"
-  - id: "UE2ZBqD5qQ"
-    property: "role"
-    value: "Co-founder, Infrastructure Lead"
-    asOf: "2021-01"
-    source: "https://anthropic.com/company"
-    notes: "Co-founded Anthropic; leads core infrastructure"
+facts: []

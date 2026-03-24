@@ -1,14 +1,2 @@
 entity: C83ppolN2r
-facts:
-  - id: "4hAY4l75UQ"
-    property: "employed-by"
-    value: !ref ksqqi7fyeA
-    asOf: "2008"
-    source: "https://people.eecs.berkeley.edu/~pabbeel/"
-    notes: "Pioneer of deep RL; co-founded Covariant (robot AI); director of Berkeley Robot Learning Lab"
-  - id: "06LkiGeOWA"
-    property: "role"
-    value: "Professor of EECS"
-    asOf: "2008"
-    source: "https://people.eecs.berkeley.edu/~pabbeel/"
-    notes: "Pioneer of deep RL; co-founded Covariant (robot AI); director of Berkeley Robot Learning Lab"
+facts: []

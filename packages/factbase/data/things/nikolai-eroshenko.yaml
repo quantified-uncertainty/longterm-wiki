@@ -1,14 +1,2 @@
 entity: CBNE3Hszkr
-facts:
-  - id: "TFJkbPjgxQ"
-    property: "employed-by"
-    value: !ref 0u4J70VqFY
-    asOf: "2022"
-    source: "https://conjecture.dev/"
-    notes: "Technical co-founder of Conjecture"
-  - id: "5yQ7Vcxruw"
-    property: "role"
-    value: "Co-founder"
-    asOf: "2022"
-    source: "https://conjecture.dev/"
-    notes: "Technical co-founder of Conjecture"
+facts: []

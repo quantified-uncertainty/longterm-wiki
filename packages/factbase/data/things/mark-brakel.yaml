@@ -1,14 +1,2 @@
 entity: KG46JUejyg
-facts:
-  - id: "On6PZICnZg"
-    property: "employed-by"
-    value: !ref d9sWZtyVwg
-    asOf: "2021"
-    source: "https://futureoflife.org/"
-    notes: "Leads FLI's European policy work; based in Brussels"
-  - id: "YrN5Q8nkfg"
-    property: "role"
-    value: "Policy Director"
-    asOf: "2021"
-    source: "https://futureoflife.org/"
-    notes: "Leads FLI's European policy work; based in Brussels"
+facts: []

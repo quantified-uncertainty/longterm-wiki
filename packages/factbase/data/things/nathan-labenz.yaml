@@ -1,8 +1,2 @@
 entity: H9tpeUdFMY
-facts:
-  - id: "RRRXjo93Fg"
-    property: "role"
-    value: "Host"
-    asOf: "2023"
-    source: "https://www.cognitiverevolution.ai/"
-    notes: "Hosts The Cognitive Revolution podcast on AI; red-teamed GPT-4 for OpenAI; CEO of Waymark"
+facts: []

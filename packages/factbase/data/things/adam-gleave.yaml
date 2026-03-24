@@ -1,28 +1,2 @@
 entity: z9YE0k6xIl
-facts:
-  - id: "MSeHM32lIQ"
-    property: "employed-by"
-    value: !ref ksqqi7fyeA
-    asOf: "2018"
-    validEnd: "2023"
-    source: "https://gleave.me/"
-    notes: "PhD at CHAI under Stuart Russell; worked on adversarial policies"
-  - id: "y2aAvxgQqg"
-    property: "role"
-    value: "PhD Student"
-    asOf: "2018"
-    validEnd: "2023"
-    source: "https://gleave.me/"
-    notes: "PhD at CHAI under Stuart Russell; worked on adversarial policies"
-  - id: "CiKvGU2hXw"
-    property: "employed-by"
-    value: !ref lCiT37k9pA
-    asOf: "2022"
-    source: "https://far.ai/"
-    notes: "Founded FAR AI; focuses on adversarial robustness and AI safety evaluations"
-  - id: "mcai15muow"
-    property: "role"
-    value: "Founder & CEO"
-    asOf: "2022"
-    source: "https://far.ai/"
-    notes: "Founded FAR AI; focuses on adversarial robustness and AI safety evaluations"
+facts: []

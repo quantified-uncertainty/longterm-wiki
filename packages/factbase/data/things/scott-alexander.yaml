@@ -1,8 +1,5 @@
 entity: ykTqvdkiLQ
 facts:
-  - id: "f_q6PPCnymgA"
-    property: "role"
-    value: "Writer"
   - id: "f_VR9yTjYlmg"
     property: "notable-for"
     value: "Author of Astral Codex Ten (formerly Slate Star Codex); influential rationalist blogger covering AI risk and
@@ -15,10 +12,3 @@ facts:
     value: "https://en.wikipedia.org/wiki/Scott_Alexander_(screenwriter)"
     source: "https://www.wikidata.org/wiki/Q3476164"
     notes: "From Wikidata Q3476164"
-  - id: "0Dvbf77shw"
-    property: "role"
-    value: "Author"
-    asOf: "2013"
-    source: "https://www.astralcodexten.com/"
-    notes: "At Astral Codex Ten / Slate Star Codex. Influential rationalist blogger; writes extensively on AI risk,
-      prediction markets, and EA; psychiatrist by profession"

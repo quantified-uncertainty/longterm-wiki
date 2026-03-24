@@ -1,14 +1,2 @@
 entity: 9MNPpMYphE
-facts:
-  - id: "kOJShhmE9A"
-    property: "employed-by"
-    value: !ref FnlNF9s98n
-    asOf: "2022"
-    source: "https://www.eleuther.ai/"
-    notes: "Works on interpretability and alignment at EleutherAI"
-  - id: "JaA43ggutw"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2022"
-    source: "https://www.eleuther.ai/"
-    notes: "Works on interpretability and alignment at EleutherAI"
+facts: []

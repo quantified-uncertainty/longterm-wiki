@@ -1,8 +1,5 @@
 entity: utxQdymSEg
 facts:
-  - id: "f_L8SLq90qgA"
-    property: "role"
-    value: "Research Scientist"
   - id: "f_13qgbQWHbA"
     property: "notable-for"
     value: "Research scientist at Google DeepMind working on AI safety; co-founder of the Future of Life Institute"
@@ -12,15 +9,3 @@ facts:
   - id: "f_YV9KvdNUQg"
     property: "website"
     value: "https://vkrakovna.wordpress.com"
-  - id: "n1Rf8U8Idg"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2017"
-    source: "https://vkrakovna.wordpress.com/"
-    notes: "Works on AI safety research at DeepMind; created specification gaming examples database"
-  - id: "zyxwz4CCiw"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2017"
-    source: "https://vkrakovna.wordpress.com/"
-    notes: "Works on AI safety research at DeepMind; created specification gaming examples database"

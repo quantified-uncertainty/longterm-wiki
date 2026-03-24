@@ -1,14 +1,2 @@
 entity: KfgopYXMo8
-facts:
-  - id: "wCP1aZ6hng"
-    property: "employed-by"
-    value: !ref HkfUxsbBLQ
-    asOf: "2023"
-    source: "https://www.gladstone.ai/"
-    notes: "Works on AI policy research at Gladstone AI"
-  - id: "HENT7E7Hxg"
-    property: "role"
-    value: "Policy Researcher"
-    asOf: "2023"
-    source: "https://www.gladstone.ai/"
-    notes: "Works on AI policy research at Gladstone AI"
+facts: []

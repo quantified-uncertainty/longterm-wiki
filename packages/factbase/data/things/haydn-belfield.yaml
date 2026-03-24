@@ -1,14 +1,2 @@
 entity: wDVvssbBWp
-facts:
-  - id: "nPRqdwwpPQ"
-    property: "employed-by"
-    value: !ref Qns43S795w
-    asOf: "2017"
-    source: "https://www.cser.ac.uk/"
-    notes: "Research affiliate at CSER and GovAI; works on AI governance and existential risk policy"
-  - id: "dzMZ2vOEeg"
-    property: "role"
-    value: "Academic Project Manager"
-    asOf: "2017"
-    source: "https://www.cser.ac.uk/"
-    notes: "Research affiliate at CSER and GovAI; works on AI governance and existential risk policy"
+facts: []

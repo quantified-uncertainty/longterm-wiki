@@ -1,22 +1,2 @@
 entity: 8IoYc1FS2s
-facts:
-  - id: "vtwYlVudjQ"
-    property: "employed-by"
-    value: !ref AZmSQxCAlk
-    asOf: "2017"
-    validEnd: "2017"
-    source: "https://en.wikipedia.org/wiki/Aidan_Gomez"
-    notes: "Co-authored 'Attention Is All You Need' (Transformer paper) while interning"
-  - id: "Wlefuv6E5g"
-    property: "role"
-    value: "Research Intern"
-    asOf: "2017"
-    validEnd: "2017"
-    source: "https://en.wikipedia.org/wiki/Aidan_Gomez"
-    notes: "Co-authored 'Attention Is All You Need' (Transformer paper) while interning"
-  - id: "GMRdnS3uKg"
-    property: "role"
-    value: "Co-founder & CEO"
-    asOf: "2019"
-    source: "https://cohere.com/"
-    notes: "Co-founded Cohere, enterprise-focused LLM company"
+facts: []

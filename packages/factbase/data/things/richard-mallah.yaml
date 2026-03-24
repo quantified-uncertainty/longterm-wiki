@@ -1,14 +1,2 @@
 entity: mK2KLknYGg
-facts:
-  - id: "pcsyEPuuIg"
-    property: "employed-by"
-    value: !ref d9sWZtyVwg
-    asOf: "2017"
-    source: "https://futureoflife.org/"
-    notes: "Leads FLI's technical AI safety work and Asilomar principles implementation"
-  - id: "NJyrALrWfg"
-    property: "role"
-    value: "VP of AI & Technology"
-    asOf: "2017"
-    source: "https://futureoflife.org/"
-    notes: "Leads FLI's technical AI safety work and Asilomar principles implementation"
+facts: []

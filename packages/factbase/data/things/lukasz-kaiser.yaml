@@ -1,28 +1,2 @@
 entity: bDntUJ9nR9
-facts:
-  - id: "cndXduyCHQ"
-    property: "employed-by"
-    value: !ref AZmSQxCAlk
-    asOf: "2013"
-    validEnd: "2021"
-    source: "https://en.wikipedia.org/wiki/Lukasz_Kaiser"
-    notes: "Co-authored the Transformer paper; worked on sequence-to-sequence models"
-  - id: "5nincFBFXw"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2013"
-    validEnd: "2021"
-    source: "https://en.wikipedia.org/wiki/Lukasz_Kaiser"
-    notes: "Co-authored the Transformer paper; worked on sequence-to-sequence models"
-  - id: "clSgv3GbAg"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2021"
-    source: "https://openai.com/"
-    notes: "Joined OpenAI; works on language model research"
-  - id: "byir1XTrlw"
-    property: "role"
-    value: "Researcher"
-    asOf: "2021"
-    source: "https://openai.com/"
-    notes: "Joined OpenAI; works on language model research"
+facts: []

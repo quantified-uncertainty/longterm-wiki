@@ -1,28 +1,2 @@
 entity: YOfOGwm1kh
-facts:
-  - id: "A3K9iqpFXQ"
-    property: "employed-by"
-    value: !ref cBPkzcVBBQ
-    asOf: "2022"
-    validEnd: "2023"
-    source: "https://epochai.org/"
-    notes: "Compute governance research at Epoch AI"
-  - id: "WOPo3tl2OQ"
-    property: "role"
-    value: "Researcher"
-    asOf: "2022"
-    validEnd: "2023"
-    source: "https://epochai.org/"
-    notes: "Compute governance research at Epoch AI"
-  - id: "zfnWQsG9zg"
-    property: "employed-by"
-    value: !ref XLLyzaEaCA
-    asOf: "2023"
-    source: "https://www.governance.ai/"
-    notes: "Leading expert on compute governance and AI chip supply chains"
-  - id: "8Us0yLbguQ"
-    property: "role"
-    value: "Researcher"
-    asOf: "2023"
-    source: "https://www.governance.ai/"
-    notes: "Leading expert on compute governance and AI chip supply chains"
+facts: []

@@ -1,8 +1,5 @@
 entity: yiBasS5uXQ
 facts:
-  - id: "f_kOWUqG4MeQ"
-    property: "role"
-    value: "Founder"
   - id: "f_8Iej2b7LDw"
     property: "born-year"
     value: 1988
@@ -15,33 +12,3 @@ facts:
   - id: "f_vatTbYjtnQ"
     property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Mira_Murati"
-  - id: "HxBM8f6WeA"
-    property: "role"
-    value: "Senior Product Manager"
-    asOf: "2016"
-    validEnd: "2018"
-    source: "https://en.wikipedia.org/wiki/Mira_Murati"
-    notes: "At Tesla. Worked on Model X development"
-  - id: "rknfARJQ5A"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2018"
-    validEnd: "2024-10"
-    source: "https://en.wikipedia.org/wiki/Mira_Murati"
-    notes: "VP of Applied AI & Partnerships, then CTO; led ChatGPT launch; briefly served as interim CEO during Nov 2023
-      board crisis; departed October 2024"
-  - id: "k36pkeU7tg"
-    property: "role"
-    value: "CTO"
-    asOf: "2018"
-    validEnd: "2024-10"
-    source: "https://en.wikipedia.org/wiki/Mira_Murati"
-    notes: "VP of Applied AI & Partnerships, then CTO; led ChatGPT launch; briefly served as interim CEO during Nov 2023
-      board crisis; departed October 2024"
-  - id: "pHAjLyNEfg"
-    property: "employed-by"
-    value: !ref DBucVJZWyR
-    asOf: "2016"
-    validEnd: "2018"
-    source: "https://en.wikipedia.org/wiki/Mira_Murati"
-    notes: "Worked on Model X development"

@@ -1,23 +1,8 @@
 entity: GAlcP90tvw
 facts:
-  - id: "f_cvli2jAbQg"
-    property: "role"
-    value: "Research Scientist"
   - id: "f_MYw0rJFjJQ"
     property: "notable-for"
     value: "Research scientist at Google DeepMind working on AI alignment; creator of the Alignment Newsletter"
   - id: "f_58eMyTSywg"
     property: "education"
     value: "PhD in Computer Science, UC Berkeley"
-  - id: "YyAxb0AM4Q"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2022"
-    source: "https://rohinshah.com/"
-    notes: "Joined DeepMind after PhD at UC Berkeley CHAI; previously authored the Alignment Newsletter"
-  - id: "UVf4k6SOaA"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2022"
-    source: "https://rohinshah.com/"
-    notes: "Joined DeepMind after PhD at UC Berkeley CHAI; previously authored the Alignment Newsletter"

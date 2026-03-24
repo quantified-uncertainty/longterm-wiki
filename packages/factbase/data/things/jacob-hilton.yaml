@@ -1,28 +1,2 @@
 entity: KKCwTYU4Zw
-facts:
-  - id: "nWmcvK4yzA"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2021"
-    validEnd: "2024"
-    source: "https://www.jacobhilton.com/"
-    notes: "Worked on alignment research at OpenAI"
-  - id: "LxgDNfD0WQ"
-    property: "role"
-    value: "Researcher, Alignment"
-    asOf: "2021"
-    validEnd: "2024"
-    source: "https://www.jacobhilton.com/"
-    notes: "Worked on alignment research at OpenAI"
-  - id: "QwnsSv7i2A"
-    property: "employed-by"
-    value: !ref QsXVXtQ0zE
-    asOf: "2024"
-    source: "https://alignment.org/"
-    notes: "Joined ARC to work on alignment theory"
-  - id: "a7rG3BgMKw"
-    property: "role"
-    value: "Researcher"
-    asOf: "2024"
-    source: "https://alignment.org/"
-    notes: "Joined ARC to work on alignment theory"
+facts: []

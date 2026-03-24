@@ -1,14 +1,2 @@
 entity: GTO7pZdhSG
-facts:
-  - id: "1mM824cRrg"
-    property: "employed-by"
-    value: !ref ngrgdfqafw
-    asOf: "2019"
-    source: "https://ai.stanford.edu/~cbfinn/"
-    notes: "Pioneer of meta-learning (MAML); research in robot learning, few-shot learning, and adaptive AI"
-  - id: "6BU0acQqzw"
-    property: "role"
-    value: "Assistant Professor of Computer Science"
-    asOf: "2019"
-    source: "https://ai.stanford.edu/~cbfinn/"
-    notes: "Pioneer of meta-learning (MAML); research in robot learning, few-shot learning, and adaptive AI"
+facts: []

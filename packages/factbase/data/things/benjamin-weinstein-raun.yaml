@@ -1,14 +1,2 @@
 entity: eg18B7rL4g
-facts:
-  - id: "csT9rNZrwg"
-    property: "employed-by"
-    value: !ref 1LcLlMGLbw
-    asOf: "2016"
-    source: "https://openai.com/"
-    notes: "Early OpenAI employee; led business operations"
-  - id: "A5CB5YewPA"
-    property: "role"
-    value: "Head of Business Operations & Strategy"
-    asOf: "2016"
-    source: "https://openai.com/"
-    notes: "Early OpenAI employee; led business operations"
+facts: []

@@ -1,8 +1,5 @@
 entity: uNNO9uwEoA
 facts:
-  - id: "f_6datGmST5Q"
-    property: "role"
-    value: "VP of AI Policy"
   - id: "f_xXooK78TVw"
     property: "notable-for"
     value: "VP of AI Policy at Google DeepMind; founder of the Centre for the Governance of AI (GovAI); leading AI
@@ -15,29 +12,3 @@ facts:
     value: "https://www.allandafoe.com/"
     source: "https://www.wikidata.org/wiki/Q126287590"
     notes: "From Wikidata Q126287590"
-  - id: "9wrN7jR08g"
-    property: "employed-by"
-    value: !ref XLLyzaEaCA
-    asOf: "2018"
-    validEnd: "2023"
-    source: "https://www.governance.ai/"
-    notes: "Founded GovAI as a research centre within FHI at Oxford; spun it out as independent org"
-  - id: "Ep60tY7vWw"
-    property: "role"
-    value: "Founding Director"
-    asOf: "2018"
-    validEnd: "2023"
-    source: "https://www.governance.ai/"
-    notes: "Founded GovAI as a research centre within FHI at Oxford; spun it out as independent org"
-  - id: "RyVoyOkkFA"
-    property: "employed-by"
-    value: !ref A4XoubikkQ
-    asOf: "2023"
-    source: "https://deepmind.google/about/"
-    notes: "Joined DeepMind to lead long-term safety strategy and governance"
-  - id: "MJrE0qV33Q"
-    property: "role"
-    value: "President of AI Safety & Head of Long-term AI Safety Strategy"
-    asOf: "2023"
-    source: "https://deepmind.google/about/"
-    notes: "Joined DeepMind to lead long-term safety strategy and governance"

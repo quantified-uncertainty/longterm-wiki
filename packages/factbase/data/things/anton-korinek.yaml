@@ -1,14 +1,2 @@
 entity: evoWfReU6W
-facts:
-  - id: "sOJfgmgjSw"
-    property: "role"
-    value: "Professor of Economics"
-    asOf: "2010"
-    source: "https://www.antonkorinek.com/"
-    notes: "At University of Virginia. Economist; works on AI economics and governance; affiliated with Brookings, NBER, CEPR"
-  - id: "qjeVpy5iMw"
-    property: "employed-by"
-    value: !ref wzvlHe9pOn
-    asOf: "2010"
-    source: "https://www.antonkorinek.com/"
-    notes: "Economist; works on AI economics and governance; affiliated with Brookings, NBER, CEPR"
+facts: []

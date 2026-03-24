@@ -1,28 +1,2 @@
 entity: R1sh5iI5Be
-facts:
-  - id: "lzlld9L3Iw"
-    property: "employed-by"
-    value: !ref rYERluiUwH
-    asOf: "2017"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked on computational biology at CZI"
-  - id: "fKiEoKzkDA"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2017"
-    validEnd: "2022"
-    source: "https://anthropic.com/"
-    notes: "Worked on computational biology at CZI"
-  - id: "WnD8rdQtqg"
-    property: "employed-by"
-    value: !ref mK9pX3rQ7n
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on interpretability; key contributor to scaling monosemanticity research"
-  - id: "eKp0GdquEA"
-    property: "role"
-    value: "Research Scientist"
-    asOf: "2022"
-    source: "https://anthropic.com/"
-    notes: "Works on interpretability; key contributor to scaling monosemanticity research"
+facts: []

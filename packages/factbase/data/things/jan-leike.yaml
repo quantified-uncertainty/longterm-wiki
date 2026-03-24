@@ -1,27 +1,5 @@
 entity: hQ7mR2kN5p
 facts:
-  - id: f_dF5bX8wC3g
-    property: employed-by
-    value: !ref 1LcLlMGLbw
-    asOf: 2021-01
-    validEnd: 2024-05
-    source: https://openai.com/blog/introducing-superalignment
-    notes: "Joined OpenAI circa 2021; co-led the Superalignment team from its founding in July 2023"
-
-  - id: f_eH9jV6nK4t
-    property: employed-by
-    value: !ref mK9pX3rQ7n
-    asOf: 2024-05
-    source: https://anthropic.com/news/jan-leike-joins-anthropic
-    notes: "Resigned from OpenAI in May 2024, citing safety concerns; joined Anthropic same month to lead Alignment Science team"
-
-  - id: f_gW2pL8rA7m
-    property: role
-    value: "VP of Alignment Science"
-    asOf: 2024-05
-    source: https://anthropic.com/news/jan-leike-joins-anthropic
-    notes: "VP leading alignment science at Anthropic; focuses on scalable oversight, weak-to-strong generalization, and robustness to jailbreaks"
-
   - id: f_jL1aB2cD3e
     property: education
     value: "PhD in Machine Learning, Australian National University"
@@ -38,26 +16,3 @@ facts:
     value: "@janleike"
     source: https://x.com/janleike
 
-  - id: f_chtWwYTL4w
-    property: employed-by
-    value: !ref A4XoubikkQ
-    asOf: "2017"
-    validEnd: "2021"
-    source: https://jan.leike.name/
-    notes: "Research scientist at DeepMind working on agent alignment and reinforcement learning"
-
-  - id: f_NhWxgnXziQ
-    property: role
-    value: "Research Scientist"
-    asOf: "2017"
-    validEnd: "2021"
-    source: https://jan.leike.name/
-    notes: "At DeepMind, focused on reinforcement learning and alignment"
-
-  - id: f_cKkzVi4YBg
-    property: role
-    value: "Co-lead, Superalignment"
-    asOf: 2023-07
-    validEnd: 2024-05
-    source: https://openai.com/blog/introducing-superalignment
-    notes: "Co-led OpenAI Superalignment team with Ilya Sutskever; resigned May 2024 citing insufficient safety resources"
