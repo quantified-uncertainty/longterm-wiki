@@ -1,0 +1,121 @@
+entity: otUkuVHDKw
+facts:
+  # ── Organizational ──────────────────────────────────────────────
+  - id: f_8i8svAFkaw
+    property: founded-date
+    value: 2023-07
+    source: https://en.wikipedia.org/wiki/DeepSeek
+    notes: "Spun off from High-Flyer Quant as an independent AI research lab in July
+      2023; incorporated as Hangzhou DeepSeek Artificial Intelligence Basic Technology
+      Research Co., Ltd."
+
+  - id: f_0xSCmDaZEg
+    property: headquarters
+    value: "Hangzhou, Zhejiang, China"
+    source: https://en.wikipedia.org/wiki/DeepSeek
+    notes: "Headquartered in Hangzhou; parent company High-Flyer is also based there"
+
+  - id: f_56WVveJOgA
+    property: country
+    value: China
+    source: https://en.wikipedia.org/wiki/DeepSeek
+
+  - id: f_eoRYwd1hVw
+    property: founded-by-name
+    value: Liang Wenfeng
+    source: https://fortune.com/2025/01/27/deepseek-founder-liang-wenfeng-hedge-fund-manager-high-flyer-quant-trading/
+    notes: "Co-founder of High-Flyer hedge fund; serves as CEO of both High-Flyer and
+      DeepSeek"
+
+  - id: f_bdfkNTZIbw
+    property: legal-structure
+    value: "Private subsidiary of High-Flyer"
+    source: https://en.wikipedia.org/wiki/DeepSeek
+    notes: "84% owned by Liang Wenfeng; remainder held by individuals affiliated with
+      High-Flyer. No external VC funding as of early 2026."
+
+  - id: f_enTjirXUUA
+    property: website
+    value: https://www.deepseek.com
+    source: https://en.wikipedia.org/wiki/DeepSeek
+
+  - id: f_7Z4yCQzbHQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/DeepSeek
+    source: https://en.wikipedia.org/wiki/DeepSeek
+
+  # ── Headcount ───────────────────────────────────────────────────
+  - id: f_VX3CZVjbug
+    property: headcount
+    value: 160
+    asOf: 2025-01
+    source: https://seo.ai/blog/how-many-employees-does-deepseek-ai-have
+    notes: "Approximately 150-200 employees; LinkedIn lists 51-200 range. Relatively
+      small team for a frontier lab."
+
+  # ── Funding ─────────────────────────────────────────────────────
+  - id: f_2VCGO6sizA
+    property: total-funding
+    value: 0
+    asOf: 2025-03
+    source: https://techcrunch.com/2025/03/10/deepseek-isnt-taking-vc-money-yet-here-are-3-reasons-why/
+    notes: "DeepSeek has raised zero external VC funding. Entirely funded by
+      High-Flyer hedge fund. VCs were reluctant early on; company now declines
+      offers."
+
+  - id: f_VNYzXpqOeg
+    property: description
+    value: "Parent company High-Flyer manages approximately $8-10B in assets; hedge
+      fund averaged 56.6% returns in 2025, indirectly funding DeepSeek operations"
+    source: https://www.bloomberg.com/news/articles/2026-01-12/deepseek-founder-liang-s-funds-surge-57-as-china-quants-boom
+    notes: "High-Flyer AUM peaked at $12B before shrinking; 2025 returns helped fund
+      continued AI research"
+
+  # ── Model Details ───────────────────────────────────────────────
+  - id: f_qbe0bnJl8Q
+    property: model-parameters
+    value: 6.71e+11
+    asOf: 2024-12
+    source: https://arxiv.org/abs/2412.19437
+    notes: "DeepSeek-V3: 671B total parameters (MoE architecture), 37B activated per
+      token. Released December 2024."
+
+  - id: f_TCKCfktktg
+    property: description
+    value: "DeepSeek-V3 training cost approximately $5.58M using 2,788K H800 GPU
+      hours over ~2 months on 2,048 H800 GPUs"
+    asOf: 2024-12
+    source: https://arxiv.org/abs/2412.19437
+    notes: "Dramatically lower than comparable frontier models; pre-training on 14.8T
+      tokens"
+
+  - id: f_WjkJd6O9vA
+    property: description
+    value: "DeepSeek-R1 final training cost reported as $294K for RL stage; full
+      pipeline including base model ~$5.6M"
+    asOf: 2025-01
+    source: https://mlq.ai/news/deepseek-reveals-r1-model-training-cost-just-294000-in-peer-reviewed-nature-publication/
+    notes: "The $294K figure (per Nature paper) covers only the R1 RL training stage,
+      not the $5.6M V3 base model it builds upon"
+
+  # ── Users & Downloads ───────────────────────────────────────────
+  - id: f_59Kp1EvULg
+    property: cumulative-downloads
+    value: 5.72e+7
+    asOf: 2025-05
+    source: https://electroiq.com/stats/deepseek-ai-statistics/
+    notes: "57.2 million total app downloads by May 2025"
+
+  - id: f_dgcemsZ6oQ
+    property: monthly-active-users
+    value: 3.37e+7
+    asOf: 2025-01
+    source: https://www.demandsage.com/deepseek-statistics/
+    notes: "33.7 million MAU in January 2025 after R1 launch"
+
+  - id: f_02T5BrSkPw
+    property: monthly-active-users
+    value: 9.688e+7
+    asOf: 2025-04
+    source: https://www.demandsage.com/deepseek-statistics/
+    notes: "96.88 million MAU in April 2025; 25.81% increase over March"

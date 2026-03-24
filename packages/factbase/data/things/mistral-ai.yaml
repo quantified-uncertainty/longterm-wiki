@@ -1,0 +1,139 @@
+entity: RFHVboBnHg
+facts:
+  # ── Organizational ──────────────────────────────────────────────
+  - id: f_qt4DCXqnUw
+    property: founded-date
+    value: 2023-04
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "Founded April 2023 by Arthur Mensch (ex-Google DeepMind), Guillaume
+      Lample and Timothee Lacroix (both ex-Meta)"
+
+  - id: f_HAKYM9y3Sw
+    property: headquarters
+    value: "Paris, France"
+    source: https://mistral.ai/about
+    notes: "Headquartered in Paris; Europe's leading frontier AI company"
+
+  - id: f_U7ANQCVQGw
+    property: country
+    value: France
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+
+  - id: f_x90PPOWZbQ
+    property: founded-by-name
+    value: Arthur Mensch
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "CEO; formerly at Google DeepMind. Co-founders Guillaume Lample and
+      Timothee Lacroix were at Meta. All three met at Ecole Polytechnique."
+
+  - id: f_7V5SjA2xDQ
+    property: legal-structure
+    value: "Private company (SAS)"
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "French simplified joint-stock company (societe par actions simplifiee)"
+
+  - id: f_385ekJF6iA
+    property: website
+    value: https://mistral.ai
+    source: https://mistral.ai/about
+
+  - id: f_klZWruQFSA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Mistral_AI
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+
+  # ── Headcount ───────────────────────────────────────────────────
+  - id: f_CSa0ePCYZw
+    property: headcount
+    value: 862
+    asOf: 2026-02
+    source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
+    notes: "862 employees as of Feb 28, 2026 per Tracxn"
+
+  # ── Funding ─────────────────────────────────────────────────────
+  - id: f_AAtA1On16g
+    property: total-funding
+    value: 1.17e+8
+    asOf: 2023-06
+    source: https://www.polytechnique.edu/en/news/mistral-ai-french-ai-nugget-co-founded-two-x-alumni-raised-eu500-mlns-2023
+    notes: "Seed round of EUR105M ($117M); investors included Lightspeed Venture
+      Partners, Eric Schmidt, Xavier Niel"
+
+  - id: f_OnBjHPgr6g
+    property: total-funding
+    value: 5.28e+8
+    asOf: 2023-12
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "After Series A of EUR385M ($428M); cumulative ~$528M raised"
+
+  - id: f_askP9byerA
+    property: total-funding
+    value: 1.19e+9
+    asOf: 2024-06
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "After Series B of EUR600M (~$660M); cumulative ~$1.19B"
+
+  - id: f_PgaGTRoKvg
+    property: total-funding
+    value: 3.05e+9
+    asOf: 2025-09
+    source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
+    notes: "Total of $3.05B raised over 7 rounds; includes Series C of EUR1.7B
+      ($2B) led by ASML"
+
+  # ── Valuation ───────────────────────────────────────────────────
+  - id: f_EBAJlOJh2Q
+    property: valuation
+    value: 2.6e+8
+    asOf: 2023-06
+    source: https://aifundingtracker.com/mistral-ai-funding-unicorn-valuation/
+    notes: "Seed round post-money valuation; $260M valuation on $117M raised"
+
+  - id: f_DxtX0AahVA
+    property: valuation
+    value: 2e+9
+    asOf: 2023-12
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "Series A post-money valuation of approximately $2B"
+
+  - id: f_E5sGyVOYpQ
+    property: valuation
+    value: 6e+9
+    asOf: 2024-06
+    source: https://en.wikipedia.org/wiki/Mistral_AI
+    notes: "Series B post-money valuation of approximately $6B"
+
+  - id: f_uui3ueOjbQ
+    property: valuation
+    value: 1.4e+10
+    asOf: 2025-09
+    source: https://www.cnbc.com/2025/09/09/ai-firm-mistral-valued-at-14-billion-as-asml-takes-major-stake.html
+    notes: "Series C post-money valuation of EUR11.7B (~$14B); led by ASML with
+      participation from a16z, General Catalyst, DST Global"
+
+  # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_75QHFTc8ig
+    property: revenue
+    value: 3.3e+8
+    asOf: 2025-09
+    source: https://mlq.ai/news/mistral-ai-surges-revenue-20-fold-to-over-400-million-arr/
+    notes: "EUR300M ARR (~$330M) as of September 2025; 20x growth from prior year.
+      Revenue from model licensing, Chat Enterprise, and Le Chat consumer
+      subscriptions."
+
+  - id: f_7Xou3dBrAA
+    property: revenue
+    value: 1.1e+9
+    asOf: 2026-12
+    source: https://mlq.ai/news/mistral-ai-surges-revenue-20-fold-to-over-400-million-arr/
+    notes: "Target to exceed EUR1B (~$1.1B) in revenue by end of 2026
+      (forward-looking)"
+
+  # ── Product ─────────────────────────────────────────────────────
+  - id: f_MvZxq7j5sA
+    property: monthly-active-users
+    value: 4.2e+6
+    asOf: 2025-03
+    source: https://anthemcreation.com/en/artificial-intelligence/mistral-ai-le-chat-ia-better-chatgpt/
+    notes: "Le Chat had 4.2 million active users in its first month after February
+      2025 launch"
