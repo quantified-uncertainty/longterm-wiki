@@ -43,7 +43,7 @@ export interface FundingProgramRow {
 // ---------------------------------------------------------------------------
 
 function formatBudget(amount: number | null, currency: string): string {
-  if (amount == null) return "-";
+  if (amount == null || amount === 0) return "-";
   if (currency === "USD") {
     if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(2)}B`;
     if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1)}M`;

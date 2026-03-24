@@ -221,7 +221,7 @@ const app = new Hono()
       // Safety bound: ~700 pages × ~10 refs each ≈ 7k rows; 10k is a generous cap.
       .limit(10000);
 
-    // Group by pageId (skip rows with no recoverable slug)
+    // Group by pageId
     const byPage: Record<
       string,
       Array<{
@@ -233,9 +233,15 @@ const app = new Hono()
       }>
     > = {};
 
+    let orphanedCount = 0;
     for (const row of citationRows) {
       const pageId = row.pageSlug;
-      if (!pageId) continue;
+      if (!pageId) {
+        // Orphaned citation: page_citations.pageId doesn't match any wiki_pages row.
+        // This can happen when pages are deleted but their citations remain.
+        orphanedCount++;
+        continue;
+      }
       if (!byPage[pageId]) byPage[pageId] = [];
       byPage[pageId].push({
         referenceId: row.referenceId,
@@ -258,6 +264,7 @@ const app = new Hono()
       totalPages: Object.keys(byPage).length,
       totalClaimRefs: 0,
       totalCitations,
+      orphanedCitations: orphanedCount,
     });
   });
 

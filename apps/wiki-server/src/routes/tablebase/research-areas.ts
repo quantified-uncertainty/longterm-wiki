@@ -401,55 +401,54 @@ const researchAreasApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let upserted = 0;
+    const { items } = parsed.data;
+
+    const allVals = items.map((item) => ({
+      id: item.id,
+      wikiId: item.wikiId ?? null,
+      title: item.title,
+      description: item.description ?? null,
+      status: item.status,
+      cluster: item.cluster ?? null,
+      parentAreaId: item.parentAreaId ?? null,
+      firstProposed: item.firstProposed ?? null,
+      firstProposedYear: item.firstProposedYear ?? null,
+      tags: item.tags,
+      metadata: item.metadata,
+      source: item.source ?? null,
+      notes: item.notes ?? null,
+      syncedAt: now,
+      updatedAt: now,
+    }));
 
     await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(researchAreas)
-          .values({
-            id: item.id,
-            wikiId: item.wikiId ?? null,
-            title: item.title,
-            description: item.description ?? null,
-            status: item.status,
-            cluster: item.cluster ?? null,
-            parentAreaId: item.parentAreaId ?? null,
-            firstProposed: item.firstProposed ?? null,
-            firstProposedYear: item.firstProposedYear ?? null,
-            tags: item.tags,
-            metadata: item.metadata,
-            source: item.source ?? null,
-            notes: item.notes ?? null,
-            syncedAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: researchAreas.id,
-            set: {
-              wikiId: item.wikiId ?? null,
-              title: item.title,
-              description: item.description ?? null,
-              status: item.status,
-              cluster: item.cluster ?? null,
-              parentAreaId: item.parentAreaId ?? null,
-              firstProposed: item.firstProposed ?? null,
-              firstProposedYear: item.firstProposedYear ?? null,
-              tags: item.tags,
-              metadata: item.metadata,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
+      await tx
+        .insert(researchAreas)
+        .values(allVals)
+        .onConflictDoUpdate({
+          target: researchAreas.id,
+          set: {
+            wikiId: sql`excluded.wiki_id`,
+            title: sql`excluded.title`,
+            description: sql`excluded.description`,
+            status: sql`excluded.status`,
+            cluster: sql`excluded.cluster`,
+            parentAreaId: sql`excluded.parent_area_id`,
+            firstProposed: sql`excluded.first_proposed`,
+            firstProposedYear: sql`excluded.first_proposed_year`,
+            tags: sql`excluded.tags`,
+            metadata: sql`excluded.metadata`,
+            source: sql`excluded.source`,
+            notes: sql`excluded.notes`,
+            syncedAt: sql`excluded.synced_at`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
 
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
-        parsed.data.items.map((ra) => ({
+        items.map((ra) => ({
           id: ra.id,
           thingType: "research-area" as const,
           title: ra.title,
@@ -462,7 +461,7 @@ const researchAreasApp = new Hono()
       );
     });
 
-    return c.json({ upserted });
+    return c.json({ upserted: items.length });
   })
 
   // ---- POST /sync-organizations ----
@@ -479,33 +478,30 @@ const researchAreasApp = new Hono()
     }
 
     const db = getDrizzleDb();
-    let upserted = 0;
+    const { items } = parsed.data;
 
-    await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(researchAreaOrganizations)
-          .values({
-            researchAreaId: item.researchAreaId,
-            organizationId: item.organizationId,
-            role: item.role,
-            notes: item.notes ?? null,
-          })
-          .onConflictDoUpdate({
-            target: [
-              researchAreaOrganizations.researchAreaId,
-              researchAreaOrganizations.organizationId,
-            ],
-            set: {
-              role: item.role,
-              notes: item.notes ?? null,
-            },
-          });
-        upserted++;
-      }
-    });
+    const allVals = items.map((item) => ({
+      researchAreaId: item.researchAreaId,
+      organizationId: item.organizationId,
+      role: item.role,
+      notes: item.notes ?? null,
+    }));
 
-    return c.json({ upserted });
+    await db
+      .insert(researchAreaOrganizations)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          researchAreaOrganizations.researchAreaId,
+          researchAreaOrganizations.organizationId,
+        ],
+        set: {
+          role: sql`excluded.role`,
+          notes: sql`excluded.notes`,
+        },
+      });
+
+    return c.json({ upserted: items.length });
   })
 
   // ---- POST /sync-papers ----
@@ -522,25 +518,25 @@ const researchAreasApp = new Hono()
     }
 
     const db = getDrizzleDb();
-    let inserted = 0;
+    const { items } = parsed.data;
 
     // Group items by researchAreaId for delete+insert pattern
-    const byArea = new Map<string, typeof parsed.data.items>();
-    for (const item of parsed.data.items) {
+    const byArea = new Map<string, typeof items>();
+    for (const item of items) {
       const existing = byArea.get(item.researchAreaId) ?? [];
       existing.push(item);
       byArea.set(item.researchAreaId, existing);
     }
 
     await db.transaction(async (tx) => {
-      // Delete existing papers for each area being synced, then insert fresh
-      for (const [areaId, items] of byArea) {
+      // Delete existing papers for each area being synced, then bulk insert fresh
+      for (const [areaId, areaItems] of byArea) {
         await tx
           .delete(researchAreaPapers)
           .where(eq(researchAreaPapers.researchAreaId, areaId));
 
-        for (const item of items) {
-          await tx.insert(researchAreaPapers).values({
+        await tx.insert(researchAreaPapers).values(
+          areaItems.map((item) => ({
             researchAreaId: item.researchAreaId,
             resourceId: item.resourceId ?? null,
             title: item.title,
@@ -551,13 +547,12 @@ const researchAreasApp = new Hono()
             isSeminal: item.isSeminal,
             sortOrder: item.sortOrder,
             notes: item.notes ?? null,
-          });
-          inserted++;
-        }
+          }))
+        );
       }
     });
 
-    return c.json({ inserted });
+    return c.json({ inserted: items.length });
   })
 
   // ---- POST /sync-grant-links ----
@@ -574,41 +569,35 @@ const researchAreasApp = new Hono()
     }
 
     const db = getDrizzleDb();
-
-    // Bulk upsert using VALUES pattern
     const { items } = parsed.data;
     const now = new Date();
-    let upserted = 0;
 
     // Process in chunks to avoid too-large SQL statements
     const CHUNK_SIZE = 500;
     for (let i = 0; i < items.length; i += CHUNK_SIZE) {
       const chunk = items.slice(i, i + CHUNK_SIZE);
-      await db.transaction(async (tx) => {
-        for (const item of chunk) {
-          await tx
-            .insert(grantResearchAreas)
-            .values({
-              grantId: item.grantId,
-              researchAreaId: item.researchAreaId,
-              confidence: item.confidence,
-              createdAt: now,
-            })
-            .onConflictDoUpdate({
-              target: [
-                grantResearchAreas.grantId,
-                grantResearchAreas.researchAreaId,
-              ],
-              set: {
-                confidence: item.confidence,
-              },
-            });
-          upserted++;
-        }
-      });
+      await db
+        .insert(grantResearchAreas)
+        .values(
+          chunk.map((item) => ({
+            grantId: item.grantId,
+            researchAreaId: item.researchAreaId,
+            confidence: item.confidence,
+            createdAt: now,
+          }))
+        )
+        .onConflictDoUpdate({
+          target: [
+            grantResearchAreas.grantId,
+            grantResearchAreas.researchAreaId,
+          ],
+          set: {
+            confidence: sql`excluded.confidence`,
+          },
+        });
     }
 
-    return c.json({ upserted });
+    return c.json({ upserted: items.length });
   })
 
   // ---- POST /backfill-papers-from-citations ----
@@ -656,35 +645,32 @@ const researchAreasApp = new Hono()
     }
 
     const db = getDrizzleDb();
-    let upserted = 0;
+    const { items } = parsed.data;
 
-    await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(researchAreaRisks)
-          .values({
-            researchAreaId: item.researchAreaId,
-            riskId: item.riskId,
-            relevance: item.relevance,
-            effectiveness: item.effectiveness ?? null,
-            notes: item.notes ?? null,
-          })
-          .onConflictDoUpdate({
-            target: [
-              researchAreaRisks.researchAreaId,
-              researchAreaRisks.riskId,
-            ],
-            set: {
-              relevance: item.relevance,
-              effectiveness: item.effectiveness ?? null,
-              notes: item.notes ?? null,
-            },
-          });
-        upserted++;
-      }
-    });
+    const allVals = items.map((item) => ({
+      researchAreaId: item.researchAreaId,
+      riskId: item.riskId,
+      relevance: item.relevance,
+      effectiveness: item.effectiveness ?? null,
+      notes: item.notes ?? null,
+    }));
 
-    return c.json({ upserted });
+    await db
+      .insert(researchAreaRisks)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          researchAreaRisks.researchAreaId,
+          researchAreaRisks.riskId,
+        ],
+        set: {
+          relevance: sql`excluded.relevance`,
+          effectiveness: sql`excluded.effectiveness`,
+          notes: sql`excluded.notes`,
+        },
+      });
+
+    return c.json({ upserted: items.length });
   })
 
   // ---- GET /evaluations/dimensions — list all evaluation dimensions ----
@@ -823,42 +809,39 @@ const researchAreasApp = new Hono()
 
     const db = getDrizzleDb();
     const now = new Date();
-    let upserted = 0;
+    const { items } = parsed.data;
 
-    await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(researchAreaEvaluations)
-          .values({
-            researchAreaId: item.researchAreaId,
-            dimension: item.dimension,
-            score: item.score,
-            confidence: item.confidence ?? null,
-            reasoning: item.reasoning ?? null,
-            evaluatorType: item.evaluatorType,
-            evaluatorId: item.evaluatorId,
-            promptVersion: item.promptVersion ?? "",
-            evaluatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: [
-              researchAreaEvaluations.researchAreaId,
-              researchAreaEvaluations.dimension,
-              researchAreaEvaluations.evaluatorId,
-              researchAreaEvaluations.promptVersion,
-            ],
-            set: {
-              score: item.score,
-              confidence: item.confidence ?? null,
-              reasoning: item.reasoning ?? null,
-              evaluatedAt: now,
-            },
-          });
-        upserted++;
-      }
-    });
+    const allVals = items.map((item) => ({
+      researchAreaId: item.researchAreaId,
+      dimension: item.dimension,
+      score: item.score,
+      confidence: item.confidence ?? null,
+      reasoning: item.reasoning ?? null,
+      evaluatorType: item.evaluatorType,
+      evaluatorId: item.evaluatorId,
+      promptVersion: item.promptVersion ?? "",
+      evaluatedAt: now,
+    }));
 
-    return c.json({ upserted });
+    await db
+      .insert(researchAreaEvaluations)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          researchAreaEvaluations.researchAreaId,
+          researchAreaEvaluations.dimension,
+          researchAreaEvaluations.evaluatorId,
+          researchAreaEvaluations.promptVersion,
+        ],
+        set: {
+          score: sql`excluded.score`,
+          confidence: sql`excluded.confidence`,
+          reasoning: sql`excluded.reasoning`,
+          evaluatedAt: sql`excluded.evaluated_at`,
+        },
+      });
+
+    return c.json({ upserted: items.length });
   })
 
   // ---- POST /evaluations/recompute-scores — recompute consensus from evaluations ----
@@ -883,49 +866,50 @@ const researchAreasApp = new Hono()
         researchAreaEvaluations.dimension
       );
 
+    if (aggregated.length === 0) {
+      return c.json({ recomputed: 0 });
+    }
+
     const now = new Date();
-    let upserted = 0;
 
-    await db.transaction(async (tx) => {
-      for (const row of aggregated) {
-        const stdDev = row.stdDev ?? 0;
-        const modelAgreement = Math.max(0, 1 - stdDev / MAX_SCORE_STDDEV);
-
-        await tx
-          .insert(researchAreaScores)
-          .values({
-            researchAreaId: row.researchAreaId,
-            dimension: row.dimension,
-            meanScore: row.meanScore,
-            medianScore: row.medianScore,
-            stdDev: row.stdDev,
-            minScore: row.minScore,
-            maxScore: row.maxScore,
-            numEvaluators: row.numEvaluators,
-            modelAgreement,
-            lastComputed: now,
-          })
-          .onConflictDoUpdate({
-            target: [
-              researchAreaScores.researchAreaId,
-              researchAreaScores.dimension,
-            ],
-            set: {
-              meanScore: row.meanScore,
-              medianScore: row.medianScore,
-              stdDev: row.stdDev,
-              minScore: row.minScore,
-              maxScore: row.maxScore,
-              numEvaluators: row.numEvaluators,
-              modelAgreement,
-              lastComputed: now,
-            },
-          });
-        upserted++;
-      }
+    const allVals = aggregated.map((row) => {
+      const stdDev = row.stdDev ?? 0;
+      const modelAgreement = Math.max(0, 1 - stdDev / MAX_SCORE_STDDEV);
+      return {
+        researchAreaId: row.researchAreaId,
+        dimension: row.dimension,
+        meanScore: row.meanScore,
+        medianScore: row.medianScore,
+        stdDev: row.stdDev,
+        minScore: row.minScore,
+        maxScore: row.maxScore,
+        numEvaluators: row.numEvaluators,
+        modelAgreement,
+        lastComputed: now,
+      };
     });
 
-    return c.json({ recomputed: upserted });
+    await db
+      .insert(researchAreaScores)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          researchAreaScores.researchAreaId,
+          researchAreaScores.dimension,
+        ],
+        set: {
+          meanScore: sql`excluded.mean_score`,
+          medianScore: sql`excluded.median_score`,
+          stdDev: sql`excluded.std_dev`,
+          minScore: sql`excluded.min_score`,
+          maxScore: sql`excluded.max_score`,
+          numEvaluators: sql`excluded.num_evaluators`,
+          modelAgreement: sql`excluded.model_agreement`,
+          lastComputed: sql`excluded.last_computed`,
+        },
+      });
+
+    return c.json({ recomputed: allVals.length });
   });
 
 export const researchAreasRoute = researchAreasApp;
