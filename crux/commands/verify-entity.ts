@@ -561,12 +561,24 @@ ${c.bold}Examples:${c.reset}
   crux verify anthropic                    Verify Anthropic's facts and records
   crux verify anthropic --type=fact        Only verify Anthropic's FactBase facts
   crux verify anthropic --dry-run          See what would be verified
+  crux verify page <page-id>               Verify wiki page prose (cited vs uncited claims)
+  crux verify page <page-id> --quick       Just count cited vs uncited (no web search)
+  crux verify page <page-id> --deep        Also verify uncited claims against web
   crux verify stats                        Show overall verification statistics`,
       };
     }
 
     if (subcommand === 'stats') {
       return statsCommand();
+    }
+
+    if (subcommand === 'page') {
+      const { verifyPageCommand } = await import('./verify-page.ts');
+      const pageId = args[1];
+      if (!pageId) {
+        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep]' };
+      }
+      return verifyPageCommand(pageId, options);
     }
 
     if (subcommand === 'all') {
