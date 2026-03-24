@@ -56,33 +56,33 @@ facts:
     source: https://www.wikidata.org/wiki/Q27057835
     notes: From Wikidata Q27057835
 
-  - id: f_pai_partner_count
+  - id: f_vfOPhOwJQP
     property: partner-count
     value: "100"
     asOf: 2025
     source: https://partnershiponai.org/partners/
     notes: "100+ partner organizations including tech companies, civil society, academia, and media"
 
-  - id: f_pai_country
+  - id: f_7cjV8ehCYn
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
 
-  - id: f_pai_founding_members
+  - id: f_vNXxz4XBOd
     property: founding-members
     value: "Amazon, Facebook (Meta), Google, DeepMind, Microsoft, IBM"
     asOf: 2016-09
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
     notes: "Apple joined as a founding member in January 2017"
 
-  - id: f_pai_responsible_practices
+  - id: f_mzFQ2P1f6M
     property: program
     value: "ABOUT ML — framework and resources for transparency reporting on machine learning systems"
     asOf: 2023
     source: https://partnershiponai.org/workstream/about-ml/
     notes: "Key PAI workstream on ML documentation and transparency"
 
-  - id: f_pai_synthetic_media
+  - id: f_xxEEEDdNDP
     property: program
     value: "Responsible AI Synthetic Media Framework — guidelines for responsible development and use of synthetic media and deepfakes"
     asOf: 2023

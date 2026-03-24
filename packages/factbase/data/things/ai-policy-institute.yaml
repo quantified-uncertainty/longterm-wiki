@@ -22,7 +22,7 @@ facts:
     asOf: 2026-03
     source: https://theaipi.org/about/
 
-  - id: f_aipi_sff_2025
+  - id: f_vZve8M0opl
     property: grant-received
     value: "1635000"
     unit: USD
@@ -30,7 +30,7 @@ facts:
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant: $1,635,000 for general support"
 
-  - id: f_aipi_sff_2024
+  - id: f_BTIfaFnsU8
     property: grant-received
     value: "142000"
     unit: USD
@@ -38,14 +38,14 @@ facts:
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant: $142,000 for general support"
 
-  - id: f_aipi_poll_catastrophic
+  - id: f_PrRhuFieEu
     property: polling-finding
     value: "83% of Americans believe AI could accidentally cause a catastrophic event; 77% say government should do more to regulate AI; 73% believe AI companies should be liable for harms"
     asOf: 2024
     source: https://theaipi.org/
     notes: "Aggregate findings across multiple AIPI polls 2023-2024"
 
-  - id: f_aipi_poll_china
+  - id: f_BwLw7PxVYD
     property: polling-finding
     value: "Three out of four voters skeptical of 'race China' arguments for AI deregulation; 76% prefer candidates supporting AI regulation"
     asOf: 2024

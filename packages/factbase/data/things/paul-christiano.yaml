@@ -68,7 +68,7 @@ facts:
 
   - id: f_He1SsMRfAw
     property: employed-by
-    value: us-aisi
+    value: !ref fYyAxYlHDQ
     asOf: 2024-08
     source: https://www.nist.gov/people/paul-christiano
     notes: "Stepped back from day-to-day ARC operations in 2023 after a brain

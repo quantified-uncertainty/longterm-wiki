@@ -1,23 +1,23 @@
 entity: inudUfk9Ix
 facts:
-  - id: f_top_founded
+  - id: f_DUlOnUqRGd
     property: founded-date
     value: "2022-01"
     source: https://techoversight.org/about-us/
     notes: "Founded January 2022"
 
-  - id: f_top_hq
+  - id: f_zh0PraFK3d
     property: headquarters
     value: "Washington, DC"
     source: https://techoversight.org/about-us/
 
-  - id: f_top_leadership
+  - id: f_DIzVAZzFGY
     property: leadership
     value: "Sacha Haworth serves as Executive Director (previously DCCC, House Majority PAC, American Bridge 21st Century)"
     asOf: 2026-03
     source: https://techoversight.org/about-us/
 
-  - id: f_top_funding
+  - id: f_nmDIqCKoRg
     property: funding-sources
     value: "100% philanthropic — funded by Omidyar Network and Economic Security Project Action"
     asOf: 2026

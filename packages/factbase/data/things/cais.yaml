@@ -21,7 +21,7 @@ facts:
     source: https://www.wikidata.org/wiki/Q119084607
     notes: From Wikidata Q119084607
 
-  - id: f_cais_description
+  - id: f_1BWsBJuBcg
     property: description
     value: >-
       The Center for AI Safety (CAIS) is a San Francisco-based nonprofit focused on
@@ -32,35 +32,35 @@ facts:
     asOf: 2025
     source: https://www.safe.ai/about
 
-  - id: f_cais_director
+  - id: f_Alru3kK8mb
     property: key-person
     value:
-      - dan-hendrycks
+      - !ref VoNqoBJkyg
     asOf: 2025
     source: https://www.safe.ai/about
     notes: "Dan Hendrycks serves as Executive & Research Director"
 
-  - id: f_cais_compute_cluster
+  - id: f_2nM7F6dimB
     property: infrastructure
     value: "Compute cluster with 80+ NVIDIA A100 GPUs available for AI safety researchers"
     asOf: 2024
     source: https://www.safe.ai/compute
     notes: "Major infrastructure investment; provides compute to safety researchers who may lack institutional access"
 
-  - id: f_cais_statement_risk
+  - id: f_JDvO7S37HY
     property: campaign
     value: "Statement on AI Risk (May 2023): one-sentence statement 'Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war.' Signed by 350+ AI leaders including Geoffery Hinton, Demis Hassabis, Sam Altman, and Dario Amodei."
     asOf: 2023-05
     source: https://www.safe.ai/statement-on-ai-risk
 
-  - id: f_cais_ml_safety_scholars
+  - id: f_qSFmYhdDFx
     property: program
     value: "ML Safety Scholars — educational program training hundreds of students in AI safety fundamentals. Includes online course, reading groups, and mentorship."
     asOf: 2024
     source: https://www.mlsafety.org/
     notes: "Key field-building program"
 
-  - id: f_cais_revenue_2024
+  - id: f_HC5iejEJyY
     property: revenue
     value: "10235085"
     unit: USD
@@ -68,7 +68,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310."
 
-  - id: f_cais_revenue_2023
+  - id: f_UgwULHbsZr
     property: revenue
     value: "16089191"
     unit: USD
@@ -76,14 +76,14 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990"
 
-  - id: f_cais_expenses_2024
+  - id: f_DrCHRnYm9V
     property: annual-expenses
     value: "7163607"
     unit: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
 
-  - id: f_cais_op_grant_2023
+  - id: f_JKwyv80ODu
     property: grant-received
     value: "8500000"
     unit: USD
@@ -91,7 +91,7 @@ facts:
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/
     notes: "Open Philanthropy general support grant to CAIS, 2023"
 
-  - id: f_cais_sff_2024
+  - id: f_2o7SVDOLcV
     property: grant-received
     value: "2767000"
     unit: USD
@@ -99,33 +99,33 @@ facts:
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024: $1,146K to CAIS Inc + $1,621K to CAIS Action Fund = $2,767K total"
 
-  - id: f_cais_hendrycks_salary
+  - id: f_JwpqYYKOyt
     property: compensation
     value: "Dan Hendrycks takes $1 annual salary as Executive Director"
     asOf: 2025
     source: https://safe.ai/about
 
-  - id: f_cais_board
+  - id: f_W7bBjifjvv
     property: board-member
     value: "Jaan Tallinn"
     asOf: 2024
     source: https://washingtonainetwork.com/2024/07/29/center-for-ai-safety-hosts-dc-launch-event/
 
-  - id: f_cais_pub_mmlu
+  - id: f_mGXpFffUh7
     property: publication
     value: "Measuring Massive Multitask Language Understanding (MMLU) — widely-used benchmark for evaluating LLM capabilities across 57 academic subjects"
     asOf: 2021-01
     source: https://arxiv.org/abs/2009.03300
     notes: "Created by Hendrycks et al.; became one of the most-cited AI benchmarks"
 
-  - id: f_cais_pub_rep_eng
+  - id: f_4j56kTwGW5
     property: publication
     value: "Representation Engineering: A Top-Down Approach to AI Transparency — proposes methods to read and control LLM internal representations for safety"
     asOf: 2023-10
     source: https://arxiv.org/abs/2310.01405
     notes: "By Zou, Phan, Chen, Campbell, Guo, Ren, Pan, Yin, Mazeika, Dombrowski, Goel, Li, Byun, Wang, Mallen, Basart, Koyejo, Song, Li, Hendrycks"
 
-  - id: f_cais_pub_wmdp
+  - id: f_apd264NL5h
     property: publication
     value: "The WMDP Benchmark: Measuring and Reducing Malicious Use With Unlearning — benchmark for evaluating dual-use AI capabilities in biosecurity, cybersecurity, and chemical weapons"
     asOf: 2024-03

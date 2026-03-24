@@ -20,5 +20,5 @@ facts:
   - id: f_iDz4FQ7lLm
     property: founded-by
     value:
-      - quri
+      - !ref Khej79OA8g
     notes: Created at QURI by Ozzie Gooen

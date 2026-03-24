@@ -15,5 +15,5 @@ facts:
   - id: f_kFB6HS9nNo
     property: founded-by
     value:
-      - fri
+      - !ref KslhqGaeJw
     notes: Organized by Forecasting Research Institute (FRI) under Philip Tetlock

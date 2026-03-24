@@ -44,24 +44,24 @@ facts:
     asOf: 2026-03
     source: https://www.rand.org/about.html
 
-  - id: f_rand_cast
+  - id: f_VD9Q5KMHWt
     property: program
     value: "RAND Center on AI, Security, and Technology (RAND CAST) — formerly TASP. Founded by Sella Nevo. Focus: frontier AI policy, AI governance, biosecurity, cybersecurity. Includes fellows program and collaborates with METR on Canary AI safety evaluation project ($10M via Audacious Project)."
     asOf: 2026-03
     source: https://www.rand.org/global-and-emerging-risks/centers/ai-security-and-technology.html
 
-  - id: f_rand_ceo
+  - id: f_5DymCTaLkT
     property: leadership
     value: "Jason Matheny serves as CEO and President (since 2022). Former founding director of CSET at Georgetown, former IARPA director, former White House OSTP."
     asOf: 2026-03
     source: https://www.rand.org/about/people/m/matheny_jason.html
 
-  - id: f_rand_ffrdc
+  - id: f_cCq99uFrzY
     property: organizational-structure
     value: "Operates 4 federally funded research and development centers (FFRDCs): Project AIR FORCE (1946), Arroyo Center (Army, 1982), NDRI (OSD/Joint Staff), and Homeland Security Operational Analysis Center"
     source: https://www.rand.org/about/ffrdc.html
 
-  - id: f_rand_op_funding
+  - id: f_lMgspCVlPG
     property: cumulative-funding
     value: "34500000"
     unit: USD
