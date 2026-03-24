@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, desc, gte, lte, sql } from "drizzle-orm";
+import { eq, and, count, desc, gte, lte, sql, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { blueskyAccounts, blueskyPosts, entities } from "../../schema.js";
+import { blueskyAccounts, blueskyPosts, entities, resources } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -28,8 +28,8 @@ const PostsQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
   offset: z.coerce.number().int().min(0).default(0),
   accountDid: z.string().optional(),
-  dateFrom: z.string().optional(),
-  dateTo: z.string().optional(),
+  dateFrom: z.string().datetime({ message: "dateFrom must be an ISO-8601 datetime string" }).optional(),
+  dateTo: z.string().datetime({ message: "dateTo must be an ISO-8601 datetime string" }).optional(),
   minLikes: z.coerce.number().int().min(0).optional(),
 });
 
@@ -87,6 +87,11 @@ interface BlueskyFeedItem {
         title?: string;
       };
     };
+  };
+  /** Present when the feed item is a repost — indicates the item is not an original post */
+  reason?: {
+    $type: string;
+    by?: { did: string; handle: string };
   };
 }
 
@@ -373,12 +378,13 @@ const blueskyApp = new Hono()
       return c.json({ error: "not_found", message: `No account with DID ${did}` }, 404);
     }
 
-    // Fetch updated profile
-    const profile = await fetchBlueskyProfile(account.handle);
+    // Fetch updated profile using the stable DID (handles can change)
+    const profile = await fetchBlueskyProfile(did);
     if (profile) {
       await db
         .update(blueskyAccounts)
         .set({
+          handle: profile.handle,
           displayName: profile.displayName ?? account.displayName,
           description: profile.description ?? account.description,
           followerCount: profile.followersCount ?? account.followerCount,
@@ -389,12 +395,36 @@ const blueskyApp = new Hono()
         .where(eq(blueskyAccounts.did, did));
     }
 
-    // Fetch posts
-    const feedItems = await fetchBlueskyPosts(account.handle);
+    // Fetch posts — filter out reposts (items with a reason field) so we only
+    // persist original posts authored by the account itself.
+    const rawFeedItems = await fetchBlueskyPosts(did);
+    const feedItems = rawFeedItems.filter((item) => !item.reason);
     const now = new Date();
     let upserted = 0;
 
     if (feedItems.length > 0) {
+      // Build a URL→resourceId lookup for embedded URLs so we can populate
+      // the resource bridge. Collect all non-null URLs from the feed items.
+      const embeddedUrls = feedItems
+        .map((item) => extractEmbeddedUrl(item).url)
+        .filter((u): u is string => u != null);
+
+      const urlToResourceId = new Map<string, string>();
+      if (embeddedUrls.length > 0) {
+        const matchedResources = await db
+          .select({ id: resources.id, url: resources.url })
+          .from(resources)
+          .where(inArray(resources.url, embeddedUrls));
+        for (const r of matchedResources) {
+          urlToResourceId.set(r.url, r.id);
+        }
+      }
+
+      // Derive entity bridge from the account's entityStableId (if linked)
+      const entityStableIds = account.entityStableId
+        ? [account.entityStableId]
+        : null;
+
       const postValues = feedItems.map((item) => {
         const { url, title } = extractEmbeddedUrl(item);
         return {
@@ -410,6 +440,8 @@ const blueskyApp = new Hono()
           embeddedUrl: url,
           embeddedTitle: title,
           replyToUri: item.post.record.reply?.parent?.uri ?? null,
+          resourceId: (url && urlToResourceId.get(url)) ?? null,
+          entityStableIds,
           fetchedAt: now,
         };
       });
@@ -436,6 +468,8 @@ const blueskyApp = new Hono()
                 embeddedUrl: sql`excluded.embedded_url`,
                 embeddedTitle: sql`excluded.embedded_title`,
                 replyToUri: sql`excluded.reply_to_uri`,
+                resourceId: sql`excluded.resource_id`,
+                entityStableIds: sql`excluded.entity_stable_ids`,
                 fetchedAt: sql`excluded.fetched_at`,
               },
             });

@@ -272,9 +272,9 @@ export function getHelp(): string {
 Bluesky Domain — Track Bluesky accounts and sync their posts
 
 Commands:
-  accounts           List all tracked accounts (default)
-  add <handle>       Add a Bluesky account to track
-  sync <handle>      Sync posts from a tracked account
+  accounts                    List all tracked accounts (default)
+  add <handle>                Add a Bluesky account to track
+  sync <handle-or-did>        Sync posts from a tracked account (accepts handle or DID)
 
 Options:
   --tags=tag1,tag2   Relevance tags when adding an account
@@ -286,6 +286,7 @@ Options:
 Examples:
   crux tb bluesky accounts                           List tracked accounts
   crux tb bluesky add danielfilan.bsky.social --tags=ai-safety
-  crux tb bluesky sync danielfilan.bsky.social       Fetch recent posts
+  crux tb bluesky sync danielfilan.bsky.social       Fetch recent posts (by handle)
+  crux tb bluesky sync did:plc:abc123                Fetch recent posts (by DID)
 `;
 }
