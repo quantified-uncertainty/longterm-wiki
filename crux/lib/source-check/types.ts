@@ -19,6 +19,35 @@ export interface LlmSourceCheckResult {
   reasoning: string;
 }
 
+/** Category of a wiki page verification item */
+export type WikiPageVerifyCategory =
+  | 'sourced-claim'
+  | 'unfootnoted-claim'
+  | 'cross-ref-claim'
+  | 'stale-temporal-claim';
+
+/**
+ * A verification item extracted from a wiki page's prose content.
+ *
+ * Each item represents a factual claim that can be verified in some way:
+ * - sourced-claim: Has a footnote URL, can be checked against the source
+ * - unfootnoted-claim: Factual assertion without any citation
+ * - cross-ref-claim: Claim value appears to conflict with FactBase data
+ * - stale-temporal-claim: References a date/year that may be outdated
+ */
+export interface WikiPageVerifyItem {
+  pageSlug: string;
+  claimText: string;
+  claimType: string;  // ExtractedClaim.type
+  category: WikiPageVerifyCategory;
+  sourceUrl?: string;        // For sourced claims
+  footnoteNumber?: number;   // For sourced claims
+  factId?: string;           // For cross-ref claims
+  factValue?: string;        // For cross-ref claims
+  sourceContext: string;     // Original text around the claim
+  priority: number;          // Higher = more important to verify
+}
+
 /** Constants shared across source-check modules */
 export const SOURCE_CHECK_CONSTANTS = {
   MAX_CONTENT_LENGTH: 8000,
