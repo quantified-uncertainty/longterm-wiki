@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
+import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
 
 /**
  * GET /api/verification-names-proxy?record_type=...&record_ids=id1,id2,...
  *
- * Proxies verification name resolution requests to the wiki-server's
- * /api/verifications/resolve-names endpoint.
- * Returns { names: Record<string, string> } mapping record IDs to human-readable names.
+ * Resolves record IDs to human-readable names.
+ *
+ * For `record_type=entity`: resolves locally from database.json (no wiki-server needed).
+ * Returns { names: Record<string, string>, hrefs: Record<string, string> }.
+ *
+ * For all other types: proxies to the wiki-server's /api/verifications/resolve-names endpoint.
+ * Returns { names: Record<string, string> }.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -35,6 +40,28 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Entity resolution: use local database.json (fast, no wiki-server dependency)
+  if (recordType === "entity") {
+    const ids = recordIds.split(",").filter(Boolean);
+    const names: Record<string, string> = {};
+    const hrefs: Record<string, string> = {};
+    const registry = getIdRegistry();
+
+    for (const stableId of ids) {
+      const entity = getTypedEntityByStableId(stableId);
+      if (entity) {
+        names[stableId] = entity.title;
+        const wikiId = registry.bySlug[entity.id];
+        if (wikiId) {
+          hrefs[stableId] = `/wiki/${wikiId}`;
+        }
+      }
+    }
+
+    return NextResponse.json({ names, hrefs });
+  }
+
+  // All other types: proxy to wiki-server
   const config = getWikiServerConfig();
   if (!config) {
     return NextResponse.json(
