@@ -79,6 +79,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'research-areas',
       'source-check',
       'source-check-orchestrate',
+      'migrate-citations',
       'legislation',
       'bluesky',
     ],

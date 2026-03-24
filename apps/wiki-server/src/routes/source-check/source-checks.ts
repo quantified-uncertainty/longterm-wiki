@@ -19,6 +19,7 @@ import {
   divisions,
   things,
   facts,
+  wikiPages,
 } from "../../schema.js";
 import {
   zv,
@@ -566,6 +567,39 @@ const sourceChecksApp = new Hono()
           names[row.stableId] = row.title;
         }
       }
+    } else if (record_type === "citation") {
+      // Citation record IDs have format "page:<slug>:fn<N>".
+      // Resolve to "<page title> - Footnote N".
+      const slugSet = new Set<string>();
+      const parsed: Array<{ recordId: string; slug: string; footnote: string }> = [];
+      for (const rid of record_ids) {
+        const match = rid.match(/^page:(.+):fn(\d+)$/);
+        if (match) {
+          slugSet.add(match[1]);
+          parsed.push({ recordId: rid, slug: match[1], footnote: match[2] });
+        } else {
+          // Fallback: use the raw ID
+          names[rid] = rid;
+        }
+      }
+
+      if (slugSet.size > 0) {
+        const slugArray = [...slugSet];
+        const rows = await db
+          .select({ slug: wikiPages.slug, title: wikiPages.title })
+          .from(wikiPages)
+          .where(inArray(wikiPages.slug, slugArray));
+
+        const titleMap = new Map<string, string>();
+        for (const row of rows) {
+          titleMap.set(row.slug, row.title);
+        }
+
+        for (const p of parsed) {
+          const pageTitle = titleMap.get(p.slug) ?? p.slug;
+          names[p.recordId] = `${pageTitle} - Footnote ${p.footnote}`;
+        }
+      }
     } else {
       // Generic fallback: use the things table
       const rows = await db
@@ -620,6 +654,8 @@ const sourceChecksApp = new Hono()
       SELECT 'benchmark-result', count(*)::int FROM benchmark_results
       UNION ALL
       SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
+      UNION ALL
+      SELECT 'citation', count(*)::int FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
     `);
 
     const totalsByType: Record<string, number> = {};
