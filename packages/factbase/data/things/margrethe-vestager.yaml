@@ -8,3 +8,10 @@ facts:
     source: "https://en.wikipedia.org/wiki/Margrethe_Vestager"
     notes: "At European Commission. Led the EU AI Act negotiations; oversaw tech regulation including the Digital Services
       Act"
+  - id: "EejQ91jYJg"
+    property: "employed-by"
+    value: !ref 3zsTSX6SFK
+    asOf: "2014"
+    validEnd: "2024"
+    source: "https://en.wikipedia.org/wiki/Margrethe_Vestager"
+    notes: "Led the EU AI Act negotiations; oversaw tech regulation including the Digital Services Act"

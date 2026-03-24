@@ -43,3 +43,10 @@ facts:
     asOf: "2014"
     source: "https://futureoflife.org/"
     notes: "Co-founded FLI with Max Tegmark; major funder of AI safety research"
+  - id: "CrCk6PqqMw"
+    property: "employed-by"
+    value: !ref EV4KoPMRXU
+    asOf: "2003"
+    validEnd: "2008"
+    source: "https://en.wikipedia.org/wiki/Jaan_Tallinn"
+    notes: "Co-founding engineer of Skype; wrote core networking code"

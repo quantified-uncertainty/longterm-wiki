@@ -7,3 +7,9 @@ facts:
     source: "https://en.wikipedia.org/wiki/Scott_Wiener"
     notes: "At California State Senate. Author of SB 1047 (the California AI safety bill); key figure in state-level AI
       regulation"
+  - id: "ksqOVnnvFg"
+    property: "employed-by"
+    value: !ref Zs39rHaxoS
+    asOf: "2016"
+    source: "https://en.wikipedia.org/wiki/Scott_Wiener"
+    notes: "Author of SB 1047 (the California AI safety bill); key figure in state-level AI regulation"

@@ -8298,3 +8298,79 @@
     Quantitative trading firm founded by Sam Bankman-Fried in 2017. Collapsed
     alongside FTX in November 2022.
   lastUpdated: 2026-03
+
+- id: skype
+  stableId: EV4KoPMRXU
+  type: organization
+  orgType: generic
+  title: Skype
+  description: >-
+    VoIP and messaging platform co-founded by Jaan Tallinn. Acquired by eBay
+    (2005), then Microsoft (2011). Tallinn's wealth from Skype funds AI safety.
+  lastUpdated: 2026-03
+
+- id: trail-of-bits
+  stableId: c1q7QvDw90
+  type: organization
+  orgType: generic
+  title: Trail of Bits
+  website: https://www.trailofbits.com
+  description: >-
+    Security research and consulting firm. AI assurance division led by Heidy
+    Khlaaf. Works on formal verification and safety-critical systems.
+  lastUpdated: 2026-03
+
+- id: craft-ventures
+  stableId: MZVf6KA9Oa
+  type: organization
+  orgType: funder
+  title: Craft Ventures
+  website: https://www.craftventures.com
+  description: >-
+    Venture capital firm co-founded by David Sacks. Invests in AI and crypto.
+  lastUpdated: 2026-03
+
+- id: us-executive-branch
+  stableId: l7Z8a6jAez
+  type: organization
+  orgType: government
+  title: United States Executive Branch
+  website: https://www.whitehouse.gov
+  description: >-
+    Executive branch of the US federal government. Includes the White House,
+    OSTP, and executive agencies. Relevant for AI executive orders and the
+    establishment of the US AI Safety Institute.
+  lastUpdated: 2026-03
+
+- id: california-state-legislature
+  stableId: Zs39rHaxoS
+  type: organization
+  orgType: government
+  title: California State Legislature
+  website: https://www.legislature.ca.gov
+  description: >-
+    Bicameral legislature of California. Source of SB 1047 and other AI
+    regulation bills.
+  lastUpdated: 2026-03
+
+- id: california-governor-office
+  stableId: 2kdYcoKUif
+  type: organization
+  orgType: government
+  title: Office of the Governor of California
+  website: https://www.gov.ca.gov
+  description: >-
+    Executive office of the California governor. Vetoed SB 1047 AI safety
+    bill in September 2024.
+  lastUpdated: 2026-03
+
+- id: european-commission
+  stableId: 3zsTSX6SFK
+  type: organization
+  orgType: government
+  title: European Commission
+  website: https://commission.europa.eu
+  description: >-
+    Executive branch of the European Union. Led the EU AI Act negotiations.
+    Margrethe Vestager served as Executive VP for Competition and Digital.
+  lastUpdated: 2026-03

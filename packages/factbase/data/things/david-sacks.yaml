@@ -36,3 +36,9 @@ facts:
     asOf: "2017"
     source: "https://en.wikipedia.org/wiki/David_O._Sacks"
     notes: "At Craft Ventures. VC firm; previously COO of PayPal and CEO of Yammer; AI/Crypto investor"
+  - id: "bpOVmoj45Q"
+    property: "employed-by"
+    value: !ref MZVf6KA9Oa
+    asOf: "2017"
+    source: "https://en.wikipedia.org/wiki/David_O._Sacks"
+    notes: "VC firm; previously COO of PayPal and CEO of Yammer; AI/Crypto investor"
