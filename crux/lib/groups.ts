@@ -54,6 +54,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'auto-verify-stakeholders',
       'extract-structured-data',
       'verify-consistency',
+      'source-check-wiki-pages',
     ],
     flattened: ['content'],
   },

@@ -19,6 +19,7 @@ import {
   divisions,
   things,
   facts,
+  wikiPages,
 } from "../../schema.js";
 import {
   zv,
@@ -566,6 +567,16 @@ const sourceChecksApp = new Hono()
           names[row.stableId] = row.title;
         }
       }
+    } else if (record_type === "wiki-page") {
+      // Resolve page slugs to page titles
+      const rows = await db
+        .select({ slug: wikiPages.slug, title: wikiPages.title })
+        .from(wikiPages)
+        .where(inArray(wikiPages.slug, record_ids));
+
+      for (const row of rows) {
+        names[row.slug] = row.title;
+      }
     } else {
       // Generic fallback: use the things table
       const rows = await db
@@ -620,6 +631,8 @@ const sourceChecksApp = new Hono()
       SELECT 'benchmark-result', count(*)::int FROM benchmark_results
       UNION ALL
       SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
+      UNION ALL
+      SELECT 'wiki-page', count(*)::int FROM wiki_pages
     `);
 
     const totalsByType: Record<string, number> = {};
