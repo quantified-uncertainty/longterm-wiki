@@ -193,7 +193,7 @@ async function migrateCommand(
   const limit = options.limit ? parseInt(options.limit, 10) : undefined;
 
   if (limit !== undefined && (isNaN(limit) || limit < 1)) {
-    return { success: false, message: '--limit must be a positive integer' };
+    return { exitCode: 1, output: '--limit must be a positive integer' };
   }
 
   console.log(`${LOG_PREFIX} Starting citation migration${dryRun ? ' (DRY RUN)' : ''}...`);
@@ -318,8 +318,8 @@ async function migrateCommand(
   console.log(summary);
 
   return {
-    success: errors === 0,
-    message: `Migrated ${migrated} citations${dryRun ? ' (dry run)' : ''}, ${skipped} skipped, ${errors} errors`,
+    exitCode: errors > 0 ? 1 : 0,
+    output: `Migrated ${migrated} citations${dryRun ? ' (dry run)' : ''}, ${skipped} skipped, ${errors} errors`,
   };
 }
 

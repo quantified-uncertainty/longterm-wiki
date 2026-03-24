@@ -318,7 +318,7 @@ async function storeClaimResult(
 ): Promise<void> {
   // Store evidence
   await storeSourceCheckEvidence({
-    recordType: 'wiki-page' as any,
+    recordType: 'wiki-page',
     recordId: pageSlug,
     sourceUrl: result.sourceUrl,
     verdict: result.verdict,
@@ -361,7 +361,7 @@ async function storePageVerdict(
   ].filter(Boolean).join('. ');
 
   await storeAggregateVerdict({
-    recordType: 'wiki-page' as any,
+    recordType: 'wiki-page',
     recordId: pageSlug,
     verdict: aggregateVerdict,
     confidence,
@@ -475,7 +475,7 @@ async function processPage(
 
         // Store as evidence
         await storeSourceCheckEvidence({
-          recordType: 'wiki-page' as any,
+          recordType: 'wiki-page',
           recordId: pageSlug,
           sourceUrl: '',
           verdict: 'contradicted',
@@ -508,7 +508,7 @@ async function processPage(
 
         // Store as evidence
         await storeSourceCheckEvidence({
-          recordType: 'wiki-page' as any,
+          recordType: 'wiki-page',
           recordId: pageSlug,
           sourceUrl: '',
           verdict: 'outdated',

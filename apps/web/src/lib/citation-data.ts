@@ -143,6 +143,9 @@ export interface SourceCheckCitationVerdict {
  * This is a server-side function — only call from Server Components or
  * server-side data fetching. Returns an empty array if the wiki-server
  * is unavailable.
+ *
+ * NOTE: Currently fetches up to 200 citation verdicts and filters client-side.
+ * If citation count exceeds 200, add a server-side record_id prefix filter.
  */
 export async function getSourceCheckVerdicts(
   pageSlug: string,

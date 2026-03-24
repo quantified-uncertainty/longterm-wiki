@@ -579,11 +579,6 @@ function computeRecordPriority(
     'entity-assessment': 10,
     'equity-position': 10,
     'policy-stakeholder': 10,
-    'publication': 15,
-    'benchmark-result': 10,
-    'entity-event': 15,
-    'entity-assessment': 10,
-    'secondary-market-price': 10,
   };
   priority += recordTypePriority[recordType] ?? 0;
 
