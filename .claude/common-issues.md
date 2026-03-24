@@ -157,6 +157,26 @@ _Add new issues below as they're discovered. Group by category._
 
 ---
 
+## Entity Sync
+
+### Entity sync slug conflicts require multi-step workarounds (!! RECURRING)
+When entity data contains slug reassignments (same slug pointing to a new stableId), the entity sync endpoint (`apps/wiki-server/src/routes/tablebase/entities.ts`) can fail with unique constraint violations. This generated 8 consecutive fix PRs (#3095-#3105) after a single feature PR (#2971).
+
+**Root cause**: The sync endpoint tries to INSERT before cleaning up stale slug rows, or the unique constraint on slugs prevents the upsert pattern.
+
+**Prevention**: After any PR that modifies entity sync logic, run `pnpm crux tb sync` end-to-end with a test slug reassignment before merging. Consider adding an integration test for slug reassignment in `entities.ts`.
+
+**Fix pattern when it happens**: Clear stale slug rows before the batch INSERT, or drop/re-add the unique constraint inside the transaction. See PRs #3096-#3105 for the progression of fixes.
+
+### Bulk FactBase enrichment consistently leaves validation errors (!! RECURRING)
+Large content enrichment sessions (adding 20+ entities/facts) reliably produce follow-up validation-fix PRs. PR #3109 ("resolve all 246 KB validation errors") fixed errors introduced by 6 different feature PRs (#3060, #3033, #3073, #3082, #3072, #3107, #2985).
+
+**Prevention**: Before committing any bulk enrichment, run `pnpm crux w validate gate --scope=content` to catch dangling refs, invalid fact IDs, and stableId issues. For large enrichment sessions, validate incrementally (every 5-10 entities) rather than at the end.
+
+**Pattern**: Dangling EntityLink refs and invalid FactBase fact IDs are the most common errors - these only surface during gate validation, not during file editing.
+
+---
+
 ## Database Migrations
 
 ### Migration journal tag index conflicts break main CI
