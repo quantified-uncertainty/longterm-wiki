@@ -79,13 +79,13 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** Location verification is the prerequisite for export control verification treaties. Without it, no party can confirm that chips sold under a licensing regime have remained with authorized users. It also underpins training run registration regimes that tie permitted compute to specific facilities.
 
-**TRL assessment:** TRL 3–4. The underlying cryptographic primitives (secure enclaves, remote attestation protocols) exist in commercial silicon, but no production AI accelerator currently ships with verified, tamper-resistant location reporting designed for treaty purposes. The bipartisan Chip Security Act (May 2024) would have mandated such features; it has not passed as of early 2026.
+**TRL assessment:** TRL 4–5. [IAPS has demonstrated a working prototype](https://www.iaps.ai/research/location-verification-for-ai-chips) on Nvidia H100 chips using delay-based challenge-response, achieving verification within approximately 300 miles of a Singapore landmark server. Nvidia [piloted its own tracking software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell GPUs in December 2025. IAPS estimates a firmware-only implementation could be completed within 6 months at under \$1M, with a landmark network of 100–500 servers costing \$2.5–12.5M/year. The bipartisan [Chip Security Act](https://www.congress.gov/bill/119th-congress/house-bill/3447/text) (H.R.3447 / S.1705) would mandate location verification on export-controlled chips within 180 days of enactment; House Foreign Affairs Committee markup is scheduled for March 26, 2026.
 
-**Active developers:** <EntityLink id="E202">MIRI</EntityLink> SPAR projects led by Aaron Scher; arXiv work by O'Gara, Kulp, et al.; US government interest through the Trump AI Action Plan (July 2025).
+**Active developers:** [IAPS](https://www.iaps.ai/research/location-verification-for-ai-chips) (Erich Grunewald et al.—primary research group); Nvidia (commercial pilot); <EntityLink id="E202">MIRI</EntityLink> SPAR projects led by Aaron Scher; Future of Life Institute (James Petrie—identified existing encryption keys in Nvidia processors); O'Gara, Kulp, et al. (arXiv 2025); U.S. government interest through the Trump AI Action Plan (July 2025).
 
-**What remains:** Integrating location attestation into chip fabrication pipelines, hardening against spoofing attacks, resolving privacy concerns about continuous location reporting, and establishing the multilateral key infrastructure needed for third-party verification.
+**What remains:** Improving accuracy near export-control borders, hardening against spoofing attacks (sophisticated actors could tamper with message speeds), scaling to millions of chips, resolving privacy concerns, and establishing multilateral key infrastructure.
 
-**Estimated timeline:** Pilot-ready within 3–5 years for export control verification if a major chip manufacturer (e.g., NVIDIA, TSMC) commits to integration; broader treaty-grade deployment likely 5–10 years out.[^2][^3]
+**Estimated timeline:** Firmware-based pilot within 6–12 months if mandated by the Chip Security Act; broader treaty-grade deployment 3–5 years out.[^2][^3]
 
 ---
 
@@ -95,11 +95,11 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** TEEs are the enabling technology for IAEA-style monitoring of AI training runs. They allow an international auditor to verify that an approved evaluation or monitoring protocol was actually executed on a specific model, without accessing the model weights or training data directly. They also enable compute metering—logging total FLOPs consumed in a verifiable, tamper-resistant way.
 
-**TRL assessment:** TRL 5–6 for commercial confidential computing (NVIDIA H100 already supports some TEE functionality). TRL 2–3 for treaty-grade AI monitoring applications, which require additional protocol design, mutual agreement on approved code, and independent evaluation of the TEE's security assumptions.
+**TRL assessment:** TRL 5–6 for commercial confidential computing (NVIDIA H100 already supports TEE functionality; [NVIDIA Remote Attestation Service](https://docs.nvidia.com/attestation/index.html) is GA). TRL 3–4 for treaty-grade AI monitoring, thanks to the [UK AI Security Institute + Anthropic + OpenMined pilot](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/) (2025)—the most concrete governance deployment to date, which used H100 secure enclaves and AMD SEV-SNP on Azure to run privacy-preserving AI safety evaluations with cryptographic certificates proving only approved code ran.
 
-**Active developers:** NVIDIA (commercial); Oxford Martin AIGI researchers; O'Gara, Kulp, et al. (protocol design); the "FlexHEG" (Flexible Hardware-Enabled Guarantee) approach developed by Petrie et al. targets faster on-chip location and compute attestation without full chip redesign.[^3]
+**Active developers:** NVIDIA (commercial NRAS service, [go-nvtrust](https://github.com/NVIDIA/go-nvtrust) open-source attestation); UK AISI + Anthropic + [OpenMined](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/) (governance pilot); Intel Trust Authority (composite CPU+GPU attestation); Oxford Martin AIGI researchers; O'Gara, Kulp, et al.; Petrie et al. ("FlexHEG" approach). [Caliptra 2.1](https://www.chipsalliance.org/news/caliptra2-1/) (AMD/Google/Microsoft/Nvidia under CHIPS Alliance)—an open-source silicon root of trust with quantum-resilient cryptography—is the most promising standardization effort and could become the cross-vendor governance foundation.
 
-**What remains:** Standardizing what an AI monitoring TEE must certify (compute quantity, cluster configuration, model behavior properties); conducting adversarial red-teaming of current TEE implementations; establishing mutual evaluation protocols between nations; and resolving IP protection concerns that arise when model internals are proximate to a verified computation.
+**What remains:** Standardizing what an AI monitoring TEE must certify; adversarial red-teaming (known vulnerabilities include "BatteringRAM" attestation replay and "TEE fail" TDX signing key leak—AMD and Intel consider physical attacks out-of-scope); establishing mutual evaluation protocols between nations; and resolving IP protection concerns.
 
 **Estimated timeline:** Prototype treaty-grade TEE monitoring plausibly within 2–4 years; deployment in a real agreement likely 5–8 years out.[^2]
 
@@ -111,9 +111,9 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** Compute metering is the core mechanism for compute allocation treaties that cap how many FLOPs a party can use for AI training above a threshold. It is also necessary for training run registration regimes in which parties declare frontier training runs in advance and regulators verify that declared compute matches actual usage.
 
-**TRL assessment:** TRL 3–4. Compute logging exists in current chips for internal performance monitoring, but treaty-grade metering requires tamper-resistant accumulation, cryptographic signing, and secure reporting channels not present in commercial silicon.
+**TRL assessment:** TRL 3–4. Compute logging exists in current chips for internal performance monitoring, but treaty-grade metering requires tamper-resistant accumulation, cryptographic signing, and secure reporting channels not present in commercial silicon. A key commercial precedent exists: [Intel On Demand](https://www.intel.com/content/www/us/en/products/docs/xeon-accelerated/on-demand-technology-brief.html) already uses cryptographic licensing to unlock chip functionality, demonstrating the concept works at scale.
 
-**Active developers:** O'Gara, Kulp, et al. (arXiv 2025); <EntityLink id="E202">MIRI</EntityLink> SPAR projects; Joël N. Christoph (European University Institute, Harvard Kennedy School) on market-based compute permit schemes that rely on hardware-audited usage.
+**Active developers:** [James Petrie](https://arxiv.org/abs/2404.18308) (Future of Life Institute/Oxford)—authored the foundational offline licensing design targeting existing H100 firmware; O'Gara, Kulp, et al. (arXiv 2025); <EntityLink id="E202">MIRI</EntityLink> SPAR projects; Joël N. Christoph on market-based compute permit schemes; [Longview Philanthropy](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) is funding HEM prototypes.
 
 **What remains:** Designing tamper-resistant counter architectures; securing the reporting channel against man-in-the-middle attacks; establishing international standards for what constitutes a "frontier training run" for metering purposes; and integrating with data center inspection regimes to cross-check reported figures.
 
@@ -196,6 +196,8 @@ Hardware mechanisms are not self-sufficient. Research consistently emphasizes th
 
 **CERN-like joint development** involves placing frontier AI development in shared international facilities under multilateral governance. In this model, hardware mechanisms enforce operational boundaries and usage limits within the shared facility itself, reducing the need for monitoring across sovereign borders.
 
+Baker et al. ([RAND, July 2025](https://www.rand.org/pubs/working_papers/WRA4077-1.html)) proposed a **"Six Layers of Verification"** framework: (1) built-in chip security features, (2–3) separate monitoring devices attached to chips, (4–6) personnel-based mechanisms including whistleblower programs. This layered approach reflects a consensus that no single hardware mechanism is sufficient; verification depends on hardware, physical inspection, and human intelligence working together.
+
 Research also highlights the synergy between hardware mechanisms and complementary non-hardware approaches: satellite remote sensing of data center energy consumption, physical inspections of fabrication facilities, and shared data centers in geopolitically neutral locations all reduce the verification burden on hardware alone.[^1][^2]
 
 ---
@@ -253,3 +255,11 @@ Perhaps the most fundamental political challenge is that illiberal states are un
 [^4]: Oxford Martin AI Governance Initiative — *Hardware Verification for International AI Agreements* (2025) - report categorizing on-chip and off-chip verification mechanisms and investment requirements
 
 [^5]: Research synthesis on hardware-enabled governance limitations — referenced across MIRI (2024), Oxford Martin AIGI (2025), and arXiv (2024–2025) sources on software/weight security gaps
+
+[^6]: Baker et al. — *Six Layers of Verification* ([RAND WRA4077-1](https://www.rand.org/pubs/working_papers/WRA4077-1.html), July 2025) - proposes layered hardware + personnel verification for international AI agreements
+
+[^7]: Petrie, James — *Near-Term Enforcement of AI Chip Export Controls Using Firmware-Based Design for Offline Licensing* ([arXiv:2404.18308](https://arxiv.org/abs/2404.18308), April 2024) - foundational design for cryptographic licensing on existing H100 chips
+
+[^8]: IAPS — *Location Verification for AI Chips* ([iaps.ai](https://www.iaps.ai/research/location-verification-for-ai-chips)) - working prototype on H100 chips demonstrating delay-based verification
+
+[^9]: OpenMined — *Secure Enclaves for AI Evaluation* ([openmined.org](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/)) - UK AISI + Anthropic pilot using H100 TEEs for privacy-preserving AI safety evaluations
