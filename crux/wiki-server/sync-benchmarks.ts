@@ -235,7 +235,7 @@ export function loadBenchmarkResults(
       results.push({
         id: contentHash(["benchmark-result", slug, model.id]),
         benchmarkId: slug,
-        modelId: model.id,
+        modelId: modelStableId,
         score: b.score,
         unit: b.unit ?? null,
         date: b.date ?? null,
@@ -295,6 +295,9 @@ function extractBenchmarkResults(
 
   for (const model of models) {
     if (!model.benchmarks?.length) continue;
+    // modelId FK references entities.stable_id, not entities.id (slug)
+    const modelStableId = (model as Record<string, unknown>).stableId as string | undefined;
+    if (!modelStableId) continue;
 
     for (const b of model.benchmarks) {
       const slug = nameToSlug.get(b.name.toLowerCase());
@@ -315,7 +318,7 @@ function extractBenchmarkResults(
       results.push({
         id: resultId,
         benchmarkId,
-        modelId: model.id,
+        modelId: modelStableId,
         score: b.score,
         unit: b.unit ?? null,
         date: b.date ?? null,
