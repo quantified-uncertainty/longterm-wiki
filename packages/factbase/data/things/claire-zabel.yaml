@@ -1,0 +1,14 @@
+entity: Unxmb3y3RF
+facts:
+  - id: "pQq9S0y2hw"
+    property: "employed-by"
+    value: !ref NifCYhN75w
+    asOf: "2017"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Key AI safety grantmaker; directs major funding to safety research organizations"
+  - id: "6gJUngeWUA"
+    property: "role"
+    value: "Program Officer, AI Safety"
+    asOf: "2017"
+    source: "https://www.openphilanthropy.org/"
+    notes: "Key AI safety grantmaker; directs major funding to safety research organizations"

@@ -1,0 +1,14 @@
+entity: nHnzS2qCLB
+facts:
+  - id: "cswaODY2JQ"
+    property: "employed-by"
+    value: !ref hvg9ecR3nA
+    asOf: "2015"
+    source: "https://80000hours.org/"
+    notes: "Hosts the 80,000 Hours Podcast; interviews AI safety researchers and policy makers"
+  - id: "Y9opoMU0iw"
+    property: "role"
+    value: "Director of Research & Host"
+    asOf: "2015"
+    source: "https://80000hours.org/"
+    notes: "Hosts the 80,000 Hours Podcast; interviews AI safety researchers and policy makers"

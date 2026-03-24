@@ -1,0 +1,15 @@
+entity: qcHr07uqUi
+facts:
+  - id: "PFDtBkno3A"
+    property: "role"
+    value: "AI Reporter"
+    asOf: "2018"
+    validEnd: "2021"
+    source: "https://www.technologyreview.com/"
+    notes: "Covered AI research and ethics; won awards for AI investigative journalism"
+  - id: "aHjLOR5ouA"
+    property: "role"
+    value: "Contributing Writer"
+    asOf: "2022"
+    source: "https://www.theatlantic.com/"
+    notes: "Covers AI and technology for The Atlantic"

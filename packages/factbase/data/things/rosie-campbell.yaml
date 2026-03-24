@@ -1,0 +1,28 @@
+entity: 9DYkyw0Hi6
+facts:
+  - id: "oeHEF7UBIA"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2021"
+    validEnd: "2024"
+    source: "https://openai.com/"
+    notes: "Led safety policy at OpenAI"
+  - id: "RoUbIuLEGA"
+    property: "role"
+    value: "Head of Safety Policy"
+    asOf: "2021"
+    validEnd: "2024"
+    source: "https://openai.com/"
+    notes: "Led safety policy at OpenAI"
+  - id: "omGWfr1Eiw"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2024"
+    source: "https://anthropic.com/"
+    notes: "Joined Anthropic's policy team"
+  - id: "KW3tlGt6Tg"
+    property: "role"
+    value: "Policy Lead"
+    asOf: "2024"
+    source: "https://anthropic.com/"
+    notes: "Joined Anthropic's policy team"

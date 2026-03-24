@@ -1,0 +1,16 @@
+entity: 7shI5k4pYO
+facts:
+  - id: "amCekv8JDg"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2018"
+    validEnd: "2024-09"
+    source: "https://openai.com/"
+    notes: "VP of Research at OpenAI; previously at Palantir; departed September 2024 alongside several other senior leaders"
+  - id: "yfpNAuOw6Q"
+    property: "role"
+    value: "VP of Research"
+    asOf: "2018"
+    validEnd: "2024-09"
+    source: "https://openai.com/"
+    notes: "VP of Research at OpenAI; previously at Palantir; departed September 2024 alongside several other senior leaders"

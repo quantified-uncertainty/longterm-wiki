@@ -1,0 +1,14 @@
+entity: e19EEvKNkB
+facts:
+  - id: "VZCJGAzdpQ"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2021"
+    source: "https://anthropic.com/"
+    notes: "Key contributor to Anthropic's human feedback and RLHF research methodology"
+  - id: "UMRQ0aI45g"
+    property: "role"
+    value: "Research Operations"
+    asOf: "2021"
+    source: "https://anthropic.com/"
+    notes: "Key contributor to Anthropic's human feedback and RLHF research methodology"

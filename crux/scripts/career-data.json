@@ -1968,5 +1968,115 @@
       {"orgSlug": "google", "orgName": "Google", "role": "Research Scientist", "start": "2018", "end": "2022", "source": "https://anthropic.com/", "notes": "Worked at Google on ML research"},
       {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2022", "source": "https://anthropic.com/", "notes": "Works on interpretability and safety research at Anthropic"}
     ]
-  }
+  },
+  {"personSlug": "barret-zoph", "careers": [
+    {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Scientist", "start": "2016", "end": "2022", "source": "https://en.wikipedia.org/wiki/Barret_Zoph", "notes": "Pioneered neural architecture search (NAS); created EfficientNet"},
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "VP of Research", "start": "2022", "source": "https://openai.com/", "notes": "VP of Research at OpenAI; leads post-training and GPT development"}
+  ]},
+  {"personSlug": "bob-mcgrew", "careers": [
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "VP of Research", "start": "2018", "end": "2024-09", "source": "https://openai.com/", "notes": "VP of Research at OpenAI; previously at Palantir; departed September 2024 alongside several other senior leaders"}
+  ]},
+  {"personSlug": "noam-shazeer", "careers": [
+    {"orgSlug": "google", "orgName": "Google", "role": "Principal Engineer", "start": "2000", "end": "2021", "source": "https://en.wikipedia.org/wiki/Noam_Shazeer", "notes": "Key contributor to Transformer architecture ('Attention Is All You Need'); worked on LaMDA/Bard"},
+    {"orgSlug": null, "orgName": "Character.ai", "role": "Co-founder & CEO", "start": "2021-11", "end": "2024-08", "source": "https://en.wikipedia.org/wiki/Noam_Shazeer", "notes": "Co-founded Character.ai with Daniel De Freitas"},
+    {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "VP of Research", "start": "2024-08", "source": "https://deepmind.google/", "notes": "Returned to Google in August 2024 as part of Character.ai licensing deal"}
+  ]},
+  {"personSlug": "aidan-gomez", "careers": [
+    {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Intern", "start": "2017", "end": "2017", "source": "https://en.wikipedia.org/wiki/Aidan_Gomez", "notes": "Co-authored 'Attention Is All You Need' (Transformer paper) while interning"},
+    {"orgSlug": null, "orgName": "Cohere", "role": "Co-founder & CEO", "start": "2019", "source": "https://cohere.com/", "notes": "Co-founded Cohere, enterprise-focused LLM company"}
+  ]},
+  {"personSlug": "lukasz-kaiser", "careers": [
+    {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Scientist", "start": "2013", "end": "2021", "source": "https://en.wikipedia.org/wiki/Lukasz_Kaiser", "notes": "Co-authored the Transformer paper; worked on sequence-to-sequence models"},
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "Researcher", "start": "2021", "source": "https://openai.com/", "notes": "Joined OpenAI; works on language model research"}
+  ]},
+  {"personSlug": "ben-mann", "careers": [
+    {"orgSlug": "google", "orgName": "Google", "role": "Software Engineer", "start": "2017", "end": "2021-01", "source": "https://anthropic.com/company", "notes": "Software engineer at Google before co-founding Anthropic"},
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Co-founder, Infrastructure Lead", "start": "2021-01", "source": "https://anthropic.com/company", "notes": "Co-founded Anthropic; leads core infrastructure"}
+  ]},
+  {"personSlug": "claire-zabel", "careers": [
+    {"orgSlug": "open-philanthropy", "orgName": "Open Philanthropy", "role": "Program Officer, AI Safety", "start": "2017", "source": "https://www.openphilanthropy.org/", "notes": "Key AI safety grantmaker; directs major funding to safety research organizations"}
+  ]},
+  {"personSlug": "rob-wiblin", "careers": [
+    {"orgSlug": "80000-hours", "orgName": "80,000 Hours", "role": "Director of Research & Host", "start": "2015", "source": "https://80000hours.org/", "notes": "Hosts the 80,000 Hours Podcast; interviews AI safety researchers and policy makers"}
+  ]},
+  {"personSlug": "ben-todd", "careers": [
+    {"orgSlug": "80000-hours", "orgName": "80,000 Hours", "role": "Co-founder & CEO", "start": "2011", "source": "https://80000hours.org/", "notes": "Co-founded 80,000 Hours; wrote the 80,000 Hours book on career advice for impact"}
+  ]},
+  {"personSlug": "nova-dassarma", "careers": [
+    {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "Research Scientist", "start": "2019", "end": "2022", "source": "https://anthropic.com/", "notes": "Worked on safety research at DeepMind"},
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2022", "source": "https://anthropic.com/", "notes": "Works on AI safety research at Anthropic"}
+  ]},
+  {"personSlug": "adam-gleave", "careers": [
+    {"orgSlug": "uc-berkeley", "orgName": "UC Berkeley CHAI", "role": "PhD Student", "start": "2018", "end": "2023", "source": "https://gleave.me/", "notes": "PhD at CHAI under Stuart Russell; worked on adversarial policies"},
+    {"orgSlug": "far-ai", "orgName": "FAR AI", "role": "Founder & CEO", "start": "2022", "source": "https://far.ai/", "notes": "Founded FAR AI; focuses on adversarial robustness and AI safety evaluations"}
+  ]},
+  {"personSlug": "nora-belrose", "careers": [
+    {"orgSlug": "eleutherai", "orgName": "EleutherAI", "role": "Research Scientist", "start": "2022", "source": "https://www.eleuther.ai/", "notes": "Works on interpretability and alignment at EleutherAI"}
+  ]},
+  {"personSlug": "stella-biderman", "careers": [
+    {"orgSlug": "eleutherai", "orgName": "EleutherAI", "role": "Executive Director", "start": "2020", "source": "https://www.eleuther.ai/", "notes": "Co-leads EleutherAI; ML researcher focused on open-source AI and NLP"}
+  ]},
+  {"personSlug": "nicholas-carlini", "careers": [
+    {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "Research Scientist", "start": "2019", "source": "https://nicholas.carlini.com/", "notes": "Leading expert on adversarial ML, model extraction, and privacy attacks; prolific researcher in ML security"}
+  ]},
+  {"personSlug": "sholto-douglas", "careers": [
+    {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "Research Engineer", "start": "2019", "end": "2023", "source": "https://x.com/saborneuk", "notes": "Worked on large language model training at DeepMind"},
+    {"orgSlug": "xai", "orgName": "xAI", "role": "Researcher", "start": "2023", "source": "https://x.ai/", "notes": "Joined xAI; worked on Grok model development"}
+  ]},
+  {"personSlug": "rosie-campbell", "careers": [
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "Head of Safety Policy", "start": "2021", "end": "2024", "source": "https://openai.com/", "notes": "Led safety policy at OpenAI"},
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Policy Lead", "start": "2024", "source": "https://anthropic.com/", "notes": "Joined Anthropic's policy team"}
+  ]},
+  {"personSlug": "sandhini-agarwal", "careers": [
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "Policy Researcher", "start": "2020", "source": "https://openai.com/", "notes": "Works on AI safety policy and responsible deployment at OpenAI"}
+  ]},
+  {"personSlug": "gretchen-krueger", "careers": [
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "Policy Researcher", "start": "2019", "source": "https://openai.com/", "notes": "Works on AI governance and responsible release practices at OpenAI"}
+  ]},
+  {"personSlug": "josh-batson", "careers": [
+    {"orgSlug": "chan-zuckerberg-initiative", "orgName": "Chan Zuckerberg Initiative", "role": "Research Scientist", "start": "2017", "end": "2022", "source": "https://anthropic.com/", "notes": "Worked on computational biology at CZI"},
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2022", "source": "https://anthropic.com/", "notes": "Works on interpretability; key contributor to scaling monosemanticity research"}
+  ]},
+  {"personSlug": "trenton-bricken", "careers": [
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2022", "source": "https://anthropic.com/", "notes": "Works on interpretability and dictionary learning for understanding neural network features"}
+  ]},
+  {"personSlug": "nelson-elhage", "careers": [
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2021", "source": "https://anthropic.com/", "notes": "Key contributor to mechanistic interpretability research; co-authored 'Toy Models of Superposition' and other foundational interpretability papers"}
+  ]},
+  {"personSlug": "lawrence-chan", "careers": [
+    {"orgSlug": "miri", "orgName": "MIRI", "role": "Research Fellow", "start": "2019", "end": "2021", "source": "https://www.lawrencechan.me/", "notes": "Alignment research at MIRI"},
+    {"orgSlug": "redwood-research", "orgName": "Redwood Research", "role": "Researcher", "start": "2021", "end": "2022", "source": "https://www.redwoodresearch.org/", "notes": "Worked on interpretability at Redwood Research"},
+    {"orgSlug": "uc-berkeley", "orgName": "UC Berkeley", "role": "PhD Student (CHAI)", "start": "2022", "source": "https://humancompatible.ai/", "notes": "PhD student at CHAI; works on alignment"}
+  ]},
+  {"personSlug": "john-wentworth", "careers": [
+    {"orgSlug": null, "orgName": "Independent", "role": "Independent Alignment Researcher", "start": "2020", "source": "https://www.lesswrong.com/users/johnswentworth", "notes": "Independent researcher focused on natural abstractions and agent foundations; previously associated with MIRI"}
+  ]},
+  {"personSlug": "stephen-casper", "careers": [
+    {"orgSlug": "mit", "orgName": "MIT", "role": "PhD Student", "start": "2021", "source": "https://stephencasper.com/", "notes": "PhD at MIT on AI safety; focus on adversarial attacks and model evaluation; critical voice on alignment approaches"}
+  ]},
+  {"personSlug": "haydn-belfield", "careers": [
+    {"orgSlug": "cser", "orgName": "CSER", "role": "Academic Project Manager", "start": "2017", "source": "https://www.cser.ac.uk/", "notes": "Research affiliate at CSER and GovAI; works on AI governance and existential risk policy"}
+  ]},
+  {"personSlug": "brad-lightcap", "careers": [
+    {"orgSlug": "openai", "orgName": "OpenAI", "role": "COO", "start": "2018", "source": "https://openai.com/", "notes": "COO of OpenAI; manages business operations; previously at Y Combinator"}
+  ]},
+  {"personSlug": "koray-kavukcuoglu", "careers": [
+    {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "VP of Research", "start": "2012", "source": "https://deepmind.google/", "notes": "One of the earliest DeepMind employees; leads research direction across the organization"}
+  ]},
+  {"personSlug": "nathan-labenz", "careers": [
+    {"orgSlug": null, "orgName": "The Cognitive Revolution (podcast)", "role": "Host", "start": "2023", "source": "https://www.cognitiverevolution.ai/", "notes": "Hosts The Cognitive Revolution podcast on AI; red-teamed GPT-4 for OpenAI; CEO of Waymark"}
+  ]},
+  {"personSlug": "liane-lovitt", "careers": [
+    {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Operations", "start": "2021", "source": "https://anthropic.com/", "notes": "Key contributor to Anthropic's human feedback and RLHF research methodology"}
+  ]},
+  {"personSlug": "karen-hao", "careers": [
+    {"orgSlug": null, "orgName": "MIT Technology Review", "role": "AI Reporter", "start": "2018", "end": "2021", "source": "https://www.technologyreview.com/", "notes": "Covered AI research and ethics; won awards for AI investigative journalism"},
+    {"orgSlug": null, "orgName": "The Atlantic", "role": "Contributing Writer", "start": "2022", "source": "https://www.theatlantic.com/", "notes": "Covers AI and technology for The Atlantic"}
+  ]},
+  {"personSlug": "cade-metz", "careers": [
+    {"orgSlug": null, "orgName": "The New York Times", "role": "Technology Reporter", "start": "2017", "source": "https://www.nytimes.com/", "notes": "Covers AI labs and the people behind AI; author of 'Genius Makers'"}
+  ]},
+  {"personSlug": "shayne-longpre", "careers": [
+    {"orgSlug": "mit", "orgName": "MIT", "role": "PhD Student", "start": "2021", "source": "https://www.shaynelongpre.com/", "notes": "Leads Data Provenance Initiative; research on training data governance and AI transparency"}
+  ]}
 ]

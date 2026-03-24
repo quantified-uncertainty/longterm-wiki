@@ -1,0 +1,16 @@
+entity: MML4rTOPrR
+facts:
+  - id: "8jBBcyw0fQ"
+    property: "employed-by"
+    value: !ref Z1df97RYbw
+    asOf: "2021"
+    source: "https://stephencasper.com/"
+    notes: "PhD at MIT on AI safety; focus on adversarial attacks and model evaluation; critical voice on alignment
+      approaches"
+  - id: "ipjXBkgrlg"
+    property: "role"
+    value: "PhD Student"
+    asOf: "2021"
+    source: "https://stephencasper.com/"
+    notes: "PhD at MIT on AI safety; focus on adversarial attacks and model evaluation; critical voice on alignment
+      approaches"

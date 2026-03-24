@@ -1,0 +1,14 @@
+entity: yApeIYNuQH
+facts:
+  - id: "LUfVuder0A"
+    property: "employed-by"
+    value: !ref A4XoubikkQ
+    asOf: "2019"
+    source: "https://nicholas.carlini.com/"
+    notes: "Leading expert on adversarial ML, model extraction, and privacy attacks; prolific researcher in ML security"
+  - id: "Ev0RqivvFg"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2019"
+    source: "https://nicholas.carlini.com/"
+    notes: "Leading expert on adversarial ML, model extraction, and privacy attacks; prolific researcher in ML security"

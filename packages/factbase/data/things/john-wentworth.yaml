@@ -1,0 +1,8 @@
+entity: jNb9fkrRNV
+facts:
+  - id: "SJXO2VC1wA"
+    property: "role"
+    value: "Independent Alignment Researcher"
+    asOf: "2020"
+    source: "https://www.lesswrong.com/users/johnswentworth"
+    notes: "Independent researcher focused on natural abstractions and agent foundations; previously associated with MIRI"

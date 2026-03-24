@@ -1,0 +1,14 @@
+entity: FlpgQzN7DJ
+facts:
+  - id: "9HvFIG0TcA"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2022"
+    source: "https://anthropic.com/"
+    notes: "Works on interpretability and dictionary learning for understanding neural network features"
+  - id: "Jqk5oBbSdQ"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2022"
+    source: "https://anthropic.com/"
+    notes: "Works on interpretability and dictionary learning for understanding neural network features"

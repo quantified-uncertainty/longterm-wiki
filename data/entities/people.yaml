@@ -3676,3 +3676,293 @@
   tags:
     - interpretability
     - ai-safety
+
+# ── Batch 3: Multi-org career people ──
+
+- id: barret-zoph
+  stableId: np58j65k7U
+  type: person
+  title: Barret Zoph
+  description: >-
+    VP of Research at OpenAI. Previously at Google Brain where he pioneered
+    neural architecture search (NAS).
+  tags: [ai-research]
+
+- id: bob-mcgrew
+  stableId: 7shI5k4pYO
+  type: person
+  title: Bob McGrew
+  description: >-
+    Former VP of Research at OpenAI. Previously at Palantir. Departed OpenAI
+    in September 2024 alongside other senior leaders.
+  tags: [ai-research]
+
+- id: noam-shazeer
+  stableId: 2n2KWBO5lj
+  type: person
+  title: Noam Shazeer
+  description: >-
+    Co-author of 'Attention Is All You Need' (Transformer paper). Co-founded
+    Character.ai, then returned to Google DeepMind in 2024.
+  tags: [transformers, generative-ai]
+
+- id: aidan-gomez
+  stableId: 8IoYc1FS2s
+  type: person
+  title: Aidan Gomez
+  description: >-
+    Co-founder and CEO of Cohere. Co-author of the Transformer paper while
+    interning at Google Brain.
+  tags: [transformers, ai-research]
+
+- id: lukasz-kaiser
+  stableId: bDntUJ9nR9
+  type: person
+  title: Lukasz Kaiser
+  description: >-
+    Co-author of 'Attention Is All You Need'. Moved from Google Brain to
+    OpenAI.
+  tags: [transformers]
+
+- id: ben-mann
+  stableId: mO6vu4wGaZ
+  type: person
+  title: Ben Mann
+  description: >-
+    Anthropic co-founder. Previously at Google. Key technical contributor to
+    Anthropic's infrastructure.
+  tags: [ai-safety]
+
+- id: claire-zabel
+  stableId: Unxmb3y3RF
+  type: person
+  title: Claire Zabel
+  description: >-
+    Program Officer at Open Philanthropy focused on AI safety and potential
+    risks from advanced AI.
+  tags: [ai-safety, grantmaking]
+
+- id: rob-wiblin
+  stableId: nHnzS2qCLB
+  type: person
+  title: Rob Wiblin
+  description: >-
+    Director of Research at 80,000 Hours. Host of the 80,000 Hours Podcast.
+    Prominent voice in effective altruism career advice.
+  tags: [effective-altruism]
+
+- id: ben-todd
+  stableId: LTnHWq06v7
+  type: person
+  title: Ben Todd
+  description: >-
+    Co-founder and CEO of 80,000 Hours. Pioneer of EA career advice.
+    Co-founded the Centre for Effective Altruism.
+  tags: [effective-altruism]
+
+- id: nova-dassarma
+  stableId: loCJ9k9JUl
+  type: person
+  title: Nova DasSarma
+  description: >-
+    Safety researcher at Anthropic. Previously at Google DeepMind. Works
+    on AI safety and alignment.
+  tags: [ai-safety]
+
+- id: adam-gleave
+  stableId: z9YE0k6xIl
+  type: person
+  title: Adam Gleave
+  description: >-
+    Founder and CEO of FAR AI. Previously UC Berkeley CHAI PhD. Works on
+    adversarial robustness and AI safety evaluations.
+  tags: [ai-safety, adversarial-robustness]
+
+- id: nora-belrose
+  stableId: 9MNPpMYphE
+  type: person
+  title: Nora Belrose
+  description: >-
+    AI safety researcher. Associated with EleutherAI and alignment research.
+    Works on mechanistic interpretability.
+  tags: [interpretability, ai-safety]
+
+- id: stella-biderman
+  stableId: rCdvuJ9MKD
+  type: person
+  title: Stella Biderman
+  description: >-
+    Executive Director of EleutherAI. ML researcher focused on open-source
+    AI and NLP. Previously at Booz Allen Hamilton.
+  tags: [open-source-ai]
+
+- id: nicholas-carlini
+  stableId: yApeIYNuQH
+  type: person
+  title: Nicholas Carlini
+  description: >-
+    Research Scientist at Google DeepMind. Leading expert on adversarial ML,
+    model security, and privacy attacks. Prolific in ML safety research.
+  tags: [adversarial-ml, ai-security]
+
+- id: sholto-douglas
+  stableId: HE9dREUB6G
+  type: person
+  title: Sholto Douglas
+  description: >-
+    Researcher who moved from Google DeepMind to xAI. Known for work on
+    large language model training.
+  tags: [ai-research]
+
+- id: rosie-campbell
+  stableId: 9DYkyw0Hi6
+  type: person
+  title: Rosie Campbell
+  description: >-
+    AI safety policy researcher. Moved from OpenAI to Anthropic. Previously
+    led safety policy at OpenAI.
+  tags: [ai-policy, ai-safety]
+
+- id: sandhini-agarwal
+  stableId: cP9Zh9P6eQ
+  type: person
+  title: Sandhini Agarwal
+  description: >-
+    Policy researcher at OpenAI. Works on AI safety and responsible
+    deployment practices.
+  tags: [ai-policy]
+
+- id: gretchen-krueger
+  stableId: e6evfi0zqE
+  type: person
+  title: Gretchen Krueger
+  description: >-
+    Policy researcher at OpenAI. Works on AI governance and responsible
+    release practices.
+  tags: [ai-policy]
+
+- id: josh-batson
+  stableId: R1sh5iI5Be
+  type: person
+  title: Josh Batson
+  description: >-
+    Research Scientist at Anthropic. Previously at Chan Zuckerberg Initiative.
+    Works on interpretability.
+  tags: [interpretability]
+
+- id: trenton-bricken
+  stableId: FlpgQzN7DJ
+  type: person
+  title: Trenton Bricken
+  description: >-
+    Research Scientist at Anthropic. Works on interpretability and dictionary
+    learning for understanding neural networks.
+  tags: [interpretability]
+
+- id: nelson-elhage
+  stableId: J6DJn3s6Di
+  type: person
+  title: Nelson Elhage
+  description: >-
+    Research Scientist at Anthropic. Key contributor to Anthropic's
+    interpretability research including 'Toy Models of Superposition'.
+  tags: [interpretability]
+
+- id: lawrence-chan
+  stableId: pwJiQ0dvOa
+  type: person
+  title: Lawrence Chan
+  description: >-
+    AI safety researcher. Previously at MIRI and Redwood Research. Works on
+    alignment and interpretability.
+  tags: [alignment, ai-safety]
+
+- id: john-wentworth
+  stableId: jNb9fkrRNV
+  type: person
+  title: John Wentworth
+  description: >-
+    Independent alignment researcher. Known for work on natural abstractions
+    and agent foundations. Previously associated with MIRI.
+  tags: [alignment, agent-foundations]
+
+- id: stephen-casper
+  stableId: MML4rTOPrR
+  type: person
+  title: Stephen Casper
+  description: >-
+    MIT PhD student working on AI safety. Focus on adversarial attacks, model
+    evaluation, and red-teaming. Critical voice on alignment approaches.
+  tags: [ai-safety, adversarial-ml]
+
+- id: haydn-belfield
+  stableId: wDVvssbBWp
+  type: person
+  title: Haydn Belfield
+  description: >-
+    Research affiliate at CSER and GovAI. Works on AI governance and
+    existential risk policy.
+  tags: [ai-governance, existential-risk]
+
+- id: brad-lightcap
+  stableId: Vg9f2qAPVa
+  type: person
+  title: Brad Lightcap
+  description: >-
+    COO of OpenAI. Joined in 2018. Previously at Y Combinator and various
+    startups. Manages OpenAI's business operations.
+  tags: [ai-business]
+
+- id: koray-kavukcuoglu
+  stableId: UpD99xMWKS
+  type: person
+  title: Koray Kavukcuoglu
+  description: >-
+    VP of Research at Google DeepMind. One of the earliest DeepMind employees.
+    Leads research direction across the organization.
+  tags: [ai-research, deepmind]
+
+- id: nathan-labenz
+  stableId: H9tpeUdFMY
+  type: person
+  title: Nathan Labenz
+  description: >-
+    Host of The Cognitive Revolution podcast. Red-teamed GPT-4 for OpenAI.
+    CEO of Waymark. Prominent AI safety commentator.
+  tags: [ai-safety-commentary]
+
+- id: shayne-longpre
+  stableId: T3rwhFouDy
+  type: person
+  title: Shayne Longpre
+  description: >-
+    MIT PhD researcher. Leads the Data Provenance Initiative. Works on
+    training data governance and AI transparency.
+  tags: [data-governance, ai-transparency]
+
+- id: liane-lovitt
+  stableId: e19EEvKNkB
+  type: person
+  title: Liane Lovitt
+  description: >-
+    Research Scientist at Anthropic. Key contributor to human feedback
+    research and RLHF methodology.
+  tags: [rlhf, ai-safety]
+
+- id: karen-hao
+  stableId: qcHr07uqUi
+  type: person
+  title: Karen Hao
+  description: >-
+    Journalist covering AI. Former MIT Technology Review AI reporter. Now
+    at The Atlantic. Known for investigative AI reporting.
+  tags: [journalism]
+
+- id: cade-metz
+  stableId: lMRdlZKHUI
+  type: person
+  title: Cade Metz
+  description: >-
+    New York Times technology reporter. Author of 'Genius Makers'. Covers
+    AI labs and the people behind AI development.
+  tags: [journalism]

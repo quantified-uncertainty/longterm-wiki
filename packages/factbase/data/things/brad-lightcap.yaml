@@ -1,0 +1,14 @@
+entity: Vg9f2qAPVa
+facts:
+  - id: "lDqUfrbd2w"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2018"
+    source: "https://openai.com/"
+    notes: "COO of OpenAI; manages business operations; previously at Y Combinator"
+  - id: "bpErNnd5bg"
+    property: "role"
+    value: "COO"
+    asOf: "2018"
+    source: "https://openai.com/"
+    notes: "COO of OpenAI; manages business operations; previously at Y Combinator"

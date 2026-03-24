@@ -1,0 +1,14 @@
+entity: T3rwhFouDy
+facts:
+  - id: "Yc4GaiyoqA"
+    property: "employed-by"
+    value: !ref Z1df97RYbw
+    asOf: "2021"
+    source: "https://www.shaynelongpre.com/"
+    notes: "Leads Data Provenance Initiative; research on training data governance and AI transparency"
+  - id: "k0WHqjb4GQ"
+    property: "role"
+    value: "PhD Student"
+    asOf: "2021"
+    source: "https://www.shaynelongpre.com/"
+    notes: "Leads Data Provenance Initiative; research on training data governance and AI transparency"
