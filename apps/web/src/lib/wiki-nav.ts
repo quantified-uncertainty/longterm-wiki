@@ -268,6 +268,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Entity Matrix", href: internalHref("entity-matrix-dashboard") },
         { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
         { label: "Source Checks", href: internalHref("entity-source-checks-dashboard") },
+        { label: "Data Quality", href: internalHref("data-quality-dashboard") },
       ],
     },
     {

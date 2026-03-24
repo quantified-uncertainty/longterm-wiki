@@ -1,0 +1,98 @@
+---
+wikiId: E1258
+title: Tom Brown
+description: AI researcher and co-author of the GPT-3 paper, known for foundational work on large language models, reinforcement learning from human feedback, and AI alignment techniques.
+sidebar:
+  order: 50
+subcategory: safety-researchers
+update_frequency: 90
+lastEdited: 2026-03-23
+createdAt: 2026-03-23
+summary: A biographical wiki page on Tom B. Brown covering his foundational contributions to GPT-3, RLHF, and AI alignment; reasonably thorough but hampered by opaque sourcing (no URLs, just 'research data') and missing key biographical details like education and current role.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+> **Disambiguation**: This article focuses on **Tom B. Brown**, the AI researcher. Multiple other individuals share this name, including Tom Brown Jr. (naturalist and tracker, 1950–2024), Tom Brown (financial analyst and founder of Second Curve Capital), Tom Brown (satirist, 1662–1704), and Tom Brown (chemist at Oxford University), among others.
+
+## Quick Assessment
+
+| Attribute | Details |
+|-----------|---------|
+| **Full Name** | Tom B. Brown |
+| **Role** | AI researcher; co-founder of <EntityLink id="E22">Anthropic</EntityLink> |
+| **Known For** | Co-authoring the GPT-3 paper; foundational RLHF work; constitutional AI |
+| **Affiliations** | <EntityLink id="E218">OpenAI</EntityLink> (former); <EntityLink id="E22">Anthropic</EntityLink> |
+| **Research Areas** | Large language models, AI alignment, reinforcement learning from human feedback |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Tom_Brown) |
+
+## Overview
+
+Tom B. Brown is an AI researcher best known as a lead author on the GPT-3 paper, *Language Models are Few-Shot Learners* (NeurIPS 2020), which demonstrated that large language models could perform a wide range of tasks with minimal task-specific examples. His research has been highly influential in shaping both the capabilities and safety of modern AI systems, with his published work accumulating over 8,000 highly influential citations across 28 papers, according to research profiles.[^1]
+
+Brown's contributions span two interrelated areas: scaling large language models and developing alignment techniques to make those models safer and more helpful. He co-authored *Deep Reinforcement Learning from Human Preferences* (NeurIPS 2017) alongside <EntityLink id="E220">Paul Christiano</EntityLink> and others, a paper that established reinforcement learning from human feedback (RLHF) as a core technique in AI alignment research. This work has since become foundational to the training of widely deployed AI assistants.[^1]
+
+Beyond his research output, Brown is recognized as a co-founder of <EntityLink id="E22">Anthropic</EntityLink>, an AI safety-focused company. Research data notes his participation in discussions about company vision, including a Salesforce Ventures fireside chat in December 2023.[^2] His career trajectory—from core contributions at <EntityLink id="E218">OpenAI</EntityLink> to a founding role at <EntityLink id="E22">Anthropic</EntityLink>—reflects a sustained focus on both the frontier of AI capabilities and the safety challenges those capabilities create.
+
+## Research Contributions
+
+### Large Language Models and GPT-3
+
+Brown's most widely recognized work is his lead authorship on the GPT-3 paper, *Language Models are Few-Shot Learners*, published at NeurIPS 2020. The paper demonstrated that scaling transformer-based language models to hundreds of billions of parameters enabled strong few-shot performance across diverse natural language tasks, without task-specific fine-tuning. This finding reshaped assumptions about the relationship between model scale and general capability, and GPT-3 itself became the foundation for a wave of commercially deployed language systems.[^1]
+
+Related scaling research includes *Scaling Laws for Autoregressive Generative Modeling* (arXiv 2020), co-authored with Tom Henighan and others, which established empirical relationships between model size, compute, and performance—work that has guided subsequent decisions about how to allocate resources in large model training.[^1]
+
+### Reinforcement Learning from Human Feedback (RLHF)
+
+Brown co-authored *Deep Reinforcement Learning from Human Preferences* (NeurIPS 2017) with <EntityLink id="E220">Paul Christiano</EntityLink> and others, which has accumulated over 6,400 citations and is widely regarded as the paper that established RLHF as a viable alignment technique. The core idea is to train AI systems by learning from human evaluative feedback rather than from explicit reward functions—an approach that scales to tasks where reward specification is difficult or impossible.[^1]
+
+He also contributed to *Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback* (arXiv 2022), co-authored with Yuntao Bai and others at <EntityLink id="E22">Anthropic</EntityLink>, which has over 3,700 citations. This paper extended RLHF methodology toward the practical goal of producing AI assistants that are simultaneously helpful, honest, and harmless.[^1]
+
+### Constitutional AI and Scalable Oversight
+
+Brown's work connects directly to research on scalable oversight—the challenge of maintaining meaningful human control over AI systems as those systems become more capable. His involvement in constitutional AI (CAI) represents one approach to this problem: training AI systems to evaluate and revise their own outputs according to a set of explicit principles, reducing dependence on direct human feedback at each step. Research data notes his co-authorship on *Constitutional AI: Harmlessness from AI Feedback* (2022).[^1]
+
+### Mechanistic Interpretability
+
+Brown co-authored *A Mathematical Framework for Transformer Circuits* (Transformer Circuits Thread, 2021) with Nelson Elhage and others, a paper that has accumulated nearly 1,000 citations. This work aims to reverse-engineer the computations performed inside transformer models, contributing to the field of <EntityLink id="E174">interpretability</EntityLink> research—an area considered important for verifying whether AI systems are behaving as intended.[^1]
+
+### Red-Teaming and Safety Evaluation
+
+Brown is listed as a co-author on *Red Teaming Language Models to Reduce Harms* (arXiv 2022), co-authored with Deep Ganguli and others, which has received nearly 1,000 citations. This paper developed systematic methods for stress-testing language models by attempting to elicit harmful outputs, contributing to practices now widely used in pre-deployment safety evaluation.[^1]
+
+### Adversarial Robustness
+
+Earlier work includes *Adversarial Patch* (2017), which examined vulnerabilities in computer vision systems through physically realizable adversarial attacks. This line of research predates Brown's more recent alignment-focused work but reflects a consistent interest in understanding and mitigating failure modes in AI systems.[^1]
+
+## Role at Anthropic
+
+Brown is identified in research data as a co-founder of <EntityLink id="E22">Anthropic</EntityLink>, an AI safety company founded by former <EntityLink id="E218">OpenAI</EntityLink> researchers including <EntityLink id="E91">Dario Amodei</EntityLink>. Research data notes his participation in a Salesforce Ventures fireside chat on December 19, 2023, discussing the company's vision, but does not provide detailed information about his current title or day-to-day responsibilities at the organization.[^2]
+
+Anthropic's stated focus on AI safety research, and its development of techniques like constitutional AI, aligns with the research directions Brown pursued during and after his time at <EntityLink id="E218">OpenAI</EntityLink>.
+
+## Connection to AI Safety
+
+Brown's body of work sits at the intersection of AI capabilities research and AI alignment. The RLHF technique he helped establish in 2017 has become the dominant method for aligning large language models with human preferences, and is now used in training AI systems at <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, and elsewhere. His contributions to red-teaming, constitutional AI, and mechanistic <EntityLink id="E174">interpretability</EntityLink> further reflect engagement with core concerns in the AI safety community—including the problem of <EntityLink id="E93">deceptive alignment</EntityLink> and the challenge of <EntityLink id="E274">scheming</EntityLink> in advanced AI systems.
+
+Research data describes his professional background as reflecting a commitment to prioritizing empirical safety measures in AI development, though this characterization comes from research summaries rather than direct statements by Brown himself.[^1]
+
+## Effective Altruism Affiliation
+
+Research data notes that a Tom Brown is listed as the 1,214th member of the Giving What We Can Pledge, a commitment associated with the Effective Altruism community to donate a significant portion of income to effective charities. This is mentioned alongside the pledge membership numbers of <EntityLink id="E91">Dario Amodei</EntityLink> (43rd) and Jack Clark (4,002nd).[^3] It is not confirmed in the research data whether this refers to the same Tom B. Brown who co-authored GPT-3, and this detail should be treated with appropriate uncertainty.
+
+## Key Uncertainties
+
+- The research data does not specify Brown's precise role or title at <EntityLink id="E22">Anthropic</EntityLink>, or the timeline of his transition from <EntityLink id="E218">OpenAI</EntityLink>.
+- Citation counts cited in research data may not reflect the most current figures and should not be treated as precise.
+- The Giving What We Can Pledge membership attributed to a "Tom Brown" has not been independently confirmed as referring to Tom B. Brown the AI researcher.
+- Research data does not detail Brown's educational background, and none is included here to avoid hallucination.
+
+## Sources
+
+[^1]: Research data - Work section: AI researcher profile summary describing Tom B. Brown's publications, citation counts, and affiliations (no URL available in research data)
+[^2]: Research data - History section: Anthropic co-founder profile noting Salesforce Ventures fireside chat, December 19, 2023 (no URL available in research data)
+[^3]: Research data - Community section: EA Forum post "Akash's Quick Takes" discussing Giving What We Can Pledge membership numbers (no URL available in research data)

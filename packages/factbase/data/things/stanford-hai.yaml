@@ -33,37 +33,37 @@ facts:
     asOf: 2026-03
     source: https://hai.stanford.edu/about
 
-  - id: f_hai_ai_index
+  - id: f_gGmHvFYFGj
     property: publication
     value: "Annual AI Index Report — comprehensive data-driven analysis of global AI trends across R&D, economy, policy, ethics, and public opinion. Cited by governments, journalists, and researchers worldwide."
     asOf: 2025
     source: https://aiindex.stanford.edu/
     notes: "One of the most influential annual AI publications; published since 2018"
 
-  - id: f_hai_crfm
+  - id: f_XaGAuLDuRH
     property: program
     value: "Center for Research on Foundation Models (CRFM) — studies foundation model capabilities, risks, and societal implications. Approximately 175 affiliated researchers."
     asOf: 2024
     source: https://crfm.stanford.edu/
     notes: "Produces HELM (Holistic Evaluation of Language Models) benchmarks"
 
-  - id: f_hai_faculty_count
+  - id: f_iGiGC4pZKB
     property: affiliated-faculty
     value: "200"
     asOf: 2025
     source: https://hai.stanford.edu/about
     notes: "200+ affiliated faculty across all seven Stanford schools"
 
-  - id: f_hai_country
+  - id: f_kkTvpDXxYY
     property: country
     value: United States
     source: https://hai.stanford.edu/about
 
-  - id: f_hai_co_directors
+  - id: f_jiXzOc53q8
     property: key-person
     value:
-      - fei-fei-li
-      - john-etchemendy
+      - !ref QzcX3bShmQ
+      - !ref rhgfPZYXTw
     asOf: 2024
     source: https://hai.stanford.edu/about
     notes: "Co-directors since founding in 2019"

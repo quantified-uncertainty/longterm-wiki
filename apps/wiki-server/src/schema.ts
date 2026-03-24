@@ -5,6 +5,7 @@ import {
   varchar,
   integer,
   bigint,
+  serial,
   bigserial,
   boolean,
   real,
@@ -3018,5 +3019,52 @@ export const predictionMarketSnapshots = pgTable(
     uniqueIndex("idx_pms_question_date").on(table.questionId, table.date),
     index("idx_pms_question").on(table.questionId),
     index("idx_pms_date").on(table.date),
+  ]
+);
+
+// ============================================================================
+// Operational — Data Quality Snapshots
+//
+// Point-in-time snapshots of data quality metrics across all bases.
+// Captured periodically to track coverage and verification trends.
+// ============================================================================
+
+export const dataQualitySnapshots = pgTable(
+  "data_quality_snapshots",
+  {
+    id: serial("id").primaryKey(),
+    capturedAt: timestamp("captured_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    // Source-check verdicts
+    verdictsTotal: integer("verdicts_total").notNull().default(0),
+    verdictsConfirmed: integer("verdicts_confirmed").notNull().default(0),
+    verdictsContradicted: integer("verdicts_contradicted").notNull().default(0),
+    verdictsPartial: integer("verdicts_partial").notNull().default(0),
+    verdictsUnverifiable: integer("verdicts_unverifiable").notNull().default(0),
+    verdictsOutdated: integer("verdicts_outdated").notNull().default(0),
+    verdictsNeedsRecheck: integer("verdicts_needs_recheck").notNull().default(0),
+    // Record coverage
+    personnelTotal: integer("personnel_total").notNull().default(0),
+    personnelWithSource: integer("personnel_with_source").notNull().default(0),
+    personnelWithStartDate: integer("personnel_with_start_date").notNull().default(0),
+    grantsTotal: integer("grants_total").notNull().default(0),
+    grantsWithSource: integer("grants_with_source").notNull().default(0),
+    investmentsTotal: integer("investments_total").notNull().default(0),
+    investmentsWithSource: integer("investments_with_source").notNull().default(0),
+    fundingRoundsTotal: integer("funding_rounds_total").notNull().default(0),
+    // Entity coverage
+    entitiesTotal: integer("entities_total").notNull().default(0),
+    entitiesWithWikiPage: integer("entities_with_wiki_page").notNull().default(0),
+    // FactBase
+    factbaseEntities: integer("factbase_entities").notNull().default(0),
+    factbaseFacts: integer("factbase_facts").notNull().default(0),
+    // Pages
+    pagesTotal: integer("pages_total").notNull().default(0),
+    // Extra JSON for future metrics without migration
+    extra: jsonb("extra").default({}),
+  },
+  (table) => [
+    index("idx_dqs_captured").on(table.capturedAt),
   ]
 );

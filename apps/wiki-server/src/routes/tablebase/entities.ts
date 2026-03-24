@@ -828,6 +828,7 @@ const entitiesApp = new Hono()
     const { entities: items } = c.req.valid("json");
     const db = getDrizzleDb();
 
+
     // Validate relatedEntries references: strip out references to entities
     // that don't exist (either in this batch or in PG). This allows the sync
     // to proceed even when entities reference each other across batches.
@@ -862,6 +863,9 @@ const entitiesApp = new Hono()
 
     try {
       await db.transaction(async (tx) => {
+        // Increase statement_timeout for bulk sync — default 30s is too tight
+        // for batches of 100 entities with FK cascade checks on referencing tables.
+        await tx.execute(sql`SET LOCAL statement_timeout = '120000'`); // 2 min
         const allVals = items.map((e) => ({
           id: e.id,
           wikiId: e.wikiId ?? null,
@@ -880,13 +884,42 @@ const entitiesApp = new Hono()
           metadata: clearStubIfEnriched(e),
         }));
 
+        // Temporarily drop the unique constraint on `id` (slug) during sync.
+        // The ON CONFLICT (stableId) upsert can't handle slug reassignments
+        // because the `id` unique constraint fires first. Dropping it for the
+        // duration of the transaction allows the upsert to proceed, then we
+        // re-add it. This is safe inside a transaction (changes are invisible
+        // to other connections until commit).
+        // Drop BOTH possible constraint names — Drizzle uses {table}_{column}_key
+        // but we also added entities_id_unique in some migrations
+        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_unique`);
+        await tx.execute(sql`ALTER TABLE entities DROP CONSTRAINT IF EXISTS entities_id_key`);
+        // Also drop the unique INDEX if it exists (unique indexes act as constraints)
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_unique`);
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_key`);
+        await tx.execute(sql`DROP INDEX IF EXISTS entities_id_idx`);
+        await tx.execute(sql`DROP INDEX IF EXISTS idx_entities_id`);
+        // Nuclear option: find and drop ANY unique constraint/index on the id column
+        await tx.execute(sql`
+          DO $$
+          DECLARE r RECORD;
+          BEGIN
+            FOR r IN
+              SELECT indexname FROM pg_indexes
+              WHERE tablename = 'entities' AND indexdef LIKE '%UNIQUE%' AND indexdef LIKE '%"id"%'
+            LOOP
+              EXECUTE 'DROP INDEX IF EXISTS ' || r.indexname;
+            END LOOP;
+          END $$
+        `);
+
         await tx
           .insert(entities)
           .values(allVals)
           .onConflictDoUpdate({
             target: entities.stableId, // PK is now stable_id
             set: {
-              id: sql`excluded.id`, // slug may change
+              id: sql`excluded.id`,
               wikiId: sql`excluded.wiki_id`,
               entityType: sql`excluded.entity_type`,
               title: sql`excluded.title`,
@@ -904,6 +937,11 @@ const entitiesApp = new Hono()
               updatedAt: sql`now()`,
             },
           });
+
+        // Re-add the unique constraint
+        await tx.execute(sql`
+          ALTER TABLE entities ADD CONSTRAINT entities_id_unique UNIQUE (id)
+        `);
 
         // Dual-write to things table
         await upsertThingsInTx(

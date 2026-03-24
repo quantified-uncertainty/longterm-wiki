@@ -44,13 +44,13 @@ facts:
     asOf: 2026-03
     source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
 
-  - id: f_brookings_aiet_founded
+  - id: f_1lajvorYmY
     property: program-founded
     value: "2018"
     source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
     notes: "The AI and Emerging Technology Initiative launched in 2018 as part of Brookings Governance Studies"
 
-  - id: f_brookings_revenue
+  - id: f_Cq7BVOPP2O
     property: revenue
     value: "100000000"
     unit: USD
@@ -58,12 +58,12 @@ facts:
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Approximate annual operating expenses for the full Brookings Institution (~$100M)"
 
-  - id: f_brookings_country
+  - id: f_tkaEfcCmR9
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Brookings_Institution
 
-  - id: f_brookings_techtank
+  - id: f_eNkxDKqUsq
     property: publication
     value: "TechTank — regular blog series on technology policy, covering AI regulation, workforce impacts, privacy, and platform governance. One of the most-read policy blogs in DC."
     asOf: 2025

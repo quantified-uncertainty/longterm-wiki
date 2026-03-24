@@ -1,0 +1,103 @@
+---
+wikiId: E1239
+title: Jared Kaplan
+description: Theoretical physicist, co-founder and Chief Science Officer of Anthropic, and pioneer of AI scaling laws research.
+subcategory: safety-researchers
+update_frequency: 90
+sidebar:
+  order: 50
+lastEdited: 2026-03-23
+createdAt: 2026-03-23
+summary: Comprehensive biographical profile of Jared Kaplan covering his scaling laws research, Anthropic co-founder role, and Responsible Scaling Officer appointment, with notable coverage of RSP enforcement and timeline predictions through mid-2025; however, the entire article relies on a single Perplexity research compilation rather than primary sources, significantly undermining verifiability.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Value |
+|-----------|-------|
+| **Full name** | Jared Daniel Kaplan |
+| **Role** | Co-founder and Chief Science Officer, Anthropic |
+| **Also** | Associate Professor, Johns Hopkins University Department of Physics & Astronomy |
+| **Additional role** | Responsible Scaling Officer, Anthropic (since October 2024) |
+| **Education** | BS Physics & Mathematics, Stanford; PhD Physics, Harvard |
+| **Key contribution** | Scaling laws for neural language models; Constitutional AI |
+| **Net worth (est.)** | \$3.7 billion (Forbes, 2026) |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Jared_Kaplan) |
+| Wikidata | [wikidata.org](https://www.wikidata.org/wiki/Q102649624) |
+
+## Overview
+
+<EntityLink id="E1239">Jared Kaplan</EntityLink> is a theoretical physicist and AI researcher who serves as co-founder and Chief Science Officer of <EntityLink id="E22">Anthropic</EntityLink>, an AI safety and research company. He also maintains an appointment as associate professor in the Department of Physics & Astronomy at Johns Hopkins University, where he has taught since 2012, including courses on deep learning. His career bridges academic physics—with research spanning quantum gravity, holography (AdS/CFT), conformal field theory, and cosmology—and applied machine learning research at the frontier of large language model development.[^1]
+
+Kaplan is best known outside academia for co-authoring *Scaling Laws for Neural Language Models* (2020) while at <EntityLink id="E218">OpenAI</EntityLink>, a paper that demonstrated language model performance improves predictably as a function of model size, dataset size, and compute. This empirical finding shaped how AI labs allocate resources and plan capability development. He also co-authored *Language Models are Few-Shot Learners* (2020), which introduced GPT-3 to the research community.[^1]
+
+In October 2024, Anthropic appointed Kaplan as its Responsible Scaling Officer, giving him formal responsibility for overseeing the company's Responsible Scaling Policy (RSP) and determining the safety assessments and precautions required before each model release.[^1]
+
+## Background and Education
+
+Kaplan completed a bachelor's degree in physics and mathematics at Stanford University and a PhD in physics at Harvard University, where his doctoral thesis was titled *Aspects of Holography* and was supervised by Nima Arkani-Hamed.[^1] Following his doctorate, he held postdoctoral positions at SLAC and Stanford University before joining Johns Hopkins in 2012. He was named a Hertz Fellow in 2005, received a Sloan Research Fellowship, and was awarded an NSF CAREER Award (PHY-1454083) in 2015.[^1]
+
+His academic research has spanned quantum gravity, holography and the AdS/CFT correspondence, conformal field theory, particle physics phenomenology, and cosmology—including topics in dark matter. This background in theoretical physics, particularly in identifying systematic patterns across scales, appears to have informed his later interest in empirical scaling behavior in machine learning systems.[^1]
+
+## Machine Learning and AI Research
+
+Kaplan joined OpenAI as a researcher in 2019. His most influential contribution from this period is *Scaling Laws for Neural Language Models* (Kaplan et al., 2020; arXiv:2001.08361), which established that the performance of language models on training objectives follows predictable power laws as a function of parameter count, data volume, and compute budget. The paper has been cited extensively and is widely credited with giving AI labs a principled basis for planning model training runs.[^1]
+
+During this period he also co-authored *Language Models are Few-Shot Learners* (Brown et al., NeurIPS 2020), which introduced GPT-3, and contributed to work that produced Codex, the code-generating model underlying early GitHub Copilot products. Other related work includes *Scaling Laws for Autoregressive Generative Modeling* (Henighan et al., 2020) and *Evaluating Large Language Models Trained on Code* (Chen et al., 2021).[^1]
+
+At a July 2025 Y Combinator event, Kaplan described the discovery of scaling laws as emerging from asking what he called basic empirical questions—specifically, determining the precise data and compute requirements for training—questions he characterized as foundational to understanding how AI performance could be predicted from model and dataset size.[^1]
+
+## Anthropic and AI Safety Work
+
+Kaplan co-founded Anthropic alongside <EntityLink id="E91">Dario Amodei</EntityLink> and other former OpenAI researchers. Anthropic is structured as a public benefit corporation with a stated mission of developing AI that is safe and beneficial, and Kaplan has described the organization as deliberately collaborating with government, academia, civil society, and industry on safety questions.[^1]
+
+At Anthropic, Kaplan contributed to the development of **Constitutional AI**, an alignment approach that trains AI systems by providing a set of explicit principles and using AI feedback to enforce adherence to them—in contrast to purely human-labeled reinforcement learning from human feedback (RLHF).[^1]
+
+### Responsible Scaling Policy
+
+Anthropic's Responsible Scaling Policy (RSP) defines a tiered system of AI Safety Levels (ASL), modeled conceptually on biosafety level frameworks. Higher ASL designations correspond to greater model capability and trigger correspondingly stricter safety, security, and operational requirements. If safety measures cannot keep pace with capability development, the policy specifies that training may be paused. In October 2024, Kaplan was formally named Responsible Scaling Officer, making him the individual responsible for ensuring compliance with this framework before model releases.[^1]
+
+In May 2025, Kaplan enforced ASL-3 safeguards for the release of Claude 4, citing concerns about the model's potential to provide meaningful assistance to individuals attempting to develop biological weapons. This included anti-jailbreaking provisions and leak-prevention measures. According to reporting at the time, this represented the first instance of the RSP's higher-level provisions being activated for a release. Anthropic's RSP framework is described in available sources as the first formal policy of its kind, and has reportedly influenced other AI labs, including OpenAI, to adopt similar capability-triggered safety measures for biological risk scenarios.[^1]
+
+The RSP is a **voluntary and non-binding** policy without regulatory backing. Critics and observers have noted this limits enforceability and that Kaplan, as RSO, effectively self-determines the safety thresholds his own company must meet.[^1]
+
+### Views on AI Timelines and Risk
+
+In public statements, Kaplan has expressed views on both the pace of AI development and its implications. In an April 2025 podcast, he stated that he had moved up his estimate for human-level AI from around 2030 to roughly two to three years, citing advances from scaling laws and chain-of-thought reasoning in systems like Claude. He has also predicted that AI could match the capabilities of top physicists within a similar timeframe, and has described most white-collar tasks as potentially automatable within a few years.[^1]
+
+Kaplan has addressed the possibility of recursive self-improvement—AI systems improving their own training—as a scenario requiring careful human oversight. In a December 2025 interview with *The Guardian*, he discussed AI autonomy and timelines to recursive self-improvement, framing the question of whether to allow AI systems to train their successors as a high-stakes decision that humanity would face in the coming years.[^1] He has also acknowledged the risk of AI being deliberately misused to assist in creating weapons of mass destruction, alongside risks from unintended autonomous behavior.[^1]
+
+He has noted a structural tension in safety research: studying frontier AI risks requires access to large frontier models, which may itself accelerate the development and deployment of potentially dangerous systems. He has described this as a genuine challenge without a clean resolution.[^1]
+
+In a June 2025 talk, Kaplan expressed confidence that scaling laws continue to hold across many orders of magnitude in compute, data, and model size, characterizing apparent signs of scaling failure as more likely attributable to training errors or architectural choices than to fundamental limits. He has also stated that he sees ongoing improvements from extended inference-time compute, as models are given more steps to reason before producing outputs.[^1]
+
+## Community Engagement
+
+Kaplan has been recognized in TIME's 100 Most Influential People in AI (2025) for his role in AI safety leadership.[^1] He has participated in speaking engagements within the AI safety and EA-adjacent research communities, including talks on scaling laws for neural networks as part of discussion series on AI alignment, and has appeared alongside researchers including <EntityLink id="E220">Paul Christiano</EntityLink> in broader speaker series on alignment.[^1] He has also provided expert input on AI safety for U.S. Senate proceedings.[^1]
+
+## Criticisms and Concerns
+
+Several concerns have been raised about Kaplan's work and positions, though no major personal controversies appear in available sources.
+
+The voluntary nature of Anthropic's RSP has drawn scrutiny. Because the policy is self-imposed and Kaplan as RSO determines compliance thresholds for his own company's models, observers have questioned whether the framework provides meaningful external accountability or primarily serves reputational purposes.[^1]
+
+Kaplan's strong advocacy for scaling laws as the primary driver of AI progress has attracted skepticism from researchers who argue the framing underweights architectural innovation and overstates the predictability of emergent capabilities. Some critics have also pointed to reliability challenges—such as hallucination in large language models—as evidence that scaling does not straightforwardly deliver the safety and alignment properties that Anthropic claims.[^1]
+
+His timeline predictions for human-level AI and large-scale automation have been noted as potentially accelerationist: by publicly predicting rapid capability gains and normalizing very short timelines, researchers in the field have debated whether such statements shape expectations in ways that increase competitive pressure on safety considerations, even when made with safety intent.[^1]
+
+In June 2025, Anthropic cut direct access for Windsurf, a developer tools company, to Claude 3.5 Sonnet and Claude 3.7 Sonnet amid reports of OpenAI's potential acquisition of Windsurf. Kaplan stated the decision reflected a preference for lasting partnerships and was constrained by compute availability. Windsurf reported that the access cut caused short-term user instability, and the episode drew attention to the degree to which Anthropic's partnership decisions can affect downstream users without clear advance notice.[^1]
+
+## Key Uncertainties
+
+- Whether scaling laws will continue to hold at the compute scales currently being planned, or whether diminishing returns will emerge at higher capability levels
+- Whether Anthropic's voluntary Responsible Scaling Policy provides meaningful safety constraints or primarily serves as a reputational commitment device
+- The accuracy of Kaplan's stated timelines for human-level AI and large-scale automation, which remain prospective and contested
+- How Kaplan's dual roles—as a commercial AI developer building frontier systems and as a safety officer assessing those same systems—affect the independence of safety assessments
+
+[^1]: Perplexity research data compiled for this article — covers Kaplan's biography, academic career, OpenAI work, Anthropic roles, RSP/ASL policy, public statements, and recent developments through early 2026.

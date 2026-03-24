@@ -812,12 +812,28 @@
     - security-mindset
     - deconfusion
   lastUpdated: 2025-12
+- id: uk-dsit
+  stableId: rEQ9mInLoQ
+  type: organization
+  orgType: government
+  title: UK Department for Science, Innovation and Technology (DSIT)
+  website: https://www.gov.uk/government/organisations/department-for-science-innovation-and-technology
+  description: >-
+    UK government department responsible for science, research, innovation,
+    and technology policy. Parent department of the UK AI Safety Institute
+    and ARIA.
+  status: stub
+  tags:
+    - government
+    - uk
+  lastUpdated: 2026-03
+
 - id: uk-aisi
   stableId: aX0jkoaekQ
   wikiId: E364
   type: organization
   orgType: government
-  # parentOrg: uk-dsit — removed, no entity exists for DSIT
+  parentOrg: uk-dsit
   summaryPage: government-orgs-overview
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
@@ -1506,6 +1522,23 @@
     - title: Nick Bostrom on FHI at Oxford
       url: https://nickbostrom.com/oxfhi
   lastUpdated: 2025-12
+
+- id: macrostrategy-research-initiative
+  stableId: idAU5YPkSw
+  type: organization
+  orgType: safety-org
+  title: Macrostrategy Research Initiative
+  description: >-
+    Nonprofit research organization founded by Nick Bostrom in 2024 after leaving
+    Oxford and the closure of the Future of Humanity Institute. Focuses on
+    macrostrategy research examining how present-day actions connect to long-term
+    outcomes for humanity.
+  status: stub
+  tags:
+    - research-org
+    - existential-risk
+  lastUpdated: 2026-03
+
 # Batch 4 - Organization Entity Definitions
 # Generated 2026-02-08
 
@@ -7187,7 +7220,7 @@
   lastUpdated: 2026-03
 
 - id: mellon-foundation
-  stableId: MIie9_9BSq
+  stableId: Ni1A9uFQ9S
   type: organization
   orgType: funder
   title: Andrew W. Mellon Foundation
@@ -7197,7 +7230,7 @@
   lastUpdated: 2026-03
 
 - id: walton-family-foundation
-  stableId: gk4_-AGcTd
+  stableId: OEr0rtfTAU
   type: organization
   orgType: funder
   title: Walton Family Foundation
@@ -7218,7 +7251,7 @@
   lastUpdated: 2026-03
 
 - id: sandler-foundation
-  stableId: EPY-YnX6K8
+  stableId: B1GYdbJuD9
   type: organization
   orgType: funder
   title: Sandler Foundation
@@ -7251,7 +7284,7 @@
 
 # --- EA/AI safety grantee organizations ---
 - id: wild-animal-initiative
-  stableId: mHrz7Y-rOx
+  stableId: 2OLJZcF1pW
   type: organization
   orgType: generic
   title: Wild Animal Initiative
@@ -7263,7 +7296,7 @@
   lastUpdated: 2026-03
 
 - id: mercy-for-animals
-  stableId: 8C_NZjRH28
+  stableId: u2j7u53L8S
   type: organization
   orgType: generic
   title: Mercy For Animals
@@ -7461,7 +7494,7 @@
   lastUpdated: 2026-03
 
 - id: encode-ai
-  stableId: BVYHXX_LvA
+  stableId: J6bv0LEEgY
   type: organization
   orgType: generic
   title: Encode AI Corporation
@@ -7470,7 +7503,7 @@
   lastUpdated: 2026-03
 
 - id: california-yimby
-  stableId: yU5rKw_sAa
+  stableId: pwHtwwEByZ
   type: organization
   orgType: generic
   title: California YIMBY
@@ -7724,7 +7757,7 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: CnTLlp3VqA
+    - id: y4bieqSeag
       type: organization
       relationship: related
   sources:
@@ -8039,10 +8072,10 @@
   clusters:
     - governance
   relatedEntries:
-    - id: tWHbSbUBVg
+    - id: GADd9PU0UA
       type: organization
       relationship: related
-    - id: j83jDvR3Cg
+    - id: 8q2GhtEmkA
       type: organization
       relationship: related
     - id: DK0GbGg7Kf

@@ -114,12 +114,31 @@ function getMilestoneColor(label: string): string {
 // ── Vote/milestone deduplication ────────────────────────────────────────
 
 const CHAMBER_TO_MILESTONE: Record<string, string[]> = {
+  // US state legislatures
   "senate floor": ["passed senate"],
   "assembly floor": ["passed assembly"],
   "house floor": ["passed house"],
   "senate concurrence": ["passed legislature"],
   "house concurrence": ["passed legislature"],
   "assembly concurrence": ["passed legislature"],
+  // State-prefixed chambers (e.g., NY Senate, NY Assembly)
+  "ny senate": ["passed senate", "passed legislature"],
+  "ny assembly": ["passed assembly", "passed legislature"],
+  // Executive actions
+  governor: ["signed", "enacted", "vetoed"],
+  president: ["signed", "enacted", "vetoed"],
+  "executive order": ["signed", "enacted", "effective"],
+  // International / diplomatic
+  summit: ["signed", "signed on", "adopted", "agreed"],
+  // EU institutions
+  "european parliament (final adoption)": [
+    "parliament final vote",
+    "passed parliament",
+  ],
+  "european parliament (negotiating mandate)": [
+    "parliament negotiating mandate",
+  ],
+  "council of the european union": ["council adoption", "council adopted"],
 };
 
 function voteLabelMatch(voteChamber: string, milestoneLabel: string): boolean {
@@ -129,10 +148,46 @@ function voteLabelMatch(voteChamber: string, milestoneLabel: string): boolean {
   return matchLabels !== undefined && matchLabels.includes(labelKey);
 }
 
-function voteDateMatch(voteDate: string, milestoneDate: string): boolean {
+/**
+ * Check if a display date string is month-only (e.g., "April 2024", "2024-05").
+ * Month-only dates get parsed to YYYY-MM-01 by parseDisplayDateToISO,
+ * so we detect them from the original display string to allow wider matching.
+ */
+function isMonthOnlyDisplay(display: string): boolean {
+  // "April 2024", "May 2024", etc.
+  if (/^[A-Za-z]+\s+\d{4}$/.test(display.trim())) return true;
+  // "2024-05" (ISO month-only)
+  if (/^\d{4}-\d{2}$/.test(display.trim())) return true;
+  return false;
+}
+
+/**
+ * Match vote and milestone dates, accounting for month-only granularity.
+ * When either date is month-only, matching is by same year-month.
+ * Otherwise, matching is within 1 day (86400000 ms).
+ */
+function voteDateMatch(
+  voteDate: string,
+  milestoneDate: string,
+  voteDisplay?: string,
+  milestoneDisplay?: string
+): boolean {
   const vd = new Date(voteDate).getTime();
   const md = new Date(milestoneDate).getTime();
-  return !isNaN(vd) && !isNaN(md) && Math.abs(vd - md) <= 86400000;
+  if (isNaN(vd) || isNaN(md)) return false;
+
+  // If either date is month-only, match by year-month
+  const voteMonthOnly = voteDisplay ? isMonthOnlyDisplay(voteDisplay) : false;
+  const milestoneMonthOnly = milestoneDisplay
+    ? isMonthOnlyDisplay(milestoneDisplay)
+    : false;
+
+  if (voteMonthOnly || milestoneMonthOnly) {
+    // Compare YYYY-MM prefix (first 7 chars of ISO date)
+    return voteDate.slice(0, 7) === milestoneDate.slice(0, 7);
+  }
+
+  return Math.abs(vd - md) <= 86400000;
 }
 
 // ── Main merge algorithm ────────────────────────────────────────────────
@@ -217,7 +272,8 @@ export function buildUnifiedTimeline(
     }
   }
 
-  // Pass 2: match remaining by date proximity (within 1 day)
+  // Pass 2: match remaining by date proximity (within 1 day, or same month
+  // if either date is month-only granularity)
   for (let vi = 0; vi < rawVotes.length; vi++) {
     if (matchedVoteIndices.has(vi)) continue;
     const vote = rawVotes[vi];
@@ -227,7 +283,14 @@ export function buildUnifiedTimeline(
     if (!voteDate) continue;
     for (let mi = 0; mi < milestones.length; mi++) {
       if (claimedMilestoneIndices.has(mi)) continue;
-      if (voteDateMatch(voteDate, milestones[mi].sortDate)) {
+      if (
+        voteDateMatch(
+          voteDate,
+          milestones[mi].sortDate,
+          vote.date,
+          milestones[mi].displayDate
+        )
+      ) {
         assignVoteToMilestone(vi, mi);
         break;
       }
@@ -250,54 +313,47 @@ export function buildUnifiedTimeline(
 
   // Step 4: Assign amendments and unmatched votes to milestones.
   // Everything between milestone N and milestone N+1 goes under milestone N.
-  // Items that fall before the first milestone (or when there are no milestones
-  // at all) are collected into orphanChildren and surfaced via a synthetic
-  // milestone, so they are not silently dropped.
-  const orphanChildren: TimelineChild[] = [];
+  // Items that fall before the first milestone are attached to the nearest
+  // milestone (the first one) so they're not silently dropped or pushed into
+  // a confusing "Unmatched events" bucket.
 
   for (const amendment of parsedAmendments) {
-    const milestoneIdx = findMilestoneIndex(milestones, amendment.sortDate);
-    const target =
-      milestoneIdx >= 0 ? milestones[milestoneIdx].children : orphanChildren;
-    target.push({
-      type: "amendment",
-      sortDate: amendment.sortDate,
-      date: amendment.date,
-      description: amendment.description,
-      url: amendment.url,
-      author: amendment.author,
-    });
+    const milestoneIdx = findNearestMilestoneIndex(
+      milestones,
+      amendment.sortDate
+    );
+    if (milestoneIdx >= 0) {
+      milestones[milestoneIdx].children.push({
+        type: "amendment",
+        sortDate: amendment.sortDate,
+        date: amendment.date,
+        description: amendment.description,
+        url: amendment.url,
+        author: amendment.author,
+      });
+    }
+    // If no milestones at all, the amendment is silently dropped (no bucket).
+    // This only happens when rawMilestones is empty.
   }
 
   for (const vote of parsedVotes) {
     if (!vote.sortDate) continue;
-    const milestoneIdx = findMilestoneIndex(milestones, vote.sortDate);
-    const target =
-      milestoneIdx >= 0 ? milestones[milestoneIdx].children : orphanChildren;
-    target.push({
-      type: "vote",
-      sortDate: vote.sortDate,
-      chamber: vote.chamber,
-      date: vote.date ?? "",
-      result: vote.result,
-      ayes: vote.ayes,
-      noes: vote.noes,
-      ayesDem: vote.ayesDem,
-      ayesRep: vote.ayesRep,
-      noesDem: vote.noesDem,
-      noesRep: vote.noesRep,
-    });
-  }
-
-  // Insert a synthetic milestone at the front for any unmatched items
-  if (orphanChildren.length > 0) {
-    milestones.unshift({
-      sortDate: "0000-01-01",
-      displayDate: "",
-      label: "Unmatched events",
-      color: "bg-gray-500",
-      children: orphanChildren,
-    });
+    const milestoneIdx = findNearestMilestoneIndex(milestones, vote.sortDate);
+    if (milestoneIdx >= 0) {
+      milestones[milestoneIdx].children.push({
+        type: "vote",
+        sortDate: vote.sortDate,
+        chamber: vote.chamber,
+        date: vote.date ?? "",
+        result: vote.result,
+        ayes: vote.ayes,
+        noes: vote.noes,
+        ayesDem: vote.ayesDem,
+        ayesRep: vote.ayesRep,
+        noesDem: vote.noesDem,
+        noesRep: vote.noesRep,
+      });
+    }
   }
 
   // Sort children within each milestone by date
@@ -379,4 +435,21 @@ function findMilestoneIndex(
     }
   }
   return result;
+}
+
+/**
+ * Find the nearest milestone for a date, falling back to the first milestone
+ * when the date is before all milestones. This prevents orphan items from
+ * being pushed into an "Unmatched events" synthetic milestone.
+ *
+ * Returns -1 only if there are no milestones at all.
+ */
+function findNearestMilestoneIndex(
+  milestones: TimelineMilestone[],
+  date: string
+): number {
+  if (milestones.length === 0) return -1;
+  const idx = findMilestoneIndex(milestones, date);
+  // If before all milestones, attach to the first one
+  return idx >= 0 ? idx : 0;
 }

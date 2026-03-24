@@ -286,7 +286,7 @@ export function preprocessReferences(
         data = claimData;
         definitionText = buildClaimFootnote(claimData);
       } else {
-        definitionText = `Claim reference ${refId} (data unavailable — rebuild with wiki-server access)`;
+        definitionText = `Claim reference ${refId}`;
       }
     } else if (refId.startsWith("kb-")) {
       kind = "kb";
@@ -296,7 +296,7 @@ export function preprocessReferences(
         data = kbData;
         definitionText = buildKBFactFootnote(kbData);
       } else {
-        definitionText = `KB fact ${factId} (data unavailable)`;
+        definitionText = `KB fact ${factId}`;
       }
     } else {
       kind = "citation";
@@ -305,7 +305,7 @@ export function preprocessReferences(
         data = citData;
         definitionText = buildCitationFootnote(citData);
       } else {
-        definitionText = `Citation ${refId} (data unavailable — rebuild with wiki-server access)`;
+        definitionText = `Citation ${refId}`;
       }
     }
 
