@@ -157,27 +157,29 @@ const benchmarkResultsApp = new Hono()
     // Validate FK references before inserting.
     // benchmarkId references the `benchmarks` table (not entities), so check it separately.
     // modelId references entities.stable_id, so use the standard entity validation.
-    const skip = c.req.query("skipEntityValidation") === "true";
-    if (!skip) {
-      // Check benchmarkIds against the benchmarks table
-      const benchmarkIds = [...new Set(parsed.data.items.map((i) => i.benchmarkId).filter(Boolean))];
-      if (benchmarkIds.length > 0) {
-        const placeholders = benchmarkIds.map((id) => sql`${id}`);
-        const inList = sql.join(placeholders, sql`, `);
-        const found = await db.execute<{ id: string }>(sql`
-          SELECT id FROM benchmarks WHERE id IN (${inList})
-        `);
-        const foundSet = new Set(found.map((r) => r.id));
-        const missing = benchmarkIds.filter((id) => !foundSet.has(id));
-        if (missing.length > 0) {
-          return validationError(
-            c,
-            `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
-          );
-        }
+    // Check benchmarkIds against the benchmarks table.
+    // This always runs — benchmarkId is a real FK to `benchmarks`, and skipping
+    // this check would let invalid references through to the upsert.
+    const benchmarkIds = [...new Set(parsed.data.items.map((i) => i.benchmarkId))];
+    if (benchmarkIds.length > 0) {
+      const placeholders = benchmarkIds.map((id) => sql`${id}`);
+      const inList = sql.join(placeholders, sql`, `);
+      const found = await db.execute<{ id: string }>(sql`
+        SELECT id FROM benchmarks WHERE id IN (${inList})
+      `);
+      const foundSet = new Set(found.map((r) => r.id));
+      const missing = benchmarkIds.filter((id) => !foundSet.has(id));
+      if (missing.length > 0) {
+        return validationError(
+          c,
+          `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
+        );
       }
+    }
 
-      // Check modelIds against the entities table
+    // Check modelIds against the entities table (skippable via ?skipEntityValidation=true
+    // because entity sync order may vary, but benchmark refs are always required).
+    if (c.req.query("skipEntityValidation") !== "true") {
       const modelRefError = await validateEntityRefs(c, db, [
         { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
       ]);
