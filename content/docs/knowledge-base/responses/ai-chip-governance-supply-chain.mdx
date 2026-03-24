@@ -112,7 +112,7 @@ The CNAS research recommends coordinating HEM development through a NIST-led wor
 
 Industry positions on hardware-enabled governance range from cautious engagement to active resistance.
 
-**Nvidia** has piloted customer tracking software and cooperated with export control compliance at the sales stage. However, the company has resisted proposals for hardware kill-switches or hard functionality throttles. Nvidia's Vice President of Government Affairs has argued that restricting access to critical technology would stifle global collaboration and innovation, ultimately weakening the U.S. economy and its technological edge. The company also fears export limitations will shrink its addressable market, particularly given revenue exposure to hyperscalers whose orders have at times been delayed.
+**Nvidia** is the only major chipmaker actively building governance technology. In December 2025, Nvidia [piloted location-verification software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell AI GPUs, using GPU telemetry and communication latency to landmark servers to estimate chip country of operation. The system uses confidential computing capabilities already in the chips, is customer-installed (not hidden), and Nvidia plans to make it open-source. However, the company has [firmly rejected kill switches](https://blogs.nvidia.com/blog/no-backdoors-no-kill-switches-no-spyware/): Chief Security Officer David Reber wrote in August 2025 that kill switches are "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper Chip as precedent. Nvidia's FY2026 data center revenue reached \$62.3B in Q4 alone, giving it enormous market leverage in shaping governance standards.
 
 **AMD and Intel** have similarly cooperated with export controls while publicly emphasizing innovation and competitiveness concerns. Both companies have existing chip features that researchers argue are HEM-compatible, but neither has committed to deploying them for governance purposes absent government mandate.
 
@@ -136,7 +136,32 @@ The research organizations most actively working on AI chip governance policy in
 - **Georgetown CSET**: Analyzes semiconductor supply chains, export control effectiveness, and allied coordination.
 - **Academic labs**: Computer science and security researchers at MIT, Stanford, and Carnegie Mellon have contributed to technical understanding of HEM feasibility.
 
-Experts working in this space have noted that the gap between the scale of industry investment and the scale of governance R&D investment is a structural problem. Hardware governance requires deep technical expertise—in chip architecture, secure enclaves, firmware, and supply chain logistics—that is expensive to develop and in short supply outside industry. Philanthropic funders and governments considering where marginal dollars have most impact might consider direct support for technical HEM research, capacity-building at BIS and allied export control agencies, and multi-stakeholder convenings to develop governance standards before the next generation of chips is designed.
+The ratio of governance R&D to industry investment is stark. Identifiable dedicated funding for hardware governance mechanisms includes:
+
+| Funder | Amount | Focus |
+|--------|--------|-------|
+| [Longview Philanthropy HEM RFP](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) | \$2–10M (one-time) | HEM prototypes: location verification, offline licensing, bandwidth limiters |
+| <EntityLink id="E552">Coefficient Giving</EntityLink> | \$200K–2M/year | AI governance grants (hardware is a subset) |
+| RAND workshop (Li Lu Humanitarian Foundation) | Undisclosed | Expert convening on HEM feasibility |
+| CHIPS Act R&D allocation | \$11B total, \$3.5B defense "secure enclave" | Hardware governance is a small subset, not specifically earmarked |
+| Nvidia (internal) | Unknown | Location verification software; landmark infrastructure est. \$2.5–12.5M/year |
+
+This amounts to roughly \$10M in philanthropic funding versus \$400B+ in annual AI infrastructure spending—a ratio of approximately 1:40,000. No dedicated Focused Research Organization for hardware governance exists, and no VC-funded startup is focused specifically on governance-specific hardware.
+
+## How Funders Can Help
+
+[Coefficient Giving has identified](https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-ai-governance/) the field as "still very funding-constrained." The highest-impact areas for marginal philanthropic dollars, in rough priority order:
+
+| Priority | Investment Needed | What It Buys |
+|----------|-------------------|-------------|
+| **HEM prototyping** | \$5–20M | Delay-based location verification improvements (accuracy from ≈100-500km), offline licensing systems, bandwidth rate limiters, red-teaming of existing mechanisms |
+| **Dedicated FRO** | \$10–30M over 3 years | A [Focused Research Organization](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) combining hardware security expertise with AI governance policy—no such entity currently exists |
+| **Talent pipeline** | \$2–5M/year | Fellowships and secondments for [hardware engineers at Nvidia, TSMC, and ASML](https://coefficientgiving.org/research/ai-governance-talent-profiles-wed-like-to-see/) interested in governance applications |
+| **Policy research** | \$1–5M/year | Detailed technical analysis at CNAS, RAND, IAPS, GovAI—organizations that could absorb more funding |
+| **Field-building** | \$1–3M/year | Cross-disciplinary workshops connecting hardware security, cryptography, AI safety, and government researchers—fields that "don't typically interact" |
+| **Chip tracking infrastructure** | \$5–15M | Building the landmark server network for location verification (\$2.5–12.5M/year for 100–500 servers) |
+
+**The window may be closing.** Lennart Heim (RAND/GovAI) has [argued](https://80000hours.org/podcast/episodes/lennart-heim-compute-governance/) that compute governance may only be viable for "a decade or two" before algorithmic efficiency improvements make chip controls less effective. Investments made now in hardware governance mechanisms could have outsized impact compared to the same investments made later.
 
 ## Criticisms and Concerns
 
