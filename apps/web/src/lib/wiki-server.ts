@@ -179,6 +179,7 @@ import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
 import type { PersonnelRoute } from "@wiki-server/personnel-route";
 import type { PredictionMarketsRoute } from "@wiki-server/prediction-markets-route";
 import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-prices-route";
+import type { DataQualityRoute } from "@wiki-server/data-quality-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -352,4 +353,43 @@ export type RpcSecondaryMarketLatestResult = InferResponseType<SecondaryMarketPr
 
 /** Inferred response type for GET /api/secondary-market-prices/timeseries/:entityId */
 export type RpcSecondaryMarketTimeseriesResult = InferResponseType<SecondaryMarketPricesClient['timeseries'][':entityId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Data Quality Snapshots API
+// ============================================================================
+
+/**
+ * Create a typed Hono RPC client for the data quality snapshots API.
+ * Returns null if the wiki-server URL is not configured.
+ */
+export function getDataQualityRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 300;
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<DataQualityRoute>(`${config.serverUrl}/api/data-quality`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+type DataQualityClient = NonNullable<ReturnType<typeof getDataQualityRpcClient>>;
+
+/** Inferred response type for GET /api/data-quality/latest */
+export type RpcDataQualityLatestResult = InferResponseType<DataQualityClient['latest']['$get'], 200>;
+
+/** Inferred response type for GET /api/data-quality/history */
+export type RpcDataQualityHistoryResult = InferResponseType<DataQualityClient['history']['$get'], 200>;
+
+/** A single data quality snapshot row */
+export type RpcDataQualitySnapshot = NonNullable<RpcDataQualityLatestResult['snapshot']>;
 

@@ -28,6 +28,7 @@ export interface Config {
     githubShadowbanCheck: ShadowbanCheckConfig;
     snapshotRetention: SnapshotRetentionConfig;
     sessionSweep: TaskConfig;
+    dataQualitySnapshot: TaskConfig;
   };
 }
 
@@ -101,6 +102,11 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_SESSION_SWEEP_ENABLED", true),
         schedule:
           process.env["TASK_SESSION_SWEEP_SCHEDULE"] ?? "0 */4 * * *", // every 4 hours
+      },
+      dataQualitySnapshot: {
+        enabled: envBool("TASK_DATA_QUALITY_SNAPSHOT_ENABLED", true),
+        schedule:
+          process.env["TASK_DATA_QUALITY_SNAPSHOT_SCHEDULE"] ?? "0 6 * * *", // daily at 6am UTC
       },
     },
   };

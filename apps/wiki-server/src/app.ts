@@ -67,6 +67,7 @@ import { githubPullsRoute } from "./routes/operational/github-pulls.js";
 import { monitoringRoute } from "./routes/operational/monitoring.js";
 import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
 import { qaChecksRoute } from "./routes/operational/qa-checks.js";
+import { dataQualityRoute } from "./routes/operational/data-quality.js";
 
 let requestCounter = 0;
 
@@ -232,6 +233,7 @@ export function createApp() {
   app.route("/api/monitoring", monitoringRoute);
   app.route("/api/build-metrics", buildMetricsRoute);
   app.route("/api/qa-checks", qaChecksRoute);
+  app.route("/api/data-quality", dataQualityRoute);
 
   return app;
 }

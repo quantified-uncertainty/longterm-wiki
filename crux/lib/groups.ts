@@ -112,6 +112,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'audits',
       'maintain',
       'wiki-server',
+      'quality',
     ],
   },
 };
