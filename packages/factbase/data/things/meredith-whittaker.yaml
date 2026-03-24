@@ -28,3 +28,17 @@ facts:
     asOf: "2022-09"
     source: "https://signal.org/"
     notes: "At Signal Foundation. Became president of Signal; privacy-focused encrypted messaging"
+  - id: "WNJZhA2gVA"
+    property: "employed-by"
+    value: !ref cMNszJMTPX
+    asOf: "2006"
+    validEnd: "2019"
+    source: "https://en.wikipedia.org/wiki/Meredith_Whittaker"
+    notes: "Worked at Google for 13 years; organized Google Walkout; co-founded AI Now Institute while at Google; left over
+      retaliation concerns"
+  - id: "Kx1EIrapBA"
+    property: "employed-by"
+    value: !ref vFTydRTv82
+    asOf: "2022-09"
+    source: "https://signal.org/"
+    notes: "Became president of Signal; privacy-focused encrypted messaging"

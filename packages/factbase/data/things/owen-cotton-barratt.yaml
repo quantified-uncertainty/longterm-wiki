@@ -1,0 +1,14 @@
+entity: MMNpm1875e
+facts:
+  - id: "6GhKYauomA"
+    property: "employed-by"
+    value: !ref Zmw9nfUYWA
+    asOf: "2014"
+    source: "https://www.fhi.ox.ac.uk/"
+    notes: "Oxford mathematician; worked on global priorities research and existential risk"
+  - id: "MdgKzmrrZA"
+    property: "role"
+    value: "Research Fellow"
+    asOf: "2014"
+    source: "https://www.fhi.ox.ac.uk/"
+    notes: "Oxford mathematician; worked on global priorities research and existential risk"

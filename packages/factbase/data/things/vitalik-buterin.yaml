@@ -17,3 +17,9 @@ facts:
     source: "https://en.wikipedia.org/wiki/Vitalik_Buterin"
     notes: "At Ethereum Foundation. Co-created Ethereum; philanthropic funder of AI safety research; donated to MIRI and
       other safety orgs"
+  - id: "9NnH2N2kbw"
+    property: "employed-by"
+    value: !ref eYI7y4bKdq
+    asOf: "2013"
+    source: "https://en.wikipedia.org/wiki/Vitalik_Buterin"
+    notes: "Co-created Ethereum; philanthropic funder of AI safety research; donated to MIRI and other safety orgs"

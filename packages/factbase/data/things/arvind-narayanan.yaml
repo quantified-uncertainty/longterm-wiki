@@ -1,0 +1,8 @@
+entity: 8QyInrJfl7
+facts:
+  - id: "Sj5UKxWpAA"
+    property: "role"
+    value: "Professor of Computer Science"
+    asOf: "2012"
+    source: "https://www.cs.princeton.edu/~arvindn/"
+    notes: "Expert on algorithmic fairness; co-author of 'AI Snake Oil' book; Center for IT Policy"

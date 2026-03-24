@@ -26,3 +26,10 @@ facts:
     asOf: "2024"
     source: "https://anthropic.com/"
     notes: "Joined Anthropic's research team; focuses on model evaluation and safety"
+  - id: "kX4BePOE1Q"
+    property: "employed-by"
+    value: !ref 5IBy869q9Q
+    asOf: "2016"
+    validEnd: "2024"
+    source: "https://cims.nyu.edu/~sbowman/"
+    notes: "Led NLP and AI safety research at NYU; created major NLU benchmarks (SNLI, MultiNLI)"

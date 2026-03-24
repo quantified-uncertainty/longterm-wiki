@@ -60,3 +60,17 @@ facts:
     validEnd: "2017-03"
     source: "https://en.wikipedia.org/wiki/Gary_Marcus"
     notes: "At Uber AI Labs. Uber acquired his startup Geometric Intelligence; brief tenure running Uber AI"
+  - id: "HAJRrVCSTQ"
+    property: "employed-by"
+    value: !ref 5IBy869q9Q
+    asOf: "1995"
+    validEnd: "2023"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Professor Emeritus; founded the NYU Center for Language and Music"
+  - id: "6pDd1Ivhaw"
+    property: "employed-by"
+    value: !ref k99f02K8jm
+    asOf: "2016-12"
+    validEnd: "2017-03"
+    source: "https://en.wikipedia.org/wiki/Gary_Marcus"
+    notes: "Uber acquired his startup Geometric Intelligence; brief tenure running Uber AI"

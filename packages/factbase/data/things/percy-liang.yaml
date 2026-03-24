@@ -1,0 +1,14 @@
+entity: nJAhdmv7E6
+facts:
+  - id: "zXY9c6QGHw"
+    property: "employed-by"
+    value: !ref ngrgdfqafw
+    asOf: "2012"
+    source: "https://cs.stanford.edu/~pliang/"
+    notes: "Director of CRFM; creator of HELM evaluation framework for foundation models"
+  - id: "QoRjTQ8SAQ"
+    property: "role"
+    value: "Associate Professor of Computer Science"
+    asOf: "2012"
+    source: "https://cs.stanford.edu/~pliang/"
+    notes: "Director of CRFM; creator of HELM evaluation framework for foundation models"

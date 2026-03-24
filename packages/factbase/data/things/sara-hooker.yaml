@@ -1,0 +1,22 @@
+entity: mtZvdUB2Pm
+facts:
+  - id: "GTyaHb55Ig"
+    property: "employed-by"
+    value: !ref AZmSQxCAlk
+    asOf: "2018"
+    validEnd: "2022"
+    source: "https://www.sarahooker.me/"
+    notes: "Worked on efficient ML and model compression at Google Brain"
+  - id: "VCanyevXKw"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2018"
+    validEnd: "2022"
+    source: "https://www.sarahooker.me/"
+    notes: "Worked on efficient ML and model compression at Google Brain"
+  - id: "ExnwDvHc5A"
+    property: "role"
+    value: "Founder & Head of Research"
+    asOf: "2022"
+    source: "https://cohere.for.ai/"
+    notes: "Founded Cohere For AI, a nonprofit ML research lab focused on open science and equitable access"

@@ -1,0 +1,14 @@
+entity: EWTG4ReRam
+facts:
+  - id: "wNO4Z9BDUA"
+    property: "employed-by"
+    value: !ref aX0jkoaekQ
+    asOf: "2023-06"
+    source: "https://www.gov.uk/government/organisations/ai-safety-institute"
+    notes: "Co-chairs UK AISI alongside Ian Hogarth; also runs Entrepreneur First"
+  - id: "bM01FkzmXQ"
+    property: "role"
+    value: "Co-Chair"
+    asOf: "2023-06"
+    source: "https://www.gov.uk/government/organisations/ai-safety-institute"
+    notes: "Co-chairs UK AISI alongside Ian Hogarth; also runs Entrepreneur First"

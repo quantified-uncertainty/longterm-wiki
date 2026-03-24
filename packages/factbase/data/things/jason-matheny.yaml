@@ -1,0 +1,16 @@
+entity: gA9eoKhFAM
+facts:
+  - id: "9P0r4QUBiQ"
+    property: "role"
+    value: "Director"
+    asOf: "2015"
+    validEnd: "2019"
+    source: "https://en.wikipedia.org/wiki/Jason_Matheny"
+    notes: "Directed Intelligence Advanced Research Projects Activity; funded forecasting research"
+  - id: "zo9FDd0bew"
+    property: "role"
+    value: "Deputy Assistant to the President"
+    asOf: "2021"
+    validEnd: "2022"
+    source: "https://en.wikipedia.org/wiki/Jason_Matheny"
+    notes: "Served on National Security Council; advised on technology and national security policy"

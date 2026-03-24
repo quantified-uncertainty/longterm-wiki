@@ -1,0 +1,9 @@
+entity: N2uGQXnMvD
+facts:
+  - id: "thfSpSpHbw"
+    property: "role"
+    value: "Professor of Linguistics"
+    asOf: "2003"
+    source: "https://faculty.washington.edu/ebender/"
+    notes: "Co-authored 'On the Dangers of Stochastic Parrots' (2021); leading critic of LLM hype; director of the
+      Computational Linguistics Lab"

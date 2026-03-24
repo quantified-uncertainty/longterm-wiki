@@ -20,3 +20,9 @@ facts:
     asOf: "2024"
     source: "https://grayswan.ai/"
     notes: "At Gray Swan AI. Co-founded Gray Swan AI to commercialize AI red-teaming and safety tools"
+  - id: "JKvdj77x3w"
+    property: "employed-by"
+    value: !ref RFHtSrFaE3
+    asOf: "2024"
+    source: "https://grayswan.ai/"
+    notes: "Co-founded Gray Swan AI to commercialize AI red-teaming and safety tools"

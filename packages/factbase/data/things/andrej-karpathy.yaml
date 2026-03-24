@@ -59,3 +59,10 @@ facts:
     validEnd: "2024-02"
     source: "https://en.wikipedia.org/wiki/Andrej_Karpathy"
     notes: "Returned briefly; worked on frontier model development"
+  - id: "ItiSrHVJ7g"
+    property: "employed-by"
+    value: !ref DBucVJZWyR
+    asOf: "2017-06"
+    validEnd: "2022-07"
+    source: "https://en.wikipedia.org/wiki/Andrej_Karpathy"
+    notes: "Led the Autopilot computer vision team; built Tesla's AI training infrastructure"

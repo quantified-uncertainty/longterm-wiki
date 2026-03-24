@@ -1,0 +1,15 @@
+entity: OBvnfQJxnv
+facts:
+  - id: "i9zZy6xCyQ"
+    property: "role"
+    value: "Director of ML Ethics, Transparency, and Accountability"
+    asOf: "2021"
+    validEnd: "2022"
+    source: "https://en.wikipedia.org/wiki/Rumman_Chowdhury"
+    notes: "Led Twitter's responsible AI team; departed after Elon Musk acquisition"
+  - id: "vfRN3Xa95w"
+    property: "role"
+    value: "Founder"
+    asOf: "2023"
+    source: "https://www.humaneintelligence.com/"
+    notes: "Founded Humane Intelligence; AI auditing and accountability nonprofit"

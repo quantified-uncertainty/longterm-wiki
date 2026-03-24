@@ -1,0 +1,28 @@
+entity: 7Eyg6j59ep
+facts:
+  - id: "aeKgdsZIoA"
+    property: "employed-by"
+    value: !ref ksqqi7fyeA
+    asOf: "2020"
+    validEnd: "2024"
+    source: "https://collinburns.com/"
+    notes: "PhD on unsupervised methods for discovering model beliefs; 'Discovering Latent Knowledge' paper"
+  - id: "6qiSPtn4hg"
+    property: "role"
+    value: "PhD Student"
+    asOf: "2020"
+    validEnd: "2024"
+    source: "https://collinburns.com/"
+    notes: "PhD on unsupervised methods for discovering model beliefs; 'Discovering Latent Knowledge' paper"
+  - id: "NUfcqdAdGw"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2024"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI after completing PhD at Berkeley"
+  - id: "eI1tgiGAow"
+    property: "role"
+    value: "Researcher"
+    asOf: "2024"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI after completing PhD at Berkeley"

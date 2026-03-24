@@ -1,0 +1,14 @@
+entity: WCxgtVgcr1
+facts:
+  - id: "6ktWc9RTLw"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2022"
+    source: "https://anthropic.com/"
+    notes: "Leads Anthropic's policy and government engagement; previously at Carnegie Endowment"
+  - id: "dBeItF4uYg"
+    property: "role"
+    value: "Head of Policy"
+    asOf: "2022"
+    source: "https://anthropic.com/"
+    notes: "Leads Anthropic's policy and government engagement; previously at Carnegie Endowment"

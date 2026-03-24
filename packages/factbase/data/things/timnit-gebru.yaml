@@ -48,3 +48,17 @@ facts:
     asOf: "2021-12"
     source: "https://www.dairinstitute.org/"
     notes: "At DAIR Institute. Founded the Distributed AI Research Institute after leaving Google"
+  - id: "P3vLhx1XOA"
+    property: "employed-by"
+    value: !ref cMNszJMTPX
+    asOf: "2018"
+    validEnd: "2020-12"
+    source: "https://en.wikipedia.org/wiki/Timnit_Gebru"
+    notes: "Co-led the Ethical AI team; fired in December 2020 following dispute over a research paper on large language
+      models"
+  - id: "0s9enMTXhw"
+    property: "employed-by"
+    value: !ref DZ35boEfdI
+    asOf: "2021-12"
+    source: "https://www.dairinstitute.org/"
+    notes: "Founded the Distributed AI Research Institute after leaving Google"

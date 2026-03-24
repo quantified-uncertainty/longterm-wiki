@@ -1,0 +1,24 @@
+entity: ePBtKVxUkn
+facts:
+  - id: "Wi3X2Xo7mA"
+    property: "role"
+    value: "Professor of Computer Science"
+    asOf: "2016"
+    source: "https://www.scottaaronson.com/"
+    notes: "Quantum computing and computational complexity; David J. Bruton Centennial Professor"
+  - id: "QIj5ryossw"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2022-08"
+    validEnd: "2023-07"
+    source: "https://scottaaronson.blog/?p=6823"
+    notes: "Spent a year at OpenAI working on AI safety, specifically AI text watermarking; returned to UT Austin after
+      sabbatical"
+  - id: "xdUQmv7yCQ"
+    property: "role"
+    value: "Guest Researcher"
+    asOf: "2022-08"
+    validEnd: "2023-07"
+    source: "https://scottaaronson.blog/?p=6823"
+    notes: "Spent a year at OpenAI working on AI safety, specifically AI text watermarking; returned to UT Austin after
+      sabbatical"

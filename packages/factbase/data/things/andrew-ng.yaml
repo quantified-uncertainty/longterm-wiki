@@ -56,3 +56,10 @@ facts:
     validEnd: "2017"
     source: "https://en.wikipedia.org/wiki/Andrew_Ng"
     notes: "At Baidu. Led Baidu's AI Group and AI research lab in Silicon Valley"
+  - id: "lFoXruhF2Q"
+    property: "employed-by"
+    value: !ref Z1ypUKIPc0
+    asOf: "2014"
+    validEnd: "2017"
+    source: "https://en.wikipedia.org/wiki/Andrew_Ng"
+    notes: "Led Baidu's AI Group and AI research lab in Silicon Valley"

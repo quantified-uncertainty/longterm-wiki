@@ -55,3 +55,10 @@ facts:
     asOf: "2024-03"
     source: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
     notes: "Appointed CEO of Microsoft AI division; brought much of Inflection team"
+  - id: "H9wRCcHX9Q"
+    property: "employed-by"
+    value: !ref r1i7cwBiD7
+    asOf: "2022-01"
+    validEnd: "2024-03"
+    source: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
+    notes: "Founded Inflection AI; built Pi chatbot; left when most of team joined Microsoft"

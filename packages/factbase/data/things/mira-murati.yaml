@@ -38,3 +38,10 @@ facts:
     source: "https://en.wikipedia.org/wiki/Mira_Murati"
     notes: "VP of Applied AI & Partnerships, then CTO; led ChatGPT launch; briefly served as interim CEO during Nov 2023
       board crisis; departed October 2024"
+  - id: "pHAjLyNEfg"
+    property: "employed-by"
+    value: !ref DBucVJZWyR
+    asOf: "2016"
+    validEnd: "2018"
+    source: "https://en.wikipedia.org/wiki/Mira_Murati"
+    notes: "Worked on Model X development"

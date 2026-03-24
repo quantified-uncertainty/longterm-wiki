@@ -33,3 +33,10 @@ facts:
     asOf: "2024-06"
     source: "https://ssi.inc/"
     notes: "Co-founded SSI with Ilya Sutskever and Daniel Levy"
+  - id: "gRvecZfs3Q"
+    property: "employed-by"
+    value: !ref 1kawFEPpVe
+    asOf: "2013"
+    validEnd: "2017"
+    source: "https://en.wikipedia.org/wiki/Daniel_Gross_(technologist)"
+    notes: "Apple acquired his startup Cue; led ML projects at Apple"

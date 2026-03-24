@@ -34,3 +34,10 @@ facts:
     validEnd: "2018"
     source: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
     notes: "At Google Cloud. Led AI strategy at Google Cloud on sabbatical from Stanford"
+  - id: "OlmLPlMVcQ"
+    property: "employed-by"
+    value: !ref cMNszJMTPX
+    asOf: "2017"
+    validEnd: "2018"
+    source: "https://en.wikipedia.org/wiki/Fei-Fei_Li"
+    notes: "Led AI strategy at Google Cloud on sabbatical from Stanford"

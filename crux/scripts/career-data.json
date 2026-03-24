@@ -412,7 +412,7 @@
         "notes": "Co-led the Ethical AI team; fired in December 2020 following dispute over a research paper on large language models"
       },
       {
-        "orgSlug": "dair",
+        "orgSlug": "dair-institute",
         "orgName": "DAIR Institute",
         "role": "Founder & Executive Director",
         "start": "2021-12",
@@ -482,7 +482,7 @@
     "personSlug": "robin-hanson",
     "careers": [
       {
-        "orgSlug": "gmu",
+        "orgSlug": "george-mason-university",
         "orgName": "George Mason University",
         "role": "Associate Professor of Economics",
         "start": "1999",
@@ -530,7 +530,7 @@
         "notes": "Co-founded DeepMind with Demis Hassabis and Shane Legg; led applied AI division; placed on leave in 2019, then moved to Google VP role"
       },
       {
-        "orgSlug": "inflection",
+        "orgSlug": "inflection-ai",
         "orgName": "Inflection AI",
         "role": "Co-founder & CEO",
         "start": "2022-01",
@@ -1074,7 +1074,7 @@
         "notes": "Co-founded AI Now at NYU; left in 2022"
       },
       {
-        "orgSlug": "signal",
+        "orgSlug": "signal-foundation",
         "orgName": "Signal Foundation",
         "role": "President",
         "start": "2022-09",
@@ -1113,7 +1113,7 @@
     "personSlug": "vitalik-buterin",
     "careers": [
       {
-        "orgSlug": "ethereum",
+        "orgSlug": "ethereum-foundation",
         "orgName": "Ethereum Foundation",
         "role": "Co-founder",
         "start": "2013",
@@ -1227,7 +1227,7 @@
     "personSlug": "anthony-aguirre",
     "careers": [
       {
-        "orgSlug": "ucsc",
+        "orgSlug": "uc-santa-cruz",
         "orgName": "UC Santa Cruz",
         "role": "Professor of Physics",
         "start": "2004",
@@ -1324,7 +1324,7 @@
         "notes": "PhD in AI safety; co-authored the universal adversarial attacks paper (GCG attack); also affiliated with CMU"
       },
       {
-        "orgSlug": "gray-swan",
+        "orgSlug": "gray-swan-ai",
         "orgName": "Gray Swan AI",
         "role": "Co-founder",
         "start": "2024",
@@ -1504,7 +1504,7 @@
         "notes": "Quantitative trader; met SBF at Jane Street"
       },
       {
-        "orgSlug": "alameda",
+        "orgSlug": "alameda-research",
         "orgName": "Alameda Research",
         "role": "CEO",
         "start": "2021",
@@ -1757,6 +1757,216 @@
         "start": "2022",
         "notes": "AI safety community member and researcher"
       }
+    ]
+  },
+  {
+    "personSlug": "catherine-olsson",
+    "careers": [
+      {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Scientist", "start": "2016", "end": "2018", "source": "https://anthropic.com/company", "notes": "Worked on interpretability research at Google Brain"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Researcher", "start": "2018", "end": "2021-01", "source": "https://anthropic.com/company", "notes": "Worked on AI safety at OpenAI before co-founding Anthropic"},
+      {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Co-founder, Researcher", "start": "2021-01", "source": "https://anthropic.com/company", "notes": "Co-founded Anthropic; works on interpretability"}
+    ]
+  },
+  {
+    "personSlug": "tom-henighan",
+    "careers": [
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Researcher", "start": "2018", "end": "2021-01", "source": "https://anthropic.com/company", "notes": "Worked on scaling laws and language model research at OpenAI"},
+      {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Co-founder, Researcher", "start": "2021-01", "source": "https://anthropic.com/company", "notes": "Co-founded Anthropic; key contributor to Claude development"}
+    ]
+  },
+  {
+    "personSlug": "miles-brundage",
+    "careers": [
+      {"orgSlug": "fhi", "orgName": "Future of Humanity Institute", "role": "Research Fellow", "start": "2015", "end": "2018", "source": "https://en.wikipedia.org/wiki/Miles_Brundage", "notes": "AI policy researcher at FHI; co-authored 'The Malicious Use of AI' report"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Head of Policy Research", "start": "2018", "end": "2024", "source": "https://openai.com/", "notes": "Led policy research at OpenAI; advocated for responsible publication practices"}
+    ]
+  },
+  {
+    "personSlug": "jade-leung",
+    "careers": [
+      {"orgSlug": "govai", "orgName": "Centre for the Governance of AI", "role": "Research Lead", "start": "2018", "end": "2022", "source": "https://www.governance.ai/", "notes": "Led governance research at GovAI at Oxford"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Head of Policy", "start": "2022", "source": "https://openai.com/", "notes": "Heads policy team at OpenAI; previously ran preparedness work"}
+    ]
+  },
+  {
+    "personSlug": "ryan-greenblatt",
+    "careers": [
+      {"orgSlug": "redwood-research", "orgName": "Redwood Research", "role": "Researcher", "start": "2021", "end": "2023", "source": "https://www.redwoodresearch.org/", "notes": "AI alignment research at Redwood"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Alignment Researcher", "start": "2023", "source": "https://openai.com/", "notes": "Works on alignment research; key contributor to control and safety evaluations"}
+    ]
+  },
+  {
+    "personSlug": "lennart-heim",
+    "careers": [
+      {"orgSlug": "epoch-ai", "orgName": "Epoch AI", "role": "Researcher", "start": "2022", "end": "2023", "source": "https://epochai.org/", "notes": "Compute governance research at Epoch AI"},
+      {"orgSlug": "govai", "orgName": "Centre for the Governance of AI", "role": "Researcher", "start": "2023", "source": "https://www.governance.ai/", "notes": "Leading expert on compute governance and AI chip supply chains"}
+    ]
+  },
+  {
+    "personSlug": "percy-liang",
+    "careers": [
+      {"orgSlug": "stanford-university", "orgName": "Stanford University", "role": "Associate Professor of Computer Science", "start": "2012", "source": "https://cs.stanford.edu/~pliang/", "notes": "Director of CRFM; creator of HELM evaluation framework for foundation models"}
+    ]
+  },
+  {
+    "personSlug": "anca-dragan",
+    "careers": [
+      {"orgSlug": "uc-berkeley", "orgName": "UC Berkeley", "role": "Assistant Professor of EECS", "start": "2016", "end": "2023", "source": "https://people.eecs.berkeley.edu/~anca/", "notes": "Led InterACT lab; core member of CHAI under Stuart Russell; expert in value alignment"},
+      {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "Research Director", "start": "2023", "source": "https://deepmind.google/", "notes": "Joined DeepMind to lead safety-relevant research"}
+    ]
+  },
+  {
+    "personSlug": "ethan-perez",
+    "careers": [
+      {"orgSlug": "nyu", "orgName": "New York University", "role": "PhD Student", "start": "2019", "end": "2023", "source": "https://ethanperez.net/", "notes": "PhD on LLM safety and red-teaming"},
+      {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Researcher", "start": "2023", "source": "https://anthropic.com/", "notes": "Works on red-teaming, model evaluation, and safety research"}
+    ]
+  },
+  {
+    "personSlug": "collin-burns",
+    "careers": [
+      {"orgSlug": "uc-berkeley", "orgName": "UC Berkeley", "role": "PhD Student", "start": "2020", "end": "2024", "source": "https://collinburns.com/", "notes": "PhD on unsupervised methods for discovering model beliefs; 'Discovering Latent Knowledge' paper"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Researcher", "start": "2024", "source": "https://openai.com/", "notes": "Joined OpenAI after completing PhD at Berkeley"}
+    ]
+  },
+  {
+    "personSlug": "jason-matheny",
+    "careers": [
+      {"orgSlug": null, "orgName": "IARPA", "role": "Director", "start": "2015", "end": "2019", "source": "https://en.wikipedia.org/wiki/Jason_Matheny", "notes": "Directed Intelligence Advanced Research Projects Activity; funded forecasting research"},
+      {"orgSlug": null, "orgName": "White House OSTP", "role": "Deputy Assistant to the President", "start": "2021", "end": "2022", "source": "https://en.wikipedia.org/wiki/Jason_Matheny", "notes": "Served on National Security Council; advised on technology and national security policy"}
+    ]
+  },
+  {
+    "personSlug": "sara-hooker",
+    "careers": [
+      {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Scientist", "start": "2018", "end": "2022", "source": "https://www.sarahooker.me/", "notes": "Worked on efficient ML and model compression at Google Brain"},
+      {"orgSlug": null, "orgName": "Cohere For AI", "role": "Founder & Head of Research", "start": "2022", "source": "https://cohere.for.ai/", "notes": "Founded Cohere For AI, a nonprofit ML research lab focused on open science and equitable access"}
+    ]
+  },
+  {
+    "personSlug": "scott-aaronson",
+    "careers": [
+      {"orgSlug": null, "orgName": "UT Austin", "role": "Professor of Computer Science", "start": "2016", "source": "https://www.scottaaronson.com/", "notes": "Quantum computing and computational complexity; David J. Bruton Centennial Professor"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Guest Researcher", "start": "2022-08", "end": "2023-07", "source": "https://scottaaronson.blog/?p=6823", "notes": "Spent a year at OpenAI working on AI safety, specifically AI text watermarking; returned to UT Austin after sabbatical"}
+    ]
+  },
+  {
+    "personSlug": "jason-wei",
+    "careers": [
+      {"orgSlug": "google-brain", "orgName": "Google Brain", "role": "Research Scientist", "start": "2020", "end": "2023", "source": "https://jasonwei.net/", "notes": "Discovered chain-of-thought prompting and emergent abilities in large language models"},
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Researcher", "start": "2023", "source": "https://openai.com/", "notes": "Joined OpenAI after Google Brain; works on reasoning and model capabilities"}
+    ]
+  },
+  {
+    "personSlug": "meg-mitchell",
+    "careers": [
+      {"orgSlug": "google", "orgName": "Google", "role": "Research Scientist, Ethical AI Co-lead", "start": "2016", "end": "2021-02", "source": "https://en.wikipedia.org/wiki/Margaret_Mitchell_(scientist)", "notes": "Co-led Google's Ethical AI team; created model cards framework; fired February 2021 after Timnit Gebru controversy"},
+      {"orgSlug": null, "orgName": "Hugging Face", "role": "Chief Ethics Scientist", "start": "2021", "source": "https://huggingface.co/", "notes": "Leads ethical AI work at Hugging Face; continues model cards and responsible AI research"}
+    ]
+  },
+  {
+    "personSlug": "emily-bender",
+    "careers": [
+      {"orgSlug": null, "orgName": "University of Washington", "role": "Professor of Linguistics", "start": "2003", "source": "https://faculty.washington.edu/ebender/", "notes": "Co-authored 'On the Dangers of Stochastic Parrots' (2021); leading critic of LLM hype; director of the Computational Linguistics Lab"}
+    ]
+  },
+  {
+    "personSlug": "arvind-narayanan",
+    "careers": [
+      {"orgSlug": null, "orgName": "Princeton University", "role": "Professor of Computer Science", "start": "2012", "source": "https://www.cs.princeton.edu/~arvindn/", "notes": "Expert on algorithmic fairness; co-author of 'AI Snake Oil' book; Center for IT Policy"}
+    ]
+  },
+  {
+    "personSlug": "owen-cotton-barratt",
+    "careers": [
+      {"orgSlug": "fhi", "orgName": "Future of Humanity Institute", "role": "Research Fellow", "start": "2014", "source": "https://www.fhi.ox.ac.uk/", "notes": "Oxford mathematician; worked on global priorities research and existential risk"}
+    ]
+  },
+  {
+    "personSlug": "oliver-habryka",
+    "careers": [
+      {"orgSlug": "lesswrong", "orgName": "LessWrong / Lightcone Infrastructure", "role": "Co-founder & CEO", "start": "2017", "source": "https://www.lesswrong.com/", "notes": "Rebuilt LessWrong as a modern platform; runs Lightcone Infrastructure; key rationalist community builder"}
+    ]
+  },
+  {
+    "personSlug": "kelsey-piper",
+    "careers": [
+      {"orgSlug": null, "orgName": "Vox", "role": "Journalist, Future Perfect", "start": "2018", "source": "https://www.vox.com/authors/kelsey-piper", "notes": "Covers AI safety, effective altruism, and emerging technology for Vox's Future Perfect vertical"}
+    ]
+  },
+  {
+    "personSlug": "zvi-mowshowitz",
+    "careers": [
+      {"orgSlug": null, "orgName": "Independent", "role": "Blogger & AI Commentator", "start": "2017", "source": "https://thezvi.substack.com/", "notes": "Writes weekly AI updates and analysis; 'Don't Worry About the Vase' blog; influential rationalist commentator"}
+    ]
+  },
+  {
+    "personSlug": "chelsea-finn",
+    "careers": [
+      {"orgSlug": "stanford-university", "orgName": "Stanford University", "role": "Assistant Professor of Computer Science", "start": "2019", "source": "https://ai.stanford.edu/~cbfinn/", "notes": "Pioneer of meta-learning (MAML); research in robot learning, few-shot learning, and adaptive AI"}
+    ]
+  },
+  {
+    "personSlug": "pieter-abbeel",
+    "careers": [
+      {"orgSlug": "uc-berkeley", "orgName": "UC Berkeley", "role": "Professor of EECS", "start": "2008", "source": "https://people.eecs.berkeley.edu/~pabbeel/", "notes": "Pioneer of deep RL; co-founded Covariant (robot AI); director of Berkeley Robot Learning Lab"}
+    ]
+  },
+  {
+    "personSlug": "jeff-dean",
+    "careers": [
+      {"orgSlug": "google", "orgName": "Google / Alphabet", "role": "Chief Scientist, Google DeepMind (formerly SVP of Google AI)", "start": "1999", "source": "https://en.wikipedia.org/wiki/Jeff_Dean", "notes": "Co-founded Google Brain with Andrew Ng; led development of TensorFlow, TPUs; key architect of Google's AI infrastructure"}
+    ]
+  },
+  {
+    "personSlug": "lilian-weng",
+    "careers": [
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "VP of Research", "start": "2018", "source": "https://lilianweng.github.io/", "notes": "Previously led safety systems team; known for influential technical blog posts (Lil'Log)"}
+    ]
+  },
+  {
+    "personSlug": "alec-radford",
+    "careers": [
+      {"orgSlug": "openai", "orgName": "OpenAI", "role": "Research Scientist", "start": "2016", "source": "https://openai.com/", "notes": "Lead researcher on GPT-2, CLIP, DALL-E, and Whisper; one of OpenAI's most prolific technical contributors"}
+    ]
+  },
+  {
+    "personSlug": "rumman-chowdhury",
+    "careers": [
+      {"orgSlug": null, "orgName": "Twitter", "role": "Director of ML Ethics, Transparency, and Accountability", "start": "2021", "end": "2022", "source": "https://en.wikipedia.org/wiki/Rumman_Chowdhury", "notes": "Led Twitter's responsible AI team; departed after Elon Musk acquisition"},
+      {"orgSlug": null, "orgName": "Humane Intelligence", "role": "Founder", "start": "2023", "source": "https://www.humaneintelligence.com/", "notes": "Founded Humane Intelligence; AI auditing and accountability nonprofit"}
+    ]
+  },
+  {
+    "personSlug": "matt-clifford",
+    "careers": [
+      {"orgSlug": "uk-aisi", "orgName": "UK AI Safety Institute", "role": "Co-Chair", "start": "2023-06", "source": "https://www.gov.uk/government/organisations/ai-safety-institute", "notes": "Co-chairs UK AISI alongside Ian Hogarth; co-founder of Entrepreneur First"}
+    ]
+  },
+  {
+    "personSlug": "michael-sellitto",
+    "careers": [
+      {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Head of Policy", "start": "2022", "source": "https://anthropic.com/", "notes": "Leads Anthropic's policy and government engagement; previously at Carnegie Endowment"}
+    ]
+  },
+  {
+    "personSlug": "pushmeet-kohli",
+    "careers": [
+      {"orgSlug": "microsoft", "orgName": "Microsoft Research", "role": "Principal Researcher", "start": "2007", "end": "2017", "source": "https://scholar.google.com/citations?user=mGSJSbcAAAAJ", "notes": "Worked on computer vision and ML at Microsoft Research Cambridge"},
+      {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "VP of Research, AI Safety", "start": "2017", "source": "https://deepmind.google/", "notes": "Leads the AI for Science and AI Safety teams at DeepMind"}
+    ]
+  },
+  {
+    "personSlug": "david-silver",
+    "careers": [
+      {"orgSlug": "deepmind", "orgName": "Google DeepMind", "role": "Principal Research Scientist", "start": "2013", "source": "https://www.davidsilver.uk/", "notes": "Led AlphaGo, AlphaZero, and contributed to AlphaFold; pioneer of deep RL"}
+    ]
+  },
+  {
+    "personSlug": "eliana-lorch",
+    "careers": [
+      {"orgSlug": "google", "orgName": "Google", "role": "Research Scientist", "start": "2018", "end": "2022", "source": "https://anthropic.com/", "notes": "Worked at Google on ML research"},
+      {"orgSlug": "anthropic", "orgName": "Anthropic", "role": "Research Scientist", "start": "2022", "source": "https://anthropic.com/", "notes": "Works on interpretability and safety research at Anthropic"}
     ]
   }
 ]

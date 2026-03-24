@@ -1,0 +1,28 @@
+entity: fBHkLjfr0S
+facts:
+  - id: "v2J8RoeShg"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2018"
+    validEnd: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Worked on scaling laws and language model research at OpenAI"
+  - id: "Ere3sWQyIA"
+    property: "role"
+    value: "Researcher"
+    asOf: "2018"
+    validEnd: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Worked on scaling laws and language model research at OpenAI"
+  - id: "luux3CyMoA"
+    property: "employed-by"
+    value: !ref mK9pX3rQ7n
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; key contributor to Claude development"
+  - id: "byl7VKviHA"
+    property: "role"
+    value: "Co-founder, Researcher"
+    asOf: "2021-01"
+    source: "https://anthropic.com/company"
+    notes: "Co-founded Anthropic; key contributor to Claude development"

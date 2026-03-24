@@ -3297,3 +3297,382 @@
     under President Obama. Helped establish the US Digital Service (USDS).
   tags:
     - civic-tech
+
+# ── Additional AI safety people (career flow enrichment batch 2) ──
+
+- id: catherine-olsson
+  stableId: lJQbegzdX3
+  type: person
+  title: Catherine Olsson
+  description: >-
+    Anthropic co-founder. Previously at Google Brain and OpenAI. Focused on
+    interpretability research and AI safety.
+  tags:
+    - interpretability
+    - ai-safety
+
+- id: tom-henighan
+  stableId: fBHkLjfr0S
+  type: person
+  title: Tom Henighan
+  description: >-
+    Anthropic co-founder. Previously at OpenAI where he worked on scaling
+    laws research. Key technical contributor.
+  tags:
+    - scaling-laws
+    - ai-safety
+
+- id: miles-brundage
+  stableId: B5jANSN3Ae
+  type: person
+  title: Miles Brundage
+  description: >-
+    AI policy researcher. Former Head of Policy Research at OpenAI. Previously
+    at FHI. Authored seminal paper on the malicious use of AI.
+  tags:
+    - ai-policy
+    - ai-governance
+
+- id: jade-leung
+  stableId: GRrd7Z857X
+  type: person
+  title: Jade Leung
+  description: >-
+    AI governance researcher. Former Head of Policy at OpenAI. Previously
+    research lead at GovAI. Co-lead author of the International AI Safety Report.
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: ryan-greenblatt
+  stableId: lkJlFaIeQb
+  type: person
+  title: Ryan Greenblatt
+  description: >-
+    Alignment researcher. Previously at Redwood Research, then OpenAI alignment
+    team. Works on alignment and control research.
+  tags:
+    - alignment
+    - ai-control
+
+- id: lennart-heim
+  stableId: YOfOGwm1kh
+  type: person
+  title: Lennart Heim
+  description: >-
+    Compute governance researcher. Affiliated with RAND, Epoch AI, and GovAI.
+    Leading expert on AI compute supply chains and governance.
+  tags:
+    - compute-governance
+    - ai-policy
+
+- id: percy-liang
+  stableId: nJAhdmv7E6
+  type: person
+  title: Percy Liang
+  description: >-
+    Stanford professor of Computer Science. Director of the Center for Research
+    on Foundation Models (CRFM). Creator of the HELM evaluation framework.
+  tags:
+    - ai-evaluation
+    - foundation-models
+
+- id: anca-dragan
+  stableId: 1YOwxSaDsd
+  type: person
+  title: Anca Dragan
+  description: >-
+    AI safety researcher. Former UC Berkeley professor and CHAI member.
+    Joined Google DeepMind. Expert in human-robot interaction and value alignment.
+  tags:
+    - alignment
+    - human-compatible-ai
+
+- id: ethan-perez
+  stableId: ncKwPfn8tD
+  type: person
+  title: Ethan Perez
+  description: >-
+    AI safety researcher at Anthropic. Previously at NYU. Works on red-teaming
+    LLMs and discovering model behaviors.
+  tags:
+    - red-teaming
+    - ai-safety
+
+- id: collin-burns
+  stableId: 7Eyg6j59ep
+  type: person
+  title: Collin Burns
+  description: >-
+    AI alignment researcher. UC Berkeley PhD. Known for 'Discovering Latent
+    Knowledge' paper on unsupervised probing of LLM beliefs.
+  tags:
+    - alignment
+    - interpretability
+
+- id: jason-matheny
+  stableId: gA9eoKhFAM
+  type: person
+  title: Jason Matheny
+  description: >-
+    AI policy leader. Former President and CEO of RAND Corporation. Previously
+    Director of IARPA and Deputy Assistant to the President for Technology
+    and National Security on the White House NSC.
+  tags:
+    - ai-policy
+    - national-security
+
+- id: sara-hooker
+  stableId: mtZvdUB2Pm
+  type: person
+  title: Sara Hooker
+  description: >-
+    AI researcher. Former Google Brain researcher. Founded Cohere For AI, a
+    nonprofit research lab. Focused on efficient AI and equitable access.
+  tags:
+    - ai-research
+    - ai-ethics
+
+- id: scott-aaronson
+  stableId: ePBtKVxUkn
+  type: person
+  title: Scott Aaronson
+  description: >-
+    Professor of Computer Science at UT Austin. Quantum computing and
+    computational complexity expert. Spent a sabbatical at OpenAI working
+    on AI safety and watermarking. Author of 'Shtetl-Optimized' blog.
+  tags:
+    - ai-safety
+    - computational-complexity
+
+- id: jason-wei
+  stableId: E4Al7y4BJF
+  type: person
+  title: Jason Wei
+  description: >-
+    AI researcher. Former Google Brain researcher who discovered chain-of-thought
+    prompting. Moved to OpenAI.
+  tags:
+    - chain-of-thought
+    - ai-research
+
+- id: meg-mitchell
+  stableId: FDJkqelsHQ
+  type: person
+  title: Meg Mitchell
+  description: >-
+    AI ethics researcher. Co-led Google's Ethical AI team alongside Timnit
+    Gebru. Fired from Google in 2021. Joined Hugging Face as Chief Ethics Scientist.
+  tags:
+    - ai-ethics
+    - responsible-ai
+
+- id: emily-bender
+  stableId: N2uGQXnMvD
+  type: person
+  title: Emily Bender
+  description: >-
+    Professor of Linguistics at University of Washington. Co-author of the
+    'stochastic parrots' paper. Prominent critic of LLM hype.
+  tags:
+    - ai-ethics
+    - linguistics
+
+- id: arvind-narayanan
+  stableId: 8QyInrJfl7
+  type: person
+  title: Arvind Narayanan
+  description: >-
+    Professor of Computer Science at Princeton. Co-author of 'AI Snake Oil'.
+    Expert on algorithmic fairness and AI hype.
+  tags:
+    - ai-ethics
+    - algorithmic-fairness
+
+- id: owen-cotton-barratt
+  stableId: MMNpm1875e
+  type: person
+  title: Owen Cotton-Barratt
+  description: >-
+    Researcher at the Future of Humanity Institute. Oxford mathematician
+    focused on global priorities research and existential risk.
+  tags:
+    - existential-risk
+    - global-priorities
+
+- id: oliver-habryka
+  stableId: e6c93VvfY3
+  type: person
+  title: Oliver Habryka
+  description: >-
+    Co-founder and CEO of Lightcone Infrastructure (operators of LessWrong).
+    Key figure in the rationalist and AI safety community infrastructure.
+  tags:
+    - rationality
+    - ai-safety-community
+
+- id: kelsey-piper
+  stableId: 3QSnX97Qv1
+  type: person
+  title: Kelsey Piper
+  description: >-
+    Journalist at Vox, writing for the Future Perfect vertical. Covers AI safety,
+    effective altruism, and emerging technology risks.
+  tags:
+    - journalism
+    - effective-altruism
+
+- id: zvi-mowshowitz
+  stableId: lIFbgZDnGa
+  type: person
+  title: Zvi Mowshowitz
+  description: >-
+    AI safety commentator and blogger. Author of 'Don't Worry About the Vase'.
+    Former professional Magic: The Gathering player. Writes weekly AI updates.
+  tags:
+    - ai-safety-commentary
+
+- id: chelsea-finn
+  stableId: GTO7pZdhSG
+  type: person
+  title: Chelsea Finn
+  description: >-
+    Stanford professor of Computer Science. Expert in meta-learning, robotics,
+    and few-shot learning. Pioneer of MAML algorithm.
+  tags:
+    - meta-learning
+    - robotics
+
+- id: pieter-abbeel
+  stableId: C83ppolN2r
+  type: person
+  title: Pieter Abbeel
+  description: >-
+    UC Berkeley professor of EECS. Co-founder of Covariant (robotics AI).
+    Pioneer in deep reinforcement learning and robot learning.
+  tags:
+    - reinforcement-learning
+    - robotics
+
+- id: jeff-dean
+  stableId: 75vgQ9g8K0
+  type: person
+  title: Jeff Dean
+  description: >-
+    Chief Scientist of Google DeepMind. Previously SVP of Google AI. Co-founded
+    Google Brain with Andrew Ng. Key architect of modern ML infrastructure
+    including TensorFlow, TPUs, and Transformer architecture.
+  tags:
+    - ai-infrastructure
+    - google
+
+- id: lilian-weng
+  stableId: Xln342A6WT
+  type: person
+  title: Lilian Weng
+  description: >-
+    VP of Research at OpenAI. Previously led the safety systems team. Known
+    for influential technical blog posts on AI concepts.
+  tags:
+    - ai-research
+    - ai-safety
+
+- id: alec-radford
+  stableId: w9BDDEfwj6
+  type: person
+  title: Alec Radford
+  description: >-
+    Researcher at OpenAI. Lead researcher on GPT-2, CLIP, DALL-E, and Whisper.
+    One of the most prolific contributors to modern generative AI.
+  tags:
+    - generative-ai
+    - multimodal
+
+- id: rumman-chowdhury
+  stableId: OBvnfQJxnv
+  type: person
+  title: Rumman Chowdhury
+  description: >-
+    AI ethics leader. Former Director of ML Ethics at Twitter. Founded Parity
+    (algorithmic auditing). Leads Humane Intelligence. Former Accenture AI lead.
+  tags:
+    - ai-ethics
+    - algorithmic-auditing
+
+- id: sayash-kapoor
+  stableId: 0aqF8abxF9
+  type: person
+  title: Sayash Kapoor
+  description: >-
+    PhD student at Princeton. Co-author of 'AI Snake Oil' with Arvind Narayanan.
+    Research on AI hype and reproducibility.
+  tags:
+    - ai-ethics
+    - reproducibility
+
+- id: carrick-flynn
+  stableId: OtpREjSl17
+  type: person
+  title: Carrick Flynn
+  description: >-
+    AI policy researcher. Previously at RAND. Ran for US Congress in Oregon
+    with support from Protect Our Future (SBF-funded PAC). Now focused on
+    biosecurity and AI policy.
+  tags:
+    - ai-policy
+    - biosecurity
+
+- id: matt-clifford
+  stableId: EWTG4ReRam
+  type: person
+  title: Matt Clifford
+  description: >-
+    Co-chair of the UK AI Safety Institute. Co-founder of Entrepreneur First.
+    Appointed by UK PM to lead the Frontier AI Taskforce alongside Ian Hogarth.
+  tags:
+    - ai-governance
+    - uk-policy
+
+- id: michael-sellitto
+  stableId: WCxgtVgcr1
+  type: person
+  title: Michael Sellitto
+  description: >-
+    Head of Policy at Anthropic. Previously at the Bechtel Corporation and
+    Carnegie Endowment for International Peace. Leads Anthropic's policy
+    and government engagement.
+  tags:
+    - ai-policy
+
+- id: pushmeet-kohli
+  stableId: 6T8nglIbo6
+  type: person
+  title: Pushmeet Kohli
+  description: >-
+    VP of Research at Google DeepMind. Leads the AI Safety and Alignment team.
+    Previously at Microsoft Research.
+  tags:
+    - ai-safety
+    - alignment
+
+- id: david-silver
+  stableId: e7urD1sfMx
+  type: person
+  title: David Silver
+  description: >-
+    Principal Research Scientist at Google DeepMind. Led the AlphaGo, AlphaZero,
+    and AlphaFold projects. Pioneer of deep reinforcement learning.
+  tags:
+    - reinforcement-learning
+    - deepmind
+
+- id: eliana-lorch
+  stableId: SlWMsuNIes
+  type: person
+  title: Eliana Lorch
+  description: >-
+    Research Scientist at Anthropic. Previously at Google. Focuses on
+    interpretability and AI safety.
+  tags:
+    - interpretability
+    - ai-safety

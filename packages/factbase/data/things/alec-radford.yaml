@@ -1,0 +1,14 @@
+entity: w9BDDEfwj6
+facts:
+  - id: "aXZpR7Mc3w"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2016"
+    source: "https://openai.com/"
+    notes: "Lead researcher on GPT-2, CLIP, DALL-E, and Whisper; one of OpenAI's most prolific technical contributors"
+  - id: "pNMmxhsMVw"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2016"
+    source: "https://openai.com/"
+    notes: "Lead researcher on GPT-2, CLIP, DALL-E, and Whisper; one of OpenAI's most prolific technical contributors"

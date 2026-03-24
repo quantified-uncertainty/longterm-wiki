@@ -50,3 +50,9 @@ facts:
     source: "https://en.wikipedia.org/wiki/Robin_Hanson"
     notes: "At George Mason University. Research on prediction markets, AI futures, and social science; associated faculty
       at GMU"
+  - id: "KX4aQpW23g"
+    property: "employed-by"
+    value: !ref IAd0DJ2TB3
+    asOf: "1999"
+    source: "https://en.wikipedia.org/wiki/Robin_Hanson"
+    notes: "Research on prediction markets, AI futures, and social science; associated faculty at GMU"

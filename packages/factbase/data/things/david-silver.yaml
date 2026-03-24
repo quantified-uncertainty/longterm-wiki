@@ -1,0 +1,14 @@
+entity: e7urD1sfMx
+facts:
+  - id: "G9E5UGQKbQ"
+    property: "employed-by"
+    value: !ref A4XoubikkQ
+    asOf: "2013"
+    source: "https://www.davidsilver.uk/"
+    notes: "Led AlphaGo, AlphaZero, and contributed to AlphaFold; pioneer of deep RL"
+  - id: "9CnDzYPLjQ"
+    property: "role"
+    value: "Principal Research Scientist"
+    asOf: "2013"
+    source: "https://www.davidsilver.uk/"
+    notes: "Led AlphaGo, AlphaZero, and contributed to AlphaFold; pioneer of deep RL"

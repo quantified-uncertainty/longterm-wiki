@@ -49,3 +49,18 @@ facts:
     source: "https://en.wikipedia.org/wiki/Sam_Bankman-Fried"
     notes: "Founded Alameda Research (2017) and FTX (2019); was a major funder of AI safety and EA before FTX collapse in
       Nov 2022; convicted of fraud in 2023"
+  - id: "nncX3VoiOw"
+    property: "employed-by"
+    value: !ref bunzL4OFhZ
+    asOf: "2014"
+    validEnd: "2017"
+    source: "https://en.wikipedia.org/wiki/Sam_Bankman-Fried"
+    notes: "Worked as a quantitative trader; decided to earn-to-give for effective altruism causes"
+  - id: "C91oN0JsUw"
+    property: "employed-by"
+    value: !ref yevJm2XDsQ
+    asOf: "2017"
+    validEnd: "2022-11"
+    source: "https://en.wikipedia.org/wiki/Sam_Bankman-Fried"
+    notes: "Founded Alameda Research (2017) and FTX (2019); was a major funder of AI safety and EA before FTX collapse in
+      Nov 2022; convicted of fraud in 2023"

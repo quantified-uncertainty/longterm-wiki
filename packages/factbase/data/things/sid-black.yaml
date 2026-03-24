@@ -11,3 +11,9 @@ facts:
     asOf: "2020"
     source: "https://www.eleuther.ai/"
     notes: "At EleutherAI. Co-founded EleutherAI; open-source AI research collective that created GPT-NeoX and The Pile"
+  - id: "vLz1Dkd5kw"
+    property: "employed-by"
+    value: !ref FnlNF9s98n
+    asOf: "2020"
+    source: "https://www.eleuther.ai/"
+    notes: "Co-founded EleutherAI; open-source AI research collective that created GPT-NeoX and The Pile"

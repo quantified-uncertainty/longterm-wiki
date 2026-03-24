@@ -1,0 +1,28 @@
+entity: E4Al7y4BJF
+facts:
+  - id: "FjM3CDf5vw"
+    property: "employed-by"
+    value: !ref AZmSQxCAlk
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://jasonwei.net/"
+    notes: "Discovered chain-of-thought prompting and emergent abilities in large language models"
+  - id: "FI4gqGR0tw"
+    property: "role"
+    value: "Research Scientist"
+    asOf: "2020"
+    validEnd: "2023"
+    source: "https://jasonwei.net/"
+    notes: "Discovered chain-of-thought prompting and emergent abilities in large language models"
+  - id: "OrtVBaasrQ"
+    property: "employed-by"
+    value: !ref 1LcLlMGLbw
+    asOf: "2023"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI after Google Brain; works on reasoning and model capabilities"
+  - id: "9Sa2jcbRXw"
+    property: "role"
+    value: "Researcher"
+    asOf: "2023"
+    source: "https://openai.com/"
+    notes: "Joined OpenAI after Google Brain; works on reasoning and model capabilities"

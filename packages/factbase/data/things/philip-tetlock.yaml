@@ -52,3 +52,10 @@ facts:
     source: "https://en.wikipedia.org/wiki/Philip_E._Tetlock"
     notes: "At University of Pennsylvania. Leads the Good Judgment Project; pioneered superforecasting research; applies
       forecasting methods to AI risk assessment"
+  - id: "ZkeATyk6Rg"
+    property: "employed-by"
+    value: !ref fwWLWc3zlo
+    asOf: "2011"
+    source: "https://en.wikipedia.org/wiki/Philip_E._Tetlock"
+    notes: "Leads the Good Judgment Project; pioneered superforecasting research; applies forecasting methods to AI risk
+      assessment"

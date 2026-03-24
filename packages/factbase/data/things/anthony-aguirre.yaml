@@ -18,3 +18,9 @@ facts:
     asOf: "2014"
     source: "https://futureoflife.org/"
     notes: "Co-founded FLI with Max Tegmark and Jaan Tallinn"
+  - id: "977zSUjFWw"
+    property: "employed-by"
+    value: !ref OKO1q9NQaT
+    asOf: "2004"
+    source: "https://en.wikipedia.org/wiki/Anthony_Aguirre"
+    notes: "Cosmologist; co-founded FLI and Metaculus"
