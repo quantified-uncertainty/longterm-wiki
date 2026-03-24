@@ -24,7 +24,7 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 | **Key chokepoints** | TSMC (fabrication), ASML (lithography), Nvidia (chip design), NIST/BIS (policy) |
 | **Primary policy tool** | U.S. Export Administration Regulations (EAR) + Foreign Direct Product Rule (FDPR) |
 | **Hardware governance readiness** | Existing chip features (Nvidia, AMD, Intel, Apple) could support governance; deployment pending |
-| **Investment in governance R&D** | Marginal vs. total AI chip capex (\$630B+ industry in 2024); no dedicated public R&D fund identified |
+| **Investment in governance R&D** | Marginal vs. total AI chip capex (<FBF entity="9EIbn9XvH6" property="global-chip-revenue">\$630B+</FBF> industry in 2024); no dedicated public R&D fund identified |
 | **Funding gaps** | Significant; think tanks (CNAS, GovAI, IAPS) working on policy, but hardware R&D funding is sparse |
 | **Subcategory** | compute-governance |
 
@@ -37,9 +37,9 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 
 ## Overview
 
-The global supply chain for advanced AI chips is extraordinarily concentrated. Taiwan's TSMC manufactures over 60% of all semiconductors globally and more than 90% of the most advanced chips. The Netherlands' ASML supplies the extreme ultraviolet (EUV) lithography machines without which cutting-edge chips cannot be fabricated. U.S. firms dominate chip design—Nvidia in particular has become synonymous with AI training hardware—while Japan and South Korea contribute critical materials, packaging tools, and memory. This concentration is not merely an economic fact; it is the structural foundation on which AI chip governance is built.
+The global supply chain for advanced AI chips is extraordinarily concentrated. Taiwan's TSMC manufactures over <FBF entity="9EIbn9XvH6" property="tsmc-global-share">60%</FBF> of all semiconductors globally and more than <FBF entity="9EIbn9XvH6" property="tsmc-advanced-share">90%</FBF> of the most advanced chips.[^3] The Netherlands' ASML supplies the extreme ultraviolet (EUV) lithography machines without which cutting-edge chips cannot be fabricated. U.S. firms dominate chip design—Nvidia in particular has become synonymous with AI training hardware—while Japan and South Korea contribute critical materials, packaging tools, and memory. This concentration is not merely an economic fact; it is the structural foundation on which AI chip governance is built.
 
-Because no country can manufacture frontier AI chips without inputs from this small cluster of allied nations, that cluster possesses significant collective leverage. Export controls, hardware-embedded mechanisms, and multilateral coordination are all strategies for converting that physical leverage into enforceable governance. The core idea animating the field is that, unlike software—which can be copied instantly and monitored only with difficulty—chips are physical objects that move through trackable supply chains, can be embedded with hardware controls, and must pass through a small number of chokepoints before reaching end users.
+Because no country can manufacture frontier AI chips without inputs from this small cluster of allied nations, that cluster possesses significant collective leverage. Export controls, hardware-embedded mechanisms, and multilateral coordination are all strategies for converting that physical leverage into enforceable governance. The core idea animating the field is that, unlike software—which can be copied instantly and monitored only with difficulty—chips are physical objects that move through trackable supply chains, can be embedded with hardware controls, and must pass through a small number of chokepoints before reaching end users.[^6]
 
 The field is evolving rapidly. U.S. policy has oscillated between administrations, with the Biden administration's 2025 AI Diffusion Interim Final Rule expanding controls on model weights and chip performance thresholds, while the second Trump administration introduced its own modifications and tariffs. Meanwhile, proposals for <EntityLink id="E463">Hardware-Enabled Governance</EntityLink> mechanisms—features built directly into chips to enforce export compliance, verify location, and limit certain uses—have moved from academic papers to active policy discussion. Whether the governance infrastructure can keep pace with the technology it aims to regulate remains deeply uncertain.
 
@@ -57,11 +57,11 @@ The field is evolving rapidly. U.S. policy has oscillated between administration
 
 ### Foundries
 
-**TSMC** (Taiwan Semiconductor Manufacturing Company) is the critical chokepoint in global AI chip fabrication. Its geographic concentration in Taiwan creates both geopolitical fragility and governance leverage: any chip requiring TSMC's most advanced nodes must pass through Taiwan. TSMC has cooperated with U.S. export control enforcement by declining orders from sanctioned entities and is expanding fabrication capacity in Arizona under CHIPS Act incentives.
+**TSMC** (Taiwan Semiconductor Manufacturing Company) is the critical chokepoint in global AI chip fabrication. Its geographic concentration in Taiwan creates both geopolitical fragility and governance leverage: any chip requiring TSMC's most advanced nodes must pass through Taiwan. TSMC has cooperated with U.S. export control enforcement by declining orders from sanctioned entities and is expanding fabrication capacity in Arizona under CHIPS Act incentives.[^2]
 
 **Samsung** operates both advanced logic fabs and dominates high-bandwidth memory (HBM) production, a key bottleneck in AI chip supply chains. Samsung supplies Chinese AI firms (Alibaba, Tencent, ByteDance) with HBM under ongoing supply agreements.
 
-**SMIC** (Semiconductor Manufacturing International Corporation), China's leading foundry, has reportedly manufactured 5nm electronic circuits, challenging earlier assumptions about the effectiveness of export controls on manufacturing equipment. This development is cited as evidence that controls must be continuously updated as Chinese domestic capability grows.
+**SMIC** (Semiconductor Manufacturing International Corporation), China's leading foundry, has reportedly manufactured 5nm electronic circuits, challenging earlier assumptions about the effectiveness of export controls on manufacturing equipment.[^4] This development is cited as evidence that controls must be continuously updated as Chinese domestic capability grows.
 
 **Intel Foundry** is positioned as an alternative Western foundry, with the U.S. government and partners such as Amazon Web Services investing in Intel's 18A node as a supply security hedge.
 
@@ -75,44 +75,46 @@ Deloitte has predicted that at least \$30 billion will be spent on critical tech
 
 ### Governance-Specific Hardware Startups
 
-No major dedicated startups focused solely on governance-specific hardware have been publicly identified in available research. The primary proposals for hardware-enabled governance involve modifying firmware and secure enclave features in chips from existing major manufacturers, rather than purpose-built governance chips. Research from CNAS has documented that AMD, Apple, Intel, and Nvidia chips already contain features—such as location verification mechanisms and change-control hooks—that could be adapted for governance purposes with appropriate firmware updates and policy mandates.
+No major dedicated startups focused solely on governance-specific hardware have been publicly identified in available research. The primary proposals for hardware-enabled governance involve modifying firmware and secure enclave features in chips from existing major manufacturers, rather than purpose-built governance chips. Research from CNAS has documented that AMD, Apple, Intel, and Nvidia chips already contain features—such as location verification mechanisms and change-control hooks—that could be adapted for governance purposes with appropriate firmware updates and policy mandates.[^1]
 
 ## Policy Architecture
 
 ### Export Controls
 
-The primary instrument of AI chip governance is the U.S. Export Administration Regulations (EAR), administered by the Bureau of Industry and Security (BIS) within the Department of Commerce. The core tools include:
+The primary instrument of AI chip governance is the U.S. Export Administration Regulations (EAR), administered by the Bureau of Industry and Security (BIS) within the Department of Commerce. The core tools include:[^5]
 
 **The Commerce Control List (CCL)** classifies chips and semiconductor equipment under Export Control Classification Numbers (ECCNs). October 2022 rules added new ECCNs for high-performance AI chips; January 2025 rules added ECCN 4E091 covering AI model weights.
 
 **The Foreign Direct Product Rule (FDPR)** extends U.S. jurisdiction extraterritorially: any chip manufactured anywhere in the world using U.S.-origin design software, manufacturing equipment, or components is subject to U.S. export controls. The December 2024 expansion of the FDPR brought essentially all advanced chips—regardless of where they are fabricated—under U.S. regulatory reach.
 
-**The Biden Administration's AI Diffusion Rule** (early 2025) introduced a tiered country framework, imposing worldwide licensing requirements and a "rebuttable presumption" of control on third-party assembly and test firms. This extended compliance obligations to server manufacturers and data center operators.
+**The Biden Administration's AI Diffusion Rule** (January 2025 Interim Final Rule) introduced a tiered country framework, imposing worldwide licensing requirements and a "rebuttable presumption" of control on third-party assembly and test firms. This extended compliance obligations to server manufacturers and data center operators. However, the rule was [rescinded by BIS on May 13, 2025](https://www.bis.gov/press-release/department-commerce-announces-recission-biden-era-artificial-intelligence-diffusion-rule-strengthens-chip)—before its May 15, 2025 compliance date—and never took effect.
 
-**The Trump Administration's Modifications** (2025) included eliminating certain Validated End-User (VEU) authorizations for semiconductor manufacturing equipment producers, introducing a 25% tariff on advanced AI chips not intended for the U.S. supply chain, and codifying conditional export policies for chips like the Nvidia H200 to China—requiring that TPP exports to China remain below 50% of U.S. shipments and that no U.S. supply be delayed.
+**The Trump Administration's Chip Export Modifications** (2025) included eliminating certain Validated End-User (VEU) authorizations for semiconductor manufacturing equipment producers and introducing a 25% tariff on advanced AI chips not intended for the U.S. supply chain.
+
+**The H200 Export Policy** (January 13, 2026) established a separate case-by-case review rule for exports of chips like the Nvidia H200 to China, requiring that Third-Party Partner (TPP) exports to China remain below 50% of U.S. shipments and that no U.S. supply be delayed.[^5]
 
 ### Proposed Legislation
 
 Several pieces of legislation have been introduced in the U.S. Congress to strengthen chip governance:
 
-- **The Chip Security Act** proposes a two-phase framework: an initial 180-day mandate for location verification on exported chips, followed by a feasibility assessment within two years for anti-tamper features or functionality throttling. It grants the Commerce Secretary post-export monitoring authority.
-- **The AI Overwatch Act** (introduced December 2025) requires congressional review of advanced AI chip export licenses to China.
+- **The Chip Security Act** proposes a two-phase framework: an initial 180-day mandate for location verification on exported chips, followed by a feasibility assessment within two years for anti-tamper features or functionality throttling. It grants the Commerce Secretary post-export monitoring authority.[^8]
+- **The AI Overwatch Act** (introduced December 2025) requires congressional review of advanced AI chip export licenses to China.[^7]
 - **The GAIN AI Act** mandates that U.S. businesses receive priority access to advanced AI chips before exports to China or countries of concern.
 - **The STRIDE Act** directs the State Department to coordinate semiconductor export controls with partner nations.
 
 ### Hardware-Enabled Mechanisms (HEMs)
 
-<EntityLink id="E463">Hardware-Enabled Governance</EntityLink> mechanisms represent a proposed evolution beyond list-based export controls toward enforcement built directly into chips. The CNAS working paper "Secure, Governable Chips" documents existing chip features from AMD, Apple, Intel, and Nvidia that already support governance functions—including location verification pings, usage monitoring, and change-control hooks.
+<EntityLink id="E463">Hardware-Enabled Governance</EntityLink> mechanisms represent a proposed evolution beyond list-based export controls toward enforcement built directly into chips. The CNAS working paper "Secure, Governable Chips" documents existing chip features from AMD, Apple, Intel, and Nvidia that already support governance functions—including location verification pings, usage monitoring, and change-control hooks.[^1]
 
 Proponents argue that HEMs could enable more surgical governance: instead of blanket restrictions that burden all users above a performance threshold, chips could verify their own location, flag unauthorized transfers, limit certain use cases (such as training runs above specified compute thresholds), or require periodic license renewal. A staged rollout has been proposed: short-term firmware updates linked to export licenses for data center AI chips, followed by deeper hardware integration in future chip generations.
 
-The CNAS research recommends coordinating HEM development through a NIST-led working group, with input from chip designers (AMD, Apple, Intel, Nvidia), the CHIPS Program Office, and allied governments (Netherlands, Taiwan, South Korea, Japan, UK, EU). The National Advanced Packaging Manufacturing Program has been identified as a venue for R&D on tamper-proof encasing, though no specific funding amounts have been allocated.
+The CNAS research recommends coordinating HEM development through a NIST-led working group, with input from chip designers (AMD, Apple, Intel, Nvidia), the CHIPS Program Office, and allied governments (Netherlands, Taiwan, South Korea, Japan, UK, EU).[^1] The National Advanced Packaging Manufacturing Program has been identified as a venue for R&D on tamper-proof encasing, though no specific funding amounts have been allocated.
 
 ## Industry Stances on Hardware Governance
 
 Industry positions on hardware-enabled governance range from cautious engagement to active resistance.
 
-**Nvidia** is the only major chipmaker actively building governance technology. In December 2025, Nvidia [piloted location-verification software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell AI GPUs, using GPU telemetry and communication latency to landmark servers to estimate chip country of operation. The system uses confidential computing capabilities already in the chips, is customer-installed (not hidden), and Nvidia plans to make it open-source. However, the company has [firmly rejected kill switches](https://blogs.nvidia.com/blog/no-backdoors-no-kill-switches-no-spyware/): Chief Security Officer David Reber wrote in August 2025 that kill switches are "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper Chip as precedent. Nvidia's FY2026 data center revenue reached \$62.3B in Q4 alone, giving it enormous market leverage in shaping governance standards.
+**Nvidia** is the only major chipmaker actively building governance technology. In December 2025, Nvidia [piloted location-verification software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell AI GPUs, using GPU telemetry and communication latency to landmark servers to estimate chip country of operation. The system uses confidential computing capabilities already in the chips, is customer-installed (not hidden), and Nvidia plans to make it open-source. However, the company has [firmly rejected kill switches](https://blogs.nvidia.com/blog/no-backdoors-no-kill-switches-no-spyware/): Chief Security Officer David Reber wrote in August 2025 that kill switches are "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper Chip as precedent. Nvidia's FY2026 data center revenue reached <FBF entity="UvpZCnW3wA" property="quarterly-data-center-revenue">\$62.3B</FBF> in Q4 alone, giving it enormous market leverage in shaping governance standards.
 
 **AMD and Intel** have similarly cooperated with export controls while publicly emphasizing innovation and competitiveness concerns. Both companies have existing chip features that researchers argue are HEM-compatible, but neither has committed to deploying them for governance purposes absent government mandate.
 
@@ -124,7 +126,7 @@ The **Semiconductor Industry Association** has called for a more measured approa
 
 ## Investment Levels and Funding Gaps
 
-Global chip revenue reached approximately \$630 billion in 2024 and is projected to reach \$910 billion by 2026. U.S. private investment catalyzed by the CHIPS and Science Act totals over \$630 billion. The four major hyperscalers (Google, Amazon, Microsoft, Meta) have projected combined capital expenditure of \$650 billion in the AI infrastructure build-out. OpenAI has signed agreements for 900,000 wafers per month by 2029 for its Stargate project.
+Global chip revenue reached approximately <FBF entity="9EIbn9XvH6" property="global-chip-revenue">\$630 billion</FBF> in 2024 and is projected to reach <FBF entity="9EIbn9XvH6" property="global-chip-revenue-projected">\$910 billion</FBF> by 2026.[^3] U.S. private investment catalyzed by the CHIPS and Science Act totals over <FBF entity="9EIbn9XvH6" property="chips-act-private-investment">\$630 billion</FBF>.[^2] The four major hyperscalers (Google, Amazon, Microsoft, Meta) have projected combined capital expenditure of \$650 billion in the AI infrastructure build-out. OpenAI has signed agreements for 900,000 wafers per month by 2029 for its Stargate project.
 
 Against this backdrop, investment specifically in governance-oriented hardware R&D appears marginal. No dedicated public fund for HEM development has been identified in available research. The primary sources of governance-relevant research are policy think tanks—CNAS, the Georgetown Center for Security and Emerging Technology, <EntityLink id="E552">Open Philanthropy</EntityLink>-funded organizations, and academic labs—whose total budgets are a rounding error relative to chip industry capex.
 
@@ -181,11 +183,11 @@ Critics argue that hardware control proposals would allow chip designers, fabric
 
 ### Geopolitical Complications
 
-Export controls have geopolitical costs. Restricting advanced chips exclusively to U.S. companies risks alienating allies—Nvidia has secured a deal to supply 260,000 advanced AI chips to South Korea's government and industrial partners, a deal that stricter controls could jeopardize. China's SMIC has reportedly manufactured 5nm electronic circuits despite restrictions, suggesting that controls delay rather than prevent adversary capability development. A cycle of misperceptions about rivals' motives is identified in the research literature as a risk to strategic stability, and trust-building measures are argued to be prerequisites for effective international AI governance agreements.
+Export controls have geopolitical costs. Restricting advanced chips exclusively to U.S. companies risks alienating allies—Nvidia has secured a deal to supply 260,000 advanced AI chips to South Korea's government and industrial partners, a deal that stricter controls could jeopardize. China's SMIC has reportedly manufactured 5nm electronic circuits despite restrictions, suggesting that controls delay rather than prevent adversary capability development.[^4] A cycle of misperceptions about rivals' motives is identified in the research literature as a risk to strategic stability, and trust-building measures are argued to be prerequisites for effective international AI governance agreements.
 
 ### Policy Volatility
 
-Frequent policy reversals—Biden's AI Diffusion Rule, Trump's modifications, scrapped frameworks—create procurement uncertainty for global semiconductor firms. The second Trump administration reversed an April 2025 export freeze on Nvidia chips in December 2025, subject to conditions. This volatility strains business relationships, delays deployments, and undermines the credibility of U.S. governance commitments to allied partners.
+Frequent policy reversals—Biden's AI Diffusion Rule, Trump's modifications, scrapped frameworks—create procurement uncertainty for global semiconductor firms. The second Trump administration reversed an April 2025 export freeze on Nvidia chips in December 2025, subject to conditions. This volatility strains business relationships, delays deployments, and undermines the credibility of U.S. governance commitments to allied partners.[^9]
 
 ## Key Uncertainties
 

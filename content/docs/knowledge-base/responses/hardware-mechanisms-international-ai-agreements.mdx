@@ -18,12 +18,12 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 
 | Dimension | Assessment |
 |-----------|------------|
-| **Maturity** | Early research / pre-deployment; most mechanisms at TRL 2–5 |
+| **Maturity** | Early research / pre-deployment; most mechanisms at TRL 2–<FBF entity="rjN34NUnb0" property="location-verification-trl">5</FBF> |
 | **Primary challenge** | Geopolitical buy-in and adversarial evasion, not just technical readiness |
 | **Key mechanism types** | Location verification, TEEs/confidential computing, interconnect limits, chip tracking, compute metering |
 | **Governance models targeted** | IAEA-style monitoring, compute allocation treaties, export control verification, training run registration |
 | **Main developers** | <EntityLink id="E202">MIRI</EntityLink>, Oxford Martin AIGI, <EntityLink id="E1193">IAPS</EntityLink>, arXiv research groups |
-| **Subcategory** | <EntityLink id="E473">Compute Governance</EntityLink> |
+| **Subcategory** | <EntityLink id="E64">Compute Governance</EntityLink> |
 | **Related wiki pages** | <EntityLink id="E463">Hardware-Enabled Governance</EntityLink>, <EntityLink id="E473">International Compute Regimes</EntityLink> |
 
 ## Key Links
@@ -58,13 +58,13 @@ The Arms Control Exchange program of the 1990s is particularly influential. US n
 | Year | Event | Key Actors |
 |------|-------|------------|
 | Pre-2024 | US imposes export controls on AI accelerators to restrict military and surveillance use | US government |
-| May 2024 | Senator Tom Cotton introduces bipartisan Chip Security Act mandating security features in high-performance AI chips | US Congress / <EntityLink id="E1990">CSIS</EntityLink> analysis |
 | 2024 | arXiv report outlines hardware-enabled mechanisms including chip-based location reporting and geolocking for AI policy goals | Sastry et al. and related researchers |
 | November 2024 | MIRI report details verification mechanisms, prioritizing chip tracking and TEEs | <EntityLink id="E202">MIRI</EntityLink> |
 | 2025 | Oxford Martin AIGI report categorizes on-chip and off-chip verification methods | Oxford Martin AIGI |
+| May 8, 2025 | Senator Tom Cotton introduces bipartisan Chip Security Act mandating security features in high-performance AI chips | US Congress / <EntityLink id="E1990">CSIS</EntityLink> analysis |
 | 2025 | arXiv paper (abs/2505.03742) by Aidan O'Gara, Gabriel Kulp, et al. on hardware-enabled mechanisms for verifying AI training properties | O'Gara, Kulp, et al. |
 | 2025 | Centre pour la Sécurité de l'IA begins developing prototype trackers for EU AI Act compliance | French Center for AI Safety |
-| July 2025 | Trump AI Action Plan mandates location verification for chips and new controls on semiconductor subsystems | US government |
+| July 2025 | Trump AI Action Plan recommends DOC/OSTP/NSC explore location-verification features for chips and recommends developing controls on semiconductor-manufacturing subsystems | US government |
 | 2026 | SPAR projects (MIRI-led) assess existing chip security for verification, interconnect limits, and US–China bilateral feasibility | Aaron Scher / <EntityLink id="E202">MIRI</EntityLink> |
 
 ---
@@ -79,7 +79,7 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** Location verification is the prerequisite for export control verification treaties. Without it, no party can confirm that chips sold under a licensing regime have remained with authorized users. It also underpins training run registration regimes that tie permitted compute to specific facilities.
 
-**TRL assessment:** TRL 4–5. [IAPS has demonstrated a working prototype](https://www.iaps.ai/research/location-verification-for-ai-chips) on Nvidia H100 chips using delay-based challenge-response, achieving verification within approximately 300 miles of a Singapore landmark server. Nvidia [piloted its own tracking software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell GPUs in December 2025. IAPS estimates a firmware-only implementation could be completed within 6 months at under \$1M, with a landmark network of 100–500 servers costing \$2.5–12.5M/year. The bipartisan [Chip Security Act](https://www.congress.gov/bill/119th-congress/house-bill/3447/text) (H.R.3447 / S.1705) would mandate location verification on export-controlled chips within 180 days of enactment; House Foreign Affairs Committee markup is scheduled for March 26, 2026.
+**TRL assessment:** TRL <FBF entity="rjN34NUnb0" property="location-verification-trl">4–5</FBF>. [IAPS has demonstrated a working prototype](https://www.iaps.ai/research/location-verification-for-ai-chips) on Nvidia H100 chips using delay-based challenge-response, achieving verification within approximately <FBF entity="rjN34NUnb0" property="location-verification-accuracy">300 miles</FBF> of a Singapore landmark server. Nvidia [piloted its own tracking software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell GPUs in December 2025. IAPS estimates a firmware-only implementation could be completed within 6 months at under <FBF entity="rjN34NUnb0" property="location-verification-firmware-cost">\$1M</FBF>, with a landmark network of 100–500 servers costing <FBF entity="rjN34NUnb0" property="landmark-network-annual-cost">\$2.5–12.5M/year</FBF>. The bipartisan [Chip Security Act](https://www.congress.gov/bill/119th-congress/house-bill/3447/text) (H.R.3447 / S.1705) would mandate location verification on export-controlled chips within 180 days of enactment; House Foreign Affairs Committee markup is scheduled for March 26, 2026.
 
 **Active developers:** [IAPS](https://www.iaps.ai/research/location-verification-for-ai-chips) (Erich Grunewald et al.—primary research group); Nvidia (commercial pilot); <EntityLink id="E202">MIRI</EntityLink> SPAR projects led by Aaron Scher; Future of Life Institute (James Petrie—identified existing encryption keys in Nvidia processors); O'Gara, Kulp, et al. (arXiv 2025); U.S. government interest through the Trump AI Action Plan (July 2025).
 

@@ -3820,7 +3820,7 @@
     - hardware-governance
     - international-agreements
     - verification
-  relatedEntities:
+  relatedEntries:
     - id: hardware-enabled-governance
       type: approach
     - id: international-regimes
@@ -3844,7 +3844,7 @@
     - hardware-governance
     - supply-chain
     - semiconductors
-  relatedEntities:
+  relatedEntries:
     - id: hardware-enabled-governance
       type: approach
     - id: compute-governance
