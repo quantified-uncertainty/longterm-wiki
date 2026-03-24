@@ -3,9 +3,11 @@ import { z } from "zod";
 import {
   eq,
   and,
+  or,
   count,
   sql,
   desc,
+  lte,
   inArray,
   countDistinct,
 } from "drizzle-orm";
@@ -19,6 +21,13 @@ import {
   divisions,
   things,
   facts,
+  publications,
+  benchmarkResults,
+  benchmarks,
+  entityEvents,
+  entityAssessments,
+  secondaryMarketPrices,
+  wikiPages,
 } from "../../schema.js";
 import {
   zv,
@@ -89,6 +98,13 @@ const VerdictsQuery = z.object({
 const EvidenceQuery = z.object({
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
+});
+
+const DueForRecheckQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+  record_type: z.string().max(50).optional(),
+  min_priority: z.coerce.number().optional(),
 });
 
 const ResolveNamesQuery = z.object({
@@ -566,6 +582,114 @@ const sourceChecksApp = new Hono()
           names[row.stableId] = row.title;
         }
       }
+    } else if (record_type === "publication") {
+      const rows = await db
+        .select({ id: publications.id, title: publications.title })
+        .from(publications)
+        .where(inArray(publications.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = row.title;
+      }
+    } else if (record_type === "benchmark-result") {
+      const rows = await db
+        .select({
+          id: benchmarkResults.id,
+          benchmarkName: benchmarks.name,
+          modelId: benchmarkResults.modelId,
+          score: benchmarkResults.score,
+        })
+        .from(benchmarkResults)
+        .leftJoin(benchmarks, eq(benchmarks.id, benchmarkResults.benchmarkId))
+        .where(inArray(benchmarkResults.id, record_ids));
+
+      for (const row of rows) {
+        const bmName = row.benchmarkName ?? "Unknown benchmark";
+        const score = row.score != null ? String(row.score) : "?";
+        names[row.id] = `${row.modelId} / ${bmName}: ${score}`;
+      }
+    } else if (record_type === "entity-event") {
+      const rows = await db
+        .select({ id: entityEvents.id, title: entityEvents.title })
+        .from(entityEvents)
+        .where(inArray(entityEvents.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = row.title;
+      }
+    } else if (record_type === "entity-assessment") {
+      const rows = await db
+        .select({
+          id: entityAssessments.id,
+          dimension: entityAssessments.dimension,
+          entityId: entityAssessments.entityId,
+          rating: entityAssessments.rating,
+        })
+        .from(entityAssessments)
+        .where(inArray(entityAssessments.id, record_ids));
+
+      for (const row of rows) {
+        names[row.id] = `${row.dimension} (${row.entityId}): ${row.rating}`;
+      }
+    } else if (record_type === "secondary-market-price") {
+      const rows = await db
+        .select({
+          id: secondaryMarketPrices.id,
+          companyDisplayName: secondaryMarketPrices.companyDisplayName,
+          companyId: secondaryMarketPrices.companyId,
+          date: secondaryMarketPrices.date,
+          platform: secondaryMarketPrices.platform,
+        })
+        .from(secondaryMarketPrices)
+        .where(inArray(secondaryMarketPrices.id, record_ids));
+
+      for (const row of rows) {
+        const company = row.companyDisplayName ?? row.companyId;
+        names[row.id] = `${company} (${row.platform}) ${row.date}`;
+      }
+    } else if (record_type === "citation") {
+      // Citation record IDs have format "page:<slug>:fn<N>".
+      // Resolve to "<page title> - Footnote N".
+      const slugSet = new Set<string>();
+      const parsed: Array<{ recordId: string; slug: string; footnote: string }> = [];
+      for (const rid of record_ids) {
+        const match = rid.match(/^page:(.+):fn(\d+)$/);
+        if (match) {
+          slugSet.add(match[1]);
+          parsed.push({ recordId: rid, slug: match[1], footnote: match[2] });
+        } else {
+          // Fallback: use the raw ID
+          names[rid] = rid;
+        }
+      }
+
+      if (slugSet.size > 0) {
+        const slugArray = [...slugSet];
+        const rows = await db
+          .select({ slug: wikiPages.slug, title: wikiPages.title })
+          .from(wikiPages)
+          .where(inArray(wikiPages.slug, slugArray));
+
+        const titleMap = new Map<string, string>();
+        for (const row of rows) {
+          titleMap.set(row.slug, row.title);
+        }
+
+        for (const p of parsed) {
+          const pageTitle = titleMap.get(p.slug) ?? p.slug;
+          names[p.recordId] = `${pageTitle} - Footnote ${p.footnote}`;
+        }
+      }
+    } else if (record_type === "wiki-page") {
+      // Resolve page slugs to page titles
+      const rows = await db
+        .select({ slug: wikiPages.slug, title: wikiPages.title })
+        .from(wikiPages)
+        .where(inArray(wikiPages.slug, record_ids));
+
+      for (const row of rows) {
+        names[row.slug] = row.title;
+      }
     } else {
       // Generic fallback: use the things table
       const rows = await db
@@ -620,6 +744,10 @@ const sourceChecksApp = new Hono()
       SELECT 'benchmark-result', count(*)::int FROM benchmark_results
       UNION ALL
       SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
+      UNION ALL
+      SELECT 'citation', count(*)::int FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+      UNION ALL
+      SELECT 'wiki-page', count(*)::int FROM wiki_pages
     `);
 
     const totalsByType: Record<string, number> = {};
@@ -659,6 +787,94 @@ const sourceChecksApp = new Hono()
       .sort((a, b) => a.recordType.localeCompare(b.recordType));
 
     return c.json({ coverage });
+  })
+
+  // ---- GET /due-for-recheck ----
+  .get("/due-for-recheck", zv("query", DueForRecheckQuery), async (c) => {
+    const { limit, offset, record_type, min_priority } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Build priority CASE expression based on verdict severity
+    const priorityExpr = sql<number>`CASE ${sourceCheckVerdicts.verdict}
+      WHEN 'contradicted' THEN 100
+      WHEN 'outdated' THEN 80
+      WHEN 'partial' THEN 50
+      WHEN 'unverifiable' THEN 30
+      WHEN 'confirmed' THEN 10
+      ELSE 0
+    END`;
+
+    // Items are due for recheck when:
+    // 1. next_check_due <= NOW(), or
+    // 2. needs_recheck = true
+    const dueConditions = or(
+      lte(sourceCheckVerdicts.nextCheckDue, sql`NOW()`),
+      eq(sourceCheckVerdicts.needsRecheck, true),
+    );
+
+    const conditions = [dueConditions];
+    if (record_type) {
+      conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+    }
+
+    const whereClause = and(...conditions);
+
+    // Fetch rows with computed priority
+    const rows = await db
+      .select({
+        recordType: sourceCheckVerdicts.recordType,
+        recordId: sourceCheckVerdicts.recordId,
+        fieldName: sourceCheckVerdicts.fieldName,
+        entityId: sourceCheckVerdicts.entityId,
+        verdict: sourceCheckVerdicts.verdict,
+        confidence: sourceCheckVerdicts.confidence,
+        reasoning: sourceCheckVerdicts.reasoning,
+        sourcesChecked: sourceCheckVerdicts.sourcesChecked,
+        needsRecheck: sourceCheckVerdicts.needsRecheck,
+        nextCheckDue: sourceCheckVerdicts.nextCheckDue,
+        lastComputedAt: sourceCheckVerdicts.lastComputedAt,
+        createdAt: sourceCheckVerdicts.createdAt,
+        updatedAt: sourceCheckVerdicts.updatedAt,
+        priority: priorityExpr,
+      })
+      .from(sourceCheckVerdicts)
+      .where(whereClause)
+      .orderBy(sql`${priorityExpr} DESC`, desc(sourceCheckVerdicts.lastComputedAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Apply min_priority filter in-app (simpler than adding it to the SQL WHERE
+    // since the CASE expression would need to be repeated)
+    const filtered = min_priority !== undefined
+      ? rows.filter((r) => r.priority >= min_priority)
+      : rows;
+
+    // Count total matching rows
+    const countResult = await db
+      .select({ count: count() })
+      .from(sourceCheckVerdicts)
+      .where(whereClause);
+    const total = countResult[0].count;
+
+    return c.json({
+      items: filtered.map((r) => ({
+        recordType: r.recordType,
+        recordId: r.recordId,
+        fieldName: r.fieldName,
+        entityId: r.entityId,
+        verdict: r.verdict,
+        confidence: r.confidence,
+        reasoning: r.reasoning,
+        sourcesChecked: r.sourcesChecked,
+        needsRecheck: r.needsRecheck,
+        nextCheckDue: r.nextCheckDue,
+        lastComputedAt: r.lastComputedAt,
+        createdAt: r.createdAt,
+        updatedAt: r.updatedAt,
+        priority: r.priority,
+      })),
+      total,
+    });
   });
 
 // ---- Exports ----
