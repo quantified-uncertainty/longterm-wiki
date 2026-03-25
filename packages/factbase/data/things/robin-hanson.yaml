@@ -42,6 +42,6 @@ facts:
     notes: Enriched from wiki page
   - id: zgze2RX90w
     property: wikipedia-url
-    value: https://en.wikipedia.org/wiki/Robin_Hanson_(swimmer)
-    source: https://www.wikidata.org/wiki/Q106923078
-    notes: From Wikidata Q106923078
+    value: https://en.wikipedia.org/wiki/Robin_Hanson
+    source: https://www.wikidata.org/wiki/Q2159779
+    notes: From Wikidata Q2159779 (economist, not the swimmer Q106923078)
