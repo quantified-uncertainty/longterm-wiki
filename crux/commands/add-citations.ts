@@ -17,7 +17,12 @@ import type { CommandResult } from '../lib/command-types.ts';
 import { findPageById } from '../lib/page-resolution.ts';
 import { extractClaims } from '../lib/semantic-diff/claim-extractor.ts';
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
-import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
+import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
+import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import {
+  detectPaywall,
+  isUnverifiableDomain,
+} from '../lib/search/paywall-detection.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 
@@ -134,6 +139,115 @@ Search the web and return the best source URL as JSON.`, {
     console.warn(`    Warning: source search failed for "${claim.text.slice(0, 50)}...": ${e instanceof Error ? e.message : String(e)}`);
     return null;
   }
+}
+
+// ── Source content fetching ──────────────────────────────────────────
+
+const FETCH_TIMEOUT_MS = 15_000;
+const MAX_CONTENT_LENGTH = 8000;
+
+/**
+ * Fetch the actual content of a source URL.
+ * Checks wiki-server citation content cache first, then direct fetch.
+ */
+async function fetchSourceContent(url: string): Promise<string | null> {
+  if (isUnverifiableDomain(url)) return null;
+
+  // Try wiki-server cache first
+  try {
+    const cached = await getCitationContentByUrl(url);
+    if (cached.ok && cached.data?.fullText && cached.data.fullText.length > 50) {
+      return cached.data.fullText.slice(0, MAX_CONTENT_LENGTH);
+    }
+  } catch {
+    // Cache miss — fall through to direct fetch
+  }
+
+  // Direct fetch
+  try {
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'LongtermWiki-Verification/1.0' },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      redirect: 'follow',
+    });
+
+    if (!res.ok) return null;
+
+    const contentType = res.headers.get('content-type') ?? '';
+    if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('application/json')) {
+      return null;
+    }
+
+    const text = await res.text();
+    if (detectPaywall(text)) return null;
+
+    const plainText = text
+      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return plainText.length > 50 ? plainText.slice(0, MAX_CONTENT_LENGTH) : null;
+  } catch {
+    return null;
+  }
+}
+
+// ── Independent claim verification ───────────────────────────────────
+
+type VerifyVerdict = 'supported' | 'contradicted' | 'insufficient';
+
+/**
+ * Independently verify whether fetched source content supports a claim.
+ * This is the critical quality gate — prevents inserting citations where
+ * the source doesn't actually say what we claim it says.
+ */
+async function verifyClaimAgainstContent(
+  claim: ExtractedClaim,
+  sourceContent: string,
+  client: ReturnType<typeof createLlmClient>,
+  costTracker: CostTracker,
+): Promise<{ verdict: VerifyVerdict; reasoning: string }> {
+  const result = await callLlm(client, {
+    system: `You verify whether source text supports a specific factual claim. Be strict.
+
+Output JSON:
+{
+  "verdict": "supported" | "contradicted" | "insufficient",
+  "reasoning": "One sentence explaining why"
+}
+
+Rules:
+- "supported": The source text EXPLICITLY states or clearly implies the claim. The specific facts (numbers, dates, names) must match.
+- "contradicted": The source text explicitly states something different from the claim.
+- "insufficient": The source text doesn't address this specific claim, or is too vague to confirm it. When in doubt, say "insufficient".
+- Be STRICT: the source must contain the specific information, not just be about the same topic.`,
+    user: `Claim to verify: "${claim.text}"${claim.keyValue ? `\n(Key value: ${claim.keyValue})` : ''}
+
+Source content (first ${sourceContent.length} chars):
+${sourceContent.slice(0, 4000)}
+
+Does this source text support the claim?`,
+  }, {
+    model: MODELS.haiku,
+    maxTokens: 300,
+    retryLabel: 'verify-against-content',
+  });
+
+  if (result.usage) costTracker.record(MODELS.haiku, result.usage, 'verify-content');
+
+  const parsed = parseJsonFromLlm<{ verdict: VerifyVerdict; reasoning: string }>(
+    result.text,
+    'verify-content',
+    () => ({ verdict: 'insufficient' as VerifyVerdict, reasoning: 'Failed to parse' }),
+  );
+
+  const validVerdicts = new Set<VerifyVerdict>(['supported', 'contradicted', 'insufficient']);
+  return {
+    verdict: validVerdicts.has(parsed.verdict) ? parsed.verdict : 'insufficient',
+    reasoning: parsed.reasoning || '',
+  };
 }
 
 // ── Footnote ID generation ───────────────────────────────────────────
@@ -311,6 +425,7 @@ export async function addCitationsCommand(
       break;
     }
 
+    // Step A: Find a candidate source URL via web search
     const source = await findSourceForClaim(claim, client, costTracker);
     if (!source) {
       console.log(`    [-] No source found: ${claim.text.slice(0, 60)}...`);
@@ -323,6 +438,24 @@ export async function addCitationsCommand(
       continue;
     }
 
+    // Step B: Fetch the actual source content
+    const sourceContent = await fetchSourceContent(source.url);
+    if (!sourceContent) {
+      console.log(`    [!] Can't fetch source content: ${source.url.slice(0, 50)} — skipping`);
+      continue;
+    }
+
+    // Step C: Independently verify the claim against fetched content
+    const verification = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
+    if (verification.verdict !== 'supported') {
+      console.log(`    [✗] Source doesn't support claim (${verification.verdict}): ${claim.text.slice(0, 50)}...`);
+      if (verification.reasoning) {
+        console.log(`        ${verification.reasoning}`);
+      }
+      continue;
+    }
+
+    // Step D: Find insertion point in the MDX
     const insertion = findInsertionPoint(claim, lines);
     if (!insertion) {
       console.log(`    [?] Can't find insertion point: ${claim.text.slice(0, 60)}...`);
@@ -348,7 +481,7 @@ export async function addCitationsCommand(
     usedLines.add(insertion.line);
     usedUrls.add(source.url);
 
-    console.log(`    [+] ${claim.text.slice(0, 50)}... → ${source.url.slice(0, 60)}`);
+    console.log(`    [✓] VERIFIED: ${claim.text.slice(0, 50)}... → ${source.url.slice(0, 50)}`);
   }
 
   console.log(`\n  [3/4] ${citationsToAdd.length} citations to add`);
