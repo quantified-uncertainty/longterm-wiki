@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import { getRecordHref } from "@/app/source-checks/source-checks-shared";
+import { VerdictBadge, VERDICT_STYLES, getRecordHref } from "@/app/source-checks/source-checks-shared";
 
 // -- Types --
 
@@ -64,16 +64,7 @@ interface EvidenceRow {
   checkedAt: string | null;
 }
 
-// ── Verdict styling & priority ──────────────────────────────────────────
-
-const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
-  confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600" },
-  contradicted: { bg: "bg-red-500/15", text: "text-red-600" },
-  outdated: { bg: "bg-amber-500/15", text: "text-amber-600" },
-  partial: { bg: "bg-amber-400/15", text: "text-amber-500" },
-  unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500" },
-  unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
-};
+// ── Verdict priority (viewer-specific sort order) ───────────────────────
 
 /** Sort priority: most actionable verdicts first. Lower = higher priority. */
 const VERDICT_PRIORITY: Record<string, number> = {
@@ -85,16 +76,7 @@ const VERDICT_PRIORITY: Record<string, number> = {
   unchecked: 5,
 };
 
-function VerdictBadge({ verdict }: { verdict: string }) {
-  const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
-  return (
-    <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${style.bg} ${style.text}`}>
-      {verdict}
-    </span>
-  );
-}
-
-// -- Columns --
+// ── Columns ────────────────────────────────────────────────────────────────
 
 function expandToggleColumn(): ColumnDef<VerdictRow> {
   return {
@@ -159,20 +141,34 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
         const recordId = row.original.recordId;
         const recordHref = getRecordHref(row.original.recordType, recordId);
 
-        const display = resolvedName
-          ? (resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName)
-          : (recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId);
+        if (resolvedName) {
+          const display = resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName;
+          if (recordHref) {
+            return (
+              <a href={recordHref} className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" title={resolvedName}>
+                {display}
+              </a>
+            );
+          }
+          return (
+            <span className="text-xs font-medium" title={resolvedName}>
+              {display}
+            </span>
+          );
+        }
 
+        // Fallback: show raw ID, linked if a detail page exists
+        const idDisplay = recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId;
         if (recordHref) {
           return (
-            <a href={recordHref} className={cn("text-xs hover:underline", resolvedName ? "font-medium text-blue-600 dark:text-blue-400" : "font-mono text-blue-600/70 dark:text-blue-400/70")} title={resolvedName || recordId}>
-              {display}
+            <a href={recordHref} className="text-xs font-mono text-blue-600/70 hover:underline dark:text-blue-400/70" title={recordId}>
+              {idDisplay}
             </a>
           );
         }
         return (
-          <span className={cn("text-xs", resolvedName ? "font-medium" : "font-mono text-muted-foreground")} title={resolvedName || recordId}>
-            {display}
+          <span className="text-xs font-mono text-muted-foreground" title={recordId}>
+            {idDisplay}
           </span>
         );
       },
@@ -720,18 +716,23 @@ export function EntitySourceChecksViewer() {
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            placeholder="Search source checks..."
+            placeholder="Search by entity, record, or reasoning..."
             value={globalFilter ?? ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
             className="h-10 w-full rounded-lg border border-border bg-background pl-10 pr-4 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           />
         </div>
         <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {filteredCount === filtered.length
-            ? `${filtered.length} results`
-            : `${filteredCount} of ${filtered.length} results`}
+          {filteredCount} results
         </span>
       </div>
+
+      {/* Empty state for zero-result filters */}
+      {filtered.length === 0 && (
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-6 py-8 text-center text-sm text-muted-foreground mb-4">
+          No source checks match your filters. Try adjusting the type or verdict filters.
+        </div>
+      )}
 
       {/* Table */}
       <DataTable

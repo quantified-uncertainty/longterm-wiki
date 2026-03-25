@@ -16,6 +16,7 @@ import {
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
 import { isUrl } from "@/components/wiki/factbase/format";
+import { getEntityHref } from "@data/entity-nav";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -96,8 +97,14 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const displayName =
     resolvedName ?? `${formatRecordType(recordType)} ${recordId}`;
 
-  // Deduplicate evidence by unique source URLs
-  const uniqueSourceUrls = new Set(evidence.map((e) => e.sourceUrl).filter(Boolean));
+  // Compute evidence counts for verdict summary
+  const uniqueSourceUrls = new Set(
+    evidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
+  );
+
+  // Resolve entity info from first verdict that has an entityId
+  const entityId = verdicts.find((v) => v.entityId)?.entityId ?? null;
+  const entityHref = entityId ? getEntityHref(entityId) : null;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
@@ -118,93 +125,120 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           <span className="font-mono">{recordId}</span>
         </div>
         <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
-        {(() => {
-          const recordHref = getRecordHref(recordType, recordId);
-          return recordHref ? (
+        <div className="flex flex-wrap items-center gap-3">
+          {(() => {
+            const recordHref = getRecordHref(recordType, recordId);
+            return recordHref ? (
+              <Link
+                href={recordHref}
+                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
+              >
+                View {formatRecordType(recordType).toLowerCase()} record &rarr;
+              </Link>
+            ) : null;
+          })()}
+          {entityHref && (
             <Link
-              href={recordHref}
+              href={entityHref}
               className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
             >
-              View {formatRecordType(recordType).toLowerCase()} record &rarr;
+              View entity page &rarr;
             </Link>
-          ) : null;
-        })()}
+          )}
+        </div>
       </div>
 
       {/* Verdict summary cards */}
       {verdicts.length > 0 ? (
         <div className="space-y-4 mb-8">
-          {verdicts.map((v, i) => (
-            <div
-              key={`${v.fieldName ?? "overall"}-${i}`}
-              className="rounded-lg border border-border/60 p-5"
-            >
-              <div className="flex items-start justify-between gap-4 mb-3">
-                <div>
-                  {v.fieldName && (
-                    <p className="text-xs text-muted-foreground mb-1">
-                      Field:{" "}
-                      <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                        {v.fieldName}
-                      </code>
-                    </p>
-                  )}
-                  <div className="flex items-center gap-3">
-                    <VerdictBadge verdict={v.verdict} />
-                    {v.confidence != null && (
-                      <span className="text-sm tabular-nums font-medium">
-                        {Math.round(v.confidence * 100)}% confidence
-                      </span>
+          {verdicts.map((v, i) => {
+            // Count evidence items that match this verdict's fieldName
+            const fieldEvidence = evidence.filter(
+              (e) => (e.fieldName ?? null) === (v.fieldName ?? null)
+            );
+            const fieldUniqueUrls = new Set(
+              fieldEvidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
+            );
+
+            return (
+              <div
+                key={`${v.fieldName ?? "overall"}-${i}`}
+                className="rounded-lg border border-border/60 p-5"
+              >
+                <div className="flex items-start justify-between gap-4 mb-3">
+                  <div>
+                    {v.fieldName && (
+                      <p className="text-xs text-muted-foreground mb-1">
+                        Field:{" "}
+                        <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                          {v.fieldName}
+                        </code>
+                      </p>
+                    )}
+                    <div className="flex items-center gap-3">
+                      <VerdictBadge verdict={v.verdict} />
+                      {v.confidence != null && (
+                        <span className="text-sm tabular-nums font-medium">
+                          {Math.round(v.confidence * 100)}% confidence
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-right text-xs text-muted-foreground">
+                    {fieldEvidence.length > 0 && (
+                      <p>
+                        {fieldEvidence.length} evidence check
+                        {fieldEvidence.length !== 1 ? "s" : ""}
+                        {fieldUniqueUrls.size > 0 &&
+                          fieldUniqueUrls.size !== fieldEvidence.length && (
+                            <>
+                              {" "}from {fieldUniqueUrls.size} unique source
+                              {fieldUniqueUrls.size !== 1 ? "s" : ""}
+                            </>
+                          )}
+                      </p>
+                    )}
+                    {v.lastComputedAt && (
+                      <p>
+                        Last checked:{" "}
+                        {new Date(v.lastComputedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                    {v.needsRecheck && (
+                      <p className="text-amber-500 font-medium mt-0.5">
+                        Needs recheck
+                      </p>
                     )}
                   </div>
                 </div>
-                <div className="text-right text-xs text-muted-foreground">
-                  <p>
-                    {evidence.length} evidence check{evidence.length !== 1 ? "s" : ""}
-                    {uniqueSourceUrls.size > 0 && uniqueSourceUrls.size !== evidence.length
-                      ? ` from ${uniqueSourceUrls.size} source${uniqueSourceUrls.size !== 1 ? "s" : ""}`
-                      : ""}
-                  </p>
-                  {v.lastComputedAt && (
-                    <p>
-                      Last checked:{" "}
-                      {new Date(v.lastComputedAt).toLocaleDateString()}
-                    </p>
-                  )}
-                  {v.needsRecheck && (
-                    <p className="text-amber-500 font-medium mt-0.5">
-                      Needs recheck
-                    </p>
-                  )}
-                </div>
+
+                {/* Confidence bar */}
+                {v.confidence != null && (
+                  <div className="w-full bg-muted rounded-full h-2 mb-3">
+                    <div
+                      className={cn(
+                        "h-2 rounded-full transition-all",
+                        v.verdict === "confirmed"
+                          ? "bg-emerald-500"
+                          : v.verdict === "contradicted"
+                            ? "bg-red-500"
+                            : v.verdict === "outdated"
+                              ? "bg-amber-500"
+                              : v.verdict === "partial"
+                                ? "bg-amber-400"
+                                : "bg-gray-400"
+                      )}
+                      style={{ width: `${Math.round(v.confidence * 100)}%` }}
+                    />
+                  </div>
+                )}
+
+                {v.reasoning && (
+                  <p className="text-sm text-muted-foreground">{v.reasoning}</p>
+                )}
               </div>
-
-              {/* Confidence bar */}
-              {v.confidence != null && (
-                <div className="w-full bg-muted rounded-full h-2 mb-3">
-                  <div
-                    className={cn(
-                      "h-2 rounded-full transition-all",
-                      v.verdict === "confirmed"
-                        ? "bg-emerald-500"
-                        : v.verdict === "contradicted"
-                          ? "bg-red-500"
-                          : v.verdict === "outdated"
-                            ? "bg-amber-500"
-                            : v.verdict === "partial"
-                              ? "bg-amber-400"
-                              : "bg-gray-400"
-                    )}
-                    style={{ width: `${Math.round(v.confidence * 100)}%` }}
-                  />
-                </div>
-              )}
-
-              {v.reasoning && (
-                <p className="text-sm text-muted-foreground">{v.reasoning}</p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-lg border border-border/60 p-6 text-center text-muted-foreground mb-8">
@@ -216,7 +250,16 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       {evidence.length > 0 && (
         <section className="mb-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Evidence ({evidence.length} check{evidence.length !== 1 ? "s" : ""})
+            Evidence ({evidence.length} check
+            {evidence.length !== 1 ? "s" : ""}
+            {uniqueSourceUrls.size > 0 &&
+              uniqueSourceUrls.size !== evidence.length && (
+                <>
+                  {" "}from {uniqueSourceUrls.size} unique source
+                  {uniqueSourceUrls.size !== 1 ? "s" : ""}
+                </>
+              )}
+            )
           </h2>
           <div className="space-y-3">
             {evidence.map((e) => (
@@ -224,67 +267,85 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 key={e.id}
                 className="rounded-lg border border-border/60 p-4"
               >
-                <div className="flex items-center justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    <VerdictBadge verdict={e.verdict} />
-                    {e.confidence != null && (
-                      <span className="text-xs tabular-nums text-muted-foreground">
-                        {Math.round(e.confidence * 100)}% confidence
-                      </span>
+                {/* Card header: verdict + confidence + model + date */}
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <VerdictBadge verdict={e.verdict} />
+                  {e.confidence != null && (
+                    <span className="text-xs tabular-nums font-medium text-muted-foreground">
+                      {Math.round(e.confidence * 100)}% confidence
+                    </span>
+                  )}
+                  {e.isPrimarySource && (
+                    <span className="inline-flex items-center rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+                      primary source
+                    </span>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground flex items-center gap-2">
+                    {e.checkerModel && (
+                      <span>{e.checkerModel}</span>
                     )}
-                  </div>
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                    {e.checkerModel && <span>{e.checkerModel}</span>}
                     {e.checkedAt && (
                       <span className="tabular-nums">
                         {new Date(e.checkedAt).toLocaleDateString()}
                       </span>
                     )}
-                  </div>
+                  </span>
                 </div>
 
                 {/* Source URL */}
                 {e.sourceUrl && (
-                  <div className="mb-2">
+                  <div className="mb-3">
                     {isUrl(e.sourceUrl) ? (
                       <a
                         href={e.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 dark:text-blue-400 break-all"
+                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400 break-all"
                       >
-                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {e.sourceUrl}
                       </a>
                     ) : (
-                      <span className="font-mono text-xs break-all">{e.sourceUrl}</span>
+                      <span className="font-mono text-sm break-all">{e.sourceUrl}</span>
                     )}
                   </div>
                 )}
 
-                {/* Expected vs Found */}
+                {/* Expected vs Found values grid */}
                 {(e.expectedValue || e.extractedValue) && (
-                  <div className="grid grid-cols-2 gap-3 text-xs mb-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                     {e.expectedValue && (
                       <div>
-                        <span className="text-muted-foreground font-medium">Expected: </span>
-                        <span>{e.expectedValue}</span>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-0.5">
+                          Expected
+                        </p>
+                        <p className="text-sm">{e.expectedValue}</p>
                       </div>
                     )}
                     {e.extractedValue && (
                       <div>
-                        <span className="text-muted-foreground font-medium">Found: </span>
-                        <span>{e.extractedValue}</span>
+                        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-0.5">
+                          Found
+                        </p>
+                        <p className="text-sm">{e.extractedValue}</p>
                       </div>
                     )}
                   </div>
                 )}
 
-                {/* Quote */}
+                {/* Extracted quote */}
                 {e.extractedQuote && (
-                  <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-3 italic">
-                    &ldquo;{e.extractedQuote}&rdquo;
+                  <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-3">
+                    {e.extractedQuote}
                   </blockquote>
+                )}
+
+                {/* Notes */}
+                {e.notes && (
+                  <p className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground/70">Note:</span>{" "}
+                    {e.notes}
+                  </p>
                 )}
               </div>
             ))}
