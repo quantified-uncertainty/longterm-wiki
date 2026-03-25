@@ -7158,14 +7158,6 @@
   tags: [physics]
   lastUpdated: 2026-03
 
-    AI safety researcher at Anthropic. PhD from UC Berkeley focused on
-    multi-agent systems and cooperative AI. Works on alignment and safety
-    evaluation of foundation models.
-  tags:
-    - ai-safety
-    - cooperative-ai
-  lastUpdated: 2026-03
-
 - id: david-manheim
   stableId: 4auxbz6oS9
   type: person
