@@ -7,7 +7,7 @@ sidebar:
 subcategory: epistemic-orgs
 lastEdited: 2026-03-25
 update_frequency: 45
-summary: "QURI develops Squiggle (probabilistic programming language with native distribution types), SquiggleAI (Claude-powered model generation producing 100-500 line models), Metaforecast (aggregating forecasts from 10+ platforms), and related epistemic tools. Founded 2019 by Ozzie Gooen with \\$850K+ funding (SFF \\$650K, Future Fund \\$200K), primarily serving EA/rationalist community for cost-effectiveness analysis and Fermi estimation."
+summary: "QURI develops Squiggle (probabilistic programming language with native distribution types), SquiggleAI (Claude Sonnet 3.5-powered model generation), Metaforecast (forecast aggregation across 18 platforms, currently unmaintained), and related epistemic tools. Founded 2019 by Ozzie Gooen with \\$850K+ documented funding through 2022, primarily serving EA/rationalist community for cost-effectiveness analysis and Fermi estimation."
 clusters:
   - epistemics
   - community
@@ -23,7 +23,7 @@ import { Mermaid, EntityLink } from '@components/wiki';
 | **Open Source** | Fully | All projects MIT licensed on [GitHub](https://github.com/quantified-uncertainty); monorepo includes Squiggle, Hub, and <EntityLink id="E200" name="metaforecast">Metaforecast</EntityLink> |
 | **Funding** | Stable | \$850K+ documented through 2022: SFF (\$650K), Future Fund (\$200K); <EntityLink id="E543" name="ltff">LTFF</EntityLink> ongoing |
 | **Team Size** | Small | Small core team led by Ozzie Gooen (founder), with fiscal sponsorship from <EntityLink id="E558" name="rethink-priorities">Rethink Priorities</EntityLink> |
-| **AI Integration** | Active | <EntityLink id="E287" name="squiggleai">SquiggleAI</EntityLink> uses Claude for model generation; <EntityLink id="E385" name="roastmypost">RoastMyPost</EntityLink> uses Claude + Perplexity |
+| **AI Integration** | Active | <EntityLink id="E287" name="squiggleai">SquiggleAI</EntityLink> uses Claude Sonnet 3.5 for model generation; <EntityLink id="E385" name="roastmypost">RoastMyPost</EntityLink> uses Claude + Perplexity |
 | **Community** | Niche but Engaged | EA Forum presence, Forecasting & Epistemics Slack (#squiggle-dev) |
 
 ## Key Links
@@ -51,7 +51,7 @@ import { Mermaid, EntityLink } from '@components/wiki';
 
 ## Overview
 
-The [Quantified Uncertainty Research Institute](https://quantifieduncertainty.org/) (QURI) is a nonprofit research organization focused on developing tools and methodologies for probabilistic reasoning and forecasting. Founded in 2019 by Ozzie Gooen, QURI aims to make uncertainty quantification more accessible and rigorous, particularly for decisions affecting the long-term future of humanity. The organization evolved from Gooen's earlier work on [Guesstimate](https://www.getguesstimate.com/), a spreadsheet tool for Monte Carlo simulations.
+The [Quantified Uncertainty Research Institute](https://quantifieduncertainty.org/) (QURI) is a nonprofit research organization focused on developing tools and methodologies for probabilistic reasoning and forecasting. Founded in 2019 by Ozzie Gooen, QURI aims to make uncertainty quantification more accessible and rigorous, particularly for decisions affecting the long-term future of humanity. The organization evolved from Gooen's earlier work on [Guesstimate](https://www.getguesstimate.com/), a spreadsheet tool for Monte Carlo simulations that QURI formally acquired in 2023.
 
 QURI's flagship project is <EntityLink id="E286" name="squiggle">Squiggle</EntityLink>, a domain-specific programming language designed for probabilistic estimation. Unlike general-purpose languages, Squiggle provides first-class support for probability distributions, enabling analysts to express complex uncertainties naturally. QURI's experience building these tools revealed a significant challenge: even highly skilled domain experts frequently struggle with basic programming requirements and often make errors in their probabilistic models—motivating the development of <EntityLink id="E287" name="squiggleai">SquiggleAI</EntityLink>.
 
@@ -110,7 +110,7 @@ For full details on syntax, features, code examples, and version history, see th
 
 ### SquiggleAI
 
-<EntityLink id="E287" name="squiggleai">SquiggleAI</EntityLink> integrates large language models to assist with probabilistic model creation, addressing the challenge that domain experts frequently struggle with programming requirements for probabilistic modeling. It uses prompt caching to provide the LLM with deep knowledge of Squiggle syntax and best practices, producing models typically 100-500 lines long.
+<EntityLink id="E287" name="squiggleai">SquiggleAI</EntityLink> integrates large language models to assist with probabilistic model creation, addressing the challenge that domain experts frequently struggle with programming requirements for probabilistic modeling. It currently uses Claude Sonnet 3.5 with prompt caching (~20,000 tokens of Squiggle language information), producing models typically 100-500 lines long at a cost of \$0.002-\$0.02 per query.
 
 For details on model support, capabilities, and integration with Squiggle Hub, see the **[SquiggleAI page](/wiki/E287)**.
 
@@ -120,7 +120,7 @@ For details on model support, capabilities, and integration with Squiggle Hub, s
 
 ### Metaforecast
 
-<EntityLink id="E200" name="metaforecast">Metaforecast</EntityLink> aggregates forecasts from multiple prediction platforms (Metaculus, Manifold, Polymarket, Good Judgment Open, and others) into a single searchable interface. The initial version was created by Nuño Sempere with help from Ozzie Gooen. Data is fetched daily, optimized for quick lookups rather than trend analysis.
+<EntityLink id="E200" name="metaforecast">Metaforecast</EntityLink> aggregates forecasts from 18 prediction platforms (Metaculus, Manifold, Polymarket, Good Judgment Open, Kalshi, and others) into a single searchable interface. The initial version was created by Nuño Sempere with help from Ozzie Gooen. As of 2025, QURI has noted they are not currently maintaining Metaforecast but hope to resume in the future; the site remains operational with existing data.
 
 For full details on platforms aggregated, features, and integrations, see the **[Metaforecast page](/wiki/E200)**.
 
@@ -154,9 +154,11 @@ The Future Fund's 2022 grant was affected by the FTX collapse, which eliminated 
 |--------|---------|
 | **Legal Status** | 501(c)(3) nonprofit (EIN: 84-3847921) |
 | **Fiscal Sponsor** | [Rethink Priorities](https://rethinkpriorities.org/) Special Projects Program |
-| **Team** | Small core team; Ozzie Gooen (founder/ED) |
-| **Board Members** | Abigail Olvera, Ben Goldhaber |
-| **Past Contributors** | Sam Nolan, <EntityLink id="E579" name="nuno-sempere">Nuño Sempere</EntityLink> (Metaforecast creator), Michael Dickens (unit types) |
+| **Full-Time Staff** | Ozzie Gooen (founder/ED) |
+| **Board Members** | Abigail Olvera (Golden Gate Institute for AI), Ben Goldhaber (Far Labs) |
+| **Advisor** | Peter Wildeford (IAPS) |
+| **Research Collaborators** | <EntityLink id="E579" name="nuno-sempere">Nuño Sempere</EntityLink> (Sentinel), Eli Lifland |
+| **Past Contributors** | Slava Matyuhin, Sam Nolan, Quinn Dougherty, Umur Ozkul, Michael Dickens (unit types) |
 | **Communication** | EA Forecasting & Epistemics Slack (#squiggle-dev), [QURI Substack](https://quri.substack.com/) |
 | **Code Repository** | Monorepo at [github.com/quantified-uncertainty/squiggle](https://github.com/quantified-uncertainty/squiggle) |
 
@@ -201,6 +203,7 @@ Multiple projects have used Squiggle to add uncertainty quantification to GiveWe
 | **2020** | [Squiggle Early Access](https://forum.effectivealtruism.org/posts/TfPdb2aMKzgWXFvc3/announcing-squiggle-early-access) released |
 | **2021** | [Metaforecast launched](https://forum.effectivealtruism.org/posts/tEo5oXeSNcB3sYr8m/introducing-metaforecast-a-forecast-aggregator-and-search) |
 | **2022** | \$650K+ SFF funding, \$200K Future Fund grant (pre-FTX) |
+| **2023** | Guesstimate formally acquired; Rethink Priorities fiscal sponsorship begins |
 | **2024** | [Squiggle Hub launch](https://quantifieduncertainty.org/posts/announcing-squiggle-hub/), [SquiggleAI released](https://forum.effectivealtruism.org/posts/jJ4pn3qvBopkEvGXb/introducing-squiggle-ai), [RoastMyPost launch](https://forum.effectivealtruism.org/posts/BdufL4GZmeBht3fak/announcing-roastmypost-llms-eval-blog-posts-and-more) |
 | **2025** | [Squiggle 0.10.0](https://quantifieduncertainty.org/posts/squiggle-0-10-0/) (type inference, Web Workers), [shallowreview.ai](https://shallowreview.ai/) collaboration |
 
