@@ -235,7 +235,7 @@ export function loadBenchmarkResults(
       results.push({
         id: contentHash(["benchmark-result", slug, model.id]),
         benchmarkId: slug,
-        modelId: modelStableId,
+        modelId: model.id,
         score: b.score,
         unit: b.unit ?? null,
         date: b.date ?? null,
