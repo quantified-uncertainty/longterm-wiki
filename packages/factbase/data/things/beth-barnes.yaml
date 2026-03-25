@@ -6,7 +6,6 @@ facts:
       evaluating dangerous AI capabilities.
     asOf: 2026-03
     notes: Migrated from old entity system
-
   - id: f_bB6tN2pQ4v
     property: notable-for
     value: "Founded METR (formerly ARC Evals), pioneering dangerous capability
@@ -14,7 +13,6 @@ facts:
       GPT-4 and Claude"
     asOf: 2026-03
     notes: Enriched from entity description
-
   - id: f_bBcY8fL3kA
     property: education
     value: "Studied at University of Oxford"

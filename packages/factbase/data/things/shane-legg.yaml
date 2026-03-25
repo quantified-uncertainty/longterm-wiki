@@ -9,14 +9,12 @@ facts:
   - id: f_BbpmsSq6zg
     property: website
     value: https://deepmind.google
-
   - id: f_sL2nLw9pYr
     property: notable-for
     value: "Co-founding DeepMind; Early work on AGI; Machine super intelligence
       thesis"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-
   - id: CSAKC0XVnA
     property: education
     value: Dalle Molle Institute for Artificial Intelligence Research

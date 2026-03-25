@@ -1,8 +1,10 @@
 entity: x16GL4gP2A
 facts:
-  - id: "f_clGvV7hzcA"
-    property: "notable-for"
+  - id: f_clGvV7hzcA
+    property: notable-for
     value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of neural scaling laws research"
-  - id: "f_h7OOErJfYQ"
-    property: "education"
+
+  - id: f_h7OOErJfYQ
+    property: education
     value: "PhD in Physics, Stanford University"
+

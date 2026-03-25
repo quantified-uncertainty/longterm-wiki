@@ -6,7 +6,6 @@ facts:
       focused on mathematical foundations of AI alignment.
     asOf: 2026-03
     notes: Migrated from old entity system
-
   - id: f_nS6tN2pQ5v
     property: notable-for
     value: "Executive Director of MIRI; focuses on mathematical foundations of AI
@@ -14,7 +13,6 @@ facts:
       corrigibility; author of MIRI technical agenda papers"
     asOf: 2026-03
     notes: Enriched from entity description
-
   - id: f_nScY8fL1kA
     property: education
     value: "B.S. in Computer Science, University of California, Berkeley"
