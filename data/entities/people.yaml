@@ -8006,3 +8006,205 @@
     - algorithmic-fairness
     - ai-governance
   lastUpdated: 2026-03
+# ── Phase 1 Political Race Candidates (2026 AI races) ───────────────────
+
+- id: laurie-buckhout
+  stableId: mGJWs0I9DR
+  type: person
+  title: Laurie Buckhout
+  description: >-
+    Republican candidate for NC-1. Won 2026 GOP primary with American
+    Mission PAC support (\$500K). Former DOD deputy assistant secretary
+    for cyber policy. Faces incumbent Don Davis (D) in general election.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: don-davis
+  stableId: NjPH3LAWxM
+  type: person
+  title: Don Davis
+  description: >-
+    U.S. Representative for North Carolina's 1st district (D). Incumbent
+    facing Laurie Buckhout (R) in 2026 general election after redistricting
+    made the district more competitive.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: josh-gottheimer
+  stableId: tVEKHxyInn
+  type: person
+  title: Josh Gottheimer
+  description: >-
+    U.S. Representative for New Jersey's 5th district (D). Co-chair of the
+    House Democratic Commission on AI and the Innovation Economy. Jobs and
+    Democracy PAC (Anthropic-backed) spent \$300K supporting his reelection.
+    Introduced the AI Workforce Training Act.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: chris-gober
+  stableId: jJ0yCaVU9E
+  type: person
+  title: Chris Gober
+  description: >-
+    Republican nominee for TX-10. Former Elon Musk attorney and America PAC
+    director. Won 2026 primary with American Mission PAC support (\$500K+).
+    First candidate backed by Leading the Future's GOP arm.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: alex-mealer
+  stableId: upZRDVRpEj
+  type: person
+  title: Alex Mealer
+  description: >-
+    Republican candidate in TX-9 runoff. West Point graduate, Harvard
+    JD-MBA, combat veteran, oil and gas executive. Backed by Defending Our
+    Values PAC (Public First/Anthropic).
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: carlos-de-la-cruz
+  stableId: cuRfFRqEWH
+  type: person
+  title: Carlos De La Cruz
+  description: >-
+    Republican candidate in TX-35 runoff. Air Force veteran,
+    Trump-endorsed. Backed by Public First Action as part of their
+    pro-AI-regulation Republican slate.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: mallory-mcmorrow
+  stableId: MufHpHOmRJ
+  type: person
+  title: Mallory McMorrow
+  description: >-
+    Michigan State Senator running for U.S. Senate in 2026. Built her
+    campaign explicitly on AI regulation for child safety. Key contender in
+    the August 2026 Democratic primary alongside Haley Stevens.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: haley-stevens
+  stableId: Wxqv54AslU
+  type: person
+  title: Haley Stevens
+  description: >-
+    Former U.S. Representative running for U.S. Senate in Michigan 2026
+    Democratic primary. Moderate, establishment-backed. Involved in tech
+    policy during her House tenure.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: mike-rogers-mi
+  stableId: rTJq3v2HV6
+  type: person
+  title: Mike Rogers
+  description: >-
+    Republican nominee for U.S. Senate in Michigan. Former House Intel
+    Committee Chair. Trump-endorsed. Publicly endorsed the White House AI
+    framework calling for a single national deregulatory standard.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: john-cornyn
+  stableId: 4TO1jXYozt
+  type: person
+  title: John Cornyn
+  description: >-
+    U.S. Senator from Texas (R). Senate Commerce Committee member. In 2026
+    GOP primary runoff against Ken Paxton. AI preemption stance is a key
+    issue — Paxton led Texas legislators opposing federal override of state
+    AI laws.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: ken-paxton
+  stableId: bIat5xswtM
+  type: person
+  title: Ken Paxton
+  description: >-
+    Texas Attorney General challenging John Cornyn in 2026 GOP Senate
+    primary runoff. Led coalition of 16 Texas state senators opposing
+    federal moratorium on state AI laws. Used AI-generated attack ads
+    against Cornyn.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: roy-cooper
+  stableId: uOwPoVTf2h
+  type: person
+  title: Roy Cooper
+  description: >-
+    Former Governor of North Carolina. Democratic nominee for U.S. Senate
+    in 2026 against Michael Whatley. Race projected to be the most expensive
+    Senate race in history.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: jon-ossoff
+  stableId: N2rG9yPZ9K
+  type: person
+  title: Jon Ossoff
+  description: >-
+    U.S. Senator from Georgia (D). Incumbent in 2026. Subject of AI
+    deepfake attack ad by opponent Mike Collins' campaign. Judiciary and
+    banking committee member.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: susan-collins
+  stableId: 5NoqE8uJSr
+  type: person
+  title: Susan Collins
+  description: >-
+    U.S. Senator from Maine (R). Incumbent in 2026. Only Republican
+    incumbent in a state Harris won in 2024 — top Democratic pickup target.
+    Historically bipartisan on technology policy. Rated Toss-Up.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: byron-donalds
+  stableId: 5mkCGqtYnA
+  type: person
+  title: Byron Donalds
+  description: >-
+    U.S. Representative running for Florida Governor in 2026. Leading the
+    Future PAC pledged \$5M to support his candidacy. Opposes DeSantis-backed
+    AI regulation. Trump-endorsed.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: nida-allam
+  stableId: L9zuCKRaWC
+  type: person
+  title: Nida Allam
+  description: >-
+    Progressive challenger in NC-4 Democratic primary (2026). Lost to
+    incumbent Valerie Foushee by less than 1 percentage point despite Jobs
+    and Democracy PAC spending \$1.6M against her.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: micah-lasher
+  stableId: bxc9r4rOAn
+  type: person
+  title: Micah Lasher
+  description: >-
+    Candidate in the NY-12 Democratic primary (2026). Leading in prediction
+    markets (47-52% on Polymarket). Former aide to ex-AG Eric Schneiderman.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: jack-schlossberg
+  stableId: XIHqP2pPI0
+  type: person
+  title: Jack Schlossberg
+  description: >-
+    Candidate in the NY-12 Democratic primary (2026). Grandson of President
+    John F. Kennedy. Polling second in some surveys, 18-27% on prediction
+    markets.
+  tags: [politics]
+  lastUpdated: 2026-03
+
