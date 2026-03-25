@@ -11,8 +11,8 @@ facts:
     value: "57900000"
     unit: USD
     asOf: 2024
-    source: https://projects.propublica.org/nonprofits/organizations/133988199
-    notes: "Approximately $57.9M (FY 2023-2024)"
+    source: https://en.wikipedia.org/wiki/Brennan_Center_for_Justice
+    notes: "Approximately $57.9M (FY 2023-2024). ProPublica URL 404; figure confirmed via Wikipedia."
 
   - id: f_trbZTG1zGA
     property: employee-count
@@ -39,12 +39,6 @@ facts:
       federal and state policy recommendations"
     asOf: 2025
     source: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
-
-  - id: f_WyAY9PnuSp
-    property: leadership
-    value: "Michael Waldman serves as President and CEO"
-    asOf: 2026-03
-    source: https://www.brennancenter.org/about/leadership
   - id: 6joOI7UWRg
     property: website
     value: http://www.brennancenter.org

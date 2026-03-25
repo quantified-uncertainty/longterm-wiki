@@ -11,12 +11,6 @@ facts:
     value: "Washington, DC"
     source: https://epic.org/about/
 
-  - id: f_HBGQD2BGk6
-    property: leadership
-    value: "Alan Butler serves as Executive Director and President since 2020"
-    asOf: 2026-03
-    source: https://epic.org/about/
-
   - id: f_VI3re1fuer
     property: program
     value: "AI & Human Rights Program — advocates for transparent, equitable AI
@@ -31,8 +25,54 @@ facts:
       activity"
     asOf: 2024
     source: https://www.charitynavigator.org/ein/521436610
+
   - id: KftahIuIMQ
     property: website
     value: http://www.epic.org/
     source: https://www.wikidata.org/wiki/Q4383251
     notes: From Wikidata Q4383251
+
+  - id: f_9UHngbbF1G
+    property: annual-revenue
+    value: "3029134"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: "FY 2024 Form 990 (EIN 52-2225921). Total expenses $3,368,137. Net assets $4,215,708. Revenue peaked at $3.8M in 2023."
+
+  - id: f_EcOoH0xzDh
+    property: litigation
+    value: "Filed lawsuit (NACA v. RentGrow) against tenant screening company RentGrow for unfair and deceptive algorithmic practices under DC Consumer Protection Procedures Act. Survived motion to dismiss November 2024."
+    asOf: 2024-11
+    source: https://epic.org/documents/naca-v-rentgrow/
+    notes: "Filed Oct 1, 2024 with Richman Law & Policy and NACA. Alleges RentGrow generates screening reports with serious errors disproportionately affecting marginalized communities."
+
+  - id: f_nj2oAQYBTN
+    property: litigation
+    value: "Filed FTC complaint against OpenAI (Oct 29, 2024) urging investigation of GPTs and third-party APIs for failing to meet responsible AI standards, unsafe security/privacy practices, and perpetuating unfair and deceptive practices"
+    asOf: 2024-11
+    source: https://epic.org/press-release-epic-files-complaint-urging-the-ftc-to-investigate-openais-gpts-and-third-party-apis/
+
+  - id: f_twu71qJcbg
+    property: litigation
+    value: "Filed FOIA lawsuit against OPM over DOGE access to federal personnel data containing personal information of millions of current and former federal workers (2025)"
+    asOf: 2025
+    source: https://epic.org/documents/epic-v-opm-information-security-violations/
+
+  - id: f_QTgB4VySkD
+    property: executive-compensation
+    value: "President Alan Butler received $210,350; Deputy Director Caitriona Fitzgerald received $197,410; Senior Counsel Jeramie Scott received $166,200; Senior Counsel John Davisson received $150,861"
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+
+  - id: f_N2luGXwXx2
+    property: publications
+    value: "Publishes multiple books including Privacy in the Modern Age, Privacy Law Sourcebook, Privacy and Human Rights, and Litigation Under the Federal Open Government Laws. Also publishes monthly EPIC Alert newsletter."
+    asOf: 2025
+    source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
+
+  - id: f_BVwCCUQ2FG
+    property: foia-track-record
+    value: "Prevailed in FOIA cases against CIA, DHS, Department of Education, FBI, NSA, ODNI, and TSA. EPIC v. DHS led to removal of x-ray body scanners from US airports; EPIC v. NSA resulted in release of NSA cybersecurity authority documents."
+    asOf: 2025
+    source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center

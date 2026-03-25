@@ -1,0 +1,33 @@
+entity: XkqcWk46oQ
+facts:
+  - id: f_cdt_founded
+    property: founded-date
+    value: "1994-12"
+    source: https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology
+    notes: "Founded December 1994 by Jerry Berman, Janlori Goldman, Deirdre Mulligan, Jonah Seiger, Daniel Weitzner"
+
+  - id: f_cdt_hq
+    property: headquarters
+    value: "1401 K St NW, Suite 200, Washington, DC 20005"
+    source: https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology
+    notes: "Also has Brussels office"
+
+  - id: f_cdt_revenue
+    property: annual-revenue
+    value: "11300000"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/521905358
+    notes: "Revenue $11.3M. Expenses $8.77M. Assets $21.3M. Revenue: 56% foundations, 24% corporations, 10% events."
+
+  - id: f_cdt_ai_lab
+    property: program
+    value: "AI Governance Lab (launched May 2023): founding director Miranda Bogen, senior advisor Kevin Bankston. Develops technically-informed solutions for AI regulation. Reports on AI assurance, safety training transparency, AI agents, fairness assessments."
+    asOf: 2025
+    source: https://cdt.org/cdt-ai-governance-lab/
+
+  - id: f_cdt_funding
+    property: funding-sources
+    value: "56% foundations (incl. MacArthur), 24% corporations (Amazon, Meta, Microsoft, TikTok, Apple), 10% events, 7% cy pres, 3% individuals"
+    asOf: 2024
+    source: https://cdt.org/financials/

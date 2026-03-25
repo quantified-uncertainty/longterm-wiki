@@ -1,0 +1,37 @@
+entity: 8zy1QbFxOg
+facts:
+  - id: f_lpp_founded
+    property: founded-date
+    value: "2020-08"
+    source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
+    notes: "Idea from EA group at Harvard Law School (Fall 2018); launched August 30, 2020. Rebranded to Institute for Law & AI (LawAI) around 2023-2024."
+
+  - id: f_lpp_hq
+    property: headquarters
+    value: "6 Liberty Square, #6079, Boston, MA"
+    source: https://law-ai.org/
+
+  - id: f_lpp_revenue
+    property: annual-revenue
+    value: "7852814"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/851024198
+    notes: "Major jump from $963K (2023) to $7.85M (2024). Assets $6.05M."
+
+  - id: f_lpp_staff
+    property: employee-count
+    value: "28"
+    asOf: 2026
+    source: https://law-ai.org/team/
+    notes: "28 core team + 9 affiliates. Grew from 6.1 FTE in 2022."
+
+  - id: f_lpp_research
+    property: research-areas
+    value: "AI governance and regulation, law-following AI systems, treaty-following AI, automated compliance, AI transparency and trade secrets, AI agent governance"
+    source: https://law-ai.org/
+
+  - id: f_lpp_rebrand
+    property: organizational-change
+    value: "Rebranded from Legal Priorities Project to Institute for Law & AI (LawAI) around 2023-2024"
+    source: https://law-ai.org/
