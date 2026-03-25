@@ -34,3 +34,41 @@ export function resolveName(item: Record<string, unknown>, ...keys: string[]): s
   }
   return '(unknown)';
 }
+
+/**
+ * Extract the entity ID to associate with a record's verification verdict.
+ *
+ * Maps each record type to the most relevant parent entity ID:
+ * - Personnel: orgEntityId (org context), falling back to personEntityId
+ * - Division: parentOrgId (the parent organization), falling back to organizationId
+ * - Grant: orgEntityId (funder), falling back to granteeEntityId
+ * - Funding round: companyEntityId
+ * - Investment: investorEntityId, falling back to companyEntityId
+ * - Equity position: companyEntityId
+ * - Funding program: orgEntityId
+ * - Policy stakeholder: stakeholderEntityId
+ *
+ * Returns null if no entity ID is available.
+ */
+export function extractEntityId(recordType: string, item: Record<string, unknown>): string | null {
+  switch (recordType) {
+    case 'personnel':
+      return strOrNull(item, 'orgEntityId') ?? strOrNull(item, 'personEntityId');
+    case 'division':
+      return strOrNull(item, 'parentOrgId') ?? strOrNull(item, 'organizationId');
+    case 'grant':
+      return strOrNull(item, 'orgEntityId') ?? strOrNull(item, 'granteeEntityId');
+    case 'funding-round':
+      return strOrNull(item, 'companyEntityId');
+    case 'investment':
+      return strOrNull(item, 'investorEntityId') ?? strOrNull(item, 'companyEntityId');
+    case 'equity-position':
+      return strOrNull(item, 'companyEntityId');
+    case 'funding-program':
+      return strOrNull(item, 'orgEntityId');
+    case 'policy-stakeholder':
+      return strOrNull(item, 'stakeholderEntityId');
+    default:
+      return null;
+  }
+}

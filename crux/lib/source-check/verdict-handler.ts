@@ -25,6 +25,8 @@ export async function storeSourceCheckEvidence(params: {
   extractedValue: string;
   reasoning: string;
   isPrimarySource?: boolean;
+  /** Entity ID to associate with this evidence (e.g., org stableId for personnel/division records) */
+  entityId?: string | null;
 }, logPrefix = '[source-check]'): Promise<void> {
   const body = {
     recordType: params.recordType,
@@ -36,6 +38,7 @@ export async function storeSourceCheckEvidence(params: {
     checkerModel: MODELS.haiku,
     notes: params.reasoning,
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
+    ...(params.entityId ? { entityId: params.entityId } : {}),
   };
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
@@ -62,6 +65,8 @@ export async function storeAggregateVerdict(params: {
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
+  /** Entity ID to associate with this verdict (e.g., org stableId for personnel/division records) */
+  entityId?: string | null;
 }, logPrefix = '[source-check]'): Promise<void> {
   const body = {
     recordType: params.recordType,
@@ -70,6 +75,7 @@ export async function storeAggregateVerdict(params: {
     confidence: params.confidence,
     reasoning: params.reasoning,
     sourcesChecked: params.sourcesChecked,
+    ...(params.entityId ? { entityId: params.entityId } : {}),
   };
 
   const response = await apiRequest<{ ok: boolean }>(
