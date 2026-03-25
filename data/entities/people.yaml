@@ -3359,11 +3359,157 @@
   stableId: YOfOGwm1kh
   type: person
   title: Lennart Heim
+  affiliation: RAND Corporation
+  affiliationId: 8grDoD8kig
   description: >-
     Compute governance researcher. Affiliated with RAND, Epoch AI, and GovAI.
-    Leading expert on AI compute supply chains and governance.
+    Leading expert on AI compute supply chains and governance. Co-authored
+    RAND working papers on hardware-enabled mechanisms (HEMs). Also cautioned
+    against premature advocacy in an influential 2024 blog post.
+  knownFor:
+    - Compute governance research
+    - Hardware-enabled governance mechanisms
+    - Computing Power and the Governance of AI
   tags:
     - compute-governance
+    - ai-policy
+    - hardware-governance
+
+- id: tim-fist
+  stableId: pCun4K9Bf8
+  type: person
+  title: Tim Fist
+  role: Senior Adjunct Fellow, Technology and National Security Program
+  affiliation: CNAS
+  affiliationId: dYjY3Ma1Hw
+  description: >-
+    Senior Adjunct Fellow at CNAS. Previously Head of Strategy & Governance at
+    Fathom Radiant (AI hardware company). Co-authored "Secure, Governable Chips"
+    (January 2024), which coined the term "on-chip governance" and proposed
+    hardware-embedded mechanisms as alternatives to blanket export bans.
+    Co-authored "Technology to Secure the AI Chip Supply Chain" (December 2024).
+  website: https://www.cnas.org/people/tim-fist
+  knownFor:
+    - Secure Governable Chips report
+    - On-chip governance framework
+  tags:
+    - hardware-governance
+    - compute-governance
+    - national-security
+
+- id: onni-aarne
+  stableId: bZxOUSEdmY
+  type: person
+  title: Onni Aarne
+  role: Consultant, Compute Governance Team
+  affiliation: IAPS
+  affiliationId: NI4hqOL33A
+  description: >-
+    Consultant on the compute governance team at IAPS. Previously at Rethink
+    Priorities. Co-authored "Secure, Governable Chips" (CNAS/IAPS, January 2024).
+    Researches hardware-enabled mechanisms on AI chips for restricting dangerous
+    uses and enabling verifiable claims about AI systems.
+  website: https://www.iaps.ai/onni-aarne
+  knownFor:
+    - Secure Governable Chips report
+    - Export auditor proposals
+  tags:
+    - hardware-governance
+    - compute-governance
+    - ai-policy
+
+- id: gabriel-kulp
+  stableId: jjQcmC_uFV
+  type: person
+  title: Gabriel Kulp
+  role: Researcher
+  affiliation: RAND Corporation
+  affiliationId: 8grDoD8kig
+  description: >-
+    Researcher at RAND Corporation pursuing a PhD in AI. Introduced the
+    "Hardware-Enabled Governance Mechanisms" (HEMs) terminology. Prototyped
+    Offline Licensing and Fixed Set approaches for AI chip governance. Co-authored
+    key RAND working papers and workshop proceedings on HEMs.
+  knownFor:
+    - Hardware-Enabled Governance Mechanisms terminology
+    - Offline Licensing and Fixed Set prototypes
+  tags:
+    - hardware-governance
+    - compute-governance
+
+- id: james-petrie
+  stableId: D9naOsJk5k
+  type: person
+  title: James Petrie
+  role: Researcher
+  affiliation: Future of Life Institute
+  description: >-
+    Researcher at Future of Life Institute and Oxford. Authored the foundational
+    offline licensing design for existing NVIDIA H100 firmware (arXiv:2404.18308,
+    April 2024). Led FLI proof-of-concept with Mithril Security on hardware-backed
+    compute governance. Identified existing encryption keys in NVIDIA processors
+    usable for governance.
+  knownFor:
+    - Offline licensing design for H100 chips
+    - FLI hardware governance proof-of-concept
+  tags:
+    - hardware-governance
+    - compute-governance
+
+- id: yonadav-shavit
+  stableId: 5Z1YE2bJbj
+  type: person
+  title: Yonadav Shavit
+  role: Policy Staff
+  affiliation: OpenAI
+  description: >-
+    PhD in Computer Science from Harvard. Currently on policy staff at OpenAI
+    focused on frontier AI risks. Previously led AI policy at Schmidt Futures.
+    Authored "What does it take to catch a Chinchilla?" (arXiv:2303.11341,
+    March 2023), the first major compute monitoring framework proposing on-chip
+    firmware snapshots of neural network weights during training.
+  website: https://yonadavshavit.com/
+  knownFor:
+    - First major compute monitoring framework
+    - What does it take to catch a Chinchilla?
+  tags:
+    - compute-governance
+    - hardware-governance
+    - ai-policy
+
+- id: aidan-ogara
+  stableId: SM7cEzpYvl
+  type: person
+  title: Aidan O'Gara
+  role: Researcher
+  description: >-
+    Lead author on "Hardware-Enabled Mechanisms for Verifying Responsible AI
+    Development" (arXiv:2505.03742, May 2025), a comprehensive paper on compute
+    quantity and cluster configuration verification mechanisms.
+  knownFor:
+    - Hardware-Enabled Mechanisms for Verifying AI Training Properties
+  tags:
+    - hardware-governance
+    - compute-governance
+
+- id: aaron-scher
+  stableId: yDK4NovwS8
+  type: person
+  title: Aaron Scher
+  role: Researcher, SPAR Projects
+  affiliation: MIRI
+  affiliationId: AkfkGwE2fI
+  description: >-
+    Researcher at MIRI leading SPAR (Summer Program on Applied Rationality)
+    projects on hardware-based verification. Assessing existing chip security
+    for treaty-grade verification, interconnect limits for networking equipment,
+    and US-China bilateral AI agreement feasibility.
+  knownFor:
+    - SPAR verification projects
+    - Chip security assessment for treaty use
+  tags:
+    - hardware-governance
+    - verification
     - ai-policy
 
 - id: percy-liang

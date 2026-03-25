@@ -1684,6 +1684,165 @@
     manufacturing equipment, primarily targeting China. These controls represent one of the most significant attempts to
     constrain AI development through hardware governance.
   lastUpdated: 2025-12
+
+- id: chip-security-act
+  stableId: k-BNI9CkOn
+  type: policy
+  title: Chip Security Act
+  introduced: "2025-05-08"
+  policyStatus: proposed
+  scope: Federal
+  billNumber: H.R.3447 / S.1705
+  jurisdiction: United States
+  session: "119th Congress"
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/house-bill/3447/text
+  description: >-
+    Bipartisan legislation mandating location verification and security mechanisms
+    on export-controlled AI chips. Requires the Secretary of Commerce to issue
+    standards for "chip security mechanisms" within 180 days of enactment. Uses
+    ping-based delay measurement (not GPS) to verify chip locations. Companies must
+    notify BIS if chips are found in unauthorized locations. Explicitly prohibits
+    kill switches and geofencing that would hinder chip functionality. Motivated by
+    an estimated 140,000 chips worth $5-7 billion smuggled to China in 2024.
+  provisions:
+    - title: Location Verification Mandate
+      description: >-
+        Requires chip security mechanisms implementing location verification using
+        "feasible and appropriate" techniques on covered chips (ECCN 3A090, 3A001.z,
+        4A090, 4A003.z) within 180 days of enactment.
+      category: Hardware
+    - title: Unauthorized Location Reporting
+      description: >-
+        Companies must notify BIS upon discovering "credible information" that a chip
+        is in an unauthorized location or has been tampered with to disable or spoof
+        security mechanisms.
+      category: Enforcement
+    - title: Kill Switch Prohibition
+      description: >-
+        Explicitly prohibits "any chip security mechanisms that may hinder the
+        capability or functionality of a covered integrated circuit product, such
+        as a kill switch or geofencing mechanism."
+      category: Limitations
+    - title: Additional Mechanism Assessment
+      description: >-
+        Requires DoC (and DoD in Senate version) to assess whether additional
+        mechanisms are needed to verify chip workload or modify functionality.
+      category: Future Scope
+  stakeholders:
+    - name: Sen. Tom Cotton
+      position: support
+      role: Primary Senate sponsor
+      importance: high
+    - name: Sen. Elizabeth Warren
+      position: support
+      role: Senate cosponsor
+      importance: high
+    - name: Rep. Bill Huizenga
+      position: support
+      role: Primary House sponsor
+      importance: high
+    - name: Semiconductor Industry Association
+      position: oppose
+      importance: high
+      reason: >-
+        Cannot support "blanket mandates for new, untested, and potentially
+        infeasible on-chip mechanisms"; warns of undermining global trust in
+        American semiconductor technologies.
+  tags:
+    - hardware-governance
+    - export-controls
+    - semiconductors
+    - location-verification
+  relatedEntries:
+    - id: export-controls
+      type: policy
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
+    - id: hardware-enabled-governance
+      type: approach
+  sources:
+    - title: Chip Security Act (H.R.3447)
+      url: https://www.congress.gov/bill/119th-congress/house-bill/3447/text
+    - title: SIA Statement on Chip Security Act
+      url: https://www.semiconductors.org/sia-statement-on-chip-security-act/
+    - title: Atlantic Council Analysis
+      url: https://www.atlanticcouncil.org/blogs/geotech-cues/how-the-chip-security-act-could-usher-in-an-era-of-trusted-trade-with-us-partners/
+  lastUpdated: 2026-03
+
+- id: stop-stealing-our-chips-act
+  stableId: dLGmQQU4yB
+  type: policy
+  title: Stop Stealing Our Chips Act
+  introduced: "2025-04-10"
+  policyStatus: proposed
+  scope: Federal
+  billNumber: S.1473 / H.R.6322
+  jurisdiction: United States
+  session: "119th Congress"
+  fullTextUrl: https://www.congress.gov/bill/119th-congress/senate-bill/1473/text
+  description: >-
+    Creates a whistleblower incentive program at the Bureau of Industry and Security
+    (BIS) modeled after the SEC Whistleblower Incentive Program. Whistleblowers
+    receive 10-30% of collected fines for original information leading to penalties
+    exceeding $1 million. Anonymous reporting permitted with retaliation protections.
+    Funded via an "Export Compliance Accountability Fund" financed by collected fines
+    (no new appropriations). Aims to deter export control violations through
+    market-powered enforcement.
+  provisions:
+    - title: Whistleblower Financial Incentives
+      description: >-
+        Whistleblowers receive 10-30% of collected fines for original information
+        leading to penalties exceeding $1 million. BIS can levy penalties up to 2x
+        the transaction value.
+      category: Enforcement
+    - title: Anonymous Reporting Platform
+      description: >-
+        BIS must create a public, secure platform for submitting reports. 60-day
+        credibility determination deadline with status updates every 30 days.
+      category: Infrastructure
+    - title: Retaliation Protections
+      description: >-
+        Whistleblowers receive legal protections against retaliation. Known
+        terrorists, criminals, and federal employees acting within scope are
+        excluded.
+      category: Protections
+    - title: Export Compliance Accountability Fund
+      description: >-
+        Self-funded program financed by collected fines. Covers whistleblower
+        awards, investigation reviews, business education, and record-keeping.
+        No new appropriations required.
+      category: Funding
+  stakeholders:
+    - name: Sen. Mike Rounds
+      position: support
+      role: Primary Senate sponsor
+      importance: high
+    - name: Sen. Mark Warner
+      position: support
+      role: Senate cosponsor
+      importance: high
+    - name: Rep. Tom Kean Jr.
+      position: support
+      role: Primary House sponsor
+      importance: medium
+  tags:
+    - export-controls
+    - enforcement
+    - whistleblower
+  relatedEntries:
+    - id: export-controls
+      type: policy
+    - id: chip-security-act
+      type: policy
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
+  sources:
+    - title: Stop Stealing Our Chips Act (S.1473)
+      url: https://www.congress.gov/bill/119th-congress/senate-bill/1473/text
+    - title: IAPS Issue Brief
+      url: https://www.iaps.ai/research/issue-brief-the-stop-stealing-our-chips-act
+  lastUpdated: 2026-03
+
 - id: failed-stalled-proposals
   stableId: dj6xnXmB7A
   wikiId: E137
@@ -3812,14 +3971,20 @@
   type: analysis
   title: Hardware Mechanisms for International AI Agreements
   description: >-
-    Technical taxonomy of hardware-based AI verification mechanisms—location attestation, TEEs,
-    compute metering, interconnect limits, chip tracking, and remote disablement—mapped to
-    specific governance agreement types with R&D readiness assessments. Most mechanisms at
-    TRL 2–5, with geopolitical buy-in as the central challenge.
+    Comprehensive analysis of hardware-based AI verification mechanisms—location attestation,
+    TEEs, compute metering, interconnect limits, chip tracking, and remote disablement—mapped
+    to governance agreement types. Covers three-level threat model, TEE vulnerabilities
+    (BatteringRAM/WireTap/TEE.fail), legislative landscape (Chip Security Act, Stop Stealing
+    Our Chips Act), key organizations (CNAS, RAND, IAPS, FlexHEG), startups (Lucid Computing),
+    investment landscape, and actionable recommendations. Most mechanisms at TRL 2–5, with
+    dramatically underfunded R&D relative to importance.
   tags:
     - hardware-governance
     - international-agreements
     - verification
+    - compute-governance
+    - export-controls
+    - semiconductors
   relatedEntries:
     - id: hardware-enabled-governance
       type: approach
@@ -3829,6 +3994,18 @@
       type: approach
     - id: export-controls
       type: policy
+    - id: chip-security-act
+      type: policy
+    - id: stop-stealing-our-chips-act
+      type: policy
+    - id: flexheg
+      type: project
+    - id: caliptra
+      type: project
+    - id: lucid-computing
+      type: organization
+    - id: chips-alliance
+      type: organization
   lastUpdated: 2026-03
 
 - id: ai-chip-governance-supply-chain
@@ -3851,6 +4028,76 @@
       type: concept
     - id: export-controls
       type: policy
+  lastUpdated: 2026-03
+
+- id: flexheg
+  stableId: KrbvQbV0Js
+  type: project
+  title: FlexHEG (Flexible Hardware-Enabled Guarantees)
+  projectStatus: active
+  projectUrl: https://yoshuabengio.org/wp-content/uploads/2024/09/FlexHEG-Interim-Report_2024.pdf
+  startDate: "2024-09"
+  description: >-
+    Research project led by Yoshua Bengio developing open-source hardware-enabled
+    guarantees for AI governance. Proposes a "Guarantee Processor" that monitors
+    accelerator usage and verifies compliance, combined with a "Secure Enclosure"
+    providing physical tamper protection. Funded with $4.1M from the Survival and
+    Flourishing Fund (2024). Published interim report (September 2024), technical
+    options paper (arXiv:2506.03409), and international security applications paper
+    (arXiv:2506.15100). Interlock-based design gives the Guarantee Processor direct
+    access to the accelerator data path. Estimated 3.7-7.9 years for integrated
+    hardware deployment.
+  tags:
+    - hardware-governance
+    - compute-governance
+    - open-source
+    - verification
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
+    - id: compute-governance
+      type: concept
+  sources:
+    - title: FlexHEG Interim Report
+      url: https://yoshuabengio.org/wp-content/uploads/2024/09/FlexHEG-Interim-Report_2024.pdf
+    - title: "Technical Options for FlexHEGs"
+      url: https://arxiv.org/abs/2506.03409
+    - title: "International Security Applications of FlexHEGs"
+      url: https://arxiv.org/abs/2506.15100
+  lastUpdated: 2026-03
+
+- id: caliptra
+  stableId: JmkRAn_5i-
+  type: project
+  title: Caliptra
+  projectStatus: active
+  projectUrl: https://github.com/chipsalliance/Caliptra
+  startDate: "2022-10"
+  description: >-
+    Open-source silicon Root of Trust (RoT) security subsystem designed for
+    integration into SoCs. Provides identity, measured boot, and attestation
+    capabilities. Founded by Microsoft, AMD, Google, and NVIDIA in 2022 under
+    the CHIPS Alliance. Version 2.1 adds quantum-resilient cryptography (ML-DSA
+    for post-quantum signatures, ML-KEM for key exchange). ~1.6M logic gates
+    with dual RISC-V cores. Potentially the most promising cross-vendor
+    foundation for hardware-enabled AI governance.
+  tags:
+    - hardware-governance
+    - open-source
+    - semiconductors
+    - root-of-trust
+  relatedEntries:
+    - id: chips-alliance
+      type: organization
+    - id: hardware-enabled-governance
+      type: approach
+  sources:
+    - title: CHIPS Alliance Caliptra 2.1 RTL Release
+      url: https://www.chipsalliance.org/news/caliptra2-1/
+    - title: Caliptra GitHub Repository
+      url: https://github.com/chipsalliance/Caliptra
   lastUpdated: 2026-03
 
 - id: thresholds
