@@ -298,8 +298,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
           const seen = new Map<string, DeduplicatedCheck>();
           for (const c of checks) {
-            // Key on verdict + first 100 chars of notes (to catch near-identical notes)
-            const dedupeKey = `${c.verdict}:${(c.notes || c.extractedValue || "").slice(0, 100)}`;
+            // Key on field + entity + verdict + values + notes to avoid collapsing distinct field checks
+            const dedupeKey = [
+              c.fieldName ?? "",
+              c.entityId ?? "",
+              c.verdict,
+              c.expectedValue ?? "",
+              c.extractedValue ?? "",
+              (c.notes ?? "").slice(0, 100),
+            ].join("::");
             const existing = seen.get(dedupeKey);
             if (existing) {
               existing.duplicateCount++;
