@@ -228,7 +228,7 @@ export function OrgNetFlowTable({
 // ---- Flow Edges Table ----
 
 export function FlowEdgesTable({ flows }: { flows: FlowEdge[] }) {
-  const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   if (flows.length === 0) {
     return (
@@ -263,14 +263,14 @@ export function FlowEdgesTable({ flows }: { flows: FlowEdge[] }) {
         </thead>
         <tbody>
           {flows.map((flow, idx) => {
-            const isExpanded = expandedIdx === idx;
-            const barWidth = Math.max((flow.count / maxCount) * 100, 12);
             const rowKey = `${flow.fromOrg.id}-${flow.toOrg.id}`;
+            const isExpanded = expandedKey === rowKey;
+            const barWidth = Math.max((flow.count / maxCount) * 100, 12);
             return (
               <Fragment key={rowKey}>
                 <tr
                   className={`border-b border-border/30 hover:bg-muted/40 transition-colors cursor-pointer ${idx % 2 === 0 ? "" : "bg-muted/10"} ${isExpanded ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}`}
-                  onClick={() => setExpandedIdx(isExpanded ? null : idx)}
+                  onClick={() => setExpandedKey(isExpanded ? null : rowKey)}
                 >
                   <td className="py-2.5 px-4">
                     <OrgLink org={flow.fromOrg} />
@@ -314,7 +314,7 @@ export function FlowEdgesTable({ flows }: { flows: FlowEdge[] }) {
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        setExpandedIdx(isExpanded ? null : idx);
+                        setExpandedKey(isExpanded ? null : rowKey);
                       }}
                       className="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                     >
