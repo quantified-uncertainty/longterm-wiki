@@ -40,11 +40,20 @@ export function isPrivateHost(host: string): boolean {
 
 /**
  * Strip HTML tags and entities from raw HTML, returning plain text.
+ * Prioritizes <main>, <article>, or role="main" content to avoid
+ * nav/header/footer pollution that causes false "unverifiable" verdicts.
  */
 export function htmlToText(html: string): string {
-  return html
+  // Try to extract the main content area first to avoid nav/menu noise
+  const bodyContent = extractMainContent(html) ?? html;
+
+  return bodyContent
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
+    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
+    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
+    .replace(/<aside[^>]*>[\s\S]*?<\/aside>/gi, '')
     .replace(/<[^>]+>/g, ' ')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
@@ -54,6 +63,28 @@ export function htmlToText(html: string): string {
     .replace(/&#39;/g, "'")
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/**
+ * Try to extract the main content from an HTML page.
+ * Returns the inner HTML of <main>, <article>, or role="main" element,
+ * or null if none found.
+ */
+function extractMainContent(html: string): string | null {
+  // Try <main> tag
+  const mainMatch = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i);
+  if (mainMatch && mainMatch[1].length > 200) return mainMatch[1];
+
+  // Try role="main"
+  const roleMainMatch = html.match(/<[^>]+role=["']main["'][^>]*>([\s\S]*?)<\/\w+>/i);
+  if (roleMainMatch && roleMainMatch[1].length > 200) return roleMainMatch[1];
+
+  // Try <article> tag
+  const articleMatch = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i);
+  if (articleMatch && articleMatch[1].length > 200) return articleMatch[1];
+
+  // No main content area found — fall back to full HTML
+  return null;
 }
 
 /**
