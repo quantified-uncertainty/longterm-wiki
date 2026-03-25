@@ -82,11 +82,16 @@ async function findSourceForClaim(
   claim: ExtractedClaim,
   client: ReturnType<typeof createLlmClient>,
   costTracker: CostTracker,
+  avoidDomains: string[] = [],
 ): Promise<FoundSource | null> {
+  const avoidClause = avoidDomains.length > 0
+    ? `\n\nIMPORTANT: Do NOT return URLs from these domains (they block automated access): ${avoidDomains.join(', ')}`
+    : '';
+
   try {
     const resultText = await runLlmAgent(client, `Find a web source that supports this factual claim:
 
-"${claim.text}"${claim.keyValue ? `\n(Key value: ${claim.keyValue})` : ''}
+"${claim.text}"${claim.keyValue ? `\n(Key value: ${claim.keyValue})` : ''}${avoidClause}
 
 Search the web and return the best source URL as JSON.`, {
       model: MODELS.haiku,
@@ -425,35 +430,62 @@ export async function addCitationsCommand(
       break;
     }
 
-    // Step A: Find a candidate source URL via web search
-    const source = await findSourceForClaim(claim, client, costTracker);
-    if (!source) {
-      console.log(`    [-] No source found: ${claim.text.slice(0, 60)}...`);
-      continue;
-    }
+    // Steps A-C: Find source, fetch content, verify — with retry on failure
+    const MAX_SOURCE_ATTEMPTS = 3;
+    const avoidDomains: string[] = [];
+    let verifiedSource: FoundSource | null = null;
+    let verifiedContent: string | null = null;
 
-    // Skip if we already have a citation for this URL (dedup)
-    if (usedUrls.has(source.url)) {
-      console.log(`    [=] Duplicate URL skipped: ${source.url.slice(0, 50)}`);
-      continue;
-    }
+    for (let attempt = 0; attempt < MAX_SOURCE_ATTEMPTS; attempt++) {
+      if (costTracker.totalCost >= budget) break;
 
-    // Step B: Fetch the actual source content
-    const sourceContent = await fetchSourceContent(source.url);
-    if (!sourceContent) {
-      console.log(`    [!] Can't fetch source content: ${source.url.slice(0, 50)} — skipping`);
-      continue;
-    }
-
-    // Step C: Independently verify the claim against fetched content
-    const verification = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
-    if (verification.verdict !== 'supported') {
-      console.log(`    [✗] Source doesn't support claim (${verification.verdict}): ${claim.text.slice(0, 50)}...`);
-      if (verification.reasoning) {
-        console.log(`        ${verification.reasoning}`);
+      // Step A: Find a candidate source URL via web search
+      const source = await findSourceForClaim(claim, client, costTracker, avoidDomains);
+      if (!source) {
+        if (attempt === 0) console.log(`    [-] No source found: ${claim.text.slice(0, 60)}...`);
+        break; // no point retrying if search returns nothing
       }
-      continue;
+
+      // Skip if we already have a citation for this URL (dedup)
+      if (usedUrls.has(source.url)) {
+        console.log(`    [=] Duplicate URL skipped: ${source.url.slice(0, 50)}`);
+        break;
+      }
+
+      // Step B: Fetch the actual source content
+      const sourceContent = await fetchSourceContent(source.url);
+      if (!sourceContent) {
+        const domain = new URL(source.url).hostname;
+        avoidDomains.push(domain);
+        if (attempt < MAX_SOURCE_ATTEMPTS - 1) {
+          console.log(`    [↻] Can't fetch ${domain} — retrying with different source...`);
+        } else {
+          console.log(`    [!] Can't fetch any source for: ${claim.text.slice(0, 50)}...`);
+        }
+        continue;
+      }
+
+      // Step C: Independently verify the claim against fetched content
+      const verification = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
+      if (verification.verdict !== 'supported') {
+        const domain = new URL(source.url).hostname;
+        avoidDomains.push(domain);
+        if (attempt < MAX_SOURCE_ATTEMPTS - 1) {
+          console.log(`    [↻] Source doesn't verify (${verification.verdict}) — retrying...`);
+        } else {
+          console.log(`    [✗] No verified source found: ${claim.text.slice(0, 50)}...`);
+          if (verification.reasoning) console.log(`        ${verification.reasoning}`);
+        }
+        continue;
+      }
+
+      // Success — source found, fetched, and verified
+      verifiedSource = source;
+      verifiedContent = sourceContent;
+      break;
     }
+
+    if (!verifiedSource) continue;
 
     // Step D: Find insertion point in the MDX
     const insertion = findInsertionPoint(claim, lines);
@@ -468,20 +500,20 @@ export async function addCitationsCommand(
       continue;
     }
 
-    const refId = generateRefId(`cite:${page.slug}:${source.url}`, existingIds);
+    const refId = generateRefId(`cite:${page.slug}:${verifiedSource.url}`, existingIds);
 
     citationsToAdd.push({
       claim,
-      source,
+      source: verifiedSource,
       refId,
       insertionLine: insertion.line,
       insertionColumn: insertion.col,
     });
 
     usedLines.add(insertion.line);
-    usedUrls.add(source.url);
+    usedUrls.add(verifiedSource.url);
 
-    console.log(`    [✓] VERIFIED: ${claim.text.slice(0, 50)}... → ${source.url.slice(0, 50)}`);
+    console.log(`    [✓] VERIFIED: ${claim.text.slice(0, 50)}... → ${verifiedSource.url.slice(0, 50)}`);
   }
 
   console.log(`\n  [3/4] ${citationsToAdd.length} citations to add`);
