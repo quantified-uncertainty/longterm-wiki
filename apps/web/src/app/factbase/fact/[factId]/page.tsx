@@ -15,6 +15,9 @@ import { getEntityHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
+import { fetchDetailed } from "@/lib/wiki-server";
+import type { RpcSourceCheckDetailResult } from "@/lib/wiki-server";
+import { VerdictBadge } from "@/app/source-checks/source-checks-shared";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
@@ -104,6 +107,15 @@ export default async function FactDetailPage({ params }: PageProps) {
   const valueType = getValueType(fact);
   const unit = getUnit(fact, property);
   const expired = isFactExpired(fact);
+
+  // Fetch source-check verdict (best-effort)
+  const sourceCheckResult = await fetchDetailed<RpcSourceCheckDetailResult>(
+    `/api/source-checks/verdicts/fact/${encodeURIComponent(factId)}`,
+    { revalidate: 3600 }
+  ).catch(() => null);
+  const primaryVerdict = sourceCheckResult?.ok
+    ? sourceCheckResult.data.verdicts[0] ?? null
+    : null;
 
   // Time series: all facts for same entity+property
   const timeSeriesFacts = getKBFacts(fact.subjectId, fact.propertyId).filter(
@@ -201,6 +213,28 @@ export default async function FactDetailPage({ params }: PageProps) {
           )}
         </KVRow>
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
+        <KVRow label="Verification">
+          {primaryVerdict ? (
+            <span className="inline-flex items-center gap-2">
+              <VerdictBadge verdict={primaryVerdict.verdict} />
+              {primaryVerdict.confidence != null && (
+                <span className="text-xs tabular-nums text-muted-foreground">
+                  {Math.round(primaryVerdict.confidence * 100)}%
+                </span>
+              )}
+              <FactLink href={`/source-checks/fact/${factId}`}>
+                details {"\u2192"}
+              </FactLink>
+            </span>
+          ) : (
+            <span className="text-xs text-muted-foreground">
+              Not yet checked &middot;{" "}
+              <FactLink href={`/source-checks/fact/${factId}`}>
+                view {"\u2192"}
+              </FactLink>
+            </span>
+          )}
+        </KVRow>
       </KVTable>
 
       {/* Currency / Conversion */}
