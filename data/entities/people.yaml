@@ -5622,6 +5622,628 @@
     - label: Research Area
       value: Biological engineering / biotech startups
   tags: [biotechnology]
+- id: ethan-caballero
+  stableId: xg5tg6bSyL
+  type: person
+  title: Ethan Caballero
+  description: >-
+    AI safety and machine learning researcher. Known for work on scaling laws
+    and neural network efficiency. Previously at Mila, contributing to research
+    on model performance prediction.
+  tags:
+    - ai-safety
+    - scaling-laws
+  lastUpdated: 2026-03
+
+- id: roger-grosse
+  stableId: 1fbavZUggd
+  type: person
+  title: Roger Grosse
+  description: >-
+    Associate professor at University of Toronto and researcher at Anthropic.
+    Known for work on neural network training dynamics, scalable second-order
+    optimization, and AI safety. Co-leads alignment finetuning research at
+    Anthropic.
+  tags:
+    - ai-safety
+    - machine-learning
+    - alignment
+  lastUpdated: 2026-03
+
+- id: jesse-clifton
+  stableId: CFkbaKi5D7
+  type: person
+  title: Jesse Clifton
+  description: >-
+    AI safety researcher focused on multi-agent safety, cooperative AI, and
+    game-theoretic approaches to alignment. Previously at the Center for AI
+    Safety.
+  tags:
+    - ai-safety
+    - cooperative-ai
+    - game-theory
+  lastUpdated: 2026-03
+
+- id: akash-wasil
+  stableId: aKLEgry4Hp
+  type: person
+  title: Akash Wasil
+  description: >-
+    AI safety researcher and writer. Active contributor to the AI safety
+    community through research and public communication. Works on AI governance
+    and technical safety strategy.
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: nitarshan-rajkumar
+  stableId: Xhhsse7wFu
+  type: person
+  title: Nitarshan Rajkumar
+  description: >-
+    AI safety researcher. Previously at Mila and DeepMind. Works on language
+    model evaluation, alignment, and understanding emergent capabilities.
+  tags:
+    - ai-safety
+    - evaluation
+  lastUpdated: 2026-03
+
+- id: sam-power
+  stableId: wi4r9KC8iD
+  type: person
+  title: Sam Power
+  description: >-
+    AI alignment researcher. Works on formal approaches to alignment and
+    decision theory. Contributor to MIRI-adjacent alignment research.
+  tags:
+    - ai-safety
+    - alignment
+    - decision-theory
+  lastUpdated: 2026-03
+
+- id: lukas-berglund
+  stableId: udSffp-NsK
+  type: person
+  title: Lukas Berglund
+  description: >-
+    AI safety researcher known for work on the Reversal Curse in LLMs,
+    demonstrating that models trained on "A is B" fail to infer "B is A".
+    Contributed to understanding of LLM generalization failures.
+  tags:
+    - ai-safety
+    - language-models
+  lastUpdated: 2026-03
+
+- id: alex-turner
+  stableId: 0iFP9QT8ZK
+  type: person
+  title: Alex Turner
+  description: >-
+    AI alignment researcher known for work on power-seeking theorems and shard
+    theory. Developed formal results showing optimal policies tend to seek power
+    under certain conditions. Researcher at Anthropic.
+  tags:
+    - ai-safety
+    - alignment
+    - power-seeking
+  lastUpdated: 2026-03
+
+- id: vivek-hebbar
+  stableId: 28ceX4p8yM
+  type: person
+  title: Vivek Hebbar
+  description: >-
+    AI safety researcher working on alignment and evaluations. Contributed to
+    research on AI risk assessment and capability evaluation.
+  tags:
+    - ai-safety
+    - evaluations
+  lastUpdated: 2026-03
+
+- id: steven-basart
+  stableId: 6QrJwedEnl
+  type: person
+  title: Steven Basart
+  description: >-
+    AI safety researcher at the Center for AI Safety. Works on benchmarking and
+    evaluating AI systems for safety-relevant properties. Co-developed safety
+    benchmarks used by the research community.
+  tags:
+    - ai-safety
+    - benchmarks
+    - evaluation
+  lastUpdated: 2026-03
+
+- id: nick-ryder
+  stableId: 2XwTwKVLE1
+  type: person
+  title: Nick Ryder
+  description: >-
+    Researcher at Anthropic. Previously at OpenAI, where he was a key
+    contributor to the GPT-3 paper and scaling research. Moved to Anthropic as
+    part of the broader talent flow from OpenAI.
+  tags:
+    - ai-research
+    - scaling-laws
+  lastUpdated: 2026-03
+
+- id: tom-conerly
+  stableId: Zcen8WJCFL
+  type: person
+  title: Tom Conerly
+  description: >-
+    Researcher at Anthropic working on mechanistic interpretability. Contributed
+    to the Scaling Monosemanticity work extracting interpretable features from
+    Claude. Previously at Google Brain.
+  tags:
+    - interpretability
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: andy-jones
+  stableId: D-BpcrbThn
+  type: person
+  title: Andy Jones
+  description: >-
+    Researcher at Anthropic. Known for work on scaling laws for neural language
+    models. Previously at DeepMind. Contributed to empirical understanding of
+    how model performance scales with compute and data.
+  tags:
+    - scaling-laws
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: jared-hummer
+  stableId: B4zWn1pwOO
+  type: person
+  title: Jared Hummer
+  description: >-
+    Early employee and business operations lead at Anthropic. Previously worked
+    at Stripe. Helps manage Anthropic's business and operational functions.
+  tags:
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: deep-ganguli
+  stableId: S12Ynw0MVU
+  type: person
+  title: Deep Ganguli
+  description: >-
+    Research lead at Anthropic. Co-author of key papers on RLHF, Constitutional
+    AI, and red-teaming language models. Leads research on making AI systems
+    more honest and harmless.
+  tags:
+    - ai-safety
+    - rlhf
+    - red-teaming
+  lastUpdated: 2026-03
+
+- id: jackson-kernion
+  stableId: TG97oCTgWF
+  type: person
+  title: Jackson Kernion
+  description: >-
+    Researcher at Anthropic. Contributed to research on language model behavior,
+    including work on sycophancy, persona evaluation, and model-written
+    evaluations.
+  tags:
+    - ai-safety
+    - evaluation
+  lastUpdated: 2026-03
+
+- id: jakub-pachocki
+  stableId: lounsdKyEk
+  type: person
+  title: Jakub Pachocki
+  description: >-
+    CTO of OpenAI (appointed May 2024). Previously led optimization and scaling
+    research. Played a key role in developing GPT-4 and subsequent models.
+    Long-time OpenAI researcher focused on training infrastructure.
+  tags:
+    - ai-industry
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: mark-chen
+  stableId: 7E27ekhvh9
+  type: person
+  title: Mark Chen
+  description: >-
+    SVP of Research at OpenAI. Led the development of Codex and DALL-E.
+    Previously worked on language models and multimodal systems. Key leader in
+    OpenAI's product-oriented research.
+  tags:
+    - ai-research
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: szymon-sidor
+  stableId: 8-JZq4lrlD
+  type: person
+  title: Szymon Sidor
+  description: >-
+    Long-time researcher at OpenAI. Contributed to reinforcement learning
+    research, game-playing AI, and infrastructure for large-scale training. Part
+    of OpenAI's foundational research team.
+  tags:
+    - ai-research
+    - reinforcement-learning
+  lastUpdated: 2026-03
+
+- id: ilya-cherepanov
+  stableId: UjudUwG0kh
+  type: person
+  title: Ilya Cherepanov
+  description: >-
+    Engineer at OpenAI working on infrastructure and training systems.
+    Contributed to the scaling of large language models.
+  tags:
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: liam-fedus
+  stableId: rbHGdR5qRX
+  type: person
+  title: Liam Fedus
+  description: >-
+    Researcher at OpenAI. Previously at Google Brain where he led work on the
+    Switch Transformer, a key advance in mixture-of-experts models. Research on
+    scaling and sparse models.
+  tags:
+    - ai-research
+    - scaling-laws
+    - mixture-of-experts
+  lastUpdated: 2026-03
+
+- id: oriol-vinyals
+  stableId: E_d2tIXg_R
+  type: person
+  title: Oriol Vinyals
+  description: >-
+    VP of Research at Google DeepMind. Led the AlphaStar project that achieved
+    Grandmaster-level StarCraft II play. Previously at Google Brain and
+    Berkeley. Pioneer in sequence-to-sequence learning and attention mechanisms.
+  tags:
+    - ai-research
+    - reinforcement-learning
+  lastUpdated: 2026-03
+
+- id: laurent-sifre
+  stableId: uou479pLL7
+  type: person
+  title: Laurent Sifre
+  description: >-
+    Research scientist at Google DeepMind. Key contributor to the Gemini model
+    family. Previously worked on AlphaGo and neural network efficiency.
+    Expertise in large-scale model development.
+  tags:
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: raia-hadsell
+  stableId: iyC6uSZb88
+  type: person
+  title: Raia Hadsell
+  description: >-
+    VP of Research at Google DeepMind. Leads research on continual learning,
+    robotics, and representation learning. Previously contributed to
+    self-driving car research at NVIDIA. Known for work on contrastive learning
+    and avoiding catastrophic forgetting.
+  tags:
+    - ai-research
+    - continual-learning
+    - robotics
+  lastUpdated: 2026-03
+
+- id: joel-lehman
+  stableId: f49HpAJtFv
+  type: person
+  title: Joel Lehman
+  description: >-
+    AI researcher known for pioneering work on open-endedness and novelty
+    search. Previously at Uber AI Labs and OpenAI. Co-author of "Why Greatness
+    Cannot Be Planned." Research on evolutionary approaches to AI.
+  tags:
+    - ai-research
+    - open-endedness
+  lastUpdated: 2026-03
+
+- id: arati-prabhakar
+  stableId: gFHljeXYBx
+  type: person
+  title: Arati Prabhakar
+  description: >-
+    Director of the White House Office of Science and Technology Policy (OSTP)
+    under President Biden (2023-2025). Previously led DARPA (2012-2017) and
+    NIST. Oversaw the Biden administration's AI executive order and technology
+    policy.
+  tags:
+    - ai-governance
+    - us-policy
+  lastUpdated: 2026-03
+
+- id: bruce-reed
+  stableId: IJia3DgS7g
+  type: person
+  title: Bruce Reed
+  description: >-
+    White House Deputy Chief of Staff under President Biden. Key coordinator of
+    the Biden administration's AI policy, including the October 2023 executive
+    order on AI safety. Long-time Democratic policy advisor.
+  tags:
+    - ai-governance
+    - us-policy
+  lastUpdated: 2026-03
+
+- id: suresh-venkatasubramanian
+  stableId: KP0YlCojue
+  type: person
+  title: Suresh Venkatasubramanian
+  description: >-
+    Professor at Brown University. Served as Assistant Director for Science and
+    Justice at the White House OSTP (2022-2023). Co-author of the Blueprint for
+    an AI Bill of Rights. Expert on algorithmic fairness and accountability.
+  tags:
+    - ai-governance
+    - algorithmic-fairness
+    - us-policy
+  lastUpdated: 2026-03
+
+- id: habiba-islam
+  stableId: d8Ly3F_muN
+  type: person
+  title: Habiba Islam
+  description: >-
+    Operations and community building professional in the effective altruism
+    ecosystem. Previously at the Centre for Effective Altruism. Works on
+    organizational development and community coordination.
+  tags:
+    - effective-altruism
+    - community-building
+  lastUpdated: 2026-03
+
+- id: ben-west
+  stableId: B-gKWfuL0j
+  type: person
+  title: Ben West
+  description: >-
+    Director of the EA Infrastructure Fund. Previously co-founder of .impact
+    (now Rethink Charity). Long-time effective altruism community builder
+    focused on organizational infrastructure and funding.
+  tags:
+    - effective-altruism
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: cari-tuna
+  stableId: gBWtOYd80I
+  type: person
+  title: Cari Tuna
+  description: >-
+    Co-founder and president of Open Philanthropy. Married to Dustin Moskovitz.
+    Together they have directed billions toward effective altruism causes
+    including AI safety, biosecurity, and global health. Key funder of AI
+    alignment research organizations.
+  tags:
+    - philanthropy
+    - effective-altruism
+    - ai-safety-funding
+  lastUpdated: 2026-03
+
+- id: patrick-collison
+  stableId: zTSGoA9u6P
+  type: person
+  title: Patrick Collison
+  description: >-
+    Co-founder and CEO of Stripe. Co-founded the fast grants program during
+    COVID-19 with Tyler Cowen. Active in science funding through Arc Institute.
+    Prominent voice on technology progress, economic growth, and institutional
+    innovation.
+  tags:
+    - technology
+    - science-funding
+    - economic-growth
+  lastUpdated: 2026-03
+
+- id: jason-crawford
+  stableId: -ADBx8IUqc
+  type: person
+  title: Jason Crawford
+  description: >-
+    Founder of The Roots of Progress, a nonprofit focused on the philosophy and
+    history of technology and industrial progress. Advocate for progress studies
+    as an intellectual discipline. Previously a software engineer.
+  tags:
+    - progress-studies
+    - technology
+  lastUpdated: 2026-03
+
+- id: timothy-lee
+  stableId: kwM-ieiO3J
+  type: person
+  title: Timothy B. Lee
+  description: >-
+    Technology journalist covering AI. Writes Understanding AI on Substack.
+    Previously at Ars Technica, Vox, and the Washington Post. Known for clear
+    explanations of AI technology and policy.
+  tags:
+    - ai-journalism
+  lastUpdated: 2026-03
+
+- id: matt-sheehan
+  stableId: gkshLVsfiY
+  type: person
+  title: Matt Sheehan
+  description: >-
+    Fellow at the Carnegie Endowment for International Peace. Expert on China's
+    AI ecosystem and US-China technology competition. Author of "The
+    Transpacific Experiment." Key analyst on Chinese AI governance and strategy.
+  tags:
+    - china-ai
+    - ai-governance
+    - geopolitics
+  lastUpdated: 2026-03
+
+- id: james-vincent
+  stableId: lINKSQzj2t
+  type: person
+  title: James Vincent
+  description: >-
+    AI reporter at The Verge. Covers artificial intelligence, robotics, and
+    machine learning. Known for accessible reporting on frontier AI developments
+    and their societal implications.
+  tags:
+    - ai-journalism
+  lastUpdated: 2026-03
+
+- id: will-knight
+  stableId: Y4UNNdmzLX
+  type: person
+  title: Will Knight
+  description: >-
+    Senior writer at WIRED covering AI. Previously at MIT Technology Review.
+    Decades of experience covering AI developments, from academic research to
+    commercial deployment and policy implications.
+  tags:
+    - ai-journalism
+  lastUpdated: 2026-03
+
+- id: stuart-armstrong
+  stableId: TCToTngvc4
+  type: person
+  title: Stuart Armstrong
+  description: >-
+    AI safety researcher formerly at the Future of Humanity Institute, Oxford.
+    Known for work on value learning, corrigibility, and interruptibility in AI
+    systems. Author of "Smarter Than Us."
+  tags:
+    - ai-safety
+    - alignment
+    - value-learning
+  lastUpdated: 2026-03
+
+- id: ramana-kumar
+  stableId: nsdgK701QQ
+  type: person
+  title: Ramana Kumar
+  description: >-
+    AI safety researcher at DeepMind. Previously worked on formal verification.
+    Research on reward modeling, alignment theory, and safely training AI
+    systems. Combines formal methods background with alignment research.
+  tags:
+    - ai-safety
+    - alignment
+    - formal-verification
+  lastUpdated: 2026-03
+
+- id: scott-garrabrant
+  stableId: 5DCoJsfU4M
+  type: person
+  title: Scott Garrabrant
+  description: >-
+    Research Fellow at MIRI. Known for work on logical induction, embedded
+    agency, and decision theory. Developed the logical induction framework, a
+    key result in MIRI's research agenda on foundations of rational agency.
+  tags:
+    - ai-safety
+    - decision-theory
+    - logical-induction
+  lastUpdated: 2026-03
+
+- id: abram-demski
+  stableId: hy6WuIjjHi
+  type: person
+  title: Abram Demski
+  description: >-
+    Research Fellow at MIRI. Works on agent foundations, decision theory, and
+    embedded agency. Co-developer (with Scott Garrabrant) of the logical
+    induction framework. Writes on alignment theory and rationality.
+  tags:
+    - ai-safety
+    - agent-foundations
+    - decision-theory
+  lastUpdated: 2026-03
+
+- id: jessica-taylor
+  stableId: WI7FMLPnpn
+  type: person
+  title: Jessica Taylor
+  description: >-
+    AI safety researcher. Previously at MIRI where she worked on alignment
+    theory and value learning. Contributed to research on quantilization,
+    approval-directed agents, and other approaches to safe AI design.
+  tags:
+    - ai-safety
+    - alignment
+    - value-learning
+  lastUpdated: 2026-03
+
+- id: thomas-kwa
+  stableId: RpoMg9g1Sw
+  type: person
+  title: Thomas Kwa
+  description: >-
+    AI alignment researcher at MIRI. Works on worst-case alignment guarantees
+    and formal approaches to AI safety. Contributor to alignment research and AI
+    safety community discussions.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: leon-lang
+  stableId: HeZ1-0cfc5
+  type: person
+  title: Leon Lang
+  description: >-
+    AI safety researcher focused on theoretical alignment, interpretability, and
+    the mathematical foundations of safe AI. Works on formal properties of
+    neural networks relevant to safety.
+  tags:
+    - ai-safety
+    - alignment
+    - theory
+  lastUpdated: 2026-03
+
+- id: adam-scherlis
+  stableId: Tw_Eo226h3
+  type: person
+  title: Adam Scherlis
+  description: >-
+    AI safety researcher at Anthropic. Previously at Redwood Research. Works on
+    mechanistic interpretability and language model internals. Contributed to
+    research on understanding transformer computations.
+  tags:
+    - interpretability
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: kamal-ndousse
+  stableId: bEVEaqopVT
+  type: person
+  title: Kamal Ndousse
+  description: >-
+    AI safety researcher at Anthropic. Works on evaluations and red-teaming of
+    language models. Contributed to research on emergent deception and sleeper
+    agent behaviors in AI systems.
+  tags:
+    - ai-safety
+    - evaluations
+    - red-teaming
+  lastUpdated: 2026-03
+
+- id: tom-mcgrath
+  stableId: pnps84gsiZ
+  type: person
+  title: Tom McGrath
+  description: >-
+    AI safety researcher at Google DeepMind. Works on mechanistic
+    interpretability and understanding the internal computations of neural
+    networks. Previously contributed to AlphaFold-related research.
+  tags:
+    - interpretability
+    - ai-safety
   lastUpdated: 2026-03
 
 - id: scott-emmons
@@ -6536,3 +7158,593 @@
   tags: [physics]
   lastUpdated: 2026-03
 
+    AI safety researcher at Anthropic. PhD from UC Berkeley focused on
+    multi-agent systems and cooperative AI. Works on alignment and safety
+    evaluation of foundation models.
+  tags:
+    - ai-safety
+    - cooperative-ai
+  lastUpdated: 2026-03
+
+- id: david-manheim
+  stableId: 4auxbz6oS9
+  type: person
+  title: David Manheim
+  description: >-
+    Researcher working at the intersection of AI safety, biosecurity, and
+    existential risk. Associated with the Miri, SecureBio, and other
+    risk-focused organizations. Expert on catastrophic and existential risk
+    assessment.
+  tags:
+    - ai-safety
+    - biosecurity
+    - existential-risk
+  lastUpdated: 2026-03
+
+- id: matthew-barnett
+  stableId: dMBFcubfsO
+  type: person
+  title: Matthew Barnett
+  description: >-
+    AI safety researcher and forecaster. Active contributor to AI safety
+    discourse and prediction markets. Works on understanding AI timelines and
+    risk scenarios.
+  tags:
+    - ai-safety
+    - forecasting
+  lastUpdated: 2026-03
+
+- id: irene-solaiman
+  stableId: gHNYZu5CFw
+  type: person
+  title: Irene Solaiman
+  description: >-
+    Head of Global Policy at Hugging Face. Previously at OpenAI where she led
+    social impact research and co-authored the GPT-2 release strategy. Pioneer
+    in responsible AI release practices and AI governance.
+  tags:
+    - ai-governance
+    - responsible-ai
+  lastUpdated: 2026-03
+
+- id: yolanda-lannquist
+  stableId: 0ckUtuwpkw
+  type: person
+  title: Yolanda Lannquist
+  description: >-
+    Head of AI policy at The Future Society. Works on international AI
+    governance and emerging technology policy. Previously advised governments
+    and international organizations on AI regulation.
+  tags:
+    - ai-governance
+    - international-policy
+  lastUpdated: 2026-03
+
+- id: arthur-mensch
+  stableId: y6wrSRiJx8
+  type: person
+  title: Arthur Mensch
+  description: >-
+    Co-founder and CEO of Mistral AI. Previously at Google DeepMind where he
+    worked on large language models. Led the creation of Mistral, a European AI
+    company valued at billions, focusing on open-weight models and European AI
+    sovereignty.
+  tags:
+    - ai-industry
+    - open-source-ai
+  lastUpdated: 2026-03
+
+- id: guillaume-lample
+  stableId: b9isxdN4Gz
+  type: person
+  title: Guillaume Lample
+  description: >-
+    Co-founder and Chief Scientist at Mistral AI. Previously at Meta AI (FAIR)
+    where he made significant contributions to unsupervised machine translation
+    and language model pre-training.
+  tags:
+    - ai-research
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: timothee-lacroix
+  stableId: zxDXO21ELF
+  type: person
+  title: Timothee Lacroix
+  description: >-
+    Co-founder of Mistral AI. Previously at Meta AI (FAIR) working on efficient
+    training of large language models. Technical co-founder alongside Arthur
+    Mensch and Guillaume Lample.
+  tags:
+    - ai-research
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: tri-dao
+  stableId: yWbBTulRyQ
+  type: person
+  title: Tri Dao
+  description: >-
+    Co-founder of Together AI. Creator of FlashAttention, a widely adopted
+    algorithm that dramatically speeds up transformer training and inference.
+    Assistant professor at Princeton. Previously PhD at Stanford under
+    Christopher Re.
+  tags:
+    - ai-research
+    - efficiency
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: david-ha
+  stableId: xIgng9YGT5
+  type: person
+  title: David Ha
+  description: >-
+    Co-founder and CEO of Sakana AI, a Tokyo-based AI lab focused on
+    nature-inspired AI. Previously at Google Brain and worked on creative AI
+    applications. Known for work on world models, neuroevolution, and SketchRNN.
+  tags:
+    - ai-research
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: been-kim
+  stableId: 6f30hZ4h1x
+  type: person
+  title: Been Kim
+  description: >-
+    Staff research scientist at Google DeepMind. Pioneer in AI interpretability
+    and explainability. Creator of TCAV (Testing with Concept Activation
+    Vectors), a widely used interpretability method. Leading voice on making AI
+    systems understandable.
+  tags:
+    - interpretability
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: quoc-le
+  stableId: PkgToeFaAf
+  type: person
+  title: Quoc Le
+  description: >-
+    Principal scientist at Google. Co-inventor of the Transformer architecture
+    and sequence-to-sequence learning. Early pioneer of deep learning at Google,
+    contributing to Google Brain's foundational research. Key figure in the
+    development of modern language models.
+  tags:
+    - ai-research
+    - transformers
+  lastUpdated: 2026-03
+
+- id: mike-schroepfer
+  stableId: 1ujAtAolB0
+  type: person
+  title: Mike Schroepfer
+  description: >-
+    Former CTO of Meta/Facebook (2013-2022). Oversaw the growth of Meta's AI
+    research lab (FAIR) and the company's AI infrastructure. Now focused on
+    climate technology and sustainability investments.
+  tags:
+    - ai-industry
+    - technology-leadership
+  lastUpdated: 2026-03
+
+- id: kevin-scott
+  stableId: sLrdNdMIpJ
+  type: person
+  title: Kevin Scott
+  description: >-
+    CTO of Microsoft. Oversaw the strategic partnership with OpenAI and the
+    integration of AI throughout Microsoft's products including Copilot.
+    Previously VP of Engineering at LinkedIn. Key decision-maker in Microsoft's
+    AI strategy.
+  tags:
+    - ai-industry
+    - technology-leadership
+  lastUpdated: 2026-03
+
+- id: james-manyika
+  stableId: sQ_S6S_jtG
+  type: person
+  title: James Manyika
+  description: >-
+    SVP of Research, Technology, and Society at Google. Previously led McKinsey
+    Global Institute. Serves on multiple AI advisory boards. Key figure
+    connecting AI research with economic and policy analysis.
+  tags:
+    - ai-governance
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: eric-schmidt
+  stableId: afuYa1WcnH
+  type: person
+  title: Eric Schmidt
+  description: >-
+    Former CEO and Chairman of Google/Alphabet. Major funder of AI research
+    through Schmidt Futures and Schmidt Sciences. Co-author of "The Age of AI."
+    Influential voice on AI competition with China and national security
+    implications of AI.
+  tags:
+    - ai-industry
+    - ai-governance
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: eric-horvitz
+  stableId: hCBMClNOex
+  type: person
+  title: Eric Horvitz
+  description: >-
+    Chief Scientific Officer at Microsoft. Long-time AI researcher known for
+    work on decision-making under uncertainty, human-AI interaction, and AI
+    safety. Co-founded the One Hundred Year Study on AI at Stanford. Leading
+    voice on responsible AI development.
+  tags:
+    - ai-research
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: kai-fu-lee
+  stableId: mXpM022YBf
+  type: person
+  title: Kai-Fu Lee
+  description: >-
+    Chairman and CEO of Sinovation Ventures. Former president of Google China
+    and VP at Microsoft and Apple. Author of "AI Superpowers." Prominent
+    commentator on US-China AI competition and AI's economic impact.
+  tags:
+    - ai-industry
+    - china-ai
+    - venture-capital
+  lastUpdated: 2026-03
+
+- id: joelle-pineau
+  stableId: he0I2G8Q4g
+  type: person
+  title: Joelle Pineau
+  description: >-
+    VP of AI Research at Meta. Professor at McGill University. Leads Meta's
+    Fundamental AI Research (FAIR) lab. Pioneer in reinforcement learning for
+    healthcare applications and reproducibility in ML research.
+  tags:
+    - ai-research
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: finale-doshi-velez
+  stableId: YiLkYc6n9r
+  type: person
+  title: Finale Doshi-Velez
+  description: >-
+    Professor at Harvard. Expert on interpretable machine learning and AI for
+    healthcare. Co-authored influential papers on defining and evaluating
+    interpretability. Works at the intersection of ML, healthcare, and policy.
+  tags:
+    - interpretability
+    - ai-policy
+    - healthcare-ai
+  lastUpdated: 2026-03
+
+- id: zoubin-ghahramani
+  stableId: FQCE4fpH55
+  type: person
+  title: Zoubin Ghahramani
+  description: >-
+    VP of Research at Google DeepMind. Professor at University of Cambridge.
+    Pioneer in Bayesian machine learning and probabilistic AI. Former leader of
+    Uber AI Labs. Major contributor to the theoretical foundations of modern ML.
+  tags:
+    - ai-research
+    - bayesian-ml
+  lastUpdated: 2026-03
+
+- id: christopher-manning
+  stableId: 3G_wha7jJs
+  type: person
+  title: Christopher Manning
+  description: >-
+    Professor at Stanford University. Director of the Stanford AI Lab (SAIL).
+    Pioneer in natural language processing and deep learning for NLP. Creator of
+    the Stanford NLP toolkit, one of the most widely used NLP libraries.
+  tags:
+    - ai-research
+    - natural-language-processing
+  lastUpdated: 2026-03
+
+- id: dan-jurafsky
+  stableId: MH-7qwtQBs
+  type: person
+  title: Dan Jurafsky
+  description: >-
+    Professor at Stanford University. Co-author of the standard NLP textbook
+    "Speech and Language Processing." Expert in computational linguistics and
+    NLP. His textbook has trained generations of NLP researchers.
+  tags:
+    - ai-research
+    - natural-language-processing
+  lastUpdated: 2026-03
+
+- id: michael-nielsen
+  stableId: gqOQpUBAD_
+  type: person
+  title: Michael Nielsen
+  description: >-
+    Research scientist and author. Co-inventor of quantum teleportation. Author
+    of "Neural Networks and Deep Learning" and writings on tools for thought.
+    Now researches how AI could improve the practice of science.
+  tags:
+    - ai-research
+    - science-of-science
+  lastUpdated: 2026-03
+
+- id: charlie-griffin
+  stableId: NtrlAXwLGm
+  type: person
+  title: Charlie Griffin
+  description: >-
+    AI safety researcher at Anthropic. Works on evaluations and alignment
+    research. Previously contributed to AI safety research in the UK AI safety
+    ecosystem.
+  tags:
+    - ai-safety
+    - evaluations
+  lastUpdated: 2026-03
+
+- id: oliver-daniels-koch
+  stableId: vs9fiB2mdH
+  type: person
+  title: Oliver Daniels-Koch
+  description: >-
+    AI safety researcher. Works on alignment and AI governance. Contributed to
+    policy research and technical safety research in the AI safety community.
+  tags:
+    - ai-safety
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: alan-davidson
+  stableId: 2QvcZhPojZ
+  type: person
+  title: Alan Davidson
+  description: >-
+    Assistant Secretary of Commerce for Communications and Information and NTIA
+    Administrator. Leads US government policy on AI accountability and internet
+    governance. Previously VP of Global Policy at Mozilla.
+  tags:
+    - ai-governance
+    - us-policy
+  lastUpdated: 2026-03
+
+- id: devi-parikh
+  stableId: cvglVxvIx2
+  type: person
+  title: Devi Parikh
+  description: >-
+    Research Director at Meta AI (FAIR). Professor at Georgia Tech. Pioneer in
+    visual question answering and multimodal AI. Known for creative AI research
+    combining vision and language.
+  tags:
+    - ai-research
+    - multimodal-ai
+  lastUpdated: 2026-03
+
+- id: chris-re
+  stableId: Eb-Ns30LBA
+  type: person
+  title: Chris Re
+  description: >-
+    Professor at Stanford University. Co-founder of Together AI and Snorkel AI.
+    Developed foundational work on data-centric AI, weak supervision, and
+    efficient model architectures. Creator of state-space models that compete
+    with transformers.
+  tags:
+    - ai-research
+    - data-centric-ai
+  lastUpdated: 2026-03
+
+- id: michael-littman
+  stableId: 5_SZhYyF0W
+  type: person
+  title: Michael Littman
+  description: >-
+    Professor at Brown University. Former division director at NSF for
+    Information and Intelligent Systems. Leading researcher in reinforcement
+    learning. Past president of AAAI. Influential voice on AI policy and
+    education.
+  tags:
+    - ai-research
+    - reinforcement-learning
+    - ai-policy
+  lastUpdated: 2026-03
+
+- id: kyunghyun-cho
+  stableId: KBhxXcyDcc
+  type: person
+  title: Kyunghyun Cho
+  description: >-
+    Professor at NYU and research scientist at Genentech. Co-inventor of the GRU
+    (Gated Recurrent Unit) architecture. Key contributor to neural machine
+    translation and the attention mechanism. Pioneer in sequence modeling.
+  tags:
+    - ai-research
+    - natural-language-processing
+  lastUpdated: 2026-03
+
+- id: jason-weston
+  stableId: icN0YS9GGj
+  type: person
+  title: Jason Weston
+  description: >-
+    Research scientist at Meta AI (FAIR). Pioneer in memory networks, dialogue
+    systems, and open-domain chatbots. Led the development of BlenderBot. Long
+    career spanning kernel methods to modern conversational AI.
+  tags:
+    - ai-research
+    - dialogue-systems
+  lastUpdated: 2026-03
+
+- id: owain-evans
+  stableId: lPByZwgBKC
+  type: person
+  title: Owain Evans
+  description: >-
+    AI safety researcher at UC Berkeley. Works on truthfulness and honesty in AI
+    systems. Co-created TruthfulQA, a widely-used benchmark for evaluating
+    language model truthfulness. Research on AI deception and calibration.
+  tags:
+    - ai-safety
+    - truthfulness
+    - evaluation
+  lastUpdated: 2026-03
+
+- id: daniel-kokotajlo
+  stableId: 3rVnY5qWJW
+  type: person
+  title: Daniel Kokotajlo
+  description: >-
+    AI safety researcher and forecaster. Previously at OpenAI where he worked on
+    governance and safety. Departed citing concerns about OpenAI's safety
+    culture. Known for AI timeline forecasting and analysis of AI risk.
+  tags:
+    - ai-safety
+    - forecasting
+    - ai-governance
+  lastUpdated: 2026-03
+
+- id: mrinank-sharma
+  stableId: zTJh46Qshl
+  type: person
+  title: Mrinank Sharma
+  description: >-
+    AI safety researcher at Anthropic. Previously at Oxford (FHI) and DeepMind.
+    Works on alignment techniques, representation engineering, and AI risk.
+    Contributed to research on sleeper agents and latent adversarial training.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: sam-toyer
+  stableId: V-55MuswUh
+  type: person
+  title: Sam Toyer
+  description: >-
+    AI safety researcher at Anthropic. PhD from UC Berkeley. Works on alignment
+    techniques and robustness of AI systems. Research on reward hacking,
+    specification gaming, and safe reinforcement learning.
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: david-bau
+  stableId: AYb_nwxcDq
+  type: person
+  title: David Bau
+  description: >-
+    Assistant professor at Northeastern University. Pioneer in mechanistic
+    interpretability of neural networks. Creator of tools for understanding and
+    editing neural network representations including ROME (Rank-One Model
+    Editing).
+  tags:
+    - interpretability
+    - ai-research
+  lastUpdated: 2026-03
+
+- id: martin-wattenberg
+  stableId: eUnWIdJ8Ij
+  type: person
+  title: Martin Wattenberg
+  description: >-
+    Senior research scientist at Google. Co-leads the People + AI Research
+    (PAIR) team with Fernanda Viegas. Pioneer in AI visualization and
+    interactive tools for understanding ML models. Co-created TensorFlow
+    Playground.
+  tags:
+    - ai-research
+    - interpretability
+    - visualization
+  lastUpdated: 2026-03
+
+- id: jesse-dodge
+  stableId: 830Z4KsTz-
+  type: person
+  title: Jesse Dodge
+  description: >-
+    Research scientist at the Allen Institute for AI (AI2). Expert on the
+    environmental impact of AI training and efficient NLP. Works on
+    reproducibility and transparency in AI research.
+  tags:
+    - ai-research
+    - ai-efficiency
+    - transparency
+  lastUpdated: 2026-03
+
+- id: taylor-rogalski
+  stableId: 6ktbHPUrB7
+  type: person
+  title: Taylor Rogalski
+  description: >-
+    AI safety researcher and alignment field-builder. Previously at the Center
+    for AI Safety. Works on safety evaluation and coordination in the AI safety
+    ecosystem.
+  tags:
+    - ai-safety
+    - community-building
+  lastUpdated: 2026-03
+
+- id: jack-lindamood
+  stableId: VY9u6VEHj7
+  type: person
+  title: Jack Lindamood
+  description: >-
+    Engineering leader. Previously Director of Engineering at Twitch and
+    engineering roles at several tech companies. Contributed to AI
+    infrastructure and scaling systems.
+  tags:
+    - technology
+    - ai-industry
+  lastUpdated: 2026-03
+
+- id: chris-lu
+  stableId: aaskCE9v_9
+  type: person
+  title: Chris Lu
+  description: >-
+    AI researcher working on discovered optimization and meta-learning. PhD
+    student at Oxford. Known for work on learned optimization, including
+    discovering new RL algorithms through meta-learning.
+  tags:
+    - ai-research
+    - meta-learning
+  lastUpdated: 2026-03
+
+- id: dan-roberts
+  stableId: j-SY7ab81k
+  type: person
+  title: Dan Roberts
+  description: >-
+    Researcher at MIT and formerly at Meta AI (FAIR). Theoretical physicist
+    turned AI researcher. Author of "The Principles of Deep Learning Theory."
+    Works on understanding neural networks through the lens of physics.
+  tags:
+    - ai-research
+    - theory
+  lastUpdated: 2026-03
+
+- id: cynthia-dwork
+  stableId: 0gbqpv1Uwp
+  type: person
+  title: Cynthia Dwork
+  description: >-
+    Professor at Harvard. Inventor of differential privacy, a foundational
+    concept in data privacy. Turing Award-eligible researcher. Also pioneered
+    work on algorithmic fairness. Her differential privacy framework is now used
+    by the US Census and major tech companies.
+  tags:
+    - privacy
+    - algorithmic-fairness
+    - ai-governance
+  lastUpdated: 2026-03
