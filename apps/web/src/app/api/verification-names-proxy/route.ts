@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
 import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
+import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 
 /**
  * GET /api/verification-names-proxy?record_type=...&record_ids=id1,id2,...
@@ -38,6 +39,25 @@ export async function GET(request: NextRequest) {
       { error: "record_type contains invalid characters" },
       { status: 400 },
     );
+  }
+
+  // Fact resolution: use local FactBase data (fast, no wiki-server dependency)
+  if (recordType === "fact") {
+    const ids = recordIds.split(",").filter(Boolean);
+    const names: Record<string, string> = {};
+
+    for (const factId of ids) {
+      const fact = getKBFactById(factId);
+      if (fact) {
+        const entity = getKBEntity(fact.subjectId);
+        const property = getKBProperty(fact.propertyId);
+        const entityName = entity?.name ?? fact.subjectId;
+        const propertyName = property?.name ?? fact.propertyId;
+        names[factId] = `${entityName} — ${propertyName}`;
+      }
+    }
+
+    return NextResponse.json({ names });
   }
 
   // Entity resolution: use local database.json (fast, no wiki-server dependency)
@@ -89,6 +109,14 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
+    // Strip "new:" prefix from resolved names at API boundary
+    if (data.names) {
+      for (const key of Object.keys(data.names)) {
+        if (typeof data.names[key] === "string" && data.names[key].startsWith("new:")) {
+          data.names[key] = data.names[key].slice(4).trim();
+        }
+      }
+    }
     return NextResponse.json(data);
   } catch (err) {
     console.warn(
