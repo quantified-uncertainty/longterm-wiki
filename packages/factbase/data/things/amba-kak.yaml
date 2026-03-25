@@ -1,2 +1,11 @@
 entity: xTqcQVprIH
-facts: []
+facts:
+  [
+    {
+        id: fcJRycTzgw,
+        property: education,
+        value: Mansfield College,
+        source: https://www.wikidata.org/wiki/Q113084571,
+        notes: From Wikidata Q113084571
+      }
+  ]

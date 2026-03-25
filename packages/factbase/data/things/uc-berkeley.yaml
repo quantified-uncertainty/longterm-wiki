@@ -49,5 +49,13 @@ facts:
         value: "https://en.wikipedia.org/wiki/University_of_California,_Berkeley",
         source: https://www.wikidata.org/wiki/Q168756,
         notes: From Wikidata Q168756
+      },
+    {
+        id: mfdXoUWafA,
+        property: description,
+        value: "University of California, Berkeley is a subsidiary/division of
+          University of California.",
+        source: https://www.wikidata.org/wiki/Q168756,
+        notes: Parent organization from Wikidata Q168756
       }
   ]

@@ -1,2 +1,18 @@
 entity: B1GYdbJuD9
-facts: []
+facts:
+  [
+    {
+        id: lhczWqoEFA,
+        property: founded-date,
+        value: "1991",
+        source: https://www.wikidata.org/wiki/Q7416399,
+        notes: From Wikidata Q7416399
+      },
+    {
+        id: hbpI7hzFTQ,
+        property: website,
+        value: https://www.sandlerfoundation.org/,
+        source: https://www.wikidata.org/wiki/Q7416399,
+        notes: From Wikidata Q7416399
+      }
+  ]

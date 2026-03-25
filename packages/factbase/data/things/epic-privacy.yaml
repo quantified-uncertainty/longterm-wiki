@@ -19,12 +19,20 @@ facts:
 
   - id: f_VI3re1fuer
     property: program
-    value: "AI & Human Rights Program — advocates for transparent, equitable AI regulation through litigation, FOIA requests, legislative advocacy, and comments to decision-makers"
+    value: "AI & Human Rights Program — advocates for transparent, equitable AI
+      regulation through litigation, FOIA requests, legislative advocacy, and
+      comments to decision-makers"
     asOf: 2026-03
     source: https://epic.org/issues/ai/
 
   - id: f_xdoqCplX4h
     property: organizational-rating
-    value: "97% Charity Navigator score, 4 stars. 83% of revenue goes to program activity"
+    value: "97% Charity Navigator score, 4 stars. 83% of revenue goes to program
+      activity"
     asOf: 2024
     source: https://www.charitynavigator.org/ein/521436610
+  - id: KftahIuIMQ
+    property: website
+    value: http://www.epic.org/
+    source: https://www.wikidata.org/wiki/Q4383251
+    notes: From Wikidata Q4383251

@@ -1,2 +1,18 @@
 entity: AZmSQxCAlk
-facts: []
+facts:
+  [
+    {
+        id: 3JqfOkPLCg,
+        property: founded-date,
+        value: "2011",
+        source: https://www.wikidata.org/wiki/Q16927616,
+        notes: From Wikidata Q16927616
+      },
+    {
+        id: lZ1IEP6Iew,
+        property: headquarters,
+        value: Mountain View,
+        source: https://www.wikidata.org/wiki/Q16927616,
+        notes: From Wikidata Q16927616
+      }
+  ]

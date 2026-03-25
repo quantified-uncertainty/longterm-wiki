@@ -28,7 +28,7 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 | Publication Output | Medium-High | 15-25 major papers annually including <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink>, interpretability, and deception research |
 | Industry Influence | High | RSP framework adopted by <EntityLink id="E218" name="openai">OpenAI</EntityLink>, DeepMind; <R id="ZTFjMDAwNj">MOU with <EntityLink id="E365" name="us-aisi">US AI Safety Institute</EntityLink></R> (August 2024) |
 | Commercial Pressure Risk | High | \$5B+ run-rate revenue by August 2025; \$8B Amazon investment, \$3B Google investment create deployment incentives |
-| Governance Structure | Medium | Public Benefit Corporation status provides some protection; Jared Kaplan serves as Responsible Scaling Officer |
+| Governance Structure | Medium | Public Benefit Corporation status provides some protection; <EntityLink id="E1239" name="jared-kaplan">Jared Kaplan</EntityLink> serves as Responsible Scaling Officer |
 
 ## Overview
 
@@ -94,9 +94,9 @@ Anthropic's commitment to safety research is reflected in substantial financial 
 | Safety-focused staff | 200-330 (20-30%) | Includes interpretability, alignment, red team, policy |
 | Interpretability team | 40-60 researchers | Largest dedicated team globally |
 | Annual safety publications | 15-25 papers | Constitutional AI, interpretability, deception research |
-| Key safety hires (2024) | <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>, John Schulman | Former OpenAI safety leads joined Anthropic |
+| Key safety hires (2024) | <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink>, <EntityLink id="john-schulman" name="john-schulman">John Schulman</EntityLink> | Former OpenAI safety leads joined Anthropic |
 
-The company's organizational structure reflects this dual focus, with an estimated 20-30% of technical staff working primarily on safety-focused research rather than capability development. This includes the world's largest dedicated interpretability team, comprising 40-60 researchers working on understanding the internal mechanisms of neural networks. The interpretability program, led by figures like Chris Olah from the former OpenAI safety team, represents a distinctive bet that reverse-engineering AI systems can provide crucial insights for ensuring their safe deployment.
+The company's organizational structure reflects this dual focus, with an estimated 20-30% of technical staff working primarily on safety-focused research rather than capability development. This includes the world's largest dedicated interpretability team, comprising 40-60 researchers working on understanding the internal mechanisms of neural networks. The interpretability program, led by figures like <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> from the former OpenAI safety team, represents a distinctive bet that reverse-engineering AI systems can provide crucial insights for ensuring their safe deployment.
 
 Anthropic's research output includes 15-25 major safety papers annually, published in venues like NeurIPS, ICML, and through their <R id="ZDE0NmU0NT">Alignment Science Blog</R>. Notable publications include:
 
@@ -153,7 +153,7 @@ Anthropic's <R id="NDA5OTUyY2">Responsible Scaling Policy</R> (RSP) framework re
 | 2.1 | March 2025 | Clarified which thresholds require ASL-3+ safeguards |
 | <R id="YjQzY2NkNG">2.2</R> | May 2025 | Amended insider threat scope in ASL-3 Security Standard |
 
-The RSP framework has gained influence beyond Anthropic, with other major AI labs including OpenAI and DeepMind developing similar policies. Jared Kaplan, Co-Founder and Chief Science Officer, serves as Anthropic's Responsible Scaling Officer, succeeding Sam McCandlish who oversaw the initial implementation. The framework's emphasis on measurable capability thresholds and concrete safety requirements provides a more systematic approach than previous ad hoc safety measures.
+The RSP framework has gained influence beyond Anthropic, with other major AI labs including OpenAI and DeepMind developing similar policies. Jared Kaplan, Co-Founder and Chief Science Officer, serves as Anthropic's Responsible Scaling Officer, succeeding <EntityLink id="E1259" name="sam-mccandlish">Sam McCandlish</EntityLink> who oversaw the initial implementation. The framework's emphasis on measurable capability thresholds and concrete safety requirements provides a more systematic approach than previous ad hoc safety measures.
 
 However, the RSP framework has also attracted criticism. <R id="YmQxNmIxYj">SaferAI has argued</R> that the October 2024 update "makes a step backwards" by shifting from precisely defined thresholds to more qualitative descriptions—"specifying the capability levels they aim to detect and the objectives of mitigations, but lacks concrete details on the mitigations and evaluations themselves." Critics argue this reduces transparency and accountability.
 
@@ -163,7 +163,7 @@ Additionally, the framework's focus on preventing obviously dangerous capabiliti
 
 Anthropic's <R id="MGJhYTk1MW">interpretability research program</R>, led by figures like <R id="ZWE3ODM1ND">Chris Olah</R> and others from the former OpenAI safety team, represents the most ambitious effort to understand the internal workings of large neural networks. The program's goal is to reverse-engineer trained models to understand their computational mechanisms, potentially enabling detection of deceptive behavior or misalignment before deployment.
 
-The research has achieved notable successes, documented on the <R id="MGJhYTk1MW">Transformer Circuits thread</R>. In May 2024, the team published "<R id="ZWFmNWM5Mz">Scaling Monosemanticity</R>," demonstrating that sparse autoencoders can decompose Claude 3 Sonnet's activations into interpretable features. The research team—including Adly Templeton, Tom Conerly, Jack Lindsey, Trenton Bricken, and others—identified millions of features representing specific concepts, including safety-relevant features for deception, sycophancy, bias, and dangerous content.
+The research has achieved notable successes, documented on the <R id="MGJhYTk1MW">Transformer Circuits thread</R>. In May 2024, the team published "<R id="ZWFmNWM5Mz">Scaling Monosemanticity</R>," demonstrating that sparse autoencoders can decompose Claude 3 Sonnet's activations into interpretable features. The research team—including Adly Templeton, Tom Conerly, Jack Lindsey, <EntityLink id="trenton-bricken" name="trenton-bricken">Trenton Bricken</EntityLink>, and others—identified millions of features representing specific concepts, including safety-relevant features for deception, sycophancy, bias, and dangerous content.
 
 ### Key Interpretability Findings
 

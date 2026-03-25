@@ -68,7 +68,7 @@ The Chinchilla paper (Hoffmann et al., 2022) is the most cited example of an alg
 
 ### Inference-Time Compute as a New Scaling Dimension
 
-Beginning with <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 model family and similar "thinking" models, a new scaling axis has emerged: allocating extra compute at inference time rather than training time to improve reasoning quality. Reasoning queries can consume 10,000 tokens or more compared to roughly 500 for standard completions — a 20× difference in per-query compute.[^rc-4c14] Jensen Huang described this as a new scaling law: increasing compute for "long thinking" makes the answer smarter independently of training scale.[^rc-dd80] This shift has significant implications for infrastructure planning because inference compute demand is more variable and latency-sensitive than training compute demand.
+Beginning with <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 model family and similar "thinking" models, a new scaling axis has emerged: allocating extra compute at inference time rather than training time to improve reasoning quality. Reasoning queries can consume 10,000 tokens or more compared to roughly 500 for standard completions — a 20× difference in per-query compute.[^rc-4c14] <EntityLink id="E1292" name="jensen-huang">Jensen Huang</EntityLink> described this as a new scaling law: increasing compute for "long thinking" makes the answer smarter independently of training scale.[^rc-dd80] This shift has significant implications for infrastructure planning because inference compute demand is more variable and latency-sensitive than training compute demand.
 
 ## 2. GPU Deployment and Hardware
 

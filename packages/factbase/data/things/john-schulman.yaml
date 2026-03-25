@@ -1,2 +1,11 @@
 entity: ZocUS6ej6S
-facts: []
+facts:
+  [
+    {
+        id: opjZ3c25Lw,
+        property: education,
+        value: "University of California, Berkeley; California Institute of Technology",
+        source: https://www.wikidata.org/wiki/Q103236782,
+        notes: From Wikidata Q103236782
+      }
+  ]

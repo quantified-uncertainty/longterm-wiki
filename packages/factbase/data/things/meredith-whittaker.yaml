@@ -1,2 +1,18 @@
 entity: 3R1I5JCrP4
-facts: []
+facts:
+  [
+    {
+        id: Yepv9NCNKw,
+        property: born-year,
+        value: 2000,
+        source: https://www.wikidata.org/wiki/Q55433882,
+        notes: From Wikidata Q55433882
+      },
+    {
+        id: Nfwi3MRz2A,
+        property: education,
+        value: "University of California, Berkeley College of Engineering",
+        source: https://www.wikidata.org/wiki/Q55433882,
+        notes: From Wikidata Q55433882
+      }
+  ]

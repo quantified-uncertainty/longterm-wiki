@@ -13,3 +13,8 @@ facts:
     value: https://en.wikipedia.org/wiki/Scott_Alexander_(screenwriter)
     source: https://www.wikidata.org/wiki/Q3476164
     notes: From Wikidata Q3476164
+  - id: Fl1ByRlCog
+    property: born-year
+    value: 1963
+    source: https://www.wikidata.org/wiki/Q3476164
+    notes: From Wikidata Q3476164

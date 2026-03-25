@@ -12,3 +12,9 @@ facts:
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Jensen_Huang"
 
+  - id: DSQ5VnEgcg
+    property: education
+    value: Oregon State University; Stanford University; Aloha High School; Oneida
+      Baptist Institute
+    source: https://www.wikidata.org/wiki/Q305177
+    notes: From Wikidata Q305177

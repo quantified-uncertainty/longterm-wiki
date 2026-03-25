@@ -19,18 +19,33 @@ facts:
 
   - id: f_0x5K8ac51g
     property: program
-    value: "Launched appellate litigation practice in August 2025 with approximately 12 lawyers"
+    value: "Launched appellate litigation practice in August 2025 with approximately
+      12 lawyers"
     asOf: 2025-08
     source: https://democracyforward.org
 
   - id: f_xtn0QtEEfP
     property: litigation
-    value: "Filed FOIA lawsuit against HUD and State Department seeking records about Trump administration use of generative AI to rewrite rules, monitor employees, and target visa holders"
+    value: "Filed FOIA lawsuit against HUD and State Department seeking records
+      about Trump administration use of generative AI to rewrite rules, monitor
+      employees, and target visa holders"
     asOf: 2025-03
     source: https://democracyforward.org/updates/foia-ai-lawsuit/
 
   - id: f_9aYCt6tEaG
     property: litigation
-    value: "Filed FOIA lawsuit against OPM, GSA, HUD, and OMB compelling disclosure of AI use in the Trump administration's deregulation agenda"
+    value: "Filed FOIA lawsuit against OPM, GSA, HUD, and OMB compelling disclosure
+      of AI use in the Trump administration's deregulation agenda"
     asOf: 2025
     source: https://democracyforward.org/updates/ai-deregulation/
+  - id: PY8cmDi8Ww
+    property: headcount
+    value: 68
+    asOf: 2025-01
+    source: https://www.wikidata.org/wiki/Q56278847
+    notes: From Wikidata Q56278847 (as of 2025-01)
+  - id: HKKIVojfVA
+    property: website
+    value: http://democracyforward.org
+    source: https://www.wikidata.org/wiki/Q56278847
+    notes: From Wikidata Q56278847

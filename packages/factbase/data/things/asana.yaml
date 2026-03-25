@@ -4,4 +4,15 @@ facts:
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Asana_(software)
     source: https://www.wikidata.org/wiki/Q4803821
-    notes: From Wikidata Q4803821 (Asana software company, corrected from yoga Q466797)
+    notes: From Wikidata Q4803821 (Asana software company, corrected from yoga
+      Q466797)
+  - id: 6ktQptBxXw
+    property: founded-date
+    value: "2011"
+    source: https://www.wikidata.org/wiki/Q4468073
+    notes: From Wikidata Q4468073
+  - id: MgYYcu9WeQ
+    property: website
+    value: https://asana.com
+    source: https://www.wikidata.org/wiki/Q4468073
+    notes: From Wikidata Q4468073

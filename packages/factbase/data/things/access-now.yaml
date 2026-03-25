@@ -21,13 +21,23 @@ facts:
 
   - id: f_2wVPFe1iPM
     property: leadership
-    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett Solomon who served 2009-2024)"
+    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett
+      Solomon who served 2009-2024)"
     asOf: 2025
     source: https://www.accessnow.org/about-us/
 
   - id: f_4t8WFcs3XE
     property: campaign
-    value: "Led coalition of 110+ civil society organizations in EU AI Act advocacy on transparency safeguards"
+    value: "Led coalition of 110+ civil society organizations in EU AI Act advocacy
+      on transparency safeguards"
     asOf: 2024
     source: https://www.accessnow.org/campaign/ban-biometric-surveillance/
-    notes: "Access Now led major civil society coalition on EU AI Act. The ban-biometric-surveillance campaign page documents their 200+ org coalition work; the 110+ figure specifically refers to the AI Act advocacy coalition."
+    notes: "Access Now led major civil society coalition on EU AI Act. The
+      ban-biometric-surveillance campaign page documents their 200+ org
+      coalition work; the 110+ figure specifically refers to the AI Act advocacy
+      coalition."
+  - id: xbB4a3XeNQ
+    property: website
+    value: https://www.accessnow.org
+    source: https://www.wikidata.org/wiki/Q4672520
+    notes: From Wikidata Q4672520
