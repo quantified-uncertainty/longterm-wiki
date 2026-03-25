@@ -167,8 +167,31 @@ function findInsertionPoint(
 
   if (searchTerms.length === 0) return null;
 
-  // Search lines for the best match
-  for (let i = 0; i < lines.length; i++) {
+  // Find where frontmatter ends
+  let bodyStart = 0;
+  if (lines[0]?.trim() === '---') {
+    for (let i = 1; i < lines.length; i++) {
+      if (lines[i].trim() === '---') {
+        bodyStart = i + 1;
+        break;
+      }
+    }
+  }
+
+  // Search lines for the best match (skip frontmatter, imports, tables, headings)
+  for (let i = bodyStart; i < lines.length; i++) {
+    const rawTrimmed = lines[i].trim();
+
+    // Skip non-prose lines
+    if (rawTrimmed.startsWith('|')) continue;          // table rows
+    if (rawTrimmed.startsWith('import ')) continue;     // imports
+    if (rawTrimmed.startsWith('export ')) continue;     // exports
+    if (rawTrimmed.startsWith('#')) continue;           // headings
+    if (rawTrimmed.startsWith('[^')) continue;          // footnote definitions
+    if (rawTrimmed.length < 20) continue;              // very short lines
+    // Skip self-closing component lines like <Mermaid ... /> or <Aside ...>
+    if (/^<[A-Z]\w+[^>]*\/>$/.test(rawTrimmed)) continue;
+
     const lineLower = lines[i].toLowerCase()
       .replace(/<[^>]+>/g, '')        // strip tags for matching
       .replace(/\[\^[\w:.-]+\]/g, '') // strip existing footnotes
@@ -258,6 +281,8 @@ export async function addCitationsCommand(
   }
 
   const citationsToAdd: CitationToAdd[] = [];
+  const usedLines = new Set<number>();  // track which lines already got a citation
+  const usedUrls = new Set<string>();   // dedup same URL
   const lines = page.content.split('\n');
 
   for (const claim of uncitedCheckWorthy) {
@@ -272,9 +297,21 @@ export async function addCitationsCommand(
       continue;
     }
 
+    // Skip if we already have a citation for this URL (dedup)
+    if (usedUrls.has(source.url)) {
+      console.log(`    [=] Duplicate URL skipped: ${source.url.slice(0, 50)}`);
+      continue;
+    }
+
     const insertion = findInsertionPoint(claim, lines);
     if (!insertion) {
       console.log(`    [?] Can't find insertion point: ${claim.text.slice(0, 60)}...`);
+      continue;
+    }
+
+    // Skip if this line already got a citation in this run (avoid stacking)
+    if (usedLines.has(insertion.line)) {
+      console.log(`    [=] Line ${insertion.line + 1} already cited, skipping`);
       continue;
     }
 
@@ -287,6 +324,9 @@ export async function addCitationsCommand(
       insertionLine: insertion.line,
       insertionColumn: insertion.col,
     });
+
+    usedLines.add(insertion.line);
+    usedUrls.add(source.url);
 
     console.log(`    [+] ${claim.text.slice(0, 50)}... → ${source.url.slice(0, 60)}`);
   }
