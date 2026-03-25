@@ -1,0 +1,44 @@
+entity: wrbWEng9gg
+facts:
+  - id: f_ce_founded
+    property: founded-date
+    value: "1910"
+    source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
+
+  - id: f_ce_hq
+    property: headquarters
+    value: "Washington, DC"
+    source: https://carnegieendowment.org/about
+    notes: "Also offices in Palo Alto, Beirut, Berlin, Brussels, Singapore, New Delhi"
+
+  - id: f_ce_leadership
+    property: leadership
+    value: "Mariano-Florentino (Tino) Cuellar (10th President, stepping down July 2026 to return to Stanford). Board chair: Jane Hartley."
+    asOf: 2026-01
+    source: https://carnegieendowment.org/posts/2026/01/tino-cuellar-to-step-down-as-carnegie-endowment-president-in-july-2026
+
+  - id: f_ce_revenue
+    property: annual-revenue
+    value: "57574887"
+    unit: USD
+    asOf: 2025
+    source: https://projects.propublica.org/nonprofits/organizations/130552040
+    notes: "FY ending June 2025. Total assets $602M."
+
+  - id: f_ce_staff
+    property: employee-count
+    value: "375"
+    asOf: 2025
+    source: https://carnegieendowment.org/about
+    notes: "~375-400 employees; 170+ research experts across 6 continents"
+
+  - id: f_ce_tia
+    property: program
+    value: "Technology and International Affairs Program. Co-directors: Jon Bateman and Arthur Nelson. ~15+ staff/fellows. Four areas: AI, Information Environment, Cybersecurity, Biotechnology."
+    asOf: 2026-03
+    source: https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program
+
+  - id: f_ce_aigs
+    property: publication
+    value: "AI Global Surveillance (AIGS) Index covering 176 countries, created by Steven Feldstein"
+    source: https://carnegieendowment.org/features/ai-global-surveillance-technology

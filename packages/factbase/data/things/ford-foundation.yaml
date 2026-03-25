@@ -1,0 +1,56 @@
+entity: 3ViojCH3Sw
+facts:
+  - id: f_ff_founded
+    property: founded-date
+    value: "1936"
+    source: https://en.wikipedia.org/wiki/Ford_Foundation
+
+  - id: f_ff_hq
+    property: headquarters
+    value: "320 E 43rd St, New York, NY 10017"
+    source: https://www.fordfoundation.org
+
+  - id: f_ff_leadership
+    property: leadership
+    value: "Heather Gerken (11th President, since November 2025; formerly dean of Yale Law School). Succeeded Darren Walker."
+    asOf: 2025-11
+    source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/ford-foundation-announces-heather-gerken-as-new-president/
+
+  - id: f_ff_assets
+    property: total-assets
+    value: "17480000000"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+
+  - id: f_ff_revenue
+    property: annual-revenue
+    value: "1150000000"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B. Charitable disbursements ~$1.05B."
+
+  - id: f_ff_grantmaking
+    property: annual-grantmaking
+    value: "840000000"
+    unit: USD
+    asOf: 2024
+    source: https://www.fordfoundation.org/work/our-grants/
+    notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400 grants/year worldwide."
+
+  - id: f_ff_tech_society
+    property: program
+    value: "Technology and Society program, directed by Lori McGlinchey. Focus: equitable digital access, fair regulation, civil/human rights in digital spaces, tech capacity for social justice orgs."
+    asOf: 2026-03
+    source: https://www.fordfoundation.org/work/challenging-inequality/technology-and-society/
+
+  - id: f_ff_pai_grant
+    property: grant-given
+    value: "Partnership on AI: $550K (2023, 3yr for AI openness/transparency), $250K (2022, 2yr for AI and workers), $200K (2020, 2yr for shared prosperity)"
+    source: https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/partnership-on-ai-to-benefit-people-and-society-147330/
+
+  - id: f_ff_ai_coalition
+    property: coalition
+    value: "Co-led 2023 initiative where 10 major philanthropies committed $200M+ collectively to mitigate AI harms. Founding member of Humanity AI ($500M, 2025)."
+    source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/philanthropies-launch-new-initiative-to-ensure-ai-advances-the-public-interest/

@@ -1,0 +1,44 @@
+entity: u3Yf4JXH4Q
+facts:
+  - id: f_tfs_founded
+    property: founded-date
+    value: "2014"
+    source: https://www.influencewatch.org/non-profit/the-future-society/
+    notes: "Founded 2014 as student club at Harvard Kennedy School; registered as US 501(c)(3) in 2016"
+
+  - id: f_tfs_hq
+    property: headquarters
+    value: "Boston, MA"
+    source: https://www.idealist.org/en/nonprofit/f7355327c3924e5989eabf6adbe7f9ae-the-future-society-boston
+    notes: "Staff in 12 countries across US and Europe"
+
+  - id: f_tfs_leadership
+    property: leadership
+    value: "Nicolas Moes (Executive Director, selected early 2024, formerly Director of EU AI Governance at TFS). Founder: Nicolas Miailhe (transitioned to Board in Dec 2023)."
+    asOf: 2024
+    source: https://thefuturesociety.org/leadership-transition-announcement/
+
+  - id: f_tfs_revenue
+    property: annual-revenue
+    value: "3406697"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/813568099
+    notes: "Revenue $3.4M, expenses $1.9M, assets $3.7M. EIN: 81-3568099. Growing: was $755K in 2021."
+
+  - id: f_tfs_athens
+    property: program
+    value: "Athens Roundtable on AI and the Rule of Law (annual since 2019). 6th edition Dec 2024: 135 in-person + 830 online participants from 108 countries."
+    asOf: 2024-12
+    source: https://thefuturesociety.org/theme/ai-and-the-rule-of-law/
+
+  - id: f_tfs_reach
+    property: scale
+    value: "4,000+ students taught, 8,000+ senior decision-makers engaged, 60+ institutional partners including OECD, UNESCO, Harvard Kennedy School"
+    source: https://thefuturesociety.org/about-us/
+
+  - id: f_tfs_summit
+    property: campaign
+    value: "Consulted 10,000+ citizens and 200+ experts worldwide for the 2025 AI Action Summit deliverables"
+    asOf: 2025
+    source: https://thefuturesociety.org/theme/global-ai-governance/

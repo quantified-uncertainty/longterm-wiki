@@ -1,0 +1,37 @@
+entity: 0TFmORNnKQ
+facts:
+  - id: f_cip_founded
+    property: founded-date
+    value: "2022"
+    source: https://forum.effectivealtruism.org/posts/suKkvQPxgG6ihvhfP/launching-the-collective-intelligence-project-whitepaper-and
+    notes: "Co-founded late 2022; public launch February 2023"
+
+  - id: f_cip_hq
+    property: headquarters
+    value: "San Francisco, CA"
+    source: https://www.cip.org/
+    notes: "Opened SF office in 2024. Tax filing: Encino, CA. EIN: 92-0327339."
+
+  - id: f_cip_leadership
+    property: leadership
+    value: "Divya Siddarth (Co-Founder & Executive Director, formerly Microsoft OCTO). Saffron Huang (Co-Founder & Board Director, formerly Google DeepMind). Advisory Council includes Daron Acemoglu and Danielle Allen."
+    asOf: 2026-03
+    source: https://www.cip.org/team
+
+  - id: f_cip_alignment_assemblies
+    property: program
+    value: "Alignment Assemblies: democratic forums to surface public views on AI alignment. Launched Feb 2023. Engaged 1,200+ participants across 68 countries by 2024."
+    asOf: 2024
+    source: https://www.cip.org/alignmentassemblies
+
+  - id: f_cip_funding
+    property: funding-sources
+    value: "Funders: Omidyar Network (from $30M inclusive AI fund, 2023), Robert Wood Johnson Foundation, Google.org, Ford Foundation, ONE Project, Future of Life Institute, Amaranth Foundation, SFF. Partners: Anthropic, OpenAI, Mistral, Jigsaw, Mozilla, Chatham House, Taiwan MODA."
+    source: https://www.cip.org/funding-partnerships
+
+  - id: f_cip_staff
+    property: employee-count
+    value: "10"
+    asOf: 2026
+    source: https://www.cip.org/team
+    notes: "10 core team + 12-person Advisory Council + 20+ Community Council"
