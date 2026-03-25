@@ -13,10 +13,13 @@ import {
   VerdictBadge,
   formatRecordType,
   getRecordHref,
+  formatCheckerModel,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
 import { isUrl } from "@/components/wiki/factbase/format";
 import { getEntityHref } from "@data/entity-nav";
+import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
+import { formatKBFactValue } from "@/components/wiki/factbase/format";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -106,6 +109,23 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const entityId = verdicts.find((v) => v.entityId)?.entityId ?? null;
   const entityHref = entityId ? getEntityHref(entityId) : null;
 
+  // Build claim summary based on record type
+  let claimSummary: string | null = null;
+  let claimEntityName: string | null = null;
+  if (recordType === "fact") {
+    const fact = getKBFactById(recordId);
+    if (fact) {
+      const entity = getKBEntity(fact.subjectId);
+      const property = getKBProperty(fact.propertyId);
+      claimEntityName = entity?.name ?? fact.subjectId;
+      const propertyName = property?.name ?? fact.propertyId;
+      const formattedValue = formatKBFactValue(fact, property?.unit, property?.display);
+      claimSummary = `${claimEntityName} — ${propertyName}: ${formattedValue}`;
+    }
+  }
+
+  const recordHref = getRecordHref(recordType, recordId);
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Breadcrumbs */}
@@ -118,31 +138,27 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       </Link>
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
           <span className="capitalize">{formatRecordType(recordType)}</span>
-          <span>/</span>
+          <span>&middot;</span>
           <span className="font-mono">{recordId}</span>
         </div>
-        <h1 className="text-2xl font-bold mb-2">{displayName}</h1>
-        <div className="flex flex-wrap items-center gap-3">
-          {(() => {
-            const recordHref = getRecordHref(recordType, recordId);
-            return recordHref ? (
-              <Link
-                href={recordHref}
-                className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
-              >
-                View {formatRecordType(recordType).toLowerCase()} record &rarr;
-              </Link>
-            ) : null;
-          })()}
+        <h1 className="text-2xl font-bold mb-1">
+          {claimSummary ?? displayName}
+        </h1>
+        {claimSummary && resolvedName && resolvedName !== claimSummary && (
+          <p className="text-sm text-muted-foreground mb-2">{resolvedName}</p>
+        )}
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          {recordHref && (
+            <Link href={recordHref} className="text-primary hover:underline">
+              View {formatRecordType(recordType).toLowerCase()} record &rarr;
+            </Link>
+          )}
           {entityHref && (
-            <Link
-              href={entityHref}
-              className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline"
-            >
-              View entity page &rarr;
+            <Link href={entityHref} className="text-primary hover:underline">
+              {claimEntityName ? `${claimEntityName} wiki page` : "View entity page"} &rarr;
             </Link>
           )}
         </div>
@@ -246,112 +262,132 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Evidence cards */}
-      {evidence.length > 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Evidence ({evidence.length} check
-            {evidence.length !== 1 ? "s" : ""}
-            {uniqueSourceUrls.size > 0 &&
-              uniqueSourceUrls.size !== evidence.length && (
-                <>
-                  {" "}from {uniqueSourceUrls.size} unique source
-                  {uniqueSourceUrls.size !== 1 ? "s" : ""}
-                </>
-              )}
-            )
-          </h2>
-          <div className="space-y-3">
-            {evidence.map((e) => (
-              <div
-                key={e.id}
-                className="rounded-lg border border-border/60 p-4"
-              >
-                {/* Card header: verdict + confidence + model + date */}
-                <div className="flex flex-wrap items-center gap-2 mb-3">
-                  <VerdictBadge verdict={e.verdict} />
-                  {e.confidence != null && (
-                    <span className="text-xs tabular-nums font-medium text-muted-foreground">
-                      {Math.round(e.confidence * 100)}% confidence
-                    </span>
-                  )}
-                  {e.isPrimarySource && (
-                    <span className="inline-flex items-center rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
-                      primary source
-                    </span>
-                  )}
-                  <span className="ml-auto text-xs text-muted-foreground flex items-center gap-2">
-                    {e.checkerModel && (
-                      <span>{e.checkerModel}</span>
-                    )}
-                    {e.checkedAt && (
-                      <span className="tabular-nums">
-                        {new Date(e.checkedAt).toLocaleDateString()}
-                      </span>
-                    )}
-                  </span>
-                </div>
+      {/* Evidence — grouped by source URL, deduplicated */}
+      {evidence.length > 0 && (() => {
+        // Group evidence by source URL
+        const bySource = new Map<string, typeof evidence>();
+        for (const e of evidence) {
+          const key = e.sourceUrl || "(no source)";
+          const group = bySource.get(key);
+          if (group) group.push(e);
+          else bySource.set(key, [e]);
+        }
 
-                {/* Source URL */}
-                {e.sourceUrl && (
-                  <div className="mb-3">
-                    {isUrl(e.sourceUrl) ? (
+        // Deduplicate within each source group: collapse checks with same verdict + similar notes
+        // Keep the most recent check, show count of duplicates
+        type DeduplicatedCheck = (typeof evidence)[number] & { duplicateCount: number };
+        function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
+          const seen = new Map<string, DeduplicatedCheck>();
+          for (const c of checks) {
+            // Key on verdict + first 100 chars of notes (to catch near-identical notes)
+            const dedupeKey = `${c.verdict}:${(c.notes || c.extractedValue || "").slice(0, 100)}`;
+            const existing = seen.get(dedupeKey);
+            if (existing) {
+              existing.duplicateCount++;
+              // Keep the more recent one
+              if (c.checkedAt && existing.checkedAt && c.checkedAt > existing.checkedAt) {
+                seen.set(dedupeKey, { ...c, duplicateCount: existing.duplicateCount });
+              }
+            } else {
+              seen.set(dedupeKey, { ...c, duplicateCount: 1 });
+            }
+          }
+          return [...seen.values()];
+        }
+
+        return (
+          <section className="mb-8">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+              Evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
+            </h2>
+            <div className="space-y-4">
+              {[...bySource.entries()].map(([sourceUrl, checks]) => (
+                <div key={sourceUrl} className="rounded-lg border border-border/60 overflow-hidden">
+                  {/* Source header */}
+                  {sourceUrl !== "(no source)" && (
+                    <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40">
                       <a
-                        href={e.sourceUrl}
+                        href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400 break-all"
+                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400"
                       >
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                        {e.sourceUrl}
+                        {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
                       </a>
-                    ) : (
-                      <span className="font-mono text-sm break-all">{e.sourceUrl}</span>
-                    )}
-                  </div>
-                )}
+                      <span className="text-xs text-muted-foreground ml-2">
+                        ({checks.length} check{checks.length !== 1 ? "s" : ""})
+                      </span>
+                    </div>
+                  )}
 
-                {/* Expected vs Found values grid */}
-                {(e.expectedValue || e.extractedValue) && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-                    {e.expectedValue && (
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-0.5">
-                          Expected
-                        </p>
-                        <p className="text-sm">{e.expectedValue}</p>
+                  {/* Individual checks for this source (deduplicated) */}
+                  <div className="divide-y divide-border/30">
+                    {deduplicateChecks(checks).map((e) => (
+                      <div key={e.id} className="px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <VerdictBadge verdict={e.verdict} />
+                          {e.confidence != null && (
+                            <span className="text-xs tabular-nums text-muted-foreground">
+                              {Math.round(e.confidence * 100)}%
+                            </span>
+                          )}
+                          {e.isPrimarySource && (
+                            <span className="inline-flex items-center rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
+                              primary
+                            </span>
+                          )}
+                          {e.duplicateCount > 1 && (
+                            <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+                              {e.duplicateCount} similar checks
+                            </span>
+                          )}
+                          <span className="ml-auto text-xs text-muted-foreground">
+                            {e.checkerModel && formatCheckerModel(e.checkerModel)}
+                            {e.checkedAt && <> &middot; {new Date(e.checkedAt).toLocaleDateString()}</>}
+                          </span>
+                        </div>
+
+                        {/* Expected vs Found */}
+                        {(e.expectedValue || e.extractedValue) && (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 text-sm">
+                            {e.expectedValue && (
+                              <div>
+                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Expected: </span>
+                                {e.expectedValue}
+                              </div>
+                            )}
+                            {e.extractedValue && (
+                              <div>
+                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Found: </span>
+                                {e.extractedValue}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Quote */}
+                        {e.extractedQuote && (
+                          <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-2">
+                            {e.extractedQuote}
+                          </blockquote>
+                        )}
+
+                        {/* Notes */}
+                        {e.notes && (
+                          <p className="text-sm text-muted-foreground">
+                            <span className="font-medium text-foreground/70">Note:</span> {e.notes}
+                          </p>
+                        )}
                       </div>
-                    )}
-                    {e.extractedValue && (
-                      <div>
-                        <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-0.5">
-                          Found
-                        </p>
-                        <p className="text-sm">{e.extractedValue}</p>
-                      </div>
-                    )}
+                    ))}
                   </div>
-                )}
-
-                {/* Extracted quote */}
-                {e.extractedQuote && (
-                  <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-3">
-                    {e.extractedQuote}
-                  </blockquote>
-                )}
-
-                {/* Notes */}
-                {e.notes && (
-                  <p className="text-sm text-muted-foreground">
-                    <span className="font-medium text-foreground/70">Note:</span>{" "}
-                    {e.notes}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+                </div>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {evidence.length === 0 && (
         <section className="mb-8">
