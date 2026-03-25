@@ -45,6 +45,16 @@ export function buildFilterUrl(
   return qs ? `${base}?${qs}` : base;
 }
 
+/** Sort priority: most actionable verdicts first. Lower = higher priority. */
+export const VERDICT_PRIORITY: Record<string, number> = {
+  contradicted: 0,
+  outdated: 1,
+  partial: 2,
+  unverifiable: 3,
+  confirmed: 4,
+  unchecked: 5,
+};
+
 /** Format a record type for display (capitalize). */
 export function formatRecordType(type: string): string {
   return type

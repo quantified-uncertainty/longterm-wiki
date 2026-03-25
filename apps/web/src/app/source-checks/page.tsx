@@ -9,6 +9,7 @@ import type {
   RpcSourceChecksVerdictsResult,
   RpcSourceChecksResolveNamesResult,
 } from "@/lib/wiki-server";
+import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
 import { SourceChecksTable } from "./source-checks-table";
 import { SourceChecksSearch } from "./source-checks-filter";
 import {
@@ -23,6 +24,7 @@ export const metadata: Metadata = {
   title: "Source Checks | Longterm Wiki",
   description:
     "Directory of source verification checks across wiki data, including personnel records, grants, divisions, and more.",
+  robots: { index: false },
 };
 
 // Revalidate every 5 minutes
@@ -87,11 +89,13 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   const stats = statsResult.data;
   const { verdicts, total } = verdictsResult.data;
 
-  // Resolve names for the current page of verdicts
+  // Resolve names for the current page of verdicts (records + entities)
   let names: Record<string, string> = {};
+  const hrefs: Record<string, string> = {};
   if (verdicts.length > 0) {
-    // Group by record type for batch resolution
+    // Group record IDs by type for batch resolution via wiki-server
     const byType = new Map<string, Set<string>>();
+    const entityIds = new Set<string>();
     for (const v of verdicts) {
       const existing = byType.get(v.recordType);
       if (existing) {
@@ -99,8 +103,12 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       } else {
         byType.set(v.recordType, new Set([v.recordId]));
       }
+      if (v.entityId) {
+        entityIds.add(v.entityId);
+      }
     }
 
+    // Resolve record names via wiki-server
     const nameResults = await Promise.all(
       [...byType.entries()].map(async ([recordType, ids]) => {
         const idList = [...ids].join(",");
@@ -114,17 +122,34 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     for (const nameMap of nameResults) {
       names = { ...names, ...nameMap };
     }
+
+    // Resolve entity names + hrefs locally from database.json (fast, no roundtrip)
+    if (entityIds.size > 0) {
+      const registry = getIdRegistry();
+      for (const stableId of entityIds) {
+        const entity = getTypedEntityByStableId(stableId);
+        if (entity) {
+          names[stableId] = entity.title;
+          const wikiId = registry.bySlug[entity.id];
+          if (wikiId) {
+            hrefs[stableId] = `/wiki/${wikiId}`;
+          }
+        }
+      }
+    }
   }
 
   // Client-side search filtering (server already filtered by type/verdict)
   const filteredVerdicts = searchQuery
     ? verdicts.filter((v) => {
-        const name = names[v.recordId] ?? "";
+        const recordName = names[v.recordId] ?? "";
+        const entityName = v.entityId ? (names[v.entityId] ?? "") : "";
         const searchLower = searchQuery.toLowerCase();
         return (
           v.recordId.toLowerCase().includes(searchLower) ||
           v.recordType.toLowerCase().includes(searchLower) ||
-          name.toLowerCase().includes(searchLower) ||
+          recordName.toLowerCase().includes(searchLower) ||
+          entityName.toLowerCase().includes(searchLower) ||
           (v.reasoning?.toLowerCase().includes(searchLower) ?? false)
         );
       })
@@ -171,20 +196,25 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           <p className="text-2xl font-bold tabular-nums">{avgConfidence}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
+          <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
           <p
             className={cn(
               "text-2xl font-bold tabular-nums",
-              stats.needs_recheck > 0 && "text-amber-600"
+              (stats.by_verdict.contradicted ?? 0) > 0 && "text-red-600"
             )}
           >
-            {stats.needs_recheck}
+            {stats.by_verdict.contradicted ?? 0}
           </p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Record Types</p>
-          <p className="text-2xl font-bold tabular-nums">
-            {Object.keys(stats.by_type).length}
+          <p className="text-xs text-muted-foreground mb-1">Outdated</p>
+          <p
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              (stats.by_verdict.outdated ?? 0) > 0 && "text-amber-600"
+            )}
+          >
+            {stats.by_verdict.outdated ?? 0}
           </p>
         </div>
       </div>
@@ -279,7 +309,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table */}
-      <SourceChecksTable verdicts={filteredVerdicts} names={names} />
+      <SourceChecksTable verdicts={filteredVerdicts} names={names} hrefs={hrefs} />
 
       {/* Pagination */}
       {totalPages > 1 && (

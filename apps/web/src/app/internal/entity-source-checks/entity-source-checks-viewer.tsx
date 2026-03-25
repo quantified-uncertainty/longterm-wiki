@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import { VerdictBadge, VERDICT_STYLES, getRecordHref } from "@/app/source-checks/source-checks-shared";
+import { VerdictBadge, VERDICT_STYLES, VERDICT_PRIORITY, getRecordHref } from "@/app/source-checks/source-checks-shared";
 
 // -- Types --
 
@@ -66,15 +66,7 @@ interface EvidenceRow {
 
 // ── Verdict priority (viewer-specific sort order) ───────────────────────
 
-/** Sort priority: most actionable verdicts first. Lower = higher priority. */
-const VERDICT_PRIORITY: Record<string, number> = {
-  contradicted: 0,
-  outdated: 1,
-  partial: 2,
-  unverifiable: 3,
-  confirmed: 4,
-  unchecked: 5,
-};
+// VERDICT_PRIORITY imported from source-checks-shared
 
 // ── Columns ────────────────────────────────────────────────────────────────
 
