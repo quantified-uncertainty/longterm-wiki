@@ -80,6 +80,29 @@ interface GenericRecord {
 }
 
 // ---------------------------------------------------------------------------
+// Entity name resolution
+// ---------------------------------------------------------------------------
+
+/**
+ * Load entity data from database.json and return it as parsed JSON.
+ * Returns null if the file doesn't exist or can't be parsed.
+ */
+function loadDatabaseJson(): {
+  typedEntities?: Array<{ id: string; stableId?: string; title?: string }>;
+  idRegistry?: { stableIdBySlug?: Record<string, string> };
+} | null {
+  const dbPath = join(PROJECT_ROOT, 'apps/web/src/data/database.json');
+  if (!existsSync(dbPath)) return null;
+
+  try {
+    return JSON.parse(readFileSync(dbPath, 'utf-8'));
+  } catch {
+    // Non-critical — callers handle null gracefully
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Deterministic checks
 // ---------------------------------------------------------------------------
 
@@ -89,26 +112,153 @@ interface GenericRecord {
  */
 function buildStableIdSet(): Set<string> {
   const ids = new Set<string>();
-  const dbPath = join(PROJECT_ROOT, 'apps/web/src/data/database.json');
-  if (!existsSync(dbPath)) return ids;
+  const db = loadDatabaseJson();
+  if (!db) return ids;
 
-  try {
-    const db = JSON.parse(readFileSync(dbPath, 'utf-8'));
-    // Index from typedEntities
-    for (const e of (db.typedEntities || []) as Array<{ stableId?: string }>) {
-      if (e.stableId) ids.add(e.stableId);
+  // Index from typedEntities
+  for (const e of (db.typedEntities || []) as Array<{ stableId?: string }>) {
+    if (e.stableId) ids.add(e.stableId);
+  }
+  // Index from idRegistry
+  const registry = db.idRegistry?.stableIdBySlug as Record<string, string> | undefined;
+  if (registry) {
+    for (const stableId of Object.values(registry)) {
+      ids.add(stableId);
     }
-    // Index from idRegistry
-    const registry = db.idRegistry?.stableIdBySlug as Record<string, string> | undefined;
-    if (registry) {
-      for (const stableId of Object.values(registry)) {
-        ids.add(stableId);
-      }
-    }
-  } catch {
-    // Non-critical — existence check will be skipped
   }
   return ids;
+}
+
+/**
+ * Build a map of stableId -> human-readable entity name from database.json.
+ * Used to resolve opaque internal IDs to names the LLM can verify.
+ */
+export function buildStableIdNameMap(): Map<string, string> {
+  const nameMap = new Map<string, string>();
+  const db = loadDatabaseJson();
+  if (!db) return nameMap;
+
+  // Build stableId -> slug map from idRegistry for fallback names
+  const stableIdToSlug = new Map<string, string>();
+  const slugToStableId = db.idRegistry?.stableIdBySlug;
+  if (slugToStableId) {
+    for (const [slug, stableId] of Object.entries(slugToStableId)) {
+      stableIdToSlug.set(stableId, slug);
+    }
+  }
+
+  // Index from typedEntities — prefer title, fall back to slug
+  for (const e of (db.typedEntities || [])) {
+    const stableId = e.stableId;
+    if (!stableId) continue;
+    const name = e.title || e.id || stableIdToSlug.get(stableId);
+    if (name) nameMap.set(stableId, name);
+  }
+
+  // Also add entries from idRegistry that aren't already covered
+  if (slugToStableId) {
+    for (const [slug, stableId] of Object.entries(slugToStableId)) {
+      if (!nameMap.has(stableId)) {
+        // Use slug as a readable fallback (e.g. "anthropic")
+        nameMap.set(stableId, slug);
+      }
+    }
+  }
+
+  return nameMap;
+}
+
+/**
+ * Fields that contain entity stableIds (opaque 10-char internal identifiers).
+ * These are resolved to human-readable names before sending to the LLM.
+ */
+const ENTITY_ID_FIELDS = [
+  'personId', 'organizationId', 'investorId', 'companyId',
+  'benchmarkId', 'modelId', 'granteeId',
+  'personEntityId', 'orgEntityId',
+];
+
+/**
+ * Fields that are internal-only and should be stripped from the LLM prompt
+ * because they are redundant with resolved names or not useful for verification.
+ */
+const INTERNAL_ONLY_FIELDS = [
+  'personEntityId', 'orgEntityId',
+  'syncedAt', 'createdAt', 'updatedAt',
+];
+
+/**
+ * Create a human-readable copy of a record for LLM verification.
+ *
+ * - Replaces stableId values in entity-reference fields with human-readable names
+ * - Uses resolved name fields from the API response when available (e.g. personResolvedName)
+ * - Strips internal-only fields that don't help verification
+ * - Falls back to the original value if no name can be resolved
+ */
+export function humanizeRecord(
+  record: GenericRecord,
+  nameMap: Map<string, string>,
+): GenericRecord {
+  const humanized: GenericRecord = { ...record };
+
+  // Strip internal-only fields
+  for (const field of INTERNAL_ONLY_FIELDS) {
+    delete humanized[field];
+  }
+
+  // Replace stableId fields with human-readable names
+  for (const field of ENTITY_ID_FIELDS) {
+    const val = humanized[field];
+    if (typeof val !== 'string' || !val) continue;
+
+    // Check for resolved name from the API response
+    // e.g. personId -> personResolvedName, organizationId -> orgResolvedName
+    const resolvedNameField = getResolvedNameField(field);
+    const resolvedName = resolvedNameField ? (record[resolvedNameField] as string | undefined) : undefined;
+
+    if (resolvedName) {
+      humanized[field] = resolvedName;
+    } else {
+      // Fall back to name map lookup
+      const name = nameMap.get(val);
+      if (name) {
+        humanized[field] = name;
+      }
+      // If no name found, leave the original value (better than nothing)
+    }
+  }
+
+  // Also remove the redundant *ResolvedName fields since we've inlined the names
+  delete humanized['personResolvedName'];
+  delete humanized['orgResolvedName'];
+
+  // Remove nested entity ref objects (person, organization) since we've inlined names
+  // These are structured duplicates of the flat fields
+  if (humanized['person'] && typeof humanized['person'] === 'object') {
+    delete humanized['person'];
+  }
+  if (humanized['organization'] && typeof humanized['organization'] === 'object') {
+    delete humanized['organization'];
+  }
+
+  return humanized;
+}
+
+/**
+ * Map an entity ID field name to its corresponding resolved name field.
+ * Returns null if no resolved name field exists for this field.
+ */
+function getResolvedNameField(idField: string): string | null {
+  switch (idField) {
+    case 'personId':
+    case 'personEntityId':
+      return 'personResolvedName';
+    case 'organizationId':
+    case 'orgEntityId':
+      return 'orgResolvedName';
+    default:
+      return null;
+  }
 }
 
 /**
@@ -240,10 +390,16 @@ export function runDeterministicChecks(
 // ---------------------------------------------------------------------------
 
 /** Build a verification prompt for a single record */
-function buildVerificationPrompt(table: string, record: GenericRecord): string {
+export function buildVerificationPrompt(
+  table: string,
+  record: GenericRecord,
+  nameMap: Map<string, string>,
+): string {
   const sourceUrl = record.source || record.sourceUrl || '(none)';
 
-  const recordJson = JSON.stringify(record, null, 2);
+  // Replace opaque stableIds with human-readable entity names
+  const humanized = humanizeRecord(record, nameMap);
+  const recordJson = JSON.stringify(humanized, null, 2);
 
   return `You are a data quality auditor. Verify this ${table} record for accuracy and completeness.
 
@@ -258,6 +414,8 @@ ${recordJson}
 3. **Role plausibility**: Does the role title sound real for this type of organization?
 4. **Source quality**: Source URL is "${sourceUrl}". Does it look like a legitimate source (team page, news article, Wikipedia)?
 5. **Internal consistency**: Do the fields agree with each other? (e.g., isFounder=true but role is "Intern" would be suspicious)
+
+Note: Entity reference fields (personId, organizationId, etc.) have been resolved to human-readable names. The "id" field is an internal record identifier — do not flag it as unverifiable.
 
 ## Response format
 Respond with a JSON object:
@@ -341,6 +499,9 @@ export async function runBatchVerification(
   const client = createLlmClient();
   const issues: VerificationIssue[] = [];
 
+  // Build name map once for the entire batch
+  const nameMap = buildStableIdNameMap();
+
   // Build batch requests
   const batchRequests: BatchRequest[] = records.map((rec) => ({
     customId: `verify-${table}-${rec.id}`,
@@ -348,7 +509,7 @@ export async function runBatchVerification(
       model,
       max_tokens: 1024,
       messages: [
-        { role: 'user' as const, content: buildVerificationPrompt(table, rec) },
+        { role: 'user' as const, content: buildVerificationPrompt(table, rec, nameMap) },
       ],
     },
   }));
