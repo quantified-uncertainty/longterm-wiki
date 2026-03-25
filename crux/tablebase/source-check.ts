@@ -175,7 +175,6 @@ export function buildStableIdNameMap(): Map<string, string> {
 const ENTITY_ID_FIELDS = [
   'personId', 'organizationId', 'investorId', 'companyId',
   'benchmarkId', 'modelId', 'granteeId',
-  'personEntityId', 'orgEntityId',
 ];
 
 /**
@@ -251,10 +250,8 @@ export function humanizeRecord(
 function getResolvedNameField(idField: string): string | null {
   switch (idField) {
     case 'personId':
-    case 'personEntityId':
       return 'personResolvedName';
     case 'organizationId':
-    case 'orgEntityId':
       return 'orgResolvedName';
     default:
       return null;
