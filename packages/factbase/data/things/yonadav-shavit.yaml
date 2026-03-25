@@ -1,0 +1,32 @@
+entity: 5Z1YE2bJbj
+facts:
+  - id: f_9Cprm7Squ8
+    property: description
+    value: "Policy staff at OpenAI. PhD in Computer Science from Harvard. Author of 'What does it take to catch a Chinchilla?' (2023), the first major compute monitoring framework proposing on-chip firmware snapshots for international AI governance verification."
+    asOf: "2026-03"
+    source: https://yonadavshavit.com/
+
+  - id: f_GH68Rrs47C
+    property: notable-for
+    value: "Authored 'What does it take to catch a Chinchilla?' (arXiv:2303.11341, March 2023) — first major compute monitoring framework proposing on-chip firmware snapshots for international AI governance verification"
+    source: https://arxiv.org/abs/2303.11341
+    asOf: "2023-03"
+
+  - id: f_0Cl1yNUM48
+    property: education
+    value: "PhD Computer Science, Harvard University"
+    source: https://yonadavshavit.com/
+
+  - id: f_h0UXrzjdpJ
+    property: employed-by
+    value: !ref 1LcLlMGLbw
+    role: "Policy Staff"
+    source: https://yonadavshavit.com/
+    asOf: "2024"
+
+  - id: f_it9naaB0SG
+    property: employed-by
+    value: !ref h6ntSGk8fg
+    role: "AI Policy Lead"
+    notes: "Previously AI policy lead at Schmidt Futures before joining OpenAI"
+    validEnd: "2024"

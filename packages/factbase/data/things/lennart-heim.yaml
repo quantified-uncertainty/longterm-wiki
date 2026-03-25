@@ -1,0 +1,26 @@
+entity: YOfOGwm1kh
+facts:
+  - id: f_BbFW80vDg6
+    property: description
+    value: "Compute governance researcher at RAND Corporation. Also affiliated with Epoch AI and GovAI. Expertise in AI compute supply chains, hardware-enabled governance mechanisms, and compute measurement. Authored cautious analysis of HEM limitations."
+    asOf: "2026-03"
+    source: https://www.rand.org/about/people/h/heim_lennart.html
+
+  - id: f_t0PYpj8bv7
+    property: notable-for
+    value: "Co-authored RAND working papers on hardware-enabled mechanisms for AI governance; leading voice on compute governance policy; cautious about HEM feasibility timelines"
+    asOf: "2026-03"
+
+  - id: f_IdpHixNKFF
+    property: employed-by
+    value: !ref 8grDoD8kig
+    role: "Researcher"
+    source: https://www.rand.org/about/people/h/heim_lennart.html
+    asOf: "2024"
+
+  - id: f_1MZTHvQLl6
+    property: employed-by
+    value: !ref XLLyzaEaCA
+    role: "Adjunct Research Fellow"
+    notes: "Affiliated with GovAI (Centre for the Governance of AI)"
+    asOf: "2024"
