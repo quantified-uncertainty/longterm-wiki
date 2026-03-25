@@ -1,0 +1,24 @@
+entity: 3SLFjy1eDj
+facts:
+  - id: f_GxdE4hs2i4
+    property: description
+    value: >-
+      Co-founder and general partner of Andreessen Horowitz (a16z).
+      Author of "The Hard Thing About Hard Things."
+    asOf: 2026-03
+
+  - id: f_wufDSWqIso
+    property: born-year
+    value: 1966
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz
+
+  - id: f_EUVDgbJJYA
+    property: education
+    value: "B.A. Computer Science, Columbia University; M.S. Computer Science, UCLA"
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz
+
+  - id: f_2zrAA9YhWd
+    property: role
+    value: "Co-founder and General Partner, Andreessen Horowitz"
+    asOf: 2009-07
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz

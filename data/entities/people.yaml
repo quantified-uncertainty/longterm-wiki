@@ -3966,3 +3966,68 @@
     New York Times technology reporter. Author of 'Genius Makers'. Covers
     AI labs and the people behind AI development.
   tags: [journalism]
+
+- id: reid-hoffman
+  stableId: yPLp_SbMx0
+  type: person
+  title: Reid Hoffman
+  description: >-
+    Co-founder of LinkedIn and partner at Greylock Partners. One of the most
+    prominent tech donors focused on democracy and political stability. Board
+    member at Microsoft. Relevant to AI governance as a major funder and
+    public voice on technology's role in democratic institutions.
+  tags:
+    - ai-governance
+    - philanthropy
+  sources:
+    - title: Reid Hoffman - Wikipedia
+      url: https://en.wikipedia.org/wiki/Reid_Hoffman
+  lastUpdated: 2026-03
+
+- id: mackenzie-scott
+  stableId: Cv-5ugMp20
+  type: person
+  title: Mackenzie Scott
+  description: >-
+    Philanthropist and novelist. Former spouse of Jeff Bezos. Since 2019,
+    has given away over \$17 billion through a distinctive no-strings-attached
+    approach targeting neglected areas. One of the largest individual donors
+    globally.
+  tags:
+    - philanthropy
+  sources:
+    - title: Mackenzie Scott - Wikipedia
+      url: https://en.wikipedia.org/wiki/MacKenzie_Scott
+  lastUpdated: 2026-03
+
+- id: russell-moore
+  stableId: scmpCYKuBq
+  type: person
+  title: Russell Moore
+  description: >-
+    Editor-in-chief of Christianity Today. Former president of the Ethics
+    and Religious Liberty Commission of the Southern Baptist Convention.
+    Left the SBC in 2021 over its political alignment with Trumpism. One of
+    the most prominent evangelical voices opposing Christian nationalism
+    from within the tradition.
+  tags:
+    - political-stability
+  sources:
+    - title: Russell Moore - Wikipedia
+      url: https://en.wikipedia.org/wiki/Russell_Moore
+  lastUpdated: 2026-03
+
+- id: ben-horowitz
+  stableId: 3SLFjy1eDj
+  type: person
+  title: Ben Horowitz
+  description: >-
+    Co-founder and general partner of Andreessen Horowitz (a16z). Author of
+    "The Hard Thing About Hard Things."
+  tags:
+    - venture-capital
+    - ai-governance
+  sources:
+    - title: Ben Horowitz - Wikipedia
+      url: https://en.wikipedia.org/wiki/Ben_Horowitz
+  lastUpdated: 2026-03

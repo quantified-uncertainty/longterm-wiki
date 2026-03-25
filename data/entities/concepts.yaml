@@ -1305,3 +1305,31 @@
     - governance
     - ai-safety
   lastUpdated: 2026-03
+
+- id: elite-coordination-infrastructure
+  stableId: T5kYZL4jKQ
+  wikiId: E2065
+  type: concept
+  title: Elite Coordination Infrastructure
+  description: >-
+    The networks, institutions, and mechanisms through which elites coordinate
+    resources and decisions across political, economic, and technological
+    domains, with particular relevance to AI governance and safety.
+  tags:
+    - ai-governance
+    - international-coordination
+  lastUpdated: 2026-03
+
+- id: intra-coalition-engagement-strategies
+  stableId: q1VJt8n70A
+  wikiId: E2066
+  type: concept
+  title: Intra-Coalition Engagement Strategies
+  description: >-
+    Approaches for engaging distinct groups within political coalitions
+    separately rather than treating them as monolithic, with applications
+    to AI policy coalition dynamics.
+  tags:
+    - ai-governance
+    - political-stability
+  lastUpdated: 2026-03

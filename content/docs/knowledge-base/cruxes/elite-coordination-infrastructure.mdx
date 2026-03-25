@@ -1,0 +1,159 @@
+---
+wikiId: E2065
+title: Elite Coordination Infrastructure
+description: The networks, institutions, and mechanisms through which elites coordinate resources, decisions, and power across political, economic, and technological domains, with particular relevance to AI governance and safety.
+sidebar:
+  order: 50
+lastEdited: 2026-03-25
+createdAt: 2026-03-25
+summary: This wiki page synthesizes elite theory, political economy, and AI governance into an analytical framework for understanding coordination failures in frontier AI safety, identifying a structural 'coordination gap' where cross-actor mechanisms are absent; however, the concept is informal and the sourcing is heavily synthesized without primary URLs, limiting empirical credibility.
+balanceFlags:
+  - single-source-dominance
+  - missing-primary-sources
+  - uncritical-claims
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Concept maturity** | Emerging / informal |
+| **Primary domain** | Governance, political economy, AI safety |
+| **Key tension** | Production-oriented coordination vs. extraction-oriented capture |
+| **AI safety relevance** | Medium-high: cross-actor coordination gaps pose structural governance risks |
+| **Main critics** | Scholars of elite capture (Acemoglu, Robinson); populist and pluralist theorists |
+| **EA community stance** | Ambivalent: coordination valued but concerns about elitism persistent |
+
+---
+
+## Overview
+
+"Elite Coordination Infrastructure" is an informal analytical term for the networks, institutions, competitive structures, and shared systems through which powerful actors—in politics, business, finance, and technology—organize themselves to allocate resources, set agendas, and respond to crises. The concept does not name any single organization or formal body; rather, it describes a recurring pattern observed across historical and contemporary cases, from the late-nineteenth-century American railroad trusts coordinated under J.P. Morgan to the Swiss corporate elite networks of the mid-twentieth century, and into the present-day landscape of frontier AI governance.
+
+The concept sits at the intersection of elite theory, institutional economics, and infrastructure studies. Its analytical core distinguishes between two modes of elite coordination: *production-oriented* tournaments, in which status and resources flow toward actors who build firms, exports, or public goods; and *extraction-oriented* tournaments, in which status derives from proximity to regulatory rents, federal allocations, or positional goods. According to this framework—developed in the context of African political economy but applicable more broadly—a society's developmental trajectory depends heavily on which type of tournament dominates. Scholars such as Daron Acemoglu and James Robinson have formalized the extraction end of this spectrum under the label "extractive institutions," defined as systems designed to transfer wealth from one societal subset to another.[^1]
+
+In the AI safety context, the term has acquired a more specific resonance: researchers have identified a structural gap in current frontier AI governance, where existing Frontier AI Safety Policies (FASPs) invest heavily in internal prevention mechanisms but lack coordinated cross-actor crisis response infrastructure. This gap is considered structural rather than accidental, arising because investments in ecosystem-wide robustness yield diffuse benefits but impose concentrated costs, creating systematic underinvestment in the coordination layer.[^2]
+
+---
+
+## Historical Background
+
+Elite coordination as a social phenomenon predates any formal theorization of it. In the United States during the 1880s, federal judges enabled "friendly" receiverships for over-leveraged railroad companies—twelve of the twenty-eight largest systems, covering roughly one-third of total mileage—allowing managers to slash average debt by around 34 percent between 1885 and 1900. This process prioritized national system integration over creditor rights and represented an early form of state-sanctioned elite coordination around critical infrastructure.[^3]
+
+The merger wave that followed between 1897 and 1904 consolidated approximately 4,277 industrial firms into 257, with financiers coordinating the formation of cartels, trusts, and holding companies. This period of "merger fever" was facilitated by legal changes in Northeastern states that had standardized incorporation, granted directors expanded powers over charters, and liberalized accounting rules—a legal infrastructure built for elite consolidation.[^3] The National Association of Manufacturers, founded in 1895, exemplified the parallel emergence of formal business associations as coordination vehicles.
+
+In Switzerland, a distinct pattern of elite consolidation developed between roughly 1910 and 1937, as business leaders built dense corporate networks anchored in financial firms and cross-sector associations. This produced what analysts have described as a *unitary elite* core, in which ties extended from corporate executives to politicians, civil servants, and academics through shared participation in associations, parliamentary committees, and expert bodies. By the period 1957–1980, this had evolved into an *integrated elite core* resembling C. Wright Mills' "power elite" model, bridging sectors through long-lasting alliances organized around neo-corporatist expert committees.[^3]
+
+The mid-twentieth century also saw the institutionalization of coordination bodies in other domains. Virginia established a State Council for Higher Education in 1956, and Illinois followed with a similar board in 1957—early examples of formalized, cross-institutional coordination designed to resolve resource conflicts and reduce duplication among competing elite institutions.[^3]
+
+---
+
+## Theoretical Frameworks
+
+### Extractive vs. Inclusive Coordination
+
+The most influential theoretical frame comes from Acemoglu and Robinson's 2012 work on extractive institutions, which describes systems designed to transfer wealth from one group to another as a *feature* rather than a bug of certain coordination structures. Under this view, elite coordination infrastructure is not neutral: the incentive structures embedded in it determine whether coordinating elites compete to produce value or to capture existing rents.[^1]
+
+Two diagnostic metrics have been proposed to identify when a society's elite coordination has shifted toward extraction:
+
+- The **Elite Saturation Index (ESI)**: the ratio of credentialed strivers to elite-track seats (in law, finance, and senior civil service). An ESI exceeding 1.8 is argued to signal a systematic shift from production to extraction, as competition for fixed positional goods crowds out entrepreneurial activity.[^1]
+- The **Urban Cost Pressure Index (UCPI)**: core metropolitan costs (housing, education, healthcare) divided by median after-tax income. A UCPI exceeding 0.7 is said to correlate with legitimacy erosion, reduced family formation, and increased elite extraction behaviors.[^1]
+
+These indices are analytical constructs rather than widely validated empirical measures, and their specific thresholds should be treated as illustrative rather than established findings.
+
+### Production Tournaments and Diaspora Elites
+
+An alternative framework, developed in the context of African political economy—particularly Nigeria—distinguishes elite coordination by the nature of the "tournaments" through which status is assigned. Where domestic political elites derive status from proximity to regulatory access, oil rents, and federal budget allocation (Abuja proximity), the system rewards extraction. Proposed remedies emphasize integrating diaspora elites who have internalized rule-of-law norms, procurement discipline, and performance-sensitive status signals from abroad, thereby rewiring coordination incentives toward measurable productive outputs.[^1]
+
+This framework draws on Robert Putnam's work on social capital as a counterweight to elite dominance, and on Deci and Ryan's emphasis on agency and autonomy as conditions for productive rather than extractive behavior.[^4]
+
+### Infrastructures and Power Asymmetries
+
+A third theoretical strand, drawn from infrastructure studies and international relations, treats coordination infrastructure as constitutive of power rather than merely instrumental to it. On this view, physical and digital infrastructures—telecommunications cables, data centers, routing architectures—do not simply enable coordination among pre-existing elites; they heterogenize spaces, order mobilities, and produce the asymmetries that define elite relations in the first place. Algorithms and machine learning systems are cited as recent examples of how computing innovations can accelerate certain circulations while enabling new forms of containment and control.[^4]
+
+---
+
+## AI Safety Relevance
+
+The AI safety research community has increasingly focused on what might be called the *coordination gap* in frontier AI governance. Existing Frontier AI Safety Policies (FASPs) developed by major labs—including <EntityLink id="E22">Anthropic</EntityLink>'s AI Safety Level framework, <EntityLink id="E218">OpenAI</EntityLink>'s High/Critical risk gates, and analogous systems at other frontier developers—concentrate investment in internal prevention mechanisms: capability evaluations, deployment gates, and usage constraints. What they lack, according to researchers analyzing this landscape, are cross-actor alignment mechanisms capable of coordinating responses when preventive measures fail.[^2]
+
+This gap is structural. Investments in ecosystem-wide robustness—shared protocols, information-sharing frameworks, coordinated crisis exercises—yield diffuse benefits across the industry while imposing concentrated costs on individual organizations that build them. This creates systematic underinvestment in precisely the coordination layer most needed for managing novel, cross-cutting risks.[^2]
+
+Drawing on analogies to nuclear safety regimes, pandemic preparedness infrastructure, and critical infrastructure protection, proposed solutions include precommitment frameworks establishing binding cross-actor agreements before crises emerge, standing coordination venues for regular alignment, and requirements for frontier AI companies to participate in joint crisis exercises involving realistic scenarios—autonomous cyberattacks, AI-driven biological threats, and AI-enabled attacks on physical infrastructure.[^2] Some proposals also recommend requiring frontier labs to report cyber breaches to government authorities, treating advanced AI systems as critical infrastructure warranting state-level coordination oversight.[^2]
+
+The underlying claim is that AI safety cannot be achieved through isolated organizational effort: no single lab, company, or nation-state can contain the risks independently, making the construction of cross-actor coordination infrastructure a precondition for adequate safety governance.[^2]
+
+<EntityLink id="E470">International Coordination Mechanisms</EntityLink>, <EntityLink id="E172">International AI Coordination Game Model</EntityLink>, and <EntityLink id="E211">Multipolar Trap Coordination Model</EntityLink> represent related analytical frameworks addressing the same structural problem from different angles.
+
+---
+
+## Contemporary Examples
+
+### AI Infrastructure Investment
+
+The scale of contemporary elite coordination around AI infrastructure is substantial. Microsoft reportedly spent \$11.1 billion on data center assets in the quarter ending September 2025. <EntityLink id="E218">OpenAI</EntityLink> and AWS announced a \$38 billion partnership for AI cloud expansion. McKinsey projects \$6.7 trillion in total global data center investment by 2030, of which approximately \$5.2 trillion is attributed to AI workloads.[^5]
+
+Larry Ellison's Oracle has positioned itself as a critical supplier to frontier AI through arrangements including a reported \$300 billion five-year cloud infrastructure contract with OpenAI and participation in the \$500 billion Stargate Project alongside OpenAI and SoftBank. Oracle reported \$455 billion in remaining performance obligations as of August 2025, according to filings cited in coverage of these deals.[^6] Eric Schmidt has argued publicly that AI is substantially underestimated in its potential for breakthroughs in complex autonomous tasks, while simultaneously urging U.S. lawmakers to strengthen domestic energy infrastructure to maintain competitive advantage.[^6]
+
+These developments represent a form of elite coordination infrastructure in real time: a small number of very large actors—AI labs, hyperscale cloud providers, sovereign wealth funds, and government bodies—negotiating the physical, financial, and regulatory substrate on which frontier AI will run.
+
+### Geopolitical Coordination
+
+Trump administration engagement in the India-Middle East-Europe Corridor (IMEC) during May 2025 advanced a "digital superstructure" for AI data centers linking Gulf hubs to India's Global Capability Centers, which reportedly employ 1.66 million people in AI research and software engineering.[^5] The House-passed SPEED Act of 2025 aimed to fast-track AI and energy permits amid concerns about 270-day permitting timelines and compute shortages—an example of legislative infrastructure being reshaped around elite coordination priorities in AI.[^5]
+
+### Effective Altruism Community Infrastructure
+
+Within the <EntityLink id="E517">Centre for Effective Altruism</EntityLink> ecosystem, coordination infrastructure takes a more explicit organizational form. The EA Infrastructure Fund (EAIF) has issued 499 grants totaling \$18.9 million since January 2020, supporting meta-level EA coordination including university groups, the EA Forum, and cross-cause prioritization research.[^7] A single grant round from June 2023 to March 2024 disbursed \$1.39 million across 41 projects.[^7] Fund managers have articulated a strategic shift toward "principles-first" EA—funding projects that cultivate epistemic rigor and broad altruistic ethos rather than cause-specific recruitment—though this framing has been contested within the community.[^7]
+
+<EntityLink id="E1152">Lightcone Infrastructure</EntityLink> and <EntityLink id="E538">LessWrong</EntityLink> represent adjacent infrastructure projects oriented toward maintaining epistemic quality within rationalist and EA communities. <EntityLink id="E552">Open Philanthropy</EntityLink> functions as a major funder of coordination-related work across AI safety, biosecurity, and global health.
+
+---
+
+## Criticisms and Concerns
+
+### Elite Capture as Systemic Feature
+
+The most fundamental criticism of elite coordination infrastructure is that it tends to reproduce elite advantage rather than serve broader public goods. Acemoglu and Robinson's analysis characterizes extractive institutions not as failures of design but as successes at a different goal: transferring resources to those in authority. This critique applies to coordination bodies as readily as to other institutions—implementing partners in development projects, for example, are described as sometimes tolerating embezzlement by local elites in order to avoid project disruption, making capture a rational equilibrium rather than an aberration.[^1]
+
+### Technocratic Anti-Pluralism
+
+Coordination infrastructure that operates through technocratic expert committees—a pattern visible in both twentieth-century Swiss elite networks and contemporary AI governance proposals—has been criticized for claiming value-neutrality while excluding non-expert stakeholders and treating contested normative questions as technical ones. This critique holds that technocracy is inherently elitist, concentrating decision-making authority among credentialed insiders while foreclosing the plural interests that democratic governance is supposed to represent.[^4]
+
+### Extraction and Talent Misallocation
+
+Where elite coordination tournaments reward proximity to regulatory access and financial arbitrage over productive investment, the result according to the ESI/UCPI framework is a systematic misallocation of talent—a "Great Narrowing" in which high-ability individuals pursue rent extraction rather than firm-building or scientific research. This dynamic is argued to fray political legitimacy and stall growth, with the costs distributed across society while the benefits concentrate among coordinating elites.[^1]
+
+### Elitism within EA Coordination
+
+Within the EA community, concerns about elitism in coordination infrastructure have been raised explicitly. Surveys on "elitism in EA" examine whether quality-weighting metrics—prioritizing high-caliber attendees at events, or funding projects based on assessments of competence and dedication—reproduce exclusionary dynamics even when well-intentioned. Critics have also noted that past EAIF grantmaking was sometimes "scattered and inconsistent" due to unclear terminal goals, and that the community's default concentration in the San Francisco Bay Area may create geographic biases in which projects and people receive coordination support.[^7]
+
+---
+
+## Key Uncertainties
+
+Several significant uncertainties surround the concept and its applications:
+
+- **Empirical validity of diagnostic indices**: The Elite Saturation Index and Urban Cost Pressure Index are analytically suggestive but have not been subject to the kind of systematic empirical validation that would establish their thresholds as reliable predictors of elite behavior.
+- **Causal direction**: It is unclear whether elite coordination infrastructure produces extractive behavior, or whether societies already dominated by extractive elites naturally build coordination infrastructure that serves their interests—a distinction with significant implications for reform strategies.
+- **Transferability of governance analogies**: Proposals to adapt nuclear safety or pandemic preparedness coordination models to frontier AI governance face the objection that these analogies may not hold—AI development timelines, competitive dynamics, and the nature of potential failures differ substantially from those domains.
+- **Diaspora elite hypothesis**: The proposal to rewire extraction-dominated elite systems through diaspora capital and know-how remains unproven at scale, and it is unclear whether the incentive structures diaspora elites bring with them are durable in domestic political environments.
+- **AI coordination gap remediation**: Whether proposed mechanisms—precommitment frameworks, joint crisis exercises, mandatory breach reporting—would actually close the coordination gap in frontier AI governance, or whether competitive pressures would render them ineffective, remains an open empirical question.
+
+---
+
+## Sources
+
+[^1]: Acemoglu, Daron and Robinson, James A. — *Why Nations Fail: The Origins of Power, Prosperity, and Poverty* (2012); synthesized with analysis of elite capture in development contexts and Nigerian political economy from EA Forum and related research literature
+
+[^2]: Frontier AI Safety Policy coordination gap analysis — synthesized from research on comparative FASP frameworks and crisis response governance, drawing on analogies to nuclear safety and pandemic preparedness literature
+
+[^3]: Historical elite coordination — synthesized from research on US railroad receiverships (1880s–1900), Swiss elite network studies (1910–1980), US merger wave (1897–1904), and statewide higher education coordinating board histories; no single primary source URL available
+
+[^4]: Infrastructure studies and international relations perspective — synthesized from literature on infrastructures and power asymmetries, technocracy critiques, Putnam (2000) on social capital, and Deci and Ryan (2000) on agency; no single primary source URL available
+
+[^5]: 2025 AI infrastructure news — synthesized from reporting on IMEC digital superstructure (May 2025), Microsoft data center spending (Q3 2025), OpenAI-AWS partnership, McKinsey data center projections, and SPEED Act (2025); no source URLs available in research data
+
+[^6]: Larry Ellison Oracle infrastructure strategy and Eric Schmidt commentary — synthesized from coverage of Oracle-OpenAI contracts, Stargate Project, and Schmidt's May 2025 TED talk; no source URLs available in research data
+
+[^7]: EA Infrastructure Fund — EAIF grant reports covering January 2020 through March 2024, including June 2023–March 2024 round (\$1.39M, 41 projects) and cumulative figures (499 grants, \$18.9M); EA Forum discussion threads on principles-first pivot and geographic bias concerns; no source URLs available in research data

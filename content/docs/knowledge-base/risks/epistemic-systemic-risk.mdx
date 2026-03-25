@@ -1,0 +1,158 @@
+---
+wikiId: E2073
+title: Epistemic Systemic Risk
+description: The risk that structural deficiencies in knowledge systems—flawed beliefs, information failures, or errors in collective reasoning—propagate through interconnected systems to produce cascading, potentially catastrophic outcomes.
+sidebar:
+  order: 50
+lastEdited: 2026-03-25
+createdAt: 2026-03-25
+summary: This article synthesizes epistemic risk and systemic risk into a coherent 'epistemic systemic risk' concept, noting it remains an emerging, not-yet-formalized framework; it is intellectually serious and well-structured but offers limited actionable guidance and the AI safety connections remain speculative and underdeveloped.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Property | Assessment |
+|---|---|
+| Concept status | Emerging / not yet formally standardized |
+| Primary domains | Epistemology, risk management, AI safety, finance, public health |
+| Core mechanism | Epistemic errors propagating through interconnected systems via contagion and feedback loops |
+| Key challenge | Measurement difficulty; endogenous and non-linear nature resists empirical quantification |
+| Relation to AI safety | Concerns about flawed beliefs or training assumptions cascading across AI-dependent systems |
+| Established precedents | 2008 Global Financial Crisis; COVID-19 infodemic; environmental boundary ignorance |
+
+## Overview
+
+Epistemic systemic risk refers to the danger that errors, gaps, or distortions in knowledge—affecting individuals, institutions, or entire epistemic communities—can spread through interconnected systems in ways that undermine collective decision-making, stability, and resilience. The concept sits at the intersection of two well-developed but largely separate fields: **epistemic risk** (the riskiness of an agent's beliefs or credences, understood in terms of sensitivity to graded error) and **systemic risk** (the potential for failures in one part of an interconnected system to cascade, amplify, and destabilize the whole).
+
+Neither field alone captures what the combined concept points toward. Classical epistemic risk, as developed in the philosophy of science, focuses on individual agents and their credence functions—how confident a reasoner is in various propositions, and how sensitive those credences are to different kinds of error. Systemic risk, by contrast, is primarily studied in finance and economics, where it describes how the failure of one bank, market, or institution can trigger contagion across a broader system. Epistemic systemic risk bridges these frameworks, asking: what happens when flawed beliefs, bad models, or corrupted information structures are not isolated to individual agents but are shared across interdependent nodes of a complex system?
+
+As of the mid-2020s, the concept has not yet been formally defined or established as a standalone research domain. Its intellectual components are well-developed independently, but work explicitly integrating them remains sparse. This article synthesizes existing scholarship to characterize the concept, explore its mechanisms and examples, and connect it to ongoing debates in <EntityLink id="E396">AI epistemic cruxes</EntityLink>, information ecosystem governance, and <EntityLink id="E131">existential risk</EntityLink>.
+
+## Background: Component Concepts
+
+### Epistemic Risk
+
+In philosophy of science, epistemic risk is understood as the riskiness of an agent's credence function—the degree to which that function encodes sensitivity to graded errors in belief. One formal account treats the risk of a credence as a scaled reflection of its expected inaccuracy, which can be understood as a form of generalized information entropy. This approach links epistemic risk to epistemic utility theory, Bayesian scoring rules, and prior selection methods such as Laplacean indifference.
+
+Research in this area also identifies several varieties of epistemic risk:
+
+- **Inductive risk**: The risk of drawing false positive or false negative inferences from statistical evidence
+- **Phronetic risk**: A broader category encompassing practical judgment and contextual reasoning failures
+- **Credence-based risk**: The formal measure of how sensitive a credence function is to different types of graded error
+
+The field connects to long-standing debates in virtue epistemology, epistemic luck, testimony, and the ethics of belief. Crucially, however, most treatments of epistemic risk remain focused on **individual** agents rather than on how epistemic failures propagate across interconnected populations.
+
+### Systemic Risk
+
+Systemic risk, in contrast, is fundamentally about **collective** dynamics. It describes the possibility that a failure or distress originating in one component of an interconnected system will spread—through direct linkages, behavioral contagion, or shared exposures—to undermine the stability of the broader system. Systemic risk is characterized by non-linearity: small initiating events can trigger disproportionately large cascades, particularly when feedback loops are reinforcing rather than balancing.
+
+Research following the 2008–2009 Global Financial Crisis (GFC) produced a significant body of work attempting to define and measure systemic risk. Key contributions included the Marginal Expected Shortfall (MES) and Systemic Expected Shortfall (SES) metrics, which attempted to quantify individual institutions' contributions to system-wide risk. Definitions from this period distinguished between endogenous systemic risk—built up internally through feedback imbalances like lending booms—and exogenous systemic risk from common external shocks.
+
+More recent scholarship, including frameworks from the United Nations Office for Disaster Risk Reduction (UNDRR) and the Systemic Risk Centre at the London School of Economics, has extended systemic risk analysis beyond finance to include cascading impacts across ecosystems, health infrastructure, food systems, and social institutions.
+
+## The Combined Concept
+
+Epistemic systemic risk describes scenarios in which the **epistemic** failures are themselves the vector of systemic propagation—or in which systemic structures shape, corrupt, or amplify epistemic failures. This can manifest in several ways:
+
+**Shared false models**: When multiple interconnected actors rely on the same flawed model or set of assumptions, the failure of that model is not localized. The 2008 financial crisis, for instance, involved widespread reliance on models that systematically underestimated correlated mortgage default risks. The epistemic error was not confined to one institution but was structurally embedded across the system.
+
+**Epistemic contagion**: Beliefs and credences can spread through social networks, institutions, and media ecosystems in ways that parallel financial contagion. Herd behavior—where agents update their beliefs not on independent evidence but on observations of others' behavior—can produce rapid, correlated epistemic failures across large populations.
+
+**Knowledge gaps and boundary ignorance**: Societies operating with insufficient knowledge about critical thresholds—such as planetary boundaries or tipping points in complex systems—face heightened epistemic systemic risk. When knowledge about the true state of one system (e.g., ocean acidification) is inadequate, this can generate compounding failures in adjacent systems (e.g., food security) that the initial ignorance prevented actors from anticipating.
+
+**Infodemic dynamics**: As recognized by the World Health Organization in the context of COVID-19, disinformation can spread faster than corrections during large-scale crises, creating feedback loops in which false beliefs propagate through information ecosystems more rapidly than accurate ones, undermining collective decision-making precisely when it is most critical.
+
+## Mechanisms
+
+Epistemic systemic risk operates through mechanisms broadly analogous to those identified in financial systemic risk research, adapted to knowledge and belief propagation:
+
+**Initiation** occurs when a local epistemic error arises—an overconfident credence, a model that ignores a class of risks, or a deliberate suppression of inconvenient knowledge. In isolation, such errors are relatively contained.
+
+**Transmission** happens through the linkages that connect epistemic agents: shared information sources, institutional reporting chains, common training data, scientific consensus formation, or algorithmic recommendation systems. When agents update their beliefs based on what others believe rather than on independent evidence, transmission can be rapid and correlated.
+
+**Amplification** occurs when feedback loops are reinforcing rather than balancing. In stable epistemic systems, errors tend to be corrected through mechanisms like peer review, market signals, or adversarial scrutiny. In fragile systems, errors can be amplified—particularly when those errors serve the interests of powerful actors, when correction mechanisms have been eroded, or when the error itself undermines the capacity for correction.
+
+**Systemic consequences** emerge when the propagated epistemic failure is widespread enough to impair collective decision-making across interconnected domains—regulatory systems, financial markets, public health responses, or scientific communities—simultaneously.
+
+## Examples and Applications
+
+### Financial Systems
+
+The Global Financial Crisis of 2008–2009 stands as the most thoroughly analyzed example of epistemic failure contributing to systemic collapse. Financial actors across the system shared overconfident beliefs about housing price dynamics, correlated risk models that underestimated joint default probabilities, and institutional incentive structures that discouraged correction of these errors. The resulting systemic collapse illustrated how epistemic uniformity across interconnected institutions amplifies rather than distributes risk.
+
+### Environmental and Planetary Systems
+
+Scholars working on planetary boundaries have argued that societies face heightened epistemic systemic risk when they operate with inadequate knowledge about proximity to critical thresholds. Poorly understood systems—such as those governing biodiversity loss, ocean acidification, or microplastics accumulation—create conditions in which the systemic effects of approaching these boundaries may not be recognized until corrective action is no longer feasible. The epistemic gap is itself a risk factor for systemic collapse.
+
+### Information Ecosystems and Infodemics
+
+The WHO has characterized health-related disinformation as a direct threat to public health, particularly during crisis events where falsehoods can spread faster than corrections. The 2024 Southport riots in the United Kingdom illustrated how delayed or absent official information can create a news vacuum that disinformation rapidly fills, with downstream effects on public behavior and social stability. The OECD adopted a Recommendation on Information Integrity in 2024, attempting to address systemic vulnerabilities in information ecosystems.
+
+### Epistemic Injustice as Systemic Risk
+
+Researchers in social epistemology have identified what is sometimes called "white ignorance"—systematic exclusion of certain communities' knowledge from dominant epistemic frameworks—as a form of epistemic risk with systemic dimensions. When governance and policy rely on knowledge frameworks that structurally exclude relevant perspectives, the resulting decisions may externalize long-term costs onto future societies or marginalized communities, constituting a form of intergenerational epistemic harm.
+
+## Relation to AI Safety
+
+The concept of epistemic systemic risk has significant potential relevance to <EntityLink id="E131">existential risk from AI</EntityLink> and AI alignment research, though explicit connections in the literature remain limited.
+
+One application concerns AI training and deployment at scale. When AI systems trained on flawed assumptions or biased datasets are deployed across interconnected social, economic, and institutional systems, the epistemic errors embedded in those systems may propagate in ways that parallel financial contagion. Unlike idiosyncratic errors confined to individual models, errors arising from shared training data or common architectural choices could produce correlated failures across many deployed systems simultaneously.
+
+A related concern involves <EntityLink id="E93">deceptive alignment</EntityLink>—the possibility that AI systems might behave safely during evaluation while concealing misaligned objectives. If evaluators share common epistemic blind spots about the types of deception to test for, the resulting false confidence in safety could propagate through the research and deployment ecosystem before being corrected. This represents a potential instance of epistemic systemic risk in AI governance.
+
+More broadly, <EntityLink id="E119">epistemic collapse</EntityLink>—the breakdown of collective epistemic norms and shared standards of evidence—could undermine the institutional capacity to recognize and respond to AI risks. The <EntityLink id="E120">epistemic collapse threshold model</EntityLink> attempts to formalize conditions under which epistemic systems lose their self-correcting properties. <EntityLink id="E124">Epistemic sycophancy</EntityLink> in AI systems—where models reinforce users' existing beliefs rather than providing accurate information—represents a specific mechanism through which AI deployment could contribute to broader epistemic systemic risk.
+
+## Criticisms and Limitations
+
+### Definitional Ambiguity
+
+Systemic risk lacks a universally accepted definition even in its home domain of finance. Debates persist about whether it should be defined horizontally (confined to the financial system) or vertically (encompassing broader economic and social effects), and whether its origins should be understood as primarily endogenous or exogenous. Extending the concept into the epistemic domain compounds these ambiguities. Without more precise definitions, "epistemic systemic risk" risks becoming a catch-all label that obscures more than it reveals.
+
+### Measurement Challenges
+
+Systemic risk in finance is notoriously difficult to measure empirically, precisely because of its endogenous nature: the risk builds up within the system itself, in ways that may not be detectable until a crisis occurs. Epistemic systemic risk faces analogous—and arguably more severe—measurement challenges. There is no epistemic equivalent of a bank balance sheet or a market price signal that would allow researchers to monitor the accumulation of epistemic fragility in real time.
+
+### Risk of Overgeneralization
+
+As the concept of systemic risk has expanded beyond finance into health, environment, and social systems, critics have noted a risk of overgeneralization: if everything interconnected counts as systemic risk, the concept loses its analytical bite. Adding an epistemic dimension further broadens the concept's scope, potentially to the point where it becomes difficult to specify what would not count as epistemic systemic risk.
+
+### The Endogeneity Problem
+
+True systemic risk, on some accounts, is fundamentally endogenous—it arises from within the system through feedback dynamics rather than from external shocks. Applying this standard to epistemic systems raises challenging questions: when does a knowledge failure become truly endogenous (generated by the system's own dynamics) rather than the result of external manipulation, adversarial actors, or simple individual error? Existing frameworks do not clearly resolve this question.
+
+### Regulatory and Intervention Risks
+
+In the financial domain, critics have warned that overly broad definitions of systemic risk can justify excessive regulatory intervention, preemptively designating institutions as "systemically important" in ways that create moral hazard. Similar concerns could arise in the epistemic domain: interventions aimed at managing epistemic systemic risk—content moderation, information labeling, centralized fact-checking—carry their own risks of error and abuse.
+
+## Key Uncertainties
+
+Several fundamental questions about epistemic systemic risk remain unresolved:
+
+- **How can epistemic fragility be measured before a crisis?** The absence of good leading indicators is a central limitation of existing systemic risk frameworks, and epistemic systems face additional measurement challenges.
+- **What distinguishes epistemic systemic risk from ordinary misinformation or scientific error?** A clearer account of the threshold conditions—when does an epistemic failure become systemic?—is needed.
+- **How does the deployment of AI systems affect epistemic systemic risk?** Whether AI deployment increases or decreases epistemic fragility in connected social systems is an empirically open question.
+- **Can epistemic systems develop macroprudential-style safeguards?** Financial regulators have developed macroprudential tools aimed at preventing the build-up of systemic risk; analogous institutional designs for epistemic systems are underdeveloped.
+- **What is the relationship between epistemic systemic risk and political power?** Powerful actors can deliberately suppress corrective information or entrench false beliefs; the political economy of epistemic risk management is poorly understood.
+
+## Sources
+
+[^1]: "A Theory of Epistemic Risk" - Philosophy of Science, July 2019, pp. 522–550 (published online 2022). Funded by the Social Sciences and Humanities Research Council of Canada. Defines epistemic risk as credence sensitivity to graded error, linked to expected inaccuracy and information entropy.
+
+[^2]: European Central Bank Working Paper - Systemic risk definitions and measurement, 2009. Surveys forms of systemic risk including endogenous imbalances, herd behavior, and contagion.
+
+[^3]: Systemic Risk Centre, London School of Economics - Research on endogenous systemic risk, emphasizing that systemic risk is generated within complex systems through feedback dynamics rather than solely from external shocks.
+
+[^4]: OECD - Holistic risk management framework, 2003. Introduced systemic risk as embedded in broader social and financial contexts requiring interdisciplinary analysis.
+
+[^5]: Thinking Ahead Institute - Systemic risk paper, 2023. Defines systemic risk as "the possibility of malfunctioning in complex adaptive systems," emphasizing endogenous feedback dynamics.
+
+[^6]: United Nations Office for Disaster Risk Reduction (UNDRR) - Systemic risk briefing. Extends systemic risk analysis to cascading impacts across ecosystems, health, infrastructure, and food sectors.
+
+[^7]: World Health Organization - Framework on health disinformation and infodemics. Identifies disinformation as a direct threat to public health, particularly during large-scale outbreaks.
+
+[^8]: OECD - Recommendation on Information Integrity, 2024. Addresses systemic vulnerabilities in information ecosystems.
+
+[^9]: DTCC Systemic Risk Barometer Survey, 2024. Found that 55% of respondents believe there is a high or very high chance of a high-impact systemic event in 2025, with geopolitical and cyber risks identified as top concerns.
+
+[^10]: Eurac Research - Workshop on conceptual frameworks for interconnected risks related to climate change, disasters, and societal transitions, 2025. Brought together international researchers to support resilient decision-making at the science-policy interface.
