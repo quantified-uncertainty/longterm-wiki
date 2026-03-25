@@ -298,7 +298,7 @@ function EvidenceTable({ evidence }: { evidence: EvidenceRow[] }) {
               <span className={cn("text-muted-foreground", e.isStale && "text-amber-500")}>
                 {e.checkerModel || "-"}
                 {e.isStale && (
-                  <AlertTriangle className="inline h-3 w-3 ml-1 text-amber-500" title="Stale: checked with an outdated model" />
+                  <span title="Stale: checked with an outdated model"><AlertTriangle className="inline h-3 w-3 ml-1 text-amber-500" /></span>
                 )}
               </span>
             </td>
