@@ -1761,6 +1761,10 @@
       type: analysis
     - id: hardware-enabled-governance
       type: approach
+    - id: stop-stealing-our-chips-act
+      type: policy
+    - id: iaps
+      type: organization
   sources:
     - title: Chip Security Act (H.R.3447)
       url: https://www.congress.gov/bill/119th-congress/house-bill/3447/text
@@ -1838,6 +1842,10 @@
       type: policy
     - id: hardware-mechanisms-international-ai-agreements
       type: analysis
+    - id: hardware-enabled-governance
+      type: approach
+    - id: iaps
+      type: organization
   sources:
     - title: Stop Stealing Our Chips Act (S.1473)
       url: https://www.congress.gov/bill/119th-congress/senate-bill/1473/text
@@ -4062,6 +4070,11 @@
       type: analysis
     - id: compute-governance
       type: concept
+    - id: yoshua-bengio
+      type: person
+      relationship: leads
+    - id: chips-alliance
+      type: organization
   sources:
     - title: FlexHEG Interim Report
       url: https://yoshuabengio.org/wp-content/uploads/2024/09/FlexHEG-Interim-Report_2024.pdf

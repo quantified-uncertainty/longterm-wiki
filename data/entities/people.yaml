@@ -3370,6 +3370,11 @@
     - Compute governance research
     - Hardware-enabled governance mechanisms
     - Computing Power and the Governance of AI
+  relatedEntries:
+    - id: rand-corporation
+      type: organization
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - compute-governance
     - ai-policy
@@ -3392,6 +3397,11 @@
   knownFor:
     - Secure Governable Chips report
     - On-chip governance framework
+  relatedEntries:
+    - id: cnas
+      type: organization
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - hardware-governance
     - compute-governance
@@ -3413,6 +3423,11 @@
   knownFor:
     - Secure Governable Chips report
     - Export auditor proposals
+  relatedEntries:
+    - id: iaps
+      type: organization
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - hardware-governance
     - compute-governance
@@ -3472,6 +3487,11 @@
   knownFor:
     - First major compute monitoring framework
     - What does it take to catch a Chinchilla?
+  relatedEntries:
+    - id: openai
+      type: organization
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - compute-governance
     - hardware-governance

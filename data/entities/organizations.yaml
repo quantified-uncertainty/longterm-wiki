@@ -7365,6 +7365,11 @@
     compliance marketplace (GDPR, HIPAA, EU AI Act, ITAR modules), and "Digital
     Embassies" for sovereign AI infrastructure. One of the only dedicated
     startups in the hardware governance space.
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - hardware-governance
     - confidential-computing
@@ -7403,6 +7408,13 @@
     Hosts the Caliptra project (open-source silicon Root of Trust) with
     contributors including AMD, Google, Microsoft, NVIDIA, and Samsung.
     Develops open standards for chip security and interoperability.
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: flexheg
+      type: project
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
   tags:
     - open-source
     - hardware-governance
