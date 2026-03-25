@@ -15,6 +15,7 @@ import {
   getRecordHref,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
+import { isUrl } from "@/components/wiki/factbase/format";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -245,15 +246,19 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 {/* Source URL */}
                 {e.sourceUrl && (
                   <div className="mb-2">
-                    <a
-                      href={e.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 dark:text-blue-400 break-all"
-                    >
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      {e.sourceUrl}
-                    </a>
+                    {isUrl(e.sourceUrl) ? (
+                      <a
+                        href={e.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 dark:text-blue-400 break-all"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        {e.sourceUrl}
+                      </a>
+                    ) : (
+                      <span className="font-mono text-xs break-all">{e.sourceUrl}</span>
+                    )}
                   </div>
                 )}
 
