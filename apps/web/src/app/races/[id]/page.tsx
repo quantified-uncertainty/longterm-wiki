@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchDetailed, fetchFromWikiServer } from "@/lib/wiki-server";
+
+import { fetchFromWikiServer } from "@/lib/wiki-server";
 import {
   RACE_STATUS_COLORS,
   AI_STANCE_COLORS,
@@ -17,6 +19,7 @@ import {
  * during the build).
  */
 export const dynamic = "force-dynamic";
+
 
 interface RaceDetail {
   id: string;
@@ -93,6 +96,7 @@ function extractSourceDomain(url: string): string {
   }
 }
 
+
 export default async function RaceDetailPage({
   params,
 }: {
@@ -100,6 +104,8 @@ export default async function RaceDetailPage({
 }) {
   const { id } = await params;
   const result = await fetchDetailed<RaceDetail>(
+
+  const race = await fetchFromWikiServer<RaceDetail>(
     `/api/political-races/${id}`,
     { revalidate: 300 },
   );
@@ -135,6 +141,8 @@ export default async function RaceDetailPage({
   }
 
   const race = result.data;
+
+  if (!race) return notFound();
 
   const proRegCandidates = race.candidates.filter((c) => c.aiStance === "pro_regulation");
   const antiRegCandidates = race.candidates.filter((c) => c.aiStance === "anti_regulation");
@@ -362,6 +370,10 @@ export default async function RaceDetailPage({
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
             {extractSourceDomain(race.source)}
+
+            className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+          >
+            {race.source}
           </a>
         </div>
       )}

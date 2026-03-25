@@ -3,6 +3,9 @@
 import { Fragment, useState, useMemo } from "react";
 import Link from "next/link";
 import { ChevronRight, ChevronDown } from "lucide-react";
+
+import { useState, useMemo } from "react";
+import Link from "next/link";
 import {
   RACE_STATUS_COLORS,
   AI_STANCE_COLORS,
@@ -125,6 +128,10 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
             {filtered.map((race) => (
               <Fragment key={race.id}>
                 <tr
+
+              <>
+                <tr
+                  key={race.id}
                   className="border-b hover:bg-muted/50 cursor-pointer"
                   onClick={() =>
                     setExpandedRace(expandedRace === race.id ? null : race.id)
@@ -154,6 +161,19 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                         </span>
                       ) : null}
                     </span>
+
+                    <Link
+                      href={`/races/${race.id}`}
+                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {race.name}
+                    </Link>
+                    {race.district && (
+                      <span className="text-muted-foreground ml-1 text-xs">
+                        ({race.district})
+                      </span>
+                    )}
                   </td>
                   <td className="py-2 pr-4">
                     {RACE_LEVEL_LABELS[race.level] ?? race.level}
@@ -177,6 +197,9 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                     >
                       {race.aiAngle ?? "—"}
                     </p>
+
+                  <td className="py-2 pr-4 max-w-xs truncate text-muted-foreground">
+                    {race.aiAngle ?? "—"}
                   </td>
                   <td className="py-2 pr-4 text-center">
                     {race.candidates.length}
@@ -191,6 +214,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                             <tr className="text-left text-muted-foreground">
                               <th className="pb-1 pr-3">Candidate</th>
                               <th className="pb-1 pr-3">Party</th>
+
                               <th className="pb-1 pr-3">Status</th>
                               <th className="pb-1 pr-3">AI Stance</th>
                               <th className="pb-1 pr-3">PAC</th>
@@ -220,6 +244,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                   )}
                                 </td>
                                 <td className="py-1 pr-3 capitalize">{c.party ?? "—"}</td>
+
                                 <td className="py-1 pr-3">{c.status}</td>
                                 <td className="py-1 pr-3">
                                   {c.aiStance ? (
@@ -265,6 +290,8 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                   </tr>
                 )}
               </Fragment>
+
+              </>
             ))}
           </tbody>
         </table>

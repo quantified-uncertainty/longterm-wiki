@@ -113,6 +113,7 @@ import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
 import * as branchesCommands from './commands/branches.ts';
 
+
 const domains = {
   validate: validateCommands,
   analyze: analyzeCommands,
@@ -188,6 +189,7 @@ const domains = {
   bluesky: blueskyCommands,
   races: politicalRacesCommands,
   branches: branchesCommands,
+
 };
 
 const shortcutMap = buildShortcutMap();

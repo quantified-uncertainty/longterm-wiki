@@ -214,6 +214,9 @@ async function seedCommand(
   // ---- Races (8 original + 17 new = 25 total) ----
   const races = [
     // === FEDERAL HOUSE ===
+
+  // ---- Races ----
+  const races = [
     {
       id: "TSXwV8b755",
       name: "NY-12 Democratic Primary 2026",
@@ -227,6 +230,9 @@ async function seedCommand(
       aiAngle: "Flagship AI regulation race: RAISE Act author Alex Bores vs anti-regulation PAC-backed challengers",
       aiAngleSummary: "The NY-12 Democratic primary is the highest-profile race in the 2026 AI policy battle. Alex Bores, author of the RAISE Act, faces challengers backed by Leading the Future ($125M anti-regulation PAC). Think Big PAC spent $1.95M opposing Bores. Jobs and Democracy PAC (Anthropic-backed via Public First Action) supports Bores with $450K. Polymarket has prediction markets: Lasher 47-52%, Bores 19-22%.",
       source: "https://techcrunch.com/2026/03/03/ai-companies-are-spending-millions-to-thwart-this-former-tech-execs-congressional-bid/",
+
+      aiAngleSummary: "The NY-12 Democratic primary is the highest-profile race in the 2026 AI policy battle. Alex Bores, author of the RAISE Act, faces challengers backed by Leading the Future ($125M anti-regulation PAC). Public First Action ($20M, Anthropic-funded) supports Bores. Polymarket has prediction markets on this race.",
+      source: "https://www.nytimes.com/2026/03/15/us/politics/ai-pac-spending-midterms.html",
     },
     {
       id: "LDge8ou24V",
@@ -242,6 +248,9 @@ async function seedCommand(
       outcomeDetails: "Foushee won by <1% (49.18% vs 48.22%) with $1.6M Jobs and Democracy PAC support",
       aiAngle: "Jobs and Democracy PAC (Anthropic-backed) spent $1.6M supporting Foushee. Co-Chair of House Democratic Commission on AI.",
       source: "https://prospect.org/2026/02/25/ai-anthropic-claude-super-pac-valerie-foushee-congress-north-carolina/",
+
+      outcomeDetails: "Incumbent Valerie Foushee won the primary",
+      aiAngle: "Think Big PAC spent against incumbent; Foushee won despite PAC opposition",
     },
     {
       id: "ZyQ5x9tybH",
@@ -256,6 +265,9 @@ async function seedCommand(
       outcomeDetails: "Jesse Jackson Jr. lost comeback attempt despite $1.4M Think Big PAC support",
       aiAngle: "Think Big PAC spent $1.4M backing Jackson Jr.; he lost despite PAC spending",
       source: "https://fortune.com/2026/03/18/ai-crypto-illinois-primary-spending-fairshake-think-big-pac/",
+
+      outcomeDetails: "Jesse Jackson Jr. lost comeback attempt",
+      aiAngle: "American Mission PAC backed Jackson Jr.; he lost despite PAC spending",
     },
     {
       id: "TXjvrAw4pC",
@@ -271,6 +283,9 @@ async function seedCommand(
       outcomeDetails: "Melissa Bean won with $1.1M Think Big PAC support",
       aiAngle: "Think Big PAC spent $1.1M backing Bean; anti-regulation candidate won",
       source: "https://fortune.com/2026/03/18/ai-crypto-illinois-primary-spending-fairshake-think-big-pac/",
+
+      outcomeDetails: "Melissa Bean won the primary",
+      aiAngle: "Anti-regulation PAC-backed candidate won the primary",
     },
     {
       id: "Tm1uIiblgl",
@@ -342,6 +357,12 @@ async function seedCommand(
       source: "https://sanantonioreport.org/texas-35-congressional-district-primary-election-results/",
     },
     // === FEDERAL SENATE ===
+    {
+
+      electionDate: "2026-05-26",
+      status: "active" as const,
+      aiAngle: "Anti-regulation candidate backed by tech PAC spending",
+    },
     {
       id: "fmor5oDhMK",
       name: "Nebraska Senate 2026",
@@ -422,6 +443,10 @@ async function seedCommand(
     },
     // === GOVERNORS ===
     {
+
+      aiAngle: "Senate race with AI policy implications; Ricketts has tech-friendly positions",
+    },
+    {
       id: "WVvIzjS9NL",
       name: "Tennessee Governor 2026",
       raceType: "general" as const,
@@ -451,6 +476,12 @@ async function seedCommand(
     {
       id: "51a0on9XH1",
       name: "California Parents & Kids Safe AI Act",
+
+      aiAngle: "Gubernatorial race with state-level AI policy implications",
+    },
+    {
+      id: "51a0on9XH1",
+      name: "California Kids AI Safety Act",
       raceType: "ballot_measure" as const,
       party: null,
       level: "ballot_measure" as const,
@@ -489,6 +520,10 @@ async function seedCommand(
       measureDescription: "Mandates risk assessments and warning labels for AI products used by minors. Bans AI chatbots simulating human relationships with children. Extends data protection to all under-18. Enables private litigation for AI-caused harm. Bans personal device use at school.",
       aiAngle: "Original Common Sense Media standalone initiative. More restrictive than the joint OpenAI/CSM measure. Enables private lawsuits for AI harm.",
       source: "https://news.ballotpedia.org/2025/12/11/five-ballot-initiatives-filed-in-california-to-regulate-artificial-intelligence-and-its-developers/",
+
+      measureTitle: "Kids AI Safety Act",
+      measureDescription: "Ballot measure to regulate AI systems used by minors in California",
+      aiAngle: "Direct AI regulation ballot measure targeting AI systems and minors",
     },
   ];
 
@@ -556,6 +591,138 @@ async function seedCommand(
     { id: "6C2vi0IKQe", raceId: "eDtnnUSs86", candidateDisplayName: "Against (OpenAI)", status: "running" as const, aiStance: "anti_regulation" as const },
     { id: "A2d7Kgnw0b", raceId: "jH4sV9WMpw", candidateDisplayName: "For (Common Sense Media)", status: "running" as const, aiStance: "pro_regulation" as const },
     { id: "RUsej9M8Lc", raceId: "jH4sV9WMpw", candidateDisplayName: "Against", status: "running" as const, aiStance: "anti_regulation" as const },
+
+  // ---- Candidates ----
+  const candidates = [
+    // NY-12
+    {
+      id: "fxl5cRngKV",
+      raceId: "TSXwV8b755",
+      candidateEntityId: "W2B4vrLpsU",
+      candidateDisplayName: "Alex Bores",
+      status: "running" as const,
+      party: "democrat",
+      aiStance: "pro_regulation" as const,
+      pacEntityId: "NeUHBH9hGa",
+      pacDisplayName: "Public First Action",
+      pacAmount: 5000000,
+      pacPosition: "support" as const,
+      endorsements: "RAISE Act author, Anthropic-backed PAC support",
+    },
+    {
+      id: "YbGr4jFPfq",
+      raceId: "TSXwV8b755",
+      candidateEntityId: "YKtqDKysGb",
+      candidateDisplayName: "Rebecca Lasher",
+      status: "running" as const,
+      party: "democrat",
+      aiStance: "anti_regulation" as const,
+      pacEntityId: "iqEF0amsJM",
+      pacDisplayName: "Think Big PAC",
+      pacAmount: 8000000,
+      pacPosition: "support" as const,
+    },
+    {
+      id: "caw46R0ZMD",
+      raceId: "TSXwV8b755",
+      candidateEntityId: "6b2Vi6bhfX",
+      candidateDisplayName: "Brad Schlossberg",
+      status: "running" as const,
+      party: "democrat",
+      aiStance: "neutral" as const,
+    },
+    {
+      id: "zIP2VOi2f2",
+      raceId: "TSXwV8b755",
+      candidateEntityId: "6lQRx57F7M",
+      candidateDisplayName: "Mike Conway",
+      status: "running" as const,
+      party: "democrat",
+      aiStance: "neutral" as const,
+    },
+    // NC-4
+    {
+      id: "py3bfUWyRp",
+      raceId: "LDge8ou24V",
+      candidateEntityId: "aJJNryIYDC",
+      candidateDisplayName: "Valerie Foushee",
+      isIncumbent: true,
+      isWinner: true,
+      status: "won" as const,
+      party: "democrat",
+      aiStance: "neutral" as const,
+    },
+    // IL-2
+    {
+      id: "9UEXcsNoEs",
+      raceId: "ZyQ5x9tybH",
+      candidateEntityId: "69tAH5XWON",
+      candidateDisplayName: "Jesse Jackson Jr.",
+      status: "lost" as const,
+      party: "democrat",
+      aiStance: "anti_regulation" as const,
+      pacEntityId: "GGcOTR25tl",
+      pacDisplayName: "American Mission PAC",
+      pacAmount: 3000000,
+      pacPosition: "support" as const,
+    },
+    // IL-8
+    {
+      id: "oS2G8YGDOL",
+      raceId: "TXjvrAw4pC",
+      candidateEntityId: "PnwPk4Vcau",
+      candidateDisplayName: "Melissa Bean",
+      isWinner: true,
+      status: "won" as const,
+      party: "democrat",
+      aiStance: "anti_regulation" as const,
+    },
+    // TX-10
+    {
+      id: "8VK1JjVxdR",
+      raceId: "Tm1uIiblgl",
+      candidateEntityId: "Zs43I3aG72",
+      candidateDisplayName: "Jake Gober",
+      status: "running" as const,
+      party: "republican",
+      aiStance: "anti_regulation" as const,
+    },
+    // NE Senate
+    {
+      id: "UPY0UhmHv8",
+      raceId: "fmor5oDhMK",
+      candidateEntityId: "E6W6VILiNn",
+      candidateDisplayName: "Pete Ricketts",
+      isIncumbent: true,
+      status: "running" as const,
+      party: "republican",
+      aiStance: "anti_regulation" as const,
+    },
+    // TN Governor
+    {
+      id: "s6sZkb16IO",
+      raceId: "WVvIzjS9NL",
+      candidateEntityId: "enf2UNKyDx",
+      candidateDisplayName: "Marsha Blackburn",
+      status: "running" as const,
+      party: "republican",
+      aiStance: "mixed" as const,
+    },
+    // CA ballot measure sides
+    {
+      id: "t7iy3eb2x2",
+      raceId: "51a0on9XH1",
+      candidateDisplayName: "For",
+      status: "running" as const,
+      aiStance: "pro_regulation" as const,
+    },
+    {
+      id: "4nGjL5y6jX",
+      raceId: "51a0on9XH1",
+      candidateDisplayName: "Against",
+      status: "running" as const,
+      aiStance: "anti_regulation" as const,
+    },
   ];
 
   const candidateResult = await apiRequest<{ upserted: number }>(

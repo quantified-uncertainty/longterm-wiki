@@ -74,6 +74,7 @@ const CandidatesAllQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+
 // ---- Sync schemas ----
 
 const SyncRaceItemSchema = z.object({
@@ -355,6 +356,8 @@ const politicalRacesApp = new Hono()
 
   // ---- GET /candidates/all ----
   .get("/candidates/all", zv("query", CandidatesAllQuery), async (c) => {
+
+  .get("/candidates/all", zv("query", AllQuery), async (c) => {
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 

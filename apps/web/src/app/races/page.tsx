@@ -75,6 +75,43 @@ export default async function RacesPage() {
     candidates: candidatesByRace.get(race.id) ?? [],
   }));
 
+  // Fetch races (all, with ISR revalidation)
+  const racesData = await fetchFromWikiServer<{
+    races: RaceApiRow[];
+    total: number;
+  }>("/api/political-races/all?limit=200", { revalidate: 300 });
+
+  const stats = await fetchFromWikiServer<StatsApiResult>(
+    "/api/political-races/stats",
+    { revalidate: 300 },
+  );
+
+  // Fetch each race's candidates
+  const races = racesData?.races ?? [];
+  const raceRows: RaceRow[] = await Promise.all(
+    races.map(async (race) => {
+      const detail = await fetchFromWikiServer<{
+        candidates: CandidateRow[];
+      }>(`/api/political-races/${race.id}`, { revalidate: 300 });
+
+      return {
+        id: race.id,
+        name: race.name,
+        raceType: race.raceType,
+        party: race.party,
+        level: race.level,
+        state: race.state,
+        district: race.district,
+        electionDate: race.electionDate,
+        status: race.status,
+        outcome: race.outcome,
+        outcomeDetails: race.outcomeDetails,
+        aiAngle: race.aiAngle,
+        candidates: detail?.candidates ?? [],
+      };
+    }),
+  );
+
   const raceStats = stats?.races ?? { total: 0, upcoming: 0, active: 0, resolved: 0 };
   const candidateStats = stats?.candidates ?? { total: 0 };
 
@@ -94,6 +131,10 @@ export default async function RacesPage() {
         <ProfileStatCard label="Upcoming" value={String(raceStats.upcoming)} />
         <ProfileStatCard label="Active" value={String(raceStats.active)} />
         <ProfileStatCard label="Resolved" value={String(raceStats.resolved)} />
+
+        <ProfileStatCard label="Total Races" value={String(raceStats.total)} />
+        <ProfileStatCard label="Upcoming" value={String(raceStats.upcoming)} />
+        <ProfileStatCard label="Active" value={String(raceStats.active)} />
         <ProfileStatCard label="Candidates" value={String(candidateStats.total)} />
       </div>
 
