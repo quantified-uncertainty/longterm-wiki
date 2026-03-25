@@ -20,7 +20,7 @@ facts:
     property: total-funding
     value: 2.5e+7
     asOf: 2022-12
-    source: https://techcrunch.com/2022/07/20/conjecture-raises-25m-seed-round/
+    source: https://www.conjecture.dev/
     notes: "Raised $25M seed round in 2022; investors included Nat Friedman and
       Daniel Gross"
 
