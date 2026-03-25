@@ -1,0 +1,35 @@
+entity: etCe7rcH1g
+facts:
+  - id: f_ej_founded
+    property: founded-date
+    value: "2020-07"
+    source: https://en.wikipedia.org/wiki/Sneha_Revanur
+    notes: "Founded July 2020 by Sneha Revanur"
+
+  - id: f_ej_legal
+    property: legal-structure
+    value: "501(c)(4) civic league. Operates as fiscal project of Future Incubator (joint program of March On and Future Coalition)."
+    source: https://www.influencewatch.org/non-profit/encode-justice/
+
+  - id: f_ej_members
+    property: scale
+    value: "1,000+ members across 40+ US states and 30+ countries. 15,000+ students participated in workshops."
+    asOf: 2025
+    source: https://www.berkshireeagle.com/news/northern_berkshires/williams-college-sneha-revanur-encode-justice/article_8d506e62-ebca-11ee-8bea-f39f98185cf4.html
+
+  - id: f_ej_ai2030
+    property: campaign
+    value: "AI 2030 Plan: 22 goals for global AI governance by 2030 (released ahead of Seoul AI Summit, 2024). Endorsed by Mary Robinson, Daron Acemoglu, Yoshua Bengio, Audrey Tang."
+    asOf: 2024
+    source: https://ai2030.encodejustice.org/
+
+  - id: f_ej_sb1047
+    property: campaign
+    value: "Co-sponsored California SB 1047 alongside CAIS Action Fund."
+    asOf: 2024
+    source: https://fortune.com/2024/07/15/california-ai-bill-sb-1047-fierce-debate-regulation-safety/
+
+  - id: f_ej_funding
+    property: funding-sources
+    value: "Funders include Responsible Technology Youth Power Fund, Archewell Foundation, Heising-Simons Foundation, We Are Family Foundation. Does not accept corporate funding, foreign government funds, or donations from top AI company executives."
+    source: https://www.influencewatch.org/non-profit/encode-justice/

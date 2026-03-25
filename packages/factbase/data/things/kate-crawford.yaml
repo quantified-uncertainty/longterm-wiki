@@ -1,2 +1,18 @@
 entity: 77SnPuPnk8
-facts: []
+facts:
+  [
+    {
+        id: rgsieq4yjg,
+        property: born-year,
+        value: 1974,
+        source: https://www.wikidata.org/wiki/Q6375450,
+        notes: From Wikidata Q6375450
+      },
+    {
+        id: 00mxokmZmg,
+        property: education,
+        value: University of Sydney,
+        source: https://www.wikidata.org/wiki/Q6375450,
+        notes: From Wikidata Q6375450
+      }
+  ]

@@ -6,7 +6,8 @@ facts:
     value: 150
     asOf: 2025-12
     source: https://horizonpublicservice.org/horizons-2025-year-in-review/
-    notes: "150+ early- and mid-career professionals placed into emerging technology policy across 3 years"
+    notes: "150+ early- and mid-career professionals placed into emerging technology
+      policy across 3 years"
 
   # ── Cohort sizes ───────────────────────────────────────────────
   - id: f_1t3Jia6d99
@@ -37,7 +38,8 @@ facts:
     value: 113000
     asOf: 2025-01
     source: https://horizonpublicservice.org/horizon-fellowship-applicant-faqs/
-    notes: "Annual stipend for fellows; $75K for junior fellows; plus $15K health/professional development"
+    notes: "Annual stipend for fellows; $75K for junior fellows; plus $15K
+      health/professional development"
 
   # ── Placement rate ─────────────────────────────────────────────
   - id: f_VwmWkr3vSs
@@ -60,3 +62,8 @@ facts:
     value: "2022"
     source: https://horizonpublicservice.org/about-us/
     notes: "Founded by Remco Zwetsloot (ex-CSET Georgetown) and Joan Gass"
+  - id: aCpSS1L01g
+    property: website
+    value: https://www.horizonpublicservice.org
+    source: https://www.wikidata.org/wiki/Q121852509
+    notes: From Wikidata Q121852509

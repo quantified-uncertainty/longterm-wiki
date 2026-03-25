@@ -1,2 +1,11 @@
 entity: R8tDuupBTt
-facts: []
+facts:
+  [
+    {
+        id: mvP0UGboWw,
+        property: born-year,
+        value: 1957,
+        source: https://www.wikidata.org/wiki/Q6968733,
+        notes: From Wikidata Q6968733
+      }
+  ]

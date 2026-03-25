@@ -1,0 +1,112 @@
+[
+  {
+    "personId": "new: Jaime Raldua Veuthey",
+    "organizationId": "5WqgebIWFQ",
+    "role": "CEO",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as CEO on Apart Research impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "HwM6OF6Ewg",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Founder, Board Member",
+    "roleType": "key-person",
+    "startDate": "2022",
+    "endDate": null,
+    "isFounder": true,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Board Member on impact page; confirmed as founder by multiple external sources"
+  },
+  {
+    "personId": "new: Jason Hoelscher-Obermaier",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Director of Research",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Director of Research on impact page (verified 2026-03-25); previously co-Director per 2024 year-in-review"
+  },
+  {
+    "personId": "new: Natalia Perez-Campanero Antolin",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Research Lead",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Research Lead on impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "new: Jacob Haimes",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Research Manager",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Research Manager on impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "new: Al-Hussein Saqr",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Operations Coordinator",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Operations Coordinator on impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "new: Clement Neo",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Lab Advisor",
+    "roleType": "key-person",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Lab Advisor on impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "Z62bQynY4g",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Advisor",
+    "roleType": "board",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Buck Shlegeris (CEO of Redwood Research) listed as Advisor on impact page"
+  },
+  {
+    "personId": "new: Christian Schroeder de Witt",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Research Advisor",
+    "roleType": "board",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Research Advisor on impact page (verified 2026-03-25)"
+  },
+  {
+    "personId": "new: Nick Fitz",
+    "organizationId": "5WqgebIWFQ",
+    "role": "Strategy Advisor",
+    "roleType": "board",
+    "startDate": null,
+    "endDate": null,
+    "isFounder": false,
+    "source": "https://apartresearch.com/impact",
+    "notes": "Listed as Strategy Advisor on impact page (verified 2026-03-25)"
+  }
+]

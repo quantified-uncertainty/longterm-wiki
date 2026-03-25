@@ -70,12 +70,6 @@ facts:
     value: "Chinese Policy Translations Program — translates Chinese government AI and technology policy documents into English, led by Ben Murphy. Major source of English-language Chinese AI policy intelligence for US policymakers."
     source: https://cset.georgetown.edu/team/
 
-  - id: f_pobqaMrCKO
-    property: leadership
-    value: "Helen Toner serving as Interim Executive Director (former OpenAI board member). Mallory Stewart is CEO (former State Dept assistant secretary). Jason Matheny was founding director (now RAND CEO)."
-    asOf: 2026-03
-    source: https://cset.georgetown.edu/team/
-
   - id: f_QGx6d8Eut1
     property: grant-received
     value: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"

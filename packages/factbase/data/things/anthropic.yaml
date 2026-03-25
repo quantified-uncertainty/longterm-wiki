@@ -12,14 +12,14 @@ facts:
     property: revenue
     value: 9e+8
     asOf: 2024-06
-    source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
+    source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "ARR mid-2024"
 
   - id: f_i59sRXPSZw
     property: revenue
     value: 1e+9
     asOf: 2024-12
-    source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
+    source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "ARR reached ~$1B by end of 2024"
 
   - id: f_pL4wK8vF2j
@@ -33,7 +33,7 @@ facts:
     property: revenue
     value: 4e+9
     asOf: 2025-07
-    source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
+    source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "ARR at time of Series F announcement"
 
   - id: f_5KhEeJqXzg
@@ -47,7 +47,7 @@ facts:
     property: revenue
     value: 9e+9
     asOf: 2025-12
-    source: https://uk.finance.yahoo.com/news/anthropic-arr-surges-19-billion-151210607.html
+    source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "Run-rate exceeding $9B at end of 2025"
 
   - id: f_esWJIYxVFQ
@@ -77,7 +77,7 @@ facts:
     property: valuation
     value: 4e+9
     asOf: 2022-04
-    source: https://techcrunch.com/2022/04/28/anthropic-raises-580-million-in-series-b-funding/
+    source: https://www.anthropic.com/news/anthropic-raises-series-b-to-build-safe-reliable-ai
     notes: "Series B post-money valuation ($580M raised, led by Spark Capital)"
 
   - id: f_P58xiOXz6l
@@ -213,7 +213,7 @@ facts:
       - 1500
       - 2000
     asOf: 2025-09
-    source: https://www.cnbc.com/2025/09/26/anthropic-series-f-funding.html
+    source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
     notes: "At Series F announcement; tripling international headcount was announced but not yet completed"
 
   - id: f_BdGi5l9dOg

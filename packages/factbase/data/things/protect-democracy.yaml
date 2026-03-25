@@ -33,12 +33,6 @@ facts:
     source: https://protectdemocracy.org
     notes: "Filed July 2025"
 
-  - id: f_0Tf1iUNZwi
-    property: leadership
-    value: "Ian Bassin serves as Co-founder and Executive Director"
-    asOf: 2026-03
-    source: https://protectdemocracy.org/about/
-
   - id: f_U6QEB8QMYJ
     property: litigation-detail
     value: "Pallek v. Rollins (1:25-cv-01650, D.D.C., Judge Jia M. Cobb) — Plaintiffs include SNAP recipients, MAZON, EPIC. Counsel: National Student Legal Defense Network, Protect Democracy, National Center for Law and Economic Justice. USDA demanded SSNs and addresses of all SNAP recipients since Jan 2020. Plaintiffs filed TRO (July 17, 2025), motion for summary judgment (Aug 29, 2025)."

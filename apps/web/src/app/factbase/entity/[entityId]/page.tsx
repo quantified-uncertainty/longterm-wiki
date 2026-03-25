@@ -241,7 +241,11 @@ function FactValueDisplay({ fact, property }: { fact: Fact; property?: Property 
       </span>
     );
   }
-  return <span>{formatKBFactValue(fact, property?.unit, property?.display)}</span>;
+  // Guard against formatKBFactValue accidentally returning a non-string
+  // (which would render as "[object Object]" in JSX).
+  const formatted = formatKBFactValue(fact, property?.unit, property?.display);
+  const safeFormatted = typeof formatted === "string" ? formatted : JSON.stringify(formatted);
+  return <span>{safeFormatted}</span>;
 }
 
 /** Hero stat card for a key metric. */

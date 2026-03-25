@@ -3,41 +3,130 @@ facts:
   - id: f_jnMi5YScdW
     property: founded-date
     value: "2022"
-    source: https://apartresearch.com/
-    notes: "Founded by Esben Kran; approximately 2.5 years of operation referenced as of mid-2025"
+    source: https://www.linkedin.com/company/apartresearch
+    notes: "Founded by Esben Kran; no exact month confirmed on primary site"
 
   - id: f_V6B3W78L6P
     property: headquarters
     value: "Copenhagen, Denmark"
-    source: https://kran.ai/
-    notes: "Founder Esben Kran is based in Copenhagen"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Remote-first organization with physical presence in Copenhagen (EnigmA co-working space)"
 
   - id: f_FDyq9EZAbL
     property: description
     value: >-
-      AI safety research organization that accelerates safety research through hackathons,
-      fellowships, and collaborative sprints. Has organized 55+ research sprints with 6,000+
-      participants across 200+ global locations, producing 22+ peer-reviewed publications.
-    asOf: 2025-12
-    source: https://apartresearch.com/
+      Independent AI safety research organization that accelerates safety research through
+      hackathons, fellowships, and collaborative sprints. Has hosted 42+ open-to-all research
+      sprints with 3,000+ participants across 50+ global locations, producing 22 peer-reviewed
+      publications at venues including NeurIPS, ICLR, and ACL.
+    asOf: 2026-03
+    source: https://apartresearch.com/impact
+    notes: "Participant count from impact page (3,000) and donate page (3,500+); sprint count verified at 42"
 
   - id: f_UFFN6omUo5
     property: headcount
     value:
-      - 5
-      - 15
-    asOf: 2025-06
-    notes: "Estimate; no published source. Small core team running global hackathon programs"
+      - 4
+      - 8
+    asOf: 2025-11
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "EA Forum post mentions ~4 full-time staff; budget plans for 8 FTE at $691,200 (73% of total)"
 
   - id: f_dpUiLVq0nA
     property: legal-structure
-    value: "Nonprofit research institute"
-    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "Operates as nonprofit; exploring for-profit AI safety models as of 2025"
+    value: "Nonprofit (501(c)(3) via fiscal sponsor Ashgro Inc)"
+    source: https://apartresearch.com/donate
+    notes: "Tax-deductible donations through fiscal sponsor Ashgro Inc, a 501(c)(3) organization"
 
   - id: f_LMWMZbT6an
     property: founded-by
     value:
       - !ref HwM6OF6Ewg
-    source: https://apartresearch.com/person/esben-kran
-    notes: "Founded by Esben Kran at age 22 after leaving grad school"
+    source: https://apartresearch.com/impact
+    notes: "Founded by Esben Kran at age 22 after leaving grad school; currently Board Member per impact page"
+
+  - id: f_aR7kYmPfnZ
+    property: annual-budget
+    value: 954800
+    asOf: 2025
+    source: https://apartresearch.com/donate/2025
+    notes: "2025 fundraising target: $954,800. Breakdown: staff (73%, $691,200 for 8 FTE), programs (16%, $156,000), indirect/fiscal sponsorship (11%, $107,600)"
+
+  - id: f_bQ8mNcRtYz
+    property: total-funding
+    value: 700000
+    asOf: 2024-12
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Raised approximately $700,000 in 2024. Prior 12 months (before mid-2025): ~$680,000"
+
+  - id: f_cT9pQdSwXa
+    property: total-funding
+    value: 619921
+    asOf: 2025-07
+    source: https://apartresearch.com/donate/2025
+    notes: "2025 Manifund campaign raised $619,921 of $954,800 goal by close"
+
+  - id: f_dV2rSfTxYb
+    property: publication-count
+    value: 22
+    asOf: 2026-03
+    source: https://apartresearch.com/impact
+    notes: "22 publications in AI safety; 2 received oral awards at ICLR 2025 (top 1.8% of accepted papers)"
+
+  - id: f_eW3sTgUyZc
+    property: sprint-count
+    value: 42
+    asOf: 2026-03
+    source: https://apartresearch.com/impact
+    notes: "42 open-to-all research sprints hosted"
+
+  - id: f_fX4tUhVzAd
+    property: research-report-count
+    value: 485
+    asOf: 2026-03
+    source: https://apartresearch.com/impact
+    notes: "485 event research reports submitted across all sprints"
+
+  - id: f_gY5uViWaBe
+    property: fellowship-count
+    value: 100
+    asOf: 2026-03
+    source: https://apartresearch.com/impact
+    notes: "100+ researchers through the Apart Fellowship program"
+
+  - id: f_hZ6vWjXbCf
+    property: talent-placement-count
+    value: 30
+    asOf: 2025
+    source: https://apartresearch.com/donate/2025
+    notes: "30 placements at 20+ organizations in AI safety"
+
+  - id: f_iA7wXkYcDg
+    property: funder
+    value: "Long-Term Future Fund"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Previously a primary funder; declined a recent grant despite high rating due to LTFF's own funding constraints"
+
+  - id: f_jB8xYlZdEh
+    property: funder
+    value: "Survival and Flourishing Fund"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Previously a primary funder"
+
+  - id: f_kC9yZmAfFi
+    property: funder
+    value: "Open Philanthropy"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Minority funder with limited engagement"
+
+  - id: f_lD0zAnBgGj
+    property: funder
+    value: "OpenAI Inc 501(c)(3)"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Restricted funding for specific research projects"
+
+  - id: f_mE1aBoCxHk
+    property: funder
+    value: "Schmidt Sciences"
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Restricted funding for specific research projects"

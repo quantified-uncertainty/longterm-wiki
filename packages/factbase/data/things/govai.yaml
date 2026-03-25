@@ -109,7 +109,7 @@ facts:
     property: program
     value: "GovAI Fellowship — competitive research fellowship program bringing early-career researchers to work on AI governance for 3-12 months. 100+ alumni placed across DeepMind, OpenAI, Anthropic, government agencies, and think tanks."
     asOf: 2025
-    source: https://www.governance.ai/fellowship
+    source: https://www.governance.ai/
     notes: "Key field-building program; alumni network is a significant output"
 
   - id: f_eUWSvVFjob

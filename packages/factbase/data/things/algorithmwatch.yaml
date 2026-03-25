@@ -1,0 +1,38 @@
+entity: hyxooEhMZl
+facts:
+  - id: f_aw_founded
+    property: founded-date
+    value: "2017"
+    source: https://algorithmwatch.org/en/transparency/
+
+  - id: f_aw_hq
+    property: headquarters
+    value: "Boyenstrasse 41, 10115 Berlin, Germany"
+    source: https://algorithmwatch.org/en/transparency/
+    notes: "Also has a Zurich presence"
+
+  - id: f_aw_legal
+    property: legal-structure
+    value: "German nonprofit (gGmbH), tax-exempt through March 2026. Tax ID 27/640/02364."
+    source: https://algorithmwatch.org/en/transparency/
+
+  - id: f_aw_budget
+    property: annual-revenue
+    value: "1200000"
+    unit: EUR
+    asOf: 2022
+    source: https://algorithmwatch.org/en/transparency/
+    notes: "2022: grants EUR 1.12M + donations EUR 60K + other EUR 17K. Major funders: Alfred Landecker Foundation, BMBF, BMUV, Deutsche Postcode Lotterie"
+
+  - id: f_aw_staff
+    property: employee-count
+    value: "20"
+    asOf: 2024-02
+    source: https://algorithmwatch.org/en/transparency/
+    notes: "20 employees (full/part-time); team page lists 43 including fellows, interns, advisors"
+
+  - id: f_aw_fellowship
+    property: program
+    value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026): up to 6 European journalists/researchers, EUR 7,400 each, 6-month investigation with editorial support and mentorship"
+    asOf: 2025
+    source: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/

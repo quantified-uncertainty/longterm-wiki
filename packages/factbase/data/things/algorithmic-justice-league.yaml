@@ -3,8 +3,8 @@ facts:
   - id: f_LQXN188UWa
     property: founded-date
     value: "2016"
-    source: https://www.ajl.org/about
-    notes: "Founded 2016 by Dr. Joy Buolamwini"
+    source: https://en.wikipedia.org/wiki/Algorithmic_Justice_League
+    notes: "Founded 2016 by Dr. Joy Buolamwini. ajl.org/about confirms founder but not year."
 
   - id: f_27RCJxAJk4
     property: headquarters
@@ -13,13 +13,15 @@ facts:
 
   - id: f_0YRkRbhXvy
     property: project
-    value: "Freedom Flyers Campaign investigating TSA facial recognition at 250+ US airports; published 'Comply To Fly?' report"
+    value: "Freedom Flyers Campaign investigating TSA facial recognition at 250+ US
+      airports; published 'Comply To Fly?' report"
     asOf: 2025
     source: https://www.ajl.org/flyreport
 
   - id: f_B5jDAHq7Pu
     property: project
-    value: "CRASH Project (Community Reporting of Algorithmic System Harms) — bug-bounty programs for algorithmic bias, launched July 2020"
+    value: "CRASH Project (Community Reporting of Algorithmic System Harms) —
+      bug-bounty programs for algorithmic bias, launched July 2020"
     asOf: 2020-07
     source: https://www.ajl.org
 
@@ -28,3 +30,49 @@ facts:
     value: "Dr. Joy Buolamwini elected to NAACP Legal Defense Fund Board"
     asOf: 2025
     source: https://www.ajl.org
+
+  - id: RZYaiQovGw
+    property: website
+    value: https://www.ajl.org
+    source: https://www.wikidata.org/wiki/Q104880166
+    notes: From Wikidata Q104880166
+
+  - id: f_n1IL7VXouL
+    property: publication
+    value: "Gender Shades study (2018) by Buolamwini and Gebru demonstrated intersectional accuracy disparities in commercial facial recognition from IBM, Microsoft, and Face++. Dark-skinned women had highest error rates; light-skinned men had lowest. Over 4,900 citations on Semantic Scholar."
+    asOf: 2026-03
+    source: https://www.semanticscholar.org/paper/Gender-Shades:-Intersectional-Accuracy-Disparities-Buolamwini-Gebru/18858cc936947fc96b5c06bbe3c6c2faa5614540
+    notes: "Citation count as of March 2026. IBM issued a public response acknowledging the research. Study shaped industry practice, policy agendas, and academic research."
+
+  - id: f_QY6TVHSOt4
+    property: documentary
+    value: "Coded Bias (2020), directed by Shalini Kantayya, premiered at Sundance Film Festival. 90 minutes. Released on Netflix April 5, 2021 and broadcast on PBS Independent Lens. 100% Rotten Tomatoes score (52 reviews, 7.9/10 average). Emmy-nominated for Outstanding Science/Technology Documentary."
+    asOf: 2021
+    source: https://en.wikipedia.org/wiki/Coded_Bias
+    notes: "Also won Calgary IFF Best International Documentary, Social Impact Media Awards Best Director, and was nominated for NAACP Image Award Outstanding Documentary."
+
+  - id: f_dCQfLNdiI1
+    property: recognition
+    value: "Named one of Fast Company's 10 Most Innovative AI Companies in the World"
+    asOf: 2021
+    source: https://www.media.mit.edu/posts/algorithmic-justice-league-fast-company-recognition/
+
+  - id: f_ahaNfGqaL9
+    property: funding-sources
+    value: "Funded by Ford Foundation, MacArthur Foundation, Alfred P. Sloan Foundation, Rockefeller Foundation, Mozilla Foundation, and individual donors"
+    asOf: 2025
+    source: https://en.wikipedia.org/wiki/Algorithmic_Justice_League
+    notes: "Combined at least $1.9M from Ford, MacArthur, Rockefeller, Sloan, and Mozilla foundations. Specific individual grant amounts not publicly disclosed."
+
+  - id: f_Tqwnb9PLM5
+    property: advocacy
+    value: "Dr. Joy Buolamwini testified before the House Committee on Science, Space, and Technology on AI and facial recognition bias"
+    asOf: 2019
+    source: https://en.wikipedia.org/wiki/Algorithmic_Justice_League
+
+  - id: f_EFm0RvCrbg
+    property: research-impact
+    value: "Over 70 AI researchers publicly signed letter defending AJL's research following Amazon's challenge to the Gender Shades findings on their Rekognition system"
+    asOf: 2019
+    source: https://www.ajl.org/about
+    notes: "Amazon initially disputed the findings; later announced moratorium on police use of Rekognition in 2020."

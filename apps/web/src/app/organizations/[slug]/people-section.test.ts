@@ -88,7 +88,7 @@ describe("pgPersonnelToEntries", () => {
     expect(entries[0].name).toBe("Resolved Name");
   });
 
-  it("uses personId as last-resort fallback name", () => {
+  it("humanizes slug-format personId as last-resort fallback name", () => {
     const row = makeRow({
       personId: "fallback-id",
       person: { entityId: null, slug: null, name: null },
@@ -96,7 +96,40 @@ describe("pgPersonnelToEntries", () => {
     });
 
     const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("fallback-id");
+    expect(entries[0].name).toBe("Fallback Id");
+  });
+
+  it("returns 'Unknown' for bare stableId personId", () => {
+    const row = makeRow({
+      personId: "AbCdEfG12H",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: null,
+    });
+
+    const entries = pgPersonnelToEntries([row]);
+    expect(entries[0].name).toBe("Unknown");
+  });
+
+  it("returns 'Unknown' for numeric PK personId", () => {
+    const row = makeRow({
+      personId: "12345",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: null,
+    });
+
+    const entries = pgPersonnelToEntries([row]);
+    expect(entries[0].name).toBe("Unknown");
+  });
+
+  it("strips 'new:' prefix from personId fallback", () => {
+    const row = makeRow({
+      personId: "new:Jane Smith",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: null,
+    });
+
+    const entries = pgPersonnelToEntries([row]);
+    expect(entries[0].name).toBe("Jane Smith");
   });
 
   it("sets isCurrent=false when endDate is present", () => {

@@ -13,19 +13,70 @@ facts:
 
   - id: f_lHViEp5E6w
     property: publication
-    value: "Freedom on the Net 2025 documented the 15th consecutive year of internet freedom decline globally"
-    asOf: 2025
-    source: https://freedomhouse.org/country/united-states/freedom-net/2025
+    value: "Freedom on the Net 2024 documented the 14th consecutive year of internet freedom decline globally"
+    asOf: 2024
+    source: https://freedomhouse.org/report/freedom-net/2024/struggle-trust-online
+    notes: "2024 global report confirmed 14th year. 2025 edition not yet released at time of check."
 
   - id: f_8pFBTDGEEK
     property: report
-    value: "Reported on Trump administration's use of AI-enabled immigration surveillance including facial recognition, social media monitoring, and algorithmic visa screening"
+    value: "Reported on Trump administration's use of AI-enabled immigration
+      surveillance including facial recognition, social media monitoring, and
+      algorithmic visa screening"
     asOf: 2025
     source: https://freedomhouse.org/article/trumps-immigration-crackdown-built-ai-surveillance-and-disregard-due-process
 
   - id: f_LSBLBnIb3W
     property: organizational-impact
-    value: "Significantly impacted by Trump administration foreign aid freezes that disrupted Freedom House programs in multiple countries"
+    value: "Terminated over 80% of global programs and conducted significant staff reductions due to Trump administration foreign aid freeze under Executive Order 14169"
     asOf: 2025
-    source: https://freedomhouse.org
-    notes: "Impact from 2025 foreign aid freezes; specific program count unverified from primary sources"
+    source: https://en.wikipedia.org/wiki/Freedom_House
+    notes: "Federal grants comprised ~$79.6M of $93.7M revenue (FY 2022), making Freedom House heavily dependent on government funding."
+
+  - id: jjwc2m9hxQ
+    property: headcount
+    value: 120
+    source: https://www.wikidata.org/wiki/Q242424
+    notes: From Wikidata Q242424
+
+  - id: BR2bufFQdw
+    property: website
+    value: https://freedomhouse.org/
+    source: https://www.wikidata.org/wiki/Q242424
+    notes: From Wikidata Q242424
+
+  - id: f_RysUmFd7UE
+    property: annual-revenue
+    value: "90305550"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/131656647
+    notes: "FY ending June 2024 (EIN 13-1656647). Total expenses $88,758,068. Contributions $89,972,151 (99.6% of revenue). Previous year (FY 2023) revenue was $93.5M."
+
+  - id: f_vp0kpHX4Xa
+    property: staff-count
+    value: "Approximately 230 staff members worldwide with field offices in about a dozen countries including Ukraine, Hungary, Serbia, Jordan, Mexico, and Central Asia"
+    asOf: 2024
+    source: https://en.wikipedia.org/wiki/Freedom_House
+    notes: "Pre-2025 aid freeze figure. Significant reductions occurred in 2025 after >80% of programs were terminated."
+
+  - id: f_l6P2HLC8gP
+    property: publication
+    value: "Freedom in the World 2026 report documented 20th consecutive year of global freedom decline. Assessed 195 countries and 13 territories. Only 21% of world's people live in Free countries, down from 46% two decades ago. 54 countries deteriorated vs 35 improved."
+    asOf: 2026-03
+    source: https://freedomhouse.org/report/freedom-world/2026/growing-shadow-autocracy
+    notes: "Report titled 'The Growing Shadow of Autocracy.' Published March 2026."
+
+  - id: f_QfeQYM2IbX
+    property: program
+    value: "Three flagship annual reports: Freedom in the World (195 countries + 13 territories, since 1973), Freedom on the Net (72 countries), and Nations in Transit (29 countries in Central Europe to Central Asia, 1996-2024)"
+    asOf: 2025
+    source: https://freedomhouse.org/reports
+    notes: "Freedom of the Press report was published 1980-2017 but is now discontinued."
+
+  - id: f_i7LxWlx6cH
+    property: funding-breakdown
+    value: "Federal grants comprised $79.6M of $93.7M total revenue (85%) in FY 2022. Additional funding from international public agencies ($1.1M), corporations, foundations, and individual contributions (~$5.3M combined)."
+    asOf: 2022
+    source: https://en.wikipedia.org/wiki/Freedom_House
+    notes: "Heavy dependence on US government funding made organization vulnerable to 2025 aid freeze."

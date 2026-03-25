@@ -1,11 +1,7 @@
 entity: vIgoE1BeAk
 facts:
-  [
-    {
-        id: 3J8UJvrguA,
-        property: wikipedia-url,
-        value: https://en.wikipedia.org/wiki/Daniel_Levy_(businessman),
-        source: https://www.wikidata.org/wiki/Q861328,
-        notes: From Wikidata Q861328
-      }
-  ]
+  - id: WnJFEGdDyQ
+    property: notable-for
+    value: "Co-founder of Safe Superintelligence Inc (SSI) with Ilya Sutskever and Daniel Gross"
+    source: https://ssi.inc
+    notes: SSI co-founder; previously ML researcher

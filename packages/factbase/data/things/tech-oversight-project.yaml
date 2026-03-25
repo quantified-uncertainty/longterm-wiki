@@ -11,14 +11,52 @@ facts:
     value: "Washington, DC"
     source: https://techoversight.org/about-us/
 
-  - id: f_DIzVAZzFGY
-    property: leadership
-    value: "Sacha Haworth serves as Executive Director (previously DCCC, House Majority PAC, American Bridge 21st Century)"
-    asOf: 2026-03
-    source: https://techoversight.org/about-us/
-
   - id: f_nmDIqCKoRg
     property: funding-sources
     value: "100% philanthropic — funded by Omidyar Network and Economic Security Project Action"
     asOf: 2026
     source: https://techoversight.org/about-us/
+
+  - id: f_nIIQPufNjQ
+    property: annual-revenue
+    value: "910105"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/874209086
+    notes: "FY 2024 Form 990 filed Oct 30, 2025. Total expenses $889,146. Net assets $264,299."
+
+  - id: f_cjiOYb1T09
+    property: tax-status
+    value: "501(c)(4) social welfare organization (EIN 87-4209086); tax-exempt since February 2023; donations are not tax-deductible"
+    source: https://projects.propublica.org/nonprofits/organizations/874209086
+
+  - id: f_Qsc55SCagS
+    property: executive-compensation
+    value: "Executive Director Sacha Haworth received $206,100; Treasurer Kyle Morse received $171,100; Communications Director Marjorie Connolly received $116,100. Executive compensation totaled $383,374 (43.1% of expenses)"
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/874209086
+    notes: "From 2024 Form 990. High executive-compensation ratio typical for small advocacy orgs."
+
+  - id: f_ou9R9a5oa5
+    property: campaign
+    value: "Big Tech on Trial — launched microsite spotlighting evidence from landmark social media addiction lawsuits against Meta, Google, Snap, and TikTok, documenting deliberate platform design to keep children addicted"
+    asOf: 2026-02
+    source: https://techoversight.org/2026/02/02/microsite-social-media-addiction/
+
+  - id: f_jRfnSSDMSM
+    property: coalition
+    value: "Member of the Digital Democracy Project, a nonpartisan 501(c)(3) coalition working on tech accountability"
+    asOf: 2025
+    source: https://digitaldemocracyproject.org/member-organizations/the-tech-oversight-project
+
+  - id: f_Muy2NNfehz
+    property: focus-areas
+    value: "Four core focus areas: antitrust enforcement against Big Tech, privacy and data protections, online safety (especially children and families), and AI regulatory oversight"
+    asOf: 2025
+    source: https://techoversight.org/our-work/
+
+  - id: f_3Um5SpXaWg
+    property: publication
+    value: "Publishes The Dispatch, a weekly newsletter covering Big Tech harms and accountability efforts in Congress and statehouses"
+    asOf: 2025
+    source: https://dispatch.techoversight.org/

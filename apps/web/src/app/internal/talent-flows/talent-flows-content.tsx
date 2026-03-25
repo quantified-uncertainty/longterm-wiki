@@ -17,7 +17,7 @@ import {
 
 async function loadFromApi(): Promise<FetchResult<RpcTalentFlowsResult>> {
   return fetchDetailed<RpcTalentFlowsResult>(
-    "/api/talent-flows/",
+    "/api/talent-flows",
     { revalidate: 3600 }
   );
 }

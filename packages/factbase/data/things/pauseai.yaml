@@ -1,0 +1,24 @@
+entity: qtXe9VykMz
+facts:
+  - id: f_pai_founded
+    property: founded-date
+    value: "2023-05"
+    source: https://en.wikipedia.org/wiki/PauseAI
+    notes: "First public action May 2023. Registered as Dutch foundation (Stichting) February 2024."
+
+  - id: f_pai_hq
+    property: headquarters
+    value: "Utrecht, Netherlands"
+    source: https://pauseai.info/organization
+    notes: "PauseAI Global is a Dutch foundation (Stichting PauseAI, KvK 92951031). PauseAI US is a separate 501(c)(3)."
+
+  - id: f_pai_chapters
+    property: scale
+    value: "16 national chapters (Australia, Canada, Czechia, France, Germany, Italy, Kenya, Netherlands, Nigeria, Poland, Romania, Serbia, Spain, Sweden, UK, US). PauseAI US has 6 local groups."
+    asOf: 2025
+    source: https://pauseai.info/communities
+
+  - id: f_pai_actions
+    property: key-actions
+    value: "May 2023: protest at Microsoft Brussels. Nov 2023: protest at Bletchley Park AI Safety Summit. Feb 2024: protest at OpenAI HQ. May 2024: coordinated protests in 13 countries before Seoul Summit. Feb 2025: global protest for Paris AI Summit."
+    source: https://en.wikipedia.org/wiki/PauseAI

@@ -3,8 +3,8 @@ facts:
   - id: f_MrsVbdkfeQ
     property: founded-date
     value: "1920-01-19"
-    source: https://www.aclu.org/about
-    notes: "Founded January 19, 1920"
+    source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
+    notes: "Founded January 19, 1920. aclu.org/about confirms founding context but not specific date."
 
   - id: f_2puku4DVng
     property: annual-revenue
@@ -12,14 +12,15 @@ facts:
     unit: USD
     asOf: 2025
     source: https://projects.propublica.org/nonprofits/organizations/136213516
-    notes: "ACLU Foundation revenue ~$307M (FY ending March 2025). Separate 501(c)(4) entity adds additional revenue."
+    notes: "ACLU Foundation revenue ~$307M (FY ending March 2025). Separate
+      501(c)(4) entity adds additional revenue."
 
   - id: f_zeupuvzLWw
     property: employee-count
     value: "1400"
     asOf: 2024
-    source: https://www.aclu.org/about
-    notes: "Approximately 1,400 staff nationally including 300-500 staff attorneys"
+    source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
+    notes: "~1,400 staff nationally. aclu.org/about mentions 500 staff attorneys; total staff count from Wikipedia."
 
   - id: f_EY6AhAlcaQ
     property: headquarters
@@ -28,27 +29,38 @@ facts:
 
   - id: f_EboYLGtPqS
     property: litigation
-    value: "ACLU v. NSA — FOIA lawsuit seeking records about NSA use of AI in surveillance programs"
+    value: "ACLU v. NSA — FOIA lawsuit seeking records about NSA use of AI in
+      surveillance programs"
     asOf: 2024-04
     source: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
-    notes: "Filed April 2024 after NSA failed to release records on AI use in spy programs"
+    notes: "Filed April 2024 after NSA failed to release records on AI use in spy
+      programs"
 
   - id: f_z8Enea407O
     property: foia-campaign
-    value: "Filed FOIA requests with 40+ federal agencies (including SSA, VA, OPM) seeking records on DOGE's unrestricted access to databases containing PII, financial, and healthcare data"
+    value: "Filed FOIA requests with 40+ federal agencies (including SSA, VA, OPM)
+      seeking records on DOGE's unrestricted access to databases containing PII,
+      financial, and healthcare data"
     asOf: 2025
     source: https://www.aclu.org/press-releases/aclu-seeks-records-on-doges-unrestricted-access-to-americans-data-urges-congress-to-step-up
     notes: "FOIA requests to 40+ agencies plus letters to Congress"
 
   - id: f_evA8xqWi5I
     property: policy-position
-    value: "Publicly opposed Trump administration December 2025 executive order preempting state AI regulation"
+    value: "Publicly opposed Trump administration December 2025 executive order
+      preempting state AI regulation"
     asOf: 2025-12
     source: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
     notes: "Called executive order unconstitutional"
 
   - id: f_FpG8BtUSCD
     property: policy-position
-    value: "Formally opposed Trump administration AI Action Plan for thwarting state-level AI protections"
+    value: "Formally opposed Trump administration AI Action Plan for thwarting
+      state-level AI protections"
     asOf: 2025-07
     source: https://www.aclu.org/press-releases/aclu-comment-on-trump-administrations-ai-action-plan
+  - id: xvNISKVwHQ
+    property: website
+    value: https://www.aclu.org/
+    source: https://www.wikidata.org/wiki/Q21637
+    notes: From Wikidata Q21637

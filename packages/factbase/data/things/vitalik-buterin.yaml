@@ -14,5 +14,19 @@ facts:
         value: https://en.wikipedia.org/wiki/Vitalik_Buterin,
         source: https://www.wikidata.org/wiki/Q16197959,
         notes: From Wikidata Q16197959
+      },
+    {
+        id: lWq9lBzJ6w,
+        property: born-year,
+        value: 1994,
+        source: https://www.wikidata.org/wiki/Q16197959,
+        notes: From Wikidata Q16197959
+      },
+    {
+        id: 4DuNGbB9jw,
+        property: education,
+        value: University of Waterloo; The Abelard School,
+        source: https://www.wikidata.org/wiki/Q16197959,
+        notes: From Wikidata Q16197959
       }
   ]

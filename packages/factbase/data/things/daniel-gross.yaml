@@ -1,2 +1,11 @@
 entity: 0x0hqwKo4I
-facts: []
+facts:
+  [
+    {
+        id: X0odHyvvMw,
+        property: education,
+        value: The Commonwealth Medical College,
+        source: https://www.wikidata.org/wiki/Q87523463,
+        notes: From Wikidata Q87523463
+      }
+  ]

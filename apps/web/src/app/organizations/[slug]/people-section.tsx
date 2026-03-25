@@ -6,7 +6,7 @@
  * a unified people table with roles, tenure dates, and source-type badges.
  */
 import Link from "next/link";
-import { formatKBDate } from "@/components/wiki/factbase/format";
+import { formatKBDate, titleCase } from "@/components/wiki/factbase/format";
 import {
   fetchFromWikiServer,
   type RpcPersonnelByEntityResult,
@@ -61,10 +61,41 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  * Convert PG personnel rows into PersonEntry format for merging with
  * existing FactBase key-persons and board-seats data.
  */
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+
+/** Matches pure numeric IDs (legacy DB PKs). */
+const NUMERIC_ID_RE = /^\d+$/;
+
+/**
+ * Humanize a raw person identifier for display.
+ * Returns null for bare stableIds and numeric PKs (not human-readable).
+ * Strips "new:" prefix and converts slug-format IDs to title case.
+ */
+function humanizePersonId(raw: string): string | null {
+  if (STABLE_ID_RE.test(raw) || NUMERIC_ID_RE.test(raw)) return null;
+  const cleaned = raw.startsWith("new:") ? raw.slice(4).trim() : raw;
+  if (!cleaned) return null;
+  // If it looks like a slug (contains hyphens/underscores), humanize it
+  if (cleaned.includes("-") || cleaned.includes("_")) {
+    return titleCase(cleaned);
+  }
+  return cleaned;
+}
+
 export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PersonEntry[] {
   return rows.map((row) => {
     const personRef = row.person;
-    const name = personRef?.name ?? row.personResolvedName ?? row.personId;
+    // Name resolution priority:
+    // 1. Structured ref name (from entity JOIN)
+    // 2. Pre-resolved name from API (personResolvedName)
+    // 3. Humanized raw personId (strips new:, converts slug to title case)
+    // 4. "Unknown" for bare stableIds and numeric PKs
+    const name =
+      personRef?.name ??
+      row.personResolvedName ??
+      humanizePersonId(row.personId) ??
+      "Unknown";
     const slug = personRef?.slug ?? undefined;
     const isCurrent = !row.endDate;
     const isFounder = row.isFounder ?? false;
