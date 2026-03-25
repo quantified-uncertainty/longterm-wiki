@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
+import { getRecordHref } from "@/app/source-checks/source-checks-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -154,38 +155,22 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
       cell: ({ row }) => {
         const resolvedName = names[row.original.recordId];
         const recordId = row.original.recordId;
-        // For facts, link to the factbase page
-        const isFact = row.original.recordType === "fact";
-        const factHref = isFact ? `/factbase/fact/${recordId}` : null;
+        const recordHref = getRecordHref(row.original.recordType, recordId);
 
-        if (resolvedName) {
-          const display = resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName;
-          if (factHref) {
-            return (
-              <a href={factHref} className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" title={resolvedName}>
-                {display}
-              </a>
-            );
-          }
+        const display = resolvedName
+          ? (resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName)
+          : (recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId);
+
+        if (recordHref) {
           return (
-            <span className="text-xs font-medium" title={`${resolvedName} (${recordId})`}>
+            <a href={recordHref} className={cn("text-xs hover:underline", resolvedName ? "font-medium text-blue-600 dark:text-blue-400" : "font-mono text-blue-600/70 dark:text-blue-400/70")} title={resolvedName || recordId}>
               {display}
-            </span>
-          );
-        }
-
-        // Fallback: show raw ID, linked for facts
-        const idDisplay = recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId;
-        if (factHref) {
-          return (
-            <a href={factHref} className="text-xs font-mono text-blue-600/70 hover:underline dark:text-blue-400/70" title={recordId}>
-              {idDisplay}
             </a>
           );
         }
         return (
-          <span className="text-xs font-mono text-muted-foreground" title={recordId}>
-            {idDisplay}
+          <span className={cn("text-xs", resolvedName ? "font-medium" : "font-mono text-muted-foreground")} title={resolvedName || recordId}>
+            {display}
           </span>
         );
       },

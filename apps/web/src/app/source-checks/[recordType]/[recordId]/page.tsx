@@ -15,6 +15,7 @@ import {
   getRecordHref,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
+import { isUrl } from "@/components/wiki/factbase/format";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -95,8 +96,8 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const displayName =
     resolvedName ?? `${formatRecordType(recordType)} ${recordId}`;
 
-  // Use the first verdict for the primary summary (may have multiple per field)
-  const primaryVerdict = verdicts[0] ?? null;
+  // Deduplicate evidence by unique source URLs
+  const uniqueSourceUrls = new Set(evidence.map((e) => e.sourceUrl).filter(Boolean));
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
@@ -158,12 +159,12 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                   </div>
                 </div>
                 <div className="text-right text-xs text-muted-foreground">
-                  {v.sourcesChecked > 0 && (
-                    <p>
-                      {v.sourcesChecked} source
-                      {v.sourcesChecked !== 1 ? "s" : ""} checked
-                    </p>
-                  )}
+                  <p>
+                    {evidence.length} evidence check{evidence.length !== 1 ? "s" : ""}
+                    {uniqueSourceUrls.size > 0 && uniqueSourceUrls.size !== evidence.length
+                      ? ` from ${uniqueSourceUrls.size} source${uniqueSourceUrls.size !== 1 ? "s" : ""}`
+                      : ""}
+                  </p>
                   {v.lastComputedAt && (
                     <p>
                       Last checked:{" "}
@@ -190,7 +191,9 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           ? "bg-red-500"
                           : v.verdict === "outdated"
                             ? "bg-amber-500"
-                            : "bg-gray-400"
+                            : v.verdict === "partial"
+                              ? "bg-amber-400"
+                              : "bg-gray-400"
                     )}
                     style={{ width: `${Math.round(v.confidence * 100)}%` }}
                   />
@@ -209,100 +212,82 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Evidence table */}
+      {/* Evidence cards */}
       {evidence.length > 0 && (
         <section className="mb-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Evidence ({evidence.length} source
-            {evidence.length !== 1 ? "s" : ""})
+            Evidence ({evidence.length} check{evidence.length !== 1 ? "s" : ""})
           </h2>
-          <div className="overflow-x-auto rounded-lg border border-border/60">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b border-border bg-muted/50 text-left text-muted-foreground">
-                  <th className="py-2 pl-4 pr-3 font-medium">Source</th>
-                  <th className="py-2 pr-3 font-medium">Verdict</th>
-                  <th className="py-2 pr-3 font-medium">Confidence</th>
-                  <th className="py-2 pr-3 font-medium">Expected</th>
-                  <th className="py-2 pr-3 font-medium">Found</th>
-                  <th className="py-2 pr-3 font-medium">Quote</th>
-                  <th className="py-2 pr-3 font-medium">Model</th>
-                  <th className="py-2 pr-4 font-medium">Checked</th>
-                </tr>
-              </thead>
-              <tbody>
-                {evidence.map((e) => (
-                  <tr
-                    key={e.id}
-                    className="border-b border-border/30 last:border-0"
-                  >
-                    <td className="py-2 pl-4 pr-3 max-w-[200px]">
-                      {e.sourceUrl ? (
-                        <a
-                          href={e.sourceUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400"
-                        >
-                          <ExternalLink className="h-3 w-3 shrink-0" />
-                          <span className="truncate">
-                            {(() => {
-                              try {
-                                return new URL(e.sourceUrl).hostname;
-                              } catch {
-                                return e.sourceUrl;
-                              }
-                            })()}
-                          </span>
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </td>
-                    <td className="py-2 pr-3">
-                      <VerdictBadge verdict={e.verdict} />
-                    </td>
-                    <td className="py-2 pr-3 tabular-nums">
-                      {e.confidence != null
-                        ? `${Math.round(e.confidence * 100)}%`
-                        : "-"}
-                    </td>
-                    <td
-                      className="py-2 pr-3 max-w-[150px] truncate"
-                      title={e.expectedValue ?? undefined}
-                    >
-                      {e.expectedValue || "-"}
-                    </td>
-                    <td
-                      className="py-2 pr-3 max-w-[150px] truncate"
-                      title={e.extractedValue ?? undefined}
-                    >
-                      {e.extractedValue || "-"}
-                    </td>
-                    <td className="py-2 pr-3 max-w-[200px]">
-                      {e.extractedQuote ? (
-                        <span
-                          className="text-muted-foreground line-clamp-2"
-                          title={e.extractedQuote}
-                        >
-                          &ldquo;{e.extractedQuote}&rdquo;
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </td>
-                    <td className="py-2 pr-3 text-muted-foreground">
-                      {e.checkerModel || "-"}
-                    </td>
-                    <td className="py-2 pr-4 tabular-nums text-muted-foreground">
-                      {e.checkedAt
-                        ? new Date(e.checkedAt).toLocaleDateString()
-                        : "-"}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="space-y-3">
+            {evidence.map((e) => (
+              <div
+                key={e.id}
+                className="rounded-lg border border-border/60 p-4"
+              >
+                <div className="flex items-center justify-between gap-3 mb-2">
+                  <div className="flex items-center gap-2">
+                    <VerdictBadge verdict={e.verdict} />
+                    {e.confidence != null && (
+                      <span className="text-xs tabular-nums text-muted-foreground">
+                        {Math.round(e.confidence * 100)}% confidence
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    {e.checkerModel && <span>{e.checkerModel}</span>}
+                    {e.checkedAt && (
+                      <span className="tabular-nums">
+                        {new Date(e.checkedAt).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Source URL */}
+                {e.sourceUrl && (
+                  <div className="mb-2">
+                    {isUrl(e.sourceUrl) ? (
+                      <a
+                        href={e.sourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:underline inline-flex items-center gap-1 dark:text-blue-400 break-all"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        {e.sourceUrl}
+                      </a>
+                    ) : (
+                      <span className="font-mono text-xs break-all">{e.sourceUrl}</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Expected vs Found */}
+                {(e.expectedValue || e.extractedValue) && (
+                  <div className="grid grid-cols-2 gap-3 text-xs mb-2">
+                    {e.expectedValue && (
+                      <div>
+                        <span className="text-muted-foreground font-medium">Expected: </span>
+                        <span>{e.expectedValue}</span>
+                      </div>
+                    )}
+                    {e.extractedValue && (
+                      <div>
+                        <span className="text-muted-foreground font-medium">Found: </span>
+                        <span>{e.extractedValue}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Quote */}
+                {e.extractedQuote && (
+                  <blockquote className="text-xs text-muted-foreground border-l-2 border-border pl-3 italic">
+                    &ldquo;{e.extractedQuote}&rdquo;
+                  </blockquote>
+                )}
+              </div>
+            ))}
           </div>
         </section>
       )}
