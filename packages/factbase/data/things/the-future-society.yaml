@@ -12,12 +12,6 @@ facts:
     source: https://www.idealist.org/en/nonprofit/f7355327c3924e5989eabf6adbe7f9ae-the-future-society-boston
     notes: "Staff in 12 countries across US and Europe"
 
-  - id: f_tfs_leadership
-    property: leadership
-    value: "Nicolas Moes (Executive Director, selected early 2024, formerly Director of EU AI Governance at TFS). Founder: Nicolas Miailhe (transitioned to Board in Dec 2023)."
-    asOf: 2024
-    source: https://thefuturesociety.org/leadership-transition-announcement/
-
   - id: f_tfs_revenue
     property: annual-revenue
     value: "3406697"

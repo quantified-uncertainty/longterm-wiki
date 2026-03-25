@@ -39,12 +39,6 @@ facts:
       federal and state policy recommendations"
     asOf: 2025
     source: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
-
-  - id: f_WyAY9PnuSp
-    property: leadership
-    value: "Michael Waldman serves as President and CEO"
-    asOf: 2026-03
-    source: https://www.brennancenter.org/about/leadership
   - id: 6joOI7UWRg
     property: website
     value: http://www.brennancenter.org

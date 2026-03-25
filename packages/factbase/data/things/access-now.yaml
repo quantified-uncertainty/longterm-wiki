@@ -19,13 +19,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Access_Now
     notes: "Approximate figure from Wikipedia. Superseded by FY 2024 Form 990 data (f_YY42DsWj0s) showing $16.15M."
 
-  - id: f_2wVPFe1iPM
-    property: leadership
-    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett Solomon who served 2009-2024, started October 1, 2024)"
-    asOf: 2025
-    source: https://www.accessnow.org/press-release/access-now-welcomes-new-executive-director/
-    notes: "Original about-us page not machine-readable; used press release"
-
   - id: f_4t8WFcs3XE
     property: campaign
     value: "Led coalition of 110+ civil society organizations in EU AI Act advocacy
@@ -51,7 +44,7 @@ facts:
   - id: f_H4wmxeLGia
     property: staff-count
     value: "More than 70 experts worldwide, with offices in New York, Berlin, Brussels, San Jose (Costa Rica), Tunis, Delhi, Nairobi, Manila, London, and Washington DC"
-    asOf: 2025
+    asOf: 2024-10
     source: https://en.wikipedia.org/wiki/Access_Now
 
   - id: f_iXIzAyns7o
@@ -77,5 +70,5 @@ facts:
   - id: f_Q1raFluzOO
     property: global-presence
     value: "Offices in 10 cities: New York (HQ), Berlin, Brussels, San Jose (Costa Rica), Tunis, Delhi, Nairobi, Manila, London, and Washington DC"
-    asOf: 2025
+    asOf: 2024-10
     source: https://www.accessnow.org/about-us/

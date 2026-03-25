@@ -11,13 +11,6 @@ facts:
     value: "Washington, DC"
     source: https://democracyforward.org/about/
 
-  - id: f_CadQSzEjGY
-    property: leadership
-    value: "Skye L. Perryman serves as President and CEO"
-    asOf: 2026-03
-    source: https://democracyforward.org/team/
-    notes: "About page doesn't name leadership; team page confirms"
-
   - id: f_0x5K8ac51g
     property: program
     value: "Launched appellate litigation practice in August 2025 with approximately

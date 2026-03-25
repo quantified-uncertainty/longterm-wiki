@@ -11,12 +11,6 @@ facts:
     source: https://carnegieendowment.org/about
     notes: "Also offices in Palo Alto, Beirut, Berlin, Brussels, Singapore, New Delhi"
 
-  - id: f_ce_leadership
-    property: leadership
-    value: "Mariano-Florentino (Tino) Cuellar (10th President, stepping down July 2026 to return to Stanford). Board chair: Jane Hartley."
-    asOf: 2026-01
-    source: https://carnegieendowment.org/posts/2026/01/tino-cuellar-to-step-down-as-carnegie-endowment-president-in-july-2026
-
   - id: f_ce_revenue
     property: annual-revenue
     value: "57574887"

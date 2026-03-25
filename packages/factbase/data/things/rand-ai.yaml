@@ -50,12 +50,6 @@ facts:
     asOf: 2026-03
     source: https://www.rand.org/global-and-emerging-risks/centers/ai-security-and-technology.html
 
-  - id: f_5DymCTaLkT
-    property: leadership
-    value: "Jason Matheny serves as CEO and President (since 2022). Former founding director of CSET at Georgetown, former IARPA director, former White House OSTP."
-    asOf: 2026-03
-    source: https://www.rand.org/about/people/m/matheny_jason.html
-
   - id: f_cCq99uFrzY
     property: organizational-structure
     value: "Operates 4 federally funded research and development centers (FFRDCs): Project AIR FORCE (1946), Arroyo Center (Army, 1982), NDRI (OSD/Joint Staff), and Homeland Security Operational Analysis Center"

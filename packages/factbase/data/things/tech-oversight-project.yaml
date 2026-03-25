@@ -11,12 +11,6 @@ facts:
     value: "Washington, DC"
     source: https://techoversight.org/about-us/
 
-  - id: f_DIzVAZzFGY
-    property: leadership
-    value: "Sacha Haworth serves as Executive Director (previously DCCC, House Majority PAC, American Bridge 21st Century)"
-    asOf: 2026-03
-    source: https://techoversight.org/about-us/
-
   - id: f_nmDIqCKoRg
     property: funding-sources
     value: "100% philanthropic — funded by Omidyar Network and Economic Security Project Action"

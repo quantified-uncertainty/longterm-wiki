@@ -12,12 +12,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology
     notes: "Also has Brussels office"
 
-  - id: f_cdt_leadership
-    property: leadership
-    value: "Alexandra Reeve Givens (President & CEO, since 2020). Compensation: $417,500 (2024)."
-    asOf: 2026-03
-    source: https://projects.propublica.org/nonprofits/organizations/521905358
-
   - id: f_cdt_revenue
     property: annual-revenue
     value: "11300000"

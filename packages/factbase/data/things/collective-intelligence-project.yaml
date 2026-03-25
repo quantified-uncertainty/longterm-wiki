@@ -12,12 +12,6 @@ facts:
     source: https://www.cip.org/
     notes: "Opened SF office in 2024. Tax filing: Encino, CA. EIN: 92-0327339."
 
-  - id: f_cip_leadership
-    property: leadership
-    value: "Divya Siddarth (Co-Founder & Executive Director, formerly Microsoft OCTO). Saffron Huang (Co-Founder & Board Director, formerly Google DeepMind). Advisory Council includes Daron Acemoglu and Danielle Allen."
-    asOf: 2026-03
-    source: https://www.cip.org/team
-
   - id: f_cip_alignment_assemblies
     property: program
     value: "Alignment Assemblies: democratic forums to surface public views on AI alignment. Launched Feb 2023. Engaged 1,200+ participants across 68 countries by 2024."

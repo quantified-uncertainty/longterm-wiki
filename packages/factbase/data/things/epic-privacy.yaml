@@ -11,13 +11,6 @@ facts:
     value: "Washington, DC"
     source: https://epic.org/about/
 
-  - id: f_HBGQD2BGk6
-    property: leadership
-    value: "Alan Butler serves as Executive Director and President since 2020"
-    asOf: 2026-03
-    source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
-    notes: "epic.org/about/ returns 403 to automated fetchers; verified via Wikipedia"
-
   - id: f_VI3re1fuer
     property: program
     value: "AI & Human Rights Program — advocates for transparent, equitable AI
@@ -50,14 +43,14 @@ facts:
   - id: f_EcOoH0xzDh
     property: litigation
     value: "Filed lawsuit (NACA v. RentGrow) against tenant screening company RentGrow for unfair and deceptive algorithmic practices under DC Consumer Protection Procedures Act. Survived motion to dismiss November 2024."
-    asOf: 2024-10
+    asOf: 2024-11
     source: https://epic.org/documents/naca-v-rentgrow/
     notes: "Filed Oct 1, 2024 with Richman Law & Policy and NACA. Alleges RentGrow generates screening reports with serious errors disproportionately affecting marginalized communities."
 
   - id: f_nj2oAQYBTN
     property: litigation
     value: "Filed FTC complaint against OpenAI (Oct 29, 2024) urging investigation of GPTs and third-party APIs for failing to meet responsible AI standards, unsafe security/privacy practices, and perpetuating unfair and deceptive practices"
-    asOf: 2024-10
+    asOf: 2024-11
     source: https://epic.org/press-release-epic-files-complaint-urging-the-ftc-to-investigate-openais-gpts-and-third-party-apis/
 
   - id: f_twu71qJcbg
@@ -65,7 +58,6 @@ facts:
     value: "Filed FOIA lawsuit against OPM over DOGE access to federal personnel data containing personal information of millions of current and former federal workers (2025)"
     asOf: 2025
     source: https://epic.org/documents/epic-v-opm-information-security-violations/
-    notes: "Response to unlawful access of OPM systems by DOGE. Also filed FOIA lawsuit against CISA over SS7 telecommunications security vulnerabilities report."
 
   - id: f_QTgB4VySkD
     property: executive-compensation

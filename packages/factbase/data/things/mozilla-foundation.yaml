@@ -10,19 +10,13 @@ facts:
     value: "San Francisco, CA"
     source: https://www.mozillafoundation.org
 
-  - id: f_mf_leadership
-    property: leadership
-    value: "Nabiha Syed (Executive Director), Mark Surman (President), Angela Plohman (COO), Nicole Wong (Board Chair)"
-    asOf: 2026-03
-    source: https://www.mozillafoundation.org/en/who-we-are/leadership
-
   - id: f_mf_revenue
     property: annual-revenue
     value: "37200000"
     unit: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/200097189
-    notes: "Foundation only. Revenue: $37.2M ($22.6M license fees from Mozilla Corp + $16.9M contributions). Assets: $123.3M."
+    notes: "Foundation only. Revenue: $37.2M (Major sources: license fees from Mozilla Corp and contributions). Assets: $123.3M."
 
   - id: f_mf_layoffs
     property: organizational-change

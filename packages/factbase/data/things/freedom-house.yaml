@@ -60,13 +60,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Freedom_House
     notes: "Pre-2025 aid freeze figure. Significant reductions occurred in 2025 after >80% of programs were terminated."
 
-  - id: f_EAliEWncce
-    property: leadership
-    value: "Interim Co-Presidents Gerardo Berthin (VP of International Programs) and Annie Boyajian (VP of Policy and Advocacy) lead the organization. Board Chair Norman Willox. Suzanne Nossel (former PEN America CEO) was selected as President/CEO in Oct 2024 but decided not to join in January 2025."
-    asOf: 2025-01
-    source: https://freedomhouse.org/article/freedom-house-announces-executive-and-board-leadership-transitions
-    notes: "Michael Abramowitz departed May 2024 to lead Voice of America. Nicole Bibbins Sedaca served as interim president May-Dec 2024."
-
   - id: f_l6P2HLC8gP
     property: publication
     value: "Freedom in the World 2026 report documented 20th consecutive year of global freedom decline. Assessed 195 countries and 13 territories. Only 21% of world's people live in Free countries, down from 46% two decades ago. 54 countries deteriorated vs 35 improved."

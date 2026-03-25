@@ -11,12 +11,6 @@ facts:
     value: "501(c)(4) civic league. Operates as fiscal project of Future Incubator (joint program of March On and Future Coalition)."
     source: https://www.influencewatch.org/non-profit/encode-justice/
 
-  - id: f_ej_leadership
-    property: leadership
-    value: "Sneha Revanur (Founder & President, now at Williams College). Sunny Gandhi (VP of Political Affairs)."
-    asOf: 2026-03
-    source: https://encodejustice.org/team-members/sneha-revanur/
-
   - id: f_ej_members
     property: scale
     value: "1,000+ members across 40+ US states and 30+ countries. 15,000+ students participated in workshops."
@@ -31,7 +25,7 @@ facts:
 
   - id: f_ej_sb1047
     property: campaign
-    value: "Co-sponsored California SB 1047 alongside CAIS Action Fund. Also sponsoring SB 53 (2025)."
+    value: "Co-sponsored California SB 1047 alongside CAIS Action Fund."
     asOf: 2024
     source: https://fortune.com/2024/07/15/california-ai-bill-sb-1047-fierce-debate-regulation-safety/
 

@@ -18,13 +18,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation
     notes: "Approximately 100 staff. eff.org/about does not state the number directly."
 
-  - id: f_caJaCK6QFV
-    property: leadership
-    value: "Cindy Cohn serving as Executive Director; successor search underway via Russell Reynolds Associates"
-    asOf: 2025-11
-    source: https://www.eff.org/deeplinks/2025/11/what-eff-needs-new-executive-director
-    notes: "Announced November 2025; departure timeline not specified"
-
   - id: f_77xsyIGOey
     property: investigation
     value: "Investigated Axon's 'Draft One' AI-written police report product, designed to hinder audits"

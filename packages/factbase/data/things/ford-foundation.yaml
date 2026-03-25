@@ -10,12 +10,6 @@ facts:
     value: "320 E 43rd St, New York, NY 10017"
     source: https://www.fordfoundation.org
 
-  - id: f_ff_leadership
-    property: leadership
-    value: "Heather Gerken (11th President, since November 2025; formerly dean of Yale Law School). Succeeded Darren Walker."
-    asOf: 2025-11
-    source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/ford-foundation-announces-heather-gerken-as-new-president/
-
   - id: f_ff_assets
     property: total-assets
     value: "17480000000"

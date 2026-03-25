@@ -16,12 +16,6 @@ facts:
     value: "German nonprofit (gGmbH), tax-exempt through March 2026. Tax ID 27/640/02364."
     source: https://algorithmwatch.org/en/transparency/
 
-  - id: f_aw_leadership
-    property: leadership
-    value: "Matthias Spielkamp (Executive Director & Co-Founder), Kristina Hubner (Deputy Director)"
-    asOf: 2026-03
-    source: https://algorithmwatch.org/en/team/matthias-spielkamp/
-
   - id: f_aw_budget
     property: annual-revenue
     value: "1200000"

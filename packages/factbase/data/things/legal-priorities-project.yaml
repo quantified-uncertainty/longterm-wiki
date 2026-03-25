@@ -11,12 +11,6 @@ facts:
     value: "6 Liberty Square, #6079, Boston, MA"
     source: https://law-ai.org/
 
-  - id: f_lpp_leadership
-    property: leadership
-    value: "Prof. Christoph Winter (Director, co-founder). Cullen O'Keefe (Director of Research, co-founder, formerly OpenAI). Mackenzie Arnold (Director of US Policy). Dr. Matthijs Maas (Senior Research Fellow)."
-    asOf: 2026-03
-    source: https://law-ai.org/team/
-
   - id: f_lpp_revenue
     property: annual-revenue
     value: "7852814"
