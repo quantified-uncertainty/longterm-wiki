@@ -39,7 +39,7 @@ export async function generateMetadata({
     : `Source Check: ${formatRecordType(recordType)} ${recordId}`;
 
   return {
-    title: `${title} | Longterm Wiki`,
+    title,
     description: `Source verification details for ${name ?? recordId} (${formatRecordType(recordType)}).`,
     robots: { index: false },
   };

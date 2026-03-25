@@ -126,51 +126,66 @@ const ResolveNamesQuery = z.object({
 const sourceChecksApp = new Hono()
 
   // ---- GET /stats ----
-  .get("/stats", async (c) => {
-    const db = getDrizzleDb();
+  .get(
+    "/stats",
+    zv("query", z.object({ record_type: z.string().max(50).optional() })),
+    async (c) => {
+      const { record_type } = c.req.valid("query");
+      const db = getDrizzleDb();
 
-    const [statsRow] = await db
-      .select({
-        total: count(),
-        needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
-        avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
-      })
-      .from(sourceCheckVerdicts);
+      // When record_type is provided, total/by_verdict/avg_confidence are scoped
+      // to that type. by_type is always unfiltered (for the type-filter tabs).
+      const typeCondition = record_type
+        ? eq(sourceCheckVerdicts.recordType, record_type)
+        : undefined;
 
-    const byVerdictRows = await db
-      .select({
-        verdict: sourceCheckVerdicts.verdict,
-        count: count(),
-      })
-      .from(sourceCheckVerdicts)
-      .groupBy(sourceCheckVerdicts.verdict);
+      const [statsRow] = await db
+        .select({
+          total: count(),
+          needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
+          avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
+        })
+        .from(sourceCheckVerdicts)
+        .where(typeCondition);
 
-    const byVerdict: Record<string, number> = {};
-    for (const row of byVerdictRows) {
-      byVerdict[row.verdict] = row.count;
+      const byVerdictRows = await db
+        .select({
+          verdict: sourceCheckVerdicts.verdict,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .where(typeCondition)
+        .groupBy(sourceCheckVerdicts.verdict);
+
+      const byVerdict: Record<string, number> = {};
+      for (const row of byVerdictRows) {
+        byVerdict[row.verdict] = row.count;
+      }
+
+      // by_type is always unfiltered so the UI can show all type tabs
+      const byTypeRows = await db
+        .select({
+          recordType: sourceCheckVerdicts.recordType,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .groupBy(sourceCheckVerdicts.recordType);
+
+      const byType: Record<string, number> = {};
+      for (const row of byTypeRows) {
+        byType[row.recordType] = row.count;
+      }
+
+      return c.json({
+        total: statsRow.total,
+        by_verdict: byVerdict,
+        by_type: byType,
+        needs_recheck: Number(statsRow.needsRecheck),
+        avg_confidence:
+          Math.round(Number(statsRow.avgConfidence) * 100) / 100,
+      });
     }
-
-    const byTypeRows = await db
-      .select({
-        recordType: sourceCheckVerdicts.recordType,
-        count: count(),
-      })
-      .from(sourceCheckVerdicts)
-      .groupBy(sourceCheckVerdicts.recordType);
-
-    const byType: Record<string, number> = {};
-    for (const row of byTypeRows) {
-      byType[row.recordType] = row.count;
-    }
-
-    return c.json({
-      total: statsRow.total,
-      by_verdict: byVerdict,
-      by_type: byType,
-      needs_recheck: Number(statsRow.needsRecheck),
-      avg_confidence: Math.round(Number(statsRow.avgConfidence) * 100) / 100,
-    });
-  })
+  )
 
   // ---- GET /verdicts ----
   .get("/verdicts", zv("query", VerdictsQuery), async (c) => {

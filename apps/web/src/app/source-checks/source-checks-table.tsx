@@ -27,7 +27,6 @@ export function SourceChecksTable({ verdicts, names }: SourceChecksTableProps) {
             <th className="py-2.5 pr-3 font-medium">Record</th>
             <th className="py-2.5 pr-3 font-medium">Verdict</th>
             <th className="py-2.5 pr-3 font-medium">Confidence</th>
-            <th className="py-2.5 pr-3 font-medium">Sources</th>
             <th className="py-2.5 pr-3 font-medium">Last Checked</th>
             <th className="py-2.5 pr-4 font-medium w-8"></th>
           </tr>
@@ -88,11 +87,6 @@ export function SourceChecksTable({ verdicts, names }: SourceChecksTableProps) {
                   ) : (
                     <span className="text-xs text-muted-foreground">-</span>
                   )}
-                </td>
-                <td className="py-2.5 pr-3">
-                  <span className="text-sm tabular-nums">
-                    {v.sourcesChecked}
-                  </span>
                 </td>
                 <td className="py-2.5 pr-3">
                   {v.lastComputedAt ? (
