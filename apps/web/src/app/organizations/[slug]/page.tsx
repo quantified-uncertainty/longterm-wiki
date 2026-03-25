@@ -180,6 +180,9 @@ export default async function OrgProfilePage({
   ]);
 
   // PG grants: check if wiki-server has grants for this org (as funder)
+  if (!pgGrantsData && entityStableId) {
+    console.warn(`[org-profile] Failed to fetch PG grants for ${entityStableId} — wiki-server may be unavailable`);
+  }
   const pgGrantCount = pgGrantsData?.total ?? 0;
 
   // ── Build tabs from available data ──────────────────────────────────
