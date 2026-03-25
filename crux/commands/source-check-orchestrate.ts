@@ -38,7 +38,7 @@ import {
   SOURCE_CHECK_CONSTANTS,
   MODELS,
 } from '../lib/source-check/index.ts';
-import { str, strOrNull, numOrNull, resolveName } from '../lib/source-check/record-fields.ts';
+import { str, strOrNull, numOrNull, resolveName, extractEntityId } from '../lib/source-check/record-fields.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -118,6 +118,8 @@ interface RecordItemData {
   recordType: RecordType;
   recordId: string;
   fields: Record<string, string | number | null>;
+  /** Entity ID for the parent entity (org for personnel/divisions, company for funding-rounds, etc.) */
+  entityId?: string | null;
 }
 
 interface EntityItemData {
@@ -423,6 +425,8 @@ async function collectRecordItems(
 
         const priority = computeRecordPriority(recordType, existing);
 
+        const entityId = extractEntityId(recordType, item);
+
         items.push({
           kind: 'record',
           id: `record:${recordType}:${id}`,
@@ -438,6 +442,7 @@ async function collectRecordItems(
             recordType,
             recordId: id,
             fields,
+            entityId,
           },
         });
       }
@@ -893,6 +898,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       confidence: result.confidence,
       extractedValue: result.extractedValue,
       reasoning: result.reasoning,
+      entityId: recordData.entityId,
     }, '[source-check]');
 
     // Store aggregate verdict
@@ -903,6 +909,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       confidence: result.confidence,
       reasoning: result.reasoning,
       sourcesChecked: 1,
+      entityId: recordData.entityId,
     }, '[source-check]').catch((e: unknown) => {
       console.warn(`[source-check] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
     });
