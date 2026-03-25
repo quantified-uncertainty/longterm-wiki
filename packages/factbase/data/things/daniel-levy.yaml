@@ -1,6 +1,7 @@
 entity: vIgoE1BeAk
 facts:
-  - id: 3J8UJvrguA
+  - id: WnJFEGdDyQ
     property: notable-for
     value: "Co-founder of Safe Superintelligence Inc (SSI) with Ilya Sutskever and Daniel Gross"
+    source: https://ssi.inc
     notes: SSI co-founder; previously ML researcher
