@@ -1026,6 +1026,8 @@ const sourceChecksApp = new Hono()
       SELECT 'citation', count(*)::int FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
       UNION ALL
       SELECT 'wiki-page', count(*)::int FROM wiki_pages
+      UNION ALL
+      SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
     `);
 
     const totalsByType: Record<string, number> = {};
