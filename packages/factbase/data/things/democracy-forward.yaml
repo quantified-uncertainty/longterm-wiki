@@ -15,7 +15,8 @@ facts:
     property: leadership
     value: "Skye L. Perryman serves as President and CEO"
     asOf: 2026-03
-    source: https://democracyforward.org/about/
+    source: https://democracyforward.org/team/
+    notes: "About page doesn't name leadership; team page confirms"
 
   - id: f_0x5K8ac51g
     property: program

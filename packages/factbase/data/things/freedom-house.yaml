@@ -13,10 +13,10 @@ facts:
 
   - id: f_lHViEp5E6w
     property: publication
-    value: "Freedom on the Net 2025 documented the 15th consecutive year of internet
-      freedom decline globally"
-    asOf: 2025
-    source: https://freedomhouse.org/country/united-states/freedom-net/2025
+    value: "Freedom on the Net 2024 documented the 14th consecutive year of internet freedom decline globally"
+    asOf: 2024
+    source: https://freedomhouse.org/report/freedom-net/2024/struggle-trust-online
+    notes: "2024 global report confirmed 14th year. 2025 edition not yet released at time of check."
 
   - id: f_8pFBTDGEEK
     property: report

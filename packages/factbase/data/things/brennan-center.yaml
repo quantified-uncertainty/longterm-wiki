@@ -11,8 +11,8 @@ facts:
     value: "57900000"
     unit: USD
     asOf: 2024
-    source: https://projects.propublica.org/nonprofits/organizations/133988199
-    notes: "Approximately $57.9M (FY 2023-2024)"
+    source: https://en.wikipedia.org/wiki/Brennan_Center_for_Justice
+    notes: "Approximately $57.9M (FY 2023-2024). ProPublica URL 404; figure confirmed via Wikipedia."
 
   - id: f_trbZTG1zGA
     property: employee-count

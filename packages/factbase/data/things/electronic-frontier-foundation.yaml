@@ -15,8 +15,8 @@ facts:
     property: employee-count
     value: "100"
     asOf: 2024
-    source: https://www.eff.org/about
-    notes: "Approximately 100 staff — lawyers, activists, technologists"
+    source: https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation
+    notes: "Approximately 100 staff. eff.org/about does not state the number directly."
 
   - id: f_caJaCK6QFV
     property: leadership

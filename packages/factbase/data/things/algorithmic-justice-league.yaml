@@ -3,8 +3,8 @@ facts:
   - id: f_LQXN188UWa
     property: founded-date
     value: "2016"
-    source: https://www.ajl.org/about
-    notes: "Founded 2016 by Dr. Joy Buolamwini"
+    source: https://en.wikipedia.org/wiki/Algorithmic_Justice_League
+    notes: "Founded 2016 by Dr. Joy Buolamwini. ajl.org/about confirms founder but not year."
 
   - id: f_27RCJxAJk4
     property: headquarters

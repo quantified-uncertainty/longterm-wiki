@@ -15,7 +15,8 @@ facts:
     property: leadership
     value: "Alan Butler serves as Executive Director and President since 2020"
     asOf: 2026-03
-    source: https://epic.org/about/
+    source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
+    notes: "epic.org/about/ returns 403 to automated fetchers; verified via Wikipedia"
 
   - id: f_VI3re1fuer
     property: program

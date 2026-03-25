@@ -37,7 +37,8 @@ facts:
     property: leadership
     value: "Ian Bassin serves as Co-founder and Executive Director"
     asOf: 2026-03
-    source: https://protectdemocracy.org/about/
+    source: https://en.wikipedia.org/wiki/Protect_Democracy
+    notes: "protectdemocracy.org/about/ does not name leadership directly"
 
   - id: f_U6QEB8QMYJ
     property: litigation-detail

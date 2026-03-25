@@ -21,10 +21,10 @@ facts:
 
   - id: f_2wVPFe1iPM
     property: leadership
-    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett
-      Solomon who served 2009-2024)"
+    value: "Alejandro Mayoral Banos serves as Executive Director (succeeded Brett Solomon who served 2009-2024, started October 1, 2024)"
     asOf: 2025
-    source: https://www.accessnow.org/about-us/
+    source: https://www.accessnow.org/press-release/access-now-welcomes-new-executive-director/
+    notes: "Original about-us page not machine-readable; used press release"
 
   - id: f_4t8WFcs3XE
     property: campaign

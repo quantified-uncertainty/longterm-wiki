@@ -3,8 +3,8 @@ facts:
   - id: f_MrsVbdkfeQ
     property: founded-date
     value: "1920-01-19"
-    source: https://www.aclu.org/about
-    notes: "Founded January 19, 1920"
+    source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
+    notes: "Founded January 19, 1920. aclu.org/about confirms founding context but not specific date."
 
   - id: f_2puku4DVng
     property: annual-revenue
@@ -19,8 +19,8 @@ facts:
     property: employee-count
     value: "1400"
     asOf: 2024
-    source: https://www.aclu.org/about
-    notes: "Approximately 1,400 staff nationally including 300-500 staff attorneys"
+    source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
+    notes: "~1,400 staff nationally. aclu.org/about mentions 500 staff attorneys; total staff count from Wikipedia."
 
   - id: f_EY6AhAlcaQ
     property: headquarters
