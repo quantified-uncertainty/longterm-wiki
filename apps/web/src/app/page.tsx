@@ -25,9 +25,14 @@ import type { ExploreItem } from "@/data";
 import type { LucideIcon } from "lucide-react";
 
 // ── Directory definitions ────────────────────────────────────────────
+// Entity type strings are referenced from entity-type-names.ts canonical list.
+// When multiple canonical types map to the same directory, list them in `entityTypes`.
 
 interface DirectoryDef {
+  /** Unique key for this directory (may be a canonical entity type or a pseudo-type like "_grant") */
   type: string;
+  /** Canonical entity types that belong to this directory */
+  entityTypes: string[];
   label: string;
   href: string;
   icon: LucideIcon;
@@ -37,16 +42,19 @@ interface DirectoryDef {
 }
 
 const DIRECTORIES: DirectoryDef[] = [
-  { type: "organization", label: "Organizations", href: "/organizations", icon: Building2, iconColor: "text-slate-500" },
-  { type: "person", label: "People", href: "/people", icon: Users, iconColor: "text-blue-500" },
-  { type: "ai-model", label: "AI Models", href: "/ai-models", icon: Brain, iconColor: "text-purple-500" },
-  { type: "policy", label: "Legislation", href: "/legislation", icon: Landmark, iconColor: "text-amber-600" },
-  { type: "approach", label: "Approaches", href: "/approaches", icon: FlaskConical, iconColor: "text-emerald-500" },
-  { type: "event", label: "Events", href: "/events", icon: CalendarDays, iconColor: "text-orange-500" },
-  { type: "benchmark", label: "Benchmarks", href: "/benchmarks", icon: BarChart3, iconColor: "text-indigo-500" },
-  { type: "_grant", label: "Grants", href: "/grants", icon: Banknote, iconColor: "text-green-500" },
-  { type: "_publication", label: "Publications", href: "/publications", icon: BookOpen, iconColor: "text-rose-500" },
+  { type: "organization", entityTypes: ["organization"], label: "Organizations", href: "/organizations", icon: Building2, iconColor: "text-slate-500" },
+  { type: "person", entityTypes: ["person"], label: "People", href: "/people", icon: Users, iconColor: "text-blue-500" },
+  { type: "ai-model", entityTypes: ["ai-model"], label: "AI Models", href: "/ai-models", icon: Brain, iconColor: "text-purple-500" },
+  { type: "policy", entityTypes: ["policy"], label: "Legislation", href: "/legislation", icon: Landmark, iconColor: "text-amber-600" },
+  { type: "approach", entityTypes: ["approach", "safety-agenda"], label: "Approaches", href: "/approaches", icon: FlaskConical, iconColor: "text-emerald-500" },
+  { type: "event", entityTypes: ["event"], label: "Events", href: "/events", icon: CalendarDays, iconColor: "text-orange-500" },
+  { type: "benchmark", entityTypes: ["benchmark"], label: "Benchmarks", href: "/benchmarks", icon: BarChart3, iconColor: "text-indigo-500" },
+  { type: "_grant", entityTypes: [], label: "Grants", href: "/grants", icon: Banknote, iconColor: "text-green-500" },
+  { type: "_publication", entityTypes: [], label: "Publications", href: "/publications", icon: BookOpen, iconColor: "text-rose-500" },
 ];
+
+/** Set of all entity types that map to a directory, for fast lookups */
+const DIRECTORY_ENTITY_TYPES = new Set(DIRECTORIES.flatMap((d) => d.entityTypes));
 
 // ── Stats definitions ────────────────────────────────────────────────
 
@@ -59,10 +67,19 @@ interface StatDef {
 }
 
 interface DataContext {
-  allItems: ExploreItem[];
+  entityTypeCounts: Map<string, number>;
   totalPages: number;
   publicationCount: number;
   resourceCount: number;
+}
+
+/** Count entities matching the given directory's entityTypes */
+function dirEntityCount(dir: DirectoryDef, ctx: DataContext): number {
+  let total = 0;
+  for (const t of dir.entityTypes) {
+    total += ctx.entityTypeCounts.get(t) ?? 0;
+  }
+  return total;
 }
 
 const STAT_DEFS: StatDef[] = [
@@ -70,14 +87,14 @@ const STAT_DEFS: StatDef[] = [
     label: "Organizations",
     icon: Building2,
     iconColor: "text-slate-500",
-    getValue: (ctx) => ctx.allItems.filter((i) => i.type === "organization").length,
+    getValue: (ctx) => ctx.entityTypeCounts.get("organization") ?? 0,
     href: "/organizations",
   },
   {
     label: "People",
     icon: Users,
     iconColor: "text-blue-500",
-    getValue: (ctx) => ctx.allItems.filter((i) => i.type === "person").length,
+    getValue: (ctx) => ctx.entityTypeCounts.get("person") ?? 0,
     href: "/people",
   },
   {
@@ -91,7 +108,7 @@ const STAT_DEFS: StatDef[] = [
     label: "Approaches",
     icon: FlaskConical,
     iconColor: "text-emerald-500",
-    getValue: (ctx) => ctx.allItems.filter((i) => i.type === "approach" || i.type === "safety-agenda").length,
+    getValue: (ctx) => (ctx.entityTypeCounts.get("approach") ?? 0) + (ctx.entityTypeCounts.get("safety-agenda") ?? 0),
     href: "/approaches",
   },
   {
@@ -111,10 +128,11 @@ const STAT_DEFS: StatDef[] = [
 ];
 
 // ── Directory preview sections ───────────────────────────────────────
+// Derive preview config from DIRECTORIES to avoid duplicating type strings.
 
 interface PreviewSection {
   label: string;
-  type: string;
+  entityTypes: string[];
   href: string;
   icon: LucideIcon;
   iconColor: string;
@@ -122,12 +140,20 @@ interface PreviewSection {
   count: number;
 }
 
-const PREVIEW_SECTIONS: PreviewSection[] = [
-  { label: "Organizations", type: "organization", href: "/organizations", icon: Building2, iconColor: "text-slate-500", count: 6 },
-  { label: "People", type: "person", href: "/people", icon: Users, iconColor: "text-blue-500", count: 6 },
-  { label: "Approaches", type: "approach", href: "/approaches", icon: FlaskConical, iconColor: "text-emerald-500", count: 6 },
-  { label: "Legislation", type: "policy", href: "/legislation", icon: Landmark, iconColor: "text-amber-600", count: 6 },
-];
+/** Directory types to show in preview sections, with item count */
+const PREVIEW_DIRECTORY_TYPES = ["organization", "person", "approach", "policy"] as const;
+
+const PREVIEW_SECTIONS: PreviewSection[] = PREVIEW_DIRECTORY_TYPES.map((dirType) => {
+  const dir = DIRECTORIES.find((d) => d.type === dirType)!;
+  return {
+    label: dir.label,
+    entityTypes: dir.entityTypes,
+    href: dir.href,
+    icon: dir.icon,
+    iconColor: dir.iconColor,
+    count: 6,
+  };
+});
 
 // ── Scoring ──────────────────────────────────────────────────────────
 
@@ -141,47 +167,49 @@ function entityScore(item: ExploreItem): number {
 // ── Page component ───────────────────────────────────────────────────
 
 export default function Home() {
+  // Use entity-backed data for directory stats and previews (not getExploreItems
+  // which includes pageOnlyItems — wiki pages without typed entities).
+  const entities = getTypedEntities();
   const allItems = getExploreItems().filter(
     (item) => item.type !== "table" && item.type !== "diagram" && item.type !== "internal"
   );
   const pages = getAllPages();
   const publications = getAllPublications();
   const resources = getAllResources();
-  const entities = getTypedEntities();
 
   const totalPages = pages.length;
   const publicationCount = publications.length;
   const resourceCount = resources.length;
 
-  const dataCtx: DataContext = { allItems, totalPages, publicationCount, resourceCount };
-
-  // Count items by type for directory chips
-  const typeCounts = new Map<string, number>();
-  for (const item of allItems) {
-    typeCounts.set(item.type, (typeCounts.get(item.type) ?? 0) + 1);
+  // Count typed entities by entityType for directory stats
+  const entityTypeCounts = new Map<string, number>();
+  for (const entity of entities) {
+    const t = entity.entityType;
+    entityTypeCounts.set(t, (entityTypeCounts.get(t) ?? 0) + 1);
   }
 
-  // Build directory chips with counts
-  const directoryChips = DIRECTORIES.map((dir) => ({
-    ...dir,
-    count: dir.fixedCount ?? typeCounts.get(dir.type) ?? 0,
-  })).filter((d) => d.count > 0 || d.type === "_grant");
+  const dataCtx: DataContext = { entityTypeCounts, totalPages, publicationCount, resourceCount };
 
-  // For PG-primary tables, compute counts from their data sources
-  for (const chip of directoryChips) {
-    if (chip.type === "_grant") {
-      // Grants are PG-primary — not in explore items. We don't have a local getter,
-      // so show without count (the grants page has its own count).
-      chip.count = 0;
-    } else if (chip.type === "_publication") {
-      chip.count = publicationCount;
-    }
-  }
+  // Build directory chips with counts.
+  // Compute synthetic/PG-primary counts BEFORE filtering so _publication isn't dropped.
+  const directoryChips = DIRECTORIES.map((dir) => {
+    const count =
+      dir.type === "_grant"
+        ? 0 // Grants are PG-primary — not in explore items; grants page has its own count
+        : dir.type === "_publication"
+          ? publicationCount
+          : dir.fixedCount ?? dirEntityCount(dir, dataCtx);
 
-  // Build preview sections — top items per directory type
+    return { ...dir, count };
+  }).filter((d) => d.count > 0 || d.type === "_grant");
+
+  // Build preview sections — top entities per directory type (entity-backed only)
+  const entityTypeSet = new Set(DIRECTORY_ENTITY_TYPES);
+  const entityItems = allItems.filter((item) => entityTypeSet.has(item.type));
   const previewData = PREVIEW_SECTIONS.map((section) => {
-    const items = allItems
-      .filter((item) => item.type === section.type)
+    const typeSet = new Set(section.entityTypes);
+    const items = entityItems
+      .filter((item) => typeSet.has(item.type))
       .sort((a, b) => entityScore(b) - entityScore(a))
       .slice(0, section.count);
     return { ...section, items };
@@ -281,7 +309,7 @@ export default function Home() {
             {previewData.map((section) => {
               const SectionIcon = section.icon;
               return (
-                <div key={section.type}>
+                <div key={section.href}>
                   <div className="flex items-center gap-2 mb-2">
                     <SectionIcon className={`w-4 h-4 ${section.iconColor}`} />
                     <h3 className="text-sm font-semibold">{section.label}</h3>
