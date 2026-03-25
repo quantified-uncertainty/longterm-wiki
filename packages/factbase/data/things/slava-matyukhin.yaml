@@ -7,7 +7,6 @@ facts:
       of the Squiggle language rewrite (v0.8-0.10) and the Squiggle Hub
       platform. Also known as berekuk on GitHub.
     asOf: !date 2026-03
-
   - id: f_SM4notab01
     property: notable-for
     value: "Squiggle language rewrite (v0.8-0.10); built Squiggle Hub platform; previously built Kocherga (EA community space in Moscow)"

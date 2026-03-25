@@ -1,12 +1,8 @@
 /**
- * Removes employed-by and role facts from FactBase YAML files.
+ * Surgically removes employed-by and role fact blocks from FactBase YAML files
+ * WITHOUT reformatting. Preserves original YAML style, blank lines, etc.
  *
- * Career records belong in the personnel table (TableBase), not FactBase.
- * This script strips employed-by and role facts while preserving biographical
- * facts (born-year, education, notable-for, social-media, etc.).
- *
- * Usage:
- *   node --import tsx/esm crux/scripts/strip-career-facts.ts [--dry-run]
+ * Usage: node --import tsx/esm crux/scripts/strip-career-facts-v2.ts [--dry-run]
  */
 
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
@@ -16,78 +12,98 @@ const ROOT = join(import.meta.dirname, "../..");
 const THINGS_DIR = join(ROOT, "packages/factbase/data/things");
 const dryRun = process.argv.includes("--dry-run");
 
-// Properties that are career/employment data → remove from FactBase
-const CAREER_PROPERTIES = new Set(["employed-by", "role"]);
-
 let filesModified = 0;
-let filesDeleted = 0;
 let factsRemoved = 0;
-let factsKept = 0;
 
 for (const filename of readdirSync(THINGS_DIR).filter((f) => f.endsWith(".yaml"))) {
   const filePath = join(THINGS_DIR, filename);
   const content = readFileSync(filePath, "utf-8");
 
-  // Parse the file manually to handle !ref tags
-  // Split into entity line and facts
-  const entityMatch = content.match(/^entity: (.+)/m);
-  if (!entityMatch) continue;
-  const entityId = entityMatch[1];
+  // Check if file has any career facts
+  if (!/property:\s*"?(?:employed-by|role)"?/.test(content)) continue;
 
-  // Extract individual fact blocks
-  const factBlocks: string[] = [];
-  const careerFactBlocks: string[] = [];
+  const lines = content.split("\n");
+  const outputLines: string[] = [];
+  let inCareerFact = false;
+  let removedInThisFile = 0;
+  let blankLineBuffer: string[] = [];
 
-  // Split by "  - id:" pattern (each fact starts with this)
-  const rawBlocks = content.split(/(?=  - id:)/);
-  for (const block of rawBlocks) {
-    if (!block.includes("- id:")) continue;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
 
-    // Check if this fact has a career property
-    const propMatch = block.match(/property:\s*"?([^"\n]+)"?/);
-    if (propMatch && CAREER_PROPERTIES.has(propMatch[1])) {
-      careerFactBlocks.push(block);
-      factsRemoved++;
-    } else {
-      factBlocks.push(block);
-      factsKept++;
+    // Detect start of a fact block (indented "- id:")
+    if (/^\s{2}- id:/.test(line)) {
+      // Look ahead to find the property line
+      let propLine = "";
+      for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
+        if (/^\s+property:/.test(lines[j])) {
+          propLine = lines[j];
+          break;
+        }
+      }
+
+      const isCareerFact = /property:\s*"?(?:employed-by|role)"?/.test(propLine);
+      if (isCareerFact) {
+        inCareerFact = true;
+        removedInThisFile++;
+        factsRemoved++;
+        blankLineBuffer = []; // Drop buffered blank lines before this fact
+        continue;
+      } else {
+        inCareerFact = false;
+        // Flush blank line buffer
+        outputLines.push(...blankLineBuffer);
+        blankLineBuffer = [];
+        outputLines.push(line);
+        continue;
+      }
     }
+
+    if (inCareerFact) {
+      // Skip lines belonging to the current career fact block
+      // A fact block ends when we hit another "  - id:" or a non-indented line
+      if (/^\s{2}- id:/.test(line) || /^[^\s]/.test(line)) {
+        inCareerFact = false;
+        // Re-process this line
+        i--;
+        continue;
+      }
+      // Blank line within a career fact block — skip
+      if (line.trim() === "") continue;
+      // Still in the career fact — skip
+      continue;
+    }
+
+    // Buffer blank lines (we might drop them if followed by a career fact)
+    if (line.trim() === "" && outputLines.length > 0) {
+      blankLineBuffer.push(line);
+      continue;
+    }
+
+    // Normal line — flush buffer and keep
+    outputLines.push(...blankLineBuffer);
+    blankLineBuffer = [];
+    outputLines.push(line);
   }
 
-  if (careerFactBlocks.length === 0) continue; // No career facts to remove
+  // Flush remaining buffer
+  outputLines.push(...blankLineBuffer);
 
-  if (factBlocks.length === 0) {
-    // File would be empty (only had career facts) — check if it's a person file
-    // that was created just for career data. If the only facts were career facts,
-    // we might want to keep the file with just the entity ID for other facts
-    // to be added later. But if it literally has nothing, flag it.
-    if (dryRun) {
-      console.log(`[DRY RUN] ${filename}: would remove ${careerFactBlocks.length} career facts (file would have 0 remaining facts)`);
-    } else {
-      // Write a minimal file with just the entity header
-      writeFileSync(filePath, `entity: ${entityId}\nfacts: []\n`);
-    }
-    filesModified++;
-    continue;
-  }
+  if (removedInThisFile === 0) continue;
+
+  // Clean up trailing blank lines before EOF
+  let result = outputLines.join("\n");
+  result = result.replace(/\n{3,}/g, "\n\n"); // Collapse multiple blank lines
+  if (!result.endsWith("\n")) result += "\n";
 
   if (dryRun) {
-    console.log(`[DRY RUN] ${filename}: remove ${careerFactBlocks.length} career facts, keep ${factBlocks.length} biographical facts`);
-    filesModified++;
-    continue;
+    console.log(`[DRY RUN] ${filename}: remove ${removedInThisFile} career facts`);
+  } else {
+    writeFileSync(filePath, result);
   }
-
-  // Reconstruct the file
-  const newContent = `entity: ${entityId}\nfacts:\n${factBlocks.join("")}`;
-  writeFileSync(filePath, newContent);
   filesModified++;
 }
 
-console.log("\n── Summary ──");
-console.log(`Files modified: ${filesModified}`);
+console.log(`\nFiles modified: ${filesModified}`);
 console.log(`Career facts removed: ${factsRemoved}`);
-console.log(`Biographical facts kept: ${factsKept}`);
-
-if (dryRun) {
-  console.log("\n[DRY RUN] No files were modified.");
-}
+if (dryRun) console.log("[DRY RUN] No files were modified.");

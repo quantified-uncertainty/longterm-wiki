@@ -7358,7 +7358,86 @@
   description: >-
     Open-source community focused on privacy-preserving AI and data science.
     Develops tools for federated learning, differential privacy, and encrypted
-    computation. Funded by Open Philanthropy.
+    computation. Funded by Open Philanthropy. Partnered with UK AI Safety
+    Institute and Anthropic on the first practical test of NVIDIA H100 secure
+    enclaves for cross-organizational AI evaluation (2025).
+  tags:
+    - privacy
+    - confidential-computing
+    - hardware-governance
+  lastUpdated: 2026-03
+
+- id: lucid-computing
+  stableId: SYntJDlIY1
+  type: organization
+  orgType: startup
+  title: Lucid Computing
+  website: https://lucidcomputing.ai
+  founded: "2025"
+  headquarters: San Francisco, CA
+  description: >-
+    Startup building a hardware-rooted zero-trust verification platform for AI
+    workloads. Uses Trusted Execution Environments (Intel TDX, NVIDIA H100
+    Confidential Computing) and latency-based location proofs for cryptographic
+    verification of AI chip usage and data processing location. Products include
+    "AI Passports" (cryptographic certification of where and how models ran),
+    compliance marketplace (GDPR, HIPAA, EU AI Act, ITAR modules), and "Digital
+    Embassies" for sovereign AI infrastructure. One of the only dedicated
+    startups in the hardware governance space.
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
+  tags:
+    - hardware-governance
+    - confidential-computing
+    - compute-governance
+    - startup
+  lastUpdated: 2026-03
+
+- id: mithril-security
+  stableId: V5RCY2I3eY
+  type: organization
+  orgType: startup
+  title: Mithril Security
+  website: https://www.mithrilsecurity.io
+  headquarters: Ris-Orangis, France
+  description: >-
+    Startup specializing in enclave-based solutions for trustworthy AI using
+    Intel SGX. Built BlindAI, an open-source secure deployment solution
+    (independently audited). Partnered with Future of Life Institute on a
+    proof-of-concept for hardware-backed AI governance. Received OpenAI
+    cybersecurity grant. Raised \$1.7M before acquisition by H Company in
+    June 2024.
+  tags:
+    - confidential-computing
+    - hardware-governance
+    - acquired
+  lastUpdated: 2026-03
+
+- id: chips-alliance
+  stableId: 0bYYDuKcGH
+  type: organization
+  orgType: generic
+  title: CHIPS Alliance
+  website: https://www.chipsalliance.org
+  description: >-
+    Open-source hardware development organization under the Linux Foundation.
+    Hosts the Caliptra project (open-source silicon Root of Trust) with
+    contributors including AMD, Google, Microsoft, NVIDIA, and Samsung.
+    Develops open standards for chip security and interoperability.
+  relatedEntries:
+    - id: hardware-enabled-governance
+      type: approach
+    - id: flexheg
+      type: project
+    - id: hardware-mechanisms-international-ai-agreements
+      type: analysis
+  tags:
+    - open-source
+    - hardware-governance
+    - semiconductors
   lastUpdated: 2026-03
 
 - id: ai-objectives-institute
@@ -8131,7 +8210,7 @@
   website: https://www.baidu.com
   description: >-
     Chinese technology company with major AI research lab. Career pathway for
-    researchers including Andrew Ng (Chief Scientist) and Dario Amodei.
+    researchers including Andrew Ng (Chief Scientist, 2014-2017).
   lastUpdated: 2026-03
 
 - id: google
@@ -8478,4 +8557,37 @@
       url: https://www.worldvision.org/
     - title: World Vision International - Wikipedia
       url: https://en.wikipedia.org/wiki/World_Vision_International
+# ── Political Action Committees (AI-related) ────────────────────────────
+
+- id: think-big-pac
+  stableId: iqEF0amsJM
+  type: organization
+  orgType: generic
+  title: Think Big PAC
+  description: >-
+    Super PAC funded by Leading the Future. Backs candidates who oppose
+    restrictive AI regulation in federal races.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: american-mission-pac
+  stableId: GGcOTR25tl
+  type: organization
+  orgType: generic
+  title: American Mission PAC
+  description: >-
+    Super PAC funded by Leading the Future. Active in 2026 Democratic
+    primaries backing candidates opposed to AI regulation.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: public-first-action
+  stableId: NeUHBH9hGa
+  type: organization
+  orgType: generic
+  title: Public First Action
+  description: >-
+    Political organization funded in part by Anthropic. Supports
+    pro-regulation candidates in 2026 races. Raised approximately \$20M.
+  tags: [political-action, ai-regulation]
   lastUpdated: 2026-03

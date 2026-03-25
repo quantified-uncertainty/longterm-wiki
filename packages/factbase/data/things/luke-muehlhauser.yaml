@@ -1,5 +1,6 @@
 entity: TclWePCJ7w
 facts:
-  - id: "f_yFiXtoJMDg"
-    property: "notable-for"
+  - id: f_yFiXtoJMDg
+    property: notable-for
     value: "Former Executive Director of MIRI; former GiveWell/Open Philanthropy researcher on AI risk"
+

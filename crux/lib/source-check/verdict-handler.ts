@@ -59,7 +59,7 @@ export async function storeSourceCheckEvidence(params: {
  * @param logPrefix - Prefix for warning messages (default: '[source-check]')
  */
 export async function storeAggregateVerdict(params: {
-  recordType: RecordType;
+  recordType: RecordType | 'fact';
   recordId: string;
   verdict: SourceCheckVerdict | string;
   confidence: number;

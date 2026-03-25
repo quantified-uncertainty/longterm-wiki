@@ -15,7 +15,6 @@ facts:
     property: social-media
     value: "@NPCollapse"
     source: https://x.com/NPCollapse
-
   - id: V5EttM7ikA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Connor_Leahy

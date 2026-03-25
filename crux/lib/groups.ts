@@ -84,6 +84,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'migrate-citations',
       'legislation',
       'bluesky',
+      'races',
     ],
     flattened: ['tablebase'],
   },

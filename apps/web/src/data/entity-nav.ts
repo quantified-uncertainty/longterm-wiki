@@ -20,6 +20,7 @@ const DIRECTORY_ENTITY_TYPES: Record<string, string> = {
   "research-area": "/research-areas",
   approach: "/approaches",
   event: "/events",
+  "political-race": "/races",
 };
 
 /**

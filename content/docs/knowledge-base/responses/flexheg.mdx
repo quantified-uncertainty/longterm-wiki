@@ -1,0 +1,144 @@
+---
+wikiId: E2087
+title: FlexHEG (Flexible Hardware-Enabled Guarantees)
+description: A proposed family of secure, privacy-preserving hardware mechanisms integrated into AI chips to enforce verifiable compliance with rules on AI compute usage, supporting multilateral governance of advanced AI.
+sidebar:
+  order: 50
+subcategory: compute-governance
+lastEdited: 2026-03-25
+summary: FlexHEG is a nascent but technically serious proposal to embed tamper-resistant governance processors into AI accelerators, enabling cryptographically verifiable enforcement of international AI compute agreements; the article provides thorough coverage of architecture, governance vision, and acknowledged limitations, though the concept remains unproven and faces major political and technical hurdles.
+clusters:
+  - ai-safety
+  - governance
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Detail |
+|-----------|--------|
+| **Full Name** | Flexible Hardware-Enabled Guarantees |
+| **Type** | Hardware governance proposal / R&D initiative |
+| **Status** | Research and early prototyping phase |
+| **Commissioning Body** | ARIA (Advanced Research and Invention Agency) |
+| **Key Funder** | Survival and Flourishing Fund (SFF) |
+| **Target Deployment** | 2027 |
+| **Proposed Seed Funding** | \$2M–\$10M (Focused Research Organization) |
+| **Related Concept** | <EntityLink id="E463">Hardware-Enabled Governance</EntityLink> |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [flexheg.com](https://flexheg.com) |
+
+## Overview
+
+**FlexHEG (Flexible Hardware-Enabled Guarantees)** is a proposed family of secure hardware mechanisms designed to be integrated into AI chips and accelerators, enabling verifiable, privacy-preserving enforcement of rules governing AI compute usage. The core idea is to embed a tamper-resistant **Guarantee Processor** within AI accelerators that can locally monitor workloads, enforce updateable policy rulesets, and produce cryptographically verifiable claims about what an AI system has or has not done—all without exposing proprietary model weights or sensitive training data to outside parties. Proposed applications include enforcing compute limits for AI training runs, verifying that AI models have not been used to develop weapons, enabling controlled deployment under operating licenses, and supporting compliance with international AI governance agreements.
+
+The concept sits at the intersection of hardware security engineering and AI governance. Rather than relying on auditors with physical access to data centers, or on self-reported compliance from AI developers, FlexHEG proposes to make trustworthy guarantees a technical property of the hardware itself. Policy rulesets could be updated cryptographically—by device owners, institutional quorums, or international bodies—without requiring hardware changes, and enforcement could be automated and non-destructive (for example, pausing an invalid workload rather than destroying the chip). The system is designed to treat AI accelerators as black boxes, collecting independent measurements such as floating-point operation counts, memory access patterns, and network traffic at the hardware level, with multiple data sources providing robustness against falsification.
+
+FlexHEG is a nascent research initiative rather than a mature product. It was commissioned as a three-part report series by ARIA (the UK's Advanced Research and Invention Agency) and has attracted funding interest from the Survival and Flourishing Fund. The initiative is positioned as contributing to <EntityLink id="E2053">Hardware Mechanisms for International AI Agreements</EntityLink>, and the open-source R&D community centered at flexheg.com frames the project as supporting "trustworthy assurance for AI." Key open problems remain, including adversarially robust capability evaluations, supply chain security, and the establishment of internationally trusted governance bodies for oversight.
+
+## History
+
+FlexHEG does not have a traditional founding story—it emerged from policy-oriented technical research rather than as a commercial product or organization. The concept appears to have developed in response to growing concern about the governance of frontier AI compute, particularly as AI accelerator clusters began scaling rapidly and timelines for potential international AI agreements shortened.
+
+The most concrete institutional origin identified in available sources is a commission from **ARIA** (the UK's Advanced Research and Invention Agency) for a three-part report series exploring flexible hardware-enabled guarantees for AI governance. This series comprises Part I (an overview of the concept, governance capabilities, and challenges, released April 2025 and also available as arXiv preprint 2506.15093), Part II (a technical options analysis covering design requirements and accelerator modifications, hosted at flexheg.com), and Part III (focused on international security applications, available as arXiv 2506.15100). The reports were authored by researchers including Onni Aarne, James Petrie, Nora Ammann, and David 'davidad' Dalrymple, among others.
+
+In parallel, the **Survival and Flourishing Fund (SFF)** launched a dedicated grant round in 2024 targeting FlexHEG technical maturity, using its S-Process for funder recommendations. That round distributed \$4.1 million for FlexHEG feasibility and related research—exceeding an initial estimate of \$1M–\$4M. A separate EA Infrastructure Fund announcement explored seeding a Focused Research Organization (FRO) with \$2M–\$10M to build and test working FlexHEG prototypes within two to three years.
+
+David Dalrymple (davidad) presented on the FlexHEG concept at the AI Security Forum, describing the high-level architecture including secure enclosures with thermal and capacitance sensors. Yoshua Bengio authored a memo advocating FlexHEG for international AI governance, proposing deployment timelines and suggesting that guaranteeable chips could be available by the end of 2025 to lower adoption barriers for hardware firms and governments. Akash Wasil authored an analysis applying DARPA's Heilmeier Catechism framework to assess FlexHEG for national security funding contexts. Trustless Computing Associates (TCA) submitted a 2024 grant proposal drawing on nine years of prior work on ultra-secure AI systems, proposing a certification body and building on the FlexHEG concept.
+
+The reports identify a critical window for deployment: major data center buildouts are projected to occur between 2025 and 2030, and the reports argue that FlexHEG systems need to be available by 2027 to be integrated into new hardware before that window closes.
+
+## Technical Architecture
+
+### Core Components
+
+FlexHEG systems are built around two primary hardware elements: a **Secure Enclosure** and a **Guarantee Processor**. The Secure Enclosure protects against physical tampering using tamper-evident seals, physically unclonable functions (PUFs) for key generation, active sensors such as capacitance and temperature detectors, and eFuses that can erase sensitive data in response to intrusion attempts. The Guarantee Processor is an auditable compute element that runs a firmware-enforced ruleset—updateable via smart contract-like mechanisms—and monitors accelerator behavior from the outside, treating the accelerator itself as a black box.
+
+An **Interlock Design** positions FlexHEG components on the data and instruction paths into the accelerator, allowing the Guarantee Processor to intercept and verify memory (HBM) content, instructions, network traffic, performance counters such as FLOPs, and power usage. **Crypto Engines** support encrypted cluster formation using AES-GCM session keys and public key lookups, enabling secure coordination across distributed multi-device AI training runs.
+
+### Policy Enforcement and Updates
+
+A central feature of FlexHEG is that its rulesets are updateable without hardware changes. Policies can be broadcast one-way to chips by device owners, institutional quorums, or state-level authorities, and the system is designed so that no data leaves the chip without the owner's permission. Updates can be cryptographically signed and applied on a rolling basis (one proposal describes updates roughly every ten minutes for certain rule classes). This flexibility is intended to allow FlexHEG to adapt to new governance requirements—such as emerging international agreements or newly identified AI risks—without requiring hardware replacement.
+
+Enforcement is designed to be non-destructive: an invalid workload might be paused rather than the hardware destroyed. The system supports privacy-preserving aggregation, enabling claims such as "this model was trained under X total FLOPs" to be verifiable across a distributed cluster without exposing the model itself.
+
+### Implementation Options
+
+The Part II report discusses four main categories of modification for AI accelerators: fully integrated hardware modifications (adding Guarantee Processor and Secure Enclosure directly to the accelerator die or PCB), retrofittable enclosures placed around existing hardware, firmware-level modifications, and hybrid approaches. These options trade off security against deployability. Integrated hardware modifications offer the highest security guarantees but require multi-year chip design and manufacturing cycles and the cooperation of accelerator manufacturers. Firmware modifications can be deployed more quickly but are more vulnerable to sophisticated physical attacks and depend on manufacturer cooperation for proprietary signing. Retrofittable enclosures occupy a middle ground, offering faster deployment than new chip designs while providing more physical security than firmware-only approaches.
+
+The reports are explicit that early implementations will likely require compromises on security and rule sophistication, with higher-assurance versions requiring more time to develop and validate.
+
+## Governance and International Applications
+
+The reports frame FlexHEG primarily as an enabler of international AI governance agreements. Proposed governance applications include:
+
+- **Export control enforcement**: Location tracking and workload monitoring to verify that AI chips exported to other countries are not used for prohibited applications, such as weapons development.
+- **Compute limit agreements**: Verifiable enforcement of internationally agreed caps on training compute for frontier AI models, with automated compliance rather than reliance on self-reporting.
+- **Controlled model deployment**: Restricting AI system usage via operating licenses or location-based rules, with cryptographic verification rather than physical inspection.
+- **Capability verification**: Allowing states to verify claims about AI system capabilities without exposing proprietary model weights, reducing the information asymmetries that might otherwise fuel arms-race dynamics.
+- **WMD prevention**: Detecting workloads associated with military or weapons-related applications and triggering lockdown responses.
+
+The reports acknowledge that this governance vision requires a trusted international body to standardize FlexHEG designs, oversee manufacturing and installation, and guard against backdoors or compromise. The proposal for random device assignment to customers—so that manufacturers cannot selectively compromise specific chips intended for particular buyers—is one suggested mechanism for building trust. The reports also discuss game-theoretic arguments that comprehensive AI compute agreements enforced via FlexHEG would be stable under reasonable assumptions about state preferences, though they acknowledge that finding entities trusted by all major powers is extremely difficult in the current international system.
+
+Apart Research has explored an "AI IntelSat" governance model that would use FlexHEG devices as part of a satellite-regime-inspired international framework for AI coordination.
+
+## Connections to AI Safety
+
+FlexHEG is not an AI alignment technique in the technical sense—it does not address how to specify or learn human values, or how to make AI systems pursue beneficial goals. Rather, it is a hardware governance tool situated within the broader <EntityLink id="E463">Hardware-Enabled Governance</EntityLink> approach to AI safety. Its relevance to AI safety and existential risk reduction lies in its potential to:
+
+- Prevent malicious actors from using frontier AI to develop <EntityLink id="E40">biological</EntityLink> or other weapons of mass destruction, by verifying workload characteristics at the hardware level.
+- Enable international agreements that reduce <EntityLink id="E29">AI-enabled authoritarian takeover</EntityLink> risks by limiting which actors can develop the most powerful AI systems.
+- Support verification of safer training architectures and techniques, making it possible for third parties to confirm claims about how a model was trained without accessing its weights.
+- Provide a mechanism for rapid adaptation to newly identified AI risks, by enabling ruleset updates without hardware replacement.
+
+David Dalrymple has described FlexHEG as drawing on the tradition of DARPA's HACMS program for bug-resistant software, applying similar principles of formal verification and hardware-level security to AI governance. <EntityLink id="E125">Epoch AI</EntityLink> research on AI hardware scaling trends is cited in the reports as informing the urgency of the 2027 deployment target.
+
+## Criticisms and Limitations
+
+### Technical Feasibility
+
+The FlexHEG reports themselves acknowledge that the system is technically ambitious and will require many person-years of interdependent hardware, firmware, and security work. Early prototypes are expected to compromise on both security and rule sophistication. Hardware security science is described as less amenable to formal verification than software, meaning that secure enclosures rely on less established methodologies than, for example, formally verified cryptographic protocols.
+
+Fully integrated hardware modifications require multi-year manufacturing cycles and the cooperation of accelerator manufacturers—cooperation that may be difficult to secure given proprietary IP concerns. Firmware modifications are faster to deploy but more vulnerable to sophisticated physical attacks such as voltage glitching during Secure Boot. Even retrofittable enclosures face supply chain risks and the challenge of verifying that commercial chip designs, which prioritize speed over security, have not introduced vulnerabilities.
+
+### Security and Circumvention
+
+Critics note that FlexHEG mechanisms face circumvention risks at multiple levels. On-demand features could in principle be bypassed to exploit full chip capabilities. Lock/unlock functions create targets for cyber-attacks on private key custodians. Firmware update mechanisms, if updates are blocked or tampered with, represent a single point of failure. Even collaborative open-source design processes may not eliminate subtle design-stage flaws or backdoors—an analogy drawn in the reports is to speculated weaknesses in cryptographic standards allegedly introduced by the NSA.
+
+The reports acknowledge that adversarially robust capability evaluations remain an open problem. It is technically difficult to create evaluations that cannot be defeated by models specifically trained to underperform on those evaluations, and verifying that no such subversion occurred while preserving privacy is very challenging. The reports describe these as known open problems for which solutions are needed but have not yet been demonstrated.
+
+### Governance and Adoption
+
+Perhaps the most fundamental challenge is political rather than technical. FlexHEG's international governance vision requires an international body trusted by all major AI-developing states to standardize designs, oversee manufacturing, and manage updates. No such body currently exists, and the reports acknowledge the difficulty of establishing one given the current geopolitical environment. There is also a risk that governance mechanisms could be abused—for example, by states using ruleset update authority to impose restrictions on competitors' AI development that go beyond agreed international norms.
+
+Adoption faces practical hurdles: manufacturers may be reluctant to cooperate, "bifurcated product lines" with and without FlexHEG features could emerge and undermine universal safeguards, and privacy or security concerns might render FlexHEG-equipped chips unusable for risk-averse actors. The Heilmeier Catechism analysis by Akash Wasil frames these as significant but potentially surmountable barriers, positioning FlexHEG as promising for national security investment contexts while acknowledging the non-trivial barriers to success.
+
+### Strategic Risks
+
+Some critics raise concerns that hardware-enabled governance mechanisms could exacerbate rather than reduce risks. Accelerated technology transfer between states, enabled by FlexHEG-governed deployment, could fuel rather than dampen AI arms-race dynamics. Regulatory overreach enabled by fine-grained compute monitoring is another concern. The reports address these risks via game-theoretic arguments for the stability of comprehensive agreements, but these arguments depend on assumptions about state preferences that may not hold in practice.
+
+## Key Uncertainties
+
+- Whether accelerator manufacturers will cooperate with integrated FlexHEG hardware requirements within timelines relevant for the 2027 deployment target.
+- Whether adversarially robust capability evaluations can be developed and standardized in time to support meaningful governance agreements.
+- Whether an internationally trusted governance body for FlexHEG standardization and oversight can be established, given current geopolitical tensions.
+- Whether open-source design and collaborative development can adequately address the risk of subtle backdoors or design-stage vulnerabilities.
+- Whether firmware and retrofittable approaches can provide sufficient security guarantees for high-stakes international governance applications in the near term.
+- The extent to which FlexHEG governance mechanisms could be circumvented by sophisticated state-level adversaries willing to invest significant resources.
+
+## Sources
+
+[^1]: Aarne, Onni and Petrie, James — FlexHEG Part I: Introduction and Governance Capabilities (arXiv 2506.15093, April 2025)
+[^2]: Aarne, Onni and Petrie, James — FlexHEG Part III: International Security Applications (arXiv 2506.15100, June 2025)
+[^3]: ARIA (Advanced Research and Invention Agency) — FlexHEG Part II: Technical Options for Flexible Hardware-Enabled Guarantees (flexheg.com/report-2.pdf)
+[^4]: Dalrymple, David A. (davidad) — Presentation on FlexHEG design and architecture (AI Security Forum, April 2025)
+[^5]: Wasil, Akash — FlexHEG national security case via DARPA Heilmeier Catechism analysis (SSRN, 2025)
+[^6]: Survival and Flourishing Fund — SFF-2024 FlexHEGs Grant Round announcement and S-Process funding results (\$4.1M distributed)
+[^7]: EA Infrastructure Fund — Hardware-Enabled Mechanisms (HEM) funding announcement, including FRO seed funding proposal (\$2M–\$10M)
+[^8]: Bengio, Yoshua — Memo on FlexHEG for international AI governance, proposing end-of-2025 chip deployment target (August 2024)
+[^9]: Apart Research — AI IntelSat governance model incorporating FlexHEG devices (July 2025)
+[^10]: Trustless Computing Associates (TCA) — Grant proposal for FlexHEG certification body and Seevik Controls (2024)

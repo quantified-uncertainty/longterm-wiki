@@ -1,12 +1,12 @@
 entity: 1CHfDs0vsg
 facts:
-  - id: "f_UJ9mqFHBHQ"
-    property: "description"
-    value: "Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts."
-    asOf: "2026-03"
-    notes: "Migrated from old entity system"
-  - id: "f_eK2nLw9pYr"
-    property: "notable-for"
+  - id: f_UJ9mqFHBHQ
+    property: description
+    value: Director of the US AI Safety Institute (AISI), leading federal AI safety evaluation and policy efforts.
+    asOf: 2026-03
+    notes: Migrated from old entity system
+  - id: f_eK2nLw9pYr
+    property: notable-for
     value: "Leading US AI Safety Institute; AI policy"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"

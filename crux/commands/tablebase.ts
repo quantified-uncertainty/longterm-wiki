@@ -903,6 +903,11 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   const dryRun = !!options.dryRun;
   const serverUrl = getServerUrl();
 
+  console.log('NOTE: This command syncs career data from FactBase YAML + experts.yaml only.');
+  console.log('      Bulk career enrichment data is managed separately via:');
+  console.log('        crux/scripts/sync-careers-to-personnel.ts + crux/scripts/career-data.json');
+  console.log('      This sync is additive (upsert) and will NOT delete existing records.\n');
+
   console.log('Extracting career data from FactBase...');
   const { entries, stats } = extractAllCareers();
 
@@ -978,9 +983,24 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
     }
   }
 
+  // Show total personnel stats so users can see the full picture
+  const statsResult = await apiRequest<{
+    total: number;
+    byRoleType: { 'key-person': number; board: number; career: number };
+  }>('GET', '/api/personnel/stats');
+
+  if (statsResult.ok) {
+    const { total, byRoleType } = statsResult.data;
+    console.log(`\nPersonnel table totals (all sources):`);
+    console.log(`  Total records:  ${total}`);
+    console.log(`  Career:         ${byRoleType.career}`);
+    console.log(`  Key-person:     ${byRoleType['key-person']}`);
+    console.log(`  Board:          ${byRoleType.board}`);
+  }
+
   return {
     exitCode: 0,
-    output: `\nSynced ${totalUpserted} career entries to personnel table.`,
+    output: `\nSynced ${totalUpserted} career entries to personnel table (from FactBase/experts sources).`,
   };
 }
 

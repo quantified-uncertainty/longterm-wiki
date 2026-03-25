@@ -367,6 +367,10 @@ const ResearchAreaEntitySchema = BaseEntity.extend({
   entityType: z.literal("research-area"),
 });
 
+const PoliticalRaceEntitySchema = BaseEntity.extend({
+  entityType: z.literal("political-race"),
+});
+
 // Catch-all for entity types we haven't explicitly modeled
 const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
@@ -411,6 +415,7 @@ export const TypedEntitySchema = z.discriminatedUnion("entityType", [
   AiModelEntitySchema,
   BenchmarkEntitySchema,
   ResearchAreaEntitySchema,
+  PoliticalRaceEntitySchema,
 ]);
 
 // ============================================================================
@@ -427,6 +432,7 @@ export type AiModelEntity = z.infer<typeof AiModelEntitySchema>;
 export type BenchmarkEntity = z.infer<typeof BenchmarkEntitySchema>;
 export type ProjectEntity = z.infer<typeof ProjectEntitySchema>;
 export type ResearchAreaEntity = z.infer<typeof ResearchAreaEntitySchema>;
+export type PoliticalRaceEntity = z.infer<typeof PoliticalRaceEntitySchema>;
 export type ApproachEntity = z.infer<typeof ApproachEntitySchema>;
 export type EventEntity = z.infer<typeof EventEntitySchema>;
 export type GenericEntity = z.infer<typeof GenericEntitySchema>;

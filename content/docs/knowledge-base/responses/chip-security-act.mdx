@@ -1,0 +1,153 @@
+---
+wikiId: E2085
+title: Chip Security Act
+description: Bipartisan U.S. legislation requiring location verification mechanisms on advanced AI semiconductors to prevent smuggling and diversion to adversarial nations.
+sidebar:
+  order: 50
+subcategory: compute-governance
+lastEdited: 2026-03-25
+summary: The Chip Security Act (H.R. 3447/S. 1705) would require location verification mechanisms on advanced AI chips to prevent export control evasion, representing a concrete compute governance intervention; the article covers the bill's provisions, supporters, and opposition thoroughly but relies heavily on sources without accessible URLs, limiting independent verification.
+clusters:
+  - governance
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Detail |
+|-----------|--------|
+| **Full Name** | Chip Security Act |
+| **Bill Numbers** | H.R. 3447 (House), S. 1705 (Senate) |
+| **Introduced** | May 2025 |
+| **Sponsors** | Sen. Tom Cotton (R-Ark.), Rep. Bill Huizenga (R-Mich.) |
+| **Type** | Bipartisan U.S. Congressional Bill |
+| **Status** | Pending; House Foreign Affairs Committee markup scheduled March 3, 2026 |
+| **Primary Agency** | Bureau of Industry and Security (BIS), U.S. Department of Commerce |
+| **Related Legislation** | <EntityLink id="E2086" name="stop-stealing-our-chips-act">Stop Stealing Our Chips Act</EntityLink>, CHIPS and Science Act (2022) |
+| **Key Opponents** | Semiconductor Industry Association (SIA) |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Bill Text | [huizenga.house.gov](https://huizenga.house.gov/uploadedfiles/chip_security_act_5.13.25_final.pdf) |
+
+## Overview
+
+The Chip Security Act is a bipartisan U.S. bill — introduced in May 2025 as H.R. 3447 in the House and S. 1705 in the Senate — that would require advanced U.S. AI semiconductors to include mechanisms capable of verifying their physical location after export. Its primary goal is to prevent the smuggling and diversion of high-end chips to adversarial nations, including China, Russia, Iran, and North Korea, by enabling exporters to detect when chips appear in unauthorized locations or have been tampered with.[^1]
+
+The bill targets chips classified under export control classifications ECCN 3A090, 3A001.z, 4A090, and 4A003.z — the categories covering advanced AI accelerators such as those produced by Nvidia. Under the proposal, manufacturers and exporters would be required to equip these chips with "chip security mechanisms" enabling location tracking, and to report credible evidence of unauthorized deployment or tampering to the Bureau of Industry and Security (BIS). Proponents characterize it as a "low-burden, high-impact" complement to existing <EntityLink id="E136">U.S. AI chip export controls</EntityLink>, arguing that current enforcement — which covers less than 1% of shipped chips through physical inspection — is wholly inadequate against the scale of documented smuggling.[^2]
+
+The bill is distinct from the 2022 CHIPS and Science Act, which provides subsidies for domestic semiconductor manufacturing. It also explicitly prohibits the implementation of backdoors, kill switches, spyware, or geofencing mechanisms that would hinder chip functionality — provisions that sponsors have highlighted in response to comparisons with the controversial 1990s Clipper Chip program, which embedded government-accessible decryption backdoors into hardware.[^3]
+
+## Background and Context
+
+The legislation emerged in the context of growing evidence that U.S. export controls on advanced AI chips were being systematically circumvented. Reports surfaced that Chinese AI company DeepSeek had developed its R1 model using Nvidia chips acquired in violation of U.S. export restrictions. Estimates cited by bill supporters put the number of chips smuggled to China at a median of approximately 140,000 in 2024 alone, with over \$1 billion in controlled Nvidia AI chips reaching China over a single three-month period.[^4]
+
+These developments followed the Biden administration's withdrawal of the AI Diffusion Rule on advanced semiconductors, leaving a perceived enforcement gap. The Trump administration's AI Action Plan, which frames U.S. dominance in AI as a national security imperative, provided additional political context for the bill's framing around denying adversaries the hardware needed for military AI applications.[^5]
+
+Supporters have also pointed to structural limitations at the BIS, which operates with a roughly \$200 million budget and reportedly had just one officer covering all of Southeast Asia — a region central to chip transshipment routes — at the time of the bill's introduction.[^6]
+
+## Provisions
+
+The Chip Security Act takes a deliberately non-prescriptive approach to implementation. Rather than mandating specific technologies, it requires that covered chips include "chip security mechanisms" capable of verifying physical location. These mechanisms may be implemented through software, firmware, hardware modifications, or on-site inspection regimes, leaving the specific method to manufacturers and exporters.[^7]
+
+Key features of the bill include:
+
+- **Location verification requirements**: Covered chips must be capable of confirming their physical location globally, enabling detection of diversion from authorized end-users.
+- **Reporting obligations**: Exporters must notify BIS (under the House version) or the Departments of Commerce and Defense (under the Senate version) upon confirmation of credible information that chips are present in unauthorized locations or have been subjected to tampering such as location spoofing.
+- **Prohibitions on surveillance**: The bill explicitly bars mechanisms that monitor computational workloads or chip operations. It also prohibits backdoors, kill switches, spyware, and any geofencing that impairs chip functionality.
+- **Air-gapped compliance paths**: Recognizing that some data centers operate without internet connectivity, the bill provides compliance options for offline or air-gapped deployments.
+- **Industry-led implementation**: Compliance is demonstrated by companies themselves; government agencies receive reports only after companies have confirmed a diversion event.
+- **Future study provisions**: The bill directs Commerce (and Defense in the Senate version) to study additional potential safeguards, including workload verification and performance degradation mechanisms, though these are not mandated in the current text.[^8]
+
+Proposed technical implementations discussed by supporters include firmware geolocation, Delay-Based Location Verification (DBLV), and Provenance-Based Location Verification (PBLV) — approaches that proponents argue are deployable using existing capabilities without hardware redesign.[^9]
+
+## Legislative History
+
+The bill was introduced in May 2025 with bipartisan sponsorship. In the House, the primary sponsors are Rep. Bill Huizenga (R-Mich.) and Rep. Bill Foster (D-Ill.), with cosponsors including Reps. John Moolenaar (R-Mich.), Raja Krishnamoorthi (D-Ill.), Rick Crawford (R-Ark.), Ted Lieu (D-Calif.), Darin LaHood (R-Ill.), and Josh Gottheimer (D-N.J.). In the Senate, Sen. Tom Cotton (R-Ark.) leads the bill, with Sen. Cynthia Lummis (R-Wyo.) among its supporters.[^10]
+
+The bipartisan House Select Committee on China united behind the legislation following a June 25, 2024 hearing on AI competition with China.[^11] The House Foreign Affairs Committee was scheduled for a markup of H.R. 3447 on March 3, 2026. The Semiconductor Industry Association issued a formal opposition statement on February 2, 2026, ahead of the markup.[^12]
+
+The bill complements the <EntityLink id="E2086" name="stop-stealing-our-chips-act">Stop Stealing Our Chips Act</EntityLink>, a related bipartisan Senate bill that would create a whistleblower incentive program offering informants 10–30% of fines collected from smuggling violations, excluding individuals with terrorist or criminal affiliations.[^13]
+
+## Supporters and Their Arguments
+
+Supporters of the bill span national security think tanks, policy analysts, and some members of industry. Key advocates include:
+
+- **Samuel Hammond** (Foundation for American Innovation), who characterized the bill as urgently needed reform that minimizes burdens on U.S. chipmakers while closing critical enforcement gaps.[^14]
+- **Kit Conklin** (Atlantic Council), who described the bill as a "low-burden, high-impact" solution to enforcement tools that have repeatedly failed to prevent diversion.[^15]
+- **Michael Sobolik** (Hudson Institute), who urged Congress to pass the legislation to crack down on actors evading export controls.[^16]
+- **Mark Beall, Jr.** (AI Policy Network), who described the bill as instrumental to securing the U.S. AI supply chain.[^17]
+
+Supporters argue that the bill would resolve what they characterize as a false dilemma facing BIS: either restrict chip exports so broadly as to harm U.S. competitiveness, or permit exports that risk enabling smuggling. By enabling trusted verification, they contend, the bill could allow broader diffusion of U.S. AI technology to allies and partners without proportionally increasing the risk of diversion to adversaries.[^18]
+
+## Criticisms and Concerns
+
+### Industry Opposition
+
+The Semiconductor Industry Association formally opposed the bill, arguing that mandatory chip security mechanisms constitute complex, costly, and unproven features that could erode global trust in U.S. semiconductors. The SIA raised concerns about feasibility for air-gapped data centers and warned that requiring such mechanisms could be perceived as evidence of U.S. government control over the AI hardware stack, potentially driving allied governments and commercial customers toward alternative suppliers.[^19]
+
+The Information Technology Industry Council (ITIC) published an analysis warning of unintended consequences, including that the bill's provisions — particularly potential "workload verification" study requirements — could fuel perceptions of surveillance overreach and prompt allies to shift toward open-source or non-U.S. chip alternatives. ITIC also raised concerns about privacy implications for cloud providers and end-users.[^20]
+
+### Cybersecurity Risks
+
+Critics from the cybersecurity community, including Luke O'Grady of the Center for Cybersecurity Policy, argue that mandated tracking mechanisms could introduce new exploitable vulnerabilities into chips deployed across critical infrastructure, healthcare, and defense systems. These critics note that geolocation methods — whether asset-reported, topology-based, or delay-based — may be brittle, spoofable, and untested at the scale of global chip deployment.[^21]
+
+Some analysts have drawn comparisons to the Clipper Chip controversy of the 1990s, in which government-mandated cryptographic backdoors were found to contain serious security flaws. Proponents of the Chip Security Act dispute this analogy, noting that the bill explicitly prohibits backdoors and does not grant the government access to chip computations or communications.[^22]
+
+### Commercial and Geopolitical Risks
+
+Critics also argue the bill could harm U.S. commercial interests by framing American technology as government-monitored, potentially accelerating allied countries' efforts to develop or adopt non-U.S. chip alternatives. Some opponents suggest that better resourcing and staffing of the BIS — rather than hardware mandates — would be a more effective and less disruptive approach to enforcement.[^23]
+
+There are also concerns about the potential for adversaries to simply route chip acquisition through additional intermediaries, limiting the bill's effectiveness against determined state-level actors. Critics note that the bill does not address the fundamental resource asymmetry between BIS and the scale of global chip smuggling networks.[^24]
+
+### Industry Influence and Conflicts of Interest
+
+Reports documented that social media accounts associated with PR firm Influenceable portrayed the Republican-led bill as a Democratic mechanism to approve China sales. Model Republic documented undisclosed paid influence efforts related to opposition to the bill, though a direct connection to Nvidia funding was not confirmed. Nvidia CEO Jensen Huang publicly opposed the bill; Nvidia stands to lose substantial China revenue if stricter export enforcement is enacted. Congressional leaders sent nine letters questioning Nvidia regarding chip diversion to China over the course of a single year.[^25]
+
+## Relationship to AI Safety
+
+The Chip Security Act addresses <EntityLink id="E2054">AI chip governance supply chain</EntityLink> concerns primarily through a national security and export control lens. Its direct connection to AI safety as conventionally understood — concerning technical alignment of AI systems with human values — is limited. The bill does not address AI model development practices, training safety, or risks from misaligned AI systems.
+
+The indirect connection to AI safety concerns lies in the observation that controlling access to advanced compute is one of the primary levers available to governments seeking to shape the pace and distribution of AI development globally. By attempting to prevent adversarial nations from acquiring frontier AI hardware, the bill is consistent with arguments made in the AI safety and governance community that compute governance represents an important, tractable intervention point.[^26]
+
+The bill's study provisions — directing agencies to assess workload verification and other potential future mechanisms — have drawn attention from analysts who note that these could eventually expand the bill's scope toward more direct oversight of AI computation, though the current text contains no such requirements.[^27]
+
+## Key Uncertainties
+
+- **Technical feasibility at scale**: Whether any of the proposed location verification approaches can be reliably deployed across billions of chips in diverse operational environments, including adversarial ones, remains contested. No large-scale deployment of such mechanisms has been documented.
+- **Evasion by sophisticated actors**: State-level adversaries with significant resources may be able to develop effective countermeasures, such as location spoofing, potentially limiting the bill's effectiveness against the most capable adversaries.
+- **Legislative prospects**: As of March 2026, the bill has not passed committee. Its commercial opposition, combined with questions about its technical feasibility, creates uncertainty about its path to enactment.
+- **Scope creep**: Critics and some neutral observers have raised questions about whether the study provisions in the bill could be used to justify future expansion toward workload monitoring or other more intrusive mechanisms.
+- **International response**: How allied governments and major commercial customers would respond to U.S. chips carrying mandatory verification mechanisms — and whether this would accelerate the development of competing chip ecosystems — is difficult to predict.
+
+## Sources
+
+[^1]: Chip Security Act bill text — huizenga.house.gov, May 2025. [Official PDF](https://huizenga.house.gov/uploadedfiles/chip_security_act_5.13.25_final.pdf)
+[^2]: Atlantic Council analysis — "How the Chip Security Act could usher in an era of 'trusted trade'", 2024/2025. No URL available.
+[^3]: Chip Security Act bill text — huizenga.house.gov, May 2025. [Official PDF](https://huizenga.house.gov/uploadedfiles/chip_security_act_5.13.25_final.pdf)
+[^4]: House Select Committee on China — hearing materials, June 25, 2024. No URL available.
+[^5]: White House AI Action Plan — July 2025. No URL available.
+[^6]: Foundation for American Innovation / Hudson Institute analyses — 2024/2025. No URL available.
+[^7]: Chip Security Act bill text — huizenga.house.gov, May 2025. [Official PDF](https://huizenga.house.gov/uploadedfiles/chip_security_act_5.13.25_final.pdf)
+[^8]: Chip Security Act bill text — huizenga.house.gov, May 2025. [Official PDF](https://huizenga.house.gov/uploadedfiles/chip_security_act_5.13.25_final.pdf)
+[^9]: Atlantic Council analysis — "How the Chip Security Act could usher in an era of 'trusted trade'", 2024/2025. No URL available.
+[^10]: Chip Security Act legislative records — House Foreign Affairs Committee, 2025. No URL available.
+[^11]: House Select Committee on China — bipartisan statement, June 25, 2024. No URL available.
+[^12]: Semiconductor Industry Association (SIA) — opposition statement, February 2, 2026. No URL available.
+[^13]: Stop Stealing Our Chips Act — bipartisan Senate bill, 2025. No URL available.
+[^14]: Foundation for American Innovation — Samuel Hammond statement on Chip Security Act, 2025. No URL available.
+[^15]: Atlantic Council — Kit Conklin analysis, 2024/2025. No URL available.
+[^16]: Hudson Institute — Michael Sobolik statement on Chip Security Act, 2025. No URL available.
+[^17]: AI Policy Network — Mark Beall, Jr. statement on Chip Security Act, 2025. No URL available.
+[^18]: Atlantic Council analysis — "How the Chip Security Act could usher in an era of 'trusted trade'", 2024/2025. No URL available.
+[^19]: Semiconductor Industry Association (SIA) — opposition statement, February 2, 2026. No URL available.
+[^20]: Information Technology Industry Council (ITIC) — "The Unintended Consequence of the Chip Security Act", 2024/2025. No URL available.
+[^21]: Center for Cybersecurity Policy — Luke O'Grady report on Chip Security Act vulnerabilities, 2024. No URL available.
+[^22]: Center for Cybersecurity Policy report; Atlantic Council rebuttal analysis — 2024/2025. No URL available.
+[^23]: Information Technology Industry Council (ITIC) — "The Unintended Consequence of the Chip Security Act", 2024/2025. No URL available.
+[^24]: Center for Cybersecurity Policy — Luke O'Grady analysis, 2024. No URL available.
+[^25]: Model Republic — documentation of undisclosed paid influence efforts related to Chip Security Act opposition, 2025/2026. No URL available.
+[^26]: LessWrong community discussions on chip export controls and AI governance — 2024/2025. No URL available.
+[^27]: Information Technology Industry Council (ITIC) — analysis of Chip Security Act workload verification provisions, 2024/2025. No URL available.
