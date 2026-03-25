@@ -3247,3 +3247,34 @@
     - ai-safety
     - governance
   lastUpdated: 2026-03
+
+- id: ai-enabled-political-polarization
+  stableId: M4NQ38gfDQ
+  wikiId: E2072
+  type: risk
+  title: AI-Enabled Political Polarization
+  description: >-
+    The phenomenon whereby AI systems amplify societal political divisions
+    through algorithmic curation, generative content, and microtargeting,
+    creating echo chambers and deepening partisan divides.
+  tags:
+    - near-term
+    - governance
+    - epistemic
+  lastUpdated: 2026-03
+
+- id: epistemic-systemic-risk
+  stableId: Wtu0Y2eJ9A
+  wikiId: E2073
+  type: risk
+  title: Epistemic Systemic Risk
+  summaryPage: epistemic-overview
+  description: >-
+    The risk that AI-driven epistemic degradation acts as a systemic
+    externality analogous to financial systemic risk, where each platform's
+    extremization imposes costs on the broader epistemic commons.
+  tags:
+    - near-term
+    - epistemic
+    - governance
+  lastUpdated: 2026-03

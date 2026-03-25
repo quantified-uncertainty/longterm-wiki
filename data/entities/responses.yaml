@@ -6861,3 +6861,60 @@
     - government-digital-services
     - talent-pipeline
   lastUpdated: 2026-03
+
+- id: ai-non-extremization-coordination
+  stableId: dEV3Nqi4Ew
+  wikiId: E2069
+  type: approach
+  title: AI Non-Extremization Coordination
+  description: >-
+    Cross-company coordination to prevent AI-driven extremization, modeled on
+    financial systemic risk regulation. Proposes operational definitions of
+    extremization, third-party auditing, and floor commitments.
+  tags:
+    - ai-governance
+    - international-coordination
+    - epistemic
+  lastUpdated: 2026-03
+
+- id: ai-assisted-diplomacy-and-negotiation
+  stableId: BImsyqMAmA
+  wikiId: E2068
+  type: approach
+  title: AI-Assisted Diplomacy and Negotiation
+  description: >-
+    Using AI for diplomatic preparation and multi-party negotiation, including
+    knowledge graph construction for actor mapping, scenario modeling, and
+    multi-agent coordinator models for exploring agreement spaces.
+  tags:
+    - ai-governance
+    - international-coordination
+  lastUpdated: 2026-03
+
+- id: intervention-evaluation-for-political-stability
+  stableId: OqsRkMX3Dw
+  wikiId: E2071
+  type: approach
+  title: Intervention Evaluation for Political Stability
+  description: >-
+    Frameworks for rigorously evaluating political stability interventions,
+    applying GiveWell-style cost-effectiveness analysis to polarization
+    reduction and democratic resilience programs.
+  tags:
+    - ai-governance
+    - epistemic
+  lastUpdated: 2026-03
+
+- id: forecasting-based-policy-triggers
+  stableId: eE8I4L31pw
+  wikiId: E2070
+  type: approach
+  title: Forecasting-Based Policy Triggers
+  description: >-
+    Using pre-registered predictions and prediction markets to trigger
+    automatic policy reviews when forecasted outcomes diverge from reality,
+    reducing the leap of faith required in cross-coalition agreements.
+  tags:
+    - ai-governance
+    - forecasting
+  lastUpdated: 2026-03
