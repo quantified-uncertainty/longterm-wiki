@@ -131,8 +131,16 @@ export function formatKBFactValue(
       return `\u2265${formatKBNumber(v.value, unit, display)}`;
     case "json":
       return JSON.stringify(v.value);
-    default:
-      return String((v as { value: unknown }).value);
+    default: {
+      // Safety: guard against value being an object (e.g., malformed FactValue
+      // or nested object not caught by a specific case). String({}) produces
+      // "[object Object]" — always use JSON.stringify for objects.
+      const rawValue = (v as { value: unknown }).value;
+      if (rawValue !== null && typeof rawValue === "object") {
+        return JSON.stringify(rawValue);
+      }
+      return String(rawValue ?? "");
+    }
   }
 }
 
@@ -167,9 +175,12 @@ export function formatKBCellValue(
       case "boolean":
         return value ? "Yes" : "No";
       case "ref":
-        // Caller should handle ref rendering as EntityLink
+        // Caller should handle ref rendering as EntityLink.
+        // Guard: if value is an object (e.g., nested FactValue), stringify it.
+        if (typeof value === "object") return JSON.stringify(value);
         return String(value);
       case "text":
+        if (typeof value === "object") return JSON.stringify(value);
         return String(value);
     }
   }

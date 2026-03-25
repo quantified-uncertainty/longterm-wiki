@@ -17,6 +17,21 @@ export const metadata: Metadata = {
     "Directory of funding rounds tracked in the knowledge base, including venture capital, grants, and other financing events for AI-related companies.",
 };
 
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+/** Matches pure numeric IDs (legacy DB PKs). */
+const NUMERIC_ID_RE = /^\d+$/;
+
+/**
+ * Filter out raw IDs that aren't human-readable names.
+ * Returns null for stableIds and numeric PKs so the resolver can handle them.
+ */
+function filterRawId(name: string | null): string | null {
+  if (!name) return null;
+  if (STABLE_ID_RE.test(name) || NUMERIC_ID_RE.test(name)) return null;
+  return name;
+}
+
 interface FundingRoundRow {
   key: string;
   name: string;
@@ -35,12 +50,19 @@ export default function FundingRoundsPage() {
 
   const rows: FundingRoundRow[] = allRecords.map((record) => {
     const f = record.fields;
-    const preResolvedCompanyName = typeof f.company_name === "string" ? f.company_name : null;
+    // Filter out raw stableIds/numeric PKs that leaked through as company_name
+    const preResolvedCompanyName = filterRawId(
+      typeof f.company_name === "string" ? f.company_name : null,
+    );
     const company = resolveEntityLink(record.ownerEntityId, preResolvedCompanyName);
     const leadInvestorId =
       typeof f.lead_investor === "string" ? f.lead_investor : null;
+    // Also filter lead investor pre-resolved name
+    const preResolvedLeadName = filterRawId(
+      typeof f.lead_investor_name === "string" ? f.lead_investor_name : null,
+    );
     const leadInvestor = leadInvestorId
-      ? resolveEntityLink(leadInvestorId)
+      ? resolveEntityLink(leadInvestorId, preResolvedLeadName)
       : { name: "", href: null };
 
     return {

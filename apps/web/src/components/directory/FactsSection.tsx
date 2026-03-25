@@ -114,7 +114,11 @@ export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Pr
       </span>
     );
   }
-  return <span>{formatKBFactValue(fact, property?.unit, property?.display)}</span>;
+  // formatKBFactValue always returns a string, but guard against edge cases
+  // where an object might leak through (which renders as "[object Object]").
+  const formatted = formatKBFactValue(fact, property?.unit, property?.display);
+  const safeFormatted = typeof formatted === "string" ? formatted : JSON.stringify(formatted);
+  return <span>{safeFormatted}</span>;
 }
 
 /** Full categorized facts display panel used on entity profile pages. */
