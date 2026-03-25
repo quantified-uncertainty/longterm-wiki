@@ -91,6 +91,10 @@ import {
   MarketHighlights,
 } from "./market-data-section";
 
+// PG grants integration — fetch grants from wiki-server for orgs that are funders
+import { fetchFromWikiServer } from "@/lib/wiki-server";
+import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
+
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
 
@@ -164,11 +168,19 @@ export default async function OrgProfilePage({
 
   const data = loadOrgPageData(entity, slug);
 
-  // ── Fetch PG data (personnel + market data) in parallel ──
-  const [pgPersonnelRows, marketData] = await Promise.all([
+  // ── Fetch PG data (personnel + market data + grants) in parallel ──
+  const entityStableId = entity.stableId ?? entity.id;
+  const [pgPersonnelRows, marketData, pgGrantsData] = await Promise.all([
     fetchPgPersonnel(entity.id),
     fetchMarketData(entity.id),
+    fetchFromWikiServer<RpcGrantsByEntityResult>(
+      `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?limit=500&offset=0`,
+      { revalidate: 3600, timeoutMs: 10_000 },
+    ),
   ]);
+
+  // PG grants: check if wiki-server has grants for this org (as funder)
+  const pgGrantCount = pgGrantsData?.total ?? 0;
 
   // ── Build tabs from available data ──────────────────────────────────
 
@@ -395,6 +407,7 @@ export default async function OrgProfilePage({
     meaningfulEquity.length > 0 ||
     data.grantsReceived.length > 0 ||
     data.grantsMade.length > 0 ||
+    pgGrantCount > 0 ||
     data.sortedPartnerships.length > 0 ||
     data.fundingPrograms.length > 0;
 
@@ -404,7 +417,7 @@ export default async function OrgProfilePage({
       meaningfulInvestments.length +
       meaningfulEquity.length +
       data.sortedPartnerships.length +
-      data.grantsMade.length +
+      Math.max(data.grantsMade.length, pgGrantCount) +
       data.grantsReceived.length;
 
     tabs.push({
@@ -428,12 +441,13 @@ export default async function OrgProfilePage({
             />
           )}
 
-          {data.grantsMade.length > 0 && (
+          {(data.grantsMade.length > 0 || pgGrantCount > 0) && (
             <GrantsSection
               grants={data.grantsMade}
               direction="given"
-              entityId={entity.stableId ?? entity.id}
+              entityId={entityStableId}
               orgSlug={slug}
+              pgGrantCount={pgGrantCount}
             />
           )}
           {data.grantsReceived.length > 0 && (
