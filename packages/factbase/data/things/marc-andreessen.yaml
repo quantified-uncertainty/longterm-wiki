@@ -40,21 +40,20 @@ facts:
     asOf: 2023-10
     source: https://a16z.com/the-techno-optimist-manifesto/
     notes: >-
-      Published October 2023. Explicitly attacks EA, longtermism, and
-      AI safety regulation. Frames effective altruism and
-      deceleration/safety movements as enemies of progress.
+      Published October 2023. Critiques EA, longtermism, and AI safety
+      regulation. Lists effective altruism and deceleration/safety
+      movements among ideologies opposed to techno-optimism.
 
   - id: f_mAeW9qM2xC
     property: political-positioning
     value: >-
-      Shifted to explicit MAGA political alignment circa 2023-2024.
-      Donated to Republican candidates and publicly supported Trump.
-      This positioning, combined with the Techno-Optimist Manifesto,
-      created adversarial tribal framing between a16z and EA/AI safety
+      Publicly supported Republican candidates and endorsed Trump
+      circa 2023-2024. This positioning, combined with the Techno-Optimist
+      Manifesto, increased tensions between a16z and EA/AI safety
       communities.
     asOf: 2024-01
     source: https://en.wikipedia.org/wiki/Marc_Andreessen
     notes: >-
-      The EA/a16z conflict is partly tribal signaling (MAGA vs progressive
-      coding) and partly substantive disagreement on AI development pace
-      and safety regulation.
+      The a16z/EA conflict involves both political affiliation differences
+      and substantive disagreement on AI development pace and safety
+      regulation.

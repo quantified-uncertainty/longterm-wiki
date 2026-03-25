@@ -6868,9 +6868,9 @@
   type: approach
   title: AI Non-Extremization Coordination
   description: >-
-    Cross-company coordination to prevent AI-driven extremization, modeled on
-    financial systemic risk regulation. Proposes operational definitions of
-    extremization, third-party auditing, and floor commitments.
+    Cross-company coordination approaches to prevent AI systems from driving
+    users toward more extreme positions, drawing on analogies to financial
+    systemic risk regulation and existing AI safety coordination frameworks.
   tags:
     - ai-governance
     - international-coordination
@@ -6898,8 +6898,8 @@
   title: Intervention Evaluation for Political Stability
   description: >-
     Frameworks for rigorously evaluating political stability interventions,
-    applying GiveWell-style cost-effectiveness analysis to polarization
-    reduction and democratic resilience programs.
+    covering evidence synthesis methods, cost-effectiveness analysis, and
+    measurement challenges in polarization reduction programs.
   tags:
     - ai-governance
     - epistemic
@@ -6911,9 +6911,9 @@
   type: approach
   title: Forecasting-Based Policy Triggers
   description: >-
-    Using pre-registered predictions and prediction markets to trigger
-    automatic policy reviews when forecasted outcomes diverge from reality,
-    reducing the leap of faith required in cross-coalition agreements.
+    Mechanisms that use pre-defined forecast thresholds to automatically
+    trigger policy actions, drawing on forecast-based financing models
+    from humanitarian disaster response and climate adaptation.
   tags:
     - ai-governance
     - forecasting
