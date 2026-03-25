@@ -15,17 +15,15 @@
 import fs from 'fs';
 import path from 'path';
 import type { CommandResult } from '../lib/command-types.ts';
-import { findPageById, type PageInfo } from '../lib/page-resolution.ts';
+import { findPageById } from '../lib/page-resolution.ts';
 import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
 import { findMdxFiles } from '../lib/file-utils.ts';
 import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import {
-  preprocessMdxForExtraction,
-  splitIntoChunks,
   extractClaims,
 } from '../lib/semantic-diff/claim-extractor.ts';
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
-import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
+import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 
@@ -377,7 +375,7 @@ export async function verifyPageCommand(
 
   // Step 3: Verify uncited check-worthy claims against web
   console.log('  [3/4] Verifying uncited claims against web...');
-  const costTracker = new CostTracker(budget);
+  const costTracker = new CostTracker();
   const client = createLlmClient();
 
   const verifiedClaims: VerifiedClaim[] = [];
@@ -551,9 +549,9 @@ export async function auditAllPagesCommand(
     const wordCount = prose.split(/\s+/).filter(w => w.length > 0).length;
     if (wordCount < minWords) continue;
 
-    // Count footnote references
-    const footnoteRefs = (body.match(/\[\^[\w:.-]+\]/g) || []);
-    // Deduplicate footnote definitions vs references — only count references
+    // Count footnote references (strip definitions first to avoid double-counting)
+    const bodyWithoutDefs = body.replace(/^\[\^[\w:.-]+\]:.*$/gm, '');
+    const footnoteRefs = (bodyWithoutDefs.match(/\[\^[\w:.-]+\]/g) || []);
     const footnoteCount = footnoteRefs.length;
 
     const proseWordsPerFootnote = footnoteCount > 0
@@ -584,7 +582,13 @@ export async function auditAllPagesCommand(
 
   // Sort
   if (sortBy === 'density') {
-    stats.sort((a, b) => b.proseWordsPerFootnote - a.proseWordsPerFootnote);
+    // Sort by density descending, with zero-footnote pages sorted by word count
+    stats.sort((a, b) => {
+      if (a.footnoteCount === 0 && b.footnoteCount === 0) return b.wordCount - a.wordCount;
+      if (a.footnoteCount === 0) return -1;
+      if (b.footnoteCount === 0) return 1;
+      return b.proseWordsPerFootnote - a.proseWordsPerFootnote;
+    });
   } else if (sortBy === 'words') {
     stats.sort((a, b) => b.wordCount - a.wordCount);
   } else if (sortBy === 'footnotes') {

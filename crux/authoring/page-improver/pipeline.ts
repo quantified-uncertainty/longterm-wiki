@@ -506,8 +506,9 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
           log('citation-density', `WARNING: low citation density — ${density} words per footnote (${footnoteRefs} footnotes for ${wordCount} words)`);
         }
       }
-    } catch {
-      // Non-blocking — citation density check is advisory
+    } catch (e: unknown) {
+      // Intentionally quiet: citation density is advisory and should never block the improve pipeline.
+      void e;
     }
 
     fs.writeFileSync(filePath, contentToApply);
