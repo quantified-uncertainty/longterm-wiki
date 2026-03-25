@@ -38,7 +38,8 @@ export async function generateMetadata({
     `/api/source-checks/resolve-names?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(recordId)}`,
     { revalidate: 3600 }
   );
-  const name = namesResult.ok ? namesResult.data.names[recordId] : null;
+  const rawName = namesResult.ok ? namesResult.data.names[recordId] : null;
+  const name = rawName?.startsWith("new:") ? rawName.slice(4).trim() : rawName;
   const title = name
     ? `Source Check: ${name}`
     : `Source Check: ${formatRecordType(recordType)} ${recordId}`;
@@ -94,9 +95,13 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   }
 
   const { verdicts, evidence } = detailResult.data;
-  const resolvedName = namesResult.ok
+  const rawResolvedName = namesResult.ok
     ? namesResult.data.names[recordId]
     : null;
+  // Strip "new:" prefix that can leak from personnel/division raw IDs
+  const resolvedName = rawResolvedName?.startsWith("new:")
+    ? rawResolvedName.slice(4).trim()
+    : rawResolvedName;
   const displayName =
     resolvedName ?? `${formatRecordType(recordType)} ${recordId}`;
 
@@ -153,12 +158,20 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {recordHref && (
             <Link href={recordHref} className="text-primary hover:underline">
-              View {formatRecordType(recordType).toLowerCase()} record &rarr;
+              {recordType === "personnel"
+                ? "People directory"
+                : `View ${formatRecordType(recordType).toLowerCase()} record`} &rarr;
             </Link>
           )}
           {entityHref && (
             <Link href={entityHref} className="text-primary hover:underline">
-              {claimEntityName ? `${claimEntityName} wiki page` : "View entity page"} &rarr;
+              {recordType === "personnel"
+                ? "View organization page"
+                : recordType === "division"
+                  ? "View parent organization"
+                  : claimEntityName
+                    ? `${claimEntityName} wiki page`
+                    : "View entity page"} &rarr;
             </Link>
           )}
         </div>
@@ -230,7 +243,14 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
                 {/* Confidence bar */}
                 {v.confidence != null && (
-                  <div className="w-full bg-muted rounded-full h-2 mb-3">
+                  <div
+                    className="w-full bg-muted rounded-full h-2 mb-3"
+                    role="progressbar"
+                    aria-valuenow={Math.round(v.confidence * 100)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${v.verdict} confidence: ${Math.round(v.confidence * 100)}%`}
+                  >
                     <div
                       className={cn(
                         "h-2 rounded-full transition-all",
@@ -402,10 +422,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
       {/* Footer */}
       <div className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        Record Type:{" "}
-        <code className="px-1 py-0.5 bg-muted rounded">{recordType}</code>{" "}
-        &middot; Record ID:{" "}
-        <code className="px-1 py-0.5 bg-muted rounded">{recordId}</code>
+        <span className="font-mono">{recordId}</span>
       </div>
     </div>
   );

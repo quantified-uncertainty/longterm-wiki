@@ -21,7 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Source Checks | Longterm Wiki",
+  title: "Source Checks",
   description:
     "Directory of source verification checks across wiki data, including personnel records, grants, divisions, and more.",
   robots: { index: false },
@@ -57,19 +57,34 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   verdictParams.set("limit", String(PAGE_SIZE));
   verdictParams.set("offset", String(offset));
 
-  // Fetch stats and verdicts in parallel
-  const [statsResult, verdictsResult] = await Promise.all([
-    fetchDetailed<RpcSourceChecksStatsResult>("/api/source-checks/stats", {
-      revalidate: 300,
-    }),
-    fetchDetailed<RpcSourceChecksVerdictsResult>(
-      `/api/source-checks/verdicts?${verdictParams.toString()}`,
-      { revalidate: 300 }
-    ),
-  ]);
+  // Build stats URL — pass record_type when a type filter is active so that
+  // the stat cards and verdict-pill counts reflect the selected type.
+  const statsParams = new URLSearchParams();
+  if (filterType !== "all") statsParams.set("record_type", filterType);
+  const statsQs = statsParams.toString();
+  const statsUrl = statsQs
+    ? `/api/source-checks/stats?${statsQs}`
+    : "/api/source-checks/stats";
+
+  // Fetch global stats (for type tabs), filtered stats (for cards + verdict tabs), and verdicts
+  const [globalStatsResult, filteredStatsResult, verdictsResult] =
+    await Promise.all([
+      // Always fetch unfiltered stats for the type-filter tab counts
+      fetchDetailed<RpcSourceChecksStatsResult>("/api/source-checks/stats", {
+        revalidate: 300,
+      }),
+      // Fetch type-filtered stats for stat cards + verdict pills
+      fetchDetailed<RpcSourceChecksStatsResult>(statsUrl, {
+        revalidate: 300,
+      }),
+      fetchDetailed<RpcSourceChecksVerdictsResult>(
+        `/api/source-checks/verdicts?${verdictParams.toString()}`,
+        { revalidate: 300 }
+      ),
+    ]);
 
   // Handle error state
-  if (!statsResult.ok || !verdictsResult.ok) {
+  if (!globalStatsResult.ok || !filteredStatsResult.ok || !verdictsResult.ok) {
     return (
       <div className="max-w-[90rem] mx-auto px-6 py-8">
         <h1 className="text-3xl font-extrabold tracking-tight mb-4">
@@ -86,7 +101,8 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     );
   }
 
-  const stats = statsResult.data;
+  const globalStats = globalStatsResult.data;
+  const filteredStats = filteredStatsResult.data;
   const { verdicts, total } = verdictsResult.data;
 
   // Resolve names for the current page of verdicts (records + entities)
@@ -123,6 +139,13 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       names = { ...names, ...nameMap };
     }
 
+    // Strip "new:" prefix from display names (artefact of record creation)
+    for (const [key, value] of Object.entries(names)) {
+      if (value.startsWith("new:")) {
+        names[key] = value.slice(4);
+      }
+    }
+
     // Resolve entity names + hrefs locally from database.json (fast, no roundtrip)
     if (entityIds.size > 0) {
       const registry = getIdRegistry();
@@ -157,17 +180,21 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // Stats
+  // Stats — use filteredStats for cards (reflects type filter)
   const avgConfidence =
-    stats.avg_confidence > 0
-      ? `${Math.round(stats.avg_confidence * 100)}%`
+    filteredStats.avg_confidence > 0
+      ? `${Math.round(filteredStats.avg_confidence * 100)}%`
       : "N/A";
 
-  // Build sorted type/verdict entries for filter tabs
-  const typeEntries = Object.entries(stats.by_type).sort(
+  // Type tabs always use global stats (so all types are visible)
+  const globalTotal = globalStats.by_type
+    ? Object.values(globalStats.by_type).reduce((a, b) => a + b, 0)
+    : globalStats.total;
+  const typeEntries = Object.entries(globalStats.by_type).sort(
     ([, a], [, b]) => b - a
   );
-  const verdictEntries = Object.entries(stats.by_verdict).sort(
+  // Verdict tabs use filteredStats (contextual to selected type)
+  const verdictEntries = Object.entries(filteredStats.by_verdict).sort(
     ([, a], [, b]) => b - a
   );
 
@@ -185,11 +212,13 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
         </p>
       </div>
 
-      {/* Stats cards */}
+      {/* Stats cards — reflect active type filter */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
-          <p className="text-2xl font-bold tabular-nums">{stats.total}</p>
+          <p className="text-2xl font-bold tabular-nums">
+            {filteredStats.total}
+          </p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>
@@ -200,10 +229,11 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           <p
             className={cn(
               "text-2xl font-bold tabular-nums",
-              (stats.by_verdict.contradicted ?? 0) > 0 && "text-red-600"
+              (filteredStats.by_verdict.contradicted ?? 0) > 0 &&
+                "text-red-600"
             )}
           >
-            {stats.by_verdict.contradicted ?? 0}
+            {filteredStats.by_verdict.contradicted ?? 0}
           </p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
@@ -211,10 +241,10 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           <p
             className={cn(
               "text-2xl font-bold tabular-nums",
-              (stats.by_verdict.outdated ?? 0) > 0 && "text-amber-600"
+              (filteredStats.by_verdict.outdated ?? 0) > 0 && "text-amber-600"
             )}
           >
-            {stats.by_verdict.outdated ?? 0}
+            {filteredStats.by_verdict.outdated ?? 0}
           </p>
         </div>
       </div>
@@ -235,7 +265,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
                 : "bg-muted text-muted-foreground hover:bg-muted/80"
             )}
           >
-            All types ({stats.total})
+            All types ({globalTotal})
           </Link>
           {typeEntries.map(([type, count]) => (
             <Link

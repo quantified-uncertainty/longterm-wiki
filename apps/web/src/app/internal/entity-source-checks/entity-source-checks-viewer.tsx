@@ -504,7 +504,16 @@ export function EntitySourceChecksViewer() {
         // Resolve names in background (non-blocking)
         if (allVerdicts.length > 0) {
           resolveNames(allVerdicts).then(
-            ({ names, hrefs }) => { setRecordNames(names); setEntityHrefs(hrefs); },
+            ({ names, hrefs }) => {
+              // Strip "new:" prefix from resolved display names
+              for (const key of Object.keys(names)) {
+                if (names[key].startsWith("new:")) {
+                  names[key] = names[key].slice(4);
+                }
+              }
+              setRecordNames(names);
+              setEntityHrefs(hrefs);
+            },
             (e) => console.warn(`[entity-source-checks] Name resolution failed: ${e instanceof Error ? e.message : String(e)}`)
           );
         }
@@ -520,15 +529,24 @@ export function EntitySourceChecksViewer() {
   // Without memoization, `filtered` is a new array every render, which
   // TanStack Table treats as a data change — triggering autoResetPageIndex
   // on every render and causing an infinite re-render loop that freezes the page.
-  const { typeCounts, verdictCounts } = useMemo(() => {
+  const typeCounts = useMemo(() => {
     const tc = new Map<string, number>();
-    const vc = new Map<string, number>();
     for (const v of verdicts) {
       tc.set(v.recordType, (tc.get(v.recordType) ?? 0) + 1);
+    }
+    return tc;
+  }, [verdicts]);
+
+  // Verdict counts are contextual: when a type filter is active, show counts
+  // for that type only so the verdict buttons reflect the visible subset.
+  const verdictCounts = useMemo(() => {
+    const source = filterType === "all" ? verdicts : verdicts.filter((v) => v.recordType === filterType);
+    const vc = new Map<string, number>();
+    for (const v of source) {
       vc.set(v.verdict, (vc.get(v.verdict) ?? 0) + 1);
     }
-    return { typeCounts: tc, verdictCounts: vc };
-  }, [verdicts]);
+    return vc;
+  }, [verdicts, filterType]);
 
   const filtered = useMemo(
     () =>
@@ -597,12 +615,12 @@ export function EntitySourceChecksViewer() {
   const rangeStart = pageIndex * ps + 1;
   const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
 
-  // Stats
-  const withConfidence = verdicts.filter((v) => v.confidence != null);
+  // Stats — computed from filtered data so they update with active filters
+  const withConfidence = filtered.filter((v) => v.confidence != null);
   const avgConfidence = withConfidence.length > 0
     ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
-  const contradictedCount = verdicts.filter((v) => v.verdict === "contradicted").length;
-  const needsRecheckCount = verdicts.filter((v) => v.needsRecheck).length;
+  const contradictedCount = filtered.filter((v) => v.verdict === "contradicted").length;
+  const needsRecheckCount = filtered.filter((v) => v.needsRecheck).length;
 
   // Coverage stats
   const totalRecords = coverageData.reduce((sum, r) => sum + r.total, 0);
@@ -640,14 +658,14 @@ export function EntitySourceChecksViewer() {
         )}
         {totalRecords > 0 && (
           <div className="rounded-lg border border-border/60 p-4">
-            <p className="text-xs text-muted-foreground mb-1">Verified</p>
+            <p className="text-xs text-muted-foreground mb-1">Checked</p>
             <p className={cn("text-2xl font-bold tabular-nums", overallCoveragePct < 50 ? "text-amber-600" : "text-emerald-600")}>{overallCoveragePct}%</p>
             <p className="text-xs text-muted-foreground mt-1">{totalVerified.toLocaleString()} / {totalRecords.toLocaleString()}</p>
           </div>
         )}
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
-          <p className="text-2xl font-bold tabular-nums">{verdicts.length}</p>
+          <p className="text-2xl font-bold tabular-nums">{filtered.length}</p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>

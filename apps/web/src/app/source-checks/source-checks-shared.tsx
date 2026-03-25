@@ -11,8 +11,19 @@ export const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
 };
 
+/** Tooltip descriptions for verdict types. */
+export const VERDICT_DESCRIPTIONS: Record<string, string> = {
+  confirmed: "Source evidence supports this claim.",
+  contradicted: "Source evidence contradicts this claim.",
+  outdated: "Source evidence suggests this information is no longer current.",
+  partial: "Source evidence partially supports this claim, but some details differ.",
+  unverifiable: "Unable to verify this claim from available sources.",
+  unchecked: "This claim has not yet been checked against sources.",
+};
+
 export function VerdictBadge({ verdict, className }: { verdict: string; className?: string }) {
   const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
+  const description = VERDICT_DESCRIPTIONS[verdict];
   return (
     <span
       className={cn(
@@ -21,6 +32,7 @@ export function VerdictBadge({ verdict, className }: { verdict: string; classNam
         style.text,
         className
       )}
+      title={description}
     >
       {verdict}
     </span>
@@ -83,6 +95,8 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
       return `/funding-rounds/${recordId}`;
     case "division":
       return `/divisions/${recordId}`;
+    case "personnel":
+      return `/people`;
     default:
       return null;
   }
