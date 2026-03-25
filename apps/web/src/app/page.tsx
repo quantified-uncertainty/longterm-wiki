@@ -198,11 +198,8 @@ export default function Home() {
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-background dark:from-slate-950 dark:to-background" />
-        <div className="relative max-w-7xl mx-auto px-6 pt-14 sm:pt-16 pb-10">
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-4">
-            AI Safety Knowledge Base
-          </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mb-8 leading-relaxed">
+        <div className="relative max-w-7xl mx-auto px-6 pt-10 sm:pt-12 pb-10">
+          <p className="text-base text-muted-foreground max-w-2xl mb-6 leading-relaxed">
             Structured data on organizations, people, models, legislation, grants,
             and publications — plus {totalPages} wiki articles on AI safety.
           </p>
@@ -210,7 +207,7 @@ export default function Home() {
           {/* Search bar */}
           <Link
             href="/search"
-            className="flex items-center gap-3 max-w-xl px-4 py-3 rounded-xl border border-border bg-background/80 hover:bg-muted/50 transition-colors no-underline mb-8 group"
+            className="flex items-center gap-3 max-w-xl px-4 py-3 rounded-xl border border-border bg-background/80 hover:bg-muted/50 transition-colors no-underline mb-7 group"
           >
             <Search size={18} className="text-muted-foreground/60 shrink-0" />
             <span className="text-sm text-muted-foreground/60 group-hover:text-muted-foreground transition-colors">
