@@ -4031,3 +4031,152 @@
     - title: Ben Horowitz - Wikipedia
       url: https://en.wikipedia.org/wiki/Ben_Horowitz
   lastUpdated: 2026-03
+
+- id: allison-duettmann
+  stableId: BvtUK0yEDv
+  type: person
+  title: Allison Duettmann
+  description: >-
+    President and CEO of Foresight Institute. Directs AI safety grants,
+    longevity biotechnology, molecular nanotechnology, and neurotechnology
+    programs. Co-authored AGI coordination white paper (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: President & CEO, Foresight Institute
+  tags:
+    - ai-safety
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: christine-peterson
+  stableId: xhHJeAYzUm
+  type: person
+  title: Christine Peterson
+  description: >-
+    Co-founder and Projects Director of Foresight Institute. Nanotechnology
+    advocate credited with coining the term "open-source software" in its
+    modern software community sense (1998).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Projects Director, Foresight Institute
+    - label: Known For
+      value: Coined "open-source software" term (1998)
+  tags:
+    - nanotechnology
+    - open-source
+  lastUpdated: 2026-03
+
+- id: k-eric-drexler
+  stableId: jExOzigU4B
+  type: person
+  title: K. Eric Drexler
+  description: >-
+    Co-founder of Foresight Institute. Pioneer in nanotechnology and
+    molecular manufacturing. Author of foundational works on molecular
+    machine systems.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Foresight Institute
+    - label: Known For
+      value: Nanotechnology pioneer, molecular manufacturing
+  tags:
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: james-c-bennett
+  stableId: 8Mk8-7uSm6
+  type: person
+  title: James C. Bennett
+  description: >-
+    Co-founder and Director of Foresight Institute. Co-founder of commercial
+    space launch companies and consultant in space and technology.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Director, Foresight Institute
+  tags:
+    - space
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: brandon-goldman
+  stableId: 04ESS5IDzn
+  type: person
+  title: Brandon Goldman
+  description: >-
+    Treasurer of Foresight Institute. Investor focused on AI safety and
+    existential risk.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Treasurer, Foresight Institute
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: sonia-arrison
+  stableId: JkPfxLKrTR
+  type: person
+  title: Sonia Arrison
+  description: >-
+    Director of Foresight Institute. Author of '100 Plus'. Founder of 100
+    Plus Capital. Board member at Thiel Foundation.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Director, Foresight Institute
+    - label: Known For
+      value: Author of '100 Plus', 100 Plus Capital founder
+  tags:
+    - longevity
+  lastUpdated: 2026-03
+
+- id: chip-morningstar
+  stableId: uPDPgwTvaz
+  type: person
+  title: Chip Morningstar
+  description: >-
+    Director of Foresight Institute. Software architect focused on online
+    entertainment and communication.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Director, Foresight Institute
+  lastUpdated: 2026-03
+
+- id: peter-diamandis
+  stableId: tVhfitccVu
+  type: person
+  title: Peter Diamandis
+  description: >-
+    Advisor to Foresight Institute. Founder of X-Prize Foundation. Chaired
+    Feynman Grand Prize committee (2004). Entrepreneur and author focused
+    on exponential technologies.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Advisor, Foresight Institute
+    - label: Known For
+      value: X-Prize Foundation founder
+  tags:
+    - technology
+  lastUpdated: 2026-03

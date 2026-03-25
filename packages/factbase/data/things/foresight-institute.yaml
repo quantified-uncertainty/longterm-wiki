@@ -30,17 +30,17 @@ facts:
     property: total-assets
     value: "8900000"
     unit: USD
-    asOf: "2022"
+    asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
-    notes: "From IRS Form 990 filing. EIN: 77-0119168."
+    notes: "From IRS Form 990 filing (fiscal year ending Dec 2024, filed Nov 2025). EIN: 77-0119168."
 
   - id: f_3oG8SogVOI
     property: annual-expenses
-    value: "3100000"
+    value: "3750000"
     unit: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
-    notes: "Program service expenses from Form 990"
+    notes: "Total functional expenses from Form 990 (fiscal year ending Dec 2024, filed Nov 2025)"
 
   - id: f_AYVFqVRNeG
     property: employee-count
@@ -115,24 +115,6 @@ facts:
     asOf: "2023"
     source: https://futureoflife.org/grant/foresight-institute-existential-hope/
     notes: "Grant from Future of Life Institute for Existential Hope and Tech Tree Programs, published October 2023"
-
-  - id: f_1zeOSjqb0f
-    property: key-person
-    value: "Christine Peterson"
-    asOf: 2025
-    notes: "Co-founder and Projects Director. Credited with coining the term 'open-source software' (1998)."
-
-  - id: f_NnnKpuMG9x
-    property: key-person
-    value: "K. Eric Drexler"
-    asOf: 2025
-    notes: "Co-founder. Pioneer in nanotechnology and molecular manufacturing."
-
-  - id: f_HX3h1ec8Ii
-    property: key-person
-    value: "Allison Duettmann"
-    asOf: 2025
-    notes: "CEO. Leads AI safety grants program and co-authored AGI coordination white paper (2018)."
 
   - id: f_7mh2tQkFnF
     property: revenue
