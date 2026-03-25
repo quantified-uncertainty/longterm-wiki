@@ -26,6 +26,7 @@ import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
 import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -98,120 +99,6 @@ function buildFootnoteMap(rawContent: string): FootnoteMap {
     sentencesWithFootnotes,
     totalFootnotes: footnoteMatches.length,
   };
-}
-
-/**
- * Build a list of cleaned text from sentences that contain footnotes.
- * Strips MDX components, footnote markers, and formatting to get clean text
- * that can be compared against extracted claims.
- */
-function extractFootnotedSentences(rawContent: string): string[] {
-  // Strip frontmatter
-  let text = rawContent.replace(/^---[\s\S]*?---\n/, '');
-
-  const paragraphs = text.split(/\n\n+/);
-  const results: string[] = [];
-
-  for (const para of paragraphs) {
-    // Skip footnote definitions, imports, headings
-    if (/^\[\^[\w:.-]+\]:/.test(para.trim())) continue;
-    if (/^(?:import|export)\s/.test(para.trim())) continue;
-    if (/^#{1,6}\s/.test(para.trim())) continue;
-    if (!/\[\^[\w:.-]+\]/.test(para)) continue;
-
-    // Clean the paragraph text: strip components, footnotes, formatting
-    const clean = para
-      .replace(/<[^>]+>/g, '')             // strip JSX/HTML tags
-      .replace(/<\/[^>]+>/g, '')           // strip closing tags
-      .replace(/\[\^[\w:.-]+\]/g, '')      // strip footnote refs
-      .replace(/\*\*([^*]+)\*\*/g, '$1')   // strip bold
-      .replace(/\*([^*]+)\*/g, '$1')       // strip italic
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // strip links, keep text
-      .replace(/\\(\$)/g, '$1')            // unescape dollars
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
-
-    if (clean.length > 15) {
-      results.push(clean);
-    }
-  }
-
-  return results;
-}
-
-/**
- * Check if a claim appears in text that has footnotes in the original source.
- *
- * Strategy: compare claim content against cleaned footnoted paragraphs.
- * Uses multiple signals: keyValue, numbers, and distinctive word sequences.
- */
-function claimHasCitation(
-  claim: ExtractedClaim,
-  footnotedParagraphs: string[],
-): boolean {
-  const claimLower = claim.text.toLowerCase();
-
-  // Build distinctive search terms from the claim
-  const searchTerms: string[] = [];
-
-  // keyValue is typically the most distinctive
-  if (claim.keyValue && claim.keyValue.length > 2) {
-    searchTerms.push(claim.keyValue.toLowerCase());
-  }
-
-  // Numbers are very distinctive
-  const numbers = claimLower.match(/\d[\d,.]+/g);
-  if (numbers) {
-    for (const num of numbers) {
-      if (num.length >= 2) searchTerms.push(num);
-    }
-  }
-
-  // Multi-word phrases from the claim
-  const words = claimLower.split(/\s+/).filter(w => w.length > 4);
-  if (words.length >= 3) {
-    for (let i = 0; i < Math.min(words.length - 2, 3); i++) {
-      searchTerms.push(words.slice(i, i + 3).join(' '));
-    }
-  }
-
-  if (searchTerms.length === 0) return false;
-
-  for (const paragraph of footnotedParagraphs) {
-    let matches = 0;
-    for (const term of searchTerms) {
-      if (paragraph.includes(term)) matches++;
-    }
-    // 2+ term matches = high confidence it's the same fact
-    if (matches >= 2) return true;
-    // 1 match on keyValue alone is sufficient (e.g., "$380 billion")
-    if (matches >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase()) return true;
-  }
-
-  return false;
-}
-
-// ── Checkworthiness filter ───────────────────────────────────────────
-
-/**
- * Loki-inspired checkworthiness filter.
- * Skip claims that are definitions, vague existence claims, or trivially true.
- */
-function isCheckWorthy(claim: ExtractedClaim): boolean {
-  // Definitions are not worth fact-checking against the web
-  if (claim.type === 'definition') return false;
-
-  // Low-confidence claims from the extractor are often vague
-  if (claim.confidence === 'low') return false;
-
-  // Existence claims without a specific keyValue are usually trivial
-  if (claim.type === 'existence' && !claim.keyValue) return false;
-
-  // Very short claims are usually not substantive
-  if (claim.text.length < 20) return false;
-
-  return true;
 }
 
 // ── Web verification ─────────────────────────────────────────────────

@@ -1,0 +1,378 @@
+/**
+ * Lightweight Citation-Adding Pass
+ *
+ * Surgical footnote insertion: finds uncited factual claims in wiki page
+ * prose, searches the web for source URLs, and inserts footnote references
+ * + definitions. Does NOT rewrite prose — only adds [^rc-XXXX] markers.
+ *
+ * Usage:
+ *   crux verify page <id> --fix              Add citations to uncited claims
+ *   crux verify page <id> --fix --limit=10   Limit to 10 claims
+ *   crux verify page <id> --fix --dry-run    Show what would be added without writing
+ */
+
+import fs from 'fs';
+import { createHash } from 'crypto';
+import type { CommandResult } from '../lib/command-types.ts';
+import { findPageById } from '../lib/page-resolution.ts';
+import { extractClaims } from '../lib/semantic-diff/claim-extractor.ts';
+import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
+import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
+import { parseJsonFromLlm } from '../lib/json-parsing.ts';
+import { CostTracker } from '../lib/cost-tracker.ts';
+
+// Reuse from verify-page.ts
+import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
+
+// ── Types ────────────────────────────────────────────────────────────
+
+interface FoundSource {
+  url: string;
+  title: string;
+  snippet: string;
+}
+
+interface CitationToAdd {
+  claim: ExtractedClaim;
+  source: FoundSource;
+  refId: string;
+  insertionLine: number;      // line number in the MDX where the footnote ref goes
+  insertionColumn: number;    // character position after which to insert
+}
+
+// ── Source finding ───────────────────────────────────────────────────
+
+const FIND_SOURCE_PROMPT = `You find authoritative web sources for factual claims. Search the web and return the single best source URL that directly supports the claim.
+
+Output JSON:
+{
+  "url": "https://...",
+  "title": "Page title",
+  "snippet": "The specific text from the page that supports the claim"
+}
+
+If no good source is found, return:
+{
+  "url": "",
+  "title": "",
+  "snippet": ""
+}
+
+Rules:
+- Prefer primary sources (official announcements, research papers, government docs)
+- Prefer recent sources over old ones
+- The source must DIRECTLY support the specific claim, not just be about the topic
+- Never return URLs you aren't confident are real`;
+
+interface FindSourceResult {
+  url: string;
+  title: string;
+  snippet: string;
+}
+
+async function findSourceForClaim(
+  claim: ExtractedClaim,
+  client: ReturnType<typeof createLlmClient>,
+  costTracker: CostTracker,
+): Promise<FoundSource | null> {
+  try {
+    const resultText = await runLlmAgent(client, `Find a web source that supports this factual claim:
+
+"${claim.text}"${claim.keyValue ? `\n(Key value: ${claim.keyValue})` : ''}
+
+Search the web and return the best source URL as JSON.`, {
+      model: MODELS.haiku,
+      maxTokens: 1000,
+      systemPrompt: FIND_SOURCE_PROMPT,
+      serverTools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }],
+      maxToolTurns: 3,
+      retryLabel: 'find-source',
+      costTracker,
+    });
+
+    const parsed = parseJsonFromLlm<FindSourceResult>(
+      resultText,
+      'find-source',
+      () => ({ url: '', title: '', snippet: '' }),
+    );
+
+    if (!parsed.url || parsed.url.length < 10) return null;
+
+    // Basic URL validation
+    try {
+      new URL(parsed.url);
+    } catch {
+      return null;
+    }
+
+    return {
+      url: parsed.url,
+      title: parsed.title || '',
+      snippet: parsed.snippet || '',
+    };
+  } catch (e) {
+    console.warn(`    Warning: source search failed for "${claim.text.slice(0, 50)}...": ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
+}
+
+// ── Footnote ID generation ───────────────────────────────────────────
+
+function generateRefId(data: string, existingIds: Set<string>): string {
+  const hash = createHash('sha256').update(data).digest('hex');
+  for (let offset = 0; offset < hash.length - 4; offset++) {
+    const candidate = `rc-${hash.slice(offset, offset + 4)}`;
+    if (!existingIds.has(candidate)) {
+      existingIds.add(candidate);
+      return candidate;
+    }
+  }
+  const fallback = `rc-${hash.slice(0, 8)}`;
+  existingIds.add(fallback);
+  return fallback;
+}
+
+// ── Claim-to-line mapping ────────────────────────────────────────────
+
+/**
+ * Find the line in the MDX content where a claim's source text appears,
+ * and the best position to insert a footnote reference.
+ *
+ * Returns the line index and character position after which to insert [^rc-XXXX].
+ * Targets the end of the sentence containing the claim.
+ */
+function findInsertionPoint(
+  claim: ExtractedClaim,
+  lines: string[],
+): { line: number; col: number } | null {
+  // Build search terms from the claim
+  const searchTerms: string[] = [];
+
+  if (claim.keyValue && claim.keyValue.length > 2) {
+    searchTerms.push(claim.keyValue.toLowerCase());
+  }
+
+  const numbers = claim.text.toLowerCase().match(/\d[\d,.]+/g);
+  if (numbers) {
+    for (const num of numbers) {
+      if (num.length >= 2) searchTerms.push(num);
+    }
+  }
+
+  // Also use a distinctive phrase
+  const words = claim.text.toLowerCase().split(/\s+/).filter(w => w.length > 4);
+  if (words.length >= 3) {
+    searchTerms.push(words.slice(0, 4).join(' '));
+  }
+
+  if (searchTerms.length === 0) return null;
+
+  // Search lines for the best match
+  for (let i = 0; i < lines.length; i++) {
+    const lineLower = lines[i].toLowerCase()
+      .replace(/<[^>]+>/g, '')        // strip tags for matching
+      .replace(/\[\^[\w:.-]+\]/g, '') // strip existing footnotes
+      .replace(/\\(\$)/g, '$1');      // unescape
+
+    let matchCount = 0;
+    for (const term of searchTerms) {
+      if (lineLower.includes(term)) matchCount++;
+    }
+
+    if (matchCount >= 2 || (matchCount >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase())) {
+      // Found the line. Find the sentence end closest to where the claim content is.
+      const rawLine = lines[i];
+
+      // Find the position of the key term in the raw line
+      const keyTerm = searchTerms[0];
+      const keyIdx = rawLine.toLowerCase().indexOf(keyTerm);
+      if (keyIdx === -1) continue;
+
+      // Find the next sentence-ending punctuation after the key term
+      const afterKey = rawLine.slice(keyIdx);
+      const sentenceEnd = afterKey.match(/[.!?](?:\[\^[\w:.-]+\])*(?:\s|$)/);
+      if (sentenceEnd && sentenceEnd.index !== undefined) {
+        // Insert after the period (and any existing footnotes)
+        const periodPos = keyIdx + sentenceEnd.index;
+        // Find the end of any existing footnote chain
+        const afterPeriod = rawLine.slice(periodPos);
+        const footnoteChain = afterPeriod.match(/^[.!?](\[\^[\w:.-]+\])*/);
+        const insertCol = periodPos + (footnoteChain ? footnoteChain[0].length : 1);
+        return { line: i, col: insertCol };
+      }
+
+      // Fallback: insert at end of line before any trailing whitespace
+      return { line: i, col: rawLine.trimEnd().length };
+    }
+  }
+
+  return null;
+}
+
+// ── Main command ─────────────────────────────────────────────────────
+
+export async function addCitationsCommand(
+  pageId: string,
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun;
+  const budget = Number(options.budget) || 3;
+  const limit = Number(options.limit) || 20;
+  const startTime = Date.now();
+
+  // Load page
+  const page = findPageById(pageId);
+  if (!page) {
+    return { exitCode: 1, output: `Page not found: ${pageId}` };
+  }
+
+  console.log(`\n  Adding citations to: ${page.title} (${page.slug})`);
+  console.log(`  Mode: ${dryRun ? 'dry-run' : 'apply'}, limit: ${limit}, budget: $${budget}\n`);
+
+  // Step 1: Extract claims and classify
+  console.log('  [1/4] Extracting claims...');
+  const claims = await extractClaims(page.content);
+  const footnotedParagraphs = extractFootnotedSentences(page.content);
+
+  const uncitedCheckWorthy = claims
+    .filter(c => !claimHasCitation(c, footnotedParagraphs) && isCheckWorthy(c))
+    .slice(0, limit);
+
+  console.log(`         ${claims.length} claims, ${uncitedCheckWorthy.length} uncited check-worthy (processing up to ${limit})`);
+
+  if (uncitedCheckWorthy.length === 0) {
+    return { exitCode: 0, output: `No uncited check-worthy claims found in ${page.title}` };
+  }
+
+  // Step 2: Find sources for uncited claims
+  console.log('  [2/4] Finding sources...');
+  const costTracker = new CostTracker();
+  const client = createLlmClient();
+
+  // Collect existing footnote IDs to avoid collisions
+  const existingIds = new Set<string>();
+  const existingRefPattern = /\[\^((?:rc|cr)-[a-f0-9]+|kb-[^\]]+)\]/g;
+  let match;
+  while ((match = existingRefPattern.exec(page.content)) !== null) {
+    existingIds.add(match[1]);
+  }
+
+  const citationsToAdd: CitationToAdd[] = [];
+  const lines = page.content.split('\n');
+
+  for (const claim of uncitedCheckWorthy) {
+    if (costTracker.totalCost >= budget) {
+      console.log(`         Budget limit reached ($${budget})`);
+      break;
+    }
+
+    const source = await findSourceForClaim(claim, client, costTracker);
+    if (!source) {
+      console.log(`    [-] No source found: ${claim.text.slice(0, 60)}...`);
+      continue;
+    }
+
+    const insertion = findInsertionPoint(claim, lines);
+    if (!insertion) {
+      console.log(`    [?] Can't find insertion point: ${claim.text.slice(0, 60)}...`);
+      continue;
+    }
+
+    const refId = generateRefId(`cite:${page.slug}:${source.url}`, existingIds);
+
+    citationsToAdd.push({
+      claim,
+      source,
+      refId,
+      insertionLine: insertion.line,
+      insertionColumn: insertion.col,
+    });
+
+    console.log(`    [+] ${claim.text.slice(0, 50)}... → ${source.url.slice(0, 60)}`);
+  }
+
+  console.log(`\n  [3/4] ${citationsToAdd.length} citations to add`);
+
+  if (citationsToAdd.length === 0) {
+    return {
+      exitCode: 0,
+      output: `No sources found for uncited claims in ${page.title}. Cost: $${costTracker.totalCost.toFixed(3)}`,
+    };
+  }
+
+  // Step 3: Apply changes to the MDX
+  if (dryRun) {
+    const output = formatDryRun(page.title, citationsToAdd, costTracker.totalCost, Date.now() - startTime);
+    return { exitCode: 0, output };
+  }
+
+  console.log('  [4/4] Inserting footnotes...');
+
+  // Sort insertions by line (reverse) so we can insert without offset issues
+  const sorted = [...citationsToAdd].sort((a, b) => {
+    if (a.insertionLine !== b.insertionLine) return b.insertionLine - a.insertionLine;
+    return b.insertionColumn - a.insertionColumn;
+  });
+
+  const modifiedLines = [...lines];
+
+  for (const citation of sorted) {
+    const line = modifiedLines[citation.insertionLine];
+    const ref = `[^${citation.refId}]`;
+    modifiedLines[citation.insertionLine] =
+      line.slice(0, citation.insertionColumn) + ref + line.slice(citation.insertionColumn);
+  }
+
+  // Add footnote definitions at the end
+  modifiedLines.push('');
+  for (const citation of citationsToAdd) {
+    const def = `[^${citation.refId}]: [${citation.source.title || 'Source'}](${citation.source.url})`;
+    modifiedLines.push(def);
+  }
+
+  const newContent = modifiedLines.join('\n');
+  fs.writeFileSync(page.filePath, newContent);
+
+  console.log(`\n  Done. Added ${citationsToAdd.length} citations to ${page.filePath}`);
+
+  const output = [
+    `\n  Citation Addition Report: ${page.title}`,
+    `  ${'─'.repeat(50)}`,
+    `  Citations added: ${citationsToAdd.length}`,
+    `  Cost: $${costTracker.totalCost.toFixed(3)}`,
+    `  Duration: ${((Date.now() - startTime) / 1000).toFixed(1)}s`,
+    '',
+    '  Added:',
+    ...citationsToAdd.map(c => `    [^${c.refId}] ${c.claim.text.slice(0, 50)}... → ${c.source.url.slice(0, 50)}`),
+  ].join('\n');
+
+  return { exitCode: 0, output };
+}
+
+// ── Dry run formatting ───────────────────────────────────────────────
+
+function formatDryRun(
+  title: string,
+  citations: CitationToAdd[],
+  cost: number,
+  durationMs: number,
+): string {
+  const lines: string[] = [];
+  lines.push(`\n  Citation Addition DRY RUN: ${title}`);
+  lines.push(`  ${'─'.repeat(50)}`);
+  lines.push(`  Would add ${citations.length} citations`);
+  lines.push(`  Cost so far: $${cost.toFixed(3)}`);
+  lines.push(`  Duration: ${(durationMs / 1000).toFixed(1)}s`);
+  lines.push('');
+
+  for (const c of citations) {
+    lines.push(`  Line ${c.insertionLine + 1}: [^${c.refId}]`);
+    lines.push(`    Claim: ${c.claim.text}`);
+    lines.push(`    Source: ${c.source.title || c.source.url}`);
+    lines.push(`    URL: ${c.source.url}`);
+    lines.push('');
+  }
+
+  lines.push('  Run without --dry-run to apply.');
+  return lines.join('\n');
+}

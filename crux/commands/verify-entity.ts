@@ -564,6 +564,8 @@ ${c.bold}Examples:${c.reset}
   crux verify page <page-id>               Verify wiki page prose (cited vs uncited claims)
   crux verify page <page-id> --quick       Just count cited vs uncited (no web search)
   crux verify page <page-id> --deep        Also verify uncited claims against web
+  crux verify page <page-id> --fix         Add citations to uncited claims (surgical)
+  crux verify page <page-id> --fix --dry-run  Preview what citations would be added
   crux verify page --all                   Fast citation density audit across all pages
   crux verify page --all --limit=100       Show top 100 worst-cited pages
   crux verify stats                        Show overall verification statistics`,
@@ -581,7 +583,11 @@ ${c.bold}Examples:${c.reset}
         return auditAllPagesCommand(options);
       }
       if (!pageId) {
-        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep]\n       crux verify page --all' };
+        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep|--fix]\n       crux verify page --all' };
+      }
+      if (options.fix) {
+        const { addCitationsCommand } = await import('./add-citations.ts');
+        return addCitationsCommand(pageId, options);
       }
       const { verifyPageCommand } = await import('./verify-page.ts');
       return verifyPageCommand(pageId, options);
