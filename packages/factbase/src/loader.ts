@@ -855,5 +855,12 @@ export async function loadKB(dataDir: string, options?: LoadOptions): Promise<Lo
     }
   }
 
+  // Populate slug → entityId map on the graph for slug-based lookups
+  const slugToId = new Map<string, string>();
+  for (const [entityId, slug] of filenameMap) {
+    slugToId.set(slug, entityId);
+  }
+  graph.setSlugMap(slugToId);
+
   return { graph, filenameMap };
 }

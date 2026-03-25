@@ -11,7 +11,7 @@
  */
 
 import { cn } from "@lib/utils";
-import { getKBEntity } from "@data/factbase";
+import { getFactBaseEntity, resolveFactBaseSlug } from "@data/factbase";
 import { getTypedEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
 
@@ -24,9 +24,11 @@ interface FBRefLinkProps {
 }
 
 export function FBRefLink({ id, label, className }: FBRefLinkProps) {
-  const kbEntity = getKBEntity(id);
+  // Try direct stableId lookup first, then resolve slug → stableId
+  const resolvedId = resolveFactBaseSlug(id);
+  const kbEntity = getFactBaseEntity(id) ?? (resolvedId ? getFactBaseEntity(resolvedId) : undefined);
 
-  // Try wiki entity lookup (KB slug or direct id)
+  // Try wiki entity lookup (FactBase stableId or direct id)
   const wikiEntity = getTypedEntityById(kbEntity?.id ?? id);
   if (wikiEntity) {
     return (
@@ -36,8 +38,11 @@ export function FBRefLink({ id, label, className }: FBRefLinkProps) {
     );
   }
 
-  // Fallback: show the KB entity name or raw ID
-  const displayName = label ?? kbEntity?.name ?? id;
+  // Fallback: show the KB entity name, or title-case the slug so "spark-capital" → "Spark Capital"
+  const displayName =
+    label ??
+    kbEntity?.name ??
+    id.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
   return (
     <span
       className={cn("text-muted-foreground", className)}

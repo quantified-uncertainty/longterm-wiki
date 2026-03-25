@@ -744,6 +744,9 @@ describe("validate", () => {
     });
   });
 
+  // record-endpoint-unresolved tests removed — records migrated from YAML to PostgreSQL.
+  // Endpoint validation now happens at the PG/API layer.
+
   describe("new checks on real data", () => {
     it("produces no stableid-format errors on real entities", () => {
       const results = validate(graph);
@@ -780,5 +783,7 @@ describe("validate", () => {
       const dateWarnings = results.filter((r) => r.rule === "date-format");
       expect(dateWarnings).toHaveLength(0);
     });
+
+    // record-endpoint-unresolved real-data test removed — records are PG-managed
   });
 });
