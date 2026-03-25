@@ -1,0 +1,29 @@
+entity: dYjY3Ma1Hw
+facts:
+  - id: f_mdEkRxxaE9
+    property: founded-date
+    value: "2007"
+    source: https://www.cnas.org/about
+    notes: "Founded in 2007 by Michèle Flournoy and Kurt Campbell"
+
+  - id: f_xaEZYJ6E0s
+    property: headquarters
+    value: "Washington, DC"
+    source: https://www.cnas.org/about
+
+  - id: f_xZikUjBUeA
+    property: legal-structure
+    value: "501(c)(3) nonprofit"
+    source: https://www.cnas.org/about
+
+  - id: f_rkwgrbKBWg
+    property: description
+    value: "Bipartisan national security and defense policy think tank. Key contributor to hardware-enabled governance research through publications 'Secure, Governable Chips' (January 2024) and 'Technology to Secure the AI Chip Supply Chain' (December 2024)."
+    source: https://www.cnas.org/about
+    asOf: "2026-03"
+
+  - id: f_kOdZxvjO6M
+    property: notable-for
+    value: "Established the policy framework for hardware-enabled AI chip governance through Tim Fist's research; coined 'on-chip governance' terminology"
+    source: https://www.cnas.org/publications
+    asOf: "2026-03"

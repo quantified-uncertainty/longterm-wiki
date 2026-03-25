@@ -1,0 +1,24 @@
+entity: V5RCY2I3eY
+facts:
+  - id: f_QxLmtpAtfr
+    property: headquarters
+    value: "Ris-Orangis, France"
+    source: https://www.mithrilsecurity.io
+
+  - id: f_bKGl8XJYCt
+    property: total-funding
+    value: 1.7e+6
+    source: https://www.mithrilsecurity.io
+    notes: "Raised $1.7M plus received OpenAI cybersecurity grant"
+
+  - id: f_MvsQuztShB
+    property: description
+    value: "French startup building enclave-based solutions for trustworthy AI using Intel SGX. Key product is BlindAI, an open-source secure AI deployment solution. Acquired by H Company in June 2024."
+    source: https://www.mithrilsecurity.io
+    asOf: "2026-03"
+
+  - id: f_43sjxudssr
+    property: notable-for
+    value: "Developed BlindAI open-source secure deployment solution (independently audited); partnered with Future of Life Institute on hardware-backed AI governance proof-of-concept"
+    source: https://www.mithrilsecurity.io
+    asOf: "2026-03"
