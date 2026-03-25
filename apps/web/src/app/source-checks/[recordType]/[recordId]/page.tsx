@@ -16,7 +16,6 @@ import {
   formatCheckerModel,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
-import { isUrl } from "@/components/wiki/factbase/format";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
@@ -299,8 +298,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
           const seen = new Map<string, DeduplicatedCheck>();
           for (const c of checks) {
-            // Key on verdict + first 100 chars of notes (to catch near-identical notes)
-            const dedupeKey = `${c.verdict}:${(c.notes || c.extractedValue || "").slice(0, 100)}`;
+            // Key on field + entity + verdict + values + notes to avoid collapsing distinct field checks
+            const dedupeKey = [
+              c.fieldName ?? "",
+              c.entityId ?? "",
+              c.verdict,
+              c.expectedValue ?? "",
+              c.extractedValue ?? "",
+              (c.notes ?? "").slice(0, 100),
+            ].join("::");
             const existing = seen.get(dedupeKey);
             if (existing) {
               existing.duplicateCount++;
@@ -421,9 +427,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       )}
 
       {/* Footer */}
-      <div className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        <span className="font-mono">{recordId}</span>
-      </div>
+      <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
+        <summary className="cursor-pointer hover:text-foreground transition-colors">
+          Debug info
+        </summary>
+        <div className="mt-2 space-y-0.5">
+          <p>Record type: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordType}</code></p>
+          <p>Record ID: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordId}</code></p>
+        </div>
+      </details>
     </div>
   );
 }

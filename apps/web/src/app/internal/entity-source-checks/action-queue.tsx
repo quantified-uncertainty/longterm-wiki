@@ -275,17 +275,27 @@ function ActionGroup({
 // ── Single action item ─────────────────────────────────────────────────────
 
 function ActionItem({ item, names }: { item: VerdictRow; names: NameMap }) {
-  let displayName = names[item.recordId]
-    ?? names[item.entityId ?? ""]
-    ?? item.recordId;
+  // Resolve the record-level name (e.g., fact label "Headquarters", personnel name)
+  const recordName = names[item.recordId] ?? null;
+  // Resolve the parent entity name (e.g., "Anthropic", "Elon Musk")
+  const entityName = item.entityId ? (names[item.entityId] ?? null) : null;
+
+  // Build display name: prefer "Entity: Record" when both are available
+  // so users can distinguish multiple entries for the same entity.
+  let displayName: string;
+  if (recordName && entityName && recordName !== entityName) {
+    displayName = `${entityName}: ${recordName}`;
+  } else {
+    displayName = recordName ?? entityName ?? item.recordId;
+  }
 
   // Strip "new:" prefix from resolved display names
   if (displayName.startsWith("new:")) {
     displayName = displayName.slice(4);
   }
 
-  const truncatedName = displayName.length > 50
-    ? displayName.slice(0, 48) + "..."
+  const truncatedName = displayName.length > 60
+    ? displayName.slice(0, 58) + "..."
     : displayName;
 
   const href = `/source-checks/${encodeURIComponent(item.recordType)}/${encodeURIComponent(item.recordId)}`;

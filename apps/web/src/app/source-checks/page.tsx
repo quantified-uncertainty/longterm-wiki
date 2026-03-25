@@ -162,6 +162,21 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       }
     }
 
+    // Resolve fact names locally from FactBase as fallback (wiki-server may not
+    // have the resolve-names endpoint deployed yet)
+    for (const v of verdicts) {
+      if (v.recordType === "fact" && !names[v.recordId]) {
+        const fact = getKBFactById(v.recordId);
+        if (fact) {
+          const property = getKBProperty(fact.propertyId);
+          const entity = getKBEntity(fact.subjectId);
+          const propertyName = property?.name ?? fact.propertyId;
+          const entityName = entity?.name ?? fact.subjectId;
+          names[v.recordId] = `${entityName} — ${propertyName}`;
+        }
+      }
+    }
+
     // Resolve entity names + hrefs locally from database.json (fast, no roundtrip)
     if (entityIds.size > 0) {
       const registry = getIdRegistry();
