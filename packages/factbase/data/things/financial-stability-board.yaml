@@ -1,0 +1,36 @@
+entity: McCoYr5xR5
+facts:
+  - id: f_fsb01desc
+    property: description
+    value: >-
+      International body that monitors and makes recommendations about the
+      global financial system. Established in 2009 as successor to the
+      Financial Stability Forum. Hosted by the Bank for International
+      Settlements in Basel, Switzerland.
+    asOf: 2026-03
+
+  - id: f_fsb02founded
+    property: founded-date
+    value: 2009
+    source: https://en.wikipedia.org/wiki/Financial_Stability_Board
+    notes: >-
+      Established at the G20 London summit in April 2009. Successor to
+      the Financial Stability Forum (est. 1999).
+
+  - id: f_fsb03hq
+    property: headquarters
+    value: "Basel, Switzerland"
+    source: https://en.wikipedia.org/wiki/Financial_Stability_Board
+
+  - id: f_fsb04website
+    property: website
+    value: https://www.fsb.org
+
+  - id: f_fsb05members
+    property: membership
+    value: >-
+      Representatives from 68 institutions: central banks, finance
+      ministries, supervisory authorities from 25 jurisdictions, plus
+      10 international organizations and standard-setting bodies.
+    asOf: 2026-03
+    source: https://www.fsb.org/about/organisation-and-governance/members-of-the-fsb/

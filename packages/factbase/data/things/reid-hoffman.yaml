@@ -1,0 +1,28 @@
+entity: yPLp_SbMx0
+facts:
+  - id: f_rh01desc
+    property: description
+    value: >-
+      Co-founder of LinkedIn and partner at Greylock Partners. One of the
+      most prominent tech donors focused on democracy and political stability.
+      Board member at Microsoft.
+    asOf: 2026-03
+
+  - id: f_rh02born
+    property: born-year
+    value: 1967
+    source: https://en.wikipedia.org/wiki/Reid_Hoffman
+
+  - id: f_rh03education
+    property: education
+    value: "B.S. Symbolic Systems, Stanford; M.St. Philosophy, Oxford (Marshall Scholar)"
+    source: https://en.wikipedia.org/wiki/Reid_Hoffman
+
+  - id: f_rh04notable
+    property: notable-for
+    value: >-
+      Co-founded LinkedIn (2002, acquired by Microsoft for $26.2B in 2016);
+      early PayPal executive; Greylock Partners board partner; major
+      Democratic donor and democracy-focused philanthropist.
+    asOf: 2026-03
+    source: https://en.wikipedia.org/wiki/Reid_Hoffman

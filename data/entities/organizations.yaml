@@ -8374,3 +8374,89 @@
     Executive branch of the European Union. Led the EU AI Act negotiations.
     Margrethe Vestager served as Executive VP for Competition and Digital.
   lastUpdated: 2026-03
+
+- id: world-economic-forum
+  stableId: FqdVIQLb-I
+  type: organization
+  orgType: generic
+  title: World Economic Forum
+  website: https://www.weforum.org
+  description: >-
+    International organization founded in 1971 by Klaus Schwab that convenes
+    annual meetings in Davos, Switzerland. Functions as elite coordination
+    infrastructure for global business, political, and academic leaders.
+    Relevant to AI governance as a venue for cross-sector dialogue on
+    technology policy, though criticized for prioritizing networking over
+    institutional accountability.
+  tags:
+    - ai-governance
+    - international-coordination
+  sources:
+    - title: World Economic Forum
+      url: https://www.weforum.org/
+    - title: World Economic Forum - Wikipedia
+      url: https://en.wikipedia.org/wiki/World_Economic_Forum
+  lastUpdated: 2026-03
+
+- id: financial-stability-board
+  stableId: McCoYr5xR5
+  type: organization
+  orgType: generic
+  title: Financial Stability Board
+  website: https://www.fsb.org
+  description: >-
+    International body established in 2009 (successor to the Financial
+    Stability Forum) that monitors and makes recommendations about the global
+    financial system. Hosted by the Bank for International Settlements in
+    Basel. Cited as a model for AI governance coordination due to its
+    combination of technical staff, shared methodologies, genuine enforcement
+    through regulatory equivalence, and standing institutional structure
+    connecting central bankers across jurisdictions.
+  tags:
+    - international-coordination
+    - systemic-risk
+  sources:
+    - title: Financial Stability Board
+      url: https://www.fsb.org/
+    - title: Financial Stability Board - Wikipedia
+      url: https://en.wikipedia.org/wiki/Financial_Stability_Board
+  lastUpdated: 2026-03
+
+- id: christianity-today
+  stableId: 19tcfkelEF
+  type: organization
+  orgType: generic
+  title: Christianity Today
+  website: https://www.christianitytoday.com
+  description: >-
+    American evangelical Christian media company founded in 1956 by Billy
+    Graham. Under editor-in-chief Russell Moore (formerly of the Southern
+    Baptist Convention), it has become a prominent platform for opposing
+    Christian nationalism from within the evangelical tradition.
+  tags:
+    - media
+  sources:
+    - title: Christianity Today
+      url: https://www.christianitytoday.com/
+    - title: Christianity Today - Wikipedia
+      url: https://en.wikipedia.org/wiki/Christianity_Today
+  lastUpdated: 2026-03
+
+- id: world-vision
+  stableId: iFu20pvEsh
+  type: organization
+  orgType: generic
+  title: World Vision
+  website: https://www.worldvision.org
+  description: >-
+    International evangelical Christian humanitarian aid, development, and
+    advocacy organization founded in 1950. One of the largest
+    relief-and-development NGOs globally, operating in nearly 100 countries.
+  tags:
+    - humanitarian
+  sources:
+    - title: World Vision International
+      url: https://www.worldvision.org/
+    - title: World Vision International - Wikipedia
+      url: https://en.wikipedia.org/wiki/World_Vision_International
+  lastUpdated: 2026-03

@@ -1,0 +1,26 @@
+entity: 3SLFjy1eDj
+facts:
+  - id: f_bh01desc
+    property: description
+    value: >-
+      Co-founder and general partner of Andreessen Horowitz (a16z).
+      Author of "The Hard Thing About Hard Things." Described as more
+      pragmatic than co-founder Marc Andreessen on engagement with the
+      EA/AI safety community.
+    asOf: 2026-03
+
+  - id: f_bh02born
+    property: born-year
+    value: 1966
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz
+
+  - id: f_bh03education
+    property: education
+    value: "B.A. Computer Science, Columbia University; M.S. Computer Science, UCLA"
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz
+
+  - id: f_bh04role
+    property: role
+    value: "Co-founder and General Partner, Andreessen Horowitz"
+    asOf: 2009-07
+    source: https://en.wikipedia.org/wiki/Ben_Horowitz
