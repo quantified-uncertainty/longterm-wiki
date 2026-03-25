@@ -5,9 +5,9 @@ description: Frameworks, policies, and hardware mechanisms governing the global 
 sidebar:
   order: 7
 subcategory: compute-governance
-lastEdited: 2026-03-24
+lastEdited: 2026-03-25
 update_frequency: 30
-summary: A comprehensive, well-structured overview of AI chip governance supply chain frameworks, covering export controls, hardware-enabled governance proposals, key chokepoints (TSMC, ASML, Nvidia), enforcement gaps, and policy volatility — concluding that governance infrastructure lags far behind the scale of chip industry investment. The article is unusually complete for wiki content, with substantive criticisms sections and clear identification of key uncertainties.
+summary: Covers AI chip governance supply chain frameworks including U.S. export controls (EAR, FDPR), hardware-enabled governance proposals, key chokepoints (TSMC, ASML, Nvidia), enforcement gaps and smuggling cases, industry stances, funding landscape, policy volatility across administrations, and key uncertainties around allied coordination and China's domestic capability trajectory.
 clusters:
   - ai-safety
   - governance
@@ -26,7 +26,6 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 | **Hardware governance readiness** | Existing chip features (Nvidia, AMD, Intel, Apple) could support governance; deployment pending |
 | **Investment in governance R&D** | Marginal vs. total AI chip capex (\$630B+ industry in 2024); no dedicated public R&D fund identified |
 | **Funding gaps** | Significant; think tanks (CNAS, GovAI, IAPS) working on policy, but hardware R&D funding is sparse |
-| **Subcategory** | compute-governance |
 
 ## Key Links
 
@@ -47,7 +46,7 @@ The field is evolving rapidly. U.S. policy has oscillated between administration
 
 ### Chip Designers
 
-**Nvidia** is the dominant supplier of GPUs used in AI training and inference. Its H100, H200, and Blackwell series chips are the primary targets of U.S. export controls aimed at China. Nvidia has responded to these controls by developing China-specific downgraded chips (the A800, H800, and H20) that attempt to remain below regulatory performance thresholds. Nvidia CEO Jensen Huang has publicly evaluated the H20 chip's status under export controls. The company's position on hardware governance has been cautious: Nvidia has reportedly piloted customer tracking software but has resisted proposals for hardware kill-switches or hard functionality throttles, with company representatives arguing that restricting access would stifle global innovation and weaken U.S. competitive advantage.
+<EntityLink id="E693">**Nvidia**</EntityLink> is the dominant supplier of GPUs used in AI training and inference. Its H100, H200, and Blackwell series chips are the primary targets of U.S. export controls aimed at China. Nvidia has responded to these controls by developing China-specific downgraded chips (the A800, H800, and H20) that attempt to remain below regulatory performance thresholds. Nvidia CEO Jensen Huang has publicly evaluated the H20 chip's status under export controls. The company's position on hardware governance has been cautious: Nvidia has reportedly piloted customer tracking software but has resisted proposals for hardware kill-switches or hard functionality throttles, with company representatives arguing that restricting access would stifle global innovation and weaken U.S. competitive advantage.
 
 **AMD** is the principal competitor in AI accelerators and, alongside Nvidia, Intel, and Apple, already incorporates chip features that researchers argue could be repurposed for governance functions—such as location verification pings and usage monitoring—without revealing sensitive operational details.
 
@@ -114,7 +113,7 @@ The CNAS research recommends coordinating HEM development through a NIST-led wor
 
 Industry positions on hardware-enabled governance range from cautious engagement to active resistance.
 
-**Nvidia** is the only major chipmaker actively building governance technology. In December 2025, Nvidia [piloted location-verification software](https://www.cnbc.com/2025/12/11/nvidias-new-software-could-help-trace-where-its-ai-chips-end-up.html) for Blackwell AI GPUs, using GPU telemetry and communication latency to landmark servers to estimate chip country of operation. The system uses confidential computing capabilities already in the chips, is customer-installed (not hidden), and Nvidia plans to make it open-source. However, the company has [firmly rejected kill switches](https://blogs.nvidia.com/blog/no-backdoors-no-kill-switches-no-spyware/): Chief Security Officer David Reber wrote in August 2025 that kill switches are "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper Chip as precedent. Nvidia's FY2026 data center revenue reached \$62.3B in Q4 alone, giving it enormous market leverage in shaping governance standards.
+**Nvidia** is the only major chipmaker actively building governance technology. In December 2025, Nvidia piloted location-verification software for Blackwell AI GPUs, using GPU telemetry and communication latency to landmark servers to estimate chip country of operation.[^13] The system uses confidential computing capabilities already in the chips, is customer-installed (not hidden), and Nvidia plans to make it open-source. However, the company has rejected kill switches: Chief Security Officer David Reber wrote in August 2025 that kill switches are "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper Chip as precedent.[^14]
 
 **AMD and Intel** have similarly cooperated with export controls while publicly emphasizing innovation and competitiveness concerns. Both companies have existing chip features that researchers argue are HEM-compatible, but neither has committed to deploying them for governance purposes absent government mandate.
 
@@ -128,42 +127,42 @@ The **Semiconductor Industry Association** has called for a more measured approa
 
 Global chip revenue reached approximately \$630 billion in 2024 and is projected to reach \$910 billion by 2026.[^3] U.S. private investment catalyzed by the CHIPS and Science Act totals over \$630 billion.[^2] The four major hyperscalers (Google, Amazon, Microsoft, Meta) have projected combined capital expenditure of \$650 billion in the AI infrastructure build-out. OpenAI has signed agreements for 900,000 wafers per month by 2029 for its Stargate project.
 
-Against this backdrop, investment specifically in governance-oriented hardware R&D appears marginal. No dedicated public fund for HEM development has been identified in available research. The primary sources of governance-relevant research are policy think tanks—CNAS, the Georgetown Center for Security and Emerging Technology, <EntityLink id="E552">Open Philanthropy</EntityLink>-funded organizations, and academic labs—whose total budgets are a rounding error relative to chip industry capex.
+Against this backdrop, investment specifically in governance-oriented hardware R&D appears marginal. No dedicated public fund for HEM development has been identified in available research. The primary sources of governance-relevant research are policy think tanks—CNAS, the <EntityLink id="E524">Georgetown Center for Security and Emerging Technology</EntityLink>, <EntityLink id="E552">Open Philanthropy</EntityLink>-funded organizations, and academic labs—whose budgets are small relative to chip industry capex.
 
 The research organizations most actively working on AI chip governance policy include:
 
 - **CNAS (Center for a New American Security)**: Authored the "Secure, Governable Chips" working paper, the most detailed public treatment of HEM design. Published work on allied coordination for export controls.
 - **IAPS (Institute for AI Policy and Strategy)**: Active on compute governance, export controls, and hardware security.
 - **GovAI (Centre for the Governance of AI)**: Publishes research on AI governance frameworks, including compute governance dimensions. See also <EntityLink id="E154">AI Governance and Policy</EntityLink>.
-- **Georgetown CSET**: Analyzes semiconductor supply chains, export control effectiveness, and allied coordination.
+- **<EntityLink id="E524">Georgetown CSET</EntityLink>**: Analyzes semiconductor supply chains, export control effectiveness, and allied coordination.
 - **Academic labs**: Computer science and security researchers at MIT, Stanford, and Carnegie Mellon have contributed to technical understanding of HEM feasibility.
 
-The ratio of governance R&D to industry investment is stark. Identifiable dedicated funding for hardware governance mechanisms includes:
+Identifiable dedicated funding for hardware governance mechanisms includes:
 
 | Funder | Amount | Focus |
 |--------|--------|-------|
 | [Longview Philanthropy HEM RFP](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) | \$2–10M (one-time) | HEM prototypes: location verification, offline licensing, bandwidth limiters |
-| <EntityLink id="E552">Coefficient Giving</EntityLink> | \$200K–2M/year | AI governance grants (hardware is a subset) |
+| <EntityLink id="E521">Coefficient Giving</EntityLink> | \$200K–2M/year | AI governance grants (hardware is a subset) |
 | RAND workshop (Li Lu Humanitarian Foundation) | Undisclosed | Expert convening on HEM feasibility |
 | CHIPS Act R&D allocation | \$11B total, \$3.5B defense "secure enclave" | Hardware governance is a small subset, not specifically earmarked |
 | Nvidia (internal) | Unknown | Location verification software; landmark infrastructure est. \$2.5–12.5M/year |
 
 This amounts to roughly \$10M in philanthropic funding versus \$400B+ in annual AI infrastructure spending—a ratio of approximately 1:40,000. No dedicated Focused Research Organization for hardware governance exists, and no VC-funded startup is focused specifically on governance-specific hardware.
 
-## How Funders Can Help
+## Proposed Funding Priorities
 
-[Coefficient Giving has identified](https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-ai-governance/) the field as "still very funding-constrained." The highest-impact areas for marginal philanthropic dollars, in rough priority order:
+<EntityLink id="E521">Coefficient Giving</EntityLink> has [described](https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-ai-governance/) the field as "still very funding-constrained." Several organizations have identified areas where additional funding could advance hardware governance research:
 
-| Priority | Investment Needed | What It Buys |
-|----------|-------------------|-------------|
-| **HEM prototyping** | \$5–20M | Delay-based location verification improvements (accuracy from ≈100-500km), offline licensing systems, bandwidth rate limiters, red-teaming of existing mechanisms |
-| **Dedicated FRO** | \$10–30M over 3 years | A [Focused Research Organization](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) combining hardware security expertise with AI governance policy—no such entity currently exists |
-| **Talent pipeline** | \$2–5M/year | Fellowships and secondments for [hardware engineers at Nvidia, TSMC, and ASML](https://coefficientgiving.org/research/ai-governance-talent-profiles-wed-like-to-see/) interested in governance applications |
-| **Policy research** | \$1–5M/year | Detailed technical analysis at CNAS, RAND, IAPS, GovAI—organizations that could absorb more funding |
-| **Field-building** | \$1–3M/year | Cross-disciplinary workshops connecting hardware security, cryptography, AI safety, and government researchers—fields that "don't typically interact" |
-| **Chip tracking infrastructure** | \$5–15M | Building the landmark server network for location verification (\$2.5–12.5M/year for 100–500 servers) |
+| Area | Estimated Cost | Description |
+|------|----------------|-------------|
+| **HEM prototyping** | \$5–20M | Delay-based location verification improvements, offline licensing systems, bandwidth rate limiters, red-teaming of existing mechanisms |
+| **Dedicated research organization** | \$10–30M over 3 years | [Longview Philanthropy](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) has proposed a Focused Research Organization combining hardware security expertise with AI governance policy |
+| **Talent pipeline** | \$2–5M/year | Fellowships and secondments for [hardware engineers](https://coefficientgiving.org/research/ai-governance-talent-profiles-wed-like-to-see/) interested in governance applications |
+| **Policy research** | \$1–5M/year | Technical analysis at organizations such as CNAS, RAND, IAPS, and GovAI |
+| **Field-building** | \$1–3M/year | Cross-disciplinary workshops connecting hardware security, cryptography, AI safety, and government researchers |
+| **Chip tracking infrastructure** | \$5–15M | Landmark server networks for location verification (estimated \$2.5–12.5M/year for 100–500 servers) |
 
-**The window may be closing.** Lennart Heim (RAND/GovAI) has [argued](https://80000hours.org/podcast/episodes/lennart-heim-compute-governance/) that compute governance may only be viable for "a decade or two" before algorithmic efficiency improvements make chip controls less effective. Investments made now in hardware governance mechanisms could have outsized impact compared to the same investments made later.
+Lennart Heim (RAND/GovAI) has [argued](https://80000hours.org/podcast/episodes/lennart-heim-compute-governance/) that compute governance may only be viable for "a decade or two" before algorithmic efficiency improvements make chip controls less effective, suggesting that earlier investment in hardware governance mechanisms may have greater impact than later investment.
 
 ## Criticisms and Concerns
 
@@ -171,7 +170,7 @@ This amounts to roughly \$10M in philanthropic funding versus \$400B+ in annual 
 
 Current export controls face fundamental enforcement challenges. BIS relies primarily on checking buyers against a blacklist, but shell companies can be established for a few thousand dollars in hours or days, while investigations take years. Because officials have no reliable means of tracking who possesses AI chips after export or how they are being used, controls are applied as blanket restrictions on all shipments above certain performance thresholds.
 
-The scale of smuggling is staggering. [CNAS estimated](https://www.cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority) a median of ~140,000 chips diverted to China in 2024, representing 6–10% of China's AI compute capacity. The Megaspeed case illustrates how intermediaries exploit regulatory gaps: the Singapore-based firm allegedly diverted \$2 billion in restricted Nvidia chips through a Malaysian subsidiary. In December 2025, Operation Gatekeeper [exposed a \$160 million smuggling ring](https://www.cnbc.com/2025/12/31/160-million-export-controlled-nvidia-gpus-allegedly-smuggled-to-china.html) exporting H100 and H200 GPUs via shell companies. In March 2026, Supermicro's co-founder was arrested in connection with a [\$2.5 billion smuggling operation](https://www.fdd.org/analysis/2026/03/20/exposure-of-major-chinese-linked-chip-smuggling-operations-shows-limits-of-industry-self-policing/) diverting servers to China via Southeast Asian front companies—\$510 million in a single six-week window. Estimated profits from just three smuggling cases in 2024 exceed BIS's entire annual enforcement budget.
+The scale of smuggling is significant. CNAS estimated a median of ~140,000 chips diverted to China in 2024, representing 6–10% of China's AI compute capacity.[^10] The Megaspeed case illustrates how intermediaries exploit regulatory gaps: the Singapore-based firm allegedly diverted \$2 billion in restricted Nvidia chips through a Malaysian subsidiary. In December 2025, Operation Gatekeeper exposed a \$160 million smuggling ring exporting H100 and H200 GPUs via shell companies.[^11] In March 2026, Supermicro's co-founder was arrested in connection with a \$2.5 billion smuggling operation diverting servers to China via Southeast Asian front companies—\$510 million in a single six-week window.[^12] Estimated profits from just three smuggling cases in 2024 exceed BIS's entire annual enforcement budget.
 
 ### De-Americanization Risk
 
@@ -215,4 +214,14 @@ Frequent policy reversals—Biden's AI Diffusion Rule, Trump's modifications, sc
 
 [^8]: Chip Security Act legislative text – two-phase framework for location verification and anti-tamper assessment; Commerce Secretary monitoring authority
 
-[^9]: Bain & Company – Peter Hanbury analysis of AI deployment timelines (2025) - covers 40-60% enterprise deployment delays and extended custom solution timelines
+[^9]: Bain & Company – Peter Hanbury analysis of AI deployment timelines (2025) - covers 40-60% enterprise deployment delays and extended custom solution timelines; cited for effects of policy uncertainty on semiconductor procurement
+
+[^10]: CNAS – "Countering AI Chip Smuggling Has Become a National Security Priority" - estimates ~140,000 chips diverted to China in 2024; available at cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority
+
+[^11]: CNBC – "\$160 million export-controlled Nvidia GPUs allegedly smuggled to China" (December 2025) - Operation Gatekeeper enforcement action
+
+[^12]: Foundation for Defense of Democracies – "Exposure of Major Chinese-Linked Chip Smuggling Operations Shows Limits of Industry Self-Policing" (March 2026) - Supermicro co-founder arrest, \$2.5B smuggling operation
+
+[^13]: CNBC – "Nvidia's new software could help trace where its AI chips end up" (December 2025) - location-verification software pilot for Blackwell GPUs
+
+[^14]: Nvidia Blog – "No Backdoors. No Kill Switches. No Spyware." (August 2025) - CSO David Reber statement on kill switch risks
