@@ -1,2 +1,18 @@
 entity: GwMzWw7fpA
-facts: []
+facts:
+  [
+    {
+        id: HYdE1oMdYA,
+        property: born-year,
+        value: 1969,
+        source: https://www.wikidata.org/wiki/Q6178697,
+        notes: From Wikidata Q6178697
+      },
+    {
+        id: fb4BpmobMA,
+        property: education,
+        value: Yale University,
+        source: https://www.wikidata.org/wiki/Q6178697,
+        notes: From Wikidata Q6178697
+      }
+  ]

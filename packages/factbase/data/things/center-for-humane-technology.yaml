@@ -38,7 +38,8 @@ facts:
     unit: USD
     asOf: 2024
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
-    notes: "Federal lobbying via Holland & Knight LLP: $80K/quarter consistently since Q3 2023. Verified from Senate LDA."
+    notes: "Federal lobbying via Holland & Knight LLP: $80K/quarter consistently
+      since Q3 2023. Verified from Senate LDA."
 
   - id: f_Wf8azn6DG2
     property: lobbying-spend
@@ -58,7 +59,8 @@ facts:
 
   - id: f_LkgFUd1n4N
     property: media-reach
-    value: "Your Undivided Attention podcast: 25+ million total downloads, 151 episodes, part of TED Audio Collective"
+    value: "Your Undivided Attention podcast: 25+ million total downloads, 151
+      episodes, part of TED Audio Collective"
     asOf: 2026
     source: https://www.humanetech.com/podcast
 
@@ -68,4 +70,10 @@ facts:
     unit: USD
     asOf: 2024
     source: https://www.humanetech.com
-    notes: "Most recent 990: revenue $3.58M, expenses $6.33M, net assets $6.01M, grants distributed $395K"
+    notes: "Most recent 990: revenue $3.58M, expenses $6.33M, net assets $6.01M,
+      grants distributed $395K"
+  - id: sbTVYfnD9w
+    property: website
+    value: http://www.timewellspent.io/
+    source: https://www.wikidata.org/wiki/Q30314140
+    notes: From Wikidata Q30314140

@@ -13,13 +13,15 @@ facts:
 
   - id: f_0YRkRbhXvy
     property: project
-    value: "Freedom Flyers Campaign investigating TSA facial recognition at 250+ US airports; published 'Comply To Fly?' report"
+    value: "Freedom Flyers Campaign investigating TSA facial recognition at 250+ US
+      airports; published 'Comply To Fly?' report"
     asOf: 2025
     source: https://www.ajl.org/flyreport
 
   - id: f_B5jDAHq7Pu
     property: project
-    value: "CRASH Project (Community Reporting of Algorithmic System Harms) — bug-bounty programs for algorithmic bias, launched July 2020"
+    value: "CRASH Project (Community Reporting of Algorithmic System Harms) —
+      bug-bounty programs for algorithmic bias, launched July 2020"
     asOf: 2020-07
     source: https://www.ajl.org
 
@@ -28,3 +30,8 @@ facts:
     value: "Dr. Joy Buolamwini elected to NAACP Legal Defense Fund Board"
     asOf: 2025
     source: https://www.ajl.org
+  - id: RZYaiQovGw
+    property: website
+    value: https://www.ajl.org
+    source: https://www.wikidata.org/wiki/Q104880166
+    notes: From Wikidata Q104880166

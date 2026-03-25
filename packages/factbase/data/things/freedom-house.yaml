@@ -13,19 +13,34 @@ facts:
 
   - id: f_lHViEp5E6w
     property: publication
-    value: "Freedom on the Net 2025 documented the 15th consecutive year of internet freedom decline globally"
+    value: "Freedom on the Net 2025 documented the 15th consecutive year of internet
+      freedom decline globally"
     asOf: 2025
     source: https://freedomhouse.org/country/united-states/freedom-net/2025
 
   - id: f_8pFBTDGEEK
     property: report
-    value: "Reported on Trump administration's use of AI-enabled immigration surveillance including facial recognition, social media monitoring, and algorithmic visa screening"
+    value: "Reported on Trump administration's use of AI-enabled immigration
+      surveillance including facial recognition, social media monitoring, and
+      algorithmic visa screening"
     asOf: 2025
     source: https://freedomhouse.org/article/trumps-immigration-crackdown-built-ai-surveillance-and-disregard-due-process
 
   - id: f_LSBLBnIb3W
     property: organizational-impact
-    value: "Significantly impacted by Trump administration foreign aid freezes that disrupted Freedom House programs in multiple countries"
+    value: "Significantly impacted by Trump administration foreign aid freezes that
+      disrupted Freedom House programs in multiple countries"
     asOf: 2025
     source: https://freedomhouse.org
-    notes: "Impact from 2025 foreign aid freezes; specific program count unverified from primary sources"
+    notes: "Impact from 2025 foreign aid freezes; specific program count unverified
+      from primary sources"
+  - id: jjwc2m9hxQ
+    property: headcount
+    value: 120
+    source: https://www.wikidata.org/wiki/Q242424
+    notes: From Wikidata Q242424
+  - id: BR2bufFQdw
+    property: website
+    value: https://freedomhouse.org/
+    source: https://www.wikidata.org/wiki/Q242424
+    notes: From Wikidata Q242424

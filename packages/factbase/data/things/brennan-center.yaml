@@ -35,7 +35,8 @@ facts:
 
   - id: f_vtvKIx18hH
     property: publication
-    value: "Published 'Agenda to Strengthen U.S. Democracy in the Age of AI' with federal and state policy recommendations"
+    value: "Published 'Agenda to Strengthen U.S. Democracy in the Age of AI' with
+      federal and state policy recommendations"
     asOf: 2025
     source: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
 
@@ -44,3 +45,14 @@ facts:
     value: "Michael Waldman serves as President and CEO"
     asOf: 2026-03
     source: https://www.brennancenter.org/about/leadership
+  - id: 6joOI7UWRg
+    property: website
+    value: http://www.brennancenter.org
+    source: https://www.wikidata.org/wiki/Q4961241
+    notes: From Wikidata Q4961241
+  - id: aSjBxHEOyw
+    property: description
+    value: Brennan Center for Justice is a subsidiary/division of New York
+      University School of Law.
+    source: https://www.wikidata.org/wiki/Q4961241
+    notes: Parent organization from Wikidata Q4961241

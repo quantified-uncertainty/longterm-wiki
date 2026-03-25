@@ -142,7 +142,7 @@ After: "AI is working and improving; the question of what happens as it improves
 | Detail | Information |
 |--------|-------------|
 | **Founded** | 2010 |
-| **Founders** | <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink>, <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>, Mustafa Suleyman |
+| **Founders** | <EntityLink id="E101" name="demis-hassabis">Demis Hassabis</EntityLink>, <EntityLink id="E280" name="shane-legg">Shane Legg</EntityLink>, <EntityLink id="E1288" name="mustafa-suleyman">Mustafa Suleyman</EntityLink> |
 | **Location** | London, UK |
 | **Acquisition** | [Google (January 2014)](https://techcrunch.com/2014/01/26/google-deepmind/) for \$400–650M |
 | **Pre-acquisition Funding** | Venture funding from Peter Thiel and others |
@@ -250,7 +250,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | Detail | Information |
 |--------|-------------|
 | **Founded** | [December 11, 2015](https://en.wikipedia.org/wiki/OpenAI) |
-| **Founders** | <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink>, Elon Musk, <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, Greg Brockman, Wojciech Zaremba, and others |
+| **Founders** | <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink>, <EntityLink id="E116" name="elon-musk">Elon Musk</EntityLink>, <EntityLink id="E163" name="ilya-sutskever">Ilya Sutskever</EntityLink>, <EntityLink id="E1012" name="greg-brockman">Greg Brockman</EntityLink>, <EntityLink id="wojciech-zaremba" name="wojciech-zaremba">Wojciech Zaremba</EntityLink>, and others |
 | **Pledged Funding** | \$1 billion (from Musk, Altman, Thiel, Hoffman, AWS, Infosys) |
 | **Actual Funding by 2019** | [\$130 million received](https://openai.com/index/openai-elon-musk/) (self-reported figure; Musk's contribution was approximately \$45 million against a larger pledge)[^rc-9752] |
 | **Structure** | Non-profit research lab (until 2019) |
@@ -373,7 +373,7 @@ AlphaGo's surprise victory carried several lessons relevant to AI safety researc
 | Detail | Information |
 |--------|-------------|
 | **Title** | [Concrete Problems in AI Safety](https://arxiv.org/abs/1606.06565) |
-| **Authors** | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>, <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>, Jacob Steinhardt, <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>, John Schulman, Dan Mané |
+| **Authors** | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>, <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink>, <EntityLink id="E1299" name="jacob-steinhardt">Jacob Steinhardt</EntityLink>, <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>, <EntityLink id="john-schulman" name="john-schulman">John Schulman</EntityLink>, Dan Mané |
 | **Affiliation** | Google Brain and OpenAI researchers |
 | **Published** | June 2016 (arXiv) |
 | **Citations** | [2,700+ citations](https://www.semanticscholar.org/paper/Concrete-Problems-in-AI-Safety-Amodei-Olah/e86f71ca2948d17b003a5f068db1ecb2b77827f7) (124 highly influential) |
@@ -500,7 +500,7 @@ The table below summarizes four major safety research threads that took shape du
 | Iterated Amplification | <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> | OpenAI | Can human judgment be reliably scaled to supervise AI on tasks humans cannot evaluate directly? | Influential theoretical framework; connected to RLHF and debate proposals; not yet empirically validated at scale [^rc-35fb] |
 | Mechanistic Interpretability | <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> | OpenAI (later Anthropic) | What computations do individual neurons and circuits implement inside neural networks? | Active research program producing circuit-level findings; gap between tools and frontier model scale remained wide [^rc-077a] |
 | Adversarial Robustness | Ian Goodfellow et al. | Google Brain / OpenAI | Why are neural networks vulnerable to imperceptible input perturbations, and can defenses be certified? | Extensive attack-defense literature; no fully general defense established; adversarial attacks identified as severe security threat [^rc-ebd3] |
-| RLHF Foundations | Dario Amodei, Paul Christiano, et al. | OpenAI | Can reinforcement learning from human preferences align model behavior with human intent at scale? | Foundational papers published; technique later adopted broadly; Amodei and colleagues departed OpenAI in late 2020 partly over alignment priorities [^rc-a4f4] |
+| RLHF Foundations | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink>, <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink>, et al. | OpenAI | Can reinforcement learning from human preferences align model behavior with human intent at scale? | Foundational papers published; technique later adopted broadly; Amodei and colleagues departed OpenAI in late 2020 partly over alignment priorities [^rc-a4f4] |
 
 ## BERT and the Transformer Era (2018-2019)
 
@@ -539,7 +539,7 @@ Alongside long-horizon safety research, a parallel community of researchers focu
 
 - **ProPublica's COMPAS analysis (2016)**: Reporting found that a commercial recidivism prediction algorithm showed disparate error rates across racial groups.[^rc-c700] ProPublica obtained risk scores for over 7,000 people arrested in Broward County, Florida, finding that Black defendants were falsely flagged as future criminals at almost twice the rate of white defendants.[^rc-c700] Critically, only 20 percent of people predicted to commit violent crimes actually did so, demonstrating the algorithm's unreliability.[^rc-c700] Subsequent mathematical analysis by researchers at Stanford, Cornell, Harvard, and Carnegie Mellon established that it is provably impossible for a risk algorithm to simultaneously satisfy multiple standard fairness criteria, making some form of disparate impact mathematically inevitable.[^rc-1beb] COMPAS remains in use in many jurisdictions, making it a landmark case study in algorithmic accountability.[^rc-d92c]
 
-- **"Gender Shades" (2018)**: Joy Buolamwini and Timnit Gebru published an intersectional audit of commercial facial recognition systems at FAT 2018, finding substantially higher error rates for darker-skinned women.[^rc-9ef4] The study prompted major vendors to revise their systems.[^rc-134b]
+- **"Gender Shades" (2018)**: Joy Buolamwini and <EntityLink id="E1305" name="timnit-gebru">Timnit Gebru</EntityLink> published an intersectional audit of commercial facial recognition systems at FAT 2018, finding substantially higher error rates for darker-skinned women.[^rc-9ef4] The study prompted major vendors to revise their systems.[^rc-134b]
 
 - **"Stochastic Parrots" (2020)**: Bender, Gebru, McMillan-Major, and Shmitchell argued that large language models encode existing biases and unfairnesses from web training data, functioning as stochastic parrots that repeat statistical patterns without meaningful understanding.[^rc-05c8] The paper called for research centering adversely affected communities and questioning whether applications should proceed despite foreseeable harms.[^rc-05c8] Timnit Gebru and Margaret Mitchell were subsequently dismissed from Google after co-authoring the paper, making the episode a flashpoint for debates about researcher independence inside large AI laboratories.[^rc-05c8]
 
@@ -697,7 +697,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 ### Tensions at OpenAI
 
-**2019–2020**: <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^rc-40ee] Escalating tensions with Sam Altman over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^rc-a4f4] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^rc-110f]
+**2019–2020**: <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (VP of Research) and <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink> (VP of Operations) grew concerned about a set of issues at OpenAI. Dario had joined OpenAI roughly a year after its founding as Team Lead for AI Safety, later becoming Research Director in September 2018 and Vice President of Research in November 2019.[^rc-40ee] Escalating tensions with <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> over AI safety priorities and differences in vision came to a head on December 29, 2020, when Dario formally departed.[^rc-a4f4] He and other colleagues believed that scaling compute improved models but that alignment work was equally necessary — a priority they felt was not adequately shared by OpenAI's leadership.[^rc-110f]
 
 **Issues cited in subsequent reporting**:
 - The shift to capped-profit structure and its implications for mission prioritization
@@ -708,7 +708,7 @@ The deep learning era surfaced multiple concrete examples of reward hacking — 
 
 ### Who Left
 
-The departure was not limited to the Amodeis. <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink>, Nicholas Joseph, and Amanda Askell left in December, January, and February respectively.[^rc-077a] Chris Olah and Jack Clark also announced their departures from OpenAI around the same time.[^rc-077a] In total, roughly 90% of those who left OpenAI in this period went on to work at Anthropic.[^rc-077a]
+The departure was not limited to the Amodeis. <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink>, Nicholas Joseph, and <EntityLink id="amanda-askell" name="amanda-askell">Amanda Askell</EntityLink> left in December, January, and February respectively.[^rc-077a] <EntityLink id="E59" name="chris-olah">Chris Olah</EntityLink> and <EntityLink id="E1248" name="jack-clark">Jack Clark</EntityLink> also announced their departures from OpenAI around the same time.[^rc-077a] In total, roughly 90% of those who left OpenAI in this period went on to work at Anthropic.[^rc-077a]
 
 ### Founding Anthropic
 
@@ -752,7 +752,7 @@ Multiple distinct approaches had been established: <EntityLink id="E174" name="i
 
 **3. Major Lab Engagement**
 
-<EntityLink id="E98" name="deepmind">DeepMind</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, Daniela Amodei, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^rc-077a]
+<EntityLink id="E98" name="deepmind">DeepMind</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink>, Google, and Facebook had each established dedicated safety teams or research programs by 2020. At OpenAI, a recognizable safety cohort — including Dario Amodei, <EntityLink id="E90" name="daniela-amodei">Daniela Amodei</EntityLink>, Chris Olah, and Jack Clark — had formed around shared concerns, though tensions over organizational priorities would lead many of them to depart in late 2020 and early 2021.[^rc-077a]
 
 **4. Funding Growth**
 

@@ -14,5 +14,19 @@ facts:
         value: https://en.wikipedia.org/wiki/Wojciech_Zaremba,
         source: https://www.wikidata.org/wiki/Q27733815,
         notes: From Wikidata Q27733815
+      },
+    {
+        id: 6fEfCMzaog,
+        property: born-year,
+        value: 1988,
+        source: https://www.wikidata.org/wiki/Q27733815,
+        notes: From Wikidata Q27733815
+      },
+    {
+        id: 7MfJTzMjVw,
+        property: education,
+        value: New York University; University of Warsaw; École polytechnique,
+        source: https://www.wikidata.org/wiki/Q27733815,
+        notes: From Wikidata Q27733815
       }
   ]

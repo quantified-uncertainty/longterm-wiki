@@ -12,3 +12,10 @@ facts:
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mark_Zuckerberg"
 
+  - id: qNjdIv1gIQ
+    property: education
+    value: Harvard University; Phillips Exeter Academy; Ardsley High School; Johns
+      Hopkins Center for Talented Youth; Mercy University; New York Medical
+      College
+    source: https://www.wikidata.org/wiki/Q36215
+    notes: From Wikidata Q36215

@@ -4,3 +4,8 @@ facts:
     property: notable-for
     value: "Co-founder of Anthropic; co-author of neural scaling laws research; formerly at OpenAI"
 
+  - id: WXcJm3oHAQ
+    property: education
+    value: Stanford University
+    source: https://www.wikidata.org/wiki/Q105285886
+    notes: From Wikidata Q105285886
