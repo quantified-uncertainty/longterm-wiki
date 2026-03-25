@@ -1687,6 +1687,7 @@
 
 - id: chip-security-act
   stableId: k-BNI9CkOn
+  wikiId: E2085
   type: policy
   title: Chip Security Act
   introduced: "2025-05-08"
@@ -1771,6 +1772,7 @@
 
 - id: stop-stealing-our-chips-act
   stableId: dLGmQQU4yB
+  wikiId: E2086
   type: policy
   title: Stop Stealing Our Chips Act
   introduced: "2025-04-10"
@@ -4032,6 +4034,7 @@
 
 - id: flexheg
   stableId: KrbvQbV0Js
+  wikiId: E2087
   type: project
   title: FlexHEG (Flexible Hardware-Enabled Guarantees)
   projectStatus: active
