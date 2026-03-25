@@ -1,6 +1,6 @@
 entity: yPLp_SbMx0
 facts:
-  - id: f_rh01desc
+  - id: f_3sWzLPJYzt
     property: description
     value: >-
       Co-founder of LinkedIn and partner at Greylock Partners. One of the
@@ -8,17 +8,17 @@ facts:
       Board member at Microsoft.
     asOf: 2026-03
 
-  - id: f_rh02born
+  - id: f_NOQQbpFdyH
     property: born-year
     value: 1967
     source: https://en.wikipedia.org/wiki/Reid_Hoffman
 
-  - id: f_rh03education
+  - id: f_mI1D9F9YjL
     property: education
     value: "B.S. Symbolic Systems, Stanford; M.St. Philosophy, Oxford (Marshall Scholar)"
     source: https://en.wikipedia.org/wiki/Reid_Hoffman
 
-  - id: f_rh04notable
+  - id: f_kBEnmPVUDD
     property: notable-for
     value: >-
       Co-founded LinkedIn (2002, acquired by Microsoft for $26.2B in 2016);

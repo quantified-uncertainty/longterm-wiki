@@ -1,6 +1,6 @@
 entity: 3SLFjy1eDj
 facts:
-  - id: f_bh01desc
+  - id: f_GxdE4hs2i4
     property: description
     value: >-
       Co-founder and general partner of Andreessen Horowitz (a16z).
@@ -9,17 +9,17 @@ facts:
       EA/AI safety community.
     asOf: 2026-03
 
-  - id: f_bh02born
+  - id: f_wufDSWqIso
     property: born-year
     value: 1966
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
 
-  - id: f_bh03education
+  - id: f_EUVDgbJJYA
     property: education
     value: "B.A. Computer Science, Columbia University; M.S. Computer Science, UCLA"
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
 
-  - id: f_bh04role
+  - id: f_2zrAA9YhWd
     property: role
     value: "Co-founder and General Partner, Andreessen Horowitz"
     asOf: 2009-07
