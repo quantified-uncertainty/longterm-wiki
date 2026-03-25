@@ -11,8 +11,19 @@ export const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
   unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
 };
 
+/** Tooltip descriptions for verdict types. */
+export const VERDICT_DESCRIPTIONS: Record<string, string> = {
+  confirmed: "Source evidence supports this claim.",
+  contradicted: "Source evidence contradicts this claim.",
+  outdated: "Source evidence suggests this information is no longer current.",
+  partial: "Source evidence partially supports this claim, but some details differ.",
+  unverifiable: "Unable to verify this claim from available sources.",
+  unchecked: "This claim has not yet been checked against sources.",
+};
+
 export function VerdictBadge({ verdict, className }: { verdict: string; className?: string }) {
   const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
+  const description = VERDICT_DESCRIPTIONS[verdict];
   return (
     <span
       className={cn(
@@ -21,6 +32,7 @@ export function VerdictBadge({ verdict, className }: { verdict: string; classNam
         style.text,
         className
       )}
+      title={description}
     >
       {verdict}
     </span>
@@ -44,6 +56,16 @@ export function buildFilterUrl(
   const qs = sp.toString();
   return qs ? `${base}?${qs}` : base;
 }
+
+/** Sort priority: most actionable verdicts first. Lower = higher priority. */
+export const VERDICT_PRIORITY: Record<string, number> = {
+  contradicted: 0,
+  outdated: 1,
+  partial: 2,
+  unverifiable: 3,
+  confirmed: 4,
+  unchecked: 5,
+};
 
 /** Format a record type for display (capitalize). */
 export function formatRecordType(type: string): string {
@@ -73,6 +95,8 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
       return `/funding-rounds/${recordId}`;
     case "division":
       return `/divisions/${recordId}`;
+    case "personnel":
+      return `/people`;
     default:
       return null;
   }
@@ -81,4 +105,15 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
 /** Get the URL for the source-check detail page. */
 export function getSourceCheckHref(recordType: string, recordId: string): string {
   return `/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+}
+
+/** Format a checker model ID for display (e.g. "claude-haiku-4-5-20251001" → "Haiku 4.5"). */
+export function formatCheckerModel(model: string): string {
+  if (model.includes("haiku-4-5") || model.includes("haiku-4.5")) return "Haiku 4.5";
+  if (model.includes("haiku-3") || model === "claude-3-haiku") return "Haiku 3";
+  if (model.includes("sonnet-4")) return "Sonnet 4";
+  if (model.includes("sonnet-3.5") || model.includes("sonnet-3-5")) return "Sonnet 3.5";
+  if (model.includes("opus-4")) return "Opus 4";
+  // Fallback: strip "claude-" prefix and date suffix
+  return model.replace(/^claude-/, "").replace(/-\d{8,}$/, "");
 }

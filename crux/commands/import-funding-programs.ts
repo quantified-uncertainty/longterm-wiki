@@ -774,6 +774,56 @@ const PROGRAMS: FundingProgramDef[] = [
     source: "https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/",
     notes: "GBP 5.4M Phase 1 across 9 teams (continuing). Phase 2 (GBP 8.4M) cancelled Nov 2025.",
   },
+
+  // ---- Foresight Institute ----
+  {
+    idSeed: "prog|foresight|norm-hardy-prize",
+    orgId: ORG_IDS.FORESIGHT_INSTITUTE,
+    name: "Norm Hardy Prize",
+    description:
+      "Annual $10,000 prize for advances in usable security, honoring computer scientist Norm Hardy (known for identifying the confused deputy vulnerability and developing KeyKOS). Recognizes work helping users make wise security decisions through intuitive system design, user studies, and interaction design principles. Sponsored by Agoric and Protocol Labs.",
+    programType: "prize",
+    totalBudget: 10_000,
+    status: "open",
+    source: "https://foresight.org/prizes/norm-hardy-prize/",
+    notes: "Inaugural award in 2023. $10,000 annual prize. Winners: Covid Watch (2023), Frik/Egelman/Gilsenan/Peer (2024), Emami-Naeini/Cranor/Agarwal (2025).",
+  },
+  {
+    idSeed: "prog|foresight|feynman-prize-theory",
+    orgId: ORG_IDS.FORESIGHT_INSTITUTE,
+    name: "Feynman Prize in Nanotechnology (Theory)",
+    description:
+      "Annual $5,000 prize for theoretical work advancing molecular manufacturing — the construction of atomically-precise products through molecular machine systems. Named after Richard Feynman's 1959 lecture 'There's Plenty of Room at the Bottom.' Two Feynman Prize recipients later won Nobel Prizes: David Baker (2004 Feynman → 2024 Chemistry Nobel) and J. Fraser Stoddart (2007 Feynman → 2016 Chemistry Nobel).",
+    programType: "prize",
+    totalBudget: 5_000,
+    status: "open",
+    source: "https://foresight.org/prizes/feynman-prizes/",
+    notes: "Awarded since 1993. Originally a single biennial prize; split into Theory and Experiment categories in 1997.",
+  },
+  {
+    idSeed: "prog|foresight|feynman-prize-experiment",
+    orgId: ORG_IDS.FORESIGHT_INSTITUTE,
+    name: "Feynman Prize in Nanotechnology (Experiment)",
+    description:
+      "Annual $5,000 prize for experimental work advancing molecular manufacturing — the construction of atomically-precise products through molecular machine systems. Named after Richard Feynman's 1959 lecture 'There's Plenty of Room at the Bottom.'",
+    programType: "prize",
+    totalBudget: 5_000,
+    status: "open",
+    source: "https://foresight.org/prizes/feynman-prizes/",
+    notes: "Awarded since 1997 when the prize split into Theory and Experiment categories.",
+  },
+  {
+    idSeed: "prog|foresight|feynman-student-award",
+    orgId: ORG_IDS.FORESIGHT_INSTITUTE,
+    name: "Foresight Distinguished Student Award",
+    description:
+      "Annual $1,000 award recognizing the most notable undergraduate or graduate student work in nanotechnology. Part of the Foresight Institute's Feynman Prize program.",
+    programType: "prize",
+    totalBudget: 1_000,
+    status: "open",
+    source: "https://foresight.org/prizes/feynman-prizes/",
+    notes: "First awarded in 2003. Not awarded every year.",
+  },
 ];
 
 // ---------------------------------------------------------------------------

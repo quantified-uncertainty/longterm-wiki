@@ -115,9 +115,14 @@ export function ActionQueue() {
 
         const results: VerdictRow[] = [];
         const seen = new Set<string>();
+        let failedCount = 0;
 
         for (const res of [contradictedRes, outdatedRes, recheckRes]) {
-          if (!res.ok) continue;
+          if (!res.ok) {
+            failedCount++;
+            console.warn(`[action-queue] API returned ${res.status}`);
+            continue;
+          }
           const data = await res.json();
           const verdicts = (data.verdicts ?? []) as VerdictRow[];
           for (const v of verdicts) {
@@ -127,6 +132,11 @@ export function ActionQueue() {
               results.push(v);
             }
           }
+        }
+
+        // If ALL fetches failed, show an error instead of false "all clear"
+        if (failedCount === 3) {
+          setError("Could not reach wiki-server. Action items may exist but cannot be loaded.");
         }
 
         setItems(results);
@@ -265,21 +275,28 @@ function ActionGroup({
 // ── Single action item ─────────────────────────────────────────────────────
 
 function ActionItem({ item, names }: { item: VerdictRow; names: NameMap }) {
-  const displayName = names[item.recordId]
+  let displayName = names[item.recordId]
     ?? names[item.entityId ?? ""]
     ?? item.recordId;
+
+  // Strip "new:" prefix from resolved display names
+  if (displayName.startsWith("new:")) {
+    displayName = displayName.slice(4);
+  }
 
   const truncatedName = displayName.length > 50
     ? displayName.slice(0, 48) + "..."
     : displayName;
 
+  const href = `/source-checks/${encodeURIComponent(item.recordType)}/${encodeURIComponent(item.recordId)}`;
+
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors">
+    <a href={href} className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors group">
       <div className="flex items-center gap-3 min-w-0">
         <span className="shrink-0 inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
           {item.recordType}
         </span>
-        <span className="text-sm font-medium truncate" title={displayName}>
+        <span className="text-sm font-medium truncate group-hover:text-blue-600 dark:group-hover:text-blue-400" title={displayName}>
           {truncatedName}
         </span>
         {item.fieldName && (
@@ -298,6 +315,6 @@ function ActionItem({ item, names }: { item: VerdictRow; names: NameMap }) {
           {formatTimeSince(item.lastComputedAt)}
         </span>
       </div>
-    </div>
+    </a>
   );
 }
