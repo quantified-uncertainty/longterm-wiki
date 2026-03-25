@@ -10,6 +10,7 @@ import type {
   RpcSourceChecksResolveNamesResult,
 } from "@/lib/wiki-server";
 import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
+import { getKBFactById, getKBProperty, getKBEntity } from "@/data/factbase";
 import { SourceChecksTable } from "./source-checks-table";
 import { SourceChecksSearch } from "./source-checks-filter";
 import {
@@ -143,6 +144,21 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     for (const [key, value] of Object.entries(names)) {
       if (value.startsWith("new:")) {
         names[key] = value.slice(4);
+      }
+    }
+
+    // Resolve fact names locally from FactBase as fallback (wiki-server may not
+    // have the resolve-names endpoint deployed yet)
+    for (const v of verdicts) {
+      if (v.recordType === "fact" && !names[v.recordId]) {
+        const fact = getKBFactById(v.recordId);
+        if (fact) {
+          const property = getKBProperty(fact.propertyId);
+          const entity = getKBEntity(fact.subjectId);
+          const propertyName = property?.name ?? fact.propertyId;
+          const entityName = entity?.name ?? fact.subjectId;
+          names[v.recordId] = `${entityName} — ${propertyName}`;
+        }
       }
     }
 

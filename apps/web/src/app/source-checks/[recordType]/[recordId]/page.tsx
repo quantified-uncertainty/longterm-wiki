@@ -421,9 +421,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       )}
 
       {/* Footer */}
-      <div className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        <span className="font-mono">{recordId}</span>
-      </div>
+      <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
+        <summary className="cursor-pointer hover:text-foreground transition-colors">
+          Debug info
+        </summary>
+        <div className="mt-2 space-y-0.5">
+          <p>Record type: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordType}</code></p>
+          <p>Record ID: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordId}</code></p>
+        </div>
+      </details>
     </div>
   );
 }
