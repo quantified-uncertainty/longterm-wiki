@@ -16,7 +16,6 @@ import {
   formatCheckerModel,
 } from "../../source-checks-shared";
 import { cn } from "@/lib/utils";
-import { isUrl } from "@/components/wiki/factbase/format";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
