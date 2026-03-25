@@ -317,9 +317,32 @@ function findInsertionPoint(
     }
   }
 
+  // Track code/Mermaid blocks to skip
+  let insideCodeBlock = false;
+  let insideMermaidOrComponent = false;
+
   // Search lines for the best match (skip frontmatter, imports, tables, headings)
   for (let i = bodyStart; i < lines.length; i++) {
     const rawTrimmed = lines[i].trim();
+
+    // Track code blocks (```)
+    if (rawTrimmed.startsWith('```')) {
+      insideCodeBlock = !insideCodeBlock;
+      continue;
+    }
+    if (insideCodeBlock) continue;
+
+    // Track Mermaid/JSX component blocks
+    if (/^<Mermaid\s/.test(rawTrimmed) || /chart=\{`$/.test(rawTrimmed)) {
+      insideMermaidOrComponent = true;
+      continue;
+    }
+    if (insideMermaidOrComponent) {
+      if (rawTrimmed === '`} />' || rawTrimmed === '/>') {
+        insideMermaidOrComponent = false;
+      }
+      continue;
+    }
 
     // Skip non-prose lines
     if (rawTrimmed.startsWith('|')) continue;          // table rows
@@ -327,6 +350,7 @@ function findInsertionPoint(
     if (rawTrimmed.startsWith('export ')) continue;     // exports
     if (rawTrimmed.startsWith('#')) continue;           // headings
     if (rawTrimmed.startsWith('[^')) continue;          // footnote definitions
+    if (rawTrimmed.startsWith('- [')) continue;         // reference list items (links)
     if (rawTrimmed.length < 20) continue;              // very short lines
     // Skip self-closing component lines like <Mermaid ... /> or <Aside ...>
     if (/^<[A-Z]\w+[^>]*\/>$/.test(rawTrimmed)) continue;
