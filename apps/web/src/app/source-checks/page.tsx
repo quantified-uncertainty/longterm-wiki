@@ -10,7 +10,7 @@ import type {
   RpcSourceChecksResolveNamesResult,
 } from "@/lib/wiki-server";
 import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
-import { getKBFactById, getKBProperty, getKBEntity } from "@/data/factbase";
+import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { SourceChecksTable } from "./source-checks-table";
 import { SourceChecksSearch } from "./source-checks-filter";
 import {
@@ -138,6 +138,21 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     );
     for (const nameMap of nameResults) {
       names = { ...names, ...nameMap };
+    }
+
+    // Local FactBase fallback for fact names not resolved by wiki-server
+    const factIds = byType.get("fact");
+    if (factIds) {
+      for (const factId of factIds) {
+        if (!names[factId]) {
+          const fact = getKBFactById(factId);
+          if (fact) {
+            const entity = getKBEntity(fact.subjectId);
+            const property = getKBProperty(fact.propertyId);
+            names[factId] = `${entity?.name ?? fact.subjectId} — ${property?.name ?? fact.propertyId}`;
+          }
+        }
+      }
     }
 
     // Strip "new:" prefix from display names (artefact of record creation)

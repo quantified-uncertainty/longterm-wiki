@@ -1,0 +1,27 @@
+entity: bZxOUSEdmY
+facts:
+  - id: f_1AH0LiV0Gz
+    property: description
+    value: "Compute governance consultant at IAPS (Institute for AI Policy and Strategy). Previously at Rethink Priorities. Co-authored 'Secure, Governable Chips' with Tim Fist at CNAS. Focuses on export control enforcement and compute governance mechanisms."
+    asOf: "2026-03"
+    source: https://www.iaps.ai/onni-aarne
+
+  - id: f_RWVr7m9l7I
+    property: notable-for
+    value: "Co-authored 'Secure, Governable Chips' (CNAS, January 2024); proposed export auditor mechanisms for hardware governance enforcement"
+    asOf: "2026-03"
+    source: https://www.iaps.ai/onni-aarne
+
+  - id: f_xW7fewFLKA
+    property: employed-by
+    value: !ref NI4hqOL33A
+    role: "Consultant, Compute Governance Team"
+    source: https://www.iaps.ai/onni-aarne
+    asOf: "2024"
+
+  - id: f_rjNVzLFI5u
+    property: employed-by
+    value: !ref t0p43V5oLA
+    role: "Researcher"
+    notes: "Previously at Rethink Priorities before joining IAPS"
+    validEnd: "2024"

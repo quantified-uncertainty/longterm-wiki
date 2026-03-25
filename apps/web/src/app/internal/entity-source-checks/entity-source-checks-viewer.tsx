@@ -24,7 +24,7 @@ import {
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
-import { VerdictBadge, VERDICT_STYLES, VERDICT_PRIORITY, getRecordHref } from "@/app/source-checks/source-checks-shared";
+import { VerdictBadge, VERDICT_STYLES, VERDICT_PRIORITY, getRecordHref, formatCheckerModel } from "@/app/source-checks/source-checks-shared";
 
 // -- Types --
 
@@ -269,7 +269,7 @@ function EvidenceTable({ evidence }: { evidence: EvidenceRow[] }) {
             </td>
             <td className="py-1.5 pr-3">
               <span className={cn("text-muted-foreground", e.isStale && "text-amber-500")}>
-                {e.checkerModel || "-"}
+                {e.checkerModel ? formatCheckerModel(e.checkerModel) : "-"}
                 {e.isStale && (
                   <span title="Stale: checked with an outdated model"><AlertTriangle className="inline h-3 w-3 ml-1 text-amber-500" /></span>
                 )}
@@ -765,7 +765,7 @@ export function EntitySourceChecksViewer() {
       {pageCount > 1 && (
         <div className="flex items-center justify-between px-1 mt-4">
           <span className="text-sm text-muted-foreground">
-            Showing {rangeStart}--{rangeEnd} of {filteredCount}
+            Showing {rangeStart}&ndash;{rangeEnd} of {filteredCount}
           </span>
           <div className="flex items-center gap-1">
             <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}

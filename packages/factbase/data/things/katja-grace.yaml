@@ -1,9 +1,10 @@
 entity: t2wkJarnWQ
 facts:
-  - id: "f_TJsbiNSvsg"
-    property: "notable-for"
-    value: "Founder of AI Impacts; conducts research on AI timelines and forecasting; author of influential AI researcher
-      surveys"
-  - id: "f_hv6QB2ZWzg"
-    property: "website"
+  - id: f_TJsbiNSvsg
+    property: notable-for
+    value: "Founder of AI Impacts; conducts research on AI timelines and forecasting; author of influential AI researcher surveys"
+
+  - id: f_hv6QB2ZWzg
+    property: website
     value: "https://aiimpacts.org"
+

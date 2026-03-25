@@ -1,9 +1,10 @@
 entity: YqSmRNVRAg
 facts:
-  - id: "f_utfXyxaqTw"
-    property: "born-year"
+  - id: f_utfXyxaqTw
+    property: born-year
     value: 1988
-  - id: "f_y6ELYGnAGQ"
-    property: "notable-for"
-    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy
-      advocate"
+
+  - id: f_y6ELYGnAGQ
+    property: notable-for
+    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy advocate"
+

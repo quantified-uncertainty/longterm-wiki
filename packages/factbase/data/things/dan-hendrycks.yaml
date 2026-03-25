@@ -9,14 +9,12 @@ facts:
       risks seriously. He is known for combining rigorous empirical research
       with clear communication about catastrophic risks.
 
-
       Hendrycks has made foundational contributions to AI safety evaluation. He
       created MMLU (Massive Multitask Language Understanding), one of the most
       widely-used benchmarks for measuring AI capabilities, as well as numerous
       benchmarks for robustness, calibration, and safety. His research on
       out-of-distribution detection, adversarial robustness, and AI ethics has
       been highly cited and influenced how the field measures progress.
-
 
       As CAIS director, Hendrycks has focused on building the case for AI risk
       as a serious issue. He was instrumental in organizing the 2023 Statement
@@ -30,14 +28,12 @@ facts:
   - id: f_jm56ULnB8A
     property: website
     value: https://hendrycks.com
-
   - id: f_dH2nLw9pYr
     property: notable-for
     value: "AI safety research; benchmark creation; CAIS leadership; catastrophic
       risk focus"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-
   - id: G6NX3xbaYw
     property: education
     value: University of California, Berkeley

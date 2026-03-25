@@ -10,7 +10,6 @@ facts:
       influential in shaping how policymakers and researchers think about
       catastrophic risks.
 
-
       In "The Precipice," Ord provides quantitative estimates of existential
       risk from various sources, with AI among the highest. He argues that we
       are living through a critical period in human history where our
@@ -19,7 +18,6 @@ facts:
       probability of existential catastrophe this century at about 1 in 6, with
       AI being a major contributor - are frequently cited in discussions of AI
       risk.
-
 
       Ord is also a founding figure in the effective altruism movement. In 2009,
       he co-founded Giving What We Can, which encourages people to donate
@@ -34,13 +32,11 @@ facts:
   - id: f_UiqpPbYqPQ
     property: website
     value: https://www.tobyord.com
-
   - id: f_tO2nLw9pYr
     property: notable-for
     value: "The Precipice; existential risk quantification; effective altruism"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-
   - id: gCm5sBgiQA
     property: born-year
     value: 1979

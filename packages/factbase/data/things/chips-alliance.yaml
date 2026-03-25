@@ -1,0 +1,19 @@
+entity: 0bYYDuKcGH
+facts:
+  - id: f_UyhnMGw8so
+    property: founded-date
+    value: "2022"
+    source: https://www.chipsalliance.org
+    notes: "Founded under the Linux Foundation"
+
+  - id: f_Lmj6dEFsrd
+    property: description
+    value: "Open-source hardware development organization under the Linux Foundation. Develops Caliptra, an open-source silicon Root of Trust with contributions from AMD, Google, Microsoft, NVIDIA, and Samsung."
+    source: https://www.chipsalliance.org
+    asOf: "2026-03"
+
+  - id: f_H5eoS7X5Xx
+    property: notable-for
+    value: "Develops Caliptra open-source Root of Trust (v2.1: ~1.6M logic gates, dual RISC-V cores, quantum-resilient cryptography). Most promising cross-vendor foundation for hardware-enabled AI governance."
+    source: https://www.chipsalliance.org
+    asOf: "2026-03"

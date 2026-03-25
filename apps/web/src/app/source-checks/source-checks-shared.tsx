@@ -77,7 +77,12 @@ export function formatRecordType(type: string): string {
 
 /**
  * Get the URL for the source record's detail page.
- * Returns null if no detail page exists for this record type.
+ * Returns null if no detail page exists for this record type,
+ * or if the recordId format doesn't match what the target page expects.
+ *
+ * NOTE: Source-check recordIds are PG primary keys (10-char alphanumeric).
+ * Some pages expect slugs or FactBase keys instead — those return null
+ * to avoid broken links.
  */
 export function getRecordHref(recordType: string, recordId: string): string | null {
   switch (recordType) {
@@ -85,18 +90,16 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
       return `/factbase/fact/${recordId}`;
     case "wiki-page":
       return `/wiki/${recordId}`;
-    case "grant":
-      return `/grants/${recordId}`;
     case "publication":
       return `/publications/${recordId}`;
     case "investment":
       return `/investments/${recordId}`;
     case "funding-round":
       return `/funding-rounds/${recordId}`;
-    case "division":
-      return `/divisions/${recordId}`;
     case "personnel":
       return `/people`;
+    // grant: /grants/:id expects FactBase key, not PG ID — link to source-check detail instead
+    // division: /divisions/:slug expects slug, not PG ID — link to source-check detail instead
     default:
       return null;
   }

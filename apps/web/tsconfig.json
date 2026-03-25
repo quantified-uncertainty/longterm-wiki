@@ -31,7 +31,8 @@
       "@wiki-server/personnel-route": ["../wiki-server/src/routes/tablebase/personnel.ts"],
       "@wiki-server/prediction-markets-route": ["../wiki-server/src/routes/tablebase/prediction-markets.ts"],
       "@wiki-server/secondary-market-prices-route": ["../wiki-server/src/routes/tablebase/secondary-market-prices.ts"],
-      "@wiki-server/data-quality-route": ["../wiki-server/src/routes/operational/data-quality.ts"]
+      "@wiki-server/data-quality-route": ["../wiki-server/src/routes/operational/data-quality.ts"],
+      "@wiki-server/talent-flows-route": ["../wiki-server/src/routes/tablebase/talent-flows.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
