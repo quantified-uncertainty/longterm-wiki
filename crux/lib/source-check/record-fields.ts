@@ -40,7 +40,7 @@ export function resolveName(item: Record<string, unknown>, ...keys: string[]): s
  *
  * Maps each record type to the most relevant parent entity ID:
  * - Personnel: orgEntityId (org context), falling back to personEntityId
- * - Division: parentOrgId (the parent organization)
+ * - Division: parentOrgId (the parent organization), falling back to organizationId
  * - Grant: orgEntityId (funder), falling back to granteeEntityId
  * - Funding round: companyEntityId
  * - Investment: investorEntityId, falling back to companyEntityId
@@ -55,7 +55,7 @@ export function extractEntityId(recordType: string, item: Record<string, unknown
     case 'personnel':
       return strOrNull(item, 'orgEntityId') ?? strOrNull(item, 'personEntityId');
     case 'division':
-      return strOrNull(item, 'parentOrgId');
+      return strOrNull(item, 'parentOrgId') ?? strOrNull(item, 'organizationId');
     case 'grant':
       return strOrNull(item, 'orgEntityId') ?? strOrNull(item, 'granteeEntityId');
     case 'funding-round':

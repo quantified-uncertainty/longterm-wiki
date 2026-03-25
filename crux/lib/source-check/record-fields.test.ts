@@ -77,18 +77,28 @@ describe('extractEntityId', () => {
       expect(extractEntityId('division', item)).toBe('PARENT_ORG_ID');
     });
 
-    it('returns null when parentOrgId is missing', () => {
+    it('falls back to organizationId when parentOrgId is missing', () => {
       const item = {
         id: 'div-1',
+        organizationId: 'ORG_ID',
         name: 'Safety Team',
       };
-      expect(extractEntityId('division', item)).toBeNull();
+      expect(extractEntityId('division', item)).toBe('ORG_ID');
     });
 
-    it('returns null when parentOrgId is null', () => {
+    it('falls back to organizationId when parentOrgId is null', () => {
       const item = {
         id: 'div-1',
         parentOrgId: null,
+        organizationId: 'ORG_ID',
+        name: 'Safety Team',
+      };
+      expect(extractEntityId('division', item)).toBe('ORG_ID');
+    });
+
+    it('returns null when both parentOrgId and organizationId are missing', () => {
+      const item = {
+        id: 'div-1',
         name: 'Safety Team',
       };
       expect(extractEntityId('division', item)).toBeNull();
