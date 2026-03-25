@@ -12,8 +12,13 @@
  *   crux verify page <page-id> --budget=2         Limit spending (default: $2)
  */
 
+import fs from 'fs';
+import path from 'path';
 import type { CommandResult } from '../lib/command-types.ts';
-import { findPageById } from '../lib/page-resolution.ts';
+import { findPageById, type PageInfo } from '../lib/page-resolution.ts';
+import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import {
   preprocessMdxForExtraction,
   splitIntoChunks,
@@ -486,4 +491,138 @@ function formatReport(report: PageVerificationReport): string {
   }
 
   return lines.join('\n');
+}
+
+// ── Batch audit (no LLM) ────────────────────────────────────────────
+
+interface PageCitationStats {
+  slug: string;
+  title: string;
+  wordCount: number;
+  footnoteCount: number;
+  proseWordsPerFootnote: number;
+  estimatedCitationDensity: 'good' | 'fair' | 'poor' | 'none';
+  subcategory: string;
+}
+
+/**
+ * Fast citation density audit across all pages. No LLM calls — just counts
+ * footnotes and prose words to estimate how well-cited each page is.
+ */
+export async function auditAllPagesCommand(
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const limitN = Number(options.limit) || 50;
+  const sortBy = (options.sort as string) || 'density';
+  const minWords = Number(options.minWords) || 200;
+
+  const files = findMdxFiles(CONTENT_DIR_ABS);
+  const stats: PageCitationStats[] = [];
+
+  for (const file of files) {
+    const content = fs.readFileSync(file, 'utf-8');
+    const fm = parseFrontmatter(content);
+    const slug = path.basename(file, path.extname(file));
+    const title = (fm.title as string) || slug;
+    const subcategory = (fm.subcategory as string) || '';
+
+    // Skip internal/dashboard/meta pages
+    if (subcategory === 'dashboards' || subcategory === 'citations') continue;
+    if ((fm.contentFormat as string) === 'dashboard') continue;
+    const relPath = path.relative(CONTENT_DIR_ABS, file);
+    if (relPath.startsWith('internal/') || relPath.startsWith('docs/internal/')) continue;
+    if (relPath.startsWith('meta/') || relPath.startsWith('docs/meta/')) continue;
+    // Skip pages explicitly marked as internal content
+    if (subcategory === 'internal' || subcategory === 'style-guides' || subcategory === 'meta') continue;
+
+    // Strip frontmatter
+    const body = content.replace(/^---[\s\S]*?---\n/, '');
+
+    // Strip imports, components, footnote definitions
+    const prose = body
+      .replace(/^(?:import|export)\s.*$/gm, '')
+      .replace(/<[^>]+\/>/g, '')           // self-closing tags
+      .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, '') // component blocks
+      .replace(/^\[\^[\w:.-]+\]:.*$/gm, '') // footnote defs
+      .replace(/^#{1,6}\s.*$/gm, '')        // headings
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const wordCount = prose.split(/\s+/).filter(w => w.length > 0).length;
+    if (wordCount < minWords) continue;
+
+    // Count footnote references
+    const footnoteRefs = (body.match(/\[\^[\w:.-]+\]/g) || []);
+    // Deduplicate footnote definitions vs references — only count references
+    const footnoteCount = footnoteRefs.length;
+
+    const proseWordsPerFootnote = footnoteCount > 0
+      ? Math.round(wordCount / footnoteCount)
+      : Infinity;
+
+    let estimatedCitationDensity: PageCitationStats['estimatedCitationDensity'];
+    if (footnoteCount === 0) {
+      estimatedCitationDensity = 'none';
+    } else if (proseWordsPerFootnote <= 50) {
+      estimatedCitationDensity = 'good';  // roughly 1 footnote per 2-3 sentences
+    } else if (proseWordsPerFootnote <= 120) {
+      estimatedCitationDensity = 'fair';
+    } else {
+      estimatedCitationDensity = 'poor';
+    }
+
+    stats.push({
+      slug,
+      title: title.slice(0, 40),
+      wordCount,
+      footnoteCount,
+      proseWordsPerFootnote,
+      estimatedCitationDensity,
+      subcategory,
+    });
+  }
+
+  // Sort
+  if (sortBy === 'density') {
+    stats.sort((a, b) => b.proseWordsPerFootnote - a.proseWordsPerFootnote);
+  } else if (sortBy === 'words') {
+    stats.sort((a, b) => b.wordCount - a.wordCount);
+  } else if (sortBy === 'footnotes') {
+    stats.sort((a, b) => a.footnoteCount - b.footnoteCount);
+  }
+
+  // Summary stats
+  const total = stats.length;
+  const noneCount = stats.filter(s => s.estimatedCitationDensity === 'none').length;
+  const poorCount = stats.filter(s => s.estimatedCitationDensity === 'poor').length;
+  const fairCount = stats.filter(s => s.estimatedCitationDensity === 'fair').length;
+  const goodCount = stats.filter(s => s.estimatedCitationDensity === 'good').length;
+
+  const lines: string[] = [];
+  lines.push(`\n  Wiki Citation Density Audit`);
+  lines.push(`  ${'─'.repeat(60)}`);
+  lines.push(`  Pages analyzed: ${total} (min ${minWords} words)`);
+  lines.push(`  Citation density:  good: ${goodCount}  fair: ${fairCount}  poor: ${poorCount}  none: ${noneCount}`);
+  lines.push('');
+
+  // Show worst pages
+  const shown = stats.slice(0, limitN);
+  lines.push(`  Worst ${shown.length} pages by citation density:`);
+  lines.push('');
+  lines.push(`  ${'Page'.padEnd(42)} ${'Words'.padStart(6)} ${'FN'.padStart(4)} ${'W/FN'.padStart(6)} Rating`);
+  lines.push(`  ${'─'.repeat(42)} ${'─'.repeat(6)} ${'─'.repeat(4)} ${'─'.repeat(6)} ${'─'.repeat(6)}`);
+
+  for (const s of shown) {
+    const wPerFn = s.footnoteCount === 0 ? '  n/a' : String(s.proseWordsPerFootnote).padStart(6);
+    const rating = s.estimatedCitationDensity === 'none' ? 'NONE' :
+      s.estimatedCitationDensity === 'poor' ? 'POOR' :
+      s.estimatedCitationDensity === 'fair' ? 'fair' : 'good';
+    lines.push(`  ${s.title.padEnd(42)} ${String(s.wordCount).padStart(6)} ${String(s.footnoteCount).padStart(4)} ${wPerFn} ${rating}`);
+  }
+
+  if (stats.length > limitN) {
+    lines.push(`  ... and ${stats.length - limitN} more pages`);
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
 }

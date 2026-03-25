@@ -564,6 +564,8 @@ ${c.bold}Examples:${c.reset}
   crux verify page <page-id>               Verify wiki page prose (cited vs uncited claims)
   crux verify page <page-id> --quick       Just count cited vs uncited (no web search)
   crux verify page <page-id> --deep        Also verify uncited claims against web
+  crux verify page --all                   Fast citation density audit across all pages
+  crux verify page --all --limit=100       Show top 100 worst-cited pages
   crux verify stats                        Show overall verification statistics`,
       };
     }
@@ -573,11 +575,15 @@ ${c.bold}Examples:${c.reset}
     }
 
     if (subcommand === 'page') {
-      const { verifyPageCommand } = await import('./verify-page.ts');
       const pageId = args[1];
-      if (!pageId) {
-        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep]' };
+      if (options.all || pageId === '--all') {
+        const { auditAllPagesCommand } = await import('./verify-page.ts');
+        return auditAllPagesCommand(options);
       }
+      if (!pageId) {
+        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep]\n       crux verify page --all' };
+      }
+      const { verifyPageCommand } = await import('./verify-page.ts');
       return verifyPageCommand(pageId, options);
     }
 
