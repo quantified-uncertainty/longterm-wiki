@@ -4,21 +4,11 @@ title: Stop Stealing Our Chips Act
 description: A bipartisan U.S. bill introduced in December 2025 to combat AI chip smuggling to China and other adversaries by establishing a whistleblower incentive program at the Bureau of Industry and Security.
 sidebar:
   order: 50
-quality: 70
-readerImportance: 62
-tacticalValue: 82
+subcategory: compute-governance
 lastEdited: 2026-03-25
-createdAt: 2026-03-25
-summary: The Stop Stealing Our Chips Act (Dec. 2025) creates an SEC-modeled whistleblower incentive program at BIS to enforce AI chip export controls against smuggling to China and other adversaries, funded entirely through violation fines; it is indirectly relevant to AI safety through compute governance but makes no explicit AI safety claims. The article is well-structured, appropriately caveated, and includes a genuine criticisms section, though sourcing relies heavily on sponsor press materials.
-ratings:
-  novelty: 7
-  rigor: 7
-  actionability: 6
-  completeness: 8
-balanceFlags:
-  - single-source-dominance
-  - missing-source-incentives
-importance: 50
+summary: The Stop Stealing Our Chips Act (Dec. 2025) creates an SEC-modeled whistleblower incentive program at BIS to enforce AI chip export controls against smuggling to China and other adversaries, funded entirely through violation fines; it is indirectly relevant to AI safety through compute governance but makes no explicit AI safety claims.
+clusters:
+  - governance
 ---
 import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
 
@@ -37,7 +27,7 @@ The **Stop Stealing Our Chips Act** is a bipartisan U.S. congressional bill intr
 | **Whistleblower Reward** | 10–30% of fines collected |
 | **Funding Mechanism** | Fines from export control violations (no new appropriations) |
 | **Status** | Introduced; pending as of early 2026 |
-| **Related Legislation** | <EntityLink id="chip-security-act">Chip Security Act</EntityLink> |
+| **Related Legislation** | <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink> |
 
 ## Key Links
 
@@ -51,7 +41,7 @@ The Stop Stealing Our Chips Act responds to persistent evidence that advanced U.
 
 The bill's core mechanism is modeled on the Securities and Exchange Commission's (SEC) whistleblower program. Individuals — including non-U.S. citizens — who submit original, credible information that leads to a BIS investigation and the collection of fines would be eligible to receive between 10% and 30% of the fines collected. A secure, public portal would be established within 120 days of enactment for submissions. BIS would be required to initiate formal investigations within 60 days of receiving a credible report and provide status updates every 30 days. The program is self-financing: rewards are drawn from a dedicated fund populated by violation fines, with any surplus returned to the Treasury. No new Congressional appropriations are required.
 
-The bill is distinct from the 2022 CHIPS and Science Act, which focuses on domestic semiconductor manufacturing subsidies (\$39 billion) and research investment (\$13 billion). Where the CHIPS and Science Act is primarily an industrial policy instrument, the Stop Stealing Our Chips Act is an enforcement instrument targeting the circumvention of existing export restrictions. It is most closely related to the companion <EntityLink id="chip-security-act">Chip Security Act</EntityLink>, which takes a complementary technical approach by requiring location verification on high-end AI chips sold by manufacturers.
+The bill is distinct from the 2022 CHIPS and Science Act, which focuses on domestic semiconductor manufacturing subsidies (\$39 billion) and research investment (\$13 billion). Where the CHIPS and Science Act is primarily an industrial policy instrument, the Stop Stealing Our Chips Act is an enforcement instrument targeting the circumvention of existing export restrictions. It is most closely related to the companion <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink>, which takes a complementary technical approach by requiring location verification on high-end AI chips sold by manufacturers.
 
 ## History and Legislative Background
 
@@ -95,7 +85,7 @@ The program requires no new Congressional appropriations. All costs — includin
 
 ## Relationship to the Chip Security Act
 
-The Stop Stealing Our Chips Act is often discussed alongside the <EntityLink id="chip-security-act">Chip Security Act</EntityLink> (H.R. 3447), a complementary but distinct piece of legislation led by Rep. Moolenaar, Sen. Tom Cotton (R-AR), and Rep. Bill Huizenga (R-MI). Where the Stop Stealing Our Chips Act focuses on enforcement through human intelligence — empowering insiders and observers to report violations — the Chip Security Act takes a technical approach, requiring chipmakers to implement location verification mechanisms on advanced AI chips so that their whereabouts can be tracked after sale.
+The Stop Stealing Our Chips Act is often discussed alongside the <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink> (H.R. 3447), a complementary but distinct piece of legislation led by Rep. Moolenaar, Sen. Tom Cotton (R-AR), and Rep. Bill Huizenga (R-MI). Where the Stop Stealing Our Chips Act focuses on enforcement through human intelligence — empowering insiders and observers to report violations — the Chip Security Act takes a technical approach, requiring chipmakers to implement location verification mechanisms on advanced AI chips so that their whereabouts can be tracked after sale.
 
 The Semiconductor Industry Association (SIA) has expressed opposition to the Chip Security Act as of early 2026, though no specific detailed objections were documented in available sources. No similar industry opposition has been reported against the Stop Stealing Our Chips Act specifically.
 
@@ -119,7 +109,7 @@ Several broader limitations and concerns can be identified from the wider policy
 
 **Effectiveness benchmarking**: No quantitative evidence was available at the time of the bill's introduction on the likely effectiveness of an SEC-style whistleblower program in the export controls context. The SEC program is frequently cited as a model, but the semiconductor supply chain differs significantly from financial markets in terms of the visibility of violations, the number of potential whistleblowers, and the structure of enforcement.
 
-**Related technical limitations**: Analyses of the companion <EntityLink id="chip-security-act">Chip Security Act</EntityLink> have raised concerns about the spoofability of location verification mechanisms and the cybersecurity risks associated with mandated backdoor-style controls. While these concerns are not directly applicable to the whistleblower-focused Stop Stealing Our Chips Act, they underscore the broader difficulty of the enforcement problem that the bill is attempting to address.
+**Related technical limitations**: Analyses of the companion <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink> have raised concerns about the spoofability of location verification mechanisms and the cybersecurity risks associated with mandated backdoor-style controls. While these concerns are not directly applicable to the whistleblower-focused Stop Stealing Our Chips Act, they underscore the broader difficulty of the enforcement problem that the bill is attempting to address.
 
 ## Key Uncertainties
 
@@ -127,7 +117,7 @@ Several broader limitations and concerns can be identified from the wider policy
 - Whether a whistleblower program modeled on the SEC's will prove effective in the semiconductor export control context, given differences in market structure and violation visibility
 - Whether BIS has sufficient institutional capacity to process a large volume of whistleblower submissions within the mandated 60-day investigation window
 - Whether fine revenues will be sufficient to sustain the program's operations and meaningful reward payments over time, given that successful prosecutions may be infrequent
-- The extent to which the bill, if enacted, would complement or overlap with the <EntityLink id="chip-security-act">Chip Security Act</EntityLink>'s technical verification approach
+- The extent to which the bill, if enacted, would complement or overlap with the <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink>'s technical verification approach
 
 ## Sources
 

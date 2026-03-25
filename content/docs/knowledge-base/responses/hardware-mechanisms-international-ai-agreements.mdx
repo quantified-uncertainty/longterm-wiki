@@ -22,7 +22,7 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 | **Primary challenge** | Geopolitical buy-in and adversarial evasion, not just technical readiness |
 | **Key mechanism types** | Location verification, TEEs/confidential computing, interconnect limits, chip tracking, compute metering |
 | **Governance models targeted** | IAEA-style monitoring, compute allocation treaties, export control verification, training run registration |
-| **Main developers** | <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E1193">IAPS</EntityLink>, <EntityLink id="E1189">CNAS</EntityLink>, <EntityLink id="E1185">RAND</EntityLink>, <EntityLink id="flexheg">FlexHEG</EntityLink> (<EntityLink id="E94">Bengio</EntityLink>), <EntityLink id="lucid-computing">Lucid Computing</EntityLink>, Oxford Martin AIGI |
+| **Main developers** | <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E1193">IAPS</EntityLink>, <EntityLink id="E1189">CNAS</EntityLink>, <EntityLink id="E1185">RAND</EntityLink>, <EntityLink id="E2087" name="flexheg">FlexHEG</EntityLink> (<EntityLink id="E94">Bengio</EntityLink>), <EntityLink id="lucid-computing">Lucid Computing</EntityLink>, Oxford Martin AIGI |
 | **Subcategory** | <EntityLink id="E64">Compute Governance</EntityLink> |
 | **Related wiki pages** | <EntityLink id="E463">Hardware-Enabled Governance</EntityLink>, <EntityLink id="E473">International Compute Regimes</EntityLink> |
 
@@ -47,7 +47,7 @@ The strategic case for hardware-enabled governance rests on a structural advanta
 
 The conceptual foundation draws heavily on nuclear arms control precedents. Information Barriers (IBs) used in warhead verification and Permissive Action Links (PALs) used to prevent unauthorized launches both demonstrated that hardware could enforce treaty obligations without exposing sensitive design details. The 1990s Arms Control Exchange (ACE) program between US and Chinese laboratories, which developed seismic monitoring and tamper-proof IB hardware for Comprehensive Test Ban Treaty verification, is a frequently cited analogue. Researchers working on AI hardware mechanisms argue that the same logic—hardware-rooted assurances that permit verification without full disclosure—can be adapted to govern compute thresholds, data center configurations, and training run characteristics.[^1]
 
-The field crystallized rapidly between 2024 and 2026. The <EntityLink id="E1189">CNAS</EntityLink> report (January 2024) established the policy framework. A November 2024 report from <EntityLink id="E202">MIRI</EntityLink> outlined a taxonomy of verification mechanisms. <EntityLink id="E1185">RAND</EntityLink> published working papers on hardware-enabled mechanisms and convened workshops with chip manufacturers, policymakers, and researchers.[^11] <EntityLink id="E94">Yoshua Bengio</EntityLink>'s <EntityLink id="flexheg">FlexHEG</EntityLink> project received \$4.1M from the Survival and Flourishing Fund in 2024 to develop flexible hardware-enabled guarantees with an open-source "Guarantee Processor" architecture.[^12] Subsequent arXiv work (2025) and an Oxford Martin AI Governance Initiative report (2025) elaborated specific mechanism types, mapped them to governance objectives, and assessed their readiness.[^2][^3]
+The field crystallized rapidly between 2024 and 2026. The <EntityLink id="E1189">CNAS</EntityLink> report (January 2024) established the policy framework. A November 2024 report from <EntityLink id="E202">MIRI</EntityLink> outlined a taxonomy of verification mechanisms. <EntityLink id="E1185">RAND</EntityLink> published working papers on hardware-enabled mechanisms and convened workshops with chip manufacturers, policymakers, and researchers.[^11] <EntityLink id="E94">Yoshua Bengio</EntityLink>'s <EntityLink id="E2087" name="flexheg">FlexHEG</EntityLink> project received \$4.1M from the Survival and Flourishing Fund in 2024 to develop flexible hardware-enabled guarantees with an open-source "Guarantee Processor" architecture.[^12] Subsequent arXiv work (2025) and an Oxford Martin AI Governance Initiative report (2025) elaborated specific mechanism types, mapped them to governance objectives, and assessed their readiness.[^2][^3]
 
 ---
 
@@ -296,7 +296,7 @@ These vulnerabilities do not invalidate the HEM research program—they clarify 
 
 ## Legislative Landscape
 
-### <EntityLink id="chip-security-act">Chip Security Act</EntityLink> (H.R.3447 / S.1705)
+### <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink> (H.R.3447 / S.1705)
 
 The most significant legislative effort to date. Introduced May 2025 by Sen. Tom Cotton (R-AR) with bipartisan cosponsors including Sen. Elizabeth Warren (D-MA), and Rep. Bill Huizenga (R-MI) with 34 House cosponsors.
 
@@ -311,7 +311,7 @@ The most significant legislative effort to date. Introduced May 2025 by Sen. Tom
 
 **Scale of the smuggling problem:** An estimated 140,000 chips worth \$5–7 billion were smuggled to China in 2024, and Huawei obtained 2.9+ million AI chip dies from TSMC via intermediaries.
 
-### <EntityLink id="stop-stealing-our-chips-act">Stop Stealing Our Chips Act</EntityLink> (S.1473 / H.R.6322)
+### <EntityLink id="E2086" name="stop-stealing-our-chips-act">Stop Stealing Our Chips Act</EntityLink> (S.1473 / H.R.6322)
 
 Introduced April 2025 by Sens. Mike Rounds (R-SD) and Mark Warner (D-VA). Creates a whistleblower incentive program at BIS modeled after the SEC Whistleblower Incentive Program: 10–30% of collected fines for original information leading to penalties exceeding \$1 million. Anonymous reporting permitted; retaliation protections included. Funded via an "Export Compliance Accountability Fund" financed by collected fines (no new appropriations).[^18]
 
@@ -328,7 +328,7 @@ Introduced April 2025 by Sens. Mike Rounds (R-SD) and Mark Warner (D-VA). Create
 | **<EntityLink id="gabriel-kulp">Gabriel Kulp</EntityLink>** | <EntityLink id="E1185">RAND</EntityLink> | Introduced "Hardware-Enabled Governance Mechanisms" terminology; prototyped Offline Licensing and Fixed Set approaches |
 | **<EntityLink id="james-petrie">James Petrie</EntityLink>** | FLI / Oxford | Foundational offline licensing design for existing H100 firmware; FLI proof-of-concept with <EntityLink id="mithril-security">Mithril Security</EntityLink> |
 | **<EntityLink id="aidan-ogara">Aidan O'Gara</EntityLink>** | arXiv research | Lead author on *Hardware-Enabled Mechanisms for Verifying Responsible AI Development* (May 2025) |
-| **<EntityLink id="E94">Yoshua Bengio</EntityLink>** | Mila; <EntityLink id="flexheg">FlexHEG</EntityLink> project lead | FlexHEG Guarantee Processor architecture; \$4.1M SFF-funded research program |
+| **<EntityLink id="E94">Yoshua Bengio</EntityLink>** | Mila; <EntityLink id="E2087" name="flexheg">FlexHEG</EntityLink> project lead | FlexHEG Guarantee Processor architecture; \$4.1M SFF-funded research program |
 | **<EntityLink id="aaron-scher">Aaron Scher</EntityLink>** | <EntityLink id="E202">MIRI</EntityLink> SPAR | Assessing existing chip security for verification; interconnect limits; US–China bilateral feasibility |
 
 ---
@@ -365,8 +365,8 @@ Research also highlights the synergy between hardware mechanisms and complementa
 |---|---|---|---|
 | **<EntityLink id="E1189">CNAS</EntityLink>** | <EntityLink id="tim-fist">Tim Fist</EntityLink>, <EntityLink id="onni-aarne">Onni Aarne</EntityLink>, Caleb Withers, Tao Burga | On-chip governance framework, supply chain security | *Secure, Governable Chips* (Jan 2024); *Technology to Secure the AI Chip Supply Chain* (Dec 2024) |
 | **<EntityLink id="E1185">RAND Corporation</EntityLink>** | <EntityLink id="lennart-heim">Lennart Heim</EntityLink>, <EntityLink id="gabriel-kulp">Gabriel Kulp</EntityLink>, Margaret Siu | HEMs for export controls, multi-stakeholder workshops | Working papers on HEMs (2024–2025); workshop convenings with industry |
-| **<EntityLink id="E1193">IAPS</EntityLink>** | <EntityLink id="onni-aarne">Onni Aarne</EntityLink>, Erich Grunewald | Location verification prototypes, compute policy | Working H100 location verification demo; influenced <EntityLink id="chip-security-act">Chip Security Act</EntityLink> |
-| **<EntityLink id="flexheg">FlexHEG Project</EntityLink>** | <EntityLink id="E94">Yoshua Bengio</EntityLink> (lead) | Open-source Guarantee Processor + Secure Enclosure | Interim report (Sep 2024); technical options and international security papers (Jun 2025); \$4.1M SFF funding |
+| **<EntityLink id="E1193">IAPS</EntityLink>** | <EntityLink id="onni-aarne">Onni Aarne</EntityLink>, Erich Grunewald | Location verification prototypes, compute policy | Working H100 location verification demo; influenced <EntityLink id="E2085" name="chip-security-act">Chip Security Act</EntityLink> |
+| **<EntityLink id="E2087" name="flexheg">FlexHEG Project</EntityLink>** | <EntityLink id="E94">Yoshua Bengio</EntityLink> (lead) | Open-source Guarantee Processor + Secure Enclosure | Interim report (Sep 2024); technical options and international security papers (Jun 2025); \$4.1M SFF funding |
 | **GovAI** | <EntityLink id="lennart-heim">Lennart Heim</EntityLink> (adjunct) | Compute governance research | *Computing Power and the Governance of AI* (Feb 2024) |
 | **<EntityLink id="E202">MIRI</EntityLink>** | <EntityLink id="aaron-scher">Aaron Scher</EntityLink> | SPAR verification projects | Verification mechanisms taxonomy (Nov 2024); ongoing SPAR projects |
 | **[FLI](https://futureoflife.org/)** | <EntityLink id="james-petrie">James Petrie</EntityLink> | Hardware-backed compute governance | Offline licensing design; proof-of-concept with <EntityLink id="mithril-security">Mithril Security</EntityLink> |

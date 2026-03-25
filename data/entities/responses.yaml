@@ -4072,7 +4072,7 @@
       type: concept
     - id: yoshua-bengio
       type: person
-      relationship: leads
+      relationship: leads-to
     - id: chips-alliance
       type: organization
   sources:
