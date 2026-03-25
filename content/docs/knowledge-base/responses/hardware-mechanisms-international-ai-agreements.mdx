@@ -59,6 +59,28 @@ The intellectual genealogy of hardware mechanisms for AI runs directly through n
 
 The Arms Control Exchange program of the 1990s is particularly influential. US national laboratories worked with China's CAEP to build IB systems for warhead verification: six-component tamper-proof hardware assemblies combining data barriers, volatile storage, yes/no displays, security watchdogs, physical shielding, and procedural controls. These devices could confirm whether a warhead met treaty specifications without revealing design secrets. AI researchers cite this as proof of concept that hardware can provide meaningful assurance under adversarial conditions.[^1]
 
+### How the AI Hardware Problem Compares to Nuclear Verification
+
+| Dimension | Nuclear (IAEA) | AI Hardware |
+|-----------|---------------|-------------|
+| **Facilities under safeguards** | ≈1,300 nuclear facilities (2024) | ≈1,300 hyperscale data centers (late 2025), plus thousands of smaller facilities |
+| **Annual inspections** | \>3,000 in-field verification activities | No equivalent inspection regime exists |
+| **Treaty framework** | NPT (1968), IAEA safeguards, New START | No equivalent treaty exists |
+| **Safeguards budget** | ≈\$161M/year (≈39% of IAEA's ≈\$418M budget) | No equivalent budget allocation |
+| **Manufacturing concentration** | Uranium enrichment in handful of countries | **More concentrated**: TSMC ≈67% of leading-edge chips; ASML sole maker of EUV lithography |
+| **Excludability of key input** | Plutonium and enriched uranium are physically scarce and trackable | Compute is general-purpose; AI knowledge is infinitely replicable |
+| **Speed of proliferation** | Building nuclear weapons takes years | Training AI models can be done in weeks |
+
+The supply chain concentration is the strongest point of analogy—semiconductor manufacturing is *more* concentrated than nuclear materials, making upstream controls potentially more effective. The IAEA's tag-and-seal practices for nuclear materials have direct analogues in proposed tamper-evident chip enclosures. However, the analogy breaks down on excludability (compute is general-purpose, not scarce), scale (the number of facilities to monitor is far larger), and speed (AI capabilities can proliferate through weight distribution in hours, not years). CNAS explicitly cautions against slavish adherence to the IAEA model, arguing for mechanisms that allow "policymakers to think beyond the limitations of slow and complex structures such as the IAEA."[^10]
+
+### The Clipper Chip Cautionary Precedent
+
+The most frequently cited cautionary tale for hardware-embedded governance is the 1993 Clipper chip. The Clinton White House proposed mandating a cryptographic chip (MYK-78) in all telecommunications equipment, with each chip's encryption key split and held in escrow by NIST and the Department of the Treasury. Law enforcement could reconstruct the key with a court order.
+
+In 1994, AT&T researcher Matt Blaze [demonstrated](https://www.mattblaze.org/papers/eesproto.pdf) that the 16-bit integrity hash protecting the escrow system was fatally too short—a brute-force attack averaging only 65,536 attempts could produce a fake escrow field, letting users get strong encryption while defeating key recovery entirely. Combined with massive public opposition (led by the EFF's "Golden Key" coalition) and market failure (the only purchaser was the Department of Justice itself), the program was dead by 1996.
+
+Lessons for AI chip governance: hardware-based backdoors with weak integrity checks can be defeated; governance mechanisms that impose costs without buy-in from manufacturers and users get routed around by the market; and the difference between "surveillance tool" and "verification mechanism" matters enormously for public acceptance. Proponents of HEMs argue their proposals differ from Clipper because they use privacy-preserving verification (proving *where* a chip is or *how much* compute was used, without accessing *what* was computed) rather than content access, and because they have a clearer security rationale.
+
 ### Timeline of Key Developments in the AI Context
 
 | Year | Event | Key Actors |
@@ -93,7 +115,15 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 ### 1. Location Verification and Geolocking
 
-**What it does:** Chips report cryptographically authenticated location data—GPS coordinates or network topology information—to verify they remain within authorized jurisdictions and have not been diverted to restricted actors. Geolocking refers to the capability to disable chip functionality if location attestation fails, enforcing export controls without requiring physical recovery of diverted hardware.
+**What it does:** Chips verify their geographic location using delay-based challenge-response with cryptographic attestation—not GPS (which is easily spoofed and cannot penetrate data center walls). The process works as follows:
+
+1. A **landmark server** at a known geographic location sends a cryptographic challenge to an AI chip
+2. The chip signs the response using its **hardware root of trust**—a unique cryptographic key fused into the silicon at manufacturing (already present in NVIDIA H100s)
+3. The landmark measures the **round-trip delay** of the signed response
+4. Using speed-of-light physics: if a chip responds in 1 millisecond, the signal traveled at most 186 miles round-trip, so the chip is at most 93 miles away
+5. **Triangulation** from multiple geographically dispersed landmarks narrows the location to ~50–60 mile accuracy (sufficient for country-level verification)
+
+Relay attacks (forwarding challenges to a distant chip) are defeated because the relay itself adds measurable latency. The system does not reveal what models chips are training, what data they process, or what computations they run—it operates independently from computational workloads, like temperature monitoring. For air-gapped facilities, the Chip Security Act provides alternative compliance paths: on-site audits at approved destinations and certifications by US-headquartered entities maintaining secure control.
 
 **Why it matters for agreements:** Location verification is the prerequisite for export control verification treaties. Without it, no party can confirm that chips sold under a licensing regime have remained with authorized users. It also underpins training run registration regimes that tie permitted compute to specific facilities.
 
@@ -113,7 +143,11 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** TEEs are the enabling technology for IAEA-style monitoring of AI training runs. They allow an international auditor to verify that an approved evaluation or monitoring protocol was actually executed on a specific model, without accessing the model weights or training data directly. They also enable compute metering—logging total FLOPs consumed in a verifiable, tamper-resistant way.
 
-**TRL assessment:** TRL 5–6 for commercial confidential computing (NVIDIA H100 already supports TEE functionality; [NVIDIA Remote Attestation Service](https://docs.nvidia.com/attestation/index.html) is GA). TRL 3–4 for treaty-grade AI monitoring, thanks to the [UK AI Security Institute + Anthropic + OpenMined pilot](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/) (2025)—the most concrete governance deployment to date, which used H100 secure enclaves and AMD SEV-SNP on Azure to run privacy-preserving AI safety evaluations with cryptographic certificates proving only approved code ran.
+**TRL assessment:** TRL 5–6 for commercial confidential computing (NVIDIA H100 already supports TEE functionality; [NVIDIA Remote Attestation Service](https://docs.nvidia.com/attestation/index.html) is GA). TRL 3–4 for treaty-grade AI monitoring.
+
+The most concrete governance deployment to date is the [UK AI Security Institute + Anthropic + OpenMined pilot](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/) (2025), which used H100 secure enclaves and AMD SEV-SNP on Azure to run privacy-preserving AI safety evaluations. Key findings: the end-to-end process took 28 minutes and 3 seconds, of which only 1 minute 11 seconds was actual computation—the remaining ~27 minutes was the governance/approval process (stakeholders reviewing code, policies, and execution parameters, then independently approving and cryptographically signing all code). The GPU showed less than 5% performance overhead. The key insight: **procedural coordination, not computation, is the bottleneck** for TEE-based governance. The cloud provider does not need to be trusted—integrity, authenticity, and confidentiality are guaranteed via hardware attestation.[^9]
+
+NVIDIA H100 confidential computing provides a hardware root of trust anchored in on-die silicon, with a chain of trust spanning four processors (CEC EROT → FSP → GSP → SEC2). All CPU-GPU transfers are encrypted across PCIe. Approximately 90% of GPU memory is locked in a Compute Protected Region inaccessible to the host OS, hypervisor, or cloud administrator. Remote attestation verifies 64 measurement records (firmware hashes, configurations) against NVIDIA's Reference Integrity Manifest. The raw compute overhead is zero (plaintext in secure memory); the CPU-GPU interconnect bandwidth is limited to ~4 GB/s due to encryption, resulting in under 7% end-to-end throughput loss for most LLM inference workloads.
 
 **Active developers:** NVIDIA (commercial NRAS service, [go-nvtrust](https://github.com/NVIDIA/go-nvtrust) open-source attestation); UK AISI + Anthropic + [OpenMined](https://openmined.org/blog/secure-enclaves-for-ai-evaluation/) (governance pilot); Intel Trust Authority (composite CPU+GPU attestation); [Lucid Computing](https://lucidcomputing.ai/) (commercial TEE-based verification platform using Intel TDX and NVIDIA CC); Oxford Martin AIGI researchers; O'Gara, Kulp, et al.; <EntityLink id="E94">Yoshua Bengio</EntityLink>'s [FlexHEG project](https://yoshuabengio.org/wp-content/uploads/2024/09/FlexHEG-Interim-Report_2024.pdf) (\$4.1M SFF-funded, developing an open-source "Guarantee Processor" that monitors accelerator usage and a "Secure Enclosure" providing physical tamper protection).[^12] [Caliptra 2.1](https://www.chipsalliance.org/news/caliptra2-1/) (AMD/Google/Microsoft/Nvidia under CHIPS Alliance)—an open-source silicon root of trust with quantum-resilient cryptography—is the most promising standardization effort and could become the cross-vendor governance foundation.
 
@@ -129,7 +163,9 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 
 **Why it matters for agreements:** Compute metering is the core mechanism for compute allocation treaties that cap how many FLOPs a party can use for AI training above a threshold. It is also necessary for training run registration regimes in which parties declare frontier training runs in advance and regulators verify that declared compute matches actual usage.
 
-**TRL assessment:** TRL 3–4. Compute logging exists in current chips for internal performance monitoring, but treaty-grade metering requires tamper-resistant accumulation, cryptographic signing, and secure reporting channels not present in commercial silicon. A key commercial precedent exists: [Intel On Demand](https://www.intel.com/content/www/us/en/products/docs/xeon-accelerated/on-demand-technology-brief.html) already uses cryptographic licensing to unlock chip functionality, demonstrating the concept works at scale.
+**TRL assessment:** TRL 3–4. Compute logging exists in current chips for internal performance monitoring, but treaty-grade metering requires tamper-resistant accumulation, cryptographic signing, and secure reporting channels not present in commercial silicon.
+
+A key commercial precedent existed in [Intel On Demand](https://www.intel.com/content/www/us/en/products/docs/xeon-accelerated/on-demand-technology-brief.html) (also called "Software Defined Silicon"), launched with 4th Gen Xeon Scalable processors in 2022. Hardware accelerator blocks—including Intel QAT (cryptographic acceleration), DSA (data streaming), IAA (analytics), and even SGX (security enclaves)—were physically present on the die but electronically disabled, unlockable through purchased software licenses. This demonstrated that remote feature activation/deactivation in shipping silicon is technically feasible at commercial scale. However, the program was [quietly discontinued in November 2025](https://www.tomshardware.com/pc-components/cpus/intel-quietly-kills-controversial-software-defined-silicon-initiative-github-repository-was-archived-in-november-2025-allegedly-signaling-the-end-of-active-development) due to market rejection—hardware buyers expected full capabilities at point of sale. The governance lesson: post-purchase feature gating is technically proven but requires a compelling security rationale, not just a revenue model.
 
 **Active developers:** [James Petrie](https://arxiv.org/abs/2404.18308) (Future of Life Institute/Oxford)—authored the foundational offline licensing design targeting existing H100 firmware; O'Gara, Kulp, et al. (arXiv 2025); <EntityLink id="E202">MIRI</EntityLink> SPAR projects; Joël N. Christoph on market-based compute permit schemes; [Longview Philanthropy](https://www.longview.org/request-for-proposals-on-hardware-enabled-mechanisms-hems-for-ai-verification/) is funding HEM prototypes.
 
@@ -184,6 +220,24 @@ Research has converged on roughly six distinct hardware mechanism types, each ta
 **What remains:** Almost everything: governance of the key, hardening against abuse, international agreement on trigger conditions, liability frameworks, and diplomatic acceptance. This mechanism likely requires the most governance work of any on this list.
 
 **Estimated timeline:** No near-term deployment path without significant diplomatic breakthroughs; speculative on a 10+ year horizon.[^2][^3]
+
+---
+
+## R&D Readiness Summary
+
+| Mechanism | Readiness | Timeline | Key Blocker |
+|-----------|-----------|----------|-------------|
+| **Commercial TEEs** (NVIDIA CC, Intel SGX/TDX, AMD SEV) | Deployed commercially | Available now | Physical-access attacks break attestation (BatteringRAM, TEE.fail) |
+| **Remote attestation** (NVIDIA NRAS, go-nvtrust) | Deployed commercially | Available now | Attestation keys extractable on current hardware |
+| **Data center detection** (satellite, energy monitoring) | Operational | Available now | Requires intelligence access; cannot verify specific chip use |
+| **Export controls / supply chain KYC** | Partially deployed | Available now | Significant enforcement gaps; \$5–7B in smuggled chips (2024) |
+| **Location verification** (ping-based PBLV) | Prototype on H100 | 6–12 months if mandated | Spoofing resistance at scale; landmark network deployment |
+| **Offline licensing** (firmware-based compute quotas) | Early R&D | 2–4 years | Key management infrastructure; tamper resistance; market acceptance (Intel On Demand failure) |
+| **Workload verification** (privacy-preserving reporting) | Research | 2–5 years | Privacy-preserving reporting without creating attack surfaces |
+| **Network/cluster verification** (interconnect limits) | Research | 2–5 years | Evasion via alternative topologies; threshold calibration |
+| **FlexHEG** (Guarantee Processor + Secure Enclosure) | Active R&D (\$4.1M funded) | 3–5+ years | Tamper-resistant enclosure engineering; interlock design |
+| **Full tamper-proof on-chip governance** | Early concept | 4+ years | Requires new chip generations; no production-ready solutions against state-level adversaries |
+| **Remote disablement** (kill switch) | Conceptual | 10+ years | Governance of key; diplomatic acceptance; sovereignty concerns |
 
 ---
 
@@ -334,7 +388,7 @@ Major chip companies already ship hardware that could support governance mechani
 - **<EntityLink id="E7">NVIDIA</EntityLink>**: Confidential computing on H100/H200/Blackwell GPUs; NVIDIA Remote Attestation Service (NRAS); [go-nvtrust](https://github.com/NVIDIA/go-nvtrust) open-source attestation library; piloted tracking software for Blackwell GPUs (December 2025)
 - **Intel**: Software Guard Extensions (SGX); Trust Domain Extensions (TDX); Intel Trust Authority for composite CPU+GPU attestation
 - **AMD**: Secure Encrypted Virtualization (SEV/SEV-SNP) TEE technology; contributed to Caliptra open-source silicon root of trust
-- **[Caliptra 2.1](https://www.chipsalliance.org/news/caliptra2-1/)** (AMD/Google/Microsoft/NVIDIA under CHIPS Alliance): Open-source silicon root of trust with quantum-resilient cryptography—potentially the most promising cross-vendor governance foundation
+- **[Caliptra 2.1](https://www.chipsalliance.org/news/caliptra2-1/)** (AMD/Google/Microsoft/NVIDIA under CHIPS Alliance): Open-source silicon root of trust (~1.6M logic gates, dual RISC-V cores) providing identity, measured boot, and attestation. Version 2.1 adds quantum-resilient cryptography (ML-DSA for post-quantum signatures, ML-KEM for key exchange) and ownership transfer for code integrity—potentially the most promising cross-vendor governance foundation
 
 ### Key Funders
 
@@ -378,6 +432,8 @@ If only some chips ship with treaty-required security features, manufacturers fa
 ### Adversarial Evasion
 
 Undeclared data centers, smuggled legacy chips, and substitution of near-frontier commodity GPUs (which are nearly as capable as specialized accelerators for some training tasks) all represent evasion strategies that hardware mechanisms alone cannot address. Consumer GPUs present a particular challenge: their widespread availability means that compute caps enforced only on specialized accelerators could be circumvented through distributed training on consumer hardware.[^3][^4]
+
+**Decentralized training** is an increasingly viable evasion vector. Techniques like DiLoCo (Distributed Low-Communication) reduce inter-node synchronization by 500x, enabling training across geographically dispersed sites with limited bandwidth. The INTELLECT-1 project trained a 10B parameter model across multiple continents, synchronizing only once every 38 minutes. Consilience reached 40B parameters. However, these are ~1,000x smaller than current frontier models, and decentralized networks have ~300x less effective throughput than frontier datacenters. Since early 2024, startups have raised ≈\$145 million to pursue decentralized training, with some targeting frontier-competitive models. The technology is not yet a credible path to frontier capabilities, but it is progressing rapidly enough to warrant governance attention—particularly because obfuscating synchronization patterns across cloud providers is "likely possible," and true peer-to-peer networks create "no obvious point of accountability or intervention."[^22]
 
 ### Geopolitical and Sovereignty Concerns
 
@@ -490,3 +546,5 @@ Based on recommendations from CNAS, RAND, IAPS, FAS, and Longview Philanthropy, 
 [^20]: Shavit, Yonadav — *What does it take to catch a Chinchilla? Verifying Rules on Large-Scale Neural Network Training via Compute Monitoring* ([arXiv:2303.11341](https://arxiv.org/abs/2303.11341), March 2023) - first major compute monitoring framework proposing on-chip firmware snapshots and supply chain monitoring
 
 [^21]: Heim, Lennart — *Considerations and Limitations for AI Hardware-Enabled Mechanisms* ([blog.heim.xyz](https://blog.heim.xyz/considerations-and-limitations-for-ai-hardware-enabled-mechanisms/), March 2024) - cautions against premature advocacy; identifies circumvention risks, prolonged hardware rollout lead times, and governance framework challenges
+
+[^22]: *Distributed and Decentralised Training: Technical Governance Challenges* ([arXiv](https://arxiv.org/html/2507.07765)) - analysis of decentralized training (DiLoCo, INTELLECT-1) as evasion vector; currently ~1,000x smaller than frontier models but rapidly progressing; \$145M+ raised by startups since 2024
