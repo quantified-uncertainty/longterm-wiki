@@ -1,14 +1,15 @@
 entity: ykTqvdkiLQ
 facts:
-  - id: "f_VR9yTjYlmg"
-    property: "notable-for"
-    value: "Author of Astral Codex Ten (formerly Slate Star Codex); influential rationalist blogger covering AI risk and
-      effective altruism"
-  - id: "f_wIn1DbjxRQ"
-    property: "website"
+  - id: f_VR9yTjYlmg
+    property: notable-for
+    value: "Author of Astral Codex Ten (formerly Slate Star Codex); influential
+      rationalist blogger covering AI risk and effective altruism"
+
+  - id: f_wIn1DbjxRQ
+    property: website
     value: "https://www.astralcodexten.com"
-  - id: "Y3RTpPgUag"
-    property: "wikipedia-url"
-    value: "https://en.wikipedia.org/wiki/Scott_Alexander_(screenwriter)"
-    source: "https://www.wikidata.org/wiki/Q3476164"
-    notes: "From Wikidata Q3476164"
+  - id: Y3RTpPgUag
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Scott_Alexander_(screenwriter)
+    source: https://www.wikidata.org/wiki/Q3476164
+    notes: From Wikidata Q3476164

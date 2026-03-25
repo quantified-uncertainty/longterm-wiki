@@ -11,13 +11,11 @@ facts:
       built Metaforecast.
     asOf: 2026-03
     notes: Migrated from old entity system; description updated 2026-03
-
   - id: f_nP6tN2pQ9v
     property: notable-for
     value: "Co-founded Samotsvety forecasting group (won CSET-Foretell by ~2x margin); founded Sentinel for global catastrophe early warning; built Metaforecast.org; ranked 2nd all-time on INFER platform"
     asOf: 2026-03
     notes: Enriched from wiki page
-
   - id: f_nPcY8fL6kA
     property: born-year
     value: 1998
@@ -27,4 +25,3 @@ facts:
     property: education
     value: "Studied Mathematics and Philosophy (dropped out); subsequently studied development economics"
     notes: Enriched from wiki page
-

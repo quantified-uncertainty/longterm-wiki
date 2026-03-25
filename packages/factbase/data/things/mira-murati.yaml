@@ -1,14 +1,18 @@
 entity: yiBasS5uXQ
 facts:
-  - id: "f_8Iej2b7LDw"
-    property: "born-year"
+  - id: f_8Iej2b7LDw
+    property: born-year
     value: 1988
-  - id: "f_f3XKVPdewA"
-    property: "notable-for"
+
+  - id: f_f3XKVPdewA
+    property: notable-for
     value: "Former CTO of OpenAI; led development of ChatGPT, DALL-E, and GPT-4; now building a new AI company"
-  - id: "f_ekVZn67U9A"
-    property: "education"
+
+  - id: f_ekVZn67U9A
+    property: education
     value: "BS in Mechanical Engineering, Dartmouth College"
-  - id: "f_vatTbYjtnQ"
-    property: "wikipedia-url"
+
+  - id: f_vatTbYjtnQ
+    property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mira_Murati"
+

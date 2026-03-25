@@ -1,0 +1,27 @@
+entity: pCun4K9Bf8
+facts:
+  - id: f_qPylVVHUot
+    property: description
+    value: "AI chip governance researcher; Senior Adjunct Fellow at CNAS Technology and National Security Program. Co-authored foundational policy papers on hardware-enabled mechanisms including 'Secure, Governable Chips' and 'Technology to Secure the AI Chip Supply Chain'. Coined 'on-chip governance' term."
+    asOf: "2026-03"
+    source: https://www.cnas.org/people/tim-fist
+
+  - id: f_H9izLxJ0AN
+    property: notable-for
+    value: "Co-authored 'Secure, Governable Chips' (Jan 2024) and 'Technology to Secure the AI Chip Supply Chain' (Dec 2024) establishing the CNAS policy framework for hardware-enabled AI governance"
+    source: https://www.cnas.org/publications
+    asOf: "2026-03"
+
+  - id: f_pN4TGlSX4c
+    property: employed-by
+    value: !ref dYjY3Ma1Hw
+    role: "Senior Adjunct Fellow, Technology and National Security Program"
+    source: https://www.cnas.org/people/tim-fist
+    asOf: "2024"
+
+  - id: f_CnX33i1Q4h
+    property: employed-by
+    value: "Fathom Radiant"
+    role: "Head of Strategy & Governance"
+    notes: "Previously Head of Strategy & Governance at Fathom Radiant before joining CNAS"
+    validEnd: "2024"

@@ -1,11 +1,13 @@
 entity: Yq4s2cI7ng
 facts:
-  - id: "f_qVoWltsFvw"
-    property: "born-year"
+  - id: f_qVoWltsFvw
+    property: born-year
     value: 1988
-    notes: "Born 1988 (approximate); previously CTO of Stripe before co-founding OpenAI"
-  - id: "IvZ52PQsHg"
-    property: "education"
-    value: "Harvard University; Massachusetts Institute of Technology; Red River High School; University of North Dakota"
-    source: "https://www.wikidata.org/wiki/Q100604534"
-    notes: "From Wikidata Q100604534"
+    notes: "Born 1988 (approximate); previously CTO of Stripe before co-founding
+      OpenAI"
+  - id: IvZ52PQsHg
+    property: education
+    value: Harvard University; Massachusetts Institute of Technology; Red River High
+      School; University of North Dakota
+    source: https://www.wikidata.org/wiki/Q100604534
+    notes: From Wikidata Q100604534

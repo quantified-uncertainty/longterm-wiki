@@ -25,6 +25,7 @@ import { secondaryMarketPricesRoute } from "./routes/tablebase/secondary-market-
 import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js";
 import { politicalRacesRoute } from "./routes/tablebase/political-races.js";
 import { blueskyRoute } from "./routes/tablebase/bluesky.js";
+import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 
 // Unified source-check system (replaces factbase-verifications + record-verifications)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
@@ -197,6 +198,7 @@ export function createApp() {
   app.route("/api/prediction-markets", predictionMarketsRoute);
   app.route("/api/political-races", politicalRacesRoute);
   app.route("/api/bluesky", blueskyRoute);
+  app.route("/api/talent-flows", talentFlowsRoute);
   app.route("/api/divisions", divisionsRoute);
   app.route("/api/division-personnel", divisionPersonnelRoute);
   app.route("/api/funding-programs", fundingProgramsRoute);

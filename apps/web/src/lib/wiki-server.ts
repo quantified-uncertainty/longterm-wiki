@@ -180,6 +180,7 @@ import type { PersonnelRoute } from "@wiki-server/personnel-route";
 import type { PredictionMarketsRoute } from "@wiki-server/prediction-markets-route";
 import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-prices-route";
 import type { DataQualityRoute } from "@wiki-server/data-quality-route";
+import type { TalentFlowsRoute } from "@wiki-server/talent-flows-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -398,4 +399,19 @@ export type RpcDataQualityHistoryResult = InferResponseType<DataQualityClient['h
 
 /** A single data quality snapshot row */
 export type RpcDataQualitySnapshot = NonNullable<RpcDataQualityLatestResult['snapshot']>;
+
+// ============================================================================
+// Hono RPC client — Talent Flows API
+// ============================================================================
+
+type TalentFlowsClient = ReturnType<typeof hc<TalentFlowsRoute>>;
+
+/** Inferred response type for GET /api/talent-flows/ */
+export type RpcTalentFlowsResult = InferResponseType<TalentFlowsClient['index']['$get'], 200>;
+
+/** A single flow edge (org A -> org B) */
+export type RpcTalentFlowEdge = RpcTalentFlowsResult['flows'][number];
+
+/** A single org net-flow row */
+export type RpcOrgNetFlow = RpcTalentFlowsResult['orgNetFlows'][number];
 

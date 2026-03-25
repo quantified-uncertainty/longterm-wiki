@@ -28,3 +28,4 @@ export { websiteSourcesRoute, type WebsiteSourcesRoute } from "./website-sources
 export { secondaryMarketPricesRoute, type SecondaryMarketPricesRoute } from "./secondary-market-prices.js";
 export { predictionMarketsRoute, type PredictionMarketsRoute } from "./prediction-markets.js";
 export { politicalRacesRoute, type PoliticalRacesRoute } from "./political-races.js";
+export { talentFlowsRoute, type TalentFlowsRoute } from "./talent-flows.js";

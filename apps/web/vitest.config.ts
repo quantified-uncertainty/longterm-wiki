@@ -39,6 +39,7 @@ export default defineConfig({
       "@wiki-server/divisions-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/divisions.ts"),
       "@wiki-server/funding-programs-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/funding-programs.ts"),
       "@wiki-server/personnel-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/personnel.ts"),
+      "@wiki-server/talent-flows-route": path.resolve(__dirname, "../wiki-server/src/routes/tablebase/talent-flows.ts"),
     },
   },
 });

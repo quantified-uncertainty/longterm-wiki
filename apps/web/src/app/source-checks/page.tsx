@@ -10,6 +10,7 @@ import type {
   RpcSourceChecksResolveNamesResult,
 } from "@/lib/wiki-server";
 import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
+import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { SourceChecksTable } from "./source-checks-table";
 import { SourceChecksSearch } from "./source-checks-filter";
 import {
@@ -139,10 +140,40 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       names = { ...names, ...nameMap };
     }
 
+    // Local FactBase fallback for fact names not resolved by wiki-server
+    const factIds = byType.get("fact");
+    if (factIds) {
+      for (const factId of factIds) {
+        if (!names[factId]) {
+          const fact = getKBFactById(factId);
+          if (fact) {
+            const entity = getKBEntity(fact.subjectId);
+            const property = getKBProperty(fact.propertyId);
+            names[factId] = `${entity?.name ?? fact.subjectId} — ${property?.name ?? fact.propertyId}`;
+          }
+        }
+      }
+    }
+
     // Strip "new:" prefix from display names (artefact of record creation)
     for (const [key, value] of Object.entries(names)) {
       if (value.startsWith("new:")) {
         names[key] = value.slice(4);
+      }
+    }
+
+    // Resolve fact names locally from FactBase as fallback (wiki-server may not
+    // have the resolve-names endpoint deployed yet)
+    for (const v of verdicts) {
+      if (v.recordType === "fact" && !names[v.recordId]) {
+        const fact = getKBFactById(v.recordId);
+        if (fact) {
+          const property = getKBProperty(fact.propertyId);
+          const entity = getKBEntity(fact.subjectId);
+          const propertyName = property?.name ?? fact.propertyId;
+          const entityName = entity?.name ?? fact.subjectId;
+          names[v.recordId] = `${entityName} — ${propertyName}`;
+        }
       }
     }
 
