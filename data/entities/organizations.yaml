@@ -4126,14 +4126,43 @@
   title: Apart Research
   website: https://apartresearch.com
   description: >-
-    AI safety research organization running hackathons, fellowships, and
-    collaborative research projects.
+    Independent AI safety research organization that accelerates safety research
+    through hackathons, fellowships, and collaborative research sprints.
+    Founded in 2022 and headquartered in Copenhagen, Denmark, Apart Research
+    operates as a remote-first nonprofit. As of 2026, the organization has hosted
+    42+ research sprints with 3,000+ participants across 50+ global locations,
+    producing 22 peer-reviewed publications at venues including NeurIPS, ICLR, and ACL.
   relatedEntries:
+    - id: HwM6OF6Ewg
+      type: person
+      relationship: created-by
+    - id: Z62bQynY4g
+      type: person
+      relationship: supports
     - id: XcGTez1oFw
       type: policy
+    - id: dwMzc9WzPa
+      type: organization
+      relationship: related
+    - id: knwcFNXNQQ
+      type: organization
+      relationship: related
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+    - title: "How Apart Research Would Use Marginal Funding to Scale AI Safety Research"
+      url: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+      date: 2025-05
+    - title: Apart Research — Donate 2025
+      url: https://apartresearch.com/donate/2025
+    - title: Apart Research on Manifund
+      url: https://manifund.org/projects/keep-apart-research-going-global-ai-safety-research--talent-pipeline
   tags:
     - ai-safety
     - alignment
+    - mechanistic-interpretability
+    - research
+    - hackathons
   lastUpdated: 2026-03
 
 - id: saferai

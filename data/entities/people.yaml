@@ -3248,12 +3248,163 @@
   stableId: HwM6OF6Ewg
   type: person
   title: Esben Kran
+  website: https://kran.ai
   description: >-
     Founder of Apart Research, an AI safety research organization that
     accelerates safety research through hackathons, fellowships, and
-    collaborative sprints. Based in Copenhagen, Denmark.
+    collaborative sprints. Founded Apart Research in 2022 at age 22 after
+    leaving graduate school. Currently serves on Apart Research's board.
+    Based in Copenhagen, Denmark.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+      relationship: created-by
+  customFields:
+    - label: Role
+      value: Founder, Board Member
+    - label: Affiliation
+      value: Apart Research
+  sources:
+    - title: Apart Research — Impact (Team)
+      url: https://apartresearch.com/impact
+    - title: Esben Kran personal site
+      url: https://kran.ai
   tags:
     - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: jaime-raldua-veuthey
+  stableId: "-vEy6ah4qE"
+  type: person
+  title: Jaime Raldua Veuthey
+  description: >-
+    CEO of Apart Research. Leads the organization's operations, research sprints,
+    and fellowship programs.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: jason-hoelscher-obermaier
+  stableId: 2kfQ41S__Y
+  type: person
+  title: Jason Hoelscher-Obermaier
+  description: >-
+    Director of Research at Apart Research. Runs Apart Lab and Apart Sprints
+    research programs. Has a PhD and co-authored publications including
+    "Detecting Edit Failures In Large Language Models" (ACL 2023).
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+    - alignment
+  lastUpdated: 2026-03
+
+- id: natalia-perez-campanero-antolin
+  stableId: i78bV5zHTe
+  type: person
+  title: Natalia Perez-Campanero Antolin
+  description: >-
+    Research Lead at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: jacob-haimes
+  stableId: Bq7bnwVybe
+  type: person
+  title: Jacob Haimes
+  description: >-
+    Research Manager at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: al-hussein-saqr
+  stableId: vxQxyoROkq
+  type: person
+  title: Al-Hussein Saqr
+  description: >-
+    Operations Coordinator at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: clement-neo
+  stableId: BkIIdAqW_U
+  type: person
+  title: Clement Neo
+  description: >-
+    Lab Advisor at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: christian-schroeder-de-witt
+  stableId: Uyu-64zinm
+  type: person
+  title: Christian Schroeder de Witt
+  description: >-
+    Research Advisor at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: nick-fitz
+  stableId: g2nElvI1Hj
+  type: person
+  title: Nick Fitz
+  description: >-
+    Strategy Advisor at Apart Research.
+  relatedEntries:
+    - id: 5WqgebIWFQ
+      type: organization
+  sources:
+    - title: Apart Research — Impact
+      url: https://apartresearch.com/impact
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
 
 - id: jeremie-harris
   stableId: aJOiUj35UA
