@@ -98,34 +98,19 @@ export function SourceChecksTable({ verdicts, names, hrefs }: SourceChecksTableP
                 {/* Record */}
                 <td className="py-2.5 pr-3">
                   {recordName ? (
-                    <div className="flex flex-col gap-0.5">
-                      {recordHref ? (
+                    (() => {
+                      const display = recordName.length > 40 ? recordName.slice(0, 38) + "\u2026" : recordName;
+                      const href = recordHref || detailHref;
+                      return (
                         <Link
-                          href={recordHref}
-                          className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400"
+                          href={href}
+                          className={`text-xs font-medium hover:underline ${recordHref ? "text-blue-600 dark:text-blue-400" : "text-foreground"}`}
                           title={recordName}
                         >
-                          {recordName.length > 40
-                            ? recordName.slice(0, 38) + "\u2026"
-                            : recordName}
+                          {display}
                         </Link>
-                      ) : (
-                        <Link
-                          href={detailHref}
-                          className="text-xs font-medium text-foreground hover:underline"
-                          title={recordName}
-                        >
-                          {recordName.length > 40
-                            ? recordName.slice(0, 38) + "\u2026"
-                            : recordName}
-                        </Link>
-                      )}
-                      <span className="text-[10px] font-mono text-muted-foreground">
-                        {v.recordId.length > 15
-                          ? v.recordId.slice(0, 12) + "\u2026"
-                          : v.recordId}
-                      </span>
-                    </div>
+                      );
+                    })()
                   ) : (
                     recordHref ? (
                       <Link
