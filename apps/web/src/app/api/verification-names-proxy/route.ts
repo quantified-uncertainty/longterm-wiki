@@ -89,6 +89,14 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await res.json();
+    // Strip "new:" prefix from resolved names at API boundary
+    if (data.names) {
+      for (const key of Object.keys(data.names)) {
+        if (typeof data.names[key] === "string" && data.names[key].startsWith("new:")) {
+          data.names[key] = data.names[key].slice(4).trim();
+        }
+      }
+    }
     return NextResponse.json(data);
   } catch (err) {
     console.warn(
