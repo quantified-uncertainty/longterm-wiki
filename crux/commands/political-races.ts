@@ -225,7 +225,7 @@ async function seedCommand(
       electionDate: "2026-06-23",
       status: "upcoming" as const,
       aiAngle: "Flagship AI regulation race: RAISE Act author Alex Bores vs anti-regulation PAC-backed challengers",
-      aiAngleSummary: "The NY-12 Democratic primary is the highest-profile race in the 2026 AI policy battle. Alex Bores, author of the RAISE Act, faces challengers backed by Leading the Future ($125M anti-regulation PAC). Think Big PAC spent $1.95M opposing Bores. Public First Action ($20M, Anthropic-funded) supports Bores with $450K. Polymarket has prediction markets: Lasher 47-52%, Bores 19-22%.",
+      aiAngleSummary: "The NY-12 Democratic primary is the highest-profile race in the 2026 AI policy battle. Alex Bores, author of the RAISE Act, faces challengers backed by Leading the Future ($125M anti-regulation PAC). Think Big PAC spent $1.95M opposing Bores. Jobs and Democracy PAC (Anthropic-backed via Public First Action) supports Bores with $450K. Polymarket has prediction markets: Lasher 47-52%, Bores 19-22%.",
       source: "https://techcrunch.com/2026/03/03/ai-companies-are-spending-millions-to-thwart-this-former-tech-execs-congressional-bid/",
     },
     {
@@ -338,7 +338,7 @@ async function seedCommand(
       district: "TX-35",
       electionDate: "2026-05-26",
       status: "upcoming" as const,
-      aiAngle: "Public First Action backed De La Cruz as part of pro-regulation Republican slate. Key House battleground.",
+      aiAngle: "Defending Our Values PAC (Anthropic-backed via Public First Action) backed De La Cruz as part of pro-regulation Republican slate. Key House battleground.",
       source: "https://sanantonioreport.org/texas-35-congressional-district-primary-election-results/",
     },
     // === FEDERAL SENATE ===
@@ -542,6 +542,7 @@ async function seedCommand(
     { id: "SlNqSTfjXz", raceId: "8mcyqvWkfB", candidateEntityId: "7ucfe1TgTW", candidateDisplayName: "Michael Whatley", status: "running" as const, party: "republican", aiStance: "neutral" as const, endorsements: "Former RNC Chair, Trump-endorsed" },
     // === GA Senate ===
     { id: "rTzuF1tpfG", raceId: "p01cOr273G", candidateEntityId: "N2rG9yPZ9K", candidateDisplayName: "Jon Ossoff", isIncumbent: true, status: "running" as const, party: "democrat", aiStance: "neutral" as const, notes: "Subject of AI deepfake attack ad by opponent" },
+    { id: "VZPP4xzOKw", raceId: "p01cOr273G", candidateDisplayName: "Mike Collins", status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Used AI deepfake of Ossoff in attack ad" },
     // === ME Senate ===
     { id: "U8hQu1gcoX", raceId: "1VZyeYdjFS", candidateEntityId: "5NoqE8uJSr", candidateDisplayName: "Susan Collins", isIncumbent: true, status: "running" as const, party: "republican", aiStance: "mixed" as const, notes: "Only R incumbent in a state Harris won. Top D pickup target." },
     // === TN Governor ===
