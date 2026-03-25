@@ -1,14 +1,18 @@
 entity: APUqKVNaAA
 facts:
-  - id: "f_6X5fU4J1hQ"
-    property: "born-year"
+  - id: f_6X5fU4J1hQ
+    property: born-year
     value: 1972
-  - id: "f_F6CMdX41GQ"
-    property: "notable-for"
+
+  - id: f_F6CMdX41GQ
+    property: notable-for
     value: "CEO of Google and Alphabet; oversees Google DeepMind and Gemini AI development"
-  - id: "f_TXjPh03EzA"
-    property: "education"
+
+  - id: f_TXjPh03EzA
+    property: education
     value: "MS in Engineering, Stanford University; MBA, Wharton School"
-  - id: "f_wDkX9vRf2A"
-    property: "wikipedia-url"
+
+  - id: f_wDkX9vRf2A
+    property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Sundar_Pichai"
+

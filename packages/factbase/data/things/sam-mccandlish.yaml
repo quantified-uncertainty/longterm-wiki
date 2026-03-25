@@ -1,5 +1,6 @@
 entity: ENl8sgChDQ
 facts:
-  - id: "f_ZN4oC3AUWw"
-    property: "notable-for"
+  - id: f_ZN4oC3AUWw
+    property: notable-for
     value: "Co-founder of Anthropic; co-author of neural scaling laws research; formerly at OpenAI"
+

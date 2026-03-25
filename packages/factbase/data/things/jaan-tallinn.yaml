@@ -1,26 +1,28 @@
 entity: 6gjF5d3geg
 facts:
-  - id: "f_m9kTf3qYKQ"
-    property: "description"
+  - id: f_m9kTf3qYKQ
+    property: description
     value: "Co-founded Skype in 2003, sold to eBay for $2.6B in 2005"
-  - id: "f_OxxVfxzLnw"
-    property: "net-worth"
-    value: 900000000
+
+  - id: f_OxxVfxzLnw
+    property: net-worth
+    value: 9e+8
     asOf: "2025"
-    source: "https://en.wikipedia.org/wiki/Jaan_Tallinn"
+    source: https://en.wikipedia.org/wiki/Jaan_Tallinn
     notes: "Estimated net worth; primary funder of SFF and Lightspeed Grants"
-  - id: "f_1QqEUKiNaw"
-    property: "description"
+
+  - id: f_1QqEUKiNaw
+    property: description
     value: "Personal foundation giving (2024): $20M (excludes SFF amounts)"
-    source: "https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview"
+    source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
     notes: "Allocated through personal foundation in 2024"
-  - id: "Qhkqi9dJtA"
-    property: "born-year"
+  - id: Qhkqi9dJtA
+    property: born-year
     value: 1972
-    source: "https://www.wikidata.org/wiki/Q3156998"
-    notes: "From Wikidata Q3156998"
-  - id: "xGcPzg2OvQ"
-    property: "education"
-    value: "University of Tartu; Gustav Adolf Grammar School"
-    source: "https://www.wikidata.org/wiki/Q3156998"
-    notes: "From Wikidata Q3156998"
+    source: https://www.wikidata.org/wiki/Q3156998
+    notes: From Wikidata Q3156998
+  - id: xGcPzg2OvQ
+    property: education
+    value: University of Tartu; Gustav Adolf Grammar School
+    source: https://www.wikidata.org/wiki/Q3156998
+    notes: From Wikidata Q3156998
