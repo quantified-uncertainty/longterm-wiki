@@ -265,21 +265,38 @@ function ActionGroup({
 // ── Single action item ─────────────────────────────────────────────────────
 
 function ActionItem({ item, names }: { item: VerdictRow; names: NameMap }) {
-  const displayName = names[item.recordId]
-    ?? names[item.entityId ?? ""]
-    ?? item.recordId;
+  // Resolve the record-level name (e.g., fact label "Headquarters", personnel name)
+  const recordName = names[item.recordId] ?? null;
+  // Resolve the parent entity name (e.g., "Anthropic", "Elon Musk")
+  const entityName = item.entityId ? (names[item.entityId] ?? null) : null;
 
-  const truncatedName = displayName.length > 50
-    ? displayName.slice(0, 48) + "..."
+  // Build display name: prefer "Entity: Record" when both are available
+  // so users can distinguish multiple entries for the same entity.
+  let displayName: string;
+  if (recordName && entityName && recordName !== entityName) {
+    displayName = `${entityName}: ${recordName}`;
+  } else {
+    displayName = recordName ?? entityName ?? item.recordId;
+  }
+
+  // Strip "new:" prefix from resolved display names
+  if (displayName.startsWith("new:")) {
+    displayName = displayName.slice(4);
+  }
+
+  const truncatedName = displayName.length > 60
+    ? displayName.slice(0, 58) + "..."
     : displayName;
 
+  const href = `/source-checks/${encodeURIComponent(item.recordType)}/${encodeURIComponent(item.recordId)}`;
+
   return (
-    <div className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors">
+    <a href={href} className="flex items-center justify-between gap-3 px-4 py-2.5 hover:bg-muted/30 transition-colors group">
       <div className="flex items-center gap-3 min-w-0">
         <span className="shrink-0 inline-flex items-center rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
           {item.recordType}
         </span>
-        <span className="text-sm font-medium truncate" title={displayName}>
+        <span className="text-sm font-medium truncate group-hover:text-blue-600 dark:group-hover:text-blue-400" title={displayName}>
           {truncatedName}
         </span>
         {item.fieldName && (
@@ -298,6 +315,6 @@ function ActionItem({ item, names }: { item: VerdictRow; names: NameMap }) {
           {formatTimeSince(item.lastComputedAt)}
         </span>
       </div>
-    </div>
+    </a>
   );
 }

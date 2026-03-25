@@ -577,9 +577,10 @@ export function EntitySourceChecksViewer() {
   const contradictedCount = verdicts.filter((v) => v.verdict === "contradicted").length;
   const needsRecheckCount = verdicts.filter((v) => v.needsRecheck).length;
 
-  // Coverage stats
-  const totalRecords = coverageData.reduce((sum, r) => sum + r.total, 0);
-  const totalVerified = coverageData.reduce((sum, r) => sum + r.verified, 0);
+  // Coverage stats — filter out rows with neither records nor verdicts
+  const meaningfulCoverage = coverageData.filter((r) => r.total > 0 || r.verified > 0);
+  const totalRecords = meaningfulCoverage.reduce((sum, r) => sum + r.total, 0);
+  const totalVerified = meaningfulCoverage.reduce((sum, r) => sum + r.verified, 0);
   const overallCoveragePct = totalRecords > 0
     ? Math.round((totalVerified / totalRecords) * 100)
     : 0;
@@ -608,7 +609,7 @@ export function EntitySourceChecksViewer() {
           <div className="rounded-lg border border-border/60 p-4">
             <p className="text-xs text-muted-foreground mb-1">Total Records</p>
             <p className="text-2xl font-bold tabular-nums">{totalRecords.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-1">{coverageData.length} record types</p>
+            <p className="text-xs text-muted-foreground mt-1">{meaningfulCoverage.length} record types</p>
           </div>
         )}
         {totalRecords > 0 && (

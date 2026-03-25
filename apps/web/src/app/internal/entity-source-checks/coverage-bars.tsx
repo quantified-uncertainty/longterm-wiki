@@ -59,8 +59,11 @@ export function CoverageBars() {
     );
   }
 
+  // Filter out rows with neither total records nor verdicts (phantom record types)
+  const meaningful = coverage.filter((r) => r.total > 0 || r.verified > 0);
+
   // Sort by percentage descending, then by total descending for ties
-  const sorted = [...coverage].sort((a, b) => {
+  const sorted = [...meaningful].sort((a, b) => {
     if (b.percentage !== a.percentage) return b.percentage - a.percentage;
     return b.total - a.total;
   });
