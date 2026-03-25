@@ -51,19 +51,26 @@ export function resolveEntityName(
   displayName?: string | null,
 ): { name: string; href: string | null } {
   // 1. Use embedded displayName if available (from API JOIN)
-  if (displayName?.trim()) {
+  //    But reject bare stableIds and numeric PKs that leaked through —
+  //    these are not human-readable names and should be resolved below.
+  const trimmedDisplayName = displayName?.trim();
+  if (
+    trimmedDisplayName &&
+    !STABLE_ID_PATTERN.test(trimmedDisplayName) &&
+    !NUMERIC_ID_PATTERN.test(trimmedDisplayName)
+  ) {
     // Still try to resolve href via FactBase for linking
     if (entityId) {
       const entity = getKBEntity(entityId);
       if (entity) {
         const slug = getKBEntitySlug(entity.id);
         return {
-          name: displayName,
+          name: trimmedDisplayName,
           href: buildEntityHref(entity.type, slug ?? undefined, entity.id),
         };
       }
     }
-    return { name: displayName, href: null };
+    return { name: trimmedDisplayName, href: null };
   }
 
   if (!entityId) return { name: "Unknown", href: null };
