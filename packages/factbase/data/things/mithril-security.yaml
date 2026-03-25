@@ -9,7 +9,7 @@ facts:
     property: total-funding
     value: 1.7e+6
     source: https://www.mithrilsecurity.io
-    notes: "Raised \$1.7M plus received OpenAI cybersecurity grant"
+    notes: "Raised $1.7M plus received OpenAI cybersecurity grant"
 
   - id: f_MvsQuztShB
     property: description
