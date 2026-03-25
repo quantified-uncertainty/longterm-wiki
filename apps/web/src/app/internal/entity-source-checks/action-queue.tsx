@@ -115,9 +115,14 @@ export function ActionQueue() {
 
         const results: VerdictRow[] = [];
         const seen = new Set<string>();
+        let failedCount = 0;
 
         for (const res of [contradictedRes, outdatedRes, recheckRes]) {
-          if (!res.ok) continue;
+          if (!res.ok) {
+            failedCount++;
+            console.warn(`[action-queue] API returned ${res.status}`);
+            continue;
+          }
           const data = await res.json();
           const verdicts = (data.verdicts ?? []) as VerdictRow[];
           for (const v of verdicts) {
@@ -127,6 +132,11 @@ export function ActionQueue() {
               results.push(v);
             }
           }
+        }
+
+        // If ALL fetches failed, show an error instead of false "all clear"
+        if (failedCount === 3) {
+          setError("Could not reach wiki-server. Action items may exist but cannot be loaded.");
         }
 
         setItems(results);

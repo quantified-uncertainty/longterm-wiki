@@ -205,11 +205,17 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">
           Source Checks
         </h1>
-        <p className="text-muted-foreground text-sm max-w-2xl">
+        <p className="text-muted-foreground text-sm max-w-2xl mb-2">
           Automated verification of wiki data against original sources. Each
           record is checked against one or more external sources to confirm
           accuracy.
         </p>
+        <Link
+          href="/wiki/E2200"
+          className="text-xs text-primary hover:underline"
+        >
+          View internal dashboard with coverage &amp; action queue &rarr;
+        </Link>
       </div>
 
       {/* Stats cards — reflect active type filter */}
