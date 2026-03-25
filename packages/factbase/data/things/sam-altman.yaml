@@ -1,109 +1,59 @@
 entity: JKsVHQ5stQ
 facts:
-  - id: f_StIAxD850A
-    property: employed-by
-    value: !ref 1LcLlMGLbw
-    asOf: 2015-12
-    source: https://openai.com/about
-    notes: "Co-founded OpenAI in December 2015; co-chairman initially, became CEO in
-      2019 when capped-profit entity was created"
-
-  - id: f_WLIAavRzUQ
-    property: role
-    value: "CEO"
-    asOf: 2019-03
-    source: https://openai.com/about
-    notes: "Briefly fired by the board on November 17, 2023; reinstated November 22,
-      2023 after employee revolt and Microsoft intervention"
-
-  - id: f_ZfbfHkh9Uw
-    property: born-year
+  - id: "f_ZfbfHkh9Uw"
+    property: "born-year"
     value: 1985
     notes: "Born April 22, 1985 in Chicago, Illinois"
-
-  - id: f_Zu4CcuDsTw
-    property: role
-    value: "President, Y Combinator"
-    asOf: "2014"
-    validEnd: "2019"
-    source: https://www.ycombinator.com/blog/sam-altman-is-the-new-president-of-y-combinator
-    notes: "Succeeded Paul Graham as YC president in 2014; stepped down in 2019 to
-      focus on OpenAI full-time"
-
-  - id: f_aR3kT8mW5q
-    property: education
-    value: "Studied computer science at Stanford University (dropped out after
-      sophomore year)"
-    source: https://en.wikipedia.org/wiki/Sam_Altman
+  - id: "f_aR3kT8mW5q"
+    property: "education"
+    value: "Studied computer science at Stanford University (dropped out after sophomore year)"
+    source: "https://en.wikipedia.org/wiki/Sam_Altman"
     notes: "Dropped out to work on Loopt, his first startup"
-
-  - id: f_bN7vQ2xJ4p
-    property: notable-for
-    value: "CEO of OpenAI; previously president of Y Combinator; central figure in
-      the commercialization of large language models"
-    source: https://en.wikipedia.org/wiki/Sam_Altman
-
-  - id: f_cM6wP9rK3s
-    property: social-media
+  - id: "f_bN7vQ2xJ4p"
+    property: "notable-for"
+    value: "CEO of OpenAI; previously president of Y Combinator; central figure in the commercialization of large language
+      models"
+    source: "https://en.wikipedia.org/wiki/Sam_Altman"
+  - id: "f_cM6wP9rK3s"
+    property: "social-media"
     value: "@sama"
-    source: https://x.com/sama
-
-  - id: f_4wv2f7drz7
-    property: wikipedia-url
+    source: "https://x.com/sama"
+  - id: "f_4wv2f7drz7"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Sam_Altman"
-
-  - id: f_68fi4nulwx
-    property: website
+  - id: "f_68fi4nulwx"
+    property: "website"
     value: "https://blog.samaltman.com"
-
-  - id: f_a0agpci09z
-    property: github-profile
+  - id: "f_a0agpci09z"
+    property: "github-profile"
     value: "https://github.com/sama"
-
-  - id: f_dL5uH8tF2n
-    property: role
-    value: "CEO & Co-founder, Loopt"
-    asOf: "2005"
-    validEnd: "2012"
-    source: https://en.wikipedia.org/wiki/Loopt
-    notes: "Location-based social networking app; acquired by Green Dot Corporation
-      for $43.4M in 2012"
-
-  # ── Migrated from old facts system ─────────────────────────────
-  - id: f_U5suM3Dqcg
-    property: net-worth
-    value: 2.8e+9
+  - id: "f_U5suM3Dqcg"
+    property: "net-worth"
+    value: 2800000000
     asOf: "2024"
     notes: "Investment portfolio value per WSJ investigation."
-
-  - id: f_kFUCZeA9vg
-    property: description
+  - id: "f_kFUCZeA9vg"
+    property: "description"
     value: "OpenAI annual salary (2024): $76,001"
     notes: "Per OpenAI tax filing."
-
-  - id: f_QQPVOIMyoQ
-    property: description
+  - id: "f_QQPVOIMyoQ"
+    property: "description"
     value: "Loopt sold to Green Dot Corporation for $43.4M"
-
-  - id: f_0raqAkyYDw
-    property: description
+  - id: "f_0raqAkyYDw"
+    property: "description"
     value: "Early Stripe investment (2009): $15,000 for 2%"
     notes: "Per WSJ investigation."
-
-  - id: f_W5AHRbYniw
-    property: description
+  - id: "f_W5AHRbYniw"
+    property: "description"
     value: "Y Combinator companies funded during tenure: 1,900 (through 2019)"
-
-  - id: f_kmBIoQdLEQ
-    property: description
-    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter
-      threatening to quit"
-
-  - id: f_7lQ4XtaMBQ
-    property: description
+  - id: "f_kmBIoQdLEQ"
+    property: "description"
+    value: "Board crisis (Nov 2023): 738 of 770 employees (95%) signed letter threatening to quit"
+  - id: "f_7lQ4XtaMBQ"
+    property: "description"
     value: "Personal investment in Helion Energy: $375M"
-  - id: 9rqwdozDvA
-    property: website
-    value: https://blog.samaltman.com/
-    source: https://www.wikidata.org/wiki/Q7407093
-    notes: From Wikidata Q7407093
+  - id: "9rqwdozDvA"
+    property: "website"
+    value: "https://blog.samaltman.com/"
+    source: "https://www.wikidata.org/wiki/Q7407093"
+    notes: "From Wikidata Q7407093"

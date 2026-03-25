@@ -1,0 +1,172 @@
+---
+wikiId: E2068
+title: AI-Assisted Diplomacy and Negotiation
+description: The integration of artificial intelligence tools into diplomatic processes to augment data analysis, negotiation preparation, crisis management, and communication, while raising questions about accountability, bias, and the appropriate scope of human oversight.
+sidebar:
+  order: 50
+lastEdited: 2026-03-25
+createdAt: 2026-03-25
+summary: A well-structured survey of AI applications in diplomacy covering data analysis, negotiation support, crisis management, and public diplomacy, with meaningful treatment of safety concerns including escalation bias, hallucination risks, and accountability gaps; moderately relevant to AI safety but peripheral to core existential risk concerns. The article is notably comprehensive and balanced, though some citations are vague aggregations rather than primary sources.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Maturity** | Early-to-mid deployment; experimental in many contexts |
+| **Primary use case** | Data analysis, scenario simulation, translation, consular operations |
+| **AI safety relevance** | Moderate — raises alignment, bias, and escalation risk concerns |
+| **Replacement of humans** | No; augmentation model dominant in literature |
+| **Key risk** | Escalation bias, hallucination in high-stakes contexts, accountability gaps |
+| **Governance status** | Fragmented; EU AI Act excludes military/national security applications |
+
+## Overview
+
+AI-assisted diplomacy and negotiation refers to the integration of artificial intelligence tools — including machine learning algorithms, predictive analytics, natural language processing, and generative models — into the processes by which states and diplomatic institutions conduct negotiations, manage crises, and engage in international communication. Rather than replacing human diplomats, the prevailing model in both research and practice is one of augmentation: AI handles data-intensive or routine cognitive tasks while human judgment remains responsible for final decisions.
+
+The range of applications is broad. At the operational end, AI systems draft speeches, triage consular emails, generate real-time translations, and summarize media coverage. At the strategic end, tools simulate negotiation scenarios, model likely counterpart positions using historical treaty and voting data, forecast conflict risks, and support early warning systems. The <EntityLink id="E1990">CSIS Wadhwani Center for AI and Advanced Technologies</EntityLink> has conducted Pentagon-funded experiments using platforms like ChatGPT and DeepSeek to craft peace agreements, model nuclear escalation scenarios, and develop ceasefire monitoring tools — including a system trained on peace treaties and news data to identify agreement paths in the Ukraine war context.[^1]
+
+Proponents argue that AI substantially compresses the time needed to process diplomatic intelligence, reduces information asymmetries for smaller delegations, and enables proactive strategies where reactive ones previously dominated. Critics counter that AI systems cannot replicate the empathy, cultural intuition, and contextual judgment that underpin successful diplomacy, and that bias embedded in training data — particularly toward escalation in crisis scenarios and toward Western-centric cooperation frameworks — poses real risks in high-stakes geopolitical environments. The field sits at an early but rapidly accelerating stage, with significant institutional attention from foreign ministries, think tanks, and multilateral organizations.
+
+## History
+
+The roots of AI in diplomacy are inseparable from the broader history of artificial intelligence, which has passed through multiple cycles of investment and stagnation since the 1950s. Early "AI winters" — periods of declining funding following unmet expectations — shaped a cautious institutional culture. A significant early impetus came in the 1980s, when Japan's Fifth Generation Computer System Project spurred the development of expert systems as decision-support tools. These systems found some application in policy analysis but proved difficult to scale, contributing to another period of reduced enthusiasm.
+
+The trajectory shifted with the introduction of neural networks and deep learning in the late 1990s, which reopened questions about AI's potential across a wide range of domains, including international relations. Several technological milestones marked the acceleration: IBM's Deep Blue defeated world chess champion Garry Kasparov in 1997; Google DeepMind's AlphaGo beat world Go champion Lee Sedol 4–1 in 2016; Google Research published the Transformer architecture in 2017; and <EntityLink id="E218">OpenAI</EntityLink> launched GPT-3 in 2020, demonstrating language generation at a scale that surprised many observers.[^2]
+
+The launch of ChatGPT in November 2022 is widely regarded as the moment AI's diplomatic potential became practically tangible. Researchers at the Stiftung Wissenschaft und Politik published case studies that year examining AI for negotiation data analysis, concluding that the technology offered significant added value over traditional methods and could become an indispensable preparation tool for those who adopted it effectively.[^3] DiploFoundation had flagged earlier, in 2019, the utility of AI for processing the enormous volume of text that characterizes multilateral diplomacy.[^4]
+
+By 2025, the field had moved from speculation to active institutional deployment. The U.S. State Department was actively developing AI capabilities and being urged to build department-wide AI ecosystems integrating analytics, negotiation modeling, and predictive dashboards under ethical and security frameworks. A Belfer Center report published in December 2025 described AI as now central to diplomatic work — drafting speeches, analyzing UN Security Council video debates, triaging emails, detecting early signs of conflict, and simulating negotiations — and projected significant further expansion over the following five years.[^5]
+
+## Core Applications
+
+### Data Analysis and Prediction
+
+The most established application of AI in diplomacy is the processing of large datasets to identify patterns, forecast state behaviors, and generate strategic insights. AI systems can scan UN debate records, social media trends, economic indicators, and historical voting patterns at a speed and scale beyond human capacity. Research has demonstrated AI's ability to predict UN General Assembly voting behavior, and systems trained on treaty data have been used to model likely positions of counterparties in negotiations.
+
+Early warning systems represent a particularly consequential application. Machine learning models monitoring indicators associated with conflict onset, humanitarian crises, or natural disasters can enable proactive diplomatic engagement rather than purely reactive responses. A documented example involves a consulate that implemented an AI system trained on five years of historical data to predict demand for emergency passports, visas, and business certifications. The system correctly identified August and May as high-demand periods; its December prediction was initially inaccurate, but it recalibrated on updated data and subsequently improved consular resource allocation. As confidence in the system grew, it was extended to additional consulates.[^6]
+
+### Negotiation Support and Scenario Simulation
+
+Negotiation support systems (NSS) use historical treaty data, economic indicators, and voting records to model bargaining scenarios, forecast likely outcomes, and simulate counterpart positions. These tools have been applied in multilateral climate talks, where the complexity of aligning many parties across technical and political dimensions exceeds the analytical capacity of individual delegations. The <EntityLink id="E1984">Brookings Institution</EntityLink> and affiliated researchers have explored AI for identifying consensus in political discussions, with work by MIT Sloan's Michiel Bakker examining AI applications for managing the complexity of hundreds of simultaneous negotiation threads.[^7]
+
+A notable 2025 example involved climate negotiators from nine African countries, representing over 178 million people, who used AI tools at the UNFCCC campus in Bonn to structure priorities, surface overlooked perspectives, and identify shared ground. Post-session data reported by CEMUNE Managing Director Huw Davies showed that 91% of participants uncovered insights they had missed, perceived co-presence among participants tripled, empathy increased by 35%, and coordination time was reduced by 60%.[^8] These figures come from a single experimental session and should be interpreted cautiously, but they illustrate the potential for AI to support inclusive multi-stakeholder alignment.
+
+Harvard researchers at the Program on Negotiation have examined AI as a backstage coach — providing preparation, feedback, and training for negotiators rather than participating directly. Research by Zilin Ma found that context-specific AI tools outperformed general-purpose advice in high-stakes scenarios such as humanitarian ceasefires and hostage negotiations.[^9]
+
+### Communication, Translation, and Public Diplomacy
+
+AI-powered real-time translation has reduced language barriers in multilateral settings, with tools handling not only word-for-word conversion but also elements of diplomatic register and tone. Generative AI models have been deployed to draft speeches, produce media summaries, and generate talking points. The U.S. public diplomacy section in Guinea began using ChatGPT in late 2022 to draft daily media summaries, reportedly reducing production time to a matter of minutes.[^10]
+
+Deepfake detection has emerged as a related application, given the risks that AI-generated disinformation poses to diplomatic communication. In July 2025, AI-generated deepfakes impersonated U.S. Secretary of State Marco Rubio in attempts to deceive foreign officials and foreign ministers — a concrete example of AI being weaponized against the diplomatic processes it is also meant to support.[^11]
+
+Chatbots and virtual assistants have been deployed for public engagement, handling routine consular inquiries and disseminating information during crises. During the COVID-19 pandemic, AI-assisted consular operations allowed foreign ministries to manage dramatically increased demand for consular services with limited additional staffing.
+
+### Crisis Management and Early Warning
+
+Beyond the conflict prediction capabilities described above, AI tools are being tested for real-time crisis monitoring, resource allocation during emergencies, and ceasefire monitoring. The CSIS Futures Lab's "Strategic Headwinds" tool, trained on peace treaties and news data, is designed to identify agreement paths for faster ceasefires in active conflicts, with the Ukraine war as a primary test case.[^12] Andrew Moore of the Center for a New American Security has suggested that AI bots simulating the decision-making of specific leaders — including heads of state — could be used to stress-test crisis response strategies before real-world application.[^13]
+
+## AI Safety and Alignment Connections
+
+The connections between AI-assisted diplomacy and broader AI safety concerns are meaningful, though the field's current literature focuses more on operational risks than existential ones. Several threads are worth distinguishing.
+
+**Escalation bias** is the most documented safety-relevant concern. Research testing AI models against hundreds of crisis scenarios found that some widely used models exhibited a systematic bias toward escalatory responses — recommending more aggressive options than human analysts would typically favor. This finding, reported in analyses through 2025, raises direct concerns about deploying AI tools in crisis decision-making contexts without careful calibration and human override mechanisms.[^14]
+
+**Hallucination in high-stakes contexts** represents a related failure mode. A documented simulated nuclear negotiation scenario found that an LLM fabricated details about the SALT and JCPOA treaties, producing plausible-sounding but inaccurate tactical guidance that caused the simulation to fail.[^15] In real negotiations over arms control or nuclear risk reduction, such hallucinations could have severe consequences.
+
+**Western-centric bias in cooperation modeling** has been flagged as a structural concern. AI models trained predominantly on Western-origin data tend to favor cooperative frameworks aligned with Western-led international institutions, potentially misrepresenting the strategic logic of states that pursue hedging, selective engagement, or coercive diplomacy as rational alternatives.[^16] This can cause AI-generated strategic advice to be systematically misleading when applied to great-power competition scenarios.
+
+On the more constructive side, some experimental diplomatic applications have engaged explicitly with alignment concepts. Climate negotiation experiments conducted through CEMUNE and organizations like ComplexChaos have used "open-source constitutional alignment systems" — structured methods for ensuring AI outputs reflect human values and inclusive priorities — to guide deliberation interfaces. Experiments with tools like Talk to the City and ThinkScape explore how AI can surface overlooked perspectives, including those of future generations or non-human stakeholders, in multilateral negotiations.[^17]
+
+The governance gap is significant: the EU Artificial Intelligence Act, often described as the world's strongest civilian AI regulation, explicitly excludes military, defense, and national security applications — precisely the domains where AI-assisted diplomacy is most consequential.[^18]
+
+## Key People and Organizations
+
+Several institutions have been active in developing and studying AI-assisted diplomacy. The <EntityLink id="E1990">CSIS Wadhwani Center for AI and Advanced Technologies</EntityLink> operates the Futures Lab with Pentagon funding, conducting experiments in AI-assisted peacebuilding and nuclear risk reduction. DiploFoundation has researched and documented AI applications in multilateral diplomacy since at least 2019. The Stiftung Wissenschaft und Politik (German Institute for International and Security Affairs) published influential case studies in 2022 under Stanzel and Voelsen. The <EntityLink id="E1984">Brookings Institution</EntityLink> has examined AI for consensus-building and U.S.-China AI governance dialogues, including through the Brookings-Tsinghua Track II format.
+
+The UAE has positioned itself as a hub for AI diplomacy, developing the Falcon open-source large language model and hosting the World Governments Summit as a venue for discussions on AI in governance. Mark Freeman of the Institute for Integrated Transitions (IFIT) has promoted AI for accelerating framework agreements in active conflicts. Huw Davies of CEMUNE led the 2025 African climate negotiator sessions. Maya Ben Dror, co-founder and COO of ComplexChaos, has focused on AI tools for scaling inclusion in multilateral processes.
+
+The U.S. State Department has been publicly identified as an institution actively working to harness AI for diplomatic purposes. Pavel Slunkin's December 2025 Belfer Center report recommended that the State Department build a secure, department-wide AI ecosystem and tie AI training competence to officer promotion criteria.[^19]
+
+## Criticisms and Concerns
+
+### The Irreducibility of Human Judgment
+
+The most fundamental objection to AI-assisted diplomacy is that the core of effective negotiation — trust-building, empathy, creative improvisation, and contextual judgment — cannot be replicated by algorithms. Singapore's UN ambassador Umej Bhatia has argued that texts written by AI can mimic authority without containing substance, and that contextual and situational judgment is crucial and cannot be provided by AI.[^20] Diplomacy has historically been described as more art than science, and critics argue that optimizing for the measurable (data processing speed, scenario coverage) risks underweighting the immeasurable (relational dynamics, cultural intuition).
+
+This concern is not merely theoretical. The most difficult negotiations — those over existential conflicts, territorial disputes, or nuclear risk — tend to hinge on exactly the elements AI handles least well: unspoken communication, personal credibility, and the ability to read a room.
+
+### Accountability Gaps and Governance Failures
+
+When AI systems contribute to diplomatic outcomes, the question of who is responsible for errors becomes murky. Recommendations may emerge from combinations of human direction and model behavior, without clear attribution. This accountability gap is compounded by the absence of meaningful regulation: as noted above, the EU AI Act's carve-out for national security applications leaves the most consequential uses of AI in diplomacy outside the scope of the world's most developed regulatory framework.[^21]
+
+### Erosion of Human Expertise and Cognitive Autonomy
+
+A subtler concern involves the long-term effects of AI delegation on human diplomatic capacity. If analysts and negotiators routinely defer to AI recommendations, the institutional knowledge, analytical intuition, and judgment developed through experience may atrophy. This concern is particularly acute for younger professionals whose formative years in the field are shaped by AI-mediated workflows. Critics have argued this represents a structural risk to the diplomatic profession's capacity to function when AI systems fail or produce unreliable outputs.
+
+### Information Manipulation and Deepfakes
+
+AI's capacity to generate persuasive disinformation represents a direct threat to the conditions that make diplomacy possible — namely, a shared factual baseline. The July 2025 deepfake incident targeting Secretary Rubio illustrates how rapidly AI-generated content can be weaponized against diplomatic processes. More broadly, AI-enabled fracturing of shared reality — through synthetic media, automated influence operations, and targeted content — can force diplomatic actors into reactive postures, responding to plausible fictions rather than negotiating from common ground.[^22]
+
+### Power Asymmetries and Access Inequality
+
+Advanced AI diplomatic capabilities require significant data infrastructure, computing resources, and technical expertise. Wealthier states with established technology sectors can deploy far more sophisticated tools than smaller or less resourced nations. If AI adoption follows the pattern of other diplomatic technologies, early adopters may gain durable strategic advantages, while lagging foreign services find themselves increasingly disadvantaged in negotiations. Research examining small delegations in multilateral talks — drawing on Amartya Sen's capabilities approach — hypothesizes that AI access may be particularly valuable for resource-constrained delegations, but only if access is equitable.[^23]
+
+## Key Uncertainties
+
+Several questions remain genuinely unresolved in the field:
+
+- **How far will the augmentation model hold?** Most current commentary insists AI will supplement rather than replace human diplomats. Whether this remains true as AI capabilities advance — particularly for routine negotiation tasks — is uncertain.
+- **Can escalation bias be reliably corrected?** The finding that some widely used models exhibit systematic escalation bias in crisis scenarios is well-documented, but whether this can be adequately addressed through fine-tuning and human parameter-setting, or whether it reflects deeper structural features of how these models process conflict, is not yet established.
+- **What governance architecture is adequate?** Current frameworks are fragmented and exclude the most high-stakes applications. Whether multilateral AI governance bodies like the Global Partnership on Artificial Intelligence (GPAI) can develop enforceable standards for AI in diplomacy and national security remains to be seen.
+- **Will AI widen or narrow power asymmetries among states?** The theoretical case for AI reducing informational asymmetries for small delegations competes with the practical reality that AI capability is correlated with national wealth and technical infrastructure.
+- **How will AI tools affect negotiation norms?** If counterparts in negotiations know that AI systems are informing positions and analyzing their behavior in real time, this may alter negotiating dynamics in ways that are difficult to anticipate.
+
+## Sources
+
+[^1]: Center for Strategic and International Studies Futures Lab - Pentagon-funded AI experiments for peace agreements and Ukraine war negotiations, including the Strategic Headwinds tool (reported by NPR, 2024–2025)
+
+[^2]: History of AI milestones (Deep Blue 1997, AlphaGo 2016, Transformer 2017, GPT-3 2020) - Multiple academic and journalistic sources synthesized in AI-diplomacy research literature
+
+[^3]: Stanzel and Voelsen - Exploratory case studies on AI in negotiations, Stiftung Wissenschaft und Politik (2022)
+
+[^4]: DiploFoundation - AI for processing diplomatic text volumes (2019)
+
+[^5]: Pavel Slunkin - "AI-Powered Diplomacy" report, Belfer Center, Harvard Kennedy School (December 5, 2025)
+
+[^6]: Consulate AI case study - Predictive analytics for consular demand management, documented in AI-diplomacy research literature (source: synthesized from multiple research reports)
+
+[^7]: Michiel Bakker (MIT Sloan) - AI for consensus in political discussions; Jared R. Curhan (MIT) - lessons on AI negotiation practices (cited in research on AI-assisted negotiation)
+
+[^8]: Huw Davies, CEMUNE Managing Director - African climate negotiator sessions, UNFCCC Bonn campus, July 2025; results reported by World Economic Forum/CEMUNE
+
+[^9]: Zilin Ma (Harvard) - Research on AI for humanitarian negotiators, Harvard Program on Negotiation (PON) AI Negotiation Summit
+
+[^10]: Alexander Hunt, U.S. public diplomacy section chief in Guinea - ChatGPT for daily media summaries (late 2022)
+
+[^11]: AI deepfake impersonation of Secretary of State Marco Rubio targeting foreign officials, July 2025 (reported in news coverage of AI in diplomacy)
+
+[^12]: CSIS Futures Lab - "Strategic Headwinds" tool for Ukraine war ceasefire scenarios, with Mark Freeman (IFIT) on framework agreements (2024–2025)
+
+[^13]: Andrew Moore, Center for a New American Security - Predictions on AI bots simulating leaders for crisis testing (cited in 2025 AI diplomacy news coverage)
+
+[^14]: Research on AI escalation bias - Testing of AI models across 400+ scenarios and 60,000+ question-and-answer pairs (CSIS Critical Foreign Policy Decisions Benchmark research, 2024–2025)
+
+[^15]: LLM hallucination in nuclear negotiation simulation - fabricated SALT/JCPOA tactics causing simulation failure (documented in AI-diplomacy criticism literature)
+
+[^16]: Western bias in AI cooperation modeling - identified in CSIS benchmarking research on AI model behavior in geopolitical scenarios (2025)
+
+[^17]: Constitutional alignment systems in climate negotiations - CEMUNE/ComplexChaos experiments (2025); Maya Ben Dror (ComplexChaos co-founder/COO); Emmanuel Lubanzadio (Africa Lead, OpenAI)
+
+[^18]: EU Artificial Intelligence Act - explicit exclusion of military, defense, and national security applications from regulatory scope
+
+[^19]: Pavel Slunkin - Belfer Center "AI-Powered Diplomacy" report recommendations for U.S. State Department (December 2025)
+
+[^20]: Umej Bhatia, Singapore UN Ambassador - quoted in research on AI limitations in diplomacy (source: criticism literature on AI-assisted diplomacy)
+
+[^21]: EU AI Act governance gap - analysis from multiple AI governance research sources (2024–2025)
+
+[^22]: AI deepfake incidents and shared-reality erosion in public diplomacy - documented in 2025 news coverage and academic analysis
+
+[^23]: Graduate Institute thesis on AI and small delegations in multilateral negotiations - applying Amartya Sen's capabilities approach (Development as Freedom, 1999) to AI equity in diplomacy

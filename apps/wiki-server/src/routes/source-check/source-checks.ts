@@ -8,6 +8,8 @@ import {
   sql,
   desc,
   lte,
+  ne,
+  isNull,
   inArray,
   countDistinct,
 } from "drizzle-orm";
@@ -51,6 +53,13 @@ const VALID_VERDICTS = [
 ] as const;
 
 const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
+
+/**
+ * The current checker model used by the source-check pipeline.
+ * Evidence rows checked with a different model are flagged as stale.
+ * Update this when the pipeline switches to a newer model.
+ */
+export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
 
 // ---- Query schemas ----
 
@@ -107,6 +116,12 @@ const DueForRecheckQuery = z.object({
   min_priority: z.coerce.number().optional(),
 });
 
+const StaleEvidenceQuery = z.object({
+  record_type: z.string().max(50).optional(),
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 const ResolveNamesQuery = z.object({
   record_type: z.string().min(1).max(50),
   record_ids: z
@@ -120,6 +135,54 @@ const ResolveNamesQuery = z.object({
         .filter(Boolean)
     ),
 });
+
+// ---- Helpers ----
+
+/** Check if a checker model is stale (different from the current model). */
+function isStaleModel(checkerModel: string | null): boolean {
+  if (!checkerModel) return true; // No model recorded = stale
+  return checkerModel !== CURRENT_CHECKER_MODEL;
+}
+
+/** Map an evidence DB row to the API response shape with isStale flag. */
+function mapEvidenceRow(e: {
+  id: number;
+  recordType: string;
+  recordId: string;
+  fieldName: string | null;
+  entityId: string | null;
+  expectedValue: string | null;
+  resourceId: string | null;
+  sourceUrl: string | null;
+  extractedValue: string | null;
+  extractedQuote: string | null;
+  verdict: string;
+  confidence: number | null;
+  isPrimarySource: boolean;
+  checkerModel: string | null;
+  notes: string | null;
+  checkedAt: Date | null;
+}) {
+  return {
+    id: e.id,
+    recordType: e.recordType,
+    recordId: e.recordId,
+    fieldName: e.fieldName,
+    entityId: e.entityId,
+    expectedValue: e.expectedValue,
+    resourceId: e.resourceId,
+    sourceUrl: e.sourceUrl,
+    extractedValue: e.extractedValue,
+    extractedQuote: e.extractedQuote,
+    verdict: e.verdict,
+    confidence: e.confidence,
+    isPrimarySource: e.isPrimarySource,
+    checkerModel: e.checkerModel,
+    isStale: isStaleModel(e.checkerModel),
+    notes: e.notes,
+    checkedAt: e.checkedAt,
+  };
+}
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
@@ -163,12 +226,25 @@ const sourceChecksApp = new Hono()
       byType[row.recordType] = row.count;
     }
 
+    // Count stale evidence rows (checker_model != current model)
+    const [staleRow] = await db
+      .select({ count: count() })
+      .from(sourceCheckEvidence)
+      .where(
+        or(
+          ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
+          isNull(sourceCheckEvidence.checkerModel),
+        )
+      );
+
     return c.json({
       total: statsRow.total,
       by_verdict: byVerdict,
       by_type: byType,
       needs_recheck: Number(statsRow.needsRecheck),
       avg_confidence: Math.round(Number(statsRow.avgConfidence) * 100) / 100,
+      stale_evidence_count: staleRow.count,
+      current_checker_model: CURRENT_CHECKER_MODEL,
     });
   })
 
@@ -255,6 +331,7 @@ const sourceChecksApp = new Hono()
     }
 
     // Return all verdicts for this record (row-level + any cell-level)
+    // Order by sourceUrl first (for grouping), then by checkedAt descending
     const evidenceRows = await db
       .select()
       .from(sourceCheckEvidence)
@@ -264,7 +341,7 @@ const sourceChecksApp = new Hono()
           eq(sourceCheckEvidence.recordId, recordId),
         )
       )
-      .orderBy(desc(sourceCheckEvidence.checkedAt));
+      .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt));
 
     return c.json({
       verdicts: verdictRows.map((v) => ({
@@ -280,24 +357,8 @@ const sourceChecksApp = new Hono()
         nextCheckDue: v.nextCheckDue,
         lastComputedAt: v.lastComputedAt,
       })),
-      evidence: evidenceRows.map((e) => ({
-        id: e.id,
-        recordType: e.recordType,
-        recordId: e.recordId,
-        fieldName: e.fieldName,
-        entityId: e.entityId,
-        expectedValue: e.expectedValue,
-        resourceId: e.resourceId,
-        sourceUrl: e.sourceUrl,
-        extractedValue: e.extractedValue,
-        extractedQuote: e.extractedQuote,
-        verdict: e.verdict,
-        confidence: e.confidence,
-        isPrimarySource: e.isPrimarySource,
-        checkerModel: e.checkerModel,
-        notes: e.notes,
-        checkedAt: e.checkedAt,
-      })),
+      evidence: evidenceRows.map(mapEvidenceRow),
+      currentCheckerModel: CURRENT_CHECKER_MODEL,
     });
   })
 
@@ -311,7 +372,7 @@ const sourceChecksApp = new Hono()
       const { limit, offset } = c.req.valid("query");
 
       if (recordId.length > MAX_ID_LENGTH) {
-        return c.json({ evidence: [] });
+        return c.json({ evidence: [], currentCheckerModel: CURRENT_CHECKER_MODEL });
       }
 
       const db = getDrizzleDb();
@@ -325,34 +386,20 @@ const sourceChecksApp = new Hono()
             eq(sourceCheckEvidence.recordId, recordId),
           )
         )
-        .orderBy(desc(sourceCheckEvidence.checkedAt))
+        .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt))
         .limit(limit)
         .offset(offset);
 
       return c.json({
-        evidence: rows.map((e) => ({
-          id: e.id,
-          recordType: e.recordType,
-          recordId: e.recordId,
-          fieldName: e.fieldName,
-          entityId: e.entityId,
-          expectedValue: e.expectedValue,
-          resourceId: e.resourceId,
-          sourceUrl: e.sourceUrl,
-          extractedValue: e.extractedValue,
-          extractedQuote: e.extractedQuote,
-          verdict: e.verdict,
-          confidence: e.confidence,
-          isPrimarySource: e.isPrimarySource,
-          checkerModel: e.checkerModel,
-          notes: e.notes,
-          checkedAt: e.checkedAt,
-        })),
+        evidence: rows.map(mapEvidenceRow),
+        currentCheckerModel: CURRENT_CHECKER_MODEL,
       });
     }
   )
 
   // ---- POST /evidence ----
+  // Upserts on (recordType, recordId, sourceUrl, checkerModel) to prevent duplicates.
+  // If a row with the same key exists, updates it; otherwise inserts a new row.
   .post("/evidence", async (c) => {
     const raw = await parseJsonBody(c);
     if (!raw) return invalidJsonError(c);
@@ -364,31 +411,115 @@ const sourceChecksApp = new Hono()
     const db = getDrizzleDb();
     const now = new Date();
 
-    const [inserted] = await db
-      .insert(sourceCheckEvidence)
-      .values({
-        recordType: body.recordType,
-        recordId: body.recordId,
+    const sourceUrlVal = body.sourceUrl ?? null;
+    const checkerModelVal = body.checkerModel ?? null;
+
+    // Two-step upsert: try UPDATE first (matching the dedup key), INSERT if no match.
+    // This pattern avoids ON CONFLICT with COALESCE expression issues.
+    const sourceUrlForLookup = sourceUrlVal ?? "";
+    const checkerModelForLookup = checkerModelVal ?? "";
+
+    const updated = await db
+      .update(sourceCheckEvidence)
+      .set({
         fieldName: body.fieldName ?? null,
         entityId: body.entityId ?? null,
         expectedValue: body.expectedValue ?? null,
         resourceId: body.resourceId ?? null,
-        sourceUrl: body.sourceUrl ?? null,
         extractedValue: body.extractedValue ?? null,
         extractedQuote: body.extractedQuote ?? null,
         verdict: body.verdict,
         confidence: body.confidence ?? null,
         isPrimarySource: body.isPrimarySource,
-        checkerModel: body.checkerModel ?? null,
         notes: body.notes ?? null,
         checkedAt: now,
-        createdAt: now,
         updatedAt: now,
       })
+      .where(
+        and(
+          eq(sourceCheckEvidence.recordType, body.recordType),
+          eq(sourceCheckEvidence.recordId, body.recordId),
+          sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlForLookup}`,
+          sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelForLookup}`,
+        )
+      )
       .returning({ id: sourceCheckEvidence.id });
 
+    let evidenceId: number;
+    let wasUpdated: boolean;
+
+    if (updated.length > 0) {
+      evidenceId = updated[0].id;
+      wasUpdated = true;
+    } else {
+      // No existing row found — insert a new one
+      try {
+        const [inserted] = await db
+          .insert(sourceCheckEvidence)
+          .values({
+            recordType: body.recordType,
+            recordId: body.recordId,
+            fieldName: body.fieldName ?? null,
+            entityId: body.entityId ?? null,
+            expectedValue: body.expectedValue ?? null,
+            resourceId: body.resourceId ?? null,
+            sourceUrl: sourceUrlVal,
+            extractedValue: body.extractedValue ?? null,
+            extractedQuote: body.extractedQuote ?? null,
+            verdict: body.verdict,
+            confidence: body.confidence ?? null,
+            isPrimarySource: body.isPrimarySource,
+            checkerModel: checkerModelVal,
+            notes: body.notes ?? null,
+            checkedAt: now,
+            createdAt: now,
+            updatedAt: now,
+          })
+          .returning({ id: sourceCheckEvidence.id });
+
+        evidenceId = inserted.id;
+        wasUpdated = false;
+      } catch (insertErr: unknown) {
+        // Race condition: another request inserted between our UPDATE and INSERT.
+        // Retry the UPDATE which should now find the row.
+        const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
+        if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
+          const retried = await db
+            .update(sourceCheckEvidence)
+            .set({
+              fieldName: body.fieldName ?? null,
+              entityId: body.entityId ?? null,
+              expectedValue: body.expectedValue ?? null,
+              resourceId: body.resourceId ?? null,
+              extractedValue: body.extractedValue ?? null,
+              extractedQuote: body.extractedQuote ?? null,
+              verdict: body.verdict,
+              confidence: body.confidence ?? null,
+              isPrimarySource: body.isPrimarySource,
+              notes: body.notes ?? null,
+              checkedAt: now,
+              updatedAt: now,
+            })
+            .where(
+              and(
+                eq(sourceCheckEvidence.recordType, body.recordType),
+                eq(sourceCheckEvidence.recordId, body.recordId),
+                sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlForLookup}`,
+                sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelForLookup}`,
+              )
+            )
+            .returning({ id: sourceCheckEvidence.id });
+
+          evidenceId = retried[0]?.id ?? 0;
+          wasUpdated = true;
+        } else {
+          throw insertErr;
+        }
+      }
+    }
+
     // Auto-flag corresponding verdicts for recheck
-    const updated = await db
+    const verdictUpdated = await db
       .update(sourceCheckVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
       .where(
@@ -401,11 +532,52 @@ const sourceChecksApp = new Hono()
 
     return c.json(
       {
-        id: inserted.id,
-        verdictFlagged: updated.length > 0,
+        id: evidenceId,
+        wasUpdated,
+        verdictFlagged: verdictUpdated.length > 0,
       },
-      201
+      wasUpdated ? 200 : 201
     );
+  })
+
+  // ---- GET /stale-evidence ----
+  // Returns evidence rows checked with outdated models (not the current checker model).
+  .get("/stale-evidence", zv("query", StaleEvidenceQuery), async (c) => {
+    const { record_type, limit, offset } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const conditions = [
+      or(
+        ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
+        isNull(sourceCheckEvidence.checkerModel),
+      ),
+    ];
+
+    if (record_type) {
+      conditions.push(eq(sourceCheckEvidence.recordType, record_type));
+    }
+
+    const whereClause = and(...conditions);
+
+    const rows = await db
+      .select()
+      .from(sourceCheckEvidence)
+      .where(whereClause)
+      .orderBy(desc(sourceCheckEvidence.checkedAt))
+      .limit(limit)
+      .offset(offset);
+
+    const countResult = await db
+      .select({ count: count() })
+      .from(sourceCheckEvidence)
+      .where(whereClause);
+    const total = countResult[0].count;
+
+    return c.json({
+      evidence: rows.map(mapEvidenceRow),
+      total,
+      currentCheckerModel: CURRENT_CHECKER_MODEL,
+    });
   })
 
   // ---- POST /verdicts ----

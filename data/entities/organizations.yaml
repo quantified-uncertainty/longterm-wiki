@@ -8087,3 +8087,376 @@
     - title: Humanity AI (Mellon Foundation)
       url: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
   lastUpdated: 2026-03
+
+# ── External orgs (career flow endpoints) ──────────────────────────
+# Lightweight entities for tracking career transitions into/out of the
+# AI safety ecosystem. No wiki pages, minimal metadata.
+
+- id: tesla
+  stableId: DBucVJZWyR
+  type: organization
+  orgType: generic
+  title: Tesla
+  website: https://tesla.com
+  description: >-
+    Electric vehicle and clean energy company. AI safety relevance: major employer
+    of AI researchers (Autopilot/FSD team), career pathway for people like Andrej
+    Karpathy and Mira Murati.
+  lastUpdated: 2026-03
+
+- id: baidu
+  stableId: Z1ypUKIPc0
+  type: organization
+  orgType: generic
+  title: Baidu
+  website: https://www.baidu.com
+  description: >-
+    Chinese technology company with major AI research lab. Career pathway for
+    researchers including Andrew Ng (Chief Scientist) and Dario Amodei.
+  lastUpdated: 2026-03
+
+- id: google
+  stableId: cMNszJMTPX
+  type: organization
+  orgType: generic
+  title: Google / Alphabet
+  website: https://about.google
+  description: >-
+    Parent company of Google DeepMind. Distinct from Google Brain (merged into
+    DeepMind in 2023). Career endpoint for many AI researchers and policy people.
+  lastUpdated: 2026-03
+
+- id: apple
+  stableId: 1kawFEPpVe
+  type: organization
+  orgType: generic
+  title: Apple
+  website: https://www.apple.com
+  description: >-
+    Technology company with growing AI/ML division. Career pathway for people
+    like Daniel Gross (Director of ML).
+  lastUpdated: 2026-03
+
+- id: uber
+  stableId: k99f02K8jm
+  type: organization
+  orgType: generic
+  title: Uber
+  website: https://www.uber.com
+  description: >-
+    Ride-sharing company. Acquired Geometric Intelligence (Gary Marcus) and
+    ran Uber AI Labs.
+  lastUpdated: 2026-03
+
+- id: jane-street
+  stableId: bunzL4OFhZ
+  type: organization
+  orgType: generic
+  title: Jane Street
+  website: https://www.janestreet.com
+  description: >-
+    Quantitative trading firm. Notable as origin workplace for Sam Bankman-Fried
+    and Caroline Ellison before they founded Alameda Research.
+  lastUpdated: 2026-03
+
+- id: dair-institute
+  stableId: DZ35boEfdI
+  type: organization
+  orgType: safety-org
+  title: DAIR Institute
+  website: https://www.dairinstitute.org
+  description: >-
+    Distributed AI Research Institute, founded by Timnit Gebru after leaving
+    Google. Focuses on AI ethics, accountability, and community-centered AI research.
+  lastUpdated: 2026-03
+
+- id: signal-foundation
+  stableId: vFTydRTv82
+  type: organization
+  orgType: generic
+  title: Signal Foundation
+  website: https://signal.org
+  description: >-
+    Nonprofit behind the Signal encrypted messaging app. Led by Meredith
+    Whittaker (former Google, AI Now co-founder) as president.
+  lastUpdated: 2026-03
+
+- id: eleutherai
+  stableId: FnlNF9s98n
+  type: organization
+  orgType: generic
+  title: EleutherAI
+  website: https://www.eleuther.ai
+  description: >-
+    Open-source AI research collective. Created GPT-NeoX, The Pile, and other
+    open models. Co-founded by Sid Black and Connor Leahy (who later founded Conjecture).
+  lastUpdated: 2026-03
+
+- id: inflection-ai
+  stableId: r1i7cwBiD7
+  type: organization
+  orgType: startup
+  title: Inflection AI
+  website: https://inflection.ai
+  description: >-
+    AI company co-founded by Mustafa Suleyman (DeepMind co-founder). Built
+    Pi chatbot. Most of team joined Microsoft in March 2024.
+  lastUpdated: 2026-03
+
+- id: gray-swan-ai
+  stableId: RFHtSrFaE3
+  type: organization
+  orgType: startup
+  title: Gray Swan AI
+  website: https://grayswan.ai
+  description: >-
+    AI safety startup co-founded by Andy Zou (UC Berkeley). Commercializes
+    AI red-teaming and safety evaluation tools.
+  lastUpdated: 2026-03
+
+- id: ethereum-foundation
+  stableId: eYI7y4bKdq
+  type: organization
+  orgType: generic
+  title: Ethereum Foundation
+  website: https://ethereum.org
+  description: >-
+    Nonprofit supporting the Ethereum ecosystem. Co-founded by Vitalik Buterin,
+    who is a significant funder of AI safety research.
+  lastUpdated: 2026-03
+
+- id: george-mason-university
+  stableId: IAd0DJ2TB3
+  type: organization
+  orgType: academic
+  title: George Mason University
+  website: https://www.gmu.edu
+  description: >-
+    University in Virginia. Home to Robin Hanson and the economics department
+    influential in EA/rationalist circles.
+  lastUpdated: 2026-03
+
+- id: uc-santa-cruz
+  stableId: OKO1q9NQaT
+  type: organization
+  orgType: academic
+  title: UC Santa Cruz
+  website: https://www.ucsc.edu
+  description: >-
+    University of California campus. Home to Anthony Aguirre (FLI co-founder,
+    Metaculus co-founder).
+  lastUpdated: 2026-03
+
+- id: upenn
+  stableId: fwWLWc3zlo
+  type: organization
+  orgType: academic
+  title: University of Pennsylvania
+  website: https://www.upenn.edu
+  description: >-
+    Ivy League university. Home to Philip Tetlock and the Good Judgment Project.
+  lastUpdated: 2026-03
+
+- id: uva
+  stableId: wzvlHe9pOn
+  type: organization
+  orgType: academic
+  title: University of Virginia
+  website: https://www.virginia.edu
+  description: >-
+    University in Charlottesville. Home to Anton Korinek (AI economics).
+  lastUpdated: 2026-03
+
+- id: world-labs
+  stableId: aDZeLVyKXr
+  type: organization
+  orgType: startup
+  title: World Labs
+  website: https://www.worldlabs.ai
+  description: >-
+    Spatial intelligence AI company co-founded by Fei-Fei Li. Raised over
+    \$230M in funding as of 2024.
+  lastUpdated: 2026-03
+
+- id: landing-ai
+  stableId: tLHsRJBa9g
+  type: organization
+  orgType: startup
+  title: Landing AI
+  website: https://landing.ai
+  description: >-
+    AI company founded by Andrew Ng after leaving Baidu. Focuses on
+    computer vision and manufacturing AI.
+  lastUpdated: 2026-03
+
+- id: alameda-research
+  stableId: iY6f25tTSJ
+  type: organization
+  orgType: generic
+  title: Alameda Research
+  description: >-
+    Quantitative trading firm founded by Sam Bankman-Fried in 2017. Collapsed
+    alongside FTX in November 2022.
+  lastUpdated: 2026-03
+
+- id: skype
+  stableId: EV4KoPMRXU
+  type: organization
+  orgType: generic
+  title: Skype
+  description: >-
+    VoIP and messaging platform co-founded by Jaan Tallinn. Acquired by eBay
+    (2005), then Microsoft (2011). Tallinn's wealth from Skype funds AI safety.
+  lastUpdated: 2026-03
+
+- id: trail-of-bits
+  stableId: c1q7QvDw90
+  type: organization
+  orgType: generic
+  title: Trail of Bits
+  website: https://www.trailofbits.com
+  description: >-
+    Security research and consulting firm. AI assurance division led by Heidy
+    Khlaaf. Works on formal verification and safety-critical systems.
+  lastUpdated: 2026-03
+
+- id: craft-ventures
+  stableId: MZVf6KA9Oa
+  type: organization
+  orgType: generic
+  title: Craft Ventures
+  website: https://www.craftventures.com
+  description: >-
+    Venture capital firm co-founded by David Sacks. Invests in AI and crypto.
+  lastUpdated: 2026-03
+
+- id: us-executive-branch
+  stableId: l7Z8a6jAez
+  type: organization
+  orgType: government
+  title: United States Executive Branch
+  website: https://www.whitehouse.gov
+  description: >-
+    Executive branch of the US federal government. Includes the White House,
+    OSTP, and executive agencies. Relevant for AI executive orders and the
+    establishment of the US AI Safety Institute.
+  lastUpdated: 2026-03
+
+- id: california-state-legislature
+  stableId: Zs39rHaxoS
+  type: organization
+  orgType: government
+  title: California State Legislature
+  website: https://www.legislature.ca.gov
+  description: >-
+    Bicameral legislature of California. Source of SB 1047 and other AI
+    regulation bills.
+  lastUpdated: 2026-03
+
+- id: california-governor-office
+  stableId: 2kdYcoKUif
+  type: organization
+  orgType: government
+  title: Office of the Governor of California
+  website: https://www.gov.ca.gov
+  description: >-
+    Executive office of the California governor. Vetoed SB 1047 AI safety
+    bill in September 2024.
+  lastUpdated: 2026-03
+
+- id: european-commission
+  stableId: 3zsTSX6SFK
+  type: organization
+  orgType: government
+  title: European Commission
+  website: https://commission.europa.eu
+  description: >-
+    Executive branch of the European Union. Led the EU AI Act negotiations.
+    Margrethe Vestager served as Executive VP for Competition and Digital.
+  lastUpdated: 2026-03
+
+- id: world-economic-forum
+  stableId: FqdVIQLb-I
+  type: organization
+  orgType: generic
+  title: World Economic Forum
+  website: https://www.weforum.org
+  description: >-
+    International organization founded in 1971 by Klaus Schwab that convenes
+    annual meetings in Davos, Switzerland. Functions as elite coordination
+    infrastructure for global business, political, and academic leaders.
+    Relevant to AI governance as a venue for cross-sector dialogue on
+    technology policy, though criticized for prioritizing networking over
+    institutional accountability.
+  tags:
+    - ai-governance
+    - international-coordination
+  sources:
+    - title: World Economic Forum
+      url: https://www.weforum.org/
+    - title: World Economic Forum - Wikipedia
+      url: https://en.wikipedia.org/wiki/World_Economic_Forum
+  lastUpdated: 2026-03
+
+- id: financial-stability-board
+  stableId: McCoYr5xR5
+  type: organization
+  orgType: generic
+  title: Financial Stability Board
+  website: https://www.fsb.org
+  description: >-
+    International body established in 2009 (successor to the Financial
+    Stability Forum) that monitors and makes recommendations about the global
+    financial system. Hosted by the Bank for International Settlements in
+    Basel. Cited as a model for AI governance coordination due to its
+    combination of technical staff, shared methodologies, genuine enforcement
+    through regulatory equivalence, and standing institutional structure
+    connecting central bankers across jurisdictions.
+  tags:
+    - international-coordination
+    - systemic-risk
+  sources:
+    - title: Financial Stability Board
+      url: https://www.fsb.org/
+    - title: Financial Stability Board - Wikipedia
+      url: https://en.wikipedia.org/wiki/Financial_Stability_Board
+  lastUpdated: 2026-03
+
+- id: christianity-today
+  stableId: 19tcfkelEF
+  type: organization
+  orgType: generic
+  title: Christianity Today
+  website: https://www.christianitytoday.com
+  description: >-
+    American evangelical Christian media company founded in 1956 by Billy
+    Graham. Under editor-in-chief Russell Moore (formerly of the Southern
+    Baptist Convention), it has become a prominent platform for opposing
+    Christian nationalism from within the evangelical tradition.
+  tags:
+    - media
+  sources:
+    - title: Christianity Today
+      url: https://www.christianitytoday.com/
+    - title: Christianity Today - Wikipedia
+      url: https://en.wikipedia.org/wiki/Christianity_Today
+  lastUpdated: 2026-03
+
+- id: world-vision
+  stableId: iFu20pvEsh
+  type: organization
+  orgType: generic
+  title: World Vision
+  website: https://www.worldvision.org
+  description: >-
+    International evangelical Christian humanitarian aid, development, and
+    advocacy organization founded in 1950. One of the largest
+    relief-and-development NGOs globally, operating in nearly 100 countries.
+  tags:
+    - humanitarian
+  sources:
+    - title: World Vision International
+      url: https://www.worldvision.org/
+    - title: World Vision International - Wikipedia
+      url: https://en.wikipedia.org/wiki/World_Vision_International
+  lastUpdated: 2026-03

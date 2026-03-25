@@ -2476,3 +2476,17 @@
   clusters:
     - ai-safety
   lastUpdated: 2026-02
+
+- id: political-stability-as-an-ai-safety-factor
+  stableId: n4BRluIqnw
+  wikiId: E2067
+  type: analysis
+  title: Political Stability as an AI Safety Factor
+  description: >-
+    Analysis of the bidirectional relationship between political stability
+    and AI safety: political instability degrades AI governance capacity,
+    while AI capabilities amplify political instability.
+  tags:
+    - ai-governance
+    - political-stability
+  lastUpdated: 2026-03

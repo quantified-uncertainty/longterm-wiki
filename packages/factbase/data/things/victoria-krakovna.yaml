@@ -1,18 +1,11 @@
 entity: utxQdymSEg
 facts:
-  - id: f_L8SLq90qgA
-    property: role
-    value: "Research Scientist"
-
-  - id: f_13qgbQWHbA
-    property: notable-for
+  - id: "f_13qgbQWHbA"
+    property: "notable-for"
     value: "Research scientist at Google DeepMind working on AI safety; co-founder of the Future of Life Institute"
-
-  - id: f_Cv8z8DxCsw
-    property: education
+  - id: "f_Cv8z8DxCsw"
+    property: "education"
     value: "PhD in Statistics and Machine Learning, Harvard University"
-
-  - id: f_YV9KvdNUQg
-    property: website
+  - id: "f_YV9KvdNUQg"
+    property: "website"
     value: "https://vkrakovna.wordpress.com"
-

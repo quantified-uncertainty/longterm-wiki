@@ -1,26 +1,5 @@
 entity: 5N5UqXNkkg
 facts:
-  - id: f_CQptGEFesw
-    property: employed-by
-    value: !ref A4XoubikkQ
-    asOf: 2013-03
-    validEnd: 2023-05
-    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-    notes: "VP and Engineering Fellow at Google; resigned May 2023 to speak freely about AI risks"
-
-  - id: f_dIsk3jBSrg
-    property: role
-    value: "VP and Engineering Fellow"
-    asOf: 2013-03
-    validEnd: 2023-05
-    source: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-
-  - id: f_l7LgM4CmFg
-    property: role
-    value: "Professor Emeritus"
-    asOf: "2023"
-    notes: "University of Toronto; professor emeritus of computer science"
-
   - id: f_xrorsSWSXw
     property: born-year
     value: 1947
@@ -54,16 +33,3 @@ facts:
     property: website
     value: "https://www.cs.toronto.edu/~hinton/"
 
-  - id: f_lpaINqQFBw
-    property: role
-    value: "Professor of Computer Science"
-    asOf: "1987"
-    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
-    notes: "University of Toronto; University Professor (highest rank); professor emeritus since retirement in 2023"
-
-  - id: f_fQhNdXYo9w
-    property: employed-by
-    value: !ref G4vgO5B8oA
-    asOf: "1987"
-    source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
-    notes: "Joined University of Toronto in 1987; held joint position with Google from 2013"

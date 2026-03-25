@@ -1,28 +1,5 @@
 entity: vzxfzxBITd
 facts:
-  - id: f_rPQmiVa1LH
-    property: employed-by
-    value: !ref 1LcLlMGLbw
-    asOf: 2017-01
-    validEnd: 2021-10
-    source: https://paulfchristiano.com/
-    notes: "Researcher at OpenAI from 2017 to 2021; led alignment research including
-      RLHF work"
-
-  - id: f_qPXcXJF3Uv
-    property: employed-by
-    value: !ref QsXVXtQ0zE
-    asOf: 2021-10
-    source: https://alignment.org/
-    notes: "Founded Alignment Research Center (ARC) in 2021; stepped back from
-      day-to-day operations in 2023 due to a brain injury"
-
-  - id: f_rvwYSk7eFi
-    property: role
-    value: "Founder, Alignment Research Center"
-    asOf: 2021-10
-    source: https://alignment.org/
-
   - id: f_ZmXlEP6Y6H
     property: born-year
     value: 1992
@@ -58,21 +35,6 @@ facts:
     property: google-scholar
     value: "https://scholar.google.com/citations?user=6gHkYDgAAAAJ"
 
-  - id: f_DRwx53YvWw
-    property: role
-    value: "Head of AI Safety, US AI Safety Institute"
-    asOf: 2024-08
-    source: https://www.nist.gov/people/paul-christiano
-    notes: "Publicly announced as Head of AI Safety at the U.S. AI Safety Institute
-      (under NIST) in August 2024"
-
-  - id: f_He1SsMRfAw
-    property: employed-by
-    value: !ref fYyAxYlHDQ
-    asOf: 2024-08
-    source: https://www.nist.gov/people/paul-christiano
-    notes: "Stepped back from day-to-day ARC operations in 2023 after a brain
-      injury; joined US AISI in August 2024"
   - id: X0XbB0w92w
     property: website
     value: https://paulfchristiano.com/

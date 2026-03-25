@@ -1,21 +1,5 @@
 entity: Jtj6jHbuQ7
 facts:
-  - id: f_KHaU3bGPmQ
-    property: employed-by
-    value: !ref xakL6BzSla
-    asOf: 2008-01
-    source: https://asana.com/company
-    notes: "Co-founded Asana in 2008 with Justin Rosenstein; serves as CEO"
-
-  - id: f_EUADNVkvmr
-    property: role
-    value: "Board Chair, Asana; Co-founder, Good Ventures / Coefficient Giving"
-    asOf: 2025-07
-    source: https://coefficientgiving.org/
-    notes: "Co-founded Facebook in 2004; was CEO of Asana until July 2025 when he became
-      Board Chair; with wife Cari Tuna, funds Coefficient Giving (formerly Open Philanthropy)
-      and Good Ventures"
-
   - id: f_8PBld3Shsv
     property: born-year
     value: 1984

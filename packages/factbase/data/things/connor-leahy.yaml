@@ -1,20 +1,5 @@
 entity: CrXoCsIucX
 facts:
-  - id: f_6RTYYOtNHd
-    property: employed-by
-    value: !ref 0u4J70VqFY
-    asOf: 2022-03
-    source: https://www.conjecture.dev/
-    notes: "Co-founded Conjecture in 2022; previously co-founded EleutherAI"
-
-  - id: f_cflb799S8T
-    property: role
-    value: "CEO & Co-founder, Conjecture"
-    asOf: 2022-03
-    source: https://www.conjecture.dev/
-    notes: "Prominent public advocate for AI safety; testified before UK Parliament
-      and EU; frequent media commentator"
-
   - id: f_2HGntp6Jt1
     property: born-year
     value: 1998
@@ -31,14 +16,6 @@ facts:
     value: "@NPCollapse"
     source: https://x.com/NPCollapse
 
-  - id: f_cL7kL8mN9o
-    property: role
-    value: "Co-founder"
-    asOf: "2020"
-    validEnd: "2022"
-    source: https://www.eleuther.ai/
-    notes: "Co-founded EleutherAI, an open-source AI research collective; developed
-      GPT-NeoX and GPT-J"
   - id: V5EttM7ikA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Connor_Leahy

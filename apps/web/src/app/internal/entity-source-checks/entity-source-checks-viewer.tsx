@@ -20,11 +20,13 @@ import {
   ExternalLink,
   RotateCcw,
   ArrowUpRight,
+  AlertTriangle,
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
+import { getRecordHref } from "@/app/source-checks/source-checks-shared";
 
-// ── Types ──────────────────────────────────────────────────────────────────
+// -- Types --
 
 interface VerdictRow {
   recordType: string;
@@ -57,6 +59,7 @@ interface EvidenceRow {
   confidence: number | null;
   isPrimarySource: boolean;
   checkerModel: string | null;
+  isStale: boolean;
   notes: string | null;
   checkedAt: string | null;
 }
@@ -91,7 +94,7 @@ function VerdictBadge({ verdict }: { verdict: string }) {
   );
 }
 
-// ── Columns ────────────────────────────────────────────────────────────────
+// -- Columns --
 
 function expandToggleColumn(): ColumnDef<VerdictRow> {
   return {
@@ -154,38 +157,22 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
       cell: ({ row }) => {
         const resolvedName = names[row.original.recordId];
         const recordId = row.original.recordId;
-        // For facts, link to the factbase page
-        const isFact = row.original.recordType === "fact";
-        const factHref = isFact ? `/factbase/fact/${recordId}` : null;
+        const recordHref = getRecordHref(row.original.recordType, recordId);
 
-        if (resolvedName) {
-          const display = resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName;
-          if (factHref) {
-            return (
-              <a href={factHref} className="text-xs font-medium text-blue-600 hover:underline dark:text-blue-400" title={resolvedName}>
-                {display}
-              </a>
-            );
-          }
+        const display = resolvedName
+          ? (resolvedName.length > 30 ? resolvedName.slice(0, 28) + "…" : resolvedName)
+          : (recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId);
+
+        if (recordHref) {
           return (
-            <span className="text-xs font-medium" title={`${resolvedName} (${recordId})`}>
+            <a href={recordHref} className={cn("text-xs hover:underline", resolvedName ? "font-medium text-blue-600 dark:text-blue-400" : "font-mono text-blue-600/70 dark:text-blue-400/70")} title={resolvedName || recordId}>
               {display}
-            </span>
-          );
-        }
-
-        // Fallback: show raw ID, linked for facts
-        const idDisplay = recordId.length > 15 ? recordId.slice(0, 12) + "…" : recordId;
-        if (factHref) {
-          return (
-            <a href={factHref} className="text-xs font-mono text-blue-600/70 hover:underline dark:text-blue-400/70" title={recordId}>
-              {idDisplay}
             </a>
           );
         }
         return (
-          <span className="text-xs font-mono text-muted-foreground" title={recordId}>
-            {idDisplay}
+          <span className={cn("text-xs", resolvedName ? "font-medium" : "font-mono text-muted-foreground")} title={resolvedName || recordId}>
+            {display}
           </span>
         );
       },
@@ -249,9 +236,66 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
   ];
 }
 
-// ── Expanded evidence detail ───────────────────────────────────────────────
+// -- Expanded evidence detail (grouped by source URL) --
 
-type DetailCache = Record<string, { status: "loading" | "error" | "loaded"; data?: { evidence: EvidenceRow[] }; error?: string }>;
+type DetailCache = Record<string, { status: "loading" | "error" | "loaded"; data?: { evidence: EvidenceRow[]; currentCheckerModel?: string }; error?: string }>;
+
+/** Group evidence rows by sourceUrl for display. */
+function groupBySourceUrl(evidence: EvidenceRow[]): Map<string, EvidenceRow[]> {
+  const groups = new Map<string, EvidenceRow[]>();
+  for (const e of evidence) {
+    const key = e.sourceUrl || "(no source URL)";
+    const existing = groups.get(key);
+    if (existing) {
+      existing.push(e);
+    } else {
+      groups.set(key, [e]);
+    }
+  }
+  return groups;
+}
+
+function EvidenceTable({ evidence }: { evidence: EvidenceRow[] }) {
+  return (
+    <table className="w-full text-xs">
+      <thead>
+        <tr className="border-b border-border/40 text-left text-muted-foreground">
+          <th className="py-1.5 pr-3 font-medium">Verdict</th>
+          <th className="py-1.5 pr-3 font-medium">Confidence</th>
+          <th className="py-1.5 pr-3 font-medium">Expected</th>
+          <th className="py-1.5 pr-3 font-medium">Found</th>
+          <th className="py-1.5 pr-3 font-medium">Model</th>
+          <th className="py-1.5 font-medium">Checked</th>
+        </tr>
+      </thead>
+      <tbody>
+        {evidence.map((e) => (
+          <tr key={e.id} className={cn("border-b border-border/20 last:border-0", e.isStale && "opacity-60")}>
+            <td className="py-1.5 pr-3"><VerdictBadge verdict={e.verdict} /></td>
+            <td className="py-1.5 pr-3 tabular-nums">{e.confidence != null ? `${Math.round(e.confidence * 100)}%` : "-"}</td>
+            <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.expectedValue ?? undefined}>
+              {e.expectedValue || "-"}
+            </td>
+            <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.extractedValue ?? undefined}>
+              {e.extractedValue || "-"}
+            </td>
+            <td className="py-1.5 pr-3">
+              <span className={cn("text-muted-foreground", e.isStale && "text-amber-500")}>
+                {e.checkerModel || "-"}
+                {e.isStale && (
+                  <span title="Stale: checked with an outdated model"><AlertTriangle className="inline h-3 w-3 ml-1 text-amber-500" /></span>
+                )}
+              </span>
+            </td>
+            <td className="py-1.5 tabular-nums text-muted-foreground">
+              {e.checkedAt ? new Date(e.checkedAt).toLocaleDateString() : "-"}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
 function ExpandedDetail({
   recordType,
@@ -296,58 +340,53 @@ function ExpandedDetail({
     return <div className="px-6 py-4 text-sm text-muted-foreground">No evidence records found.</div>;
   }
 
+  const staleCount = evidence.filter((e) => e.isStale).length;
+  const grouped = groupBySourceUrl(evidence);
+
   return (
     <div className="px-6 py-4 bg-muted/30">
-      <div className="text-xs font-semibold text-muted-foreground mb-2">
-        Evidence ({evidence.length} source{evidence.length !== 1 ? "s" : ""})
+      <div className="flex items-center gap-3 mb-3">
+        <div className="text-xs font-semibold text-muted-foreground">
+          Evidence ({evidence.length} check{evidence.length !== 1 ? "s" : ""} across {grouped.size} source{grouped.size !== 1 ? "s" : ""})
+        </div>
+        {staleCount > 0 && (
+          <div className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">
+            <AlertTriangle className="h-3 w-3" />
+            {staleCount} stale
+          </div>
+        )}
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs">
-          <thead>
-            <tr className="border-b border-border/40 text-left text-muted-foreground">
-              <th className="py-1.5 pr-3 font-medium">Source</th>
-              <th className="py-1.5 pr-3 font-medium">Verdict</th>
-              <th className="py-1.5 pr-3 font-medium">Confidence</th>
-              <th className="py-1.5 pr-3 font-medium">Expected</th>
-              <th className="py-1.5 pr-3 font-medium">Found</th>
-              <th className="py-1.5 pr-3 font-medium">Model</th>
-              <th className="py-1.5 font-medium">Checked</th>
-            </tr>
-          </thead>
-          <tbody>
-            {evidence.map((e) => (
-              <tr key={e.id} className="border-b border-border/20 last:border-0">
-                <td className="py-1.5 pr-3 max-w-[200px]">
-                  {e.sourceUrl ? (
-                    <a href={e.sourceUrl} target="_blank" rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400">
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      <span className="truncate">{(() => { try { return new URL(e.sourceUrl).hostname; } catch { return e.sourceUrl; } })()}</span>
-                    </a>
-                  ) : <span className="text-muted-foreground">-</span>}
-                </td>
-                <td className="py-1.5 pr-3"><VerdictBadge verdict={e.verdict} /></td>
-                <td className="py-1.5 pr-3 tabular-nums">{e.confidence != null ? `${Math.round(e.confidence * 100)}%` : "-"}</td>
-                <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.expectedValue ?? undefined}>
-                  {e.expectedValue || "-"}
-                </td>
-                <td className="py-1.5 pr-3 max-w-[150px] truncate" title={e.extractedValue ?? undefined}>
-                  {e.extractedValue || "-"}
-                </td>
-                <td className="py-1.5 pr-3 text-muted-foreground">{e.checkerModel || "-"}</td>
-                <td className="py-1.5 tabular-nums text-muted-foreground">
-                  {e.checkedAt ? new Date(e.checkedAt).toLocaleDateString() : "-"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <div className="space-y-4">
+        {[...grouped.entries()].map(([sourceUrl, items]) => (
+          <div key={sourceUrl} className="rounded-md border border-border/40 overflow-hidden">
+            {/* Source URL header */}
+            <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-b border-border/30">
+              {sourceUrl !== "(no source URL)" ? (
+                <a href={sourceUrl} target="_blank" rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400 min-w-0">
+                  <ExternalLink className="h-3 w-3 shrink-0" />
+                  <span className="truncate">{(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}</span>
+                </a>
+              ) : (
+                <span className="text-xs text-muted-foreground italic">{sourceUrl}</span>
+              )}
+              <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
+                {items.length} check{items.length !== 1 ? "s" : ""}
+              </span>
+            </div>
+            {/* Evidence rows for this source */}
+            <div className="overflow-x-auto px-3 py-1">
+              <EvidenceTable evidence={items} />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
 }
 
-// ── Name resolution ──────────────────────────────────────────────────────
+// -- Name resolution --
 
 type NameMap = Record<string, string>;
 type HrefMap = Record<string, string>;
@@ -417,7 +456,7 @@ async function resolveNames(
   return { names, hrefs };
 }
 
-// ── Main viewer ────────────────────────────────────────────────────────────
+// -- Main viewer --
 
 interface CoverageRow {
   recordType: string;
@@ -714,7 +753,7 @@ export function EntitySourceChecksViewer() {
       {pageCount > 1 && (
         <div className="flex items-center justify-between px-1 mt-4">
           <span className="text-sm text-muted-foreground">
-            Showing {rangeStart}–{rangeEnd} of {filteredCount}
+            Showing {rangeStart}--{rangeEnd} of {filteredCount}
           </span>
           <div className="flex items-center gap-1">
             <button onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}
@@ -732,7 +771,7 @@ export function EntitySourceChecksViewer() {
 
       <p className="text-xs text-muted-foreground mt-4">
         Data from <code className="text-[11px]">source_check_verdicts</code> table.
-        Click a row to expand and see per-source evidence.
+        Click a row to expand and see per-source evidence grouped by URL.
       </p>
     </div>
   );

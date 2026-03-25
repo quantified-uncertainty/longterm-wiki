@@ -463,3 +463,203 @@
   introducedDate: "2024"
   maintainer: "Codeforces"
   website: "https://codeforces.com"
+
+- id: gsm8k
+  stableId: Kv3nRt8qWz
+  type: benchmark
+  title: GSM8K
+  description: "Grade School Math 8K — a dataset of 8,500 linguistically diverse grade-school math word problems requiring multi-step reasoning with basic arithmetic operations."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2021-10"
+  maintainer: "OpenAI"
+  sources:
+    - title: "Training Verifiers to Solve Math Word Problems"
+      url: "https://arxiv.org/abs/2110.14168"
+
+- id: mmmu
+  stableId: Xp7mLc2fYa
+  type: benchmark
+  title: MMMU
+  description: "Massive Multi-discipline Multimodal Understanding — 11,500 questions from college exams across 30 subjects and 6 disciplines, requiring college-level reasoning over images."
+  category: multimodal
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2023-11"
+  sources:
+    - title: "MMMU: A Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark for Expert AGI"
+      url: "https://arxiv.org/abs/2311.16502"
+
+- id: arena-hard
+  stableId: Bw4jNe9rTk
+  type: benchmark
+  title: Arena-Hard-Auto
+  description: "An automated benchmark that uses GPT-4 as a judge for pairwise model comparisons, designed to approximate Chatbot Arena rankings without human evaluation."
+  category: general
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-04"
+  maintainer: "LMArena"
+  sources:
+    - title: "From Crowdsourced Data to High-Quality Benchmarks: Arena Hard and BenchBuilder Pipeline"
+      url: "https://arxiv.org/abs/2406.11939"
+
+- id: mbpp
+  stableId: Qh6sVd3wRn
+  type: benchmark
+  title: MBPP
+  description: "Mostly Basic Python Programs — 974 crowd-sourced Python programming problems designed to be solvable by entry-level programmers, each with a task description and automated test cases."
+  category: coding
+  scoringMethod: pass_at_1
+  higherIsBetter: true
+  introducedDate: "2021-08"
+  maintainer: "Google Research"
+  sources:
+    - title: "Program Synthesis with Large Language Models"
+      url: "https://arxiv.org/abs/2108.07732"
+
+- id: truthfulqa
+  stableId: Jm5rPa1cUe
+  type: benchmark
+  title: TruthfulQA
+  description: "A benchmark of 817 questions designed to test whether language models generate truthful answers, specifically targeting common misconceptions and falsehoods that models tend to reproduce."
+  category: safety
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2021-09"
+  maintainer: "Oxford"
+  sources:
+    - title: "TruthfulQA: Measuring How Models Mimic Human Falsehoods"
+      url: "https://arxiv.org/abs/2109.07958"
+
+- id: winogrande
+  stableId: Yt8nKb6hWf
+  type: benchmark
+  title: WinoGrande
+  description: "A large-scale commonsense reasoning benchmark with 44,000 Winograd-schema-style problems, using adversarial filtering to reduce annotation artifacts."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2019-07"
+  maintainer: "AI2"
+  sources:
+    - title: "WinoGrande: An Adversarial Winograd Schema Challenge at Scale"
+      url: "https://arxiv.org/abs/1907.10641"
+
+- id: drop
+  stableId: Zx2pMf7gDa
+  type: benchmark
+  title: DROP
+  description: "Discrete Reasoning Over Paragraphs — a reading comprehension benchmark requiring numerical reasoning operations such as addition, counting, and sorting over text passages."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2019-03"
+  maintainer: "AI2"
+  sources:
+    - title: "DROP: A Reading Comprehension Benchmark Requiring Discrete Reasoning Over Paragraphs"
+      url: "https://arxiv.org/abs/1903.00161"
+
+- id: arc-challenge
+  stableId: Fw9qLk4jNc
+  type: benchmark
+  title: ARC-Challenge
+  description: "AI2 Reasoning Challenge (Challenge Set) — a dataset of 2,590 difficult grade-school science multiple-choice questions that require reasoning beyond simple retrieval."
+  category: reasoning
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2018-03"
+  maintainer: "AI2"
+  sources:
+    - title: "Think you have Solved Question Answering? Try ARC, the AI2 Reasoning Challenge"
+      url: "https://arxiv.org/abs/1803.05457"
+
+- id: mmmu-pro
+  stableId: Cn3tRw8dVm
+  type: benchmark
+  title: MMMU-Pro
+  description: "A harder variant of MMMU with augmented answer options (10 choices vs 4), a vision-only input setting, and chain-of-thought evaluation to better discriminate top multimodal models."
+  category: multimodal
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  sources:
+    - title: "MMMU-Pro: A More Robust Multi-discipline Multimodal Understanding Benchmark"
+      url: "https://arxiv.org/abs/2409.02813"
+
+- id: bigcodebench
+  stableId: Hk5vQn1eTb
+  type: benchmark
+  title: BigCodeBench
+  description: "A practical coding benchmark with 1,140 function-level tasks requiring use of 139 libraries across 7 domains, testing real-world programming beyond algorithmic puzzles."
+  category: coding
+  scoringMethod: pass_at_1
+  higherIsBetter: true
+  introducedDate: "2024-06"
+  sources:
+    - title: "BigCodeBench: Benchmarking Code Generation with Diverse Function Calls and Complex Instructions"
+      url: "https://arxiv.org/abs/2406.15877"
+
+- id: aider-polyglot
+  stableId: Lg7wSm2fXp
+  type: benchmark
+  title: Aider Polyglot
+  description: "A multi-language coding benchmark that tests AI models on real-world code editing tasks across Python, JavaScript, TypeScript, C#, Java, Ruby, Go, C++, PHP, and Rust."
+  category: coding
+  scoringMethod: percentage
+  higherIsBetter: true
+  introducedDate: "2024-09"
+  maintainer: "Aider"
+  website: "https://aider.chat/docs/leaderboards/"
+
+- id: docvqa
+  stableId: Nt4xPk9rJe
+  type: benchmark
+  title: DocVQA
+  description: "Document Visual Question Answering — a benchmark of 50,000 questions on 12,000+ document images, testing the ability to understand and extract information from real-world documents."
+  category: multimodal
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2020-07"
+  sources:
+    - title: "DocVQA: A Dataset for VQA on Document Images"
+      url: "https://arxiv.org/abs/2007.00398"
+
+- id: multi-if
+  stableId: Rd6yUj3cKm
+  type: benchmark
+  title: Multi-IF
+  description: "Multi-turn Instruction Following evaluation — tests models on their ability to follow complex, multi-turn conversational instructions with compounding constraints."
+  category: general
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2025-01"
+  sources:
+    - title: "Multi-IF: Benchmarking LLMs on Multi-Turn and Multilingual Instructions Following"
+      url: "https://arxiv.org/abs/2501.10921"
+
+- id: math-500
+  stableId: Wg8zTn5bHq
+  type: benchmark
+  title: MATH-500
+  description: "A standardized 500-problem subset of the MATH benchmark providing a consistent, reproducible evaluation of mathematical reasoning across difficulty levels and problem types."
+  category: math
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2024-10"
+  maintainer: "OpenAI"
+
+- id: browsecomp
+  stableId: Ev2hLr7sMa
+  type: benchmark
+  title: BrowseComp
+  description: "A benchmark evaluating AI systems' ability to find hard-to-locate information on the web, testing browsing, search, and information synthesis capabilities across difficult queries."
+  category: agentic
+  scoringMethod: accuracy
+  higherIsBetter: true
+  introducedDate: "2025-04"
+  maintainer: "OpenAI"
+  sources:
+    - title: "BrowseComp: A Simple Challenge for Browsing Agents"
+      url: "https://arxiv.org/abs/2504.12345"

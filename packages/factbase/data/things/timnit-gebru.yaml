@@ -1,27 +1,19 @@
 entity: xVdjAKxCSQ
 facts:
-  - id: f_M0qzQXcHlg
-    property: role
-    value: "Founder and Executive Director"
-
-  - id: f_uTUXxLBdtA
-    property: born-year
+  - id: "f_uTUXxLBdtA"
+    property: "born-year"
     value: 1983
-
-  - id: f_3NUOYZSdQw
-    property: notable-for
-    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI
-      team; AI ethics and fairness researcher"
-
-  - id: f_hfbDHNUaWg
-    property: education
+  - id: "f_3NUOYZSdQw"
+    property: "notable-for"
+    value: "Founder of the DAIR Institute; former co-lead of Google's Ethical AI team; AI ethics and fairness researcher"
+  - id: "f_hfbDHNUaWg"
+    property: "education"
     value: "PhD in Computer Science, Stanford University"
-
-  - id: f_seF7GHtJYg
-    property: wikipedia-url
+  - id: "f_seF7GHtJYg"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Timnit_Gebru"
-  - id: UaVuC5M83A
-    property: website
-    value: https://ai.stanford.edu/~tgebru/
-    source: https://www.wikidata.org/wiki/Q59753117
-    notes: From Wikidata Q59753117
+  - id: "UaVuC5M83A"
+    property: "website"
+    value: "https://ai.stanford.edu/~tgebru/"
+    source: "https://www.wikidata.org/wiki/Q59753117"
+    notes: "From Wikidata Q59753117"

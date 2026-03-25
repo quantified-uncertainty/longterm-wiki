@@ -9,17 +9,6 @@ facts:
       the Future of Humanity Institute at Oxford.
     asOf: !date 2026-03
 
-  - id: f_OG2emplyd1
-    property: employed-by
-    value: !ref Khej79OA8g
-    asOf: !date 2026-03
-    notes: Founder and Executive Director of QURI since 2019
-
-  - id: f_OG3role001
-    property: role
-    value: "Founder & Executive Director"
-    asOf: !date 2026-03
-
   - id: f_OG4educa01
     property: education
     value: "Harvey Mudd College"

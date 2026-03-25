@@ -709,6 +709,9 @@
     - name: Artificial Analysis Intelligence Index
       score: 70
       unit: points
+    - name: GPQA Diamond
+      score: 87.0
+      unit: "%"
   capabilities:
     - tool-use
     - extended-thinking
@@ -761,6 +764,12 @@
     - name: OSWorld
       score: 72.7
       unit: "%"
+    - name: GPQA Diamond
+      score: 91.3
+      unit: "%"
+    - name: SWE-bench Verified
+      score: 80.8
+      unit: "%"
   capabilities:
     - tool-use
     - extended-thinking
@@ -810,6 +819,9 @@
   benchmarks:
     - name: SWE-bench Verified
       score: 79.6
+      unit: "%"
+    - name: GPQA Diamond
+      score: 74.1
       unit: "%"
   capabilities:
     - tool-use
@@ -1451,6 +1463,9 @@
     - name: "Humanity's Last Exam"
       score: 19.8
       unit: "%"
+    - name: Codeforces Rating
+      score: 2706
+      unit: elo
   capabilities:
     - reasoning
     - tool-use
@@ -1666,6 +1681,12 @@
       unit: "%"
     - name: IFEval
       score: 91.7
+      unit: "%"
+    - name: Codeforces Rating
+      score: 2719
+      unit: elo
+    - name: AIME 2025
+      score: 92.6
       unit: "%"
   capabilities:
     - reasoning
@@ -2052,6 +2073,9 @@
     - name: MGSM
       score: 92.2
       unit: "%"
+    - name: MMMU
+      score: 81.7
+      unit: "%"
   capabilities:
     - reasoning
     - tool-use
@@ -2114,6 +2138,12 @@
       unit: "%"
     - name: MMLU
       score: 86.6
+      unit: "%"
+    - name: MATH
+      score: 93.4
+      unit: "%"
+    - name: MMLU-Pro
+      score: 76.0
       unit: "%"
   capabilities:
     - reasoning
@@ -2324,6 +2354,9 @@
     - name: MGSM
       score: 91.6
       unit: "%"
+    - name: GSM8K
+      score: 96.8
+      unit: "%"
   capabilities:
     - tool-use
   description: >-
@@ -2377,6 +2410,9 @@
     - name: HumanEval
       score: 88.4
       unit: "%"
+    - name: MMLU-Pro
+      score: 68.9
+      unit: "%"
   capabilities:
     - tool-use
   description: >-
@@ -2417,6 +2453,21 @@
   benchmarks:
     - name: MMLU
       score: 89.3
+      unit: "%"
+    - name: MMLU-Pro
+      score: 74.3
+      unit: "%"
+    - name: GPQA Diamond
+      score: 57.2
+      unit: "%"
+    - name: MMMU
+      score: 69.4
+      unit: "%"
+    - name: LiveCodeBench
+      score: 32.8
+      unit: "%"
+    - name: DocVQA
+      score: 94.4
       unit: "%"
   capabilities:
     - tool-use
@@ -2463,6 +2514,21 @@
   benchmarks:
     - name: MMLU
       score: 92.2
+      unit: "%"
+    - name: MMLU-Pro
+      score: 80.5
+      unit: "%"
+    - name: GPQA Diamond
+      score: 69.8
+      unit: "%"
+    - name: MMMU
+      score: 73.4
+      unit: "%"
+    - name: LiveCodeBench
+      score: 43.4
+      unit: "%"
+    - name: DocVQA
+      score: 94.4
       unit: "%"
   capabilities:
     - tool-use
@@ -2756,6 +2822,18 @@
     - name: SWE-bench Verified
       score: 53.2
       unit: "%"
+    - name: AIME 2025
+      score: 93.3
+      unit: "%"
+    - name: LiveCodeBench
+      score: 79.4
+      unit: "%"
+    - name: MMLU-Pro
+      score: 79.9
+      unit: "%"
+    - name: Chatbot Arena Elo
+      score: 1402
+      unit: elo
   capabilities:
     - reasoning
     - tool-use
@@ -2870,6 +2948,9 @@
     - name: Codeforces Rating
       score: 1759
       unit: elo
+    - name: GSM8K
+      score: 89.3
+      unit: "%"
   capabilities:
     - tool-use
   description: >-
@@ -2947,6 +3028,9 @@
       unit: "%"
     - name: "Humanity's Last Exam"
       score: 8.6
+      unit: "%"
+    - name: DROP
+      score: 92.2
       unit: "%"
   capabilities:
     - reasoning
