@@ -4031,3 +4031,2508 @@
     - title: Ben Horowitz - Wikipedia
       url: https://en.wikipedia.org/wiki/Ben_Horowitz
   lastUpdated: 2026-03
+
+- id: allison-duettmann
+  stableId: BvtUK0yEDv
+  type: person
+  title: Allison Duettmann
+  description: >-
+    President and CEO of Foresight Institute. Directs AI safety grants,
+    longevity biotechnology, molecular nanotechnology, and neurotechnology
+    programs. Co-authored AGI coordination white paper (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: President & CEO, Foresight Institute
+  tags:
+    - ai-safety
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: christine-peterson
+  stableId: xhHJeAYzUm
+  type: person
+  title: Christine Peterson
+  description: >-
+    Co-founder and Projects Director of Foresight Institute. Nanotechnology
+    advocate credited with coining the term "open-source software" in its
+    modern software community sense (1998).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Projects Director, Foresight Institute
+    - label: Known For
+      value: Coined "open-source software" term (1998)
+  tags:
+    - nanotechnology
+    - open-source
+  lastUpdated: 2026-03
+
+- id: k-eric-drexler
+  stableId: jExOzigU4B
+  type: person
+  title: K. Eric Drexler
+  description: >-
+    Co-founder of Foresight Institute. Pioneer in nanotechnology and
+    molecular manufacturing. Author of foundational works on molecular
+    machine systems.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Foresight Institute
+    - label: Known For
+      value: Nanotechnology pioneer, molecular manufacturing
+  tags:
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: james-c-bennett
+  stableId: 8Mk8-7uSm6
+  type: person
+  title: James C. Bennett
+  description: >-
+    Co-founder and Director of Foresight Institute. Co-founder of commercial
+    space launch companies and consultant in space and technology.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Co-founder, Director, Foresight Institute
+  tags:
+    - space
+    - nanotechnology
+  lastUpdated: 2026-03
+
+- id: brandon-goldman
+  stableId: 04ESS5IDzn
+  type: person
+  title: Brandon Goldman
+  description: >-
+    Treasurer of Foresight Institute. Investor focused on AI safety and
+    existential risk.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Treasurer, Foresight Institute
+  tags:
+    - ai-safety
+  lastUpdated: 2026-03
+
+- id: sonia-arrison
+  stableId: JkPfxLKrTR
+  type: person
+  title: Sonia Arrison
+  description: >-
+    Director of Foresight Institute. Author of '100 Plus'. Founder of 100
+    Plus Capital. Board member at Thiel Foundation.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Director, Foresight Institute
+    - label: Known For
+      value: Author of '100 Plus', 100 Plus Capital founder
+  tags:
+    - longevity
+  lastUpdated: 2026-03
+
+- id: chip-morningstar
+  stableId: uPDPgwTvaz
+  type: person
+  title: Chip Morningstar
+  description: >-
+    Director of Foresight Institute. Software architect focused on online
+    entertainment and communication.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Director, Foresight Institute
+  lastUpdated: 2026-03
+
+- id: peter-diamandis
+  stableId: tVhfitccVu
+  type: person
+  title: Peter Diamandis
+  description: >-
+    Advisor to Foresight Institute. Founder of X-Prize Foundation. Chaired
+    Feynman Grand Prize committee (2004). Entrepreneur and author focused
+    on exponential technologies.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Advisor, Foresight Institute
+    - label: Known For
+      value: X-Prize Foundation founder
+  tags:
+    - technology
+  lastUpdated: 2026-03
+
+- id: michael-skuhersky
+  stableId: WF63mO4uXf
+  type: person
+  title: Michael Skuhersky
+  description: >-
+    Researcher in synthetic neurobiology and mind uploading at MIT Media Lab. Foresight Fellow (2017).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2017)
+    - label: Research Area
+      value: Synthetic neurobiology / mind uploading
+  tags: [neuroscience, nanotechnology]
+  lastUpdated: 2026-03
+
+- id: berhane-temelso
+  stableId: E4_x-Cc9Nb
+  type: person
+  title: Berhane Temelso
+  description: >-
+    Computational chemist at Furman University. Foresight Fellow (2017).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2017)
+    - label: Research Area
+      value: Computational chemistry
+  tags: [chemistry]
+  lastUpdated: 2026-03
+
+- id: christopher-wilmer
+  stableId: gc2ul9ESdY
+  type: person
+  title: Christopher Wilmer
+  description: >-
+    Chemical engineering researcher focused on molecular machines at University of Pittsburgh. Foresight Fellow (2017).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2017)
+    - label: Research Area
+      value: Chemical engineering / molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: chuyang-cheng
+  stableId: 0NB15aKxPM
+  type: person
+  title: Chuyang Cheng
+  description: >-
+    Researcher in molecular machines at Northwestern University (Stoddart group). Foresight Fellow (2017).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2017)
+    - label: Research Area
+      value: Molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: eva-maria-strauch
+  stableId: k3aEQarjFs
+  type: person
+  title: Eva-Maria Strauch
+  description: >-
+    Protein design researcher at University of Washington. Foresight Fellow (2017).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2017)
+    - label: Research Area
+      value: Protein design
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: roman-yampolskiy
+  stableId: LH_b3YDCyA
+  type: person
+  title: Roman V. Yampolskiy
+  description: >-
+    AI safety and security researcher at University of Louisville. Known for work on AI containment and the AI control problem. Foresight Fellow (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2018)
+    - label: Research Area
+      value: AI safety & security
+  tags: [ai-safety]
+  lastUpdated: 2026-03
+
+- id: grigory-tikhomirov
+  stableId: _OzCsPWWG2
+  type: person
+  title: Grigory Tikhomirov
+  description: >-
+    DNA nanotechnology researcher at Caltech. Foresight Fellow (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2018)
+    - label: Research Area
+      value: DNA nanotechnology
+  tags: [nanotechnology, biotechnology]
+  lastUpdated: 2026-03
+
+- id: jane-lippencott
+  stableId: mEMBu1OgGM
+  type: person
+  title: Jane Lippencott
+  description: >-
+    Blockchain governance researcher. Associated with ZenCash and Eden. Foresight Fellow (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2018)
+    - label: Research Area
+      value: Blockchain governance
+  tags: [governance, blockchain]
+  lastUpdated: 2026-03
+
+- id: peter-scheyer
+  stableId: -IegqWaP_8
+  type: person
+  title: Peter Scheyer
+  description: >-
+    Researcher in corporate AGI and computer security. Foresight Fellow (2018).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2018)
+    - label: Research Area
+      value: Corporate AGI & computer security
+  tags: [ai-safety, cybersecurity]
+  lastUpdated: 2026-03
+
+- id: patrick-mellor
+  stableId: xckZ8811MM
+  type: person
+  title: Patrick Mellor
+  description: >-
+    Clean energy and CO2 drawdown researcher at San Francisco State University. Foresight Fellow (2019).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2019)
+    - label: Research Area
+      value: Clean energy & CO2 drawdown
+  tags: [climate]
+  lastUpdated: 2026-03
+
+- id: tj-brunette
+  stableId: BXUtJUR2Mk
+  type: person
+  title: TJ Brunette
+  description: >-
+    Protein design and molecular machines researcher at University of Washington (Baker lab). Foresight Fellow (2019).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2019)
+    - label: Research Area
+      value: Protein design / molecular machines
+  tags: [biotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: caroline-jeanmaire
+  stableId: VZOcEjZnoz
+  type: person
+  title: Caroline Jeanmaire
+  description: >-
+    AI governance researcher at UC Berkeley Center for Human-Compatible AI (CHAI). Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: AI governance
+  tags: [ai-governance, ai-safety]
+  lastUpdated: 2026-03
+
+- id: felix-andreas-faber
+  stableId: jc3mO3Nbd5
+  type: person
+  title: Felix Andreas Faber
+  description: >-
+    Machine learning researcher focused on drug and materials discovery. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: ML for drug/materials discovery
+  tags: [machine-learning, biotechnology]
+  lastUpdated: 2026-03
+
+- id: matthew-ryder
+  stableId: f3iZsZaJL7
+  type: person
+  title: Matthew R. Ryder
+  description: >-
+    Molecular-scale engineering researcher at Oak Ridge National Laboratory. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Molecular-scale engineering
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: alevtina-evgrafova
+  stableId: iClhSDzfCb
+  type: person
+  title: Alevtina Evgrafova
+  description: >-
+    Researcher in sustainable agriculture. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Sustainable agriculture
+  tags: [agriculture]
+  lastUpdated: 2026-03
+
+- id: tony-lai
+  stableId: bZ-9Klhvc-
+  type: person
+  title: Tony Lai
+  description: >-
+    Legal engineering researcher at Stanford CodeX focused on biosphere governance. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Legal engineering for the biosphere
+  tags: [governance, law]
+  lastUpdated: 2026-03
+
+- id: giuliana-rotola
+  stableId: 3Nvj6hnumO
+  type: person
+  title: Giuliana Rotola
+  description: >-
+    Space studies and space law researcher. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Space studies / space law
+  tags: [space]
+  lastUpdated: 2026-03
+
+- id: jeffrey-ladish
+  stableId: WVV_8_T-oo
+  type: person
+  title: Jeffrey Ladish
+  description: >-
+    Biosecurity researcher and advocate. Foresight Fellow (2020). Works on reducing catastrophic biological risks.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Biosecurity
+  tags: [biosecurity, existential-risk]
+  lastUpdated: 2026-03
+
+- id: tessa-alexanian
+  stableId: NRW6ZB83dF
+  type: person
+  title: Tessa Alexanian
+  description: >-
+    Responsible biotechnology researcher and advocate. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: Responsible biotechnology
+  tags: [biotechnology, biosecurity]
+  lastUpdated: 2026-03
+
+- id: daniel-elton
+  stableId: Cz6cISzH1W
+  type: person
+  title: Daniel Elton
+  description: >-
+    AI for medical imaging researcher at NIH Clinical Center. Foresight Fellow (2020).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2020)
+    - label: Research Area
+      value: AI for medical imaging
+  tags: [machine-learning, healthcare]
+  lastUpdated: 2026-03
+
+- id: liang-feng
+  stableId: 0SMuMn2uP1
+  type: person
+  title: Liang Feng
+  description: >-
+    Researcher in metal-organic frameworks and molecular machines. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: Metal-organic frameworks / molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: maxim-ziatdinov
+  stableId: jF16YrGGt9
+  type: person
+  title: Maxim Ziatdinov
+  description: >-
+    Machine learning for materials science researcher. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: ML for materials science
+  tags: [machine-learning, nanotechnology]
+  lastUpdated: 2026-03
+
+- id: yunyan-qiu
+  stableId: pIg7IUR6ZK
+  type: person
+  title: Yunyan Qiu
+  description: >-
+    Molecular machines researcher at Northwestern University (Stoddart group). Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: Molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: xiaohu-neil-zhu
+  stableId: DIubf1q8c4
+  type: person
+  title: Xiaohu (Neil) Zhu
+  description: >-
+    AI education researcher at University AI (China). Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: AI education
+  tags: [ai-education]
+  lastUpdated: 2026-03
+
+- id: joscha-bach
+  stableId: _LXq6c8vXY
+  type: person
+  title: Joscha Bach
+  description: >-
+    AI researcher affiliated with AI Foundation, MIT Media Lab, and Harvard. Known for work on cognitive architectures and artificial general intelligence. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: AI research / cognitive architectures
+  tags: [ai-safety, agi]
+  lastUpdated: 2026-03
+
+- id: jazear-brooks
+  stableId: 1CMuMbNe1q
+  type: person
+  title: Jazear Brooks
+  description: >-
+    Computer science and fintech researcher. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: Computer science / fintech
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: yip-fai-tse
+  stableId: h7l352tthg
+  type: person
+  title: Yip Fai Tse
+  description: >-
+    AI ethics researcher focused on nonhuman animals at Princeton University (under Peter Singer). Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: "AI ethics re: nonhuman animals"
+  tags: [ai-ethics]
+  lastUpdated: 2026-03
+
+- id: stephen-malina
+  stableId: PG8MZrQT6v
+  type: person
+  title: Stephen Malina
+  description: >-
+    Machine learning researcher focused on virus and protein design at Dyno Therapeutics. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: ML for virus & protein design
+  tags: [machine-learning, biotechnology]
+  lastUpdated: 2026-03
+
+- id: jj-ben-joseph
+  stableId: MPO_wgUUDj
+  type: person
+  title: JJ Ben-Joseph
+  description: >-
+    Biosecurity and AI researcher at In-Q-Tel. Foresight Fellow (2021).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2021)
+    - label: Research Area
+      value: Biosecurity & AI
+  tags: [biosecurity, ai-safety]
+  lastUpdated: 2026-03
+
+- id: delphine-larrieu
+  stableId: ovkNsXhA41
+  type: person
+  title: Delphine Larrieu
+  description: >-
+    Researcher on premature aging syndromes at Cambridge Institute for Medical Research. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Premature aging syndromes
+  tags: [longevity, biotechnology]
+  lastUpdated: 2026-03
+
+- id: simon-krause
+  stableId: dLjBtrUfhw
+  type: person
+  title: Simon Krause
+  description: >-
+    Researcher on framework-embedded molecular machines at Max Planck Institute. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Framework-embedded molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: alexander-fedintsev
+  stableId: B-2DIwLZOb
+  type: person
+  title: Alexander Fedintsev
+  description: >-
+    Bioinformatics and machine learning researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Bioinformatics / ML
+  tags: [machine-learning, biotechnology]
+  lastUpdated: 2026-03
+
+- id: tatyana-dobreva
+  stableId: bQv1tYrfRd
+  type: person
+  title: Tatyana Dobreva
+  description: >-
+    Signal processing and neuroprosthetics researcher at NASA JPL. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Signal processing / neuroprosthetics
+  tags: [neuroscience, space]
+  lastUpdated: 2026-03
+
+- id: victor-garcia-lopez
+  stableId: 551B3lJTX0
+  type: person
+  title: Victor Garcia Lopez
+  description: >-
+    Researcher in molecular devices. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Molecular devices
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: david-august
+  stableId: nuD8_FJ7ne
+  type: person
+  title: David August
+  description: >-
+    Molecular weaving researcher at University of Edinburgh. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Molecular weaving
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: matthew-mcateer
+  stableId: 0xBcCmkVM4
+  type: person
+  title: Matthew McAteer
+  description: >-
+    Biotech and machine learning researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Biotech / ML
+  tags: [machine-learning, biotechnology]
+  lastUpdated: 2026-03
+
+- id: jamie-joyce
+  stableId: PEyP8A7QXX
+  type: person
+  title: Jamie Joyce
+  description: >-
+    Structured knowledge and argument mapping researcher. Founder of Society Library. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Structured knowledge / argument mapping
+  tags: [knowledge-management]
+  lastUpdated: 2026-03
+
+- id: nikola-markov
+  stableId: 30kVfhriPv
+  type: person
+  title: Nikola T. Markov
+  description: >-
+    Bioinformatics and aging researcher at Buck Institute. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Bioinformatics / aging
+  tags: [longevity, biotechnology]
+  lastUpdated: 2026-03
+
+- id: zvonimir-vrselja
+  stableId: j_tiaJYbZf
+  type: person
+  title: Zvonimir Vrselja
+  description: >-
+    Neuroscience researcher at Yale School of Medicine. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Neuroscience
+  tags: [neuroscience]
+  lastUpdated: 2026-03
+
+- id: bradley-english
+  stableId: U1OfRySCHR
+  type: person
+  title: Bradley English
+  description: >-
+    Aging biomarkers researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Aging biomarkers
+  tags: [longevity]
+  lastUpdated: 2026-03
+
+- id: tushant-jha
+  stableId: _OcY1kmurG
+  type: person
+  title: Tushant Jha
+  description: >-
+    AI ethics and value alignment researcher at Future of Humanity Institute (FHI). Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: AI ethics / value alignment
+  tags: [ai-safety, ai-ethics]
+  lastUpdated: 2026-03
+
+- id: tinka-vidovic
+  stableId: Mo3dSTEDNV
+  type: person
+  title: Tinka Vidovic
+  description: >-
+    Molecular medicine and anti-aging researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Molecular medicine / anti-aging
+  tags: [longevity, biotechnology]
+  lastUpdated: 2026-03
+
+- id: maryna-polyakova
+  stableId: WwfLP95_oA
+  type: person
+  title: Maryna Polyakova
+  description: >-
+    Neuroimaging and depression researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Neuroimaging / depression
+  tags: [neuroscience, healthcare]
+  lastUpdated: 2026-03
+
+- id: yuri-deigin
+  stableId: 8bh_v5LzgL
+  type: person
+  title: Yuri Deigin
+  description: >-
+    Biotech entrepreneur focused on drug discovery and longevity. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Biotech entrepreneurship / drug discovery
+  tags: [longevity, biotechnology]
+  lastUpdated: 2026-03
+
+- id: yanguang-zhou
+  stableId: 1KA0JCfjE4
+  type: person
+  title: Yanguang Zhou
+  description: >-
+    Mechanical engineering and thermal science researcher at HKUST. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Mechanical engineering / thermal science
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: georgios-kaissis
+  stableId: jxL-vV2Li1
+  type: person
+  title: Georgios Kaissis
+  description: >-
+    Radiology and privacy-preserving machine learning researcher at TU Munich. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Radiology / privacy-preserving ML
+  tags: [machine-learning, healthcare]
+  lastUpdated: 2026-03
+
+- id: yuanning-feng
+  stableId: 0Z1dC0PS2b
+  type: person
+  title: Yuanning Feng
+  description: >-
+    Researcher in dynamic functional molecules. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Dynamic functional molecules
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: giulio-ragazzon
+  stableId: Wj8Gmei1lA
+  type: person
+  title: Giulio Ragazzon
+  description: >-
+    Molecular machines and photochemistry researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Molecular machines / photochemistry
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: kai-micah-mills
+  stableId: v80f8wYPXB
+  type: person
+  title: Kai Micah Mills
+  description: >-
+    Serial entrepreneur and technologist. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Entrepreneurship / technology
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: philipp-koellinger
+  stableId: z1et4GySMo
+  type: person
+  title: Philipp Koellinger
+  description: >-
+    Social science genetics researcher at University of Wisconsin-Madison. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Social science genetics
+  tags: [genetics]
+  lastUpdated: 2026-03
+
+- id: joshua-tan
+  stableId: ekENYOG2FU
+  type: person
+  title: Joshua Tan
+  description: >-
+    AI governance and metagovernance researcher affiliated with Oxford and Stanford. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: AI governance / metagovernance
+  tags: [ai-governance]
+  lastUpdated: 2026-03
+
+- id: mac-davis
+  stableId: Kj61v4mfdi
+  type: person
+  title: Mac Davis
+  description: >-
+    Gene therapy and biohacking researcher. Foresight Fellow (2022).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022)
+    - label: Research Area
+      value: Gene therapy / biohacking
+  tags: [biotechnology, longevity]
+  lastUpdated: 2026-03
+
+- id: matthew-allcock
+  stableId: BP5q62cTTr
+  type: person
+  title: Matthew Allcock
+  description: >-
+    Space weather and infrastructure resilience researcher. Foresight Fellow (2022, 2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2022, 2025)
+    - label: Research Area
+      value: Space weather / infrastructure resilience
+  tags: [space, existential-risk]
+  lastUpdated: 2026-03
+
+- id: shady-el-damaty
+  stableId: mKcC7QBEQe
+  type: person
+  title: Shady El Damaty
+  description: >-
+    Intelligent cooperation and neurotech researcher at Holonym and OpSci. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Intelligent cooperation / neurotech
+  tags: [neuroscience, technology]
+  lastUpdated: 2026-03
+
+- id: aaron-mayer
+  stableId: HewWunPEsp
+  type: person
+  title: Aaron Mayer
+  description: >-
+    Effective altruism and investing researcher. Founder of Open Heart Capital. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: EA / investing
+  tags: [effective-altruism]
+  lastUpdated: 2026-03
+
+- id: danielle-fong
+  stableId: 0CnCl3sc0f
+  type: person
+  title: Danielle Fong
+  description: >-
+    Energy and science entrepreneur. Co-founder of LightSail Energy. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Energy / science
+  tags: [climate, technology]
+  lastUpdated: 2026-03
+
+- id: ala-shaabana
+  stableId: VVMNSO3e-Z
+  type: person
+  title: Ala Shaabana
+  description: >-
+    Machine learning and distributed systems researcher at McMaster University. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: ML / distributed systems
+  tags: [machine-learning]
+  lastUpdated: 2026-03
+
+- id: ghada-almashaqbeh
+  stableId: x-zXBr_BdK
+  type: person
+  title: Ghada Almashaqbeh
+  description: >-
+    Computer science and cryptography researcher at UConn. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Computer science / cryptography
+  tags: [cryptography]
+  lastUpdated: 2026-03
+
+- id: kelvin-yu
+  stableId: 52Ahct1S5P
+  type: person
+  title: Kelvin Yu
+  description: >-
+    Tech policy researcher focused on US-China geopolitics. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Tech policy / US-China geopolitics
+  tags: [ai-policy, geopolitics]
+  lastUpdated: 2026-03
+
+- id: mikayla-maki
+  stableId: j6eTa7sKMl
+  type: person
+  title: Mikayla Maki
+  description: >-
+    Distributed web and P2P software researcher at Portland State University and Zed. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Distributed web / P2P software
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: stacy-copp
+  stableId: NzAxfm9CE9
+  type: person
+  title: Stacy Copp
+  description: >-
+    Photonic nanomaterials researcher at UC Irvine. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Photonic nanomaterials
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: ekaterina-ilin
+  stableId: PYdGMjfM5p
+  type: person
+  title: Ekaterina Ilin
+  description: >-
+    Stellar magnetism and exoplanet habitability researcher. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Stellar magnetism / exoplanet habitability
+  tags: [space]
+  lastUpdated: 2026-03
+
+- id: laura-minquini
+  stableId: 9TxPq16hyW
+  type: person
+  title: Laura Minquini
+  description: >-
+    Branding and business development professional. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Branding / business development
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: mariam-elgabry
+  stableId: BoLCyyyEm8
+  type: person
+  title: Mariam Elgabry
+  description: >-
+    Cyber-biosecurity researcher at Bronic. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Cyber-biosecurity
+  tags: [biosecurity, cybersecurity]
+  lastUpdated: 2026-03
+
+- id: logan-thrasher-collins
+  stableId: Qcjn1NUW9M
+  type: person
+  title: Logan Thrasher Collins
+  description: >-
+    Neurotech, connectomics, and synthetic biology researcher. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Neurotech / connectomics / synthetic biology
+  tags: [neuroscience, biotechnology]
+  lastUpdated: 2026-03
+
+- id: andy-matuschak
+  stableId: SJNMsyBonF
+  type: person
+  title: Andy Matuschak
+  description: >-
+    Tools for thought and learning technology researcher. Known for work on spaced repetition and evergreen notes. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Tools for thought / learning tech
+  tags: [technology, education]
+  lastUpdated: 2026-03
+
+- id: rico-meinl
+  stableId: UBIyBMiwKy
+  type: person
+  title: Rico Meinl
+  description: >-
+    Computational biology researcher at retro.bio. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Computational biology
+  tags: [biotechnology, longevity]
+  lastUpdated: 2026-03
+
+- id: raiany-romanni
+  stableId: WAANMEujqf
+  type: person
+  title: Raiany Romanni
+  description: >-
+    Bioethics and longevity researcher. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Bioethics / longevity
+  tags: [longevity, bioethics]
+  lastUpdated: 2026-03
+
+- id: jonathan-passerat-palmbach
+  stableId: Z_T7HrdQBj
+  type: person
+  title: Jonathan Passerat-Palmbach
+  description: >-
+    Privacy-enhancing technology researcher at Flashbots. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Privacy-enhancing technology
+  tags: [cryptography, technology]
+  lastUpdated: 2026-03
+
+- id: guido-putignano
+  stableId: VdhYJjQ4J3
+  type: person
+  title: Guido Putignano
+  description: >-
+    Synthetic biology therapeutics researcher. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Synthetic biology therapeutics
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: anastasia-ershova
+  stableId: S9a6WggxO5
+  type: person
+  title: Anastasia Ershova
+  description: >-
+    DNA research scientist. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: DNA research
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: david-boyer
+  stableId: -cudJYVqrX
+  type: person
+  title: David Boyer
+  description: >-
+    Neurodegeneration researcher. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Neurodegeneration
+  tags: [neuroscience, longevity]
+  lastUpdated: 2026-03
+
+- id: marco-ovalle
+  stableId: 53vPdbF2jq
+  type: person
+  title: Marco Ovalle
+  description: >-
+    Molecular machines researcher in the Feringa group. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: theo-knopfer
+  stableId: NNYy055wJx
+  type: person
+  title: Theo Knopfer
+  description: >-
+    Researcher on emerging technology terrorism risk. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Emerging tech terrorism risk
+  tags: [existential-risk, biosecurity]
+  lastUpdated: 2026-03
+
+- id: stephane-redon
+  stableId: ORyNColiWM
+  type: person
+  title: Stephane Redon
+  description: >-
+    Molecular simulation researcher. Founder of OneAngstrom. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Molecular simulation
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: elena-meirzadeh
+  stableId: uG_sGCLVzX
+  type: person
+  title: Elena Meirzadeh
+  description: >-
+    Solid-state chemistry researcher at Columbia University. Foresight Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2023)
+    - label: Research Area
+      value: Solid-state chemistry
+  tags: [nanotechnology, chemistry]
+  lastUpdated: 2026-03
+
+- id: alia-abbas
+  stableId: oKmVk_aaZG
+  type: person
+  title: Alia Abbas
+  description: >-
+    Physics and materials engineering researcher. Foresight Prodigy Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Prodigy Fellow (2023)
+    - label: Research Area
+      value: Physics / materials engineering
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: natasha-asmi
+  stableId: Lar4TaohoD
+  type: person
+  title: Natasha Asmi
+  description: >-
+    Scientific ecosystem infrastructure researcher at Halogen. Foresight Prodigy Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Prodigy Fellow (2023)
+    - label: Research Area
+      value: Scientific ecosystem infrastructure
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: akash-patel
+  stableId: 6bkO20mLYD
+  type: person
+  title: Akash Patel
+  description: >-
+    Medicine and nanotech researcher at BandX. Foresight Prodigy Fellow (2023).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Prodigy Fellow (2023)
+    - label: Research Area
+      value: Medicine / nanotech
+  tags: [nanotechnology, healthcare]
+  lastUpdated: 2026-03
+
+- id: pavi-dhiman
+  stableId: L727R6bnP2
+  type: person
+  title: Pavi Dhiman
+  description: >-
+    Young researcher and Foresight Prodigy Fellow (2023). One of the youngest fellows at 16 years old at time of selection.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Prodigy Fellow (2023)
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: aj-kourabi
+  stableId: aqSu5pvw4Q
+  type: person
+  title: AJ Kourabi
+  description: >-
+    Engineering researcher at McMaster University. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Engineering
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: hooman-reza-nezhad
+  stableId: bQcUONnc08
+  type: person
+  title: Hooman Reza Nezhad
+  description: >-
+    STEM and Mars resource utilization researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: STEM / Mars resource utilization
+  tags: [space]
+  lastUpdated: 2026-03
+
+- id: lisa-thiergart
+  stableId: hBqW4ONQOf
+  type: person
+  title: Lisa Thiergart
+  description: >-
+    AI safety and neurotech researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI safety / neurotech
+  tags: [ai-safety, neuroscience]
+  lastUpdated: 2026-03
+
+- id: michael-florea
+  stableId: SIvlDx1NDX
+  type: person
+  title: Michael Florea
+  description: >-
+    Genetic engineering and longevity researcher at Olden Labs. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Genetic engineering / longevity
+  tags: [biotechnology, longevity]
+  lastUpdated: 2026-03
+
+- id: chris-wintersinger
+  stableId: CYWc9anaJp
+  type: person
+  title: Chris Wintersinger
+  description: >-
+    Biological engineering researcher and biotech startup founder. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Biological engineering / biotech startups
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: scott-emmons
+  stableId: TximOVySLO
+  type: person
+  title: Scott Emmons
+  description: >-
+    AI safety and alignment researcher at Google DeepMind. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI safety & alignment
+  tags: [ai-safety, ai-alignment]
+  lastUpdated: 2026-03
+
+- id: ariel-zeleznikow-johnston
+  stableId: EOr3GHi0mq
+  type: person
+  title: Ariel Zeleznikow-Johnston
+  description: >-
+    Neuroscience and consciousness researcher at Monash University. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Neuroscience / consciousness
+  tags: [neuroscience]
+  lastUpdated: 2026-03
+
+- id: niccolo-zanichelli
+  stableId: yloXSksP3p
+  type: person
+  title: Niccolo Zanichelli
+  description: >-
+    AI and biology researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI + biology
+  tags: [machine-learning, biotechnology]
+  lastUpdated: 2026-03
+
+- id: jason-hausenloy
+  stableId: anJm4-_QW0
+  type: person
+  title: Jason Hausenloy
+  description: >-
+    AI policy researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI policy
+  tags: [ai-policy]
+  lastUpdated: 2026-03
+
+- id: nora-ammann
+  stableId: 9OYg0A2u9v
+  type: person
+  title: Nora Ammann
+  description: >-
+    Guaranteed Safe AI researcher at PIBBSS. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Guaranteed Safe AI
+  tags: [ai-safety]
+  lastUpdated: 2026-03
+
+- id: zan-huang
+  stableId: zT8gF0s15B
+  type: person
+  title: Zan Huang
+  description: >-
+    AI, cognition, and music composition researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI / cognition / music composition
+  tags: [machine-learning]
+  lastUpdated: 2026-03
+
+- id: claire-short
+  stableId: cIKKyepSlX
+  type: person
+  title: Claire Short
+  description: >-
+    AI and neuroscience researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI / neuroscience
+  tags: [ai-safety, neuroscience]
+  lastUpdated: 2026-03
+
+- id: amanda-ngo
+  stableId: Rnlp94clBB
+  type: person
+  title: Amanda Ngo
+  description: >-
+    AI for wellbeing researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI for wellbeing
+  tags: [machine-learning]
+  lastUpdated: 2026-03
+
+- id: samuel-nellessen
+  stableId: i9FJ8vh36r
+  type: person
+  title: Samuel Nellessen
+  description: >-
+    AI researcher at Radboud University. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI
+  tags: [machine-learning]
+  lastUpdated: 2026-03
+
+- id: bogdan-ionut-cirstea
+  stableId: mpkV-n2lMm
+  type: person
+  title: Bogdan-Ionut Cirstea
+  description: >-
+    AI existential safety researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI existential safety
+  tags: [ai-safety, existential-risk]
+  lastUpdated: 2026-03
+
+- id: bear-haon
+  stableId: hOfDebmkcY
+  type: person
+  title: Bear Haon
+  description: >-
+    Robotics and trustworthy autonomous systems researcher at UC Berkeley. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Robotics / trustworthy autonomous systems
+  tags: [ai-safety, robotics]
+  lastUpdated: 2026-03
+
+- id: sruthi-sivakumar
+  stableId: cREFraM1QC
+  type: person
+  title: Sruthi Sivakumar
+  description: >-
+    Computational biology and longevity researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Computational biology / longevity
+  tags: [biotechnology, longevity]
+  lastUpdated: 2026-03
+
+- id: roman-bauer
+  stableId: -lMQMNfhSu
+  type: person
+  title: Roman Bauer
+  description: >-
+    Computational biology and brain modeling researcher at University of Surrey. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Computational biology / brain modeling
+  tags: [biotechnology, neuroscience]
+  lastUpdated: 2026-03
+
+- id: simeon-campos
+  stableId: 4V7_qVznQK
+  type: person
+  title: Simeon Campos
+  description: >-
+    AI governance and AI auditing researcher at SaferAI. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: AI governance / AI auditing
+  tags: [ai-governance, ai-safety]
+  lastUpdated: 2026-03
+
+- id: dmitrii-usynin
+  stableId: iuLi9NNEtt
+  type: person
+  title: Dmitrii Usynin
+  description: >-
+    Machine learning under privacy constraints researcher at Imperial College London and TU Munich. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: ML under privacy constraints
+  tags: [machine-learning]
+  lastUpdated: 2026-03
+
+- id: ekaterina-seltikova
+  stableId: wc-8Sekkqt
+  type: person
+  title: Ekaterina Seltikova
+  description: >-
+    Lunar exploration and space researcher. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Lunar exploration / space
+  tags: [space]
+  lastUpdated: 2026-03
+
+- id: shuntaro-amano
+  stableId: pbOuMCEkuP
+  type: person
+  title: Shuntaro Amano
+  description: >-
+    Autonomous molecular motors researcher at University of Strasbourg. Foresight Fellow (2024).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2024)
+    - label: Research Area
+      value: Autonomous molecular motors
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: dean-thomas
+  stableId: 3-3k_iIEBt
+  type: person
+  title: Dean Thomas
+  description: >-
+    Digital chemistry and molecular machines researcher at University of Glasgow. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Digital chemistry / molecular machines
+  tags: [nanotechnology, molecular-machines]
+  lastUpdated: 2026-03
+
+- id: felix-sosa
+  stableId: UmkwKHQIo5
+  type: person
+  title: Felix Sosa
+  description: >-
+    Computational cognitive science and AGI researcher at Harvard/MIT. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Computational cognitive science / AGI
+  tags: [ai-safety, agi]
+  lastUpdated: 2026-03
+
+- id: jasper-gotting
+  stableId: U8w-x24QoY
+  type: person
+  title: Jasper Gotting
+  description: >-
+    AI and biotech risks researcher at SecureBio. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: AI + biotech risks
+  tags: [biosecurity, ai-safety]
+  lastUpdated: 2026-03
+
+- id: yasmeen-hmaidan
+  stableId: JlRea3-OEV
+  type: person
+  title: Yasmeen Hmaidan
+  description: >-
+    Neurotechnology and e-textiles researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Neurotechnology / e-textiles
+  tags: [neuroscience, nanotechnology]
+  lastUpdated: 2026-03
+
+- id: guanyu-lu
+  stableId: OF4YTvRCbi
+  type: person
+  title: Guanyu Lu
+  description: >-
+    Nanoscale light-matter interactions researcher at Northwestern University. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Nanoscale light-matter interactions
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: nirosha-murugan
+  stableId: 69uPZKxSDe
+  type: person
+  title: Nirosha Murugan
+  description: >-
+    Biophysics and cellular communication researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Biophysics / cellular communication
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: abhinav-singh
+  stableId: GuvDN-3G9F
+  type: person
+  title: Abhinav Singh
+  description: >-
+    Cybersecurity researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Cybersecurity
+  tags: [cybersecurity]
+  lastUpdated: 2026-03
+
+- id: zihao-ou
+  stableId: YDyJQcs6xr
+  type: person
+  title: Zihao Ou
+  description: >-
+    Biomedical science and tissue transparency researcher at UT Dallas. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Biomedical science / tissue transparency
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: moritz-von-knebel
+  stableId: 2hbTrdTLY_
+  type: person
+  title: Moritz von Knebel
+  description: >-
+    Tech geopolitics and semiconductor security researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Tech geopolitics / semiconductor security
+  tags: [geopolitics, technology]
+  lastUpdated: 2026-03
+
+- id: akash-kulgod
+  stableId: Cv-tq9lK1G
+  type: person
+  title: Akash Kulgod
+  description: >-
+    Brain-computer interfaces and disease detection researcher at Dognosis. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Brain-computer interfaces / disease detection
+  tags: [neuroscience, healthcare]
+  lastUpdated: 2026-03
+
+- id: penghao-li
+  stableId: fVwZd8qbAg
+  type: person
+  title: Penghao Li
+  description: >-
+    Chemistry researcher at University of Mississippi. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Chemistry
+  tags: [chemistry]
+  lastUpdated: 2026-03
+
+- id: aydin-gokce
+  stableId: bEefY866Md
+  type: person
+  title: Aydin Gokce
+  description: >-
+    Cybernetics researcher at General Cybernetics. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Cybernetics
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: raghav-sehgal
+  stableId: on2sSLp8Ak
+  type: person
+  title: Raghav Sehgal
+  description: >-
+    Computational biology researcher at Yale. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Computational biology
+  tags: [biotechnology]
+  lastUpdated: 2026-03
+
+- id: maxx-yung
+  stableId: siyU8twAWy
+  type: person
+  title: Maxx Yung
+  description: >-
+    Materials engineering researcher at University of Pennsylvania. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Materials engineering
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: gustavs-zilgalvis
+  stableId: OTY4pxUlg2
+  type: person
+  title: Gustavs Zilgalvis
+  description: >-
+    International policy researcher at Stanford. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: International policy
+  tags: [ai-policy]
+  lastUpdated: 2026-03
+
+- id: chiara-herzog
+  stableId: aVyDpkdJyI
+  type: person
+  title: Chiara Herzog
+  description: >-
+    Ageing and biomarkers researcher at King's College London. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Ageing / biomarkers
+  tags: [longevity, biotechnology]
+  lastUpdated: 2026-03
+
+- id: ruairidh-battleday
+  stableId: 0uoTCLKHAV
+  type: person
+  title: Ruairidh Battleday
+  description: >-
+    Cognitive science and AI researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Cognitive science / AI
+  tags: [ai-safety, neuroscience]
+  lastUpdated: 2026-03
+
+- id: peggy-yin
+  stableId: T55A96uz_3
+  type: person
+  title: Peggy Yin
+  description: >-
+    Psychology and cognitive security researcher at Stanford. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Psychology / cognitive security
+  tags: [cybersecurity, neuroscience]
+  lastUpdated: 2026-03
+
+- id: ninon-lize-masclef
+  stableId: EtUZ3PP2KP
+  type: person
+  title: Ninon Lize Masclef
+  description: >-
+    AI, neuroscience, and 3D visual perception researcher at MIT Media Lab. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: AI / neuroscience / 3D visual perception
+  tags: [neuroscience, machine-learning]
+  lastUpdated: 2026-03
+
+- id: mahlaqua-mila-noor
+  stableId: 0nZmkTd3Ug
+  type: person
+  title: Mahlaqua Mila Noor
+  description: >-
+    Researcher at University of Cambridge. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: fin-moorhouse
+  stableId: XQm8l8LuOs
+  type: person
+  title: Fin Moorhouse
+  description: >-
+    Existential Hope researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Existential Hope
+  tags: [existential-risk]
+  lastUpdated: 2026-03
+
+- id: abigail-olvera
+  stableId: Ek1Ki4LnFH
+  type: person
+  title: Abigail Olvera
+  description: >-
+    Existential Hope researcher. Foresight Fellow (2025).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2025)
+    - label: Research Area
+      value: Existential Hope
+  tags: [existential-risk]
+  lastUpdated: 2026-03
+
+- id: alberto-privitera
+  stableId: 7V2LqaTShW
+  type: person
+  title: Alberto Privitera
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: alex-plesa
+  stableId: OSe82Ax4gm
+  type: person
+  title: Alex Plesa
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: avery-krieger
+  stableId: koF-u4YPz5
+  type: person
+  title: Avery Krieger
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: constanze-albrecht
+  stableId: hHyQAK9htk
+  type: person
+  title: Constanze Albrecht
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: donnacha-fitzgerald
+  stableId: aZQXutz76s
+  type: person
+  title: Donnacha Fitzgerald
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: elisa-kallioniemi
+  stableId: UQKSKdPyiQ
+  type: person
+  title: Elisa Kallioniemi
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: gianluca-cidonio
+  stableId: phMYtz3rfV
+  type: person
+  title: Gianluca Cidonio
+  description: >-
+    Foresight Fellow (2026).
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Fellow (2026)
+  lastUpdated: 2026-03
+
+- id: creon-levit
+  stableId: trv0r0CAA9
+  type: person
+  title: Creon Levit
+  description: >-
+    Space technology researcher at Planet Labs. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Space technology
+  tags: [space, technology]
+  lastUpdated: 2026-03
+
+- id: anders-sandberg
+  stableId: 7ojZDBA9wb
+  type: person
+  title: Anders Sandberg
+  description: >-
+    Existential risk and long-range futures researcher. Previously at Future of Humanity Institute (FHI) at University of Oxford. Known for work on global catastrophic risks, whole brain emulation, and human enhancement. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Existential risk / long-range futures
+  tags: [existential-risk, ai-safety]
+  lastUpdated: 2026-03
+
+- id: mark-s-miller
+  stableId: PmKAZl2vJK
+  type: person
+  title: Mark S. Miller
+  description: >-
+    Pioneer of agoric computing and smart contracts. Chief Scientist at Agoric. Known for object-capability security model and the E programming language. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Agoric computing / smart contracts
+  tags: [cryptography, technology]
+  lastUpdated: 2026-03
+
+- id: martin-edelstein
+  stableId: CiN_-IiD1U
+  type: person
+  title: Martin Edelstein
+  description: >-
+    Bottom-up nanotechnology researcher at Covalent Industrial Technologies. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Bottom-up nanotechnology
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: brad-templeton
+  stableId: fdyIzTzN0R
+  type: person
+  title: Brad Templeton
+  description: >-
+    Computing pioneer and EFF board member. Faculty at Singularity University. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Computing / digital rights
+  tags: [technology]
+  lastUpdated: 2026-03
+
+- id: zooko-wilcox
+  stableId: F2KOlrJHwv
+  type: person
+  title: Zooko Wilcox
+  description: >-
+    Cryptocurrency and privacy researcher. Founder of Electric Coin Company (Zcash). Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Cryptocurrency / privacy
+  tags: [cryptography]
+  lastUpdated: 2026-03
+
+- id: samo-burja
+  stableId: RZt-Ryen4Q
+  type: person
+  title: Samo Burja
+  description: >-
+    Political risk and institutional analysis researcher. Founder of Bismarck Analysis. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Political risk / institutional analysis
+  tags: [governance]
+  lastUpdated: 2026-03
+
+- id: adam-brown
+  stableId: ZZ63lzP4Gp
+  type: person
+  title: Adam Brown
+  description: >-
+    Theoretical physics and cosmology researcher at Stanford. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Theoretical physics / cosmology
+  tags: [physics]
+  lastUpdated: 2026-03
+
+- id: chiara-marletto
+  stableId: tzd-uHhq6m
+  type: person
+  title: Chiara Marletto
+  description: >-
+    Quantum theory of computation researcher at Oxford. Known for constructor theory. Foresight Institute Senior Fellow.
+  relatedEntries:
+    - id: NPPTvNqRXA
+      type: organization
+  customFields:
+    - label: Role
+      value: Foresight Senior Fellow
+    - label: Research Area
+      value: Quantum theory of computation
+  tags: [physics]
+  lastUpdated: 2026-03
+

@@ -5083,17 +5083,36 @@
   stableId: NPPTvNqRXA
   wikiId: E1210
   type: organization
-  orgType: generic
+  orgType: other
   title: Foresight Institute
   website: https://foresight.org
   description: >-
-    Research organization focused on beneficial use of emerging technologies.
+    Nonprofit research organization founded in 1986 focused on nanotechnology,
+    secure AI, neurotechnology, longevity biotechnology, and existential hope.
+    Operates through grants, prizes (Feynman Prize since 1993), fellowships,
+    and conferences rather than direct laboratory research. Recently expanded
+    into AI safety grantmaking (~$1.5M in 2024) and planned AI Nodes hubs.
+  founded: "1986"
+  location: San Francisco, CA
   relatedEntries:
     - id: XcGTez1oFw
       type: policy
+    - id: BvtUK0yEDv
+      type: person
+    - id: xhHJeAYzUm
+      type: person
+    - id: jExOzigU4B
+      type: person
+    - id: 8Mk8-7uSm6
+      type: person
+    - id: tVhfitccVu
+      type: person
   tags:
     - existential-risk
     - research
+    - ai-safety
+    - nanotechnology
+    - grantmaking
   lastUpdated: 2026-03
 
 - id: charter-cities-institute

@@ -54,6 +54,7 @@ export const FUNDER_IDS = {
   SURDNA_FOUNDATION: "6wJ85FrPfi",
   DONORSTRUST: "rY6Rdleg5f",
   VITALIK_BUTERIN: "iEEm0cZ3tn",
+  FORESIGHT_INSTITUTE: "NPPTvNqRXA",
 } as const;
 
 /**

@@ -12,6 +12,7 @@ import { source as fordFoundation } from "./ford-foundation.ts";
 import { source as fli } from "./fli.ts";
 import { source as aria } from "./aria.ts";
 import { source as vipulnaik } from "./vipulnaik.ts";
+import { source as foresightPrizes } from "./foresight-prizes.ts";
 
 export const ALL_SOURCES: GrantSource[] = [
   coefficientGiving,
@@ -27,6 +28,7 @@ export const ALL_SOURCES: GrantSource[] = [
   fli,
   aria,
   vipulnaik,
+  foresightPrizes,
 ];
 
-export { coefficientGiving, eaFunds, sff, ftxFutureFund, manifund, givewell, acxGrants, gatesFoundation, wellcomeTrust, fordFoundation, fli, aria, vipulnaik };
+export { coefficientGiving, eaFunds, sff, ftxFutureFund, manifund, givewell, acxGrants, gatesFoundation, wellcomeTrust, fordFoundation, fli, aria, vipulnaik, foresightPrizes };
