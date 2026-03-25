@@ -8587,7 +8587,101 @@
   orgType: generic
   title: Public First Action
   description: >-
-    Political organization funded in part by Anthropic. Supports
-    pro-regulation candidates in 2026 races. Raised approximately \$20M.
+    Political 501(c)(4) organization co-founded by Brad Carson (D-OK) and
+    Chris Stewart (R-UT). Anthropic contributed \$20M; total network raised
+    approximately \$50M targeting \$75M. Operates two super PACs: Jobs and
+    Democracy PAC (Democratic races) and Defending Our Values PAC (Republican
+    races). Supports pro-regulation candidates in 2026 races.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: jobs-and-democracy-pac
+  stableId: cI2xccoTjv
+  type: organization
+  orgType: generic
+  title: Jobs and Democracy PAC
+  description: >-
+    Democratic-focused super PAC affiliated with Public First Action (FEC ID
+    C00928374). Funded by Anthropic via Public First Action. Spent \$1.6M
+    supporting Rep. Valerie Foushee in NC-4, \$450K supporting Alex Bores in
+    NY-12, and \$300K supporting Josh Gottheimer in NJ-5.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: defending-our-values-pac
+  stableId: r3zkBIfezx
+  type: organization
+  orgType: generic
+  title: Defending Our Values PAC
+  description: >-
+    Republican-focused super PAC affiliated with Public First Action (FEC ID
+    C00928390). Backed by Anthropic via Public First Action. Supports
+    pro-regulation Republican candidates including Pete Ricketts (NE Senate)
+    and Marsha Blackburn (TN Governor). Spent \$864K on Texas races.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: meta-atep
+  stableId: u0WnyGmzGL
+  type: organization
+  orgType: generic
+  title: American Technology Excellence Project
+  description: >-
+    National super PAC seeded by Meta with \$45M. Focuses on state
+    legislative races opposing state-level AI regulation bills. Bipartisan
+    leadership: Brian Baker (GOP strategist) and Hilltop Public Solutions
+    (Democratic firm). Targets the 1,100+ state-level AI bills introduced
+    across the US.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: meta-california-pac
+  stableId: 1J0EEnfJzw
+  type: organization
+  orgType: generic
+  title: Mobilizing Economic Transformation Across California PAC
+  description: >-
+    California-focused super PAC seeded by Meta with \$20M. Backs
+    pro-AI-policy candidates in California state races regardless of party.
+    Part of Meta's broader political strategy alongside the national ATEP.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: build-american-ai
+  stableId: kX9KFRLq0f
+  type: organization
+  orgType: generic
+  title: Build American AI
+  description: >-
+    501(c)(4) dark money nonprofit affiliated with Leading the Future.
+    Received \$500K from Leading the Future super PAC. Plans at least \$10M on
+    digital ads lobbying for federal AI preemption of state laws. Claims
+    500,000+ supporters. Not required to disclose donors.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: making-our-tomorrow-pac
+  stableId: HMXgglvRtp
+  type: organization
+  orgType: generic
+  title: Making Our Tomorrow PAC
+  description: >-
+    Illinois state-level PAC funded by Meta with \$750K. Targeted four
+    Illinois state house races in March 2026 primaries to oppose social media
+    and AI regulation legislation. Went 1-for-4 in outcomes.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: cani-coalition
+  stableId: kGAU1KJ0qG
+  type: organization
+  orgType: generic
+  title: Coalition for AI Nonprofit Integrity
+  description: >-
+    Coalition of 50+ organizations supporting the California ballot measure
+    to create a Charitable Research Oversight Board. Led by Poornima Ramarao
+    (mother of Suchir Balaji, deceased OpenAI whistleblower). Backed by the
+    San Francisco Foundation. Targets OpenAI's nonprofit-to-for-profit
+    conversion.
   tags: [political-action, ai-regulation]
   lastUpdated: 2026-03
