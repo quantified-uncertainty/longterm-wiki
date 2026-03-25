@@ -48,6 +48,59 @@ const nextConfig: NextConfig = {
         destination: "/legislation/us-executive-order",
         permanent: true,
       },
+      // Approach → research-area type migration redirects (#3170)
+      // These entities were moved from entityType "approach" (or "safety-agenda")
+      // to "research-area" and now live under /research-areas/ instead of /approaches/.
+      {
+        source: "/approaches/interpretability",
+        destination: "/research-areas/interpretability",
+        permanent: true,
+      },
+      {
+        source: "/approaches/mech-interp",
+        destination: "/research-areas/mech-interp",
+        permanent: true,
+      },
+      {
+        source: "/approaches/mechanistic-interpretability",
+        destination: "/research-areas/mech-interp",
+        permanent: true,
+      },
+      {
+        source: "/approaches/red-teaming",
+        destination: "/research-areas/red-teaming",
+        permanent: true,
+      },
+      {
+        source: "/approaches/evals",
+        destination: "/research-areas/evals",
+        permanent: true,
+      },
+      {
+        source: "/approaches/ai-control",
+        destination: "/research-areas/ai-control",
+        permanent: true,
+      },
+      {
+        source: "/approaches/scalable-oversight",
+        destination: "/research-areas/scalable-oversight",
+        permanent: true,
+      },
+      {
+        source: "/approaches/corrigibility",
+        destination: "/research-areas/corrigibility",
+        permanent: true,
+      },
+      {
+        source: "/approaches/value-learning",
+        destination: "/research-areas/value-learning",
+        permanent: true,
+      },
+      {
+        source: "/approaches/rlhf",
+        destination: "/research-areas/rlhf",
+        permanent: true,
+      },
       // Research area title-slug → canonical short-ID redirects (#2634)
       {
         source: "/research-areas/mechanistic-interpretability",
