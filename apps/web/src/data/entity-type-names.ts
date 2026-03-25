@@ -46,6 +46,7 @@ const CANONICAL_ENTITY_TYPE_NAMES = [
   "ai-model",
   "benchmark",
   "research-area",
+  "political-race",
 ] as const;
 
 /** TypeScript type for a canonical entity type name */

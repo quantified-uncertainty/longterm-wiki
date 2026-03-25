@@ -8557,4 +8557,37 @@
       url: https://www.worldvision.org/
     - title: World Vision International - Wikipedia
       url: https://en.wikipedia.org/wiki/World_Vision_International
+# ── Political Action Committees (AI-related) ────────────────────────────
+
+- id: think-big-pac
+  stableId: iqEF0amsJM
+  type: organization
+  orgType: generic
+  title: Think Big PAC
+  description: >-
+    Super PAC funded by Leading the Future. Backs candidates who oppose
+    restrictive AI regulation in federal races.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: american-mission-pac
+  stableId: GGcOTR25tl
+  type: organization
+  orgType: generic
+  title: American Mission PAC
+  description: >-
+    Super PAC funded by Leading the Future. Active in 2026 Democratic
+    primaries backing candidates opposed to AI regulation.
+  tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: public-first-action
+  stableId: NeUHBH9hGa
+  type: organization
+  orgType: generic
+  title: Public First Action
+  description: >-
+    Political organization funded in part by Anthropic. Supports
+    pro-regulation candidates in 2026 races. Raised approximately \$20M.
+  tags: [political-action, ai-regulation]
   lastUpdated: 2026-03

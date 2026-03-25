@@ -4196,6 +4196,106 @@
   sources:
     - title: Ben Horowitz - Wikipedia
       url: https://en.wikipedia.org/wiki/Ben_Horowitz
+# ── Political Candidates (2026 AI-related races) ────────────────────────
+
+- id: alex-bores
+  stableId: W2B4vrLpsU
+  type: person
+  title: Alex Bores
+  description: >-
+    New York State Assemblymember (District 73). Author of the RAISE Act,
+    landmark AI regulation legislation. Running in the NY-12 Democratic
+    primary for U.S. Congress (June 23, 2026). Flagship pro-regulation
+    candidate in the 2026 AI policy races.
+  tags: [politics, ai-regulation]
+  lastUpdated: 2026-03
+
+- id: rebecca-lasher
+  stableId: YKtqDKysGb
+  type: person
+  title: Rebecca Lasher
+  description: >-
+    Candidate in the NY-12 Democratic primary (2026). Backed by
+    anti-regulation PAC spending from Leading the Future.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: brad-schlossberg
+  stableId: 6b2Vi6bhfX
+  type: person
+  title: Brad Schlossberg
+  description: >-
+    Candidate in the NY-12 Democratic primary (2026).
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: mike-conway
+  stableId: 6lQRx57F7M
+  type: person
+  title: Mike Conway
+  description: >-
+    Candidate in the NY-12 Democratic primary (2026).
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: valerie-foushee
+  stableId: aJJNryIYDC
+  type: person
+  title: Valerie Foushee
+  description: >-
+    U.S. Representative for North Carolina's 4th district. Won the 2026
+    Democratic primary. Incumbent.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: jesse-jackson-jr
+  stableId: 69tAH5XWON
+  type: person
+  title: Jesse Jackson Jr.
+  description: >-
+    Former U.S. Representative for Illinois' 2nd district. Lost 2026
+    Democratic primary comeback attempt.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: melissa-bean
+  stableId: PnwPk4Vcau
+  type: person
+  title: Melissa Bean
+  description: >-
+    Former U.S. Representative. Won the 2026 Democratic primary for
+    Illinois' 8th district.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: jake-gober
+  stableId: Zs43I3aG72
+  type: person
+  title: Jake Gober
+  description: >-
+    Republican candidate in the TX-10 primary (2026). Anti-regulation
+    stance on AI policy.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: pete-ricketts
+  stableId: E6W6VILiNn
+  type: person
+  title: Pete Ricketts
+  description: >-
+    U.S. Senator from Nebraska. Up for election in 2026. Known for
+    tech-friendly policy positions.
+  tags: [politics]
+  lastUpdated: 2026-03
+
+- id: marsha-blackburn
+  stableId: enf2UNKyDx
+  type: person
+  title: Marsha Blackburn
+  description: >-
+    U.S. Senator from Tennessee, running for Governor in 2026. Has taken
+    positions on AI policy and technology regulation.
+  tags: [politics]
   lastUpdated: 2026-03
 
 - id: allison-duettmann

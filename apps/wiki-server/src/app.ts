@@ -23,6 +23,7 @@ import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
 import { secondaryMarketPricesRoute } from "./routes/tablebase/secondary-market-prices.js";
 import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js";
+import { politicalRacesRoute } from "./routes/tablebase/political-races.js";
 import { blueskyRoute } from "./routes/tablebase/bluesky.js";
 import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 
@@ -195,6 +196,7 @@ export function createApp() {
   app.route("/api/equity-positions", equityPositionsRoute);
   app.route("/api/secondary-market-prices", secondaryMarketPricesRoute);
   app.route("/api/prediction-markets", predictionMarketsRoute);
+  app.route("/api/political-races", politicalRacesRoute);
   app.route("/api/bluesky", blueskyRoute);
   app.route("/api/talent-flows", talentFlowsRoute);
   app.route("/api/divisions", divisionsRoute);

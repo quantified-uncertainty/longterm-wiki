@@ -38,6 +38,7 @@ import {
   FileText,
   LayoutList,
   Beaker,
+  Vote,
 } from "lucide-react";
 
 type LucideIcon = React.ForwardRefExoticComponent<
@@ -266,6 +267,13 @@ export const ENTITY_TYPES: Record<string, EntityTypeDefinition> = {
     iconColor: "text-cyan-600 dark:text-cyan-400",
     badgeColor: "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300",
     headerColor: "#0891b2",
+  },
+  "political-race": {
+    label: "Political Race",
+    icon: Vote,
+    iconColor: "text-rose-600 dark:text-rose-400",
+    badgeColor: "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300",
+    headerColor: "#e11d48",
   },
 };
 
