@@ -298,18 +298,9 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
     return {};
   }
 
-  // Build a URL → best verdict map from all citation quotes across all pages.
-  // A URL may appear in multiple pages with different verdicts; prefer the
-  // MOST CAUTIOUS verdict (worst case wins) so flagged issues are never hidden.
-  const VERDICT_PRIORITY = {
-    inaccurate: 6,    // Most concerning → highest priority
-    unsupported: 5,
-    minor_issues: 4,
-    not_verifiable: 3,
-    accurate: 2,
-    verified: 1,
-  };
-
+  // Build a URL → verdict map from all citation quotes across all pages.
+  // When a URL has multiple verdicts, prefer the MOST RECENT one so that
+  // re-checks actually update the displayed verdict (fixes stale contradictions).
   const urlToVerdict = new Map();
 
   for (const quotes of Object.values(citationQuotesBundle)) {
@@ -320,10 +311,11 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
 
       const normalizedUrl = normalizeUrlForMatch(q.url);
       const existing = urlToVerdict.get(normalizedUrl);
-      const existingPriority = existing ? (VERDICT_PRIORITY[existing] ?? 0) : 0;
-      const newPriority = VERDICT_PRIORITY[verdict] ?? 0;
-      if (newPriority > existingPriority) {
-        urlToVerdict.set(normalizedUrl, verdict);
+      // Use most recent verdict (by checkedAt/updatedAt) or just overwrite
+      // since citation quotes are ordered by recency in the bundle.
+      // If no timestamp info, last-write-wins gives the most recent check.
+      if (!existing || (q.checkedAt && existing.checkedAt && q.checkedAt > existing.checkedAt) || !existing.checkedAt) {
+        urlToVerdict.set(normalizedUrl, { verdict, checkedAt: q.checkedAt ?? null });
       }
     }
   }
@@ -346,9 +338,9 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
       if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
 
       const normalizedSource = normalizeUrlForMatch(url);
-      const verdict = urlToVerdict.get(normalizedSource);
-      if (verdict) {
-        verification[fact.id] = verdict;
+      const entry = urlToVerdict.get(normalizedSource);
+      if (entry) {
+        verification[fact.id] = entry.verdict;
         matchCount++;
       }
     }

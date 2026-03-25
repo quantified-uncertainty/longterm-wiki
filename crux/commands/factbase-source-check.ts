@@ -262,13 +262,20 @@ ${sourceText}
 
 Does the source text confirm, contradict, or not address this claim?
 
-Consider:
+IMPORTANT — avoid these common false-positive errors:
+- **Range vs. point**: If the source gives a range (e.g., "51-200 employees") and the claimed value falls within that range (e.g., 91), that is "confirmed", NOT contradicted.
+- **Temporal mismatch**: Only compare values from the same time period. If the claim is "as of 2024" but the source discusses 2025 projections (or vice versa), that is "unverifiable" or "outdated", NOT contradicted.
+- **Wrong source relevance**: The source must actually discuss the specific claim. If the source is about entity X's own page but the claim is about a person's prior employment at entity Y, the source cannot contradict that — it's "unverifiable".
+- **Approximate values**: A claimed value within 10% of the source value is "partial" or "confirmed", not "contradicted". Only use "contradicted" when values clearly conflict (e.g., source says 500, claim says 2000).
+
+Other considerations:
 - Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
 - Dates may be approximate
-- The source may confirm the general fact but with a slightly different value
 - If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
 - If the source has a newer value that supersedes the claimed value, that's "outdated"
 - If the source partially confirms (e.g., confirms the ballpark but not the exact figure), that's "partial"
+
+Reserve "contradicted" ONLY for cases where the source clearly and directly states a value that is incompatible with the claim for the same time period.
 
 Respond with ONLY a JSON object (no markdown code fences):
 {
@@ -384,7 +391,28 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
   );
 
   if (!response.ok) {
-    console.warn(`[fb-source-check] Failed to store verification for ${result.factId}: ${response.error}`);
+    console.warn(`[fb-source-check] Failed to store evidence for ${result.factId}: ${response.error}`);
+  }
+
+  // Also store aggregate verdict so re-runs update the displayed verdict.
+  // Without this, stale contradictions persist even after re-checks confirm data.
+  const verdictBody = {
+    recordType: 'fact',
+    recordId: result.factId,
+    verdict: result.verdict,
+    confidence: result.confidence,
+    reasoning: result.reasoning,
+    sourcesChecked: 1,
+  };
+
+  const verdictResponse = await apiRequest<{ ok: boolean }>(
+    'POST',
+    '/api/verifications/verdicts',
+    verdictBody,
+  );
+
+  if (!verdictResponse.ok) {
+    console.warn(`[fb-source-check] Failed to store verdict for ${result.factId}: ${verdictResponse.error}`);
   }
 }
 
