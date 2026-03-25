@@ -201,6 +201,11 @@ export default async function FactDetailPage({ params }: PageProps) {
           )}
         </KVRow>
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
+        <KVRow label="Source Check">
+          <FactLink href={`/source-checks/fact/${factId}`}>
+            View verification details {"\u2192"}
+          </FactLink>
+        </KVRow>
       </KVTable>
 
       {/* Currency / Conversion */}
