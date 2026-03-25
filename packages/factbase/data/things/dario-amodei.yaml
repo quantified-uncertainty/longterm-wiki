@@ -1,18 +1,5 @@
 entity: zR4nW8xB2f
 facts:
-  - id: f_aE3mK7pQ9x
-    property: employed-by
-    value: !ref mK9pX3rQ7n
-    asOf: 2021-01
-    source: https://anthropic.com/company
-    notes: "Co-founded Anthropic in January 2021; serves as CEO"
-
-  - id: f_bT6wL2nH5v
-    property: role
-    value: "CEO"
-    asOf: 2021-01
-    source: https://anthropic.com/company
-
   - id: f_cY9rP4jS1d
     property: born-year
     value: 1983
@@ -42,26 +29,3 @@ facts:
     property: google-scholar
     value: "https://scholar.google.com/citations?user=0tSbNNgAAAAJ"
 
-  - id: f_9Rz2EK1pYA
-    property: role
-    value: "VP of Research"
-    asOf: "2016"
-    validEnd: 2021-01
-    source: https://en.wikipedia.org/wiki/Dario_Amodei
-    notes: "VP of Research at OpenAI; led GPT-2 and GPT-3 safety research before departing to found Anthropic"
-
-  - id: f_nuoya5WHmQ
-    property: employed-by
-    value: !ref 1LcLlMGLbw
-    asOf: "2016"
-    validEnd: 2021-01
-    source: https://en.wikipedia.org/wiki/Dario_Amodei
-    notes: "Joined OpenAI as VP of Research around 2016; left to co-found Anthropic in January 2021"
-
-  - id: f_vNgM0OKk5w
-    property: role
-    value: "Research Scientist"
-    asOf: "2014"
-    validEnd: "2016"
-    source: https://en.wikipedia.org/wiki/Dario_Amodei
-    notes: "Researcher at Baidu's AI lab under Andrew Ng; worked on speech recognition"

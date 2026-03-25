@@ -12,23 +12,11 @@ facts:
     asOf: 2026-03
     notes: Migrated from old entity system; description updated 2026-03
 
-  - id: f_nP3rK7mW6x
-    property: role
-    value: "Founder and Director"
-    asOf: 2023-01
-    notes: Enriched from wiki page; founder of Sentinel
-
   - id: f_nP6tN2pQ9v
     property: notable-for
     value: "Co-founded Samotsvety forecasting group (won CSET-Foretell by ~2x margin); founded Sentinel for global catastrophe early warning; built Metaforecast.org; ranked 2nd all-time on INFER platform"
     asOf: 2026-03
     notes: Enriched from wiki page
-
-  - id: f_nP9wS5jH3d
-    property: employed-by
-    value: !ref JzhBAecjaA
-    asOf: 2023-01
-    notes: Enriched from wiki page; leads Sentinel early detection and response for global catastrophes
 
   - id: f_nPcY8fL6kA
     property: born-year
@@ -40,8 +28,3 @@ facts:
     value: "Studied Mathematics and Philosophy (dropped out); subsequently studied development economics"
     notes: Enriched from wiki page
 
-  - id: f_nPkW7mR4xB
-    property: employed-by
-    value: !ref Khej79OA8g
-    asOf: !date 2023
-    notes: Research Fellow at QURI from 2020 to 2023; built Metaforecast

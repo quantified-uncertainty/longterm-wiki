@@ -8,17 +8,6 @@ facts:
       platform. Also known as berekuk on GitHub.
     asOf: !date 2026-03
 
-  - id: f_SM2emplyd1
-    property: employed-by
-    value: !ref Khej79OA8g
-    asOf: !date 2025
-    notes: Lead Developer at QURI from 2022 to 2025
-
-  - id: f_SM3role001
-    property: role
-    value: "Lead Developer"
-    asOf: !date 2024
-
   - id: f_SM4notab01
     property: notable-for
     value: "Squiggle language rewrite (v0.8-0.10); built Squiggle Hub platform; previously built Kocherga (EA community space in Moscow)"

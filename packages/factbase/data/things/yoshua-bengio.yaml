@@ -1,21 +1,5 @@
 entity: nGFBXZeM3d
 facts:
-  - id: f_ymkhC4xtr2
-    property: employed-by
-    value: !ref alE9l9RI99
-    asOf: 2017-01
-    source: https://mila.quebec/en/person/bengio-yoshua
-    notes: "Scientific Director of Mila (formerly Montreal Institute for Learning
-      Algorithms); professor at Université de Montréal"
-
-  - id: f_s9wbJl2EO3
-    property: role
-    value: "Scientific Director, Mila; Professor, Université de Montréal"
-    asOf: 2017-01
-    source: https://mila.quebec/en/person/bengio-yoshua
-    notes: "One of the 'Godfathers of Deep Learning'; 2018 Turing Award recipient
-      with Hinton and LeCun"
-
   - id: f_HXYs4QC0Kq
     property: born-year
     value: 1964

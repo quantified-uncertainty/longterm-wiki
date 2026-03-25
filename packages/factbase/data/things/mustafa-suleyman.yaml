@@ -1,27 +1,16 @@
 entity: DBq1ddu8Mg
 facts:
-  - id: f_Q7BZ7C7buA
-    property: employed-by
-    value: !ref OIY5gaPpBA
-
-  - id: f_9yY7JJzb0A
-    property: role
-    value: "CEO of Microsoft AI"
-
-  - id: f_yfpjzZXSJA
-    property: born-year
+  - id: "f_yfpjzZXSJA"
+    property: "born-year"
     value: 1984
-
-  - id: f_65egajgbIQ
-    property: notable-for
-    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI;
-      advocate for AI safety and governance"
-
-  - id: f_ufd9nJBdCA
-    property: wikipedia-url
+  - id: "f_65egajgbIQ"
+    property: "notable-for"
+    value: "Co-founder of DeepMind; CEO of Microsoft AI; founded Inflection AI; advocate for AI safety and governance"
+  - id: "f_ufd9nJBdCA"
+    property: "wikipedia-url"
     value: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
-  - id: lwbM3fLU2Q
-    property: website
-    value: https://the-coming-wave.com
-    source: https://www.wikidata.org/wiki/Q16847797
-    notes: From Wikidata Q16847797
+  - id: "lwbM3fLU2Q"
+    property: "website"
+    value: "https://the-coming-wave.com"
+    source: "https://www.wikidata.org/wiki/Q16847797"
+    notes: "From Wikidata Q16847797"

@@ -1,19 +1,14 @@
 entity: uNNO9uwEoA
 facts:
-  - id: f_6datGmST5Q
-    property: role
-    value: "VP of AI Policy"
-
-  - id: f_xXooK78TVw
-    property: notable-for
-    value: "VP of AI Policy at Google DeepMind; founder of the Centre for the
-      Governance of AI (GovAI); leading AI governance researcher"
-
-  - id: f_NPUNFvYj4A
-    property: education
+  - id: "f_xXooK78TVw"
+    property: "notable-for"
+    value: "VP of AI Policy at Google DeepMind; founder of the Centre for the Governance of AI (GovAI); leading AI
+      governance researcher"
+  - id: "f_NPUNFvYj4A"
+    property: "education"
     value: "PhD in Political Science, Yale University"
-  - id: uPqC8BegfQ
-    property: website
-    value: https://www.allandafoe.com/
-    source: https://www.wikidata.org/wiki/Q126287590
-    notes: From Wikidata Q126287590
+  - id: "uPqC8BegfQ"
+    property: "website"
+    value: "https://www.allandafoe.com/"
+    source: "https://www.wikidata.org/wiki/Q126287590"
+    notes: "From Wikidata Q126287590"

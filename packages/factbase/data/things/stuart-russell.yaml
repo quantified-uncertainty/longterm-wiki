@@ -1,21 +1,5 @@
 entity: ZxUirlzHke
 facts:
-  - id: f_xSvwobPnd7
-    property: employed-by
-    value: !ref ksqqi7fyeA
-    asOf: 1986-01
-    source: https://people.eecs.berkeley.edu/~russell/
-    notes: "Professor of Computer Science at UC Berkeley since 1986; founder of
-      Center for Human-Compatible AI (CHAI)"
-
-  - id: f_hlx9NqiojX
-    property: role
-    value: "Professor of Computer Science, UC Berkeley; Founder of CHAI"
-    asOf: 1986-01
-    source: https://people.eecs.berkeley.edu/~russell/
-    notes: "Co-author of 'Artificial Intelligence: A Modern Approach', the standard
-      AI textbook; author of 'Human Compatible' (2019)"
-
   - id: f_iRPcKCTGM3
     property: born-year
     value: 1962

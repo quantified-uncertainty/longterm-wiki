@@ -1,14 +1,8 @@
 entity: GAlcP90tvw
 facts:
-  - id: f_cvli2jAbQg
-    property: role
-    value: "Research Scientist"
-
-  - id: f_MYw0rJFjJQ
-    property: notable-for
+  - id: "f_MYw0rJFjJQ"
+    property: "notable-for"
     value: "Research scientist at Google DeepMind working on AI alignment; creator of the Alignment Newsletter"
-
-  - id: f_58eMyTSywg
-    property: education
+  - id: "f_58eMyTSywg"
+    property: "education"
     value: "PhD in Computer Science, UC Berkeley"
-
