@@ -1546,6 +1546,8 @@ export const sourceCheckEvidence = pgTable(
     index("idx_sce_entity").on(table.entityId),
     index("idx_sce_verdict").on(table.verdict),
     index("idx_sce_checked").on(table.checkedAt),
+    // Dedup unique index: idx_sce_dedup on (record_type, record_id, COALESCE(source_url, ''), COALESCE(checker_model, ''))
+    // Defined in migration 0135. COALESCE expressions require raw SQL, not Drizzle .on() syntax.
   ]
 );
 
