@@ -2342,6 +2342,8 @@ export const VALID_THING_TYPES = [
   "entity-event",
   "entity-assessment",
   "publication",
+  "political-race",
+  "race-candidate",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -3144,5 +3146,132 @@ export const blueskyPosts = pgTable(
     index("idx_bp_posted_at").on(table.postedAt),
     index("idx_bp_embedded_url").on(table.embeddedUrl),
     index("idx_bp_resource_id").on(table.resourceId),
+  ]
+);
+
+// ── Political Races ──────────────────────────────────────────────────────
+//
+// Tracks political races relevant to AI policy (2026 midterms, ballot measures).
+// Each race can have multiple candidates via the race_candidates join table.
+
+export const politicalRaces = pgTable(
+  "political_races",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** Full race name, e.g. "NY-12 Democratic Primary 2026" */
+    name: text("name").notNull(),
+    /** Race type: primary, general, runoff, special, ballot_measure */
+    raceType: text("race_type").notNull(),
+    /** Party: democrat, republican, or null for ballot measures */
+    party: text("party"),
+    /** Level: federal_house, federal_senate, state_governor, state_legislature, ballot_measure */
+    level: text("level").notNull(),
+    /** US state abbreviation */
+    state: text("state"),
+    /** District identifier, e.g. "NY-12", "NE-Sen", "TN-Gov" */
+    district: text("district"),
+    /** Election date: YYYY-MM-DD */
+    electionDate: text("election_date"),
+    /** Status: upcoming, active, resolved, cancelled */
+    status: text("status").notNull().default("upcoming"),
+    /** Winner stableId or "Yes"/"No" for ballot measures */
+    outcome: text("outcome"),
+    /** Narrative outcome details */
+    outcomeDetails: text("outcome_details"),
+    /** Short AI relevance description */
+    aiAngle: text("ai_angle"),
+    /** Longer AI relevance narrative */
+    aiAngleSummary: text("ai_angle_summary"),
+    /** FK to entities.stable_id for linked legislation */
+    policyEntityId: text("policy_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** For ballot measures: measure title */
+    measureTitle: text("measure_title"),
+    /** For ballot measures: measure description */
+    measureDescription: text("measure_description"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pr_status").on(table.status),
+    index("idx_pr_state").on(table.state),
+    index("idx_pr_level").on(table.level),
+    index("idx_pr_race_type").on(table.raceType),
+    index("idx_pr_election_date").on(table.electionDate),
+    index("idx_pr_policy_entity").on(table.policyEntityId),
+  ]
+);
+
+// ── Race Candidates ──────────────────────────────────────────────────────
+//
+// Candidates participating in political races, with PAC backing info.
+// For ballot measures, "candidates" are the "For" and "Against" sides.
+
+export const raceCandidates = pgTable(
+  "race_candidates",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to political_races.id */
+    raceId: varchar("race_id", { length: 10 })
+      .notNull()
+      .references(() => politicalRaces.id, { onDelete: "cascade" }),
+    /** FK to entities.stable_id for the candidate */
+    candidateEntityId: text("candidate_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Always present display name */
+    candidateDisplayName: text("candidate_display_name").notNull(),
+    isIncumbent: boolean("is_incumbent").notNull().default(false),
+    isWinner: boolean("is_winner").notNull().default(false),
+    /** Vote share as decimal (0.42 = 42%) */
+    voteShare: numeric("vote_share"),
+    /** Status: running, won, lost, withdrew */
+    status: text("status").notNull().default("running"),
+    /** FK to entities.stable_id for primary PAC */
+    pacEntityId: text("pac_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** PAC display name fallback */
+    pacDisplayName: text("pac_display_name"),
+    /** Total PAC spending in USD */
+    pacAmount: numeric("pac_amount"),
+    /** PAC position: support, oppose */
+    pacPosition: text("pac_position"),
+    party: text("party"),
+    /** Notable endorsements */
+    endorsements: text("endorsements"),
+    /** AI stance: pro_regulation, anti_regulation, mixed, neutral */
+    aiStance: text("ai_stance"),
+    source: text("source"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_rc_race").on(table.raceId),
+    index("idx_rc_candidate_entity").on(table.candidateEntityId),
+    index("idx_rc_pac_entity").on(table.pacEntityId),
+    index("idx_rc_status").on(table.status),
+    index("idx_rc_ai_stance").on(table.aiStance),
   ]
 );
