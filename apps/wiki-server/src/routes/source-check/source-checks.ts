@@ -189,64 +189,77 @@ function mapEvidenceRow(e: {
 const sourceChecksApp = new Hono()
 
   // ---- GET /stats ----
-  .get("/stats", async (c) => {
-    const db = getDrizzleDb();
+  .get(
+    "/stats",
+    zv("query", z.object({ record_type: z.string().max(50).optional() })),
+    async (c) => {
+      const { record_type } = c.req.valid("query");
+      const db = getDrizzleDb();
 
-    const [statsRow] = await db
-      .select({
-        total: count(),
-        needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
-        avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
-      })
-      .from(sourceCheckVerdicts);
+      const typeCondition = record_type
+        ? eq(sourceCheckVerdicts.recordType, record_type)
+        : undefined;
 
-    const byVerdictRows = await db
-      .select({
-        verdict: sourceCheckVerdicts.verdict,
-        count: count(),
-      })
-      .from(sourceCheckVerdicts)
-      .groupBy(sourceCheckVerdicts.verdict);
+      const [statsRow] = await db
+        .select({
+          total: count(),
+          needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
+          avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
+        })
+        .from(sourceCheckVerdicts)
+        .where(typeCondition);
 
-    const byVerdict: Record<string, number> = {};
-    for (const row of byVerdictRows) {
-      byVerdict[row.verdict] = row.count;
+      const byVerdictRows = await db
+        .select({
+          verdict: sourceCheckVerdicts.verdict,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .where(typeCondition)
+        .groupBy(sourceCheckVerdicts.verdict);
+
+      const byVerdict: Record<string, number> = {};
+      for (const row of byVerdictRows) {
+        byVerdict[row.verdict] = row.count;
+      }
+
+      // by_type is always unfiltered (shows all types for the type-filter tabs)
+      const byTypeRows = await db
+        .select({
+          recordType: sourceCheckVerdicts.recordType,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .groupBy(sourceCheckVerdicts.recordType);
+
+      const byType: Record<string, number> = {};
+      for (const row of byTypeRows) {
+        byType[row.recordType] = row.count;
+      }
+
+      // Count stale evidence rows (checker_model != current model)
+      const [staleRow] = await db
+        .select({ count: count() })
+        .from(sourceCheckEvidence)
+        .where(
+          or(
+            ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
+            isNull(sourceCheckEvidence.checkerModel),
+          )
+        );
+
+      return c.json({
+        total: statsRow.total,
+        by_verdict: byVerdict,
+        by_type: byType,
+        needs_recheck: Number(statsRow.needsRecheck),
+        avg_confidence:
+          Math.round(Number(statsRow.avgConfidence) * 100) / 100,
+        stale_evidence_count: staleRow.count,
+        current_checker_model: CURRENT_CHECKER_MODEL,
+      });
     }
-
-    const byTypeRows = await db
-      .select({
-        recordType: sourceCheckVerdicts.recordType,
-        count: count(),
-      })
-      .from(sourceCheckVerdicts)
-      .groupBy(sourceCheckVerdicts.recordType);
-
-    const byType: Record<string, number> = {};
-    for (const row of byTypeRows) {
-      byType[row.recordType] = row.count;
-    }
-
-    // Count stale evidence rows (checker_model != current model)
-    const [staleRow] = await db
-      .select({ count: count() })
-      .from(sourceCheckEvidence)
-      .where(
-        or(
-          ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
-          isNull(sourceCheckEvidence.checkerModel),
-        )
-      );
-
-    return c.json({
-      total: statsRow.total,
-      by_verdict: byVerdict,
-      by_type: byType,
-      needs_recheck: Number(statsRow.needsRecheck),
-      avg_confidence: Math.round(Number(statsRow.avgConfidence) * 100) / 100,
-      stale_evidence_count: staleRow.count,
-      current_checker_model: CURRENT_CHECKER_MODEL,
-    });
-  })
+  )
 
   // ---- GET /verdicts ----
   .get("/verdicts", zv("query", VerdictsQuery), async (c) => {
@@ -694,7 +707,9 @@ const sourceChecksApp = new Hono()
     const names: Record<string, string> = {};
 
     if (record_type === "personnel") {
-      // Personnel: join with entities to get person name + org name
+      // Personnel: join with entities to get person name + org name.
+      // The join uses stableId, but some records have numeric IDs (e.g. "304")
+      // or wikiIds (e.g. "E304") in personEntityId instead. We handle fallbacks below.
       const personEntity = alias(entities, "person_entity");
       const orgEntity = alias(entities, "org_entity");
 
@@ -702,8 +717,11 @@ const sourceChecksApp = new Hono()
         .select({
           id: personnel.id,
           personDisplayName: personnel.personDisplayName,
+          personId: personnel.personId,
+          personEntityId: personnel.personEntityId,
           personEntityTitle: personEntity.title,
           orgDisplayName: personnel.orgDisplayName,
+          orgEntityId: personnel.orgEntityId,
           orgEntityTitle: orgEntity.title,
         })
         .from(personnel)
@@ -714,10 +732,98 @@ const sourceChecksApp = new Hono()
         .leftJoin(orgEntity, eq(orgEntity.stableId, personnel.orgEntityId))
         .where(inArray(personnel.id, record_ids));
 
+      // Collect unresolved person/org entity IDs for secondary lookup
+      const unresolvedPersonIds: string[] = [];
+      const unresolvedOrgIds: string[] = [];
       for (const row of rows) {
-        const personName =
-          row.personDisplayName ?? row.personEntityTitle ?? "Unknown";
-        const orgName = row.orgDisplayName ?? row.orgEntityTitle;
+        if (!row.personDisplayName && !row.personEntityTitle && row.personEntityId) {
+          unresolvedPersonIds.push(row.personEntityId);
+        }
+        if (!row.orgDisplayName && !row.orgEntityTitle && row.orgEntityId) {
+          unresolvedOrgIds.push(row.orgEntityId);
+        }
+      }
+
+      // Secondary lookup: try matching unresolved IDs by wikiId (e.g. "E304"
+      // from "304") or by slug. This handles numeric personEntityId values.
+      const entityFallbackMap = new Map<string, string>();
+      const allUnresolved = [...new Set([...unresolvedPersonIds, ...unresolvedOrgIds])];
+      if (allUnresolved.length > 0) {
+        // Build lookup candidates: try "E<id>" for purely numeric IDs,
+        // and try the raw value as a slug
+        const wikiIdCandidates: string[] = [];
+        const slugCandidates: string[] = [];
+        for (const uid of allUnresolved) {
+          if (/^\d+$/.test(uid)) {
+            wikiIdCandidates.push(`E${uid}`);
+          }
+          slugCandidates.push(uid);
+        }
+
+        if (wikiIdCandidates.length > 0 || slugCandidates.length > 0) {
+          const conditions = [];
+          if (wikiIdCandidates.length > 0) {
+            conditions.push(inArray(entities.wikiId, wikiIdCandidates));
+          }
+          if (slugCandidates.length > 0) {
+            conditions.push(inArray(entities.id, slugCandidates));
+          }
+
+          const fallbackRows = await db
+            .select({
+              stableId: entities.stableId,
+              slug: entities.id,
+              wikiId: entities.wikiId,
+              title: entities.title,
+            })
+            .from(entities)
+            .where(or(...conditions));
+
+          // Map back: for each unresolved ID, check if we found a match
+          for (const uid of allUnresolved) {
+            const byWikiId = /^\d+$/.test(uid)
+              ? fallbackRows.find((r) => r.wikiId === `E${uid}`)
+              : undefined;
+            const bySlug = fallbackRows.find((r) => r.slug === uid);
+            const match = byWikiId ?? bySlug;
+            if (match) {
+              entityFallbackMap.set(uid, match.title);
+            }
+          }
+        }
+      }
+
+      for (const row of rows) {
+        // Resolve person name with fallback chain:
+        // 1. personDisplayName (strip "new:" prefix if present)
+        // 2. personEntityTitle (from stableId join)
+        // 3. entityFallbackMap (from wikiId/slug secondary lookup)
+        // 4. personId (legacy field, often a readable name)
+        // 5. "Staff" as last resort
+        let personName = row.personDisplayName ?? row.personEntityTitle ?? null;
+        if (!personName && row.personEntityId) {
+          personName = entityFallbackMap.get(row.personEntityId) ?? null;
+        }
+        if (!personName && row.personId) {
+          // Legacy personId may be a readable name (not a hash/UUID)
+          const pid = row.personId;
+          if (pid.length > 2 && !/^[a-f0-9]{10}$/.test(pid) && !/^\d+$/.test(pid)) {
+            personName = pid;
+          }
+        }
+        personName = personName ?? "Staff";
+
+        // Strip "new:" prefix — data pipeline artifact
+        if (personName.startsWith("new:")) {
+          personName = personName.slice(4).trim();
+        }
+
+        // Resolve org name with same fallback chain
+        let orgName = row.orgDisplayName ?? row.orgEntityTitle ?? null;
+        if (!orgName && row.orgEntityId) {
+          orgName = entityFallbackMap.get(row.orgEntityId) ?? null;
+        }
+
         names[row.id] = orgName ? `${personName} @ ${orgName}` : personName;
       }
     } else if (record_type === "division") {
