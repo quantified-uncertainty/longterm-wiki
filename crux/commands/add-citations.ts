@@ -62,7 +62,10 @@ Rules:
 - Prefer primary sources (official announcements, research papers, government docs)
 - Prefer recent sources over old ones
 - The source must DIRECTLY support the specific claim, not just be about the topic
-- Never return URLs you aren't confident are real`;
+- Never return URLs you aren't confident are real
+- NEVER cite longtermwiki.com, longterm.wiki, or any mirror of this wiki — that would be circular
+- Prefer stable URLs: Wikipedia, arxiv, official company pages, major news outlets
+- Avoid URLs with database record IDs (e.g., /rec12345) that may break`;
 
 interface FindSourceResult {
   url: string;
@@ -99,9 +102,26 @@ Search the web and return the best source URL as JSON.`, {
     if (!parsed.url || parsed.url.length < 10) return null;
 
     // Basic URL validation
+    let parsedUrl: URL;
     try {
-      new URL(parsed.url);
+      parsedUrl = new URL(parsed.url);
     } catch {
+      return null;
+    }
+
+    // Block circular citations (our own wiki)
+    const blockedDomains = [
+      'longtermwiki.com', 'www.longtermwiki.com',
+      'longterm.wiki', 'www.longterm.wiki',
+    ];
+    if (blockedDomains.includes(parsedUrl.hostname)) {
+      console.warn(`    [!] Blocked circular citation: ${parsed.url}`);
+      return null;
+    }
+
+    // Warn about fragile URLs (database IDs, temp pages)
+    if (/\/rec[A-Za-z0-9]{10,}/.test(parsed.url)) {
+      console.warn(`    [!] Fragile URL (database ID): ${parsed.url}`);
       return null;
     }
 
