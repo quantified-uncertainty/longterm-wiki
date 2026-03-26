@@ -62,9 +62,10 @@ describe("pgPersonnelToEntries", () => {
       person: { entityId: "e1", slug: "alice-smith", name: "Alice Smith" },
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries).toHaveLength(1);
-    expect(entries[0]).toEqual({
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(1);
+    expect(result.unresolvedCount).toBe(0);
+    expect(result.entries[0]).toEqual({
       name: "Alice Smith",
       title: "CEO",
       slug: "alice-smith",
@@ -84,8 +85,8 @@ describe("pgPersonnelToEntries", () => {
       personResolvedName: "Resolved Name",
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("Resolved Name");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].name).toBe("Resolved Name");
   });
 
   it("humanizes slug-format personId as last-resort fallback name", () => {
@@ -95,30 +96,32 @@ describe("pgPersonnelToEntries", () => {
       personResolvedName: null,
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("Fallback Id");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].name).toBe("Fallback Id");
   });
 
-  it("returns 'Unknown' for bare stableId personId", () => {
+  it("excludes bare stableId personId and counts as unresolved", () => {
     const row = makeRow({
       personId: "AbCdEfG12H",
       person: { entityId: null, slug: null, name: null },
       personResolvedName: null,
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("Unknown");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
   });
 
-  it("returns 'Unknown' for numeric PK personId", () => {
+  it("excludes numeric PK personId and counts as unresolved", () => {
     const row = makeRow({
       personId: "12345",
       person: { entityId: null, slug: null, name: null },
       personResolvedName: null,
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("Unknown");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
   });
 
   it("strips 'new:' prefix from personId fallback", () => {
@@ -128,33 +131,34 @@ describe("pgPersonnelToEntries", () => {
       personResolvedName: null,
     });
 
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].name).toBe("Jane Smith");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].name).toBe("Jane Smith");
   });
 
   it("sets isCurrent=false when endDate is present", () => {
     const row = makeRow({ endDate: "2023-12-31" });
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].isCurrent).toBe(false);
-    expect(entries[0].end).toBe("2023-12-31");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].isCurrent).toBe(false);
+    expect(result.entries[0].end).toBe("2023-12-31");
   });
 
   it("marks board members correctly", () => {
     const row = makeRow({ roleType: "board" });
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].isBoard).toBe(true);
-    expect(entries[0].roleType).toBe("board");
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].isBoard).toBe(true);
+    expect(result.entries[0].roleType).toBe("board");
   });
 
   it("sets roleType to undefined for invalid roleType values", () => {
     const row = makeRow({ roleType: "unknown-type" as string });
-    const entries = pgPersonnelToEntries([row]);
-    expect(entries[0].roleType).toBeUndefined();
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].roleType).toBeUndefined();
   });
 
   it("handles empty array input", () => {
-    const entries = pgPersonnelToEntries([]);
-    expect(entries).toEqual([]);
+    const result = pgPersonnelToEntries([]);
+    expect(result.entries).toEqual([]);
+    expect(result.unresolvedCount).toBe(0);
   });
 
   it("sets entityType only when slug is present", () => {
@@ -165,9 +169,24 @@ describe("pgPersonnelToEntries", () => {
       person: { entityId: null, slug: null, name: "Bob" },
     });
 
-    const entries = pgPersonnelToEntries([withSlug, withoutSlug]);
-    expect(entries[0].entityType).toBe("person");
-    expect(entries[1].entityType).toBeUndefined();
+    const result = pgPersonnelToEntries([withSlug, withoutSlug]);
+    expect(result.entries[0].entityType).toBe("person");
+    expect(result.entries[1].entityType).toBeUndefined();
+  });
+
+  it("correctly partitions mixed named and unnamed records", () => {
+    const rows = [
+      makeRow({ personId: "alice", person: { entityId: "e1", slug: "alice", name: "Alice" } }),
+      makeRow({ personId: "AbCdEfG12H", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+      makeRow({ personId: "bob-jones", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+      makeRow({ personId: "XyZaBcDe99", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+    ];
+
+    const result = pgPersonnelToEntries(rows);
+    expect(result.entries).toHaveLength(2); // Alice + Bob Jones (humanized)
+    expect(result.unresolvedCount).toBe(2); // 2 stableIds
+    expect(result.entries[0].name).toBe("Alice");
+    expect(result.entries[1].name).toBe("Bob Jones");
   });
 });
 
