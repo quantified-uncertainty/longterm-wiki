@@ -485,11 +485,6 @@ facts:
     value: Chris Olah
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847; text value (not entity ref)
-  - id: wk9n4TXkdA
-    property: legal-structure
-    value: Delaware corporation
-    source: https://www.wikidata.org/wiki/Q116758847
-    notes: From Wikidata Q116758847
   - id: S4m9grsGAw
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Anthropic
