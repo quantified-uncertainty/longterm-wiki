@@ -8,6 +8,30 @@
 
 set -euo pipefail
 
+# ── Check for pushes to branches with already-merged PRs ──
+# Prevents orphaned commits when an agent pushes after merge.
+BRANCH=$(git branch --show-current 2>/dev/null || true)
+if [ -n "$BRANCH" ] && [ "$BRANCH" != "main" ] && command -v gh &>/dev/null; then
+  PR_STATE=$(gh pr view "$BRANCH" --json state --jq '.state' 2>/dev/null || true)
+  if [ "$PR_STATE" = "MERGED" ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  BLOCKED: PR for branch '$BRANCH' is already MERGED.       ║"
+    echo "║                                                            ║"
+    echo "║  These commits will be orphaned — they won't reach main.   ║"
+    echo "║  Create a new branch and cherry-pick your commits instead. ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    exit 1
+  fi
+  if [ "$PR_STATE" = "CLOSED" ]; then
+    echo ""
+    echo "⚠  WARNING: PR for branch '$BRANCH' is CLOSED."
+    echo "   Commits pushed here won't reach main unless a new PR is opened."
+    echo ""
+  fi
+fi
+
 echo ""
 echo "Running pre-push gate checks..."
 echo ""
