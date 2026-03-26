@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { fetchFromWikiServer } from "@/lib/wiki-server";
+import { fetchDetailed, fetchFromWikiServer } from "@/lib/wiki-server";
 import {
   RACE_STATUS_COLORS,
   AI_STANCE_COLORS,
@@ -9,6 +9,15 @@ import {
   RACE_LEVEL_LABELS,
   CANDIDATE_STATUS_COLORS,
 } from "../races-constants";
+
+/**
+ * Race data lives in Postgres and is fetched from the wiki-server at request
+ * time. Force dynamic rendering so Next.js does not attempt to statically
+ * generate these pages (which would 404 when the wiki-server is unreachable
+ * during the build).
+ */
+export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 interface RaceDetail {
   id: string;
@@ -76,18 +85,57 @@ function formatCurrency(amount: number): string {
   return `\$${amount.toFixed(0)}`;
 }
 
+/** Extract the domain from a URL for compact display. */
+function extractSourceDomain(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    return url;
+  }
+}
+
 export default async function RaceDetailPage({
   params,
 }: {
   params: Params;
 }) {
   const { id } = await params;
-  const race = await fetchFromWikiServer<RaceDetail>(
+  const result = await fetchDetailed<RaceDetail>(
     `/api/political-races/${id}`,
     { revalidate: 300 },
   );
 
-  if (!race) return notFound();
+  if (!result.ok) {
+    // Distinguish "race not found" (server returned 404) from "server
+    // unreachable / misconfigured". Only the former should be a true 404.
+    if (
+      result.error.type === "server-error" &&
+      result.error.status === 404
+    ) {
+      return notFound();
+    }
+    // For connection errors or non-404 server errors, show a user-friendly
+    // message instead of a misleading 404.
+    return (
+      <div className="container mx-auto max-w-4xl px-4 py-8">
+        <nav className="text-sm text-muted-foreground mb-4">
+          <Link href="/races" className="hover:underline">
+            Political Races
+          </Link>
+        </nav>
+        <h1 className="text-2xl font-bold mb-2">Unable to load race</h1>
+        <p className="text-muted-foreground">
+          The race data could not be loaded at this time. Please try again
+          later or return to the{" "}
+          <Link href="/races" className="text-blue-600 dark:text-blue-400 hover:underline">
+            races directory
+          </Link>.
+        </p>
+      </div>
+    );
+  }
+
+  const race = result.data;
 
   const proRegCandidates = race.candidates.filter((c) => c.aiStance === "pro_regulation");
   const antiRegCandidates = race.candidates.filter((c) => c.aiStance === "anti_regulation");
@@ -312,9 +360,9 @@ export default async function RaceDetailPage({
             href={race.source}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+            className="text-blue-600 dark:text-blue-400 hover:underline"
           >
-            {race.source}
+            {extractSourceDomain(race.source)}
           </a>
         </div>
       )}
