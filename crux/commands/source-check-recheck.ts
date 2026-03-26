@@ -358,6 +358,11 @@ async function recheckCommand(
           from: result.previousVerdict,
           to: result.newVerdict,
         });
+
+        // Prominent alert for confirmed→contradicted flips (data regression)
+        if (result.previousVerdict === 'confirmed' && result.newVerdict === 'contradicted') {
+          console.log(`    \x1b[41m\x1b[37m ⚠ DATA REGRESSION: was confirmed, now contradicted \x1b[0m`);
+        }
       }
 
       const changeMarker = result.changed ? ' [CHANGED]' : '';
