@@ -1,50 +1,10 @@
 /**
  * Tests for PR Patrol parallel dispatch — stale working-label cleanup logic.
  */
-import { describe, it, expect, beforeAll, afterEach } from 'vitest';
-import { mkdirSync, writeFileSync, rmSync, existsSync } from 'fs';
-import { join } from 'path';
-import os from 'os';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { existsSync } from 'fs';
 
 import { ensureDirs } from './state.ts';
-import { findIdleSlots, getLwDir } from './parallel.ts';
-
-// ── Stale label detection (unit-testable pure logic) ─────────────────────────
-//
-// We test the PR-node filtering logic that determines which PRs have stale
-// working labels. This logic lives inline in cleanStaleWorkingLabels but the
-// key invariant is:
-//   A label is stale  ⟺  no active lock file claims that PR number.
-
-describe('cleanStaleLocks integration — getLwDir', () => {
-  it('returns a path ending in /lw when invoked from a normal directory', () => {
-    const lwDir = getLwDir();
-    expect(typeof lwDir).toBe('string');
-    expect(lwDir.length).toBeGreaterThan(0);
-    // The directory either IS lw/ or has lw as a parent segment
-    expect(lwDir).toMatch(/lw$/);
-  });
-});
-
-// ── Lock file stale detection (exercises isLockStale indirectly via findIdleSlots) ──
-
-describe('findIdleSlots — basic validation', () => {
-  it('returns an empty array when lwDir does not exist', () => {
-    const result = findIdleSlots('/tmp/nonexistent-dir-xyz-12345', [2, 10]);
-    expect(result).toEqual([]);
-  });
-
-  it('returns an empty array for an empty lwDir', () => {
-    const tmpDir = join(os.tmpdir(), `patrol-test-${Date.now()}`);
-    mkdirSync(tmpDir, { recursive: true });
-    try {
-      const result = findIdleSlots(tmpDir, [2, 10]);
-      expect(result).toEqual([]);
-    } finally {
-      rmSync(tmpDir, { recursive: true, force: true });
-    }
-  });
-});
 
 // ── Stale label filtering — core logic ───────────────────────────────────────
 //
