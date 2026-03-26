@@ -1,0 +1,3297 @@
+# AI for Coordination Ecosystem
+# Organizations, projects, and people working on AI-powered coordination tools
+# Including deliberation, DAO governance, arbitration, mechanism design, collective intelligence
+
+# ============================================================
+# ORGANIZATIONS — Deliberation & Democracy
+# ============================================================
+
+- id: ai-democracy-foundation
+  stableId: 7rS95q1sP-
+  type: organization
+  orgType: safety-org
+  title: AI & Democracy Foundation
+  description: >-
+    Nonprofit designing and testing democratic processes for AI governance and alignment.
+    Led by Aviv Ovadya. Key projects include the Democracy Levels framework (evaluating
+    how democratically decisions are made), Case Law for AI (judicial-inspired approaches
+    to connecting deliberative input into alignment), and Safeguarded AI (ARIA partnership
+    for formal safety specifications through deliberation). 11 staff members.
+  website: https://aidemocracyfoundation.org
+  tags:
+    - deliberation
+    - ai-governance
+    - democratic-ai
+    - alignment
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: aviv-ovadya
+      type: person
+      relationship: leads-to
+    - id: democracy-levels
+      type: project
+      relationship: composed-of
+    - id: case-law-for-ai
+      type: project
+      relationship: composed-of
+  sources:
+    - title: AI & Democracy Foundation
+      url: https://aidemocracyfoundation.org
+    - title: "Democratic AI is Possible (arxiv 2411.09222)"
+      url: https://arxiv.org/abs/2411.09222
+  customFields:
+    - label: Founded
+      value: "2024"
+    - label: Key Project
+      value: Democracy Levels Framework
+
+- id: radicalxchange
+  stableId: GO99Gd5tfl
+  type: organization
+  orgType: generic
+  title: RadicalxChange Foundation
+  description: >-
+    501(c)(3) nonprofit advancing radical social technologies for property, voting,
+    deliberation, data sovereignty, and value exchange. Founded by Glen Weyl in 2018.
+    Closely associated with quadratic voting, quadratic funding, and soulbound tokens
+    through founder Glen Weyl's research collaborations (with Buterin, Posner, Hitzig,
+    Ohlhaver). Collaborates with Gitcoin, governments, and academic institutions.
+  website: https://www.radicalxchange.org
+  tags:
+    - mechanism-design
+    - quadratic-voting
+    - quadratic-funding
+    - governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: glen-weyl
+      type: person
+      relationship: leads-to
+    - id: gitcoin
+      type: organization
+      relationship: related
+    - id: plurality-institute
+      type: organization
+      relationship: related
+  sources:
+    - title: RadicalxChange Foundation
+      url: https://www.radicalxchange.org
+  customFields:
+    - label: Founded
+      value: "2018"
+    - label: Key Innovation
+      value: Quadratic Voting & Funding
+
+- id: plurality-institute
+  stableId: XW1ucKZvGy
+  type: organization
+  orgType: generic
+  title: Plurality Institute
+  description: >-
+    Research organization founded by Glen Weyl advancing plural technology — tools for
+    collaborative diversity and democracy. Connected to Microsoft Research's Plural
+    Technology Collaboratory. Co-produced the book "Plurality: The Future of Collaborative
+    Technology and Democracy" with Audrey Tang.
+  website: https://www.plurality.institute
+  tags:
+    - plural-technology
+    - democracy
+    - collaboration
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: glen-weyl
+      type: person
+      relationship: leads-to
+    - id: radicalxchange
+      type: organization
+      relationship: related
+
+- id: computational-democracy-project
+  stableId: Tx5VgJAKkn
+  type: organization
+  orgType: generic
+  title: Computational Democracy Project
+  description: >-
+    Nonprofit stewarding Polis, the open-source AI-assisted deliberation platform used in
+    35+ countries. Co-founded by Colin Megill. Polis uses ML clustering to map opinion
+    landscapes, surface consensus, and bridge divides. Used by Taiwan's vTaiwan for 26
+    national issues (80% implementation rate) and by Anthropic for Collective Constitutional AI.
+  website: https://compdemocracy.org
+  tags:
+    - deliberation
+    - polis
+    - opinion-mapping
+    - consensus
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: colin-megill
+      type: person
+      relationship: leads-to
+    - id: polis-platform
+      type: project
+      relationship: composed-of
+  sources:
+    - title: Computational Democracy Project
+      url: https://compdemocracy.org
+    - title: Polis
+      url: https://pol.is
+
+- id: govlab
+  stableId: G-ywlvZHIR
+  type: organization
+  orgType: academic
+  title: The GovLab
+  description: >-
+    Research center at Northeastern University (formerly NYU) founded by Beth Noveck,
+    pioneering open government and collective intelligence for public problem-solving.
+    Part of the GETTING-Plurality research network. Partner in Taiwan's 2024 Alignment
+    Assemblies with CIP, Anthropic, and OpenAI.
+  website: https://thegovlab.org
+  tags:
+    - open-government
+    - collective-intelligence
+    - civic-tech
+    - governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: beth-noveck
+      type: person
+      relationship: leads-to
+  sources:
+    - title: The GovLab
+      url: https://thegovlab.org
+  customFields:
+    - label: Key Concept
+      value: Smarter governance through data and collective intelligence
+
+- id: stanford-deliberative-democracy-lab
+  stableId: IXnetrmsr6
+  type: organization
+  orgType: academic
+  title: Stanford Deliberative Democracy Lab
+  description: >-
+    Research lab at Stanford directed by James Fishkin, inventor of deliberative polling.
+    Has conducted 150+ deliberative polls in 50+ countries since 1988. "America in One
+    Room" series demonstrated 18-point drops in dissatisfaction with democracy.
+    Increasingly incorporating AI for translation, synthesis, and moderation.
+  website: https://deliberation.stanford.edu
+  tags:
+    - deliberative-polling
+    - citizen-assemblies
+    - democracy
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: james-fishkin
+      type: person
+      relationship: leads-to
+    - id: deliberation-io
+      type: project
+      relationship: related
+  sources:
+    - title: Stanford Deliberative Democracy Lab
+      url: https://deliberation.stanford.edu
+
+- id: mit-center-collective-intelligence
+  stableId: xFz84U1HN4
+  type: organization
+  orgType: academic
+  title: MIT Center for Collective Intelligence
+  description: >-
+    Research center at MIT founded by Thomas Malone studying how people and computers
+    can be connected to act collectively in intelligent ways. Key concepts include
+    "Superminds" and "collective superintelligence." Created MIT Climate CoLab for
+    crowdsourced climate solutions (spun out 2022; now read-only).
+  website: https://cci.mit.edu
+  tags:
+    - collective-intelligence
+    - superminds
+    - human-ai-collaboration
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: thomas-malone
+      type: person
+      relationship: leads-to
+  sources:
+    - title: MIT CCI
+      url: https://cci.mit.edu
+
+- id: cooperative-ai-foundation
+  stableId: fa-W-T5h3l
+  type: organization
+  orgType: safety-org
+  title: Cooperative AI Foundation
+  description: >-
+    Research foundation with $15M funding (from Macroscopic Ventures) studying how AI
+    systems can learn to cooperate and how to design environments incentivizing cooperation.
+    Co-founded by Allan Dafoe (now Director of Frontier Safety and Governance at Google
+    DeepMind), Gillian Hadfield, and others. Published foundational "Open Problems in
+    Cooperative AI" (2020). Key focus areas include multi-agent cooperation, preventing
+    destructive AI competition, and human-AI coordination.
+  website: https://www.cooperativeai.com
+  tags:
+    - cooperative-ai
+    - multi-agent
+    - ai-safety
+    - game-theory
+    - coordination
+  clusters:
+    - coordination
+    - ai-safety
+  relatedEntries:
+    - id: allan-dafoe
+      type: person
+      relationship: leads-to
+  sources:
+    - title: Cooperative AI Foundation
+      url: https://www.cooperativeai.com
+    - title: "Open Problems in Cooperative AI"
+      url: https://arxiv.org/abs/2012.08630
+  customFields:
+    - label: Funding
+      value: "$15M"
+    - label: Founded
+      value: "2021"
+
+- id: oxford-governance-ai
+  stableId: E1Wbt-foZC
+  type: organization
+  orgType: academic
+  title: Centre for the Governance of AI
+  description: >-
+    Independent research center studying AI governance. Founded by Allan Dafoe at Yale
+    (2016), moved to Oxford (2018), became independent nonprofit (2021). Now led by Ben
+    Garfinkel. Studies international coordination, AI governance, and cooperative AI.
+  website: https://www.governance.ai
+  tags:
+    - ai-governance
+    - coordination
+    - policy
+  clusters:
+    - coordination
+    - ai-safety
+  relatedEntries:
+    - id: allan-dafoe
+      type: person
+      relationship: leads-to
+  sources:
+    - title: Centre for the Governance of AI
+      url: https://www.governance.ai
+
+- id: forethought-foundation
+  stableId: Pd-y8jBVN0
+  type: organization
+  orgType: generic
+  title: Forethought Foundation
+  description: >-
+    Research organization that published "Design Sketches for Collective Epistemics" (2025),
+    proposing five technologies for shifting society toward high-honesty equilibria:
+    Community Notes for Everything, Rhetoric Highlighting, Reliability Tracking,
+    Epistemic Virtue Evals, and Provenance Tracing.
+  website: https://www.forethought.org
+  tags:
+    - collective-epistemics
+    - information-integrity
+    - coordination
+  clusters:
+    - coordination
+    - epistemics
+  sources:
+    - title: Forethought Foundation
+      url: https://www.forethought.org
+
+- id: newdemocracy-foundation
+  stableId: 7bmpbkSWVn
+  type: organization
+  orgType: generic
+  title: newDemocracy Foundation
+  description: >-
+    Australian research foundation advocating sortition-based democratic innovation.
+    Designs and supports citizens' assemblies and juries using random selection. Aviv
+    Ovadya is an affiliated Research Fellow.
+  website: https://www.newdemocracy.com.au
+  tags:
+    - sortition
+    - citizen-assemblies
+    - democracy
+    - coordination
+  clusters:
+    - coordination
+
+- id: nesta-collective-intelligence
+  stableId: XVz9frTFe-
+  type: organization
+  orgType: generic
+  title: Nesta Centre for Collective Intelligence Design
+  description: >-
+    UK-based research and practice center exploring how collective intelligence can
+    address social challenges. Projects include AI-improved crowd-sourced innovation,
+    citizen science, and distributed problem-solving.
+  website: https://www.nesta.org.uk/project/centre-collective-intelligence-design/
+  tags:
+    - collective-intelligence
+    - civic-innovation
+    - coordination
+  clusters:
+    - coordination
+
+- id: democracynext
+  stableId: xBPfJU6L5n
+  type: organization
+  orgType: generic
+  title: DemocracyNext
+  description: >-
+    EU-focused organization advocating for citizens' assemblies and sortition-based
+    governance innovation. Works to establish permanent deliberative institutions
+    alongside elected bodies.
+  website: https://www.democracynext.org
+  tags:
+    - citizen-assemblies
+    - democracy
+    - sortition
+    - coordination
+  clusters:
+    - coordination
+
+- id: sortition-foundation
+  stableId: vD5kvsbzyZ
+  type: organization
+  orgType: generic
+  title: Sortition Foundation
+  description: >-
+    UK-based organization specializing in random selection of participants for citizens'
+    assemblies, juries, and deliberative processes. Provides the sortition infrastructure
+    used by many government-run citizen assemblies.
+  website: https://www.sortitionfoundation.org
+  tags:
+    - sortition
+    - citizen-assemblies
+    - coordination
+  clusters:
+    - coordination
+
+- id: citizens-foundation
+  stableId: s8pyCzz4bJ
+  type: organization
+  orgType: generic
+  title: Citizens Foundation
+  description: >-
+    Icelandic nonprofit that built "Your Priorities," an open-source platform for citizen
+    engagement. Used in Iceland's constitutional reform process and adopted by municipalities
+    worldwide.
+  website: https://www.citizens.is
+  tags:
+    - civic-tech
+    - participatory-democracy
+    - coordination
+  clusters:
+    - coordination
+
+- id: connected-by-data
+  stableId: SHPu2XJgHT
+  type: organization
+  orgType: generic
+  title: Connected by Data
+  description: >-
+    UK organization focused on community voice in data governance. Produced options paper
+    for global citizen deliberation on AI governance with five templates for participation.
+  website: https://connectedbydata.org
+  tags:
+    - data-governance
+    - deliberation
+    - coordination
+  clusters:
+    - coordination
+
+- id: more-in-common
+  stableId: wnWIRpzZs8
+  type: organization
+  orgType: generic
+  title: More in Common
+  description: >-
+    International research organization studying polarization and identifying shared values
+    across political divides. Known for the "exhausted majority" framework. Works in US,
+    UK, France, Germany.
+  website: https://www.moreincommon.com
+  tags:
+    - depolarization
+    - social-cohesion
+    - coordination
+  clusters:
+    - coordination
+
+- id: reboot-democracy
+  stableId: JVXgq2Yz7i
+  type: organization
+  orgType: generic
+  title: Reboot Democracy
+  description: >-
+    Blog and platform by Beth Noveck (GovLab/Northeastern) covering AI-for-democracy
+    research, news, and analysis. Publishes weekly news digests, original essays, and
+    lecture series on AI-assisted deliberation and democratic AI.
+  website: https://rebootdemocracy.ai
+  tags:
+    - ai-democracy
+    - news-aggregation
+    - coordination
+  clusters:
+    - coordination
+
+- id: iswe-foundation
+  stableId: oarsGBuqTO
+  type: organization
+  orgType: generic
+  title: Iswe Foundation
+  description: >-
+    Organization supporting global citizens' assemblies, particularly in the Global South.
+    Advocates for permanently institutionalized deliberative bodies.
+  website: https://www.iswe.org
+  tags:
+    - citizen-assemblies
+    - global-south
+    - democracy
+    - coordination
+  clusters:
+    - coordination
+
+- id: mysociety
+  stableId: k2IQRH6YXQ
+  type: organization
+  orgType: generic
+  title: mySociety
+  description: >-
+    UK civic technology nonprofit. Built FixMyStreet (report local issues),
+    TheyWorkForYou (parliamentary monitoring), and other tools for citizen-government
+    engagement. Operates internationally.
+  website: https://www.mysociety.org
+  tags:
+    - civic-tech
+    - transparency
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# ORGANIZATIONS — Crypto / DAO / Web3 Governance
+# ============================================================
+
+- id: kleros
+  stableId: yXV7lgCSyC
+  type: organization
+  orgType: startup
+  title: Kleros
+  description: >-
+    Decentralized arbitration protocol using crypto-economic incentives and Schelling-point
+    game theory. Crowdsourced jurors stake tokens and are rewarded for voting with the
+    majority. Kleros 2.0 deployed on Arbitrum One (November 2024). Now exploring AI agents
+    as jurors. Argentina's Disposición 893/2025 opened regulatory path for Kleros-powered
+    consumer dispute resolution. Stanford Law published a case study on Kleros as
+    "decentralized justice."
+  website: https://kleros.io
+  tags:
+    - arbitration
+    - dispute-resolution
+    - decentralized-justice
+    - blockchain
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: federico-ast
+      type: person
+      relationship: leads-to
+    - id: clement-lesaege
+      type: person
+      relationship: leads-to
+    - id: kleros-court
+      type: project
+      relationship: composed-of
+    - id: proof-of-humanity
+      type: project
+      relationship: composed-of
+  sources:
+    - title: Kleros
+      url: https://kleros.io
+    - title: "Kleros: A Socio-Legal Case Study (Stanford Law)"
+      url: https://law.stanford.edu/publications/kleros-a-socio-legal-case-study-of-decentralized-justice-blockchain-arbitration/
+  customFields:
+    - label: Founded
+      value: "2017"
+    - label: Network
+      value: Arbitrum One
+
+- id: metadao
+  stableId: ZtNcKtFTMG
+  type: organization
+  orgType: startup
+  title: MetaDAO
+  description: >-
+    First DAO implementing functional futarchy governance on mainnet (Solana). Instead of
+    token-holder voting, participants trade on prediction markets about whether proposals
+    will increase token value. Generates ~$4,825/day revenue. Paradigm has invested.
+    Multiple projects using "Futarchy as a Service" including Drift, Jito, Sanctum.
+  website: https://www.metadao.fi
+  tags:
+    - futarchy
+    - prediction-markets
+    - dao-governance
+    - solana
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: metadao-futarchy
+      type: project
+      relationship: composed-of
+    - id: robin-hanson
+      type: person
+      relationship: related
+  sources:
+    - title: MetaDAO
+      url: https://www.metadao.fi
+  customFields:
+    - label: Market Cap
+      value: "$76M"
+    - label: Launched
+      value: "2023-11"
+
+- id: eliza-labs
+  stableId: 2byQBO7TCk
+  type: organization
+  orgType: startup
+  title: Eliza Labs
+  description: >-
+    Builders of ElizaOS (formerly ai16z), the open-source TypeScript framework for
+    autonomous on-chain AI agents. Originally an AI-managed VC fund DAO where AI agent
+    "Marc" managed treasury investments. Rebranded from ai16z in January 2025. Claims
+    2,200+ agents built on the Eliza framework. DAO manages ~$25M.
+  website: https://elizaos.ai
+  tags:
+    - ai-agents
+    - dao
+    - autonomous-agents
+    - solana
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: elizaos
+      type: project
+      relationship: composed-of
+  customFields:
+    - label: DAO Treasury
+      value: "~$25M"
+    - label: Agents Built
+      value: "2,200+"
+
+- id: gitcoin
+  stableId: MY96WtwBp-
+  type: organization
+  orgType: startup
+  title: Gitcoin
+  description: >-
+    Platform implementing quadratic funding for public goods, distributing $67M+ to
+    5,000+ open-source projects. Co-founded by Kevin Owocki. Pioneered the practical
+    application of Buterin/Hitzig/Weyl's quadratic funding mechanism. Also built Gitcoin
+    Passport (decentralized Sybil defense) and Allo Protocol (open-source funding
+    infrastructure).
+  website: https://www.gitcoin.co
+  tags:
+    - quadratic-funding
+    - public-goods
+    - open-source
+    - ethereum
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: kevin-owocki
+      type: person
+      relationship: leads-to
+    - id: gitcoin-grants-qf
+      type: project
+      relationship: composed-of
+    - id: gitcoin-passport
+      type: project
+      relationship: composed-of
+    - id: radicalxchange
+      type: organization
+      relationship: related
+    - id: glen-weyl
+      type: person
+      relationship: related
+  sources:
+    - title: Gitcoin
+      url: https://www.gitcoin.co
+  customFields:
+    - label: Total Distributed
+      value: "$67M+"
+    - label: Projects Funded
+      value: "5,000+"
+
+- id: safe-global
+  stableId: W95v6d6gHm
+  type: organization
+  orgType: startup
+  title: Safe (formerly Gnosis Safe)
+  description: >-
+    Multi-signature smart contract wallet infrastructure — the standard for DAO treasury
+    custody. Independent since 2023. Deployed on 14+ chains. Used by 200+ protocols
+    including Uniswap DAO, Worldcoin, and Morpho for managing billions in assets.
+  website: https://safe.global
+  tags:
+    - multisig
+    - treasury
+    - dao-infrastructure
+    - ethereum
+    - coordination
+  clusters:
+    - coordination
+  sources:
+    - title: Safe Global
+      url: https://safe.global
+  customFields:
+    - label: Chains
+      value: "14+"
+    - label: Protocols
+      value: "200+"
+
+- id: snapshot-labs
+  stableId: ILK84OVV1z
+  type: organization
+  orgType: startup
+  title: Snapshot Labs
+  description: >-
+    Builder of Snapshot, the dominant gasless off-chain voting platform for DAOs.
+    96% of DAOs use Snapshot. 21,000+ spaces across 52 blockchain networks. Used by
+    Uniswap, Aave, ENS. Votes stored on IPFS as signed messages. 500,000 monthly
+    active users.
+  website: https://snapshot.org
+  tags:
+    - dao-voting
+    - governance
+    - off-chain
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: snapshot-voting
+      type: project
+      relationship: composed-of
+  customFields:
+    - label: Projects
+      value: "21,000+ spaces"
+    - label: Market Share
+      value: "96% of DAOs; 500K monthly active users"
+
+- id: tally-governance
+  stableId: zSjuai_X9N
+  type: organization
+  orgType: startup
+  title: Tally
+  description: >-
+    On-chain governance platform built on OpenZeppelin Governor. Provides governance
+    dashboards, delegation tracking, and proposal management. Secures $30B+ in protocol
+    assets. Also built Tally MCP Server enabling AI agents to interact with DAO governance
+    data.
+  website: https://www.tally.xyz
+  tags:
+    - dao-governance
+    - on-chain
+    - delegation
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Assets Secured
+      value: "$30B+"
+
+- id: gnosis-guild
+  stableId: 6Lmf99p9ZT
+  type: organization
+  orgType: startup
+  title: Gnosis Guild
+  description: >-
+    Builders of Zodiac, the modular governance expansion pack for DAOs. Zodiac turns
+    Safe into a programmable OS with composable modules for voting (Governor), off-chain
+    signals (Reality), time delays, and cross-chain governance.
+  website: https://www.gnosisguild.org
+  tags:
+    - modular-governance
+    - dao-infrastructure
+    - zodiac
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: zodiac-modules
+      type: project
+      relationship: composed-of
+    - id: safe-global
+      type: organization
+      relationship: related
+
+- id: aragon
+  stableId: LgCzsC0d-y
+  type: organization
+  orgType: startup
+  title: Aragon
+  description: >-
+    Pioneering DAO creation framework launched in 2017. Enabled no-code smart contract
+    deployment for governance, treasury, and permissions. 6,000+ projects launched
+    including Aave and Decentraland. Aragon Court (decentralized justice) sunset in 2024.
+  website: https://aragon.org
+  tags:
+    - dao-framework
+    - governance
+    - smart-contracts
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Projects Launched
+      value: "6,000+"
+    - label: Status
+      value: Active framework, Court sunset 2024
+
+- id: manifold-markets
+  stableId: VV8aH7aXAT
+  type: organization
+  orgType: startup
+  title: Manifold Markets
+  description: >-
+    Play-money prediction market where anyone can create markets on anything. 200,000+
+    active markets. Popular in EA/rationalist communities. Enables rapid information
+    aggregation on niche topics.
+  website: https://manifold.markets
+  tags:
+    - prediction-markets
+    - play-money
+    - forecasting
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Active Markets
+      value: "200,000+"
+
+- id: uma-protocol
+  stableId: wkI22Ywfwf
+  type: organization
+  orgType: startup
+  title: UMA Protocol
+  description: >-
+    Builder of the Optimistic Oracle used by Polymarket for dispute resolution. Uses
+    "optimistic" model where assertions are assumed true unless challenged. Now integrating
+    LLMs to propose and dispute data for faster/cheaper resolution. Whitelisted human
+    proposers achieve 99.7% accuracy; overall undisputed rate >98%.
+  website: https://uma.xyz
+  tags:
+    - oracle
+    - dispute-resolution
+    - prediction-markets
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: uma-optimistic-oracle
+      type: project
+      relationship: composed-of
+    - id: polymarket
+      type: organization
+      relationship: related
+
+- id: vitadao
+  stableId: IPHh25UJ0s
+  type: organization
+  orgType: startup
+  title: VitaDAO
+  description: >-
+    Community-funded longevity research DAO. Members vote on biotech projects and share
+    resulting IP. Flagship DeSci (Decentralized Science) project. 20+ projects funded
+    with millions deployed.
+  website: https://www.vitadao.com
+  tags:
+    - desci
+    - longevity
+    - biotech
+    - dao
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Projects Funded
+      value: "20+"
+
+- id: researchhub
+  stableId: J5TH1IGfF6
+  type: organization
+  orgType: startup
+  title: ResearchHub
+  description: >-
+    Open publishing and peer review platform rewarding contributions via RSC token.
+    Supports summaries, reviews, bounties, and DOIs. Part of the DeSci movement
+    democratizing scientific research.
+  website: https://www.researchhub.com
+  tags:
+    - desci
+    - open-science
+    - peer-review
+    - coordination
+  clusters:
+    - coordination
+
+- id: asi-alliance
+  stableId: qG0WbdykMb
+  type: organization
+  orgType: startup
+  title: Artificial Superintelligence Alliance
+  description: >-
+    Merger of Fetch.ai, SingularityNET, and Ocean Protocol (completed June 2024).
+    Combines autonomous agent technology, AI service marketplace, and decentralized data
+    exchange. $7.5B combined value at signing. Led by Ben Goertzel.
+  website: https://superintelligence.io
+  tags:
+    - decentralized-ai
+    - agent-marketplace
+    - data-exchange
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ben-goertzel
+      type: person
+      relationship: leads-to
+
+- id: bittensor
+  stableId: ynW1nsuvDG
+  type: organization
+  orgType: startup
+  title: Bittensor
+  description: >-
+    Decentralized marketplace for AI where specialized subnets compete to provide AI
+    services. Validators score miners on output quality; TAO token emissions flow based on
+    performance. 128+ active subnets. Grayscale and Bitwise filed for spot TAO ETFs.
+    $620M+ total value staked.
+  website: https://bittensor.com
+  tags:
+    - decentralized-ai
+    - ai-marketplace
+    - subnets
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Active Subnets
+      value: "128+"
+    - label: Value Staked
+      value: "$620M+"
+
+- id: virtuals-protocol
+  stableId: Jn1fbOnSOy
+  type: organization
+  orgType: startup
+  title: Virtuals Protocol
+  description: >-
+    Launchpad for tokenized AI agents on Base (Coinbase L2). Communities create, deploy,
+    and co-own autonomous AI agents generating revenue across gaming, social media, and
+    trading. 2,200+ AI agents in ecosystem. VIRTUAL token hit $5B market cap at peak.
+  website: https://www.virtuals.io
+  tags:
+    - ai-agents
+    - tokenized-agents
+    - base-l2
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Agents
+      value: "2,200+"
+    - label: Peak Market Cap
+      value: "$5B"
+
+- id: olas-network
+  stableId: LNI8zmunod
+  type: organization
+  orgType: startup
+  title: Olas (Autonolas)
+  description: >-
+    Protocol for building and coordinating autonomous multi-agent systems across
+    blockchains. Uses Tendermint consensus so multiple agents must agree before executing
+    on-chain. Decentralized marketplace for AI agent services.
+  website: https://olas.network
+  tags:
+    - multi-agent
+    - agent-coordination
+    - consensus
+    - coordination
+  clusters:
+    - coordination
+
+- id: colony-dao
+  stableId: RaW1yaJw0C
+  type: organization
+  orgType: startup
+  title: Colony
+  description: >-
+    DAO framework focused on decentralized project management — task assignment,
+    contribution tracking, and merit-based rewards using reputation-weighted governance.
+  website: https://colony.io
+  tags:
+    - dao-framework
+    - project-management
+    - reputation
+    - coordination
+  clusters:
+    - coordination
+
+- id: daohaus
+  stableId: 9tY9xRlT6p
+  type: organization
+  orgType: startup
+  title: DAOhaus
+  description: >-
+    No-code DAO launcher built on Moloch v3. Enables deploying DAOs, submitting proposals,
+    managing funds, and voting with cross-chain execution via Safe multisig.
+  website: https://daohaus.club
+  tags:
+    - dao-framework
+    - no-code
+    - moloch
+    - coordination
+  clusters:
+    - coordination
+
+- id: hats-protocol
+  stableId: UfxyUubU6Q
+  type: organization
+  orgType: startup
+  title: Hats Protocol
+  description: >-
+    On-chain roles and permissions protocol (ERC-1155). Creates role trees for flexible
+    DAO org structures. Automates Safe signing authority and workspace access based on
+    on-chain data. Trusted by 50+ DAOs.
+  website: https://www.hatsprotocol.xyz
+  tags:
+    - roles
+    - permissions
+    - dao-infrastructure
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: DAOs Using
+      value: "50+"
+
+- id: deepdao
+  stableId: 7x7spCmy84
+  type: organization
+  orgType: startup
+  title: DeepDAO
+  description: >-
+    DAO analytics and intelligence platform tracking treasuries, proposals, voting,
+    delegation, and participation across chains. 2,500+ verified DAOs and 11M participant
+    profiles tracked.
+  website: https://deepdao.io
+  tags:
+    - dao-analytics
+    - governance-data
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: DAOs Tracked
+      value: "2,500+"
+    - label: Profiles
+      value: "11M"
+
+- id: agora-governance
+  stableId: -wM33bfyIY
+  type: organization
+  orgType: startup
+  title: Agora
+  description: >-
+    On-chain governance platform that acquired Boardroom (300+ protocols) in January 2025.
+    Aims to make good governance the standard for all protocols.
+  website: https://www.agora.xyz
+  tags:
+    - dao-governance
+    - on-chain
+    - coordination
+  clusters:
+    - coordination
+
+- id: coordinape
+  stableId: kNDqBGHQCx
+  type: organization
+  orgType: startup
+  title: Coordinape
+  description: >-
+    Peer-to-peer token allocation platform for DAO contributor rewards. Circle-based
+    giving mechanism where team members recognize each other's contributions.
+  website: https://coordinape.com
+  tags:
+    - contributor-rewards
+    - peer-allocation
+    - dao-tooling
+    - coordination
+  clusters:
+    - coordination
+
+- id: superfluid
+  stableId: 15dGe0oPW8
+  type: organization
+  orgType: startup
+  title: Superfluid
+  description: >-
+    Real-time streaming payments protocol enabling continuous token flows for salaries,
+    subscriptions, and grants. Pioneered real-time finance (2020). Used for DAO payroll
+    and grant disbursement.
+  website: https://www.superfluid.finance
+  tags:
+    - streaming-payments
+    - payroll
+    - dao-tooling
+    - coordination
+  clusters:
+    - coordination
+
+- id: jokerace
+  stableId: pAtPr-umWc
+  type: organization
+  orgType: startup
+  title: JokeRace
+  description: >-
+    On-chain contest platform with "Persuasion Markets" — participants buy votes for
+    entries, creating financial incentives for accurate subjective predictions. Used by
+    Polygon, Arbitrum, EigenLayer for hackathons and governance.
+  website: https://jokerace.io
+  tags:
+    - contests
+    - persuasion-markets
+    - governance
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# ORGANIZATIONS — AI Arbitration & Negotiation
+# ============================================================
+
+- id: pactum-ai
+  stableId: 1jmlJYFJ-9
+  type: organization
+  orgType: startup
+  title: Pactum AI
+  description: >-
+    AI procurement negotiation platform where autonomous AI agents conduct full negotiation
+    conversations with suppliers. Estonia-founded; $54M Series C from Insight Partners.
+    Serves 50+ Global 2000 companies including Walmart, Maersk, Suez. $140M+ in closed
+    deals. Walmart achieved 3% average gain + 35-day payment term extension.
+  website: https://pactum.com
+  tags:
+    - ai-negotiation
+    - procurement
+    - autonomous-agents
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: martin-rand
+      type: person
+      relationship: leads-to
+    - id: pactum-negotiation
+      type: project
+      relationship: composed-of
+  sources:
+    - title: Pactum AI
+      url: https://pactum.com
+  customFields:
+    - label: Funding
+      value: "$54M Series C"
+    - label: Closed Deals
+      value: "$140M+"
+
+- id: unanimous-ai
+  stableId: gD58SMZzvp
+  type: organization
+  orgType: startup
+  title: Unanimous AI
+  description: >-
+    Artificial swarm intelligence company founded by Louis Rosenberg. Groups make collective
+    decisions in real-time by collaboratively moving a puck, guided by AI algorithms inspired
+    by biological swarms. CMU study: groups averaged IQ 128 (97th percentile). Stanford Med
+    study: 33% reduction in diagnostic errors. Platforms include Swarm, ThinkScape, Mindmix.
+  website: https://unanimous.ai
+  tags:
+    - swarm-intelligence
+    - collective-intelligence
+    - group-decision-making
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: louis-rosenberg
+      type: person
+      relationship: leads-to
+    - id: thinkscape
+      type: project
+      relationship: composed-of
+  sources:
+    - title: Unanimous AI
+      url: https://unanimous.ai
+  customFields:
+    - label: Key Result
+      value: Groups averaged IQ 128 (97th percentile)
+
+- id: nibble-technology
+  stableId: X4tbIyj8gf
+  type: organization
+  orgType: startup
+  title: Nibble Technology
+  description: >-
+    AI negotiation chatbot for e-commerce. Online shoppers negotiate personalized prices
+    with an AI agent in real-time. 350+ organizations, 30,000 negotiations/month.
+  website: https://nibbletechnology.com
+  tags:
+    - ai-negotiation
+    - e-commerce
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Monthly Negotiations
+      value: "30,000"
+
+- id: dyspute-ai
+  stableId: sUOmkfFK6q
+  type: organization
+  orgType: startup
+  title: Dyspute.ai
+  description: >-
+    24/7 asynchronous AI mediation platform (Adri v2). Parties engage on their own
+    schedules; AI generates settlement proposals. $299/mediation. Launched January 2026.
+  website: https://dyspute.ai
+  tags:
+    - ai-mediation
+    - dispute-resolution
+    - coordination
+  clusters:
+    - coordination
+
+- id: remesh
+  stableId: _OtxdQPPPU
+  type: organization
+  orgType: startup
+  title: Remesh
+  description: >-
+    AI-powered large-group conversation platform processing thousands of open-text
+    responses simultaneously, clustering opinions in real-time. Used by US military,
+    Johnson & Johnson, World Bank. Acquired by Culture Amp (2023). Used in OpenAI's
+    Democratic Inputs program with 1,500 Americans.
+  website: https://www.remesh.ai
+  tags:
+    - group-conversation
+    - opinion-clustering
+    - deliberation
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# ORGANIZATIONS — Civic Tech
+# ============================================================
+
+- id: decidim-association
+  stableId: Km8liQ0JQW
+  type: organization
+  orgType: generic
+  title: Decidim Association
+  description: >-
+    Open-source participatory democracy platform used by 500+ institutions with 3M+ users
+    worldwide. Pioneered in Barcelona. Supports participatory budgeting, citizen proposals,
+    and deliberation. MultiPOD project (2025-2027) creating European Public Space.
+  website: https://decidim.org
+  tags:
+    - participatory-democracy
+    - open-source
+    - civic-tech
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: decidim-platform
+      type: project
+      relationship: composed-of
+  customFields:
+    - label: Institutions
+      value: "500+"
+    - label: Users
+      value: "3M+"
+
+- id: loomio-cooperative
+  stableId: FUwsaGee-g
+  type: organization
+  orgType: generic
+  title: Loomio Cooperative
+  description: >-
+    Cooperative-built decision-making platform from New Zealand. Used by governments
+    (New Zealand, Spain), cooperatives, and organizations. Supports proposals, polls,
+    and structured discussion for group decisions.
+  website: https://www.loomio.com
+  tags:
+    - decision-making
+    - cooperative
+    - civic-tech
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: loomio-platform
+      type: project
+      relationship: composed-of
+
+- id: citizenlab
+  stableId: I-xCtppXD3
+  type: organization
+  orgType: startup
+  title: CitizenLab
+  description: >-
+    Belgian civic engagement platform used by 400+ government organizations worldwide.
+    AI-powered analysis of citizen input for participatory budgeting, urban planning,
+    and policy consultation.
+  website: https://www.citizenlab.co
+  tags:
+    - civic-engagement
+    - government
+    - participatory-budgeting
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Government Clients
+      value: "400+"
+
+# ============================================================
+# ORGANIZATIONS — AI for Climate/Commons
+# ============================================================
+
+- id: climate-trace
+  stableId: GR2ARSExNu
+  type: organization
+  orgType: generic
+  title: Climate TRACE
+  description: >-
+    Coalition using AI (satellite imagery, sensor data, ML) to independently track
+    greenhouse gas emissions globally. Co-founded by Al Gore and Gavin McCormick.
+    Tracks 352M+ assets. Reduces information asymmetry — a key barrier to climate
+    collective action. Used at COP summits.
+  website: https://climatetrace.org
+  tags:
+    - climate
+    - emissions-tracking
+    - satellite-ai
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: gavin-mccormick
+      type: person
+      relationship: leads-to
+    - id: climate-trace-platform
+      type: project
+      relationship: composed-of
+  customFields:
+    - label: Assets Tracked
+      value: "352M+"
+
+- id: watttime
+  stableId: 5Cs8BFT1eo
+  type: organization
+  orgType: generic
+  title: WattTime
+  description: >-
+    Nonprofit providing real-time grid emissions data enabling "emissionality" — timing
+    energy consumption to minimize carbon footprint. Enables automated coordination of
+    energy demand.
+  website: https://watttime.org
+  tags:
+    - climate
+    - grid-emissions
+    - energy
+    - coordination
+  clusters:
+    - coordination
+
+- id: open-climate-fix
+  stableId: ItQRF0vanz
+  type: organization
+  orgType: generic
+  title: Open Climate Fix
+  description: >-
+    UK nonprofit using ML for solar power forecasting to improve grid integration of
+    renewables. Better forecasting reduces the need for fossil fuel backup plants.
+  website: https://openclimatefix.org
+  tags:
+    - climate
+    - solar-forecasting
+    - energy
+    - coordination
+  clusters:
+    - coordination
+
+- id: global-fishing-watch
+  stableId: KkbLfjLc6T
+  type: organization
+  orgType: generic
+  title: Global Fishing Watch
+  description: >-
+    Nonprofit using AI and satellite data to detect and publicize illegal fishing
+    worldwide. Promotes ocean transparency and sustainable fisheries through open data.
+  website: https://globalfishingwatch.org
+  tags:
+    - ocean
+    - illegal-fishing
+    - satellite-ai
+    - commons
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# PEOPLE — Democracy & Deliberation
+# ============================================================
+
+- id: aviv-ovadya
+  stableId: BoiTQ6pfAs
+  type: person
+  title: Aviv Ovadya
+  description: >-
+    Founder and CEO of the AI & Democracy Foundation. Coined "infocalypse" (2016) to
+    describe AI-generated misinformation crisis. Created the Democracy Levels framework
+    for evaluating democratic AI governance. Leads ARIA-funded "Deliberative AI
+    Specifications and Infrastructure" project. Affiliated with Harvard Berkman Klein
+    Center, Centre for Governance of AI, and newDemocracy Foundation. MIT MEng in CS.
+  website: https://aviv.me
+  tags:
+    - democratic-ai
+    - deliberation
+    - ai-governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-democracy-foundation
+      type: organization
+      relationship: leads-to
+    - id: democracy-levels
+      type: project
+      relationship: related
+    - id: case-law-for-ai
+      type: project
+      relationship: related
+  sources:
+    - title: Aviv Ovadya
+      url: https://aviv.me
+    - title: AI & Democracy Foundation
+      url: https://aidemocracyfoundation.org
+  customFields:
+    - label: Role
+      value: Founder & CEO, AI & Democracy Foundation
+    - label: Known For
+      value: Democracy Levels framework, infocalypse concept
+
+- id: divya-siddarth
+  stableId: DqUdaH7kCQ
+  type: person
+  title: Divya Siddarth
+  description: >-
+    Co-founder and Executive Director of the Collective Intelligence Project (CIP).
+    Leads development of Alignment Assemblies and Global Dialogues bringing thousands of
+    voices worldwide to AI governance. Connected to RadicalxChange and Plurality movement.
+    Partnered with Anthropic on CCAI, Taiwan's moda on Alignment Assemblies.
+  website: https://divyasiddarth.com
+  tags:
+    - collective-intelligence
+    - deliberation
+    - ai-governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: collective-intelligence-project
+      type: organization
+      relationship: leads-to
+    - id: radicalxchange
+      type: organization
+      relationship: related
+  sources:
+    - title: Divya Siddarth
+      url: https://divyasiddarth.com
+    - title: CIP
+      url: https://www.cip.org
+  customFields:
+    - label: Role
+      value: Co-founder & Executive Director, CIP
+    - label: Known For
+      value: Alignment Assemblies, Global Dialogues
+
+- id: glen-weyl
+  stableId: GMMRN_ENld
+  type: person
+  title: Glen Weyl
+  description: >-
+    Founder of RadicalxChange Foundation and Plurality Institute. Research Lead at
+    Microsoft Research's Plural Technology Collaboratory. Co-authored "Plurality: The
+    Future of Collaborative Technology and Democracy" with Audrey Tang. Originated
+    quadratic voting, quadratic funding, and soulbound tokens. Co-inventor of
+    mathematically proven optimal public goods funding mechanism.
+  website: https://glenweyl.com
+  tags:
+    - mechanism-design
+    - quadratic-voting
+    - plurality
+    - democracy
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: radicalxchange
+      type: organization
+      relationship: leads-to
+    - id: plurality-institute
+      type: organization
+      relationship: leads-to
+    - id: gitcoin
+      type: organization
+      relationship: related
+  sources:
+    - title: Glen Weyl
+      url: https://glenweyl.com
+  customFields:
+    - label: Role
+      value: Founder, RadicalxChange & Plurality Institute
+    - label: Known For
+      value: Quadratic voting/funding, soulbound tokens, Plurality
+
+- id: james-fishkin
+  stableId: AcxatkEvzF
+  type: person
+  title: James Fishkin
+  description: >-
+    Professor at Stanford and Director of the Deliberative Democracy Lab. Inventor of
+    deliberative polling (1988). Has conducted 150+ deliberative polls worldwide showing
+    15-35% opinion change rates. "America in One Room" series demonstrated 18-point drops
+    in dissatisfaction with democracy.
+  website: https://deliberation.stanford.edu
+  tags:
+    - deliberative-polling
+    - democracy
+    - political-science
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: stanford-deliberative-democracy-lab
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Director, Stanford Deliberative Democracy Lab
+    - label: Known For
+      value: Deliberative polling (150+ polls in 50+ countries)
+
+- id: beth-noveck
+  stableId: hWhJnhkxlG
+  type: person
+  title: Beth Noveck
+  description: >-
+    Co-Founder and Director of The GovLab at Northeastern University. Pioneer of open
+    government and smarter governance using data, technology, and collective intelligence.
+    Author of "Wiki Government," "Smart Citizens, Smarter State," and "Solving Public
+    Problems." Former US Deputy CTO (2009-2011).
+  tags:
+    - open-government
+    - govtech
+    - collective-intelligence
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: govlab
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Co-Founder & Director, The GovLab
+    - label: Known For
+      value: Open government, Wiki Government
+
+- id: helene-landemore
+  stableId: 5Mpv0u55Dq
+  type: person
+  title: "Hélène Landemore"
+  description: >-
+    Professor of Political Science at Yale. Author of "Open Democracy: Reinventing Popular
+    Rule for the Twenty-First Century" (2020). Argues elections are aristocratic; truly
+    democratic governance uses sortition + deliberation, which AI can now help scale.
+    Collaborates with CIP on democratic AI governance frameworks.
+  tags:
+    - open-democracy
+    - sortition
+    - political-theory
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, Yale Political Science
+    - label: Known For
+      value: Open Democracy, sortition advocacy
+
+- id: colin-megill
+  stableId: ljeqoMJY1C
+  type: person
+  title: Colin Megill
+  description: >-
+    Co-founder of Polis and the Computational Democracy Project. Built the AI-assisted
+    deliberation platform used in 35+ countries. Advised OpenAI in 2023 on facilitating
+    deliberation at scale.
+  tags:
+    - polis
+    - deliberation
+    - computational-democracy
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: computational-democracy-project
+      type: organization
+      relationship: leads-to
+    - id: polis-platform
+      type: project
+      relationship: related
+  customFields:
+    - label: Role
+      value: Co-founder, Polis / Computational Democracy Project
+    - label: Known For
+      value: Polis deliberation platform
+
+- id: saffron-huang
+  stableId: YZDwyYuU8r
+  type: person
+  title: Saffron Huang
+  description: >-
+    Co-founder of the Collective Intelligence Project with Divya Siddarth. Works on
+    collective intelligence approaches to AI governance and alignment.
+  tags:
+    - collective-intelligence
+    - ai-governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: collective-intelligence-project
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Co-founder, CIP
+
+- id: luke-thorburn
+  stableId: qxNoJsdejX
+  type: person
+  title: Luke Thorburn
+  description: >-
+    Researcher at AI & Democracy Foundation and UCL. Works on deliberative AI
+    specifications and connecting public input to AI alignment. Co-author of
+    "Prosocial Media" with Glen Weyl and Audrey Tang.
+  tags:
+    - deliberation
+    - ai-alignment
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-democracy-foundation
+      type: organization
+      relationship: related
+  customFields:
+    - label: Role
+      value: Researcher, AIDF
+
+- id: andrew-konya
+  stableId: Wn9QOi0pAf
+  type: person
+  title: Andrew Konya
+  description: >-
+    Researcher at AI & Democracy Foundation. Works on deliberative AI infrastructure,
+    collective dialogues, and democratic policy development using AI.
+  tags:
+    - deliberation
+    - collective-dialogue
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-democracy-foundation
+      type: organization
+      relationship: related
+  customFields:
+    - label: Role
+      value: Researcher, AIDF
+
+- id: peter-eckersley
+  stableId: 5xQBSJnP-z
+  type: person
+  title: Peter Eckersley
+  description: >-
+    Co-founder of AI Objectives Institute (builders of Talk to the City). Former Chief
+    Computer Scientist at the Electronic Frontier Foundation (2006-2018). Co-creator of
+    Let's Encrypt. Died September 2, 2022 at age 43. His legacy continues through AOI's
+    work on collective deliberation tools.
+  tags:
+    - ai-objectives
+    - eff
+    - civic-tech
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-objectives-institute
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Founder, AI Objectives Institute (deceased 2022)
+    - label: Known For
+      value: EFF, Partnership on AI, Talk to the City
+
+- id: archon-fung
+  stableId: 588HYHnDoU
+  type: person
+  title: Archon Fung
+  description: >-
+    Professor at Harvard Kennedy School of Government. Expert on democracy, governance,
+    and civic participation. Studies how institutional design affects public engagement
+    and accountability.
+  tags:
+    - democracy
+    - civic-participation
+    - governance
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, Harvard Kennedy School
+
+- id: matthew-salganik
+  stableId: qJToILAPzZ
+  type: person
+  title: Matthew Salganik
+  description: >-
+    Professor at Princeton. Creator of All Our Ideas, a free wiki survey tool using
+    pairwise comparisons. NYC used it for PlaNYC 2030 (1,436 respondents, 464 ideas).
+    Author of "Bit by Bit: Social Research in the Digital Age."
+  tags:
+    - wiki-surveys
+    - social-research
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: all-our-ideas
+      type: project
+      relationship: related
+  customFields:
+    - label: Role
+      value: Professor, Princeton
+
+# ============================================================
+# PEOPLE — Crypto / DAO
+# ============================================================
+
+- id: federico-ast
+  stableId: SEHbbeuI-6
+  type: person
+  title: Federico Ast
+  description: >-
+    Founder and CEO of Kleros, the decentralized arbitration protocol. Researcher in
+    blockchain-based dispute resolution and decentralized justice.
+  tags:
+    - decentralized-justice
+    - arbitration
+    - blockchain
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: kleros
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Founder & CEO, Kleros
+
+- id: clement-lesaege
+  stableId: i3zGeeJQ0t
+  type: person
+  title: "Clément Lesaège"
+  description: >-
+    Co-founder and CTO of Kleros. Technical architect of the decentralized arbitration protocol.
+  tags:
+    - decentralized-justice
+    - smart-contracts
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: kleros
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Co-founder & CTO, Kleros
+
+- id: kevin-owocki
+  stableId: sb-DhZlxx8
+  type: person
+  title: Kevin Owocki
+  description: >-
+    Co-founder of Gitcoin. Led the largest practical implementation of quadratic funding,
+    distributing $67M+ to public goods. Advocate for regenerative cryptoeconomics.
+  tags:
+    - quadratic-funding
+    - public-goods
+    - ethereum
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: gitcoin
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Co-founder, Gitcoin
+    - label: Known For
+      value: Quadratic funding at scale
+
+- id: illia-polosukhin
+  stableId: O0HuGk4uOg
+  type: person
+  title: Illia Polosukhin
+  description: >-
+    Co-founder of NEAR Protocol. Co-author of "Attention Is All You Need" (2017), the
+    paper introducing the transformer architecture. Building AI governance delegates —
+    AI "digital twins" that learn user preferences and vote in DAOs.
+  tags:
+    - near-protocol
+    - transformers
+    - ai-governance
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Co-founder, NEAR Protocol
+    - label: Known For
+      value: Co-invented transformer architecture; AI governance delegates
+
+- id: ben-goertzel
+  stableId: nyguuo5-kQ
+  type: person
+  title: Ben Goertzel
+  description: >-
+    Founder of SingularityNET and leader of the Artificial Superintelligence Alliance
+    (Fetch.ai + SingularityNET + Ocean Protocol merger). Prominent AGI researcher
+    advocating for decentralized AI development.
+  tags:
+    - agi
+    - decentralized-ai
+    - singularitynet
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: asi-alliance
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: CEO, ASI Alliance / SingularityNET
+    - label: Known For
+      value: AGI research, decentralized AI
+
+# ============================================================
+# PEOPLE — Academic (Mechanism Design, Cooperative AI, Social Choice)
+# ============================================================
+
+- id: thomas-malone
+  stableId: E86SvWoWvO
+  type: person
+  title: Thomas Malone
+  description: >-
+    Professor at MIT and founding Director of the MIT Center for Collective Intelligence.
+    Author of "Superminds: The Surprising Power of People and Computers Thinking Together"
+    (2018). Studies how collective intelligence can achieve what he calls "collective
+    superintelligence."
+  tags:
+    - collective-intelligence
+    - superminds
+    - organizational-design
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: mit-center-collective-intelligence
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Director, MIT Center for Collective Intelligence
+    - label: Known For
+      value: Superminds, collective intelligence
+
+- id: tuomas-sandholm
+  stableId: 373HJGLm9M
+  type: person
+  title: Tuomas Sandholm
+  description: >-
+    Professor at CMU and founder of Optimized Markets. Pioneer of automated mechanism
+    design and kidney exchange algorithms. His work on UNOS kidney exchange has facilitated
+    thousands of transplants using integer programming and constraint optimization.
+    Also built Pluribus (6-player poker AI).
+  tags:
+    - mechanism-design
+    - kidney-exchange
+    - game-theory
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, CMU; Founder, Optimized Markets
+    - label: Known For
+      value: Kidney exchange algorithms, automated mechanism design
+
+- id: david-parkes
+  stableId: ARQZgudNKh
+  type: person
+  title: David Parkes
+  description: >-
+    Professor at Harvard leading the EconCS group. Pioneered differentiable economics —
+    using gradient-based methods to design mechanisms. Key collaborator on deep learning
+    auction design (RegretNet, RochetNet).
+  tags:
+    - mechanism-design
+    - differentiable-economics
+    - auction-design
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, Harvard EconCS
+    - label: Known For
+      value: Differentiable economics, optimal auctions via deep learning
+
+- id: ariel-procaccia
+  stableId: lJA5ocd4kI
+  type: person
+  title: Ariel Procaccia
+  description: >-
+    Professor at Harvard. Leading researcher in computational social choice and fair
+    division. Built Spliddit (platform for fair division of rent, goods, etc.).
+    Co-editor of "Handbook of Computational Social Choice."
+  tags:
+    - fair-division
+    - social-choice
+    - spliddit
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: spliddit
+      type: project
+      relationship: related
+  customFields:
+    - label: Role
+      value: Professor, Harvard
+    - label: Known For
+      value: Fair division, Spliddit, computational social choice
+
+- id: vincent-conitzer
+  stableId: WtoFL18DEY
+  type: person
+  title: Vincent Conitzer
+  description: >-
+    Professor at CMU and University of Oxford. Director of FOCAL (Foundations of Cooperative
+    AI Lab). Leading figure bridging AI and social choice theory. ACM Fellow (2019). Key
+    paper "Social Choice Should Guide AI Alignment" (ICML 2024) connects Arrow's
+    impossibility theorem to AI alignment.
+  tags:
+    - social-choice
+    - ai-alignment
+    - mechanism-design
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, CMU / University of Oxford
+    - label: Known For
+      value: AI alignment as social choice problem
+
+- id: noam-brown
+  stableId: WAD4Y0-Mfb
+  type: person
+  title: Noam Brown
+  description: >-
+    Researcher at OpenAI (formerly Meta AI). Built CICERO — AI achieving human-level
+    Diplomacy (published in Science 2022), requiring negotiation, alliance formation,
+    and multi-party coordination. Also built Pluribus (6-player poker AI).
+  tags:
+    - game-theory
+    - negotiation
+    - diplomacy
+    - multi-agent
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: cicero-diplomacy
+      type: project
+      relationship: related
+  customFields:
+    - label: Role
+      value: Researcher, OpenAI
+    - label: Known For
+      value: CICERO (Diplomacy AI), Pluribus (Poker AI)
+
+- id: iason-gabriel
+  stableId: -mWZIpOcWf
+  type: person
+  title: Iason Gabriel
+  description: >-
+    Research Scientist (Ethics) at Google DeepMind. Author of "Artificial Intelligence,
+    Values, and Alignment" (Minds and Machines, 2020). Contributed to the Democratic AI
+    experiment (Koster, Balaguer et al., Nature Human Behaviour, 2022) where RL-designed
+    redistribution won majority human votes over expert-designed alternatives.
+  tags:
+    - democratic-ai
+    - value-alignment
+    - social-choice
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Researcher, Google DeepMind
+    - label: Known For
+      value: Democratic AI experiment, values alignment philosophy
+
+- id: gillian-hadfield
+  stableId: vc_gWcNXgF
+  type: person
+  title: Gillian Hadfield
+  description: >-
+    Professor at Johns Hopkins and Director of CIFAR program. Expert on AI governance and
+    regulatory markets. Argues for AI-enabled regulatory infrastructure that adapts faster
+    than traditional law. Key concept: "Rules for a Flat World."
+  tags:
+    - regulatory-markets
+    - ai-governance
+    - legal-innovation
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, Johns Hopkins / CIFAR
+    - label: Known For
+      value: Regulatory markets, "Rules for a Flat World"
+
+- id: alvin-roth
+  stableId: VbLkGGsSGt
+  type: person
+  title: Alvin Roth
+  description: >-
+    Professor at Stanford. Nobel laureate in Economics (2012) for work on market design
+    and stable matching theory. Designed the National Resident Matching Program (NRMP)
+    and kidney exchange systems. Pioneer of practical mechanism design.
+  tags:
+    - market-design
+    - matching-theory
+    - nobel-laureate
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, Stanford (Nobel 2012)
+    - label: Known For
+      value: Market design, kidney exchange, NRMP matching
+
+- id: louis-rosenberg
+  stableId: Ucy1ZzDnll
+  type: person
+  title: Louis Rosenberg
+  description: >-
+    Founder and CEO of Unanimous AI. Pioneer of artificial swarm intelligence — connecting
+    groups of humans in real-time systems modeled on biological swarm behavior. Published
+    research on "collective superintelligence" via human swarming.
+  tags:
+    - swarm-intelligence
+    - collective-intelligence
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: unanimous-ai
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Founder & CEO, Unanimous AI
+    - label: Known For
+      value: Artificial swarm intelligence, collective superintelligence
+
+- id: martin-rand
+  stableId: ZIo7hUEUsz
+  type: person
+  title: Martin Rand
+  description: >-
+    Co-founder and President of Pactum AI, the leading AI procurement negotiation platform.
+    Estonia-based. Built autonomous AI agents that negotiate with suppliers for Walmart,
+    Maersk, and other Fortune 500 companies.
+  tags:
+    - ai-negotiation
+    - procurement
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: pactum-ai
+      type: organization
+      relationship: leads-to
+  customFields:
+    - label: Role
+      value: Co-founder & President, Pactum AI
+
+- id: gavin-mccormick
+  stableId: jFO5gQhk3o
+  type: person
+  title: Gavin McCormick
+  description: >-
+    Co-founder of Climate TRACE and WattTime. Uses AI and satellite imagery to
+    independently track global greenhouse gas emissions, enabling climate coordination
+    through transparency.
+  tags:
+    - climate
+    - emissions-tracking
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: climate-trace
+      type: organization
+      relationship: leads-to
+    - id: watttime
+      type: organization
+      relationship: related
+  customFields:
+    - label: Role
+      value: Co-founder, Climate TRACE & WattTime
+
+- id: daron-acemoglu
+  stableId: N3YilE9CwS
+  type: person
+  title: Daron Acemoglu
+  description: >-
+    Professor at MIT. Nobel laureate in Economics (2024, with Johnson and Robinson, for
+    studies of how institutions affect prosperity). Also a leading researcher on AI
+    automation's effects on labor markets and how technology interacts with democratic
+    institutions. Author of "The Simple Macroeconomics of AI" (2024).
+  tags:
+    - political-economy
+    - automation
+    - democracy
+    - coordination
+  clusters:
+    - coordination
+  customFields:
+    - label: Role
+      value: Professor, MIT (Nobel 2024)
+    - label: Known For
+      value: Political economy of AI, "Power and Progress"
+
+# ============================================================
+# PROJECTS — Deliberation Tools
+# ============================================================
+
+- id: talk-to-the-city
+  stableId: VSjb8B-7-1
+  type: project
+  title: Talk to the City
+  description: >-
+    Open-source LLM tool for scaling deliberation. Analyzes large-scale public input
+    (surveys, interviews, social media), clusters opinions using semantic analysis, and
+    creates interactive navigable opinion maps. Deployed in Taiwan (moda ministry),
+    Chatham House "Recursive Public" project (1,000 participants), Tokyo election polling,
+    UNFCCC climate negotiations. Audrey Tang says it reduces "broad-listening" cost to
+    "essentially zero."
+  projectStatus: active
+  projectUrl: https://talktothe.city
+  organization: ai-objectives-institute
+  tags:
+    - deliberation
+    - opinion-clustering
+    - open-source
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-objectives-institute
+      type: organization
+      relationship: related
+  sources:
+    - title: Talk to the City
+      url: https://talktothe.city
+    - title: AI Objectives Institute
+      url: https://ai.objectives.institute/talk-to-the-city
+    - title: GitHub
+      url: https://github.com/AIObjectives/talk-to-the-city-reports
+  customFields:
+    - label: Open Source
+      value: "Yes (October 2023)"
+    - label: Notable Deployment
+      value: Taiwan moda, Chatham House, UNFCCC
+
+- id: polis-platform
+  stableId: WNgwaO8dGO
+  type: project
+  title: Polis
+  description: >-
+    Open-source AI-assisted deliberation platform using ML clustering to map opinion
+    landscapes. Participants submit brief statements and vote agree/disagree/pass;
+    algorithms cluster similar voters and surface bridging consensus. No reply button
+    (eliminates trolling). Deployed in dozens of countries across five continents.
+    vTaiwan: 26+ issues, 80% implementation rate. Anthropic CCAI: ~1,000 participants
+    contributed to training Claude's constitution.
+  projectStatus: active
+  projectUrl: https://pol.is
+  organization: computational-democracy-project
+  tags:
+    - deliberation
+    - opinion-mapping
+    - consensus
+    - open-source
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: computational-democracy-project
+      type: organization
+      relationship: related
+    - id: colin-megill
+      type: person
+      relationship: related
+  sources:
+    - title: Polis
+      url: https://pol.is
+    - title: GitHub
+      url: https://github.com/compdemocracy/polis
+
+- id: habermas-machine
+  stableId: 5WYQzQZY3U
+  type: project
+  title: Habermas Machine
+  description: >-
+    Google DeepMind's LLM-based "caucus mediator" trained to generate group opinion
+    statements identifying areas of agreement on complex political/social issues.
+    Published in Science (October 2024). Tested on 5,700+ UK participants. AI-mediated
+    statements consistently preferred over human-written ones for quality, clarity, and
+    perceived fairness.
+  projectStatus: active
+  organization: deepmind
+  tags:
+    - ai-mediation
+    - consensus
+    - deliberation
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: iason-gabriel
+      type: person
+      relationship: related
+  sources:
+    - title: "AI can help humans find common ground (Science)"
+      url: https://www.science.org/doi/10.1126/science.adq2852
+  customFields:
+    - label: Published
+      value: Science, October 2024
+    - label: Participants
+      value: "5,700+ UK residents"
+
+- id: deliberation-io
+  stableId: o8aH4k5ew0
+  type: project
+  title: Deliberation.io
+  description: >-
+    Open-source platform from Stanford HAI's Digital Economy Lab and MIT GOV/LAB using
+    Socratic dialogue for large-scale AI-assisted deliberation. Four components: individual
+    engagement, AI agent interaction, "Face of the Crowd" opinion distribution, "Dynamic
+    Deliberation." First US city deployment: Washington DC (July 2025).
+  projectStatus: active
+  projectUrl: https://deliberation.io
+  tags:
+    - deliberation
+    - socratic-dialogue
+    - open-source
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: stanford-deliberative-democracy-lab
+      type: organization
+      relationship: related
+  sources:
+    - title: Deliberation.io
+      url: https://deliberation.io
+
+- id: democracy-levels
+  stableId: 51cJFHWoVK
+  type: project
+  title: Democracy Levels Framework
+  description: >-
+    Framework by Aviv Ovadya and 13 co-authors for evaluating the degree to which
+    decisions in a given domain are made democratically. Provides milestones toward
+    meaningfully democratic AI. Published November 2024 (arxiv 2411.09222).
+  projectStatus: active
+  organization: ai-democracy-foundation
+  tags:
+    - democratic-ai
+    - framework
+    - governance
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: aviv-ovadya
+      type: person
+      relationship: related
+    - id: ai-democracy-foundation
+      type: organization
+      relationship: related
+  sources:
+    - title: "Democratic AI is Possible (arxiv)"
+      url: https://arxiv.org/abs/2411.09222
+
+- id: case-law-for-ai
+  stableId: fC3kijt9Ms
+  type: project
+  title: Case Law for AI
+  description: >-
+    AIDF project exploring judicial-inspired approaches for connecting deliberative public
+    input into AI alignment and inference systems. Uses case law methods to create knowledge
+    representation that preserves deliberative nuance.
+  projectStatus: active
+  organization: ai-democracy-foundation
+  tags:
+    - judicial
+    - ai-alignment
+    - deliberation
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ai-democracy-foundation
+      type: organization
+      relationship: related
+
+- id: thinkscape
+  stableId: Xqg9cb8glL
+  type: project
+  title: ThinkScape
+  description: >-
+    Conversational Swarm Intelligence platform by Unanimous AI. Divides large groups into
+    subgroups woven together by real-time AI "Conversational Surrogates." Enables real-time
+    deliberation among groups of unlimited size. Used at UNFCCC Bonn climate negotiations
+    (2025). CMU study: groups averaged effective IQ 128.
+  projectStatus: active
+  organization: unanimous-ai
+  tags:
+    - swarm-intelligence
+    - deliberation
+    - real-time
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: unanimous-ai
+      type: organization
+      relationship: related
+
+- id: all-our-ideas
+  stableId: ZafcBn42fQ
+  type: project
+  title: All Our Ideas
+  description: >-
+    Free, open-source wiki survey tool from Princeton. Uses pairwise comparisons —
+    participants repeatedly choose between two options and the system ranks ideas. NYC
+    used it for PlaNYC 2030 (1,436 respondents, 464 ideas).
+  projectStatus: active
+  projectUrl: http://www.allourideas.org
+  tags:
+    - wiki-survey
+    - pairwise-comparison
+    - civic-tech
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: matthew-salganik
+      type: person
+      relationship: related
+
+- id: decidim-platform
+  stableId: ShsNbsIy1A
+  type: project
+  title: Decidim Platform
+  description: >-
+    Open-source participatory democracy platform. Supports participatory budgeting, citizen
+    proposals, and deliberation. 500+ institutions, 3M+ users worldwide.
+  projectStatus: active
+  projectUrl: https://decidim.org
+  organization: decidim-association
+  tags:
+    - participatory-democracy
+    - open-source
+    - coordination
+  clusters:
+    - coordination
+
+- id: loomio-platform
+  stableId: 0TVHzfFr2p
+  type: project
+  title: Loomio
+  description: >-
+    Decision-making platform for groups. Supports proposals, polls, and structured
+    discussion. Used by governments and cooperatives worldwide.
+  projectStatus: active
+  projectUrl: https://www.loomio.com
+  organization: loomio-cooperative
+  tags:
+    - decision-making
+    - collaboration
+    - coordination
+  clusters:
+    - coordination
+
+- id: kialo
+  stableId: YbcqehI-pX
+  type: project
+  title: Kialo
+  description: >-
+    Structured debate and argument mapping platform. Users build pro/con argument trees
+    on topics. Used in education and for public deliberation.
+  projectStatus: active
+  projectUrl: https://www.kialo.com
+  tags:
+    - structured-debate
+    - argument-mapping
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# PROJECTS — Crypto / DAO
+# ============================================================
+
+- id: elizaos
+  stableId: Oz15zw0fLA
+  type: project
+  title: ElizaOS
+  description: >-
+    Open-source TypeScript framework for creating autonomous on-chain AI agents. Originally
+    the ai16z DAO's AI-managed venture fund. Rebranded January 2025. Features include LLM
+    integration, long-term memory, and multi-chain platform connectors. 2,200+ agents built.
+    Building toward "Multi-Agent Swarms" where specialized agents coordinate.
+  projectStatus: active
+  projectUrl: https://elizaos.ai
+  organization: eliza-labs
+  tags:
+    - ai-agents
+    - open-source
+    - dao
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: eliza-labs
+      type: organization
+      relationship: related
+
+- id: metadao-futarchy
+  stableId: jD0XhTalqH
+  type: project
+  title: MetaDAO Futarchy Protocol
+  description: >-
+    First functional futarchy governance on mainnet. Participants trade on prediction
+    markets about whether proposals will increase token value, replacing traditional voting.
+    Generates ~$4,825/day in revenue. 11 projects using "Futarchy as a Service."
+  projectStatus: active
+  projectUrl: https://www.metadao.fi
+  organization: metadao
+  tags:
+    - futarchy
+    - prediction-markets
+    - governance
+    - coordination
+  clusters:
+    - coordination
+
+- id: truth-terminal
+  stableId: DYDII-R_Md
+  type: project
+  title: Truth Terminal
+  description: >-
+    Autonomous AI agent operating a Twitter/X account, generating content and accumulating
+    crypto wealth. Created the GOAT memecoin phenomenon (peaked above $600M market cap).
+    First AI agent to become a crypto millionaire. Created by Andy Ayrey; received
+    $50K BTC from Marc Andreessen.
+  projectStatus: active
+  tags:
+    - ai-agents
+    - autonomous
+    - social-media
+    - coordination
+  clusters:
+    - coordination
+
+- id: gitcoin-grants-qf
+  stableId: 5HfGHjFP6B
+  type: project
+  title: Gitcoin Grants (Quadratic Funding)
+  description: >-
+    Largest practical implementation of quadratic funding. Number of contributors matters
+    more than amount, mathematically optimizing public goods provision. $67M+ distributed
+    to 5,000+ open-source projects. Now using Dedicated Domain Allocation (DDA) model.
+  projectStatus: active
+  projectUrl: https://grants.gitcoin.co
+  organization: gitcoin
+  tags:
+    - quadratic-funding
+    - public-goods
+    - coordination
+  clusters:
+    - coordination
+
+- id: optimism-rpgf
+  stableId: MkMHUlkQjG
+  type: project
+  title: Optimism Retroactive Public Goods Funding
+  description: >-
+    Rewards contributors after the fact for demonstrated impact. 60M+ OP tokens distributed
+    across multiple rounds. Novel mechanism: fund what already worked rather than predicting
+    what will.
+  projectStatus: active
+  tags:
+    - retroactive-funding
+    - public-goods
+    - optimism
+    - coordination
+  clusters:
+    - coordination
+
+- id: x402-protocol
+  stableId: Lr10YB97ln
+  type: project
+  title: x402 Payment Protocol
+  description: >-
+    Coinbase-developed open standard embedding stablecoin micropayments into HTTP. Enables
+    AI agents to autonomously pay for services without accounts. x402 Foundation co-founded
+    by Coinbase and Cloudflare; Google and Visa joined. ~$28K daily volume (March 2026).
+  projectStatus: active
+  tags:
+    - agent-payments
+    - micropayments
+    - stablecoins
+    - coordination
+  clusters:
+    - coordination
+  sources:
+    - title: Coinbase x402
+      url: https://docs.cdp.coinbase.com/x402/welcome
+
+- id: snapshot-voting
+  stableId: wy1YkpMahP
+  type: project
+  title: Snapshot Voting
+  description: >-
+    Gasless off-chain voting platform. Votes stored as signed messages on IPFS. The
+    dominant DAO voting tool — 96% of major DAO votes, 30,000+ projects.
+  projectStatus: active
+  projectUrl: https://snapshot.org
+  organization: snapshot-labs
+  tags:
+    - dao-voting
+    - off-chain
+    - ipfs
+    - coordination
+  clusters:
+    - coordination
+
+- id: zodiac-modules
+  stableId: EyalPJO5lj
+  type: project
+  title: Zodiac
+  description: >-
+    Modular governance expansion pack for DAOs by Gnosis Guild. Composable modules include
+    Governor (token voting), Reality (off-chain signals trigger on-chain), and Delay
+    (time-locked execution).
+  projectStatus: active
+  organization: gnosis-guild
+  tags:
+    - modular-governance
+    - dao-infrastructure
+    - coordination
+  clusters:
+    - coordination
+
+- id: gitcoin-passport
+  stableId: VuQ79VNqvV
+  type: project
+  title: Gitcoin Passport
+  description: >-
+    Decentralized identity and Sybil defense. Aggregates "stamps" (credentials) from
+    web2/web3 authenticators, calculates forgery cost to produce a credibility score.
+  projectStatus: active
+  organization: gitcoin
+  tags:
+    - identity
+    - sybil-defense
+    - credentials
+    - coordination
+  clusters:
+    - coordination
+
+- id: proof-of-humanity
+  stableId: LFTk76uT5o
+  type: project
+  title: Proof of Humanity
+  description: >-
+    Sybil-resistant registry using video verification and vouching to prove human
+    uniqueness. Issues soulbound-style credentials. Built by Kleros.
+  projectStatus: active
+  organization: kleros
+  tags:
+    - identity
+    - sybil-defense
+    - human-verification
+    - coordination
+  clusters:
+    - coordination
+
+- id: kleros-court
+  stableId: pIG1hKsbpQ
+  type: project
+  title: Kleros Court
+  description: >-
+    Decentralized arbitration system. Jurors stake tokens, are randomly selected, and
+    rewarded for voting with the majority (Schelling point mechanism). V2 deployed on
+    Arbitrum One (November 2024). Exploring AI agents as jurors.
+  projectStatus: active
+  organization: kleros
+  tags:
+    - arbitration
+    - decentralized-justice
+    - coordination
+  clusters:
+    - coordination
+
+- id: uma-optimistic-oracle
+  stableId: t2mTrELveq
+  type: project
+  title: UMA Optimistic Oracle
+  description: >-
+    Dispute resolution mechanism for prediction markets. Assertions assumed true unless
+    challenged. Now using LLMs to propose and dispute data. >99% accuracy. Primary
+    resolution layer for Polymarket.
+  projectStatus: active
+  organization: uma-protocol
+  tags:
+    - oracle
+    - dispute-resolution
+    - prediction-markets
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# PROJECTS — AI Arbitration / Negotiation / Mechanism Design
+# ============================================================
+
+- id: aaa-ai-arbitrator
+  stableId: IRmv52mmvZ
+  type: project
+  title: AAA-ICDR AI Arbitrator
+  description: >-
+    First AI-native arbitrator from a major arbitration institution (AAA-ICDR). Opt-in for
+    two-party, documents-only construction disputes. Trained on 1,500+ real cases in
+    collaboration with McKinsey's QuantumBlack. Human arbitrators oversee, revise, and
+    authorize each outcome. Launched November 3, 2025, expanding to additional industries.
+  projectStatus: active
+  tags:
+    - ai-arbitration
+    - dispute-resolution
+    - legal-tech
+    - coordination
+  clusters:
+    - coordination
+  sources:
+    - title: AAA AI Arbitrator
+      url: https://www.adr.org/ai-arbitrator/
+  customFields:
+    - label: Launched
+      value: November 2025
+    - label: Cost Savings
+      value: "35-45%"
+
+- id: pactum-negotiation
+  stableId: Y-n_6a38Lv
+  type: project
+  title: Pactum AI Negotiation Platform
+  description: >-
+    Autonomous AI agents conducting full negotiation conversations with suppliers. Walmart:
+    3% average gain, 35-day payment term extension. Negotiation cycles reduced from weeks
+    to days (individual negotiations can complete in ~15 minutes). 2-30% value generation
+    on negotiated spend.
+  projectStatus: active
+  organization: pactum-ai
+  tags:
+    - ai-negotiation
+    - procurement
+    - coordination
+  clusters:
+    - coordination
+
+- id: learned-hand-platform
+  stableId: PmmnXdSCGg
+  type: project
+  title: Learned Hand
+  description: >-
+    AI tool that distills legal motions, learns individual judges' writing styles, and
+    drafts tentative rulings. "Deep Verify" fact-checks every sentence against case law.
+    Piloting in LA Superior Court, deployed in 10 US states. Judges not required to
+    disclose AI use.
+  projectStatus: active
+  tags:
+    - ai-judicial
+    - legal-tech
+    - coordination
+  clusters:
+    - coordination
+
+- id: cicero-diplomacy
+  stableId: 9IvxcI_vWP
+  type: project
+  title: CICERO
+  description: >-
+    Meta AI agent achieving human-level performance in Diplomacy — a game requiring
+    negotiation, alliance formation, and multi-party coordination. Published in Science
+    (2022). Demonstrated AI can learn complex multi-party coordination with humans.
+  projectStatus: completed
+  tags:
+    - game-theory
+    - negotiation
+    - multi-agent
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: noam-brown
+      type: person
+      relationship: related
+  sources:
+    - title: "Human-level play in the game of Diplomacy (Science)"
+      url: https://www.science.org/doi/10.1126/science.ade9097
+
+- id: ai-economist
+  stableId: 67_JN54w3n
+  type: project
+  title: AI Economist
+  description: >-
+    Salesforce Research reinforcement learning framework that simultaneously optimizes tax
+    policy while agents learn economic behavior. Published in Science Advances (2022).
+    Showed RL-designed tax policies improved equality-productivity tradeoffs over US tax
+    schedules.
+  projectStatus: completed
+  tags:
+    - mechanism-design
+    - reinforcement-learning
+    - tax-policy
+    - coordination
+  clusters:
+    - coordination
+  sources:
+    - title: AI Economist (GitHub)
+      url: https://github.com/salesforce/ai-economist
+
+- id: spliddit
+  stableId: TchCqc3jO1
+  type: project
+  title: Spliddit
+  description: >-
+    Fair division platform by Ariel Procaccia. Provides provably fair algorithms for
+    dividing rent, goods, chores, and credit among groups. Based on computational social
+    choice theory.
+  projectStatus: maintained
+  tags:
+    - fair-division
+    - social-choice
+    - coordination
+  clusters:
+    - coordination
+  relatedEntries:
+    - id: ariel-procaccia
+      type: person
+      relationship: related
+
+# ============================================================
+# PROJECTS — Climate / Matching
+# ============================================================
+
+- id: climate-trace-platform
+  stableId: X1kgREeQEq
+  type: project
+  title: Climate TRACE Platform
+  description: >-
+    AI + satellite platform independently tracking global greenhouse gas emissions.
+    352M+ assets tracked. Used at COP summits. Reduces information asymmetry that
+    is a key barrier to climate collective action.
+  projectStatus: active
+  projectUrl: https://climatetrace.org
+  organization: climate-trace
+  tags:
+    - climate
+    - emissions
+    - satellite-ai
+    - coordination
+  clusters:
+    - coordination
+
+# ============================================================
+# BATCH 2 — GovTech, Academics, Matching, Climate additions
+# ============================================================
+
+# --- Organizations ---
+
+- id: consul-democracy
+  stableId: phMPUVHON3
+  type: organization
+  orgType: generic
+  title: CONSUL Democracy
+  description: >-
+    Open-source participation platform for proposals, debates, voting, participatory
+    budgets, and collaborative legislation. Used by ~200 governments in 39 countries
+    reaching ~90 million citizens. Originally built by Madrid City Council.
+  website: https://consuldemocracy.org
+  tags: [participatory-democracy, open-source, civic-tech, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Governments
+      value: "~200 in 39 countries"
+    - label: Citizens Reached
+      value: "~90 million"
+
+- id: ethelo
+  stableId: sbPEBY9bL1
+  type: organization
+  orgType: startup
+  title: Ethelo
+  description: >-
+    Patented platform for complex constrained group decision-making. Optimizes for
+    consensus while minimizing inequality. Used by Decentraland DAO (87.5% approval on
+    grant programs), Arbitrum DAO, and municipal planning processes.
+  website: https://ethelo.com
+  tags: [consensus-optimization, dao-governance, decision-making, coordination]
+  clusters: [coordination]
+
+- id: metagov
+  stableId: AQMwgv-MjH
+  type: organization
+  orgType: generic
+  title: Metagov
+  description: >-
+    Research organization building interoperability standards for deliberative tools.
+    Leading the Interoperable Deliberative Tools (IDT) cohort. $400K Mina Foundation
+    grant. Scotland committed to using their standards nationally. Advising $10M+ in
+    deliberative tech R&D.
+  website: https://metagov.org
+  tags: [interoperability, standards, deliberation, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Key Achievement
+      value: Scotland adopting their standards nationally
+
+- id: mass-lbp
+  stableId: U_H2JH-7lF
+  type: organization
+  orgType: generic
+  title: MASS LBP
+  description: >-
+    Canada's leader in long-form deliberative and participatory processes for public
+    policy. 1 in 36 Canadian households invited to participate across 41 assemblies/panels.
+    Founded by Peter MacLeod.
+  website: https://www.masslbp.com
+  tags: [citizen-assemblies, deliberation, policy, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Assemblies Run
+      value: "41"
+
+- id: participedia
+  stableId: lb5vap_jQi
+  type: organization
+  orgType: academic
+  title: Participedia
+  description: >-
+    Open-source crowdsourced research database of 1,800+ cases and 330+ methods of
+    participatory democracy worldwide. Hosted by UBC. The definitive academic database
+    of participatory democracy practices globally.
+  website: https://participedia.net
+  tags: [participatory-democracy, research-database, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Cases
+      value: "1,800+"
+    - label: Methods
+      value: "330+"
+
+- id: people-powered
+  stableId: KPgc53rUgG
+  type: organization
+  orgType: generic
+  title: People Powered
+  description: >-
+    Global hub for participatory democracy. Publishes comprehensive Digital Participation
+    Tool Ratings (30 tools evaluated). Co-developed UNDP Digital Participation Platforms
+    Guide 2025 (80+ platforms).
+  website: https://www.peoplepowered.org
+  tags: [participatory-democracy, ratings, coordination]
+  clusters: [coordination]
+
+- id: demos-uk
+  stableId: zjG_NH6E1u
+  type: organization
+  orgType: generic
+  title: Demos
+  description: >-
+    UK think tank running "Waves" — largest trial of digital democracy in Britain. AI-powered
+    technology for consensus-finding on local government issues. EUR 1M project with partners
+    New Local, CASM Technology, PSi, and Remesh. Camden Council first deployment (Sept 2025).
+  website: https://demos.co.uk
+  tags: [digital-democracy, uk, deliberation, coordination]
+  clusters: [coordination]
+
+- id: polco
+  stableId: o-8zbQtjvd
+  type: organization
+  orgType: startup
+  title: Polco
+  description: >-
+    Survey and budget simulation tools for resident engagement. 400+ local government
+    clients. Named GovTech 100 company (4 consecutive years: 2023-2026). Merged with
+    Balancing Act (budget simulation tool with roots back to 1998).
+  website: https://info.polco.us
+  tags: [civic-tech, surveys, budget-simulation, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Government Clients
+      value: "400+"
+
+- id: fide-democracy
+  stableId: MaYsCDh_UK
+  type: organization
+  orgType: generic
+  title: FIDE (Federation for Innovation in Democracy)
+  description: >-
+    Nonprofit connecting deliberative democracy experts and governments. Published 2026
+    Theory of Change for Citizens' Assemblies. Supports the Ostbelgien Model (first
+    permanent citizen-lottery political institution).
+  website: https://www.fidemocracy.org
+  tags: [citizen-assemblies, democracy-innovation, coordination]
+  clusters: [coordination]
+
+- id: commons-stack
+  stableId: Fl872YNBJE
+  type: organization
+  orgType: generic
+  title: Commons Stack / Token Engineering Commons
+  description: >-
+    DAO governance applying Elinor Ostrom's commons principles via bonding curves,
+    democratic voting, and algorithmic rule enforcement. Token Engineering Commons (TEC)
+    hatched 2021 and launched early 2022 as the first CommonsDAO explicitly applying
+    Ostrom's institutional design principles to blockchain governance.
+  website: https://commonsstack.org
+  tags: [commons, ostrom, dao, token-engineering, coordination]
+  clusters: [coordination]
+
+- id: ushahidi
+  stableId: BqcZIf3nOM
+  type: organization
+  orgType: generic
+  title: Ushahidi
+  description: >-
+    Open-source crowdsourcing platform for crisis information collection, mapping, and
+    community governance. Founded in Nairobi (2008) during Kenya post-election violence.
+    Used in 160+ countries. Mapped 1,500 reports in first two weeks of 2010 Haiti
+    earthquake response.
+  website: https://www.ushahidi.com
+  tags: [crisis-mapping, crowdsourcing, open-source, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Countries
+      value: "160+"
+
+- id: pachama
+  stableId: urhk50LVCP
+  type: organization
+  orgType: startup
+  title: Pachama (Carbon Direct)
+  description: >-
+    AI + satellite + LiDAR platform for forest carbon credit measurement and verification.
+    Acquired by Carbon Direct (November 2025). Raised $55M+ Series B from Breakthrough
+    Energy Ventures. Verra piloting their digital measurement approach.
+  website: https://pachama.com
+  tags: [climate, carbon-credits, satellite-ai, coordination]
+  clusters: [coordination]
+
+- id: kayrros
+  stableId: iqVWRCMtx9
+  type: organization
+  orgType: startup
+  title: Kayrros
+  description: >-
+    Global methane and environmental monitoring using satellite imagery + AI for daily
+    emissions detection. Launched "methane GPT" LLM for public querying. Wildfire Risk
+    Monitor named TIME Best Inventions 2025. Paris-based environmental intelligence
+    company.
+  website: https://www.kayrros.com
+  tags: [climate, methane, satellite-ai, coordination]
+  clusters: [coordination]
+
+- id: electricity-maps
+  stableId: veFTBOHbk7
+  type: organization
+  orgType: startup
+  title: Electricity Maps
+  description: >-
+    Real-time and forecasted electricity carbon intensity data for 230+ regions in 190+
+    countries. Provides gCO2eq/kWh for grid-aware computing, EV charging, and
+    decarbonization optimization. Copenhagen-based (founded 2016).
+  website: https://www.electricitymaps.com
+  tags: [climate, grid-emissions, energy, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Regions
+      value: "230+"
+
+- id: feeding-america
+  stableId: dQ6qrPvX_3
+  type: organization
+  orgType: generic
+  title: Feeding America
+  description: >-
+    Largest US hunger-relief organization using market-design-inspired allocation system
+    for food donations. "Meal Connect" matches donations to local nonprofits using
+    optimization algorithms. Has facilitated billions of pounds of food donations total.
+    Partnership with Google.org.
+  website: https://www.feedingamerica.org
+  tags: [food-allocation, market-design, coordination]
+  clusters: [coordination]
+
+# --- People (Academic additions) ---
+
+- id: tim-roughgarden
+  stableId: wpLP3ETf0j
+  type: person
+  title: Tim Roughgarden
+  description: >-
+    Professor at Columbia University. Pioneer of algorithmic game theory. Proved price of
+    anarchy bounds for selfish routing. Author of "Twenty Lectures on Algorithmic Game
+    Theory." Co-editor of landmark "Algorithmic Game Theory" textbook.
+  tags: [algorithmic-game-theory, mechanism-design, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Columbia University
+    - label: Known For
+      value: Price of anarchy, algorithmic game theory
+
+- id: parag-pathak
+  stableId: oV7KFzhdLd
+  type: person
+  title: Parag Pathak
+  description: >-
+    Professor at MIT. Designed school choice mechanisms for Boston, NYC, Chicago. John
+    Bates Clark Medal (2018). Work cited in 2012 Nobel Prize for Roth and Shapley.
+  tags: [school-choice, mechanism-design, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, MIT (Clark Medal 2018)
+    - label: Known For
+      value: School choice mechanism design
+
+- id: milind-tambe
+  stableId: cja9EFqyeq
+  type: person
+  title: Milind Tambe
+  description: >-
+    Professor at Harvard and Principal Scientist at Google AI for Social Good. First
+    operational deployments of computational game theory for security (ARMOR at LAX, 2007).
+    Applied game theory to wildlife conservation (PAWS) and public health.
+  tags: [security-games, ai-for-social-good, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Harvard / Google Research
+    - label: Known For
+      value: Security games (ARMOR at LAX), AI for social good
+
+- id: erik-brynjolfsson
+  stableId: _XYZ2H39P1
+  type: person
+  title: Erik Brynjolfsson
+  description: >-
+    Professor at Stanford and Director of the Digital Economy Lab. Co-author of "The Second
+    Machine Age." Pioneer in measuring IT productivity and economics of AI adoption.
+  tags: [digital-economy, ai-economics, productivity, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Stanford HAI / Digital Economy Lab
+    - label: Known For
+      value: "The Second Machine Age, digital economy research"
+
+- id: itai-ashlagi
+  stableId: LBZDvW1BAs
+  type: person
+  title: Itai Ashlagi
+  description: >-
+    Professor at Stanford MSE. Matching market design specialist, especially kidney
+    exchange algorithms. Software deployed by Alliance for Paired Kidney Exchange. Franz
+    Edelman Finalist (2014).
+  tags: [kidney-exchange, matching-markets, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Stanford MSE
+    - label: Known For
+      value: Kidney exchange algorithms
+
+- id: scott-kominers
+  stableId: LsNkMOlKQG
+  type: person
+  title: Scott Duke Kominers
+  description: >-
+    Professor at Harvard Business School / Harvard Economics. Generalized matching theory
+    for complex structures. Applied matching to vaccine distribution, school choice, and
+    contract negotiation.
+  tags: [market-design, matching-theory, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Harvard Business School
+    - label: Known For
+      value: Market design, vaccine distribution matching
+
+- id: constantinos-daskalakis
+  stableId: kuDMXcvkFz
+  type: person
+  title: Constantinos Daskalakis
+  description: >-
+    Professor at MIT. Proved computing Nash equilibria is PPAD-complete, fundamentally
+    resolving a question open since Nash's 1951 theorem. Nevanlinna Prize (2018). ACM
+    Fellow (2022). Also contributed to optimal multi-item auction design.
+  tags: [computational-complexity, game-theory, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, MIT (Nevanlinna Prize 2018)
+    - label: Known For
+      value: Nash equilibrium computation complexity
+
+- id: caspar-oesterheld
+  stableId: J1jVBAemhC
+  type: person
+  title: Caspar Oesterheld
+  description: >-
+    PhD student at CMU under Vincent Conitzer. Works on program equilibrium, cooperation
+    through mutual transparency of AI systems, and safe Pareto improvements. Co-author
+    of "Foundations of Cooperative AI" (AAAI 2023).
+  tags: [cooperative-ai, program-equilibrium, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: PhD student, CMU
+    - label: Known For
+      value: "Foundations of Cooperative AI, program equilibrium"
+
+- id: stephan-zheng
+  stableId: -xFjqwxyMw
+  type: person
+  title: Stephan Zheng
+  description: >-
+    Former lead of the AI Economist project at Salesforce Research; now Founder and CEO of
+    Asari AI. Used deep multi-agent RL to design tax policies outperforming human-designed
+    policies on equality-productivity tradeoffs. Published in Science Advances (2022).
+  tags: [ai-economist, mechanism-design, reinforcement-learning, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Former lead, AI Economist (Salesforce Research)
+    - label: Known For
+      value: AI Economist (RL for tax policy design)
+
+- id: eric-budish
+  stableId: ZDebR_Q63g
+  type: person
+  title: Eric Budish
+  description: >-
+    Professor at Chicago Booth. Designer of Course Match (A-CEEI mechanism for
+    combinatorial course allocation at Wharton). Work on high-frequency trading market
+    design and frequent batch auctions.
+  tags: [market-design, mechanism-design, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Role
+      value: Professor, Chicago Booth
+    - label: Known For
+      value: Course Match (A-CEEI), market design
+
+# --- Projects (additions) ---
+
+- id: geomatch
+  stableId: J0t-tJABY_
+  type: project
+  title: GeoMatch (Refugee Resettlement)
+  description: >-
+    AI algorithm predicting refugees' expected employment success by location, with
+    placement recommendation tool. Deployed or piloted in US, Netherlands, Norway,
+    Switzerland. Built by Stanford/ETH Zurich Immigration Policy Lab.
+  projectStatus: active
+  tags: [refugee-matching, ai-allocation, coordination]
+  clusters: [coordination]
+  customFields:
+    - label: Countries
+      value: US, Netherlands, Norway, Switzerland
+
+- id: openspiel
+  stableId: kLVNlMm1Vd
+  type: project
+  title: OpenSpiel
+  description: >-
+    Most widely used framework for game-theoretic reinforcement learning research.
+    Open-source library by Google DeepMind (Marc Lanctot et al.). Supports extensive-form
+    games, normal-form games, and multi-agent RL environments.
+  projectStatus: active
+  projectUrl: https://github.com/google-deepmind/open_spiel
+  tags: [game-theory, multi-agent, open-source, coordination]
+  clusters: [coordination]
+
+- id: consul-platform
+  stableId: sjsTbnizW3
+  type: project
+  title: CONSUL Platform
+  description: >-
+    Open-source government participation platform for proposals, debates, voting,
+    participatory budgets, and collaborative legislation. ~200 governments in 39 countries.
+  projectStatus: active
+  projectUrl: https://consuldemocracy.org
+  organization: consul-democracy
+  tags: [participatory-democracy, open-source, coordination]
+  clusters: [coordination]
+
+- id: your-priorities
+  stableId: ulObOSkEp1
+  type: project
+  title: Your Priorities
+  description: >-
+    Open-source idea generation and participatory budgeting platform by Citizens Foundation.
+    Rated #1 on People Powered 2025 Participation Platform Ratings. Better Reykjavik
+    engaged 70,000 of 120,000 residents with 10,000+ ideas.
+  projectStatus: active
+  projectUrl: https://yrpri.org
+  organization: citizens-foundation
+  tags: [participatory-democracy, idea-generation, coordination]
+  clusters: [coordination]
+
+- id: waves-digital-democracy
+  stableId: JOWMQyTdwJ
+  type: project
+  title: Waves
+  description: >-
+    Largest trial of digital democracy in Britain. AI-powered consensus-finding on local
+    government issues. EUR 1M project. Camden Council first deployment (Sept 2025), South
+    Staffordshire (Spring 2026), expansion planned.
+  projectStatus: active
+  organization: demos-uk
+  tags: [digital-democracy, uk, deliberation, coordination]
+  clusters: [coordination]
+
+- id: liquidfeedback
+  stableId: E9fxUa8YeQ
+  type: project
+  title: LiquidFeedback
+  description: >-
+    Free software for liquid democracy — vote delegation, initiative improvement, and
+    collective decision-making. Used primarily by Pirate Parties in Germany, Italy,
+    Austria, Norway, France, Netherlands.
+  projectStatus: active
+  projectUrl: https://liquidfeedback.com
+  tags: [liquid-democracy, vote-delegation, coordination]
+  clusters: [coordination]
+
+- id: democracyos-platform
+  stableId: e36LcaGK34
+  type: project
+  title: DemocracyOS
+  description: >-
+    Open-source platform for online deliberation. Citizens vote on, track, and debate
+    legislation. Built by Democracia en Red (Argentina). Translated into 15 languages.
+    Used in Tunisia (constitutional debate), Mexico, Kenya.
+  projectStatus: maintained
+  projectUrl: https://github.com/DemocracyOS/democracyos
+  tags: [digital-democracy, open-source, latin-america, coordination]
+  clusters: [coordination]
+
+- id: kayrros-methane-watch
+  stableId: N657FSHE4-
+  type: project
+  title: Kayrros Methane Watch
+  description: >-
+    Global methane monitoring platform using Sentinel-5P satellite + AI for daily emissions
+    detection. Launched "methane GPT" LLM for public querying. TIME Best Inventions 2025.
+  projectStatus: active
+  organization: kayrros
+  tags: [climate, methane, satellite-ai, coordination]
+  clusters: [coordination]
