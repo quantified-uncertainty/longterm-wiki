@@ -430,7 +430,12 @@ export function setPersistedClaimedPr(prNum: number | null): void {
 export const PARALLEL_STATE_FILE = join(CACHE_DIR, 'parallel-state.json');
 
 export interface ParallelState {
+  lastHeartbeat: string;
   lastCycleAt: string;
+  pid: number;
+  status: 'idle' | 'dispatching' | 'sleeping';
+  cycleCount: number;
+  prsScanned: number;
   slotsUsed: number[];
   dispatched: number;
   fixed: number;

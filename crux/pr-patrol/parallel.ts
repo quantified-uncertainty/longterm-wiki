@@ -1,39 +1,34 @@
 /**
  * PR Patrol — Parallel dispatch engine
  *
- * Dispatches PR fixes to idle agent workspace slots (lw/a2–a15) in parallel,
- * using Promise.allSettled() across slots. Each fix runs in an isolated clone,
- * avoiding the git state pollution that worktrees cause.
+ * Dispatches PR fixes in parallel using temporary git worktrees.
+ * Each fix runs in its own worktree (created and destroyed per-fix),
+ * with no dependency on agent workspace slots.
  *
  * Designed to complement the existing serial daemon — shares cooldowns, failure
  * tracking, and claim labels. New subcommand: `crux pr-patrol parallel`.
  */
 
-import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
-import { join, dirname } from 'path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { join } from 'path';
 import { execSync } from 'child_process';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { REPO } from '../lib/github.ts';
-import type { PatrolConfig, ScoredPr, FixOutcome, GqlPrNode } from './types.ts';
+import type { PatrolConfig, ScoredPr, FixOutcome } from './types.ts';
 import {
   appendJsonl,
   cl,
   ensureDirs,
   getFailCount,
-  INSTANT_FAILURE_THRESHOLD_SECONDS,
   isAbandoned,
-  isCircuitOpen,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
   logHeader,
-  markAbandoned,
-  markPendingVerification,
   markProcessed,
   recordFailure,
-  recordInstantFailure,
-  resetCircuit,
   resetFailCount,
   setParallelState,
 } from './state.ts';
@@ -72,325 +67,83 @@ import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 // ── Parallel config ──────────────────────────────────────────────────────────
 
 export interface ParallelConfig extends PatrolConfig {
-  maxSlots: number;
-  slotRange: [number, number]; // inclusive [min, max]
-  reserveSlots: number;
+  maxConcurrent: number;
   abandonThreshold: number;
+  /** Directory to create worktrees in. Defaults to /tmp/pr-patrol-worktrees */
+  worktreeDir: string;
 }
 
-const LOCK_FILE_NAME = '.pr-patrol-lock';
+// ── Worktree management ──────────────────────────────────────────────────────
 
-/** Parse a .env file and return key-value pairs. */
-function loadDotEnv(dir: string): Record<string, string> {
-  const envFile = join(dir, '.env');
-  if (!existsSync(envFile)) return {};
-  const vars: Record<string, string> = {};
-  for (const line of readFileSync(envFile, 'utf-8').split('\n')) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) continue;
-    const eqIdx = trimmed.indexOf('=');
-    if (eqIdx === -1) continue;
-    const key = trimmed.slice(0, eqIdx).trim();
-    let val = trimmed.slice(eqIdx + 1).trim();
-    // Strip surrounding quotes
-    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-      val = val.slice(1, -1);
-    }
-    vars[key] = val;
+/** Get the repo root (for creating worktrees from). */
+function getRepoRoot(): string {
+  return execSync('git rev-parse --show-toplevel', { encoding: 'utf-8' }).trim();
+}
+
+/** Create a temporary worktree for a PR branch. Returns the worktree path. */
+function createPatrolWorktree(branch: string, prNumber: number, worktreeDir: string): string {
+  mkdirSync(worktreeDir, { recursive: true });
+  const wtPath = join(worktreeDir, `patrol-pr-${prNumber}-${Date.now()}`);
+
+  // Remove stale worktree at similar paths
+  gitSafe('worktree', 'prune');
+
+  // Fetch the branch and create worktree in detached HEAD mode.
+  // Using --detach avoids "branch is already checked out" errors when
+  // manual agents or other worktrees have the same branch checked out.
+  gitSafe('fetch', 'origin', branch);
+  let result = gitSafe('worktree', 'add', '--detach', wtPath, `origin/${branch}`);
+  if (!result.ok) {
+    // Fallback: try with -B (force create local branch)
+    result = gitSafe('worktree', 'add', '-B', `patrol-${prNumber}`, wtPath, `origin/${branch}`);
   }
-  return vars;
-}
-
-// ── Slot discovery ───────────────────────────────────────────────────────────
-
-/** Resolve the `lw/` parent directory from PROJECT_ROOT. */
-export function getLwDir(): string {
-  const projectRoot = process.cwd();
-  const parent = dirname(projectRoot);
-  const dirName = projectRoot.split('/').pop() || '';
-
-  if (/^(a\d+|main)$/.test(dirName) && parent.endsWith('/lw')) {
-    return parent;
+  if (!result.ok) {
+    throw new Error(`Failed to create worktree: ${result.stderr}`);
   }
 
-  return join(parent, 'lw');
+  return wtPath;
 }
 
-/** Run a git command in a directory and return trimmed output. */
-function gitInDir(dir: string, ...args: string[]): string {
+/** Remove a patrol worktree. Best-effort cleanup. */
+function removePatrolWorktree(wtPath: string): void {
+  if (!wtPath || !existsSync(wtPath)) return;
+
+  // Abort any in-progress rebase/merge
+  gitSafeIn(wtPath, 'rebase', '--abort');
+  gitSafeIn(wtPath, 'merge', '--abort');
+
+  const result = gitSafe('worktree', 'remove', '--force', wtPath);
+  if (!result.ok) {
+    try { rmSync(wtPath, { recursive: true, force: true }); } catch { /* best-effort */ }
+    gitSafe('worktree', 'prune');
+  }
+}
+
+/** Clean up any stale patrol worktrees (from crashed processes). */
+function cleanStaleWorktrees(worktreeDir: string): void {
+  if (!existsSync(worktreeDir)) return;
   try {
-    return execSync(`git ${args.join(' ')}`, {
-      cwd: dir,
-      encoding: 'utf-8',
-      timeout: 30000,
-    }).trim();
-  } catch {
-    // Intentionally silent: this runs during slot discovery where directories may
-    // not be git repos or may have missing refs. Returning '' lets callers skip
-    // non-functional slots gracefully.
-    return '';
-  }
-}
-
-interface SlotInfo {
-  dir: string;
-  slot: number;
-}
-
-/** Find all agent slot directories under lw/. */
-function findSlotDirs(lwDir: string): SlotInfo[] {
-  if (!existsSync(lwDir)) return [];
-
-  try {
-    const entries = execSync('ls', { cwd: lwDir, encoding: 'utf-8' })
-      .trim()
-      .split('\n')
-      .filter((name) => /^a\d+$/.test(name));
-
-    const results: SlotInfo[] = [];
+    const entries = execSync('ls', { cwd: worktreeDir, encoding: 'utf-8' })
+      .trim().split('\n').filter(Boolean);
     for (const name of entries) {
-      const dir = join(lwDir, name);
+      if (!name.startsWith('patrol-pr-')) continue;
+      const wtPath = join(worktreeDir, name);
+      // If the worktree is older than 2 hours, it's stale
       try {
-        const slotFile = join(dir, '.agent-slot');
-        if (!existsSync(slotFile)) continue;
-        const raw = readFileSync(slotFile, 'utf-8').trim();
-        const slot = parseInt(raw, 10);
-        if (Number.isInteger(slot) && slot > 0) {
-          results.push({ dir, slot });
+        const stat = execSync(`stat -f %m "${wtPath}"`, { encoding: 'utf-8' }).trim();
+        const age = Date.now() / 1000 - Number(stat);
+        if (age > 2 * 60 * 60) {
+          log(`  ${cl.yellow}Cleaning stale worktree: ${name}${cl.reset}`);
+          removePatrolWorktree(wtPath);
         }
-      } catch {
-        // Skip directories without valid .agent-slot
-      }
+      } catch { /* skip */ }
     }
-
-    return results.sort((a, b) => a.slot - b.slot);
-  } catch {
-    return [];
-  }
+  } catch { /* dir may not exist yet */ }
+  gitSafe('worktree', 'prune');
 }
 
-// ── Idle slot detection ──────────────────────────────────────────────────────
 
-/**
- * Find idle slots: on main branch, clean working tree, no .agent-task,
- * no .pr-patrol-lock, within configured slot range.
- */
-export function findIdleSlots(
-  lwDir: string,
-  slotRange: [number, number],
-): SlotInfo[] {
-  const allSlots = findSlotDirs(lwDir);
-  const idle: SlotInfo[] = [];
 
-  for (const s of allSlots) {
-    if (s.slot < slotRange[0] || s.slot > slotRange[1]) continue;
-
-    // Skip if manually claimed by an agent
-    if (existsSync(join(s.dir, '.agent-task'))) {
-      log(`  ${cl.dim}Slot a${s.slot}: has .agent-task — skipping${cl.reset}`);
-      continue;
-    }
-
-    // Skip if already locked by parallel patrol
-    if (existsSync(join(s.dir, LOCK_FILE_NAME))) {
-      log(`  ${cl.dim}Slot a${s.slot}: locked by parallel patrol — skipping${cl.reset}`);
-      continue;
-    }
-
-    const branch = gitInDir(s.dir, 'branch', '--show-current');
-    if (branch !== 'main') {
-      log(`  ${cl.dim}Slot a${s.slot}: on branch ${branch} — skipping${cl.reset}`);
-      continue;
-    }
-
-    const porcelain = gitInDir(s.dir, 'status', '--porcelain');
-    const significantChanges = porcelain
-      ? porcelain.split('\n').filter((l) => l && !l.endsWith('.agent-slot') && !l.endsWith('.envrc'))
-      : [];
-    if (significantChanges.length > 0) {
-      log(`  ${cl.dim}Slot a${s.slot}: dirty working tree — skipping${cl.reset}`);
-      continue;
-    }
-
-    idle.push(s);
-  }
-
-  return idle;
-}
-
-// ── Slot preparation and reset ───────────────────────────────────────────────
-
-/** Lock a slot with an advisory lock file. */
-function lockSlot(slotDir: string, prNumber: number): void {
-  writeFileSync(
-    join(slotDir, LOCK_FILE_NAME),
-    JSON.stringify({ prNumber, lockedAt: new Date().toISOString(), pid: process.pid }),
-  );
-}
-
-/** Remove the advisory lock file. */
-function unlockSlot(slotDir: string): void {
-  try {
-    const lockFile = join(slotDir, LOCK_FILE_NAME);
-    if (existsSync(lockFile)) unlinkSync(lockFile);
-  } catch {
-    // Best-effort cleanup
-  }
-}
-
-/** Check if a lock file is stale (process dead or lock too old). */
-function isLockStale(slotDir: string): boolean {
-  const lockFile = join(slotDir, LOCK_FILE_NAME);
-  if (!existsSync(lockFile)) return false;
-  try {
-    const data = JSON.parse(readFileSync(lockFile, 'utf-8'));
-    // Check if the locking process is still alive
-    if (typeof data.pid === 'number') {
-      try {
-        process.kill(data.pid, 0); // signal 0 = check if alive
-        // Process is alive — lock is not stale
-      } catch {
-        // Process is dead — lock is stale
-        return true;
-      }
-    }
-    // Check if lock is older than 2 hours (safety net)
-    if (typeof data.lockedAt === 'string') {
-      const age = Date.now() - new Date(data.lockedAt).getTime();
-      if (age > 2 * 60 * 60 * 1000) return true;
-    }
-    return false;
-  } catch {
-    // Can't parse — treat as stale
-    return true;
-  }
-}
-
-/** Clean up stale lock files from crashed processes. */
-function cleanStaleLocks(lwDir: string): void {
-  const allSlots = findSlotDirs(lwDir);
-  for (const s of allSlots) {
-    if (isLockStale(s.dir)) {
-      log(`  ${cl.yellow}Cleaning stale lock in a${s.slot} (process dead or lock expired)${cl.reset}`);
-      unlockSlot(s.dir);
-    }
-  }
-}
-
-/**
- * Build the set of PR numbers currently held by active (non-stale) locks.
- * Used to determine which pr-patrol:working labels are still legitimately held.
- */
-function getActiveLockPrNumbers(lwDir: string): Set<number> {
-  const allSlots = findSlotDirs(lwDir);
-  const active = new Set<number>();
-
-  for (const s of allSlots) {
-    const lockFile = join(s.dir, LOCK_FILE_NAME);
-    if (!existsSync(lockFile)) continue;
-    if (isLockStale(s.dir)) continue; // Process dead or expired — skip
-    try {
-      const data = JSON.parse(readFileSync(lockFile, 'utf-8'));
-      if (typeof data.prNumber === 'number') {
-        active.add(data.prNumber);
-      }
-    } catch {
-      // Can't parse lock — treat as inactive
-    }
-  }
-
-  return active;
-}
-
-/**
- * Remove pr-patrol:working labels from PRs that no longer have an active lock.
- *
- * This handles the case where the patrol process was killed (SIGKILL, OOM, machine
- * restart) before the finally block could release the label. Without this cleanup,
- * PRs with stale working labels are invisible to the detector forever.
- *
- * Must be called AFTER cleanStaleLocks() so stale locks are already removed.
- */
-async function cleanStaleWorkingLabels(
-  lwDir: string,
-  prs: GqlPrNode[],
-  repo: string,
-): Promise<number[]> {
-  // Which PR numbers are currently held by an alive lock?
-  const activePrNums = getActiveLockPrNumbers(lwDir);
-
-  // Find PRs that carry the working label but have no active lock
-  const staleLabeled = prs.filter((pr) =>
-    pr.labels.nodes.some((l) => l.name === LABELS.PR_PATROL_WORKING) &&
-    !activePrNums.has(pr.number),
-  );
-
-  if (staleLabeled.length === 0) return [];
-
-  log(`  ${cl.yellow}Found ${staleLabeled.length} PR(s) with stale ${LABELS.PR_PATROL_WORKING} label — cleaning up${cl.reset}`);
-
-  const cleaned: number[] = [];
-  for (const pr of staleLabeled) {
-    log(`  ${cl.yellow}Removing stale ${LABELS.PR_PATROL_WORKING} from PR #${pr.number}: ${pr.title}${cl.reset}`);
-    await releasePr(pr.number, repo);
-    cleaned.push(pr.number);
-  }
-
-  return cleaned;
-}
-
-/** Fetch latest and checkout a PR branch in a slot. */
-export function prepareSlot(slotDir: string, branch: string): boolean {
-  try {
-    // Fetch latest from origin
-    execSync('git fetch origin', {
-      cwd: slotDir,
-      encoding: 'utf-8',
-      timeout: 60000,
-      stdio: 'pipe',
-    });
-
-    // Checkout the PR branch
-    execSync(`git checkout -B "${branch}" "origin/${branch}"`, {
-      cwd: slotDir,
-      encoding: 'utf-8',
-      timeout: 30000,
-      stdio: 'pipe',
-    });
-
-    return true;
-  } catch (e) {
-    log(`  ${cl.red}Failed to prepare slot: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}${cl.reset}`);
-    return false;
-  }
-}
-
-/** Return a slot to main branch after fix. */
-export function resetSlot(slotDir: string, branch?: string): void {
-  try {
-    // Discard any local changes
-    try {
-      execSync('git checkout -- .', { cwd: slotDir, timeout: 10000, stdio: 'pipe' });
-    } catch { /* no tracked changes */ }
-    try {
-      execSync('git clean -fd --exclude=.agent-slot --exclude=.pr-patrol-lock --exclude=.envrc', {
-        cwd: slotDir, timeout: 10000, stdio: 'pipe',
-      });
-    } catch { /* ignore */ }
-
-    // Switch back to main
-    execSync('git checkout main', { cwd: slotDir, timeout: 10000, stdio: 'pipe' });
-
-    // Delete the old local branch
-    if (branch) {
-      try {
-        execSync(`git branch -D "${branch}"`, { cwd: slotDir, timeout: 5000, stdio: 'pipe' });
-      } catch { /* branch may not exist locally */ }
-    }
-  } catch (e) {
-    log(`  ${cl.yellow}Warning: slot reset incomplete: ${e instanceof Error ? e.message.split('\n')[0] : String(e)}${cl.reset}`);
-  }
-}
 
 // ── PR claim management (parallel-safe) ──────────────────────────────────────
 
@@ -446,7 +199,6 @@ export function classifyFixOutcome(
 ): ClassifiedOutcome {
   if (result.timedOut) {
     const failCount = recordFailure(prNumber);
-    if (failCount >= 2) markAbandoned(prNumber);
     const reason = failCount >= 2
       ? `Abandoned after ${failCount} failures (timeout)`
       : `Killed after ${effectiveTimeout}m timeout — attempt ${failCount}`;
@@ -464,7 +216,6 @@ export function classifyFixOutcome(
         };
       }
       const failCount = recordFailure(prNumber);
-      if (failCount >= 2) markAbandoned(prNumber);
       return {
         outcome: 'no-op',
         reason: `No-op: agent determined issue needs human intervention (attempt ${failCount})`,
@@ -472,15 +223,12 @@ export function classifyFixOutcome(
       };
     }
 
-    // Don't reset fail count immediately — mark as pending CI verification.
-    // The fail counter will be reset when CI passes on the next cycle.
-    markPendingVerification(prNumber);
+    resetFailCount(prNumber);
     return { outcome: 'fixed', reason: '', mainIsRootCause: false };
   }
 
   if (result.hitMaxTurns) {
     const failCount = recordFailure(prNumber);
-    if (failCount >= 2) markAbandoned(prNumber);
     const reason = failCount >= 2
       ? `Abandoned after ${failCount} failures`
       : `Hit max turns (${effectiveMaxTurns}) — attempt ${failCount}`;
@@ -489,64 +237,46 @@ export function classifyFixOutcome(
 
   // Error exit
   const failCount = recordFailure(prNumber);
-  if (failCount >= 2) markAbandoned(prNumber);
   const reason = failCount >= 2
     ? `Abandoned after ${failCount} failures (last: exit code ${result.exitCode})`
     : `Exit code: ${result.exitCode}`;
   return { outcome: 'error', reason, mainIsRootCause: false };
 }
 
-// ── Fix PR in slot ───────────────────────────────────────────────────────────
+// ── Fix PR in worktree ───────────────────────────────────────────────────────
 
-interface SlotFixResult {
+interface FixResult {
   prNumber: number;
-  slot: number;
   outcome: FixOutcome;
   reason: string;
   elapsedS: number;
 }
 
-async function fixPrInSlot(
+async function fixPrInWorktree(
   pr: ScoredPr,
-  slot: SlotInfo,
   config: ParallelConfig,
-): Promise<SlotFixResult> {
-  const prefix = `[a${slot.slot}/#${pr.number}]`;
+): Promise<FixResult> {
+  const prefix = `[#${pr.number}]`;
   log(`${prefix} Starting fix: ${pr.title}`);
   log(`${prefix} Issues: ${pr.issues.join(', ')}`);
 
   if (config.dryRun) {
-    log(`${prefix} ${cl.dim}[DRY RUN] Would fix PR #${pr.number} in slot a${slot.slot}${cl.reset}`);
-    return {
-      prNumber: pr.number,
-      slot: slot.slot,
-      outcome: 'dry-run',
-      reason: '',
-      elapsedS: 0,
-    };
+    log(`${prefix} ${cl.dim}[DRY RUN] Would fix PR #${pr.number}${cl.reset}`);
+    return { prNumber: pr.number, outcome: 'dry-run', reason: '', elapsedS: 0 };
   }
 
   const startTime = Date.now();
-
-  // Lock slot
-  lockSlot(slot.dir, pr.number);
+  let worktreePath = '';
 
   try {
-    // Prepare slot: fetch + checkout PR branch
-    if (!prepareSlot(slot.dir, pr.branch)) {
-      return {
-        prNumber: pr.number,
-        slot: slot.slot,
-        outcome: 'error',
-        reason: 'Failed to checkout branch in slot',
-        elapsedS: Math.floor((Date.now() - startTime) / 1000),
-      };
-    }
+    // Create worktree for this PR
+    worktreePath = createPatrolWorktree(pr.branch, pr.number, config.worktreeDir);
+    log(`${prefix} Worktree: ${cl.dim}${worktreePath}${cl.reset}`);
 
     // Automated rebase pre-step
     if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
       log(`${prefix} Attempting automated rebase...`);
-      const rebaseResult = tryAutomatedRebase(pr.branch, slot.dir);
+      const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
 
       if (rebaseResult.success) {
         log(`${prefix} Automated rebase ${rebaseResult.status} — no Claude needed`);
@@ -555,7 +285,6 @@ async function fixPrInSlot(
           markProcessed(pr.number);
           return {
             prNumber: pr.number,
-            slot: slot.slot,
             outcome: 'fixed',
             reason: `automated-rebase: ${rebaseResult.status}`,
             elapsedS: Math.floor((Date.now() - startTime) / 1000),
@@ -564,6 +293,33 @@ async function fixPrInSlot(
         pr.issues = remainingIssues;
         log(`${prefix} Remaining issues after rebase: ${remainingIssues.join(', ')}`);
       } else {
+        // On retry for conflict-only PRs, try rebase-only with Claude (simpler prompt)
+        const failCount = getFailCount(pr.number);
+        if (failCount > 0 && pr.issues.length === 1 && pr.issues[0] === 'conflict') {
+          log(`${prefix} Retry #${failCount + 1} for conflict-only PR — using rebase-only strategy`);
+          await claimPr(pr.number, config.repo);
+          const rebasePrompt = `Rebase the current branch onto origin/main. Resolve any merge conflicts. Then force-push with: git push --force-with-lease. Do NOT fix CI issues, do NOT address code review comments — ONLY resolve the merge conflicts and push.`;
+          const rebaseResult2 = await spawnClaude(rebasePrompt, {
+            ...config,
+            maxTurns: 30,
+            timeoutMinutes: 15,
+          }, { cwd: worktreePath });
+          const elapsedS = Math.floor((Date.now() - startTime) / 1000);
+          const outcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
+          if (outcome === 'fixed') {
+            resetFailCount(pr.number);
+            log(`${prefix} ${cl.green}Rebase-only fix succeeded${cl.reset} (${elapsedS}s)`);
+          } else {
+            recordFailure(pr.number);
+            log(`${prefix} ${cl.red}Rebase-only fix failed${cl.reset} (${elapsedS}s)`);
+          }
+          appendJsonl(JSONL_FILE, {
+            type: 'pr_result', pr_num: pr.number, issues: pr.issues,
+            outcome, elapsed_s: elapsedS, reason: 'rebase-only strategy', parallel: true,
+          });
+          markProcessed(pr.number);
+          return { prNumber: pr.number, outcome, reason: 'rebase-only strategy', elapsedS };
+        }
         log(`${prefix} Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
       }
     }
@@ -571,13 +327,13 @@ async function fixPrInSlot(
     // Claim PR on GitHub
     await claimPr(pr.number, config.repo);
 
-    // Compute budget
+    // Compute budget — full budget every attempt (no reduction on retry)
     const failCount = getFailCount(pr.number);
     const { maxTurns: effectiveMaxTurns, timeoutMinutes: effectiveTimeout } =
-      computeEffectiveBudget(pr.issues, config.maxTurns, config.timeoutMinutes, failCount);
+      computeEffectiveBudget(pr.issues, config.maxTurns, config.timeoutMinutes, 0);
 
     if (failCount > 0) {
-      log(`${prefix} Retry #${failCount + 1} — budget reduced to ${effectiveMaxTurns} turns / ${effectiveTimeout}m`);
+      log(`${prefix} Retry #${failCount + 1} (full budget — no reduction)`);
     }
     log(`${prefix} Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout`);
 
@@ -585,19 +341,13 @@ async function fixPrInSlot(
     await postEventComment(pr.number, config.repo, buildFixAttemptComment(pr.issues))
       .catch((e: unknown) => log(`${prefix} Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
 
-    // Build prompt and spawn Claude
-    // Preserve CLAUDECODE so Claude CLI uses parent session's auth.
-    // Also load slot's .env as fallback for API keys.
-    const slotEnv = loadDotEnv(slot.dir);
-    if (process.env.CLAUDECODE) {
-      slotEnv.CLAUDECODE = process.env.CLAUDECODE;
-    }
+    // Build prompt and spawn Claude in worktree (no .env loading needed — OAuth auth)
     const prompt = buildPrompt(pr, config.repo);
     const result = await spawnClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,
-    }, { cwd: slot.dir, extraEnv: slotEnv });
+    }, { cwd: worktreePath });
 
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
@@ -640,16 +390,6 @@ async function fixPrInSlot(
       }
     }
 
-    // Circuit breaker: track instant failures (error + <15s) vs non-instant outcomes
-    if (classified.outcome === 'error' && elapsedS < INSTANT_FAILURE_THRESHOLD_SECONDS) {
-      const tripped = recordInstantFailure();
-      if (tripped) {
-        log(`${prefix} ${cl.red}Circuit breaker TRIPPED — 3+ consecutive instant failures. Pausing dispatch for 15 min.${cl.reset}`);
-      }
-    } else {
-      resetCircuit();
-    }
-
     // Log to JSONL
     appendJsonl(JSONL_FILE, {
       type: 'pr_result',
@@ -659,23 +399,20 @@ async function fixPrInSlot(
       elapsed_s: elapsedS,
       reason: classified.reason || undefined,
       parallel: true,
-      slot: slot.slot,
     });
 
     markProcessed(pr.number);
 
     return {
       prNumber: pr.number,
-      slot: slot.slot,
       outcome: classified.outcome,
       reason: classified.reason,
       elapsedS,
     };
   } finally {
-    // Always release PR claim and reset slot
+    // Always release PR claim and remove worktree
     await releasePr(pr.number, config.repo);
-    resetSlot(slot.dir, pr.branch);
-    unlockSlot(slot.dir);
+    if (worktreePath) removePatrolWorktree(worktreePath);
   }
 }
 
@@ -687,35 +424,31 @@ interface CycleResult {
 }
 
 /**
- * Dispatch fixes across available slots in parallel.
+ * Dispatch fixes in parallel using worktrees.
  */
 async function dispatchFixes(
   ranked: ScoredPr[],
-  slots: SlotInfo[],
+  maxConcurrent: number,
   config: ParallelConfig,
 ): Promise<CycleResult> {
-  const pairs = ranked.slice(0, slots.length).map((pr, i) => ({
-    pr,
-    slot: slots[i],
-  }));
+  const toFix = ranked.slice(0, maxConcurrent);
 
-  if (pairs.length === 0) {
+  if (toFix.length === 0) {
     return { dispatched: 0, results: [] };
   }
 
   log('');
-  log(`${cl.bold}Dispatching ${pairs.length} fix(es) in parallel:${cl.reset}`);
-  for (const { pr, slot } of pairs) {
-    log(`  a${slot.slot} → PR #${pr.number} (${pr.issues.join(', ')}) — ${pr.title}`);
+  log(`${cl.bold}Dispatching ${toFix.length} fix(es) in parallel (worktrees):${cl.reset}`);
+  for (const pr of toFix) {
+    log(`  PR #${pr.number} (${pr.issues.join(', ')}) — ${pr.title}`);
   }
   log('');
 
-  const promises = pairs.map(({ pr, slot }) =>
-    fixPrInSlot(pr, slot, config).catch((e): SlotFixResult => {
-      log(`${cl.red}[a${slot.slot}/#${pr.number}] Unexpected error: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+  const promises = toFix.map((pr) =>
+    fixPrInWorktree(pr, config).catch((e): FixResult => {
+      log(`${cl.red}[#${pr.number}] Unexpected error: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
       return {
         prNumber: pr.number,
-        slot: slot.slot,
         outcome: 'error',
         reason: `Unexpected: ${e instanceof Error ? e.message : String(e)}`,
         elapsedS: 0,
@@ -729,96 +462,56 @@ async function dispatchFixes(
       ? r.value
       : {
           prNumber: 0,
-          slot: 0,
           outcome: 'error' as FixOutcome,
           reason: `Promise rejected: ${r.reason}`,
           elapsedS: 0,
         },
   );
 
-  return { dispatched: pairs.length, results };
-}
-
-// ── Auto-refresh merged-PR slots ─────────────────────────────────────────────
-
-/**
- * Automatically reset slots whose PR has been merged back to main.
- * This keeps the slot pool healthy without manual intervention.
- */
-function autoRefreshSlots(lwDir: string, slotRange: [number, number]): void {
-  const allSlots = findSlotDirs(lwDir);
-  for (const s of allSlots) {
-    if (s.slot < slotRange[0] || s.slot > slotRange[1]) continue;
-
-    const branch = gitInDir(s.dir, 'branch', '--show-current');
-    if (branch === 'main' || !branch) continue;
-
-    // Skip locked slots
-    if (existsSync(join(s.dir, LOCK_FILE_NAME)) && !isLockStale(s.dir)) continue;
-
-    // Check if the branch's PR has been merged
-    let prState = '';
-    try {
-      prState = execSync(
-        `gh pr view "${branch}" --json state --jq .state 2>/dev/null`,
-        { cwd: s.dir, encoding: 'utf-8', timeout: 10000 },
-      ).trim();
-    } catch {
-      // gh not available or no PR — skip
-      continue;
-    }
-
-    if (prState === 'MERGED') {
-      log(`  ${cl.cyan}Auto-refreshing a${s.slot}: ${branch} (PR merged)${cl.reset}`);
-      resetSlot(s.dir, branch);
-    }
-  }
+  return { dispatched: toFix.length, results };
 }
 
 // ── Single parallel cycle ────────────────────────────────────────────────────
 
+let parallelCycleCount = 0;
+
 export async function runParallelCycle(config: ParallelConfig): Promise<CycleResult> {
+  parallelCycleCount++;
   logHeader('Parallel patrol cycle');
 
-  // 0. Housekeeping: clean stale locks and refresh merged-PR slots
-  const lwDir = getLwDir();
-  cleanStaleLocks(lwDir);
-  autoRefreshSlots(lwDir, config.slotRange);
+  // 0. Housekeeping: clean stale worktrees
+  cleanStaleWorktrees(config.worktreeDir);
+
+  // Write heartbeat at cycle start (so monitors can detect stalls)
+  const writeHeartbeat = (status: 'idle' | 'dispatching' | 'sleeping', extra?: Partial<import('./state.ts').ParallelState>) => {
+    setParallelState({
+      lastHeartbeat: new Date().toISOString(),
+      lastCycleAt: new Date().toISOString(),
+      pid: process.pid,
+      status,
+      cycleCount: parallelCycleCount,
+      prsScanned: 0,
+      slotsUsed: [],
+      dispatched: 0,
+      fixed: 0,
+      errors: 0,
+      ...extra,
+    });
+  };
 
   // 1. Detect: Fetch open PRs and find issues
   const allPrs = await fetchOpenPrs(config);
-
-  // 1a. Stale working-label cleanup: remove pr-patrol:working from PRs that
-  // have no active lock (e.g., process was killed before the finally block ran).
-  // Must run AFTER cleanStaleLocks() above so stale locks are already gone.
-  // Strip the label from in-memory nodes so they are visible to the detector.
-  const cleanedPrNums = config.dryRun
-    ? []
-    : await cleanStaleWorkingLabels(lwDir, allPrs, config.repo).catch((e: unknown) => {
-        log(`  ${cl.yellow}Warning: stale working-label cleanup failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
-        return [] as number[];
-      });
-  if (cleanedPrNums.length > 0) {
-    const cleanedSet = new Set(cleanedPrNums);
-    for (const pr of allPrs) {
-      if (cleanedSet.has(pr.number)) {
-        pr.labels = {
-          nodes: pr.labels.nodes.filter((l) => l.name !== LABELS.PR_PATROL_WORKING),
-        };
-      }
-    }
-  }
-
   const detected = detectAllPrIssuesFromNodes(allPrs, config);
 
   if (detected.length === 0) {
     log(`${cl.green}All PRs clean${cl.reset} — nothing to fix`);
+    writeHeartbeat('idle', { prsScanned: allPrs.length });
     return { dispatched: 0, results: [] };
   }
 
-  // Filter cooldowns and abandoned
+  // Filter cooldowns and abandoned (parallel uses higher threshold than serial)
   const eligible = detected.filter((pr) => {
-    if (isAbandoned(pr.number) || getFailCount(pr.number) >= config.abandonThreshold) {
+    if (getFailCount(pr.number) >= config.abandonThreshold) {
       log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — ${getFailCount(pr.number)} failures, threshold ${config.abandonThreshold})${cl.reset}`);
       return false;
     }
@@ -832,6 +525,7 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
   const ranked = rankPrs(eligible);
   if (ranked.length === 0) {
     log(`${cl.dim}All issues recently processed — nothing to fix${cl.reset}`);
+    writeHeartbeat('idle', { prsScanned: allPrs.length });
     return { dispatched: 0, results: [] };
   }
 
@@ -840,36 +534,11 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
     log(`  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} — ${pr.title}`);
   }
 
-  // 2. Allocate: Find idle slots
-  log('');
-  log(`${cl.bold}Scanning slots${cl.reset} (range a${config.slotRange[0]}–a${config.slotRange[1]})...`);
-  const idleSlots = findIdleSlots(lwDir, config.slotRange);
+  // 2. Dispatch fixes (worktrees — no slot allocation needed)
+  log(`${cl.green}Dispatching up to ${config.maxConcurrent} fix(es) via worktrees${cl.reset}`);
 
-  if (idleSlots.length === 0) {
-    log(`${cl.yellow}No idle slots available${cl.reset}`);
-    return { dispatched: 0, results: [] };
-  }
-
-  // Reserve slots for manual use
-  const availableSlots = idleSlots.length > config.reserveSlots
-    ? idleSlots.slice(0, idleSlots.length - config.reserveSlots)
-    : [];
-
-  if (availableSlots.length === 0) {
-    log(`${cl.yellow}All ${idleSlots.length} idle slot(s) reserved (--reserve-slots=${config.reserveSlots})${cl.reset}`);
-    return { dispatched: 0, results: [] };
-  }
-
-  // Cap by maxSlots
-  const slotsToUse = availableSlots.slice(0, config.maxSlots);
-  log(`${cl.green}${slotsToUse.length} slot(s) available${cl.reset} (${idleSlots.length} idle, ${config.reserveSlots} reserved): ${slotsToUse.map((s) => `a${s.slot}`).join(', ')}`);
-
-  // 3. Dispatch fixes (skip if circuit breaker is open)
-  if (isCircuitOpen()) {
-    log(`${cl.red}Circuit breaker OPEN — pausing dispatch (3+ consecutive instant failures). Will auto-reset in ≤15 min.${cl.reset}`);
-    return { dispatched: 0, results: [] };
-  }
-  const result = await dispatchFixes(ranked, slotsToUse, config);
+  writeHeartbeat('dispatching', { prsScanned: allPrs.length });
+  const result = await dispatchFixes(ranked, config.maxConcurrent, config);
 
   // 4. Merge phase — reconcile labels, undraft, enqueue eligible PRs
   await reconcileMergeQueueLabels(allPrs, config);
@@ -947,7 +616,7 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
                  r.outcome === 'dry-run' ? cl.dim + '○' :
                  r.outcome === 'no-op' ? cl.yellow + '⚠' :
                  cl.red + '✗';
-    log(`  ${icon}${cl.reset} a${r.slot} → PR #${r.prNumber}: ${r.outcome} (${r.elapsedS}s)${r.reason ? ` — ${r.reason}` : ''}`);
+    log(`  ${icon}${cl.reset} PR #${r.prNumber}: ${r.outcome} (${r.elapsedS}s)${r.reason ? ` — ${r.reason}` : ''}`);
   }
 
   // Log cycle summary
@@ -961,19 +630,17 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
     merge_candidates: mergeCandidates.length,
     merge_eligible: eligibleForMerge.length,
     deploy_healthy: deployHealth.healthy,
-    slots_used: slotsToUse.map((s) => s.slot),
     results: result.results.map((r) => ({
       pr: r.prNumber,
-      slot: r.slot,
       outcome: r.outcome,
       elapsed_s: r.elapsedS,
     })),
   });
 
   // Write state file for monitoring
-  setParallelState({
-    lastCycleAt: new Date().toISOString(),
-    slotsUsed: slotsToUse.map((s) => s.slot),
+  writeHeartbeat('sleeping', {
+    prsScanned: allPrs.length,
+    slotsUsed: [],
     dispatched: result.dispatched,
     fixed,
     errors,
@@ -988,7 +655,7 @@ export async function runParallelDaemon(config: ParallelConfig): Promise<void> {
   ensureDirs();
 
   logHeader('PR Patrol Parallel starting');
-  log(`Config: max-slots=${config.maxSlots}, slot-range=${config.slotRange[0]}-${config.slotRange[1]}, reserve-slots=${config.reserveSlots}`);
+  log(`Config: max-concurrent=${config.maxConcurrent}, worktree-dir=${config.worktreeDir}`);
   log(`  interval=${config.intervalSeconds}s, model=${config.model}, cooldown=${config.cooldownSeconds}s`);
   log(`  mode=${config.once ? 'single pass' : config.dryRun ? 'dry run' : 'continuous'}`);
   log(`  JSONL: ${JSONL_FILE}`);
@@ -1015,7 +682,9 @@ export async function runParallelDaemon(config: ParallelConfig): Promise<void> {
     return;
   }
 
+  let cycleCount = 0;
   while (!shuttingDown) {
+    cycleCount++;
     try {
       await runParallelCycle(config);
     } catch (e) {
@@ -1072,28 +741,22 @@ export function buildParallelConfig(
     ),
   };
 
-  // Parse slot range (e.g., "2-10")
-  let slotRange: [number, number] = [2, 15];
-  if (typeof options.slotRange === 'string') {
-    const match = options.slotRange.match(/^(\d+)-(\d+)$/);
-    if (match) {
-      slotRange = [parseInt(match[1], 10), parseInt(match[2], 10)];
-    }
-  }
+  const defaultWorktreeDir = join(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'worktrees');
 
   return {
     ...base,
-    maxSlots: typeof options.maxSlots === 'number'
-      ? options.maxSlots
-      : typeof options.maxSlots === 'string'
-        ? parseInt(options.maxSlots, 10) || 5
-        : 5,
-    slotRange,
-    reserveSlots: typeof options.reserveSlots === 'number'
-      ? options.reserveSlots
-      : typeof options.reserveSlots === 'string'
-        ? parseInt(options.reserveSlots, 10) || 2
-        : 2,
+    maxConcurrent: typeof options.maxConcurrent === 'number'
+      ? options.maxConcurrent
+      : typeof options.maxConcurrent === 'string'
+        ? parseInt(options.maxConcurrent, 10) || 5
+        : typeof options.maxSlots === 'number'  // backward compat
+          ? options.maxSlots as number
+          : typeof options.maxSlots === 'string'
+            ? parseInt(options.maxSlots, 10) || 5
+            : 5,
+    worktreeDir: typeof options.worktreeDir === 'string'
+      ? options.worktreeDir
+      : defaultWorktreeDir,
     abandonThreshold: typeof options.abandonThreshold === 'number'
       ? options.abandonThreshold
       : typeof options.abandonThreshold === 'string'

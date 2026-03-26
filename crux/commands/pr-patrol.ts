@@ -25,6 +25,7 @@ import {
   fetchOpenPrs,
   findMergeCandidates,
   JSONL_FILE,
+  getParallelState,
 } from '../pr-patrol/index.ts';
 import {
   readAllEntries,
@@ -93,7 +94,21 @@ async function status(
     return { output: JSON.stringify(recent, null, 2) + '\n', exitCode: 0 };
   }
 
-  return { output: formatStatus(recent, colors), exitCode: 0 };
+  // Prepend parallel daemon status if running
+  let daemonLine = '';
+  const pState = getParallelState();
+  if (pState) {
+    const age = Math.floor((Date.now() - new Date(pState.lastHeartbeat).getTime()) / 1000);
+    const isAlive = age < 600; // stale if no heartbeat in 10 min
+    const statusIcon = isAlive ? (pState.status === 'dispatching' ? '\u2699\uFE0F' : '\u2705') : '\u274C';
+    daemonLine = `${statusIcon} Parallel daemon: ${isAlive ? pState.status : 'STALLED'} (heartbeat ${age}s ago, cycle #${pState.cycleCount}, pid ${pState.pid})\n`;
+    if (pState.dispatched > 0 || pState.fixed > 0 || pState.errors > 0) {
+      daemonLine += `  Last cycle: ${pState.dispatched} dispatched, ${pState.fixed} fixed, ${pState.errors} errors\n`;
+    }
+    daemonLine += '\n';
+  }
+
+  return { output: daemonLine + formatStatus(recent, colors), exitCode: 0 };
 }
 
 async function history(
@@ -253,22 +268,17 @@ Branch Agent Options:
   --dry-run            Show what would be done, don't fix
   --skip-perms         Add --dangerously-skip-permissions to Claude CLI
 
-Parallel Patrol (dispatch fixes to agent slots concurrently):
-  crux gh pr-patrol parallel                    Continuous daemon
-  crux gh pr-patrol parallel --once             Single cycle
-  crux gh pr-patrol parallel --max-slots=5      Limit concurrency (default: 5)
-  crux gh pr-patrol parallel --slot-range=2-10  Restrict slot range (default: 2-15)
-  crux gh pr-patrol parallel --reserve-slots=2  Keep N slots free for manual use (default: 2)
-  crux gh pr-patrol parallel --dry-run          Preview dispatch plan
+Parallel Patrol (dispatch fixes concurrently via worktrees):
+  crux gh pr-patrol parallel                        Continuous daemon
+  crux gh pr-patrol parallel --once                 Single cycle
+  crux gh pr-patrol parallel --max-concurrent=5     Limit concurrency (default: 5)
+  crux gh pr-patrol parallel --dry-run              Preview dispatch plan
 
-  Uses lw/a2-a15 agent slots as isolated clones for parallel PR fixes.
+  Creates temporary git worktrees for each fix — no agent slots needed.
   Shares cooldowns, failure tracking, and claim labels with the serial daemon.
-  Slots with .agent-task files or non-main branches are automatically skipped.
 
 Parallel Options:
-  --max-slots=N        Max concurrent fixes (default: 5)
-  --slot-range=M-N     Slot range to use (default: 2-15)
-  --reserve-slots=N    Keep N slots free for manual use (default: 2)
+  --max-concurrent=N   Max concurrent fixes (default: 5)
   --once               Single cycle, then exit
   --dry-run            Preview dispatch plan without fixing
   --interval=N         Seconds between cycles (default: 300)
@@ -330,8 +340,8 @@ Examples:
   crux gh pr-patrol stats --since=30d              Monthly performance stats
   crux gh pr-patrol explain                        How PR Patrol works
   crux gh pr-patrol merge-status                   Show merge-eligible PRs
-  crux gh pr-patrol parallel --once --dry-run     Preview parallel dispatch plan
-  crux gh pr-patrol parallel --once --max-slots=3 Run single cycle with 3 slots
-  crux gh pr-patrol parallel                       Continuous parallel daemon
+  crux gh pr-patrol parallel --once --dry-run        Preview parallel dispatch plan
+  crux gh pr-patrol parallel --once --max-concurrent=3  Single cycle, 3 concurrent
+  crux gh pr-patrol parallel                            Continuous parallel daemon
 `.trim();
 }
