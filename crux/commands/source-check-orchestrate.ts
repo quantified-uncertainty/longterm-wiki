@@ -75,6 +75,7 @@ interface OrchestrateOptions extends BaseOptions {
   'dry-run'?: boolean;
   dryRun?: boolean;
   ci?: boolean;
+  concurrency?: string;
 }
 
 type VerifyItemKind = 'fact' | 'record' | 'entity';
@@ -1145,6 +1146,7 @@ export async function orchestrateCommand(
   }
 
   // ── Live execution ──
+  const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
   const client = createLlmClient();
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
@@ -1170,19 +1172,25 @@ export async function orchestrateCommand(
     summary.byKind[item.kind].total++;
   }
 
-  console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)})...\x1b[0m\n`);
+  const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
+  console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
 
-  for (let i = 0; i < itemsToVerify.length; i++) {
-    const item = itemsToVerify[i];
+  let completedCount = 0;
+
+  async function processItem(item: VerifyItem, index: number): Promise<void> {
     const kindLabel = item.kind.toUpperCase().padEnd(7);
-    console.log(`  [${i + 1}/${itemsToVerify.length}] ${kindLabel} ${item.description.slice(0, 80)}`);
 
     const result = await verifySingleItem(item, client, useWebSearch);
+
+    // Synchronize output and summary updates
+    completedCount++;
+    const progress = `[${completedCount}/${itemsToVerify.length}]`;
 
     if ('error' in result) {
       summary.errors++;
       summary.failures.push(result);
       const typeTag = result.errorType ? ` [${result.errorType}]` : '';
+      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
       console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
     } else {
       summary[result.verdict]++;
@@ -1195,6 +1203,7 @@ export async function orchestrateCommand(
         : result.verdict === 'contradicted'
           ? '\x1b[31m'
           : '\x1b[33m';
+      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
       console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
 
       if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
@@ -1206,6 +1215,23 @@ export async function orchestrateCommand(
         console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
       });
     }
+  }
+
+  // Run with concurrency-limited pool
+  if (concurrency <= 1) {
+    for (let i = 0; i < itemsToVerify.length; i++) {
+      await processItem(itemsToVerify[i], i);
+    }
+  } else {
+    const executing = new Set<Promise<void>>();
+    for (let i = 0; i < itemsToVerify.length; i++) {
+      const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
+      executing.add(p);
+      if (executing.size >= concurrency) {
+        await Promise.race(executing);
+      }
+    }
+    await Promise.all(executing);
   }
 
   // ── Build summary output ──
@@ -1536,6 +1562,7 @@ Options:
   --entity-type=X        Filter by entity type (organization, person, ai-model, ...)
   --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
+  --concurrency=N        Number of parallel verifications (default: 5)
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
 
