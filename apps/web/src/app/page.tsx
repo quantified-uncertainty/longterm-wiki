@@ -330,6 +330,7 @@ export default function Home() {
                   </div>
                   <Link
                     href={section.href}
+                    aria-label={`View all ${section.label}`}
                     className="inline-block mt-2 text-xs text-muted-foreground hover:text-foreground no-underline transition-colors"
                   >
                     View all &rarr;
@@ -347,6 +348,7 @@ export default function Home() {
             <div className="flex-1 h-px bg-border" />
             <Link
               href="/wiki"
+              aria-label="View all wiki pages"
               className="text-sm text-muted-foreground hover:text-foreground no-underline transition-colors flex-shrink-0"
             >
               View all &rarr;

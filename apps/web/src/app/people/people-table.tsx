@@ -394,6 +394,7 @@ export function PeopleTable({
       {/* Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
+          <caption className="sr-only">People directory with roles, affiliations, and career data</caption>
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader
@@ -471,6 +472,8 @@ export function PeopleTable({
               <tr>
                 <td
                   colSpan={serverMode ? 5 : 8}
+                  role="status"
+                  aria-live="polite"
                   className="py-8 text-center text-muted-foreground text-sm"
                 >
                   Loading people...
