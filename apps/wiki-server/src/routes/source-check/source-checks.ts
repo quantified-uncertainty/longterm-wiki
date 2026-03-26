@@ -354,7 +354,8 @@ const sourceChecksApp = new Hono()
           eq(sourceCheckEvidence.recordId, recordId),
         )
       )
-      .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt));
+      .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt))
+      .limit(200);
 
     return c.json({
       verdicts: verdictRows.map((v) => ({
@@ -1030,10 +1031,18 @@ const sourceChecksApp = new Hono()
       SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
     `);
 
+    interface TableCountRow {
+      table_name: string;
+      total: number;
+    }
+
     const totalsByType: Record<string, number> = {};
     for (const row of tableCountResult) {
-      const r = row as { table_name: string; total: number };
-      totalsByType[r.table_name] = r.total;
+      const tableName = row.table_name;
+      const total = row.total;
+      if (typeof tableName === "string" && typeof total === "number") {
+        totalsByType[tableName] = total;
+      }
     }
 
     // Count distinct verified records per record_type from verification_verdicts
