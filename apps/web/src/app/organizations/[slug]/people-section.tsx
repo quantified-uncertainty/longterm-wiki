@@ -12,6 +12,7 @@ import {
   type RpcPersonnelByEntityResult,
   type RpcPersonnelRow,
 } from "@/lib/wiki-server";
+import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -61,19 +62,13 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  * Convert PG personnel rows into PersonEntry format for merging with
  * existing FactBase key-persons and board-seats data.
  */
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-
-/** Matches pure numeric IDs (legacy DB PKs). */
-const NUMERIC_ID_RE = /^\d+$/;
-
 /**
  * Humanize a raw person identifier for display.
  * Returns null for bare stableIds and numeric PKs (not human-readable).
  * Strips "new:" prefix and converts slug-format IDs to title case.
  */
 function humanizePersonId(raw: string): string | null {
-  if (STABLE_ID_RE.test(raw) || NUMERIC_ID_RE.test(raw)) return null;
+  if (STABLE_ID_PATTERN.test(raw) || NUMERIC_ID_PATTERN.test(raw)) return null;
   const cleaned = raw.startsWith("new:") ? raw.slice(4).trim() : raw;
   if (!cleaned) return null;
   // If it looks like a slug (contains hyphens/underscores), humanize it

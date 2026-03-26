@@ -16,18 +16,7 @@ import {
 } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
-
-/**
- * Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
- * Avoids false positives for short lowercase slugs like "bioweapons" or "conjecture".
- */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-
-/**
- * Matches pure numeric IDs (e.g. "335", "1234") which are never valid slugs.
- * These come from legacy FactBase entity references that used numeric IDs.
- */
-const NUMERIC_ID_PATTERN = /^\d+$/;
+import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
 
 function buildEntityHref(
   entityType: string,
