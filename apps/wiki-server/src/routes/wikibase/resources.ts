@@ -585,6 +585,8 @@ const resourcesApp = new Hono()
   // ---- POST /suggest (register URLs as resources + check content freshness) ----
 
   .post("/suggest", zv("json", SuggestResourcesSchema), async (c) => {
+    // Note: entityId and agentSessionId are accepted by the schema but not yet used.
+    // They are reserved for Phase 2 (linking suggestions to entities/sessions). See #3253.
     const { urls, maxContentAgeMs } = c.req.valid("json");
     const maxAge = maxContentAgeMs ?? SUGGEST_RESOURCES_DEFAULT_MAX_AGE_MS;
     const now = Date.now();
@@ -597,7 +599,11 @@ const resourcesApp = new Hono()
     const urlToOriginal = new Map<string, string>();
     for (const url of uniqueUrls) {
       for (const variant of urlVariants(url)) {
-        urlToOriginal.set(variant, url);
+        // First URL wins — skip if variant already mapped (prevents lossy overwrites
+        // when different input URLs produce overlapping variants)
+        if (!urlToOriginal.has(variant)) {
+          urlToOriginal.set(variant, url);
+        }
       }
     }
     const allVariants = [...urlToOriginal.keys()];
@@ -640,7 +646,7 @@ const resourcesApp = new Hono()
         SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[])
           AS t(id, url),
           LATERAL (SELECT 'web'::text AS type, now() AS created_at, now() AS updated_at) defaults
-        ON CONFLICT (id) DO UPDATE SET updated_at = now()
+        ON CONFLICT (url) DO UPDATE SET updated_at = now()
         RETURNING id, url, title, null::timestamptz AS fetched_at, false AS has_content
       `;
       for (const row of created) {
