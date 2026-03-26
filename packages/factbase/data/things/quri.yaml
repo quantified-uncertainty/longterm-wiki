@@ -26,45 +26,33 @@ facts:
 
   - id: f_Nl4IKIikMq
     property: headcount
-    value:
-      type: range
-      low: 3
-      high: 5
+    value: 1
     asOf: !date 2026-03
+    source: https://quantifieduncertainty.org/team/
     notes: >-
-      ~3-5 core contributors including Ozzie Gooen, Slava Matyukhin (2022-2025),
-      Sam Nolan (2021-2023); previously Nuño Sempere (2020-2023)
+      1 full-time staff (Ozzie Gooen); plus research collaborators
+      (Nuño Sempere, Eli Lifland) and past contributors
 
   - id: f_zwFMLRENMB
     property: funding-received
-    value:
-      type: number
-      value: 650000
-      unit: USD
+    value: 650000
     asOf: !date 2022
     source: https://survivalandflourishing.fund
-    notes: Survival and Flourishing Fund (sff) grants 2019-2022
+    notes: Survival and Flourishing Fund (SFF) grants 2019-2022
     grantor: !ref pvJ50HupEQ
 
   - id: f_AyrcCzn5aW
     property: funding-received
-    value:
-      type: number
-      value: 200000
-      unit: USD
+    value: 200000
     asOf: !date 2022
     source: https://web.archive.org/web/20221212115231/https://ftxfuturefund.org/
     notes: Future Fund grant 2022 (pre-FTX collapse)
 
   - id: f_qduycirTr5
     property: funding-received
-    value:
-      type: range
-      low: 50000
-      high: 150000
-      unit: USD
+    value: 100000
     asOf: !date 2024
-    notes: Long-Term Future Fund (ltff) ongoing support (estimated annual ~$100K; not a sourced exact figure)
+    notes: Long-Term Future Fund (LTFF) ongoing support (estimated annual; not a sourced exact figure)
     grantor: !ref yA12C1KcjQ
 
   - id: f_QR8legal01

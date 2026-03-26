@@ -42,7 +42,7 @@ export async function generateMetadata({
   if (!pub) return { title: "Publication Not Found" };
 
   return {
-    title: `${pub.name} | Publication Venues | Longterm Wiki`,
+    title: `${pub.name} | Publication Venues`,
     description:
       pub.description || `${pub.name} — publication venue tracked in the wiki.`,
   };
