@@ -24,19 +24,31 @@ async function getGraph(): Promise<Graph> {
 }
 
 /**
- * Find the KB entity for a wiki page by matching `entity.wikiPageId === pageId`.
- * Falls back to searching entity names against the last path segment.
+ * Find the KB entity for a wiki page by matching wikiPageId, slug, or entity ID.
+ *
+ * Lookup order:
+ * 1. wikiPageId match (e.g., pageId="E22" → anthropic entity)
+ * 2. Slug match via page ID (e.g., pageId="openai-foundation" → YAML filename lookup)
+ * 3. Slug match via last path segment (e.g., path="organizations/anthropic" → "anthropic")
+ * 4. Entity ID match via last path segment (for stableId-based lookups)
  */
 function findKbEntity(graph: Graph, pageId: string, pagePath?: string): Entity | undefined {
-  // Primary: match by wikiPageId (e.g., "E22" → anthropic)
+  // 1. Match by wikiPageId (e.g., "E22")
   const all = graph.getAllEntities();
   const byWikiPageId = all.find((e) => e.wikiPageId === pageId);
   if (byWikiPageId) return byWikiPageId;
 
-  // Fallback: match by entity ID
+  // 2. Match by slug using pageId directly (e.g., "openai-foundation" → YAML filename)
+  const bySlug = graph.getEntityBySlug(pageId);
+  if (bySlug) return bySlug;
+
+  // 3. Match by slug or entity ID using last path segment
   if (pagePath) {
     const segment = pagePath.split('/').pop()?.replace(/\.mdx$/, '');
-    if (segment) {
+    if (segment && segment !== pageId) {
+      const byPathSlug = graph.getEntityBySlug(segment);
+      if (byPathSlug) return byPathSlug;
+
       const byId = graph.getEntity(segment);
       if (byId) return byId;
     }

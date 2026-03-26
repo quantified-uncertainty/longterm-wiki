@@ -20,12 +20,13 @@ export interface PageInfo {
 }
 
 /**
- * Find a page by its ID (slug, relative path, or full relative path).
+ * Find a page by its ID (slug, wikiId like "E407", relative path, or full relative path).
  * Returns null if no matching page is found.
  */
 export function findPageById(pageId: string): PageInfo | null {
   const files = findMdxFiles(CONTENT_DIR_ABS);
 
+  // First pass: match by slug, relative path, or full path (fast, no file reads)
   for (const file of files) {
     const slug = path.basename(file, path.extname(file));
     const relPath = path.relative(CONTENT_DIR_ABS, file);
@@ -43,5 +44,25 @@ export function findPageById(pageId: string): PageInfo | null {
       };
     }
   }
+
+  // Second pass: match by wikiId in frontmatter (e.g., "E407")
+  if (/^E\d+$/.test(pageId)) {
+    for (const file of files) {
+      const content = fs.readFileSync(file, 'utf-8');
+      const wikiIdMatch = content.match(/^wikiId:\s*(\S+)/m);
+      if (wikiIdMatch?.[1] === pageId) {
+        const slug = path.basename(file, path.extname(file));
+        const frontmatter = parseFrontmatter(content);
+        return {
+          filePath: file,
+          content,
+          slug,
+          title: (frontmatter.title as string) || slug,
+          frontmatter,
+        };
+      }
+    }
+  }
+
   return null;
 }

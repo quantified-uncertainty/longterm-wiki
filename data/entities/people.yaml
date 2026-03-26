@@ -7620,3 +7620,180 @@
   stableId: KvrOk6eG5w
   type: person
   title: Toby Pohlen
+
+# ── Anthropic LTBT Trustees ─────────────────────────────────
+- id: neil-buddy-shah
+  stableId: n-9NN6o_sj
+  type: person
+  title: Neil Buddy Shah
+  description: >-
+    Chair of Anthropic's Long-Term Benefit Trust. CEO of the Clinton Health
+    Access Initiative (CHAI). Founding trustee since September 2023.
+  tags:
+    - ai-governance
+    - global-health
+
+- id: richard-fontaine
+  stableId: sy20C906g2
+  type: person
+  title: Richard Fontaine
+  description: >-
+    Trustee of Anthropic's Long-Term Benefit Trust. CEO of the Center for a
+    New American Security (CNAS). National security and foreign policy expert.
+    Appointed June 2025.
+  tags:
+    - national-security
+    - ai-governance
+
+- id: mariano-florentino-cuellar
+  stableId: 978SGjc9_-
+  type: person
+  title: Mariano-Florentino Cuéllar
+  description: >-
+    Trustee of Anthropic's Long-Term Benefit Trust. President of the Carnegie
+    Endowment for International Peace. Former Justice of the California Supreme
+    Court. Appointed January 2026.
+  tags:
+    - ai-governance
+    - law
+    - international-affairs
+
+- id: kanika-bahl
+  stableId: LHECP77Zxf
+  type: person
+  title: Kanika Bahl
+  description: >-
+    Former trustee of Anthropic's Long-Term Benefit Trust (2023-2026). CEO
+    of Evidence Action. Founding trustee who concluded her term in January 2026.
+  tags:
+    - ai-governance
+    - global-health
+
+- id: zachary-robinson
+  stableId: ZRDxviU6AJ
+  type: person
+  title: Zachary Robinson
+  description: >-
+    Former trustee of Anthropic's Long-Term Benefit Trust (2023-2026). CEO
+    of the Centre for Effective Altruism (CEA). Founding trustee who concluded
+    his term in January 2026.
+  tags:
+    - ai-governance
+    - effective-altruism
+
+# ── Anthropic LTBT-Appointed Board Members ──────────────────
+- id: jay-kreps
+  stableId: MBMM3yApjK
+  type: person
+  title: Jay Kreps
+  description: >-
+    Co-founder and CEO of Confluent. Appointed to Anthropic's board of directors
+    by the Long-Term Benefit Trust in May 2024, becoming the first
+    trust-appointed director.
+  tags:
+    - tech-leadership
+    - ai-governance
+
+- id: reed-hastings
+  stableId: TUwrPFHFXc
+  type: person
+  title: Reed Hastings
+  description: >-
+    Co-founder and executive chairman of Netflix. Appointed to Anthropic's
+    board of directors by the Long-Term Benefit Trust in May 2025.
+  tags:
+    - tech-leadership
+    - ai-governance
+
+- id: chris-liddell
+  stableId: 7wk_Ywg5C9
+  type: person
+  title: Chris Liddell
+  description: >-
+    Former White House Deputy Chief of Staff for Policy Coordination. Appointed
+    to Anthropic's board of directors in February 2026.
+  tags:
+    - ai-governance
+    - government
+
+# ── OpenAI Foundation Board and Leadership ──────────────────
+- id: bret-taylor
+  stableId: jPuOTgOJGS
+  type: person
+  title: Bret Taylor
+  description: >-
+    Chair of the OpenAI Foundation and OpenAI Group PBC board. Co-founder and
+    CEO of Sierra AI. Former co-CEO of Salesforce. Former CTO of Facebook.
+  tags:
+    - tech-leadership
+    - ai-governance
+
+- id: adam-d-angelo
+  stableId: sNy2jENSLL
+  type: person
+  title: Adam D'Angelo
+  description: >-
+    Co-founder and CEO of Quora. Member of the OpenAI Foundation board and
+    Safety and Security Committee. Former CTO of Facebook.
+  tags:
+    - tech-leadership
+    - ai-governance
+
+- id: sue-desmond-hellmann
+  stableId: oRTlnIq5qF
+  type: person
+  title: Sue Desmond-Hellmann
+  description: >-
+    Member of the OpenAI Foundation board. Former CEO of the Bill & Melinda
+    Gates Foundation. Physician and biotech executive.
+  tags:
+    - global-health
+    - ai-governance
+
+- id: zico-kolter
+  stableId: 7oi_TL68Fy
+  type: person
+  title: Zico Kolter
+  description: >-
+    Chair of the OpenAI Safety and Security Committee. Professor of Computer
+    Science at Carnegie Mellon University. Sits exclusively on the Foundation
+    board (not the PBC board) with full observation rights at all PBC board
+    meetings.
+  tags:
+    - ai-safety
+    - ai-governance
+    - ai-research
+
+- id: paul-nakasone
+  stableId: Ioa0kxj1_7
+  type: person
+  title: Paul Nakasone
+  description: >-
+    Member of the OpenAI Foundation board and Safety and Security Committee.
+    Retired U.S. Army General. Former Director of the National Security Agency
+    (NSA) and Commander of U.S. Cyber Command.
+  tags:
+    - national-security
+    - ai-governance
+
+- id: adebayo-ogunlesi
+  stableId: _ySs334QrO
+  type: person
+  title: Adebayo Ogunlesi
+  description: >-
+    Member of the OpenAI Foundation board. Chairman and Managing Partner of
+    Global Infrastructure Partners. Nigerian-American businessman and investor.
+  tags:
+    - finance
+    - ai-governance
+
+- id: nicole-seligman
+  stableId: 3U1A3jX8wC
+  type: person
+  title: Nicole Seligman
+  description: >-
+    Member of the OpenAI Foundation board and Safety and Security Committee.
+    Former Executive Vice President and General Counsel of Sony Corporation.
+  tags:
+    - law
+    - ai-governance
