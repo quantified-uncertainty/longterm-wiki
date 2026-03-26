@@ -38,11 +38,42 @@ import {
   SOURCE_CHECK_CONSTANTS,
   MODELS,
 } from '../lib/source-check/index.ts';
+import type { FetchSourceResult } from '../lib/source-check/types.ts';
 import { str, strOrNull, numOrNull, resolveName, extractEntityId } from '../lib/source-check/record-fields.ts';
+import { buildStableIdNameMap } from '../tablebase/source-check.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
 const { ESTIMATED_COST_PER_VERIFICATION } = SOURCE_CHECK_CONSTANTS;
+
+// ── URL Fetch Cache ──────────────────────────────────────────────────
+
+/**
+ * In-memory cache for URL fetch results within a single orchestrator run.
+ * Prevents re-fetching the same URL when multiple facts/records share a source.
+ * Caches both successful content and errors (so dead URLs aren't retried).
+ * NOT persisted across runs — URLs change over time.
+ */
+type UrlFetchCache = Map<string, FetchSourceResult>;
+
+/**
+ * Fetch source content with caching. Checks the in-memory cache first,
+ * falling back to `fetchSourceContent()` and storing the result.
+ */
+async function cachedFetchSourceContent(
+  url: string,
+  cache: UrlFetchCache,
+): Promise<FetchSourceResult> {
+  const cached = cache.get(url);
+  if (cached !== undefined) {
+    console.debug(`[source-check] Cache hit for ${url}`);
+    return cached;
+  }
+
+  const result = await fetchSourceContent(url);
+  cache.set(url, result);
+  return result;
+}
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -76,6 +107,8 @@ interface OrchestrateOptions extends BaseOptions {
   dryRun?: boolean;
   ci?: boolean;
   concurrency?: string;
+  'infer-sources'?: boolean;
+  inferSources?: boolean;
 }
 
 type VerifyItemKind = 'fact' | 'record' | 'entity';
@@ -94,6 +127,8 @@ interface VerifyItem {
   priority: number;
   /** Source URL if available */
   sourceUrl?: string;
+  /** Whether the source URL was inferred from related entity data (not original record) */
+  inferredSource?: boolean;
   /** Whether this item has never been verified */
   neverVerified: boolean;
   /** Last verification timestamp (ISO string) if available */
@@ -371,13 +406,79 @@ function collectFactItems(
 }
 
 /**
+ * Build a lookup map from entity stableId to entity for source inference.
+ * Used by collectRecordItems when --infer-sources is enabled.
+ */
+function buildEntityLookup(entities: Entity[]): Map<string, Entity> {
+  const map = new Map<string, Entity>();
+  for (const entity of entities) {
+    if (entity.id) {
+      map.set(entity.id, entity);
+    }
+  }
+  return map;
+}
+
+/**
+ * Try to infer a source URL for a sourceless record from related entity data.
+ *
+ * Strategy:
+ * 1. Look up the parent entity by entityId and use its website field.
+ * 2. If no website, check if other records for the same entity have verified source URLs.
+ *
+ * Returns the inferred URL or undefined if none found.
+ */
+function inferSourceUrl(
+  recordType: string,
+  item: Record<string, unknown>,
+  entityLookup: Map<string, Entity>,
+  verifiedSourcesByEntity: Map<string, string>,
+): string | undefined {
+  const entityId = extractEntityId(recordType, item);
+  if (!entityId) return undefined;
+
+  // Strategy 1: Entity website
+  const entity = entityLookup.get(entityId);
+  if (entity?.website) {
+    return entity.website;
+  }
+
+  // Strategy 2: Verified source from another record for the same entity
+  const verifiedSource = verifiedSourcesByEntity.get(entityId);
+  if (verifiedSource) {
+    return verifiedSource;
+  }
+
+  return undefined;
+}
+
+/**
  * Collect structured records as verification items.
+ *
+ * When inferSources is true, records without a source URL will attempt to
+ * infer one from the parent entity's website or from verified sources of
+ * sibling records. These items are marked with `inferredSource: true`.
  */
 async function collectRecordItems(
   existingVerdicts: Map<string, VerifiedRecordInfo>,
+  nameMap: Map<string, string>,
   entityTypeFilter?: string,
+  inferSources?: boolean,
+  entities?: Entity[],
 ): Promise<VerifyItem[]> {
   const items: VerifyItem[] = [];
+
+  // Build entity lookup for source inference
+  const entityLookup = (inferSources && entities)
+    ? buildEntityLookup(entities)
+    : new Map<string, Entity>();
+
+  // Track verified source URLs by entity for cross-record inference.
+  // Populated during iteration — records processed later can benefit
+  // from sources discovered in records processed earlier.
+  const verifiedSourcesByEntity = new Map<string, string>();
+
+  let inferredCount = 0;
 
   // Determine which record types to scan
   const typesToScan = entityTypeFilter
@@ -422,17 +523,44 @@ async function collectRecordItems(
 
       for (const item of rawItems) {
         // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result)
-        const source = item.source ?? item.sourceUrl;
-        if (typeof source !== 'string' || !source) continue;
+        const originalSource = item.source ?? item.sourceUrl;
+        const hasOriginalSource = typeof originalSource === 'string' && originalSource.length > 0;
+
+        let source: string | undefined;
+        let isInferred = false;
+
+        if (hasOriginalSource) {
+          source = originalSource as string;
+
+          // Track this source for cross-record inference
+          if (inferSources) {
+            const eid = extractEntityId(recordType, item);
+            if (eid && !verifiedSourcesByEntity.has(eid)) {
+              verifiedSourcesByEntity.set(eid, source);
+            }
+          }
+        } else if (inferSources) {
+          // Try to infer a source URL from related entity data
+          source = inferSourceUrl(recordType, item, entityLookup, verifiedSourcesByEntity);
+          if (source) {
+            isInferred = true;
+            inferredCount++;
+          }
+        }
+
+        if (!source) continue;
 
         const id = String(item.id ?? '');
         const key = `${recordType}:${id}`;
         const existing = existingVerdicts.get(key);
 
-        const description = buildRecordDescription(recordType, item);
-        const fields = extractRecordFields(recordType, item);
+        const description = buildRecordDescription(recordType, item, nameMap);
+        const fields = extractRecordFields(recordType, item, nameMap);
 
-        const priority = computeRecordPriority(recordType, existing);
+        // Inferred-source items get slightly lower priority since verification
+        // against a generic entity homepage is less reliable
+        const basePriority = computeRecordPriority(recordType, existing);
+        const priority = isInferred ? Math.max(0, basePriority - 20) : basePriority;
 
         const entityId = extractEntityId(recordType, item);
 
@@ -444,6 +572,7 @@ async function collectRecordItems(
           entityName: description,
           priority,
           sourceUrl: source,
+          inferredSource: isInferred || undefined,
           neverVerified: !existing,
           lastVerifiedAt: existing?.checkedAt,
           data: {
@@ -458,6 +587,10 @@ async function collectRecordItems(
     } catch (e: unknown) {
       console.warn(`[source-check] Error collecting ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
     }
+  }
+
+  if (inferSources && inferredCount > 0) {
+    console.log(`    (${inferredCount} records with inferred sources from entity websites/siblings)`);
   }
 
   return items;
@@ -595,16 +728,44 @@ function computeRecordPriority(
 
 // str, strOrNull, numOrNull, resolveName imported from ../lib/source-check/record-fields.ts
 
-function buildRecordDescription(recordType: RecordType, item: Record<string, unknown>): string {
+/**
+ * Resolve a human-readable name from API fields, falling back to the stableId name map.
+ *
+ * The API response sometimes only contains opaque stableIds (e.g. `K5ykAghIr6`) in fields
+ * like `personId` without corresponding `personResolvedName`/`personDisplayName`. When
+ * `resolveName()` falls through to the stableId field, the LLM sees the opaque ID and
+ * reports false contradictions ("source says Elizabeth Doherty, not K5ykAghIr6").
+ *
+ * This wrapper first tries `resolveName()` and, if the result looks like an opaque stableId
+ * (10-char alphanumeric without spaces), looks it up in the name map built from database.json.
+ */
+function resolveNameWithMap(
+  item: Record<string, unknown>,
+  nameMap: Map<string, string>,
+  ...keys: string[]
+): string {
+  const resolved = resolveName(item, ...keys);
+  // If resolveName returned a human-readable name (contains a space or is long enough
+  // to be a real name/slug), use it directly
+  if (resolved === '(unknown)') return resolved;
+  // Opaque stableIds are exactly 10 alphanumeric characters with no spaces/hyphens
+  if (/^[A-Za-z0-9]{10}$/.test(resolved)) {
+    const mapped = nameMap.get(resolved);
+    if (mapped) return mapped;
+  }
+  return resolved;
+}
+
+function buildRecordDescription(recordType: RecordType, item: Record<string, unknown>, nameMap: Map<string, string>): string {
   switch (recordType) {
     case 'grant': {
-      const funder = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
-      const grantee = resolveName(item, 'granteeResolvedName', 'granteeDisplayName', 'granteeId');
+      const funder = resolveNameWithMap(item, nameMap, 'orgResolvedName', 'orgDisplayName', 'organizationId');
+      const grantee = resolveNameWithMap(item, nameMap, 'granteeResolvedName', 'granteeDisplayName', 'granteeId');
       return `Grant: ${str(item, 'name')} (${funder} -> ${grantee})`;
     }
     case 'personnel': {
-      const person = resolveName(item, 'personResolvedName', 'personDisplayName', 'personId');
-      const org = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
+      const person = resolveNameWithMap(item, nameMap, 'personResolvedName', 'personDisplayName', 'personId');
+      const org = resolveNameWithMap(item, nameMap, 'orgResolvedName', 'orgDisplayName', 'organizationId');
       return `Personnel: ${person} at ${org} (${str(item, 'role')})`;
     }
     case 'division':
@@ -612,21 +773,21 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
     case 'funding-program':
       return `Funding Program: ${str(item, 'name')}`;
     case 'funding-round': {
-      const company = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+      const company = resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return `Funding Round: ${str(item, 'name')} (${company})`;
     }
     case 'investment': {
-      const investor = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');
-      const company = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+      const investor = resolveNameWithMap(item, nameMap, 'investorResolvedName', 'investorDisplayName', 'investorId');
+      const company = resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return `Investment: ${investor} -> ${company}`;
     }
     case 'equity-position': {
-      const holder = resolveName(item, 'holderResolvedName', 'holderDisplayName', 'holderId');
-      const company = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+      const holder = resolveNameWithMap(item, nameMap, 'holderResolvedName', 'holderDisplayName', 'holderId');
+      const company = resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId');
       return `Equity: ${holder} in ${company}`;
     }
     case 'policy-stakeholder': {
-      const name = resolveName(item, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId');
+      const name = resolveNameWithMap(item, nameMap, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId');
       return `Stakeholder: ${name} (${strOrNull(item, 'stance') ?? 'unknown'})`;
     }
     case 'publication': {
@@ -636,10 +797,10 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
       return `Publication: ${title} by ${authors} (${year})`;
     }
     case 'benchmark-result': {
-      const benchmarkId = str(item, 'benchmarkId');
-      const modelId = str(item, 'modelId');
+      const benchmark = resolveNameWithMap(item, nameMap, 'benchmarkResolvedName', 'benchmarkDisplayName', 'benchmarkId');
+      const model = resolveNameWithMap(item, nameMap, 'modelResolvedName', 'modelDisplayName', 'modelId');
       const score = numOrNull(item, 'score');
-      return `Benchmark Result: ${modelId} on ${benchmarkId} = ${score ?? 'N/A'}`;
+      return `Benchmark Result: ${model} on ${benchmark} = ${score ?? 'N/A'}`;
     }
     case 'entity-event': {
       const title = str(item, 'title');
@@ -650,11 +811,11 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
     case 'entity-assessment': {
       const dimension = str(item, 'dimension');
       const rating = str(item, 'rating');
-      const entityId = strOrNull(item, 'entityId') ?? 'unknown';
-      return `Assessment: ${entityId} / ${dimension} = ${rating}`;
+      const entityName = resolveNameWithMap(item, nameMap, 'entityResolvedName', 'entityDisplayName', 'entityId');
+      return `Assessment: ${entityName} / ${dimension} = ${rating}`;
     }
     case 'secondary-market-price': {
-      const company = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+      const company = resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId');
       const platform = str(item, 'platform');
       const date = strOrNull(item, 'date') ?? 'unknown date';
       const valuation = numOrNull(item, 'impliedValuation');
@@ -664,20 +825,20 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
   }
 }
 
-function extractRecordFields(recordType: RecordType, item: Record<string, unknown>): Record<string, string | number | null> {
+function extractRecordFields(recordType: RecordType, item: Record<string, unknown>, nameMap: Map<string, string>): Record<string, string | number | null> {
   switch (recordType) {
     case 'grant':
       return {
         name: str(item, 'name'),
         amount: numOrNull(item, 'amount'),
         date: strOrNull(item, 'date'),
-        grantee: resolveName(item, 'granteeResolvedName', 'granteeDisplayName', 'granteeId'),
-        funder: resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId'),
+        grantee: resolveNameWithMap(item, nameMap, 'granteeResolvedName', 'granteeDisplayName', 'granteeId'),
+        funder: resolveNameWithMap(item, nameMap, 'orgResolvedName', 'orgDisplayName', 'organizationId'),
       };
     case 'personnel':
       return {
-        person: resolveName(item, 'personResolvedName', 'personDisplayName', 'personId'),
-        org: resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId'),
+        person: resolveNameWithMap(item, nameMap, 'personResolvedName', 'personDisplayName', 'personId'),
+        org: resolveNameWithMap(item, nameMap, 'orgResolvedName', 'orgDisplayName', 'organizationId'),
         role: str(item, 'role'),
         startDate: strOrNull(item, 'startDate'),
         endDate: strOrNull(item, 'endDate'),
@@ -689,11 +850,26 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
     case 'funding-round':
       return { name: str(item, 'name'), raised: numOrNull(item, 'raised'), valuation: numOrNull(item, 'valuation'), date: strOrNull(item, 'date') };
     case 'investment':
-      return { amount: numOrNull(item, 'amount'), round: strOrNull(item, 'roundName'), role: strOrNull(item, 'role') };
+      return {
+        investor: resolveNameWithMap(item, nameMap, 'investorResolvedName', 'investorDisplayName', 'investorId'),
+        company: resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId'),
+        amount: numOrNull(item, 'amount'),
+        round: strOrNull(item, 'roundName'),
+        role: strOrNull(item, 'role'),
+      };
     case 'equity-position':
-      return { stake: strOrNull(item, 'stake'), asOf: strOrNull(item, 'asOf') };
+      return {
+        holder: resolveNameWithMap(item, nameMap, 'holderResolvedName', 'holderDisplayName', 'holderId'),
+        company: resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId'),
+        stake: strOrNull(item, 'stake'),
+        asOf: strOrNull(item, 'asOf'),
+      };
     case 'policy-stakeholder':
-      return { stance: strOrNull(item, 'stance'), role: strOrNull(item, 'role') };
+      return {
+        stakeholder: resolveNameWithMap(item, nameMap, 'stakeholderResolvedName', 'stakeholderDisplayName', 'stakeholderId'),
+        stance: strOrNull(item, 'stance'),
+        role: strOrNull(item, 'role'),
+      };
     case 'publication':
       return {
         title: str(item, 'title'),
@@ -705,8 +881,8 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
       };
     case 'benchmark-result':
       return {
-        benchmarkId: str(item, 'benchmarkId'),
-        modelId: str(item, 'modelId'),
+        benchmark: resolveNameWithMap(item, nameMap, 'benchmarkResolvedName', 'benchmarkDisplayName', 'benchmarkId'),
+        model: resolveNameWithMap(item, nameMap, 'modelResolvedName', 'modelDisplayName', 'modelId'),
         score: numOrNull(item, 'score'),
         unit: strOrNull(item, 'unit'),
         date: strOrNull(item, 'date'),
@@ -716,12 +892,12 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
         title: str(item, 'title'),
         eventType: str(item, 'eventType'),
         date: strOrNull(item, 'date'),
-        entityId: strOrNull(item, 'entityId'),
+        entity: resolveNameWithMap(item, nameMap, 'entityResolvedName', 'entityDisplayName', 'entityId'),
         significance: strOrNull(item, 'significance'),
       };
     case 'entity-assessment':
       return {
-        entityId: strOrNull(item, 'entityId'),
+        entity: resolveNameWithMap(item, nameMap, 'entityResolvedName', 'entityDisplayName', 'entityId'),
         dimension: str(item, 'dimension'),
         rating: str(item, 'rating'),
         assessor: strOrNull(item, 'assessor'),
@@ -729,7 +905,7 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
       };
     case 'secondary-market-price':
       return {
-        company: resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId'),
+        company: resolveNameWithMap(item, nameMap, 'companyResolvedName', 'companyDisplayName', 'companyId'),
         platform: str(item, 'platform'),
         date: strOrNull(item, 'date'),
         impliedValuation: numOrNull(item, 'impliedValuation'),
@@ -871,6 +1047,7 @@ async function verifySingleItem(
   item: VerifyItem,
   client: ReturnType<typeof createLlmClient>,
   useWebSearch: boolean,
+  urlCache: UrlFetchCache,
 ): Promise<VerifyResult | VerifyError> {
   let sourceUrl = item.sourceUrl;
   let sourceContent: string | null = null;
@@ -898,7 +1075,7 @@ async function verifySingleItem(
 
     // Try each URL until we get content
     for (const url of urls) {
-      const result = await fetchSourceContent(url);
+      const result = await cachedFetchSourceContent(url, urlCache);
       if (result.content) {
         sourceUrl = url;
         sourceContent = result.content;
@@ -915,7 +1092,7 @@ async function verifySingleItem(
       };
     }
   } else if (sourceUrl) {
-    const fetchResult = await fetchSourceContent(sourceUrl);
+    const fetchResult = await cachedFetchSourceContent(sourceUrl, urlCache);
     if (!fetchResult.content) {
       return {
         itemId: item.id,
@@ -1051,6 +1228,7 @@ export async function orchestrateCommand(
   const entityTypeFilter = (options['entity-type'] || options.entityType) as string | undefined;
   const sourceMode = (options.source as string) ?? 'existing';
   const useWebSearch = sourceMode === 'web-search' || sourceMode === 'all';
+  const inferSources = options['infer-sources'] || options.inferSources || false;
 
   // Validate type filter
   const validTypes = ['fact', 'record', 'entity', 'all'];
@@ -1076,6 +1254,14 @@ export async function orchestrateCommand(
 
   console.log('\x1b[1mVerification Orchestrator\x1b[0m');
   console.log('');
+
+  // Build stableId -> human-readable name map from database.json.
+  // This resolves opaque IDs (e.g. "K5ykAghIr6") to names (e.g. "Elizabeth Doherty")
+  // so the LLM sees real names instead of internal IDs, preventing false contradictions.
+  const nameMap = buildStableIdNameMap();
+  if (nameMap.size > 0) {
+    console.log(`  Name map: ${nameMap.size} stableId -> name entries loaded`);
+  }
 
   // ── Step 1: Load data and fetch existing verification status ──
   console.log('Loading data...');
@@ -1106,9 +1292,11 @@ export async function orchestrateCommand(
   }
 
   if (shouldCollectRecords) {
-    const recordItems = await collectRecordItems(existingRecordVerdicts, entityTypeFilter);
+    const recordItems = await collectRecordItems(existingRecordVerdicts, nameMap, entityTypeFilter, inferSources, entities);
     allItems.push(...recordItems);
-    console.log(`  Records: ${recordItems.length} items`);
+    const inferredRecords = recordItems.filter(i => i.inferredSource).length;
+    const inferredLabel = inferredRecords > 0 ? ` (${inferredRecords} with inferred sources)` : '';
+    console.log(`  Records: ${recordItems.length} items${inferredLabel}`);
   }
 
   if (shouldCollectEntities) {
@@ -1148,6 +1336,7 @@ export async function orchestrateCommand(
   // ── Live execution ──
   const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
   const client = createLlmClient();
+  const urlCache: UrlFetchCache = new Map();
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,
@@ -1180,7 +1369,7 @@ export async function orchestrateCommand(
   async function processItem(item: VerifyItem, index: number): Promise<void> {
     const kindLabel = item.kind.toUpperCase().padEnd(7);
 
-    const result = await verifySingleItem(item, client, useWebSearch);
+    const result = await verifySingleItem(item, client, useWebSearch, urlCache);
 
     // Synchronize output and summary updates
     completedCount++;
@@ -1234,6 +1423,12 @@ export async function orchestrateCommand(
     await Promise.all(executing);
   }
 
+  // Log cache stats
+  if (urlCache.size > 0) {
+    const successCount = [...urlCache.values()].filter(r => r.content !== null).length;
+    console.log(`\n  URL cache: ${urlCache.size} unique URLs fetched (${successCount} with content, ${urlCache.size - successCount} errors/empty)`);
+  }
+
   // ── Build summary output ──
   if (options.ci) {
     return {
@@ -1270,6 +1465,7 @@ function formatDryRunOutput(
           priority: i.priority,
           neverVerified: i.neverVerified,
           sourceUrl: i.sourceUrl,
+          ...(i.inferredSource ? { inferredSource: true } : {}),
         })),
       }),
     };
@@ -1320,8 +1516,9 @@ function formatDryRunOutput(
   for (const item of topItems) {
     const status = item.neverVerified ? '\x1b[33mnew\x1b[0m' : 'verified';
     const desc = item.description.length > 58 ? item.description.slice(0, 57) + '...' : item.description;
+    const inferredTag = item.inferredSource ? ' [inferred]' : '';
     const src = item.sourceUrl
-      ? (item.sourceUrl.length > 30 ? item.sourceUrl.slice(0, 29) + '...' : item.sourceUrl)
+      ? (item.sourceUrl.length > 30 ? item.sourceUrl.slice(0, 29) + '...' : item.sourceUrl) + inferredTag
       : '(none)';
     lines.push(
       `${item.kind.padEnd(8)} ${String(item.priority.toFixed(0)).padEnd(10)} ${status.padEnd(12)} ${desc.padEnd(60)} ${src}`,
