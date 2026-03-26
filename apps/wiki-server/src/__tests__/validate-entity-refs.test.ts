@@ -153,14 +153,14 @@ describe("Entity FK validation", () => {
 
   describe("POST /api/personnel/sync", () => {
     it("rejects when personId does not exist in entities", async () => {
-      seedEntity("org-acme", "stb_acme001");
+      seedEntity("org-acme", "acmeORG001");
 
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
             id: "P_12345678",
-            personId: "person-john",
-            organizationId: "org-acme",
+            personId: "johnPER001",
+            organizationId: "acmeORG001",
             role: "CEO",
             roleType: "key-person",
           },
@@ -171,18 +171,18 @@ describe("Entity FK validation", () => {
       const body = await res.json();
       expect(body.error).toBe("validation_error");
       expect(body.message).toContain("personId");
-      expect(body.message).toContain("person-john");
+      expect(body.message).toContain("johnPER001");
     });
 
     it("rejects when organizationId does not exist in entities", async () => {
-      seedEntity("person-john", "stb_john001");
+      seedEntity("person-john", "johnPER001");
 
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
             id: "P_12345678",
-            personId: "person-john",
-            organizationId: "org-acme",
+            personId: "johnPER001",
+            organizationId: "acmeORG001",
             role: "CEO",
             roleType: "key-person",
           },
@@ -193,19 +193,19 @@ describe("Entity FK validation", () => {
       const body = await res.json();
       expect(body.error).toBe("validation_error");
       expect(body.message).toContain("organizationId");
-      expect(body.message).toContain("org-acme");
+      expect(body.message).toContain("acmeORG001");
     });
 
-    it("accepts when both personId and organizationId exist (by slug)", async () => {
-      seedEntity("person-john", "stb_john001");
-      seedEntity("org-acme", "stb_acme001");
+    it("accepts when both personId and organizationId exist (by stableId)", async () => {
+      seedEntity("person-john", "johnPER001");
+      seedEntity("org-acme", "acmeORG001");
 
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
             id: "P_12345678",
-            personId: "person-john",
-            organizationId: "org-acme",
+            personId: "johnPER001",
+            organizationId: "acmeORG001",
             role: "CEO",
             roleType: "key-person",
           },
@@ -218,15 +218,15 @@ describe("Entity FK validation", () => {
     });
 
     it("accepts when IDs match by stableId", async () => {
-      seedEntity("person-john", "stb_john001");
-      seedEntity("org-acme", "stb_acme001");
+      seedEntity("person-john", "johnPER001");
+      seedEntity("org-acme", "acmeORG001");
 
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
             id: "P_12345678",
-            personId: "stb_john001",
-            organizationId: "stb_acme001",
+            personId: "johnPER001",
+            organizationId: "acmeORG001",
             role: "CEO",
             roleType: "key-person",
           },
@@ -244,8 +244,8 @@ describe("Entity FK validation", () => {
           items: [
             {
               id: "P_12345678",
-              personId: "nonexistent-person",
-              organizationId: "nonexistent-org",
+              personId: "nxPerson01",
+              organizationId: "nxOrgani01",
               role: "CEO",
               roleType: "key-person",
             },
@@ -261,8 +261,8 @@ describe("Entity FK validation", () => {
         items: [
           {
             id: "P_12345678",
-            personId: "missing-person",
-            organizationId: "missing-org",
+            personId: "missPER001",
+            organizationId: "missORG001",
             role: "CEO",
             roleType: "key-person",
           },
@@ -272,9 +272,9 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(400);
       const body = await res.json();
       expect(body.message).toContain("personId");
-      expect(body.message).toContain("missing-person");
+      expect(body.message).toContain("missPER001");
       expect(body.message).toContain("organizationId");
-      expect(body.message).toContain("missing-org");
+      expect(body.message).toContain("missORG001");
     });
   });
 
