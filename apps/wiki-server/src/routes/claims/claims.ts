@@ -24,9 +24,8 @@ interface ProposedClaimRow {
   batch_id: string;
   claim_text: string;
   status: string;
-  verdict: string | null;
-  confidence: number | null;
-  reasoning: string | null;
+  verdict_confidence: number | null;
+  verdict_reasoning: string | null;
   extracted_value: string | null;
 }
 
@@ -47,9 +46,8 @@ function formatClaim(row: ProposedClaimRow) {
     id: row.id,
     claimText: row.claim_text,
     status: row.status,
-    ...(row.verdict != null && { verdict: row.verdict }),
-    ...(row.confidence != null && { confidence: row.confidence }),
-    ...(row.reasoning != null && { reasoning: row.reasoning }),
+    ...(row.verdict_confidence != null && { confidence: row.verdict_confidence }),
+    ...(row.verdict_reasoning != null && { reasoning: row.verdict_reasoning }),
     ...(row.extracted_value != null && { extractedValue: row.extracted_value }),
   };
 }
@@ -68,7 +66,7 @@ const claimsApp = new Hono()
 
     // Fetch all claims for the batch
     const claims = await sql<ProposedClaimRow[]>`
-      SELECT id, batch_id, claim_text, status, verdict, confidence, reasoning, extracted_value
+      SELECT id, batch_id, claim_text, status, verdict_confidence, verdict_reasoning, extracted_value
       FROM proposed_claims
       WHERE batch_id = ${batchId}
       ORDER BY id ASC
@@ -92,6 +90,7 @@ const claimsApp = new Hono()
       verified: 0,
       contradicted: 0,
       unverifiable: 0,
+      expired: 0,
     };
 
     for (const row of statusCounts) {

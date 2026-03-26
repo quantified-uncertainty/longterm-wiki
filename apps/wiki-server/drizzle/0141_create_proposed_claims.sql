@@ -47,12 +47,12 @@ CREATE TABLE IF NOT EXISTS claim_record_links (
 );
 
 -- Indexes for proposed_claims
-CREATE INDEX idx_pc_batch ON proposed_claims(batch_id);
-CREATE INDEX idx_pc_status ON proposed_claims(status);
-CREATE INDEX idx_pc_entity ON proposed_claims(entity_id);
-CREATE INDEX idx_pc_resource ON proposed_claims(resource_id);
-CREATE INDEX idx_pc_target ON proposed_claims(target_table, entity_id);
+CREATE INDEX IF NOT EXISTS idx_pc_batch ON proposed_claims(batch_id);
+CREATE INDEX IF NOT EXISTS idx_pc_status ON proposed_claims(status);
+CREATE INDEX IF NOT EXISTS idx_pc_entity ON proposed_claims(entity_id);
+CREATE INDEX IF NOT EXISTS idx_pc_resource ON proposed_claims(resource_id);
+CREATE INDEX IF NOT EXISTS idx_pc_target ON proposed_claims(target_table, entity_id);
 
 -- Indexes for claim_record_links
-CREATE INDEX idx_crl_claim ON claim_record_links(claim_id);
-CREATE INDEX idx_crl_record ON claim_record_links(record_type, record_id);
+CREATE INDEX IF NOT EXISTS idx_crl_claim ON claim_record_links(claim_id);
+CREATE INDEX IF NOT EXISTS idx_crl_record ON claim_record_links(record_type, record_id);
