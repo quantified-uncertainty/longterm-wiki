@@ -9,7 +9,7 @@ export function Breadcrumbs({
   items: Array<{ label: string; href?: string }>;
 }) {
   return (
-    <nav className="text-sm text-muted-foreground mb-4">
+    <nav aria-label="Breadcrumb" className="text-sm text-muted-foreground mb-4">
       {items.map((item, i) => (
         <span key={item.label}>
           {i > 0 && <span className="mx-1.5">/</span>}

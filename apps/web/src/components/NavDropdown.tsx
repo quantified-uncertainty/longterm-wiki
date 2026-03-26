@@ -69,6 +69,7 @@ export function NavDropdown({ label, items }: NavDropdownType) {
       >
         {label}
         <svg
+          aria-hidden="true"
           width="12"
           height="12"
           viewBox="0 0 24 24"

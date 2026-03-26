@@ -124,10 +124,14 @@ export function TimeSeriesChart({
     padding.top + chartH - ((v - minVal) / valRange) * chartH;
 
   // Y-axis ticks (4-5 ticks)
+  // For integer formats (e.g. headcount), round ticks to whole numbers to
+  // avoid fractional values like "12.075" on the axis.
   const yTicks: number[] = [];
-  const tickStep = valRange / 4;
+  const rawTickStep = valRange / 4;
+  const tickStep = format === "number" ? Math.ceil(rawTickStep) : rawTickStep;
   for (let i = 0; i <= 4; i++) {
-    yTicks.push(minVal + tickStep * i);
+    const raw = minVal + tickStep * i;
+    yTicks.push(format === "number" ? Math.round(raw) : raw);
   }
 
   // X-axis labels: use unique years

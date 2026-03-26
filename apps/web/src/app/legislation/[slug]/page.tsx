@@ -810,7 +810,7 @@ export default async function LegislationDetailPage({
       </div>
 
       {/* Tabs — full width; sidebar is inside Overview tab only */}
-      <ProfileTabs tabs={tabs} />
+      <ProfileTabs tabs={tabs} ariaLabel="Legislation sections" />
     </div>
   );
 }

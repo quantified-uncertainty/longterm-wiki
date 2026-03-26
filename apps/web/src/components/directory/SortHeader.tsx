@@ -28,6 +28,7 @@ export function SortHeader<K extends string>({
 
   return (
     <th
+      scope="col"
       className={`py-2.5 px-3 font-medium ${className ?? ""}`}
       aria-sort={ariaSort}
     >
