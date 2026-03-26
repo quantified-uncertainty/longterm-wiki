@@ -227,6 +227,7 @@ export default function Home() {
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-background dark:from-slate-950 dark:to-background" />
         <div className="relative max-w-7xl mx-auto px-6 pt-10 sm:pt-12 pb-10">
+          <h1 className="sr-only">Longterm Wiki</h1>
           <p className="text-base text-muted-foreground max-w-2xl mb-6 leading-relaxed">
             Structured data on organizations, people, models, legislation, grants,
             and publications — plus {totalPages} wiki articles on AI safety.
@@ -359,13 +360,13 @@ export default function Home() {
         </section>
 
         {/* Footer */}
-        <section className="pb-16">
+        <footer className="pb-16">
           <div className="border-t border-border pt-8 text-center">
             <p className="text-sm text-muted-foreground">
               {totalPages} pages &middot; Continuously updated
             </p>
           </div>
-        </section>
+        </footer>
       </div>
     </div>
   );
