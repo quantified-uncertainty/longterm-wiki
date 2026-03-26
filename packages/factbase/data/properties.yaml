@@ -302,6 +302,19 @@ properties:
       prefix: "$"
       suffix: "B"
 
+  cumulative-losses:
+    name: Cumulative Losses
+    description: "Total accumulated net losses since inception"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
   enterprise-market-share:
     name: Enterprise Market Share
     description: "Enterprise LLM market share by usage"

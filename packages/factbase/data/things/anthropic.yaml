@@ -475,11 +475,6 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: CTxrfaCzbw
-    property: headcount
-    value: 500
-    source: https://www.wikidata.org/wiki/Q116758847
-    notes: From Wikidata Q116758847
   - id: 6dXtTgqnAQ
     property: founded-by-name
     value: Chris Olah
