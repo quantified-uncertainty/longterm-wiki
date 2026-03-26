@@ -196,6 +196,16 @@ const SCRIPTS = {
     description: 'Validate resource authorEntityIds and publicationId references (advisory)',
     passthrough: ['ci', 'verbose'],
   },
+  'display-names': {
+    script: 'validate/validate-display-names.ts',
+    description: 'Detect raw machine IDs in entity display fields (titles)',
+    passthrough: ['ci'],
+  },
+  'display-formatting': {
+    script: 'validate/validate-display-formatting.ts',
+    description: 'Detect serialization bugs and unescaped MDX in entity data',
+    passthrough: ['ci'],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
