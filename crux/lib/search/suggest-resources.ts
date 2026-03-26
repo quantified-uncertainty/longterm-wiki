@@ -30,7 +30,7 @@ export interface SuggestedResource {
   url: string;
   resourceId: string;
   status: 'ok' | 'error' | 'paywall' | 'dead';
-  contentLength: number;
+  contentLength: number | null;
   title: string | null;
 }
 
@@ -105,7 +105,7 @@ export async function suggestResources(
         url: r.url,
         resourceId: r.resourceId,
         status: 'ok' as const,
-        contentLength: 0, // fresh content exists but we didn't re-fetch, so length unknown
+        contentLength: null, // fresh content exists but we didn't re-fetch, so length unknown
         title: r.title,
       };
     }
