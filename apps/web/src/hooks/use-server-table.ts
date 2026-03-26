@@ -137,7 +137,7 @@ export function useServerTable<T>(
       })
       .finally(() => {
         clearTimeout(timeout);
-        setIsLoading(false);
+        if (!controller.signal.aborted || timedOut) setIsLoading(false);
       });
 
     return () => { clearTimeout(timeout); controller.abort(); };
