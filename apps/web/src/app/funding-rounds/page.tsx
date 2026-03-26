@@ -10,7 +10,7 @@ import {
   formatKBDate,
   titleCase,
 } from "@/components/wiki/factbase/format";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
+import { isBareMachineId } from "@/lib/stable-id";
 
 export const metadata: Metadata = {
   title: "Funding Rounds",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
  */
 function filterRawId(name: string | null): string | null {
   if (!name) return null;
-  if (STABLE_ID_PATTERN.test(name) || NUMERIC_ID_PATTERN.test(name)) return null;
+  if (isBareMachineId(name)) return null;
   return name;
 }
 
