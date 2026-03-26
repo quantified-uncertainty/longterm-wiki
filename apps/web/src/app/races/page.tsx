@@ -34,42 +34,46 @@ interface StatsApiResult {
 }
 
 export default async function RacesPage() {
-  // Fetch races (all, with ISR revalidation)
-  const racesData = await fetchFromWikiServer<{
-    races: RaceApiRow[];
-    total: number;
-  }>("/api/political-races/all?limit=200", { revalidate: 300 });
+  // Fetch races, stats, and all candidates in 3 parallel bulk calls (not per-race)
+  const [racesData, stats, candidatesData] = await Promise.all([
+    fetchFromWikiServer<{
+      races: RaceApiRow[];
+      total: number;
+    }>("/api/political-races/all?limit=200", { revalidate: 300 }),
+    fetchFromWikiServer<StatsApiResult>(
+      "/api/political-races/stats",
+      { revalidate: 300 },
+    ),
+    fetchFromWikiServer<{
+      candidates: (CandidateRow & { raceId: string })[];
+      total: number;
+    }>("/api/political-races/candidates/all?limit=1000", { revalidate: 300 }),
+  ]);
 
-  const stats = await fetchFromWikiServer<StatsApiResult>(
-    "/api/political-races/stats",
-    { revalidate: 300 },
-  );
+  // Group candidates by raceId for O(1) lookup
+  const candidatesByRace = new Map<string, CandidateRow[]>();
+  for (const c of candidatesData?.candidates ?? []) {
+    const list = candidatesByRace.get(c.raceId) ?? [];
+    list.push(c);
+    candidatesByRace.set(c.raceId, list);
+  }
 
-  // Fetch each race's candidates
   const races = racesData?.races ?? [];
-  const raceRows: RaceRow[] = await Promise.all(
-    races.map(async (race) => {
-      const detail = await fetchFromWikiServer<{
-        candidates: CandidateRow[];
-      }>(`/api/political-races/${race.id}`, { revalidate: 300 });
-
-      return {
-        id: race.id,
-        name: race.name,
-        raceType: race.raceType,
-        party: race.party,
-        level: race.level,
-        state: race.state,
-        district: race.district,
-        electionDate: race.electionDate,
-        status: race.status,
-        outcome: race.outcome,
-        outcomeDetails: race.outcomeDetails,
-        aiAngle: race.aiAngle,
-        candidates: detail?.candidates ?? [],
-      };
-    }),
-  );
+  const raceRows: RaceRow[] = races.map((race) => ({
+    id: race.id,
+    name: race.name,
+    raceType: race.raceType,
+    party: race.party,
+    level: race.level,
+    state: race.state,
+    district: race.district,
+    electionDate: race.electionDate,
+    status: race.status,
+    outcome: race.outcome,
+    outcomeDetails: race.outcomeDetails,
+    aiAngle: race.aiAngle,
+    candidates: candidatesByRace.get(race.id) ?? [],
+  }));
 
   const raceStats = stats?.races ?? { total: 0, upcoming: 0, active: 0, resolved: 0 };
   const candidateStats = stats?.candidates ?? { total: 0 };
