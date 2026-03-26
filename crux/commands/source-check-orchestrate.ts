@@ -51,29 +51,30 @@ const { ESTIMATED_COST_PER_VERIFICATION } = SOURCE_CHECK_CONSTANTS;
 
 /**
  * In-memory cache for URL fetch results within a single orchestrator run.
- * Prevents re-fetching the same URL when multiple facts/records share a source.
- * Caches both successful content and errors (so dead URLs aren't retried).
+ * Stores Promises (not resolved values) so concurrent fetches for the same URL
+ * share a single in-flight request instead of duplicating.
  * NOT persisted across runs — URLs change over time.
  */
-type UrlFetchCache = Map<string, FetchSourceResult>;
+type UrlFetchCache = Map<string, Promise<FetchSourceResult>>;
 
 /**
- * Fetch source content with caching. Checks the in-memory cache first,
- * falling back to `fetchSourceContent()` and storing the result.
+ * Fetch source content with caching. If the URL is already being fetched
+ * (in-flight), returns the same Promise. Otherwise initiates a new fetch
+ * and caches both successful content and errors.
  */
 async function cachedFetchSourceContent(
   url: string,
   cache: UrlFetchCache,
 ): Promise<FetchSourceResult> {
-  const cached = cache.get(url);
-  if (cached !== undefined) {
+  const existing = cache.get(url);
+  if (existing !== undefined) {
     console.debug(`[source-check] Cache hit for ${url}`);
-    return cached;
+    return existing;
   }
 
-  const result = await fetchSourceContent(url);
-  cache.set(url, result);
-  return result;
+  const pending = fetchSourceContent(url);
+  cache.set(url, pending);
+  return pending;
 }
 
 /** Entity types ordered by change frequency (most volatile first) */
@@ -1335,7 +1336,8 @@ export async function orchestrateCommand(
   }
 
   // ── Live execution ──
-  const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
+  const parsedConcurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
+  const concurrency = Number.isNaN(parsedConcurrency) || parsedConcurrency < 1 ? 5 : parsedConcurrency;
   const client = createLlmClient();
   const urlCache: UrlFetchCache = new Map();
   const summary: OrchestrationSummary = {
@@ -1367,13 +1369,14 @@ export async function orchestrateCommand(
 
   let completedCount = 0;
 
-  async function processItem(item: VerifyItem, index: number): Promise<void> {
+  async function processItem(item: VerifyItem): Promise<void> {
     const inferLabel = item.inferredSource ? ' [inferred]' : '';
     const kindLabel = item.kind.toUpperCase().padEnd(7);
 
     const result = await verifySingleItem(item, client, useWebSearch, urlCache);
 
-    // Synchronize output and summary updates
+    // Update progress counter — safe in Node.js single-threaded event loop
+    // (mutations happen synchronously between await points)
     completedCount++;
     const progress = `[${completedCount}/${itemsToVerify.length}]`;
 
@@ -1411,12 +1414,12 @@ export async function orchestrateCommand(
   // Run with concurrency-limited pool
   if (concurrency <= 1) {
     for (let i = 0; i < itemsToVerify.length; i++) {
-      await processItem(itemsToVerify[i], i);
+      await processItem(itemsToVerify[i]);
     }
   } else {
     const executing = new Set<Promise<void>>();
     for (let i = 0; i < itemsToVerify.length; i++) {
-      const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
+      const p = processItem(itemsToVerify[i]).finally(() => executing.delete(p));
       executing.add(p);
       if (executing.size >= concurrency) {
         await Promise.race(executing);
@@ -1427,7 +1430,8 @@ export async function orchestrateCommand(
 
   // Log cache stats
   if (urlCache.size > 0) {
-    const successCount = [...urlCache.values()].filter(r => r.content !== null).length;
+    const resolvedResults = await Promise.all(urlCache.values());
+    const successCount = resolvedResults.filter(r => r.content !== null).length;
     console.log(`\n  URL cache: ${urlCache.size} unique URLs fetched (${successCount} with content, ${urlCache.size - successCount} errors/empty)`);
   }
 

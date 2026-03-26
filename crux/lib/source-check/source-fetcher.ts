@@ -277,22 +277,16 @@ export async function fetchWikidataContent(
       return { content: null, errorType: 'fetch_error', errorMessage: `Wikidata API HTTP ${response.status}` };
     }
 
-    // Read the body with a size limit to avoid memory issues on large entities
+    // Parse the full JSON response — truncating before parse can silently lose claims.
+    // Wikidata entities are typically 50-500KB; parsing the full response is safe.
     const rawText = await response.text();
-    const truncatedText = rawText.length > WIKIDATA_MAX_JSON_BYTES
-      ? rawText.slice(0, WIKIDATA_MAX_JSON_BYTES)
-      : rawText;
 
     let data: { entities?: Record<string, WikidataEntity> };
     try {
-      // If we truncated, the JSON may be invalid — try to parse, fall back on failure
-      data = JSON.parse(truncatedText);
+      data = JSON.parse(rawText);
     } catch {
-      if (rawText.length > WIKIDATA_MAX_JSON_BYTES) {
-        console.warn(`${logPrefix} Wikidata JSON truncated and unparseable for ${qid} (${rawText.length} bytes)`);
-        return { content: null, errorType: 'fetch_error', errorMessage: 'Wikidata JSON too large to parse' };
-      }
-      throw new Error('Invalid JSON from Wikidata API');
+      console.warn(`${logPrefix} Wikidata JSON unparseable for ${qid} (${rawText.length} bytes)`);
+      return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid JSON from Wikidata API' };
     }
 
     const entity = data.entities?.[qid];
@@ -495,7 +489,7 @@ export async function fetchSourceContent(
         const status = response.status;
         // Consume the body to avoid leaking connections.
         // Intentionally quiet: body content is irrelevant for error responses.
-        await response.text().catch(() => {});
+        await response.text().catch((e: unknown) => { void e; });
 
         if (RETRYABLE_STATUS_CODES.has(status) && attempt < MAX_RETRIES) {
           const delay = RETRY_DELAYS_MS[attempt];
