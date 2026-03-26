@@ -66,12 +66,12 @@ facts:
       Superintelligence Labs and Prometheus supercluster"
 
   - id: f_lCAFEOqqgQ
-    property: cash-burn
+    property: cumulative-losses
     value: 7e+10
     asOf: 2026-01
     source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
-    notes: "Reality Labs cumulative losses since late 2020; cited at time of January
-      2026 layoffs"
+    notes: "Reality Labs cumulative losses since late 2020 (~5 years); cited at time
+      of January 2026 layoffs. This is a cumulative total, NOT an annual figure."
 
   - id: f_TWxhXOjkvg
     property: revenue
@@ -106,13 +106,6 @@ facts:
     asOf: 2025-10
     source: https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/
     notes: "$27B partnership with Blue Owl Capital for Hyperion data center project"
-
-  - id: f_nju6MOGqNQ
-    property: description
-    value: "AMI Labs (Yann LeCun) seeking ~$3.5B valuation in fundraising talks
-      (2025)"
-    source: https://fortune.com/2025/12/19/yann-lecun-ami-labs-ai-startup-valuation-meta-departure/
-    notes: "Separate entity from Meta AI"
 
   - id: f_DXtu23aW3Q
     property: description

@@ -77,14 +77,6 @@ facts:
       SoftBank ($15B from third parties, $15B from SoftBank directly, with
       additional participants)."
 
-  - id: f_m5b6R9pIby
-    property: total-funding
-    value: 5.79e+10
-    asOf: 2025-03
-    source: https://www.reuters.com/technology/openai-closes-40-billion-funding-round-softbank-2025-03-31/
-    notes: "Cumulative funding after $40B SoftBank-led round in March 2025 at $300B
-      valuation, bringing total to ~$57.9B"
-
   # ── Valuation ──────────────────────────────────────────────────
   - id: f_b56n3kcD2g
     property: valuation
@@ -505,26 +497,11 @@ facts:
     value: Sam Altman
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-  - id: JU8dVl7ViQ
-    property: headcount
-    value: 375
-    source: https://www.wikidata.org/wiki/Q21708200
-    notes: From Wikidata Q21708200
-  - id: hf1lYXbYXQ
-    property: revenue
-    value: 5363248
-    source: https://www.wikidata.org/wiki/Q21708200
-    notes: From Wikidata Q21708200
   - id: zn71ZtJN2A
     property: founded-by-name
     value: Elon Musk
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200; text value (not entity ref)
-  - id: Jjf6iAusCA
-    property: legal-structure
-    value: 501(c)(3) organization
-    source: https://www.wikidata.org/wiki/Q21708200
-    notes: From Wikidata Q21708200
   - id: Zuy0wq0iZw
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/OpenAI
