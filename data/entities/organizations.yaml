@@ -5200,7 +5200,7 @@
       type: person
     - id: jExOzigU4B
       type: person
-    - id: 8Mk8-7uSm6
+    - id: PFfb7RFhTg
       type: person
     - id: tVhfitccVu
       type: person
@@ -6950,7 +6950,7 @@
 
 # --- ARIA Safeguarded AI grantee universities ---
 - id: university-college-london
-  stableId: ln8-CgTqI8
+  stableId: HEAdFvsqJw
   type: organization
   orgType: academic
   title: University College London
@@ -8575,7 +8575,7 @@
   lastUpdated: 2026-03
 
 - id: world-economic-forum
-  stableId: FqdVIQLb-I
+  stableId: nOszW4yDzw
   type: organization
   orgType: generic
   title: World Economic Forum
@@ -8819,7 +8819,7 @@
     - id: UvpZCnW3wA
       type: organization
       relationship: enables
-    - id: HqHZwHBnH_
+    - id: Tbq2qL6mbA
       type: organization
       relationship: enables
   sources:
@@ -8860,7 +8860,7 @@
   lastUpdated: 2026-03
 
 - id: smic
-  stableId: 09_v0xRGgS
+  stableId: Qnt7osskRA
   wikiId: E2608
   type: organization
   orgType: generic
@@ -8888,7 +8888,7 @@
   lastUpdated: 2026-03
 
 - id: amd
-  stableId: HqHZwHBnH_
+  stableId: Tbq2qL6mbA
   wikiId: E2609
   type: organization
   orgType: generic
@@ -8909,7 +8909,7 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: RB8fKn8-tA
+    - id: vr5HogmRLQ
       type: person
       relationship: leads-to
   sources:
@@ -8947,7 +8947,7 @@
   lastUpdated: 2026-03
 
 - id: bureau-of-industry-and-security
-  stableId: GVy4_Tlsa-
+  stableId: K1hxe7b9SA
   wikiId: E2611
   type: organization
   orgType: government
@@ -9036,7 +9036,7 @@
   lastUpdated: 2026-03
 
 - id: semiconductor-industry-association
-  stableId: Ss1JR_v3Ld
+  stableId: ezdMt069kA
   wikiId: E2614
   type: organization
   orgType: generic
@@ -9078,7 +9078,7 @@
   lastUpdated: 2026-03
 
 - id: tokyo-electron
-  stableId: ER_K4Y_mj7
+  stableId: 2dQxYx0aVA
   type: organization
   orgType: generic
   title: Tokyo Electron
@@ -9180,7 +9180,7 @@
   lastUpdated: 2026-03
 
 - id: qualcomm
-  stableId: Q2q_4brdL-
+  stableId: 9PuCCs56UQ
   type: organization
   orgType: generic
   title: Qualcomm
@@ -9193,7 +9193,7 @@
   lastUpdated: 2026-03
 
 - id: cambricon
-  stableId: O8FL_Svad_
+  stableId: tkD0H2KyCQ
   type: organization
   orgType: generic
   title: Cambricon Technologies
@@ -9205,7 +9205,7 @@
   lastUpdated: 2026-03
 
 - id: biren-technology
-  stableId: TpN_rNyN9V
+  stableId: wEy0RcQyjQ
   type: organization
   orgType: startup
   title: Biren Technology
@@ -9242,7 +9242,7 @@
   lastUpdated: 2026-03
 
 - id: cxmt
-  stableId: w_4zbNf3lK
+  stableId: gbqVMWgcXA
   type: organization
   orgType: generic
   title: ChangXin Memory Technologies

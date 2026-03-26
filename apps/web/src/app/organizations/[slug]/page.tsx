@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
+import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
 import {
   getKBLatest,
   getKBProperty,
@@ -288,7 +289,6 @@ export default async function OrgProfilePage({
     const peopleByName = new Map<string, PersonEntry>();
 
     // Add key persons first (from FactBase)
-    const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
     for (const person of data.sortedPersons) {
       const personRef = field(person, "person");
       // Resolve person ref through TableBase (handles slugs, E-numbers, stableIds)
@@ -304,9 +304,9 @@ export default async function OrgProfilePage({
       }
       // Build display name: prefer explicit display_name, then resolved title,
       // then humanized slug. Never display raw stableIds or numeric IDs.
-      const isStableId = STABLE_ID_RE.test(personRef ?? "");
-      const isNumericId = /^\d+$/.test(personRef ?? "");
-      const fallbackName = (isStableId || isNumericId)
+      const isStableIdVal = STABLE_ID_PATTERN.test(personRef ?? "");
+      const isNumericId = NUMERIC_ID_PATTERN.test(personRef ?? "");
+      const fallbackName = (isStableIdVal || isNumericId)
         ? "Unknown"
         : titleCase(personRef ?? person.key);
       const name =

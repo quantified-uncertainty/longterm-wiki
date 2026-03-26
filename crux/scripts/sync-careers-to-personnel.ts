@@ -13,7 +13,7 @@
 import { config } from "dotenv";
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { createHash } from "node:crypto";
+import { generateId } from "../lib/grant-import/id.ts";
 
 // Load .env from repo root
 config({ path: join(import.meta.dirname, "../../.env") });
@@ -49,10 +49,6 @@ interface SyncItem {
 }
 
 // ── Helpers ────────────────────────────────────────────────────────
-
-function generateId(input: string): string {
-  return createHash("sha256").update(input).digest("base64url").substring(0, 10);
-}
 
 function loadEntityMap(yamlPath: string): Map<string, string> {
   const content = readFileSync(yamlPath, "utf-8");

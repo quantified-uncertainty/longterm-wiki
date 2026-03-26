@@ -1,0 +1,249 @@
+/**
+ * One-time migration: normalize stableIds containing base64url chars (- and _).
+ *
+ * The grant-import/id.ts generator historically used raw base64url encoding,
+ * producing IDs with - and _. The rest of the system assumes pure [A-Za-z0-9]{10}.
+ * This script replaces all contaminated stableIds with fresh random alphanumeric IDs.
+ *
+ * Usage:
+ *   node --import tsx/esm crux/scripts/normalize-stableids.ts [--dry-run] [--generate-sql]
+ *
+ * --dry-run:      Show what would change without writing files
+ * --generate-sql: Output PG migration SQL to stdout (for pasting into migration file)
+ */
+
+import { readFileSync, writeFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+import { randomBytes } from "node:crypto";
+
+const PROJECT_ROOT = join(import.meta.dirname, "../..");
+
+// ── ID generation (clean, matches packages/factbase/src/ids.ts) ──────
+
+const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+function randomAlphanumeric10(): string {
+  const raw = randomBytes(7).toString("base64url").slice(0, 10);
+  return raw
+    .split("")
+    .map((ch) => {
+      if (ch === "-" || ch === "_") {
+        const byte = randomBytes(1)[0];
+        return REPLACEMENT_CHARS[byte % REPLACEMENT_CHARS.length];
+      }
+      return ch;
+    })
+    .join("");
+}
+
+// ── Scan for contaminated IDs ────────────────────────────────────────
+
+interface ContaminatedId {
+  oldId: string;
+  file: string;
+  field: string; // "stableId" | "entity" | "relatedEntries"
+}
+
+/**
+ * Detect stableIds that contain base64url chars (- or _).
+ * Must have at least one uppercase letter to distinguish from slugs like "chris-olah".
+ * Also catches IDs starting with - or _ (which YAML quotes as "-vEy6ah4qE").
+ */
+function isContaminatedStableId(id: string): boolean {
+  return /[-_]/.test(id) && /^[A-Za-z0-9_-]{10}$/.test(id) && /[A-Z]/.test(id);
+}
+
+function scanEntityYaml(filePath: string): ContaminatedId[] {
+  const content = readFileSync(filePath, "utf-8");
+  const results: ContaminatedId[] = [];
+
+  // Match stableId: lines
+  for (const match of content.matchAll(/stableId:\s*"?([^"\n]+)"?/g)) {
+    const id = match[1].trim();
+    if (isContaminatedStableId(id)) {
+      results.push({ oldId: id, file: filePath, field: "stableId" });
+    }
+  }
+
+  // Match relatedEntries id: lines that contain contaminated IDs
+  for (const match of content.matchAll(/- id:\s*"?([A-Za-z0-9_-]{10})"?\b/g)) {
+    const id = match[1];
+    if (isContaminatedStableId(id)) {
+      results.push({ oldId: id, file: filePath, field: "relatedEntries" });
+    }
+  }
+
+  return results;
+}
+
+function scanFactBaseThing(filePath: string): ContaminatedId[] {
+  const content = readFileSync(filePath, "utf-8");
+  const results: ContaminatedId[] = [];
+
+  // Match entity: line (first line typically)
+  const entityMatch = content.match(/^entity:\s*([^\n]+)/m);
+  if (entityMatch) {
+    const id = entityMatch[1].trim();
+    if (isContaminatedStableId(id)) {
+      results.push({ oldId: id, file: filePath, field: "entity" });
+    }
+  }
+
+  return results;
+}
+
+// ── Main ──────────────────────────────────────────────────────────────
+
+const isDryRun = process.argv.includes("--dry-run");
+const generateSql = process.argv.includes("--generate-sql");
+
+// 1. Scan entity YAML files
+const entityDir = join(PROJECT_ROOT, "data", "entities");
+const entityFiles = ["people.yaml", "organizations.yaml", "responses.yaml"];
+const allContaminated: ContaminatedId[] = [];
+
+for (const f of entityFiles) {
+  allContaminated.push(...scanEntityYaml(join(entityDir, f)));
+}
+
+// 2. Scan FactBase thing files
+const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "things");
+const allThingFiles = readdirSync(thingsDir).filter((f) => f.endsWith(".yaml"));
+for (const f of allThingFiles) {
+  allContaminated.push(...scanFactBaseThing(join(thingsDir, f)));
+}
+
+// 3. Build unique old→new mapping
+const uniqueOldIds = [...new Set(allContaminated.map((c) => c.oldId))];
+
+// Collect all existing stableIds to avoid collisions
+const allExistingIds = new Set<string>();
+for (const f of entityFiles) {
+  const content = readFileSync(join(entityDir, f), "utf-8");
+  for (const match of content.matchAll(/stableId:\s*"?([^"\n]+)"?/g)) {
+    allExistingIds.add(match[1].trim());
+  }
+}
+
+const migrationMap = new Map<string, string>();
+for (const oldId of uniqueOldIds) {
+  let newId: string;
+  let attempts = 0;
+  do {
+    newId = randomAlphanumeric10();
+    attempts++;
+    if (attempts > 100) throw new Error(`Cannot generate collision-free ID for ${oldId}`);
+  } while (allExistingIds.has(newId) || migrationMap.has(newId));
+  migrationMap.set(oldId, newId);
+  allExistingIds.add(newId);
+}
+
+console.log(`Found ${uniqueOldIds.length} contaminated stableIds across ${allContaminated.length} references`);
+console.log(`\nMigration mapping:`);
+for (const [old, replacement] of migrationMap) {
+  console.log(`  ${old} → ${replacement}`);
+}
+
+if (generateSql) {
+  console.log(`\n-- ======== PG Migration SQL ========`);
+  console.log(`-- Generated by crux/scripts/normalize-stableids.ts`);
+  console.log(`-- ${migrationMap.size} stableIds to normalize\n`);
+  console.log(`CREATE TEMP TABLE stableid_migration (`);
+  console.log(`  old_id TEXT PRIMARY KEY,`);
+  console.log(`  new_id TEXT NOT NULL UNIQUE`);
+  console.log(`);\n`);
+  console.log(`INSERT INTO stableid_migration (old_id, new_id) VALUES`);
+  const entries = [...migrationMap.entries()];
+  for (let i = 0; i < entries.length; i++) {
+    const [old, replacement] = entries[i];
+    const comma = i < entries.length - 1 ? "," : ";";
+    console.log(`  ('${old}', '${replacement}')${comma}`);
+  }
+
+  // Generate UPDATE statements for all tables
+  const fkTables = [
+    // [table, fk_columns[], legacy_text_columns[]]
+    ["entity_ids", ["stable_id"], []],
+    ["summaries", ["entity_id"], []],
+    ["facts", ["entity_id", "subject"], []],
+    ["personnel", ["person_entity_id", "org_entity_id"], ["person_id", "organization_id"]],
+    ["grants", ["org_entity_id", "grantee_entity_id"], ["grantee_id", "organization_id"]],
+    ["funding_rounds", ["company_entity_id", "lead_investor_entity_id"], ["company_id", "lead_investor"]],
+    ["investments", ["company_entity_id", "investor_entity_id"], ["company_id", "investor_id"]],
+    ["equity_positions", ["company_entity_id", "holder_entity_id"], ["company_id", "holder_id"]],
+    ["divisions", ["parent_org_id"], []],
+    ["division_members", ["person_id"], []],
+    ["entity_profile_descriptions", ["entity_id"], []],
+    ["source_checks", ["entity_id"], []],
+    ["data_quality_snapshots", ["entity_id"], []],
+    ["research_area_evaluations", ["entity_id"], []],
+    ["websites", ["entity_id"], []],
+    ["secondary_market_prices", ["company_entity_id"], []],
+    ["policy_evaluations", ["policy_entity_id"], []],
+    ["prediction_market_links", ["entity_id"], []],
+  ] as const;
+
+  console.log(`\n-- Update child tables FIRST (before changing entities PK)`);
+  for (const [table, fkCols, legacyCols] of fkTables) {
+    for (const col of fkCols) {
+      console.log(`UPDATE ${table} t SET ${col} = m.new_id FROM stableid_migration m WHERE t.${col} = m.old_id;`);
+    }
+    for (const col of legacyCols) {
+      console.log(`UPDATE ${table} t SET ${col} = m.new_id FROM stableid_migration m WHERE t.${col} = m.old_id;`);
+    }
+  }
+
+  console.log(`\n-- Update entities PK LAST`);
+  console.log(`UPDATE entities e SET stable_id = m.new_id FROM stableid_migration m WHERE e.stable_id = m.old_id;`);
+
+  console.log(`\nDROP TABLE stableid_migration;`);
+  process.exit(0);
+}
+
+if (isDryRun) {
+  console.log(`\n[DRY RUN] Would update ${allContaminated.length} references in ${new Set(allContaminated.map((c) => c.file)).size} files`);
+  process.exit(0);
+}
+
+// 4. Apply YAML changes
+const filesModified = new Set<string>();
+for (const { oldId, file, field } of allContaminated) {
+  const newId = migrationMap.get(oldId)!;
+  let content = readFileSync(file, "utf-8");
+
+  if (field === "stableId") {
+    // Replace stableId: oldId (with or without quotes)
+    content = content.replace(
+      new RegExp(`(stableId:\\s*)"?${escapeRegex(oldId)}"?`, "g"),
+      `$1${newId}`
+    );
+  } else if (field === "entity") {
+    // Replace entity: oldId
+    content = content.replace(
+      new RegExp(`(entity:\\s*)${escapeRegex(oldId)}`, "g"),
+      `$1${newId}`
+    );
+  } else if (field === "relatedEntries") {
+    // Replace - id: oldId
+    content = content.replace(
+      new RegExp(`(- id:\\s*)${escapeRegex(oldId)}`, "g"),
+      `$1${newId}`
+    );
+  }
+
+  writeFileSync(file, content, "utf-8");
+  filesModified.add(file);
+}
+
+console.log(`\nUpdated ${filesModified.size} files`);
+
+// 5. Write migration map for auditability
+const mapPath = join(PROJECT_ROOT, "crux", "scripts", "stableid-migration-map.json");
+writeFileSync(mapPath, JSON.stringify(Object.fromEntries(migrationMap), null, 2) + "\n", "utf-8");
+console.log(`Migration map written to ${mapPath}`);
+
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function escapeRegex(s: string): string {
+  return s.replace(/[-_\\^$*+?.()|[\]{}]/g, "\\$&");
+}

@@ -10,12 +10,12 @@
  * personnel sync format for the wiki-server.
  */
 
-import { createHash } from "crypto";
 import { readFileSync, readdirSync } from "fs";
 import { join, basename } from "path";
 import { parse as parseYaml } from "yaml";
 import { PROJECT_ROOT } from "../content-types.ts";
 import { buildTableBaseEntityMap } from "../factbase-loader.ts";
+import { generateId } from "../grant-import/id.ts";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -40,14 +40,6 @@ export interface CareerEntry {
   notes: string | null;
   /** Origin of this entry for debugging */
   origin: "kb-record" | "kb-fact" | "experts-yaml";
-}
-
-// ── ID generation ──────────────────────────────────────────────────────
-
-/** Generate a deterministic 10-char ID from input string */
-function generateId(input: string): string {
-  const hash = createHash("sha256").update(input).digest("base64url");
-  return hash.substring(0, 10);
 }
 
 // ── KB data loading ────────────────────────────────────────────────────
