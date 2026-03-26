@@ -15,7 +15,8 @@ import { createHash } from 'node:crypto';
 // Shared ID detection helpers
 // ---------------------------------------------------------------------------
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
+/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
+ * Canonical definition: apps/web/src/lib/stable-id.ts */
 const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 /** Matches pure numeric IDs (legacy DB PKs). */
 const NUMERIC_ID_RE = /^\d+$/;

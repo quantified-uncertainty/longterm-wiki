@@ -39,6 +39,14 @@ describe("formatEntityRef", () => {
     expect(ref.name).toBe("openai-2024");
   });
 
+  it("allows legacy base64url IDs as names since they are not detected as stableIds", () => {
+    // After migration 0141 these IDs no longer exist in the system, but if they
+    // somehow appear, the strict pattern won't detect them as stableIds and they'll
+    // leak through as names. This is acceptable because the data is now clean.
+    expect(formatEntityRef(null, null, null, null, "Tw_Eo226h3").name).toBe("Tw_Eo226h3");
+    expect(formatEntityRef(null, null, null, null, "V-55MuswUh").name).toBe("V-55MuswUh");
+  });
+
   it("returns all null for no inputs", () => {
     const ref = formatEntityRef(null, null, null, null, null);
     expect(ref).toEqual({ entityId: null, slug: null, name: null });
@@ -62,5 +70,14 @@ describe("STABLE_ID_PATTERN", () => {
 
   it("rejects numeric-only strings", () => {
     expect(STABLE_ID_PATTERN.test("1234567890")).toBe(false);
+  });
+
+  it("rejects base64url chars (- and _) in stableIds", () => {
+    // These were produced by a now-fixed bug in crux/lib/grant-import/id.ts.
+    // Migration 0141 normalized all existing contaminated IDs.
+    expect(STABLE_ID_PATTERN.test("Tw_Eo226h3")).toBe(false);
+    expect(STABLE_ID_PATTERN.test("V-55MuswUh")).toBe(false);
+    expect(STABLE_ID_PATTERN.test("FqdVIQLb-I")).toBe(false);
+    expect(STABLE_ID_PATTERN.test("09_v0xRGgS")).toBe(false);
   });
 });

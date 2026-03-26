@@ -10,6 +10,7 @@ import {
   formatKBDate,
   titleCase,
 } from "@/components/wiki/factbase/format";
+import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
 
 export const metadata: Metadata = {
   title: "Funding Rounds",
@@ -17,18 +18,13 @@ export const metadata: Metadata = {
     "Directory of funding rounds tracked in the knowledge base, including venture capital, grants, and other financing events for AI-related companies.",
 };
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-/** Matches pure numeric IDs (legacy DB PKs). */
-const NUMERIC_ID_RE = /^\d+$/;
-
 /**
  * Filter out raw IDs that aren't human-readable names.
  * Returns null for stableIds and numeric PKs so the resolver can handle them.
  */
 function filterRawId(name: string | null): string | null {
   if (!name) return null;
-  if (STABLE_ID_RE.test(name) || NUMERIC_ID_RE.test(name)) return null;
+  if (STABLE_ID_PATTERN.test(name) || NUMERIC_ID_PATTERN.test(name)) return null;
   return name;
 }
 

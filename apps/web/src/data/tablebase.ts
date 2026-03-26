@@ -33,6 +33,7 @@ import {
   isPolicy,
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
+import { isStableId } from "@/lib/stable-id";
 
 // Re-export for consumers
 export type { WithSource };
@@ -501,7 +502,7 @@ function resolveIdWithoutRegistry(id: string): string {
     return registry.byWikiId[id] || id;
   }
   // StableId: 10-char alphanumeric → slug
-  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+  if (isStableId(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }
@@ -597,7 +598,7 @@ export function resolveId(id: string): string {
     return registry.byWikiId[id] || id;
   }
   // StableId: 10-char alphanumeric → slug
-  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+  if (isStableId(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }

@@ -36,8 +36,7 @@ function sqlInList(values: string[]) {
 const MAX_PAGE_SIZE = 200;
 const VALID_ROLE_TYPES = ["key-person", "board", "career"] as const;
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+import { STABLE_ID_PATTERN } from "../shared/entity-ref.js";
 
 // ---- Query schemas ----
 
@@ -61,7 +60,7 @@ const AllQuery = z.object({
 // ---- Sync schema ----
 
 const SyncPersonnelItemSchema = z.object({
-  id: z.string().length(10),
+  id: z.string().regex(/^[A-Za-z0-9]{10}$/, "id must be 10 alphanumeric characters"),
   personId: z.string().min(1).max(200),
   organizationId: z.string().min(1).max(200),
   role: z.string().min(1).max(500),
