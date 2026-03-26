@@ -416,13 +416,16 @@ export function EquityBreakdownChart({
   const totalShown = sorted.reduce((s, h) => s + h.stakePercent, 0);
   const otherPercent = Math.max(0, 100 - totalShown);
 
+  /** Format stake as "low–high%" or "~pct%" with 1 decimal, no trailing zeros. */
+  const fmtStake = (h: (typeof holders)[number]) =>
+    h.stakeLow != null && h.stakeHigh != null
+      ? `${parseFloat(h.stakeLow.toFixed(1))}–${parseFloat(h.stakeHigh.toFixed(1))}%`
+      : `~${h.stakePercent.toFixed(1)}%`;
+
   // Build accessible label summarizing equity holders
   const equityAriaLabel = (() => {
     const holderSummaries = sorted.map((h) => {
-      const stake =
-        h.stakeLow != null && h.stakeHigh != null
-          ? `${parseFloat(h.stakeLow.toFixed(1))}–${parseFloat(h.stakeHigh.toFixed(1))}%`
-          : `~${h.stakePercent.toFixed(1)}%`;
+      const stake = fmtStake(h);
       const value =
         valuation != null
           ? ` (${formatCompactCurrency((h.stakePercent / 100) * valuation)})`
@@ -499,9 +502,7 @@ export function EquityBreakdownChart({
                 {h.name}
               </span>
               <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
-                {h.stakeLow != null && h.stakeHigh != null
-                  ? `${parseFloat(h.stakeLow.toFixed(1))}–${parseFloat(h.stakeHigh.toFixed(1))}%`
-                  : `~${h.stakePercent.toFixed(1)}%`}
+                {fmtStake(h)}
               </span>
               {equityValue != null && (
                 <span className="text-xs font-semibold tabular-nums whitespace-nowrap">

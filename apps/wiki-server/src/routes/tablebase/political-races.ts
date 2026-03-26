@@ -16,6 +16,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  paginationQuery,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -64,15 +65,8 @@ const ListQuery = z.object({
   raceType: z.string().max(50).optional(),
 });
 
-const AllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
-const CandidatesAllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(1000).default(1000),
-  offset: z.coerce.number().int().min(0).default(0),
-});
+const AllQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit: MAX_PAGE_SIZE });
+const CandidatesAllQuery = paginationQuery({ maxLimit: 1000, defaultLimit: 1000 });
 
 // ---- Sync schemas ----
 
