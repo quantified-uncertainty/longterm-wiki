@@ -158,7 +158,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
-            id: "P_12345678",
+            id: "Pabcde1234",
             personId: "johnPER001",
             organizationId: "acmeORG001",
             role: "CEO",
@@ -180,7 +180,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
-            id: "P_12345678",
+            id: "Pabcde1234",
             personId: "johnPER001",
             organizationId: "acmeORG001",
             role: "CEO",
@@ -203,7 +203,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
-            id: "P_12345678",
+            id: "Pabcde1234",
             personId: "johnPER001",
             organizationId: "acmeORG001",
             role: "CEO",
@@ -224,7 +224,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
-            id: "P_12345678",
+            id: "Pabcde1234",
             personId: "johnPER001",
             organizationId: "acmeORG001",
             role: "CEO",
@@ -243,7 +243,7 @@ describe("Entity FK validation", () => {
         {
           items: [
             {
-              id: "P_12345678",
+              id: "Pabcde1234",
               personId: "nxPerson01",
               organizationId: "nxOrgani01",
               role: "CEO",
@@ -260,7 +260,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [
           {
-            id: "P_12345678",
+            id: "Pabcde1234",
             personId: "missPER001",
             organizationId: "missORG001",
             role: "CEO",
@@ -287,7 +287,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/investments/sync", {
         items: [
           {
-            id: "I_12345678",
+            id: "Iabcde1234",
             companyId: "company-x",
             investorId: "nonexistent-investor",
           },
@@ -307,7 +307,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/investments/sync", {
         items: [
           {
-            id: "I_12345678",
+            id: "Iabcde1234",
             companyId: "company-x",
             investorId: "investor-y",
           },
@@ -325,7 +325,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/funding-rounds/sync", {
         items: [
           {
-            id: "F_12345678",
+            id: "Fabcde1234",
             companyId: "nonexistent-company",
             name: "Series A",
           },
@@ -344,7 +344,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/funding-rounds/sync", {
         items: [
           {
-            id: "F_12345678",
+            id: "Fabcde1234",
             companyId: "company-z",
             name: "Series A",
           },
@@ -365,7 +365,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/benchmark-results/sync", {
         items: [
           {
-            id: "B_12345678",
+            id: "Babcde1234",
             benchmarkId: "nonexistent-benchmark",
             modelId: "model-gpt4",
             score: 0.95,
@@ -385,7 +385,7 @@ describe("Entity FK validation", () => {
       const res = await postJson(app, "/api/benchmark-results/sync", {
         items: [
           {
-            id: "B_12345678",
+            id: "Babcde1234",
             benchmarkId: "benchmark-mmlu",
             modelId: "model-gpt4",
             score: 0.95,
