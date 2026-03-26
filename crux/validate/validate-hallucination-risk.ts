@@ -149,7 +149,9 @@ export async function loadAccuracyMap(): Promise<AccuracyMap | null> {
 
     const map: AccuracyMap = new Map();
     for (const row of result.data.pages) {
-      map.set(row.pageId, { checked: Number(row.checked), inaccurate: Number(row.inaccurate) });
+      if (row.pageId != null) {
+        map.set(row.pageId, { checked: Number(row.checked), inaccurate: Number(row.inaccurate) });
+      }
     }
     return map;
   } catch {

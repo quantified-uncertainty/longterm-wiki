@@ -420,7 +420,7 @@ async function fixPrInWorktree(
 
 interface CycleResult {
   dispatched: number;
-  results: SlotFixResult[];
+  results: FixResult[];
 }
 
 /**
