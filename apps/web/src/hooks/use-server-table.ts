@@ -126,12 +126,15 @@ export function useServerTable<T>(
         setTotal(result.total);
       })
       .catch((err: unknown) => {
-        if (err instanceof Error && err.name === "AbortError") return;
+        if (err instanceof Error && err.name === "AbortError") {
+          setError("Request timed out");
+          return;
+        }
         setError(err instanceof Error ? err.message : String(err));
       })
       .finally(() => {
         clearTimeout(timeout);
-        if (!controller.signal.aborted) setIsLoading(false);
+        setIsLoading(false);
       });
 
     return () => { clearTimeout(timeout); controller.abort(); };
