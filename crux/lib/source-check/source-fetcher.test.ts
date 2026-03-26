@@ -2,7 +2,16 @@
  * Tests for source-fetcher.ts
  */
 import { describe, it, expect } from 'vitest';
-import { isPrivateHost, htmlToText } from './source-fetcher.ts';
+import {
+  isPrivateHost,
+  htmlToText,
+  extractWikidataQid,
+  WIKIDATA_PROPERTIES,
+  COMMON_ENTITY_LABELS,
+  RETRYABLE_STATUS_CODES,
+  MAX_RETRIES,
+  RETRY_DELAYS_MS,
+} from './source-fetcher.ts';
 
 describe('isPrivateHost', () => {
   it('blocks localhost', () => {
@@ -153,5 +162,132 @@ describe('htmlToText', () => {
     const text = htmlToText(html);
     // <main> has < 200 chars, so falls back to full HTML
     expect(text).toContain('Full body content');
+  });
+});
+
+describe('extractWikidataQid', () => {
+  it('extracts QID from standard Wikidata URL', () => {
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Q15733006')).toBe('Q15733006');
+  });
+
+  it('extracts QID from URL without www', () => {
+    expect(extractWikidataQid('https://wikidata.org/wiki/Q42')).toBe('Q42');
+  });
+
+  it('extracts QID from HTTP URL', () => {
+    expect(extractWikidataQid('http://www.wikidata.org/wiki/Q100')).toBe('Q100');
+  });
+
+  it('returns null for non-Wikidata URLs', () => {
+    expect(extractWikidataQid('https://en.wikipedia.org/wiki/Google')).toBeNull();
+    expect(extractWikidataQid('https://example.com')).toBeNull();
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Property:P31')).toBeNull();
+  });
+
+  it('returns null for Wikidata URLs without QID', () => {
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Main_Page')).toBeNull();
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Special:Search')).toBeNull();
+  });
+
+  it('returns null for empty string', () => {
+    expect(extractWikidataQid('')).toBeNull();
+  });
+
+  it('returns null for Wikidata URL with trailing path segments', () => {
+    // Should only match exact entity pages, not subpages
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Q42/something')).toBeNull();
+  });
+
+  it('returns null for Wikidata URL with query params', () => {
+    // The regex requires exact match — query params would be after the QID
+    expect(extractWikidataQid('https://www.wikidata.org/wiki/Q42?action=edit')).toBeNull();
+  });
+});
+
+describe('WIKIDATA_PROPERTIES', () => {
+  it('contains common organization properties', () => {
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P571'); // Founded
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P159'); // Headquarters
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P856'); // Website
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P1128'); // Employee count
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P749'); // Parent organization
+  });
+
+  it('contains common person properties', () => {
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P569'); // Date of birth
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P570'); // Date of death
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P27'); // Country of citizenship
+    expect(WIKIDATA_PROPERTIES).toHaveProperty('P108'); // Employer
+  });
+
+  it('has human-readable labels for all properties', () => {
+    for (const [pid, label] of Object.entries(WIKIDATA_PROPERTIES)) {
+      expect(label).toBeTruthy();
+      expect(typeof label).toBe('string');
+      expect(pid).toMatch(/^P\d+$/);
+    }
+  });
+});
+
+describe('COMMON_ENTITY_LABELS', () => {
+  it('contains major countries', () => {
+    expect(COMMON_ENTITY_LABELS.Q30).toBe('United States');
+    expect(COMMON_ENTITY_LABELS.Q145).toBe('United Kingdom');
+    expect(COMMON_ENTITY_LABELS.Q148).toBe('China');
+  });
+
+  it('contains major cities', () => {
+    expect(COMMON_ENTITY_LABELS.Q84).toBe('London');
+    expect(COMMON_ENTITY_LABELS.Q62).toBe('San Francisco');
+    expect(COMMON_ENTITY_LABELS.Q18426).toBe('Mountain View');
+  });
+
+  it('contains common tech organizations', () => {
+    expect(COMMON_ENTITY_LABELS.Q95).toBe('Google');
+    expect(COMMON_ENTITY_LABELS.Q2283).toBe('Microsoft');
+    expect(COMMON_ENTITY_LABELS.Q21692564).toBe('Alphabet Inc.');
+  });
+
+  it('has string values for all QID keys', () => {
+    for (const [qid, label] of Object.entries(COMMON_ENTITY_LABELS)) {
+      expect(label).toBeTruthy();
+      expect(typeof label).toBe('string');
+      expect(qid).toMatch(/^Q\d+$/);
+    }
+  });
+});
+
+describe('retry configuration', () => {
+  it('retries transient server errors (429, 500, 502, 503)', () => {
+    expect(RETRYABLE_STATUS_CODES.has(429)).toBe(true);
+    expect(RETRYABLE_STATUS_CODES.has(500)).toBe(true);
+    expect(RETRYABLE_STATUS_CODES.has(502)).toBe(true);
+    expect(RETRYABLE_STATUS_CODES.has(503)).toBe(true);
+  });
+
+  it('does not retry permanent client errors (401, 403, 404)', () => {
+    expect(RETRYABLE_STATUS_CODES.has(401)).toBe(false);
+    expect(RETRYABLE_STATUS_CODES.has(403)).toBe(false);
+    expect(RETRYABLE_STATUS_CODES.has(404)).toBe(false);
+  });
+
+  it('does not retry other status codes', () => {
+    expect(RETRYABLE_STATUS_CODES.has(200)).toBe(false);
+    expect(RETRYABLE_STATUS_CODES.has(301)).toBe(false);
+    expect(RETRYABLE_STATUS_CODES.has(400)).toBe(false);
+    expect(RETRYABLE_STATUS_CODES.has(418)).toBe(false);
+  });
+
+  it('has 2 retries with increasing backoff delays', () => {
+    expect(MAX_RETRIES).toBe(2);
+    expect(RETRY_DELAYS_MS).toHaveLength(2);
+    expect(RETRY_DELAYS_MS[0]).toBe(1000);
+    expect(RETRY_DELAYS_MS[1]).toBe(3000);
+    // Second delay must be longer than first (backoff)
+    expect(RETRY_DELAYS_MS[1]).toBeGreaterThan(RETRY_DELAYS_MS[0]);
+  });
+
+  it('has a delay entry for each retry attempt', () => {
+    expect(RETRY_DELAYS_MS).toHaveLength(MAX_RETRIES);
   });
 });
