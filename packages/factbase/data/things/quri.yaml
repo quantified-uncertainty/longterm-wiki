@@ -33,35 +33,27 @@ facts:
       1 full-time staff (Ozzie Gooen); plus research collaborators
       (Nuño Sempere, Eli Lifland) and past contributors
 
-  - id: f_zwFMLRENMB
-    property: funding-received
-    value: 650000
-    asOf: !date 2022
-    source: https://survivalandflourishing.fund
-    notes: Survival and Flourishing Fund (SFF) grants 2019-2022
-    grantor: !ref pvJ50HupEQ
-
-  - id: f_AyrcCzn5aW
-    property: funding-received
-    value: 200000
-    asOf: !date 2022
-    source: https://web.archive.org/web/20221212115231/https://ftxfuturefund.org/
-    notes: Future Fund grant 2022 (pre-FTX collapse)
-
-  - id: f_qduycirTr5
-    property: funding-received
-    value: 100000
-    asOf: !date 2024
-    notes: Long-Term Future Fund (LTFF) ongoing support (estimated annual; not a sourced exact figure)
-    grantor: !ref yA12C1KcjQ
-
   - id: f_QR8legal01
     property: legal-structure
-    value: "501(c)(3) nonprofit; fiscally sponsored by Rethink Priorities"
+    value: "501(c)(3) nonprofit"
     asOf: !date 2026-03
+    source: https://quantifieduncertainty.org/about/
+
+  - id: f_QR8fiscal01
+    property: fiscal-sponsor
+    value: !ref t0p43V5oLA
+    asOf: !date 2023
+    source: https://quantifieduncertainty.org/about/
+    notes: Fiscally sponsored under Rethink Priorities Special Projects Program since 2023
 
   - id: f_QR9fndby01
     property: founded-by
     value:
       - !ref 24aX2Ru7Dg
     notes: Founded by Ozzie Gooen in 2019
+
+  - id: f_QR9fndby02
+    property: founded-by-name
+    value: Ozzie Gooen
+    source: https://quantifieduncertainty.org/about/
+    notes: Text fallback for display when entity ref doesn't resolve
