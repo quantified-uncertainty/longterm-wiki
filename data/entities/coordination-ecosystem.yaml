@@ -23,9 +23,9 @@
     - ai-governance
     - democratic-ai
     - alignment
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: aviv-ovadya
       type: person
@@ -64,9 +64,9 @@
     - quadratic-voting
     - quadratic-funding
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: glen-weyl
       type: person
@@ -101,9 +101,9 @@
     - plural-technology
     - democracy
     - collaboration
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: glen-weyl
       type: person
@@ -128,9 +128,9 @@
     - polis
     - opinion-mapping
     - consensus
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: colin-megill
       type: person
@@ -160,9 +160,9 @@
     - collective-intelligence
     - civic-tech
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: beth-noveck
       type: person
@@ -189,9 +189,9 @@
     - deliberative-polling
     - citizen-assemblies
     - democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: james-fishkin
       type: person
@@ -218,9 +218,9 @@
     - collective-intelligence
     - superminds
     - human-ai-collaboration
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: thomas-malone
       type: person
@@ -247,9 +247,9 @@
     - multi-agent
     - ai-safety
     - game-theory
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
     - ai-safety
   relatedEntries:
     - id: allan-dafoe
@@ -278,10 +278,10 @@
   website: https://www.governance.ai
   tags:
     - ai-governance
-    - coordination
+    - governance
     - policy
   clusters:
-    - coordination
+    - governance
     - ai-safety
   relatedEntries:
     - id: allan-dafoe
@@ -305,9 +305,9 @@
   tags:
     - collective-epistemics
     - information-integrity
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
     - epistemics
   sources:
     - title: Forethought Foundation
@@ -327,9 +327,9 @@
     - sortition
     - citizen-assemblies
     - democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: nesta-collective-intelligence
   stableId: XVz9frTFe-
@@ -344,9 +344,9 @@
   tags:
     - collective-intelligence
     - civic-innovation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: democracynext
   stableId: xBPfJU6L5n
@@ -362,9 +362,9 @@
     - citizen-assemblies
     - democracy
     - sortition
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: sortition-foundation
   stableId: vD5kvsbzyZ
@@ -379,9 +379,9 @@
   tags:
     - sortition
     - citizen-assemblies
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: citizens-foundation
   stableId: s8pyCzz4bJ
@@ -396,9 +396,9 @@
   tags:
     - civic-tech
     - participatory-democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: connected-by-data
   stableId: SHPu2XJgHT
@@ -412,9 +412,9 @@
   tags:
     - data-governance
     - deliberation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: more-in-common
   stableId: wnWIRpzZs8
@@ -429,9 +429,9 @@
   tags:
     - depolarization
     - social-cohesion
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: reboot-democracy
   stableId: JVXgq2Yz7i
@@ -446,9 +446,9 @@
   tags:
     - ai-democracy
     - news-aggregation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: iswe-foundation
   stableId: oarsGBuqTO
@@ -463,9 +463,9 @@
     - citizen-assemblies
     - global-south
     - democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: mysociety
   stableId: k2IQRH6YXQ
@@ -480,9 +480,9 @@
   tags:
     - civic-tech
     - transparency
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # ORGANIZATIONS — Crypto / DAO / Web3 Governance
@@ -506,9 +506,9 @@
     - dispute-resolution
     - decentralized-justice
     - blockchain
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: federico-ast
       type: person
@@ -549,9 +549,9 @@
     - prediction-markets
     - dao-governance
     - solana
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: metadao-futarchy
       type: project
@@ -584,9 +584,9 @@
     - dao
     - autonomous-agents
     - solana
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: elizaos
       type: project
@@ -614,9 +614,9 @@
     - public-goods
     - open-source
     - ethereum
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: kevin-owocki
       type: person
@@ -657,9 +657,9 @@
     - treasury
     - dao-infrastructure
     - ethereum
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   sources:
     - title: Safe Global
       url: https://safe.global
@@ -684,9 +684,9 @@
     - dao-voting
     - governance
     - off-chain
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: snapshot-voting
       type: project
@@ -712,9 +712,9 @@
     - dao-governance
     - on-chain
     - delegation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Assets Secured
       value: "$30B+"
@@ -733,9 +733,9 @@
     - modular-governance
     - dao-infrastructure
     - zodiac
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: zodiac-modules
       type: project
@@ -758,9 +758,9 @@
     - dao-framework
     - governance
     - smart-contracts
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Projects Launched
       value: "6,000+"
@@ -781,9 +781,9 @@
     - prediction-markets
     - play-money
     - forecasting
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Active Markets
       value: "200,000+"
@@ -803,9 +803,9 @@
     - oracle
     - dispute-resolution
     - prediction-markets
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: uma-optimistic-oracle
       type: project
@@ -829,9 +829,9 @@
     - longevity
     - biotech
     - dao
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Projects Funded
       value: "20+"
@@ -850,9 +850,9 @@
     - desci
     - open-science
     - peer-review
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: asi-alliance
   stableId: qG0WbdykMb
@@ -868,9 +868,9 @@
     - decentralized-ai
     - agent-marketplace
     - data-exchange
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ben-goertzel
       type: person
@@ -891,9 +891,9 @@
     - decentralized-ai
     - ai-marketplace
     - subnets
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Active Subnets
       value: "128+"
@@ -914,9 +914,9 @@
     - ai-agents
     - tokenized-agents
     - base-l2
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Agents
       value: "2,200+"
@@ -937,9 +937,9 @@
     - multi-agent
     - agent-coordination
     - consensus
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: colony-dao
   stableId: RaW1yaJw0C
@@ -954,9 +954,9 @@
     - dao-framework
     - project-management
     - reputation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: daohaus
   stableId: 9tY9xRlT6p
@@ -971,9 +971,9 @@
     - dao-framework
     - no-code
     - moloch
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: hats-protocol
   stableId: UfxyUubU6Q
@@ -989,9 +989,9 @@
     - roles
     - permissions
     - dao-infrastructure
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: DAOs Using
       value: "50+"
@@ -1009,9 +1009,9 @@
   tags:
     - dao-analytics
     - governance-data
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: DAOs Tracked
       value: "2,500+"
@@ -1030,9 +1030,9 @@
   tags:
     - dao-governance
     - on-chain
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: coordinape
   stableId: kNDqBGHQCx
@@ -1047,9 +1047,9 @@
     - contributor-rewards
     - peer-allocation
     - dao-tooling
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: superfluid
   stableId: 15dGe0oPW8
@@ -1065,9 +1065,9 @@
     - streaming-payments
     - payroll
     - dao-tooling
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: jokerace
   stableId: pAtPr-umWc
@@ -1083,9 +1083,9 @@
     - contests
     - persuasion-markets
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # ORGANIZATIONS — AI Arbitration & Negotiation
@@ -1106,9 +1106,9 @@
     - ai-negotiation
     - procurement
     - autonomous-agents
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: martin-rand
       type: person
@@ -1140,9 +1140,9 @@
     - swarm-intelligence
     - collective-intelligence
     - group-decision-making
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: louis-rosenberg
       type: person
@@ -1169,9 +1169,9 @@
   tags:
     - ai-negotiation
     - e-commerce
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Monthly Negotiations
       value: "30,000"
@@ -1188,9 +1188,9 @@
   tags:
     - ai-mediation
     - dispute-resolution
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: remesh
   stableId: _OtxdQPPPU
@@ -1207,9 +1207,9 @@
     - group-conversation
     - opinion-clustering
     - deliberation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # ORGANIZATIONS — Civic Tech
@@ -1229,9 +1229,9 @@
     - participatory-democracy
     - open-source
     - civic-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: decidim-platform
       type: project
@@ -1256,9 +1256,9 @@
     - decision-making
     - cooperative
     - civic-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: loomio-platform
       type: project
@@ -1278,9 +1278,9 @@
     - civic-engagement
     - government
     - participatory-budgeting
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Government Clients
       value: "400+"
@@ -1304,9 +1304,9 @@
     - climate
     - emissions-tracking
     - satellite-ai
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: gavin-mccormick
       type: person
@@ -1332,9 +1332,9 @@
     - climate
     - grid-emissions
     - energy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: open-climate-fix
   stableId: ItQRF0vanz
@@ -1349,9 +1349,9 @@
     - climate
     - solar-forecasting
     - energy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: global-fishing-watch
   stableId: KkbLfjLc6T
@@ -1367,9 +1367,9 @@
     - illegal-fishing
     - satellite-ai
     - commons
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # PEOPLE — Democracy & Deliberation
@@ -1390,9 +1390,9 @@
     - democratic-ai
     - deliberation
     - ai-governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-democracy-foundation
       type: organization
@@ -1428,9 +1428,9 @@
     - collective-intelligence
     - deliberation
     - ai-governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: collective-intelligence-project
       type: organization
@@ -1465,9 +1465,9 @@
     - quadratic-voting
     - plurality
     - democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: radicalxchange
       type: organization
@@ -1501,9 +1501,9 @@
     - deliberative-polling
     - democracy
     - political-science
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: stanford-deliberative-democracy-lab
       type: organization
@@ -1527,9 +1527,9 @@
     - open-government
     - govtech
     - collective-intelligence
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: govlab
       type: organization
@@ -1553,9 +1553,9 @@
     - open-democracy
     - sortition
     - political-theory
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, Yale Political Science
@@ -1574,9 +1574,9 @@
     - polis
     - deliberation
     - computational-democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: computational-democracy-project
       type: organization
@@ -1600,9 +1600,9 @@
   tags:
     - collective-intelligence
     - ai-governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: collective-intelligence-project
       type: organization
@@ -1622,9 +1622,9 @@
   tags:
     - deliberation
     - ai-alignment
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-democracy-foundation
       type: organization
@@ -1643,9 +1643,9 @@
   tags:
     - deliberation
     - collective-dialogue
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-democracy-foundation
       type: organization
@@ -1667,9 +1667,9 @@
     - ai-objectives
     - eff
     - civic-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-objectives-institute
       type: organization
@@ -1692,9 +1692,9 @@
     - democracy
     - civic-participation
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, Harvard Kennedy School
@@ -1710,9 +1710,9 @@
   tags:
     - wiki-surveys
     - social-research
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: all-our-ideas
       type: project
@@ -1736,9 +1736,9 @@
     - decentralized-justice
     - arbitration
     - blockchain
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: kleros
       type: organization
@@ -1756,9 +1756,9 @@
   tags:
     - decentralized-justice
     - smart-contracts
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: kleros
       type: organization
@@ -1778,9 +1778,9 @@
     - quadratic-funding
     - public-goods
     - ethereum
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: gitcoin
       type: organization
@@ -1803,9 +1803,9 @@
     - near-protocol
     - transformers
     - ai-governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Co-founder, NEAR Protocol
@@ -1824,9 +1824,9 @@
     - agi
     - decentralized-ai
     - singularitynet
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: asi-alliance
       type: organization
@@ -1854,9 +1854,9 @@
     - collective-intelligence
     - superminds
     - organizational-design
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: mit-center-collective-intelligence
       type: organization
@@ -1880,9 +1880,9 @@
     - mechanism-design
     - kidney-exchange
     - game-theory
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, CMU; Founder, Optimized Markets
@@ -1901,9 +1901,9 @@
     - mechanism-design
     - differentiable-economics
     - auction-design
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, Harvard EconCS
@@ -1922,9 +1922,9 @@
     - fair-division
     - social-choice
     - spliddit
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: spliddit
       type: project
@@ -1948,9 +1948,9 @@
     - social-choice
     - ai-alignment
     - mechanism-design
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, CMU / University of Oxford
@@ -1970,9 +1970,9 @@
     - negotiation
     - diplomacy
     - multi-agent
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: cicero-diplomacy
       type: project
@@ -1996,9 +1996,9 @@
     - democratic-ai
     - value-alignment
     - social-choice
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Researcher, Google DeepMind
@@ -2017,9 +2017,9 @@
     - regulatory-markets
     - ai-governance
     - legal-innovation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, Johns Hopkins / CIFAR
@@ -2038,9 +2038,9 @@
     - market-design
     - matching-theory
     - nobel-laureate
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, Stanford (Nobel 2012)
@@ -2058,9 +2058,9 @@
   tags:
     - swarm-intelligence
     - collective-intelligence
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: unanimous-ai
       type: organization
@@ -2082,9 +2082,9 @@
   tags:
     - ai-negotiation
     - procurement
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: pactum-ai
       type: organization
@@ -2104,9 +2104,9 @@
   tags:
     - climate
     - emissions-tracking
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: climate-trace
       type: organization
@@ -2131,9 +2131,9 @@
     - political-economy
     - automation
     - democracy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   customFields:
     - label: Role
       value: Professor, MIT (Nobel 2024)
@@ -2162,9 +2162,9 @@
     - deliberation
     - opinion-clustering
     - open-source
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-objectives-institute
       type: organization
@@ -2201,9 +2201,9 @@
     - opinion-mapping
     - consensus
     - open-source
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: computational-democracy-project
       type: organization
@@ -2233,9 +2233,9 @@
     - ai-mediation
     - consensus
     - deliberation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: iason-gabriel
       type: person
@@ -2264,9 +2264,9 @@
     - deliberation
     - socratic-dialogue
     - open-source
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: stanford-deliberative-democracy-lab
       type: organization
@@ -2289,9 +2289,9 @@
     - democratic-ai
     - framework
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: aviv-ovadya
       type: person
@@ -2317,9 +2317,9 @@
     - judicial
     - ai-alignment
     - deliberation
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ai-democracy-foundation
       type: organization
@@ -2340,9 +2340,9 @@
     - swarm-intelligence
     - deliberation
     - real-time
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: unanimous-ai
       type: organization
@@ -2362,9 +2362,9 @@
     - wiki-survey
     - pairwise-comparison
     - civic-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: matthew-salganik
       type: person
@@ -2383,9 +2383,9 @@
   tags:
     - participatory-democracy
     - open-source
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: loomio-platform
   stableId: 0TVHzfFr2p
@@ -2400,9 +2400,9 @@
   tags:
     - decision-making
     - collaboration
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: kialo
   stableId: YbcqehI-pX
@@ -2416,9 +2416,9 @@
   tags:
     - structured-debate
     - argument-mapping
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # PROJECTS — Crypto / DAO
@@ -2440,9 +2440,9 @@
     - ai-agents
     - open-source
     - dao
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: eliza-labs
       type: organization
@@ -2463,9 +2463,9 @@
     - futarchy
     - prediction-markets
     - governance
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: truth-terminal
   stableId: DYDII-R_Md
@@ -2481,9 +2481,9 @@
     - ai-agents
     - autonomous
     - social-media
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: gitcoin-grants-qf
   stableId: 5HfGHjFP6B
@@ -2499,9 +2499,9 @@
   tags:
     - quadratic-funding
     - public-goods
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: optimism-rpgf
   stableId: MkMHUlkQjG
@@ -2516,9 +2516,9 @@
     - retroactive-funding
     - public-goods
     - optimism
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: x402-protocol
   stableId: Lr10YB97ln
@@ -2533,9 +2533,9 @@
     - agent-payments
     - micropayments
     - stablecoins
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   sources:
     - title: Coinbase x402
       url: https://docs.cdp.coinbase.com/x402/welcome
@@ -2554,9 +2554,9 @@
     - dao-voting
     - off-chain
     - ipfs
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: zodiac-modules
   stableId: EyalPJO5lj
@@ -2571,9 +2571,9 @@
   tags:
     - modular-governance
     - dao-infrastructure
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: gitcoin-passport
   stableId: VuQ79VNqvV
@@ -2588,9 +2588,9 @@
     - identity
     - sybil-defense
     - credentials
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: proof-of-humanity
   stableId: LFTk76uT5o
@@ -2605,9 +2605,9 @@
     - identity
     - sybil-defense
     - human-verification
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: kleros-court
   stableId: pIG1hKsbpQ
@@ -2622,9 +2622,9 @@
   tags:
     - arbitration
     - decentralized-justice
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: uma-optimistic-oracle
   stableId: t2mTrELveq
@@ -2640,9 +2640,9 @@
     - oracle
     - dispute-resolution
     - prediction-markets
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # PROJECTS — AI Arbitration / Negotiation / Mechanism Design
@@ -2662,9 +2662,9 @@
     - ai-arbitration
     - dispute-resolution
     - legal-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   sources:
     - title: AAA AI Arbitrator
       url: https://www.adr.org/ai-arbitrator/
@@ -2688,9 +2688,9 @@
   tags:
     - ai-negotiation
     - procurement
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: learned-hand-platform
   stableId: PmmnXdSCGg
@@ -2705,9 +2705,9 @@
   tags:
     - ai-judicial
     - legal-tech
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 - id: cicero-diplomacy
   stableId: 9IvxcI_vWP
@@ -2722,9 +2722,9 @@
     - game-theory
     - negotiation
     - multi-agent
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: noam-brown
       type: person
@@ -2747,9 +2747,9 @@
     - mechanism-design
     - reinforcement-learning
     - tax-policy
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   sources:
     - title: AI Economist (GitHub)
       url: https://github.com/salesforce/ai-economist
@@ -2766,9 +2766,9 @@
   tags:
     - fair-division
     - social-choice
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
   relatedEntries:
     - id: ariel-procaccia
       type: person
@@ -2793,9 +2793,9 @@
     - climate
     - emissions
     - satellite-ai
-    - coordination
+    - governance
   clusters:
-    - coordination
+    - governance
 
 # ============================================================
 # BATCH 2 — GovTech, Academics, Matching, Climate additions
@@ -2814,7 +2814,7 @@
     reaching ~90 million citizens. Originally built by Madrid City Council.
   website: https://consuldemocracy.org
   tags: [participatory-democracy, open-source, civic-tech, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Governments
       value: "~200 in 39 countries"
@@ -2832,7 +2832,7 @@
     grant programs), Arbitrum DAO, and municipal planning processes.
   website: https://ethelo.com
   tags: [consensus-optimization, dao-governance, decision-making, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: metagov
   stableId: AQMwgv-MjH
@@ -2846,7 +2846,7 @@
     deliberative tech R&D.
   website: https://metagov.org
   tags: [interoperability, standards, deliberation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Key Achievement
       value: Scotland adopting their standards nationally
@@ -2862,7 +2862,7 @@
     Founded by Peter MacLeod.
   website: https://www.masslbp.com
   tags: [citizen-assemblies, deliberation, policy, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Assemblies Run
       value: "41"
@@ -2878,7 +2878,7 @@
     of participatory democracy practices globally.
   website: https://participedia.net
   tags: [participatory-democracy, research-database, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Cases
       value: "1,800+"
@@ -2896,7 +2896,7 @@
     Guide 2025 (80+ platforms).
   website: https://www.peoplepowered.org
   tags: [participatory-democracy, ratings, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: demos-uk
   stableId: zjG_NH6E1u
@@ -2909,7 +2909,7 @@
     New Local, CASM Technology, PSi, and Remesh. Camden Council first deployment (Sept 2025).
   website: https://demos.co.uk
   tags: [digital-democracy, uk, deliberation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: polco
   stableId: o-8zbQtjvd
@@ -2922,7 +2922,7 @@
     Balancing Act (budget simulation tool with roots back to 1998).
   website: https://info.polco.us
   tags: [civic-tech, surveys, budget-simulation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Government Clients
       value: "400+"
@@ -2938,7 +2938,7 @@
     permanent citizen-lottery political institution).
   website: https://www.fidemocracy.org
   tags: [citizen-assemblies, democracy-innovation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: commons-stack
   stableId: Fl872YNBJE
@@ -2952,7 +2952,7 @@
     Ostrom's institutional design principles to blockchain governance.
   website: https://commonsstack.org
   tags: [commons, ostrom, dao, token-engineering, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: ushahidi
   stableId: BqcZIf3nOM
@@ -2966,7 +2966,7 @@
     earthquake response.
   website: https://www.ushahidi.com
   tags: [crisis-mapping, crowdsourcing, open-source, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Countries
       value: "160+"
@@ -2982,7 +2982,7 @@
     Energy Ventures. Verra piloting their digital measurement approach.
   website: https://pachama.com
   tags: [climate, carbon-credits, satellite-ai, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: kayrros
   stableId: iqVWRCMtx9
@@ -2996,7 +2996,7 @@
     company.
   website: https://www.kayrros.com
   tags: [climate, methane, satellite-ai, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: electricity-maps
   stableId: veFTBOHbk7
@@ -3009,7 +3009,7 @@
     decarbonization optimization. Copenhagen-based (founded 2016).
   website: https://www.electricitymaps.com
   tags: [climate, grid-emissions, energy, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Regions
       value: "230+"
@@ -3026,7 +3026,7 @@
     Partnership with Google.org.
   website: https://www.feedingamerica.org
   tags: [food-allocation, market-design, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 # --- People (Academic additions) ---
 
@@ -3039,7 +3039,7 @@
     anarchy bounds for selfish routing. Author of "Twenty Lectures on Algorithmic Game
     Theory." Co-editor of landmark "Algorithmic Game Theory" textbook.
   tags: [algorithmic-game-theory, mechanism-design, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Columbia University
@@ -3054,7 +3054,7 @@
     Professor at MIT. Designed school choice mechanisms for Boston, NYC, Chicago. John
     Bates Clark Medal (2018). Work cited in 2012 Nobel Prize for Roth and Shapley.
   tags: [school-choice, mechanism-design, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, MIT (Clark Medal 2018)
@@ -3070,7 +3070,7 @@
     operational deployments of computational game theory for security (ARMOR at LAX, 2007).
     Applied game theory to wildlife conservation (PAWS) and public health.
   tags: [security-games, ai-for-social-good, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Harvard / Google Research
@@ -3085,7 +3085,7 @@
     Professor at Stanford and Director of the Digital Economy Lab. Co-author of "The Second
     Machine Age." Pioneer in measuring IT productivity and economics of AI adoption.
   tags: [digital-economy, ai-economics, productivity, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Stanford HAI / Digital Economy Lab
@@ -3101,7 +3101,7 @@
     exchange algorithms. Software deployed by Alliance for Paired Kidney Exchange. Franz
     Edelman Finalist (2014).
   tags: [kidney-exchange, matching-markets, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Stanford MSE
@@ -3117,7 +3117,7 @@
     for complex structures. Applied matching to vaccine distribution, school choice, and
     contract negotiation.
   tags: [market-design, matching-theory, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Harvard Business School
@@ -3133,7 +3133,7 @@
     resolving a question open since Nash's 1951 theorem. Nevanlinna Prize (2018). ACM
     Fellow (2022). Also contributed to optimal multi-item auction design.
   tags: [computational-complexity, game-theory, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, MIT (Nevanlinna Prize 2018)
@@ -3149,7 +3149,7 @@
     through mutual transparency of AI systems, and safe Pareto improvements. Co-author
     of "Foundations of Cooperative AI" (AAAI 2023).
   tags: [cooperative-ai, program-equilibrium, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: PhD student, CMU
@@ -3165,7 +3165,7 @@
     Asari AI. Used deep multi-agent RL to design tax policies outperforming human-designed
     policies on equality-productivity tradeoffs. Published in Science Advances (2022).
   tags: [ai-economist, mechanism-design, reinforcement-learning, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Former lead, AI Economist (Salesforce Research)
@@ -3181,7 +3181,7 @@
     combinatorial course allocation at Wharton). Work on high-frequency trading market
     design and frequent batch auctions.
   tags: [market-design, mechanism-design, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Role
       value: Professor, Chicago Booth
@@ -3200,7 +3200,7 @@
     Switzerland. Built by Stanford/ETH Zurich Immigration Policy Lab.
   projectStatus: active
   tags: [refugee-matching, ai-allocation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
   customFields:
     - label: Countries
       value: US, Netherlands, Norway, Switzerland
@@ -3216,7 +3216,7 @@
   projectStatus: active
   projectUrl: https://github.com/google-deepmind/open_spiel
   tags: [game-theory, multi-agent, open-source, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: consul-platform
   stableId: sjsTbnizW3
@@ -3229,7 +3229,7 @@
   projectUrl: https://consuldemocracy.org
   organization: consul-democracy
   tags: [participatory-democracy, open-source, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: your-priorities
   stableId: ulObOSkEp1
@@ -3243,7 +3243,7 @@
   projectUrl: https://yrpri.org
   organization: citizens-foundation
   tags: [participatory-democracy, idea-generation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: waves-digital-democracy
   stableId: JOWMQyTdwJ
@@ -3256,7 +3256,7 @@
   projectStatus: active
   organization: demos-uk
   tags: [digital-democracy, uk, deliberation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: liquidfeedback
   stableId: E9fxUa8YeQ
@@ -3269,7 +3269,7 @@
   projectStatus: active
   projectUrl: https://liquidfeedback.com
   tags: [liquid-democracy, vote-delegation, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: democracyos-platform
   stableId: e36LcaGK34
@@ -3282,7 +3282,7 @@
   projectStatus: maintained
   projectUrl: https://github.com/DemocracyOS/democracyos
   tags: [digital-democracy, open-source, latin-america, coordination]
-  clusters: [coordination]
+  clusters: [governance]
 
 - id: kayrros-methane-watch
   stableId: N657FSHE4-
@@ -3294,4 +3294,4 @@
   projectStatus: active
   organization: kayrros
   tags: [climate, methane, satellite-ai, coordination]
-  clusters: [coordination]
+  clusters: [governance]
