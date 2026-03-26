@@ -19,6 +19,8 @@ import {
   type ResolvedEntityVars,
 } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -85,6 +87,7 @@ const SyncQuestionItemSchema = z.object({
   discoveryMethod: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncQuestionsBatchSchema = z.object({
@@ -103,6 +106,7 @@ const SyncSnapshotItemSchema = z.object({
   openInterest: z.number().nullable().optional(),
   communityPrediction: z.number().min(0).max(1).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncSnapshotsBatchSchema = z.object({
@@ -369,6 +373,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const db = getDrizzleDb();
 
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const allVals = items.map((item) => ({
@@ -421,10 +426,24 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           },
         });
 
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "prediction-market-question",
+          recordId: item.id,
+          entityId: item.entityId ?? null,
+          sourceUrl: item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   })
 
   // ---- POST /snapshots/sync ----
@@ -439,6 +458,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const db = getDrizzleDb();
 
     let upserted = 0;
+    let snapshotVerdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const allVals = items.map((item) => ({
@@ -483,23 +503,35 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       // Uses a single UPDATE...FROM subquery instead of N+1 sequential queries.
       const questionIds = [...new Set(items.map((i) => i.questionId))];
       if (questionIds.length > 0) {
-        await tx.execute(sql`
-          UPDATE prediction_market_questions q
-          SET current_probability = sub.probability,
-              updated_at = now()
-          FROM (
-            SELECT DISTINCT ON (question_id)
-              question_id, probability
-            FROM prediction_market_snapshots
-            WHERE question_id = ANY(${questionIds})
-            ORDER BY question_id, date DESC
-          ) sub
-          WHERE q.id = sub.question_id
-        `);
+        await tx
+          .update(predictionMarketQuestions)
+          .set({
+            currentProbability: sql`(
+              SELECT probability FROM prediction_market_snapshots
+              WHERE question_id = ${predictionMarketQuestions.id}
+              ORDER BY date DESC LIMIT 1
+            )`,
+            updatedAt: sql`now()`,
+          })
+          .where(inArray(predictionMarketQuestions.id, questionIds));
       }
+
+      // Write inline verification verdicts atomically within the same transaction
+      snapshotVerdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "prediction-market-snapshot",
+          recordId: item.id,
+          entityId: item.questionId,
+          sourceUrl: item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: snapshotVerdictsResult.written });
   });
 
 // ---- Exports ----

@@ -152,10 +152,11 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
     const domain = extractDomain(url);
 
     // Page aggregation
-    if (!pageMap.has(pageId)) {
-      pageMap.set(pageId, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
+    const pageIdStr = String(pageId);
+    if (!pageMap.has(pageIdStr)) {
+      pageMap.set(pageIdStr, { total: 0, checked: 0, accurate: 0, inaccurate: 0, unsupported: 0, minorIssues: 0, scoreSum: 0, scoreCount: 0 });
     }
-    const page = pageMap.get(pageId)!;
+    const page = pageMap.get(pageIdStr)!;
     page.total++;
 
     // Domain aggregation
@@ -208,7 +209,7 @@ export async function buildDashboardExport(): Promise<DashboardExport | null> {
       // Flag problematic citations
       if (verdict === 'inaccurate' || verdict === 'unsupported') {
         flagged.push({
-          pageId,
+          pageId: pageIdStr,
           footnote: q.footnote,
           claimText: q.claimText,
           sourceTitle: q.sourceTitle,

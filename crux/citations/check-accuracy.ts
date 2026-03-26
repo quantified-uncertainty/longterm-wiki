@@ -272,7 +272,7 @@ async function main() {
           );
 
           try {
-            const result = await checkAccuracyForPage(page.pageId, {
+            const result = await checkAccuracyForPage(page.pageId!, {
               verbose: concurrency === 1,
               recheck,
             });

@@ -83,25 +83,39 @@ function humanizePersonId(raw: string): string | null {
   return cleaned;
 }
 
-export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PersonEntry[] {
-  return rows.map((row) => {
+export interface PgPersonnelResult {
+  entries: PersonEntry[];
+  /** Number of records excluded because the person name could not be resolved */
+  unresolvedCount: number;
+}
+
+export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult {
+  const entries: PersonEntry[] = [];
+  let unresolvedCount = 0;
+
+  for (const row of rows) {
     const personRef = row.person;
     // Name resolution priority:
     // 1. Structured ref name (from entity JOIN)
     // 2. Pre-resolved name from API (personResolvedName)
     // 3. Humanized raw personId (strips new:, converts slug to title case)
-    // 4. "Unknown" for bare stableIds and numeric PKs
+    // 4. Skip — bare stableIds and numeric PKs are not displayable
     const name =
       personRef?.name ??
       row.personResolvedName ??
-      humanizePersonId(row.personId) ??
-      "Unknown";
+      humanizePersonId(row.personId);
+
+    if (!name) {
+      unresolvedCount++;
+      continue;
+    }
+
     const slug = personRef?.slug ?? undefined;
     const isCurrent = !row.endDate;
     const isFounder = row.isFounder ?? false;
     const isBoard = row.roleType === "board";
 
-    return {
+    entries.push({
       name,
       title: row.role ?? undefined,
       slug,
@@ -114,8 +128,10 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PersonEntry[] {
       roleType: VALID_ROLE_TYPES.has(row.roleType)
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
-    };
-  });
+    });
+  }
+
+  return { entries, unresolvedCount };
 }
 
 /**
@@ -175,10 +191,12 @@ export function mergePgPersonnel(
  */
 export function PeopleSection({
   people,
+  unresolvedCount = 0,
 }: {
   people: PersonEntry[];
+  unresolvedCount?: number;
 }) {
-  if (people.length === 0) return null;
+  if (people.length === 0 && unresolvedCount === 0) return null;
 
   return (
     <section>
@@ -254,6 +272,11 @@ export function PeopleSection({
           </tbody>
         </table>
       </div>
+      {unresolvedCount > 0 && (
+        <p className="text-xs text-muted-foreground mt-2 px-1">
+          {unresolvedCount} additional personnel {unresolvedCount === 1 ? "record" : "records"} pending name resolution
+        </p>
+      )}
     </section>
   );
 }

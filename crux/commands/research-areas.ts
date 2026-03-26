@@ -12,12 +12,49 @@ import {
   matchResearchAreas,
   type ResearchAreaMatch,
 } from "../lib/grant-import/research-area-matcher.ts";
+import { PROGRAM_IDS } from "../lib/grant-import/program-matcher.ts";
 import {
   batchedRequest,
   apiRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
 import { RESEARCH_AREAS } from "../data/research-areas-seed.ts";
+
+// ---------------------------------------------------------------------------
+// Program ID allowlist — only grants from these programs should be matched
+// to AI safety research areas. Global health, animal welfare, and other
+// non-AI-safety programs produce false positives via keyword matching.
+// ---------------------------------------------------------------------------
+
+/**
+ * Set of funding program IDs that may contain AI-safety-relevant grants.
+ * Grants from OTHER programs (global health, animal welfare, etc.) are skipped
+ * during research area matching to prevent false positives.
+ *
+ * A null programId (grant not assigned to any program) is also included
+ * to avoid dropping grants that were not yet matched to a program.
+ */
+const AI_SAFETY_PROGRAM_IDS = new Set<string>([
+  PROGRAM_IDS.OP_AI_SAFETY,
+  PROGRAM_IDS.CG_TECHNICAL_AI_SAFETY_RFP,
+  PROGRAM_IDS.CG_GCR_OPPORTUNITIES,
+  PROGRAM_IDS.OP_BIOSECURITY, // biosecurity overlaps with ai-biosecurity research area
+  PROGRAM_IDS.LTFF_GRANTS,
+  PROGRAM_IDS.SFF_S_PROCESS,
+  PROGRAM_IDS.SFF_SPECULATION,
+  PROGRAM_IDS.FTX_GENERAL,
+  PROGRAM_IDS.FTX_REGRANTING,
+  PROGRAM_IDS.MANIFUND_REGRANTING,
+  PROGRAM_IDS.ACX_2022,
+  PROGRAM_IDS.ACX_2023,
+  PROGRAM_IDS.ACX_2025,
+  PROGRAM_IDS.ARIA_TA1_1,
+  PROGRAM_IDS.ARIA_TA1_2_3,
+  PROGRAM_IDS.ARIA_TA1_4,
+  PROGRAM_IDS.ARIA_TA2,
+  PROGRAM_IDS.ARIA_TA3,
+  PROGRAM_IDS.EAIF_GRANTS, // EA Infrastructure Fund (borderline but plausible)
+]);
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,6 +67,7 @@ interface GrantForMatching {
   amount: number | null;
   organizationId: string;
   granteeId: string | null;
+  programId: string | null;
 }
 
 interface AllGrantsForMatchingResponse {
@@ -117,13 +155,26 @@ async function linkGrants(dryRun: boolean): Promise<void> {
   console.log(`  Total grants: ${allGrants.length}\n`);
 
   // 2. Match each grant to research areas
+  // Only attempt matching for grants from AI-safety-relevant programs.
+  // Grants from global health, animal welfare, and other non-AI-safety programs
+  // produce false positives via keyword matching (e.g. "transparency" matching
+  // interpretability, "evaluation" matching evals, "isolation" matching sandboxing).
   console.log("Matching grants to research areas...");
   const allLinks: GrantLink[] = [];
   let matchedGrants = 0;
+  let skippedGrants = 0;
   const unmatchedGrantsList: GrantForMatching[] = [];
   const areaCounts = new Map<string, { count: number; totalFunding: number }>();
 
   for (const grant of allGrants) {
+    // Skip grants from non-AI-safety programs to prevent false positives.
+    // A null programId means the grant wasn't matched to any known program —
+    // include those so we don't miss newly imported grants without a program.
+    if (grant.programId !== null && !AI_SAFETY_PROGRAM_IDS.has(grant.programId)) {
+      skippedGrants++;
+      continue;
+    }
+
     const matches: ResearchAreaMatch[] = matchResearchAreas({
       name: grant.name,
       description: grant.notes,
@@ -152,11 +203,13 @@ async function linkGrants(dryRun: boolean): Promise<void> {
 
   // 3. Print summary
   console.log("\n=== Matching Results ===");
+  console.log(`  Grants considered: ${allGrants.length - skippedGrants} (skipped ${skippedGrants} non-AI-safety program grants)`);
   console.log(`  Grants matched:    ${matchedGrants}`);
   console.log(`  Grants unmatched:  ${unmatchedGrantsList.length}`);
   console.log(`  Total links:       ${allLinks.length}`);
-  const coveragePct = allGrants.length > 0
-    ? ((matchedGrants / allGrants.length) * 100).toFixed(1)
+  const eligibleGrants = allGrants.length - skippedGrants;
+  const coveragePct = eligibleGrants > 0
+    ? ((matchedGrants / eligibleGrants) * 100).toFixed(1)
     : "0.0";
   console.log(`  Coverage:          ${coveragePct}%\n`);
 

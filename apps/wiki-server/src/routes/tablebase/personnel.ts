@@ -14,6 +14,9 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { logAuditEntries } from "./audit-log.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Helpers: SQL ----
 
@@ -70,6 +73,7 @@ const SyncPersonnelItemSchema = z.object({
   background: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncPersonnelBatchSchema = z.object({
@@ -339,6 +343,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     if (refError) return refError;
 
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const allVals = items.map((item) => ({
@@ -355,6 +360,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         source: item.source ?? null,
         notes: item.notes ?? null,
       }));
+
+      // Fetch existing records for audit log (before upsert)
+      const existingIds = items.map((i) => i.id);
+      const existing = await tx
+        .select()
+        .from(personnel)
+        .where(inArray(personnel.id, existingIds));
+      const existingMap = new Map(existing.map((r) => [r.id, r]));
 
       await tx
         .insert(personnel)
@@ -377,6 +390,22 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Audit log
+      await logAuditEntries(
+        tx,
+        allVals.map((v) => {
+          const old = existingMap.get(v.id);
+          return {
+            recordType: "personnel",
+            recordId: v.id,
+            operation: old ? ("update" as const) : ("insert" as const),
+            oldData: old ? { ...old } : null,
+            newData: { ...v },
+            sourceUrl: v.source ?? null,
+          };
+        })
+      );
 
       // Post-sync: resolve entity FKs for newly synced rows
       // NOTE: Use IN (sqlInList()) not ANY() — Drizzle expands JS arrays as
@@ -466,10 +495,24 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         })
       );
 
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "personnel",
+          recordId: item.id,
+          entityId: item.organizationId,
+          sourceUrl: item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("personnel/sync", items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });
 
 // ---- Exports ----

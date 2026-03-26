@@ -14,7 +14,7 @@ const mockGetAllQuotes = vi.mocked(getAllQuotes);
  * Helper to build a mock quote row matching the API shape (camelCase).
  */
 function makeQuote(overrides: {
-  pageId: string;
+  pageId: number;
   footnote: number;
   claimText: string;
   url?: string;
@@ -29,7 +29,7 @@ function makeQuote(overrides: {
   return {
     id: Math.floor(Math.random() * 100000),
     pageId: overrides.pageId,
-    pageIdInt: null,
+    pageIdInt: null as number | null,
     footnote: overrides.footnote,
     url: overrides.url ?? null,
     resourceId: null,
@@ -76,9 +76,9 @@ describe('buildDashboardExport', () => {
 
   it('returns correct summary for basic data', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'test-page', footnote: 1, claimText: 'Claim A', accuracyVerdict: 'accurate', accuracyScore: 0.95 }),
-      makeQuote({ pageId: 'test-page', footnote: 2, claimText: 'Claim B', accuracyVerdict: 'inaccurate', accuracyScore: 0.2 }),
-      makeQuote({ pageId: 'test-page', footnote: 3, claimText: 'Claim C' }), // unchecked
+      makeQuote({ pageId: 100, footnote: 1, claimText: 'Claim A', accuracyVerdict: 'accurate', accuracyScore: 0.95 }),
+      makeQuote({ pageId: 100, footnote: 2, claimText: 'Claim B', accuracyVerdict: 'inaccurate', accuracyScore: 0.2 }),
+      makeQuote({ pageId: 100, footnote: 3, claimText: 'Claim C' }), // unchecked
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -92,15 +92,15 @@ describe('buildDashboardExport', () => {
 
   it('computes per-page accuracy rate correctly', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'page-a', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'page-a', footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
-      makeQuote({ pageId: 'page-a', footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
-      makeQuote({ pageId: 'page-b', footnote: 1, claimText: 'C4', accuracyVerdict: 'accurate', accuracyScore: 1.0 }),
+      makeQuote({ pageId: 200, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 200, footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
+      makeQuote({ pageId: 200, footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
+      makeQuote({ pageId: 201, footnote: 1, claimText: 'C4', accuracyVerdict: 'accurate', accuracyScore: 1.0 }),
     ]);
 
     const result = (await buildDashboardExport())!;
-    const pageA = result.pages.find(p => p.pageId === 'page-a')!;
-    const pageB = result.pages.find(p => p.pageId === 'page-b')!;
+    const pageA = result.pages.find(p => p.pageId === '200')!;
+    const pageB = result.pages.find(p => p.pageId === '201')!;
 
     expect(pageA.checked).toBe(3);
     expect(pageA.accurate).toBe(2);
@@ -114,15 +114,15 @@ describe('buildDashboardExport', () => {
 
   it('handles minor_issues and unsupported verdicts', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'C1', accuracyVerdict: 'minor_issues', accuracyScore: 0.7 }),
-      makeQuote({ pageId: 'p1', footnote: 2, claimText: 'C2', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'C1', accuracyVerdict: 'minor_issues', accuracyScore: 0.7 }),
+      makeQuote({ pageId: 300, footnote: 2, claimText: 'C2', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
     ]);
 
     const result = (await buildDashboardExport())!;
     expect(result.summary.minorIssueCitations).toBe(1);
     expect(result.summary.unsupportedCitations).toBe(1);
 
-    const page = result.pages.find(p => p.pageId === 'p1')!;
+    const page = result.pages.find(p => p.pageId === '300')!;
     expect(page.minorIssues).toBe(1);
     expect(page.unsupported).toBe(1);
     // accuracy rate includes minor_issues as "acceptable"
@@ -131,9 +131,9 @@ describe('buildDashboardExport', () => {
 
   it('flags inaccurate and unsupported citations', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'Good claim', accuracyVerdict: 'accurate', accuracyScore: 0.95 }),
-      makeQuote({ pageId: 'p1', footnote: 2, claimText: 'Bad claim', accuracyVerdict: 'inaccurate', accuracyScore: 0.2, accuracyIssues: 'Wrong number' }),
-      makeQuote({ pageId: 'p1', footnote: 3, claimText: 'Unsourced claim', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'Good claim', accuracyVerdict: 'accurate', accuracyScore: 0.95 }),
+      makeQuote({ pageId: 300, footnote: 2, claimText: 'Bad claim', accuracyVerdict: 'inaccurate', accuracyScore: 0.2, accuracyIssues: 'Wrong number' }),
+      makeQuote({ pageId: 300, footnote: 3, claimText: 'Unsourced claim', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -144,9 +144,9 @@ describe('buildDashboardExport', () => {
 
   it('computes verdict distribution', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'p1', footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
-      makeQuote({ pageId: 'p1', footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
+      makeQuote({ pageId: 300, footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -158,9 +158,9 @@ describe('buildDashboardExport', () => {
 
   it('computes difficulty distribution', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9, verificationDifficulty: 'easy' }),
-      makeQuote({ pageId: 'p1', footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8, verificationDifficulty: 'hard' }),
-      makeQuote({ pageId: 'p1', footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3, verificationDifficulty: 'hard' }),
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9, verificationDifficulty: 'easy' }),
+      makeQuote({ pageId: 300, footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8, verificationDifficulty: 'hard' }),
+      makeQuote({ pageId: 300, footnote: 3, claimText: 'C3', accuracyVerdict: 'inaccurate', accuracyScore: 0.3, verificationDifficulty: 'hard' }),
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -172,10 +172,10 @@ describe('buildDashboardExport', () => {
 
   it('computes domain analysis correctly', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, url: 'https://arxiv.org/abs/1', claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'p1', footnote: 2, url: 'https://arxiv.org/abs/2', claimText: 'C2', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
-      makeQuote({ pageId: 'p2', footnote: 1, url: 'https://arxiv.org/abs/3', claimText: 'C3', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
-      makeQuote({ pageId: 'p2', footnote: 2, url: 'https://example.com/1', claimText: 'C4', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 1, url: 'https://arxiv.org/abs/1', claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 2, url: 'https://arxiv.org/abs/2', claimText: 'C2', accuracyVerdict: 'inaccurate', accuracyScore: 0.3 }),
+      makeQuote({ pageId: 301, footnote: 1, url: 'https://arxiv.org/abs/3', claimText: 'C3', accuracyVerdict: 'unsupported', accuracyScore: 0.1 }),
+      makeQuote({ pageId: 301, footnote: 2, url: 'https://example.com/1', claimText: 'C4', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -195,8 +195,8 @@ describe('buildDashboardExport', () => {
 
   it('strips www. from domains', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, url: 'https://www.example.com/a', claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'p1', footnote: 2, url: 'https://www.example.com/b', claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
+      makeQuote({ pageId: 300, footnote: 1, url: 'https://www.example.com/a', claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 2, url: 'https://www.example.com/b', claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -206,22 +206,22 @@ describe('buildDashboardExport', () => {
   it('sorts pages by inaccuracy rate (worst first)', async () => {
     mockQuotes([
       // page-good: 100% accurate
-      makeQuote({ pageId: 'page-good', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'page-good', footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
+      makeQuote({ pageId: 400, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 400, footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate', accuracyScore: 0.8 }),
       // page-bad: 50% inaccurate
-      makeQuote({ pageId: 'page-bad', footnote: 1, claimText: 'C3', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'page-bad', footnote: 2, claimText: 'C4', accuracyVerdict: 'inaccurate', accuracyScore: 0.2 }),
+      makeQuote({ pageId: 401, footnote: 1, claimText: 'C3', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 401, footnote: 2, claimText: 'C4', accuracyVerdict: 'inaccurate', accuracyScore: 0.2 }),
     ]);
 
     const result = (await buildDashboardExport())!;
-    expect(result.pages[0].pageId).toBe('page-bad');
-    expect(result.pages[1].pageId).toBe('page-good');
+    expect(result.pages[0].pageId).toBe('401');
+    expect(result.pages[1].pageId).toBe('400');
   });
 
   it('handles average score with null scores', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
-      makeQuote({ pageId: 'p1', footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate' }), // no score
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 2, claimText: 'C2', accuracyVerdict: 'accurate' }), // no score
     ]);
 
     const result = (await buildDashboardExport())!;
@@ -231,7 +231,7 @@ describe('buildDashboardExport', () => {
 
   it('includes exportedAt timestamp', async () => {
     mockQuotes([
-      makeQuote({ pageId: 'p1', footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
+      makeQuote({ pageId: 300, footnote: 1, claimText: 'C1', accuracyVerdict: 'accurate', accuracyScore: 0.9 }),
     ]);
 
     const result = (await buildDashboardExport())!;

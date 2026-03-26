@@ -17,6 +17,8 @@ import {
   upsertThingsInTx,
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -64,6 +66,7 @@ const SyncItemSchema = z.object({
   abstract: z.string().max(10000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncBatchSchema = z.object({
@@ -173,6 +176,7 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const db = getDrizzleDb();
     const now = new Date();
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const entityIds = [...new Set(items.map((i) => i.entityId))];
@@ -242,9 +246,23 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             null,
         }))
       );
+
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "publication",
+          recordId: item.id,
+          entityId: item.entityId,
+          sourceUrl: item.url ?? item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("publications/sync", items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });
 
 export const publicationsRoute = publicationsApp;

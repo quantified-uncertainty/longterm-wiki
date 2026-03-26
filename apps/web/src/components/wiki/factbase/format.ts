@@ -129,8 +129,34 @@ export function formatKBFactValue(
     }
     case "min":
       return `\u2265${formatKBNumber(v.value, unit, display)}`;
-    case "json":
+    case "json": {
+      // Guard: if the JSON value is a nested FactValue object (e.g., malformed YAML
+      // `value: {type: number, value: X, unit: USD}`), format it properly instead of
+      // showing raw JSON. This prevents "[object Object]" or ugly JSON strings.
+      const jv = v.value;
+      if (
+        jv !== null &&
+        typeof jv === "object" &&
+        !Array.isArray(jv) &&
+        "type" in jv &&
+        "value" in jv
+      ) {
+        const nested = jv as { type: string; value: unknown; unit?: string };
+        if (nested.type === "number" && typeof nested.value === "number") {
+          return formatKBNumber(nested.value, unit ?? nested.unit, display, fact.currency);
+        }
+        if (nested.type === "text" && typeof nested.value === "string") {
+          return nested.value;
+        }
+        if (nested.type === "date" && typeof nested.value === "string") {
+          return formatKBDate(nested.value);
+        }
+        if (nested.type === "boolean") {
+          return nested.value ? "Yes" : "No";
+        }
+      }
       return JSON.stringify(v.value);
+    }
     default: {
       // Safety: guard against value being an object (e.g., malformed FactValue
       // or nested object not caught by a specific case). String({}) produces

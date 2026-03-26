@@ -184,15 +184,16 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
 
   // Resolve entity identifier to stableId for API calls
   const db = loadDatabase();
-  const entity = (db.typedEntities ?? db.entities ?? []).find(
-    (e: Record<string, unknown>) =>
+  const entities = db.typedEntities ?? db.entities ?? [];
+  const entity = entities.find(
+    (e) =>
       e.id === entityId ||
-      e.stableId === entityId ||
+      'stableId' in e && (e as { stableId?: string }).stableId === entityId ||
       e.wikiId === entityId
   );
   if (!entity) return claims;
 
-  const stableId = (entity as Record<string, unknown>).stableId as string ?? entityId;
+  const stableId = ('stableId' in entity ? (entity as { stableId?: string }).stableId : undefined) ?? entityId;
 
   // Fetch records from various TableBase endpoints
   const endpoints: Array<{ type: string; path: string; descFn: (r: Record<string, unknown>) => string; sourceField?: string }> = [
@@ -564,6 +565,10 @@ ${c.bold}Examples:${c.reset}
   crux verify page <page-id>               Verify wiki page prose (cited vs uncited claims)
   crux verify page <page-id> --quick       Just count cited vs uncited (no web search)
   crux verify page <page-id> --deep        Also verify uncited claims against web
+  crux verify page <page-id> --fix         Add citations to uncited claims (surgical)
+  crux verify page <page-id> --fix --dry-run  Preview what citations would be added
+  crux verify page --all                   Fast citation density audit across all pages
+  crux verify page --all --limit=100       Show top 100 worst-cited pages
   crux verify stats                        Show overall verification statistics`,
       };
     }
@@ -573,11 +578,19 @@ ${c.bold}Examples:${c.reset}
     }
 
     if (subcommand === 'page') {
-      const { verifyPageCommand } = await import('./verify-page.ts');
       const pageId = args[1];
-      if (!pageId) {
-        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep]' };
+      if (options.all || pageId === '--all') {
+        const { auditAllPagesCommand } = await import('./verify-page.ts');
+        return auditAllPagesCommand(options);
       }
+      if (!pageId) {
+        return { exitCode: 1, output: 'Usage: crux verify page <page-id> [--quick|--deep|--fix]\n       crux verify page --all' };
+      }
+      if (options.fix) {
+        const { addCitationsCommand } = await import('./add-citations.ts');
+        return addCitationsCommand(pageId, options);
+      }
+      const { verifyPageCommand } = await import('./verify-page.ts');
       return verifyPageCommand(pageId, options);
     }
 

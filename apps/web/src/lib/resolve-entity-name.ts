@@ -15,6 +15,7 @@ import {
   getKBEntitySlug,
 } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
+import { getEntityHref } from "@/data/entity-nav";
 import { titleCase } from "@/components/wiki/factbase/format";
 
 /**
@@ -29,14 +30,9 @@ const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
  */
 const NUMERIC_ID_PATTERN = /^\d+$/;
 
-function buildEntityHref(
-  entityType: string,
-  slug: string | undefined,
-  entityId: string,
-): string | null {
-  if (!slug) return `/factbase/entity/${entityId}`;
-  if (entityType === "organization") return `/organizations/${slug}`;
-  if (entityType === "person") return `/people/${slug}`;
+/** Build the canonical href for an entity, falling back to /factbase/entity/{id}. */
+function buildEntityHref(slug: string | undefined, entityId: string): string | null {
+  if (slug) return getEntityHref(slug);
   return `/factbase/entity/${entityId}`;
 }
 
@@ -66,7 +62,7 @@ export function resolveEntityName(
         const slug = getKBEntitySlug(entity.id);
         return {
           name: trimmedDisplayName,
-          href: buildEntityHref(entity.type, slug ?? undefined, entity.id),
+          href: buildEntityHref(slug ?? undefined, entity.id),
         };
       }
     }
@@ -88,7 +84,7 @@ export function resolveEntityName(
     const slug = getKBEntitySlug(entity.id);
     return {
       name: entity.name,
-      href: buildEntityHref(entity.type, slug ?? undefined, entity.id),
+      href: buildEntityHref(slug ?? undefined, entity.id),
     };
   }
 
@@ -98,11 +94,7 @@ export function resolveEntityName(
   if (typedEntity?.title?.trim()) {
     return {
       name: typedEntity.title,
-      href: buildEntityHref(
-        typedEntity.entityType,
-        typedEntity.id,
-        typedEntity.stableId ?? typedEntity.id,
-      ),
+      href: buildEntityHref(typedEntity.id, typedEntity.stableId ?? typedEntity.id),
     };
   }
 

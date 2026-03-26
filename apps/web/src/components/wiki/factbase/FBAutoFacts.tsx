@@ -92,20 +92,21 @@ const SPECIAL_COLLECTIONS = new Set([
   "products",
 ]);
 
-/** Default columns per collection type, used when schema is unavailable. */
+/** Default columns per collection type, used when schema is unavailable.
+ *  Date columns are consistently placed second (after the primary identifier). */
 const DEFAULT_RECORD_COLUMNS: Record<string, string[]> = {
   "funding-rounds": ["date", "raised", "lead_investor"],
   "key-persons": ["person", "title", "start"],
   products: ["name", "launched", "description"],
   "model-releases": ["name", "released", "description"],
-  "board-seats": ["member", "role", "appointed"],
+  "board-seats": ["member", "appointed", "role"],
   "charitable-pledges": ["pledger", "pledge"],
   "equity-positions": ["holder", "stake"],
-  "investments": ["investor", "round_name", "date", "amount", "stake_acquired", "role"],
-  "strategic-partnerships": ["partner", "type", "date", "investment_amount"],
+  "investments": ["investor", "date", "round_name", "amount", "stake_acquired", "role"],
+  "strategic-partnerships": ["partner", "date", "type", "investment_amount", "compute_commitment"],
   "safety-milestones": ["name", "date", "description"],
-  "research-areas": ["name", "description", "started"],
-  grants: ["name", "amount", "date"],
+  "research-areas": ["name", "started", "description"],
+  grants: ["name", "date", "amount"],
 };
 
 /** Excluded fields (metadata, not useful in summary view). */
@@ -175,6 +176,35 @@ function field(item: FactBaseRecordEntry, key: string): string | undefined {
   return undefined; // Don't coerce arrays/objects
 }
 
+/**
+ * Find the first explicit endpoint that uses displayName (allowDisplayName + required).
+ * Returns the endpoint name (e.g. "partner") or undefined.
+ */
+function findDisplayNameEndpoint(schema?: FactBaseRecordSchema): string | undefined {
+  if (!schema?.endpoints) return undefined;
+  for (const [name, ep] of Object.entries(schema.endpoints)) {
+    if (!ep.implicit && ep.allowDisplayName) return name;
+  }
+  return undefined;
+}
+
+/**
+ * Get the effective value for a column, considering displayName fallback.
+ * When an explicit endpoint uses allowDisplayName, the value is stored
+ * in item.displayName rather than item.fields[endpointName].
+ */
+function getColumnValue(
+  item: FactBaseRecordEntry,
+  col: string,
+  displayNameEndpoint?: string,
+): unknown {
+  const fieldVal = item.fields[col];
+  if (fieldVal != null) return fieldVal;
+  // Fall back to displayName for the endpoint that uses it
+  if (col === displayNameEndpoint && item.displayName) return item.displayName;
+  return undefined;
+}
+
 /** Resolve which columns to show for a collection, including explicit endpoints. */
 function resolveRecordColumns(
   collectionName: string,
@@ -183,13 +213,15 @@ function resolveRecordColumns(
 ): string[] {
   const defaults = DEFAULT_RECORD_COLUMNS[collectionName];
   const fieldDefs = schema?.fields;
+  const displayNameEndpoint = findDisplayNameEndpoint(schema);
 
   // Collect explicit endpoint names (e.g. "holder", "pledger", "investor")
   // Only include if at least one item actually has the field populated
+  // (also checks displayName for allowDisplayName endpoints)
   const explicitEndpoints: string[] = [];
   if (schema?.endpoints) {
     for (const [name, ep] of Object.entries(schema.endpoints)) {
-      if (!ep.implicit && items.some((item) => item.fields[name] != null)) {
+      if (!ep.implicit && items.some((item) => getColumnValue(item, name, displayNameEndpoint) != null)) {
         explicitEndpoints.push(name);
       }
     }
@@ -251,23 +283,23 @@ function SourceCell({ source }: { source: string | undefined }) {
     );
   }
   return (
-    <span className="text-muted-foreground/30" title="No source URL" aria-label="No source">
+    <span className="text-muted-foreground/50" title="No source URL" aria-label="No source">
       {"\u2014"}
     </span>
   );
 }
 
 /** Section divider with title and optional count badge. */
-function SectionDivider({ title, count }: { title: string; count?: number }) {
+function SectionDivider({ title, count, id }: { title: string; count?: number; id?: string }) {
   return (
-    <div className="flex items-center gap-2 mb-2 mt-5 first:mt-0">
-      <h3 className="text-sm font-bold tracking-tight text-foreground">{title}</h3>
+    <div id={id} className="flex items-center gap-2 mb-2 mt-5 first:mt-0 scroll-mt-4">
+      <h3 className="text-base font-bold tracking-tight text-foreground">{title}</h3>
       {count != null && (
         <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
           {count}
         </span>
       )}
-      <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
+      <div className="flex-1 h-px bg-gradient-to-r from-border/50 to-transparent" />
     </div>
   );
 }
@@ -284,9 +316,9 @@ function StatCard({
 }) {
 
   return (
-    <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
+    <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
       <div className="absolute top-0 right-0 w-12 h-12 bg-primary/[0.03] rounded-bl-[2rem]" />
-      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
+      <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
         {prop?.name ?? titleCase(propertyId)}
       </div>
       <div className="text-lg font-bold tabular-nums tracking-tight text-foreground">
@@ -320,7 +352,7 @@ function PersonCard({ item }: { item: FactBaseRecordEntry }) {
     .toUpperCase();
 
   return (
-    <div className="group relative rounded-lg border border-border/50 bg-card px-2.5 py-2 transition-all hover:shadow-sm hover:border-border">
+    <div className="group relative rounded-lg border border-border/50 bg-card px-2.5 py-2 transition-all hover:shadow-sm hover:border-border h-full">
       <div className="flex items-center gap-2">
         <div className="shrink-0 w-7 h-7 rounded-full bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center text-[10px] font-semibold text-primary/60">
           {initials}
@@ -353,58 +385,68 @@ function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   );
 }
 
-/** Funding round row for timeline display. */
-function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
-  const date = field(item, "date");
-  const raised = item.fields.raised;
-  const valuation = item.fields.valuation;
-  const leadInvestor = field(item, "lead_investor");
-  const instrument = field(item, "instrument");
-  const source = field(item, "source");
-
+/** Funding history table with proper column headers. */
+function FundingHistoryTable({ items }: { items: FactBaseRecordEntry[] }) {
   return (
-    <div className="py-1.5 border-b border-border/30 last:border-b-0">
-      <div className="flex items-baseline gap-2 flex-wrap">
-        <span className="font-semibold text-sm">{name}</span>
-        {instrument && (
-          <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
-            {instrument}
-          </span>
-        )}
-        {date && (
-          <span className="text-xs text-muted-foreground/60">
-            {formatKBDate(date)}
-          </span>
-        )}
-        {raised != null && (
-          <span className="text-sm font-bold tabular-nums tracking-tight">
-            {formatAmount(raised)}
-          </span>
-        )}
-        {valuation != null && (
-          <span className="text-xs text-muted-foreground">
-            at {formatAmount(valuation)} valuation
-          </span>
-        )}
-      </div>
-      {(leadInvestor || (source && isUrl(source))) && (
-        <div className="flex items-baseline gap-2 text-xs text-muted-foreground">
-          {leadInvestor && (
-            <span>Led by <FBRefLink id={leadInvestor} /></span>
-          )}
-          {source && isUrl(source) && (
-            <a
-              href={source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary/40 hover:text-primary hover:underline transition-colors"
-            >
-              {shortDomain(source)}
-            </a>
-          )}
-        </div>
-      )}
+    <div className="overflow-x-auto border border-border/40 rounded-xl">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border/50 bg-muted/20">
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Round</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Date</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Raised</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Valuation</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Lead Investor</th>
+            <th scope="col" className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap">Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item) => {
+            const name = field(item, "name") ?? titleCase(item.key);
+            const date = field(item, "date");
+            const raised = item.fields.raised;
+            const valuation = item.fields.valuation;
+            const leadInvestor = field(item, "lead_investor");
+            const instrument = field(item, "instrument");
+            const source = field(item, "source");
+
+            return (
+              <tr key={item.key} className="border-b border-border/40 last:border-b-0 even:bg-muted/15">
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-medium">{name}</span>
+                    {instrument && instrument !== "equity" && instrument !== "founding" && (
+                      <span className="text-[10px] px-1.5 py-px rounded-full bg-muted text-muted-foreground font-medium">
+                        {instrument}
+                      </span>
+                    )}
+                  </div>
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap text-muted-foreground">
+                  {date ? formatKBDate(date) : "\u2014"}
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap font-mono tabular-nums">
+                  {raised != null ? formatAmount(raised) : <span className="text-muted-foreground">{"\u2014"}</span>}
+                </td>
+                <td className="py-1.5 px-3 align-baseline whitespace-nowrap font-mono tabular-nums">
+                  {valuation != null ? formatAmount(valuation) : <span className="text-muted-foreground">{"\u2014"}</span>}
+                </td>
+                <td className="py-1.5 px-3 align-baseline">
+                  {leadInvestor ? (
+                    // Try rendering as entity ref; falls back to titleCase via FBRefLink
+                    <FBRefLink id={leadInvestor} />
+                  ) : (
+                    <span className="text-muted-foreground">{"\u2014"}</span>
+                  )}
+                </td>
+                <td className="py-1.5 px-3 align-baseline text-center">
+                  <SourceCell source={source} />
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
@@ -417,13 +459,13 @@ function ProductCard({ item }: { item: FactBaseRecordEntry }) {
   const source = field(item, "source");
 
   return (
-    <div className="group rounded-xl border border-border/60 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
+    <div className="group rounded-xl border border-border/50 bg-card p-3.5 transition-all hover:shadow-md hover:border-border">
       <div className="flex items-baseline gap-2">
         <span className="font-semibold text-sm group-hover:text-primary transition-colors">
           {name}
         </span>
         {launched && (
-          <span className="text-[10px] text-muted-foreground/60">
+          <span className="text-xs text-muted-foreground">
             {formatKBDate(launched)}
           </span>
         )}
@@ -438,7 +480,7 @@ function ProductCard({ item }: { item: FactBaseRecordEntry }) {
           href={source}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[10px] text-primary/50 hover:text-primary hover:underline mt-1 inline-block transition-colors"
+          className="text-xs text-primary/60 hover:text-primary hover:underline mt-1 inline-block transition-colors"
         >
           {shortDomain(source)}
         </a>
@@ -454,6 +496,9 @@ function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
   const description = field(item, "description");
   const safetyLevel = field(item, "safety_level");
 
+  // Link to wiki page if the record key matches a KB entity (e.g., "claude-3-5-sonnet")
+  const hasKBEntity = !!getKBEntity(item.key);
+
   return (
     <div className="flex items-start gap-3 py-2.5 border-b border-border/50 last:border-b-0">
       <div className="min-w-[65px] text-xs text-muted-foreground pt-0.5">
@@ -461,9 +506,19 @@ function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="font-medium text-sm">{name}</span>
+          {hasKBEntity ? (
+            <FBRefLink id={item.key} label={name} className="font-medium text-sm" />
+          ) : (
+            <span className="font-medium text-sm">{name}</span>
+          )}
           {safetyLevel && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+            <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+              safetyLevel.includes("ASL-4") || safetyLevel.includes("ASL 4")
+                ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300"
+                : safetyLevel.includes("ASL-3") || safetyLevel.includes("ASL 3")
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+                  : "bg-muted text-muted-foreground"
+            }`}>
               {safetyLevel}
             </span>
           )}
@@ -489,23 +544,27 @@ function TimeSeriesFactRow({
   const prop = items[0]?.property;
   const label = prop?.name ?? titleCase(propertyId);
 
+  // Prefer non-expired active facts as "latest" — undated facts represent
+  // current values and shouldn't be buried by older dated snapshots.
+  const active = items.filter((i) => !isFactExpired(i.fact));
+  const undated = active.find((i) => !i.fact.asOf);
   const sorted = sortFactsByAsOf(items);
-  const latest = sorted[0];
-  const history = sorted.slice(1);
+  const latest = undated ?? sorted[0];
+  const history = sorted.filter((i) => i !== latest);
 
   if (!latest) return null;
 
   return (
     <>
       {/* Main row showing latest value */}
-      <tr className="border-b border-border/30 last:border-b-0">
+      <tr className="border-b border-border/40 last:border-b-0">
         <td className="py-1.5 pr-3 text-sm text-muted-foreground align-baseline whitespace-nowrap">
           {label}
         </td>
         <td className="py-1.5 pr-3 text-sm align-baseline">
           <FBFactValueDisplay fact={latest.fact} property={prop} />
         </td>
-        <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
+        <td className="py-1.5 pr-3 text-xs text-muted-foreground align-baseline whitespace-nowrap">
           {formatKBDate(latest.fact.asOf)}
         </td>
         <td className="py-1.5 align-baseline text-center">
@@ -514,7 +573,7 @@ function TimeSeriesFactRow({
       </tr>
       {/* Expandable history rows */}
       {history.length > 0 && (
-        <tr className="border-b border-border/30 last:border-b-0">
+        <tr className="border-b border-border/40 last:border-b-0">
           <td colSpan={4} className="py-0 pb-1">
             <details className="group/ts">
               <summary className="cursor-pointer select-none text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors py-0.5 flex items-center gap-1">
@@ -528,7 +587,7 @@ function TimeSeriesFactRow({
                 {history.map((item) => (
                   <div
                     key={item.fact.id}
-                    className="flex items-baseline gap-3 py-0.5 text-xs text-muted-foreground/70"
+                    className="flex items-baseline gap-3 py-0.5 text-xs text-muted-foreground"
                   >
                     <span className="whitespace-nowrap min-w-[60px]">
                       {formatKBDate(item.fact.asOf)}
@@ -570,14 +629,14 @@ function SingleFactRow({
   if (!fact) return null;
 
   return (
-    <tr className="border-b border-border/30 last:border-b-0">
+    <tr className="border-b border-border/40 last:border-b-0">
       <td className="py-1.5 pr-3 text-sm text-muted-foreground align-baseline whitespace-nowrap">
         {label}
       </td>
       <td className="py-1.5 pr-3 text-sm align-baseline">
         <FBFactValueDisplay fact={fact} property={prop} />
       </td>
-      <td className="py-1.5 pr-3 text-xs text-muted-foreground/60 align-baseline whitespace-nowrap">
+      <td className="py-1.5 pr-3 text-xs text-muted-foreground align-baseline whitespace-nowrap">
         {fact.asOf ? formatKBDate(fact.asOf) : ""}
       </td>
       <td className="py-1.5 align-baseline text-center">
@@ -587,16 +646,24 @@ function SingleFactRow({
   );
 }
 
+/** Max rows to show in a generic collection table (server component, no toggle). */
+const MAX_GENERIC_ROWS = 12;
+
 /** Render a record collection as a table (generic fallback). */
 function RecordCollectionSection({
   collectionName,
   items,
+  entityId,
+  sectionId,
 }: {
   collectionName: string;
   items: FactBaseRecordEntry[];
+  entityId: string;
+  sectionId?: string;
 }) {
   const recordSchema = items[0] ? getKBRecordSchema(items[0].schema) : undefined;
   const fieldDefs = recordSchema?.fields;
+  const displayNameEndpoint = findDisplayNameEndpoint(recordSchema);
   const cols = resolveRecordColumns(collectionName, items, recordSchema);
 
   // Build set of endpoint column names for entity-ref rendering
@@ -607,9 +674,26 @@ function RecordCollectionSection({
     }
   }
 
+  // Filter out rows where ALL displayed columns have null/undefined values
+  const nonEmptyItems = items.filter((item) =>
+    cols.some((col) => getColumnValue(item, col, displayNameEndpoint) != null),
+  );
+
+  if (nonEmptyItems.length === 0) return null;
+
+  // Sort by date descending if a date column exists
+  const dateCol = cols.find((c) => c === "date" || c === "appointed" || c === "started" || c === "launched");
+  const sortedItems = dateCol ? sortKBRecords(nonEmptyItems, dateCol, true) : nonEmptyItems;
+
+  // Cap at MAX_GENERIC_ROWS for server-rendered view
+  const isTruncated = sortedItems.length > MAX_GENERIC_ROWS;
+  const displayItems = isTruncated
+    ? sortedItems.slice(0, MAX_GENERIC_ROWS)
+    : sortedItems;
+
   return (
     <div className="mt-4">
-      <SectionDivider title={titleCase(collectionName)} count={items.length} />
+      <SectionDivider title={titleCase(collectionName)} count={nonEmptyItems.length} id={sectionId} />
       <div className="overflow-x-auto border border-border/40 rounded-xl">
         <table className="w-full text-sm">
           <thead>
@@ -618,7 +702,7 @@ function RecordCollectionSection({
                 <th
                   key={col}
                   scope="col"
-                  className="text-left text-xs font-medium text-muted-foreground/70 py-1.5 px-3 whitespace-nowrap"
+                  className="text-left text-xs font-medium text-muted-foreground py-1.5 px-3 whitespace-nowrap"
                 >
                   {titleCase(col)}
                 </th>
@@ -626,32 +710,51 @@ function RecordCollectionSection({
             </tr>
           </thead>
           <tbody>
-            {items.map((item) => (
-              <tr
-                key={item.key}
-                className="border-b border-border/20 last:border-b-0"
-              >
-                {cols.map((col) => (
-                  <td
-                    key={col}
-                    className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
-                  >
-                    {endpointCols.has(col) && typeof item.fields[col] === "string" ? (
-                      <FBRefLink id={item.fields[col] as string} />
-                    ) : (
-                      <FBCellValue
-                        value={item.fields[col]}
-                        fieldName={col}
-                        fieldDef={fieldDefs?.[col]}
-                      />
-                    )}
-                  </td>
-                ))}
-              </tr>
-            ))}
+            {displayItems.map((item) => {
+              return (
+                <tr
+                  key={item.key}
+                  className="border-b border-border/40 last:border-b-0 even:bg-muted/15"
+                >
+                  {cols.map((col) => {
+                    const val = getColumnValue(item, col, displayNameEndpoint);
+                    const isEndpoint = endpointCols.has(col);
+                    const isDisplayNameFallback = col === displayNameEndpoint && item.fields[col] == null && item.displayName != null;
+                    return (
+                      <td
+                        key={col}
+                        className="py-1.5 px-3 text-sm align-baseline whitespace-normal"
+                      >
+                        {isEndpoint && typeof item.fields[col] === "string" ? (
+                          <FBRefLink id={item.fields[col] as string} />
+                        ) : isDisplayNameFallback ? (
+                          <span className="font-medium">{item.displayName}</span>
+                        ) : (
+                          <FBCellValue
+                            value={val}
+                            fieldName={col}
+                            fieldDef={fieldDefs?.[col]}
+                          />
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      {isTruncated && (
+        <div className="mt-1.5 text-center">
+          <Link
+            href={`/factbase/entity/${entityId}`}
+            className="text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
+          >
+            View all {nonEmptyItems.length} {titleCase(collectionName).toLowerCase()} in full profile &rarr;
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -712,21 +815,32 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
   const modelReleases = allCollections["model-releases"];
   const products = allCollections["products"];
 
-  const sortedFundingRounds = fundingRounds ? sortKBRecords(fundingRounds, "date", false) : [];
-  const sortedModelReleases = modelReleases ? sortKBRecords(modelReleases, "released", false) : [];
+  const sortedFundingRounds = fundingRounds ? sortKBRecords(fundingRounds, "date", true) : [];
+  const sortedModelReleases = modelReleases ? sortKBRecords(modelReleases, "released", true) : [];
 
   // Generic collections = everything not in SPECIAL_COLLECTIONS
   const genericCollections = Object.entries(allCollections)
     .filter(([name]) => !SPECIAL_COLLECTIONS.has(name))
     .sort(([a], [b]) => a.localeCompare(b));
 
+  // Build section nav entries (only for sections that have data)
+  const sectionNavItems: { label: string; id: string }[] = [];
+  if (keyPersons && keyPersons.length > 0) sectionNavItems.push({ label: "Key People", id: "kb-key-people" });
+  if (sortedFundingRounds.length > 0) sectionNavItems.push({ label: "Funding History", id: "kb-funding-history" });
+  if (sortedModelReleases.length > 0) sectionNavItems.push({ label: "Model Releases", id: "kb-model-releases" });
+  if (products && products.length > 0) sectionNavItems.push({ label: "Products", id: "kb-products" });
+  if (substantiveFacts.length > 0) sectionNavItems.push({ label: "All Facts", id: "kb-all-facts" });
+  for (const [name, items] of genericCollections) {
+    if (items && items.length > 0) sectionNavItems.push({ label: titleCase(name), id: `kb-${name}` });
+  }
+
   return (
     <section className="not-prose mt-8 mb-6" aria-labelledby="kb-auto-facts-heading">
       <div>
         {/* Header bar */}
-        <div className="py-2 border-b border-border/60 flex items-center gap-2">
-          <Database size={14} className="text-muted-foreground/60" />
-          <h2 id="kb-auto-facts-heading" className="text-sm font-bold tracking-tight">
+        <div className="py-2 border-b border-border/50 flex items-center gap-2">
+          <Database size={14} className="text-muted-foreground" />
+          <h2 id="kb-auto-facts-heading" className="text-base font-bold tracking-tight">
             Structured Data
           </h2>
           <span className="text-xs text-muted-foreground flex items-center gap-1.5 ml-1">
@@ -737,7 +851,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
               </span>
             )}
             {substantiveFacts.length > 0 && totalRecords > 0 && (
-              <span className="text-muted-foreground/40">{"\u00B7"}</span>
+              <span className="text-muted-foreground/50">{"\u00B7"}</span>
             )}
             {totalRecords > 0 && (
               <span>
@@ -753,6 +867,21 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
           </Link>
         </div>
 
+        {/* Section nav (only when there are multiple sections) */}
+        {sectionNavItems.length > 1 && (
+          <nav className="flex flex-wrap gap-1.5 pt-2 pb-1" aria-label="Structured data sections">
+            {sectionNavItems.map(({ label, id }) => (
+              <a
+                key={id}
+                href={`#${id}`}
+                className="text-[11px] px-2 py-0.5 rounded-full border border-border/50 text-muted-foreground hover:text-foreground hover:border-border hover:bg-muted/50 transition-colors"
+              >
+                {label}
+              </a>
+            ))}
+          </nav>
+        )}
+
         <div className="pt-3">
           {/* 1. Hero stat cards */}
           {heroCards.length > 0 && (
@@ -766,7 +895,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
           {/* 2. Key People */}
           {keyPersons && keyPersons.length > 0 && (
             <>
-              <SectionDivider title="Key People" count={keyPersons.length} />
+              <SectionDivider title="Key People" count={keyPersons.length} id="kb-key-people" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 {keyPersons.map((item) => (
                   <PersonCard key={item.key} item={item} />
@@ -781,12 +910,9 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
               <SectionDivider
                 title="Funding History"
                 count={sortedFundingRounds.length}
+                id="kb-funding-history"
               />
-              <div className="border border-border/40 rounded-xl px-4 bg-card">
-                {sortedFundingRounds.map((item) => (
-                  <FundingRoundRow key={item.key} item={item} />
-                ))}
-              </div>
+              <FundingHistoryTable items={sortedFundingRounds} />
             </>
           )}
 
@@ -796,6 +922,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
               <SectionDivider
                 title="Model Releases"
                 count={sortedModelReleases.length}
+                id="kb-model-releases"
               />
               <div className="border border-border/40 rounded-xl px-4 bg-card">
                 {sortedModelReleases.map((item) => (
@@ -808,7 +935,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
           {/* 5. Products */}
           {products && products.length > 0 && (
             <>
-              <SectionDivider title="Products" count={products.length} />
+              <SectionDivider title="Products" count={products.length} id="kb-products" />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {products.map((item) => (
                   <ProductCard key={item.key} item={item} />
@@ -820,7 +947,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
           {/* 6. Category-grouped facts */}
           {substantiveFacts.length > 0 && (
             <>
-              <SectionDivider title="All Facts" />
+              <SectionDivider title="All Facts" count={substantiveFacts.length} id="kb-all-facts" />
               {categoryKeys.map((category) => {
                 const categoryFacts = byCategory[category];
                 if (!categoryFacts || categoryFacts.length === 0) return null;
@@ -830,7 +957,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
 
                 return (
                   <div key={category} className="mb-3 last:mb-0">
-                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground/60 mb-1 pb-0.5 border-b border-border/40">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-1 pb-0.5 border-b border-border/40">
                       {titleCase(category)}
                     </div>
                     <table className="w-full">
@@ -886,6 +1013,8 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
                 key={name}
                 collectionName={name}
                 items={items}
+                entityId={entityId}
+                sectionId={`kb-${name}`}
               />
             );
           })}

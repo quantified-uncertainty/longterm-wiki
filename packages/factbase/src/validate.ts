@@ -40,6 +40,9 @@
  *
  * Currency:
  * 23. currency-code        (warning)  — Fact has unknown currency code
+ *
+ * Record endpoints (removed — records migrated to PostgreSQL):
+ * 24. record-endpoint-unresolved — REMOVED, now handled at PG/API layer
  */
 
 import type { Graph } from "./graph";
@@ -719,6 +722,10 @@ function checkCurrencyCode(
   return results;
 }
 
+// Note: Check 24 (record-endpoint-unresolved) was removed because records
+// migrated from YAML to PostgreSQL. Endpoint validation now happens at the
+// PG/API layer, not in the FactBase YAML validator.
+
 // ── Graph-level checks (run once across all entities) ─────────────────────────
 
 /** Check 8: duplicate entity IDs across the graph. */
@@ -841,6 +848,7 @@ export function validateEntity(
     ...checkOrphanEntity(graph, entityId),
     ...checkRangeValues(graph, entityId),
     ...checkCurrencyCode(graph, entityId),
+    // checkRecordEndpointUnresolved removed — records are now PG-managed
   ];
 
   const schema = graph.getSchema(entity.type);

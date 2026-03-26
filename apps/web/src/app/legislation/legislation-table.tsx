@@ -339,6 +339,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
           <div className="flex flex-wrap gap-1.5">
             <button
               onClick={() => setStatusFilter("all")}
+              aria-pressed={statusFilter === "all"}
               className={`${pillBase} ${statusFilter === "all" ? pillActive : pillInactive}`}
             >
               All
@@ -348,6 +349,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
               <button
                 key={status}
                 onClick={() => setStatusFilter(statusFilter === status ? "all" : status)}
+                aria-pressed={statusFilter === status}
                 className={`${pillBase} capitalize ${statusFilter === status ? pillActive : pillInactive}`}
               >
                 {status}
@@ -364,6 +366,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
               <span className="text-xs text-muted-foreground/70 mr-0.5">Scope:</span>
               <button
                 onClick={() => setScopeFilter("all")}
+                aria-pressed={scopeFilter === "all"}
                 className={`${pillBase} ${scopeFilter === "all" ? pillActive : pillInactive}`}
               >
                 All
@@ -372,6 +375,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
                 <button
                   key={scope}
                   onClick={() => setScopeFilter(scopeFilter === scope ? "all" : scope)}
+                  aria-pressed={scopeFilter === scope}
                   className={`${pillBase} capitalize ${scopeFilter === scope ? pillActive : pillInactive}`}
                 >
                   {scope}
@@ -385,6 +389,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
             <span className="text-xs text-muted-foreground/70 mr-0.5">View:</span>
             <button
               onClick={() => setGroupByJurisdiction((g) => !g)}
+              aria-pressed={groupByJurisdiction}
               className={`text-xs px-2.5 py-1 rounded-md border transition-all ${
                 groupByJurisdiction
                   ? "bg-primary/10 border-primary/30 text-primary font-medium"
@@ -397,6 +402,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
               <button
                 key={col.key}
                 onClick={() => toggleColumn(col.key)}
+                aria-pressed={visibleColumns.has(col.key)}
                 className={`text-xs px-2.5 py-1 rounded-md border transition-all ${
                   visibleColumns.has(col.key)
                     ? "bg-primary/10 border-primary/30 text-primary font-medium"

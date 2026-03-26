@@ -1,0 +1,140 @@
+---
+wikiId: E2606
+title: TSMC
+description: Taiwan Semiconductor Manufacturing Company, the world's largest dedicated semiconductor foundry and critical infrastructure for global AI hardware development.
+subcategory: industry
+sidebar:
+  order: 50
+lastEdited: 2026-03-25
+createdAt: 2026-03-25
+summary: Comprehensive overview of TSMC's role as the critical chokepoint for global AI hardware, covering business model, geopolitical risk, AI safety implications, and controversies including Arizona expansion difficulties, espionage incidents, and discrimination lawsuits. The article is well-structured and appropriately balanced but relies heavily on internal 'LongtermWiki research compilation' citations rather than primary sources, limiting verifiability.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Attribute | Value |
+|-----------|-------|
+| **Full Name** | Taiwan Semiconductor Manufacturing Company Limited (TSMC) |
+| **Type** | Public company (contract semiconductor manufacturer) |
+| **Founded** | 1987 |
+| **Founder** | Morris Chang |
+| **Headquarters** | Hsinchu Science Park, Taiwan |
+| **Market Position** | World's largest dedicated semiconductor foundry; ≈53% global foundry market share |
+| **AI Relevance** | Manufactures over 90% of the world's most advanced semiconductors (&lt;5nm); sole or primary manufacturer of chips for Nvidia, Apple, AMD, and other leading AI hardware firms |
+| **Revenue (2025)** | \$122.4 billion (35.9% YoY increase) |
+| **Stock Listings** | TWSE:2330, NYSE:TSM |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/TSMC) |
+
+## Overview
+
+Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated contract chipmaker, responsible for manufacturing semiconductors for companies including Apple, Nvidia, Broadcom, AMD, and Qualcomm. Founded in 1987 by Morris Chang, TSMC pioneered the "pure-play foundry" model — manufacturing chips exclusively for other companies rather than designing or selling branded products of its own. This model allowed fabless chip design firms to flourish without owning fabrication infrastructure, reshaping the global semiconductor industry. TSMC now holds approximately 53% of the global foundry market and is responsible for manufacturing over 90% of the world's most advanced semiconductors below 5 nanometers.[^1]
+
+TSMC's strategic importance extends well beyond its commercial role. The company accounts for roughly 15% of Taiwan's GDP and produces chips that underpin virtually every major AI system, consumer electronics product, and defense application worldwide. This concentration has given rise to the concept of Taiwan's "silicon shield" — the idea that TSMC's indispensability to the global economy provides Taiwan with a form of geopolitical deterrence against military aggression. At the same time, it has made TSMC a focal point in U.S.-China technological competition, supply chain security debates, and discussions about the infrastructure dependencies of AI development.[^2]
+
+For AI safety researchers and analysts, TSMC occupies a particularly critical position. The company manufactures the Nvidia H100, A100, and Blackwell GPU families that power large-scale AI training and inference, as well as the chips used by <EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, and other frontier AI labs. Disruption to TSMC — whether from geopolitical conflict, natural disaster, or sabotage — would substantially set back global AI development timelines. The EA and rationalist communities have discussed TSMC extensively in the context of Taiwan invasion risk, AI hardware scaling, and the concentration of critical compute infrastructure.[^3]
+
+## History
+
+### Founding (1987)
+
+TSMC was established in 1987 as a joint venture between Taiwan's government (via the National Development Fund, contributing approximately 48% equity), Dutch electronics firm Philips (contributing approximately 27.5% equity plus \$58 million, production technology, and intellectual property licenses), and private investors.[^4] The founding grew out of the Industrial Technology Research Institute (ITRI), a Taiwanese government research body that had been developing semiconductor manufacturing capabilities.
+
+Morris Chang, who had spent 25 years at Texas Instruments before briefly serving as president and chief operating officer of General Instrument in 1984, was recruited by Li Kwoh-ting of Taiwan's Executive Yuan in 1986 to lead ITRI and build Taiwan's chip industry. Chang's insight was that a dedicated foundry — one that would never compete with its customers by designing its own chips — could attract fabless design companies who otherwise had no path to manufacturing. Texas Instruments and Intel both declined to participate in the joint venture before Philips agreed.[^4]
+
+James E. Dykes, a former GE semiconductor director brought in through Philips' involvement, served as TSMC's first CEO but left after approximately one year. Morris Chang then assumed the CEO role, which he held until 2005, continuing as chairman until 2018.[^4]
+
+### Early Growth
+
+TSMC's first factory reused an ITRI production line. Intel became TSMC's first U.S. customer after visiting in late 1987, following a trial run that required TSMC to meet rigorous quality standards including statistical process control. By 1990, revenue had reached \$110 million. The company went public on the Taiwan Stock Exchange in 1994 at a market capitalization of approximately \$2 billion, and revenue surpassed \$1 billion the following year. TSMC listed American Depositary Shares on the New York Stock Exchange in 1997.[^4]
+
+By 2000, TSMC was operating five factories producing more than 3 million wafers per year and beginning to plan global expansion including early facilities in Arizona.
+
+### Technology Leadership
+
+TSMC became the first foundry to commercialize 7nm process nodes, then 5nm (used in Apple's A14 and M1 chips, MediaTek's Dimensity 8100, and AMD's Ryzen 7000 series), and was the first to achieve high-volume production using extreme ultraviolet (EUV) lithography. The company currently produces chips ranging from 2-micron to 3-nanometer process nodes, with 2nm volume production beginning in the second half of 2025 at facilities in Hsinchu and Kaohsiung.[^5]
+
+In 2025, TSMC surpassed \$100 billion in annual revenue for the first time, reporting full-year net revenue of \$122.4 billion — a 35.9% increase from 2024 — driven primarily by AI hardware demand. High-performance computing (HPC) accounted for 58% of 2025 revenue, up from 51% the prior year, reflecting the growing share of AI chip production in TSMC's output.[^6]
+
+## Business Model and Market Position
+
+TSMC's foundry model rests on a commitment not to compete with customers. By refusing to design or brand its own chips, TSMC can serve competing fabless companies simultaneously — manufacturing chips for Apple and Qualcomm, or for AMD and Nvidia, without the conflicts of interest that would arise if it were also a chip designer. This has enabled the company to attract the world's leading semiconductor designers as customers and to invest heavily in manufacturing process innovation without the distraction of product development.
+
+The company holds approximately 53% of the global foundry market, with Taiwanese foundries collectively holding 67%.[^1] In 2021, Apple alone accounted for approximately 26% of TSMC's revenue.[^1] TSMC is Taiwan's largest company, accounting for roughly 15% of Taiwan's GDP and approximately 30% of the Taiwan Stock Exchange's main index.[^2]
+
+Taiwan's integrated circuit exports reached \$184 billion in 2022 — approximately 25% of Taiwan's GDP — with TSMC producing over 60% of the world's semiconductors by value. The company's global manufacturing capacity is approximately 13 million 300mm-equivalent wafers per year.[^1]
+
+## Role in AI Hardware
+
+TSMC's relevance to AI development stems from its position as the sole or primary manufacturer of the advanced chips that power large-scale AI training and inference. Nvidia's A100, H100, and Blackwell GPU families — the chips used to train and run frontier AI models — are manufactured at TSMC's advanced nodes. AMD's AI accelerators and Apple's M-series chips, which increasingly feature on-device inference capabilities, are similarly TSMC products.
+
+The company produces over 90% of the world's most advanced semiconductors below 5nm, a concentration that makes it effectively irreplaceable in the near term for leading-edge AI compute.[^7] EA Forum and LessWrong discussions have characterized TSMC's manufacturing expertise as a "Coca-Cola recipe" — proprietary knowledge about achieving high yields at challenging process nodes, built up through decades of tacit engineering experience and embedded supplier relationships with companies like ASML and Applied Materials, that rivals could not quickly replicate even if they obtained TSMC's equipment.[^3]
+
+TSMC's capital expenditure in 2025 was \$40.9 billion, up from \$29.8 billion in 2024, with 2026 spending projected at \$52–56 billion. Of that 2026 figure, 60–80% is directed toward advanced process development. The company is building nine new advanced factories in 2025 — eight wafer fabs and one advanced packaging facility — and plans to quadruple CoWoS (Chip-on-Wafer-on-Substrate) advanced packaging capacity to 130,000 wafers monthly by late 2026.[^5]
+
+## Geopolitical Significance and AI Safety Implications
+
+TSMC's concentration in Taiwan creates a significant single point of failure for global AI development and the broader technology economy. A Chinese military seizure of Taiwan — or even a naval blockade — could halt production of the advanced chips that AI labs, consumer electronics companies, defense contractors, and data center operators depend upon. Community analyses on LessWrong and the EA Forum suggest that losing TSMC's manufacturing capacity and engineering workforce would delay rivals by at least a decade, given the tacit knowledge embedded in TSMC's processes and the tightly integrated supplier ecosystem.[^3]
+
+The "silicon shield" concept holds that Taiwan's indispensability to the global chip supply makes military aggression against Taiwan prohibitively costly for China. However, this deterrence is incomplete: it depends on other actors perceiving the costs correctly and on Taiwan's semiconductor infrastructure remaining intact (rather than being sabotaged or seized) in any conflict scenario. TSMC has publicly acknowledged planning for scenarios in which its advanced equipment and processes could be rendered inoperable to prevent capture.[^7]
+
+The U.S. government has responded to these vulnerabilities through the CHIPS and Science Act, awarding TSMC a \$6.6 billion grant and \$5 billion in loans to support construction of advanced fabrication facilities in Arizona. TSMC's Arizona investment is projected at approximately \$165 billion in total. A third Arizona fab has begun construction, with high-volume manufacturing expected in the second half of 2027, linked to a broader \$250-billion U.S.-Taiwan trade deal.[^6]
+
+<EntityLink id="E114">Eliezer Yudkowsky</EntityLink> and <EntityLink id="E220">Paul Christiano</EntityLink> have both engaged with questions of AI hardware dependencies in broader discussions of AI takeoff scenarios, though their specific views on TSMC's role are not directly stated in available sources.[^3]
+
+## Criticism and Controversies
+
+### Arizona Expansion Difficulties
+
+TSMC's U.S. expansion has been marked by significant difficulties. The \$40 billion Arizona Fab 21 project was delayed by at least two years from initial targets, with volume production pushed to 2025 due to skilled labor shortages, supply chain failures, and construction accidents. Local chemical supplies failed TSMC's quality standards and cost approximately five times more than Taiwanese equivalents, requiring TSMC to import ultra-pure sulfuric acid from Taiwan (over 6,500 miles) for a period — with even Intel purchasing from the same shipments.[^8]
+
+Construction incidents included a pipe collapse caused by unauthorized field modifications that damaged structural supports, and a separate fire incident during construction. Wafer contamination from a foreign polymer in chemical supplies resulted in 10,000–30,000 wafers being scrapped, corresponding to an estimated \$550 million in lost revenue.[^8] TSMC chairman Mark Liu resigned in December 2023, with reports attributing the departure in part to persistent Arizona problems.[^9]
+
+TSMC also initially resisted CHIPS Act conditions, with Chairman Liu characterizing some requirements as unacceptable in early 2023. TSMC founder Morris Chang publicly characterized the broader U.S. effort to onshore semiconductor manufacturing as an "expensive exercise in futility" given skilled worker shortages.[^9]
+
+### Workplace Discrimination Allegations
+
+A lawsuit filed by former employee David Amiri, a fire protection expert hired in 2022 for TSMC's Phoenix plant, alleges a pattern of discrimination favoring East Asian employees at the Arizona facility. The suit claims non-East Asian workers were subjected to verbal abuse, isolation, and a hostile work environment, and that safety concerns raised by workers were dismissed. The lawsuit had grown to 28 plaintiffs as of available reports. TSMC stated in court filings that it employs a team of over 3,000 people working toward equal treatment at the Phoenix site and declined on-camera media interviews.[^10]
+
+### Technology Theft and Espionage
+
+In August 2025, Taiwan's High Prosecutors Office indicted three former TSMC engineers for violating the National Security Act by leaking trade secrets related to TSMC's 2-nanometer chip technology. An additional case involved two current and six former employees who allegedly acquired 2nm process secrets; one suspect had subsequently taken a position with Tokyo Electron, a partner in Japan's Rapidus chip manufacturing initiative, and was terminated upon discovery. TSMC stated it maintains a zero-tolerance policy and reported the incidents promptly. CEO C.C. Wei noted that the complexity of 2nm manufacturing means that full theft by a small group is not feasible.[^11]
+
+Chinese state-sponsored hackers have also been reported to have targeted TSMC's semiconductor intellectual property over a period of years.[^11]
+
+### Geopolitical Tensions Around U.S. Expansion
+
+Taiwan's opposition Kuomintang (KMT) party criticized the ruling administration for allowing TSMC to build the Arizona plant, arguing it erodes the "silicon shield" that helps deter Chinese military action. The KMT characterized TSMC as acting under ruling party directives and questioned the plant's strategic and economic implications for Taiwan. TSMC's capital expenditure from 2019 to 2021 represented approximately 12% of Taiwan's total domestic capital expenditure, making its geographic deployment decisions consequential at the national level.[^9]
+
+### Concerns About Concentration
+
+From an AI safety perspective, some analysts raise concerns about the implications of TSMC's dominance running in the opposite direction: the concentration of advanced chip manufacturing in a single company creates leverage points that could be used to monitor, restrict, or shape AI development — for better or worse depending on who exercises that leverage and for what purposes. The U.S. government has pressed TSMC on transparency, capacity allocation, and national security considerations as part of the CHIPS Act funding relationship.[^7]
+
+## Key Uncertainties
+
+Several uncertainties are relevant for those tracking TSMC's role in AI development:
+
+- **Taiwan conflict risk**: The probability, timeline, and nature of potential Chinese military action against Taiwan remains deeply uncertain and contested among analysts. The consequences for global AI development would be severe, but the deterrent effects of the silicon shield are difficult to quantify.
+- **Technology diffusion**: Whether competitors — particularly SMIC in China, Samsung in South Korea, or Intel in the U.S. — can close the gap with TSMC's advanced process nodes, and on what timeline, has significant implications for both AI hardware availability and geopolitical risk.
+- **AI demand trajectory**: TSMC CEO C.C. Wei acknowledged uncertainty about whether the semiconductor market could sustain strong growth for multiple consecutive years, even amid current AI demand strength.
+- **U.S. expansion viability**: The long-term viability and competitiveness of TSMC's U.S. fabs, which have historically faced ~50% higher production costs than Taiwan facilities, remains unproven at scale.
+- **Trade policy**: Tariffs and trade restrictions between the U.S., Taiwan, and China could significantly affect TSMC's cost structure and customer relationships.
+
+## Sources
+
+[^1]: TSMC company overview and market data - LongtermWiki research compilation (overview section)
+[^2]: Taiwan semiconductor industry statistics and TSMC geopolitical role - LongtermWiki research compilation (overview section)
+[^3]: EA Forum and LessWrong discussions on TSMC, Taiwan invasion risk, and AI hardware dependencies - LongtermWiki research compilation (community section)
+[^4]: TSMC founding history, joint venture structure, and early leadership - LongtermWiki research compilation (history section)
+[^5]: TSMC manufacturing expansion and process node roadmap - LongtermWiki research compilation (news section)
+[^6]: TSMC 2025 financial results and 2026 outlook - LongtermWiki research compilation (news/impact sections)
+[^7]: TSMC role in AI infrastructure and geopolitical risk analysis - LongtermWiki research compilation (AI safety section)
+[^8]: TSMC Arizona fab operational failures and supply chain challenges - LongtermWiki research compilation (failures section)
+[^9]: TSMC political controversies, CHIPS Act friction, and Arizona leadership issues - LongtermWiki research compilation (incentives section)
+[^10]: TSMC Arizona workplace discrimination lawsuit - LongtermWiki research compilation (criticism section)
+[^11]: TSMC trade secret theft incidents and espionage - LongtermWiki research compilation (criticism section)

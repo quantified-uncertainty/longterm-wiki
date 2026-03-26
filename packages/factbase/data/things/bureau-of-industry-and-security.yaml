@@ -1,0 +1,75 @@
+entity: GVy4_Tlsa-
+facts:
+  # ── Organizational ──────────────────────────────────────────────
+  - id: f_bis_found
+    property: founded-date
+    value: "2002-04"
+    source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    notes: "Established as BIS in 2002; successor to Bureau of Export Administration (BXA)"
+
+  - id: f_bis_hq
+    property: headquarters
+    value: "Washington, DC"
+    source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+
+  - id: f_bis_country
+    property: country
+    value: United States
+    source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+
+  - id: f_bis_website
+    property: website
+    value: https://www.bis.gov
+    source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+
+  - id: f_bis_wiki
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+
+  # ── Description ─────────────────────────────────────────────────
+  - id: f_bis_desc
+    property: description
+    value: >-
+      U.S. Department of Commerce agency responsible for administering the Export
+      Administration Regulations (EAR). Maintains the Commerce Control List (CCL) and
+      Entity List. Primary regulatory body governing exports of advanced AI chips and
+      semiconductor equipment since October 2022.
+    asOf: 2026-03
+
+  # ── Leadership ──────────────────────────────────────────────────
+  - id: f_bis_leader
+    property: leadership
+    value: Alan Estevez
+    asOf: 2026-03
+    source: https://www.bis.gov/about-bis
+    notes: "Under Secretary of Commerce for Industry and Security"
+
+  # ── Key events ──────────────────────────────────────────────────
+  - id: f_bis_oct2022
+    property: key-event
+    value: "Implemented sweeping export controls on AI chips and semiconductor equipment to China"
+    asOf: 2022-10
+    source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
+    notes: "October 7, 2022 rules; described as 'new strategic approach' to export controls"
+
+  - id: f_bis_oct2023
+    property: key-event
+    value: "Expanded chip export controls, closing loopholes exploited by Nvidia's A800/H800 China-specific chips"
+    asOf: 2023-10
+    source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
+    notes: "Updated performance thresholds and expanded equipment restrictions"
+
+  - id: f_bis_dec2024
+    property: key-event
+    value: "Expanded FDPR to cover essentially all advanced chips manufactured anywhere using U.S.-origin equipment"
+    asOf: 2024-12
+    source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
+    notes: "December 2024 FDPR expansion extended U.S. regulatory reach globally"
+
+  - id: f_bis_diffusion_rescind
+    property: key-event
+    value: "Rescinded Biden-era AI Diffusion Rule before its compliance date"
+    asOf: 2025-05
+    source: https://www.bis.gov/press-release/department-commerce-announces-recission-biden-era-artificial-intelligence-diffusion-rule-strengthens-chip
+    notes: "Rescinded on May 13, 2025, before May 15 compliance date"

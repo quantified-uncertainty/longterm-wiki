@@ -11,6 +11,8 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -44,6 +46,7 @@ const SyncBenchmarkResultItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncBenchmarkResultBatchSchema = z.object({
@@ -188,6 +191,7 @@ const benchmarkResultsApp = new Hono()
 
     const now = new Date();
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       for (const item of parsed.data.items) {
@@ -234,9 +238,23 @@ const benchmarkResultsApp = new Hono()
           sourceUrl: br.sourceUrl,
         }))
       );
+
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        parsed.data.items.map((item) => ({
+          recordType: "benchmark-result",
+          recordId: item.id,
+          entityId: item.modelId,
+          sourceUrl: item.sourceUrl ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("benchmark-results/sync", parsed.data.items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });
 
 export const benchmarkResultsRoute = benchmarkResultsApp;

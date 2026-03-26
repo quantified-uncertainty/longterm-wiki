@@ -91,7 +91,8 @@ function apiEntityToRow(e: DirectoryEntity): AiModelRow {
     modelTier,
     generation: (meta.generation as string | undefined) ?? null,
     developer: developer?.entityId ?? (meta.developer as string | undefined) ?? null,
-    developerName: developer?.name ?? null,
+    developerName: developer?.name
+      ?? (meta.developer ? (getTypedEntityById(meta.developer as string)?.title ?? null) : null),
     releaseDate,
     inputPrice: (meta.inputPrice as number | undefined) ?? null,
     outputPrice: (meta.outputPrice as number | undefined) ?? null,

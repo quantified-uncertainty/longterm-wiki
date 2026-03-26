@@ -62,7 +62,7 @@ async function main() {
       } else {
         // Re-upsert with the resource_id populated
         await upsertCitationQuote({
-          pageId: quote.pageId,
+          pageId: String(quote.pageId),
           footnote: quote.footnote,
           url: quote.url,
           resourceId: resource.id,

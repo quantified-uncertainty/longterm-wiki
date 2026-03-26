@@ -13,6 +13,8 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -52,6 +54,7 @@ const SyncDivisionItemSchema = z.object({
   website: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncDivisionsBatchSchema = z.object({
@@ -227,6 +230,7 @@ const divisionsApp = new Hono()
     const db = getDrizzleDb();
 
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const allVals = items.map((item) => ({
@@ -286,10 +290,24 @@ const divisionsApp = new Hono()
         }))
       );
 
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "division",
+          recordId: item.id,
+          entityId: item.parentOrgId,
+          sourceUrl: item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("divisions/sync", items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });
 
 // ---- Exports ----

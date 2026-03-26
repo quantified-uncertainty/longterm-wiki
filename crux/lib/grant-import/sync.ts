@@ -113,7 +113,7 @@ export async function syncToServer(
       console.log(`    → ${result.data.upserted} upserted`);
     } else {
       failedBatches++;
-      console.error(`    ✗ Batch ${batchNum} failed:`, result.error);
+      console.error(`    ✗ Batch ${batchNum} failed:`, result.error, result.message ?? "");
     }
   }
 

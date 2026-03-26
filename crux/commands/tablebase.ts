@@ -254,11 +254,62 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   }
 
   const count = result.data.upserted ?? result.data.updated ?? records.length;
+
+  // Write manifest file for PR audit trail
+  const { promises: fsPromises } = await import('fs');
+  const path = await import('path');
+  const { PROJECT_ROOT: projRoot } = await import('../lib/content-types.ts');
+
+  const manifestDir = path.join(projRoot, 'data', 'tablebase-manifests');
+  await fsPromises.mkdir(manifestDir, { recursive: true });
+
+  const now = new Date();
+  const dateStr = now.toISOString().slice(0, 10);
+  const timeStr = now.toISOString().slice(11, 19).replace(/:/g, '');
+  const manifestPath = path.join(manifestDir, `${dateStr}-${timeStr}-${table}.json`);
+
+  const manifest = {
+    table,
+    recordCount: records.length,
+    submittedAt: now.toISOString(),
+    verificationSummary: {
+      withVerification: records.filter((r: Record<string, unknown>) => r.verification).length,
+      withoutVerification: records.filter((r: Record<string, unknown>) => !r.verification).length,
+      verdicts: {
+        verified: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
+        contradicted: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
+        unverifiable: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
+        other: records.filter((r: Record<string, unknown>) => {
+          const v = r.verification as Record<string, unknown> | undefined;
+          return v && !['confirmed', 'contradicted', 'unverifiable'].includes(v.verdict as string);
+        }).length,
+      },
+    },
+    records: records.map((r: Record<string, unknown>) => {
+      const summary: Record<string, unknown> = { id: r.id };
+      if (r.personId) summary.personId = r.personId;
+      if (r.organizationId) summary.organizationId = r.organizationId;
+      if (r.role) summary.role = r.role;
+      if (r.name || r.title) summary.name = r.name || r.title;
+      if (r.source) summary.source = r.source;
+      if (r.verification) {
+        const v = r.verification as Record<string, unknown>;
+        summary.verdict = v.verdict;
+        summary.evidence = v.evidence;
+      } else {
+        summary.verdict = 'none';
+      }
+      return summary;
+    }),
+  };
+
+  await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
+
   return {
     exitCode: 0,
     output: options.ci
       ? JSON.stringify({ submitted: count, table })
-      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}`,
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}\n  Manifest: ${manifestPath}`,
   };
 }
 
