@@ -40,7 +40,7 @@ function mockOrgEntity(overrides: { id: string; title: string; entityType?: stri
     sources: [],
     customFields: [],
     relatedTopics: [],
-  } as ReturnType<typeof getTypedEntityById>;
+  } as unknown as ReturnType<typeof getTypedEntityById>;
 }
 
 function mockKBEntity(overrides: { id: string; name: string; type?: string }) {

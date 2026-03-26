@@ -76,7 +76,7 @@ function makeTypedEntity(overrides: {
     sources: [],
     customFields: [],
     relatedTopics: [],
-  } as ReturnType<typeof getTypedEntityById>;
+  } as unknown as ReturnType<typeof getTypedEntityById>;
 }
 
 // ── Reset mocks ──────────────────────────────────────────────────
