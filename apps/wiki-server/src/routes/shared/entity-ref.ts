@@ -17,7 +17,8 @@ export interface EntityRef {
 
 /**
  * Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
- * Exported so other modules can use the same canonical pattern.
+ * Canonical definition for frontend: apps/web/src/lib/stable-id.ts
+ * This is the wiki-server copy (separate TS project, can't share imports).
  */
 export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 

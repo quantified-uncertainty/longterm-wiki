@@ -13,6 +13,11 @@
 -- Verify after applying:
 --   SELECT stable_id FROM entities WHERE stable_id ~ '[-_]';
 --   -- Should return 0 rows.
+--
+-- IMPORTANT: This script wraps everything in a single transaction.
+-- If any statement fails, the entire migration is rolled back cleanly.
+
+BEGIN;
 
 CREATE TEMP TABLE stableid_migration (
   old_id TEXT PRIMARY KEY,
@@ -64,7 +69,7 @@ INSERT INTO stableid_migration (old_id, new_id) VALUES
   ('mpkV-n2lMm', 'UuKAC9Hjmg'),
   ('-lMQMNfhSu', 'Alq8iQczCw'),
   ('4V7_qVznQK', 'PR8WkXXhPw'),
-  ('wc-8Sekkqt', '8ia3z0vlsg'),
+  ('wc-8Sekkqt', 'fdH7ZJ50ng'),
   ('3-3k_iIEBt', 'VqNMhSpxiQ'),
   ('U8w-x24QoY', 'kaYcNe2ndw'),
   ('JlRea3-OEV', 'BPFjeugDQQ'),
@@ -261,3 +266,5 @@ UPDATE qa_page_checks t SET thing_id = m.new_id FROM stableid_migration m WHERE 
 SET session_replication_role = DEFAULT;
 
 DROP TABLE stableid_migration;
+
+COMMIT;
