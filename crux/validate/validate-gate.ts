@@ -551,6 +551,18 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
     emitOutputInCi: true,
   },
+  {
+    id: 'verification-coverage',
+    name: 'TableBase verification coverage (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-verification-coverage.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: warns when TableBase submissions in data/tablebase-manifests/
+    // include records without verification. Does not block — verification is
+    // encouraged but not yet mandatory for all tables.
+    advisory: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
