@@ -1570,36 +1570,111 @@
 # Batch 4 - Organization Entity Definitions
 # Generated 2026-02-08
 
+- id: long-term-benefit-trust
+  stableId: eNJ3h95yWw
+  wikiId: E407
+  type: organization
+  orgType: generic
+  title: Anthropic Long-Term Benefit Trust
+  website: https://www.anthropic.com/news/the-long-term-benefit-trust
+  description: >-
+    Delaware purpose trust established in 2023 to ensure Anthropic responsibly
+    develops AI for humanity's long-term benefit. Holds Class T Common Stock with
+    negligible economic value but significant governance power, including the
+    authority to appoint a majority (3 of 5) of Anthropic's board of directors.
+    Trustees are financially disinterested and serve one-year terms.
+  tags:
+    - nonprofit-governance
+    - corporate-structure
+    - ai-safety
+    - purpose-trust
+    - delaware-trust
+    - anthropic
+  clusters:
+    - governance
+  relatedEntries:
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: part-of
+    - id: vzxfzxBITd
+      type: person
+    - id: gA9eoKhFAM
+      type: person
+    - id: n-9NN6o_sj
+      type: person
+    - id: sy20C906g2
+      type: person
+    - id: 978SGjc9_-
+      type: person
+    - id: zR4nW8xB2f
+      type: person
+    - id: tKMznr07QA
+      type: person
+    - id: gNsqAes7Dw
+      type: organization
+  sources:
+    - title: "Anthropic: The Long-Term Benefit Trust"
+      url: https://www.anthropic.com/news/the-long-term-benefit-trust
+    - title: "Harvard Law Forum: Anthropic Long-Term Benefit Trust"
+      url: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
+    - title: "AI Lab Watch: Anthropic's Certificate of Incorporation"
+      url: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
+  lastUpdated: 2026-03
+
 - id: openai-foundation
   stableId: GQuPhNkZbg
   wikiId: E421
   type: organization
-  orgType: generic
+  orgType: funder
   title: OpenAI Foundation
-  website: https://openai.com/
+  website: https://openaifoundation.org
   description: >-
-    Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC,
-    with governance control through board appointment rights and philanthropic
-    commitments focused on health and AI resilience.
+    501(c)(3) nonprofit (formerly OpenAI, Inc.) that retains governance control
+    over OpenAI Group PBC through sole authority to appoint and remove all PBC
+    board directors. Holds a 26% equity stake valued at approximately \$130
+    billion. Operates the Safety and Security Committee with power to halt model
+    releases. Committed \$1 billion in grants for 2026-2027 across health, AI
+    resilience, economic impact, and civil society programs.
   tags:
     - nonprofit-governance
     - ai-philanthropy
     - corporate-structure
     - accountability
     - openai
+    - restructuring
+    - pbc-governance
+    - safety-oversight
   clusters:
     - governance
     - community
   relatedEntries:
     - id: 1LcLlMGLbw
       type: organization
+      relationship: part-of
     - id: JKsVHQ5stQ
       type: person
-    - id: mK9pX3rQ7n
-      type: organization
+    - id: jPuOTgOJGS
+      type: person
+    - id: sNy2jENSLL
+      type: person
+    - id: 7oi_TL68Fy
+      type: person
+    - id: Ioa0kxj1_7
+      type: person
+    - id: 3U1A3jX8wC
+      type: person
     - id: 3w5hW5liew
       type: concept
-  lastUpdated: 2026-02
+  sources:
+    - title: "OpenAI: Built to Benefit Everyone"
+      url: https://openai.com/index/built-to-benefit-everyone/
+    - title: "OpenAI: Our Structure"
+      url: https://openai.com/our-structure/
+    - title: "Update on the OpenAI Foundation (March 2026)"
+      url: https://openai.com/index/update-on-the-openai-foundation/
+    - title: "CA AG MOU (October 2025)"
+      url: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
+  lastUpdated: 2026-03
 
 - id: leading-the-future
   stableId: pg7Ym4EQ9A
