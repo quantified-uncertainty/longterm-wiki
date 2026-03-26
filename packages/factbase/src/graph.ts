@@ -18,6 +18,8 @@ export class Graph {
   private previousIdAliases: Map<string, string> = new Map();
   /** Tracks duplicate entity IDs detected during loading */
   private _duplicateIds: Array<{ id: string; name: string; existingName: string }> = [];
+  /** Maps YAML filename slug → entity stableId. Populated by loader after loading. */
+  private slugToId: Map<string, string> = new Map();
   private facts: Map<string, Fact[]> = new Map(); // keyed by entity.id (subjectId)
   private factIds: Set<string> = new Set(); // dedup guard
   private properties: Map<string, Property> = new Map();
@@ -62,6 +64,17 @@ export class Graph {
   /** Returns duplicate entity IDs detected during loading. */
   getDuplicateIds(): Array<{ id: string; name: string; existingName: string }> {
     return this._duplicateIds;
+  }
+
+  /** Set the slug → entity ID mapping (called by loader after loading). */
+  setSlugMap(slugMap: Map<string, string>): void {
+    this.slugToId = slugMap;
+  }
+
+  /** Resolve a YAML slug to an entity, or return undefined. */
+  getEntityBySlug(slug: string): Entity | undefined {
+    const id = this.slugToId.get(slug);
+    return id ? this.entities.get(id) : undefined;
   }
 
   /**

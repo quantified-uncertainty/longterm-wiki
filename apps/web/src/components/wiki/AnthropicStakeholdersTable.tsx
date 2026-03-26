@@ -7,7 +7,7 @@
  * not structured data.
  */
 
-import { getKBLatest, getKBRecords } from "@data/factbase";
+import { getKBLatest, getKBRecords, getFactBaseEntity, resolveFactBaseSlug } from "@data/factbase";
 import { getTypedEntityById, getPageById, getEntityHref } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
 
@@ -70,8 +70,14 @@ function parseRange(field: unknown): [number, number] | null {
 
 /** Get a display name for a holder slug. */
 function resolveHolderName(holderSlug: string): string {
+  // Try wiki entity lookup first
   const entity = getTypedEntityById(holderSlug);
   if (entity?.title) return entity.title;
+  // Try FactBase: resolve slug → stableId, then look up entity name
+  const resolvedId = resolveFactBaseSlug(holderSlug);
+  const fbEntity = getFactBaseEntity(holderSlug) ?? (resolvedId ? getFactBaseEntity(resolvedId) : undefined);
+  if (fbEntity?.name) return fbEntity.name;
+  // Fallback: title-case the slug
   return holderSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 }
 
@@ -158,8 +164,15 @@ export async function AnthropicStakeholdersTable() {
     if (tbEntity?.wikiId) {
       link = `/wiki/${tbEntity.wikiId}`;
     } else {
-      const href = getEntityHref(holderSlug);
-      if (href !== `/wiki/${holderSlug}`) link = href;
+      // Try FactBase slug resolution for entities not in TableBase
+      const holderResolved = resolveFactBaseSlug(holderSlug);
+      const fbEntity = getFactBaseEntity(holderSlug) ?? (holderResolved ? getFactBaseEntity(holderResolved) : undefined);
+      if (fbEntity?.wikiId) {
+        link = `/wiki/${fbEntity.wikiId}`;
+      } else {
+        const href = getEntityHref(holderSlug);
+        if (href !== `/wiki/${holderSlug}`) link = href;
+      }
     }
 
     const includeInTotal = pledgeMax > 0 && stakeMin !== null;
