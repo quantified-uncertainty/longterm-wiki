@@ -62,6 +62,7 @@ const claimsApp = new Hono()
       FROM proposed_claims
       WHERE batch_id = ${batchId}
       ORDER BY id ASC
+      LIMIT 1000
     `;
 
     if (claims.length === 0) {

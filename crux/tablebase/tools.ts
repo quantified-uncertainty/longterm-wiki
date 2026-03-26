@@ -102,11 +102,11 @@ export function getToolDefinitions() {
       },
       {
         name: 'check_claim_status',
-        description: 'Check verification status of previously submitted claims. Returns per-claim verdicts. Call this after submit_claims to see which claims were verified.',
+        description: 'Check verification status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
         input_schema: {
           type: 'object',
           properties: {
-            batchId: { type: 'string', description: 'Batch ID returned by submit_claims' },
+            batchId: { type: 'string', description: 'Batch ID for the claim submission to check' },
           },
           required: ['batchId'],
         },

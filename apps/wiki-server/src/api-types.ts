@@ -1329,7 +1329,7 @@ export const VALID_CLAIM_STATUSES = [
 export type ClaimStatus = (typeof VALID_CLAIM_STATUSES)[number];
 
 export const ProposeClaimsSchema = z.object({
-  entityId: z.string().max(200),
+  entityId: z.string().min(1).max(200).optional(),
   targetTable: z.string().max(100),
   agentSessionId: z.string().max(200).optional(),
   claims: z
@@ -1339,9 +1339,9 @@ export const ProposeClaimsSchema = z.object({
         targetField: z.string().max(200).optional(),
         proposedValue: z.string().max(5000).optional(),
         proposedData: z.record(z.unknown()).optional(),
-        resourceId: z.string().max(200),
+        resourceId: z.string().min(1).max(200).optional(),
         sourceUrl: z.string().url().max(2000),
-        agentEvidence: z.string().max(5000),
+        agentEvidence: z.string().min(1).max(5000).optional(),
       })
     )
     .min(1)
