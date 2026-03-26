@@ -16,9 +16,18 @@ export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 /** Matches pure numeric IDs (legacy database PKs like "175", "335"). */
 export const NUMERIC_ID_PATTERN = /^\d+$/;
 
-/** Check if a string looks like a stableId. */
+/** Check if a string looks like a stableId (strict: requires uppercase). */
 export function isStableId(s: string): boolean {
   return STABLE_ID_PATTERN.test(s);
+}
+
+/**
+ * Check if a string is any 10-char alphanumeric ID (relaxed: no uppercase requirement).
+ * Use this for ID lookup/routing contexts where all-lowercase stableIds must also match.
+ * Use `isStableId()` for display contexts where you need to distinguish IDs from slugs.
+ */
+export function isAlphanumeric10(s: string): boolean {
+  return /^[A-Za-z0-9]{10}$/.test(s);
 }
 
 /** Check if a string is a bare machine ID (stableId or numeric PK) that should never be displayed. */
