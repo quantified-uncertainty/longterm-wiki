@@ -19,30 +19,24 @@ facts:
 
   - id: jcWxrJcFHA
     property: funding-received
-    value:
-      type: number
-      value: 25025000
-      unit: USD
+    value: "25025000"
+    unit: USD
     asOf: !date 2022
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization from FLI in December 2022
 
   - id: kkD8QJ7GnQ
     property: funding-received
-    value:
-      type: number
-      value: 15700000
-      unit: USD
+    value: "15700000"
+    unit: USD
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2023
 
   - id: c4n53UgmJQ
     property: funding-received
-    value:
-      type: number
-      value: 18100000
-      unit: USD
+    value: "18100000"
+    unit: USD
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2024
@@ -66,20 +60,16 @@ facts:
 
   - id: oVR358oLnw
     property: grant-given
-    value:
-      type: number
-      value: 800000
-      unit: USD
+    value: "800000"
+    unit: USD
     asOf: !date 2025-04
     source: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
     notes: Grant to Wise Ancestors for conservation genomics platform growth
 
   - id: XoYyHGrQXw
     property: grant-given
-    value:
-      type: number
-      value: 1275000
-      unit: USD
+    value: "1275000"
+    unit: USD
     asOf: !date 2025-07
     notes: >-
       Estimated cost of AI for Human Reasoning Fellowship: 30 fellows x
