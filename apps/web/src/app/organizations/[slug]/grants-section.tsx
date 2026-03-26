@@ -52,6 +52,7 @@ export function GrantsSection({
   direction,
   entityId,
   orgSlug,
+  pgGrantCount,
 }: {
   grants: ParsedGrantRecord[] | ReceivedGrant[];
   direction: "given" | "received";
@@ -59,8 +60,11 @@ export function GrantsSection({
   entityId?: string;
   /** Organization slug for constructing grant detail links (e.g. "80000-hours"). */
   orgSlug?: string;
+  /** Number of grants in PG (wiki-server) for this org. When > 0 and KB grants are empty, use server mode. */
+  pgGrantCount?: number;
 }) {
-  if (grants.length === 0) return null;
+  const effectiveCount = Math.max(grants.length, pgGrantCount ?? 0);
+  if (effectiveCount === 0) return null;
 
   const totalAmount = grants.reduce(
     (sum, g) => sum + numericValue(g.amount),
@@ -69,11 +73,13 @@ export function GrantsSection({
 
   const title = direction === "given" ? "Grants Given" : "Grants Received";
 
-  // Server mode is only applicable for "given" direction.
-  // Grants received are aggregated from multiple orgs' KB data,
-  // so wiki-server (which tracks by grantor, not grantee) can't serve them.
+  // Server mode: use when (a) large KB dataset, or (b) PG has grants but KB doesn't.
+  // This lets orgs with PG-only grants (imported via crux import-grants) display data.
   const useServerMode =
-    direction === "given" && entityId && grants.length >= SERVER_MODE_THRESHOLD;
+    direction === "given" && entityId && (
+      grants.length >= SERVER_MODE_THRESHOLD ||
+      (grants.length === 0 && (pgGrantCount ?? 0) > 0)
+    );
 
   // Build rows — received grants use the funder's slug for grant detail links
   const rows: GrantRow[] =
@@ -85,15 +91,23 @@ export function GrantsSection({
         }))
       : grants.slice(0, MAX_RENDERED_ROWS).map((g) => toGrantRow(g, orgSlug));
 
+  const displayCount = useServerMode && grants.length === 0 ? (pgGrantCount ?? 0) : grants.length;
+
   return (
     <section>
-      <SectionHeader title={title} count={grants.length} />
-      <div className="text-sm text-muted-foreground mb-3">
-        {grants.length} grant{grants.length !== 1 ? "s" : ""} totaling{" "}
-        <span className="font-semibold text-foreground">
-          {formatCompactCurrency(totalAmount)}
-        </span>
-      </div>
+      <SectionHeader title={title} count={displayCount} />
+      {totalAmount > 0 ? (
+        <div className="text-sm text-muted-foreground mb-3">
+          {displayCount} grant{displayCount !== 1 ? "s" : ""} totaling{" "}
+          <span className="font-semibold text-foreground">
+            {formatCompactCurrency(totalAmount)}
+          </span>
+        </div>
+      ) : (
+        <div className="text-sm text-muted-foreground mb-3">
+          {displayCount} grant{displayCount !== 1 ? "s" : ""}
+        </div>
+      )}
       {useServerMode ? (
         <InteractiveGrantsTable
           entityId={entityId}

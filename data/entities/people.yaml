@@ -8800,6 +8800,959 @@
     - label: Known For
       value: AMD turnaround, AI accelerator competition with Nvidia
   tags: [semiconductors, ai-hardware]
+
+- id: charles-musgrave
+  stableId: dm3564AzwW
+  type: person
+  title: Charles Musgrave
+  description: >-
+    Computational chemist at Caltech. Feynman Prize in Nanotechnology winner (1993) for modeling hydrogen abstraction tools.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: nadrian-seeman
+  stableId: 04b-jJMlJ5
+  type: person
+  title: Nadrian C. Seeman
+  description: >-
+    Pioneer of DNA nanotechnology at New York University. Feynman Prize in Nanotechnology winner (1995).
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: charles-bauschlicher
+  stableId: NJxxjYB346
+  type: person
+  title: Charles Bauschlicher
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: stephen-barnard
+  stableId: 9o2fvO_kFz
+  type: person
+  title: Stephen Barnard
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: glenn-deardorff
+  stableId: DyMxSmsaAx
+  type: person
+  title: Glenn Deardorff
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: al-globus
+  stableId: 6i__uIvaha
+  type: person
+  title: Al Globus
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: jie-han
+  stableId: rxk5kdbYth
+  type: person
+  title: Jie Han
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: richard-jaffe
+  stableId: o8el2UhB0E
+  type: person
+  title: Richard Jaffe
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: alessandra-ricca
+  stableId: 9r3Gx9RljM
+  type: person
+  title: Alessandra Ricca
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: marzio-rosi
+  stableId: EdnJ6TsFPm
+  type: person
+  title: Marzio Rosi
+  description: >-
+    Computational nanotechnology researcher. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: deepak-srivastava
+  stableId: WdIlcePAtc
+  type: person
+  title: Deepak Srivastava
+  description: >-
+    Computational nanotechnology researcher at NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: h-thuemmel
+  stableId: xhzxl1X8wH
+  type: person
+  title: H. Thuemmel
+  description: >-
+    Computational nanotechnology researcher at MRJ Technology Solutions. Feynman Prize in Nanotechnology (Theory) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: james-gimzewski
+  stableId: mEaMVguEQn
+  type: person
+  title: James K. Gimzewski
+  description: >-
+    Nanoscientist at IBM Zurich Research Laboratory. Feynman Prize in Nanotechnology (Experiment) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: reto-schlittler
+  stableId: N1-HCoqHT1
+  type: person
+  title: Reto Schlittler
+  description: >-
+    Researcher at IBM Zurich Research Laboratory. Feynman Prize in Nanotechnology (Experiment) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: christian-joachim
+  stableId: 5l8z2m7yXj
+  type: person
+  title: Christian Joachim
+  description: >-
+    Nanoscience researcher at CEMES-CNRS, France. Feynman Prize in Nanotechnology winner (Experiment 1997, Theory 2005).
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: phil-collins-nano
+  stableId: fAS6QxfsqB
+  type: person
+  title: Phil Collins
+  description: >-
+    Nanoscience researcher. Feynman Prize in Nanotechnology (Experiment) winner, 1997.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: ralph-merkle
+  stableId: v6BHLZvvwL
+  type: person
+  title: Ralph C. Merkle
+  description: >-
+    Computer scientist and nanotechnology theorist at Xerox PARC. Feynman Prize in Nanotechnology (Theory) winner, 1998.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: stephen-walch
+  stableId: Q1YUZz3vbk
+  type: person
+  title: Stephen Walch
+  description: >-
+    Computational chemist at ELORET/NASA Ames Research Center. Feynman Prize in Nanotechnology (Theory) winner, 1998.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: reza-ghadiri
+  stableId: 8DUyEnxEV5
+  type: person
+  title: M. Reza Ghadiri
+  description: >-
+    Chemist at Scripps Research Institute. Feynman Prize in Nanotechnology (Experiment) winner, 1998.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: fotis-nifiatis
+  stableId: ywfH3f0wzM
+  type: person
+  title: Fotis Nifiatis
+  description: >-
+    Researcher at Scripps Research Institute. Feynman Prize in Nanotechnology (Experiment) winner, 1998.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: william-goddard
+  stableId: jvrow4k-rN
+  type: person
+  title: William A. Goddard III
+  description: >-
+    Computational chemist at Caltech. Feynman Prize in Nanotechnology (Theory) winner, 1999.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: tahir-cagin
+  stableId: j6Egr6aHXq
+  type: person
+  title: Tahir Cagin
+  description: >-
+    Computational nanotechnology researcher at Caltech. Feynman Prize in Nanotechnology (Theory) winner, 1999.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: yue-qi
+  stableId: gEPF2wUNr_
+  type: person
+  title: Yue Qi
+  description: >-
+    Computational materials scientist. Feynman Prize in Nanotechnology (Theory) winner, 1999.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: phaedon-avouris
+  stableId: nSNU9PkMP3
+  type: person
+  title: Phaedon Avouris
+  description: >-
+    Nanoscientist at IBM T.J. Watson Research Center. Feynman Prize in Nanotechnology (Experiment) winner, 1999.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: anita-goel
+  stableId: sABndIheek
+  type: person
+  title: Anita Goel
+  description: >-
+    Physicist and biophysicist at Harvard University. Feynman Prize in Nanotechnology (Experiment) winner, 1999.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: uzi-landman
+  stableId: Rid2OzQRKm
+  type: person
+  title: Uzi Landman
+  description: >-
+    Computational materials scientist at Georgia Institute of Technology. Feynman Prize in Nanotechnology (Theory) winner, 2000.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: stanley-williams
+  stableId: sI3Mx6SVSG
+  type: person
+  title: R. Stanley Williams
+  description: >-
+    Nanotechnology researcher at HP Labs. Feynman Prize in Nanotechnology (Experiment) winner, 2000.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: philip-kuekes
+  stableId: b9G-hi3bf4
+  type: person
+  title: Philip Kuekes
+  description: >-
+    Nanotechnology researcher at HP Labs. Feynman Prize in Nanotechnology (Experiment) winner, 2000.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: james-heath
+  stableId: 1KrX2xquOh
+  type: person
+  title: James Heath
+  description: >-
+    Chemist at UCLA. Feynman Prize in Nanotechnology (Experiment) winner, 2000.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: christopher-love
+  stableId: xszdJkdyqf
+  type: person
+  title: Christopher Love
+  description: >-
+    Nanotechnology researcher. Feynman Prize in Nanotechnology (Experiment) winner, 2000.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: mark-ratner
+  stableId: 5yzfycPuJh
+  type: person
+  title: Mark A. Ratner
+  description: >-
+    Pioneer of molecular electronics at Northwestern University. Feynman Prize in Nanotechnology (Theory) winner, 2001.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: charles-lieber
+  stableId: Vfm5arj0NM
+  type: person
+  title: Charles M. Lieber
+  description: >-
+    Nanoscientist at Harvard University. Feynman Prize in Nanotechnology (Experiment) winner, 2001.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: jing-kong
+  stableId: VY1tUTlwTp
+  type: person
+  title: Jing Kong
+  description: >-
+    Carbon nanotube researcher at Harvard University. Feynman Prize in Nanotechnology (Experiment) winner, 2001.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: don-brenner
+  stableId: uW3-oZo8X8
+  type: person
+  title: Don Brenner
+  description: >-
+    Computational nanotechnology researcher at North Carolina State University. Feynman Prize in Nanotechnology (Theory) winner, 2002.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: chad-mirkin
+  stableId: DKZTCGY2dW
+  type: person
+  title: Chad Mirkin
+  description: >-
+    Nanoscientist at Northwestern University. Feynman Prize in Nanotechnology (Experiment) winner, 2002.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: yi-cui
+  stableId: l61ooNQ2Jn
+  type: person
+  title: Yi Cui
+  description: >-
+    Materials scientist at Stanford University. Feynman Prize in Nanotechnology (Experiment) winner, 2002.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: marvin-cohen
+  stableId: y-pYGIJTOH
+  type: person
+  title: Marvin L. Cohen
+  description: >-
+    Theoretical physicist at UC Berkeley. Feynman Prize in Nanotechnology (Theory) winner, 2003.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: steven-louie
+  stableId: rGfnk9cjhE
+  type: person
+  title: Steven G. Louie
+  description: >-
+    Theoretical physicist at UC Berkeley. Feynman Prize in Nanotechnology (Theory) winner, 2003.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: carlo-montemagno
+  stableId: -ElpBHyhiv
+  type: person
+  title: Carlo Montemagno
+  description: >-
+    Bio-nanotechnology researcher at UCLA. Feynman Prize in Nanotechnology (Experiment) winner, 2003.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: ahmet-yildiz
+  stableId: 8t9bFhNVDh
+  type: person
+  title: Ahmet Yildiz
+  description: >-
+    Biophysicist studying molecular motors at the University of Illinois. Feynman Prize Distinguished Student Award winner, 2003.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: david-baker-protein
+  stableId: z0Bzf1c1Ji
+  type: person
+  title: David Baker
+  description: >-
+    Protein design pioneer at University of Washington. Feynman Prize in Nanotechnology (Theory) winner, 2004. Nobel Prize in Chemistry, 2024.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: brian-kuhlman
+  stableId: f-qp0f35GQ
+  type: person
+  title: Brian Kuhlman
+  description: >-
+    Protein design researcher at University of North Carolina. Feynman Prize in Nanotechnology (Theory) winner, 2004.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: homme-hellinga
+  stableId: UxDrSYuD3N
+  type: person
+  title: Homme Hellinga
+  description: >-
+    Protein engineer at Duke University. Feynman Prize in Nanotechnology (Experiment) winner, 2004.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: damian-allis
+  stableId: 2wPOGXCHCg
+  type: person
+  title: Damian Allis
+  description: >-
+    Nanotechnology researcher at Duke University. Feynman Prize in Nanotechnology (Experiment) winner, 2004.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: christian-schafmeister
+  stableId: yI3KkFywod
+  type: person
+  title: Christian Schafmeister
+  description: >-
+    Chemist at University of Pittsburgh. Feynman Prize in Nanotechnology (Experiment) winner, 2005.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: christopher-levins
+  stableId: 2yVNPE9woM
+  type: person
+  title: Christopher Levins
+  description: >-
+    Chemist at University of Pittsburgh. Feynman Prize in Nanotechnology (Experiment) winner, 2005.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: erik-winfree
+  stableId: ZYqjkvAsDT
+  type: person
+  title: Erik Winfree
+  description: >-
+    Computer scientist at Caltech working on DNA computing and self-assembly. Feynman Prize in Nanotechnology (Theory) winner, 2006.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: paul-rothemund
+  stableId: eHENzP6XRR
+  type: person
+  title: Paul W.K. Rothemund
+  description: >-
+    DNA origami pioneer at Caltech. Feynman Prize in Nanotechnology (Theory) winner, 2006.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: david-leigh
+  stableId: Ud3dpcT7-M
+  type: person
+  title: David A. Leigh
+  description: >-
+    Molecular machine designer at University of Edinburgh. Feynman Prize in Nanotechnology (Theory) winner, 2007.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: fraser-stoddart
+  stableId: 2jsolKOyyB
+  type: person
+  title: J. Fraser Stoddart
+  description: >-
+    Chemist and Nobel laureate (2016) for molecular machines. Feynman Prize in Nanotechnology (Experiment) winner, 2007.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: fung-suong-ou
+  stableId: EBNLA56_uz
+  type: person
+  title: Fung Suong Ou
+  description: >-
+    Nanotechnology researcher. Feynman Prize Distinguished Student Award winner, 2007.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: george-schatz
+  stableId: C-bR4vfy_f
+  type: person
+  title: George C. Schatz
+  description: >-
+    Theoretical chemist at Northwestern University. Feynman Prize in Nanotechnology (Theory) winner, 2008.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: james-tour
+  stableId: EBTqbDgB-M
+  type: person
+  title: James M. Tour
+  description: >-
+    Chemist at Rice University known for nanocars. Feynman Prize in Nanotechnology (Experiment) winner, 2008.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: robert-freitas
+  stableId: _qKgXk-gR2
+  type: person
+  title: Robert A. Freitas Jr.
+  description: >-
+    Nanomedicine theorist at Institute for Molecular Manufacturing. Feynman Prize in Nanotechnology (Theory) winner, 2009.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: yoshiaki-sugimoto
+  stableId: yxDw1aRTEf
+  type: person
+  title: Yoshiaki Sugimoto
+  description: >-
+    Physicist at Osaka University. Feynman Prize in Nanotechnology (Experiment) winner, 2009.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: masayuki-abe
+  stableId: dHw53yzgGP
+  type: person
+  title: Masayuki Abe
+  description: >-
+    Physicist at Osaka University. Feynman Prize in Nanotechnology (Experiment) winner, 2009.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: oscar-custance
+  stableId: YIicC5WlNJ
+  type: person
+  title: Oscar Custance
+  description: >-
+    Physicist at NIMS, Japan. Feynman Prize in Nanotechnology (Experiment) winner, 2009.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: gustavo-scuseria
+  stableId: J4rLGnUrD6
+  type: person
+  title: Gustavo E. Scuseria
+  description: >-
+    Computational chemist at Rice University. Feynman Prize in Nanotechnology (Theory) winner, 2010.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: masakazu-aono
+  stableId: 7tuG6MwTWx
+  type: person
+  title: Masakazu Aono
+  description: >-
+    Physicist at NIMS, Japan. Pioneer of atomic switch technology. Feynman Prize in Nanotechnology (Experiment) winner, 2010.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: raymond-astumian
+  stableId: OPrdd-JIOG
+  type: person
+  title: Raymond Astumian
+  description: >-
+    Theoretical biophysicist at University of Maine. Feynman Prize in Nanotechnology (Theory) winner, 2011.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: leonhard-grill
+  stableId: wPndGVe7oX
+  type: person
+  title: Leonhard Grill
+  description: >-
+    Physicist at Fritz Haber Institute, Berlin. Feynman Prize in Nanotechnology (Experiment) winner, 2011.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: david-soloveichik
+  stableId: 7-OzHdSOus
+  type: person
+  title: David Soloveichik
+  description: >-
+    Computer scientist at UC San Francisco. Feynman Prize in Nanotechnology (Theory) winner, 2012.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: gerhard-meyer
+  stableId: KJWNTtc1WR
+  type: person
+  title: Gerhard Meyer
+  description: >-
+    Physicist at IBM Research Zurich. Feynman Prize in Nanotechnology (Experiment) winner, 2012.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: leo-gross
+  stableId: GhnqHYpCzj
+  type: person
+  title: Leo Gross
+  description: >-
+    Physicist at IBM Research Zurich. Feynman Prize in Nanotechnology (Experiment) winner, 2012.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: jascha-repp
+  stableId: hdiV0abS7c
+  type: person
+  title: Jascha Repp
+  description: >-
+    Physicist at University of Regensburg. Feynman Prize in Nanotechnology (Experiment) winner, 2012.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: david-walker-nano
+  stableId: FVV87S0TMi
+  type: person
+  title: David Walker
+  description: >-
+    Nanotechnology researcher. Feynman Prize Distinguished Student Award winner, 2012.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: david-beratan
+  stableId: iEHUQfVS0a
+  type: person
+  title: David N. Beratan
+  description: >-
+    Theoretical chemist at Duke University. Feynman Prize in Nanotechnology (Theory) winner, 2013.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: alexander-zettl
+  stableId: Qk_JBn0QIP
+  type: person
+  title: Alexander K. Zettl
+  description: >-
+    Physicist at UC Berkeley. Feynman Prize in Nanotechnology (Experiment) winner, 2013.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: jonathan-barnes
+  stableId: O_PjI9Ekck
+  type: person
+  title: Jonathan C. Barnes
+  description: >-
+    Molecular nanotechnology researcher at Northwestern University. Feynman Prize Distinguished Student Award winner, 2013.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: amanda-barnard
+  stableId: xrtuLZQ124
+  type: person
+  title: Amanda S. Barnard
+  description: >-
+    Computational nanotechnology researcher at CSIRO, Australia. Feynman Prize in Nanotechnology (Theory) winner, 2014.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: joseph-lyding
+  stableId: YA4OLmGFeL
+  type: person
+  title: Joseph W. Lyding
+  description: >-
+    Electrical engineer at University of Illinois. Feynman Prize in Nanotechnology (Experiment) winner, 2014.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: markus-buehler
+  stableId: C4kJ-1HRvN
+  type: person
+  title: Markus J. Buehler
+  description: >-
+    Materials scientist at MIT. Feynman Prize in Nanotechnology (Theory) winner, 2015.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: michelle-simmons
+  stableId: B8zIqK-yFt
+  type: person
+  title: Michelle Y. Simmons
+  description: >-
+    Quantum physicist at UNSW, Australia. Feynman Prize in Nanotechnology (Experiment) winner, 2015.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: bartosz-grzybowski
+  stableId: _-LQ_cralJ
+  type: person
+  title: Bartosz A. Grzybowski
+  description: >-
+    Chemist at UNIST, South Korea. Feynman Prize in Nanotechnology (Theory) winner, 2016.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: franz-giessibl
+  stableId: 8gryM-S-t_
+  type: person
+  title: Franz J. Giessibl
+  description: >-
+    Physicist at University of Regensburg. Feynman Prize in Nanotechnology (Experiment) winner, 2016.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: conrad-pfeiffer
+  stableId: qyD1gk1Evv
+  type: person
+  title: Conrad Pfeiffer
+  description: >-
+    Physicist at University of Regensburg. Feynman Prize in Nanotechnology (Experiment) winner, 2016.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: giovanni-zocchi
+  stableId: EmAGAr-lur
+  type: person
+  title: Giovanni Zocchi
+  description: >-
+    Physicist at UCLA. Feynman Prize in Nanotechnology (Theory) winner, 2017.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: william-shih
+  stableId: -YcnVkBCjs
+  type: person
+  title: William Shih
+  description: >-
+    DNA nanotechnology researcher at Harvard University. Feynman Prize in Nanotechnology (Experiment) winner, 2017.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: hai-qian
+  stableId: xhQ4FxQZXp
+  type: person
+  title: Hai Qian
+  description: >-
+    Nanotechnology researcher. Feynman Prize Distinguished Student Award winner, 2017.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: anatole-von-lilienfeld
+  stableId: JPLsyOnjud
+  type: person
+  title: Anatole von Lilienfeld
+  description: >-
+    Computational chemist at University of Basel. Feynman Prize in Nanotechnology (Theory) winner, 2018.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: andreas-heinrich
+  stableId: KzzogZG8Ol
+  type: person
+  title: Andreas Heinrich
+  description: >-
+    Physicist at IBS Center for Quantum Nanoscience, Seoul. Feynman Prize in Nanotechnology (Experiment) winner, 2018.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: christopher-lutz
+  stableId: 7cspZujyG2
+  type: person
+  title: Christopher Lutz
+  description: >-
+    Researcher at IBM Research. Feynman Prize in Nanotechnology (Experiment) winner, 2018.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: qi-li
+  stableId: AfZwD5AHkN
+  type: person
+  title: Qi Li
+  description: >-
+    Nanotechnology researcher. Feynman Prize Distinguished Student Award winner, 2018.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: giulia-galli
+  stableId: oharhxWLzw
+  type: person
+  title: Giulia Galli
+  description: >-
+    Computational scientist at University of Chicago and Argonne. Feynman Prize in Nanotechnology (Theory) winner, 2019.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: lulu-qian
+  stableId: I0lBWQOPdZ
+  type: person
+  title: Lulu Qian
+  description: >-
+    DNA computing researcher at Caltech. Feynman Prize in Nanotechnology (Experiment) winner, 2019.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: yuxing-yao
+  stableId: BIMHSf8wCb
+  type: person
+  title: Yuxing Yao
+  description: >-
+    Biomimetics researcher at Harvard/Caltech. Feynman Prize Distinguished Student Award winner, 2019.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: massimiliano-di-ventra
+  stableId: ZkU7gCOfJ2
+  type: person
+  title: Massimiliano Di Ventra
+  description: >-
+    Theoretical physicist at UC San Diego. Feynman Prize in Nanotechnology (Theory) winner, 2020.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: hao-yan
+  stableId: ucOypAzBTx
+  type: person
+  title: Hao Yan
+  description: >-
+    DNA nanotechnology researcher at Arizona State University. Feynman Prize in Nanotechnology (Experiment) winner, 2020.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: kendall-houk
+  stableId: sfObZ2kshL
+  type: person
+  title: Kendall N. Houk
+  description: >-
+    Theoretical and computational organic chemist at UCLA. Feynman Prize in Nanotechnology (Theory) winner, 2021.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: anne-sophie-duwez
+  stableId: MoKd-K-WEx
+  type: person
+  title: Anne-Sophie Duwez
+  description: >-
+    Physicist at University of Liege, Belgium. Feynman Prize in Nanotechnology (Experiment) winner, 2021.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: james-chelikowsky
+  stableId: E-iDGjEEl2
+  type: person
+  title: James R. Chelikowsky
+  description: >-
+    Computational physicist at University of Texas at Austin. Feynman Prize in Nanotechnology (Theory) winner, 2022.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: sergei-kalinin
+  stableId: FV8iKswdQ3
+  type: person
+  title: Sergei V. Kalinin
+  description: >-
+    Materials scientist at University of Tennessee. Feynman Prize in Nanotechnology (Experiment) winner, 2022.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: emanuele-penocchio
+  stableId: UDvewxMQqd
+  type: person
+  title: Emanuele Penocchio
+  description: >-
+    Molecular nanotechnology researcher at Northwestern University. Feynman Prize Distinguished Student Award winner, 2022.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: alexandre-tkatchenko
+  stableId: dBPEKErmC9
+  type: person
+  title: Alexandre Tkatchenko
+  description: >-
+    Computational physicist at University of Luxembourg. Feynman Prize in Nanotechnology (Theory) winner, 2023.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: james-collins
+  stableId: PPZGnptNsh
+  type: person
+  title: James J. Collins
+  description: >-
+    Synthetic biologist at MIT. Feynman Prize in Nanotechnology (Experiment) winner, 2023.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: qiancheng-xiong
+  stableId: qzHGm_5jG4
+  type: person
+  title: Qiancheng Xiong
+  description: >-
+    DNA nanotechnology researcher at Yale University. Feynman Prize Distinguished Student Award winner, 2023.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: klaus-robert-muller
+  stableId: Ahj1sm_eRx
+  type: person
+  title: Klaus-Robert Muller
+  description: >-
+    Machine learning and quantum chemistry researcher at TU Berlin. Feynman Prize in Nanotechnology (Theory) winner, 2024.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: saw-wai-hla
+  stableId: 3IvzzyPcT_
+  type: person
+  title: Saw Wai Hla
+  description: >-
+    Physicist at Ohio University and Argonne National Laboratory. Feynman Prize in Nanotechnology (Experiment) winner, 2024.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: gabriella-gagliano
+  stableId: I2laR4bZLQ
+  type: person
+  title: Gabriella Gagliano
+  description: >-
+    Nanotechnology researcher. Feynman Prize Distinguished Student Award winner, 2024.
+  tags: [nanotechnology]
+  lastUpdated: 2026-03
+
+- id: alisa-frik
+  stableId: eQc8EFi1Zk
+  type: person
+  title: Alisa Frik
+  description: >-
+    Privacy and security researcher at ICSI/UC Berkeley. Norm Hardy Prize winner, 2024.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: serge-egelman
+  stableId: OziR1VyA3-
+  type: person
+  title: Serge Egelman
+  description: >-
+    Usable security researcher at ICSI/UC Berkeley. Norm Hardy Prize winner, 2024.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: conor-gilsenan
+  stableId: DChVcEpBZs
+  type: person
+  title: Conor Gilsenan
+  description: >-
+    Security researcher at ICSI/UC Berkeley. Norm Hardy Prize winner, 2024.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: eyal-peer
+  stableId: NYSl6N9MW9
+  type: person
+  title: Eyal Peer
+  description: >-
+    Behavioral researcher at Hebrew University of Jerusalem. Norm Hardy Prize winner, 2024.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: pardis-emami-naeini
+  stableId: d8kKZis94U
+  type: person
+  title: Pardis Emami-Naeini
+  description: >-
+    Cybersecurity researcher at Duke University. Norm Hardy Prize winner, 2025.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: lorrie-faith-cranor
+  stableId: NEkGLoM8_N
+  type: person
+  title: Lorrie Faith Cranor
+  description: >-
+    Usable security researcher at Carnegie Mellon University. Norm Hardy Prize winner, 2025.
+  tags: [security]
+  lastUpdated: 2026-03
+
+- id: yuvraj-agarwal
+  stableId: 28Nd_LdEtI
+  type: person
+  title: Yuvraj Agarwal
+  description: >-
+    IoT and security researcher at Carnegie Mellon University. Norm Hardy Prize winner, 2025.
+  tags: [security]
   lastUpdated: 2026-03
 
 - id: christophe-fouquet
