@@ -75,8 +75,6 @@
   title: Connor Leahy
   website: https://conjecture.dev
   relatedEntries:
-    - id: 73qTEkYyWA
-      type: safety-agenda
     - id: Tz48rTriBg
       type: person
     - id: zaRXTCXPPk
@@ -190,59 +188,12 @@
   title: Dario Amodei
   website: https://anthropic.com
   relatedEntries:
-    - id: mK9pX3rQ7n
-      type: organization
     - id: 1LcLlMGLbw
       type: organization
     - id: CsWO4o3gZw
       type: safety-agenda
     - id: hQ7mR2kN5p
       type: person
-    - id: Tz48rTriBg
-      type: person
-  customFields:
-    - label: Role
-      value: Co-founder & CEO
-    - label: Known For
-      value: Constitutional AI, Responsible Scaling Policy, Claude development
-  sources:
-    - title: Anthropic Website
-      url: https://anthropic.com
-    - title: Anthropic Core Views on AI Safety
-      url: https://anthropic.com/news/core-views-on-ai-safety
-    - title: Responsible Scaling Policy
-      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
-    - title: Dwarkesh Podcast Interview
-      url: https://www.dwarkeshpatel.com/p/dario-amodei
-  description: >
-    Dario Amodei is the CEO and co-founder of Anthropic, one of the leading AI safety-focused companies. Before founding
-    Anthropic in 2021, he was VP of Research at OpenAI, where he led the team that developed GPT-2 and GPT-3. He left
-    OpenAI along with his sister Daniela and several colleagues over concerns about the company's direction,
-    particularly its increasing commercialization and partnership with Microsoft.
-
-
-    Amodei's approach to AI safety emphasizes empirical research on current systems rather than purely theoretical work.
-    Under his leadership, Anthropic has developed Constitutional AI (a method for training helpful, harmless, and honest
-    AI without extensive human feedback), pioneered "responsible scaling policies" that tie safety commitments to
-    capability levels, and invested heavily in interpretability research. The company's Claude models have become
-    leading examples of safety-conscious AI development.
-
-
-    As a public voice for AI safety, Amodei occupies a distinctive position - arguing that AI development is likely to
-    continue rapidly regardless of individual company decisions, so the priority should be ensuring that safety-focused
-    labs are at the frontier. He has advocated for industry self-regulation, compute governance, and international
-    coordination while maintaining that slowing AI development unilaterally would simply cede the field to less
-    safety-conscious actors. His essay "Machines of Loving Grace" outlined a vision for how powerful AI could be
-    beneficial if developed carefully.
-  tags:
-    - constitutional-ai
-    - responsible-scaling
-    - claude
-    - rlhf
-    - interpretability
-    - ai-safety-levels
-    - empirical-alignment
-  lastUpdated: 2025-12
 - id: demis-hassabis
   stableId: Aqcyu3onCA
   wikiId: E101
@@ -338,8 +289,6 @@
   title: Geoffrey Hinton
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
-    - id: nGFBXZeM3d
-      type: person
     - id: A4XoubikkQ
       type: organization
   customFields:
@@ -396,26 +345,6 @@
       type: organization
     - id: eQh3ZhWv8D
       type: person
-    - id: vzxfzxBITd
-      type: person
-  customFields:
-    - label: Role
-      value: Member of Technical Staff at METR (formerly Senior Advisor at Coefficient Giving)
-    - label: Known For
-      value: Bio Anchors AI timelines report, AI safety grantmaking, intelligence explosion analysis, crunch time framework
-  sources:
-    - title: 80,000 Hours Podcast - Ajeya Cotra on transformative AI crunch time
-      url: https://80000hours.org/podcast/episodes/ajeya-cotra-transformative-ai-crunch-time/
-    - title: METR - About
-      url: https://metr.org/about
-    - title: Ajeya Cotra's Bio Anchors Report
-      url: https://www.lesswrong.com/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
-  description: >
-    Ajeya Cotra is a member of technical staff at METR (Model Evaluation and Threat Research) and formerly a senior advisor at
-    Coefficient Giving (Open Philanthropy), where she led technical AI safety grantmaking and authored the influential Bio Anchors
-    report on AI timelines. She is among the most respected commentators on AI development trajectories, intelligence explosion
-    dynamics, and the strategic use of early transformative AI for safety work during what she terms "crunch time."
-
 - id: holden-karnofsky
   stableId: eQh3ZhWv8D
   wikiId: E156
@@ -423,8 +352,6 @@
   title: Holden Karnofsky
   website: https://coefficientgiving.org
   relatedEntries:
-    - id: mK9pX3rQ7n
-      type: organization
     - id: 8nmqy7vFiA
       type: person
   customFields:
@@ -487,10 +414,6 @@
   relatedEntries:
     - id: 1OSiYOaWVL
       type: organization
-    - id: 1LcLlMGLbw
-      type: organization
-    - id: hQ7mR2kN5p
-      type: person
     - id: 5N5UqXNkkg
       type: person
   customFields:
@@ -539,54 +462,8 @@
   title: Jan Leike
   website: https://anthropic.com
   relatedEntries:
-    - id: mK9pX3rQ7n
-      type: organization
     - id: MBGtb3Qlkw
       type: safety-agenda
-    - id: zR4nW8xB2f
-      type: person
-    - id: vzxfzxBITd
-      type: person
-  customFields:
-    - label: Role
-      value: VP of Alignment Science
-    - label: Known For
-      value: Alignment research, scalable oversight, RLHF
-  sources:
-    - title: Jan Leike on X/Twitter
-      url: https://twitter.com/janleike
-    - title: Deep RL from Human Preferences
-      url: https://arxiv.org/abs/1706.03741
-    - title: OpenAI Superalignment Announcement
-      url: https://openai.com/blog/introducing-superalignment
-    - title: Departure Statement
-      url: https://twitter.com/janleike/status/1790517668677865835
-  description: >
-    Jan Leike is the VP of Alignment Science at Anthropic, where he leads research on ensuring AI systems remain beneficial as
-    they become more capable. Before joining Anthropic in 2024, he co-led OpenAI's Superalignment team, which was tasked
-    with solving alignment for superintelligent AI systems within four years.
-
-
-    Leike's research has been foundational for modern alignment techniques. He co-authored key papers on learning from
-    human feedback, including "Deep Reinforcement Learning from Human Preferences" which helped establish RLHF as the
-    dominant paradigm for aligning large language models. His work on scalable oversight explores how to maintain human
-    control over AI systems even when they become too capable for humans to directly evaluate their outputs.
-
-
-    Leike's departure from OpenAI in May 2024 was publicly significant - he stated that safety had "taken a backseat to
-    shiny products" and that the company was not adequately preparing for the challenges of superintelligence. His move
-    to Anthropic, along with several colleagues from the Superalignment team, signaled broader concerns about safety
-    culture at frontier labs. At Anthropic, he continues work on scalable oversight, weak-to-strong generalization, and
-    detecting deceptive behavior in AI systems.
-  tags:
-    - rlhf
-    - scalable-oversight
-    - superalignment
-    - reward-modeling
-    - weak-to-strong-generalization
-    - process-supervision
-    - deception
-  lastUpdated: 2025-12
 - id: nate-soares
   stableId: 5MVd90lzCg
   wikiId: E212
@@ -600,53 +477,6 @@
   title: Neel Nanda
   website: https://www.neelnanda.io
   relatedEntries:
-    - id: A4XoubikkQ
-      type: organization
-    - id: Tz48rTriBg
-      type: person
-    - id: 73qTEkYyWA
-      type: safety-agenda
-  customFields:
-    - label: Role
-      value: Research Scientist, Google DeepMind
-    - label: Known For
-      value: Mechanistic interpretability, TransformerLens library, educational content
-  sources:
-    - title: Neel Nanda's Website
-      url: https://www.neelnanda.io
-    - title: TransformerLens
-      url: https://github.com/neelnanda-io/TransformerLens
-    - title: 200 Open Problems in Mech Interp
-      url: https://www.lesswrong.com/posts/LbrPTJ4fmABEdEnLf/200-concrete-open-problems-in-mechanistic-interpretability
-    - title: Blog Posts
-      url: https://www.neelnanda.io/blog
-  description: >
-    Neel Nanda is an alignment researcher at Google DeepMind who has become one of the leading figures in mechanistic
-    interpretability. His work focuses on understanding the internal computations of transformer models -
-    reverse-engineering how these neural networks implement algorithms and form representations.
-
-
-    Nanda's most significant contribution to the field is TransformerLens, an open-source library that makes it vastly
-    easier to conduct interpretability research on language models. By providing clean abstractions for accessing model
-    internals, the library has enabled hundreds of researchers to enter the field and accelerated the pace of discovery.
-    He has also authored influential posts cataloging open problems in mechanistic interpretability, helping to define
-    the research agenda.
-
-
-    Beyond his technical work, Nanda is known for his commitment to growing the interpretability research community. He
-    actively mentors new researchers, creates educational content explaining complex concepts, and maintains a strong
-    online presence where he discusses research directions and results. His approach exemplifies a field-building
-    philosophy - that progress on AI safety requires not just individual research contributions but growing the number
-    of capable researchers working on the problem.
-  tags:
-    - interpretability
-    - transformer-circuits
-    - transformerlens
-    - induction-heads
-    - ai-safety
-    - research-tools
-    - science-communication
-  lastUpdated: 2025-12
 - id: nick-bostrom
   stableId: IQvWHA3OiF
   wikiId: E215
@@ -658,49 +488,6 @@
       type: risk
     - id: tRj4bS6V8Q
       type: risk
-    - id: 8nmqy7vFiA
-      type: person
-  customFields:
-    - label: Role
-      value: Founder and Principal Researcher, Macrostrategy Research Initiative
-    - label: Known For
-      value: Superintelligence, existential risk research, simulation hypothesis
-  sources:
-    - title: Nick Bostrom's Website
-      url: https://nickbostrom.com
-    - title: Superintelligence (book)
-      url: https://www.superintelligence.com/
-    - title: FHI Publications
-      url: https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/publications/
-    - title: Existential Risk Prevention as Global Priority
-      url: https://www.existential-risk.org/concept.html
-  description: >
-    Nick Bostrom is a philosopher who founded the Future of Humanity Institute (FHI) at Oxford University and authored
-    "Superintelligence: Paths, Dangers, Strategies" (2014), the book that brought AI existential risk into mainstream
-    academic and policy discourse. His work laid the conceptual foundations for much of modern AI safety thinking.
-
-
-    Bostrom's key contributions include the orthogonality thesis (intelligence and goals are independent - a
-    superintelligent AI could pursue any objective), instrumental convergence (most goal-pursuing systems will converge
-    on certain subgoals like self-preservation and resource acquisition), and the concept of the "treacherous turn" (an
-    AI might behave well until it's powerful enough to act on misaligned goals). These ideas are now standard reference
-    points in AI safety discussions.
-
-
-    Beyond AI, Bostrom has shaped the broader study of existential risk as an academic field, arguing that reducing the
-    probability of human extinction should be a global priority given the astronomical value of humanity's potential
-    future. Though FHI closed in 2024 due to administrative issues at Oxford, its influence persists through the
-    researchers it trained and the research agendas it established. Bostrom's work continues to frame how many
-    researchers and policymakers think about the stakes of advanced AI development.
-  tags:
-    - superintelligence
-    - x-risk
-    - orthogonality-thesis
-    - instrumental-convergence
-    - treacherous-turn
-    - value-alignment
-    - control-problem
-  lastUpdated: 2025-12
 - id: paul-christiano
   stableId: vzxfzxBITd
   wikiId: E220
@@ -710,55 +497,8 @@
   relatedEntries:
     - id: QsXVXtQ0zE
       type: organization
-    - id: MBGtb3Qlkw
-      type: safety-agenda
     - id: fS1tEGKuNq
       type: person
-    - id: hQ7mR2kN5p
-      type: person
-  customFields:
-    - label: Role
-      value: Head of AI Safety, US AI Safety Institute
-    - label: Known For
-      value: Iterated amplification, AI safety via debate, scalable oversight
-  sources:
-    - title: ARC Website
-      url: https://alignment.org
-    - title: Paul's Alignment Forum Posts
-      url: https://www.alignmentforum.org/users/paulfchristiano
-    - title: Iterated Amplification Paper
-      url: https://arxiv.org/abs/1810.08575
-    - title: ELK Report
-      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-  description: >
-    Paul Christiano is the founder of the Alignment Research Center (ARC) and one of the most technically influential
-    figures in AI alignment. His research has shaped how the field thinks about scaling alignment techniques to
-    superintelligent systems, particularly through his work on iterated amplification, AI safety via debate, and
-    scalable oversight.
-
-
-    Christiano's key insight is that we need alignment techniques that work even when AI systems are smarter than their
-    human overseers. Iterated amplification proposes training AI systems by having them decompose complex tasks into
-    simpler subtasks that humans can evaluate. AI safety via debate imagines training AI systems by having them argue
-    with each other, with humans judging the debates. These approaches aim to amplify human judgment rather than replace
-    it entirely. His work on "Eliciting Latent Knowledge" (ELK) addresses how to get AI systems to honestly report what
-    they believe, even if they're capable of deception.
-
-
-    Before founding ARC in 2021, Christiano was a researcher at OpenAI where he led early work on RLHF and helped
-    establish many of the techniques now used to train large language models. He is known for taking AI risk seriously
-    while maintaining that there are tractable technical paths to safe AI - a position between those who think alignment
-    is essentially impossible and those who think it will be solved by default. His probability estimates for AI-caused
-    catastrophe (around 10-20%) are often cited as representing a serious but not inevitable risk.
-  tags:
-    - iterated-amplification
-    - scalable-oversight
-    - ai-safety-via-debate
-    - elk
-    - prosaic-alignment
-    - recursive-reward-modeling
-    - deception
-  lastUpdated: 2025-12
 - id: robin-hanson
   stableId: DmGXPl1h2g
   wikiId: E260
@@ -794,50 +534,6 @@
       type: organization
     - id: aE60G9uLyA
       type: risk
-    - id: vzxfzxBITd
-      type: person
-  customFields:
-    - label: Role
-      value: Professor of Computer Science, CHAI Founder
-    - label: Known For
-      value: Human Compatible, inverse reinforcement learning, AI safety advocacy
-  sources:
-    - title: Stuart Russell's Homepage
-      url: https://people.eecs.berkeley.edu/~russell/
-    - title: Human Compatible (book)
-      url: https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/
-    - title: CHAI Website
-      url: https://humancompatible.ai/
-    - title: 'TED Talk: 3 Principles for Creating Safer AI'
-      url: https://www.ted.com/talks/stuart_russell_3_principles_for_creating_safer_ai
-  description: >
-    Stuart Russell is a professor of computer science at UC Berkeley and one of the most prominent mainstream AI
-    researchers to seriously engage with AI safety. He is the author of "Artificial Intelligence: A Modern Approach,"
-    the standard textbook used in AI courses worldwide, giving him unusual credibility when he warns about AI risks.
-
-
-    Russell founded the Center for Human-Compatible AI (CHAI) at Berkeley to pursue his vision of AI systems that are
-    inherently safe because they are designed to be uncertain about human values and deferential to human preferences.
-    His book "Human Compatible" (2019) articulated this vision for a general audience, arguing that the standard
-    paradigm of optimizing AI systems for fixed objectives is fundamentally flawed. Instead, he proposes that AI systems
-    should be designed to defer to humans, allow themselves to be corrected, and actively seek to learn human
-    preferences rather than assume they already know them.
-
-
-    Russell has been active in AI governance advocacy, working with the UN and various governments on policy issues
-    including lethal autonomous weapons. He signed open letters calling for AI research to prioritize safety and has
-    testified before legislative bodies on AI risks. His approach emphasizes that AI safety is a solvable technical
-    problem if we redesign AI systems from the ground up with the right objectives, rather than trying to patch safety
-    onto systems designed without it.
-  tags:
-    - inverse-reinforcement-learning
-    - value-alignment
-    - cooperative-ai
-    - off-switch-problem
-    - corrigibility
-    - human-compatible-ai
-    - governance
-  lastUpdated: 2025-12
 - id: toby-ord
   stableId: 8nmqy7vFiA
   wikiId: E355
@@ -847,50 +543,6 @@
   relatedEntries:
     - id: IQvWHA3OiF
       type: person
-    - id: eQh3ZhWv8D
-      type: person
-  customFields:
-    - label: Role
-      value: Senior Research Fellow in Philosophy
-    - label: Known For
-      value: The Precipice, existential risk quantification, effective altruism
-  sources:
-    - title: Toby Ord's Website
-      url: https://www.tobyord.com
-    - title: The Precipice
-      url: https://theprecipice.com/
-    - title: 80,000 Hours Podcast
-      url: https://80000hours.org/podcast/episodes/toby-ord-the-precipice-existential-risk-future-humanity/
-    - title: Giving What We Can
-      url: https://www.givingwhatwecan.org/
-  description: >
-    Toby Ord is a philosopher at Oxford University and author of "The Precipice: Existential Risk and the Future of
-    Humanity" (2020), a comprehensive treatment of existential risks that helped establish AI as a central concern for
-    humanity's long-term future. His work has been influential in shaping how policymakers and researchers think about
-    catastrophic risks.
-
-
-    In "The Precipice," Ord provides quantitative estimates of existential risk from various sources, with AI among the
-    highest. He argues that we are living through a critical period in human history where our technological
-    capabilities have outpaced our wisdom, and that reducing existential risk should be a global priority. His estimates
-    - placing the probability of existential catastrophe this century at about 1 in 6, with AI being a major contributor
-    - are frequently cited in discussions of AI risk.
-
-
-    Ord is also a founding figure in the effective altruism movement. In 2009, he co-founded Giving What We Can, which
-    encourages people to donate significant portions of their income to effective charities. His transition from
-    focusing on global health and development to prioritizing existential risks mirrors a broader shift in the EA
-    movement. Through his writing, teaching, and advisory roles (including advising the UK government on AI), Ord has
-    helped translate abstract concerns about humanity's future into concrete policy discussions.
-  tags:
-    - x-risk
-    - effective-altruism
-    - longtermism
-    - ai-safety
-    - moral-philosophy
-    - risk-assessment
-    - future-generations
-  lastUpdated: 2025-12
 - id: yoshua-bengio
   stableId: nGFBXZeM3d
   wikiId: E380
@@ -898,10 +550,6 @@
   title: Yoshua Bengio
   website: https://yoshuabengio.org
   relatedEntries:
-    - id: 5N5UqXNkkg
-      type: person
-    - id: 73qTEkYyWA
-      type: safety-agenda
     - id: XqjV4mbMXQ
       type: organization
       relationship: research
@@ -956,8 +604,6 @@
   relatedEntries:
     - id: GLXKjYAEKw
       type: organization
-    - id: 1LcLlMGLbw
-      type: organization
     - id: XcGTez1oFw
       type: policy
   tags:
@@ -971,8 +617,6 @@
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
   relatedEntries:
-    - id: rQEkFJxS5w
-      type: organization
     - id: myeSKJXTMA
       type: organization
   tags:
@@ -1003,16 +647,6 @@
   relatedEntries:
     - id: 69vftmr1jg
       type: person
-    - id: mK9pX3rQ7n
-      type: organization
-    - id: zR4nW8xB2f
-      type: person
-    - id: ULjDXpSLCI
-      type: organization
-    - id: 1LcLlMGLbw
-      type: organization
-  lastUpdated: 2026-02
-
 - id: marc-andreessen
   stableId: qspeazccPg
   wikiId: E432
@@ -1031,8 +665,6 @@
   clusters:
     - governance
   relatedEntries:
-    - id: 69vftmr1jg
-      type: person
     - id: rt6jVH9yuA
       type: concept
     - id: bioweapons
@@ -1065,14 +697,8 @@
       type: organization
     - id: 2V63hGITAw
       type: organization
-    - id: 69vftmr1jg
-      type: person
-    - id: nGFBXZeM3d
-      type: person
     - id: dVQzYIAN3A
       type: person
-    - id: 73qTEkYyWA
-      type: safety-agenda
     - id: l8ZPtVJdsA
       type: concept
   lastUpdated: 2026-03
@@ -1128,10 +754,6 @@
       type: organization
     - id: samotsvety
       type: organization
-    - id: CUBiiyCfOA
-      type: organization
-    - id: ULjDXpSLCI
-      type: organization
     - id: BEKEqQDmkQ
       type: organization
     - id: quri
@@ -1160,8 +782,6 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: ULjDXpSLCI
-      type: organization
     - id: 6gjF5d3geg
       type: person
     - id: pvJ50HupEQ
@@ -1226,21 +846,10 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: d9sWZtyVwg
-      type: organization
-    - id: 2V63hGITAw
-      type: organization
     - id: Qns43S795w
-      type: organization
-    - id: pvJ50HupEQ
-      type: organization
-    - id: mK9pX3rQ7n
       type: organization
     - id: 3KjUCZCV8w
       type: person
-    - id: dVQzYIAN3A
-      type: person
-  lastUpdated: 2026-03
 - id: leopold-aschenbrenner
   stableId: izkduIMBDg
   wikiId: E578
@@ -1267,8 +876,6 @@
     space management in Moscow) and contributed to LessWrong/ForumMagnum
     development. Active on Squiggle from 2022 to 2025.
   relatedEntries:
-    - id: quri
-      type: organization
     - id: squiggle
       type: project
     - id: squiggle-hub
@@ -1290,9 +897,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  lastUpdated: 2026-03
 - id: vidur-kapur
   stableId: XqvdX3YisQ
   wikiId: E580
@@ -1368,36 +972,6 @@
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries:
-    - id: ULjDXpSLCI
-      type: organization
-    - id: JhIGCaI3Ng
-      type: organization
-    - id: 8nmqy7vFiA
-      type: person
-  customFields:
-    - label: Role
-      value: Philosopher, longtermist philanthropist, former Open Philanthropy program officer
-    - label: Known For
-      value: Longtermism, existential risk, FTX Future Fund leadership, Secure AI Project
-  sources:
-    - title: Nick Beckstead's website
-      url: https://www.nickbeckstead.com/
-    - title: Nick Beckstead's PhD thesis - On the Overwhelming Importance of Shaping the Far Future
-      url: https://rucore.libraries.rutgers.edu/rutgers-lib/40469/
-  description: >-
-    Nick Beckstead is a philosopher and philanthropist who completed his PhD at Rutgers University in 2013
-    with a dissertation arguing for the overwhelming importance of shaping the far future—one of the first
-    rigorous academic defenses of longtermism. He served as a program officer at Open Philanthropy, where
-    he managed a substantial longtermism portfolio focusing on existential risk reduction and global catastrophic
-    risk. He later became a founding team member of the FTX Future Fund before its collapse in November 2022
-    when FTX filed for bankruptcy. He subsequently founded the Secure AI Project, a policy advocacy organization
-    focused on legislative requirements for AI safety protocols and whistleblower protections.
-  clusters:
-    - ai-safety
-    - community
-    - governance
-  lastUpdated: 2026-02
-
 - id: will-macaskill
   stableId: p1P9oQwB6w
   wikiId: E862
@@ -1407,38 +981,6 @@
   relatedEntries:
     - id: aKZsmUeuWg
       type: organization
-    - id: gNsqAes7Dw
-      type: organization
-    - id: 8nmqy7vFiA
-      type: person
-    - id: ULjDXpSLCI
-      type: organization
-  customFields:
-    - label: Role
-      value: Senior Research Fellow, Forethought
-    - label: Known For
-      value: Effective altruism, longtermism, "What We Owe the Future", Giving What We Can
-  sources:
-    - title: Will MacAskill's website
-      url: https://www.willmacaskill.com/
-    - title: What We Owe the Future (book)
-      url: https://www.basicbooks.com/titles/william-macaskill/what-we-owe-the-future/9781541618626/
-    - title: Doing Good Better (book)
-      url: https://www.goodreads.com/book/show/23398748-doing-good-better
-  description: >-
-    Will MacAskill is an Associate Professor of Philosophy at Oxford University and a central figure in
-    the effective altruism (EA) movement. In 2009, he co-founded Giving What We Can with Toby Ord, an
-    organization that encourages members to pledge 10% of their income to highly effective charities.
-    He also co-founded the Centre for Effective Altruism. His 2015 book "Doing Good Better" popularized
-    EA principles to a mainstream audience. His 2022 book "What We Owe the Future" made the case for
-    longtermism—the view that we should give significant weight to the wellbeing of future generations—
-    and brought widespread attention to existential risk and AI safety. He coined the term "effective
-    altruism" and has been instrumental in directing billions of dollars toward high-impact causes including
-    global health, animal welfare, and existential risk reduction.
-  clusters:
-    - ai-safety
-    - community
-  lastUpdated: 2026-02
 - id: joe-biden
   stableId: 6kAEE9sPCg
   wikiId: E1017
@@ -1846,14 +1388,6 @@
     - governance
     - epistemics
   relatedEntries:
-    - id: d9sWZtyVwg
-      type: organization
-    - id: 2V63hGITAw
-      type: organization
-    - id: CUBiiyCfOA
-      type: project
-    - id: 3KjUCZCV8w
-      type: person
     - id: 518H1VpKLA
       type: organization
   customFields:
@@ -1901,8 +1435,6 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
     - id: xPfsyJ9s4Q
       type: approach
     - id: lCiT37k9pA
@@ -1911,30 +1443,6 @@
       type: organization
     - id: sdM7KbGOGg
       type: person
-    - id: dVQzYIAN3A
-      type: person
-    - id: 3KjUCZCV8w
-      type: person
-    - id: nGFBXZeM3d
-      type: person
-  customFields:
-    - label: Role
-      value: Projects Lead, Future of Life Foundation
-    - label: Known For
-      value: AI for Human Reasoning Fellowship, Knowledge Commons, Guaranteed Safe AI
-  sources:
-    - title: Ben Goldhaber Newsletter (Jan 2025)
-      url: https://bengoldhaber.substack.com/p/january-2025-bengoldhabercom-newsletter
-    - title: FAR.AI Profile
-      url: https://www.far.ai/about/people/ben-goldhaber
-    - title: A Knowledge Commons for the 21st Century (Dec 2025)
-      url: https://bengoldhaber.substack.com/
-    - title: Towards Guaranteed Safe AI (arXiv, May 2024)
-      url: https://arxiv.org/abs/2405.06624
-    - title: Some Areas I'm Excited About (May 2025)
-      url: https://bengoldhaber.com/
-  lastUpdated: 2026-03
-
 - id: josh-jacobson
   stableId: fslZ4KLnXg
   type: person
@@ -1953,14 +1461,6 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
-    - id: myeSKJXTMA
-      type: organization
-    - id: lCiT37k9pA
-      type: organization
-    - id: mK9pX3rQ7n
-      type: organization
     - id: Zmw9nfUYWA
       type: organization
   customFields:
@@ -1998,28 +1498,10 @@
     - epistemics
     - governance
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
     - id: aX0jkoaekQ
       type: organization
     - id: 0tQftJKP4Q
       type: person
-    - id: xPfsyJ9s4Q
-      type: approach
-  customFields:
-    - label: Role
-      value: Researcher, AI Specialist, Future of Life Foundation
-    - label: Known For
-      value: Full Epistemic Stack, MATS fellow, UK AISI researcher
-  sources:
-    - title: Oliver Sourbut - A Full Epistemic Stack
-      url: https://www.oliversourbut.net/p/a-full-epistemic-stack
-    - title: FLI Podcast - How AI Can Help Humanity Reason Better
-      url: https://podcast.futureoflife.org/how-ai-can-help-humanity-reason-better-with-oly-sourbut/
-    - title: MATS Mentor Page
-      url: https://www.matsprogram.org/mentor/sourbut
-  lastUpdated: 2026-03
-
 - id: elizabeth-garrett
   stableId: rWMi3jrTCQ
   type: person
@@ -2036,13 +1518,6 @@
   clusters:
     - community
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
-  customFields:
-    - label: Role
-      value: Headhunter/Recruitment Lead, Future of Life Foundation
-  lastUpdated: 2026-03
-
 - id: richard-mallah
   stableId: mK2KLknYGg
   type: person
@@ -2062,17 +1537,6 @@
   relatedEntries:
     - id: Vc6W6S1qMg
       type: organization
-    - id: d9sWZtyVwg
-      type: organization
-    - id: 2V63hGITAw
-      type: organization
-  customFields:
-    - label: Role
-      value: Executive Director, CARMA
-    - label: Known For
-      value: FLI AI Safety Strategy, CARMA
-  lastUpdated: 2026-03
-
 - id: timothy-telleen-lawton
   stableId: 4ZKddwff5g
   type: person
@@ -2087,10 +1551,6 @@
   clusters:
     - community
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
-    - id: xPfsyJ9s4Q
-      type: approach
     - id: OwXl35e7bg
       type: organization
   customFields:
@@ -2116,22 +1576,6 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: 2V63hGITAw
-      type: organization
-    - id: xPfsyJ9s4Q
-      type: approach
-    - id: ULjDXpSLCI
-      type: organization
-  customFields:
-    - label: Role
-      value: Program Manager, AI for Human Reasoning Fellowship
-    - label: Known For
-      value: Open Philanthropy AI forecasting, Eleos AI Research
-  sources:
-    - title: Kathleen Finlinson Personal Site
-      url: https://k-finn.github.io/
-  lastUpdated: 2026-03
-
 - id: scott-wiener
   stableId: HLc6VrCh5w
   wikiId: E1471
@@ -2150,8 +1594,6 @@
     - label: Known For
       value: "SB 1047, SB 53, AI safety legislation"
   relatedEntries:
-    - id: XcGTez1oFw
-      type: policy
     - id: UD11PlWtlg
       type: policy
   tags:
@@ -2176,19 +1618,6 @@
     - label: Known For
       value: "SB 1047 veto, signing 18 AI bills, SB 53"
   relatedEntries:
-    - id: XcGTez1oFw
-      type: policy
-    - id: UD11PlWtlg
-      type: policy
-  tags:
-    - california
-    - governance
-    - ai-policy
-
-# Entries below fix garbled/missing person entries on org pages (issue #2602).
-# These stableIds must match exactly what was written to the PG entities table
-# by previous personnel enrichment runs.
-
 - id: josue-estrada
   stableId: FeHrdAUKpQ
   type: person
@@ -2637,12 +2066,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-    - id: squiggle
-      type: project
-    - id: squiggle-hub
-      type: project
     - id: guesstimate
       type: project
   customFields:
@@ -2669,12 +2092,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-    - id: squiggle
-      type: project
-  lastUpdated: 2026-03
-
 - id: quinn-dougherty
   stableId: YtooTZ0ORg
   type: person
@@ -2687,13 +2104,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/quinn
-  lastUpdated: 2026-03
-
 - id: elizabeth-van-nostrand
   stableId: rF8popeiHw
   type: person
@@ -2706,15 +2116,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/elizabeth
-    - title: LessWrong Profile
-      url: https://www.lesswrong.com/users/elizabeth-1
-  lastUpdated: 2026-03
-
 - id: umur-ozkul
   stableId: y9XSIBClAw
   type: person
@@ -2726,12 +2127,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-    - id: squiggle
-      type: project
-  lastUpdated: 2026-03
-
 - id: jacob-lagerros
   stableId: JUWVFemrYQ
   type: person
@@ -2742,15 +2137,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/jacobjacob
-    - title: LessWrong Profile
-      url: https://www.lesswrong.com/users/jacobjacob
-  lastUpdated: 2026-03
-
 - id: andrew-critch
   stableId: ckKaHtKC5g
   type: person
@@ -2768,15 +2154,6 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/critch
-    - title: LessWrong Profile
-      url: https://www.lesswrong.com/users/andrew_critch
-  lastUpdated: 2026-03
-
 - id: peter-wildeford
   stableId: mIbKwQ4ZwQ
   type: person
@@ -2787,8 +2164,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
     - id: rethink-priorities
       type: organization
   sources:
@@ -2807,13 +2182,6 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: quri
-      type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/misha_yagudin
-  lastUpdated: 2026-03
-
 - id: tom-brown
   stableId: 4CY8YJCrM7
   wikiId: E1258
@@ -2953,9 +2321,6 @@
   title: David Dalrymple
   website: https://davidad.org
   relatedEntries:
-    - id: XqjV4mbMXQ
-      type: organization
-      relationship: leads-to
     - id: MEt9F7f50w
       type: approach
       relationship: leads-to
@@ -3028,62 +2393,16 @@
   type: person
   title: Markus Anderljung
   relatedEntries:
-    - id: XLLyzaEaCA
-      type: organization
-      relationship: leads-to
-  sources:
-    - title: GovAI Team Page
-      url: https://www.governance.ai/team
-  description: >-
-    Head of Policy at the Centre for the Governance of AI (GovAI).
-    Lead author of "Frontier AI Regulation: Managing Emerging Risks to
-    Public Safety" (2023) and co-author of "Computing Power and the
-    Governance of Artificial Intelligence" (2024). Previously at the
-    Future of Humanity Institute.
-  tags:
-    - ai-governance
-    - ai-policy
-    - compute-governance
-
 - id: emma-bluemke
   stableId: wKx_yCn-EJ
   type: person
   title: Emma Bluemke
   relatedEntries:
-    - id: XLLyzaEaCA
-      type: organization
-      relationship: related
-  sources:
-    - title: GovAI Team Page
-      url: https://www.governance.ai/team
-  description: >-
-    Research Manager at the Centre for the Governance of AI (GovAI).
-  tags:
-    - ai-governance
-
 - id: anton-korinek
   stableId: evoWfReU6W
   type: person
   title: Anton Korinek
   relatedEntries:
-    - id: XLLyzaEaCA
-      type: organization
-      relationship: related
-  sources:
-    - title: Anton Korinek at UVA
-      url: https://www.antonkorinek.com/
-  description: >-
-    Professor of Economics at the University of Virginia and Economics
-    of AI Lead at GovAI. Research focuses on the economic implications
-    of AI, macroeconomic policy for transformative AI, and AI governance.
-    Also affiliated with the Brookings Institution and NBER.
-  tags:
-    - ai-governance
-    - economics
-    - ai-policy
-
-# --- AI Now Institute personnel ---
-
 - id: amba-kak
   stableId: xTqcQVprIH
   type: person
@@ -3111,139 +2430,36 @@
   type: person
   title: Sarah Myers West
   relatedEntries:
-    - id: VJacG0VE2w
-      type: organization
-      relationship: leads-to
-  sources:
-    - title: AI Now Institute Team
-      url: https://ainowinstitute.org/people
-  description: >-
-    Co-Executive Director of the AI Now Institute. Previously a
-    postdoctoral researcher at AI Now and a Senior AI Policy Analyst
-    at the Federal Trade Commission (FTC). Research focuses on AI
-    governance, data practices, and institutional accountability.
-  tags:
-    - ai-governance
-    - ai-policy
-
 - id: kate-crawford
   stableId: 77SnPuPnk8
   type: person
   title: Kate Crawford
   relatedEntries:
-    - id: VJacG0VE2w
-      type: organization
-      relationship: leads-to
-  sources:
-    - title: Kate Crawford Website
-      url: https://www.katecrawford.net/
-    - title: "Atlas of AI (Yale University Press)"
-      url: https://yalebooks.yale.edu/book/9780300264630/atlas-of-ai/
-  description: >-
-    Co-founder of the AI Now Institute and Research Professor at USC
-    Annenberg. Previously a Principal Researcher at Microsoft Research
-    (2006-2021). Author of "Atlas of AI" (2021), a landmark book on
-    AI's material and social impacts. Senior Fellow at the Oxford
-    Internet Institute.
-  tags:
-    - ai-governance
-    - ai-ethics
-    - research
-
 - id: meredith-whittaker
   stableId: 3R1I5JCrP4
   type: person
   title: Meredith Whittaker
   relatedEntries:
-    - id: VJacG0VE2w
-      type: organization
-      relationship: leads-to
-  sources:
-    - title: Signal Foundation
-      url: https://signal.org/
-    - title: AI Now Institute
-      url: https://ainowinstitute.org/
-  description: >-
-    Co-founder of the AI Now Institute and President of the Signal
-    Foundation. Previously at Google for 13 years, where she founded
-    Google's Open Research group and led internal organizing against
-    Project Maven and workplace conditions. Known for advocacy on
-    AI accountability and tech worker rights.
-  tags:
-    - ai-governance
-    - ai-ethics
-    - privacy
-
 - id: heidy-khlaaf
   stableId: npfho6p1QL
   type: person
   title: Heidy Khlaaf
   relatedEntries:
-    - id: VJacG0VE2w
-      type: organization
-      relationship: related
-  sources:
-    - title: AI Now Institute About
-      url: https://ainowinstitute.org/about
-  description: >-
-    Chief AI Scientist at the AI Now Institute. PhD in Computer Science from
-    UCL. Previously Engineering Director of AI Assurance at Trail of Bits.
-    Led safety evaluation of Codex at OpenAI and pioneered the field of AI
-    Safety Engineering. Led cyber evaluations for the launch of UK AISI.
-    Named TIME 100 AI 2025 and MIT Technology Review Innovators Under 35.
-  tags:
-    - ai-safety
-    - ai-governance
-    - cybersecurity
-
-# --- CAIS personnel ---
-
 - id: thomas-woodside
   stableId: KfgopYXMo8
   type: person
   title: Thomas Woodside
   relatedEntries:
-    - id: y4bieqSeag
-      type: organization
-      relationship: related
-  description: >-
-    Policy Director at the Center for AI Safety (CAIS). Works on AI policy
-    and governance, including compute governance and safety standards.
-  tags:
-    - ai-safety
-    - ai-policy
-
 - id: andy-zou
   stableId: SIfbuDzvcU
   type: person
   title: Andy Zou
   relatedEntries:
-    - id: y4bieqSeag
-      type: organization
-      relationship: related
-  description: >-
-    Research scientist at the Center for AI Safety (CAIS). Lead author
-    of "Universal and Transferable Adversarial Attacks on Aligned Language
-    Models" and co-author of representation engineering research.
-  tags:
-    - ai-safety
-    - adversarial-robustness
-
 - id: mantas-mazeika
   stableId: j4eeIGYdY2
   type: person
   title: Mantas Mazeika
   relatedEntries:
-    - id: y4bieqSeag
-      type: organization
-      relationship: related
-  description: >-
-    Research scientist at the Center for AI Safety (CAIS). Co-author of
-    the WMDP benchmark and HarmBench papers on evaluating AI safety.
-  tags:
-    - ai-safety
-    - benchmarks
-
 - id: esben-kran
   stableId: HwM6OF6Ewg
   type: person
@@ -3282,15 +2498,6 @@
     CEO of Apart Research. Leads the organization's operations, research sprints,
     and fellowship programs.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: jason-hoelscher-obermaier
   stableId: 2kfQ41S__Y
   type: person
@@ -3300,16 +2507,6 @@
     research programs. Has a PhD and co-authored publications including
     "Detecting Edit Failures In Large Language Models" (ACL 2023).
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-    - alignment
-  lastUpdated: 2026-03
-
 - id: natalia-perez-campanero-antolin
   stableId: i78bV5zHTe
   type: person
@@ -3317,15 +2514,6 @@
   description: >-
     Research Lead at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: jacob-haimes
   stableId: Bq7bnwVybe
   type: person
@@ -3333,15 +2521,6 @@
   description: >-
     Research Manager at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: al-hussein-saqr
   stableId: vxQxyoROkq
   type: person
@@ -3349,15 +2528,6 @@
   description: >-
     Operations Coordinator at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: clement-neo
   stableId: BkIIdAqW_U
   type: person
@@ -3365,15 +2535,6 @@
   description: >-
     Lab Advisor at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: christian-schroeder-de-witt
   stableId: Uyu-64zinm
   type: person
@@ -3381,15 +2542,6 @@
   description: >-
     Research Advisor at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: nick-fitz
   stableId: g2nElvI1Hj
   type: person
@@ -3397,15 +2549,6 @@
   description: >-
     Strategy Advisor at Apart Research.
   relatedEntries:
-    - id: 5WqgebIWFQ
-      type: organization
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: jeremie-harris
   stableId: aJOiUj35UA
   type: person
@@ -3551,13 +2694,6 @@
   relatedEntries:
     - id: cnas
       type: organization
-    - id: hardware-mechanisms-international-ai-agreements
-      type: analysis
-  tags:
-    - hardware-governance
-    - compute-governance
-    - national-security
-
 - id: onni-aarne
   stableId: bZxOUSEdmY
   type: person
@@ -3577,13 +2713,6 @@
   relatedEntries:
     - id: iaps
       type: organization
-    - id: hardware-mechanisms-international-ai-agreements
-      type: analysis
-  tags:
-    - hardware-governance
-    - compute-governance
-    - ai-policy
-
 - id: gabriel-kulp
   stableId: jjQcmC_uFV
   type: person
@@ -3641,13 +2770,6 @@
   relatedEntries:
     - id: openai
       type: organization
-    - id: hardware-mechanisms-international-ai-agreements
-      type: analysis
-  tags:
-    - compute-governance
-    - hardware-governance
-    - ai-policy
-
 - id: aidan-ogara
   stableId: SM7cEzpYvl
   type: person
@@ -4478,18 +3600,6 @@
     advocate credited with coining the term "open-source software" in its
     modern software community sense (1998).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Co-founder, Projects Director, Foresight Institute
-    - label: Known For
-      value: Coined "open-source software" term (1998)
-  tags:
-    - nanotechnology
-    - open-source
-  lastUpdated: 2026-03
-
 - id: k-eric-drexler
   stableId: jExOzigU4B
   type: person
@@ -4499,17 +3609,6 @@
     molecular manufacturing. Author of foundational works on molecular
     machine systems.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Co-founder, Foresight Institute
-    - label: Known For
-      value: Nanotechnology pioneer, molecular manufacturing
-  tags:
-    - nanotechnology
-  lastUpdated: 2026-03
-
 - id: james-c-bennett
   stableId: 8Mk8-7uSm6
   type: person
@@ -4518,16 +3617,6 @@
     Co-founder and Director of Foresight Institute. Co-founder of commercial
     space launch companies and consultant in space and technology.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Co-founder, Director, Foresight Institute
-  tags:
-    - space
-    - nanotechnology
-  lastUpdated: 2026-03
-
 - id: brandon-goldman
   stableId: 04ESS5IDzn
   type: person
@@ -4536,15 +3625,6 @@
     Treasurer of Foresight Institute. Investor focused on AI safety and
     existential risk.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Treasurer, Foresight Institute
-  tags:
-    - ai-safety
-  lastUpdated: 2026-03
-
 - id: sonia-arrison
   stableId: JkPfxLKrTR
   type: person
@@ -4553,17 +3633,6 @@
     Director of Foresight Institute. Author of '100 Plus'. Founder of 100
     Plus Capital. Board member at Thiel Foundation.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Director, Foresight Institute
-    - label: Known For
-      value: Author of '100 Plus', 100 Plus Capital founder
-  tags:
-    - longevity
-  lastUpdated: 2026-03
-
 - id: chip-morningstar
   stableId: uPDPgwTvaz
   type: person
@@ -4572,13 +3641,6 @@
     Director of Foresight Institute. Software architect focused on online
     entertainment and communication.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Director, Foresight Institute
-  lastUpdated: 2026-03
-
 - id: peter-diamandis
   stableId: tVhfitccVu
   type: person
@@ -4588,17 +3650,6 @@
     Feynman Grand Prize committee (2004). Entrepreneur and author focused
     on exponential technologies.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Advisor, Foresight Institute
-    - label: Known For
-      value: X-Prize Foundation founder
-  tags:
-    - technology
-  lastUpdated: 2026-03
-
 - id: michael-skuhersky
   stableId: WF63mO4uXf
   type: person
@@ -4606,16 +3657,6 @@
   description: >-
     Researcher in synthetic neurobiology and mind uploading at MIT Media Lab. Foresight Fellow (2017).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2017)
-    - label: Research Area
-      value: Synthetic neurobiology / mind uploading
-  tags: [neuroscience, nanotechnology]
-  lastUpdated: 2026-03
-
 - id: berhane-temelso
   stableId: E4_x-Cc9Nb
   type: person
@@ -4623,16 +3664,6 @@
   description: >-
     Computational chemist at Furman University. Foresight Fellow (2017).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2017)
-    - label: Research Area
-      value: Computational chemistry
-  tags: [chemistry]
-  lastUpdated: 2026-03
-
 - id: christopher-wilmer
   stableId: gc2ul9ESdY
   type: person
@@ -4640,16 +3671,6 @@
   description: >-
     Chemical engineering researcher focused on molecular machines at University of Pittsburgh. Foresight Fellow (2017).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2017)
-    - label: Research Area
-      value: Chemical engineering / molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: chuyang-cheng
   stableId: 0NB15aKxPM
   type: person
@@ -4657,16 +3678,6 @@
   description: >-
     Researcher in molecular machines at Northwestern University (Stoddart group). Foresight Fellow (2017).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2017)
-    - label: Research Area
-      value: Molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: eva-maria-strauch
   stableId: k3aEQarjFs
   type: person
@@ -4674,16 +3685,6 @@
   description: >-
     Protein design researcher at University of Washington. Foresight Fellow (2017).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2017)
-    - label: Research Area
-      value: Protein design
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: roman-yampolskiy
   stableId: LH_b3YDCyA
   type: person
@@ -4691,16 +3692,6 @@
   description: >-
     AI safety and security researcher at University of Louisville. Known for work on AI containment and the AI control problem. Foresight Fellow (2018).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2018)
-    - label: Research Area
-      value: AI safety & security
-  tags: [ai-safety]
-  lastUpdated: 2026-03
-
 - id: grigory-tikhomirov
   stableId: _OzCsPWWG2
   type: person
@@ -4708,16 +3699,6 @@
   description: >-
     DNA nanotechnology researcher at Caltech. Foresight Fellow (2018).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2018)
-    - label: Research Area
-      value: DNA nanotechnology
-  tags: [nanotechnology, biotechnology]
-  lastUpdated: 2026-03
-
 - id: jane-lippencott
   stableId: mEMBu1OgGM
   type: person
@@ -4725,16 +3706,6 @@
   description: >-
     Blockchain governance researcher. Associated with ZenCash and Eden. Foresight Fellow (2018).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2018)
-    - label: Research Area
-      value: Blockchain governance
-  tags: [governance, blockchain]
-  lastUpdated: 2026-03
-
 - id: peter-scheyer
   stableId: -IegqWaP_8
   type: person
@@ -4742,16 +3713,6 @@
   description: >-
     Researcher in corporate AGI and computer security. Foresight Fellow (2018).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2018)
-    - label: Research Area
-      value: Corporate AGI & computer security
-  tags: [ai-safety, cybersecurity]
-  lastUpdated: 2026-03
-
 - id: patrick-mellor
   stableId: xckZ8811MM
   type: person
@@ -4759,16 +3720,6 @@
   description: >-
     Clean energy and CO2 drawdown researcher at San Francisco State University. Foresight Fellow (2019).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2019)
-    - label: Research Area
-      value: Clean energy & CO2 drawdown
-  tags: [climate]
-  lastUpdated: 2026-03
-
 - id: tj-brunette
   stableId: BXUtJUR2Mk
   type: person
@@ -4776,16 +3727,6 @@
   description: >-
     Protein design and molecular machines researcher at University of Washington (Baker lab). Foresight Fellow (2019).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2019)
-    - label: Research Area
-      value: Protein design / molecular machines
-  tags: [biotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: caroline-jeanmaire
   stableId: VZOcEjZnoz
   type: person
@@ -4793,16 +3734,6 @@
   description: >-
     AI governance researcher at UC Berkeley Center for Human-Compatible AI (CHAI). Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: AI governance
-  tags: [ai-governance, ai-safety]
-  lastUpdated: 2026-03
-
 - id: felix-andreas-faber
   stableId: jc3mO3Nbd5
   type: person
@@ -4810,16 +3741,6 @@
   description: >-
     Machine learning researcher focused on drug and materials discovery. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: ML for drug/materials discovery
-  tags: [machine-learning, biotechnology]
-  lastUpdated: 2026-03
-
 - id: matthew-ryder
   stableId: f3iZsZaJL7
   type: person
@@ -4827,16 +3748,6 @@
   description: >-
     Molecular-scale engineering researcher at Oak Ridge National Laboratory. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Molecular-scale engineering
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: alevtina-evgrafova
   stableId: iClhSDzfCb
   type: person
@@ -4844,16 +3755,6 @@
   description: >-
     Researcher in sustainable agriculture. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Sustainable agriculture
-  tags: [agriculture]
-  lastUpdated: 2026-03
-
 - id: tony-lai
   stableId: bZ-9Klhvc-
   type: person
@@ -4861,16 +3762,6 @@
   description: >-
     Legal engineering researcher at Stanford CodeX focused on biosphere governance. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Legal engineering for the biosphere
-  tags: [governance, law]
-  lastUpdated: 2026-03
-
 - id: giuliana-rotola
   stableId: 3Nvj6hnumO
   type: person
@@ -4878,16 +3769,6 @@
   description: >-
     Space studies and space law researcher. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Space studies / space law
-  tags: [space]
-  lastUpdated: 2026-03
-
 - id: jeffrey-ladish
   stableId: WVV_8_T-oo
   type: person
@@ -4895,16 +3776,6 @@
   description: >-
     Biosecurity researcher and advocate. Foresight Fellow (2020). Works on reducing catastrophic biological risks.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Biosecurity
-  tags: [biosecurity, existential-risk]
-  lastUpdated: 2026-03
-
 - id: tessa-alexanian
   stableId: NRW6ZB83dF
   type: person
@@ -4912,16 +3783,6 @@
   description: >-
     Responsible biotechnology researcher and advocate. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: Responsible biotechnology
-  tags: [biotechnology, biosecurity]
-  lastUpdated: 2026-03
-
 - id: daniel-elton
   stableId: Cz6cISzH1W
   type: person
@@ -4929,16 +3790,6 @@
   description: >-
     AI for medical imaging researcher at NIH Clinical Center. Foresight Fellow (2020).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2020)
-    - label: Research Area
-      value: AI for medical imaging
-  tags: [machine-learning, healthcare]
-  lastUpdated: 2026-03
-
 - id: liang-feng
   stableId: 0SMuMn2uP1
   type: person
@@ -4946,16 +3797,6 @@
   description: >-
     Researcher in metal-organic frameworks and molecular machines. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: Metal-organic frameworks / molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: maxim-ziatdinov
   stableId: jF16YrGGt9
   type: person
@@ -4963,16 +3804,6 @@
   description: >-
     Machine learning for materials science researcher. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: ML for materials science
-  tags: [machine-learning, nanotechnology]
-  lastUpdated: 2026-03
-
 - id: yunyan-qiu
   stableId: pIg7IUR6ZK
   type: person
@@ -4980,16 +3811,6 @@
   description: >-
     Molecular machines researcher at Northwestern University (Stoddart group). Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: Molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: xiaohu-neil-zhu
   stableId: DIubf1q8c4
   type: person
@@ -4997,16 +3818,6 @@
   description: >-
     AI education researcher at University AI (China). Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: AI education
-  tags: [ai-education]
-  lastUpdated: 2026-03
-
 - id: joscha-bach
   stableId: _LXq6c8vXY
   type: person
@@ -5014,16 +3825,6 @@
   description: >-
     AI researcher affiliated with AI Foundation, MIT Media Lab, and Harvard. Known for work on cognitive architectures and artificial general intelligence. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: AI research / cognitive architectures
-  tags: [ai-safety, agi]
-  lastUpdated: 2026-03
-
 - id: jazear-brooks
   stableId: 1CMuMbNe1q
   type: person
@@ -5031,16 +3832,6 @@
   description: >-
     Computer science and fintech researcher. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: Computer science / fintech
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: yip-fai-tse
   stableId: h7l352tthg
   type: person
@@ -5048,16 +3839,6 @@
   description: >-
     AI ethics researcher focused on nonhuman animals at Princeton University (under Peter Singer). Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: "AI ethics re: nonhuman animals"
-  tags: [ai-ethics]
-  lastUpdated: 2026-03
-
 - id: stephen-malina
   stableId: PG8MZrQT6v
   type: person
@@ -5065,16 +3846,6 @@
   description: >-
     Machine learning researcher focused on virus and protein design at Dyno Therapeutics. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: ML for virus & protein design
-  tags: [machine-learning, biotechnology]
-  lastUpdated: 2026-03
-
 - id: jj-ben-joseph
   stableId: MPO_wgUUDj
   type: person
@@ -5082,16 +3853,6 @@
   description: >-
     Biosecurity and AI researcher at In-Q-Tel. Foresight Fellow (2021).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2021)
-    - label: Research Area
-      value: Biosecurity & AI
-  tags: [biosecurity, ai-safety]
-  lastUpdated: 2026-03
-
 - id: delphine-larrieu
   stableId: ovkNsXhA41
   type: person
@@ -5099,16 +3860,6 @@
   description: >-
     Researcher on premature aging syndromes at Cambridge Institute for Medical Research. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Premature aging syndromes
-  tags: [longevity, biotechnology]
-  lastUpdated: 2026-03
-
 - id: simon-krause
   stableId: dLjBtrUfhw
   type: person
@@ -5116,16 +3867,6 @@
   description: >-
     Researcher on framework-embedded molecular machines at Max Planck Institute. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Framework-embedded molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: alexander-fedintsev
   stableId: B-2DIwLZOb
   type: person
@@ -5133,16 +3874,6 @@
   description: >-
     Bioinformatics and machine learning researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Bioinformatics / ML
-  tags: [machine-learning, biotechnology]
-  lastUpdated: 2026-03
-
 - id: tatyana-dobreva
   stableId: bQv1tYrfRd
   type: person
@@ -5150,16 +3881,6 @@
   description: >-
     Signal processing and neuroprosthetics researcher at NASA JPL. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Signal processing / neuroprosthetics
-  tags: [neuroscience, space]
-  lastUpdated: 2026-03
-
 - id: victor-garcia-lopez
   stableId: 551B3lJTX0
   type: person
@@ -5167,16 +3888,6 @@
   description: >-
     Researcher in molecular devices. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Molecular devices
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: david-august
   stableId: nuD8_FJ7ne
   type: person
@@ -5184,16 +3895,6 @@
   description: >-
     Molecular weaving researcher at University of Edinburgh. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Molecular weaving
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: matthew-mcateer
   stableId: 0xBcCmkVM4
   type: person
@@ -5201,16 +3902,6 @@
   description: >-
     Biotech and machine learning researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Biotech / ML
-  tags: [machine-learning, biotechnology]
-  lastUpdated: 2026-03
-
 - id: jamie-joyce
   stableId: PEyP8A7QXX
   type: person
@@ -5218,16 +3909,6 @@
   description: >-
     Structured knowledge and argument mapping researcher. Founder of Society Library. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Structured knowledge / argument mapping
-  tags: [knowledge-management]
-  lastUpdated: 2026-03
-
 - id: nikola-markov
   stableId: 30kVfhriPv
   type: person
@@ -5235,16 +3916,6 @@
   description: >-
     Bioinformatics and aging researcher at Buck Institute. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Bioinformatics / aging
-  tags: [longevity, biotechnology]
-  lastUpdated: 2026-03
-
 - id: zvonimir-vrselja
   stableId: j_tiaJYbZf
   type: person
@@ -5252,16 +3923,6 @@
   description: >-
     Neuroscience researcher at Yale School of Medicine. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Neuroscience
-  tags: [neuroscience]
-  lastUpdated: 2026-03
-
 - id: bradley-english
   stableId: U1OfRySCHR
   type: person
@@ -5269,16 +3930,6 @@
   description: >-
     Aging biomarkers researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Aging biomarkers
-  tags: [longevity]
-  lastUpdated: 2026-03
-
 - id: tushant-jha
   stableId: _OcY1kmurG
   type: person
@@ -5286,16 +3937,6 @@
   description: >-
     AI ethics and value alignment researcher at Future of Humanity Institute (FHI). Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: AI ethics / value alignment
-  tags: [ai-safety, ai-ethics]
-  lastUpdated: 2026-03
-
 - id: tinka-vidovic
   stableId: Mo3dSTEDNV
   type: person
@@ -5303,16 +3944,6 @@
   description: >-
     Molecular medicine and anti-aging researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Molecular medicine / anti-aging
-  tags: [longevity, biotechnology]
-  lastUpdated: 2026-03
-
 - id: maryna-polyakova
   stableId: WwfLP95_oA
   type: person
@@ -5320,16 +3951,6 @@
   description: >-
     Neuroimaging and depression researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Neuroimaging / depression
-  tags: [neuroscience, healthcare]
-  lastUpdated: 2026-03
-
 - id: yuri-deigin
   stableId: 8bh_v5LzgL
   type: person
@@ -5337,16 +3958,6 @@
   description: >-
     Biotech entrepreneur focused on drug discovery and longevity. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Biotech entrepreneurship / drug discovery
-  tags: [longevity, biotechnology]
-  lastUpdated: 2026-03
-
 - id: yanguang-zhou
   stableId: 1KA0JCfjE4
   type: person
@@ -5354,16 +3965,6 @@
   description: >-
     Mechanical engineering and thermal science researcher at HKUST. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Mechanical engineering / thermal science
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: georgios-kaissis
   stableId: jxL-vV2Li1
   type: person
@@ -5371,16 +3972,6 @@
   description: >-
     Radiology and privacy-preserving machine learning researcher at TU Munich. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Radiology / privacy-preserving ML
-  tags: [machine-learning, healthcare]
-  lastUpdated: 2026-03
-
 - id: yuanning-feng
   stableId: 0Z1dC0PS2b
   type: person
@@ -5388,16 +3979,6 @@
   description: >-
     Researcher in dynamic functional molecules. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Dynamic functional molecules
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: giulio-ragazzon
   stableId: Wj8Gmei1lA
   type: person
@@ -5405,16 +3986,6 @@
   description: >-
     Molecular machines and photochemistry researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Molecular machines / photochemistry
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: kai-micah-mills
   stableId: v80f8wYPXB
   type: person
@@ -5422,16 +3993,6 @@
   description: >-
     Serial entrepreneur and technologist. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Entrepreneurship / technology
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: philipp-koellinger
   stableId: z1et4GySMo
   type: person
@@ -5439,16 +4000,6 @@
   description: >-
     Social science genetics researcher at University of Wisconsin-Madison. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Social science genetics
-  tags: [genetics]
-  lastUpdated: 2026-03
-
 - id: joshua-tan
   stableId: ekENYOG2FU
   type: person
@@ -5456,16 +4007,6 @@
   description: >-
     AI governance and metagovernance researcher affiliated with Oxford and Stanford. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: AI governance / metagovernance
-  tags: [ai-governance]
-  lastUpdated: 2026-03
-
 - id: mac-davis
   stableId: Kj61v4mfdi
   type: person
@@ -5473,16 +4014,6 @@
   description: >-
     Gene therapy and biohacking researcher. Foresight Fellow (2022).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022)
-    - label: Research Area
-      value: Gene therapy / biohacking
-  tags: [biotechnology, longevity]
-  lastUpdated: 2026-03
-
 - id: matthew-allcock
   stableId: BP5q62cTTr
   type: person
@@ -5490,16 +4021,6 @@
   description: >-
     Space weather and infrastructure resilience researcher. Foresight Fellow (2022, 2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2022, 2025)
-    - label: Research Area
-      value: Space weather / infrastructure resilience
-  tags: [space, existential-risk]
-  lastUpdated: 2026-03
-
 - id: shady-el-damaty
   stableId: mKcC7QBEQe
   type: person
@@ -5507,16 +4028,6 @@
   description: >-
     Intelligent cooperation and neurotech researcher at Holonym and OpSci. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Intelligent cooperation / neurotech
-  tags: [neuroscience, technology]
-  lastUpdated: 2026-03
-
 - id: aaron-mayer
   stableId: HewWunPEsp
   type: person
@@ -5524,16 +4035,6 @@
   description: >-
     Effective altruism and investing researcher. Founder of Open Heart Capital. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: EA / investing
-  tags: [effective-altruism]
-  lastUpdated: 2026-03
-
 - id: danielle-fong
   stableId: 0CnCl3sc0f
   type: person
@@ -5541,16 +4042,6 @@
   description: >-
     Energy and science entrepreneur. Co-founder of LightSail Energy. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Energy / science
-  tags: [climate, technology]
-  lastUpdated: 2026-03
-
 - id: ala-shaabana
   stableId: VVMNSO3e-Z
   type: person
@@ -5558,16 +4049,6 @@
   description: >-
     Machine learning and distributed systems researcher at McMaster University. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: ML / distributed systems
-  tags: [machine-learning]
-  lastUpdated: 2026-03
-
 - id: ghada-almashaqbeh
   stableId: x-zXBr_BdK
   type: person
@@ -5575,16 +4056,6 @@
   description: >-
     Computer science and cryptography researcher at UConn. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Computer science / cryptography
-  tags: [cryptography]
-  lastUpdated: 2026-03
-
 - id: kelvin-yu
   stableId: 52Ahct1S5P
   type: person
@@ -5592,16 +4063,6 @@
   description: >-
     Tech policy researcher focused on US-China geopolitics. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Tech policy / US-China geopolitics
-  tags: [ai-policy, geopolitics]
-  lastUpdated: 2026-03
-
 - id: mikayla-maki
   stableId: j6eTa7sKMl
   type: person
@@ -5609,16 +4070,6 @@
   description: >-
     Distributed web and P2P software researcher at Portland State University and Zed. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Distributed web / P2P software
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: stacy-copp
   stableId: NzAxfm9CE9
   type: person
@@ -5626,16 +4077,6 @@
   description: >-
     Photonic nanomaterials researcher at UC Irvine. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Photonic nanomaterials
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: ekaterina-ilin
   stableId: PYdGMjfM5p
   type: person
@@ -5643,16 +4084,6 @@
   description: >-
     Stellar magnetism and exoplanet habitability researcher. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Stellar magnetism / exoplanet habitability
-  tags: [space]
-  lastUpdated: 2026-03
-
 - id: laura-minquini
   stableId: 9TxPq16hyW
   type: person
@@ -5660,16 +4091,6 @@
   description: >-
     Branding and business development professional. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Branding / business development
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: mariam-elgabry
   stableId: BoLCyyyEm8
   type: person
@@ -5677,16 +4098,6 @@
   description: >-
     Cyber-biosecurity researcher at Bronic. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Cyber-biosecurity
-  tags: [biosecurity, cybersecurity]
-  lastUpdated: 2026-03
-
 - id: logan-thrasher-collins
   stableId: Qcjn1NUW9M
   type: person
@@ -5694,16 +4105,6 @@
   description: >-
     Neurotech, connectomics, and synthetic biology researcher. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Neurotech / connectomics / synthetic biology
-  tags: [neuroscience, biotechnology]
-  lastUpdated: 2026-03
-
 - id: andy-matuschak
   stableId: SJNMsyBonF
   type: person
@@ -5711,16 +4112,6 @@
   description: >-
     Tools for thought and learning technology researcher. Known for work on spaced repetition and evergreen notes. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Tools for thought / learning tech
-  tags: [technology, education]
-  lastUpdated: 2026-03
-
 - id: rico-meinl
   stableId: UBIyBMiwKy
   type: person
@@ -5728,16 +4119,6 @@
   description: >-
     Computational biology researcher at retro.bio. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Computational biology
-  tags: [biotechnology, longevity]
-  lastUpdated: 2026-03
-
 - id: raiany-romanni
   stableId: WAANMEujqf
   type: person
@@ -5745,16 +4126,6 @@
   description: >-
     Bioethics and longevity researcher. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Bioethics / longevity
-  tags: [longevity, bioethics]
-  lastUpdated: 2026-03
-
 - id: jonathan-passerat-palmbach
   stableId: Z_T7HrdQBj
   type: person
@@ -5762,16 +4133,6 @@
   description: >-
     Privacy-enhancing technology researcher at Flashbots. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Privacy-enhancing technology
-  tags: [cryptography, technology]
-  lastUpdated: 2026-03
-
 - id: guido-putignano
   stableId: VdhYJjQ4J3
   type: person
@@ -5779,16 +4140,6 @@
   description: >-
     Synthetic biology therapeutics researcher. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Synthetic biology therapeutics
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: anastasia-ershova
   stableId: S9a6WggxO5
   type: person
@@ -5796,16 +4147,6 @@
   description: >-
     DNA research scientist. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: DNA research
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: david-boyer
   stableId: -cudJYVqrX
   type: person
@@ -5813,16 +4154,6 @@
   description: >-
     Neurodegeneration researcher. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Neurodegeneration
-  tags: [neuroscience, longevity]
-  lastUpdated: 2026-03
-
 - id: marco-ovalle
   stableId: 53vPdbF2jq
   type: person
@@ -5830,16 +4161,6 @@
   description: >-
     Molecular machines researcher in the Feringa group. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: theo-knopfer
   stableId: NNYy055wJx
   type: person
@@ -5847,16 +4168,6 @@
   description: >-
     Researcher on emerging technology terrorism risk. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Emerging tech terrorism risk
-  tags: [existential-risk, biosecurity]
-  lastUpdated: 2026-03
-
 - id: stephane-redon
   stableId: ORyNColiWM
   type: person
@@ -5864,16 +4175,6 @@
   description: >-
     Molecular simulation researcher. Founder of OneAngstrom. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Molecular simulation
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: elena-meirzadeh
   stableId: uG_sGCLVzX
   type: person
@@ -5881,16 +4182,6 @@
   description: >-
     Solid-state chemistry researcher at Columbia University. Foresight Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2023)
-    - label: Research Area
-      value: Solid-state chemistry
-  tags: [nanotechnology, chemistry]
-  lastUpdated: 2026-03
-
 - id: alia-abbas
   stableId: oKmVk_aaZG
   type: person
@@ -5898,16 +4189,6 @@
   description: >-
     Physics and materials engineering researcher. Foresight Prodigy Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Prodigy Fellow (2023)
-    - label: Research Area
-      value: Physics / materials engineering
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: natasha-asmi
   stableId: Lar4TaohoD
   type: person
@@ -5915,16 +4196,6 @@
   description: >-
     Scientific ecosystem infrastructure researcher at Halogen. Foresight Prodigy Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Prodigy Fellow (2023)
-    - label: Research Area
-      value: Scientific ecosystem infrastructure
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: akash-patel
   stableId: 6bkO20mLYD
   type: person
@@ -5932,16 +4203,6 @@
   description: >-
     Medicine and nanotech researcher at BandX. Foresight Prodigy Fellow (2023).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Prodigy Fellow (2023)
-    - label: Research Area
-      value: Medicine / nanotech
-  tags: [nanotechnology, healthcare]
-  lastUpdated: 2026-03
-
 - id: pavi-dhiman
   stableId: L727R6bnP2
   type: person
@@ -5949,14 +4210,6 @@
   description: >-
     Young researcher and Foresight Prodigy Fellow (2023). One of the youngest fellows at 16 years old at time of selection.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Prodigy Fellow (2023)
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: aj-kourabi
   stableId: aqSu5pvw4Q
   type: person
@@ -5964,16 +4217,6 @@
   description: >-
     Engineering researcher at McMaster University. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Engineering
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: hooman-reza-nezhad
   stableId: bQcUONnc08
   type: person
@@ -5981,16 +4224,6 @@
   description: >-
     STEM and Mars resource utilization researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: STEM / Mars resource utilization
-  tags: [space]
-  lastUpdated: 2026-03
-
 - id: lisa-thiergart
   stableId: hBqW4ONQOf
   type: person
@@ -5998,16 +4231,6 @@
   description: >-
     AI safety and neurotech researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI safety / neurotech
-  tags: [ai-safety, neuroscience]
-  lastUpdated: 2026-03
-
 - id: michael-florea
   stableId: SIvlDx1NDX
   type: person
@@ -6015,16 +4238,6 @@
   description: >-
     Genetic engineering and longevity researcher at Olden Labs. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Genetic engineering / longevity
-  tags: [biotechnology, longevity]
-  lastUpdated: 2026-03
-
 - id: chris-wintersinger
   stableId: CYWc9anaJp
   type: person
@@ -6032,14 +4245,6 @@
   description: >-
     Biological engineering researcher and biotech startup founder. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Biological engineering / biotech startups
-  tags: [biotechnology]
 - id: ethan-caballero
   stableId: xg5tg6bSyL
   type: person
@@ -6671,16 +4876,6 @@
   description: >-
     AI safety and alignment researcher at Google DeepMind. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI safety & alignment
-  tags: [ai-safety, ai-alignment]
-  lastUpdated: 2026-03
-
 - id: ariel-zeleznikow-johnston
   stableId: EOr3GHi0mq
   type: person
@@ -6688,16 +4883,6 @@
   description: >-
     Neuroscience and consciousness researcher at Monash University. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Neuroscience / consciousness
-  tags: [neuroscience]
-  lastUpdated: 2026-03
-
 - id: niccolo-zanichelli
   stableId: yloXSksP3p
   type: person
@@ -6705,16 +4890,6 @@
   description: >-
     AI and biology researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI + biology
-  tags: [machine-learning, biotechnology]
-  lastUpdated: 2026-03
-
 - id: jason-hausenloy
   stableId: anJm4-_QW0
   type: person
@@ -6722,16 +4897,6 @@
   description: >-
     AI policy researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI policy
-  tags: [ai-policy]
-  lastUpdated: 2026-03
-
 - id: nora-ammann
   stableId: 9OYg0A2u9v
   type: person
@@ -6739,16 +4904,6 @@
   description: >-
     Guaranteed Safe AI researcher at PIBBSS. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Guaranteed Safe AI
-  tags: [ai-safety]
-  lastUpdated: 2026-03
-
 - id: zan-huang
   stableId: zT8gF0s15B
   type: person
@@ -6756,16 +4911,6 @@
   description: >-
     AI, cognition, and music composition researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI / cognition / music composition
-  tags: [machine-learning]
-  lastUpdated: 2026-03
-
 - id: claire-short
   stableId: cIKKyepSlX
   type: person
@@ -6773,16 +4918,6 @@
   description: >-
     AI and neuroscience researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI / neuroscience
-  tags: [ai-safety, neuroscience]
-  lastUpdated: 2026-03
-
 - id: amanda-ngo
   stableId: Rnlp94clBB
   type: person
@@ -6790,16 +4925,6 @@
   description: >-
     AI for wellbeing researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI for wellbeing
-  tags: [machine-learning]
-  lastUpdated: 2026-03
-
 - id: samuel-nellessen
   stableId: i9FJ8vh36r
   type: person
@@ -6807,16 +4932,6 @@
   description: >-
     AI researcher at Radboud University. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI
-  tags: [machine-learning]
-  lastUpdated: 2026-03
-
 - id: bogdan-ionut-cirstea
   stableId: mpkV-n2lMm
   type: person
@@ -6824,16 +4939,6 @@
   description: >-
     AI existential safety researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI existential safety
-  tags: [ai-safety, existential-risk]
-  lastUpdated: 2026-03
-
 - id: bear-haon
   stableId: hOfDebmkcY
   type: person
@@ -6841,16 +4946,6 @@
   description: >-
     Robotics and trustworthy autonomous systems researcher at UC Berkeley. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Robotics / trustworthy autonomous systems
-  tags: [ai-safety, robotics]
-  lastUpdated: 2026-03
-
 - id: sruthi-sivakumar
   stableId: cREFraM1QC
   type: person
@@ -6858,16 +4953,6 @@
   description: >-
     Computational biology and longevity researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Computational biology / longevity
-  tags: [biotechnology, longevity]
-  lastUpdated: 2026-03
-
 - id: roman-bauer
   stableId: -lMQMNfhSu
   type: person
@@ -6875,16 +4960,6 @@
   description: >-
     Computational biology and brain modeling researcher at University of Surrey. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Computational biology / brain modeling
-  tags: [biotechnology, neuroscience]
-  lastUpdated: 2026-03
-
 - id: simeon-campos
   stableId: 4V7_qVznQK
   type: person
@@ -6892,16 +4967,6 @@
   description: >-
     AI governance and AI auditing researcher at SaferAI. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: AI governance / AI auditing
-  tags: [ai-governance, ai-safety]
-  lastUpdated: 2026-03
-
 - id: dmitrii-usynin
   stableId: iuLi9NNEtt
   type: person
@@ -6909,16 +4974,6 @@
   description: >-
     Machine learning under privacy constraints researcher at Imperial College London and TU Munich. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: ML under privacy constraints
-  tags: [machine-learning]
-  lastUpdated: 2026-03
-
 - id: ekaterina-seltikova
   stableId: wc-8Sekkqt
   type: person
@@ -6926,16 +4981,6 @@
   description: >-
     Lunar exploration and space researcher. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Lunar exploration / space
-  tags: [space]
-  lastUpdated: 2026-03
-
 - id: shuntaro-amano
   stableId: pbOuMCEkuP
   type: person
@@ -6943,16 +4988,6 @@
   description: >-
     Autonomous molecular motors researcher at University of Strasbourg. Foresight Fellow (2024).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2024)
-    - label: Research Area
-      value: Autonomous molecular motors
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: dean-thomas
   stableId: 3-3k_iIEBt
   type: person
@@ -6960,16 +4995,6 @@
   description: >-
     Digital chemistry and molecular machines researcher at University of Glasgow. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Digital chemistry / molecular machines
-  tags: [nanotechnology, molecular-machines]
-  lastUpdated: 2026-03
-
 - id: felix-sosa
   stableId: UmkwKHQIo5
   type: person
@@ -6977,16 +5002,6 @@
   description: >-
     Computational cognitive science and AGI researcher at Harvard/MIT. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Computational cognitive science / AGI
-  tags: [ai-safety, agi]
-  lastUpdated: 2026-03
-
 - id: jasper-gotting
   stableId: U8w-x24QoY
   type: person
@@ -6994,16 +5009,6 @@
   description: >-
     AI and biotech risks researcher at SecureBio. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: AI + biotech risks
-  tags: [biosecurity, ai-safety]
-  lastUpdated: 2026-03
-
 - id: yasmeen-hmaidan
   stableId: JlRea3-OEV
   type: person
@@ -7011,16 +5016,6 @@
   description: >-
     Neurotechnology and e-textiles researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Neurotechnology / e-textiles
-  tags: [neuroscience, nanotechnology]
-  lastUpdated: 2026-03
-
 - id: guanyu-lu
   stableId: OF4YTvRCbi
   type: person
@@ -7028,16 +5023,6 @@
   description: >-
     Nanoscale light-matter interactions researcher at Northwestern University. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Nanoscale light-matter interactions
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: nirosha-murugan
   stableId: 69uPZKxSDe
   type: person
@@ -7045,16 +5030,6 @@
   description: >-
     Biophysics and cellular communication researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Biophysics / cellular communication
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: abhinav-singh
   stableId: GuvDN-3G9F
   type: person
@@ -7062,16 +5037,6 @@
   description: >-
     Cybersecurity researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Cybersecurity
-  tags: [cybersecurity]
-  lastUpdated: 2026-03
-
 - id: zihao-ou
   stableId: YDyJQcs6xr
   type: person
@@ -7079,16 +5044,6 @@
   description: >-
     Biomedical science and tissue transparency researcher at UT Dallas. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Biomedical science / tissue transparency
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: moritz-von-knebel
   stableId: 2hbTrdTLY_
   type: person
@@ -7096,16 +5051,6 @@
   description: >-
     Tech geopolitics and semiconductor security researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Tech geopolitics / semiconductor security
-  tags: [geopolitics, technology]
-  lastUpdated: 2026-03
-
 - id: akash-kulgod
   stableId: Cv-tq9lK1G
   type: person
@@ -7113,16 +5058,6 @@
   description: >-
     Brain-computer interfaces and disease detection researcher at Dognosis. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Brain-computer interfaces / disease detection
-  tags: [neuroscience, healthcare]
-  lastUpdated: 2026-03
-
 - id: penghao-li
   stableId: fVwZd8qbAg
   type: person
@@ -7130,16 +5065,6 @@
   description: >-
     Chemistry researcher at University of Mississippi. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Chemistry
-  tags: [chemistry]
-  lastUpdated: 2026-03
-
 - id: aydin-gokce
   stableId: bEefY866Md
   type: person
@@ -7147,16 +5072,6 @@
   description: >-
     Cybernetics researcher at General Cybernetics. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Cybernetics
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: raghav-sehgal
   stableId: on2sSLp8Ak
   type: person
@@ -7164,16 +5079,6 @@
   description: >-
     Computational biology researcher at Yale. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Computational biology
-  tags: [biotechnology]
-  lastUpdated: 2026-03
-
 - id: maxx-yung
   stableId: siyU8twAWy
   type: person
@@ -7181,16 +5086,6 @@
   description: >-
     Materials engineering researcher at University of Pennsylvania. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Materials engineering
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: gustavs-zilgalvis
   stableId: OTY4pxUlg2
   type: person
@@ -7198,16 +5093,6 @@
   description: >-
     International policy researcher at Stanford. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: International policy
-  tags: [ai-policy]
-  lastUpdated: 2026-03
-
 - id: chiara-herzog
   stableId: aVyDpkdJyI
   type: person
@@ -7215,16 +5100,6 @@
   description: >-
     Ageing and biomarkers researcher at King's College London. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Ageing / biomarkers
-  tags: [longevity, biotechnology]
-  lastUpdated: 2026-03
-
 - id: ruairidh-battleday
   stableId: 0uoTCLKHAV
   type: person
@@ -7232,16 +5107,6 @@
   description: >-
     Cognitive science and AI researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Cognitive science / AI
-  tags: [ai-safety, neuroscience]
-  lastUpdated: 2026-03
-
 - id: peggy-yin
   stableId: T55A96uz_3
   type: person
@@ -7249,16 +5114,6 @@
   description: >-
     Psychology and cognitive security researcher at Stanford. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Psychology / cognitive security
-  tags: [cybersecurity, neuroscience]
-  lastUpdated: 2026-03
-
 - id: ninon-lize-masclef
   stableId: EtUZ3PP2KP
   type: person
@@ -7266,16 +5121,6 @@
   description: >-
     AI, neuroscience, and 3D visual perception researcher at MIT Media Lab. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: AI / neuroscience / 3D visual perception
-  tags: [neuroscience, machine-learning]
-  lastUpdated: 2026-03
-
 - id: mahlaqua-mila-noor
   stableId: 0nZmkTd3Ug
   type: person
@@ -7283,14 +5128,6 @@
   description: >-
     Researcher at University of Cambridge. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: fin-moorhouse
   stableId: XQm8l8LuOs
   type: person
@@ -7298,16 +5135,6 @@
   description: >-
     Existential Hope researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Existential Hope
-  tags: [existential-risk]
-  lastUpdated: 2026-03
-
 - id: abigail-olvera
   stableId: Ek1Ki4LnFH
   type: person
@@ -7315,16 +5142,6 @@
   description: >-
     Existential Hope researcher. Foresight Fellow (2025).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2025)
-    - label: Research Area
-      value: Existential Hope
-  tags: [existential-risk]
-  lastUpdated: 2026-03
-
 - id: alberto-privitera
   stableId: 7V2LqaTShW
   type: person
@@ -7332,13 +5149,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: alex-plesa
   stableId: OSe82Ax4gm
   type: person
@@ -7346,13 +5156,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: avery-krieger
   stableId: koF-u4YPz5
   type: person
@@ -7360,13 +5163,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: constanze-albrecht
   stableId: hHyQAK9htk
   type: person
@@ -7374,13 +5170,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: donnacha-fitzgerald
   stableId: aZQXutz76s
   type: person
@@ -7388,13 +5177,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: elisa-kallioniemi
   stableId: UQKSKdPyiQ
   type: person
@@ -7402,13 +5184,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: gianluca-cidonio
   stableId: phMYtz3rfV
   type: person
@@ -7416,13 +5191,6 @@
   description: >-
     Foresight Fellow (2026).
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Fellow (2026)
-  lastUpdated: 2026-03
-
 - id: creon-levit
   stableId: trv0r0CAA9
   type: person
@@ -7430,16 +5198,6 @@
   description: >-
     Space technology researcher at Planet Labs. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Space technology
-  tags: [space, technology]
-  lastUpdated: 2026-03
-
 - id: anders-sandberg
   stableId: 7ojZDBA9wb
   type: person
@@ -7447,16 +5205,6 @@
   description: >-
     Existential risk and long-range futures researcher. Previously at Future of Humanity Institute (FHI) at University of Oxford. Known for work on global catastrophic risks, whole brain emulation, and human enhancement. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Existential risk / long-range futures
-  tags: [existential-risk, ai-safety]
-  lastUpdated: 2026-03
-
 - id: mark-s-miller
   stableId: PmKAZl2vJK
   type: person
@@ -7464,16 +5212,6 @@
   description: >-
     Pioneer of agoric computing and smart contracts. Chief Scientist at Agoric. Known for object-capability security model and the E programming language. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Agoric computing / smart contracts
-  tags: [cryptography, technology]
-  lastUpdated: 2026-03
-
 - id: martin-edelstein
   stableId: CiN_-IiD1U
   type: person
@@ -7481,16 +5219,6 @@
   description: >-
     Bottom-up nanotechnology researcher at Covalent Industrial Technologies. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Bottom-up nanotechnology
-  tags: [nanotechnology]
-  lastUpdated: 2026-03
-
 - id: brad-templeton
   stableId: fdyIzTzN0R
   type: person
@@ -7498,16 +5226,6 @@
   description: >-
     Computing pioneer and EFF board member. Faculty at Singularity University. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Computing / digital rights
-  tags: [technology]
-  lastUpdated: 2026-03
-
 - id: zooko-wilcox
   stableId: F2KOlrJHwv
   type: person
@@ -7515,16 +5233,6 @@
   description: >-
     Cryptocurrency and privacy researcher. Founder of Electric Coin Company (Zcash). Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Cryptocurrency / privacy
-  tags: [cryptography]
-  lastUpdated: 2026-03
-
 - id: samo-burja
   stableId: RZt-Ryen4Q
   type: person
@@ -7532,16 +5240,6 @@
   description: >-
     Political risk and institutional analysis researcher. Founder of Bismarck Analysis. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Political risk / institutional analysis
-  tags: [governance]
-  lastUpdated: 2026-03
-
 - id: adam-brown
   stableId: ZZ63lzP4Gp
   type: person
@@ -7549,16 +5247,6 @@
   description: >-
     Theoretical physics and cosmology researcher at Stanford. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Theoretical physics / cosmology
-  tags: [physics]
-  lastUpdated: 2026-03
-
 - id: chiara-marletto
   stableId: tzd-uHhq6m
   type: person
@@ -7566,16 +5254,6 @@
   description: >-
     Quantum theory of computation researcher at Oxford. Known for constructor theory. Foresight Institute Senior Fellow.
   relatedEntries:
-    - id: NPPTvNqRXA
-      type: organization
-  customFields:
-    - label: Role
-      value: Foresight Senior Fellow
-    - label: Research Area
-      value: Quantum theory of computation
-  tags: [physics]
-  lastUpdated: 2026-03
-
 - id: david-manheim
   stableId: 4auxbz6oS9
   type: person
@@ -8386,14 +6064,6 @@
     - label: Role
       value: "Co-founder and CEO, GiveWell"
   relatedEntries:
-    - id: OwXl35e7bg
-      type: organization
-      relationship: related
-  tags:
-    - ea-community
-    - philanthropy
-  lastUpdated: 2026-03
-
 - id: bill-gates
   stableId: kzPpqPCdnw
   wikiId: E1910
@@ -8431,14 +6101,6 @@
     - label: Role
       value: "Founder, Pivotal Ventures; Former Co-chair, Gates Foundation"
   relatedEntries:
-    - id: l4EHdNDZqg
-      type: organization
-      relationship: related
-  tags:
-    - philanthropy
-    - global-health
-  lastUpdated: 2026-03
-
 - id: peter-singer
   stableId: TDUEAFxz2w
   wikiId: E1912
@@ -8519,13 +6181,6 @@
     - label: Role
       value: "President and CEO, Bezos Earth Fund"
   relatedEntries:
-    - id: fVMqY7vpMA
-      type: organization
-      relationship: related
-  tags:
-    - philanthropy
-  lastUpdated: 2026-03
-
 - id: pierre-omidyar
   stableId: Ol0uNxO0gg
   wikiId: E1916
@@ -8604,13 +6259,6 @@
     - label: Role
       value: "Co-founder and Co-chair, Arnold Ventures"
   relatedEntries:
-    - id: AT0VDnvwRw
-      type: organization
-      relationship: related
-  tags:
-    - philanthropy
-  lastUpdated: 2026-03
-
 - id: darren-walker
   stableId: Be7G95qQ1Q
   wikiId: E1920
@@ -8709,13 +6357,6 @@
     - label: Role
       value: "Co-founder, Omidyar Network; Founder, Humanity United"
   relatedEntries:
-    - id: GADd9PU0UA
-      type: organization
-      relationship: related
-  tags:
-    - philanthropy
-  lastUpdated: 2026-03
-
 - id: leah-edgerton
   stableId: Xq2bq3EJZQ
   wikiId: E1925
@@ -8752,14 +6393,6 @@
     - label: Role
       value: "Executive Director, The Life You Can Save"
   relatedEntries:
-    - id: pShgsxdp8Q
-      type: organization
-      relationship: related
-  tags:
-    - ea-community
-    - philanthropy
-  lastUpdated: 2026-03
-
 - id: john-arne-rottingen
   stableId: QkTjuStGuw
   wikiId: E1927
