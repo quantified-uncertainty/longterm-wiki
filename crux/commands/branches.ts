@@ -497,6 +497,23 @@ async function recoverCommand(
 
   log.heading(`Recovering: ${clean}`);
 
+  // Remember original branch so we can restore it on any exit path
+  const originalBranch = gitSafe('rev-parse', '--abbrev-ref', 'HEAD');
+  const restoreBranch = () => {
+    if (originalBranch.ok && originalBranch.output) {
+      gitSafe('checkout', originalBranch.output);
+    }
+  };
+
+  // Check for uncommitted changes that would block checkout
+  const statusCheck = gitSafe('status', '--porcelain');
+  if (statusCheck.ok && statusCheck.output) {
+    return {
+      output: `Working tree has uncommitted changes. Commit or stash them before running recover.`,
+      exitCode: 1,
+    };
+  }
+
   // Verify branch exists
   const exists = gitSafe('rev-parse', '--verify', `origin/${clean}`);
   if (!exists.ok) {
@@ -531,6 +548,7 @@ async function recoverCommand(
 
   const branchResult = gitSafe('checkout', '-b', recoveryBranch);
   if (!branchResult.ok) {
+    restoreBranch();
     return { output: `Failed to create branch ${recoveryBranch}: ${branchResult.stderr}`, exitCode: 1 };
   }
 
@@ -561,9 +579,10 @@ async function recoverCommand(
   }
 
   if (picked === 0) {
-    // Nothing was recovered, clean up
-    git('checkout', 'main');
+    // Nothing was recovered, clean up and restore original branch
+    gitSafe('checkout', 'main');
     gitSafe('branch', '-D', recoveryBranch);
+    restoreBranch();
     lines.push(`\n${yellow}No commits could be cherry-picked. Recovery branch deleted.${reset}`);
     return { output: lines.join('\n'), exitCode: 1 };
   }
@@ -611,8 +630,8 @@ async function recoverCommand(
     );
   }
 
-  // Switch back to original branch
-  gitSafe('checkout', '-');
+  // Restore original branch
+  restoreBranch();
 
   return { output: lines.join('\n'), exitCode: 0 };
 }
