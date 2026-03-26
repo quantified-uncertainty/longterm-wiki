@@ -2,15 +2,14 @@
  * Claims routes — claim verification status polling.
  *
  * Part of the claims-first verification architecture (#3253).
- * The `proposed_claims` table is created by a parallel migration task;
- * this route uses raw SQL via postgres.js since the Drizzle schema may
- * not include the table yet.
+ * Uses raw SQL via postgres.js for simplicity (single-query read endpoint).
  */
 
 import { Hono } from "hono";
 import { getDb } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
 import { notFoundError } from "../shared/utils.js";
+import { VALID_CLAIM_STATUSES } from "../../api-types.js";
 
 const logger = rootLogger.child({ component: "claims" });
 
@@ -18,7 +17,6 @@ const logger = rootLogger.child({ component: "claims" });
 // Row types for raw SQL results
 // ---------------------------------------------------------------------------
 
-/** Shape of a row from the `proposed_claims` table (snake_case columns). */
 interface ProposedClaimRow {
   id: number;
   batch_id: string;
@@ -29,16 +27,11 @@ interface ProposedClaimRow {
   extracted_value: string | null;
 }
 
-/** Aggregated count per status. */
-interface StatusCountRow {
-  status: string;
-  count: string; // postgres COUNT returns bigint as string
-}
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
+/** Rough estimate of seconds per pending claim for polling UX. */
 const SECONDS_PER_CLAIM_ESTIMATE = 3;
 
 function formatClaim(row: ProposedClaimRow) {
@@ -64,7 +57,6 @@ const claimsApp = new Hono()
 
     logger.debug({ batchId }, "polling claim status");
 
-    // Fetch all claims for the batch
     const claims = await sql<ProposedClaimRow[]>`
       SELECT id, batch_id, claim_text, status, verdict_confidence, verdict_reasoning, extracted_value
       FROM proposed_claims
@@ -76,28 +68,15 @@ const claimsApp = new Hono()
       return notFoundError(c, `No claims found for batch ${batchId}`);
     }
 
-    // Aggregate counts by status
-    const statusCounts = await sql<StatusCountRow[]>`
-      SELECT status, COUNT(*)::text AS count
-      FROM proposed_claims
-      WHERE batch_id = ${batchId}
-      GROUP BY status
-    `;
-
-    const byStatus: Record<string, number> = {
-      pending: 0,
-      verifying: 0,
-      verified: 0,
-      contradicted: 0,
-      unverifiable: 0,
-      expired: 0,
-    };
-
-    for (const row of statusCounts) {
-      byStatus[row.status] = parseInt(row.count, 10);
+    // Compute status counts from the already-fetched claims array
+    const byStatus: Record<string, number> = Object.fromEntries(
+      VALID_CLAIM_STATUSES.map((s) => [s, 0]),
+    );
+    for (const row of claims) {
+      byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
     }
 
-    const unsettledCount = (byStatus.pending ?? 0) + (byStatus.verifying ?? 0);
+    const unsettledCount = byStatus.pending + byStatus.verifying;
     const allSettled = unsettledCount === 0;
     const estimatedRemaining = unsettledCount * SECONDS_PER_CLAIM_ESTIMATE;
 
