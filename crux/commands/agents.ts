@@ -7,6 +7,7 @@
  *   crux sys agents update <id> [--step="..."] [--status=X]          Update agent state
  *   crux sys agents heartbeat <id>                                   Send heartbeat
  *   crux sys agents complete <id>                                    Mark agent as completed
+ *   crux sys agents close [--reason="..."]                           Close current session (auto-discovers agent)
  *   crux sys agents sweep [--timeout=30]                             Mark stale agents
  */
 
@@ -41,6 +42,7 @@ interface CommandOptions extends BaseOptions {
   files?: string;
   timeout?: string;
   limit?: string;
+  reason?: string;
   json?: boolean;
   ci?: boolean;
 }
@@ -351,9 +353,11 @@ async function closeCommand(
     }
   }
 
+  // Check server availability once for all DB operations
+  const serverUp = await isServerAvailable();
+
   // 2. Mark active agent as completed in DB
   if (agentId) {
-    const serverUp = await isServerAvailable();
     if (serverUp) {
       const result = await updateAgent(agentId, { status: 'completed' });
       if (result.ok) {
@@ -363,10 +367,11 @@ async function closeCommand(
       }
 
       // Log a "completed" event
+      const reason = options.reason ?? 'Session closed via crux sys agents close';
       await appendEvent({
         agentId,
         eventType: 'completed',
-        message: options.reason || 'Session closed via crux sys agents close',
+        message: reason,
       }).catch((e: unknown) => {
         // Best-effort — event logging is non-critical
         output += `${c.dim}  (event log failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
@@ -381,18 +386,16 @@ async function closeCommand(
   // 3. Mark agent session as completed (by branch)
   try {
     const branch = options.branch || currentBranchSafe();
-    if (branch && branch !== 'main' && branch !== 'detached') {
-      const serverUp = await isServerAvailable();
-      if (serverUp) {
-        const sessionResult = await getAgentSessionByBranch(branch);
-        if (sessionResult.ok && sessionResult.data.status === 'active') {
-          await updateAgentSession(sessionResult.data.id, { status: 'completed' });
-          output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
-        }
+    if (branch && branch !== 'main' && branch !== 'detached' && serverUp) {
+      const sessionResult = await getAgentSessionByBranch(branch);
+      if (sessionResult.ok && sessionResult.data.status === 'active') {
+        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
+        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
       }
     }
-  } catch {
-    // Best-effort
+  } catch (e: unknown) {
+    // Best-effort — session close failure shouldn't block slot reset
+    output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
   }
 
   // 4. Clean up local files
@@ -512,6 +515,7 @@ Options:
   --status=X       Filter or set: active | completed | errored | stale
   --pr=N           PR number (update, complete)
   --files=a,b,c    Comma-separated files touched (update)
+  --reason="..."   Close reason (close)
   --timeout=30     Stale timeout in minutes (sweep)
   --json           JSON output
   --ci             CI-compatible output
