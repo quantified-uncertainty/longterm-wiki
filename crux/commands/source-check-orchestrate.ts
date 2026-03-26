@@ -67,10 +67,7 @@ async function cachedFetchSourceContent(
   cache: UrlFetchCache,
 ): Promise<FetchSourceResult> {
   const existing = cache.get(url);
-  if (existing !== undefined) {
-    console.debug(`[source-check] Cache hit for ${url}`);
-    return existing;
-  }
+  if (existing !== undefined) return existing;
 
   const pending = fetchSourceContent(url);
   cache.set(url, pending);
@@ -589,10 +586,6 @@ async function collectRecordItems(
     } catch (e: unknown) {
       console.warn(`[source-check] Error collecting ${recordType}: ${e instanceof Error ? e.message : String(e)}`);
     }
-  }
-
-  if (inferSources && inferredCount > 0) {
-    console.log(`    (${inferredCount} records with inferred sources from entity websites/siblings)`);
   }
 
   return items;
@@ -1257,10 +1250,9 @@ export async function orchestrateCommand(
   console.log('\x1b[1mVerification Orchestrator\x1b[0m');
   console.log('');
 
-  // Build stableId -> human-readable name map from database.json.
-  // This resolves opaque IDs (e.g. "K5ykAghIr6") to names (e.g. "Elizabeth Doherty")
-  // so the LLM sees real names instead of internal IDs, preventing false contradictions.
-  const nameMap = buildStableIdNameMap();
+  // Build stableId -> human-readable name map only when verifying records
+  // (facts don't use it). Avoids parsing multi-MB database.json unnecessarily.
+  const nameMap = shouldCollectRecords ? buildStableIdNameMap() : new Map<string, string>();
   if (nameMap.size > 0) {
     console.log(`  Name map: ${nameMap.size} stableId -> name entries loaded`);
   }
@@ -1375,8 +1367,6 @@ export async function orchestrateCommand(
 
     const result = await verifySingleItem(item, client, useWebSearch, urlCache);
 
-    // Update progress counter — safe in Node.js single-threaded event loop
-    // (mutations happen synchronously between await points)
     completedCount++;
     const progress = `[${completedCount}/${itemsToVerify.length}]`;
 

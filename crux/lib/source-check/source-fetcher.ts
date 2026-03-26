@@ -18,6 +18,7 @@ import {
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import type { FetchSourceResult } from './types.ts';
 import { SOURCE_CHECK_CONSTANTS } from './types.ts';
+import { sleep } from '../anthropic.ts';
 
 const { MAX_CONTENT_LENGTH, FETCH_TIMEOUT_MS } = SOURCE_CHECK_CONSTANTS;
 
@@ -30,13 +31,6 @@ export const MAX_RETRIES = 2;
 /** Backoff delays in ms for each retry attempt (index 0 = first retry). */
 export const RETRY_DELAYS_MS = [1000, 3000];
 
-/**
- * Sleep for a given number of milliseconds.
- */
-function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 // ---------------------------------------------------------------------------
 // Wikidata structured data extraction
 // ---------------------------------------------------------------------------
@@ -46,9 +40,6 @@ const WIKIDATA_QID_PATTERN = /^https?:\/\/(?:www\.)?wikidata\.org\/wiki\/(Q\d+)$
 
 /** Timeout for the Wikidata JSON API fetch (10s — separate from the general FETCH_TIMEOUT_MS) */
 const WIKIDATA_FETCH_TIMEOUT_MS = 10_000;
-
-/** Max bytes to read from the Wikidata JSON response (50 KB) */
-const WIKIDATA_MAX_JSON_BYTES = 50_000;
 
 /**
  * Wikidata property IDs we extract, mapped to human-readable labels.
@@ -277,15 +268,11 @@ export async function fetchWikidataContent(
       return { content: null, errorType: 'fetch_error', errorMessage: `Wikidata API HTTP ${response.status}` };
     }
 
-    // Parse the full JSON response — truncating before parse can silently lose claims.
-    // Wikidata entities are typically 50-500KB; parsing the full response is safe.
-    const rawText = await response.text();
-
     let data: { entities?: Record<string, WikidataEntity> };
     try {
-      data = JSON.parse(rawText);
+      data = await response.json();
     } catch {
-      console.warn(`${logPrefix} Wikidata JSON unparseable for ${qid} (${rawText.length} bytes)`);
+      console.warn(`${logPrefix} Wikidata JSON unparseable for ${qid}`);
       return { content: null, errorType: 'fetch_error', errorMessage: 'Invalid JSON from Wikidata API' };
     }
 
