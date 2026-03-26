@@ -4,7 +4,7 @@
 
 import { getTableBase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./tablebase";
 import type { WithSource } from "./tablebase";
-import { isStableId } from "@/lib/stable-id";
+import { isAlphanumeric10 } from "@/lib/stable-id";
 
 // ============================================================================
 // DIRECTORY URL RESOLUTION
@@ -65,6 +65,8 @@ export function getEntityHref(id: string, _type?: string): string {
   if (/^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(id) && registry.byStableId?.[id]) {
 
   if (isStableId(id) && registry.byStableId?.[id]) {
+
+  if (isAlphanumeric10(id) && registry.byStableId?.[id]) {
     const slug = registry.byStableId[id];
     const wikiId = registry.bySlug[slug];
     return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;

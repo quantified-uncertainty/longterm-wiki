@@ -5,7 +5,7 @@ import { getEntityTypeIcon } from "./EntityTypeIcon";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
 import { stripMdxEscapes } from "@lib/inline-markdown";
-import { isStableId } from "@/lib/stable-id";
+import { isAlphanumeric10 } from "@/lib/stable-id";
 
 interface EntityLinkProps {
   id: string;
@@ -35,7 +35,7 @@ function formatIdAsTitle(id: string): string {
   // Detect stableIds (10-char alphanumeric strings like "Khej79OA8g")
   // and wiki IDs (E<number>). These should not be shown as titles since
   // they are opaque identifiers, not human-readable slugs.
-  if (isStableId(id) || /^E\d+$/.test(id)) {
+  if (isAlphanumeric10(id) || /^E\d+$/.test(id)) {
     return id;
   }
   return id
