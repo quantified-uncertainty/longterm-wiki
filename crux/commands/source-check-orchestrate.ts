@@ -14,6 +14,7 @@
  *   crux source-check orchestrate --type=entity                 Check entities via web search
  *   crux source-check orchestrate --entity-type=organization    Filter by entity type
  *   crux source-check orchestrate --source=web-search           Include web search for sourceless entities
+ *   crux source-check orchestrate --infer-sources              Infer sources for sourceless records from entity websites
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -1783,5 +1784,6 @@ Examples:
   crux tb verify stats                                  Show verification coverage
   crux tb verify --type=fact --entity-type=organization  Verify organization facts
   crux tb verify --type=record --limit=20               Verify 20 records
+  crux tb verify --infer-sources --dry-run              Preview with inferred sources for sourceless records
 `;
 }
