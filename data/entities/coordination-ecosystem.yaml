@@ -2357,7 +2357,7 @@
     participants repeatedly choose between two options and the system ranks ideas. NYC
     used it for PlaNYC 2030 (1,436 respondents, 464 ideas).
   projectStatus: active
-  projectUrl: http://www.allourideas.org
+  projectUrl: https://allourideas.org
   tags:
     - wiki-survey
     - pairwise-comparison
