@@ -119,7 +119,7 @@ async function main() {
       const scoreStr =
         p.avgScore !== null ? ` avg:${(Number(p.avgScore) * 100).toFixed(0)}%` : '';
       console.log(
-        `  ${p.pageId.padEnd(40)} ${String(p.total).padStart(3)} total, ${String(p.withQuotes).padStart(3)} quoted, ${String(p.verified).padStart(3)} verified${scoreStr}`,
+        `  ${(p.pageId ?? '').padEnd(40)} ${String(p.total).padStart(3)} total, ${String(p.withQuotes).padStart(3)} quoted, ${String(p.verified).padStart(3)} verified${scoreStr}`,
       );
     }
     if (pageStats.length > 15) {

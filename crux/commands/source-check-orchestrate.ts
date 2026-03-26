@@ -660,6 +660,8 @@ function buildRecordDescription(recordType: RecordType, item: Record<string, unk
       const valuationStr = valuation != null ? ` ($${(valuation / 1e9).toFixed(1)}B)` : '';
       return `Market Price: ${company} on ${platform} (${date})${valuationStr}`;
     }
+    default:
+      return `${recordType}: ${strOrNull(item, 'name') ?? strOrNull(item, 'title') ?? 'unknown'}`;
   }
 }
 
@@ -735,6 +737,8 @@ function extractRecordFields(recordType: RecordType, item: Record<string, unknow
         pricePerShare: numOrNull(item, 'pricePerShare'),
         priceType: strOrNull(item, 'priceType'),
       };
+    default:
+      return { name: strOrNull(item, 'name') ?? strOrNull(item, 'title') };
   }
 }
 

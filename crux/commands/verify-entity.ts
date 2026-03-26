@@ -184,15 +184,16 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
 
   // Resolve entity identifier to stableId for API calls
   const db = loadDatabase();
-  const entity = (db.typedEntities ?? db.entities ?? []).find(
-    (e: Record<string, unknown>) =>
+  const entities = db.typedEntities ?? db.entities ?? [];
+  const entity = entities.find(
+    (e) =>
       e.id === entityId ||
-      e.stableId === entityId ||
+      'stableId' in e && (e as { stableId?: string }).stableId === entityId ||
       e.wikiId === entityId
   );
   if (!entity) return claims;
 
-  const stableId = (entity as Record<string, unknown>).stableId as string ?? entityId;
+  const stableId = ('stableId' in entity ? (entity as { stableId?: string }).stableId : undefined) ?? entityId;
 
   // Fetch records from various TableBase endpoints
   const endpoints: Array<{ type: string; path: string; descFn: (r: Record<string, unknown>) => string; sourceField?: string }> = [

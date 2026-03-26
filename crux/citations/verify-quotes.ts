@@ -173,7 +173,7 @@ async function main() {
         `${c.dim}[${i + 1}/${pagesToProcess.length}]${c.reset} ${c.bold}${page.pageId}${c.reset} (${page.quoteCount} quotes)`,
       );
 
-      const result = await verifyQuotesForPage(page.pageId, {
+      const result = await verifyQuotesForPage(page.pageId!, {
         verbose: true,
         refetch,
       });
