@@ -12,11 +12,11 @@
  */
 
 import { existsSync, readFileSync, unlinkSync } from 'fs';
-import { execSync } from 'child_process';
 import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { gitSafe } from '../lib/git.ts';
 import {
   registerAgent,
   listActiveAgents,
@@ -355,47 +355,61 @@ async function closeCommand(
 
   // Check server availability once for all DB operations
   const serverUp = await isServerAvailable();
+  const branchResult = gitSafe('rev-parse', '--abbrev-ref', 'HEAD');
+  const branch = options.branch || (branchResult.ok ? branchResult.output : null);
 
-  // 2. Mark active agent as completed in DB
-  if (agentId) {
-    if (serverUp) {
-      const result = await updateAgent(agentId, { status: 'completed' });
-      if (result.ok) {
+  if (serverUp) {
+    // 2 & 3. Fire independent DB calls in parallel
+    const reason = options.reason ?? 'Session closed via crux sys agents close';
+
+    const agentClosePromise = agentId
+      ? Promise.allSettled([
+          updateAgent(agentId, { status: 'completed' }),
+          appendEvent({ agentId, eventType: 'completed', message: reason }),
+        ])
+      : null;
+
+    const sessionClosePromise = (branch && branch !== 'main' && branch !== 'detached')
+      ? getAgentSessionByBranch(branch).catch(() => null)
+      : null;
+
+    // Await all parallel calls
+    const [agentResults, sessionResult] = await Promise.all([
+      agentClosePromise,
+      sessionClosePromise,
+    ]);
+
+    // Process agent close results
+    if (agentId && agentResults) {
+      const [agentUpdate, eventLog] = agentResults;
+      if (agentUpdate.status === 'fulfilled' && agentUpdate.value.ok) {
         output += `${c.green}✓${c.reset} Active agent #${agentId} marked completed\n`;
       } else {
-        output += `${c.yellow}⚠ Failed to close active agent #${agentId}: ${result.message}${c.reset}\n`;
+        const msg = agentUpdate.status === 'rejected'
+          ? (agentUpdate.reason instanceof Error ? agentUpdate.reason.message : String(agentUpdate.reason))
+          : (agentUpdate.value as { message?: string }).message ?? 'unknown error';
+        output += `${c.yellow}⚠ Failed to close active agent #${agentId}: ${msg}${c.reset}\n`;
       }
-
-      // Log a "completed" event
-      const reason = options.reason ?? 'Session closed via crux sys agents close';
-      await appendEvent({
-        agentId,
-        eventType: 'completed',
-        message: reason,
-      }).catch((e: unknown) => {
-        // Best-effort — event logging is non-critical
-        output += `${c.dim}  (event log failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
-      });
-    } else {
-      output += `${c.yellow}⚠ Wiki server unreachable — skipping DB close${c.reset}\n`;
+      if (eventLog.status === 'rejected') {
+        output += `${c.dim}  (event log failed: ${eventLog.reason instanceof Error ? eventLog.reason.message : String(eventLog.reason)})${c.reset}\n`;
+      }
+    } else if (!agentId) {
+      output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
     }
-  } else {
-    output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
-  }
 
-  // 3. Mark agent session as completed (by branch)
-  try {
-    const branch = options.branch || currentBranchSafe();
-    if (branch && branch !== 'main' && branch !== 'detached' && serverUp) {
-      const sessionResult = await getAgentSessionByBranch(branch);
-      if (sessionResult.ok && sessionResult.data.status === 'active') {
+    // Process session close result — may need a follow-up call
+    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
+      try {
         await updateAgentSession(sessionResult.data.id, { status: 'completed' });
         output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
+      } catch (e: unknown) {
+        output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
       }
     }
-  } catch (e: unknown) {
-    // Best-effort — session close failure shouldn't block slot reset
-    output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
+  } else {
+    output += agentId
+      ? `${c.yellow}⚠ Wiki server unreachable — skipping DB close${c.reset}\n`
+      : `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
   }
 
   // 4. Clean up local files
@@ -406,9 +420,11 @@ async function closeCommand(
     [agentTaskPath, '.agent-task'],
     [lastHeartbeatPath, '.claude/last-heartbeat'],
   ] as const) {
-    if (existsSync(path)) {
+    try {
       unlinkSync(path);
       cleaned.push(label);
+    } catch {
+      // File doesn't exist — nothing to clean
     }
   }
   if (cleaned.length > 0) {
@@ -418,15 +434,6 @@ async function closeCommand(
   }
 
   return { exitCode: 0, output };
-}
-
-/** Safe git branch read that doesn't throw */
-function currentBranchSafe(): string | null {
-  try {
-    return execSync('git branch --show-current', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim() || null;
-  } catch {
-    return null;
-  }
 }
 
 // ---------------------------------------------------------------------------
