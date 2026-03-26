@@ -2,6 +2,7 @@
 
 import { Fragment, useState, useMemo } from "react";
 import Link from "next/link";
+import { ChevronRight, ChevronDown } from "lucide-react";
 import {
   RACE_STATUS_COLORS,
   AI_STANCE_COLORS,
@@ -130,18 +131,29 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                   }
                 >
                   <td className="py-2 pr-4">
-                    <Link
-                      href={`/races/${race.id}`}
-                      className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {race.name}
-                    </Link>
-                    {race.district && (
-                      <span className="text-muted-foreground ml-1 text-xs">
-                        ({race.district})
-                      </span>
-                    )}
+                    <span className="inline-flex items-center gap-1">
+                      {expandedRace === race.id ? (
+                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                      ) : (
+                        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                      )}
+                      <Link
+                        href={`/races/${race.id}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {race.name}
+                      </Link>
+                      {race.district ? (
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          ({race.district})
+                        </span>
+                      ) : race.state ? (
+                        <span className="text-muted-foreground ml-1 text-xs">
+                          ({race.state})
+                        </span>
+                      ) : null}
+                    </span>
                   </td>
                   <td className="py-2 pr-4">
                     {RACE_LEVEL_LABELS[race.level] ?? race.level}
@@ -158,8 +170,13 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                       {race.status}
                     </span>
                   </td>
-                  <td className="py-2 pr-4 max-w-xs truncate text-muted-foreground">
-                    {race.aiAngle ?? "—"}
+                  <td className="py-2 pr-4 min-w-0 text-muted-foreground">
+                    <p
+                      className="line-clamp-2 text-sm"
+                      title={race.aiAngle ?? undefined}
+                    >
+                      {race.aiAngle ?? "—"}
+                    </p>
                   </td>
                   <td className="py-2 pr-4 text-center">
                     {race.candidates.length}
@@ -173,6 +190,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                           <thead>
                             <tr className="text-left text-muted-foreground">
                               <th className="pb-1 pr-3">Candidate</th>
+                              <th className="pb-1 pr-3">Party</th>
                               <th className="pb-1 pr-3">Status</th>
                               <th className="pb-1 pr-3">AI Stance</th>
                               <th className="pb-1 pr-3">PAC</th>
@@ -201,6 +219,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                     <span className="ml-1 text-green-600">✓</span>
                                   )}
                                 </td>
+                                <td className="py-1 pr-3 capitalize">{c.party ?? "—"}</td>
                                 <td className="py-1 pr-3">{c.status}</td>
                                 <td className="py-1 pr-3">
                                   {c.aiStance ? (

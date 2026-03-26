@@ -39,6 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Policy",
     items: [
       { href: "/legislation", label: "Legislation" },
+      { href: "/races", label: "Races" },
       { href: "/funding-programs", label: "Funding" },
     ],
   },
