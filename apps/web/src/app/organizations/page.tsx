@@ -178,6 +178,34 @@ async function loadFromApi(
     if (org.description) searchParts.push(org.description);
     if (orgType) searchParts.push(orgType);
 
+    // Fall back to local FactBase data for financial fields when the API
+    // returns null (e.g., facts not yet synced to the wiki-server DB).
+    // The API values take precedence when present; local FactBase fills gaps.
+    const localRevFact = org.revenueNum == null ? getKBLatest(org.id, "revenue") : null;
+    const localValFact = org.valuationNum == null ? getKBLatest(org.id, "valuation") : null;
+    const localHcFact = org.headcount == null ? getKBLatest(org.id, "headcount") : null;
+    const localTfFact = org.totalFundingNum == null ? getKBLatest(org.id, "total-funding") : null;
+    const localFoundedFact = org.foundedDate == null ? getKBLatest(org.id, "founded-date") : null;
+
+    const revenueNum = org.revenueNum ?? numericValue(localRevFact ?? undefined);
+    const revenueDate = org.revenueDate ?? localRevFact?.asOf ?? null;
+    const valuationNum = org.valuationNum ?? numericValue(localValFact ?? undefined);
+    const valuationDate = org.valuationDate ?? localValFact?.asOf ?? null;
+    const headcount =
+      org.headcount ??
+      (localHcFact?.value.type === "number" ? localHcFact.value.value : null);
+    const headcountDate = org.headcountDate ?? localHcFact?.asOf ?? null;
+    const totalFundingNum = org.totalFundingNum ?? numericValue(localTfFact ?? undefined);
+    const foundedDate =
+      org.foundedDate ??
+      (localFoundedFact?.value.type === "date"
+        ? localFoundedFact.value.value
+        : localFoundedFact?.value.type === "text"
+          ? localFoundedFact.value.value
+          : localFoundedFact?.value.type === "number"
+            ? String(localFoundedFact.value.value)
+            : null);
+
     return {
       id: org.id,
       slug: org.id,
@@ -186,24 +214,30 @@ async function loadFromApi(
       orgType,
       wikiPageId: org.wikiId,
 
-      revenue: null, // Display formatting handled by client component
-      revenueNum: org.revenueNum,
-      revenueDate: org.revenueDate,
+      revenue: null, // Display uses revenueNum directly
+      revenueNum,
+      revenueDate,
 
       valuation: null,
-      valuationNum: org.valuationNum,
-      valuationDate: org.valuationDate,
+      valuationNum,
+      valuationDate,
 
-      headcount: org.headcount,
-      headcountDate: org.headcountDate,
+      headcount,
+      headcountDate,
 
       totalFunding: null,
-      totalFundingNum: org.totalFundingNum,
+      totalFundingNum,
 
-      foundedDate: org.foundedDate,
+      foundedDate,
 
       peopleCount: null, // Not available from API
-      completionScore: computeCompletionScore(org),
+      completionScore: computeCompletionScore({
+        revenueNum,
+        valuationNum,
+        headcount,
+        totalFundingNum,
+        foundedDate,
+      }),
 
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -219,14 +253,27 @@ async function loadFromApi(
     const searchParts = [org.title];
     if (org.description) searchParts.push(org.description);
     if (orgType) searchParts.push(orgType);
+
+    // Load all financial facts from local FactBase for orgs not in the API
+    const localRevFact2 = getKBLatest(org.id, "revenue");
+    const localValFact2 = getKBLatest(org.id, "valuation");
+    const localHcFact2 = getKBLatest(org.id, "headcount");
+    const localTfFact2 = getKBLatest(org.id, "total-funding");
+    const localRevenueNum = numericValue(localRevFact2);
+    const localValuationNum = numericValue(localValFact2);
+    const localHeadcount =
+      localHcFact2?.value.type === "number" ? localHcFact2.value.value : null;
+    const localTotalFundingNum = numericValue(localTfFact2);
+
     const foundedFact = getKBLatest(org.id, "founded-date");
-    const foundedDate = foundedFact?.value.type === "date"
-      ? foundedFact.value.value
-      : foundedFact?.value.type === "text"
+    const foundedDate =
+      foundedFact?.value.type === "date"
         ? foundedFact.value.value
-        : foundedFact?.value.type === "number"
-          ? String(foundedFact.value.value)
-          : null;
+        : foundedFact?.value.type === "text"
+          ? foundedFact.value.value
+          : foundedFact?.value.type === "number"
+            ? String(foundedFact.value.value)
+            : null;
 
     rows.push({
       id: org.id,
@@ -237,23 +284,29 @@ async function loadFromApi(
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
 
       revenue: null,
-      revenueNum: null,
-      revenueDate: null,
+      revenueNum: localRevenueNum,
+      revenueDate: localRevFact2?.asOf ?? null,
 
       valuation: null,
-      valuationNum: null,
-      valuationDate: null,
+      valuationNum: localValuationNum,
+      valuationDate: localValFact2?.asOf ?? null,
 
-      headcount: null,
-      headcountDate: null,
+      headcount: localHeadcount,
+      headcountDate: localHcFact2?.asOf ?? null,
 
       totalFunding: null,
-      totalFundingNum: null,
+      totalFundingNum: localTotalFundingNum,
 
       foundedDate,
 
       peopleCount: null,
-      completionScore: computeCompletionScore({}),
+      completionScore: computeCompletionScore({
+        revenueNum: localRevenueNum,
+        valuationNum: localValuationNum,
+        headcount: localHeadcount,
+        totalFundingNum: localTotalFundingNum,
+        foundedDate,
+      }),
 
       searchText: searchParts.join(" ").toLowerCase(),
     });
