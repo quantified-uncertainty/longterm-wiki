@@ -207,14 +207,14 @@ export function PeopleTable({
       if (serverMode) {
         const serverField = SORT_KEY_TO_SERVER_FIELD[key];
         if (serverField) {
-          const { dir } = toggleSort(urlSort, key, ["name", "role", "employer"]);
+          const { dir } = toggleSort(server.sort, key, ["name", "role", "employer"]);
           serverSetSort(serverField, dir);
         }
       } else {
         urlSetSort(toggleSort(urlSort, key, ["name", "role", "employer"]));
       }
     },
-    [serverMode, serverSetSort, urlSetSort, urlSort],
+    [serverMode, server.sort, serverSetSort, urlSetSort, urlSort],
   );
 
   const { filters: serverFilters, setFilter: serverSetFilter } = server;
