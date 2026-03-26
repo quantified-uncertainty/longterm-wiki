@@ -164,6 +164,22 @@ if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detac
   fi
 fi
 
+# ─── 7. Idle slot detection ──────────────────────────────────────────────────────
+# When on main with no checklist and no task, signal that this slot is ready for work.
+# This makes the post-/reset-dir + /clear experience seamless.
+
+if [ "$BRANCH" = "main" ] && [ ! -f ".claude/wip-checklist.md" ] && [ ! -f ".agent-task" ]; then
+  SLOT_LABEL=""
+  if [ -f "$REPO_ROOT/.agent-slot" ]; then
+    SLOT_LABEL="Slot A$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]') is "
+  fi
+  CONTEXT_LINES+=("")
+  CONTEXT_LINES+=("═══════════════════════════════════════════════════════")
+  CONTEXT_LINES+=("${SLOT_LABEL}idle on main — ready for a new task.")
+  CONTEXT_LINES+=("Tell me what to work on, or run /agent-session-start.")
+  CONTEXT_LINES+=("═══════════════════════════════════════════════════════")
+fi
+
 # ─── Output ─────────────────────────────────────────────────────────────────────
 
 if [ ${#WARNINGS[@]} -gt 0 ]; then
