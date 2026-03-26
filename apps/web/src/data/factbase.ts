@@ -645,6 +645,10 @@ export function getFactBaseEntitySlug(entityId: string): string | undefined {
     const registry = getIdRegistry();
     const slug = registry.stableIdToSlug?.[entityId] ?? registry.byStableId?.[entityId];
     if (slug) return slug;
+
+    // Check if the input is already a known slug (e.g. "us-aisi" passed
+    // from a FactBase ref value that happens to be a slug, not a stableId)
+    if (registry.stableIdBySlug?.[entityId]) return entityId;
   } catch {
     // database.json not available yet — fall through
   }

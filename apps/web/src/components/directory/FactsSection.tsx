@@ -9,6 +9,7 @@ import {
   getKBEntitySlug,
   isFactExpired,
 } from "@/data/factbase";
+import { getEntityHref } from "@/data/entity-nav";
 import {
   formatKBFactValue,
   titleCase,
@@ -67,18 +68,26 @@ export function groupByCategory(
 
 // ── Components ───────────────────────────────────────────────────────
 
+/**
+ * Resolve a FactBase ref value to its canonical URL.
+ * Uses getKBEntitySlug to get the slug (handles both stableIds and slugs),
+ * then getEntityHref for proper directory routing (all entity types).
+ * Falls back to /factbase/entity/{id} only if the entity has no wiki presence.
+ */
+function resolveRefHref(refId: string): string {
+  const refSlug = getKBEntitySlug(refId);
+  if (refSlug) return getEntityHref(refSlug);
+  return `/factbase/entity/${refId}`;
+}
+
 /** Render a fact value, resolving ref/refs to entity name links. */
 export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Property }) {
   const v = fact.value;
   if (v.type === "ref") {
     const refEntity = getKBEntity(v.value);
     if (refEntity) {
-      const refSlug = getKBEntitySlug(v.value);
-      const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
-        : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
-        : `/factbase/entity/${v.value}`;
       return (
-        <Link href={href} className="text-primary hover:underline">
+        <Link href={resolveRefHref(v.value)} className="text-primary hover:underline">
           {refEntity.name}
         </Link>
       );
@@ -91,14 +100,10 @@ export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Pr
         {v.value.map((refId, i) => {
           const refEntity = getKBEntity(refId);
           if (refEntity) {
-            const refSlug = getKBEntitySlug(refId);
-            const href = refSlug && refEntity.type === "organization" ? `/organizations/${refSlug}`
-              : refSlug && refEntity.type === "person" ? `/people/${refSlug}`
-              : `/factbase/entity/${refId}`;
             return (
               <span key={refId}>
                 {i > 0 && ", "}
-                <Link href={href} className="text-primary hover:underline">
+                <Link href={resolveRefHref(refId)} className="text-primary hover:underline">
                   {refEntity.name}
                 </Link>
               </span>
