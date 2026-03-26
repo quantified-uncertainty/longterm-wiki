@@ -146,12 +146,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- entities: SELECT with WHERE + OR (get by id, wiki_id, or stable_id) ---
+  // The directory query also uses OR for metadata conditions, so exclude it by
+  // checking for the absence of ORDER BY (directory queries always have ORDER BY).
   if (
     q.includes('"entities"') &&
     q.includes("where") &&
     q.includes(" or ") &&
     !q.includes("count(*)") &&
     !q.includes("order by")
+
+    !q.includes("order by") &&
+    !q.includes("count(*)")
   ) {
     const id = params[0] as string;
     const wikiId = params[1] as string;
@@ -256,6 +261,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("select") &&
     q.includes('"entities"') &&
     q.includes("where") &&
+    !q.includes(" in ") &&   // exclude IN queries (e.g., step 4b metadata ref lookups)
     !q.includes("not in") &&
     !q.includes("or") &&
     !q.includes("order by") &&
@@ -292,6 +298,30 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
     }
     return [];
+  }
+
+  // --- directory step 4b: SELECT id, title FROM entities WHERE id IN (...) ---
+  // Used by the metadata ref resolution step to look up entity names by slug ID.
+  // Distinguishing features: selects only id + title (no stable_id), has WHERE + IN, no NOT IN or ORDER BY.
+  if (
+    q.includes('"entities"') &&
+    q.includes("where") &&
+    q.includes(" in ") &&
+    !q.includes("not in") &&
+    !q.includes("order by") &&
+    !q.includes("stable_id") &&
+    !q.includes("count(*)") &&
+    !q.includes("group by") &&
+    !q.includes("insert")
+  ) {
+    const ids = new Set(params as string[]);
+    const results: { id: string; title: string }[] = [];
+    for (const row of entitiesStore.values()) {
+      if (ids.has(row.id as string)) {
+        results.push({ id: row.id as string, title: row.title as string });
+      }
+    }
+    return results;
   }
 
   // --- facts: DISTINCT ON query for directory endpoint ---
@@ -784,6 +814,28 @@ describe("Entities API", () => {
       const body = await res.json();
       const model = body.entities.find((e: { id: string }) => e.id === "claude-3-opus");
       expect(model).toBeDefined();
+
+      // Seed the developer org entity
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+        stableId: "aB1cD2eF3g",
+      });
+      // Seed an AI model with metadata.developer pointing to the org by slug ID
+      await seedEntity(app, "claude-3-opus", "Claude 3 Opus", {
+        entityType: "ai-model",
+        stableId: "bC2dE3fG4h",
+        metadata: { developer: "anthropic", releaseDate: "2024-03-04" },
+      });
+
+      const res = await app.request(
+        "/api/entities/directory?entityType=ai-model&measures=developer"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const model = (body.entities as Array<{ id: string; resolvedRefs: Record<string, { name: string; entityId: string }> }>)
+        .find((e) => e.id === "claude-3-opus");
+      expect(model).toBeDefined();
+      // The developer metadata ref should be resolved to the org's name
       expect(model?.resolvedRefs["developer"]).toBeDefined();
       expect(model?.resolvedRefs["developer"].name).toBe("Anthropic");
       expect(model?.resolvedRefs["developer"].entityId).toBe("anthropic");
