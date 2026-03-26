@@ -12,17 +12,21 @@
  *   crux verify page <page-id> --budget=2         Limit spending (default: $2)
  */
 
+import fs from 'fs';
+import path from 'path';
 import type { CommandResult } from '../lib/command-types.ts';
 import { findPageById } from '../lib/page-resolution.ts';
+import { CONTENT_DIR_ABS } from '../lib/content-types.ts';
+import { findMdxFiles } from '../lib/file-utils.ts';
+import { parseFrontmatter } from '../lib/mdx-utils.ts';
 import {
-  preprocessMdxForExtraction,
-  splitIntoChunks,
   extractClaims,
 } from '../lib/semantic-diff/claim-extractor.ts';
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
-import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
+import { createLlmClient, runLlmAgent, MODELS } from '../lib/llm.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
+import { extractFootnotedSentences, claimHasCitation, isCheckWorthy } from './verify-page-utils.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -95,120 +99,6 @@ function buildFootnoteMap(rawContent: string): FootnoteMap {
     sentencesWithFootnotes,
     totalFootnotes: footnoteMatches.length,
   };
-}
-
-/**
- * Build a list of cleaned text from sentences that contain footnotes.
- * Strips MDX components, footnote markers, and formatting to get clean text
- * that can be compared against extracted claims.
- */
-function extractFootnotedSentences(rawContent: string): string[] {
-  // Strip frontmatter
-  let text = rawContent.replace(/^---[\s\S]*?---\n/, '');
-
-  const paragraphs = text.split(/\n\n+/);
-  const results: string[] = [];
-
-  for (const para of paragraphs) {
-    // Skip footnote definitions, imports, headings
-    if (/^\[\^[\w:.-]+\]:/.test(para.trim())) continue;
-    if (/^(?:import|export)\s/.test(para.trim())) continue;
-    if (/^#{1,6}\s/.test(para.trim())) continue;
-    if (!/\[\^[\w:.-]+\]/.test(para)) continue;
-
-    // Clean the paragraph text: strip components, footnotes, formatting
-    const clean = para
-      .replace(/<[^>]+>/g, '')             // strip JSX/HTML tags
-      .replace(/<\/[^>]+>/g, '')           // strip closing tags
-      .replace(/\[\^[\w:.-]+\]/g, '')      // strip footnote refs
-      .replace(/\*\*([^*]+)\*\*/g, '$1')   // strip bold
-      .replace(/\*([^*]+)\*/g, '$1')       // strip italic
-      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // strip links, keep text
-      .replace(/\\(\$)/g, '$1')            // unescape dollars
-      .replace(/\s+/g, ' ')
-      .trim()
-      .toLowerCase();
-
-    if (clean.length > 15) {
-      results.push(clean);
-    }
-  }
-
-  return results;
-}
-
-/**
- * Check if a claim appears in text that has footnotes in the original source.
- *
- * Strategy: compare claim content against cleaned footnoted paragraphs.
- * Uses multiple signals: keyValue, numbers, and distinctive word sequences.
- */
-function claimHasCitation(
-  claim: ExtractedClaim,
-  footnotedParagraphs: string[],
-): boolean {
-  const claimLower = claim.text.toLowerCase();
-
-  // Build distinctive search terms from the claim
-  const searchTerms: string[] = [];
-
-  // keyValue is typically the most distinctive
-  if (claim.keyValue && claim.keyValue.length > 2) {
-    searchTerms.push(claim.keyValue.toLowerCase());
-  }
-
-  // Numbers are very distinctive
-  const numbers = claimLower.match(/\d[\d,.]+/g);
-  if (numbers) {
-    for (const num of numbers) {
-      if (num.length >= 2) searchTerms.push(num);
-    }
-  }
-
-  // Multi-word phrases from the claim
-  const words = claimLower.split(/\s+/).filter(w => w.length > 4);
-  if (words.length >= 3) {
-    for (let i = 0; i < Math.min(words.length - 2, 3); i++) {
-      searchTerms.push(words.slice(i, i + 3).join(' '));
-    }
-  }
-
-  if (searchTerms.length === 0) return false;
-
-  for (const paragraph of footnotedParagraphs) {
-    let matches = 0;
-    for (const term of searchTerms) {
-      if (paragraph.includes(term)) matches++;
-    }
-    // 2+ term matches = high confidence it's the same fact
-    if (matches >= 2) return true;
-    // 1 match on keyValue alone is sufficient (e.g., "$380 billion")
-    if (matches >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase()) return true;
-  }
-
-  return false;
-}
-
-// ── Checkworthiness filter ───────────────────────────────────────────
-
-/**
- * Loki-inspired checkworthiness filter.
- * Skip claims that are definitions, vague existence claims, or trivially true.
- */
-function isCheckWorthy(claim: ExtractedClaim): boolean {
-  // Definitions are not worth fact-checking against the web
-  if (claim.type === 'definition') return false;
-
-  // Low-confidence claims from the extractor are often vague
-  if (claim.confidence === 'low') return false;
-
-  // Existence claims without a specific keyValue are usually trivial
-  if (claim.type === 'existence' && !claim.keyValue) return false;
-
-  // Very short claims are usually not substantive
-  if (claim.text.length < 20) return false;
-
-  return true;
 }
 
 // ── Web verification ─────────────────────────────────────────────────
@@ -372,7 +262,7 @@ export async function verifyPageCommand(
 
   // Step 3: Verify uncited check-worthy claims against web
   console.log('  [3/4] Verifying uncited claims against web...');
-  const costTracker = new CostTracker(budget);
+  const costTracker = new CostTracker();
   const client = createLlmClient();
 
   const verifiedClaims: VerifiedClaim[] = [];
@@ -486,4 +376,144 @@ function formatReport(report: PageVerificationReport): string {
   }
 
   return lines.join('\n');
+}
+
+// ── Batch audit (no LLM) ────────────────────────────────────────────
+
+interface PageCitationStats {
+  slug: string;
+  title: string;
+  wordCount: number;
+  footnoteCount: number;
+  proseWordsPerFootnote: number;
+  estimatedCitationDensity: 'good' | 'fair' | 'poor' | 'none';
+  subcategory: string;
+}
+
+/**
+ * Fast citation density audit across all pages. No LLM calls — just counts
+ * footnotes and prose words to estimate how well-cited each page is.
+ */
+export async function auditAllPagesCommand(
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const limitN = Number(options.limit) || 50;
+  const sortBy = (options.sort as string) || 'density';
+  const minWords = Number(options.minWords) || 200;
+
+  const files = findMdxFiles(CONTENT_DIR_ABS);
+  const stats: PageCitationStats[] = [];
+
+  for (const file of files) {
+    const content = fs.readFileSync(file, 'utf-8');
+    const fm = parseFrontmatter(content);
+    const slug = path.basename(file, path.extname(file));
+    const title = (fm.title as string) || slug;
+    const subcategory = (fm.subcategory as string) || '';
+
+    // Skip internal/dashboard/meta pages
+    if (subcategory === 'dashboards' || subcategory === 'citations') continue;
+    if ((fm.contentFormat as string) === 'dashboard') continue;
+    const relPath = path.relative(CONTENT_DIR_ABS, file);
+    if (relPath.startsWith('internal/') || relPath.startsWith('docs/internal/')) continue;
+    if (relPath.startsWith('meta/') || relPath.startsWith('docs/meta/')) continue;
+    // Skip pages explicitly marked as internal content
+    if (subcategory === 'internal' || subcategory === 'style-guides' || subcategory === 'meta') continue;
+
+    // Strip frontmatter
+    const body = content.replace(/^---[\s\S]*?---\n/, '');
+
+    // Strip imports, components, footnote definitions
+    const prose = body
+      .replace(/^(?:import|export)\s.*$/gm, '')
+      .replace(/<[^>]+\/>/g, '')           // self-closing tags
+      .replace(/<\w+[^>]*>[\s\S]*?<\/\w+>/g, '') // component blocks
+      .replace(/^\[\^[\w:.-]+\]:.*$/gm, '') // footnote defs
+      .replace(/^#{1,6}\s.*$/gm, '')        // headings
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    const wordCount = prose.split(/\s+/).filter(w => w.length > 0).length;
+    if (wordCount < minWords) continue;
+
+    // Count footnote references (strip definitions first to avoid double-counting)
+    const bodyWithoutDefs = body.replace(/^\[\^[\w:.-]+\]:.*$/gm, '');
+    const footnoteRefs = (bodyWithoutDefs.match(/\[\^[\w:.-]+\]/g) || []);
+    const footnoteCount = footnoteRefs.length;
+
+    const proseWordsPerFootnote = footnoteCount > 0
+      ? Math.round(wordCount / footnoteCount)
+      : Infinity;
+
+    let estimatedCitationDensity: PageCitationStats['estimatedCitationDensity'];
+    if (footnoteCount === 0) {
+      estimatedCitationDensity = 'none';
+    } else if (proseWordsPerFootnote <= 50) {
+      estimatedCitationDensity = 'good';  // roughly 1 footnote per 2-3 sentences
+    } else if (proseWordsPerFootnote <= 120) {
+      estimatedCitationDensity = 'fair';
+    } else {
+      estimatedCitationDensity = 'poor';
+    }
+
+    stats.push({
+      slug,
+      title: title.slice(0, 40),
+      wordCount,
+      footnoteCount,
+      proseWordsPerFootnote,
+      estimatedCitationDensity,
+      subcategory,
+    });
+  }
+
+  // Sort
+  if (sortBy === 'density') {
+    // Sort by density descending, with zero-footnote pages sorted by word count
+    stats.sort((a, b) => {
+      if (a.footnoteCount === 0 && b.footnoteCount === 0) return b.wordCount - a.wordCount;
+      if (a.footnoteCount === 0) return -1;
+      if (b.footnoteCount === 0) return 1;
+      return b.proseWordsPerFootnote - a.proseWordsPerFootnote;
+    });
+  } else if (sortBy === 'words') {
+    stats.sort((a, b) => b.wordCount - a.wordCount);
+  } else if (sortBy === 'footnotes') {
+    stats.sort((a, b) => a.footnoteCount - b.footnoteCount);
+  }
+
+  // Summary stats
+  const total = stats.length;
+  const noneCount = stats.filter(s => s.estimatedCitationDensity === 'none').length;
+  const poorCount = stats.filter(s => s.estimatedCitationDensity === 'poor').length;
+  const fairCount = stats.filter(s => s.estimatedCitationDensity === 'fair').length;
+  const goodCount = stats.filter(s => s.estimatedCitationDensity === 'good').length;
+
+  const lines: string[] = [];
+  lines.push(`\n  Wiki Citation Density Audit`);
+  lines.push(`  ${'─'.repeat(60)}`);
+  lines.push(`  Pages analyzed: ${total} (min ${minWords} words)`);
+  lines.push(`  Citation density:  good: ${goodCount}  fair: ${fairCount}  poor: ${poorCount}  none: ${noneCount}`);
+  lines.push('');
+
+  // Show worst pages
+  const shown = stats.slice(0, limitN);
+  lines.push(`  Worst ${shown.length} pages by citation density:`);
+  lines.push('');
+  lines.push(`  ${'Page'.padEnd(42)} ${'Words'.padStart(6)} ${'FN'.padStart(4)} ${'W/FN'.padStart(6)} Rating`);
+  lines.push(`  ${'─'.repeat(42)} ${'─'.repeat(6)} ${'─'.repeat(4)} ${'─'.repeat(6)} ${'─'.repeat(6)}`);
+
+  for (const s of shown) {
+    const wPerFn = s.footnoteCount === 0 ? '  n/a' : String(s.proseWordsPerFootnote).padStart(6);
+    const rating = s.estimatedCitationDensity === 'none' ? 'NONE' :
+      s.estimatedCitationDensity === 'poor' ? 'POOR' :
+      s.estimatedCitationDensity === 'fair' ? 'fair' : 'good';
+    lines.push(`  ${s.title.padEnd(42)} ${String(s.wordCount).padStart(6)} ${String(s.footnoteCount).padStart(4)} ${wPerFn} ${rating}`);
+  }
+
+  if (stats.length > limitN) {
+    lines.push(`  ... and ${stats.length - limitN} more pages`);
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
 }

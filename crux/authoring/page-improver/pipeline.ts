@@ -488,6 +488,29 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       process.exit(75);
     }
 
+    // Citation density check: warn if the improved content has many uncited claims
+    try {
+      const footnoteRefs = (contentToApply.match(/\[\^[\w:.-]+\]/g) || []).length;
+      const proseBody = contentToApply
+        .replace(/^---[\s\S]*?---\n/, '')
+        .replace(/^(?:import|export)\s.*$/gm, '')
+        .replace(/^\[\^[\w:.-]+\]:.*$/gm, '')
+        .replace(/\s+/g, ' ').trim();
+      const wordCount = proseBody.split(/\s+/).length;
+
+      if (wordCount > 500 && footnoteRefs === 0) {
+        log('citation-density', `WARNING: ${wordCount} words of prose with 0 footnotes — page has no citations`);
+      } else if (wordCount > 500 && footnoteRefs > 0) {
+        const density = Math.round(wordCount / footnoteRefs);
+        if (density > 150) {
+          log('citation-density', `WARNING: low citation density — ${density} words per footnote (${footnoteRefs} footnotes for ${wordCount} words)`);
+        }
+      }
+    } catch (e: unknown) {
+      // Intentionally quiet: citation density is advisory and should never block the improve pipeline.
+      void e;
+    }
+
     fs.writeFileSync(filePath, contentToApply);
     console.log(`\nChanges applied to ${filePath}`);
 
