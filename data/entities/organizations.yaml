@@ -2150,6 +2150,7 @@
   orgType: funder
   title: Coefficient Giving
   aliases:
+    # Historical name — Coefficient Giving was formerly Open Philanthropy's grantmaking arm
     - Open Philanthropy
     - OP
   website: https://www.coefficientgiving.org
