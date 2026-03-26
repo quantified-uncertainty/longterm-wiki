@@ -218,6 +218,38 @@ const nextConfig: NextConfig = {
         destination: "/publications/deepmind",
         permanent: true,
       },
+      // Organization alternate-name redirects
+      {
+        source: "/organizations/google-deepmind",
+        destination: "/organizations/deepmind",
+        permanent: true,
+      },
+      {
+        source: "/organizations/future-of-life-institute",
+        destination: "/organizations/fli",
+        permanent: true,
+      },
+      {
+        source: "/organizations/centre-for-effective-altruism",
+        destination: "/organizations/cea",
+        permanent: true,
+      },
+      // AI model and benchmark alternate-name redirects
+      {
+        source: "/ai-models/gemini-ultra",
+        destination: "/ai-models/gemini-1-0-ultra",
+        permanent: true,
+      },
+      {
+        source: "/benchmarks/arc",
+        destination: "/benchmarks/arc-challenge",
+        permanent: true,
+      },
+      {
+        source: "/benchmarks/hle",
+        destination: "/benchmarks/humanitys-last-exam",
+        permanent: true,
+      },
     ];
   },
 };
