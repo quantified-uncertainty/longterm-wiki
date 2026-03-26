@@ -15,6 +15,8 @@ import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { InlineVerificationSchema } from "./verification-schema.js";
+import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -45,6 +47,7 @@ const SyncFundingRoundItemSchema = z.object({
   leadInvestor: z.string().max(500).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  verification: InlineVerificationSchema.optional(),
 });
 
 const SyncFundingRoundsBatchSchema = z.object({
@@ -207,6 +210,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     if (refError) return refError;
 
     let upserted = 0;
+    let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
       const allVals = items.map((item) => {
@@ -277,10 +281,24 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
+      // Write inline verification verdicts atomically within the same transaction
+      verdictsResult = await writeInlineVerdicts(
+        tx,
+        items.map((item) => ({
+          recordType: "funding-round",
+          recordId: item.id,
+          entityId: item.companyId,
+          sourceUrl: item.source ?? null,
+          verification: item.verification ?? null,
+        }))
+      );
+
       upserted = allVals.length;
     });
 
-    return c.json({ upserted });
+    logVerificationCoverage("funding-rounds/sync", items.length, verdictsResult.written);
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });
 
 // ---- Exports ----
