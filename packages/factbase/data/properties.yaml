@@ -713,19 +713,6 @@ properties:
 
   # ── Additional Monetary ───────────────────────────────────────────
 
-  employee-tender-offer:
-    name: Employee Tender Offer
-    description: "Dollar value of an employee share sale or tender offer program"
-    dataType: number
-    unit: USD
-    category: financial
-    temporal: true
-    appliesTo: [organization]
-    display:
-      divisor: 1e9
-      prefix: "$"
-      suffix: "B"
-
   market-cap:
     name: Market Cap
     description: "Market capitalization (publicly traded) or implied valuation for private companies"
