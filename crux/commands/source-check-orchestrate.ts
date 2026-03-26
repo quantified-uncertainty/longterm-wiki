@@ -1489,7 +1489,9 @@ function formatDryRunOutput(
     lines.push(`  Facts:    ${totalFacts} total, ${neverVerifiedFacts} never verified (${kbVerdicts.size} existing verdicts)`);
   }
   if (totalRecords > 0) {
-    lines.push(`  Records:  ${totalRecords} total, ${neverVerifiedRecords} never verified (${recordVerdicts.size} existing verdicts)`);
+    const inferredRecordCount = allItems.filter(i => i.kind === 'record' && i.inferredSource).length;
+    const inferredNote = inferredRecordCount > 0 ? `, ${inferredRecordCount} with inferred sources` : '';
+    lines.push(`  Records:  ${totalRecords} total, ${neverVerifiedRecords} never verified (${recordVerdicts.size} existing verdicts${inferredNote})`);
   }
   if (totalEntities > 0) {
     lines.push(`  Entities: ${totalEntities} without sources (web search candidates)`);
@@ -1761,6 +1763,8 @@ Options:
   --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
   --concurrency=N        Number of parallel verifications (default: 5)
+  --infer-sources        For sourceless records, infer source URLs from parent entity
+                         websites or sibling records (default: off, opt-in)
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
 
