@@ -276,7 +276,7 @@ const factsApp = new Hono()
       grouped[row.entityId].push(fact);
     }
 
-    return c.json({ facts: grouped, total: rows.length });
+    return c.json({ facts: grouped, total: rows.length, entities: Object.keys(grouped).length });
   })
 
   // ---- POST /sync ----
@@ -416,81 +416,9 @@ const factsApp = new Hono()
     }
 
     return c.json({ upserted });
-  })
-
-  // ---- GET /export ----
-  // Returns all facts grouped by entity ID in a format approximating SerializedKB.facts.
-  // Note: some Fact fields (derivedFrom, sourceQuote, usdEquivalent, etc.) are not
-  // stored in PG and will be absent. See discussion #2950 for the PG-primary roadmap.
-  .get("/export", async (c) => {
-    const db = getDrizzleDb();
-
-    // Select only columns used in the response (skip syncedAt, createdAt, updatedAt, id, label, formatDivisor)
-    const allFacts = await db
-      .select({
-        entityId: facts.entityId,
-        factId: facts.factId,
-        value: facts.value,
-        numeric: facts.numeric,
-        low: facts.low,
-        high: facts.high,
-        asOf: facts.asOf,
-        validEnd: facts.validEnd,
-        currency: facts.currency,
-        measure: facts.measure,
-        source: facts.source,
-        note: facts.note,
-        format: facts.format,
-      })
-      .from(facts)
-      .orderBy(asc(facts.entityId), asc(facts.asOf));
-
-    // Group by entity ID
-    const grouped: Record<string, Array<{
-      id: string;
-      subjectId: string;
-      propertyId: string;
-      value: { type: string; value: unknown; low?: number; high?: number };
-      asOf: string | null;
-      validEnd?: string | null;
-      currency?: string | null;
-      source: string | null;
-      notes: string | null;
-      measure?: string;
-    }>> = {};
-
-    for (const f of allFacts) {
-      if (!grouped[f.entityId]) grouped[f.entityId] = [];
-
-      // Reconstruct the Fact value shape from PG columns
-      const inferredType = f.format ?? (f.numeric != null ? "number" : "text");
-      const value: { type: string; value: unknown; low?: number; high?: number } = {
-        type: inferredType,
-        value: f.numeric != null ? f.numeric : f.value,
-      };
-      if (f.low != null) value.low = f.low;
-      if (f.high != null) value.high = f.high;
-
-      grouped[f.entityId].push({
-        id: f.factId,
-        subjectId: f.entityId,
-        propertyId: f.measure ?? f.factId,
-        value,
-        asOf: f.asOf,
-        ...(f.validEnd != null && { validEnd: f.validEnd }),
-        ...(f.currency != null && { currency: f.currency }),
-        source: f.source,
-        notes: f.note,
-        ...(f.measure && { measure: f.measure }),
-      });
-    }
-
-    return c.json({
-      facts: grouped,
-      total: allFacts.length,
-      entities: Object.keys(grouped).length,
-    });
   });
+  // NOTE: Duplicate /export route was removed here. The active /export route is
+  // defined above (uses pgRowToFact). See #3173.
 
 // ---- Exports ----
 
