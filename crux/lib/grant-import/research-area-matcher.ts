@@ -48,7 +48,9 @@ const RULES: MatchRule[] = [
   },
   {
     areaId: "refusal-training",
-    patterns: [/refusal train/i, /safety train/i, /harmlessness train/i],
+    // "/safety train/i" alone is too broad — it matches prison/workplace safety
+    // training grants. Require AI context or use more specific phrases.
+    patterns: [/refusal train/i, /\b(ai|llm|model)\b.*safety train/i, /harmlessness train/i],
   },
   {
     areaId: "adversarial-training",
@@ -82,7 +84,9 @@ const RULES: MatchRule[] = [
   },
   {
     areaId: "interpretability",
-    patterns: [/interpretab/i, /transparency/i, /white.box/i, /model.*(internal|understand)/i],
+    // "/transparency/i" alone is too broad — it matches organizational transparency
+    // grants (e.g. global health evidence transparency). Require AI/model context.
+    patterns: [/interpretab/i, /\b(ai|model|neural|llm)\b.*transparency|transparency.*\b(ai|model|neural|llm)\b/i, /white.box/i, /model.*(internal|understand)/i],
   },
   {
     areaId: "externalizing-reasoning",
@@ -124,7 +128,14 @@ const RULES: MatchRule[] = [
   },
   {
     areaId: "evals",
-    patterns: [/\beval(uation)?s?\b/i, /benchmark/i, /safety (test|assess)/i],
+    // "/\beval(uation)?s?\b/i" alone is too broad — it matches program evaluation
+    // in global health, criminal justice, etc. Require AI/safety context.
+    // Similarly "/benchmark/i" is broad; narrow to AI/model benchmarks.
+    patterns: [
+      /\b(ai|llm|model|alignment|safety)\b.*\beval(uation)?s?\b|\beval(uation)?s?\b.*\b(ai|llm|model|alignment|safety)\b/i,
+      /\b(ai|model|llm)\b.*benchmark|benchmark.*\b(ai|model|llm)\b/i,
+      /safety (test|assess)/i,
+    ],
   },
 
   // ── AI Control ──────────────────────────────────────────────────────

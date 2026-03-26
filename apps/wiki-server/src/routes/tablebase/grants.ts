@@ -528,6 +528,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         amount: grants.amount,
         organizationId: grants.organizationId,
         granteeId: grants.granteeId,
+        programId: grants.programId,
       })
       .from(grants)
       .limit(HARD_LIMIT);
@@ -540,6 +541,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         amount: r.amount != null ? Number(r.amount) : null,
         organizationId: r.organizationId,
         granteeId: r.granteeId,
+        programId: r.programId ?? null,
       })),
       total: rows.length,
       truncated: rows.length >= HARD_LIMIT,
