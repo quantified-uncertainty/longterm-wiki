@@ -88,12 +88,14 @@ export function formatKBNumber(
     return `${prefix}${formatted}${suffix}`;
   }
 
-  // No unit, no display config — plain locale string
-  // Detect year-like values (4-digit integers 1800–2100) and skip thousands separator
+  // No unit, no display config — use smart magnitude formatter for large numbers
+  // so unrecognized properties (missing from properties.yaml) still produce
+  // readable output like "5.5 billion" instead of raw "5,500,000,000".
+  // Detect year-like values (4-digit integers 1800–2100) and skip formatting.
   if (Number.isInteger(value) && value >= 1800 && value <= 2100) {
     return String(value);
   }
-  return value.toLocaleString();
+  return smartFormatValue(value, undefined, currency);
 }
 
 // ── Fact value formatting ──────────────────────────────────────────

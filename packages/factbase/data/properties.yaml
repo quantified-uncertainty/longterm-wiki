@@ -683,3 +683,425 @@ properties:
     appliesTo: [policy]
     display:
       suffix: "%"
+
+  # ── Additional Monetary ───────────────────────────────────────────
+
+  employee-tender-offer:
+    name: Employee Tender Offer
+    description: "Dollar value of an employee share sale or tender offer program"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  market-cap:
+    name: Market Cap
+    description: "Market capitalization (publicly traded) or implied valuation for private companies"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  euv-system-price:
+    name: EUV System Price
+    description: "Price per EUV lithography system"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  quarterly-data-center-revenue:
+    name: Quarterly Data Center Revenue
+    description: "Quarterly revenue from data center products or services"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  global-semiconductor-revenue:
+    name: Global Semiconductor Revenue
+    description: "Industry-wide global semiconductor market revenue"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  chips-act-total-funding:
+    name: CHIPS Act Total Funding
+    description: "Total funding authorized or appropriated under the CHIPS and Science Act"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [policy, organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  chips-act-private-investment:
+    name: CHIPS Act Private Investment
+    description: "Private sector investment catalyzed by or pledged under CHIPS Act programs"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [policy, organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  chips-act-rd-allocation:
+    name: CHIPS Act R&D Allocation
+    description: "R&D funding allocated or committed under CHIPS Act programs"
+    dataType: number
+    unit: USD
+    category: financial
+    appliesTo: [policy, organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  hyperscaler-ai-capex:
+    name: Hyperscaler AI CapEx
+    description: "Combined capital expenditure on AI infrastructure by major cloud providers"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  program-budget:
+    name: Program Budget
+    description: "Funding budget for a specific program or initiative"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization, project]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  annual-budget:
+    name: Annual Budget
+    description: "Annual operating or program budget"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  federal-ai-rd-spending:
+    name: Federal AI R&D Spending
+    description: "U.S. federal government spending on AI research and development"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization, policy]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  dod-ai-budget-request:
+    name: DoD AI Budget Request
+    description: "U.S. Department of Defense budget request for AI programs"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization, policy]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  fellow-stipend:
+    name: Fellow Stipend
+    description: "Annual stipend paid to fellows in a training or research program"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization, project]
+    display:
+      divisor: 1000
+      prefix: "$"
+      suffix: "K"
+
+  grant-received:
+    name: Grant Received
+    description: "Amount of a specific grant or award received"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization, project]
+    display:
+      divisor: 1e6
+      prefix: "$"
+      suffix: "M"
+
+  # ── Market Share (percent) ─────────────────────────────────────────
+
+  euv-market-share:
+    name: EUV Market Share
+    description: "Market share in EUV lithography systems"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  hbm-market-share:
+    name: HBM Market Share
+    description: "Market share in high-bandwidth memory (HBM) products"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  foundry-market-share:
+    name: Foundry Market Share
+    description: "Market share in semiconductor foundry (contract manufacturing) services"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  advanced-node-market-share:
+    name: Advanced Node Market Share
+    description: "Market share in advanced node (sub-5nm) semiconductor manufacturing"
+    dataType: number
+    unit: percent
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      suffix: "%"
+
+  # ── Workforce & Programs ───────────────────────────────────────────
+
+  publication-count:
+    name: Publication Count
+    description: "Number of research publications or papers produced"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization, project]
+
+  fellowship-count:
+    name: Fellowship Count
+    description: "Number of fellows placed or active in a program"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  fellows-placed:
+    name: Fellows Placed
+    description: "Cumulative number of fellows placed in government or other roles"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  talent-placement-count:
+    name: Talent Placements
+    description: "Number of people placed in roles through a talent pipeline program"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  cohort-size:
+    name: Cohort Size
+    description: "Number of participants in a training or fellowship cohort"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  agencies-served:
+    name: Agencies Served
+    description: "Number of government agencies or organizations served"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  cumulative-downloads:
+    name: Cumulative Downloads
+    description: "Total number of times a software package or resource has been downloaded"
+    dataType: number
+    unit: count
+    category: product
+    temporal: true
+    appliesTo: [organization, project]
+
+  federal-civilian-workforce:
+    name: Federal Civilian Workforce
+    description: "Total size of the U.S. federal civilian workforce"
+    dataType: number
+    unit: count
+    category: organization
+    temporal: true
+    appliesTo: [organization]
+
+  it-workers-departed:
+    name: IT Workers Departed
+    description: "Number of IT workers who left government employment"
+    dataType: number
+    unit: count
+    category: organization
+    temporal: true
+    appliesTo: [organization]
+
+  tech-force-target:
+    name: Tech Force Target
+    description: "Target headcount for a technology workforce initiative"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+
+  sprint-count:
+    name: Sprint Count
+    description: "Number of project sprints or iterations completed"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization, project]
+
+  research-report-count:
+    name: Research Reports
+    description: "Number of research reports or white papers published"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization, project]
+
+  billing-rate:
+    name: Billing Rate
+    description: "Hourly or unit billing rate charged for services"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      prefix: "$"
+      suffix: "/hr"
+
+  estimated-chip-diversion:
+    name: Estimated Chip Diversion
+    description: "Estimated number of restricted AI chips diverted to unauthorized end-users"
+    dataType: number
+    unit: count
+    category: safety
+    temporal: true
+    appliesTo: [organization, policy]
+
+  # ── Fraction-percentage properties (0–1 scale stored as decimals) ──
+  # These values are stored as 0.0–1.0 fractions. The divisor: 0.01 converts
+  # to display percentage (0.85 → 85%) without requiring 0–100 integer values.
+
+  gov-retention-rate:
+    name: Government Retention Rate
+    description: "Fraction (0–1) of departing staff who moved to other government roles"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 0.01
+      suffix: "%"
+
+  placement-rate:
+    name: Placement Rate
+    description: "Fraction (0–1) of program participants successfully placed in target roles"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+    display:
+      divisor: 0.01
+      suffix: "%"
+
+  alumni-retention-rate:
+    name: Alumni Retention Rate
+    description: "Fraction (0–1) of alumni who remain in public service or related roles"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization, project]
+    display:
+      divisor: 0.01
+      suffix: "%"
+
+  it-retirement-eligible-pct:
+    name: IT Retirement-Eligible Percentage
+    description: "Fraction (0–1) of IT workforce eligible for retirement within 5 years"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 0.01
+      suffix: "%"
+
+  under-30-pct:
+    name: Under-30 Percentage
+    description: "Fraction (0–1) of workforce or cohort under 30 years old"
+    dataType: number
+    category: organization
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 0.01
+      suffix: "%"
