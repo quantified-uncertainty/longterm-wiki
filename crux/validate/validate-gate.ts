@@ -377,6 +377,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'factbase-entity-ids',
+    name: 'FactBase ↔ TableBase entity ID consistency (duplicates, stableId mismatches)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-entity-ids.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: stableId mismatches and duplicate entity IDs cause financial data
+    // to silently disappear from directory pages (facts join on stableId).
+  },
+  {
     id: 'kb-entity-slugs',
     name: 'KB entity slug validation (FactBase refs have entity registry entries)',
     command: 'npx',
