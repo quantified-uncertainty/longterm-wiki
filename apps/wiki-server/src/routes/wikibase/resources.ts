@@ -38,10 +38,14 @@ import {
   UpsertResourcePaperSchema,
   UpsertResourceForumPostSchema,
   UpsertResourcePolicyDocSchema,
+  SuggestResourcesSchema,
+  SUGGEST_RESOURCES_DEFAULT_MAX_AGE_MS,
   type ResourceStatsResult,
+  type ContentStatus,
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { createHash } from "crypto";
 
 // ---- Raw SQL row types ----
 
@@ -91,6 +95,11 @@ interface CountRow {
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+
+/** Generate a 16-char hex hash ID from a URL. Matches crux/lib/hash-utils.ts hashId(). */
+function hashId(str: string): string {
+  return createHash("sha256").update(str).digest("hex").slice(0, 16);
+}
 
 // ---- URL normalization ----
 
@@ -571,6 +580,130 @@ const resourcesApp = new Hono()
     }
 
     return c.json({ upserted: results.length, results }, 201);
+  })
+
+  // ---- POST /suggest (register URLs as resources + check content freshness) ----
+
+  .post("/suggest", zv("json", SuggestResourcesSchema), async (c) => {
+    const { urls, maxContentAgeMs } = c.req.valid("json");
+    const maxAge = maxContentAgeMs ?? SUGGEST_RESOURCES_DEFAULT_MAX_AGE_MS;
+    const now = Date.now();
+    const rawDb = getDb();
+
+    // Deduplicate input URLs
+    const uniqueUrls = [...new Set(urls)];
+
+    // 1. Build all URL variants for batch lookup
+    const urlToOriginal = new Map<string, string>();
+    for (const url of uniqueUrls) {
+      for (const variant of urlVariants(url)) {
+        urlToOriginal.set(variant, url);
+      }
+    }
+    const allVariants = [...urlToOriginal.keys()];
+
+    // 2. Batch lookup existing resources by URL variants
+    interface ResourceLookupRow {
+      id: string;
+      url: string;
+      title: string | null;
+    }
+    const existingRows: ResourceLookupRow[] =
+      allVariants.length > 0
+        ? await rawDb<ResourceLookupRow[]>`
+            SELECT id, url, title
+            FROM resources
+            WHERE url = ANY(${allVariants})
+          `
+        : [];
+
+    // Map original input URL → existing resource
+    const urlToResource = new Map<string, ResourceLookupRow>();
+    for (const row of existingRows) {
+      const original = urlToOriginal.get(row.url);
+      if (original && !urlToResource.has(original)) {
+        urlToResource.set(original, row);
+      }
+    }
+
+    // 3. Create minimal resources for unknown URLs (one at a time with ON CONFLICT)
+    const toCreate = uniqueUrls.filter((u) => !urlToResource.has(u));
+    for (const url of toCreate) {
+      const id = hashId(url);
+      const rows = await rawDb<ResourceLookupRow[]>`
+        INSERT INTO resources (id, url, type, created_at, updated_at)
+        VALUES (${id}, ${url}, 'web', now(), now())
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id, url, title
+      `;
+      if (rows.length > 0) {
+        urlToResource.set(url, rows[0]);
+      } else {
+        // ID conflict — look up the existing resource by ID or URL variants
+        const variants = urlVariants(url);
+        const fallback = await rawDb<ResourceLookupRow[]>`
+          SELECT id, url, title FROM resources
+          WHERE id = ${id} OR url = ANY(${variants})
+          LIMIT 1
+        `;
+        if (fallback.length > 0) {
+          urlToResource.set(url, fallback[0]);
+        } else {
+          // Should not happen, but provide a safe fallback
+          urlToResource.set(url, { id, url, title: null });
+        }
+      }
+    }
+
+    // 4. Check citation_content freshness for all resources
+    const resourceUrls = uniqueUrls.map((u) => urlToResource.get(u)!.url);
+
+    interface ContentFreshnessRow {
+      url: string;
+      fetched_at: Date | null;
+      has_content: boolean;
+    }
+    const contentRows: ContentFreshnessRow[] =
+      resourceUrls.length > 0
+        ? await rawDb<ContentFreshnessRow[]>`
+            SELECT
+              r.url,
+              cc.fetched_at,
+              (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
+            FROM resources r
+            LEFT JOIN citation_content cc ON cc.url = r.url
+            WHERE r.url = ANY(${resourceUrls})
+          `
+        : [];
+
+    const contentMap = new Map(contentRows.map((r) => [r.url, r]));
+
+    // 5. Build response
+    const results = uniqueUrls.map((url) => {
+      const resource = urlToResource.get(url)!;
+      const content = contentMap.get(resource.url);
+
+      let contentStatus: ContentStatus;
+      if (!content || !content.has_content) {
+        contentStatus = "missing";
+      } else if (
+        content.fetched_at &&
+        now - content.fetched_at.getTime() > maxAge
+      ) {
+        contentStatus = "stale";
+      } else {
+        contentStatus = "fresh";
+      }
+
+      return {
+        url,
+        resourceId: resource.id,
+        contentStatus,
+        title: resource.title,
+      };
+    });
+
+    return c.json({ results });
   })
 
   // ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
