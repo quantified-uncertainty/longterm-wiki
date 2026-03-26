@@ -8766,10 +8766,10 @@
   relatedEntries:
     - id: UvpZCnW3wA
       type: organization
-      relationship: supplies
+      relationship: enables
     - id: HqHZwHBnH_
       type: organization
-      relationship: supplies
+      relationship: enables
   sources:
     - title: TSMC Website
       url: https://www.tsmc.com
