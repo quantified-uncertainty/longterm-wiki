@@ -15,6 +15,7 @@ import {
   getKBEntitySlug,
 } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
+import { getEntityHref } from "@/data/entity-nav";
 import { titleCase } from "@/components/wiki/factbase/format";
 
 /**
@@ -29,14 +30,18 @@ const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
  */
 const NUMERIC_ID_PATTERN = /^\d+$/;
 
+/**
+ * Build the canonical href for an entity.
+ * Uses getEntityHref which handles all entity types with directory pages
+ * (organizations, people, ai-models, benchmarks, policies, projects, etc.).
+ * Falls back to /factbase/entity/{id} only for entities without wiki slugs.
+ */
 function buildEntityHref(
-  entityType: string,
+  _entityType: string,
   slug: string | undefined,
   entityId: string,
 ): string | null {
-  if (!slug) return `/factbase/entity/${entityId}`;
-  if (entityType === "organization") return `/organizations/${slug}`;
-  if (entityType === "person") return `/people/${slug}`;
+  if (slug) return getEntityHref(slug);
   return `/factbase/entity/${entityId}`;
 }
 
