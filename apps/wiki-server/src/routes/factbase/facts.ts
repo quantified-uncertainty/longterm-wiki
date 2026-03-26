@@ -14,10 +14,12 @@ import {
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { logger } from "../../logger.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+const EXPORT_MAX_LIMIT = 50000;
 
 // ---- Query schemas ----
 
@@ -264,20 +266,55 @@ const factsApp = new Hono()
   // Returns all facts grouped by entityId, reconstructed into the KB Fact shape
   // (FactValue discriminated union). Used by build-data.mjs to read facts from
   // PG instead of YAML.
-  .get("/export", async (c) => {
-    const db = getDrizzleDb();
+  //
+  // Supports optional pagination via `limit` (max 50000) and `offset`.
+  // Callers that need the full dataset should paginate using offset until the
+  // returned `total` is exhausted.
+  .get(
+    "/export",
+    zv(
+      "query",
+      z.object({
+        limit: z.coerce
+          .number()
+          .int()
+          .min(1)
+          .max(EXPORT_MAX_LIMIT)
+          .default(EXPORT_MAX_LIMIT),
+        offset: z.coerce.number().int().min(0).default(0),
+      })
+    ),
+    async (c) => {
+      const { limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
 
-    const rows = await db.select().from(facts).orderBy(asc(facts.entityId), asc(facts.factId));
+      const rows = await db
+        .select()
+        .from(facts)
+        .orderBy(asc(facts.entityId), asc(facts.factId))
+        .limit(limit)
+        .offset(offset);
 
-    const grouped: Record<string, object[]> = {};
-    for (const row of rows) {
-      const fact = pgRowToFact(row);
-      if (!grouped[row.entityId]) grouped[row.entityId] = [];
-      grouped[row.entityId].push(fact);
+      const countResult = await db.select({ count: count() }).from(facts);
+      const total = countResult[0].count;
+
+      const grouped: Record<string, object[]> = {};
+      for (const row of rows) {
+        const fact = pgRowToFact(row);
+        if (!grouped[row.entityId]) grouped[row.entityId] = [];
+        grouped[row.entityId].push(fact);
+      }
+
+      return c.json({
+        facts: grouped,
+        total,
+        returned: rows.length,
+        limit,
+        offset,
+        entities: Object.keys(grouped).length,
+      });
     }
-
-    return c.json({ facts: grouped, total: rows.length, entities: Object.keys(grouped).length });
-  })
+  )
 
   // ---- POST /sync ----
   // Uses manual JSON parsing to preserve the "invalid_json" error code
@@ -301,7 +338,7 @@ const factsApp = new Hono()
       const missingSet = new Set(missingEntities);
       const skipped = items.filter((f) => missingSet.has(f.entityId));
       items = items.filter((f) => !missingSet.has(f.entityId));
-      console.warn(
+      logger.warn(
         `[facts/sync] Skipping ${skipped.length} facts for ${missingEntities.length} missing entities: ${missingEntities.slice(0, 10).join(", ")}${missingEntities.length > 10 ? ` ... (+${missingEntities.length - 10} more)` : ""}`
       );
       if (items.length === 0) {
@@ -320,7 +357,7 @@ const factsApp = new Hono()
     if (subjectIds.length > 0) {
       missingSubjects = await checkRefsExist(db, entities, entities.stableId, subjectIds);
       if (missingSubjects.length > 0) {
-        console.warn(
+        logger.warn(
           `Facts sync: nulling out ${missingSubjects.length} unresolved subject(s): ${missingSubjects.join(", ")}`
         );
         const missingSet = new Set(missingSubjects);
