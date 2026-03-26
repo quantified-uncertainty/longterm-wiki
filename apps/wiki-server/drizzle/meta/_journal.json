@@ -981,6 +981,13 @@
       "when": 1781683200000,
       "tag": "0139_create_political_races",
       "breakpoints": true
+    },
+    {
+      "idx": 140,
+      "version": "7",
+      "when": 1781769600000,
+      "tag": "0140_tablebase_audit_log",
+      "breakpoints": true
     }
   ]
 }

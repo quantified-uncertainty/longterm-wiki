@@ -1595,6 +1595,37 @@ export const verificationEvidence = sourceCheckEvidence;
 export const verificationVerdicts = sourceCheckVerdicts;
 
 /**
+ * Audit log for TableBase changes — records every insert/update/delete
+ * to PG-primary tables (personnel, grants, funding_rounds, etc.).
+ * Provides git-like change history for data that bypasses git.
+ */
+export const tablebaseAuditLog = pgTable(
+  "tablebase_audit_log",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    recordType: text("record_type").notNull(),
+    recordId: varchar("record_id", { length: 10 }).notNull(),
+    operation: text("operation").notNull(), // 'insert', 'update', 'delete'
+    oldData: jsonb("old_data"),
+    newData: jsonb("new_data").notNull(),
+    sourceUrl: text("source_url"),
+    verdict: text("verdict"),
+    evidence: text("evidence"),
+    agentSessionId: text("agent_session_id"),
+    prNumber: integer("pr_number"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_audit_log_record").on(table.recordType, table.recordId),
+    index("idx_audit_log_created").on(table.createdAt),
+    index("idx_audit_log_session").on(table.agentSessionId),
+    index("idx_audit_log_type").on(table.recordType),
+  ]
+);
+
+/**
  * Personnel — unified table covering key-persons, board-seats, and career-history.
  *
  * A single person connects to multiple organizations via different role types.

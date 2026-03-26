@@ -1,0 +1,22 @@
+import { z } from "zod";
+
+/**
+ * Optional verification data that can be submitted alongside any TableBase record.
+ * When present, a source_check_verdict is written atomically with the record.
+ */
+export const InlineVerificationSchema = z.object({
+  verdict: z.enum([
+    "confirmed",
+    "contradicted",
+    "outdated",
+    "partial",
+    "unverifiable",
+  ]),
+  evidence: z.string().max(5000).optional(),
+  confidence: z.number().min(0).max(1).optional(),
+  sourceContentHash: z.string().max(100).optional(),
+  checkedAt: z.string().datetime().optional(),
+  checkedBy: z.string().max(100).optional(),
+});
+
+export type InlineVerification = z.infer<typeof InlineVerificationSchema>;
