@@ -616,7 +616,7 @@ const resourcesApp = new Hono()
             SELECT r.id, r.url, r.title, cc.fetched_at,
               (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
             FROM resources r
-            LEFT JOIN citation_content cc ON cc.url = r.url
+            LEFT JOIN citation_content cc ON cc.resource_id = r.id
             WHERE r.url = ANY(${allVariants})
           `
         : [];
@@ -662,7 +662,7 @@ const resourcesApp = new Hono()
             SELECT r.id, r.url, r.title, cc.fetched_at,
               (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
             FROM resources r
-            LEFT JOIN citation_content cc ON cc.url = r.url
+            LEFT JOIN citation_content cc ON cc.resource_id = r.id
             WHERE r.url = ANY(${variants})
             LIMIT 1
           `;
