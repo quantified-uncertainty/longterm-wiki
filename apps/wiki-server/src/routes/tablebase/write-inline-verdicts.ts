@@ -39,6 +39,11 @@ export async function writeInlineVerdicts(
     const v = record.verification!;
 
     // Upsert verdict — same conflict key as source-checks.ts
+    // Note: `reasoning` is the verdict-level summary (not raw evidence text).
+    // Raw evidence goes in source_check_evidence.extracted_quote.
+    const reasoning = v.evidence
+      ? `Inline verification: ${v.verdict}. Evidence: ${v.evidence.slice(0, 500)}`
+      : `Inline verification: ${v.verdict}`;
     await tx.execute(sql`
       INSERT INTO source_check_verdicts (
         record_type, record_id, field_name, entity_id,
@@ -52,7 +57,7 @@ export async function writeInlineVerdicts(
         ${record.entityId ?? null},
         ${v.verdict},
         ${v.confidence ?? null},
-        ${v.evidence ?? null},
+        ${reasoning},
         1,
         false,
         NOW() + INTERVAL '90 days',
@@ -63,7 +68,7 @@ export async function writeInlineVerdicts(
         verdict = EXCLUDED.verdict,
         confidence = EXCLUDED.confidence,
         reasoning = EXCLUDED.reasoning,
-        sources_checked = source_check_verdicts.sources_checked + 1,
+        sources_checked = EXCLUDED.sources_checked,
         needs_recheck = false,
         next_check_due = NOW() + INTERVAL '90 days',
         last_computed_at = NOW(),
@@ -115,7 +120,9 @@ export function logVerificationCoverage(
   verifiedCount: number
 ): void {
   if (verifiedCount === 0) {
-    logger.warn(
+    // Debug-level: verification is optional today, so missing verification is expected.
+    // Upgrade to warn once verification is mandatory.
+    logger.debug(
       { endpoint, totalItems },
       `${endpoint}: all ${totalItems} records submitted without verification`
     );
