@@ -18,6 +18,8 @@
   wikiId: E59
   type: person
   title: Chris Olah
+  aliases:
+    - Christopher Olah
   website: https://colah.github.io
   relatedEntries:
     - id: mK9pX3rQ7n
@@ -73,6 +75,8 @@
   wikiId: E71
   type: person
   title: Connor Leahy
+  aliases:
+    - Connor
   website: https://conjecture.dev
   relatedEntries:
     - id: Tz48rTriBg
@@ -174,6 +178,8 @@
   wikiId: E90
   type: person
   title: Daniela Amodei
+  aliases:
+    - Daniela
   website: https://anthropic.com
   customFields:
     - label: Role
@@ -186,6 +192,8 @@
   wikiId: E91
   type: person
   title: Dario Amodei
+  aliases:
+    - Dario
   website: https://anthropic.com
   relatedEntries:
     - id: 1LcLlMGLbw
@@ -199,12 +207,17 @@
   wikiId: E101
   type: person
   title: Demis Hassabis
+  aliases:
+    - Demis
   description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
   stableId: fS1tEGKuNq
   wikiId: E114
   type: person
   title: Eliezer Yudkowsky
+  aliases:
+    - Eliezer
+    - EY
   website: https://intelligence.org
   relatedEntries:
     - id: puAffUjWSS
@@ -264,6 +277,8 @@
   wikiId: E115
   type: person
   title: Elizabeth Kelly
+  aliases:
+    - Elizabeth Kelly (US AISI Director)
   description: Former Director of the US AI Safety Institute (AISI), who led federal AI safety evaluation and policy efforts until her departure in February 2025.
   customFields:
     - label: Role
@@ -287,6 +302,9 @@
   wikiId: E149
   type: person
   title: Geoffrey Hinton
+  aliases:
+    - Geoff Hinton
+    - Godfather of Deep Learning
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
     - id: A4XoubikkQ
@@ -350,6 +368,8 @@
   wikiId: E156
   type: person
   title: Holden Karnofsky
+  aliases:
+    - Holden
   website: https://coefficientgiving.org
   relatedEntries:
     - id: 8nmqy7vFiA
@@ -410,6 +430,8 @@
   wikiId: E163
   type: person
   title: Ilya Sutskever
+  aliases:
+    - Ilya
   website: https://ssi.inc
   relatedEntries:
     - id: 1OSiYOaWVL
@@ -470,11 +492,17 @@
   type: person
   title: Nate Soares
   description: President of the Machine Intelligence Research Institute (MIRI) since June 2023 (previously Executive Director 2015-2023), focused on mathematical foundations of AI alignment.
+
+  aliases:
+    - Nate Soares (MIRI)
+  description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   stableId: zaRXTCXPPk
   wikiId: E214
   type: person
   title: Neel Nanda
+  aliases:
+    - Neel
   website: https://www.neelnanda.io
   relatedEntries: []
 - id: nick-bostrom
@@ -482,6 +510,8 @@
   wikiId: E215
   type: person
   title: Nick Bostrom
+  aliases:
+    - Niklas Bostr\u00F6m
   website: https://nickbostrom.com
   relatedEntries:
     - id: BYKermZj1A
@@ -493,6 +523,8 @@
   wikiId: E220
   type: person
   title: Paul Christiano
+  aliases:
+    - Paul
   website: https://alignment.org
   relatedEntries:
     - id: QsXVXtQ0zE
@@ -510,6 +542,8 @@
   wikiId: E269
   type: person
   title: Sam Altman
+  aliases:
+    - Samuel H. Altman
   description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
   stableId: muueuPOHfg
@@ -528,6 +562,8 @@
   wikiId: E290
   type: person
   title: Stuart Russell
+  aliases:
+    - Stuart J. Russell
   website: https://people.eecs.berkeley.edu/~russell/
   relatedEntries:
     - id: zMfgJqiEPQ
@@ -548,6 +584,8 @@
   wikiId: E380
   type: person
   title: Yoshua Bengio
+  aliases:
+    - Bengio
   website: https://yoshuabengio.org
   relatedEntries:
     - id: XqjV4mbMXQ
@@ -600,6 +638,8 @@
   wikiId: E116
   type: person
   title: Elon Musk
+  aliases:
+    - Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   relatedEntries:
     - id: GLXKjYAEKw
@@ -631,6 +671,8 @@
   wikiId: E431
   type: person
   title: David Sacks
+  aliases:
+    - David Sacks (White House AI Czar)
   description: >-
     South African-American entrepreneur, venture capitalist, and White House AI and
     Crypto Czar who co-founded Craft Ventures and played key roles at PayPal and
@@ -652,6 +694,8 @@
   wikiId: E432
   type: person
   title: Marc Andreessen
+  aliases:
+    - Marc Andreessen (AI Investor)
   description: >-
     American software engineer, entrepreneur, and venture capitalist who co-created
     Mosaic, founded Netscape, and co-founded Andreessen Horowitz. Known for
@@ -708,6 +752,8 @@
   wikiId: E434
   type: person
   title: Philip Tetlock
+  aliases:
+    - Philip Tetlock (Forecasting Pioneer)
   description: >-
     Psychologist and forecasting researcher who pioneered the science of
     superforecasting through the Good Judgment Project, demonstrating that
@@ -765,6 +811,8 @@
   wikiId: E436
   type: person
   title: Dustin Moskovitz
+  aliases:
+    - Dustin
   description: >-
     Facebook co-founder who became the world's youngest self-made billionaire in
     2011. Together with his wife Cari Tuna, he has given away over $4 billion
@@ -837,6 +885,8 @@
   wikiId: E577
   type: person
   title: Jaan Tallinn
+  aliases:
+    - Tallinn
   description: >-
     Comprehensive profile of Jaan Tallinn documenting $150M+ lifetime AI safety
     giving (86% of $51M in 2024), primarily through SFF ($34.33M distributed in
@@ -931,6 +981,8 @@
   wikiId: E582
   type: person
   title: Yann LeCun
+  aliases:
+    - LeCun
   description: >-
     Comprehensive biographical profile of Yann LeCun documenting his technical
     contributions (CNNs, JEPA), his ~0% AI extinction risk estimate, and his
@@ -1969,6 +2021,8 @@
   wikiId: E1012
   type: person
   title: Greg Brockman
+  aliases:
+    - Brockman
   description: >-
     Greg Brockman is the co-founder and President of OpenAI. He previously
     served as CTO of Stripe before co-founding OpenAI in December 2015.

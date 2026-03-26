@@ -8,6 +8,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Anthropic
+  aliases:
+    - Anthropic PBC
+    - Anthropic AI
   website: https://anthropic.com
   relatedEntries:
     - id: zR4nW8xB2f
@@ -109,6 +112,10 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Google DeepMind
+  aliases:
+    - DeepMind
+    - DeepMind Technologies
+    - Google DeepMind
   website: https://deepmind.google
   relatedEntries:
     - id: Aqcyu3onCA
@@ -201,6 +208,10 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: OpenAI
+  aliases:
+    - OpenAI Inc
+    - OpenAI LP
+    - OpenAI Global LLC
   website: https://openai.com
   relatedEntries:
     - id: JKsVHQ5stQ
@@ -271,6 +282,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: xAI
+  aliases:
+    - xAI Corp
+    - X.AI
   website: https://x.ai
   relatedEntries:
     - id: 69vftmr1jg
@@ -321,6 +335,8 @@
   parentOrg: ksqqi7fyeA
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
+  aliases:
+    - CHAI
   website: https://humancompatible.ai
   relatedEntries:
     - id: Ub7IaobzDA
@@ -409,6 +425,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Center for AI Safety (CAIS)
+  aliases:
+    - CAIS
   website: https://safe.ai
   relatedEntries:
     - id: bQ9a5lwwlg
@@ -444,6 +462,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Conjecture
+  aliases:
+    - Conjecture AI
   website: https://conjecture.dev
   relatedEntries:
     - id: CrXoCsIucX
@@ -646,6 +666,9 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Alignment Research Center (ARC)
+  aliases:
+    - ARC
+    - ARC Alignment
   website: https://alignment.org
   relatedEntries:
     - id: vzxfzxBITd
@@ -754,6 +777,11 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Machine Intelligence Research Institute (MIRI)
+  aliases:
+    - MIRI
+    - Singularity Institute
+    - Singularity Institute for Artificial Intelligence
+    - SIAI
   website: https://intelligence.org
   relatedEntries:
     - id: fS1tEGKuNq
@@ -1673,6 +1701,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Safe Superintelligence Inc. (SSI)
+  aliases:
+    - SSI
+    - Safe Superintelligence
   website: https://ssi.inc/
   description: >-
     AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
@@ -2084,6 +2115,8 @@
   type: organization
   orgType: funder
   title: Chan Zuckerberg Initiative
+  aliases:
+    - CZI
   website: https://chanzuckerberg.com/
   description: >-
     The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted
@@ -2116,6 +2149,9 @@
   type: organization
   orgType: funder
   title: Coefficient Giving
+  aliases:
+    - Open Philanthropy
+    - OP
   website: https://www.coefficientgiving.org
   description: >-
     Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants
@@ -2686,6 +2722,11 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Meta AI (FAIR)
+  aliases:
+    - Meta AI
+    - FAIR
+    - Facebook AI Research
+    - Meta Fundamental AI Research
   website: https://ai.meta.com/
   description: >-
     Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted
@@ -2857,6 +2898,8 @@
   type: organization
   orgType: startup
   title: Red Queen Bio
+  aliases:
+    - RQB
   website: https://www.redqueen.bio/
   description: >-
     An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
@@ -2875,6 +2918,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Redwood Research
+  aliases:
+    - Redwood
   website: https://redwoodresearch.org
   relatedEntries:
     - id: JqMTO0YVEA
@@ -3077,6 +3122,8 @@
   type: organization
   orgType: funder
   title: Survival and Flourishing Fund (SFF)
+  aliases:
+    - SFF
   website: https://survivalandflourishing.fund/
   description: >-
     SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M
@@ -5370,6 +5417,8 @@
   type: organization
   orgType: generic
   title: GiveWell
+  aliases:
+    - GiveWell.org
   website: https://www.givewell.org
   description: >-
     Nonprofit charity evaluator founded in 2007 by Holden Karnofsky and Elie
@@ -5927,6 +5976,8 @@
   type: organization
   orgType: funder
   title: ACX Grants
+  aliases:
+    - Astral Codex Ten Grants
   website: https://www.astralcodexten.com/p/acx-grants-results
   description: >-
     ACX Grants is a grant program run by Scott Alexander through his Astral

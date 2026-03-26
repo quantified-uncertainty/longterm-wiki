@@ -68,6 +68,7 @@ export function buildTableBaseEntityMap(): Map<string, Entity> {
           type: resolveType(entry.type) || entry.type,
           name: entry.title || entry.id,
           ...(entry.wikiId && { wikiPageId: entry.wikiId, wikiId: entry.wikiId }),
+          ...(Array.isArray(entry.aliases) && entry.aliases.length > 0 && { aliases: entry.aliases }),
         });
       }
     } catch {

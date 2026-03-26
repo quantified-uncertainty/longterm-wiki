@@ -64,6 +64,9 @@
   wikiId: E924
   type: event
   title: Anthropic-Pentagon Standoff (2026)
+  aliases:
+    - Anthropic Pentagon Standoff
+    - Anthropic Supply Chain Risk Designation
   customFields:
     - label: Key Question
       value: Will the supply chain risk designation survive legal challenge?

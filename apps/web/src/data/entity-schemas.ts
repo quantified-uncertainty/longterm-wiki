@@ -35,6 +35,7 @@ const BaseEntity = z.object({
   stableId: z.string().optional(), // 10-char stable identifier for cross-system references
   title: z.string(),
   description: z.string().optional(),
+  aliases: z.array(z.string()).default([]),
   tags: z.array(z.string()).default([]),
   clusters: z.array(z.string()).default([]),
   relatedEntries: z.array(RelatedEntry).default([]),
