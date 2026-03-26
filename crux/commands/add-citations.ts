@@ -119,6 +119,11 @@ Search the web and return the best source URL as JSON.`, {
       return null;
     }
 
+    if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+      console.warn(`    [!] Unsupported URL scheme: ${parsed.url}`);
+      return null;
+    }
+
     // Block circular citations (our own wiki)
     const blockedDomains = [
       'longtermwiki.com', 'www.longtermwiki.com',
@@ -365,7 +370,8 @@ function findInsertionPoint(
       if (lineLower.includes(term)) matchCount++;
     }
 
-    if (matchCount >= 2 || (matchCount >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase())) {
+    const singleTermMatch = searchTerms.length === 1 || searchTerms[0] === claim.keyValue?.toLowerCase();
+    if (matchCount >= 2 || (matchCount >= 1 && singleTermMatch)) {
       // Found the line. Find the sentence end closest to where the claim content is.
       const rawLine = lines[i];
 
@@ -444,8 +450,8 @@ export async function addCitationsCommand(
   }
 
   const citationsToAdd: CitationToAdd[] = [];
-  const usedLines = new Set<number>();  // track which lines already got a citation
-  const usedUrls = new Set<string>();   // dedup same URL
+  const usedPositions = new Set<string>();  // track which (line,col) already got a citation
+  const usedUrls = new Map<string, string>();   // URL → refId (reuse ref for same source)
   const lines = page.content.split('\n');
 
   for (const claim of uncitedCheckWorthy) {
@@ -470,9 +476,10 @@ export async function addCitationsCommand(
         break; // no point retrying if search returns nothing
       }
 
-      // Skip if we already have a citation for this URL (dedup)
+      // If we already verified this URL, reuse the existing refId
       if (usedUrls.has(source.url)) {
-        console.log(`    [=] Duplicate URL skipped: ${source.url.slice(0, 50)}`);
+        verifiedSource = source;
+        verifiedContent = null; // already verified
         break;
       }
 
@@ -518,13 +525,15 @@ export async function addCitationsCommand(
       continue;
     }
 
-    // Skip if this line already got a citation in this run (avoid stacking)
-    if (usedLines.has(insertion.line)) {
-      console.log(`    [=] Line ${insertion.line + 1} already cited, skipping`);
+    // Skip if this exact position already got a citation in this run
+    const posKey = `${insertion.line},${insertion.col}`;
+    if (usedPositions.has(posKey)) {
+      console.log(`    [=] Position ${insertion.line + 1}:${insertion.col} already cited, skipping`);
       continue;
     }
 
-    const refId = generateRefId(`cite:${page.slug}:${verifiedSource.url}`, existingIds);
+    // Reuse existing refId for same URL, or generate a new one
+    const refId = usedUrls.get(verifiedSource.url) ?? generateRefId(`cite:${page.slug}:${verifiedSource.url}`, existingIds);
 
     citationsToAdd.push({
       claim,
@@ -534,8 +543,10 @@ export async function addCitationsCommand(
       insertionColumn: insertion.col,
     });
 
-    usedLines.add(insertion.line);
-    usedUrls.add(verifiedSource.url);
+    usedPositions.add(posKey);
+    if (!usedUrls.has(verifiedSource.url)) {
+      usedUrls.set(verifiedSource.url, refId);
+    }
 
     console.log(`    [✓] VERIFIED: ${claim.text.slice(0, 50)}... → ${verifiedSource.url.slice(0, 50)}`);
   }
@@ -573,9 +584,18 @@ export async function addCitationsCommand(
   }
 
   // Add footnote definitions at the end
+  const escapeLinkText = (text: string) =>
+    text.replace(/\\/g, '\\\\').replace(/\]/g, '\\]');
+
+  // Only add footnote defs for unique refIds (avoid duplicates when URL is reused)
+  const addedRefIds = new Set<string>();
   modifiedLines.push('');
   for (const citation of citationsToAdd) {
-    const def = `[^${citation.refId}]: [${citation.source.title || 'Source'}](${citation.source.url})`;
+    if (addedRefIds.has(citation.refId)) continue;
+    addedRefIds.add(citation.refId);
+    const label = escapeLinkText(citation.source.title || 'Source');
+    const destination = `<${citation.source.url.replace(/>/g, '%3E')}>`;
+    const def = `[^${citation.refId}]: [${label}](${destination})`;
     modifiedLines.push(def);
   }
 

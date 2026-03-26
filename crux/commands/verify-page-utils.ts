@@ -75,8 +75,9 @@ export function claimHasCitation(
     for (const term of searchTerms) {
       if (paragraph.includes(term)) matches++;
     }
+    const singleTermMatch = searchTerms.length === 1 || searchTerms[0] === claim.keyValue?.toLowerCase();
     if (matches >= 2) return true;
-    if (matches >= 1 && searchTerms[0] === claim.keyValue?.toLowerCase()) return true;
+    if (matches >= 1 && singleTermMatch) return true;
   }
 
   return false;
