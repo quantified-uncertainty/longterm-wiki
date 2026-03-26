@@ -1,15 +1,22 @@
-name: Sync Entities
-run-name: "Sync Entities${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+name: Sync Entities and Facts
+run-name: "Sync Entities and Facts${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   push:
     branches: [main, production]
     paths:
       - "data/entities/**"
+      # FactBase YAML facts — sync-facts must run when these change so the
+      # wiki-server DB stays in sync with YAML. Without this, the /people page
+      # "With Net Worth" stat fluctuates: API path returns stale DB count while
+      # local fallback returns correct YAML count. See issue where count was 3 vs 4.
+      - "packages/factbase/data/things/**"
       # Also trigger when the sync/prune pipeline or workflow config changes,
       # so that new prune logic is exercised immediately after merge. See #2796.
       - "crux/wiki-server/sync-entities.ts"
+      - "crux/wiki-server/sync-facts.ts"
       - "apps/wiki-server/src/routes/tablebase/entities.ts"
+      - "apps/wiki-server/src/routes/factbase/facts.ts"
       - ".github/workflows/sync-entities-facts.yml"
 
   # Run weekly to catch stale entities that missed path-triggered syncs.
@@ -58,6 +65,15 @@ jobs:
 
       - name: Sync entities to wiki-server
         run: pnpm crux wiki-server sync-entities
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
+      - name: Sync FactBase facts to wiki-server
+        # Syncs packages/factbase/data/things/*.yaml → facts table in PG.
+        # Must run after sync-entities so FK constraints (facts.entity_id →
+        # entities.stable_id) are satisfied for any newly added entities.
+        run: pnpm crux wiki-server sync-facts
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
