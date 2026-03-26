@@ -892,7 +892,7 @@ const entitiesApp = new Hono()
             );
           }
         }
-        console.warn(
+        logger.warn(
           `[entities/sync] Stripped ${missing.length} unresolved relatedEntries refs: ${missing.slice(0, 10).join(", ")}${missing.length > 10 ? ` ... (+${missing.length - 10} more)` : ""}`
         );
       }

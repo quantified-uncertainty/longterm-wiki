@@ -194,37 +194,37 @@ const benchmarkResultsApp = new Hono()
     let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(benchmarkResults)
-          .values({
-            id: item.id,
-            benchmarkId: item.benchmarkId,
-            modelId: item.modelId,
-            score: item.score,
-            unit: item.unit ?? null,
-            date: item.date ?? null,
-            sourceUrl: item.sourceUrl ?? null,
-            notes: item.notes ?? null,
-            syncedAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: benchmarkResults.id,
-            set: {
-              benchmarkId: item.benchmarkId,
-              modelId: item.modelId,
-              score: item.score,
-              unit: item.unit ?? null,
-              date: item.date ?? null,
-              sourceUrl: item.sourceUrl ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
+      const allVals = parsed.data.items.map((item) => ({
+        id: item.id,
+        benchmarkId: item.benchmarkId,
+        modelId: item.modelId,
+        score: item.score,
+        unit: item.unit ?? null,
+        date: item.date ?? null,
+        sourceUrl: item.sourceUrl ?? null,
+        notes: item.notes ?? null,
+        syncedAt: now,
+        updatedAt: now,
+      }));
+
+      await tx
+        .insert(benchmarkResults)
+        .values(allVals)
+        .onConflictDoUpdate({
+          target: benchmarkResults.id,
+          set: {
+            benchmarkId: sql`excluded.benchmark_id`,
+            modelId: sql`excluded.model_id`,
+            score: sql`excluded.score`,
+            unit: sql`excluded.unit`,
+            date: sql`excluded.date`,
+            sourceUrl: sql`excluded.source_url`,
+            notes: sql`excluded.notes`,
+            syncedAt: sql`excluded.synced_at`,
+            updatedAt: sql`excluded.updated_at`,
+          },
+        });
+      upserted = allVals.length;
 
       // Dual-write to things table
       await upsertThingsInTx(
