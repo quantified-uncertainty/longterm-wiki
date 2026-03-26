@@ -150,7 +150,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes('"entities"') &&
     q.includes("where") &&
     q.includes(" or ") &&
-    !q.includes("count(*)")
+    !q.includes("count(*)") &&
+    !q.includes("order by")
   ) {
     const id = params[0] as string;
     const wikiId = params[1] as string;
@@ -232,6 +233,23 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results;
   }
 
+  // --- directory step 4b: SELECT id, title FROM entities WHERE id IN (...) ---
+  // Resolves metadata ref fields (e.g. metadata.developer = "anthropic") into entity names.
+  if (
+    q.includes('"entities"') && q.includes("where") && q.includes(" in ") &&
+    !q.includes("not in") && !q.includes("order by") && !q.includes("stable_id") &&
+    !q.includes("count(*)") && !q.includes("group by") && !q.includes("insert")
+  ) {
+    const ids = new Set(params as string[]);
+    const results: { id: string; title: string }[] = [];
+    for (const row of entitiesStore.values()) {
+      if (ids.has(row.id as string)) {
+        results.push({ id: row.id as string, title: row.title as string });
+      }
+    }
+    return results;
+  }
+
   // --- prune: SELECT id WHERE entity_type = ? (no NOT IN — all entities of type) ---
   // Matches when keepIds is empty (prune all of type)
   if (
@@ -245,6 +263,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("insert") &&
     !q.includes("ilike") &&
     !q.includes("group by") &&
+    !q.includes(" in ") &&
     params.length === 1
   ) {
     const entityType = params[0] as string;
@@ -752,6 +771,22 @@ describe("Entities API", () => {
     it("requires entityType parameter", async () => {
       const res = await app.request("/api/entities/directory");
       expect(res.status).toBe(400);
+    });
+
+    it("resolves metadata ref fields (e.g. developer) into resolvedRefs", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", { entityType: "organization", stableId: "aB1cD2eF3g" });
+      await seedEntity(app, "claude-3-opus", "Claude 3 Opus", {
+        entityType: "ai-model", stableId: "bC2dE3fG4h",
+        metadata: { developer: "anthropic", releaseDate: "2024-03-04" },
+      });
+      const res = await app.request("/api/entities/directory?entityType=ai-model&measures=developer");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const model = body.entities.find((e: { id: string }) => e.id === "claude-3-opus");
+      expect(model).toBeDefined();
+      expect(model?.resolvedRefs["developer"]).toBeDefined();
+      expect(model?.resolvedRefs["developer"].name).toBe("Anthropic");
+      expect(model?.resolvedRefs["developer"].entityId).toBe("anthropic");
     });
   });
 

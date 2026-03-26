@@ -651,6 +651,33 @@ const entitiesApp = new Hono()
       }
     }
 
+    // 4b. Resolve metadata ref fields (entity slug IDs stored in metadata, e.g. metadata.developer = "anthropic").
+    // These are short entity IDs (not 10-char stableIds), so they need a separate lookup by id.
+    const metadataRefResolutionMap = new Map<string, { name: string; entityId: string }>();
+    if (measureList.length > 0) {
+      const metadataRefCandidates = new Set<string>();
+      for (const e of entityRows) {
+        const meta = e.metadata;
+        if (!meta || typeof meta !== "object") continue;
+        for (const measure of measureList) {
+          const val = (meta as Record<string, unknown>)[measure];
+          if (typeof val === "string" && val.length > 0) {
+            metadataRefCandidates.add(val);
+          }
+        }
+      }
+      if (metadataRefCandidates.size > 0) {
+        const candidateIds = [...metadataRefCandidates];
+        const metaRefRows = await db
+          .select({ id: entities.id, title: entities.title })
+          .from(entities)
+          .where(inArray(entities.id, candidateIds));
+        for (const r of metaRefRows) {
+          metadataRefResolutionMap.set(r.id, { name: r.title, entityId: r.id });
+        }
+      }
+    }
+
     // 5. Fetch domain table counts (personnel + grants)
     const stableIds = entityRows
       .map((e) => e.stableId)
@@ -727,6 +754,18 @@ const entitiesApp = new Hono()
           // If this fact's value resolved to an entity, include it
           if (f.value && refResolutionMap.has(f.value)) {
             resolvedRefs[measure] = refResolutionMap.get(f.value)!;
+          }
+        }
+      }
+
+      // Also resolve metadata ref fields (e.g. metadata.developer = "anthropic").
+      // These supplement FactBase fact refs — fact-based resolution takes precedence.
+      if (e.metadata && typeof e.metadata === "object") {
+        for (const measure of measureList) {
+          if (resolvedRefs[measure]) continue; // already resolved via facts
+          const val = (e.metadata as Record<string, unknown>)[measure];
+          if (typeof val === "string" && metadataRefResolutionMap.has(val)) {
+            resolvedRefs[measure] = metadataRefResolutionMap.get(val)!;
           }
         }
       }
