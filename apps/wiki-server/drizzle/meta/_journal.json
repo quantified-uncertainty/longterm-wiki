@@ -988,6 +988,13 @@
       "when": 1781769600000,
       "tag": "0140_tablebase_audit_log",
       "breakpoints": true
+    },
+    {
+      "idx": 141,
+      "version": "7",
+      "when": 1781856000000,
+      "tag": "0141_create_proposed_claims",
+      "breakpoints": true
     }
   ]
 }
