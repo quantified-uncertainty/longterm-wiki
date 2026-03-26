@@ -593,7 +593,7 @@ const resourcesApp = new Hono()
     // Deduplicate input URLs
     const uniqueUrls = [...new Set(urls)];
 
-    // 1. Build all URL variants for batch lookup
+    // 1. Build URL variants for batch lookup
     const urlToOriginal = new Map<string, string>();
     for (const url of uniqueUrls) {
       for (const variant of urlVariants(url)) {
@@ -602,23 +602,27 @@ const resourcesApp = new Hono()
     }
     const allVariants = [...urlToOriginal.keys()];
 
-    // 2. Batch lookup existing resources by URL variants
-    interface ResourceLookupRow {
+    // 2. Batch lookup existing resources + content freshness in one query
+    interface ResourceWithContent {
       id: string;
       url: string;
       title: string | null;
+      fetched_at: Date | null;
+      has_content: boolean;
     }
-    const existingRows: ResourceLookupRow[] =
+    const existingRows: ResourceWithContent[] =
       allVariants.length > 0
-        ? await rawDb<ResourceLookupRow[]>`
-            SELECT id, url, title
-            FROM resources
-            WHERE url = ANY(${allVariants})
+        ? await rawDb<ResourceWithContent[]>`
+            SELECT r.id, r.url, r.title, cc.fetched_at,
+              (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
+            FROM resources r
+            LEFT JOIN citation_content cc ON cc.url = r.url
+            WHERE r.url = ANY(${allVariants})
           `
         : [];
 
-    // Map original input URL → existing resource
-    const urlToResource = new Map<string, ResourceLookupRow>();
+    // Map original input URL → existing resource + content info
+    const urlToResource = new Map<string, ResourceWithContent>();
     for (const row of existingRows) {
       const original = urlToOriginal.get(row.url);
       if (original && !urlToResource.has(original)) {
@@ -626,71 +630,62 @@ const resourcesApp = new Hono()
       }
     }
 
-    // 3. Create minimal resources for unknown URLs (one at a time with ON CONFLICT)
+    // 3. Bulk-create resources for unknown URLs (single query)
     const toCreate = uniqueUrls.filter((u) => !urlToResource.has(u));
-    for (const url of toCreate) {
-      const id = hashId(url);
-      const rows = await rawDb<ResourceLookupRow[]>`
+    if (toCreate.length > 0) {
+      const ids = toCreate.map((u) => hashId(u));
+      // DO UPDATE SET updated_at = now() forces RETURNING to include conflicting rows
+      const created = await rawDb<ResourceWithContent[]>`
         INSERT INTO resources (id, url, type, created_at, updated_at)
-        VALUES (${id}, ${url}, 'web', now(), now())
-        ON CONFLICT (id) DO NOTHING
-        RETURNING id, url, title
+        SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[])
+          AS t(id, url),
+          LATERAL (SELECT 'web'::text AS type, now() AS created_at, now() AS updated_at) defaults
+        ON CONFLICT (id) DO UPDATE SET updated_at = now()
+        RETURNING id, url, title, null::timestamptz AS fetched_at, false AS has_content
       `;
-      if (rows.length > 0) {
-        urlToResource.set(url, rows[0]);
-      } else {
-        // ID conflict — look up the existing resource by ID or URL variants
-        const variants = urlVariants(url);
-        const fallback = await rawDb<ResourceLookupRow[]>`
-          SELECT id, url, title FROM resources
-          WHERE id = ${id} OR url = ANY(${variants})
-          LIMIT 1
-        `;
-        if (fallback.length > 0) {
-          urlToResource.set(url, fallback[0]);
-        } else {
-          // Should not happen — ID conflicted but no row found.
-          logger.warn({ url, id }, "suggest: ID conflict but no resource found — using fallback");
-          urlToResource.set(url, { id, url, title: null });
+      for (const row of created) {
+        // Find which input URL this row corresponds to
+        const original = toCreate.find(
+          (u) => hashId(u) === row.id || u === row.url,
+        );
+        if (original && !urlToResource.has(original)) {
+          urlToResource.set(original, row);
+        }
+      }
+
+      // Handle any URLs still unmapped (URL unique constraint prevented insert
+      // but the row has a different ID than our hash — rare edge case)
+      for (const url of toCreate) {
+        if (!urlToResource.has(url)) {
+          const variants = urlVariants(url);
+          const fallback = await rawDb<ResourceWithContent[]>`
+            SELECT r.id, r.url, r.title, cc.fetched_at,
+              (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
+            FROM resources r
+            LEFT JOIN citation_content cc ON cc.url = r.url
+            WHERE r.url = ANY(${variants})
+            LIMIT 1
+          `;
+          if (fallback.length > 0) {
+            urlToResource.set(url, fallback[0]);
+          } else {
+            logger.warn({ url, id: hashId(url) }, "suggest: could not resolve resource — using fallback");
+            urlToResource.set(url, {
+              id: hashId(url), url, title: null, fetched_at: null, has_content: false,
+            });
+          }
         }
       }
     }
 
-    // 4. Check citation_content freshness for all resources
-    const resourceUrls = uniqueUrls.map((u) => urlToResource.get(u)!.url);
-
-    interface ContentFreshnessRow {
-      url: string;
-      fetched_at: Date | null;
-      has_content: boolean;
-    }
-    const contentRows: ContentFreshnessRow[] =
-      resourceUrls.length > 0
-        ? await rawDb<ContentFreshnessRow[]>`
-            SELECT
-              r.url,
-              cc.fetched_at,
-              (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
-            FROM resources r
-            LEFT JOIN citation_content cc ON cc.url = r.url
-            WHERE r.url = ANY(${resourceUrls})
-          `
-        : [];
-
-    const contentMap = new Map(contentRows.map((r) => [r.url, r]));
-
-    // 5. Build response
+    // 4. Build response
     const results = uniqueUrls.map((url) => {
-      const resource = urlToResource.get(url)!;
-      const content = contentMap.get(resource.url);
+      const r = urlToResource.get(url)!;
 
       let contentStatus: ContentStatus;
-      if (!content || !content.has_content) {
+      if (!r.has_content) {
         contentStatus = "missing";
-      } else if (
-        content.fetched_at &&
-        now - content.fetched_at.getTime() > maxAge
-      ) {
+      } else if (r.fetched_at && now - r.fetched_at.getTime() > maxAge) {
         contentStatus = "stale";
       } else {
         contentStatus = "fresh";
@@ -698,9 +693,9 @@ const resourcesApp = new Hono()
 
       return {
         url,
-        resourceId: resource.id,
+        resourceId: r.id,
         contentStatus,
-        title: resource.title,
+        title: r.title,
       };
     });
 
