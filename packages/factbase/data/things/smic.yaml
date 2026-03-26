@@ -1,0 +1,66 @@
+entity: 09_v0xRGgS
+facts:
+  # ── Organizational ──────────────────────────────────────────────
+  - id: f_smic_found
+    property: founded-date
+    value: "2000-04"
+    source: https://en.wikipedia.org/wiki/SMIC
+    notes: "Founded by Richard Chang in Shanghai"
+
+  - id: f_smic_hq
+    property: headquarters
+    value: "Shanghai, China"
+    source: https://en.wikipedia.org/wiki/SMIC
+
+  - id: f_smic_country
+    property: country
+    value: China
+    source: https://en.wikipedia.org/wiki/SMIC
+
+  - id: f_smic_legal
+    property: legal-structure
+    value: "Public company (HKEX: 0981, SSE STAR: 688981)"
+    source: https://en.wikipedia.org/wiki/SMIC
+
+  - id: f_smic_website
+    property: website
+    value: https://www.smics.com
+    source: https://en.wikipedia.org/wiki/SMIC
+
+  - id: f_smic_wiki
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/SMIC
+    source: https://en.wikipedia.org/wiki/SMIC
+
+  # ── Description ─────────────────────────────────────────────────
+  - id: f_smic_desc
+    property: description
+    value: >-
+      China's largest and most advanced semiconductor foundry. Despite being cut off
+      from EUV lithography by export controls, SMIC has reportedly manufactured 5nm-class
+      circuits using multi-patterning DUV techniques. Key case study in the limits of
+      export control effectiveness.
+    asOf: 2026-03
+
+  # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_smic_rev_2024
+    property: revenue
+    value: 8.03e+09
+    asOf: 2024-12
+    source: https://www.smics.com/site/company_annual
+    notes: "2024 annual revenue (~$8.03B); significant growth driven by domestic demand"
+
+  # ── Key events ──────────────────────────────────────────────────
+  - id: f_smic_entity_list
+    property: key-event
+    value: "Added to U.S. Entity List, restricting access to U.S. semiconductor technology"
+    asOf: 2020-12
+    source: https://en.wikipedia.org/wiki/SMIC
+    notes: "BIS placed SMIC on Entity List in December 2020"
+
+  - id: f_smic_5nm
+    property: key-event
+    value: "Reportedly manufactured 5nm-class circuits for Huawei's Kirin 9000S processor"
+    asOf: 2023-09
+    source: https://www.tomshardware.com/news/huawei-mate-60-pro-teardown-reveals-smic-5nm-processor
+    notes: "Discovered in Huawei Mate 60 Pro teardown; used multi-patterning DUV techniques without EUV"

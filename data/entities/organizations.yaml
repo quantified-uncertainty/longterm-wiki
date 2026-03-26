@@ -4834,11 +4834,31 @@
   title: Center for a New American Security
   website: https://www.cnas.org
   description: >-
-    Bipartisan national security and defense policy think tank.
+    Bipartisan national security and defense policy think tank founded in 2007.
+    CNAS has produced the most detailed public research on hardware-enabled governance
+    (HEM) mechanisms, including the "Secure, Governable Chips" working paper documenting
+    existing chip features from AMD, Apple, Intel, and Nvidia that could support
+    governance functions. The Wadhwani Center for AI and Advanced Technologies at CNAS,
+    led by Gregory Allen, is a leading voice on AI chip export controls and allied
+    coordination for semiconductor governance.
   tags:
     - policy
     - ai-governance
     - security
+    - compute-governance
+    - hardware-enabled-governance
+  clusters:
+    - governance
+    - ai-safety
+  relatedEntries:
+    - id: vn087g2XWa
+      type: person
+      relationship: leads-to
+  sources:
+    - title: CNAS Website
+      url: https://www.cnas.org
+    - title: Secure, Governable Chips Working Paper
+      url: https://www.cnas.org/publications/reports/secure-governable-chips
   lastUpdated: 2026-03
 
 - id: federation-of-american-scientists
@@ -8713,4 +8733,483 @@
     San Francisco Foundation. Targets OpenAI's nonprofit-to-for-profit
     conversion.
   tags: [political-action, ai-regulation]
+  lastUpdated: 2026-03
+
+# ═══════════════════════════════════════════════════════════════════
+# Semiconductor Supply Chain — Organizations
+# Added 2026-03-25 for AI chip governance coverage
+# ═══════════════════════════════════════════════════════════════════
+
+- id: tsmc
+  stableId: 1aWy1sKHng
+  wikiId: E2606
+  type: organization
+  orgType: generic
+  title: TSMC
+  website: https://www.tsmc.com
+  description: >-
+    Taiwan Semiconductor Manufacturing Company (TSMC) is the world's largest dedicated
+    semiconductor foundry, fabricating over 60% of all semiconductors globally and more
+    than 90% of the most advanced chips (sub-7nm). Founded in 1987 by Morris Chang in
+    Hsinchu, Taiwan, TSMC pioneered the pure-play foundry model. Its customers include
+    Apple, Nvidia, AMD, Qualcomm, and most major chip designers. TSMC's geographic
+    concentration in Taiwan makes it both a critical chokepoint for AI chip governance
+    and a geopolitical vulnerability. The company is expanding fabrication capacity in
+    Arizona under U.S. CHIPS Act incentives. Annual revenue exceeded $87B in 2024.
+  tags:
+    - semiconductors
+    - compute-governance
+    - supply-chain
+  clusters:
+    - governance
+    - ai-safety
+  relatedEntries:
+    - id: UvpZCnW3wA
+      type: organization
+      relationship: enables
+    - id: HqHZwHBnH_
+      type: organization
+      relationship: enables
+  sources:
+    - title: TSMC Website
+      url: https://www.tsmc.com
+    - title: TSMC - Wikipedia
+      url: https://en.wikipedia.org/wiki/TSMC
+  lastUpdated: 2026-03
+
+- id: asml
+  stableId: uW7R22grHt
+  wikiId: E2607
+  type: organization
+  orgType: generic
+  title: ASML
+  website: https://www.asml.com
+  description: >-
+    ASML Holding NV is the sole global supplier of extreme ultraviolet (EUV) lithography
+    machines, which are required to manufacture semiconductors at advanced nodes (sub-7nm).
+    Headquartered in Veldhoven, Netherlands, and founded in 1984, ASML's monopoly on EUV
+    technology makes it one of the most critical chokepoints in the AI chip supply chain.
+    Dutch export restrictions on ASML equipment, aligned with U.S. policy, are among the
+    most effective levers in the current chip governance architecture. ASML's systems cost
+    $150-400M each. Annual revenue was approximately $28B in 2024.
+  tags:
+    - semiconductors
+    - compute-governance
+    - supply-chain
+    - lithography
+  clusters:
+    - governance
+    - ai-safety
+  sources:
+    - title: ASML Website
+      url: https://www.asml.com
+    - title: ASML - Wikipedia
+      url: https://en.wikipedia.org/wiki/ASML_Holding
+  lastUpdated: 2026-03
+
+- id: smic
+  stableId: 09_v0xRGgS
+  wikiId: E2608
+  type: organization
+  orgType: generic
+  title: SMIC
+  website: https://www.smics.com
+  description: >-
+    Semiconductor Manufacturing International Corporation (SMIC) is China's largest
+    and most advanced semiconductor foundry. Founded in 2000 and headquartered in
+    Shanghai, SMIC has reportedly manufactured 5nm-class circuits despite U.S. export
+    controls restricting access to EUV lithography equipment. SMIC's progress is a key
+    variable in debates about the long-term effectiveness of chip export controls.
+    The company was added to the U.S. Entity List in December 2020.
+  tags:
+    - semiconductors
+    - compute-governance
+    - china
+  clusters:
+    - governance
+    - ai-safety
+  sources:
+    - title: SMIC Website
+      url: https://www.smics.com
+    - title: SMIC - Wikipedia
+      url: https://en.wikipedia.org/wiki/SMIC
+  lastUpdated: 2026-03
+
+- id: amd
+  stableId: HqHZwHBnH_
+  wikiId: E2609
+  type: organization
+  orgType: generic
+  title: AMD
+  website: https://www.amd.com
+  description: >-
+    Advanced Micro Devices (AMD) is the principal competitor to Nvidia in AI accelerator
+    chips, with its Instinct MI300 series GPUs targeting AI training and inference
+    workloads. Founded in 1969 and headquartered in Santa Clara, California, AMD also
+    produces CPUs and FPGAs (via Xilinx acquisition). AMD's chips already incorporate
+    features that researchers argue could be repurposed for hardware-enabled governance,
+    including location verification and usage monitoring capabilities.
+  tags:
+    - semiconductors
+    - compute-governance
+    - ai-hardware
+  clusters:
+    - governance
+    - ai-safety
+  relatedEntries:
+    - id: RB8fKn8-tA
+      type: person
+      relationship: leads-to
+  sources:
+    - title: AMD Website
+      url: https://www.amd.com
+    - title: AMD - Wikipedia
+      url: https://en.wikipedia.org/wiki/AMD
+  lastUpdated: 2026-03
+
+- id: sk-hynix
+  stableId: CABtVBdlnf
+  wikiId: E2610
+  type: organization
+  orgType: generic
+  title: SK Hynix
+  website: https://www.skhynix.com
+  description: >-
+    SK Hynix is a South Korean semiconductor company and the world's leading producer
+    of high-bandwidth memory (HBM), a critical component in AI training GPUs. HBM is a
+    key bottleneck in the AI chip supply chain — Nvidia's H100 and H200 GPUs depend on
+    HBM supplied primarily by SK Hynix and Samsung. Founded in 1983 and headquartered in
+    Icheon, South Korea, SK Hynix is also a major DRAM and NAND flash producer.
+  tags:
+    - semiconductors
+    - memory
+    - supply-chain
+  clusters:
+    - governance
+    - ai-safety
+  sources:
+    - title: SK Hynix Website
+      url: https://www.skhynix.com
+    - title: SK Hynix - Wikipedia
+      url: https://en.wikipedia.org/wiki/SK_Hynix
+  lastUpdated: 2026-03
+
+- id: bureau-of-industry-and-security
+  stableId: GVy4_Tlsa-
+  wikiId: E2611
+  type: organization
+  orgType: government
+  title: Bureau of Industry and Security
+  website: https://www.bis.gov
+  description: >-
+    The Bureau of Industry and Security (BIS) is an agency of the U.S. Department of
+    Commerce responsible for administering the Export Administration Regulations (EAR),
+    including export controls on advanced AI chips and semiconductor equipment. BIS
+    maintains the Commerce Control List (CCL) and Entity List, and enforces the Foreign
+    Direct Product Rule (FDPR). Since October 2022, BIS has been the primary regulatory
+    body governing exports of high-performance AI chips, making it a central actor in
+    AI chip governance. Critics note that BIS enforcement budgets are dwarfed by the
+    profits from chip smuggling operations.
+  tags:
+    - compute-governance
+    - export-controls
+    - government
+    - policy
+  clusters:
+    - governance
+    - ai-safety
+  sources:
+    - title: BIS Website
+      url: https://www.bis.gov
+    - title: BIS - Wikipedia
+      url: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+  lastUpdated: 2026-03
+
+- id: applied-materials
+  stableId: AuPn7YbiaZ
+  wikiId: E2612
+  type: organization
+  orgType: generic
+  title: Applied Materials
+  website: https://www.appliedmaterials.com
+  description: >-
+    Applied Materials is the world's largest supplier of semiconductor manufacturing
+    equipment, providing deposition, etching, and inspection tools used across the
+    chip fabrication process. Founded in 1967 and headquartered in Santa Clara,
+    California. Alongside Lam Research and Tokyo Electron, Applied Materials constitutes
+    one of the key equipment chokepoints in the semiconductor supply chain. U.S. export
+    controls have progressively expanded to cover these tools.
+  tags:
+    - semiconductors
+    - supply-chain
+    - equipment
+  clusters:
+    - governance
+  sources:
+    - title: Applied Materials Website
+      url: https://www.appliedmaterials.com
+    - title: Applied Materials - Wikipedia
+      url: https://en.wikipedia.org/wiki/Applied_Materials
+  lastUpdated: 2026-03
+
+- id: huawei
+  stableId: 52UNnWZMFz
+  wikiId: E2613
+  type: organization
+  orgType: generic
+  title: Huawei
+  website: https://www.huawei.com
+  description: >-
+    Huawei Technologies is a Chinese multinational technology company that, through its
+    HiSilicon subsidiary, designs the Ascend series of AI accelerator chips. Huawei was
+    placed on the U.S. Entity List in May 2019. Despite export restrictions cutting off
+    access to TSMC fabrication and advanced EDA tools, Huawei has continued AI chip
+    development using SMIC's domestic fabrication capabilities. The Ascend 910B and 910C
+    chips represent China's most advanced domestic AI accelerators. Huawei's ability to
+    develop competitive AI chips despite sanctions is a key case study in the limits of
+    export control effectiveness.
+  tags:
+    - semiconductors
+    - compute-governance
+    - china
+    - ai-hardware
+  clusters:
+    - governance
+    - ai-safety
+  sources:
+    - title: Huawei Website
+      url: https://www.huawei.com
+    - title: Huawei - Wikipedia
+      url: https://en.wikipedia.org/wiki/Huawei
+  lastUpdated: 2026-03
+
+- id: semiconductor-industry-association
+  stableId: Ss1JR_v3Ld
+  wikiId: E2614
+  type: organization
+  orgType: generic
+  title: Semiconductor Industry Association
+  website: https://www.semiconductors.org
+  description: >-
+    The Semiconductor Industry Association (SIA) is the U.S. trade association
+    representing the semiconductor industry. SIA advocates for policies that promote
+    chip innovation and competitiveness, including CHIPS Act funding, and has called
+    for measured approaches to export controls that balance security with economic and
+    innovation priorities. SIA members include Intel, Nvidia, AMD, Qualcomm, and
+    Broadcom.
+  tags:
+    - semiconductors
+    - policy
+    - trade-association
+  clusters:
+    - governance
+  sources:
+    - title: SIA Website
+      url: https://www.semiconductors.org
+    - title: SIA - Wikipedia
+      url: https://en.wikipedia.org/wiki/Semiconductor_Industry_Association
+  lastUpdated: 2026-03
+
+# ── Lightweight semiconductor entities (stableId only, no wiki pages) ──
+
+- id: lam-research
+  stableId: jNzUivk7jw
+  type: organization
+  orgType: generic
+  title: Lam Research
+  website: https://www.lamresearch.com
+  description: >-
+    U.S. semiconductor equipment company specializing in etching and deposition
+    tools used in chip fabrication. Subject to U.S. export controls on semiconductor
+    manufacturing equipment.
+  tags: [semiconductors, equipment, supply-chain]
+  lastUpdated: 2026-03
+
+- id: tokyo-electron
+  stableId: ER_K4Y_mj7
+  type: organization
+  orgType: generic
+  title: Tokyo Electron
+  website: https://www.tel.com
+  description: >-
+    Japanese semiconductor equipment manufacturer. One of the top five global suppliers
+    of chip fabrication equipment. Japan's export restrictions on semiconductor equipment
+    align with U.S. and Dutch controls.
+  tags: [semiconductors, equipment, supply-chain]
+  lastUpdated: 2026-03
+
+- id: kla-corporation
+  stableId: 6gGwTtTO1B
+  type: organization
+  orgType: generic
+  title: KLA Corporation
+  website: https://www.kla.com
+  description: >-
+    U.S. semiconductor equipment company specializing in process control and
+    inspection systems used in chip fabrication.
+  tags: [semiconductors, equipment, supply-chain]
+  lastUpdated: 2026-03
+
+- id: synopsys
+  stableId: TuX8lVYNqF
+  type: organization
+  orgType: generic
+  title: Synopsys
+  website: https://www.synopsys.com
+  description: >-
+    Leading electronic design automation (EDA) software company. EDA tools are a
+    critical dependency in chip design; U.S. export controls restrict Chinese access
+    to advanced EDA software.
+  tags: [semiconductors, eda, supply-chain]
+  lastUpdated: 2026-03
+
+- id: cadence-design-systems
+  stableId: 5wFQ6rVKjO
+  type: organization
+  orgType: generic
+  title: Cadence Design Systems
+  website: https://www.cadence.com
+  description: >-
+    Major electronic design automation (EDA) company. Alongside Synopsys, dominates
+    the EDA market essential for advanced chip design.
+  tags: [semiconductors, eda, supply-chain]
+  lastUpdated: 2026-03
+
+- id: arm-holdings
+  stableId: MIf3XVLguX
+  type: organization
+  orgType: generic
+  title: ARM Holdings
+  website: https://www.arm.com
+  description: >-
+    British semiconductor design company that licenses the ARM architecture used in
+    most mobile processors and increasingly in AI inference chips. ARM's IP licensing
+    model means its architecture appears in chips from Apple, Qualcomm, Nvidia, and
+    others.
+  tags: [semiconductors, chip-design, supply-chain]
+  lastUpdated: 2026-03
+
+- id: globalfoundries
+  stableId: pKwjaipwfq
+  type: organization
+  orgType: generic
+  title: GlobalFoundries
+  website: https://www.globalfoundries.com
+  description: >-
+    U.S.-headquartered semiconductor foundry. Exited leading-edge manufacturing in
+    2018; focuses on mature process nodes used in automotive, IoT, and defense applications.
+  tags: [semiconductors, foundry]
+  lastUpdated: 2026-03
+
+- id: micron-technology
+  stableId: POHyucI53I
+  type: organization
+  orgType: generic
+  title: Micron Technology
+  website: https://www.micron.com
+  description: >-
+    U.S. memory and storage manufacturer producing DRAM and NAND flash. Key player
+    in AI chip supply chains through HBM production. China banned Micron products
+    from critical infrastructure in 2023 in retaliation for U.S. chip export controls.
+  tags: [semiconductors, memory, supply-chain]
+  lastUpdated: 2026-03
+
+- id: broadcom
+  stableId: DXHx7P20JO
+  type: organization
+  orgType: generic
+  title: Broadcom
+  website: https://www.broadcom.com
+  description: >-
+    U.S. semiconductor and infrastructure software company. Designs custom AI
+    accelerators (TPU-class chips) for hyperscaler customers including Google.
+    Acquired VMware in 2023.
+  tags: [semiconductors, chip-design]
+  lastUpdated: 2026-03
+
+- id: qualcomm
+  stableId: Q2q_4brdL-
+  type: organization
+  orgType: generic
+  title: Qualcomm
+  website: https://www.qualcomm.com
+  description: >-
+    U.S. semiconductor company that designs mobile processors and AI inference chips.
+    Qualcomm's Snapdragon chips power most Android devices. Increasingly active in
+    on-device AI inference.
+  tags: [semiconductors, chip-design, mobile]
+  lastUpdated: 2026-03
+
+- id: cambricon
+  stableId: O8FL_Svad_
+  type: organization
+  orgType: generic
+  title: Cambricon Technologies
+  website: https://www.cambricon.com
+  description: >-
+    Chinese AI chip company. Designs the Siyuan series of AI accelerators as a
+    domestic alternative to Nvidia GPUs. Publicly listed on China's STAR Market.
+  tags: [semiconductors, china, ai-hardware]
+  lastUpdated: 2026-03
+
+- id: biren-technology
+  stableId: TpN_rNyN9V
+  type: organization
+  orgType: startup
+  title: Biren Technology
+  website: https://www.birentech.com
+  description: >-
+    Chinese AI chip startup designing GPU-class accelerators. Its BR100 chip was
+    designed to compete with Nvidia's A100 but was impacted by U.S. export controls
+    restricting TSMC fabrication access.
+  tags: [semiconductors, china, ai-hardware]
+  lastUpdated: 2026-03
+
+- id: enflame-technology
+  stableId: mt5dMCPvf6
+  type: organization
+  orgType: startup
+  title: Enflame Technology
+  website: https://www.enflame-tech.com
+  description: >-
+    Chinese AI chip startup developing training and inference accelerators. One of
+    several Chinese firms developing domestic alternatives to restricted Nvidia GPUs.
+  tags: [semiconductors, china, ai-hardware]
+  lastUpdated: 2026-03
+
+- id: moore-threads
+  stableId: XzaH4qlwvx
+  type: organization
+  orgType: startup
+  title: Moore Threads
+  website: https://www.mthreads.com
+  description: >-
+    Chinese GPU startup founded by former Nvidia executives. Developing general-purpose
+    GPUs for AI and graphics as part of China's domestic chip ecosystem.
+  tags: [semiconductors, china, ai-hardware]
+  lastUpdated: 2026-03
+
+- id: cxmt
+  stableId: w_4zbNf3lK
+  type: organization
+  orgType: generic
+  title: ChangXin Memory Technologies
+  website: https://www.cxmt.com
+  description: >-
+    China's leading domestic DRAM manufacturer. CXMT represents China's effort to
+    build indigenous memory chip capacity independent of Samsung, SK Hynix, and Micron.
+  tags: [semiconductors, china, memory]
+  lastUpdated: 2026-03
+
+- id: chips-program-office
+  stableId: Wq9cjUfPfl
+  type: organization
+  orgType: government
+  title: CHIPS Program Office
+  website: https://www.nist.gov/chips
+  description: >-
+    Office within NIST responsible for implementing the CHIPS and Science Act,
+    including distributing $52.7B in semiconductor manufacturing incentives and
+    R&D funding. Coordinates with BIS on export control compliance.
+  tags: [semiconductors, government, policy]
   lastUpdated: 2026-03

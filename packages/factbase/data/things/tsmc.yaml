@@ -1,0 +1,111 @@
+entity: 1aWy1sKHng
+facts:
+  # ── Organizational ──────────────────────────────────────────────
+  - id: f_tsmc_found
+    property: founded-date
+    value: "1987-02"
+    source: https://en.wikipedia.org/wiki/TSMC
+    notes: "Founded February 1987 by Morris Chang in Hsinchu, Taiwan"
+
+  - id: f_tsmc_hq
+    property: headquarters
+    value: "Hsinchu, Taiwan"
+    source: https://en.wikipedia.org/wiki/TSMC
+
+  - id: f_tsmc_country
+    property: country
+    value: Taiwan
+    source: https://en.wikipedia.org/wiki/TSMC
+
+  - id: f_tsmc_founder
+    property: founded-by-name
+    value: Morris Chang
+    source: https://en.wikipedia.org/wiki/TSMC
+    notes: "Pioneered the pure-play foundry business model"
+
+  - id: f_tsmc_ceo
+    property: ceo
+    value: C.C. Wei
+    asOf: 2026-03
+    source: https://en.wikipedia.org/wiki/TSMC
+    notes: "CEO since 2018; Mark Liu serves as Chairman"
+
+  - id: f_tsmc_legal
+    property: legal-structure
+    value: "Public company (TWSE: 2330, NYSE: TSM)"
+    source: https://en.wikipedia.org/wiki/TSMC
+
+  - id: f_tsmc_website
+    property: website
+    value: https://www.tsmc.com
+    source: https://en.wikipedia.org/wiki/TSMC
+
+  - id: f_tsmc_wiki
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/TSMC
+    source: https://en.wikipedia.org/wiki/TSMC
+
+  # ── Description ─────────────────────────────────────────────────
+  - id: f_tsmc_desc
+    property: description
+    value: >-
+      World's largest dedicated semiconductor foundry. Fabricates over 60% of all
+      semiconductors globally and more than 90% of the most advanced chips (sub-7nm).
+      Pioneered the pure-play foundry model. Key chokepoint in AI chip governance.
+    asOf: 2026-03
+
+  # ── Headcount ───────────────────────────────────────────────────
+  - id: f_tsmc_hc_2024
+    property: headcount
+    value: 76478
+    asOf: 2024-12
+    source: https://investor.tsmc.com/english/annual-reports
+    notes: "End of 2024; primarily in Taiwan"
+
+  # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_tsmc_rev_2023
+    property: revenue
+    value: 6.94e+10
+    asOf: 2023-12
+    source: https://investor.tsmc.com/english/annual-reports
+    notes: "2023 annual revenue ($69.4B); decline from record 2022"
+
+  - id: f_tsmc_rev_2024
+    property: revenue
+    value: 8.78e+10
+    asOf: 2024-12
+    source: https://investor.tsmc.com/english/annual-reports
+    notes: "2024 annual revenue ($87.8B); 26.5% YoY growth driven by AI chip demand"
+
+  # ── Market share ────────────────────────────────────────────────
+  - id: f_tsmc_mshare_overall
+    property: foundry-market-share
+    value: 64
+    unit: percent
+    asOf: 2024-12
+    source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
+    notes: "TSMC holds ~64% of global semiconductor foundry revenue"
+
+  - id: f_tsmc_mshare_advanced
+    property: advanced-node-market-share
+    value: 92
+    unit: percent
+    asOf: 2024-12
+    source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
+    notes: "TSMC fabricates >90% of chips at sub-7nm nodes"
+
+  # ── Market cap ──────────────────────────────────────────────────
+  - id: f_tsmc_mcap_2026
+    property: market-cap
+    value: 8.8e+11
+    asOf: 2026-03
+    source: https://stockanalysis.com/stocks/tsm/market-cap/
+    notes: "Market cap ~$880B as of March 2026"
+
+  # ── Arizona fab investment ──────────────────────────────────────
+  - id: f_tsmc_arizona
+    property: key-event
+    value: "Announced $65B investment for three semiconductor fabs in Arizona"
+    asOf: 2024-12
+    source: https://pr.tsmc.com/english/news/3188
+    notes: "Under CHIPS Act incentives; first fab operational 2025, advanced packaging by 2028-2030"

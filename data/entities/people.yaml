@@ -8780,6 +8780,165 @@
   tags:
     - philanthropy
     - global-health
+
+# ═══════════════════════════════════════════════════════════════════
+# Semiconductor / Chip Governance People
+# Added 2026-03-25 for AI chip governance coverage
+# ═══════════════════════════════════════════════════════════════════
+
+- id: lisa-su
+  stableId: RB8fKn8-tA
+  type: person
+  title: Lisa Su
+  description: >-
+    CEO of AMD since 2014. Under her leadership, AMD became the principal competitor
+    to Nvidia in AI accelerator chips with the Instinct MI300 series. AMD's chips
+    incorporate features that researchers argue could support hardware-enabled governance.
+  customFields:
+    - label: Role
+      value: CEO
+    - label: Known For
+      value: AMD turnaround, AI accelerator competition with Nvidia
+  tags: [semiconductors, ai-hardware]
+  lastUpdated: 2026-03
+
+- id: christophe-fouquet
+  stableId: 4Qz7ctU0HG
+  type: person
+  title: Christophe Fouquet
+  description: >-
+    CEO of ASML since April 2024, succeeding Peter Wennink. Leads the sole global
+    supplier of EUV lithography machines, a critical chokepoint in semiconductor
+    manufacturing and AI chip governance.
+  customFields:
+    - label: Role
+      value: CEO
+  tags: [semiconductors, lithography]
+  lastUpdated: 2026-03
+
+- id: cc-wei
+  stableId: -nHng0OoNW
+  type: person
+  title: C.C. Wei
+  description: >-
+    CEO of TSMC since 2018. Oversees the world's largest semiconductor foundry,
+    which fabricates over 90% of the world's most advanced chips. Key decision-maker
+    on TSMC's cooperation with U.S. export controls and Arizona fab expansion.
+  customFields:
+    - label: Role
+      value: CEO
+  tags: [semiconductors]
+  lastUpdated: 2026-03
+
+- id: alan-estevez
+  stableId: onn1iNNwpa
+  type: person
+  title: Alan Estevez
+  description: >-
+    Under Secretary of Commerce for Industry and Security, leading the Bureau of
+    Industry and Security (BIS). Oversees the implementation of U.S. export controls
+    on AI chips and semiconductor equipment, including the Entity List and Foreign
+    Direct Product Rule enforcement.
+  customFields:
+    - label: Role
+      value: Under Secretary for Industry and Security
+  tags: [compute-governance, export-controls, policy]
+  lastUpdated: 2026-03
+
+- id: jake-sullivan
+  stableId: dKI5rHw2SA
+  type: person
+  title: Jake Sullivan
+  description: >-
+    U.S. National Security Advisor (2021-2025) under President Biden. Architect of
+    the October 2022 semiconductor export controls on China, which he described as
+    maintaining "as large of a lead as possible" in foundational technologies.
+    Sullivan's strategy represented a shift from traditional export control approaches
+    to actively degrading adversary capabilities.
+  customFields:
+    - label: Role
+      value: Former National Security Advisor
+    - label: Known For
+      value: Architect of October 2022 chip export controls on China
+  tags: [compute-governance, export-controls, policy]
+  lastUpdated: 2026-03
+
+- id: gina-raimondo
+  stableId: 8J_VlGz54s
+  type: person
+  title: Gina Raimondo
+  description: >-
+    U.S. Secretary of Commerce (2021-2025). Oversaw the implementation of semiconductor
+    export controls and CHIPS Act incentives. Led negotiations with TSMC, Samsung, and
+    Intel on U.S. fab investments.
+  customFields:
+    - label: Role
+      value: Former Secretary of Commerce
+  tags: [compute-governance, policy]
+  lastUpdated: 2026-03
+
+- id: chris-miller-chipwar
+  stableId: 2eMcDCbe_5
+  type: person
+  title: Chris Miller
+  description: >-
+    Associate Professor at Tufts University and author of "Chip War: The Fight for the
+    World's Most Critical Technology" (2022), the defining book on semiconductor
+    geopolitics. The book shaped public understanding of chip supply chain concentration
+    and its governance implications.
+  customFields:
+    - label: Role
+      value: Associate Professor, Tufts University
+    - label: Known For
+      value: Author of "Chip War" (2022)
+  tags: [semiconductors, geopolitics]
+  lastUpdated: 2026-03
+
+- id: saif-khan
+  stableId: hDk-NX2dFB
+  type: person
+  title: Saif Khan
+  description: >-
+    Research fellow at Georgetown Center for Security and Emerging Technology (CSET).
+    Leads semiconductor supply chain analysis, including studies of export control
+    effectiveness and allied coordination on chip governance.
+  customFields:
+    - label: Role
+      value: Research Fellow
+  tags: [semiconductors, compute-governance, policy]
+  lastUpdated: 2026-03
+
+- id: gregory-allen
+  stableId: vn087g2XWa
+  type: person
+  title: Gregory Allen
+  description: >-
+    Director of the Wadhwani Center for AI and Advanced Technologies at CNAS. Former
+    Director of Strategy and Policy at the Department of Defense Joint AI Center (JAIC).
+    Leads CNAS research on AI governance, export controls, and hardware-enabled
+    governance mechanisms.
+  customFields:
+    - label: Role
+      value: Director, Wadhwani Center for AI and Advanced Technologies
+  tags: [compute-governance, ai-governance, policy]
+  lastUpdated: 2026-03
+
+- id: david-reber
+  stableId: U3xCxPjV6T
+  type: person
+  title: David Reber
+  description: >-
+    Chief Security Officer of Nvidia. In August 2025, published "No Backdoors. No Kill
+    Switches. No Spyware." on the Nvidia blog, arguing that hardware kill switches are
+    "permanent flaws" and "a gift to hackers," referencing the failed 1993 NSA Clipper
+    Chip as precedent. His position represents the major industry counterargument to
+    mandatory hardware-enabled governance mechanisms.
+  customFields:
+    - label: Role
+      value: Chief Security Officer
+    - label: Known For
+      value: Anti-kill-switch position on hardware governance
+  tags: [compute-governance, hardware-security]
   lastUpdated: 2026-03
 
 - id: ahmad-al-dahle
