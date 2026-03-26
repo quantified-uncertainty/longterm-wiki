@@ -806,7 +806,7 @@ export default async function OrgProfilePage({
       </div>
 
       {/* ── Tabbed content ─────────────────────────────────────── */}
-      <OrgProfileTabs tabs={tabs} />
+      <OrgProfileTabs tabs={tabs} ariaLabel="Organization sections" />
     </div>
   );
 }

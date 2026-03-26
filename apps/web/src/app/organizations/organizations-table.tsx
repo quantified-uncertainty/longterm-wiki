@@ -493,19 +493,20 @@ export function OrganizationsTable({
       {/* Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
+          <caption className="sr-only">Organizations directory with financial and headcount data</caption>
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Organization" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               {isSortable("orgType") ? (
                 <SortHeader label="Type" sortKey="orgType" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               ) : (
-                <th className="py-2.5 px-3 font-medium text-left">Type</th>
+                <th scope="col" className="py-2.5 px-3 font-medium text-left">Type</th>
               )}
               {visibleColumns.has("completionScore") && (
                 isSortable("completionScore") ? (
                   <SortHeader label="Data" sortKey="completionScore" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
                 ) : (
-                  <th className="py-2.5 px-3 font-medium text-center">Data</th>
+                  <th scope="col" className="py-2.5 px-3 font-medium text-center">Data</th>
                 )
               )}
               <SortHeader label="Revenue" sortKey="revenue" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -517,7 +518,7 @@ export function OrganizationsTable({
                 isSortable("peopleCount") ? (
                   <SortHeader label="People" sortKey="peopleCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
                 ) : (
-                  <th className="py-2.5 px-3 font-medium text-right">People</th>
+                  <th scope="col" className="py-2.5 px-3 font-medium text-right">People</th>
                 )
               )}
             </tr>
@@ -527,6 +528,8 @@ export function OrganizationsTable({
               <tr>
                 <td
                   colSpan={activeColCount}
+                  role="status"
+                  aria-live="polite"
                   className="py-8 text-center text-muted-foreground text-sm"
                 >
                   Loading organizations...

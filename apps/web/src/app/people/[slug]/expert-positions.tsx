@@ -36,7 +36,7 @@ export function ExpertPositions({
       <h2 className="text-lg font-bold tracking-tight mb-4">
         Expert Positions
         <span className="ml-2 text-sm font-normal text-muted-foreground">
-          {positions.length} topics
+          {positions.length} {positions.length === 1 ? "topic" : "topics"}
         </span>
       </h2>
       <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
