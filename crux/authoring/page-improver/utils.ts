@@ -117,9 +117,15 @@ function enrichWithFrontmatterRatings(page: PageData): PageData {
 }
 
 export function findPage(pages: PageData[], query: string): PageData | null {
+  // Exact id match
   let page = pages.find(p => p.id === query);
   if (page) return enrichWithFrontmatterRatings(page);
 
+  // Exact wikiId match (e.g., "E407")
+  page = pages.find(p => p.wikiId === query);
+  if (page) return enrichWithFrontmatterRatings(page);
+
+  // Fuzzy match on id or title
   const matches = pages.filter(p =>
     p.id.includes(query) || p.title.toLowerCase().includes(query.toLowerCase())
   );
