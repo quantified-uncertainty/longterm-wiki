@@ -1367,6 +1367,7 @@ export async function orchestrateCommand(
   let completedCount = 0;
 
   async function processItem(item: VerifyItem, index: number): Promise<void> {
+    const inferLabel = item.inferredSource ? ' [inferred]' : '';
     const kindLabel = item.kind.toUpperCase().padEnd(7);
 
     const result = await verifySingleItem(item, client, useWebSearch, urlCache);
@@ -1379,7 +1380,7 @@ export async function orchestrateCommand(
       summary.errors++;
       summary.failures.push(result);
       const typeTag = result.errorType ? ` [${result.errorType}]` : '';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+      console.log(`  ${progress} ${kindLabel}${inferLabel} ${item.description.slice(0, 80)}`);
       console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
     } else {
       summary[result.verdict]++;
@@ -1392,7 +1393,7 @@ export async function orchestrateCommand(
         : result.verdict === 'contradicted'
           ? '\x1b[31m'
           : '\x1b[33m';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+      console.log(`  ${progress} ${kindLabel}${inferLabel} ${item.description.slice(0, 80)}`);
       console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
 
       if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
