@@ -274,12 +274,12 @@ export default async function OrgProfilePage({
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
 
   // ── People tab: key personnel + board + PG personnel data ──
-  const pgEntries = pgPersonnelToEntries(pgPersonnelRows);
+  const pgResult = pgPersonnelToEntries(pgPersonnelRows);
 
   const hasPeopleData =
     data.sortedPersons.length > 0 ||
     data.boardMembers.length > 0 ||
-    pgEntries.length > 0;
+    pgResult.entries.length > 0;
 
   if (hasPeopleData) {
     // Build unified people list from key-persons + board members + PG personnel
@@ -373,7 +373,7 @@ export default async function OrgProfilePage({
     }
 
     // Merge PG personnel data (supplements FactBase data, deduplicates by slug/name)
-    mergePgPersonnel(peopleByName, pgEntries);
+    mergePgPersonnel(peopleByName, pgResult.entries);
 
     const allPeople = [...peopleByName.values()].sort((a, b) => {
       // Current before former
@@ -388,7 +388,7 @@ export default async function OrgProfilePage({
       id: "people",
       label: "People",
       count: allPeople.length,
-      content: <PeopleSection people={allPeople} />,
+      content: <PeopleSection people={allPeople} unresolvedCount={pgResult.unresolvedCount} />,
     });
   }
 
