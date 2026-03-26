@@ -7,8 +7,8 @@
  */
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
-import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -101,14 +101,14 @@ export function getToolDefinitions() {
         },
       },
       {
-        name: 'suggest_resources',
-        description: 'Register URLs and fetch their content for future verification. Call this with URLs found during web search BEFORE submitting claims or records that reference them. Returns resourceIds for each URL.',
+        name: 'check_claim_status',
+        description: 'Check verification status of previously submitted claims. Returns per-claim verdicts. Call this after submit_claims to see which claims were verified.',
         input_schema: {
           type: 'object',
           properties: {
-            urls: { type: 'array', items: { type: 'string' }, description: 'URLs to register and fetch content for (max 20)' },
+            batchId: { type: 'string', description: 'Batch ID returned by submit_claims' },
           },
-          required: ['urls'],
+          required: ['batchId'],
         },
       },
     ],
@@ -239,6 +239,24 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   });
 }
 
+async function handleCheckClaimStatus(input: Record<string, unknown>): Promise<string> {
+  const batchId = input.batchId as string;
+  if (!batchId) return 'Error: batchId is required';
+
+  const result = await getClaimStatus(batchId);
+  if (!result.ok) return `Error: ${result.message}`;
+
+  const data = result.data;
+  const summary = [
+    `Batch ${data.batchId}: ${data.totalClaims} claims`,
+    `Status: ${JSON.stringify(data.byStatus)}`,
+    `All settled: ${data.allSettled}`,
+    ...(data.estimatedRemaining > 0 ? [`Estimated remaining: ${data.estimatedRemaining}s`] : []),
+  ].join('\n');
+
+  return `${summary}\n\nClaims:\n${JSON.stringify(data.claims, null, 2)}`;
+}
+
 async function handleSubmitRecords(
   input: Record<string, unknown>,
   task: EnrichmentTask,
@@ -332,30 +350,6 @@ async function handleSubmitRecords(
   return `Successfully submitted ${count} records to ${table} (${records.length - deduped.length} duplicates filtered).`;
 }
 
-async function handleSuggestResources(input: Record<string, unknown>): Promise<string> {
-  const urls = (input.urls as string[] | undefined)?.slice(0, 20) ?? [];
-  if (urls.length === 0) return 'Error: no URLs provided';
-
-  try {
-    const result = await suggestResources({ urls, concurrency: 5 });
-    return JSON.stringify({
-      resourceCount: result.resources.length,
-      fetchedCount: result.fetchedCount,
-      cachedCount: result.cachedCount,
-      errorCount: result.errorCount,
-      resources: result.resources.map((r) => ({
-        url: r.url,
-        resourceId: r.resourceId,
-        status: r.status,
-        title: r.title,
-      })),
-    }, null, 2);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return `Error suggesting resources: ${msg}`;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Build tool handlers map for runLlmAgent
 // ---------------------------------------------------------------------------
@@ -372,7 +366,7 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
-    suggest_resources: handleSuggestResources,
+    check_claim_status: handleCheckClaimStatus,
   };
 }
 
