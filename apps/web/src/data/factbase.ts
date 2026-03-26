@@ -219,7 +219,7 @@ export function getFactBaseProperty(propertyId: string): Property | undefined {
  * Maps TypedEntity fields to the FactBase Entity interface so existing callers
  * continue working without changes.
  */
-function toFactBaseEntity(typed: { id: string; entityType: string; title: string; stableId?: string; wikiId?: string; [key: string]: unknown }): Entity {
+function toFactBaseEntity(typed: { id: string; entityType: string; title: string; stableId?: string; wikiId?: string; aliases?: string[]; [key: string]: unknown }): Entity {
   return {
     id: typed.stableId ?? typed.id,
     type: typed.entityType,
@@ -227,6 +227,7 @@ function toFactBaseEntity(typed: { id: string; entityType: string; title: string
     stableId: typed.stableId ?? typed.id,
     wikiPageId: typed.wikiId,
     wikiId: typed.wikiId,
+    ...(typed.aliases && typed.aliases.length > 0 && { aliases: typed.aliases }),
   };
 }
 

@@ -147,6 +147,7 @@ export default async function OrgProfilePage({
       name: resolved.title,
       wikiId: resolved.wikiId,
       wikiPageId: resolved.wikiId,
+      ...(resolved.aliases && resolved.aliases.length > 0 && { aliases: resolved.aliases }),
     };
   } else {
     const canonical = resolveSlugAlias(slug);
@@ -163,6 +164,7 @@ export default async function OrgProfilePage({
       name: typedEntity.title,
       wikiId: typedEntity.wikiId,
       wikiPageId: typedEntity.wikiId,
+      ...(typedEntity.aliases && typedEntity.aliases.length > 0 && { aliases: typedEntity.aliases }),
     };
   }
 

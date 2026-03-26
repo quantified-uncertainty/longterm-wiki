@@ -91,6 +91,7 @@ export interface RawEntity {
   customFields?: { label: string; value: string; link?: string }[];
   relatedTopics?: string[];
   relatedEntries?: { id: string; type: string; relationship?: string }[];
+  aliases?: string[];
   tags?: string[];
   lastUpdated?: string;
   sourceRefs?: string[];

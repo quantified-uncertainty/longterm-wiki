@@ -76,6 +76,7 @@ function makeTypedEntity(overrides: {
     sources: [],
     customFields: [],
     relatedTopics: [],
+    aliases: [],
   } as ReturnType<typeof getTypedEntityById>;
 }
 

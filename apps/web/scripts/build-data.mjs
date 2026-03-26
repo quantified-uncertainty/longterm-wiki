@@ -582,6 +582,7 @@ async function main() {
           type: resolveEntityType(entity.type) || entity.type,
           name: entity.title || entity.id,
           ...(entity.wikiId && { wikiPageId: entity.wikiId, wikiId: entity.wikiId }),
+          ...(Array.isArray(entity.aliases) && entity.aliases.length > 0 && { aliases: entity.aliases }),
         });
       }
     }

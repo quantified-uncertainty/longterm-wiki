@@ -159,6 +159,7 @@ function transformEntity(raw, expertMap, orgMap) {
     ...(raw.stableId != null ? { stableId: raw.stableId } : {}),
     title: raw.title,
     description: raw.description,
+    aliases: raw.aliases || [],
     tags: raw.tags || [],
     clusters: raw.clusters || [],
     relatedEntries: raw.relatedEntries || [],
