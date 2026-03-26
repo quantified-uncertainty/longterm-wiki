@@ -649,7 +649,8 @@ const resourcesApp = new Hono()
         if (fallback.length > 0) {
           urlToResource.set(url, fallback[0]);
         } else {
-          // Should not happen, but provide a safe fallback
+          // Should not happen — ID conflicted but no row found.
+          logger.warn({ url, id }, "suggest: ID conflict but no resource found — using fallback");
           urlToResource.set(url, { id, url, title: null });
         }
       }

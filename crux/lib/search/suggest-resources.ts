@@ -10,7 +10,7 @@
  *   3. Return final results with enriched metadata
  */
 
-import { fetchSource, fetchSources } from './source-fetcher.ts';
+import { fetchSources } from './source-fetcher.ts';
 import { suggestResourcesApi, type SuggestResourcesResult } from '../wiki-server/resources.ts';
 
 // ---------------------------------------------------------------------------
