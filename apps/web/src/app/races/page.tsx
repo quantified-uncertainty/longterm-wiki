@@ -91,9 +91,9 @@ export default async function RacesPage() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <ProfileStatCard label="Total Races" value={String(raceStats.total)} />
         <ProfileStatCard label="Upcoming" value={String(raceStats.upcoming)} />
         <ProfileStatCard label="Active" value={String(raceStats.active)} />
+        <ProfileStatCard label="Resolved" value={String(raceStats.resolved)} />
         <ProfileStatCard label="Candidates" value={String(candidateStats.total)} />
       </div>
 

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, sql, desc, inArray, or } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { fundingRounds, entities } from "../../schema.js";
@@ -209,6 +209,24 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     ]);
     if (refError) return refError;
 
+    // Resolve companyId values (slugs or stableIds) to proper stableIds for the FK column.
+    // This ensures companyEntityId is populated so the JOIN on GET /all works correctly.
+    const uniqueCompanyIds = [...new Set(items.map((i) => i.companyId).filter(Boolean))];
+    const entityRows = uniqueCompanyIds.length > 0
+      ? await db
+          .select({ id: entities.id, stableId: entities.stableId })
+          .from(entities)
+          .where(or(inArray(entities.id, uniqueCompanyIds), inArray(entities.stableId, uniqueCompanyIds)))
+      : [];
+
+    const companyStableIdMap = new Map<string, string>();
+    for (const row of entityRows) {
+      if (row.stableId) {
+        companyStableIdMap.set(row.id, row.stableId);
+        companyStableIdMap.set(row.stableId, row.stableId);
+      }
+    }
+
     let upserted = 0;
     let verdictsResult = { written: 0 };
 
@@ -219,6 +237,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         return {
           id: item.id,
           companyId: item.companyId,
+          companyEntityId: companyStableIdMap.get(item.companyId) ?? null,
           name: item.name,
           date: item.date ?? null,
           raised: item.raised != null ? String(item.raised) : null,
@@ -241,6 +260,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           target: fundingRounds.id,
           set: {
             companyId: sql`excluded.company_id`,
+            companyEntityId: sql`COALESCE(excluded.company_entity_id, ${fundingRounds.companyEntityId})`,
             name: sql`excluded.name`,
             date: sql`excluded.date`,
             raised: sql`excluded.raised`,

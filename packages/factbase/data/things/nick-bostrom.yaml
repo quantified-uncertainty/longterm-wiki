@@ -42,3 +42,19 @@ facts:
     value: https://www.nickbostrom.com
     source: https://www.wikidata.org/wiki/Q460475
     notes: From Wikidata Q460475
+
+  - id: f_nBempl0x1a
+    property: employed-by
+    value: !ref Zmw9nfUYWA
+    role: "Founder and Director, Future of Humanity Institute"
+    validEnd: "2024-04"
+    source: https://en.wikipedia.org/wiki/Nick_Bostrom
+    notes: "FHI closed in April 2024 due to administrative issues at Oxford University"
+
+  - id: f_nBempl0x2b
+    property: employed-by
+    value: !ref idAU5YPkSw
+    role: "Founder and Principal Researcher"
+    validStart: "2024-04"
+    source: https://nickbostrom.com
+    notes: "Founded Macrostrategy Research Initiative after FHI closure"

@@ -147,7 +147,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   return (
     <div>
       {/* Filters */}
-      <div className="flex flex-col gap-3 mb-5">
+      <div role="search" className="flex flex-col gap-3 mb-5">
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
@@ -263,6 +263,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
       {/* Table */}
       <div className="border border-border rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
+          <caption className="sr-only">AI models directory with pricing, benchmarks, and safety data</caption>
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted sticky top-0 z-10 backdrop-blur-sm">
               <SortHeader label="Model" sortKey="name" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
@@ -273,7 +274,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <SortHeader label="Context" sortKey="contextWindow" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Safety" sortKey="safetyLevel" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="MMLU" sortKey="mmlu" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
-              <SortHeader label="GPQA" sortKey="gpqa" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <SortHeader label="GPQA Diamond" sortKey="gpqa" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="SWE-bench" sortKey="sweBench" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
             </tr>
           </thead>

@@ -408,7 +408,7 @@ export default async function PersonProfilePage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content — tabbed */}
         <div className="lg:col-span-2">
-          <ProfileTabs tabs={tabs} />
+          <ProfileTabs tabs={tabs} ariaLabel="Person sections" />
         </div>
 
         {/* Sidebar */}

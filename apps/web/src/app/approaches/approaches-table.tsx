@@ -57,7 +57,7 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+      <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
           placeholder="Search approaches by name, description, or tag..."

@@ -136,12 +136,13 @@ export function FactsPanel({
 
   return (
     <section>
-      <h2 className="text-lg font-bold tracking-tight mb-4">
-        Facts
-        <span className="ml-2 text-sm font-normal text-muted-foreground">
+      <div className="flex items-center gap-3 mb-4">
+        <h2 className="text-lg font-bold tracking-tight">Facts</h2>
+        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
           {latestByProp.size}
         </span>
-      </h2>
+        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" aria-hidden="true" />
+      </div>
       <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
         {categoryGroups.map(({ category, label, props }) => (
           <div key={category} className="px-4 py-3">

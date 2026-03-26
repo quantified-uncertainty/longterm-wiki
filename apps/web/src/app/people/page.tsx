@@ -308,7 +308,7 @@ export default async function PeoplePage() {
 
   const stats = [
     { label: "With Detailed Data", value: String(meaningful.length) },
-    { label: "Total People", value: String(rows.length) },
+    { label: "Total (incl. stubs)", value: String(rows.length) },
     { label: "With Role Data", value: String(withRole) },
     { label: "With Employer", value: String(withEmployer) },
     { label: "With Birth Year", value: String(withBornYear) },

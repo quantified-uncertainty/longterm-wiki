@@ -592,7 +592,7 @@
   wikiId: E212
   type: person
   title: Nate Soares
-  description: Executive Director of the Machine Intelligence Research Institute (MIRI), focused on mathematical foundations of AI alignment.
+  description: President of the Machine Intelligence Research Institute (MIRI) since June 2023 (previously Executive Director 2015-2023), focused on mathematical foundations of AI alignment.
 - id: neel-nanda
   stableId: zaRXTCXPPk
   wikiId: E214
@@ -3811,8 +3811,9 @@
   type: person
   title: Owen Cotton-Barratt
   description: >-
-    Researcher at the Future of Humanity Institute. Oxford mathematician
-    focused on global priorities research and existential risk.
+    Former Senior Research Scholar at the Future of Humanity Institute (until
+    FHI's closure in April 2024). Oxford mathematician focused on global
+    priorities research and existential risk.
   tags:
     - existential-risk
     - global-priorities

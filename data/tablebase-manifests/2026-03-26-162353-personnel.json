@@ -1,0 +1,49 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "submittedAt": "2026-03-26T16:23:53.919Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "vVBieRrB4a",
+      "personId": "5MVd90lzCg",
+      "organizationId": "puAffUjWSS",
+      "role": "Executive Director",
+      "source": "https://intelligence.org/2023/10/10/announcing-miris-new-ceo-and-leadership-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "2aA6TACLzP",
+      "personId": "MMNpm1875e",
+      "organizationId": "Zmw9nfUYWA",
+      "role": "Senior Research Scholar",
+      "source": "https://www.fhi.ox.ac.uk/",
+      "verdict": "none"
+    },
+    {
+      "id": "wA82xdr3WS",
+      "personId": "oTieHq0pRA",
+      "organizationId": "1LcLlMGLbw",
+      "role": "Board Member",
+      "source": "https://www.wsj.com/articles/openai-sam-altman-board-helen-toner-11e503a7",
+      "verdict": "none"
+    },
+    {
+      "id": "GjLMMC1E9B",
+      "personId": "gBWtOYd80I",
+      "organizationId": "NifCYhN75w",
+      "role": "Co-founder and President",
+      "source": "https://www.openphilanthropy.org/about",
+      "verdict": "none"
+    }
+  ]
+}

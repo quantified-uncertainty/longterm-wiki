@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { BenchmarksTable, type BenchmarkRow } from "@/app/benchmarks/benchmarks-table";
 import {
   ComparisonMatrix,
@@ -24,7 +25,25 @@ export function BenchmarksView({
   matrixModels,
   matrixScores,
 }: Props) {
-  const [view, setView] = useState<ViewMode>("directory");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const viewParam = searchParams.get("view");
+  const view: ViewMode = viewParam === "matrix" ? "matrix" : "directory";
+
+  const setView = useCallback(
+    (next: ViewMode) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === "matrix") {
+        params.set("view", "matrix");
+      } else {
+        params.delete("view");
+      }
+      const query = params.toString();
+      router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+    },
+    [router, pathname, searchParams],
+  );
 
   return (
     <div>
