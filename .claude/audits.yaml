@@ -218,5 +218,5 @@ post_merge:
     merged: "2026-03-21"
     claim: "robots.txt Disallow rules for /factbase/ and /organizations/*/grants/ reduce bot traffic to near-zero on those routes, cutting Vercel function costs"
     how_to_verify: "Check Vercel observability for /factbase/record/[recordId] route — requests should drop from 202K/day to near-zero within 1-2 weeks as crawlers honor robots.txt. Check billing to confirm cost reduction."
-    status: pending
+    status: verified
     deadline: "2026-04-04"
