@@ -115,8 +115,10 @@ export function useServerTable<T>(
     setIsLoading(true);
     setError(null);
 
-    // 15s timeout prevents indefinite loading when wiki-server is unreachable
-    const timeout = setTimeout(() => controller.abort(), 15_000);
+    // 15s timeout prevents indefinite loading when wiki-server is unreachable.
+    // Track whether the abort was caused by the timeout (vs effect cleanup).
+    let timedOut = false;
+    const timeout = setTimeout(() => { timedOut = true; controller.abort(); }, 15_000);
     fetch(`${endpoint}?${queryKey}`, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -127,7 +129,8 @@ export function useServerTable<T>(
       })
       .catch((err: unknown) => {
         if (err instanceof Error && err.name === "AbortError") {
-          setError("Request timed out");
+          if (timedOut) setError("Request timed out");
+          // Cleanup aborts (effect re-run / unmount) are silently ignored
           return;
         }
         setError(err instanceof Error ? err.message : String(err));

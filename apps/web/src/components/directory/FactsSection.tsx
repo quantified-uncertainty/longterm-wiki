@@ -68,12 +68,7 @@ export function groupByCategory(
 
 // ── Components ───────────────────────────────────────────────────────
 
-/**
- * Resolve a FactBase ref value to its canonical URL.
- * Uses getKBEntitySlug to get the slug (handles both stableIds and slugs),
- * then getEntityHref for proper directory routing (all entity types).
- * Falls back to /factbase/entity/{id} only if the entity has no wiki presence.
- */
+/** Resolve a FactBase ref to its canonical directory URL. */
 function resolveRefHref(refId: string): string {
   const refSlug = getKBEntitySlug(refId);
   if (refSlug) return getEntityHref(refSlug);

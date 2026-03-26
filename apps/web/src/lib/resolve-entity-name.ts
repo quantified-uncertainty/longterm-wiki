@@ -30,17 +30,8 @@ const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
  */
 const NUMERIC_ID_PATTERN = /^\d+$/;
 
-/**
- * Build the canonical href for an entity.
- * Uses getEntityHref which handles all entity types with directory pages
- * (organizations, people, ai-models, benchmarks, policies, projects, etc.).
- * Falls back to /factbase/entity/{id} only for entities without wiki slugs.
- */
-function buildEntityHref(
-  _entityType: string,
-  slug: string | undefined,
-  entityId: string,
-): string | null {
+/** Build the canonical href for an entity, falling back to /factbase/entity/{id}. */
+function buildEntityHref(slug: string | undefined, entityId: string): string | null {
   if (slug) return getEntityHref(slug);
   return `/factbase/entity/${entityId}`;
 }
@@ -71,7 +62,7 @@ export function resolveEntityName(
         const slug = getKBEntitySlug(entity.id);
         return {
           name: trimmedDisplayName,
-          href: buildEntityHref(entity.type, slug ?? undefined, entity.id),
+          href: buildEntityHref(slug ?? undefined, entity.id),
         };
       }
     }
@@ -93,7 +84,7 @@ export function resolveEntityName(
     const slug = getKBEntitySlug(entity.id);
     return {
       name: entity.name,
-      href: buildEntityHref(entity.type, slug ?? undefined, entity.id),
+      href: buildEntityHref(slug ?? undefined, entity.id),
     };
   }
 
@@ -103,11 +94,7 @@ export function resolveEntityName(
   if (typedEntity?.title?.trim()) {
     return {
       name: typedEntity.title,
-      href: buildEntityHref(
-        typedEntity.entityType,
-        typedEntity.id,
-        typedEntity.stableId ?? typedEntity.id,
-      ),
+      href: buildEntityHref(typedEntity.id, typedEntity.stableId ?? typedEntity.id),
     };
   }
 
