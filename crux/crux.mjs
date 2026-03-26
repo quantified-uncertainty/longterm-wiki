@@ -111,6 +111,7 @@ import * as wikidataEnrichCommands from './commands/wikidata-enrich.ts';
 import * as dataQualityCommands from './commands/data-quality.ts';
 import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
+import * as branchesCommands from './commands/branches.ts';
 
 const domains = {
   validate: validateCommands,
@@ -186,6 +187,7 @@ const domains = {
   quality: dataQualityCommands,
   bluesky: blueskyCommands,
   races: politicalRacesCommands,
+  branches: branchesCommands,
 };
 
 const shortcutMap = buildShortcutMap();
