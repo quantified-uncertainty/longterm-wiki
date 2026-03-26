@@ -14,6 +14,7 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { logAuditEntries } from "./audit-log.js";
 
 // ---- Helpers: SQL ----
 
@@ -356,6 +357,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         notes: item.notes ?? null,
       }));
 
+      // Fetch existing records for audit log (before upsert)
+      const existingIds = items.map((i) => i.id);
+      const existing = await tx
+        .select()
+        .from(personnel)
+        .where(inArray(personnel.id, existingIds));
+      const existingMap = new Map(existing.map((r) => [r.id, r]));
+
       await tx
         .insert(personnel)
         .values(allVals)
@@ -377,6 +386,22 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Audit log
+      await logAuditEntries(
+        tx,
+        allVals.map((v) => {
+          const old = existingMap.get(v.id);
+          return {
+            recordType: "personnel",
+            recordId: v.id,
+            operation: old ? ("update" as const) : ("insert" as const),
+            oldData: old ? { ...old } : null,
+            newData: { ...v },
+            sourceUrl: v.source ?? null,
+          };
+        })
+      );
 
       // Post-sync: resolve entity FKs for newly synced rows
       // NOTE: Use IN (sqlInList()) not ANY() — Drizzle expands JS arrays as

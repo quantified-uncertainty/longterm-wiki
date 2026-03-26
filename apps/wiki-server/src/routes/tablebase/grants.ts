@@ -16,6 +16,7 @@ import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { logAuditEntries } from "./audit-log.js";
 
 // ---- Constants ----
 
@@ -587,6 +588,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         programId: item.programId ?? null,
       }));
 
+      // Fetch existing records for audit log (before upsert)
+      const existingIds = items.map((i) => i.id);
+      const existing = await tx
+        .select()
+        .from(grants)
+        .where(inArray(grants.id, existingIds));
+      const existingMap = new Map(existing.map((r) => [r.id, r]));
+
       await tx
         .insert(grants)
         .values(allVals)
@@ -608,6 +617,22 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Audit log
+      await logAuditEntries(
+        tx,
+        allVals.map((v) => {
+          const old = existingMap.get(v.id);
+          return {
+            recordType: "grants",
+            recordId: v.id,
+            operation: old ? ("update" as const) : ("insert" as const),
+            oldData: old ? { ...old } : null,
+            newData: { ...v },
+            sourceUrl: v.source ?? null,
+          };
+        })
+      );
 
       // Resolve org + grantee slugs to human-readable titles for search
       const orgSlugs = [...new Set(items.map((g) => g.organizationId))];
