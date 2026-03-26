@@ -421,7 +421,7 @@ export function EquityBreakdownChart({
     const holderSummaries = sorted.map((h) => {
       const stake =
         h.stakeLow != null && h.stakeHigh != null
-          ? `${h.stakeLow}–${h.stakeHigh}%`
+          ? `${parseFloat(h.stakeLow.toFixed(1))}–${parseFloat(h.stakeHigh.toFixed(1))}%`
           : `~${h.stakePercent.toFixed(1)}%`;
       const value =
         valuation != null
@@ -500,7 +500,7 @@ export function EquityBreakdownChart({
               </span>
               <span className="text-xs text-muted-foreground tabular-nums whitespace-nowrap">
                 {h.stakeLow != null && h.stakeHigh != null
-                  ? `${h.stakeLow}–${h.stakeHigh}%`
+                  ? `${parseFloat(h.stakeLow.toFixed(1))}–${parseFloat(h.stakeHigh.toFixed(1))}%`
                   : `~${h.stakePercent.toFixed(1)}%`}
               </span>
               {equityValue != null && (

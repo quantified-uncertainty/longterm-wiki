@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Fragment, useState, useMemo } from "react";
 import Link from "next/link";
 import {
   RACE_STATUS_COLORS,
@@ -122,9 +122,8 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
           </thead>
           <tbody>
             {filtered.map((race) => (
-              <>
+              <Fragment key={race.id}>
                 <tr
-                  key={race.id}
                   className="border-b hover:bg-muted/50 cursor-pointer"
                   onClick={() =>
                     setExpandedRace(expandedRace === race.id ? null : race.id)
@@ -246,7 +245,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

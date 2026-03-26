@@ -11,13 +11,20 @@ vi.mock("@/data/tablebase", () => ({
   getTypedEntityById: vi.fn(),
 }));
 
+// Mock entity-nav — getEntityHref builds directory URLs from slugs
+vi.mock("@/data/entity-nav", () => ({
+  getEntityHref: vi.fn(),
+}));
+
 import { resolveEntityName } from "../resolve-entity-name";
 import { getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getTypedEntityById } from "@/data/tablebase";
+import { getEntityHref } from "@/data/entity-nav";
 
 const mockGetKBEntity = vi.mocked(getKBEntity);
 const mockGetKBEntitySlug = vi.mocked(getKBEntitySlug);
 const mockGetTypedEntityById = vi.mocked(getTypedEntityById);
+const mockGetEntityHref = vi.mocked(getEntityHref);
 
 beforeEach(() => {
   vi.resetAllMocks();
@@ -36,6 +43,7 @@ describe("resolveEntityName", () => {
       type: "person",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("dario-amodei");
+    mockGetEntityHref.mockReturnValue("/people/dario-amodei");
 
     const result = resolveEntityName("3KjUCZCV8w", "Dario Amodei");
     expect(result).toEqual({
@@ -51,6 +59,7 @@ describe("resolveEntityName", () => {
       type: "organization",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("anthropic");
+    mockGetEntityHref.mockReturnValue("/organizations/anthropic");
 
     const result = resolveEntityName("3KjUCZCV8w");
     expect(result).toEqual({
@@ -66,6 +75,7 @@ describe("resolveEntityName", () => {
       type: "organization",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("miri");
+    mockGetEntityHref.mockReturnValue("/organizations/miri");
 
     const result = resolveEntityName("miri");
     expect(result).toEqual({
@@ -131,10 +141,11 @@ describe("resolveEntityName", () => {
       type: "person",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("some-entity");
+    mockGetEntityHref.mockReturnValue("/people/some-entity");
 
     const result = resolveEntityName("some-entity", "Override Name");
     expect(result.name).toBe("Override Name");
-    // Still gets href from FactBase
+    // Still gets href from FactBase via getEntityHref
     expect(result.href).toBe("/people/some-entity");
   });
 
@@ -152,19 +163,21 @@ describe("resolveEntityName", () => {
     expect(result.name).toBe("Empty Name");
   });
 
-  it("returns factbase entity path for non-org/person types", () => {
+  it("uses getEntityHref for all entity types with slugs (including non-directory types)", () => {
     mockGetKBEntity.mockReturnValue({
       id: "some-concept",
       name: "Some Concept",
       type: "concept",
     } as ReturnType<typeof getKBEntity>);
     mockGetKBEntitySlug.mockReturnValue("some-concept");
+    mockGetEntityHref.mockReturnValue("/wiki/E42");
 
     const result = resolveEntityName("some-concept");
     expect(result).toEqual({
       name: "Some Concept",
-      href: "/factbase/entity/some-concept",
+      href: "/wiki/E42",
     });
+    expect(mockGetEntityHref).toHaveBeenCalledWith("some-concept");
   });
 
   it("trims whitespace from displayName", () => {
@@ -196,6 +209,7 @@ describe("resolveEntityName", () => {
       customFields: [],
       relatedTopics: [],
     });
+    mockGetEntityHref.mockReturnValue("/organizations/some-org");
 
     const result = resolveEntityName("some-org");
     expect(result).toEqual({
@@ -218,6 +232,7 @@ describe("resolveEntityName", () => {
       customFields: [],
       relatedTopics: [],
     });
+    mockGetEntityHref.mockReturnValue("/people/tom-brown");
 
     const result = resolveEntityName("tom-brown");
     expect(result).toEqual({
