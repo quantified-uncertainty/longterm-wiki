@@ -549,6 +549,33 @@ properties:
     category: general
     appliesTo: [organization, person, project, funder, safety-agenda]
 
+  country:
+    name: Country
+    description: "Country where the entity is headquartered or primarily operates"
+    dataType: text
+    category: organization
+    appliesTo: [organization, person, funder]
+
+  employee-tender-offer:
+    name: Employee Tender Offer
+    description: "Employee share sale / tender offer program size in USD"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  founded-by-name:
+    name: Founder (text)
+    description: "Founder name as plain text (use founded-by with entity ref when available)"
+    dataType: text
+    category: people
+    appliesTo: [organization, project]
+
   # ── Incident Properties ──────────────────────────────────────────────
 
   incident-date:
