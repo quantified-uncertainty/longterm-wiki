@@ -8,6 +8,7 @@
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { generateId } from '../lib/grant-import/id.ts';
+import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -97,6 +98,17 @@ export function getToolDefinitions() {
             description: { type: 'string', description: 'Brief one-sentence description' },
           },
           required: ['name', 'entityType'],
+        },
+      },
+      {
+        name: 'suggest_resources',
+        description: 'Register URLs and fetch their content for future verification. Call this with URLs found during web search BEFORE submitting claims or records that reference them. Returns resourceIds for each URL.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            urls: { type: 'array', items: { type: 'string' }, description: 'URLs to register and fetch content for (max 20)' },
+          },
+          required: ['urls'],
         },
       },
     ],
@@ -320,6 +332,30 @@ async function handleSubmitRecords(
   return `Successfully submitted ${count} records to ${table} (${records.length - deduped.length} duplicates filtered).`;
 }
 
+async function handleSuggestResources(input: Record<string, unknown>): Promise<string> {
+  const urls = (input.urls as string[] | undefined)?.slice(0, 20) ?? [];
+  if (urls.length === 0) return 'Error: no URLs provided';
+
+  try {
+    const result = await suggestResources({ urls, concurrency: 5 });
+    return JSON.stringify({
+      resourceCount: result.resources.length,
+      fetchedCount: result.fetchedCount,
+      cachedCount: result.cachedCount,
+      errorCount: result.errorCount,
+      resources: result.resources.map((r) => ({
+        url: r.url,
+        resourceId: r.resourceId,
+        status: r.status,
+        title: r.title,
+      })),
+    }, null, 2);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `Error suggesting resources: ${msg}`;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Build tool handlers map for runLlmAgent
 // ---------------------------------------------------------------------------
@@ -336,6 +372,7 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
+    suggest_resources: handleSuggestResources,
   };
 }
 
