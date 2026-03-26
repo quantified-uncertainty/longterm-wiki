@@ -14,6 +14,7 @@ import { cn } from "@lib/utils";
 import { getFactBaseEntity, resolveFactBaseSlug } from "@data/factbase";
 import { getTypedEntityById } from "@data";
 import { EntityLink } from "@/components/wiki/EntityLink";
+import { titleCase } from "./format";
 
 interface FBRefLinkProps {
   /** KB entity slug (e.g., "anthropic") or stableId */
@@ -38,11 +39,8 @@ export function FBRefLink({ id, label, className }: FBRefLinkProps) {
     );
   }
 
-  // Fallback: show the KB entity name, or title-case the slug so "spark-capital" → "Spark Capital"
-  const displayName =
-    label ??
-    kbEntity?.name ??
-    id.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  // Fallback: show the KB entity name or title-cased slug
+  const displayName = label ?? kbEntity?.name ?? titleCase(id);
   return (
     <span
       className={cn("text-muted-foreground", className)}
