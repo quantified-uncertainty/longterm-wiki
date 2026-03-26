@@ -60,7 +60,7 @@ export function NavDropdown({ label, items }: NavDropdownType) {
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
-        aria-haspopup="menu"
+        aria-haspopup="true"
         className={`text-sm transition-colors inline-flex items-center gap-0.5 ${
           isActive
             ? "text-foreground"

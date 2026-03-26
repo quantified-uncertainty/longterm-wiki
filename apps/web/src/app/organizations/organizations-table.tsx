@@ -435,7 +435,7 @@ export function OrganizationsTable({
       )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+      <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
         <input
           type="text"
           placeholder="Search name, type, people, funding programs, description..."
