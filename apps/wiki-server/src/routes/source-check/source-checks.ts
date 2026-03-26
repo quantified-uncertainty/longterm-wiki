@@ -1031,17 +1031,11 @@ const sourceChecksApp = new Hono()
       SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
     `);
 
-    interface TableCountRow {
-      table_name: string;
-      total: number;
-    }
-
     const totalsByType: Record<string, number> = {};
     for (const row of tableCountResult) {
-      const tableName = row.table_name;
-      const total = row.total;
-      if (typeof tableName === "string" && typeof total === "number") {
-        totalsByType[tableName] = total;
+      const { table_name, total } = row as { table_name: string; total: number };
+      if (typeof table_name === "string" && typeof total === "number") {
+        totalsByType[table_name] = total;
       }
     }
 
