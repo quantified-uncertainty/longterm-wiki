@@ -109,13 +109,8 @@ INSERT INTO stableid_migration (old_id, new_id) VALUES
 -- Temporarily disable FK constraint checking
 SET session_replication_role = replica;
 
--- ── Primary tables ──────────────────────────────────────────────────────
-
--- entities PK (stable_id is the primary key)
-UPDATE entities e SET stable_id = m.new_id FROM stableid_migration m WHERE e.stable_id = m.old_id;
-
--- entity_ids registry (stable_id column)
-UPDATE entity_ids t SET stable_id = m.new_id FROM stableid_migration m WHERE t.stable_id = m.old_id;
+-- Wrap all updates in a transaction for atomicity
+BEGIN;
 
 -- ── FactBase ────────────────────────────────────────────────────────────
 
@@ -256,6 +251,16 @@ UPDATE qa_page_checks t SET thing_id = m.new_id FROM stableid_migration m WHERE 
 -- 1. They are rebuilt from YAML on every build-data sync
 -- 2. Updating JSONB arrays requires more complex SQL and is not worth the risk
 -- The next build-data run will produce clean values from the updated YAML.
+
+-- ── Primary tables (updated LAST so child FK refs are already migrated) ──
+
+-- entity_ids registry (stable_id column)
+UPDATE entity_ids t SET stable_id = m.new_id FROM stableid_migration m WHERE t.stable_id = m.old_id;
+
+-- entities PK (stable_id is the primary key) — must be last
+UPDATE entities e SET stable_id = m.new_id FROM stableid_migration m WHERE e.stable_id = m.old_id;
+
+COMMIT;
 
 -- Re-enable FK constraint checking
 SET session_replication_role = DEFAULT;

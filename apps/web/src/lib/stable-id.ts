@@ -32,5 +32,5 @@ export function isAlphanumeric10(s: string): boolean {
 
 /** Check if a string is a bare machine ID (stableId or numeric PK) that should never be displayed. */
 export function isBareMachineId(s: string): boolean {
-  return STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s);
+  return isAlphanumeric10(s) || NUMERIC_ID_PATTERN.test(s);
 }
