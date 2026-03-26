@@ -43,7 +43,7 @@ const integrityApp = new Hono()
       // 1. facts.entity_id → entities.stable_id
       checkDangling(
         db,
-        sql`SELECT DISTINCT entity_id AS ref FROM facts WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL)`,
+        sql`SELECT DISTINCT f.entity_id AS ref FROM facts f WHERE NOT EXISTS (SELECT 1 FROM entities e WHERE e.stable_id = f.entity_id)`,
         "facts",
         "entity_id",
         "entities"
@@ -51,16 +51,16 @@ const integrityApp = new Hono()
       // 2. summaries.entity_id → entities.stable_id
       checkDangling(
         db,
-        sql`SELECT DISTINCT entity_id AS ref FROM summaries WHERE entity_id NOT IN (SELECT stable_id FROM entities WHERE stable_id IS NOT NULL)`,
+        sql`SELECT DISTINCT s.entity_id AS ref FROM summaries s WHERE NOT EXISTS (SELECT 1 FROM entities e WHERE e.stable_id = s.entity_id)`,
         "summaries",
         "entity_id",
         "entities"
       ),
       // 4. citation_quotes.page_id → wiki_pages
-      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
+      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id::text AS ref FROM citation_quotes WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
+        sql`SELECT DISTINCT cq.page_id::text AS ref FROM citation_quotes cq WHERE cq.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = cq.page_id)`,
         "citation_quotes",
         "page_id",
         "wiki_pages"
@@ -68,16 +68,16 @@ const integrityApp = new Hono()
       // 5. citation_quotes.resource_id → resources
       checkDangling(
         db,
-        sql`SELECT DISTINCT resource_id AS ref FROM citation_quotes WHERE resource_id IS NOT NULL AND resource_id NOT IN (SELECT id FROM resources)`,
+        sql`SELECT DISTINCT cq.resource_id AS ref FROM citation_quotes cq WHERE cq.resource_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = cq.resource_id)`,
         "citation_quotes",
         "resource_id",
         "resources"
       ),
       // 6. edit_logs.page_id → wiki_pages
-      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
+      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id::text AS ref FROM edit_logs WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
+        sql`SELECT DISTINCT el.page_id::text AS ref FROM edit_logs el WHERE el.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = el.page_id)`,
         "edit_logs",
         "page_id",
         "wiki_pages"
@@ -85,16 +85,16 @@ const integrityApp = new Hono()
       // 7. entities.relatedEntries JSONB → entities
       checkDangling(
         db,
-        sql`SELECT DISTINCT elem->>'id' AS ref FROM entities, jsonb_array_elements(related_entries) AS elem WHERE related_entries IS NOT NULL AND (elem->>'id') NOT IN (SELECT id FROM entities)`,
+        sql`SELECT DISTINCT elem->>'id' AS ref FROM entities ent, jsonb_array_elements(ent.related_entries) AS elem WHERE ent.related_entries IS NOT NULL AND NOT EXISTS (SELECT 1 FROM entities e2 WHERE e2.id = elem->>'id')`,
         "entities",
         "related_entries[].id",
         "entities"
       ),
       // 8. resource_citations.page_id → wiki_pages
-      // NULL-safe: NULL NOT IN (...) = NULL in SQL, so include IS NULL to catch unresolved rows
+      // Catches both NULL page_id (unresolved) and non-NULL values with no matching wiki_page
       checkDangling(
         db,
-        sql`SELECT DISTINCT page_id::text AS ref FROM resource_citations WHERE (page_id IS NULL OR page_id NOT IN (SELECT id FROM wiki_pages))`,
+        sql`SELECT DISTINCT rc.page_id::text AS ref FROM resource_citations rc WHERE rc.page_id IS NULL OR NOT EXISTS (SELECT 1 FROM wiki_pages wp WHERE wp.id = rc.page_id)`,
         "resource_citations",
         "page_id",
         "wiki_pages"
