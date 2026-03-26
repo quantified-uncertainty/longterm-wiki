@@ -8370,3 +8370,414 @@
   tags: [politics]
   lastUpdated: 2026-03
 
+- id: elie-hassenfeld
+  stableId: xVfFkFIk3Q
+  wikiId: E1908
+  type: person
+  title: Elie Hassenfeld
+  website: https://www.givewell.org
+  description: >-
+    Co-founder and CEO of GiveWell, the influential charity evaluator he
+    started with Holden Karnofsky in 2007. Under his leadership, GiveWell has
+    directed over $1B annually to top-rated global health charities through
+    rigorous cost-effectiveness analysis.
+  customFields:
+    - label: Role
+      value: "Co-founder and CEO, GiveWell"
+  relatedEntries:
+    - id: OwXl35e7bg
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: bill-gates
+  stableId: kzPpqPCdnw
+  wikiId: E1910
+  type: person
+  title: Bill Gates
+  website: https://www.gatesnotes.com
+  description: >-
+    Co-founder of Microsoft and co-chair of the Bill & Melinda Gates
+    Foundation, the world's largest private charitable foundation with an
+    endowment exceeding $75B. A Giving Pledge signatory who has committed
+    to giving away the majority of his wealth.
+  customFields:
+    - label: Role
+      value: "Co-chair, Bill & Melinda Gates Foundation"
+  relatedEntries:
+    - id: l4EHdNDZqg
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: melinda-french-gates
+  stableId: AmS9eXVCFA
+  wikiId: E1911
+  type: person
+  title: Melinda French Gates
+  website: https://www.melindafrenchgates.com
+  description: >-
+    Philanthropist and co-founder of the Bill & Melinda Gates Foundation.
+    Departed the foundation in 2024 and launched Pivotal Ventures, focused on
+    advancing women and families in the United States.
+  customFields:
+    - label: Role
+      value: "Founder, Pivotal Ventures; Former Co-chair, Gates Foundation"
+  relatedEntries:
+    - id: l4EHdNDZqg
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: peter-singer
+  stableId: TDUEAFxz2w
+  wikiId: E1912
+  type: person
+  title: Peter Singer
+  website: https://petersinger.info
+  description: >-
+    Australian moral philosopher and professor of bioethics at Princeton
+    University. His 1975 book Animal Liberation helped launch the modern
+    animal rights movement, and his 2009 book The Life You Can Save became
+    the intellectual foundation for the effective giving movement.
+  customFields:
+    - label: Role
+      value: "Professor of Bioethics, Princeton University"
+  relatedEntries:
+    - id: pShgsxdp8Q
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+    - animal-welfare
+  lastUpdated: 2026-03
+
+- id: michael-bloomberg
+  stableId: ma5nt6psEA
+  wikiId: E1913
+  type: person
+  title: Michael Bloomberg
+  website: https://www.bloomberg.org
+  description: >-
+    Founder of Bloomberg LP and Bloomberg Philanthropies. Former Mayor of New
+    York City (2002-2013). Distributes over $1.7B annually through Bloomberg
+    Philanthropies. Estimated lifetime giving exceeds $17B.
+  customFields:
+    - label: Role
+      value: "Founder, Bloomberg LP and Bloomberg Philanthropies"
+  relatedEntries:
+    - id: H9mGnBuumA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: jeff-bezos
+  stableId: H6GOwDIzbw
+  wikiId: E1914
+  type: person
+  title: Jeff Bezos
+  website: https://www.bezosearthfund.org
+  description: >-
+    Founder of Amazon and the Bezos Earth Fund. In 2020, committed $10B to
+    fight climate change, one of the largest individual philanthropic
+    commitments to climate action.
+  customFields:
+    - label: Role
+      value: "Founder, Amazon and Bezos Earth Fund"
+  relatedEntries:
+    - id: fVMqY7vpMA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: andrew-steer
+  stableId: QWMkNoodwA
+  wikiId: E1915
+  type: person
+  title: Andrew Steer
+  website: https://www.bezosearthfund.org
+  description: >-
+    President and CEO of the Bezos Earth Fund since 2021. Previously served
+    as president and CEO of the World Resources Institute (WRI) from 2012 to
+    2021. Former World Bank Special Envoy for Climate Change.
+  customFields:
+    - label: Role
+      value: "President and CEO, Bezos Earth Fund"
+  relatedEntries:
+    - id: fVMqY7vpMA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: pierre-omidyar
+  stableId: Ol0uNxO0gg
+  wikiId: E1916
+  type: person
+  title: Pierre Omidyar
+  website: https://omidyar.com
+  description: >-
+    Founder of eBay and Omidyar Network. Through Omidyar Network, he supports
+    responsible technology, digital infrastructure, and governance innovation.
+    Estimated total giving exceeds $2B.
+  customFields:
+    - label: Role
+      value: "Founder, eBay and Omidyar Network"
+  relatedEntries:
+    - id: GADd9PU0UA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - governance
+  lastUpdated: 2026-03
+
+- id: jeff-skoll
+  stableId: C458I0yUKg
+  wikiId: E1917
+  type: person
+  title: Jeff Skoll
+  website: https://skoll.org
+  description: >-
+    First president of eBay and founder of the Skoll Foundation (1999),
+    which has invested over $600M in social entrepreneurs. Also founded
+    Participant Media.
+  customFields:
+    - label: Role
+      value: "Founder, Skoll Foundation"
+  relatedEntries:
+    - id: 3swyqpXTRA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: john-arnold
+  stableId: 8rZgjgj8Gg
+  wikiId: E1918
+  type: person
+  title: John Arnold
+  website: https://www.arnoldventures.org
+  description: >-
+    Former hedge fund manager and co-founder of Arnold Ventures with his wife
+    Laura. Funds evidence-based policy research in criminal justice,
+    healthcare, education, and public finance. A Giving Pledge signatory.
+  customFields:
+    - label: Role
+      value: "Co-founder, Arnold Ventures"
+  relatedEntries:
+    - id: AT0VDnvwRw
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: laura-arnold
+  stableId: NhxFtIuyjg
+  wikiId: E1919
+  type: person
+  title: Laura Arnold
+  website: https://www.arnoldventures.org
+  description: >-
+    Co-founder and co-chair of Arnold Ventures. Former corporate attorney.
+    Under her leadership, Arnold Ventures has become one of the largest
+    funders of research integrity and open science initiatives.
+  customFields:
+    - label: Role
+      value: "Co-founder and Co-chair, Arnold Ventures"
+  relatedEntries:
+    - id: AT0VDnvwRw
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: darren-walker
+  stableId: Be7G95qQ1Q
+  wikiId: E1920
+  type: person
+  title: Darren Walker
+  website: https://www.fordfoundation.org
+  description: >-
+    President of the Ford Foundation since 2013, overseeing approximately
+    $16B in assets. Under his leadership, Ford Foundation became the first
+    nonprofit to issue social bonds.
+  customFields:
+    - label: Role
+      value: "President, Ford Foundation"
+  relatedEntries:
+    - id: 3ViojCH3Sw
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: rajiv-shah
+  stableId: 0Ev9WHrXIw
+  wikiId: E1921
+  type: person
+  title: Rajiv Shah
+  website: https://www.rockefellerfoundation.org
+  description: >-
+    President of the Rockefeller Foundation since 2017. Previously served as
+    Administrator of USAID under President Obama (2010-2015), leading the US
+    response to the Haiti earthquake and Ebola crisis.
+  customFields:
+    - label: Role
+      value: "President, Rockefeller Foundation"
+  relatedEntries:
+    - id: 3wtyeezoxQ
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: chris-hohn
+  stableId: KJVkZptGVQ
+  wikiId: E1922
+  type: person
+  title: Chris Hohn
+  website: https://ciff.org
+  description: >-
+    British billionaire hedge fund manager and philanthropist. Founder of TCI
+    Fund Management and the Children's Investment Fund Foundation (CIFF),
+    which distributes over $500M annually.
+  customFields:
+    - label: Role
+      value: "Founder, CIFF and TCI Fund Management"
+  relatedEntries:
+    - id: Z6vKggPBaA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03
+
+- id: heather-templeton-dill
+  stableId: AYxtuMsoiw
+  wikiId: E1923
+  type: person
+  title: Heather Templeton Dill
+  website: https://www.templeton.org
+  description: >-
+    President of the John Templeton Foundation since 2015, granddaughter of
+    founder Sir John Templeton. Oversees approximately $3.4B endowment.
+  customFields:
+    - label: Role
+      value: "President, John Templeton Foundation"
+  relatedEntries:
+    - id: W3UAlnscAg
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: pam-omidyar
+  stableId: d5rr9sMk2w
+  wikiId: E1924
+  type: person
+  title: Pam Omidyar
+  website: https://omidyar.com
+  description: >-
+    Co-founder of Omidyar Network and founder of Humanity United, a
+    foundation focused on ending human trafficking and mass atrocities.
+  customFields:
+    - label: Role
+      value: "Co-founder, Omidyar Network; Founder, Humanity United"
+  relatedEntries:
+    - id: GADd9PU0UA
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: leah-edgerton
+  stableId: Xq2bq3EJZQ
+  wikiId: E1925
+  type: person
+  title: Leah Edgerton
+  website: https://animalcharityevaluators.org
+  description: >-
+    Executive Director of Animal Charity Evaluators since 2019. Leads ACE's
+    research evaluating animal advocacy charities for effectiveness, directing
+    millions in donations to high-impact organizations.
+  customFields:
+    - label: Role
+      value: "Executive Director, Animal Charity Evaluators"
+  relatedEntries:
+    - id: nJF5vuz1kA
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - animal-welfare
+  lastUpdated: 2026-03
+
+- id: charlie-bresler
+  stableId: Y2C4nsiyYw
+  wikiId: E1926
+  type: person
+  title: Charlie Bresler
+  website: https://www.thelifeyoucansave.org
+  description: >-
+    Executive Director of The Life You Can Save. Retired business executive
+    who helped build the organization from Peter Singer's book project into
+    a functioning charity evaluator and giving platform.
+  customFields:
+    - label: Role
+      value: "Executive Director, The Life You Can Save"
+  relatedEntries:
+    - id: pShgsxdp8Q
+      type: organization
+      relationship: related
+  tags:
+    - ea-community
+    - philanthropy
+  lastUpdated: 2026-03
+
+- id: john-arne-rottingen
+  stableId: QkTjuStGuw
+  wikiId: E1927
+  type: person
+  title: "John-Arne R\xF8ttingen"
+  website: https://wellcome.org
+  description: >-
+    Director of the Wellcome Trust since February 2023. Previously CEO of the
+    Research Council of Norway and CEO of the Coalition for Epidemic
+    Preparedness Innovations (CEPI), where he led COVID-19 vaccine
+    development efforts.
+  customFields:
+    - label: Role
+      value: "Director, Wellcome Trust"
+  relatedEntries:
+    - id: D3QcAF9wzQ
+      type: organization
+      relationship: related
+  tags:
+    - philanthropy
+    - global-health
+  lastUpdated: 2026-03

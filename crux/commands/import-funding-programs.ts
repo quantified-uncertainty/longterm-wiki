@@ -167,7 +167,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Historical grantmaking for criminal justice reform. Program wound down in 2022.",
     programType: "grant-round",
     status: "closed",
-    source: "https://coefficientgiving.org/grant-publishing-process/",
+    source: "https://coefficientgiving.org/grants/?q=&focus-area=criminal-justice-reform",
     notes: "~$200M total grants. 398 grants. Focused on reducing incarceration.",
   },
   {
@@ -668,6 +668,370 @@ const PROGRAMS: FundingProgramDef[] = [
     status: "open",
     source: "https://manifund.org/",
     notes: "Novel funding mechanism using impact certificates/retroactive public goods funding. Since 2023.",
+  },
+
+  // ---- GiveWell ----
+  {
+    idSeed: "prog|givewell|top-charities-fund",
+    orgId: ORG_IDS.GIVEWELL,
+    name: "Top Charities Fund",
+    description:
+      "GiveWell's flagship fund directing donations to its highest-rated charities based on cost-effectiveness analysis.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.givewell.org/top-charities-fund",
+    notes: "Directed over $1B in 2023.",
+  },
+  {
+    idSeed: "prog|givewell|all-grants-fund",
+    orgId: ORG_IDS.GIVEWELL,
+    name: "All Grants Fund",
+    description:
+      "Broader GiveWell fund supporting both top charities and other high-impact opportunities.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.givewell.org/all-grants-fund",
+  },
+
+  // ---- Gates Foundation ----
+  {
+    idSeed: "prog|gates|grand-challenges",
+    orgId: ORG_IDS.GATES_FOUNDATION,
+    name: "Grand Challenges",
+    description:
+      "Family of initiatives fostering innovation to solve key global health and development problems.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://gcgh.grandchallenges.org/",
+    notes: "Launched 2003. Over 4,200 grants in 100+ countries.",
+  },
+  {
+    idSeed: "prog|gates|global-health-grants",
+    orgId: ORG_IDS.GATES_FOUNDATION,
+    name: "Global Health Grantmaking",
+    description:
+      "Core grantmaking for infectious disease, maternal and child health, nutrition, and health systems strengthening.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.gatesfoundation.org/our-work/programs/global-health",
+    notes: "~$4B annually in global health grants.",
+  },
+
+  // ---- Wellcome Trust ----
+  {
+    idSeed: "prog|wellcome|discovery-research",
+    orgId: ORG_IDS.WELLCOME_TRUST,
+    name: "Discovery Research",
+    description:
+      "Wellcome's core research funding supporting curiosity-driven science across biomedical and health sciences.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://wellcome.org/what-we-do/discovery-research",
+    notes: "~$1.5B annually in research grants.",
+  },
+
+  // ---- Bloomberg Philanthropies ----
+  {
+    idSeed: "prog|bloomberg|public-health",
+    orgId: ORG_IDS.BLOOMBERG_PHILANTHROPIES,
+    name: "Public Health Programs",
+    description:
+      "Anti-tobacco campaigns, road safety, drowning prevention, and obesity prevention in low- and middle-income countries.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.bloomberg.org/public-health/",
+    notes: "Bloomberg Initiative to Reduce Tobacco Use: over $1.6B since 2006.",
+  },
+
+  // ---- Arnold Ventures ----
+  {
+    idSeed: "prog|arnold|evidence-policy",
+    orgId: ORG_IDS.ARNOLD_VENTURES,
+    name: "Evidence-Based Policy Research",
+    description:
+      "Funding for rigorous research and RCTs evaluating social programs in criminal justice, healthcare, education, and public finance.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.arnoldventures.org/",
+  },
+
+  // ---- Skoll Foundation ----
+  {
+    idSeed: "prog|skoll|awards",
+    orgId: ORG_IDS.SKOLL_FOUNDATION,
+    name: "Skoll Awards for Social Entrepreneurship",
+    description:
+      "Annual awards recognizing social entrepreneurs with proven models for large-scale social change.",
+    programType: "prize",
+    status: "open",
+    source: "https://skoll.org/about/skoll-awards/",
+    notes: "Awarded since 2003. Over $600M invested.",
+  },
+
+  // ---- Templeton Foundation ----
+  {
+    idSeed: "prog|templeton|research-grants",
+    orgId: ORG_IDS.TEMPLETON_FOUNDATION,
+    name: "Research Grants",
+    description:
+      "Grants for research at the intersection of science, philosophy, and theology.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.templeton.org/grants",
+    notes: "Distributes ~$150M annually.",
+  },
+
+  // ---- CIFF ----
+  {
+    idSeed: "prog|ciff|climate",
+    orgId: ORG_IDS.CIFF,
+    name: "Climate and Environment Programs",
+    description:
+      "Major climate change mitigation and adaptation funding including clean energy transitions and sustainable landscapes.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://ciff.org/our-work/climate-and-environment/",
+    notes: "~$200M annually for climate.",
+  },
+
+  // ---- Bezos Earth Fund ----
+  {
+    idSeed: "prog|bezos|climate-solutions",
+    orgId: ORG_IDS.BEZOS_EARTH_FUND,
+    name: "Climate Solutions Grants",
+    description:
+      "Grants for clean energy innovation, nature conservation, environmental justice, and food system transformation.",
+    programType: "grant-round",
+    totalBudget: 10_000_000_000,
+    status: "open",
+    source: "https://www.bezosearthfund.org/",
+    notes: "$10B total commitment.",
+  },
+
+  // ---- Wellcome Trust (additional) ----
+  {
+    idSeed: "prog|wellcome|mental-health",
+    orgId: ORG_IDS.WELLCOME_TRUST,
+    name: "Mental Health Awards",
+    description:
+      "Targeted RFPs for mental health research including early intervention for anxiety, depression, and psychosis in young people.",
+    programType: "rfp",
+    status: "open",
+    source: "https://wellcome.org/what-we-do/mental-health",
+  },
+  {
+    idSeed: "prog|wellcome|early-career",
+    orgId: ORG_IDS.WELLCOME_TRUST,
+    name: "Early-Career Awards",
+    description:
+      "5-year fellowships for researchers developing independent research identities, covering salary and up to GBP 400K research expenses.",
+    programType: "fellowship",
+    status: "open",
+    source: "https://wellcome.org/grant-funding/schemes/wellcome-early-career-awards",
+  },
+
+  // ---- Rockefeller Foundation ----
+  {
+    idSeed: "prog|rockefeller|food-is-medicine",
+    orgId: ORG_IDS.ROCKEFELLER_FOUNDATION,
+    name: "Food Is Medicine Initiative",
+    description:
+      "Programs integrating nutrition directly into healthcare delivery systems, enabling doctors to prescribe healthy food.",
+    programType: "grant-round",
+    totalBudget: 100_000_000,
+    status: "open",
+    source: "https://www.rockefellerfoundation.org/initiative/food-is-medicine/",
+    notes: "$100M+ committed since 2019.",
+  },
+  {
+    idSeed: "prog|rockefeller|geapp",
+    orgId: ORG_IDS.ROCKEFELLER_FOUNDATION,
+    name: "Global Energy Alliance for People and Planet (GEAPP)",
+    description:
+      "Co-founded initiative to accelerate green energy transitions in developing economies.",
+    programType: "grant-round",
+    totalBudget: 10_000_000_000,
+    status: "open",
+    source: "https://www.energyalliance.org/",
+    notes: "Launched at COP26. $1.5B from anchor partners.",
+  },
+
+  // ---- Ford Foundation ----
+  {
+    idSeed: "prog|ford|build",
+    orgId: ORG_IDS.FORD_FOUNDATION,
+    name: "BUILD Initiative",
+    description:
+      "Multi-year unrestricted operating support for up to 300 social justice organizations in 30+ countries.",
+    programType: "grant-round",
+    totalBudget: 2_000_000_000,
+    status: "open",
+    source: "https://www.fordfoundation.org/work/our-grants/building-institutions-and-networks/",
+    notes: "$2B total over 12 years (2016-2026).",
+  },
+  {
+    idSeed: "prog|ford|tech-society",
+    orgId: ORG_IDS.FORD_FOUNDATION,
+    name: "Technology and Society Grantmaking",
+    description:
+      "Grants ensuring digital technologies advance social and economic justice. Supports digital rights, platform accountability, and technology governance.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://www.fordfoundation.org/work/challenging-inequality/technology-and-society/",
+    notes: "~$80M annually.",
+  },
+
+  // ---- Bloomberg Philanthropies (additional) ----
+  {
+    idSeed: "prog|bloomberg|beyond-carbon",
+    orgId: ORG_IDS.BLOOMBERG_PHILANTHROPIES,
+    name: "Beyond Carbon",
+    description:
+      "Climate initiative aiming to close all remaining US coal plants and increase clean energy to 80% of electricity by 2030.",
+    programType: "grant-round",
+    totalBudget: 1_000_000_000,
+    status: "open",
+    source: "https://www.bloomberg.org/environment/",
+    notes: "$500M initial 2019 + $500M additional 2023.",
+  },
+  {
+    idSeed: "prog|bloomberg|american-health",
+    orgId: ORG_IDS.BLOOMBERG_PHILANTHROPIES,
+    name: "Bloomberg American Health Initiative",
+    description:
+      "Addresses health challenges across addiction, adolescent health, environment, food systems, and violence. Includes fully funded MPH fellowships.",
+    programType: "fellowship",
+    totalBudget: 300_000_000,
+    status: "open",
+    source: "https://americanhealth.jhu.edu/",
+    notes: "$300M gift to Johns Hopkins. 400+ fellows.",
+  },
+
+  // ---- Arnold Ventures (additional) ----
+  {
+    idSeed: "prog|arnold|criminal-justice",
+    orgId: ORG_IDS.ARNOLD_VENTURES,
+    name: "Criminal Justice Research Grants",
+    description:
+      "Dedicated RFP funding causal research on policing, incarceration, fines and fees, and housing programs.",
+    programType: "rfp",
+    status: "open",
+    source: "https://www.arnoldventures.org/work/criminal-justice",
+  },
+
+  // ---- Omidyar Network ----
+  {
+    idSeed: "prog|omidyar|responsible-tech-youth",
+    orgId: ORG_IDS.OMIDYAR_NETWORK,
+    name: "Responsible Tech Youth Power Fund",
+    description:
+      "Supports youth-led organizations working on tech accountability, responsible AI, and climate tech solutions.",
+    programType: "grant-round",
+    totalBudget: 4_500_000,
+    status: "open",
+    source: "https://omidyar.com/",
+    notes: "$2.4M distributed in 2025 to 18 organizations.",
+  },
+
+  // ---- Skoll Foundation (additional) ----
+  {
+    idSeed: "prog|skoll|scholarships",
+    orgId: ORG_IDS.SKOLL_FOUNDATION,
+    name: "Skoll Scholarships at Oxford Said Business School",
+    description:
+      "Fully funded MBA scholarships for social entrepreneurs. Up to 4 per year.",
+    programType: "fellowship",
+    status: "open",
+    source: "https://www.sbs.ox.ac.uk/oxford-experience/scholarships-and-funding/skoll-scholarships",
+  },
+
+  // ---- ACE ----
+  {
+    idSeed: "prog|ace|recommended-charity-fund",
+    orgId: ORG_IDS.ACE,
+    name: "Recommended Charity Fund",
+    description:
+      "Distributes donations to top-rated animal charities working to reduce farmed and wild animal suffering globally.",
+    programType: "grant-round",
+    status: "open",
+    source: "https://animalcharityevaluators.org/donate/recommended-charity-fund/",
+    notes: "$12M+ distributed since 2017.",
+  },
+
+  // ---- Templeton Foundation (additional) ----
+  {
+    idSeed: "prog|templeton|small-grants",
+    orgId: ORG_IDS.TEMPLETON_FOUNDATION,
+    name: "Small Grant Program",
+    description:
+      "Streamlined funding for smaller projects across Templeton's core research areas. Grants up to $235K.",
+    programType: "rfp",
+    status: "open",
+    source: "https://www.templeton.org/grants/grant-calendar",
+  },
+
+  // ---- CIFF (additional) ----
+  {
+    idSeed: "prog|ciff|child-health",
+    orgId: ORG_IDS.CIFF,
+    name: "Child Health and Development Programs",
+    description:
+      "Grants ensuring every child has the chance to survive and thrive, covering birth through adolescence.",
+    programType: "grant-round",
+    totalBudget: 425_800_000,
+    status: "open",
+    source: "https://ciff.org/grant-portfolio/",
+    notes: "$425.8M committed.",
+  },
+  {
+    idSeed: "prog|ciff|srhr",
+    orgId: ORG_IDS.CIFF,
+    name: "Sexual and Reproductive Health and Rights",
+    description:
+      "Working toward universal access to sexual and reproductive health including preventing unintended pregnancy and HIV.",
+    programType: "grant-round",
+    totalBudget: 349_300_000,
+    status: "open",
+    source: "https://ciff.org/grant-portfolio/",
+    notes: "$349.3M committed.",
+  },
+
+  // ---- Bezos Earth Fund (additional) ----
+  {
+    idSeed: "prog|bezos|ai-grand-challenge",
+    orgId: ORG_IDS.BEZOS_EARTH_FUND,
+    name: "AI Grand Challenge for Climate and Nature",
+    description:
+      "Multi-phase challenge leveraging AI for sustainable proteins, power grid optimization, and biodiversity conservation.",
+    programType: "prize",
+    totalBudget: 100_000_000,
+    status: "open",
+    source: "https://www.bezosearthfund.org/initiatives/ai-for-climate-and-nature",
+    notes: "Phase II: 15 teams received up to $2M each.",
+  },
+  {
+    idSeed: "prog|bezos|nature",
+    orgId: ORG_IDS.BEZOS_EARTH_FUND,
+    name: "Conserving and Restoring Nature",
+    description:
+      "Major portfolio funding nature conservation, ocean protection, and biodiversity.",
+    programType: "grant-round",
+    totalBudget: 2_000_000_000,
+    status: "open",
+    source: "https://www.bezosearthfund.org/our-programs",
+    notes: "$2B committed from $10B total pledge.",
+  },
+  {
+    idSeed: "prog|bezos|food",
+    orgId: ORG_IDS.BEZOS_EARTH_FUND,
+    name: "Future of Food Program",
+    description:
+      "Transforming food and agricultural systems for sustainability and climate resilience.",
+    programType: "grant-round",
+    totalBudget: 1_000_000_000,
+    status: "open",
+    source: "https://www.bezosearthfund.org/our-programs",
+    notes: "$1B committed.",
   },
 
   // ---- ACX Grants ----
