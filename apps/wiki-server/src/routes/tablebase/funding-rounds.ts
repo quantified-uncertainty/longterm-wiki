@@ -39,12 +39,14 @@ const AllQuery = z.object({
 const SyncFundingRoundItemSchema = z.object({
   id: z.string().length(10),
   companyId: z.string().min(1).max(200),
+  companyDisplayName: z.string().max(500).nullable().optional(),
   name: z.string().min(1).max(500),
   date: z.string().max(20).nullable().optional(),
   raised: z.number().nullable().optional(),
   valuation: z.number().nullable().optional(),
   instrument: z.string().max(100).nullable().optional(),
   leadInvestor: z.string().max(500).nullable().optional(),
+  leadInvestorDisplayName: z.string().max(500).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
@@ -209,21 +211,26 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     ]);
     if (refError) return refError;
 
-    // Resolve companyId values (slugs or stableIds) to proper stableIds for the FK column.
-    // This ensures companyEntityId is populated so the JOIN on GET /all works correctly.
+    // Resolve companyId and leadInvestor values (slugs or stableIds) to proper stableIds
+    // for the FK columns. This ensures companyEntityId and leadInvestorEntityId are populated
+    // so the JOINs on GET /all work correctly.
     const uniqueCompanyIds = [...new Set(items.map((i) => i.companyId).filter(Boolean))];
-    const entityRows = uniqueCompanyIds.length > 0
+    const uniqueLeadInvestorIds = [...new Set(
+      items.map((i) => i.leadInvestor).filter((id): id is string => id != null && id !== "")
+    )];
+    const allUniqueIds = [...new Set([...uniqueCompanyIds, ...uniqueLeadInvestorIds])];
+    const entityRows = allUniqueIds.length > 0
       ? await db
           .select({ id: entities.id, stableId: entities.stableId })
           .from(entities)
-          .where(or(inArray(entities.id, uniqueCompanyIds), inArray(entities.stableId, uniqueCompanyIds)))
+          .where(or(inArray(entities.id, allUniqueIds), inArray(entities.stableId, allUniqueIds)))
       : [];
 
-    const companyStableIdMap = new Map<string, string>();
+    const entityStableIdMap = new Map<string, string>();
     for (const row of entityRows) {
       if (row.stableId) {
-        companyStableIdMap.set(row.id, row.stableId);
-        companyStableIdMap.set(row.stableId, row.stableId);
+        entityStableIdMap.set(row.id, row.stableId);
+        entityStableIdMap.set(row.stableId, row.stableId);
       }
     }
 
@@ -234,10 +241,13 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       const allVals = items.map((item) => {
         const raisedRange = parseRange(item.raised);
         const valuationRange = parseRange(item.valuation);
+        // Strip "new:" prefix from leadInvestor raw ID for entity resolution
+        const rawLI = item.leadInvestor?.startsWith("new:") ? item.leadInvestor.slice(4).trim() : item.leadInvestor;
         return {
           id: item.id,
           companyId: item.companyId,
-          companyEntityId: companyStableIdMap.get(item.companyId) ?? null,
+          companyEntityId: entityStableIdMap.get(item.companyId) ?? null,
+          companyDisplayName: item.companyDisplayName ?? null,
           name: item.name,
           date: item.date ?? null,
           raised: item.raised != null ? String(item.raised) : null,
@@ -248,6 +258,8 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           valuationHigh: valuationRange.high,
           instrument: item.instrument ?? null,
           leadInvestor: item.leadInvestor ?? null,
+          leadInvestorEntityId: rawLI ? (entityStableIdMap.get(rawLI) ?? null) : null,
+          leadInvestorDisplayName: item.leadInvestorDisplayName ?? null,
           source: item.source ?? null,
           notes: item.notes ?? null,
         };
@@ -261,6 +273,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           set: {
             companyId: sql`excluded.company_id`,
             companyEntityId: sql`COALESCE(excluded.company_entity_id, ${fundingRounds.companyEntityId})`,
+            companyDisplayName: sql`COALESCE(excluded.company_display_name, ${fundingRounds.companyDisplayName})`,
             name: sql`excluded.name`,
             date: sql`excluded.date`,
             raised: sql`excluded.raised`,
@@ -271,6 +284,8 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             valuationHigh: sql`excluded.valuation_high`,
             instrument: sql`excluded.instrument`,
             leadInvestor: sql`excluded.lead_investor`,
+            leadInvestorEntityId: sql`COALESCE(excluded.lead_investor_entity_id, ${fundingRounds.leadInvestorEntityId})`,
+            leadInvestorDisplayName: sql`COALESCE(excluded.lead_investor_display_name, ${fundingRounds.leadInvestorDisplayName})`,
             source: sql`excluded.source`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
@@ -292,11 +307,11 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           sourceTable: "funding_rounds",
           sourceId: fr.id,
           sourceUrl: fr.source,
-          parentTitle: titleMap.get(fr.companyId) ?? fr.companyId,
+          parentTitle: titleMap.get(fr.companyId) ?? fr.companyDisplayName ?? fr.companyId,
           description: [
             fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
             fr.instrument,
-            fr.leadInvestor ? `led by ${fr.leadInvestor}` : null,
+            fr.leadInvestor ? `led by ${fr.leadInvestorDisplayName ?? fr.leadInvestor}` : null,
           ].filter(Boolean).join(", ") || null,
         }))
       );
