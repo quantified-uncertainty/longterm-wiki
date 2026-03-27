@@ -42,9 +42,9 @@ export async function generateMetadata({
   if (!pub) return { title: "Publication Not Found" };
 
   return {
-    title: `${pub.name} | Publication Venues`,
+    title: `${pub.name} | Publications`,
     description:
-      pub.description || `${pub.name} — publication venue tracked in the wiki.`,
+      pub.description || `${pub.name} — publication tracked in the wiki.`,
   };
 }
 
@@ -99,7 +99,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        All Publication Venues
+        All Publications
       </Link>
 
       {/* Header */}
