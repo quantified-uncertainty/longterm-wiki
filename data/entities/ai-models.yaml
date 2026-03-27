@@ -72,7 +72,7 @@
       type: ai-model
       relationship: composed-of
     - id: 6sdr78k9kQ
-      type: concept
+      type: approach
       relationship: related
   sources:
     - title: Anthropic Claude Product Page
