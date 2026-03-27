@@ -3395,3 +3395,31 @@ export const claimRecordLinks = pgTable(
     index("idx_crl_record").on(table.recordType, table.recordId),
   ]
 );
+
+/**
+ * Operations log — records manual DB operations, deploy actions, and other
+ * production changes that don't naturally live in a PR or code commit.
+ *
+ * Linked to agent_sessions when the operation was performed during a session.
+ */
+export const operationsLog = pgTable(
+  "operations_log",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    description: text("description").notNull(),
+    prNumber: integer("pr_number"),
+    agentSessionId: bigint("agent_session_id", { mode: "number" }).references(
+      () => agentSessions.id
+    ),
+    operator: text("operator").notNull().default("agent"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_ops_log_created").on(table.createdAt),
+    index("idx_ops_log_pr").on(table.prNumber),
+    index("idx_ops_log_session").on(table.agentSessionId),
+  ]
+);

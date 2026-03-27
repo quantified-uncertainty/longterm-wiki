@@ -21,3 +21,4 @@ export { githubPullsRoute, type GithubPullsRoute, type OpenPR, type CheckResult,
 export { monitoringRoute, type MonitoringRoute } from "./monitoring.js";
 export { qaChecksRoute, type QaChecksRoute } from "./qa-checks.js";
 export { dataQualityRoute, type DataQualityRoute } from "./data-quality.js";
+export { operationsLogRoute, type OperationsLogRoute } from "./operations-log.js";
