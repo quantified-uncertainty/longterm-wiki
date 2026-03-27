@@ -13,7 +13,7 @@ export function SourcesOverviewContent() {
 
   const stats = [
     { label: "Resources", value: resources.length, href: "/resources" },
-    { label: "Publication Venues", value: publications.length, href: "/publications" },
+    { label: "Publications", value: publications.length, href: "/publications" },
     { label: "Peer-Reviewed Venues", value: peerReviewed },
     { label: "With Summaries", value: withSummary },
     { label: "Cited by Pages", value: citedResources },
@@ -72,10 +72,10 @@ export function SourcesOverviewContent() {
           className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
         >
           <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
-            Publication Venues
+            Publications
           </h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {publications.length} publication venues with credibility ratings
+            {publications.length} publications with credibility ratings
             (1-5 scale). Maps domains to venues for automatic resource
             credibility assignment.
           </p>

@@ -619,6 +619,10 @@ const STATIC_SLUG_ALIASES: Record<string, string> = {
   "math": "math-benchmark",
   "mistral-large": "mistral-large-2",
   "alignment-research-center": "arc",
+  "gemini-2-0": "gemini-2-0-flash",
+  "william-macaskill": "will-macaskill",
+  "executive-order-14110": "us-executive-order",
+  "sb-1047": "california-sb1047",
 };
 
 /**
