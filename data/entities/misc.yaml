@@ -88,7 +88,7 @@
     - id: SUZgWeZLNA
       type: risk
     - id: khXUiwWtkg
-      type: concept
+      type: crux
   sources:
     - title: "Trump Orders US Government to Drop Anthropic After Pentagon Feud"
       url: https://www.bloomberg.com/news/articles/2026-02-27/trump-orders-us-government-to-drop-anthropic-after-pentagon-feud
@@ -161,7 +161,7 @@
     - id: RQsF3N9BQA
       type: analysis
     - id: eNJ3h95yWw
-      type: analysis
+      type: organization
     - id: 1LcLlMGLbw
       type: organization
     - id: mK9pX3rQ7n
@@ -354,7 +354,7 @@
     - id: 69vftmr1jg
       type: person
     - id: 3w5hW5liew
-      type: concept
+      type: organization
     - id: Jtj6jHbuQ7
       type: person
     - id: 1LcLlMGLbw
@@ -390,9 +390,9 @@
     - id: 1DjpqfXwjA
       type: analysis
     - id: eNJ3h95yWw
-      type: analysis
+      type: organization
     - id: 3w5hW5liew
-      type: concept
+      type: organization
     - id: zR4nW8xB2f
       type: person
   lastUpdated: 2026-02
@@ -427,7 +427,7 @@
     - id: hPZbflFceQ
       type: analysis
     - id: 3w5hW5liew
-      type: concept
+      type: organization
     - id: zR4nW8xB2f
       type: person
   lastUpdated: 2026-02
@@ -486,13 +486,13 @@
     - governance
   relatedEntries:
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
     - id: mK9pX3rQ7n
       type: organization
     - id: vzxfzxBITd
       type: person
     - id: SUZgWeZLNA
-      type: concept
+      type: risk
     - id: cBPkzcVBBQ
       type: organization
   lastUpdated: 2026-02
@@ -519,13 +519,13 @@
     - governance
   relatedEntries:
     - id: sFjyY5xXZA
-      type: safety-agenda
+      type: research-area
     - id: lfvY1bGeoA
       type: concept
     - id: mK9pX3rQ7n
       type: organization
     - id: La8s84s3zg
-      type: concept
+      type: policy
   lastUpdated: 2026-02
 
 - id: technical-pathways
@@ -552,7 +552,7 @@
     - id: CWaxxnWsDg
       type: analysis
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
     - id: mK9pX3rQ7n
       type: organization
     - id: 1LcLlMGLbw
@@ -582,7 +582,7 @@
     - id: CWaxxnWsDg
       type: analysis
     - id: SUZgWeZLNA
-      type: concept
+      type: risk
     - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
@@ -645,7 +645,7 @@
     - id: vc60Nthkcg
       type: risk
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
   lastUpdated: 2026-02
 
 - id: ea-biosecurity-scope

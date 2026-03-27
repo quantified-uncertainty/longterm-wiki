@@ -25,7 +25,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
     - id: zR4nW8xB2f
       type: person
   customFields:
@@ -132,7 +132,7 @@
     - id: y4bieqSeag
       type: organization
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: nGFBXZeM3d
       type: person
   customFields:
@@ -485,7 +485,7 @@
   website: https://anthropic.com
   relatedEntries:
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
 - id: nate-soares
   stableId: 5MVd90lzCg
   wikiId: E212
@@ -708,7 +708,7 @@
     - governance
   relatedEntries:
     - id: rt6jVH9yuA
-      type: concept
+      type: approach
     - id: bioweapons
       type: risk
     - id: MUGUxfl2YA
@@ -742,7 +742,7 @@
     - id: dVQzYIAN3A
       type: person
     - id: l8ZPtVJdsA
-      type: concept
+      type: approach
   lastUpdated: 2026-03
 
 - id: philip-tetlock
