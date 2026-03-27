@@ -20,6 +20,20 @@ import {
 } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-shared";
 
+/** FactBase entity IDs are exactly 10 alphanumeric characters. */
+const ENTITY_ID_RE = /^[A-Za-z0-9]{10}$/;
+
+/**
+ * Try to resolve a string value as a FactBase entity reference.
+ * Returns the entity if the value matches the 10-char alphanumeric ID format
+ * and corresponds to a known entity. This is used as a heuristic fallback when
+ * schema field definitions are unavailable.
+ */
+function tryResolveRef(value: unknown) {
+  if (typeof value !== "string" || !ENTITY_ID_RE.test(value)) return undefined;
+  return getFactBaseEntity(value);
+}
+
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~351 pages saved).
 // These are internal KB record detail pages with low traffic.
@@ -210,6 +224,24 @@ export default async function RecordDetailPage({ params }: PageProps) {
             );
           }
 
+          // Heuristic ref detection: if schema is unavailable, check if the
+          // value looks like a FactBase entity ID and resolves to a known entity
+          if (!fieldDef) {
+            const resolvedEntity = tryResolveRef(fieldValue);
+            if (resolvedEntity) {
+              return (
+                <KVRow key={fieldName} label={titleCase(fieldName)}>
+                  <Link
+                    href={`/factbase/entity/${fieldValue}`}
+                    className="text-primary hover:underline"
+                  >
+                    {resolvedEntity.name}
+                  </Link>
+                </KVRow>
+              );
+            }
+          }
+
           // Everything else
           return (
             <KVRow key={fieldName} label={titleCase(fieldName)}>
@@ -277,6 +309,20 @@ export default async function RecordDetailPage({ params }: PageProps) {
                                 </Link>
                               </td>
                             );
+                          }
+
+                          // Heuristic ref fallback for missing schemas
+                          if (!colDef) {
+                            const resolvedEnt = tryResolveRef(cellVal);
+                            if (resolvedEnt) {
+                              return (
+                                <td key={col} className="px-3 py-1.5">
+                                  <Link href={`/factbase/entity/${cellVal}`} className="text-primary hover:underline">
+                                    {resolvedEnt.name}
+                                  </Link>
+                                </td>
+                              );
+                            }
                           }
 
                           return (
