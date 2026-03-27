@@ -2,7 +2,7 @@
 
 Verify the agent checklist is complete, polish the PR, and ship.
 
-This command assumes `/agent-session-start` was run earlier and `.claude/wip-checklist.md` exists.
+This command assumes `/agent-init` was run earlier and `.claude/wip-checklist.md` exists.
 
 ## Step 1: Check progress
 
@@ -32,7 +32,7 @@ Parse the summary line (e.g. `12 files changed, 450 insertions(+), 120 deletions
 - **Files changed** = number before "files changed"
 - **Lines changed** = insertions + deletions
 
-**Check if `/review-pr` was run** by testing for the marker file, validating the commit SHA, and verifying the diff hash:
+**Check if `/agent-review-pr` was run** by testing for the marker file, validating the commit SHA, and verifying the diff hash:
 
 ```bash
 if [ -f .claude/review-done ]; then
@@ -43,7 +43,7 @@ if [ -f .claude/review-done ]; then
   if [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -n "$MARKER_HASH" ] && [ "$MARKER_HASH" = "$CURRENT_HASH" ]; then
     echo "REVIEWED (SHA + diff hash match)"
   elif [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -z "$MARKER_HASH" ]; then
-    echo "STALE_FORMAT (missing diff hash — re-run /review-pr)"
+    echo "STALE_FORMAT (missing diff hash — re-run /agent-review-pr)"
   elif [ "$MARKER_SHA" != "$HEAD_SHA" ]; then
     echo "STALE (marker SHA ${MARKER_SHA:0:8} != HEAD ${HEAD_SHA:0:8})"
   else
@@ -60,19 +60,19 @@ Print this warning prominently:
 
 ```
 ╔══════════════════════════════════════════════════════════════════════╗
-║  REQUIRED: Large PR must be reviewed via /review-pr                 ║
+║  REQUIRED: Large PR must be reviewed via /agent-review-pr                 ║
 ║                                                                      ║
 ║  This PR exceeds size thresholds (>5 files or >300 lines) and       ║
-║  /review-pr was not run (or was run before additional commits).     ║
+║  /agent-review-pr was not run (or was run before additional commits).     ║
 ║                                                                      ║
 ║  Per CLAUDE.md: "For non-trivial changes (>5 files or >300 lines),  ║
-║  run /review-pr before shipping."                                   ║
+║  run /agent-review-pr before shipping."                                   ║
 ║                                                                      ║
-║  Running /review-pr now...                                           ║
+║  Running /agent-review-pr now...                                           ║
 ╚══════════════════════════════════════════════════════════════════════╝
 ```
 
-Then **run `/review-pr` automatically**. Do not offer an option to skip. The review is mandatory for PRs that exceed the thresholds.
+Then **run `/agent-review-pr` automatically**. Do not offer an option to skip. The review is mandatory for PRs that exceed the thresholds.
 
 If the thresholds are NOT exceeded, or if the review marker is valid (SHA matches HEAD), continue without interruption.
 
@@ -85,12 +85,12 @@ For each unchecked item in the checklist:
 3. **Blocked?** Note why next to the item.
 
 Pay special attention to:
-- **Paranoid review** (`paranoid-review`): Run `/review-pr` — this handles diff review (fresh subagent), test plan validation, execution-based verification, and edge case testing. Fix or document every finding before checking the item off.
+- **Paranoid review** (`paranoid-review`): Run `/agent-review-pr` — this handles diff review (fresh subagent), test plan validation, execution-based verification, and edge case testing. Fix or document every finding before checking the item off.
 - **Self-audit**: Re-run commands you claimed to run. Verify outputs match your claims.
 
 ## Step 4: Write / update PR description
 
-Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux gh pr create`.
+Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/agent-push-and-verify` will create one using `crux gh pr create`.
 
 ## Step 4b: Deploy task detection and injection (MANDATORY)
 
@@ -152,7 +152,7 @@ Run `pnpm crux sys agent-checklist complete` — must exit 0 (all items checked 
 
 ## Step 8: Ship
 
-Run `/push-and-ensure-green`.
+Run `/agent-push-and-verify`.
 
 ## Step 9: Final report
 

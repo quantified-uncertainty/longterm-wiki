@@ -40,7 +40,7 @@ For each dimension, rate the entity and identify specific issues:
 
 ### 2c. Organization
 - Are statements well-categorized with appropriate properties?
-- Are there statements that should be on a sub-entity instead? (Use `/ontology-review` for deep analysis)
+- Are there statements that should be on a sub-entity instead? (Use `/review-ontology` for deep analysis)
 - Is the wiki page well-structured with appropriate sections?
 
 ### 2d. Connections

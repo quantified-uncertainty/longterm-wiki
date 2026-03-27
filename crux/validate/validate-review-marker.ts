@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Validate that large PRs have been reviewed via /review-pr.
+ * Validate that large PRs have been reviewed via /agent-review-pr.
  *
  * Checks:
  *   1. Count files changed and lines changed (insertions + deletions) vs main
@@ -230,9 +230,9 @@ export function runCheck(): ReviewCheckResult {
   const marker = readMarker();
   if (!marker.found) {
     const reason =
-      'Large PR (>' + FILES_THRESHOLD + ' files or >' + LINES_THRESHOLD + ' lines) has not been reviewed via /review-pr';
+      'Large PR (>' + FILES_THRESHOLD + ' files or >' + LINES_THRESHOLD + ' lines) has not been reviewed via /agent-review-pr';
     console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
-    console.log(`${c.dim}  Fix: run /review-pr before shipping${c.reset}`);
+    console.log(`${c.dim}  Fix: run /agent-review-pr before shipping${c.reset}`);
     return {
       passed: false,
       warnings: 1,
@@ -269,7 +269,7 @@ export function runCheck(): ReviewCheckResult {
     if (!onlyMergeCommitsSince(marker.sha, headSha)) {
       const reason = `Review marker SHA (${marker.sha.slice(0, 8)}) does not match HEAD (${headSha.slice(0, 8)}) — new commits added after review`;
       console.log(`\n${c.yellow}WARNING: ${reason}${c.reset}`);
-      console.log(`${c.dim}  Fix: run /review-pr again to review the latest changes${c.reset}`);
+      console.log(`${c.dim}  Fix: run /agent-review-pr again to review the latest changes${c.reset}`);
       return {
         passed: false,
         warnings: 1,
@@ -300,6 +300,6 @@ export function runCheck(): ReviewCheckResult {
 
 if (process.argv[1]?.includes('validate-review-marker')) {
   const result = runCheck();
-  // Blocking: exit 1 if the check fails (large PRs require /review-pr)
+  // Blocking: exit 1 if the check fails (large PRs require /agent-review-pr)
   process.exit(result.passed ? 0 : 1);
 }

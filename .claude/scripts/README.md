@@ -11,7 +11,7 @@ macOS launchd jobs that run Claude Code via subscription. These poll on a schedu
 
 ### Auto-Update (`com.longtermwiki.auto-update`)
 
-Runs `/auto-update` to fetch news and refresh wiki pages. Pulls latest main, then invokes `claude -p "/auto-update"`.
+Runs `/auto-update` to fetch news and refresh wiki pages. Pulls latest main, then invokes `claude -p "/auto-update"`. (The `/auto-update` command name is unchanged.)
 
 - **Script:** `auto-update-cron.sh`
 - **Plist:** `com.longtermwiki.auto-update.plist`
@@ -20,7 +20,7 @@ Runs `/auto-update` to fetch news and refresh wiki pages. Pulls latest main, the
 
 ### Maintenance Sweep (`com.longtermwiki.maintenance`)
 
-Runs `/maintain` to review PRs, triage issues, fix TS errors, and clean up cruft. Checks merged PR count first — exits immediately if below threshold.
+Runs `/maintain` to review PRs, triage issues, fix TS errors, and clean up cruft. (The `/maintain` command name is unchanged.) Checks merged PR count first — exits immediately if below threshold.
 
 - **Script:** `maintenance-cron.sh`
 - **Plist:** `com.longtermwiki.maintenance.plist`

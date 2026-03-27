@@ -2,9 +2,9 @@
 
 Enrich structured data (personnel, funding rounds, investments, benchmarks) using the subscription instead of API billing. Processes up to 5 tasks per invocation.
 
-**Schedule:** `/loop 4h /tablebase-enrich` for periodic runs.
+**Schedule:** `/loop 4h /review-tablebase-enrich` for periodic runs.
 
-**Do NOT run `/agent-session-start`** — this skill manages its own workflow.
+**Do NOT run `/agent-init`** — this skill manages its own workflow.
 
 ## Model Tiering
 

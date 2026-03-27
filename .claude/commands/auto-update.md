@@ -4,7 +4,7 @@ Run the daily wiki auto-update using Claude Code's subscription instead of API b
 
 This replaces the CI-based auto-update pipeline (~$6.50/page via Opus API) with Claude Code's native editing capabilities ($0/page via subscription). The cheap digest/routing stage still uses Haiku API (~$0.15 total).
 
-**Do NOT run `/agent-session-start` — this skill manages its own workflow.**
+**Do NOT run `/agent-init` — this skill manages its own workflow.**
 
 ## Phase 1: Fetch & Plan
 

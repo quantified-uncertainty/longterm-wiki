@@ -62,7 +62,7 @@ After the work is done:
 pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
-Then run `/push-and-ensure-green` as usual.
+Then run `/agent-push-and-verify` as usual.
 
 ## Quick reference
 
