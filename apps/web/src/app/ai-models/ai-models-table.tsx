@@ -147,8 +147,6 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
   return (
     <div>
       {/* Filters */}
-      <div role="search" className="flex flex-col gap-3 mb-5">
-
       <div className="flex flex-col gap-3 mb-5" role="search">
         <div className="flex flex-col sm:flex-row gap-3">
           <input
