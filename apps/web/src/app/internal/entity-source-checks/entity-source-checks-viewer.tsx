@@ -21,6 +21,9 @@ import {
   RotateCcw,
   ArrowUpRight,
   AlertTriangle,
+  AlertOctagon,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
@@ -444,6 +447,137 @@ async function resolveNames(
   return { names, hrefs };
 }
 
+// -- Contradictions summary (prominent alert section) --
+
+function ContradictionsSummary({
+  contradictions,
+  names,
+  hrefs,
+}: {
+  contradictions: VerdictRow[];
+  names: NameMap;
+  hrefs: HrefMap;
+}) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  if (contradictions.length === 0) return null;
+
+  return (
+    <div className="rounded-lg border-2 border-red-500/40 bg-red-500/5 dark:bg-red-500/10 mb-6">
+      {/* Header */}
+      <button
+        type="button"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="w-full flex items-center gap-3 px-5 py-4 text-left hover:bg-red-500/5 transition-colors rounded-t-lg"
+      >
+        <AlertOctagon className="h-5 w-5 text-red-600 dark:text-red-400 shrink-0" />
+        <div className="flex-1 min-w-0">
+          <h3 className="text-sm font-semibold text-red-700 dark:text-red-400">
+            {contradictions.length} Contradicted Verdict{contradictions.length !== 1 ? "s" : ""}
+          </h3>
+          <p className="text-xs text-red-600/70 dark:text-red-400/60 mt-0.5">
+            Source evidence contradicts these claims — review and correct
+          </p>
+        </div>
+        {isCollapsed ? (
+          <ChevronDown className="h-4 w-4 text-red-600/60 shrink-0" />
+        ) : (
+          <ChevronUp className="h-4 w-4 text-red-600/60 shrink-0" />
+        )}
+      </button>
+
+      {/* Contradiction cards */}
+      {!isCollapsed && (
+        <div className="px-5 pb-4 space-y-3">
+          {contradictions.map((v) => {
+            const entityName = v.entityId ? names[v.entityId] : null;
+            const recordName = names[v.recordId];
+            const entityHref = v.entityId ? hrefs[v.entityId] : null;
+            const detailHref = `/source-checks/${encodeURIComponent(v.recordType)}/${encodeURIComponent(v.recordId)}`;
+
+            return (
+              <div
+                key={`${v.recordType}:${v.recordId}:${v.fieldName ?? ""}`}
+                className="rounded-md border border-red-500/20 bg-background p-4"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-1 min-w-0 space-y-2">
+                    {/* Entity + record type */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold bg-red-500/15 text-red-600 uppercase tracking-wider">
+                        {v.recordType}
+                      </span>
+                      {entityName && (
+                        entityHref ? (
+                          <a
+                            href={entityHref}
+                            className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+                          >
+                            {entityName}
+                          </a>
+                        ) : (
+                          <span className="text-sm font-medium">{entityName}</span>
+                        )
+                      )}
+                      {!entityName && v.entityId && (
+                        <span className="text-sm font-mono text-muted-foreground">{v.entityId}</span>
+                      )}
+                    </div>
+
+                    {/* Field / record identifier */}
+                    <div className="text-sm">
+                      <span className="text-muted-foreground">Claim: </span>
+                      <span className="font-medium">
+                        {recordName || v.recordId}
+                        {v.fieldName && (
+                          <span className="text-muted-foreground font-normal"> / {v.fieldName}</span>
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Reasoning */}
+                    {v.reasoning && (
+                      <p className="text-sm text-muted-foreground leading-relaxed">
+                        {v.reasoning}
+                      </p>
+                    )}
+
+                    {/* Metadata row */}
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      {v.confidence != null && (
+                        <span className="tabular-nums">
+                          Confidence: <span className="font-medium text-red-600">{Math.round(v.confidence * 100)}%</span>
+                        </span>
+                      )}
+                      {v.lastComputedAt && (
+                        <span className="tabular-nums">
+                          Checked: {new Date(v.lastComputedAt).toLocaleDateString()}
+                        </span>
+                      )}
+                      {v.sourcesChecked > 0 && (
+                        <span>{v.sourcesChecked} source{v.sourcesChecked !== 1 ? "s" : ""}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Detail link */}
+                  <a
+                    href={detailHref}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-red-500/30 bg-red-500/5 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-500/10 dark:text-red-400 transition-colors shrink-0"
+                    title="View source check detail"
+                  >
+                    Review <ArrowUpRight className="h-3 w-3" />
+                  </a>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // -- Main viewer --
 
 interface CoverageRow {
@@ -556,6 +690,12 @@ export function EntitySourceChecksViewer() {
         return true;
       }),
     [verdicts, filterType, filterVerdict]
+  );
+
+  // All contradicted verdicts (unfiltered) for the prominent summary section
+  const contradictedVerdicts = useMemo(
+    () => verdicts.filter((v) => v.verdict === "contradicted"),
+    [verdicts]
   );
 
   // Memoize columns so they update when record names / hrefs are resolved
@@ -681,6 +821,13 @@ export function EntitySourceChecksViewer() {
           <p className={cn("text-2xl font-bold tabular-nums", needsRecheckCount > 0 ? "text-amber-600" : "")}>{needsRecheckCount}</p>
         </div>
       </div>
+
+      {/* Contradictions alert section */}
+      <ContradictionsSummary
+        contradictions={contradictedVerdicts}
+        names={recordNames}
+        hrefs={entityHrefs}
+      />
 
       {/* Filter tabs */}
       <div className="space-y-3 mb-4">
