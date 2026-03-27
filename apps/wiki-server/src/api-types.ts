@@ -1348,3 +1348,18 @@ export const ProposeClaimsSchema = z.object({
     .max(100),
 });
 export type ProposeClaims = z.infer<typeof ProposeClaimsSchema>;
+
+export const ClaimVerdictSchema = z.object({
+  claimId: z.number().int().positive(),
+  status: z.enum(["verified", "contradicted", "unverifiable"]),
+  confidence: z.number().min(0).max(1),
+  reasoning: z.string().max(5000),
+  extractedValue: z.string().max(5000).optional(),
+  checkerModel: z.string().max(100).optional(),
+});
+export type ClaimVerdict = z.infer<typeof ClaimVerdictSchema>;
+
+export const ClaimVerdictBatchSchema = z.object({
+  verdicts: z.array(ClaimVerdictSchema).min(1).max(100),
+});
+export type ClaimVerdictBatch = z.infer<typeof ClaimVerdictBatchSchema>;

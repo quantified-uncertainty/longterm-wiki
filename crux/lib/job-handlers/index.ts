@@ -14,6 +14,7 @@ import { handlePageImprove } from './page-improve.ts';
 import { handlePageCreate } from './page-create.ts';
 import { handleBatchCommit } from './batch-commit.ts';
 import { handleAutoUpdateDigest } from './auto-update-digest.ts';
+import { handleClaimVerification } from './claim-verification.ts';
 
 // ---------------------------------------------------------------------------
 // Handler Registry
@@ -66,6 +67,9 @@ const handlers: Record<string, JobHandler> = {
 
   // Auto-update pipeline
   'auto-update-digest': handleAutoUpdateDigest,
+
+  // Claims-first verification (#3253)
+  'claim-verification': handleClaimVerification,
 };
 
 /**
