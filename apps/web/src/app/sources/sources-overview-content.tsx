@@ -75,7 +75,7 @@ export function SourcesOverviewContent() {
             Publications
           </h3>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            {publications.length} publication venues with credibility ratings
+            {publications.length} publications with credibility ratings
             (1-5 scale). Maps domains to venues for automatic resource
             credibility assignment.
           </p>
