@@ -14,6 +14,7 @@ import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
+import { detectDeployTasks, formatDeployTasksSection } from '../lib/deploy-tasks/detect.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -143,6 +144,12 @@ export function generateReleaseBody(opts: {
       lines.push('');
     }
   }
+
+  // Detect deploy tasks from the diff
+  const deployResult = detectDeployTasks('origin/production');
+  const deploySection = formatDeployTasksSection(deployResult.tasks);
+  lines.push(deploySection);
+  lines.push('');
 
   lines.push('---');
   lines.push(`[Full diff](https://github.com/${repoSlug}/compare/production...main)`);

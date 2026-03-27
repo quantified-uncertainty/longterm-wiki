@@ -92,14 +92,25 @@ Pay special attention to:
 
 Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/push-and-ensure-green` will create one using `crux gh pr create`.
 
-## Step 4b: Consider post-merge verification
+## Step 4b: Deploy task detection and injection (MANDATORY)
 
-If this PR changes CI, Vercel config, GitHub Actions, scheduled workflows, or other infrastructure whose effect **cannot be verified by build + test alone**, add an entry to `.claude/audits.yaml`:
+Run the deploy task detector to check if this PR has post-deploy requirements:
 
-- Add a `post_merge` item with the PR number, what to verify, how to verify it, and a deadline (typically 1-2 weeks after merge)
-- If the property should be checked permanently, add it as an ongoing audit item in the `audits` section instead
+```bash
+pnpm crux gh deploy-tasks detect
+```
 
-Skip this step if the PR only changes code, content, or styling that is fully verified by CI.
+If tasks are detected, inject the deploy checklist into the PR description:
+
+```bash
+pnpm crux gh deploy-tasks inject --pr=<PR_NUMBER>
+```
+
+If no PR exists yet, the inject command without `--pr` outputs the section — include it when creating the PR body.
+
+This is **automatic** and **deterministic** — the detector scans the diff for migrations, env vars, workflow changes, schema changes, Docker changes, etc. You do not need to manually remember which changes need post-deploy verification.
+
+For infrastructure changes that the detector does **not** cover (DNS changes, external service configuration, manual database operations), also add a `post_merge` entry to `.claude/audits.yaml` with the PR number, what to verify, and a deadline.
 
 ## Step 5: Update GitHub issue
 

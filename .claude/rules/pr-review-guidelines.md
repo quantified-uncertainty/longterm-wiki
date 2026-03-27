@@ -46,6 +46,14 @@ If `/agent-session-start` was not run (e.g., a quick fix session), run `/agent-s
 
 As a bare minimum, always open a PR before considering work complete.
 
+## Deploy task detection
+
+Before opening a PR, run `pnpm crux gh deploy-tasks detect` to check for post-deploy requirements. If tasks are detected, inject them into the PR description with `pnpm crux gh deploy-tasks inject --pr=<N>`. The `/agent-session-ready-PR` skill handles this automatically.
+
+The deploy task system auto-detects: new migrations, manual SQL scripts, new env vars, GitHub Actions changes, schema changes, config changes, new API routes, build pipeline changes, and Docker changes. For anything the detector misses, add tasks manually to the `## Deploy Checklist` section.
+
+When merging a release PR (main→production), run `/deploy` to collect all deploy tasks from included PRs, monitor deployment, and verify tasks.
+
 ## Post-merge verification
 
 When a PR changes infrastructure, CI config, Vercel settings, GitHub Actions, DNS, or any behavior that **cannot be verified by `pnpm build` + `pnpm test`**, consider adding an entry to `.claude/audits.yaml`:
