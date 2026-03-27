@@ -26,6 +26,9 @@
     - id: mK9pX3rQ7n
       type: organization
       relationship: created-by
+    - id: R3iYKUUe2g
+      type: ai-model
+      relationship: composed-of
     - id: Ko9DCNV87A
       type: ai-model
       relationship: composed-of
@@ -82,6 +85,51 @@
     - ai-assistant
     - frontier-ai
   lastUpdated: 2026-02
+
+- id: claude-2
+  stableId: R3iYKUUe2g
+  wikiId: E2105
+  type: ai-model
+  title: Claude 2
+  modelFamily: Claude
+  modelTier: mid
+  generation: "2"
+  developer: anthropic
+  releaseDate: "2023-07-11"
+  contextWindow: 100000
+  openWeight: false
+  modality:
+    - text
+  benchmarks:
+    - name: MMLU
+      score: 78.5
+      unit: "%"
+    - name: HumanEval
+      score: 71.2
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    Claude 2 was released on July 11, 2023 as Anthropic's second-generation model. It introduced
+    a dramatically expanded context window of 100,000 tokens — among the largest at the time —
+    and improved coding and reasoning capabilities compared to Claude 1. Scored 78.5% on MMLU
+    and 71.2% on HumanEval. Available via API and the claude.ai interface. Superseded by Claude 3
+    in March 2024.
+  relatedEntries:
+    - id: cMKB5i2WZQ
+      type: ai-model
+      relationship: part-of
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: created-by
+  sources:
+    - title: Claude 2 Announcement
+      url: https://www.anthropic.com/news/claude-2
+  tags:
+    - claude
+    - claude-2
+    - historical
+  lastUpdated: 2023-07
 
 - id: claude-3-opus
   stableId: Ko9DCNV87A
@@ -872,6 +920,9 @@
     - id: 1LcLlMGLbw
       type: organization
       relationship: created-by
+    - id: bFjrDfX8rQ
+      type: ai-model
+      relationship: composed-of
     - id: Zd0khJQ6XA
       type: ai-model
       relationship: composed-of
@@ -898,6 +949,58 @@
     - openai
     - frontier-ai
   lastUpdated: 2025-04
+
+- id: gpt-3-5-turbo
+  stableId: bFjrDfX8rQ
+  wikiId: E2104
+  type: ai-model
+  title: GPT-3.5 Turbo
+  modelFamily: GPT
+  modelTier: mid
+  generation: "3.5"
+  developer: openai
+  releaseDate: "2023-03-01"
+  inputPrice: 0.50
+  outputPrice: 1.50
+  contextWindow: 16385
+  openWeight: false
+  modality:
+    - text
+  trainingCutoff: "2021-09"
+  benchmarks:
+    - name: MMLU
+      score: 70.0
+      unit: "%"
+    - name: HumanEval
+      score: 48.1
+      unit: "%"
+  capabilities:
+    - tool-use
+  description: >-
+    GPT-3.5 Turbo was released via the OpenAI API in March 2023 and powered the original ChatGPT
+    launched in November 2022. It represented a major improvement over GPT-3 in instruction-following
+    and conversational ability. The model features a 16K token context window (16,385 tokens).
+    Priced at \$0.50/\$1.50 per million tokens (input/output). Largely superseded by GPT-4o mini,
+    which is cheaper and more capable, but remains historically significant as the model behind
+    ChatGPT's viral launch.
+  relatedEntries:
+    - id: Gqv7h9oEwA
+      type: ai-model
+      relationship: part-of
+    - id: 1LcLlMGLbw
+      type: organization
+      relationship: created-by
+  sources:
+    - title: OpenAI ChatGPT Launch (November 2022)
+      url: https://openai.com/blog/chatgpt
+    - title: OpenAI Models Documentation — GPT-3.5 Turbo
+      url: https://platform.openai.com/docs/models/gpt-3-5-turbo
+  tags:
+    - gpt
+    - gpt-3
+    - chatgpt
+    - historical
+  lastUpdated: 2023-03
 
 - id: gpt-4
   stableId: Zd0khJQ6XA

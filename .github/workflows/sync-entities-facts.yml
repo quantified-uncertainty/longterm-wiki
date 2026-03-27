@@ -1,18 +1,21 @@
-name: Sync Entities
-run-name: "Sync Entities${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+name: Sync Entities & Facts
+run-name: "Sync Entities & Facts${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
 on:
   push:
     branches: [main, production]
     paths:
       - "data/entities/**"
+      - "packages/factbase/data/things/**"
       # Also trigger when the sync/prune pipeline or workflow config changes,
       # so that new prune logic is exercised immediately after merge. See #2796.
       - "crux/wiki-server/sync-entities.ts"
+      - "crux/wiki-server/sync-facts.ts"
       - "apps/wiki-server/src/routes/tablebase/entities.ts"
+      - "apps/wiki-server/src/routes/factbase/facts.ts"
       - ".github/workflows/sync-entities-facts.yml"
 
-  # Run weekly to catch stale entities that missed path-triggered syncs.
+  # Run weekly to catch stale entities/facts that missed path-triggered syncs.
   # Ghost entries can persist if entity YAML is deleted but the sync workflow
   # doesn't trigger (e.g., production branch is stale). See #2796.
   schedule:
@@ -36,7 +39,7 @@ jobs:
     uses: ./.github/workflows/_preflight-wiki-server.yml
     secrets: inherit
 
-  sync-entities:
+  sync:
     needs: [preflight]
     runs-on: ubuntu-latest
 
@@ -58,6 +61,12 @@ jobs:
 
       - name: Sync entities to wiki-server
         run: pnpm crux wiki-server sync-entities
+        env:
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+
+      - name: Sync facts to wiki-server
+        run: pnpm crux wiki-server sync-facts
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}

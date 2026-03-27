@@ -377,6 +377,15 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'factbase-entity-ids',
+    name: 'FactBase ↔ TableBase entity ID consistency (duplicates, stableId mismatches)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-entity-ids.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: stableId mismatches and duplicate entity IDs cause financial data
+    // to silently disappear from directory pages (facts join on stableId).
+  },
+  {
     id: 'kb-entity-slugs',
     name: 'KB entity slug validation (FactBase refs have entity registry entries)',
     command: 'npx',
@@ -562,6 +571,26 @@ const PARALLEL_STEPS: Step[] = [
     // encouraged but not yet mandatory for all tables.
     advisory: true,
     emitOutputInCi: true,
+  },
+  {
+    id: 'display-names',
+    name: 'Display name quality (no raw machine IDs in titles)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-display-names.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: raw stableIds or "Unknown" in entity titles produce broken
+    // display on organization pages, people pages, and directory listings.
+    // These indicate data pipeline bugs that should be caught immediately.
+  },
+  {
+    id: 'display-formatting',
+    name: 'Display formatting quality (no [object Object], no unescaped MDX in titles)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-display-formatting.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: [object Object] in any field and unescaped MDX characters in
+    // titles indicate serialization bugs or data contamination that produce
+    // broken rendering.
   },
 ];
 

@@ -6,7 +6,7 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
-import type { UpsertResource, UpdateResourceFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
+import type { UpsertResource, UpdateResourceFetchStatus, SuggestResources } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { ResourcesRoute } from '../../../apps/wiki-server/src/routes/wikibase/resources.ts';
 
@@ -99,4 +99,16 @@ export async function updateResourceFetchStatus(
     `/api/resources/${encodeURIComponent(id)}/fetch-status`,
     status,
   );
+}
+
+// ---------------------------------------------------------------------------
+// Suggest resources (claims-first verification pipeline)
+// ---------------------------------------------------------------------------
+
+export type SuggestResourcesResult = InferResponseType<RpcClient['suggest']['$post'], 200>;
+
+export async function suggestResourcesApi(
+  input: SuggestResources,
+): Promise<ApiResult<SuggestResourcesResult>> {
+  return apiRequest<SuggestResourcesResult>('POST', '/api/resources/suggest', input);
 }

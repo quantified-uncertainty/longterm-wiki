@@ -8,6 +8,7 @@ import {
   sql,
   desc,
   lte,
+  gte,
   ne,
   isNull,
   inArray,
@@ -1099,6 +1100,11 @@ const sourceChecksApp = new Hono()
     if (record_type) {
       conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
     }
+    // Push min_priority into SQL so the total count and pagination are correct.
+    // The CASE expression is wrapped in a subquery to avoid repeating it.
+    if (min_priority !== undefined) {
+      conditions.push(gte(priorityExpr, min_priority));
+    }
 
     const whereClause = and(...conditions);
 
@@ -1126,13 +1132,7 @@ const sourceChecksApp = new Hono()
       .limit(limit)
       .offset(offset);
 
-    // Apply min_priority filter in-app (simpler than adding it to the SQL WHERE
-    // since the CASE expression would need to be repeated)
-    const filtered = min_priority !== undefined
-      ? rows.filter((r) => r.priority >= min_priority)
-      : rows;
-
-    // Count total matching rows
+    // Count total matching rows (includes min_priority filter)
     const countResult = await db
       .select({ count: count() })
       .from(sourceCheckVerdicts)
@@ -1140,7 +1140,7 @@ const sourceChecksApp = new Hono()
     const total = countResult[0].count;
 
     return c.json({
-      items: filtered.map((r) => ({
+      items: rows.map((r) => ({
         recordType: r.recordType,
         recordId: r.recordId,
         fieldName: r.fieldName,

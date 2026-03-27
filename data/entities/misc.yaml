@@ -64,6 +64,9 @@
   wikiId: E924
   type: event
   title: Anthropic-Pentagon Standoff (2026)
+  aliases:
+    - Anthropic Pentagon Standoff
+    - Anthropic Supply Chain Risk Designation
   customFields:
     - label: Key Question
       value: Will the supply chain risk designation survive legal challenge?
@@ -264,37 +267,6 @@
       type: person
     - id: Jtj6jHbuQ7
       type: person
-  lastUpdated: 2026-02
-
-- id: long-term-benefit-trust
-  stableId: eNJ3h95yWw
-  wikiId: E407
-  type: analysis
-  title: Long-Term Benefit Trust (Anthropic)
-  description: >-
-    Independent governance mechanism at Anthropic designed to ensure board
-    accountability to humanity's long-term benefit through financially
-    disinterested trustees with growing board appointment power.
-  tags:
-    - anthropic
-    - governance
-    - trust-structure
-    - board-oversight
-    - public-benefit-corporation
-  clusters:
-    - ai-safety
-    - governance
-  relatedEntries:
-    - id: mK9pX3rQ7n
-      type: organization
-    - id: zR4nW8xB2f
-      type: person
-    - id: tKMznr07QA
-      type: person
-    - id: vzxfzxBITd
-      type: person
-    - id: gNsqAes7Dw
-      type: organization
   lastUpdated: 2026-02
 
 - id: musk-openai-lawsuit

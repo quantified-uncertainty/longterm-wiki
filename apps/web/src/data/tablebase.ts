@@ -33,6 +33,7 @@ import {
   isPolicy,
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
+import { isAlphanumeric10 } from "@/lib/stable-id";
 
 // Re-export for consumers
 export type { WithSource };
@@ -91,6 +92,7 @@ export interface RawEntity {
   customFields?: { label: string; value: string; link?: string }[];
   relatedTopics?: string[];
   relatedEntries?: { id: string; type: string; relationship?: string }[];
+  aliases?: string[];
   tags?: string[];
   lastUpdated?: string;
   sourceRefs?: string[];
@@ -501,7 +503,7 @@ function resolveIdWithoutRegistry(id: string): string {
     return registry.byWikiId[id] || id;
   }
   // StableId: 10-char alphanumeric → slug
-  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+  if (isAlphanumeric10(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }
@@ -597,7 +599,7 @@ export function resolveId(id: string): string {
     return registry.byWikiId[id] || id;
   }
   // StableId: 10-char alphanumeric → slug
-  if (/^[A-Za-z0-9]{10}$/.test(id)) {
+  if (isAlphanumeric10(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }

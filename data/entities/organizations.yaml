@@ -8,6 +8,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Anthropic
+  aliases:
+    - Anthropic PBC
+    - Anthropic AI
   website: https://anthropic.com
   relatedEntries:
     - id: zR4nW8xB2f
@@ -109,6 +112,10 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Google DeepMind
+  aliases:
+    - DeepMind
+    - DeepMind Technologies
+    - Google DeepMind
   website: https://deepmind.google
   relatedEntries:
     - id: Aqcyu3onCA
@@ -201,6 +208,10 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: OpenAI
+  aliases:
+    - OpenAI Inc
+    - OpenAI LP
+    - OpenAI Global LLC
   website: https://openai.com
   relatedEntries:
     - id: JKsVHQ5stQ
@@ -271,6 +282,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: xAI
+  aliases:
+    - xAI Corp
+    - X.AI
   website: https://x.ai
   relatedEntries:
     - id: 69vftmr1jg
@@ -321,6 +335,8 @@
   parentOrg: ksqqi7fyeA
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
+  aliases:
+    - CHAI
   website: https://humancompatible.ai
   relatedEntries:
     - id: Ub7IaobzDA
@@ -409,6 +425,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Center for AI Safety (CAIS)
+  aliases:
+    - CAIS
   website: https://safe.ai
   relatedEntries:
     - id: bQ9a5lwwlg
@@ -444,6 +462,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Conjecture
+  aliases:
+    - Conjecture AI
   website: https://conjecture.dev
   relatedEntries:
     - id: CrXoCsIucX
@@ -646,6 +666,9 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Alignment Research Center (ARC)
+  aliases:
+    - ARC
+    - ARC Alignment
   website: https://alignment.org
   relatedEntries:
     - id: vzxfzxBITd
@@ -754,6 +777,11 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Machine Intelligence Research Institute (MIRI)
+  aliases:
+    - MIRI
+    - Singularity Institute
+    - Singularity Institute for Artificial Intelligence
+    - SIAI
   website: https://intelligence.org
   relatedEntries:
     - id: fS1tEGKuNq
@@ -1542,36 +1570,111 @@
 # Batch 4 - Organization Entity Definitions
 # Generated 2026-02-08
 
+- id: long-term-benefit-trust
+  stableId: eNJ3h95yWw
+  wikiId: E407
+  type: organization
+  orgType: generic
+  title: Anthropic Long-Term Benefit Trust
+  website: https://www.anthropic.com/news/the-long-term-benefit-trust
+  description: >-
+    Delaware purpose trust established in 2023 to ensure Anthropic responsibly
+    develops AI for humanity's long-term benefit. Holds Class T Common Stock with
+    negligible economic value but significant governance power, including the
+    authority to appoint a majority (3 of 5) of Anthropic's board of directors.
+    Trustees are financially disinterested and serve one-year terms.
+  tags:
+    - nonprofit-governance
+    - corporate-structure
+    - ai-safety
+    - purpose-trust
+    - delaware-trust
+    - anthropic
+  clusters:
+    - governance
+  relatedEntries:
+    - id: mK9pX3rQ7n
+      type: organization
+      relationship: part-of
+    - id: vzxfzxBITd
+      type: person
+    - id: gA9eoKhFAM
+      type: person
+    - id: n-9NN6o_sj
+      type: person
+    - id: sy20C906g2
+      type: person
+    - id: 978SGjc9_-
+      type: person
+    - id: zR4nW8xB2f
+      type: person
+    - id: tKMznr07QA
+      type: person
+    - id: gNsqAes7Dw
+      type: organization
+  sources:
+    - title: "Anthropic: The Long-Term Benefit Trust"
+      url: https://www.anthropic.com/news/the-long-term-benefit-trust
+    - title: "Harvard Law Forum: Anthropic Long-Term Benefit Trust"
+      url: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
+    - title: "AI Lab Watch: Anthropic's Certificate of Incorporation"
+      url: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
+  lastUpdated: 2026-03
+
 - id: openai-foundation
   stableId: GQuPhNkZbg
   wikiId: E421
   type: organization
-  orgType: generic
+  orgType: funder
   title: OpenAI Foundation
-  website: https://openai.com/
+  website: https://openaifoundation.org
   description: >-
-    Nonprofit organization holding 26% equity stake (~$130B) in OpenAI Group PBC,
-    with governance control through board appointment rights and philanthropic
-    commitments focused on health and AI resilience.
+    501(c)(3) nonprofit (formerly OpenAI, Inc.) that retains governance control
+    over OpenAI Group PBC through sole authority to appoint and remove all PBC
+    board directors. Holds a 26% equity stake valued at approximately \$130
+    billion. Operates the Safety and Security Committee with power to halt model
+    releases. Committed \$1 billion in grants for 2026-2027 across health, AI
+    resilience, economic impact, and civil society programs.
   tags:
     - nonprofit-governance
     - ai-philanthropy
     - corporate-structure
     - accountability
     - openai
+    - restructuring
+    - pbc-governance
+    - safety-oversight
   clusters:
     - governance
     - community
   relatedEntries:
     - id: 1LcLlMGLbw
       type: organization
+      relationship: part-of
     - id: JKsVHQ5stQ
       type: person
-    - id: mK9pX3rQ7n
-      type: organization
+    - id: jPuOTgOJGS
+      type: person
+    - id: sNy2jENSLL
+      type: person
+    - id: 7oi_TL68Fy
+      type: person
+    - id: Ioa0kxj1_7
+      type: person
+    - id: 3U1A3jX8wC
+      type: person
     - id: 3w5hW5liew
       type: concept
-  lastUpdated: 2026-02
+  sources:
+    - title: "OpenAI: Built to Benefit Everyone"
+      url: https://openai.com/index/built-to-benefit-everyone/
+    - title: "OpenAI: Our Structure"
+      url: https://openai.com/our-structure/
+    - title: "Update on the OpenAI Foundation (March 2026)"
+      url: https://openai.com/index/update-on-the-openai-foundation/
+    - title: "CA AG MOU (October 2025)"
+      url: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
+  lastUpdated: 2026-03
 
 - id: leading-the-future
   stableId: pg7Ym4EQ9A
@@ -1673,6 +1776,9 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Safe Superintelligence Inc. (SSI)
+  aliases:
+    - SSI
+    - Safe Superintelligence
   website: https://ssi.inc/
   description: >-
     AI research startup founded by Ilya Sutskever, Daniel Gross, and Daniel Levy
@@ -2084,6 +2190,8 @@
   type: organization
   orgType: funder
   title: Chan Zuckerberg Initiative
+  aliases:
+    - CZI
   website: https://chanzuckerberg.com/
   description: >-
     The Chan Zuckerberg Initiative is a philanthropic LLC that has pivoted
@@ -2116,6 +2224,10 @@
   type: organization
   orgType: funder
   title: Coefficient Giving
+  aliases:
+    # Historical name — Coefficient Giving was formerly Open Philanthropy's grantmaking arm
+    - Open Philanthropy
+    - OP
   website: https://www.coefficientgiving.org
   description: >-
     Coefficient Giving (formerly Open Philanthropy) has directed $4B+ in grants
@@ -2686,6 +2798,11 @@
   orgType: frontier-lab
   summaryPage: labs-overview
   title: Meta AI (FAIR)
+  aliases:
+    - Meta AI
+    - FAIR
+    - Facebook AI Research
+    - Meta Fundamental AI Research
   website: https://ai.meta.com/
   description: >-
     Meta AI has invested $66-72B in AI infrastructure (2025) with AGI targeted
@@ -2857,6 +2974,8 @@
   type: organization
   orgType: startup
   title: Red Queen Bio
+  aliases:
+    - RQB
   website: https://www.redqueen.bio/
   description: >-
     An AI biosecurity Public Benefit Corporation founded in 2025 by Nikolai
@@ -2875,6 +2994,8 @@
   orgType: safety-org
   summaryPage: safety-orgs-overview
   title: Redwood Research
+  aliases:
+    - Redwood
   website: https://redwoodresearch.org
   relatedEntries:
     - id: JqMTO0YVEA
@@ -3077,6 +3198,8 @@
   type: organization
   orgType: funder
   title: Survival and Flourishing Fund (SFF)
+  aliases:
+    - SFF
   website: https://survivalandflourishing.fund/
   description: >-
     SFF distributed $141M since 2019 (primarily from Jaan Tallinn's ~$900M
@@ -5152,7 +5275,7 @@
       type: person
     - id: jExOzigU4B
       type: person
-    - id: 8Mk8-7uSm6
+    - id: PFfb7RFhTg
       type: person
     - id: tVhfitccVu
       type: person
@@ -5370,6 +5493,8 @@
   type: organization
   orgType: generic
   title: GiveWell
+  aliases:
+    - GiveWell.org
   website: https://www.givewell.org
   description: >-
     Nonprofit charity evaluator founded in 2007 by Holden Karnofsky and Elie
@@ -5927,6 +6052,8 @@
   type: organization
   orgType: funder
   title: ACX Grants
+  aliases:
+    - Astral Codex Ten Grants
   website: https://www.astralcodexten.com/p/acx-grants-results
   description: >-
     ACX Grants is a grant program run by Scott Alexander through his Astral
@@ -6898,7 +7025,7 @@
 
 # --- ARIA Safeguarded AI grantee universities ---
 - id: university-college-london
-  stableId: ln8-CgTqI8
+  stableId: HEAdFvsqJw
   type: organization
   orgType: academic
   title: University College London
@@ -8523,7 +8650,7 @@
   lastUpdated: 2026-03
 
 - id: world-economic-forum
-  stableId: FqdVIQLb-I
+  stableId: nOszW4yDzw
   type: organization
   orgType: generic
   title: World Economic Forum
@@ -8767,7 +8894,7 @@
     - id: UvpZCnW3wA
       type: organization
       relationship: enables
-    - id: HqHZwHBnH_
+    - id: Tbq2qL6mbA
       type: organization
       relationship: enables
   sources:
@@ -8808,7 +8935,7 @@
   lastUpdated: 2026-03
 
 - id: smic
-  stableId: 09_v0xRGgS
+  stableId: Qnt7osskRA
   wikiId: E2608
   type: organization
   orgType: generic
@@ -8836,7 +8963,7 @@
   lastUpdated: 2026-03
 
 - id: amd
-  stableId: HqHZwHBnH_
+  stableId: Tbq2qL6mbA
   wikiId: E2609
   type: organization
   orgType: generic
@@ -8857,7 +8984,7 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: RB8fKn8-tA
+    - id: vr5HogmRLQ
       type: person
       relationship: leads-to
   sources:
@@ -8895,7 +9022,7 @@
   lastUpdated: 2026-03
 
 - id: bureau-of-industry-and-security
-  stableId: GVy4_Tlsa-
+  stableId: K1hxe7b9SA
   wikiId: E2611
   type: organization
   orgType: government
@@ -8984,7 +9111,7 @@
   lastUpdated: 2026-03
 
 - id: semiconductor-industry-association
-  stableId: Ss1JR_v3Ld
+  stableId: ezdMt069kA
   wikiId: E2614
   type: organization
   orgType: generic
@@ -9026,7 +9153,7 @@
   lastUpdated: 2026-03
 
 - id: tokyo-electron
-  stableId: ER_K4Y_mj7
+  stableId: 2dQxYx0aVA
   type: organization
   orgType: generic
   title: Tokyo Electron
@@ -9128,7 +9255,7 @@
   lastUpdated: 2026-03
 
 - id: qualcomm
-  stableId: Q2q_4brdL-
+  stableId: 9PuCCs56UQ
   type: organization
   orgType: generic
   title: Qualcomm
@@ -9141,7 +9268,7 @@
   lastUpdated: 2026-03
 
 - id: cambricon
-  stableId: O8FL_Svad_
+  stableId: tkD0H2KyCQ
   type: organization
   orgType: generic
   title: Cambricon Technologies
@@ -9153,7 +9280,7 @@
   lastUpdated: 2026-03
 
 - id: biren-technology
-  stableId: TpN_rNyN9V
+  stableId: wEy0RcQyjQ
   type: organization
   orgType: startup
   title: Biren Technology
@@ -9190,7 +9317,7 @@
   lastUpdated: 2026-03
 
 - id: cxmt
-  stableId: w_4zbNf3lK
+  stableId: gbqVMWgcXA
   type: organization
   orgType: generic
   title: ChangXin Memory Technologies

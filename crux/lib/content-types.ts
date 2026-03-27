@@ -102,6 +102,7 @@ export type PathRegistry = Record<string, string>;
 
 export interface PageEntry {
   id: string;
+  wikiId?: string;
   path: string;
   filePath?: string;
   title: string;

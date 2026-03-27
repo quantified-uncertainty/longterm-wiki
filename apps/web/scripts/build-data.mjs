@@ -501,6 +501,28 @@ async function main() {
 
   // Merge: YAML entities take precedence, frontmatter fills gaps
   const entities = [...yamlEntities, ...frontmatterEntities];
+
+  // ── Fail-fast: reject duplicate entity IDs ──
+  // YAML lists allow duplicate `id` fields without parse errors, but they cause
+  // silent data corruption. This was the root cause of a cascading CI failure
+  // when merge conflict resolutions duplicated entries in people.yaml.
+  {
+    const idCounts = new Map();
+    for (const e of entities) {
+      idCounts.set(e.id, (idCounts.get(e.id) || 0) + 1);
+    }
+    const dupes = [...idCounts.entries()].filter(([, count]) => count > 1);
+    if (dupes.length > 0) {
+      console.error('\n  ERROR: Duplicate entity IDs detected:');
+      for (const [id, count] of dupes.slice(0, 20)) {
+        console.error(`    ${id}: ${count} occurrences`);
+      }
+      if (dupes.length > 20) console.error(`    ... and ${dupes.length - 20} more`);
+      console.error('\n  Fix: run `python3 -c "..."` dedup or check merge conflict resolutions.\n');
+      process.exit(1);
+    }
+  }
+
   database.entities = entities;
 
   // =========================================================================
@@ -582,6 +604,7 @@ async function main() {
           type: resolveEntityType(entity.type) || entity.type,
           name: entity.title || entity.id,
           ...(entity.wikiId && { wikiPageId: entity.wikiId, wikiId: entity.wikiId }),
+          ...(Array.isArray(entity.aliases) && entity.aliases.length > 0 && { aliases: entity.aliases }),
         });
       }
     }

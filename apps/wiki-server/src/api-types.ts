@@ -760,6 +760,26 @@ export interface ResourceListResult {
   offset: number;
 }
 
+// -- Resources: Suggest endpoint ------------------------------------------------
+
+export const SUGGEST_RESOURCES_MAX_URLS = 50;
+export const SUGGEST_RESOURCES_DEFAULT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+export const SuggestResourcesSchema = z.object({
+  urls: z.array(z.string().url().max(2000)).min(1).max(SUGGEST_RESOURCES_MAX_URLS),
+  entityId: z.string().max(200).optional(),
+  agentSessionId: z.string().max(200).optional(),
+  maxContentAgeMs: z.number().int().positive().optional(),
+});
+export type SuggestResources = z.infer<typeof SuggestResourcesSchema>;
+
+export const CONTENT_STATUS_VALUES = [
+  "fresh",
+  "stale",
+  "missing",
+] as const;
+export type ContentStatus = (typeof CONTENT_STATUS_VALUES)[number];
+
 // ---------------------------------------------------------------------------
 // Entities
 // ---------------------------------------------------------------------------

@@ -59,6 +59,7 @@ function resolvePersonEntity(slug: string): Entity | undefined {
       name: resolved.title,
       wikiId: resolved.wikiId,
       wikiPageId: resolved.wikiId,
+      ...(resolved.aliases && resolved.aliases.length > 0 && { aliases: resolved.aliases }),
     };
   }
 
@@ -72,6 +73,7 @@ function resolvePersonEntity(slug: string): Entity | undefined {
       name: typedEntity.title,
       wikiId: typedEntity.wikiId,
       wikiPageId: typedEntity.wikiId,
+      ...(typedEntity.aliases && typedEntity.aliases.length > 0 && { aliases: typedEntity.aliases }),
     };
   }
   return undefined;

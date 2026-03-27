@@ -7,11 +7,16 @@
  *   crux sys agents update <id> [--step="..."] [--status=X]          Update agent state
  *   crux sys agents heartbeat <id>                                   Send heartbeat
  *   crux sys agents complete <id>                                    Mark agent as completed
+ *   crux sys agents close [--reason="..."]                           Close current session (auto-discovers agent)
  *   crux sys agents sweep [--timeout=30]                             Mark stale agents
  */
 
+import { existsSync, readFileSync, unlinkSync } from 'fs';
+import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
+import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { gitSafe } from '../lib/git.ts';
 import {
   registerAgent,
   listActiveAgents,
@@ -22,7 +27,8 @@ import {
   type ActiveAgentListResponse,
 } from '../lib/wiki-server/active-agents.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
-import { sweepStaleSessions } from '../lib/wiki-server/agent-sessions.ts';
+import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
+import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
 
 interface CommandOptions extends BaseOptions {
   task?: string;
@@ -36,6 +42,7 @@ interface CommandOptions extends BaseOptions {
   files?: string;
   timeout?: string;
   limit?: string;
+  reason?: string;
   json?: boolean;
   ci?: boolean;
 }
@@ -318,6 +325,118 @@ async function completeCommand(
 }
 
 // ---------------------------------------------------------------------------
+// close — auto-discover agent from local state and close everything
+// ---------------------------------------------------------------------------
+
+async function closeCommand(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const agentIdPath = join(PROJECT_ROOT, '.claude/agent-id');
+  const checklistPath = join(PROJECT_ROOT, '.claude/wip-checklist.md');
+  const agentTaskPath = join(PROJECT_ROOT, '.agent-task');
+  const lastHeartbeatPath = join(PROJECT_ROOT, '.claude/last-heartbeat');
+
+  let output = '';
+  let agentId: number | null = null;
+
+  // 1. Read agent ID from local file
+  if (existsSync(agentIdPath)) {
+    const raw = readFileSync(agentIdPath, 'utf-8').trim();
+    agentId = Number(raw);
+    if (!Number.isInteger(agentId) || agentId < 1) {
+      agentId = null;
+      output += `${c.yellow}⚠ Invalid agent ID in .claude/agent-id: ${raw}${c.reset}\n`;
+    }
+  }
+
+  // Check server availability once for all DB operations
+  const serverUp = await isServerAvailable();
+  const branchResult = gitSafe('rev-parse', '--abbrev-ref', 'HEAD');
+  const branch = options.branch || (branchResult.ok ? branchResult.output : null);
+
+  if (serverUp) {
+    // 2 & 3. Fire independent DB calls in parallel
+    const reason = options.reason ?? 'Session closed via crux sys agents close';
+
+    const agentClosePromise = agentId
+      ? Promise.allSettled([
+          updateAgent(agentId, { status: 'completed' }),
+          appendEvent({ agentId, eventType: 'completed', message: reason }),
+        ])
+      : null;
+
+    const sessionClosePromise = (branch && branch !== 'main' && branch !== 'detached')
+      ? getAgentSessionByBranch(branch).catch(() => null)
+      : null;
+
+    // Await all parallel calls
+    const [agentResults, sessionResult] = await Promise.all([
+      agentClosePromise,
+      sessionClosePromise,
+    ]);
+
+    // Process agent close results
+    if (agentId && agentResults) {
+      const [agentUpdate, eventLog] = agentResults;
+      if (agentUpdate.status === 'fulfilled' && agentUpdate.value.ok) {
+        output += `${c.green}✓${c.reset} Active agent #${agentId} marked completed\n`;
+      } else {
+        const msg = agentUpdate.status === 'rejected'
+          ? (agentUpdate.reason instanceof Error ? agentUpdate.reason.message : String(agentUpdate.reason))
+          : (agentUpdate.value as { message?: string }).message ?? 'unknown error';
+        output += `${c.yellow}⚠ Failed to close active agent #${agentId}: ${msg}${c.reset}\n`;
+      }
+      if (eventLog.status === 'rejected') {
+        output += `${c.dim}  (event log failed: ${eventLog.reason instanceof Error ? eventLog.reason.message : String(eventLog.reason)})${c.reset}\n`;
+      }
+    } else if (!agentId) {
+      output += `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
+    }
+
+    // Process session close result — may need a follow-up call
+    if (sessionResult && 'ok' in sessionResult && sessionResult.ok && sessionResult.data.status === 'active') {
+      try {
+        await updateAgentSession(sessionResult.data.id, { status: 'completed' });
+        output += `${c.green}✓${c.reset} Agent session for ${c.cyan}${branch}${c.reset} marked completed\n`;
+      } catch (e: unknown) {
+        output += `${c.dim}  (session close failed: ${e instanceof Error ? e.message : String(e)})${c.reset}\n`;
+      }
+    }
+  } else {
+    output += agentId
+      ? `${c.yellow}⚠ Wiki server unreachable — skipping DB close${c.reset}\n`
+      : `${c.dim}No .claude/agent-id found — no active agent to close${c.reset}\n`;
+  }
+
+  // 4. Clean up local files
+  const cleaned: string[] = [];
+  for (const [path, label] of [
+    [agentIdPath, '.claude/agent-id'],
+    [checklistPath, '.claude/wip-checklist.md'],
+    [agentTaskPath, '.agent-task'],
+    [lastHeartbeatPath, '.claude/last-heartbeat'],
+  ] as const) {
+    try {
+      unlinkSync(path);
+      cleaned.push(label);
+    } catch {
+      // File doesn't exist — nothing to clean
+    }
+  }
+  if (cleaned.length > 0) {
+    output += `${c.green}✓${c.reset} Cleaned up: ${cleaned.join(', ')}\n`;
+  } else {
+    output += `${c.dim}No local files to clean up${c.reset}\n`;
+  }
+
+  return { exitCode: 0, output };
+}
+
+// ---------------------------------------------------------------------------
 // sweep
 // ---------------------------------------------------------------------------
 
@@ -375,6 +494,7 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
   update: updateCommand,
   heartbeat: heartbeatCommand,
   complete: completeCommand,
+  close: closeCommand,
   sweep: sweepCommand,
 };
 
@@ -389,7 +509,8 @@ Commands:
   status      Show all active agents and detect conflicts (default)
   update      Update agent state (step, files, status)
   heartbeat   Send a heartbeat to prove the agent is alive
-  complete    Mark agent as completed
+  complete    Mark agent as completed (by ID)
+  close       Close current session — auto-discovers agent, marks DB completed, cleans up local files
   sweep       Mark stale agents (no heartbeat for N minutes)
 
 Options:
@@ -401,6 +522,7 @@ Options:
   --status=X       Filter or set: active | completed | errored | stale
   --pr=N           PR number (update, complete)
   --files=a,b,c    Comma-separated files touched (update)
+  --reason="..."   Close reason (close)
   --timeout=30     Stale timeout in minutes (sweep)
   --json           JSON output
   --ci             CI-compatible output
@@ -411,6 +533,8 @@ Examples:
   crux sys agents update 7 --step="Running tests" --files=src/app.ts,src/lib/utils.ts
   crux sys agents heartbeat 7
   crux sys agents complete 7 --pr=123
+  crux sys agents close                    # Close current session (auto-discovers agent)
+  crux sys agents close --reason="shipped" # Close with a reason
   crux sys agents sweep --timeout=60
 `;
 }

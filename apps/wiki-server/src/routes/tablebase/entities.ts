@@ -652,7 +652,9 @@ const entitiesApp = new Hono()
     }
 
     // 4b. Resolve metadata ref fields (entity slug IDs stored in metadata, e.g. metadata.developer = "anthropic").
-    // These are short entity IDs (not 10-char stableIds), so they need a separate lookup by id.
+    // The FactBase ref resolution above (step 4) handles stableId-format values (10-char alphanumeric).
+    // Metadata refs use the entity's short `id` field (e.g. "anthropic", "openai"), not stableId.
+    // For each requested measure, collect metadata[measure] values and resolve them to entity titles.
     const metadataRefResolutionMap = new Map<string, { name: string; entityId: string }>();
     if (measureList.length > 0) {
       const metadataRefCandidates = new Set<string>();
@@ -669,7 +671,10 @@ const entitiesApp = new Hono()
       if (metadataRefCandidates.size > 0) {
         const candidateIds = [...metadataRefCandidates];
         const metaRefRows = await db
-          .select({ id: entities.id, title: entities.title })
+          .select({
+            id: entities.id,
+            title: entities.title,
+          })
           .from(entities)
           .where(inArray(entities.id, candidateIds));
         for (const r of metaRefRows) {
@@ -892,7 +897,7 @@ const entitiesApp = new Hono()
             );
           }
         }
-        console.warn(
+        logger.warn(
           `[entities/sync] Stripped ${missing.length} unresolved relatedEntries refs: ${missing.slice(0, 10).join(", ")}${missing.length > 10 ? ` ... (+${missing.length - 10} more)` : ""}`
         );
       }
