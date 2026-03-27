@@ -6,6 +6,7 @@
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
+import type { ProposeClaims } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { ClaimsRoute } from '../../../apps/wiki-server/src/routes/claims/claims.ts';
 
@@ -16,6 +17,7 @@ import type { ClaimsRoute } from '../../../apps/wiki-server/src/routes/claims/cl
 type RpcClient = ReturnType<typeof hc<ClaimsRoute>>;
 
 export type ClaimStatusResult = InferResponseType<RpcClient['status'][':batchId']['$get'], 200>;
+export type ProposeClaimsResult = InferResponseType<RpcClient['propose']['$post'], 201>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -26,6 +28,21 @@ export type ClaimStatusResult = InferResponseType<RpcClient['status'][':batchId'
  *
  * Returns per-claim verdicts and an aggregate summary.
  * `allSettled` is true when no claims are still pending or verifying.
+ */
+/**
+ * Submit a batch of claims for async verification.
+ *
+ * Creates proposed_claims rows and dispatches verification jobs
+ * batched by resource. Returns a batchId for polling via getClaimStatus().
+ */
+export async function proposeClaims(
+  input: ProposeClaims,
+): Promise<ApiResult<ProposeClaimsResult>> {
+  return apiRequest<ProposeClaimsResult>('POST', '/api/claims/propose', input);
+}
+
+/**
+ * Poll verification status for a batch of claims.
  */
 export async function getClaimStatus(
   batchId: string,

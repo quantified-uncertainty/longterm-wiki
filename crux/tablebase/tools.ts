@@ -7,7 +7,7 @@
  */
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { getClaimStatus } from '../lib/wiki-server/claims.ts';
+import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
@@ -98,6 +98,33 @@ export function getToolDefinitions() {
             description: { type: 'string', description: 'Brief one-sentence description' },
           },
           required: ['name', 'entityType'],
+        },
+      },
+      {
+        name: 'submit_claims',
+        description: 'Submit structured claims for async verification. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            targetTable: { type: 'string', enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'], description: 'The table these claims will eventually populate' },
+            claims: {
+              type: 'array',
+              description: 'Array of claims to verify. Each must have claimText and sourceUrl.',
+              items: {
+                type: 'object',
+                properties: {
+                  claimText: { type: 'string', description: 'The factual assertion (e.g., "Jaime Raldua Veuthey is CEO of Apart Research")' },
+                  sourceUrl: { type: 'string', description: 'URL that supports this claim' },
+                  resourceId: { type: 'string', description: 'Resource ID from suggest_resources (if available)' },
+                  targetField: { type: 'string', description: 'Which field this claim justifies (e.g., "role", "raised")' },
+                  proposedValue: { type: 'string', description: 'The specific value being proposed (e.g., "CEO")' },
+                  agentEvidence: { type: 'string', description: 'What you found in the source that supports this claim' },
+                },
+                required: ['claimText', 'sourceUrl'],
+              },
+            },
+          },
+          required: ['targetTable', 'claims'],
         },
       },
       {
@@ -239,6 +266,46 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   });
 }
 
+async function handleSubmitClaims(
+  input: Record<string, unknown>,
+  task: EnrichmentTask,
+): Promise<string> {
+  const targetTable = input.targetTable as string;
+  const claims = input.claims as Array<Record<string, unknown>> | undefined;
+  if (!targetTable || !claims || claims.length === 0) {
+    return 'Error: targetTable and at least one claim are required';
+  }
+
+  try {
+    const result = await proposeClaims({
+      entityId: task.entityId,
+      targetTable,
+      claims: claims.map((cl) => ({
+        claimText: String(cl.claimText ?? ''),
+        sourceUrl: String(cl.sourceUrl ?? ''),
+        resourceId: cl.resourceId ? String(cl.resourceId) : undefined,
+        targetField: cl.targetField ? String(cl.targetField) : undefined,
+        proposedValue: cl.proposedValue ? String(cl.proposedValue) : undefined,
+        agentEvidence: cl.agentEvidence ? String(cl.agentEvidence) : undefined,
+      })),
+    });
+
+    if (!result.ok) return `Error submitting claims: ${result.message}`;
+
+    const data = result.data;
+    return JSON.stringify({
+      batchId: data.batchId,
+      claimCount: data.claims.length,
+      jobCount: data.jobCount,
+      estimatedVerificationTime: data.estimatedVerificationTime,
+      message: `Submitted ${data.claims.length} claims (${data.jobCount} verification jobs created). Use check_claim_status with batchId "${data.batchId}" to poll verification progress.`,
+    }, null, 2);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `Error submitting claims: ${msg}`;
+  }
+}
+
 async function handleCheckClaimStatus(input: Record<string, unknown>): Promise<string> {
   const batchId = input.batchId as string;
   if (!batchId) return 'Error: batchId is required';
@@ -366,6 +433,7 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
+    submit_claims: async (input) => handleSubmitClaims(input, task),
     check_claim_status: handleCheckClaimStatus,
   };
 }

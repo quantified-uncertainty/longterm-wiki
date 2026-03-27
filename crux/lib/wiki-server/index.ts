@@ -225,5 +225,5 @@ export {
 export type { VerdictEntry, VerdictsResponse } from './source-checks.ts';
 
 // Claims
-export { getClaimStatus } from './claims.ts';
-export type { ClaimStatusResult } from './claims.ts';
+export { proposeClaims, getClaimStatus } from './claims.ts';
+export type { ProposeClaimsResult, ClaimStatusResult } from './claims.ts';
