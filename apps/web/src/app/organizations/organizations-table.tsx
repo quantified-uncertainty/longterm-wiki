@@ -367,10 +367,11 @@ export function OrganizationsTable({
   const statusText = (() => {
     if (serverMode) {
       if (isLoading) return "Loading...";
+      const fallbackNote = serverFailed ? " (showing cached data)" : "";
       if (typeFilter !== "all" || statFilter !== "all") {
-        return `${filteredTotal} of ${displayTotal} organizations (filtered)`;
+        return `${filteredTotal} of ${displayTotal} organizations (filtered)${fallbackNote}`;
       }
-      return `${displayTotal} organizations`;
+      return `${displayTotal} organizations${fallbackNote}`;
     }
     return `Showing ${filteredTotal} of ${rows.length} organizations`;
   })();
@@ -458,7 +459,7 @@ export function OrganizationsTable({
 
       {/* Results count + column picker */}
       <div className="flex items-center gap-3 mb-3">
-        <span className="text-xs text-muted-foreground">
+        <span className={`text-xs ${serverFailed ? "text-destructive" : "text-muted-foreground"}`}>
           {statusText}
         </span>
         <div className="ml-auto relative" ref={colPickerRef}>
