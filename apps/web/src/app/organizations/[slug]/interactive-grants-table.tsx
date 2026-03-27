@@ -310,6 +310,7 @@ export function InteractiveGrantsTable({
   const isLoading = serverMode ? server.isLoading : false;
   // In server mode, show loading on the very first fetch (no data yet, request in flight)
   const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
+  const serverError = serverMode ? server.error : null;
 
   const handleSearch = (value: string) => {
     if (serverMode) {
@@ -525,6 +526,15 @@ export function InteractiveGrantsTable({
                   className="py-8 text-center text-muted-foreground text-sm"
                 >
                   Loading grants...
+                </td>
+              </tr>
+            ) : serverError && rows.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={activeCols.length}
+                  className="py-8 text-center text-sm"
+                >
+                  <span className="text-destructive">{serverError}</span>
                 </td>
               </tr>
             ) : (

@@ -139,6 +139,7 @@ export function ServerPaginatedTable<T>({
   const filteredTotal = serverMode ? server.meta.total : localFiltered.length;
   const isLoading = serverMode ? server.isLoading : false;
   const isInitialLoad = serverMode && server.isLoading && server.data.length === 0;
+  const serverError = serverMode ? server.error : null;
 
   const handleSearch = useCallback((value: string) => {
     if (serverMode) { serverSetSearch(value); }
@@ -281,6 +282,12 @@ export function ServerPaginatedTable<T>({
               <tr>
                 <td colSpan={activeCols.length} className="py-8 text-center text-muted-foreground text-sm">
                   {loadingMessage}
+                </td>
+              </tr>
+            ) : serverError && rows.length === 0 ? (
+              <tr>
+                <td colSpan={activeCols.length} className="py-8 text-center text-sm">
+                  <span className="text-destructive">{serverError}</span>
                 </td>
               </tr>
             ) : (
