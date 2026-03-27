@@ -76,6 +76,56 @@ function getRawValue(fact: Fact): string {
   }
 }
 
+/** Render a single ref entity ID as a resolved name link. */
+function RefLink({ entityId }: { entityId: string }) {
+  const refEntity = getKBEntity(entityId);
+  return (
+    <Link
+      href={`/factbase/entity/${entityId}`}
+      className="text-primary hover:underline"
+    >
+      {refEntity?.name ?? entityId}
+    </Link>
+  );
+}
+
+/**
+ * Render a fact value with entity resolution for ref/refs types.
+ * For ref-type values, resolves the entity ID to a human-readable name
+ * and renders it as a clickable link. For other types, returns the
+ * formatted string value.
+ */
+function FactValueDisplay({
+  fact,
+  unit,
+  display,
+}: {
+  fact: Fact;
+  unit?: string;
+  display?: Property["display"];
+}) {
+  const v = fact.value;
+
+  if (v.type === "ref") {
+    return <RefLink entityId={v.value} />;
+  }
+
+  if (v.type === "refs") {
+    return (
+      <>
+        {v.value.map((refId: string, i: number) => (
+          <span key={refId}>
+            {i > 0 && ", "}
+            <RefLink entityId={refId} />
+          </span>
+        ))}
+      </>
+    );
+  }
+
+  return <>{formatKBFactValue(fact, unit, display)}</>;
+}
+
 function getValueType(fact: Fact): string {
   return fact.value.type;
 }
@@ -99,7 +149,6 @@ export default async function FactDetailPage({ params }: PageProps) {
   const entityName = entity?.name ?? fact.subjectId;
   const propertyName = property?.name ?? fact.propertyId;
 
-  const formattedValue = formatKBFactValue(fact, property?.unit, property?.display);
   const rawValue = getRawValue(fact);
   const valueType = getValueType(fact);
   const unit = getUnit(fact, property);
@@ -137,7 +186,9 @@ export default async function FactDetailPage({ params }: PageProps) {
       </nav>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-1">{formattedValue}</h1>
+      <h1 className="text-2xl font-bold mb-1">
+        <FactValueDisplay fact={fact} unit={property?.unit} display={property?.display} />
+      </h1>
       <p className="text-sm text-muted-foreground mb-6">
         <FactLink href={`/factbase/entity/${fact.subjectId}`}>{entityName}</FactLink>
         {" \u203A "}
@@ -153,7 +204,9 @@ export default async function FactDetailPage({ params }: PageProps) {
         <KVRow label="Property">
           <FactLink href={`/factbase/property/${fact.propertyId}`}>{propertyName}</FactLink>
         </KVRow>
-        <KVRow label="Formatted Value">{formattedValue}</KVRow>
+        <KVRow label="Formatted Value">
+          <FactValueDisplay fact={fact} unit={property?.unit} display={property?.display} />
+        </KVRow>
         <KVRow label="Raw Value">
           <span className="font-mono">{rawValue}</span>
         </KVRow>
@@ -266,14 +319,15 @@ export default async function FactDetailPage({ params }: PageProps) {
               <tbody>
                 {timeSeriesFacts.map((f) => {
                   const isCurrent = f.id === factId;
-                  const fValue = formatKBFactValue(f, property?.unit, property?.display);
                   return (
                     <tr
                       key={f.id}
                       className={`border-t border-border ${isCurrent ? "bg-primary/5" : "[&:nth-child(even)]:bg-muted/30"}`}
                     >
                       <td className="px-3 py-1.5">{formatKBDate(f.asOf)}</td>
-                      <td className="px-3 py-1.5 font-mono">{fValue}</td>
+                      <td className="px-3 py-1.5 font-mono">
+                        <FactValueDisplay fact={f} unit={property?.unit} display={property?.display} />
+                      </td>
                       <td className="px-3 py-1.5">
                         {f.source && isUrl(f.source) ? (
                           <a
