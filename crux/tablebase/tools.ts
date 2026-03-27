@@ -7,8 +7,8 @@
  */
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
-import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -101,14 +101,41 @@ export function getToolDefinitions() {
         },
       },
       {
-        name: 'suggest_resources',
-        description: 'Register URLs and fetch their content for future verification. Call this with URLs found during web search BEFORE submitting claims or records that reference them. Returns resourceIds for each URL.',
+        name: 'submit_claims',
+        description: 'Submit structured claims for async verification. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
         input_schema: {
           type: 'object',
           properties: {
-            urls: { type: 'array', items: { type: 'string' }, description: 'URLs to register and fetch content for (max 20)' },
+            targetTable: { type: 'string', enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'], description: 'The table these claims will eventually populate' },
+            claims: {
+              type: 'array',
+              description: 'Array of claims to verify. Each must have claimText and sourceUrl.',
+              items: {
+                type: 'object',
+                properties: {
+                  claimText: { type: 'string', description: 'The factual assertion (e.g., "Jaime Raldua Veuthey is CEO of Apart Research")' },
+                  sourceUrl: { type: 'string', description: 'URL that supports this claim' },
+                  resourceId: { type: 'string', description: 'Resource ID from suggest_resources (if available)' },
+                  targetField: { type: 'string', description: 'Which field this claim justifies (e.g., "role", "raised")' },
+                  proposedValue: { type: 'string', description: 'The specific value being proposed (e.g., "CEO")' },
+                  agentEvidence: { type: 'string', description: 'What you found in the source that supports this claim' },
+                },
+                required: ['claimText', 'sourceUrl'],
+              },
+            },
           },
-          required: ['urls'],
+          required: ['targetTable', 'claims'],
+        },
+      },
+      {
+        name: 'check_claim_status',
+        description: 'Check verification status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            batchId: { type: 'string', description: 'Batch ID for the claim submission to check' },
+          },
+          required: ['batchId'],
         },
       },
     ],
@@ -239,6 +266,64 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   });
 }
 
+async function handleSubmitClaims(
+  input: Record<string, unknown>,
+  task: EnrichmentTask,
+): Promise<string> {
+  const targetTable = input.targetTable as string;
+  const claims = input.claims as Array<Record<string, unknown>> | undefined;
+  if (!targetTable || !claims || claims.length === 0) {
+    return 'Error: targetTable and at least one claim are required';
+  }
+
+  try {
+    const result = await proposeClaims({
+      entityId: task.entityId,
+      targetTable,
+      claims: claims.map((cl) => ({
+        claimText: String(cl.claimText ?? ''),
+        sourceUrl: String(cl.sourceUrl ?? ''),
+        resourceId: cl.resourceId ? String(cl.resourceId) : undefined,
+        targetField: cl.targetField ? String(cl.targetField) : undefined,
+        proposedValue: cl.proposedValue ? String(cl.proposedValue) : undefined,
+        agentEvidence: cl.agentEvidence ? String(cl.agentEvidence) : undefined,
+      })),
+    });
+
+    if (!result.ok) return `Error submitting claims: ${result.message}`;
+
+    const data = result.data;
+    return JSON.stringify({
+      batchId: data.batchId,
+      claimCount: data.claims.length,
+      jobCount: data.jobCount,
+      estimatedVerificationTime: data.estimatedVerificationTime,
+      message: `Submitted ${data.claims.length} claims (${data.jobCount} verification jobs created). Use check_claim_status with batchId "${data.batchId}" to poll verification progress.`,
+    }, null, 2);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `Error submitting claims: ${msg}`;
+  }
+}
+
+async function handleCheckClaimStatus(input: Record<string, unknown>): Promise<string> {
+  const batchId = input.batchId as string;
+  if (!batchId) return 'Error: batchId is required';
+
+  const result = await getClaimStatus(batchId);
+  if (!result.ok) return `Error: ${result.message}`;
+
+  const data = result.data;
+  const summary = [
+    `Batch ${data.batchId}: ${data.totalClaims} claims`,
+    `Status: ${JSON.stringify(data.byStatus)}`,
+    `All settled: ${data.allSettled}`,
+    ...(data.estimatedRemaining > 0 ? [`Estimated remaining: ${data.estimatedRemaining}s`] : []),
+  ].join('\n');
+
+  return `${summary}\n\nClaims:\n${JSON.stringify(data.claims, null, 2)}`;
+}
+
 async function handleSubmitRecords(
   input: Record<string, unknown>,
   task: EnrichmentTask,
@@ -332,30 +417,6 @@ async function handleSubmitRecords(
   return `Successfully submitted ${count} records to ${table} (${records.length - deduped.length} duplicates filtered).`;
 }
 
-async function handleSuggestResources(input: Record<string, unknown>): Promise<string> {
-  const urls = (input.urls as string[] | undefined)?.slice(0, 20) ?? [];
-  if (urls.length === 0) return 'Error: no URLs provided';
-
-  try {
-    const result = await suggestResources({ urls, concurrency: 5 });
-    return JSON.stringify({
-      resourceCount: result.resources.length,
-      fetchedCount: result.fetchedCount,
-      cachedCount: result.cachedCount,
-      errorCount: result.errorCount,
-      resources: result.resources.map((r) => ({
-        url: r.url,
-        resourceId: r.resourceId,
-        status: r.status,
-        title: r.title,
-      })),
-    }, null, 2);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return `Error suggesting resources: ${msg}`;
-  }
-}
-
 // ---------------------------------------------------------------------------
 // Build tool handlers map for runLlmAgent
 // ---------------------------------------------------------------------------
@@ -372,7 +433,8 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
-    suggest_resources: handleSuggestResources,
+    submit_claims: async (input) => handleSubmitClaims(input, task),
+    check_claim_status: handleCheckClaimStatus,
   };
 }
 

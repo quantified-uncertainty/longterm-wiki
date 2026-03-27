@@ -992,8 +992,15 @@
     {
       "idx": 141,
       "version": "7",
-      "when": 1781856000000,
+      "when": 1781812800000,
       "tag": "0141_normalize_stableids",
+      "breakpoints": true
+    },
+    {
+      "idx": 142,
+      "version": "7",
+      "when": 1781856000000,
+      "tag": "0142_create_proposed_claims",
       "breakpoints": true
     }
   ]
