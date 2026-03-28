@@ -346,10 +346,14 @@ jobs:
             if [ "$i" -lt 3 ]; then sleep $((i * 3)); fi
           done
           if [ "$CLEANUP_OK" != "true" ]; then
-            echo "::error::Smoke test cleanup failed after 3 attempts (HTTP $DELETE_HTTP_CODE): $DELETE_RESPONSE"
-            exit 1
+            # Cleanup failure is non-fatal: the __smoke-test__ row is harmless orphan data.
+            # During rolling deploys, DELETE can hit a shutting-down pod (502) or trigger
+            # rate limiting (429). Failing the entire deploy for a cleanup issue caused a
+            # 3-hour outage on 2026-03-28 — see incident report #3326.
+            echo "::warning::Smoke test cleanup failed after 3 attempts (HTTP $DELETE_HTTP_CODE) — continuing anyway. The __smoke-test__ page will be cleaned up on next deploy."
+          else
+            echo "Smoke test cleanup passed: deleted=$DELETED"
           fi
-          echo "Smoke test cleanup passed: deleted=$DELETED"
 
           # 4. Resources stats smoke test — verifies the resources endpoint is reachable
           #    and returns expected shape (catches schema/migration issues like the 0026/0027 gap)

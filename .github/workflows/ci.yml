@@ -312,7 +312,12 @@ jobs:
   # ---------------------------------------------------------------------------
   ci:
     needs: [build-data, validate, build-nextjs, test]
-    if: always()
+    # Skip on label events — dependent jobs skip too, so "skipped != success" would
+    # cause a false failure on every label add/remove (e.g. agent:working).
+    if: >-
+      always() &&
+      github.event.action != 'labeled' &&
+      github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - name: Check all jobs passed

@@ -17,45 +17,7 @@ import {
 } from "../../api-types.js";
 import { z } from "zod";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
-
-// ---- Parsers ----
-
-/**
- * Parse a cost string like "~$0.50", "$1.23", "~$10" into integer cents.
- */
-export function parseCostCents(cost: string | null | undefined): number | null {
-  if (!cost) return null;
-  const match = cost.match(/\$\s*([\d.]+)/);
-  if (!match) return null;
-  const dollars = parseFloat(match[1]);
-  if (isNaN(dollars)) return null;
-  return Math.round(dollars * 100);
-}
-
-/**
- * Parse a duration string like "~20 minutes", "~1.5 hours", "30min", "1h 15m" into minutes.
- */
-export function parseDurationMinutes(duration: string | null | undefined): number | null {
-  if (!duration) return null;
-  const lower = duration.toLowerCase();
-  const hoursAndMinutes = lower.match(/([\d.]+)\s*h(?:ours?)?\s+([\d.]+)\s*m(?:in(?:utes?)?)?/);
-  if (hoursAndMinutes) {
-    const h = parseFloat(hoursAndMinutes[1]);
-    const m = parseFloat(hoursAndMinutes[2]);
-    if (!isNaN(h) && !isNaN(m)) return h * 60 + m;
-  }
-  const hoursMatch = lower.match(/([\d.]+)\s*h(?:ours?|r)?(?!\s*[\d.])/);
-  if (hoursMatch) {
-    const h = parseFloat(hoursMatch[1]);
-    if (!isNaN(h)) return h * 60;
-  }
-  const minutesMatch = lower.match(/([\d.]+)\s*m(?:in(?:utes?)?)?/);
-  if (minutesMatch) {
-    const m = parseFloat(minutesMatch[1]);
-    if (!isNaN(m)) return m;
-  }
-  return null;
-}
+import { parseCostCents, parseDurationMinutes } from "./sessions.js";
 
 // ---- Query schemas ----
 

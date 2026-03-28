@@ -231,6 +231,8 @@ export function runCheck(): ValidatorResult {
   return { passed: errors === 0, errors, warnings };
 }
 
-// Direct invocation
-const result = runCheck();
-process.exit(result.passed ? 0 : 1);
+// Only run when invoked directly (not when imported as a module)
+if (process.argv[1]?.endsWith('validate-factbase-entity-ids.ts')) {
+  const result = runCheck();
+  process.exit(result.passed ? 0 : 1);
+}

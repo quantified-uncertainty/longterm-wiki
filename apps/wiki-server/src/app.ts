@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "./logger.js";
 import { validateApiKey } from "./auth.js";
+import { getMigrationError } from "./migration-state.js";
 import {
   rateLimitMiddleware,
   createDefaultRateLimiters,
@@ -150,9 +151,26 @@ export function createApp() {
   });
 
   // Lightweight liveness probe — no DB queries, no auth, no rate limiting.
-  // Use this for K8s probes and groundskeeper health checks.
+  // Use this for K8s liveness probes and groundskeeper health checks.
   app.get("/healthz", (c) => {
     return c.json({ status: "ok" });
+  });
+
+  // Readiness probe — returns 503 if migrations failed (degraded mode).
+  // K8s readiness probes should use this endpoint to prevent routing traffic
+  // to pods that started with a schema mismatch. During rolling deploys,
+  // traffic stays on old (working) pods until the new pod is fully ready.
+  app.get("/readyz", (c) => {
+    const migrationError = getMigrationError();
+    if (migrationError) {
+      // Don't expose raw error — it may contain SQL/table names.
+      // Full details are in server logs.
+      return c.json(
+        { status: "not-ready", reason: "migration_failed" },
+        503
+      );
+    }
+    return c.json({ status: "ready" });
   });
 
   // Detailed health endpoint — unauthenticated, includes DB stats

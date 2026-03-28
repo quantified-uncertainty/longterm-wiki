@@ -35,7 +35,7 @@ export async function generateMetadata({
 }
 
 function formatPrice(price: number): string {
-  return `\$${price}`;
+  return `\$${price.toFixed(2)}`;
 }
 
 export default async function AiModelDetailPage({

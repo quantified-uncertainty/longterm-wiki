@@ -486,7 +486,7 @@ const thingsApp = new Hono()
 
     const SyncThingSchema = z.object({
       id: z.string().min(1).max(200),
-      thingType: z.enum(VALID_THING_TYPES as unknown as [string, ...string[]]),
+      thingType: z.enum(VALID_THING_TYPES),
       title: z.string().min(1).max(2000),
       parentThingId: z.string().max(200).optional(),
       sourceTable: z.string().min(1).max(100),
