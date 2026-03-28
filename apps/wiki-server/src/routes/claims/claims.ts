@@ -7,7 +7,7 @@
 
 import { Hono } from "hono";
 import { randomBytes } from "node:crypto";
-import { getDb } from "../../db.js";
+import { getDb, beginTransaction } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
 import {
   notFoundError,
@@ -120,82 +120,87 @@ const claimsApp = new Hono()
       }
     }
 
-    // 2. Insert all claims in a single batch
-    const insertedClaims = await sql<InsertedClaimRow[]>`
-      INSERT INTO proposed_claims (
-        batch_id, claim_text, entity_id, target_table, target_field,
-        proposed_value, proposed_data, resource_id, source_url,
-        agent_evidence, status, submitted_by
-      )
-      SELECT * FROM unnest(
-        ${claims.map(() => batchId)}::text[],
-        ${claims.map((cl) => cl.claimText)}::text[],
-        ${claims.map(() => entityId ?? null)}::text[],
-        ${claims.map(() => targetTable)}::text[],
-        ${claims.map((cl) => cl.targetField ?? null)}::text[],
-        ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
-        ${claims.map((cl) => cl.proposedData ? JSON.stringify(cl.proposedData) : null)}::jsonb[],
-        ${claims.map((cl) => cl.resourceId ?? null)}::text[],
-        ${claims.map((cl) => cl.sourceUrl)}::text[],
-        ${claims.map((cl) => cl.agentEvidence ?? null)}::text[],
-        ${claims.map(() => "pending")}::text[],
-        ${claims.map(() => agentSessionId ?? null)}::text[]
-      )
-      RETURNING id, resource_id
-    `;
-
-    if (insertedClaims.length !== claims.length) {
-      logger.error(
-        { expected: claims.length, got: insertedClaims.length, batchId },
-        "claim insertion count mismatch",
-      );
-    }
-
-    // 3. Group claims by resource_id → one verification job per resource
-    const claimsByResource = new Map<string, number[]>();
-    for (const row of insertedClaims) {
-      const key = row.resource_id ?? "__no_resource__";
-      const group = claimsByResource.get(key);
-      if (group) group.push(row.id);
-      else claimsByResource.set(key, [row.id]);
-    }
-
-    // 4. Create verification jobs (one per resource group)
+    // 2-5. Insert claims, create jobs, and link them — all in a transaction
+    //       so partial failures don't leave orphaned claims or jobs.
+    let insertedClaims: InsertedClaimRow[] = [];
     const jobEntries: Array<{ claimIds: number[]; resourceId: string | null; jobId: number }> = [];
 
-    for (const [resourceKey, claimIds] of claimsByResource) {
-      const resourceId = resourceKey === "__no_resource__" ? null : resourceKey;
-      const jobParams = {
-        claimIds,
-        resourceId,
-        batchId,
-        entityId: entityId ?? null,
-      };
-
-      const jobRows = await sql<InsertedJobRow[]>`
-        INSERT INTO jobs (type, params, priority, max_retries)
-        VALUES (
-          'claim-verification',
-          ${JSON.stringify(jobParams)}::jsonb,
-          ${CLAIM_VERIFICATION_JOB_PRIORITY},
-          3
+    await beginTransaction(async (tx) => {
+      // 2. Insert all claims in a single batch
+      insertedClaims = await tx<InsertedClaimRow[]>`
+        INSERT INTO proposed_claims (
+          batch_id, claim_text, entity_id, target_table, target_field,
+          proposed_value, proposed_data, resource_id, source_url,
+          agent_evidence, status, submitted_by
         )
-        RETURNING id
+        SELECT * FROM unnest(
+          ${claims.map(() => batchId)}::text[],
+          ${claims.map((cl) => cl.claimText)}::text[],
+          ${claims.map(() => entityId ?? null)}::text[],
+          ${claims.map(() => targetTable)}::text[],
+          ${claims.map((cl) => cl.targetField ?? null)}::text[],
+          ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
+          ${claims.map((cl) => cl.proposedData ? JSON.stringify(cl.proposedData) : null)}::jsonb[],
+          ${claims.map((cl) => cl.resourceId ?? null)}::text[],
+          ${claims.map((cl) => cl.sourceUrl)}::text[],
+          ${claims.map((cl) => cl.agentEvidence ?? null)}::text[],
+          ${claims.map(() => "pending")}::text[],
+          ${claims.map(() => agentSessionId ?? null)}::text[]
+        )
+        RETURNING id, resource_id
       `;
 
-      if (jobRows.length > 0) {
-        jobEntries.push({ claimIds, resourceId, jobId: jobRows[0].id });
+      if (insertedClaims.length !== claims.length) {
+        logger.error(
+          { expected: claims.length, got: insertedClaims.length, batchId },
+          "claim insertion count mismatch",
+        );
       }
-    }
 
-    // 5. Update claims with their verification_job_id
-    for (const entry of jobEntries) {
-      await sql`
-        UPDATE proposed_claims
-        SET verification_job_id = ${entry.jobId}
-        WHERE id = ANY(${entry.claimIds})
-      `;
-    }
+      // 3. Group claims by resource_id → one verification job per resource
+      const claimsByResource = new Map<string, number[]>();
+      for (const row of insertedClaims) {
+        const key = row.resource_id ?? "__no_resource__";
+        const group = claimsByResource.get(key);
+        if (group) group.push(row.id);
+        else claimsByResource.set(key, [row.id]);
+      }
+
+      // 4. Create verification jobs (one per resource group)
+      for (const [resourceKey, claimIds] of claimsByResource) {
+        const resourceId = resourceKey === "__no_resource__" ? null : resourceKey;
+        const jobParams = {
+          claimIds,
+          resourceId,
+          batchId,
+          entityId: entityId ?? null,
+        };
+
+        const jobRows = await tx<InsertedJobRow[]>`
+          INSERT INTO jobs (type, params, priority, max_retries)
+          VALUES (
+            'claim-verification',
+            ${JSON.stringify(jobParams)}::jsonb,
+            ${CLAIM_VERIFICATION_JOB_PRIORITY},
+            3
+          )
+          RETURNING id
+        `;
+
+        if (jobRows.length > 0) {
+          jobEntries.push({ claimIds, resourceId, jobId: jobRows[0].id });
+        }
+      }
+
+      // 5. Update claims with their verification_job_id
+      for (const entry of jobEntries) {
+        await tx`
+          UPDATE proposed_claims
+          SET verification_job_id = ${entry.jobId}
+          WHERE id = ANY(${entry.claimIds})
+        `;
+      }
+    });
 
     // 6. Build response
     const claimIdToJobId = new Map<number, number>();
@@ -205,8 +210,7 @@ const claimsApp = new Hono()
       }
     }
 
-    const uniqueResources = claimsByResource.size;
-    const estimatedVerificationTime = uniqueResources * SECONDS_PER_CLAIM_ESTIMATE;
+    const estimatedVerificationTime = jobEntries.length * SECONDS_PER_CLAIM_ESTIMATE;
 
     return c.json(
       {

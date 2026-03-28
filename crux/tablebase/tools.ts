@@ -115,7 +115,7 @@ export function getToolDefinitions() {
                 properties: {
                   claimText: { type: 'string', description: 'The factual assertion (e.g., "Jaime Raldua Veuthey is CEO of Apart Research")' },
                   sourceUrl: { type: 'string', description: 'URL that supports this claim' },
-                  resourceId: { type: 'string', description: 'Resource ID from suggest_resources (if available)' },
+                  resourceId: { type: 'string', description: 'Resource ID (if available)' },
                   targetField: { type: 'string', description: 'Which field this claim justifies (e.g., "role", "raised")' },
                   proposedValue: { type: 'string', description: 'The specific value being proposed (e.g., "CEO")' },
                   agentEvidence: { type: 'string', description: 'What you found in the source that supports this claim' },
@@ -439,7 +439,9 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
-    submit_claims: async (input) => handleSubmitClaims(input, task),
+    submit_claims: async (input) => dryRun
+      ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
+      : handleSubmitClaims(input, task),
     check_claim_status: handleCheckClaimStatus,
   };
 }
