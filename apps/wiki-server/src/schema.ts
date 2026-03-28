@@ -2169,6 +2169,7 @@ export const fundingPrograms = pgTable(
     index("idx_fp_division").on(table.divisionId),
     index("idx_fp_status").on(table.status),
     index("idx_fp_type").on(table.programType),
+    uniqueIndex("uq_fp_org_name").on(table.orgId, table.name),
   ]
 );
 
