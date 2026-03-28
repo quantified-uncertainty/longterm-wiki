@@ -14,12 +14,13 @@ CREATE TABLE IF NOT EXISTS proposed_claims (
   proposed_data JSONB,
 
   -- Source evidence (from research agent)
-  resource_id TEXT REFERENCES resources(id),
+  resource_id TEXT REFERENCES resources(id) ON DELETE SET NULL,
   source_url TEXT NOT NULL,
   agent_evidence TEXT,
 
   -- Verification state (updated by worker)
-  status TEXT NOT NULL DEFAULT 'pending',
+  status TEXT NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending', 'verifying', 'verified', 'contradicted', 'unverifiable', 'expired')),
   verdict_confidence REAL,
   verdict_reasoning TEXT,
   extracted_value TEXT,
@@ -38,7 +39,7 @@ CREATE TABLE IF NOT EXISTS proposed_claims (
 
 CREATE TABLE IF NOT EXISTS claim_record_links (
   id BIGSERIAL PRIMARY KEY,
-  claim_id BIGINT NOT NULL REFERENCES proposed_claims(id),
+  claim_id BIGINT NOT NULL REFERENCES proposed_claims(id) ON DELETE CASCADE,
   record_type TEXT NOT NULL,
   record_id TEXT NOT NULL,
   match_verdict TEXT,

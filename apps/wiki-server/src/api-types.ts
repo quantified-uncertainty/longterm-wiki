@@ -1330,7 +1330,7 @@ export type ClaimStatus = (typeof VALID_CLAIM_STATUSES)[number];
 
 export const ProposeClaimsSchema = z.object({
   entityId: z.string().min(1).max(200).optional(),
-  targetTable: z.string().max(100),
+  targetTable: z.string().min(1).max(100),
   agentSessionId: z.string().max(200).optional(),
   claims: z
     .array(

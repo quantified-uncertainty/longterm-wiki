@@ -115,7 +115,7 @@ export function getToolDefinitions() {
                 properties: {
                   claimText: { type: 'string', description: 'The factual assertion (e.g., "Jaime Raldua Veuthey is CEO of Apart Research")' },
                   sourceUrl: { type: 'string', description: 'URL that supports this claim' },
-                  resourceId: { type: 'string', description: 'Resource ID from suggest_resources (if available)' },
+                  resourceId: { type: 'string', description: 'Resource ID (if available)' },
                   targetField: { type: 'string', description: 'Which field this claim justifies (e.g., "role", "raised")' },
                   proposedValue: { type: 'string', description: 'The specific value being proposed (e.g., "CEO")' },
                   agentEvidence: { type: 'string', description: 'What you found in the source that supports this claim' },
@@ -321,7 +321,13 @@ async function handleCheckClaimStatus(input: Record<string, unknown>): Promise<s
     ...(data.estimatedRemaining > 0 ? [`Estimated remaining: ${data.estimatedRemaining}s`] : []),
   ].join('\n');
 
-  return `${summary}\n\nClaims:\n${JSON.stringify(data.claims, null, 2)}`;
+  const MAX_SHOWN = 20;
+  const shownClaims = data.claims.slice(0, MAX_SHOWN);
+  const omitted = data.claims.length - shownClaims.length;
+  const claimsText = JSON.stringify(shownClaims, null, 2);
+  const omittedNote = omitted > 0 ? `\n\n...and ${omitted} more claims omitted` : '';
+
+  return `${summary}\n\nClaims:\n${claimsText}${omittedNote}`;
 }
 
 async function handleSubmitRecords(
@@ -433,7 +439,9 @@ export function buildToolHandlers(
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
     submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
-    submit_claims: async (input) => handleSubmitClaims(input, task),
+    submit_claims: async (input) => dryRun
+      ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
+      : handleSubmitClaims(input, task),
     check_claim_status: handleCheckClaimStatus,
   };
 }
