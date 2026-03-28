@@ -16,7 +16,11 @@ import {
   dbError,
   zv,
 } from "../shared/utils.js";
-import { ProposeClaimsSchema, VALID_CLAIM_STATUSES } from "../../api-types.js";
+import {
+  ProposeClaimsSchema,
+  ClaimVerdictBatchSchema,
+  VALID_CLAIM_STATUSES,
+} from "../../api-types.js";
 
 const logger = rootLogger.child({ component: "claims" });
 
@@ -217,6 +221,74 @@ const claimsApp = new Hono()
       },
       201,
     );
+  })
+
+  // ---- POST /verdicts (batch update claim verification results) ----
+
+  .post("/verdicts", zv("json", ClaimVerdictBatchSchema), async (c) => {
+    const { verdicts } = c.req.valid("json");
+    const sql = getDb();
+
+    logger.info({ count: verdicts.length }, "recording claim verdicts");
+
+    let updated = 0;
+    for (const v of verdicts) {
+      const result = await sql`
+        UPDATE proposed_claims
+        SET
+          status = ${v.status},
+          verdict_confidence = ${v.confidence},
+          verdict_reasoning = ${v.reasoning},
+          extracted_value = ${v.extractedValue ?? null},
+          checker_model = ${v.checkerModel ?? null},
+          verified_at = NOW(),
+          updated_at = NOW()
+        WHERE id = ${v.claimId} AND status IN ('pending', 'verifying')
+        RETURNING id
+      `;
+      if (result.length > 0) updated++;
+    }
+
+    return c.json({ updated, total: verdicts.length });
+  })
+
+  // ---- GET /by-ids (fetch claims by ID list, used by verification worker) ----
+
+  .get("/by-ids", async (c) => {
+    const idsParam = c.req.query("ids");
+    if (!idsParam) {
+      return validationError(c, "Missing required query parameter: ids");
+    }
+
+    const ids = idsParam.split(",").map(Number).filter((n) => !isNaN(n) && n > 0);
+    if (ids.length === 0) {
+      return validationError(c, "No valid IDs provided");
+    }
+    if (ids.length > 200) {
+      return validationError(c, "Maximum 200 IDs per request");
+    }
+
+    const sql = getDb();
+    interface ClaimDetailRow {
+      id: number;
+      claim_text: string;
+      source_url: string;
+      target_table: string;
+      target_field: string | null;
+      proposed_value: string | null;
+      agent_evidence: string | null;
+      resource_id: string | null;
+    }
+
+    const claims = await sql<ClaimDetailRow[]>`
+      SELECT id, claim_text, source_url, target_table, target_field,
+             proposed_value, agent_evidence, resource_id
+      FROM proposed_claims
+      WHERE id = ANY(${ids})
+      ORDER BY id ASC
+    `;
+
+    return c.json({ claims });
   })
 
   // ---- GET /status/:batchId (poll verification progress) ----
