@@ -318,7 +318,7 @@ const fundingProgramsApp = new Hono()
     let upserted = 0;
 
     try {
-    await db.transaction(async (tx) => {
+      await db.transaction(async (tx) => {
       const allVals = items.map((item) => ({
         id: item.id,
         orgId: item.orgId,
@@ -380,14 +380,18 @@ const fundingProgramsApp = new Hono()
         }))
       );
 
-      upserted = allVals.length;
-    });
+        upserted = allVals.length;
+      });
     } catch (err: unknown) {
       // Catch unique constraint violations from race conditions (concurrent insert
       // with same orgId+name but different id, between pre-check and INSERT).
       // The pre-check reduces this window but can't eliminate it.
-      const pgError = err as { code?: string; constraint?: string };
-      if (pgError.code === "23505" && pgError.constraint?.includes("uq_fp_org_name")) {
+      if (
+        err && typeof err === "object" && "code" in err &&
+        (err as { code: string }).code === "23505" &&
+        "constraint" in err &&
+        String((err as { constraint: string }).constraint).includes("uq_fp_org_name")
+      ) {
         return validationError(
           c,
           "A funding program with the same (orgId, name) was created concurrently. " +
