@@ -1,0 +1,111 @@
+name: Auto-Enqueue on Auto-Merge
+
+# When auto-merge is enabled AFTER checks have already passed, GitHub doesn't
+# auto-enqueue the PR into the merge queue (it only enqueues on the
+# pending→success transition). This workflow detects that case and enqueues
+# the PR via the GraphQL API.
+
+on:
+  pull_request:
+    types: [auto_merge_enabled]
+    branches: [main]
+
+jobs:
+  enqueue-if-ready:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Check status and enqueue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+
+            console.log(`Auto-merge enabled on PR #${pr.number}: ${pr.title}`);
+            console.log(`Head SHA: ${pr.head.sha}`);
+
+            // Get combined status for the head commit
+            const { data: status } = await github.rest.repos.getCombinedStatusForRef({
+              owner,
+              repo,
+              ref: pr.head.sha,
+            });
+
+            // Get check runs for the head commit
+            const { data: checks } = await github.rest.checks.listForRef({
+              owner,
+              repo,
+              ref: pr.head.sha,
+              per_page: 100,
+            });
+
+            // Filter to the latest run per check name (GitHub can have multiple)
+            const latestByName = new Map();
+            for (const run of checks.check_runs) {
+              const existing = latestByName.get(run.name);
+              if (!existing || new Date(run.completed_at) > new Date(existing.completed_at)) {
+                latestByName.set(run.name, run);
+              }
+            }
+
+            const allCheckRuns = [...latestByName.values()];
+            const pending = allCheckRuns.filter(r => r.status !== 'completed');
+            const failed = allCheckRuns.filter(r =>
+              r.status === 'completed' &&
+              r.conclusion !== 'success' &&
+              r.conclusion !== 'skipped' &&
+              r.conclusion !== 'neutral'
+            );
+
+            // Also check commit statuses (e.g., Vercel, CodeRabbit)
+            const failedStatuses = status.statuses.filter(s =>
+              s.state !== 'success' && s.state !== 'pending'
+            );
+            const pendingStatuses = status.statuses.filter(s => s.state === 'pending');
+
+            console.log(`Check runs: ${allCheckRuns.length} total, ${pending.length} pending, ${failed.length} failed`);
+            console.log(`Commit statuses: ${status.statuses.length} total, ${pendingStatuses.length} pending, ${failedStatuses.length} failed`);
+
+            if (pending.length > 0 || pendingStatuses.length > 0) {
+              console.log('Some checks still pending — GitHub will auto-enqueue when they complete.');
+              for (const r of pending) console.log(`  pending: ${r.name}`);
+              for (const s of pendingStatuses) console.log(`  pending status: ${s.context}`);
+              return;
+            }
+
+            if (failed.length > 0 || failedStatuses.length > 0) {
+              console.log('Some checks failed — cannot enqueue.');
+              for (const r of failed) console.log(`  failed: ${r.name} (${r.conclusion})`);
+              for (const s of failedStatuses) console.log(`  failed status: ${s.context} (${s.state})`);
+              return;
+            }
+
+            // All checks passed and none pending — enqueue the PR
+            console.log('All checks passed. Enqueuing PR into merge queue...');
+
+            try {
+              await github.graphql(`
+                mutation($prId: ID!, $headOid: GitObjectID!) {
+                  enqueuePullRequest(input: {
+                    pullRequestId: $prId,
+                    expectedHeadOid: $headOid
+                  }) {
+                    mergeQueueEntry {
+                      position
+                    }
+                  }
+                }
+              `, {
+                prId: pr.node_id,
+                headOid: pr.head.sha,
+              });
+              console.log(`PR #${pr.number} enqueued into the merge queue.`);
+            } catch (error) {
+              // The PR might already be in the queue, or the queue might not
+              // be enabled — either way, log and move on.
+              console.log(`Could not enqueue: ${error.message}`);
+            }
