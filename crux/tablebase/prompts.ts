@@ -14,6 +14,16 @@ const SHARED_RULES = `
 - **If resolve_entity returns NOT_FOUND**, use create_entity to create the entity first, then use the returned stableId in your record. This is the expected workflow — most people won't exist yet.
 - Use query_existing_records to see what data already exists before adding new records.
 - If you cannot find reliable data, say so — do not guess or make up records.
+
+## Claims-First Verification Workflow (preferred)
+When available, use the claims-first workflow for higher-quality data:
+1. After web_search, call **suggest_resources** with all URLs you plan to reference — this registers them and fetches their content.
+2. Extract specific, verifiable claims from the sources and submit them via **submit_claims** — each claim must reference a resourceId from step 1.
+3. Poll **check_claim_status** with the returned batchId until allSettled is true.
+4. Only submit_records for claims that were **verified**. Include the verified claim IDs in the claimIds field.
+5. Do NOT submit records based on contradicted claims — note them in your summary instead.
+
+If the claims tools are not available or fail, fall back to the standard submit_records workflow without claimIds.
 `;
 
 export function getSystemPrompt(task: EnrichmentTask): string {

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb } from "../../db.js";
+import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { grants, things, entities, fundingPrograms } from "../../schema.js";
 import {
@@ -19,6 +19,7 @@ import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
 
@@ -60,6 +61,7 @@ const SyncGrantItemSchema = z.object({
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
+  claimIds: z.array(z.number().int().positive()).optional(),
 });
 
 const SyncGrantsBatchSchema = z.object({
@@ -575,6 +577,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       }
     }
 
+    // Validate claim references
+    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const claimError = await validateClaimRefs(rawDb, allClaimIds);
+      if (claimError) return validationError(c, claimError);
+    }
+
     let upserted = 0;
     let verdictsResult = { written: 0 };
 
@@ -685,7 +695,19 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     logVerificationCoverage("grants/sync", items.length, verdictsResult.written);
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
+    // Link verified claims to records
+    let claimsLinked = 0;
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+        recordId: item.id,
+        recordType: "grants",
+        claimIds: item.claimIds,
+      })));
+      claimsLinked = linkResult.linked;
+    }
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
   })
 
   // ---- POST /delete-batch ----
