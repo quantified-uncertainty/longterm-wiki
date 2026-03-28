@@ -4,11 +4,13 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import { entityIds, wikiPages, entities, facts } from "../../schema.js";
 import { logger } from "../../logger.js";
 import { verifyToken } from "../../auth.js";
+import { getMigrationError } from "../../migration-state.js";
 
 const startTime = Date.now();
 
 const healthApp = new Hono()
   .get("/", async (c) => {
+    const migrationError = getMigrationError();
     const db = getDrizzleDb();
 
     let dbStatus = "ok";
@@ -48,9 +50,15 @@ const healthApp = new Hono()
       logger.error({ err }, "Health check DB error");
     }
 
+    // Degraded if migration failed at startup OR DB queries are failing.
+    // The post-deploy smoke test checks for status === "healthy", so a degraded
+    // server will correctly fail the smoke test and trigger investigation.
+    const isDegraded = migrationError !== null || dbStatus !== "ok";
+
     return c.json({
-      status: dbStatus === "ok" ? "healthy" : "degraded",
+      status: isDegraded ? "degraded" : "healthy",
       database: dbStatus,
+      ...(migrationError ? { migrationError } : {}),
       totalIds,
       totalPages,
       totalEntities,

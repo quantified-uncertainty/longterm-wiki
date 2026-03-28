@@ -268,6 +268,53 @@ const fundingProgramsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    // Check for natural key collisions within the batch itself
+    const batchKeys = new Set<string>();
+    for (const item of items) {
+      const key = `${item.orgId}::${item.name}`;
+      if (batchKeys.has(key)) {
+        return validationError(
+          c,
+          `Duplicate (orgId, name) in batch: orgId=${item.orgId}, name="${item.name}". ` +
+          `Each funding program must have a unique name within its organization.`
+        );
+      }
+      batchKeys.add(key);
+    }
+
+    // Check for natural key collisions with existing records (different IDs, same orgId+name).
+    // The uq_fp_org_name unique index enforces this at the DB level, but checking here
+    // gives a clear error message instead of a raw constraint violation.
+    const existingConflicts = await db
+      .select({ id: fundingPrograms.id, orgId: fundingPrograms.orgId, name: fundingPrograms.name })
+      .from(fundingPrograms)
+      .where(
+        sql`(${fundingPrograms.orgId}, ${fundingPrograms.name}) IN (${sql.join(
+          items.map(i => sql`(${i.orgId}, ${i.name})`),
+          sql`, `
+        )})`
+      );
+
+    const conflictById = new Map(existingConflicts.map(r => [`${r.orgId}::${r.name}`, r.id]));
+    const naturalKeyConflicts: string[] = [];
+    for (const item of items) {
+      const existingId = conflictById.get(`${item.orgId}::${item.name}`);
+      if (existingId && existingId !== item.id) {
+        naturalKeyConflicts.push(
+          `"${item.name}" (orgId=${item.orgId}): incoming id=${item.id} conflicts with existing id=${existingId}`
+        );
+      }
+    }
+
+    if (naturalKeyConflicts.length > 0) {
+      return validationError(
+        c,
+        `Natural key conflict: ${naturalKeyConflicts.length} item(s) have the same (orgId, name) as existing records with different IDs. ` +
+        `Use the existing ID to update, or delete the existing record first.\n` +
+        naturalKeyConflicts.join("\n")
+      );
+    }
+
     let upserted = 0;
 
     await db.transaction(async (tx) => {

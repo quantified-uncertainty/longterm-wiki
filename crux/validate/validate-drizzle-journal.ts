@@ -265,6 +265,51 @@ export function runCheck(): CheckResult {
     );
   }
 
+  // Check for unsafe unique constraint patterns in migration files.
+  // CREATE UNIQUE INDEX with hardcoded DELETE (specific IDs) is fragile — if new
+  // duplicates are created after the migration is written, the CREATE fails and
+  // crashes the server. Dynamic dedup (ROW_NUMBER window functions) is safer.
+  //
+  // Incident context: Migration 0143 hardcoded one duplicate ID but missed 2 others,
+  // causing a 3-hour outage on 2026-03-28 when CREATE UNIQUE INDEX failed.
+  const unsafeConstraintWarnings: string[] = [];
+  for (const tag of sqlFiles) {
+    const filePath = join(DRIZZLE_DIR, `${tag}.sql`);
+    let content: string;
+    try {
+      content = readFileSync(filePath, 'utf-8');
+    } catch {
+      continue;
+    }
+    const stripped = content.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    const hasUniqueIndex = /\bCREATE\s+UNIQUE\s+INDEX\b/i.test(stripped);
+    const hasHardcodedDelete = /\bDELETE\s+FROM\s+\w+\s+WHERE\s+id\s*=\s*'/i.test(stripped);
+    const hasDynamicDedup = /\bROW_NUMBER\s*\(\s*\)\s+OVER\b/i.test(stripped);
+
+    if (hasUniqueIndex && hasHardcodedDelete && !hasDynamicDedup) {
+      unsafeConstraintWarnings.push(
+        `${tag}.sql: CREATE UNIQUE INDEX with hardcoded DELETE — use ROW_NUMBER() dynamic dedup instead. ` +
+        `Hardcoded IDs miss duplicates created after the migration is written.`
+      );
+    }
+  }
+
+  if (unsafeConstraintWarnings.length > 0) {
+    console.log(
+      `\n${c.yellow}Found ${unsafeConstraintWarnings.length} unsafe unique constraint migration(s) (warning):${c.reset}\n`
+    );
+    for (const warn of unsafeConstraintWarnings) {
+      console.log(`  ${c.yellow}${warn}${c.reset}`);
+    }
+    console.log();
+    console.log(
+      `${c.dim}Prefer ROW_NUMBER() OVER (PARTITION BY ... ORDER BY created_at) to dynamically find and remove ALL duplicates.${c.reset}`
+    );
+    console.log(
+      `${c.dim}See migration 0108_natural_key_uniqueness.sql for the reference pattern.${c.reset}`
+    );
+  }
+
   const totalErrors = missing.length + newDuplicates.length + journalIssues.length;
 
   return {
