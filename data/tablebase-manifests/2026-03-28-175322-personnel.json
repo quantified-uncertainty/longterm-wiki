@@ -1,0 +1,129 @@
+{
+  "table": "personnel",
+  "recordCount": 14,
+  "submittedAt": "2026-03-28T17:53:22.808Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 14,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "caK6gzlhAy",
+      "personId": "vr5HogmRLQ",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Chair & CEO",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "QizMKAxnSZ",
+      "personId": "iLfCTMQmvr",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "EVP, CFO & Treasurer",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "QCbbejleCm",
+      "personId": "E9zwdcLWG6",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "EVP & CTO",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "nUAI3F7fuS",
+      "personId": "xSmprbs8Rv",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "EVP & Chief Sales Officer",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "dJ8y4EybzZ",
+      "personId": "dCx5F5DlkH",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "EVP & Chief Commercial Officer",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "OrevmJvZcP",
+      "personId": "X9rPkLSO8j",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "EVP & GM, Data Center Solutions",
+      "source": "https://www.amd.com/en/corporate/leadership.html",
+      "verdict": "none"
+    },
+    {
+      "id": "pjn62vneWK",
+      "personId": "DrWkPoqIwE",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Lead Independent Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "uxCllBcDlM",
+      "personId": "GK6n9u7urX",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "9Tocyfj0v2",
+      "personId": "qS7HoNqV6M",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "f8WZB4seIY",
+      "personId": "vjnlcuBTSl",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "ttBpF2A8Kn",
+      "personId": "kOfKnmR526",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/news-events/press-releases/detail/1275/amd-appoints-kc-mcclure-to-board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "yqY3KIEStg",
+      "personId": "5vjACnEgjI",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "uqmUU7UVI1",
+      "personId": "bW9f8cnq8L",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "x2b6Mzdb91",
+      "personId": "Vc4Dk8nrV5",
+      "organizationId": "Tbq2qL6mbA",
+      "role": "Director",
+      "source": "https://ir.amd.com/corporate-governance/board-of-directors",
+      "verdict": "none"
+    }
+  ]
+}
