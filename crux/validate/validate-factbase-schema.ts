@@ -24,7 +24,9 @@ const verbose = process.argv.includes("--verbose");
 // not integrity violations.
 // factid-format is demoted because 248 legacy human-readable IDs exist from
 // before the f_XXXXXXXXXX format was standardized. Migration tracked in #3329.
+// New violations beyond the baseline are still blocking.
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
+const LEGACY_FACTID_FORMAT_BASELINE = 248;
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {
@@ -117,7 +119,16 @@ async function main(): Promise<void> {
   // Always print the summary table for visibility
   printSummaryTable(results);
 
-  if (blockingErrors.length > 0) {
+  // Check if factid-format violations exceed the legacy baseline (new violations are blocking)
+  const factidFormatDemoted = demotedErrors.filter((r) => r.rule === "factid-format");
+  const newFactidFormatErrors = Math.max(0, factidFormatDemoted.length - LEGACY_FACTID_FORMAT_BASELINE);
+  if (newFactidFormatErrors > 0) {
+    console.error(
+      `\n${newFactidFormatErrors} new factid-format violation(s) beyond the legacy baseline of ${LEGACY_FACTID_FORMAT_BASELINE}`
+    );
+  }
+
+  if (blockingErrors.length > 0 || newFactidFormatErrors > 0) {
     console.error(
       `\nKB schema validation failed: ${blockingErrors.length} blocking error(s), ` +
         `${demotedErrors.length} demoted, ${warnings.length} warning(s), ${infos.length} info`
