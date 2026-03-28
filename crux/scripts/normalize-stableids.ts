@@ -99,7 +99,7 @@ const generateSql = process.argv.includes("--generate-sql");
 
 // 1. Scan entity YAML files
 const entityDir = join(PROJECT_ROOT, "data", "entities");
-const entityFiles = ["people.yaml", "organizations.yaml", "responses.yaml"];
+const entityFiles = readdirSync(entityDir).filter((f) => f.endsWith(".yaml"));
 const allContaminated: ContaminatedId[] = [];
 
 for (const f of entityFiles) {

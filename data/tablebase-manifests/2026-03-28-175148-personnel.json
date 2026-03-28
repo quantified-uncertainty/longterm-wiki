@@ -1,0 +1,105 @@
+{
+  "table": "personnel",
+  "recordCount": 11,
+  "submittedAt": "2026-03-28T17:51:48.676Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 11,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Roa3MV79nO",
+      "personId": "BoiTQ6pfAs",
+      "organizationId": "7rS95q1sP-",
+      "role": "Founder & CEO",
+      "source": "https://reimagine.aviv.me/p/ai-and-democracy-foundation-founding-and-hiring",
+      "verdict": "none"
+    },
+    {
+      "id": "s5ZtScny2K",
+      "personId": "Wn9QOi0pAf",
+      "organizationId": "7rS95q1sP-",
+      "role": "Research Collaborator",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    },
+    {
+      "id": "kdPID2yqwK",
+      "personId": "qxNoJsdejX",
+      "organizationId": "7rS95q1sP-",
+      "role": "Research Fellow",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "grnlITpAi2",
+      "personId": "558r4f2Vgw",
+      "organizationId": "7rS95q1sP-",
+      "role": "Researcher",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "rPwOMGjsid",
+      "personId": "nh8qgA4H1C",
+      "organizationId": "7rS95q1sP-",
+      "role": "Researcher",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "VfhqDDTCnt",
+      "personId": "QWN9fWnwUf",
+      "organizationId": "7rS95q1sP-",
+      "role": "Researcher",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "CIvfUixp4w",
+      "personId": "lJcj5Bb9LN",
+      "organizationId": "7rS95q1sP-",
+      "role": "Team Member",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    },
+    {
+      "id": "diqrEHOWCm",
+      "personId": "K9bEhM8sef",
+      "organizationId": "7rS95q1sP-",
+      "role": "Researcher",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "eLW0fHzm5R",
+      "personId": "oVZA4951MU",
+      "organizationId": "7rS95q1sP-",
+      "role": "Fellow",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    },
+    {
+      "id": "jZjQWZUkFo",
+      "personId": "HLVm1SgHnW",
+      "organizationId": "7rS95q1sP-",
+      "role": "Fellow",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    },
+    {
+      "id": "ncSALgtwF3",
+      "personId": "V0lqus3d8T",
+      "organizationId": "7rS95q1sP-",
+      "role": "Team Member",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    }
+  ]
+}

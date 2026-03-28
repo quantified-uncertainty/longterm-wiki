@@ -1009,6 +1009,13 @@
       "when": 1781942400000,
       "tag": "0143_dedup_funding_program_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 144,
+      "version": "7",
+      "when": 1781942500000,
+      "tag": "0144_create_operations_log",
+      "breakpoints": true
     }
   ]
 }

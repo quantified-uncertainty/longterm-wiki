@@ -24,12 +24,6 @@ export type ProposeClaimsResult = InferResponseType<RpcClient['propose']['$post'
 // ---------------------------------------------------------------------------
 
 /**
- * Poll verification status for a batch of claims.
- *
- * Returns per-claim verdicts and an aggregate summary.
- * `allSettled` is true when no claims are still pending or verifying.
- */
-/**
  * Submit a batch of claims for async verification.
  *
  * Creates proposed_claims rows and dispatches verification jobs

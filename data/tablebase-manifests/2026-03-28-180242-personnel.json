@@ -1,0 +1,65 @@
+{
+  "table": "personnel",
+  "recordCount": 6,
+  "submittedAt": "2026-03-28T18:02:42.496Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 6,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "6K5kNYBjOk",
+      "personId": "0ekR2eKUMA",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Co-Founder & First Executive Director",
+      "source": "https://en.wikipedia.org/wiki/18F",
+      "verdict": "none"
+    },
+    {
+      "id": "5vtKF3SvVh",
+      "personId": "Vlhozz2X81",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Co-Founder & Executive Director",
+      "source": "https://en.wikipedia.org/wiki/18F",
+      "verdict": "none"
+    },
+    {
+      "id": "dVqiY2v5vs",
+      "personId": "vuNuRiZJV2",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/18F",
+      "verdict": "none"
+    },
+    {
+      "id": "FJm0y5VT36",
+      "personId": "Kai0TQRL6X",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Executive Director (Interim)",
+      "source": "https://en.wikipedia.org/wiki/V._David_Zvenyach",
+      "verdict": "none"
+    },
+    {
+      "id": "W3ULs7eHa3",
+      "personId": "rEKehRdMhM",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://en.wikipedia.org/wiki/18F",
+      "verdict": "none"
+    },
+    {
+      "id": "sKlswV9WHD",
+      "personId": "ltq1ipuyko",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://federalnewsnetwork.com/reorganization/2025/03/after-rocky-history-gsa-shuts-down-18f-office/",
+      "verdict": "none"
+    }
+  ]
+}
