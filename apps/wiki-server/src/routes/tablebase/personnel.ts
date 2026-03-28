@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { personnel, entities } from "../../schema.js";
+import { personnel, entities, things } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -442,6 +442,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         WHERE person_entity_id IS NULL
           AND person_display_name IS NULL
           AND NOT (person_id ~ '^[A-Za-z0-9]{10}$' AND person_id ~ '[A-Z]')
+          AND NOT (length(person_id) BETWEEN 8 AND 12
+                  AND person_id ~ '[_-]'
+                  AND person_id ~ '[0-9]'
+                  AND person_id ~ '[A-Z]')
           AND id IN (${idList})
       `);
 
@@ -512,6 +516,71 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     logVerificationCoverage("personnel/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
+  })
+
+  // ---- POST /delete ----
+  .post("/delete", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = z
+      .object({
+        ids: z.array(z.string().min(1).max(20)).min(1).max(500),
+        reason: z.string().min(1).max(500),
+      })
+      .safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { ids, reason } = parsed.data;
+    const db = getDrizzleDb();
+
+    let deleted = 0;
+
+    await db.transaction(async (tx) => {
+      // Fetch records before deletion for audit log
+      const idList = sqlInList(ids);
+      const existing = await tx
+        .select()
+        .from(personnel)
+        .where(sql`${personnel.id} IN (${idList})`);
+
+      if (existing.length === 0) {
+        return;
+      }
+
+      // Audit log the deletions
+      await logAuditEntries(
+        tx,
+        existing.map((row) => ({
+          recordType: "personnel",
+          recordId: row.id,
+          operation: "delete" as const,
+          oldData: { ...row },
+          newData: { reason },
+          sourceUrl: null,
+        }))
+      );
+
+      // Delete from things table first (FK-safe)
+      await tx
+        .delete(things)
+        .where(
+          and(
+            eq(things.sourceTable, "personnel"),
+            sql`${things.sourceId} IN (${idList})`
+          )
+        );
+
+      // Delete personnel records
+      const result = await tx
+        .delete(personnel)
+        .where(sql`${personnel.id} IN (${idList})`)
+        .returning({ id: personnel.id });
+
+      deleted = result.length;
+    });
+
+    return c.json({ deleted, reason });
   });
 
 // ---- Exports ----

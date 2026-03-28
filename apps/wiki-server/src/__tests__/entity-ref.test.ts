@@ -39,12 +39,22 @@ describe("formatEntityRef", () => {
     expect(ref.name).toBe("openai-2024");
   });
 
-  it("allows legacy base64url IDs as names since they are not detected as stableIds", () => {
-    // After migration 0141 these IDs no longer exist in the system, but if they
-    // somehow appear, the strict pattern won't detect them as stableIds and they'll
-    // leak through as names. This is acceptable because the data is now clean.
-    expect(formatEntityRef(null, null, null, null, "Tw_Eo226h3").name).toBe("Tw_Eo226h3");
-    expect(formatEntityRef(null, null, null, null, "V-55MuswUh").name).toBe("V-55MuswUh");
+  it("rejects legacy base64url IDs with hyphens/underscores as names", () => {
+    // These legacy IDs (from a fixed bug in id.ts) should not leak through
+    // as display names. Migration 0141 normalized most, but personnel records
+    // may still contain them as personDisplayName values.
+    expect(formatEntityRef(null, null, null, null, "Tw_Eo226h3").name).toBeNull();
+    expect(formatEntityRef(null, null, null, null, "V-55MuswUh").name).toBeNull();
+  });
+
+  it("rejects stableId in displayName and falls back to rawId", () => {
+    const ref = formatEntityRef(null, null, null, "AbCdEfG12H", "some-org");
+    expect(ref.name).toBe("some-org");
+  });
+
+  it("rejects legacy ID in displayName and returns null when no fallback", () => {
+    const ref = formatEntityRef(null, null, null, "8-JZq4lrlD", null);
+    expect(ref.name).toBeNull();
   });
 
   it("returns all null for no inputs", () => {
