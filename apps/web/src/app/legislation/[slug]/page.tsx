@@ -44,6 +44,7 @@ import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
+import { getSourceDisplayName } from "../source-display-names";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -64,64 +65,6 @@ export async function generateMetadata({
   };
 }
 
-/**
- * Derive a human-readable source name from a URL.
- * Tries the publication database first, then falls back to a cleaned domain name.
- */
-/** Common domain → display name fallbacks for sources not in the publication DB. */
-const DOMAIN_DISPLAY_NAMES: Record<string, string> = {
-  "github.com": "GitHub",
-  "nytimes.com": "The New York Times",
-  "washingtonpost.com": "The Washington Post",
-  "reuters.com": "Reuters",
-  "apnews.com": "AP News",
-  "bbc.co.uk": "BBC",
-  "bbc.com": "BBC",
-  "theguardian.com": "The Guardian",
-  "bloomberg.com": "Bloomberg",
-  "ft.com": "Financial Times",
-  "wsj.com": "The Wall Street Journal",
-  "politico.com": "Politico",
-  "thehill.com": "The Hill",
-  "congress.gov": "Congress.gov",
-  "whitehouse.gov": "White House",
-  "arxiv.org": "arXiv",
-  "twitter.com": "Twitter/X",
-  "x.com": "X",
-  "medium.com": "Medium",
-  "substack.com": "Substack",
-  "techcrunch.com": "TechCrunch",
-  "theverge.com": "The Verge",
-  "wired.com": "Wired",
-  "arstechnica.com": "Ars Technica",
-  "cnbc.com": "CNBC",
-  "cnn.com": "CNN",
-  "npr.org": "NPR",
-  "pbs.org": "PBS",
-  "nature.com": "Nature",
-  "science.org": "Science",
-};
-
-function getSourceDisplayName(url: string): string | undefined {
-  const domain = extractDomain(url);
-  if (!domain) return undefined;
-  const pub = getPublicationByDomain(domain);
-  if (pub) return pub.name;
-  // Check hardcoded fallbacks for common sources
-  const fallback = DOMAIN_DISPLAY_NAMES[domain];
-  if (fallback) return fallback;
-  // Check subdomain match (e.g., news.bbc.co.uk → BBC)
-  for (const [d, name] of Object.entries(DOMAIN_DISPLAY_NAMES)) {
-    if (domain.endsWith(`.${d}`)) return name;
-  }
-  const cleaned = domain
-    .replace(/\.(com|org|net|io|co|gov|edu|us|uk|ca|au)$/i, "")
-    .replace(/\./g, " ");
-  return cleaned
-    .split(/[\s-]+/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
-}
 
 /** Resolve verification verdict for a stakeholder (server-side only). */
 function resolveVerdict(
