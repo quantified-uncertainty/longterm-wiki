@@ -209,7 +209,8 @@ const websiteSourcesApp = new Hono()
       .select()
       .from(websiteSourcePages)
       .where(eq(websiteSourcePages.sourceId, sourceId))
-      .orderBy(websiteSourcePages.path);
+      .orderBy(websiteSourcePages.path)
+      .limit(5000);
 
     return c.json({ sourceId, pages });
   })

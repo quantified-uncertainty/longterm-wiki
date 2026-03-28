@@ -199,7 +199,8 @@ const citationsApp = new Hono()
         accuracyScore: citationQuotes.accuracyScore,
       })
       .from(citationQuotes)
-      .where(eq(citationQuotes.pageId, intId));
+      .where(eq(citationQuotes.pageId, intId))
+      .limit(1000);
 
     return c.json(computePageHealth(pageId, rows));
   })
