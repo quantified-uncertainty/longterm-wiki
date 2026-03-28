@@ -50,7 +50,7 @@ jobs:
       WIKI_SERVER_ENV: prod
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
-      PROD_LONGTERMWIKI_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_API_KEY }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
       INPUT_BUDGET: ${{ inputs.budget || '2' }}
