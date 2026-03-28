@@ -346,8 +346,13 @@ export function OrganizationsTable({
   const displayRows = useStaticFallback ? staticPageRows : serverMode ? serverFiltered : localPageRows;
   const currentPage = useStaticFallback ? staticSafePage : serverMode ? server.meta.page - 1 : localSafePage;
   const totalPages = useStaticFallback ? staticFilteredPages : serverMode ? server.meta.pageCount : localTotalPages;
-  const displayTotal = serverMode ? server.meta.total : rows.length;
+  const displayTotal = useStaticFallback
+    ? rows.length
+    : serverMode
+      ? server.meta.total
+      : rows.length;
   const filteredTotal = useStaticFallback ? staticFiltered.length : serverMode ? serverFiltered.length : localFiltered.length;
+  const hasFallbackRows = useStaticFallback && staticFiltered.length > 0;
   const isLoading = serverMode && !useStaticFallback ? server.isLoading : false;
   const isInitialLoad = serverMode && !useStaticFallback && server.isLoading && server.data.length === 0;
 
@@ -367,7 +372,7 @@ export function OrganizationsTable({
   const statusText = (() => {
     if (serverMode) {
       if (isLoading) return "Loading...";
-      const fallbackNote = serverFailed ? " (showing cached data)" : "";
+      const fallbackNote = serverFailed && hasFallbackRows ? " (showing cached data)" : "";
       if (typeFilter !== "all" || statFilter !== "all") {
         return `${filteredTotal} of ${displayTotal} organizations (filtered)${fallbackNote}`;
       }
