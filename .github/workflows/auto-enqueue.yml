@@ -6,7 +6,7 @@ name: Auto-Enqueue on Auto-Merge
 # the PR via the GraphQL API.
 
 on:
-  pull_request:
+  pull_request_target:
     types: [auto_merge_enabled]
     branches: [main]
 
@@ -14,8 +14,10 @@ jobs:
   enqueue-if-ready:
     runs-on: ubuntu-latest
     permissions:
+      checks: read
       contents: read
       pull-requests: write
+      statuses: read
     steps:
       - name: Check status and enqueue
         uses: actions/github-script@v7
@@ -105,7 +107,14 @@ jobs:
               });
               console.log(`PR #${pr.number} enqueued into the merge queue.`);
             } catch (error) {
-              // The PR might already be in the queue, or the queue might not
-              // be enabled — either way, log and move on.
-              console.log(`Could not enqueue: ${error.message}`);
+              const msg = error.message || '';
+              // Known idempotent cases: PR already enqueued, or merge queue not enabled
+              const isIdempotent = msg.includes('already in') ||
+                msg.includes('merge queue is not enabled') ||
+                msg.includes('MERGE_QUEUE');
+              if (isIdempotent) {
+                console.log(`Enqueue skipped (expected): ${msg}`);
+              } else {
+                throw error;
+              }
             }
