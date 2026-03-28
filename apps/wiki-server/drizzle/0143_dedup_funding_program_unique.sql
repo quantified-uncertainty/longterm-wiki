@@ -13,7 +13,7 @@
 -- Step 1: Reassign grants from duplicate programs to canonical (earliest-created) programs.
 -- For each (org_id, name) group, the row with the lowest created_at is canonical.
 UPDATE grants g
-SET program_id = canonical.id
+SET program_id = canonical.canonical_id
 FROM (
   -- Find duplicates: rows where row_number > 1 within each (org_id, name) group
   SELECT fp.id AS dup_id, first_value(fp.id) OVER (
