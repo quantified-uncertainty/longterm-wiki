@@ -289,7 +289,7 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
 4. Run \`pnpm crux w validate gate --fix\`
 5. Run \`pnpm crux tb matrix mark-done ${top.wikiId}\`
 6. Commit changes
-7. Open PR via \`/agent-session-ready-PR\`` };
+7. Open PR via \`/agent-ship\`` };
 }
 
 async function markDoneCommand(args: string[], options: CommandOptions): Promise<CommandResult> {

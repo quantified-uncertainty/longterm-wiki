@@ -20,7 +20,7 @@ pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an 
 
 **"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
 
-At session end, run `/agent-session-ready-PR`. Always open a PR — never push directly to `main`.
+At session end, run `/agent-ship`. Always open a PR — never push directly to `main`.
 
 ## Quick Reference
 

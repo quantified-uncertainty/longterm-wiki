@@ -6,8 +6,8 @@ Analyze recent PR patterns, session logs, and development process to identify wh
 
 **Relationship to other commands:**
 - `/maintain` handles tactical cleanup (close issues, fix cruft)
-- `/audit` reviews codebase health and complexity
-- `/retrospective` reviews the development *process* — how work is getting done, not what the code looks like
+- `/maintain-audit` reviews codebase health and complexity
+- `/maintain-retrospective` reviews the development *process* — how work is getting done, not what the code looks like
 
 ## Phase 1: Gather Data
 

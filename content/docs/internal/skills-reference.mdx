@@ -1,0 +1,75 @@
+---
+wikiId: E2107
+title: "Skills Reference"
+description: "Complete reference for all Claude Code slash commands (skills) available in the longterm-wiki project."
+subcategory: dashboards
+contentFormat: dashboard
+lastEdited: "2026-03-27"
+---
+
+This page documents all slash commands (skills) available to Claude Code agents working on the longterm-wiki project. Skills are organized into four categories based on their purpose.
+
+## Agent Lifecycle
+
+These skills manage the session lifecycle: initialize, work, ship, and reset.
+
+| Command | Description | When to use |
+|---------|-------------|-------------|
+| `/agent-init` | Initialize agent checklist, register in DB, establish context | First thing in every session |
+| `/agent-ship` | Verify checklist, polish PR, create session log, push | End of every session |
+| `/agent-push-and-verify` | Run gate checks, push to GitHub, poll CI until green | Called by `/agent-ship`; also usable standalone |
+| `/agent-review-pr` | Paranoid diff review + execution-based verification | Before shipping non-trivial PRs; auto-triggered by `/agent-ship` for large PRs |
+| `/agent-next-issue` | Pick highest-priority GitHub issue, signal start, begin work | When starting a new issue-driven session |
+| `/agent-reset` | Close DB session, reset git to clean main, clean up local files | After shipping a PR to prepare for next task |
+
+**Typical session flow:** `/agent-init` → work → `/agent-ship` → `/agent-reset`
+
+## Maintenance & Health
+
+Periodic tasks that keep the codebase, wiki, and process healthy.
+
+| Command | Description | Cadence |
+|---------|-------------|---------|
+| `/maintain` | Full maintenance sweep: review PRs, triage issues, detect cruft, take action | Weekly (or after batch of PRs merge) |
+| `/maintain-pr-patrol` | Scan all open PRs for issues (CI failures, conflicts, bot comments) and fix them | Periodically, or via daemon mode |
+| `/maintain-audit` | Strategic codebase health review: complexity trends, dead code, system ROI | Biweekly |
+| `/maintain-retrospective` | Analyze recent PR patterns, session logs, process friction | Weekly |
+| `/maintain-qa-sweep` | Adversarial QA: break things, find bugs, audit data integrity, file issues | Daily via `/loop 24h /maintain-qa-sweep` |
+
+## Content & Data Review
+
+Deep analysis of specific entities, data quality, and knowledge coverage.
+
+| Command | Description | Input |
+|---------|-------------|-------|
+| `/review-entity-deep-dive` | Comprehensive review of one entity: completeness, accuracy, connections, recency | Entity slug (e.g., `anthropic`) |
+| `/review-ontology` | Analyze entity structure: sub-entity candidates, relationship gaps, statement placement | Entity slug |
+| `/review-knowledge-gap` | Identify missing topics, thin coverage areas, relationship gaps | Optional focus area |
+| `/review-tablebase-enrich` | Enrich structured data (personnel, funding, benchmarks) via web research | Runs from task queue |
+
+## Operations
+
+Standalone operational tasks with their own workflows.
+
+| Command | Description | Schedule |
+|---------|-------------|----------|
+| `/auto-update` | Fetch news, route to wiki pages, make targeted edits | Daily at 06:00 UTC (GitHub Actions) or via subscription |
+| `/maintain` (cron) | Maintenance sweep via launchd | Every 4 hours (gated on PR count) |
+
+## Naming Convention
+
+Skills follow a prefix-based naming scheme for discoverability:
+
+- **`agent-*`** — Session lifecycle (init, ship, push, review, reset, next-issue)
+- **`maintain-*`** — Periodic health checks and cleanup (audit, retrospective, qa-sweep, pr-patrol)
+- **`review-*`** — Deep analysis of specific content/data (entity-deep-dive, ontology, knowledge-gap, tablebase-enrich)
+- **`auto-update`** and **`maintain`** — Top-level operational commands
+
+## Skill Locations
+
+Skills are defined in two places:
+
+- **Commands** (`.claude/commands/*.md`): Simple markdown files, one per command
+- **Skills** (`.claude/skills/*/SKILL.md`): Directory-based skills with frontmatter for tool restrictions
+
+Both are loaded automatically by Claude Code.

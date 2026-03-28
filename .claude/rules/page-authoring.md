@@ -9,7 +9,7 @@ pnpm crux w improve <page-id> --tier=standard --apply  # polish | standard | dee
 
 **If the pipeline fails, fix the pipeline** — do not bypass it. See the crux source code in `crux/` to diagnose and fix issues. Manually written pages are missing citations, EntityLink validation, frontmatter syncing, and quality grading.
 
-Session logs are written automatically after `--apply` runs. Do not also run `/agent-session-ready-PR` for improve-only sessions.
+Session logs are written automatically after `--apply` runs. Do not also run `/agent-ship` for improve-only sessions.
 
 The improve pipeline includes a **semantic diff safety check** (`crux/lib/semantic-diff/`) that automatically runs after `--apply`. It extracts factual claims before and after modification, diffs them, and checks for contradictions. Warnings are logged but writes are never blocked. Snapshots are stored in `.claude/snapshots/` (gitignored) for post-hoc auditing.
 

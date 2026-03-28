@@ -4,7 +4,7 @@ description: User wants PR reviews to be much more thorough with mandatory manua
 type: feedback
 ---
 
-PR reviews must be aggressive and adversarial, not rubber-stamps. The old /review-pr was "not strong enough."
+PR reviews must be aggressive and adversarial, not rubber-stamps. The old /agent-review-pr was "not strong enough."
 
 **Why:** PRs were getting through with issues that should have been caught. The review process felt like a checkbox exercise rather than a genuine quality gate.
 

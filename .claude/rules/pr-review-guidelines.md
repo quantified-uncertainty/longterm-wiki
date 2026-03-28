@@ -34,15 +34,15 @@ Closes #533
 Closes #538
 ```
 
-## Preferred: `/agent-session-ready-PR`
+## Preferred: `/agent-ship`
 
-The recommended end-of-session command is `/agent-session-ready-PR`. It verifies the agent checklist (from `/agent-session-start`), polishes the PR description, updates GitHub issues, creates a session log, and calls `/push-and-ensure-green` to ship.
+The recommended end-of-session command is `/agent-ship`. It verifies the agent checklist (from `/agent-init`), polishes the PR description, updates GitHub issues, creates a session log, and calls `/agent-push-and-verify` to ship.
 
-If `/agent-session-start` was run at session start and `.claude/wip-checklist.md` exists, just run `/agent-session-ready-PR` — it handles everything.
+If `/agent-init` was run at session start and `.claude/wip-checklist.md` exists, just run `/agent-ship` — it handles everything.
 
 ## Fallback: Quick fix sessions
 
-If `/agent-session-start` was not run (e.g., a quick fix session), run `/agent-session-ready-PR` directly — it will generate a checklist on the fly if one doesn't exist, then walk through completion and shipping.
+If `/agent-init` was not run (e.g., a quick fix session), run `/agent-ship` directly — it will generate a checklist on the fly if one doesn't exist, then walk through completion and shipping.
 
 As a bare minimum, always open a PR before considering work complete.
 

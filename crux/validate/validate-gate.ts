@@ -340,7 +340,7 @@ const PARALLEL_STEPS: Step[] = [
     args: ['tsx', 'crux/validate/validate-review-marker.ts'],
     cwd: PROJECT_ROOT,
     // Blocking: large PRs (>5 files or >300 lines) must be reviewed via
-    // /review-pr. The check passes immediately for small PRs.
+    // /agent-review-pr. The check passes immediately for small PRs.
   },
   {
     id: 'typecheck-crux-baseline',

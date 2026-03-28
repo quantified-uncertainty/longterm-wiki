@@ -55,7 +55,7 @@ ${recentEntries}
 - Do NOT file speculative issues — only patterns demonstrated by log data.
 - Do NOT file issues about one-time events — look for recurring patterns (3+ occurrences).
 - Do NOT run any git commands or modify any files.
-- Do NOT run /agent-session-start or /agent-session-ready-PR.`;
+- Do NOT run /agent-init or /agent-ship.`;
 
   const startTime = Date.now();
   try {
