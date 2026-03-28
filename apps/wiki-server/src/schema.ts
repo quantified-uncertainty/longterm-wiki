@@ -3337,7 +3337,7 @@ export const proposedClaims = pgTable(
     proposedData: jsonb("proposed_data"),
 
     // Source evidence (from research agent)
-    resourceId: text("resource_id").references(() => resources.id),
+    resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
     sourceUrl: text("source_url").notNull(),
     agentEvidence: text("agent_evidence"),
 
@@ -3381,7 +3381,7 @@ export const claimRecordLinks = pgTable(
     id: bigserial("id", { mode: "number" }).primaryKey(),
     claimId: bigint("claim_id", { mode: "number" })
       .notNull()
-      .references(() => proposedClaims.id),
+      .references(() => proposedClaims.id, { onDelete: "cascade" }),
     recordType: text("record_type").notNull(),
     recordId: text("record_id").notNull(),
     matchVerdict: text("match_verdict"),
@@ -3409,7 +3409,8 @@ export const operationsLog = pgTable(
     description: text("description").notNull(),
     prNumber: integer("pr_number"),
     agentSessionId: bigint("agent_session_id", { mode: "number" }).references(
-      () => agentSessions.id
+      () => agentSessions.id,
+      { onDelete: "set null" }
     ),
     operator: text("operator").notNull().default("agent"),
     metadata: jsonb("metadata").$type<Record<string, unknown>>(),

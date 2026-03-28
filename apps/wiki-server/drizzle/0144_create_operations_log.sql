@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS "operations_log" (
   "id" bigserial PRIMARY KEY,
   "description" text NOT NULL,
   "pr_number" integer,
-  "agent_session_id" bigint REFERENCES "agent_sessions"("id"),
+  "agent_session_id" bigint REFERENCES "agent_sessions"("id") ON DELETE SET NULL,
   "operator" text NOT NULL DEFAULT 'agent',
   "metadata" jsonb,
   "created_at" timestamp with time zone NOT NULL DEFAULT now()

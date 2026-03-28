@@ -6,17 +6,18 @@ import { zv } from "../shared/utils.js";
 import { z } from "zod";
 
 const CreateOperationSchema = z.object({
-  description: z.string().min(1),
-  prNumber: z.number().int().optional(),
-  agentSessionId: z.number().int().optional(),
-  operator: z.string().default("agent"),
+  description: z.string().trim().min(1),
+  prNumber: z.number().int().positive().optional(),
+  agentSessionId: z.number().int().positive().optional(),
+  operator: z.string().trim().min(1).default("agent"),
   metadata: z.record(z.unknown()).optional(),
 });
 
 const operationsLogApp = new Hono()
   .get("/", async (c) => {
     const db = getDrizzleDb();
-    const limit = Math.min(Number(c.req.query("limit") ?? 50), 200);
+    const raw = parseInt(c.req.query("limit") ?? "50", 10);
+    const limit = Math.min(Math.max(Number.isNaN(raw) || raw < 1 ? 50 : raw, 1), 200);
 
     const rows = await db
       .select()

@@ -319,7 +319,11 @@ const claimsApp = new Hono()
       byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
     }
 
-    const unsettledCount = byStatus.pending + byStatus.verifying;
+    // Compute settled as total minus known-terminal statuses, so unexpected
+    // status values are treated as unsettled (fail-safe).
+    const SETTLED_STATUSES = new Set(["verified", "contradicted", "unverifiable", "expired"]);
+    const settledCount = claims.filter((r) => SETTLED_STATUSES.has(r.status)).length;
+    const unsettledCount = claims.length - settledCount;
     const allSettled = unsettledCount === 0;
     const estimatedRemaining = unsettledCount * SECONDS_PER_CLAIM_ESTIMATE;
 

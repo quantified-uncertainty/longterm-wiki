@@ -321,7 +321,13 @@ async function handleCheckClaimStatus(input: Record<string, unknown>): Promise<s
     ...(data.estimatedRemaining > 0 ? [`Estimated remaining: ${data.estimatedRemaining}s`] : []),
   ].join('\n');
 
-  return `${summary}\n\nClaims:\n${JSON.stringify(data.claims, null, 2)}`;
+  const MAX_SHOWN = 20;
+  const shownClaims = data.claims.slice(0, MAX_SHOWN);
+  const omitted = data.claims.length - shownClaims.length;
+  const claimsText = JSON.stringify(shownClaims, null, 2);
+  const omittedNote = omitted > 0 ? `\n\n...and ${omitted} more claims omitted` : '';
+
+  return `${summary}\n\nClaims:\n${claimsText}${omittedNote}`;
 }
 
 async function handleSubmitRecords(
