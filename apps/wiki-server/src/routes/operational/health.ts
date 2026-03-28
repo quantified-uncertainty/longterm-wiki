@@ -58,7 +58,10 @@ const healthApp = new Hono()
     return c.json({
       status: isDegraded ? "degraded" : "healthy",
       database: dbStatus,
-      ...(migrationError ? { migrationError } : {}),
+      // Only expose that a migration failed, not the raw error message.
+      // Raw errors may contain table names, SQL fragments, or literal values.
+      // Full details are in the server logs (logger.error in index.ts).
+      ...(migrationError ? { migrationError: "migration_failed" } : {}),
       totalIds,
       totalPages,
       totalEntities,

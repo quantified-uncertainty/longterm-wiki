@@ -163,8 +163,10 @@ export function createApp() {
   app.get("/readyz", (c) => {
     const migrationError = getMigrationError();
     if (migrationError) {
+      // Don't expose raw error — it may contain SQL/table names.
+      // Full details are in server logs.
       return c.json(
-        { status: "not-ready", reason: "migration_failed", error: migrationError },
+        { status: "not-ready", reason: "migration_failed" },
         503
       );
     }
