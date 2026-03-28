@@ -149,6 +149,74 @@ describe("formatKBFactValue", () => {
     });
   });
 
+  describe("Bug #3305: range and min values missing currency", () => {
+    it("passes currency to formatKBNumber for range values", () => {
+      const fact: Fact = {
+        id: "test", subjectId: "test", propertyId: "revenue",
+        value: { type: "range", low: 20_000_000_000, high: 26_000_000_000 },
+        currency: "GBP",
+      };
+      const result = formatKBFactValue(fact, "USD");
+      expect(result).toContain("£");
+      expect(result).not.toContain("$");
+    });
+
+    it("passes currency to formatKBNumber for min values", () => {
+      const fact: Fact = {
+        id: "test", subjectId: "test", propertyId: "revenue",
+        value: { type: "min", value: 5_000_000_000 },
+        currency: "GBP",
+      };
+      const result = formatKBFactValue(fact, "USD");
+      expect(result).toContain("£");
+      expect(result).not.toContain("$");
+    });
+
+    it("uses range value own unit when property unit is absent", () => {
+      const fact = makeFact("unknown-prop", { type: "range", low: 1_000_000_000, high: 2_000_000_000, unit: "USD" });
+      const result = formatKBFactValue(fact);
+      expect(result).toContain("$");
+    });
+
+    it("uses min value own unit when property unit is absent", () => {
+      const fact = makeFact("unknown-prop", { type: "min", value: 1_000_000_000, unit: "USD" });
+      const result = formatKBFactValue(fact);
+      expect(result).toContain("$");
+    });
+  });
+
+  describe("Bug #3305: JSON-wrapped nested FactValue objects", () => {
+    it("unwraps nested number from json format", () => {
+      const fact = makeFact("valuation", { type: "json", value: { type: "number", value: 500_000_000_000 } });
+      expect(formatKBFactValue(fact, "USD")).toBe("$500 billion");
+    });
+
+    it("unwraps nested number with unit from json format", () => {
+      const fact = makeFact("valuation", { type: "json", value: { type: "number", value: 500_000_000_000, unit: "USD" } });
+      expect(formatKBFactValue(fact)).toBe("$500 billion");
+    });
+
+    it("unwraps nested text from json format", () => {
+      const fact = makeFact("some-field", { type: "json", value: { type: "text", value: "Hello World" } });
+      expect(formatKBFactValue(fact)).toBe("Hello World");
+    });
+
+    it("unwraps nested boolean from json format", () => {
+      const fact = makeFact("some-bool", { type: "json", value: { type: "boolean", value: true } });
+      expect(formatKBFactValue(fact)).toBe("Yes");
+    });
+
+    it("unwraps nested date from json format", () => {
+      const fact = makeFact("some-date", { type: "json", value: { type: "date", value: "2025-06" } });
+      expect(formatKBFactValue(fact)).toBe("Jun 2025");
+    });
+
+    it("falls back to JSON.stringify for non-FactValue json objects", () => {
+      const fact = makeFact("some-json", { type: "json", value: { foo: "bar", baz: 42 } });
+      expect(formatKBFactValue(fact)).toBe('{"foo":"bar","baz":42}');
+    });
+  });
+
   describe("existing value types are unaffected", () => {
     it("formats boolean facts", () => {
       const fact = makeFact("some-bool", { type: "boolean", value: true });

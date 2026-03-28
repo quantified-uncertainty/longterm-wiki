@@ -125,12 +125,13 @@ export function formatKBFactValue(
     case "refs":
       return v.value.join(", "); // Caller should render as EntityLinks
     case "range": {
-      const lowStr = formatKBNumber(v.low, unit, display);
-      const highStr = formatKBNumber(v.high, unit, display);
+      const rangeUnit = unit ?? v.unit;
+      const lowStr = formatKBNumber(v.low, rangeUnit, display, fact.currency);
+      const highStr = formatKBNumber(v.high, rangeUnit, display, fact.currency);
       return `${lowStr}\u2013${highStr}`;
     }
     case "min":
-      return `\u2265${formatKBNumber(v.value, unit, display)}`;
+      return `\u2265${formatKBNumber(v.value, unit ?? v.unit, display, fact.currency)}`;
     case "json": {
       // Guard: if the JSON value is a nested FactValue object (e.g., malformed YAML
       // `value: {type: number, value: X, unit: USD}`), format it properly instead of
