@@ -1,3 +1,8 @@
+---
+description: Run CI checks locally, push to GitHub, and monitor until green. Fix and retry if anything fails.
+effort: medium
+---
+
 # Ship
 
 Run all CI checks locally, push to GitHub, and monitor until green. Fix and retry if anything fails.

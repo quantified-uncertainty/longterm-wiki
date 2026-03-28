@@ -1,3 +1,8 @@
+---
+description: Comprehensive paranoid review of the current branch's changes. Combines diff review with execution-based verification.
+effort: high
+---
+
 # Review PR
 
 Comprehensive paranoid review of the current branch's changes. Combines diff review with execution-based verification.

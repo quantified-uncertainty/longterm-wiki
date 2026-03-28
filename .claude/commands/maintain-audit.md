@@ -1,3 +1,8 @@
+---
+description: Strategic review of codebase health, complexity trends, and simplification opportunities.
+effort: medium
+---
+
 # Codebase Audit
 
 Strategic review of codebase health, complexity trends, and simplification opportunities. Produces a written report with concrete recommendations.

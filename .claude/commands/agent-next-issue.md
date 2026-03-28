@@ -1,3 +1,9 @@
+---
+description: Pick up the next highest-priority GitHub issue and start working on it.
+argument-hint: "[issue-number]"
+effort: medium
+---
+
 # Next Issue
 
 Pick up the next highest-priority GitHub issue and start working on it.

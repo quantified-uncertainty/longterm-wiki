@@ -1,3 +1,8 @@
+---
+description: Verify the agent checklist is complete, polish the PR, and ship.
+effort: medium
+---
+
 # Agent Session Ready PR
 
 Verify the agent checklist is complete, polish the PR, and ship.

@@ -1,3 +1,8 @@
+---
+description: Run the daily wiki auto-update using subscription mode instead of API billing.
+effort: high
+---
+
 # Auto-Update (Subscription Mode)
 
 Run the daily wiki auto-update using Claude Code's subscription instead of API billing.
