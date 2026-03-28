@@ -291,28 +291,6 @@
     - title: Centre for the Governance of AI
       url: https://www.governance.ai
 
-- id: forethought-foundation
-  stableId: Pd-y8jBVN0
-  type: organization
-  orgType: generic
-  title: Forethought Foundation
-  description: >-
-    Research organization that published "Design Sketches for Collective Epistemics" (2025),
-    proposing five technologies for shifting society toward high-honesty equilibria:
-    Community Notes for Everything, Rhetoric Highlighting, Reliability Tracking,
-    Epistemic Virtue Evals, and Provenance Tracing.
-  website: https://www.forethought.org
-  tags:
-    - collective-epistemics
-    - information-integrity
-    - governance
-  clusters:
-    - governance
-    - epistemics
-  sources:
-    - title: Forethought Foundation
-      url: https://www.forethought.org
-
 - id: newdemocracy-foundation
   stableId: 7bmpbkSWVn
   type: organization

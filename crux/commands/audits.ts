@@ -581,6 +581,9 @@ async function runAutoCommand(
     lines.push('');
 
     try {
+      // Note: check_command is from version-controlled audits.yaml.
+      // Commands require shell features (pipes, loops, gh api) so
+      // they run through execSync. YAML changes are reviewed via PR.
       const output = execSync(item.check_command!, {
         cwd: PROJECT_ROOT,
         timeout: 30_000,
