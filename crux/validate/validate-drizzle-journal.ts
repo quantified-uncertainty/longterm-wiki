@@ -283,7 +283,8 @@ export function runCheck(): CheckResult {
     }
     const stripped = content.replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
     const hasUniqueIndex = /\bCREATE\s+UNIQUE\s+INDEX\b/i.test(stripped);
-    const hasHardcodedDelete = /\bDELETE\s+FROM\s+\w+\s+WHERE\s+id\s*=\s*'/i.test(stripped);
+    // Match DELETE with hardcoded IDs: WHERE id = 'x' OR WHERE id IN ('x', 'y')
+    const hasHardcodedDelete = /\bDELETE\s+FROM\s+\S+\s+WHERE\s+\S*id\s*(?:=\s*'|IN\s*\()/i.test(stripped);
     const hasDynamicDedup = /\bROW_NUMBER\s*\(\s*\)\s+OVER\b/i.test(stripped);
 
     if (hasUniqueIndex && hasHardcodedDelete && !hasDynamicDedup) {

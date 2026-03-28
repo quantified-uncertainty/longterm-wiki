@@ -17,10 +17,10 @@ async function main() {
       await initDb();
     } catch (err) {
       // Start in degraded mode instead of crash-looping.
-      // The health endpoint will report "degraded" with the error details,
-      // giving operators visibility without requiring kubectl to diagnose.
-      // Write endpoints will still work (the DB connection pool is separate
-      // from the migration connection), but schema may be out of date.
+      // The /health endpoint reports "degraded" with the error, and the
+      // /readyz endpoint returns 503 to prevent K8s from routing traffic
+      // to this pod. Endpoints that touch schema created by the failed
+      // migration will 500, but the diagnostic endpoints remain reachable.
       migrationFailed = true;
       const errorMessage = err instanceof Error ? err.message : String(err);
       setMigrationError(errorMessage);
