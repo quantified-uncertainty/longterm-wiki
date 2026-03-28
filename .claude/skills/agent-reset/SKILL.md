@@ -1,5 +1,5 @@
 ---
-name: reset-dir
+name: agent-reset
 description: Close the current agent session in the DB and reset the agent slot back to a clean main branch. Run this when finishing a feature — it handles DB cleanup, git reset, and local file cleanup in one step.
 disable-model-invocation: true
 allowed-tools: Bash, Read
@@ -60,8 +60,8 @@ This command handles the full session transition: DB close + git reset + local c
 
 ## Arguments
 
-- `/reset-dir --force` — skip the confirmation step
-- `/reset-dir` — confirm before discarding changes
+- `/agent-reset --force` — skip the confirmation step
+- `/agent-reset` — confirm before discarding changes
 
 ## Important
 

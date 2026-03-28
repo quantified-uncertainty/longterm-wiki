@@ -2169,6 +2169,7 @@ export const fundingPrograms = pgTable(
     index("idx_fp_division").on(table.divisionId),
     index("idx_fp_status").on(table.status),
     index("idx_fp_type").on(table.programType),
+    uniqueIndex("uq_fp_org_name").on(table.orgId, table.name),
   ]
 );
 
@@ -3304,5 +3305,93 @@ export const raceCandidates = pgTable(
     index("idx_rc_pac_entity").on(table.pacEntityId),
     index("idx_rc_status").on(table.status),
     index("idx_rc_ai_stance").on(table.aiStance),
+  ]
+);
+
+// ============================================================================
+// Claims-first verification — proposed_claims + claim_record_links
+//
+// Research agents propose structured claims about entities. A verification
+// worker checks each claim against source evidence and records a verdict.
+// claim_record_links connects approved claims to the records they affected.
+//
+// See: https://github.com/quantified-uncertainty/longterm-wiki/issues/3253
+// ============================================================================
+
+/**
+ * Proposed claims — structured assertions submitted by research agents
+ * for verification before being applied to TableBase records.
+ */
+export const proposedClaims = pgTable(
+  "proposed_claims",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    batchId: text("batch_id").notNull(),
+
+    // What's being claimed
+    claimText: text("claim_text").notNull(),
+    entityId: text("entity_id"),
+    targetTable: text("target_table").notNull(),
+    targetField: text("target_field"),
+    proposedValue: text("proposed_value"),
+    proposedData: jsonb("proposed_data"),
+
+    // Source evidence (from research agent)
+    resourceId: text("resource_id").references(() => resources.id),
+    sourceUrl: text("source_url").notNull(),
+    agentEvidence: text("agent_evidence"),
+
+    // Verification state (updated by worker)
+    status: text("status").notNull().default("pending"),
+    verdictConfidence: real("verdict_confidence"),
+    verdictReasoning: text("verdict_reasoning"),
+    extractedValue: text("extracted_value"),
+    checkerModel: text("checker_model"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    evidenceId: bigint("evidence_id", { mode: "number" }),
+
+    // Job tracking
+    verificationJobId: bigint("verification_job_id", { mode: "number" }),
+
+    // Audit
+    submittedBy: text("submitted_by"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pc_batch").on(table.batchId),
+    index("idx_pc_status").on(table.status),
+    index("idx_pc_entity").on(table.entityId),
+    index("idx_pc_resource").on(table.resourceId),
+    index("idx_pc_target").on(table.targetTable, table.entityId),
+  ]
+);
+
+/**
+ * Claim-record links — connects verified claims to the domain records
+ * they were applied to (personnel, grants, funding_rounds, etc.).
+ */
+export const claimRecordLinks = pgTable(
+  "claim_record_links",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    claimId: bigint("claim_id", { mode: "number" })
+      .notNull()
+      .references(() => proposedClaims.id),
+    recordType: text("record_type").notNull(),
+    recordId: text("record_id").notNull(),
+    matchVerdict: text("match_verdict"),
+    matchConfidence: real("match_confidence"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_crl_claim").on(table.claimId),
+    index("idx_crl_record").on(table.recordType, table.recordId),
   ]
 );

@@ -112,6 +112,7 @@ import * as dataQualityCommands from './commands/data-quality.ts';
 import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
 import * as branchesCommands from './commands/branches.ts';
+import * as deployTasksCommands from './commands/deploy-tasks.ts';
 
 const domains = {
   validate: validateCommands,
@@ -188,6 +189,7 @@ const domains = {
   bluesky: blueskyCommands,
   races: politicalRacesCommands,
   branches: branchesCommands,
+  'deploy-tasks': deployTasksCommands,
 };
 
 const shortcutMap = buildShortcutMap();

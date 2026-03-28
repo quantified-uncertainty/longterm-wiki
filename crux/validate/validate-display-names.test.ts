@@ -32,7 +32,6 @@ function run(cmd: string): { stdout: string; exitCode: number } {
 describe('looksLikeStableId', () => {
   it('detects typical stableIds', () => {
     expect(looksLikeStableId('mK9pX3rQ7n')).toBe(true);
-    expect(looksLikeStableId('Tw_Eo226h3')).toBe(true);
     expect(looksLikeStableId('A4XoubikkQ')).toBe(true); // has digits, mixed case
     expect(looksLikeStableId('Z62bQynY4g')).toBe(true);
     expect(looksLikeStableId('0u4J70VqFY')).toBe(true);

@@ -100,6 +100,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'review',
       'pr-patrol',
       'branches',
+      'deploy-tasks',
     ],
     flattened: ['issues'],
   },

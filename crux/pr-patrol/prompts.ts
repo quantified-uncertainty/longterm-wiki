@@ -127,8 +127,8 @@ After making and committing fixes, push with:
   git push --force-with-lease
 
 The pre-push gate hook runs automatically. If it fails with a **review marker error**
-("Review marker SHA ... does not match HEAD" or "has not been reviewed via /review-pr"),
-write the marker directly — patrol fixes are small and targeted, so a full /review-pr
+("Review marker SHA ... does not match HEAD" or "has not been reviewed via /agent-review-pr"),
+write the marker directly — patrol fixes are small and targeted, so a full /agent-review-pr
 re-review is not required:
   echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ)" > .claude/review-done
   git add .claude/review-done && git commit -m "chore: update review marker"
@@ -140,7 +140,7 @@ re-review is not required:
 - After any code changes, run: pnpm crux validate gate --fix
 - Use git push --force-with-lease (never --force) when pushing rebased branches
 - Do not modify files unrelated to the fix
-- Do NOT run /agent-session-start or /agent-session-ready-PR — this is a targeted fix, not a full session
+- Do NOT run /agent-init or /agent-ship — this is a targeted fix, not a full session
 - Do NOT create new branches — work on the existing PR branch
 
 ## Escalation order — exhaust automation before stopping
@@ -244,6 +244,6 @@ The CI workflow on the \`main\` branch is failing. Run ID: ${runId}
 - Only fix the CI failure — do not refactor or improve unrelated code
 - If the failure is in test expectations that need updating (not a real bug), update the tests
 - If you cannot diagnose or fix the issue, output a clear summary of what you found
-- Do NOT run /agent-session-start or /agent-session-ready-PR
+- Do NOT run /agent-init or /agent-ship
 - Run pnpm crux validate gate --fix before committing`;
 }

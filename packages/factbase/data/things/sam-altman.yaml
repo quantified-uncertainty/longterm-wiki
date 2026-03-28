@@ -35,9 +35,10 @@ facts:
     value: "https://github.com/sama"
   - id: f_U5suM3Dqcg
     property: net-worth
-    value: 2.8e+9
-    asOf: "2024"
-    notes: "Investment portfolio value per WSJ investigation."
+    value: 2.0e+9
+    asOf: "2025"
+    source: https://en.wikipedia.org/wiki/Sam_Altman
+    notes: "Estimated at ~$2.0B (Forbes Dec 2025: $2.1B). Derived from venture investments including Reddit (~$1.6B in shares), Stripe, Helion Energy, and other holdings. Altman holds zero OpenAI equity per the Oct 2025 PBC restructuring, despite earlier reports of a proposed 7% stake."
 
   - id: f_kFUCZeA9vg
     property: description

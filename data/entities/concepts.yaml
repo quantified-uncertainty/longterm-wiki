@@ -143,7 +143,7 @@
       value: Policy, law, international relations
   relatedEntries:
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: La8s84s3zg
       type: policy
     - id: XLLyzaEaCA
@@ -245,7 +245,7 @@
       value: PhD or self-study + demonstrations
   relatedEntries:
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
     - id: mK9pX3rQ7n
       type: organization
     - id: dwMzc9WzPa
@@ -428,7 +428,7 @@
   status: stub
   relatedEntries:
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
   tags:
     - interpretability
     - theory
@@ -735,7 +735,7 @@
     - id: sycophancy
       type: risk
     - id: rt6jVH9yuA
-      type: concept
+      type: approach
   lastUpdated: 2026-02
 
 - id: misuse-risks
@@ -794,11 +794,11 @@
     - governance
   relatedEntries:
     - id: 73qTEkYyWA
-      type: concept
+      type: research-area
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: pkCwkyxL0w
-      type: concept
+      type: approach
   lastUpdated: 2026-02
 
 - id: accident-risks
@@ -823,11 +823,11 @@
     - governance
   relatedEntries:
     - id: 8Bv92x9G1A
-      type: concept
+      type: risk
     - id: vc60Nthkcg
       type: risk
     - id: 5maTNr0PGA
-      type: concept
+      type: capability
     - id: mK9pX3rQ7n
       type: organization
     - id: puAffUjWSS
@@ -885,7 +885,7 @@
     - id: MUGUxfl2YA
       type: risk
     - id: KYKdAOzynA
-      type: concept
+      type: organization
     - id: 9v7wxee33g
       type: crux
     - id: Ped7HAlI0A
@@ -975,7 +975,7 @@
     - epistemics
   relatedEntries:
     - id: l8ZPtVJdsA
-      type: concept
+      type: approach
     - id: JKsVHQ5stQ
       type: person
     - id: zR4nW8xB2f
@@ -1014,9 +1014,9 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: x19LcGDk6Q
-      type: concept
+      type: risk
     - id: 73qTEkYyWA
-      type: concept
+      type: research-area
   lastUpdated: 2026-02
 
 - id: heavy-scaffolding
@@ -1047,7 +1047,7 @@
     - id: RScckMUC2g
       type: concept
     - id: BP0tsiccNw
-      type: concept
+      type: capability
   lastUpdated: 2026-02
 
 - id: provable-safe
@@ -1073,9 +1073,9 @@
     - governance
   relatedEntries:
     - id: DSSCdI8gLA
-      type: concept
+      type: approach
     - id: d9OJFyUmjw
-      type: concept
+      type: capability
     - id: RScckMUC2g
       type: concept
     - id: NCLlwmOTkg
@@ -1106,11 +1106,11 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: rSE7kY5k4Q
-      type: concept
+      type: research-area
     - id: 6sdr78k9kQ
       type: approach
     - id: x19LcGDk6Q
-      type: concept
+      type: risk
     - id: NCLlwmOTkg
       type: concept
   lastUpdated: 2026-02

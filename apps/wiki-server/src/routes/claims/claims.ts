@@ -1,0 +1,265 @@
+/**
+ * Claims routes — propose claims for verification + poll status.
+ *
+ * Part of the claims-first verification architecture (#3253).
+ * Uses raw SQL via postgres.js for simplicity.
+ */
+
+import { Hono } from "hono";
+import { randomBytes } from "node:crypto";
+import { getDb } from "../../db.js";
+import { logger as rootLogger } from "../../logger.js";
+import {
+  notFoundError,
+  validationError,
+  parseJsonBody,
+  dbError,
+  zv,
+} from "../shared/utils.js";
+import { ProposeClaimsSchema, VALID_CLAIM_STATUSES } from "../../api-types.js";
+
+const logger = rootLogger.child({ component: "claims" });
+
+// ---------------------------------------------------------------------------
+// Row types for raw SQL results
+// ---------------------------------------------------------------------------
+
+interface ProposedClaimRow {
+  id: number;
+  batch_id: string;
+  claim_text: string;
+  status: string;
+  verdict_confidence: number | null;
+  verdict_reasoning: string | null;
+  extracted_value: string | null;
+}
+
+interface InsertedClaimRow {
+  id: number;
+  resource_id: string | null;
+}
+
+interface InsertedJobRow {
+  id: number;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Generate a 10-character alphanumeric ID. Same pattern as ids.ts generateStableId(). */
+function generateBatchId(): string {
+  const CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
+  const raw = randomBytes(7).toString("base64url").slice(0, 10);
+  return raw
+    .split("")
+    .map((ch) => {
+      if (ch === "-" || ch === "_") {
+        const byte = randomBytes(1)[0];
+        return CHARS[byte % CHARS.length];
+      }
+      return ch;
+    })
+    .join("");
+}
+
+/** Rough estimate of seconds per pending claim for polling UX. */
+const SECONDS_PER_CLAIM_ESTIMATE = 3;
+
+/** Job priority for claim verification (higher than default page-improve). */
+const CLAIM_VERIFICATION_JOB_PRIORITY = 10;
+
+function formatClaim(row: ProposedClaimRow) {
+  return {
+    id: row.id,
+    claimText: row.claim_text,
+    status: row.status,
+    ...(row.verdict_confidence != null && { confidence: row.verdict_confidence }),
+    ...(row.verdict_reasoning != null && { reasoning: row.verdict_reasoning }),
+    ...(row.extracted_value != null && { extractedValue: row.extracted_value }),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Route
+// ---------------------------------------------------------------------------
+
+const claimsApp = new Hono()
+
+  // ---- POST /propose (submit claims for verification) ----
+
+  .post("/propose", zv("json", ProposeClaimsSchema), async (c) => {
+    const { entityId, targetTable, agentSessionId, claims } = c.req.valid("json");
+    const sql = getDb();
+    const batchId = generateBatchId();
+
+    logger.info(
+      { batchId, entityId, targetTable, claimCount: claims.length },
+      "proposing claims for verification",
+    );
+
+    // 1. Validate resource references exist (if provided)
+    const resourceIds = [
+      ...new Set(claims.map((cl) => cl.resourceId).filter(Boolean) as string[]),
+    ];
+    if (resourceIds.length > 0) {
+      const existing = await sql<{ id: string }[]>`
+        SELECT id FROM resources WHERE id = ANY(${resourceIds})
+      `;
+      const existingSet = new Set(existing.map((r) => r.id));
+      const missing = resourceIds.filter((id) => !existingSet.has(id));
+      if (missing.length > 0) {
+        return validationError(
+          c,
+          `Resource IDs not found: ${missing.join(", ")}`,
+        );
+      }
+    }
+
+    // 2. Insert all claims in a single batch
+    const insertedClaims = await sql<InsertedClaimRow[]>`
+      INSERT INTO proposed_claims (
+        batch_id, claim_text, entity_id, target_table, target_field,
+        proposed_value, proposed_data, resource_id, source_url,
+        agent_evidence, status, submitted_by
+      )
+      SELECT * FROM unnest(
+        ${claims.map(() => batchId)}::text[],
+        ${claims.map((cl) => cl.claimText)}::text[],
+        ${claims.map(() => entityId ?? null)}::text[],
+        ${claims.map(() => targetTable)}::text[],
+        ${claims.map((cl) => cl.targetField ?? null)}::text[],
+        ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
+        ${claims.map((cl) => cl.proposedData ? JSON.stringify(cl.proposedData) : null)}::jsonb[],
+        ${claims.map((cl) => cl.resourceId ?? null)}::text[],
+        ${claims.map((cl) => cl.sourceUrl)}::text[],
+        ${claims.map((cl) => cl.agentEvidence ?? null)}::text[],
+        ${claims.map(() => "pending")}::text[],
+        ${claims.map(() => agentSessionId ?? null)}::text[]
+      )
+      RETURNING id, resource_id
+    `;
+
+    if (insertedClaims.length !== claims.length) {
+      logger.error(
+        { expected: claims.length, got: insertedClaims.length, batchId },
+        "claim insertion count mismatch",
+      );
+    }
+
+    // 3. Group claims by resource_id → one verification job per resource
+    const claimsByResource = new Map<string, number[]>();
+    for (const row of insertedClaims) {
+      const key = row.resource_id ?? "__no_resource__";
+      const group = claimsByResource.get(key);
+      if (group) group.push(row.id);
+      else claimsByResource.set(key, [row.id]);
+    }
+
+    // 4. Create verification jobs (one per resource group)
+    const jobEntries: Array<{ claimIds: number[]; resourceId: string | null; jobId: number }> = [];
+
+    for (const [resourceKey, claimIds] of claimsByResource) {
+      const resourceId = resourceKey === "__no_resource__" ? null : resourceKey;
+      const jobParams = {
+        claimIds,
+        resourceId,
+        batchId,
+        entityId: entityId ?? null,
+      };
+
+      const jobRows = await sql<InsertedJobRow[]>`
+        INSERT INTO jobs (type, params, priority, max_retries)
+        VALUES (
+          'claim-verification',
+          ${JSON.stringify(jobParams)}::jsonb,
+          ${CLAIM_VERIFICATION_JOB_PRIORITY},
+          3
+        )
+        RETURNING id
+      `;
+
+      if (jobRows.length > 0) {
+        jobEntries.push({ claimIds, resourceId, jobId: jobRows[0].id });
+      }
+    }
+
+    // 5. Update claims with their verification_job_id
+    for (const entry of jobEntries) {
+      await sql`
+        UPDATE proposed_claims
+        SET verification_job_id = ${entry.jobId}
+        WHERE id = ANY(${entry.claimIds})
+      `;
+    }
+
+    // 6. Build response
+    const claimIdToJobId = new Map<number, number>();
+    for (const entry of jobEntries) {
+      for (const claimId of entry.claimIds) {
+        claimIdToJobId.set(claimId, entry.jobId);
+      }
+    }
+
+    const uniqueResources = claimsByResource.size;
+    const estimatedVerificationTime = uniqueResources * SECONDS_PER_CLAIM_ESTIMATE;
+
+    return c.json(
+      {
+        batchId,
+        claims: insertedClaims.map((row) => ({
+          id: row.id,
+          status: "pending" as const,
+          verificationJobId: claimIdToJobId.get(row.id) ?? null,
+        })),
+        jobCount: jobEntries.length,
+        estimatedVerificationTime,
+      },
+      201,
+    );
+  })
+
+  // ---- GET /status/:batchId (poll verification progress) ----
+
+  .get("/status/:batchId", async (c) => {
+    const batchId = c.req.param("batchId");
+    const sql = getDb();
+
+    logger.debug({ batchId }, "polling claim status");
+
+    const claims = await sql<ProposedClaimRow[]>`
+      SELECT id, batch_id, claim_text, status, verdict_confidence, verdict_reasoning, extracted_value
+      FROM proposed_claims
+      WHERE batch_id = ${batchId}
+      ORDER BY id ASC
+      LIMIT 1000
+    `;
+
+    if (claims.length === 0) {
+      return notFoundError(c, `No claims found for batch ${batchId}`);
+    }
+
+    // Compute status counts from the already-fetched claims array
+    const byStatus: Record<string, number> = Object.fromEntries(
+      VALID_CLAIM_STATUSES.map((s) => [s, 0]),
+    );
+    for (const row of claims) {
+      byStatus[row.status] = (byStatus[row.status] ?? 0) + 1;
+    }
+
+    const unsettledCount = byStatus.pending + byStatus.verifying;
+    const allSettled = unsettledCount === 0;
+    const estimatedRemaining = unsettledCount * SECONDS_PER_CLAIM_ESTIMATE;
+
+    return c.json({
+      batchId,
+      totalClaims: claims.length,
+      byStatus,
+      claims: claims.map(formatClaim),
+      allSettled,
+      estimatedRemaining,
+    });
+  });
+
+export const claimsRoute = claimsApp;
+export type ClaimsRoute = typeof claimsApp;

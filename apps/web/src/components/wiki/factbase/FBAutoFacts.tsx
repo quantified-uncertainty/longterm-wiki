@@ -337,7 +337,7 @@ function StatCard({
 function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
-  const name = personEntity?.name ?? field(item, "display_name") ?? titleCase(item.key);
+  const name = personEntity?.name ?? item.displayName ?? field(item, "display_name") ?? titleCase(item.key);
   const title = field(item, "title");
   const start = field(item, "start");
   const end = field(item, "end");
@@ -360,7 +360,7 @@ function PersonCard({ item }: { item: FactBaseRecordEntry }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5 flex-wrap">
             {personId ? (
-              <FBRefLink id={personId} className="font-semibold text-sm leading-tight text-foreground group-hover:text-primary transition-colors" />
+              <FBRefLink id={personId} label={item.displayName} className="font-semibold text-sm leading-tight text-foreground group-hover:text-primary transition-colors" />
             ) : (
               <span className="font-semibold text-sm leading-tight">{name}</span>
             )}

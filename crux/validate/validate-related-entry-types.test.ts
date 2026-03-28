@@ -109,6 +109,33 @@ describe('findTypeMismatches', () => {
     expect(mismatches).toHaveLength(0);
   });
 
+    it('detects mismatches when relatedEntries reference by stableId', () => {
+    const entities = [
+      {
+        id: 'some-entity',
+        type: 'concept',
+        _sourceFile: 'concepts.yaml',
+        relatedEntries: [
+          { id: 'aBcDeFgHiJ', type: 'safety-agenda' }, // Wrong! Actually 'research-area'
+        ],
+      },
+    ];
+    // typeMap includes both slug and stableId for the referenced entity
+    const typeMap = new Map([
+      ['some-entity', 'concept'],
+      ['interpretability', 'research-area'],
+      ['aBcDeFgHiJ', 'research-area'], // stableId mapping
+    ]);
+
+    const mismatches = findTypeMismatches(entities, typeMap);
+    expect(mismatches).toHaveLength(1);
+    expect(mismatches[0]).toMatchObject({
+      referencedEntityId: 'aBcDeFgHiJ',
+      declaredType: 'safety-agenda',
+      actualType: 'research-area',
+    });
+  });
+
   it('reports correct source file', () => {
     const entities = [
       {

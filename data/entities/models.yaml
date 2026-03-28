@@ -69,7 +69,7 @@
       type: analysis
       relationship: related
     - id: SUZgWeZLNA
-      type: analysis
+      type: risk
       relationship: related
   tags:
     - prioritization
@@ -101,7 +101,7 @@
       type: analysis
       relationship: related
     - id: SUZgWeZLNA
-      type: analysis
+      type: risk
       relationship: related
   tags:
     - prioritization
@@ -261,10 +261,10 @@
       type: risk
       relationship: example
     - id: rSE7kY5k4Q
-      type: capability
+      type: research-area
       relationship: vulnerable-technique
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
       relationship: mitigation
   tags:
     - taxonomy
@@ -397,7 +397,7 @@
       type: risk
       relationship: related
     - id: sFjyY5xXZA
-      type: safety-agenda
+      type: research-area
       relationship: mitigation
   tags:
     - causal-model
@@ -2294,7 +2294,7 @@
     - id: oeNG1pEkeg
       type: analysis
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: Ja9HeRlQ2A
       type: analysis
   tags:
@@ -2461,7 +2461,7 @@
     - id: cF7VgLKSpg
       type: analysis
     - id: E2BOiahT9A
-      type: concept
+      type: crux
     - id: MvImONf1YA
       type: risk
     - id: URCXiRsX0w

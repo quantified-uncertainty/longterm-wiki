@@ -16,7 +16,7 @@ This posts a start comment on the issue and adds the `agent:working` label. The 
 
 ## At Session End (when shipping)
 
-After the work is committed and pushed (via `/push-and-ensure-green`), signal completion:
+After the work is committed and pushed (via `/agent-push-and-verify`), signal completion:
 
 ```bash
 pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
@@ -53,4 +53,4 @@ PRBODY
 
 - If `GITHUB_TOKEN` is not set, skip the API calls and note this in the session log
 - If the issue number cannot be determined from the task description, skip this workflow
-- The `/next-issue` command handles start tracking automatically — no need to do it manually when using that workflow
+- The `/agent-next-issue` command handles start tracking automatically — no need to do it manually when using that workflow

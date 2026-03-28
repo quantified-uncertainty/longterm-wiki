@@ -1313,3 +1313,38 @@ export const RecordQaCheckSchema = z.object({
 export const RecordQaCheckBatchSchema = z.object({
   items: z.array(RecordQaCheckSchema).min(1).max(200),
 });
+
+// ---------------------------------------------------------------------------
+// Claims: Proposed Claims schemas (issue #3253)
+// ---------------------------------------------------------------------------
+
+export const VALID_CLAIM_STATUSES = [
+  "pending",
+  "verifying",
+  "verified",
+  "contradicted",
+  "unverifiable",
+  "expired",
+] as const;
+export type ClaimStatus = (typeof VALID_CLAIM_STATUSES)[number];
+
+export const ProposeClaimsSchema = z.object({
+  entityId: z.string().min(1).max(200).optional(),
+  targetTable: z.string().max(100),
+  agentSessionId: z.string().max(200).optional(),
+  claims: z
+    .array(
+      z.object({
+        claimText: z.string().min(1).max(5000),
+        targetField: z.string().max(200).optional(),
+        proposedValue: z.string().max(5000).optional(),
+        proposedData: z.record(z.unknown()).optional(),
+        resourceId: z.string().min(1).max(200).optional(),
+        sourceUrl: z.string().url().max(2000),
+        agentEvidence: z.string().min(1).max(5000).optional(),
+      })
+    )
+    .min(1)
+    .max(100),
+});
+export type ProposeClaims = z.infer<typeof ProposeClaimsSchema>;

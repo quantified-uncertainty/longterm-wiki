@@ -52,7 +52,7 @@
       type: ai-model
       relationship: composed-of
     - id: D8dD07y5oQ
-      type: concept
+      type: risk
       relationship: research
     - id: A4XoubikkQ
       type: organization
@@ -340,11 +340,11 @@
   website: https://humancompatible.ai
   relatedEntries:
     - id: Ub7IaobzDA
-      type: safety-agenda
+      type: research-area
     - id: 9XN9QMfecA
       type: risk
     - id: aUMeFdALrA
-      type: safety-agenda
+      type: research-area
     - id: stuart-russell
       type: person
       relationship: leads-to
@@ -684,7 +684,7 @@
     - id: puAffUjWSS
       type: organization
     - id: aX0jkoaekQ
-      type: policy
+      type: organization
   sources:
     - title: ARC Website
       url: https://alignment.org
@@ -875,7 +875,7 @@
     - id: pKeaWwP6sQ
       type: organization
     - id: mnhBgvNfXA
-      type: event
+      type: historical
     - id: mK9pX3rQ7n
       type: organization
     - id: 1LcLlMGLbw
@@ -1664,7 +1664,7 @@
     - id: 3U1A3jX8wC
       type: person
     - id: 3w5hW5liew
-      type: concept
+      type: organization
   sources:
     - title: "OpenAI: Built to Benefit Everyone"
       url: https://openai.com/index/built-to-benefit-everyone/
@@ -1920,7 +1920,7 @@
     - id: pvJ50HupEQ
       type: organization
     - id: rt6jVH9yuA
-      type: concept
+      type: approach
   sources:
     - title: Palisade Research Website
       url: https://palisaderesearch.org/

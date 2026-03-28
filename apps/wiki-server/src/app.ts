@@ -29,6 +29,9 @@ import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 
 // Unified source-check system (replaces factbase-verifications + record-verifications)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
+
+// Claims-first verification system (#3253)
+import { claimsRoute } from "./routes/claims/claims.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
 import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
@@ -186,6 +189,9 @@ export function createApp() {
   app.route("/api/citations", citationsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/integrity", integrityRoute);
+
+  // Claims-first verification (#3253)
+  app.route("/api/claims", claimsRoute);
 
   // Financial data routes (operational — personnel, grants, funding)
   app.route("/api/personnel", personnelRoute);
