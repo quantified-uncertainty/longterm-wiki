@@ -18,6 +18,14 @@ on:
         required: false
         type: boolean
         default: false
+      skip_post_deploy_smoke_test:
+        description: >
+          Skip the post-deploy smoke test and automatic rollback. Use during
+          incident recovery when the server is already down and the smoke test
+          would just trigger another rollback cycle.
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: wiki-server-docker-${{ github.ref }}
@@ -251,6 +259,7 @@ jobs:
           echo "Health status: ${HEALTH_STATUS}"
 
       - name: Post-deploy smoke test
+        if: inputs.skip_post_deploy_smoke_test != true
         id: post-deploy-smoke
         env:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
