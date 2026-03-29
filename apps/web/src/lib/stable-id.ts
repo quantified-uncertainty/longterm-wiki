@@ -49,6 +49,7 @@ export function isContaminatedStableId(s: string): boolean {
   if (!s.includes("-") && !s.includes("_")) return false;
   if (!/[A-Z]/.test(s)) return false;
   const stripped = s.replace(/[-_]/g, "");
+  // 8–12 chars: stableIds are 10 chars, so 10 ± 2 tolerates one separator being stripped
   if (stripped.length < 8 || stripped.length > 12) return false;
   if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
   return true;

@@ -40,8 +40,8 @@ export function formatEntityRef(
   displayName: string | null,
   rawId: string | null,
 ): EntityRef {
-  // Name priority: entity title > display name > raw ID (if not a bare machine ID)
-  // Skip bare stableIds and numeric database PKs — neither are human-readable
+  // Name priority: entity title > display name > humanized raw ID
+  // Skip bare machine IDs (stableIds, numeric PKs, contaminated IDs) — not human-readable.
   let name: string | null =
     entityTitle ??
     (displayName && !isBareMachineId(displayName) ? displayName : null) ??
