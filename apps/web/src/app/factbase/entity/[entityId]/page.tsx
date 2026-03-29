@@ -489,7 +489,7 @@ function CategoryFactSection({
                   {property?.name ?? propertyId}
                 </span>
                 <span className="flex-1 text-muted-foreground truncate font-mono text-[13px]">
-                  {formatKBFactValue(latestFact, property?.unit, property?.display)}
+                  <FactValueDisplay fact={latestFact} property={property} />
                 </span>
                 <span className="text-muted-foreground/60 text-xs whitespace-nowrap">
                   {formatKBDate(latestFact.asOf)}
