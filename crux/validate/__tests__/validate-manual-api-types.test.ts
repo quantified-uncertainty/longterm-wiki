@@ -1,66 +1,56 @@
 import { describe, it, expect } from 'vitest';
+import { checkLine } from '../validate-manual-api-types.ts';
 
-describe('validate-manual-api-types — pattern detection', () => {
-  const VIOLATION_PATTERN = /apiRequest<\{/;
-
-  it('matches inline apiRequest<{ type parameter', () => {
-    const line = "  const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts });";
-    expect(VIOLATION_PATTERN.test(line)).toBe(true);
+describe('validate-manual-api-types — violation detection', () => {
+  it('flags inline apiRequest<{ type parameter', () => {
+    const line =
+      "  const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts });";
+    expect(checkLine(line)).toBe('violation');
   });
 
-  it('matches multiline start of inline type', () => {
-    const line = '  const result = await apiRequest<{';
-    expect(VIOLATION_PATTERN.test(line)).toBe(true);
+  it('flags multiline start of inline type', () => {
+    expect(checkLine('  const result = await apiRequest<{')).toBe('violation');
   });
 
-  it('does not match apiRequest without type parameter', () => {
+  it('passes apiRequest without type parameter', () => {
     const line = "  const result = await apiRequest('POST', '/api/claims/verdicts', { verdicts });";
-    expect(VIOLATION_PATTERN.test(line)).toBe(false);
+    expect(checkLine(line)).toBe('clean');
   });
 
-  it('does not match apiRequest with named type parameter', () => {
-    const line = '  const result = await apiRequest<ClaimVerdictsResponse>(';
-    expect(VIOLATION_PATTERN.test(line)).toBe(false);
+  it('passes apiRequest with named type parameter', () => {
+    expect(checkLine('  const result = await apiRequest<ClaimVerdictsResponse>(')).toBe('clean');
   });
 
-  it('does not match apiRequest with generic type variable', () => {
-    const line = '  const result = await apiRequest<T>(';
-    expect(VIOLATION_PATTERN.test(line)).toBe(false);
+  it('passes apiRequest with generic type variable', () => {
+    expect(checkLine('  const result = await apiRequest<T>(')).toBe('clean');
   });
 
-  it('does not match comment lines', () => {
-    // The checker skips comment lines before applying the regex,
-    // but the regex itself would match — this tests the regex only
-    const commentLine = '  // apiRequest<{ example in comment';
-    expect(VIOLATION_PATTERN.test(commentLine)).toBe(true);
-    // The actual checker would skip this because trimmed.startsWith('//')
+  it('skips comment lines (not a violation)', () => {
+    expect(checkLine('  // apiRequest<{ example in comment')).toBe('clean');
+    expect(checkLine('  /* apiRequest<{ block comment */')).toBe('clean');
+    expect(checkLine('  * apiRequest<{ jsdoc line')).toBe('clean');
   });
 });
 
 describe('validate-manual-api-types — suppression', () => {
-  const SUPPRESS_COMMENT = 'api-type-ok';
-
-  it('recognizes suppression comment', () => {
+  it('suppresses violation when // api-type-ok comment is present', () => {
     const line = "  const r = await apiRequest<{ ok: boolean }>('GET', '/health'); // api-type-ok";
-    expect(line.includes(SUPPRESS_COMMENT)).toBe(true);
+    expect(checkLine(line)).toBe('suppressed');
   });
 
-  it('does not suppress without comment', () => {
+  it('does not suppress without the comment', () => {
     const line = "  const r = await apiRequest<{ ok: boolean }>('GET', '/health');";
-    expect(line.includes(SUPPRESS_COMMENT)).toBe(false);
-  });
-});
-
-describe('validate-manual-api-types — exclusion logic', () => {
-  it('wiki-server client directory should be excluded', () => {
-    // The check excludes crux/lib/wiki-server/ because those files ARE the typed clients
-    // This is a design constraint, not a code test — verifying the intention is documented
-    const excludedPath = 'crux/lib/wiki-server/claims.ts';
-    expect(excludedPath.startsWith('crux/lib/wiki-server/')).toBe(true);
+    expect(checkLine(line)).toBe('violation');
   });
 
-  it('test files should be excluded', () => {
-    const testFile = 'crux/lib/job-handlers/__tests__/claim-verification.test.ts';
-    expect(testFile.includes('__tests__') || testFile.endsWith('.test.ts')).toBe(true);
+  it('does not suppress when api-type-ok appears in code (not a comment)', () => {
+    // e.g., a variable name containing the substring
+    const line = "  const apiTypeOkResult = await apiRequest<{ ok: boolean }>('GET', '/health');";
+    expect(checkLine(line)).toBe('violation');
+  });
+
+  it('suppresses with extra spacing in comment', () => {
+    const line = "  const r = await apiRequest<{ ok: boolean }>('GET', '/health'); //  api-type-ok";
+    expect(checkLine(line)).toBe('suppressed');
   });
 });

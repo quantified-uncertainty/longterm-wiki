@@ -80,6 +80,45 @@ const XML_INTERP_PATTERN = /<\w[\w-]*>\$\{([^}]+)\}<\/\w[\w-]*>/g;
 /** Suppression comment */
 const SUPPRESS_COMMENT = 'prompt-escape-ok';
 
+/** Patterns that match function declarations with "prompt" in the name. Exported for testing. */
+export const PROMPT_FUNC_PATTERNS = [
+  // function buildPrompt(...) {
+  /\bfunction\s+\w*[Pp]rompt\w*\s*\(/,
+  // const buildPrompt = (...) => {
+  /\b(?:const|let|var)\s+\w*[Pp]rompt\w*\s*=/,
+  // buildPrompt(...) {  (method definition)
+  /\b\w*[Pp]rompt\w*\s*\([^)]*\)\s*(?::\s*\w[^{]*)?\{/,
+  // Also match case-insensitive "prompt" in function names more broadly
+  /\bfunction\s+\w*prompt\w*\s*\(/i,
+  /\b(?:const|let|var)\s+\w*prompt\w*\s*=/i,
+];
+
+/**
+ * Check a single line inside a prompt function for unescaped XML interpolations.
+ * Returns violations found on that line. Exported for testing.
+ */
+export function checkPromptLine(line: string): Array<{ expr: string }> {
+  const trimmed = line.trimStart();
+
+  // Skip if suppressed
+  if (line.includes(SUPPRESS_COMMENT)) return [];
+
+  // Skip comment lines
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+    return [];
+  }
+
+  const violations: Array<{ expr: string }> = [];
+  let match: RegExpExecArray | null;
+  XML_INTERP_PATTERN.lastIndex = 0;
+  while ((match = XML_INTERP_PATTERN.exec(line)) !== null) {
+    const expr = match[1];
+    if (expr.includes('escapeXml(')) continue;
+    violations.push({ expr });
+  }
+  return violations;
+}
+
 /**
  * Check whether a line index falls inside a prompt-building function.
  *
@@ -89,18 +128,7 @@ const SUPPRESS_COMMENT = 'prompt-escape-ok';
 function findPromptFunctionRanges(lines: string[]): Array<{ start: number; end: number }> {
   const ranges: Array<{ start: number; end: number }> = [];
 
-  // Patterns that match function declarations with "prompt" in the name
-  const promptFuncPatterns = [
-    // function buildPrompt(...) {
-    /\bfunction\s+\w*[Pp]rompt\w*\s*\(/,
-    // const buildPrompt = (...) => {
-    /\b(?:const|let|var)\s+\w*[Pp]rompt\w*\s*=/,
-    // buildPrompt(...) {  (method definition)
-    /\b\w*[Pp]rompt\w*\s*\([^)]*\)\s*(?::\s*\w[^{]*)?\{/,
-    // Also match case-insensitive "prompt" in function names more broadly
-    /\bfunction\s+\w*prompt\w*\s*\(/i,
-    /\b(?:const|let|var)\s+\w*prompt\w*\s*=/i,
-  ];
+  const promptFuncPatterns = PROMPT_FUNC_PATTERNS;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];

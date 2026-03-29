@@ -1,90 +1,55 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { readFileSync } from 'fs';
-
-// We test the check by mocking the filesystem with controlled file contents,
-// then importing and calling runCheck().
-
-// Mock fs to control file contents
-vi.mock('fs', async () => {
-  const actual = await vi.importActual<typeof import('fs')>('fs');
-  return {
-    ...actual,
-    readFileSync: vi.fn(actual.readFileSync),
-    readdirSync: vi.fn(actual.readdirSync),
-    statSync: vi.fn(actual.statSync),
-  };
-});
-
-// Since the validator uses filesystem scanning which is hard to mock cleanly,
-// we test the core detection logic by creating temp files and running the check.
-// Instead, we test the patterns directly.
+import { describe, it, expect } from 'vitest';
+import { PROMPT_FUNC_PATTERNS, checkPromptLine } from '../validate-prompt-escaping.ts';
 
 describe('validate-prompt-escaping — pattern detection', () => {
-  // Test the XML interpolation regex directly
-  const XML_INTERP_PATTERN = /<\w[\w-]*>\$\{([^}]+)\}<\/\w[\w-]*>/g;
+  // Test the XML interpolation regex via checkPromptLine (the actual validator logic)
 
-  it('matches unescaped XML interpolation', () => {
-    const line = '      parts.push(`   <claim_text>${cl.claim_text}</claim_text>`);';
-    XML_INTERP_PATTERN.lastIndex = 0;
-    const match = XML_INTERP_PATTERN.exec(line);
-    expect(match).not.toBeNull();
-    expect(match![1]).toBe('cl.claim_text');
+  it('detects unescaped XML interpolation', () => {
+    const violations = checkPromptLine(
+      '      parts.push(`   <claim_text>${cl.claim_text}</claim_text>`);'
+    );
+    expect(violations).toHaveLength(1);
+    expect(violations[0].expr).toBe('cl.claim_text');
   });
 
-  it('matches escaped XML interpolation (escapeXml present in expression)', () => {
-    const line = '      parts.push(`   <claim_text>${escapeXml(cl.claim_text)}</claim_text>`);';
-    XML_INTERP_PATTERN.lastIndex = 0;
-    const match = XML_INTERP_PATTERN.exec(line);
-    expect(match).not.toBeNull();
-    // The expression contains escapeXml(, which the checker allows
-    expect(match![1]).toContain('escapeXml(');
+  it('passes escaped XML interpolation (escapeXml present)', () => {
+    const violations = checkPromptLine(
+      '      parts.push(`   <claim_text>${escapeXml(cl.claim_text)}</claim_text>`);'
+    );
+    expect(violations).toHaveLength(0);
   });
 
-  it('does not match plain template literals without XML tags', () => {
-    const line = '  return `Source: ${sourceUrl}`;';
-    XML_INTERP_PATTERN.lastIndex = 0;
-    const match = XML_INTERP_PATTERN.exec(line);
-    expect(match).toBeNull();
+  it('passes plain template literals without XML tags', () => {
+    const violations = checkPromptLine('  return `Source: ${sourceUrl}`;');
+    expect(violations).toHaveLength(0);
   });
 
-  it('does not match static XML tags without interpolation', () => {
-    const line = '  return `<source_content>static text</source_content>`;';
-    XML_INTERP_PATTERN.lastIndex = 0;
-    const match = XML_INTERP_PATTERN.exec(line);
-    expect(match).toBeNull();
+  it('passes static XML tags without interpolation', () => {
+    const violations = checkPromptLine(
+      '  return `<source_content>static text</source_content>`;'
+    );
+    expect(violations).toHaveLength(0);
   });
 
-  it('matches multiple interpolations on one line', () => {
-    const line = '<a>${x}</a> <b>${y}</b>';
-    const matches: string[] = [];
-    XML_INTERP_PATTERN.lastIndex = 0;
-    let m;
-    while ((m = XML_INTERP_PATTERN.exec(line)) !== null) {
-      matches.push(m[1]);
-    }
-    expect(matches).toEqual(['x', 'y']);
+  it('detects multiple interpolations on one line', () => {
+    const violations = checkPromptLine('<a>${x}</a> <b>${y}</b>');
+    expect(violations).toHaveLength(2);
+    expect(violations.map((v) => v.expr)).toEqual(['x', 'y']);
   });
 
-  it('matches hyphenated tag names', () => {
-    const line = '<claim-text>${data}</claim-text>';
-    XML_INTERP_PATTERN.lastIndex = 0;
-    const match = XML_INTERP_PATTERN.exec(line);
-    expect(match).not.toBeNull();
-    expect(match![1]).toBe('data');
+  it('detects hyphenated tag names', () => {
+    const violations = checkPromptLine('<claim-text>${data}</claim-text>');
+    expect(violations).toHaveLength(1);
+    expect(violations[0].expr).toBe('data');
   });
 });
 
 describe('validate-prompt-escaping — prompt function detection', () => {
-  // Test the patterns that identify prompt functions
-  const promptFuncPatterns = [
-    /\bfunction\s+\w*[Pp]rompt\w*\s*\(/,
-    /\b(?:const|let|var)\s+\w*[Pp]rompt\w*\s*=/,
-    /\bfunction\s+\w*prompt\w*\s*\(/i,
-    /\b(?:const|let|var)\s+\w*prompt\w*\s*=/i,
-  ];
-
   function matchesPromptFunc(line: string): boolean {
-    return promptFuncPatterns.some((p) => p.test(line));
+    return PROMPT_FUNC_PATTERNS.some((p) => {
+      p.lastIndex = 0;
+      return p.test(line);
+    });
   }
 
   it('matches function buildMultiClaimPrompt(...)', () => {
@@ -97,6 +62,15 @@ describe('validate-prompt-escaping — prompt function detection', () => {
 
   it('matches function buildVerificationPrompt(...)', () => {
     expect(matchesPromptFunc('function buildVerificationPrompt(entity, facts) {')).toBe(true);
+  });
+
+  it('matches method definition buildPrompt(...) {', () => {
+    // This is the method-call pattern from the validator
+    expect(matchesPromptFunc('buildPrompt(claims) {')).toBe(true);
+  });
+
+  it('matches method definition with return type annotation', () => {
+    expect(matchesPromptFunc('buildPrompt(claims): string {')).toBe(true);
   });
 
   it('does not match unrelated functions', () => {
@@ -114,8 +88,21 @@ describe('validate-prompt-escaping — prompt function detection', () => {
 });
 
 describe('validate-prompt-escaping — suppression', () => {
-  it('suppression comment is recognized', () => {
-    const line = '      <tag>${raw.data}</tag>  // prompt-escape-ok';
-    expect(line.includes('prompt-escape-ok')).toBe(true);
+  it('suppresses violations when // prompt-escape-ok is present', () => {
+    const violations = checkPromptLine(
+      '      <tag>${raw.data}</tag>  // prompt-escape-ok'
+    );
+    expect(violations).toHaveLength(0);
+  });
+
+  it('does not suppress without the comment', () => {
+    const violations = checkPromptLine('      <tag>${raw.data}</tag>');
+    expect(violations).toHaveLength(1);
+    expect(violations[0].expr).toBe('raw.data');
+  });
+
+  it('skips comment lines entirely', () => {
+    const violations = checkPromptLine('  // <tag>${raw.data}</tag>');
+    expect(violations).toHaveLength(0);
   });
 });

@@ -34,8 +34,8 @@ const EXCLUDED_SUBDIR = join('crux', 'lib', 'wiki-server');
 /** Pattern to detect: apiRequest<{ (inline hand-written type parameter) */
 const VIOLATION_PATTERN = /apiRequest<\{/;
 
-/** Suppression comment */
-const SUPPRESS_COMMENT = 'api-type-ok';
+/** Suppression comment — must appear as `// api-type-ok` (comment-style) */
+const SUPPRESS_PATTERN = /\/\/\s*api-type-ok/;
 
 interface Violation {
   file: string;
@@ -80,6 +80,27 @@ function collectTsFiles(dir: string): string[] {
   return results;
 }
 
+/** Check a single line for violations. Exported for testing. */
+export function checkLine(line: string): 'violation' | 'suppressed' | 'clean' {
+  const trimmed = line.trimStart();
+
+  // Skip comment lines
+  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
+    return 'clean';
+  }
+
+  // Check suppression (must be a comment: // api-type-ok)
+  if (SUPPRESS_PATTERN.test(line)) {
+    return 'suppressed';
+  }
+
+  if (VIOLATION_PATTERN.test(trimmed)) {
+    return 'violation';
+  }
+
+  return 'clean';
+}
+
 function checkFile(filePath: string): Violation[] {
   const content = readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
@@ -95,8 +116,8 @@ function checkFile(filePath: string): Violation[] {
       continue;
     }
 
-    // Skip if suppressed
-    if (line.includes(SUPPRESS_COMMENT)) continue;
+    // Skip if suppressed with explicit comment syntax: // api-type-ok
+    if (SUPPRESS_PATTERN.test(line)) continue;
 
     if (VIOLATION_PATTERN.test(trimmed)) {
       violations.push({
