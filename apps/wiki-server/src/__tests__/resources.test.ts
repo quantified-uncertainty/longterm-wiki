@@ -8,13 +8,18 @@ let resourceStore: Map<string, Record<string, unknown>>;
 let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
 
 // Helper: derive the simplified suggest shape from a full resource row.
+// In production, has_content is derived via LEFT JOIN citation_content:
+//   (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
+// Since the mock doesn't model citation_content, we check:
+//   1. An explicit has_content field (set directly by suggest tests), OR
+//   2. content_hash being non-null (proxy for content having been fetched)
 function toSuggestShape(row: Record<string, unknown>): { id: string; url: string; title: string | null; fetched_at: Date | null; has_content: boolean } {
   return {
     id: row.id as string,
     url: row.url as string,
     title: (row.title as string | null) ?? null,
     fetched_at: (row.fetched_at as Date | null) ?? null,
-    has_content: row.has_content === true,
+    has_content: row.has_content === true || (row.content_hash != null && row.content_hash !== ""),
   };
 }
 
