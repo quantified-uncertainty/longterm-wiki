@@ -22,11 +22,25 @@ const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 const NUMERIC_ID_RE = /^\d+$/;
 
 /**
- * Check if a string is a bare machine ID (stableId or numeric PK) that
- * should never be displayed as a human-readable name.
+ * Detect contaminated stableIds: machine-generated IDs with hyphens/underscores
+ * from a legacy import bug. Examples: "D-BpcrbThn", "Tw_Eo226h3".
+ * Real slugs are all-lowercase; contaminated IDs have uppercase letters.
+ */
+function isContaminatedStableId(s) {
+  if (!s.includes('-') && !s.includes('_')) return false;
+  if (!/[A-Z]/.test(s)) return false;
+  const stripped = s.replace(/[-_]/g, '');
+  if (stripped.length < 8 || stripped.length > 12) return false;
+  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
+  return true;
+}
+
+/**
+ * Check if a string is a bare machine ID (stableId, numeric PK, or contaminated
+ * stableId) that should never be displayed as a human-readable name.
  */
 function isBareMachineId(s) {
-  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s);
+  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || isContaminatedStableId(s);
 }
 
 // ---------------------------------------------------------------------------

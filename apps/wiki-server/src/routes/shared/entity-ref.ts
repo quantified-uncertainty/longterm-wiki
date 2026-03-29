@@ -25,6 +25,32 @@ export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 const NUMERIC_ID_PATTERN = /^\d+$/;
 
 /**
+ * Detect contaminated stableIds: machine-generated IDs with hyphens/underscores
+ * from a legacy import bug. Examples: "D-BpcrbThn", "Tw_Eo226h3".
+ * Real slugs are all-lowercase; contaminated IDs have uppercase letters.
+ */
+function isContaminatedStableId(s: string): boolean {
+  if (!s.includes("-") && !s.includes("_")) return false;
+  if (!/[A-Z]/.test(s)) return false;
+  const stripped = s.replace(/[-_]/g, "");
+  if (stripped.length < 8 || stripped.length > 12) return false;
+  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
+  return true;
+}
+
+/** Check if a string is a bare machine ID that should never be displayed. */
+function isBareMachineId(s: string): boolean {
+  return STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s) || isContaminatedStableId(s);
+}
+
+/** Humanize a slug by converting hyphens/underscores to spaces and title-casing. */
+function humanizeSlug(s: string): string {
+  return s
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+/**
  * Format an entity reference from joined query results.
  *
  * @param entityId - The resolved stableId FK (from the *EntityId column)
@@ -41,18 +67,16 @@ export function formatEntityRef(
   rawId: string | null,
 ): EntityRef {
   // Name priority: entity title > display name > humanized raw ID
-  // Skip bare stableIds, numeric database PKs, and legacy IDs with hyphens — not human-readable
-  const isId = (s: string) => {
-    if (STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s)) return true;
-    // Legacy IDs with hyphens/underscores (e.g., "8-JZq4lrlD", "Tw_Eo226h3")
-    // from a fixed bug in id.ts. Key signal: 8-12 chars, has separator + digits + uppercase.
-    if (s.length >= 8 && s.length <= 12 && /[_-]/.test(s) && /\d/.test(s) && /[A-Z]/.test(s) && !s.includes(" ")) return true;
-    return false;
-  };
-  const name =
+  // Skip bare machine IDs (stableIds, numeric PKs, contaminated IDs) — not human-readable
+  let name =
     entityTitle ??
-    (displayName && !isId(displayName) ? displayName : null) ??
-    (rawId && !isId(rawId) ? rawId : null);
+    (displayName && !isBareMachineId(displayName) ? displayName : null) ??
+    null;
+
+  // Last resort: humanize the rawId if it's a slug (not a machine ID)
+  if (!name && rawId && !isBareMachineId(rawId)) {
+    name = humanizeSlug(rawId);
+  }
 
   return {
     entityId: entityId ?? null,

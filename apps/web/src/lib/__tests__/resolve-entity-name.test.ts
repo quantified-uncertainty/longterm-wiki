@@ -250,4 +250,101 @@ describe("resolveEntityName", () => {
     const result = resolveEntityName("jane-doe");
     expect(result).toEqual({ name: "Jane Doe", href: null });
   });
+
+  it("rejects slug-format displayName and resolves via TableBase instead", () => {
+    // When the API returns a raw slug like "tom-brown" as displayName,
+    // resolveEntityName should NOT use it as-is. It should fall through
+    // to the proper resolution pipeline.
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue({
+      id: "tom-brown",
+      stableId: "4CY8YJCrM7",
+      title: "Tom Brown",
+      entityType: "person",
+      aliases: [],
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    });
+    mockGetEntityHref.mockReturnValue("/people/tom-brown");
+
+    const result = resolveEntityName("tom-brown", "tom-brown");
+    expect(result.name).toBe("Tom Brown");
+    expect(result.href).toBe("/people/tom-brown");
+  });
+
+  it("rejects slug-format displayName and falls through to humanization", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    // When slug displayName can't be resolved, it should be humanized
+    const result = resolveEntityName("employee-equity-pool", "employee-equity-pool");
+    expect(result.name).toBe("Employee Equity Pool");
+  });
+
+  it("returns 'Unknown' for contaminated stableIds", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    expect(resolveEntityName("D-BpcrbThn")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("Tw_Eo226h3")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("V-55MuswUh")).toEqual({ name: "Unknown", href: null });
+  });
+
+  it("rejects contaminated stableId displayNames", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    const result = resolveEntityName("some-id", "D-BpcrbThn");
+    // Falls through to resolve "some-id" via FactBase/TableBase/humanization
+    expect(result.name).not.toBe("D-BpcrbThn");
+  });
+
+  it("accepts legitimate displayName with spaces (not a slug)", () => {
+    const result = resolveEntityName("some-id", "Google");
+    expect(result.name).toBe("Google");
+  });
+
+  it("accepts single-word displayName that doesn't match entityId", () => {
+    // "google" has no hyphens so it's not treated as a slug,
+    // and doesn't match the entityId so it's used directly.
+    const result = resolveEntityName("some-id", "google");
+    expect(result.name).toBe("google");
+  });
+
+  it("rejects displayName that exactly matches entityId (echoed slug)", () => {
+    // When the API just echoes the raw slug back as displayName,
+    // we should resolve via the full pipeline instead.
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue({
+      id: "google",
+      stableId: "cMNszJMTPX",
+      title: "Google / Alphabet",
+      entityType: "organization",
+      aliases: [],
+      tags: [],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    });
+    mockGetEntityHref.mockReturnValue("/organizations/google");
+
+    const result = resolveEntityName("google", "google");
+    expect(result.name).toBe("Google / Alphabet");
+    expect(result.href).toBe("/organizations/google");
+  });
+
+  it("falls through to humanization when echoed slug has no entity", () => {
+    mockGetKBEntity.mockReturnValue(undefined);
+    mockGetTypedEntityById.mockReturnValue(undefined);
+
+    // "amazon" as both entityId and displayName, no entity found
+    const result = resolveEntityName("amazon", "amazon");
+    expect(result.name).toBe("Amazon"); // humanized via titleCase
+  });
 });
