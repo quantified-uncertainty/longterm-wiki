@@ -15,8 +15,8 @@ WORKDIR /repo
 # Copy only the deps we need (~30MB vs ~1GB full monorepo)
 COPY --chown=worker:worker --from=deps /deps/node_modules ./node_modules
 
-# Install tsx globally (needed for TypeScript compilation at runtime)
-RUN npm install -g tsx@4.19.0 && node --import tsx/esm -e "console.log('tsx verified')"
+# Verify tsx is available (installed via docker/worker/package.json)
+RUN node --import tsx/esm -e "console.log('tsx verified')"
 
 # Copy crux source (worker + all transitive imports)
 COPY --chown=worker:worker crux/ ./crux/
