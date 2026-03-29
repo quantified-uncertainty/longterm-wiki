@@ -120,7 +120,7 @@ describe('crux kb lookup', () => {
   }, 30_000);
 
   it('returns JSON in ci mode', async () => {
-    const result = await commands.lookup(['zR4nW8xB2f'], { ci: true });
+    const result = await commands.lookup(['sid_zR4nW8xB2f'], { ci: true });
     expect(result.exitCode).toBe(0);
     const data = JSON.parse(result.output);
     expect(data.name).toBe('Dario Amodei');
