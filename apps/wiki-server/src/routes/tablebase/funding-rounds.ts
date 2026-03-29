@@ -13,6 +13,7 @@ import {
   parseRange,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -303,6 +304,17 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Post-sync: resolve entity FKs as safety net (pre-insert JS resolution above
+      // may miss entities added after the initial query)
+      await resolveEntityFKs(tx, {
+        tableName: "funding_rounds",
+        fields: [
+          { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
+          { rawIdColumn: "lead_investor", entityIdColumn: "lead_investor_entity_id", displayNameColumn: "lead_investor_display_name" },
+        ],
+        scopeIds: items.map((i) => i.id),
+      });
 
       // Resolve company slugs to human-readable titles for search
       const companySlugs = [...new Set(items.map((fr) => fr.companyId))];
