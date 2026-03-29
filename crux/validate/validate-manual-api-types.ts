@@ -145,7 +145,7 @@ export function runCheck(): { passed: boolean; errors: number; violations: Viola
 }
 
 if (process.argv[1]?.includes('validate-manual-api-types')) {
-  const result = runCheck();
+  runCheck();
   // Advisory: always exit 0, but print warnings
   process.exit(0);
 }
