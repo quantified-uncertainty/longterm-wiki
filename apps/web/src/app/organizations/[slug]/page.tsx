@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 import {
   getKBLatest,
   getKBProperty,
@@ -303,10 +303,8 @@ export default async function OrgProfilePage({
         typedPerson = getTypedEntityByStableId(personRef);
       }
       // Build display name: prefer explicit display_name, then resolved title,
-      // then humanized slug. Never display raw stableIds or numeric IDs.
-      const isStableIdVal = STABLE_ID_PATTERN.test(personRef ?? "");
-      const isNumericId = NUMERIC_ID_PATTERN.test(personRef ?? "");
-      const fallbackName = (isStableIdVal || isNumericId)
+      // then humanized slug. Never display raw stableIds.
+      const fallbackName = isSid(personRef)
         ? "Unknown"
         : titleCase(personRef ?? person.key);
       const name =

@@ -8,7 +8,7 @@
  * 3. TableBase entity lookup (direct slug match)
  * 4. Strip "new:" prefix
  * 5. Humanize slug-format IDs (hyphens/underscores → title case)
- * 6. "Unknown" for bare stableIds and numeric-only IDs
+ * 6. "Unknown" for sid_-prefixed stableIds
  */
 import {
   getKBEntity,
@@ -17,7 +17,7 @@ import {
 import { getTypedEntityById } from "@/data/tablebase";
 import { getEntityHref } from "@/data/entity-nav";
 import { titleCase } from "@/components/wiki/factbase/format";
-import { isBareMachineId } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 
 /** Build the canonical href for an entity, falling back to /factbase/entity/{id}. */
 function buildEntityHref(slug: string | undefined, entityId: string): string | null {
@@ -57,10 +57,9 @@ export function resolveEntityName(
   displayName?: string | null,
 ): { name: string; href: string | null } {
   // 1. Use embedded displayName if available (from API JOIN)
-  //    But reject bare stableIds, numeric PKs, contaminated IDs, and raw slugs
-  //    that leaked through — these are not human-readable names and should be
-  //    resolved via the full pipeline below (FactBase/TableBase lookups, then
-  //    humanization as a last resort).
+  //    But reject stableIds and raw slugs that leaked through — these are not
+  //    human-readable names and should be resolved via the full pipeline below
+  //    (FactBase/TableBase lookups, then humanization as a last resort).
   //
   //    Also reject displayNames that exactly match the entityId — this indicates
   //    the API couldn't resolve the entity and just echoed the raw ID/slug back.
@@ -73,7 +72,7 @@ export function resolveEntityName(
 
   if (
     trimmedDisplayName &&
-    !isBareMachineId(trimmedDisplayName) &&
+    !isSid(trimmedDisplayName) &&
     !looksLikeSlug(trimmedDisplayName) &&
     !displayNameIsJustEchoedId
   ) {
@@ -120,8 +119,8 @@ export function resolveEntityName(
     };
   }
 
-  // 5. Detect unresolvable machine IDs (stableIds, contaminated stableIds, numeric PKs)
-  if (isBareMachineId(cleanId)) {
+  // 5. Detect unresolvable stableIds
+  if (isSid(cleanId)) {
     return { name: "Unknown", href: null };
   }
 

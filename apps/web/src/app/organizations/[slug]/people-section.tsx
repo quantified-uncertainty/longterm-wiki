@@ -12,7 +12,7 @@ import {
   type RpcPersonnelByEntityResult,
   type RpcPersonnelRow,
 } from "@/lib/wiki-server";
-import { isBareMachineId } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -62,45 +62,21 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  * Convert PG personnel rows into PersonEntry format for merging with
  * existing FactBase key-persons and board-seats data.
  */
-/**
- * Check if a string is a displayable person name (not a machine-generated ID).
- * Rejects stableIds (both sid_-prefixed and legacy bare 10-char), numeric PKs,
- * contaminated IDs with hyphens/underscores, and short digit+uppercase strings
- * that look like legacy IDs.
- */
-function isDisplayablePersonName(name: string): boolean {
-  if (isBareMachineId(name)) return false;
-  // Legacy IDs with hyphens from a fixed bug in id.ts (e.g., "8-JZq4lrlD").
-  // Real person names at this length always contain spaces or start with a letter
-  // followed by lowercase — IDs mix digits and uppercase without spaces.
-  if (
-    name.length <= 15 &&
-    !name.includes(" ") &&
-    /\d/.test(name) &&
-    /[A-Z]/.test(name)
-  )
-    return false;
-  return true;
-}
 
 /**
  * Humanize a raw person identifier for display.
- * Returns null for bare stableIds and numeric PKs (not human-readable).
+ * Returns null for sid_-prefixed stableIds (not human-readable).
  * Strips "new:" prefix and converts slug-format IDs to title case.
  */
 function humanizePersonId(raw: string): string | null {
-  if (isBareMachineId(raw)) return null;
+  if (isSid(raw)) return null;
   const cleaned = raw.startsWith("new:") ? raw.slice(4).trim() : raw;
   if (!cleaned) return null;
-  if (isBareMachineId(cleaned)) return null;
+  if (isSid(cleaned)) return null;
   // If it looks like a slug (contains hyphens/underscores), humanize it
   if (cleaned.includes("-") || cleaned.includes("_")) {
-    const humanized = titleCase(cleaned);
-    // Reject if the result still looks like a machine ID
-    if (!isDisplayablePersonName(humanized)) return null;
-    return humanized;
+    return titleCase(cleaned);
   }
-  if (!isDisplayablePersonName(cleaned)) return null;
   return cleaned;
 }
 
@@ -117,19 +93,15 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
   for (const row of rows) {
     const personRef = row.person;
     // Name resolution priority:
-    // 1. Structured ref name (from entity JOIN) — validated
-    // 2. Pre-resolved name from API (personResolvedName) — validated
+    // 1. Structured ref name (from entity JOIN) — skip if it's a stableId
+    // 2. Pre-resolved name from API (personResolvedName) — skip if it's a stableId
     // 3. Humanized raw personId (strips new:, converts slug to title case)
-    // 4. Skip — bare stableIds and numeric PKs are not displayable
-    //
-    // Every candidate is checked against isDisplayablePersonName() because
-    // the enrichment pipeline sometimes stores stableIds as personDisplayName,
-    // which then propagates through personResolvedName and personRef.name.
+    // 4. Skip — stableIds are not displayable
     const refName = personRef?.name;
     const resolvedName = row.personResolvedName;
     const name =
-      (refName && isDisplayablePersonName(refName) ? refName : null) ??
-      (resolvedName && isDisplayablePersonName(resolvedName) ? resolvedName : null) ??
+      (refName && !isSid(refName) ? refName : null) ??
+      (resolvedName && !isSid(resolvedName) ? resolvedName : null) ??
       humanizePersonId(row.personId);
 
     if (!name) {

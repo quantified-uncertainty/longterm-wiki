@@ -10,7 +10,7 @@ import {
   formatKBDate,
   titleCase,
 } from "@/components/wiki/factbase/format";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 
 export const metadata: Metadata = {
   title: "Funding Rounds",
@@ -20,11 +20,11 @@ export const metadata: Metadata = {
 
 /**
  * Filter out raw IDs that aren't human-readable names.
- * Returns null for stableIds and numeric PKs so the resolver can handle them.
+ * Returns null for stableIds so the resolver can handle them.
  */
 function filterRawId(name: string | null): string | null {
   if (!name) return null;
-  if (STABLE_ID_PATTERN.test(name) || NUMERIC_ID_PATTERN.test(name)) return null;
+  if (isSid(name)) return null;
   return name;
 }
 

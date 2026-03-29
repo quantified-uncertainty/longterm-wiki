@@ -15,32 +15,12 @@ import { createHash } from 'node:crypto';
 // Shared ID detection helpers
 // ---------------------------------------------------------------------------
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
- * Canonical definition: apps/web/src/lib/stable-id.ts */
-const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-/** Matches pure numeric IDs (legacy DB PKs). */
-const NUMERIC_ID_RE = /^\d+$/;
+/** All stableIds use the sid_ prefix. */
+const SID_PREFIX = 'sid_';
 
-/**
- * Detect contaminated stableIds: machine-generated IDs with hyphens/underscores
- * from a legacy import bug. Examples: "D-BpcrbThn", "Tw_Eo226h3".
- * Real slugs are all-lowercase; contaminated IDs have uppercase letters.
- */
-function isContaminatedStableId(s) {
-  if (!s.includes('-') && !s.includes('_')) return false;
-  if (!/[A-Z]/.test(s)) return false;
-  const stripped = s.replace(/[-_]/g, '');
-  if (stripped.length < 8 || stripped.length > 12) return false;
-  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
-  return true;
-}
-
-/**
- * Check if a string is a bare machine ID (stableId, numeric PK, or contaminated
- * stableId) that should never be displayed as a human-readable name.
- */
-function isBareMachineId(s) {
-  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || isContaminatedStableId(s);
+/** Check if a string is a sid_-prefixed stableId that should never be displayed. */
+function isSid(s) {
+  return typeof s === 'string' && s.startsWith(SID_PREFIX);
 }
 
 // ---------------------------------------------------------------------------
@@ -786,7 +766,7 @@ function personnelRowToRecordEntry(row) {
   };
   // Embed resolved display name from API JOIN (personnel API returns personResolvedName).
   // Filter out bare stableIds and numeric PKs that aren't human-readable.
-  if (row.personResolvedName && !isBareMachineId(row.personResolvedName)) entry.displayName = row.personResolvedName;
+  if (row.personResolvedName && !isSid(row.personResolvedName)) entry.displayName = row.personResolvedName;
   return entry;
 }
 
@@ -817,7 +797,7 @@ function grantRowToRecordEntry(row) {
   };
   // Embed resolved grantee display name from entity ref.
   // Filter out bare machine IDs that aren't human-readable.
-  if (row.grantee?.name && !isBareMachineId(row.grantee.name)) entry.displayName = row.grantee.name;
+  if (row.grantee?.name && !isSid(row.grantee.name)) entry.displayName = row.grantee.name;
   return entry;
 }
 
@@ -839,8 +819,8 @@ function fundingRoundRowToRecordEntry(row) {
   // even when companyRef.entityId is null (legacy numeric companyId rows).
   // Filter out bare stableIds (10 alphanumeric chars with uppercase) and numeric PKs
   // that leak through as company names — these aren't human-readable.
-  if (row.companyRef?.name && !isBareMachineId(row.companyRef.name)) fields.company_name = row.companyRef.name;
-  else if (row.companyResolvedName && !isBareMachineId(row.companyResolvedName)) fields.company_name = row.companyResolvedName;
+  if (row.companyRef?.name && !isSid(row.companyRef.name)) fields.company_name = row.companyRef.name;
+  else if (row.companyResolvedName && !isSid(row.companyResolvedName)) fields.company_name = row.companyResolvedName;
 
   const entry = {
     key: row.id,
@@ -852,7 +832,7 @@ function fundingRoundRowToRecordEntry(row) {
   };
   // Embed resolved lead investor display name from entity ref.
   // Filter out bare machine IDs that aren't human-readable.
-  if (row.leadInvestorRef?.name && !isBareMachineId(row.leadInvestorRef.name)) entry.displayName = row.leadInvestorRef.name;
+  if (row.leadInvestorRef?.name && !isSid(row.leadInvestorRef.name)) entry.displayName = row.leadInvestorRef.name;
   return entry;
 }
 
@@ -893,7 +873,7 @@ function investmentRowToRecordEntry(row) {
   };
   // Embed resolved investor display name from entity ref.
   // Filter out bare machine IDs that aren't human-readable.
-  if (row.investor?.name && !isBareMachineId(row.investor.name)) entry.displayName = row.investor.name;
+  if (row.investor?.name && !isSid(row.investor.name)) entry.displayName = row.investor.name;
   return entry;
 }
 
@@ -930,7 +910,7 @@ function equityPositionRowToRecordEntry(row) {
   if (row.validEnd) entry.validEnd = row.validEnd;
   // Embed resolved holder display name from entity ref.
   // Filter out bare machine IDs that aren't human-readable.
-  if (row.holder?.name && !isBareMachineId(row.holder.name)) entry.displayName = row.holder.name;
+  if (row.holder?.name && !isSid(row.holder.name)) entry.displayName = row.holder.name;
   return entry;
 }
 
