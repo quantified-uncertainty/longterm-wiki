@@ -8,12 +8,14 @@ WORKDIR /repo
 # Copy workspace manifests and lockfile first for layer caching
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/wiki-server/package.json ./apps/wiki-server/
+COPY packages/id-utils/package.json ./packages/id-utils/
 
-# Install only wiki-server dependencies
-RUN pnpm install --frozen-lockfile --filter wiki-server
+# Install wiki-server and its workspace dependencies
+RUN pnpm install --frozen-lockfile --filter wiki-server...
 
-# Copy server source
+# Copy server source and workspace packages it depends on
 COPY apps/wiki-server/ ./apps/wiki-server/
+COPY packages/id-utils/ ./packages/id-utils/
 
 ENV NODE_ENV=production
 
