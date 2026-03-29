@@ -14,11 +14,14 @@
 import { apiRequest } from '../lib/wiki-server/client.ts';
 
 const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-const LEGACY_ID_RE = /^[A-Za-z0-9][_-][A-Za-z0-9_-]{7,10}$/;
 const NUMERIC_ID_RE = /^\d+$/;
 
 function isMachineId(s: string): boolean {
-  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || LEGACY_ID_RE.test(s);
+  if (STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s)) return true;
+  // Legacy IDs with hyphens/underscores (e.g., "8-JZq4lrlD", "Tw_Eo226h3").
+  // Matches entity-ref.ts isId() heuristic: 8-12 chars, has separator + digits + uppercase.
+  if (s.length >= 8 && s.length <= 12 && /[_-]/.test(s) && /\d/.test(s) && /[A-Z]/.test(s) && !s.includes(' ')) return true;
+  return false;
 }
 
 interface PersonnelRecord {

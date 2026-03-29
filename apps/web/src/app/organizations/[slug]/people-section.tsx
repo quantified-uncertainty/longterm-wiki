@@ -59,10 +59,6 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
 // ── Merge Logic ──────────────────────────────────────────────────────
 
 /**
- * Convert PG personnel rows into PersonEntry format for merging with
- * existing FactBase key-persons and board-seats data.
- */
-/**
  * Check if a string is a displayable person name (not a machine-generated ID).
  * Rejects stableIds, numeric PKs, and legacy IDs with hyphens/underscores.
  */
