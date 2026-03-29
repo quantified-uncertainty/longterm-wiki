@@ -41,6 +41,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
     recordVerdicts: _recordVerdicts,
     kbFactVerification: _kbFactVerification,
     researchAreas: _researchAreas,
+    researchAreaDetails: _researchAreaDetails,
     pageReferenceIndex: _pageReferenceIndex,
     // Phase 2: Operational/internal-only data (dashboards use wiki-server API)
     prItems: _prItems,
@@ -82,7 +83,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
   writeFileSync(outputFile, JSON.stringify(databaseForOutput, null, 2));
   const strippedKeys = [
     'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
-    'researchAreas', 'pageReferenceIndex', 'prItems', 'updateSchedule',
+    'researchAreas', 'researchAreaDetails', 'pageReferenceIndex', 'prItems', 'updateSchedule',
     'redundancyPairs', 'backlinks', 'relatedGraph', 'resources',
   ];
   console.log(`\n✓ Written: ${outputFile} (stripped: entities, KB, experts, ${strippedKeys.join(', ')})`);
@@ -102,6 +103,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
   const LAZY_FILES = [
     { key: '_benchmarkResults', varRef: _benchmarkResults, name: 'benchmark-results.json', label: 'benchmark results' },
     { key: '_researchAreas', varRef: _researchAreas, name: 'research-areas.json', label: 'research areas' },
+    { key: '_researchAreaDetails', varRef: _researchAreaDetails, name: 'research-area-details.json', label: 'research area details' },
     { key: '_recordVerdicts', varRef: _recordVerdicts, name: 'record-verdicts.json', label: 'record verdicts' },
     { key: '_kbFactVerification', varRef: _kbFactVerification, name: 'kb-fact-verification.json', label: 'KB fact verifications' },
   ];
