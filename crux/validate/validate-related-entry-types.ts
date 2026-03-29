@@ -67,7 +67,9 @@ export interface TypeMismatch {
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
 
 /**
- * Load all entities from YAML files and build an id→type map.
+ * Load all entities from YAML files and build an id->type map.
+ * Maps both slug ids and stableIds so relatedEntries references
+ * (which may use either form) can be resolved.
  */
 function loadEntities(): {
   entities: Array<EntityRecord & { _sourceFile: string }>;
@@ -95,6 +97,10 @@ function loadEntities(): {
         if (entity && typeof entity === 'object' && entity.id && entity.type) {
           entities.push({ ...entity, _sourceFile: filename });
           typeMap.set(entity.id, entity.type);
+          // relatedEntries often reference by stableId, not slug id
+          if (entity.stableId) {
+            typeMap.set(entity.stableId, entity.type);
+          }
         }
       }
     } else if (parsed && typeof parsed === 'object') {
@@ -102,6 +108,9 @@ function loadEntities(): {
       if (e.id && e.type) {
         entities.push({ ...e, _sourceFile: filename as string });
         typeMap.set(e.id, e.type);
+        if ((e as Record<string, unknown>).stableId) {
+          typeMap.set((e as Record<string, unknown>).stableId as string, e.type);
+        }
       }
     }
   }

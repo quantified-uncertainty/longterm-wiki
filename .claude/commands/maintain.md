@@ -1,3 +1,8 @@
+---
+description: Prioritized maintenance — review PRs, analyze session logs, triage issues, detect cruft, take action.
+effort: medium
+---
+
 # Maintenance Sweep
 
 Run a prioritized maintenance session: review recent PRs, analyze session logs, triage GitHub issues, detect codebase cruft, and take action.
@@ -105,7 +110,7 @@ Only remove things you're confident are unused — grep thoroughly before deleti
 1. The `crux sys maintain` report auto-updates `.claude/maintain-last-run.txt`.
 2. Write a session log summarizing what was done.
 3. Commit all changes.
-4. Run `/push-and-ensure-green`.
+4. Run `/agent-push-and-verify`.
 
 ## Guardrails
 

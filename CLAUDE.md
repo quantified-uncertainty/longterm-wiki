@@ -20,7 +20,7 @@ pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an 
 
 **"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
 
-At session end, run `/agent-session-ready-PR`. Always open a PR — never push directly to `main`.
+At session end, run `/agent-ship`. Always open a PR — never push directly to `main`.
 
 ## Quick Reference
 
@@ -53,6 +53,9 @@ pnpm crux tb people discover                 # Discover people entities
 pnpm crux gh issues start <N>               # Signal work start on issue
 pnpm crux gh issues done <N> --pr=URL       # Signal completion
 pnpm crux gh ci status --wait               # Poll CI until green
+pnpm crux gh deploy-tasks detect             # Auto-detect deploy tasks from diff
+pnpm crux gh deploy-tasks pending            # Find unchecked tasks from merged PRs
+pnpm crux gh deploy-tasks inject --pr=N      # Inject deploy checklist into PR
 
 # System (sys = system)
 pnpm crux sys audits list                    # Show audit items, highlight overdue

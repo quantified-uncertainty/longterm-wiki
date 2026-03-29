@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { logger } from "./logger.js";
 import { validateApiKey } from "./auth.js";
+import { getMigrationError } from "./migration-state.js";
 import {
   rateLimitMiddleware,
   createDefaultRateLimiters,
@@ -29,6 +30,9 @@ import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 
 // Unified source-check system (replaces factbase-verifications + record-verifications)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
+
+// Claims-first verification system (#3253)
+import { claimsRoute } from "./routes/claims/claims.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
 import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
@@ -71,6 +75,7 @@ import { monitoringRoute } from "./routes/operational/monitoring.js";
 import { buildMetricsRoute } from "./routes/operational/build-metrics.js";
 import { qaChecksRoute } from "./routes/operational/qa-checks.js";
 import { dataQualityRoute } from "./routes/operational/data-quality.js";
+import { operationsLogRoute } from "./routes/operational/operations-log.js";
 
 let requestCounter = 0;
 
@@ -147,9 +152,26 @@ export function createApp() {
   });
 
   // Lightweight liveness probe — no DB queries, no auth, no rate limiting.
-  // Use this for K8s probes and groundskeeper health checks.
+  // Use this for K8s liveness probes and groundskeeper health checks.
   app.get("/healthz", (c) => {
     return c.json({ status: "ok" });
+  });
+
+  // Readiness probe — returns 503 if migrations failed (degraded mode).
+  // K8s readiness probes should use this endpoint to prevent routing traffic
+  // to pods that started with a schema mismatch. During rolling deploys,
+  // traffic stays on old (working) pods until the new pod is fully ready.
+  app.get("/readyz", (c) => {
+    const migrationError = getMigrationError();
+    if (migrationError) {
+      // Don't expose raw error — it may contain SQL/table names.
+      // Full details are in server logs.
+      return c.json(
+        { status: "not-ready", reason: "migration_failed" },
+        503
+      );
+    }
+    return c.json({ status: "ready" });
   });
 
   // Detailed health endpoint — unauthenticated, includes DB stats
@@ -186,6 +208,9 @@ export function createApp() {
   app.route("/api/citations", citationsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/integrity", integrityRoute);
+
+  // Claims-first verification (#3253)
+  app.route("/api/claims", claimsRoute);
 
   // Financial data routes (operational — personnel, grants, funding)
   app.route("/api/personnel", personnelRoute);
@@ -240,6 +265,7 @@ export function createApp() {
   app.route("/api/build-metrics", buildMetricsRoute);
   app.route("/api/qa-checks", qaChecksRoute);
   app.route("/api/data-quality", dataQualityRoute);
+  app.route("/api/operations-log", operationsLogRoute);
 
   return app;
 }

@@ -1,17 +1,23 @@
+---
+description: Systematic adversarial audit of the wiki — finds bugs, broken pages, regressions, data integrity issues.
+argument-hint: "[directories] [--depth=quick|standard|deep|exhaustive]"
+effort: medium
+---
+
 # Adversarial QA Sweep
 
 Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions, and data integrity issues. Produces a prioritized findings report and files GitHub issues for real bugs.
 
-**Schedule:** `/loop 24h /qa-sweep` for daily runs using your Claude Code subscription.
+**Schedule:** `/loop 24h /maintain-qa-sweep` for daily runs using your Claude Code subscription.
 
 **Usage:**
-- `/qa-sweep` — standard sweep across all directories (~10 min)
-- `/qa-sweep legislation` — focus on one directory
-- `/qa-sweep organizations,people` — focus on multiple directories
-- `/qa-sweep --pages=/organizations/1day-sooner,/legislation/eu-ai-act` — specific URLs
-- `/qa-sweep --depth=deep` — thorough audit with many subagents (~30 min)
-- `/qa-sweep --depth=exhaustive` — maximum coverage, every directory + detail pages (~60 min)
-- `/qa-sweep legislation --depth=deep` — deep audit of one directory
+- `/maintain-qa-sweep` — standard sweep across all directories (~10 min)
+- `/maintain-qa-sweep legislation` — focus on one directory
+- `/maintain-qa-sweep organizations,people` — focus on multiple directories
+- `/maintain-qa-sweep --pages=/organizations/1day-sooner,/legislation/eu-ai-act` — specific URLs
+- `/maintain-qa-sweep --depth=deep` — thorough audit with many subagents (~30 min)
+- `/maintain-qa-sweep --depth=exhaustive` — maximum coverage, every directory + detail pages (~60 min)
+- `/maintain-qa-sweep legislation --depth=deep` — deep audit of one directory
 
 **Depth levels:**
 
@@ -30,8 +36,8 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 
 **Relationship to other commands:**
 - `/maintain` — day-to-day cleanup (close issues, fix cruft)
-- `/audit` — strategic review (complexity trends, architecture)
-- `/qa-sweep` — adversarial (actively try to break things)
+- `/maintain-audit` — strategic review (complexity trends, architecture)
+- `/maintain-qa-sweep` — adversarial (actively try to break things)
 
 ## Argument parsing
 
@@ -329,7 +335,7 @@ After filing issues, post the **complete** Phase 3 report as a comment on Discus
 
 ```bash
 # First run: create the discussion
-pnpm crux epic create "QA Sweep Reports" --body="Archive of /qa-sweep findings. Each comment is one sweep run."
+pnpm crux epic create "QA Sweep Reports" --body="Archive of /maintain-qa-sweep findings. Each comment is one sweep run."
 
 # Every run: post the report as a comment
 pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
@@ -355,7 +361,7 @@ REPORT
 | **P1** (latent bug) | File a GitHub issue (already done above) |
 | **P2** (quality/UX) | File a GitHub issue (already done above) |
 
-After fixing P0s, run `/push-and-ensure-green` to ship.
+After fixing P0s, run `/agent-push-and-verify` to ship.
 
 ## Guardrails
 

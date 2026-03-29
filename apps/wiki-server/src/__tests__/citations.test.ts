@@ -270,9 +270,12 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map(quoteToSqlRow);
   }
 
-  // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY, no LIMIT) ---
-  if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by") && !q.includes("limit")) {
-    if (params.length === 1) {
+  // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY) ---
+  // Handles health endpoint (with or without LIMIT). First param is always pageId.
+  if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by")) {
+    // Health query: params[0] = pageId, optionally params[1] = limit value
+    // Single-quote query: params[0] = pageId, params[1] = footnote (handled below if 2 non-limit params)
+    if (params.length === 1 || (params.length === 2 && q.includes("limit"))) {
       const intId = params[0] as number;
       return Array.from(quotesStore.values())
         .filter((r) => r.pageId === intId)

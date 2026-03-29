@@ -70,7 +70,7 @@ export function runCheck(): ChecklistRequiredResult {
 
   const reason = `Large diff (${files} files, ${lines} lines) without agent checklist. Run \`pnpm crux sys agent-checklist init "Task" --type=X\` or use --force to override.`;
   console.log(`\n${c.red}FAIL: ${reason}${c.reset}`);
-  console.log(`${c.dim}  Fix: run /agent-session-start before making large changes${c.reset}`);
+  console.log(`${c.dim}  Fix: run /agent-init before making large changes${c.reset}`);
 
   return {
     passed: false,

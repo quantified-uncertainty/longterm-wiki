@@ -18,6 +18,7 @@ import { githubApi, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { rebaseAllPrs } from '../lib/pr-rebase.ts';
 import { resolveAllConflicts } from '../lib/conflict-resolution.ts';
+import { parseDeployTasksFromBody } from '../lib/deploy-tasks/detect.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Test plan validation ─────────────────────────────────────────────────────
@@ -308,11 +309,28 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
           );
         }
       }
+
+      // Check 3: Pending deploy tasks from recently merged PRs (warning only)
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - 14);
+      for (const pr of recentMerged) {
+        if (!pr.merged_at || !pr.body) continue;
+        if (new Date(pr.merged_at) < cutoff) continue;
+        const parsed = parseDeployTasksFromBody(pr.body);
+        if (parsed && parsed.unchecked > 0) {
+          const uncheckedItems = parsed.items.filter(i => !i.checked).map(i => i.text);
+          log.warn(
+            `PR #${pr.number} ("${pr.title}") has ${parsed.unchecked} unchecked deploy task(s):\n` +
+            uncheckedItems.map(t => `    ☐ ${t}`).join('\n') + '\n' +
+            `  Run \`pnpm crux gh deploy-tasks pending\` to see all pending tasks.`
+          );
+        }
+      }
     } catch {
       // Quality checks are best-effort — don't block PR creation if they fail
     }
 
-    // Check 3: Test plan validation
+    // Check 4: Test plan validation
     if (!(options.skipTestPlan ?? options['skip-test-plan'])) {
       const testPlanResult = validateTestPlan(body);
       if (testPlanResult.status === 'block') {

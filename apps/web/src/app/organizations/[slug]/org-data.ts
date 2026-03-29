@@ -1204,7 +1204,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
         : { name: "", href: null };
       return {
         ...parsed,
-        holderName: resolved.name || titleCase(parsed.holderId ?? "") || "Unknown Holder",
+        holderName: resolved.name || "Unknown Holder",
         holderHref: resolved.href,
       };
     })

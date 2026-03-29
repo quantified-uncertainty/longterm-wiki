@@ -282,9 +282,13 @@ export async function fetchWaybackCommand(
       }
 
       // Update enrichment status
+      // Fire-and-forget: enrichment status update is best-effort; failure
+      // should not block wayback batch processing.
       await apiRequest('POST', '/api/resources/batch', {
         items: [{ id: r.id, url: r.url, enrichmentStatus: 'fetched' }],
-      }).catch(() => {});
+      }).catch((e: unknown) => {
+        console.warn(`Failed to update enrichment status for ${r.id}: ${e instanceof Error ? e.message : String(e)}`);
+      });
 
       if ((fetched + fetchFailed) % 20 === 0) {
         process.stdout.write(`\r  Progress: ${i + 1}/${toProcess.length} checked, ${fetched} fetched, ${found} snapshots found`);

@@ -25,7 +25,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
     - id: zR4nW8xB2f
       type: person
   customFields:
@@ -132,7 +132,7 @@
     - id: y4bieqSeag
       type: organization
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: nGFBXZeM3d
       type: person
   customFields:
@@ -485,7 +485,7 @@
   website: https://anthropic.com
   relatedEntries:
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
 - id: nate-soares
   stableId: 5MVd90lzCg
   wikiId: E212
@@ -708,7 +708,7 @@
     - governance
   relatedEntries:
     - id: rt6jVH9yuA
-      type: concept
+      type: approach
     - id: bioweapons
       type: risk
     - id: MUGUxfl2YA
@@ -742,7 +742,7 @@
     - id: dVQzYIAN3A
       type: person
     - id: l8ZPtVJdsA
-      type: concept
+      type: approach
   lastUpdated: 2026-03
 
 - id: philip-tetlock
@@ -6497,7 +6497,7 @@
   lastUpdated: 2026-03
 
 - id: nadrian-seeman
-  stableId: 04b-jJMlJ5
+  stableId: FZeKRtovLQ
   type: person
   title: Nadrian C. Seeman
   description: >-
@@ -6515,7 +6515,7 @@
   lastUpdated: 2026-03
 
 - id: stephen-barnard
-  stableId: 9o2fvO_kFz
+  stableId: jzOKTbpXVA
   type: person
   title: Stephen Barnard
   description: >-
@@ -6533,7 +6533,7 @@
   lastUpdated: 2026-03
 
 - id: al-globus
-  stableId: 6i__uIvaha
+  stableId: AX2ipeFpxQ
   type: person
   title: Al Globus
   description: >-
@@ -6605,7 +6605,7 @@
   lastUpdated: 2026-03
 
 - id: reto-schlittler
-  stableId: N1-HCoqHT1
+  stableId: dW9d1letqg
   type: person
   title: Reto Schlittler
   description: >-
@@ -6668,7 +6668,7 @@
   lastUpdated: 2026-03
 
 - id: william-goddard
-  stableId: jvrow4k-rN
+  stableId: g3A4KvCPbg
   type: person
   title: William A. Goddard III
   description: >-
@@ -6686,7 +6686,7 @@
   lastUpdated: 2026-03
 
 - id: yue-qi
-  stableId: gEPF2wUNr_
+  stableId: C5ZRQgwdXw
   type: person
   title: Yue Qi
   description: >-
@@ -6731,7 +6731,7 @@
   lastUpdated: 2026-03
 
 - id: philip-kuekes
-  stableId: b9G-hi3bf4
+  stableId: SADdIz271g
   type: person
   title: Philip Kuekes
   description: >-
@@ -6785,7 +6785,7 @@
   lastUpdated: 2026-03
 
 - id: don-brenner
-  stableId: uW3-oZo8X8
+  stableId: gr19HovNHQ
   type: person
   title: Don Brenner
   description: >-
@@ -6812,7 +6812,7 @@
   lastUpdated: 2026-03
 
 - id: marvin-cohen
-  stableId: y-pYGIJTOH
+  stableId: lEmUiZWZ6Q
   type: person
   title: Marvin L. Cohen
   description: >-
@@ -6830,7 +6830,7 @@
   lastUpdated: 2026-03
 
 - id: carlo-montemagno
-  stableId: -ElpBHyhiv
+  stableId: Kg335Zr9gQ
   type: person
   title: Carlo Montemagno
   description: >-
@@ -6857,7 +6857,7 @@
   lastUpdated: 2026-03
 
 - id: brian-kuhlman
-  stableId: f-qp0f35GQ
+  stableId: mMaPu5zNTQ
   type: person
   title: Brian Kuhlman
   description: >-
@@ -6920,7 +6920,7 @@
   lastUpdated: 2026-03
 
 - id: david-leigh
-  stableId: Ud3dpcT7-M
+  stableId: tpr2ivIi8w
   type: person
   title: David A. Leigh
   description: >-
@@ -6938,7 +6938,7 @@
   lastUpdated: 2026-03
 
 - id: fung-suong-ou
-  stableId: EBNLA56_uz
+  stableId: nnBCkdzMBg
   type: person
   title: Fung Suong Ou
   description: >-
@@ -6947,7 +6947,7 @@
   lastUpdated: 2026-03
 
 - id: george-schatz
-  stableId: C-bR4vfy_f
+  stableId: AQo3DXAlDw
   type: person
   title: George C. Schatz
   description: >-
@@ -6956,7 +6956,7 @@
   lastUpdated: 2026-03
 
 - id: james-tour
-  stableId: EBTqbDgB-M
+  stableId: Ou283QVyDg
   type: person
   title: James M. Tour
   description: >-
@@ -6965,7 +6965,7 @@
   lastUpdated: 2026-03
 
 - id: robert-freitas
-  stableId: _qKgXk-gR2
+  stableId: aFJXa6dhDQ
   type: person
   title: Robert A. Freitas Jr.
   description: >-
@@ -7019,7 +7019,7 @@
   lastUpdated: 2026-03
 
 - id: raymond-astumian
-  stableId: OPrdd-JIOG
+  stableId: lfWDZAC6ng
   type: person
   title: Raymond Astumian
   description: >-
@@ -7037,7 +7037,7 @@
   lastUpdated: 2026-03
 
 - id: david-soloveichik
-  stableId: 7-OzHdSOus
+  stableId: vlCvjxY9gw
   type: person
   title: David Soloveichik
   description: >-
@@ -7091,7 +7091,7 @@
   lastUpdated: 2026-03
 
 - id: alexander-zettl
-  stableId: Qk_JBn0QIP
+  stableId: ds8lnHk7og
   type: person
   title: Alexander K. Zettl
   description: >-
@@ -7100,7 +7100,7 @@
   lastUpdated: 2026-03
 
 - id: jonathan-barnes
-  stableId: O_PjI9Ekck
+  stableId: a9u0mNCNnw
   type: person
   title: Jonathan C. Barnes
   description: >-
@@ -7127,7 +7127,7 @@
   lastUpdated: 2026-03
 
 - id: markus-buehler
-  stableId: C4kJ-1HRvN
+  stableId: gKoe9fTUyQ
   type: person
   title: Markus J. Buehler
   description: >-
@@ -7136,7 +7136,7 @@
   lastUpdated: 2026-03
 
 - id: michelle-simmons
-  stableId: B8zIqK-yFt
+  stableId: XLGEBz90WQ
   type: person
   title: Michelle Y. Simmons
   description: >-
@@ -7145,7 +7145,7 @@
   lastUpdated: 2026-03
 
 - id: bartosz-grzybowski
-  stableId: _-LQ_cralJ
+  stableId: y1cwz74Nhw
   type: person
   title: Bartosz A. Grzybowski
   description: >-
@@ -7154,7 +7154,7 @@
   lastUpdated: 2026-03
 
 - id: franz-giessibl
-  stableId: 8gryM-S-t_
+  stableId: HBeg0cncQw
   type: person
   title: Franz J. Giessibl
   description: >-
@@ -7172,7 +7172,7 @@
   lastUpdated: 2026-03
 
 - id: giovanni-zocchi
-  stableId: EmAGAr-lur
+  stableId: d2jyQILVUA
   type: person
   title: Giovanni Zocchi
   description: >-
@@ -7181,7 +7181,7 @@
   lastUpdated: 2026-03
 
 - id: william-shih
-  stableId: -YcnVkBCjs
+  stableId: fV226i65Qw
   type: person
   title: William Shih
   description: >-
@@ -7289,7 +7289,7 @@
   lastUpdated: 2026-03
 
 - id: anne-sophie-duwez
-  stableId: MoKd-K-WEx
+  stableId: O6bG7hrkoA
   type: person
   title: Anne-Sophie Duwez
   description: >-
@@ -7298,7 +7298,7 @@
   lastUpdated: 2026-03
 
 - id: james-chelikowsky
-  stableId: E-iDGjEEl2
+  stableId: MR6ri0SHAw
   type: person
   title: James R. Chelikowsky
   description: >-
@@ -7343,7 +7343,7 @@
   lastUpdated: 2026-03
 
 - id: qiancheng-xiong
-  stableId: qzHGm_5jG4
+  stableId: BcjrAqPsSg
   type: person
   title: Qiancheng Xiong
   description: >-
@@ -7352,7 +7352,7 @@
   lastUpdated: 2026-03
 
 - id: klaus-robert-muller
-  stableId: Ahj1sm_eRx
+  stableId: Q4Qq5hLrtA
   type: person
   title: Klaus-Robert Muller
   description: >-
@@ -7361,7 +7361,7 @@
   lastUpdated: 2026-03
 
 - id: saw-wai-hla
-  stableId: 3IvzzyPcT_
+  stableId: kUDmreRcsQ
   type: person
   title: Saw Wai Hla
   description: >-
@@ -7388,7 +7388,7 @@
   lastUpdated: 2026-03
 
 - id: serge-egelman
-  stableId: OziR1VyA3-
+  stableId: N2qvjMwwVg
   type: person
   title: Serge Egelman
   description: >-
@@ -7424,7 +7424,7 @@
   lastUpdated: 2026-03
 
 - id: lorrie-faith-cranor
-  stableId: NEkGLoM8_N
+  stableId: FqIaAc60SA
   type: person
   title: Lorrie Faith Cranor
   description: >-
@@ -7433,7 +7433,7 @@
   lastUpdated: 2026-03
 
 - id: yuvraj-agarwal
-  stableId: 28Nd_LdEtI
+  stableId: nyiQxMiigQ
   type: person
   title: Yuvraj Agarwal
   description: >-
@@ -7623,7 +7623,7 @@
 
 # ── Anthropic LTBT Trustees ─────────────────────────────────
 - id: neil-buddy-shah
-  stableId: n-9NN6o_sj
+  stableId: MY7i5cfpRQ
   type: person
   title: Neil Buddy Shah
   description: >-
@@ -7646,7 +7646,7 @@
     - ai-governance
 
 - id: mariano-florentino-cuellar
-  stableId: 978SGjc9_-
+  stableId: 6zzGkJhk5g
   type: person
   title: Mariano-Florentino Cuéllar
   description: >-
@@ -7706,7 +7706,7 @@
     - ai-governance
 
 - id: chris-liddell
-  stableId: 7wk_Ywg5C9
+  stableId: x4ecRCtvSA
   type: person
   title: Chris Liddell
   description: >-
@@ -7751,7 +7751,7 @@
     - ai-governance
 
 - id: zico-kolter
-  stableId: 7oi_TL68Fy
+  stableId: Q2T4QDC7dA
   type: person
   title: Zico Kolter
   description: >-
@@ -7765,7 +7765,7 @@
     - ai-research
 
 - id: paul-nakasone
-  stableId: Ioa0kxj1_7
+  stableId: CzFijjMitA
   type: person
   title: Paul Nakasone
   description: >-
@@ -7777,7 +7777,7 @@
     - ai-governance
 
 - id: adebayo-ogunlesi
-  stableId: _ySs334QrO
+  stableId: CCEQ9bJTBw
   type: person
   title: Adebayo Ogunlesi
   description: >-

@@ -8,7 +8,7 @@ Always work on a `claude/short-description` branch. Never commit directly to `ma
 
 ## Step 1: Session Start — BEFORE taking any action
 
-Run `/agent-session-start` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
+Run `/agent-init` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
 
 ```bash
 # If working on a GitHub issue:
@@ -25,7 +25,7 @@ Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
 ## Step 2: Session End — BEFORE considering work complete
 
-Run `/agent-session-ready-PR`. It verifies the checklist, polishes the PR description, updates GitHub issues, creates a session log, and ships.
+Run `/agent-ship`. It verifies the checklist, polishes the PR description, updates GitHub issues, creates a session log, and ships.
 
 See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
 

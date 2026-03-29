@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb } from "../../db.js";
+import { getDrizzleDb, getDb } from "../../db.js";
 import { investments, entities } from "../../schema.js";
 import {
   parseJsonBody,
@@ -17,6 +17,7 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
 
@@ -50,6 +51,7 @@ const SyncInvestmentItemSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
+  claimIds: z.array(z.number().int().positive()).optional(),
 });
 
 const SyncInvestmentsBatchSchema = z.object({
@@ -246,6 +248,14 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     ]);
     if (refError) return refError;
 
+    // Validate claim references
+    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const claimError = await validateClaimRefs(rawDb, allClaimIds);
+      if (claimError) return validationError(c, claimError);
+    }
+
     let upserted = 0;
     let verdictsResult = { written: 0 };
 
@@ -329,7 +339,19 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     logVerificationCoverage("investments/sync", items.length, verdictsResult.written);
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
+    // Link verified claims to records
+    let claimsLinked = 0;
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+        recordId: item.id,
+        recordType: "investments",
+        claimIds: item.claimIds,
+      })));
+      claimsLinked = linkResult.linked;
+    }
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
   });
 
 // ---- Exports ----

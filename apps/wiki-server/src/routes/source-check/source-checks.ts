@@ -12,6 +12,7 @@ import {
   ne,
   isNull,
   inArray,
+  ilike,
   countDistinct,
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -101,6 +102,7 @@ const VerdictsQuery = z.object({
     .enum(["true", "false"])
     .transform((v) => v === "true")
     .optional(),
+  q: z.string().max(500).optional(),
   limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -264,7 +266,7 @@ const sourceChecksApp = new Hono()
 
   // ---- GET /verdicts ----
   .get("/verdicts", zv("query", VerdictsQuery), async (c) => {
-    const { record_type, verdict, entity_id, needs_recheck, limit, offset } =
+    const { record_type, verdict, entity_id, needs_recheck, q, limit, offset } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
@@ -280,6 +282,17 @@ const sourceChecksApp = new Hono()
     }
     if (entity_id) {
       conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+    }
+    if (q) {
+      const pattern = `%${q}%`;
+      conditions.push(
+        or(
+          ilike(sourceCheckVerdicts.recordId, pattern),
+          ilike(sourceCheckVerdicts.recordType, pattern),
+          ilike(sourceCheckVerdicts.entityId, pattern),
+          ilike(sourceCheckVerdicts.reasoning, pattern),
+        )!
+      );
     }
 
     const whereClause =

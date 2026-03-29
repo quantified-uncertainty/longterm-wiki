@@ -55,6 +55,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   const verdictParams = new URLSearchParams();
   if (filterType !== "all") verdictParams.set("record_type", filterType);
   if (filterVerdict !== "all") verdictParams.set("verdict", filterVerdict);
+  if (searchQuery) verdictParams.set("q", searchQuery);
   verdictParams.set("limit", String(PAGE_SIZE));
   verdictParams.set("offset", String(offset));
 
@@ -192,22 +193,6 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       }
     }
   }
-
-  // Client-side search filtering (server already filtered by type/verdict)
-  const filteredVerdicts = searchQuery
-    ? verdicts.filter((v) => {
-        const recordName = names[v.recordId] ?? "";
-        const entityName = v.entityId ? (names[v.entityId] ?? "") : "";
-        const searchLower = searchQuery.toLowerCase();
-        return (
-          v.recordId.toLowerCase().includes(searchLower) ||
-          v.recordType.toLowerCase().includes(searchLower) ||
-          recordName.toLowerCase().includes(searchLower) ||
-          entityName.toLowerCase().includes(searchLower) ||
-          (v.reasoning?.toLowerCase().includes(searchLower) ?? false)
-        );
-      })
-    : verdicts;
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -369,14 +354,12 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       <div className="flex items-center gap-4 mb-4">
         <SourceChecksSearch />
         <span className="text-sm text-muted-foreground whitespace-nowrap">
-          {searchQuery
-            ? `${filteredVerdicts.length} of ${total} results`
-            : `${total} results`}
+          {`${total} results`}
         </span>
       </div>
 
       {/* Table */}
-      <SourceChecksTable verdicts={filteredVerdicts} names={names} hrefs={hrefs} />
+      <SourceChecksTable verdicts={verdicts} names={names} hrefs={hrefs} />
 
       {/* Pagination */}
       {totalPages > 1 && (

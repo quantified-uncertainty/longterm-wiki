@@ -15,6 +15,42 @@ The migration client (`initDb()` in `apps/wiki-server/src/db.ts`) uses a dedicat
 - `lock_timeout: '60000'` — 60s (fail fast if lock can't be acquired)
 - `idle_in_transaction_session_timeout: '600000'` — 10min total bound
 
+## Migration failure behavior
+
+If a migration fails at startup, the server starts in **degraded mode** instead of crash-looping. The health endpoint reports `"status": "degraded"` with a `migrationError` field containing the error message. This gives operators visibility without requiring kubectl access to diagnose the issue.
+
+The post-deploy smoke test checks for `status === "healthy"`, so a degraded server will correctly fail the smoke test and prevent the bad image from receiving traffic.
+
+## Adding unique constraints — MANDATORY pattern
+
+**Never hardcode specific duplicate IDs in migrations.** Use dynamic dedup with `ROW_NUMBER()` window functions to find and remove ALL duplicates, including ones created after the migration was written.
+
+Incident context: Hardcoding one duplicate ID in migration 0143 missed 2 others, causing a 3-hour outage on 2026-03-28.
+
+```sql
+-- GOOD: dynamic dedup (handles ALL duplicates)
+DELETE FROM my_table
+WHERE id IN (
+  SELECT id FROM (
+    SELECT id, ROW_NUMBER() OVER (
+      PARTITION BY natural_key_col1, natural_key_col2
+      ORDER BY created_at, id  -- keep earliest; id as tiebreaker
+    ) AS rn
+    FROM my_table
+  ) ranked WHERE rn > 1
+);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_my_table_natural_key
+  ON my_table (natural_key_col1, natural_key_col2);
+
+-- BAD: hardcoded IDs (misses future duplicates)
+DELETE FROM my_table WHERE id = 'abc123';
+CREATE UNIQUE INDEX ...
+```
+
+Reference implementations: `0108_natural_key_uniqueness.sql`, `0143_dedup_funding_program_unique.sql`.
+
+The gate check (`validate-drizzle-journal.ts`) warns if it detects CREATE UNIQUE INDEX with hardcoded DELETEs.
+
 ## When Drizzle migrations work fine
 
 Most migrations: adding columns, creating tables, adding indexes on small tables, inserting rows. These complete in seconds and work through the normal Drizzle migration runner.

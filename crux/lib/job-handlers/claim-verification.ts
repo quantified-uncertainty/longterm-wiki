@@ -1,0 +1,368 @@
+/**
+ * Claim Verification Job Handler
+ *
+ * Processes `claim-verification` jobs created by POST /api/claims/propose.
+ * Each job verifies a batch of claims against a shared resource's content.
+ *
+ * Flow:
+ *   1. Load claims from proposed_claims via wiki-server
+ *   2. Load resource content from citation_content
+ *   3. Build multi-claim verification prompt
+ *   4. Call LLM (Haiku) to verify all claims against the source
+ *   5. Store evidence in source_check_evidence
+ *   6. Update claim verdicts via POST /api/claims/verdicts
+ *
+ * Part of the claims-first verification architecture (#3253, Component 3).
+ */
+
+import { createLlmClient, MODELS } from '../llm.ts';
+import { callLlm } from '../llm.ts';
+import { parseJsonResponse } from '../anthropic.ts';
+import { getCitationContentByUrl } from '../wiki-server/citations.ts';
+import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
+import { apiRequest } from '../wiki-server/client.ts';
+import type { JobHandlerResult, JobHandlerContext } from './types.ts';
+import { z } from 'zod';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface ClaimJobParams {
+  claimIds: number[];
+  resourceId: string | null;
+  batchId: string;
+  entityId: string | null;
+}
+
+interface ClaimRow {
+  id: number;
+  claim_text: string;
+  source_url: string;
+  target_table: string;
+  target_field: string | null;
+  proposed_value: string | null;
+  agent_evidence: string | null;
+  resource_id: string | null;
+}
+
+interface ClaimVerificationResult {
+  claimId: number;
+  verdict: string;
+  confidence: number;
+  extractedValue: string;
+  reasoning: string;
+}
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const MAX_CLAIMS_PER_LLM_CALL = 20;
+const MAX_SOURCE_CONTENT_CHARS = 6000;
+
+// ---------------------------------------------------------------------------
+// LLM response parsing
+// ---------------------------------------------------------------------------
+
+const SingleClaimResultSchema = z.object({
+  claimId: z.number(),
+  verdict: z.enum(['confirmed', 'contradicted', 'unverifiable', 'partial', 'outdated']),
+  confidence: z.number().min(0).max(1),
+  extracted_value: z.string().default(''),
+  reasoning: z.string().default(''),
+});
+
+const MultiClaimResultSchema = z.array(SingleClaimResultSchema);
+
+// ---------------------------------------------------------------------------
+// Prompt builder
+// ---------------------------------------------------------------------------
+
+function buildMultiClaimPrompt(
+  claims: ClaimRow[],
+  sourceUrl: string,
+  sourceTitle: string | null,
+  sourceContent: string,
+): string {
+  const claimLines = claims
+    .map((cl, i) => {
+      const parts = [`${i + 1}. [Claim ID ${cl.id}] "${cl.claim_text}"`];
+      if (cl.agent_evidence) parts.push(`   Agent's evidence: "${cl.agent_evidence}"`);
+      if (cl.proposed_value) parts.push(`   Proposed value: ${cl.target_field ?? 'field'} = "${cl.proposed_value}"`);
+      return parts.join('\n');
+    })
+    .join('\n\n');
+
+  return `You are verifying claims against a source document.
+
+Source: ${sourceUrl}
+${sourceTitle ? `Source title: ${sourceTitle}` : ''}
+Source content:
+---
+${sourceContent.slice(0, MAX_SOURCE_CONTENT_CHARS)}
+---
+
+Claims to verify:
+${claimLines}
+
+For each claim, determine whether the source text confirms, contradicts, or does not address the claim.
+
+IMPORTANT — avoid common false-positive errors:
+- Range vs. point: if source says "51-200" and claim is 91, that's "confirmed" (within range)
+- Temporal mismatch: only compare the same time period
+- Approximate values: within 10% is "confirmed" or "partial"
+- Reserve "contradicted" ONLY for direct, clear incompatibility
+
+Respond with a JSON array (one object per claim):
+[
+  {
+    "claimId": <the claim ID number>,
+    "verdict": "confirmed" | "contradicted" | "unverifiable" | "partial" | "outdated",
+    "confidence": 0.0 to 1.0,
+    "extracted_value": "what the source actually says (quote or paraphrase)",
+    "reasoning": "brief explanation"
+  }
+]
+
+Respond ONLY with the JSON array, no other text.`;
+}
+
+// ---------------------------------------------------------------------------
+// Main handler
+// ---------------------------------------------------------------------------
+
+export async function handleClaimVerification(
+  params: Record<string, unknown>,
+  ctx: JobHandlerContext,
+): Promise<JobHandlerResult> {
+  const { claimIds, resourceId, batchId, entityId } = params as unknown as ClaimJobParams;
+
+  if (!Array.isArray(claimIds) || claimIds.length === 0) {
+    return { success: false, data: {}, error: 'Missing or empty claimIds' };
+  }
+
+  if (ctx.verbose) {
+    console.log(`[claim-verification] Batch ${batchId}: ${claimIds.length} claims, resource=${resourceId ?? 'none'}`);
+  }
+
+  // 1. Fetch claims from the database
+  const claimsResult = await apiRequest<{ claims: ClaimRow[] }>(
+    'GET',
+    `/api/claims/by-ids?ids=${claimIds.join(',')}`,
+  );
+
+  // Fallback: if the by-ids endpoint doesn't exist yet, fetch via status endpoint
+  // and filter. This is a temporary measure until the by-ids endpoint is added.
+  let claims: ClaimRow[];
+  if (claimsResult.ok) {
+    claims = claimsResult.data.claims;
+  } else {
+    // Construct claims from params — the propose endpoint stored the data
+    // We'll need a way to get claim details. For now, return an error.
+    return {
+      success: false,
+      data: { batchId, claimIds },
+      error: `Cannot fetch claims: ${claimsResult.message}. The /api/claims/by-ids endpoint may not exist yet.`,
+    };
+  }
+
+  if (claims.length === 0) {
+    return {
+      success: true,
+      data: { batchId, message: 'No claims to verify (all may have been processed already)' },
+    };
+  }
+
+  // 2. Load resource content
+  let sourceContent: string | null = null;
+  let sourceTitle: string | null = null;
+  const sourceUrl = claims[0]?.source_url ?? '';
+
+  if (resourceId) {
+    // Try to get content via the resource's URL
+    const resourceResult = await apiRequest<{
+      url: string;
+      title: string | null;
+      content: { fullText: string | null; pageTitle: string | null } | null;
+    }>('GET', `/api/resources/${encodeURIComponent(resourceId)}/content`);
+
+    if (resourceResult.ok && resourceResult.data.content?.fullText) {
+      sourceContent = resourceResult.data.content.fullText;
+      sourceTitle = resourceResult.data.content.pageTitle ?? resourceResult.data.title;
+    }
+  }
+
+  // Fallback: try citation_content by URL
+  if (!sourceContent && sourceUrl) {
+    const contentResult = await getCitationContentByUrl(sourceUrl);
+    if (contentResult.ok && contentResult.data?.fullText) {
+      sourceContent = contentResult.data.fullText;
+      sourceTitle = contentResult.data.pageTitle ?? null;
+    }
+  }
+
+  if (!sourceContent) {
+    // Mark all claims as unverifiable — no source content available
+    const verdicts = claims.map((cl) => ({
+      claimId: cl.id,
+      status: 'unverifiable' as const,
+      confidence: 0,
+      reasoning: 'Source content not available for verification',
+    }));
+
+    await apiRequest('POST', '/api/claims/verdicts', { verdicts });
+
+    return {
+      success: true,
+      data: {
+        batchId,
+        totalClaims: claims.length,
+        verified: 0,
+        unverifiable: claims.length,
+        reason: 'Source content not available',
+      },
+    };
+  }
+
+  // 3. Verify claims in batches (up to MAX_CLAIMS_PER_LLM_CALL per call)
+  const client = createLlmClient();
+  const allResults: ClaimVerificationResult[] = [];
+  const errors: Array<{ claimId: number; error: string }> = [];
+
+  for (let i = 0; i < claims.length; i += MAX_CLAIMS_PER_LLM_CALL) {
+    const batch = claims.slice(i, i + MAX_CLAIMS_PER_LLM_CALL);
+    const prompt = buildMultiClaimPrompt(batch, sourceUrl, sourceTitle, sourceContent);
+
+    try {
+      const llmResult = await callLlm(client, prompt, {
+        model: MODELS.haiku,
+        maxTokens: 2000, // More tokens for multi-claim response
+        temperature: 0,
+        retryLabel: `claim-verify-batch-${batchId}-${i}`,
+      });
+
+      const raw = parseJsonResponse(llmResult.text);
+      const parsed = MultiClaimResultSchema.safeParse(raw);
+
+      if (parsed.success) {
+        for (const r of parsed.data) {
+          allResults.push({
+            claimId: r.claimId,
+            verdict: r.verdict,
+            confidence: r.confidence,
+            extractedValue: r.extracted_value,
+            reasoning: r.reasoning,
+          });
+        }
+      } else {
+        // If multi-claim parsing fails, try to handle gracefully
+        for (const cl of batch) {
+          errors.push({
+            claimId: cl.id,
+            error: `LLM response parsing failed: ${parsed.error.message.slice(0, 200)}`,
+          });
+        }
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      for (const cl of batch) {
+        errors.push({ claimId: cl.id, error: msg.slice(0, 200) });
+      }
+    }
+  }
+
+  // 4. Store evidence for each verified claim
+  for (const r of allResults) {
+    const claim = claims.find((cl) => cl.id === r.claimId);
+    if (!claim) continue;
+
+    await storeSourceCheckEvidence({
+      recordType: (claim.target_table || 'fact') as 'fact',
+      recordId: String(claim.id),
+      sourceUrl: claim.source_url,
+      verdict: r.verdict,
+      confidence: r.confidence,
+      extractedValue: r.extractedValue,
+      reasoning: r.reasoning,
+      entityId: (entityId as string) ?? null,
+    }).catch((e: unknown) => {
+      // Best-effort: evidence storage failure shouldn't block verdict updates
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[claim-verification] Failed to store evidence for claim ${r.claimId}: ${msg}`);
+    });
+  }
+
+  // 5. Update claim verdicts via the verdicts endpoint
+  const verdicts = [
+    ...allResults.map((r) => ({
+      claimId: r.claimId,
+      status: mapVerdictToStatus(r.verdict),
+      confidence: r.confidence,
+      reasoning: r.reasoning,
+      extractedValue: r.extractedValue,
+      checkerModel: MODELS.haiku,
+    })),
+    ...errors.map((e) => ({
+      claimId: e.claimId,
+      status: 'unverifiable' as const,
+      confidence: 0,
+      reasoning: e.error,
+      checkerModel: MODELS.haiku,
+    })),
+  ];
+
+  if (verdicts.length > 0) {
+    const updateResult = await apiRequest<{ updated: number; total: number }>(
+      'POST',
+      '/api/claims/verdicts',
+      { verdicts },
+    );
+
+    if (!updateResult.ok) {
+      console.warn(`[claim-verification] Failed to update verdicts: ${updateResult.message}`);
+    }
+  }
+
+  // 6. Return structured result
+  const confirmed = allResults.filter((r) => r.verdict === 'confirmed').length;
+  const contradicted = allResults.filter((r) => r.verdict === 'contradicted').length;
+  const unverifiable = allResults.filter((r) => r.verdict === 'unverifiable').length + errors.length;
+  const partial = allResults.filter((r) => r.verdict === 'partial').length;
+
+  return {
+    success: true,
+    data: {
+      batchId,
+      resourceId,
+      totalClaims: claims.length,
+      confirmed,
+      contradicted,
+      unverifiable,
+      partial,
+      errors: errors.length,
+      results: allResults.map((r) => ({
+        claimId: r.claimId,
+        verdict: r.verdict,
+        confidence: r.confidence,
+      })),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/** Map source-check verdicts to claim statuses. */
+function mapVerdictToStatus(verdict: string): 'verified' | 'contradicted' | 'unverifiable' {
+  switch (verdict) {
+    case 'confirmed':
+    case 'partial':
+      return 'verified';
+    case 'contradicted':
+      return 'contradicted';
+    default:
+      return 'unverifiable';
+  }
+}

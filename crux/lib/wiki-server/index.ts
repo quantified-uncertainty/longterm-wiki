@@ -223,3 +223,7 @@ export {
   getContradictedEntityIds,
 } from './source-checks.ts';
 export type { VerdictEntry, VerdictsResponse } from './source-checks.ts';
+
+// Claims
+export { proposeClaims, getClaimStatus } from './claims.ts';
+export type { ProposeClaimsResult, ClaimStatusResult } from './claims.ts';

@@ -1,0 +1,33 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "submittedAt": "2026-03-28T17:55:56.880Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "KTcYlGzlmq",
+      "personId": "aAFe7DRvPv",
+      "organizationId": "GGcOTR25tl",
+      "role": "Co-leader (via Leading the Future)",
+      "source": "https://www.transformernews.ai/p/the-gop-consultancy-at-the-heart-ai-industry-targeted-victory",
+      "verdict": "none"
+    },
+    {
+      "id": "0Yy9bK8ZIu",
+      "personId": "WHwuoAkZim",
+      "organizationId": "GGcOTR25tl",
+      "role": "Co-leader (via Leading the Future)",
+      "source": "https://www.axios.com/2026/02/27/ai-influence-power-players",
+      "verdict": "none"
+    }
+  ]
+}

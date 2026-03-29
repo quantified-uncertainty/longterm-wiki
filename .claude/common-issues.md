@@ -54,7 +54,7 @@ When `git status -b --short` shows `[ahead 3, behind 23]`, it means the auto-reb
 
 **Fix:** Run `git pull --rebase` to rebase local commits onto the updated remote. Then push with `git push --force-with-lease -u origin HEAD` (force-with-lease is required because the rebase rewrote history).
 
-This is handled automatically by the `/push-and-ensure-green` Step 0 workflow. If `git pull --rebase` succeeds cleanly (no conflicts), no manual conflict resolution is needed — the auto-rebase workflow already incorporated your commits on top of main on the remote side.
+This is handled automatically by the `/agent-push-and-verify` Step 0 workflow. If `git pull --rebase` succeeds cleanly (no conflicts), no manual conflict resolution is needed — the auto-rebase workflow already incorporated your commits on top of main on the remote side.
 
 ---
 

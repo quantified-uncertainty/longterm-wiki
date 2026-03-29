@@ -708,7 +708,7 @@
     - id: pz3KSt33AA
       type: policy
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: La8s84s3zg
       type: policy
     - id: ZXvLxl4RMw
@@ -891,9 +891,9 @@
     - id: La8s84s3zg
       type: policy
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: B3alpHHvzg
-      type: policy
+      type: event
   sources:
     - title: 'Translation: Interim Measures for Generative AI Management'
       url: >-
@@ -1200,7 +1200,7 @@
     - id: XLLyzaEaCA
       type: organization
     - id: khXUiwWtkg
-      type: approach
+      type: crux
     - id: SUZgWeZLNA
       type: risk
     - id: Pr5xmThNfA
@@ -1539,7 +1539,7 @@
       value: Up to EUR 35M or 7% of global annual turnover (prohibited practices); EUR 15M or 3% (other violations); EUR 7.5M or 1% (incorrect information)
   relatedEntries:
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: aX0jkoaekQ
       type: organization
     - id: XLLyzaEaCA
@@ -2376,7 +2376,7 @@
     - id: pz3KSt33AA
       type: policy
     - id: B3alpHHvzg
-      type: policy
+      type: event
     - id: mK9pX3rQ7n
       type: organization
     - id: 1LcLlMGLbw
@@ -2512,9 +2512,9 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
   sources:
     - title: Core Views on AI Safety
       url: https://anthropic.com/news/core-views-on-ai-safety
@@ -2993,7 +2993,7 @@
     - id: pKeaWwP6sQ
       type: organization
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
@@ -3150,7 +3150,7 @@
     - id: JqMTO0YVEA
       type: risk
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
   lastUpdated: 2026-02
 
 - id: capability-elicitation
@@ -3239,7 +3239,7 @@
     - id: JqMTO0YVEA
       type: risk
     - id: sFjyY5xXZA
-      type: safety-agenda
+      type: research-area
   lastUpdated: 2026-02
 
 - id: ai-assisted
@@ -3298,7 +3298,7 @@
     - id: JqMTO0YVEA
       type: risk
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
   lastUpdated: 2026-02
 
 - id: alignment-evals
@@ -3384,7 +3384,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: rt6jVH9yuA
       type: approach
     - id: 9XN9QMfecA
@@ -3414,7 +3414,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: 9XN9QMfecA
       type: risk
     - id: vc60Nthkcg
@@ -3444,7 +3444,7 @@
     - id: xwxKWEAkSQ
       type: approach
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
   lastUpdated: 2026-02
 
 - id: preference-optimization
@@ -3470,7 +3470,7 @@
     - id: 1LcLlMGLbw
       type: organization
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: 9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
@@ -3498,9 +3498,9 @@
     - id: 9XN9QMfecA
       type: risk
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
   lastUpdated: 2026-02
 
 - id: refusal-training
@@ -3527,7 +3527,7 @@
     - id: 1LcLlMGLbw
       type: organization
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
@@ -3755,11 +3755,11 @@
     - id: ULjDXpSLCI
       type: organization
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: 73qTEkYyWA
-      type: concept
+      type: research-area
     - id: etuIjQhFbQ
-      type: concept
+      type: research-area
   lastUpdated: 2026-02
 
 - id: evals-governance
@@ -3796,7 +3796,7 @@
     - id: rQEkFJxS5w
       type: organization
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
@@ -3898,7 +3898,7 @@
     - governance
   relatedEntries:
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: 1LcLlMGLbw
       type: organization
     - id: mK9pX3rQ7n
@@ -3939,7 +3939,7 @@
     - id: monitoring
       type: approach
     - id: uvwmYLYstg
-      type: policy
+      type: concept
   lastUpdated: 2026-02
 
 - id: monitoring
@@ -3968,9 +3968,9 @@
     - id: thresholds
       type: concept
     - id: uvwmYLYstg
-      type: policy
+      type: concept
     - id: 57vCq45URQ
-      type: policy
+      type: approach
     - id: hardware-enabled-governance
       type: approach
   lastUpdated: 2026-02
@@ -4146,7 +4146,7 @@
     - id: monitoring
       type: approach
     - id: uvwmYLYstg
-      type: policy
+      type: concept
     - id: international-regimes
       type: concept
   lastUpdated: 2026-02
@@ -4208,9 +4208,9 @@
     - id: y4bieqSeag
       type: organization
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: 3Mc5fuvtMg
-      type: policy
+      type: concept
   lastUpdated: 2026-02
 
 - id: training-programs
@@ -4341,7 +4341,7 @@
     - id: La8s84s3zg
       type: policy
     - id: 4a6Sf9Fupg
-      type: policy
+      type: concept
   lastUpdated: 2026-02
 
 - id: singapore-consensus
@@ -4368,13 +4368,13 @@
     - ai-safety
   relatedEntries:
     - id: B3alpHHvzg
-      type: policy
+      type: event
     - id: X2gSvrOang
       type: policy
     - id: aCEdTooCBw
       type: policy
     - id: 4a6Sf9Fupg
-      type: policy
+      type: concept
   sources:
     - title: The Singapore Consensus on Global AI Safety Research Priorities
       url: https://arxiv.org/abs/2506.20702
@@ -4672,7 +4672,7 @@
     - id: aCEdTooCBw
       type: policy
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
   lastUpdated: 2026-02
 
 - id: international-regimes
@@ -4747,13 +4747,13 @@
     - id: SUZgWeZLNA
       type: risk
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: SpFgTz2INg
       type: policy
     - id: uvwmYLYstg
-      type: policy
+      type: concept
     - id: 4a6Sf9Fupg
-      type: policy
+      type: concept
   lastUpdated: 2026-02
 
 - id: open-source
@@ -4815,7 +4815,7 @@
     - id: aCEdTooCBw
       type: policy
     - id: i1qSgjAj5A
-      type: policy
+      type: approach
     - id: La8s84s3zg
       type: policy
     - id: 1LcLlMGLbw
@@ -4900,11 +4900,11 @@
     - ai-safety
   relatedEntries:
     - id: 0vyIQ4YLIA
-      type: approach
+      type: research-area
     - id: 6sdr78k9kQ
       type: approach
     - id: sFjyY5xXZA
-      type: approach
+      type: research-area
     - id: y4bieqSeag
       type: organization
   lastUpdated: 2026-02
@@ -4929,7 +4929,7 @@
     - ai-safety
   relatedEntries:
     - id: 0vyIQ4YLIA
-      type: approach
+      type: research-area
     - id: xwxKWEAkSQ
       type: approach
     - id: H74rOLotqg
@@ -4962,9 +4962,9 @@
     - id: vc60Nthkcg
       type: risk
     - id: MBGtb3Qlkw
-      type: approach
+      type: research-area
     - id: 73qTEkYyWA
-      type: approach
+      type: research-area
     - id: ULjDXpSLCI
       type: organization
   lastUpdated: 2026-02
@@ -4989,9 +4989,9 @@
     - ai-safety
   relatedEntries:
     - id: rSE7kY5k4Q
-      type: approach
+      type: research-area
     - id: MBGtb3Qlkw
-      type: approach
+      type: research-area
     - id: vc60Nthkcg
       type: risk
     - id: mK9pX3rQ7n
@@ -5021,7 +5021,7 @@
     - id: MEt9F7f50w
       type: approach
     - id: 73qTEkYyWA
-      type: approach
+      type: research-area
     - id: 6sdr78k9kQ
       type: approach
     - id: vc60Nthkcg
@@ -5054,9 +5054,9 @@
     - id: 6sdr78k9kQ
       type: approach
     - id: sFjyY5xXZA
-      type: approach
+      type: research-area
     - id: 73qTEkYyWA
-      type: approach
+      type: research-area
   lastUpdated: 2026-02
 
 - id: sandboxing
@@ -5084,7 +5084,7 @@
     - id: cYETfX9wzA
       type: approach
     - id: 95ASV0XEwQ
-      type: concept
+      type: capability
     - id: rQEkFJxS5w
       type: organization
     - id: mK9pX3rQ7n
@@ -5150,7 +5150,7 @@
     - id: sandboxing
       type: approach
     - id: 95ASV0XEwQ
-      type: concept
+      type: capability
     - id: rQEkFJxS5w
       type: organization
     - id: mK9pX3rQ7n
@@ -5179,13 +5179,13 @@
     - ai-safety
   relatedEntries:
     - id: k6BfxaEwuQ
-      type: approach
+      type: research-area
     - id: MBGtb3Qlkw
-      type: approach
+      type: research-area
     - id: 95ASV0XEwQ
-      type: concept
+      type: capability
     - id: LSqNo6FATg
-      type: organization
+      type: approach
   lastUpdated: 2026-02
 
 
@@ -5871,7 +5871,7 @@
       value: Jennifer Pahlka (Code for America, USDS)
   relatedEntries:
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: aCEdTooCBw
       type: policy
     - id: 7ptWHyqwBA
@@ -5910,7 +5910,7 @@
     - id: y8Ib2pmieA
       type: concept
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
   sources:
     - title: Recoding America Official Website
       url: https://www.recodingamerica.us/

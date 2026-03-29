@@ -1,0 +1,41 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "submittedAt": "2026-03-28T17:48:49.517Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Yhs8ohB13N",
+      "personId": "ZZONkNifAR",
+      "organizationId": "-wM33bfyIY",
+      "role": "Co-Founder & CEO",
+      "source": "https://www.agora.xyz/blogs/6-boardroom-acquisition",
+      "verdict": "none"
+    },
+    {
+      "id": "T7OnA2naeM",
+      "personId": "VhGgVMp9MT",
+      "organizationId": "-wM33bfyIY",
+      "role": "Co-Founder",
+      "source": "https://finance.yahoo.com/news/ex-coinbase-designer-raises-5m-130000410.html",
+      "verdict": "none"
+    },
+    {
+      "id": "kqH6HWPLEv",
+      "personId": "FQ6AxUpjiI",
+      "organizationId": "-wM33bfyIY",
+      "role": "Co-Founder & CTO",
+      "source": "https://www.artsci.utoronto.ca/news/web3-here-we-come-alum-and-agora-co-founder-kent-fenwick-future-internet",
+      "verdict": "none"
+    }
+  ]
+}

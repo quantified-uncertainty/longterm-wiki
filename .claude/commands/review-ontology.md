@@ -1,3 +1,9 @@
+---
+description: Deep analysis of an entity's ontological structure — sub-entities, relationships, statement organization.
+argument-hint: "<entity-slug>"
+effort: medium
+---
+
 # Ontology Review
 
 Deep analysis of an entity's ontological structure: what sub-entities should exist, what relationships are missing, and how statements should be organized. Produces a structured report with actionable recommendations.

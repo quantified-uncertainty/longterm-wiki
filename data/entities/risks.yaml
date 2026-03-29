@@ -405,7 +405,7 @@
     - id: hwDgNNDsDQ
       type: risk
     - id: sFjyY5xXZA
-      type: safety-agenda
+      type: research-area
   sources:
     - title: Corrigibility
       url: https://intelligence.org/files/Corrigibility.pdf
@@ -563,13 +563,13 @@
     - id: 8Bv92x9G1A
       type: risk
     - id: 73qTEkYyWA
-      type: safety-agenda
+      type: research-area
     - id: sFjyY5xXZA
-      type: safety-agenda
+      type: research-area
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
     - id: etuIjQhFbQ
-      type: approach
+      type: research-area
     - id: mK9pX3rQ7n
       type: organization
   sources:
@@ -1339,7 +1339,7 @@
     - id: hwDgNNDsDQ
       type: risk
     - id: aUMeFdALrA
-      type: safety-agenda
+      type: research-area
     - id: puAffUjWSS
       type: organization
   sources:
@@ -1815,7 +1815,7 @@
     - id: BYKermZj1A
       type: risk
     - id: aUMeFdALrA
-      type: safety-agenda
+      type: research-area
     - id: y4bieqSeag
       type: organization
   sources:
@@ -1920,7 +1920,7 @@
     - id: 7c6UC46TWQ
       type: risk
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
   sources:
     - title: Open-sourcing highly capable foundation models (arXiv)
       url: https://arxiv.org/abs/2311.09227
@@ -1970,7 +1970,7 @@
       value: Arms race dynamics
   relatedEntries:
     - id: lfvY1bGeoA
-      type: policy
+      type: concept
     - id: mK9pX3rQ7n
       type: organization
     - id: XLLyzaEaCA
@@ -2085,9 +2085,9 @@
     - id: nYPuaov1hA
       type: risk
     - id: rSE7kY5k4Q
-      type: capability
+      type: research-area
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
     - id: sycophancy
       type: risk
   sources:
@@ -2443,7 +2443,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: MBGtb3Qlkw
-      type: safety-agenda
+      type: research-area
     - id: automation-bias
       type: risk
     - id: erosion-of-agency
@@ -2552,7 +2552,7 @@
     - id: BYKermZj1A
       type: risk
     - id: aUMeFdALrA
-      type: safety-agenda
+      type: research-area
   sources:
     - title: 'Superintelligence: Paths, Dangers, Strategies'
       author: Nick Bostrom
@@ -2860,7 +2860,7 @@
     - id: mK9pX3rQ7n
       type: organization
     - id: 5maTNr0PGA
-      type: concept
+      type: capability
   lastUpdated: 2026-02
 
 # === Auto-generated stubs for pages missing entities ===

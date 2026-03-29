@@ -33,6 +33,12 @@ interface BenchmarkResultRecord {
   [key: string]: unknown;
 }
 
+interface FundingProgramRecord {
+  orgId: string;
+  name: string;
+  [key: string]: unknown;
+}
+
 interface GrantRecord {
   id: string;
   granteeId?: string | null;
@@ -73,6 +79,14 @@ async function fetchExistingBenchmarkResults(modelId: string): Promise<Benchmark
     `/api/benchmark-results/by-model/${encodeURIComponent(modelId)}?limit=200`,
   );
   return result.ok ? result.data.benchmarkResults : [];
+}
+
+async function fetchExistingFundingPrograms(orgId: string): Promise<FundingProgramRecord[]> {
+  const result = await apiRequest<{ fundingPrograms: FundingProgramRecord[] }>(
+    'GET',
+    `/api/funding-programs/by-org/${encodeURIComponent(orgId)}?limit=500`,
+  );
+  return result.ok ? result.data.fundingPrograms : [];
 }
 
 async function fetchExistingGrantsForOrg(entityId: string): Promise<GrantRecord[]> {
@@ -144,6 +158,20 @@ export async function dedupBenchmarkResults(
   );
   return candidates.filter(
     c => !keys.has(`${normalize(c.benchmarkId)}|${normalize(c.modelId)}`),
+  );
+}
+
+/** Dedup funding programs. Match on orgId + name (case-insensitive). */
+export async function dedupFundingPrograms(
+  orgId: string,
+  candidates: Array<Record<string, unknown>>,
+): Promise<Array<Record<string, unknown>>> {
+  const existing = await fetchExistingFundingPrograms(orgId);
+  const keys = new Set(
+    existing.map(r => `${normalize(r.orgId)}|${normalize(r.name)}`),
+  );
+  return candidates.filter(
+    c => !keys.has(`${normalize(c.orgId)}|${normalize(c.name)}`),
   );
 }
 

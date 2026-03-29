@@ -44,6 +44,7 @@ import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
+import { getSourceDisplayName } from "../source-display-names";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -62,24 +63,6 @@ export async function generateMetadata({
       : "Legislation Not Found",
     description: entity?.description ?? undefined,
   };
-}
-
-/**
- * Derive a human-readable source name from a URL.
- * Tries the publication database first, then falls back to a cleaned domain name.
- */
-function getSourceDisplayName(url: string): string | undefined {
-  const domain = extractDomain(url);
-  if (!domain) return undefined;
-  const pub = getPublicationByDomain(domain);
-  if (pub) return pub.name;
-  const cleaned = domain
-    .replace(/\.(com|org|net|io|co|gov|edu|us|uk|ca|au)$/i, "")
-    .replace(/\./g, " ");
-  return cleaned
-    .split(/[\s-]+/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
 }
 
 /** Resolve verification verdict for a stakeholder (server-side only). */

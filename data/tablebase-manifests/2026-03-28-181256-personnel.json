@@ -1,0 +1,33 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "submittedAt": "2026-03-28T18:12:56.631Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "wgicOb7bGx",
+      "personId": "qWSiInqBoN",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://fedscoop.com/brian-whittaker-acting-director-18f-gsa/",
+      "verdict": "none"
+    },
+    {
+      "id": "lrFly3rOQC",
+      "personId": "pYabsLmh9j",
+      "organizationId": "WVHl7Ya8oQ",
+      "role": "Executive Director",
+      "source": "https://fedscoop.com/radio/lindsay-young-executive-director-of-18f-when-it-was-shuttered-joins-the-podcast/",
+      "verdict": "none"
+    }
+  ]
+}

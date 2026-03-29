@@ -40,6 +40,7 @@ import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
+import { isServerAvailable } from '../lib/wiki-server/client.ts';
 
 /**
  * Find the tsc binary. Prefers the local copy in apps/web/node_modules
@@ -159,6 +160,7 @@ interface Step {
   cwd: string;
   advisory?: boolean; // if true, failure is reported but doesn't block
   emitOutputInCi?: boolean; // print captured output in CI even on success
+  requiresServer?: boolean; // if true, auto-advisory when wiki-server is unreachable
 }
 
 const APP_DIR = `${PROJECT_ROOT}/apps/web`;
@@ -335,19 +337,27 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'review-marker',
-    name: 'PR review status',
+    name: 'PR review status (advisory)',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-review-marker.ts'],
     cwd: PROJECT_ROOT,
-    // Blocking: large PRs (>5 files or >300 lines) must be reviewed via
-    // /review-pr. The check passes immediately for small PRs.
+    // Advisory: the pre-push gate runs before a PR exists, so review status
+    // is not applicable at push time. The /agent-session-ready-PR workflow
+    // enforces /review-pr before shipping — that is the enforcement point.
+    // Making this blocking in the gate caused agents to use --no-verify (#3301).
+    advisory: true,
   },
   {
     id: 'typecheck-crux-baseline',
-    name: 'Crux TypeScript check',
+    name: 'Crux TypeScript check (advisory)',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],
     cwd: PROJECT_ROOT,
+    // Advisory: CI runs this with continue-on-error:true, so the gate
+    // should match. The crux/ codebase has pre-existing type errors from
+    // rapid iteration. Making this blocking locally while advisory in CI
+    // creates a discrepancy that causes agents to use --no-verify (#3301).
+    advisory: true,
   },
   {
     id: 'kb-schema',
@@ -434,6 +444,7 @@ const PARALLEL_STEPS: Step[] = [
     // gracefully when the server is unavailable (fail-open). Promotes to
     // blocking once orphan entities are consistently zero.
     advisory: true,
+    requiresServer: true,
     emitOutputInCi: true,
   },
   {
@@ -446,6 +457,7 @@ const PARALLEL_STEPS: Step[] = [
     // in PG tables (personnel, grants, investments, etc.) that don't resolve
     // to known entities. Informational for now.
     advisory: true,
+    requiresServer: true,
     emitOutputInCi: true,
   },
   {
@@ -457,6 +469,7 @@ const PARALLEL_STEPS: Step[] = [
     // Advisory: depends on wiki-server being reachable. The check skips
     // gracefully when the server is unavailable (fail-open).
     advisory: true,
+    requiresServer: true,
     emitOutputInCi: true,
   },
   {
@@ -480,6 +493,7 @@ const PARALLEL_STEPS: Step[] = [
     // Advisory: depends on wiki-server being reachable. The check skips
     // gracefully when the server is unavailable (fail-open).
     advisory: true,
+    requiresServer: true,
     emitOutputInCi: true,
   },
   {
@@ -492,6 +506,7 @@ const PARALLEL_STEPS: Step[] = [
     // and publicationId fields in the resources table reference valid entities
     // and publications. Informational for now.
     advisory: true,
+    requiresServer: true,
     emitOutputInCi: true,
   },
   {
@@ -802,6 +817,23 @@ async function main(): Promise<void> {
     return;
   }
 
+  // ── Pre-triage: Check wiki-server availability for server-dependent checks ──
+  const hasServerDependentSteps = PARALLEL_STEPS.some(s => s.requiresServer);
+  let serverAvailable = true;
+  if (hasServerDependentSteps && !CI_MODE) {
+    // In CI, the wiki-server is always expected to be available.
+    // Locally, check and skip server-dependent checks if unreachable.
+    try {
+      serverAvailable = await isServerAvailable();
+    } catch {
+      serverAvailable = false;
+    }
+    if (!serverAvailable && !CI_MODE) {
+      const serverSteps = PARALLEL_STEPS.filter(s => s.requiresServer);
+      console.log(`${c.dim}  Wiki-server unreachable — ${serverSteps.length} server-dependent check(s) will be skipped${c.reset}`);
+    }
+  }
+
   // ── Phase 0: Triage — decide which checks to skip ─────────────────────────
   if (!NO_TRIAGE && changedFiles.length > 0) {
     const categories = categorizeFiles(changedFiles);
@@ -816,9 +848,14 @@ async function main(): Promise<void> {
     triageResult = await triageGateChecks(changedFiles, allStepIds, categories);
   }
 
-  // Filter parallel steps based on triage
+  // Filter parallel steps based on triage + server availability
   const skippedStepIds = new Set(triageResult ? Object.keys(triageResult.skip) : []);
-  const activeParallelSteps = PARALLEL_STEPS.filter(s => !skippedStepIds.has(s.id));
+  const activeParallelSteps = PARALLEL_STEPS.filter(s => {
+    if (skippedStepIds.has(s.id)) return false;
+    // Skip server-dependent checks when wiki-server is unreachable (local only)
+    if (s.requiresServer && !serverAvailable && !CI_MODE) return false;
+    return true;
+  });
   const skippedCount = PARALLEL_STEPS.length - activeParallelSteps.length + (skippedBuildData ? 1 : 0);
 
   const totalSteps = (skippedBuildData ? 0 : 1) + (FIX_MODE ? FIX_STEPS.length : 0) + activeParallelSteps.length + (FULL_MODE ? 1 : 0);

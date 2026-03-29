@@ -1,3 +1,8 @@
+---
+description: Analyze recent PR patterns, session logs, and development process. Produces a process improvements report.
+effort: medium
+---
+
 # Retrospective
 
 Analyze recent PR patterns, session logs, and development process to identify what's working, what's not, and what to change. Produces a written report focused on process improvements.
@@ -6,8 +11,8 @@ Analyze recent PR patterns, session logs, and development process to identify wh
 
 **Relationship to other commands:**
 - `/maintain` handles tactical cleanup (close issues, fix cruft)
-- `/audit` reviews codebase health and complexity
-- `/retrospective` reviews the development *process* — how work is getting done, not what the code looks like
+- `/maintain-audit` reviews codebase health and complexity
+- `/maintain-retrospective` reviews the development *process* — how work is getting done, not what the code looks like
 
 ## Phase 1: Gather Data
 

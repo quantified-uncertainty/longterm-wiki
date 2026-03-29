@@ -1,10 +1,15 @@
+---
+description: Strategic review of codebase health, complexity trends, and simplification opportunities.
+effort: medium
+---
+
 # Codebase Audit
 
 Strategic review of codebase health, complexity trends, and simplification opportunities. Produces a written report with concrete recommendations.
 
 **Recommended cadence:** Biweekly, or after a burst of infrastructure PRs.
 
-**Relationship to `/maintain`:** `/maintain` handles day-to-day cleanup (close issues, fix cruft, propagate learnings). `/audit` is the strategic counterpart — it asks whether systems are earning their complexity and whether the overall trajectory is healthy.
+**Relationship to `/maintain`:** `/maintain` handles day-to-day cleanup (close issues, fix cruft, propagate learnings). `/maintain-audit` is the strategic counterpart — it asks whether systems are earning their complexity and whether the overall trajectory is healthy.
 
 ## Phase 1: Measure
 

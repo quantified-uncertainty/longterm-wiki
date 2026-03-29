@@ -7,7 +7,7 @@
 # ============================================================
 
 - id: ai-democracy-foundation
-  stableId: 7rS95q1sP-
+  stableId: 5LtumXmvSg
   type: organization
   orgType: safety-org
   title: AI & Democracy Foundation
@@ -145,7 +145,7 @@
       url: https://pol.is
 
 - id: govlab
-  stableId: G-ywlvZHIR
+  stableId: 4GF4eFBtHg
   type: organization
   orgType: academic
   title: The GovLab
@@ -230,7 +230,7 @@
       url: https://cci.mit.edu
 
 - id: cooperative-ai-foundation
-  stableId: fa-W-T5h3l
+  stableId: iA0Nfo7fMw
   type: organization
   orgType: safety-org
   title: Cooperative AI Foundation
@@ -267,7 +267,7 @@
       value: "2021"
 
 - id: oxford-governance-ai
-  stableId: E1Wbt-foZC
+  stableId: ljFcfiM0Zw
   type: organization
   orgType: academic
   title: Centre for the Governance of AI
@@ -291,28 +291,6 @@
     - title: Centre for the Governance of AI
       url: https://www.governance.ai
 
-- id: forethought-foundation
-  stableId: Pd-y8jBVN0
-  type: organization
-  orgType: generic
-  title: Forethought Foundation
-  description: >-
-    Research organization that published "Design Sketches for Collective Epistemics" (2025),
-    proposing five technologies for shifting society toward high-honesty equilibria:
-    Community Notes for Everything, Rhetoric Highlighting, Reliability Tracking,
-    Epistemic Virtue Evals, and Provenance Tracing.
-  website: https://www.forethought.org
-  tags:
-    - collective-epistemics
-    - information-integrity
-    - governance
-  clusters:
-    - governance
-    - epistemics
-  sources:
-    - title: Forethought Foundation
-      url: https://www.forethought.org
-
 - id: newdemocracy-foundation
   stableId: 7bmpbkSWVn
   type: organization
@@ -332,7 +310,7 @@
     - governance
 
 - id: nesta-collective-intelligence
-  stableId: XVz9frTFe-
+  stableId: QFiny3za6A
   type: organization
   orgType: generic
   title: Nesta Centre for Collective Intelligence Design
@@ -598,7 +576,7 @@
       value: "2,200+"
 
 - id: gitcoin
-  stableId: MY96WtwBp-
+  stableId: U4i6vcNaDA
   type: organization
   orgType: startup
   title: Gitcoin
@@ -698,7 +676,7 @@
       value: "96% of DAOs; 500K monthly active users"
 
 - id: tally-governance
-  stableId: zSjuai_X9N
+  stableId: hcJZRhZC2g
   type: organization
   orgType: startup
   title: Tally
@@ -745,7 +723,7 @@
       relationship: related
 
 - id: aragon
-  stableId: LgCzsC0d-y
+  stableId: dimMUIEbhA
   type: organization
   orgType: startup
   title: Aragon
@@ -1019,7 +997,7 @@
       value: "11M"
 
 - id: agora-governance
-  stableId: -wM33bfyIY
+  stableId: sgu6I0VtAA
   type: organization
   orgType: startup
   title: Agora
@@ -1070,7 +1048,7 @@
     - governance
 
 - id: jokerace
-  stableId: pAtPr-umWc
+  stableId: Rz9uehtQvg
   type: organization
   orgType: startup
   title: JokeRace
@@ -1092,7 +1070,7 @@
 # ============================================================
 
 - id: pactum-ai
-  stableId: 1jmlJYFJ-9
+  stableId: Xpti70scnw
   type: organization
   orgType: startup
   title: Pactum AI
@@ -1193,7 +1171,7 @@
     - governance
 
 - id: remesh
-  stableId: _OtxdQPPPU
+  stableId: 0Cbzvn8OXA
   type: organization
   orgType: startup
   title: Remesh
@@ -1243,7 +1221,7 @@
       value: "3M+"
 
 - id: loomio-cooperative
-  stableId: FUwsaGee-g
+  stableId: aHlEGnLIdw
   type: organization
   orgType: generic
   title: Loomio Cooperative
@@ -1265,7 +1243,7 @@
       relationship: composed-of
 
 - id: citizenlab
-  stableId: I-xCtppXD3
+  stableId: 6PfhPgDIZg
   type: organization
   orgType: startup
   title: CitizenLab
@@ -1450,7 +1428,7 @@
       value: Alignment Assemblies, Global Dialogues
 
 - id: glen-weyl
-  stableId: GMMRN_ENld
+  stableId: JceuRU3tbg
   type: person
   title: Glen Weyl
   description: >-
@@ -1655,7 +1633,7 @@
       value: Researcher, AIDF
 
 - id: peter-eckersley
-  stableId: 5xQBSJnP-z
+  stableId: vARvKmPOLw
   type: person
   title: Peter Eckersley
   description: >-
@@ -1726,7 +1704,7 @@
 # ============================================================
 
 - id: federico-ast
-  stableId: SEHbbeuI-6
+  stableId: jbWli8ffTA
   type: person
   title: Federico Ast
   description: >-
@@ -1768,7 +1746,7 @@
       value: Co-founder & CTO, Kleros
 
 - id: kevin-owocki
-  stableId: sb-DhZlxx8
+  stableId: 1zLXdwDsfg
   type: person
   title: Kevin Owocki
   description: >-
@@ -1813,7 +1791,7 @@
       value: Co-invented transformer architecture; AI governance delegates
 
 - id: ben-goertzel
-  stableId: nyguuo5-kQ
+  stableId: OopAmuzVuQ
   type: person
   title: Ben Goertzel
   description: >-
@@ -1958,7 +1936,7 @@
       value: AI alignment as social choice problem
 
 - id: noam-brown
-  stableId: WAD4Y0-Mfb
+  stableId: HKckE8tpTw
   type: person
   title: Noam Brown
   description: >-
@@ -1984,7 +1962,7 @@
       value: CICERO (Diplomacy AI), Pluribus (Poker AI)
 
 - id: iason-gabriel
-  stableId: -mWZIpOcWf
+  stableId: U2zfJ0Mzxw
   type: person
   title: Iason Gabriel
   description: >-
@@ -2006,7 +1984,7 @@
       value: Democratic AI experiment, values alignment philosophy
 
 - id: gillian-hadfield
-  stableId: vc_gWcNXgF
+  stableId: BtBqVgSMpw
   type: person
   title: Gillian Hadfield
   description: >-
@@ -2145,7 +2123,7 @@
 # ============================================================
 
 - id: talk-to-the-city
-  stableId: VSjb8B-7-1
+  stableId: cslhHNCk8Q
   type: project
   title: Talk to the City
   description: >-
@@ -2405,7 +2383,7 @@
     - governance
 
 - id: kialo
-  stableId: YbcqehI-pX
+  stableId: F2OeL8ot0g
   type: project
   title: Kialo
   description: >-
@@ -2468,7 +2446,7 @@
     - governance
 
 - id: truth-terminal
-  stableId: DYDII-R_Md
+  stableId: T4gqkkgnyQ
   type: project
   title: Truth Terminal
   description: >-
@@ -2675,7 +2653,7 @@
       value: "35-45%"
 
 - id: pactum-negotiation
-  stableId: Y-n_6a38Lv
+  stableId: B4fwmhgxrA
   type: project
   title: Pactum AI Negotiation Platform
   description: >-
@@ -2710,7 +2688,7 @@
     - governance
 
 - id: cicero-diplomacy
-  stableId: 9IvxcI_vWP
+  stableId: 03zm54jO9Q
   type: project
   title: CICERO
   description: >-
@@ -2734,7 +2712,7 @@
       url: https://www.science.org/doi/10.1126/science.ade9097
 
 - id: ai-economist
-  stableId: 67_JN54w3n
+  stableId: WiaVpz27fg
   type: project
   title: AI Economist
   description: >-
@@ -2835,7 +2813,7 @@
   clusters: [governance]
 
 - id: metagov
-  stableId: AQMwgv-MjH
+  stableId: dEsK8grz2g
   type: organization
   orgType: generic
   title: Metagov
@@ -2852,7 +2830,7 @@
       value: Scotland adopting their standards nationally
 
 - id: mass-lbp
-  stableId: U_H2JH-7lF
+  stableId: ioMviz9lWQ
   type: organization
   orgType: generic
   title: MASS LBP
@@ -2868,7 +2846,7 @@
       value: "41"
 
 - id: participedia
-  stableId: lb5vap_jQi
+  stableId: Nd9jUPbBUA
   type: organization
   orgType: academic
   title: Participedia
@@ -2899,7 +2877,7 @@
   clusters: [governance]
 
 - id: demos-uk
-  stableId: zjG_NH6E1u
+  stableId: qrnxvTe6zw
   type: organization
   orgType: generic
   title: Demos
@@ -2912,7 +2890,7 @@
   clusters: [governance]
 
 - id: polco
-  stableId: o-8zbQtjvd
+  stableId: 3kgrrgeuGA
   type: organization
   orgType: startup
   title: Polco
@@ -2928,7 +2906,7 @@
       value: "400+"
 
 - id: fide-democracy
-  stableId: MaYsCDh_UK
+  stableId: 0WnODo4eCQ
   type: organization
   orgType: generic
   title: FIDE (Federation for Innovation in Democracy)
@@ -3015,7 +2993,7 @@
       value: "230+"
 
 - id: feeding-america
-  stableId: dQ6qrPvX_3
+  stableId: 5nUXLlWpwQ
   type: organization
   orgType: generic
   title: Feeding America
@@ -3078,7 +3056,7 @@
       value: Security games (ARMOR at LAX), AI for social good
 
 - id: erik-brynjolfsson
-  stableId: _XYZ2H39P1
+  stableId: 0DEGg8bIrQ
   type: person
   title: Erik Brynjolfsson
   description: >-
@@ -3157,7 +3135,7 @@
       value: "Foundations of Cooperative AI, program equilibrium"
 
 - id: stephan-zheng
-  stableId: -xFjqwxyMw
+  stableId: bUJVsmvZ2A
   type: person
   title: Stephan Zheng
   description: >-
@@ -3173,7 +3151,7 @@
       value: AI Economist (RL for tax policy design)
 
 - id: eric-budish
-  stableId: ZDebR_Q63g
+  stableId: Tnj6lsfLDw
   type: person
   title: Eric Budish
   description: >-
@@ -3191,7 +3169,7 @@
 # --- Projects (additions) ---
 
 - id: geomatch
-  stableId: J0t-tJABY_
+  stableId: P8rWjfeZHA
   type: project
   title: GeoMatch (Refugee Resettlement)
   description: >-
@@ -3285,7 +3263,7 @@
   clusters: [governance]
 
 - id: kayrros-methane-watch
-  stableId: N657FSHE4-
+  stableId: 7yWKYSiWdg
   type: project
   title: Kayrros Methane Watch
   description: >-

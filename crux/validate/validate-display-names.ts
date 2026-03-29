@@ -32,13 +32,11 @@ export interface DisplayNameViolation {
 }
 
 /**
- * StableId pattern: exactly 10 alphanumeric characters with at least one
- * uppercase and at least one lowercase letter. This matches the canonical
- * stableId format (e.g., "mK9pX3rQ7n", "Tw_Eo226h3").
- *
- * We also allow underscores since some stableIds contain them.
+ * StableId pattern: exactly 10 alphanumeric characters [A-Za-z0-9].
+ * StableIds never contain `-` or `_` (migration 0141 normalized all legacy ones).
+ * Canonical definition: apps/web/src/lib/stable-id.ts
  */
-const STABLE_ID_PATTERN = /^[A-Za-z0-9_]{10}$/;
+const STABLE_ID_PATTERN = /^[A-Za-z0-9]{10}$/;
 
 /**
  * Check if a string looks like a stableId (machine-generated 10-char ID).

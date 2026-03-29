@@ -1,3 +1,9 @@
+---
+description: Comprehensive review of a single entity — wiki page, facts, relationships, and overall quality.
+argument-hint: "<entity-slug>"
+effort: high
+---
+
 # Entity Deep Dive
 
 Comprehensive review of a single entity: its wiki page, statements, relationships, and overall quality. Identifies issues and makes improvements.
@@ -40,7 +46,7 @@ For each dimension, rate the entity and identify specific issues:
 
 ### 2c. Organization
 - Are statements well-categorized with appropriate properties?
-- Are there statements that should be on a sub-entity instead? (Use `/ontology-review` for deep analysis)
+- Are there statements that should be on a sub-entity instead? (Use `/review-ontology` for deep analysis)
 - Is the wiki page well-structured with appropriate sections?
 
 ### 2d. Connections

@@ -31,7 +31,7 @@ interface InvestmentRow {
 export default function InvestmentsPage() {
   const allRecords = getAllKBRecords("investments");
 
-  const rows: InvestmentRow[] = allRecords.map((record) => {
+  const allRows: InvestmentRow[] = allRecords.map((record) => {
     const f = record.fields;
     const company = resolveEntityLink(record.ownerEntityId);
     const investorId =
@@ -53,6 +53,43 @@ export default function InvestmentsPage() {
       role: typeof f.role === "string" ? f.role : null,
     };
   });
+
+  // Deduplicate investment rows. The PG data can contain near-duplicate rows
+  // (e.g., a "YC round" record with a resolved investor entity link and a
+  // "YC batch" record without one). Group by company + investor name
+  // (case-insensitive) + round name, keeping the record with the most data
+  // (prefer linked investor, then higher amount, then more fields).
+  const dedupMap = new Map<string, InvestmentRow>();
+  for (const row of allRows) {
+    const fp = [
+      row.companyName.toLowerCase().trim(),
+      row.investorName.toLowerCase().trim(),
+      (row.roundName ?? "").toLowerCase().trim(),
+    ].join("|");
+
+    const existing = dedupMap.get(fp);
+    if (!existing) {
+      dedupMap.set(fp, row);
+      continue;
+    }
+
+    // Prefer the row with an investor link, then higher amount, then more
+    // non-null fields as a tiebreaker.
+    const score = (r: InvestmentRow) => {
+      let s = 0;
+      if (r.investorHref) s += 100;
+      if (r.companyHref) s += 100;
+      if (r.amount != null) s += 10;
+      if (r.date) s += 1;
+      if (r.instrument) s += 1;
+      if (r.role) s += 1;
+      return s;
+    };
+    if (score(row) > score(existing)) {
+      dedupMap.set(fp, row);
+    }
+  }
+  const rows = Array.from(dedupMap.values());
 
   // Sort by amount descending, then date descending
   rows.sort((a, b) => {

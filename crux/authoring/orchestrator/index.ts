@@ -64,6 +64,7 @@ interface PageData {
   id: string;
   title: string;
   path: string;
+  wikiId?: string;
   quality?: number;
   readerImportance?: number;
 }

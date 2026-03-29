@@ -19,7 +19,7 @@
  *   issues: string[] (optional)
  *   learnings: string[] (optional)
  *   recommendations: string[] | object[] (optional)
- *   reviewed: boolean — whether /review-pr was run (optional)
+ *   reviewed: boolean — whether /agent-review-pr was run (optional)
  *
  * Usage:
  *   npx tsx crux/validate/validate-session-logs.ts
@@ -96,7 +96,7 @@ export const SessionLogSchema = z.object({
   learnings: z.array(z.string()).optional(),
   recommendations: z.array(RecommendationSchema).optional(),
   checks: ChecksSchema.optional(),
-  /** Whether /review-pr was run during this session. */
+  /** Whether /agent-review-pr was run during this session. */
   reviewed: z.boolean().optional(),
 }).strict();
 

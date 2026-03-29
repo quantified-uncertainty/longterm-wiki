@@ -1,3 +1,8 @@
+---
+description: Initialize an agent checklist and establish working context. Run at session start.
+effort: low
+---
+
 # Agent Session Start
 
 Initialize an agent checklist and establish working context.
@@ -47,4 +52,4 @@ Output is saved to `.claude/wip-context.md`. Read it once — it contains page m
 
 Read `.claude/wip-checklist.md` and output it to the user. Highlight any items that seem particularly important or risky for this specific task.
 
-Throughout the session, check items off in `.claude/wip-checklist.md` as they are completed. When it's time to ship, run `/agent-session-ready-PR`.
+Throughout the session, check items off in `.claude/wip-checklist.md` as they are completed. When it's time to ship, run `/agent-ship`.

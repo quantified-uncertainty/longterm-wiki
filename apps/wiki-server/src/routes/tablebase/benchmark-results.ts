@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, desc, sql } from "drizzle-orm";
-import { getDrizzleDb } from "../../db.js";
+import { getDrizzleDb, getDb } from "../../db.js";
 import { benchmarkResults, benchmarks } from "../../schema.js";
 import {
   parseJsonBody,
@@ -13,6 +13,7 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
 
@@ -47,6 +48,7 @@ const SyncBenchmarkResultItemSchema = z.object({
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
+  claimIds: z.array(z.number().int().positive()).optional(),
 });
 
 const SyncBenchmarkResultBatchSchema = z.object({
@@ -189,12 +191,21 @@ const benchmarkResultsApp = new Hono()
       if (modelRefError) return modelRefError;
     }
 
+    // Validate claim references
+    const items = parsed.data.items;
+    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const claimError = await validateClaimRefs(rawDb, allClaimIds);
+      if (claimError) return validationError(c, claimError);
+    }
+
     const now = new Date();
     let upserted = 0;
     let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
-      const allVals = parsed.data.items.map((item) => ({
+      const allVals = items.map((item) => ({
         id: item.id,
         benchmarkId: item.benchmarkId,
         modelId: item.modelId,
@@ -229,7 +240,7 @@ const benchmarkResultsApp = new Hono()
       // Dual-write to things table
       await upsertThingsInTx(
         tx,
-        parsed.data.items.map((br) => ({
+        items.map((br) => ({
           id: br.id,
           thingType: "benchmark-result" as const,
           title: `${br.modelId} on ${br.benchmarkId}: ${br.score}`,
@@ -242,7 +253,7 @@ const benchmarkResultsApp = new Hono()
       // Write inline verification verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
-        parsed.data.items.map((item) => ({
+        items.map((item) => ({
           recordType: "benchmark-result",
           recordId: item.id,
           entityId: item.modelId,
@@ -252,9 +263,21 @@ const benchmarkResultsApp = new Hono()
       );
     });
 
-    logVerificationCoverage("benchmark-results/sync", parsed.data.items.length, verdictsResult.written);
+    logVerificationCoverage("benchmark-results/sync", items.length, verdictsResult.written);
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
+    // Link verified claims to records
+    let claimsLinked = 0;
+    if (allClaimIds.length > 0) {
+      const rawDb = getDb();
+      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+        recordId: item.id,
+        recordType: "benchmark-results",
+        claimIds: item.claimIds,
+      })));
+      claimsLinked = linkResult.linked;
+    }
+
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
   });
 
 export const benchmarkResultsRoute = benchmarkResultsApp;

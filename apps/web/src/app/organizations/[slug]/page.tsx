@@ -310,6 +310,7 @@ export default async function OrgProfilePage({
         ? "Unknown"
         : titleCase(personRef ?? person.key);
       const name =
+        person.displayName ??
         field(person, "display_name") ??
         typedPerson?.title ??
         fallbackName;
