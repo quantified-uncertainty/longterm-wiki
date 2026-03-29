@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -670,6 +671,16 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           };
         })
       );
+
+      // Post-sync: resolve entity FKs for newly synced rows
+      await resolveEntityFKs(tx, {
+        tableName: "grants",
+        fields: [
+          { rawIdColumn: "organization_id", entityIdColumn: "org_entity_id", displayNameColumn: "org_display_name", entityTypeFilter: "organization" },
+          { rawIdColumn: "grantee_id", entityIdColumn: "grantee_entity_id", displayNameColumn: "grantee_display_name" },
+        ],
+        scopeIds: items.map((i) => i.id),
+      });
 
       // Resolve org + grantee slugs to human-readable titles for search
       const orgSlugs = [...new Set(items.map((g) => g.organizationId))];
