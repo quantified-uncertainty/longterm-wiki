@@ -130,7 +130,9 @@ function cleanStaleWorktrees(worktreeDir: string): void {
       const wtPath = join(worktreeDir, name);
       // If the worktree is older than 2 hours, it's stale
       try {
-        const stat = execSync(`stat -f %m "${wtPath}"`, { encoding: 'utf-8' }).trim();
+        // Use platform-appropriate stat flag: -f %m (macOS) vs -c %Y (Linux)
+        const statFlag = process.platform === 'darwin' ? '-f %m' : '-c %Y';
+        const stat = execSync(`stat ${statFlag} "${wtPath}"`, { encoding: 'utf-8' }).trim();
         const age = Date.now() / 1000 - Number(stat);
         if (age > 2 * 60 * 60) {
           log(`  ${cl.yellow}Cleaning stale worktree: ${name}${cl.reset}`);

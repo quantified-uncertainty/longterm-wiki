@@ -1,133 +1,166 @@
 /**
- * Cleanup script: delete personnel records with fabricated/unresolvable personIds.
+ * Clean up garbage personnel records from the PG personnel table.
  *
- * Root cause: The LLM enrichment pipeline sometimes hallucinated 10-char stableIds
- * instead of calling resolve_entity. These IDs don't match any entity, leaving
- * personEntityId null and no display name resolvable.
- *
- * See discussion #3387 for the full analysis.
+ * Identifies and deletes:
+ * 1. Records with unresolved stableId as personId (no entity match, no displayable name)
+ * 2. Records with "new:" prefix that were never resolved
+ * 3. Duplicate records (same person at same org)
  *
  * Usage:
- *   WIKI_SERVER_ENV=prod pnpm crux run crux/scripts/cleanup-personnel.ts --dry-run   # preview
- *   WIKI_SERVER_ENV=prod pnpm crux run crux/scripts/cleanup-personnel.ts             # delete
+ *   pnpm tsx crux/scripts/cleanup-personnel.ts --dry-run   # preview what would be deleted
+ *   pnpm tsx crux/scripts/cleanup-personnel.ts              # actually delete
  */
 
-import 'dotenv/config';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 
-interface BrokenRecord {
+const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+const LEGACY_ID_RE = /^[A-Za-z0-9][_-][A-Za-z0-9_-]{7,10}$/;
+const NUMERIC_ID_RE = /^\d+$/;
+
+function isMachineId(s: string): boolean {
+  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || LEGACY_ID_RE.test(s);
+}
+
+interface PersonnelRecord {
   id: string;
   personId: string;
   organizationId: string;
   role: string;
+  roleType: string;
+  startDate: string | null;
+  endDate: string | null;
+  isFounder: boolean;
+  source: string | null;
+  person: { entityId: string | null; slug: string | null; name: string | null };
+  organization: { entityId: string | null; slug: string | null; name: string | null };
   personEntityId: string | null;
   personDisplayName: string | null;
   personResolvedName: string | null;
-  issueType: string;
+  syncedAt: string;
 }
 
-interface BrokenResponse {
-  records: BrokenRecord[];
-  total: number;
+async function fetchAllPersonnel(): Promise<PersonnelRecord[]> {
+  const all: PersonnelRecord[] = [];
+  let offset = 0;
+  while (true) {
+    const r = await apiRequest<{ personnel: PersonnelRecord[]; total: number }>(
+      'GET',
+      `/api/personnel/all?limit=200&offset=${offset}`,
+    );
+    if (!r.ok) {
+      console.error('Failed to fetch personnel:', r.error);
+      break;
+    }
+    all.push(...r.data.personnel);
+    if (all.length >= r.data.total) break;
+    offset += 200;
+  }
+  return all;
 }
 
-interface DeleteResponse {
-  deleted: number;
+function getDisplayName(r: PersonnelRecord): string | null {
+  return r.person?.name ?? r.personResolvedName ?? r.personDisplayName;
+}
+
+function hasDisplayableName(r: PersonnelRecord): boolean {
+  const name = getDisplayName(r);
+  if (!name) return false;
+  if (isMachineId(name)) return false;
+  // Names with digits mixed in but no spaces are likely IDs
+  if (name.length <= 15 && !name.includes(' ') && /\d/.test(name) && /[A-Z]/.test(name)) return false;
+  return true;
 }
 
 async function main() {
   const dryRun = process.argv.includes('--dry-run');
 
-  console.log(`\n=== Personnel Cleanup ${dryRun ? '(DRY RUN)' : '(LIVE)'} ===\n`);
+  console.log(`Personnel cleanup ${dryRun ? '(DRY RUN)' : '(LIVE)'}`);
+  console.log('Fetching all personnel records...');
 
-  // Fetch all broken records
-  const result = await apiRequest<BrokenResponse>('GET', '/api/personnel/broken');
-  if (!result.ok) {
-    console.error('Failed to fetch broken records:', result.message);
-    process.exit(1);
+  const all = await fetchAllPersonnel();
+  console.log(`Total records: ${all.length}`);
+
+  // ── Category 1: No displayable name ──
+  const noName = all.filter((r) => !hasDisplayableName(r));
+  console.log(`\nRecords with no displayable name: ${noName.length}`);
+
+  // ── Category 2: Duplicates (same person + same org) ──
+  const seen = new Map<string, PersonnelRecord>();
+  const duplicates: PersonnelRecord[] = [];
+  for (const r of all) {
+    // Skip records we're already deleting for no name
+    if (!hasDisplayableName(r)) continue;
+
+    const name = getDisplayName(r)!.toLowerCase();
+    const orgId = r.organization?.entityId ?? r.organizationId;
+    const key = `${name}::${orgId}`;
+
+    if (seen.has(key)) {
+      // Keep the one with more data (prefer entity-resolved, then newer sync)
+      const existing = seen.get(key)!;
+      const existingScore = (existing.personEntityId ? 10 : 0) + (existing.startDate ? 1 : 0) + (existing.endDate ? 1 : 0);
+      const newScore = (r.personEntityId ? 10 : 0) + (r.startDate ? 1 : 0) + (r.endDate ? 1 : 0);
+
+      if (newScore > existingScore) {
+        // New one is better, mark old one as duplicate
+        duplicates.push(existing);
+        seen.set(key, r);
+      } else {
+        duplicates.push(r);
+      }
+    } else {
+      seen.set(key, r);
+    }
+  }
+  console.log(`Duplicate records: ${duplicates.length}`);
+
+  // ── Summary ──
+  const toDelete = [...noName, ...duplicates];
+  const toDeleteIds = [...new Set(toDelete.map((r) => r.id))];
+  console.log(`\nTotal to delete: ${toDeleteIds.length}`);
+  console.log(`Will remain: ${all.length - toDeleteIds.length}`);
+
+  // Show samples
+  console.log('\n── Sample deletions (no name) ──');
+  for (const r of noName.slice(0, 10)) {
+    const org = r.organization?.name ?? r.organizationId;
+    console.log(`  ${r.id} | personId=${r.personId} | ${r.role} at ${org}`);
   }
 
-  const { records, total } = result.data;
-  console.log(`Found ${total} broken personnel records\n`);
-
-  if (records.length === 0) {
-    console.log('Nothing to clean up.');
-    return;
+  console.log('\n── Sample deletions (duplicates) ──');
+  for (const r of duplicates.slice(0, 10)) {
+    const name = getDisplayName(r);
+    const org = r.organization?.name ?? r.organizationId;
+    console.log(`  ${r.id} | ${name} | ${r.role} (${r.roleType}) at ${org}`);
   }
-
-  // Group by issue type
-  const byType = new Map<string, BrokenRecord[]>();
-  for (const r of records) {
-    const list = byType.get(r.issueType) || [];
-    list.push(r);
-    byType.set(r.issueType, list);
-  }
-
-  for (const [type, recs] of byType) {
-    console.log(`  ${type}: ${recs.length} records`);
-  }
-  console.log();
-
-  // Group by organization for visibility
-  const byOrg = new Map<string, number>();
-  for (const r of records) {
-    byOrg.set(r.organizationId, (byOrg.get(r.organizationId) || 0) + 1);
-  }
-  const topOrgs = [...byOrg.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 15);
-  console.log('Top affected organizations:');
-  for (const [org, count] of topOrgs) {
-    console.log(`  ${org}: ${count} broken records`);
-  }
-  console.log();
-
-  // Filter to only unresolved-stableId records (the hallucinated ones)
-  const toDelete = records.filter(r => r.issueType === 'unresolved-stableId');
-  console.log(`Records to delete (unresolved-stableId): ${toDelete.length}`);
 
   if (dryRun) {
-    console.log('\n[DRY RUN] Would delete these records. Run without --dry-run to execute.');
-    // Show sample
-    for (const r of toDelete.slice(0, 10)) {
-      console.log(`  ${r.id}: personId=${r.personId} org=${r.organizationId} role="${r.role}"`);
-    }
-    if (toDelete.length > 10) {
-      console.log(`  ... and ${toDelete.length - 10} more`);
-    }
+    console.log('\nDry run complete. Run without --dry-run to delete.');
     return;
   }
 
-  // Delete in batches
+  // ── Delete in batches ──
   const BATCH_SIZE = 100;
   let totalDeleted = 0;
-  for (let i = 0; i < toDelete.length; i += BATCH_SIZE) {
-    const batch = toDelete.slice(i, i + BATCH_SIZE);
-    const ids = batch.map(r => r.id);
-
-    const deleteResult = await apiRequest<DeleteResponse>('POST', '/api/personnel/delete', {
-      ids,
-      reason: 'Cleanup fabricated personIds — see discussion #3387',
-    });
-    if (!deleteResult.ok) {
-      console.error(`Failed to delete batch ${i / BATCH_SIZE + 1}:`, deleteResult.message);
-      continue;
+  for (let i = 0; i < toDeleteIds.length; i += BATCH_SIZE) {
+    const batch = toDeleteIds.slice(i, i + BATCH_SIZE);
+    const result = await apiRequest<{ deleted: number }>(
+      'POST',
+      '/api/personnel/delete',
+      { ids: batch, reason: 'Cleanup: unresolved stableId names and duplicate records' },
+    );
+    if (result.ok) {
+      totalDeleted += result.data.deleted;
+      console.log(`  Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.data.deleted} records`);
+    } else {
+      console.error(`  Batch ${Math.floor(i / BATCH_SIZE) + 1} failed:`, result.error);
     }
-
-    totalDeleted += deleteResult.data.deleted;
-    console.log(`  Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${deleteResult.data.deleted} records`);
   }
 
-  console.log(`\n✓ Total deleted: ${totalDeleted} of ${toDelete.length} targeted records`);
-
-  // Verify
-  const verifyResult = await apiRequest<BrokenResponse>('GET', '/api/personnel/broken');
-  if (verifyResult.ok) {
-    console.log(`  Remaining broken: ${verifyResult.data.total}`);
-  }
+  console.log(`\nDone. Deleted ${totalDeleted} records.`);
 }
 
-main().catch(err => {
-  console.error('Fatal error:', err);
+main().catch((e) => {
+  console.error(e);
   process.exit(1);
 });

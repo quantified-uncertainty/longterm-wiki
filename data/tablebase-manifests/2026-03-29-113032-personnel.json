@@ -1,0 +1,121 @@
+{
+  "table": "personnel",
+  "recordCount": 13,
+  "submittedAt": "2026-03-29T11:30:32.438Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 13,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "nE3DmtsL2o",
+      "personId": "HE9d5Wy07a",
+      "organizationId": "MIf3XVLguX",
+      "role": "CEO",
+      "source": "https://newsroom.arm.com/news/arm-appoints-rene-haas-as-ceo",
+      "verdict": "none"
+    },
+    {
+      "id": "bAXBYkv9XG",
+      "personId": "zZP36QkXLw",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP & CFO",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "RtFosrIEB2",
+      "personId": "HY2m12Tcnq",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Chief Legal Officer & Company Secretary",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "lC9RofEf78",
+      "personId": "qi46DqYHn5",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP & Chief People Officer",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "FtnfoyPF09",
+      "personId": "SzTiwrhfCy",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP & Chief Commercial Officer",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "NMXLvFgDPl",
+      "personId": "WGhNhofYyk",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP & Chief Architect",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "5eMKxT9u1A",
+      "personId": "nyiLfYI2WY",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Cloud & AI Business Unit",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "ERXgX1Ln5G",
+      "personId": "eAL5MFN9eB",
+      "organizationId": "MIf3XVLguX",
+      "role": "Founding CEO & Chairman",
+      "source": "https://newsroom.arm.com/blog/sir-robin-saxby-city-of-london-engineering-hall-of-fame",
+      "verdict": "none"
+    },
+    {
+      "id": "ASi7F63Oxn",
+      "personId": "zWOOLLTUq0",
+      "organizationId": "MIf3XVLguX",
+      "role": "CEO",
+      "source": "https://en.wikipedia.org/wiki/Arm_Holdings",
+      "verdict": "none"
+    },
+    {
+      "id": "BnrBcngr2h",
+      "personId": "W25abePOy9",
+      "organizationId": "MIf3XVLguX",
+      "role": "CEO",
+      "source": "https://en.wikipedia.org/wiki/Arm_Holdings",
+      "verdict": "none"
+    },
+    {
+      "id": "faAY6oymub",
+      "personId": "1YMnB2dt5n",
+      "organizationId": "MIf3XVLguX",
+      "role": "Co-Founder & CTO",
+      "source": "https://en.wikipedia.org/wiki/Arm_Holdings",
+      "verdict": "none"
+    },
+    {
+      "id": "t9wOjCDENA",
+      "personId": "p7cmpQgoYn",
+      "organizationId": "MIf3XVLguX",
+      "role": "Co-Founder & President",
+      "source": "https://en.wikipedia.org/wiki/Arm_Holdings",
+      "verdict": "none"
+    },
+    {
+      "id": "4Zg8B8N3oa",
+      "personId": "kzQH9iZQWI",
+      "organizationId": "MIf3XVLguX",
+      "role": "Co-Founder & COO",
+      "source": "https://en.wikipedia.org/wiki/Arm_Holdings",
+      "verdict": "none"
+    }
+  ]
+}

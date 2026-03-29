@@ -1,0 +1,65 @@
+{
+  "table": "personnel",
+  "recordCount": 6,
+  "submittedAt": "2026-03-29T02:16:43.633Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 6,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "MLtg9FKf9b",
+      "personId": "BoiTQ6pfAs",
+      "organizationId": "5LtumXmvSg",
+      "role": "CEO",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    },
+    {
+      "id": "Q4iP7TqYYg",
+      "personId": "558r4f2Vgw",
+      "organizationId": "5LtumXmvSg",
+      "role": "Democracy Lead",
+      "source": "https://kyleredman.info/",
+      "verdict": "none"
+    },
+    {
+      "id": "TQLt179F9h",
+      "personId": "lJcj5Bb9LN",
+      "organizationId": "5LtumXmvSg",
+      "role": "Program Lead",
+      "source": "https://www.linkedin.com/in/elo%C3%AFse-gabadou-santiago-254887108/",
+      "verdict": "none"
+    },
+    {
+      "id": "vsJlHauEhU",
+      "personId": "QWN9fWnwUf",
+      "organizationId": "5LtumXmvSg",
+      "role": "Researcher",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "jL07tWc4JM",
+      "personId": "qxNoJsdejX",
+      "organizationId": "5LtumXmvSg",
+      "role": "Research Fellow",
+      "source": "https://arxiv.org/abs/2411.09222",
+      "verdict": "none"
+    },
+    {
+      "id": "CRzoSrCsXK",
+      "personId": "oVZA4951MU",
+      "organizationId": "5LtumXmvSg",
+      "role": "Fellow",
+      "source": "https://aidemocracyfoundation.org/",
+      "verdict": "none"
+    }
+  ]
+}

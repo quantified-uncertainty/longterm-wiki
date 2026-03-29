@@ -198,7 +198,7 @@ describe('parseChecklist', () => {
 
   it('treats [~] (N/A) as passing', () => {
     const md = `1. [x] \`fix-escaping\` Fix escaping (auto-verify)
-2. [~] \`security\` No secrets, no unsanitized input
+2. [~] \`security\` No secrets committed; user input sanitized in prompts, SQL, and HTML
 3. [x] \`gate-passes\` Gate passes (auto-verify)
 `;
     const status = parseChecklist(md);
@@ -414,8 +414,8 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 15 items', () => {
-    expect(CHECKLIST_ITEMS.length).toBe(15);
+  it('catalog has exactly 18 items', () => {
+    expect(CHECKLIST_ITEMS.length).toBe(18);
   });
 
   it('all items have valid priority', () => {

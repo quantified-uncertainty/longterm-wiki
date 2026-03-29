@@ -40,12 +40,18 @@ export function formatEntityRef(
   displayName: string | null,
   rawId: string | null,
 ): EntityRef {
-  // Name priority: entity title > display name > humanized raw ID
-  // Skip bare stableIds and numeric database PKs — neither are human-readable
+  // Name priority: entity title > display name > raw ID (if not a bare machine ID)
+  // Skip bare stableIds, numeric database PKs, and legacy IDs with hyphens — not human-readable
+  const isId = (s: string) => {
+    if (STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s)) return true;
+    // Legacy IDs with hyphens/underscores (e.g., "8-JZq4lrlD", "Tw_Eo226h3")
+    if (s.length >= 8 && s.length <= 12 && /[_-]/.test(s) && /\d/.test(s) && /[A-Z]/.test(s) && !s.includes(" ")) return true;
+    return false;
+  };
   const name =
     entityTitle ??
-    displayName ??
-    (rawId && !STABLE_ID_PATTERN.test(rawId) && !NUMERIC_ID_PATTERN.test(rawId) ? rawId : null);
+    (displayName && !isId(displayName) ? displayName : null) ??
+    (rawId && !isId(rawId) ? rawId : null);
 
   return {
     entityId: entityId ?? null,
