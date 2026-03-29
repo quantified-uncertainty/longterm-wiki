@@ -4,8 +4,6 @@ import {
   isSid,
   isDisplayableName,
   generateSid,
-  isLegacyStableId,
-  isAnySid,
 } from "../src/index.js";
 
 describe("isSid", () => {
@@ -88,53 +86,6 @@ describe("generateSid", () => {
   });
 });
 
-describe("isLegacyStableId", () => {
-  it("detects bare 10-char alphanumeric IDs with uppercase", () => {
-    expect(isLegacyStableId("1LcLlMGLbw")).toBe(true);
-    expect(isLegacyStableId("AbCdEfG12H")).toBe(true);
-  });
-
-  it("rejects all-lowercase 10-char strings (could be slugs)", () => {
-    expect(isLegacyStableId("bioweapons")).toBe(false);
-    expect(isLegacyStableId("conjecture")).toBe(false);
-    expect(isLegacyStableId("abcdefghij")).toBe(false);
-  });
-
-  it("rejects all-numeric 10-char strings", () => {
-    expect(isLegacyStableId("0123456789")).toBe(false);
-  });
-
-  it("rejects wrong lengths", () => {
-    expect(isLegacyStableId("abc123ABC")).toBe(false);
-    expect(isLegacyStableId("abc123ABCDE")).toBe(false);
-  });
-
-  it("rejects non-alphanumeric", () => {
-    expect(isLegacyStableId("abc-123ABC")).toBe(false);
-    expect(isLegacyStableId("abc_123ABC")).toBe(false);
-  });
-
-  it("rejects sid_-prefixed (those are new format)", () => {
-    expect(isLegacyStableId("sid_1LcLlM")).toBe(false);
-  });
-});
-
-describe("isAnySid", () => {
-  it("detects new format", () => {
-    expect(isAnySid("sid_1LcLlMGLbw")).toBe(true);
-  });
-
-  it("detects legacy format", () => {
-    expect(isAnySid("1LcLlMGLbw")).toBe(true);
-  });
-
-  it("rejects non-IDs", () => {
-    expect(isAnySid("openai")).toBe(false);
-    expect(isAnySid("John Smith")).toBe(false);
-    expect(isAnySid("openai-2024")).toBe(false);
-  });
-});
-
 describe("null/undefined safety", () => {
   it("isSid returns false for non-string values", () => {
     expect(isSid(undefined)).toBe(false);
@@ -144,10 +95,5 @@ describe("null/undefined safety", () => {
   it("isDisplayableName returns false for non-string values", () => {
     expect(isDisplayableName(undefined)).toBe(false);
     expect(isDisplayableName(null)).toBe(false);
-  });
-
-  it("isAnySid returns false for non-string values", () => {
-    expect(isAnySid(undefined)).toBe(false);
-    expect(isAnySid(null)).toBe(false);
   });
 });

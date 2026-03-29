@@ -5,7 +5,7 @@ import { getEntityTypeIcon } from "./EntityTypeIcon";
 import { cn } from "@lib/utils";
 import styles from "./tooltip.module.css";
 import { stripMdxEscapes } from "@lib/inline-markdown";
-import { isAnySid } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 
 interface EntityLinkProps {
   id: string;
@@ -32,10 +32,10 @@ function formatEntityType(type: string): string {
 }
 
 function formatIdAsTitle(id: string): string {
-  // Detect stableIds (both sid_-prefixed and legacy 10-char alphanumeric)
-  // and wiki IDs (E<number>). These should not be shown as titles since
-  // they are opaque identifiers, not human-readable slugs.
-  if (isAnySid(id) || /^E\d+$/.test(id)) {
+  // Detect stableIds (sid_-prefixed) and wiki IDs (E<number>).
+  // These should not be shown as titles since they are opaque identifiers,
+  // not human-readable slugs.
+  if (isSid(id) || /^E\d+$/.test(id)) {
     return id;
   }
   return id
