@@ -162,6 +162,25 @@ audits:
         result: pass
         checked_by: "manual"
 
+  - id: gate-override-frequency
+    category: process
+    description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
+    check_type: hybrid
+    check_command: |
+      total=$(gh pr list --state merged --limit 50 --json mergedAt --jq '[.[] | select(.mergedAt > (now - 30*86400 | strftime("%Y-%m-%dT%H:%M:%SZ")))] | length' 2>/dev/null)
+      overrides=$(gh pr list --state merged --limit 50 --json mergedAt,labels --jq '[.[] | select(.mergedAt > (now - 30*86400 | strftime("%Y-%m-%dT%H:%M:%SZ")) and (.labels | map(.name) | index("gate:rules-ok")))] | length' 2>/dev/null)
+      echo "Last 30 days: $overrides overrides out of $total merged PRs ($(( overrides * 100 / (total > 0 ? total : 1) ))%)"
+    how_to_verify: |
+      Run the check_command. If override rate exceeds 20%, review which validators
+      are most frequently overridden:
+      1. List overridden PRs to identify patterns
+      2. For flaky validators: fix root cause or demote to advisory
+      3. For aspirational validators: demote to advisory with a plan to promote
+      4. For legitimate overrides (infra PRs changing protected paths): acceptable
+      Target: <20% override rate on non-infrastructure PRs.
+    frequency: monthly
+    added: "2026-03-29"
+
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"

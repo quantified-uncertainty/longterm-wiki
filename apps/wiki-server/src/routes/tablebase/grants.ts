@@ -11,6 +11,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  noDuplicateIds,
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
@@ -65,7 +66,11 @@ const SyncGrantItemSchema = z.object({
 });
 
 const SyncGrantsBatchSchema = z.object({
-  items: z.array(SyncGrantItemSchema).min(1).max(500),
+  items: z
+    .array(SyncGrantItemSchema)
+    .min(1)
+    .max(500)
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Batch grantee update schema ----
@@ -560,6 +565,22 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Check for natural key collisions within the batch itself.
+    // Natural key: (organizationId, name)
+    const batchKeys = new Set<string>();
+    for (const item of items) {
+      const key = `${item.organizationId}::${item.name}`;
+      if (batchKeys.has(key)) {
+        return validationError(
+          c,
+          `Duplicate (organizationId, name) in batch: ` +
+          `organizationId=${item.organizationId}, name="${item.name}". ` +
+          `Each grant must have a unique name within its organization.`
+        );
+      }
+      batchKeys.add(key);
+    }
 
     // Validate programId references (skip if skipEntityValidation is set)
     const skipValidation = c.req.query("skipEntityValidation") === "true";
