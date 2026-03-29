@@ -73,7 +73,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       baseCtx,
     );
     expect(result.success).toBe(false);
-    expect(result.error).toContain("Missing or empty claimIds");
+    expect(result.error).toContain("Invalid job params");
   });
 
   it("rejects params with empty claimIds array", async () => {
@@ -82,6 +82,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       baseCtx,
     );
     expect(result.success).toBe(false);
+    expect(result.error).toContain("Invalid job params");
   });
 
   it("rejects params with non-array claimIds", async () => {
@@ -90,6 +91,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       baseCtx,
     );
     expect(result.success).toBe(false);
+    expect(result.error).toContain("Invalid job params");
   });
 
   it("handles LLM returning claimIds as floats", async () => {
