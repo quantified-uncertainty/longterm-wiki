@@ -134,3 +134,20 @@ describe("isAnySid", () => {
     expect(isAnySid("openai-2024")).toBe(false);
   });
 });
+
+describe("null/undefined safety", () => {
+  it("isSid returns false for non-string values", () => {
+    expect(isSid(undefined)).toBe(false);
+    expect(isSid(null)).toBe(false);
+  });
+
+  it("isDisplayableName returns false for non-string values", () => {
+    expect(isDisplayableName(undefined)).toBe(false);
+    expect(isDisplayableName(null)).toBe(false);
+  });
+
+  it("isAnySid returns false for non-string values", () => {
+    expect(isAnySid(undefined)).toBe(false);
+    expect(isAnySid(null)).toBe(false);
+  });
+});

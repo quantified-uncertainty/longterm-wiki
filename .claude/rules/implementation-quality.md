@@ -24,6 +24,17 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 4. Confirm the test passes
 5. Do NOT edit code without a reproducing test
 
+## Simplicity
+
+**Simpler code is better code.** Before committing, review each changed file and ask:
+
+- Is there unnecessary abstraction? (helpers used once, premature generalization)
+- Is there unnecessary complexity? (nested ternaries, over-engineered error handling for impossible cases)
+- Is the code longer than it needs to be? (verbose null checks where `?.` works, manual iteration where `.map()` is clearer)
+- Could a reader understand this in one pass? If not, simplify or add a brief comment.
+
+The `/agent-review-pr` skill includes a simplification pass — but don't rely on the review to catch what you should write simply in the first place.
+
 ## Pre-Commit Review
 
 Before committing, re-read the diff and actively look for problems:
@@ -34,3 +45,4 @@ Before committing, re-read the diff and actively look for problems:
 4. **No TODO/FIXME without issue number**: No `// TODO`, `// HACK`, `// FIXME` in committed code without a `#<issue-number>`
 5. **Discoverability**: New feature/endpoint linked from navigation, help text, or parent pages?
 6. **Idempotency**: For job handlers and batch operations — what happens if this runs twice? Does the caller handle already-processed items (e.g., `updated < total` on retry) as success, not failure?
+7. **Test coverage**: Every new exported function has at least one test. Every error path has a test that triggers it.

@@ -30,8 +30,7 @@ export function isSid(s: string | null | undefined): boolean {
 
 /** Is this safe to show to users? (Not a machine-generated ID) */
 export function isDisplayableName(s: string | null | undefined): boolean {
-  if (!s) return false;
-  return !isSid(s);
+  return typeof s === "string" && !isSid(s);
 }
 
 /**
