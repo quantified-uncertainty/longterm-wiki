@@ -534,6 +534,41 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
+  })
+
+  // ---- POST /delete ----
+  // Bulk delete personnel records by ID. Used for cleanup of fabricated/broken records.
+  // See discussion #3387 for context.
+  .post("/delete", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = z.object({
+      ids: z.array(z.string().min(1).max(20)).min(1).max(500),
+    }).safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { ids } = parsed.data;
+    const db = getDrizzleDb();
+
+    // Log before deleting (destructive operation)
+    const existing = await db
+      .select({ id: personnel.id, personId: personnel.personId, organizationId: personnel.organizationId, role: personnel.role })
+      .from(personnel)
+      .where(inArray(personnel.id, ids));
+
+    await logAuditEntries(db, existing.map((r) => ({
+      recordType: "personnel",
+      recordId: r.id,
+      operation: "delete" as const,
+      newData: { personId: r.personId, organizationId: r.organizationId, role: r.role },
+    })));
+
+    await db
+      .delete(personnel)
+      .where(inArray(personnel.id, ids));
+
+    return c.json({ deleted: existing.length });
   });
 
 // ---- Exports ----
