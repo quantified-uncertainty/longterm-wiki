@@ -29,6 +29,7 @@ export interface Config {
     snapshotRetention: SnapshotRetentionConfig;
     sessionSweep: TaskConfig;
     dataQualitySnapshot: TaskConfig;
+    jobWorkerHealth: TaskConfig;
   };
 }
 
@@ -107,6 +108,11 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_DATA_QUALITY_SNAPSHOT_ENABLED", true),
         schedule:
           process.env["TASK_DATA_QUALITY_SNAPSHOT_SCHEDULE"] ?? "0 6 * * *", // daily at 6am UTC
+      },
+      jobWorkerHealth: {
+        enabled: envBool("TASK_JOB_WORKER_HEALTH_ENABLED", true),
+        schedule:
+          process.env["TASK_JOB_WORKER_HEALTH_SCHEDULE"] ?? "*/5 * * * *", // every 5 minutes
       },
     },
   };
