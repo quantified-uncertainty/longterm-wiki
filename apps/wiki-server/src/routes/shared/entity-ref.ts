@@ -25,32 +25,6 @@ export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 const NUMERIC_ID_PATTERN = /^\d+$/;
 
 /**
- * Detect contaminated stableIds: machine-generated IDs with hyphens/underscores
- * from a legacy import bug. Examples: "D-BpcrbThn", "Tw_Eo226h3".
- * Real slugs are all-lowercase; contaminated IDs have uppercase letters.
- */
-function isContaminatedStableId(s: string): boolean {
-  if (!s.includes("-") && !s.includes("_")) return false;
-  if (!/[A-Z]/.test(s)) return false;
-  const stripped = s.replace(/[-_]/g, "");
-  if (stripped.length < 8 || stripped.length > 12) return false;
-  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
-  return true;
-}
-
-/** Check if a string is a bare machine ID that should never be displayed. */
-function isBareMachineId(s: string): boolean {
-  return STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s) || isContaminatedStableId(s);
-}
-
-/** Humanize a slug by converting hyphens/underscores to spaces and title-casing. */
-function humanizeSlug(s: string): string {
-  return s
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-/**
  * Format an entity reference from joined query results.
  *
  * @param entityId - The resolved stableId FK (from the *EntityId column)
@@ -66,9 +40,9 @@ export function formatEntityRef(
   displayName: string | null,
   rawId: string | null,
 ): EntityRef {
-  // Name priority: entity title > display name > humanized raw ID
-  // Skip bare machine IDs (stableIds, numeric PKs, contaminated IDs) — not human-readable
-  let name =
+  // Name priority: entity title > display name > raw ID (if not a bare machine ID)
+  // Skip bare stableIds and numeric database PKs — neither are human-readable
+  let name: string | null =
     entityTitle ??
     (displayName && !isBareMachineId(displayName) ? displayName : null) ??
     null;

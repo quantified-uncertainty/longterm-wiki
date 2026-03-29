@@ -77,12 +77,12 @@ describe("isBareMachineId", () => {
     expect(isBareMachineId("employee-equity-pool")).toBe(false);
   });
 
-  it("catches 10-char lowercase words (ambiguous with all-lowercase stableIds)", () => {
-    // isAlphanumeric10 matches any 10-char alphanumeric string regardless of case.
-    // This is intentional for isBareMachineId (display filtering).
-    // Use isStableId for the stricter check that requires uppercase.
-    expect(isBareMachineId("bioweapons")).toBe(true);
-    expect(isBareMachineId("conjecture")).toBe(true);
+  it("does NOT catch all-lowercase 10-char words (not machine IDs)", () => {
+    // isBareMachineId uses isStableId (strict: requires uppercase) so that
+    // all-lowercase words like "bioweapons" and "conjecture" are humanized
+    // rather than hidden as Unknown. StableIds always have at least one uppercase letter.
+    expect(isBareMachineId("bioweapons")).toBe(false);
+    expect(isBareMachineId("conjecture")).toBe(false);
   });
 
   it("does not catch real slugs with hyphens", () => {
