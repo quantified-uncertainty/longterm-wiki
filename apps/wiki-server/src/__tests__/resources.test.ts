@@ -7,9 +7,16 @@ import { mockDbModule, postJson } from "./test-utils.js";
 let resourceStore: Map<string, Record<string, unknown>>;
 let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
 
-// Lightweight resource store for /suggest endpoint tests.
-// Stores resources with the simplified shape returned by the suggest lookup query.
-let suggestResourceStore: Map<string, { id: string; url: string; title: string | null; fetched_at: Date | null; has_content: boolean }>;
+// Helper: derive the simplified suggest shape from a full resource row.
+function toSuggestShape(row: Record<string, unknown>): { id: string; url: string; title: string | null; fetched_at: Date | null; has_content: boolean } {
+  return {
+    id: row.id as string,
+    url: row.url as string,
+    title: (row.title as string | null) ?? null,
+    fetched_at: (row.fetched_at as Date | null) ?? null,
+    has_content: row.has_content === true || ((row.fetched_at ?? null) !== null),
+  };
+}
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -38,7 +45,6 @@ function slugFromIntId(intId: number | null): string | null {
 function resetStores() {
   resourceStore = new Map();
   citationStore = [];
-  suggestResourceStore = new Map();
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
 }
@@ -231,9 +237,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("from resources") && q.includes("citation_content") && q.includes("any($)")) {
     const urlList = params[0] as string[];
     const results: Record<string, unknown>[] = [];
-    for (const url of urlList) {
-      const r = suggestResourceStore.get(url);
-      if (r) results.push({ ...r });
+    for (const row of resourceStore.values()) {
+      if (urlList.includes(row.url as string)) {
+        results.push(toSuggestShape(row));
+      }
     }
     // If query has LIMIT 1, return at most 1 (fallback query in suggest)
     if (q.includes("limit 1")) return results.slice(0, 1);
@@ -246,9 +253,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const urls = params[1] as string[];
     const results: Record<string, unknown>[] = [];
     for (let i = 0; i < ids.length; i++) {
-      const row = { id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false };
-      suggestResourceStore.set(urls[i], row);
-      results.push(row);
+      const row: Record<string, unknown> = { id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false, created_at: new Date(), updated_at: new Date() };
+      resourceStore.set(ids[i], row);
+      results.push({ id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false });
     }
     return results;
   }
@@ -636,7 +643,7 @@ describe("Resources API", () => {
   describe("POST /api/resources/suggest — variant collision handling", () => {
     it("resolves both URLs when they are www-variants of each other and one exists in DB", async () => {
       // Pre-populate: the DB has the www version stored
-      suggestResourceStore.set("https://www.example.com", {
+      resourceStore.set("existing-res-1", {
         id: "existing-res-1",
         url: "https://www.example.com",
         title: "Example Site",
@@ -669,7 +676,7 @@ describe("Resources API", () => {
 
     it("resolves both URLs when DB has the non-www version stored", async () => {
       // Pre-populate: the DB has the non-www version stored
-      suggestResourceStore.set("https://example.com", {
+      resourceStore.set("existing-res-2", {
         id: "existing-res-2",
         url: "https://example.com",
         title: "Example Site",
@@ -684,6 +691,12 @@ describe("Resources API", () => {
       const body = await res.json();
       expect(body.results).toHaveLength(2);
 
+      // Both original input URLs should be preserved in the response
+      expect(body.results.map((r: any) => r.url).sort()).toEqual([
+        "https://example.com",
+        "https://www.example.com",
+      ]);
+
       // Both should resolve to the existing resource
       for (const result of body.results) {
         expect(result.resourceId).toBe("existing-res-2");
@@ -693,14 +706,14 @@ describe("Resources API", () => {
 
     it("prefers exact URL match over variant match when both exist in DB", async () => {
       // DB has both www and non-www as separate resources
-      suggestResourceStore.set("https://example.com", {
+      resourceStore.set("res-no-www", {
         id: "res-no-www",
         url: "https://example.com",
         title: "No WWW Version",
         fetched_at: new Date(),
         has_content: true,
       });
-      suggestResourceStore.set("https://www.example.com", {
+      resourceStore.set("res-with-www", {
         id: "res-with-www",
         url: "https://www.example.com",
         title: "WWW Version",
@@ -725,7 +738,7 @@ describe("Resources API", () => {
 
     it("creates new resource only for genuinely unknown URLs", async () => {
       // DB has one URL; submit it along with a truly new URL
-      suggestResourceStore.set("https://known.com", {
+      resourceStore.set("known-res", {
         id: "known-res",
         url: "https://known.com",
         title: "Known Resource",
@@ -752,7 +765,7 @@ describe("Resources API", () => {
 
     it("handles trailing slash variants correctly", async () => {
       // DB stores URL with trailing slash
-      suggestResourceStore.set("https://example.com/page/", {
+      resourceStore.set("slash-res", {
         id: "slash-res",
         url: "https://example.com/page/",
         title: "Page With Slash",
@@ -772,7 +785,7 @@ describe("Resources API", () => {
     });
 
     it("deduplicates identical input URLs", async () => {
-      suggestResourceStore.set("https://example.com", {
+      resourceStore.set("dedup-res", {
         id: "dedup-res",
         url: "https://example.com",
         title: "Dedup Test",
@@ -785,7 +798,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(200);
       const body = await res.json();
-      // Deduplication via new Set(urls) means 3 identical URLs → 1 unique → 1 result
+      // Deduplication: 3 identical URLs → 1 unique result
       expect(body.results).toHaveLength(1);
       for (const result of body.results) {
         expect(result.resourceId).toBe("dedup-res");

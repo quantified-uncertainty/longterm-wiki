@@ -81,6 +81,17 @@ const SingleClaimResultSchema = z.object({
 const MultiClaimResultSchema = z.array(SingleClaimResultSchema);
 
 // ---------------------------------------------------------------------------
+// XML escaping — prevent prompt injection via user-supplied claim fields
+// ---------------------------------------------------------------------------
+
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+// ---------------------------------------------------------------------------
 // Prompt builder
 // ---------------------------------------------------------------------------
 
@@ -95,9 +106,9 @@ function buildMultiClaimPrompt(
   const claimLines = claims
     .map((cl, i) => {
       const parts = [`${i + 1}. [Claim ID ${cl.id}]`];
-      parts.push(`   <claim_text>${cl.claim_text}</claim_text>`);
-      if (cl.agent_evidence) parts.push(`   <agent_evidence>${cl.agent_evidence}</agent_evidence>`);
-      if (cl.proposed_value) parts.push(`   Proposed value: ${cl.target_field ?? 'field'} = <proposed_value>${cl.proposed_value}</proposed_value>`);
+      parts.push(`   <claim_text>${escapeXml(cl.claim_text)}</claim_text>`);
+      if (cl.agent_evidence) parts.push(`   <agent_evidence>${escapeXml(cl.agent_evidence)}</agent_evidence>`);
+      if (cl.proposed_value) parts.push(`   Proposed value: ${cl.target_field ?? 'field'} = <proposed_value>${escapeXml(cl.proposed_value)}</proposed_value>`);
       return parts.join('\n');
     })
     .join('\n\n');
@@ -107,7 +118,7 @@ function buildMultiClaimPrompt(
 Source: ${sourceUrl}
 ${sourceTitle ? `Source title: ${sourceTitle}` : ''}
 <source_content>
-${sourceContent.slice(0, MAX_SOURCE_CONTENT_CHARS)}
+${escapeXml(sourceContent.slice(0, MAX_SOURCE_CONTENT_CHARS))}
 </source_content>
 
 Claims to verify:
@@ -229,7 +240,11 @@ export async function handleClaimVerification(
     }
 
     if (result.data.updated < result.data.total) {
-      console.warn(`[claim-verification] Partial verdict persistence: ${result.data.updated}/${result.data.total} claims updated`);
+      return {
+        success: false,
+        data: { batchId },
+        error: `Partial verdict persistence: ${result.data.updated}/${result.data.total} claims updated`,
+      };
     }
 
     return {
@@ -371,7 +386,11 @@ export async function handleClaimVerification(
     }
 
     if (updateResult.data.updated < updateResult.data.total) {
-      console.warn(`[claim-verification] Partial verdict persistence (batch ${Math.floor(i / MAX_VERDICTS_PER_REQUEST) + 1}): ${updateResult.data.updated}/${updateResult.data.total} claims updated`);
+      return {
+        success: false,
+        data: { batchId },
+        error: `Partial verdict persistence: ${updateResult.data.updated}/${updateResult.data.total} claims updated`,
+      };
     }
   }
 
