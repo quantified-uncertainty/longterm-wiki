@@ -112,6 +112,30 @@ describe("pgPersonnelToEntries", () => {
     expect(result.unresolvedCount).toBe(1);
   });
 
+  it("excludes contaminated stableId personId (with hyphens) and counts as unresolved", () => {
+    const row = makeRow({
+      personId: "D-BpcrbThn",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: null,
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("excludes contaminated stableId personId (with underscores) and counts as unresolved", () => {
+    const row = makeRow({
+      personId: "Tw_Eo226h3",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: null,
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
   it("excludes numeric PK personId and counts as unresolved", () => {
     const row = makeRow({
       personId: "12345",
@@ -180,11 +204,12 @@ describe("pgPersonnelToEntries", () => {
       makeRow({ personId: "AbCdEfG12H", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
       makeRow({ personId: "bob-jones", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
       makeRow({ personId: "XyZaBcDe99", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+      makeRow({ personId: "D-BpcrbThn", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
     ];
 
     const result = pgPersonnelToEntries(rows);
     expect(result.entries).toHaveLength(2); // Alice + Bob Jones (humanized)
-    expect(result.unresolvedCount).toBe(2); // 2 stableIds
+    expect(result.unresolvedCount).toBe(3); // 2 clean stableIds + 1 contaminated
     expect(result.entries[0].name).toBe("Alice");
     expect(result.entries[1].name).toBe("Bob Jones");
   });

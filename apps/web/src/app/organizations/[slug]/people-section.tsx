@@ -12,7 +12,7 @@ import {
   type RpcPersonnelByEntityResult,
   type RpcPersonnelRow,
 } from "@/lib/wiki-server";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN, isBareMachineId } from "@/lib/stable-id";
+import { isBareMachineId } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -87,9 +87,10 @@ function isDisplayablePersonName(name: string): boolean {
  * Strips "new:" prefix and converts slug-format IDs to title case.
  */
 function humanizePersonId(raw: string): string | null {
-  if (STABLE_ID_PATTERN.test(raw) || NUMERIC_ID_PATTERN.test(raw)) return null;
+  if (isBareMachineId(raw)) return null;
   const cleaned = raw.startsWith("new:") ? raw.slice(4).trim() : raw;
   if (!cleaned) return null;
+  if (isBareMachineId(cleaned)) return null;
   // If it looks like a slug (contains hyphens/underscores), humanize it
   if (cleaned.includes("-") || cleaned.includes("_")) {
     const humanized = titleCase(cleaned);
