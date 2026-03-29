@@ -1,5 +1,5 @@
 # ---- Stage 1: Install only worker dependencies ----
-FROM node:22-alpine AS deps
+FROM node:20-alpine AS deps
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -9,17 +9,24 @@ COPY docker/worker/package.json ./
 RUN pnpm install --prod
 
 # ---- Stage 2: Runtime image ----
-FROM node:22-alpine
+# Node 20 required: tsx's ESM loader hits ERR_REQUIRE_CYCLE_MODULE on Node 22
+# due to its require(esm) cycle detection. Track tsx Node 22 support for upgrade.
+FROM node:20-alpine
 WORKDIR /repo
 
-# Copy only the deps we need (~30MB vs ~1GB full monorepo)
-COPY --chown=worker:worker --from=deps /deps/node_modules ./node_modules
+# Minimal package.json with "type": "module" so Node treats .ts files as ESM.
+# Without this, Node defaults to CJS and tsx's ESM hooks don't apply.
+RUN echo '{"type":"module"}' > package.json
 
-# Verify tsx is available (installed via docker/worker/package.json)
-RUN node --import tsx/esm -e "console.log('tsx verified')"
+# Copy only the deps we need (~30MB vs ~1GB full monorepo)
+COPY --from=deps /deps/node_modules ./node_modules
+
+# Verify tsx can load .ts files (catches missing deps or ESM config issues)
+RUN echo 'export const X = 1;' > /tmp/test.ts && \
+    node --import tsx/esm -e "import('/tmp/test.ts').then(m => { if (m.X !== 1) throw new Error('bad'); console.log('tsx verified'); })"
 
 # Copy crux source (worker + all transitive imports)
-COPY --chown=worker:worker crux/ ./crux/
+COPY crux/ ./crux/
 
 # NOTE: No apps/wiki-server/ files needed — all imports are type-only (erased by tsx)
 # NOTE: No content/, data/, apps/web/ needed — worker is stateless
