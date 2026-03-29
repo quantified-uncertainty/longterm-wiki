@@ -1,0 +1,49 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "submittedAt": "2026-03-29T02:11:41.902Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "IDMBovplf9",
+      "personId": "ZZONkNifAR",
+      "organizationId": "sgu6I0VtAA",
+      "role": "CEO",
+      "source": "https://www.crunchbase.com/organization/agora-eb38",
+      "verdict": "none"
+    },
+    {
+      "id": "pnpF9i55Gx",
+      "personId": "VhGgVMp9MT",
+      "organizationId": "sgu6I0VtAA",
+      "role": "Co-Founder",
+      "source": "https://fortune.com/crypto/2024/05/01/ex-coinbase-designer-raises-5m-for-crypto-voting-service-agora/",
+      "verdict": "none"
+    },
+    {
+      "id": "oQj91Rg2q3",
+      "personId": "FQ6AxUpjiI",
+      "organizationId": "sgu6I0VtAA",
+      "role": "CTO",
+      "source": "https://www.artsci.utoronto.ca/news/web3-here-we-come-alum-and-agora-co-founder-kent-fenwick-future-internet",
+      "verdict": "none"
+    },
+    {
+      "id": "7LdwQeIkaU",
+      "personId": "PhdWXS4T5o",
+      "organizationId": "sgu6I0VtAA",
+      "role": "Founding Engineer",
+      "source": "https://www.crunchbase.com/organization/agora-eb38",
+      "verdict": "none"
+    }
+  ]
+}
