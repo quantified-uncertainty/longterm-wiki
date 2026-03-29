@@ -99,9 +99,9 @@ export default async function RacesPage() {
 
       {races.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          <p>No political races data available.</p>
+          <p>No political races data available yet.</p>
           <p className="text-sm mt-2">
-            Seed data with: <code>pnpm crux tb races seed</code>
+            Check back soon — data will be added as elections approach.
           </p>
         </div>
       ) : (

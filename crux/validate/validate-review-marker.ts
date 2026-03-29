@@ -157,8 +157,10 @@ function getDiffStats(): { files: number; lines: number } {
 
     return parseDiffStat(stat);
   } catch {
-    // Fail-closed: if we can't determine diff size, report 0
-    // (don't warn about missing review for unknown diffs)
+    // Fail-open: if we can't determine diff size, skip the review check.
+    // Justification: broken git environment (e.g., shallow clone, detached HEAD)
+    // should not block CI since the review-marker check is advisory. A broken git
+    // setup will also prevent normal CI checks from passing.
     return { files: 0, lines: 0 };
   }
 }

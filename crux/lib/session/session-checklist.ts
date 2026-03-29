@@ -130,6 +130,24 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     priority: 'blocking',
   },
   {
+    id: 'retry-safety',
+    label: 'Retries are safe (idempotent endpoints, partial success handled)',
+    applicableTypes: ['infrastructure', 'bugfix'],
+    priority: 'blocking',
+  },
+  {
+    id: 'prompt-security',
+    label: 'LLM prompts escape user content (escapeXml for XML, fencing for freetext)',
+    applicableTypes: ['infrastructure', 'commands'],
+    priority: 'blocking',
+  },
+  {
+    id: 'contract-alignment',
+    label: 'API callers match server response shape (use InferResponseType or typed client)',
+    applicableTypes: ['infrastructure', 'bugfix'],
+    priority: 'blocking',
+  },
+  {
     id: 'scope-complete',
     label: 'All acceptance criteria met',
     applicableTypes: 'all',
@@ -137,7 +155,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   },
   {
     id: 'security',
-    label: 'No secrets, no unsanitized input',
+    label: 'No secrets committed; user input sanitized in prompts, SQL, and HTML',
     applicableTypes: 'all',
     priority: 'blocking',
   },

@@ -1,0 +1,193 @@
+{
+  "table": "personnel",
+  "recordCount": 22,
+  "submittedAt": "2026-03-29T11:19:56.406Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 22,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "H7Oqq9l1Bn",
+      "personId": "l1N5DoHXB4",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Executive Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "9rnvfF5lKy",
+      "personId": "DXfheyPhSD",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Growth Lead",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "bQtkd5uSqE",
+      "personId": "ENyeHbkktA",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Product Manager",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "NqfB9nlrl9",
+      "personId": "7fgz7HXMWf",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Director of Financial Operations",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "ILwIfD64Zq",
+      "personId": "GmvGP6Wrpe",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Community Lead & Project Manager",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "qSUIjS8wRt",
+      "personId": "847s2V1car",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Board Member",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "EuMCxSaf5a",
+      "personId": "a69mPhHYcU",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Board Member",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "zYUNtY9iHF",
+      "personId": "7ESEgnaTwf",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Board Member",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "trM7eFggfl",
+      "personId": "R4e7lHomy6",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Board Member",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "EiTPqvIZSE",
+      "personId": "ekENYOG2FU",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Board Member",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "boe36lJtZ8",
+      "personId": "VTQQJI2BJv",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "a1BTuwnv9M",
+      "personId": "DqUdaH7kCQ",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "Lng59ignP8",
+      "personId": "A74IJ5If13",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "ezVV7vYwO5",
+      "personId": "BvXngh9Rwe",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "ulUk1U9AzY",
+      "personId": "JI8YoF9wFL",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "t9sq2CZPg4",
+      "personId": "s9hwcJ7NQZ",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "5kPuhVzxrn",
+      "personId": "RHfFhj85p4",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "PAZ8Pr8tnK",
+      "personId": "BoiTQ6pfAs",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "eKAtw34SG4",
+      "personId": "B1pxbq8Ozj",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Director",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "d2uvPngrsT",
+      "personId": "cmcNgXPKGV",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Research Advisor",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "V8j9mamd5K",
+      "personId": "IRo6p67Tpo",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Advisor",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    },
+    {
+      "id": "9suGmlOx9y",
+      "personId": "4IVdurUbXG",
+      "organizationId": "AQMwgv-MjH",
+      "role": "Advisor",
+      "source": "https://metagov.org/people",
+      "verdict": "none"
+    }
+  ]
+}

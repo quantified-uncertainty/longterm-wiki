@@ -124,7 +124,7 @@ export async function linkClaimsToRecords(
         ${linkRows.map((r) => r.recordType)}::text[],
         ${linkRows.map((r) => r.recordId)}::text[]
       )
-      ON CONFLICT DO NOTHING
+      ON CONFLICT (claim_id, record_type, record_id) DO NOTHING
     `;
   }
 

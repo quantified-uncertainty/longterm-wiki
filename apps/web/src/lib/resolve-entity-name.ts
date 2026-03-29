@@ -17,12 +17,33 @@ import {
 import { getTypedEntityById } from "@/data/tablebase";
 import { getEntityHref } from "@/data/entity-nav";
 import { titleCase } from "@/components/wiki/factbase/format";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
+import { isBareMachineId } from "@/lib/stable-id";
 
 /** Build the canonical href for an entity, falling back to /factbase/entity/{id}. */
 function buildEntityHref(slug: string | undefined, entityId: string): string | null {
   if (slug) return getEntityHref(slug);
   return `/factbase/entity/${entityId}`;
+}
+
+/**
+ * Check if a string looks like a raw slug rather than a display name.
+ * Slugs are all-lowercase with hyphens separating words (e.g., "tom-brown",
+ * "employee-equity-pool"). Display names contain spaces and/or mixed case
+ * (e.g., "Tom Brown", "Employee Equity Pool").
+ *
+ * We only treat something as a slug if it contains hyphens AND has no spaces.
+ * Single-word lowercase strings like "google" or "amazon" are ambiguous —
+ * they could be either slugs or proper names — so we let them through to
+ * be resolved by the full resolution pipeline below.
+ */
+function looksLikeSlug(s: string): boolean {
+  // Must contain at least one hyphen (single words are ambiguous)
+  if (!s.includes("-")) return false;
+  // Must not contain spaces (display names have spaces)
+  if (s.includes(" ")) return false;
+  // Must be all-lowercase (display names have uppercase)
+  if (s !== s.toLowerCase()) return false;
+  return true;
 }
 
 /**
@@ -36,13 +57,25 @@ export function resolveEntityName(
   displayName?: string | null,
 ): { name: string; href: string | null } {
   // 1. Use embedded displayName if available (from API JOIN)
-  //    But reject bare stableIds and numeric PKs that leaked through —
-  //    these are not human-readable names and should be resolved below.
+  //    But reject bare stableIds, numeric PKs, contaminated IDs, and raw slugs
+  //    that leaked through — these are not human-readable names and should be
+  //    resolved via the full pipeline below (FactBase/TableBase lookups, then
+  //    humanization as a last resort).
+  //
+  //    Also reject displayNames that exactly match the entityId — this indicates
+  //    the API couldn't resolve the entity and just echoed the raw ID/slug back.
+  //    The full pipeline below can often resolve these via FactBase/TableBase.
   const trimmedDisplayName = displayName?.trim();
+  const displayNameIsJustEchoedId =
+    trimmedDisplayName != null &&
+    entityId != null &&
+    trimmedDisplayName === entityId;
+
   if (
     trimmedDisplayName &&
-    !STABLE_ID_PATTERN.test(trimmedDisplayName) &&
-    !NUMERIC_ID_PATTERN.test(trimmedDisplayName)
+    !isBareMachineId(trimmedDisplayName) &&
+    !looksLikeSlug(trimmedDisplayName) &&
+    !displayNameIsJustEchoedId
   ) {
     // Still try to resolve href via FactBase for linking
     if (entityId) {
@@ -87,13 +120,8 @@ export function resolveEntityName(
     };
   }
 
-  // 5. Detect unresolvable stableId (10 alphanumeric chars with uppercase)
-  if (STABLE_ID_PATTERN.test(cleanId)) {
-    return { name: "Unknown", href: null };
-  }
-
-  // 6. Detect pure numeric IDs (legacy FactBase references) — not valid slugs
-  if (NUMERIC_ID_PATTERN.test(cleanId)) {
+  // 5. Detect unresolvable machine IDs (stableIds, contaminated stableIds, numeric PKs)
+  if (isBareMachineId(cleanId)) {
     return { name: "Unknown", href: null };
   }
 

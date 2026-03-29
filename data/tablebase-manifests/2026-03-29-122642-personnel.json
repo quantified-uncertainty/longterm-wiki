@@ -1,0 +1,121 @@
+{
+  "table": "personnel",
+  "recordCount": 13,
+  "submittedAt": "2026-03-29T12:26:42.625Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 13,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "A0gOmFEGw6",
+      "personId": "Ey4bBksS7Z",
+      "organizationId": "MIf3XVLguX",
+      "role": "Chairman of the Board",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "rcuk8WbsPz",
+      "personId": "jizsoTvnJ8",
+      "organizationId": "MIf3XVLguX",
+      "role": "Lead Independent Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "TEUP2sPAlU",
+      "personId": "BN8S2jB0Wz",
+      "organizationId": "MIf3XVLguX",
+      "role": "Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "6y4u26JZrn",
+      "personId": "wOE0A9Tl6Z",
+      "organizationId": "MIf3XVLguX",
+      "role": "Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "26VserxddB",
+      "personId": "qD7d47syy0",
+      "organizationId": "MIf3XVLguX",
+      "role": "Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "E2bCbO5pq2",
+      "personId": "4npmeYEQvf",
+      "organizationId": "MIf3XVLguX",
+      "role": "Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "HRbEIXaEY9",
+      "personId": "omaJLhOPOu",
+      "organizationId": "MIf3XVLguX",
+      "role": "Director",
+      "source": "https://www.arm.com/company/board",
+      "verdict": "none"
+    },
+    {
+      "id": "U5xojyoMU8",
+      "personId": "YYl9Hvn9hU",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Edge AI Business Unit",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "7M121ubzc8",
+      "personId": "lrBCypxvOy",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Central Engineering",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "wVlDabh99g",
+      "personId": "tH6bC1AoQT",
+      "organizationId": "MIf3XVLguX",
+      "role": "Chief People Officer",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "URZn3DFRR8",
+      "personId": "pJEgwcocum",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Operations",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "f1vEJGW9Cy",
+      "personId": "M91VY7PH2l",
+      "organizationId": "MIf3XVLguX",
+      "role": "EVP, Physical AI Business Unit",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "EM8cnTIgoQ",
+      "personId": "nxLrf0CP78",
+      "organizationId": "MIf3XVLguX",
+      "role": "Chief Marketing Officer",
+      "source": "https://www.arm.com/company/leadership",
+      "verdict": "none"
+    }
+  ]
+}

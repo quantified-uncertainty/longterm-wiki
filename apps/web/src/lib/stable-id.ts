@@ -32,5 +32,25 @@ export function isAlphanumeric10(s: string): boolean {
 
 /** Check if a string is a bare machine ID (stableId or numeric PK) that should never be displayed. */
 export function isBareMachineId(s: string): boolean {
-  return isAlphanumeric10(s) || NUMERIC_ID_PATTERN.test(s);
+  return isStableId(s) || NUMERIC_ID_PATTERN.test(s) || isContaminatedStableId(s);
+}
+
+/**
+ * Detect "contaminated" stableIds — machine-generated IDs that contain
+ * hyphens or underscores due to a legacy bug in crux/lib/grant-import/id.ts
+ * (fixed 2026-03-26). Examples: "D-BpcrbThn", "Tw_Eo226h3", "V-55MuswUh".
+ *
+ * Heuristic: if the string contains at least one uppercase letter and, after
+ * stripping hyphens/underscores, is 8-12 alphanumeric chars, it's likely a
+ * contaminated stableId rather than a meaningful slug like "tom-brown".
+ * Real slugs are all-lowercase by convention.
+ */
+export function isContaminatedStableId(s: string): boolean {
+  if (!s.includes("-") && !s.includes("_")) return false;
+  if (!/[A-Z]/.test(s)) return false;
+  const stripped = s.replace(/[-_]/g, "");
+  // 8–12 chars: stableIds are 10 chars, so 10 ± 2 tolerates one separator being stripped
+  if (stripped.length < 8 || stripped.length > 12) return false;
+  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
+  return true;
 }
