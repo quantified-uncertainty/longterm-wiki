@@ -28,6 +28,36 @@ if [ -f ".claude/wip-checklist.md" ]; then
   CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux sys agent-checklist init\` before editing code.")
 fi
 
+# ─── 0a. Stale stash detection ──────────────────────────────────────────────────
+# Stale stashes cause branch confusion when a later session does `git stash pop`
+# and restores state from a completely different branch/task. (#3200 incident)
+
+STASH_COUNT=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
+if [ "$STASH_COUNT" -gt 0 ]; then
+  STASH_BRANCHES=$(git stash list --format='%gs' 2>/dev/null | head -5)
+  WARNINGS+=("Found ${STASH_COUNT} stale stash(es) from previous sessions. These cause branch confusion.")
+  WARNINGS+=("Stashes: ${STASH_BRANCHES}")
+  WARNINGS+=("Run \`git stash drop\` to clean each one, or \`git stash clear\` to drop all.")
+fi
+
+# ─── 0b. Branch lock file ───────────────────────────────────────────────────────
+# Write .claude/active-branch at session start. If a previous session left one
+# and it doesn't match the current branch, something switched the branch between
+# sessions without proper cleanup.
+
+PREV_ACTIVE_BRANCH=""
+if [ -f ".claude/active-branch" ]; then
+  PREV_ACTIVE_BRANCH=$(cat ".claude/active-branch" 2>/dev/null | tr -d '[:space:]')
+fi
+
+if [ -n "$PREV_ACTIVE_BRANCH" ] && [ "$PREV_ACTIVE_BRANCH" != "$BRANCH" ]; then
+  WARNINGS+=("Branch mismatch! Previous session was on \`${PREV_ACTIVE_BRANCH}\`, now on \`${BRANCH}\`.")
+  WARNINGS+=("A subagent or another session may have switched branches. Verify you're on the right branch before proceeding.")
+fi
+
+# Write current branch as the active branch lock
+echo "$BRANCH" > ".claude/active-branch"
+
 # ─── 1. Verify environment (fast checks only) ──────────────────────────────────
 
 if [ ! -d "node_modules" ] || [ ! -d "apps/web/node_modules" ]; then
