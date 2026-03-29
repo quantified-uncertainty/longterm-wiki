@@ -308,6 +308,16 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'manual-api-types',
+    name: 'No inline apiRequest<{...}> types (advisory)', // api-type-ok
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-manual-api-types.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: ~30 existing violations need migration to typed wiki-server
+    // clients with InferResponseType<>. Blocking would prevent all PRs.
+    advisory: true,
+  },
+  {
     id: 'conflict-markers',
     name: 'Conflict marker detection',
     command: 'npx',
