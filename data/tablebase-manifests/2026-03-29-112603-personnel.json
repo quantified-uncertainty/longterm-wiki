@@ -1,0 +1,57 @@
+{
+  "table": "personnel",
+  "recordCount": 5,
+  "submittedAt": "2026-03-29T11:26:03.002Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 5,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Ffj2MMXa9K",
+      "personId": "PCVZaKFGZB",
+      "organizationId": "dimMUIEbhA",
+      "role": "Co-Founder",
+      "source": "https://iq.wiki/wiki/aragon",
+      "verdict": "none"
+    },
+    {
+      "id": "pSrJ99UTKK",
+      "personId": "cwYgWTgwVI",
+      "organizationId": "dimMUIEbhA",
+      "role": "Co-Founder & CEO (Aragon One)",
+      "source": "https://cryptoslate.com/aragon-one-ceo-resigns-after-a-disagreement-over-governance-decisions/",
+      "verdict": "none"
+    },
+    {
+      "id": "Hh7rEqih29",
+      "personId": "ZxfHAFnYzR",
+      "organizationId": "dimMUIEbhA",
+      "role": "CEO",
+      "source": "https://theeagleweekly.substack.com/p/announcing-aragon-xs-new-ceo",
+      "verdict": "none"
+    },
+    {
+      "id": "nGJ6Kaw98c",
+      "personId": "7HtcVtOd6S",
+      "organizationId": "dimMUIEbhA",
+      "role": "CTO / Lead Developer",
+      "source": "https://blog.aragon.org/some-changes-at-the-aragon-association/",
+      "verdict": "none"
+    },
+    {
+      "id": "uc1pEqi8D3",
+      "personId": "VyGYZFImF8",
+      "organizationId": "dimMUIEbhA",
+      "role": "Executive Director",
+      "source": "https://blog.aragon.org/welcoming-stefano-to-the-aragon-association/",
+      "verdict": "none"
+    }
+  ]
+}
