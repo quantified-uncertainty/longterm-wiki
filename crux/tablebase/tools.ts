@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
+import { generateSid, isAnySid } from '../../packages/id-utils/src/index.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -269,8 +270,8 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
     return JSON.stringify({ created: false, existing: true, stableId: existing.stableId, name: existing.name });
   }
 
-  // Generate lightweight stableId (no wikiId — not a full wiki entity)
-  const stableId = generateId(`${entityType}:${slug}`);
+  // Generate sid_-prefixed stableId (no wikiId — not a full wiki entity)
+  const stableId = generateSid();
 
   // Sync entity to wiki-server (lightweight — no wikiId)
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
@@ -287,8 +288,9 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
     return `Error creating entity: ${syncResult.message}`;
   }
 
-  // Update the cached matcher so subsequent resolve calls find this entity
+  // Update caches so subsequent resolve/validate calls find this entity
   _entityMatcher = null; // Force re-build on next resolve
+  if (_knownStableIds) _knownStableIds.add(stableId); // Avoid stale-cache rejection in submit_records
 
   return JSON.stringify({
     created: true,
@@ -418,8 +420,8 @@ async function handleSubmitRecords(
         continue;
       }
 
-      // If it looks like a stableId (10-char alphanumeric), verify it exists
-      if (/^[A-Za-z0-9]{10}$/.test(val)) {
+      // If it looks like a stableId (sid_-prefixed or legacy 10-char), verify it exists
+      if (isAnySid(val)) {
         if (stableIdSet.has(val)) {
           continue; // Legitimate stableId from resolve_entity or create_entity
         }
