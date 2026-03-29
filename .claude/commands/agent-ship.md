@@ -61,11 +61,11 @@ fi
 
 **If review marker is missing or stale, run `/agent-review-pr`:**
 
-`/agent-review-pr` is now adaptive — it triages the diff and scales its verification intensity to the PR size and risk. Even small PRs benefit from a quick review (build + types + diff review). Large or risky PRs get the full treatment (red-teaming, Playwright testing, test coverage audit, simplification).
+`/agent-review-pr` is now adaptive — it triages the diff and scales its verification intensity to the PR size and risk. Even small PRs benefit from a quick review (build + types + tests + gate + diff review). Large or risky PRs get the full treatment (red-teaming, Playwright testing, test coverage audit, simplification).
 
 Print this message and run the review:
 
-```text
+```
 ═══════════════════════════════════════════════════════════════
   Running /agent-review-pr (adaptive — intensity scales to PR size)
   [N] files changed, [M] lines

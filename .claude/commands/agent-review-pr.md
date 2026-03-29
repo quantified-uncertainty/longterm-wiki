@@ -13,6 +13,8 @@ This skill triages the current branch's changes, builds a verification plan from
 
 ## Phase 1: Triage — Analyze the diff and build a verification plan
 
+**Prerequisite:** Verify the agent checklist exists (`.claude/wip-checklist.md`). If not, run `pnpm crux sys agent-checklist init "PR review" --type=infrastructure` before proceeding.
+
 Run these commands to understand what changed:
 
 ```bash
@@ -44,7 +46,7 @@ Count the metrics:
 
 Select steps from the menu below. **The default is to INCLUDE a step** — only exclude if clearly irrelevant (e.g., no .tsx files means skip UI testing). Print the plan before executing:
 
-```text
+```
 ═══════════════════════════════════════════════════════════════
   REVIEW PLAN — [N] files changed, [M] lines, categories: [X, Y, Z]
 ═══════════════════════════════════════════════════════════════
@@ -169,7 +171,7 @@ After simplifications, re-run `pnpm test` and `pnpm build` to verify nothing bro
 Grep for new exports in the diff:
 
 ```bash
-git diff main...HEAD | grep -E '^\+.*(export (default |)(function|const|class|async function)|export \{|export \*)' | grep -v '\.test\.' | grep -v '\.spec\.'
+git diff --name-only main...HEAD -- '*.ts' '*.tsx' ':!*.test.*' ':!*.spec.*' | xargs -I{} git diff main...HEAD -- {} | grep -E '^\+.*(export (default |)(function|const|class|async function)|export \{|export \*)'
 ```
 
 For each new exported function/class:
@@ -347,7 +349,7 @@ This file is gitignored. It persists for the life of the session and is read by 
 
 Summarize the review with:
 
-```text
+```
 ═══════════════════════════════════════════════════════════════
   REVIEW COMPLETE
 ═══════════════════════════════════════════════════════════════
