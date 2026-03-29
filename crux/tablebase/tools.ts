@@ -6,6 +6,8 @@
  *        submit_records, resolve_entity
  */
 
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
@@ -173,8 +175,6 @@ let _knownStableIds: Set<string> | null = null;
 function getKnownStableIds(): Set<string> {
   if (_knownStableIds) return _knownStableIds;
   try {
-    const { readFileSync } = require('fs');
-    const { resolve } = require('path');
     const db = JSON.parse(readFileSync(resolve('apps/web/src/data/database.json'), 'utf8'));
     const ids = new Set<string>();
     // Index from byStableId (stableId → slug mapping)

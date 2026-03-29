@@ -557,16 +557,19 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .where(inArray(personnel.id, ids));
 
-    await logAuditEntries(db, existing.map((r) => ({
-      recordType: "personnel",
-      recordId: r.id,
-      operation: "delete" as const,
-      newData: { personId: r.personId, organizationId: r.organizationId, role: r.role },
-    })));
+    await db.transaction(async (tx) => {
+      await logAuditEntries(tx, existing.map((r) => ({
+        recordType: "personnel",
+        recordId: r.id,
+        operation: "delete" as const,
+        oldData: { personId: r.personId, organizationId: r.organizationId, role: r.role },
+        newData: {},
+      })));
 
-    await db
-      .delete(personnel)
-      .where(inArray(personnel.id, ids));
+      await tx
+        .delete(personnel)
+        .where(inArray(personnel.id, ids));
+    });
 
     return c.json({ deleted: existing.length });
   });
