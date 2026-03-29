@@ -64,7 +64,9 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  */
 /**
  * Check if a string is a displayable person name (not a machine-generated ID).
- * Rejects stableIds, numeric PKs, and legacy IDs with hyphens/underscores.
+ * Rejects stableIds (both sid_-prefixed and legacy bare 10-char), numeric PKs,
+ * contaminated IDs with hyphens/underscores, and short digit+uppercase strings
+ * that look like legacy IDs.
  */
 function isDisplayablePersonName(name: string): boolean {
   if (isBareMachineId(name)) return false;
