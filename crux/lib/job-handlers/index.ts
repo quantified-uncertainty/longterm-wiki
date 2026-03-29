@@ -89,6 +89,10 @@ const handlers: Record<string, JobHandler> = {
   // Claims-first verification (#3253) — lazy to avoid Anthropic SDK cycle
   'claim-verification': lazyHandler(async () =>
     (await import('./claim-verification.ts')).handleClaimVerification),
+
+  // Resource URL liveness checking (#3209) — lazy for consistency
+  'resource-verify': lazyHandler(async () =>
+    (await import('./resource-verify.ts')).handleResourceVerify),
 };
 
 /**

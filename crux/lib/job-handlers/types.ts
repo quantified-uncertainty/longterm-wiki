@@ -100,3 +100,12 @@ export interface AutoUpdateDigestParams {
   /** Whether this is a dry run (no child jobs created) */
   dryRun?: boolean;
 }
+
+export interface ResourceVerifyParams {
+  /** Resource stableId */
+  resourceId: string;
+  /** URL to verify */
+  url: string;
+  /** Hash of previously fetched content (for change detection) */
+  previousContentHash?: string;
+}
