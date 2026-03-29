@@ -4,3 +4,4 @@ packages:
   - "apps/wiki-server"
   - "apps/groundskeeper"
   - "packages/factbase"
+  - "packages/id-utils"

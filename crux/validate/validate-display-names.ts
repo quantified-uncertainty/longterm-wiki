@@ -20,6 +20,7 @@ import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
 import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+import { isLegacyStableId } from '../../packages/id-utils/src/index.ts';
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data/entities');
 
@@ -32,18 +33,13 @@ export interface DisplayNameViolation {
 }
 
 /**
- * StableId pattern: exactly 10 alphanumeric characters [A-Za-z0-9].
- * StableIds never contain `-` or `_` (migration 0141 normalized all legacy ones).
- * Canonical definition: apps/web/src/lib/stable-id.ts
- */
-const STABLE_ID_PATTERN = /^[A-Za-z0-9]{10}$/;
-
-/**
  * Check if a string looks like a stableId (machine-generated 10-char ID).
- * Requires mixed case to avoid false positives on short real names.
+ * Uses isLegacyStableId from id-utils for the base 10-char pattern check,
+ * then adds heuristics requiring mixed case + digits to avoid false positives
+ * on short real names like "Washington" or "Regulation".
  */
 export function looksLikeStableId(value: string): boolean {
-  if (!STABLE_ID_PATTERN.test(value)) return false;
+  if (!isLegacyStableId(value)) return false;
   // Must contain at least one uppercase AND one lowercase letter
   // to distinguish from real words like "Washington" or "Pythonista"
   const hasUpper = /[A-Z]/.test(value);

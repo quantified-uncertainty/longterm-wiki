@@ -5,6 +5,15 @@
  * so the frontend always has slug (for URLs) and name (for display) — never bare stableIds.
  */
 
+import {
+  isAnySid,
+  STABLE_ID_PATTERN,
+  NUMERIC_ID_PATTERN,
+} from "@longterm-wiki/id-utils";
+
+// Re-export for consumers that import STABLE_ID_PATTERN from this module
+export { STABLE_ID_PATTERN };
+
 /** Structured entity reference in API responses. */
 export interface EntityRef {
   /** Entity stableId (10-char alphanumeric), null if unresolved */
@@ -14,15 +23,6 @@ export interface EntityRef {
   /** Display name: prefers entity title > displayName > humanized raw ID */
   name: string | null;
 }
-
-/**
- * Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
- * Exported so other modules can use the same canonical pattern.
- */
-export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-
-/** Matches pure numeric IDs (legacy database PKs like "175", "335"). */
-const NUMERIC_ID_PATTERN = /^\d+$/;
 
 /**
  * Format an entity reference from joined query results.
@@ -41,9 +41,9 @@ export function formatEntityRef(
   rawId: string | null,
 ): EntityRef {
   // Name priority: entity title > display name > raw ID (if not a bare machine ID)
-  // Skip bare stableIds, numeric database PKs, and legacy IDs with hyphens — not human-readable
+  // Skip bare stableIds (both new sid_ and legacy), numeric database PKs, and legacy IDs with hyphens
   const isId = (s: string) => {
-    if (STABLE_ID_PATTERN.test(s) || NUMERIC_ID_PATTERN.test(s)) return true;
+    if (isAnySid(s) || NUMERIC_ID_PATTERN.test(s)) return true;
     // Legacy IDs with hyphens/underscores (e.g., "8-JZq4lrlD", "Tw_Eo226h3")
     if (s.length >= 8 && s.length <= 12 && /[_-]/.test(s) && /\d/.test(s) && /[A-Z]/.test(s) && !s.includes(" ")) return true;
     return false;

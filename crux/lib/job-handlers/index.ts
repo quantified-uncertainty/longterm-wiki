@@ -6,22 +6,36 @@
  *
  * Each handler receives job params and a context object, and returns a
  * JobHandlerResult with success/failure status and result data.
+ *
+ * Handlers are loaded lazily (on first dispatch) to avoid pulling in heavy
+ * dependencies (Anthropic SDK, dotenv, etc.) at module evaluation time.
+ * This prevents ESM/CJS circular dependency errors on Node 22, where
+ * require(esm) cycle detection is strict.
  */
 
 import { execFileSync } from 'child_process';
 import type { JobHandler } from './types.ts';
-import { handlePageImprove } from './page-improve.ts';
-import { handlePageCreate } from './page-create.ts';
-import { handleBatchCommit } from './batch-commit.ts';
-import { handleAutoUpdateDigest } from './auto-update-digest.ts';
-import { handleClaimVerification } from './claim-verification.ts';
+
+// ---------------------------------------------------------------------------
+// Lazy handler loaders — each returns the handler on first call, then caches
+// ---------------------------------------------------------------------------
+
+function lazyHandler(loader: () => Promise<JobHandler>): JobHandler {
+  let cached: JobHandler | undefined;
+  return async (params, ctx) => {
+    if (!cached) {
+      cached = await loader();
+    }
+    return cached(params, ctx);
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Handler Registry
 // ---------------------------------------------------------------------------
 
 const handlers: Record<string, JobHandler> = {
-  // Simple handlers
+  // Simple handlers (no heavy deps — defined inline)
   ping: async (_params, ctx) => {
     return {
       success: true,
@@ -58,18 +72,23 @@ const handlers: Record<string, JobHandler> = {
     }
   },
 
-  // Content-modifying handlers
-  'page-improve': handlePageImprove,
-  'page-create': handlePageCreate,
+  // Content-modifying handlers (lazy — depend on full monorepo)
+  'page-improve': lazyHandler(async () =>
+    (await import('./page-improve.ts')).handlePageImprove),
+  'page-create': lazyHandler(async () =>
+    (await import('./page-create.ts')).handlePageCreate),
 
   // Batch orchestration
-  'batch-commit': handleBatchCommit,
+  'batch-commit': lazyHandler(async () =>
+    (await import('./batch-commit.ts')).handleBatchCommit),
 
   // Auto-update pipeline
-  'auto-update-digest': handleAutoUpdateDigest,
+  'auto-update-digest': lazyHandler(async () =>
+    (await import('./auto-update-digest.ts')).handleAutoUpdateDigest),
 
-  // Claims-first verification (#3253)
-  'claim-verification': handleClaimVerification,
+  // Claims-first verification (#3253) — lazy to avoid Anthropic SDK cycle
+  'claim-verification': lazyHandler(async () =>
+    (await import('./claim-verification.ts')).handleClaimVerification),
 };
 
 /**

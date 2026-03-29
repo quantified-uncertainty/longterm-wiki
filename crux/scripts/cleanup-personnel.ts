@@ -12,13 +12,12 @@
  */
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { isAnySid, NUMERIC_ID_PATTERN } from '../../packages/id-utils/src/index.ts';
 
-const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 const LEGACY_ID_RE = /^[A-Za-z0-9][_-][A-Za-z0-9_-]{7,10}$/;
-const NUMERIC_ID_RE = /^\d+$/;
 
 function isMachineId(s: string): boolean {
-  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || LEGACY_ID_RE.test(s);
+  return isAnySid(s) || NUMERIC_ID_PATTERN.test(s) || LEGACY_ID_RE.test(s);
 }
 
 interface PersonnelRecord {

@@ -59,27 +59,24 @@ else
 fi
 ```
 
-**If thresholds exceeded (>5 files OR >300 lines) AND review marker is missing or stale:**
+**If review marker is missing or stale, run `/agent-review-pr`:**
 
-Print this warning prominently:
+`/agent-review-pr` is now adaptive — it triages the diff and scales its verification intensity to the PR size and risk. Even small PRs benefit from a quick review (build + types + tests + gate + diff review). Large or risky PRs get the full treatment (red-teaming, Playwright testing, test coverage audit, simplification).
+
+Print this message and run the review:
 
 ```
-╔══════════════════════════════════════════════════════════════════════╗
-║  REQUIRED: Large PR must be reviewed via /agent-review-pr                 ║
-║                                                                      ║
-║  This PR exceeds size thresholds (>5 files or >300 lines) and       ║
-║  /agent-review-pr was not run (or was run before additional commits).     ║
-║                                                                      ║
-║  Per CLAUDE.md: "For non-trivial changes (>5 files or >300 lines),  ║
-║  run /agent-review-pr before shipping."                                   ║
-║                                                                      ║
-║  Running /agent-review-pr now...                                           ║
-╚══════════════════════════════════════════════════════════════════════╝
+═══════════════════════════════════════════════════════════════
+  Running /agent-review-pr (adaptive — intensity scales to PR size)
+  [N] files changed, [M] lines
+═══════════════════════════════════════════════════════════════
 ```
 
-Then **run `/agent-review-pr` automatically**. Do not offer an option to skip. The review is mandatory for PRs that exceed the thresholds.
+**Do not offer an option to skip.** The review is mandatory for all code PRs. The triage phase handles scaling — a 5-line fix gets a 2-minute review, a 500-line feature gets the full treatment.
 
-If the thresholds are NOT exceeded, or if the review marker is valid (SHA matches HEAD), continue without interruption.
+**Content-only PRs** (only `.mdx`/`.yaml` changes, no code logic): The review triage will detect this and run only the gate check + content validation. This is fast and still mandatory.
+
+If the review marker is valid (SHA + diff hash match HEAD), continue without re-running.
 
 ## Step 3: Complete unchecked items
 
@@ -90,7 +87,7 @@ For each unchecked item in the checklist:
 3. **Blocked?** Note why next to the item.
 
 Pay special attention to:
-- **Paranoid review** (`paranoid-review`): Run `/agent-review-pr` — this handles diff review (fresh subagent), test plan validation, execution-based verification, and edge case testing. Fix or document every finding before checking the item off.
+- **Review** (`paranoid-review`): Run `/agent-review-pr` — this triages the diff, builds an adaptive verification plan (diff review, simplification, test coverage, red-teaming, UI/API/CLI testing as applicable), and executes it. Fix or document every finding before checking the item off.
 - **Self-audit**: Re-run commands you claimed to run. Verify outputs match your claims.
 
 ## Step 4: Write / update PR description
