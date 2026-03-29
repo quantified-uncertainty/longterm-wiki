@@ -33,7 +33,7 @@ import {
   isPolicy,
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
-import { isAlphanumeric10 } from "@/lib/stable-id";
+import { isAnySid } from "@/lib/stable-id";
 
 // Re-export for consumers
 export type { WithSource };
@@ -492,8 +492,8 @@ export function getEntityBundle(entityId: string): EntityBundle | null {
 }
 
 /**
- * Resolve a wiki ID (E35) or stableId (10-char alphanumeric) to slug without
- * loading the full database. Falls back to the full registry if needed,
+ * Resolve a wiki ID (E35) or stableId (both sid_-prefixed and legacy 10-char) to slug
+ * without loading the full database. Falls back to the full registry if needed,
  * but tries the lightweight approach first.
  */
 function resolveIdWithoutRegistry(id: string): string {
@@ -502,8 +502,8 @@ function resolveIdWithoutRegistry(id: string): string {
     const registry = getIdRegistry();
     return registry.byWikiId[id] || id;
   }
-  // StableId: 10-char alphanumeric → slug
-  if (isAlphanumeric10(id)) {
+  // StableId: sid_-prefixed or legacy 10-char alphanumeric → slug
+  if (isAnySid(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }
@@ -588,7 +588,7 @@ export { isRisk, isPerson, isOrganization, isPolicy, isAiModel, isBenchmark, isP
 // ============================================================================
 
 /**
- * Resolve an ID that may be numeric (E35), a stableId (10-char alphanumeric),
+ * Resolve an ID that may be numeric (E35), a stableId (sid_-prefixed or legacy 10-char),
  * or a slug (deepmind) to its slug form.
  * Returns the original ID if it's already a slug or not found in the registry.
  */
@@ -598,8 +598,8 @@ export function resolveId(id: string): string {
     const registry = getIdRegistry();
     return registry.byWikiId[id] || id;
   }
-  // StableId: 10-char alphanumeric → slug
-  if (isAlphanumeric10(id)) {
+  // StableId: sid_-prefixed or legacy 10-char alphanumeric → slug
+  if (isAnySid(id)) {
     const registry = getIdRegistry();
     return registry.byStableId?.[id] || id;
   }
