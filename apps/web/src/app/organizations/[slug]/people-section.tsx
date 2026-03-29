@@ -12,7 +12,7 @@ import {
   type RpcPersonnelByEntityResult,
   type RpcPersonnelRow,
 } from "@/lib/wiki-server";
-import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN } from "@/lib/stable-id";
+import { STABLE_ID_PATTERN, NUMERIC_ID_PATTERN, isBareMachineId } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -63,6 +63,25 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  * existing FactBase key-persons and board-seats data.
  */
 /**
+ * Check if a string is a displayable person name (not a machine-generated ID).
+ * Rejects stableIds, numeric PKs, and legacy IDs with hyphens/underscores.
+ */
+function isDisplayablePersonName(name: string): boolean {
+  if (isBareMachineId(name)) return false;
+  // Legacy IDs with hyphens from a fixed bug in id.ts (e.g., "8-JZq4lrlD").
+  // Real person names at this length always contain spaces or start with a letter
+  // followed by lowercase — IDs mix digits and uppercase without spaces.
+  if (
+    name.length <= 15 &&
+    !name.includes(" ") &&
+    /\d/.test(name) &&
+    /[A-Z]/.test(name)
+  )
+    return false;
+  return true;
+}
+
+/**
  * Humanize a raw person identifier for display.
  * Returns null for bare stableIds and numeric PKs (not human-readable).
  * Strips "new:" prefix and converts slug-format IDs to title case.
@@ -73,8 +92,12 @@ function humanizePersonId(raw: string): string | null {
   if (!cleaned) return null;
   // If it looks like a slug (contains hyphens/underscores), humanize it
   if (cleaned.includes("-") || cleaned.includes("_")) {
-    return titleCase(cleaned);
+    const humanized = titleCase(cleaned);
+    // Reject if the result still looks like a machine ID
+    if (!isDisplayablePersonName(humanized)) return null;
+    return humanized;
   }
+  if (!isDisplayablePersonName(cleaned)) return null;
   return cleaned;
 }
 
@@ -91,13 +114,19 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
   for (const row of rows) {
     const personRef = row.person;
     // Name resolution priority:
-    // 1. Structured ref name (from entity JOIN)
-    // 2. Pre-resolved name from API (personResolvedName)
+    // 1. Structured ref name (from entity JOIN) — validated
+    // 2. Pre-resolved name from API (personResolvedName) — validated
     // 3. Humanized raw personId (strips new:, converts slug to title case)
     // 4. Skip — bare stableIds and numeric PKs are not displayable
+    //
+    // Every candidate is checked against isDisplayablePersonName() because
+    // the enrichment pipeline sometimes stores stableIds as personDisplayName,
+    // which then propagates through personResolvedName and personRef.name.
+    const refName = personRef?.name;
+    const resolvedName = row.personResolvedName;
     const name =
-      personRef?.name ??
-      row.personResolvedName ??
+      (refName && isDisplayablePersonName(refName) ? refName : null) ??
+      (resolvedName && isDisplayablePersonName(resolvedName) ? resolvedName : null) ??
       humanizePersonId(row.personId);
 
     if (!name) {
