@@ -497,13 +497,9 @@ describe("Claims API — adversarial HTTP requests", () => {
     const res1 = await app.request("/api/claims/by-ids?ids=-1,-2", { method: "GET" });
     expect(res1.status).toBe(400); // Filtered out, results in empty valid IDs
 
-    // Float IDs
+    // Float IDs — should be rejected (Number.isInteger filter)
     const res2 = await app.request("/api/claims/by-ids?ids=1.5,2.7", { method: "GET" });
-    const body2 = await res2.json();
-    // NaN check: 1.5 → Number("1.5") = 1.5, but filter checks isNaN and > 0
-    // 1.5 is not NaN and > 0, so it passes... but it's not an integer
-    // This is a potential bug — non-integer IDs would be sent to SQL
-    expect(res2.status).toBe(200);
+    expect(res2.status).toBe(400);
 
     // Zero
     const res3 = await app.request("/api/claims/by-ids?ids=0", { method: "GET" });

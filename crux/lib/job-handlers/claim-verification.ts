@@ -340,18 +340,22 @@ export async function handleClaimVerification(
     })),
   ];
 
-  if (verdicts.length > 0) {
+  // The verdicts endpoint allows max 100 per request, but a job can have up to
+  // MAX_CLAIMS_PER_JOB=200 claims. Batch the verdicts POST accordingly.
+  const MAX_VERDICTS_PER_REQUEST = 100;
+  for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST) {
+    const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST);
     const updateResult = await apiRequest<{ updated: number; total: number }>(
       'POST',
       '/api/claims/verdicts',
-      { verdicts },
+      { verdicts: batch },
     );
 
     if (!updateResult.ok) {
       return {
         success: false,
-        data: { batchId },
-        error: `Failed to persist verdicts: ${updateResult.message}`,
+        data: { batchId, verdictsWritten: i },
+        error: `Failed to persist verdicts (batch ${Math.floor(i / MAX_VERDICTS_PER_REQUEST) + 1}): ${updateResult.message}`,
       };
     }
   }

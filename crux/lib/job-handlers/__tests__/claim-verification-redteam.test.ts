@@ -412,4 +412,47 @@ describe("handleClaimVerification — adversarial inputs", () => {
     expect(result.data.contradicted).toBe(1);
     expect(mockCallLlm).toHaveBeenCalledTimes(2);
   });
+
+  it("batches verdict POST when >100 verdicts (max per API request)", async () => {
+    // 150 claims → all verified → 150 verdicts → needs 2 POST requests
+    const claims = Array.from({ length: 150 }, (_, i) => makeClaim(i + 1));
+
+    // by-ids returns claims (called once for all)
+    mockApiRequest.mockResolvedValueOnce({ ok: true, data: { claims } } as any);
+    // Two verdict POST calls (100 + 50)
+    mockApiRequest.mockResolvedValueOnce({ ok: true, data: { updated: 100, total: 100 } } as any);
+    mockApiRequest.mockResolvedValueOnce({ ok: true, data: { updated: 50, total: 50 } } as any);
+
+    mockGetContent.mockResolvedValue({ ok: true, data: { fullText: "Content", pageTitle: null } } as any);
+
+    // 150 claims in batches of 20 = 8 LLM calls (7×20 + 1×10)
+    for (let i = 0; i < 8; i++) {
+      mockCallLlm.mockResolvedValueOnce({ text: "json", usage: { input_tokens: 0, output_tokens: 0 } } as any);
+      const batchStart = i * 20;
+      const batchEnd = Math.min(batchStart + 20, 150);
+      const batchClaims = claims.slice(batchStart, batchEnd);
+      mockParseJson.mockReturnValueOnce(
+        batchClaims.map((cl) => ({
+          claimId: cl.id, verdict: "confirmed", confidence: 0.9, extracted_value: "", reasoning: "",
+        })),
+      );
+    }
+
+    const result = await handleClaimVerification(
+      { claimIds: claims.map((c) => c.id), batchId: "test", resourceId: null, entityId: null },
+      baseCtx,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.confirmed).toBe(150);
+    // apiRequest called: 1 (by-ids) + 2 (verdict batches) = 3
+    expect(mockApiRequest).toHaveBeenCalledTimes(3);
+    // Verify the verdict POST calls have correct batch sizes
+    const verdictCalls = mockApiRequest.mock.calls.filter(
+      (call) => call[0] === "POST" && (call[1] as string).includes("verdicts"),
+    );
+    expect(verdictCalls).toHaveLength(2);
+    expect((verdictCalls[0][2] as any).verdicts).toHaveLength(100);
+    expect((verdictCalls[1][2] as any).verdicts).toHaveLength(50);
+  });
 });

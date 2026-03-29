@@ -311,7 +311,7 @@ const claimsApp = new Hono()
       return validationError(c, "Missing required query parameter: ids");
     }
 
-    const ids = idsParam.split(",").map(Number).filter((n) => !isNaN(n) && n > 0);
+    const ids = idsParam.split(",").map(Number).filter((n) => Number.isInteger(n) && n > 0);
     if (ids.length === 0) {
       return validationError(c, "No valid IDs provided");
     }
