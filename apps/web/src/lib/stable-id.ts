@@ -1,6 +1,7 @@
 /**
  * Canonical stableId detection — thin re-export from @longterm-wiki/id-utils.
  *
+<<<<<<< HEAD
  * This module re-exports the shared ID utilities and adds app-specific helpers
  * (isContaminatedStableId, isBareMachineId) that aren't needed in the core package.
  */
@@ -55,3 +56,10 @@ export function isContaminatedStableId(s: string): boolean {
   if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
   return true;
 }
+=======
+ * All entity stableIds now use the `sid_` prefix. Legacy bare 10-char IDs,
+ * contaminated IDs, and numeric PKs are no longer in use.
+ */
+
+export { isSid, isDisplayableName, SID_PREFIX } from "@longterm-wiki/id-utils";
+>>>>>>> 767558b75 (refactor: remove legacy ID detection code after sid_ migration)
