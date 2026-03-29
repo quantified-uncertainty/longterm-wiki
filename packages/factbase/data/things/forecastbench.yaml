@@ -1,4 +1,4 @@
-entity: 2smzyptQJg
+entity: sid_2smzyptQJg
 facts:
   - id: f_WXk4Z58tdg
     property: description
@@ -20,5 +20,5 @@ facts:
   - id: f_cXt8zK1eFf
     property: founded-by
     value:
-      - !ref KslhqGaeJw
+      - !ref sid_KslhqGaeJw
     notes: Created by Forecasting Research Institute (FRI), led by Ezra Karger and Philip Tetlock

@@ -1,4 +1,4 @@
-entity: A4XoubikkQ
+entity: sid_A4XoubikkQ
 facts:
   - id: f_mEKUPPFYRg
     property: founded-date
@@ -24,9 +24,9 @@ facts:
   - id: f_AX7AnnLZQQ
     property: founded-by
     value:
-      - !ref Aqcyu3onCA
-      - !ref muueuPOHfg
-      - !ref DBq1ddu8Mg
+      - !ref sid_Aqcyu3onCA
+      - !ref sid_muueuPOHfg
+      - !ref sid_DBq1ddu8Mg
     source: https://en.wikipedia.org/wiki/Google_DeepMind
 
   - id: f_KtTrbGQynQ

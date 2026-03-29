@@ -1,4 +1,4 @@
-entity: XqjV4mbMXQ
+entity: sid_XqjV4mbMXQ
 facts:
   # ── Description ────────────────────────────────────────────────
   - id: f_Jrkhe2gj6g
@@ -88,7 +88,7 @@ facts:
   # ── Parent Organization ────────────────────────────────────────
   - id: f_YMiDCNN37A
     property: parent-org
-    value: !ref rEQ9mInLoQ
+    value: !ref sid_rEQ9mInLoQ
     asOf: 2023
     source: https://www.legislation.gov.uk/ukpga/2022/3/enacted
     notes: "ARIA reports to DSIT but operates with significant independence by statute"

@@ -1,4 +1,4 @@
-entity: 8slnDr4emg
+entity: sid_8slnDr4emg
 facts:
   - id: f_KaC6RqSuIw
     property: description
@@ -20,5 +20,5 @@ facts:
   - id: f_iDz4FQ7lLm
     property: founded-by
     value:
-      - !ref Khej79OA8g
+      - !ref sid_Khej79OA8g
     notes: Created at QURI by Ozzie Gooen

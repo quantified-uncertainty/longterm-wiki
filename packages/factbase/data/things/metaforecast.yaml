@@ -1,4 +1,4 @@
-entity: 1tpQRlyyIQ
+entity: sid_1tpQRlyyIQ
 facts:
   - id: f_3cJPlhlDBA
     property: description
@@ -19,5 +19,5 @@ facts:
   - id: f_fAw1CN4iIj
     property: founded-by
     value:
-      - !ref Khej79OA8g
+      - !ref sid_Khej79OA8g
     notes: Created at QURI by Nuno Sempere with Ozzie Gooen

@@ -50,7 +50,7 @@ describe("extractAllCareers", () => {
 
     // Find Dario Amodei's Anthropic entry (should have stableId, not slug)
     const anthropicEntries = result.entries.filter(
-      (e) => e.organizationId === "mK9pX3rQ7n", // Anthropic's stableId
+      (e) => e.organizationId === "sid_mK9pX3rQ7n", // Anthropic's stableId
     );
     expect(anthropicEntries.length).toBeGreaterThan(0);
   });

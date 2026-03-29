@@ -1,4 +1,4 @@
-entity: dwMzc9WzPa
+entity: sid_dwMzc9WzPa
 facts:
   - id: f_GXvWNFPV7M
     property: founded-date
@@ -19,6 +19,6 @@ facts:
   - id: f_yii7fct7Gw
     property: founded-by
     value:
-      - !ref R8tDuupBTt
-      - !ref Z62bQynY4g
+      - !ref sid_R8tDuupBTt
+      - !ref sid_Z62bQynY4g
     source: https://www.redwoodresearch.org/

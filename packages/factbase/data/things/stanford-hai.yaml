@@ -1,4 +1,4 @@
-entity: YPE80Sx2VA
+entity: sid_YPE80Sx2VA
 facts:
   - id: f_Bm4nT7xR3a
     property: founded-date
@@ -62,8 +62,8 @@ facts:
   - id: f_jiXzOc53q8
     property: key-person
     value:
-      - !ref QzcX3bShmQ
-      - !ref rhgfPZYXTw
+      - !ref sid_QzcX3bShmQ
+      - !ref sid_rhgfPZYXTw
     asOf: 2024
     source: https://hai.stanford.edu/about
     notes: "Co-directors since founding in 2019"

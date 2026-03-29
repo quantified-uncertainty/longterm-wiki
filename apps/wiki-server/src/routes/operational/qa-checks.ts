@@ -8,6 +8,7 @@
 import { Hono } from "hono";
 import { eq, desc, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
+import { sqlInList } from "../shared/query-helpers.js";
 import { qaPageChecks } from "../../schema.js";
 import {
   parseJsonBody,
@@ -54,13 +55,6 @@ const ENTITY_TYPE_TO_DIRECTORY: Record<string, string> = {
   event: "events",
   "research-area": "research-areas",
 };
-
-function sqlInList(values: string[]) {
-  return sql.join(
-    values.map((v) => sql`${v}`),
-    sql`, `,
-  );
-}
 
 const qaChecksApp = new Hono()
   // ---- POST / (record a single check) ----

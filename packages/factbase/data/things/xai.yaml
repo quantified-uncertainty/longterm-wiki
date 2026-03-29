@@ -1,4 +1,4 @@
-entity: GLXKjYAEKw
+entity: sid_GLXKjYAEKw
 facts:
   - id: f_3rNHFIucqQ
     property: founded-date
@@ -23,7 +23,7 @@ facts:
   - id: f_qr3MjbUa4Q
     property: founded-by
     value:
-      - !ref 69vftmr1jg
+      - !ref sid_69vftmr1jg
     source: https://x.ai/about
 
   - id: f_Uxbvs82r3w

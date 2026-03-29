@@ -1,4 +1,4 @@
-entity: PnUBtoCeMw
+entity: sid_PnUBtoCeMw
 facts:
   - id: f_GKYIGEv15w
     property: description
@@ -15,5 +15,5 @@ facts:
   - id: f_kFB6HS9nNo
     property: founded-by
     value:
-      - !ref KslhqGaeJw
+      - !ref sid_KslhqGaeJw
     notes: Organized by Forecasting Research Institute (FRI) under Philip Tetlock

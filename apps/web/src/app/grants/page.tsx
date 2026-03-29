@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
@@ -211,7 +212,9 @@ export default function GrantsPage() {
 
       {/* Grants table */}
       {totalGrants > 0 ? (
-        <GrantsTable rows={rows} funders={funderSummaries} />
+        <Suspense fallback={<div className="text-sm text-muted-foreground">Loading grants table...</div>}>
+          <GrantsTable rows={rows} funders={funderSummaries} />
+        </Suspense>
       ) : (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
           <p className="text-lg font-medium mb-2">No grants data available</p>

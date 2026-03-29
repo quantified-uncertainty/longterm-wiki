@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: ea-shareholder-diversification-anthropic
-  stableId: bbKjzXS1lQ
+  stableId: sid_bbKjzXS1lQ
   wikiId: E858
   type: concept
   title: EA Shareholder Diversification from Anthropic
@@ -18,9 +18,9 @@
     - diversification
     - philanthropy
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: pxRqsPtwjg
+    - id: sid_pxRqsPtwjg
       type: crux
   clusters:
     - community
@@ -29,7 +29,7 @@
   lastUpdated: 2026-02
 
 - id: corporate-influence
-  stableId: pxRqsPtwjg
+  stableId: sid_pxRqsPtwjg
   wikiId: E78
   type: crux
   title: Corporate Influence on AI Policy
@@ -45,13 +45,13 @@
     - label: Counterfactual Complexity
       value: Very High
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   sources:
     - title: Working at Frontier AI Labs
@@ -81,7 +81,7 @@
     - corporate-governance
   lastUpdated: 2025-12
 - id: field-building
-  stableId: 4vlIteCy4Q
+  stableId: sid_4vlIteCy4Q
   wikiId: E141
   type: crux
   title: AI Safety Field Building and Community
@@ -97,9 +97,9 @@
     - label: Entry Barrier
       value: Low to Medium
   relatedEntries:
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   sources:
     - title: ARENA Program
@@ -126,7 +126,7 @@
     - career-development
   lastUpdated: 2025-12
 - id: governance-policy
-  stableId: khXUiwWtkg
+  stableId: sid_khXUiwWtkg
   wikiId: E154
   type: crux
   title: AI Governance and Policy
@@ -142,13 +142,13 @@
     - label: Entry Paths
       value: Policy, law, international relations
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   sources:
     - title: The Governance of AI
@@ -176,7 +176,7 @@
     - export-controls
     - ai-safety-summits
 - id: research-agendas
-  stableId: 91aiRK6RgA
+  stableId: sid_91aiRK6RgA
   wikiId: E251
   type: crux
   title: AI Alignment Research Agendas
@@ -188,13 +188,13 @@
     - label: Related To
       value: Alignment Difficulty, Timelines
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: myeSKJXTMA
+    - id: sid_myeSKJXTMA
       type: organization
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
   sources:
     - title: Constitutional AI
@@ -228,7 +228,7 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: technical-research
-  stableId: buPrZrnpSw
+  stableId: sid_buPrZrnpSw
   wikiId: E297
   type: crux
   title: Technical AI Safety Research
@@ -244,13 +244,13 @@
     - label: Career Entry
       value: PhD or self-study + demonstrations
   relatedEntries:
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
   sources:
     - title: AI Alignment Research Overview
@@ -281,7 +281,7 @@
     - robustness
   lastUpdated: 2025-12
 - id: misuse
-  stableId: DAaRZ9Q15A
+  stableId: sid_DAaRZ9Q15A
   wikiId: E206
   type: concept
   title: AI Misuse
@@ -295,7 +295,7 @@
     - ai-risk
   lastUpdated: 2025-12
 - id: dual-use
-  stableId: CwBPBQAmxA
+  stableId: sid_CwBPBQAmxA
   wikiId: E106
   type: concept
   title: Dual-Use AI Technology
@@ -307,7 +307,7 @@
     - governance
   lastUpdated: 2025-12
 - id: fast-takeoff
-  stableId: fRYu1EXclA
+  stableId: sid_fRYu1EXclA
   wikiId: E139
   type: concept
   title: Fast Takeoff
@@ -316,9 +316,9 @@
     implement safety measures.
   status: stub
   relatedEntries:
-    - id: 3fyHbDnHIQ
+    - id: sid_3fyHbDnHIQ
       type: concept
-    - id: eUR0jvxO5A
+    - id: sid_eUR0jvxO5A
       type: capability
   tags:
     - ai-timelines
@@ -326,16 +326,16 @@
     - x-risk
   lastUpdated: 2025-12
 - id: superintelligence
-  stableId: 3fyHbDnHIQ
+  stableId: sid_3fyHbDnHIQ
   wikiId: E291
   type: concept
   title: Superintelligence
   description: Hypothetical AI systems with cognitive abilities vastly exceeding those of humans across virtually all domains.
   status: stub
   relatedEntries:
-    - id: fRYu1EXclA
+    - id: sid_fRYu1EXclA
       type: concept
-    - id: eUR0jvxO5A
+    - id: sid_eUR0jvxO5A
       type: capability
   tags:
     - superintelligence
@@ -343,7 +343,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: content-moderation
-  stableId: s8PQomHkvA
+  stableId: sid_s8PQomHkvA
   wikiId: E75
   type: concept
   title: AI Content Moderation
@@ -355,7 +355,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: agi-race
-  stableId: QVsRgOaeUw
+  stableId: sid_QVsRgOaeUw
   wikiId: E3
   type: concept
   title: AGI Race
@@ -364,7 +364,7 @@
     of safety.
   status: stub
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   tags:
     - competition
@@ -372,7 +372,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: capability-evaluations
-  stableId: CD9w0PDxvg
+  stableId: sid_CD9w0PDxvg
   wikiId: E52
   type: concept
   title: Capability Evaluations
@@ -381,9 +381,9 @@
     autonomous operation.
   status: stub
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: myeSKJXTMA
+    - id: sid_myeSKJXTMA
       type: organization
   tags:
     - evaluations
@@ -391,14 +391,14 @@
     - capabilities
   lastUpdated: 2025-12
 - id: existential-risk
-  stableId: bQ9a5lwwlg
+  stableId: sid_bQ9a5lwwlg
   wikiId: E131
   type: concept
   title: Existential Risk from AI
   description: Risks that could cause human extinction or permanently curtail humanity's long-term potential.
   status: stub
   relatedEntries:
-    - id: 3fyHbDnHIQ
+    - id: sid_3fyHbDnHIQ
       type: concept
   tags:
     - x-risk
@@ -406,7 +406,7 @@
     - longtermism
   lastUpdated: 2025-12
 - id: adversarial-robustness
-  stableId: gWxL0U06oQ
+  stableId: sid_gWxL0U06oQ
   wikiId: E1
   type: concept
   title: Adversarial Robustness
@@ -418,7 +418,7 @@
     - safety
   lastUpdated: 2025-12
 - id: natural-abstractions
-  stableId: jHU2ZaCpdQ
+  stableId: sid_jHU2ZaCpdQ
   wikiId: E213
   type: concept
   title: Natural Abstractions
@@ -427,14 +427,14 @@
     interpretability.
   status: stub
   relatedEntries:
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
   tags:
     - interpretability
     - theory
   lastUpdated: 2025-12
 - id: benchmarking
-  stableId: bfK5RgQBcQ
+  stableId: sid_bfK5RgQBcQ
   wikiId: E38
   type: concept
   title: AI Benchmarking
@@ -446,28 +446,28 @@
     - capabilities
   lastUpdated: 2025-12
 - id: transformative-ai
-  stableId: bmVIhwpQww
+  stableId: sid_bmVIhwpQww
   wikiId: E357
   type: concept
   title: Transformative AI
   description: AI systems capable of causing changes to society as significant as the industrial or agricultural revolutions.
   status: stub
   relatedEntries:
-    - id: 3fyHbDnHIQ
+    - id: sid_3fyHbDnHIQ
       type: concept
   tags:
     - ai-timelines
     - societal-impact
   lastUpdated: 2025-12
 - id: scaling-laws
-  stableId: eZJ1oAKS6A
+  stableId: sid_eZJ1oAKS6A
   wikiId: E273
   type: concept
   title: AI Scaling Laws
   description: Empirical relationships between model size, compute, data, and AI performance that have driven recent AI progress.
   status: stub
   relatedEntries:
-    - id: cBPkzcVBBQ
+    - id: sid_cBPkzcVBBQ
       type: organization
   tags:
     - capabilities
@@ -475,14 +475,14 @@
     - forecasting
   lastUpdated: 2025-12
 - id: ai-timelines
-  stableId: URCXiRsX0w
+  stableId: sid_URCXiRsX0w
   wikiId: E16
   type: concept
   title: AI Timelines
   description: Predictions and analysis of when various AI capability milestones (AGI, transformative AI) might be reached.
   status: stub
   relatedEntries:
-    - id: cBPkzcVBBQ
+    - id: sid_cBPkzcVBBQ
       type: organization
   tags:
     - forecasting
@@ -490,14 +490,14 @@
     - ai-development
   lastUpdated: 2025-12
 - id: data-constraints
-  stableId: HLakK5zplg
+  stableId: sid_HLakK5zplg
   wikiId: E92
   type: concept
   title: AI Training Data Constraints
   description: Limitations on AI training due to availability, quality, or accessibility of training data.
   status: stub
   relatedEntries:
-    - id: eZJ1oAKS6A
+    - id: sid_eZJ1oAKS6A
       type: concept
   tags:
     - training
@@ -505,7 +505,7 @@
     - limitations
   lastUpdated: 2025-12
 - id: is-ai-xrisk-real
-  stableId: 6AGWnGH8cg
+  stableId: sid_6AGWnGH8cg
   wikiId: E181
   type: crux
   title: Is AI Existential Risk Real?
@@ -523,7 +523,7 @@
     - fundamental
   lastUpdated: 2025-01
 - id: open-vs-closed
-  stableId: 9jV0lwtvEQ
+  stableId: sid_9jV0lwtvEQ
   wikiId: E217
   type: crux
   title: Open vs Closed Source AI
@@ -541,7 +541,7 @@
     - governance
   lastUpdated: 2025-01
 - id: pause-debate
-  stableId: ho1C93UpIA
+  stableId: sid_ho1C93UpIA
   wikiId: E223
   type: crux
   title: Should We Pause AI Development?
@@ -559,7 +559,7 @@
     - governance
   lastUpdated: 2025-01
 - id: agi-timeline-debate
-  stableId: W59ZdZXNgw
+  stableId: sid_W59ZdZXNgw
   wikiId: E4
   type: crux
   title: When Will AGI Arrive?
@@ -577,7 +577,7 @@
     - agi
   lastUpdated: 2025-01
 - id: regulation-debate
-  stableId: Ql7oWeGbQw
+  stableId: sid_Ql7oWeGbQw
   wikiId: E248
   type: crux
   title: Government Regulation vs Industry Self-Governance
@@ -595,7 +595,7 @@
     - governance
   lastUpdated: 2025-01
 - id: interpretability-sufficient
-  stableId: YOnFkCixlw
+  stableId: sid_YOnFkCixlw
   wikiId: E176
   type: crux
   title: Is Interpretability Sufficient for Safety?
@@ -613,7 +613,7 @@
     - safety-research
   lastUpdated: 2025-01
 - id: scaling-debate
-  stableId: E2BOiahT9A
+  stableId: sid_E2BOiahT9A
   wikiId: E272
   type: crux
   title: Is Scaling All You Need?
@@ -631,7 +631,7 @@
     - capabilities
   lastUpdated: 2025-01
 - id: why-alignment-easy
-  stableId: DbvIIgLAMA
+  stableId: sid_DbvIIgLAMA
   wikiId: E372
   type: argument
   title: Why Alignment Might Be Easy
@@ -651,7 +651,7 @@
     - optimistic
   lastUpdated: 2025-01
 - id: case-against-xrisk
-  stableId: 0n7ROm8oow
+  stableId: sid_0n7ROm8oow
   wikiId: E55
   type: argument
   title: The Case Against AI Existential Risk
@@ -669,7 +669,7 @@
     - skeptical
   lastUpdated: 2025-01
 - id: why-alignment-hard
-  stableId: 1Y5n2IYUFg
+  stableId: sid_1Y5n2IYUFg
   wikiId: E373
   type: argument
   title: Why Alignment Might Be Hard
@@ -689,7 +689,7 @@
     - pessimistic
   lastUpdated: 2025-01
 - id: case-for-xrisk
-  stableId: D1s139xdig
+  stableId: sid_D1s139xdig
   wikiId: E56
   type: argument
   title: The Case For AI Existential Risk
@@ -710,7 +710,7 @@
   lastUpdated: 2025-01
 
 - id: ai-welfare
-  stableId: TK450w7sTw
+  stableId: sid_TK450w7sTw
   wikiId: E391
   type: concept
   title: AI Welfare and Digital Minds
@@ -728,18 +728,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: t0p43V5oLA
+    - id: sid_t0p43V5oLA
       type: organization
     - id: sycophancy
       type: risk
-    - id: rt6jVH9yuA
+    - id: sid_rt6jVH9yuA
       type: approach
   lastUpdated: 2026-02
 
 - id: misuse-risks
-  stableId: 9v7wxee33g
+  stableId: sid_9v7wxee33g
   wikiId: E392
   type: crux
   title: AI Misuse Risk Cruxes
@@ -760,20 +760,20 @@
     - cyber
     - governance
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
     - id: bioweapons
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: cm5KEblCZg
+    - id: sid_cm5KEblCZg
       type: risk
-    - id: Ped7HAlI0A
+    - id: sid_Ped7HAlI0A
       type: crux
   lastUpdated: 2026-02
 
 - id: solutions
-  stableId: Ped7HAlI0A
+  stableId: sid_Ped7HAlI0A
   wikiId: E393
   type: crux
   title: AI Safety Solution Cruxes
@@ -793,16 +793,16 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: pkCwkyxL0w
+    - id: sid_pkCwkyxL0w
       type: approach
   lastUpdated: 2026-02
 
 - id: accident-risks
-  stableId: 9bhkg6CsdQ
+  stableId: sid_9bhkg6CsdQ
   wikiId: E394
   type: crux
   title: AI Accident Risk Cruxes
@@ -822,20 +822,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
   lastUpdated: 2026-02
 
 - id: structural-risks
-  stableId: U8q54nae2A
+  stableId: sid_U8q54nae2A
   wikiId: E395
   type: crux
   title: AI Structural Risk Cruxes
@@ -855,14 +855,14 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
 - id: epistemic-risks
-  stableId: zFMkgYF35w
+  stableId: sid_zFMkgYF35w
   wikiId: E396
   type: crux
   title: AI Epistemic Cruxes
@@ -882,18 +882,18 @@
     - epistemics
     - ai-safety
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: KYKdAOzynA
+    - id: sid_KYKdAOzynA
       type: organization
-    - id: 9v7wxee33g
+    - id: sid_9v7wxee33g
       type: crux
-    - id: Ped7HAlI0A
+    - id: sid_Ped7HAlI0A
       type: crux
   lastUpdated: 2026-02
 
 - id: governance-focused
-  stableId: H20G0Nc3zQ
+  stableId: sid_H20G0Nc3zQ
   wikiId: E397
   type: concept
   title: Governance-Focused Worldview
@@ -914,16 +914,16 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
 - id: critical-uncertainties
-  stableId: hDyfgJTQZw
+  stableId: sid_hDyfgJTQZw
   wikiId: E398
   type: crux
   title: AI Risk Critical Uncertainties Model
@@ -943,18 +943,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: TdbypiKyCw
+    - id: sid_TdbypiKyCw
       type: organization
-    - id: CUBiiyCfOA
+    - id: sid_CUBiiyCfOA
       type: organization
-    - id: cBPkzcVBBQ
+    - id: sid_cBPkzcVBBQ
       type: organization
-    - id: zkYFTnzRLA
+    - id: sid_zkYFTnzRLA
       type: concept
   lastUpdated: 2026-02
 
 - id: agi-timeline
-  stableId: zkYFTnzRLA
+  stableId: sid_zkYFTnzRLA
   wikiId: E399
   type: concept
   title: AGI Timeline
@@ -974,20 +974,20 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: l8ZPtVJdsA
+    - id: sid_l8ZPtVJdsA
       type: approach
-    - id: JKsVHQ5stQ
+    - id: sid_JKsVHQ5stQ
       type: person
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
-    - id: CUBiiyCfOA
+    - id: sid_CUBiiyCfOA
       type: organization
-    - id: TdbypiKyCw
+    - id: sid_TdbypiKyCw
       type: organization
   lastUpdated: 2026-02
 
 - id: large-language-models
-  stableId: KwyMqBNvOQ
+  stableId: sid_KwyMqBNvOQ
   wikiId: E400
   type: concept
   title: Large Language Models
@@ -1007,20 +1007,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: x19LcGDk6Q
+    - id: sid_x19LcGDk6Q
       type: risk
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
   lastUpdated: 2026-02
 
 - id: heavy-scaffolding
-  stableId: NCLlwmOTkg
+  stableId: sid_NCLlwmOTkg
   wikiId: E401
   type: concept
   title: Heavy Scaffolding / Agentic Systems
@@ -1040,18 +1040,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: RScckMUC2g
+    - id: sid_RScckMUC2g
       type: concept
-    - id: BP0tsiccNw
+    - id: sid_BP0tsiccNw
       type: capability
   lastUpdated: 2026-02
 
 - id: provable-safe
-  stableId: gmRaYb1fgg
+  stableId: sid_gmRaYb1fgg
   wikiId: E402
   type: concept
   title: Provable / Guaranteed Safe AI
@@ -1072,18 +1072,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: DSSCdI8gLA
+    - id: sid_DSSCdI8gLA
       type: approach
-    - id: d9OJFyUmjw
+    - id: sid_d9OJFyUmjw
       type: capability
-    - id: RScckMUC2g
+    - id: sid_RScckMUC2g
       type: concept
-    - id: NCLlwmOTkg
+    - id: sid_NCLlwmOTkg
       type: concept
   lastUpdated: 2026-02
 
 - id: dense-transformers
-  stableId: RScckMUC2g
+  stableId: sid_RScckMUC2g
   wikiId: E403
   type: concept
   title: Dense Transformers
@@ -1103,21 +1103,21 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
-    - id: x19LcGDk6Q
+    - id: sid_x19LcGDk6Q
       type: risk
-    - id: NCLlwmOTkg
+    - id: sid_NCLlwmOTkg
       type: concept
   lastUpdated: 2026-02
 
 # === Auto-generated stubs for pages missing entities ===
 - id: doomer
-  stableId: DDCrE9J2eQ
+  stableId: sid_DDCrE9J2eQ
   wikiId: E504
   type: concept
   title: AI Doomer Worldview
@@ -1132,7 +1132,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: long-timelines
-  stableId: m87MfZdIHg
+  stableId: sid_m87MfZdIHg
   wikiId: E505
   type: concept
   title: Long-Timelines Technical Worldview
@@ -1147,7 +1147,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: ea-funding-absorption-capacity
-  stableId: qkp5pxu0Fg
+  stableId: sid_qkp5pxu0Fg
   wikiId: E695
   type: concept
   title: EA Funding Absorption Capacity
@@ -1157,7 +1157,7 @@
     Anthropic-linked capital. Key constraints are talent, management capacity, and strategic clarity.
   lastUpdated: 2026-02
 - id: ftx-collapse-ea-funding-lessons
-  stableId: XfOw9fm0kQ
+  stableId: sid_XfOw9fm0kQ
   wikiId: E696
   type: concept
   title: "FTX Collapse: Lessons for EA Funding Resilience"
@@ -1167,7 +1167,7 @@
     disbursed and revealed structural vulnerabilities in EA's funding infrastructure.
   lastUpdated: 2026-02
 - id: autonomous-cooperative-agents
-  stableId: qqM20Mquew
+  stableId: sid_qqM20Mquew
   wikiId: E921
   type: concept
   title: Autonomous Cooperative Agents
@@ -1185,24 +1185,24 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: LSqNo6FATg
+    - id: sid_LSqNo6FATg
       type: approach
-    - id: N0ImU3ZcXA
+    - id: sid_N0ImU3ZcXA
       type: approach
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: DnYQRsR1pw
+    - id: sid_DnYQRsR1pw
       type: approach
-    - id: SDvbPMOcQw
+    - id: sid_SDvbPMOcQw
       type: approach
-    - id: p7pqkvIWfw
+    - id: sid_p7pqkvIWfw
       type: concept
-    - id: XuunnMt8vQ
+    - id: sid_XuunnMt8vQ
       type: concept
   lastUpdated: 2026-02
 
 - id: cooperate-bot
-  stableId: p7pqkvIWfw
+  stableId: sid_p7pqkvIWfw
   wikiId: E922
   type: concept
   title: Cooperate-Bot
@@ -1219,18 +1219,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: qqM20Mquew
+    - id: sid_qqM20Mquew
       type: concept
-    - id: XuunnMt8vQ
+    - id: sid_XuunnMt8vQ
       type: concept
-    - id: LSqNo6FATg
+    - id: sid_LSqNo6FATg
       type: approach
-    - id: N0ImU3ZcXA
+    - id: sid_N0ImU3ZcXA
       type: approach
   lastUpdated: 2026-02
 
 - id: cooperative-funding-mechanisms
-  stableId: XuunnMt8vQ
+  stableId: sid_XuunnMt8vQ
   wikiId: E923
   type: concept
   title: Cooperative Funding Mechanisms
@@ -1248,18 +1248,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: qqM20Mquew
+    - id: sid_qqM20Mquew
       type: concept
-    - id: p7pqkvIWfw
+    - id: sid_p7pqkvIWfw
       type: concept
-    - id: LSqNo6FATg
+    - id: sid_LSqNo6FATg
       type: approach
-    - id: DnYQRsR1pw
+    - id: sid_DnYQRsR1pw
       type: approach
   lastUpdated: 2026-02
 
 - id: optimistic
-  stableId: VhzJsfCVOA
+  stableId: sid_VhzJsfCVOA
   wikiId: E506
   type: concept
   title: Optimistic Alignment Worldview
@@ -1275,7 +1275,7 @@
   lastUpdated: 2026-02
 
 - id: ai-assisted-legislation
-  stableId: UcJzT3w0Sw
+  stableId: sid_UcJzT3w0Sw
   wikiId: E2014
   type: analysis
   title: AI-Assisted Legislation
@@ -1285,21 +1285,21 @@
     drafting tools, regulatory AI, congressional adoption, and academic research
     in computational law.
   relatedEntries:
-    - id: hrCbRXB4rg
+    - id: sid_hrCbRXB4rg
       type: organization
-    - id: 92Op4ymvxQ
+    - id: sid_92Op4ymvxQ
       type: organization
-    - id: RIqV81buCg
+    - id: sid_RIqV81buCg
       type: organization
-    - id: HMEZGsaP3A
+    - id: sid_HMEZGsaP3A
       type: organization
-    - id: TCbaQbZwDA
+    - id: sid_TCbaQbZwDA
       type: organization
-    - id: YqPeeaLCgQ
+    - id: sid_YqPeeaLCgQ
       type: organization
-    - id: dy97FfG3Mw
+    - id: sid_dy97FfG3Mw
       type: organization
-    - id: P33feJM86w
+    - id: sid_P33feJM86w
       type: organization
   clusters:
     - governance
@@ -1307,7 +1307,7 @@
   lastUpdated: 2026-03
 
 - id: elite-coordination-infrastructure
-  stableId: T5kYZL4jKQ
+  stableId: sid_T5kYZL4jKQ
   wikiId: E2065
   type: concept
   title: Elite Coordination Infrastructure
@@ -1321,7 +1321,7 @@
   lastUpdated: 2026-03
 
 - id: intra-coalition-engagement-strategies
-  stableId: q1VJt8n70A
+  stableId: sid_q1VJt8n70A
   wikiId: E2066
   type: concept
   title: Intra-Coalition Engagement Strategies

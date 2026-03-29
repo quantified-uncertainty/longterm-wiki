@@ -9,15 +9,16 @@ import {
 
 describe("ids", () => {
   describe("generateId", () => {
-    it("returns a 10-character string", () => {
+    it("returns a sid_-prefixed 14-character string", () => {
       const id = generateId();
-      expect(id).toHaveLength(10);
+      expect(id).toHaveLength(14);
+      expect(id.startsWith("sid_")).toBe(true);
     });
 
-    it("returns only alphanumeric characters (no - or _)", () => {
+    it("returns sid_ prefix + alphanumeric characters (no - or _)", () => {
       for (let i = 0; i < 50; i++) {
         const id = generateId();
-        expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
+        expect(id).toMatch(/^sid_[A-Za-z0-9]{10}$/);
       }
     });
 
@@ -33,8 +34,8 @@ describe("ids", () => {
   describe("generateStableId (deprecated alias)", () => {
     it("returns same format as generateId", () => {
       const id = generateStableId();
-      expect(id).toHaveLength(10);
-      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
+      expect(id).toHaveLength(14);
+      expect(id).toMatch(/^sid_[A-Za-z0-9]{10}$/);
     });
   });
 

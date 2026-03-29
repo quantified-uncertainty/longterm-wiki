@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
@@ -55,12 +56,35 @@ export function GrantsTable({
   rows: GrantRow[];
   funders: FunderSummary[];
 }) {
-  const [search, setSearch] = useState("");
-  const [funderFilter, setFunderFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [sortKey, setSortKey] = useState<SortKey>("amount");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [page, setPage] = useState(0);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
+  const [funderFilter, setFunderFilter] = useState<string>(() => searchParams.get("funder") ?? "all");
+  const [statusFilter, setStatusFilter] = useState<string>(() => searchParams.get("status") ?? "all");
+  const [sortKey, setSortKey] = useState<SortKey>(() => (searchParams.get("sort") as SortKey) || "amount");
+  const [sortDir, setSortDir] = useState<SortDir>(() => (searchParams.get("dir") as SortDir) || "desc");
+  const [page, setPage] = useState(() => {
+    const p = parseInt(searchParams.get("page") ?? "0", 10);
+    return Number.isFinite(p) && p >= 0 ? p : 0;
+  });
+
+  const updateUrl = useCallback(
+    (updates: Record<string, string | null>) => {
+      const params = new URLSearchParams(searchParams.toString());
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === null || value === "" || value === "all" || (key === "sort" && value === "amount") || (key === "dir" && value === "desc") || (key === "page" && value === "0")) {
+          params.delete(key);
+        } else {
+          params.set(key, value);
+        }
+      }
+      const query = params.toString();
+      router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+    },
+    [router, pathname, searchParams],
+  );
 
   // Dynamically detect whether status data exists in the dataset.
   // The grant import pipeline currently sets status to null for all PG-sourced
@@ -88,13 +112,17 @@ export function GrantsTable({
   }, [rows]);
 
   const handleSort = (key: SortKey) => {
+    let newDir: SortDir;
     if (sortKey === key) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+      newDir = sortDir === "asc" ? "desc" : "asc";
+      setSortDir(newDir);
     } else {
+      newDir = key === "name" || key === "organization" || key === "recipient" || key === "program" ? "asc" : "desc";
       setSortKey(key);
-      setSortDir(key === "name" || key === "organization" || key === "recipient" || key === "program" ? "asc" : "desc");
+      setSortDir(newDir);
     }
     setPage(0);
+    updateUrl({ sort: key, dir: newDir, page: null });
   };
 
   const filtered = useMemo(() => {
@@ -141,6 +169,7 @@ export function GrantsTable({
             onChange={(e) => {
               setSearch(e.target.value);
               setPage(0);
+              updateUrl({ search: e.target.value, page: null });
             }}
             className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-64"
           />
@@ -152,6 +181,7 @@ export function GrantsTable({
                 onClick={() => {
                   setStatusFilter("all");
                   setPage(0);
+                  updateUrl({ status: null, page: null });
                 }}
                 aria-pressed={statusFilter === "all"}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
@@ -170,8 +200,10 @@ export function GrantsTable({
                   type="button"
                   key={s}
                   onClick={() => {
-                    setStatusFilter(statusFilter === s ? "all" : s);
+                    const next = statusFilter === s ? "all" : s;
+                    setStatusFilter(next);
                     setPage(0);
+                    updateUrl({ status: next, page: null });
                   }}
                   aria-pressed={statusFilter === s}
                   className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
@@ -199,6 +231,7 @@ export function GrantsTable({
               onClick={() => {
                 setFunderFilter("all");
                 setPage(0);
+                updateUrl({ funder: null, page: null });
               }}
               aria-pressed={funderFilter === "all"}
               className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
@@ -217,8 +250,10 @@ export function GrantsTable({
                 type="button"
                 key={f.id}
                 onClick={() => {
-                  setFunderFilter(funderFilter === f.id ? "all" : f.id);
+                  const next = funderFilter === f.id ? "all" : f.id;
+                  setFunderFilter(next);
                   setPage(0);
+                  updateUrl({ funder: next, page: null });
                 }}
                 aria-pressed={funderFilter === f.id}
                 className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
@@ -247,7 +282,7 @@ export function GrantsTable({
           pageCount={totalPages}
           totalItems={filtered.length}
           pageSize={PAGE_SIZE}
-          onPageChange={setPage}
+          onPageChange={(p) => { setPage(p); updateUrl({ page: String(p) }); }}
         />
       </div>
 
@@ -400,7 +435,7 @@ export function GrantsTable({
           pageCount={totalPages}
           totalItems={filtered.length}
           pageSize={PAGE_SIZE}
-          onPageChange={setPage}
+          onPageChange={(p) => { setPage(p); updateUrl({ page: String(p) }); }}
         />
       </div>
     </div>

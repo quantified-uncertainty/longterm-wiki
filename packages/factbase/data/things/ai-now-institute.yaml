@@ -1,4 +1,4 @@
-entity: VJacG0VE2w
+entity: sid_VJacG0VE2w
 facts:
   - id: f_bZ2ZkRMSLJ
     property: founded-date
@@ -16,8 +16,8 @@ facts:
   - id: f_H3jscXNPlN
     property: founded-by
     value:
-      - !ref 77SnPuPnk8
-      - !ref 3R1I5JCrP4
+      - !ref sid_77SnPuPnk8
+      - !ref sid_3R1I5JCrP4
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "Co-founded by Kate Crawford (researcher) and Meredith Whittaker (now
       Signal president)"
@@ -76,8 +76,8 @@ facts:
   - id: f_ntfwCB5oLi
     property: key-person
     value:
-      - !ref xTqcQVprIH
-      - !ref lCvbYl5SE0
+      - !ref sid_xTqcQVprIH
+      - !ref sid_lCvbYl5SE0
     asOf: 2023
     source: https://ainowinstitute.org/about
     notes: "Amba Kak and Sarah Myers West serve as Co-Executive Directors since 2023"

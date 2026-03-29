@@ -3,7 +3,7 @@
 
 # Organizations
 - id: quri
-  stableId: Khej79OA8g
+  stableId: sid_Khej79OA8g
   wikiId: E238
   type: organization
   orgType: safety-org
@@ -93,7 +93,7 @@
   lastUpdated: 2026-03
 
 - id: metaculus
-  stableId: CUBiiyCfOA
+  stableId: sid_CUBiiyCfOA
   wikiId: E199
   type: organization
   orgType: startup
@@ -101,15 +101,15 @@
   description: Reputation-based prediction aggregation platform that has become the primary source for AI timeline forecasts, with over 1 million predictions across 15,000+ questions. Created by Anthony Aguirre (FLI/FLF President).
   path: /knowledge-base/organizations/metaculus/
   relatedEntries:
-    - id: dVQzYIAN3A
+    - id: sid_dVQzYIAN3A
       type: person
       relationship: created-by
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
   lastUpdated: 2026-03
 
 - id: fri
-  stableId: KslhqGaeJw
+  stableId: sid_KslhqGaeJw
   wikiId: E147
   type: organization
   orgType: academic
@@ -120,7 +120,7 @@
 
 # Projects
 - id: squiggle
-  stableId: nAjP2vwwSw
+  stableId: sid_nAjP2vwwSw
   wikiId: E286
   type: project
   title: Squiggle
@@ -133,7 +133,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: metaforecast
-  stableId: 1tpQRlyyIQ
+  stableId: sid_1tpQRlyyIQ
   wikiId: E200
   type: project
   title: Metaforecast
@@ -146,7 +146,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: squiggleai
-  stableId: 8slnDr4emg
+  stableId: sid_8slnDr4emg
   wikiId: E287
   type: project
   title: SquiggleAI
@@ -158,7 +158,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: squiggle-hub
-  stableId: esASr3BOVQ
+  stableId: sid_esASr3BOVQ
   wikiId: E1944
   type: project
   title: Squiggle Hub
@@ -180,7 +180,7 @@
   lastUpdated: 2026-03
 
 - id: guesstimate
-  stableId: MlKFIMTdRg
+  stableId: sid_MlKFIMTdRg
   wikiId: E1945
   type: project
   title: Guesstimate
@@ -195,7 +195,7 @@
   lastUpdated: 2026-03
 
 - id: xpt
-  stableId: PnUBtoCeMw
+  stableId: sid_PnUBtoCeMw
   wikiId: E379
   type: project
   title: XPT (Existential Risk Persuasion Tournament)
@@ -208,7 +208,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: forecastbench
-  stableId: 2smzyptQJg
+  stableId: sid_2smzyptQJg
   wikiId: E144
   type: project
   title: ForecastBench
@@ -221,7 +221,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: ai-forecasting-benchmark
-  stableId: fNqR8JGdog
+  stableId: sid_fNqR8JGdog
   wikiId: E10
   type: project
   title: AI Forecasting Benchmark Tournament
@@ -233,7 +233,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: ai-assisted-knowledge-management
-  stableId: TWli6On67Q
+  stableId: sid_TWli6On67Q
   wikiId: E681
   type: concept
   title: AI-Assisted Knowledge Management
@@ -243,7 +243,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: grokipedia
-  stableId: 2QDkp6k5pw
+  stableId: sid_2QDkp6k5pw
   wikiId: E682
   type: project
   title: Grokipedia
@@ -256,7 +256,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: wikipedia-and-ai
-  stableId: xJjtghDmcw
+  stableId: sid_xJjtghDmcw
   wikiId: E683
   type: concept
   title: Wikipedia and AI Content
@@ -266,7 +266,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: foretold
-  stableId: pF3vNTBCmg
+  stableId: sid_pF3vNTBCmg
   type: project
   title: Foretold.io
   projectStatus: deprecated
@@ -279,7 +279,7 @@
   lastUpdated: 2026-03
 
 - id: utility-function-extractor
-  stableId: t9w0BEC2zQ
+  stableId: sid_t9w0BEC2zQ
   type: project
   title: Utility Function Extractor
   projectStatus: archived
@@ -291,7 +291,7 @@
   lastUpdated: 2026-03
 
 - id: ai-safety-papers
-  stableId: T6AGNzTdKw
+  stableId: sid_T6AGNzTdKw
   type: project
   title: AI Safety Papers
   projectStatus: archived

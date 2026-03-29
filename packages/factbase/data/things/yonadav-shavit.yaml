@@ -1,4 +1,4 @@
-entity: 5Z1YE2bJbj
+entity: sid_5Z1YE2bJbj
 facts:
   - id: f_9Cprm7Squ8
     property: description
@@ -19,14 +19,14 @@ facts:
 
   - id: f_h0UXrzjdpJ
     property: employed-by
-    value: !ref 1LcLlMGLbw
+    value: !ref sid_1LcLlMGLbw
     role: "Policy Staff"
     source: https://yonadavshavit.com/
     asOf: "2024"
 
   - id: f_it9naaB0SG
     property: employed-by
-    value: !ref h6ntSGk8fg
+    value: !ref sid_h6ntSGk8fg
     role: "AI Policy Lead"
     notes: "Previously AI policy lead at Schmidt Futures before joining OpenAI"
     validEnd: "2024"

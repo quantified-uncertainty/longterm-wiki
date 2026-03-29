@@ -1,4 +1,4 @@
-entity: Khej79OA8g
+entity: sid_Khej79OA8g
 facts:
   - id: f_hdxXdOaXLg
     property: description
@@ -41,7 +41,7 @@ facts:
 
   - id: f_QR8fiscal01
     property: fiscal-sponsor
-    value: !ref t0p43V5oLA
+    value: !ref sid_t0p43V5oLA
     asOf: !date 2023
     source: https://quantifieduncertainty.org/about/
     notes: Fiscally sponsored under Rethink Priorities Special Projects Program since 2023
@@ -49,7 +49,7 @@ facts:
   - id: f_QR9fndby01
     property: founded-by
     value:
-      - !ref 24aX2Ru7Dg
+      - !ref sid_24aX2Ru7Dg
     notes: Founded by Ozzie Gooen in 2019
 
   - id: f_QR9fndby02

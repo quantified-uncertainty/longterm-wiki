@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: buck-shlegeris
-  stableId: Z62bQynY4g
+  stableId: sid_Z62bQynY4g
   wikiId: E46
   type: person
   title: Buck Shlegeris
@@ -14,7 +14,7 @@
     - label: Known For
       value: AI safety research, Redwood Research leadership
 - id: chris-olah
-  stableId: Tz48rTriBg
+  stableId: sid_Tz48rTriBg
   wikiId: E59
   type: person
   title: Chris Olah
@@ -22,11 +22,11 @@
     - Christopher Olah
   website: https://colah.github.io
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
   customFields:
     - label: Role
@@ -71,7 +71,7 @@
     - monosemanticity
   lastUpdated: 2025-12
 - id: connor-leahy
-  stableId: CrXoCsIucX
+  stableId: sid_CrXoCsIucX
   wikiId: E71
   type: person
   title: Connor Leahy
@@ -79,9 +79,9 @@
     - Connor
   website: https://conjecture.dev
   relatedEntries:
-    - id: Tz48rTriBg
+    - id: sid_Tz48rTriBg
       type: person
-    - id: zaRXTCXPPk
+    - id: sid_zaRXTCXPPk
       type: person
   customFields:
     - label: Role
@@ -123,17 +123,17 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: dan-hendrycks
-  stableId: VoNqoBJkyg
+  stableId: sid_VoNqoBJkyg
   wikiId: E89
   type: person
   title: Dan Hendrycks
   website: https://hendrycks.com
   relatedEntries:
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: nGFBXZeM3d
+    - id: sid_nGFBXZeM3d
       type: person
   customFields:
     - label: Role
@@ -174,7 +174,7 @@
     - compute-governance
   lastUpdated: 2025-12
 - id: daniela-amodei
-  stableId: tKMznr07QA
+  stableId: sid_tKMznr07QA
   wikiId: E90
   type: person
   title: Daniela Amodei
@@ -188,7 +188,7 @@
       value: Co-founding Anthropic, Operations and business leadership
   description: "Co-founder and President of Anthropic, previously VP of Operations at OpenAI. Leads the business and operational strategy of Anthropic alongside her brother Dario Amodei as CEO."
 - id: dario-amodei
-  stableId: zR4nW8xB2f
+  stableId: sid_zR4nW8xB2f
   wikiId: E91
   type: person
   title: Dario Amodei
@@ -196,14 +196,14 @@
     - Dario
   website: https://anthropic.com
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: CsWO4o3gZw
+    - id: sid_CsWO4o3gZw
       type: safety-agenda
-    - id: hQ7mR2kN5p
+    - id: sid_hQ7mR2kN5p
       type: person
 - id: demis-hassabis
-  stableId: Aqcyu3onCA
+  stableId: sid_Aqcyu3onCA
   wikiId: E101
   type: person
   title: Demis Hassabis
@@ -211,7 +211,7 @@
     - Demis
   description: "Co-founder and CEO of Google DeepMind, the merged entity of DeepMind and Google Brain. Nobel Prize in Chemistry co-recipient (2024) for AlphaFold protein structure prediction. A key architect of DeepMind's reinforcement learning and scientific AI research agenda."
 - id: eliezer-yudkowsky
-  stableId: fS1tEGKuNq
+  stableId: sid_fS1tEGKuNq
   wikiId: E114
   type: person
   title: Eliezer Yudkowsky
@@ -220,13 +220,13 @@
     - EY
   website: https://intelligence.org
   relatedEntries:
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: AMhUctK34Q
+    - id: sid_AMhUctK34Q
       type: risk
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
   customFields:
     - label: Role
@@ -273,7 +273,7 @@
     - deception
   lastUpdated: 2025-12
 - id: elizabeth-kelly
-  stableId: 1CHfDs0vsg
+  stableId: sid_1CHfDs0vsg
   wikiId: E115
   type: person
   title: Elizabeth Kelly
@@ -286,19 +286,19 @@
     - label: Known For
       value: Leading US AI Safety Institute, AI policy
 - id: evan-hubinger
-  stableId: XnqqKHiNmw
+  stableId: sid_XnqqKHiNmw
   wikiId: E129
   type: person
   title: Evan Hubinger
   description: "AI safety researcher formerly at Anthropic and MIRI, known for the influential risks from learned optimization framework and the concept of deceptive alignment (mesa-optimization). Author of key foundational work on inner alignment and corrigibility."
 - id: gary-marcus
-  stableId: ILx7EzDqXQ
+  stableId: sid_ILx7EzDqXQ
   wikiId: E148
   type: person
   title: Gary Marcus
   description: Cognitive scientist and AI critic, known for skepticism of deep learning's path to AGI and advocacy for hybrid AI approaches.
 - id: geoffrey-hinton
-  stableId: 5N5UqXNkkg
+  stableId: sid_5N5UqXNkkg
   wikiId: E149
   type: person
   title: Geoffrey Hinton
@@ -307,7 +307,7 @@
     - Godfather of Deep Learning
   website: https://www.cs.toronto.edu/~hinton/
   relatedEntries:
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
   customFields:
     - label: Role
@@ -351,20 +351,20 @@
     - autonomous-weapons
   lastUpdated: 2025-12
 - id: ajeya-cotra
-  stableId: dPzCwzIxiQ
+  stableId: sid_dPzCwzIxiQ
   wikiId: E864
   type: person
   title: Ajeya Cotra
   website: https://metr.org
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: eQh3ZhWv8D
+    - id: sid_eQh3ZhWv8D
       type: person
 - id: holden-karnofsky
-  stableId: eQh3ZhWv8D
+  stableId: sid_eQh3ZhWv8D
   wikiId: E156
   type: person
   title: Holden Karnofsky
@@ -372,7 +372,7 @@
     - Holden
   website: https://coefficientgiving.org
   relatedEntries:
-    - id: 8nmqy7vFiA
+    - id: sid_8nmqy7vFiA
       type: person
   customFields:
     - label: Role
@@ -415,7 +415,7 @@
     - grantmaking
   lastUpdated: 2025-12
 - id: ian-hogarth
-  stableId: DX4NK1gGtg
+  stableId: sid_DX4NK1gGtg
   wikiId: E162
   type: person
   title: Ian Hogarth
@@ -426,7 +426,7 @@
     - label: Known For
       value: Former Chair of UK AI Safety Institute, AI investor and writer
 - id: ilya-sutskever
-  stableId: eYrBgMLJDw
+  stableId: sid_eYrBgMLJDw
   wikiId: E163
   type: person
   title: Ilya Sutskever
@@ -434,9 +434,9 @@
     - Ilya
   website: https://ssi.inc
   relatedEntries:
-    - id: 1OSiYOaWVL
+    - id: sid_1OSiYOaWVL
       type: organization
-    - id: 5N5UqXNkkg
+    - id: sid_5N5UqXNkkg
       type: person
   customFields:
     - label: Role
@@ -478,16 +478,16 @@
     - gpt
   lastUpdated: 2025-12
 - id: jan-leike
-  stableId: hQ7mR2kN5p
+  stableId: sid_hQ7mR2kN5p
   wikiId: E182
   type: person
   title: Jan Leike
   website: https://anthropic.com
   relatedEntries:
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
 - id: nate-soares
-  stableId: 5MVd90lzCg
+  stableId: sid_5MVd90lzCg
   wikiId: E212
   type: person
   title: Nate Soares
@@ -495,7 +495,7 @@
   aliases:
     - Nate Soares (MIRI)
 - id: neel-nanda
-  stableId: zaRXTCXPPk
+  stableId: sid_zaRXTCXPPk
   wikiId: E214
   type: person
   title: Neel Nanda
@@ -504,7 +504,7 @@
   website: https://www.neelnanda.io
   relatedEntries: []
 - id: nick-bostrom
-  stableId: IQvWHA3OiF
+  stableId: sid_IQvWHA3OiF
   wikiId: E215
   type: person
   title: Nick Bostrom
@@ -512,12 +512,12 @@
     - Niklas Bostr\u00F6m
   website: https://nickbostrom.com
   relatedEntries:
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: tRj4bS6V8Q
+    - id: sid_tRj4bS6V8Q
       type: risk
 - id: paul-christiano
-  stableId: vzxfzxBITd
+  stableId: sid_vzxfzxBITd
   wikiId: E220
   type: person
   title: Paul Christiano
@@ -525,18 +525,18 @@
     - Paul
   website: https://alignment.org
   relatedEntries:
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
-    - id: fS1tEGKuNq
+    - id: sid_fS1tEGKuNq
       type: person
 - id: robin-hanson
-  stableId: DmGXPl1h2g
+  stableId: sid_DmGXPl1h2g
   wikiId: E260
   type: person
   title: Robin Hanson
   description: "Economist and futurist at George Mason University, known for work on prediction markets, near-term AI economics, and the Em scenario (brain emulation). Author of The Age of Em and co-author of The Elephant in the Brain."
 - id: sam-altman
-  stableId: JKsVHQ5stQ
+  stableId: sid_JKsVHQ5stQ
   wikiId: E269
   type: person
   title: Sam Altman
@@ -544,7 +544,7 @@
     - Samuel H. Altman
   description: "CEO of OpenAI since its founding. Previously president of Y Combinator. Central figure in the 2023 OpenAI board crisis and subsequent reinstatement. Known for public advocacy of both AI's transformative potential and the importance of safety governance."
 - id: shane-legg
-  stableId: muueuPOHfg
+  stableId: sid_muueuPOHfg
   wikiId: E280
   type: person
   title: Shane Legg
@@ -556,7 +556,7 @@
     - label: Known For
       value: Co-founding DeepMind, Early work on AGI, Machine super intelligence thesis
 - id: stuart-russell
-  stableId: ZxUirlzHke
+  stableId: sid_ZxUirlzHke
   wikiId: E290
   type: person
   title: Stuart Russell
@@ -564,21 +564,21 @@
     - Stuart J. Russell
   website: https://people.eecs.berkeley.edu/~russell/
   relatedEntries:
-    - id: zMfgJqiEPQ
+    - id: sid_zMfgJqiEPQ
       type: organization
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
 - id: toby-ord
-  stableId: 8nmqy7vFiA
+  stableId: sid_8nmqy7vFiA
   wikiId: E355
   type: person
   title: Toby Ord
   website: https://www.tobyord.com
   relatedEntries:
-    - id: IQvWHA3OiF
+    - id: sid_IQvWHA3OiF
       type: person
 - id: yoshua-bengio
-  stableId: nGFBXZeM3d
+  stableId: sid_nGFBXZeM3d
   wikiId: E380
   type: person
   title: Yoshua Bengio
@@ -586,7 +586,7 @@
     - Bengio
   website: https://yoshuabengio.org
   relatedEntries:
-    - id: XqjV4mbMXQ
+    - id: sid_XqjV4mbMXQ
       type: organization
       relationship: research
   customFields:
@@ -632,7 +632,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: elon-musk
-  stableId: 69vftmr1jg
+  stableId: sid_69vftmr1jg
   wikiId: E116
   type: person
   title: Elon Musk
@@ -640,22 +640,22 @@
     - Musk
   description: Tech entrepreneur, co-founder of OpenAI, founder of xAI. Influential voice on AI development and risks.
   relatedEntries:
-    - id: GLXKjYAEKw
+    - id: sid_GLXKjYAEKw
       type: organization
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - entrepreneur
     - ai-labs
   lastUpdated: 2025-12
 - id: beth-barnes
-  stableId: ZvfLhIm7pw
+  stableId: sid_ZvfLhIm7pw
   wikiId: E39
   type: person
   title: Beth Barnes
   description: AI safety researcher, founder of METR (formerly ARC Evals). Focus on evaluating dangerous AI capabilities.
   relatedEntries:
-    - id: myeSKJXTMA
+    - id: sid_myeSKJXTMA
       type: organization
   tags:
     - evaluations
@@ -665,7 +665,7 @@
 # Generated 2026-02-08
 
 - id: david-sacks
-  stableId: JjyNWsA91A
+  stableId: sid_JjyNWsA91A
   wikiId: E431
   type: person
   title: David Sacks
@@ -685,10 +685,10 @@
   clusters:
     - governance
   relatedEntries:
-    - id: 69vftmr1jg
+    - id: sid_69vftmr1jg
       type: person
 - id: marc-andreessen
-  stableId: qspeazccPg
+  stableId: sid_qspeazccPg
   wikiId: E432
   type: person
   title: Marc Andreessen
@@ -707,16 +707,16 @@
   clusters:
     - governance
   relatedEntries:
-    - id: rt6jVH9yuA
+    - id: sid_rt6jVH9yuA
       type: approach
     - id: bioweapons
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
   lastUpdated: 2026-02
 
 - id: max-tegmark
-  stableId: 3KjUCZCV8w
+  stableId: sid_3KjUCZCV8w
   wikiId: E433
   type: person
   title: Max Tegmark
@@ -735,18 +735,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
-    - id: dVQzYIAN3A
+    - id: sid_dVQzYIAN3A
       type: person
-    - id: l8ZPtVJdsA
+    - id: sid_l8ZPtVJdsA
       type: approach
   lastUpdated: 2026-03
 
 - id: philip-tetlock
-  stableId: BCisPStEdQ
+  stableId: sid_BCisPStEdQ
   wikiId: E434
   type: person
   title: Philip Tetlock
@@ -766,16 +766,16 @@
   clusters:
     - epistemics
   relatedEntries:
-    - id: Zx7ckq6syw
+    - id: sid_Zx7ckq6syw
       type: organization
-    - id: KslhqGaeJw
+    - id: sid_KslhqGaeJw
       type: organization
-    - id: CUBiiyCfOA
+    - id: sid_CUBiiyCfOA
       type: organization
   lastUpdated: 2026-02
 
 - id: eli-lifland
-  stableId: wjtZjN8acQ
+  stableId: sid_wjtZjN8acQ
   wikiId: E435
   type: person
   title: Eli Lifland
@@ -794,18 +794,18 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: KDYvrwkgtw
+    - id: sid_KDYvrwkgtw
       type: organization
     - id: samotsvety
       type: organization
-    - id: BEKEqQDmkQ
+    - id: sid_BEKEqQDmkQ
       type: organization
     - id: quri
       type: organization
   lastUpdated: 2026-03
 
 - id: dustin-moskovitz
-  stableId: Jtj6jHbuQ7
+  stableId: sid_Jtj6jHbuQ7
   wikiId: E436
   type: person
   title: Dustin Moskovitz
@@ -828,16 +828,16 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: 6gjF5d3geg
+    - id: sid_6gjF5d3geg
       type: person
-    - id: pvJ50HupEQ
+    - id: sid_pvJ50HupEQ
       type: organization
   lastUpdated: 2026-02
 
 
 # === Auto-generated stubs for pages missing entities ===
 - id: gwern
-  stableId: 25eyvY39Bw
+  stableId: sid_25eyvY39Bw
   wikiId: E574
   type: person
   title: Gwern Branwen
@@ -851,7 +851,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: helen-toner
-  stableId: oTieHq0pRA
+  stableId: sid_oTieHq0pRA
   wikiId: E575
   type: person
   title: Helen Toner
@@ -865,7 +865,7 @@
     - governance
   lastUpdated: 2026-02
 - id: issa-rice
-  stableId: nuR3te3Rkw
+  stableId: sid_nuR3te3Rkw
   wikiId: E576
   type: person
   title: Issa Rice
@@ -879,7 +879,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: jaan-tallinn
-  stableId: 6gjF5d3geg
+  stableId: sid_6gjF5d3geg
   wikiId: E577
   type: person
   title: Jaan Tallinn
@@ -894,12 +894,12 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: Qns43S795w
+    - id: sid_Qns43S795w
       type: organization
-    - id: 3KjUCZCV8w
+    - id: sid_3KjUCZCV8w
       type: person
 - id: leopold-aschenbrenner
-  stableId: izkduIMBDg
+  stableId: sid_izkduIMBDg
   wikiId: E578
   type: person
   title: Leopold Aschenbrenner
@@ -913,7 +913,7 @@
     - governance
   lastUpdated: 2026-02
 - id: slava-matyukhin
-  stableId: 9TS0Cj5u5Q
+  stableId: sid_9TS0Cj5u5Q
   wikiId: E1946
   type: person
   title: Slava Matyukhin
@@ -931,7 +931,7 @@
   lastUpdated: 2026-03
 
 - id: nuno-sempere
-  stableId: AnFfbQlIog
+  stableId: sid_AnFfbQlIog
   wikiId: E579
   type: person
   title: Nuño Sempere
@@ -946,7 +946,7 @@
     - epistemics
   relatedEntries: []
 - id: vidur-kapur
-  stableId: XqvdX3YisQ
+  stableId: sid_XqvdX3YisQ
   wikiId: E580
   type: person
   title: Vidur Kapur
@@ -961,7 +961,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: vipul-naik
-  stableId: OdDfkoWwQg
+  stableId: sid_OdDfkoWwQg
   wikiId: E581
   type: person
   title: Vipul Naik
@@ -975,7 +975,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: yann-lecun
-  stableId: cMbVUVK29Q
+  stableId: sid_cMbVUVK29Q
   wikiId: E582
   type: person
   title: Yann LeCun
@@ -991,7 +991,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sam-bankman-fried
-  stableId: sace2bALew
+  stableId: sid_sace2bALew
   wikiId: E857
   type: person
   title: Sam Bankman-Fried
@@ -1004,11 +1004,11 @@
     estimated $8–9 billion in customer funds. His collapse severely damaged the
     EA community's reputation and disrupted AI safety funding pipelines.
   relatedEntries:
-    - id: yevJm2XDsQ
+    - id: sid_yevJm2XDsQ
       type: organization
-    - id: JhIGCaI3Ng
+    - id: sid_JhIGCaI3Ng
       type: organization
-    - id: gNsqAes7Dw
+    - id: sid_gNsqAes7Dw
       type: organization
   clusters:
     - ai-safety
@@ -1016,23 +1016,23 @@
   lastUpdated: 2026-02
 
 - id: nick-beckstead
-  stableId: licWPlOJMg
+  stableId: sid_licWPlOJMg
   wikiId: E861
   type: person
   title: Nick Beckstead
   website: https://www.nickbeckstead.com/
   relatedEntries: []
 - id: will-macaskill
-  stableId: p1P9oQwB6w
+  stableId: sid_p1P9oQwB6w
   wikiId: E862
   type: person
   title: Will MacAskill
   website: https://www.willmacaskill.com/
   relatedEntries:
-    - id: aKZsmUeuWg
+    - id: sid_aKZsmUeuWg
       type: organization
 - id: joe-biden
-  stableId: 6kAEE9sPCg
+  stableId: sid_6kAEE9sPCg
   wikiId: E1017
   type: person
   summaryPage: people-overview
@@ -1042,9 +1042,9 @@
     AI on October 30, 2023, the most comprehensive US government action on AI policy. The EO was revoked by
     President Trump on January 20, 2025.
   relatedEntries:
-    - id: pz3KSt33AA
+    - id: sid_pz3KSt33AA
       type: policy
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
   customFields:
     - label: Role
@@ -1057,7 +1057,7 @@
   lastUpdated: 2026-03
 
 - id: andrej-karpathy
-  stableId: Q9eaz6joHA
+  stableId: sid_Q9eaz6joHA
   wikiId: E1287
   type: person
   title: "Andrej Karpathy"
@@ -1074,7 +1074,7 @@
     - ai
 
 - id: mustafa-suleyman
-  stableId: DBq1ddu8Mg
+  stableId: sid_DBq1ddu8Mg
   wikiId: E1288
   type: person
   title: "Mustafa Suleyman"
@@ -1090,7 +1090,7 @@
     - ai
 
 - id: jack-clark
-  stableId: YqSmRNVRAg
+  stableId: sid_YqSmRNVRAg
   wikiId: E1248
   type: person
   title: "Jack Clark"
@@ -1106,7 +1106,7 @@
     - ai
 
 - id: sam-mccandlish
-  stableId: ENl8sgChDQ
+  stableId: sid_ENl8sgChDQ
   wikiId: E1259
   type: person
   title: "Sam McCandlish"
@@ -1121,7 +1121,7 @@
     - ai
 
 - id: jared-kaplan
-  stableId: x16GL4gP2A
+  stableId: sid_x16GL4gP2A
   wikiId: E1239
   type: person
   title: "Jared Kaplan"
@@ -1137,7 +1137,7 @@
     - ai
 
 - id: mira-murati
-  stableId: yiBasS5uXQ
+  stableId: sid_yiBasS5uXQ
   wikiId: E1289
   type: person
   title: "Mira Murati"
@@ -1153,7 +1153,7 @@
     - ai
 
 - id: satya-nadella
-  stableId: 1L16qpyk5A
+  stableId: sid_1L16qpyk5A
   wikiId: E1290
   type: person
   title: "Satya Nadella"
@@ -1169,7 +1169,7 @@
     - ai
 
 - id: sundar-pichai
-  stableId: APUqKVNaAA
+  stableId: sid_APUqKVNaAA
   wikiId: E1291
   type: person
   title: "Sundar Pichai"
@@ -1184,7 +1184,7 @@
     - ai
 
 - id: jensen-huang
-  stableId: So79iNy2sQ
+  stableId: sid_So79iNy2sQ
   wikiId: E1292
   type: person
   title: "Jensen Huang"
@@ -1200,7 +1200,7 @@
     - ai
 
 - id: mark-zuckerberg
-  stableId: OxXXTxtbrA
+  stableId: sid_OxXXTxtbrA
   wikiId: E1293
   type: person
   title: "Mark Zuckerberg"
@@ -1216,7 +1216,7 @@
     - ai
 
 - id: katja-grace
-  stableId: t2wkJarnWQ
+  stableId: sid_t2wkJarnWQ
   wikiId: E1294
   type: person
   title: "Katja Grace"
@@ -1232,7 +1232,7 @@
     - ai
 
 - id: allan-dafoe
-  stableId: uNNO9uwEoA
+  stableId: sid_uNNO9uwEoA
   wikiId: E1295
   type: person
   title: "Allan Dafoe"
@@ -1248,7 +1248,7 @@
     - ai
 
 - id: victoria-krakovna
-  stableId: utxQdymSEg
+  stableId: sid_utxQdymSEg
   wikiId: E1296
   type: person
   title: "Victoria Krakovna"
@@ -1265,7 +1265,7 @@
     - ai
 
 - id: rohin-shah
-  stableId: GAlcP90tvw
+  stableId: sid_GAlcP90tvw
   wikiId: E1297
   type: person
   title: "Rohin Shah"
@@ -1281,7 +1281,7 @@
     - ai
 
 - id: richard-ngo
-  stableId: FB9xXKFuqg
+  stableId: sid_FB9xXKFuqg
   wikiId: E1298
   type: person
   title: "Richard Ngo"
@@ -1297,7 +1297,7 @@
     - ai
 
 - id: jacob-steinhardt
-  stableId: C20cHdGiHQ
+  stableId: sid_C20cHdGiHQ
   wikiId: E1299
   type: person
   title: "Jacob Steinhardt"
@@ -1314,7 +1314,7 @@
     - ai
 
 - id: scott-alexander
-  stableId: ykTqvdkiLQ
+  stableId: sid_ykTqvdkiLQ
   wikiId: E1308
   type: person
   title: "Scott Alexander"
@@ -1331,7 +1331,7 @@
     - ai
 
 - id: luke-muehlhauser
-  stableId: TclWePCJ7w
+  stableId: sid_TclWePCJ7w
   wikiId: E1306
   type: person
   title: "Luke Muehlhauser"
@@ -1348,7 +1348,7 @@
     - ai
 
 - id: andrew-ng
-  stableId: v13BF4zP2A
+  stableId: sid_v13BF4zP2A
   wikiId: E1307
   type: person
   title: "Andrew Ng"
@@ -1365,7 +1365,7 @@
     - ai
 
 - id: fei-fei-li
-  stableId: QzcX3bShmQ
+  stableId: sid_QzcX3bShmQ
   wikiId: E1303
   type: person
   title: "Fei-Fei Li"
@@ -1381,7 +1381,7 @@
     - ai
 
 - id: david-krueger
-  stableId: ATFBoSnuqA
+  stableId: sid_ATFBoSnuqA
   wikiId: E1304
   type: person
   title: "David Krueger"
@@ -1398,7 +1398,7 @@
     - ai
 
 - id: timnit-gebru
-  stableId: xVdjAKxCSQ
+  stableId: sid_xVdjAKxCSQ
   wikiId: E1305
   type: person
   title: "Timnit Gebru"
@@ -1415,7 +1415,7 @@
 
 
 - id: anthony-aguirre
-  stableId: dVQzYIAN3A
+  stableId: sid_dVQzYIAN3A
   type: person
   title: Anthony Aguirre
   website: https://www.flf.org
@@ -1438,7 +1438,7 @@
     - governance
     - epistemics
   relatedEntries:
-    - id: 518H1VpKLA
+    - id: sid_518H1VpKLA
       type: organization
   customFields:
     - label: Role
@@ -1455,7 +1455,7 @@
   lastUpdated: 2026-03
 
 - id: ben-goldhaber
-  stableId: 0tQftJKP4Q
+  stableId: sid_0tQftJKP4Q
   type: person
   title: Ben Goldhaber
   description: >-
@@ -1485,16 +1485,16 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: xPfsyJ9s4Q
+    - id: sid_xPfsyJ9s4Q
       type: approach
-    - id: lCiT37k9pA
+    - id: sid_lCiT37k9pA
       type: organization
-    - id: Khej79OA8g
+    - id: sid_Khej79OA8g
       type: organization
-    - id: sdM7KbGOGg
+    - id: sid_sdM7KbGOGg
       type: person
 - id: josh-jacobson
-  stableId: fslZ4KLnXg
+  stableId: sid_fslZ4KLnXg
   type: person
   title: Josh Jacobson
   description: >-
@@ -1511,7 +1511,7 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: Zmw9nfUYWA
+    - id: sid_Zmw9nfUYWA
       type: organization
   customFields:
     - label: Role
@@ -1524,7 +1524,7 @@
   lastUpdated: 2026-03
 
 - id: oliver-sourbut
-  stableId: sdM7KbGOGg
+  stableId: sid_sdM7KbGOGg
   type: person
   title: Oliver Sourbut
   description: >-
@@ -1548,12 +1548,12 @@
     - epistemics
     - governance
   relatedEntries:
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: 0tQftJKP4Q
+    - id: sid_0tQftJKP4Q
       type: person
 - id: elizabeth-garrett
-  stableId: rWMi3jrTCQ
+  stableId: sid_rWMi3jrTCQ
   type: person
   title: Elizabeth Garrett
   description: >-
@@ -1569,7 +1569,7 @@
     - community
   relatedEntries: []
 - id: richard-mallah
-  stableId: mK2KLknYGg
+  stableId: sid_mK2KLknYGg
   type: person
   title: Richard Mallah
   description: >-
@@ -1585,10 +1585,10 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: Vc6W6S1qMg
+    - id: sid_Vc6W6S1qMg
       type: organization
 - id: timothy-telleen-lawton
-  stableId: 4ZKddwff5g
+  stableId: sid_4ZKddwff5g
   type: person
   title: Timothy Telleen-Lawton
   description: >-
@@ -1601,7 +1601,7 @@
   clusters:
     - community
   relatedEntries:
-    - id: OwXl35e7bg
+    - id: sid_OwXl35e7bg
       type: organization
   customFields:
     - label: Role
@@ -1609,7 +1609,7 @@
   lastUpdated: 2026-03
 
 - id: kathleen-finlinson
-  stableId: q607cJo21g
+  stableId: sid_q607cJo21g
   type: person
   title: Kathleen Finlinson
   description: >-
@@ -1627,7 +1627,7 @@
     - community
   relatedEntries: []
 - id: scott-wiener
-  stableId: HLc6VrCh5w
+  stableId: sid_HLc6VrCh5w
   wikiId: E1471
   type: person
   title: Scott Wiener
@@ -1644,7 +1644,7 @@
     - label: Known For
       value: "SB 1047, SB 53, AI safety legislation"
   relatedEntries:
-    - id: UD11PlWtlg
+    - id: sid_UD11PlWtlg
       type: policy
   tags:
     - ai-governance
@@ -1652,7 +1652,7 @@
     - legislation
 
 - id: gavin-newsom
-  stableId: tDwxa07Urw
+  stableId: sid_tDwxa07Urw
   wikiId: E1472
   type: person
   title: Gavin Newsom
@@ -1669,7 +1669,7 @@
       value: "SB 1047 veto, signing 18 AI bills, SB 53"
   relatedEntries: []
 - id: josue-estrada
-  stableId: FeHrdAUKpQ
+  stableId: sid_FeHrdAUKpQ
   type: person
   title: Josué Estrada
   description: >-
@@ -1687,7 +1687,7 @@
     - ai-safety
 
 - id: oliver-zhang
-  stableId: TnHMQ4cMOw
+  stableId: sid_TnHMQ4cMOw
   type: person
   title: Oliver Zhang
   description: >-
@@ -1703,7 +1703,7 @@
     - ai-safety
 
 - id: mark-nitzberg
-  stableId: 0bmt4zJZVg
+  stableId: sid_0bmt4zJZVg
   type: person
   title: Mark Nitzberg
   description: >-
@@ -1720,7 +1720,7 @@
     - ai-safety
 
 - id: mark-brakel
-  stableId: KG46JUejyg
+  stableId: sid_KG46JUejyg
   type: person
   title: Mark Brakel
   description: >-
@@ -1739,7 +1739,7 @@
     - ai-policy
 
 - id: emilia-javorsky
-  stableId: XvvppfgBPw
+  stableId: sid_XvvppfgBPw
   type: person
   title: Emilia Javorsky
   description: >-
@@ -1759,7 +1759,7 @@
     - ai-governance
 
 - id: margrethe-vestager
-  stableId: LSLuPzY3vQ
+  stableId: sid_LSLuPzY3vQ
   type: person
   title: Margrethe Vestager
   description: >-
@@ -1780,7 +1780,7 @@
     - ai-policy
 
 - id: julia-wise
-  stableId: OsJT0ukTmw
+  stableId: sid_OsJT0ukTmw
   type: person
   title: Julia Wise
   description: >-
@@ -1799,7 +1799,7 @@
     - effective-altruism
 
 - id: zach-robinson
-  stableId: VBDv1fiH9g
+  stableId: sid_VBDv1fiH9g
   type: person
   title: Zach Robinson
   description: >-
@@ -1817,7 +1817,7 @@
     - effective-altruism
 
 - id: huw-price
-  stableId: T6SowQJJbg
+  stableId: sid_T6SowQJJbg
   type: person
   title: Huw Price
   description: >-
@@ -1837,7 +1837,7 @@
     - existential-risk
 
 - id: martin-rees
-  stableId: WlwcDX4nYA
+  stableId: sid_WlwcDX4nYA
   type: person
   title: Martin Rees
   description: >-
@@ -1857,7 +1857,7 @@
     - existential-risk
 
 - id: sean-o-heigeartaigh
-  stableId: YsjgB5Gy0g
+  stableId: sid_YsjgB5Gy0g
   type: person
   title: Seán Ó hÉigeartaigh
   description: >-
@@ -1880,7 +1880,7 @@
     - existential-risk
 
 - id: jacob-hilton
-  stableId: KKCwTYU4Zw
+  stableId: sid_KKCwTYU4Zw
   type: person
   title: Jacob Hilton
   description: >-
@@ -1900,7 +1900,7 @@
     - alignment
 
 - id: jaime-sevilla
-  stableId: g7Hg6qBW6A
+  stableId: sid_g7Hg6qBW6A
   type: person
   title: Jaime Sevilla
   description: >-
@@ -1922,7 +1922,7 @@
     - epistemics
 
 - id: maria-de-la-lama
-  stableId: BoXCNeZK3w
+  stableId: sid_BoXCNeZK3w
   type: person
   title: María de la Lama Laviada
   description: >-
@@ -1940,7 +1940,7 @@
     - ai-safety
 
 - id: yafah-edelman
-  stableId: ZrowXa4u4w
+  stableId: sid_ZrowXa4u4w
   type: person
   title: Yafah Edelman
   description: >-
@@ -1959,7 +1959,7 @@
     - epistemics
 
 - id: avital-balwit
-  stableId: LWYBcu2iSQ
+  stableId: sid_LWYBcu2iSQ
   type: person
   title: Avital Balwit
   description: >-
@@ -1978,7 +1978,7 @@
     - effective-altruism
 
 - id: ketan-ramakrishnan
-  stableId: u7QD93Xjug
+  stableId: sid_u7QD93Xjug
   type: person
   title: Ketan Ramakrishnan
   description: >-
@@ -1997,7 +1997,7 @@
     - effective-altruism
 
 - id: caroline-ellison
-  stableId: U7QD93Xjug
+  stableId: sid_U7QD93Xjug
   type: person
   title: Caroline Ellison
   description: >-
@@ -2015,7 +2015,7 @@
     - effective-altruism
 
 - id: greg-brockman
-  stableId: Yq4s2cI7ng
+  stableId: sid_Yq4s2cI7ng
   wikiId: E1012
   type: person
   title: Greg Brockman
@@ -2040,7 +2040,7 @@
 # andreas-stuhlm-ller, alex-kaskasoli, ben-weinstein-raun, buck).
 
 - id: amanda-askell
-  stableId: 2qcak72NwQ
+  stableId: sid_2qcak72NwQ
   type: person
   title: Amanda Askell
   description: AI safety researcher at Anthropic, known for work on language model alignment and sycophancy.
@@ -2051,7 +2051,7 @@
     - ai
 
 - id: samuel-r-bowman
-  stableId: DikTuUb39Q
+  stableId: sid_DikTuUb39Q
   type: person
   title: Samuel R. Bowman
   description: AI safety researcher and NLP professor, known for work on language model evaluation and safety.
@@ -2062,7 +2062,7 @@
     - ai
 
 - id: alexandre-kaskasoli
-  stableId: KnHneaUKew
+  stableId: sid_KnHneaUKew
   type: person
   title: Alexandre Kaskasoli
   description: AI safety researcher known for work on dangerous capability evaluations of frontier models.
@@ -2073,7 +2073,7 @@
     - ai
 
 - id: benjamin-weinstein-raun
-  stableId: eg18B7rL4g
+  stableId: sid_eg18B7rL4g
   type: person
   title: Benjamin Weinstein-Raun
   description: Senior Researcher and acting director at Palisade Research, focused on AI safety.
@@ -2084,7 +2084,7 @@
     - ai
 
 - id: andreas-stuhlmuller
-  stableId: SqupPjf6AJ
+  stableId: sid_SqupPjf6AJ
   type: person
   title: Andreas Stuhlmüller
   description: >-
@@ -2099,7 +2099,7 @@
     - ai
 
 - id: ozzie-gooen
-  stableId: 24aX2Ru7Dg
+  stableId: sid_24aX2Ru7Dg
   type: person
   title: Ozzie Gooen
   description: >-
@@ -2133,7 +2133,7 @@
   lastUpdated: 2026-03
 
 - id: sam-nolan
-  stableId: 2Ui200bHUQ
+  stableId: sid_2Ui200bHUQ
   type: person
   title: Sam Nolan
   description: >-
@@ -2145,7 +2145,7 @@
     - epistemics
   relatedEntries: []
 - id: quinn-dougherty
-  stableId: YtooTZ0ORg
+  stableId: sid_YtooTZ0ORg
   type: person
   title: Quinn Dougherty
   description: >-
@@ -2157,7 +2157,7 @@
     - epistemics
   relatedEntries: []
 - id: elizabeth-van-nostrand
-  stableId: rF8popeiHw
+  stableId: sid_rF8popeiHw
   type: person
   title: Elizabeth Van Nostrand
   description: >-
@@ -2169,7 +2169,7 @@
     - epistemics
   relatedEntries: []
 - id: umur-ozkul
-  stableId: y9XSIBClAw
+  stableId: sid_y9XSIBClAw
   type: person
   title: Umur Ozkul
   description: >-
@@ -2180,7 +2180,7 @@
     - epistemics
   relatedEntries: []
 - id: jacob-lagerros
-  stableId: JUWVFemrYQ
+  stableId: sid_JUWVFemrYQ
   type: person
   title: Jacob Lagerros
   description: >-
@@ -2190,7 +2190,7 @@
     - epistemics
   relatedEntries: []
 - id: andrew-critch
-  stableId: ckKaHtKC5g
+  stableId: sid_ckKaHtKC5g
   type: person
   title: Andrew Critch
   description: >-
@@ -2207,7 +2207,7 @@
     - epistemics
   relatedEntries: []
 - id: peter-wildeford
-  stableId: mIbKwQ4ZwQ
+  stableId: sid_mIbKwQ4ZwQ
   type: person
   title: Peter Wildeford
   description: >-
@@ -2224,7 +2224,7 @@
   lastUpdated: 2026-03
 
 - id: misha-yagudin
-  stableId: 1oXRs4wqTA
+  stableId: sid_1oXRs4wqTA
   type: person
   title: Misha Yagudin
   description: >-
@@ -2235,7 +2235,7 @@
     - epistemics
   relatedEntries: []
 - id: tom-brown
-  stableId: 4CY8YJCrM7
+  stableId: sid_4CY8YJCrM7
   wikiId: E1258
   type: person
   title: Tom Brown
@@ -2249,7 +2249,7 @@
     - ai
 
 - id: sid-black
-  stableId: kLIpOZtU1n
+  stableId: sid_kLIpOZtU1n
   type: person
   title: Sid Black
   description: >-
@@ -2262,7 +2262,7 @@
     - ai
 
 - id: gabriel-alfour
-  stableId: n0d7I3OAej
+  stableId: sid_n0d7I3OAej
   wikiId: E2100
   type: person
   title: Gabriel Alfour
@@ -2275,7 +2275,7 @@
     - ai
 
 - id: wojciech-zaremba
-  stableId: 4eNHxKcml1
+  stableId: sid_4eNHxKcml1
   type: person
   title: Wojciech Zaremba
   description: >-
@@ -2288,7 +2288,7 @@
     - ai
 
 - id: john-schulman
-  stableId: ZocUS6ej6S
+  stableId: sid_ZocUS6ej6S
   type: person
   title: John Schulman
   description: >-
@@ -2301,7 +2301,7 @@
     - ai
 
 - id: nikolai-eroshenko
-  stableId: CBNE3Hszkr
+  stableId: sid_CBNE3Hszkr
   type: person
   title: Nikolai Eroshenko
   description: >-
@@ -2314,7 +2314,7 @@
     - biosecurity
 
 - id: hannu-rajaniemi
-  stableId: 9VlZhCkPBE
+  stableId: sid_9VlZhCkPBE
   type: person
   title: Hannu Rajaniemi
   description: >-
@@ -2327,7 +2327,7 @@
     - biosecurity
 
 - id: nate-thomas
-  stableId: R8tDuupBTt
+  stableId: sid_R8tDuupBTt
   type: person
   title: Nate Thomas
   description: >-
@@ -2340,7 +2340,7 @@
     - ai
 
 - id: daniel-gross
-  stableId: 0x0hqwKo4I
+  stableId: sid_0x0hqwKo4I
   type: person
   title: Daniel Gross
   description: >-
@@ -2354,7 +2354,7 @@
     - ai
 
 - id: daniel-levy
-  stableId: vIgoE1BeAk
+  stableId: sid_vIgoE1BeAk
   type: person
   title: Daniel Levy
   description: >-
@@ -2367,13 +2367,13 @@
     - ai
 
 - id: david-dalrymple
-  stableId: SQlb1r5EzN
+  stableId: sid_SQlb1r5EzN
   wikiId: E1998
   type: person
   title: David Dalrymple
   website: https://davidad.org
   relatedEntries:
-    - id: MEt9F7f50w
+    - id: sid_MEt9F7f50w
       type: approach
       relationship: leads-to
   sources:
@@ -2406,7 +2406,7 @@
     - formal-verification
 
 - id: vitalik-buterin
-  stableId: iEEm0cZ3tn
+  stableId: sid_iEEm0cZ3tn
   type: person
   title: Vitalik Buterin
   description: >-
@@ -2421,11 +2421,11 @@
 # --- GovAI personnel ---
 
 - id: ben-garfinkel
-  stableId: aAaiRGmdG1
+  stableId: sid_aAaiRGmdG1
   type: person
   title: Ben Garfinkel
   relatedEntries:
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
       relationship: leads-to
   sources:
@@ -2441,26 +2441,26 @@
     - ai-policy
 
 - id: markus-anderljung
-  stableId: 1nsWegMiR3
+  stableId: sid_1nsWegMiR3
   type: person
   title: Markus Anderljung
   relatedEntries: []
 - id: emma-bluemke
-  stableId: qh4CU4bV2Q
+  stableId: sid_qh4CU4bV2Q
   type: person
   title: Emma Bluemke
   relatedEntries: []
 - id: anton-korinek
-  stableId: evoWfReU6W
+  stableId: sid_evoWfReU6W
   type: person
   title: Anton Korinek
   relatedEntries: []
 - id: amba-kak
-  stableId: xTqcQVprIH
+  stableId: sid_xTqcQVprIH
   type: person
   title: Amba Kak
   relatedEntries:
-    - id: VJacG0VE2w
+    - id: sid_VJacG0VE2w
       type: organization
       relationship: leads-to
   sources:
@@ -2478,42 +2478,42 @@
     - digital-rights
 
 - id: sarah-myers-west
-  stableId: lCvbYl5SE0
+  stableId: sid_lCvbYl5SE0
   type: person
   title: Sarah Myers West
   relatedEntries: []
 - id: kate-crawford
-  stableId: 77SnPuPnk8
+  stableId: sid_77SnPuPnk8
   type: person
   title: Kate Crawford
   relatedEntries: []
 - id: meredith-whittaker
-  stableId: 3R1I5JCrP4
+  stableId: sid_3R1I5JCrP4
   type: person
   title: Meredith Whittaker
   relatedEntries: []
 - id: heidy-khlaaf
-  stableId: npfho6p1QL
+  stableId: sid_npfho6p1QL
   type: person
   title: Heidy Khlaaf
   relatedEntries: []
 - id: thomas-woodside
-  stableId: KfgopYXMo8
+  stableId: sid_KfgopYXMo8
   type: person
   title: Thomas Woodside
   relatedEntries: []
 - id: andy-zou
-  stableId: SIfbuDzvcU
+  stableId: sid_SIfbuDzvcU
   type: person
   title: Andy Zou
   relatedEntries: []
 - id: mantas-mazeika
-  stableId: j4eeIGYdY2
+  stableId: sid_j4eeIGYdY2
   type: person
   title: Mantas Mazeika
   relatedEntries: []
 - id: esben-kran
-  stableId: HwM6OF6Ewg
+  stableId: sid_HwM6OF6Ewg
   type: person
   title: Esben Kran
   website: https://kran.ai
@@ -2524,7 +2524,7 @@
     leaving graduate school. Currently serves on Apart Research's board.
     Based in Copenhagen, Denmark.
   relatedEntries:
-    - id: 5WqgebIWFQ
+    - id: sid_5WqgebIWFQ
       type: organization
       relationship: created-by
   customFields:
@@ -2543,7 +2543,7 @@
   lastUpdated: 2026-03
 
 - id: jaime-raldua-veuthey
-  stableId: TvDQT0yRcg
+  stableId: sid_TvDQT0yRcg
   type: person
   title: Jaime Raldua Veuthey
   description: >-
@@ -2551,7 +2551,7 @@
     and fellowship programs.
   relatedEntries: []
 - id: jason-hoelscher-obermaier
-  stableId: UEESj5NtPw
+  stableId: sid_UEESj5NtPw
   type: person
   title: Jason Hoelscher-Obermaier
   description: >-
@@ -2560,49 +2560,49 @@
     "Detecting Edit Failures In Large Language Models" (ACL 2023).
   relatedEntries: []
 - id: natalia-perez-campanero-antolin
-  stableId: i78bV5zHTe
+  stableId: sid_i78bV5zHTe
   type: person
   title: Natalia Perez-Campanero Antolin
   description: >-
     Research Lead at Apart Research.
   relatedEntries: []
 - id: jacob-haimes
-  stableId: Bq7bnwVybe
+  stableId: sid_Bq7bnwVybe
   type: person
   title: Jacob Haimes
   description: >-
     Research Manager at Apart Research.
   relatedEntries: []
 - id: al-hussein-saqr
-  stableId: vxQxyoROkq
+  stableId: sid_vxQxyoROkq
   type: person
   title: Al-Hussein Saqr
   description: >-
     Operations Coordinator at Apart Research.
   relatedEntries: []
 - id: clement-neo
-  stableId: UqDEDIL8tw
+  stableId: sid_UqDEDIL8tw
   type: person
   title: Clement Neo
   description: >-
     Lab Advisor at Apart Research.
   relatedEntries: []
 - id: christian-schroeder-de-witt
-  stableId: XiUFny2rFw
+  stableId: sid_XiUFny2rFw
   type: person
   title: Christian Schroeder de Witt
   description: >-
     Research Advisor at Apart Research.
   relatedEntries: []
 - id: nick-fitz
-  stableId: g2nElvI1Hj
+  stableId: sid_g2nElvI1Hj
   type: person
   title: Nick Fitz
   description: >-
     Strategy Advisor at Apart Research.
   relatedEntries: []
 - id: jeremie-harris
-  stableId: aJOiUj35UA
+  stableId: sid_aJOiUj35UA
   type: person
   title: Jeremie Harris
   description: >-
@@ -2614,7 +2614,7 @@
     - ai-governance
 
 - id: edouard-harris
-  stableId: 7lQpdb5nDg
+  stableId: sid_7lQpdb5nDg
   type: person
   title: Edouard Harris
   description: >-
@@ -2624,7 +2624,7 @@
     - ai-safety
 
 - id: john-etchemendy
-  stableId: rhgfPZYXTw
+  stableId: sid_rhgfPZYXTw
   type: person
   title: John Etchemendy
   description: >-
@@ -2635,7 +2635,7 @@
     - ai-governance
 
 - id: jennifer-pahlka
-  stableId: GwMzWw7fpA
+  stableId: sid_GwMzWw7fpA
   type: person
   title: Jennifer Pahlka
   description: >-
@@ -2647,7 +2647,7 @@
 # ── Additional AI safety people (career flow enrichment batch 2) ──
 
 - id: catherine-olsson
-  stableId: lJQbegzdX3
+  stableId: sid_lJQbegzdX3
   type: person
   title: Catherine Olsson
   description: >-
@@ -2658,7 +2658,7 @@
     - ai-safety
 
 - id: tom-henighan
-  stableId: fBHkLjfr0S
+  stableId: sid_fBHkLjfr0S
   type: person
   title: Tom Henighan
   description: >-
@@ -2669,7 +2669,7 @@
     - ai-safety
 
 - id: miles-brundage
-  stableId: B5jANSN3Ae
+  stableId: sid_B5jANSN3Ae
   type: person
   title: Miles Brundage
   description: >-
@@ -2680,7 +2680,7 @@
     - ai-governance
 
 - id: jade-leung
-  stableId: GRrd7Z857X
+  stableId: sid_GRrd7Z857X
   type: person
   title: Jade Leung
   description: >-
@@ -2691,7 +2691,7 @@
     - ai-policy
 
 - id: ryan-greenblatt
-  stableId: lkJlFaIeQb
+  stableId: sid_lkJlFaIeQb
   type: person
   title: Ryan Greenblatt
   description: >-
@@ -2702,7 +2702,7 @@
     - ai-control
 
 - id: lennart-heim
-  stableId: YOfOGwm1kh
+  stableId: sid_YOfOGwm1kh
   type: person
   title: Lennart Heim
   affiliation: RAND Corporation
@@ -2727,7 +2727,7 @@
     - hardware-governance
 
 - id: tim-fist
-  stableId: pCun4K9Bf8
+  stableId: sid_pCun4K9Bf8
   type: person
   title: Tim Fist
   role: Senior Adjunct Fellow, Technology and National Security Program
@@ -2747,7 +2747,7 @@
     - id: cnas
       type: organization
 - id: onni-aarne
-  stableId: bZxOUSEdmY
+  stableId: sid_bZxOUSEdmY
   type: person
   title: Onni Aarne
   role: Consultant, Compute Governance Team
@@ -2766,7 +2766,7 @@
     - id: iaps
       type: organization
 - id: gabriel-kulp
-  stableId: PlTs1KcYtA
+  stableId: sid_PlTs1KcYtA
   type: person
   title: Gabriel Kulp
   role: Researcher
@@ -2785,7 +2785,7 @@
     - compute-governance
 
 - id: james-petrie
-  stableId: D9naOsJk5k
+  stableId: sid_D9naOsJk5k
   type: person
   title: James Petrie
   role: Researcher
@@ -2804,7 +2804,7 @@
     - compute-governance
 
 - id: yonadav-shavit
-  stableId: 5Z1YE2bJbj
+  stableId: sid_5Z1YE2bJbj
   type: person
   title: Yonadav Shavit
   role: Policy Staff
@@ -2823,7 +2823,7 @@
     - id: openai
       type: organization
 - id: aidan-ogara
-  stableId: SM7cEzpYvl
+  stableId: sid_SM7cEzpYvl
   type: person
   title: Aidan O'Gara
   role: Researcher
@@ -2838,7 +2838,7 @@
     - compute-governance
 
 - id: aaron-scher
-  stableId: yDK4NovwS8
+  stableId: sid_yDK4NovwS8
   type: person
   title: Aaron Scher
   role: Researcher, SPAR Projects
@@ -2858,7 +2858,7 @@
     - ai-policy
 
 - id: percy-liang
-  stableId: nJAhdmv7E6
+  stableId: sid_nJAhdmv7E6
   type: person
   title: Percy Liang
   description: >-
@@ -2869,7 +2869,7 @@
     - foundation-models
 
 - id: anca-dragan
-  stableId: 1YOwxSaDsd
+  stableId: sid_1YOwxSaDsd
   type: person
   title: Anca Dragan
   description: >-
@@ -2880,7 +2880,7 @@
     - human-compatible-ai
 
 - id: ethan-perez
-  stableId: ncKwPfn8tD
+  stableId: sid_ncKwPfn8tD
   type: person
   title: Ethan Perez
   description: >-
@@ -2891,7 +2891,7 @@
     - ai-safety
 
 - id: collin-burns
-  stableId: 7Eyg6j59ep
+  stableId: sid_7Eyg6j59ep
   type: person
   title: Collin Burns
   description: >-
@@ -2902,7 +2902,7 @@
     - interpretability
 
 - id: jason-matheny
-  stableId: gA9eoKhFAM
+  stableId: sid_gA9eoKhFAM
   type: person
   title: Jason Matheny
   description: >-
@@ -2914,7 +2914,7 @@
     - national-security
 
 - id: sara-hooker
-  stableId: mtZvdUB2Pm
+  stableId: sid_mtZvdUB2Pm
   type: person
   title: Sara Hooker
   description: >-
@@ -2925,7 +2925,7 @@
     - ai-ethics
 
 - id: scott-aaronson
-  stableId: ePBtKVxUkn
+  stableId: sid_ePBtKVxUkn
   type: person
   title: Scott Aaronson
   description: >-
@@ -2937,7 +2937,7 @@
     - computational-complexity
 
 - id: jason-wei
-  stableId: E4Al7y4BJF
+  stableId: sid_E4Al7y4BJF
   type: person
   title: Jason Wei
   description: >-
@@ -2948,7 +2948,7 @@
     - ai-research
 
 - id: meg-mitchell
-  stableId: FDJkqelsHQ
+  stableId: sid_FDJkqelsHQ
   type: person
   title: Meg Mitchell
   description: >-
@@ -2959,7 +2959,7 @@
     - responsible-ai
 
 - id: emily-bender
-  stableId: N2uGQXnMvD
+  stableId: sid_N2uGQXnMvD
   type: person
   title: Emily Bender
   description: >-
@@ -2970,7 +2970,7 @@
     - linguistics
 
 - id: arvind-narayanan
-  stableId: 8QyInrJfl7
+  stableId: sid_8QyInrJfl7
   type: person
   title: Arvind Narayanan
   description: >-
@@ -2981,7 +2981,7 @@
     - algorithmic-fairness
 
 - id: owen-cotton-barratt
-  stableId: MMNpm1875e
+  stableId: sid_MMNpm1875e
   type: person
   title: Owen Cotton-Barratt
   description: >-
@@ -2993,7 +2993,7 @@
     - global-priorities
 
 - id: oliver-habryka
-  stableId: e6c93VvfY3
+  stableId: sid_e6c93VvfY3
   type: person
   title: Oliver Habryka
   description: >-
@@ -3004,7 +3004,7 @@
     - ai-safety-community
 
 - id: kelsey-piper
-  stableId: 3QSnX97Qv1
+  stableId: sid_3QSnX97Qv1
   type: person
   title: Kelsey Piper
   description: >-
@@ -3015,7 +3015,7 @@
     - effective-altruism
 
 - id: zvi-mowshowitz
-  stableId: lIFbgZDnGa
+  stableId: sid_lIFbgZDnGa
   type: person
   title: Zvi Mowshowitz
   description: >-
@@ -3025,7 +3025,7 @@
     - ai-safety-commentary
 
 - id: chelsea-finn
-  stableId: GTO7pZdhSG
+  stableId: sid_GTO7pZdhSG
   type: person
   title: Chelsea Finn
   description: >-
@@ -3036,7 +3036,7 @@
     - robotics
 
 - id: pieter-abbeel
-  stableId: C83ppolN2r
+  stableId: sid_C83ppolN2r
   type: person
   title: Pieter Abbeel
   description: >-
@@ -3047,7 +3047,7 @@
     - robotics
 
 - id: jeff-dean
-  stableId: 75vgQ9g8K0
+  stableId: sid_75vgQ9g8K0
   type: person
   title: Jeff Dean
   description: >-
@@ -3059,7 +3059,7 @@
     - google
 
 - id: lilian-weng
-  stableId: Xln342A6WT
+  stableId: sid_Xln342A6WT
   type: person
   title: Lilian Weng
   description: >-
@@ -3070,7 +3070,7 @@
     - ai-safety
 
 - id: alec-radford
-  stableId: w9BDDEfwj6
+  stableId: sid_w9BDDEfwj6
   type: person
   title: Alec Radford
   description: >-
@@ -3081,7 +3081,7 @@
     - multimodal
 
 - id: rumman-chowdhury
-  stableId: OBvnfQJxnv
+  stableId: sid_OBvnfQJxnv
   type: person
   title: Rumman Chowdhury
   description: >-
@@ -3092,7 +3092,7 @@
     - algorithmic-auditing
 
 - id: sayash-kapoor
-  stableId: 0aqF8abxF9
+  stableId: sid_0aqF8abxF9
   type: person
   title: Sayash Kapoor
   description: >-
@@ -3103,7 +3103,7 @@
     - reproducibility
 
 - id: carrick-flynn
-  stableId: OtpREjSl17
+  stableId: sid_OtpREjSl17
   type: person
   title: Carrick Flynn
   description: >-
@@ -3115,7 +3115,7 @@
     - biosecurity
 
 - id: matt-clifford
-  stableId: EWTG4ReRam
+  stableId: sid_EWTG4ReRam
   type: person
   title: Matt Clifford
   description: >-
@@ -3126,7 +3126,7 @@
     - uk-policy
 
 - id: michael-sellitto
-  stableId: WCxgtVgcr1
+  stableId: sid_WCxgtVgcr1
   type: person
   title: Michael Sellitto
   description: >-
@@ -3137,7 +3137,7 @@
     - ai-policy
 
 - id: pushmeet-kohli
-  stableId: 6T8nglIbo6
+  stableId: sid_6T8nglIbo6
   type: person
   title: Pushmeet Kohli
   description: >-
@@ -3148,7 +3148,7 @@
     - alignment
 
 - id: david-silver
-  stableId: e7urD1sfMx
+  stableId: sid_e7urD1sfMx
   type: person
   title: David Silver
   description: >-
@@ -3159,7 +3159,7 @@
     - deepmind
 
 - id: eliana-lorch
-  stableId: SlWMsuNIes
+  stableId: sid_SlWMsuNIes
   type: person
   title: Eliana Lorch
   description: >-
@@ -3172,7 +3172,7 @@
 # ── Batch 3: Multi-org career people ──
 
 - id: barret-zoph
-  stableId: np58j65k7U
+  stableId: sid_np58j65k7U
   type: person
   title: Barret Zoph
   description: >-
@@ -3181,7 +3181,7 @@
   tags: [ai-research]
 
 - id: bob-mcgrew
-  stableId: 7shI5k4pYO
+  stableId: sid_7shI5k4pYO
   type: person
   title: Bob McGrew
   description: >-
@@ -3190,7 +3190,7 @@
   tags: [ai-research]
 
 - id: noam-shazeer
-  stableId: 2n2KWBO5lj
+  stableId: sid_2n2KWBO5lj
   type: person
   title: Noam Shazeer
   description: >-
@@ -3199,7 +3199,7 @@
   tags: [transformers, generative-ai]
 
 - id: aidan-gomez
-  stableId: 8IoYc1FS2s
+  stableId: sid_8IoYc1FS2s
   type: person
   title: Aidan Gomez
   description: >-
@@ -3208,7 +3208,7 @@
   tags: [transformers, ai-research]
 
 - id: lukasz-kaiser
-  stableId: bDntUJ9nR9
+  stableId: sid_bDntUJ9nR9
   type: person
   title: Lukasz Kaiser
   description: >-
@@ -3217,7 +3217,7 @@
   tags: [transformers]
 
 - id: ben-mann
-  stableId: mO6vu4wGaZ
+  stableId: sid_mO6vu4wGaZ
   type: person
   title: Ben Mann
   description: >-
@@ -3226,7 +3226,7 @@
   tags: [ai-safety]
 
 - id: claire-zabel
-  stableId: Unxmb3y3RF
+  stableId: sid_Unxmb3y3RF
   type: person
   title: Claire Zabel
   description: >-
@@ -3235,7 +3235,7 @@
   tags: [ai-safety, grantmaking]
 
 - id: rob-wiblin
-  stableId: nHnzS2qCLB
+  stableId: sid_nHnzS2qCLB
   type: person
   title: Rob Wiblin
   description: >-
@@ -3244,7 +3244,7 @@
   tags: [effective-altruism]
 
 - id: ben-todd
-  stableId: LTnHWq06v7
+  stableId: sid_LTnHWq06v7
   type: person
   title: Ben Todd
   description: >-
@@ -3253,7 +3253,7 @@
   tags: [effective-altruism]
 
 - id: nova-dassarma
-  stableId: loCJ9k9JUl
+  stableId: sid_loCJ9k9JUl
   type: person
   title: Nova DasSarma
   description: >-
@@ -3262,7 +3262,7 @@
   tags: [ai-safety]
 
 - id: adam-gleave
-  stableId: z9YE0k6xIl
+  stableId: sid_z9YE0k6xIl
   type: person
   title: Adam Gleave
   description: >-
@@ -3271,7 +3271,7 @@
   tags: [ai-safety, adversarial-robustness]
 
 - id: nora-belrose
-  stableId: 9MNPpMYphE
+  stableId: sid_9MNPpMYphE
   type: person
   title: Nora Belrose
   description: >-
@@ -3280,7 +3280,7 @@
   tags: [interpretability, ai-safety]
 
 - id: stella-biderman
-  stableId: rCdvuJ9MKD
+  stableId: sid_rCdvuJ9MKD
   type: person
   title: Stella Biderman
   description: >-
@@ -3289,7 +3289,7 @@
   tags: [open-source-ai]
 
 - id: nicholas-carlini
-  stableId: yApeIYNuQH
+  stableId: sid_yApeIYNuQH
   type: person
   title: Nicholas Carlini
   description: >-
@@ -3298,7 +3298,7 @@
   tags: [adversarial-ml, ai-security]
 
 - id: sholto-douglas
-  stableId: HE9dREUB6G
+  stableId: sid_HE9dREUB6G
   type: person
   title: Sholto Douglas
   description: >-
@@ -3307,7 +3307,7 @@
   tags: [ai-research]
 
 - id: rosie-campbell
-  stableId: 9DYkyw0Hi6
+  stableId: sid_9DYkyw0Hi6
   type: person
   title: Rosie Campbell
   description: >-
@@ -3316,7 +3316,7 @@
   tags: [ai-policy, ai-safety]
 
 - id: sandhini-agarwal
-  stableId: cP9Zh9P6eQ
+  stableId: sid_cP9Zh9P6eQ
   type: person
   title: Sandhini Agarwal
   description: >-
@@ -3325,7 +3325,7 @@
   tags: [ai-policy]
 
 - id: gretchen-krueger
-  stableId: e6evfi0zqE
+  stableId: sid_e6evfi0zqE
   type: person
   title: Gretchen Krueger
   description: >-
@@ -3334,7 +3334,7 @@
   tags: [ai-policy]
 
 - id: josh-batson
-  stableId: R1sh5iI5Be
+  stableId: sid_R1sh5iI5Be
   type: person
   title: Josh Batson
   description: >-
@@ -3343,7 +3343,7 @@
   tags: [interpretability]
 
 - id: trenton-bricken
-  stableId: FlpgQzN7DJ
+  stableId: sid_FlpgQzN7DJ
   type: person
   title: Trenton Bricken
   description: >-
@@ -3352,7 +3352,7 @@
   tags: [interpretability]
 
 - id: nelson-elhage
-  stableId: J6DJn3s6Di
+  stableId: sid_J6DJn3s6Di
   type: person
   title: Nelson Elhage
   description: >-
@@ -3361,7 +3361,7 @@
   tags: [interpretability]
 
 - id: lawrence-chan
-  stableId: pwJiQ0dvOa
+  stableId: sid_pwJiQ0dvOa
   type: person
   title: Lawrence Chan
   description: >-
@@ -3370,7 +3370,7 @@
   tags: [alignment, ai-safety]
 
 - id: john-wentworth
-  stableId: jNb9fkrRNV
+  stableId: sid_jNb9fkrRNV
   type: person
   title: John Wentworth
   description: >-
@@ -3379,7 +3379,7 @@
   tags: [alignment, agent-foundations]
 
 - id: stephen-casper
-  stableId: MML4rTOPrR
+  stableId: sid_MML4rTOPrR
   type: person
   title: Stephen Casper
   description: >-
@@ -3388,7 +3388,7 @@
   tags: [ai-safety, adversarial-ml]
 
 - id: haydn-belfield
-  stableId: wDVvssbBWp
+  stableId: sid_wDVvssbBWp
   type: person
   title: Haydn Belfield
   description: >-
@@ -3397,7 +3397,7 @@
   tags: [ai-governance, existential-risk]
 
 - id: brad-lightcap
-  stableId: Vg9f2qAPVa
+  stableId: sid_Vg9f2qAPVa
   type: person
   title: Brad Lightcap
   description: >-
@@ -3406,7 +3406,7 @@
   tags: [ai-business]
 
 - id: koray-kavukcuoglu
-  stableId: UpD99xMWKS
+  stableId: sid_UpD99xMWKS
   type: person
   title: Koray Kavukcuoglu
   description: >-
@@ -3415,7 +3415,7 @@
   tags: [ai-research, deepmind]
 
 - id: nathan-labenz
-  stableId: H9tpeUdFMY
+  stableId: sid_H9tpeUdFMY
   type: person
   title: Nathan Labenz
   description: >-
@@ -3424,7 +3424,7 @@
   tags: [ai-safety-commentary]
 
 - id: shayne-longpre
-  stableId: T3rwhFouDy
+  stableId: sid_T3rwhFouDy
   type: person
   title: Shayne Longpre
   description: >-
@@ -3433,7 +3433,7 @@
   tags: [data-governance, ai-transparency]
 
 - id: liane-lovitt
-  stableId: e19EEvKNkB
+  stableId: sid_e19EEvKNkB
   type: person
   title: Liane Lovitt
   description: >-
@@ -3442,7 +3442,7 @@
   tags: [rlhf, ai-safety]
 
 - id: karen-hao
-  stableId: qcHr07uqUi
+  stableId: sid_qcHr07uqUi
   type: person
   title: Karen Hao
   description: >-
@@ -3451,7 +3451,7 @@
   tags: [journalism]
 
 - id: cade-metz
-  stableId: lMRdlZKHUI
+  stableId: sid_lMRdlZKHUI
   type: person
   title: Cade Metz
   description: >-
@@ -3460,7 +3460,7 @@
   tags: [journalism]
 
 - id: reid-hoffman
-  stableId: x39KP3SjCg
+  stableId: sid_x39KP3SjCg
   type: person
   title: Reid Hoffman
   description: >-
@@ -3477,7 +3477,7 @@
   lastUpdated: 2026-03
 
 - id: mackenzie-scott
-  stableId: qXAd0hBawg
+  stableId: sid_qXAd0hBawg
   type: person
   title: Mackenzie Scott
   description: >-
@@ -3493,7 +3493,7 @@
   lastUpdated: 2026-03
 
 - id: russell-moore
-  stableId: scmpCYKuBq
+  stableId: sid_scmpCYKuBq
   type: person
   title: Russell Moore
   description: >-
@@ -3510,7 +3510,7 @@
   lastUpdated: 2026-03
 
 - id: ben-horowitz
-  stableId: 3SLFjy1eDj
+  stableId: sid_3SLFjy1eDj
   type: person
   title: Ben Horowitz
   description: >-
@@ -3525,7 +3525,7 @@
 # ── Political Candidates (2026 AI-related races) ────────────────────────
 
 - id: alex-bores
-  stableId: W2B4vrLpsU
+  stableId: sid_W2B4vrLpsU
   type: person
   title: Alex Bores
   description: >-
@@ -3537,7 +3537,7 @@
   lastUpdated: 2026-03
 
 - id: rebecca-lasher
-  stableId: YKtqDKysGb
+  stableId: sid_YKtqDKysGb
   type: person
   title: Rebecca Lasher
   description: >-
@@ -3547,7 +3547,7 @@
   lastUpdated: 2026-03
 
 - id: brad-schlossberg
-  stableId: 6b2Vi6bhfX
+  stableId: sid_6b2Vi6bhfX
   type: person
   title: Brad Schlossberg
   description: >-
@@ -3556,7 +3556,7 @@
   lastUpdated: 2026-03
 
 - id: mike-conway
-  stableId: 6lQRx57F7M
+  stableId: sid_6lQRx57F7M
   type: person
   title: Mike Conway
   description: >-
@@ -3565,7 +3565,7 @@
   lastUpdated: 2026-03
 
 - id: valerie-foushee
-  stableId: aJJNryIYDC
+  stableId: sid_aJJNryIYDC
   type: person
   title: Valerie Foushee
   description: >-
@@ -3575,7 +3575,7 @@
   lastUpdated: 2026-03
 
 - id: jesse-jackson-jr
-  stableId: 69tAH5XWON
+  stableId: sid_69tAH5XWON
   type: person
   title: Jesse Jackson Jr.
   description: >-
@@ -3585,7 +3585,7 @@
   lastUpdated: 2026-03
 
 - id: melissa-bean
-  stableId: PnwPk4Vcau
+  stableId: sid_PnwPk4Vcau
   type: person
   title: Melissa Bean
   description: >-
@@ -3595,7 +3595,7 @@
   lastUpdated: 2026-03
 
 - id: jake-gober
-  stableId: Zs43I3aG72
+  stableId: sid_Zs43I3aG72
   type: person
   title: Jake Gober
   description: >-
@@ -3605,7 +3605,7 @@
   lastUpdated: 2026-03
 
 - id: pete-ricketts
-  stableId: E6W6VILiNn
+  stableId: sid_E6W6VILiNn
   type: person
   title: Pete Ricketts
   description: >-
@@ -3615,7 +3615,7 @@
   lastUpdated: 2026-03
 
 - id: marsha-blackburn
-  stableId: enf2UNKyDx
+  stableId: sid_enf2UNKyDx
   type: person
   title: Marsha Blackburn
   description: >-
@@ -3625,7 +3625,7 @@
   lastUpdated: 2026-03
 
 - id: allison-duettmann
-  stableId: BvtUK0yEDv
+  stableId: sid_BvtUK0yEDv
   type: person
   title: Allison Duettmann
   description: >-
@@ -3633,7 +3633,7 @@
     longevity biotechnology, molecular nanotechnology, and neurotechnology
     programs. Co-authored AGI coordination white paper (2018).
   relatedEntries:
-    - id: NPPTvNqRXA
+    - id: sid_NPPTvNqRXA
       type: organization
   customFields:
     - label: Role
@@ -3644,7 +3644,7 @@
   lastUpdated: 2026-03
 
 - id: christine-peterson
-  stableId: xhHJeAYzUm
+  stableId: sid_xhHJeAYzUm
   type: person
   title: Christine Peterson
   description: >-
@@ -3653,7 +3653,7 @@
     modern software community sense (1998).
   relatedEntries: []
 - id: k-eric-drexler
-  stableId: jExOzigU4B
+  stableId: sid_jExOzigU4B
   type: person
   title: K. Eric Drexler
   description: >-
@@ -3662,7 +3662,7 @@
     machine systems.
   relatedEntries: []
 - id: james-c-bennett
-  stableId: PFfb7RFhTg
+  stableId: sid_PFfb7RFhTg
   type: person
   title: James C. Bennett
   description: >-
@@ -3670,7 +3670,7 @@
     space launch companies and consultant in space and technology.
   relatedEntries: []
 - id: brandon-goldman
-  stableId: 04ESS5IDzn
+  stableId: sid_04ESS5IDzn
   type: person
   title: Brandon Goldman
   description: >-
@@ -3678,7 +3678,7 @@
     existential risk.
   relatedEntries: []
 - id: sonia-arrison
-  stableId: JkPfxLKrTR
+  stableId: sid_JkPfxLKrTR
   type: person
   title: Sonia Arrison
   description: >-
@@ -3686,7 +3686,7 @@
     Plus Capital. Board member at Thiel Foundation.
   relatedEntries: []
 - id: chip-morningstar
-  stableId: uPDPgwTvaz
+  stableId: sid_uPDPgwTvaz
   type: person
   title: Chip Morningstar
   description: >-
@@ -3694,7 +3694,7 @@
     entertainment and communication.
   relatedEntries: []
 - id: peter-diamandis
-  stableId: tVhfitccVu
+  stableId: sid_tVhfitccVu
   type: person
   title: Peter Diamandis
   description: >-
@@ -3703,602 +3703,602 @@
     on exponential technologies.
   relatedEntries: []
 - id: michael-skuhersky
-  stableId: WF63mO4uXf
+  stableId: sid_WF63mO4uXf
   type: person
   title: Michael Skuhersky
   description: >-
     Researcher in synthetic neurobiology and mind uploading at MIT Media Lab. Foresight Fellow (2017).
   relatedEntries: []
 - id: berhane-temelso
-  stableId: vQnbhz7zFw
+  stableId: sid_vQnbhz7zFw
   type: person
   title: Berhane Temelso
   description: >-
     Computational chemist at Furman University. Foresight Fellow (2017).
   relatedEntries: []
 - id: christopher-wilmer
-  stableId: gc2ul9ESdY
+  stableId: sid_gc2ul9ESdY
   type: person
   title: Christopher Wilmer
   description: >-
     Chemical engineering researcher focused on molecular machines at University of Pittsburgh. Foresight Fellow (2017).
   relatedEntries: []
 - id: chuyang-cheng
-  stableId: 0NB15aKxPM
+  stableId: sid_0NB15aKxPM
   type: person
   title: Chuyang Cheng
   description: >-
     Researcher in molecular machines at Northwestern University (Stoddart group). Foresight Fellow (2017).
   relatedEntries: []
 - id: eva-maria-strauch
-  stableId: k3aEQarjFs
+  stableId: sid_k3aEQarjFs
   type: person
   title: Eva-Maria Strauch
   description: >-
     Protein design researcher at University of Washington. Foresight Fellow (2017).
   relatedEntries: []
 - id: roman-yampolskiy
-  stableId: qXvDmzlQMg
+  stableId: sid_qXvDmzlQMg
   type: person
   title: Roman V. Yampolskiy
   description: >-
     AI safety and security researcher at University of Louisville. Known for work on AI containment and the AI control problem. Foresight Fellow (2018).
   relatedEntries: []
 - id: grigory-tikhomirov
-  stableId: oewEKHMtJQ
+  stableId: sid_oewEKHMtJQ
   type: person
   title: Grigory Tikhomirov
   description: >-
     DNA nanotechnology researcher at Caltech. Foresight Fellow (2018).
   relatedEntries: []
 - id: jane-lippencott
-  stableId: mEMBu1OgGM
+  stableId: sid_mEMBu1OgGM
   type: person
   title: Jane Lippencott
   description: >-
     Blockchain governance researcher. Associated with ZenCash and Eden. Foresight Fellow (2018).
   relatedEntries: []
 - id: peter-scheyer
-  stableId: PpR8NnUoNQ
+  stableId: sid_PpR8NnUoNQ
   type: person
   title: Peter Scheyer
   description: >-
     Researcher in corporate AGI and computer security. Foresight Fellow (2018).
   relatedEntries: []
 - id: patrick-mellor
-  stableId: xckZ8811MM
+  stableId: sid_xckZ8811MM
   type: person
   title: Patrick Mellor
   description: >-
     Clean energy and CO2 drawdown researcher at San Francisco State University. Foresight Fellow (2019).
   relatedEntries: []
 - id: tj-brunette
-  stableId: BXUtJUR2Mk
+  stableId: sid_BXUtJUR2Mk
   type: person
   title: TJ Brunette
   description: >-
     Protein design and molecular machines researcher at University of Washington (Baker lab). Foresight Fellow (2019).
   relatedEntries: []
 - id: caroline-jeanmaire
-  stableId: VZOcEjZnoz
+  stableId: sid_VZOcEjZnoz
   type: person
   title: Caroline Jeanmaire
   description: >-
     AI governance researcher at UC Berkeley Center for Human-Compatible AI (CHAI). Foresight Fellow (2020).
   relatedEntries: []
 - id: felix-andreas-faber
-  stableId: jc3mO3Nbd5
+  stableId: sid_jc3mO3Nbd5
   type: person
   title: Felix Andreas Faber
   description: >-
     Machine learning researcher focused on drug and materials discovery. Foresight Fellow (2020).
   relatedEntries: []
 - id: matthew-ryder
-  stableId: f3iZsZaJL7
+  stableId: sid_f3iZsZaJL7
   type: person
   title: Matthew R. Ryder
   description: >-
     Molecular-scale engineering researcher at Oak Ridge National Laboratory. Foresight Fellow (2020).
   relatedEntries: []
 - id: alevtina-evgrafova
-  stableId: iClhSDzfCb
+  stableId: sid_iClhSDzfCb
   type: person
   title: Alevtina Evgrafova
   description: >-
     Researcher in sustainable agriculture. Foresight Fellow (2020).
   relatedEntries: []
 - id: tony-lai
-  stableId: 7tPcSXQdBg
+  stableId: sid_7tPcSXQdBg
   type: person
   title: Tony Lai
   description: >-
     Legal engineering researcher at Stanford CodeX focused on biosphere governance. Foresight Fellow (2020).
   relatedEntries: []
 - id: giuliana-rotola
-  stableId: 3Nvj6hnumO
+  stableId: sid_3Nvj6hnumO
   type: person
   title: Giuliana Rotola
   description: >-
     Space studies and space law researcher. Foresight Fellow (2020).
   relatedEntries: []
 - id: jeffrey-ladish
-  stableId: HZSUA7YGIw
+  stableId: sid_HZSUA7YGIw
   type: person
   title: Jeffrey Ladish
   description: >-
     Biosecurity researcher and advocate. Foresight Fellow (2020). Works on reducing catastrophic biological risks.
   relatedEntries: []
 - id: tessa-alexanian
-  stableId: NRW6ZB83dF
+  stableId: sid_NRW6ZB83dF
   type: person
   title: Tessa Alexanian
   description: >-
     Responsible biotechnology researcher and advocate. Foresight Fellow (2020).
   relatedEntries: []
 - id: daniel-elton
-  stableId: Cz6cISzH1W
+  stableId: sid_Cz6cISzH1W
   type: person
   title: Daniel Elton
   description: >-
     AI for medical imaging researcher at NIH Clinical Center. Foresight Fellow (2020).
   relatedEntries: []
 - id: liang-feng
-  stableId: 0SMuMn2uP1
+  stableId: sid_0SMuMn2uP1
   type: person
   title: Liang Feng
   description: >-
     Researcher in metal-organic frameworks and molecular machines. Foresight Fellow (2021).
   relatedEntries: []
 - id: maxim-ziatdinov
-  stableId: jF16YrGGt9
+  stableId: sid_jF16YrGGt9
   type: person
   title: Maxim Ziatdinov
   description: >-
     Machine learning for materials science researcher. Foresight Fellow (2021).
   relatedEntries: []
 - id: yunyan-qiu
-  stableId: pIg7IUR6ZK
+  stableId: sid_pIg7IUR6ZK
   type: person
   title: Yunyan Qiu
   description: >-
     Molecular machines researcher at Northwestern University (Stoddart group). Foresight Fellow (2021).
   relatedEntries: []
 - id: xiaohu-neil-zhu
-  stableId: DIubf1q8c4
+  stableId: sid_DIubf1q8c4
   type: person
   title: Xiaohu (Neil) Zhu
   description: >-
     AI education researcher at University AI (China). Foresight Fellow (2021).
   relatedEntries: []
 - id: joscha-bach
-  stableId: DRFj0e4o4A
+  stableId: sid_DRFj0e4o4A
   type: person
   title: Joscha Bach
   description: >-
     AI researcher affiliated with AI Foundation, MIT Media Lab, and Harvard. Known for work on cognitive architectures and artificial general intelligence. Foresight Fellow (2021).
   relatedEntries: []
 - id: jazear-brooks
-  stableId: 1CMuMbNe1q
+  stableId: sid_1CMuMbNe1q
   type: person
   title: Jazear Brooks
   description: >-
     Computer science and fintech researcher. Foresight Fellow (2021).
   relatedEntries: []
 - id: yip-fai-tse
-  stableId: h7l352tthg
+  stableId: sid_h7l352tthg
   type: person
   title: Yip Fai Tse
   description: >-
     AI ethics researcher focused on nonhuman animals at Princeton University (under Peter Singer). Foresight Fellow (2021).
   relatedEntries: []
 - id: stephen-malina
-  stableId: PG8MZrQT6v
+  stableId: sid_PG8MZrQT6v
   type: person
   title: Stephen Malina
   description: >-
     Machine learning researcher focused on virus and protein design at Dyno Therapeutics. Foresight Fellow (2021).
   relatedEntries: []
 - id: jj-ben-joseph
-  stableId: 4uCfmwgv1Q
+  stableId: sid_4uCfmwgv1Q
   type: person
   title: JJ Ben-Joseph
   description: >-
     Biosecurity and AI researcher at In-Q-Tel. Foresight Fellow (2021).
   relatedEntries: []
 - id: delphine-larrieu
-  stableId: ovkNsXhA41
+  stableId: sid_ovkNsXhA41
   type: person
   title: Delphine Larrieu
   description: >-
     Researcher on premature aging syndromes at Cambridge Institute for Medical Research. Foresight Fellow (2022).
   relatedEntries: []
 - id: simon-krause
-  stableId: dLjBtrUfhw
+  stableId: sid_dLjBtrUfhw
   type: person
   title: Simon Krause
   description: >-
     Researcher on framework-embedded molecular machines at Max Planck Institute. Foresight Fellow (2022).
   relatedEntries: []
 - id: alexander-fedintsev
-  stableId: DGK6nOUbNw
+  stableId: sid_DGK6nOUbNw
   type: person
   title: Alexander Fedintsev
   description: >-
     Bioinformatics and machine learning researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: tatyana-dobreva
-  stableId: bQv1tYrfRd
+  stableId: sid_bQv1tYrfRd
   type: person
   title: Tatyana Dobreva
   description: >-
     Signal processing and neuroprosthetics researcher at NASA JPL. Foresight Fellow (2022).
   relatedEntries: []
 - id: victor-garcia-lopez
-  stableId: 551B3lJTX0
+  stableId: sid_551B3lJTX0
   type: person
   title: Victor Garcia Lopez
   description: >-
     Researcher in molecular devices. Foresight Fellow (2022).
   relatedEntries: []
 - id: david-august
-  stableId: jcIx8MS6NQ
+  stableId: sid_jcIx8MS6NQ
   type: person
   title: David August
   description: >-
     Molecular weaving researcher at University of Edinburgh. Foresight Fellow (2022).
   relatedEntries: []
 - id: matthew-mcateer
-  stableId: 0xBcCmkVM4
+  stableId: sid_0xBcCmkVM4
   type: person
   title: Matthew McAteer
   description: >-
     Biotech and machine learning researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: jamie-joyce
-  stableId: PEyP8A7QXX
+  stableId: sid_PEyP8A7QXX
   type: person
   title: Jamie Joyce
   description: >-
     Structured knowledge and argument mapping researcher. Founder of Society Library. Foresight Fellow (2022).
   relatedEntries: []
 - id: nikola-markov
-  stableId: 30kVfhriPv
+  stableId: sid_30kVfhriPv
   type: person
   title: Nikola T. Markov
   description: >-
     Bioinformatics and aging researcher at Buck Institute. Foresight Fellow (2022).
   relatedEntries: []
 - id: zvonimir-vrselja
-  stableId: mZrDig45wQ
+  stableId: sid_mZrDig45wQ
   type: person
   title: Zvonimir Vrselja
   description: >-
     Neuroscience researcher at Yale School of Medicine. Foresight Fellow (2022).
   relatedEntries: []
 - id: bradley-english
-  stableId: U1OfRySCHR
+  stableId: sid_U1OfRySCHR
   type: person
   title: Bradley English
   description: >-
     Aging biomarkers researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: tushant-jha
-  stableId: fombUNjCXA
+  stableId: sid_fombUNjCXA
   type: person
   title: Tushant Jha
   description: >-
     AI ethics and value alignment researcher at Future of Humanity Institute (FHI). Foresight Fellow (2022).
   relatedEntries: []
 - id: tinka-vidovic
-  stableId: Mo3dSTEDNV
+  stableId: sid_Mo3dSTEDNV
   type: person
   title: Tinka Vidovic
   description: >-
     Molecular medicine and anti-aging researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: maryna-polyakova
-  stableId: WbooKqReCQ
+  stableId: sid_WbooKqReCQ
   type: person
   title: Maryna Polyakova
   description: >-
     Neuroimaging and depression researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: yuri-deigin
-  stableId: mQmYqXIWoA
+  stableId: sid_mQmYqXIWoA
   type: person
   title: Yuri Deigin
   description: >-
     Biotech entrepreneur focused on drug discovery and longevity. Foresight Fellow (2022).
   relatedEntries: []
 - id: yanguang-zhou
-  stableId: 1KA0JCfjE4
+  stableId: sid_1KA0JCfjE4
   type: person
   title: Yanguang Zhou
   description: >-
     Mechanical engineering and thermal science researcher at HKUST. Foresight Fellow (2022).
   relatedEntries: []
 - id: georgios-kaissis
-  stableId: k49u7izUlw
+  stableId: sid_k49u7izUlw
   type: person
   title: Georgios Kaissis
   description: >-
     Radiology and privacy-preserving machine learning researcher at TU Munich. Foresight Fellow (2022).
   relatedEntries: []
 - id: yuanning-feng
-  stableId: 0Z1dC0PS2b
+  stableId: sid_0Z1dC0PS2b
   type: person
   title: Yuanning Feng
   description: >-
     Researcher in dynamic functional molecules. Foresight Fellow (2022).
   relatedEntries: []
 - id: giulio-ragazzon
-  stableId: Wj8Gmei1lA
+  stableId: sid_Wj8Gmei1lA
   type: person
   title: Giulio Ragazzon
   description: >-
     Molecular machines and photochemistry researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: kai-micah-mills
-  stableId: v80f8wYPXB
+  stableId: sid_v80f8wYPXB
   type: person
   title: Kai Micah Mills
   description: >-
     Serial entrepreneur and technologist. Foresight Fellow (2022).
   relatedEntries: []
 - id: philipp-koellinger
-  stableId: z1et4GySMo
+  stableId: sid_z1et4GySMo
   type: person
   title: Philipp Koellinger
   description: >-
     Social science genetics researcher at University of Wisconsin-Madison. Foresight Fellow (2022).
   relatedEntries: []
 - id: joshua-tan
-  stableId: ekENYOG2FU
+  stableId: sid_ekENYOG2FU
   type: person
   title: Joshua Tan
   description: >-
     AI governance and metagovernance researcher affiliated with Oxford and Stanford. Foresight Fellow (2022).
   relatedEntries: []
 - id: mac-davis
-  stableId: Kj61v4mfdi
+  stableId: sid_Kj61v4mfdi
   type: person
   title: Mac Davis
   description: >-
     Gene therapy and biohacking researcher. Foresight Fellow (2022).
   relatedEntries: []
 - id: matthew-allcock
-  stableId: BP5q62cTTr
+  stableId: sid_BP5q62cTTr
   type: person
   title: Matthew Allcock
   description: >-
     Space weather and infrastructure resilience researcher. Foresight Fellow (2022, 2025).
   relatedEntries: []
 - id: shady-el-damaty
-  stableId: mKcC7QBEQe
+  stableId: sid_mKcC7QBEQe
   type: person
   title: Shady El Damaty
   description: >-
     Intelligent cooperation and neurotech researcher at Holonym and OpSci. Foresight Fellow (2023).
   relatedEntries: []
 - id: aaron-mayer
-  stableId: HewWunPEsp
+  stableId: sid_HewWunPEsp
   type: person
   title: Aaron Mayer
   description: >-
     Effective altruism and investing researcher. Founder of Open Heart Capital. Foresight Fellow (2023).
   relatedEntries: []
 - id: danielle-fong
-  stableId: 0CnCl3sc0f
+  stableId: sid_0CnCl3sc0f
   type: person
   title: Danielle Fong
   description: >-
     Energy and science entrepreneur. Co-founder of LightSail Energy. Foresight Fellow (2023).
   relatedEntries: []
 - id: ala-shaabana
-  stableId: QpBu3qcyFw
+  stableId: sid_QpBu3qcyFw
   type: person
   title: Ala Shaabana
   description: >-
     Machine learning and distributed systems researcher at McMaster University. Foresight Fellow (2023).
   relatedEntries: []
 - id: ghada-almashaqbeh
-  stableId: GWKPk2edUA
+  stableId: sid_GWKPk2edUA
   type: person
   title: Ghada Almashaqbeh
   description: >-
     Computer science and cryptography researcher at UConn. Foresight Fellow (2023).
   relatedEntries: []
 - id: kelvin-yu
-  stableId: 52Ahct1S5P
+  stableId: sid_52Ahct1S5P
   type: person
   title: Kelvin Yu
   description: >-
     Tech policy researcher focused on US-China geopolitics. Foresight Fellow (2023).
   relatedEntries: []
 - id: mikayla-maki
-  stableId: j6eTa7sKMl
+  stableId: sid_j6eTa7sKMl
   type: person
   title: Mikayla Maki
   description: >-
     Distributed web and P2P software researcher at Portland State University and Zed. Foresight Fellow (2023).
   relatedEntries: []
 - id: stacy-copp
-  stableId: NzAxfm9CE9
+  stableId: sid_NzAxfm9CE9
   type: person
   title: Stacy Copp
   description: >-
     Photonic nanomaterials researcher at UC Irvine. Foresight Fellow (2023).
   relatedEntries: []
 - id: ekaterina-ilin
-  stableId: PYdGMjfM5p
+  stableId: sid_PYdGMjfM5p
   type: person
   title: Ekaterina Ilin
   description: >-
     Stellar magnetism and exoplanet habitability researcher. Foresight Fellow (2023).
   relatedEntries: []
 - id: laura-minquini
-  stableId: 9TxPq16hyW
+  stableId: sid_9TxPq16hyW
   type: person
   title: Laura Minquini
   description: >-
     Branding and business development professional. Foresight Fellow (2023).
   relatedEntries: []
 - id: mariam-elgabry
-  stableId: BoLCyyyEm8
+  stableId: sid_BoLCyyyEm8
   type: person
   title: Mariam Elgabry
   description: >-
     Cyber-biosecurity researcher at Bronic. Foresight Fellow (2023).
   relatedEntries: []
 - id: logan-thrasher-collins
-  stableId: Qcjn1NUW9M
+  stableId: sid_Qcjn1NUW9M
   type: person
   title: Logan Thrasher Collins
   description: >-
     Neurotech, connectomics, and synthetic biology researcher. Foresight Fellow (2023).
   relatedEntries: []
 - id: andy-matuschak
-  stableId: SJNMsyBonF
+  stableId: sid_SJNMsyBonF
   type: person
   title: Andy Matuschak
   description: >-
     Tools for thought and learning technology researcher. Known for work on spaced repetition and evergreen notes. Foresight Fellow (2023).
   relatedEntries: []
 - id: rico-meinl
-  stableId: UBIyBMiwKy
+  stableId: sid_UBIyBMiwKy
   type: person
   title: Rico Meinl
   description: >-
     Computational biology researcher at retro.bio. Foresight Fellow (2023).
   relatedEntries: []
 - id: raiany-romanni
-  stableId: WAANMEujqf
+  stableId: sid_WAANMEujqf
   type: person
   title: Raiany Romanni
   description: >-
     Bioethics and longevity researcher. Foresight Fellow (2023).
   relatedEntries: []
 - id: jonathan-passerat-palmbach
-  stableId: MaVd8W4LXw
+  stableId: sid_MaVd8W4LXw
   type: person
   title: Jonathan Passerat-Palmbach
   description: >-
     Privacy-enhancing technology researcher at Flashbots. Foresight Fellow (2023).
   relatedEntries: []
 - id: guido-putignano
-  stableId: VdhYJjQ4J3
+  stableId: sid_VdhYJjQ4J3
   type: person
   title: Guido Putignano
   description: >-
     Synthetic biology therapeutics researcher. Foresight Fellow (2023).
   relatedEntries: []
 - id: anastasia-ershova
-  stableId: S9a6WggxO5
+  stableId: sid_S9a6WggxO5
   type: person
   title: Anastasia Ershova
   description: >-
     DNA research scientist. Foresight Fellow (2023).
   relatedEntries: []
 - id: david-boyer
-  stableId: FyoyD9kEOw
+  stableId: sid_FyoyD9kEOw
   type: person
   title: David Boyer
   description: >-
     Neurodegeneration researcher. Foresight Fellow (2023).
   relatedEntries: []
 - id: marco-ovalle
-  stableId: 53vPdbF2jq
+  stableId: sid_53vPdbF2jq
   type: person
   title: Marco Ovalle
   description: >-
     Molecular machines researcher in the Feringa group. Foresight Fellow (2023).
   relatedEntries: []
 - id: theo-knopfer
-  stableId: NNYy055wJx
+  stableId: sid_NNYy055wJx
   type: person
   title: Theo Knopfer
   description: >-
     Researcher on emerging technology terrorism risk. Foresight Fellow (2023).
   relatedEntries: []
 - id: stephane-redon
-  stableId: ORyNColiWM
+  stableId: sid_ORyNColiWM
   type: person
   title: Stephane Redon
   description: >-
     Molecular simulation researcher. Founder of OneAngstrom. Foresight Fellow (2023).
   relatedEntries: []
 - id: elena-meirzadeh
-  stableId: 4oubIjydtQ
+  stableId: sid_4oubIjydtQ
   type: person
   title: Elena Meirzadeh
   description: >-
     Solid-state chemistry researcher at Columbia University. Foresight Fellow (2023).
   relatedEntries: []
 - id: alia-abbas
-  stableId: zsRuvTJL0A
+  stableId: sid_zsRuvTJL0A
   type: person
   title: Alia Abbas
   description: >-
     Physics and materials engineering researcher. Foresight Prodigy Fellow (2023).
   relatedEntries: []
 - id: natasha-asmi
-  stableId: Lar4TaohoD
+  stableId: sid_Lar4TaohoD
   type: person
   title: Natasha Asmi
   description: >-
     Scientific ecosystem infrastructure researcher at Halogen. Foresight Prodigy Fellow (2023).
   relatedEntries: []
 - id: akash-patel
-  stableId: 6bkO20mLYD
+  stableId: sid_6bkO20mLYD
   type: person
   title: Akash Patel
   description: >-
     Medicine and nanotech researcher at BandX. Foresight Prodigy Fellow (2023).
   relatedEntries: []
 - id: pavi-dhiman
-  stableId: L727R6bnP2
+  stableId: sid_L727R6bnP2
   type: person
   title: Pavi Dhiman
   description: >-
     Young researcher and Foresight Prodigy Fellow (2023). One of the youngest fellows at 16 years old at time of selection.
   relatedEntries: []
 - id: aj-kourabi
-  stableId: aqSu5pvw4Q
+  stableId: sid_aqSu5pvw4Q
   type: person
   title: AJ Kourabi
   description: >-
     Engineering researcher at McMaster University. Foresight Fellow (2024).
   relatedEntries: []
 - id: hooman-reza-nezhad
-  stableId: bQcUONnc08
+  stableId: sid_bQcUONnc08
   type: person
   title: Hooman Reza Nezhad
   description: >-
     STEM and Mars resource utilization researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: lisa-thiergart
-  stableId: hBqW4ONQOf
+  stableId: sid_hBqW4ONQOf
   type: person
   title: Lisa Thiergart
   description: >-
     AI safety and neurotech researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: michael-florea
-  stableId: SIvlDx1NDX
+  stableId: sid_SIvlDx1NDX
   type: person
   title: Michael Florea
   description: >-
     Genetic engineering and longevity researcher at Olden Labs. Foresight Fellow (2024).
   relatedEntries: []
 - id: chris-wintersinger
-  stableId: CYWc9anaJp
+  stableId: sid_CYWc9anaJp
   type: person
   title: Chris Wintersinger
   description: >-
     Biological engineering researcher and biotech startup founder. Foresight Fellow (2024).
   relatedEntries: []
 - id: ethan-caballero
-  stableId: xg5tg6bSyL
+  stableId: sid_xg5tg6bSyL
   type: person
   title: Ethan Caballero
   description: >-
@@ -4311,7 +4311,7 @@
   lastUpdated: 2026-03
 
 - id: roger-grosse
-  stableId: 1fbavZUggd
+  stableId: sid_1fbavZUggd
   type: person
   title: Roger Grosse
   description: >-
@@ -4326,7 +4326,7 @@
   lastUpdated: 2026-03
 
 - id: jesse-clifton
-  stableId: CFkbaKi5D7
+  stableId: sid_CFkbaKi5D7
   type: person
   title: Jesse Clifton
   description: >-
@@ -4340,7 +4340,7 @@
   lastUpdated: 2026-03
 
 - id: akash-wasil
-  stableId: aKLEgry4Hp
+  stableId: sid_aKLEgry4Hp
   type: person
   title: Akash Wasil
   description: >-
@@ -4353,7 +4353,7 @@
   lastUpdated: 2026-03
 
 - id: nitarshan-rajkumar
-  stableId: Xhhsse7wFu
+  stableId: sid_Xhhsse7wFu
   type: person
   title: Nitarshan Rajkumar
   description: >-
@@ -4365,7 +4365,7 @@
   lastUpdated: 2026-03
 
 - id: sam-power
-  stableId: wi4r9KC8iD
+  stableId: sid_wi4r9KC8iD
   type: person
   title: Sam Power
   description: >-
@@ -4378,7 +4378,7 @@
   lastUpdated: 2026-03
 
 - id: lukas-berglund
-  stableId: OelYoBFZxg
+  stableId: sid_OelYoBFZxg
   type: person
   title: Lukas Berglund
   description: >-
@@ -4391,7 +4391,7 @@
   lastUpdated: 2026-03
 
 - id: alex-turner
-  stableId: 0iFP9QT8ZK
+  stableId: sid_0iFP9QT8ZK
   type: person
   title: Alex Turner
   description: >-
@@ -4405,7 +4405,7 @@
   lastUpdated: 2026-03
 
 - id: vivek-hebbar
-  stableId: 28ceX4p8yM
+  stableId: sid_28ceX4p8yM
   type: person
   title: Vivek Hebbar
   description: >-
@@ -4417,7 +4417,7 @@
   lastUpdated: 2026-03
 
 - id: steven-basart
-  stableId: 6QrJwedEnl
+  stableId: sid_6QrJwedEnl
   type: person
   title: Steven Basart
   description: >-
@@ -4431,7 +4431,7 @@
   lastUpdated: 2026-03
 
 - id: nick-ryder
-  stableId: 2XwTwKVLE1
+  stableId: sid_2XwTwKVLE1
   type: person
   title: Nick Ryder
   description: >-
@@ -4444,7 +4444,7 @@
   lastUpdated: 2026-03
 
 - id: tom-conerly
-  stableId: Zcen8WJCFL
+  stableId: sid_Zcen8WJCFL
   type: person
   title: Tom Conerly
   description: >-
@@ -4457,7 +4457,7 @@
   lastUpdated: 2026-03
 
 - id: andy-jones
-  stableId: 2cWWEhUw8A
+  stableId: sid_2cWWEhUw8A
   type: person
   title: Andy Jones
   description: >-
@@ -4470,7 +4470,7 @@
   lastUpdated: 2026-03
 
 - id: jared-hummer
-  stableId: B4zWn1pwOO
+  stableId: sid_B4zWn1pwOO
   type: person
   title: Jared Hummer
   description: >-
@@ -4481,7 +4481,7 @@
   lastUpdated: 2026-03
 
 - id: deep-ganguli
-  stableId: S12Ynw0MVU
+  stableId: sid_S12Ynw0MVU
   type: person
   title: Deep Ganguli
   description: >-
@@ -4495,7 +4495,7 @@
   lastUpdated: 2026-03
 
 - id: jackson-kernion
-  stableId: TG97oCTgWF
+  stableId: sid_TG97oCTgWF
   type: person
   title: Jackson Kernion
   description: >-
@@ -4508,7 +4508,7 @@
   lastUpdated: 2026-03
 
 - id: jakub-pachocki
-  stableId: lounsdKyEk
+  stableId: sid_lounsdKyEk
   type: person
   title: Jakub Pachocki
   description: >-
@@ -4521,7 +4521,7 @@
   lastUpdated: 2026-03
 
 - id: mark-chen
-  stableId: 7E27ekhvh9
+  stableId: sid_7E27ekhvh9
   type: person
   title: Mark Chen
   description: >-
@@ -4534,7 +4534,7 @@
   lastUpdated: 2026-03
 
 - id: szymon-sidor
-  stableId: cEOljcVT3g
+  stableId: sid_cEOljcVT3g
   type: person
   title: Szymon Sidor
   description: >-
@@ -4547,7 +4547,7 @@
   lastUpdated: 2026-03
 
 - id: ilya-cherepanov
-  stableId: UjudUwG0kh
+  stableId: sid_UjudUwG0kh
   type: person
   title: Ilya Cherepanov
   description: >-
@@ -4558,7 +4558,7 @@
   lastUpdated: 2026-03
 
 - id: liam-fedus
-  stableId: rbHGdR5qRX
+  stableId: sid_rbHGdR5qRX
   type: person
   title: Liam Fedus
   description: >-
@@ -4572,7 +4572,7 @@
   lastUpdated: 2026-03
 
 - id: oriol-vinyals
-  stableId: pY2ckBWacw
+  stableId: sid_pY2ckBWacw
   type: person
   title: Oriol Vinyals
   description: >-
@@ -4585,7 +4585,7 @@
   lastUpdated: 2026-03
 
 - id: laurent-sifre
-  stableId: uou479pLL7
+  stableId: sid_uou479pLL7
   type: person
   title: Laurent Sifre
   description: >-
@@ -4597,7 +4597,7 @@
   lastUpdated: 2026-03
 
 - id: raia-hadsell
-  stableId: iyC6uSZb88
+  stableId: sid_iyC6uSZb88
   type: person
   title: Raia Hadsell
   description: >-
@@ -4612,7 +4612,7 @@
   lastUpdated: 2026-03
 
 - id: joel-lehman
-  stableId: f49HpAJtFv
+  stableId: sid_f49HpAJtFv
   type: person
   title: Joel Lehman
   description: >-
@@ -4625,7 +4625,7 @@
   lastUpdated: 2026-03
 
 - id: arati-prabhakar
-  stableId: gFHljeXYBx
+  stableId: sid_gFHljeXYBx
   type: person
   title: Arati Prabhakar
   description: >-
@@ -4639,7 +4639,7 @@
   lastUpdated: 2026-03
 
 - id: bruce-reed
-  stableId: IJia3DgS7g
+  stableId: sid_IJia3DgS7g
   type: person
   title: Bruce Reed
   description: >-
@@ -4652,7 +4652,7 @@
   lastUpdated: 2026-03
 
 - id: suresh-venkatasubramanian
-  stableId: KP0YlCojue
+  stableId: sid_KP0YlCojue
   type: person
   title: Suresh Venkatasubramanian
   description: >-
@@ -4666,7 +4666,7 @@
   lastUpdated: 2026-03
 
 - id: habiba-islam
-  stableId: YtpejTP0eA
+  stableId: sid_YtpejTP0eA
   type: person
   title: Habiba Islam
   description: >-
@@ -4679,7 +4679,7 @@
   lastUpdated: 2026-03
 
 - id: ben-west
-  stableId: gO1WpaxcmQ
+  stableId: sid_gO1WpaxcmQ
   type: person
   title: Ben West
   description: >-
@@ -4692,7 +4692,7 @@
   lastUpdated: 2026-03
 
 - id: cari-tuna
-  stableId: gBWtOYd80I
+  stableId: sid_gBWtOYd80I
   type: person
   title: Cari Tuna
   description: >-
@@ -4707,7 +4707,7 @@
   lastUpdated: 2026-03
 
 - id: patrick-collison
-  stableId: zTSGoA9u6P
+  stableId: sid_zTSGoA9u6P
   type: person
   title: Patrick Collison
   description: >-
@@ -4722,7 +4722,7 @@
   lastUpdated: 2026-03
 
 - id: jason-crawford
-  stableId: B2Dbk573kQ
+  stableId: sid_B2Dbk573kQ
   type: person
   title: Jason Crawford
   description: >-
@@ -4735,7 +4735,7 @@
   lastUpdated: 2026-03
 
 - id: timothy-lee
-  stableId: TV0y0y5x2A
+  stableId: sid_TV0y0y5x2A
   type: person
   title: Timothy B. Lee
   description: >-
@@ -4747,7 +4747,7 @@
   lastUpdated: 2026-03
 
 - id: matt-sheehan
-  stableId: gkshLVsfiY
+  stableId: sid_gkshLVsfiY
   type: person
   title: Matt Sheehan
   description: >-
@@ -4761,7 +4761,7 @@
   lastUpdated: 2026-03
 
 - id: james-vincent
-  stableId: lINKSQzj2t
+  stableId: sid_lINKSQzj2t
   type: person
   title: James Vincent
   description: >-
@@ -4773,7 +4773,7 @@
   lastUpdated: 2026-03
 
 - id: will-knight
-  stableId: Y4UNNdmzLX
+  stableId: sid_Y4UNNdmzLX
   type: person
   title: Will Knight
   description: >-
@@ -4785,7 +4785,7 @@
   lastUpdated: 2026-03
 
 - id: stuart-armstrong
-  stableId: TCToTngvc4
+  stableId: sid_TCToTngvc4
   type: person
   title: Stuart Armstrong
   description: >-
@@ -4799,7 +4799,7 @@
   lastUpdated: 2026-03
 
 - id: ramana-kumar
-  stableId: nsdgK701QQ
+  stableId: sid_nsdgK701QQ
   type: person
   title: Ramana Kumar
   description: >-
@@ -4813,7 +4813,7 @@
   lastUpdated: 2026-03
 
 - id: scott-garrabrant
-  stableId: 5DCoJsfU4M
+  stableId: sid_5DCoJsfU4M
   type: person
   title: Scott Garrabrant
   description: >-
@@ -4827,7 +4827,7 @@
   lastUpdated: 2026-03
 
 - id: abram-demski
-  stableId: hy6WuIjjHi
+  stableId: sid_hy6WuIjjHi
   type: person
   title: Abram Demski
   description: >-
@@ -4841,7 +4841,7 @@
   lastUpdated: 2026-03
 
 - id: jessica-taylor
-  stableId: WI7FMLPnpn
+  stableId: sid_WI7FMLPnpn
   type: person
   title: Jessica Taylor
   description: >-
@@ -4855,7 +4855,7 @@
   lastUpdated: 2026-03
 
 - id: thomas-kwa
-  stableId: RpoMg9g1Sw
+  stableId: sid_RpoMg9g1Sw
   type: person
   title: Thomas Kwa
   description: >-
@@ -4868,7 +4868,7 @@
   lastUpdated: 2026-03
 
 - id: leon-lang
-  stableId: NsR2M6tJhw
+  stableId: sid_NsR2M6tJhw
   type: person
   title: Leon Lang
   description: >-
@@ -4882,7 +4882,7 @@
   lastUpdated: 2026-03
 
 - id: adam-scherlis
-  stableId: ylFgwP9hvw
+  stableId: sid_ylFgwP9hvw
   type: person
   title: Adam Scherlis
   description: >-
@@ -4895,7 +4895,7 @@
   lastUpdated: 2026-03
 
 - id: kamal-ndousse
-  stableId: bEVEaqopVT
+  stableId: sid_bEVEaqopVT
   type: person
   title: Kamal Ndousse
   description: >-
@@ -4909,7 +4909,7 @@
   lastUpdated: 2026-03
 
 - id: tom-mcgrath
-  stableId: pnps84gsiZ
+  stableId: sid_pnps84gsiZ
   type: person
   title: Tom McGrath
   description: >-
@@ -4922,392 +4922,392 @@
   lastUpdated: 2026-03
 
 - id: scott-emmons
-  stableId: TximOVySLO
+  stableId: sid_TximOVySLO
   type: person
   title: Scott Emmons
   description: >-
     AI safety and alignment researcher at Google DeepMind. Foresight Fellow (2024).
   relatedEntries: []
 - id: ariel-zeleznikow-johnston
-  stableId: EOr3GHi0mq
+  stableId: sid_EOr3GHi0mq
   type: person
   title: Ariel Zeleznikow-Johnston
   description: >-
     Neuroscience and consciousness researcher at Monash University. Foresight Fellow (2024).
   relatedEntries: []
 - id: niccolo-zanichelli
-  stableId: yloXSksP3p
+  stableId: sid_yloXSksP3p
   type: person
   title: Niccolo Zanichelli
   description: >-
     AI and biology researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: jason-hausenloy
-  stableId: 8vDRxd1UlA
+  stableId: sid_8vDRxd1UlA
   type: person
   title: Jason Hausenloy
   description: >-
     AI policy researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: nora-ammann
-  stableId: 9OYg0A2u9v
+  stableId: sid_9OYg0A2u9v
   type: person
   title: Nora Ammann
   description: >-
     Guaranteed Safe AI researcher at PIBBSS. Foresight Fellow (2024).
   relatedEntries: []
 - id: zan-huang
-  stableId: zT8gF0s15B
+  stableId: sid_zT8gF0s15B
   type: person
   title: Zan Huang
   description: >-
     AI, cognition, and music composition researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: claire-short
-  stableId: cIKKyepSlX
+  stableId: sid_cIKKyepSlX
   type: person
   title: Claire Short
   description: >-
     AI and neuroscience researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: amanda-ngo
-  stableId: Rnlp94clBB
+  stableId: sid_Rnlp94clBB
   type: person
   title: Amanda Ngo
   description: >-
     AI for wellbeing researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: samuel-nellessen
-  stableId: i9FJ8vh36r
+  stableId: sid_i9FJ8vh36r
   type: person
   title: Samuel Nellessen
   description: >-
     AI researcher at Radboud University. Foresight Fellow (2024).
   relatedEntries: []
 - id: bogdan-ionut-cirstea
-  stableId: UuKAC9Hjmg
+  stableId: sid_UuKAC9Hjmg
   type: person
   title: Bogdan-Ionut Cirstea
   description: >-
     AI existential safety researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: bear-haon
-  stableId: hOfDebmkcY
+  stableId: sid_hOfDebmkcY
   type: person
   title: Bear Haon
   description: >-
     Robotics and trustworthy autonomous systems researcher at UC Berkeley. Foresight Fellow (2024).
   relatedEntries: []
 - id: sruthi-sivakumar
-  stableId: cREFraM1QC
+  stableId: sid_cREFraM1QC
   type: person
   title: Sruthi Sivakumar
   description: >-
     Computational biology and longevity researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: roman-bauer
-  stableId: Alq8iQczCw
+  stableId: sid_Alq8iQczCw
   type: person
   title: Roman Bauer
   description: >-
     Computational biology and brain modeling researcher at University of Surrey. Foresight Fellow (2024).
   relatedEntries: []
 - id: simeon-campos
-  stableId: PR8WkXXhPw
+  stableId: sid_PR8WkXXhPw
   type: person
   title: Simeon Campos
   description: >-
     AI governance and AI auditing researcher at SaferAI. Foresight Fellow (2024).
   relatedEntries: []
 - id: dmitrii-usynin
-  stableId: iuLi9NNEtt
+  stableId: sid_iuLi9NNEtt
   type: person
   title: Dmitrii Usynin
   description: >-
     Machine learning under privacy constraints researcher at Imperial College London and TU Munich. Foresight Fellow (2024).
   relatedEntries: []
 - id: ekaterina-seltikova
-  stableId: 8ia3z0vlsg
+  stableId: sid_8ia3z0vlsg
   type: person
   title: Ekaterina Seltikova
   description: >-
     Lunar exploration and space researcher. Foresight Fellow (2024).
   relatedEntries: []
 - id: shuntaro-amano
-  stableId: pbOuMCEkuP
+  stableId: sid_pbOuMCEkuP
   type: person
   title: Shuntaro Amano
   description: >-
     Autonomous molecular motors researcher at University of Strasbourg. Foresight Fellow (2024).
   relatedEntries: []
 - id: dean-thomas
-  stableId: VqNMhSpxiQ
+  stableId: sid_VqNMhSpxiQ
   type: person
   title: Dean Thomas
   description: >-
     Digital chemistry and molecular machines researcher at University of Glasgow. Foresight Fellow (2025).
   relatedEntries: []
 - id: felix-sosa
-  stableId: UmkwKHQIo5
+  stableId: sid_UmkwKHQIo5
   type: person
   title: Felix Sosa
   description: >-
     Computational cognitive science and AGI researcher at Harvard/MIT. Foresight Fellow (2025).
   relatedEntries: []
 - id: jasper-gotting
-  stableId: kaYcNe2ndw
+  stableId: sid_kaYcNe2ndw
   type: person
   title: Jasper Gotting
   description: >-
     AI and biotech risks researcher at SecureBio. Foresight Fellow (2025).
   relatedEntries: []
 - id: yasmeen-hmaidan
-  stableId: BPFjeugDQQ
+  stableId: sid_BPFjeugDQQ
   type: person
   title: Yasmeen Hmaidan
   description: >-
     Neurotechnology and e-textiles researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: guanyu-lu
-  stableId: OF4YTvRCbi
+  stableId: sid_OF4YTvRCbi
   type: person
   title: Guanyu Lu
   description: >-
     Nanoscale light-matter interactions researcher at Northwestern University. Foresight Fellow (2025).
   relatedEntries: []
 - id: nirosha-murugan
-  stableId: 69uPZKxSDe
+  stableId: sid_69uPZKxSDe
   type: person
   title: Nirosha Murugan
   description: >-
     Biophysics and cellular communication researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: abhinav-singh
-  stableId: wdNOmNBzMw
+  stableId: sid_wdNOmNBzMw
   type: person
   title: Abhinav Singh
   description: >-
     Cybersecurity researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: zihao-ou
-  stableId: YDyJQcs6xr
+  stableId: sid_YDyJQcs6xr
   type: person
   title: Zihao Ou
   description: >-
     Biomedical science and tissue transparency researcher at UT Dallas. Foresight Fellow (2025).
   relatedEntries: []
 - id: moritz-von-knebel
-  stableId: MNvOmIAAkg
+  stableId: sid_MNvOmIAAkg
   type: person
   title: Moritz von Knebel
   description: >-
     Tech geopolitics and semiconductor security researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: akash-kulgod
-  stableId: rcXR1RqBjQ
+  stableId: sid_rcXR1RqBjQ
   type: person
   title: Akash Kulgod
   description: >-
     Brain-computer interfaces and disease detection researcher at Dognosis. Foresight Fellow (2025).
   relatedEntries: []
 - id: penghao-li
-  stableId: fVwZd8qbAg
+  stableId: sid_fVwZd8qbAg
   type: person
   title: Penghao Li
   description: >-
     Chemistry researcher at University of Mississippi. Foresight Fellow (2025).
   relatedEntries: []
 - id: aydin-gokce
-  stableId: bEefY866Md
+  stableId: sid_bEefY866Md
   type: person
   title: Aydin Gokce
   description: >-
     Cybernetics researcher at General Cybernetics. Foresight Fellow (2025).
   relatedEntries: []
 - id: raghav-sehgal
-  stableId: on2sSLp8Ak
+  stableId: sid_on2sSLp8Ak
   type: person
   title: Raghav Sehgal
   description: >-
     Computational biology researcher at Yale. Foresight Fellow (2025).
   relatedEntries: []
 - id: maxx-yung
-  stableId: siyU8twAWy
+  stableId: sid_siyU8twAWy
   type: person
   title: Maxx Yung
   description: >-
     Materials engineering researcher at University of Pennsylvania. Foresight Fellow (2025).
   relatedEntries: []
 - id: gustavs-zilgalvis
-  stableId: OTY4pxUlg2
+  stableId: sid_OTY4pxUlg2
   type: person
   title: Gustavs Zilgalvis
   description: >-
     International policy researcher at Stanford. Foresight Fellow (2025).
   relatedEntries: []
 - id: chiara-herzog
-  stableId: aVyDpkdJyI
+  stableId: sid_aVyDpkdJyI
   type: person
   title: Chiara Herzog
   description: >-
     Ageing and biomarkers researcher at King's College London. Foresight Fellow (2025).
   relatedEntries: []
 - id: ruairidh-battleday
-  stableId: 0uoTCLKHAV
+  stableId: sid_0uoTCLKHAV
   type: person
   title: Ruairidh Battleday
   description: >-
     Cognitive science and AI researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: peggy-yin
-  stableId: 2vFrFJkOKQ
+  stableId: sid_2vFrFJkOKQ
   type: person
   title: Peggy Yin
   description: >-
     Psychology and cognitive security researcher at Stanford. Foresight Fellow (2025).
   relatedEntries: []
 - id: ninon-lize-masclef
-  stableId: EtUZ3PP2KP
+  stableId: sid_EtUZ3PP2KP
   type: person
   title: Ninon Lize Masclef
   description: >-
     AI, neuroscience, and 3D visual perception researcher at MIT Media Lab. Foresight Fellow (2025).
   relatedEntries: []
 - id: mahlaqua-mila-noor
-  stableId: 0nZmkTd3Ug
+  stableId: sid_0nZmkTd3Ug
   type: person
   title: Mahlaqua Mila Noor
   description: >-
     Researcher at University of Cambridge. Foresight Fellow (2025).
   relatedEntries: []
 - id: fin-moorhouse
-  stableId: XQm8l8LuOs
+  stableId: sid_XQm8l8LuOs
   type: person
   title: Fin Moorhouse
   description: >-
     Existential Hope researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: abigail-olvera
-  stableId: Ek1Ki4LnFH
+  stableId: sid_Ek1Ki4LnFH
   type: person
   title: Abigail Olvera
   description: >-
     Existential Hope researcher. Foresight Fellow (2025).
   relatedEntries: []
 - id: alberto-privitera
-  stableId: 7V2LqaTShW
+  stableId: sid_7V2LqaTShW
   type: person
   title: Alberto Privitera
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: alex-plesa
-  stableId: OSe82Ax4gm
+  stableId: sid_OSe82Ax4gm
   type: person
   title: Alex Plesa
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: avery-krieger
-  stableId: pLF00ds7ew
+  stableId: sid_pLF00ds7ew
   type: person
   title: Avery Krieger
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: constanze-albrecht
-  stableId: hHyQAK9htk
+  stableId: sid_hHyQAK9htk
   type: person
   title: Constanze Albrecht
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: donnacha-fitzgerald
-  stableId: aZQXutz76s
+  stableId: sid_aZQXutz76s
   type: person
   title: Donnacha Fitzgerald
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: elisa-kallioniemi
-  stableId: UQKSKdPyiQ
+  stableId: sid_UQKSKdPyiQ
   type: person
   title: Elisa Kallioniemi
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: gianluca-cidonio
-  stableId: phMYtz3rfV
+  stableId: sid_phMYtz3rfV
   type: person
   title: Gianluca Cidonio
   description: >-
     Foresight Fellow (2026).
   relatedEntries: []
 - id: creon-levit
-  stableId: trv0r0CAA9
+  stableId: sid_trv0r0CAA9
   type: person
   title: Creon Levit
   description: >-
     Space technology researcher at Planet Labs. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: anders-sandberg
-  stableId: 7ojZDBA9wb
+  stableId: sid_7ojZDBA9wb
   type: person
   title: Anders Sandberg
   description: >-
     Existential risk and long-range futures researcher. Previously at Future of Humanity Institute (FHI) at University of Oxford. Known for work on global catastrophic risks, whole brain emulation, and human enhancement. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: mark-s-miller
-  stableId: PmKAZl2vJK
+  stableId: sid_PmKAZl2vJK
   type: person
   title: Mark S. Miller
   description: >-
     Pioneer of agoric computing and smart contracts. Chief Scientist at Agoric. Known for object-capability security model and the E programming language. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: martin-edelstein
-  stableId: 6qVlyvboZw
+  stableId: sid_6qVlyvboZw
   type: person
   title: Martin Edelstein
   description: >-
     Bottom-up nanotechnology researcher at Covalent Industrial Technologies. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: brad-templeton
-  stableId: fdyIzTzN0R
+  stableId: sid_fdyIzTzN0R
   type: person
   title: Brad Templeton
   description: >-
     Computing pioneer and EFF board member. Faculty at Singularity University. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: zooko-wilcox
-  stableId: F2KOlrJHwv
+  stableId: sid_F2KOlrJHwv
   type: person
   title: Zooko Wilcox
   description: >-
     Cryptocurrency and privacy researcher. Founder of Electric Coin Company (Zcash). Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: samo-burja
-  stableId: IibHlD436w
+  stableId: sid_IibHlD436w
   type: person
   title: Samo Burja
   description: >-
     Political risk and institutional analysis researcher. Founder of Bismarck Analysis. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: adam-brown
-  stableId: ZZ63lzP4Gp
+  stableId: sid_ZZ63lzP4Gp
   type: person
   title: Adam Brown
   description: >-
     Theoretical physics and cosmology researcher at Stanford. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: chiara-marletto
-  stableId: u4ufZ8WinQ
+  stableId: sid_u4ufZ8WinQ
   type: person
   title: Chiara Marletto
   description: >-
     Quantum theory of computation researcher at Oxford. Known for constructor theory. Foresight Institute Senior Fellow.
   relatedEntries: []
 - id: david-manheim
-  stableId: 4auxbz6oS9
+  stableId: sid_4auxbz6oS9
   type: person
   title: David Manheim
   description: >-
@@ -5322,7 +5322,7 @@
   lastUpdated: 2026-03
 
 - id: matthew-barnett
-  stableId: dMBFcubfsO
+  stableId: sid_dMBFcubfsO
   type: person
   title: Matthew Barnett
   description: >-
@@ -5335,7 +5335,7 @@
   lastUpdated: 2026-03
 
 - id: irene-solaiman
-  stableId: gHNYZu5CFw
+  stableId: sid_gHNYZu5CFw
   type: person
   title: Irene Solaiman
   description: >-
@@ -5348,7 +5348,7 @@
   lastUpdated: 2026-03
 
 - id: yolanda-lannquist
-  stableId: 0ckUtuwpkw
+  stableId: sid_0ckUtuwpkw
   type: person
   title: Yolanda Lannquist
   description: >-
@@ -5361,7 +5361,7 @@
   lastUpdated: 2026-03
 
 - id: arthur-mensch
-  stableId: y6wrSRiJx8
+  stableId: sid_y6wrSRiJx8
   type: person
   title: Arthur Mensch
   description: >-
@@ -5375,7 +5375,7 @@
   lastUpdated: 2026-03
 
 - id: guillaume-lample
-  stableId: b9isxdN4Gz
+  stableId: sid_b9isxdN4Gz
   type: person
   title: Guillaume Lample
   description: >-
@@ -5388,7 +5388,7 @@
   lastUpdated: 2026-03
 
 - id: timothee-lacroix
-  stableId: zxDXO21ELF
+  stableId: sid_zxDXO21ELF
   type: person
   title: Timothee Lacroix
   description: >-
@@ -5401,7 +5401,7 @@
   lastUpdated: 2026-03
 
 - id: tri-dao
-  stableId: yWbBTulRyQ
+  stableId: sid_yWbBTulRyQ
   type: person
   title: Tri Dao
   description: >-
@@ -5416,7 +5416,7 @@
   lastUpdated: 2026-03
 
 - id: david-ha
-  stableId: xIgng9YGT5
+  stableId: sid_xIgng9YGT5
   type: person
   title: David Ha
   description: >-
@@ -5429,7 +5429,7 @@
   lastUpdated: 2026-03
 
 - id: been-kim
-  stableId: 6f30hZ4h1x
+  stableId: sid_6f30hZ4h1x
   type: person
   title: Been Kim
   description: >-
@@ -5443,7 +5443,7 @@
   lastUpdated: 2026-03
 
 - id: quoc-le
-  stableId: PkgToeFaAf
+  stableId: sid_PkgToeFaAf
   type: person
   title: Quoc Le
   description: >-
@@ -5457,7 +5457,7 @@
   lastUpdated: 2026-03
 
 - id: mike-schroepfer
-  stableId: 1ujAtAolB0
+  stableId: sid_1ujAtAolB0
   type: person
   title: Mike Schroepfer
   description: >-
@@ -5470,7 +5470,7 @@
   lastUpdated: 2026-03
 
 - id: kevin-scott
-  stableId: sLrdNdMIpJ
+  stableId: sid_sLrdNdMIpJ
   type: person
   title: Kevin Scott
   description: >-
@@ -5484,7 +5484,7 @@
   lastUpdated: 2026-03
 
 - id: james-manyika
-  stableId: 0tcuM9nopA
+  stableId: sid_0tcuM9nopA
   type: person
   title: James Manyika
   description: >-
@@ -5497,7 +5497,7 @@
   lastUpdated: 2026-03
 
 - id: eric-schmidt
-  stableId: afuYa1WcnH
+  stableId: sid_afuYa1WcnH
   type: person
   title: Eric Schmidt
   description: >-
@@ -5512,7 +5512,7 @@
   lastUpdated: 2026-03
 
 - id: eric-horvitz
-  stableId: hCBMClNOex
+  stableId: sid_hCBMClNOex
   type: person
   title: Eric Horvitz
   description: >-
@@ -5527,7 +5527,7 @@
   lastUpdated: 2026-03
 
 - id: kai-fu-lee
-  stableId: mXpM022YBf
+  stableId: sid_mXpM022YBf
   type: person
   title: Kai-Fu Lee
   description: >-
@@ -5541,7 +5541,7 @@
   lastUpdated: 2026-03
 
 - id: joelle-pineau
-  stableId: he0I2G8Q4g
+  stableId: sid_he0I2G8Q4g
   type: person
   title: Joëlle Pineau
   description: >-
@@ -5554,7 +5554,7 @@
   lastUpdated: 2026-03
 
 - id: finale-doshi-velez
-  stableId: YiLkYc6n9r
+  stableId: sid_YiLkYc6n9r
   type: person
   title: Finale Doshi-Velez
   description: >-
@@ -5568,7 +5568,7 @@
   lastUpdated: 2026-03
 
 - id: zoubin-ghahramani
-  stableId: FQCE4fpH55
+  stableId: sid_FQCE4fpH55
   type: person
   title: Zoubin Ghahramani
   description: >-
@@ -5581,7 +5581,7 @@
   lastUpdated: 2026-03
 
 - id: christopher-manning
-  stableId: ffjt6AGNMw
+  stableId: sid_ffjt6AGNMw
   type: person
   title: Christopher Manning
   description: >-
@@ -5594,7 +5594,7 @@
   lastUpdated: 2026-03
 
 - id: dan-jurafsky
-  stableId: cyuwb6nLBQ
+  stableId: sid_cyuwb6nLBQ
   type: person
   title: Dan Jurafsky
   description: >-
@@ -5607,7 +5607,7 @@
   lastUpdated: 2026-03
 
 - id: michael-nielsen
-  stableId: NpJ769ziOQ
+  stableId: sid_NpJ769ziOQ
   type: person
   title: Michael Nielsen
   description: >-
@@ -5620,7 +5620,7 @@
   lastUpdated: 2026-03
 
 - id: charlie-griffin
-  stableId: NtrlAXwLGm
+  stableId: sid_NtrlAXwLGm
   type: person
   title: Charlie Griffin
   description: >-
@@ -5633,7 +5633,7 @@
   lastUpdated: 2026-03
 
 - id: oliver-daniels-koch
-  stableId: vs9fiB2mdH
+  stableId: sid_vs9fiB2mdH
   type: person
   title: Oliver Daniels-Koch
   description: >-
@@ -5645,7 +5645,7 @@
   lastUpdated: 2026-03
 
 - id: alan-davidson
-  stableId: 2QvcZhPojZ
+  stableId: sid_2QvcZhPojZ
   type: person
   title: Alan Davidson
   description: >-
@@ -5658,7 +5658,7 @@
   lastUpdated: 2026-03
 
 - id: devi-parikh
-  stableId: cvglVxvIx2
+  stableId: sid_cvglVxvIx2
   type: person
   title: Devi Parikh
   description: >-
@@ -5671,7 +5671,7 @@
   lastUpdated: 2026-03
 
 - id: chris-re
-  stableId: tr6EVqzeLg
+  stableId: sid_tr6EVqzeLg
   type: person
   title: Chris Re
   description: >-
@@ -5685,7 +5685,7 @@
   lastUpdated: 2026-03
 
 - id: michael-littman
-  stableId: dZ5OQgB67Q
+  stableId: sid_dZ5OQgB67Q
   type: person
   title: Michael Littman
   description: >-
@@ -5700,7 +5700,7 @@
   lastUpdated: 2026-03
 
 - id: kyunghyun-cho
-  stableId: KBhxXcyDcc
+  stableId: sid_KBhxXcyDcc
   type: person
   title: Kyunghyun Cho
   description: >-
@@ -5713,7 +5713,7 @@
   lastUpdated: 2026-03
 
 - id: jason-weston
-  stableId: icN0YS9GGj
+  stableId: sid_icN0YS9GGj
   type: person
   title: Jason Weston
   description: >-
@@ -5726,7 +5726,7 @@
   lastUpdated: 2026-03
 
 - id: owain-evans
-  stableId: lPByZwgBKC
+  stableId: sid_lPByZwgBKC
   type: person
   title: Owain Evans
   description: >-
@@ -5740,7 +5740,7 @@
   lastUpdated: 2026-03
 
 - id: daniel-kokotajlo
-  stableId: 3rVnY5qWJW
+  stableId: sid_3rVnY5qWJW
   type: person
   title: Daniel Kokotajlo
   description: >-
@@ -5754,7 +5754,7 @@
   lastUpdated: 2026-03
 
 - id: mrinank-sharma
-  stableId: zTJh46Qshl
+  stableId: sid_zTJh46Qshl
   type: person
   title: Mrinank Sharma
   description: >-
@@ -5767,7 +5767,7 @@
   lastUpdated: 2026-03
 
 - id: sam-toyer
-  stableId: 0oOPM1i5lg
+  stableId: sid_0oOPM1i5lg
   type: person
   title: Sam Toyer
   description: >-
@@ -5780,7 +5780,7 @@
   lastUpdated: 2026-03
 
 - id: david-bau
-  stableId: 1dZyLNwA5A
+  stableId: sid_1dZyLNwA5A
   type: person
   title: David Bau
   description: >-
@@ -5794,7 +5794,7 @@
   lastUpdated: 2026-03
 
 - id: martin-wattenberg
-  stableId: eUnWIdJ8Ij
+  stableId: sid_eUnWIdJ8Ij
   type: person
   title: Martin Wattenberg
   description: >-
@@ -5809,7 +5809,7 @@
   lastUpdated: 2026-03
 
 - id: jesse-dodge
-  stableId: fk0zoqEI9A
+  stableId: sid_fk0zoqEI9A
   type: person
   title: Jesse Dodge
   description: >-
@@ -5823,7 +5823,7 @@
   lastUpdated: 2026-03
 
 - id: taylor-rogalski
-  stableId: 6ktbHPUrB7
+  stableId: sid_6ktbHPUrB7
   type: person
   title: Taylor Rogalski
   description: >-
@@ -5836,7 +5836,7 @@
   lastUpdated: 2026-03
 
 - id: jack-lindamood
-  stableId: VY9u6VEHj7
+  stableId: sid_VY9u6VEHj7
   type: person
   title: Jack Lindamood
   description: >-
@@ -5849,7 +5849,7 @@
   lastUpdated: 2026-03
 
 - id: chris-lu
-  stableId: H6kBUsCOrA
+  stableId: sid_H6kBUsCOrA
   type: person
   title: Chris Lu
   description: >-
@@ -5862,7 +5862,7 @@
   lastUpdated: 2026-03
 
 - id: dan-roberts
-  stableId: awBjpP6iSA
+  stableId: sid_awBjpP6iSA
   type: person
   title: Dan Roberts
   description: >-
@@ -5875,7 +5875,7 @@
   lastUpdated: 2026-03
 
 - id: cynthia-dwork
-  stableId: 0gbqpv1Uwp
+  stableId: sid_0gbqpv1Uwp
   type: person
   title: Cynthia Dwork
   description: >-
@@ -5891,7 +5891,7 @@
 # ── Phase 1 Political Race Candidates (2026 AI races) ───────────────────
 
 - id: laurie-buckhout
-  stableId: mGJWs0I9DR
+  stableId: sid_mGJWs0I9DR
   type: person
   title: Laurie Buckhout
   description: >-
@@ -5902,7 +5902,7 @@
   lastUpdated: 2026-03
 
 - id: don-davis
-  stableId: NjPH3LAWxM
+  stableId: sid_NjPH3LAWxM
   type: person
   title: Don Davis
   description: >-
@@ -5913,7 +5913,7 @@
   lastUpdated: 2026-03
 
 - id: josh-gottheimer
-  stableId: tVEKHxyInn
+  stableId: sid_tVEKHxyInn
   type: person
   title: Josh Gottheimer
   description: >-
@@ -5925,7 +5925,7 @@
   lastUpdated: 2026-03
 
 - id: chris-gober
-  stableId: jJ0yCaVU9E
+  stableId: sid_jJ0yCaVU9E
   type: person
   title: Chris Gober
   description: >-
@@ -5936,7 +5936,7 @@
   lastUpdated: 2026-03
 
 - id: alex-mealer
-  stableId: upZRDVRpEj
+  stableId: sid_upZRDVRpEj
   type: person
   title: Alex Mealer
   description: >-
@@ -5947,7 +5947,7 @@
   lastUpdated: 2026-03
 
 - id: carlos-de-la-cruz
-  stableId: cuRfFRqEWH
+  stableId: sid_cuRfFRqEWH
   type: person
   title: Carlos De La Cruz
   description: >-
@@ -5958,7 +5958,7 @@
   lastUpdated: 2026-03
 
 - id: mallory-mcmorrow
-  stableId: MufHpHOmRJ
+  stableId: sid_MufHpHOmRJ
   type: person
   title: Mallory McMorrow
   description: >-
@@ -5969,7 +5969,7 @@
   lastUpdated: 2026-03
 
 - id: haley-stevens
-  stableId: Wxqv54AslU
+  stableId: sid_Wxqv54AslU
   type: person
   title: Haley Stevens
   description: >-
@@ -5980,7 +5980,7 @@
   lastUpdated: 2026-03
 
 - id: mike-rogers-mi
-  stableId: rTJq3v2HV6
+  stableId: sid_rTJq3v2HV6
   type: person
   title: Mike Rogers
   description: >-
@@ -5991,7 +5991,7 @@
   lastUpdated: 2026-03
 
 - id: john-cornyn
-  stableId: 4TO1jXYozt
+  stableId: sid_4TO1jXYozt
   type: person
   title: John Cornyn
   description: >-
@@ -6003,7 +6003,7 @@
   lastUpdated: 2026-03
 
 - id: ken-paxton
-  stableId: bIat5xswtM
+  stableId: sid_bIat5xswtM
   type: person
   title: Ken Paxton
   description: >-
@@ -6015,7 +6015,7 @@
   lastUpdated: 2026-03
 
 - id: roy-cooper
-  stableId: uOwPoVTf2h
+  stableId: sid_uOwPoVTf2h
   type: person
   title: Roy Cooper
   description: >-
@@ -6026,7 +6026,7 @@
   lastUpdated: 2026-03
 
 - id: jon-ossoff
-  stableId: N2rG9yPZ9K
+  stableId: sid_N2rG9yPZ9K
   type: person
   title: Jon Ossoff
   description: >-
@@ -6037,7 +6037,7 @@
   lastUpdated: 2026-03
 
 - id: susan-collins
-  stableId: 5NoqE8uJSr
+  stableId: sid_5NoqE8uJSr
   type: person
   title: Susan Collins
   description: >-
@@ -6048,7 +6048,7 @@
   lastUpdated: 2026-03
 
 - id: byron-donalds
-  stableId: 5mkCGqtYnA
+  stableId: sid_5mkCGqtYnA
   type: person
   title: Byron Donalds
   description: >-
@@ -6059,7 +6059,7 @@
   lastUpdated: 2026-03
 
 - id: nida-allam
-  stableId: L9zuCKRaWC
+  stableId: sid_L9zuCKRaWC
   type: person
   title: Nida Allam
   description: >-
@@ -6070,7 +6070,7 @@
   lastUpdated: 2026-03
 
 - id: micah-lasher
-  stableId: bxc9r4rOAn
+  stableId: sid_bxc9r4rOAn
   type: person
   title: Micah Lasher
   description: >-
@@ -6080,7 +6080,7 @@
   lastUpdated: 2026-03
 
 - id: jack-schlossberg
-  stableId: XIHqP2pPI0
+  stableId: sid_XIHqP2pPI0
   type: person
   title: Jack Schlossberg
   description: >-
@@ -6091,7 +6091,7 @@
   lastUpdated: 2026-03
 
 - id: michael-whatley
-  stableId: 7ucfe1TgTW
+  stableId: sid_7ucfe1TgTW
   type: person
   title: Michael Whatley
   description: >-
@@ -6102,7 +6102,7 @@
   lastUpdated: 2026-03
 
 - id: elie-hassenfeld
-  stableId: xVfFkFIk3Q
+  stableId: sid_xVfFkFIk3Q
   wikiId: E1908
   type: person
   title: Elie Hassenfeld
@@ -6117,7 +6117,7 @@
       value: "Co-founder and CEO, GiveWell"
   relatedEntries: []
 - id: bill-gates
-  stableId: kzPpqPCdnw
+  stableId: sid_kzPpqPCdnw
   wikiId: E1910
   type: person
   title: Bill Gates
@@ -6131,7 +6131,7 @@
     - label: Role
       value: "Co-chair, Bill & Melinda Gates Foundation"
   relatedEntries:
-    - id: l4EHdNDZqg
+    - id: sid_l4EHdNDZqg
       type: organization
       relationship: related
   tags:
@@ -6140,7 +6140,7 @@
   lastUpdated: 2026-03
 
 - id: melinda-french-gates
-  stableId: AmS9eXVCFA
+  stableId: sid_AmS9eXVCFA
   wikiId: E1911
   type: person
   title: Melinda French Gates
@@ -6154,7 +6154,7 @@
       value: "Founder, Pivotal Ventures; Former Co-chair, Gates Foundation"
   relatedEntries: []
 - id: peter-singer
-  stableId: TDUEAFxz2w
+  stableId: sid_TDUEAFxz2w
   wikiId: E1912
   type: person
   title: Peter Singer
@@ -6168,7 +6168,7 @@
     - label: Role
       value: "Professor of Bioethics, Princeton University"
   relatedEntries:
-    - id: pShgsxdp8Q
+    - id: sid_pShgsxdp8Q
       type: organization
       relationship: related
   tags:
@@ -6178,7 +6178,7 @@
   lastUpdated: 2026-03
 
 - id: michael-bloomberg
-  stableId: ma5nt6psEA
+  stableId: sid_ma5nt6psEA
   wikiId: E1913
   type: person
   title: Michael Bloomberg
@@ -6191,7 +6191,7 @@
     - label: Role
       value: "Founder, Bloomberg LP and Bloomberg Philanthropies"
   relatedEntries:
-    - id: H9mGnBuumA
+    - id: sid_H9mGnBuumA
       type: organization
       relationship: related
   tags:
@@ -6199,7 +6199,7 @@
   lastUpdated: 2026-03
 
 - id: jeff-bezos
-  stableId: H6GOwDIzbw
+  stableId: sid_H6GOwDIzbw
   wikiId: E1914
   type: person
   title: Jeff Bezos
@@ -6212,7 +6212,7 @@
     - label: Role
       value: "Founder, Amazon and Bezos Earth Fund"
   relatedEntries:
-    - id: fVMqY7vpMA
+    - id: sid_fVMqY7vpMA
       type: organization
       relationship: related
   tags:
@@ -6220,7 +6220,7 @@
   lastUpdated: 2026-03
 
 - id: andrew-steer
-  stableId: QWMkNoodwA
+  stableId: sid_QWMkNoodwA
   wikiId: E1915
   type: person
   title: Andrew Steer
@@ -6234,7 +6234,7 @@
       value: "President and CEO, Bezos Earth Fund"
   relatedEntries: []
 - id: pierre-omidyar
-  stableId: Ol0uNxO0gg
+  stableId: sid_Ol0uNxO0gg
   wikiId: E1916
   type: person
   title: Pierre Omidyar
@@ -6247,7 +6247,7 @@
     - label: Role
       value: "Founder, eBay and Omidyar Network"
   relatedEntries:
-    - id: GADd9PU0UA
+    - id: sid_GADd9PU0UA
       type: organization
       relationship: related
   tags:
@@ -6256,7 +6256,7 @@
   lastUpdated: 2026-03
 
 - id: jeff-skoll
-  stableId: C458I0yUKg
+  stableId: sid_C458I0yUKg
   wikiId: E1917
   type: person
   title: Jeff Skoll
@@ -6269,7 +6269,7 @@
     - label: Role
       value: "Founder, Skoll Foundation"
   relatedEntries:
-    - id: 3swyqpXTRA
+    - id: sid_3swyqpXTRA
       type: organization
       relationship: related
   tags:
@@ -6277,7 +6277,7 @@
   lastUpdated: 2026-03
 
 - id: john-arnold
-  stableId: 8rZgjgj8Gg
+  stableId: sid_8rZgjgj8Gg
   wikiId: E1918
   type: person
   title: John Arnold
@@ -6290,7 +6290,7 @@
     - label: Role
       value: "Co-founder, Arnold Ventures"
   relatedEntries:
-    - id: AT0VDnvwRw
+    - id: sid_AT0VDnvwRw
       type: organization
       relationship: related
   tags:
@@ -6298,7 +6298,7 @@
   lastUpdated: 2026-03
 
 - id: laura-arnold
-  stableId: NhxFtIuyjg
+  stableId: sid_NhxFtIuyjg
   wikiId: E1919
   type: person
   title: Laura Arnold
@@ -6312,7 +6312,7 @@
       value: "Co-founder and Co-chair, Arnold Ventures"
   relatedEntries: []
 - id: darren-walker
-  stableId: Be7G95qQ1Q
+  stableId: sid_Be7G95qQ1Q
   wikiId: E1920
   type: person
   title: Darren Walker
@@ -6325,7 +6325,7 @@
     - label: Role
       value: "President, Ford Foundation"
   relatedEntries:
-    - id: 3ViojCH3Sw
+    - id: sid_3ViojCH3Sw
       type: organization
       relationship: related
   tags:
@@ -6333,7 +6333,7 @@
   lastUpdated: 2026-03
 
 - id: rajiv-shah
-  stableId: 0Ev9WHrXIw
+  stableId: sid_0Ev9WHrXIw
   wikiId: E1921
   type: person
   title: Rajiv Shah
@@ -6346,7 +6346,7 @@
     - label: Role
       value: "President, Rockefeller Foundation"
   relatedEntries:
-    - id: 3wtyeezoxQ
+    - id: sid_3wtyeezoxQ
       type: organization
       relationship: related
   tags:
@@ -6355,7 +6355,7 @@
   lastUpdated: 2026-03
 
 - id: chris-hohn
-  stableId: KJVkZptGVQ
+  stableId: sid_KJVkZptGVQ
   wikiId: E1922
   type: person
   title: Chris Hohn
@@ -6368,7 +6368,7 @@
     - label: Role
       value: "Founder, CIFF and TCI Fund Management"
   relatedEntries:
-    - id: Z6vKggPBaA
+    - id: sid_Z6vKggPBaA
       type: organization
       relationship: related
   tags:
@@ -6377,7 +6377,7 @@
   lastUpdated: 2026-03
 
 - id: heather-templeton-dill
-  stableId: AYxtuMsoiw
+  stableId: sid_AYxtuMsoiw
   wikiId: E1923
   type: person
   title: Heather Templeton Dill
@@ -6389,7 +6389,7 @@
     - label: Role
       value: "President, John Templeton Foundation"
   relatedEntries:
-    - id: W3UAlnscAg
+    - id: sid_W3UAlnscAg
       type: organization
       relationship: related
   tags:
@@ -6397,7 +6397,7 @@
   lastUpdated: 2026-03
 
 - id: pam-omidyar
-  stableId: d5rr9sMk2w
+  stableId: sid_d5rr9sMk2w
   wikiId: E1924
   type: person
   title: Pam Omidyar
@@ -6410,7 +6410,7 @@
       value: "Co-founder, Omidyar Network; Founder, Humanity United"
   relatedEntries: []
 - id: leah-edgerton
-  stableId: Xq2bq3EJZQ
+  stableId: sid_Xq2bq3EJZQ
   wikiId: E1925
   type: person
   title: Leah Edgerton
@@ -6423,7 +6423,7 @@
     - label: Role
       value: "Executive Director, Animal Charity Evaluators"
   relatedEntries:
-    - id: nJF5vuz1kA
+    - id: sid_nJF5vuz1kA
       type: organization
       relationship: related
   tags:
@@ -6432,7 +6432,7 @@
   lastUpdated: 2026-03
 
 - id: charlie-bresler
-  stableId: Y2C4nsiyYw
+  stableId: sid_Y2C4nsiyYw
   wikiId: E1926
   type: person
   title: Charlie Bresler
@@ -6446,7 +6446,7 @@
       value: "Executive Director, The Life You Can Save"
   relatedEntries: []
 - id: john-arne-rottingen
-  stableId: QkTjuStGuw
+  stableId: sid_QkTjuStGuw
   wikiId: E1927
   type: person
   title: "John-Arne R\xF8ttingen"
@@ -6460,7 +6460,7 @@
     - label: Role
       value: "Director, Wellcome Trust"
   relatedEntries:
-    - id: D3QcAF9wzQ
+    - id: sid_D3QcAF9wzQ
       type: organization
       relationship: related
   tags:
@@ -6473,7 +6473,7 @@
 # ═══════════════════════════════════════════════════════════════════
 
 - id: lisa-su
-  stableId: vr5HogmRLQ
+  stableId: sid_vr5HogmRLQ
   type: person
   title: Lisa Su
   description: >-
@@ -6488,7 +6488,7 @@
   tags: [semiconductors, ai-hardware]
 
 - id: charles-musgrave
-  stableId: dm3564AzwW
+  stableId: sid_dm3564AzwW
   type: person
   title: Charles Musgrave
   description: >-
@@ -6497,7 +6497,7 @@
   lastUpdated: 2026-03
 
 - id: nadrian-seeman
-  stableId: FZeKRtovLQ
+  stableId: sid_FZeKRtovLQ
   type: person
   title: Nadrian C. Seeman
   description: >-
@@ -6506,7 +6506,7 @@
   lastUpdated: 2026-03
 
 - id: charles-bauschlicher
-  stableId: NJxxjYB346
+  stableId: sid_NJxxjYB346
   type: person
   title: Charles Bauschlicher
   description: >-
@@ -6515,7 +6515,7 @@
   lastUpdated: 2026-03
 
 - id: stephen-barnard
-  stableId: jzOKTbpXVA
+  stableId: sid_jzOKTbpXVA
   type: person
   title: Stephen Barnard
   description: >-
@@ -6524,7 +6524,7 @@
   lastUpdated: 2026-03
 
 - id: glenn-deardorff
-  stableId: DyMxSmsaAx
+  stableId: sid_DyMxSmsaAx
   type: person
   title: Glenn Deardorff
   description: >-
@@ -6533,7 +6533,7 @@
   lastUpdated: 2026-03
 
 - id: al-globus
-  stableId: AX2ipeFpxQ
+  stableId: sid_AX2ipeFpxQ
   type: person
   title: Al Globus
   description: >-
@@ -6542,7 +6542,7 @@
   lastUpdated: 2026-03
 
 - id: jie-han
-  stableId: rxk5kdbYth
+  stableId: sid_rxk5kdbYth
   type: person
   title: Jie Han
   description: >-
@@ -6551,7 +6551,7 @@
   lastUpdated: 2026-03
 
 - id: richard-jaffe
-  stableId: o8el2UhB0E
+  stableId: sid_o8el2UhB0E
   type: person
   title: Richard Jaffe
   description: >-
@@ -6560,7 +6560,7 @@
   lastUpdated: 2026-03
 
 - id: alessandra-ricca
-  stableId: 9r3Gx9RljM
+  stableId: sid_9r3Gx9RljM
   type: person
   title: Alessandra Ricca
   description: >-
@@ -6569,7 +6569,7 @@
   lastUpdated: 2026-03
 
 - id: marzio-rosi
-  stableId: EdnJ6TsFPm
+  stableId: sid_EdnJ6TsFPm
   type: person
   title: Marzio Rosi
   description: >-
@@ -6578,7 +6578,7 @@
   lastUpdated: 2026-03
 
 - id: deepak-srivastava
-  stableId: WdIlcePAtc
+  stableId: sid_WdIlcePAtc
   type: person
   title: Deepak Srivastava
   description: >-
@@ -6587,7 +6587,7 @@
   lastUpdated: 2026-03
 
 - id: h-thuemmel
-  stableId: xhzxl1X8wH
+  stableId: sid_xhzxl1X8wH
   type: person
   title: H. Thuemmel
   description: >-
@@ -6596,7 +6596,7 @@
   lastUpdated: 2026-03
 
 - id: james-gimzewski
-  stableId: mEaMVguEQn
+  stableId: sid_mEaMVguEQn
   type: person
   title: James K. Gimzewski
   description: >-
@@ -6605,7 +6605,7 @@
   lastUpdated: 2026-03
 
 - id: reto-schlittler
-  stableId: dW9d1letqg
+  stableId: sid_dW9d1letqg
   type: person
   title: Reto Schlittler
   description: >-
@@ -6614,7 +6614,7 @@
   lastUpdated: 2026-03
 
 - id: christian-joachim
-  stableId: 5l8z2m7yXj
+  stableId: sid_5l8z2m7yXj
   type: person
   title: Christian Joachim
   description: >-
@@ -6623,7 +6623,7 @@
   lastUpdated: 2026-03
 
 - id: phil-collins-nano
-  stableId: fAS6QxfsqB
+  stableId: sid_fAS6QxfsqB
   type: person
   title: Phil Collins
   description: >-
@@ -6632,7 +6632,7 @@
   lastUpdated: 2026-03
 
 - id: ralph-merkle
-  stableId: v6BHLZvvwL
+  stableId: sid_v6BHLZvvwL
   type: person
   title: Ralph C. Merkle
   description: >-
@@ -6641,7 +6641,7 @@
   lastUpdated: 2026-03
 
 - id: stephen-walch
-  stableId: Q1YUZz3vbk
+  stableId: sid_Q1YUZz3vbk
   type: person
   title: Stephen Walch
   description: >-
@@ -6650,7 +6650,7 @@
   lastUpdated: 2026-03
 
 - id: reza-ghadiri
-  stableId: 8DUyEnxEV5
+  stableId: sid_8DUyEnxEV5
   type: person
   title: M. Reza Ghadiri
   description: >-
@@ -6659,7 +6659,7 @@
   lastUpdated: 2026-03
 
 - id: fotis-nifiatis
-  stableId: ywfH3f0wzM
+  stableId: sid_ywfH3f0wzM
   type: person
   title: Fotis Nifiatis
   description: >-
@@ -6668,7 +6668,7 @@
   lastUpdated: 2026-03
 
 - id: william-goddard
-  stableId: g3A4KvCPbg
+  stableId: sid_g3A4KvCPbg
   type: person
   title: William A. Goddard III
   description: >-
@@ -6677,7 +6677,7 @@
   lastUpdated: 2026-03
 
 - id: tahir-cagin
-  stableId: j6Egr6aHXq
+  stableId: sid_j6Egr6aHXq
   type: person
   title: Tahir Cagin
   description: >-
@@ -6686,7 +6686,7 @@
   lastUpdated: 2026-03
 
 - id: yue-qi
-  stableId: C5ZRQgwdXw
+  stableId: sid_C5ZRQgwdXw
   type: person
   title: Yue Qi
   description: >-
@@ -6695,7 +6695,7 @@
   lastUpdated: 2026-03
 
 - id: phaedon-avouris
-  stableId: nSNU9PkMP3
+  stableId: sid_nSNU9PkMP3
   type: person
   title: Phaedon Avouris
   description: >-
@@ -6704,7 +6704,7 @@
   lastUpdated: 2026-03
 
 - id: anita-goel
-  stableId: sABndIheek
+  stableId: sid_sABndIheek
   type: person
   title: Anita Goel
   description: >-
@@ -6713,7 +6713,7 @@
   lastUpdated: 2026-03
 
 - id: uzi-landman
-  stableId: Rid2OzQRKm
+  stableId: sid_Rid2OzQRKm
   type: person
   title: Uzi Landman
   description: >-
@@ -6722,7 +6722,7 @@
   lastUpdated: 2026-03
 
 - id: stanley-williams
-  stableId: sI3Mx6SVSG
+  stableId: sid_sI3Mx6SVSG
   type: person
   title: R. Stanley Williams
   description: >-
@@ -6731,7 +6731,7 @@
   lastUpdated: 2026-03
 
 - id: philip-kuekes
-  stableId: SADdIz271g
+  stableId: sid_SADdIz271g
   type: person
   title: Philip Kuekes
   description: >-
@@ -6740,7 +6740,7 @@
   lastUpdated: 2026-03
 
 - id: james-heath
-  stableId: 1KrX2xquOh
+  stableId: sid_1KrX2xquOh
   type: person
   title: James Heath
   description: >-
@@ -6749,7 +6749,7 @@
   lastUpdated: 2026-03
 
 - id: christopher-love
-  stableId: xszdJkdyqf
+  stableId: sid_xszdJkdyqf
   type: person
   title: Christopher Love
   description: >-
@@ -6758,7 +6758,7 @@
   lastUpdated: 2026-03
 
 - id: mark-ratner
-  stableId: 5yzfycPuJh
+  stableId: sid_5yzfycPuJh
   type: person
   title: Mark A. Ratner
   description: >-
@@ -6767,7 +6767,7 @@
   lastUpdated: 2026-03
 
 - id: charles-lieber
-  stableId: Vfm5arj0NM
+  stableId: sid_Vfm5arj0NM
   type: person
   title: Charles M. Lieber
   description: >-
@@ -6776,7 +6776,7 @@
   lastUpdated: 2026-03
 
 - id: jing-kong
-  stableId: VY1tUTlwTp
+  stableId: sid_VY1tUTlwTp
   type: person
   title: Jing Kong
   description: >-
@@ -6785,7 +6785,7 @@
   lastUpdated: 2026-03
 
 - id: don-brenner
-  stableId: gr19HovNHQ
+  stableId: sid_gr19HovNHQ
   type: person
   title: Don Brenner
   description: >-
@@ -6794,7 +6794,7 @@
   lastUpdated: 2026-03
 
 - id: chad-mirkin
-  stableId: DKZTCGY2dW
+  stableId: sid_DKZTCGY2dW
   type: person
   title: Chad Mirkin
   description: >-
@@ -6803,7 +6803,7 @@
   lastUpdated: 2026-03
 
 - id: yi-cui
-  stableId: l61ooNQ2Jn
+  stableId: sid_l61ooNQ2Jn
   type: person
   title: Yi Cui
   description: >-
@@ -6812,7 +6812,7 @@
   lastUpdated: 2026-03
 
 - id: marvin-cohen
-  stableId: lEmUiZWZ6Q
+  stableId: sid_lEmUiZWZ6Q
   type: person
   title: Marvin L. Cohen
   description: >-
@@ -6821,7 +6821,7 @@
   lastUpdated: 2026-03
 
 - id: steven-louie
-  stableId: rGfnk9cjhE
+  stableId: sid_rGfnk9cjhE
   type: person
   title: Steven G. Louie
   description: >-
@@ -6830,7 +6830,7 @@
   lastUpdated: 2026-03
 
 - id: carlo-montemagno
-  stableId: Kg335Zr9gQ
+  stableId: sid_Kg335Zr9gQ
   type: person
   title: Carlo Montemagno
   description: >-
@@ -6839,7 +6839,7 @@
   lastUpdated: 2026-03
 
 - id: ahmet-yildiz
-  stableId: 8t9bFhNVDh
+  stableId: sid_8t9bFhNVDh
   type: person
   title: Ahmet Yildiz
   description: >-
@@ -6848,7 +6848,7 @@
   lastUpdated: 2026-03
 
 - id: david-baker-protein
-  stableId: z0Bzf1c1Ji
+  stableId: sid_z0Bzf1c1Ji
   type: person
   title: David Baker
   description: >-
@@ -6857,7 +6857,7 @@
   lastUpdated: 2026-03
 
 - id: brian-kuhlman
-  stableId: mMaPu5zNTQ
+  stableId: sid_mMaPu5zNTQ
   type: person
   title: Brian Kuhlman
   description: >-
@@ -6866,7 +6866,7 @@
   lastUpdated: 2026-03
 
 - id: homme-hellinga
-  stableId: UxDrSYuD3N
+  stableId: sid_UxDrSYuD3N
   type: person
   title: Homme Hellinga
   description: >-
@@ -6875,7 +6875,7 @@
   lastUpdated: 2026-03
 
 - id: damian-allis
-  stableId: 2wPOGXCHCg
+  stableId: sid_2wPOGXCHCg
   type: person
   title: Damian Allis
   description: >-
@@ -6884,7 +6884,7 @@
   lastUpdated: 2026-03
 
 - id: christian-schafmeister
-  stableId: yI3KkFywod
+  stableId: sid_yI3KkFywod
   type: person
   title: Christian Schafmeister
   description: >-
@@ -6893,7 +6893,7 @@
   lastUpdated: 2026-03
 
 - id: christopher-levins
-  stableId: 2yVNPE9woM
+  stableId: sid_2yVNPE9woM
   type: person
   title: Christopher Levins
   description: >-
@@ -6902,7 +6902,7 @@
   lastUpdated: 2026-03
 
 - id: erik-winfree
-  stableId: ZYqjkvAsDT
+  stableId: sid_ZYqjkvAsDT
   type: person
   title: Erik Winfree
   description: >-
@@ -6911,7 +6911,7 @@
   lastUpdated: 2026-03
 
 - id: paul-rothemund
-  stableId: eHENzP6XRR
+  stableId: sid_eHENzP6XRR
   type: person
   title: Paul W.K. Rothemund
   description: >-
@@ -6920,7 +6920,7 @@
   lastUpdated: 2026-03
 
 - id: david-leigh
-  stableId: tpr2ivIi8w
+  stableId: sid_tpr2ivIi8w
   type: person
   title: David A. Leigh
   description: >-
@@ -6929,7 +6929,7 @@
   lastUpdated: 2026-03
 
 - id: fraser-stoddart
-  stableId: 2jsolKOyyB
+  stableId: sid_2jsolKOyyB
   type: person
   title: J. Fraser Stoddart
   description: >-
@@ -6938,7 +6938,7 @@
   lastUpdated: 2026-03
 
 - id: fung-suong-ou
-  stableId: nnBCkdzMBg
+  stableId: sid_nnBCkdzMBg
   type: person
   title: Fung Suong Ou
   description: >-
@@ -6947,7 +6947,7 @@
   lastUpdated: 2026-03
 
 - id: george-schatz
-  stableId: AQo3DXAlDw
+  stableId: sid_AQo3DXAlDw
   type: person
   title: George C. Schatz
   description: >-
@@ -6956,7 +6956,7 @@
   lastUpdated: 2026-03
 
 - id: james-tour
-  stableId: Ou283QVyDg
+  stableId: sid_Ou283QVyDg
   type: person
   title: James M. Tour
   description: >-
@@ -6965,7 +6965,7 @@
   lastUpdated: 2026-03
 
 - id: robert-freitas
-  stableId: aFJXa6dhDQ
+  stableId: sid_aFJXa6dhDQ
   type: person
   title: Robert A. Freitas Jr.
   description: >-
@@ -6974,7 +6974,7 @@
   lastUpdated: 2026-03
 
 - id: yoshiaki-sugimoto
-  stableId: yxDw1aRTEf
+  stableId: sid_yxDw1aRTEf
   type: person
   title: Yoshiaki Sugimoto
   description: >-
@@ -6983,7 +6983,7 @@
   lastUpdated: 2026-03
 
 - id: masayuki-abe
-  stableId: dHw53yzgGP
+  stableId: sid_dHw53yzgGP
   type: person
   title: Masayuki Abe
   description: >-
@@ -6992,7 +6992,7 @@
   lastUpdated: 2026-03
 
 - id: oscar-custance
-  stableId: YIicC5WlNJ
+  stableId: sid_YIicC5WlNJ
   type: person
   title: Oscar Custance
   description: >-
@@ -7001,7 +7001,7 @@
   lastUpdated: 2026-03
 
 - id: gustavo-scuseria
-  stableId: J4rLGnUrD6
+  stableId: sid_J4rLGnUrD6
   type: person
   title: Gustavo E. Scuseria
   description: >-
@@ -7010,7 +7010,7 @@
   lastUpdated: 2026-03
 
 - id: masakazu-aono
-  stableId: 7tuG6MwTWx
+  stableId: sid_7tuG6MwTWx
   type: person
   title: Masakazu Aono
   description: >-
@@ -7019,7 +7019,7 @@
   lastUpdated: 2026-03
 
 - id: raymond-astumian
-  stableId: lfWDZAC6ng
+  stableId: sid_lfWDZAC6ng
   type: person
   title: Raymond Astumian
   description: >-
@@ -7028,7 +7028,7 @@
   lastUpdated: 2026-03
 
 - id: leonhard-grill
-  stableId: wPndGVe7oX
+  stableId: sid_wPndGVe7oX
   type: person
   title: Leonhard Grill
   description: >-
@@ -7037,7 +7037,7 @@
   lastUpdated: 2026-03
 
 - id: david-soloveichik
-  stableId: vlCvjxY9gw
+  stableId: sid_vlCvjxY9gw
   type: person
   title: David Soloveichik
   description: >-
@@ -7046,7 +7046,7 @@
   lastUpdated: 2026-03
 
 - id: gerhard-meyer
-  stableId: KJWNTtc1WR
+  stableId: sid_KJWNTtc1WR
   type: person
   title: Gerhard Meyer
   description: >-
@@ -7055,7 +7055,7 @@
   lastUpdated: 2026-03
 
 - id: leo-gross
-  stableId: GhnqHYpCzj
+  stableId: sid_GhnqHYpCzj
   type: person
   title: Leo Gross
   description: >-
@@ -7064,7 +7064,7 @@
   lastUpdated: 2026-03
 
 - id: jascha-repp
-  stableId: hdiV0abS7c
+  stableId: sid_hdiV0abS7c
   type: person
   title: Jascha Repp
   description: >-
@@ -7073,7 +7073,7 @@
   lastUpdated: 2026-03
 
 - id: david-walker-nano
-  stableId: FVV87S0TMi
+  stableId: sid_FVV87S0TMi
   type: person
   title: David Walker
   description: >-
@@ -7082,7 +7082,7 @@
   lastUpdated: 2026-03
 
 - id: david-beratan
-  stableId: iEHUQfVS0a
+  stableId: sid_iEHUQfVS0a
   type: person
   title: David N. Beratan
   description: >-
@@ -7091,7 +7091,7 @@
   lastUpdated: 2026-03
 
 - id: alexander-zettl
-  stableId: ds8lnHk7og
+  stableId: sid_ds8lnHk7og
   type: person
   title: Alexander K. Zettl
   description: >-
@@ -7100,7 +7100,7 @@
   lastUpdated: 2026-03
 
 - id: jonathan-barnes
-  stableId: a9u0mNCNnw
+  stableId: sid_a9u0mNCNnw
   type: person
   title: Jonathan C. Barnes
   description: >-
@@ -7109,7 +7109,7 @@
   lastUpdated: 2026-03
 
 - id: amanda-barnard
-  stableId: xrtuLZQ124
+  stableId: sid_xrtuLZQ124
   type: person
   title: Amanda S. Barnard
   description: >-
@@ -7118,7 +7118,7 @@
   lastUpdated: 2026-03
 
 - id: joseph-lyding
-  stableId: YA4OLmGFeL
+  stableId: sid_YA4OLmGFeL
   type: person
   title: Joseph W. Lyding
   description: >-
@@ -7127,7 +7127,7 @@
   lastUpdated: 2026-03
 
 - id: markus-buehler
-  stableId: gKoe9fTUyQ
+  stableId: sid_gKoe9fTUyQ
   type: person
   title: Markus J. Buehler
   description: >-
@@ -7136,7 +7136,7 @@
   lastUpdated: 2026-03
 
 - id: michelle-simmons
-  stableId: XLGEBz90WQ
+  stableId: sid_XLGEBz90WQ
   type: person
   title: Michelle Y. Simmons
   description: >-
@@ -7145,7 +7145,7 @@
   lastUpdated: 2026-03
 
 - id: bartosz-grzybowski
-  stableId: y1cwz74Nhw
+  stableId: sid_y1cwz74Nhw
   type: person
   title: Bartosz A. Grzybowski
   description: >-
@@ -7154,7 +7154,7 @@
   lastUpdated: 2026-03
 
 - id: franz-giessibl
-  stableId: HBeg0cncQw
+  stableId: sid_HBeg0cncQw
   type: person
   title: Franz J. Giessibl
   description: >-
@@ -7163,7 +7163,7 @@
   lastUpdated: 2026-03
 
 - id: conrad-pfeiffer
-  stableId: qyD1gk1Evv
+  stableId: sid_qyD1gk1Evv
   type: person
   title: Conrad Pfeiffer
   description: >-
@@ -7172,7 +7172,7 @@
   lastUpdated: 2026-03
 
 - id: giovanni-zocchi
-  stableId: d2jyQILVUA
+  stableId: sid_d2jyQILVUA
   type: person
   title: Giovanni Zocchi
   description: >-
@@ -7181,7 +7181,7 @@
   lastUpdated: 2026-03
 
 - id: william-shih
-  stableId: fV226i65Qw
+  stableId: sid_fV226i65Qw
   type: person
   title: William Shih
   description: >-
@@ -7190,7 +7190,7 @@
   lastUpdated: 2026-03
 
 - id: hai-qian
-  stableId: xhQ4FxQZXp
+  stableId: sid_xhQ4FxQZXp
   type: person
   title: Hai Qian
   description: >-
@@ -7199,7 +7199,7 @@
   lastUpdated: 2026-03
 
 - id: anatole-von-lilienfeld
-  stableId: JPLsyOnjud
+  stableId: sid_JPLsyOnjud
   type: person
   title: Anatole von Lilienfeld
   description: >-
@@ -7208,7 +7208,7 @@
   lastUpdated: 2026-03
 
 - id: andreas-heinrich
-  stableId: KzzogZG8Ol
+  stableId: sid_KzzogZG8Ol
   type: person
   title: Andreas Heinrich
   description: >-
@@ -7217,7 +7217,7 @@
   lastUpdated: 2026-03
 
 - id: christopher-lutz
-  stableId: 7cspZujyG2
+  stableId: sid_7cspZujyG2
   type: person
   title: Christopher Lutz
   description: >-
@@ -7226,7 +7226,7 @@
   lastUpdated: 2026-03
 
 - id: qi-li
-  stableId: AfZwD5AHkN
+  stableId: sid_AfZwD5AHkN
   type: person
   title: Qi Li
   description: >-
@@ -7235,7 +7235,7 @@
   lastUpdated: 2026-03
 
 - id: giulia-galli
-  stableId: oharhxWLzw
+  stableId: sid_oharhxWLzw
   type: person
   title: Giulia Galli
   description: >-
@@ -7244,7 +7244,7 @@
   lastUpdated: 2026-03
 
 - id: lulu-qian
-  stableId: I0lBWQOPdZ
+  stableId: sid_I0lBWQOPdZ
   type: person
   title: Lulu Qian
   description: >-
@@ -7253,7 +7253,7 @@
   lastUpdated: 2026-03
 
 - id: yuxing-yao
-  stableId: BIMHSf8wCb
+  stableId: sid_BIMHSf8wCb
   type: person
   title: Yuxing Yao
   description: >-
@@ -7262,7 +7262,7 @@
   lastUpdated: 2026-03
 
 - id: massimiliano-di-ventra
-  stableId: ZkU7gCOfJ2
+  stableId: sid_ZkU7gCOfJ2
   type: person
   title: Massimiliano Di Ventra
   description: >-
@@ -7271,7 +7271,7 @@
   lastUpdated: 2026-03
 
 - id: hao-yan
-  stableId: ucOypAzBTx
+  stableId: sid_ucOypAzBTx
   type: person
   title: Hao Yan
   description: >-
@@ -7280,7 +7280,7 @@
   lastUpdated: 2026-03
 
 - id: kendall-houk
-  stableId: sfObZ2kshL
+  stableId: sid_sfObZ2kshL
   type: person
   title: Kendall N. Houk
   description: >-
@@ -7289,7 +7289,7 @@
   lastUpdated: 2026-03
 
 - id: anne-sophie-duwez
-  stableId: O6bG7hrkoA
+  stableId: sid_O6bG7hrkoA
   type: person
   title: Anne-Sophie Duwez
   description: >-
@@ -7298,7 +7298,7 @@
   lastUpdated: 2026-03
 
 - id: james-chelikowsky
-  stableId: MR6ri0SHAw
+  stableId: sid_MR6ri0SHAw
   type: person
   title: James R. Chelikowsky
   description: >-
@@ -7307,7 +7307,7 @@
   lastUpdated: 2026-03
 
 - id: sergei-kalinin
-  stableId: FV8iKswdQ3
+  stableId: sid_FV8iKswdQ3
   type: person
   title: Sergei V. Kalinin
   description: >-
@@ -7316,7 +7316,7 @@
   lastUpdated: 2026-03
 
 - id: emanuele-penocchio
-  stableId: UDvewxMQqd
+  stableId: sid_UDvewxMQqd
   type: person
   title: Emanuele Penocchio
   description: >-
@@ -7325,7 +7325,7 @@
   lastUpdated: 2026-03
 
 - id: alexandre-tkatchenko
-  stableId: dBPEKErmC9
+  stableId: sid_dBPEKErmC9
   type: person
   title: Alexandre Tkatchenko
   description: >-
@@ -7334,7 +7334,7 @@
   lastUpdated: 2026-03
 
 - id: james-collins
-  stableId: PPZGnptNsh
+  stableId: sid_PPZGnptNsh
   type: person
   title: James J. Collins
   description: >-
@@ -7343,7 +7343,7 @@
   lastUpdated: 2026-03
 
 - id: qiancheng-xiong
-  stableId: BcjrAqPsSg
+  stableId: sid_BcjrAqPsSg
   type: person
   title: Qiancheng Xiong
   description: >-
@@ -7352,7 +7352,7 @@
   lastUpdated: 2026-03
 
 - id: klaus-robert-muller
-  stableId: Q4Qq5hLrtA
+  stableId: sid_Q4Qq5hLrtA
   type: person
   title: Klaus-Robert Muller
   description: >-
@@ -7361,7 +7361,7 @@
   lastUpdated: 2026-03
 
 - id: saw-wai-hla
-  stableId: kUDmreRcsQ
+  stableId: sid_kUDmreRcsQ
   type: person
   title: Saw Wai Hla
   description: >-
@@ -7370,7 +7370,7 @@
   lastUpdated: 2026-03
 
 - id: gabriella-gagliano
-  stableId: I2laR4bZLQ
+  stableId: sid_I2laR4bZLQ
   type: person
   title: Gabriella Gagliano
   description: >-
@@ -7379,7 +7379,7 @@
   lastUpdated: 2026-03
 
 - id: alisa-frik
-  stableId: eQc8EFi1Zk
+  stableId: sid_eQc8EFi1Zk
   type: person
   title: Alisa Frik
   description: >-
@@ -7388,7 +7388,7 @@
   lastUpdated: 2026-03
 
 - id: serge-egelman
-  stableId: N2qvjMwwVg
+  stableId: sid_N2qvjMwwVg
   type: person
   title: Serge Egelman
   description: >-
@@ -7397,7 +7397,7 @@
   lastUpdated: 2026-03
 
 - id: conor-gilsenan
-  stableId: DChVcEpBZs
+  stableId: sid_DChVcEpBZs
   type: person
   title: Conor Gilsenan
   description: >-
@@ -7406,7 +7406,7 @@
   lastUpdated: 2026-03
 
 - id: eyal-peer
-  stableId: NYSl6N9MW9
+  stableId: sid_NYSl6N9MW9
   type: person
   title: Eyal Peer
   description: >-
@@ -7415,7 +7415,7 @@
   lastUpdated: 2026-03
 
 - id: pardis-emami-naeini
-  stableId: d8kKZis94U
+  stableId: sid_d8kKZis94U
   type: person
   title: Pardis Emami-Naeini
   description: >-
@@ -7424,7 +7424,7 @@
   lastUpdated: 2026-03
 
 - id: lorrie-faith-cranor
-  stableId: FqIaAc60SA
+  stableId: sid_FqIaAc60SA
   type: person
   title: Lorrie Faith Cranor
   description: >-
@@ -7433,7 +7433,7 @@
   lastUpdated: 2026-03
 
 - id: yuvraj-agarwal
-  stableId: nyiQxMiigQ
+  stableId: sid_nyiQxMiigQ
   type: person
   title: Yuvraj Agarwal
   description: >-
@@ -7442,7 +7442,7 @@
   lastUpdated: 2026-03
 
 - id: christophe-fouquet
-  stableId: 4Qz7ctU0HG
+  stableId: sid_4Qz7ctU0HG
   type: person
   title: Christophe Fouquet
   description: >-
@@ -7456,7 +7456,7 @@
   lastUpdated: 2026-03
 
 - id: cc-wei
-  stableId: NuIC1Eestw
+  stableId: sid_NuIC1Eestw
   type: person
   title: C.C. Wei
   description: >-
@@ -7470,7 +7470,7 @@
   lastUpdated: 2026-03
 
 - id: alan-estevez
-  stableId: onn1iNNwpa
+  stableId: sid_onn1iNNwpa
   type: person
   title: Alan Estevez
   description: >-
@@ -7485,7 +7485,7 @@
   lastUpdated: 2026-03
 
 - id: jake-sullivan
-  stableId: dKI5rHw2SA
+  stableId: sid_dKI5rHw2SA
   type: person
   title: Jake Sullivan
   description: >-
@@ -7503,7 +7503,7 @@
   lastUpdated: 2026-03
 
 - id: gina-raimondo
-  stableId: VVhix6hvrQ
+  stableId: sid_VVhix6hvrQ
   type: person
   title: Gina Raimondo
   description: >-
@@ -7517,7 +7517,7 @@
   lastUpdated: 2026-03
 
 - id: chris-miller-chipwar
-  stableId: wBKntwURcg
+  stableId: sid_wBKntwURcg
   type: person
   title: Chris Miller
   description: >-
@@ -7534,7 +7534,7 @@
   lastUpdated: 2026-03
 
 - id: saif-khan
-  stableId: EmAhq5JolA
+  stableId: sid_EmAhq5JolA
   type: person
   title: Saif Khan
   description: >-
@@ -7548,7 +7548,7 @@
   lastUpdated: 2026-03
 
 - id: gregory-allen
-  stableId: vn087g2XWa
+  stableId: sid_vn087g2XWa
   type: person
   title: Gregory Allen
   description: >-
@@ -7563,7 +7563,7 @@
   lastUpdated: 2026-03
 
 - id: david-reber
-  stableId: U3xCxPjV6T
+  stableId: sid_U3xCxPjV6T
   type: person
   title: David Reber
   description: >-
@@ -7581,49 +7581,49 @@
   lastUpdated: 2026-03
 
 - id: ahmad-al-dahle
-  stableId: oNmeiVDxgF
+  stableId: sid_oNmeiVDxgF
   type: person
   title: Ahmad Al-Dahle
 - id: chris-ciauri
-  stableId: xeagCIAkNl
+  stableId: sid_xeagCIAkNl
   type: person
   title: Chris Ciauri
 - id: greg-yang
-  stableId: nBq0FQMIxC
+  stableId: sid_nBq0FQMIxC
   type: person
   title: Greg Yang
 - id: igor-babuschkin
-  stableId: qDigGppwee
+  stableId: sid_qDigGppwee
   type: person
   title: Igor Babuschkin
 - id: jimmy-ba
-  stableId: AdQS3o56n7
+  stableId: sid_AdQS3o56n7
   type: person
   title: Jimmy Ba
 - id: krishna-rao
-  stableId: ND8Ysm5DhN
+  stableId: sid_ND8Ysm5DhN
   type: person
   title: Krishna Rao
 - id: malo-bourgon
-  stableId: e7d7TOh7s6
+  stableId: sid_e7d7TOh7s6
   type: person
   title: Malo Bourgon
 - id: mike-krieger
-  stableId: FNwvoeGSpW
+  stableId: sid_FNwvoeGSpW
   type: person
   title: Mike Krieger
 - id: rahul-patil
-  stableId: sujuUftRFv
+  stableId: sid_sujuUftRFv
   type: person
   title: Rahul Patil
 - id: toby-pohlen
-  stableId: KvrOk6eG5w
+  stableId: sid_KvrOk6eG5w
   type: person
   title: Toby Pohlen
 
 # ── Anthropic LTBT Trustees ─────────────────────────────────
 - id: neil-buddy-shah
-  stableId: MY7i5cfpRQ
+  stableId: sid_MY7i5cfpRQ
   type: person
   title: Neil Buddy Shah
   description: >-
@@ -7634,7 +7634,7 @@
     - global-health
 
 - id: richard-fontaine
-  stableId: sy20C906g2
+  stableId: sid_sy20C906g2
   type: person
   title: Richard Fontaine
   description: >-
@@ -7646,7 +7646,7 @@
     - ai-governance
 
 - id: mariano-florentino-cuellar
-  stableId: 6zzGkJhk5g
+  stableId: sid_6zzGkJhk5g
   type: person
   title: Mariano-Florentino Cuéllar
   description: >-
@@ -7659,7 +7659,7 @@
     - international-affairs
 
 - id: kanika-bahl
-  stableId: LHECP77Zxf
+  stableId: sid_LHECP77Zxf
   type: person
   title: Kanika Bahl
   description: >-
@@ -7670,7 +7670,7 @@
     - global-health
 
 - id: zachary-robinson
-  stableId: ZRDxviU6AJ
+  stableId: sid_ZRDxviU6AJ
   type: person
   title: Zachary Robinson
   description: >-
@@ -7683,7 +7683,7 @@
 
 # ── Anthropic LTBT-Appointed Board Members ──────────────────
 - id: jay-kreps
-  stableId: MBMM3yApjK
+  stableId: sid_MBMM3yApjK
   type: person
   title: Jay Kreps
   description: >-
@@ -7695,7 +7695,7 @@
     - ai-governance
 
 - id: reed-hastings
-  stableId: TUwrPFHFXc
+  stableId: sid_TUwrPFHFXc
   type: person
   title: Reed Hastings
   description: >-
@@ -7706,7 +7706,7 @@
     - ai-governance
 
 - id: chris-liddell
-  stableId: x4ecRCtvSA
+  stableId: sid_x4ecRCtvSA
   type: person
   title: Chris Liddell
   description: >-
@@ -7718,7 +7718,7 @@
 
 # ── OpenAI Foundation Board and Leadership ──────────────────
 - id: bret-taylor
-  stableId: jPuOTgOJGS
+  stableId: sid_jPuOTgOJGS
   type: person
   title: Bret Taylor
   description: >-
@@ -7729,7 +7729,7 @@
     - ai-governance
 
 - id: adam-d-angelo
-  stableId: sNy2jENSLL
+  stableId: sid_sNy2jENSLL
   type: person
   title: Adam D'Angelo
   description: >-
@@ -7740,7 +7740,7 @@
     - ai-governance
 
 - id: sue-desmond-hellmann
-  stableId: oRTlnIq5qF
+  stableId: sid_oRTlnIq5qF
   type: person
   title: Sue Desmond-Hellmann
   description: >-
@@ -7751,7 +7751,7 @@
     - ai-governance
 
 - id: zico-kolter
-  stableId: Q2T4QDC7dA
+  stableId: sid_Q2T4QDC7dA
   type: person
   title: Zico Kolter
   description: >-
@@ -7765,7 +7765,7 @@
     - ai-research
 
 - id: paul-nakasone
-  stableId: CzFijjMitA
+  stableId: sid_CzFijjMitA
   type: person
   title: Paul Nakasone
   description: >-
@@ -7777,7 +7777,7 @@
     - ai-governance
 
 - id: adebayo-ogunlesi
-  stableId: CCEQ9bJTBw
+  stableId: sid_CCEQ9bJTBw
   type: person
   title: Adebayo Ogunlesi
   description: >-
@@ -7788,7 +7788,7 @@
     - ai-governance
 
 - id: nicole-seligman
-  stableId: 3U1A3jX8wC
+  stableId: sid_3U1A3jX8wC
   type: person
   title: Nicole Seligman
   description: >-

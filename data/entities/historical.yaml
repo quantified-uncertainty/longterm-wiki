@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: deep-learning-era
-  stableId: SbxvDZzTsQ
+  stableId: sid_SbxvDZzTsQ
   wikiId: E95
   type: historical
   title: Deep Learning Revolution Era
@@ -16,9 +16,9 @@
     - label: Outcome
       value: AI safety becomes professionalized research field
   relatedEntries:
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   sources:
     - title: ImageNet Classification with Deep Convolutional Neural Networks
@@ -68,7 +68,7 @@
     - dario-amodei
   lastUpdated: 2025-12
 - id: early-warnings
-  stableId: PjjrjKmJvg
+  stableId: sid_PjjrjKmJvg
   wikiId: E107
   type: historical
   title: Early Warnings Era
@@ -127,7 +127,7 @@
     - science-fiction
   lastUpdated: 2025-12
 - id: mainstream-era
-  stableId: G1XyCr76gw
+  stableId: sid_G1XyCr76gw
   wikiId: E195
   type: historical
   title: Mainstream Era
@@ -141,9 +141,9 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   sources:
     - title: 'Constitutional AI: Harmlessness from AI Feedback'
@@ -190,7 +190,7 @@
     - government-regulation
   lastUpdated: 2025-12
 - id: miri-era
-  stableId: 7kMHUDshhw
+  stableId: sid_7kMHUDshhw
   wikiId: E203
   type: historical
   title: The MIRI Era
@@ -204,9 +204,9 @@
     - label: Milestone
       value: Superintelligence (2014) brings academic legitimacy
   relatedEntries:
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: Zmw9nfUYWA
+    - id: sid_Zmw9nfUYWA
       type: organization
   sources:
     - title: Creating Friendly AI
@@ -249,7 +249,7 @@
     - effective-altruism
   lastUpdated: 2025-12
 - id: ai-safety-summit
-  stableId: mnhBgvNfXA
+  stableId: sid_mnhBgvNfXA
   wikiId: E14
   type: historical
   title: AI Safety Summit (Bletchley Park)
@@ -258,7 +258,7 @@
     Declaration.
   status: stub
   relatedEntries:
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   tags:
     - policy

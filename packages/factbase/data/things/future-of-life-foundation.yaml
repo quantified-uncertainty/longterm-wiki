@@ -1,4 +1,4 @@
-entity: 2V63hGITAw
+entity: sid_2V63hGITAw
 facts:
   - id: Am1UqQs1Cw
     property: founded-date
@@ -43,7 +43,7 @@ facts:
 
   - id: f70xd6480Q
     property: parent-org
-    value: !ref d9sWZtyVwg
+    value: !ref sid_d9sWZtyVwg
     source: https://www.flf.org
     notes: FLF is a sister organization to FLI, sharing board members (FLI stableId)
 

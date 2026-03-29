@@ -1,4 +1,4 @@
-entity: MlKFIMTdRg
+entity: sid_MlKFIMTdRg
 facts:
   - id: f_GE1descr01
     property: description
@@ -19,5 +19,5 @@ facts:
   - id: f_GE4fndby01
     property: founded-by
     value:
-      - !ref 24aX2Ru7Dg
+      - !ref sid_24aX2Ru7Dg
     notes: Created by Ozzie Gooen in 2016

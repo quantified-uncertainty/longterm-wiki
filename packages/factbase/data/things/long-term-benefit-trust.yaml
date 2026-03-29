@@ -1,4 +1,4 @@
-entity: eNJ3h95yWw
+entity: sid_eNJ3h95yWw
 facts:
   # ── Description & Basics ──────────────────────────────────────
   - id: f_ltbt_desc01
@@ -42,7 +42,7 @@ facts:
 
   - id: f_ltbt_parent01
     property: parent-org
-    value: !ref mK9pX3rQ7n
+    value: !ref sid_mK9pX3rQ7n
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Governance body of Anthropic PBC"
 

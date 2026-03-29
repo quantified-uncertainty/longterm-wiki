@@ -1,4 +1,4 @@
-entity: bZxOUSEdmY
+entity: sid_bZxOUSEdmY
 facts:
   - id: f_1AH0LiV0Gz
     property: description
@@ -14,14 +14,14 @@ facts:
 
   - id: f_xW7fewFLKA
     property: employed-by
-    value: !ref NI4hqOL33A
+    value: !ref sid_NI4hqOL33A
     role: "Consultant, Compute Governance Team"
     source: https://www.iaps.ai/onni-aarne
     asOf: "2024"
 
   - id: f_rjNVzLFI5u
     property: employed-by
-    value: !ref t0p43V5oLA
+    value: !ref sid_t0p43V5oLA
     role: "Researcher"
     notes: "Previously at Rethink Priorities before joining IAPS"
     validEnd: "2024"

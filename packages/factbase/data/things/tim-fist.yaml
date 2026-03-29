@@ -1,4 +1,4 @@
-entity: pCun4K9Bf8
+entity: sid_pCun4K9Bf8
 facts:
   - id: f_qPylVVHUot
     property: description
@@ -14,7 +14,7 @@ facts:
 
   - id: f_pN4TGlSX4c
     property: employed-by
-    value: !ref dYjY3Ma1Hw
+    value: !ref sid_dYjY3Ma1Hw
     role: "Senior Adjunct Fellow, Technology and National Security Program"
     source: https://www.cnas.org/people/tim-fist
     asOf: "2024"

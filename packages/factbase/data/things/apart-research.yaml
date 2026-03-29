@@ -1,4 +1,4 @@
-entity: 5WqgebIWFQ
+entity: sid_5WqgebIWFQ
 facts:
   - id: f_jnMi5YScdW
     property: founded-date
@@ -41,7 +41,7 @@ facts:
   - id: f_LMWMZbT6an
     property: founded-by
     value:
-      - !ref HwM6OF6Ewg
+      - !ref sid_HwM6OF6Ewg
     source: https://apartresearch.com/impact
     notes: "Founded by Esben Kran at age 22 after leaving grad school; currently Board Member per impact page"
 

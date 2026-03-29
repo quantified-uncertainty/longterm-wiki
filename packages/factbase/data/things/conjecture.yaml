@@ -1,4 +1,4 @@
-entity: 0u4J70VqFY
+entity: sid_0u4J70VqFY
 facts:
   - id: f_bzhF0Iaop1
     property: founded-date
@@ -27,9 +27,9 @@ facts:
   - id: f_Tu50nzl3OA
     property: founded-by
     value:
-      - !ref CrXoCsIucX
-      - !ref kLIpOZtU1n
-      - !ref n0d7I3OAej
+      - !ref sid_CrXoCsIucX
+      - !ref sid_kLIpOZtU1n
+      - !ref sid_n0d7I3OAej
     source: https://www.conjecture.dev/
   - id: x1hQfPpo8g
     property: website

@@ -29,7 +29,7 @@ import { join } from 'path';
 import { createServer, type Server } from 'http';
 import { getHandler, isKnownType, getRegisteredTypes } from '../lib/job-handlers/index.ts';
 import {
-  claimJob, startJob, completeJob, failJob, cancelJob,
+  claimJob, claimJobWithTypes, startJob, completeJob, failJob, cancelJob,
   createJob, sweepJobs,
 } from '../lib/wiki-server/jobs.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
@@ -283,32 +283,18 @@ async function reportJobResult(
 // ---------------------------------------------------------------------------
 
 /**
- * Claim a job matching any of the given types. Tries each type in sequence
- * until a job is found. When `types` is empty, claims any available job.
- *
- * When the server gains native `types[]` support, this can be replaced with
- * a single call. For now, the client-side loop is a safe workaround.
+ * Claim a job matching any of the given types. Uses the server's native
+ * `types[]` array support (= ANY($2::text[])) for a single HTTP call.
+ * When `types` is empty, claims any available job.
  */
 async function claimWithTypes(
   workerId: string,
   types: string[],
 ): Promise<ApiResult<ClaimResult>> {
-  // No type filter: claim any job
   if (types.length === 0) {
     return claimJob(workerId);
   }
-
-  // Try each type in order; first match wins
-  for (const type of types) {
-    const result = await claimJob(workerId, type);
-    // Server error: stop trying more types
-    if (!result.ok) return result;
-    // Got a job: return it
-    if (result.data.job) return result;
-  }
-
-  // No jobs of any requested type available
-  return { ok: true as const, data: { job: null } } as ApiResult<ClaimResult>;
+  return claimJobWithTypes(workerId, types);
 }
 
 // ---------------------------------------------------------------------------

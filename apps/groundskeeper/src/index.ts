@@ -9,6 +9,7 @@ import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { snapshotRetention } from "./tasks/snapshot-retention.js";
 import { sessionSweep } from "./tasks/session-sweep.js";
 import { dataQualitySnapshot } from "./tasks/data-quality-snapshot.js";
+import { jobWorkerHealth } from "./tasks/job-worker-health.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -42,6 +43,10 @@ logger.info({
     dataQualitySnapshot: {
       enabled: config.tasks.dataQualitySnapshot.enabled,
       schedule: config.tasks.dataQualitySnapshot.schedule,
+    },
+    jobWorkerHealth: {
+      enabled: config.tasks.jobWorkerHealth.enabled,
+      schedule: config.tasks.jobWorkerHealth.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -96,6 +101,14 @@ registerTask(
   config.tasks.dataQualitySnapshot.schedule,
   config.tasks.dataQualitySnapshot.enabled,
   () => dataQualitySnapshot(config)
+);
+
+registerTask(
+  config,
+  "job-worker-health",
+  config.tasks.jobWorkerHealth.schedule,
+  config.tasks.jobWorkerHealth.enabled,
+  () => jobWorkerHealth(config)
 );
 
 // Register as an active agent (best-effort)

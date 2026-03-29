@@ -1,4 +1,4 @@
-entity: QsXVXtQ0zE
+entity: sid_QsXVXtQ0zE
 facts:
   - id: f_rTz84X69ZB
     property: founded-date
@@ -19,7 +19,7 @@ facts:
   - id: f_tC3M5pbZUg
     property: founded-by
     value:
-      - !ref vzxfzxBITd
+      - !ref sid_vzxfzxBITd
     source: https://alignment.org/
   - id: xU3JVFJnrQ
     property: website

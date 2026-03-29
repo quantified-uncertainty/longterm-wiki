@@ -24,12 +24,12 @@ export const SID_PREFIX = "sid_";
 // ── Core API ───────────────────────────────────────────────────────────
 
 /** Is this a sid_-prefixed entity stableId? */
-export function isSid(s: string): boolean {
+export function isSid(s: string | null | undefined): boolean {
   return typeof s === "string" && s.startsWith(SID_PREFIX);
 }
 
 /** Is this safe to show to users? (Not a machine-generated ID) */
-export function isDisplayableName(s: string): boolean {
+export function isDisplayableName(s: string | null | undefined): boolean {
   return typeof s === "string" && !isSid(s);
 }
 
@@ -46,22 +46,19 @@ export function generateSid(): string {
 
 /**
  * Detects old-format bare 10-char alphanumeric stableIds (without sid_ prefix).
+ * Requires at least one uppercase letter to avoid false positives on 10-char
+ * lowercase slugs like "bioweapons" or "conjecture".
  * Use during migration period only. After migration completes, this can be removed.
- *
- * Note: Intentionally more permissive than STABLE_ID_PATTERN (which requires ≥1 uppercase).
- * isLegacyStableId accepts any 10-char alphanumeric string because existing data includes
- * all-lowercase and all-numeric IDs. STABLE_ID_PATTERN is stricter for display heuristics.
  */
-export function isLegacyStableId(s: string): boolean {
-  return /^[A-Za-z0-9]{10}$/.test(s);
+export function isLegacyStableId(s: string | null | undefined): boolean {
+  return typeof s === "string" && /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
 }
 
 /**
  * Detects stableIds in either new (sid_) or legacy (bare 10-char) format.
  * Use during migration period for code that needs to handle both.
  */
-export function isAnySid(s: string): boolean {
-  if (typeof s !== "string") return false;
+export function isAnySid(s: string | null | undefined): boolean {
   return isSid(s) || isLegacyStableId(s);
 }
 
