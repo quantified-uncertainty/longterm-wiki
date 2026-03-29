@@ -13,6 +13,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -418,45 +419,23 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       );
 
       // Post-sync: resolve entity FKs for newly synced rows
-      // NOTE: Use IN (sqlInList()) not ANY() — Drizzle expands JS arrays as
-      // value-lists which breaks ANY() (see entities.ts sqlInList docs).
       const syncedIds = items.map((i) => i.id);
+      await resolveEntityFKs(tx, {
+        tableName: "personnel",
+        fields: [
+          { rawIdColumn: "person_id", entityIdColumn: "person_entity_id", displayNameColumn: "person_display_name", entityTypeFilter: "person" },
+          { rawIdColumn: "organization_id", entityIdColumn: "org_entity_id", displayNameColumn: "org_display_name", entityTypeFilter: "organization" },
+        ],
+        scopeIds: syncedIds,
+      });
+
+      // Special handling: backfill display name from "new:" prefix (strip prefix)
       const idList = sqlInList(syncedIds);
-      await tx.execute(sql`
-        UPDATE personnel p SET person_entity_id = e.stable_id
-        FROM entities e
-        WHERE (e.stable_id = p.person_id OR e.id = p.person_id)
-          AND e.entity_type = 'person'
-          AND p.person_entity_id IS NULL
-          AND p.person_id NOT LIKE 'new:%'
-          AND p.id IN (${idList})
-      `);
-      await tx.execute(sql`
-        UPDATE personnel p SET org_entity_id = e.stable_id
-        FROM entities e
-        WHERE (e.stable_id = p.organization_id OR e.id = p.organization_id)
-          AND e.entity_type = 'organization'
-          AND p.org_entity_id IS NULL
-          AND p.id IN (${idList})
-      `);
-      // Backfill display names for new: prefix and unresolved personIds
       await tx.execute(sql`
         UPDATE personnel SET
           person_display_name = trim(substring(person_id FROM 5))
         WHERE person_id LIKE 'new:%'
           AND person_display_name IS NULL
-          AND id IN (${idList})
-      `);
-      await tx.execute(sql`
-        UPDATE personnel SET
-          person_display_name = person_id
-        WHERE person_entity_id IS NULL
-          AND person_display_name IS NULL
-          AND NOT (person_id ~ '^[A-Za-z0-9]{10}$' AND person_id ~ '[A-Z]')
-          AND NOT (length(person_id) BETWEEN 8 AND 12
-                  AND person_id ~ '[_-]'
-                  AND person_id ~ '[0-9]'
-                  AND person_id ~ '[A-Z]')
           AND id IN (${idList})
       `);
 

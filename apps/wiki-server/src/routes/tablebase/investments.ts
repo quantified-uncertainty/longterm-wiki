@@ -13,6 +13,7 @@ import {
   parseRange,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -309,6 +310,16 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Post-sync: resolve entity FKs for newly synced rows
+      await resolveEntityFKs(tx, {
+        tableName: "investments",
+        fields: [
+          { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
+          { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
+        ],
+        scopeIds: items.map((i) => i.id),
+      });
 
       // Dual-write to things table
       await upsertThingsInTx(
