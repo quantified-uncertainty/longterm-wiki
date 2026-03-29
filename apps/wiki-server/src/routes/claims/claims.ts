@@ -97,10 +97,16 @@ export function groupAndChunkClaims(
   insertedClaims: Array<{ id: number; resource_id: string | null; source_url: string }>,
   maxPerJob: number = MAX_CLAIMS_PER_JOB,
 ): ClaimGroupEntry[] {
-  // Group by resource_id, falling back to url:<source_url> for null resource_id
+  if (maxPerJob <= 0) {
+    throw new Error(`maxPerJob must be positive, got ${maxPerJob}`);
+  }
+
+  // Group by resource_id, falling back to \0url:<source_url> for null resource_id.
+  // The \0 prefix prevents collision with legitimate resource_ids starting with "url:".
+  const NO_RESOURCE_PREFIX = "\0url:";
   const claimsByResource = new Map<string, number[]>();
   for (const row of insertedClaims) {
-    const key = row.resource_id ?? `url:${row.source_url}`;
+    const key = row.resource_id ?? `${NO_RESOURCE_PREFIX}${row.source_url}`;
     const group = claimsByResource.get(key);
     if (group) group.push(row.id);
     else claimsByResource.set(key, [row.id]);
@@ -109,7 +115,7 @@ export function groupAndChunkClaims(
   // Chunk each group
   const entries: ClaimGroupEntry[] = [];
   for (const [resourceKey, claimIds] of claimsByResource) {
-    const resourceId = resourceKey.startsWith("url:") ? null : resourceKey;
+    const resourceId = resourceKey.startsWith(NO_RESOURCE_PREFIX) ? null : resourceKey;
     for (let i = 0; i < claimIds.length; i += maxPerJob) {
       entries.push({
         resourceKey,

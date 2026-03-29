@@ -41,8 +41,8 @@ describe("groupAndChunkClaims", () => {
 
       expect(result).toHaveLength(2);
 
-      const groupA = result.find((e) => e.resourceKey === "url:https://a.com/page1");
-      const groupB = result.find((e) => e.resourceKey === "url:https://b.com/page2");
+      const groupA = result.find((e) => e.resourceKey === "\0url:https://a.com/page1");
+      const groupB = result.find((e) => e.resourceKey === "\0url:https://b.com/page2");
 
       expect(groupA).toBeDefined();
       expect(groupA!.resourceId).toBeNull();
