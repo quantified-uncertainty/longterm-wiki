@@ -84,11 +84,11 @@ describe("resolveEntityName", () => {
     });
   });
 
-  it("returns 'Unknown' for unknown stableId (uppercase, 10 chars)", () => {
+  it("returns 'Unknown' for unknown sid_-prefixed stableId", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    const result = resolveEntityName("3KjUCZCV8w");
+    const result = resolveEntityName("sid_3KjUCZCV8w");
     expect(result).toEqual({ name: "Unknown", href: null });
   });
 
@@ -186,13 +186,14 @@ describe("resolveEntityName", () => {
     expect(result).toEqual({ name: "Unknown", href: null });
   });
 
-  it("returns 'Unknown' for pure numeric IDs (not valid slugs)", () => {
+  it("treats numeric strings as slugs (no longer special-cased)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    expect(resolveEntityName("335")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("1234")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("0")).toEqual({ name: "Unknown", href: null });
+    // Numeric strings are treated as slugs since we only check for sid_ prefix now
+    // They'll humanize to their string value
+    const result = resolveEntityName("335");
+    expect(result.name).toBe("335");
   });
 
   it("resolves entity via TableBase when FactBase lookup fails", () => {
@@ -285,22 +286,21 @@ describe("resolveEntityName", () => {
     expect(result.name).toBe("Employee Equity Pool");
   });
 
-  it("returns 'Unknown' for contaminated stableIds", () => {
+  it("returns 'Unknown' for sid_-prefixed stableIds", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    expect(resolveEntityName("D-BpcrbThn")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("Tw_Eo226h3")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("V-55MuswUh")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("sid_DBpcrbThn0")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("sid_TwEo226h30")).toEqual({ name: "Unknown", href: null });
   });
 
-  it("rejects contaminated stableId displayNames", () => {
+  it("rejects sid_-prefixed displayNames", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    const result = resolveEntityName("some-id", "D-BpcrbThn");
+    const result = resolveEntityName("some-id", "sid_DBpcrbThn0");
     // Falls through to resolve "some-id" via FactBase/TableBase/humanization
-    expect(result.name).not.toBe("D-BpcrbThn");
+    expect(result.name).not.toBe("sid_DBpcrbThn0");
   });
 
   it("accepts legitimate displayName with spaces (not a slug)", () => {
