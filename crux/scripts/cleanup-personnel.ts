@@ -105,7 +105,10 @@ async function main() {
     const batch = toDelete.slice(i, i + BATCH_SIZE);
     const ids = batch.map(r => r.id);
 
-    const deleteResult = await apiRequest<DeleteResponse>('POST', '/api/personnel/delete', { ids });
+    const deleteResult = await apiRequest<DeleteResponse>('POST', '/api/personnel/delete', {
+      ids,
+      reason: 'Cleanup fabricated personIds — see discussion #3387',
+    });
     if (!deleteResult.ok) {
       console.error(`Failed to delete batch ${i / BATCH_SIZE + 1}:`, deleteResult.message);
       continue;
