@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: agentic-ai
-  stableId: 95ASV0XEwQ
+  stableId: sid_95ASV0XEwQ
   wikiId: E2
   type: capability
   title: Agentic AI
@@ -12,11 +12,11 @@
     - label: Examples
       value: Devin, Claude Computer Use
   relatedEntries:
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   sources:
     - title: Claude Computer Use
@@ -37,7 +37,7 @@
     - ai-control
   lastUpdated: 2025-12
 - id: coding
-  stableId: 64WDhlxxKA
+  stableId: sid_64WDhlxxKA
   wikiId: E61
   type: capability
   title: Autonomous Coding
@@ -47,11 +47,11 @@
     - label: Key Systems
       value: Devin, Claude Code, Cursor
   relatedEntries:
-    - id: eUR0jvxO5A
+    - id: sid_eUR0jvxO5A
       type: capability
-    - id: C5XsvYDQGA
+    - id: sid_C5XsvYDQGA
       type: capability
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   sources:
     - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
@@ -72,7 +72,7 @@
     - ai-assisted-development
   lastUpdated: 2025-12
 - id: language-models
-  stableId: MznJisvptw
+  stableId: sid_MznJisvptw
   wikiId: E186
   type: capability
   title: Large Language Models
@@ -82,11 +82,11 @@
     - label: Key Labs
       value: OpenAI, Anthropic, Google
   relatedEntries:
-    - id: hD7bZ2b7BQ
+    - id: sid_hD7bZ2b7BQ
       type: capability
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   sources:
     - title: Language Models are Few-Shot Learners (GPT-3)
@@ -109,7 +109,7 @@
     - claude
   lastUpdated: 2025-12
 - id: long-horizon
-  stableId: ymixRXGD3A
+  stableId: sid_ymixRXGD3A
   wikiId: E192
   type: capability
   title: Long-Horizon Autonomous Tasks
@@ -119,11 +119,11 @@
     - label: Current Limit
       value: ~hours with heavy scaffolding
   relatedEntries:
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
   sources:
     - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
@@ -146,7 +146,7 @@
     - memory-systems
   lastUpdated: 2025-12
 - id: persuasion
-  stableId: n9Mqc0XteA
+  stableId: sid_n9Mqc0XteA
   wikiId: E224
   type: capability
   title: Persuasion and Social Manipulation
@@ -156,11 +156,11 @@
     - label: Status
       value: Demonstrated but understudied
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: MznJisvptw
+    - id: sid_MznJisvptw
       type: capability
-    - id: DAaRZ9Q15A
+    - id: sid_DAaRZ9Q15A
       type: concept
   sources:
     - title: Personalized Persuasion with LLMs
@@ -184,7 +184,7 @@
     - human-autonomy
   lastUpdated: 2025-12
 - id: reasoning
-  stableId: hD7bZ2b7BQ
+  stableId: sid_hD7bZ2b7BQ
   wikiId: E246
   type: capability
   title: Reasoning and Planning
@@ -194,11 +194,11 @@
     - label: Key Models
       value: OpenAI o1, o3
   relatedEntries:
-    - id: MznJisvptw
+    - id: sid_MznJisvptw
       type: capability
-    - id: eUR0jvxO5A
+    - id: sid_eUR0jvxO5A
       type: capability
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   sources:
     - title: Learning to Reason with LLMs
@@ -222,7 +222,7 @@
   lastUpdated: 2025-12
 # rlhf (E259) moved to data/entities/research-areas.yaml
 - id: scientific-research
-  stableId: dpTZOF78vg
+  stableId: sid_dpTZOF78vg
   wikiId: E277
   type: capability
   title: Scientific Research Capabilities
@@ -232,11 +232,11 @@
     - label: Key Examples
       value: AlphaFold, AI Scientists
   relatedEntries:
-    - id: eUR0jvxO5A
+    - id: sid_eUR0jvxO5A
       type: capability
-    - id: CwBPBQAmxA
+    - id: sid_CwBPBQAmxA
       type: concept
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
   sources:
     - title: Highly accurate protein structure prediction with AlphaFold
@@ -261,7 +261,7 @@
     - bioweapons-risk
   lastUpdated: 2025-12
 - id: self-improvement
-  stableId: eUR0jvxO5A
+  stableId: sid_eUR0jvxO5A
   wikiId: E278
   type: capability
   title: Self-Improvement and Recursive Enhancement
@@ -271,11 +271,11 @@
     - label: Status
       value: Partial automation, human-led
   relatedEntries:
-    - id: fRYu1EXclA
+    - id: sid_fRYu1EXclA
       type: concept
-    - id: 64WDhlxxKA
+    - id: sid_64WDhlxxKA
       type: capability
-    - id: 3fyHbDnHIQ
+    - id: sid_3fyHbDnHIQ
       type: concept
   sources:
     - title: 'Intelligence Explosion: Evidence and Import'
@@ -301,7 +301,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: situational-awareness
-  stableId: 5maTNr0PGA
+  stableId: sid_5maTNr0PGA
   wikiId: E282
   type: capability
   title: Situational Awareness
@@ -313,15 +313,15 @@
     - label: Key Concern
       value: Enables strategic deception
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: etuIjQhFbQ
+    - id: sid_etuIjQhFbQ
       type: research-area
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   sources:
     - title: Sleeper Agents Paper
@@ -372,7 +372,7 @@
     - training-gaming
   lastUpdated: 2025-12
 - id: tool-use
-  stableId: C5XsvYDQGA
+  stableId: sid_C5XsvYDQGA
   wikiId: E356
   type: capability
   title: Tool Use and Computer Use
@@ -382,11 +382,11 @@
     - label: Key Examples
       value: Claude Computer Use, GPT Actions
   relatedEntries:
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: 64WDhlxxKA
+    - id: sid_64WDhlxxKA
       type: capability
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   sources:
     - title: Claude Computer Use
@@ -413,7 +413,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: biological-organoid
-  stableId: q13KQXAy3A
+  stableId: sid_q13KQXAy3A
   wikiId: E491
   type: capability
   title: Biological / Organoid Computing
@@ -428,7 +428,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: brain-computer-interfaces
-  stableId: gAiFk4Y4aQ
+  stableId: sid_gAiFk4Y4aQ
   wikiId: E492
   type: capability
   title: Brain-Computer Interfaces
@@ -442,7 +442,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: collective-intelligence
-  stableId: FA0Pwjpvmw
+  stableId: sid_FA0Pwjpvmw
   wikiId: E493
   type: capability
   title: Collective Intelligence / Coordination
@@ -455,7 +455,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: genetic-enhancement
-  stableId: jUbUtHAGqQ
+  stableId: sid_jUbUtHAGqQ
   wikiId: E494
   type: capability
   title: Genetic Enhancement / Selection
@@ -470,7 +470,7 @@
     - biorisks
   lastUpdated: 2026-02
 - id: light-scaffolding
-  stableId: BP0tsiccNw
+  stableId: sid_BP0tsiccNw
   wikiId: E495
   type: capability
   title: Light Scaffolding
@@ -485,7 +485,7 @@
     - governance
   lastUpdated: 2026-02
 - id: minimal-scaffolding
-  stableId: LbyeLGVG0g
+  stableId: sid_LbyeLGVG0g
   wikiId: E496
   type: capability
   title: Minimal Scaffolding
@@ -499,7 +499,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: neuro-symbolic
-  stableId: d9OJFyUmjw
+  stableId: sid_d9OJFyUmjw
   wikiId: E497
   type: capability
   title: Neuro-Symbolic Hybrid Systems
@@ -513,7 +513,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: neuromorphic
-  stableId: hSC1PO5MBg
+  stableId: sid_hSC1PO5MBg
   wikiId: E498
   type: capability
   title: Neuromorphic Hardware
@@ -527,7 +527,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: novel-unknown
-  stableId: 63YrqurtZQ
+  stableId: sid_63YrqurtZQ
   wikiId: E499
   type: capability
   title: Novel / Unknown Approaches
@@ -541,7 +541,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sparse-moe
-  stableId: qSUpeYPEoQ
+  stableId: sid_qSUpeYPEoQ
   wikiId: E500
   type: capability
   title: Sparse / MoE Transformers
@@ -555,7 +555,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ssm-mamba
-  stableId: DjKKneEtdA
+  stableId: sid_DjKKneEtdA
   wikiId: E501
   type: capability
   title: State-Space Models / Mamba
@@ -569,7 +569,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: whole-brain-emulation
-  stableId: ReeAY5pNBA
+  stableId: sid_ReeAY5pNBA
   wikiId: E502
   type: capability
   title: Whole Brain Emulation
@@ -583,7 +583,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-powered-investigation
-  stableId: N0NF4lvS4Q
+  stableId: sid_N0NF4lvS4Q
   wikiId: E698
   type: capability
   title: AI-Powered Investigation
@@ -602,17 +602,17 @@
     - label: Key Concern
       value: Dual-use tension between accountability and privacy
   relatedEntries:
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: 0J0pDyhVtQ
+    - id: sid_0J0pDyhVtQ
       type: risk
-    - id: oifBdRbmYg
+    - id: sid_oifBdRbmYg
       type: approach
-    - id: GnUTRJhA4g
+    - id: sid_GnUTRJhA4g
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
   clusters:
     - ai-safety
@@ -620,7 +620,7 @@
     - cyber
   lastUpdated: 2026-02
 - id: world-models
-  stableId: vQugEFw5nA
+  stableId: sid_vQugEFw5nA
   wikiId: E503
   type: capability
   title: World Models + Planning

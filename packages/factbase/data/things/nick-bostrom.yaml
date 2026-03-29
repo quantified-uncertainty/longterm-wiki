@@ -1,4 +1,4 @@
-entity: IQvWHA3OiF
+entity: sid_IQvWHA3OiF
 facts:
   - id: f_YhxyxeHHdA
     property: born-year
@@ -45,7 +45,7 @@ facts:
 
   - id: f_nBempl0x1a
     property: employed-by
-    value: !ref Zmw9nfUYWA
+    value: !ref sid_Zmw9nfUYWA
     role: "Founder and Director, Future of Humanity Institute"
     validEnd: "2024-04"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
@@ -53,7 +53,7 @@ facts:
 
   - id: f_nBempl0x2b
     property: employed-by
-    value: !ref idAU5YPkSw
+    value: !ref sid_idAU5YPkSw
     role: "Founder and Principal Researcher"
     validStart: "2024-04"
     source: https://nickbostrom.com

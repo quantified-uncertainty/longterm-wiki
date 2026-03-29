@@ -1,4 +1,4 @@
-entity: W9J9yMK82X
+entity: sid_W9J9yMK82X
 facts:
   - id: f_zxbmbdSgwA
     property: founded-date
@@ -20,8 +20,8 @@ facts:
   - id: f_YndqOVXiTA
     property: founded-by
     value:
-      - !ref CBNE3Hszkr
-      - !ref 9VlZhCkPBE
+      - !ref sid_CBNE3Hszkr
+      - !ref sid_9VlZhCkPBE
     source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
 
   - id: f_iNzsKTtpRQ

@@ -381,6 +381,19 @@ async function handleSubmitRecords(
     return `Error: ${missingSource.length} record(s) missing "source" or "sourceUrl" field. Every record must have a source URL.`;
   }
 
+  // Reject display name fields that contain sid_-prefixed values
+  // (LLM sometimes outputs stableIds as person names)
+  const displayNameFields = ['personDisplayName', 'orgDisplayName', 'granteeDisplayName', 'companyDisplayName', 'investorDisplayName', 'holderDisplayName'];
+  const badDisplayNames = records.filter(r =>
+    displayNameFields.some(f => {
+      const val = r[f] as string | undefined;
+      return val && val.startsWith('sid_');
+    })
+  );
+  if (badDisplayNames.length > 0) {
+    return `Error: ${badDisplayNames.length} record(s) have stableIds in display name fields. Display names must be human-readable, not sid_-prefixed IDs.`;
+  }
+
   // Validate and normalize entity reference fields.
   // LLMs sometimes hallucinate plausible-looking 10-char stableIds instead of
   // calling resolve_entity. We must verify ALL entity references exist — not

@@ -1,4 +1,4 @@
-entity: y4bieqSeag
+entity: sid_y4bieqSeag
 facts:
   - id: f_SaGQWpxjYQ
     property: total-funding
@@ -36,7 +36,7 @@ facts:
   - id: f_Alru3kK8mb
     property: key-person
     value:
-      - !ref VoNqoBJkyg
+      - !ref sid_VoNqoBJkyg
     asOf: 2025
     source: https://www.safe.ai/about
     notes: "Dan Hendrycks serves as Executive & Research Director"

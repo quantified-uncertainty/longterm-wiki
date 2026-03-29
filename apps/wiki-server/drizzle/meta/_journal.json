@@ -1030,6 +1030,13 @@
       "when": 1782028900000,
       "tag": "0146_job_queue_enhancements",
       "breakpoints": true
+    },
+    {
+      "idx": 147,
+      "version": "7",
+      "when": 1782115200000,
+      "tag": "0147_sid_prefix_migration",
+      "breakpoints": true
     }
   ]
 }

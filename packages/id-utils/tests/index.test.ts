@@ -24,6 +24,12 @@ describe("isSid", () => {
     expect(isSid("")).toBe(false);
   });
 
+  it("handles null and undefined safely", () => {
+    expect(isSid(null)).toBe(false);
+    expect(isSid(undefined)).toBe(false);
+    expect(isSid("")).toBe(false);
+  });
+
   it("rejects partial prefix matches", () => {
     expect(isSid("si_1LcLlMGLbw")).toBe(false);
     expect(isSid("sid1LcLlMGLbw")).toBe(false);
@@ -83,11 +89,19 @@ describe("generateSid", () => {
 });
 
 describe("isLegacyStableId", () => {
-  it("detects bare 10-char alphanumeric IDs", () => {
+  it("detects bare 10-char alphanumeric IDs with uppercase", () => {
     expect(isLegacyStableId("1LcLlMGLbw")).toBe(true);
     expect(isLegacyStableId("AbCdEfG12H")).toBe(true);
-    expect(isLegacyStableId("abcdefghij")).toBe(true);
-    expect(isLegacyStableId("0123456789")).toBe(true);
+  });
+
+  it("rejects all-lowercase 10-char strings (could be slugs)", () => {
+    expect(isLegacyStableId("bioweapons")).toBe(false);
+    expect(isLegacyStableId("conjecture")).toBe(false);
+    expect(isLegacyStableId("abcdefghij")).toBe(false);
+  });
+
+  it("rejects all-numeric 10-char strings", () => {
+    expect(isLegacyStableId("0123456789")).toBe(false);
   });
 
   it("rejects wrong lengths", () => {
@@ -123,18 +137,17 @@ describe("isAnySid", () => {
 
 describe("null/undefined safety", () => {
   it("isSid returns false for non-string values", () => {
-    expect(isSid(undefined as unknown as string)).toBe(false);
-    expect(isSid(null as unknown as string)).toBe(false);
-    expect(isSid(123 as unknown as string)).toBe(false);
+    expect(isSid(undefined)).toBe(false);
+    expect(isSid(null)).toBe(false);
   });
 
   it("isDisplayableName returns false for non-string values", () => {
-    expect(isDisplayableName(undefined as unknown as string)).toBe(false);
-    expect(isDisplayableName(null as unknown as string)).toBe(false);
+    expect(isDisplayableName(undefined)).toBe(false);
+    expect(isDisplayableName(null)).toBe(false);
   });
 
   it("isAnySid returns false for non-string values", () => {
-    expect(isAnySid(undefined as unknown as string)).toBe(false);
-    expect(isAnySid(null as unknown as string)).toBe(false);
+    expect(isAnySid(undefined)).toBe(false);
+    expect(isAnySid(null)).toBe(false);
   });
 });

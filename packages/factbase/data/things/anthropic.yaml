@@ -1,4 +1,4 @@
-entity: mK9pX3rQ7n
+entity: sid_mK9pX3rQ7n
 facts:
   # ── Revenue (ARR time series) ───────────────────────────────────
   - id: f_qR5tY9wE1a
@@ -234,13 +234,13 @@ facts:
   - id: f_tAtOfKqDjg
     property: founded-by
     value:
-      - !ref zR4nW8xB2f
-      - !ref tKMznr07QA
-      - !ref 4CY8YJCrM7
-      - !ref Tz48rTriBg
-      - !ref x16GL4gP2A
-      - !ref ENl8sgChDQ
-      - !ref YqSmRNVRAg
+      - !ref sid_zR4nW8xB2f
+      - !ref sid_tKMznr07QA
+      - !ref sid_4CY8YJCrM7
+      - !ref sid_Tz48rTriBg
+      - !ref sid_x16GL4gP2A
+      - !ref sid_ENl8sgChDQ
+      - !ref sid_YqSmRNVRAg
     source: https://anthropic.com/company
     notes: "Seven former OpenAI researchers"
 

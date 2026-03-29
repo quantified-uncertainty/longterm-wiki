@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: anthropic
-  stableId: mK9pX3rQ7n
+  stableId: sid_mK9pX3rQ7n
   wikiId: E22
   type: organization
   orgType: frontier-lab
@@ -13,27 +13,27 @@
     - Anthropic AI
   website: https://anthropic.com
   relatedEntries:
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
       relationship: leads-to
-    - id: Tz48rTriBg
+    - id: sid_Tz48rTriBg
       type: person
       relationship: research
-    - id: hQ7mR2kN5p
+    - id: sid_hQ7mR2kN5p
       type: person
       relationship: research
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: addresses
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: shaped-by
-    - id: tKMznr07QA
+    - id: sid_tKMznr07QA
       type: person
       relationship: leads-to
-    - id: eQh3ZhWv8D
+    - id: sid_eQh3ZhWv8D
       type: person
       relationship: leads-to
     - id: evan-hubinger
@@ -51,10 +51,10 @@
     - id: claude
       type: ai-model
       relationship: composed-of
-    - id: D8dD07y5oQ
+    - id: sid_D8dD07y5oQ
       type: risk
       relationship: research
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
     - id: chris-olah
       type: person
@@ -106,7 +106,7 @@
     - racing-dynamics
   lastUpdated: 2025-12
 - id: deepmind
-  stableId: A4XoubikkQ
+  stableId: sid_A4XoubikkQ
   wikiId: E98
   type: organization
   orgType: frontier-lab
@@ -118,26 +118,26 @@
     - Google DeepMind
   website: https://deepmind.google
   relatedEntries:
-    - id: Aqcyu3onCA
+    - id: sid_Aqcyu3onCA
       type: person
       relationship: leads-to
-    - id: muueuPOHfg
+    - id: sid_muueuPOHfg
       type: person
       relationship: leads-to
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
       relationship: addresses
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: affects
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: affects
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
     - id: neel-nanda
       type: person
@@ -202,7 +202,7 @@
     - scalable-oversight
   lastUpdated: 2025-12
 - id: openai
-  stableId: 1LcLlMGLbw
+  stableId: sid_1LcLlMGLbw
   wikiId: E218
   type: organization
   orgType: frontier-lab
@@ -214,21 +214,21 @@
     - OpenAI Global LLC
   website: https://openai.com
   relatedEntries:
-    - id: JKsVHQ5stQ
+    - id: sid_JKsVHQ5stQ
       type: person
       relationship: leads-to
-    - id: eYrBgMLJDw
+    - id: sid_eYrBgMLJDw
       type: person
       relationship: leads-to
-    - id: hQ7mR2kN5p
+    - id: sid_hQ7mR2kN5p
       type: person
       relationship: research
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: affects
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: addresses
     - id: sam-altman
@@ -276,7 +276,7 @@
     - alignment-research
   lastUpdated: 2025-12
 - id: xai
-  stableId: GLXKjYAEKw
+  stableId: sid_GLXKjYAEKw
   wikiId: E378
   type: organization
   orgType: frontier-lab
@@ -287,17 +287,17 @@
     - X.AI
   website: https://x.ai
   relatedEntries:
-    - id: 69vftmr1jg
+    - id: sid_69vftmr1jg
       type: person
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: s8PQomHkvA
+    - id: sid_s8PQomHkvA
       type: concept
-    - id: QVsRgOaeUw
+    - id: sid_QVsRgOaeUw
       type: concept
     - id: elon-musk
       type: person
@@ -327,7 +327,7 @@
     - agi-development
   lastUpdated: 2025-12
 - id: chai
-  stableId: zMfgJqiEPQ
+  stableId: sid_zMfgJqiEPQ
   wikiId: E57
   type: organization
   orgType: academic
@@ -339,11 +339,11 @@
     - CHAI
   website: https://humancompatible.ai
   relatedEntries:
-    - id: Ub7IaobzDA
+    - id: sid_Ub7IaobzDA
       type: research-area
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
-    - id: aUMeFdALrA
+    - id: sid_aUMeFdALrA
       type: research-area
     - id: stuart-russell
       type: person
@@ -367,7 +367,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: apollo-research
-  stableId: pKeaWwP6sQ
+  stableId: sid_pKeaWwP6sQ
   wikiId: E24
   type: organization
   orgType: safety-org
@@ -375,19 +375,19 @@
   title: Apollo Research
   website: https://www.apolloresearch.ai
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
   sources:
     - title: Apollo Research Website
@@ -419,7 +419,7 @@
     - adversarial-testing
   lastUpdated: 2025-12
 - id: cais
-  stableId: y4bieqSeag
+  stableId: sid_y4bieqSeag
   wikiId: E47
   type: organization
   orgType: safety-org
@@ -429,11 +429,11 @@
     - CAIS
   website: https://safe.ai
   relatedEntries:
-    - id: bQ9a5lwwlg
+    - id: sid_bQ9a5lwwlg
       type: concept
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
     - id: dan-hendrycks
       type: person
@@ -456,7 +456,7 @@
     - ai-risk-communication
   lastUpdated: 2025-12
 - id: conjecture
-  stableId: 0u4J70VqFY
+  stableId: sid_0u4J70VqFY
   wikiId: E70
   type: organization
   orgType: safety-org
@@ -466,15 +466,15 @@
     - Conjecture AI
   website: https://conjecture.dev
   relatedEntries:
-    - id: CrXoCsIucX
+    - id: sid_CrXoCsIucX
       type: person
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
-    - id: EQgTf1t7dg
+    - id: sid_EQgTf1t7dg
       type: safety-agenda
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
     - id: vidur-kapur
       type: person
@@ -510,7 +510,7 @@
     - alternative-paradigms
   lastUpdated: 2025-12
 - id: far-ai
-  stableId: lCiT37k9pA
+  stableId: sid_lCiT37k9pA
   wikiId: E138
   type: organization
   orgType: safety-org
@@ -518,19 +518,19 @@
   title: FAR AI
   website: https://far.ai
   relatedEntries:
-    - id: VoNqoBJkyg
+    - id: sid_VoNqoBJkyg
       type: person
-    - id: 0tQftJKP4Q
+    - id: sid_0tQftJKP4Q
       type: person
-    - id: fslZ4KLnXg
+    - id: sid_fslZ4KLnXg
       type: person
-    - id: jHU2ZaCpdQ
+    - id: sid_jHU2ZaCpdQ
       type: concept
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   sources:
     - title: FAR AI Website
@@ -560,7 +560,7 @@
     - academic-ai-safety
   lastUpdated: 2025-12
 - id: govai
-  stableId: XLLyzaEaCA
+  stableId: sid_XLLyzaEaCA
   wikiId: E153
   type: organization
   orgType: safety-org
@@ -568,7 +568,7 @@
   title: GovAI
   website: https://governance.ai
   relatedEntries:
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
     - id: allan-dafoe
       type: person
@@ -590,7 +590,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: metr
-  stableId: rQEkFJxS5w
+  stableId: sid_rQEkFJxS5w
   wikiId: E201
   type: organization
   orgType: safety-org
@@ -598,25 +598,25 @@
   title: METR
   website: https://metr.org
   relatedEntries:
-    - id: ZvfLhIm7pw
+    - id: sid_ZvfLhIm7pw
       type: person
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: 3EuTey4ung
+    - id: sid_3EuTey4ung
       type: risk
-    - id: VPk7sdZtkg
+    - id: sid_VPk7sdZtkg
       type: risk
-    - id: kZQP3vYrXA
+    - id: sid_kZQP3vYrXA
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
     - id: ajeya-cotra
       type: person
@@ -660,7 +660,7 @@
     - preparedness-framework
   lastUpdated: 2025-12
 - id: arc
-  stableId: QsXVXtQ0zE
+  stableId: sid_QsXVXtQ0zE
   wikiId: E25
   type: organization
   orgType: safety-org
@@ -671,19 +671,19 @@
     - ARC Alignment
   website: https://alignment.org
   relatedEntries:
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: ARC Website
@@ -721,7 +721,7 @@
     - sandbagging
   lastUpdated: 2025-12
 - id: epoch-ai
-  stableId: cBPkzcVBBQ
+  stableId: sid_cBPkzcVBBQ
   wikiId: E125
   type: organization
   orgType: safety-org
@@ -729,13 +729,13 @@
   title: Epoch AI
   website: https://epochai.org
   relatedEntries:
-    - id: bmVIhwpQww
+    - id: sid_bmVIhwpQww
       type: concept
-    - id: eZJ1oAKS6A
+    - id: sid_eZJ1oAKS6A
       type: concept
-    - id: URCXiRsX0w
+    - id: sid_URCXiRsX0w
       type: concept
-    - id: HLakK5zplg
+    - id: sid_HLakK5zplg
       type: concept
   sources:
     - title: Epoch AI Website
@@ -771,7 +771,7 @@
     - trend-extrapolation
   lastUpdated: 2025-12
 - id: miri
-  stableId: puAffUjWSS
+  stableId: sid_puAffUjWSS
   wikiId: E202
   type: organization
   orgType: safety-org
@@ -784,19 +784,19 @@
     - SIAI
   website: https://intelligence.org
   relatedEntries:
-    - id: fS1tEGKuNq
+    - id: sid_fS1tEGKuNq
       type: person
-    - id: 5MVd90lzCg
+    - id: sid_5MVd90lzCg
       type: person
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
-    - id: AMhUctK34Q
+    - id: sid_AMhUctK34Q
       type: risk
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
     - id: eliezer-yudkowsky
       type: person
@@ -841,7 +841,7 @@
     - deconfusion
   lastUpdated: 2025-12
 - id: uk-dsit
-  stableId: rEQ9mInLoQ
+  stableId: sid_rEQ9mInLoQ
   type: organization
   orgType: government
   title: UK Department for Science, Innovation and Technology (DSIT)
@@ -857,7 +857,7 @@
   lastUpdated: 2026-03
 
 - id: uk-aisi
-  stableId: aX0jkoaekQ
+  stableId: sid_aX0jkoaekQ
   wikiId: E364
   type: organization
   orgType: government
@@ -866,21 +866,21 @@
   title: UK AI Safety Institute
   website: https://www.aisi.gov.uk
   relatedEntries:
-    - id: DX4NK1gGtg
+    - id: sid_DX4NK1gGtg
       type: person
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mnhBgvNfXA
+    - id: sid_mnhBgvNfXA
       type: historical
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
     - id: ian-hogarth
       type: person
@@ -918,7 +918,7 @@
     - regulatory-framework
   lastUpdated: 2025-12
 - id: us-aisi
-  stableId: fYyAxYlHDQ
+  stableId: sid_fYyAxYlHDQ
   wikiId: E365
   type: organization
   orgType: government
@@ -928,15 +928,15 @@
   title: US AI Safety Institute (now CAISI)
   website: https://www.nist.gov/aisi
   relatedEntries:
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
     - id: elizabeth-kelly
       type: person
@@ -974,7 +974,7 @@
     - standard-setting
   lastUpdated: 2026-03
 - id: japan-aisi
-  stableId: Nc5G0HG5nA
+  stableId: sid_Nc5G0HG5nA
   wikiId: E1013
   type: organization
   orgType: government
@@ -988,9 +988,9 @@
     evaluation frameworks and international alignment on testing practices with UK and US
     counterparts. Part of the international AISI network.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Japan AISI Website
@@ -1005,7 +1005,7 @@
     - international
   lastUpdated: 2026-03
 - id: singapore-aisi
-  stableId: ljAkbGE59A
+  stableId: sid_ljAkbGE59A
   wikiId: E1014
   type: organization
   orgType: government
@@ -1018,9 +1018,9 @@
     Lam Kwok Yen. Funded with S\$50 million initial grant from IMDA and National Research Foundation.
     Focuses on GenAI evaluations and collaboration with US and UK AISIs.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Singapore AISI Website
@@ -1033,7 +1033,7 @@
     - international
   lastUpdated: 2026-03
 - id: canada-aisi
-  stableId: 22LBI06kLw
+  stableId: sid_22LBI06kLw
   wikiId: E1015
   type: organization
   orgType: government
@@ -1047,9 +1047,9 @@
     and Economic Development Canada (ISED), with NRC and CIFAR research partnership. Focuses on
     science of AI safety, positioned as technical body for testing/assurance.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Canadian AI Safety Institute
@@ -1062,7 +1062,7 @@
   lastUpdated: 2026-03
 
 - id: france-inesia
-  stableId: h1iLYfDY7E
+  stableId: sid_h1iLYfDY7E
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1077,9 +1077,9 @@
     a coordination framework. Published joint testing exercises on advanced AI models (July 2025).
     First INESIA Scientific Days held at Inria Paris (July 2025). Unveiled 2026-2027 roadmap.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Inria INESIA Roadmap
@@ -1094,7 +1094,7 @@
   lastUpdated: 2026-03
 
 - id: south-korea-aisi
-  stableId: 3t2i7Ncxt5
+  stableId: sid_3t2i7Ncxt5
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1107,9 +1107,9 @@
     developing safety benchmarks, and assessing deepfake and cybersecurity threats. South Korea's
     AI Basic Act is the second comprehensive AI regulatory framework after the EU AI Act.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Cooley Analysis of South Korea AI Basic Act
@@ -1124,7 +1124,7 @@
   lastUpdated: 2026-03
 
 - id: australia-aisi
-  stableId: tN1LcjRQpc
+  stableId: sid_tN1LcjRQpc
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1139,9 +1139,9 @@
     Recruiting founding team (General Manager + Head of AI Safety Research and Testing) in late
     2025/early 2026.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: Department of Industry
@@ -1156,7 +1156,7 @@
   lastUpdated: 2026-03
 
 - id: india-aisi
-  stableId: MItFJ7FBWk
+  stableId: sid_MItFJ7FBWk
   type: organization
   orgType: government
   summaryPage: government-orgs-overview
@@ -1172,9 +1172,9 @@
     India also hosted the AI Impact Summit (Feb 2026) with 92 countries endorsing the New
     Delhi Declaration and over USD 200 billion in AI investment commitments announced.
   relatedEntries:
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: IndiaAI Announcement
@@ -1188,7 +1188,7 @@
   lastUpdated: 2026-03
 
 - id: us-digital-service
-  stableId: dbqoxdZuUw
+  stableId: sid_dbqoxdZuUw
   wikiId: E2019
   type: organization
   orgType: government
@@ -1202,11 +1202,11 @@
     to "U.S. DOGE Service" in January 2025 under the Trump administration; staffing fell from
     ~230 to ~50-89 employees. By late 2025, began hiring again.
   relatedEntries:
-    - id: WVHl7Ya8oQ
+    - id: sid_WVHl7Ya8oQ
       type: organization
-    - id: ufdntmiWtQ
+    - id: sid_ufdntmiWtQ
       type: organization
-    - id: 2avSHj60sQ
+    - id: sid_2avSHj60sQ
       type: organization
   sources:
     - title: USDS 2024 Impact Report
@@ -1223,7 +1223,7 @@
   lastUpdated: 2026-03
 
 - id: 18f
-  stableId: WVHl7Ya8oQ
+  stableId: sid_WVHl7Ya8oQ
   wikiId: E2020
   type: organization
   orgType: government
@@ -1238,9 +1238,9 @@
     on February 28, 2025 as part of DOGE-driven GSA cuts; ~85 employees laid off. 80 former
     staff filed a class-action claiming retaliation.
   relatedEntries:
-    - id: dbqoxdZuUw
+    - id: sid_dbqoxdZuUw
       type: organization
-    - id: ufdntmiWtQ
+    - id: sid_ufdntmiWtQ
       type: organization
   sources:
     - title: How 18F Transformed Government Technology (The Conversation)
@@ -1262,7 +1262,7 @@
   lastUpdated: 2026-03
 
 - id: horizon-institute
-  stableId: lsx48oPDVQ
+  stableId: sid_lsx48oPDVQ
   wikiId: E2021
   type: organization
   orgType: other
@@ -1278,11 +1278,11 @@
     three years, with 90%+ transitioning to full-time policy/government positions. Expanding to
     state-level fellowships (Texas) and new Career Accelerator program.
   relatedEntries:
-    - id: NifCYhN75w
+    - id: sid_NifCYhN75w
       type: organization
-    - id: hQ4Rdnaihw
+    - id: sid_hQ4Rdnaihw
       type: organization
-    - id: lvsDuyzPcg
+    - id: sid_lvsDuyzPcg
       type: organization
   sources:
     - title: Horizon Institute Website
@@ -1303,7 +1303,7 @@
   lastUpdated: 2026-03
 
 - id: code-for-america
-  stableId: ufdntmiWtQ
+  stableId: sid_ufdntmiWtQ
   wikiId: E2022
   type: organization
   orgType: other
@@ -1317,11 +1317,11 @@
     tours of duty. Works with 100+ government agencies. Pahlka later served as U.S. Deputy
     Chief Technology Officer and helped establish USDS.
   relatedEntries:
-    - id: dbqoxdZuUw
+    - id: sid_dbqoxdZuUw
       type: organization
-    - id: WVHl7Ya8oQ
+    - id: sid_WVHl7Ya8oQ
       type: organization
-    - id: 2avSHj60sQ
+    - id: sid_2avSHj60sQ
       type: organization
   sources:
     - title: Code for America Website
@@ -1334,7 +1334,7 @@
   lastUpdated: 2026-03
 
 - id: techcongress
-  stableId: P9vjxmKQ3w
+  stableId: sid_P9vjxmKQ3w
   type: organization
   orgType: other
   title: TechCongress
@@ -1353,7 +1353,7 @@
   lastUpdated: 2026-03
 
 - id: us-digital-corps
-  stableId: Kx8mRtWn4w
+  stableId: sid_Kx8mRtWn4w
   type: organization
   orgType: government
   title: U.S. Digital Corps
@@ -1372,7 +1372,7 @@
   lastUpdated: 2026-03
 
 - id: nava-pbc
-  stableId: Hd6vLpWm2w
+  stableId: sid_Hd6vLpWm2w
   type: organization
   orgType: other
   title: Nava PBC
@@ -1383,7 +1383,7 @@
     rescue effort. Demonstrates that private entities can work on government technology problems
     while maintaining a mission-driven focus.
   relatedEntries:
-    - id: dbqoxdZuUw
+    - id: sid_dbqoxdZuUw
       type: organization
   tags:
     - civic-tech
@@ -1392,7 +1392,7 @@
   lastUpdated: 2026-03
 
 - id: us-digital-response
-  stableId: Qw7nFtYp5w
+  stableId: sid_Qw7nFtYp5w
   type: organization
   orgType: other
   title: U.S. Digital Response
@@ -1403,9 +1403,9 @@
     technologists to help government agencies respond to crises. Demonstrates potential for
     rapid civic tech capacity mobilization during emergencies.
   relatedEntries:
-    - id: ufdntmiWtQ
+    - id: sid_ufdntmiWtQ
       type: organization
-    - id: dbqoxdZuUw
+    - id: sid_dbqoxdZuUw
       type: organization
   tags:
     - civic-tech
@@ -1414,23 +1414,23 @@
   lastUpdated: 2026-03
 
 - id: aria-uk
-  stableId: XqjV4mbMXQ
+  stableId: sid_XqjV4mbMXQ
   wikiId: E1997
   type: organization
   orgType: government
   title: Advanced Research and Invention Agency (ARIA)
   website: https://www.aria.org.uk
   relatedEntries:
-    - id: SQlb1r5EzN
+    - id: sid_SQlb1r5EzN
       type: person
       relationship: leads-to
-    - id: nGFBXZeM3d
+    - id: sid_nGFBXZeM3d
       type: person
       relationship: research
-    - id: MEt9F7f50w
+    - id: sid_MEt9F7f50w
       type: approach
       relationship: research
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
   sources:
     - title: ARIA Website
@@ -1464,7 +1464,7 @@
     - governance
   lastUpdated: 2026-03
 - id: eu-ai-office
-  stableId: aobKGolfow
+  stableId: sid_aobKGolfow
   wikiId: E1016
   type: organization
   orgType: government
@@ -1475,9 +1475,9 @@
     The European Commission's dedicated office for AI governance, established in February 2024. Responsible for
     enforcing the EU AI Act, developing standards and codes of practice, and coordinating EU-wide AI policy.
   relatedEntries:
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
   sources:
     - title: EU AI Office
@@ -1490,7 +1490,7 @@
     - international
   lastUpdated: 2026-03
 - id: arc-evals
-  stableId: myeSKJXTMA
+  stableId: sid_myeSKJXTMA
   wikiId: E26
   type: organization
   orgType: safety-org
@@ -1498,12 +1498,12 @@
   description: Organization focused on evaluating AI systems for dangerous capabilities. Now largely absorbed into METR.
   status: stub
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
       relationship: leads-to
-    - id: ZvfLhIm7pw
+    - id: sid_ZvfLhIm7pw
       type: person
       relationship: leads-to
   tags:
@@ -1516,7 +1516,7 @@
       url: https://metr.org/blog/2023-09-19-spin-out-announcement/
   lastUpdated: 2025-12
 - id: fhi
-  stableId: Zmw9nfUYWA
+  stableId: sid_Zmw9nfUYWA
   wikiId: E140
   type: organization
   orgType: academic
@@ -1529,9 +1529,9 @@
     available.
   status: stub
   relatedEntries:
-    - id: IQvWHA3OiF
+    - id: sid_IQvWHA3OiF
       type: person
-    - id: bQ9a5lwwlg
+    - id: sid_bQ9a5lwwlg
       type: concept
     - id: toby-ord
       type: person
@@ -1552,7 +1552,7 @@
   lastUpdated: 2025-12
 
 - id: macrostrategy-research-initiative
-  stableId: idAU5YPkSw
+  stableId: sid_idAU5YPkSw
   type: organization
   orgType: safety-org
   title: Macrostrategy Research Initiative
@@ -1571,7 +1571,7 @@
 # Generated 2026-02-08
 
 - id: long-term-benefit-trust
-  stableId: eNJ3h95yWw
+  stableId: sid_eNJ3h95yWw
   wikiId: E407
   type: organization
   orgType: generic
@@ -1593,24 +1593,24 @@
   clusters:
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: part-of
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
-    - id: gA9eoKhFAM
+    - id: sid_gA9eoKhFAM
       type: person
-    - id: MY7i5cfpRQ
+    - id: sid_MY7i5cfpRQ
       type: person
-    - id: sy20C906g2
+    - id: sid_sy20C906g2
       type: person
-    - id: 6zzGkJhk5g
+    - id: sid_6zzGkJhk5g
       type: person
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
-    - id: tKMznr07QA
+    - id: sid_tKMznr07QA
       type: person
-    - id: gNsqAes7Dw
+    - id: sid_gNsqAes7Dw
       type: organization
   sources:
     - title: "Anthropic: The Long-Term Benefit Trust"
@@ -1622,7 +1622,7 @@
   lastUpdated: 2026-03
 
 - id: openai-foundation
-  stableId: GQuPhNkZbg
+  stableId: sid_GQuPhNkZbg
   wikiId: E421
   type: organization
   orgType: funder
@@ -1648,22 +1648,22 @@
     - governance
     - community
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: part-of
-    - id: JKsVHQ5stQ
+    - id: sid_JKsVHQ5stQ
       type: person
-    - id: jPuOTgOJGS
+    - id: sid_jPuOTgOJGS
       type: person
-    - id: sNy2jENSLL
+    - id: sid_sNy2jENSLL
       type: person
-    - id: Q2T4QDC7dA
+    - id: sid_Q2T4QDC7dA
       type: person
-    - id: CzFijjMitA
+    - id: sid_CzFijjMitA
       type: person
-    - id: 3U1A3jX8wC
+    - id: sid_3U1A3jX8wC
       type: person
-    - id: 3w5hW5liew
+    - id: sid_3w5hW5liew
       type: organization
   sources:
     - title: "OpenAI: Built to Benefit Everyone"
@@ -1677,7 +1677,7 @@
   lastUpdated: 2026-03
 
 - id: leading-the-future
-  stableId: pg7Ym4EQ9A
+  stableId: sid_pg7Ym4EQ9A
   wikiId: E422
   type: organization
   orgType: generic
@@ -1697,14 +1697,14 @@
     - community
     - governance
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: qspeazccPg
+    - id: sid_qspeazccPg
       type: person
   lastUpdated: 2026-02
 
 - id: johns-hopkins-center-for-health-security
-  stableId: vKC8BA9hHA
+  stableId: sid_vKC8BA9hHA
   wikiId: E423
   type: organization
   orgType: academic
@@ -1724,14 +1724,14 @@
     - community
     - governance
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
 - id: nist-ai
-  stableId: Eac7pHF06Q
+  stableId: sid_Eac7pHF06Q
   wikiId: E424
   type: organization
   orgType: government
@@ -1753,11 +1753,11 @@
     - governance
     - community
   relatedEntries:
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: 1CHfDs0vsg
+    - id: sid_1CHfDs0vsg
       type: person
       relationship: leads-to
   sources:
@@ -1770,7 +1770,7 @@
   lastUpdated: 2026-02
 
 - id: ssi
-  stableId: 1OSiYOaWVL
+  stableId: sid_1OSiYOaWVL
   wikiId: E425
   type: organization
   orgType: frontier-lab
@@ -1795,13 +1795,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eYrBgMLJDw
+    - id: sid_eYrBgMLJDw
       type: person
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
     - id: ilya-sutskever
       type: person
@@ -1813,7 +1813,7 @@
   lastUpdated: 2026-02
 
 - id: controlai
-  stableId: uhTh3ndt0Q
+  stableId: sid_uhTh3ndt0Q
   wikiId: E426
   type: organization
   orgType: safety-org
@@ -1837,7 +1837,7 @@
   relatedEntries:
     - id: conjecture
       type: organization
-    - id: CrXoCsIucX
+    - id: sid_CrXoCsIucX
       type: person
   sources:
     - title: ControlAI Website
@@ -1847,7 +1847,7 @@
   lastUpdated: 2026-02
 
 - id: frontier-model-forum
-  stableId: LgiqvRCrvg
+  stableId: sid_LgiqvRCrvg
   wikiId: E427
   type: organization
   orgType: generic
@@ -1869,15 +1869,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: 6gjF5d3geg
+    - id: sid_6gjF5d3geg
       type: person
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
   sources:
     - title: Frontier Model Forum Website
@@ -1889,7 +1889,7 @@
   lastUpdated: 2026-02
 
 - id: palisade-research
-  stableId: sgEt2BpyOg
+  stableId: sid_sgEt2BpyOg
   wikiId: E428
   type: organization
   orgType: safety-org
@@ -1911,15 +1911,15 @@
     - community
     - cyber
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: nGFBXZeM3d
+    - id: sid_nGFBXZeM3d
       type: person
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
-    - id: pvJ50HupEQ
+    - id: sid_pvJ50HupEQ
       type: organization
-    - id: rt6jVH9yuA
+    - id: sid_rt6jVH9yuA
       type: approach
   sources:
     - title: Palisade Research Website
@@ -1929,7 +1929,7 @@
   lastUpdated: 2026-02
 
 - id: centre-for-long-term-resilience
-  stableId: yfUBQLMfgw
+  stableId: sid_yfUBQLMfgw
   wikiId: E429
   type: organization
   orgType: safety-org
@@ -1950,14 +1950,14 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: pvJ50HupEQ
+    - id: sid_pvJ50HupEQ
       type: organization
   lastUpdated: 2026-02
 
 - id: goodfire
-  stableId: H74rOLotqg
+  stableId: sid_H74rOLotqg
   wikiId: E430
   type: organization
   orgType: safety-org
@@ -1977,15 +1977,15 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: zR4nW8xB2f
+    - id: sid_zR4nW8xB2f
       type: person
-    - id: Tz48rTriBg
+    - id: sid_Tz48rTriBg
       type: person
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
   sources:
     - title: Goodfire Website
@@ -1999,7 +1999,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: 1day-sooner
-  stableId: 9k7drw6Qpg
+  stableId: sid_9k7drw6Qpg
   wikiId: E509
   type: organization
   orgType: generic
@@ -2017,7 +2017,7 @@
     - governance
   lastUpdated: 2026-02
 - id: 80000-hours
-  stableId: hvg9ecR3nA
+  stableId: sid_hvg9ecR3nA
   wikiId: E510
   type: organization
   orgType: safety-org
@@ -2034,7 +2034,7 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: p1P9oQwB6w
+    - id: sid_p1P9oQwB6w
       type: person
       relationship: leads-to
   sources:
@@ -2044,7 +2044,7 @@
       url: https://en.wikipedia.org/wiki/80,000_Hours
   lastUpdated: 2026-02
 - id: ai-futures-project
-  stableId: KDYvrwkgtw
+  stableId: sid_KDYvrwkgtw
   wikiId: E511
   type: organization
   orgType: safety-org
@@ -2062,7 +2062,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-impacts
-  stableId: TdbypiKyCw
+  stableId: sid_TdbypiKyCw
   wikiId: E512
   type: organization
   orgType: safety-org
@@ -2084,7 +2084,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: ai-revenue-sources
-  stableId: B7uHMuvA0Q
+  stableId: sid_B7uHMuvA0Q
   wikiId: E513
   type: organization
   orgType: generic
@@ -2100,7 +2100,7 @@
     - governance
   lastUpdated: 2026-02
 - id: arb-research
-  stableId: 6rEo4U4WPw
+  stableId: sid_6rEo4U4WPw
   wikiId: E514
   type: organization
   orgType: safety-org
@@ -2118,7 +2118,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: blueprint-biosecurity
-  stableId: lZRKSfs5wg
+  stableId: sid_lZRKSfs5wg
   wikiId: E515
   type: organization
   orgType: safety-org
@@ -2135,7 +2135,7 @@
     - governance
   lastUpdated: 2026-02
 - id: bridgewater-aia-labs
-  stableId: 19XMJpUWqQ
+  stableId: sid_19XMJpUWqQ
   wikiId: E516
   type: organization
   orgType: generic
@@ -2153,7 +2153,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: cea
-  stableId: gNsqAes7Dw
+  stableId: sid_gNsqAes7Dw
   wikiId: E517
   type: organization
   orgType: safety-org
@@ -2168,7 +2168,7 @@
     - community
   lastUpdated: 2026-02
 - id: center-for-applied-rationality
-  stableId: l5K9ZdbXww
+  stableId: sid_l5K9ZdbXww
   wikiId: E518
   type: organization
   orgType: generic
@@ -2185,7 +2185,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: chan-zuckerberg-initiative
-  stableId: rYERluiUwH
+  stableId: sid_rYERluiUwH
   wikiId: E519
   type: organization
   orgType: funder
@@ -2203,7 +2203,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coalition-for-epidemic-preparedness-innovations
-  stableId: ILE6N4wiDA
+  stableId: sid_ILE6N4wiDA
   wikiId: E520
   type: organization
   orgType: funder
@@ -2219,7 +2219,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coefficient-giving
-  stableId: ULjDXpSLCI
+  stableId: sid_ULjDXpSLCI
   wikiId: E521
   type: organization
   orgType: funder
@@ -2248,7 +2248,7 @@
     - governance
   lastUpdated: 2026-02
 - id: council-on-strategic-risks
-  stableId: FL52kVPTlA
+  stableId: sid_FL52kVPTlA
   wikiId: E522
   type: organization
   orgType: safety-org
@@ -2279,7 +2279,7 @@
       url: https://councilonstrategicrisks.org/2025/09/24/call-for-applications-ai-national-security-convergence-fellowship/
   lastUpdated: 2026-03
 - id: cser
-  stableId: Qns43S795w
+  stableId: sid_Qns43S795w
   wikiId: E523
   type: organization
   orgType: academic
@@ -2298,16 +2298,16 @@
     - biorisks
     - governance
   relatedEntries:
-    - id: T6SowQJJbg
+    - id: sid_T6SowQJJbg
       type: person
       relationship: leads-to
-    - id: WlwcDX4nYA
+    - id: sid_WlwcDX4nYA
       type: person
       relationship: leads-to
-    - id: 6gjF5d3geg
+    - id: sid_6gjF5d3geg
       type: person
       relationship: leads-to
-    - id: YsjgB5Gy0g
+    - id: sid_YsjgB5Gy0g
       type: person
       relationship: research
   sources:
@@ -2319,7 +2319,7 @@
       url: https://en.wikipedia.org/wiki/Centre_for_the_Study_of_Existential_Risk
   lastUpdated: 2026-02
 - id: cset
-  stableId: lvsDuyzPcg
+  stableId: sid_lvsDuyzPcg
   wikiId: E524
   type: organization
   orgType: academic
@@ -2348,7 +2348,7 @@
       url: https://en.wikipedia.org/wiki/Center_for_Security_and_Emerging_Technology
   lastUpdated: 2026-02
 - id: ea-global
-  stableId: k4IPgRP98A
+  stableId: sid_k4IPgRP98A
   wikiId: E525
   type: organization
   orgType: generic
@@ -2364,7 +2364,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: elicit
-  stableId: 2VexoROapg
+  stableId: sid_2VexoROapg
   wikiId: E526
   type: organization
   orgType: startup
@@ -2376,7 +2376,7 @@
     Ought and funded by Coefficient Giving (formerly Open Philanthropy, $31M total). The platform achieved
     90%+ extraction accuracy and claims 80% time savings for systematic reviews, though independent validation of these claims is limited.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   clusters:
     - ai-safety
@@ -2384,7 +2384,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: fli
-  stableId: d9sWZtyVwg
+  stableId: sid_d9sWZtyVwg
   wikiId: E528
   type: organization
   orgType: safety-org
@@ -2403,14 +2403,14 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
       relationship: related
-    - id: 3KjUCZCV8w
+    - id: sid_3KjUCZCV8w
       type: person
-    - id: dVQzYIAN3A
+    - id: sid_dVQzYIAN3A
       type: person
-    - id: 6gjF5d3geg
+    - id: sid_6gjF5d3geg
       type: person
     - id: max-tegmark
       type: person
@@ -2423,7 +2423,7 @@
       url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
   lastUpdated: 2026-03
 - id: founders-fund
-  stableId: LYfneQJbSA
+  stableId: sid_LYfneQJbSA
   wikiId: E529
   type: organization
   orgType: funder
@@ -2439,7 +2439,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: futuresearch
-  stableId: PIC4ivhNpw
+  stableId: sid_PIC4ivhNpw
   wikiId: E530
   type: organization
   orgType: startup
@@ -2457,7 +2457,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: giving-pledge
-  stableId: 3w5hW5liew
+  stableId: sid_3w5hW5liew
   wikiId: E531
   type: organization
   orgType: funder
@@ -2472,7 +2472,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: good-judgment
-  stableId: Zx7ckq6syw
+  stableId: sid_Zx7ckq6syw
   wikiId: E532
   type: organization
   orgType: generic
@@ -2489,7 +2489,7 @@
     - community
   lastUpdated: 2026-02
 - id: gpai
-  stableId: p2h6bEqhvQ
+  stableId: sid_p2h6bEqhvQ
   wikiId: E533
   type: organization
   orgType: government
@@ -2508,7 +2508,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: gratified
-  stableId: 2v7A8mb7Ww
+  stableId: sid_2v7A8mb7Ww
   wikiId: E534
   type: organization
   orgType: generic
@@ -2523,7 +2523,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: hewlett-foundation
-  stableId: 9nUCGERzgQ
+  stableId: sid_9nUCGERzgQ
   wikiId: E535
   type: organization
   orgType: funder
@@ -2539,7 +2539,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ibbis
-  stableId: 55HJBLrOzg
+  stableId: sid_55HJBLrOzg
   wikiId: E536
   type: organization
   orgType: academic
@@ -2556,7 +2556,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: kalshi
-  stableId: M7656wW5Bg
+  stableId: sid_M7656wW5Bg
   wikiId: E537
   type: organization
   orgType: startup
@@ -2573,7 +2573,7 @@
     - community
   lastUpdated: 2026-02
 - id: lesswrong
-  stableId: BEKEqQDmkQ
+  stableId: sid_BEKEqQDmkQ
   wikiId: E538
   type: organization
   orgType: generic
@@ -2589,10 +2589,10 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: fS1tEGKuNq
+    - id: sid_fS1tEGKuNq
       type: person
       relationship: leads-to
-    - id: 47Rkb1DGmw
+    - id: sid_47Rkb1DGmw
       type: organization
   sources:
     - title: LessWrong Website
@@ -2601,7 +2601,7 @@
       url: https://en.wikipedia.org/wiki/LessWrong
   lastUpdated: 2026-02
 - id: lighthaven
-  stableId: 7E2ylGl7Ug
+  stableId: sid_7E2ylGl7Ug
   wikiId: E539
   type: organization
   orgType: generic
@@ -2619,7 +2619,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: lightning-rod-labs
-  stableId: 4804DX6Zbg
+  stableId: sid_4804DX6Zbg
   wikiId: E540
   type: organization
   orgType: startup
@@ -2636,7 +2636,7 @@
     - community
   lastUpdated: 2026-02
 - id: lionheart-ventures
-  stableId: fACyX00cnQ
+  stableId: sid_fACyX00cnQ
   wikiId: E541
   type: organization
   orgType: funder
@@ -2652,7 +2652,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: longview-philanthropy
-  stableId: gV4U3qi2QA
+  stableId: sid_gV4U3qi2QA
   wikiId: E542
   type: organization
   orgType: funder
@@ -2676,7 +2676,7 @@
       url: https://www.longview.org/about/
   lastUpdated: 2026-02
 - id: ltff
-  stableId: yA12C1KcjQ
+  stableId: sid_yA12C1KcjQ
   wikiId: E543
   type: organization
   orgType: funder
@@ -2692,7 +2692,7 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
   sources:
     - title: Long-Term Future Fund
@@ -2701,7 +2701,7 @@
       url: https://forum.effectivealtruism.org/topics/long-term-future-fund
   lastUpdated: 2026-02
 - id: macarthur-foundation
-  stableId: 8q2GhtEmkA
+  stableId: sid_8q2GhtEmkA
   wikiId: E544
   type: organization
   orgType: funder
@@ -2716,7 +2716,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: manifest
-  stableId: KYKdAOzynA
+  stableId: sid_KYKdAOzynA
   wikiId: E545
   type: organization
   orgType: generic
@@ -2733,7 +2733,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifold
-  stableId: Y8MiLNuAWA
+  stableId: sid_Y8MiLNuAWA
   wikiId: E546
   type: organization
   orgType: startup
@@ -2750,7 +2750,7 @@
     - community
   lastUpdated: 2026-02
 - id: manifund
-  stableId: fFVOuFZCRf
+  stableId: sid_fFVOuFZCRf
   wikiId: E547
   type: organization
   orgType: funder
@@ -2767,7 +2767,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: mats
-  stableId: yYtGSTsXuw
+  stableId: sid_yYtGSTsXuw
   wikiId: E548
   type: organization
   orgType: safety-org
@@ -2792,7 +2792,7 @@
       url: https://www.alignmentforum.org/w/mats-program
   lastUpdated: 2026-02
 - id: meta-ai
-  stableId: tt0f5PYDCw
+  stableId: sid_tt0f5PYDCw
   wikiId: E549
   type: organization
   orgType: frontier-lab
@@ -2815,12 +2815,12 @@
     - community
     - governance
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
     - id: mark-zuckerberg
       type: person
       relationship: leads-to
-    - id: cMbVUVK29Q
+    - id: sid_cMbVUVK29Q
       type: person
       relationship: research
     - id: yann-lecun
@@ -2832,7 +2832,7 @@
       url: https://en.wikipedia.org/wiki/Meta_AI
   lastUpdated: 2026-02
 - id: microsoft
-  stableId: OIY5gaPpBA
+  stableId: sid_OIY5gaPpBA
   wikiId: E550
   type: organization
   orgType: frontier-lab
@@ -2852,7 +2852,7 @@
     - id: satya-nadella
       type: person
       relationship: leads-to
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   clusters:
     - community
@@ -2865,7 +2865,7 @@
       url: https://blogs.microsoft.com/blog/2024/03/19/mustafa-suleyman-deepmind-and-inflection-co-founder-joins-microsoft-to-lead-copilot/
   lastUpdated: 2026-02
 - id: nti-bio
-  stableId: D9lqMW2HVw
+  stableId: sid_D9lqMW2HVw
   wikiId: E551
   type: organization
   orgType: safety-org
@@ -2883,7 +2883,7 @@
     - community
   lastUpdated: 2026-02
 - id: open-philanthropy
-  stableId: NifCYhN75w
+  stableId: sid_NifCYhN75w
   wikiId: E552
   type: organization
   orgType: funder
@@ -2897,12 +2897,12 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: eQh3ZhWv8D
+    - id: sid_eQh3ZhWv8D
       type: person
       relationship: leads-to
-    - id: Jtj6jHbuQ7
+    - id: sid_Jtj6jHbuQ7
       type: person
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
   sources:
     - title: Open Philanthropy Website
@@ -2911,7 +2911,7 @@
       url: https://en.wikipedia.org/wiki/Open_Philanthropy
   lastUpdated: 2026-02
 - id: pause-ai
-  stableId: woL5lkqLpg
+  stableId: sid_woL5lkqLpg
   wikiId: E553
   type: organization
   orgType: safety-org
@@ -2936,7 +2936,7 @@
       url: https://en.wikipedia.org/wiki/PauseAI
   lastUpdated: 2026-02
 - id: peter-thiel-philanthropy
-  stableId: y4AUeiPifQ
+  stableId: sid_y4AUeiPifQ
   wikiId: E554
   type: organization
   orgType: funder
@@ -2952,7 +2952,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: polymarket
-  stableId: fRo2H0Q2xQ
+  stableId: sid_fRo2H0Q2xQ
   wikiId: E555
   type: organization
   orgType: startup
@@ -2969,7 +2969,7 @@
     - community
   lastUpdated: 2026-02
 - id: red-queen-bio
-  stableId: W9J9yMK82X
+  stableId: sid_W9J9yMK82X
   wikiId: E556
   type: organization
   orgType: startup
@@ -2988,7 +2988,7 @@
     - governance
   lastUpdated: 2026-02
 - id: redwood-research
-  stableId: dwMzc9WzPa
+  stableId: sid_dwMzc9WzPa
   wikiId: E557
   type: organization
   orgType: safety-org
@@ -2998,17 +2998,17 @@
     - Redwood
   website: https://redwoodresearch.org
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
     - id: buck-shlegeris
       type: person
@@ -3044,7 +3044,7 @@
     - community
   lastUpdated: 2026-02
 - id: rethink-priorities
-  stableId: t0p43V5oLA
+  stableId: sid_t0p43V5oLA
   wikiId: E558
   type: organization
   orgType: safety-org
@@ -3068,7 +3068,7 @@
       url: https://rethinkpriorities.org/our-research-areas/
   lastUpdated: 2026-02
 - id: samotsvety
-  stableId: 9hPhtQ9AXw
+  stableId: sid_9hPhtQ9AXw
   wikiId: E560
   type: organization
   orgType: generic
@@ -3085,7 +3085,7 @@
     - community
   lastUpdated: 2026-02
 - id: schmidt-futures
-  stableId: h6ntSGk8fg
+  stableId: sid_h6ntSGk8fg
   wikiId: E561
   type: organization
   orgType: funder
@@ -3101,7 +3101,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: secure-ai-project
-  stableId: Mj1xuvdboQ
+  stableId: sid_Mj1xuvdboQ
   wikiId: E562
   type: organization
   orgType: safety-org
@@ -3120,7 +3120,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securebio
-  stableId: QFIL8r7vPA
+  stableId: sid_QFIL8r7vPA
   wikiId: E563
   type: organization
   orgType: safety-org
@@ -3139,7 +3139,7 @@
     - governance
   lastUpdated: 2026-02
 - id: securedna
-  stableId: m4vhGiF5RQ
+  stableId: sid_m4vhGiF5RQ
   wikiId: E564
   type: organization
   orgType: safety-org
@@ -3157,7 +3157,7 @@
     - governance
   lastUpdated: 2026-02
 - id: seldon-lab
-  stableId: eBYk2wn75Q
+  stableId: sid_eBYk2wn75Q
   wikiId: E565
   type: organization
   orgType: safety-org
@@ -3175,7 +3175,7 @@
     - governance
   lastUpdated: 2026-02
 - id: sentinel
-  stableId: JzhBAecjaA
+  stableId: sid_JzhBAecjaA
   wikiId: E566
   type: organization
   orgType: safety-org
@@ -3193,7 +3193,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: sff
-  stableId: pvJ50HupEQ
+  stableId: sid_pvJ50HupEQ
   wikiId: E567
   type: organization
   orgType: funder
@@ -3224,7 +3224,7 @@
       url: https://survivalandflourishing.fund/s-process.html
   lastUpdated: 2026-02
 - id: situational-awareness-lp
-  stableId: FxJ9jQ7SlA
+  stableId: sid_FxJ9jQ7SlA
   wikiId: E568
   type: organization
   orgType: generic
@@ -3245,7 +3245,7 @@
     - governance
   lastUpdated: 2026-02
 - id: swift-centre
-  stableId: YlrwnKhMqQ
+  stableId: sid_YlrwnKhMqQ
   wikiId: E569
   type: organization
   orgType: safety-org
@@ -3261,7 +3261,7 @@
     - community
   lastUpdated: 2026-02
 - id: the-foundation-layer
-  stableId: 5jfxLzMZYg
+  stableId: sid_5jfxLzMZYg
   wikiId: E697
   type: organization
   orgType: funder
@@ -3274,10 +3274,10 @@
     intervention areas: alignment science, nonproliferation, defensive
     technology, power distribution, and talent mobilization.
   relatedEntries:
-    - id: gV4U3qi2QA
+    - id: sid_gV4U3qi2QA
       type: organization
       relationship: related
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
       relationship: related
   clusters:
@@ -3286,7 +3286,7 @@
     - governance
   lastUpdated: 2026-02
 - id: the-sequences
-  stableId: mwlHBrbdBQ
+  stableId: sid_mwlHBrbdBQ
   wikiId: E570
   type: organization
   orgType: generic
@@ -3301,7 +3301,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: turion
-  stableId: wixiIVSZdg
+  stableId: sid_wixiIVSZdg
   wikiId: E571
   type: organization
   orgType: generic
@@ -3316,7 +3316,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vara
-  stableId: 4RoymCjuvA
+  stableId: sid_4RoymCjuvA
   wikiId: E572
   type: organization
   orgType: generic
@@ -3331,7 +3331,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: vitalik-buterin-philanthropy
-  stableId: 2fEPReD49A
+  stableId: sid_2fEPReD49A
   wikiId: E573
   type: organization
   orgType: funder
@@ -3347,23 +3347,23 @@
     - community
   lastUpdated: 2026-02
 - id: astralis-foundation
-  stableId: QeknHipQPA
+  stableId: sid_QeknHipQPA
   wikiId: E702
   type: organization
   orgType: funder
   title: Astralis Foundation
   website: https://astralisfoundation.org
   relatedEntries:
-    - id: gV4U3qi2QA
+    - id: sid_gV4U3qi2QA
       type: organization
       relationship: leads-to
-    - id: t0p43V5oLA
+    - id: sid_t0p43V5oLA
       type: organization
       relationship: leads-to
-    - id: ZvfLhIm7pw
+    - id: sid_ZvfLhIm7pw
       type: person
       relationship: leads-to
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
       relationship: leads-to
   sources:
@@ -3389,7 +3389,7 @@
     - community
   lastUpdated: 2026-02
 - id: nvidia
-  stableId: UvpZCnW3wA
+  stableId: sid_UvpZCnW3wA
   wikiId: E693
   type: organization
   orgType: frontier-lab
@@ -3415,7 +3415,7 @@
       url: https://en.wikipedia.org/wiki/Jensen_Huang
   lastUpdated: 2026-02
 - id: ftx
-  stableId: yevJm2XDsQ
+  stableId: sid_yevJm2XDsQ
   wikiId: E856
   type: organization
   orgType: generic
@@ -3430,9 +3430,9 @@
     committed over $130 million to longtermist causes including AI safety before
     its bankruptcy rendered those commitments void.
   relatedEntries:
-    - id: JhIGCaI3Ng
+    - id: sid_JhIGCaI3Ng
       type: organization
-    - id: gNsqAes7Dw
+    - id: sid_gNsqAes7Dw
       type: organization
     - id: sam-bankman-fried
       type: person
@@ -3442,7 +3442,7 @@
     - community
   lastUpdated: 2026-02
 - id: ftx-future-fund
-  stableId: JhIGCaI3Ng
+  stableId: sid_JhIGCaI3Ng
   wikiId: E855
   type: organization
   orgType: funder
@@ -3457,11 +3457,11 @@
     stating that they believed committed grants could not be honored and raising
     questions about the legitimacy of the funds' source.
   relatedEntries:
-    - id: yevJm2XDsQ
+    - id: sid_yevJm2XDsQ
       type: organization
-    - id: gNsqAes7Dw
+    - id: sid_gNsqAes7Dw
       type: organization
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
   clusters:
     - ai-safety
@@ -3469,20 +3469,20 @@
   lastUpdated: 2026-02
 
 - id: giving-what-we-can
-  stableId: aKZsmUeuWg
+  stableId: sid_aKZsmUeuWg
   wikiId: E863
   type: organization
   orgType: safety-org
   title: Giving What We Can
   website: https://www.givingwhatwecan.org/
   relatedEntries:
-    - id: 8nmqy7vFiA
+    - id: sid_8nmqy7vFiA
       type: person
-    - id: p1P9oQwB6w
+    - id: sid_p1P9oQwB6w
       type: person
-    - id: gNsqAes7Dw
+    - id: sid_gNsqAes7Dw
       type: organization
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
   customFields:
     - label: Founded
@@ -3511,7 +3511,7 @@
   lastUpdated: 2026-02
 
 - id: mistral-ai
-  stableId: RFHVboBnHg
+  stableId: sid_RFHVboBnHg
   wikiId: E1097
   type: organization
   orgType: frontier-lab
@@ -3519,7 +3519,7 @@
   title: Mistral AI
   website: https://mistral.ai
   relatedEntries:
-    - id: v1e1ZwDwoA
+    - id: sid_v1e1ZwDwoA
       type: ai-model
       relationship: created-by
   description: >-
@@ -3544,7 +3544,7 @@
   lastUpdated: 2025-04
 
 - id: deepseek
-  stableId: otUkuVHDKw
+  stableId: sid_otUkuVHDKw
   wikiId: E1098
   type: organization
   orgType: frontier-lab
@@ -3552,7 +3552,7 @@
   title: DeepSeek
   website: https://www.deepseek.com
   relatedEntries:
-    - id: svlbcrT5oQ
+    - id: sid_svlbcrT5oQ
       type: ai-model
       relationship: created-by
   description: >-
@@ -3582,7 +3582,7 @@
 # =============================================================================
 
 - id: uc-berkeley
-  stableId: ksqqi7fyeA
+  stableId: sid_ksqqi7fyeA
   wikiId: E1112
   type: organization
   orgType: academic
@@ -3601,7 +3601,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-university
-  stableId: ngrgdfqafw
+  stableId: sid_ngrgdfqafw
   wikiId: E1113
   type: organization
   orgType: academic
@@ -3625,7 +3625,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-oxford
-  stableId: 18K3KG3bpg
+  stableId: sid_18K3KG3bpg
   wikiId: E1114
   type: organization
   orgType: academic
@@ -3645,7 +3645,7 @@
   lastUpdated: 2026-03
 
 - id: harvard-university
-  stableId: r90ivRT8lA
+  stableId: sid_r90ivRT8lA
   wikiId: E1115
   type: organization
   orgType: academic
@@ -3658,7 +3658,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-pennsylvania
-  stableId: mGoIaAqCmA
+  stableId: sid_mGoIaAqCmA
   wikiId: E1116
   type: organization
   orgType: academic
@@ -3677,7 +3677,7 @@
   lastUpdated: 2026-03
 
 - id: yale-university
-  stableId: 1tZbcfTFfw
+  stableId: sid_1tZbcfTFfw
   wikiId: E1117
   type: organization
   orgType: academic
@@ -3690,7 +3690,7 @@
   lastUpdated: 2026-03
 
 - id: usc
-  stableId: 5YprRPwFOg
+  stableId: sid_5YprRPwFOg
   wikiId: E1118
   type: organization
   orgType: academic
@@ -3703,7 +3703,7 @@
   lastUpdated: 2026-03
 
 - id: princeton-university
-  stableId: 5Lc4bpqlng
+  stableId: sid_5Lc4bpqlng
   wikiId: E1119
   type: organization
   orgType: academic
@@ -3717,7 +3717,7 @@
   lastUpdated: 2026-03
 
 - id: nyu
-  stableId: 5IBy869q9Q
+  stableId: sid_5IBy869q9Q
   wikiId: E1120
   type: organization
   orgType: academic
@@ -3734,7 +3734,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-washington
-  stableId: 1K9RsqC7yg
+  stableId: sid_1K9RsqC7yg
   wikiId: E1121
   type: organization
   orgType: academic
@@ -3747,7 +3747,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-chicago
-  stableId: 63eBrDMmpg
+  stableId: sid_63eBrDMmpg
   wikiId: E1122
   type: organization
   orgType: academic
@@ -3760,7 +3760,7 @@
   lastUpdated: 2026-03
 
 - id: mit
-  stableId: Z1df97RYbw
+  stableId: sid_Z1df97RYbw
   wikiId: E1123
   type: organization
   orgType: academic
@@ -3775,7 +3775,7 @@
   lastUpdated: 2026-03
 
 - id: columbia-university
-  stableId: OyPqGFqL5A
+  stableId: sid_OyPqGFqL5A
   wikiId: E1124
   type: organization
   orgType: academic
@@ -3788,7 +3788,7 @@
   lastUpdated: 2026-03
 
 - id: carnegie-mellon-university
-  stableId: lOV3OFaWMg
+  stableId: sid_lOV3OFaWMg
   wikiId: E1125
   type: organization
   orgType: academic
@@ -3803,7 +3803,7 @@
   lastUpdated: 2026-03
 
 - id: georgetown-university
-  stableId: zab6VSUgQw
+  stableId: sid_zab6VSUgQw
   wikiId: E1126
   type: organization
   orgType: academic
@@ -3818,7 +3818,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-michigan
-  stableId: CBeGcCyOyw
+  stableId: sid_CBeGcCyOyw
   wikiId: E1127
   type: organization
   orgType: academic
@@ -3831,7 +3831,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-maryland
-  stableId: qHM9LBFxXg
+  stableId: sid_qHM9LBFxXg
   wikiId: E1128
   type: organization
   orgType: academic
@@ -3844,7 +3844,7 @@
   lastUpdated: 2026-03
 
 - id: uc-davis
-  stableId: tW8PGgszJg
+  stableId: sid_tW8PGgszJg
   wikiId: E1129
   type: organization
   orgType: academic
@@ -3857,7 +3857,7 @@
   lastUpdated: 2026-03
 
 - id: uc-san-francisco
-  stableId: 0ILtQkmkeA
+  stableId: sid_0ILtQkmkeA
   wikiId: E1130
   type: organization
   orgType: academic
@@ -3870,7 +3870,7 @@
   lastUpdated: 2026-03
 
 - id: dartmouth-college
-  stableId: NTfUXx7j5Q
+  stableId: sid_NTfUXx7j5Q
   wikiId: E1131
   type: organization
   orgType: academic
@@ -3883,7 +3883,7 @@
   lastUpdated: 2026-03
 
 - id: rutgers-university
-  stableId: N7LanuxgEw
+  stableId: sid_N7LanuxgEw
   wikiId: E1132
   type: organization
   orgType: academic
@@ -3896,7 +3896,7 @@
   lastUpdated: 2026-03
 
 - id: cornell-university
-  stableId: ItehzmANzA
+  stableId: sid_ItehzmANzA
   wikiId: E1133
   type: organization
   orgType: academic
@@ -3909,7 +3909,7 @@
   lastUpdated: 2026-03
 
 - id: johns-hopkins-university
-  stableId: ntpulDMo9w
+  stableId: sid_ntpulDMo9w
   wikiId: E1134
   type: organization
   orgType: academic
@@ -3924,7 +3924,7 @@
   lastUpdated: 2026-03
 
 - id: duke-university
-  stableId: vfxNzRQfgg
+  stableId: sid_vfxNzRQfgg
   wikiId: E1135
   type: organization
   orgType: academic
@@ -3937,7 +3937,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-toronto
-  stableId: G4vgO5B8oA
+  stableId: sid_G4vgO5B8oA
   wikiId: E1136
   type: organization
   orgType: academic
@@ -3952,7 +3952,7 @@
   lastUpdated: 2026-03
 
 - id: georgia-tech
-  stableId: Mj36YWAj4A
+  stableId: sid_Mj36YWAj4A
   wikiId: E1137
   type: organization
   orgType: academic
@@ -3965,7 +3965,7 @@
   lastUpdated: 2026-03
 
 - id: purdue-university
-  stableId: ZTE66CIDxA
+  stableId: sid_ZTE66CIDxA
   wikiId: E1138
   type: organization
   orgType: academic
@@ -3978,7 +3978,7 @@
   lastUpdated: 2026-03
 
 - id: washu
-  stableId: 09jjMN7a9g
+  stableId: sid_09jjMN7a9g
   wikiId: E1139
   type: organization
   orgType: academic
@@ -3991,7 +3991,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-edinburgh
-  stableId: RtQm1h5XqQ
+  stableId: sid_RtQm1h5XqQ
   wikiId: E1140
   type: organization
   orgType: academic
@@ -4004,7 +4004,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-cambridge
-  stableId: xfad5FwoTA
+  stableId: sid_xfad5FwoTA
   wikiId: E1141
   type: organization
   orgType: academic
@@ -4022,7 +4022,7 @@
   lastUpdated: 2026-03
 
 - id: brown-university
-  stableId: LUrRQBRfOg
+  stableId: sid_LUrRQBRfOg
   wikiId: E1142
   type: organization
   orgType: academic
@@ -4035,7 +4035,7 @@
   lastUpdated: 2026-03
 
 - id: northeastern-university
-  stableId: nBi0ynYp3g
+  stableId: sid_nBi0ynYp3g
   wikiId: E1143
   type: organization
   orgType: academic
@@ -4048,7 +4048,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-notre-dame
-  stableId: feVUShox8A
+  stableId: sid_feVUShox8A
   wikiId: E1144
   type: organization
   orgType: academic
@@ -4061,7 +4061,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-glasgow
-  stableId: BRLCwQt0jg
+  stableId: sid_BRLCwQt0jg
   wikiId: E1145
   type: organization
   orgType: academic
@@ -4074,7 +4074,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-utah
-  stableId: Ea8GGLkqdg
+  stableId: sid_Ea8GGLkqdg
   wikiId: E1146
   type: organization
   orgType: academic
@@ -4087,7 +4087,7 @@
   lastUpdated: 2026-03
 
 - id: uc-los-angeles
-  stableId: 483amkzufg
+  stableId: sid_483amkzufg
   wikiId: E1147
   type: organization
   orgType: academic
@@ -4100,7 +4100,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-ottawa
-  stableId: znFFeDac6Q
+  stableId: sid_znFFeDac6Q
   wikiId: E1148
   type: organization
   orgType: academic
@@ -4117,7 +4117,7 @@
 # =============================================================================
 
 - id: beri
-  stableId: CgscaZc0lA
+  stableId: sid_CgscaZc0lA
   wikiId: E1149
   type: organization
   orgType: safety-org
@@ -4130,9 +4130,9 @@
     - ai-safety
     - existential-risk
   relatedEntries:
-    - id: zMfgJqiEPQ
+    - id: sid_zMfgJqiEPQ
       type: organization
-    - id: Qns43S795w
+    - id: sid_Qns43S795w
       type: organization
   sources:
     - title: BERI Website
@@ -4142,7 +4142,7 @@
   lastUpdated: 2026-03
 
 - id: ai-safety-support
-  stableId: gCnFEWPFqw
+  stableId: sid_gCnFEWPFqw
   wikiId: E1150
   type: organization
   orgType: safety-org
@@ -4157,7 +4157,7 @@
   lastUpdated: 2026-03
 
 - id: cambridge-boston-alignment-initiative
-  stableId: T9M80clN1w
+  stableId: sid_T9M80clN1w
   wikiId: E1151
   type: organization
   orgType: safety-org
@@ -4172,7 +4172,7 @@
   lastUpdated: 2026-03
 
 - id: lightcone-infrastructure
-  stableId: 47Rkb1DGmw
+  stableId: sid_47Rkb1DGmw
   wikiId: E1152
   type: organization
   orgType: safety-org
@@ -4185,9 +4185,9 @@
     - ai-safety
     - community
   relatedEntries:
-    - id: BEKEqQDmkQ
+    - id: sid_BEKEqQDmkQ
       type: organization
-    - id: 0tQftJKP4Q
+    - id: sid_0tQftJKP4Q
       type: person
       relationship: leads-to
   sources:
@@ -4198,7 +4198,7 @@
   lastUpdated: 2026-03
 
 - id: global-catastrophic-risk-institute
-  stableId: cth6HTkyhA
+  stableId: sid_cth6HTkyhA
   wikiId: E1153
   type: organization
   orgType: safety-org
@@ -4213,7 +4213,7 @@
   lastUpdated: 2026-03
 
 - id: allfed
-  stableId: Pc9GysNWZA
+  stableId: sid_Pc9GysNWZA
   wikiId: E1154
   type: organization
   orgType: safety-org
@@ -4228,7 +4228,7 @@
   lastUpdated: 2026-03
 
 - id: arena-alignment
-  stableId: knwcFNXNQQ
+  stableId: sid_knwcFNXNQQ
   wikiId: E1155
   type: organization
   orgType: safety-org
@@ -4244,7 +4244,7 @@
   lastUpdated: 2026-03
 
 - id: apart-research
-  stableId: 5WqgebIWFQ
+  stableId: sid_5WqgebIWFQ
   wikiId: E1156
   type: organization
   orgType: safety-org
@@ -4258,18 +4258,18 @@
     42+ research sprints with 3,000+ participants across 50+ global locations,
     producing 22 peer-reviewed publications at venues including NeurIPS, ICLR, and ACL.
   relatedEntries:
-    - id: HwM6OF6Ewg
+    - id: sid_HwM6OF6Ewg
       type: person
       relationship: created-by
-    - id: Z62bQynY4g
+    - id: sid_Z62bQynY4g
       type: person
       relationship: supports
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
       relationship: related
-    - id: knwcFNXNQQ
+    - id: sid_knwcFNXNQQ
       type: organization
       relationship: related
   sources:
@@ -4291,7 +4291,7 @@
   lastUpdated: 2026-03
 
 - id: saferai
-  stableId: VtjvwHCa6g
+  stableId: sid_VtjvwHCa6g
   wikiId: E1157
   type: organization
   orgType: safety-org
@@ -4305,7 +4305,7 @@
   lastUpdated: 2026-03
 
 - id: ai-safety-camp
-  stableId: 2BUn75004w
+  stableId: sid_2BUn75004w
   wikiId: E1158
   type: organization
   orgType: safety-org
@@ -4319,7 +4319,7 @@
   lastUpdated: 2026-03
 
 - id: london-initiative-safe-ai
-  stableId: fffMhacRCQ
+  stableId: sid_fffMhacRCQ
   wikiId: E1159
   type: organization
   orgType: safety-org
@@ -4333,7 +4333,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-existential-risks-initiative
-  stableId: 8uY7BBVJww
+  stableId: sid_8uY7BBVJww
   wikiId: E1160
   type: organization
   orgType: safety-org
@@ -4348,7 +4348,7 @@
   lastUpdated: 2026-03
 
 - id: existential-risk-observatory
-  stableId: TFEmCZBWPA
+  stableId: sid_TFEmCZBWPA
   wikiId: E1161
   type: organization
   orgType: safety-org
@@ -4362,7 +4362,7 @@
   lastUpdated: 2026-03
 
 - id: pivotal-research
-  stableId: Ay7z1aaMsQ
+  stableId: sid_Ay7z1aaMsQ
   wikiId: E1162
   type: organization
   orgType: safety-org
@@ -4376,7 +4376,7 @@
   lastUpdated: 2026-03
 
 - id: center-on-long-term-risk
-  stableId: i7Y3OcXV8A
+  stableId: sid_i7Y3OcXV8A
   wikiId: E1163
   type: organization
   orgType: safety-org
@@ -4391,7 +4391,7 @@
   lastUpdated: 2026-03
 
 - id: bluedot-impact
-  stableId: kHgmzyol5w
+  stableId: sid_kHgmzyol5w
   wikiId: E1164
   type: organization
   orgType: safety-org
@@ -4407,7 +4407,7 @@
   lastUpdated: 2026-03
 
 - id: median-group
-  stableId: Ii1sWbYtOQ
+  stableId: sid_Ii1sWbYtOQ
   wikiId: E1209
   type: organization
   orgType: safety-org
@@ -4421,7 +4421,7 @@
   lastUpdated: 2026-03
 
 - id: modeling-cooperation
-  stableId: ivJ9P4p2cQ
+  stableId: sid_ivJ9P4p2cQ
   wikiId: E1217
   type: organization
   orgType: safety-org
@@ -4440,7 +4440,7 @@
 # =============================================================================
 
 - id: ea-norway
-  stableId: vrCKTVoFbw
+  stableId: sid_vrCKTVoFbw
   wikiId: E1165
   type: organization
   orgType: generic
@@ -4453,7 +4453,7 @@
   lastUpdated: 2026-03
 
 - id: czea
-  stableId: 1assBhWMcg
+  stableId: sid_1assBhWMcg
   wikiId: E1166
   type: organization
   orgType: generic
@@ -4466,7 +4466,7 @@
   lastUpdated: 2026-03
 
 - id: ea-sweden
-  stableId: zkLhbMDSVQ
+  stableId: sid_zkLhbMDSVQ
   wikiId: E1167
   type: organization
   orgType: generic
@@ -4479,7 +4479,7 @@
   lastUpdated: 2026-03
 
 - id: founders-pledge
-  stableId: TBgnF576Vg
+  stableId: sid_TBgnF576Vg
   wikiId: E1168
   type: organization
   orgType: generic
@@ -4494,7 +4494,7 @@
   lastUpdated: 2026-03
 
 - id: ea-funds
-  stableId: GURMOHZrFA
+  stableId: sid_GURMOHZrFA
   wikiId: E1169
   type: organization
   orgType: funder
@@ -4509,7 +4509,7 @@
   lastUpdated: 2026-03
 
 - id: charity-entrepreneurship
-  stableId: O4RL1JXU6w
+  stableId: sid_O4RL1JXU6w
   wikiId: E1170
   type: organization
   orgType: generic
@@ -4524,7 +4524,7 @@
   lastUpdated: 2026-03
 
 - id: ea-geneva
-  stableId: 2WT9rbzjkA
+  stableId: sid_2WT9rbzjkA
   wikiId: E1171
   type: organization
   orgType: generic
@@ -4537,7 +4537,7 @@
   lastUpdated: 2026-03
 
 - id: ea-poland
-  stableId: snkmOerhsw
+  stableId: sid_snkmOerhsw
   wikiId: E1172
   type: organization
   orgType: generic
@@ -4550,7 +4550,7 @@
   lastUpdated: 2026-03
 
 - id: ea-netherlands
-  stableId: Wb5XO6qYwQ
+  stableId: sid_Wb5XO6qYwQ
   wikiId: E1173
   type: organization
   orgType: generic
@@ -4563,7 +4563,7 @@
   lastUpdated: 2026-03
 
 - id: ea-singapore
-  stableId: Fr0DnL9USw
+  stableId: sid_Fr0DnL9USw
   wikiId: E1174
   type: organization
   orgType: generic
@@ -4576,7 +4576,7 @@
   lastUpdated: 2026-03
 
 - id: ea-finland
-  stableId: bxNPwLZN3A
+  stableId: sid_bxNPwLZN3A
   wikiId: E1175
   type: organization
   orgType: generic
@@ -4589,7 +4589,7 @@
   lastUpdated: 2026-03
 
 - id: ea-israel
-  stableId: eDOLLPm77g
+  stableId: sid_eDOLLPm77g
   wikiId: E1176
   type: organization
   orgType: generic
@@ -4602,7 +4602,7 @@
   lastUpdated: 2026-03
 
 - id: ea-foundation
-  stableId: 4YEaHrpWUQ
+  stableId: sid_4YEaHrpWUQ
   wikiId: E1177
   type: organization
   orgType: generic
@@ -4618,7 +4618,7 @@
   lastUpdated: 2026-03
 
 - id: ea-new-zealand
-  stableId: HscPCr9okw
+  stableId: sid_HscPCr9okw
   wikiId: E1178
   type: organization
   orgType: generic
@@ -4631,7 +4631,7 @@
   lastUpdated: 2026-03
 
 - id: ea-australia
-  stableId: ho6fSE1Aow
+  stableId: sid_ho6fSE1Aow
   wikiId: E1179
   type: organization
   orgType: generic
@@ -4644,7 +4644,7 @@
   lastUpdated: 2026-03
 
 - id: ea-denmark
-  stableId: 0xZurnQ8SQ
+  stableId: sid_0xZurnQ8SQ
   wikiId: E1180
   type: organization
   orgType: generic
@@ -4657,7 +4657,7 @@
   lastUpdated: 2026-03
 
 - id: ea-austria
-  stableId: 2FQ7p7Wgnw
+  stableId: sid_2FQ7p7Wgnw
   wikiId: E1181
   type: organization
   orgType: generic
@@ -4670,7 +4670,7 @@
   lastUpdated: 2026-03
 
 - id: effective-ventures-usa
-  stableId: L04KZ3Ylsw
+  stableId: sid_L04KZ3Ylsw
   wikiId: E1182
   type: organization
   orgType: generic
@@ -4683,7 +4683,7 @@
   lastUpdated: 2026-03
 
 - id: cambridge-ea
-  stableId: z7spMQKjLQ
+  stableId: sid_z7spMQKjLQ
   wikiId: E1183
   type: organization
   orgType: generic
@@ -4697,7 +4697,7 @@
   lastUpdated: 2026-03
 
 - id: one-for-the-world
-  stableId: O6YSnkAMqg
+  stableId: sid_O6YSnkAMqg
   wikiId: E1216
   type: organization
   orgType: generic
@@ -4712,7 +4712,7 @@
   lastUpdated: 2026-03
 
 - id: non-trivial
-  stableId: e1q5WWd7gQ
+  stableId: sid_e1q5WWd7gQ
   wikiId: E1204
   type: organization
   orgType: generic
@@ -4727,7 +4727,7 @@
   lastUpdated: 2026-03
 
 - id: probably-good
-  stableId: AndlA1NTng
+  stableId: sid_AndlA1NTng
   wikiId: E1205
   type: organization
   orgType: generic
@@ -4741,7 +4741,7 @@
   lastUpdated: 2026-03
 
 - id: atlas-fellowship
-  stableId: VqPPJRKsrQ
+  stableId: sid_VqPPJRKsrQ
   wikiId: E1203
   type: organization
   orgType: generic
@@ -4756,7 +4756,7 @@
   lastUpdated: 2026-03
 
 - id: high-impact-engineers
-  stableId: 4VggZAoQcg
+  stableId: sid_4VggZAoQcg
   wikiId: E1207
   type: organization
   orgType: generic
@@ -4770,7 +4770,7 @@
   lastUpdated: 2026-03
 
 - id: high-impact-athletes
-  stableId: OmMYaAgZpw
+  stableId: sid_OmMYaAgZpw
   wikiId: E1220
   type: organization
   orgType: generic
@@ -4785,7 +4785,7 @@
   lastUpdated: 2026-03
 
 - id: generation-pledge
-  stableId: slFh7JjUqQ
+  stableId: sid_slFh7JjUqQ
   wikiId: E1221
   type: organization
   orgType: generic
@@ -4799,7 +4799,7 @@
   lastUpdated: 2026-03
 
 - id: ceealar
-  stableId: 0d2STsaG4A
+  stableId: sid_0d2STsaG4A
   wikiId: E1222
   type: organization
   orgType: generic
@@ -4814,7 +4814,7 @@
   lastUpdated: 2026-03
 
 - id: ambitious-impact
-  stableId: Umu2ZOchow
+  stableId: sid_Umu2ZOchow
   wikiId: E1223
   type: organization
   orgType: generic
@@ -4828,7 +4828,7 @@
   lastUpdated: 2026-03
 
 - id: training-for-good
-  stableId: 0Ab6GjAl0A
+  stableId: sid_0Ab6GjAl0A
   wikiId: E1224
   type: organization
   orgType: generic
@@ -4842,7 +4842,7 @@
   lastUpdated: 2026-03
 
 - id: effective-institutions-project
-  stableId: jweZ80FQSQ
+  stableId: sid_jweZ80FQSQ
   wikiId: E1225
   type: organization
   orgType: generic
@@ -4856,7 +4856,7 @@
   lastUpdated: 2026-03
 
 - id: the-unjournal
-  stableId: zuzXwcuOLw
+  stableId: sid_zuzXwcuOLw
   wikiId: E1211
   type: organization
   orgType: generic
@@ -4875,7 +4875,7 @@
 # =============================================================================
 
 - id: center-for-global-development
-  stableId: b4M1tU9tGw
+  stableId: sid_b4M1tU9tGw
   wikiId: E1184
   type: organization
   orgType: generic
@@ -4889,7 +4889,7 @@
   lastUpdated: 2026-03
 
 - id: rand-corporation
-  stableId: 8grDoD8kig
+  stableId: sid_8grDoD8kig
   wikiId: E1185
   type: organization
   orgType: generic
@@ -4905,7 +4905,7 @@
   lastUpdated: 2026-03
 
 - id: legal-priorities-project
-  stableId: 8zy1QbFxOg
+  stableId: sid_8zy1QbFxOg
   wikiId: E1186
   type: organization
   orgType: safety-org
@@ -4921,7 +4921,7 @@
   lastUpdated: 2026-03
 
 - id: global-priorities-institute
-  stableId: VTigs5s4gg
+  stableId: sid_VTigs5s4gg
   wikiId: E1187
   type: organization
   orgType: safety-org
@@ -4937,7 +4937,7 @@
   lastUpdated: 2026-03
 
 - id: simon-institute
-  stableId: CneUT6LNVg
+  stableId: sid_CneUT6LNVg
   wikiId: E1188
   type: organization
   orgType: safety-org
@@ -4952,7 +4952,7 @@
   lastUpdated: 2026-03
 
 - id: cnas
-  stableId: dYjY3Ma1Hw
+  stableId: sid_dYjY3Ma1Hw
   wikiId: E1189
   type: organization
   orgType: generic
@@ -4976,7 +4976,7 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: vn087g2XWa
+    - id: sid_vn087g2XWa
       type: person
       relationship: leads-to
   sources:
@@ -4987,7 +4987,7 @@
   lastUpdated: 2026-03
 
 - id: federation-of-american-scientists
-  stableId: 2avSHj60sQ
+  stableId: sid_2avSHj60sQ
   wikiId: E1190
   type: organization
   orgType: generic
@@ -5002,7 +5002,7 @@
   lastUpdated: 2026-03
 
 - id: institute-for-progress
-  stableId: 7ked5Nus0g
+  stableId: sid_7ked5Nus0g
   wikiId: E1191
   type: organization
   orgType: generic
@@ -5015,7 +5015,7 @@
   lastUpdated: 2026-03
 
 - id: foundation-for-american-innovation
-  stableId: rjdYwdLAvw
+  stableId: sid_rjdYwdLAvw
   wikiId: E1192
   type: organization
   orgType: generic
@@ -5028,7 +5028,7 @@
   lastUpdated: 2026-03
 
 - id: iaps
-  stableId: NI4hqOL33A
+  stableId: sid_NI4hqOL33A
   wikiId: E1193
   type: organization
   orgType: safety-org
@@ -5063,7 +5063,7 @@
   lastUpdated: 2026-03
 
 - id: niskanen-center
-  stableId: O5jCdIWixQ
+  stableId: sid_O5jCdIWixQ
   wikiId: E1194
   type: organization
   orgType: generic
@@ -5076,7 +5076,7 @@
   lastUpdated: 2026-03
 
 - id: carnegie-endowment
-  stableId: wrbWEng9gg
+  stableId: sid_wrbWEng9gg
   wikiId: E1195
   type: organization
   orgType: generic
@@ -5090,7 +5090,7 @@
   lastUpdated: 2026-03
 
 - id: oxford-china-policy-lab
-  stableId: 6T3yDF5wvg
+  stableId: sid_6T3yDF5wvg
   wikiId: E1196
   type: organization
   orgType: generic
@@ -5105,7 +5105,7 @@
   lastUpdated: 2026-03
 
 - id: bipartisan-commission-biodefense
-  stableId: wHfFIBrPcA
+  stableId: sid_wHfFIBrPcA
   wikiId: E1197
   type: organization
   orgType: generic
@@ -5119,7 +5119,7 @@
   lastUpdated: 2026-03
 
 - id: georgetown-cghss
-  stableId: vgdN9zIzqA
+  stableId: sid_vgdN9zIzqA
   wikiId: E1198
   type: organization
   orgType: generic
@@ -5133,7 +5133,7 @@
   lastUpdated: 2026-03
 
 - id: vera-institute
-  stableId: m4bxbv1MVA
+  stableId: sid_m4bxbv1MVA
   wikiId: E1199
   type: organization
   orgType: generic
@@ -5147,7 +5147,7 @@
   lastUpdated: 2026-03
 
 - id: the-future-society
-  stableId: u3Yf4JXH4Q
+  stableId: sid_u3Yf4JXH4Q
   wikiId: E1213
   type: organization
   orgType: safety-org
@@ -5166,7 +5166,7 @@
   lastUpdated: 2026-03
 
 - id: collective-intelligence-project
-  stableId: 0TFmORNnKQ
+  stableId: sid_0TFmORNnKQ
   wikiId: E1218
   type: organization
   orgType: generic
@@ -5184,7 +5184,7 @@
 # =============================================================================
 
 - id: givedirectly
-  stableId: wk3kStH8bw
+  stableId: sid_wk3kStH8bw
   wikiId: E1200
   type: organization
   orgType: generic
@@ -5198,7 +5198,7 @@
   lastUpdated: 2026-03
 
 - id: against-malaria-foundation
-  stableId: c5rNf1vl2A
+  stableId: sid_c5rNf1vl2A
   wikiId: E1201
   type: organization
   orgType: generic
@@ -5212,7 +5212,7 @@
   lastUpdated: 2026-03
 
 - id: topos-institute
-  stableId: K40O5WixNQ
+  stableId: sid_K40O5WixNQ
   wikiId: E1202
   type: organization
   orgType: generic
@@ -5226,7 +5226,7 @@
   lastUpdated: 2026-03
 
 - id: arcadia-impact
-  stableId: 8VWjCOOGbg
+  stableId: sid_8VWjCOOGbg
   wikiId: E1206
   type: organization
   orgType: generic
@@ -5240,7 +5240,7 @@
   lastUpdated: 2026-03
 
 - id: sentience-institute
-  stableId: NKNm02bYjQ
+  stableId: sid_NKNm02bYjQ
   wikiId: E1208
   type: organization
   orgType: generic
@@ -5254,7 +5254,7 @@
   lastUpdated: 2026-03
 
 - id: foresight-institute
-  stableId: NPPTvNqRXA
+  stableId: sid_NPPTvNqRXA
   wikiId: E1210
   type: organization
   orgType: other
@@ -5269,17 +5269,17 @@
   founded: "1986"
   location: San Francisco, CA
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
-    - id: BvtUK0yEDv
+    - id: sid_BvtUK0yEDv
       type: person
-    - id: xhHJeAYzUm
+    - id: sid_xhHJeAYzUm
       type: person
-    - id: jExOzigU4B
+    - id: sid_jExOzigU4B
       type: person
-    - id: PFfb7RFhTg
+    - id: sid_PFfb7RFhTg
       type: person
-    - id: tVhfitccVu
+    - id: sid_tVhfitccVu
       type: person
   tags:
     - existential-risk
@@ -5290,7 +5290,7 @@
   lastUpdated: 2026-03
 
 - id: charter-cities-institute
-  stableId: tGw4aneRnA
+  stableId: sid_tGw4aneRnA
   wikiId: E1212
   type: organization
   orgType: generic
@@ -5305,7 +5305,7 @@
   lastUpdated: 2026-03
 
 - id: our-world-in-data
-  stableId: iHh40BybGQ
+  stableId: sid_iHh40BybGQ
   wikiId: E1214
   type: organization
   orgType: generic
@@ -5319,7 +5319,7 @@
   lastUpdated: 2026-03
 
 - id: idinsight
-  stableId: zkgz9y0CSw
+  stableId: sid_zkgz9y0CSw
   wikiId: E1215
   type: organization
   orgType: generic
@@ -5333,7 +5333,7 @@
   lastUpdated: 2026-03
 
 - id: good-food-institute
-  stableId: NwOpgmI4Kw
+  stableId: sid_NwOpgmI4Kw
   wikiId: E1219
   type: organization
   orgType: generic
@@ -5347,7 +5347,7 @@
   lastUpdated: 2026-03
 
 - id: convergent-research
-  stableId: WTKOsF10bw
+  stableId: sid_WTKOsF10bw
   wikiId: E1226
   type: organization
   orgType: generic
@@ -5361,7 +5361,7 @@
   lastUpdated: 2026-03
 
 - id: innovations-for-poverty-action
-  stableId: 3km4O0U8mg
+  stableId: sid_3km4O0U8mg
   wikiId: E1227
   type: organization
   orgType: generic
@@ -5379,7 +5379,7 @@
 # =============================================================================
 
 - id: malaria-consortium
-  stableId: VZunwIHG2Q
+  stableId: sid_VZunwIHG2Q
   wikiId: E1228
   type: organization
   orgType: generic
@@ -5396,7 +5396,7 @@
   lastUpdated: 2026-03
 
 - id: evidence-action
-  stableId: 83v83rovnA
+  stableId: sid_83v83rovnA
   wikiId: E1229
   type: organization
   orgType: generic
@@ -5412,7 +5412,7 @@
   lastUpdated: 2026-03
 
 - id: helen-keller-international
-  stableId: SJtVOOdDKQ
+  stableId: sid_SJtVOOdDKQ
   wikiId: E1230
   type: organization
   orgType: generic
@@ -5428,7 +5428,7 @@
   lastUpdated: 2026-03
 
 - id: gates-philanthropy-partners
-  stableId: l9EjmCxIMA
+  stableId: sid_l9EjmCxIMA
   wikiId: E1231
   type: organization
   orgType: funder
@@ -5444,7 +5444,7 @@
   lastUpdated: 2026-03
 
 - id: the-humane-league
-  stableId: zbjE2ZHmsA
+  stableId: sid_zbjE2ZHmsA
   wikiId: E1232
   type: organization
   orgType: generic
@@ -5459,7 +5459,7 @@
   lastUpdated: 2026-03
 
 - id: anima-international
-  stableId: g5RgWEXUCg
+  stableId: sid_g5RgWEXUCg
   wikiId: E1233
   type: organization
   orgType: generic
@@ -5474,7 +5474,7 @@
   lastUpdated: 2026-03
 
 - id: compassion-in-world-farming
-  stableId: ZmtYxrupIA
+  stableId: sid_ZmtYxrupIA
   wikiId: E1234
   type: organization
   orgType: generic
@@ -5490,7 +5490,7 @@
 
 
 - id: givewell
-  stableId: OwXl35e7bg
+  stableId: sid_OwXl35e7bg
   wikiId: E1056
   type: organization
   orgType: generic
@@ -5511,7 +5511,7 @@
     - philanthropy
     - global-health
   relatedEntries:
-    - id: eQh3ZhWv8D
+    - id: sid_eQh3ZhWv8D
       type: person
       relationship: leads-to
   sources:
@@ -5522,7 +5522,7 @@
   lastUpdated: 2026-03
 
 - id: gates-foundation
-  stableId: l4EHdNDZqg
+  stableId: sid_l4EHdNDZqg
   wikiId: E1454
   type: organization
   orgType: funder
@@ -5543,7 +5543,7 @@
   lastUpdated: 2026-03
 
 - id: good-ventures
-  stableId: hQ4Rdnaihw
+  stableId: sid_hQ4Rdnaihw
   wikiId: E1455
   type: organization
   orgType: funder
@@ -5557,7 +5557,7 @@
     and other cause areas. One of the largest funders in the effective altruism
     ecosystem, with total giving exceeding \$3B.
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
       relationship: related
     - id: dustin-moskovitz
@@ -5569,7 +5569,7 @@
   lastUpdated: 2026-03
 
 - id: wellcome-trust
-  stableId: D3QcAF9wzQ
+  stableId: sid_D3QcAF9wzQ
   wikiId: E1456
   type: organization
   orgType: funder
@@ -5588,7 +5588,7 @@
   lastUpdated: 2026-03
 
 - id: rockefeller-foundation
-  stableId: 3wtyeezoxQ
+  stableId: sid_3wtyeezoxQ
   wikiId: E1457
   type: organization
   orgType: funder
@@ -5607,7 +5607,7 @@
   lastUpdated: 2026-03
 
 - id: ford-foundation
-  stableId: 3ViojCH3Sw
+  stableId: sid_3ViojCH3Sw
   wikiId: E1458
   type: organization
   orgType: funder
@@ -5625,7 +5625,7 @@
   lastUpdated: 2026-03
 
 - id: bloomberg-philanthropies
-  stableId: H9mGnBuumA
+  stableId: sid_H9mGnBuumA
   wikiId: E1459
   type: organization
   orgType: funder
@@ -5644,7 +5644,7 @@
   lastUpdated: 2026-03
 
 - id: arnold-ventures
-  stableId: AT0VDnvwRw
+  stableId: sid_AT0VDnvwRw
   wikiId: E1460
   type: organization
   orgType: funder
@@ -5662,7 +5662,7 @@
   lastUpdated: 2026-03
 
 - id: omidyar-network
-  stableId: GADd9PU0UA
+  stableId: sid_GADd9PU0UA
   wikiId: E1461
   type: organization
   orgType: funder
@@ -5680,7 +5680,7 @@
   lastUpdated: 2026-03
 
 - id: skoll-foundation
-  stableId: 3swyqpXTRA
+  stableId: sid_3swyqpXTRA
   wikiId: E1462
   type: organization
   orgType: funder
@@ -5697,7 +5697,7 @@
   lastUpdated: 2026-03
 
 - id: animal-charity-evaluators
-  stableId: nJF5vuz1kA
+  stableId: sid_nJF5vuz1kA
   wikiId: E1463
   type: organization
   orgType: generic
@@ -5717,7 +5717,7 @@
   lastUpdated: 2026-03
 
 - id: global-health-and-development-fund
-  stableId: sQjYpneK8g
+  stableId: sid_sQjYpneK8g
   wikiId: E1464
   type: organization
   orgType: funder
@@ -5730,7 +5730,7 @@
     evidence-based interventions in areas like malaria prevention, deworming,
     cash transfers, and nutrition programs.
   relatedEntries:
-    - id: GURMOHZrFA
+    - id: sid_GURMOHZrFA
       type: organization
       relationship: related
   tags:
@@ -5740,7 +5740,7 @@
   lastUpdated: 2026-03
 
 - id: ea-animal-welfare-fund
-  stableId: 7oufogONXA
+  stableId: sid_7oufogONXA
   wikiId: E1465
   type: organization
   orgType: funder
@@ -5753,7 +5753,7 @@
     research, and other interventions aimed at reducing animal suffering at
     scale.
   relatedEntries:
-    - id: GURMOHZrFA
+    - id: sid_GURMOHZrFA
       type: organization
       relationship: related
   tags:
@@ -5763,7 +5763,7 @@
   lastUpdated: 2026-03
 
 - id: new-incentives
-  stableId: hyYuA3BoYw
+  stableId: sid_hyYuA3BoYw
   wikiId: E1466
   type: organization
   orgType: generic
@@ -5782,7 +5782,7 @@
   lastUpdated: 2026-03
 
 - id: the-life-you-can-save
-  stableId: pShgsxdp8Q
+  stableId: sid_pShgsxdp8Q
   wikiId: E1467
   type: organization
   orgType: generic
@@ -5802,7 +5802,7 @@
   lastUpdated: 2026-03
 
 - id: john-templeton-foundation
-  stableId: W3UAlnscAg
+  stableId: sid_W3UAlnscAg
   wikiId: E1468
   type: organization
   orgType: funder
@@ -5820,7 +5820,7 @@
   lastUpdated: 2026-03
 
 - id: childrens-investment-fund-foundation
-  stableId: Z6vKggPBaA
+  stableId: sid_Z6vKggPBaA
   wikiId: E1469
   type: organization
   orgType: funder
@@ -5839,7 +5839,7 @@
   lastUpdated: 2026-03
 
 - id: bezos-earth-fund
-  stableId: fVMqY7vpMA
+  stableId: sid_fVMqY7vpMA
   wikiId: E1470
   type: organization
   orgType: funder
@@ -5856,7 +5856,7 @@
   lastUpdated: 2026-03
 
 - id: future-of-life-foundation
-  stableId: 2V63hGITAw
+  stableId: sid_2V63hGITAw
   type: organization
   orgType: funder
   title: Future of Life Foundation (FLF)
@@ -5887,23 +5887,23 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
       relationship: related
-    - id: dVQzYIAN3A
+    - id: sid_dVQzYIAN3A
       type: person
       relationship: leads-to
-    - id: 0tQftJKP4Q
+    - id: sid_0tQftJKP4Q
       type: person
       relationship: leads-to
-    - id: fslZ4KLnXg
+    - id: sid_fslZ4KLnXg
       type: person
       relationship: leads-to
-    - id: xPfsyJ9s4Q
+    - id: sid_xPfsyJ9s4Q
       type: approach
-    - id: 3KjUCZCV8w
+    - id: sid_3KjUCZCV8w
       type: person
-    - id: 6gjF5d3geg
+    - id: sid_6gjF5d3geg
       type: person
   sources:
     - title: FLF Website
@@ -5928,7 +5928,7 @@
   lastUpdated: 2026-03
 
 - id: carma
-  stableId: Vc6W6S1qMg
+  stableId: sid_Vc6W6S1qMg
   type: organization
   orgType: safety-org
   title: Center for AI Risk Management & Alignment (CARMA)
@@ -5949,15 +5949,15 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
       relationship: created-by
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: mK2KLknYGg
+    - id: sid_mK2KLknYGg
       type: person
       relationship: leads-to
-    - id: dVQzYIAN3A
+    - id: sid_dVQzYIAN3A
       type: person
   sources:
     - title: CARMA LinkedIn
@@ -5976,7 +5976,7 @@
   lastUpdated: 2026-03
 
 - id: wise-ancestors
-  stableId: 518H1VpKLA
+  stableId: sid_518H1VpKLA
   type: organization
   orgType: generic
   title: Wise Ancestors
@@ -5993,10 +5993,10 @@
     - genomics
     - existential-risk
   relatedEntries:
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
       relationship: supports
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
   sources:
     - title: Wise Ancestors FLF Grant Announcement
@@ -6009,7 +6009,7 @@
   lastUpdated: 2026-03
 
 - id: y-combinator
-  stableId: d9BCHgtnlw
+  stableId: sid_d9BCHgtnlw
   wikiId: E1930
   type: organization
   orgType: funder
@@ -6021,7 +6021,7 @@
     companies. YC publicly opposed SB 1047, arguing it would harm the startup ecosystem
     and drive AI innovation out of California. CEO Garry Tan was a vocal critic of the bill.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - venture-capital
@@ -6029,7 +6029,7 @@
   lastUpdated: 2026-03
 
 - id: andreessen-horowitz
-  stableId: u2YCulQ1lg
+  stableId: sid_u2YCulQ1lg
   wikiId: E1931
   type: organization
   orgType: funder
@@ -6041,7 +6041,7 @@
     publishing detailed analysis arguing the bill would stifle innovation and impose
     unworkable compliance requirements on AI startups and frontier model developers.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - venture-capital
@@ -6049,7 +6049,7 @@
   lastUpdated: 2026-03
 
 - id: acx-grants
-  stableId: LBr3ocKKyQ
+  stableId: sid_LBr3ocKKyQ
   wikiId: E1057
   type: organization
   orgType: funder
@@ -6067,7 +6067,7 @@
   lastUpdated: 2026-03
 
 - id: encode-justice
-  stableId: etCe7rcH1g
+  stableId: sid_etCe7rcH1g
   wikiId: E1932
   type: organization
   orgType: safety-org
@@ -6083,7 +6083,7 @@
     Congress and White House OSTP. Co-source and supporter of California SB 1047.
     Primary intervention types: youth-led advocacy, public campaigns, policy recommendations.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-governance
@@ -6099,7 +6099,7 @@
   lastUpdated: 2026-03
 
 - id: imbue
-  stableId: hCtMHcUWaw
+  stableId: sid_hCtMHcUWaw
   wikiId: E1933
   type: organization
   orgType: startup
@@ -6109,7 +6109,7 @@
     AI safety-focused company building AI agents with robust reasoning.
     Supported California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-safety
@@ -6117,7 +6117,7 @@
   lastUpdated: 2026-03
 
 - id: gladstone-ai
-  stableId: HkfUxsbBLQ
+  stableId: sid_HkfUxsbBLQ
   wikiId: E1934
   type: organization
   orgType: startup
@@ -6127,7 +6127,7 @@
     AI safety advisory firm. Authors of RAND-commissioned report on catastrophic
     AI risks. Supported California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-safety
@@ -6135,7 +6135,7 @@
   lastUpdated: 2026-03
 
 - id: nonlinear
-  stableId: PfIAYFXC9Q
+  stableId: sid_PfIAYFXC9Q
   wikiId: E1935
   type: organization
   orgType: safety-org
@@ -6145,7 +6145,7 @@
     EA-adjacent AI safety organization focused on field-building. Supported
     California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-safety
@@ -6153,7 +6153,7 @@
   lastUpdated: 2026-03
 
 - id: economic-security-project
-  stableId: 2ecnsQqcRg
+  stableId: sid_2ecnsQqcRg
   wikiId: E1936
   type: organization
   orgType: generic
@@ -6163,7 +6163,7 @@
     Economic policy organization. Co-source of California SB 1047. Supported
     California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - policy
@@ -6171,7 +6171,7 @@
   lastUpdated: 2026-03
 
 - id: panoplia-labs
-  stableId: NY4i2W6IVA
+  stableId: sid_NY4i2W6IVA
   wikiId: E1937
   type: organization
   orgType: startup
@@ -6179,14 +6179,14 @@
   description: >-
     AI safety research lab. Supported California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-safety
   lastUpdated: 2026-03
 
 - id: kira-center
-  stableId: oMgy3kQqOg
+  stableId: sid_oMgy3kQqOg
   wikiId: E1938
   type: organization
   orgType: safety-org
@@ -6194,7 +6194,7 @@
   description: >-
     Center for AI Risks and Impacts. Supported California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - ai-safety
@@ -6202,7 +6202,7 @@
   lastUpdated: 2026-03
 
 - id: chamber-of-progress
-  stableId: IEav94hygQ
+  stableId: sid_IEav94hygQ
   wikiId: E1939
   type: organization
   orgType: generic
@@ -6211,14 +6211,14 @@
   description: >-
     Tech industry coalition. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - tech-policy
   lastUpdated: 2026-03
 
 - id: technet
-  stableId: 0PNw6yTH0g
+  stableId: sid_0PNw6yTH0g
   wikiId: E1940
   type: organization
   orgType: generic
@@ -6228,14 +6228,14 @@
     Bipartisan network of technology CEOs and senior executives. Opposed
     California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - tech-policy
   lastUpdated: 2026-03
 
 - id: consumer-technology-association
-  stableId: b89p7duRrQ
+  stableId: sid_b89p7duRrQ
   wikiId: E1941
   type: organization
   orgType: generic
@@ -6245,14 +6245,14 @@
     Trade association representing the consumer technology industry. Opposed
     California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - tech-policy
   lastUpdated: 2026-03
 
 - id: r-street-institute
-  stableId: yfAYuNTKxQ
+  stableId: sid_yfAYuNTKxQ
   wikiId: E1942
   type: organization
   orgType: generic
@@ -6261,7 +6261,7 @@
   description: >-
     Free-market think tank. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - policy
@@ -6269,7 +6269,7 @@
   lastUpdated: 2026-03
 
 - id: competitive-enterprise-institute
-  stableId: Le8eSvx8EQ
+  stableId: sid_Le8eSvx8EQ
   wikiId: E1943
   type: organization
   orgType: generic
@@ -6278,7 +6278,7 @@
   description: >-
     Free-market policy organization. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - policy
@@ -6286,7 +6286,7 @@
   lastUpdated: 2026-03
 
 - id: rippling
-  stableId: wUdjStVKPg
+  stableId: sid_wUdjStVKPg
   type: organization
   orgType: startup
   title: Rippling
@@ -6294,7 +6294,7 @@
   description: >-
     HR and finance platform. YC W17. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6302,7 +6302,7 @@
   lastUpdated: 2026-03
 
 - id: zapier
-  stableId: GkbMPevO4g
+  stableId: sid_GkbMPevO4g
   type: organization
   orgType: startup
   title: Zapier
@@ -6310,7 +6310,7 @@
   description: >-
     Automation platform. YC S12. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6318,7 +6318,7 @@
   lastUpdated: 2026-03
 
 - id: retell-ai
-  stableId: ttZJitsMOg
+  stableId: sid_ttZJitsMOg
   type: organization
   orgType: startup
   title: Retell AI
@@ -6326,7 +6326,7 @@
   description: >-
     Voice AI platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6334,7 +6334,7 @@
   lastUpdated: 2026-03
 
 - id: stack-ai
-  stableId: tXPmBsSdzA
+  stableId: sid_tXPmBsSdzA
   type: organization
   orgType: startup
   title: Stack AI
@@ -6342,7 +6342,7 @@
   description: >-
     AI workflow builder. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6350,7 +6350,7 @@
   lastUpdated: 2026-03
 
 - id: greptile
-  stableId: Th332GuuAA
+  stableId: sid_Th332GuuAA
   type: organization
   orgType: startup
   title: Greptile
@@ -6358,7 +6358,7 @@
   description: >-
     Code search platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6366,7 +6366,7 @@
   lastUpdated: 2026-03
 
 - id: keywords-ai
-  stableId: LHXmEcJMmA
+  stableId: sid_LHXmEcJMmA
   type: organization
   orgType: startup
   title: Keywords AI
@@ -6374,7 +6374,7 @@
   description: >-
     LLM monitoring platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6382,7 +6382,7 @@
   lastUpdated: 2026-03
 
 - id: reworkd-ai
-  stableId: wU79rY0aiw
+  stableId: sid_wU79rY0aiw
   type: organization
   orgType: startup
   title: Reworkd AI
@@ -6390,7 +6390,7 @@
   description: >-
     AI agents platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6398,7 +6398,7 @@
   lastUpdated: 2026-03
 
 - id: ello-ai
-  stableId: aWLjauVMOw
+  stableId: sid_aWLjauVMOw
   type: organization
   orgType: startup
   title: Ello
@@ -6406,7 +6406,7 @@
   description: >-
     AI reading tutor. YC W23. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6414,7 +6414,7 @@
   lastUpdated: 2026-03
 
 - id: tracecat
-  stableId: F6I2v5gscw
+  stableId: sid_F6I2v5gscw
   type: organization
   orgType: startup
   title: Tracecat
@@ -6422,7 +6422,7 @@
   description: >-
     Security automation platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6430,7 +6430,7 @@
   lastUpdated: 2026-03
 
 - id: oneshop
-  stableId: 6KXyn6O0BQ
+  stableId: sid_6KXyn6O0BQ
   type: organization
   orgType: startup
   title: Oneshop
@@ -6438,7 +6438,7 @@
   description: >-
     Resale platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6446,7 +6446,7 @@
   lastUpdated: 2026-03
 
 - id: circle-medical
-  stableId: ucAYSllfeQ
+  stableId: sid_ucAYSllfeQ
   type: organization
   orgType: startup
   title: Circle Medical
@@ -6454,7 +6454,7 @@
   description: >-
     Telehealth provider. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6462,7 +6462,7 @@
   lastUpdated: 2026-03
 
 - id: algolia
-  stableId: p4zASaR2Tg
+  stableId: sid_p4zASaR2Tg
   type: organization
   orgType: startup
   title: Algolia
@@ -6470,7 +6470,7 @@
   description: >-
     Search API provider. YC W14. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6478,7 +6478,7 @@
   lastUpdated: 2026-03
 
 - id: cointracker
-  stableId: WMXMqF4tng
+  stableId: sid_WMXMqF4tng
   type: organization
   orgType: startup
   title: CoinTracker
@@ -6486,7 +6486,7 @@
   description: >-
     Crypto tax and portfolio tracking. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6494,7 +6494,7 @@
   lastUpdated: 2026-03
 
 - id: clerky
-  stableId: qaIhQ9Lj7g
+  stableId: sid_qaIhQ9Lj7g
   type: organization
   orgType: startup
   title: Clerky
@@ -6502,7 +6502,7 @@
   description: >-
     Legal platform for startups. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6510,7 +6510,7 @@
   lastUpdated: 2026-03
 
 - id: turing-labs
-  stableId: vo2hnOFgFg
+  stableId: sid_vo2hnOFgFg
   type: organization
   orgType: startup
   title: Turing Labs
@@ -6518,7 +6518,7 @@
   description: >-
     CPG formulation AI. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6526,7 +6526,7 @@
   lastUpdated: 2026-03
 
 - id: poll-everywhere
-  stableId: UX5soFbXEQ
+  stableId: sid_UX5soFbXEQ
   type: organization
   orgType: startup
   title: Poll Everywhere
@@ -6534,7 +6534,7 @@
   description: >-
     Audience engagement platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6542,7 +6542,7 @@
   lastUpdated: 2026-03
 
 - id: picnichealth
-  stableId: i2KW9yCwOw
+  stableId: sid_i2KW9yCwOw
   type: organization
   orgType: startup
   title: PicnicHealth
@@ -6550,7 +6550,7 @@
   description: >-
     Medical records platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6558,7 +6558,7 @@
   lastUpdated: 2026-03
 
 - id: rootly
-  stableId: sVxaX8SsAA
+  stableId: sid_sVxaX8SsAA
   type: organization
   orgType: startup
   title: Rootly
@@ -6566,7 +6566,7 @@
   description: >-
     Incident management platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6574,7 +6574,7 @@
   lastUpdated: 2026-03
 
 - id: simplify-jobs
-  stableId: QDCltX6DyA
+  stableId: sid_QDCltX6DyA
   type: organization
   orgType: startup
   title: Simplify
@@ -6582,7 +6582,7 @@
   description: >-
     Job search platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6590,7 +6590,7 @@
   lastUpdated: 2026-03
 
 - id: storyworth
-  stableId: kT85f91plA
+  stableId: sid_kT85f91plA
   type: organization
   orgType: startup
   title: StoryWorth
@@ -6598,7 +6598,7 @@
   description: >-
     Family storytelling platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6606,7 +6606,7 @@
   lastUpdated: 2026-03
 
 - id: firecrawl
-  stableId: vWTs3C8bnQ
+  stableId: sid_vWTs3C8bnQ
   type: organization
   orgType: startup
   title: Firecrawl
@@ -6614,7 +6614,7 @@
   description: >-
     Web scraping platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6622,7 +6622,7 @@
   lastUpdated: 2026-03
 
 - id: openmart
-  stableId: 3mRd96cKdw
+  stableId: sid_3mRd96cKdw
   type: organization
   orgType: startup
   title: Openmart
@@ -6630,7 +6630,7 @@
   description: >-
     Local business AI platform. YC backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6638,7 +6638,7 @@
   lastUpdated: 2026-03
 
 - id: playground-ai
-  stableId: kh5x0eezrQ
+  stableId: sid_kh5x0eezrQ
   type: organization
   orgType: startup
   title: Playground
@@ -6646,7 +6646,7 @@
   description: >-
     AI image generation platform. a16z backed. Opposed California SB 1047.
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
   tags:
     - startup
@@ -6654,7 +6654,7 @@
   lastUpdated: 2026-03
 
 - id: forethought
-  stableId: tdb16DLlLb
+  stableId: sid_tdb16DLlLb
   type: organization
   orgType: safety-org
   title: Forethought Foundation
@@ -6676,7 +6676,7 @@
   lastUpdated: 2026-03
 
 - id: ada-lovelace-institute
-  stableId: BgSnHHzV6g
+  stableId: sid_BgSnHHzV6g
   wikiId: E1979
   type: organization
   orgType: safety-org
@@ -6696,7 +6696,7 @@
   lastUpdated: 2026-03
 
 - id: ai-now-institute
-  stableId: VJacG0VE2w
+  stableId: sid_VJacG0VE2w
   wikiId: E1980
   type: organization
   orgType: safety-org
@@ -6730,7 +6730,7 @@
   lastUpdated: 2026-03
 
 - id: partnership-on-ai
-  stableId: lG1LEx80wg
+  stableId: sid_lG1LEx80wg
   wikiId: E1981
   type: organization
   orgType: safety-org
@@ -6752,13 +6752,13 @@
     - industry-collaboration
     - multi-stakeholder
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: OIY5gaPpBA
+    - id: sid_OIY5gaPpBA
       type: organization
   sources:
     - title: Partnership on AI Website
@@ -6770,7 +6770,7 @@
   lastUpdated: 2026-03
 
 - id: ai-policy-institute
-  stableId: w7mwNxGtCQ
+  stableId: sid_w7mwNxGtCQ
   wikiId: E1982
   type: organization
   orgType: safety-org
@@ -6796,7 +6796,7 @@
   lastUpdated: 2026-03
 
 - id: americans-for-responsible-innovation
-  stableId: IFjdCevnFg
+  stableId: sid_IFjdCevnFg
   wikiId: E1983
   type: organization
   orgType: safety-org
@@ -6829,7 +6829,7 @@
   lastUpdated: 2026-03
 
 - id: brookings-ai
-  stableId: GrI1ZpreMg
+  stableId: sid_GrI1ZpreMg
   wikiId: E1984
   type: organization
   orgType: generic
@@ -6847,7 +6847,7 @@
   lastUpdated: 2026-03
 
 - id: rand-ai
-  stableId: hibH3GwFQA
+  stableId: sid_hibH3GwFQA
   wikiId: E1985
   type: organization
   orgType: generic
@@ -6866,7 +6866,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-hai
-  stableId: YPE80Sx2VA
+  stableId: sid_YPE80Sx2VA
   wikiId: E1986
   type: organization
   orgType: academic
@@ -6885,7 +6885,7 @@
     - academic
     - ai-index
   relatedEntries:
-    - id: QzcX3bShmQ
+    - id: sid_QzcX3bShmQ
       type: person
       relationship: leads-to
   sources:
@@ -6896,7 +6896,7 @@
   lastUpdated: 2026-03
 
 - id: center-for-ai-policy
-  stableId: V3NJg9djng
+  stableId: sid_V3NJg9djng
   wikiId: E1987
   type: organization
   orgType: safety-org
@@ -6930,7 +6930,7 @@
   lastUpdated: 2026-03
 
 - id: center-for-democracy-and-technology
-  stableId: XkqcWk46oQ
+  stableId: sid_XkqcWk46oQ
   wikiId: E1988
   type: organization
   orgType: generic
@@ -6950,7 +6950,7 @@
   lastUpdated: 2026-03
 
 - id: carnegie-ai
-  stableId: 5RV1WNLBCg
+  stableId: sid_5RV1WNLBCg
   wikiId: E1989
   type: organization
   orgType: generic
@@ -6970,7 +6970,7 @@
   lastUpdated: 2026-03
 
 - id: csis-ai
-  stableId: qu9klkdh5w
+  stableId: sid_qu9klkdh5w
   wikiId: E1990
   type: organization
   orgType: generic
@@ -6990,7 +6990,7 @@
   lastUpdated: 2026-03
 
 - id: asana
-  stableId: xakL6BzSla
+  stableId: sid_xakL6BzSla
   type: organization
   orgType: generic
   title: Asana
@@ -7003,7 +7003,7 @@
   lastUpdated: 2026-03
 
 - id: google-brain
-  stableId: AZmSQxCAlk
+  stableId: sid_AZmSQxCAlk
   type: organization
   orgType: other
   title: Google Brain
@@ -7017,7 +7017,7 @@
   lastUpdated: 2026-03
 
 - id: mila
-  stableId: alE9l9RI99
+  stableId: sid_alE9l9RI99
   type: organization
   orgType: academic
   title: Mila - Quebec AI Institute
@@ -7032,7 +7032,7 @@
 
 # --- ARIA Safeguarded AI grantee universities ---
 - id: university-college-london
-  stableId: HEAdFvsqJw
+  stableId: sid_HEAdFvsqJw
   type: organization
   orgType: academic
   title: University College London
@@ -7045,7 +7045,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-birmingham
-  stableId: bEVAImWDe3
+  stableId: sid_bEVAImWDe3
   type: organization
   orgType: academic
   title: University of Birmingham
@@ -7058,7 +7058,7 @@
   lastUpdated: 2026-03
 
 - id: university-of-warwick
-  stableId: OpZ5XbfHDo
+  stableId: sid_OpZ5XbfHDo
   type: organization
   orgType: academic
   title: University of Warwick
@@ -7071,7 +7071,7 @@
   lastUpdated: 2026-03
 
 - id: heriot-watt-university
-  stableId: DbW4BTw7jq
+  stableId: sid_DbW4BTw7jq
   type: organization
   orgType: academic
   title: Heriot-Watt University
@@ -7084,7 +7084,7 @@
   lastUpdated: 2026-03
 
 - id: zeroth-research
-  stableId: 2oZvXRbu46
+  stableId: sid_2oZvXRbu46
   type: organization
   orgType: generic
   title: Zeroth Research
@@ -7099,7 +7099,7 @@
 # --- AI for Legislation & Regulatory Intelligence ---
 
 - id: fiscalnote
-  stableId: hrCbRXB4rg
+  stableId: sid_hrCbRXB4rg
   wikiId: E2006
   type: organization
   orgType: startup
@@ -7120,7 +7120,7 @@
   lastUpdated: 2026-03
 
 - id: norm-ai
-  stableId: 92Op4ymvxQ
+  stableId: sid_92Op4ymvxQ
   wikiId: E2007
   type: organization
   orgType: startup
@@ -7140,7 +7140,7 @@
   lastUpdated: 2026-03
 
 - id: popvox-foundation
-  stableId: RIqV81buCg
+  stableId: sid_RIqV81buCg
   wikiId: E2008
   type: organization
   orgType: generic
@@ -7161,7 +7161,7 @@
   lastUpdated: 2026-03
 
 - id: quorum
-  stableId: HMEZGsaP3A
+  stableId: sid_HMEZGsaP3A
   wikiId: E2009
   type: organization
   orgType: startup
@@ -7181,7 +7181,7 @@
   lastUpdated: 2026-03
 
 - id: xcential
-  stableId: TCbaQbZwDA
+  stableId: sid_TCbaQbZwDA
   wikiId: E2010
   type: organization
   orgType: startup
@@ -7202,7 +7202,7 @@
   lastUpdated: 2026-03
 
 - id: stanford-codex
-  stableId: YqPeeaLCgQ
+  stableId: sid_YqPeeaLCgQ
   wikiId: E2011
   type: organization
   orgType: academic
@@ -7223,7 +7223,7 @@
   lastUpdated: 2026-03
 
 - id: legislaide
-  stableId: dy97FfG3Mw
+  stableId: sid_dy97FfG3Mw
   wikiId: E2012
   type: organization
   orgType: startup
@@ -7242,7 +7242,7 @@
   lastUpdated: 2026-03
 
 - id: fastdemocracy
-  stableId: P33feJM86w
+  stableId: sid_P33feJM86w
   wikiId: E2013
   type: organization
   orgType: startup
@@ -7262,7 +7262,7 @@
   lastUpdated: 2026-03
 
 - id: plural-policy
-  stableId: 4maty6zh42
+  stableId: sid_4maty6zh42
   type: organization
   orgType: startup
   title: Plural Policy
@@ -7281,7 +7281,7 @@
   lastUpdated: 2026-03
 
 - id: fed10
-  stableId: nZ78007nkv
+  stableId: sid_nZ78007nkv
   type: organization
   orgType: startup
   title: Fed10
@@ -7297,7 +7297,7 @@
   lastUpdated: 2026-03
 
 - id: multistate-ai
-  stableId: 28h0ziLBdl
+  stableId: sid_28h0ziLBdl
   type: organization
   orgType: startup
   title: MultiState.ai
@@ -7313,7 +7313,7 @@
   lastUpdated: 2026-03
 
 - id: regology
-  stableId: yNOv3B8Ba3
+  stableId: sid_yNOv3B8Ba3
   type: organization
   orgType: startup
   title: Regology
@@ -7329,7 +7329,7 @@
   lastUpdated: 2026-03
 
 - id: smu-cclaw
-  stableId: OgEMJXP2sZ
+  stableId: sid_OgEMJXP2sZ
   type: organization
   orgType: academic
   title: SMU Centre for Computational Law
@@ -7347,7 +7347,7 @@
 
 # --- New funder organizations (Vipul Naik multi-donor import) ---
 - id: sloan-foundation
-  stableId: lI8DgWtPyD
+  stableId: sid_lI8DgWtPyD
   type: organization
   orgType: funder
   title: Alfred P. Sloan Foundation
@@ -7358,7 +7358,7 @@
   lastUpdated: 2026-03
 
 - id: thiel-foundation
-  stableId: 0SkH1jbTRu
+  stableId: sid_0SkH1jbTRu
   type: organization
   orgType: funder
   title: Thiel Foundation
@@ -7369,7 +7369,7 @@
   lastUpdated: 2026-03
 
 - id: knight-foundation
-  stableId: BAGFs8P6WP
+  stableId: sid_BAGFs8P6WP
   type: organization
   orgType: funder
   title: John S. and James L. Knight Foundation
@@ -7379,7 +7379,7 @@
   lastUpdated: 2026-03
 
 - id: kellogg-foundation
-  stableId: 1SqvvamQqq
+  stableId: sid_1SqvvamQqq
   type: organization
   orgType: funder
   title: W. K. Kellogg Foundation
@@ -7390,7 +7390,7 @@
   lastUpdated: 2026-03
 
 - id: pineapple-fund
-  stableId: wTnEjSfIeP
+  stableId: sid_wTnEjSfIeP
   type: organization
   orgType: funder
   title: Pineapple Fund
@@ -7401,7 +7401,7 @@
   lastUpdated: 2026-03
 
 - id: google-org
-  stableId: J2DYTkMiRA
+  stableId: sid_J2DYTkMiRA
   type: organization
   orgType: funder
   title: Google.org
@@ -7411,7 +7411,7 @@
   lastUpdated: 2026-03
 
 - id: lilly-endowment
-  stableId: kxVSuuHN7j
+  stableId: sid_kxVSuuHN7j
   type: organization
   orgType: funder
   title: Lilly Endowment
@@ -7422,7 +7422,7 @@
   lastUpdated: 2026-03
 
 - id: mellon-foundation
-  stableId: Ni1A9uFQ9S
+  stableId: sid_Ni1A9uFQ9S
   type: organization
   orgType: funder
   title: Andrew W. Mellon Foundation
@@ -7432,7 +7432,7 @@
   lastUpdated: 2026-03
 
 - id: walton-family-foundation
-  stableId: OEr0rtfTAU
+  stableId: sid_OEr0rtfTAU
   type: organization
   orgType: funder
   title: Walton Family Foundation
@@ -7443,7 +7443,7 @@
   lastUpdated: 2026-03
 
 - id: barr-foundation
-  stableId: RfxfdsVA3R
+  stableId: sid_RfxfdsVA3R
   type: organization
   orgType: funder
   title: Barr Foundation
@@ -7453,7 +7453,7 @@
   lastUpdated: 2026-03
 
 - id: sandler-foundation
-  stableId: B1GYdbJuD9
+  stableId: sid_B1GYdbJuD9
   type: organization
   orgType: funder
   title: Sandler Foundation
@@ -7464,7 +7464,7 @@
   lastUpdated: 2026-03
 
 - id: surdna-foundation
-  stableId: 6wJ85FrPfi
+  stableId: sid_6wJ85FrPfi
   type: organization
   orgType: funder
   title: Surdna Foundation
@@ -7475,7 +7475,7 @@
   lastUpdated: 2026-03
 
 - id: donorstrust
-  stableId: rY6Rdleg5f
+  stableId: sid_rY6Rdleg5f
   type: organization
   orgType: funder
   title: DonorsTrust
@@ -7486,7 +7486,7 @@
 
 # --- EA/AI safety grantee organizations ---
 - id: wild-animal-initiative
-  stableId: 2OLJZcF1pW
+  stableId: sid_2OLJZcF1pW
   type: organization
   orgType: generic
   title: Wild Animal Initiative
@@ -7498,7 +7498,7 @@
   lastUpdated: 2026-03
 
 - id: mercy-for-animals
-  stableId: u2j7u53L8S
+  stableId: sid_u2j7u53L8S
   type: organization
   orgType: generic
   title: Mercy For Animals
@@ -7510,7 +7510,7 @@
   lastUpdated: 2026-03
 
 - id: constellation
-  stableId: jwe4re7Ggo
+  stableId: sid_jwe4re7Ggo
   type: organization
   orgType: generic
   title: Constellation
@@ -7522,7 +7522,7 @@
   lastUpdated: 2026-03
 
 - id: animal-equality
-  stableId: IkwNqat1cE
+  stableId: sid_IkwNqat1cE
   type: organization
   orgType: generic
   title: Animal Equality
@@ -7533,7 +7533,7 @@
   lastUpdated: 2026-03
 
 - id: openmined
-  stableId: AOJewfN502
+  stableId: sid_AOJewfN502
   type: organization
   orgType: generic
   title: OpenMined
@@ -7551,7 +7551,7 @@
   lastUpdated: 2026-03
 
 - id: lucid-computing
-  stableId: SYntJDlIY1
+  stableId: sid_SYntJDlIY1
   type: organization
   orgType: startup
   title: Lucid Computing
@@ -7580,7 +7580,7 @@
   lastUpdated: 2026-03
 
 - id: mithril-security
-  stableId: V5RCY2I3eY
+  stableId: sid_V5RCY2I3eY
   type: organization
   orgType: startup
   title: Mithril Security
@@ -7600,7 +7600,7 @@
   lastUpdated: 2026-03
 
 - id: chips-alliance
-  stableId: 0bYYDuKcGH
+  stableId: sid_0bYYDuKcGH
   type: organization
   orgType: generic
   title: CHIPS Alliance
@@ -7624,7 +7624,7 @@
   lastUpdated: 2026-03
 
 - id: ai-objectives-institute
-  stableId: 71VWCgxV5P
+  stableId: sid_71VWCgxV5P
   type: organization
   orgType: generic
   title: AI Objectives Institute
@@ -7635,7 +7635,7 @@
   lastUpdated: 2026-03
 
 - id: timaeus
-  stableId: AzwQTQCMeo
+  stableId: sid_AzwQTQCMeo
   type: organization
   orgType: generic
   title: Timaeus
@@ -7647,7 +7647,7 @@
   lastUpdated: 2026-03
 
 - id: pibbss
-  stableId: PXcUg7YICV
+  stableId: sid_PXcUg7YICV
   type: organization
   orgType: generic
   title: PIBBSS
@@ -7661,7 +7661,7 @@
   lastUpdated: 2026-03
 
 - id: arkose
-  stableId: fj1DZJhxWy
+  stableId: sid_fj1DZJhxWy
   type: organization
   orgType: generic
   title: Arkose
@@ -7670,7 +7670,7 @@
   lastUpdated: 2026-03
 
 - id: civai
-  stableId: vG0nGlCWRn
+  stableId: sid_vG0nGlCWRn
   type: organization
   orgType: generic
   title: Civic AI Security Program (CivAI)
@@ -7680,7 +7680,7 @@
   lastUpdated: 2026-03
 
 - id: idais
-  stableId: zkWlTLfxuO
+  stableId: sid_zkWlTLfxuO
   type: organization
   orgType: generic
   title: International Dialogues on AI Safety (IDAIS)
@@ -7690,7 +7690,7 @@
   lastUpdated: 2026-03
 
 - id: alter
-  stableId: 8a5BiFe1nv
+  stableId: sid_8a5BiFe1nv
   type: organization
   orgType: generic
   title: Association for Long Term Existence and Resilience (ALTER)
@@ -7700,7 +7700,7 @@
   lastUpdated: 2026-03
 
 - id: center-for-election-science
-  stableId: gBpjt2fx66
+  stableId: sid_gBpjt2fx66
   type: organization
   orgType: generic
   title: The Center for Election Science
@@ -7711,7 +7711,7 @@
   lastUpdated: 2026-03
 
 - id: shrimp-welfare-project
-  stableId: uFuJxNjpYD
+  stableId: sid_uFuJxNjpYD
   type: organization
   orgType: generic
   title: Shrimp Welfare Project
@@ -7722,7 +7722,7 @@
   lastUpdated: 2026-03
 
 - id: fortify-health
-  stableId: XCK8EEC7tz
+  stableId: sid_XCK8EEC7tz
   type: organization
   orgType: generic
   title: Fortify Health
@@ -7733,7 +7733,7 @@
   lastUpdated: 2026-03
 
 - id: pure-earth
-  stableId: 3xDXLwV3lg
+  stableId: sid_3xDXLwV3lg
   type: organization
   orgType: generic
   title: Pure Earth
@@ -7744,7 +7744,7 @@
   lastUpdated: 2026-03
 
 - id: aquatic-life-institute
-  stableId: NDTZImcMyY
+  stableId: sid_NDTZImcMyY
   type: organization
   orgType: generic
   title: Aquatic Life Institute
@@ -7756,7 +7756,7 @@
   lastUpdated: 2026-03
 
 - id: just-impact
-  stableId: pwbWtmWHkT
+  stableId: sid_pwbWtmWHkT
   type: organization
   orgType: generic
   title: Just Impact
@@ -7765,7 +7765,7 @@
   lastUpdated: 2026-03
 
 - id: lead-exposure-action-fund
-  stableId: rCn5M6JO7K
+  stableId: sid_rCn5M6JO7K
   type: organization
   orgType: generic
   title: Lead Exposure Action Fund (LEAF)
@@ -7775,7 +7775,7 @@
   lastUpdated: 2026-03
 
 - id: encode-ai
-  stableId: J6bv0LEEgY
+  stableId: sid_J6bv0LEEgY
   type: organization
   orgType: generic
   title: Encode AI Corporation
@@ -7784,7 +7784,7 @@
   lastUpdated: 2026-03
 
 - id: california-yimby
-  stableId: pwHtwwEByZ
+  stableId: sid_pwHtwwEByZ
   type: organization
   orgType: generic
   title: California YIMBY
@@ -7795,7 +7795,7 @@
 # --- Anti-authoritarianism & AI policy cluster (added 2026-03) ---
 
 - id: aclu
-  stableId: 7DpEvy5wQr
+  stableId: sid_7DpEvy5wQr
   type: organization
   orgType: generic
   title: American Civil Liberties Union (ACLU)
@@ -7835,7 +7835,7 @@
   lastUpdated: 2026-03
 
 - id: electronic-frontier-foundation
-  stableId: H4tplAyDRX
+  stableId: sid_H4tplAyDRX
   type: organization
   orgType: generic
   title: Electronic Frontier Foundation (EFF)
@@ -7874,7 +7874,7 @@
   lastUpdated: 2026-03
 
 - id: brennan-center
-  stableId: 2KkS7mnw7K
+  stableId: sid_2KkS7mnw7K
   type: organization
   orgType: generic
   title: Brennan Center for Justice
@@ -7911,7 +7911,7 @@
   lastUpdated: 2026-03
 
 - id: epic-privacy
-  stableId: Ygxw8JVW8X
+  stableId: sid_Ygxw8JVW8X
   type: organization
   orgType: generic
   title: Electronic Privacy Information Center (EPIC)
@@ -7943,7 +7943,7 @@
   lastUpdated: 2026-03
 
 - id: protect-democracy
-  stableId: xxHyEDGp4Y
+  stableId: sid_xxHyEDGp4Y
   type: organization
   orgType: generic
   title: Protect Democracy
@@ -7978,7 +7978,7 @@
   lastUpdated: 2026-03
 
 - id: democracy-forward
-  stableId: yTlRworV1V
+  stableId: sid_yTlRworV1V
   type: organization
   orgType: generic
   title: Democracy Forward
@@ -8014,7 +8014,7 @@
   lastUpdated: 2026-03
 
 - id: cais-action-fund
-  stableId: 0HsrqIftUg
+  stableId: sid_0HsrqIftUg
   type: organization
   orgType: safety-org
   title: Center for AI Safety Action Fund
@@ -8038,7 +8038,7 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
       relationship: related
   sources:
@@ -8047,7 +8047,7 @@
   lastUpdated: 2026-03
 
 - id: freedom-house
-  stableId: pFJhncfgor
+  stableId: sid_pFJhncfgor
   wikiId: E2024
   type: organization
   orgType: generic
@@ -8084,7 +8084,7 @@
   lastUpdated: 2026-03
 
 - id: mozilla-foundation
-  stableId: DK0GbGg7Kf
+  stableId: sid_DK0GbGg7Kf
   type: organization
   orgType: funder
   title: Mozilla Foundation
@@ -8116,7 +8116,7 @@
   lastUpdated: 2026-03
 
 - id: access-now
-  stableId: DHWH2M0Ega
+  stableId: sid_DHWH2M0Ega
   type: organization
   orgType: generic
   title: Access Now
@@ -8149,7 +8149,7 @@
   lastUpdated: 2026-03
 
 - id: algorithmwatch
-  stableId: hyxooEhMZl
+  stableId: sid_hyxooEhMZl
   type: organization
   orgType: generic
   title: AlgorithmWatch
@@ -8180,7 +8180,7 @@
   lastUpdated: 2026-03
 
 - id: algorithmic-justice-league
-  stableId: UyAH46sPFN
+  stableId: sid_UyAH46sPFN
   type: organization
   orgType: generic
   title: Algorithmic Justice League
@@ -8214,7 +8214,7 @@
   lastUpdated: 2026-03
 
 - id: center-for-humane-technology
-  stableId: m9jtyXlqXT
+  stableId: sid_m9jtyXlqXT
   type: organization
   orgType: generic
   title: Center for Humane Technology
@@ -8242,7 +8242,7 @@
   lastUpdated: 2026-03
 
 - id: revolving-door-project
-  stableId: mY8BbBqKFc
+  stableId: sid_mY8BbBqKFc
   type: organization
   orgType: generic
   title: Revolving Door Project
@@ -8274,7 +8274,7 @@
   lastUpdated: 2026-03
 
 - id: tech-oversight-project
-  stableId: inudUfk9Ix
+  stableId: sid_inudUfk9Ix
   type: organization
   orgType: generic
   title: Tech Oversight Project
@@ -8306,7 +8306,7 @@
   lastUpdated: 2026-03
 
 - id: pauseai
-  stableId: qtXe9VykMz
+  stableId: sid_qtXe9VykMz
   wikiId: E2101
   type: organization
   orgType: generic
@@ -8330,7 +8330,7 @@
   lastUpdated: 2026-03
 
 - id: humanity-ai-coalition
-  stableId: 7WxlhX0LBn
+  stableId: sid_7WxlhX0LBn
   type: organization
   orgType: funder
   title: Humanity AI
@@ -8353,13 +8353,13 @@
   clusters:
     - governance
   relatedEntries:
-    - id: GADd9PU0UA
+    - id: sid_GADd9PU0UA
       type: organization
       relationship: related
-    - id: 8q2GhtEmkA
+    - id: sid_8q2GhtEmkA
       type: organization
       relationship: related
-    - id: DK0GbGg7Kf
+    - id: sid_DK0GbGg7Kf
       type: organization
       relationship: related
   sources:
@@ -8374,7 +8374,7 @@
 # AI safety ecosystem. No wiki pages, minimal metadata.
 
 - id: tesla
-  stableId: DBucVJZWyR
+  stableId: sid_DBucVJZWyR
   type: organization
   orgType: generic
   title: Tesla
@@ -8386,7 +8386,7 @@
   lastUpdated: 2026-03
 
 - id: baidu
-  stableId: Z1ypUKIPc0
+  stableId: sid_Z1ypUKIPc0
   type: organization
   orgType: generic
   title: Baidu
@@ -8397,7 +8397,7 @@
   lastUpdated: 2026-03
 
 - id: google
-  stableId: cMNszJMTPX
+  stableId: sid_cMNszJMTPX
   type: organization
   orgType: generic
   title: Google / Alphabet
@@ -8408,7 +8408,7 @@
   lastUpdated: 2026-03
 
 - id: apple
-  stableId: 1kawFEPpVe
+  stableId: sid_1kawFEPpVe
   type: organization
   orgType: generic
   title: Apple
@@ -8419,7 +8419,7 @@
   lastUpdated: 2026-03
 
 - id: uber
-  stableId: k99f02K8jm
+  stableId: sid_k99f02K8jm
   type: organization
   orgType: generic
   title: Uber
@@ -8430,7 +8430,7 @@
   lastUpdated: 2026-03
 
 - id: jane-street
-  stableId: bunzL4OFhZ
+  stableId: sid_bunzL4OFhZ
   type: organization
   orgType: generic
   title: Jane Street
@@ -8441,7 +8441,7 @@
   lastUpdated: 2026-03
 
 - id: dair-institute
-  stableId: DZ35boEfdI
+  stableId: sid_DZ35boEfdI
   type: organization
   orgType: safety-org
   title: DAIR Institute
@@ -8452,7 +8452,7 @@
   lastUpdated: 2026-03
 
 - id: signal-foundation
-  stableId: vFTydRTv82
+  stableId: sid_vFTydRTv82
   type: organization
   orgType: generic
   title: Signal Foundation
@@ -8463,7 +8463,7 @@
   lastUpdated: 2026-03
 
 - id: eleutherai
-  stableId: FnlNF9s98n
+  stableId: sid_FnlNF9s98n
   type: organization
   orgType: generic
   title: EleutherAI
@@ -8474,7 +8474,7 @@
   lastUpdated: 2026-03
 
 - id: inflection-ai
-  stableId: r1i7cwBiD7
+  stableId: sid_r1i7cwBiD7
   type: organization
   orgType: startup
   title: Inflection AI
@@ -8485,7 +8485,7 @@
   lastUpdated: 2026-03
 
 - id: gray-swan-ai
-  stableId: RFHtSrFaE3
+  stableId: sid_RFHtSrFaE3
   type: organization
   orgType: startup
   title: Gray Swan AI
@@ -8496,7 +8496,7 @@
   lastUpdated: 2026-03
 
 - id: ethereum-foundation
-  stableId: eYI7y4bKdq
+  stableId: sid_eYI7y4bKdq
   type: organization
   orgType: generic
   title: Ethereum Foundation
@@ -8507,7 +8507,7 @@
   lastUpdated: 2026-03
 
 - id: george-mason-university
-  stableId: IAd0DJ2TB3
+  stableId: sid_IAd0DJ2TB3
   type: organization
   orgType: academic
   title: George Mason University
@@ -8518,7 +8518,7 @@
   lastUpdated: 2026-03
 
 - id: uc-santa-cruz
-  stableId: OKO1q9NQaT
+  stableId: sid_OKO1q9NQaT
   type: organization
   orgType: academic
   title: UC Santa Cruz
@@ -8529,7 +8529,7 @@
   lastUpdated: 2026-03
 
 - id: uva
-  stableId: wzvlHe9pOn
+  stableId: sid_wzvlHe9pOn
   type: organization
   orgType: academic
   title: University of Virginia
@@ -8539,7 +8539,7 @@
   lastUpdated: 2026-03
 
 - id: world-labs
-  stableId: aDZeLVyKXr
+  stableId: sid_aDZeLVyKXr
   type: organization
   orgType: startup
   title: World Labs
@@ -8550,7 +8550,7 @@
   lastUpdated: 2026-03
 
 - id: landing-ai
-  stableId: tLHsRJBa9g
+  stableId: sid_tLHsRJBa9g
   type: organization
   orgType: startup
   title: Landing AI
@@ -8561,7 +8561,7 @@
   lastUpdated: 2026-03
 
 - id: alameda-research
-  stableId: iY6f25tTSJ
+  stableId: sid_iY6f25tTSJ
   type: organization
   orgType: generic
   title: Alameda Research
@@ -8571,7 +8571,7 @@
   lastUpdated: 2026-03
 
 - id: skype
-  stableId: EV4KoPMRXU
+  stableId: sid_EV4KoPMRXU
   type: organization
   orgType: generic
   title: Skype
@@ -8581,7 +8581,7 @@
   lastUpdated: 2026-03
 
 - id: trail-of-bits
-  stableId: c1q7QvDw90
+  stableId: sid_c1q7QvDw90
   type: organization
   orgType: generic
   title: Trail of Bits
@@ -8592,7 +8592,7 @@
   lastUpdated: 2026-03
 
 - id: craft-ventures
-  stableId: MZVf6KA9Oa
+  stableId: sid_MZVf6KA9Oa
   type: organization
   orgType: generic
   title: Craft Ventures
@@ -8602,7 +8602,7 @@
   lastUpdated: 2026-03
 
 - id: us-executive-branch
-  stableId: l7Z8a6jAez
+  stableId: sid_l7Z8a6jAez
   type: organization
   orgType: government
   title: United States Executive Branch
@@ -8614,7 +8614,7 @@
   lastUpdated: 2026-03
 
 - id: california-state-legislature
-  stableId: Zs39rHaxoS
+  stableId: sid_Zs39rHaxoS
   type: organization
   orgType: government
   title: California State Legislature
@@ -8625,7 +8625,7 @@
   lastUpdated: 2026-03
 
 - id: california-governor-office
-  stableId: 2kdYcoKUif
+  stableId: sid_2kdYcoKUif
   type: organization
   orgType: government
   title: Office of the Governor of California
@@ -8636,7 +8636,7 @@
   lastUpdated: 2026-03
 
 - id: european-commission
-  stableId: 3zsTSX6SFK
+  stableId: sid_3zsTSX6SFK
   type: organization
   orgType: government
   title: European Commission
@@ -8647,7 +8647,7 @@
   lastUpdated: 2026-03
 
 - id: world-economic-forum
-  stableId: nOszW4yDzw
+  stableId: sid_nOszW4yDzw
   type: organization
   orgType: generic
   title: World Economic Forum
@@ -8670,7 +8670,7 @@
   lastUpdated: 2026-03
 
 - id: financial-stability-board
-  stableId: McCoYr5xR5
+  stableId: sid_McCoYr5xR5
   type: organization
   orgType: generic
   title: Financial Stability Board
@@ -8694,7 +8694,7 @@
   lastUpdated: 2026-03
 
 - id: christianity-today
-  stableId: 19tcfkelEF
+  stableId: sid_19tcfkelEF
   type: organization
   orgType: generic
   title: Christianity Today
@@ -8714,7 +8714,7 @@
   lastUpdated: 2026-03
 
 - id: world-vision
-  stableId: iFu20pvEsh
+  stableId: sid_iFu20pvEsh
   type: organization
   orgType: generic
   title: World Vision
@@ -8733,7 +8733,7 @@
 # ── Political Action Committees (AI-related) ────────────────────────────
 
 - id: think-big-pac
-  stableId: iqEF0amsJM
+  stableId: sid_iqEF0amsJM
   type: organization
   orgType: generic
   title: Think Big PAC
@@ -8744,7 +8744,7 @@
   lastUpdated: 2026-03
 
 - id: american-mission-pac
-  stableId: GGcOTR25tl
+  stableId: sid_GGcOTR25tl
   type: organization
   orgType: generic
   title: American Mission PAC
@@ -8755,7 +8755,7 @@
   lastUpdated: 2026-03
 
 - id: public-first-action
-  stableId: NeUHBH9hGa
+  stableId: sid_NeUHBH9hGa
   type: organization
   orgType: generic
   title: Public First Action
@@ -8769,7 +8769,7 @@
   lastUpdated: 2026-03
 
 - id: jobs-and-democracy-pac
-  stableId: cI2xccoTjv
+  stableId: sid_cI2xccoTjv
   type: organization
   orgType: generic
   title: Jobs and Democracy PAC
@@ -8782,7 +8782,7 @@
   lastUpdated: 2026-03
 
 - id: defending-our-values-pac
-  stableId: r3zkBIfezx
+  stableId: sid_r3zkBIfezx
   type: organization
   orgType: generic
   title: Defending Our Values PAC
@@ -8795,7 +8795,7 @@
   lastUpdated: 2026-03
 
 - id: meta-atep
-  stableId: u0WnyGmzGL
+  stableId: sid_u0WnyGmzGL
   type: organization
   orgType: generic
   title: American Technology Excellence Project
@@ -8809,7 +8809,7 @@
   lastUpdated: 2026-03
 
 - id: meta-california-pac
-  stableId: 1J0EEnfJzw
+  stableId: sid_1J0EEnfJzw
   type: organization
   orgType: generic
   title: Mobilizing Economic Transformation Across California PAC
@@ -8821,7 +8821,7 @@
   lastUpdated: 2026-03
 
 - id: build-american-ai
-  stableId: kX9KFRLq0f
+  stableId: sid_kX9KFRLq0f
   type: organization
   orgType: generic
   title: Build American AI
@@ -8834,7 +8834,7 @@
   lastUpdated: 2026-03
 
 - id: making-our-tomorrow-pac
-  stableId: HMXgglvRtp
+  stableId: sid_HMXgglvRtp
   type: organization
   orgType: generic
   title: Making Our Tomorrow PAC
@@ -8846,7 +8846,7 @@
   lastUpdated: 2026-03
 
 - id: cani-coalition
-  stableId: kGAU1KJ0qG
+  stableId: sid_kGAU1KJ0qG
   type: organization
   orgType: generic
   title: Coalition for AI Nonprofit Integrity
@@ -8865,7 +8865,7 @@
 # ═══════════════════════════════════════════════════════════════════
 
 - id: tsmc
-  stableId: 1aWy1sKHng
+  stableId: sid_1aWy1sKHng
   wikiId: E2606
   type: organization
   orgType: generic
@@ -8888,10 +8888,10 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: UvpZCnW3wA
+    - id: sid_UvpZCnW3wA
       type: organization
       relationship: enables
-    - id: Tbq2qL6mbA
+    - id: sid_Tbq2qL6mbA
       type: organization
       relationship: enables
   sources:
@@ -8902,7 +8902,7 @@
   lastUpdated: 2026-03
 
 - id: asml
-  stableId: uW7R22grHt
+  stableId: sid_uW7R22grHt
   wikiId: E2607
   type: organization
   orgType: generic
@@ -8932,7 +8932,7 @@
   lastUpdated: 2026-03
 
 - id: smic
-  stableId: Qnt7osskRA
+  stableId: sid_Qnt7osskRA
   wikiId: E2608
   type: organization
   orgType: generic
@@ -8960,7 +8960,7 @@
   lastUpdated: 2026-03
 
 - id: amd
-  stableId: Tbq2qL6mbA
+  stableId: sid_Tbq2qL6mbA
   wikiId: E2609
   type: organization
   orgType: generic
@@ -8981,7 +8981,7 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: vr5HogmRLQ
+    - id: sid_vr5HogmRLQ
       type: person
       relationship: leads-to
   sources:
@@ -8992,7 +8992,7 @@
   lastUpdated: 2026-03
 
 - id: sk-hynix
-  stableId: CABtVBdlnf
+  stableId: sid_CABtVBdlnf
   wikiId: E2610
   type: organization
   orgType: generic
@@ -9019,7 +9019,7 @@
   lastUpdated: 2026-03
 
 - id: bureau-of-industry-and-security
-  stableId: K1hxe7b9SA
+  stableId: sid_K1hxe7b9SA
   wikiId: E2611
   type: organization
   orgType: government
@@ -9050,7 +9050,7 @@
   lastUpdated: 2026-03
 
 - id: applied-materials
-  stableId: AuPn7YbiaZ
+  stableId: sid_AuPn7YbiaZ
   wikiId: E2612
   type: organization
   orgType: generic
@@ -9077,7 +9077,7 @@
   lastUpdated: 2026-03
 
 - id: huawei
-  stableId: 52UNnWZMFz
+  stableId: sid_52UNnWZMFz
   wikiId: E2613
   type: organization
   orgType: generic
@@ -9108,7 +9108,7 @@
   lastUpdated: 2026-03
 
 - id: semiconductor-industry-association
-  stableId: ezdMt069kA
+  stableId: sid_ezdMt069kA
   wikiId: E2614
   type: organization
   orgType: generic
@@ -9137,7 +9137,7 @@
 # ── Lightweight semiconductor entities (stableId only, no wiki pages) ──
 
 - id: lam-research
-  stableId: jNzUivk7jw
+  stableId: sid_jNzUivk7jw
   type: organization
   orgType: generic
   title: Lam Research
@@ -9150,7 +9150,7 @@
   lastUpdated: 2026-03
 
 - id: tokyo-electron
-  stableId: 2dQxYx0aVA
+  stableId: sid_2dQxYx0aVA
   type: organization
   orgType: generic
   title: Tokyo Electron
@@ -9163,7 +9163,7 @@
   lastUpdated: 2026-03
 
 - id: kla-corporation
-  stableId: 6gGwTtTO1B
+  stableId: sid_6gGwTtTO1B
   type: organization
   orgType: generic
   title: KLA Corporation
@@ -9175,7 +9175,7 @@
   lastUpdated: 2026-03
 
 - id: synopsys
-  stableId: TuX8lVYNqF
+  stableId: sid_TuX8lVYNqF
   type: organization
   orgType: generic
   title: Synopsys
@@ -9188,7 +9188,7 @@
   lastUpdated: 2026-03
 
 - id: cadence-design-systems
-  stableId: 5wFQ6rVKjO
+  stableId: sid_5wFQ6rVKjO
   type: organization
   orgType: generic
   title: Cadence Design Systems
@@ -9200,7 +9200,7 @@
   lastUpdated: 2026-03
 
 - id: arm-holdings
-  stableId: MIf3XVLguX
+  stableId: sid_MIf3XVLguX
   type: organization
   orgType: generic
   title: ARM Holdings
@@ -9214,7 +9214,7 @@
   lastUpdated: 2026-03
 
 - id: globalfoundries
-  stableId: pKwjaipwfq
+  stableId: sid_pKwjaipwfq
   type: organization
   orgType: generic
   title: GlobalFoundries
@@ -9226,7 +9226,7 @@
   lastUpdated: 2026-03
 
 - id: micron-technology
-  stableId: POHyucI53I
+  stableId: sid_POHyucI53I
   type: organization
   orgType: generic
   title: Micron Technology
@@ -9239,7 +9239,7 @@
   lastUpdated: 2026-03
 
 - id: broadcom
-  stableId: DXHx7P20JO
+  stableId: sid_DXHx7P20JO
   type: organization
   orgType: generic
   title: Broadcom
@@ -9252,7 +9252,7 @@
   lastUpdated: 2026-03
 
 - id: qualcomm
-  stableId: 9PuCCs56UQ
+  stableId: sid_9PuCCs56UQ
   type: organization
   orgType: generic
   title: Qualcomm
@@ -9265,7 +9265,7 @@
   lastUpdated: 2026-03
 
 - id: cambricon
-  stableId: tkD0H2KyCQ
+  stableId: sid_tkD0H2KyCQ
   type: organization
   orgType: generic
   title: Cambricon Technologies
@@ -9277,7 +9277,7 @@
   lastUpdated: 2026-03
 
 - id: biren-technology
-  stableId: wEy0RcQyjQ
+  stableId: sid_wEy0RcQyjQ
   type: organization
   orgType: startup
   title: Biren Technology
@@ -9290,7 +9290,7 @@
   lastUpdated: 2026-03
 
 - id: enflame-technology
-  stableId: mt5dMCPvf6
+  stableId: sid_mt5dMCPvf6
   type: organization
   orgType: startup
   title: Enflame Technology
@@ -9302,7 +9302,7 @@
   lastUpdated: 2026-03
 
 - id: moore-threads
-  stableId: XzaH4qlwvx
+  stableId: sid_XzaH4qlwvx
   type: organization
   orgType: startup
   title: Moore Threads
@@ -9314,7 +9314,7 @@
   lastUpdated: 2026-03
 
 - id: cxmt
-  stableId: gbqVMWgcXA
+  stableId: sid_gbqVMWgcXA
   type: organization
   orgType: generic
   title: ChangXin Memory Technologies
@@ -9326,7 +9326,7 @@
   lastUpdated: 2026-03
 
 - id: chips-program-office
-  stableId: Wq9cjUfPfl
+  stableId: sid_Wq9cjUfPfl
   type: organization
   orgType: government
   title: CHIPS Program Office

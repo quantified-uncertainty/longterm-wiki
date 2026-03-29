@@ -1,4 +1,4 @@
-entity: GQuPhNkZbg
+entity: sid_GQuPhNkZbg
 facts:
   # ── Description & Basics ──────────────────────────────────────
   - id: f_oaif_desc01
@@ -46,7 +46,7 @@ facts:
 
   - id: f_oaif_parent01
     property: parent-org
-    value: !ref 1LcLlMGLbw
+    value: !ref sid_1LcLlMGLbw
     source: https://openai.com/our-structure/
     notes: "Governance parent of OpenAI Group PBC (controls, not subsidiary of)"
 

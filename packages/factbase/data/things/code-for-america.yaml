@@ -1,4 +1,4 @@
-entity: ufdntmiWtQ
+entity: sid_ufdntmiWtQ
 facts:
   # ── Founding ───────────────────────────────────────────────────
   - id: f_95BWQvdhFZ
@@ -19,7 +19,7 @@ facts:
   - id: f_jJ6lESgNPs
     property: founded-by
     value:
-      - !ref GwMzWw7fpA
+      - !ref sid_GwMzWw7fpA
     source: https://codeforamerica.org
     notes: "Jennifer Pahlka; also served as U.S. Deputy CTO under Obama and helped
       establish USDS"

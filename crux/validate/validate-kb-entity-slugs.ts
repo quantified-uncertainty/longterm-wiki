@@ -191,7 +191,8 @@ export function extractRefValues(
     if (colonIdx > 0) {
       stableId = stableId.slice(0, colonIdx);
     }
-    if (/^[A-Za-z0-9]{10}$/.test(stableId)) {
+    // Match both sid_-prefixed (new format) and bare 10-char (legacy format) stableIds
+    if (/^(sid_)?[A-Za-z0-9]{10}$/.test(stableId)) {
       const propertyId = findPropertyForRef(content, match.index);
       refs.push({ stableId, propertyId });
     }
