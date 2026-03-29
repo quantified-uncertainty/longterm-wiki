@@ -147,19 +147,13 @@ describe("handleClaimVerification — adversarial inputs", () => {
       baseCtx,
     );
 
-    // The handler should succeed — long strings are passed through to the verdicts endpoint
-    // which validates/truncates via Zod schema
-    expect(result).toBeDefined();
-    if (result.success && result.data.results) {
-      // If verdicts were posted, verify the API was called with the long values
-      const verdictsCall = mockApiRequest.mock.calls.find(
-        (call) => call[1] === '/api/claims/verdicts'
-      );
-      if (verdictsCall) {
-        const postedVerdicts = (verdictsCall[2] as { verdicts: Array<{ reasoning: string }> }).verdicts;
-        expect(postedVerdicts.length).toBeGreaterThan(0);
-      }
-    }
+    // The handler succeeds overall, but the oversized strings (50k chars)
+    // exceed the Zod schema's max(5000) constraint on extracted_value/reasoning,
+    // so the LLM result fails parsing and the claim is marked as an error.
+    expect(result.success).toBe(true);
+    expect(result.data.confirmed).toBe(0);
+    expect(result.data.errors).toBe(1);
+    expect(result.data.totalClaims).toBe(1);
   });
 
   it("handles LLM returning NaN confidence", async () => {
