@@ -23,6 +23,7 @@ import {
   apiRequest,
   type ApiResult,
 } from "../lib/wiki-server/client.ts";
+import { STABLE_ID_PATTERN } from '../../packages/id-utils/src/index.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -221,9 +222,6 @@ export const TABLE_SPECS: TableSpec[] = [
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
 
 /**
  * Fetch all records from a paginated endpoint.

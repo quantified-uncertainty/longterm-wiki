@@ -1,24 +1,25 @@
 /**
- * Canonical stableId detection patterns.
+ * Canonical stableId detection — thin re-export from @longterm-wiki/id-utils.
  *
- * StableIds are exactly 10 alphanumeric characters [A-Za-z0-9] with at least
- * one uppercase letter. The uppercase requirement prevents false positives on
- * short lowercase slugs like "bioweapons" or "conjecture".
- *
- * IMPORTANT: StableIds never contain `-` or `_`. If you encounter one that does,
- * it's a legacy artifact from a bug in crux/lib/grant-import/id.ts (fixed 2026-03-26).
- * Migration 0141 normalized all existing contaminated IDs.
+ * This module re-exports the shared ID utilities and adds app-specific helpers
+ * (isContaminatedStableId, isBareMachineId) that aren't needed in the core package.
  */
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter. */
-export const STABLE_ID_PATTERN = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
+export {
+  isSid,
+  isDisplayableName,
+  isAnySid,
+  isLegacyStableId,
+  STABLE_ID_PATTERN,
+  NUMERIC_ID_PATTERN,
+} from "@longterm-wiki/id-utils";
 
-/** Matches pure numeric IDs (legacy database PKs like "175", "335"). */
-export const NUMERIC_ID_PATTERN = /^\d+$/;
+import { NUMERIC_ID_PATTERN } from "@longterm-wiki/id-utils";
 
 /** Check if a string looks like a stableId (strict: requires uppercase). */
 export function isStableId(s: string): boolean {
-  return STABLE_ID_PATTERN.test(s);
+  // Delegates to the legacy pattern which requires uppercase
+  return /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
 }
 
 /**
@@ -49,7 +50,7 @@ export function isContaminatedStableId(s: string): boolean {
   if (!s.includes("-") && !s.includes("_")) return false;
   if (!/[A-Z]/.test(s)) return false;
   const stripped = s.replace(/[-_]/g, "");
-  // 8–12 chars: stableIds are 10 chars, so 10 ± 2 tolerates one separator being stripped
+  // 8-12 chars: stableIds are 10 chars, so 10 +/- 2 tolerates one separator being stripped
   if (stripped.length < 8 || stripped.length > 12) return false;
   if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
   return true;
