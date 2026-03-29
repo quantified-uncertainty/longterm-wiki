@@ -1110,9 +1110,7 @@ export const jobs = pgTable(
     workerId: text("worker_id"),
     runAfter: timestamp("run_after", { withTimezone: true }),
     dedupKey: text("dedup_key"),
-    parentJobId: bigint("parent_job_id", { mode: "number" }).references(
-      () => jobs.id
-    ),
+    parentJobId: bigint("parent_job_id", { mode: "number" }),
     costUsd: numeric("cost_usd", { precision: 10, scale: 4 }),
   },
   (table) => [

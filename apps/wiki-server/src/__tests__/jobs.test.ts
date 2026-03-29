@@ -67,7 +67,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO jobs ----
   if (q.includes("insert into") && q.includes('"jobs"')) {
-    const COLS_PER_ROW = 4; // type, params, priority, max_retries
+    const COLS_PER_ROW = 7; // type, params, priority, max_retries, dedup_key, parent_job_id, run_after
     const numRows = Math.max(1, Math.floor(params.length / COLS_PER_ROW));
     const rows: JobRow[] = [];
     for (let i = 0; i < numRows; i++) {
