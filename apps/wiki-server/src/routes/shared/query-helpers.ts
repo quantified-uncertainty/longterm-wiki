@@ -11,7 +11,7 @@ import type { PgColumn } from "drizzle-orm/pg-core";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { escapeIlike } from "./utils.js";
 import { entities } from "../../schema.js";
-import { STABLE_ID_PATTERN } from "./entity-ref.js";
+import { isSid } from "@longterm-wiki/id-utils";
 import {
   buildPrefixTsquery,
   normalizeSearchQuery,
@@ -192,8 +192,8 @@ export async function resolveEntityStableId(
   db: PostgresJsDatabase<any>,
   entityId: string,
 ): Promise<string> {
-  // StableIds are exactly 10 alphanumeric chars with at least one uppercase
-  if (STABLE_ID_PATTERN.test(entityId)) return entityId;
+  // StableIds use the sid_ prefix — return as-is without DB lookup
+  if (isSid(entityId)) return entityId;
   // Looks like a slug — try to resolve
   const [entity] = await db
     .select({ stableId: entities.stableId })
