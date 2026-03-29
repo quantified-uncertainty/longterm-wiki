@@ -24,12 +24,13 @@ export const SID_PREFIX = "sid_";
 // ── Core API ───────────────────────────────────────────────────────────
 
 /** Is this a sid_-prefixed entity stableId? */
-export function isSid(s: string): boolean {
-  return s.startsWith(SID_PREFIX);
+export function isSid(s: string | null | undefined): boolean {
+  return typeof s === "string" && s.startsWith(SID_PREFIX);
 }
 
 /** Is this safe to show to users? (Not a machine-generated ID) */
-export function isDisplayableName(s: string): boolean {
+export function isDisplayableName(s: string | null | undefined): boolean {
+  if (!s) return false;
   return !isSid(s);
 }
 
@@ -50,15 +51,15 @@ export function generateSid(): string {
  * lowercase slugs like "bioweapons" or "conjecture".
  * Use during migration period only. After migration completes, this can be removed.
  */
-export function isLegacyStableId(s: string): boolean {
-  return /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
+export function isLegacyStableId(s: string | null | undefined): boolean {
+  return typeof s === "string" && /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
 }
 
 /**
  * Detects stableIds in either new (sid_) or legacy (bare 10-char) format.
  * Use during migration period for code that needs to handle both.
  */
-export function isAnySid(s: string): boolean {
+export function isAnySid(s: string | null | undefined): boolean {
   return isSid(s) || isLegacyStableId(s);
 }
 

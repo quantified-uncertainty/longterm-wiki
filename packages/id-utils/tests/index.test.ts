@@ -24,6 +24,12 @@ describe("isSid", () => {
     expect(isSid("")).toBe(false);
   });
 
+  it("handles null and undefined safely", () => {
+    expect(isSid(null)).toBe(false);
+    expect(isSid(undefined)).toBe(false);
+    expect(isSid("")).toBe(false);
+  });
+
   it("rejects partial prefix matches", () => {
     expect(isSid("si_1LcLlMGLbw")).toBe(false);
     expect(isSid("sid1LcLlMGLbw")).toBe(false);
