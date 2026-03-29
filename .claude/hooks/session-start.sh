@@ -44,19 +44,22 @@ fi
 # Write .claude/active-branch at session start. If a previous session left one
 # and it doesn't match the current branch, something switched the branch between
 # sessions without proper cleanup.
+# NOTE: Uses CURRENT_BRANCH (read early) since BRANCH is set later in section 2.
+
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
 
 PREV_ACTIVE_BRANCH=""
 if [ -f ".claude/active-branch" ]; then
   PREV_ACTIVE_BRANCH=$(cat ".claude/active-branch" 2>/dev/null | tr -d '[:space:]')
 fi
 
-if [ -n "$PREV_ACTIVE_BRANCH" ] && [ "$PREV_ACTIVE_BRANCH" != "$BRANCH" ]; then
-  WARNINGS+=("Branch mismatch! Previous session was on \`${PREV_ACTIVE_BRANCH}\`, now on \`${BRANCH}\`.")
+if [ -n "$PREV_ACTIVE_BRANCH" ] && [ "$PREV_ACTIVE_BRANCH" != "$CURRENT_BRANCH" ]; then
+  WARNINGS+=("Branch mismatch! Previous session was on \`${PREV_ACTIVE_BRANCH}\`, now on \`${CURRENT_BRANCH}\`.")
   WARNINGS+=("A subagent or another session may have switched branches. Verify you're on the right branch before proceeding.")
 fi
 
 # Write current branch as the active branch lock
-echo "$BRANCH" > ".claude/active-branch"
+echo "$CURRENT_BRANCH" > ".claude/active-branch"
 
 # ─── 1. Verify environment (fast checks only) ──────────────────────────────────
 

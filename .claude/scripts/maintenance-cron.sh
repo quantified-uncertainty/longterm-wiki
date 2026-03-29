@@ -23,8 +23,13 @@ echo "=== Maintenance check at $(date) ===" | tee -a "$LOG_FILE"
 
 cd "$REPO_DIR"
 
-# Pull latest main
-git checkout main 2>&1 | tee -a "$LOG_FILE"
+# Pull latest main — only if the slot is already on main
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "unknown")
+if [ "$CURRENT_BRANCH" != "main" ]; then
+  echo "ERROR: Slot a11 is on branch '$CURRENT_BRANCH', not main. Skipping to avoid branch confusion." | tee -a "$LOG_FILE"
+  echo "Run './ws refresh' to reset idle slots, or manually: cd $REPO_DIR && git checkout main" | tee -a "$LOG_FILE"
+  exit 1
+fi
 git pull 2>&1 | tee -a "$LOG_FILE"
 
 # Check merged PR count since last run
