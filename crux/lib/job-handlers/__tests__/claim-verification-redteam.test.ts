@@ -167,7 +167,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
 
     mockApiRequest
       .mockResolvedValueOnce({ ok: true, data: { claims } } as any)
-      .mockResolvedValueOnce({ ok: true, data: { updated: 0, total: 1 } } as any);
+      .mockResolvedValueOnce({ ok: true, data: { updated: 1, total: 1 } } as any);
 
     mockGetContent.mockResolvedValue({ ok: true, data: { fullText: "Content", pageTitle: null } } as any);
     mockCallLlm.mockResolvedValue({ text: "json", usage: { input_tokens: 0, output_tokens: 0 } } as any);
@@ -192,7 +192,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
 
     mockApiRequest
       .mockResolvedValueOnce({ ok: true, data: { claims } } as any)
-      .mockResolvedValueOnce({ ok: true, data: { updated: 0, total: 1 } } as any);
+      .mockResolvedValueOnce({ ok: true, data: { updated: 1, total: 1 } } as any);
 
     mockGetContent.mockResolvedValue({ ok: true, data: { fullText: "Content", pageTitle: null } } as any);
     mockCallLlm.mockResolvedValue({ text: "json", usage: { input_tokens: 0, output_tokens: 0 } } as any);
@@ -216,7 +216,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
 
     mockApiRequest
       .mockResolvedValueOnce({ ok: true, data: { claims } } as any)
-      .mockResolvedValueOnce({ ok: true, data: { updated: 0, total: 2 } } as any);
+      .mockResolvedValueOnce({ ok: true, data: { updated: 2, total: 2 } } as any);
 
     mockGetContent.mockResolvedValue({ ok: true, data: { fullText: "Content", pageTitle: null } } as any);
     mockCallLlm.mockResolvedValue({ text: '[{"claimId": 1, "verdict": "confirmed"', usage: { input_tokens: 0, output_tokens: 0 } } as any);

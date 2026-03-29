@@ -56,19 +56,14 @@ describe("urlVariants — adversarial inputs", () => {
 
   it("handles IP address URLs (should not add www)", () => {
     const variants = urlVariants("https://192.168.1.1/path");
-    // Adding www to an IP makes no sense: "https://www.192.168.1.1" is invalid
-    // But the current implementation would add it. This is a known edge case.
-    // At minimum, it shouldn't crash
     expect(variants).toContain("https://192.168.1.1/path");
-    // The www variant would be generated but probably wouldn't match anything
-    // This is acceptable but worth documenting
+    expect(variants.some((v) => v.includes("://www.192.168.1.1"))).toBe(false);
   });
 
   it("handles localhost URLs", () => {
     const variants = urlVariants("http://localhost:3000/api");
     expect(variants).toContain("http://localhost:3000/api");
-    // www.localhost would be weird but shouldn't crash
-    expect(variants.length).toBeGreaterThan(0);
+    expect(variants.some((v) => v.includes("://www.localhost"))).toBe(false);
   });
 
   it("handles URLs with fragments", () => {

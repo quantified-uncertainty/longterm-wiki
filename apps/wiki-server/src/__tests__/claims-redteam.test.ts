@@ -74,18 +74,22 @@ describe("groupAndChunkClaims — adversarial inputs", () => {
     expect(result[2].claimIds).toEqual([3]);
   });
 
-  // NOTE: maxPerJob=0 causes an infinite loop (i+=0 never advances).
-  // This is a BUG — tracked below. Test skipped to avoid OOM.
-  it.skip("handles maxPerJob = 0 (KNOWN BUG: infinite loop)", () => {
-    // groupAndChunkClaims(claims, 0) causes infinite loop
-    // because the for loop does i += 0 which never advances.
-    // Fix: add guard at top of function for maxPerJob <= 0
+  it("rejects maxPerJob = 0", () => {
+    expect(() =>
+      groupAndChunkClaims(
+        [{ id: 1, resource_id: "res-1", source_url: "https://a.com" }],
+        0,
+      ),
+    ).toThrow("maxPerJob must be positive");
   });
 
-  // NOTE: maxPerJob=-1 causes slice(i, i-1) which returns [] but
-  // also never advances (i += -1 goes backwards). KNOWN BUG.
-  it.skip("handles negative maxPerJob (KNOWN BUG: infinite loop)", () => {
-    // Similar to maxPerJob=0 — negative step causes infinite/very long loop
+  it("rejects negative maxPerJob", () => {
+    expect(() =>
+      groupAndChunkClaims(
+        [{ id: 1, resource_id: "res-1", source_url: "https://a.com" }],
+        -1,
+      ),
+    ).toThrow("maxPerJob must be positive");
   });
 
   it("handles duplicate claim IDs (shouldn't happen but could via bug)", () => {

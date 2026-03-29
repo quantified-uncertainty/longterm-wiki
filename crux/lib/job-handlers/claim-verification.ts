@@ -229,22 +229,25 @@ export async function handleClaimVerification(
       reasoning: 'Source content not available for verification',
     }));
 
-    const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts });
+    // Batch verdicts in case count exceeds per-request limit
+    const MAX_VERDICTS_PER_REQUEST_NS = 100;
+    for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST_NS) {
+      const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST_NS);
+      const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts: batch });
 
-    if (!result.ok) {
-      return {
-        success: false,
-        data: { batchId },
-        error: `Failed to persist verdicts: ${result.message}`,
-      };
-    }
+      if (!result.ok) {
+        return {
+          success: false,
+          data: { batchId },
+          error: `Failed to persist verdicts: ${result.message}`,
+        };
+      }
 
-    if (result.data.updated < result.data.total) {
-      return {
-        success: false,
-        data: { batchId },
-        error: `Partial verdict persistence: ${result.data.updated}/${result.data.total} claims updated`,
-      };
+      if (result.data.updated < result.data.total) {
+        console.warn(
+          `[claim-verification] Partial no-source verdict persistence: ${result.data.updated}/${result.data.total} claims updated`,
+        );
+      }
     }
 
     return {
@@ -386,11 +389,12 @@ export async function handleClaimVerification(
     }
 
     if (updateResult.data.updated < updateResult.data.total) {
-      return {
-        success: false,
-        data: { batchId },
-        error: `Partial verdict persistence: ${updateResult.data.updated}/${updateResult.data.total} claims updated`,
-      };
+      // Non-fatal: some claims may have been persisted by a prior attempt (idempotent retry).
+      // The /verdicts endpoint only updates claims still in pending/verifying status,
+      // so already-written verdicts correctly return updated=0 on retry.
+      console.warn(
+        `[claim-verification] Partial verdict persistence (batch ${Math.floor(i / MAX_VERDICTS_PER_REQUEST) + 1}): ${updateResult.data.updated}/${updateResult.data.total} claims updated`,
+      );
     }
   }
 
@@ -399,6 +403,7 @@ export async function handleClaimVerification(
   const contradicted = allResults.filter((r) => r.verdict === 'contradicted').length;
   const unverifiable = allResults.filter((r) => r.verdict === 'unverifiable').length + errors.length;
   const partial = allResults.filter((r) => r.verdict === 'partial').length;
+  const outdated = allResults.filter((r) => r.verdict === 'outdated').length;
 
   return {
     success: true,
@@ -410,6 +415,7 @@ export async function handleClaimVerification(
       contradicted,
       unverifiable,
       partial,
+      outdated,
       errors: errors.length,
       results: allResults.map((r) => ({
         claimId: r.claimId,

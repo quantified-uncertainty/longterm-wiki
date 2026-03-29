@@ -14,7 +14,7 @@ function toSuggestShape(row: Record<string, unknown>): { id: string; url: string
     url: row.url as string,
     title: (row.title as string | null) ?? null,
     fetched_at: (row.fetched_at as Date | null) ?? null,
-    has_content: row.has_content === true || ((row.fetched_at ?? null) !== null),
+    has_content: row.has_content === true,
   };
 }
 
