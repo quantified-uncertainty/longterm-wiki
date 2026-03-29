@@ -156,6 +156,24 @@ export function parseSort(
   };
 }
 
+/**
+ * Build a parameterized SQL value list for use with `IN (...)`.
+ *
+ * Drizzle's `sql` tag expands JS arrays as row constructors `($1,$2,...)` which
+ * is valid for `IN` but **not** for PostgreSQL `ANY()` (which expects an array
+ * type). Use `IN (${sqlInList(arr)})` instead of `= ANY(${arr})` in raw
+ * `db.execute()` / tagged-template queries.
+ *
+ * Supports string and number arrays. Caller must guard against empty arrays
+ * before calling this function.
+ */
+export function sqlInList(values: (string | number)[]) {
+  return sql.join(
+    values.map((v) => sql`${v}`),
+    sql`, `,
+  );
+}
+
 /** Standard paginated response metadata. */
 export interface PaginationMeta {
   total: number;

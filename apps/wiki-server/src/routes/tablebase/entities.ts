@@ -26,6 +26,7 @@ import {
   buildTrigramFallbackCondition,
   buildTrigramRankExpr,
   parseSort,
+  sqlInList,
   TRIGRAM_FALLBACK_THRESHOLD,
 } from "../shared/query-helpers.js";
 
@@ -126,21 +127,6 @@ const DirectoryQuery = z.object({
 });
 
 // ---- Helpers ----
-
-/**
- * Build a parameterized SQL value list for use with `IN (...)`.
- *
- * Drizzle's `sql` tag expands JS arrays as value-lists `($1,$2,...)` which is
- * a row constructor — valid for `IN` but **not** for PostgreSQL `ANY()` (which
- * expects an array type). Use `IN (${sqlInList(arr)})` instead of
- * `= ANY(${arr})` in raw `db.execute()` queries.
- */
-function sqlInList(values: string[]) {
-  return sql.join(
-    values.map((v) => sql`${v}`),
-    sql`, `,
-  );
-}
 
 /**
  * Auto-clear the `stub` flag from entity metadata when the entity has been

@@ -21,19 +21,7 @@ import { logAuditEntries } from "./audit-log.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-
-// ---- Helpers: SQL ----
-
-/**
- * Build a parameterized SQL value list for use with `IN (...)`.
- * See entities.ts for full docs on why ANY() doesn't work with Drizzle sql tag.
- */
-function sqlInList(values: string[]) {
-  return sql.join(
-    values.map((v) => sql`${v}`),
-    sql`, `,
-  );
-}
+import { sqlInList } from "../shared/query-helpers.js";
 
 // ---- Constants ----
 
