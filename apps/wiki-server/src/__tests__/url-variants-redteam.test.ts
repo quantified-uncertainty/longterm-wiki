@@ -137,14 +137,15 @@ describe("urlVariants — adversarial inputs", () => {
   });
 
   it("www variant round-trip produces same set", () => {
-    // Key invariant: urlVariants(x) for any URL in the set should contain all others
+    // Key invariant: urlVariants(x) for any URL in the set should produce the same canonical set
     const original = "https://docs.example.com/page";
     const variants = urlVariants(original);
+    const canonical = new Set(variants);
 
-    // Each variant should generate a superset that includes the original
+    // Each variant should regenerate the same variant set
     for (const v of variants) {
-      const variantOfVariant = urlVariants(v);
-      expect(variantOfVariant).toContain(v);
+      const variantOfVariant = new Set(urlVariants(v));
+      expect(variantOfVariant).toEqual(canonical);
     }
   });
 

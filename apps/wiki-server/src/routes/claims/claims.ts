@@ -216,27 +216,27 @@ const claimsApp = new Hono()
       const chunks = groupAndChunkClaims(insertedClaims, MAX_CLAIMS_PER_JOB);
 
       for (const { claimIds: chunk, resourceId } of chunks) {
-          const jobParams = {
-            claimIds: chunk,
-            resourceId,
-            batchId,
-            entityId: entityId ?? null,
-          };
+        const jobParams = {
+          claimIds: chunk,
+          resourceId,
+          batchId,
+          entityId: entityId ?? null,
+        };
 
-          const jobRows = await tx<InsertedJobRow[]>`
-            INSERT INTO jobs (type, params, priority, max_retries)
-            VALUES (
-              'claim-verification',
-              ${JSON.stringify(jobParams)}::jsonb,
-              ${CLAIM_VERIFICATION_JOB_PRIORITY},
-              3
-            )
-            RETURNING id
-          `;
+        const jobRows = await tx<InsertedJobRow[]>`
+          INSERT INTO jobs (type, params, priority, max_retries)
+          VALUES (
+            'claim-verification',
+            ${JSON.stringify(jobParams)}::jsonb,
+            ${CLAIM_VERIFICATION_JOB_PRIORITY},
+            3
+          )
+          RETURNING id
+        `;
 
-          if (jobRows.length > 0) {
-            jobEntries.push({ claimIds: chunk, resourceId, jobId: jobRows[0].id });
-          }
+        if (jobRows.length > 0) {
+          jobEntries.push({ claimIds: chunk, resourceId, jobId: jobRows[0].id });
+        }
       }
 
       // 5. Update claims with their verification_job_id

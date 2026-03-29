@@ -280,6 +280,9 @@ describe('handleClaimVerification — LLM output validation', () => {
   });
 
   it('returns failure when verdict write fails', async () => {
+    // Note: In production, the /api/claims/verdicts endpoint returns HTTP 200 even on
+    // partial failures. This test mocks apiRequest returning { ok: false } to simulate
+    // network errors, timeouts, or future error status codes from the endpoint.
     const claims = [makeClaim(5)];
 
     mockApiRequest.mockImplementation(async (method: string, path: string) => {

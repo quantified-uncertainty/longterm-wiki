@@ -65,6 +65,10 @@ function makeClaim(id: number, overrides: Partial<{
 describe("handleClaimVerification — adversarial inputs", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockApiRequest.mockReset();
+    mockCallLlm.mockReset();
+    mockParseJson.mockReset();
+    mockGetContent.mockReset();
   });
 
   it("rejects params with missing claimIds", async () => {
@@ -143,9 +147,19 @@ describe("handleClaimVerification — adversarial inputs", () => {
       baseCtx,
     );
 
-    // Should not crash, but the verdict POST might fail if reasoning > 5000 (Zod max)
-    // This depends on whether the handler truncates or not
+    // The handler should succeed — long strings are passed through to the verdicts endpoint
+    // which validates/truncates via Zod schema
     expect(result).toBeDefined();
+    if (result.success && result.data.results) {
+      // If verdicts were posted, verify the API was called with the long values
+      const verdictsCall = mockApiRequest.mock.calls.find(
+        (call) => call[1] === '/api/claims/verdicts'
+      );
+      if (verdictsCall) {
+        const postedVerdicts = (verdictsCall[2] as { verdicts: Array<{ reasoning: string }> }).verdicts;
+        expect(postedVerdicts.length).toBeGreaterThan(0);
+      }
+    }
   });
 
   it("handles LLM returning NaN confidence", async () => {
@@ -249,10 +263,11 @@ describe("handleClaimVerification — adversarial inputs", () => {
     );
 
     // claimId 999 should be skipped (not in expectedIds)
-    // claimId 1 should be marked unverifiable (omitted)
+    // claimId 1 should be marked unverifiable (omitted → pushed to errors → counted in unverifiable)
     expect(result.success).toBe(true);
     expect(result.data.confirmed).toBe(1); // only claim 2
-    expect(result.data.errors).toBe(1); // claim 1 was omitted
+    expect(result.data.unverifiable).toBe(1); // claim 1 was omitted
+    expect(result.data.errors).toBe(1); // omitted claims are tracked as errors too
   });
 
   it("handles claims with mixed source_urls in same batch (should use first claim's URL)", async () => {

@@ -273,7 +273,7 @@ const benchmarkResultsApp = new Hono()
         const rawDb = getDb();
         const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
           recordId: item.id,
-          recordType: "benchmark-results",
+          recordType: "benchmark-result",
           claimIds: item.claimIds,
         })));
         claimsLinked = linkResult.linked;

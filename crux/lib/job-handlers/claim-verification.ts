@@ -218,7 +218,7 @@ export async function handleClaimVerification(
       reasoning: 'Source content not available for verification',
     }));
 
-    const result = await apiRequest('POST', '/api/claims/verdicts', { verdicts });
+    const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts });
 
     if (!result.ok) {
       return {
@@ -226,6 +226,10 @@ export async function handleClaimVerification(
         data: { batchId },
         error: `Failed to persist verdicts: ${result.message}`,
       };
+    }
+
+    if (result.data.updated < result.data.total) {
+      console.warn(`[claim-verification] Partial verdict persistence: ${result.data.updated}/${result.data.total} claims updated`);
     }
 
     return {
@@ -364,6 +368,10 @@ export async function handleClaimVerification(
         data: { batchId, verdictsWritten: i },
         error: `Failed to persist verdicts (batch ${Math.floor(i / MAX_VERDICTS_PER_REQUEST) + 1}): ${updateResult.message}`,
       };
+    }
+
+    if (updateResult.data.updated < updateResult.data.total) {
+      console.warn(`[claim-verification] Partial verdict persistence (batch ${Math.floor(i / MAX_VERDICTS_PER_REQUEST) + 1}): ${updateResult.data.updated}/${updateResult.data.total} claims updated`);
     }
   }
 

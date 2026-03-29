@@ -785,9 +785,8 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(200);
       const body = await res.json();
-      // Deduplication means only unique URLs appear in results
-      // (the endpoint deduplicates but the response maps back to unique URLs)
-      expect(body.results.length).toBeLessThanOrEqual(3);
+      // Deduplication via new Set(urls) means 3 identical URLs → 1 unique → 1 result
+      expect(body.results).toHaveLength(1);
       for (const result of body.results) {
         expect(result.resourceId).toBe("dedup-res");
       }
