@@ -350,3 +350,4 @@ BEGIN
     CHECK (holder_display_name IS NULL OR holder_display_name NOT LIKE 'sid_%');
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
+-- Trigger CI rebuild
