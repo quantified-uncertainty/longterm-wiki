@@ -41,6 +41,7 @@ interface ProposedClaimRow {
 interface InsertedClaimRow {
   id: number;
   resource_id: string | null;
+  source_url: string;
 }
 
 interface InsertedJobRow {
@@ -68,10 +69,58 @@ function generateBatchId(): string {
 }
 
 /** Rough estimate of seconds per pending claim for polling UX. */
-const SECONDS_PER_CLAIM_ESTIMATE = 3;
+export const SECONDS_PER_CLAIM_ESTIMATE = 3;
 
 /** Job priority for claim verification (higher than default page-improve). */
-const CLAIM_VERIFICATION_JOB_PRIORITY = 10;
+export const CLAIM_VERIFICATION_JOB_PRIORITY = 10;
+
+/** Maximum claims per verification job — the GET /by-ids endpoint rejects >200 IDs. */
+export const MAX_CLAIMS_PER_JOB = 200;
+
+// ---------------------------------------------------------------------------
+// Grouping + chunking (exported for testing)
+// ---------------------------------------------------------------------------
+
+export interface ClaimGroupEntry {
+  resourceKey: string;
+  resourceId: string | null;
+  claimIds: number[];
+}
+
+/**
+ * Group inserted claims by resource_id (or by source_url when resource_id is null),
+ * then chunk each group into slices of maxPerJob.
+ *
+ * Returns one entry per chunk — each becomes a verification job.
+ */
+export function groupAndChunkClaims(
+  insertedClaims: Array<{ id: number; resource_id: string | null; source_url: string }>,
+  maxPerJob: number = MAX_CLAIMS_PER_JOB,
+): ClaimGroupEntry[] {
+  // Group by resource_id, falling back to url:<source_url> for null resource_id
+  const claimsByResource = new Map<string, number[]>();
+  for (const row of insertedClaims) {
+    const key = row.resource_id ?? `url:${row.source_url}`;
+    const group = claimsByResource.get(key);
+    if (group) group.push(row.id);
+    else claimsByResource.set(key, [row.id]);
+  }
+
+  // Chunk each group
+  const entries: ClaimGroupEntry[] = [];
+  for (const [resourceKey, claimIds] of claimsByResource) {
+    const resourceId = resourceKey.startsWith("url:") ? null : resourceKey;
+    for (let i = 0; i < claimIds.length; i += maxPerJob) {
+      entries.push({
+        resourceKey,
+        resourceId,
+        claimIds: claimIds.slice(i, i + maxPerJob),
+      });
+    }
+  }
+
+  return entries;
+}
 
 function formatClaim(row: ProposedClaimRow) {
   return {
@@ -147,7 +196,7 @@ const claimsApp = new Hono()
           ${claims.map(() => "pending")}::text[],
           ${claims.map(() => agentSessionId ?? null)}::text[]
         )
-        RETURNING id, resource_id
+        RETURNING id, resource_id, source_url
       `;
 
       if (insertedClaims.length !== claims.length) {
@@ -157,39 +206,31 @@ const claimsApp = new Hono()
         );
       }
 
-      // 3. Group claims by resource_id → one verification job per resource
-      const claimsByResource = new Map<string, number[]>();
-      for (const row of insertedClaims) {
-        const key = row.resource_id ?? "__no_resource__";
-        const group = claimsByResource.get(key);
-        if (group) group.push(row.id);
-        else claimsByResource.set(key, [row.id]);
-      }
+      // 3-4. Group claims by resource and chunk into job-sized batches
+      const chunks = groupAndChunkClaims(insertedClaims, MAX_CLAIMS_PER_JOB);
 
-      // 4. Create verification jobs (one per resource group)
-      for (const [resourceKey, claimIds] of claimsByResource) {
-        const resourceId = resourceKey === "__no_resource__" ? null : resourceKey;
-        const jobParams = {
-          claimIds,
-          resourceId,
-          batchId,
-          entityId: entityId ?? null,
-        };
+      for (const { claimIds: chunk, resourceId } of chunks) {
+          const jobParams = {
+            claimIds: chunk,
+            resourceId,
+            batchId,
+            entityId: entityId ?? null,
+          };
 
-        const jobRows = await tx<InsertedJobRow[]>`
-          INSERT INTO jobs (type, params, priority, max_retries)
-          VALUES (
-            'claim-verification',
-            ${JSON.stringify(jobParams)}::jsonb,
-            ${CLAIM_VERIFICATION_JOB_PRIORITY},
-            3
-          )
-          RETURNING id
-        `;
+          const jobRows = await tx<InsertedJobRow[]>`
+            INSERT INTO jobs (type, params, priority, max_retries)
+            VALUES (
+              'claim-verification',
+              ${JSON.stringify(jobParams)}::jsonb,
+              ${CLAIM_VERIFICATION_JOB_PRIORITY},
+              3
+            )
+            RETURNING id
+          `;
 
-        if (jobRows.length > 0) {
-          jobEntries.push({ claimIds, resourceId, jobId: jobRows[0].id });
-        }
+          if (jobRows.length > 0) {
+            jobEntries.push({ claimIds: chunk, resourceId, jobId: jobRows[0].id });
+          }
       }
 
       // 5. Update claims with their verification_job_id
@@ -210,7 +251,7 @@ const claimsApp = new Hono()
       }
     }
 
-    const estimatedVerificationTime = jobEntries.length * SECONDS_PER_CLAIM_ESTIMATE;
+    const estimatedVerificationTime = insertedClaims.length * SECONDS_PER_CLAIM_ESTIMATE;
 
     return c.json(
       {

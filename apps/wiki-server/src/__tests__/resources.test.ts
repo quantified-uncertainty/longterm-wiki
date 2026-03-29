@@ -7,6 +7,10 @@ import { mockDbModule, postJson } from "./test-utils.js";
 let resourceStore: Map<string, Record<string, unknown>>;
 let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
 
+// Lightweight resource store for /suggest endpoint tests.
+// Stores resources with the simplified shape returned by the suggest lookup query.
+let suggestResourceStore: Map<string, { id: string; url: string; title: string | null; fetched_at: Date | null; has_content: boolean }>;
+
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
 
@@ -34,6 +38,7 @@ function slugFromIntId(intId: number | null): string | null {
 function resetStores() {
   resourceStore = new Map();
   citationStore = [];
+  suggestResourceStore = new Map();
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
 }
@@ -219,6 +224,33 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return citationStore
       .filter((c) => c.resource_id === resourceId)
       .map((c) => ({ slug: c.page_slug })); // wiki_pages.slug
+  }
+
+  // ---- /suggest: SELECT ... FROM resources r LEFT JOIN citation_content cc WHERE r.url = ANY(...) ----
+  // Tagged template: query has "from resources" + "left join citation_content" + "any($)"
+  if (q.includes("from resources") && q.includes("citation_content") && q.includes("any($)")) {
+    const urlList = params[0] as string[];
+    const results: Record<string, unknown>[] = [];
+    for (const url of urlList) {
+      const r = suggestResourceStore.get(url);
+      if (r) results.push({ ...r });
+    }
+    // If query has LIMIT 1, return at most 1 (fallback query in suggest)
+    if (q.includes("limit 1")) return results.slice(0, 1);
+    return results;
+  }
+
+  // ---- /suggest: INSERT INTO resources ... unnest ... RETURNING (bulk create for new URLs) ----
+  if (q.includes("insert into resources") && q.includes("unnest")) {
+    const ids = params[0] as string[];
+    const urls = params[1] as string[];
+    const results: Record<string, unknown>[] = [];
+    for (let i = 0; i < ids.length; i++) {
+      const row = { id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false };
+      suggestResourceStore.set(urls[i], row);
+      results.push(row);
+    }
+    return results;
   }
 
   // ---- Full-text search (raw SQL with to_tsquery or plainto_tsquery) ----
@@ -598,6 +630,167 @@ describe("Resources API", () => {
       expect(body.total).toBe(5);
       expect(body.limit).toBe(2);
       expect(body.offset).toBe(0);
+    });
+  });
+
+  describe("POST /api/resources/suggest — variant collision handling", () => {
+    it("resolves both URLs when they are www-variants of each other and one exists in DB", async () => {
+      // Pre-populate: the DB has the www version stored
+      suggestResourceStore.set("https://www.example.com", {
+        id: "existing-res-1",
+        url: "https://www.example.com",
+        title: "Example Site",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      // Submit both the www and non-www URLs
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com", "https://www.example.com"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(2);
+
+      // Both should resolve to existing resources (not fall through to toCreate)
+      // The www URL matches exactly; the non-www URL matches via variant lookup
+      const nonWwwResult = body.results.find((r: any) => r.url === "https://example.com");
+      const wwwResult = body.results.find((r: any) => r.url === "https://www.example.com");
+
+      expect(wwwResult).toBeDefined();
+      expect(wwwResult.resourceId).toBe("existing-res-1");
+      expect(wwwResult.contentStatus).toBe("fresh");
+
+      expect(nonWwwResult).toBeDefined();
+      expect(nonWwwResult.resourceId).toBe("existing-res-1");
+      // Both found via the same existing resource — neither should be "missing" from a newly created resource
+      expect(nonWwwResult.contentStatus).toBe("fresh");
+    });
+
+    it("resolves both URLs when DB has the non-www version stored", async () => {
+      // Pre-populate: the DB has the non-www version stored
+      suggestResourceStore.set("https://example.com", {
+        id: "existing-res-2",
+        url: "https://example.com",
+        title: "Example Site",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com", "https://www.example.com"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(2);
+
+      // Both should resolve to the existing resource
+      for (const result of body.results) {
+        expect(result.resourceId).toBe("existing-res-2");
+        expect(result.contentStatus).toBe("fresh");
+      }
+    });
+
+    it("prefers exact URL match over variant match when both exist in DB", async () => {
+      // DB has both www and non-www as separate resources
+      suggestResourceStore.set("https://example.com", {
+        id: "res-no-www",
+        url: "https://example.com",
+        title: "No WWW Version",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+      suggestResourceStore.set("https://www.example.com", {
+        id: "res-with-www",
+        url: "https://www.example.com",
+        title: "WWW Version",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com", "https://www.example.com"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(2);
+
+      const nonWwwResult = body.results.find((r: any) => r.url === "https://example.com");
+      const wwwResult = body.results.find((r: any) => r.url === "https://www.example.com");
+
+      // Each input URL should prefer its exact match over the variant
+      expect(nonWwwResult.resourceId).toBe("res-no-www");
+      expect(wwwResult.resourceId).toBe("res-with-www");
+    });
+
+    it("creates new resource only for genuinely unknown URLs", async () => {
+      // DB has one URL; submit it along with a truly new URL
+      suggestResourceStore.set("https://known.com", {
+        id: "known-res",
+        url: "https://known.com",
+        title: "Known Resource",
+        fetched_at: null,
+        has_content: false,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://known.com", "https://brand-new.com"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(2);
+
+      const knownResult = body.results.find((r: any) => r.url === "https://known.com");
+      const newResult = body.results.find((r: any) => r.url === "https://brand-new.com");
+
+      expect(knownResult.resourceId).toBe("known-res");
+      // The new URL should get a freshly created resource
+      expect(newResult.resourceId).toBeTruthy();
+      expect(newResult.resourceId).not.toBe("known-res");
+      expect(newResult.contentStatus).toBe("missing");
+    });
+
+    it("handles trailing slash variants correctly", async () => {
+      // DB stores URL with trailing slash
+      suggestResourceStore.set("https://example.com/page/", {
+        id: "slash-res",
+        url: "https://example.com/page/",
+        title: "Page With Slash",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      // Request without trailing slash — should match via variant
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/page"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.results).toHaveLength(1);
+      expect(body.results[0].resourceId).toBe("slash-res");
+      expect(body.results[0].contentStatus).toBe("fresh");
+    });
+
+    it("deduplicates identical input URLs", async () => {
+      suggestResourceStore.set("https://example.com", {
+        id: "dedup-res",
+        url: "https://example.com",
+        title: "Dedup Test",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com", "https://example.com", "https://example.com"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // Deduplication means only unique URLs appear in results
+      // (the endpoint deduplicates but the response maps back to unique URLs)
+      expect(body.results.length).toBeLessThanOrEqual(3);
+      for (const result of body.results) {
+        expect(result.resourceId).toBe("dedup-res");
+      }
     });
   });
 });

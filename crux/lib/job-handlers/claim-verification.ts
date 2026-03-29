@@ -211,7 +211,15 @@ export async function handleClaimVerification(
       reasoning: 'Source content not available for verification',
     }));
 
-    await apiRequest('POST', '/api/claims/verdicts', { verdicts });
+    const result = await apiRequest('POST', '/api/claims/verdicts', { verdicts });
+
+    if (!result.ok) {
+      return {
+        success: false,
+        data: { batchId },
+        error: `Failed to persist verdicts: ${result.message}`,
+      };
+    }
 
     return {
       success: true,
@@ -246,7 +254,19 @@ export async function handleClaimVerification(
       const parsed = MultiClaimResultSchema.safeParse(raw);
 
       if (parsed.success) {
+        const expectedIds = new Set(batch.map((cl) => cl.id));
+        const seenIds = new Set<number>();
+
         for (const r of parsed.data) {
+          if (!expectedIds.has(r.claimId)) {
+            console.warn(`[claim-verification] LLM returned unknown claimId ${r.claimId} — skipping`);
+            continue;
+          }
+          if (seenIds.has(r.claimId)) {
+            console.warn(`[claim-verification] LLM returned duplicate claimId ${r.claimId} — skipping`);
+            continue;
+          }
+          seenIds.add(r.claimId);
           allResults.push({
             claimId: r.claimId,
             verdict: r.verdict,
@@ -254,6 +274,14 @@ export async function handleClaimVerification(
             extractedValue: r.extracted_value,
             reasoning: r.reasoning,
           });
+        }
+
+        // Treat omitted claims as errors so they get unverifiable status
+        for (const cl of batch) {
+          if (!seenIds.has(cl.id)) {
+            console.warn(`[claim-verification] LLM omitted claimId ${cl.id} — marking unverifiable`);
+            errors.push({ claimId: cl.id, error: 'LLM omitted this claim from verification response' });
+          }
         }
       } else {
         // If multi-claim parsing fails, try to handle gracefully
@@ -320,7 +348,11 @@ export async function handleClaimVerification(
     );
 
     if (!updateResult.ok) {
-      console.warn(`[claim-verification] Failed to update verdicts: ${updateResult.message}`);
+      return {
+        success: false,
+        data: { batchId },
+        error: `Failed to persist verdicts: ${updateResult.message}`,
+      };
     }
   }
 

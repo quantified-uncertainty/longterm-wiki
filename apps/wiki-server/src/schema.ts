@@ -3393,6 +3393,7 @@ export const claimRecordLinks = pgTable(
   (table) => [
     index("idx_crl_claim").on(table.claimId),
     index("idx_crl_record").on(table.recordType, table.recordId),
+    uniqueIndex("uq_crl_claim_record").on(table.claimId, table.recordType, table.recordId),
   ]
 );
 
