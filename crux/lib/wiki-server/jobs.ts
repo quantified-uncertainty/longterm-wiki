@@ -95,6 +95,17 @@ export async function claimJob(
   });
 }
 
+/** Claim the next pending job matching any of the given types (single server call). */
+export async function claimJobWithTypes(
+  workerId: string,
+  types: string[],
+): Promise<ApiResult<ClaimResult>> {
+  return batchedRequest<ClaimResult>('POST', '/api/jobs/claim', {
+    workerId,
+    types,
+  });
+}
+
 /** Mark a claimed job as running. */
 export async function startJob(id: number): Promise<ApiResult<JobEntry>> {
   return apiRequest<JobEntry>('POST', `/api/jobs/${id}/start`, {});
