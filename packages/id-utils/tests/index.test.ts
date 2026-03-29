@@ -83,11 +83,19 @@ describe("generateSid", () => {
 });
 
 describe("isLegacyStableId", () => {
-  it("detects bare 10-char alphanumeric IDs", () => {
+  it("detects bare 10-char alphanumeric IDs with uppercase", () => {
     expect(isLegacyStableId("1LcLlMGLbw")).toBe(true);
     expect(isLegacyStableId("AbCdEfG12H")).toBe(true);
-    expect(isLegacyStableId("abcdefghij")).toBe(true);
-    expect(isLegacyStableId("0123456789")).toBe(true);
+  });
+
+  it("rejects all-lowercase 10-char strings (could be slugs)", () => {
+    expect(isLegacyStableId("bioweapons")).toBe(false);
+    expect(isLegacyStableId("conjecture")).toBe(false);
+    expect(isLegacyStableId("abcdefghij")).toBe(false);
+  });
+
+  it("rejects all-numeric 10-char strings", () => {
+    expect(isLegacyStableId("0123456789")).toBe(false);
   });
 
   it("rejects wrong lengths", () => {

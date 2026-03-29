@@ -46,10 +46,12 @@ export function generateSid(): string {
 
 /**
  * Detects old-format bare 10-char alphanumeric stableIds (without sid_ prefix).
+ * Requires at least one uppercase letter to avoid false positives on 10-char
+ * lowercase slugs like "bioweapons" or "conjecture".
  * Use during migration period only. After migration completes, this can be removed.
  */
 export function isLegacyStableId(s: string): boolean {
-  return /^[A-Za-z0-9]{10}$/.test(s);
+  return /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
 }
 
 /**

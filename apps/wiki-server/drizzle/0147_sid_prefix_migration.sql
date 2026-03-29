@@ -8,24 +8,8 @@
 -- Idempotent: all UPDATEs use WHERE ... NOT LIKE 'sid_%' to skip already-prefixed values.
 
 -- ══════════════════════════════════════════════════════════════════════
--- Step 1: Temporarily drop FK constraints that reference entities.stable_id
--- (Cannot update PK without dropping FKs first, then re-adding after)
--- ══════════════════════════════════════════════════════════════════════
-
--- We'll update entities.stable_id and all referencing columns in the same
--- transaction, so we need to defer constraint checks.
-SET CONSTRAINTS ALL DEFERRED;
-
--- ══════════════════════════════════════════════════════════════════════
--- Step 2: Prefix entities.stable_id (the source of truth)
--- ══════════════════════════════════════════════════════════════════════
-
-UPDATE entities SET stable_id = 'sid_' || stable_id
-WHERE stable_id IS NOT NULL
-  AND stable_id NOT LIKE 'sid_%';
-
--- ══════════════════════════════════════════════════════════════════════
--- Step 3: Update all FK columns that directly reference entities.stable_id
+-- Step 1: Update all CHILD FK columns FIRST (before parent entities.stable_id)
+-- This avoids FK constraint violations since children must match parent values.
 -- ══════════════════════════════════════════════════════════════════════
 
 -- facts.entity_id (FK to entities.stable_id)
@@ -137,6 +121,15 @@ WHERE entity_stable_id IS NOT NULL AND entity_stable_id NOT LIKE 'sid_%';
 -- agent_session_entities.entity_stable_id
 UPDATE agent_session_entities SET entity_stable_id = 'sid_' || entity_stable_id
 WHERE entity_stable_id IS NOT NULL AND entity_stable_id NOT LIKE 'sid_%';
+
+-- ══════════════════════════════════════════════════════════════════════
+-- Step 2: NOW update the parent entities.stable_id
+-- All children already have sid_ prefix, so FK constraints are satisfied.
+-- ══════════════════════════════════════════════════════════════════════
+
+UPDATE entities SET stable_id = 'sid_' || stable_id
+WHERE stable_id IS NOT NULL
+  AND stable_id NOT LIKE 'sid_%';
 
 -- ══════════════════════════════════════════════════════════════════════
 -- Step 4: Update raw ID columns that may contain stableIds
@@ -294,34 +287,75 @@ WHERE (e.stable_id = ep.holder_id OR e.id = ep.holder_id)
 
 -- ══════════════════════════════════════════════════════════════════════
 -- Step 7: Add CHECK constraints to prevent stableIds in display name columns
+-- Idempotent: uses DO block with EXCEPTION handler to skip existing constraints.
 -- ══════════════════════════════════════════════════════════════════════
 
-ALTER TABLE personnel ADD CONSTRAINT chk_person_display_name_not_sid
-  CHECK (person_display_name IS NULL OR person_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE personnel ADD CONSTRAINT chk_person_display_name_not_sid
+    CHECK (person_display_name IS NULL OR person_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE personnel ADD CONSTRAINT chk_org_display_name_not_sid
-  CHECK (org_display_name IS NULL OR org_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE personnel ADD CONSTRAINT chk_org_display_name_not_sid
+    CHECK (org_display_name IS NULL OR org_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE grants ADD CONSTRAINT chk_grantee_display_name_not_sid
-  CHECK (grantee_display_name IS NULL OR grantee_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE grants ADD CONSTRAINT chk_grantee_display_name_not_sid
+    CHECK (grantee_display_name IS NULL OR grantee_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE grants ADD CONSTRAINT chk_grant_org_display_name_not_sid
-  CHECK (org_display_name IS NULL OR org_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE grants ADD CONSTRAINT chk_grant_org_display_name_not_sid
+    CHECK (org_display_name IS NULL OR org_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE funding_rounds ADD CONSTRAINT chk_fr_company_display_name_not_sid
-  CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE funding_rounds ADD CONSTRAINT chk_fr_company_display_name_not_sid
+    CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE funding_rounds ADD CONSTRAINT chk_fr_lead_investor_display_name_not_sid
-  CHECK (lead_investor_display_name IS NULL OR lead_investor_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE funding_rounds ADD CONSTRAINT chk_fr_lead_investor_display_name_not_sid
+    CHECK (lead_investor_display_name IS NULL OR lead_investor_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE investments ADD CONSTRAINT chk_inv_company_display_name_not_sid
-  CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE investments ADD CONSTRAINT chk_inv_company_display_name_not_sid
+    CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE investments ADD CONSTRAINT chk_inv_investor_display_name_not_sid
-  CHECK (investor_display_name IS NULL OR investor_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE investments ADD CONSTRAINT chk_inv_investor_display_name_not_sid
+    CHECK (investor_display_name IS NULL OR investor_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE equity_positions ADD CONSTRAINT chk_eq_company_display_name_not_sid
-  CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE equity_positions ADD CONSTRAINT chk_eq_company_display_name_not_sid
+    CHECK (company_display_name IS NULL OR company_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
-ALTER TABLE equity_positions ADD CONSTRAINT chk_eq_holder_display_name_not_sid
-  CHECK (holder_display_name IS NULL OR holder_display_name NOT LIKE 'sid_%');
+DO $$
+BEGIN
+  ALTER TABLE equity_positions ADD CONSTRAINT chk_eq_holder_display_name_not_sid
+    CHECK (holder_display_name IS NULL OR holder_display_name NOT LIKE 'sid_%');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
