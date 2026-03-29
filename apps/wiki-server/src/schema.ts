@@ -1108,6 +1108,10 @@ export const jobs = pgTable(
     startedAt: timestamp("started_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     workerId: text("worker_id"),
+    runAfter: timestamp("run_after", { withTimezone: true }),
+    dedupKey: text("dedup_key"),
+    parentJobId: bigint("parent_job_id", { mode: "number" }),
+    costUsd: numeric("cost_usd", { precision: 10, scale: 4 }),
   },
   (table) => [
     index("idx_jobs_status_priority").on(table.status, table.priority),

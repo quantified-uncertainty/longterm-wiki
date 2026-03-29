@@ -38,6 +38,10 @@ function formatJob(row: typeof jobs.$inferSelect) {
     startedAt: row.startedAt,
     completedAt: row.completedAt,
     workerId: row.workerId,
+    runAfter: row.runAfter,
+    dedupKey: row.dedupKey,
+    parentJobId: row.parentJobId,
+    costUsd: row.costUsd,
   };
 }
 
@@ -58,6 +62,10 @@ function formatRawJobRow(row: Record<string, unknown>) {
     startedAt: row.started_at,
     completedAt: row.completed_at,
     workerId: row.worker_id as string | null,
+    runAfter: row.run_after,
+    dedupKey: row.dedup_key as string | null,
+    parentJobId: row.parent_job_id as number | null,
+    costUsd: row.cost_usd as string | null,
   };
 }
 
@@ -76,6 +84,11 @@ const jobsApp = new Hono()
       const parsed = CreateJobBatchSchema.safeParse(body);
       if (!parsed.success) return validationError(c, parsed.error.message);
 
+      // Dedup key handling is not supported in batch creation
+      if (parsed.data.some((j) => j.dedupKey)) {
+        return validationError(c, "dedupKey is not supported in batch creation; use single-job creation instead");
+      }
+
       const rows = await db
         .insert(jobs)
         .values(
@@ -84,6 +97,9 @@ const jobsApp = new Hono()
             params: j.params ?? null,
             priority: j.priority,
             maxRetries: j.maxRetries,
+            dedupKey: j.dedupKey ?? null,
+            parentJobId: j.parentJobId ?? null,
+            runAfter: j.runAfter ? new Date(j.runAfter) : null,
           }))
         )
         .returning();
@@ -95,6 +111,109 @@ const jobsApp = new Hono()
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     const d = parsed.data;
+
+    // If dedupKey is provided, use INSERT ... ON CONFLICT to avoid duplicates
+    // among active jobs (pending/claimed/running).
+    if (d.dedupKey) {
+      const pgClient = getDb();
+      const insertResult = await pgClient.unsafe(
+        `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
+         DO NOTHING
+         RETURNING *`,
+        [
+          d.type,
+          d.params ? JSON.stringify(d.params) : null,
+          d.priority,
+          d.maxRetries,
+          d.dedupKey,
+          d.parentJobId ?? null,
+          d.runAfter ?? null,
+        ]
+      );
+
+      if (insertResult.length > 0) {
+        return c.json(
+          { ...formatRawJobRow(insertResult[0] as Record<string, unknown>), dedupExisting: false },
+          201
+        );
+      }
+
+      // Insert returned 0 rows — an active job with this dedup key exists.
+      const existing = await pgClient.unsafe(
+        `SELECT * FROM "jobs"
+         WHERE dedup_key = $1 AND status IN ('pending', 'claimed', 'running')
+         LIMIT 1`,
+        [d.dedupKey]
+      );
+
+      if (existing.length > 0) {
+        return c.json(
+          { ...formatRawJobRow(existing[0] as Record<string, unknown>), dedupExisting: true },
+          200
+        );
+      }
+
+      // Race condition: the conflicting job completed between INSERT and SELECT.
+      // Retry the insert once without ON CONFLICT since no active duplicate exists.
+      const retryResult = await pgClient.unsafe(
+        `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
+         DO NOTHING
+         RETURNING *`,
+        [
+          d.type,
+          d.params ? JSON.stringify(d.params) : null,
+          d.priority,
+          d.maxRetries,
+          d.dedupKey,
+          d.parentJobId ?? null,
+          d.runAfter ?? null,
+        ]
+      );
+
+      if (retryResult.length > 0) {
+        return c.json(
+          { ...formatRawJobRow(retryResult[0] as Record<string, unknown>), dedupExisting: false },
+          201
+        );
+      }
+
+      // Still conflicting — return the existing active job
+      const existingRetry = await pgClient.unsafe(
+        `SELECT * FROM "jobs"
+         WHERE dedup_key = $1 AND status IN ('pending', 'claimed', 'running')
+         LIMIT 1`,
+        [d.dedupKey]
+      );
+
+      if (existingRetry.length > 0) {
+        return c.json(
+          { ...formatRawJobRow(existingRetry[0] as Record<string, unknown>), dedupExisting: true },
+          200
+        );
+      }
+
+      // Extreme race: conflicting job completed between both attempts.
+      // The dedup conflict is gone, so just insert normally.
+      const finalRows = await db
+        .insert(jobs)
+        .values({
+          type: d.type,
+          params: d.params ?? null,
+          priority: d.priority,
+          maxRetries: d.maxRetries,
+          dedupKey: d.dedupKey ?? null,
+          parentJobId: d.parentJobId ?? null,
+          runAfter: d.runAfter ? new Date(d.runAfter) : null,
+        })
+        .returning();
+
+      return c.json(formatJob(firstOrThrow(finalRows, "dedup fallback insert")), 201);
+    }
+
     const rows = await db
       .insert(jobs)
       .values({
@@ -102,6 +221,8 @@ const jobsApp = new Hono()
         params: d.params ?? null,
         priority: d.priority,
         maxRetries: d.maxRetries,
+        parentJobId: d.parentJobId ?? null,
+        runAfter: d.runAfter ? new Date(d.runAfter) : null,
       })
       .returning();
 
@@ -151,38 +272,64 @@ const jobsApp = new Hono()
     const parsed = ClaimJobSchema.safeParse(body);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { type, workerId } = parsed.data;
+    const { type, types, workerId } = parsed.data;
     const pgClient = getDb();
 
     // Use raw SQL for SELECT FOR UPDATE SKIP LOCKED (atomic claim).
-    // Two query variants to keep parameterization clean.
-    const result = type
-      ? await pgClient.unsafe(
-          `UPDATE "jobs"
+    // Three query variants to keep parameterization clean:
+    //   1. types array — filter by ANY($2::text[])
+    //   2. single type — filter by exact match
+    //   3. no type filter — claim any pending job
+    // All variants respect the run_after column (delayed execution).
+    const runAfterClause = `AND (run_after IS NULL OR run_after <= now())`;
+
+    let result;
+    if (types && types.length > 0) {
+      result = await pgClient.unsafe(
+        `UPDATE "jobs"
+         SET status = 'claimed', claimed_at = now(), worker_id = $1
+         WHERE id = (
+           SELECT id FROM "jobs"
+           WHERE status = 'pending' AND "type" = ANY($2::text[])
+           ${runAfterClause}
+           ORDER BY priority DESC, created_at ASC
+           LIMIT 1
+           FOR UPDATE SKIP LOCKED
+         )
+         RETURNING *`,
+        [workerId, types]
+      );
+    } else if (type) {
+      result = await pgClient.unsafe(
+        `UPDATE "jobs"
          SET status = 'claimed', claimed_at = now(), worker_id = $1
          WHERE id = (
            SELECT id FROM "jobs"
            WHERE status = 'pending' AND "type" = $2
+           ${runAfterClause}
            ORDER BY priority DESC, created_at ASC
            LIMIT 1
            FOR UPDATE SKIP LOCKED
          )
          RETURNING *`,
-          [workerId, type]
-        )
-      : await pgClient.unsafe(
-          `UPDATE "jobs"
+        [workerId, type]
+      );
+    } else {
+      result = await pgClient.unsafe(
+        `UPDATE "jobs"
          SET status = 'claimed', claimed_at = now(), worker_id = $1
          WHERE id = (
            SELECT id FROM "jobs"
            WHERE status = 'pending'
+           ${runAfterClause}
            ORDER BY priority DESC, created_at ASC
            LIMIT 1
            FOR UPDATE SKIP LOCKED
          )
          RETURNING *`,
-          [workerId]
-        );
+        [workerId]
+      );
+    }
 
     if (result.length === 0) {
       return c.json({ job: null }, 200);
@@ -232,6 +379,9 @@ const jobsApp = new Hono()
         status: "completed" as JobStatus,
         result: parsed.data.result ?? null,
         completedAt: new Date(),
+        ...(parsed.data.cost != null
+          ? { costUsd: String(parsed.data.cost) }
+          : {}),
       })
       .where(and(eq(jobs.id, id), eq(jobs.status, "running")))
       .returning();
@@ -269,6 +419,10 @@ const jobsApp = new Hono()
     // Note: `error = $1` is always written, even on retry (same as the previous
     // two-query implementation). A retried job carries the last failure's error
     // message until it completes or fails permanently.
+    //
+    // Exponential backoff: run_after = now() + (2^retries * 30s) when retrying.
+    // `retries` in `power(2, retries)` is the pre-increment value (i.e., attempt 0
+    // yields 30s delay, attempt 1 yields 60s, attempt 2 yields 120s, etc.).
     const result = await pgClient.unsafe(
       `UPDATE "jobs"
      SET
@@ -278,7 +432,8 @@ const jobsApp = new Hono()
        completed_at = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE now() END,
        claimed_at   = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE claimed_at END,
        started_at   = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE started_at END,
-       worker_id    = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE worker_id END
+       worker_id    = CASE WHEN (retries + 1) < max_retries THEN NULL ELSE worker_id END,
+       run_after    = CASE WHEN (retries + 1) < max_retries THEN now() + (power(2, retries) * interval '30 seconds') ELSE run_after END
      WHERE id = $2
        AND status IN ('running', 'claimed')
      RETURNING *`,
@@ -443,6 +598,36 @@ const jobsApp = new Hono()
     return c.json({
       swept: result.length,
       jobs: result,
+    });
+  })
+
+  // ---- GET /:id/children (child job status summary) ----
+
+  .get("/:id/children", async (c) => {
+    const id = parseInt(c.req.param("id"), 10);
+    if (isNaN(id)) return validationError(c, "id must be a number");
+
+    const pgClient = getDb();
+
+    interface ChildStatusRow {
+      status: string;
+      count: number;
+    }
+
+    const rows = (await pgClient.unsafe(
+      `SELECT status, count(*)::int as count FROM jobs WHERE parent_job_id = $1 GROUP BY status`,
+      [id]
+    )) as ChildStatusRow[];
+
+    const summary: Record<string, number> = {};
+    for (const row of rows) {
+      summary[row.status] = row.count;
+    }
+
+    return c.json({
+      parentJobId: id,
+      children: summary,
+      total: rows.reduce((sum, r) => sum + r.count, 0),
     });
   })
 

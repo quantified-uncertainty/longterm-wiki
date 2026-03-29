@@ -11,6 +11,7 @@ import {
   invalidJsonError,
   zv,
   parseRange,
+  noDuplicateIds,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
@@ -57,7 +58,11 @@ const SyncInvestmentItemSchema = z.object({
 });
 
 const SyncInvestmentsBatchSchema = z.object({
-  items: z.array(SyncInvestmentItemSchema).min(1).max(500),
+  items: z
+    .array(SyncInvestmentItemSchema)
+    .min(1)
+    .max(500)
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Helpers ----
@@ -242,6 +247,23 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Check for natural key collisions within the batch itself.
+    // Natural key: (companyId, investorId, roundName)
+    const batchKeys = new Set<string>();
+    for (const item of items) {
+      const key = `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`;
+      if (batchKeys.has(key)) {
+        return validationError(
+          c,
+          `Duplicate (companyId, investorId, roundName) in batch: ` +
+          `companyId=${item.companyId}, investorId=${item.investorId}, ` +
+          `roundName="${item.roundName ?? ""}". ` +
+          `Each investment must be unique by company + investor + round.`
+        );
+      }
+      batchKeys.add(key);
+    }
 
     // Validate entity FK references before inserting
     const refError = await validateEntityRefs(c, db, [

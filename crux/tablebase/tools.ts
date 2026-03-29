@@ -6,6 +6,8 @@
  *        submit_records, resolve_entity
  */
 
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
@@ -161,6 +163,37 @@ function getEntityMatcher() {
     _entityMatcher = buildEntityMatcher();
   }
   return _entityMatcher;
+}
+
+let _knownStableIds: Set<string> | null = null;
+
+/**
+ * Load the set of all known stableIds from database.json.
+ * Used to validate that entity references submitted by the LLM actually exist,
+ * catching hallucinated 10-char IDs that look like stableIds but don't match anything.
+ */
+function getKnownStableIds(): Set<string> {
+  if (_knownStableIds) return _knownStableIds;
+  try {
+    const db = JSON.parse(readFileSync(resolve('apps/web/src/data/database.json'), 'utf8'));
+    const ids = new Set<string>();
+    // Index from byStableId (stableId → slug mapping)
+    if (db.idRegistry?.byStableId) {
+      for (const sid of Object.keys(db.idRegistry.byStableId)) {
+        ids.add(sid);
+      }
+    }
+    // Also index from typedEntities stableId field
+    for (const e of db.typedEntities || []) {
+      if (e.stableId) ids.add(e.stableId);
+    }
+    _knownStableIds = ids;
+    return ids;
+  } catch {
+    // If database.json isn't available, return empty set (all stableIds will be rejected)
+    _knownStableIds = new Set();
+    return _knownStableIds;
+  }
 }
 
 async function handleQueryEntities(input: Record<string, unknown>): Promise<string> {
@@ -361,23 +394,45 @@ async function handleSubmitRecords(
     return `Error: ${badDisplayNames.length} record(s) have stableIds in display name fields. Display names must be human-readable, not sid_-prefixed IDs.`;
   }
 
-  // Normalize entity reference fields — resolve slugs to stableIds
-  // This catches cases where the LLM uses a slug instead of the stableId
+  // Validate and normalize entity reference fields.
+  // LLMs sometimes hallucinate plausible-looking 10-char stableIds instead of
+  // calling resolve_entity. We must verify ALL entity references exist — not
+  // just slug-formatted ones. See discussion #3387 for the full root cause.
   const entityFields = ['personId', 'organizationId', 'investorId', 'companyId', 'benchmarkId', 'modelId', 'granteeId'];
   const matcher = getEntityMatcher();
+  // Load idRegistry for stableId validation (matcher only indexes by name/slug/alias)
+  const stableIdSet = getKnownStableIds();
+  const invalidRefs: string[] = [];
   for (const record of records) {
     for (const field of entityFields) {
       const val = record[field] as string | undefined;
       if (!val) continue;
-      // If it looks like a slug (contains hyphens), try to resolve it to a stableId.
-      // StableIds are 10-char alphanumeric (no hyphens), so any value with hyphens is likely a slug.
-      if (val.includes('-')) {
-        const match = matcher.match(val);
-        if (match) {
-          record[field] = match.stableId;
-        }
+
+      // Skip "new:" prefixed values — these are unresolved names, handled downstream
+      if (val.startsWith('new:')) continue;
+
+      // Try to resolve via entity matcher (handles slugs, names, aliases)
+      const match = matcher.match(val);
+      if (match) {
+        record[field] = match.stableId;
+        continue;
       }
+
+      // If it looks like a stableId (10-char alphanumeric), verify it exists
+      if (/^[A-Za-z0-9]{10}$/.test(val)) {
+        if (stableIdSet.has(val)) {
+          continue; // Legitimate stableId from resolve_entity or create_entity
+        }
+        invalidRefs.push(`${field}="${val}" in record for ${record.role || record.name || 'unknown'}`);
+        continue;
+      }
+
+      // Slug-format values that didn't match — leave as-is for server-side resolution
     }
+  }
+
+  if (invalidRefs.length > 0) {
+    return `Error: ${invalidRefs.length} entity reference(s) could not be verified. These look like fabricated stableIds — use resolve_entity or create_entity to get valid IDs.\n${invalidRefs.join('\n')}`;
   }
 
   // Generate IDs for new records

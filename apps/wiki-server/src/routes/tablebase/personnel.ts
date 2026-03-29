@@ -10,6 +10,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  noDuplicateIds,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
@@ -80,7 +81,11 @@ const SyncPersonnelItemSchema = z.object({
 });
 
 const SyncPersonnelBatchSchema = z.object({
-  items: z.array(SyncPersonnelItemSchema).min(1).max(500),
+  items: z
+    .array(SyncPersonnelItemSchema)
+    .min(1)
+    .max(500)
+    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Helpers ----
@@ -337,6 +342,23 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Check for natural key collisions within the batch itself.
+    // Natural key: (personId, organizationId, role, roleType)
+    const batchKeys = new Set<string>();
+    for (const item of items) {
+      const key = `${item.personId}::${item.organizationId}::${item.role}::${item.roleType}`;
+      if (batchKeys.has(key)) {
+        return validationError(
+          c,
+          `Duplicate (personId, organizationId, role, roleType) in batch: ` +
+          `personId=${item.personId}, organizationId=${item.organizationId}, ` +
+          `role="${item.role}", roleType=${item.roleType}. ` +
+          `Each personnel record must be unique by person + org + role.`
+        );
+      }
+      batchKeys.add(key);
+    }
 
     // Validate entity FK references before inserting
     const refError = await validateEntityRefs(c, db, [

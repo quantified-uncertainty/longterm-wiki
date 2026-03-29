@@ -104,9 +104,11 @@ export async function startJob(id: number): Promise<ApiResult<JobEntry>> {
 export async function completeJob(
   id: number,
   result?: Record<string, unknown> | null,
+  cost?: number,
 ): Promise<ApiResult<JobEntry>> {
   return apiRequest<JobEntry>('POST', `/api/jobs/${id}/complete`, {
     result: result ?? null,
+    ...(cost != null ? { cost } : {}),
   });
 }
 
