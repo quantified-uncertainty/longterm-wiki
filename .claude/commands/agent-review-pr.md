@@ -26,6 +26,10 @@ Provide it with the full diff (`git diff main...HEAD`) and this prompt:
 > 6. **DRY violations**: Copy-pasted logic that should be extracted
 > 7. **Hardcoded values**: Magic numbers, URLs, paths that should be constants
 > 8. **Shell safety**: Unquoted variables, missing error handling in bash/workflow files
+> 9. **API contract alignment**: For any `apiRequest` call, verify the type parameter matches the actual server response shape. Prefer typed client functions from `crux/lib/wiki-server/` over raw `apiRequest<{...}>`
+> 10. **Retry idempotency**: For any job handler or batch operation, verify: what happens if this runs twice? Does the caller handle already-processed items (e.g., `updated < total` on retry) as success, not failure?
+> 11. **LLM prompt escaping**: For any prompt builder, verify all user-controlled data is escaped (`escapeXml()` for XML-delimited, fencing for others). Check `sourceUrl`, `sourceTitle`, claim text, entity names — not just obvious fields
+> 12. **Test assertion quality**: For any new test, verify assertions are specific — no standalone `toBeDefined()` without follow-up assertions on specific values. Mock stores should be shared across endpoints testing the same DB table
 >
 > For each finding, rate severity (CRITICAL / HIGH / MEDIUM / LOW) and give a confidence score (0-100).
 > Only report findings with confidence >= 70.
