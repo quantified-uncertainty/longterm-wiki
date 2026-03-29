@@ -36,9 +36,9 @@ Classify the changes into categories. A PR can belong to multiple categories:
 
 Count the metrics:
 - **Files changed**: from `git diff --stat`
-- **Lines changed**: insertions + deletions
+- **Lines changed**: insertions + deletions from `git diff --stat` summary line (this is the number used for all thresholds below)
 - **New files**: files that don't exist on main
-- **New exports**: new `export function`, `export const`, `export class`, `export async function` in changed files
+- **New exports**: new `export function`, `export const`, `export class`, `export async function`, `export default`, `export type` in changed files
 
 ### Build the verification plan
 
@@ -83,8 +83,11 @@ Must exit 0. If it fails, fix before proceeding — nothing else matters if it d
 
 ```bash
 npx tsc --noEmit -p apps/web/tsconfig.json
+npx tsc --noEmit -p apps/wiki-server/tsconfig.json
 npx tsc --noEmit -p crux/tsconfig.json
 ```
+
+Check all three projects, not just the one that changed — changes in shared types can break dependents.
 
 ### 2c. Test suite
 
@@ -138,7 +141,8 @@ Provide it with the full diff (`git diff main...HEAD`) and this prompt:
 > End with a summary: how many findings at each severity level, and your overall assessment.
 
 **Action on findings:**
-- CRITICAL or HIGH (confidence ≥ 70): Fix immediately before proceeding
+- CRITICAL (any confidence ≥ 60): Fix immediately before proceeding
+- HIGH (confidence ≥ 70): Fix immediately before proceeding
 - MEDIUM (confidence ≥ 80): Fix unless there's a strong reason not to (document why)
 - LOW: Note in PR description if relevant, otherwise skip
 
@@ -165,7 +169,7 @@ After simplifications, re-run `pnpm test` and `pnpm build` to verify nothing bro
 Grep for new exports in the diff:
 
 ```bash
-git diff main...HEAD | grep -E '^\+.*export (function|const|class|async function)' | grep -v '\.test\.' | grep -v '\.spec\.'
+git diff main...HEAD | grep -E '^\+.*(export (default |)(function|const|class|async function)|export \{)' | grep -v '\.test\.' | grep -v '\.spec\.'
 ```
 
 For each new exported function/class:
@@ -232,9 +236,11 @@ If UI components were modified, **actually look at them in a browser**.
 # Use the correct port for your agent slot (3010 + slot number)
 # NEVER use port 3001 — that's the user's dev server
 npx next dev -p <your-port> &
+DEV_PID=$!
+echo "Dev server PID: $DEV_PID"
 ```
 
-Wait for the server to be ready.
+Wait for the server to be ready. If Playwright MCP tools are not available (browser_navigate fails), fall back to checking `pnpm build` output for rendering errors and skip interactive testing.
 
 ### 7b. Navigate to affected pages with Playwright
 
@@ -256,9 +262,9 @@ Use the Playwright MCP tools to:
 - **Links and navigation**: Click through links, verify they go to the right place
 - **Forms**: Submit with valid data, empty data, and invalid data
 
-After testing, stop the dev server:
+After testing, stop the dev server by PID (job control is unreliable across shell invocations):
 ```bash
-kill %1  # or the specific PID — NEVER use pkill -f "next dev"
+kill $DEV_PID  # NEVER use pkill -f "next dev" — that kills ALL dev servers
 ```
 
 ---
@@ -289,11 +295,18 @@ If a wiki-server route was modified:
 2. Spot-check `database.json` for expected changes
 3. Verify no entities were accidentally dropped or corrupted
 
+### Infrastructure testing (when CI, Docker, config, or migrations changed)
+
+1. **GitHub Actions**: Verify all referenced commands exist and work locally. Check that action versions are pinned. Review trigger conditions.
+2. **Migrations**: Review SQL for correctness. Check for idempotency. Verify the migration follows patterns in `database-migrations.md`.
+3. **Config changes**: Verify env vars are documented, defaults are sensible, and no secrets are hardcoded.
+4. **Docker**: Verify the image builds locally if feasible.
+
 ---
 
 ## Phase 9: Final verification
 
-After all fixes from the review phases, run the full verification suite one more time:
+**If any review phase made changes** (simplifications, new tests, bug fixes), commit them and re-verify:
 
 ```bash
 pnpm build
@@ -301,7 +314,7 @@ pnpm test
 pnpm crux w validate gate --fix
 ```
 
-All three must pass. If any fail, fix and re-run.
+All three must pass. If no changes were made during review, this phase is redundant with Phase 2 — skip it.
 
 ---
 
@@ -313,9 +326,15 @@ All three must pass. If any fail, fix and re-run.
 2. Add items for any verification steps performed beyond the original plan
 3. Run `pnpm crux gh pr validate-test-plan` to confirm it passes
 
-### 10b. Create review marker
+### 10b. Commit any review-induced changes, then create review marker
+
+If the review wrote tests, applied simplifications, or fixed bugs, **commit those changes first**. The marker must be written after the final commit so the diff hash is stable.
 
 ```bash
+# Only if there are uncommitted changes from the review:
+git add -A && git commit -m "review: tests, simplifications, and fixes from /agent-review-pr"
+
+# Then write the marker against the final state:
 DIFF_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
 echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ${DIFF_HASH}" >| .claude/review-done
 ```

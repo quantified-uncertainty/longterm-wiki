@@ -87,7 +87,7 @@ For each unchecked item in the checklist:
 3. **Blocked?** Note why next to the item.
 
 Pay special attention to:
-- **Paranoid review** (`paranoid-review`): Run `/agent-review-pr` — this handles diff review (fresh subagent), test plan validation, execution-based verification, and edge case testing. Fix or document every finding before checking the item off.
+- **Review** (`paranoid-review`): Run `/agent-review-pr` — this triages the diff, builds an adaptive verification plan (diff review, simplification, test coverage, red-teaming, UI/API/CLI testing as applicable), and executes it. Fix or document every finding before checking the item off.
 - **Self-audit**: Re-run commands you claimed to run. Verify outputs match your claims.
 
 ## Step 4: Write / update PR description
