@@ -45,6 +45,7 @@ import {
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { urlVariants } from "../shared/url-variants.js";
 import { createHash } from "crypto";
 
 // ---- Raw SQL row types ----
@@ -101,34 +102,7 @@ function hashId(str: string): string {
   return createHash("sha256").update(str).digest("hex").slice(0, 16);
 }
 
-// ---- URL normalization ----
-
-/**
- * Generate common URL variants for fuzzy lookup.
- * Tries with/without www, with/without trailing slash.
- */
-function urlVariants(url: string): string[] {
-  const variants = new Set<string>();
-  try {
-    const parsed = new URL(url);
-    const base = parsed.href.replace(/\/$/, "");
-    variants.add(base);
-    variants.add(base + "/");
-    if (parsed.hostname.startsWith("www.")) {
-      const noWww = base.replace("://www.", "://");
-      variants.add(noWww);
-      variants.add(noWww + "/");
-    } else {
-      const withWww = base.replace("://", "://www.");
-      variants.add(withWww);
-      variants.add(withWww + "/");
-    }
-  } catch (err) {
-    logger.error({ err: err instanceof Error ? err.message : String(err) }, "urlVariants parse failed");
-    variants.add(url);
-  }
-  return Array.from(variants);
-}
+// urlVariants is imported from ../shared/url-variants.js
 
 // ---- Schemas (from shared api-types) ----
 
@@ -596,17 +570,18 @@ const resourcesApp = new Hono()
     const uniqueUrls = [...new Set(urls)];
 
     // 1. Build URL variants for batch lookup
-    const urlToOriginal = new Map<string, string>();
+    const variantToOriginals = new Map<string, Set<string>>();
     for (const url of uniqueUrls) {
       for (const variant of urlVariants(url)) {
-        // First URL wins — skip if variant already mapped (prevents lossy overwrites
-        // when different input URLs produce overlapping variants)
-        if (!urlToOriginal.has(variant)) {
-          urlToOriginal.set(variant, url);
+        let originals = variantToOriginals.get(variant);
+        if (!originals) {
+          originals = new Set<string>();
+          variantToOriginals.set(variant, originals);
         }
+        originals.add(url);
       }
     }
-    const allVariants = [...urlToOriginal.keys()];
+    const allVariants = [...variantToOriginals.keys()];
 
     // 2. Batch lookup existing resources + content freshness in one query
     interface ResourceWithContent {
@@ -630,9 +605,15 @@ const resourcesApp = new Hono()
     // Map original input URL → existing resource + content info
     const urlToResource = new Map<string, ResourceWithContent>();
     for (const row of existingRows) {
-      const original = urlToOriginal.get(row.url);
-      if (original && !urlToResource.has(original)) {
-        urlToResource.set(original, row);
+      const originals = variantToOriginals.get(row.url);
+      if (originals) {
+        for (const original of originals) {
+          // Prefer exact URL match; first variant match is fallback
+          const current = urlToResource.get(original);
+          if (!current || (current.url !== original && row.url === original)) {
+            urlToResource.set(original, row);
+          }
+        }
       }
     }
 

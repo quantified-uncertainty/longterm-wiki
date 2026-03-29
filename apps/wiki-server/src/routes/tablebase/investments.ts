@@ -3,6 +3,7 @@ import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
+import { logger } from "../../logger.js";
 import { investments, entities } from "../../schema.js";
 import {
   parseJsonBody,
@@ -339,16 +340,21 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     logVerificationCoverage("investments/sync", items.length, verdictsResult.written);
 
-    // Link verified claims to records
+    // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;
     if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-        recordId: item.id,
-        recordType: "investments",
-        claimIds: item.claimIds,
-      })));
-      claimsLinked = linkResult.linked;
+      try {
+        const rawDb = getDb();
+        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+          recordId: item.id,
+          recordType: "investments",
+          claimIds: item.claimIds,
+        })));
+        claimsLinked = linkResult.linked;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        logger.warn({ error: msg }, "claim linking failed (records already committed)");
+      }
     }
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });

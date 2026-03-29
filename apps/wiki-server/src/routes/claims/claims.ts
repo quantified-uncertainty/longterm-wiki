@@ -41,6 +41,7 @@ interface ProposedClaimRow {
 interface InsertedClaimRow {
   id: number;
   resource_id: string | null;
+  source_url: string;
 }
 
 interface InsertedJobRow {
@@ -68,10 +69,64 @@ function generateBatchId(): string {
 }
 
 /** Rough estimate of seconds per pending claim for polling UX. */
-const SECONDS_PER_CLAIM_ESTIMATE = 3;
+export const SECONDS_PER_CLAIM_ESTIMATE = 3;
 
 /** Job priority for claim verification (higher than default page-improve). */
-const CLAIM_VERIFICATION_JOB_PRIORITY = 10;
+export const CLAIM_VERIFICATION_JOB_PRIORITY = 10;
+
+/** Maximum claims per verification job — the GET /by-ids endpoint rejects >200 IDs. */
+export const MAX_CLAIMS_PER_JOB = 200;
+
+// ---------------------------------------------------------------------------
+// Grouping + chunking (exported for testing)
+// ---------------------------------------------------------------------------
+
+export interface ClaimGroupEntry {
+  resourceKey: string;
+  resourceId: string | null;
+  claimIds: number[];
+}
+
+/**
+ * Group inserted claims by resource_id (or by source_url when resource_id is null),
+ * then chunk each group into slices of maxPerJob.
+ *
+ * Returns one entry per chunk — each becomes a verification job.
+ */
+export function groupAndChunkClaims(
+  insertedClaims: Array<{ id: number; resource_id: string | null; source_url: string }>,
+  maxPerJob: number = MAX_CLAIMS_PER_JOB,
+): ClaimGroupEntry[] {
+  if (maxPerJob <= 0) {
+    throw new Error(`maxPerJob must be positive, got ${maxPerJob}`);
+  }
+
+  // Group by resource_id, falling back to \0url:<source_url> for null resource_id.
+  // The \0 prefix prevents collision with legitimate resource_ids starting with "url:".
+  const NO_RESOURCE_PREFIX = "\0url:";
+  const claimsByResource = new Map<string, number[]>();
+  for (const row of insertedClaims) {
+    const key = row.resource_id ?? `${NO_RESOURCE_PREFIX}${row.source_url}`;
+    const group = claimsByResource.get(key);
+    if (group) group.push(row.id);
+    else claimsByResource.set(key, [row.id]);
+  }
+
+  // Chunk each group
+  const entries: ClaimGroupEntry[] = [];
+  for (const [resourceKey, claimIds] of claimsByResource) {
+    const resourceId = resourceKey.startsWith(NO_RESOURCE_PREFIX) ? null : resourceKey;
+    for (let i = 0; i < claimIds.length; i += maxPerJob) {
+      entries.push({
+        resourceKey,
+        resourceId,
+        claimIds: claimIds.slice(i, i + maxPerJob),
+      });
+    }
+  }
+
+  return entries;
+}
 
 function formatClaim(row: ProposedClaimRow) {
   return {
@@ -147,7 +202,7 @@ const claimsApp = new Hono()
           ${claims.map(() => "pending")}::text[],
           ${claims.map(() => agentSessionId ?? null)}::text[]
         )
-        RETURNING id, resource_id
+        RETURNING id, resource_id, source_url
       `;
 
       if (insertedClaims.length !== claims.length) {
@@ -157,20 +212,12 @@ const claimsApp = new Hono()
         );
       }
 
-      // 3. Group claims by resource_id → one verification job per resource
-      const claimsByResource = new Map<string, number[]>();
-      for (const row of insertedClaims) {
-        const key = row.resource_id ?? "__no_resource__";
-        const group = claimsByResource.get(key);
-        if (group) group.push(row.id);
-        else claimsByResource.set(key, [row.id]);
-      }
+      // 3-4. Group claims by resource and chunk into job-sized batches
+      const chunks = groupAndChunkClaims(insertedClaims, MAX_CLAIMS_PER_JOB);
 
-      // 4. Create verification jobs (one per resource group)
-      for (const [resourceKey, claimIds] of claimsByResource) {
-        const resourceId = resourceKey === "__no_resource__" ? null : resourceKey;
+      for (const { claimIds: chunk, resourceId } of chunks) {
         const jobParams = {
-          claimIds,
+          claimIds: chunk,
           resourceId,
           batchId,
           entityId: entityId ?? null,
@@ -188,7 +235,7 @@ const claimsApp = new Hono()
         `;
 
         if (jobRows.length > 0) {
-          jobEntries.push({ claimIds, resourceId, jobId: jobRows[0].id });
+          jobEntries.push({ claimIds: chunk, resourceId, jobId: jobRows[0].id });
         }
       }
 
@@ -210,7 +257,7 @@ const claimsApp = new Hono()
       }
     }
 
-    const estimatedVerificationTime = jobEntries.length * SECONDS_PER_CLAIM_ESTIMATE;
+    const estimatedVerificationTime = insertedClaims.length * SECONDS_PER_CLAIM_ESTIMATE;
 
     return c.json(
       {
@@ -264,7 +311,7 @@ const claimsApp = new Hono()
       return validationError(c, "Missing required query parameter: ids");
     }
 
-    const ids = idsParam.split(",").map(Number).filter((n) => !isNaN(n) && n > 0);
+    const ids = idsParam.split(",").map(Number).filter((n) => Number.isInteger(n) && n > 0);
     if (ids.length === 0) {
       return validationError(c, "No valid IDs provided");
     }
