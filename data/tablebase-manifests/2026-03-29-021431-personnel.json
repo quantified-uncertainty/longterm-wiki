@@ -1,0 +1,97 @@
+{
+  "table": "personnel",
+  "recordCount": 10,
+  "submittedAt": "2026-03-29T02:14:31.750Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 10,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "rgs4cvleCM",
+      "personId": "M6ich7O0hs",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Co-Executive Director",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "LXBAxugugC",
+      "personId": "6cKWRjZNPx",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Co-Executive Director",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "PdCTIjASCH",
+      "personId": "DDOJG5T6Xx",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Executive Director",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "GKnoMA4Mwz",
+      "personId": "B8xHWhDLJQ",
+      "organizationId": "DHWH2M0Ega",
+      "role": "COO",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "We0nQUdh4g",
+      "personId": "8jYNZyansZ",
+      "organizationId": "DHWH2M0Ega",
+      "role": "General Counsel",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "skCVWfRTWk",
+      "personId": "8CUtbwgovj",
+      "organizationId": "DHWH2M0Ega",
+      "role": "CFO",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "vwhRAMbsGT",
+      "personId": "stsArw49jd",
+      "organizationId": "DHWH2M0Ega",
+      "role": "President, Administrative Council",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "CIbf0etcVa",
+      "personId": "sYXfVqCxx9",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Asia Pacific Policy Director",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "7ZbNq4vvPt",
+      "personId": "akhZlEer3s",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Board Member",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    },
+    {
+      "id": "OgFs0WE6XD",
+      "personId": "FpV6vweeaa",
+      "organizationId": "DHWH2M0Ega",
+      "role": "Board Member",
+      "source": "https://www.accessnow.org",
+      "verdict": "none"
+    }
+  ]
+}

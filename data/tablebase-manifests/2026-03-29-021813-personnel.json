@@ -1,0 +1,113 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "submittedAt": "2026-03-29T02:18:13.780Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 12,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "kxlbRhmjYN",
+      "personId": "jVmO8PWHQ8",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "CEO",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "hgJb8XEbDQ",
+      "personId": "eg7pFW5fKW",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "President, Semiconductor Products Group",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "eaf0xNEujO",
+      "personId": "1pYD39Ensi",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "CFO",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "humXPCB379",
+      "personId": "x6eVm9pF23",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Chief Legal Officer",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "FSla4qf7nj",
+      "personId": "8jipIflPmB",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "CTO",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "lmGvUEJE2D",
+      "personId": "IAwYnvNAG7",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Chief Human Resources Officer",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "nkFWYtBe1e",
+      "personId": "t6j8G3qtCU",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Chairman of the Board",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "OAJk8gf1ZS",
+      "personId": "YPx5BA6wvQ",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "cA5zXmOLxy",
+      "personId": "Bx3zDtPylU",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "uo7ewl2M2i",
+      "personId": "tnhaYGzVh3",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "jL28YwvWvD",
+      "personId": "w9Lkdn1KAP",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "fKynz2vF5U",
+      "personId": "W0x1GKMWZJ",
+      "organizationId": "AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    }
+  ]
+}

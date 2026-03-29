@@ -1,0 +1,81 @@
+{
+  "table": "personnel",
+  "recordCount": 8,
+  "submittedAt": "2026-03-29T02:06:20.791Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 8,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "d2ntje5tpy",
+      "personId": "imdm9MttXM",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "CEO",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "XZrgW7ick9",
+      "personId": "Wgs9ReNGHe",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "Chief Scientist",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "CFmqXiTlgx",
+      "personId": "ZIo7hUEUsz",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "President",
+      "source": "https://www.cbinsights.com/company/pactum/people",
+      "verdict": "none"
+    },
+    {
+      "id": "T88GZeq9IX",
+      "personId": "2UZcYIenUS",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "CFO",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "QkFNSX9SSy",
+      "personId": "rA2DEqs3qN",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "Chief People Officer",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "VmNwWhCBpF",
+      "personId": "qGQu1F4gbr",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "Chief Revenue Officer",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "0EgFwvrrbl",
+      "personId": "yooLYmv29E",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "Chief Product Officer",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    },
+    {
+      "id": "esDIoyDoTv",
+      "personId": "cGzH82Wkq7",
+      "organizationId": "1jmlJYFJ-9",
+      "role": "VP of Customer Solutions",
+      "source": "https://pactum.com/about",
+      "verdict": "none"
+    }
+  ]
+}
