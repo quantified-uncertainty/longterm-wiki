@@ -14,6 +14,8 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 - Every error path the code handles (`.catch()`, `try/catch`, `if (error)`) must have a test that triggers it — except intentional fire-and-forget paths documented per `error-handling.md`.
 - Test with adversarial inputs: empty strings, null/undefined, boundary values (0, -1, MAX_INT), malformed data, very large inputs.
 - No trivial assertions (`typeof result === 'object'`). Assert on specific values and shapes that would catch regressions.
+- **Test skip discipline**: No `it.skip()` without a linked GitHub issue number. Unskip in the same PR that fixes the underlying bug.
+- **Mock fidelity**: Test mocks for the same DB table must share a single in-memory store. Don't create parallel mock stores (e.g., separate `suggestResourceStore`) for different endpoints that hit the same table.
 
 **Bug fixes — TDD workflow:**
 1. Write a failing test that reproduces the bug FIRST
@@ -31,3 +33,4 @@ Before committing, re-read the diff and actively look for problems:
 3. **Race conditions**: Shared mutable state without synchronization? Assumptions about async execution order?
 4. **No TODO/FIXME without issue number**: No `// TODO`, `// HACK`, `// FIXME` in committed code without a `#<issue-number>`
 5. **Discoverability**: New feature/endpoint linked from navigation, help text, or parent pages?
+6. **Idempotency**: For job handlers and batch operations — what happens if this runs twice? Does the caller handle already-processed items (e.g., `updated < total` on retry) as success, not failure?
