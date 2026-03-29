@@ -935,7 +935,7 @@ export type ClaimJob = z.infer<typeof ClaimJobSchema>;
 
 export const CompleteJobSchema = z.object({
   result: z.record(z.unknown()).nullable().optional(),
-  cost: z.number().nonnegative().optional(),
+  cost: z.number().nonnegative().finite().max(999999.9999).optional(),
 });
 export type CompleteJob = z.infer<typeof CompleteJobSchema>;
 

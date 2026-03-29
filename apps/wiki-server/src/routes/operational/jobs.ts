@@ -84,6 +84,11 @@ const jobsApp = new Hono()
       const parsed = CreateJobBatchSchema.safeParse(body);
       if (!parsed.success) return validationError(c, parsed.error.message);
 
+      // Dedup key handling is not supported in batch creation
+      if (parsed.data.some((j) => j.dedupKey)) {
+        return validationError(c, "dedupKey is not supported in batch creation; use single-job creation instead");
+      }
+
       const rows = await db
         .insert(jobs)
         .values(
@@ -183,10 +188,30 @@ const jobsApp = new Hono()
          LIMIT 1`,
         [d.dedupKey]
       );
-      return c.json(
-        { ...formatRawJobRow(existingRetry[0] as Record<string, unknown>), dedupExisting: true },
-        200
-      );
+
+      if (existingRetry.length > 0) {
+        return c.json(
+          { ...formatRawJobRow(existingRetry[0] as Record<string, unknown>), dedupExisting: true },
+          200
+        );
+      }
+
+      // Extreme race: conflicting job completed between both attempts.
+      // The dedup conflict is gone, so just insert normally.
+      const finalRows = await db
+        .insert(jobs)
+        .values({
+          type: d.type,
+          params: d.params ?? null,
+          priority: d.priority,
+          maxRetries: d.maxRetries,
+          dedupKey: d.dedupKey ?? null,
+          parentJobId: d.parentJobId ?? null,
+          runAfter: d.runAfter ? new Date(d.runAfter) : null,
+        })
+        .returning();
+
+      return c.json(formatJob(firstOrThrow(finalRows, "dedup fallback insert")), 201);
     }
 
     const rows = await db

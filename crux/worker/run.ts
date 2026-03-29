@@ -29,7 +29,7 @@ import { join } from 'path';
 import { createServer, type Server } from 'http';
 import { getHandler, isKnownType, getRegisteredTypes } from '../lib/job-handlers/index.ts';
 import {
-  claimJob, startJob, completeJob, failJob,
+  claimJob, startJob, completeJob, failJob, cancelJob,
   createJob, sweepJobs,
 } from '../lib/wiki-server/jobs.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
@@ -151,6 +151,16 @@ function startHealthServer(): void {
     }
   });
 
+  healthServer.on('error', (err: NodeJS.ErrnoException) => {
+    if (err.code === 'EADDRINUSE') {
+      console.warn(`[worker] Health port ${healthPort} already in use, continuing without health endpoint`);
+      healthServer = null;
+    } else {
+      console.error(`[worker] Health server error: ${err.message}`);
+      healthServer = null;
+    }
+  });
+
   healthServer.listen(healthPort, () => {
     console.log(`[worker] Health endpoint listening on port ${healthPort}`);
   });
@@ -214,6 +224,8 @@ function startHeartbeat(): void {
 // ---------------------------------------------------------------------------
 // Memory watchdog
 // ---------------------------------------------------------------------------
+
+const HANDLER_TIMEOUT_MS = 15 * 60 * 1000; // 15 minutes
 
 const MAX_RSS_MB = parseInt(process.env.WORKER_MAX_RSS_MB ?? '768', 10);
 
@@ -365,6 +377,14 @@ async function runSmokeTest(workerId: string): Promise<void> {
   const claimedId = claimResult.data.job.id;
   console.log(`[worker] Smoke test: claimed job #${claimedId}`);
 
+  // C2: Verify we claimed the correct job (queue interference detection)
+  if (claimedId !== jobId) {
+    console.error(`[worker] Smoke test FAILED: queue interference — expected job #${jobId}, got #${claimedId}`);
+    await failJob(claimedId, 'Accidentally claimed by smoke test').catch(() => {});
+    await cancelJob(jobId).catch(() => {});
+    process.exit(1);
+  }
+
   // 3. Start it
   const startResult = await startJob(claimedId);
   if (!startResult.ok) {
@@ -376,16 +396,26 @@ async function runSmokeTest(workerId: string): Promise<void> {
   const handler = getHandler('ping');
   if (!handler) {
     console.error('[worker] Smoke test FAILED: ping handler not registered');
+    await failJob(claimedId, 'ping handler not registered').catch(() => {});
     process.exit(1);
   }
 
-  const handlerResult = await handler(
-    { smokeTest: true },
-    { workerId, projectRoot: join(import.meta.dirname ?? process.cwd(), '..'), verbose: false },
-  );
+  let handlerResult;
+  try {
+    handlerResult = await handler(
+      { smokeTest: true },
+      { workerId, projectRoot: join(import.meta.dirname ?? process.cwd(), '..'), verbose: false },
+    );
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err.message : String(err);
+    console.error(`[worker] Smoke test FAILED: handler threw: ${error}`);
+    await failJob(claimedId, `Smoke test handler exception: ${error}`).catch(() => {});
+    process.exit(1);
+  }
 
   if (!handlerResult.success) {
     console.error(`[worker] Smoke test FAILED: handler error: ${handlerResult.error}`);
+    await failJob(claimedId, handlerResult.error ?? 'Handler returned failure').catch(() => {});
     process.exit(1);
   }
 
@@ -433,19 +463,24 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
   consecutiveFailures = 0; // Successful claim
 
   const jobId = claimed.id;
+  // C1: Set tracking state immediately after claim to prevent SIGTERM race condition.
+  // If SIGTERM arrives between claim and here, the job would be abandoned without this.
+  currentJobId = jobId;
+  jobsInFlight++;
+
   const jobType = claimed.type;
   const jobParams = (claimed.params ?? {}) as Record<string, unknown>;
 
   console.log(`[worker] Claimed job #${jobId} (type: ${jobType})`);
-  currentJobId = jobId;
-  jobsInFlight++;
 
   try {
-    // Mark as running -- if this fails (e.g. job was cancelled), skip execution
+    // Mark as running -- if this fails (e.g. job was cancelled), fail the job back
     const startResult = await startJob(jobId);
     if (!startResult.ok) {
       console.error(`[worker] Failed to start job #${jobId}: ${startResult.message}`);
-      return 'processed'; // Job was claimed but couldn't start -- continue to next
+      totalFailed++;
+      await reportJobResult(jobId, false, null, `Failed to start: ${startResult.message}`);
+      return 'processed';
     }
 
     // Look up the handler
@@ -454,6 +489,7 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
     if (!handler) {
       const msg = `Unknown job type: ${jobType}. Known types: ${getRegisteredTypes().join(', ')}`;
       console.error(`[worker] ${msg}`);
+      totalFailed++;
       await reportJobResult(jobId, false, null, msg);
       return 'processed';
     }
@@ -462,7 +498,15 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
     const context: JobHandlerContext = { workerId, projectRoot, verbose };
 
     try {
-      const result = await handler(jobParams, context);
+      const result = await Promise.race([
+        handler(jobParams, context),
+        new Promise<never>((_, reject) =>
+          setTimeout(
+            () => reject(new Error(`Handler timed out after ${HANDLER_TIMEOUT_MS / 1000}s`)),
+            HANDLER_TIMEOUT_MS,
+          )
+        ),
+      ]);
 
       if (result.success) {
         console.log(`[worker] Job #${jobId} completed successfully`);
@@ -584,7 +628,12 @@ async function runWorker(config: WorkerConfig): Promise<void> {
 // Cleanup
 // ---------------------------------------------------------------------------
 
+let cleanupDone = false;
+
 async function cleanup(): Promise<void> {
+  if (cleanupDone) return;
+  cleanupDone = true;
+
   // Clear heartbeat
   if (heartbeatInterval) {
     clearInterval(heartbeatInterval);
@@ -600,8 +649,8 @@ async function cleanup(): Promise<void> {
     });
   }
 
-  // Close health server
-  if (healthServer) {
+  // Close health server (null-check: may have been cleared by EADDRINUSE handler)
+  if (healthServer != null) {
     healthServer.close();
     healthServer = null;
   }
