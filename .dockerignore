@@ -1,0 +1,16 @@
+# Exclude heavy directories from Docker build context
+.git
+node_modules
+content
+data
+apps/web/.next
+apps/web/node_modules
+apps/wiki-server/node_modules
+apps/groundskeeper/node_modules
+apps/discord-bot/node_modules
+packages/factbase/node_modules
+.claude
+*.md
+!docker/**/*.md
+.env*
+.agent-slot
