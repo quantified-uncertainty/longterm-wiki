@@ -65,7 +65,7 @@ fi
 
 Print this message and run the review:
 
-```
+```text
 ═══════════════════════════════════════════════════════════════
   Running /agent-review-pr (adaptive — intensity scales to PR size)
   [N] files changed, [M] lines

@@ -7,7 +7,7 @@ effort: high
 
 This skill triages the current branch's changes, builds a verification plan from a menu of steps, and executes everything that applies. The bias is always toward **doing more verification, not less** — when in doubt about whether a step applies, include it.
 
-**When to use:** Before shipping any PR. Called automatically by `/agent-ship` for large PRs, but valuable at any size.
+**When to use:** Before shipping any PR. Called automatically by `/agent-ship` for all code PRs, with verification intensity scaled to PR size and risk.
 
 ---
 
@@ -44,7 +44,7 @@ Count the metrics:
 
 Select steps from the menu below. **The default is to INCLUDE a step** — only exclude if clearly irrelevant (e.g., no .tsx files means skip UI testing). Print the plan before executing:
 
-```
+```text
 ═══════════════════════════════════════════════════════════════
   REVIEW PLAN — [N] files changed, [M] lines, categories: [X, Y, Z]
 ═══════════════════════════════════════════════════════════════
@@ -169,7 +169,7 @@ After simplifications, re-run `pnpm test` and `pnpm build` to verify nothing bro
 Grep for new exports in the diff:
 
 ```bash
-git diff main...HEAD | grep -E '^\+.*(export (default |)(function|const|class|async function)|export \{)' | grep -v '\.test\.' | grep -v '\.spec\.'
+git diff main...HEAD | grep -E '^\+.*(export (default |)(function|const|class|async function)|export \{|export \*)' | grep -v '\.test\.' | grep -v '\.spec\.'
 ```
 
 For each new exported function/class:
@@ -347,7 +347,7 @@ This file is gitignored. It persists for the life of the session and is read by 
 
 Summarize the review with:
 
-```
+```text
 ═══════════════════════════════════════════════════════════════
   REVIEW COMPLETE
 ═══════════════════════════════════════════════════════════════
