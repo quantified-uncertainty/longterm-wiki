@@ -335,15 +335,14 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'mdx-compile',
-    name: 'MDX compilation smoke-test (advisory)',
+    name: 'MDX compilation smoke-test',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-mdx-compile.ts', '--quick'],
     cwd: PROJECT_ROOT,
-    // Fail-open: MDX compilation catches rendering issues that aren't
-    // syntax errors. Some pages have known compilation warnings that don't
-    // affect production rendering. The full Next.js build (--full mode)
-    // is the authoritative compilation check.
-    advisory: true,
+    // Blocking: MDX compilation errors broke main 4 times in the week of
+    // 2026-03-23 (#3275, #3280, #3285, #3307). Promoting to blocking
+    // catches these before push. If false positives appear, add specific
+    // exclusions in validate-mdx-compile.ts rather than demoting back to advisory.
   },
   {
     id: 'component-refs',
