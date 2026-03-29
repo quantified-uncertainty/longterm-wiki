@@ -60,12 +60,14 @@ Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs a
      PRBODY
 
      # Option B: write body to file first, then use --body-file:
-     # IMPORTANT: use >| (force-overwrite) not > — zsh noclobber silently blocks > if the file exists
-     cat >| /tmp/pr-body.md <<'PRBODY'
+     # Use mktemp to avoid collisions between concurrent agents in different slots
+     PR_BODY=$(mktemp /tmp/pr-body-XXXXXX.md)
+     cat >| "$PR_BODY" <<'PRBODY'
      ## Summary
      ...
      PRBODY
-     pnpm crux gh pr create --title="<descriptive title>" --body-file=/tmp/pr-body.md
+     pnpm crux gh pr create --title="<descriptive title>" --body-file="$PR_BODY"
+     rm -f "$PR_BODY"
      ```
      **After creating, always run `pnpm crux gh pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.

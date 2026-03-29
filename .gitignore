@@ -59,6 +59,7 @@ coverage/
 .claude/issue-creates.json
 .claude/agent-id
 .claude/active-branch
+.claude/session.pid
 .claude/last-heartbeat
 .claude/review-done
 .claude/worktree-cleanup.log

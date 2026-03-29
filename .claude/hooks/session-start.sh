@@ -18,6 +18,22 @@ cd "$REPO_ROOT"
 CONTEXT_LINES=()
 WARNINGS=()
 
+# ─── 0pre. Concurrent session detection ──────────────────────────────────────────
+# Check if another Claude session is already running in this slot.
+# Uses a PID lock file — if the PID is still alive, warn about concurrent access.
+
+LOCK_FILE="$REPO_ROOT/.claude/session.pid"
+if [ -f "$LOCK_FILE" ]; then
+  OLD_PID=$(cat "$LOCK_FILE" 2>/dev/null | tr -d '[:space:]')
+  if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
+    WARNINGS+=("CONCURRENT SESSION DETECTED: Another Claude session (PID ${OLD_PID}) is already running in this slot!")
+    WARNINGS+=("Running two sessions in the same directory causes git conflicts and file corruption.")
+    WARNINGS+=("Either stop the other session or use a different slot.")
+  fi
+fi
+# Write current parent PID (the Claude process that invoked this hook)
+echo "$$" > "$LOCK_FILE"
+
 # ─── 0. Clear stale checklist from previous session ─────────────────────────────
 # This hook only fires on fresh "startup" (not resume), so removing the checklist
 # forces the new session to run `crux sys agent-checklist init` before editing code.
