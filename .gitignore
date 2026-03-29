@@ -44,6 +44,9 @@ coverage/
 # Knowledge cache
 .cache/
 
+# Agent workspace slot marker (per-clone, written by `crux agent-workspace setup`)
+.agent-slot
+
 # Claude Code temp files
 .claude/temp/
 .claude/plan.md
