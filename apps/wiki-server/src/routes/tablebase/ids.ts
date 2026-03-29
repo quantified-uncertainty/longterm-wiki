@@ -19,7 +19,7 @@ import {
 function generateStableId(): string {
   const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
   const raw = randomBytes(7).toString("base64url").slice(0, 10);
-  return raw
+  const bare = raw
     .split("")
     .map((ch) => {
       if (ch === "-" || ch === "_") {
@@ -29,6 +29,7 @@ function generateStableId(): string {
       return ch;
     })
     .join("");
+  return "sid_" + bare;
 }
 
 // ---- Helpers ----

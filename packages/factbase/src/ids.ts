@@ -36,13 +36,21 @@ function randomAlphanumeric10(): string {
 }
 
 /**
- * Returns a random 10-character alphanumeric string suitable for use as an
- * entity ID or fact ID. Survives renames because it is purely random.
+ * Returns a random sid_-prefixed alphanumeric string (14 chars total)
+ * suitable for use as an entity stableId.
  *
  * @example
- * generateId() // "a3Kf2rZ9mQ"
+ * generateId() // "sid_a3Kf2rZ9mQ"
  */
 export function generateId(): string {
+  return "sid_" + randomAlphanumeric10();
+}
+
+/**
+ * Returns a bare random 10-character alphanumeric string.
+ * Used internally for fact IDs and content hashes (not entity stableIds).
+ */
+function bareRandomId(): string {
   return randomAlphanumeric10();
 }
 
@@ -62,7 +70,7 @@ export function generateStableId(): string {
  * generateFactId() // "a3Kf2rZ9mQ"
  */
 export function generateFactId(): string {
-  return generateId();
+  return bareRandomId();
 }
 
 /**
