@@ -1835,7 +1835,7 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: sid_conjecture
+    - id: conjecture
       type: organization
     - id: sid_CrXoCsIucX
       type: person
@@ -6589,7 +6589,7 @@
     - yc-backed
   lastUpdated: 2026-03
 
-- id: sid_storyworth
+- id: storyworth
   stableId: sid_kT85f91plA
   type: organization
   orgType: startup
@@ -7098,7 +7098,7 @@
 
 # --- AI for Legislation & Regulatory Intelligence ---
 
-- id: sid_fiscalnote
+- id: fiscalnote
   stableId: sid_hrCbRXB4rg
   wikiId: E2006
   type: organization
@@ -7222,7 +7222,7 @@
     - legal-informatics
   lastUpdated: 2026-03
 
-- id: sid_legislaide
+- id: legislaide
   stableId: sid_dy97FfG3Mw
   wikiId: E2012
   type: organization
@@ -8462,7 +8462,7 @@
     Whittaker (former Google, AI Now co-founder) as president.
   lastUpdated: 2026-03
 
-- id: sid_eleutherai
+- id: eleutherai
   stableId: sid_FnlNF9s98n
   type: organization
   orgType: generic

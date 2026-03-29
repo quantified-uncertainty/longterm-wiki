@@ -788,7 +788,7 @@
     - id: uma-optimistic-oracle
       type: project
       relationship: composed-of
-    - id: sid_polymarket
+    - id: polymarket
       type: organization
       relationship: related
 
@@ -1012,7 +1012,7 @@
   clusters:
     - governance
 
-- id: sid_coordinape
+- id: coordinape
   stableId: sid_kNDqBGHQCx
   type: organization
   orgType: startup
@@ -1029,7 +1029,7 @@
   clusters:
     - governance
 
-- id: sid_superfluid
+- id: superfluid
   stableId: sid_15dGe0oPW8
   type: organization
   orgType: startup
@@ -1125,7 +1125,7 @@
     - id: louis-rosenberg
       type: person
       relationship: leads-to
-    - id: sid_thinkscape
+    - id: thinkscape
       type: project
       relationship: composed-of
   sources:
@@ -1242,7 +1242,7 @@
       type: project
       relationship: composed-of
 
-- id: sid_citizenlab
+- id: citizenlab
   stableId: sid_6PfhPgDIZg
   type: organization
   orgType: startup
@@ -2303,7 +2303,7 @@
       type: organization
       relationship: related
 
-- id: sid_thinkscape
+- id: thinkscape
   stableId: sid_Xqg9cb8glL
   type: project
   title: ThinkScape

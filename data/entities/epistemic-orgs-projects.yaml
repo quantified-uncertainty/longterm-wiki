@@ -38,7 +38,7 @@
     - id: metaforecast
       type: project
       relationship: related
-    - id: sid_squiggleai
+    - id: squiggleai
       type: project
       relationship: related
     - id: roastmypost
@@ -145,7 +145,7 @@
   lastUpdated: 2026-01
   summaryPage: epistemic-tools-tools-overview
 
-- id: sid_squiggleai
+- id: squiggleai
   stableId: sid_8slnDr4emg
   wikiId: E287
   type: project
@@ -174,7 +174,7 @@
     - id: squiggle
       type: project
       relationship: related
-    - id: sid_squiggleai
+    - id: squiggleai
       type: project
       relationship: related
   lastUpdated: 2026-03
@@ -242,7 +242,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 
-- id: sid_grokipedia
+- id: grokipedia
   stableId: sid_2QDkp6k5pw
   wikiId: E682
   type: project

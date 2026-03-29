@@ -732,7 +732,7 @@
       type: organization
     - id: sid_t0p43V5oLA
       type: organization
-    - id: sid_sycophancy
+    - id: sycophancy
       type: risk
     - id: sid_rt6jVH9yuA
       type: approach
@@ -762,7 +762,7 @@
   relatedEntries:
     - id: sid_MUGUxfl2YA
       type: risk
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
     - id: sid_AaAOkTHkug
       type: risk
@@ -1258,7 +1258,7 @@
       type: approach
   lastUpdated: 2026-02
 
-- id: sid_optimistic
+- id: optimistic
   stableId: sid_VhzJsfCVOA
   wikiId: E506
   type: concept

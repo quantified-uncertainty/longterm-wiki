@@ -519,7 +519,7 @@
     - title: "Program Synthesis with Large Language Models"
       url: "https://arxiv.org/abs/2108.07732"
 
-- id: sid_truthfulqa
+- id: truthfulqa
   stableId: sid_Jm5rPa1cUe
   type: benchmark
   title: TruthfulQA
@@ -533,7 +533,7 @@
     - title: "TruthfulQA: Measuring How Models Mimic Human Falsehoods"
       url: "https://arxiv.org/abs/2109.07958"
 
-- id: sid_winogrande
+- id: winogrande
   stableId: sid_Yt8nKb6hWf
   type: benchmark
   title: WinoGrande
@@ -650,7 +650,7 @@
   introducedDate: "2024-10"
   maintainer: "OpenAI"
 
-- id: sid_browsecomp
+- id: browsecomp
   stableId: sid_Ev2hLr7sMa
   type: benchmark
   title: BrowseComp

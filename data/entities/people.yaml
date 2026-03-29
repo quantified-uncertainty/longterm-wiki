@@ -709,7 +709,7 @@
   relatedEntries:
     - id: sid_rt6jVH9yuA
       type: approach
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
     - id: sid_MUGUxfl2YA
       type: risk
@@ -796,7 +796,7 @@
   relatedEntries:
     - id: sid_KDYvrwkgtw
       type: organization
-    - id: sid_samotsvety
+    - id: samotsvety
       type: organization
     - id: sid_BEKEqQDmkQ
       type: organization

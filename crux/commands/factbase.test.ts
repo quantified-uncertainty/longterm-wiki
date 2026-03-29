@@ -28,7 +28,7 @@ describe('crux kb list', () => {
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
     expect(result.output).toContain('organization');
-    expect(result.output).toContain('mK9pX3rQ7n');
+    expect(result.output).toContain('sid_mK9pX3rQ7n');
     expect(result.output).toContain('Total:');
   }, 30_000);
 
@@ -56,7 +56,7 @@ describe('crux kb show', () => {
     const result = await commands.show(['anthropic'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
-    expect(result.output).toContain('mK9pX3rQ7n');
+    expect(result.output).toContain('sid_mK9pX3rQ7n');
     expect(result.output).toContain('organization');
     expect(result.output).toContain('Facts');
     expect(result.output).toContain('Revenue');
@@ -75,7 +75,7 @@ describe('crux kb show', () => {
     expect(result.exitCode).toBe(0);
     // Ref values show as "Name (entityId)"
     expect(result.output).toContain('Anthropic');
-    expect(result.output).toContain('mK9pX3rQ7n');
+    expect(result.output).toContain('sid_mK9pX3rQ7n');
   }, 30_000);
 
   it('shows birth year without comma separator', async () => {
@@ -108,7 +108,7 @@ describe('crux kb show', () => {
 
 describe('crux kb lookup', () => {
   it('looks up a known stableId', async () => {
-    const result = await commands.lookup(['mK9pX3rQ7n'], {});
+    const result = await commands.lookup(['sid_mK9pX3rQ7n'], {});
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('Anthropic');
   }, 30_000);
@@ -150,7 +150,7 @@ describe('resolveEntityArg', () => {
   });
 
   it('resolves by stableId', () => {
-    const entity = resolveEntityArg('mK9pX3rQ7n', kb);
+    const entity = resolveEntityArg('sid_mK9pX3rQ7n', kb);
     expect(entity).toBeDefined();
     expect(entity!.name).toBe('Anthropic');
   });
@@ -276,7 +276,7 @@ facts:
 facts:
   - id: f_existing123
     property: employed-by
-    value: !ref mK9pX3rQ7n:anthropic
+    value: !ref sid_mK9pX3rQ7n:anthropic
   - id: f_existing456
     property: birth-year
     value: !date 1983
@@ -290,7 +290,7 @@ facts:
 
     const result = readFileSync(filePath, 'utf-8');
     // Custom tags should be preserved
-    expect(result).toContain('!ref mK9pX3rQ7n:anthropic');
+    expect(result).toContain('!ref sid_mK9pX3rQ7n:anthropic');
     expect(result).toContain('!date 1983');
   });
 

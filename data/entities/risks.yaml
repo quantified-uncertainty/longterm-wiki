@@ -134,7 +134,7 @@
     - label: Status
       value: Widespread
   relatedEntries:
-    - id: sid_sycophancy
+    - id: sycophancy
       type: risk
     - id: sid_13OO6CP98g
       type: risk
@@ -505,7 +505,7 @@
     - label: Status
       value: Active development by state actors
   relatedEntries:
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
     - id: sid_cm5KEblCZg
       type: risk
@@ -960,7 +960,7 @@
       type: risk
     - id: sid_9ToBZjhsVg
       type: risk
-    - id: sid_sycophancy
+    - id: sycophancy
       type: risk
   sources:
     - title: The Age of Surveillance Capitalism
@@ -1915,7 +1915,7 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
     - id: sid_7c6UC46TWQ
       type: risk
@@ -2088,7 +2088,7 @@
       type: research-area
     - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: sid_sycophancy
+    - id: sycophancy
       type: risk
   sources:
     - title: Specification Gaming Examples
@@ -2605,7 +2605,7 @@
       type: risk
     - id: sid_aE60G9uLyA
       type: risk
-    - id: sid_sandboxing
+    - id: sandboxing
       type: approach
   sources:
     - title: Concrete scenarios for agentic AI takeover

@@ -257,7 +257,7 @@
     - id: sid_9XN9QMfecA
       type: risk
       relationship: analyzes
-    - id: sid_sycophancy
+    - id: sycophancy
       type: risk
       relationship: example
     - id: sid_rSE7kY5k4Q
@@ -419,7 +419,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
       relationship: related
   tags:
@@ -443,7 +443,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
       relationship: related
   tags:
@@ -466,7 +466,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
       relationship: related
   tags:

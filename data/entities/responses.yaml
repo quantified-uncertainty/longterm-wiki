@@ -1205,7 +1205,7 @@
       type: risk
     - id: sid_Pr5xmThNfA
       type: risk
-    - id: sid_bioweapons
+    - id: bioweapons
       type: risk
     - id: sid_7c6UC46TWQ
       type: risk
@@ -3270,7 +3270,7 @@
       type: approach
   lastUpdated: 2026-02
 
-- id: sid_evaluation
+- id: evaluation
   stableId: sid_Fvlh8Exefg
   wikiId: E447
   type: approach
@@ -3934,15 +3934,15 @@
   relatedEntries:
     - id: sid_SpFgTz2INg
       type: policy
-    - id: sid_thresholds
+    - id: thresholds
       type: concept
-    - id: sid_monitoring
+    - id: monitoring
       type: approach
     - id: sid_uvwmYLYstg
       type: concept
   lastUpdated: 2026-02
 
-- id: sid_monitoring
+- id: monitoring
   stableId: sid_BU00lGYGAw
   wikiId: E464
   type: approach
@@ -3965,7 +3965,7 @@
   relatedEntries:
     - id: sid_SpFgTz2INg
       type: policy
-    - id: sid_thresholds
+    - id: thresholds
       type: concept
     - id: sid_uvwmYLYstg
       type: concept
@@ -4000,7 +4000,7 @@
       type: approach
     - id: international-regimes
       type: concept
-    - id: sid_monitoring
+    - id: monitoring
       type: approach
     - id: export-controls
       type: policy
@@ -4116,7 +4116,7 @@
       url: https://github.com/chipsalliance/Caliptra
   lastUpdated: 2026-03
 
-- id: sid_thresholds
+- id: thresholds
   stableId: sid_3OTN6TAzhw
   wikiId: E465
   type: concept
@@ -4143,7 +4143,7 @@
       type: policy
     - id: sid_SpFgTz2INg
       type: policy
-    - id: sid_monitoring
+    - id: monitoring
       type: approach
     - id: sid_uvwmYLYstg
       type: concept
@@ -4701,9 +4701,9 @@
       type: policy
     - id: sid_SpFgTz2INg
       type: policy
-    - id: sid_thresholds
+    - id: thresholds
       type: concept
-    - id: sid_monitoring
+    - id: monitoring
       type: approach
     - id: sid_aCEdTooCBw
       type: policy
@@ -5059,7 +5059,7 @@
       type: research-area
   lastUpdated: 2026-02
 
-- id: sid_sandboxing
+- id: sandboxing
   stableId: sid_yycfp6INgw
   wikiId: E485
   type: approach
@@ -5117,7 +5117,7 @@
   relatedEntries:
     - id: sid_Pr5xmThNfA
       type: risk
-    - id: sid_sandboxing
+    - id: sandboxing
       type: approach
     - id: sid_1LcLlMGLbw
       type: organization
@@ -5147,7 +5147,7 @@
     - governance
     - cyber
   relatedEntries:
-    - id: sid_sandboxing
+    - id: sandboxing
       type: approach
     - id: sid_95ASV0XEwQ
       type: capability
