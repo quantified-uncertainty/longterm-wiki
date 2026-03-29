@@ -903,6 +903,9 @@ export const CreateJobSchema = z.object({
   params: z.record(z.unknown()).nullable().optional(),
   priority: z.number().int().min(0).max(1000).default(0),
   maxRetries: z.number().int().min(0).max(10).default(3),
+  dedupKey: z.string().max(200).optional(),
+  parentJobId: z.number().int().positive().optional(),
+  runAfter: z.string().datetime().optional(),
 });
 /** Output type (server-resolved, defaults applied). */
 export type CreateJob = z.infer<typeof CreateJobSchema>;
@@ -925,12 +928,14 @@ export type ListJobsQuery = z.infer<typeof ListJobsQuerySchema>;
 
 export const ClaimJobSchema = z.object({
   type: z.string().min(1).max(100).optional(),
+  types: z.array(z.string().min(1).max(100)).optional(),
   workerId: z.string().min(1).max(200),
 });
 export type ClaimJob = z.infer<typeof ClaimJobSchema>;
 
 export const CompleteJobSchema = z.object({
   result: z.record(z.unknown()).nullable().optional(),
+  cost: z.number().nonnegative().finite().max(999999.9999).optional(),
 });
 export type CompleteJob = z.infer<typeof CompleteJobSchema>;
 
