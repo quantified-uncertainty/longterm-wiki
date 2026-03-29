@@ -174,7 +174,7 @@ export default async function OrgProfilePage({
   // ── Fetch PG data (personnel + market data + grants) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
   const [pgPersonnelRows, marketData, pgGrantsData] = await Promise.all([
-    fetchPgPersonnel(entity.id),
+    fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
       `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?limit=500&offset=0`,
