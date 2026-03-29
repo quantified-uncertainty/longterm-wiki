@@ -117,7 +117,31 @@ async function loadFromApi(): Promise<FetchResult<ProjectsPageData>> {
 
   if (!result.ok) return result;
 
-  const rows = result.data.entities.map(apiEntityToRow);
+  // Deduplicate entities by title. The PG entities table can contain stale
+  // rows where the slug was reassigned — the old row's id is set to its
+  // stableId (a hash-like string) and both the old and new rows appear.
+  // Keep the row with a slug-style id (contains hyphens) over hash-style ids,
+  // or the one with a wikiId, or the first one seen.
+  const seen = new Map<string, DirectoryEntity>();
+  for (const e of result.data.entities) {
+    const key = e.title.toLowerCase().trim();
+    const existing = seen.get(key);
+    if (!existing) {
+      seen.set(key, e);
+      continue;
+    }
+    // Prefer slug-style ids (contain hyphens) over hash-style ids
+    const hasSlugId = (ent: DirectoryEntity) => ent.id.includes("-");
+    const hasWikiId = (ent: DirectoryEntity) => ent.wikiId != null;
+    if (
+      (!hasSlugId(existing) && hasSlugId(e)) ||
+      (!hasWikiId(existing) && hasWikiId(e))
+    ) {
+      seen.set(key, e);
+    }
+  }
+
+  const rows = Array.from(seen.values()).map(apiEntityToRow);
   const stats = buildStats(rows);
 
   return { ok: true, data: { rows, stats } };

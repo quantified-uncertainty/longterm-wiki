@@ -1,3 +1,8 @@
+---
+description: Enrich structured data (personnel, funding, investments, benchmarks) using subscription mode.
+effort: medium
+---
+
 # TableBase Enrich (Subscription Mode)
 
 Enrich structured data (personnel, funding rounds, investments, benchmarks) using the subscription instead of API billing. Processes up to 5 tasks per invocation.

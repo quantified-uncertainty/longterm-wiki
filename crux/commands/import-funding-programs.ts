@@ -1330,7 +1330,72 @@ async function cmdSync(dryRun: boolean) {
     );
   }
 
+  // Pre-sync duplicate check: detect (orgId, name) collisions within the batch.
+  // Different idSeeds can generate different IDs for the same program, which
+  // would bypass the server's ON CONFLICT (id) upsert and create duplicates.
+  // The DB has a unique index on (org_id, name) as a safety net, but catching
+  // duplicates here gives a clear error message. See incident #3326.
+  const seen = new Map<string, string>(); // "orgId|name" -> first id
+  const dupes: Array<{ key: string; id1: string; id2: string }> = [];
+  for (const item of items) {
+    const key = `${item.orgId}|${item.name.toLowerCase().trim()}`;
+    const existing = seen.get(key);
+    if (existing) {
+      dupes.push({ key, id1: existing, id2: item.id });
+    } else {
+      seen.set(key, item.id);
+    }
+  }
+  if (dupes.length > 0) {
+    console.error("\nDuplicate (orgId, name) pairs detected in funding programs batch:");
+    for (const d of dupes) {
+      console.error(`  ${d.key}: ids ${d.id1} vs ${d.id2}`);
+    }
+    throw new Error(
+      `${dupes.length} duplicate funding program(s) in batch — fix idSeeds to avoid collisions`
+    );
+  }
+
   console.log(`\nSyncing ${items.length} funding programs to ${serverUrl}...`);
+
+  // Cross-check against existing server records: warn if any item would
+  // create a duplicate (orgId, name) pair with a different ID. The DB
+  // unique index blocks this, but a clear warning prevents confusion.
+  const orgIds = [...new Set(items.map(i => i.orgId))];
+  const existingByKey = new Map<string, string>(); // "orgId|name" -> existing id
+  for (const orgId of orgIds) {
+    const existing = await apiRequest<{ fundingPrograms: Array<{ id: string; orgId: string; name: string }> }>(
+      'GET',
+      `/api/funding-programs/by-org/${encodeURIComponent(orgId)}?limit=500`,
+    ).catch((e: unknown) => {
+      // Non-critical: server-side dedup check is best-effort.
+      // The DB unique index is the authoritative enforcement.
+      console.warn(`  (skipping server dedup check for org ${orgId}: ${e instanceof Error ? e.message : String(e)})`);
+      return null;
+    });
+    if (existing?.ok) {
+      for (const fp of existing.data.fundingPrograms) {
+        existingByKey.set(`${fp.orgId}|${fp.name.toLowerCase().trim()}`, fp.id);
+      }
+    }
+  }
+  if (existingByKey.size > 0) {
+    const conflicts: Array<{ name: string; newId: string; existingId: string }> = [];
+    for (const item of items) {
+      const key = `${item.orgId}|${item.name.toLowerCase().trim()}`;
+      const existingId = existingByKey.get(key);
+      if (existingId && existingId !== item.id) {
+        conflicts.push({ name: item.name, newId: item.id, existingId });
+      }
+    }
+    if (conflicts.length > 0) {
+      console.warn("\n  Warning: funding programs with matching (orgId, name) but different IDs:");
+      for (const c of conflicts) {
+        console.warn(`    "${c.name}": sync id=${c.newId}, existing id=${c.existingId}`);
+      }
+      console.warn("  These will be rejected by the DB unique constraint. Fix the idSeed or delete the old record.\n");
+    }
+  }
 
   if (dryRun) {
     console.log("  (dry run -- no data written)");

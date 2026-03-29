@@ -188,6 +188,54 @@ describe("pgPersonnelToEntries", () => {
     expect(result.entries[0].name).toBe("Alice");
     expect(result.entries[1].name).toBe("Bob Jones");
   });
+
+  it("rejects stableId in personResolvedName and counts as unresolved", () => {
+    const row = makeRow({
+      personId: "AbCdEfG12H",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: "AbCdEfG12H", // stableId leaked into display name
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("rejects stableId in person.name and counts as unresolved", () => {
+    const row = makeRow({
+      personId: "XyZ1234abc",
+      person: { entityId: null, slug: null, name: "XyZ1234abc" }, // stableId as name
+      personResolvedName: null,
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("rejects legacy hyphenated IDs like '8-JZq4lrlD'", () => {
+    const row = makeRow({
+      personId: "cEOljcVT3g",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: "8-JZq4lrlD", // legacy bug ID with hyphen
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("accepts real names that happen to be short", () => {
+    const row = makeRow({
+      personId: "li-wei",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: "Li Wei",
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(1);
+    expect(result.entries[0].name).toBe("Li Wei");
+  });
 });
 
 // ── mergePgPersonnel ──────────────────────────────────────────────────
