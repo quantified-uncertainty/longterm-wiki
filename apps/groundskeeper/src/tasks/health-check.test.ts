@@ -82,6 +82,7 @@ function makeConfig(overrides?: Partial<Config>): Config {
       snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
+      jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
     },
     ...overrides,
   };

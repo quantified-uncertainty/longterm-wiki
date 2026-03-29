@@ -31,6 +31,7 @@ function makeConfig(keep = 100): Config {
       snapshotRetention: { enabled: true, schedule: "0 3 * * *", keep },
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
+      jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
     },
   };
 }

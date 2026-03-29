@@ -24,6 +24,10 @@ interface JobRow {
   started_at: Date | null;
   completed_at: Date | null;
   worker_id: string | null;
+  dedup_key: string | null;
+  parent_job_id: number | null;
+  run_after: Date | null;
+  cost_usd: string | null;
 }
 let jobStore: JobRow[];
 
@@ -48,6 +52,10 @@ function makeJob(overrides: Partial<JobRow> = {}): JobRow {
     started_at: null,
     completed_at: null,
     worker_id: null,
+    dedup_key: null,
+    parent_job_id: null,
+    run_after: null,
+    cost_usd: null,
     ...overrides,
   };
 }
@@ -67,11 +75,56 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO jobs ----
   if (q.includes("insert into") && q.includes('"jobs"')) {
-    const COLS_PER_ROW = 7; // type, params, priority, max_retries, dedup_key, parent_job_id, run_after
-    const numRows = Math.max(1, Math.floor(params.length / COLS_PER_ROW));
+    // Extract param-to-column mapping from the VALUES clause.
+    // Drizzle lists ALL columns but uses DEFAULT for unset ones.
+    // Raw SQL (dedup path) lists only the columns with params.
+    // Parse the VALUES to find which columns have $N placeholders.
+    const colListMatch = query.match(/\(([^)]+)\)\s*values/i);
+    const valuesMatch = query.match(/values\s*\(([^)]+)\)/i);
+
+    if (colListMatch && valuesMatch) {
+      // Parse column names from both quoted ("col") and unquoted (col) formats
+      const colNames = colListMatch[1].split(',').map(c => c.trim().replace(/"/g, ''));
+      const valueSlots = valuesMatch[1].split(',').map(v => v.trim());
+      // Build a map of param index -> column name (only for $N slots, skip DEFAULT)
+      const paramColMap: string[] = [];
+      for (let si = 0; si < valueSlots.length; si++) {
+        if (valueSlots[si].startsWith('$')) {
+          paramColMap.push(colNames[si]);
+        }
+      }
+      // Number of params per row
+      const colsPerRow = paramColMap.length;
+      const numRows = Math.max(1, Math.floor(params.length / colsPerRow));
+      const rows: JobRow[] = [];
+      for (let i = 0; i < numRows; i++) {
+        const o = i * colsPerRow;
+        const overrides: Partial<JobRow> = {};
+        for (let ci = 0; ci < colsPerRow; ci++) {
+          const col = paramColMap[ci];
+          const val = params[o + ci];
+          switch (col) {
+            case 'type': overrides.type = val as string; break;
+            case 'params': overrides.params = val != null ? (typeof val === "string" ? JSON.parse(val as string) : val) : null; break;
+            case 'priority': overrides.priority = (val as number) ?? 0; break;
+            case 'max_retries': overrides.max_retries = (val as number) ?? 3; break;
+            case 'dedup_key': overrides.dedup_key = (val as string) ?? null; break;
+            case 'parent_job_id': overrides.parent_job_id = (val as number) ?? null; break;
+            case 'run_after': overrides.run_after = val != null ? new Date(val as string | number) : null; break;
+          }
+        }
+        const row = makeJob(overrides);
+        jobStore.push(row);
+        rows.push(row);
+      }
+      return rows;
+    }
+
+    // Fallback: simple 4-column layout (type, params, priority, max_retries)
+    const numRows = Math.max(1, Math.floor(params.length / 4));
     const rows: JobRow[] = [];
     for (let i = 0; i < numRows; i++) {
-      const o = i * COLS_PER_ROW;
+      const o = i * 4;
       const row = makeJob({
         type: params[o] as string,
         params: params[o + 1] != null ? (typeof params[o + 1] === "string" ? JSON.parse(params[o + 1] as string) : params[o + 1]) : null,
@@ -87,9 +140,25 @@ const dispatch: SqlDispatcher = (query, params) => {
   // ---- UPDATE jobs (claim via raw SQL with FOR UPDATE SKIP LOCKED) ----
   if (q.includes("update") && q.includes('"jobs"') && q.includes("for update skip locked")) {
     const workerId = params[0] as string;
-    const typeFilter = params.length >= 2 ? (params[1] as string) : null;
+    // Support both single type string and types array (ANY($2::text[]))
+    let typeFilter: string | null = null;
+    let typesFilter: string[] | null = null;
+    if (params.length >= 2) {
+      if (Array.isArray(params[1])) {
+        typesFilter = params[1] as string[];
+      } else {
+        typeFilter = params[1] as string;
+      }
+    }
     const pending = jobStore
-      .filter((j) => j.status === "pending" && (!typeFilter || j.type === typeFilter))
+      .filter((j) => {
+        if (j.status !== "pending") return false;
+        // Respect run_after: skip jobs not yet ready
+        if (j.run_after && j.run_after.getTime() > Date.now()) return false;
+        if (typesFilter) return typesFilter.includes(j.type);
+        if (typeFilter) return j.type === typeFilter;
+        return true;
+      })
       .sort((a, b) => b.priority - a.priority || a.created_at.getTime() - b.created_at.getTime());
 
     if (pending.length === 0) return [];
@@ -139,15 +208,31 @@ const dispatch: SqlDispatcher = (query, params) => {
       return [job];
     }
 
-    // ---- COMPLETE: params = ['completed', result_json, timestamp, jobId, 'running'] ----
+    // ---- COMPLETE ----
+    // Without cost: params = ['completed', result_json, timestamp, jobId, 'running']
+    // With cost:    params = ['completed', result_json, cost_usd, timestamp, jobId, 'running']
     if (newStatus === "completed" && q.includes('"result"')) {
-      const jobId = params[3] as number;
-      const job = jobStore.find((j) => j.id === jobId && j.status === "running");
-      if (!job) return [];
-      job.status = "completed";
-      job.result = params[1] != null ? (typeof params[1] === "string" ? JSON.parse(params[1] as string) : params[1]) : null;
-      job.completed_at = new Date(params[2] as string);
-      return [job];
+      // Check SET clause only (before WHERE) for cost_usd — RETURNING always lists all columns
+      const setClause = q.split('where')[0];
+      const hasCost = setClause.includes('"cost_usd"');
+      if (hasCost) {
+        const jobId = params[4] as number;
+        const job = jobStore.find((j) => j.id === jobId && j.status === "running");
+        if (!job) return [];
+        job.status = "completed";
+        job.result = params[1] != null ? (typeof params[1] === "string" ? JSON.parse(params[1] as string) : params[1]) : null;
+        job.cost_usd = params[2] as string;
+        job.completed_at = new Date(params[3] as string);
+        return [job];
+      } else {
+        const jobId = params[3] as number;
+        const job = jobStore.find((j) => j.id === jobId && j.status === "running");
+        if (!job) return [];
+        job.status = "completed";
+        job.result = params[1] != null ? (typeof params[1] === "string" ? JSON.parse(params[1] as string) : params[1]) : null;
+        job.completed_at = new Date(params[2] as string);
+        return [job];
+      }
     }
 
     // ---- CANCEL: params = ['cancelled', timestamp, jobId] ----
@@ -219,6 +304,17 @@ const dispatch: SqlDispatcher = (query, params) => {
       }
     }
     return [{ count: filtered.length }];
+  }
+
+  // ---- SELECT ... GROUP BY status WHERE parent_job_id (children) ----
+  if (q.includes("jobs") && q.includes("group by") && q.includes("parent_job_id")) {
+    const parentId = params[0] as number;
+    const children = jobStore.filter((j) => j.parent_job_id === parentId);
+    const groups: Record<string, number> = {};
+    for (const j of children) {
+      groups[j.status] = (groups[j.status] || 0) + 1;
+    }
+    return Object.entries(groups).map(([status, count]) => ({ status, count }));
   }
 
   // ---- SELECT ... GROUP BY type, status (stats) ----
@@ -351,6 +447,40 @@ describe("Jobs API", () => {
       expect(body).not.toHaveProperty("created_at");
       expect(body).not.toHaveProperty("worker_id");
     });
+
+    it("creates a job with dedupKey", async () => {
+      const res = await postJson(app, "/api/jobs", { type: "ping", dedupKey: "test-dedup" });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.dedupKey).toBe("test-dedup");
+    });
+
+    it("creates a job with parentJobId", async () => {
+      // Create parent first
+      const parent = await postJson(app, "/api/jobs", { type: "batch-commit" });
+      const parentBody = await parent.json();
+
+      const res = await postJson(app, "/api/jobs", { type: "ping", parentJobId: parentBody.id });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.parentJobId).toBe(parentBody.id);
+    });
+
+    it("creates a job with runAfter", async () => {
+      const future = new Date(Date.now() + 3600_000).toISOString();
+      const res = await postJson(app, "/api/jobs", { type: "ping", runAfter: future });
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body.runAfter).toBeTruthy();
+    });
+
+    it("rejects dedupKey in batch creation", async () => {
+      const res = await postJson(app, "/api/jobs", [
+        { type: "ping", dedupKey: "dup1" },
+        { type: "ping" },
+      ]);
+      expect(res.status).toBe(400);
+    });
   });
 
   describe("GET /api/jobs (list)", () => {
@@ -429,6 +559,33 @@ describe("Jobs API", () => {
       const res = await postJson(app, "/api/jobs/claim", {});
       expect(res.status).toBe(400);
     });
+
+    it("claims with types array", async () => {
+      // Create jobs of different types
+      await postJson(app, "/api/jobs", { type: "page-improve" });
+      await postJson(app, "/api/jobs", { type: "ping" });
+
+      const res = await postJson(app, "/api/jobs/claim", {
+        workerId: "test-worker",
+        types: ["ping", "citation-verify"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.job).not.toBeNull();
+      expect(body.job.type).toBe("ping");
+    });
+
+    it("returns null when no jobs match types", async () => {
+      await postJson(app, "/api/jobs", { type: "page-improve" });
+
+      const res = await postJson(app, "/api/jobs/claim", {
+        workerId: "test-worker",
+        types: ["citation-verify"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.job).toBeNull();
+    });
   });
 
   describe("POST /api/jobs/:id/start", () => {
@@ -455,6 +612,22 @@ describe("Jobs API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.status).toBe("completed");
+    });
+
+    it("accepts cost field", async () => {
+      // Create and claim a job
+      await postJson(app, "/api/jobs", { type: "ping" });
+      const claimed = await postJson(app, "/api/jobs/claim", { workerId: "w1" });
+      const claimBody = await claimed.json();
+      await postJson(app, `/api/jobs/${claimBody.job.id}/start`, {});
+
+      const res = await postJson(app, `/api/jobs/${claimBody.job.id}/complete`, {
+        result: { ok: true },
+        cost: 0.0042,
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.costUsd).toBeTruthy();
     });
   });
 
@@ -565,6 +738,19 @@ describe("Jobs API", () => {
       const body = await res.json();
       expect(body.swept).toBeDefined();
       expect(typeof body.swept).toBe("number");
+    });
+  });
+
+  describe("GET /api/jobs/:id/children", () => {
+    it("returns empty children for job with no children", async () => {
+      const created = await postJson(app, "/api/jobs", { type: "batch-commit" });
+      const parent = await created.json();
+
+      const res = await app.request(`/api/jobs/${parent.id}/children`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(0);
+      expect(body.children).toEqual({});
     });
   });
 });
