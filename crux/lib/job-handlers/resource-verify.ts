@@ -156,7 +156,8 @@ export async function handleResourceVerify(
         error: isTimeout ? 'Request timed out' : msg.slice(0, 300),
       });
     }
-    clearTimeout(timeout);
+    // NOTE: Do NOT clear timeout here — keep AbortController running through body read
+    // to protect against slow-loris attacks (server sends headers fast, body slowly).
 
     const statusCode = response.status;
     const contentType = response.headers.get('content-type') ?? 'unknown';
@@ -164,6 +165,7 @@ export async function handleResourceVerify(
 
     // HTTP error
     if (statusCode >= 400) {
+      clearTimeout(timeout);
       const status: ResourceStatus = statusCode === 404 ? 'not_found' : 'error';
       return buildResult(resourceId, url, status, startTime, {
         statusCode,
@@ -172,8 +174,42 @@ export async function handleResourceVerify(
       });
     }
 
-    // Read content and compute hash
-    const text = await response.text();
+    // Read content with size limit to prevent OOM on large responses
+    const contentLengthHeader = parseInt(response.headers.get('content-length') ?? '0', 10);
+    if (contentLengthHeader > MAX_CONTENT_LENGTH * 10) {
+      clearTimeout(timeout);
+      // Content-Length header indicates a very large response — skip body read
+      return buildResult(resourceId, url, 'reachable', startTime, {
+        statusCode,
+        contentType,
+        contentLength: contentLengthHeader,
+        finalUrl: finalUrl !== url ? finalUrl : undefined,
+        skippedBody: true,
+      });
+    }
+
+    // Stream-read up to MAX_CONTENT_LENGTH bytes to avoid unbounded memory usage
+    let text: string;
+    if (response.body) {
+      const reader = response.body.getReader();
+      const chunks: Uint8Array[] = [];
+      let totalBytes = 0;
+      try {
+        while (totalBytes < MAX_CONTENT_LENGTH) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          totalBytes += value.length;
+        }
+        reader.cancel().catch(() => {}); // Discard remaining body
+      } catch {
+        reader.cancel().catch(() => {});
+      }
+      text = new TextDecoder().decode(Buffer.concat(chunks).slice(0, MAX_CONTENT_LENGTH));
+    } else {
+      text = (await response.text()).slice(0, MAX_CONTENT_LENGTH);
+    }
+    clearTimeout(timeout); // Safe to clear now — body read is complete
     const contentLength = text.length;
     const contentHash = computeContentHash(text);
 
