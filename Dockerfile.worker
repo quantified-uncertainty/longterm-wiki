@@ -10,7 +10,7 @@ RUN pnpm install --prod
 
 # ---- Stage 2: Runtime image ----
 # Node 20 required: tsx's ESM loader hits ERR_REQUIRE_CYCLE_MODULE on Node 22
-# due to its require(esm) cycle detection. Matches CI (also Node 20).
+# due to its require(esm) cycle detection. Track tsx Node 22 support for upgrade.
 FROM node:20-alpine
 WORKDIR /repo
 
