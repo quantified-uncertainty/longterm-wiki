@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: lock-in-mechanisms
-  stableId: epowDRwG3Q
+  stableId: sid_epowDRwG3Q
   wikiId: E190
   type: analysis
   title: Lock-in Mechanisms Model
@@ -12,7 +12,7 @@
     Distinguishes AI-enabled lock-in from historical examples due to enforcement capabilities and estimates 10-30%
     probability of significant lock-in by 2050.
   relatedEntries:
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
   tags:
     - x-risk
@@ -21,7 +21,7 @@
     - models
   lastUpdated: 2025-12
 - id: ai-risk-portfolio-analysis
-  stableId: d7FSglxSLA
+  stableId: sid_d7FSglxSLA
   wikiId: E12
   type: analysis
   title: AI Risk Portfolio Analysis
@@ -36,10 +36,10 @@
     - label: Key Output
       value: Risk magnitude comparisons and allocation recommendations
   relatedEntries:
-    - id: uvscr74oPw
+    - id: sid_uvscr74oPw
       type: analysis
       relationship: related
-    - id: k9iTirUKxA
+    - id: sid_k9iTirUKxA
       type: analysis
       relationship: related
   tags:
@@ -50,7 +50,7 @@
     - comparative-analysis
   lastUpdated: 2025-12
 - id: worldview-intervention-mapping
-  stableId: UgWUqHaGkg
+  stableId: sid_UgWUqHaGkg
   wikiId: E377
   type: analysis
   title: Worldview-Intervention Mapping
@@ -65,10 +65,10 @@
     - label: Key Output
       value: Intervention priorities given different worldviews
   relatedEntries:
-    - id: d7FSglxSLA
+    - id: sid_d7FSglxSLA
       type: analysis
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -79,7 +79,7 @@
     - intervention-effectiveness
   lastUpdated: 2025-12
 - id: intervention-timing-windows
-  stableId: 0CW5Kkda3Q
+  stableId: sid_0CW5Kkda3Q
   wikiId: E178
   type: analysis
   title: Intervention Timing Windows
@@ -94,13 +94,13 @@
     - label: Key Output
       value: Prioritization based on closing vs stable windows
   relatedEntries:
-    - id: d7FSglxSLA
+    - id: sid_d7FSglxSLA
       type: analysis
       relationship: related
-    - id: UgWUqHaGkg
+    - id: sid_UgWUqHaGkg
       type: analysis
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -111,7 +111,7 @@
     - windows
   lastUpdated: 2025-12
 - id: deceptive-alignment-decomposition
-  stableId: MKmyyGR3CA
+  stableId: sid_MKmyyGR3CA
   wikiId: E94
   type: analysis
   title: Deceptive Alignment Decomposition Model
@@ -126,16 +126,16 @@
     - label: Base Rate Estimate
       value: 5-40% for advanced AI systems
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: analyzes
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
       relationship: related
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
       relationship: prerequisite
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: research
   tags:
@@ -146,7 +146,7 @@
     - training-dynamics
   lastUpdated: 2025-12
 - id: carlsmith-six-premises
-  stableId: Z3twlLAzJg
+  stableId: sid_Z3twlLAzJg
   wikiId: E54
   type: analysis
   title: Carlsmith's Six-Premise Argument
@@ -162,13 +162,13 @@
     - label: Combined Estimate
       value: '>10% by 2070'
   relatedEntries:
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
       relationship: analyzes
-    - id: NdUO6rBKQQ
+    - id: sid_NdUO6rBKQQ
       type: analysis
       relationship: related
-    - id: MKmyyGR3CA
+    - id: sid_MKmyyGR3CA
       type: analysis
       relationship: related
   tags:
@@ -179,7 +179,7 @@
     - existential-risk
   lastUpdated: 2026-01
 - id: mesa-optimization-analysis
-  stableId: Lcmst8htvA
+  stableId: sid_Lcmst8htvA
   wikiId: E198
   type: analysis
   title: Mesa-Optimization Risk Analysis
@@ -194,13 +194,13 @@
     - label: Key Factor
       value: Training complexity and optimization pressure
   relatedEntries:
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
       relationship: analyzes
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: related
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
       relationship: related
   tags:
@@ -210,7 +210,7 @@
     - training-dynamics
   lastUpdated: 2025-12
 - id: goal-misgeneralization-probability
-  stableId: 0B9cBkX7ZA
+  stableId: sid_0B9cBkX7ZA
   wikiId: E152
   type: analysis
   title: Goal Misgeneralization Probability Model
@@ -225,13 +225,13 @@
     - label: Base Rate
       value: 20-60% for significant distribution shifts
   relatedEntries:
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
       relationship: analyzes
-    - id: qYk1BOLgqA
+    - id: sid_qYk1BOLgqA
       type: risk
       relationship: related
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
       relationship: related
   tags:
@@ -241,7 +241,7 @@
     - deployment-safety
   lastUpdated: 2025-12
 - id: reward-hacking-taxonomy
-  stableId: IcYXjd5ppg
+  stableId: sid_IcYXjd5ppg
   wikiId: E254
   type: analysis
   title: Reward Hacking Taxonomy and Severity Model
@@ -254,16 +254,16 @@
     - label: Categories Identified
       value: 12 major failure modes
   relatedEntries:
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
       relationship: analyzes
-    - id: sycophancy
+    - id: sid_sycophancy
       type: risk
       relationship: example
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
       relationship: vulnerable-technique
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
       relationship: mitigation
   tags:
@@ -273,7 +273,7 @@
     - rlhf
   lastUpdated: 2025-12
 - id: power-seeking-conditions
-  stableId: NdUO6rBKQQ
+  stableId: sid_NdUO6rBKQQ
   wikiId: E227
   type: analysis
   title: Power-Seeking Emergence Conditions Model
@@ -288,13 +288,13 @@
     - label: Key Result
       value: Optimal policies tend to seek power under broad conditions
   relatedEntries:
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
       relationship: analyzes
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
       relationship: related
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
       relationship: consequence
   tags:
@@ -304,7 +304,7 @@
     - instrumental-goals
   lastUpdated: 2025-12
 - id: instrumental-convergence-framework
-  stableId: wazgXYQpcA
+  stableId: sid_wazgXYQpcA
   wikiId: E169
   type: analysis
   title: Instrumental Convergence Framework
@@ -319,16 +319,16 @@
     - label: Core Insight
       value: Many final goals share common instrumental subgoals
   relatedEntries:
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
       relationship: analyzes
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
       relationship: example
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
       relationship: consequence
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
       relationship: research
   tags:
@@ -338,7 +338,7 @@
     - agent-foundations
   lastUpdated: 2025-12
 - id: scheming-likelihood-model
-  stableId: jcOv2Lt2Pg
+  stableId: sid_jcOv2Lt2Pg
   wikiId: E275
   type: analysis
   title: Scheming Likelihood Assessment
@@ -353,16 +353,16 @@
     - label: Conditional Probability
       value: 10-50% given situational awareness
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
       relationship: analyzes
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: related
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
       relationship: prerequisite
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
       relationship: manifestation
   tags:
@@ -372,7 +372,7 @@
     - alignment-faking
   lastUpdated: 2025-12
 - id: corrigibility-failure-pathways
-  stableId: qio7uy0JtQ
+  stableId: sid_qio7uy0JtQ
   wikiId: E81
   type: analysis
   title: Corrigibility Failure Pathways
@@ -387,16 +387,16 @@
     - label: Pathways Identified
       value: 6 major failure modes
   relatedEntries:
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
       relationship: analyzes
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
       relationship: cause
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
       relationship: related
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
       relationship: mitigation
   tags:
@@ -406,7 +406,7 @@
     - intervention-design
   lastUpdated: 2025-12
 - id: bioweapons-attack-chain
-  stableId: 0qPdSu9SKw
+  stableId: sid_0qPdSu9SKw
   wikiId: E44
   type: analysis
   title: Bioweapons Attack Chain Model
@@ -419,7 +419,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
       relationship: related
   tags:
@@ -429,7 +429,7 @@
     - attack-chain
   lastUpdated: 2025-12
 - id: bioweapons-ai-uplift
-  stableId: pEq3UrfPCQ
+  stableId: sid_pEq3UrfPCQ
   wikiId: E43
   type: analysis
   title: AI Uplift Assessment Model
@@ -443,7 +443,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
       relationship: related
   tags:
@@ -453,7 +453,7 @@
     - marginal-risk
   lastUpdated: 2025-12
 - id: bioweapons-timeline
-  stableId: 8Zg8YYt0zg
+  stableId: sid_8Zg8YYt0zg
   wikiId: E45
   type: analysis
   title: AI-Bioweapons Timeline Model
@@ -466,7 +466,7 @@
     - label: Target Risk
       value: Bioweapons
   relatedEntries:
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
       relationship: related
   tags:
@@ -476,7 +476,7 @@
     - forecasting
   lastUpdated: 2025-12
 - id: racing-dynamics-impact
-  stableId: QVDRWo8fEA
+  stableId: sid_QVDRWo8fEA
   wikiId: E240
   type: analysis
   title: Racing Dynamics Impact Model
@@ -489,10 +489,10 @@
     - label: Target Factor
       value: Racing Dynamics
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -502,7 +502,7 @@
     - incentives
   lastUpdated: 2025-12
 - id: multipolar-trap-dynamics
-  stableId: SvvBqKEDuw
+  stableId: sid_SvvBqKEDuw
   wikiId: E210
   type: analysis
   title: Multipolar Trap Dynamics Model
@@ -515,10 +515,10 @@
     - label: Target Factor
       value: Multipolar Trap
   relatedEntries:
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -528,7 +528,7 @@
     - equilibrium
   lastUpdated: 2025-12
 - id: flash-dynamics-threshold
-  stableId: k9iTirUKxA
+  stableId: sid_k9iTirUKxA
   wikiId: E143
   type: analysis
   title: Flash Dynamics Threshold Model
@@ -541,10 +541,10 @@
     - label: Target Factor
       value: Flash Dynamics
   relatedEntries:
-    - id: 0t2GLN0sBA
+    - id: sid_0t2GLN0sBA
       type: risk
       relationship: related
-    - id: 7e3rvE5YgA
+    - id: sid_7e3rvE5YgA
       type: risk
       relationship: related
   tags:
@@ -554,7 +554,7 @@
     - cascades
   lastUpdated: 2025-12
 - id: expertise-atrophy-progression
-  stableId: ibAQzaf8cw
+  stableId: sid_ibAQzaf8cw
   wikiId: E135
   type: analysis
   title: Expertise Atrophy Progression Model
@@ -567,10 +567,10 @@
     - label: Target Factor
       value: Expertise Atrophy
   relatedEntries:
-    - id: ks0lqvZqUg
+    - id: sid_ks0lqvZqUg
       type: risk
       relationship: related
-    - id: 72cwRMbzMA
+    - id: sid_72cwRMbzMA
       type: risk
       relationship: related
   tags:
@@ -580,7 +580,7 @@
     - irreversibility
   lastUpdated: 2025-12
 - id: economic-disruption-impact
-  stableId: oRxeVV5ueQ
+  stableId: sid_oRxeVV5ueQ
   wikiId: E109
   type: analysis
   title: Economic Disruption Impact Model
@@ -593,10 +593,10 @@
     - label: Target Factor
       value: Economic Disruption
   relatedEntries:
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
       relationship: related
-    - id: YOMDe574Ew
+    - id: sid_YOMDe574Ew
       type: risk
       relationship: related
   tags:
@@ -606,7 +606,7 @@
     - instability
   lastUpdated: 2025-12
 - id: proliferation-risk-model
-  stableId: yEMy2noJAw
+  stableId: sid_yEMy2noJAw
   wikiId: E234
   type: analysis
   title: AI Proliferation Risk Model
@@ -619,10 +619,10 @@
     - label: Target Factor
       value: AI Proliferation
   relatedEntries:
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -632,7 +632,7 @@
     - dual-use
   lastUpdated: 2025-12
 - id: winner-take-all-concentration
-  stableId: Ja9HeRlQ2A
+  stableId: sid_Ja9HeRlQ2A
   wikiId: E375
   type: analysis
   title: Winner-Take-All Concentration Model
@@ -645,10 +645,10 @@
     - label: Target Factor
       value: Winner-Take-All Dynamics
   relatedEntries:
-    - id: YOMDe574Ew
+    - id: sid_YOMDe574Ew
       type: risk
       relationship: related
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
       relationship: related
   tags:
@@ -658,7 +658,7 @@
     - power
   lastUpdated: 2025-12
 - id: cyberweapons-offense-defense
-  stableId: WOetrROtMg
+  stableId: sid_WOetrROtMg
   wikiId: E88
   type: analysis
   title: Cyber Offense-Defense Balance Model
@@ -671,7 +671,7 @@
     - label: Target Risk
       value: Cyberweapons
   relatedEntries:
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
       relationship: related
   tags:
@@ -681,7 +681,7 @@
     - comparative
   lastUpdated: 2025-12
 - id: cyberweapons-attack-automation
-  stableId: mjeuoeivPQ
+  stableId: sid_mjeuoeivPQ
   wikiId: E87
   type: analysis
   title: Autonomous Cyber Attack Timeline
@@ -694,7 +694,7 @@
     - label: Target Risk
       value: Cyberweapons
   relatedEntries:
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
       relationship: related
   tags:
@@ -704,7 +704,7 @@
     - autonomy
   lastUpdated: 2025-12
 - id: autonomous-weapons-escalation
-  stableId: Wijcceep4A
+  stableId: sid_Wijcceep4A
   wikiId: E36
   type: analysis
   title: Autonomous Weapons Escalation Model
@@ -717,7 +717,7 @@
     - label: Target Risk
       value: Autonomous Weapons
   relatedEntries:
-    - id: cm5KEblCZg
+    - id: sid_cm5KEblCZg
       type: risk
       relationship: related
   tags:
@@ -727,7 +727,7 @@
     - autonomous-weapons
   lastUpdated: 2025-12
 - id: autonomous-weapons-proliferation
-  stableId: RZUPCH5Ebw
+  stableId: sid_RZUPCH5Ebw
   wikiId: E37
   type: analysis
   title: LAWS Proliferation Model
@@ -740,7 +740,7 @@
     - label: Target Risk
       value: Autonomous Weapons
   relatedEntries:
-    - id: cm5KEblCZg
+    - id: sid_cm5KEblCZg
       type: risk
       relationship: related
   tags:
@@ -750,7 +750,7 @@
     - diffusion
   lastUpdated: 2025-12
 - id: disinformation-detection-race
-  stableId: APP8lU9rZw
+  stableId: sid_APP8lU9rZw
   wikiId: E103
   type: analysis
   title: Disinformation Detection Arms Race Model
@@ -763,7 +763,7 @@
     - label: Target Risk
       value: Disinformation
   relatedEntries:
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -773,7 +773,7 @@
     - adversarial
   lastUpdated: 2025-12
 - id: disinformation-electoral-impact
-  stableId: u54BJHByGQ
+  stableId: sid_u54BJHByGQ
   wikiId: E104
   type: analysis
   title: Electoral Impact Assessment Model
@@ -786,7 +786,7 @@
     - label: Target Risk
       value: Disinformation
   relatedEntries:
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -796,7 +796,7 @@
     - impact-assessment
   lastUpdated: 2025-12
 - id: surveillance-authoritarian-stability
-  stableId: KyxBxMfyRQ
+  stableId: sid_KyxBxMfyRQ
   wikiId: E293
   type: analysis
   title: AI Surveillance and Regime Durability Model
@@ -809,7 +809,7 @@
     - label: Target Risk
       value: Surveillance
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
       relationship: related
   tags:
@@ -819,7 +819,7 @@
     - regime-durability
   lastUpdated: 2025-12
 - id: surveillance-chilling-effects
-  stableId: Ttw7hiCesQ
+  stableId: sid_Ttw7hiCesQ
   wikiId: E294
   type: analysis
   title: Surveillance Chilling Effects Model
@@ -832,7 +832,7 @@
     - label: Target Risk
       value: Surveillance
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
       relationship: related
   tags:
@@ -842,7 +842,7 @@
     - rights
   lastUpdated: 2025-12
 - id: deepfakes-authentication-crisis
-  stableId: XfrF0JHNVA
+  stableId: sid_XfrF0JHNVA
   wikiId: E97
   type: analysis
   title: Deepfakes Authentication Crisis Model
@@ -855,7 +855,7 @@
     - label: Target Risk
       value: Deepfakes
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
       relationship: related
   tags:
@@ -865,7 +865,7 @@
     - trust
   lastUpdated: 2025-12
 - id: trust-cascade-model
-  stableId: lamh6ngDlg
+  stableId: sid_lamh6ngDlg
   wikiId: E361
   type: analysis
   title: Trust Cascade Failure Model
@@ -880,13 +880,13 @@
     - label: Key Insight
       value: Trust cascades exhibit catastrophic regime shifts with hysteresis
   relatedEntries:
-    - id: IQ4E6VkW9A
+    - id: sid_IQ4E6VkW9A
       type: risk
       relationship: analyzes
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
       relationship: related
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
       relationship: leads-to
   tags:
@@ -897,7 +897,7 @@
     - threshold-effects
   lastUpdated: 2025-12
 - id: sycophancy-feedback-loop
-  stableId: d6a4HCk56g
+  stableId: sid_d6a4HCk56g
   wikiId: E296
   type: analysis
   title: Sycophancy Feedback Loop Model
@@ -912,13 +912,13 @@
     - label: Key Finding
       value: Multiple reinforcing loops drive belief rigidity increase of 2-10x per year
   relatedEntries:
-    - id: zzLBCdjXEw
+    - id: sid_zzLBCdjXEw
       type: risk
       relationship: analyzes
-    - id: 4Rz7XtP9Uw
+    - id: sid_4Rz7XtP9Uw
       type: risk
       relationship: contributes-to
-    - id: SFFrl4Pmag
+    - id: sid_SFFrl4Pmag
       type: risk
       relationship: leads-to
   tags:
@@ -929,7 +929,7 @@
     - validation
   lastUpdated: 2025-12
 - id: authentication-collapse-timeline
-  stableId: 3kBPMjJp0g
+  stableId: sid_3kBPMjJp0g
   wikiId: E28
   type: analysis
   title: Authentication Collapse Timeline Model
@@ -945,13 +945,13 @@
     - label: Critical Threshold
       value: Detection accuracy approaching random chance (50%) by 2027-2030
   relatedEntries:
-    - id: GvV1xPNXRw
+    - id: sid_GvV1xPNXRw
       type: risk
       relationship: analyzes
-    - id: 52V4qNAQjw
+    - id: sid_52V4qNAQjw
       type: risk
       relationship: leads-to
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
       relationship: related
   tags:
@@ -962,7 +962,7 @@
     - deepfakes
   lastUpdated: 2025-12
 - id: expertise-atrophy-cascade
-  stableId: DMO60ZuKrQ
+  stableId: sid_DMO60ZuKrQ
   wikiId: E134
   type: analysis
   title: Expertise Atrophy Cascade Model
@@ -977,13 +977,13 @@
     - label: Key Finding
       value: Complete knowledge loss within 15-30 years with high AI use
   relatedEntries:
-    - id: ks0lqvZqUg
+    - id: sid_ks0lqvZqUg
       type: risk
       relationship: analyzes
-    - id: 72cwRMbzMA
+    - id: sid_72cwRMbzMA
       type: risk
       relationship: related
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
       relationship: contributes-to
   tags:
@@ -994,7 +994,7 @@
     - generational
   lastUpdated: 2025-12
 - id: epistemic-collapse-threshold
-  stableId: sJIrF5heiw
+  stableId: sid_sJIrF5heiw
   wikiId: E120
   type: analysis
   title: Epistemic Collapse Threshold Model
@@ -1009,16 +1009,16 @@
     - label: Critical Threshold
       value: Epistemic health E < 0.35 leads to irreversible collapse
   relatedEntries:
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
       relationship: analyzes
-    - id: IQ4E6VkW9A
+    - id: sid_IQ4E6VkW9A
       type: risk
       relationship: component
-    - id: 4Rz7XtP9Uw
+    - id: sid_4Rz7XtP9Uw
       type: risk
       relationship: component
-    - id: SFFrl4Pmag
+    - id: sid_SFFrl4Pmag
       type: risk
       relationship: outcome
   tags:
@@ -1029,7 +1029,7 @@
     - tipping-points
   lastUpdated: 2025-12
 - id: reality-fragmentation-network
-  stableId: 8wJrhEdLCg
+  stableId: sid_8wJrhEdLCg
   wikiId: E245
   type: analysis
   title: Reality Fragmentation Network Model
@@ -1044,13 +1044,13 @@
     - label: Key Metric
       value: Fragmentation index F projected to reach 0.75-0.85 by 2030
   relatedEntries:
-    - id: 4Rz7XtP9Uw
+    - id: sid_4Rz7XtP9Uw
       type: risk
       relationship: analyzes
-    - id: zzLBCdjXEw
+    - id: sid_zzLBCdjXEw
       type: risk
       relationship: mechanism
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
       relationship: leads-to
   tags:
@@ -1061,7 +1061,7 @@
     - information-silos
   lastUpdated: 2025-12
 - id: racing-dynamics-model
-  stableId: NtsllJqplA
+  stableId: sid_NtsllJqplA
   wikiId: E241
   type: analysis
   title: Racing Dynamics Game Theory Model
@@ -1078,13 +1078,13 @@
         Individual rationality produces collectively suboptimal outcomes when safety investments reduce competitive
         advantage
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: analyzes
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: outcome
   tags:
@@ -1095,7 +1095,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: multipolar-trap-model
-  stableId: YZgsibpCwA
+  stableId: sid_YZgsibpCwA
   wikiId: E211
   type: analysis
   title: Multipolar Trap Coordination Model
@@ -1110,13 +1110,13 @@
     - label: Core Insight
       value: Local optimization plus competitive pressure creates global suboptimality that no individual actor can escape
   relatedEntries:
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: analyzes
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: manifestation
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: outcome
   tags:
@@ -1127,7 +1127,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: winner-take-all-model
-  stableId: myzUWCr6VA
+  stableId: sid_myzUWCr6VA
   wikiId: E376
   type: analysis
   title: Winner-Take-All Market Dynamics Model
@@ -1142,13 +1142,13 @@
     - label: Core Insight
       value: AI exhibits increasing returns and network effects creating extreme concentration
   relatedEntries:
-    - id: YOMDe574Ew
+    - id: sid_YOMDe574Ew
       type: risk
       relationship: analyzes
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: mechanism
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
       relationship: related
   tags:
@@ -1159,7 +1159,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: concentration-of-power-model
-  stableId: XDZHNdSQbQ
+  stableId: sid_XDZHNdSQbQ
   wikiId: E69
   type: analysis
   title: Concentration of Power Systems Model
@@ -1174,16 +1174,16 @@
     - label: Core Insight
       value: AI's cross-domain applicability enables unprecedented positive feedback loops in power accumulation
   relatedEntries:
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: analyzes
-    - id: YOMDe574Ew
+    - id: sid_YOMDe574Ew
       type: risk
       relationship: mechanism
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
       relationship: consequence
-    - id: AV6AJU1FhQ
+    - id: sid_AV6AJU1FhQ
       type: risk
       relationship: scenario
   tags:
@@ -1194,7 +1194,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: lock-in-model
-  stableId: AhDYUZ66ug
+  stableId: sid_AhDYUZ66ug
   wikiId: E191
   type: analysis
   title: Lock-in Irreversibility Model
@@ -1209,16 +1209,16 @@
     - label: Core Insight
       value: Certain AI decisions create irreversible path dependencies faster than society can evaluate them
   relatedEntries:
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
       relationship: analyzes
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: mechanism
-    - id: AV6AJU1FhQ
+    - id: sid_AV6AJU1FhQ
       type: risk
       relationship: scenario
-    - id: 7e3rvE5YgA
+    - id: sid_7e3rvE5YgA
       type: risk
       relationship: related
   tags:
@@ -1229,7 +1229,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: economic-disruption-model
-  stableId: nKTwnY9sPA
+  stableId: sid_nKTwnY9sPA
   wikiId: E110
   type: analysis
   title: Economic Disruption Structural Model
@@ -1244,16 +1244,16 @@
     - label: Core Insight
       value: AI automation differs from previous transitions in scope, speed, and completeness of displacement
   relatedEntries:
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
       relationship: analyzes
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
       relationship: consequence
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
       relationship: related
-    - id: YOMDe574Ew
+    - id: sid_YOMDe574Ew
       type: risk
       relationship: mechanism
   tags:
@@ -1264,7 +1264,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: proliferation-model
-  stableId: q5uKjtki0g
+  stableId: sid_q5uKjtki0g
   wikiId: E233
   type: analysis
   title: AI Capability Proliferation Model
@@ -1279,13 +1279,13 @@
     - label: Core Insight
       value: AI capabilities as information goods with near-zero marginal copying cost create unique containment challenges
   relatedEntries:
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
       relationship: analyzes
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -1296,7 +1296,7 @@
     - structural-risks
   lastUpdated: 2025-12
 - id: risk-activation-timeline
-  stableId: JHK2wwThGA
+  stableId: sid_JHK2wwThGA
   wikiId: E255
   type: analysis
   title: AI Risk Activation Timeline Model
@@ -1311,13 +1311,13 @@
     - label: Key Insight
       value: Risks activate at different times based on capability thresholds
   relatedEntries:
-    - id: xQzokzppDA
+    - id: sid_xQzokzppDA
       type: analysis
       relationship: related
-    - id: QkcqOBokBg
+    - id: sid_QkcqOBokBg
       type: analysis
       relationship: related
-    - id: 8Zg8YYt0zg
+    - id: sid_8Zg8YYt0zg
       type: analysis
       relationship: related
   tags:
@@ -1327,7 +1327,7 @@
     - forecasting
   lastUpdated: 2025-12
 - id: capability-threshold-model
-  stableId: xQzokzppDA
+  stableId: sid_xQzokzppDA
   wikiId: E53
   type: analysis
   title: AI Capability Threshold Model
@@ -1342,13 +1342,13 @@
     - label: Key Insight
       value: Many risks have threshold dynamics rather than gradual activation
   relatedEntries:
-    - id: JHK2wwThGA
+    - id: sid_JHK2wwThGA
       type: analysis
       relationship: related
-    - id: QkcqOBokBg
+    - id: sid_QkcqOBokBg
       type: analysis
       relationship: related
-    - id: jcOv2Lt2Pg
+    - id: sid_jcOv2Lt2Pg
       type: analysis
       relationship: related
   tags:
@@ -1358,7 +1358,7 @@
     - forecasting
   lastUpdated: 2025-12
 - id: warning-signs-model
-  stableId: QkcqOBokBg
+  stableId: sid_QkcqOBokBg
   wikiId: E370
   type: analysis
   title: AI Risk Warning Signs Model
@@ -1373,13 +1373,13 @@
     - label: Key Insight
       value: Leading indicators enable proactive response before risks materialize
   relatedEntries:
-    - id: JHK2wwThGA
+    - id: sid_JHK2wwThGA
       type: analysis
       relationship: related
-    - id: xQzokzppDA
+    - id: sid_xQzokzppDA
       type: analysis
       relationship: related
-    - id: jcOv2Lt2Pg
+    - id: sid_jcOv2Lt2Pg
       type: analysis
       relationship: related
   tags:
@@ -1389,7 +1389,7 @@
     - risk-assessment
   lastUpdated: 2025-12
 - id: authoritarian-tools-diffusion
-  stableId: l32EVOKntw
+  stableId: sid_l32EVOKntw
   wikiId: E31
   type: analysis
   title: Authoritarian Tools Diffusion Model
@@ -1405,10 +1405,10 @@
     - label: Key Insight
       value: Technology diffusion creates dual-use challenges with limited control points
   relatedEntries:
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
       relationship: related
-    - id: yEMy2noJAw
+    - id: sid_yEMy2noJAw
       type: analysis
       relationship: related
   tags:
@@ -1418,7 +1418,7 @@
     - geopolitics
   lastUpdated: 2025-12
 - id: consensus-manufacturing-dynamics
-  stableId: 9D54u1rKpg
+  stableId: sid_9D54u1rKpg
   wikiId: E73
   type: analysis
   title: Consensus Manufacturing Dynamics Model
@@ -1433,10 +1433,10 @@
     - label: Key Insight
       value: AI scales inauthentic consensus beyond detection capacity
   relatedEntries:
-    - id: gMaUtaXGaw
+    - id: sid_gMaUtaXGaw
       type: risk
       relationship: related
-    - id: APP8lU9rZw
+    - id: sid_APP8lU9rZw
       type: analysis
       relationship: related
   tags:
@@ -1446,7 +1446,7 @@
     - social-media
   lastUpdated: 2025-12
 - id: irreversibility-threshold
-  stableId: bU7sfLZe7w
+  stableId: sid_bU7sfLZe7w
   wikiId: E180
   type: analysis
   title: Irreversibility Threshold Model
@@ -1461,10 +1461,10 @@
     - label: Key Insight
       value: Reversal costs grow exponentially with time and lock-in depth
   relatedEntries:
-    - id: 7e3rvE5YgA
+    - id: sid_7e3rvE5YgA
       type: risk
       relationship: related
-    - id: AhDYUZ66ug
+    - id: sid_AhDYUZ66ug
       type: analysis
       relationship: related
   tags:
@@ -1474,7 +1474,7 @@
     - thresholds
   lastUpdated: 2025-12
 - id: preference-manipulation-drift
-  stableId: XagMpWehYA
+  stableId: sid_XagMpWehYA
   wikiId: E231
   type: analysis
   title: Preference Manipulation Drift Model
@@ -1489,10 +1489,10 @@
     - label: Key Insight
       value: Preference drift is gradual, cumulative, and often invisible to those experiencing it
   relatedEntries:
-    - id: eM6SuO5nUw
+    - id: sid_eM6SuO5nUw
       type: risk
       relationship: related
-    - id: d6a4HCk56g
+    - id: sid_d6a4HCk56g
       type: analysis
       relationship: related
   tags:
@@ -1502,7 +1502,7 @@
     - behavioral-change
   lastUpdated: 2025-12
 - id: trust-erosion-dynamics
-  stableId: J8dlHFvzTw
+  stableId: sid_J8dlHFvzTw
   wikiId: E363
   type: analysis
   title: Trust Erosion Dynamics Model
@@ -1517,10 +1517,10 @@
     - label: Key Insight
       value: Trust erodes faster than it builds, with 3-10x asymmetry in speed
   relatedEntries:
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
       relationship: related
-    - id: lamh6ngDlg
+    - id: sid_lamh6ngDlg
       type: analysis
       relationship: related
   tags:
@@ -1530,7 +1530,7 @@
     - deepfakes
   lastUpdated: 2025-12
 - id: automation-bias-cascade
-  stableId: a1IIADlAZg
+  stableId: sid_a1IIADlAZg
   wikiId: E33
   type: analysis
   title: Automation Bias Cascade Model
@@ -1546,10 +1546,10 @@
     - label: Key Insight
       value: Human-AI calibration failures create self-reinforcing patterns of over-reliance
   relatedEntries:
-    - id: ks0lqvZqUg
+    - id: sid_ks0lqvZqUg
       type: risk
       relationship: related
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
       relationship: related
   tags:
@@ -1558,7 +1558,7 @@
     - system-dynamics
   lastUpdated: 2025-12
 - id: cyber-psychosis-cascade
-  stableId: 4ezmKLmFhA
+  stableId: sid_4ezmKLmFhA
   wikiId: E84
   type: analysis
   title: Cyber Psychosis Cascade Model
@@ -1573,10 +1573,10 @@
     - label: Key Insight
       value: AI-generated content can trigger cascading psychological effects in vulnerable populations
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
       relationship: related
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -1585,7 +1585,7 @@
     - population-risk
   lastUpdated: 2025-12
 - id: fraud-sophistication-curve
-  stableId: DX8WGn3LlQ
+  stableId: sid_DX8WGn3LlQ
   wikiId: E146
   type: analysis
   title: Fraud Sophistication Curve Model
@@ -1600,10 +1600,10 @@
     - label: Key Insight
       value: AI democratizes sophisticated fraud techniques, shifting the capability curve
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
       relationship: related
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
       relationship: related
   tags:
@@ -1612,7 +1612,7 @@
     - capability-progression
   lastUpdated: 2025-12
 - id: intervention-effectiveness-matrix
-  stableId: llilzxbUQw
+  stableId: sid_llilzxbUQw
   wikiId: E177
   type: analysis
   title: AI Safety Intervention Effectiveness Matrix
@@ -1630,7 +1630,7 @@
     - prioritization
   lastUpdated: 2025-12
 - id: lab-incentives-model
-  stableId: nsm5rm03FQ
+  stableId: sid_nsm5rm03FQ
   wikiId: E185
   type: analysis
   title: AI Lab Incentives Model
@@ -1645,10 +1645,10 @@
     - label: Key Insight
       value: Lab incentives systematically diverge from social optimum under competition
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
   tags:
@@ -1657,7 +1657,7 @@
     - labs
   lastUpdated: 2025-12
 - id: risk-interaction-matrix
-  stableId: 823U6CJUOg
+  stableId: sid_823U6CJUOg
   wikiId: E257
   type: analysis
   title: AI Risk Interaction Matrix
@@ -1677,7 +1677,7 @@
     - systems-thinking
   lastUpdated: 2025-12
 - id: safety-research-value
-  stableId: CSqf1iH5Xw
+  stableId: sid_CSqf1iH5Xw
   wikiId: E267
   type: analysis
   title: AI Safety Research Value Model
@@ -1697,7 +1697,7 @@
     - expected-value
   lastUpdated: 2025-12
 - id: capabilities-to-safety-pipeline
-  stableId: JnL68gw6lA
+  stableId: sid_JnL68gw6lA
   wikiId: E51
   type: analysis
   title: Capabilities-to-Safety Pipeline Model
@@ -1712,7 +1712,7 @@
     - label: Key Insight
       value: Capabilities researchers are the primary talent pool for safety work
   relatedEntries:
-    - id: D7MbTQckMQ
+    - id: sid_D7MbTQckMQ
       type: analysis
       relationship: related
   tags:
@@ -1721,7 +1721,7 @@
     - career-transitions
   lastUpdated: 2025-12
 - id: compounding-risks-analysis
-  stableId: uvscr74oPw
+  stableId: sid_uvscr74oPw
   wikiId: E63
   type: analysis
   title: AI Compounding Risks Analysis Model
@@ -1736,10 +1736,10 @@
     - label: Key Insight
       value: Combined risks often exceed the sum of individual risks due to non-linear interactions
   relatedEntries:
-    - id: 823U6CJUOg
+    - id: sid_823U6CJUOg
       type: analysis
       relationship: related
-    - id: Xa9TwOcnZA
+    - id: sid_Xa9TwOcnZA
       type: analysis
       relationship: related
   tags:
@@ -1748,7 +1748,7 @@
     - systems-thinking
   lastUpdated: 2025-12
 - id: defense-in-depth-model
-  stableId: dHoK3QPRQg
+  stableId: sid_dHoK3QPRQg
   wikiId: E99
   type: analysis
   title: AI Safety Defense in Depth Model
@@ -1768,7 +1768,7 @@
     - layered-approach
   lastUpdated: 2025-12
 - id: institutional-adaptation-speed
-  stableId: cJxSLAJRSg
+  stableId: sid_cJxSLAJRSg
   wikiId: E165
   type: analysis
   title: Institutional AI Adaptation Speed Model
@@ -1783,7 +1783,7 @@
     - label: Key Insight
       value: Institutional adaptation typically lags technology by 5-15 years, creating persistent governance gaps
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1792,7 +1792,7 @@
     - governance-gap
   lastUpdated: 2025-12
 - id: international-coordination-game
-  stableId: OSiOU528CA
+  stableId: sid_OSiOU528CA
   wikiId: E172
   type: analysis
   title: International AI Coordination Game Model
@@ -1807,10 +1807,10 @@
     - label: Key Insight
       value: International AI coordination faces prisoner's dilemma dynamics with verification challenges
   relatedEntries:
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1819,7 +1819,7 @@
     - governance
   lastUpdated: 2025-12
 - id: media-policy-feedback-loop
-  stableId: 9tyR64KDlw
+  stableId: sid_9tyR64KDlw
   wikiId: E196
   type: analysis
   title: AI Media-Policy Feedback Loop Model
@@ -1839,7 +1839,7 @@
     - feedback-loops
   lastUpdated: 2025-12
 - id: post-incident-recovery
-  stableId: 5kJp7aLMUQ
+  stableId: sid_5kJp7aLMUQ
   wikiId: E225
   type: analysis
   title: Post-AI-Incident Recovery Model
@@ -1859,7 +1859,7 @@
     - resilience
   lastUpdated: 2025-12
 - id: public-opinion-evolution
-  stableId: qvUQw1CLBw
+  stableId: sid_qvUQw1CLBw
   wikiId: E237
   type: analysis
   title: Public Opinion on AI Evolution Model
@@ -1874,7 +1874,7 @@
     - label: Key Insight
       value: Public opinion on AI risk follows event-driven cycles with gradual baseline shifts
   relatedEntries:
-    - id: 9tyR64KDlw
+    - id: sid_9tyR64KDlw
       type: analysis
       relationship: related
   tags:
@@ -1883,7 +1883,7 @@
     - social-dynamics
   lastUpdated: 2025-12
 - id: risk-cascade-pathways
-  stableId: Xa9TwOcnZA
+  stableId: sid_Xa9TwOcnZA
   wikiId: E256
   type: analysis
   title: AI Risk Cascade Pathways Model
@@ -1898,10 +1898,10 @@
     - label: Key Insight
       value: Risks propagate through system interdependencies, often in non-obvious paths
   relatedEntries:
-    - id: uvscr74oPw
+    - id: sid_uvscr74oPw
       type: analysis
       relationship: related
-    - id: yqx0nbJ4zg
+    - id: sid_yqx0nbJ4zg
       type: analysis
       relationship: related
   tags:
@@ -1910,7 +1910,7 @@
     - systems-thinking
   lastUpdated: 2025-12
 - id: risk-interaction-network
-  stableId: yqx0nbJ4zg
+  stableId: sid_yqx0nbJ4zg
   wikiId: E258
   type: analysis
   title: AI Risk Interaction Network Model
@@ -1925,10 +1925,10 @@
     - label: Key Insight
       value: Risk network structure reveals critical nodes and amplification pathways
   relatedEntries:
-    - id: Xa9TwOcnZA
+    - id: sid_Xa9TwOcnZA
       type: analysis
       relationship: related
-    - id: uvscr74oPw
+    - id: sid_uvscr74oPw
       type: analysis
       relationship: related
   tags:
@@ -1937,7 +1937,7 @@
     - systems-thinking
   lastUpdated: 2025-12
 - id: safety-capability-tradeoff
-  stableId: CBUwMaOpbA
+  stableId: sid_CBUwMaOpbA
   wikiId: E262
   type: analysis
   title: Safety-Capability Tradeoff Model
@@ -1952,7 +1952,7 @@
     - label: Key Insight
       value: Some safety measures reduce capabilities while others are complementary; distinguishing is crucial
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1961,7 +1961,7 @@
     - capabilities
   lastUpdated: 2025-12
 - id: ai-acceleration-tradeoff
-  stableId: NtQacqwT4g
+  stableId: sid_NtQacqwT4g
   wikiId: E687
   type: analysis
   title: AI Acceleration Tradeoff Model
@@ -1977,16 +1977,16 @@
     - label: Key Insight
       value: The value of acceleration vs. deceleration depends critically on current safety readiness level
   relatedEntries:
-    - id: CBUwMaOpbA
+    - id: sid_CBUwMaOpbA
       type: analysis
       relationship: related
-    - id: CWaxxnWsDg
+    - id: sid_CWaxxnWsDg
       type: analysis
       relationship: related
-    - id: 0CW5Kkda3Q
+    - id: sid_0CW5Kkda3Q
       type: analysis
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -1996,7 +1996,7 @@
     - governance
   lastUpdated: 2026-02
 - id: safety-research-allocation
-  stableId: MaBOd5PgBw
+  stableId: sid_MaBOd5PgBw
   wikiId: E266
   type: analysis
   title: AI Safety Research Allocation Model
@@ -2011,10 +2011,10 @@
     - label: Key Insight
       value: Optimal allocation depends on problem tractability, neglectedness, and time-sensitivity
   relatedEntries:
-    - id: CSqf1iH5Xw
+    - id: sid_CSqf1iH5Xw
       type: analysis
       relationship: related
-    - id: llilzxbUQw
+    - id: sid_llilzxbUQw
       type: analysis
       relationship: related
   tags:
@@ -2023,7 +2023,7 @@
     - optimization
   lastUpdated: 2025-12
 - id: safety-researcher-gap
-  stableId: D7MbTQckMQ
+  stableId: sid_D7MbTQckMQ
   wikiId: E268
   type: analysis
   title: AI Safety Researcher Gap Model
@@ -2038,7 +2038,7 @@
     - label: Key Insight
       value: Safety researcher demand is growing faster than supply, creating widening gaps
   relatedEntries:
-    - id: JnL68gw6lA
+    - id: sid_JnL68gw6lA
       type: analysis
       relationship: related
   tags:
@@ -2047,7 +2047,7 @@
     - supply-demand
   lastUpdated: 2025-12
 - id: whistleblower-dynamics
-  stableId: cHepLtIzfQ
+  stableId: sid_cHepLtIzfQ
   wikiId: E371
   type: analysis
   title: AI Lab Whistleblower Dynamics Model
@@ -2062,7 +2062,7 @@
     - label: Key Insight
       value: Current incentive structures strongly discourage whistleblowing, creating information asymmetries
   relatedEntries:
-    - id: nsm5rm03FQ
+    - id: sid_nsm5rm03FQ
       type: analysis
       relationship: related
   tags:
@@ -2071,7 +2071,7 @@
     - transparency
   lastUpdated: 2025-12
 - id: parameter-interaction-network
-  stableId: lHRv5iV8ug
+  stableId: sid_lHRv5iV8ug
   wikiId: E219
   type: analysis
   title: AI Risk Parameter Interaction Network Model
@@ -2089,7 +2089,7 @@
         Epistemic and institutional parameters have highest downstream influence; interventions should target network
         hubs
   relatedEntries:
-    - id: yqx0nbJ4zg
+    - id: sid_yqx0nbJ4zg
       type: analysis
       relationship: related
   tags:
@@ -2099,7 +2099,7 @@
     - feedback-loops
   lastUpdated: 2025-12
 - id: safety-culture-equilibrium
-  stableId: xpUxCPa7cg
+  stableId: sid_xpUxCPa7cg
   wikiId: E263
   type: analysis
   title: AI Safety Culture Equilibrium Model
@@ -2116,10 +2116,10 @@
         Current industry sits in racing-dominant equilibrium; transition to safety-competitive requires coordination or
         forcing event
   relatedEntries:
-    - id: nsm5rm03FQ
+    - id: sid_nsm5rm03FQ
       type: analysis
       relationship: related
-    - id: NtsllJqplA
+    - id: sid_NtsllJqplA
       type: analysis
       relationship: related
   tags:
@@ -2129,7 +2129,7 @@
     - lab-behavior
   lastUpdated: 2025-12
 - id: regulatory-capacity-threshold
-  stableId: TLN24mU2AQ
+  stableId: sid_TLN24mU2AQ
   wikiId: E250
   type: analysis
   title: AI Regulatory Capacity Threshold Model
@@ -2144,7 +2144,7 @@
     - label: Key Insight
       value: Gap between regulatory capacity and industry capability is widening; crisis-level investment needed
   relatedEntries:
-    - id: cJxSLAJRSg
+    - id: sid_cJxSLAJRSg
       type: analysis
       relationship: related
   tags:
@@ -2154,7 +2154,7 @@
     - capacity-building
   lastUpdated: 2025-12
 - id: alignment-robustness-trajectory
-  stableId: HkMkzccGYw
+  stableId: sid_HkMkzccGYw
   wikiId: E21
   type: analysis
   title: Alignment Robustness Trajectory Model
@@ -2169,10 +2169,10 @@
     - label: Key Insight
       value: Critical zone at 10-30x current capability where techniques become insufficient; alignment valley problem
   relatedEntries:
-    - id: MKmyyGR3CA
+    - id: sid_MKmyyGR3CA
       type: analysis
       relationship: related
-    - id: CBUwMaOpbA
+    - id: sid_CBUwMaOpbA
       type: analysis
       relationship: related
   tags:
@@ -2183,7 +2183,7 @@
   lastUpdated: 2025-12
 
 - id: projecting-compute-spending
-  stableId: cF7VgLKSpg
+  stableId: sid_cF7VgLKSpg
   wikiId: E680
   type: analysis
   title: Projecting Compute Spending
@@ -2199,10 +2199,10 @@
     - label: Key Finding
       value: $700B+ planned capex in 2026 requires $1T annual AI revenue for 10% returns
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
       relationship: related
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
       relationship: related
   tags:
@@ -2215,7 +2215,7 @@
 
 # === Auto-generated stubs for pages missing entities ===
 - id: longtermwiki-impact
-  stableId: 98cbLvwRhQ
+  stableId: sid_98cbLvwRhQ
   wikiId: E507
   type: analysis
   title: LongtermWiki Impact Model
@@ -2230,7 +2230,7 @@
     - governance
   lastUpdated: 2026-02
 - id: societal-response
-  stableId: FB6XvHMrkw
+  stableId: sid_FB6XvHMrkw
   wikiId: E508
   type: analysis
   title: "Societal Response & Adaptation Model"
@@ -2245,7 +2245,7 @@
     - governance
   lastUpdated: 2026-02
 - id: pre-tai-capital-deployment
-  stableId: oeNG1pEkeg
+  stableId: sid_oeNG1pEkeg
   wikiId: E706
   type: analysis
   title: "Pre-TAI Capital Deployment: $100B-$300B+ Spending Analysis"
@@ -2255,19 +2255,19 @@
     safety, and implications for other organizations planning around AI lab
     scaling. Compute infrastructure absorbs 50-65%, safety gets 1-5%.
   relatedEntries:
-    - id: p2g2NDKtPQ
+    - id: sid_p2g2NDKtPQ
       type: analysis
-    - id: 0aYHpbKEqw
+    - id: sid_0aYHpbKEqw
       type: analysis
-    - id: gS4YxcslRg
+    - id: sid_gS4YxcslRg
       type: analysis
-    - id: ENKjvkrc2g
+    - id: sid_ENKjvkrc2g
       type: analysis
-    - id: CaNCZXKbig
+    - id: sid_CaNCZXKbig
       type: analysis
-    - id: CSqf1iH5Xw
+    - id: sid_CSqf1iH5Xw
       type: analysis
-    - id: Ja9HeRlQ2A
+    - id: sid_Ja9HeRlQ2A
       type: analysis
   tags:
     - capital-deployment
@@ -2281,7 +2281,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-megaproject-infrastructure
-  stableId: p2g2NDKtPQ
+  stableId: sid_p2g2NDKtPQ
   wikiId: E707
   type: analysis
   title: "AI Megaproject Infrastructure"
@@ -2291,11 +2291,11 @@
     power constraints, chip supply chains, and the economics of AI-scale
     facilities. Individual campuses cost $10-50B and require 100MW-1GW+ power.
   relatedEntries:
-    - id: oeNG1pEkeg
+    - id: sid_oeNG1pEkeg
       type: analysis
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: Ja9HeRlQ2A
+    - id: sid_Ja9HeRlQ2A
       type: analysis
   tags:
     - data-centers
@@ -2308,7 +2308,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: safety-spending-at-scale
-  stableId: 0aYHpbKEqw
+  stableId: sid_0aYHpbKEqw
   wikiId: E708
   type: analysis
   title: "Safety Spending at Scale"
@@ -2319,13 +2319,13 @@
     what meaningful safety would require. Binding constraint below $10B/year
     is talent pipeline (~1,000 qualified safety researchers globally).
   relatedEntries:
-    - id: oeNG1pEkeg
+    - id: sid_oeNG1pEkeg
       type: analysis
-    - id: CSqf1iH5Xw
+    - id: sid_CSqf1iH5Xw
       type: analysis
-    - id: ENKjvkrc2g
+    - id: sid_ENKjvkrc2g
       type: analysis
-    - id: R07X01PXQA
+    - id: sid_R07X01PXQA
       type: approach
   tags:
     - safety-funding
@@ -2338,7 +2338,7 @@
     - governance
   lastUpdated: 2026-02
 - id: frontier-lab-cost-structure
-  stableId: gS4YxcslRg
+  stableId: sid_gS4YxcslRg
   wikiId: E703
   type: analysis
   title: "Frontier Lab Cost Structure"
@@ -2348,13 +2348,13 @@
     safety priorities. OpenAI burns ~$9B/year on $20B ARR; Anthropic ~$5-7B
     on $9B ARR. Safety receives 1-8% depending on the lab.
   relatedEntries:
-    - id: oeNG1pEkeg
+    - id: sid_oeNG1pEkeg
       type: analysis
-    - id: HrokCBSmBA
+    - id: sid_HrokCBSmBA
       type: analysis
-    - id: GQuPhNkZbg
+    - id: sid_GQuPhNkZbg
       type: organization
-    - id: QVDRWo8fEA
+    - id: sid_QVDRWo8fEA
       type: analysis
   tags:
     - lab-finances
@@ -2366,7 +2366,7 @@
     - governance
   lastUpdated: 2026-02
 - id: ai-talent-market-dynamics
-  stableId: ENKjvkrc2g
+  stableId: sid_ENKjvkrc2g
   wikiId: E704
   type: analysis
   title: "AI Talent Market Dynamics"
@@ -2376,13 +2376,13 @@
     globally can contribute to frontier AI, with 500-1,000 at the highest level.
     Safety workforce (~2,000-3,500) is an order of magnitude smaller.
   relatedEntries:
-    - id: oeNG1pEkeg
+    - id: sid_oeNG1pEkeg
       type: analysis
-    - id: 0aYHpbKEqw
+    - id: sid_0aYHpbKEqw
       type: analysis
-    - id: JnL68gw6lA
+    - id: sid_JnL68gw6lA
       type: analysis
-    - id: R07X01PXQA
+    - id: sid_R07X01PXQA
       type: approach
   tags:
     - talent
@@ -2395,7 +2395,7 @@
     - community
   lastUpdated: 2026-02
 - id: planning-for-frontier-lab-scaling
-  stableId: CaNCZXKbig
+  stableId: sid_CaNCZXKbig
   wikiId: E705
   type: analysis
   title: "Planning for Frontier Lab Scaling"
@@ -2405,13 +2405,13 @@
     pre-TAI. The 2025-2028 window is critical because spending patterns are
     being established and pre-IPO accountability mechanisms are still available.
   relatedEntries:
-    - id: oeNG1pEkeg
+    - id: sid_oeNG1pEkeg
       type: analysis
-    - id: 0aYHpbKEqw
+    - id: sid_0aYHpbKEqw
       type: analysis
-    - id: GQuPhNkZbg
+    - id: sid_GQuPhNkZbg
       type: organization
-    - id: sKOD0uMVGg
+    - id: sid_sKOD0uMVGg
       type: analysis
   tags:
     - strategy
@@ -2425,7 +2425,7 @@
     - community
   lastUpdated: 2026-02
 - id: longtermist-value-comparisons
-  stableId: oltA1qTldg
+  stableId: sid_oltA1qTldg
   wikiId: E887
   type: analysis
   title: Relative Longtermist Value Comparisons
@@ -2433,9 +2433,9 @@
     A quantitative framework for comparing the expected value of different longtermist
     allocations on a common scale using GiveWell-Equivalent Units (GEUs) as the reference.
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: yA12C1KcjQ
+    - id: sid_yA12C1KcjQ
       type: organization
   tags:
     - value-comparison
@@ -2446,7 +2446,7 @@
     - community
   lastUpdated: 2026-02
 - id: ai-compute-scaling-metrics
-  stableId: 0tG3lUmFrg
+  stableId: sid_0tG3lUmFrg
   wikiId: E907
   type: analysis
   title: AI Compute Scaling Metrics
@@ -2456,17 +2456,17 @@
     expenditure approaching $700B in 2026, the shift from training-dominant to
     inference-dominant workloads, and AI coding tool adoption rates.
   relatedEntries:
-    - id: eZJ1oAKS6A
+    - id: sid_eZJ1oAKS6A
       type: concept
-    - id: cF7VgLKSpg
+    - id: sid_cF7VgLKSpg
       type: analysis
-    - id: E2BOiahT9A
+    - id: sid_E2BOiahT9A
       type: crux
-    - id: MvImONf1YA
+    - id: sid_MvImONf1YA
       type: risk
-    - id: URCXiRsX0w
+    - id: sid_URCXiRsX0w
       type: concept
-    - id: cBPkzcVBBQ
+    - id: sid_cBPkzcVBBQ
       type: organization
   tags:
     - compute
@@ -2478,7 +2478,7 @@
   lastUpdated: 2026-02
 
 - id: political-stability-as-an-ai-safety-factor
-  stableId: n4BRluIqnw
+  stableId: sid_n4BRluIqnw
   wikiId: E2067
   type: analysis
   title: Political Stability as an AI Safety Factor

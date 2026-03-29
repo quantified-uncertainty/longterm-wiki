@@ -1,4 +1,4 @@
-entity: YOfOGwm1kh
+entity: sid_YOfOGwm1kh
 facts:
   - id: f_BbFW80vDg6
     property: description
@@ -13,14 +13,14 @@ facts:
 
   - id: f_IdpHixNKFF
     property: employed-by
-    value: !ref 8grDoD8kig
+    value: !ref sid_8grDoD8kig
     role: "Researcher"
     source: https://www.rand.org/about/people/h/heim_lennart.html
     asOf: "2024"
 
   - id: f_1MZTHvQLl6
     property: employed-by
-    value: !ref XLLyzaEaCA
+    value: !ref sid_XLLyzaEaCA
     role: "Adjunct Research Fellow"
     notes: "Affiliated with GovAI (Centre for the Governance of AI)"
     asOf: "2024"

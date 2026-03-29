@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: ai-safety-institutes
-  stableId: aCEdTooCBw
+  stableId: sid_aCEdTooCBw
   wikiId: E13
   type: policy
   scope: International
@@ -36,7 +36,7 @@
   description: "Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play a key role in pre-deployment evaluations and responsible scaling policy thresholds."
   lastUpdated: 2025-12
 - id: california-sb1047
-  stableId: XcGTez1oFw
+  stableId: sid_XcGTez1oFw
   wikiId: E48
   type: policy
   summaryPage: governance-overview
@@ -705,25 +705,25 @@
     - label: a16z Lobbying (Apr-Jun 2024)
       value: $39,750
   relatedEntries:
-    - id: pz3KSt33AA
+    - id: sid_pz3KSt33AA
       type: policy
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: ZXvLxl4RMw
+    - id: sid_ZXvLxl4RMw
       type: policy
-    - id: UD11PlWtlg
+    - id: sid_UD11PlWtlg
       type: policy
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: HLc6VrCh5w
+    - id: sid_HLc6VrCh5w
       type: person
-    - id: tDwxa07Urw
+    - id: sid_tDwxa07Urw
       type: person
     - id: us-executive-order
       type: policy
@@ -773,7 +773,7 @@
     - political-strategy
   lastUpdated: 2026-03
 - id: canada-aida
-  stableId: pxSyZBoBpA
+  stableId: sid_pxSyZBoBpA
   wikiId: E49
   type: policy
   summaryPage: governance-overview
@@ -855,7 +855,7 @@
     the order paper when Parliament was dissolved in January 2025.
   lastUpdated: 2025-12
 - id: china-ai-regulations
-  stableId: LyLbPk4iNQ
+  stableId: sid_LyLbPk4iNQ
   wikiId: E58
   type: policy
   summaryPage: governance-overview
@@ -886,13 +886,13 @@
     - label: Enforcement
       value: Cyberspace Administration of China (CAC)
   relatedEntries:
-    - id: pz3KSt33AA
+    - id: sid_pz3KSt33AA
       type: policy
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: B3alpHHvzg
+    - id: sid_B3alpHHvzg
       type: event
   sources:
     - title: 'Translation: Interim Measures for Generative AI Management'
@@ -965,7 +965,7 @@
     - geopolitics
   lastUpdated: 2025-12
 - id: colorado-ai-act
-  stableId: AhnHVmUdyw
+  stableId: sid_AhnHVmUdyw
   wikiId: E62
   type: policy
   summaryPage: governance-overview
@@ -1145,10 +1145,10 @@
       author: Reuters
       date: May 2024
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
       relationship: related
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
       relationship: related
   description: >-
@@ -1173,7 +1173,7 @@
     - ai-safety
   lastUpdated: 2026-03
 - id: compute-governance
-  stableId: lfvY1bGeoA
+  stableId: sid_lfvY1bGeoA
   wikiId: E64
   type: concept
   summaryPage: governance-overview
@@ -1197,19 +1197,19 @@
     - label: Status
       value: Emerging policy area
   relatedEntries:
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
-    - id: khXUiwWtkg
+    - id: sid_khXUiwWtkg
       type: crux
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   sources:
     - title: Computing Power and the Governance of AI
@@ -1240,7 +1240,7 @@
     - cloud-computing
   lastUpdated: 2025-12
 - id: eu-ai-act
-  stableId: La8s84s3zg
+  stableId: sid_La8s84s3zg
   wikiId: E127
   type: policy
   summaryPage: governance-overview
@@ -1538,11 +1538,11 @@
     - label: Maximum Fines
       value: Up to EUR 35M or 7% of global annual turnover (prohibited practices); EUR 15M or 3% (other violations); EUR 7.5M or 1% (incorrect information)
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
     - id: us-executive-order
       type: policy
@@ -1576,7 +1576,7 @@
     - thresholds
   lastUpdated: 2026-03
 - id: export-controls
-  stableId: SpFgTz2INg
+  stableId: sid_SpFgTz2INg
   wikiId: E136
   type: policy
   summaryPage: governance-overview
@@ -1686,7 +1686,7 @@
   lastUpdated: 2025-12
 
 - id: chip-security-act
-  stableId: A9qQJtpTCA
+  stableId: sid_A9qQJtpTCA
   wikiId: E2085
   type: policy
   title: Chip Security Act
@@ -1775,7 +1775,7 @@
   lastUpdated: 2026-03
 
 - id: stop-stealing-our-chips-act
-  stableId: dLGmQQU4yB
+  stableId: sid_dLGmQQU4yB
   wikiId: E2086
   type: policy
   title: Stop Stealing Our Chips Act
@@ -1854,7 +1854,7 @@
   lastUpdated: 2026-03
 
 - id: failed-stalled-proposals
-  stableId: dj6xnXmB7A
+  stableId: sid_dj6xnXmB7A
   wikiId: E137
   type: analysis
   summaryPage: governance-overview
@@ -1877,7 +1877,7 @@
     political constraints, industry opposition patterns, and the challenges of regulating rapidly evolving technology.
   lastUpdated: 2025-12
 - id: international-summits
-  stableId: B3alpHHvzg
+  stableId: sid_B3alpHHvzg
   wikiId: E173
   type: event
   summaryPage: governance-overview
@@ -1905,13 +1905,13 @@
     - label: Format
       value: Government-led, multi-stakeholder
   relatedEntries:
-    - id: ZXvLxl4RMw
+    - id: sid_ZXvLxl4RMw
       type: policy
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: pz3KSt33AA
+    - id: sid_pz3KSt33AA
       type: policy
-    - id: LyLbPk4iNQ
+    - id: sid_LyLbPk4iNQ
       type: policy
   sources:
     - title: The Bletchley Declaration
@@ -1950,7 +1950,7 @@
     - policy-summits
   lastUpdated: 2025-12
 - id: nist-ai-rmf
-  stableId: O643v0TxvQ
+  stableId: sid_O643v0TxvQ
   wikiId: E216
   type: policy
   summaryPage: governance-overview
@@ -1994,7 +1994,7 @@
     of Standards and Technology to help organizations manage risks associated with AI systems.
   lastUpdated: 2025-12
 - id: seoul-declaration
-  stableId: 1i59OZ3q5w
+  stableId: sid_1i59OZ3q5w
   wikiId: E279
   type: policy
   summaryPage: governance-overview
@@ -2023,7 +2023,7 @@
     following the Bletchley Park Summit in November 2023.
   lastUpdated: 2025-12
 - id: standards-bodies
-  stableId: HXPEtPD1zw
+  stableId: sid_HXPEtPD1zw
   wikiId: E288
   type: concept
   summaryPage: governance-overview
@@ -2049,7 +2049,7 @@
   description: "International and national organizations that develop technical standards for AI systems, including measurement methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42, NIST, and IEEE, whose standards increasingly inform government AI regulation."
   lastUpdated: 2025-12
 - id: us-executive-order
-  stableId: pz3KSt33AA
+  stableId: sid_pz3KSt33AA
   wikiId: E366
   type: policy
   summaryPage: governance-overview
@@ -2253,7 +2253,7 @@
     - executive-policy
   lastUpdated: 2026-03
 - id: us-state-legislation
-  stableId: 2dwY9wnuYA
+  stableId: sid_2dwY9wnuYA
   wikiId: E367
   type: analysis
   summaryPage: governance-overview
@@ -2280,7 +2280,7 @@
     2024, hundreds of AI-related bills have been introduced across all 50 states, with several significant laws enacted.
   lastUpdated: 2025-12
 - id: voluntary-commitments
-  stableId: ZXvLxl4RMw
+  stableId: sid_ZXvLxl4RMw
   wikiId: E369
   type: policy
   summaryPage: governance-overview
@@ -2373,13 +2373,13 @@
     - label: Participants
       value: Major AI labs
   relatedEntries:
-    - id: pz3KSt33AA
+    - id: sid_pz3KSt33AA
       type: policy
-    - id: B3alpHHvzg
+    - id: sid_B3alpHHvzg
       type: event
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
     - id: us-executive-order
       type: policy
@@ -2419,7 +2419,7 @@
     - safety-standards
   lastUpdated: 2025-12
 - id: epistemic-security
-  stableId: UboRnYcrgg
+  stableId: sid_UboRnYcrgg
   wikiId: E123
   type: approach
   title: AI-Era Epistemic Security
@@ -2431,21 +2431,21 @@
     - label: Key Research
       value: RAND, Stanford Internet Observatory, Oxford
   relatedEntries:
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: gMaUtaXGaw
+    - id: sid_gMaUtaXGaw
       type: risk
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
-    - id: 4Rz7XtP9Uw
+    - id: sid_4Rz7XtP9Uw
       type: risk
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
-    - id: jiqdwTucCA
+    - id: sid_jiqdwTucCA
       type: risk
-    - id: zzLBCdjXEw
+    - id: sid_zzLBCdjXEw
       type: risk
   sources:
     - title: The Vulnerability of Democracies to Disinformation
@@ -2498,7 +2498,7 @@
   lastUpdated: 2025-12
 # ai-control (E6) moved to data/entities/research-areas.yaml
 - id: anthropic-core-views
-  stableId: CsWO4o3gZw
+  stableId: sid_CsWO4o3gZw
   wikiId: E23
   type: safety-agenda
   title: Anthropic Core Views
@@ -2509,11 +2509,11 @@
     - label: Status
       value: Active
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
   sources:
     - title: Core Views on AI Safety
@@ -2540,7 +2540,7 @@
 # interpretability (E174) moved to data/entities/research-areas.yaml
 # scalable-oversight (E271) moved to data/entities/research-areas.yaml
 - id: ai-forecasting
-  stableId: RW4LTglM1Q
+  stableId: sid_RW4LTglM1Q
   wikiId: E9
   type: approach
   title: AI-Augmented Forecasting
@@ -2592,7 +2592,7 @@
     - calibration
   lastUpdated: 2025-12
 - id: content-authentication
-  stableId: pZOVjv0Bng
+  stableId: sid_pZOVjv0Bng
   wikiId: E74
   type: approach
   title: AI Content Authentication
@@ -2606,13 +2606,13 @@
     - label: Key Players
       value: Adobe, Microsoft, Google, BBC, camera manufacturers
   relatedEntries:
-    - id: GvV1xPNXRw
+    - id: sid_GvV1xPNXRw
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: GnUTRJhA4g
+    - id: sid_GnUTRJhA4g
       type: risk
   sources:
     - title: C2PA Technical Specification
@@ -2652,7 +2652,7 @@
     - trust
   lastUpdated: 2025-12
 - id: coordination-tech
-  stableId: DnYQRsR1pw
+  stableId: sid_DnYQRsR1pw
   wikiId: E77
   type: approach
   title: AI Governance Coordination Technologies
@@ -2666,13 +2666,13 @@
     - label: Key Domains
       value: AI governance, epistemic defense, international cooperation
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: FAvAr2lvzg
+    - id: sid_FAvAr2lvzg
       type: risk
-    - id: 0t2GLN0sBA
+    - id: sid_0t2GLN0sBA
       type: risk
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
   sources:
     - title: The Strategy of Conflict
@@ -2712,7 +2712,7 @@
     - verification
   lastUpdated: 2025-12
 - id: deliberation
-  stableId: 3a66Dwt6xg
+  stableId: sid_3a66Dwt6xg
   wikiId: E100
   type: approach
   title: AI-Assisted Deliberation
@@ -2766,7 +2766,7 @@
     - consensus-building
   lastUpdated: 2025-12
 - id: epistemic-infrastructure
-  stableId: pkCwkyxL0w
+  stableId: sid_pkCwkyxL0w
   wikiId: E122
   type: approach
   title: AI-Era Epistemic Infrastructure
@@ -2780,15 +2780,15 @@
     - label: Key Examples
       value: Wikipedia, Semantic Scholar, fact-checking networks
   relatedEntries:
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
-    - id: TaBC4uj0Bw
+    - id: sid_TaBC4uj0Bw
       type: risk
-    - id: IK5egiQE9w
+    - id: sid_IK5egiQE9w
       type: risk
-    - id: jiqdwTucCA
+    - id: sid_jiqdwTucCA
       type: risk
   sources:
     - title: Wikimedia Foundation
@@ -2829,7 +2829,7 @@
     - ai-for-good
   lastUpdated: 2025-12
 - id: hybrid-systems
-  stableId: nvE06LwtpQ
+  stableId: sid_nvE06LwtpQ
   wikiId: E161
   type: approach
   title: AI-Human Hybrid Systems
@@ -2843,15 +2843,15 @@
     - label: Related Fields
       value: HITL, human-computer interaction, AI safety
   relatedEntries:
-    - id: 72cwRMbzMA
+    - id: sid_72cwRMbzMA
       type: risk
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
-    - id: 13OO6CP98g
+    - id: sid_13OO6CP98g
       type: risk
-    - id: SFFrl4Pmag
+    - id: sid_SFFrl4Pmag
       type: risk
-    - id: ks0lqvZqUg
+    - id: sid_ks0lqvZqUg
       type: risk
   sources:
     - title: 'Humans and Automation: Use, Misuse, Disuse, Abuse'
@@ -2891,7 +2891,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: prediction-markets
-  stableId: l8ZPtVJdsA
+  stableId: sid_l8ZPtVJdsA
   wikiId: E228
   type: approach
   title: Prediction Markets (AI Forecasting)
@@ -2905,11 +2905,11 @@
     - label: Key Players
       value: Polymarket, Metaculus, Manifold, Kalshi
   relatedEntries:
-    - id: 0t2GLN0sBA
+    - id: sid_0t2GLN0sBA
       type: risk
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: gMaUtaXGaw
+    - id: sid_gMaUtaXGaw
       type: risk
   sources:
     - title: Prediction Markets
@@ -2955,7 +2955,7 @@
   lastUpdated: 2025-12
 # value-learning (E368) moved to data/entities/research-areas.yaml
 - id: prosaic-alignment
-  stableId: EQgTf1t7dg
+  stableId: sid_EQgTf1t7dg
   wikiId: E235
   type: safety-agenda
   title: Prosaic Alignment
@@ -2968,7 +2968,7 @@
     - research-agenda
   lastUpdated: 2025-12
 - id: eval-saturation
-  stableId: qGR2sFQRoQ
+  stableId: sid_qGR2sFQRoQ
   wikiId: E437
   type: approach
   title: "Eval Saturation & The Evals Gap"
@@ -2986,20 +2986,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: YDMiSB8wyg
+    - id: sid_YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
 - id: evaluation-awareness
-  stableId: YDMiSB8wyg
+  stableId: sid_YDMiSB8wyg
   wikiId: E438
   type: approach
   title: "Evaluation Awareness"
@@ -3018,20 +3018,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: qGR2sFQRoQ
+    - id: sid_qGR2sFQRoQ
       type: approach
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
 - id: alignment
-  stableId: rt6jVH9yuA
+  stableId: sid_rt6jVH9yuA
   wikiId: E439
   type: approach
   title: AI Alignment
@@ -3048,20 +3048,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
 - id: scalable-eval-approaches
-  stableId: oSVXwc9bmQ
+  stableId: sid_oSVXwc9bmQ
   wikiId: E440
   type: approach
   title: "Scalable Eval Approaches"
@@ -3079,20 +3079,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: qGR2sFQRoQ
+    - id: sid_qGR2sFQRoQ
       type: approach
-    - id: YDMiSB8wyg
+    - id: sid_YDMiSB8wyg
       type: approach
   lastUpdated: 2026-02
 
 - id: scheming-detection
-  stableId: bkQNjmsJoQ
+  stableId: sid_bkQNjmsJoQ
   wikiId: E441
   type: approach
   title: "Scheming & Deception Detection"
@@ -3109,20 +3109,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
 - id: dangerous-cap-evals
-  stableId: 8NzBoa41MA
+  stableId: sid_8NzBoa41MA
   wikiId: E442
   type: approach
   title: "Dangerous Capability Evaluations"
@@ -3141,20 +3141,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
   lastUpdated: 2026-02
 
 - id: capability-elicitation
-  stableId: PQgF6Ve9ZA
+  stableId: sid_PQgF6Ve9ZA
   wikiId: E443
   type: approach
   title: "Capability Elicitation"
@@ -3172,18 +3172,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
   lastUpdated: 2026-02
 
 - id: safety-cases
-  stableId: oC5rwRVZ8Q
+  stableId: sid_oC5rwRVZ8Q
   wikiId: E444
   type: approach
   title: "AI Safety Cases"
@@ -3201,20 +3201,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
 - id: sleeper-agent-detection
-  stableId: BBVRwgJ43w
+  stableId: sid_BBVRwgJ43w
   wikiId: E445
   type: approach
   title: "Sleeper Agent Detection"
@@ -3232,18 +3232,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
   lastUpdated: 2026-02
 
 - id: ai-assisted
-  stableId: 5TCMXLVhQQ
+  stableId: sid_5TCMXLVhQQ
   wikiId: E446
   type: approach
   title: "AI-Assisted Alignment"
@@ -3260,18 +3260,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: JOXqSmPOiQ
+    - id: sid_JOXqSmPOiQ
       type: approach
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
   lastUpdated: 2026-02
 
-- id: evaluation
-  stableId: Fvlh8Exefg
+- id: sid_evaluation
+  stableId: sid_Fvlh8Exefg
   wikiId: E447
   type: approach
   title: "AI Evaluation"
@@ -3289,20 +3289,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
   lastUpdated: 2026-02
 
 - id: alignment-evals
-  stableId: dMC2spIgVg
+  stableId: sid_dMC2spIgVg
   wikiId: E448
   type: approach
   title: "Alignment Evaluations"
@@ -3320,22 +3320,22 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
 # red-teaming (E449) moved to data/entities/research-areas.yaml
 
 - id: model-auditing
-  stableId: BOvl3v7ZYg
+  stableId: sid_BOvl3v7ZYg
   wikiId: E450
   type: approach
   title: "Third-Party Model Auditing"
@@ -3353,18 +3353,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
   lastUpdated: 2026-02
 
 - id: constitutional-ai
-  stableId: 6sdr78k9kQ
+  stableId: sid_6sdr78k9kQ
   wikiId: E451
   type: approach
   title: "Constitutional AI"
@@ -3381,18 +3381,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: rt6jVH9yuA
+    - id: sid_rt6jVH9yuA
       type: approach
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
 - id: weak-to-strong
-  stableId: JOXqSmPOiQ
+  stableId: sid_JOXqSmPOiQ
   wikiId: E452
   type: approach
   title: "Weak-to-Strong Generalization"
@@ -3409,20 +3409,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
 - id: capability-unlearning
-  stableId: PUhEWjLnnQ
+  stableId: sid_PUhEWjLnnQ
   wikiId: E453
   type: approach
   title: "Capability Unlearning / Removal"
@@ -3439,16 +3439,16 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
-    - id: xwxKWEAkSQ
+    - id: sid_xwxKWEAkSQ
       type: approach
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
   lastUpdated: 2026-02
 
 - id: preference-optimization
-  stableId: xNAFtHP1RA
+  stableId: sid_xNAFtHP1RA
   wikiId: E454
   type: approach
   title: "Preference Optimization Methods"
@@ -3465,18 +3465,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
   lastUpdated: 2026-02
 
 - id: process-supervision
-  stableId: a2PktXtU4A
+  stableId: sid_a2PktXtU4A
   wikiId: E455
   type: approach
   title: "Process Supervision"
@@ -3493,18 +3493,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
   lastUpdated: 2026-02
 
 - id: refusal-training
-  stableId: wPEnPRTQVQ
+  stableId: sid_wPEnPRTQVQ
   wikiId: E456
   type: approach
   title: "Refusal Training"
@@ -3522,13 +3522,13 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
@@ -3536,7 +3536,7 @@
 # Generated 2026-02-08
 
 - id: california-sb53
-  stableId: UD11PlWtlg
+  stableId: sid_UD11PlWtlg
   wikiId: E457
   type: policy
   title: California SB 53
@@ -3668,23 +3668,23 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: qHOO4Xb9dA
+    - id: sid_qHOO4Xb9dA
       type: policy
-    - id: AhnHVmUdyw
+    - id: sid_AhnHVmUdyw
       type: policy
-    - id: O643v0TxvQ
+    - id: sid_O643v0TxvQ
       type: policy
-    - id: HLc6VrCh5w
+    - id: sid_HLc6VrCh5w
       type: person
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
   sources:
     - title: SB 53 Bill Text (Chaptered)
@@ -3733,7 +3733,7 @@
   lastUpdated: 2026-03
 
 - id: intervention-portfolio
-  stableId: 1tYGw60kig
+  stableId: sid_1tYGw60kig
   wikiId: E458
   type: approach
   title: AI Safety Intervention Portfolio
@@ -3752,18 +3752,18 @@
     - governance
     - community
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: etuIjQhFbQ
+    - id: sid_etuIjQhFbQ
       type: research-area
   lastUpdated: 2026-02
 
 - id: evals-governance
-  stableId: iCNSRgyFAA
+  stableId: sid_iCNSRgyFAA
   wikiId: E459
   type: approach
   title: Evals-Based Deployment Gates
@@ -3791,18 +3791,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
 - id: pause-moratorium
-  stableId: 3Mc5fuvtMg
+  stableId: sid_3Mc5fuvtMg
   wikiId: E460
   type: concept
   title: Pause / Moratorium
@@ -3822,18 +3822,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: ZxUirlzHke
+    - id: sid_ZxUirlzHke
       type: person
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: Wa3RyF9Y9A
+    - id: sid_Wa3RyF9Y9A
       type: approach
   lastUpdated: 2026-02
 
 - id: rsp
-  stableId: i1qSgjAj5A
+  stableId: sid_i1qSgjAj5A
   wikiId: E461
   type: approach
   summaryPage: governance-overview
@@ -3855,13 +3855,13 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
   sources:
     - title: Anthropic's Responsible Scaling Policy
@@ -3879,7 +3879,7 @@
   lastUpdated: 2026-02
 
 - id: corporate
-  stableId: KeRi5RnokQ
+  stableId: sid_KeRi5RnokQ
   wikiId: E462
   type: approach
   title: Corporate AI Safety Responses
@@ -3897,20 +3897,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: LgiqvRCrvg
+    - id: sid_LgiqvRCrvg
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
 - id: hardware-enabled-governance
-  stableId: 57vCq45URQ
+  stableId: sid_57vCq45URQ
   wikiId: E463
   type: approach
   title: Hardware-Enabled Governance
@@ -3932,18 +3932,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: thresholds
+    - id: sid_thresholds
       type: concept
-    - id: monitoring
+    - id: sid_monitoring
       type: approach
-    - id: uvwmYLYstg
+    - id: sid_uvwmYLYstg
       type: concept
   lastUpdated: 2026-02
 
-- id: monitoring
-  stableId: BU00lGYGAw
+- id: sid_monitoring
+  stableId: sid_BU00lGYGAw
   wikiId: E464
   type: approach
   scope: International
@@ -3963,20 +3963,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: thresholds
+    - id: sid_thresholds
       type: concept
-    - id: uvwmYLYstg
+    - id: sid_uvwmYLYstg
       type: concept
-    - id: 57vCq45URQ
+    - id: sid_57vCq45URQ
       type: approach
     - id: hardware-enabled-governance
       type: approach
   lastUpdated: 2026-02
 
 - id: hardware-mechanisms-international-ai-agreements
-  stableId: eBvdqfZEsg
+  stableId: sid_eBvdqfZEsg
   wikiId: E2053
   type: analysis
   title: Hardware Mechanisms for International AI Agreements
@@ -4000,7 +4000,7 @@
       type: approach
     - id: international-regimes
       type: concept
-    - id: monitoring
+    - id: sid_monitoring
       type: approach
     - id: export-controls
       type: policy
@@ -4019,7 +4019,7 @@
   lastUpdated: 2026-03
 
 - id: ai-chip-governance-supply-chain
-  stableId: wwLbcayLXw
+  stableId: sid_wwLbcayLXw
   wikiId: E2054
   type: concept
   title: AI Chip Governance Supply Chain
@@ -4041,7 +4041,7 @@
   lastUpdated: 2026-03
 
 - id: flexheg
-  stableId: KrbvQbV0Js
+  stableId: sid_KrbvQbV0Js
   wikiId: E2087
   type: project
   title: FlexHEG (Flexible Hardware-Enabled Guarantees)
@@ -4085,7 +4085,7 @@
   lastUpdated: 2026-03
 
 - id: caliptra
-  stableId: 3bNYPnhxCg
+  stableId: sid_3bNYPnhxCg
   type: project
   title: Caliptra
   projectStatus: active
@@ -4116,8 +4116,8 @@
       url: https://github.com/chipsalliance/Caliptra
   lastUpdated: 2026-03
 
-- id: thresholds
-  stableId: 3OTN6TAzhw
+- id: sid_thresholds
+  stableId: sid_3OTN6TAzhw
   wikiId: E465
   type: concept
   scope: International
@@ -4139,20 +4139,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: monitoring
+    - id: sid_monitoring
       type: approach
-    - id: uvwmYLYstg
+    - id: sid_uvwmYLYstg
       type: concept
     - id: international-regimes
       type: concept
   lastUpdated: 2026-02
 
 - id: lab-culture
-  stableId: OVgVMhhdHQ
+  stableId: sid_OVgVMhhdHQ
   wikiId: E466
   type: approach
   title: AI Lab Safety Culture
@@ -4170,20 +4170,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: LgiqvRCrvg
+    - id: sid_LgiqvRCrvg
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: nvyazaJFew
+    - id: sid_nvyazaJFew
       type: policy
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
 - id: pause
-  stableId: Wa3RyF9Y9A
+  stableId: sid_Wa3RyF9Y9A
   wikiId: E467
   type: approach
   title: Pause Advocacy
@@ -4201,20 +4201,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: 3Mc5fuvtMg
+    - id: sid_3Mc5fuvtMg
       type: concept
   lastUpdated: 2026-02
 
 - id: training-programs
-  stableId: GZzovyoIJg
+  stableId: sid_GZzovyoIJg
   wikiId: E468
   type: approach
   title: AI Safety Training Programs
@@ -4231,18 +4231,18 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: R07X01PXQA
+    - id: sid_R07X01PXQA
       type: approach
   lastUpdated: 2026-02
 
 - id: bletchley-declaration
-  stableId: X2gSvrOang
+  stableId: sid_X2gSvrOang
   wikiId: E469
   type: policy
   summaryPage: governance-overview
@@ -4332,20 +4332,20 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
-    - id: fYyAxYlHDQ
+    - id: sid_fYyAxYlHDQ
       type: organization
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: 4a6Sf9Fupg
+    - id: sid_4a6Sf9Fupg
       type: concept
   lastUpdated: 2026-02
 
 - id: singapore-consensus
-  stableId: NLSUTzzH5g
+  stableId: sid_NLSUTzzH5g
   wikiId: E701
   type: policy
   title: Singapore Consensus on AI Safety Research Priorities
@@ -4367,13 +4367,13 @@
     - governance
     - ai-safety
   relatedEntries:
-    - id: B3alpHHvzg
+    - id: sid_B3alpHHvzg
       type: event
-    - id: X2gSvrOang
+    - id: sid_X2gSvrOang
       type: policy
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: 4a6Sf9Fupg
+    - id: sid_4a6Sf9Fupg
       type: concept
   sources:
     - title: The Singapore Consensus on Global AI Safety Research Priorities
@@ -4385,7 +4385,7 @@
   lastUpdated: 2026-02
 
 - id: coordination-mechanisms
-  stableId: 4a6Sf9Fupg
+  stableId: sid_4a6Sf9Fupg
   wikiId: E470
   type: concept
   scope: International
@@ -4407,18 +4407,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: X2gSvrOang
+    - id: sid_X2gSvrOang
       type: policy
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   lastUpdated: 2026-02
 
 - id: new-york-raise-act
-  stableId: qHOO4Xb9dA
+  stableId: sid_qHOO4Xb9dA
   wikiId: E471
   type: policy
   summaryPage: governance-overview
@@ -4627,16 +4627,16 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: XcGTez1oFw
+    - id: sid_XcGTez1oFw
       type: policy
-    - id: UD11PlWtlg
+    - id: sid_UD11PlWtlg
       type: policy
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
   lastUpdated: 2026-03
 
 - id: model-registries
-  stableId: r8rKW3KkSg
+  stableId: sid_r8rKW3KkSg
   wikiId: E472
   type: concept
   summaryPage: governance-overview
@@ -4665,18 +4665,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
   lastUpdated: 2026-02
 
 - id: international-regimes
-  stableId: uvwmYLYstg
+  stableId: sid_uvwmYLYstg
   wikiId: E473
   type: concept
   scope: International
@@ -4697,20 +4697,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: X2gSvrOang
+    - id: sid_X2gSvrOang
       type: policy
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: thresholds
+    - id: sid_thresholds
       type: concept
-    - id: monitoring
+    - id: sid_monitoring
       type: approach
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
   lastUpdated: 2026-02
 
 - id: maim
-  stableId: HkJrXOlE2A
+  stableId: sid_HkJrXOlE2A
   wikiId: E685
   type: approach
   title: "MAIM (Mutually Assured AI Malfunction)"
@@ -4740,24 +4740,24 @@
       url: https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/
       author: MIRI
   relatedEntries:
-    - id: VoNqoBJkyg
+    - id: sid_VoNqoBJkyg
       type: person
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
-    - id: uvwmYLYstg
+    - id: sid_uvwmYLYstg
       type: concept
-    - id: 4a6Sf9Fupg
+    - id: sid_4a6Sf9Fupg
       type: concept
   lastUpdated: 2026-02
 
 - id: open-source
-  stableId: edQjxUBncw
+  stableId: sid_edQjxUBncw
   wikiId: E474
   type: approach
   title: Open Source AI Safety
@@ -4775,18 +4775,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
   lastUpdated: 2026-02
 
 - id: whistleblower-protections
-  stableId: nvyazaJFew
+  stableId: sid_nvyazaJFew
   wikiId: E475
   type: policy
   scope: Federal
@@ -4810,20 +4810,20 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: OVgVMhhdHQ
+    - id: sid_OVgVMhhdHQ
       type: approach
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: i1qSgjAj5A
+    - id: sid_i1qSgjAj5A
       type: approach
-    - id: La8s84s3zg
+    - id: sid_La8s84s3zg
       type: policy
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
 - id: field-building-analysis
-  stableId: R07X01PXQA
+  stableId: sid_R07X01PXQA
   wikiId: E476
   type: approach
   title: AI Safety Field Building Analysis
@@ -4841,18 +4841,18 @@
     - community
     - ai-safety
   relatedEntries:
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
-    - id: GZzovyoIJg
+    - id: sid_GZzovyoIJg
       type: approach
-    - id: 1tYGw60kig
+    - id: sid_1tYGw60kig
       type: approach
   lastUpdated: 2026-02
 
 # mech-interp (E477) moved to data/entities/research-areas.yaml
 
 - id: circuit-breakers
-  stableId: tyNVsTtRVA
+  stableId: sid_tyNVsTtRVA
   wikiId: E478
   type: approach
   title: Circuit Breakers / Inference Interventions
@@ -4871,18 +4871,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: JbV7e3EaHA
+    - id: sid_JbV7e3EaHA
       type: approach
-    - id: omIL5LhGnQ
+    - id: sid_omIL5LhGnQ
       type: approach
-    - id: wPEnPRTQVQ
+    - id: sid_wPEnPRTQVQ
       type: approach
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
 - id: representation-engineering
-  stableId: xwxKWEAkSQ
+  stableId: sid_xwxKWEAkSQ
   wikiId: E479
   type: approach
   title: Representation Engineering
@@ -4899,18 +4899,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: 0vyIQ4YLIA
+    - id: sid_0vyIQ4YLIA
       type: research-area
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
   lastUpdated: 2026-02
 
 - id: sparse-autoencoders
-  stableId: CUdfyx5Nkg
+  stableId: sid_CUdfyx5Nkg
   wikiId: E480
   type: approach
   title: Sparse Autoencoders (SAEs)
@@ -4928,20 +4928,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: 0vyIQ4YLIA
+    - id: sid_0vyIQ4YLIA
       type: research-area
-    - id: xwxKWEAkSQ
+    - id: sid_xwxKWEAkSQ
       type: approach
-    - id: H74rOLotqg
+    - id: sid_H74rOLotqg
       type: organization
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
 - id: eliciting-latent-knowledge
-  stableId: GJOgOYunnw
+  stableId: sid_GJOgOYunnw
   wikiId: E481
   type: approach
   title: Eliciting Latent Knowledge (ELK)
@@ -4959,18 +4959,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: ULjDXpSLCI
+    - id: sid_ULjDXpSLCI
       type: organization
   lastUpdated: 2026-02
 
 - id: debate
-  stableId: kNfdvSgC2g
+  stableId: sid_kNfdvSgC2g
   wikiId: E482
   type: approach
   title: AI Safety via Debate
@@ -4988,20 +4988,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
 - id: formal-verification
-  stableId: DSSCdI8gLA
+  stableId: sid_DSSCdI8gLA
   wikiId: E483
   type: approach
   title: Formal Verification (AI Safety)
@@ -5018,18 +5018,18 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: MEt9F7f50w
+    - id: sid_MEt9F7f50w
       type: approach
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
   lastUpdated: 2026-02
 
 - id: provably-safe
-  stableId: MEt9F7f50w
+  stableId: sid_MEt9F7f50w
   wikiId: E484
   type: approach
   title: Provably Safe AI (davidad agenda)
@@ -5049,18 +5049,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: DSSCdI8gLA
+    - id: sid_DSSCdI8gLA
       type: approach
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
   lastUpdated: 2026-02
 
-- id: sandboxing
-  stableId: yycfp6INgw
+- id: sid_sandboxing
+  stableId: sid_yycfp6INgw
   wikiId: E485
   type: approach
   title: Sandboxing / Containment
@@ -5079,15 +5079,15 @@
     - ai-safety
     - cyber
   relatedEntries:
-    - id: nl9oD17gfg
+    - id: sid_nl9oD17gfg
       type: approach
-    - id: cYETfX9wzA
+    - id: sid_cYETfX9wzA
       type: approach
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
     - id: structured-access
       type: approach
@@ -5096,7 +5096,7 @@
   lastUpdated: 2026-02
 
 - id: structured-access
-  stableId: cYETfX9wzA
+  stableId: sid_cYETfX9wzA
   wikiId: E486
   type: approach
   title: Structured Access / API-Only
@@ -5115,18 +5115,18 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
-    - id: sandboxing
+    - id: sid_sandboxing
       type: approach
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   lastUpdated: 2026-02
 
 - id: tool-restrictions
-  stableId: nl9oD17gfg
+  stableId: sid_nl9oD17gfg
   wikiId: E487
   type: approach
   title: Tool-Use Restrictions
@@ -5147,20 +5147,20 @@
     - governance
     - cyber
   relatedEntries:
-    - id: sandboxing
+    - id: sid_sandboxing
       type: approach
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
   lastUpdated: 2026-02
 
 - id: multi-agent
-  stableId: N0ImU3ZcXA
+  stableId: sid_N0ImU3ZcXA
   wikiId: E488
   type: approach
   title: Multi-Agent Safety
@@ -5178,20 +5178,20 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: k6BfxaEwuQ
+    - id: sid_k6BfxaEwuQ
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
-    - id: LSqNo6FATg
+    - id: sid_LSqNo6FATg
       type: approach
   lastUpdated: 2026-02
 
 
 # === Auto-generated stubs for pages missing entities ===
 - id: adversarial-training
-  stableId: omIL5LhGnQ
+  stableId: sid_omIL5LhGnQ
   wikiId: E583
   type: approach
   title: Adversarial Training
@@ -5205,7 +5205,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: agent-foundations
-  stableId: UXhjjryeZg
+  stableId: sid_UXhjjryeZg
   wikiId: E584
   type: approach
   title: Agent Foundations
@@ -5218,7 +5218,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-for-human-reasoning-fellowship
-  stableId: xPfsyJ9s4Q
+  stableId: sid_xPfsyJ9s4Q
   wikiId: E585
   type: approach
   title: AI for Human Reasoning Fellowship
@@ -5245,20 +5245,20 @@
     - ai-safety
     - epistemics
   relatedEntries:
-    - id: 2V63hGITAw
+    - id: sid_2V63hGITAw
       type: organization
-    - id: 0tQftJKP4Q
+    - id: sid_0tQftJKP4Q
       type: person
       relationship: leads-to
-    - id: 4ZKddwff5g
+    - id: sid_4ZKddwff5g
       type: person
-    - id: q607cJo21g
+    - id: sid_q607cJo21g
       type: person
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
-    - id: 2VexoROapg
+    - id: sid_2VexoROapg
       type: organization
-    - id: JzhBAecjaA
+    - id: sid_JzhBAecjaA
       type: organization
   sources:
     - title: EA Forum Fellowship Announcement
@@ -5267,7 +5267,7 @@
       url: https://aiforhumanreasoning.com/
   lastUpdated: 2026-03
 - id: ai-watch
-  stableId: gDdFdUktjA
+  stableId: sid_gDdFdUktjA
   wikiId: E386
   type: project
   title: AI Watch
@@ -5283,7 +5283,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: cirl
-  stableId: SDvbPMOcQw
+  stableId: sid_SDvbPMOcQw
   wikiId: E586
   type: approach
   title: Cooperative IRL (CIRL)
@@ -5296,7 +5296,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: coe-ai-convention
-  stableId: SrEFtBmBYg
+  stableId: sid_SrEFtBmBYg
   wikiId: E587
   type: policy
   title: Council of Europe Framework Convention on Artificial Intelligence
@@ -5315,7 +5315,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: collective-epistemics-design-sketches
-  stableId: mPQolusDhA
+  stableId: sid_mPQolusDhA
   wikiId: E588
   type: approach
   title: Design Sketches for Collective Epistemics
@@ -5329,7 +5329,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: community-notes
-  stableId: g75DdACthg
+  stableId: sid_g75DdACthg
   wikiId: E381
   type: project
   title: X Community Notes
@@ -5345,7 +5345,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: community-notes-for-everything
-  stableId: XjCjieOWOA
+  stableId: sid_XjCjieOWOA
   wikiId: E589
   type: approach
   title: Community Notes for Everything
@@ -5359,7 +5359,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: x-com-epistemics
-  stableId: e6XlST4rvg
+  stableId: sid_e6XlST4rvg
   wikiId: E692
   type: approach
   title: X.com Platform Epistemics
@@ -5373,7 +5373,7 @@
     - governance
   lastUpdated: 2026-02
 - id: cooperative-ai
-  stableId: LSqNo6FATg
+  stableId: sid_LSqNo6FATg
   wikiId: E590
   type: approach
   title: Cooperative AI
@@ -5386,7 +5386,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: deepfake-detection
-  stableId: PvtGbXshHw
+  stableId: sid_PvtGbXshHw
   wikiId: E591
   type: approach
   title: Deepfake Detection
@@ -5401,7 +5401,7 @@
     - epistemics
   lastUpdated: 2026-02
 - id: donations-list-website
-  stableId: 2xZD4XR3MQ
+  stableId: sid_2xZD4XR3MQ
   wikiId: E389
   type: project
   title: Donations List Website
@@ -5417,7 +5417,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: epistemic-virtue-evals
-  stableId: TpG1dUwTlw
+  stableId: sid_TpG1dUwTlw
   wikiId: E592
   type: approach
   title: Epistemic Virtue Evals
@@ -5431,7 +5431,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: labor-transition
-  stableId: v8IXZwLO2A
+  stableId: sid_v8IXZwLO2A
   wikiId: E593
   type: approach
   title: "AI Labor Transition & Economic Resilience"
@@ -5446,7 +5446,7 @@
     - governance
   lastUpdated: 2026-02
 - id: longterm-wiki
-  stableId: WxrOEBPBpA
+  stableId: sid_WxrOEBPBpA
   wikiId: E384
   type: project
   title: Longterm Wiki
@@ -5465,7 +5465,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: mit-ai-risk-repository
-  stableId: Qalx4pvUXQ
+  stableId: sid_Qalx4pvUXQ
   wikiId: E383
   type: project
   title: MIT AI Risk Repository
@@ -5484,7 +5484,7 @@
     - governance
   lastUpdated: 2026-02
 - id: model-spec
-  stableId: lHxzXeAMrg
+  stableId: sid_lHxzXeAMrg
   wikiId: E594
   type: approach
   policyStatus: active
@@ -5500,7 +5500,7 @@
     - governance
   lastUpdated: 2026-02
 - id: org-watch
-  stableId: dquHawryUA
+  stableId: sid_dquHawryUA
   wikiId: E388
   type: project
   title: Org Watch
@@ -5515,7 +5515,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: output-filtering
-  stableId: JbV7e3EaHA
+  stableId: sid_JbV7e3EaHA
   wikiId: E595
   type: approach
   title: AI Output Filtering
@@ -5530,7 +5530,7 @@
     - governance
   lastUpdated: 2026-02
 - id: probing
-  stableId: iEJPJoRsOQ
+  stableId: sid_iEJPJoRsOQ
   wikiId: E596
   type: approach
   title: Probing / Linear Probes
@@ -5544,7 +5544,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: provenance-tracing
-  stableId: PZUWcqSnMg
+  stableId: sid_PZUWcqSnMg
   wikiId: E597
   type: approach
   title: AI Content Provenance Tracing
@@ -5558,7 +5558,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: public-education
-  stableId: 4t0cluB6wg
+  stableId: sid_4t0cluB6wg
   wikiId: E598
   type: approach
   title: AI Risk Public Education
@@ -5573,7 +5573,7 @@
     - governance
   lastUpdated: 2026-02
 - id: reliability-tracking
-  stableId: jqhqx6lUxA
+  stableId: sid_jqhqx6lUxA
   wikiId: E599
   type: approach
   title: AI System Reliability Tracking
@@ -5587,7 +5587,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: reward-modeling
-  stableId: AqIhbU48OA
+  stableId: sid_AqIhbU48OA
   wikiId: E600
   type: approach
   title: Reward Modeling
@@ -5601,7 +5601,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: rhetoric-highlighting
-  stableId: CH9mPwPU6Q
+  stableId: sid_CH9mPwPU6Q
   wikiId: E601
   type: approach
   title: AI-Assisted Rhetoric Highlighting
@@ -5615,7 +5615,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: roastmypost
-  stableId: xFFP7KkzFQ
+  stableId: sid_xFFP7KkzFQ
   wikiId: E385
   type: project
   title: RoastMyPost
@@ -5634,7 +5634,7 @@
   lastUpdated: 2026-03
   summaryPage: epistemic-tools-tools-overview
 - id: stampy-aisafety-info
-  stableId: 9f8eF0CObQ
+  stableId: sid_9f8eF0CObQ
   wikiId: E382
   type: project
   title: Stampy / AISafety.info
@@ -5653,7 +5653,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: texas-traiga
-  stableId: 561xbhJAeQ
+  stableId: sid_561xbhJAeQ
   wikiId: E602
   type: policy
   title: Texas Responsible AI Governance Act (TRAIGA)
@@ -5748,7 +5748,7 @@
     - ai-safety
   lastUpdated: 2026-02
 - id: timelines-wiki
-  stableId: 8AMSTHrvSg
+  stableId: sid_8AMSTHrvSg
   wikiId: E387
   type: project
   title: Timelines Wiki
@@ -5765,7 +5765,7 @@
   lastUpdated: 2026-02
   summaryPage: epistemic-tools-tools-overview
 - id: wikipedia-views
-  stableId: SCwLOSwuiQ
+  stableId: sid_SCwLOSwuiQ
   wikiId: E390
   type: project
   title: Wikipedia Views
@@ -5781,7 +5781,7 @@
   summaryPage: epistemic-tools-tools-overview
 
 - id: government-authority-commercial-ai-infrastructure
-  stableId: 8f8b67vbgw
+  stableId: sid_8f8b67vbgw
   wikiId: E688
   type: analysis
   scope: Federal
@@ -5797,9 +5797,9 @@
     with Anthropic, Google, OpenAI, xAI; GenAI.mil serving 3M personnel) creates pre-existing
     channels for rapid mobilization.
   relatedEntries:
-    - id: MvImONf1YA
+    - id: sid_MvImONf1YA
       type: risk
-    - id: SpFgTz2INg
+    - id: sid_SpFgTz2INg
       type: policy
   tags:
     - governance
@@ -5812,7 +5812,7 @@
   lastUpdated: 2026-02
 
 - id: goal-misgeneralization-research
-  stableId: QbB5KN1Ucg
+  stableId: sid_QbB5KN1Ucg
   wikiId: E633
   type: approach
   title: Goal Misgeneralization Research
@@ -5821,13 +5821,13 @@
     a core alignment problem where AI systems pursue proxy objectives that diverge
     from intended goals when deployed outside their training distribution.
   relatedEntries:
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
   clusters:
     - ai-safety
   lastUpdated: 2026-02
 - id: ai-accountability
-  stableId: oifBdRbmYg
+  stableId: sid_oifBdRbmYg
   wikiId: E700
   type: approach
   title: AI for Accountability and Anti-Corruption
@@ -5839,26 +5839,26 @@
     hidden wealth. This sousveillance dynamic represents the beneficial flip
     side of AI surveillance capabilities.
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: N0NF4lvS4Q
+    - id: sid_N0NF4lvS4Q
       type: capability
-    - id: 0J0pDyhVtQ
+    - id: sid_0J0pDyhVtQ
       type: risk
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
   clusters:
     - ai-safety
     - governance
   lastUpdated: 2026-02
 - id: state-capacity-ai-governance
-  stableId: y8Ib2pmieA
+  stableId: sid_y8Ib2pmieA
   wikiId: E852
   type: concept
   title: State Capacity and AI Governance
@@ -5870,11 +5870,11 @@
     - label: Key Thinker
       value: Jennifer Pahlka (Code for America, USDS)
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: aCEdTooCBw
+    - id: sid_aCEdTooCBw
       type: policy
-    - id: 7ptWHyqwBA
+    - id: sid_7ptWHyqwBA
       type: resource
   sources:
     - title: Recoding America - Jennifer Pahlka
@@ -5893,7 +5893,7 @@
     being toothless or counterproductive.
   lastUpdated: 2026-02
 - id: recoding-america
-  stableId: 7ptWHyqwBA
+  stableId: sid_7ptWHyqwBA
   wikiId: E853
   type: resource
   title: "Recoding America"
@@ -5907,9 +5907,9 @@
     - label: Core Thesis
       value: Government technology failures stem from institutional culture separating policy from implementation
   relatedEntries:
-    - id: y8Ib2pmieA
+    - id: sid_y8Ib2pmieA
       type: concept
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
   sources:
     - title: Recoding America Official Website
@@ -5923,7 +5923,7 @@
     policy from implementation, creating a "cascade of rigidity" with implications for AI governance and state capacity.
   lastUpdated: 2026-02
 - id: reducing-hallucinations
-  stableId: IKC9d6Tf1A
+  stableId: sid_IKC9d6Tf1A
   wikiId: E814
   type: approach
   title: Reducing Hallucinations in AI-Generated Wiki Content
@@ -5935,7 +5935,7 @@
 # --- Trump administration AI policy + new federal/international legislation (2025-2026) ---
 
 - id: trump-eo-14179
-  stableId: PYEZ6G1Fbz
+  stableId: sid_PYEZ6G1Fbz
   wikiId: E2601
   type: policy
   summaryPage: governance-overview
@@ -6007,7 +6007,7 @@
   lastUpdated: 2026-03
 
 - id: trump-ai-preemption-eo
-  stableId: 1h93jgFv4l
+  stableId: sid_1h93jgFv4l
   wikiId: E2602
   type: policy
   summaryPage: governance-overview
@@ -6070,7 +6070,7 @@
   lastUpdated: 2026-03
 
 - id: trump-ai-framework-2026
-  stableId: 7rafBo4OER
+  stableId: sid_7rafBo4OER
   wikiId: E2603
   type: policy
   summaryPage: governance-overview
@@ -6157,7 +6157,7 @@
   lastUpdated: 2026-03
 
 - id: take-it-down-act
-  stableId: Nq8e8nItph
+  stableId: sid_Nq8e8nItph
   wikiId: E2604
   type: policy
   summaryPage: governance-overview
@@ -6253,7 +6253,7 @@
   lastUpdated: 2026-03
 
 - id: ai-lead-act
-  stableId: JCdMGaEZOj
+  stableId: sid_JCdMGaEZOj
   type: policy
   summaryPage: governance-overview
   title: AI LEAD Act (AI Liability Standards)
@@ -6300,7 +6300,7 @@
   lastUpdated: 2026-03
 
 - id: ai-risk-evaluation-act
-  stableId: ZpeTfyauLM
+  stableId: sid_ZpeTfyauLM
   type: policy
   summaryPage: governance-overview
   title: AI Risk Evaluation Act
@@ -6345,7 +6345,7 @@
   lastUpdated: 2026-03
 
 - id: paris-ai-summit
-  stableId: Fghn4m4ekW
+  stableId: sid_Fghn4m4ekW
   wikiId: E2605
   type: policy
   summaryPage: governance-overview
@@ -6384,7 +6384,7 @@
   lastUpdated: 2026-03
 
 - id: un-ai-governance-resolution
-  stableId: TNWEEemXQd
+  stableId: sid_TNWEEemXQd
   type: policy
   summaryPage: governance-overview
   title: UN General Assembly AI Governance Resolution (August 2025)
@@ -6425,7 +6425,7 @@
 # --- State-level AI legislation (2025) ---
 
 - id: utah-sb226
-  stableId: yxyu4w3Xup
+  stableId: sid_yxyu4w3Xup
   type: policy
   summaryPage: governance-overview
   title: "Utah SB 226: AI Consumer Protection Amendments"
@@ -6470,7 +6470,7 @@
   lastUpdated: 2026-03
 
 - id: illinois-ai-employment
-  stableId: ijQ2GcsXAQ
+  stableId: sid_ijQ2GcsXAQ
   type: policy
   summaryPage: governance-overview
   title: "Illinois HB 3773: AI Employment Discrimination"
@@ -6503,7 +6503,7 @@
   lastUpdated: 2026-03
 
 - id: arkansas-ai-laws
-  stableId: Tt1wXsEjKw
+  stableId: sid_Tt1wXsEjKw
   type: policy
   summaryPage: governance-overview
   title: "Arkansas AI Laws (HB 1958 & HB 1876)"
@@ -6542,7 +6542,7 @@
   lastUpdated: 2026-03
 
 - id: kentucky-ai-governance
-  stableId: TVA6XJDdOO
+  stableId: sid_TVA6XJDdOO
   type: policy
   summaryPage: governance-overview
   title: "Kentucky SB 4: AI Governance"
@@ -6573,7 +6573,7 @@
   lastUpdated: 2026-03
 
 - id: indiana-ai-healthcare
-  stableId: I8mbdJyUjs
+  stableId: sid_I8mbdJyUjs
   wikiId: E2036
   type: policy
   summaryPage: governance-overview
@@ -6606,7 +6606,7 @@
   lastUpdated: 2026-03
 
 - id: tennessee-ai-mental-health
-  stableId: CfUOvtha9O
+  stableId: sid_CfUOvtha9O
   type: policy
   summaryPage: governance-overview
   title: "Tennessee AI Mental Health Professionals Ban"
@@ -6641,7 +6641,7 @@
   lastUpdated: 2026-03
 
 - id: california-sb243
-  stableId: 38lWEn2OYr
+  stableId: sid_38lWEn2OYr
   type: policy
   summaryPage: governance-overview
   title: "California SB 243: Companion Chatbot Regulation"
@@ -6676,7 +6676,7 @@
   lastUpdated: 2026-03
 
 - id: washington-ai-chatbot
-  stableId: 7xjjFPltc4
+  stableId: sid_7xjjFPltc4
   type: policy
   summaryPage: governance-overview
   title: "Washington AI Chatbot Safety Bills (SB 5984 / HB 2225)"
@@ -6720,7 +6720,7 @@
 # --- Additional federal legislation (2025-2026) ---
 
 - id: defiance-act
-  stableId: XOxFEPaf90
+  stableId: sid_XOxFEPaf90
   type: policy
   summaryPage: governance-overview
   title: DEFIANCE Act
@@ -6770,7 +6770,7 @@
   lastUpdated: 2026-03
 
 - id: blackburn-trump-america-ai
-  stableId: Qz9kfJzEP7
+  stableId: sid_Qz9kfJzEP7
   type: policy
   summaryPage: governance-overview
   title: "TRUMP AMERICA AI Act (Blackburn Discussion Draft)"
@@ -6825,7 +6825,7 @@
 # --- Intervention taxonomy approaches ---
 
 - id: ai-litigation-democracy
-  stableId: Zl0fiVceDA
+  stableId: sid_Zl0fiVceDA
   type: approach
   title: AI Litigation as Democratic Defense
   description: >-
@@ -6851,19 +6851,19 @@
     - governance
     - governance
   relatedEntries:
-    - id: 7DpEvy5wQr
+    - id: sid_7DpEvy5wQr
       type: organization
       relationship: related
-    - id: yTlRworV1V
+    - id: sid_yTlRworV1V
       type: organization
       relationship: related
-    - id: xxHyEDGp4Y
+    - id: sid_xxHyEDGp4Y
       type: organization
       relationship: related
-    - id: H4tplAyDRX
+    - id: sid_H4tplAyDRX
       type: organization
       relationship: related
-    - id: Ygxw8JVW8X
+    - id: sid_Ygxw8JVW8X
       type: organization
       relationship: related
   sources:
@@ -6876,7 +6876,7 @@
   lastUpdated: 2026-03
 
 - id: ai-policy-lobbying
-  stableId: RQVmYNQrbD
+  stableId: sid_RQVmYNQrbD
   type: approach
   title: AI Safety Policy Lobbying
   description: >-
@@ -6907,28 +6907,28 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: IFjdCevnFg
+    - id: sid_IFjdCevnFg
       type: organization
       relationship: related
-    - id: w7mwNxGtCQ
+    - id: sid_w7mwNxGtCQ
       type: organization
       relationship: related
-    - id: V3NJg9djng
+    - id: sid_V3NJg9djng
       type: organization
       relationship: related
-    - id: 0HsrqIftUg
+    - id: sid_0HsrqIftUg
       type: organization
       relationship: related
-    - id: NI4hqOL33A
+    - id: sid_NI4hqOL33A
       type: organization
       relationship: related
-    - id: DHWH2M0Ega
+    - id: sid_DHWH2M0Ega
       type: organization
       relationship: related
-    - id: etCe7rcH1g
+    - id: sid_etCe7rcH1g
       type: organization
       relationship: related
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
       relationship: related
   sources:
@@ -6939,7 +6939,7 @@
   lastUpdated: 2026-03
 
 - id: grassroots-ai-activism
-  stableId: 6mDLLUdlQb
+  stableId: sid_6mDLLUdlQb
   type: approach
   title: Grassroots AI Safety and Democracy Activism
   description: >-
@@ -6966,19 +6966,19 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: qtXe9VykMz
+    - id: sid_qtXe9VykMz
       type: organization
       relationship: related
-    - id: etCe7rcH1g
+    - id: sid_etCe7rcH1g
       type: organization
       relationship: related
-    - id: m9jtyXlqXT
+    - id: sid_m9jtyXlqXT
       type: organization
       relationship: related
-    - id: d9sWZtyVwg
+    - id: sid_d9sWZtyVwg
       type: organization
       relationship: related
-    - id: DK0GbGg7Kf
+    - id: sid_DK0GbGg7Kf
       type: organization
       relationship: supports
   sources:
@@ -6989,7 +6989,7 @@
   lastUpdated: 2026-03
 
 - id: ai-governance-research
-  stableId: jjCh8xw39l
+  stableId: sid_jjCh8xw39l
   type: approach
   title: AI Governance Research and Analysis
   description: >-
@@ -7016,25 +7016,25 @@
     - ai-safety
     - governance
   relatedEntries:
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
       relationship: related
-    - id: NI4hqOL33A
+    - id: sid_NI4hqOL33A
       type: organization
       relationship: related
-    - id: VJacG0VE2w
+    - id: sid_VJacG0VE2w
       type: organization
       relationship: related
-    - id: hyxooEhMZl
+    - id: sid_hyxooEhMZl
       type: organization
       relationship: related
-    - id: UyAH46sPFN
+    - id: sid_UyAH46sPFN
       type: organization
       relationship: related
-    - id: 2KkS7mnw7K
+    - id: sid_2KkS7mnw7K
       type: organization
       relationship: related
-    - id: XkqcWk46oQ
+    - id: sid_XkqcWk46oQ
       type: organization
       relationship: related
   sources:
@@ -7045,7 +7045,7 @@
   lastUpdated: 2026-03
 
 - id: government-ai-monitoring
-  stableId: bidMivQo1W
+  stableId: sid_bidMivQo1W
   type: approach
   title: Government AI Use Monitoring
   description: >-
@@ -7074,19 +7074,19 @@
     - governance
     - governance
   relatedEntries:
-    - id: mY8BbBqKFc
+    - id: sid_mY8BbBqKFc
       type: organization
       relationship: related
-    - id: pFJhncfgor
+    - id: sid_pFJhncfgor
       type: organization
       relationship: related
-    - id: 2KkS7mnw7K
+    - id: sid_2KkS7mnw7K
       type: organization
       relationship: related
-    - id: inudUfk9Ix
+    - id: sid_inudUfk9Ix
       type: organization
       relationship: related
-    - id: yTlRworV1V
+    - id: sid_yTlRworV1V
       type: organization
       relationship: supports
   sources:
@@ -7097,7 +7097,7 @@
   lastUpdated: 2026-03
 
 - id: us-government-technology-workforce
-  stableId: SrRJXshFlw
+  stableId: sid_SrRJXshFlw
   wikiId: E2018
   type: analysis
   title: US Government Technology Workforce
@@ -7107,15 +7107,15 @@
     staffing numbers, talent pipeline programs (Horizon Institute, TechCongress, Digital Corps),
     federal AI spending, and implications for AI governance.
   relatedEntries:
-    - id: y8Ib2pmieA
+    - id: sid_y8Ib2pmieA
       type: concept
-    - id: dbqoxdZuUw
+    - id: sid_dbqoxdZuUw
       type: organization
-    - id: WVHl7Ya8oQ
+    - id: sid_WVHl7Ya8oQ
       type: organization
-    - id: lsx48oPDVQ
+    - id: sid_lsx48oPDVQ
       type: organization
-    - id: ufdntmiWtQ
+    - id: sid_ufdntmiWtQ
       type: organization
   tags:
     - state-capacity
@@ -7126,7 +7126,7 @@
   lastUpdated: 2026-03
 
 - id: ai-non-extremization-coordination
-  stableId: dEV3Nqi4Ew
+  stableId: sid_dEV3Nqi4Ew
   wikiId: E2069
   type: approach
   title: AI Non-Extremization Coordination
@@ -7141,7 +7141,7 @@
   lastUpdated: 2026-03
 
 - id: ai-assisted-diplomacy-and-negotiation
-  stableId: BImsyqMAmA
+  stableId: sid_BImsyqMAmA
   wikiId: E2068
   type: approach
   title: AI-Assisted Diplomacy and Negotiation
@@ -7155,7 +7155,7 @@
   lastUpdated: 2026-03
 
 - id: intervention-evaluation-for-political-stability
-  stableId: OqsRkMX3Dw
+  stableId: sid_OqsRkMX3Dw
   wikiId: E2071
   type: approach
   title: Intervention Evaluation for Political Stability
@@ -7169,7 +7169,7 @@
   lastUpdated: 2026-03
 
 - id: forecasting-based-policy-triggers
-  stableId: eE8I4L31pw
+  stableId: sid_eE8I4L31pw
   wikiId: E2070
   type: approach
   title: Forecasting-Based Policy Triggers

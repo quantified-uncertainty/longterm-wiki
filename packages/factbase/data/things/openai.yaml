@@ -1,4 +1,4 @@
-entity: 1LcLlMGLbw
+entity: sid_1LcLlMGLbw
 facts:
   - id: f_1Y4HfGVOvA
     property: founded-date
@@ -49,12 +49,12 @@ facts:
   - id: f_A4ImW0y2sw
     property: founded-by
     value:
-      - !ref JKsVHQ5stQ
-      - !ref eYrBgMLJDw
-      - !ref Yq4s2cI7ng
-      - !ref 69vftmr1jg
-      - !ref 4eNHxKcml1
-      - !ref ZocUS6ej6S
+      - !ref sid_JKsVHQ5stQ
+      - !ref sid_eYrBgMLJDw
+      - !ref sid_Yq4s2cI7ng
+      - !ref sid_69vftmr1jg
+      - !ref sid_4eNHxKcml1
+      - !ref sid_ZocUS6ej6S
     source: https://openai.com/blog/introducing-openai
 
   - id: f_HfB3WmNDFQ

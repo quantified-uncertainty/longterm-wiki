@@ -1,4 +1,4 @@
-entity: esASr3BOVQ
+entity: sid_esASr3BOVQ
 facts:
   - id: f_SH1descr01
     property: description
@@ -19,6 +19,6 @@ facts:
   - id: f_SH4fndby01
     property: founded-by
     value:
-      - !ref 24aX2Ru7Dg
-      - !ref 9TS0Cj5u5Q
+      - !ref sid_24aX2Ru7Dg
+      - !ref sid_9TS0Cj5u5Q
     notes: Built by Ozzie Gooen and Slava Matyukhin

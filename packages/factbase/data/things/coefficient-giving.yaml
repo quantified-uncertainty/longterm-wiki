@@ -1,4 +1,4 @@
-entity: ULjDXpSLCI
+entity: sid_ULjDXpSLCI
 facts:
   # ── Total Grants ──────────────────────────────────────────────
   - id: f_AGyevCSUAA
@@ -111,8 +111,8 @@ facts:
   - id: f_6C5bun09hg
     property: founded-by
     value:
-      - !ref Jtj6jHbuQ7
-      - !ref eQh3ZhWv8D
+      - !ref sid_Jtj6jHbuQ7
+      - !ref sid_eQh3ZhWv8D
     source: https://en.wikipedia.org/wiki/Coefficient_Giving
     notes: "Dustin Moskovitz and Holden Karnofsky. Moskovitz co-founded Good Ventures
       with Cari Tuna in 2011; Karnofsky co-founded GiveWell Labs (precursor) in 2014

@@ -1,4 +1,4 @@
-entity: 1OSiYOaWVL
+entity: sid_1OSiYOaWVL
 facts:
   - id: f_RYwXutlEmN
     property: founded-date
@@ -21,9 +21,9 @@ facts:
   - id: f_TUP4Wxpwqg
     property: founded-by
     value:
-      - !ref eYrBgMLJDw
-      - !ref 0x0hqwKo4I
-      - !ref vIgoE1BeAk
+      - !ref sid_eYrBgMLJDw
+      - !ref sid_0x0hqwKo4I
+      - !ref sid_vIgoE1BeAk
     source: https://ssi.inc
 
   - id: f_Oa0nwGGdna

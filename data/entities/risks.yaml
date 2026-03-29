@@ -2,7 +2,7 @@
 # Auto-generated from entities.yaml - edit this file directly
 
 - id: authentication-collapse
-  stableId: GvV1xPNXRw
+  stableId: sid_GvV1xPNXRw
   wikiId: E27
   type: risk
   summaryPage: epistemic-overview
@@ -58,7 +58,7 @@
     - provenance
   lastUpdated: 2025-12
 - id: authoritarian-tools
-  stableId: eXd3Fe8Lzg
+  stableId: sid_eXd3Fe8Lzg
   wikiId: E30
   type: risk
   summaryPage: misuse-overview
@@ -76,11 +76,11 @@
     - label: Key Risk
       value: Stabilizing autocracy
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   sources:
     - title: The Road to Digital Unfreedom
@@ -116,7 +116,7 @@
     - governance
   lastUpdated: 2025-12
 - id: automation-bias
-  stableId: 72cwRMbzMA
+  stableId: sid_72cwRMbzMA
   wikiId: E32
   type: risk
   summaryPage: accident-overview
@@ -134,11 +134,11 @@
     - label: Status
       value: Widespread
   relatedEntries:
-    - id: sycophancy
+    - id: sid_sycophancy
       type: risk
-    - id: 13OO6CP98g
+    - id: sid_13OO6CP98g
       type: risk
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
   sources:
     - title: Automation Bias in Decision Making
@@ -158,7 +158,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: autonomous-weapons
-  stableId: cm5KEblCZg
+  stableId: sid_cm5KEblCZg
   wikiId: E35
   type: risk
   summaryPage: misuse-overview
@@ -176,9 +176,9 @@
     - label: Status
       value: Active military development
   relatedEntries:
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
   sources:
     - title: Campaign to Stop Killer Robots
@@ -210,7 +210,7 @@
     - warfare
   lastUpdated: 2025-12
 - id: bioweapons
-  stableId: wAglEMR2mg
+  stableId: sid_wAglEMR2mg
   wikiId: E42
   type: risk
   summaryPage: misuse-overview
@@ -230,9 +230,9 @@
     - label: Key Concern
       value: Lowering barriers to development
   relatedEntries:
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
     - id: cyberweapons
       type: risk
@@ -276,7 +276,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: concentration-of-power
-  stableId: KpMBQkdQ5g
+  stableId: sid_KpMBQkdQ5g
   wikiId: E68
   type: risk
   summaryPage: structural-overview
@@ -293,11 +293,11 @@
     - label: Type
       value: Structural/Systemic
   relatedEntries:
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
   sources:
     - title: AI and the Future of Power
@@ -328,7 +328,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: consensus-manufacturing
-  stableId: gMaUtaXGaw
+  stableId: sid_gMaUtaXGaw
   wikiId: E72
   type: risk
   summaryPage: epistemic-overview
@@ -386,7 +386,7 @@
     - democratic-process
   lastUpdated: 2025-12
 - id: corrigibility-failure
-  stableId: aE60G9uLyA
+  stableId: sid_aE60G9uLyA
   wikiId: E80
   type: risk
   summaryPage: accident-overview
@@ -400,11 +400,11 @@
     confidence: low
   maturity: Growing
   relatedEntries:
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
   sources:
     - title: Corrigibility
@@ -427,7 +427,7 @@
     - self-preservation
   lastUpdated: 2025-12
 - id: cyber-psychosis
-  stableId: lD6bPNfEEg
+  stableId: sid_lD6bPNfEEg
   wikiId: E83
   type: risk
   summaryPage: epistemic-overview
@@ -487,7 +487,7 @@
     - disinformation
   lastUpdated: 2025-12
 - id: cyberweapons
-  stableId: 7c6UC46TWQ
+  stableId: sid_7c6UC46TWQ
   wikiId: E86
   type: risk
   summaryPage: misuse-overview
@@ -505,9 +505,9 @@
     - label: Status
       value: Active development by state actors
   relatedEntries:
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
-    - id: cm5KEblCZg
+    - id: sid_cm5KEblCZg
       type: risk
   sources:
     - title: CISA Artificial Intelligence
@@ -543,7 +543,7 @@
     - national-security
   lastUpdated: 2025-12
 - id: deceptive-alignment
-  stableId: vc60Nthkcg
+  stableId: sid_vc60Nthkcg
   wikiId: E93
   type: risk
   summaryPage: accident-overview
@@ -560,17 +560,17 @@
     - label: Key Concern
       value: AI hides misalignment during training
   relatedEntries:
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
-    - id: sFjyY5xXZA
+    - id: sid_sFjyY5xXZA
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: etuIjQhFbQ
+    - id: sid_etuIjQhFbQ
       type: research-area
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
   sources:
     - title: Risks from Learned Optimization
@@ -592,7 +592,7 @@
     - interpretability
   lastUpdated: 2025-12
 - id: deepfakes
-  stableId: MUGUxfl2YA
+  stableId: sid_MUGUxfl2YA
   wikiId: E96
   type: risk
   summaryPage: misuse-overview
@@ -610,9 +610,9 @@
     - label: Key Risk
       value: Authenticity crisis
   relatedEntries:
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
   sources:
     - title: Deepfakes and the New Disinformation War
@@ -648,7 +648,7 @@
     - ai-misuse
   lastUpdated: 2025-12
 - id: disinformation
-  stableId: AaAOkTHkug
+  stableId: sid_AaAOkTHkug
   wikiId: E102
   type: risk
   summaryPage: misuse-overview
@@ -666,9 +666,9 @@
     - label: Key Change
       value: Scale and personalization
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
   sources:
     - title: OpenAI Research on Influence Operations
@@ -703,7 +703,7 @@
     - deepfakes
   lastUpdated: 2025-12
 - id: distributional-shift
-  stableId: qYk1BOLgqA
+  stableId: sid_qYk1BOLgqA
   wikiId: E105
   type: risk
   summaryPage: accident-overview
@@ -716,9 +716,9 @@
     median: 2025
   maturity: Mature
   relatedEntries:
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
   sources:
     - title: A Survey on Distribution Shift
@@ -740,7 +740,7 @@
     - deployment
   lastUpdated: 2025-12
 - id: economic-disruption
-  stableId: hRRC36tWDg
+  stableId: sid_hRRC36tWDg
   wikiId: E108
   type: risk
   summaryPage: structural-overview
@@ -757,9 +757,9 @@
     - label: Status
       value: Beginning
   relatedEntries:
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
   sources:
     - title: The Rise of the Robots
@@ -797,7 +797,7 @@
     - economic-policy
   lastUpdated: 2025-12
 - id: emergent-capabilities
-  stableId: x19LcGDk6Q
+  stableId: sid_x19LcGDk6Q
   wikiId: E117
   type: risk
   summaryPage: accident-overview
@@ -813,11 +813,11 @@
     - label: Key Finding
       value: Capabilities appear suddenly at scale
   relatedEntries:
-    - id: AMhUctK34Q
+    - id: sid_AMhUctK34Q
       type: risk
-    - id: GzX9hnrzWw
+    - id: sid_GzX9hnrzWw
       type: risk
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
   sources:
     - title: Emergent Abilities of Large Language Models
@@ -842,7 +842,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: enfeeblement
-  stableId: 13OO6CP98g
+  stableId: sid_13OO6CP98g
   wikiId: E118
   type: risk
   summaryPage: structural-overview
@@ -859,9 +859,9 @@
     - label: Also Called
       value: Human atrophy, skill loss
   relatedEntries:
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
   sources:
     - title: What We Owe the Future
@@ -897,7 +897,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: epistemic-collapse
-  stableId: GeYirWJrwA
+  stableId: sid_GeYirWJrwA
   wikiId: E119
   type: risk
   summaryPage: epistemic-overview
@@ -914,11 +914,11 @@
     - label: Status
       value: Early stages visible
   relatedEntries:
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
   sources:
     - title: Reality+
@@ -939,7 +939,7 @@
     - democracy
   lastUpdated: 2025-12
 - id: erosion-of-agency
-  stableId: 54ItAwh4QA
+  stableId: sid_54ItAwh4QA
   wikiId: E126
   type: risk
   summaryPage: structural-overview
@@ -956,11 +956,11 @@
     - label: Status
       value: Already occurring
   relatedEntries:
-    - id: 13OO6CP98g
+    - id: sid_13OO6CP98g
       type: risk
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: sycophancy
+    - id: sid_sycophancy
       type: risk
   sources:
     - title: The Age of Surveillance Capitalism
@@ -995,7 +995,7 @@
     - digital-rights
   lastUpdated: 2025-12
 - id: expertise-atrophy
-  stableId: ks0lqvZqUg
+  stableId: sid_ks0lqvZqUg
   wikiId: E133
   type: risk
   summaryPage: epistemic-overview
@@ -1054,7 +1054,7 @@
     - resilience
   lastUpdated: 2025-12
 - id: flash-dynamics
-  stableId: 0t2GLN0sBA
+  stableId: sid_0t2GLN0sBA
   wikiId: E142
   type: risk
   summaryPage: structural-overview
@@ -1071,9 +1071,9 @@
     - label: Key Risk
       value: Speed beyond oversight
   relatedEntries:
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
-    - id: 7e3rvE5YgA
+    - id: sid_7e3rvE5YgA
       type: risk
   sources:
     - title: 'Selling Spirals: Avoiding an AI Flash Crash (Lawfare)'
@@ -1104,7 +1104,7 @@
     - human-oversight
   lastUpdated: 2025-12
 - id: fraud
-  stableId: GnUTRJhA4g
+  stableId: sid_GnUTRJhA4g
   wikiId: E145
   type: risk
   summaryPage: misuse-overview
@@ -1122,9 +1122,9 @@
     - label: Key Risk
       value: Scale and personalization
   relatedEntries:
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
   sources:
     - title: FBI 2024 Internet Crime Report
@@ -1157,7 +1157,7 @@
     - identity
   lastUpdated: 2025-12
 - id: goal-misgeneralization
-  stableId: nYPuaov1hA
+  stableId: sid_nYPuaov1hA
   wikiId: E151
   type: risk
   summaryPage: accident-overview
@@ -1175,11 +1175,11 @@
     - label: Key Paper
       value: Langosco et al. 2022
   relatedEntries:
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
   sources:
     - title: Goal Misgeneralization in Deep RL
@@ -1202,7 +1202,7 @@
     - out-of-distribution
   lastUpdated: 2025-12
 - id: historical-revisionism
-  stableId: jiqdwTucCA
+  stableId: sid_jiqdwTucCA
   wikiId: E155
   type: risk
   summaryPage: epistemic-overview
@@ -1257,7 +1257,7 @@
     - collective-memory
   lastUpdated: 2025-12
 - id: institutional-capture
-  stableId: IqKOqHEKag
+  stableId: sid_IqKOqHEKag
   wikiId: E166
   type: risk
   summaryPage: epistemic-overview
@@ -1319,7 +1319,7 @@
     - institutional-risk
   lastUpdated: 2025-12
 - id: instrumental-convergence
-  stableId: BYKermZj1A
+  stableId: sid_BYKermZj1A
   wikiId: E168
   type: risk
   summaryPage: accident-overview
@@ -1336,11 +1336,11 @@
     - label: Coined By
       value: Nick Bostrom / Steve Omohundro
   relatedEntries:
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: aUMeFdALrA
+    - id: sid_aUMeFdALrA
       type: research-area
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
   sources:
     - title: The Basic AI Drives
@@ -1365,7 +1365,7 @@
     - orthogonality-thesis
   lastUpdated: 2025-12
 - id: irreversibility
-  stableId: 7e3rvE5YgA
+  stableId: sid_7e3rvE5YgA
   wikiId: E179
   type: risk
   summaryPage: structural-overview
@@ -1383,11 +1383,11 @@
     - label: Key Risk
       value: Permanent foreclosure of options
   relatedEntries:
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: 0t2GLN0sBA
+    - id: sid_0t2GLN0sBA
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   sources:
     - title: Existential Risk from AI (Wikipedia)
@@ -1419,7 +1419,7 @@
     - long-term-future
   lastUpdated: 2025-12
 - id: knowledge-monopoly
-  stableId: TaBC4uj0Bw
+  stableId: sid_TaBC4uj0Bw
   wikiId: E183
   type: risk
   summaryPage: epistemic-overview
@@ -1477,7 +1477,7 @@
     - information-infrastructure
   lastUpdated: 2025-12
 - id: learned-helplessness
-  stableId: SFFrl4Pmag
+  stableId: sid_SFFrl4Pmag
   wikiId: E187
   type: risk
   summaryPage: epistemic-overview
@@ -1533,7 +1533,7 @@
     - democratic-decay
   lastUpdated: 2025-12
 - id: legal-evidence-crisis
-  stableId: 52V4qNAQjw
+  stableId: sid_52V4qNAQjw
   wikiId: E188
   type: risk
   summaryPage: epistemic-overview
@@ -1593,7 +1593,7 @@
     - content-provenance
   lastUpdated: 2025-12
 - id: lock-in
-  stableId: nFwuCHi9qw
+  stableId: sid_nFwuCHi9qw
   wikiId: E189
   type: risk
   summaryPage: structural-overview
@@ -1612,11 +1612,11 @@
     - label: Key Feature
       value: Irreversibility
   relatedEntries:
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
   sources:
     - title: The Precipice
@@ -1652,7 +1652,7 @@
     - long-term
   lastUpdated: 2025-12
 - id: authoritarian-takeover
-  stableId: AV6AJU1FhQ
+  stableId: sid_AV6AJU1FhQ
   wikiId: E29
   type: risk
   summaryPage: structural-overview
@@ -1671,13 +1671,13 @@
     - label: Key Feature
       value: Lock-in of oppressive systems
   relatedEntries:
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
   sources:
     - title: The Precipice
@@ -1697,7 +1697,7 @@
     - lock-in
   lastUpdated: 2025-12
 - id: mesa-optimization
-  stableId: 8Bv92x9G1A
+  stableId: sid_8Bv92x9G1A
   wikiId: E197
   type: risk
   summaryPage: accident-overview
@@ -1716,11 +1716,11 @@
     - label: Key Paper
       value: Risks from Learned Optimization (2019)
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
   sources:
     - title: Risks from Learned Optimization
@@ -1743,7 +1743,7 @@
     - base-optimizer
   lastUpdated: 2025-12
 - id: multipolar-trap
-  stableId: FAvAr2lvzg
+  stableId: sid_FAvAr2lvzg
   wikiId: E209
   type: risk
   summaryPage: structural-overview
@@ -1760,9 +1760,9 @@
     - label: Also Called
       value: Collective action failure
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   sources:
     - title: Meditations on Moloch
@@ -1794,7 +1794,7 @@
     - collective-action
   lastUpdated: 2025-12
 - id: power-seeking
-  stableId: hwDgNNDsDQ
+  stableId: sid_hwDgNNDsDQ
   wikiId: E226
   type: risk
   summaryPage: accident-overview
@@ -1812,11 +1812,11 @@
     - label: Key Paper
       value: Turner et al. 2021
   relatedEntries:
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: aUMeFdALrA
+    - id: sid_aUMeFdALrA
       type: research-area
-    - id: y4bieqSeag
+    - id: sid_y4bieqSeag
       type: organization
   sources:
     - title: Optimal Policies Tend to Seek Power
@@ -1840,7 +1840,7 @@
     - resource-acquisition
   lastUpdated: 2025-12
 - id: preference-manipulation
-  stableId: eM6SuO5nUw
+  stableId: sid_eM6SuO5nUw
   wikiId: E230
   type: risk
   summaryPage: epistemic-overview
@@ -1898,7 +1898,7 @@
     - digital-manipulation
   lastUpdated: 2025-12
 - id: proliferation
-  stableId: Pr5xmThNfA
+  stableId: sid_Pr5xmThNfA
   wikiId: E232
   type: risk
   summaryPage: structural-overview
@@ -1915,11 +1915,11 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: bioweapons
+    - id: sid_bioweapons
       type: risk
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
   sources:
     - title: Open-sourcing highly capable foundation models (arXiv)
@@ -1951,7 +1951,7 @@
     - regulation
   lastUpdated: 2025-12
 - id: racing-dynamics
-  stableId: SUZgWeZLNA
+  stableId: sid_SUZgWeZLNA
   wikiId: E239
   type: risk
   summaryPage: structural-overview
@@ -1969,11 +1969,11 @@
     - label: Also Called
       value: Arms race dynamics
   relatedEntries:
-    - id: lfvY1bGeoA
+    - id: sid_lfvY1bGeoA
       type: concept
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: XLLyzaEaCA
+    - id: sid_XLLyzaEaCA
       type: organization
   sources:
     - title: 'Racing to the Precipice: A Model of AI Development'
@@ -2005,7 +2005,7 @@
     - arms-race
   lastUpdated: 2025-12
 - id: reality-fragmentation
-  stableId: 4Rz7XtP9Uw
+  stableId: sid_4Rz7XtP9Uw
   wikiId: E244
   type: risk
   summaryPage: epistemic-overview
@@ -2064,7 +2064,7 @@
     - shared-reality
   lastUpdated: 2025-12
 - id: reward-hacking
-  stableId: 9XN9QMfecA
+  stableId: sid_9XN9QMfecA
   wikiId: E253
   type: risk
   summaryPage: accident-overview
@@ -2082,13 +2082,13 @@
     - label: Status
       value: Actively occurring
   relatedEntries:
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
-    - id: rSE7kY5k4Q
+    - id: sid_rSE7kY5k4Q
       type: research-area
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
-    - id: sycophancy
+    - id: sid_sycophancy
       type: risk
   sources:
     - title: Specification Gaming Examples
@@ -2111,7 +2111,7 @@
     - proxy-gaming
   lastUpdated: 2025-12
 - id: sandbagging
-  stableId: GzX9hnrzWw
+  stableId: sid_GzX9hnrzWw
   wikiId: E270
   type: risk
   summaryPage: accident-overview
@@ -2130,11 +2130,11 @@
     - label: Definition
       value: AI hiding capabilities during evaluation
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
   sources:
     - title: Evaluating Language-Model Agents on Realistic Autonomous Tasks
@@ -2154,7 +2154,7 @@
     - red-teaming
   lastUpdated: 2025-12
 - id: scheming
-  stableId: JqMTO0YVEA
+  stableId: sid_JqMTO0YVEA
   wikiId: E274
   type: risk
   summaryPage: accident-overview
@@ -2171,11 +2171,11 @@
     - label: Also Called
       value: Strategic deception
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
   sources:
     - title: 'Scheming AIs: Will AIs fake alignment during training in order to get power?'
@@ -2207,7 +2207,7 @@
     - ai-safety
   lastUpdated: 2025-12
 - id: scientific-corruption
-  stableId: IK5egiQE9w
+  stableId: sid_IK5egiQE9w
   wikiId: E276
   type: risk
   summaryPage: epistemic-overview
@@ -2268,7 +2268,7 @@
     - ai-detection
   lastUpdated: 2025-12
 - id: sharp-left-turn
-  stableId: AMhUctK34Q
+  stableId: sid_AMhUctK34Q
   wikiId: E281
   type: risk
   summaryPage: accident-overview
@@ -2285,11 +2285,11 @@
     - label: Coined By
       value: Nate Soares / MIRI
   relatedEntries:
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
-    - id: 8Bv92x9G1A
+    - id: sid_8Bv92x9G1A
       type: risk
   sources:
     - title: Sharp Left Turn
@@ -2311,7 +2311,7 @@
     - takeoff-speed
   lastUpdated: 2025-12
 - id: surveillance
-  stableId: 9ToBZjhsVg
+  stableId: sid_9ToBZjhsVg
   wikiId: E292
   type: risk
   summaryPage: misuse-overview
@@ -2329,9 +2329,9 @@
     - label: Key Change
       value: Automation of analysis
   relatedEntries:
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   sources:
     - title: The Global Expansion of AI Surveillance (Carnegie Endowment)
@@ -2367,7 +2367,7 @@
     - governance
   lastUpdated: 2025-12
 - id: us-ai-surveillance-democratic-erosion
-  stableId: Tnd9iuHdjw
+  stableId: sid_Tnd9iuHdjw
   wikiId: E1003
   type: risk
   summaryPage: misuse-overview
@@ -2387,13 +2387,13 @@
     - label: Key Trigger
       value: Anthropic-Pentagon standoff (Feb 2026)
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: AV6AJU1FhQ
+    - id: sid_AV6AJU1FhQ
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: 27ay7L0VtY
+    - id: sid_27ay7L0VtY
       type: event
   sources:
     - title: "Center for American Progress: Digital Watchtower"
@@ -2422,7 +2422,7 @@
     - us-policy
   lastUpdated: 2026-03
 - id: sycophancy
-  stableId: 8BWfogRouw
+  stableId: sid_8BWfogRouw
   wikiId: E295
   type: risk
   summaryPage: accident-overview
@@ -2438,11 +2438,11 @@
     - label: Status
       value: Actively occurring
   relatedEntries:
-    - id: 9XN9QMfecA
+    - id: sid_9XN9QMfecA
       type: risk
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: MBGtb3Qlkw
+    - id: sid_MBGtb3Qlkw
       type: research-area
     - id: automation-bias
       type: risk
@@ -2472,7 +2472,7 @@
     - ai-assistants
   lastUpdated: 2025-12
 - id: epistemic-sycophancy
-  stableId: zzLBCdjXEw
+  stableId: sid_zzLBCdjXEw
   wikiId: E124
   type: risk
   summaryPage: epistemic-overview
@@ -2528,7 +2528,7 @@
     - epistemic-integrity
   lastUpdated: 2025-12
 - id: treacherous-turn
-  stableId: tRj4bS6V8Q
+  stableId: sid_tRj4bS6V8Q
   wikiId: E359
   type: risk
   summaryPage: accident-overview
@@ -2547,11 +2547,11 @@
     - label: Source
       value: Superintelligence (2014)
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: aUMeFdALrA
+    - id: sid_aUMeFdALrA
       type: research-area
   sources:
     - title: 'Superintelligence: Paths, Dangers, Strategies'
@@ -2572,7 +2572,7 @@
     - corrigibility
   lastUpdated: 2025-12
 - id: rogue-ai-scenarios
-  stableId: jfSHBPsKiA
+  stableId: sid_jfSHBPsKiA
   wikiId: E490
   type: risk
   summaryPage: accident-overview
@@ -2593,19 +2593,19 @@
     - label: Key Insight
       value: None require superhuman intelligence or explicit deception
   relatedEntries:
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: BYKermZj1A
+    - id: sid_BYKermZj1A
       type: risk
-    - id: tRj4bS6V8Q
+    - id: sid_tRj4bS6V8Q
       type: risk
-    - id: hwDgNNDsDQ
+    - id: sid_hwDgNNDsDQ
       type: risk
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
-    - id: sandboxing
+    - id: sid_sandboxing
       type: approach
   sources:
     - title: Concrete scenarios for agentic AI takeover
@@ -2622,7 +2622,7 @@
     - delegation
   lastUpdated: 2026-02
 - id: trust-cascade
-  stableId: IQ4E6VkW9A
+  stableId: sid_IQ4E6VkW9A
   wikiId: E360
   type: risk
   summaryPage: epistemic-overview
@@ -2680,7 +2680,7 @@
     - democratic-backsliding
   lastUpdated: 2025-12
 - id: trust-decline
-  stableId: 1NWLygwzGw
+  stableId: sid_1NWLygwzGw
   wikiId: E362
   type: risk
   summaryPage: epistemic-overview
@@ -2697,11 +2697,11 @@
     - label: Status
       value: Ongoing
   relatedEntries:
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
   sources:
     - title: 'Trust: The Social Virtues and the Creation of Prosperity'
@@ -2720,7 +2720,7 @@
     - polarization
   lastUpdated: 2025-12
 - id: winner-take-all
-  stableId: YOMDe574Ew
+  stableId: sid_YOMDe574Ew
   wikiId: E374
   type: risk
   summaryPage: structural-overview
@@ -2737,9 +2737,9 @@
     - label: Key Risk
       value: Extreme concentration
   relatedEntries:
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
   sources:
     - title: How to Prevent Winner-Take-Most AI (Brookings)
@@ -2768,7 +2768,7 @@
     - regional-development
   lastUpdated: 2025-12
 - id: autonomous-replication
-  stableId: 3EuTey4ung
+  stableId: sid_3EuTey4ung
   wikiId: E34
   type: risk
   title: Autonomous Replication
@@ -2784,7 +2784,7 @@
     latest: 2030
   maturity: Emerging
   relatedEntries:
-    - id: 95ASV0XEwQ
+    - id: sid_95ASV0XEwQ
       type: capability
   tags:
     - dangerous-capabilities
@@ -2792,7 +2792,7 @@
     - x-risk
   lastUpdated: 2025-12
 - id: cyber-offense
-  stableId: VPk7sdZtkg
+  stableId: sid_VPk7sdZtkg
   wikiId: E82
   type: risk
   title: AI-Enabled Cyberattacks
@@ -2811,7 +2811,7 @@
     - dangerous-capabilities
   lastUpdated: 2025-12
 - id: bio-risk
-  stableId: kZQP3vYrXA
+  stableId: sid_kZQP3vYrXA
   wikiId: E40
   type: risk
   title: AI-Enabled Biological Risks
@@ -2833,7 +2833,7 @@
   lastUpdated: 2025-12
 
 - id: sleeper-agents
-  stableId: D8dD07y5oQ
+  stableId: sid_D8dD07y5oQ
   wikiId: E489
   type: risk
   summaryPage: accident-overview
@@ -2851,21 +2851,21 @@
   clusters:
     - ai-safety
   relatedEntries:
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
-    - id: JqMTO0YVEA
+    - id: sid_JqMTO0YVEA
       type: risk
-    - id: XnqqKHiNmw
+    - id: sid_XnqqKHiNmw
       type: person
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
-    - id: 5maTNr0PGA
+    - id: sid_5maTNr0PGA
       type: capability
   lastUpdated: 2026-02
 
 # === Auto-generated stubs for pages missing entities ===
 - id: compute-concentration
-  stableId: MvImONf1YA
+  stableId: sid_MvImONf1YA
   wikiId: E684
   type: risk
   summaryPage: structural-overview
@@ -2887,13 +2887,13 @@
     - label: Investment Scale
       value: $700B+ annual capex (2026)
   relatedEntries:
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
-    - id: nFwuCHi9qw
+    - id: sid_nFwuCHi9qw
       type: risk
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: cF7VgLKSpg
+    - id: sid_cF7VgLKSpg
       type: analysis
   sources:
     - title: "Securing the Backbone of AI: Cyber Threats (New America)"
@@ -2933,7 +2933,7 @@
   lastUpdated: 2026-02
 
 - id: concentrated-compute-cybersecurity-risk
-  stableId: VP53MHxfEg
+  stableId: sid_VP53MHxfEg
   wikiId: E689
   type: risk
   summaryPage: structural-overview
@@ -2954,9 +2954,9 @@
     of global frontier AI compute. The NVIDIA Container Toolkit CVE-2025-23266 (CVSS 9.0)
     demonstrated this risk by affecting all major cloud providers simultaneously.
   relatedEntries:
-    - id: MvImONf1YA
+    - id: sid_MvImONf1YA
       type: risk
-    - id: KpMBQkdQ5g
+    - id: sid_KpMBQkdQ5g
       type: risk
   tags:
     - compute
@@ -2969,7 +2969,7 @@
   lastUpdated: 2026-02
 
 - id: financial-stability-risks-ai-capex
-  stableId: Q0msUgaClw
+  stableId: sid_Q0msUgaClw
   wikiId: E690
   type: risk
   summaryPage: structural-overview
@@ -2990,11 +2990,11 @@
     2024-2026 vs $1.2T telecom inflation-adjusted). Risks could transmit to broader markets
     through index fund concentration, credit contagion, and semiconductor supply chain cascades.
   relatedEntries:
-    - id: cF7VgLKSpg
+    - id: sid_cF7VgLKSpg
       type: analysis
-    - id: B7uHMuvA0Q
+    - id: sid_B7uHMuvA0Q
       type: organization
-    - id: hRRC36tWDg
+    - id: sid_hRRC36tWDg
       type: risk
   tags:
     - economics
@@ -3007,7 +3007,7 @@
   lastUpdated: 2026-02
 
 - id: steganography
-  stableId: 5dNWb70CDA
+  stableId: sid_5dNWb70CDA
   wikiId: E603
   type: risk
   summaryPage: accident-overview
@@ -3023,7 +3023,7 @@
   lastUpdated: 2026-02
 
 - id: ai-enabled-untraceable-misuse
-  stableId: 6c238j1BMw
+  stableId: sid_6c238j1BMw
   wikiId: E691
   type: risk
   summaryPage: misuse-overview
@@ -3048,21 +3048,21 @@
     - label: Key Risk
       value: Simultaneous capability amplification and attribution defeat
   relatedEntries:
-    - id: GnUTRJhA4g
+    - id: sid_GnUTRJhA4g
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: 7c6UC46TWQ
+    - id: sid_7c6UC46TWQ
       type: risk
-    - id: GvV1xPNXRw
+    - id: sid_GvV1xPNXRw
       type: risk
-    - id: IQ4E6VkW9A
+    - id: sid_IQ4E6VkW9A
       type: risk
-    - id: CwBPBQAmxA
+    - id: sid_CwBPBQAmxA
       type: concept
-    - id: Pr5xmThNfA
+    - id: sid_Pr5xmThNfA
       type: risk
   sources:
     - title: Four Responsibility Gaps with Artificial Intelligence
@@ -3087,7 +3087,7 @@
     - governance
   lastUpdated: 2026-02
 - id: ai-investigation-risks
-  stableId: cJPcbuv5fw
+  stableId: sid_cJPcbuv5fw
   wikiId: E694
   type: risk
   title: AI-Powered Investigation Risks
@@ -3112,19 +3112,19 @@
     - label: Key Risk
       value: Erosion of privacy through obscurity as AI lowers discoverability threshold
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: GnUTRJhA4g
+    - id: sid_GnUTRJhA4g
       type: risk
-    - id: GvV1xPNXRw
+    - id: sid_GvV1xPNXRw
       type: risk
-    - id: 1NWLygwzGw
+    - id: sid_1NWLygwzGw
       type: risk
-    - id: MUGUxfl2YA
+    - id: sid_MUGUxfl2YA
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: 6c238j1BMw
+    - id: sid_6c238j1BMw
       type: risk
   sources:
     - title: "AI is undermining OSINT's core assumptions (Reuters Institute)"
@@ -3157,7 +3157,7 @@
     - governance
   lastUpdated: 2026-02
 - id: deanonymization
-  stableId: 0J0pDyhVtQ
+  stableId: sid_0J0pDyhVtQ
   wikiId: E699
   type: risk
   title: AI-Powered Deanonymization
@@ -3182,17 +3182,17 @@
     - label: Key Concern
       value: Erosion of pseudonymity and practical obscurity
   relatedEntries:
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: 54ItAwh4QA
+    - id: sid_54ItAwh4QA
       type: risk
-    - id: GeYirWJrwA
+    - id: sid_GeYirWJrwA
       type: risk
-    - id: GnUTRJhA4g
+    - id: sid_GnUTRJhA4g
       type: risk
-    - id: N0NF4lvS4Q
+    - id: sid_N0NF4lvS4Q
       type: capability
   sources:
     - title: "Beyond Memorization: Violating Privacy Via Inference with Large Language Models"
@@ -3214,7 +3214,7 @@
   lastUpdated: 2026-02
 
 - id: near-term-risks
-  stableId: zTPtio1cDA
+  stableId: sid_zTPtio1cDA
   wikiId: E1005
   type: risk
   title: Key Near-Term AI Risks
@@ -3224,19 +3224,19 @@
     Covers governance, misuse, epistemic, and technical risks that are no longer
     theoretical but producing observable real-world harms.
   relatedEntries:
-    - id: SUZgWeZLNA
+    - id: sid_SUZgWeZLNA
       type: risk
-    - id: eXd3Fe8Lzg
+    - id: sid_eXd3Fe8Lzg
       type: risk
-    - id: 9ToBZjhsVg
+    - id: sid_9ToBZjhsVg
       type: risk
-    - id: AaAOkTHkug
+    - id: sid_AaAOkTHkug
       type: risk
-    - id: GvV1xPNXRw
+    - id: sid_GvV1xPNXRw
       type: risk
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
-    - id: Tnd9iuHdjw
+    - id: sid_Tnd9iuHdjw
       type: risk
   tags:
     - near-term
@@ -3249,7 +3249,7 @@
   lastUpdated: 2026-03
 
 - id: ai-enabled-political-polarization
-  stableId: M4NQ38gfDQ
+  stableId: sid_M4NQ38gfDQ
   wikiId: E2072
   type: risk
   summaryPage: epistemic-overview
@@ -3265,7 +3265,7 @@
   lastUpdated: 2026-03
 
 - id: epistemic-systemic-risk
-  stableId: Wtu0Y2eJ9A
+  stableId: sid_Wtu0Y2eJ9A
   wikiId: E2073
   type: risk
   title: Epistemic Systemic Risk

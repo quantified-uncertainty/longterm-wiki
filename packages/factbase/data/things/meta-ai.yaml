@@ -1,4 +1,4 @@
-entity: tt0f5PYDCw
+entity: sid_tt0f5PYDCw
 facts:
   - id: f_S2gCtemHdA
     property: founded-date
@@ -17,7 +17,7 @@ facts:
   - id: f_lhQD26Idvw
     property: founded-by
     value:
-      - !ref cMbVUVK29Q
+      - !ref sid_cMbVUVK29Q
     source: https://ai.meta.com/research/
 
   - id: f_Hh20Dvc90g

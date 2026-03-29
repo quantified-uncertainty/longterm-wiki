@@ -1,4 +1,4 @@
-entity: XLLyzaEaCA
+entity: sid_XLLyzaEaCA
 facts:
   - id: f_H6HJHvsAfg
     property: description
@@ -83,7 +83,7 @@ facts:
   - id: f_wJtpNoNBDJ
     property: key-person
     value:
-      - !ref aAaiRGmdG1
+      - !ref sid_aAaiRGmdG1
     asOf: 2024
     source: https://www.governance.ai/team
     notes: "Ben Garfinkel became Director after GovAI's transition to independence"
@@ -91,7 +91,7 @@ facts:
   - id: f_UbvBHpwFpm
     property: key-person
     value:
-      - !ref 1nsWegMiR3
+      - !ref sid_1nsWegMiR3
     asOf: 2024
     source: https://www.governance.ai/team
     notes: "Markus Anderljung serves as Head of Policy"

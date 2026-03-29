@@ -8,7 +8,7 @@
 # ── Alignment Training ─────────────────────────────────────────────────
 
 - id: rlhf
-  stableId: rSE7kY5k4Q
+  stableId: sid_rSE7kY5k4Q
   wikiId: E259
   type: research-area
   title: RLHF
@@ -33,19 +33,19 @@
       author: Casper et al.
       date: '2023'
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: research
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: research
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: research
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
       relationship: research
-    - id: hQ7mR2kN5p
+    - id: sid_hQ7mR2kN5p
       type: person
       relationship: research
   lastUpdated: 2026-03
@@ -53,7 +53,7 @@
 # ── Interpretability ───────────────────────────────────────────────────
 
 - id: interpretability
-  stableId: 73qTEkYyWA
+  stableId: sid_73qTEkYyWA
   wikiId: E174
   type: research-area
   title: Interpretability
@@ -72,25 +72,25 @@
     - title: "Is Interpretability Sufficient for Safety? (Alignment Survey)"
       url: https://alignmentsurvey.com/materials/assurance/redteam/
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: research
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: research
-    - id: Tz48rTriBg
+    - id: sid_Tz48rTriBg
       type: person
       relationship: research
-    - id: zaRXTCXPPk
+    - id: sid_zaRXTCXPPk
       type: person
       relationship: research
-    - id: 0vyIQ4YLIA
+    - id: sid_0vyIQ4YLIA
       type: research-area
       relationship: composed-of
   lastUpdated: 2026-03
 
 - id: mech-interp
-  stableId: 0vyIQ4YLIA
+  stableId: sid_0vyIQ4YLIA
   wikiId: E477
   type: research-area
   title: Mechanistic Interpretability
@@ -113,19 +113,19 @@
       url: https://transformer-circuits.pub/
       author: Anthropic
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: research
-    - id: Tz48rTriBg
+    - id: sid_Tz48rTriBg
       type: person
       relationship: research
-    - id: zaRXTCXPPk
+    - id: sid_zaRXTCXPPk
       type: person
       relationship: research
-    - id: H74rOLotqg
+    - id: sid_H74rOLotqg
       type: organization
       relationship: research
-    - id: 73qTEkYyWA
+    - id: sid_73qTEkYyWA
       type: research-area
       relationship: composed-of
   lastUpdated: 2026-03
@@ -133,7 +133,7 @@
 # ── Evaluation ─────────────────────────────────────────────────────────
 
 - id: evals
-  stableId: etuIjQhFbQ
+  stableId: sid_etuIjQhFbQ
   wikiId: E128
   type: research-area
   title: AI Evaluations
@@ -155,28 +155,28 @@
       url: https://arxiv.org/abs/2407.09221
       date: '2024'
   relatedEntries:
-    - id: rQEkFJxS5w
+    - id: sid_rQEkFJxS5w
       type: organization
       relationship: research
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
       relationship: research
-    - id: aX0jkoaekQ
+    - id: sid_aX0jkoaekQ
       type: organization
       relationship: research
-    - id: VoNqoBJkyg
+    - id: sid_VoNqoBJkyg
       type: person
       relationship: research
-    - id: ZvfLhIm7pw
+    - id: sid_ZvfLhIm7pw
       type: person
       relationship: research
-    - id: CD9w0PDxvg
+    - id: sid_CD9w0PDxvg
       type: concept
       relationship: composed-of
   lastUpdated: 2026-03
 
 - id: red-teaming
-  stableId: k6BfxaEwuQ
+  stableId: sid_k6BfxaEwuQ
   wikiId: E449
   type: research-area
   title: Red Teaming
@@ -194,13 +194,13 @@
       url: https://arxiv.org/abs/2401.15897
       date: '2024'
   relatedEntries:
-    - id: pKeaWwP6sQ
+    - id: sid_pKeaWwP6sQ
       type: organization
       relationship: research
-    - id: lCiT37k9pA
+    - id: sid_lCiT37k9pA
       type: organization
       relationship: research
-    - id: etuIjQhFbQ
+    - id: sid_etuIjQhFbQ
       type: research-area
       relationship: composed-of
   lastUpdated: 2026-03
@@ -208,7 +208,7 @@
 # ── AI Control ─────────────────────────────────────────────────────────
 
 - id: ai-control
-  stableId: sFjyY5xXZA
+  stableId: sid_sFjyY5xXZA
   wikiId: E6
   type: research-area
   title: AI Control
@@ -227,16 +227,16 @@
       url: https://blog.redwoodresearch.org/p/the-case-for-ensuring-that-powerful
       author: Redwood Research
   relatedEntries:
-    - id: dwMzc9WzPa
+    - id: sid_dwMzc9WzPa
       type: organization
       relationship: research
-    - id: Z62bQynY4g
+    - id: sid_Z62bQynY4g
       type: person
       relationship: research
-    - id: XnqqKHiNmw
+    - id: sid_XnqqKHiNmw
       type: person
       relationship: research
-    - id: vc60Nthkcg
+    - id: sid_vc60Nthkcg
       type: risk
       relationship: addresses
   lastUpdated: 2026-03
@@ -244,7 +244,7 @@
 # ── Scalable Oversight ─────────────────────────────────────────────────
 
 - id: scalable-oversight
-  stableId: MBGtb3Qlkw
+  stableId: sid_MBGtb3Qlkw
   wikiId: E271
   type: research-area
   title: Scalable Oversight
@@ -267,22 +267,22 @@
       url: https://arxiv.org/abs/2504.18530
       date: '2025'
   relatedEntries:
-    - id: vzxfzxBITd
+    - id: sid_vzxfzxBITd
       type: person
       relationship: research
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: research
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: research
-    - id: QsXVXtQ0zE
+    - id: sid_QsXVXtQ0zE
       type: organization
       relationship: research
   lastUpdated: 2026-03
 
 - id: corrigibility
-  stableId: aUMeFdALrA
+  stableId: sid_aUMeFdALrA
   wikiId: E79
   type: research-area
   title: Corrigibility
@@ -305,22 +305,22 @@
       author: Nayebi
       date: '2025'
   relatedEntries:
-    - id: puAffUjWSS
+    - id: sid_puAffUjWSS
       type: organization
       relationship: research
-    - id: 5MVd90lzCg
+    - id: sid_5MVd90lzCg
       type: person
       relationship: research
-    - id: fS1tEGKuNq
+    - id: sid_fS1tEGKuNq
       type: person
       relationship: research
-    - id: aE60G9uLyA
+    - id: sid_aE60G9uLyA
       type: risk
       relationship: addresses
   lastUpdated: 2026-03
 
 - id: value-learning
-  stableId: Ub7IaobzDA
+  stableId: sid_Ub7IaobzDA
   wikiId: E368
   type: research-area
   title: Value Learning
@@ -343,16 +343,16 @@
       url: https://www.lcfi.ac.uk/research/project/value-alignment-problem
       author: Leverhulme Centre for the Future of Intelligence
   relatedEntries:
-    - id: ZxUirlzHke
+    - id: sid_ZxUirlzHke
       type: person
       relationship: research
-    - id: zMfgJqiEPQ
+    - id: sid_zMfgJqiEPQ
       type: organization
       relationship: research
-    - id: nYPuaov1hA
+    - id: sid_nYPuaov1hA
       type: risk
       relationship: addresses
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: research
   lastUpdated: 2026-03

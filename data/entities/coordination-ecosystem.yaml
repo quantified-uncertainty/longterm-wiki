@@ -7,7 +7,7 @@
 # ============================================================
 
 - id: ai-democracy-foundation
-  stableId: 5LtumXmvSg
+  stableId: sid_5LtumXmvSg
   type: organization
   orgType: safety-org
   title: AI & Democracy Foundation
@@ -48,7 +48,7 @@
       value: Democracy Levels Framework
 
 - id: radicalxchange
-  stableId: GO99Gd5tfl
+  stableId: sid_GO99Gd5tfl
   type: organization
   orgType: generic
   title: RadicalxChange Foundation
@@ -87,7 +87,7 @@
       value: Quadratic Voting & Funding
 
 - id: plurality-institute
-  stableId: XW1ucKZvGy
+  stableId: sid_XW1ucKZvGy
   type: organization
   orgType: generic
   title: Plurality Institute
@@ -113,7 +113,7 @@
       relationship: related
 
 - id: computational-democracy-project
-  stableId: Tx5VgJAKkn
+  stableId: sid_Tx5VgJAKkn
   type: organization
   orgType: generic
   title: Computational Democracy Project
@@ -145,7 +145,7 @@
       url: https://pol.is
 
 - id: govlab
-  stableId: 4GF4eFBtHg
+  stableId: sid_4GF4eFBtHg
   type: organization
   orgType: academic
   title: The GovLab
@@ -175,7 +175,7 @@
       value: Smarter governance through data and collective intelligence
 
 - id: stanford-deliberative-democracy-lab
-  stableId: IXnetrmsr6
+  stableId: sid_IXnetrmsr6
   type: organization
   orgType: academic
   title: Stanford Deliberative Democracy Lab
@@ -204,7 +204,7 @@
       url: https://deliberation.stanford.edu
 
 - id: mit-center-collective-intelligence
-  stableId: xFz84U1HN4
+  stableId: sid_xFz84U1HN4
   type: organization
   orgType: academic
   title: MIT Center for Collective Intelligence
@@ -230,7 +230,7 @@
       url: https://cci.mit.edu
 
 - id: cooperative-ai-foundation
-  stableId: iA0Nfo7fMw
+  stableId: sid_iA0Nfo7fMw
   type: organization
   orgType: safety-org
   title: Cooperative AI Foundation
@@ -267,7 +267,7 @@
       value: "2021"
 
 - id: oxford-governance-ai
-  stableId: ljFcfiM0Zw
+  stableId: sid_ljFcfiM0Zw
   type: organization
   orgType: academic
   title: Centre for the Governance of AI
@@ -292,7 +292,7 @@
       url: https://www.governance.ai
 
 - id: newdemocracy-foundation
-  stableId: 7bmpbkSWVn
+  stableId: sid_7bmpbkSWVn
   type: organization
   orgType: generic
   title: newDemocracy Foundation
@@ -310,7 +310,7 @@
     - governance
 
 - id: nesta-collective-intelligence
-  stableId: QFiny3za6A
+  stableId: sid_QFiny3za6A
   type: organization
   orgType: generic
   title: Nesta Centre for Collective Intelligence Design
@@ -327,7 +327,7 @@
     - governance
 
 - id: democracynext
-  stableId: xBPfJU6L5n
+  stableId: sid_xBPfJU6L5n
   type: organization
   orgType: generic
   title: DemocracyNext
@@ -345,7 +345,7 @@
     - governance
 
 - id: sortition-foundation
-  stableId: vD5kvsbzyZ
+  stableId: sid_vD5kvsbzyZ
   type: organization
   orgType: generic
   title: Sortition Foundation
@@ -362,7 +362,7 @@
     - governance
 
 - id: citizens-foundation
-  stableId: s8pyCzz4bJ
+  stableId: sid_s8pyCzz4bJ
   type: organization
   orgType: generic
   title: Citizens Foundation
@@ -379,7 +379,7 @@
     - governance
 
 - id: connected-by-data
-  stableId: SHPu2XJgHT
+  stableId: sid_SHPu2XJgHT
   type: organization
   orgType: generic
   title: Connected by Data
@@ -395,7 +395,7 @@
     - governance
 
 - id: more-in-common
-  stableId: wnWIRpzZs8
+  stableId: sid_wnWIRpzZs8
   type: organization
   orgType: generic
   title: More in Common
@@ -412,7 +412,7 @@
     - governance
 
 - id: reboot-democracy
-  stableId: JVXgq2Yz7i
+  stableId: sid_JVXgq2Yz7i
   type: organization
   orgType: generic
   title: Reboot Democracy
@@ -429,7 +429,7 @@
     - governance
 
 - id: iswe-foundation
-  stableId: oarsGBuqTO
+  stableId: sid_oarsGBuqTO
   type: organization
   orgType: generic
   title: Iswe Foundation
@@ -446,7 +446,7 @@
     - governance
 
 - id: mysociety
-  stableId: k2IQRH6YXQ
+  stableId: sid_k2IQRH6YXQ
   type: organization
   orgType: generic
   title: mySociety
@@ -467,7 +467,7 @@
 # ============================================================
 
 - id: kleros
-  stableId: yXV7lgCSyC
+  stableId: sid_yXV7lgCSyC
   type: organization
   orgType: startup
   title: Kleros
@@ -512,7 +512,7 @@
       value: Arbitrum One
 
 - id: metadao
-  stableId: ZtNcKtFTMG
+  stableId: sid_ZtNcKtFTMG
   type: organization
   orgType: startup
   title: MetaDAO
@@ -547,7 +547,7 @@
       value: "2023-11"
 
 - id: eliza-labs
-  stableId: 2byQBO7TCk
+  stableId: sid_2byQBO7TCk
   type: organization
   orgType: startup
   title: Eliza Labs
@@ -576,7 +576,7 @@
       value: "2,200+"
 
 - id: gitcoin
-  stableId: U4i6vcNaDA
+  stableId: sid_U4i6vcNaDA
   type: organization
   orgType: startup
   title: Gitcoin
@@ -621,7 +621,7 @@
       value: "5,000+"
 
 - id: safe-global
-  stableId: W95v6d6gHm
+  stableId: sid_W95v6d6gHm
   type: organization
   orgType: startup
   title: Safe (formerly Gnosis Safe)
@@ -648,7 +648,7 @@
       value: "200+"
 
 - id: snapshot-labs
-  stableId: ILK84OVV1z
+  stableId: sid_ILK84OVV1z
   type: organization
   orgType: startup
   title: Snapshot Labs
@@ -676,7 +676,7 @@
       value: "96% of DAOs; 500K monthly active users"
 
 - id: tally-governance
-  stableId: hcJZRhZC2g
+  stableId: sid_hcJZRhZC2g
   type: organization
   orgType: startup
   title: Tally
@@ -698,7 +698,7 @@
       value: "$30B+"
 
 - id: gnosis-guild
-  stableId: 6Lmf99p9ZT
+  stableId: sid_6Lmf99p9ZT
   type: organization
   orgType: startup
   title: Gnosis Guild
@@ -723,7 +723,7 @@
       relationship: related
 
 - id: aragon
-  stableId: dimMUIEbhA
+  stableId: sid_dimMUIEbhA
   type: organization
   orgType: startup
   title: Aragon
@@ -746,7 +746,7 @@
       value: Active framework, Court sunset 2024
 
 - id: manifold-markets
-  stableId: VV8aH7aXAT
+  stableId: sid_VV8aH7aXAT
   type: organization
   orgType: startup
   title: Manifold Markets
@@ -767,7 +767,7 @@
       value: "200,000+"
 
 - id: uma-protocol
-  stableId: wkI22Ywfwf
+  stableId: sid_wkI22Ywfwf
   type: organization
   orgType: startup
   title: UMA Protocol
@@ -788,12 +788,12 @@
     - id: uma-optimistic-oracle
       type: project
       relationship: composed-of
-    - id: polymarket
+    - id: sid_polymarket
       type: organization
       relationship: related
 
 - id: vitadao
-  stableId: IPHh25UJ0s
+  stableId: sid_IPHh25UJ0s
   type: organization
   orgType: startup
   title: VitaDAO
@@ -815,7 +815,7 @@
       value: "20+"
 
 - id: researchhub
-  stableId: J5TH1IGfF6
+  stableId: sid_J5TH1IGfF6
   type: organization
   orgType: startup
   title: ResearchHub
@@ -833,7 +833,7 @@
     - governance
 
 - id: asi-alliance
-  stableId: qG0WbdykMb
+  stableId: sid_qG0WbdykMb
   type: organization
   orgType: startup
   title: Artificial Superintelligence Alliance
@@ -855,7 +855,7 @@
       relationship: leads-to
 
 - id: bittensor
-  stableId: ynW1nsuvDG
+  stableId: sid_ynW1nsuvDG
   type: organization
   orgType: startup
   title: Bittensor
@@ -879,7 +879,7 @@
       value: "$620M+"
 
 - id: virtuals-protocol
-  stableId: Jn1fbOnSOy
+  stableId: sid_Jn1fbOnSOy
   type: organization
   orgType: startup
   title: Virtuals Protocol
@@ -902,7 +902,7 @@
       value: "$5B"
 
 - id: olas-network
-  stableId: LNI8zmunod
+  stableId: sid_LNI8zmunod
   type: organization
   orgType: startup
   title: Olas (Autonolas)
@@ -920,7 +920,7 @@
     - governance
 
 - id: colony-dao
-  stableId: RaW1yaJw0C
+  stableId: sid_RaW1yaJw0C
   type: organization
   orgType: startup
   title: Colony
@@ -937,7 +937,7 @@
     - governance
 
 - id: daohaus
-  stableId: 9tY9xRlT6p
+  stableId: sid_9tY9xRlT6p
   type: organization
   orgType: startup
   title: DAOhaus
@@ -954,7 +954,7 @@
     - governance
 
 - id: hats-protocol
-  stableId: UfxyUubU6Q
+  stableId: sid_UfxyUubU6Q
   type: organization
   orgType: startup
   title: Hats Protocol
@@ -975,7 +975,7 @@
       value: "50+"
 
 - id: deepdao
-  stableId: 7x7spCmy84
+  stableId: sid_7x7spCmy84
   type: organization
   orgType: startup
   title: DeepDAO
@@ -997,7 +997,7 @@
       value: "11M"
 
 - id: agora-governance
-  stableId: sgu6I0VtAA
+  stableId: sid_sgu6I0VtAA
   type: organization
   orgType: startup
   title: Agora
@@ -1012,8 +1012,8 @@
   clusters:
     - governance
 
-- id: coordinape
-  stableId: kNDqBGHQCx
+- id: sid_coordinape
+  stableId: sid_kNDqBGHQCx
   type: organization
   orgType: startup
   title: Coordinape
@@ -1029,8 +1029,8 @@
   clusters:
     - governance
 
-- id: superfluid
-  stableId: 15dGe0oPW8
+- id: sid_superfluid
+  stableId: sid_15dGe0oPW8
   type: organization
   orgType: startup
   title: Superfluid
@@ -1048,7 +1048,7 @@
     - governance
 
 - id: jokerace
-  stableId: Rz9uehtQvg
+  stableId: sid_Rz9uehtQvg
   type: organization
   orgType: startup
   title: JokeRace
@@ -1070,7 +1070,7 @@
 # ============================================================
 
 - id: pactum-ai
-  stableId: Xpti70scnw
+  stableId: sid_Xpti70scnw
   type: organization
   orgType: startup
   title: Pactum AI
@@ -1104,7 +1104,7 @@
       value: "$140M+"
 
 - id: unanimous-ai
-  stableId: gD58SMZzvp
+  stableId: sid_gD58SMZzvp
   type: organization
   orgType: startup
   title: Unanimous AI
@@ -1125,7 +1125,7 @@
     - id: louis-rosenberg
       type: person
       relationship: leads-to
-    - id: thinkscape
+    - id: sid_thinkscape
       type: project
       relationship: composed-of
   sources:
@@ -1136,7 +1136,7 @@
       value: Groups averaged IQ 128 (97th percentile)
 
 - id: nibble-technology
-  stableId: X4tbIyj8gf
+  stableId: sid_X4tbIyj8gf
   type: organization
   orgType: startup
   title: Nibble Technology
@@ -1155,7 +1155,7 @@
       value: "30,000"
 
 - id: dyspute-ai
-  stableId: sUOmkfFK6q
+  stableId: sid_sUOmkfFK6q
   type: organization
   orgType: startup
   title: Dyspute.ai
@@ -1171,7 +1171,7 @@
     - governance
 
 - id: remesh
-  stableId: 0Cbzvn8OXA
+  stableId: sid_0Cbzvn8OXA
   type: organization
   orgType: startup
   title: Remesh
@@ -1194,7 +1194,7 @@
 # ============================================================
 
 - id: decidim-association
-  stableId: Km8liQ0JQW
+  stableId: sid_Km8liQ0JQW
   type: organization
   orgType: generic
   title: Decidim Association
@@ -1221,7 +1221,7 @@
       value: "3M+"
 
 - id: loomio-cooperative
-  stableId: aHlEGnLIdw
+  stableId: sid_aHlEGnLIdw
   type: organization
   orgType: generic
   title: Loomio Cooperative
@@ -1242,8 +1242,8 @@
       type: project
       relationship: composed-of
 
-- id: citizenlab
-  stableId: 6PfhPgDIZg
+- id: sid_citizenlab
+  stableId: sid_6PfhPgDIZg
   type: organization
   orgType: startup
   title: CitizenLab
@@ -1268,7 +1268,7 @@
 # ============================================================
 
 - id: climate-trace
-  stableId: GR2ARSExNu
+  stableId: sid_GR2ARSExNu
   type: organization
   orgType: generic
   title: Climate TRACE
@@ -1297,7 +1297,7 @@
       value: "352M+"
 
 - id: watttime
-  stableId: 5Cs8BFT1eo
+  stableId: sid_5Cs8BFT1eo
   type: organization
   orgType: generic
   title: WattTime
@@ -1315,7 +1315,7 @@
     - governance
 
 - id: open-climate-fix
-  stableId: ItQRF0vanz
+  stableId: sid_ItQRF0vanz
   type: organization
   orgType: generic
   title: Open Climate Fix
@@ -1332,7 +1332,7 @@
     - governance
 
 - id: global-fishing-watch
-  stableId: KkbLfjLc6T
+  stableId: sid_KkbLfjLc6T
   type: organization
   orgType: generic
   title: Global Fishing Watch
@@ -1354,7 +1354,7 @@
 # ============================================================
 
 - id: aviv-ovadya
-  stableId: BoiTQ6pfAs
+  stableId: sid_BoiTQ6pfAs
   type: person
   title: Aviv Ovadya
   description: >-
@@ -1393,7 +1393,7 @@
       value: Democracy Levels framework, infocalypse concept
 
 - id: divya-siddarth
-  stableId: DqUdaH7kCQ
+  stableId: sid_DqUdaH7kCQ
   type: person
   title: Divya Siddarth
   description: >-
@@ -1428,7 +1428,7 @@
       value: Alignment Assemblies, Global Dialogues
 
 - id: glen-weyl
-  stableId: JceuRU3tbg
+  stableId: sid_JceuRU3tbg
   type: person
   title: Glen Weyl
   description: >-
@@ -1466,7 +1466,7 @@
       value: Quadratic voting/funding, soulbound tokens, Plurality
 
 - id: james-fishkin
-  stableId: AcxatkEvzF
+  stableId: sid_AcxatkEvzF
   type: person
   title: James Fishkin
   description: >-
@@ -1493,7 +1493,7 @@
       value: Deliberative polling (150+ polls in 50+ countries)
 
 - id: beth-noveck
-  stableId: hWhJnhkxlG
+  stableId: sid_hWhJnhkxlG
   type: person
   title: Beth Noveck
   description: >-
@@ -1519,7 +1519,7 @@
       value: Open government, Wiki Government
 
 - id: helene-landemore
-  stableId: 5Mpv0u55Dq
+  stableId: sid_5Mpv0u55Dq
   type: person
   title: "Hélène Landemore"
   description: >-
@@ -1541,7 +1541,7 @@
       value: Open Democracy, sortition advocacy
 
 - id: colin-megill
-  stableId: ljeqoMJY1C
+  stableId: sid_ljeqoMJY1C
   type: person
   title: Colin Megill
   description: >-
@@ -1569,7 +1569,7 @@
       value: Polis deliberation platform
 
 - id: saffron-huang
-  stableId: YZDwyYuU8r
+  stableId: sid_YZDwyYuU8r
   type: person
   title: Saffron Huang
   description: >-
@@ -1590,7 +1590,7 @@
       value: Co-founder, CIP
 
 - id: luke-thorburn
-  stableId: qxNoJsdejX
+  stableId: sid_qxNoJsdejX
   type: person
   title: Luke Thorburn
   description: >-
@@ -1612,7 +1612,7 @@
       value: Researcher, AIDF
 
 - id: andrew-konya
-  stableId: Wn9QOi0pAf
+  stableId: sid_Wn9QOi0pAf
   type: person
   title: Andrew Konya
   description: >-
@@ -1633,7 +1633,7 @@
       value: Researcher, AIDF
 
 - id: peter-eckersley
-  stableId: vARvKmPOLw
+  stableId: sid_vARvKmPOLw
   type: person
   title: Peter Eckersley
   description: >-
@@ -1659,7 +1659,7 @@
       value: EFF, Partnership on AI, Talk to the City
 
 - id: archon-fung
-  stableId: 588HYHnDoU
+  stableId: sid_588HYHnDoU
   type: person
   title: Archon Fung
   description: >-
@@ -1678,7 +1678,7 @@
       value: Professor, Harvard Kennedy School
 
 - id: matthew-salganik
-  stableId: qJToILAPzZ
+  stableId: sid_qJToILAPzZ
   type: person
   title: Matthew Salganik
   description: >-
@@ -1704,7 +1704,7 @@
 # ============================================================
 
 - id: federico-ast
-  stableId: jbWli8ffTA
+  stableId: sid_jbWli8ffTA
   type: person
   title: Federico Ast
   description: >-
@@ -1726,7 +1726,7 @@
       value: Founder & CEO, Kleros
 
 - id: clement-lesaege
-  stableId: i3zGeeJQ0t
+  stableId: sid_i3zGeeJQ0t
   type: person
   title: "Clément Lesaège"
   description: >-
@@ -1746,7 +1746,7 @@
       value: Co-founder & CTO, Kleros
 
 - id: kevin-owocki
-  stableId: 1zLXdwDsfg
+  stableId: sid_1zLXdwDsfg
   type: person
   title: Kevin Owocki
   description: >-
@@ -1770,7 +1770,7 @@
       value: Quadratic funding at scale
 
 - id: illia-polosukhin
-  stableId: O0HuGk4uOg
+  stableId: sid_O0HuGk4uOg
   type: person
   title: Illia Polosukhin
   description: >-
@@ -1791,7 +1791,7 @@
       value: Co-invented transformer architecture; AI governance delegates
 
 - id: ben-goertzel
-  stableId: OopAmuzVuQ
+  stableId: sid_OopAmuzVuQ
   type: person
   title: Ben Goertzel
   description: >-
@@ -1820,7 +1820,7 @@
 # ============================================================
 
 - id: thomas-malone
-  stableId: E86SvWoWvO
+  stableId: sid_E86SvWoWvO
   type: person
   title: Thomas Malone
   description: >-
@@ -1846,7 +1846,7 @@
       value: Superminds, collective intelligence
 
 - id: tuomas-sandholm
-  stableId: 373HJGLm9M
+  stableId: sid_373HJGLm9M
   type: person
   title: Tuomas Sandholm
   description: >-
@@ -1868,7 +1868,7 @@
       value: Kidney exchange algorithms, automated mechanism design
 
 - id: david-parkes
-  stableId: ARQZgudNKh
+  stableId: sid_ARQZgudNKh
   type: person
   title: David Parkes
   description: >-
@@ -1889,7 +1889,7 @@
       value: Differentiable economics, optimal auctions via deep learning
 
 - id: ariel-procaccia
-  stableId: lJA5ocd4kI
+  stableId: sid_lJA5ocd4kI
   type: person
   title: Ariel Procaccia
   description: >-
@@ -1914,7 +1914,7 @@
       value: Fair division, Spliddit, computational social choice
 
 - id: vincent-conitzer
-  stableId: WtoFL18DEY
+  stableId: sid_WtoFL18DEY
   type: person
   title: Vincent Conitzer
   description: >-
@@ -1936,7 +1936,7 @@
       value: AI alignment as social choice problem
 
 - id: noam-brown
-  stableId: HKckE8tpTw
+  stableId: sid_HKckE8tpTw
   type: person
   title: Noam Brown
   description: >-
@@ -1962,7 +1962,7 @@
       value: CICERO (Diplomacy AI), Pluribus (Poker AI)
 
 - id: iason-gabriel
-  stableId: U2zfJ0Mzxw
+  stableId: sid_U2zfJ0Mzxw
   type: person
   title: Iason Gabriel
   description: >-
@@ -1984,7 +1984,7 @@
       value: Democratic AI experiment, values alignment philosophy
 
 - id: gillian-hadfield
-  stableId: BtBqVgSMpw
+  stableId: sid_BtBqVgSMpw
   type: person
   title: Gillian Hadfield
   description: >-
@@ -2005,7 +2005,7 @@
       value: Regulatory markets, "Rules for a Flat World"
 
 - id: alvin-roth
-  stableId: VbLkGGsSGt
+  stableId: sid_VbLkGGsSGt
   type: person
   title: Alvin Roth
   description: >-
@@ -2026,7 +2026,7 @@
       value: Market design, kidney exchange, NRMP matching
 
 - id: louis-rosenberg
-  stableId: Ucy1ZzDnll
+  stableId: sid_Ucy1ZzDnll
   type: person
   title: Louis Rosenberg
   description: >-
@@ -2050,7 +2050,7 @@
       value: Artificial swarm intelligence, collective superintelligence
 
 - id: martin-rand
-  stableId: ZIo7hUEUsz
+  stableId: sid_ZIo7hUEUsz
   type: person
   title: Martin Rand
   description: >-
@@ -2072,7 +2072,7 @@
       value: Co-founder & President, Pactum AI
 
 - id: gavin-mccormick
-  stableId: jFO5gQhk3o
+  stableId: sid_jFO5gQhk3o
   type: person
   title: Gavin McCormick
   description: >-
@@ -2097,7 +2097,7 @@
       value: Co-founder, Climate TRACE & WattTime
 
 - id: daron-acemoglu
-  stableId: N3YilE9CwS
+  stableId: sid_N3YilE9CwS
   type: person
   title: Daron Acemoglu
   description: >-
@@ -2123,7 +2123,7 @@
 # ============================================================
 
 - id: talk-to-the-city
-  stableId: cslhHNCk8Q
+  stableId: sid_cslhHNCk8Q
   type: project
   title: Talk to the City
   description: >-
@@ -2161,7 +2161,7 @@
       value: Taiwan moda, Chatham House, UNFCCC
 
 - id: polis-platform
-  stableId: WNgwaO8dGO
+  stableId: sid_WNgwaO8dGO
   type: project
   title: Polis
   description: >-
@@ -2196,7 +2196,7 @@
       url: https://github.com/compdemocracy/polis
 
 - id: habermas-machine
-  stableId: 5WYQzQZY3U
+  stableId: sid_5WYQzQZY3U
   type: project
   title: Habermas Machine
   description: >-
@@ -2228,7 +2228,7 @@
       value: "5,700+ UK residents"
 
 - id: deliberation-io
-  stableId: o8aH4k5ew0
+  stableId: sid_o8aH4k5ew0
   type: project
   title: Deliberation.io
   description: >-
@@ -2254,7 +2254,7 @@
       url: https://deliberation.io
 
 - id: democracy-levels
-  stableId: 51cJFHWoVK
+  stableId: sid_51cJFHWoVK
   type: project
   title: Democracy Levels Framework
   description: >-
@@ -2282,7 +2282,7 @@
       url: https://arxiv.org/abs/2411.09222
 
 - id: case-law-for-ai
-  stableId: fC3kijt9Ms
+  stableId: sid_fC3kijt9Ms
   type: project
   title: Case Law for AI
   description: >-
@@ -2303,8 +2303,8 @@
       type: organization
       relationship: related
 
-- id: thinkscape
-  stableId: Xqg9cb8glL
+- id: sid_thinkscape
+  stableId: sid_Xqg9cb8glL
   type: project
   title: ThinkScape
   description: >-
@@ -2327,7 +2327,7 @@
       relationship: related
 
 - id: all-our-ideas
-  stableId: ZafcBn42fQ
+  stableId: sid_ZafcBn42fQ
   type: project
   title: All Our Ideas
   description: >-
@@ -2349,7 +2349,7 @@
       relationship: related
 
 - id: decidim-platform
-  stableId: ShsNbsIy1A
+  stableId: sid_ShsNbsIy1A
   type: project
   title: Decidim Platform
   description: >-
@@ -2366,7 +2366,7 @@
     - governance
 
 - id: loomio-platform
-  stableId: 0TVHzfFr2p
+  stableId: sid_0TVHzfFr2p
   type: project
   title: Loomio
   description: >-
@@ -2383,7 +2383,7 @@
     - governance
 
 - id: kialo
-  stableId: F2OeL8ot0g
+  stableId: sid_F2OeL8ot0g
   type: project
   title: Kialo
   description: >-
@@ -2403,7 +2403,7 @@
 # ============================================================
 
 - id: elizaos
-  stableId: Oz15zw0fLA
+  stableId: sid_Oz15zw0fLA
   type: project
   title: ElizaOS
   description: >-
@@ -2427,7 +2427,7 @@
       relationship: related
 
 - id: metadao-futarchy
-  stableId: jD0XhTalqH
+  stableId: sid_jD0XhTalqH
   type: project
   title: MetaDAO Futarchy Protocol
   description: >-
@@ -2446,7 +2446,7 @@
     - governance
 
 - id: truth-terminal
-  stableId: T4gqkkgnyQ
+  stableId: sid_T4gqkkgnyQ
   type: project
   title: Truth Terminal
   description: >-
@@ -2464,7 +2464,7 @@
     - governance
 
 - id: gitcoin-grants-qf
-  stableId: 5HfGHjFP6B
+  stableId: sid_5HfGHjFP6B
   type: project
   title: Gitcoin Grants (Quadratic Funding)
   description: >-
@@ -2482,7 +2482,7 @@
     - governance
 
 - id: optimism-rpgf
-  stableId: MkMHUlkQjG
+  stableId: sid_MkMHUlkQjG
   type: project
   title: Optimism Retroactive Public Goods Funding
   description: >-
@@ -2499,7 +2499,7 @@
     - governance
 
 - id: x402-protocol
-  stableId: Lr10YB97ln
+  stableId: sid_Lr10YB97ln
   type: project
   title: x402 Payment Protocol
   description: >-
@@ -2519,7 +2519,7 @@
       url: https://docs.cdp.coinbase.com/x402/welcome
 
 - id: snapshot-voting
-  stableId: wy1YkpMahP
+  stableId: sid_wy1YkpMahP
   type: project
   title: Snapshot Voting
   description: >-
@@ -2537,7 +2537,7 @@
     - governance
 
 - id: zodiac-modules
-  stableId: EyalPJO5lj
+  stableId: sid_EyalPJO5lj
   type: project
   title: Zodiac
   description: >-
@@ -2554,7 +2554,7 @@
     - governance
 
 - id: gitcoin-passport
-  stableId: VuQ79VNqvV
+  stableId: sid_VuQ79VNqvV
   type: project
   title: Gitcoin Passport
   description: >-
@@ -2571,7 +2571,7 @@
     - governance
 
 - id: proof-of-humanity
-  stableId: LFTk76uT5o
+  stableId: sid_LFTk76uT5o
   type: project
   title: Proof of Humanity
   description: >-
@@ -2588,7 +2588,7 @@
     - governance
 
 - id: kleros-court
-  stableId: pIG1hKsbpQ
+  stableId: sid_pIG1hKsbpQ
   type: project
   title: Kleros Court
   description: >-
@@ -2605,7 +2605,7 @@
     - governance
 
 - id: uma-optimistic-oracle
-  stableId: t2mTrELveq
+  stableId: sid_t2mTrELveq
   type: project
   title: UMA Optimistic Oracle
   description: >-
@@ -2627,7 +2627,7 @@
 # ============================================================
 
 - id: aaa-ai-arbitrator
-  stableId: IRmv52mmvZ
+  stableId: sid_IRmv52mmvZ
   type: project
   title: AAA-ICDR AI Arbitrator
   description: >-
@@ -2653,7 +2653,7 @@
       value: "35-45%"
 
 - id: pactum-negotiation
-  stableId: B4fwmhgxrA
+  stableId: sid_B4fwmhgxrA
   type: project
   title: Pactum AI Negotiation Platform
   description: >-
@@ -2671,7 +2671,7 @@
     - governance
 
 - id: learned-hand-platform
-  stableId: PmmnXdSCGg
+  stableId: sid_PmmnXdSCGg
   type: project
   title: Learned Hand
   description: >-
@@ -2688,7 +2688,7 @@
     - governance
 
 - id: cicero-diplomacy
-  stableId: 03zm54jO9Q
+  stableId: sid_03zm54jO9Q
   type: project
   title: CICERO
   description: >-
@@ -2712,7 +2712,7 @@
       url: https://www.science.org/doi/10.1126/science.ade9097
 
 - id: ai-economist
-  stableId: WiaVpz27fg
+  stableId: sid_WiaVpz27fg
   type: project
   title: AI Economist
   description: >-
@@ -2733,7 +2733,7 @@
       url: https://github.com/salesforce/ai-economist
 
 - id: spliddit
-  stableId: TchCqc3jO1
+  stableId: sid_TchCqc3jO1
   type: project
   title: Spliddit
   description: >-
@@ -2757,7 +2757,7 @@
 # ============================================================
 
 - id: climate-trace-platform
-  stableId: X1kgREeQEq
+  stableId: sid_X1kgREeQEq
   type: project
   title: Climate TRACE Platform
   description: >-
@@ -2782,7 +2782,7 @@
 # --- Organizations ---
 
 - id: consul-democracy
-  stableId: phMPUVHON3
+  stableId: sid_phMPUVHON3
   type: organization
   orgType: generic
   title: CONSUL Democracy
@@ -2800,7 +2800,7 @@
       value: "~90 million"
 
 - id: ethelo
-  stableId: sbPEBY9bL1
+  stableId: sid_sbPEBY9bL1
   type: organization
   orgType: startup
   title: Ethelo
@@ -2813,7 +2813,7 @@
   clusters: [governance]
 
 - id: metagov
-  stableId: dEsK8grz2g
+  stableId: sid_dEsK8grz2g
   type: organization
   orgType: generic
   title: Metagov
@@ -2830,7 +2830,7 @@
       value: Scotland adopting their standards nationally
 
 - id: mass-lbp
-  stableId: ioMviz9lWQ
+  stableId: sid_ioMviz9lWQ
   type: organization
   orgType: generic
   title: MASS LBP
@@ -2846,7 +2846,7 @@
       value: "41"
 
 - id: participedia
-  stableId: Nd9jUPbBUA
+  stableId: sid_Nd9jUPbBUA
   type: organization
   orgType: academic
   title: Participedia
@@ -2864,7 +2864,7 @@
       value: "330+"
 
 - id: people-powered
-  stableId: KPgc53rUgG
+  stableId: sid_KPgc53rUgG
   type: organization
   orgType: generic
   title: People Powered
@@ -2877,7 +2877,7 @@
   clusters: [governance]
 
 - id: demos-uk
-  stableId: qrnxvTe6zw
+  stableId: sid_qrnxvTe6zw
   type: organization
   orgType: generic
   title: Demos
@@ -2890,7 +2890,7 @@
   clusters: [governance]
 
 - id: polco
-  stableId: 3kgrrgeuGA
+  stableId: sid_3kgrrgeuGA
   type: organization
   orgType: startup
   title: Polco
@@ -2906,7 +2906,7 @@
       value: "400+"
 
 - id: fide-democracy
-  stableId: 0WnODo4eCQ
+  stableId: sid_0WnODo4eCQ
   type: organization
   orgType: generic
   title: FIDE (Federation for Innovation in Democracy)
@@ -2919,7 +2919,7 @@
   clusters: [governance]
 
 - id: commons-stack
-  stableId: Fl872YNBJE
+  stableId: sid_Fl872YNBJE
   type: organization
   orgType: generic
   title: Commons Stack / Token Engineering Commons
@@ -2933,7 +2933,7 @@
   clusters: [governance]
 
 - id: ushahidi
-  stableId: BqcZIf3nOM
+  stableId: sid_BqcZIf3nOM
   type: organization
   orgType: generic
   title: Ushahidi
@@ -2950,7 +2950,7 @@
       value: "160+"
 
 - id: pachama
-  stableId: urhk50LVCP
+  stableId: sid_urhk50LVCP
   type: organization
   orgType: startup
   title: Pachama (Carbon Direct)
@@ -2963,7 +2963,7 @@
   clusters: [governance]
 
 - id: kayrros
-  stableId: iqVWRCMtx9
+  stableId: sid_iqVWRCMtx9
   type: organization
   orgType: startup
   title: Kayrros
@@ -2977,7 +2977,7 @@
   clusters: [governance]
 
 - id: electricity-maps
-  stableId: veFTBOHbk7
+  stableId: sid_veFTBOHbk7
   type: organization
   orgType: startup
   title: Electricity Maps
@@ -2993,7 +2993,7 @@
       value: "230+"
 
 - id: feeding-america
-  stableId: 5nUXLlWpwQ
+  stableId: sid_5nUXLlWpwQ
   type: organization
   orgType: generic
   title: Feeding America
@@ -3009,7 +3009,7 @@
 # --- People (Academic additions) ---
 
 - id: tim-roughgarden
-  stableId: wpLP3ETf0j
+  stableId: sid_wpLP3ETf0j
   type: person
   title: Tim Roughgarden
   description: >-
@@ -3025,7 +3025,7 @@
       value: Price of anarchy, algorithmic game theory
 
 - id: parag-pathak
-  stableId: oV7KFzhdLd
+  stableId: sid_oV7KFzhdLd
   type: person
   title: Parag Pathak
   description: >-
@@ -3040,7 +3040,7 @@
       value: School choice mechanism design
 
 - id: milind-tambe
-  stableId: cja9EFqyeq
+  stableId: sid_cja9EFqyeq
   type: person
   title: Milind Tambe
   description: >-
@@ -3056,7 +3056,7 @@
       value: Security games (ARMOR at LAX), AI for social good
 
 - id: erik-brynjolfsson
-  stableId: 0DEGg8bIrQ
+  stableId: sid_0DEGg8bIrQ
   type: person
   title: Erik Brynjolfsson
   description: >-
@@ -3071,7 +3071,7 @@
       value: "The Second Machine Age, digital economy research"
 
 - id: itai-ashlagi
-  stableId: LBZDvW1BAs
+  stableId: sid_LBZDvW1BAs
   type: person
   title: Itai Ashlagi
   description: >-
@@ -3087,7 +3087,7 @@
       value: Kidney exchange algorithms
 
 - id: scott-kominers
-  stableId: LsNkMOlKQG
+  stableId: sid_LsNkMOlKQG
   type: person
   title: Scott Duke Kominers
   description: >-
@@ -3103,7 +3103,7 @@
       value: Market design, vaccine distribution matching
 
 - id: constantinos-daskalakis
-  stableId: kuDMXcvkFz
+  stableId: sid_kuDMXcvkFz
   type: person
   title: Constantinos Daskalakis
   description: >-
@@ -3119,7 +3119,7 @@
       value: Nash equilibrium computation complexity
 
 - id: caspar-oesterheld
-  stableId: J1jVBAemhC
+  stableId: sid_J1jVBAemhC
   type: person
   title: Caspar Oesterheld
   description: >-
@@ -3135,7 +3135,7 @@
       value: "Foundations of Cooperative AI, program equilibrium"
 
 - id: stephan-zheng
-  stableId: bUJVsmvZ2A
+  stableId: sid_bUJVsmvZ2A
   type: person
   title: Stephan Zheng
   description: >-
@@ -3151,7 +3151,7 @@
       value: AI Economist (RL for tax policy design)
 
 - id: eric-budish
-  stableId: Tnj6lsfLDw
+  stableId: sid_Tnj6lsfLDw
   type: person
   title: Eric Budish
   description: >-
@@ -3169,7 +3169,7 @@
 # --- Projects (additions) ---
 
 - id: geomatch
-  stableId: P8rWjfeZHA
+  stableId: sid_P8rWjfeZHA
   type: project
   title: GeoMatch (Refugee Resettlement)
   description: >-
@@ -3184,7 +3184,7 @@
       value: US, Netherlands, Norway, Switzerland
 
 - id: openspiel
-  stableId: kLVNlMm1Vd
+  stableId: sid_kLVNlMm1Vd
   type: project
   title: OpenSpiel
   description: >-
@@ -3197,7 +3197,7 @@
   clusters: [governance]
 
 - id: consul-platform
-  stableId: sjsTbnizW3
+  stableId: sid_sjsTbnizW3
   type: project
   title: CONSUL Platform
   description: >-
@@ -3210,7 +3210,7 @@
   clusters: [governance]
 
 - id: your-priorities
-  stableId: ulObOSkEp1
+  stableId: sid_ulObOSkEp1
   type: project
   title: Your Priorities
   description: >-
@@ -3224,7 +3224,7 @@
   clusters: [governance]
 
 - id: waves-digital-democracy
-  stableId: JOWMQyTdwJ
+  stableId: sid_JOWMQyTdwJ
   type: project
   title: Waves
   description: >-
@@ -3237,7 +3237,7 @@
   clusters: [governance]
 
 - id: liquidfeedback
-  stableId: E9fxUa8YeQ
+  stableId: sid_E9fxUa8YeQ
   type: project
   title: LiquidFeedback
   description: >-
@@ -3250,7 +3250,7 @@
   clusters: [governance]
 
 - id: democracyos-platform
-  stableId: e36LcaGK34
+  stableId: sid_e36LcaGK34
   type: project
   title: DemocracyOS
   description: >-
@@ -3263,7 +3263,7 @@
   clusters: [governance]
 
 - id: kayrros-methane-watch
-  stableId: 7yWKYSiWdg
+  stableId: sid_7yWKYSiWdg
   type: project
   title: Kayrros Methane Watch
   description: >-

@@ -7,7 +7,7 @@
 # =============================================================================
 
 - id: claude
-  stableId: cMKB5i2WZQ
+  stableId: sid_cMKB5i2WZQ
   wikiId: E1041
   type: ai-model
   title: Claude
@@ -23,55 +23,55 @@
     including Claude 1, Claude 2, Claude 3, and Claude 4. Claude is available via API, the claude.ai
     web interface, and Claude Code (a CLI tool for software engineering).
   relatedEntries:
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-    - id: R3iYKUUe2g
+    - id: sid_R3iYKUUe2g
       type: ai-model
       relationship: composed-of
-    - id: Ko9DCNV87A
+    - id: sid_Ko9DCNV87A
       type: ai-model
       relationship: composed-of
-    - id: ReFcBG3rJQ
+    - id: sid_ReFcBG3rJQ
       type: ai-model
       relationship: composed-of
-    - id: DlLHB7v8lQ
+    - id: sid_DlLHB7v8lQ
       type: ai-model
       relationship: composed-of
-    - id: ISfAiImMYg
+    - id: sid_ISfAiImMYg
       type: ai-model
       relationship: composed-of
-    - id: Dvvt8cKpkg
+    - id: sid_Dvvt8cKpkg
       type: ai-model
       relationship: composed-of
-    - id: ePVee3jidQ
+    - id: sid_ePVee3jidQ
       type: ai-model
       relationship: composed-of
-    - id: 3cgL7jNlgw
+    - id: sid_3cgL7jNlgw
       type: ai-model
       relationship: composed-of
-    - id: bmxLNyfK3A
+    - id: sid_bmxLNyfK3A
       type: ai-model
       relationship: composed-of
-    - id: dHgSM46fMw
+    - id: sid_dHgSM46fMw
       type: ai-model
       relationship: composed-of
-    - id: fdp0LajPwQ
+    - id: sid_fdp0LajPwQ
       type: ai-model
       relationship: composed-of
-    - id: y87VxEBBIA
+    - id: sid_y87VxEBBIA
       type: ai-model
       relationship: composed-of
-    - id: tppPAkJqjQ
+    - id: sid_tppPAkJqjQ
       type: ai-model
       relationship: composed-of
-    - id: Ac7c55KtVw
+    - id: sid_Ac7c55KtVw
       type: ai-model
       relationship: composed-of
-    - id: Au1yMEZYWQ
+    - id: sid_Au1yMEZYWQ
       type: ai-model
       relationship: composed-of
-    - id: 6sdr78k9kQ
+    - id: sid_6sdr78k9kQ
       type: approach
       relationship: related
   sources:
@@ -87,7 +87,7 @@
   lastUpdated: 2026-02
 
 - id: claude-2
-  stableId: R3iYKUUe2g
+  stableId: sid_R3iYKUUe2g
   wikiId: E2105
   type: ai-model
   title: Claude 2
@@ -116,10 +116,10 @@
     and 71.2% on HumanEval. Available via API and the claude.ai interface. Superseded by Claude 3
     in March 2024.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -132,7 +132,7 @@
   lastUpdated: 2023-07
 
 - id: claude-3-opus
-  stableId: Ko9DCNV87A
+  stableId: sid_Ko9DCNV87A
   wikiId: E1027
   type: ai-model
   title: Claude 3 Opus
@@ -175,10 +175,10 @@
     GPT-4 on MMLU (86.8%), GPQA, GSM8K, and HumanEval benchmarks. Priced at \$15/\$75 per million
     tokens (input/output) with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -191,7 +191,7 @@
   lastUpdated: 2024-03
 
 - id: claude-3-sonnet
-  stableId: ReFcBG3rJQ
+  stableId: sid_ReFcBG3rJQ
   wikiId: E1028
   type: ai-model
   title: Claude 3 Sonnet
@@ -215,10 +215,10 @@
     2x the speed of Claude 2 at higher intelligence levels. Priced at \$3/\$15 per million tokens with a
     200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -230,7 +230,7 @@
   lastUpdated: 2024-03
 
 - id: claude-3-haiku
-  stableId: DlLHB7v8lQ
+  stableId: sid_DlLHB7v8lQ
   wikiId: E1029
   type: ai-model
   title: Claude 3 Haiku
@@ -254,10 +254,10 @@
     March 4, 2024. It could process a 10K-token research paper in under 3 seconds. Priced at \$0.25/\$1.25
     per million tokens with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -269,7 +269,7 @@
   lastUpdated: 2024-03
 
 - id: claude-3-5-sonnet
-  stableId: ISfAiImMYg
+  stableId: sid_ISfAiImMYg
   wikiId: E1030
   type: ai-model
   title: Claude 3.5 Sonnet
@@ -340,10 +340,10 @@
     outperformed Claude 3 Opus across the board at half the price (\$3/\$15 per MTok). The October update
     introduced computer use capability in public beta. Scored 92.0% on HumanEval and 88.7% on MMLU.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -358,7 +358,7 @@
   lastUpdated: 2024-10
 
 - id: claude-3-5-haiku
-  stableId: Dvvt8cKpkg
+  stableId: sid_Dvvt8cKpkg
   wikiId: E1031
   type: ai-model
   title: Claude 3.5 Haiku
@@ -401,10 +401,10 @@
     evaluations while maintaining Haiku-class speed. Priced at \$0.80/\$4 per million tokens (reduced
     from initial \$1/\$5 in December 2024) with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -418,7 +418,7 @@
   lastUpdated: 2024-11
 
 - id: claude-3-7-sonnet
-  stableId: ePVee3jidQ
+  stableId: sid_ePVee3jidQ
   wikiId: E1032
   type: ai-model
   title: Claude 3.7 Sonnet
@@ -465,10 +465,10 @@
     toggle extended thinking mode on or off, allowing the model to self-reflect before answering.
     Priced at \$3/\$15 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -483,7 +483,7 @@
   lastUpdated: 2025-02
 
 - id: claude-sonnet-4
-  stableId: 3cgL7jNlgw
+  stableId: sid_3cgL7jNlgw
   wikiId: E1033
   type: ai-model
   title: Claude Sonnet 4
@@ -524,10 +524,10 @@
     a new naming convention. Scored 72.7% on SWE-bench Verified. Priced at \$3/\$15 per million tokens
     with a 200K token context window (1M beta added later).
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -539,7 +539,7 @@
   lastUpdated: 2025-05
 
 - id: claude-opus-4
-  stableId: bmxLNyfK3A
+  stableId: sid_bmxLNyfK3A
   wikiId: E1034
   type: ai-model
   title: Claude Opus 4
@@ -581,10 +581,10 @@
     model at launch, capable of autonomous coding for up to 7 hours. Scored 72.5% on SWE-bench Verified.
     Priced at \$15/\$75 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -597,7 +597,7 @@
   lastUpdated: 2025-05
 
 - id: claude-opus-4-1
-  stableId: dHgSM46fMw
+  stableId: sid_dHgSM46fMw
   wikiId: E1035
   type: ai-model
   title: Claude Opus 4.1
@@ -623,10 +623,10 @@
     in software engineering, agentic reasoning, and research-level tasks. Priced at \$15/\$75 per million
     tokens with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -638,7 +638,7 @@
   lastUpdated: 2025-08
 
 - id: claude-sonnet-4-5
-  stableId: fdp0LajPwQ
+  stableId: sid_fdp0LajPwQ
   wikiId: E1036
   type: ai-model
   title: Claude Sonnet 4.5
@@ -674,10 +674,10 @@
     parallel compute) and 61.4% on OSWorld. Maintained focus for 30+ hours on multi-step tasks. Launched
     alongside Claude Code 2.0. Priced at \$3/\$15 per million tokens with 200K context (1M beta).
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -690,7 +690,7 @@
   lastUpdated: 2025-09
 
 - id: claude-haiku-4-5
-  stableId: y87VxEBBIA
+  stableId: sid_y87VxEBBIA
   wikiId: E1037
   type: ai-model
   title: Claude Haiku 4.5
@@ -715,10 +715,10 @@
     fraction of the cost, making near-frontier intelligence accessible for scaled deployments. Priced at
     \$1/\$5 per million tokens with a 200K token context window.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -730,7 +730,7 @@
   lastUpdated: 2025-10
 
 - id: claude-opus-4-5
-  stableId: tppPAkJqjQ
+  stableId: sid_tppPAkJqjQ
   wikiId: E1038
   type: ai-model
   title: Claude Opus 4.5
@@ -769,10 +769,10 @@
     (80.9%). Featured a 67% price reduction from Opus 4 (\$5/\$25 vs \$15/\$75 per MTok). Scored 44% on
     Terminal-Bench Hard and 70 on Artificial Analysis Intelligence Index.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -785,7 +785,7 @@
   lastUpdated: 2025-11
 
 - id: claude-opus-4-6
-  stableId: Ac7c55KtVw
+  stableId: sid_Ac7c55KtVw
   wikiId: E1039
   type: ai-model
   title: Claude Opus 4.6
@@ -830,10 +830,10 @@
     (83% improvement over Opus 4.5), 65.4% on Terminal-Bench 2.0, and 72.7% on OSWorld.
     Priced at \$5/\$25 per million tokens.
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -847,7 +847,7 @@
   lastUpdated: 2026-02
 
 - id: claude-sonnet-4-6
-  stableId: Au1yMEZYWQ
+  stableId: sid_Au1yMEZYWQ
   wikiId: E1040
   type: ai-model
   title: Claude Sonnet 4.6
@@ -881,10 +881,10 @@
     cost. Default model for free and Pro Claude users. Priced at \$3/\$15 per million tokens with
     200K context (1M beta).
   relatedEntries:
-    - id: cMKB5i2WZQ
+    - id: sid_cMKB5i2WZQ
       type: ai-model
       relationship: part-of
-    - id: mK9pX3rQ7n
+    - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
   sources:
@@ -900,7 +900,7 @@
 # =============================================================================
 
 - id: gpt
-  stableId: Gqv7h9oEwA
+  stableId: sid_Gqv7h9oEwA
   wikiId: E1060
   type: ai-model
   title: GPT
@@ -917,28 +917,28 @@
     (o1, o3) extends GPT with chain-of-thought reasoning. GPT models are available via the OpenAI
     API, ChatGPT, and Microsoft Copilot.
   relatedEntries:
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-    - id: bFjrDfX8rQ
+    - id: sid_bFjrDfX8rQ
       type: ai-model
       relationship: composed-of
-    - id: Zd0khJQ6XA
+    - id: sid_Zd0khJQ6XA
       type: ai-model
       relationship: composed-of
-    - id: ziNB5viRfw
+    - id: sid_ziNB5viRfw
       type: ai-model
       relationship: composed-of
-    - id: 6zbeHdP49g
+    - id: sid_6zbeHdP49g
       type: ai-model
       relationship: composed-of
-    - id: KpR1gIwJZw
+    - id: sid_KpR1gIwJZw
       type: ai-model
       relationship: composed-of
-    - id: x0Qhowq8zA
+    - id: sid_x0Qhowq8zA
       type: ai-model
       relationship: composed-of
-    - id: EvEua2w8IA
+    - id: sid_EvEua2w8IA
       type: ai-model
       relationship: composed-of
   sources:
@@ -951,7 +951,7 @@
   lastUpdated: 2025-04
 
 - id: gpt-3-5-turbo
-  stableId: bFjrDfX8rQ
+  stableId: sid_bFjrDfX8rQ
   wikiId: E2104
   type: ai-model
   title: GPT-3.5 Turbo
@@ -984,10 +984,10 @@
     which is cheaper and more capable, but remains historically significant as the model behind
     ChatGPT's viral launch.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1003,7 +1003,7 @@
   lastUpdated: 2023-03
 
 - id: gpt-4
-  stableId: Zd0khJQ6XA
+  stableId: sid_Zd0khJQ6XA
   wikiId: E1066
   type: ai-model
   title: GPT-4
@@ -1049,10 +1049,10 @@
     90th percentile on the bar exam. Initially text-only with an 8K context window (32K variant
     available). Priced at \$30/\$60 per million tokens.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1065,7 +1065,7 @@
   lastUpdated: 2023-03
 
 - id: gpt-4-turbo
-  stableId: K3lbRphedA
+  stableId: sid_K3lbRphedA
   wikiId: E1067
   type: ai-model
   title: GPT-4 Turbo
@@ -1103,10 +1103,10 @@
     (16x the original GPT-4), lower pricing (\$10/\$30 per MTok, 3x cheaper than GPT-4), multimodal
     vision capabilities, and a knowledge cutoff of April 2023 (later updated to December 2023).
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1120,7 +1120,7 @@
   lastUpdated: 2023-11
 
 - id: gpt-4o
-  stableId: ziNB5viRfw
+  stableId: sid_ziNB5viRfw
   wikiId: E1068
   type: ai-model
   title: GPT-4o
@@ -1195,10 +1195,10 @@
     at 50% lower price (\$2.50/\$10 per MTok) and 2x faster speed. Scored 88.7% on MMLU. Available
     free to all ChatGPT users with rate limits.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1211,7 +1211,7 @@
   lastUpdated: 2024-05
 
 - id: gpt-4o-mini
-  stableId: 6zbeHdP49g
+  stableId: sid_6zbeHdP49g
   wikiId: E1069
   type: ai-model
   title: GPT-4o mini
@@ -1255,10 +1255,10 @@
     Priced at \$0.15/\$0.60 per million tokens — over 60% cheaper than GPT-3.5 Turbo. Scored 82% on
     MMLU and 87.2% on HumanEval. Replaced GPT-3.5 Turbo as the default free-tier model in ChatGPT.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1271,7 +1271,7 @@
   lastUpdated: 2024-07
 
 - id: o1-preview
-  stableId: i4hm7GvTew
+  stableId: sid_i4hm7GvTew
   wikiId: E1070
   type: ai-model
   title: o1-preview
@@ -1309,13 +1309,13 @@
     chain-of-thought to think through complex problems before responding. Scored 83.3% on the
     International Mathematics Olympiad qualifying exam (vs 13.4% for GPT-4o) and 78% on GPQA Diamond.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-    - id: KpR1gIwJZw
+    - id: sid_KpR1gIwJZw
       type: ai-model
       relationship: related
   sources:
@@ -1328,7 +1328,7 @@
   lastUpdated: 2024-09
 
 - id: o1
-  stableId: KpR1gIwJZw
+  stableId: sid_KpR1gIwJZw
   wikiId: E1071
   type: ai-model
   title: o1
@@ -1387,10 +1387,10 @@
     Added vision capabilities, tool use, and a 200K context window. Scored 96.4% on MATH and
     79.2% on GPQA Diamond. Priced at \$15/\$60 per million tokens.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1403,7 +1403,7 @@
   lastUpdated: 2024-12
 
 - id: o1-mini
-  stableId: Qjqpsk0VQA
+  stableId: sid_Qjqpsk0VQA
   wikiId: E1072
   type: ai-model
   title: o1-mini
@@ -1437,10 +1437,10 @@
     o1-mini was released alongside o1-preview on September 12, 2024. A smaller, faster, 80% cheaper
     reasoning model optimized for STEM tasks. Scored 90% on MATH. Priced at \$3/\$12 per million tokens.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1454,7 +1454,7 @@
   lastUpdated: 2024-09
 
 - id: o3-mini
-  stableId: nTRFbfAcAw
+  stableId: sid_nTRFbfAcAw
   wikiId: E1073
   type: ai-model
   title: o3-mini
@@ -1499,10 +1499,10 @@
     On high effort, scored 97.9% on MATH and 79.7% on GPQA Diamond. Priced at \$1.10/\$4.40 per
     million tokens — significantly cheaper than o1. Available in the API and ChatGPT.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1516,7 +1516,7 @@
   lastUpdated: 2025-01
 
 - id: o3
-  stableId: x0Qhowq8zA
+  stableId: sid_x0Qhowq8zA
   wikiId: E1074
   type: ai-model
   title: o3
@@ -1579,10 +1579,10 @@
     87.5% on ARC-AGI, and 83.3% on GPQA Diamond. Featured improved tool use, image understanding,
     and code execution. Priced at \$10/\$40 per million tokens with a 200K context window.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1596,7 +1596,7 @@
   lastUpdated: 2025-04
 
 - id: gpt-4-1
-  stableId: EvEua2w8IA
+  stableId: sid_EvEua2w8IA
   wikiId: E1075
   type: ai-model
   title: GPT-4.1
@@ -1644,10 +1644,10 @@
     following. Featured a 1M token context window, scored 54.6% on SWE-bench Verified, and priced at
     \$2/\$8 per million tokens. Replaced GPT-4o as the recommended general-purpose API model.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1660,7 +1660,7 @@
   lastUpdated: 2025-04
 
 - id: gpt-4-1-mini
-  stableId: nywmt9QdsA
+  stableId: sid_nywmt9QdsA
   wikiId: E1076
   type: ai-model
   title: GPT-4.1 mini
@@ -1686,10 +1686,10 @@
     same 1M token context window. Priced at \$0.40/\$1.60 per million tokens — nearly 3x cheaper than
     GPT-4o mini with better performance.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1702,7 +1702,7 @@
   lastUpdated: 2025-04
 
 - id: gpt-4-1-nano
-  stableId: oSG59ppF7g
+  stableId: sid_oSG59ppF7g
   wikiId: E1077
   type: ai-model
   title: GPT-4.1 nano
@@ -1728,10 +1728,10 @@
     Designed for high-throughput classification, routing, and structured output tasks. Priced at
     \$0.10/\$0.40 per million tokens with a 1M token context window.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1744,7 +1744,7 @@
   lastUpdated: 2025-04
 
 - id: o4-mini
-  stableId: QUHdhavDNA
+  stableId: sid_QUHdhavDNA
   wikiId: E1078
   type: ai-model
   title: o4-mini
@@ -1801,10 +1801,10 @@
     approaches o3 performance at a fraction of the cost. Scored 68.1% on SWE-bench Verified
     and 81.4% on GPQA Diamond. Priced at \$1.10/\$4.40 per million tokens.
   relatedEntries:
-    - id: Gqv7h9oEwA
+    - id: sid_Gqv7h9oEwA
       type: ai-model
       relationship: part-of
-    - id: 1LcLlMGLbw
+    - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
   sources:
@@ -1822,7 +1822,7 @@
 # =============================================================================
 
 - id: gemini
-  stableId: PaKhQQNPkg
+  stableId: sid_PaKhQQNPkg
   wikiId: E1061
   type: ai-model
   title: Gemini
@@ -1840,25 +1840,25 @@
     The family spans three tiers: Ultra (most capable), Pro (balanced), and Flash (fast/efficient).
     Gemini powers Google AI Studio, the Gemini API, and various Google products.
   relatedEntries:
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-    - id: DMvYhkrQgg
+    - id: sid_DMvYhkrQgg
       type: ai-model
       relationship: composed-of
-    - id: 36NY6axmRA
+    - id: sid_36NY6axmRA
       type: ai-model
       relationship: composed-of
-    - id: hDHozNlJHQ
+    - id: sid_hDHozNlJHQ
       type: ai-model
       relationship: composed-of
-    - id: 1Vsd6bbAbg
+    - id: sid_1Vsd6bbAbg
       type: ai-model
       relationship: composed-of
-    - id: FmNMFeajhg
+    - id: sid_FmNMFeajhg
       type: ai-model
       relationship: composed-of
-    - id: a5llQhfVkw
+    - id: sid_a5llQhfVkw
       type: ai-model
       relationship: composed-of
   sources:
@@ -1872,7 +1872,7 @@
   lastUpdated: 2025-03
 
 - id: gemini-1-0-ultra
-  stableId: DMvYhkrQgg
+  stableId: sid_DMvYhkrQgg
   wikiId: E1079
   type: ai-model
   title: Gemini 1.0 Ultra
@@ -1916,10 +1916,10 @@
     performance on MMLU (90.0%). Built natively multimodal, processing text, images, audio, and video
     in a single model. Powered the Gemini Advanced subscription tier.
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -1933,7 +1933,7 @@
   lastUpdated: 2024-02
 
 - id: gemini-1-5-pro
-  stableId: 36NY6axmRA
+  stableId: sid_36NY6axmRA
   wikiId: E1080
   type: ai-model
   title: Gemini 1.5 Pro
@@ -1974,10 +1974,10 @@
     extended to 2M). Used a Mixture-of-Experts architecture for efficiency. Could process up to 1 hour
     of video, 11 hours of audio, or 30,000+ lines of code. Priced at \$1.25/\$5 per million tokens.
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -1991,7 +1991,7 @@
   lastUpdated: 2024-02
 
 - id: gemini-1-5-flash
-  stableId: hDHozNlJHQ
+  stableId: sid_hDHozNlJHQ
   wikiId: E1081
   type: ai-model
   title: Gemini 1.5 Flash
@@ -2038,10 +2038,10 @@
     Designed for high-volume, cost-sensitive tasks. Featured a 1M token context window at an
     extremely low price point (\$0.075/\$0.30 per million tokens).
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2056,7 +2056,7 @@
   lastUpdated: 2024-05
 
 - id: gemini-2-0-flash
-  stableId: 1Vsd6bbAbg
+  stableId: sid_1Vsd6bbAbg
   wikiId: E1082
   type: ai-model
   title: Gemini 2.0 Flash
@@ -2102,10 +2102,10 @@
     tool use, multimodal generation (images and audio output), and agentic capabilities.
     Priced at \$0.10/\$0.40 per million tokens.
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2118,7 +2118,7 @@
   lastUpdated: 2024-12
 
 - id: gemini-2-5-pro
-  stableId: FmNMFeajhg
+  stableId: sid_FmNMFeajhg
   wikiId: E1083
   type: ai-model
   title: Gemini 2.5 Pro
@@ -2191,10 +2191,10 @@
     on SWE-bench Verified, 84% on GPQA Diamond, and 97.3% on MATH. Featured a 1M token context
     window with reasoning capabilities. Priced at \$1.25/\$10 per million tokens.
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2208,7 +2208,7 @@
   lastUpdated: 2025-03
 
 - id: gemini-2-5-flash
-  stableId: a5llQhfVkw
+  stableId: sid_a5llQhfVkw
   wikiId: E1084
   type: ai-model
   title: Gemini 2.5 Flash
@@ -2260,10 +2260,10 @@
     multimodal capabilities. Priced at \$0.15/\$0.60 per million tokens. Designed to bring 2.5 Pro
     reasoning quality to Flash-tier pricing.
   relatedEntries:
-    - id: PaKhQQNPkg
+    - id: sid_PaKhQQNPkg
       type: ai-model
       relationship: part-of
-    - id: A4XoubikkQ
+    - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
   sources:
@@ -2285,7 +2285,7 @@
 # =============================================================================
 
 - id: llama
-  stableId: kWPQCvjKSg
+  stableId: sid_kWPQCvjKSg
   wikiId: E1062
   type: ai-model
   title: Llama
@@ -2301,25 +2301,25 @@
     the gap to proprietary models, and Llama 4 (April 2025) introduced mixture-of-experts
     architecture. Llama models are available for download and can be self-hosted.
   relatedEntries:
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-    - id: B2NbO8iHzQ
+    - id: sid_B2NbO8iHzQ
       type: ai-model
       relationship: composed-of
-    - id: ws008RbGOA
+    - id: sid_ws008RbGOA
       type: ai-model
       relationship: composed-of
-    - id: kNi5nDKetA
+    - id: sid_kNi5nDKetA
       type: ai-model
       relationship: composed-of
-    - id: vxov67Lixw
+    - id: sid_vxov67Lixw
       type: ai-model
       relationship: composed-of
-    - id: JodiKHELlg
+    - id: sid_JodiKHELlg
       type: ai-model
       relationship: composed-of
-    - id: T3ipFW0POA
+    - id: sid_T3ipFW0POA
       type: ai-model
       relationship: composed-of
   sources:
@@ -2333,7 +2333,7 @@
   lastUpdated: 2025-04
 
 - id: llama-2
-  stableId: B2NbO8iHzQ
+  stableId: sid_B2NbO8iHzQ
   wikiId: E1085
   type: ai-model
   title: Llama 2
@@ -2357,10 +2357,10 @@
     MMLU. Trained on 2T tokens with a 4K context window. Llama 2 Chat variants were fine-tuned for
     dialogue using RLHF.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2373,7 +2373,7 @@
   lastUpdated: 2023-07
 
 - id: llama-3
-  stableId: ws008RbGOA
+  stableId: sid_ws008RbGOA
   wikiId: E1086
   type: ai-model
   title: Llama 3
@@ -2406,10 +2406,10 @@
     The 70B model scored 82% on MMLU and 81.7% on HumanEval, approaching GPT-4 performance.
     Used a Grouped Query Attention (GQA) architecture and a 128K token vocabulary.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2422,7 +2422,7 @@
   lastUpdated: 2024-04
 
 - id: llama-3-1
-  stableId: kNi5nDKetA
+  stableId: sid_kNi5nDKetA
   wikiId: E1087
   type: ai-model
   title: Llama 3.1
@@ -2467,10 +2467,10 @@
     openly available model at the time. The 405B scored 88.6% on MMLU, competitive with GPT-4o and
     Claude 3.5 Sonnet. Extended context to 128K tokens. Released under the Llama 3.1 Community License.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2484,7 +2484,7 @@
   lastUpdated: 2024-07
 
 - id: llama-3-3
-  stableId: vxov67Lixw
+  stableId: sid_vxov67Lixw
   wikiId: E1088
   type: ai-model
   title: Llama 3.3
@@ -2523,10 +2523,10 @@
     on many benchmarks. This represented a significant efficiency improvement — near-405B quality at
     70B cost. Scored 86% on MMLU with 128K context window.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2539,7 +2539,7 @@
   lastUpdated: 2024-12
 
 - id: llama-4-scout
-  stableId: JodiKHELlg
+  stableId: sid_JodiKHELlg
   wikiId: E1089
   type: ai-model
   title: Llama 4 Scout
@@ -2582,10 +2582,10 @@
     model at launch. Natively multimodal (text + image). Scored 89.3% on MMLU. Beat Gemini 2.0 Flash
     and GPT-4o on multiple benchmarks while being deployable on a single H100 GPU.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2600,7 +2600,7 @@
   lastUpdated: 2025-04
 
 - id: llama-4-maverick
-  stableId: T3ipFW0POA
+  stableId: sid_T3ipFW0POA
   wikiId: E1090
   type: ai-model
   title: Llama 4 Maverick
@@ -2642,10 +2642,10 @@
     Featured a 1M token context window and native multimodal support. Could be deployed on a single
     H100 DGX host.
   relatedEntries:
-    - id: kWPQCvjKSg
+    - id: sid_kWPQCvjKSg
       type: ai-model
       relationship: part-of
-    - id: tt0f5PYDCw
+    - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
   sources:
@@ -2664,7 +2664,7 @@
 # =============================================================================
 
 - id: mistral-ai-models
-  stableId: v1e1ZwDwoA
+  stableId: sid_v1e1ZwDwoA
   wikiId: E1063
   type: ai-model
   title: Mistral
@@ -2680,13 +2680,13 @@
     (the first competitive small open model), Mixtral (mixture-of-experts), and Mistral Large
     (frontier-class). The company offers both open-weight and proprietary models.
   relatedEntries:
-    - id: RFHVboBnHg
+    - id: sid_RFHVboBnHg
       type: organization
       relationship: created-by
-    - id: S519Yr3AOw
+    - id: sid_S519Yr3AOw
       type: ai-model
       relationship: composed-of
-    - id: 7aS5YclgSQ
+    - id: sid_7aS5YclgSQ
       type: ai-model
       relationship: composed-of
   sources:
@@ -2699,7 +2699,7 @@
   lastUpdated: 2024-07
 
 - id: mixtral-8x7b
-  stableId: S519Yr3AOw
+  stableId: sid_S519Yr3AOw
   wikiId: E1091
   type: ai-model
   title: Mixtral 8x7B
@@ -2724,10 +2724,10 @@
     or outperformed Llama 2 70B and GPT-3.5 on most benchmarks while being 6x faster at inference.
     Scored 70.6% on MMLU. Released under Apache 2.0 license.
   relatedEntries:
-    - id: v1e1ZwDwoA
+    - id: sid_v1e1ZwDwoA
       type: ai-model
       relationship: part-of
-    - id: RFHVboBnHg
+    - id: sid_RFHVboBnHg
       type: organization
       relationship: created-by
   sources:
@@ -2740,7 +2740,7 @@
   lastUpdated: 2023-12
 
 - id: mistral-large-2
-  stableId: 7aS5YclgSQ
+  stableId: sid_7aS5YclgSQ
   wikiId: E1092
   type: ai-model
   title: Mistral Large 2
@@ -2783,10 +2783,10 @@
     Featured a 128K context window and was released under the Mistral Research License (later made
     more permissive). Available via API and self-hosting.
   relatedEntries:
-    - id: v1e1ZwDwoA
+    - id: sid_v1e1ZwDwoA
       type: ai-model
       relationship: part-of
-    - id: RFHVboBnHg
+    - id: sid_RFHVboBnHg
       type: organization
       relationship: created-by
   sources:
@@ -2803,7 +2803,7 @@
 # =============================================================================
 
 - id: grok
-  stableId: nnv09Wl5OQ
+  stableId: sid_nnv09Wl5OQ
   wikiId: E1064
   type: ai-model
   title: Grok
@@ -2819,13 +2819,13 @@
     information via the X (Twitter) platform. Grok-1 was partially open-sourced, but later versions
     are proprietary. Available via the xAI API and the X platform.
   relatedEntries:
-    - id: GLXKjYAEKw
+    - id: sid_GLXKjYAEKw
       type: organization
       relationship: created-by
-    - id: wRDaY5XnEA
+    - id: sid_wRDaY5XnEA
       type: ai-model
       relationship: composed-of
-    - id: ELbPFPb5vA
+    - id: sid_ELbPFPb5vA
       type: ai-model
       relationship: composed-of
   sources:
@@ -2838,7 +2838,7 @@
   lastUpdated: 2025-02
 
 - id: grok-2
-  stableId: wRDaY5XnEA
+  stableId: sid_wRDaY5XnEA
   wikiId: E1093
   type: ai-model
   title: Grok-2
@@ -2875,10 +2875,10 @@
     3.5 Sonnet. Featured vision capabilities and integrated image generation via FLUX. Available
     through the xAI API and X Premium+ subscribers. Priced at \$2/\$10 per million tokens.
   relatedEntries:
-    - id: nnv09Wl5OQ
+    - id: sid_nnv09Wl5OQ
       type: ai-model
       relationship: part-of
-    - id: GLXKjYAEKw
+    - id: sid_GLXKjYAEKw
       type: organization
       relationship: created-by
   sources:
@@ -2891,7 +2891,7 @@
   lastUpdated: 2024-08
 
 - id: grok-3
-  stableId: ELbPFPb5vA
+  stableId: sid_ELbPFPb5vA
   wikiId: E1094
   type: ai-model
   title: Grok-3
@@ -2946,10 +2946,10 @@
     H100 GPUs). Scored 80% on GPQA Diamond and 95% on MATH. Featured a "think" mode for chain-of-thought
     reasoning. Available via the xAI API and X platform. Priced at \$3/\$15 per million tokens.
   relatedEntries:
-    - id: nnv09Wl5OQ
+    - id: sid_nnv09Wl5OQ
       type: ai-model
       relationship: part-of
-    - id: GLXKjYAEKw
+    - id: sid_GLXKjYAEKw
       type: organization
       relationship: created-by
   sources:
@@ -2967,7 +2967,7 @@
 # =============================================================================
 
 - id: deepseek-models
-  stableId: svlbcrT5oQ
+  stableId: sid_svlbcrT5oQ
   wikiId: E1065
   type: ai-model
   title: DeepSeek Models
@@ -2983,13 +2983,13 @@
     training cost, and R1's open-weight reasoning capabilities that rivaled o1. All models are
     released under permissive MIT licenses.
   relatedEntries:
-    - id: otUkuVHDKw
+    - id: sid_otUkuVHDKw
       type: organization
       relationship: created-by
-    - id: DysvXRWdOQ
+    - id: sid_DysvXRWdOQ
       type: ai-model
       relationship: composed-of
-    - id: jhJqRVFXcg
+    - id: sid_jhJqRVFXcg
       type: ai-model
       relationship: composed-of
   sources:
@@ -3002,7 +3002,7 @@
   lastUpdated: 2025-01
 
 - id: deepseek-v3
-  stableId: DysvXRWdOQ
+  stableId: sid_DysvXRWdOQ
   wikiId: E1095
   type: ai-model
   title: DeepSeek V3
@@ -3063,10 +3063,10 @@
     90.2% on MATH. Released under MIT license. API pricing at \$0.27/\$1.10 per million tokens — one
     of the cheapest frontier-class models.
   relatedEntries:
-    - id: svlbcrT5oQ
+    - id: sid_svlbcrT5oQ
       type: ai-model
       relationship: part-of
-    - id: otUkuVHDKw
+    - id: sid_otUkuVHDKw
       type: organization
       relationship: created-by
   sources:
@@ -3080,7 +3080,7 @@
   lastUpdated: 2024-12
 
 - id: deepseek-r1
-  stableId: jhJqRVFXcg
+  stableId: sid_jhJqRVFXcg
   wikiId: E1096
   type: ai-model
   title: DeepSeek R1
@@ -3145,10 +3145,10 @@
     versions (1.5B to 70B). Released under MIT license, making it the first open-weight model competitive
     with proprietary reasoning models.
   relatedEntries:
-    - id: svlbcrT5oQ
+    - id: sid_svlbcrT5oQ
       type: ai-model
       relationship: part-of
-    - id: otUkuVHDKw
+    - id: sid_otUkuVHDKw
       type: organization
       relationship: created-by
   sources:

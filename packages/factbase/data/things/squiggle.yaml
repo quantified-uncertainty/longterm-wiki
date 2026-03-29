@@ -1,4 +1,4 @@
-entity: nAjP2vwwSw
+entity: sid_nAjP2vwwSw
 facts:
   - id: f_voCxsWhgvg
     property: description
@@ -20,5 +20,5 @@ facts:
   - id: f_uRq5zW8bLc
     property: founded-by
     value:
-      - !ref Khej79OA8g
+      - !ref sid_Khej79OA8g
     notes: Created by QURI (Quantified Uncertainty Research Institute)

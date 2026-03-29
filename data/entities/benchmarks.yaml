@@ -3,7 +3,7 @@
 # Benchmark results (model scores) are stored in the wiki-server PG database.
 
 - id: mmlu
-  stableId: pDqehtEoiw
+  stableId: sid_pDqehtEoiw
   wikiId: E1100
   type: benchmark
   title: MMLU
@@ -19,7 +19,7 @@
       url: "https://arxiv.org/abs/2009.03300"
 
 - id: swe-bench-verified
-  stableId: FaFyApPcNQ
+  stableId: sid_FaFyApPcNQ
   wikiId: E1101
   type: benchmark
   title: SWE-bench Verified
@@ -35,7 +35,7 @@
       url: "https://arxiv.org/abs/2310.06770"
 
 - id: math-benchmark
-  stableId: j76swRBTVA
+  stableId: sid_j76swRBTVA
   wikiId: E1102
   type: benchmark
   title: MATH
@@ -50,7 +50,7 @@
       url: "https://arxiv.org/abs/2103.03874"
 
 - id: humaneval
-  stableId: 7nyWJfSgOQ
+  stableId: sid_7nyWJfSgOQ
   wikiId: E1103
   type: benchmark
   title: HumanEval
@@ -65,7 +65,7 @@
       url: "https://arxiv.org/abs/2107.03374"
 
 - id: gpqa-diamond
-  stableId: TOj1uhYwMA
+  stableId: sid_TOj1uhYwMA
   wikiId: E1104
   type: benchmark
   title: GPQA Diamond
@@ -80,7 +80,7 @@
       url: "https://arxiv.org/abs/2311.12022"
 
 - id: arc-agi
-  stableId: GtNBCWxnjA
+  stableId: sid_GtNBCWxnjA
   wikiId: E1105
   type: benchmark
   title: ARC-AGI
@@ -96,7 +96,7 @@
       url: "https://arxiv.org/abs/1911.01547"
 
 - id: arc-agi-2
-  stableId: C7CZ1MleIQ
+  stableId: sid_C7CZ1MleIQ
   wikiId: E1106
   type: benchmark
   title: ARC-AGI-2
@@ -109,7 +109,7 @@
   website: "https://arcprize.org"
 
 - id: terminal-bench-hard
-  stableId: 9kQIZcOluA
+  stableId: sid_9kQIZcOluA
   wikiId: E1107
   type: benchmark
   title: Terminal-Bench Hard
@@ -124,7 +124,7 @@
       url: "https://github.com/terminal-bench/terminal-bench"
 
 - id: terminal-bench-2
-  stableId: lbTyjIb90A
+  stableId: sid_lbTyjIb90A
   wikiId: E1108
   type: benchmark
   title: Terminal-Bench 2
@@ -136,7 +136,7 @@
   maintainer: "Terminal-Bench"
 
 - id: artificial-analysis-intelligence-index
-  stableId: dEzoE9HQTg
+  stableId: sid_dEzoE9HQTg
   wikiId: E1109
   type: benchmark
   title: Artificial Analysis Intelligence Index
@@ -149,7 +149,7 @@
   website: "https://artificialanalysis.ai"
 
 - id: osworld
-  stableId: WYTefOxYPQ
+  stableId: sid_WYTefOxYPQ
   wikiId: E1110
   type: benchmark
   title: OSWorld
@@ -165,7 +165,7 @@
       url: "https://arxiv.org/abs/2404.07972"
 
 - id: aime-2025
-  stableId: OiqJ2XUuMQ
+  stableId: sid_OiqJ2XUuMQ
   wikiId: E1111
   type: benchmark
   title: AIME 2025
@@ -177,7 +177,7 @@
   maintainer: "Mathematical Association of America"
 
 - id: mmlu-pro
-  stableId: RT858MkjuQ
+  stableId: sid_RT858MkjuQ
   wikiId: E1301
   type: benchmark
   title: MMLU-Pro
@@ -193,7 +193,7 @@
       url: "https://arxiv.org/abs/2406.01574"
 
 - id: simpleqa
-  stableId: oxtbxgfUUg
+  stableId: sid_oxtbxgfUUg
   wikiId: E1302
   type: benchmark
   title: SimpleQA
@@ -208,7 +208,7 @@
       url: "https://openai.com/index/introducing-simpleqa/"
 
 - id: humanitys-last-exam
-  stableId: Lh6IqIxepw
+  stableId: sid_Lh6IqIxepw
   wikiId: E1235
   type: benchmark
   title: "Humanity's Last Exam"
@@ -224,7 +224,7 @@
       url: "https://arxiv.org/abs/2501.14249"
 
 - id: ifeval
-  stableId: 3DEqmUEGPQ
+  stableId: sid_3DEqmUEGPQ
   wikiId: E1236
   type: benchmark
   title: IFEval
@@ -239,7 +239,7 @@
       url: "https://arxiv.org/abs/2311.07911"
 
 - id: chatbot-arena-elo
-  stableId: HcdwpPmRSw
+  stableId: sid_HcdwpPmRSw
   wikiId: E1237
   type: benchmark
   title: Chatbot Arena Elo
@@ -255,7 +255,7 @@
       url: "https://arxiv.org/abs/2403.04132"
 
 - id: livecodebench
-  stableId: RoW25Cag2g
+  stableId: sid_RoW25Cag2g
   wikiId: E1238
   type: benchmark
   title: LiveCodeBench
@@ -271,7 +271,7 @@
       url: "https://arxiv.org/abs/2403.07974"
 
 - id: livebench
-  stableId: QZHbwL6aHg
+  stableId: sid_QZHbwL6aHg
   wikiId: E1240
   type: benchmark
   title: LiveBench
@@ -287,7 +287,7 @@
       url: "https://arxiv.org/abs/2406.19314"
 
 - id: bfcl
-  stableId: 67KLm5yAHQ
+  stableId: sid_67KLm5yAHQ
   wikiId: E1241
   type: benchmark
   title: BFCL
@@ -303,7 +303,7 @@
       url: "https://arxiv.org/abs/2402.15491"
 
 - id: frontiermath
-  stableId: MnqcmhPTaQ
+  stableId: sid_MnqcmhPTaQ
   wikiId: E1242
   type: benchmark
   title: FrontierMath
@@ -319,7 +319,7 @@
       url: "https://arxiv.org/abs/2411.04872"
 
 - id: aime-2024
-  stableId: lUijiPGVBw
+  stableId: sid_lUijiPGVBw
   wikiId: E1243
   type: benchmark
   title: AIME 2024
@@ -331,7 +331,7 @@
   maintainer: "Mathematical Association of America"
 
 - id: bbh
-  stableId: oojQVYfPfw
+  stableId: sid_oojQVYfPfw
   wikiId: E1245
   type: benchmark
   title: BBH
@@ -346,7 +346,7 @@
       url: "https://arxiv.org/abs/2210.09261"
 
 - id: hellaswag
-  stableId: Huw5YsSoMg
+  stableId: sid_Huw5YsSoMg
   wikiId: E1247
   type: benchmark
   title: HellaSwag
@@ -361,7 +361,7 @@
       url: "https://arxiv.org/abs/1905.07830"
 
 - id: re-bench
-  stableId: sOJOmnwGmA
+  stableId: sid_sOJOmnwGmA
   wikiId: E1249
   type: benchmark
   title: RE-Bench
@@ -376,7 +376,7 @@
       url: "https://arxiv.org/abs/2411.15114"
 
 - id: mle-bench
-  stableId: dPZFXNFXcA
+  stableId: sid_dPZFXNFXcA
   wikiId: E1251
   type: benchmark
   title: MLE-bench
@@ -391,7 +391,7 @@
       url: "https://arxiv.org/abs/2410.07095"
 
 - id: webarena
-  stableId: 0HEF0o51UA
+  stableId: sid_0HEF0o51UA
   wikiId: E1253
   type: benchmark
   title: WebArena
@@ -407,7 +407,7 @@
       url: "https://arxiv.org/abs/2307.13854"
 
 - id: tau-bench
-  stableId: Z6tH7RnpHg
+  stableId: sid_Z6tH7RnpHg
   wikiId: E1254
   type: benchmark
   title: TAU-bench
@@ -422,7 +422,7 @@
       url: "https://arxiv.org/abs/2407.12841"
 
 - id: mgsm
-  stableId: tDWpiYrrkQ
+  stableId: sid_tDWpiYrrkQ
   wikiId: E1255
   type: benchmark
   title: MGSM
@@ -437,7 +437,7 @@
       url: "https://arxiv.org/abs/2210.03057"
 
 - id: mathvista
-  stableId: 1mGW7D6lwQ
+  stableId: sid_1mGW7D6lwQ
   wikiId: E1256
   type: benchmark
   title: MathVista
@@ -452,7 +452,7 @@
       url: "https://arxiv.org/abs/2310.02255"
 
 - id: codeforces-rating
-  stableId: 2deBrz125g
+  stableId: sid_2deBrz125g
   wikiId: E1257
   type: benchmark
   title: Codeforces Rating
@@ -465,7 +465,7 @@
   website: "https://codeforces.com"
 
 - id: gsm8k
-  stableId: Kv3nRt8qWz
+  stableId: sid_Kv3nRt8qWz
   type: benchmark
   title: GSM8K
   description: "Grade School Math 8K — a dataset of 8,500 linguistically diverse grade-school math word problems requiring multi-step reasoning with basic arithmetic operations."
@@ -479,7 +479,7 @@
       url: "https://arxiv.org/abs/2110.14168"
 
 - id: mmmu
-  stableId: Xp7mLc2fYa
+  stableId: sid_Xp7mLc2fYa
   type: benchmark
   title: MMMU
   description: "Massive Multi-discipline Multimodal Understanding — 11,500 questions from college exams across 30 subjects and 6 disciplines, requiring college-level reasoning over images."
@@ -492,7 +492,7 @@
       url: "https://arxiv.org/abs/2311.16502"
 
 - id: arena-hard
-  stableId: Bw4jNe9rTk
+  stableId: sid_Bw4jNe9rTk
   type: benchmark
   title: Arena-Hard-Auto
   description: "An automated benchmark that uses GPT-4 as a judge for pairwise model comparisons, designed to approximate Chatbot Arena rankings without human evaluation."
@@ -506,7 +506,7 @@
       url: "https://arxiv.org/abs/2406.11939"
 
 - id: mbpp
-  stableId: Qh6sVd3wRn
+  stableId: sid_Qh6sVd3wRn
   type: benchmark
   title: MBPP
   description: "Mostly Basic Python Programs — 974 crowd-sourced Python programming problems designed to be solvable by entry-level programmers, each with a task description and automated test cases."
@@ -519,8 +519,8 @@
     - title: "Program Synthesis with Large Language Models"
       url: "https://arxiv.org/abs/2108.07732"
 
-- id: truthfulqa
-  stableId: Jm5rPa1cUe
+- id: sid_truthfulqa
+  stableId: sid_Jm5rPa1cUe
   type: benchmark
   title: TruthfulQA
   description: "A benchmark of 817 questions designed to test whether language models generate truthful answers, specifically targeting common misconceptions and falsehoods that models tend to reproduce."
@@ -533,8 +533,8 @@
     - title: "TruthfulQA: Measuring How Models Mimic Human Falsehoods"
       url: "https://arxiv.org/abs/2109.07958"
 
-- id: winogrande
-  stableId: Yt8nKb6hWf
+- id: sid_winogrande
+  stableId: sid_Yt8nKb6hWf
   type: benchmark
   title: WinoGrande
   description: "A large-scale commonsense reasoning benchmark with 44,000 Winograd-schema-style problems, using adversarial filtering to reduce annotation artifacts."
@@ -548,7 +548,7 @@
       url: "https://arxiv.org/abs/1907.10641"
 
 - id: drop
-  stableId: Zx2pMf7gDa
+  stableId: sid_Zx2pMf7gDa
   type: benchmark
   title: DROP
   description: "Discrete Reasoning Over Paragraphs — a reading comprehension benchmark requiring numerical reasoning operations such as addition, counting, and sorting over text passages."
@@ -562,7 +562,7 @@
       url: "https://arxiv.org/abs/1903.00161"
 
 - id: arc-challenge
-  stableId: Fw9qLk4jNc
+  stableId: sid_Fw9qLk4jNc
   type: benchmark
   title: ARC-Challenge
   description: "AI2 Reasoning Challenge (Challenge Set) — a dataset of 2,590 difficult grade-school science multiple-choice questions that require reasoning beyond simple retrieval."
@@ -576,7 +576,7 @@
       url: "https://arxiv.org/abs/1803.05457"
 
 - id: mmmu-pro
-  stableId: Cn3tRw8dVm
+  stableId: sid_Cn3tRw8dVm
   type: benchmark
   title: MMMU-Pro
   description: "A harder variant of MMMU with augmented answer options (10 choices vs 4), a vision-only input setting, and chain-of-thought evaluation to better discriminate top multimodal models."
@@ -589,7 +589,7 @@
       url: "https://arxiv.org/abs/2409.02813"
 
 - id: bigcodebench
-  stableId: Hk5vQn1eTb
+  stableId: sid_Hk5vQn1eTb
   type: benchmark
   title: BigCodeBench
   description: "A practical coding benchmark with 1,140 function-level tasks requiring use of 139 libraries across 7 domains, testing real-world programming beyond algorithmic puzzles."
@@ -602,7 +602,7 @@
       url: "https://arxiv.org/abs/2406.15877"
 
 - id: aider-polyglot
-  stableId: Lg7wSm2fXp
+  stableId: sid_Lg7wSm2fXp
   type: benchmark
   title: Aider Polyglot
   description: "A multi-language coding benchmark that tests AI models on real-world code editing tasks across Python, JavaScript, TypeScript, C#, Java, Ruby, Go, C++, PHP, and Rust."
@@ -614,7 +614,7 @@
   website: "https://aider.chat/docs/leaderboards/"
 
 - id: docvqa
-  stableId: Nt4xPk9rJe
+  stableId: sid_Nt4xPk9rJe
   type: benchmark
   title: DocVQA
   description: "Document Visual Question Answering — a benchmark of 50,000 questions on 12,000+ document images, testing the ability to understand and extract information from real-world documents."
@@ -627,7 +627,7 @@
       url: "https://arxiv.org/abs/2007.00398"
 
 - id: multi-if
-  stableId: Rd6yUj3cKm
+  stableId: sid_Rd6yUj3cKm
   type: benchmark
   title: Multi-IF
   description: "Multi-turn Instruction Following evaluation — tests models on their ability to follow complex, multi-turn conversational instructions with compounding constraints."
@@ -640,7 +640,7 @@
       url: "https://arxiv.org/abs/2501.10921"
 
 - id: math-500
-  stableId: Wg8zTn5bHq
+  stableId: sid_Wg8zTn5bHq
   type: benchmark
   title: MATH-500
   description: "A standardized 500-problem subset of the MATH benchmark providing a consistent, reproducible evaluation of mathematical reasoning across difficulty levels and problem types."
@@ -650,8 +650,8 @@
   introducedDate: "2024-10"
   maintainer: "OpenAI"
 
-- id: browsecomp
-  stableId: Ev2hLr7sMa
+- id: sid_browsecomp
+  stableId: sid_Ev2hLr7sMa
   type: benchmark
   title: BrowseComp
   description: "A benchmark evaluating AI systems' ability to find hard-to-locate information on the web, testing browsing, search, and information synthesis capabilities across difficult queries."
