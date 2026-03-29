@@ -1,3 +1,9 @@
+---
+description: Identify what's missing from the knowledge base — topics without entities, thin coverage, missing relationships.
+argument-hint: "[focus-area]"
+effort: medium
+---
+
 # Knowledge Gap Analysis
 
 Identify what's missing from the knowledge base: topics without entities, entities without statements, thin coverage areas, and important relationships that don't exist yet.

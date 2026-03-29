@@ -1,3 +1,9 @@
+---
+description: Comprehensive review of a single entity — wiki page, facts, relationships, and overall quality.
+argument-hint: "<entity-slug>"
+effort: high
+---
+
 # Entity Deep Dive
 
 Comprehensive review of a single entity: its wiki page, statements, relationships, and overall quality. Identifies issues and makes improvements.

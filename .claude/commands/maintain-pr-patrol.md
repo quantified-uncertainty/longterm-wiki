@@ -1,3 +1,8 @@
+---
+description: Scan all open PRs for issues and fix them in priority order.
+effort: medium
+---
+
 # PR Patrol
 
 Scan all open PRs for issues and fix them in priority order. One-shot version of the `pnpm crux gh pr-patrol` daemon.

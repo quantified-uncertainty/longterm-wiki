@@ -1,3 +1,8 @@
+---
+description: Initialize an agent checklist and establish working context. Run at session start.
+effort: low
+---
+
 # Agent Session Start
 
 Initialize an agent checklist and establish working context.

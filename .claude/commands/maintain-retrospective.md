@@ -1,3 +1,8 @@
+---
+description: Analyze recent PR patterns, session logs, and development process. Produces a process improvements report.
+effort: medium
+---
+
 # Retrospective
 
 Analyze recent PR patterns, session logs, and development process to identify what's working, what's not, and what to change. Produces a written report focused on process improvements.

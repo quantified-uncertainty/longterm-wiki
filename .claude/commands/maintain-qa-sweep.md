@@ -1,3 +1,9 @@
+---
+description: Systematic adversarial audit of the wiki — finds bugs, broken pages, regressions, data integrity issues.
+argument-hint: "[directories] [--depth=quick|standard|deep|exhaustive]"
+effort: medium
+---
+
 # Adversarial QA Sweep
 
 Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions, and data integrity issues. Produces a prioritized findings report and files GitHub issues for real bugs.
