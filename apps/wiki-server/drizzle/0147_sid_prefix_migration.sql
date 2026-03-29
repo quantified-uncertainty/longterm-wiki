@@ -16,15 +16,6 @@
 UPDATE facts SET entity_id = 'sid_' || entity_id
 WHERE entity_id IS NOT NULL AND entity_id NOT LIKE 'sid_%';
 
--- fact_timeseries.entity_id
-UPDATE fact_timeseries SET entity_id = 'sid_' || entity_id
-WHERE entity_id IS NOT NULL AND entity_id NOT LIKE 'sid_%';
-
--- fact_timeseries.subject
-UPDATE fact_timeseries SET subject = 'sid_' || subject
-WHERE subject IS NOT NULL AND subject NOT LIKE 'sid_%'
-  AND length(subject) = 10 AND subject ~ '^[A-Za-z0-9]{10}$';
-
 -- personnel.person_entity_id
 UPDATE personnel SET person_entity_id = 'sid_' || person_entity_id
 WHERE person_entity_id IS NOT NULL AND person_entity_id NOT LIKE 'sid_%';
