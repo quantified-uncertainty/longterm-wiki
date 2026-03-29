@@ -1,0 +1,145 @@
+{
+  "table": "personnel",
+  "recordCount": 16,
+  "submittedAt": "2026-03-29T11:35:42.095Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 16,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "qinMLWP0vM",
+      "personId": "4Qz7ctU0HG",
+      "organizationId": "uW7R22grHt",
+      "role": "President & CEO",
+      "source": "https://www.asml.com/en/company/governance/board-of-management",
+      "verdict": "none"
+    },
+    {
+      "id": "pTX7F2p4nl",
+      "personId": "4S3CXgYTIf",
+      "organizationId": "uW7R22grHt",
+      "role": "EVP & CFO",
+      "source": "https://www.asml.com/en/company/governance/board-of-management",
+      "verdict": "none"
+    },
+    {
+      "id": "4AgDtGGoYY",
+      "personId": "KurkY2hYAa",
+      "organizationId": "uW7R22grHt",
+      "role": "EVP & COO",
+      "source": "https://www.asml.com/en/company/governance/board-of-management",
+      "verdict": "none"
+    },
+    {
+      "id": "xY9tppn2Al",
+      "personId": "DxPwWhCHlV",
+      "organizationId": "uW7R22grHt",
+      "role": "EVP & Chief Strategic Sourcing & Procurement Officer",
+      "source": "https://www.asml.com/en/company/governance/board-of-management",
+      "verdict": "none"
+    },
+    {
+      "id": "NDRApt4jkJ",
+      "personId": "DKXfn4Ij7X",
+      "organizationId": "uW7R22grHt",
+      "role": "EVP & Chief Customer Officer",
+      "source": "https://www.asml.com/en/company/governance/board-of-management",
+      "verdict": "none"
+    },
+    {
+      "id": "gDM1jSkHNS",
+      "personId": "9e7rzrAih9",
+      "organizationId": "uW7R22grHt",
+      "role": "President & CEO",
+      "source": "https://www.asml.com/en/news/press-releases/2023/asml-board-of-management-changes",
+      "verdict": "none"
+    },
+    {
+      "id": "JyoFsNmroN",
+      "personId": "jcOTktxAyc",
+      "organizationId": "uW7R22grHt",
+      "role": "President & CTO",
+      "source": "https://www.asml.com/en/news/press-releases/2023/asml-board-of-management-changes",
+      "verdict": "none"
+    },
+    {
+      "id": "3ED2yer1qB",
+      "personId": "qgGdRwVXsy",
+      "organizationId": "uW7R22grHt",
+      "role": "Chair, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "iXwhK4hkQ7",
+      "personId": "ShMZJ3DJ9n",
+      "organizationId": "uW7R22grHt",
+      "role": "Vice Chair, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "FcnkGNJ6PB",
+      "personId": "kefrF5F76S",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "V3A70NlpYj",
+      "personId": "pXzHMjNObs",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "I8yy9BkHYA",
+      "personId": "zWOOLLTUq0",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "rLP4GRw1di",
+      "personId": "GysFrGN5fA",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "lKW9qUwOV7",
+      "personId": "kS49dfHKq5",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/news/press-releases/2025/asml-publishes-agenda-annual-general-meeting-2025",
+      "verdict": "none"
+    },
+    {
+      "id": "9qx5NJfFv5",
+      "personId": "IKp2OikLsN",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    },
+    {
+      "id": "F6K0rA9DJh",
+      "personId": "9dQA2gVV9X",
+      "organizationId": "uW7R22grHt",
+      "role": "Member, Supervisory Board",
+      "source": "https://www.asml.com/en/company/governance/supervisory-board",
+      "verdict": "none"
+    }
+  ]
+}

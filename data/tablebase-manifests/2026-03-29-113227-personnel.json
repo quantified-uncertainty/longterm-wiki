@@ -1,0 +1,57 @@
+{
+  "table": "personnel",
+  "recordCount": 5,
+  "submittedAt": "2026-03-29T11:32:27.069Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 5,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "EckAzKUZPE",
+      "personId": "OopAmuzVuQ",
+      "organizationId": "qG0WbdykMb",
+      "role": "CEO",
+      "source": "https://docs.superintelligence.io/artificial-superintelligence-alliance/leadership-and-governance",
+      "verdict": "none"
+    },
+    {
+      "id": "ysPVp0Hs80",
+      "personId": "U7LQStfqnc",
+      "organizationId": "qG0WbdykMb",
+      "role": "Chairman",
+      "source": "https://docs.superintelligence.io/artificial-superintelligence-alliance/leadership-and-governance",
+      "verdict": "none"
+    },
+    {
+      "id": "2ICqfJbQ2U",
+      "personId": "yT01UkU01j",
+      "organizationId": "qG0WbdykMb",
+      "role": "Board Representative (Ocean Protocol)",
+      "source": "https://docs.superintelligence.io/artificial-superintelligence-alliance/leadership-and-governance",
+      "verdict": "none"
+    },
+    {
+      "id": "3e64e0RQVz",
+      "personId": "KIXczpvTHf",
+      "organizationId": "qG0WbdykMb",
+      "role": "Board Representative (Ocean Protocol)",
+      "source": "https://docs.superintelligence.io/artificial-superintelligence-alliance/leadership-and-governance",
+      "verdict": "none"
+    },
+    {
+      "id": "JkfyfKOcHH",
+      "personId": "2dcnU9XJUq",
+      "organizationId": "qG0WbdykMb",
+      "role": "Board Director",
+      "source": "https://docs.superintelligence.io/artificial-superintelligence-alliance/leadership-and-governance",
+      "verdict": "none"
+    }
+  ]
+}
