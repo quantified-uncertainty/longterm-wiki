@@ -120,7 +120,7 @@ export function formatKBFactValue(
       return formatKBDate(v.value);
     case "text":
       // Guard: stale "[object Object]" artifacts from old sync should not render
-      if (v.value === "[object Object]") return null;
+      if (v.value === "[object Object]") return "";
       return v.value;
     case "ref":
       return v.value; // Caller should render as EntityLink
