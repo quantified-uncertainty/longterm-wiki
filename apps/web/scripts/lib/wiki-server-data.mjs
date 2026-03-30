@@ -495,6 +495,58 @@ export async function fetchResearchAreas() {
 }
 
 /**
+ * Fetch detail data (organizations, papers, grants, fundingByOrg) for each
+ * research area. Returns a map keyed by area ID.
+ *
+ * This replaces the ISR-based per-page fetch that was unreliable during builds.
+ */
+export async function fetchResearchAreaDetails(areaIds) {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl || areaIds.length === 0) {
+    console.log('  research-area-details: skipped (no server or no areas)');
+    return {};
+  }
+
+  const headers = buildHeaders();
+  const details = {};
+  let fetched = 0;
+  let failed = 0;
+
+  // Fetch in parallel with a concurrency limit of 10
+  const CONCURRENCY = 10;
+  for (let i = 0; i < areaIds.length; i += CONCURRENCY) {
+    const batch = areaIds.slice(i, i + CONCURRENCY);
+    const results = await Promise.allSettled(
+      batch.map(async (id) => {
+        const resp = await fetch(`${serverUrl}/api/research-areas/${id}`, {
+          headers,
+          signal: AbortSignal.timeout(15_000),
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return { id, data: await resp.json() };
+      })
+    );
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        const { id, data } = result.value;
+        details[id] = {
+          organizations: data.organizations ?? [],
+          papers: data.papers ?? [],
+          grants: data.grants ?? [],
+          fundingByOrg: data.fundingByOrg ?? [],
+        };
+        fetched++;
+      } else {
+        failed++;
+      }
+    }
+  }
+
+  console.log(`  research-area-details: ${fetched} fetched, ${failed} failed`);
+  return details;
+}
+
+/**
  * Fetch verification verdicts from wiki-server (unified verification system).
  * Returns a map keyed by "recordType:recordId" -> verdict info.
  */

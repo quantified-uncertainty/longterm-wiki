@@ -18,6 +18,7 @@
 import { createLlmClient, MODELS } from '../llm.ts';
 import { callLlm } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
+import { escapeXml } from '../prompt-utils.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
 import { apiRequest } from '../wiki-server/client.ts';
@@ -79,17 +80,6 @@ const SingleClaimResultSchema = z.object({
 });
 
 const MultiClaimResultSchema = z.array(SingleClaimResultSchema);
-
-// ---------------------------------------------------------------------------
-// XML escaping — prevent prompt injection via user-supplied claim fields
-// ---------------------------------------------------------------------------
-
-function escapeXml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-}
 
 // ---------------------------------------------------------------------------
 // Prompt builder
