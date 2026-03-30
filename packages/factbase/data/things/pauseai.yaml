@@ -22,3 +22,45 @@ facts:
     property: key-actions
     value: "May 2023: protest at Microsoft Brussels. Nov 2023: protest at Bletchley Park AI Safety Summit. Feb 2024: protest at OpenAI HQ. May 2024: coordinated protests in 13 countries before Seoul Summit. Feb 2025: global protest for Paris AI Summit."
     source: https://en.wikipedia.org/wiki/PauseAI
+
+  - id: f_pai_founder
+    property: founded-by
+    value: "Joep Meindertsma"
+    source: https://en.wikipedia.org/wiki/PauseAI
+    notes: "Software entrepreneur who put his CEO role on hold due to concerns about existential risks from AI"
+
+  - id: f_pai_legal
+    property: legal-structure
+    value: "Dutch foundation (Stichting PauseAI, KvK 92951031). PauseAI US is a separate 501(c)(3). Operates as a federation of national chapters coordinated by the global entity."
+    source: https://pauseai.info/organization
+
+  - id: f_pai_total_funding
+    property: total-funding
+    value: 715000
+    unit: EUR
+    asOf: 2025-12
+    source: https://pauseai.info/funding
+    notes: "Largest donors: Future of Life Institute (EUR 423K), Greg Colbourn (EUR 95K), Conjointly (EUR 83K), Lightspeed Grants (EUR 46K combined), SFF (EUR 9.5K)"
+
+  - id: f_pai_leadership
+    property: leadership
+    value: "CEO: Maxime Fournes. Organizing Director: Irina Tavera. Communications Director: Jonathan Moody. Board: Joep Meindertsma (Chairman), Michiel van den Ingh (Treasurer), Otto Barten (Secretary)."
+    asOf: 2025
+    source: https://pauseai.info/organization
+    notes: "Board members receive no remuneration"
+
+  - id: f_pai_description
+    property: description
+    value: "International grassroots advocacy movement calling for a global moratorium on the development of more powerful AI systems until safety can be guaranteed and democratic control established. Seeks an international AI safety agency modeled on the IAEA."
+    asOf: 2026-03
+    source: https://pauseai.info/about
+
+  - id: f_pai_website
+    property: website
+    value: "https://pauseai.info/"
+    source: https://pauseai.info/
+
+  - id: f_pai_country
+    property: country
+    value: "Netherlands"
+    source: https://pauseai.info/legal

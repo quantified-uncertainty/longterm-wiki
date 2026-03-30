@@ -2,9 +2,9 @@ entity: sid_yTlRworV1V
 facts:
   - id: f_tjK3GJTnOA
     property: founded-date
-    value: "2017"
+    value: "2016"
     source: https://democracyforward.org/about/
-    notes: "Founded in 2017"
+    notes: "Founded in 2016 in the wake of the 2016 election; publicly launched 2017"
 
   - id: f_ixLgM3sWwA
     property: headquarters

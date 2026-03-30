@@ -47,10 +47,10 @@ facts:
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_VX3CZVjbug
     property: headcount
-    value: 160
+    value: 200
     asOf: 2025-01
     source: https://seo.ai/blog/how-many-employees-does-deepseek-ai-have
-    notes: "Approximately 150-200 employees; LinkedIn lists 51-200 range. Relatively
+    notes: "Approximately 200 employees as of January 2025; LinkedIn lists 51-200 range. Relatively
       small team for a frontier lab."
 
   # ── Funding ─────────────────────────────────────────────────────

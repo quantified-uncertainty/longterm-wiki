@@ -24,9 +24,25 @@ export function isSid(s: string | null | undefined): boolean {
   return typeof s === "string" && s.startsWith(SID_PREFIX);
 }
 
+/**
+ * Is this any form of stableId? Matches both sid_-prefixed IDs and legacy
+ * 10-char alphanumeric IDs (with at least one uppercase letter).
+ */
+export function isAnySid(s: string | null | undefined): boolean {
+  if (typeof s !== "string") return false;
+  if (s.startsWith(SID_PREFIX)) return true;
+  // Legacy format: exactly 10 alphanumeric chars with at least one uppercase
+  return /^(?=.*[A-Z])[A-Za-z0-9]{10}$/.test(s);
+}
+
 /** Is this safe to show to users? (Not a machine-generated ID) */
 export function isDisplayableName(s: string | null | undefined): boolean {
   return typeof s === "string" && !isSid(s);
+}
+
+/** Strip sid_ prefix if present, returning the raw ID for storage/lookup. */
+export function stripSid(s: string): string {
+  return s.startsWith(SID_PREFIX) ? s.slice(SID_PREFIX.length) : s;
 }
 
 /**

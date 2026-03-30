@@ -2,9 +2,9 @@ entity: sid_xxHyEDGp4Y
 facts:
   - id: f_fNjFtPQSuQ
     property: founded-date
-    value: "2017"
+    value: "2016-11"
     source: https://en.wikipedia.org/wiki/Protect_Democracy
-    notes: "Founded in early 2017"
+    notes: "Formed November 2016; incorporated and launched publicly in early 2017"
 
   - id: f_1Mqq9p4LHQ
     property: employee-count

@@ -36,7 +36,7 @@ facts:
     property: description
     value: "Multi-stakeholder organization bringing together academics, civil
       society, industry, and media to advance understanding of AI technologies.
-      Founded by six major tech companies, PAI now has over 100 partner
+      Founded by six major tech companies, PAI now has 138 partner
       organizations and focuses on responsible AI practices and guidelines."
     asOf: 2026-03
     source: https://partnershiponai.org/about/
@@ -58,10 +58,10 @@ facts:
 
   - id: f_vfOPhOwJQP
     property: partner-count
-    value: "100"
-    asOf: 2025
+    value: "138"
+    asOf: 2026-03
     source: https://partnershiponai.org/partners/
-    notes: "100+ partner organizations including tech companies, civil society, academia, and media"
+    notes: "138 partner organizations across tech companies, civil society, academia, and media"
 
   - id: f_7cjV8ehCYn
     property: country
