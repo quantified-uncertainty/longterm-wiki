@@ -11,7 +11,7 @@ import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
-import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '@longterm-wiki/id-utils';
+import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -431,13 +431,8 @@ async function handleSubmitRecords(
         continue;
       }
 
-<<<<<<< HEAD
-      // Legacy bare stableId (10-char alphanumeric) — verify it exists
+      // Legacy bare stableId (10-char alphanumeric) or sid_-prefixed — verify it exists
       if (isAnySid(val)) {
-=======
-      // If it looks like a stableId (sid_-prefixed or legacy 10-char), verify it exists
-      if (isSid(val)) {
->>>>>>> 7e1f86a46 (fix: stop reintroducing bare stableIds — prefix grant constants, fix build-data keying, repair isAnySid import)
         if (stableIdSet.has(val)) {
           continue;
         }

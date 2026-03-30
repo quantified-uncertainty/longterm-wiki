@@ -1316,8 +1316,8 @@ export async function mergePGRecordsIntoKB(kb) {
     personnelResult,
     ['key-persons', 'board-seats', 'career-history'],
     (row) => {
-      if (row.roleType === 'career') return row.personId;
-      return row.organizationId;
+      if (row.roleType === 'career') return row.personEntityId || row.personId;
+      return row.orgEntityId || row.organizationId;
     },
     (row) => {
       if (row.roleType === 'key-person') return 'key-persons';
@@ -1333,7 +1333,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'grants',
     grantsResult,
     ['grants'],
-    (row) => row.organizationId,
+    (row) => row.orgEntityId || row.organizationId,
     () => 'grants',
     grantRowToRecordEntry,
   );
@@ -1353,7 +1353,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'investments',
     investmentsResult,
     ['investments'],
-    (row) => row.companyId,
+    (row) => row.companyEntityId || row.companyId,
     () => 'investments',
     investmentRowToRecordEntry,
   );
@@ -1363,7 +1363,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'equity-positions',
     equityPositionsResult,
     ['equity-positions'],
-    (row) => row.companyId,
+    (row) => row.companyEntityId || row.companyId,
     () => 'equity-positions',
     equityPositionRowToRecordEntry,
   );
