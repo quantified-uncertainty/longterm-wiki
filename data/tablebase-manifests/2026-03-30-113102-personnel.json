@@ -1,0 +1,29 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "submittedAt": "2026-03-30T11:31:02.144Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 12,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {"id": "pnUZNMnv2T", "personId": "DDOJG5T6Xx", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Founder & Executive Director", "source": "https://www.accessnow.org/executive-director/", "verdict": "none"},
+    {"id": "ZihCvAl2Wn", "personId": "U299gj7NjP", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Founder", "source": "https://en.wikipedia.org/wiki/Access_Now", "verdict": "none"},
+    {"id": "OgxJFCIRpE", "personId": "4KslawskL2", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Founder & CTO", "source": "https://blog.torproject.org/volunteer-spotlight-sina-rabbani-helps-activists-avoid-government-censorship/", "verdict": "none"},
+    {"id": "JHdY2yJFnf", "personId": "x9YWrjekBo", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Founder", "source": "https://en.wikipedia.org/wiki/Access_Now", "verdict": "none"},
+    {"id": "iLfrqyJu95", "personId": "6cKWRjZNPx", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Executive Director", "source": "https://www.accessnow.org/press-release/access-now-welcomes-new-executive-director/", "verdict": "none"},
+    {"id": "5pAtGCNnY9", "personId": "M6ich7O0hs", "organizationId": "sid_DHWH2M0Ega", "role": "Co-Executive Director", "source": "https://www.accessnow.org/press-release/strengthening-the-foundation-access-now-embraces-new-co-leadership-model/", "verdict": "none"},
+    {"id": "TTV6sebiUD", "personId": "B8xHWhDLJQ", "organizationId": "sid_DHWH2M0Ega", "role": "Chief Operating Officer", "source": "https://www.accessnow.org/press-release/access-now-welcomes-new-executive-director/", "verdict": "none"},
+    {"id": "TyuLZkF9cQ", "personId": "I3e8nacNnq", "organizationId": "sid_DHWH2M0Ega", "role": "Chief Security Officer", "source": "https://www.rightscon.org/meet-our-safety-and-security-team/", "verdict": "none"},
+    {"id": "1rG98FlzQ9", "personId": "EWcOXhlpAQ", "organizationId": "sid_DHWH2M0Ega", "role": "Board Co-Chair", "source": "https://cyber.harvard.edu/people/amclaughlin", "verdict": "none"},
+    {"id": "0ok9uZafKd", "personId": "JGDNvilBxb", "organizationId": "sid_DHWH2M0Ega", "role": "Europe Policy and Advocacy Director", "source": "https://www.accessnow.org/profile/fanny/", "verdict": "none"},
+    {"id": "N5zri7Qxb9", "personId": "KfOC3um99n", "organizationId": "sid_DHWH2M0Ega", "role": "Europe Legislative Manager & Global Data Protection Lead", "source": "https://www.accessnow.org/profile/estelle-masse/", "verdict": "none"},
+    {"id": "c8ClMKzDSo", "personId": "PO21TjY9y6", "organizationId": "sid_DHWH2M0Ega", "role": "Senior Policy Analyst", "source": "https://www.accessnow.org/profile/daniel-leufer/", "verdict": "none"}
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "submittedAt": "2026-03-30T11:31:57.314Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 4,
+    "verdicts": {"verified": 0, "contradicted": 0, "unverifiable": 0, "other": 0}
+  },
+  "records": [
+    {"id": "gwzxxk9jq7", "personId": "sid_HwM6OF6Ewg", "organizationId": "sid_eBYk2wn75Q", "role": "Co-Founder", "source": "https://seldonlab.com/", "verdict": "none"},
+    {"id": "6xG2iNRavY", "personId": "oIQSH9TbxU", "organizationId": "sid_eBYk2wn75Q", "role": "Co-Founder", "source": "https://seldonlab.com/", "verdict": "none"},
+    {"id": "exqPP9Acyn", "personId": "sid_g2nElvI1Hj", "organizationId": "sid_eBYk2wn75Q", "role": "Advisor", "source": "https://seldonlab.com/", "verdict": "none"},
+    {"id": "J2Gss9pgYh", "personId": "Wlxm5fH4uK", "organizationId": "sid_eBYk2wn75Q", "role": "Advisor", "source": "https://seldonlab.com/", "verdict": "none"}
+  ]
+}
