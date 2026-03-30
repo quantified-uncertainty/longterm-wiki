@@ -2,14 +2,17 @@
  * Resource Ingest Job Handler
  *
  * Fetches a resource URL, caches content, and persists metadata.
- * Part of the verified-by-default data pipeline (#3209).
+ * Uses the shared source-fetcher for Wayback, Firecrawl, forum APIs, and PDF support.
  *
  * Given a URL, this handler:
- *   1. Fetches the page and detects liveness (reachable, 404, paywall, etc.)
- *   2. Caches the plain-text content in citation_content table
+ *   1. Fetches via the shared source-fetcher (with domain-aware strategies)
+ *   2. Detects soft-404s on top of the fetcher's paywall/dead detection
  *   3. Persists fetch_status + last_fetched_at to the resource record
+ *   4. Chains a resource-enrich job for reachable resources
  *
- * Downstream: resource-enrich chains from this to generate summaries via LLM.
+ * Content caching is handled by fetchSource() internally — it writes to
+ * citation_content automatically. This handler only needs to persist the
+ * resource-level fetch_status.
  *
  * Params:
  *   - resourceId: string (required) — resource stableId
@@ -20,8 +23,8 @@
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import { createHash } from 'crypto';
 import { z } from 'zod';
-import { isPrivateHost, htmlToText } from '../source-check/source-fetcher.ts';
-import { upsertCitationContent } from '../wiki-server/citations.ts';
+import { isPrivateHost } from '../source-check/source-fetcher.ts';
+import { fetchSource, type FetchedSourceStatus } from '../search/source-fetcher.ts';
 import { createJob } from '../wiki-server/jobs.ts';
 import { updateResourceFetchStatus } from '../wiki-server/resources.ts';
 
@@ -39,7 +42,6 @@ const ResourceIngestParamsSchema = z.object({
 // Constants
 // ---------------------------------------------------------------------------
 
-const FETCH_TIMEOUT_MS = 15_000;
 const MAX_CONTENT_LENGTH = 1_000_000; // 1MB for hash computation
 const CONTENT_HASH_PREFIX_LENGTH = 16; // Use first 16 hex chars of SHA-256
 
@@ -70,13 +72,12 @@ function computeContentHash(text: string): string {
 }
 
 function detectSoft404(text: string, contentLength: number): boolean {
-  // Only check short pages — long pages mentioning "404" are likely real content
   if (contentLength > 5000) return false;
   return SOFT_404_PATTERNS.some((pattern) => pattern.test(text));
 }
 
 // ---------------------------------------------------------------------------
-// Resource verification status
+// Status types
 // ---------------------------------------------------------------------------
 
 type ResourceStatus =
@@ -89,6 +90,36 @@ type ResourceStatus =
   | 'paywall'
   | 'blocked'
   | 'invalid_url';
+
+/** Map fetchSource status to our more granular ResourceStatus. */
+function mapFetchStatus(fetchStatus: FetchedSourceStatus, httpStatus: number): ResourceStatus {
+  switch (fetchStatus) {
+    case 'ok': return 'reachable';
+    case 'paywall': return 'paywall';
+    case 'dead':
+      if (httpStatus === 404) return 'not_found';
+      if (httpStatus === 0) return 'unreachable';
+      return 'error';
+    case 'error':
+      if (httpStatus === 0) return 'timeout';
+      return 'error';
+  }
+}
+
+/** Map ResourceStatus to the fetch_status enum used by the resources table. */
+function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'error' {
+  switch (status) {
+    case 'reachable': return 'ok';
+    case 'paywall': return 'paywall';
+    case 'not_found':
+    case 'soft_404':
+    case 'unreachable':
+    case 'timeout':
+      return 'dead';
+    default:
+      return 'error';
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Main handler
@@ -109,7 +140,7 @@ export async function handleResourceIngest(
   const { resourceId, url, previousContentHash } = parsed.data;
 
   if (ctx.verbose) {
-    console.log(`[resource-ingest] Checking ${url} (resource=${resourceId})`);
+    console.log(`[resource-ingest] Ingesting ${url} (resource=${resourceId})`);
   }
 
   const startTime = Date.now();
@@ -138,119 +169,39 @@ export async function handleResourceIngest(
       });
     }
 
-    // Perform the fetch
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    // Fetch using the shared source-fetcher (handles Wayback, Firecrawl, forum
+    // APIs, PDF extraction, YouTube transcripts, domain-aware strategies).
+    // maxAgeMs: 0 forces a fresh fetch (skip cache — we're ingesting).
+    // fetchSource() automatically caches content in citation_content.
+    const result = await fetchSource({
+      url,
+      extractMode: 'full',
+      resourceId,
+      maxAgeMs: 0,
+    });
 
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        signal: controller.signal,
-        redirect: 'follow',
-        headers: {
-          'User-Agent': 'LongtermWiki-ResourceVerifier/1.0',
-          'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        },
-      });
-    } catch (err: unknown) {
-      clearTimeout(timeout);
-      const msg = err instanceof Error ? err.message : String(err);
-      const isTimeout = err instanceof DOMException && err.name === 'AbortError';
-      return buildResult(resourceId, url, isTimeout ? 'timeout' : 'unreachable', startTime, {
-        error: isTimeout ? 'Request timed out' : msg.slice(0, 300),
-      });
-    }
-    // NOTE: Do NOT clear timeout here — keep AbortController running through body read
-    // to protect against slow-loris attacks (server sends headers fast, body slowly).
+    // Map fetcher status to our more granular ResourceStatus
+    let status = mapFetchStatus(result.status, result.httpStatus);
 
-    const statusCode = response.status;
-    const contentType = response.headers.get('content-type') ?? 'unknown';
-    const finalUrl = response.url; // After redirects
-
-    // HTTP error
-    if (statusCode >= 400) {
-      clearTimeout(timeout);
-      const status: ResourceStatus = statusCode === 404 ? 'not_found' : 'error';
-      // Persist the dead/error status so we track unreachable resources
-      await persistResults(resourceId, url, status, statusCode, contentType, null, null, ctx);
-      return buildResult(resourceId, url, status, startTime, {
-        statusCode,
-        contentType,
-        finalUrl: finalUrl !== url ? finalUrl : undefined,
-      });
-    }
-
-    // Read content with size limit to prevent OOM on large responses
-    const contentLengthHeader = parseInt(response.headers.get('content-length') ?? '0', 10);
-    if (contentLengthHeader > MAX_CONTENT_LENGTH * 10) {
-      clearTimeout(timeout);
-      // Content-Length header indicates a very large response — skip body read
-      // Still persist reachable status even though we can't cache the content
-      await persistResults(resourceId, url, 'reachable', statusCode, contentType, null, null, ctx);
-      return buildResult(resourceId, url, 'reachable', startTime, {
-        statusCode,
-        contentType,
-        contentLength: contentLengthHeader,
-        finalUrl: finalUrl !== url ? finalUrl : undefined,
-        skippedBody: true,
-      });
-    }
-
-    // Stream-read up to MAX_CONTENT_LENGTH bytes to avoid unbounded memory usage
-    let text: string;
-    if (response.body) {
-      const reader = response.body.getReader();
-      const chunks: Uint8Array[] = [];
-      let totalBytes = 0;
-      try {
-        while (totalBytes < MAX_CONTENT_LENGTH) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          chunks.push(value);
-          totalBytes += value.length;
-        }
-        reader.cancel().catch(() => {}); // Discard remaining body
-      } catch {
-        reader.cancel().catch(() => {});
+    // Additional soft-404 detection (fetchSource doesn't check for this)
+    if (status === 'reachable' && result.content.length > 0) {
+      if (detectSoft404(result.content, result.content.length)) {
+        status = 'soft_404';
       }
-      text = new TextDecoder().decode(Buffer.concat(chunks).slice(0, MAX_CONTENT_LENGTH));
-    } else {
-      text = (await response.text()).slice(0, MAX_CONTENT_LENGTH);
     }
-    clearTimeout(timeout); // Safe to clear now — body read is complete
-    const contentLength = text.length;
-    const contentHash = computeContentHash(text);
 
-    // Content change detection
-    const contentChanged = previousContentHash != null
+    // Compute content hash for change detection
+    const contentHash = result.content.length > 0
+      ? computeContentHash(result.content)
+      : null;
+
+    const contentChanged = previousContentHash != null && contentHash != null
       ? contentHash !== previousContentHash
       : undefined;
 
-    // Soft-404 detection
-    const isSoft404 = statusCode === 200 && detectSoft404(text, contentLength);
-
-    // Paywall detection — reuse the existing source-check infrastructure
-    // (fetchSourceContent already detects paywalls, but we're doing a direct
-    // fetch here for hash computation, so check inline)
-    const isPaywall = detectBasicPaywall(text, contentLength);
-
-    let status: ResourceStatus;
-    if (isSoft404) {
-      status = 'soft_404';
-    } else if (isPaywall) {
-      status = 'paywall';
-    } else {
-      status = 'reachable';
-    }
-
-    // Persist content to citation_content cache and update resource fetch_status.
-    // Fire-and-forget — don't fail the job if persistence fails.
-    // Note: contentHash is computed from raw HTML (for change detection consistency),
-    // but citation_content stores plain text. The hashes won't match if recomputed
-    // from the stored text — this is intentional.
-    const isHtml = contentType.includes('html') || contentType.includes('xhtml');
-    const plainText = isHtml ? htmlToText(text) : text;
-    await persistResults(resourceId, url, status, statusCode, contentType, plainText, contentHash, ctx);
+    // Persist fetch_status to the resource record.
+    // Content caching is already handled by fetchSource() internally.
+    await persistFetchStatus(resourceId, status, ctx);
 
     // Chain: enqueue resource-enrich job for reachable resources (best-effort)
     if (status === 'reachable') {
@@ -266,13 +217,14 @@ export async function handleResourceIngest(
     }
 
     return buildResult(resourceId, url, status, startTime, {
-      statusCode,
-      contentType,
-      contentLength,
+      statusCode: result.httpStatus,
+      contentType: result.contentType ?? 'html',
+      contentLength: result.content.length,
       contentHash,
       contentChanged,
       previousContentHash: previousContentHash ?? null,
-      finalUrl: finalUrl !== url ? finalUrl : undefined,
+      title: result.title || undefined,
+      fetchMethod: result.contentType === 'pdf' ? 'pdf' : result.contentType === 'transcript' ? 'youtube' : 'shared-fetcher',
     });
   } catch (err: unknown) {
     const error = err instanceof Error ? err.message : String(err);
@@ -285,68 +237,22 @@ export async function handleResourceIngest(
 }
 
 // ---------------------------------------------------------------------------
-// Persistence — cache content + update resource record
+// Persistence — update resource record
 // ---------------------------------------------------------------------------
 
-/** Map resource-ingest status to the fetch_status enum used by the resources table. */
-function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'error' {
-  switch (status) {
-    case 'reachable': return 'ok';
-    case 'paywall': return 'paywall';
-    case 'not_found':
-    case 'soft_404':
-    case 'unreachable':
-    case 'timeout':
-      return 'dead';
-    default:
-      return 'error';
-  }
-}
-
 /**
- * Persist verification results: cache fetched content in citation_content and
- * update the resource's fetch_status. Both are fire-and-forget — errors are
- * logged but don't fail the job.
+ * Update the resource's fetch_status. Fire-and-forget — errors are logged
+ * but don't fail the job. Content caching is handled by fetchSource().
  */
-async function persistResults(
+async function persistFetchStatus(
   resourceId: string,
-  url: string,
   status: ResourceStatus,
-  statusCode: number | undefined,
-  contentType: string,
-  plainText: string | null,
-  contentHash: string | null,
   ctx: JobHandlerContext,
 ): Promise<void> {
-  const now = new Date().toISOString();
-
-  // 1. Cache content in citation_content (if we have content to cache)
-  if (plainText && plainText.length > 0) {
-    try {
-      await upsertCitationContent({
-        url,
-        resourceId,
-        fetchedAt: now,
-        httpStatus: statusCode ?? null,
-        contentType: contentType !== 'unknown' ? contentType : null,
-        fullText: plainText,
-        contentLength: plainText.length,
-        contentHash: contentHash ?? null,
-        fetchMethod: 'resource-ingest',
-      });
-      if (ctx.verbose) {
-        console.log(`[resource-ingest] Cached ${plainText.length} chars for ${url}`);
-      }
-    } catch (e: unknown) {
-      console.warn(`[resource-ingest] Failed to cache content for ${url}: ${e instanceof Error ? e.message : String(e)}`);
-    }
-  }
-
-  // 2. Update resource fetch_status
   try {
     await updateResourceFetchStatus(resourceId, {
       fetchStatus: toFetchStatus(status),
-      lastFetchedAt: now,
+      lastFetchedAt: new Date().toISOString(),
     });
     if (ctx.verbose) {
       console.log(`[resource-ingest] Updated fetch_status=${toFetchStatus(status)} for ${resourceId}`);
@@ -377,29 +283,4 @@ function buildResult(
       ...extra,
     },
   };
-}
-
-// ---------------------------------------------------------------------------
-// Basic paywall detection
-// ---------------------------------------------------------------------------
-
-/**
- * Lightweight paywall check for very short pages that are likely behind a wall.
- * This is intentionally conservative — a false negative (missing a paywall) is
- * better than a false positive (marking a real page as paywalled).
- */
-function detectBasicPaywall(text: string, contentLength: number): boolean {
-  if (contentLength > 10_000) return false; // Real pages are usually long enough
-  const lowerText = text.toLowerCase();
-  const signals = [
-    'subscribe to continue',
-    'subscribe to read',
-    'sign in to read',
-    'create a free account',
-    'this content is for subscribers',
-    'paywall',
-    'premium content',
-    'members only',
-  ];
-  return signals.some((s) => lowerText.includes(s));
 }

@@ -20,6 +20,8 @@ import {
   isUnverifiableDomain,
 } from '../search/paywall-detection.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
+import { createJob } from '../wiki-server/jobs.ts';
+import { lookupResourceByUrl } from '../wiki-server/resources.ts';
 import type { FetchSourceResult } from './types.ts';
 import { SOURCE_CHECK_CONSTANTS } from './types.ts';
 
@@ -144,6 +146,34 @@ export async function fetchSourceContent(
     console.warn(`${logPrefix} Cache lookup failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // No cached content — signal that the resource pipeline needs to process this URL
-  return { content: null, errorType: 'not_cached', errorMessage: 'Source content not in cache — run resource-ingest first' };
+  // No cached content — auto-enqueue a resource-ingest job so the content
+  // gets fetched for next time (self-healing pipeline, Discussion #3499 Issue H).
+  // Fire-and-forget: don't block the caller or fail the source-check.
+  let ingestEnqueued = false;
+  try {
+    const resource = await lookupResourceByUrl(url);
+    if (resource.ok && resource.data) {
+      const resourceId = (resource.data as { id: string }).id;
+      await createJob({
+        type: 'resource-ingest',
+        params: { resourceId, url },
+        priority: 1, // Slightly elevated — source-check is actively waiting for this
+        dedupKey: `ingest:${resourceId}`,
+      });
+      ingestEnqueued = true;
+      console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
+    }
+  } catch (e: unknown) {
+    // Best-effort — don't fail source-check if enqueue fails
+    console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  return {
+    content: null,
+    errorType: 'not_cached',
+    errorMessage: ingestEnqueued
+      ? 'Source content not in cache — resource-ingest job enqueued'
+      : 'Source content not in cache — run resource-ingest first',
+    ingestEnqueued,
+  };
 }
