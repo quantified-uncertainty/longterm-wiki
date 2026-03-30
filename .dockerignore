@@ -1,8 +1,9 @@
 # Exclude heavy directories from Docker build context
 .git
 node_modules
-content
-data
+# NOTE: content/ and data/ are NOT ignored — the discord-bot Dockerfile
+# needs them for /ask command file tools. The worker and wiki-server
+# Dockerfiles don't COPY them, so they only add ~35MB to build context.
 apps/web/.next
 apps/web/node_modules
 apps/wiki-server/node_modules
