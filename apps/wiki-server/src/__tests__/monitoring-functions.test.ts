@@ -386,6 +386,11 @@ describe("GET /api/monitoring/extended — fetchRecentSessions", () => {
 // ---------------------------------------------------------------------------
 
 describe("GET /api/monitoring/extended — fetchCiStatus", () => {
+  beforeEach(() => {
+    // Prevent any real HTTP calls (fetchApiKeyHealth, fetchDeployHistory, etc.)
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false }));
+  });
+
   afterEach(() => {
     vi.unstubAllGlobals();
     delete process.env.GITHUB_TOKEN;
