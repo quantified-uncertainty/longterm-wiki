@@ -382,4 +382,38 @@ describe('handleResourceIngest — enrichment chaining', () => {
     expect(result.success).toBe(true);
     expect(result.data.status).toBe('reachable');
   });
+
+  it('does NOT enqueue enrichment when content is empty', async () => {
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: '',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/empty' },
+      CTX,
+    );
+
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.contentHash).toBeNull();
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+});
+
+describe('handleResourceIngest — resilience', () => {
+  it('succeeds even when fetch_status persistence fails', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mockRejectedValue(
+      new Error('DB connection lost'),
+    );
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
 });

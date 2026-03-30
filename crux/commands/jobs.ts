@@ -661,16 +661,39 @@ async function enqueueResourceIngest(_args: string[], options: CommandOptions): 
     return { output, exitCode: 0 };
   }
 
-  // Step 2: Create jobs sequentially with rate-limit retry
+  // Step 2: Group by domain and compute staggered runAfter timestamps
+  // to avoid hitting the same domain repeatedly in quick succession.
+  const DOMAIN_STAGGER_MS = 3_000; // 3 seconds between same-domain jobs
+  const domainCounters = new Map<string, number>(); // domain -> next index
+
+  function getDomain(url: string): string {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return 'unknown';
+    }
+  }
+
+  function getRunAfter(url: string): string | undefined {
+    const domain = getDomain(url);
+    const idx = domainCounters.get(domain) ?? 0;
+    domainCounters.set(domain, idx + 1);
+    if (idx === 0) return undefined; // First URL per domain: immediate
+    return new Date(Date.now() + idx * DOMAIN_STAGGER_MS).toISOString();
+  }
+
+  // Step 3: Create jobs sequentially with rate-limit retry
   let created = 0;
   let deduped = 0;
   let failed = 0;
   let rateLimitPauses = 0;
 
-  output += `\n${c.dim}Creating jobs...${c.reset}\n`;
+  const uniqueDomains = new Set(toEnqueue.map(r => getDomain(r.url)));
+  output += `\n${c.dim}Creating jobs across ${uniqueDomains.size} domains (${DOMAIN_STAGGER_MS}ms stagger per domain)...${c.reset}\n`;
 
   for (let i = 0; i < toEnqueue.length; i++) {
     const r = toEnqueue[i];
+    const runAfter = getRunAfter(r.url);
     let rateLimitRetries = 0;
     const MAX_RATE_LIMIT_RETRIES = 10; // Rate limits always resolve — retry generously
 
@@ -682,6 +705,7 @@ async function enqueueResourceIngest(_args: string[], options: CommandOptions): 
         priority: 0,
         maxRetries: 3,
         dedupKey: `resource-ingest-${r.id}`,
+        ...(runAfter ? { runAfter } : {}),
       });
 
       if (!result.ok && result.message.includes('429')) {
