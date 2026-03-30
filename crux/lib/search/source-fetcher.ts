@@ -40,6 +40,7 @@ import {
   getResourceById,
   getResourceByUrl,
   updateResourceFetchStatus,
+  updateResourceArchiveUrl,
   type ResourceEntry,
 } from './resource-lookup.ts';
 import { isYoutubeUrl } from '../../resource-utils.ts';
@@ -47,6 +48,13 @@ import {
   detectPaywall,
   isUnverifiableDomain,
 } from './paywall-detection.ts';
+import {
+  getContentFetchStrategy,
+  fetchForumContent,
+  fetchDoiContent,
+  fetchWaybackContent,
+  type StrategyResult,
+} from './fetch-strategies.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
@@ -676,11 +684,9 @@ async function _fetchSourceCore(
     return result;
   }
 
-  // ---- 5. Network fetch (Firecrawl → built-in fallback) ----
-  // arXiv: rewrite to Ar5iv HTML for clean full-text extraction.
-  // If Ar5iv fails (404 — paper not converted yet), fall back to original arxiv.org URL.
-  const ar5ivUrl = rewriteArxivUrl(url);
-  const fetchUrl = ar5ivUrl ?? url;
+  // ---- 5. Network fetch (domain-aware strategies → Firecrawl → built-in) ----
+  // Domain-aware routing (#3457): specialized strategies run first for domains
+  // where they recover content that generic HTTP can't (403s, dead sites, paywalls).
 
   let title = '';
   let content = '';
@@ -688,26 +694,82 @@ async function _fetchSourceCore(
   let fetchError: string | null = null;
   let fetchedContentType: FetchedSourceContentType = 'html';
   let fetchMethod: string = 'built-in';
+  let archiveUrl: string | undefined;
 
-  const firecrawlResult = await fetchWithFirecrawl(fetchUrl);
-  if (firecrawlResult) {
-    title = firecrawlResult.title;
-    content = firecrawlResult.content;
-    httpStatus = 200;
-    // Firecrawl returns markdown — treat as HTML-equivalent
-    fetchedContentType = 'html';
-    fetchMethod = 'firecrawl';
+  const strategy = getContentFetchStrategy(url);
+
+  let strategyResult: StrategyResult | null = null;
+
+  // Try domain-specific strategy first
+  switch (strategy) {
+    case 'forum-api':
+      strategyResult = await fetchForumContent(url);
+      break;
+    case 'doi':
+      strategyResult = await fetchDoiContent(url);
+      break;
+    case 'wayback-only':
+      strategyResult = await fetchWaybackContent(url);
+      break;
+    case 'firecrawl-priority':
+      // For bot-blocked domains, try Firecrawl first and skip built-in if it fails
+      // (built-in would just get a 403 anyway).
+      {
+        const fcResult = await fetchWithFirecrawl(url);
+        if (fcResult) {
+          strategyResult = {
+            title: fcResult.title,
+            content: fcResult.content,
+            httpStatus: 200,
+            fetchMethod: 'firecrawl',
+          };
+        }
+        // If Firecrawl failed, fall through to built-in as a last resort
+      }
+      break;
+    default:
+      // 'default' — handled below in the standard fetch path
+      break;
+  }
+
+  if (strategyResult && strategyResult.content.length > 0) {
+    title = strategyResult.title;
+    content = strategyResult.content;
+    httpStatus = strategyResult.httpStatus;
+    fetchMethod = strategyResult.fetchMethod;
+    archiveUrl = strategyResult.archiveUrl;
   } else {
-    const builtinResult = await fetchWithBuiltin(fetchUrl);
-    // If Ar5iv failed with a 4xx error, retry with the original arxiv.org URL
-    if (ar5ivUrl && builtinResult.httpStatus >= 400 && fetchUrl !== url) {
-      const fallbackResult = await fetchWithBuiltin(url);
-      if (fallbackResult.httpStatus < 400 && fallbackResult.content.length > 0) {
-        title = fallbackResult.title;
-        content = fallbackResult.content;
-        httpStatus = fallbackResult.httpStatus;
-        fetchError = fallbackResult.error;
-        fetchedContentType = fallbackResult.contentType;
+    // Standard fetch path: arXiv rewrite → Firecrawl → built-in
+    const ar5ivUrl = rewriteArxivUrl(url);
+    const fetchUrl = ar5ivUrl ?? url;
+
+    const firecrawlResult = strategy !== 'firecrawl-priority'
+      ? await fetchWithFirecrawl(fetchUrl)
+      : null; // Already tried above for firecrawl-priority
+    if (firecrawlResult) {
+      title = firecrawlResult.title;
+      content = firecrawlResult.content;
+      httpStatus = 200;
+      fetchedContentType = 'html';
+      fetchMethod = 'firecrawl';
+    } else {
+      const builtinResult = await fetchWithBuiltin(fetchUrl);
+      // If Ar5iv failed with a 4xx error, retry with the original arxiv.org URL
+      if (ar5ivUrl && builtinResult.httpStatus >= 400 && fetchUrl !== url) {
+        const fallbackResult = await fetchWithBuiltin(url);
+        if (fallbackResult.httpStatus < 400 && fallbackResult.content.length > 0) {
+          title = fallbackResult.title;
+          content = fallbackResult.content;
+          httpStatus = fallbackResult.httpStatus;
+          fetchError = fallbackResult.error;
+          fetchedContentType = fallbackResult.contentType;
+        } else {
+          title = builtinResult.title;
+          content = builtinResult.content;
+          httpStatus = builtinResult.httpStatus;
+          fetchError = builtinResult.error;
+          fetchedContentType = builtinResult.contentType;
+        }
       } else {
         title = builtinResult.title;
         content = builtinResult.content;
@@ -715,16 +777,26 @@ async function _fetchSourceCore(
         fetchError = builtinResult.error;
         fetchedContentType = builtinResult.contentType;
       }
-    } else {
-      title = builtinResult.title;
-      content = builtinResult.content;
-      httpStatus = builtinResult.httpStatus;
-      fetchError = builtinResult.error;
-      fetchedContentType = builtinResult.contentType;
     }
   }
 
-  // ---- 5b. Determine status ----
+  // ---- 5b. Wayback fallback for 404/dead URLs ----
+  // If the standard fetch got a 404/410 and we didn't already try Wayback,
+  // attempt Wayback as a last resort (#3457 P2).
+  if ((httpStatus === 404 || httpStatus === 410 || (httpStatus === 0 && fetchError)) &&
+      content.length === 0 && strategy !== 'wayback-only') {
+    const waybackResult = await fetchWaybackContent(url);
+    if (waybackResult && waybackResult.content.length > 0) {
+      title = waybackResult.title;
+      content = waybackResult.content;
+      httpStatus = waybackResult.httpStatus;
+      fetchMethod = waybackResult.fetchMethod;
+      archiveUrl = waybackResult.archiveUrl;
+      fetchError = null;
+    }
+  }
+
+  // ---- 5c. Determine status ----
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
@@ -744,6 +816,11 @@ async function _fetchSourceCore(
   if (content.length > 0) {
     saveToMemoryCache(url, title, content, httpStatus, fetchedContentType);
     saveToPostgres(url, title, content, httpStatus, fetchedContentType, fetchMethod);
+  }
+
+  // ---- 6b. Update archive URL on resource (fire-and-forget) ----
+  if (archiveUrl && resource) {
+    updateResourceArchiveUrl(resource.id, archiveUrl);
   }
 
   // ---- 7. Extract excerpts ----
