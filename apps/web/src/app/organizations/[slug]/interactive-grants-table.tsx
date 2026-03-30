@@ -4,6 +4,10 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
+import {
+  RecordVerificationDot,
+  type VerificationInfo,
+} from "@/components/verification/RecordVerificationDot";
 
 // ── Serializable grant row (no JSX, no functions — pure JSON) ───────
 
@@ -25,6 +29,8 @@ export interface GrantRow {
   // For grants received:
   funderName?: string;
   funderHref?: string | null;
+  // Source-check verification
+  verification?: VerificationInfo | null;
 }
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
@@ -48,6 +54,12 @@ interface ServerGrant {
   source: string | null;
   notes: string | null;
   programId: string | null;
+  verification?: {
+    verdict: string | null;
+    confidence: number | null;
+    sourcesChecked: number;
+    checkedAt: string | null;
+  } | null;
 }
 
 function formatSlug(slug: string): string {
@@ -73,6 +85,7 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     divisionName: null,
     notes: g.notes,
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
+    verification: g.verification ?? null,
   };
 }
 
@@ -101,7 +114,8 @@ type ColumnId =
   | "program"
   | "division"
   | "status"
-  | "notes";
+  | "notes"
+  | "verified";
 
 // Map column IDs to server sort field names
 const COLUMN_TO_SORT_FIELD: Partial<Record<ColumnId, string>> = {
@@ -165,6 +179,13 @@ const ALL_COLUMNS: ColumnDef[] = [
     defaultVisible: false,
     align: "center",
     onlyIfData: (rows) => rows.some((r) => r.status),
+  },
+  {
+    id: "verified",
+    label: "V",
+    defaultVisible: true,
+    align: "center",
+    onlyIfData: (rows) => rows.some((r) => r.verification?.verdict),
   },
   {
     id: "notes",
@@ -272,6 +293,9 @@ export function InteractiveGrantsTable({
           break;
         case "notes":
           cmp = (a.notes ?? "").localeCompare(b.notes ?? "");
+          break;
+        case "verified":
+          cmp = (a.verification?.verdict ?? "").localeCompare(b.verification?.verdict ?? "");
           break;
       }
       return localSortDir === "asc" ? cmp : -cmp;
@@ -724,6 +748,8 @@ function CellContent({
           {grant.status}
         </span>
       ) : null;
+    case "verified":
+      return <RecordVerificationDot verification={grant.verification} />;
     case "notes":
       return grant.notes ? (
         <span className="text-muted-foreground text-xs line-clamp-2">

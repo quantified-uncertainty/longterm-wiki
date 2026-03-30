@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
+import { eq, and, count, sql, desc, inArray, isNull } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things, entities, fundingPrograms } from "../../schema.js";
+import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -101,13 +101,17 @@ const BatchUpdateProgramSchema = z.object({
 const granteeEntity = alias(entities, "grantee_entity");
 const orgEntity = alias(entities, "org_entity");
 
-/** Selection shape for grants + joined entity titles + slugs. */
+/** Selection shape for grants + joined entity titles + slugs + verification verdict. */
 const joinedSelect = {
   grants: grants,
   granteeTitle: granteeEntity.title,
   granteeSlug: granteeEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
+  verificationVerdict: sourceCheckVerdicts.verdict,
+  verificationConfidence: sourceCheckVerdicts.confidence,
+  verificationSourcesChecked: sourceCheckVerdicts.sourcesChecked,
+  verificationCheckedAt: sourceCheckVerdicts.lastComputedAt,
 };
 
 interface JoinedRow {
@@ -116,6 +120,10 @@ interface JoinedRow {
   granteeSlug: string | null;
   orgTitle: string | null;
   orgSlug: string | null;
+  verificationVerdict: string | null;
+  verificationConfidence: number | null;
+  verificationSourcesChecked: number | null;
+  verificationCheckedAt: Date | null;
 }
 
 function formatRow(r: JoinedRow) {
@@ -150,6 +158,14 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
+    verification: r.verificationVerdict
+      ? {
+          verdict: r.verificationVerdict,
+          confidence: r.verificationConfidence,
+          sourcesChecked: r.verificationSourcesChecked ?? 0,
+          checkedAt: r.verificationCheckedAt?.toISOString() ?? null,
+        }
+      : null,
   };
 }
 
@@ -285,6 +301,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
+      .leftJoin(
+        sourceCheckVerdicts,
+        and(
+          eq(sourceCheckVerdicts.recordType, "grant"),
+          eq(sourceCheckVerdicts.recordId, grants.id),
+          isNull(sourceCheckVerdicts.fieldName),
+        ),
+      )
       .where(where)
       .orderBy(orderClause, grants.id)
       .limit(limit)

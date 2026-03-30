@@ -14,6 +14,7 @@ import {
 } from "@/lib/wiki-server";
 import { isBareMachineId } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
+import { RecordVerificationDot, type VerificationInfo } from "@/components/verification/RecordVerificationDot";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -28,6 +29,8 @@ export interface PersonEntry {
   start?: string;
   end?: string;
   roleType?: "key-person" | "board" | "career";
+  /** Source-check verification (from PG LEFT JOIN) */
+  verification?: VerificationInfo | null;
 }
 
 /** Max page size accepted by the wiki-server personnel endpoint */
@@ -155,6 +158,7 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
       roleType: VALID_ROLE_TYPES.has(row.roleType)
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
+      verification: row.verification ?? undefined,
     });
   }
 
@@ -202,6 +206,7 @@ export function mergePgPersonnel(
       if (!existing.title && pgEntry.title) existing.title = pgEntry.title;
       if (pgEntry.isBoard) existing.isBoard = true;
       if (pgEntry.isFounder) existing.isFounder = true;
+      if (!existing.verification && pgEntry.verification) existing.verification = pgEntry.verification;
     } else {
       // New person from PG — add to map
       const dedupKey = pgEntry.slug ?? pgEntry.name;
@@ -265,6 +270,7 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
+                      <RecordVerificationDot verification={person.verification} />
                       {href ? (
                         <Link
                           href={href}
