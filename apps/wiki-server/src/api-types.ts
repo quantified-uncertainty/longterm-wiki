@@ -1355,7 +1355,7 @@ export const ProposeClaimsSchema = z.object({
 export type ProposeClaims = z.infer<typeof ProposeClaimsSchema>;
 
 export const ClaimVerdictSchema = z.object({
-  claimId: z.number().int().positive(),
+  claimId: z.coerce.number().int().positive(),
   status: z.enum(["verified", "contradicted", "unverifiable"]),
   confidence: z.number().min(0).max(1),
   reasoning: z.string().max(5000),
