@@ -45,7 +45,7 @@ import {
   formatIssueRow,
 } from '../lib/issues/formatting.ts';
 import { extractModel, applyModelLabel, isValidModel } from '../lib/issues/models.ts';
-import { DAILY_CREATE_LIMIT, getCreatesToday, recordCreate } from '../lib/issues/rate-limit.ts';
+import { DAILY_CREATE_LIMIT, ENTITY_TYPE_THRESHOLD, getCreatesToday, recordCreate, getOverrepresentedEntityTypes } from '../lib/issues/rate-limit.ts';
 
 /**
  * Read a text value from a `--*-file=<path>` flag.
@@ -379,6 +379,43 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
+  // Entity-type duplicate gate: warn if >3 issues in this session reference the same entity type.
+  // This catches QA sweeps that file many symptom-level issues for one root cause (#3387).
+  const ENTITY_TYPE_PATTERNS: Array<[RegExp, string]> = [
+    [/\bperson(?:nel)?\b/, 'person'],
+    [/\bpeople\b/, 'person'],
+    [/\borganization\b/, 'organization'],
+    [/\binvestor\b/, 'investor'],
+    [/\binvestment\b/, 'investor'],
+    [/\bgrant(?:ee)?\b/, 'grant'],
+    [/\bbenchmark\b/, 'benchmark'],
+    [/\bai[- ]model\b/, 'ai-model'],  // "ai model" or "ai-model", not bare "model"
+    [/\bfunding\b/, 'funding'],
+  ];
+  // Strip the "## Recommended Model" section injected by buildIssueBody before scanning,
+  // so the --model flag doesn't cause false positives on every structured issue.
+  const textToScan = `${title} ${body}`.toLowerCase().replace(/## recommended model[\s\S]*?(?=##|$)/, '');
+  const normalizedTypes = [...new Set(
+    ENTITY_TYPE_PATTERNS
+      .filter(([re]) => re.test(textToScan))
+      .map(([, type]) => type),
+  )];
+
+  // Check existing counts before creating
+  const overrep = getOverrepresentedEntityTypes();
+  const overlapping = overrep.filter(([t]) => normalizedTypes.includes(t));
+  if (overlapping.length > 0 && !options.force) {
+    const details = overlapping.map(([t, n]) => `"${t}" (${n} issues today)`).join(', ');
+    return {
+      output:
+        `${c.yellow}⚠ Entity-type concentration warning:${c.reset} ${details}\n` +
+        `You've filed >${ENTITY_TYPE_THRESHOLD} issues today referencing the same entity type.\n` +
+        `These may be symptoms of a single root cause — consider filing one umbrella issue instead.\n` +
+        `${c.dim}Use --force to override this warning.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
   // Evidence validation: advisory warning if issue body lacks concrete evidence
   let evidenceWarning = '';
   if (body && !options.draft) {
@@ -407,7 +444,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   });
 
   // Record creation for rate limiting (non-fatal)
-  try { recordCreate(); } catch { /* ignore — rate limiting is advisory */ }
+  try { recordCreate(normalizedTypes); } catch { /* ignore — rate limiting is advisory */ }
 
   // Apply model label if --model was specified
   if (options.model) {

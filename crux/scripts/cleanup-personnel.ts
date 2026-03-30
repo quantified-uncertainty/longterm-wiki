@@ -77,9 +77,19 @@ async function main() {
   const all = await fetchAllPersonnel();
   console.log(`Total records: ${all.length}`);
 
-  // ── Category 1: No displayable name ──
-  const noName = all.filter((r) => !hasDisplayableName(r));
-  console.log(`\nRecords with no displayable name: ${noName.length}`);
+  // ── Category 1a: Fabricated stableId — personId looks like a stableId but doesn't
+  //    match any entity AND has no human-readable name from any source.
+  //    The !hasDisplayableName guard prevents deleting records that are merely
+  //    waiting for entity resolution (e.g., synced before their person entity).
+  const fabricatedId = all.filter(
+    (r) => STABLE_ID_RE.test(r.personId) && !r.personEntityId && !hasDisplayableName(r),
+  );
+  console.log(`\nRecords with fabricated personId (stableId, no entity, no name): ${fabricatedId.length}`);
+
+  // ── Category 1b: No displayable name (catches remaining junk) ──
+  const fabricatedIdSet = new Set(fabricatedId.map((r) => r.id));
+  const noName = all.filter((r) => !hasDisplayableName(r) && !fabricatedIdSet.has(r.id));
+  console.log(`Records with no displayable name (additional): ${noName.length}`);
 
   // ── Category 2: Duplicates (same person + same org) ──
   const seen = new Map<string, PersonnelRecord>();
@@ -112,12 +122,21 @@ async function main() {
   console.log(`Duplicate records: ${duplicates.length}`);
 
   // ── Summary ──
-  const toDelete = [...noName, ...duplicates];
+  const toDelete = [...fabricatedId, ...noName, ...duplicates];
   const toDeleteIds = [...new Set(toDelete.map((r) => r.id))];
   console.log(`\nTotal to delete: ${toDeleteIds.length}`);
+  console.log(`  - Fabricated stableIds: ${fabricatedId.length}`);
+  console.log(`  - No displayable name: ${noName.length}`);
+  console.log(`  - Duplicates: ${duplicates.length}`);
   console.log(`Will remain: ${all.length - toDeleteIds.length}`);
 
   // Show samples
+  console.log('\n── Sample deletions (fabricated stableId) ──');
+  for (const r of fabricatedId.slice(0, 10)) {
+    const org = r.organization?.name ?? r.organizationId;
+    console.log(`  ${r.id} | personId=${r.personId} | ${r.role} at ${org}`);
+  }
+
   console.log('\n── Sample deletions (no name) ──');
   for (const r of noName.slice(0, 10)) {
     const org = r.organization?.name ?? r.organizationId;
