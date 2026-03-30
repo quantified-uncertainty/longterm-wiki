@@ -1,0 +1,81 @@
+{
+  "table": "personnel",
+  "recordCount": 8,
+  "submittedAt": "2026-03-30T11:19:57.165Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 8,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "hS6Bn9ZAF9",
+      "personId": "0gwKDyoD8z",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Co-Founder & President",
+      "source": "https://www.1daysooner.org/about/our-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "rSX05nnqU2",
+      "personId": "P5quBMcJys",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Co-Founder",
+      "source": "https://www.ted.com/speakers/sophie_rose",
+      "verdict": "none"
+    },
+    {
+      "id": "spKK7WrF3t",
+      "personId": "FSm30yJO7D",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Co-Founder & Chief Operating Officer",
+      "source": "https://www.linkedin.com/in/julia-murdza-904b541a/",
+      "verdict": "none"
+    },
+    {
+      "id": "ncjGjobw91",
+      "personId": "LmfP0vx4zH",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Director of 1Day Africa",
+      "source": "https://panafricanvisions.com/2022/01/africa-must-step-up-participation-in-vaccine-research-zacharia-kafuko-1day-africa-director/",
+      "verdict": "none"
+    },
+    {
+      "id": "1Si09R0glA",
+      "personId": "qBpY7XR9VR",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Board Member",
+      "source": "https://www.1daysooner.org/board-of-directors-gallery/",
+      "verdict": "none"
+    },
+    {
+      "id": "YaFlaLFU5p",
+      "personId": "ZZ1S2y3ath",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Board Member",
+      "source": "https://www.1daysooner.org/board-of-directors-gallery/",
+      "verdict": "none"
+    },
+    {
+      "id": "IlxnqUtG5F",
+      "personId": "XGMps5vqz8",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Board Member",
+      "source": "https://www.1daysooner.org/board-of-directors-gallery/",
+      "verdict": "none"
+    },
+    {
+      "id": "C1FjcuI1dl",
+      "personId": "Kp2pWo6ist",
+      "organizationId": "sid_9k7drw6Qpg",
+      "role": "Board Member",
+      "source": "https://www.1daysooner.org/board-of-directors-gallery/",
+      "verdict": "none"
+    }
+  ]
+}
