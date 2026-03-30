@@ -113,6 +113,7 @@ import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
 import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
+import * as agentResetCommands from './commands/agent-reset.ts';
 
 const domains = {
   validate: validateCommands,
@@ -190,6 +191,7 @@ const domains = {
   races: politicalRacesCommands,
   branches: branchesCommands,
   'deploy-tasks': deployTasksCommands,
+  'agent-reset': agentResetCommands,
 };
 
 const shortcutMap = buildShortcutMap();
