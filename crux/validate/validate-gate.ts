@@ -464,6 +464,18 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
+    id: 'sid-display',
+    name: 'No sid_ values in display name columns',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-sid-display.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: display name columns must never contain sid_-prefixed stableIds.
+    // The sid_ prefix makes detection trivial. If any display column has a sid_
+    // value, it means the enrichment pipeline wrote a stableId where a human-
+    // readable name should be. Requires wiki-server for API queries.
+    requiresServer: true,
+  },
+  {
     id: 'soft-fks',
     name: 'Soft FK entity reference validation (advisory)',
     command: 'npx',
