@@ -6,6 +6,8 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 let resourceStore: Map<string, Record<string, unknown>>;
 let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
+let jobStore: Map<number, Record<string, unknown>>;
+let nextJobId = 1;
 
 // Helper: derive the simplified suggest shape from a full resource row.
 // In production, has_content is derived via LEFT JOIN citation_content:
@@ -50,6 +52,8 @@ function slugFromIntId(intId: number | null): string | null {
 function resetStores() {
   resourceStore = new Map();
   citationStore = [];
+  jobStore = new Map();
+  nextJobId = 1;
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
 }
@@ -326,6 +330,101 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const limit = (params[0] as number) || 50;
     const offset = (params[1] as number) || 0;
     return filtered.slice(offset, offset + limit);
+  }
+
+  // ---- /suggest: SELECT resource_id, count(*) FROM resource_citations WHERE resource_id = ANY(...) ----
+  if (q.includes("resource_citations") && q.includes("group by") && q.includes("any($)")) {
+    const resourceIds = params[0] as string[];
+    const counts: Record<string, number> = {};
+    for (const c of citationStore) {
+      if (resourceIds.includes(c.resource_id)) {
+        counts[c.resource_id] = (counts[c.resource_id] || 0) + 1;
+      }
+    }
+    return Object.entries(counts).map(([resource_id, cnt]) => ({
+      resource_id,
+      cnt: String(cnt),
+    }));
+  }
+
+  // ---- INSERT INTO jobs ... ON CONFLICT ... RETURNING id ----
+  // Tagged template: only interpolated values appear in params.
+  // The SQL is: INSERT INTO jobs (type, params, priority, max_retries, dedup_key)
+  //   VALUES ('resource-ingest', $1::jsonb, $2, 3, $3)
+  // So params = [jsonbString, priority, dedupKey]
+  if (q.includes("insert into jobs")) {
+    const jobParamsStr = params[0] as string;
+    const jobParams = typeof jobParamsStr === "string" ? JSON.parse(jobParamsStr) : jobParamsStr;
+    const priority = params[1] as number;
+    const dedupKey = params[2] as string;
+
+    // Check for dedup conflict (active job with same dedup_key)
+    if (dedupKey) {
+      for (const job of jobStore.values()) {
+        if (
+          job.dedup_key === dedupKey &&
+          ["pending", "claimed", "running"].includes(job.status as string)
+        ) {
+          // ON CONFLICT DO NOTHING — return empty
+          return [];
+        }
+      }
+    }
+
+    const id = nextJobId++;
+    const job: Record<string, unknown> = {
+      id,
+      type: "resource-ingest",
+      status: "pending",
+      params: jobParams,
+      priority,
+      max_retries: 3,
+      dedup_key: dedupKey,
+      created_at: new Date(),
+    };
+    jobStore.set(id, job);
+    return [{ id }];
+  }
+
+  // ---- SELECT id FROM jobs WHERE dedup_key = $1 (dedup lookup) ----
+  if (q.includes("from jobs") && q.includes("dedup_key") && q.includes("limit 1") && !q.includes("left join")) {
+    const dedupKey = params[0] as string;
+    for (const job of jobStore.values()) {
+      if (
+        job.dedup_key === dedupKey &&
+        ["pending", "claimed", "running"].includes(job.status as string)
+      ) {
+        return [{ id: job.id }];
+      }
+    }
+    return [];
+  }
+
+  // ---- /suggest/status: SELECT ... FROM jobs j LEFT JOIN resources r ... WHERE j.dedup_key LIKE ... ----
+  if (q.includes("from jobs") && q.includes("left join resources") && q.includes("like")) {
+    const pattern = params[0] as string;
+    // Convert SQL LIKE pattern "batch:xxx:%" to prefix match
+    const prefix = pattern.replace(/%$/, "");
+    const results: Record<string, unknown>[] = [];
+    for (const job of jobStore.values()) {
+      const dk = job.dedup_key as string;
+      if (dk && dk.startsWith(prefix)) {
+        const jobParams = job.params as { resourceId?: string; url?: string } | null;
+        const resourceId = jobParams?.resourceId ?? null;
+        const resource = resourceId ? resourceStore.get(resourceId) : null;
+        results.push({
+          job_id: job.id,
+          job_status: job.status,
+          dedup_key: dk,
+          params: job.params,
+          resource_id: resource?.id ?? null,
+          resource_url: resource?.url ?? null,
+          enrichment_status: resource?.enrichment_status ?? null,
+          summary: resource?.summary ?? null,
+        });
+      }
+    }
+    return results;
   }
 
   return [];
@@ -808,6 +907,248 @@ describe("Resources API", () => {
       for (const result of body.results) {
         expect(result.resourceId).toBe("dedup-res");
       }
+    });
+  });
+
+  describe("POST /api/resources/suggest — batch job creation", () => {
+    it("creates ingestion jobs for non-fresh resources and returns batchId", async () => {
+      // Submit URLs for brand-new resources (no existing data → contentStatus = missing)
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/a", "https://example.com/b"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      // Both resources are new → contentStatus = missing → jobs created
+      expect(body.batchId).toBeTruthy();
+      expect(typeof body.batchId).toBe("string");
+      expect(body.batchId.length).toBe(12);
+
+      // Each non-fresh result should have a jobId
+      for (const result of body.results) {
+        expect(result.contentStatus).toBe("missing");
+        expect(result.jobId).toBeTruthy();
+        expect(typeof result.jobId).toBe("number");
+      }
+
+      // Jobs should be in the store
+      expect(jobStore.size).toBe(2);
+      for (const job of jobStore.values()) {
+        expect(job.type).toBe("resource-ingest");
+        expect((job.dedup_key as string).startsWith(`batch:${body.batchId}:`)).toBe(true);
+      }
+    });
+
+    it("does not create jobs for fresh resources", async () => {
+      // Pre-populate with a fresh resource
+      resourceStore.set("fresh-res", {
+        id: "fresh-res",
+        url: "https://example.com/fresh",
+        title: "Fresh Resource",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/fresh"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.results).toHaveLength(1);
+      expect(body.results[0].contentStatus).toBe("fresh");
+      expect(body.results[0].jobId).toBeNull();
+      // No jobs created, no batchId
+      expect(body.batchId).toBeNull();
+      expect(jobStore.size).toBe(0);
+    });
+
+    it("returns batchId only for non-fresh resources in a mixed batch", async () => {
+      // One fresh, one missing
+      resourceStore.set("fresh-mixed", {
+        id: "fresh-mixed",
+        url: "https://example.com/existing",
+        title: "Existing Resource",
+        fetched_at: new Date(),
+        has_content: true,
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/existing", "https://example.com/new-url"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.batchId).toBeTruthy();
+
+      const freshResult = body.results.find((r: any) => r.url === "https://example.com/existing");
+      const missingResult = body.results.find((r: any) => r.url === "https://example.com/new-url");
+
+      expect(freshResult.contentStatus).toBe("fresh");
+      expect(freshResult.jobId).toBeNull();
+
+      expect(missingResult.contentStatus).toBe("missing");
+      expect(missingResult.jobId).toBeTruthy();
+
+      // Only 1 job created (for the non-fresh URL)
+      expect(jobStore.size).toBe(1);
+    });
+
+    it("sets job priority based on citation count", async () => {
+      // Pre-populate a resource with known ID and citations
+      resourceStore.set("cited-res", {
+        id: "cited-res",
+        url: "https://example.com/cited",
+        title: null,
+        fetched_at: null,
+        has_content: false,
+      });
+
+      // Add citations: 4 pages cite this resource → priority = min(100, 4 * 5) = 20
+      const pageIds = ["page-1", "page-2", "page-3", "page-4"];
+      for (const slug of pageIds) {
+        citationStore.push({
+          resource_id: "cited-res",
+          page_slug: slug,
+          page_id: getIntIdForSlug(slug),
+          created_at: new Date(),
+        });
+      }
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/cited"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.results[0].jobId).toBeTruthy();
+
+      // Verify job priority
+      const jobId = body.results[0].jobId;
+      const job = jobStore.get(jobId);
+      expect(job).toBeDefined();
+      expect(job!.priority).toBe(20); // 4 citations × 5 = 20
+    });
+
+    it("caps priority at 100", async () => {
+      // Pre-populate resource with 25 citations → priority = min(100, 25 * 5) = 100
+      resourceStore.set("popular-res", {
+        id: "popular-res",
+        url: "https://example.com/popular",
+        title: null,
+        fetched_at: null,
+        has_content: false,
+      });
+
+      for (let i = 0; i < 25; i++) {
+        citationStore.push({
+          resource_id: "popular-res",
+          page_slug: `page-${i}`,
+          page_id: getIntIdForSlug(`page-${i}`),
+          created_at: new Date(),
+        });
+      }
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/popular"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      const jobId = body.results[0].jobId;
+      const job = jobStore.get(jobId);
+      expect(job!.priority).toBe(100); // capped at 100
+    });
+  });
+
+  describe("GET /api/resources/suggest/status/:batchId", () => {
+    it("returns empty results for unknown batchId", async () => {
+      const res = await app.request("/api/resources/suggest/status/nonexistent");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.batchId).toBe("nonexistent");
+      expect(body.total).toBe(0);
+      expect(body.pending).toBe(0);
+      expect(body.completed).toBe(0);
+      expect(body.failed).toBe(0);
+      expect(body.results).toEqual([]);
+    });
+
+    it("returns status for a batch with pending jobs", async () => {
+      // Create a batch via suggest
+      const suggestRes = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/status-a", "https://example.com/status-b"],
+      });
+      const suggestBody = await suggestRes.json();
+      const batchId = suggestBody.batchId;
+      expect(batchId).toBeTruthy();
+
+      // Poll status
+      const statusRes = await app.request(`/api/resources/suggest/status/${batchId}`);
+      expect(statusRes.status).toBe(200);
+      const statusBody = await statusRes.json();
+
+      expect(statusBody.batchId).toBe(batchId);
+      expect(statusBody.total).toBe(2);
+      expect(statusBody.pending).toBe(2);
+      expect(statusBody.completed).toBe(0);
+      expect(statusBody.failed).toBe(0);
+      expect(statusBody.results).toHaveLength(2);
+
+      // Each result should have job details
+      for (const result of statusBody.results) {
+        expect(result.jobId).toBeTruthy();
+        expect(result.jobStatus).toBe("pending");
+        expect(result.resourceId).toBeTruthy();
+        expect(result.url).toBeTruthy();
+      }
+    });
+
+    it("reflects job completion status", async () => {
+      // Create batch
+      const suggestRes = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/complete-a", "https://example.com/complete-b"],
+      });
+      const suggestBody = await suggestRes.json();
+      const batchId = suggestBody.batchId;
+
+      // Simulate: mark first job as completed, second as failed
+      const jobIds = Array.from(jobStore.keys());
+      jobStore.get(jobIds[0])!.status = "completed";
+      jobStore.get(jobIds[1])!.status = "failed";
+
+      // Poll status
+      const statusRes = await app.request(`/api/resources/suggest/status/${batchId}`);
+      const statusBody = await statusRes.json();
+
+      expect(statusBody.total).toBe(2);
+      expect(statusBody.pending).toBe(0);
+      expect(statusBody.completed).toBe(1);
+      expect(statusBody.failed).toBe(1);
+    });
+
+    it("includes enrichment data for completed jobs", async () => {
+      // Create batch
+      const suggestRes = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/enriched"],
+      });
+      const suggestBody = await suggestRes.json();
+      const batchId = suggestBody.batchId;
+      const resourceId = suggestBody.results[0].resourceId;
+
+      // Simulate completion: mark job complete and add enrichment to resource
+      const jobId = Array.from(jobStore.keys())[0];
+      jobStore.get(jobId)!.status = "completed";
+      resourceStore.get(resourceId)!.enrichment_status = "enriched";
+      resourceStore.get(resourceId)!.summary = "This is an enriched summary";
+
+      const statusRes = await app.request(`/api/resources/suggest/status/${batchId}`);
+      const statusBody = await statusRes.json();
+
+      expect(statusBody.results[0].jobStatus).toBe("completed");
+      expect(statusBody.results[0].enrichmentStatus).toBe("enriched");
+      expect(statusBody.results[0].summary).toBe("This is an enriched summary");
     });
   });
 });
