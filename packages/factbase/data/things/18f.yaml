@@ -18,9 +18,9 @@ facts:
   # ── Founding ───────────────────────────────────────────────────
   - id: f_qitBEUD8xO
     property: founded-date
-    value: "2014-03"
+    value: "2014-03-19"
     source: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
-    notes: "Founded within GSA; named after GSA's address at 1800 F Street NW"
+    notes: "Founded March 19, 2014 within GSA by Presidential Innovation Fellows; named after GSA's address at 1800 F Street NW"
 
   # ── Financial model ────────────────────────────────────────────
   - id: f_ykUcR7cNwI

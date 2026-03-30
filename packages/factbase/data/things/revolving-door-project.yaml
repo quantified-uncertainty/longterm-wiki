@@ -7,8 +7,9 @@ facts:
 
   - id: f_IRpZN4T6YV
     property: legal-structure
-    value: "Project of the Goodnation Foundation"
-    source: https://www.influencewatch.org/organization/revolving-door-project/
+    value: "Fiscally sponsored by Goodnation Foundation (EIN 81-4768448)"
+    source: https://therevolvingdoorproject.org/about-us/
+    notes: "Per RDP's own about page. InfluenceWatch describes RDP as a 'project of CEPR' which may reflect an earlier arrangement."
 
   - id: f_pLAEnfZoee
     property: project

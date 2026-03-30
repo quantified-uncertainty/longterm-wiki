@@ -7,9 +7,9 @@ facts:
 
   - id: f_dA1eF2gH3i
     property: education
-    value: "PhD in Computational Neuroscience, Princeton University"
+    value: "PhD in Biophysics, Princeton University"
     source: https://en.wikipedia.org/wiki/Dario_Amodei
-    notes: "Undergraduate at Stanford University; PhD at Princeton"
+    notes: "Studied electrophysiology of neural circuits; thesis: 'Network-Scale Electrophysiology: Measuring and Understanding the Collective Behavior of Neural Circuits' (2011)"
 
   - id: f_dA4jK5lM6n
     property: notable-for

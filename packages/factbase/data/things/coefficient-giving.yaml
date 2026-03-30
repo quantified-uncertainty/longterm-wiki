@@ -126,12 +126,12 @@ facts:
       Dustin Moskovitz in 2011, which funded the Open Philanthropy Project."
 
   - id: f_o7b7ts6XBg
-    property: founded-by-name
+    property: key-person
     value: Elie Hassenfeld
     source: https://coefficientgiving.org/governance/
-    notes: "Co-founded GiveWell with Holden Karnofsky in 2007; serves on Coefficient
-      Giving's Board of Managers. GiveWell Labs (2011) evolved into Open Philanthropy
-      Project (2014)."
+    notes: "Board of Managers member (not a founder of Coefficient Giving). Co-founded
+      GiveWell with Holden Karnofsky in 2007; GiveWell Labs (2011) evolved into Open
+      Philanthropy Project (2014)."
 
   # ── Legal Structure ──────────────────────────────────────────
   - id: f_LUa4wxC8YQ

@@ -14,10 +14,10 @@ facts:
 
   - id: f_Rq6vL1tN5c
     property: headcount
-    value: 350
+    value: 250
     asOf: 2025-06
     source: https://www.csis.org/about
-    notes: "Expert team of around 350 individuals"
+    notes: "Over 250 full-time staff plus a large network of affiliated scholars (CSIS-wide, not Wadhwani Center alone)"
 
   - id: f_Ty8cH3mQ9d
     property: legal-structure
