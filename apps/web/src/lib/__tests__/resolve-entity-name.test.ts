@@ -45,7 +45,7 @@ describe("resolveEntityName", () => {
     mockGetKBEntitySlug.mockReturnValue("dario-amodei");
     mockGetEntityHref.mockReturnValue("/people/dario-amodei");
 
-    const result = resolveEntityName("3KjUCZCV8w", "Dario Amodei");
+    const result = resolveEntityName("sid_3KjUCZCV8w", "Dario Amodei");
     expect(result).toEqual({
       name: "Dario Amodei",
       href: "/people/dario-amodei",
@@ -61,7 +61,7 @@ describe("resolveEntityName", () => {
     mockGetKBEntitySlug.mockReturnValue("anthropic");
     mockGetEntityHref.mockReturnValue("/organizations/anthropic");
 
-    const result = resolveEntityName("3KjUCZCV8w");
+    const result = resolveEntityName("sid_3KjUCZCV8w");
     expect(result).toEqual({
       name: "Anthropic",
       href: "/organizations/anthropic",
@@ -84,11 +84,11 @@ describe("resolveEntityName", () => {
     });
   });
 
-  it("returns 'Unknown' for unknown stableId (uppercase, 10 chars)", () => {
+  it("returns 'Unknown' for unknown stableId (sid_ prefix)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    const result = resolveEntityName("3KjUCZCV8w");
+    const result = resolveEntityName("sid_3KjUCZCV8w");
     expect(result).toEqual({ name: "Unknown", href: null });
   });
 
@@ -186,20 +186,22 @@ describe("resolveEntityName", () => {
     expect(result).toEqual({ name: "Unknown", href: null });
   });
 
-  it("returns 'Unknown' for pure numeric IDs (not valid slugs)", () => {
+  it("humanizes pure numeric IDs (legacy format, no longer detected as stableIds)", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    expect(resolveEntityName("335")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("1234")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("0")).toEqual({ name: "Unknown", href: null });
+    // Pure numeric IDs are no longer detected as stableIds (isSid requires sid_ prefix).
+    // They fall through to titleCase humanization, which returns them as-is.
+    expect(resolveEntityName("335")).toEqual({ name: "335", href: null });
+    expect(resolveEntityName("1234")).toEqual({ name: "1234", href: null });
+    expect(resolveEntityName("0")).toEqual({ name: "0", href: null });
   });
 
   it("resolves entity via TableBase when FactBase lookup fails", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue({
       id: "some-org",
-      stableId: "Abc1234567",
+      stableId: "sid_Abc1234567",
       title: "Some Organization",
       entityType: "organization",
       aliases: [],
@@ -223,7 +225,7 @@ describe("resolveEntityName", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue({
       id: "tom-brown",
-      stableId: "xY12345678",
+      stableId: "sid_xY12345678",
       title: "Tom Brown",
       entityType: "person",
       aliases: [],
@@ -258,7 +260,7 @@ describe("resolveEntityName", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue({
       id: "tom-brown",
-      stableId: "4CY8YJCrM7",
+      stableId: "sid_4CY8YJCrM7",
       title: "Tom Brown",
       entityType: "person",
       aliases: [],
@@ -285,22 +287,23 @@ describe("resolveEntityName", () => {
     expect(result.name).toBe("Employee Equity Pool");
   });
 
-  it("returns 'Unknown' for contaminated stableIds", () => {
+  it("returns 'Unknown' for unresolvable sid_-prefixed stableIds", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    expect(resolveEntityName("D-BpcrbThn")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("Tw_Eo226h3")).toEqual({ name: "Unknown", href: null });
-    expect(resolveEntityName("V-55MuswUh")).toEqual({ name: "Unknown", href: null });
+    // With sid_ prefix, isSid() detects these and returns "Unknown"
+    expect(resolveEntityName("sid_DBpcrbThn1")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("sid_TwEo226h33")).toEqual({ name: "Unknown", href: null });
+    expect(resolveEntityName("sid_V55MuswUhx")).toEqual({ name: "Unknown", href: null });
   });
 
-  it("rejects contaminated stableId displayNames", () => {
+  it("rejects sid_-prefixed stableId displayNames", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue(undefined);
 
-    const result = resolveEntityName("some-id", "D-BpcrbThn");
-    // Falls through to resolve "some-id" via FactBase/TableBase/humanization
-    expect(result.name).not.toBe("D-BpcrbThn");
+    const result = resolveEntityName("some-id", "sid_DBpcrbThn1");
+    // isSid() catches the displayName, falls through to resolve "some-id"
+    expect(result.name).not.toBe("sid_DBpcrbThn1");
   });
 
   it("accepts legitimate displayName with spaces (not a slug)", () => {
@@ -321,7 +324,7 @@ describe("resolveEntityName", () => {
     mockGetKBEntity.mockReturnValue(undefined);
     mockGetTypedEntityById.mockReturnValue({
       id: "google",
-      stableId: "cMNszJMTPX",
+      stableId: "sid_cMNszJMTPX",
       title: "Google / Alphabet",
       entityType: "organization",
       aliases: [],
