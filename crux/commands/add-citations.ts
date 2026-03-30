@@ -18,11 +18,7 @@ import { findPageById } from '../lib/page-resolution.ts';
 import { extractClaims } from '../lib/semantic-diff/claim-extractor.ts';
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
 import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
-import {
-  detectPaywall,
-  isUnverifiableDomain,
-} from '../lib/search/paywall-detection.ts';
+import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 
@@ -153,55 +149,14 @@ Search the web and return the best source URL as JSON.`, {
 
 // ── Source content fetching ──────────────────────────────────────────
 
-const FETCH_TIMEOUT_MS = 15_000;
-const MAX_CONTENT_LENGTH = 8000;
-
 /**
- * Fetch the actual content of a source URL.
- * Checks wiki-server citation content cache first, then direct fetch.
+ * Thin wrapper around the shared cache-only fetchSourceContent.
+ * Returns the cached content as a plain string, or null on miss/error.
+ * No live HTTP fetching — the resource-verify pipeline populates the cache.
  */
 async function fetchSourceContent(url: string): Promise<string | null> {
-  if (isUnverifiableDomain(url)) return null;
-
-  // Try wiki-server cache first
-  try {
-    const cached = await getCitationContentByUrl(url);
-    if (cached.ok && cached.data?.fullText && cached.data.fullText.length > 50) {
-      return cached.data.fullText.slice(0, MAX_CONTENT_LENGTH);
-    }
-  } catch {
-    // Cache miss — fall through to direct fetch
-  }
-
-  // Direct fetch
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'LongtermWiki-Verification/1.0' },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      redirect: 'follow',
-    });
-
-    if (!res.ok) return null;
-
-    const contentType = res.headers.get('content-type') ?? '';
-    if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('application/json')) {
-      return null;
-    }
-
-    const text = await res.text();
-    if (detectPaywall(text)) return null;
-
-    const plainText = text
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    return plainText.length > 50 ? plainText.slice(0, MAX_CONTENT_LENGTH) : null;
-  } catch {
-    return null;
-  }
+  const result = await fetchCachedContent(url, undefined, '[add-citations]');
+  return result.content;
 }
 
 // ── Independent claim verification ───────────────────────────────────
