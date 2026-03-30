@@ -150,28 +150,47 @@ export default function SourcesPage() {
         ))}
       </div>
 
-      {/* Enrichment pipeline progress */}
-      <div className="mb-8 rounded-xl border border-border/60 bg-card p-5">
-        <h2 className="text-sm font-semibold mb-3">Enrichment Pipeline</h2>
-        <div className="flex h-4 rounded-full overflow-hidden mb-3">
-          {enrichmentStats.map(({ stage, count }) => (
-            <div
-              key={stage}
-              className={`${enrichmentStageColor(stage)} transition-all`}
-              style={{ width: `${(count / resources.length) * 100}%` }}
-              title={`${stageLabel(stage)}: ${count.toLocaleString()}`}
-            />
-          ))}
-        </div>
-        <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
-          {enrichmentStats.map(({ stage, count }) => (
-            <span key={stage} className="flex items-center gap-1.5">
-              <span className={`inline-block w-2.5 h-2.5 rounded-sm ${enrichmentStageColor(stage)}`} />
-              {stageLabel(stage)}: {count.toLocaleString()}
+      {/* Enrichment pipeline progress — hidden when no resources */}
+      {resources.length > 0 && (
+        <div className="mb-8 rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              Enrichment Pipeline
+            </h2>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {enrichmentStats
+                .filter((s) => s.stage === "enriched" || s.stage === "reviewed")
+                .reduce((sum, s) => sum + s.count, 0)
+                .toLocaleString()}{" "}
+              / {resources.length.toLocaleString()} enriched
             </span>
-          ))}
+          </div>
+          <div className="flex h-3 rounded-full overflow-hidden mb-4 bg-muted/40">
+            {enrichmentStats.map(({ stage, count }) => (
+              <div
+                key={stage}
+                className={`${enrichmentStageColor(stage)}`}
+                style={{ width: `${(count / resources.length) * 100}%` }}
+                title={`${stageLabel(stage)}: ${count.toLocaleString()} (${Math.round((count / resources.length) * 100)}%)`}
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+            {enrichmentStats.map(({ stage, count }) => (
+              <span key={stage} className="flex items-center gap-1.5">
+                <span className={`inline-block w-2 h-2 rounded-sm ${enrichmentStageColor(stage)}`} />
+                <span>{stageLabel(stage)}</span>
+                <span className="tabular-nums font-medium text-foreground/70">
+                  {count.toLocaleString()}
+                </span>
+                <span className="tabular-nums text-muted-foreground/50">
+                  ({Math.round((count / resources.length) * 100)}%)
+                </span>
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <SourcesTabs
         resourceRows={resourceRows}
