@@ -28,11 +28,20 @@ If the plan shows no pages to update, report "No updates needed today" and stop.
 
 ## Phase 2: Prepare workspace
 
+**If already on a feature branch**, stay on it. Otherwise, create a new branch from main:
+
 ```bash
-git checkout main && git pull
-BRANCH="auto-update/$(date +%Y-%m-%d)"
-git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
+CURRENT=$(git branch --show-current)
+if [ "$CURRENT" = "main" ]; then
+  git pull
+  BRANCH="auto-update/$(date +%Y-%m-%d)"
+  git checkout -b "$BRANCH" 2>/dev/null || git checkout "$BRANCH"
+else
+  echo "Already on branch $CURRENT — continuing on it"
+fi
 ```
+
+**Never run `git checkout main`** from a slot that may have other work in progress — it destroys the branch context.
 
 ## Phase 3: Update each page
 

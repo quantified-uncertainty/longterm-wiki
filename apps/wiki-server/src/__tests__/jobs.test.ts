@@ -210,7 +210,8 @@ const dispatch: SqlDispatcher = (query, params) => {
 
     // ---- COMPLETE ----
     // Without cost: params = ['completed', result_json, timestamp, jobId, 'running']
-    // With cost:    params = ['completed', result_json, cost_usd, timestamp, jobId, 'running']
+    // With cost:    params = ['completed', result_json, timestamp, cost_usd, jobId, 'running']
+    //   (Drizzle follows JS object key order: status, result, completedAt, costUsd)
     if (newStatus === "completed" && q.includes('"result"')) {
       // Check SET clause only (before WHERE) for cost_usd — RETURNING always lists all columns
       const setClause = q.split('where')[0];
@@ -221,8 +222,8 @@ const dispatch: SqlDispatcher = (query, params) => {
         if (!job) return [];
         job.status = "completed";
         job.result = params[1] != null ? (typeof params[1] === "string" ? JSON.parse(params[1] as string) : params[1]) : null;
-        job.cost_usd = params[2] as string;
-        job.completed_at = new Date(params[3] as string);
+        job.completed_at = new Date(params[2] as string);
+        job.cost_usd = params[3] as string;
         return [job];
       } else {
         const jobId = params[3] as number;
@@ -471,7 +472,8 @@ describe("Jobs API", () => {
       const res = await postJson(app, "/api/jobs", { type: "ping", runAfter: future });
       expect(res.status).toBe(201);
       const body = await res.json();
-      expect(body.runAfter).toBeTruthy();
+      expect(typeof body.runAfter).toBe("string");
+      expect(new Date(body.runAfter).getTime()).toBeGreaterThan(Date.now() - 60_000);
     });
 
     it("rejects dedupKey in batch creation", async () => {
@@ -627,7 +629,7 @@ describe("Jobs API", () => {
       });
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.costUsd).toBeTruthy();
+      expect(body.costUsd).toBe("0.0042");
     });
   });
 
@@ -698,6 +700,7 @@ describe("Jobs API", () => {
       const body = await res.json();
       expect(body.totalJobs).toBe(2);
       expect(body.byType).toBeDefined();
+      expect(typeof body.byType).toBe("object");
     });
 
     it("returns zeros when no jobs exist", async () => {
@@ -736,7 +739,6 @@ describe("Jobs API", () => {
       const res = await postJson(app, "/api/jobs/sweep", {});
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.swept).toBeDefined();
       expect(typeof body.swept).toBe("number");
     });
   });

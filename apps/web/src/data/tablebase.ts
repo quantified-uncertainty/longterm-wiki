@@ -1022,6 +1022,73 @@ export function getResearchAreasFromPG(
 }
 
 // ============================================================================
+// RESEARCH AREA DETAILS
+// Entity lists (orgs, papers, grants) for research area detail pages.
+// Loaded from research-area-details.json (built from wiki-server at build time).
+// ============================================================================
+
+export interface ResearchAreaDetailOrg {
+  organizationId: string;
+  role: string;
+  notes: string | null;
+}
+
+export interface ResearchAreaDetailPaper {
+  id: number;
+  resourceId: string | null;
+  title: string;
+  url: string | null;
+  authors: string | null;
+  publishedDate: string | null;
+  citationCount: number | null;
+  isSeminal: boolean;
+  sortOrder: number;
+  notes: string | null;
+}
+
+export interface ResearchAreaDetailGrant {
+  id: string;
+  name: string;
+  amount: number | null;
+  date: string | null;
+  organizationId: string;
+  granteeId: string | null;
+  confidence: number | null;
+}
+
+export interface ResearchAreaDetailFundingByOrg {
+  organizationId: string;
+  grantCount: number;
+  totalAmount: string;
+}
+
+export interface ResearchAreaDetail {
+  organizations: ResearchAreaDetailOrg[];
+  papers: ResearchAreaDetailPaper[];
+  grants: ResearchAreaDetailGrant[];
+  fundingByOrg: ResearchAreaDetailFundingByOrg[];
+}
+
+let _researchAreaDetails: Record<string, ResearchAreaDetail> | null = null;
+
+function loadResearchAreaDetails(): Record<string, ResearchAreaDetail> {
+  if (_researchAreaDetails) return _researchAreaDetails;
+  const filePath = path.join(LOCAL_DATA_DIR, "research-area-details.json");
+  try {
+    _researchAreaDetails = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _researchAreaDetails!;
+  } catch {
+    _researchAreaDetails = {};
+    return _researchAreaDetails;
+  }
+}
+
+/** Get detail data (orgs, papers, grants) for a research area by ID. */
+export function getResearchAreaDetail(areaId: string): ResearchAreaDetail | null {
+  return loadResearchAreaDetails()[areaId] ?? null;
+}
+
+// ============================================================================
 // RECORD VERDICTS
 // Used by VerificationBadge on organization, grant, and funding-round detail pages.
 // ============================================================================

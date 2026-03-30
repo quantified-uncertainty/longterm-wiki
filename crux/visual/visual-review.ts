@@ -205,13 +205,14 @@ async function takeScreenshot(
     return null;
   }
 
+  const devPort = process.env.DEV_PORT || '3001';
   try {
-    execSync('curl -s -o /dev/null -w "%{http_code}" http://localhost:3001', {
+    execSync(`curl -s -o /dev/null -w "%{http_code}" http://localhost:${devPort}`, {
       stdio: 'pipe',
     });
   } catch {
     console.warn(
-      'Dev server not running on port 3001. Start with: pnpm dev',
+      `Dev server not running on port ${devPort}. Start with: pnpm dev`,
     );
     console.warn(
       'Falling back to static analysis only.\n',
@@ -235,7 +236,7 @@ async function takeScreenshot(
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.setViewportSize({ width: 1200, height: 800 });
-      await page.goto('http://localhost:3001/${pageId}', {
+      await page.goto('http://localhost:${devPort}/${pageId}', {
         waitUntil: 'networkidle',
         timeout: 30000,
       });

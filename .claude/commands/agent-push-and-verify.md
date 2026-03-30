@@ -27,7 +27,7 @@ Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs a
 
 **New failures** (caused by your changes): Stop and fix. Re-run the failing check, then re-run ALL checks to make sure fixes didn't break something else.
 
-**Pre-existing failures** (also present on clean main, not caused by your changes): To determine if a failure is pre-existing, stash your changes and re-run the failing check on clean main. If it fails the same way, it's pre-existing — note it and move on. Do not block the push on pre-existing failures.
+**Pre-existing failures** (also present on clean main, not caused by your changes): To determine if a failure is pre-existing, check the CI status on the `main` branch via `gh run list --branch main -L 3` or compare against the latest main commit. Do NOT use `git stash` or `git checkout main` to test this — those operations cause branch confusion in multi-agent slots. If the same failure appears on main's CI, it's pre-existing — note it and move on. Do not block the push on pre-existing failures.
 
 ### Build artifacts
 
@@ -60,12 +60,14 @@ Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs a
      PRBODY
 
      # Option B: write body to file first, then use --body-file:
-     # IMPORTANT: use >| (force-overwrite) not > — zsh noclobber silently blocks > if the file exists
-     cat >| /tmp/pr-body.md <<'PRBODY'
+     # Use mktemp to avoid collisions between concurrent agents in different slots
+     PR_BODY=$(mktemp /tmp/pr-body-XXXXXX.md)
+     cat >| "$PR_BODY" <<'PRBODY'
      ## Summary
      ...
      PRBODY
-     pnpm crux gh pr create --title="<descriptive title>" --body-file=/tmp/pr-body.md
+     pnpm crux gh pr create --title="<descriptive title>" --body-file="$PR_BODY"
+     rm -f "$PR_BODY"
      ```
      **After creating, always run `pnpm crux gh pr fix-body`** — this detects and repairs any literal `\n` in the PR body automatically.
    - If a PR exists, note its number and move on.

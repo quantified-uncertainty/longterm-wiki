@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getResearchAreasFromPG, getTypedEntityById } from "@/data/tablebase";
+import { getResearchAreasFromPG, getTypedEntityById, getResearchAreaDetail } from "@/data/tablebase";
 import { getEntityHref } from "@/data/entity-nav";
 import {
   CLUSTER_COLORS,
@@ -9,53 +9,6 @@ import {
   formatCluster,
   formatFunding,
 } from "../research-area-constants";
-import { fetchFromWikiServer } from "@/lib/wiki-server";
-
-// ---------------------------------------------------------------------------
-// Types for the enriched detail response from wiki-server
-// ---------------------------------------------------------------------------
-
-interface AreaDetailGrant {
-  id: string;
-  name: string;
-  amount: number | null;
-  date: string | null;
-  organizationId: string;
-  granteeId: string | null;
-  confidence: number | null;
-}
-
-interface AreaDetailFundingByOrg {
-  organizationId: string;
-  grantCount: number;
-  totalAmount: string;
-}
-
-interface AreaDetailPaper {
-  id: number;
-  resourceId: string | null;
-  title: string;
-  url: string | null;
-  authors: string | null;
-  publishedDate: string | null;
-  citationCount: number | null;
-  isSeminal: boolean;
-  sortOrder: number;
-  notes: string | null;
-}
-
-interface AreaDetailOrg {
-  organizationId: string;
-  role: string;
-  notes: string | null;
-}
-
-interface AreaDetailResponse {
-  grants: AreaDetailGrant[];
-  fundingByOrg: AreaDetailFundingByOrg[];
-  papers: AreaDetailPaper[];
-  organizations: AreaDetailOrg[];
-}
 
 // ---------------------------------------------------------------------------
 // Data helpers
@@ -125,11 +78,8 @@ export default async function ResearchAreaDetailPage({
     ? allAreas.find((a) => a.id === area.parentAreaId)
     : null;
 
-  // Fetch rich detail from wiki-server (ISR, 5 min revalidation)
-  const detail = await fetchFromWikiServer<AreaDetailResponse>(
-    `/api/research-areas/${slug}`,
-    { revalidate: 300 }
-  );
+  // Load detail data from build-time JSON (fetched from wiki-server during build-data)
+  const detail = getResearchAreaDetail(slug);
 
   const grants = detail?.grants ?? [];
   const fundingByOrg = detail?.fundingByOrg ?? [];

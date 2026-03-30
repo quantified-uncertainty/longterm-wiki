@@ -16,7 +16,7 @@ interface ApiResult<T> {
   error?: string;
 }
 
-async function apiRequest<T>(
+export async function apiRequest<T>(
   config: Config,
   method: "GET" | "POST" | "PATCH",
   path: string,

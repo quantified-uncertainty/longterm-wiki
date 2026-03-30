@@ -51,6 +51,7 @@ import {
   fetchAssessments,
   fetchBenchmarkResults,
   fetchResearchAreas,
+  fetchResearchAreaDetails,
   fetchRecordVerdicts,
   // fetchFactBaseFromServer — available but not yet wired as default (PG-primary prep)
   fetchPolicyStakeholderIds,
@@ -666,6 +667,10 @@ async function main() {
     database.researchAreas = researchAreasData;
     database.recordVerdicts = recordVerdicts;
     assessmentMap = assessments;
+
+    // Fetch detail data (orgs, papers, grants) for each research area
+    const areaIds = researchAreasData.map(a => a.id);
+    database.researchAreaDetails = await fetchResearchAreaDetails(areaIds);
   }
 
   // Build URL → resource map for unconverted link detection
