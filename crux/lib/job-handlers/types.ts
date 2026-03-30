@@ -101,10 +101,10 @@ export interface AutoUpdateDigestParams {
   dryRun?: boolean;
 }
 
-export interface ResourceVerifyParams {
+export interface ResourceIngestParams {
   /** Resource stableId */
   resourceId: string;
-  /** URL to verify */
+  /** URL to ingest */
   url: string;
   /** Hash of previously fetched content (for change detection) */
   previousContentHash?: string;

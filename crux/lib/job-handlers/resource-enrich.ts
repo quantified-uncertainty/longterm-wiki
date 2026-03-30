@@ -2,7 +2,7 @@
  * Resource Enrichment Job Handler
  *
  * Combines classification and deep enrichment in a single LLM call per resource.
- * Triggered automatically by resource-verify when a resource is reachable,
+ * Triggered automatically by resource-ingest when a resource is reachable,
  * or manually via the job queue.
  *
  * Params:

@@ -3,7 +3,7 @@
  *
  * Shared by factbase-source-check and source-check-orchestrate. This is a
  * **read-only** layer: it reads from the citation_content cache populated by
- * the resource-verify worker. It does NOT fetch URLs directly.
+ * the resource-ingest worker. It does NOT fetch URLs directly.
  *
  * If the cache misses, it returns errorType: 'not_cached' — signaling that the
  * resource pipeline should process this URL first (Discussion #3499).
@@ -97,7 +97,7 @@ function extractMainContent(html: string): string | null {
  *
  * Reads from the citation_content cache only — does NOT fetch URLs.
  * If the cache misses, returns errorType: 'not_cached' to signal that the
- * resource-verify pipeline should process this URL first.
+ * resource-ingest pipeline should process this URL first.
  *
  * @param url - The source URL to look up
  * @param _userAgent - Deprecated, ignored (kept for API compat)
@@ -127,7 +127,7 @@ export async function fetchSourceContent(
     return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
-  // Read from wiki-server citation_content cache (populated by resource-verify worker)
+  // Read from wiki-server citation_content cache (populated by resource-ingest worker)
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
@@ -145,5 +145,5 @@ export async function fetchSourceContent(
   }
 
   // No cached content — signal that the resource pipeline needs to process this URL
-  return { content: null, errorType: 'not_cached', errorMessage: 'Source content not in cache — run resource-verify first' };
+  return { content: null, errorType: 'not_cached', errorMessage: 'Source content not in cache — run resource-ingest first' };
 }

@@ -45,7 +45,7 @@ const mockStatsWithData = {
         avgDurationMs: 12500,
         failureRate: 0.036,
       },
-      "resource-verify": {
+      "resource-ingest": {
         byStatus: { pending: 0, completed: 50, failed: 10 },
         avgDurationMs: 45000,
         failureRate: 0.167,
@@ -123,7 +123,7 @@ describe("JobsDashboardContent", () => {
 
     const element = await JobsDashboardContent();
     const markup = renderToStaticMarkup(element as React.ReactElement);
-    // 5 pending from claim-verification + 0 from resource-verify
+    // 5 pending from claim-verification + 0 from resource-ingest
     expect(markup).toContain("5 pending");
     expect(markup).toContain("2 running");
     expect(markup).toContain("130 completed"); // 80 + 50

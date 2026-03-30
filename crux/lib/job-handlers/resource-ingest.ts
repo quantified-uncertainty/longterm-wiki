@@ -1,18 +1,20 @@
 /**
- * Resource Verification Job Handler
+ * Resource Ingest Job Handler
  *
- * Checks resource URLs for liveness, content freshness, and caches content.
+ * Fetches a resource URL, caches content, and persists metadata.
  * Part of the verified-by-default data pipeline (#3209).
+ *
+ * Given a URL, this handler:
+ *   1. Fetches the page and detects liveness (reachable, 404, paywall, etc.)
+ *   2. Caches the plain-text content in citation_content table
+ *   3. Persists fetch_status + last_fetched_at to the resource record
+ *
+ * Downstream: resource-enrich chains from this to generate summaries via LLM.
  *
  * Params:
  *   - resourceId: string (required) — resource stableId
- *   - url: string (required) — URL to verify
+ *   - url: string (required) — URL to ingest
  *   - previousContentHash: string (optional) — hash of previously fetched content
- *
- * On success:
- *   1. Caches fetched content in citation_content table (for source-check + enrichment)
- *   2. Persists fetch_status, last_fetched_at, content_hash to the resource record
- *   3. Reports liveness status (reachable, soft_404, paywall, etc.)
  */
 
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
@@ -27,7 +29,7 @@ import { updateResourceFetchStatus } from '../wiki-server/resources.ts';
 // Params validation
 // ---------------------------------------------------------------------------
 
-const ResourceVerifyParamsSchema = z.object({
+const ResourceIngestParamsSchema = z.object({
   resourceId: z.string().min(1),
   url: z.string().url(),
   previousContentHash: z.string().optional(),
@@ -92,11 +94,11 @@ type ResourceStatus =
 // Main handler
 // ---------------------------------------------------------------------------
 
-export async function handleResourceVerify(
+export async function handleResourceIngest(
   params: Record<string, unknown>,
   ctx: JobHandlerContext,
 ): Promise<JobHandlerResult> {
-  const parsed = ResourceVerifyParamsSchema.safeParse(params);
+  const parsed = ResourceIngestParamsSchema.safeParse(params);
   if (!parsed.success) {
     return {
       success: false,
@@ -107,7 +109,7 @@ export async function handleResourceVerify(
   const { resourceId, url, previousContentHash } = parsed.data;
 
   if (ctx.verbose) {
-    console.log(`[resource-verify] Checking ${url} (resource=${resourceId})`);
+    console.log(`[resource-ingest] Checking ${url} (resource=${resourceId})`);
   }
 
   const startTime = Date.now();
@@ -259,7 +261,7 @@ export async function handleResourceVerify(
         dedupKey: `resource-enrich:${resourceId}`,
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
-        console.warn(`[resource-verify] Failed to enqueue enrichment for ${resourceId}: ${msg}`);
+        console.warn(`[resource-ingest] Failed to enqueue enrichment for ${resourceId}: ${msg}`);
       });
     }
 
@@ -286,7 +288,7 @@ export async function handleResourceVerify(
 // Persistence — cache content + update resource record
 // ---------------------------------------------------------------------------
 
-/** Map resource-verify status to the fetch_status enum used by the resources table. */
+/** Map resource-ingest status to the fetch_status enum used by the resources table. */
 function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'error' {
   switch (status) {
     case 'reachable': return 'ok';
@@ -330,13 +332,13 @@ async function persistResults(
         fullText: plainText,
         contentLength: plainText.length,
         contentHash: contentHash ?? null,
-        fetchMethod: 'resource-verify',
+        fetchMethod: 'resource-ingest',
       });
       if (ctx.verbose) {
-        console.log(`[resource-verify] Cached ${plainText.length} chars for ${url}`);
+        console.log(`[resource-ingest] Cached ${plainText.length} chars for ${url}`);
       }
     } catch (e: unknown) {
-      console.warn(`[resource-verify] Failed to cache content for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+      console.warn(`[resource-ingest] Failed to cache content for ${url}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
@@ -347,10 +349,10 @@ async function persistResults(
       lastFetchedAt: now,
     });
     if (ctx.verbose) {
-      console.log(`[resource-verify] Updated fetch_status=${toFetchStatus(status)} for ${resourceId}`);
+      console.log(`[resource-ingest] Updated fetch_status=${toFetchStatus(status)} for ${resourceId}`);
     }
   } catch (e: unknown) {
-    console.warn(`[resource-verify] Failed to update fetch_status for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[resource-ingest] Failed to update fetch_status for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 
