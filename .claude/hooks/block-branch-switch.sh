@@ -12,9 +12,11 @@
 #   git switch -c <new-branch>       (creating a new branch)
 #   git switch --create <new-branch> (creating a new branch)
 #
+# Warned (allowed with stderr warning):
+#   git checkout main                (needed for /agent-reset; warns but doesn't block)
+#
 # Blocked:
 #   git checkout <existing-branch>   (switches the working tree to another branch)
-#   git checkout main                (most dangerous — destroys feature branch context)
 #   git switch <existing-branch>     (same as checkout)
 #
 # Exit codes:
@@ -41,6 +43,11 @@ if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\b'; then
   fi
   # Allow: git checkout -- <file> (discarding file changes)
   if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\s+--\s'; then
+    exit 0
+  fi
+  # Allow (with warning): git checkout main — needed for /agent-reset end-of-session
+  if echo "$STRIPPED" | grep -qE '(^|\||&&|;)\s*git\s+checkout\s+main\b'; then
+    echo "WARNING: Switching to main. This is only appropriate during /agent-reset (end-of-session cleanup). If you are mid-session, use worktree isolation instead." >&2
     exit 0
   fi
   # Block everything else (branch switching)
