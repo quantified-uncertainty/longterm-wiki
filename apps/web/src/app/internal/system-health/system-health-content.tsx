@@ -229,12 +229,14 @@ const MONITORED_SERVICES = new Set([
   "wiki-server",
   "groundskeeper",
   "github-actions",
+  "job-worker",
 ]);
 
 const SERVICE_LABELS: Record<string, string> = {
   "wiki-server": "Wiki Server",
   groundskeeper: "Groundskeeper",
   "github-actions": "GitHub Actions",
+  "job-worker": "Job Worker",
 };
 
 function StatusBadge({ status }: { status: string }) {
@@ -269,6 +271,51 @@ function ServiceCard({
         </p>
       )}
     </div>
+  );
+}
+
+// ── Job Queue Section ─────────────────────────────────────────────────────
+
+/** Status keys ordered for display, with color classes. */
+const JOB_STATUS_DISPLAY: Array<{
+  key: string;
+  label: string;
+  colorClass: string;
+}> = [
+  { key: "pending", label: "Pending", colorClass: "text-yellow-600" },
+  { key: "claimed", label: "Claimed", colorClass: "text-blue-600" },
+  { key: "running", label: "Running", colorClass: "text-blue-600" },
+  { key: "completed", label: "Completed", colorClass: "text-green-600" },
+  { key: "failed", label: "Failed", colorClass: "text-red-500" },
+  { key: "cancelled", label: "Cancelled", colorClass: "text-muted-foreground" },
+];
+
+function JobQueueSection({ jobsQueue }: { jobsQueue: Record<string, number> }) {
+  const total = Object.values(jobsQueue).reduce((sum, n) => sum + n, 0);
+
+  if (total === 0) {
+    return null;
+  }
+
+  // Only show statuses that have non-zero counts, in the defined order
+  const entries = JOB_STATUS_DISPLAY
+    .map((s) => ({ ...s, count: jobsQueue[s.key] ?? 0 }))
+    .filter((s) => s.count > 0);
+
+  return (
+    <>
+      <SectionHeader>Job Queue</SectionHeader>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 mb-6">
+        {entries.map((entry) => (
+          <StatCard
+            key={entry.key}
+            label={entry.label}
+            value={entry.count}
+            colorClass={entry.colorClass}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -1189,12 +1236,15 @@ export async function SystemHealthContent() {
 
       {/* Service status cards — only monitored services */}
       {services.length > 0 && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {services.map((svc) => (
             <ServiceCard key={svc.name} service={svc} />
           ))}
         </div>
       )}
+
+      {/* Job Queue */}
+      <JobQueueSection jobsQueue={data.jobsQueue} />
 
       {/* API Key Health */}
       {extended ? (

@@ -29,6 +29,7 @@ const SERVICES = [
   "wiki-server",
   "groundskeeper",
   "github-actions",
+  "job-worker",
 ] as const;
 
 // Expected migration count — update this when adding new drizzle migrations.
@@ -125,6 +126,53 @@ const monitoringApp = new Hono()
             : "down";
     }
 
+    // 2b. Job Worker — demand-aware status model.
+    // Unlike the singleton groundskeeper, workers are ephemeral (GHA or K8s)
+    // and may legitimately be absent when the queue is empty.
+    // Detect by model='job-worker-daemon' (set by crux/worker/run.ts).
+    const workerRows = await db
+      .select({
+        heartbeatAt: activeAgents.heartbeatAt,
+        status: activeAgents.status,
+      })
+      .from(activeAgents)
+      .where(
+        and(
+          eq(activeAgents.model, "job-worker-daemon"),
+          eq(activeAgents.status, "active"),
+        ),
+      )
+      .orderBy(desc(activeAgents.heartbeatAt))
+      .limit(1);
+
+    // Count pending jobs to distinguish "no worker needed" from "worker missing"
+    const pendingJobCountResult = await db
+      .select({ count: count() })
+      .from(jobs)
+      .where(eq(jobs.status, "pending"));
+    const pendingJobCount = pendingJobCountResult[0]?.count ?? 0;
+
+    const workerAgent = workerRows[0];
+    let jobWorkerStatus: "healthy" | "degraded" | "down" | "unknown" =
+      "unknown";
+    if (workerAgent) {
+      const minutesSinceHeartbeat =
+        (Date.now() - new Date(workerAgent.heartbeatAt).getTime()) / 60_000;
+      jobWorkerStatus =
+        minutesSinceHeartbeat < 10
+          ? "healthy"
+          : minutesSinceHeartbeat < 30
+            ? "degraded"
+            : "down";
+    } else if (pendingJobCount > 0) {
+      // Pending jobs but no active worker — something needs attention.
+      // The GHA scheduled worker runs every 30 min, so give it some slack.
+      jobWorkerStatus = pendingJobCount > 10 ? "down" : "degraded";
+    } else {
+      // No pending jobs and no active worker — everything is fine.
+      jobWorkerStatus = "healthy";
+    }
+
     // 3. Open incidents per service
     const openIncidents = await db
       .select({
@@ -176,6 +224,8 @@ const monitoringApp = new Hono()
         status = wikiServerStatus;
       } else if (name === "groundskeeper") {
         status = groundskeeperStatus;
+      } else if (name === "job-worker") {
+        status = jobWorkerStatus;
       } else {
         // discord-bot, vercel-frontend, github-actions — inferred from open incidents
         const hasCritical = recentIncidents.some(

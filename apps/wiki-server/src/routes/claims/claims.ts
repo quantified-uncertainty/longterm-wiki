@@ -347,7 +347,7 @@ const claimsApp = new Hono()
     }
 
     const claims = await sql<ClaimDetailRow[]>`
-      SELECT id, claim_text, source_url, target_table, target_field,
+      SELECT id::int, claim_text, source_url, target_table, target_field,
              proposed_value, agent_evidence, resource_id
       FROM proposed_claims
       WHERE id = ANY(${ids})
@@ -366,7 +366,7 @@ const claimsApp = new Hono()
     logger.debug({ batchId }, "polling claim status");
 
     const claims = await sql<ProposedClaimRow[]>`
-      SELECT id, batch_id, claim_text, status, verdict_confidence, verdict_reasoning, extracted_value
+      SELECT id::int, batch_id, claim_text, status, verdict_confidence, verdict_reasoning, extracted_value
       FROM proposed_claims
       WHERE batch_id = ${batchId}
       ORDER BY id ASC

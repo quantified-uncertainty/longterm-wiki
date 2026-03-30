@@ -274,7 +274,7 @@ export async function handleClaimVerification(
       const parsed = MultiClaimResultSchema.safeParse(raw);
 
       if (parsed.success) {
-        const expectedIds = new Set(batch.map((cl) => cl.id));
+        const expectedIds = new Set(batch.map((cl) => Number(cl.id)));
         const seenIds = new Set<number>();
 
         for (const r of parsed.data) {
@@ -298,7 +298,7 @@ export async function handleClaimVerification(
 
         // Treat omitted claims as errors so they get unverifiable status
         for (const cl of batch) {
-          if (!seenIds.has(cl.id)) {
+          if (!seenIds.has(Number(cl.id))) {
             console.warn(`[claim-verification] LLM omitted claimId ${cl.id} — marking unverifiable`);
             errors.push({ claimId: cl.id, error: 'LLM omitted this claim from verification response' });
           }
@@ -322,7 +322,7 @@ export async function handleClaimVerification(
 
   // 4. Store evidence for each verified claim
   for (const r of allResults) {
-    const claim = claims.find((cl) => cl.id === r.claimId);
+    const claim = claims.find((cl) => Number(cl.id) === r.claimId);
     if (!claim) continue;
 
     await storeSourceCheckEvidence({
