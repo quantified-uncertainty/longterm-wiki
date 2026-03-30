@@ -107,7 +107,7 @@ const dataQualityApp = new Hono()
       const entitiesTotal = entitiesTotalRows[0].count;
 
       const entitiesWithWikiPageRows = (await db.execute(
-        sql`SELECT COUNT(DISTINCT e.stable_id)::text AS cnt FROM entities e INNER JOIN wiki_pages wp ON wp.entity_id = e.stable_id`
+        sql`SELECT COUNT(DISTINCT e.stable_id)::text AS cnt FROM entities e INNER JOIN wiki_pages wp ON wp.wiki_id = e.wiki_id WHERE e.wiki_id IS NOT NULL`
       )) as Array<{ cnt: string }>;
       const entitiesWithWikiPage = parseInt(entitiesWithWikiPageRows[0]?.cnt ?? "0", 10);
 
