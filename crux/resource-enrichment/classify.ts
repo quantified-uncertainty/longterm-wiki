@@ -5,7 +5,6 @@
  * - resource_subtype (arxiv_preprint, blog_post, executive_order, etc.)
  * - resource_purpose (primary_source, commentary, dataset, etc.)
  * - context_note (single sentence of context)
- * - Which sub-table the resource belongs to
  *
  * Cost: ~$15 for 5,000 resources with Haiku batch (50% discount).
  */
@@ -26,7 +25,6 @@ interface ClassificationResult {
   resource_subtype: string;
   resource_purpose: string;
   context_note: string;
-  sub_table: 'paper' | 'forum_post' | 'policy_doc' | 'none';
 }
 
 export async function classifyCommand(

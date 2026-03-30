@@ -29,16 +29,9 @@ import { getResource, upsertResourceBatch } from '../wiki-server/resources.ts';
 import { COMBINED_ENRICHMENT_SYSTEM, combinedEnrichmentPrompt } from '../../resource-enrichment/prompts.ts';
 
 // ---------------------------------------------------------------------------
-// Minimal resource shape for the fields we read
+// getResource() returns ResourceRow & { citedBy: string[] } — we use fields
+// directly from that type without re-declaring an interface.
 // ---------------------------------------------------------------------------
-
-interface ResourceFields {
-  enrichmentStatus: string | null;
-  title: string | null;
-  type: string | null;
-  summary: string | null;
-  tags: string[] | null;
-}
 
 // ---------------------------------------------------------------------------
 // Params validation
@@ -56,8 +49,7 @@ const ResourceEnrichParamsSchema = z.object({
 const CombinedEnrichmentResultSchema = z.object({
   resource_subtype: z.string().min(1),
   resource_purpose: z.string().min(1),
-  context_note: z.string().max(700).default(''),  // prompt says max 100 words (~600-700 chars)
-  sub_table: z.enum(['paper', 'forum_post', 'policy_doc', 'none']),
+  context_note: z.string().max(500).default(''),  // matches UpsertResourceSchema.contextNote max(500)
   clean_title: z.string().nullable(),
   summary: z.string().min(1),
   key_points: z.array(z.string().max(200)).min(1).max(10),
@@ -100,7 +92,7 @@ export async function handleResourceEnrich(
       };
     }
 
-    const resource = resourceResult.data as unknown as ResourceFields;
+    const resource = resourceResult.data;
 
     if (resource.enrichmentStatus === 'enriched' || resource.enrichmentStatus === 'reviewed') {
       if (ctx.verbose) {
