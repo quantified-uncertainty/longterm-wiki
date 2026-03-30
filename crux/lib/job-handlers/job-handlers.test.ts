@@ -37,6 +37,7 @@ describe('job-handlers/index', () => {
     expect(types).toContain('batch-commit');
     expect(types).toContain('auto-update-digest');
     expect(types).toContain('resource-ingest');
+    expect(types).toContain('resource-enrich');
   });
 
   it('isKnownType returns true for registered types', async () => {

@@ -93,6 +93,10 @@ const handlers: Record<string, JobHandler> = {
   // Resource ingestion: fetch, cache content, persist metadata (#3209)
   'resource-ingest': lazyHandler(async () =>
     (await import('./resource-ingest.ts')).handleResourceIngest),
+
+  // Per-resource LLM enrichment (#3499) — lazy to avoid Anthropic SDK cycle
+  'resource-enrich': lazyHandler(async () =>
+    (await import('./resource-enrich.ts')).handleResourceEnrich),
 };
 
 /**

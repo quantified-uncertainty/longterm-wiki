@@ -22,6 +22,7 @@ import { createHash } from 'crypto';
 import { z } from 'zod';
 import { isPrivateHost, htmlToText } from '../source-check/source-fetcher.ts';
 import { upsertCitationContent } from '../wiki-server/citations.ts';
+import { createJob } from '../wiki-server/jobs.ts';
 import { updateResourceFetchStatus } from '../wiki-server/resources.ts';
 
 // ---------------------------------------------------------------------------
@@ -250,6 +251,19 @@ export async function handleResourceIngest(
     const isHtml = contentType.includes('html') || contentType.includes('xhtml');
     const plainText = isHtml ? htmlToText(text) : text;
     await persistResults(resourceId, url, status, statusCode, contentType, plainText, contentHash, ctx);
+
+    // Chain: enqueue resource-enrich job for reachable resources (best-effort)
+    if (status === 'reachable') {
+      createJob({
+        type: 'resource-enrich',
+        params: { resourceId, url },
+        priority: 0,
+        dedupKey: `resource-enrich:${resourceId}`,
+      }).catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(`[resource-ingest] Failed to enqueue enrichment for ${resourceId}: ${msg}`);
+      });
+    }
 
     return buildResult(resourceId, url, status, startTime, {
       statusCode,

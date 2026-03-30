@@ -109,3 +109,4 @@ export interface ResourceIngestParams {
   /** Hash of previously fetched content (for change detection) */
   previousContentHash?: string;
 }
+
