@@ -18,6 +18,31 @@ export const metadata: Metadata = {
     "Overview of external resources and publication venues tracked in the wiki — papers, articles, reports, and credibility ratings.",
 };
 
+const ENRICHMENT_STAGES: readonly {
+  key: string;
+  label: string;
+  color: string;
+}[] = [
+  { key: "none", label: "Not Started", color: "bg-zinc-300 dark:bg-zinc-700" },
+  { key: "pending", label: "Pending", color: "bg-amber-400 dark:bg-amber-600" },
+  { key: "fetched", label: "Fetched", color: "bg-sky-400 dark:bg-sky-600" },
+  { key: "classified", label: "Classified", color: "bg-violet-400 dark:bg-violet-600" },
+  { key: "enriched", label: "Enriched", color: "bg-emerald-500 dark:bg-emerald-600" },
+  { key: "reviewed", label: "Reviewed", color: "bg-emerald-700 dark:bg-emerald-400" },
+];
+
+const STAGE_LOOKUP = Object.fromEntries(
+  ENRICHMENT_STAGES.map((s) => [s.key, s])
+);
+
+function stageLabel(stage: string): string {
+  return STAGE_LOOKUP[stage]?.label ?? stage;
+}
+
+function enrichmentStageColor(stage: string): string {
+  return STAGE_LOOKUP[stage]?.color ?? "bg-zinc-400";
+}
+
 export default function SourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
@@ -66,6 +91,15 @@ export default function SourcesPage() {
     };
   });
 
+  // Resource type breakdown
+  const typeCounts = new Map<string, number>();
+  for (const r of resourceRows) {
+    typeCounts.set(r.type, (typeCounts.get(r.type) || 0) + 1);
+  }
+  const topTypes = [...typeCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
   // Compute summary stats
   const peerReviewed = publications.filter((p) => p.peer_reviewed).length;
   const withSummary = resources.filter((r) => r.summary).length;
@@ -73,14 +107,39 @@ export default function SourcesPage() {
     const pages = getPagesForResource(r.id);
     return pages.length > 0;
   }).length;
+  const enriched = resources.filter((r) => r.enrichment_status === "enriched").length;
 
   const stats = [
     { label: "Resources", value: String(resources.length) },
     { label: "Publications", value: String(publications.length) },
-    { label: "Peer-Reviewed Venues", value: String(peerReviewed) },
+    ...topTypes.map(([type, count]) => ({
+      label: type.charAt(0).toUpperCase() + type.slice(1) + "s",
+      value: String(count),
+    })),
+    { label: "Peer-Reviewed", value: String(peerReviewed) },
     { label: "With Summaries", value: String(withSummary) },
     { label: "Cited by Pages", value: String(citedResources) },
+    { label: "Enriched", value: String(enriched) },
   ];
+
+  // Enrichment pipeline breakdown
+  const enrichmentCounts = new Map<string, number>();
+  for (const r of resources) {
+    const status = r.enrichment_status ?? "none";
+    enrichmentCounts.set(status, (enrichmentCounts.get(status) || 0) + 1);
+  }
+  // Ordered by pipeline stage, with unknown stages collected as "other"
+  const knownKeys = new Set(ENRICHMENT_STAGES.map((s) => s.key));
+  const enrichmentStats = ENRICHMENT_STAGES
+    .filter((s) => enrichmentCounts.has(s.key))
+    .map((s) => ({ stage: s.key, count: enrichmentCounts.get(s.key)! }));
+  let otherCount = 0;
+  for (const [key, count] of enrichmentCounts) {
+    if (!knownKeys.has(key)) otherCount += count;
+  }
+  if (otherCount > 0) {
+    enrichmentStats.push({ stage: "other", count: otherCount });
+  }
 
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
@@ -96,7 +155,7 @@ export default function SourcesPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
         {stats.map((stat) => (
           <ProfileStatCard
             key={stat.label}
@@ -105,6 +164,48 @@ export default function SourcesPage() {
           />
         ))}
       </div>
+
+      {/* Enrichment pipeline progress — hidden when no resources */}
+      {resources.length > 0 && (
+        <div className="mb-8 rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              Enrichment Pipeline
+            </h2>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {enrichmentStats
+                .filter((s) => s.stage === "enriched" || s.stage === "reviewed")
+                .reduce((sum, s) => sum + s.count, 0)
+                .toLocaleString()}{" "}
+              / {resources.length.toLocaleString()} enriched
+            </span>
+          </div>
+          <div className="flex h-3 rounded-full overflow-hidden mb-4 bg-muted/40">
+            {enrichmentStats.map(({ stage, count }) => (
+              <div
+                key={stage}
+                className={`${enrichmentStageColor(stage)}`}
+                style={{ width: `${(count / resources.length) * 100}%` }}
+                title={`${stageLabel(stage)}: ${count.toLocaleString()} (${Math.round((count / resources.length) * 100)}%)`}
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs text-muted-foreground">
+            {enrichmentStats.map(({ stage, count }) => (
+              <span key={stage} className="flex items-center gap-1.5">
+                <span className={`inline-block w-2 h-2 rounded-sm ${enrichmentStageColor(stage)}`} />
+                <span>{stageLabel(stage)}</span>
+                <span className="tabular-nums font-medium text-foreground/70">
+                  {count.toLocaleString()}
+                </span>
+                <span className="tabular-nums text-muted-foreground/50">
+                  ({Math.round((count / resources.length) * 100)}%)
+                </span>
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       <SourcesTabs
         resourceRows={resourceRows}

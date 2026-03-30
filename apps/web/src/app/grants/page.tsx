@@ -17,12 +17,13 @@ export const metadata: Metadata = {
 };
 
 /**
- * Canonical entity ID for Centre for Effective Altruism.
- * The slug "cea" maps to stableId "gNsqAes7Dw". Some imported grants may use
- * the slug as organizationId, causing duplicate funder entries. Normalize here.
+ * Canonical entity stableId for Centre for Effective Altruism.
+ * Some imported grants may use the slug or bare ID as organizationId,
+ * causing duplicate funder entries. Normalize here.
  */
-const CEA_CANONICAL_ID = "gNsqAes7Dw";
+const CEA_CANONICAL_ID = "sid_gNsqAes7Dw";
 const CEA_SLUG_ALIAS = "cea";
+const CEA_BARE_ID = "gNsqAes7Dw";
 
 /**
  * Resolve an entity identifier to a display name, slug, and wiki page ID.
@@ -55,7 +56,7 @@ export default function GrantsPage() {
   const rows: GrantRow[] = allGrants.map((record) => {
     // Normalize CEA duplicate: map slug alias to canonical entity ID
     const orgId =
-      record.ownerEntityId === CEA_SLUG_ALIAS
+      record.ownerEntityId === CEA_SLUG_ALIAS || record.ownerEntityId === CEA_BARE_ID
         ? CEA_CANONICAL_ID
         : record.ownerEntityId;
 

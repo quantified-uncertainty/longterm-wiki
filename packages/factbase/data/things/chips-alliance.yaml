@@ -2,9 +2,9 @@ entity: sid_0bYYDuKcGH
 facts:
   - id: f_UyhnMGw8so
     property: founded-date
-    value: "2022"
+    value: "2019"
     source: https://www.chipsalliance.org
-    notes: "Founded under the Linux Foundation"
+    notes: "Established in 2019 under the Linux Foundation"
 
   - id: f_Lmj6dEFsrd
     property: description

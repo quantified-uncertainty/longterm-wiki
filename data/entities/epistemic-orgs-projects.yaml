@@ -201,7 +201,7 @@
   title: XPT (Existential Risk Persuasion Tournament)
   projectStatus: active
   projectUrl: https://xpt.forecastingresearch.org
-  organization: KslhqGaeJw
+  organization: fri
   description: Four-month structured forecasting tournament bringing together superforecasters and domain experts through adversarial collaboration.
   path: /knowledge-base/responses/xpt/
   lastUpdated: 2026-01
@@ -214,7 +214,7 @@
   title: ForecastBench
   projectStatus: active
   projectUrl: https://forecastbench.org
-  organization: KslhqGaeJw
+  organization: fri
   description: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
   path: /knowledge-base/responses/forecastbench/
   lastUpdated: 2026-01
@@ -226,7 +226,7 @@
   type: project
   title: AI Forecasting Benchmark Tournament
   projectStatus: active
-  organization: CUBiiyCfOA
+  organization: metaculus
   description: Quarterly competition run by Metaculus comparing human Pro Forecasters against AI forecasting bots.
   path: /knowledge-base/responses/ai-forecasting-benchmark/
   lastUpdated: 2026-01
@@ -249,7 +249,7 @@
   title: Grokipedia
   projectStatus: active
   projectUrl: https://grokipedia.com
-  organization: GLXKjYAEKw
+  organization: xai
   description: xAI's AI-generated encyclopedia launched October 2025, growing to 6M+ articles with documented quality concerns including political bias and scientific inaccuracies.
   path: /knowledge-base/responses/grokipedia/
   lastUpdated: 2026-02

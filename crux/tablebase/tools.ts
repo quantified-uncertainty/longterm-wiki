@@ -431,7 +431,7 @@ async function handleSubmitRecords(
         continue;
       }
 
-      // Legacy bare stableId (10-char alphanumeric) — verify it exists
+      // Legacy bare stableId (10-char alphanumeric) or sid_-prefixed — verify it exists
       if (isAnySid(val)) {
         if (stableIdSet.has(val)) {
           continue;

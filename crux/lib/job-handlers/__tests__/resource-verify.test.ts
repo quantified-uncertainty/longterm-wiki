@@ -30,6 +30,25 @@ vi.mock('../../source-check/source-fetcher.ts', () => ({
     host.startsWith('10.') ||
     host.startsWith('192.168.') ||
     /^172\.(1[6-9]|2\d|3[01])\./.test(host),
+  htmlToText: (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+}));
+
+vi.mock('../../wiki-server/citations.ts', () => ({
+  upsertCitationContent: vi.fn().mockResolvedValue({ ok: true, data: { url: 'test' } }),
+}));
+
+vi.mock('../../wiki-server/resources.ts', () => ({
+  updateResourceFetchStatus: vi.fn().mockResolvedValue({ ok: true, data: {} }),
+}));
+
+// ---------------------------------------------------------------------------
+// Mock: jobs API (createJob) — for enrichment chaining
+// ---------------------------------------------------------------------------
+
+const mockCreateJob = vi.fn<() => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
+
+vi.mock('../../wiki-server/jobs.ts', () => ({
+  createJob: (...args: unknown[]) => mockCreateJob(...args),
 }));
 
 // ---------------------------------------------------------------------------
@@ -82,6 +101,8 @@ const originalFetch = globalThis.fetch;
 
 beforeEach(() => {
   vi.restoreAllMocks();
+  mockCreateJob.mockClear();
+  mockCreateJob.mockResolvedValue({ ok: true, data: { id: 999 } });
 });
 
 afterEach(() => {
@@ -599,5 +620,154 @@ describe('handleResourceVerify — large response handling', () => {
     expect(result.data.status).toBe('reachable');
     expect(result.data.skippedBody).toBe(true);
     expect(result.data.contentLength).toBe(15000000);
+  });
+});
+
+describe('handleResourceVerify — persistence', () => {
+  it('caches content and updates fetch_status on reachable URL', async () => {
+    const { upsertCitationContent } = await import('../../wiki-server/citations.ts');
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const body = '<html><body><h1>Title</h1><p>Content</p></body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    await handleResourceVerify(
+      { resourceId: 'res-persist', url: 'https://example.com/persist-test' },
+      CTX,
+    );
+
+    expect(upsertCitationContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://example.com/persist-test',
+        resourceId: 'res-persist',
+        fetchMethod: 'resource-verify',
+      }),
+    );
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-persist',
+      expect.objectContaining({
+        fetchStatus: 'ok',
+      }),
+    );
+  });
+
+  it('updates fetch_status to dead on 404', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse('Not Found', { status: 404 }));
+
+    await handleResourceVerify(
+      { resourceId: 'res-dead', url: 'https://example.com/missing' },
+      CTX,
+    );
+
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-dead',
+      expect.objectContaining({
+        fetchStatus: 'dead',
+      }),
+    );
+  });
+
+  it('persists reachable status even when body is skipped (large response)', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const res = mockResponse('', {
+      headers: { 'content-length': '15000000', 'content-type': 'application/pdf' },
+    });
+    globalThis.fetch = vi.fn().mockResolvedValue(res);
+
+    await handleResourceVerify(
+      { resourceId: 'res-large', url: 'https://example.com/huge.pdf' },
+      CTX,
+    );
+
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-large',
+      expect.objectContaining({
+        fetchStatus: 'ok',
+      }),
+    );
+  });
+});
+
+describe('handleResourceVerify — enrichment chaining', () => {
+  it('enqueues resource-enrich job when status is reachable', async () => {
+    const body = '<html><body><h1>Real Article</h1><p>Content about AI safety.</p></body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+
+    // createJob should have been called with resource-enrich params
+    expect(mockCreateJob).toHaveBeenCalledTimes(1);
+    expect(mockCreateJob).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'resource-enrich',
+      params: { resourceId: 'res-1', url: 'https://example.com/article' },
+      dedupKey: 'resource-enrich:res-1',
+    }));
+  });
+
+  it('does NOT enqueue enrichment for not_found status', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      mockResponse('Not Found', { status: 404 }),
+    );
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/gone' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('not_found');
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('does NOT enqueue enrichment for soft_404 status', async () => {
+    const body = '<html><body><h1>Page not found</h1></body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/missing' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('soft_404');
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('does NOT enqueue enrichment for paywall status', async () => {
+    const body = '<p>Subscribe to continue reading this article.</p>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/paywalled' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('paywall');
+    expect(mockCreateJob).not.toHaveBeenCalled();
+  });
+
+  it('still succeeds when enrichment job creation fails', async () => {
+    const body = '<html><body><h1>Real Article</h1><p>Content about AI safety.</p></body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+    mockCreateJob.mockRejectedValue(new Error('Wiki-server down'));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    // Verify job still succeeds despite createJob failure
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
   });
 });

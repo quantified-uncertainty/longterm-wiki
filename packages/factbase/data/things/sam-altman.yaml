@@ -6,10 +6,9 @@ facts:
     notes: "Born April 22, 1985 in Chicago, Illinois"
   - id: f_aR3kT8mW5q
     property: education
-    value: "Studied computer science at Stanford University (dropped out after
-      sophomore year)"
+    value: "Studied computer science at Stanford University for two years; dropped out in 2005"
     source: https://en.wikipedia.org/wiki/Sam_Altman
-    notes: "Dropped out to work on Loopt, his first startup"
+    notes: "Left Stanford to co-found Loopt, his first startup"
 
   - id: f_bN7vQ2xJ4p
     property: notable-for

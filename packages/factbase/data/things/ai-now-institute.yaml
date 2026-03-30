@@ -91,10 +91,10 @@ facts:
 
   - id: f_tjvsWtm5t3
     property: publication
-    value: "AI Now 2017 Report — first annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
+    value: "AI Now 2017 Report — second annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
     asOf: 2017
     source: https://ainowinstitute.org/publication/ai-now-2017-report
-    notes: "Inaugural annual landscape report"
+    notes: "Second annual report (first was the 2016 workshop/report); published October 2017"
 
   - id: f_bWrhn03JAn
     property: publication
@@ -136,8 +136,9 @@ facts:
 
   - id: f_N10dTfD8W6
     property: funder
-    value: "Omidyar Network / Luminate"
+    value: "Luminate (formerly Omidyar Network)"
     source: https://ainowinstitute.org/about
+    notes: "Listed as a current supporter on AI Now's about page. AI Now does not accept corporate/big tech funding since mid-2022, but Luminate is a philanthropic funder, not big tech."
 
   - id: f_diDp4Ck5W9
     property: policy-influence

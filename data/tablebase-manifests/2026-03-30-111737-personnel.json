@@ -1,0 +1,73 @@
+{
+  "table": "personnel",
+  "recordCount": 7,
+  "submittedAt": "2026-03-30T11:17:37.314Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 7,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "IyJ6iX3FQV",
+      "personId": "Vlhozz2X81",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Executive Director",
+      "source": "https://fedscoop.com/exit-interview-18fs-aaron-snow-candid-ig-report-departs-government/",
+      "verdict": "none"
+    },
+    {
+      "id": "0oI5eyQszV",
+      "personId": "rEKehRdMhM",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://fedscoop.com/angela-colter-takes-executive-director-role-18f/",
+      "verdict": "none"
+    },
+    {
+      "id": "WX7e8TvICg",
+      "personId": "ltq1ipuyko",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://www.meritalk.com/articles/whittaker-named-acting-executive-director-at-gsas-18f/",
+      "verdict": "none"
+    },
+    {
+      "id": "UpphuOeZMr",
+      "personId": "pP7nNaC2a5",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Acting Executive Director",
+      "source": "https://www.fedhealthit.com/2021/03/gsa-appoints-new-leader-of-18f/",
+      "verdict": "none"
+    },
+    {
+      "id": "vK7Jgv9Fvc",
+      "personId": "pYabsLmh9j",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Executive Director",
+      "source": "https://fedscoop.com/radio/lindsay-young-executive-director-of-18f-when-it-was-shuttered-joins-the-podcast/",
+      "verdict": "none"
+    },
+    {
+      "id": "OXbx8Ym6Ea",
+      "personId": "t9t4F8ji8Y",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Co-Founder",
+      "source": "https://digital.gov/authors/alison-rowland/",
+      "verdict": "none"
+    },
+    {
+      "id": "nJ4YZAQ4m0",
+      "personId": "JUKluQ5MVB",
+      "organizationId": "sid_WVHl7Ya8oQ",
+      "role": "Co-Founder",
+      "source": "https://fedscoop.com/former-innovation-fellows-band-together-to-build-new-digital-consultancy/",
+      "verdict": "none"
+    }
+  ]
+}
