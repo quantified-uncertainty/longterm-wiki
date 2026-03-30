@@ -588,7 +588,7 @@ const resourcesApp = new Hono()
       id: string;
       url: string;
       title: string | null;
-      fetched_at: Date | null;
+      fetched_at: string | Date | null;
       has_content: boolean;
     }
     const existingRows: ResourceWithContent[] =
@@ -672,7 +672,7 @@ const resourcesApp = new Hono()
       let contentStatus: ContentStatus;
       if (!r.has_content) {
         contentStatus = "missing";
-      } else if (r.fetched_at && now - r.fetched_at.getTime() > maxAge) {
+      } else if (r.fetched_at && now - new Date(r.fetched_at).getTime() > maxAge) {
         contentStatus = "stale";
       } else {
         contentStatus = "fresh";
