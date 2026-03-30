@@ -1365,6 +1365,9 @@ export const ClaimVerdictSchema = z.object({
 export type ClaimVerdict = z.infer<typeof ClaimVerdictSchema>;
 
 export const ClaimVerdictBatchSchema = z.object({
-  verdicts: z.array(ClaimVerdictSchema).min(1).max(100),
+  verdicts: z.array(ClaimVerdictSchema).min(1).max(100).refine(
+    (arr) => new Set(arr.map((v) => v.claimId)).size === arr.length,
+    "Duplicate claimIds are not allowed",
+  ),
 });
 export type ClaimVerdictBatch = z.infer<typeof ClaimVerdictBatchSchema>;

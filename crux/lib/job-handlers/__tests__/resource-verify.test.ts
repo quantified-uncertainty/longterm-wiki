@@ -448,6 +448,130 @@ describe('handleResourceVerify — network errors', () => {
   });
 });
 
+describe('handleResourceVerify — response.body null fallback', () => {
+  it('falls back to response.text() when body is null', async () => {
+    const content = '<html><body>Page loaded via text() fallback</body></html>';
+    const res = new Response(content, {
+      status: 200,
+      headers: { 'content-type': 'text/html' },
+    });
+    // Override body to null so the handler takes the fallback path
+    Object.defineProperty(res, 'body', { value: null, writable: false });
+    Object.defineProperty(res, 'url', { value: 'https://example.com/page' });
+    globalThis.fetch = vi.fn().mockResolvedValue(res);
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/page' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.contentHash).toBe(expectedHash(content));
+  });
+});
+
+describe('handleResourceVerify — stream read error mid-read', () => {
+  it('handles a stream that errors after emitting one chunk', async () => {
+    const encoder = new TextEncoder();
+    const partialChunk = 'partial content before error';
+    const stream = new ReadableStream({
+      async pull(controller) {
+        controller.enqueue(encoder.encode(partialChunk));
+        // Yield to ensure the chunk is consumed before the error
+        await new Promise((resolve) => setTimeout(resolve, 0));
+        controller.error(new Error('network interrupted'));
+      },
+    });
+    const res = new Response(stream, {
+      status: 200,
+      headers: { 'content-type': 'text/html' },
+    });
+    Object.defineProperty(res, 'url', { value: 'https://example.com/page' });
+    globalThis.fetch = vi.fn().mockResolvedValue(res);
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/page' },
+      CTX,
+    );
+
+    // The handler should process partial data and still return a result
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.contentHash).toBe(expectedHash(partialChunk));
+  });
+});
+
+describe('handleResourceVerify — malformed URL', () => {
+  it('returns invalid_url for a URL that passes Zod but fails new URL()', async () => {
+    const targetUrl = 'https://looks-valid-but-throws.example.com/page';
+    const OriginalURL = globalThis.URL;
+    let callCount = 0;
+    globalThis.URL = class extends OriginalURL {
+      constructor(input: string | URL, base?: string | URL) {
+        // Zod's .url() internally calls new URL() to validate. Let those calls
+        // succeed, but throw on a later call (the handler's explicit new URL()).
+        if (typeof input === 'string' && input === targetUrl) {
+          callCount++;
+          if (callCount > 1) {
+            throw new TypeError('Invalid URL');
+          }
+        }
+        super(input, base);
+      }
+    } as typeof URL;
+
+    try {
+      const result = await handleResourceVerify(
+        { resourceId: 'res-1', url: targetUrl },
+        CTX,
+      );
+
+      expect(result.success).toBe(true);
+      expect(result.data.status).toBe('invalid_url');
+      expect(result.data.error).toBe('Malformed URL');
+    } finally {
+      globalThis.URL = OriginalURL;
+    }
+  });
+});
+
+describe('handleResourceVerify — empty response body', () => {
+  it('returns reachable with valid content hash for empty body', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(''));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/empty' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.contentHash).toBe(expectedHash(''));
+    expect(result.data.contentLength).toBe(0);
+  });
+});
+
+describe('handleResourceVerify — contentChanged undefined without previousContentHash', () => {
+  it('sets contentChanged to undefined when no previousContentHash provided', async () => {
+    const body = '<html><body>Some content</body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://example.com/page' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    // contentChanged must be strictly undefined (not false, not null)
+    expect(result.data.contentChanged).toBeUndefined();
+    expect('contentChanged' in result.data).toBe(true);
+    expect(result.data.contentChanged).not.toBe(false);
+    expect(result.data.contentChanged).not.toBe(null);
+  });
+});
+
 describe('handleResourceVerify — large response handling', () => {
   it('skips body read for very large Content-Length', async () => {
     // Content-Length > 10MB triggers the skip
