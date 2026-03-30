@@ -438,6 +438,9 @@
     - id: dan-hendrycks
       type: person
       relationship: leads-to
+    - id: sid_TnHMQ4cMOw
+      type: person
+      relationship: leads-to
   sources:
     - title: CAIS Website
       url: https://safe.ai
@@ -445,16 +448,19 @@
       url: https://www.safe.ai/statement-on-ai-risk
     - title: Representation Engineering Paper
       url: https://arxiv.org/abs/2310.01405
+    - title: CAIS About
+      url: https://safe.ai/about
   description: >-
     The Center for AI Safety (CAIS) is a nonprofit organization that works to reduce societal-scale risks from AI. CAIS
-    combines research, field-building, and public communication to advance AI safety.
+    combines research, field-building, and public communication to advance AI safety. Co-founded by Dan Hendrycks
+    (Executive Director) and Oliver Zhang (Managing Director) in 2022.
   tags:
     - ai-safety
     - x-risk
     - representation-engineering
     - field-building
     - ai-risk-communication
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: conjecture
   stableId: sid_0u4J70VqFY
   wikiId: E70
@@ -573,6 +579,23 @@
     - id: allan-dafoe
       type: person
       relationship: leads-to
+    - id: sid_aAaiRGmdG1
+      type: person
+      relationship: leads-to
+    - id: sid_1nsWegMiR3
+      type: person
+      relationship: research
+    - id: sid_VwtX0KjSB7
+      type: person
+      relationship: research
+    - id: sid_wkrlZwg73n
+      type: person
+      relationship: research
+    - id: sid_YOfOGwm1kh
+      type: person
+      relationship: research
+    - id: sid_GRrd7Z857X
+      type: person
   sources:
     - title: GovAI Website
       url: https://governance.ai
@@ -580,15 +603,18 @@
       url: https://governance.ai/compute
     - title: GovAI Research Papers
       url: https://governance.ai/research
+    - title: GovAI People
+      url: https://www.governance.ai/people
   description: >-
     The Centre for the Governance of AI (GovAI) is a research organization focused on AI policy and governance.
     Originally part of the Future of Humanity Institute at Oxford, GovAI began operating independently in 2021 and formally incorporated as a separate entity before FHI closed in April 2024.
+    Led by Director Ben Garfinkel with Markus Anderljung directing policy and research.
   tags:
     - governance
     - compute-governance
     - international
     - regulation
-  lastUpdated: 2025-12
+  lastUpdated: 2026-03
 - id: metr
   stableId: sid_rQEkFJxS5w
   wikiId: E201
@@ -2334,7 +2360,28 @@
   relatedEntries:
     - id: helen-toner
       type: person
+      relationship: leads-to
+    - id: sid_gA9eoKhFAM
+      type: person
       relationship: research
+    - id: sid_HNLXHY2JPv
+      type: person
+    - id: sid_EHJnA0xd9I
+      type: person
+    - id: sid_olcSAPOVSn
+      type: person
+    - id: sid_6ti6YwtcVq
+      type: person
+    - id: sid_p6v8L9qgoa
+      type: person
+    - id: sid_FWirpL5SlK
+      type: person
+    - id: sid_iEm4DtzxcC
+      type: person
+    - id: sid_ELJ2FIKXEU
+      type: person
+    - id: sid_EmAhq5JolA
+      type: person
   clusters:
     - community
     - governance
@@ -2346,7 +2393,9 @@
       url: https://cset.georgetown.edu/about-us/
     - title: Center for Security and Emerging Technology - Wikipedia
       url: https://en.wikipedia.org/wiki/Center_for_Security_and_Emerging_Technology
-  lastUpdated: 2026-02
+    - title: CSET Team Page
+      url: https://cset.georgetown.edu/team/
+  lastUpdated: 2026-03
 - id: ea-global
   stableId: sid_k4IPgRP98A
   wikiId: E525
@@ -2414,6 +2463,15 @@
       type: person
     - id: max-tegmark
       type: person
+      relationship: leads-to
+    - id: sid_utxQdymSEg
+      type: person
+    - id: sid_Hb3T98fPHc
+      type: person
+    - id: sid_KG46JUejyg
+      type: person
+    - id: sid_XvvppfgBPw
+      type: person
   sources:
     - title: Future of Life Institute Website
       url: https://futureoflife.org/
@@ -2421,6 +2479,8 @@
       url: https://en.wikipedia.org/wiki/Future_of_Life_Institute
     - title: Pause Giant AI Experiments Open Letter
       url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
+    - title: FLI Our People
+      url: https://futureoflife.org/about-us/our-people/
   lastUpdated: 2026-03
 - id: founders-fund
   stableId: sid_LYfneQJbSA
@@ -4979,6 +5039,8 @@
     - id: sid_vn087g2XWa
       type: person
       relationship: leads-to
+    - id: sid_hd3NTHWp0l
+      type: person
   sources:
     - title: CNAS Website
       url: https://www.cnas.org
@@ -6721,6 +6783,23 @@
     - ai-ethics
     - power-concentration
     - research
+  relatedEntries:
+    - id: sid_xTqcQVprIH
+      type: person
+      relationship: leads-to
+    - id: sid_lCvbYl5SE0
+      type: person
+      relationship: leads-to
+    - id: sid_77SnPuPnk8
+      type: person
+    - id: sid_3R1I5JCrP4
+      type: person
+    - id: sid_npfho6p1QL
+      type: person
+    - id: sid_wsVptq6vg9
+      type: person
+    - id: sid_mLr8phls1l
+      type: person
   clusters:
     - governance
     - governance
@@ -6760,6 +6839,23 @@
       type: organization
     - id: sid_OIY5gaPpBA
       type: organization
+    - id: sid_m9rEqFrCkf
+      type: person
+      relationship: leads-to
+    - id: sid_yibdrO5rgh
+      type: person
+    - id: sid_B8LrTnaDpT
+      type: person
+    - id: sid_he0I2G8Q4g
+      type: person
+    - id: sid_nIlZDPzSj8
+      type: person
+    - id: sid_9t23MXZwNI
+      type: person
+    - id: sid_Z68V2AtdFx
+      type: person
+    - id: sid_fPrCLKppF3
+      type: person
   sources:
     - title: Partnership on AI Website
       url: https://partnershiponai.org/
@@ -6767,6 +6863,8 @@
       url: https://partnershiponai.org/about/
     - title: Partnership on AI - Wikipedia
       url: https://en.wikipedia.org/wiki/Partnership_on_AI
+    - title: Partnership on AI Team
+      url: https://partnershiponai.org/team/
   lastUpdated: 2026-03
 
 - id: ai-policy-institute
@@ -6790,6 +6888,10 @@
     - ai-policy
     - advocacy
     - polling
+  relatedEntries:
+    - id: sid_k7Xw6otC8a
+      type: person
+      relationship: leads-to
   clusters:
     - ai-safety
     - governance
@@ -6818,6 +6920,17 @@
     - advocacy
     - ea-community
     - lobbying
+  relatedEntries:
+    - id: sid_PQYAd3EcSQ
+      type: person
+      relationship: leads-to
+    - id: sid_4dwqcYO3sZ
+      type: person
+      relationship: leads-to
+    - id: sid_kHKTVjWRe7
+      type: person
+    - id: sid_vlCND0FtTw
+      type: person
   clusters:
     - ai-safety
     - governance
@@ -6826,6 +6939,8 @@
       url: https://ari.us/
     - title: ARI About
       url: https://ari.us/about-us/
+    - title: ARI Team
+      url: https://ari.us/team/
   lastUpdated: 2026-03
 
 - id: brookings-ai
@@ -6863,6 +6978,18 @@
     - ai-policy
     - national-security
     - think-tank
+  relatedEntries:
+    - id: sid_lnRDrBaWNt
+      type: person
+    - id: sid_YOfOGwm1kh
+      type: person
+    - id: sid_gA9eoKhFAM
+      type: person
+  sources:
+    - title: RAND AI Research
+      url: https://www.rand.org/topics/artificial-intelligence.html
+    - title: RAND CAST Staff
+      url: https://www.rand.org/global-and-emerging-risks/centers/ai-security-and-technology/staff.html
   lastUpdated: 2026-03
 
 - id: stanford-hai
@@ -6888,11 +7015,35 @@
     - id: sid_QzcX3bShmQ
       type: person
       relationship: leads-to
+    - id: sid_rhgfPZYXTw
+      type: person
+      relationship: leads-to
+    - id: sid_SpX9DLSkHP
+      type: person
+      relationship: leads-to
+    - id: sid_rZVptD1Mdq
+      type: person
+    - id: sid_Rmw4K4EQuX
+      type: person
+    - id: sid_Z7yCa2gFFh
+      type: person
+    - id: sid_HQUSdoXU47
+      type: person
+    - id: sid_csTWks7Pxh
+      type: person
+    - id: sid_x39KP3SjCg
+      type: person
+    - id: sid_afuYa1WcnH
+      type: person
+    - id: sid_BTOYhStYj8
+      type: person
   sources:
     - title: Stanford HAI Website
       url: https://hai.stanford.edu
     - title: Stanford HAI Five Years
       url: https://hai.stanford.edu/news/stanford-hai-five-pioneering-future-human-centered-ai
+    - title: Stanford HAI People
+      url: https://hai.stanford.edu/about/people
   lastUpdated: 2026-03
 
 - id: center-for-ai-policy
@@ -6917,6 +7068,10 @@
     - ai-policy
     - lobbying
     - defunct
+  relatedEntries:
+    - id: sid_zvMaj29XJk
+      type: person
+      relationship: leads-to
   clusters:
     - ai-safety
     - governance
@@ -6947,6 +7102,11 @@
     - ai-policy
     - digital-rights
     - civil-liberties
+  relatedEntries:
+    - id: sid_YrFpFk4BHx
+      type: person
+    - id: sid_3KYTMxNqMM
+      type: person
   lastUpdated: 2026-03
 
 - id: carnegie-ai
@@ -7898,6 +8058,12 @@
     - surveillance
     - anti-authoritarianism
     - policy-advocacy
+  relatedEntries:
+    - id: sid_SCjtdr96uJ
+      type: person
+      relationship: leads-to
+    - id: sid_CeVB8A25p2
+      type: person
   clusters:
     - governance
     - governance
@@ -7932,6 +8098,10 @@
     - litigation
     - civil-liberties
     - digital-rights
+  relatedEntries:
+    - id: sid_cP2vcXheA3
+      type: person
+      relationship: leads-to
   clusters:
     - governance
     - governance
@@ -7968,6 +8138,10 @@
     - ai-governance
     - surveillance
     - policy-advocacy
+  relatedEntries:
+    - id: sid_8uwYGwtLY2
+      type: person
+      relationship: leads-to
   clusters:
     - governance
   sources:

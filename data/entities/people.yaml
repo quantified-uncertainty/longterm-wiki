@@ -7798,3 +7798,888 @@
     - law
     - ai-governance
 
+# ── CSET (Center for Security and Emerging Technology) Personnel ──────
+
+- id: dewey-murdick
+  stableId: sid_HNLXHY2JPv
+  type: person
+  title: Dewey Murdick
+  description: >-
+    Executive Director of Georgetown's Center for Security and Emerging
+    Technology (CSET) from 2021 to 2025. Previously founding Director of
+    Data Science at CSET and Director of Science Analytics at the Chan
+    Zuckerberg Initiative.
+  customFields:
+    - label: Role
+      value: Former Executive Director
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: cara-lapointe
+  stableId: sid_EHJnA0xd9I
+  type: person
+  title: Cara LaPointe
+  description: >-
+    Director of Analysis at Georgetown's Center for Security and Emerging
+    Technology (CSET). Leads CSET's analytical research programs on emerging
+    technology policy and national security.
+  customFields:
+    - label: Role
+      value: Director of Analysis
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: catherine-aiken
+  stableId: sid_olcSAPOVSn
+  type: person
+  title: Catherine Aiken
+  description: >-
+    Director of Data Science and Research at Georgetown's Center for Security
+    and Emerging Technology (CSET). Oversees CSET's data-driven research
+    methodology and the Emerging Technology Observatory datasets.
+  customFields:
+    - label: Role
+      value: Director of Data Science and Research
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - ai-policy
+    - data-science
+
+- id: tarun-chhabra
+  stableId: sid_6ti6YwtcVq
+  type: person
+  title: Tarun Chhabra
+  description: >-
+    Senior Fellow at Georgetown's Center for Security and Emerging Technology
+    (CSET). Previously served on the White House National Security Council
+    staff as Director for Strategic Planning and Director for Human Rights
+    and National Security Issues. Former Pentagon speechwriter for the
+    Secretary of Defense.
+  customFields:
+    - label: Role
+      value: Senior Fellow
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - national-security
+    - ai-policy
+
+- id: christa-bennett
+  stableId: sid_p6v8L9qgoa
+  type: person
+  title: Christa Bennett
+  description: >-
+    Director of Communications and Strategic Engagement at Georgetown's
+    Center for Security and Emerging Technology (CSET).
+  customFields:
+    - label: Role
+      value: Director of Communications and Strategic Engagement
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-policy
+
+- id: cole-mcfaul
+  stableId: sid_FWirpL5SlK
+  type: person
+  title: Cole McFaul
+  description: >-
+    Senior Research Analyst and Andrew W. Marshall Fellow at Georgetown's
+    Center for Security and Emerging Technology (CSET).
+  customFields:
+    - label: Role
+      value: Senior Research Analyst
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-policy
+
+- id: ali-crawford-cset
+  stableId: sid_iEm4DtzxcC
+  type: person
+  title: Ali Crawford
+  description: >-
+    Senior Research Analyst at Georgetown's Center for Security and Emerging
+    Technology (CSET). Conducts research on emerging technology policy.
+  customFields:
+    - label: Role
+      value: Senior Research Analyst
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-policy
+
+- id: hanna-dohmen
+  stableId: sid_ELJ2FIKXEU
+  type: person
+  title: Hanna Dohmen
+  description: >-
+    Senior Research Analyst at Georgetown's Center for Security and Emerging
+    Technology (CSET). Contributes to data-driven AI policy research.
+  customFields:
+    - label: Role
+      value: Senior Research Analyst
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-policy
+
+# ── CSET Advisory Board ──────────────────────────────────────────────
+
+- id: lauren-bedula
+  stableId: sid_Nvplzn2YQl
+  type: person
+  title: Lauren Bedula
+  description: >-
+    Founding member of the CSET Advisory Board at Georgetown University.
+  customFields:
+    - label: Role
+      value: Advisory Board Member
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+
+- id: michael-brown-cset
+  stableId: sid_O26yqrceL0
+  type: person
+  title: Michael Brown
+  description: >-
+    Founding member of the CSET Advisory Board at Georgetown University.
+    Former Director of the Defense Innovation Unit (DIU).
+  customFields:
+    - label: Role
+      value: Advisory Board Member
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - national-security
+
+# alan-estevez (sid_onn1iNNwpa) — already exists above; also CSET Advisory Board founding member
+
+- id: sarah-sewall
+  stableId: sid_IKDmYWdFSP
+  type: person
+  title: Sarah Sewall
+  description: >-
+    Founding member of the CSET Advisory Board at Georgetown University.
+    Former Under Secretary of State for Civilian Security, Democracy, and
+    Human Rights. National security and technology policy expert.
+  customFields:
+    - label: Role
+      value: Advisory Board Member
+    - label: Organization
+      value: CSET (Georgetown)
+  tags:
+    - ai-governance
+    - national-security
+
+# ── GovAI Personnel ──────────────────────────────────────────────────
+
+- id: robert-trager
+  stableId: sid_VwtX0KjSB7
+  type: person
+  title: Robert Trager
+  description: >-
+    Strategic Modelling Team Lead at the Centre for the Governance of AI
+    (GovAI). International relations scholar researching strategic dynamics
+    of AI development and international cooperation on AI governance.
+  customFields:
+    - label: Role
+      value: Strategic Modelling Team Lead
+    - label: Organization
+      value: GovAI
+  tags:
+    - ai-governance
+    - international-relations
+
+- id: jonas-schuett
+  stableId: sid_wkrlZwg73n
+  type: person
+  title: Jonas Schuett
+  description: >-
+    Senior Research Fellow at the Centre for the Governance of AI (GovAI).
+    Researcher on AI governance law and regulation, with expertise in
+    corporate governance of AI companies and regulatory frameworks for
+    frontier AI systems.
+  customFields:
+    - label: Role
+      value: Senior Research Fellow
+    - label: Organization
+      value: GovAI
+  tags:
+    - ai-governance
+    - ai-policy
+    - law
+
+# ── Stanford HAI Personnel ───────────────────────────────────────────
+
+- id: russell-wald
+  stableId: sid_rZVptD1Mdq
+  type: person
+  title: Russell Wald
+  description: >-
+    Executive Director of the Stanford Institute for Human-Centered
+    Artificial Intelligence (HAI). Oversees HAI's operations, convenings,
+    and policy programs.
+  customFields:
+    - label: Role
+      value: Executive Director
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: james-landay
+  stableId: sid_SpX9DLSkHP
+  type: person
+  title: James Landay
+  description: >-
+    Denning Co-Director of the Stanford Institute for Human-Centered
+    Artificial Intelligence (HAI). Anand Rajaraman and Venky Harinarayan
+    Professor of Computer Science at Stanford University. HCI researcher.
+  customFields:
+    - label: Role
+      value: Denning Co-Director
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - ai-research
+
+- id: julian-nyarko
+  stableId: sid_Rmw4K4EQuX
+  type: person
+  title: Julian Nyarko
+  description: >-
+    Associate Director at the Stanford Institute for Human-Centered
+    Artificial Intelligence (HAI). Associate Professor at Stanford Law
+    School. Research focuses on AI and law.
+  customFields:
+    - label: Role
+      value: Associate Director
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - law
+
+- id: amy-zegart
+  stableId: sid_Z7yCa2gFFh
+  type: person
+  title: Amy Zegart
+  description: >-
+    Associate Director at the Stanford Institute for Human-Centered
+    Artificial Intelligence (HAI). Morris Arnold and Nona Jean Cox Senior
+    Fellow at the Hoover Institution. Senior Fellow at the Freeman Spogli
+    Institute. National security and intelligence expert.
+  customFields:
+    - label: Role
+      value: Associate Director
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - national-security
+
+- id: surya-ganguli
+  stableId: sid_HQUSdoXU47
+  type: person
+  title: Surya Ganguli
+  description: >-
+    Associate Director and Senior Fellow at the Stanford Institute for
+    Human-Centered Artificial Intelligence (HAI). Associate Professor
+    of Applied Physics at Stanford. Theoretical neuroscience and deep
+    learning researcher.
+  customFields:
+    - label: Role
+      value: Associate Director and Senior Fellow
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-research
+
+- id: daniel-ho
+  stableId: sid_csTWks7Pxh
+  type: person
+  title: Daniel E. Ho
+  description: >-
+    Senior Fellow at the Stanford Institute for Human-Centered Artificial
+    Intelligence (HAI). William Benjamin Scott and Luna M. Scott Professor
+    of Law and Professor of Political Science at Stanford. Research focuses
+    on AI regulation and algorithmic fairness.
+  customFields:
+    - label: Role
+      value: Senior Fellow
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - law
+    - ai-policy
+
+# ── Stanford HAI Advisory Council ────────────────────────────────────
+
+# reid-hoffman (sid_x39KP3SjCg) — already exists above, also Stanford HAI Advisory Council Chair
+# eric-schmidt (sid_afuYa1WcnH) — already exists above, also Stanford HAI Advisory Council Member
+
+- id: condoleezza-rice
+  stableId: sid_BTOYhStYj8
+  type: person
+  title: Condoleezza Rice
+  description: >-
+    Member of the Stanford HAI Advisory Council. Director of the Hoover
+    Institution at Stanford. Former U.S. Secretary of State (2005-2009)
+    and National Security Advisor (2001-2005). Tad and Dianne Taube
+    Director of the Hoover Institution.
+  customFields:
+    - label: Role
+      value: Advisory Council Member
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - national-security
+
+- id: steve-denning
+  stableId: sid_j7lCANDh62
+  type: person
+  title: Steve Denning
+  description: >-
+    Vice Chair of the Stanford HAI Advisory Council. Major philanthropist
+    and Stanford donor. The Denning family is a namesake for the HAI
+    co-director positions.
+  customFields:
+    - label: Role
+      value: Advisory Council Vice Chair
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+
+- id: srinija-srinivasan
+  stableId: sid_qsHfOJGmIw
+  type: person
+  title: Srinija Srinivasan
+  description: >-
+    Vice Chair of the Stanford HAI Advisory Council. Former Yahoo Chief
+    Evangelist and editorial director. Advisor and investor in technology
+    and media companies.
+  customFields:
+    - label: Role
+      value: Advisory Council Vice Chair
+    - label: Organization
+      value: Stanford HAI
+  tags:
+    - ai-governance
+    - tech-leadership
+
+# ── Partnership on AI Personnel ──────────────────────────────────────
+
+- id: rebecca-finlay
+  stableId: sid_m9rEqFrCkf
+  type: person
+  title: Rebecca Finlay
+  relatedEntries:
+    - id: sid_lG1LEx80wg
+      type: organization
+      relationship: leads-to
+  description: >-
+    CEO of Partnership on AI since October 2021. Previously VP at the
+    Mastercard Center for Inclusive Growth. Leads PAI's multi-stakeholder
+    efforts on responsible AI practices across 126 partner organizations
+    in 16 countries.
+  customFields:
+    - label: Role
+      value: CEO
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: jerremy-holland
+  stableId: sid_yibdrO5rgh
+  type: person
+  title: Jerremy Holland
+  description: >-
+    Board Chair of Partnership on AI. Director of AI Research at Apple.
+    Appointed as board chair in October 2023, succeeding founding chair
+    Eric Horvitz.
+  customFields:
+    - label: Role
+      value: Board Chair
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - ai-research
+
+- id: jatin-aythora
+  stableId: sid_B8LrTnaDpT
+  type: person
+  title: Jatin Aythora
+  description: >-
+    Board Vice Chair of Partnership on AI. Director of BBC Research and
+    Development. Drives technical vision and innovation at the BBC.
+  customFields:
+    - label: Role
+      value: Board Vice Chair
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - media-technology
+
+- id: angela-kane
+  stableId: sid_nIlZDPzSj8
+  type: person
+  title: Angela Kane
+  description: >-
+    Board Treasurer of Partnership on AI. Former UN High Representative
+    for Disarmament Affairs. Senior Fellow at the Vienna Center for
+    Disarmament and Non-Proliferation.
+  customFields:
+    - label: Role
+      value: Board Treasurer
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - international-affairs
+
+- id: nicol-turner-lee
+  stableId: sid_9t23MXZwNI
+  type: person
+  title: Nicol Turner Lee
+  description: >-
+    Board Director of Partnership on AI. Senior Fellow and Director of
+    the Center for Technology Innovation at the Brookings Institution.
+    Expert on AI equity, digital divide, and technology policy.
+  customFields:
+    - label: Role
+      value: Board Director
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - ai-policy
+    - ai-ethics
+
+- id: martin-tisne
+  stableId: sid_Z68V2AtdFx
+  type: person
+  title: Martin Tisne
+  description: >-
+    Board Director of Partnership on AI. Managing Director at the Luminate
+    Group (part of the Omidyar Network). Expert on data rights and digital
+    governance.
+  customFields:
+    - label: Role
+      value: Board Director
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - digital-rights
+
+- id: natasha-crampton
+  stableId: sid_fPrCLKppF3
+  type: person
+  title: Natasha Crampton
+  description: >-
+    Board Director of Partnership on AI. Chief Responsible AI Officer at
+    Microsoft. Leads Microsoft's responsible AI program and governance
+    framework.
+  customFields:
+    - label: Role
+      value: Board Director
+    - label: Organization
+      value: Partnership on AI
+  tags:
+    - ai-governance
+    - ai-ethics
+
+# ── FLI (Future of Life Institute) Personnel ─────────────────────────
+
+- id: mihaela-chita-tegmark
+  stableId: sid_Hb3T98fPHc
+  type: person
+  title: Mihaela Chita-Tegmark
+  description: >-
+    Co-founder of the Future of Life Institute (FLI, 2014). Board Secretary
+    of FLI. Research affiliate at Tufts University studying social cognition
+    and human-robot interaction. Also known as Meia Chita-Tegmark.
+  aliases:
+    - Meia Chita-Tegmark
+  customFields:
+    - label: Role
+      value: Co-founder and Board Secretary
+    - label: Organization
+      value: Future of Life Institute
+  tags:
+    - ai-governance
+    - ai-safety
+
+# ── AI Now Institute Additional Personnel ────────────────────────────
+
+- id: frederike-kaltheuner
+  stableId: sid_wsVptq6vg9
+  type: person
+  title: Frederike Kaltheuner
+  description: >-
+    Senior EU and Global Governance Lead at the AI Now Institute.
+    Develops AI Now's engagement in Europe and global governance fora
+    on issues of power concentration in technology. Previously at the
+    Bertelsmann Foundation and Human Rights Watch.
+  customFields:
+    - label: Role
+      value: Senior EU and Global Governance Lead
+    - label: Organization
+      value: AI Now Institute
+  tags:
+    - ai-governance
+    - ai-policy
+    - digital-rights
+
+- id: lucy-suchman
+  stableId: sid_mLr8phls1l
+  type: person
+  title: Lucy Suchman
+  description: >-
+    Faculty Advisor at the AI Now Institute. Professor Emerita of Sociology
+    at Lancaster University. Pioneer in human-computer interaction and
+    situated cognition research. Author of influential critiques of AI and
+    autonomous systems.
+  customFields:
+    - label: Role
+      value: Faculty Advisor
+    - label: Organization
+      value: AI Now Institute
+  tags:
+    - ai-governance
+    - ai-ethics
+
+# ── AI Policy Institute Personnel ────────────────────────────────────
+
+- id: daniel-colson
+  stableId: sid_k7Xw6otC8a
+  type: person
+  title: Daniel Colson
+  relatedEntries:
+    - id: sid_w7mwNxGtCQ
+      type: organization
+      relationship: leads-to
+  description: >-
+    Co-founder and Executive Director of the AI Policy Institute (AIPI).
+    Also founder and Executive Director of the AI Policy Network (AIPN).
+    Researches implications of AI R&D automation and advocates for
+    government policies to mitigate extreme risks from frontier AI.
+  customFields:
+    - label: Role
+      value: Co-founder and Executive Director
+    - label: Organization
+      value: AI Policy Institute
+  tags:
+    - ai-governance
+    - ai-policy
+
+# ── Americans for Responsible Innovation Personnel ───────────────────
+
+- id: brad-carson
+  stableId: sid_PQYAd3EcSQ
+  type: person
+  title: Brad Carson
+  relatedEntries:
+    - id: sid_IFjdCevnFg
+      type: organization
+      relationship: leads-to
+  description: >-
+    Co-founder and President of Americans for Responsible Innovation (ARI).
+    Former U.S. Congressman (OK-2, 2001-2005). Former Under Secretary of
+    the Army and Acting Under Secretary of Defense for Personnel and
+    Readiness. Former President of the University of Tulsa.
+  customFields:
+    - label: Role
+      value: Co-founder and President
+    - label: Organization
+      value: Americans for Responsible Innovation
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: eric-gastfriend
+  stableId: sid_4dwqcYO3sZ
+  type: person
+  title: Eric Gastfriend
+  relatedEntries:
+    - id: sid_IFjdCevnFg
+      type: organization
+      relationship: leads-to
+  description: >-
+    Co-founder and Executive Director of Americans for Responsible Innovation
+    (ARI). Previously CEO and President of DynamiCare Health, a digital
+    health startup. Focuses on building bipartisan support for AI safety
+    legislation in Congress.
+  customFields:
+    - label: Role
+      value: Co-founder and Executive Director
+    - label: Organization
+      value: Americans for Responsible Innovation
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: doug-calidas
+  stableId: sid_kHKTVjWRe7
+  type: person
+  title: Doug Calidas
+  description: >-
+    Senior Vice President of Government Affairs at Americans for Responsible
+    Innovation (ARI). Former Chief of Staff to Senator Amy Klobuchar and
+    former Chief Counsel to Senator Joe Manchin.
+  customFields:
+    - label: Role
+      value: SVP of Government Affairs
+    - label: Organization
+      value: Americans for Responsible Innovation
+  tags:
+    - ai-governance
+    - ai-policy
+
+- id: justin-bullock
+  stableId: sid_vlCND0FtTw
+  type: person
+  title: Justin Bullock
+  description: >-
+    Vice President of Policy at Americans for Responsible Innovation (ARI).
+    Non-resident Senior Fellow at the Global Governance Institute. Lecturer
+    at Texas A&M University.
+  customFields:
+    - label: Role
+      value: VP of Policy
+    - label: Organization
+      value: Americans for Responsible Innovation
+  tags:
+    - ai-governance
+    - ai-policy
+
+# ── Brennan Center for Justice Personnel ─────────────────────────────
+
+- id: michael-waldman
+  stableId: sid_SCjtdr96uJ
+  type: person
+  title: Michael Waldman
+  relatedEntries:
+    - id: sid_2KkS7mnw7K
+      type: organization
+      relationship: leads-to
+  description: >-
+    President and CEO of the Brennan Center for Justice at NYU School
+    of Law. Author and legal expert on democracy, constitutional law,
+    and the presidency. Leads the Brennan Center's work on AI governance,
+    surveillance, and democratic resilience.
+  customFields:
+    - label: Role
+      value: President and CEO
+    - label: Organization
+      value: Brennan Center for Justice
+  tags:
+    - democracy
+    - ai-governance
+    - law
+
+- id: david-harris-brennan
+  stableId: sid_CeVB8A25p2
+  type: person
+  title: David Harris
+  description: >-
+    Senior Adviser for AI and Elections to the Brennan Center's Elections
+    and Government team. Chancellor's Public Scholar at UC Berkeley.
+    Advises on AI's impact on democratic processes and election integrity.
+  customFields:
+    - label: Role
+      value: Senior Adviser for AI and Elections
+    - label: Organization
+      value: Brennan Center for Justice
+  tags:
+    - ai-governance
+    - democracy
+
+# ── Center for AI Policy Personnel ───────────────────────────────────
+
+- id: jason-green-lowe
+  stableId: sid_zvMaj29XJk
+  type: person
+  title: Jason Green-Lowe
+  relatedEntries:
+    - id: sid_V3NJg9djng
+      type: organization
+      relationship: leads-to
+  description: >-
+    Executive Director of the Center for AI Policy (CAIP). Led CAIP's
+    bipartisan congressional lobbying efforts on AI safety legislation
+    from June 2023 until the organization ceased most operations around
+    May 2025 due to funding constraints.
+  customFields:
+    - label: Role
+      value: Executive Director
+    - label: Organization
+      value: Center for AI Policy
+  tags:
+    - ai-governance
+    - ai-policy
+
+# ── Protect Democracy Personnel ──────────────────────────────────────
+
+- id: ian-bassin
+  stableId: sid_8uwYGwtLY2
+  type: person
+  title: Ian Bassin
+  relatedEntries:
+    - id: sid_xxHyEDGp4Y
+      type: organization
+      relationship: leads-to
+  description: >-
+    Co-founder and Executive Director of Protect Democracy. Former
+    Associate White House Counsel under President Obama. Leads Protect
+    Democracy's litigation and advocacy, including the AI for Democracy
+    Action Lab (AI-DAL). Published "The Authoritarian Playbook for 2025."
+  customFields:
+    - label: Role
+      value: Co-founder and Executive Director
+    - label: Organization
+      value: Protect Democracy
+  tags:
+    - democracy
+    - ai-governance
+
+# ── EPIC (Electronic Privacy Information Center) Personnel ───────────
+
+- id: alan-butler
+  stableId: sid_cP2vcXheA3
+  type: person
+  title: Alan Butler
+  relatedEntries:
+    - id: sid_Ygxw8JVW8X
+      type: organization
+      relationship: leads-to
+  description: >-
+    Executive Director and President of the Electronic Privacy Information
+    Center (EPIC) since 2020. Leads EPIC's AI and Human Rights Project.
+    Has testified before the Senate Judiciary Subcommittee on privacy and
+    AI. Under his leadership EPIC achieved a 97% Charity Navigator score.
+  customFields:
+    - label: Role
+      value: Executive Director and President
+    - label: Organization
+      value: EPIC
+  tags:
+    - privacy
+    - ai-governance
+    - digital-rights
+
+# ── RAND Corporation AI Personnel ────────────────────────────────────
+
+- id: james-ryseff
+  stableId: sid_lnRDrBaWNt
+  type: person
+  title: James Ryseff
+  description: >-
+    Senior Technical Policy Analyst at the RAND Corporation. Expert in
+    AI, defense innovation, technical workforce issues, and software
+    engineering best practices. Previously software engineer at Microsoft,
+    Google, and other private-sector companies.
+  customFields:
+    - label: Role
+      value: Senior Technical Policy Analyst
+    - label: Organization
+      value: RAND Corporation
+  tags:
+    - ai-governance
+    - ai-policy
+    - national-security
+
+# ── CNAS (Center for a New American Security) Personnel ──────────────
+
+- id: paul-scharre
+  stableId: sid_hd3NTHWp0l
+  type: person
+  title: Paul Scharre
+  relatedEntries:
+    - id: sid_dYjY3Ma1Hw
+      type: organization
+  description: >-
+    Executive Vice President at the Center for a New American Security (CNAS).
+    Director of the CNAS Technology and National Security Program. Author of
+    "Four Battlegrounds: Power in the Age of Artificial Intelligence" and
+    "Army of None: Autonomous Weapons and the Future of War." Named to TIME's
+    inaugural TIME100/AI list. Former special operations reconnaissance team
+    leader in the U.S. Army's 3rd Ranger Battalion. Leading expert on AI and
+    autonomous weapons policy.
+  customFields:
+    - label: Role
+      value: Executive Vice President
+    - label: Organization
+      value: CNAS
+  tags:
+    - ai-governance
+    - national-security
+    - autonomous-weapons
+
+# ── CDT (Center for Democracy and Technology) Personnel ──────────────
+
+- id: miranda-bogen
+  stableId: sid_YrFpFk4BHx
+  type: person
+  title: Miranda Bogen
+  relatedEntries:
+    - id: sid_XkqcWk46oQ
+      type: organization
+  description: >-
+    Founding Director of the AI Governance Lab at the Center for Democracy
+    and Technology (CDT). AI policy expert who previously led responsible
+    AI strategy and implementation at Meta. Works on technically informed
+    solutions for effective AI regulation and governance.
+  customFields:
+    - label: Role
+      value: Founding Director, AI Governance Lab
+    - label: Organization
+      value: Center for Democracy and Technology
+  tags:
+    - ai-governance
+    - ai-policy
+    - ai-ethics
+
+- id: kevin-bankston
+  stableId: sid_3KYTMxNqMM
+  type: person
+  title: Kevin Bankston
+  relatedEntries:
+    - id: sid_XkqcWk46oQ
+      type: organization
+  description: >-
+    Senior Advisor on AI Governance at the Center for Democracy and Technology
+    (CDT). Over two decades of experience at the intersection of emerging
+    technology, law, and policy. Veteran digital rights advocate.
+  customFields:
+    - label: Role
+      value: Senior Advisor on AI Governance
+    - label: Organization
+      value: Center for Democracy and Technology
+  tags:
+    - ai-governance
+    - ai-policy
+    - digital-rights
+

@@ -33,3 +33,32 @@ facts:
     property: funding-sources
     value: "Funders include Responsible Technology Youth Power Fund, Archewell Foundation, Heising-Simons Foundation, We Are Family Foundation. Does not accept corporate funding, foreign government funds, or donations from top AI company executives."
     source: https://www.influencewatch.org/non-profit/encode-justice/
+
+  - id: f_ej_founder
+    property: founded-by
+    value: "Sneha Revanur"
+    source: https://en.wikipedia.org/wiki/Sneha_Revanur
+    notes: "Founded as a high school student at Evergreen Valley High School in San Jose, California. Currently a student at Williams College."
+
+  - id: f_ej_hq
+    property: headquarters
+    value: "San Jose, CA (founded); Washington, DC (policy operations)"
+    source: https://www.kqed.org/news/11982374/meet-the-19-year-old-from-silicon-valley-leading-the-youth-led-charge-on-ai
+    notes: "Distributed youth-led organization with members in 40+ US states and 30+ countries"
+
+  - id: f_ej_description
+    property: description
+    value: "Youth-led AI policy advocacy organization. Campaigns for equitable AI regulation through grassroots organizing, policy advocacy, and public education. Known for the AI Bill of Rights campaign and AI 2030 Plan. One of the most prominent youth voices in AI governance."
+    asOf: 2026-03
+    source: https://encodejustice.org/
+
+  - id: f_ej_website
+    property: website
+    value: "https://encodeai.org/"
+    source: https://encodeai.org/
+    notes: "Rebranded from encodejustice.org to encodeai.org"
+
+  - id: f_ej_country
+    property: country
+    value: "United States"
+    source: https://www.influencewatch.org/non-profit/encode-justice/
