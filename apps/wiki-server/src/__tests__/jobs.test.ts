@@ -75,6 +75,8 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO jobs ----
   if (q.includes("insert into") && q.includes('"jobs"')) {
+    const hasOnConflict = q.includes("on conflict");
+
     // Extract param-to-column mapping from the VALUES clause.
     // Drizzle lists ALL columns but uses DEFAULT for unset ones.
     // Raw SQL (dedup path) lists only the columns with params.
@@ -113,6 +115,19 @@ const dispatch: SqlDispatcher = (query, params) => {
             case 'run_after': overrides.run_after = val != null ? new Date(val as string | number) : null; break;
           }
         }
+
+        // ON CONFLICT DO NOTHING: check for active duplicate by dedup_key
+        if (hasOnConflict && overrides.dedup_key) {
+          const activeStatuses = new Set(["pending", "claimed", "running"]);
+          const existing = jobStore.find(
+            (j) => j.dedup_key === overrides.dedup_key && activeStatuses.has(j.status)
+          );
+          if (existing) {
+            // Simulate DO NOTHING — return empty (0 rows)
+            continue;
+          }
+        }
+
         const row = makeJob(overrides);
         jobStore.push(row);
         rows.push(row);
@@ -295,6 +310,14 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [];
   }
 
+  // ---- SELECT * FROM jobs WHERE dedup_key = $1 (dedup lookup) ----
+  if (q.includes("select") && q.includes('"jobs"') && q.includes("where") && q.includes("dedup_key =") && !q.includes("insert")) {
+    const dedupKey = params[0] as string;
+    const activeStatuses = new Set(["pending", "claimed", "running"]);
+    const match = jobStore.find((j) => j.dedup_key === dedupKey && activeStatuses.has(j.status));
+    return match ? [match] : [];
+  }
+
   // ---- SELECT count(*) FROM jobs ----
   if (q.includes("count(*)") && q.includes('"jobs"') && !q.includes("group by")) {
     let filtered = jobStore;
@@ -474,12 +497,50 @@ describe("Jobs API", () => {
       expect(body.runAfter).toBeTruthy();
     });
 
-    it("rejects dedupKey in batch creation", async () => {
+    it("creates a batch with dedupKey per job", async () => {
       const res = await postJson(app, "/api/jobs", [
-        { type: "ping", dedupKey: "dup1" },
-        { type: "ping" },
+        { type: "ping", dedupKey: "batch-dup-1" },
+        { type: "ping", dedupKey: "batch-dup-2" },
       ]);
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body).toHaveLength(2);
+      expect(body[0].dedupKey).toBe("batch-dup-1");
+      expect(body[0].dedupExisting).toBe(false);
+      expect(body[1].dedupKey).toBe("batch-dup-2");
+      expect(body[1].dedupExisting).toBe(false);
+    });
+
+    it("deduplicates batch jobs against existing active jobs", async () => {
+      // Create an existing job with a dedup key
+      await postJson(app, "/api/jobs", { type: "ping", dedupKey: "existing-key" });
+
+      // Batch with one duplicate and one new
+      const res = await postJson(app, "/api/jobs", [
+        { type: "ping", dedupKey: "existing-key" },
+        { type: "ping", dedupKey: "new-key" },
+      ]);
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body).toHaveLength(2);
+      // First job should be the existing one (dedup hit)
+      expect(body[0].dedupKey).toBe("existing-key");
+      expect(body[0].dedupExisting).toBe(true);
+      // Second job should be newly created
+      expect(body[1].dedupKey).toBe("new-key");
+      expect(body[1].dedupExisting).toBe(false);
+    });
+
+    it("allows batch with mix of dedup and non-dedup jobs", async () => {
+      const res = await postJson(app, "/api/jobs", [
+        { type: "ping", dedupKey: "dk1" },
+        { type: "citation-verify" },
+      ]);
+      expect(res.status).toBe(201);
+      const body = await res.json();
+      expect(body).toHaveLength(2);
+      expect(body[0].dedupKey).toBe("dk1");
+      expect(body[1].dedupKey).toBeNull();
     });
   });
 

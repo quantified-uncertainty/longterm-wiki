@@ -84,27 +84,118 @@ const jobsApp = new Hono()
       const parsed = CreateJobBatchSchema.safeParse(body);
       if (!parsed.success) return validationError(c, parsed.error.message);
 
-      // Dedup key handling is not supported in batch creation
-      if (parsed.data.some((j) => j.dedupKey)) {
-        return validationError(c, "dedupKey is not supported in batch creation; use single-job creation instead");
+      const hasDedup = parsed.data.some((j) => j.dedupKey);
+
+      if (!hasDedup) {
+        // Fast path: no dedup keys, use simple Drizzle insert
+        const rows = await db
+          .insert(jobs)
+          .values(
+            parsed.data.map((j) => ({
+              type: j.type,
+              params: j.params ?? null,
+              priority: j.priority,
+              maxRetries: j.maxRetries,
+              dedupKey: j.dedupKey ?? null,
+              parentJobId: j.parentJobId ?? null,
+              runAfter: j.runAfter ? new Date(j.runAfter) : null,
+            }))
+          )
+          .returning();
+
+        return c.json(rows.map(formatJob), 201);
       }
 
-      const rows = await db
-        .insert(jobs)
-        .values(
-          parsed.data.map((j) => ({
-            type: j.type,
-            params: j.params ?? null,
-            priority: j.priority,
-            maxRetries: j.maxRetries,
-            dedupKey: j.dedupKey ?? null,
-            parentJobId: j.parentJobId ?? null,
-            runAfter: j.runAfter ? new Date(j.runAfter) : null,
-          }))
-        )
-        .returning();
+      // Dedup path: INSERT ... ON CONFLICT DO NOTHING per job, then resolve
+      // which were created vs already existed.
+      const pgClient = getDb();
+      const results: Array<(ReturnType<typeof formatRawJobRow> | ReturnType<typeof formatJob>) & { dedupExisting: boolean }> = [];
 
-      return c.json(rows.map(formatJob), 201);
+      for (const j of parsed.data) {
+        if (!j.dedupKey) {
+          // No dedup key — simple insert via Drizzle
+          const rows = await db
+            .insert(jobs)
+            .values({
+              type: j.type,
+              params: j.params ?? null,
+              priority: j.priority,
+              maxRetries: j.maxRetries,
+              parentJobId: j.parentJobId ?? null,
+              runAfter: j.runAfter ? new Date(j.runAfter) : null,
+            })
+            .returning();
+          results.push({ ...formatJob(firstOrThrow(rows, "batch insert")), dedupExisting: false });
+          continue;
+        }
+
+        // INSERT ON CONFLICT for dedup
+        const insertResult = await pgClient.unsafe(
+          `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
+           DO NOTHING
+           RETURNING *`,
+          [
+            j.type,
+            j.params ? JSON.stringify(j.params) : null,
+            j.priority,
+            j.maxRetries,
+            j.dedupKey,
+            j.parentJobId ?? null,
+            j.runAfter ?? null,
+          ]
+        );
+
+        if (insertResult.length > 0) {
+          results.push({ ...formatRawJobRow(insertResult[0] as Record<string, unknown>), dedupExisting: false });
+        } else {
+          // Active duplicate exists — fetch it
+          const existing = await pgClient.unsafe(
+            `SELECT * FROM "jobs"
+             WHERE dedup_key = $1 AND status IN ('pending', 'claimed', 'running')
+             LIMIT 1`,
+            [j.dedupKey]
+          );
+          if (existing.length > 0) {
+            results.push({ ...formatRawJobRow(existing[0] as Record<string, unknown>), dedupExisting: true });
+          } else {
+            // Race condition: conflicting job completed between INSERT and SELECT. Retry once.
+            const retryResult = await pgClient.unsafe(
+              `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
+               VALUES ($1, $2, $3, $4, $5, $6, $7)
+               ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
+               DO NOTHING
+               RETURNING *`,
+              [
+                j.type,
+                j.params ? JSON.stringify(j.params) : null,
+                j.priority,
+                j.maxRetries,
+                j.dedupKey,
+                j.parentJobId ?? null,
+                j.runAfter ?? null,
+              ]
+            );
+            if (retryResult.length > 0) {
+              results.push({ ...formatRawJobRow(retryResult[0] as Record<string, unknown>), dedupExisting: false });
+            } else {
+              // Still conflicting — fetch existing
+              const existingRetry = await pgClient.unsafe(
+                `SELECT * FROM "jobs"
+                 WHERE dedup_key = $1 AND status IN ('pending', 'claimed', 'running')
+                 LIMIT 1`,
+                [j.dedupKey]
+              );
+              if (existingRetry.length > 0) {
+                results.push({ ...formatRawJobRow(existingRetry[0] as Record<string, unknown>), dedupExisting: true });
+              }
+            }
+          }
+        }
+      }
+
+      return c.json(results, 201);
     }
 
     const parsed = CreateJobSchema.safeParse(body);
