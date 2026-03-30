@@ -47,7 +47,8 @@ export type SourceFetchErrorType =
   | 'timeout'
   | 'not_found'
   | 'fetch_error'
-  | 'unverifiable_domain';
+  | 'unverifiable_domain'
+  | 'not_cached';
 
 // ---------------------------------------------------------------------------
 // Detection functions

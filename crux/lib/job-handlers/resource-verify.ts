@@ -1,7 +1,7 @@
 /**
  * Resource Verification Job Handler
  *
- * Checks resource URLs for liveness and content freshness.
+ * Checks resource URLs for liveness, content freshness, and caches content.
  * Part of the verified-by-default data pipeline (#3209).
  *
  * Params:
@@ -9,17 +9,18 @@
  *   - url: string (required) — URL to verify
  *   - previousContentHash: string (optional) — hash of previously fetched content
  *
- * Checks:
- *   1. URL is reachable (HTTP 200, follows redirects)
- *   2. Content type is acceptable (text/html, application/json, etc.)
- *   3. Content hasn't changed (if previousContentHash provided)
- *   4. Page isn't a soft 404 or paywall
+ * On success:
+ *   1. Caches fetched content in citation_content table (for source-check + enrichment)
+ *   2. Persists fetch_status, last_fetched_at, content_hash to the resource record
+ *   3. Reports liveness status (reachable, soft_404, paywall, etc.)
  */
 
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import { createHash } from 'crypto';
 import { z } from 'zod';
-import { isPrivateHost } from '../source-check/source-fetcher.ts';
+import { isPrivateHost, htmlToText } from '../source-check/source-fetcher.ts';
+import { upsertCitationContent } from '../wiki-server/citations.ts';
+import { updateResourceFetchStatus } from '../wiki-server/resources.ts';
 
 // ---------------------------------------------------------------------------
 // Params validation
@@ -167,6 +168,8 @@ export async function handleResourceVerify(
     if (statusCode >= 400) {
       clearTimeout(timeout);
       const status: ResourceStatus = statusCode === 404 ? 'not_found' : 'error';
+      // Persist the dead/error status so we track unreachable resources
+      await persistResults(resourceId, url, status, statusCode, contentType, null, null, ctx);
       return buildResult(resourceId, url, status, startTime, {
         statusCode,
         contentType,
@@ -179,6 +182,8 @@ export async function handleResourceVerify(
     if (contentLengthHeader > MAX_CONTENT_LENGTH * 10) {
       clearTimeout(timeout);
       // Content-Length header indicates a very large response — skip body read
+      // Still persist reachable status even though we can't cache the content
+      await persistResults(resourceId, url, 'reachable', statusCode, contentType, null, null, ctx);
       return buildResult(resourceId, url, 'reachable', startTime, {
         statusCode,
         contentType,
@@ -235,6 +240,15 @@ export async function handleResourceVerify(
       status = 'reachable';
     }
 
+    // Persist content to citation_content cache and update resource fetch_status.
+    // Fire-and-forget — don't fail the job if persistence fails.
+    // Note: contentHash is computed from raw HTML (for change detection consistency),
+    // but citation_content stores plain text. The hashes won't match if recomputed
+    // from the stored text — this is intentional.
+    const isHtml = contentType.includes('html') || contentType.includes('xhtml');
+    const plainText = isHtml ? htmlToText(text) : text;
+    await persistResults(resourceId, url, status, statusCode, contentType, plainText, contentHash, ctx);
+
     return buildResult(resourceId, url, status, startTime, {
       statusCode,
       contentType,
@@ -251,6 +265,78 @@ export async function handleResourceVerify(
       data: { resourceId, url, durationMs: Date.now() - startTime },
       error: error.slice(0, 500),
     };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Persistence — cache content + update resource record
+// ---------------------------------------------------------------------------
+
+/** Map resource-verify status to the fetch_status enum used by the resources table. */
+function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'error' {
+  switch (status) {
+    case 'reachable': return 'ok';
+    case 'paywall': return 'paywall';
+    case 'not_found':
+    case 'soft_404':
+    case 'unreachable':
+    case 'timeout':
+      return 'dead';
+    default:
+      return 'error';
+  }
+}
+
+/**
+ * Persist verification results: cache fetched content in citation_content and
+ * update the resource's fetch_status. Both are fire-and-forget — errors are
+ * logged but don't fail the job.
+ */
+async function persistResults(
+  resourceId: string,
+  url: string,
+  status: ResourceStatus,
+  statusCode: number | undefined,
+  contentType: string,
+  plainText: string | null,
+  contentHash: string | null,
+  ctx: JobHandlerContext,
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  // 1. Cache content in citation_content (if we have content to cache)
+  if (plainText && plainText.length > 0) {
+    try {
+      await upsertCitationContent({
+        url,
+        resourceId,
+        fetchedAt: now,
+        httpStatus: statusCode ?? null,
+        contentType: contentType !== 'unknown' ? contentType : null,
+        fullText: plainText,
+        contentLength: plainText.length,
+        contentHash: contentHash ?? null,
+        fetchMethod: 'resource-verify',
+      });
+      if (ctx.verbose) {
+        console.log(`[resource-verify] Cached ${plainText.length} chars for ${url}`);
+      }
+    } catch (e: unknown) {
+      console.warn(`[resource-verify] Failed to cache content for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // 2. Update resource fetch_status
+  try {
+    await updateResourceFetchStatus(resourceId, {
+      fetchStatus: toFetchStatus(status),
+      lastFetchedAt: now,
+    });
+    if (ctx.verbose) {
+      console.log(`[resource-verify] Updated fetch_status=${toFetchStatus(status)} for ${resourceId}`);
+    }
+  } catch (e: unknown) {
+    console.warn(`[resource-verify] Failed to update fetch_status for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 
