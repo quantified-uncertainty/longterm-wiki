@@ -282,25 +282,34 @@ const claimsApp = new Hono()
 
     logger.info({ count: verdicts.length }, "recording claim verdicts");
 
-    let updated = 0;
-    for (const v of verdicts) {
-      const result = await sql`
-        UPDATE proposed_claims
-        SET
-          status = ${v.status},
-          verdict_confidence = ${v.confidence},
-          verdict_reasoning = ${v.reasoning},
-          extracted_value = ${v.extractedValue ?? null},
-          checker_model = ${v.checkerModel ?? null},
-          verified_at = NOW(),
-          updated_at = NOW()
-        WHERE id = ${v.claimId} AND status IN ('pending', 'verifying')
-        RETURNING id
-      `;
-      if (result.length > 0) updated++;
+    // Batch UPDATE via unnest — single SQL round-trip instead of N sequential updates.
+    // The WHERE status IN ('pending', 'verifying') ensures idempotency on retry.
+    interface UpdatedRow {
+      id: number;
     }
+    const result = await sql<UpdatedRow[]>`
+      UPDATE proposed_claims AS pc
+      SET
+        status = v.status,
+        verdict_confidence = v.confidence,
+        verdict_reasoning = v.reasoning,
+        extracted_value = v.extracted_value,
+        checker_model = v.checker_model,
+        verified_at = NOW(),
+        updated_at = NOW()
+      FROM unnest(
+        ${verdicts.map((v) => v.claimId)}::bigint[],
+        ${verdicts.map((v) => v.status)}::text[],
+        ${verdicts.map((v) => v.confidence)}::real[],
+        ${verdicts.map((v) => v.reasoning)}::text[],
+        ${verdicts.map((v) => v.extractedValue ?? null)}::text[],
+        ${verdicts.map((v) => v.checkerModel ?? null)}::text[]
+      ) AS v(claim_id, status, confidence, reasoning, extracted_value, checker_model)
+      WHERE pc.id = v.claim_id AND pc.status IN ('pending', 'verifying')
+      RETURNING pc.id
+    `;
 
-    return c.json({ updated, total: verdicts.length });
+    return c.json({ updated: result.length, total: verdicts.length });
   })
 
   // ---- GET /by-ids (fetch claims by ID list, used by verification worker) ----
