@@ -61,15 +61,15 @@ describe("loadEntityRegistry", () => {
   it("loads stableIds from YAML entity files", () => {
     writeFileSync(
       join(fixture.entitiesDir, "orgs.yaml"),
-      "- id: anthropic\n  stableId: mK9pX3rQ7n\n  type: organization\n  title: Anthropic\n- id: openai\n  stableId: zR4nW8xB2f\n  type: organization\n  title: OpenAI\n"
+      "- id: anthropic\n  stableId: sid_mK9pX3rQ7n\n  type: organization\n  title: Anthropic\n- id: openai\n  stableId: zR4nW8xB2f\n  type: organization\n  title: OpenAI\n"
     );
 
     const registry = loadEntityRegistry(fixture.entitiesDir);
     expect(registry.stableIds.size).toBe(2);
-    expect(registry.stableIds.has("mK9pX3rQ7n")).toBe(true);
+    expect(registry.stableIds.has("sid_mK9pX3rQ7n")).toBe(true);
     expect(registry.stableIds.has("zR4nW8xB2f")).toBe(true);
-    expect(registry.slugToStableId.get("anthropic")).toBe("mK9pX3rQ7n");
-    expect(registry.stableIdToSlug.get("mK9pX3rQ7n")).toBe("anthropic");
+    expect(registry.slugToStableId.get("anthropic")).toBe("sid_mK9pX3rQ7n");
+    expect(registry.stableIdToSlug.get("sid_mK9pX3rQ7n")).toBe("anthropic");
   });
 
   it("returns empty sets for missing directory", () => {
@@ -106,36 +106,36 @@ describe("loadEntityRegistry", () => {
 
 describe("extractRefValues", () => {
   it("extracts !ref values from YAML content", () => {
-    const content = "entity: aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref mK9pX3rQ7n\n    asOf: 2021-01\n";
+    const content = "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref sid_mK9pX3rQ7n\n    asOf: 2021-01\n";
     const refs = extractRefValues(content);
     expect(refs.length).toBe(1);
-    expect(refs[0].stableId).toBe("mK9pX3rQ7n");
+    expect(refs[0].stableId).toBe("sid_mK9pX3rQ7n");
     expect(refs[0].propertyId).toBe("employed-by");
   });
 
   it("strips slug hints from !ref tags", () => {
-    const content = "entity: aBcDeFgHiJ\nfacts:\n  - id: f_ref1234567\n    property: employed-by\n    value: !ref mK9pX3rQ7n:anthropic\n";
+    const content = "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_ref1234567\n    property: employed-by\n    value: !ref sid_mK9pX3rQ7n:anthropic\n";
     const refs = extractRefValues(content);
     expect(refs.length).toBe(1);
-    expect(refs[0].stableId).toBe("mK9pX3rQ7n");
+    expect(refs[0].stableId).toBe("sid_mK9pX3rQ7n");
   });
 
   it("extracts multiple refs from refs-type facts", () => {
-    const content = "entity: aBcDeFgHiJ\nfacts:\n  - id: f_fnd1234567\n    property: founded-by\n    value:\n      - !ref tKMznr07QA\n      - !ref zR4nW8xB2f\n";
+    const content = "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_fnd1234567\n    property: founded-by\n    value:\n      - !ref sid_tKMznr07QA\n      - !ref sid_zR4nW8xB2f\n";
     const refs = extractRefValues(content);
     expect(refs.length).toBe(2);
-    expect(refs[0].stableId).toBe("tKMznr07QA");
-    expect(refs[1].stableId).toBe("zR4nW8xB2f");
+    expect(refs[0].stableId).toBe("sid_tKMznr07QA");
+    expect(refs[1].stableId).toBe("sid_zR4nW8xB2f");
   });
 
   it("ignores non-stableId !ref values", () => {
-    const content = "entity: aBcDeFgHiJ\nfacts:\n  - id: f_bad1234567\n    property: employed-by\n    value: !ref short\n";
+    const content = "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_bad1234567\n    property: employed-by\n    value: !ref short\n";
     const refs = extractRefValues(content);
     expect(refs.length).toBe(0);
   });
 
   it("returns empty array for content without refs", () => {
-    const content = "entity: aBcDeFgHiJ\nfacts:\n  - id: f_txt1234567\n    property: description\n    value: No refs here\n";
+    const content = "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_txt1234567\n    property: description\n    value: No refs here\n";
     const refs = extractRefValues(content);
     expect(refs.length).toBe(0);
   });
@@ -154,25 +154,25 @@ describe("scanFactbaseRefs", () => {
   it("extracts entity stableIds from entity: format", () => {
     writeFileSync(
       join(fixture.thingsDir, "anthropic.yaml"),
-      "entity: mK9pX3rQ7n\nfacts:\n  - id: f_abc1234567\n    property: revenue\n    value: 1e9\n"
+      "entity: sid_mK9pX3rQ7n\nfacts:\n  - id: f_abc1234567\n    property: revenue\n    value: 1e9\n"
     );
 
     const result = scanFactbaseRefs(fixture.thingsDir);
     expect(result.entityStableIds.size).toBe(1);
-    expect(result.entityStableIds.has("mK9pX3rQ7n")).toBe(true);
-    expect(result.entityStableIds.get("mK9pX3rQ7n")?.slug).toBe("anthropic");
+    expect(result.entityStableIds.has("sid_mK9pX3rQ7n")).toBe(true);
+    expect(result.entityStableIds.get("sid_mK9pX3rQ7n")?.slug).toBe("anthropic");
   });
 
   it("extracts !ref values from facts", () => {
     writeFileSync(
       join(fixture.thingsDir, "dario.yaml"),
-      "entity: tKMznr07QA\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref mK9pX3rQ7n\n    asOf: 2021-01\n"
+      "entity: sid_tKMznr07QA\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref sid_mK9pX3rQ7n\n    asOf: 2021-01\n"
     );
 
     const result = scanFactbaseRefs(fixture.thingsDir);
     expect(result.totalRefs).toBe(1);
-    expect(result.referencedStableIds.has("mK9pX3rQ7n")).toBe(true);
-    const refs = result.referencedStableIds.get("mK9pX3rQ7n")!;
+    expect(result.referencedStableIds.has("sid_mK9pX3rQ7n")).toBe(true);
+    const refs = result.referencedStableIds.get("sid_mK9pX3rQ7n")!;
     expect(refs.length).toBe(1);
     expect(refs[0].sourceFile).toBe("dario.yaml");
   });
@@ -189,7 +189,7 @@ describe("scanFactbaseRefs", () => {
     writeFileSync(
       join(fixture.thingsDir, "quri.yaml"),
       [
-        "entity: xQ1rT2sU3v",
+        "entity: sid_xQ1rT2sU3v",
         "facts:",
         "  - id: f_hc1234567a",
         "    property: headcount",
@@ -210,7 +210,7 @@ describe("scanFactbaseRefs", () => {
 
     const result = scanFactbaseRefs(fixture.thingsDir);
     expect(result.entityStableIds.size).toBe(1);
-    const info = result.entityStableIds.get("xQ1rT2sU3v");
+    const info = result.entityStableIds.get("sid_xQ1rT2sU3v");
     expect(info).toBeDefined();
     expect(info!.slug).toBe("quri");
     // entity: format should NOT have type extracted from nested value types
@@ -334,15 +334,15 @@ describe("validateKbEntitySlugs", () => {
   it("reports no missing when all refs have registry entries", () => {
     writeFileSync(
       join(fixture.entitiesDir, "orgs.yaml"),
-      "- id: anthropic\n  stableId: mK9pX3rQ7n\n  type: organization\n  title: Anthropic\n"
+      "- id: anthropic\n  stableId: sid_mK9pX3rQ7n\n  type: organization\n  title: Anthropic\n"
     );
     writeFileSync(
       join(fixture.entitiesDir, "people.yaml"),
-      "- id: person\n  stableId: aBcDeFgHiJ\n  type: person\n  title: A Person\n"
+      "- id: person\n  stableId: sid_aBcDeFgHiJ\n  type: person\n  title: A Person\n"
     );
     writeFileSync(
       join(fixture.thingsDir, "person.yaml"),
-      "entity: aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref mK9pX3rQ7n\n"
+      "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref sid_mK9pX3rQ7n\n"
     );
 
     const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, false);
@@ -355,13 +355,13 @@ describe("validateKbEntitySlugs", () => {
     writeFileSync(join(fixture.entitiesDir, "orgs.yaml"), "[]");
     writeFileSync(
       join(fixture.thingsDir, "person.yaml"),
-      "entity: aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref mK9pX3rQ7n\n"
+      "entity: sid_aBcDeFgHiJ\nfacts:\n  - id: f_emp1234567\n    property: employed-by\n    value: !ref sid_mK9pX3rQ7n\n"
     );
 
     const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, false);
     expect(result.uniqueMissing.size).toBe(2);
-    expect(result.uniqueMissing.has("mK9pX3rQ7n")).toBe(true);
-    expect(result.uniqueMissing.has("aBcDeFgHiJ")).toBe(true);
+    expect(result.uniqueMissing.has("sid_mK9pX3rQ7n")).toBe(true);
+    expect(result.uniqueMissing.has("sid_aBcDeFgHiJ")).toBe(true);
   });
 
   it("fixes missing entries with --fix mode (thing: format)", () => {
@@ -398,12 +398,12 @@ describe("validateKbEntitySlugs", () => {
     // entity: format file with nested `type: range` in fact values
     writeFileSync(
       join(fixture.entitiesDir, "orgs.yaml"),
-      "- id: test-org\n  stableId: xQ1rT2sU3v\n  type: organization\n  title: Test Org\n"
+      "- id: test-org\n  stableId: sid_xQ1rT2sU3v\n  type: organization\n  title: Test Org\n"
     );
     writeFileSync(
       join(fixture.thingsDir, "test-org.yaml"),
       [
-        "entity: xQ1rT2sU3v",
+        "entity: sid_xQ1rT2sU3v",
         "facts:",
         "  - id: f_hc1234567a",
         "    property: headcount",
@@ -413,7 +413,7 @@ describe("validateKbEntitySlugs", () => {
         "      high: 5",
         "  - id: f_emp1234567",
         "    property: employed-by",
-        "    value: !ref MissngRef0",
+        "    value: !ref sid_MissngRef0",
         "",
       ].join("\n")
     );
@@ -421,9 +421,9 @@ describe("validateKbEntitySlugs", () => {
     const result = validateKbEntitySlugs(fixture.entitiesDir, fixture.thingsDir, false);
     // xQ1rT2sU3v is in registry, so only MissngRef0 should be missing
     expect(result.uniqueMissing.size).toBe(1);
-    expect(result.uniqueMissing.has("MissngRef0")).toBe(true);
+    expect(result.uniqueMissing.has("sid_MissngRef0")).toBe(true);
     // The missing ref should NOT have type "range" from the nested value
-    const missing = result.uniqueMissing.get("MissngRef0")!;
+    const missing = result.uniqueMissing.get("sid_MissngRef0")!;
     expect(missing.entityType).not.toBe("range");
     // It should default to "concept" since entity: format has no type metadata
     expect(missing.entityType).toBe("concept");
