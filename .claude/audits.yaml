@@ -180,6 +180,11 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
+    history:
+      - date: "2026-03-30"
+        result: pass
+        checked_by: "manual"
+        notes: "30 gate:rules-ok PRs out of 500+ merged in last 30 days (6%) — well under 20% threshold"
 
   - id: audits-system-adoption
     category: process

@@ -173,3 +173,28 @@ export function updateResourceFetchStatus(
       );
     });
 }
+
+/**
+ * Update a resource's archive_url by calling the wiki-server batch endpoint.
+ *
+ * Fire-and-forget: errors are logged but do not propagate to the caller.
+ */
+export function updateResourceArchiveUrl(
+  resourceId: string,
+  archiveUrl: string,
+): void {
+  import('../wiki-server/resources.ts')
+    .then((mod) => mod.updateResourceArchiveUrl(resourceId, archiveUrl))
+    .then((result) => {
+      if (!result.ok) {
+        console.warn(
+          `[resource-lookup] Failed to update archive URL for ${resourceId}: ${result.error}`,
+        );
+      }
+    })
+    .catch((e: unknown) => {
+      console.warn(
+        `[resource-lookup] Failed to update archive URL for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    });
+}

@@ -66,6 +66,7 @@ vi.mock('./resource-lookup.ts', () => ({
     return null;
   }),
   updateResourceFetchStatus: vi.fn(),
+  updateResourceArchiveUrl: vi.fn(),
 }));
 
 // Mock pdf-extractor (the module source-fetcher actually imports) instead of
@@ -84,6 +85,15 @@ vi.mock('youtube-transcript', () => ({
 // Mock api-keys to ensure Firecrawl is never activated in tests.
 vi.mock('../api-keys.ts', () => ({
   getApiKey: vi.fn(() => undefined),
+}));
+
+// Mock fetch-strategies so domain-aware routing doesn't interfere with existing tests.
+// All strategies return null (no match), falling through to standard fetch path.
+vi.mock('./fetch-strategies.ts', () => ({
+  getContentFetchStrategy: vi.fn(() => 'default'),
+  fetchForumContent: vi.fn().mockResolvedValue(null),
+  fetchDoiContent: vi.fn().mockResolvedValue(null),
+  fetchWaybackContent: vi.fn().mockResolvedValue(null),
 }));
 
 // ---------------------------------------------------------------------------

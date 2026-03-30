@@ -5,7 +5,13 @@ import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things, entities, fundingPrograms } from "../../schema.js";
+import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
+import {
+  verdictJoinCondition,
+  verdictSelectFields,
+  formatVerification,
+  type VerdictJoinFields,
+} from "../shared/verification-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -101,16 +107,17 @@ const BatchUpdateProgramSchema = z.object({
 const granteeEntity = alias(entities, "grantee_entity");
 const orgEntity = alias(entities, "org_entity");
 
-/** Selection shape for grants + joined entity titles + slugs. */
+/** Selection shape for grants + joined entity titles + slugs + verdicts. */
 const joinedSelect = {
   grants: grants,
   granteeTitle: granteeEntity.title,
   granteeSlug: granteeEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
+  ...verdictSelectFields,
 };
 
-interface JoinedRow {
+interface JoinedRow extends VerdictJoinFields {
   grants: typeof grants.$inferSelect;
   granteeTitle: string | null;
   granteeSlug: string | null;
@@ -150,6 +157,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
+    verification: formatVerification(r),
   };
 }
 
@@ -206,6 +214,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
       .orderBy(desc(grants.syncedAt), grants.id)
       .limit(limit)
       .offset(offset);
@@ -285,6 +294,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
       .where(where)
       .orderBy(orderClause, grants.id)
       .limit(limit)

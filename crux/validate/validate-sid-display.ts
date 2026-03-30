@@ -9,17 +9,18 @@
  * or be NULL. This validator catches cases where the enrichment pipeline
  * incorrectly stores a stableId as a display name.
  *
- * Checks all 5 tables with display name columns:
+ * Checks all 6 tables with display name columns:
  * - personnel: person_display_name, org_display_name
  * - grants: grantee_display_name, org_display_name
  * - funding_rounds: company_display_name, lead_investor_display_name
  * - investments: company_display_name, investor_display_name
  * - equity_positions: company_display_name, holder_display_name
+ * - entity_events: entity_display_name
  *
  * Also checks that raw ID fields (person_id, grantee_id, etc.) that contain
  * sid_-prefixed values have a resolved entity FK.
  *
- * Requires wiki-server to be running (queries the API). Advisory — not CI-blocking.
+ * Requires wiki-server to be running (queries the API). CI-blocking.
  *
  * Usage:
  *   npx tsx crux/validate/validate-sid-display.ts              # advisory mode
@@ -160,6 +161,16 @@ export const TABLE_DISPLAY_SPECS: TableDisplaySpec[] = [
       { idField: "companyId", entityFkField: "companyEntityId" },
       { idField: "holderId", entityFkField: "holderEntityId" },
     ],
+    maxLimit: 200,
+  },
+  {
+    apiPath: "/api/entity-events/all",
+    responseKey: "events",
+    displayFields: [
+      { displayField: "entityDisplayName" },
+    ],
+    // entityId is a hard FK (NOT NULL) — no separate raw ID vs resolved FK pattern
+    idFields: [],
     maxLimit: 200,
   },
 ];

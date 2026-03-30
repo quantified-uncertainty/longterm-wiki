@@ -259,6 +259,7 @@ function transformEntity(raw, expertMap, orgMap) {
         votes: raw.votes || [],
         amendments: raw.amendments || [],
         keyPoliticians: raw.keyPoliticians || [],
+        keyFigures: raw.keyFigures || [],
         customFields: filterCustomFields('Introduced', 'Established', 'Status', 'Author', 'Scope'),
       };
 

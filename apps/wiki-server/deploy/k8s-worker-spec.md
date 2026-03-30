@@ -12,10 +12,11 @@ alternative.
   ```
   node --import tsx/esm crux/worker/run.ts \
     --poll --poll-interval=5000 \
+    --concurrency=5 \
     --types=claim-verification,citation-verify,resource-verify,ping \
     --verbose
   ```
-- **Replicas**: 1 (scale to 2-3 when verification volume grows)
+- **Replicas**: 3 (scaled from 1 for resource-verify backlog clearance)
 - **Resources**:
   - Requests: 256Mi memory, 250m CPU
   - Limits: 1Gi memory, 1000m CPU
@@ -48,7 +49,7 @@ metadata:
   labels:
     app: longterm-wiki-worker
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: longterm-wiki-worker
@@ -68,6 +69,7 @@ spec:
             - crux/worker/run.ts
             - --poll
             - --poll-interval=5000
+            - --concurrency=5
             - --types=claim-verification,citation-verify,resource-verify,ping
             - --verbose
           ports:

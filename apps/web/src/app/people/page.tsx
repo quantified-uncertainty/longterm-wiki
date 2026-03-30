@@ -165,7 +165,7 @@ function resolveRef(fact: Fact | undefined): { id: string; name: string } | null
   const refId = fact.value.value;
   const entity = getTypedEntityById(refId);
   if (!entity) return null;
-  return { id: entity.stableId ?? entity.id, name: entity.title };
+  return { id: entity.id, name: entity.title };
 }
 
 /** Properties already handled explicitly or not useful for search (URLs/handles). */

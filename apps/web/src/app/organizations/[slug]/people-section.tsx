@@ -14,6 +14,7 @@ import {
 } from "@/lib/wiki-server";
 import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
+import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -28,6 +29,8 @@ export interface PersonEntry {
   start?: string;
   end?: string;
   roleType?: "key-person" | "board" | "career";
+  /** Source-check verification verdict (null if not checked) */
+  verificationVerdict?: string | null;
 }
 
 /** Max page size accepted by the wiki-server personnel endpoint */
@@ -139,6 +142,7 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
       roleType: VALID_ROLE_TYPES.has(row.roleType)
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
+      verificationVerdict: row.verification?.verdict ?? null,
     });
   }
 
@@ -249,6 +253,9 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
+                      <RecordVerificationDot
+                        verdict={person.verificationVerdict}
+                      />
                       {href ? (
                         <Link
                           href={href}
