@@ -183,11 +183,11 @@ facts:
   - id: f_Z7oaVivRvE
     property: headcount
     value:
+      - 200
       - 300
-      - 400
     asOf: 2023-06
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Approximate headcount mid-2023 from multiple sources"
+    notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other sources suggest up to 300"
 
   - id: f_0PxEBZyv45
     property: headcount

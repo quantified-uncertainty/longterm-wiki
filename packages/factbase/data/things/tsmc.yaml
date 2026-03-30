@@ -97,10 +97,10 @@ facts:
   # ── Market cap ──────────────────────────────────────────────────
   - id: f_tsmc_mcap_2026
     property: market-cap
-    value: 8.8e+11
+    value: 1.75e+12
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/tsm/market-cap/
-    notes: "Market cap ~$880B as of March 2026"
+    notes: "Market cap ~$1.75T as of late March 2026"
 
   # ── Arizona fab investment ──────────────────────────────────────
   - id: f_tsmc_arizona

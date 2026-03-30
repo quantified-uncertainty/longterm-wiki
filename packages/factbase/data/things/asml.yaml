@@ -93,10 +93,10 @@ facts:
   # ── Market cap ──────────────────────────────────────────────────
   - id: f_asml_mcap_2026
     property: market-cap
-    value: 2.7e+11
+    value: 5.11e+11
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/asml/market-cap/
-    notes: "Market cap ~$270B as of March 2026"
+    notes: "Market cap ~$511B as of late March 2026"
 
   # ── Export control events ───────────────────────────────────────
   - id: f_asml_export_2023
