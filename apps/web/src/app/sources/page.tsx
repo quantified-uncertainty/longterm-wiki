@@ -122,6 +122,21 @@ export default function SourcesPage() {
     { label: "Enriched", value: String(enriched) },
   ];
 
+  // Domain breakdown — group resources by hostname
+  const domainCounts = new Map<string, number>();
+  for (const r of resources) {
+    if (!r.url) continue;
+    try {
+      const hostname = new URL(r.url).hostname;
+      domainCounts.set(hostname, (domainCounts.get(hostname) || 0) + 1);
+    } catch {
+      // skip malformed URLs
+    }
+  }
+  const topDomains = [...domainCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 20);
+
   // Enrichment pipeline breakdown
   const enrichmentCounts = new Map<string, number>();
   for (const r of resources) {
@@ -202,6 +217,32 @@ export default function SourcesPage() {
                   ({Math.round((count / resources.length) * 100)}%)
                 </span>
               </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Domain breakdown — top 20 domains by resource count */}
+      {topDomains.length > 0 && (
+        <div className="mb-8 rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+          <div className="flex items-baseline justify-between mb-3">
+            <h2 className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+              Top Domains
+            </h2>
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {domainCounts.size.toLocaleString()} unique domains
+            </span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-1.5 text-xs">
+            {topDomains.map(([domain, count]) => (
+              <div key={domain} className="flex items-center justify-between gap-2 min-w-0">
+                <span className="truncate text-muted-foreground" title={domain}>
+                  {domain}
+                </span>
+                <span className="tabular-nums font-medium text-foreground/70 shrink-0">
+                  {count.toLocaleString()}
+                </span>
+              </div>
             ))}
           </div>
         </div>

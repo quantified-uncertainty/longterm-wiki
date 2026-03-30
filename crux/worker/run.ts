@@ -260,10 +260,17 @@ async function reportJobResult(
   const maxAttempts = 3;
   const delays = [5_000, 15_000, 30_000];
 
+  // Extract cost from handler result data (handlers may use either field name)
+  const costUsd = data != null
+    ? (typeof data.costUsd === 'number' ? data.costUsd
+      : typeof data.estimatedCostUsd === 'number' ? data.estimatedCostUsd
+      : undefined)
+    : undefined;
+
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     try {
       const result = success
-        ? await completeJob(jobId, data)
+        ? await completeJob(jobId, data, costUsd)
         : await failJob(jobId, error ?? 'Unknown error');
 
       if (result.ok) return;
