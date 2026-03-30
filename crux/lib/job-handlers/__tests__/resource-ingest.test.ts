@@ -1,5 +1,5 @@
 /**
- * Tests for resource-verify job handler.
+ * Tests for resource-ingest job handler.
  *
  * Covers:
  *  - Successful reachability check with content hash
@@ -101,15 +101,15 @@ afterEach(() => {
 // Import handler (after mocks are set up)
 // ---------------------------------------------------------------------------
 
-const { handleResourceVerify } = await import('../resource-verify.ts');
+const { handleResourceIngest } = await import('../resource-ingest.ts');
 
 // ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
-describe('handleResourceVerify — param validation', () => {
+describe('handleResourceIngest — param validation', () => {
   it('rejects missing resourceId', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { url: 'https://example.com' },
       CTX,
     );
@@ -118,7 +118,7 @@ describe('handleResourceVerify — param validation', () => {
   });
 
   it('rejects missing url', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1' },
       CTX,
     );
@@ -127,7 +127,7 @@ describe('handleResourceVerify — param validation', () => {
   });
 
   it('rejects invalid url format', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'not-a-url' },
       CTX,
     );
@@ -136,7 +136,7 @@ describe('handleResourceVerify — param validation', () => {
   });
 
   it('rejects empty resourceId', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: '', url: 'https://example.com' },
       CTX,
     );
@@ -145,9 +145,9 @@ describe('handleResourceVerify — param validation', () => {
   });
 });
 
-describe('handleResourceVerify — URL security', () => {
+describe('handleResourceIngest — URL security', () => {
   it('rejects non-HTTPS URLs', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'http://example.com/page' },
       CTX,
     );
@@ -157,7 +157,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('rejects FTP URLs', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'ftp://example.com/file' },
       CTX,
     );
@@ -166,7 +166,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('blocks localhost (SSRF protection)', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://localhost/admin' },
       CTX,
     );
@@ -176,7 +176,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('blocks 127.0.0.1 (SSRF protection)', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://127.0.0.1/secret' },
       CTX,
     );
@@ -185,7 +185,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('blocks private network 10.x (SSRF protection)', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://10.0.0.1/internal' },
       CTX,
     );
@@ -194,7 +194,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('blocks private network 192.168.x (SSRF protection)', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://192.168.1.1/router' },
       CTX,
     );
@@ -203,7 +203,7 @@ describe('handleResourceVerify — URL security', () => {
   });
 
   it('blocks private network 172.16-31.x (SSRF protection)', async () => {
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://172.20.10.5/internal' },
       CTX,
     );
@@ -212,12 +212,12 @@ describe('handleResourceVerify — URL security', () => {
   });
 });
 
-describe('handleResourceVerify — successful checks', () => {
+describe('handleResourceIngest — successful checks', () => {
   it('returns reachable for a normal page', async () => {
     const body = '<html><body><h1>Real Article</h1><p>Content here about AI safety.</p></body></html>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/article' },
       CTX,
     );
@@ -233,7 +233,7 @@ describe('handleResourceVerify — successful checks', () => {
     const body = 'Updated content';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       {
         resourceId: 'res-1',
         url: 'https://example.com/page',
@@ -252,7 +252,7 @@ describe('handleResourceVerify — successful checks', () => {
     const hash = expectedHash(body);
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       {
         resourceId: 'res-1',
         url: 'https://example.com/page',
@@ -271,7 +271,7 @@ describe('handleResourceVerify — successful checks', () => {
       mockResponse(body, { url: 'https://example.com/new-location' }),
     );
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/old-page' },
       CTX,
     );
@@ -282,13 +282,13 @@ describe('handleResourceVerify — successful checks', () => {
   });
 });
 
-describe('handleResourceVerify — HTTP errors', () => {
+describe('handleResourceIngest — HTTP errors', () => {
   it('returns not_found for HTTP 404', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(
       mockResponse('Not Found', { status: 404 }),
     );
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/gone' },
       CTX,
     );
@@ -303,7 +303,7 @@ describe('handleResourceVerify — HTTP errors', () => {
       mockResponse('Server Error', { status: 500 }),
     );
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/broken' },
       CTX,
     );
@@ -318,7 +318,7 @@ describe('handleResourceVerify — HTTP errors', () => {
       mockResponse('Forbidden', { status: 403 }),
     );
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/forbidden' },
       CTX,
     );
@@ -329,12 +329,12 @@ describe('handleResourceVerify — HTTP errors', () => {
   });
 });
 
-describe('handleResourceVerify — soft-404 detection', () => {
+describe('handleResourceIngest — soft-404 detection', () => {
   it('detects "page not found" text in short page', async () => {
     const body = '<html><body><h1>Page not found</h1><p>Sorry, this page doesn\'t exist.</p></body></html>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/missing' },
       CTX,
     );
@@ -347,7 +347,7 @@ describe('handleResourceVerify — soft-404 detection', () => {
     const body = '<html><body>Error 404 - The page you requested could not be found.</body></html>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/err' },
       CTX,
     );
@@ -361,7 +361,7 @@ describe('handleResourceVerify — soft-404 detection', () => {
     const body = 'x'.repeat(6000) + ' error 404 mentioned in passing';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/long-article' },
       CTX,
     );
@@ -374,7 +374,7 @@ describe('handleResourceVerify — soft-404 detection', () => {
     const body = '<p>This content has been removed by the author.</p>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/removed' },
       CTX,
     );
@@ -384,12 +384,12 @@ describe('handleResourceVerify — soft-404 detection', () => {
   });
 });
 
-describe('handleResourceVerify — paywall detection', () => {
+describe('handleResourceIngest — paywall detection', () => {
   it('detects "subscribe to continue" paywall', async () => {
     const body = '<p>Subscribe to continue reading this article.</p>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/paywalled' },
       CTX,
     );
@@ -402,7 +402,7 @@ describe('handleResourceVerify — paywall detection', () => {
     const body = '<div>This is members only content. Please sign up.</div>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/members' },
       CTX,
     );
@@ -416,7 +416,7 @@ describe('handleResourceVerify — paywall detection', () => {
     const body = 'x'.repeat(11000) + ' premium content mentioned';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/long-article' },
       CTX,
     );
@@ -426,12 +426,12 @@ describe('handleResourceVerify — paywall detection', () => {
   });
 });
 
-describe('handleResourceVerify — network errors', () => {
+describe('handleResourceIngest — network errors', () => {
   it('returns timeout on AbortError', async () => {
     const abortError = new DOMException('The operation was aborted', 'AbortError');
     globalThis.fetch = vi.fn().mockRejectedValue(abortError);
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://slow.example.com/page' },
       CTX,
     );
@@ -444,7 +444,7 @@ describe('handleResourceVerify — network errors', () => {
   it('returns unreachable on DNS failure', async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new TypeError('fetch failed'));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://nonexistent.example.com' },
       CTX,
     );
@@ -457,7 +457,7 @@ describe('handleResourceVerify — network errors', () => {
   it('returns unreachable on connection refused', async () => {
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('connect ECONNREFUSED'));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com:9999/down' },
       CTX,
     );
@@ -467,7 +467,7 @@ describe('handleResourceVerify — network errors', () => {
   });
 });
 
-describe('handleResourceVerify — response.body null fallback', () => {
+describe('handleResourceIngest — response.body null fallback', () => {
   it('falls back to response.text() when body is null', async () => {
     const content = '<html><body>Page loaded via text() fallback</body></html>';
     const res = new Response(content, {
@@ -479,7 +479,7 @@ describe('handleResourceVerify — response.body null fallback', () => {
     Object.defineProperty(res, 'url', { value: 'https://example.com/page' });
     globalThis.fetch = vi.fn().mockResolvedValue(res);
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/page' },
       CTX,
     );
@@ -490,7 +490,7 @@ describe('handleResourceVerify — response.body null fallback', () => {
   });
 });
 
-describe('handleResourceVerify — stream read error mid-read', () => {
+describe('handleResourceIngest — stream read error mid-read', () => {
   it('handles a stream that errors after emitting one chunk', async () => {
     const encoder = new TextEncoder();
     const partialChunk = 'partial content before error';
@@ -509,7 +509,7 @@ describe('handleResourceVerify — stream read error mid-read', () => {
     Object.defineProperty(res, 'url', { value: 'https://example.com/page' });
     globalThis.fetch = vi.fn().mockResolvedValue(res);
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/page' },
       CTX,
     );
@@ -521,7 +521,7 @@ describe('handleResourceVerify — stream read error mid-read', () => {
   });
 });
 
-describe('handleResourceVerify — malformed URL', () => {
+describe('handleResourceIngest — malformed URL', () => {
   it('returns invalid_url for a URL that passes Zod but fails new URL()', async () => {
     const targetUrl = 'https://looks-valid-but-throws.example.com/page';
     const OriginalURL = globalThis.URL;
@@ -541,7 +541,7 @@ describe('handleResourceVerify — malformed URL', () => {
     } as typeof URL;
 
     try {
-      const result = await handleResourceVerify(
+      const result = await handleResourceIngest(
         { resourceId: 'res-1', url: targetUrl },
         CTX,
       );
@@ -555,11 +555,11 @@ describe('handleResourceVerify — malformed URL', () => {
   });
 });
 
-describe('handleResourceVerify — empty response body', () => {
+describe('handleResourceIngest — empty response body', () => {
   it('returns reachable with valid content hash for empty body', async () => {
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(''));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/empty' },
       CTX,
     );
@@ -571,12 +571,12 @@ describe('handleResourceVerify — empty response body', () => {
   });
 });
 
-describe('handleResourceVerify — contentChanged undefined without previousContentHash', () => {
+describe('handleResourceIngest — contentChanged undefined without previousContentHash', () => {
   it('sets contentChanged to undefined when no previousContentHash provided', async () => {
     const body = '<html><body>Some content</body></html>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/page' },
       CTX,
     );
@@ -591,7 +591,7 @@ describe('handleResourceVerify — contentChanged undefined without previousCont
   });
 });
 
-describe('handleResourceVerify — large response handling', () => {
+describe('handleResourceIngest — large response handling', () => {
   it('skips body read for very large Content-Length', async () => {
     // Content-Length > 10MB triggers the skip
     const res = mockResponse('', {
@@ -599,7 +599,7 @@ describe('handleResourceVerify — large response handling', () => {
     });
     globalThis.fetch = vi.fn().mockResolvedValue(res);
 
-    const result = await handleResourceVerify(
+    const result = await handleResourceIngest(
       { resourceId: 'res-1', url: 'https://example.com/huge.pdf' },
       CTX,
     );
@@ -611,7 +611,7 @@ describe('handleResourceVerify — large response handling', () => {
   });
 });
 
-describe('handleResourceVerify — persistence', () => {
+describe('handleResourceIngest — persistence', () => {
   it('caches content and updates fetch_status on reachable URL', async () => {
     const { upsertCitationContent } = await import('../../wiki-server/citations.ts');
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
@@ -619,7 +619,7 @@ describe('handleResourceVerify — persistence', () => {
     const body = '<html><body><h1>Title</h1><p>Content</p></body></html>';
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
 
-    await handleResourceVerify(
+    await handleResourceIngest(
       { resourceId: 'res-persist', url: 'https://example.com/persist-test' },
       CTX,
     );
@@ -628,7 +628,7 @@ describe('handleResourceVerify — persistence', () => {
       expect.objectContaining({
         url: 'https://example.com/persist-test',
         resourceId: 'res-persist',
-        fetchMethod: 'resource-verify',
+        fetchMethod: 'resource-ingest',
       }),
     );
     expect(updateResourceFetchStatus).toHaveBeenCalledWith(
@@ -644,7 +644,7 @@ describe('handleResourceVerify — persistence', () => {
 
     globalThis.fetch = vi.fn().mockResolvedValue(mockResponse('Not Found', { status: 404 }));
 
-    await handleResourceVerify(
+    await handleResourceIngest(
       { resourceId: 'res-dead', url: 'https://example.com/missing' },
       CTX,
     );
@@ -665,7 +665,7 @@ describe('handleResourceVerify — persistence', () => {
     });
     globalThis.fetch = vi.fn().mockResolvedValue(res);
 
-    await handleResourceVerify(
+    await handleResourceIngest(
       { resourceId: 'res-large', url: 'https://example.com/huge.pdf' },
       CTX,
     );

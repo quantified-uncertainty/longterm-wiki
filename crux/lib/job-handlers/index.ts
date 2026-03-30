@@ -90,9 +90,9 @@ const handlers: Record<string, JobHandler> = {
   'claim-verification': lazyHandler(async () =>
     (await import('./claim-verification.ts')).handleClaimVerification),
 
-  // Resource URL liveness checking (#3209) — lazy for consistency
-  'resource-verify': lazyHandler(async () =>
-    (await import('./resource-verify.ts')).handleResourceVerify),
+  // Resource ingestion: fetch, cache content, persist metadata (#3209)
+  'resource-ingest': lazyHandler(async () =>
+    (await import('./resource-ingest.ts')).handleResourceIngest),
 };
 
 /**

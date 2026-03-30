@@ -13,10 +13,10 @@ alternative.
   node --import tsx/esm crux/worker/run.ts \
     --poll --poll-interval=5000 \
     --concurrency=5 \
-    --types=claim-verification,citation-verify,resource-verify,ping \
+    --types=claim-verification,citation-verify,resource-ingest,ping \
     --verbose
   ```
-- **Replicas**: 3 (scaled from 1 for resource-verify backlog clearance)
+- **Replicas**: 3 (scaled from 1 for resource-ingest backlog clearance)
 - **Resources**:
   - Requests: 256Mi memory, 250m CPU
   - Limits: 1Gi memory, 1000m CPU
@@ -70,7 +70,7 @@ spec:
             - --poll
             - --poll-interval=5000
             - --concurrency=5
-            - --types=claim-verification,citation-verify,resource-verify,ping
+            - --types=claim-verification,citation-verify,resource-ingest,ping
             - --verbose
           ports:
             - name: health
