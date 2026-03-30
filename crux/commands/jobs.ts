@@ -43,6 +43,7 @@ interface CommandOptions extends BaseOptions {
   priority?: string;
   maxRetries?: string;
   limit?: string;
+  dryRun?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -589,6 +590,147 @@ async function worker(args: string[], options: CommandOptions): Promise<CommandR
 }
 
 /**
+ * Bulk-enqueue resource-verify jobs for unfetched resources.
+ *
+ * Pages through /api/resources/all, filters for lastFetchedAt === null,
+ * and creates resource-verify jobs with dedup keys.
+ *
+ * Usage:
+ *   crux sys jobs enqueue-resource-verify [--dry-run] [--limit=N]
+ */
+async function enqueueResourceVerify(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const dryRun = !!options.dryRun;
+  const maxEnqueue = parseIntOpt(options.limit, 0); // 0 = no limit
+
+  let output = '';
+  output += `${c.bold}${c.blue}Enqueue Resource-Verify Jobs${c.reset}\n`;
+  if (dryRun) output += `${c.yellow}DRY RUN — no jobs will be created${c.reset}\n`;
+  output += '\n';
+
+  // Step 1: Page through all resources and collect unfetched ones
+  const PAGE_SIZE = 200;
+  let offset = 0;
+  let total = 0;
+  const unfetched: Array<{ id: string; url: string }> = [];
+
+  output += `${c.dim}Scanning resources...${c.reset}\n`;
+
+  while (true) {
+    const result = await apiRequest<{
+      resources: Array<{ id: string; url: string; lastFetchedAt: string | null }>;
+      total: number;
+      limit: number;
+      offset: number;
+    }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${offset}`);
+
+    if (!result.ok) return handleApiError(result, c);
+
+    total = result.data.total;
+    for (const r of result.data.resources) {
+      if (r.lastFetchedAt === null && r.url) {
+        unfetched.push({ id: r.id, url: r.url });
+      }
+    }
+
+    offset += PAGE_SIZE;
+    if (offset >= total) break;
+  }
+
+  output += `  Total resources: ${c.bold}${total}${c.reset}\n`;
+  output += `  Unfetched: ${c.bold}${unfetched.length}${c.reset}\n`;
+
+  if (unfetched.length === 0) {
+    output += `\n${c.green}✓${c.reset} All resources have been fetched.\n`;
+    return { output, exitCode: 0 };
+  }
+
+  // Apply limit
+  const toEnqueue = maxEnqueue > 0 ? unfetched.slice(0, maxEnqueue) : unfetched;
+  if (maxEnqueue > 0 && maxEnqueue < unfetched.length) {
+    output += `  Enqueueing: ${c.bold}${toEnqueue.length}${c.reset} (limited by --limit)\n`;
+  }
+
+  if (dryRun) {
+    output += `\n${c.dim}Would create ${toEnqueue.length} resource-verify jobs.${c.reset}\n`;
+    output += `${c.dim}First 10:${c.reset}\n`;
+    for (const r of toEnqueue.slice(0, 10)) {
+      output += `  ${r.id}: ${r.url.slice(0, 80)}\n`;
+    }
+    return { output, exitCode: 0 };
+  }
+
+  // Step 2: Create jobs sequentially with rate-limit retry
+  let created = 0;
+  let deduped = 0;
+  let failed = 0;
+  let rateLimitPauses = 0;
+
+  output += `\n${c.dim}Creating jobs...${c.reset}\n`;
+
+  for (let i = 0; i < toEnqueue.length; i++) {
+    const r = toEnqueue[i];
+    let attempts = 0;
+    const MAX_ATTEMPTS = 3;
+
+    while (attempts < MAX_ATTEMPTS) {
+      const result = await createJob({
+        type: 'resource-verify',
+        params: { resourceId: r.id, url: r.url },
+        priority: 0,
+        maxRetries: 3,
+        dedupKey: `resource-verify-${r.id}`,
+      });
+
+      if (!result.ok && result.message.includes('429')) {
+        // Rate limited — extract retry-after and wait
+        const retryMatch = result.message.match(/retryAfter[":]+\s*(\d+)/i);
+        const waitSec = retryMatch ? parseInt(retryMatch[1], 10) : 30;
+        rateLimitPauses++;
+        process.stderr.write(`  ${c.yellow}Rate limited, waiting ${waitSec}s...${c.reset}\n`);
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+        attempts++;
+        continue;
+      }
+
+      if (!result.ok) {
+        failed++;
+        if (failed <= 3) {
+          process.stderr.write(`  ${c.red}Error: ${result.message}${c.reset}\n`);
+        }
+      } else {
+        const job = result.data as JobEntry & { dedupExisting?: boolean };
+        if (job.dedupExisting) {
+          deduped++;
+        } else {
+          created++;
+        }
+      }
+      break;
+    }
+
+    // Progress every 100 jobs
+    const processed = i + 1;
+    if (processed % 100 === 0 || processed === toEnqueue.length) {
+      process.stderr.write(`  [${processed}/${toEnqueue.length}] created=${created} deduped=${deduped} failed=${failed}\n`);
+    }
+  }
+
+  if (rateLimitPauses > 0) {
+    output += `  ${c.yellow}Rate limit pauses:${c.reset} ${rateLimitPauses}\n`;
+  }
+
+  output += `\n${c.bold}Results:${c.reset}\n`;
+  output += `  ${c.green}Created:${c.reset} ${created}\n`;
+  output += `  ${c.dim}Deduped:${c.reset} ${deduped}\n`;
+  if (failed > 0) output += `  ${c.red}Failed:${c.reset} ${failed}\n`;
+  output += `\n${c.dim}Jobs will be processed by workers. Monitor: crux sys jobs list --type=resource-verify${c.reset}\n`;
+
+  return { output, exitCode: failed > 0 ? 1 : 0 };
+}
+
+/**
  * Show registered job types.
  */
 async function types(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -626,6 +768,7 @@ export const commands = {
   batch,
   worker,
   types,
+  'enqueue-resource-verify': enqueueResourceVerify,
 };
 
 export function getHelp(): string {
@@ -644,6 +787,7 @@ Commands:
   batch           Create a batch of content jobs with auto batch-commit
   worker          Run the job worker locally
   types           List registered job handler types
+  enqueue-resource-verify  Bulk-enqueue resource-verify jobs for unfetched resources
 
 Options:
   --status=X      Filter by status (pending, claimed, running, completed, failed, cancelled)
@@ -689,5 +833,14 @@ Examples:
                                                 Run worker locally for page-improve jobs
   crux sys jobs types                               List registered job types
   crux sys jobs stats                               Show job statistics
+
+Enqueue Resource-Verify Options:
+  --dry-run       Show what would be enqueued without creating jobs
+  --limit=N       Max resources to enqueue (default: all)
+
+Examples:
+  crux sys jobs enqueue-resource-verify --dry-run    Preview unfetched resources
+  crux sys jobs enqueue-resource-verify              Enqueue all unfetched
+  crux sys jobs enqueue-resource-verify --limit=500  Enqueue first 500
 `;
 }
