@@ -38,9 +38,12 @@ vi.mock('../../search/source-fetcher.ts', () => ({
   fetchSource: (req: unknown) => mockFetchSource(req),
 }));
 
+const mockFindResourcesByContentHash = vi.fn();
+
 vi.mock('../../wiki-server/resources.ts', () => ({
   updateResourceFetchStatus: vi.fn().mockResolvedValue({ ok: true, data: {} }),
   lookupResourceByUrl: vi.fn().mockResolvedValue({ ok: false }),
+  findResourcesByContentHash: (...args: unknown[]) => mockFindResourcesByContentHash(...args),
 }));
 
 const mockCreateJob = vi.fn<() => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
@@ -88,7 +91,9 @@ beforeEach(() => {
   vi.restoreAllMocks();
   mockFetchSource.mockClear();
   mockCreateJob.mockClear();
+  mockFindResourcesByContentHash.mockClear();
   mockCreateJob.mockResolvedValue({ ok: true, data: { id: 999 } });
+  mockFindResourcesByContentHash.mockResolvedValue({ ok: true, data: { resources: [] } });
   mockFetchSource.mockResolvedValue(mockFetchResult());
 });
 
@@ -415,5 +420,72 @@ describe('handleResourceIngest — resilience', () => {
 
     expect(result.success).toBe(true);
     expect(result.data.status).toBe('reachable');
+  });
+});
+
+describe('handleResourceIngest — duplicate detection', () => {
+  it('reports duplicateOf when content hash matches another resource', async () => {
+    mockFindResourcesByContentHash.mockResolvedValue({
+      ok: true,
+      data: {
+        resources: [{ id: 'existing-res', url: 'https://example.com/original', title: 'Original' }],
+      },
+    });
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-dup', url: 'https://example.com/duplicate' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.duplicateOf).toBe('existing-res');
+    expect(mockFindResourcesByContentHash).toHaveBeenCalledWith(
+      expect.any(String),
+      'res-dup',
+    );
+  });
+
+  it('does not set duplicateOf when no matches found', async () => {
+    mockFindResourcesByContentHash.mockResolvedValue({
+      ok: true,
+      data: { resources: [] },
+    });
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-unique', url: 'https://example.com/unique' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.duplicateOf).toBeUndefined();
+  });
+
+  it('still succeeds when duplicate check fails', async () => {
+    mockFindResourcesByContentHash.mockRejectedValue(new Error('wiki-server down'));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(result.data.duplicateOf).toBeUndefined();
+  });
+
+  it('skips duplicate check when content is empty', async () => {
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: '',
+    }));
+
+    await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/empty' },
+      CTX,
+    );
+
+    expect(mockFindResourcesByContentHash).not.toHaveBeenCalled();
   });
 });

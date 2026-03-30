@@ -947,6 +947,28 @@ const resourcesApp = new Hono()
     });
   })
 
+  // ---- GET /by-content-hash?hash=X&excludeId=Y (duplicate detection) ----
+
+  .get("/by-content-hash", async (c) => {
+    const hash = c.req.query("hash");
+    if (!hash) return validationError(c, "hash query parameter is required");
+
+    const excludeId = c.req.query("excludeId");
+    const db = getDrizzleDb();
+
+    const conditions = excludeId
+      ? sql`${resources.contentHash} = ${hash} AND ${resources.id} != ${excludeId}`
+      : eq(resources.contentHash, hash);
+
+    const rows = await db
+      .select({ id: resources.id, url: resources.url, title: resources.title })
+      .from(resources)
+      .where(conditions)
+      .limit(10);
+
+    return c.json({ resources: rows });
+  })
+
   // ---- GET /:id/content (resource + linked fetched content) ----
 
   .get("/:id/content", async (c) => {
