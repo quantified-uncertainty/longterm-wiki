@@ -110,3 +110,10 @@ export interface ResourceIngestParams {
   previousContentHash?: string;
 }
 
+export interface ResourceEnrichParams {
+  /** Resource stableId */
+  resourceId: string;
+  /** Resource URL */
+  url: string;
+}
+

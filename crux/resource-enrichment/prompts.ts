@@ -26,8 +26,7 @@ Return JSON with these fields:
 {
   "resource_subtype": one of: "arxiv_preprint", "journal_article", "conference_paper", "working_paper", "blog_post", "news_article", "organizational_report", "policy_brief", "executive_order", "legislation", "regulation", "guidance_document", "standard", "book_chapter", "book", "video", "podcast_episode", "dataset", "tool_page", "documentation", "wiki_page", "homepage", "press_release", "opinion_piece", "interview", "other",
   "resource_purpose": one of: "primary_source", "commentary", "analysis", "reference", "tool", "dataset", "homepage", "news", "educational",
-  "context_note": a single sentence explaining what this resource is and why it matters for AI safety (max 100 words),
-  "sub_table": one of: "paper", "forum_post", "policy_doc", "none" — which sub-table this resource belongs to
+  "context_note": a single sentence explaining what this resource is and why it matters for AI safety (max 100 words)
 }`;
 }
 
@@ -100,7 +99,6 @@ Return a single JSON object with ALL of these fields:
   "resource_subtype": one of: "arxiv_preprint", "journal_article", "conference_paper", "working_paper", "blog_post", "news_article", "organizational_report", "policy_brief", "executive_order", "legislation", "regulation", "guidance_document", "standard", "book_chapter", "book", "video", "podcast_episode", "dataset", "tool_page", "documentation", "wiki_page", "homepage", "press_release", "opinion_piece", "interview", "other",
   "resource_purpose": one of: "primary_source", "commentary", "analysis", "reference", "tool", "dataset", "homepage", "news", "educational",
   "context_note": a single sentence explaining what this resource is and why it matters for AI safety (max 100 words),
-  "sub_table": one of: "paper", "forum_post", "policy_doc", "none" — which sub-table this resource belongs to,
   "clean_title": improved title if current one is truncated/bad, else null,
   "summary": 1-3 sentence summary of the resource's key contribution,
   "key_points": array of 3-5 bullet points (strings, each max 200 chars),

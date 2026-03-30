@@ -16,7 +16,6 @@ import { deepEnrichCommand } from '../resource-enrichment/enrich.ts';
 import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts';
 import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
 import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
-import { fixEnrichmentStatusCommand } from '../resource-enrichment/fix-enrichment-status.ts';
 import { enrichCrossrefCommand } from '../resource-enrichment/enrich-crossref.ts';
 
 interface ResourceCommandConfig {
@@ -155,7 +154,6 @@ commands['deep-enrich'] = deepEnrichCommand;
 commands['cross-reference'] = crossReferenceCommand;
 commands['fetch-wayback'] = fetchWaybackCommand;
 commands['archive-pdfs'] = archivePdfsCommand;
-commands['fix-enrichment-status'] = fixEnrichmentStatusCommand;
 commands['enrich-crossref'] = enrichCrossrefCommand;
 
 // Convenience aliases
@@ -196,7 +194,6 @@ Enrichment:
   fetch-wayback     Retry failed URLs via Wayback Machine (archive.org)
   archive-pdfs      Archive PDF files to DigitalOcean Spaces
   enrich-free       Run all free enrichment (papers + forums + fetch)
-  fix-enrichment-status  Backfill enrichment_status for resources with cached content
   classify          LLM classification via Anthropic Batch API (Haiku, ~\$15)
   deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~\$100)
 
