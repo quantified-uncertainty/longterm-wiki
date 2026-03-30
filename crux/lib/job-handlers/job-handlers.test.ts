@@ -36,7 +36,7 @@ describe('job-handlers/index', () => {
     expect(types).toContain('page-create');
     expect(types).toContain('batch-commit');
     expect(types).toContain('auto-update-digest');
-    expect(types).toContain('resource-verify');
+    expect(types).toContain('resource-ingest');
     expect(types).toContain('resource-enrich');
   });
 

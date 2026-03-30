@@ -2,7 +2,7 @@
  * Resource Enrichment Job Handler
  *
  * Combines classification and deep enrichment in a single LLM call per resource.
- * Triggered automatically by resource-verify when a resource is reachable,
+ * Triggered automatically by resource-ingest when a resource is reachable,
  * or manually via the job queue.
  *
  * Params:
@@ -25,20 +25,13 @@ import { z } from 'zod';
 import { createLlmClient, MODELS, callLlm } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
-import { getResource, upsertResourceBatch } from '../wiki-server/resources.ts';
+import { getResource, upsertResourceBatch, suggestResourcesApi } from '../wiki-server/resources.ts';
 import { COMBINED_ENRICHMENT_SYSTEM, combinedEnrichmentPrompt } from '../../resource-enrichment/prompts.ts';
 
 // ---------------------------------------------------------------------------
-// Minimal resource shape for the fields we read
+// getResource() returns ResourceRow & { citedBy: string[] } — we use fields
+// directly from that type without re-declaring an interface.
 // ---------------------------------------------------------------------------
-
-interface ResourceFields {
-  enrichmentStatus: string | null;
-  title: string | null;
-  type: string | null;
-  summary: string | null;
-  tags: string[] | null;
-}
 
 // ---------------------------------------------------------------------------
 // Params validation
@@ -56,13 +49,13 @@ const ResourceEnrichParamsSchema = z.object({
 const CombinedEnrichmentResultSchema = z.object({
   resource_subtype: z.string().min(1),
   resource_purpose: z.string().min(1),
-  context_note: z.string().max(700).default(''),  // prompt says max 100 words (~600-700 chars)
-  sub_table: z.enum(['paper', 'forum_post', 'policy_doc', 'none']),
+  context_note: z.string().max(500).default(''),  // matches UpsertResourceSchema.contextNote max(500)
   clean_title: z.string().nullable(),
   summary: z.string().min(1),
   key_points: z.array(z.string().max(200)).min(1).max(10),
   tags: z.array(z.string()).max(10),
   importance_score: z.number().int().min(0).max(100),
+  discovered_urls: z.array(z.string().url()).max(5).optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -100,7 +93,7 @@ export async function handleResourceEnrich(
       };
     }
 
-    const resource = resourceResult.data as unknown as ResourceFields;
+    const resource = resourceResult.data;
 
     if (resource.enrichmentStatus === 'enriched' || resource.enrichmentStatus === 'reviewed') {
       if (ctx.verbose) {
@@ -194,6 +187,21 @@ export async function handleResourceEnrich(
       };
     }
 
+    // 7. Fire-and-forget: suggest discovered URLs for ingestion
+    const discoveredUrls = result.discovered_urls?.filter(
+      (u) => u !== url, // exclude the source URL itself
+    );
+    if (discoveredUrls && discoveredUrls.length > 0) {
+      suggestResourcesApi({ urls: discoveredUrls }).catch((e: unknown) => {
+        console.warn(
+          `[resource-enrich] Failed to suggest discovered URLs for ${resourceId}: ${e instanceof Error ? e.message : String(e)}`,
+        );
+      });
+      if (ctx.verbose) {
+        console.log(`[resource-enrich] Suggested ${discoveredUrls.length} discovered URL(s) for ingestion`);
+      }
+    }
+
     const durationMs = Date.now() - startTime;
     const estimatedCost = estimateCost(llmResult.usage.input_tokens, llmResult.usage.output_tokens);
 
@@ -212,6 +220,7 @@ export async function handleResourceEnrich(
         outputTokens: llmResult.usage.output_tokens,
         estimatedCostUsd: estimatedCost,
         fieldsWritten: Object.keys(update).filter(k => k !== 'id' && k !== 'url'),
+        discoveredUrls: discoveredUrls?.length ? discoveredUrls : undefined,
       },
     };
   } catch (err: unknown) {

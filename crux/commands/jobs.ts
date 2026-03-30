@@ -590,22 +590,22 @@ async function worker(args: string[], options: CommandOptions): Promise<CommandR
 }
 
 /**
- * Bulk-enqueue resource-verify jobs for unfetched resources.
+ * Bulk-enqueue resource-ingest jobs for unfetched resources.
  *
  * Pages through /api/resources/all, filters for lastFetchedAt === null,
- * and creates resource-verify jobs with dedup keys.
+ * and creates resource-ingest jobs with dedup keys.
  *
  * Usage:
- *   crux sys jobs enqueue-resource-verify [--dry-run] [--limit=N]
+ *   crux sys jobs enqueue-resource-ingest [--dry-run] [--limit=N]
  */
-async function enqueueResourceVerify(_args: string[], options: CommandOptions): Promise<CommandResult> {
+async function enqueueResourceIngest(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
   const dryRun = !!options.dryRun;
   const maxEnqueue = parseIntOpt(options.limit, 0); // 0 = no limit
 
   let output = '';
-  output += `${c.bold}${c.blue}Enqueue Resource-Verify Jobs${c.reset}\n`;
+  output += `${c.bold}${c.blue}Enqueue Resource-Ingest Jobs${c.reset}\n`;
   if (dryRun) output += `${c.yellow}DRY RUN — no jobs will be created${c.reset}\n`;
   output += '\n';
 
@@ -653,7 +653,7 @@ async function enqueueResourceVerify(_args: string[], options: CommandOptions): 
   }
 
   if (dryRun) {
-    output += `\n${c.dim}Would create ${toEnqueue.length} resource-verify jobs.${c.reset}\n`;
+    output += `\n${c.dim}Would create ${toEnqueue.length} resource-ingest jobs.${c.reset}\n`;
     output += `${c.dim}First 10:${c.reset}\n`;
     for (const r of toEnqueue.slice(0, 10)) {
       output += `  ${r.id}: ${r.url.slice(0, 80)}\n`;
@@ -661,27 +661,51 @@ async function enqueueResourceVerify(_args: string[], options: CommandOptions): 
     return { output, exitCode: 0 };
   }
 
-  // Step 2: Create jobs sequentially with rate-limit retry
+  // Step 2: Group by domain and compute staggered runAfter timestamps
+  // to avoid hitting the same domain repeatedly in quick succession.
+  const DOMAIN_STAGGER_MS = 3_000; // 3 seconds between same-domain jobs
+  const domainCounters = new Map<string, number>(); // domain -> next index
+
+  function getDomain(url: string): string {
+    try {
+      return new URL(url).hostname;
+    } catch {
+      return 'unknown';
+    }
+  }
+
+  function getRunAfter(url: string): string | undefined {
+    const domain = getDomain(url);
+    const idx = domainCounters.get(domain) ?? 0;
+    domainCounters.set(domain, idx + 1);
+    if (idx === 0) return undefined; // First URL per domain: immediate
+    return new Date(Date.now() + idx * DOMAIN_STAGGER_MS).toISOString();
+  }
+
+  // Step 3: Create jobs sequentially with rate-limit retry
   let created = 0;
   let deduped = 0;
   let failed = 0;
   let rateLimitPauses = 0;
 
-  output += `\n${c.dim}Creating jobs...${c.reset}\n`;
+  const uniqueDomains = new Set(toEnqueue.map(r => getDomain(r.url)));
+  output += `\n${c.dim}Creating jobs across ${uniqueDomains.size} domains (${DOMAIN_STAGGER_MS}ms stagger per domain)...${c.reset}\n`;
 
   for (let i = 0; i < toEnqueue.length; i++) {
     const r = toEnqueue[i];
+    const runAfter = getRunAfter(r.url);
     let rateLimitRetries = 0;
     const MAX_RATE_LIMIT_RETRIES = 10; // Rate limits always resolve — retry generously
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const result = await createJob({
-        type: 'resource-verify',
+        type: 'resource-ingest',
         params: { resourceId: r.id, url: r.url },
         priority: 0,
         maxRetries: 3,
-        dedupKey: `resource-verify-${r.id}`,
+        dedupKey: `resource-ingest-${r.id}`,
+        ...(runAfter ? { runAfter } : {}),
       });
 
       if (!result.ok && result.message.includes('429')) {
@@ -733,7 +757,7 @@ async function enqueueResourceVerify(_args: string[], options: CommandOptions): 
   output += `  ${c.green}Created:${c.reset} ${created}\n`;
   output += `  ${c.dim}Deduped:${c.reset} ${deduped}\n`;
   if (failed > 0) output += `  ${c.red}Failed:${c.reset} ${failed}\n`;
-  output += `\n${c.dim}Jobs will be processed by workers. Monitor: crux sys jobs list --type=resource-verify${c.reset}\n`;
+  output += `\n${c.dim}Jobs will be processed by workers. Monitor: crux sys jobs list --type=resource-ingest${c.reset}\n`;
 
   return { output, exitCode: failed > 0 ? 1 : 0 };
 }
@@ -759,6 +783,195 @@ async function types(_args: string[], options: CommandOptions): Promise<CommandR
   return { output, exitCode: 0 };
 }
 
+/**
+ * Bulk-enqueue resource-ingest jobs for stale resources (periodic re-ingestion).
+ *
+ * Queries resources where last_fetched_at is older than a content_lifecycle-based
+ * threshold. Immutable resources are always skipped. Resources without a
+ * content_lifecycle default to a 60-day threshold.
+ *
+ * Usage:
+ *   crux sys jobs enqueue-resource-reingest [--dry-run] [--limit=N]
+ */
+async function enqueueResourceReingest(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const dryRun = !!options.dryRun;
+  const maxEnqueue = parseIntOpt(options.limit, 0);
+
+  let output = '';
+  output += `${c.bold}${c.blue}Enqueue Resource Re-ingest Jobs (stale content)${c.reset}\n`;
+  if (dryRun) output += `${c.yellow}DRY RUN — no jobs will be created${c.reset}\n`;
+  output += '\n';
+
+  const STALENESS_THRESHOLDS: Record<string, number> = {
+    ephemeral: 7,
+    evergreen: 30,
+    versioned: 90,
+  };
+  const DEFAULT_STALENESS_DAYS = 60;
+
+  output += `${c.dim}Staleness thresholds:${c.reset}\n`;
+  for (const [lifecycle, days] of Object.entries(STALENESS_THRESHOLDS)) {
+    output += `  ${lifecycle}: ${days} days\n`;
+  }
+  output += `  immutable: skip (never re-ingest)\n`;
+  output += `  (unset): ${DEFAULT_STALENESS_DAYS} days\n`;
+  output += '\n';
+
+  const PAGE_SIZE = 200;
+  let pageOffset = 0;
+  let total = 0;
+  const now = Date.now();
+  const stale: Array<{ id: string; url: string; lifecycle: string | null; lastFetchedAt: string }> = [];
+  let immutableSkipped = 0;
+  let neverFetched = 0;
+
+  output += `${c.dim}Scanning resources...${c.reset}\n`;
+
+  while (true) {
+    const result = await apiRequest<{
+      resources: Array<{
+        id: string;
+        url: string;
+        lastFetchedAt: string | null;
+        contentLifecycle: string | null;
+        contentHash: string | null;
+      }>;
+      total: number;
+      limit: number;
+      offset: number;
+    }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${pageOffset}`);
+
+    if (!result.ok) return handleApiError(result, c);
+
+    total = result.data.total;
+    for (const r of result.data.resources) {
+      if (!r.url) continue;
+
+      if (!r.lastFetchedAt) {
+        neverFetched++;
+        continue;
+      }
+
+      if (r.contentLifecycle === 'immutable') {
+        immutableSkipped++;
+        continue;
+      }
+
+      const thresholdDays = r.contentLifecycle && r.contentLifecycle in STALENESS_THRESHOLDS
+        ? STALENESS_THRESHOLDS[r.contentLifecycle]
+        : DEFAULT_STALENESS_DAYS;
+
+      const ageMs = now - new Date(r.lastFetchedAt).getTime();
+      const ageDays = ageMs / (24 * 60 * 60 * 1000);
+
+      if (ageDays >= thresholdDays) {
+        stale.push({ id: r.id, url: r.url, lifecycle: r.contentLifecycle, lastFetchedAt: r.lastFetchedAt });
+      }
+    }
+
+    pageOffset += PAGE_SIZE;
+    if (pageOffset >= total) break;
+  }
+
+  output += `  Total resources: ${c.bold}${total}${c.reset}\n`;
+  output += `  Stale: ${c.bold}${stale.length}${c.reset}\n`;
+  output += `  Immutable (skipped): ${c.dim}${immutableSkipped}${c.reset}\n`;
+  output += `  Never fetched (use enqueue-resource-ingest): ${c.dim}${neverFetched}${c.reset}\n`;
+
+  if (stale.length === 0) {
+    output += `\n${c.green}\u2713${c.reset} No stale resources found.\n`;
+    return { output, exitCode: 0 };
+  }
+
+  const toEnqueue = maxEnqueue > 0 ? stale.slice(0, maxEnqueue) : stale;
+  if (maxEnqueue > 0 && maxEnqueue < stale.length) {
+    output += `  Enqueueing: ${c.bold}${toEnqueue.length}${c.reset} (limited by --limit)\n`;
+  }
+
+  if (dryRun) {
+    output += `\n${c.dim}Would create ${toEnqueue.length} resource-ingest jobs.${c.reset}\n`;
+    const byLifecycle: Record<string, number> = {};
+    for (const r of toEnqueue) {
+      const key = r.lifecycle ?? '(unset)';
+      byLifecycle[key] = (byLifecycle[key] ?? 0) + 1;
+    }
+    output += `${c.dim}By lifecycle:${c.reset}\n`;
+    for (const [lifecycle, cnt] of Object.entries(byLifecycle)) {
+      output += `  ${lifecycle}: ${cnt}\n`;
+    }
+    output += `\n${c.dim}First 10:${c.reset}\n`;
+    for (const r of toEnqueue.slice(0, 10)) {
+      output += `  ${r.id}: ${r.url.slice(0, 70)} (${r.lifecycle ?? 'unset'}, last: ${r.lastFetchedAt.slice(0, 10)})\n`;
+    }
+    return { output, exitCode: 0 };
+  }
+
+  let created = 0;
+  let deduped = 0;
+  let failed = 0;
+  let rateLimitPauses = 0;
+
+  output += `\n${c.dim}Creating jobs...${c.reset}\n`;
+
+  for (let i = 0; i < toEnqueue.length; i++) {
+    const r = toEnqueue[i];
+    let rateLimitRetries = 0;
+    const MAX_RATE_LIMIT_RETRIES = 10;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const result = await createJob({
+        type: 'resource-ingest',
+        params: { resourceId: r.id, url: r.url, previousContentHash: undefined },
+        priority: 2,
+        maxRetries: 3,
+        dedupKey: `reingest:${r.id}`,
+      });
+
+      if (!result.ok && result.message.includes('429')) {
+        if (rateLimitRetries >= MAX_RATE_LIMIT_RETRIES) {
+          failed++;
+          break;
+        }
+        const retryMatch = result.message.match(/retryAfter[":]+\s*(\d+)/i);
+        const waitSec = retryMatch ? parseInt(retryMatch[1], 10) : 30;
+        rateLimitPauses++;
+        rateLimitRetries++;
+        process.stderr.write(`  ${c.yellow}Rate limited, waiting ${waitSec}s...${c.reset}\n`);
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+        continue;
+      }
+
+      if (!result.ok) {
+        failed++;
+        if (failed <= 3) process.stderr.write(`  ${c.red}Error: ${result.message}${c.reset}\n`);
+      } else {
+        const job = result.data as JobEntry & { dedupExisting?: boolean };
+        if (job.dedupExisting) deduped++;
+        else created++;
+      }
+      break;
+    }
+
+    const processed = i + 1;
+    if (processed % 100 === 0 || processed === toEnqueue.length) {
+      process.stderr.write(`  [${processed}/${toEnqueue.length}] created=${created} deduped=${deduped} failed=${failed}\n`);
+    }
+  }
+
+  if (rateLimitPauses > 0) output += `  ${c.yellow}Rate limit pauses:${c.reset} ${rateLimitPauses}\n`;
+
+  output += `\n${c.bold}Results:${c.reset}\n`;
+  output += `  ${c.green}Created:${c.reset} ${created}\n`;
+  output += `  ${c.dim}Deduped:${c.reset} ${deduped}\n`;
+  if (failed > 0) output += `  ${c.red}Failed:${c.reset} ${failed}\n`;
+  output += `\n${c.dim}Jobs will be processed by workers. Monitor: crux sys jobs list --type=resource-ingest${c.reset}\n`;
+
+  return { output, exitCode: failed > 0 ? 1 : 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -776,7 +989,8 @@ export const commands = {
   batch,
   worker,
   types,
-  'enqueue-resource-verify': enqueueResourceVerify,
+  'enqueue-resource-ingest': enqueueResourceIngest,
+  'enqueue-resource-reingest': enqueueResourceReingest,
 };
 
 export function getHelp(): string {
@@ -795,7 +1009,8 @@ Commands:
   batch           Create a batch of content jobs with auto batch-commit
   worker          Run the job worker locally
   types           List registered job handler types
-  enqueue-resource-verify  Bulk-enqueue resource-verify jobs for unfetched resources
+  enqueue-resource-ingest    Bulk-enqueue resource-ingest jobs for unfetched resources
+  enqueue-resource-reingest  Enqueue re-ingest jobs for stale resources (by content_lifecycle)
 
 Options:
   --status=X      Filter by status (pending, claimed, running, completed, failed, cancelled)
@@ -842,13 +1057,27 @@ Examples:
   crux sys jobs types                               List registered job types
   crux sys jobs stats                               Show job statistics
 
-Enqueue Resource-Verify Options:
+Enqueue Resource-Ingest Options:
   --dry-run       Show what would be enqueued without creating jobs
   --limit=N       Max resources to enqueue (default: all)
 
 Examples:
-  crux sys jobs enqueue-resource-verify --dry-run    Preview unfetched resources
-  crux sys jobs enqueue-resource-verify              Enqueue all unfetched
-  crux sys jobs enqueue-resource-verify --limit=500  Enqueue first 500
+  crux sys jobs enqueue-resource-ingest --dry-run    Preview unfetched resources
+  crux sys jobs enqueue-resource-ingest              Enqueue all unfetched
+  crux sys jobs enqueue-resource-ingest --limit=500  Enqueue first 500
+
+Enqueue Resource Re-ingest Options:
+  --dry-run       Show what would be re-ingested without creating jobs
+  --limit=N       Max resources to re-ingest (default: all)
+
+  Staleness thresholds (by content_lifecycle):
+    ephemeral: 7 days    evergreen: 30 days
+    versioned: 90 days   immutable: skip
+    (unset):   60 days
+
+Examples:
+  crux sys jobs enqueue-resource-reingest --dry-run  Preview stale resources
+  crux sys jobs enqueue-resource-reingest            Enqueue all stale
+  crux sys jobs enqueue-resource-reingest --limit=100  Enqueue first 100 stale
 `;
 }

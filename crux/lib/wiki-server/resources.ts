@@ -102,6 +102,25 @@ export async function updateResourceFetchStatus(
 }
 
 // ---------------------------------------------------------------------------
+// Duplicate detection (content hash lookup)
+// ---------------------------------------------------------------------------
+
+export type ContentHashMatch = { id: string; url: string; title: string | null };
+
+/**
+ * Find resources with the same content hash, excluding a given resource ID.
+ * Used during ingestion to flag potential duplicates.
+ */
+export async function findResourcesByContentHash(
+  contentHash: string,
+  excludeId?: string,
+): Promise<ApiResult<{ resources: ContentHashMatch[] }>> {
+  let url = `/api/resources/by-content-hash?hash=${encodeURIComponent(contentHash)}`;
+  if (excludeId) url += `&excludeId=${encodeURIComponent(excludeId)}`;
+  return apiRequest('GET', url);
+}
+
+// ---------------------------------------------------------------------------
 // Suggest resources (claims-first verification pipeline)
 // ---------------------------------------------------------------------------
 

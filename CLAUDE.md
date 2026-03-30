@@ -61,6 +61,8 @@ pnpm crux gh deploy-tasks inject --pr=N      # Inject deploy checklist into PR
 pnpm crux sys audits list                    # Show audit items, highlight overdue
 pnpm crux sys audits check <id> --pass       # Record a check result
 pnpm crux sys agent-checklist init --issue=N # Init session checklist
+pnpm crux sys agent-reset                   # Show stale processes (MCP, dev servers)
+pnpm crux sys agent-reset --kill             # Kill stale processes
 
 # Cross-cutting (top-level)
 pnpm crux query search "topic"               # Full-text search

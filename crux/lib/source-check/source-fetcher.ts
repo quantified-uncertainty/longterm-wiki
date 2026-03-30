@@ -3,7 +3,7 @@
  *
  * Shared by factbase-source-check and source-check-orchestrate. This is a
  * **read-only** layer: it reads from the citation_content cache populated by
- * the resource-verify worker. It does NOT fetch URLs directly.
+ * the resource-ingest worker. It does NOT fetch URLs directly.
  *
  * If the cache misses, it returns errorType: 'not_cached' — signaling that the
  * resource pipeline should process this URL first (Discussion #3499).
@@ -20,6 +20,8 @@ import {
   isUnverifiableDomain,
 } from '../search/paywall-detection.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
+import { createJob } from '../wiki-server/jobs.ts';
+import { lookupResourceByUrl } from '../wiki-server/resources.ts';
 import type { FetchSourceResult } from './types.ts';
 import { SOURCE_CHECK_CONSTANTS } from './types.ts';
 
@@ -97,7 +99,7 @@ function extractMainContent(html: string): string | null {
  *
  * Reads from the citation_content cache only — does NOT fetch URLs.
  * If the cache misses, returns errorType: 'not_cached' to signal that the
- * resource-verify pipeline should process this URL first.
+ * resource-ingest pipeline should process this URL first.
  *
  * @param url - The source URL to look up
  * @param _userAgent - Deprecated, ignored (kept for API compat)
@@ -127,7 +129,7 @@ export async function fetchSourceContent(
     return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
-  // Read from wiki-server citation_content cache (populated by resource-verify worker)
+  // Read from wiki-server citation_content cache (populated by resource-ingest worker)
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
@@ -144,6 +146,34 @@ export async function fetchSourceContent(
     console.warn(`${logPrefix} Cache lookup failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // No cached content — signal that the resource pipeline needs to process this URL
-  return { content: null, errorType: 'not_cached', errorMessage: 'Source content not in cache — run resource-verify first' };
+  // No cached content — auto-enqueue a resource-ingest job so the content
+  // gets fetched for next time (self-healing pipeline, Discussion #3499 Issue H).
+  // Fire-and-forget: don't block the caller or fail the source-check.
+  let ingestEnqueued = false;
+  try {
+    const resource = await lookupResourceByUrl(url);
+    if (resource.ok && resource.data) {
+      const resourceId = (resource.data as { id: string }).id;
+      await createJob({
+        type: 'resource-ingest',
+        params: { resourceId, url },
+        priority: 1, // Slightly elevated — source-check is actively waiting for this
+        dedupKey: `ingest:${resourceId}`,
+      });
+      ingestEnqueued = true;
+      console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
+    }
+  } catch (e: unknown) {
+    // Best-effort — don't fail source-check if enqueue fails
+    console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  return {
+    content: null,
+    errorType: 'not_cached',
+    errorMessage: ingestEnqueued
+      ? 'Source content not in cache — resource-ingest job enqueued'
+      : 'Source content not in cache — run resource-ingest first',
+    ingestEnqueued,
+  };
 }
