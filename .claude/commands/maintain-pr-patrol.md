@@ -64,10 +64,26 @@ Priority queue (N items):
 
 ## Phase 3: Fix (one PR at a time)
 
-Work through the queue starting with the highest-priority PR:
+Work through the queue starting with the highest-priority PR.
+
+**IMPORTANT: Never `git checkout` PR branches in the current directory.** This causes branch confusion in multi-session slots. Use one of these isolation strategies:
+
+**Option A (preferred): Spawn a subagent with worktree isolation.**
+For each PR fix, use the Agent tool with `isolation: "worktree"`. The subagent gets an isolated copy of the repo and can safely checkout the PR branch without affecting the parent session.
+
+**Option B: Use git worktrees manually.**
+```bash
+git worktree add /tmp/pr-fix-<N> <branch>
+# ... make fixes in /tmp/pr-fix-<N> ...
+cd /tmp/pr-fix-<N> && git push
+git worktree remove /tmp/pr-fix-<N>
+```
+
+**Option C: For metadata-only fixes (PR body edits, labels), use `gh` CLI.**
+These don't require checking out the branch at all.
 
 ### Merge conflicts
-1. Check out the PR branch: `git checkout <branch>`
+1. Spawn a subagent (worktree-isolated) or create a worktree for the PR branch
 2. Rebase on main: `git rebase origin/main`
 3. Resolve conflicts — prefer the PR's changes where intent is clear
 4. For generated files (database.json, lock files), regenerate: `pnpm build-data:content`
@@ -76,27 +92,26 @@ Work through the queue starting with the highest-priority PR:
 ### CI failures
 1. Check what failed: `gh pr checks <N>`
 2. Read CI logs to understand the failure
-3. Fix the issue locally, verify with `pnpm build` / `pnpm test`
-4. Commit and push
+3. Spawn a subagent (worktree-isolated) to fix the issue, verify with `pnpm build` / `pnpm test`
+4. Subagent commits and pushes
 
 ### Bot review comments (CodeRabbit etc.)
 1. Bot comment details are included directly in the fix prompt (fetched via GraphQL `reviewThreads`)
-2. For Major/Minor/Critical issues: verify the concern is valid, then fix
+2. For Major/Minor/Critical issues: verify the concern is valid, then fix (in a worktree-isolated subagent)
 3. For Nitpick issues: fix only if trivial and clearly correct
 4. Look for "Prompt for AI Agents" sections — they contain ready-made fix instructions
-5. Commit and push
 
 ### Missing test plan
 1. Read the PR diff to understand what changed
-2. Add a `## Test plan` section to the PR body via `gh pr edit`
+2. Add a `## Test plan` section to the PR body via `gh pr edit` (no checkout needed)
 
 ### Missing issue reference
 1. Search for related issues: `gh issue list --search "keywords"`
-2. If a match exists, add `Closes #N` to the PR body
+2. If a match exists, add `Closes #N` to the PR body (no checkout needed)
 3. If no match, skip — not all PRs need an issue
 
 ### Stale PRs
-1. Rebase on main to pick up latest changes
+1. Rebase on main in a worktree to pick up latest changes
 2. Push to re-trigger CI
 
 ## Phase 4: Report

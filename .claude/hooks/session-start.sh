@@ -18,6 +18,22 @@ cd "$REPO_ROOT"
 CONTEXT_LINES=()
 WARNINGS=()
 
+# ─── 0pre. Concurrent session detection ──────────────────────────────────────────
+# Check if another Claude session is already running in this slot.
+# Uses a PID lock file — if the PID is still alive, warn about concurrent access.
+
+LOCK_FILE="$REPO_ROOT/.claude/session.pid"
+if [ -f "$LOCK_FILE" ]; then
+  OLD_PID=$(cat "$LOCK_FILE" 2>/dev/null | tr -d '[:space:]')
+  if [ -n "$OLD_PID" ] && kill -0 "$OLD_PID" 2>/dev/null; then
+    WARNINGS+=("CONCURRENT SESSION DETECTED: Another Claude session (PID ${OLD_PID}) is already running in this slot!")
+    WARNINGS+=("Running two sessions in the same directory causes git conflicts and file corruption.")
+    WARNINGS+=("Either stop the other session or use a different slot.")
+  fi
+fi
+# Write current parent PID (the Claude process that invoked this hook)
+echo "$$" > "$LOCK_FILE"
+
 # ─── 0. Clear stale checklist from previous session ─────────────────────────────
 # This hook only fires on fresh "startup" (not resume), so removing the checklist
 # forces the new session to run `crux sys agent-checklist init` before editing code.
@@ -27,6 +43,39 @@ if [ -f ".claude/wip-checklist.md" ]; then
   rm -f ".claude/wip-checklist.md"
   CONTEXT_LINES+=("⚠ Cleared stale checklist from previous session. Run \`pnpm crux sys agent-checklist init\` before editing code.")
 fi
+
+# ─── 0a. Stale stash detection ──────────────────────────────────────────────────
+# Stale stashes cause branch confusion when a later session does `git stash pop`
+# and restores state from a completely different branch/task. (#3200 incident)
+
+STASH_COUNT=$(git stash list 2>/dev/null | wc -l | tr -d ' ')
+if [ "$STASH_COUNT" -gt 0 ]; then
+  STASH_BRANCHES=$(git stash list --format='%gs' 2>/dev/null | head -5)
+  WARNINGS+=("Found ${STASH_COUNT} stale stash(es) from previous sessions. These cause branch confusion.")
+  WARNINGS+=("Stashes: ${STASH_BRANCHES}")
+  WARNINGS+=("Run \`git stash drop\` to clean each one, or \`git stash clear\` to drop all.")
+fi
+
+# ─── 0b. Branch lock file ───────────────────────────────────────────────────────
+# Write .claude/active-branch at session start. If a previous session left one
+# and it doesn't match the current branch, something switched the branch between
+# sessions without proper cleanup.
+# NOTE: Uses CURRENT_BRANCH (read early) since BRANCH is set later in section 2.
+
+CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo "detached")
+
+PREV_ACTIVE_BRANCH=""
+if [ -f ".claude/active-branch" ]; then
+  PREV_ACTIVE_BRANCH=$(cat ".claude/active-branch" 2>/dev/null | tr -d '[:space:]')
+fi
+
+if [ -n "$PREV_ACTIVE_BRANCH" ] && [ "$PREV_ACTIVE_BRANCH" != "$CURRENT_BRANCH" ]; then
+  WARNINGS+=("Branch mismatch! Previous session was on \`${PREV_ACTIVE_BRANCH}\`, now on \`${CURRENT_BRANCH}\`.")
+  WARNINGS+=("A subagent or another session may have switched branches. Verify you're on the right branch before proceeding.")
+fi
+
+# Write current branch as the active branch lock
+echo "$CURRENT_BRANCH" > ".claude/active-branch"
 
 # ─── 1. Verify environment (fast checks only) ──────────────────────────────────
 

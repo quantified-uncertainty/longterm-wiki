@@ -25,6 +25,19 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/warn-main-branch.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-git-stash.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-branch-switch.sh\""
+          }
+        ]
       }
     ],
     "PostToolUse": [

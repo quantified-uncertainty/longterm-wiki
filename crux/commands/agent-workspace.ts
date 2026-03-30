@@ -444,10 +444,50 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
 
   const updated: string[] = [];
   const skipped: string[] = [];
+  const cleaned: string[] = [];
 
   for (const { dir, slot } of slots) {
     const branch = git(dir, 'branch', '--show-current');
+
+    // Clean stale stashes from ALL slots (stashes cause branch confusion)
+    const stashList = git(dir, 'stash', 'list');
+    if (stashList) {
+      const stashCount = stashList.split('\n').filter(Boolean).length;
+      try {
+        execSync('git stash clear', { cwd: dir, encoding: 'utf-8', timeout: 10000 });
+        cleaned.push(`  a${slot}: cleared ${stashCount} stale stash(es)`);
+      } catch {
+        cleaned.push(`  a${slot}: failed to clear ${stashCount} stash(es)`);
+      }
+    }
+
+    // Clean stale active-branch lock file from idle slots on main
+    const activeBranchFile = join(dir, '.claude', 'active-branch');
+    if (branch === 'main' && existsSync(activeBranchFile)) {
+      try {
+        const { unlinkSync } = await import('fs');
+        unlinkSync(activeBranchFile);
+      } catch { /* ignore */ }
+    }
+
     if (branch !== 'main') {
+      // Check if the slot is clean and on a merged branch — safe to reclaim
+      const porcelain = git(dir, 'status', '--porcelain');
+      if (!porcelain) {
+        const mergedBranches = git(dir, 'branch', '--merged', 'origin/main');
+        if (mergedBranches.split('\n').some((b) => b.trim() === branch)) {
+          try {
+            execSync('git checkout main', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+            execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
+            execSync(`git branch -d ${branch}`, { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+            updated.push(`  a${slot}: returned to main (${branch} was merged)`);
+            continue;
+          } catch {
+            skipped.push(`  a${slot}: on merged branch ${branch} but checkout failed`);
+            continue;
+          }
+        }
+      }
       skipped.push(`  a${slot}: on branch ${branch}`);
       continue;
     }
@@ -458,9 +498,24 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
       continue;
     }
 
+    // Prune stale local branches that have been merged
+    try {
+      const mergedBranches = git(dir, 'branch', '--merged', 'origin/main');
+      const staleBranches = mergedBranches
+        .split('\n')
+        .map((b) => b.trim())
+        .filter((b) => b && b !== 'main' && !b.startsWith('*'));
+      for (const staleBranch of staleBranches) {
+        try {
+          execSync(`git branch -d ${staleBranch}`, { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+          cleaned.push(`  a${slot}: pruned merged branch ${staleBranch}`);
+        } catch { /* branch delete failed — skip */ }
+      }
+    } catch { /* branch listing failed — skip */ }
+
     try {
       execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
-      updated.push(`  ✓ a${slot}: pulled latest main`);
+      updated.push(`  a${slot}: pulled latest main`);
     } catch (e) {
       skipped.push(`  a${slot}: git pull failed (${e instanceof Error ? e.message.split('\n')[0] : 'unknown error'})`);
     }
@@ -470,10 +525,13 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
   if (updated.length > 0) {
     output += `Updated ${updated.length} slot(s):\n${updated.join('\n')}\n`;
   }
+  if (cleaned.length > 0) {
+    output += `Cleaned:\n${cleaned.join('\n')}\n`;
+  }
   if (skipped.length > 0) {
     output += `Skipped ${skipped.length} slot(s):\n${skipped.join('\n')}\n`;
   }
-  if (updated.length === 0 && skipped.length === 0) {
+  if (updated.length === 0 && skipped.length === 0 && cleaned.length === 0) {
     output = 'No slots to refresh.';
   }
 

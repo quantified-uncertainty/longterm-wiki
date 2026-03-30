@@ -139,7 +139,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 
 ## Key Conventions
 
-- **Branch discipline**: After any `git checkout`, verify the branch with `git branch --show-current` before continuing work. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
+- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. To work on another branch, use the Agent tool with `isolation: "worktree"`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
 - **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
 - **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
