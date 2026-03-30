@@ -4,7 +4,13 @@ import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-or
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { personnel, entities, things } from "../../schema.js";
+import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.js";
+import {
+  verdictJoinCondition,
+  verdictSelectFields,
+  formatVerification,
+  type VerdictJoinFields,
+} from "../shared/verification-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -88,16 +94,17 @@ function cleanPersonId(pid: string): string | null {
 const personEntity = alias(entities, "person_entity");
 const orgEntity = alias(entities, "org_entity");
 
-/** Selection shape for personnel + joined entity titles + slugs. */
+/** Selection shape for personnel + joined entity titles + slugs + verdicts. */
 const joinedSelect = {
   personnel: personnel,
   personTitle: personEntity.title,
   personSlug: personEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
+  ...verdictSelectFields,
 };
 
-interface JoinedRow {
+interface JoinedRow extends VerdictJoinFields {
   personnel: typeof personnel.$inferSelect;
   personTitle: string | null;
   personSlug: string | null;
@@ -137,6 +144,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
+    verification: formatVerification(r),
   };
 }
 
@@ -181,6 +189,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -215,6 +224,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -246,6 +256,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -275,6 +286,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(
         or(
           isNull(personnel.personEntityId),

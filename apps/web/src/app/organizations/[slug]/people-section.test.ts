@@ -76,6 +76,7 @@ describe("pgPersonnelToEntries", () => {
       start: "2020-01-01",
       end: undefined,
       roleType: "key-person",
+      verificationVerdict: null,
     });
   });
 
@@ -199,6 +200,30 @@ describe("pgPersonnelToEntries", () => {
     const result = pgPersonnelToEntries([row]);
     expect(result.entries).toHaveLength(0);
     expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("passes through verification verdict from PG row", () => {
+    const row = makeRow({
+      person: { entityId: "e1", slug: "alice", name: "Alice" },
+      verification: {
+        verdict: "confirmed",
+        confidence: 0.92,
+        sourcesChecked: 3,
+        checkedAt: "2026-03-01T00:00:00Z",
+      },
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].verificationVerdict).toBe("confirmed");
+  });
+
+  it("sets verificationVerdict to null when no verification data", () => {
+    const row = makeRow({
+      person: { entityId: "e1", slug: "bob", name: "Bob" },
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].verificationVerdict).toBeNull();
   });
 
   it("accepts real names that happen to be short", () => {
