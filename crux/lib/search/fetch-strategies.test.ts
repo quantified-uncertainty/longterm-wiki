@@ -18,12 +18,27 @@ import {
 } from './fetch-strategies.ts';
 
 // Mock the forum API module
-vi.mock('../forum-api.ts', () => ({
-  forumGraphql: vi.fn(),
+vi.mock('../forum-api.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../forum-api.ts')>();
+  return {
+    ...actual,
+    forumGraphql: vi.fn(),
+  };
+});
+
+// Mock the shared wayback module
+vi.mock('../wayback.ts', () => ({
+  fetchWaybackPageContent: vi.fn(),
+  lookupWaybackSnapshot: vi.fn(),
+  extractTitleFromHtml: vi.fn(),
+  htmlToPlainText: vi.fn(),
 }));
 
 import { forumGraphql } from '../forum-api.ts';
 const mockForumGraphql = vi.mocked(forumGraphql);
+
+import { fetchWaybackPageContent } from '../wayback.ts';
+const mockFetchWaybackPageContent = vi.mocked(fetchWaybackPageContent);
 
 // ---------------------------------------------------------------------------
 // Domain Classification Tests
@@ -295,33 +310,13 @@ describe('fetchWaybackContent', () => {
     vi.resetAllMocks();
   });
 
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it('fetches content from Wayback Machine', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    // Mock Wayback availability API
-    fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({
-        archived_snapshots: {
-          closest: {
-            url: 'https://web.archive.org/web/20230101/https://www.fhi.ox.ac.uk/report',
-            timestamp: '20230101120000',
-            available: true,
-          },
-        },
-      }), { status: 200 }),
-    );
-
-    // Mock archive content fetch
-    fetchSpy.mockResolvedValueOnce(
-      new Response(
-        '<html><head><title>FHI Report</title></head><body><p>This is an important report about existential risk from the Future of Humanity Institute. It covers various topics related to AI safety and global catastrophic risks.</p></body></html>',
-        { status: 200, headers: { 'content-type': 'text/html' } },
-      ),
-    );
+  it('wraps fetchWaybackPageContent result into StrategyResult', async () => {
+    mockFetchWaybackPageContent.mockResolvedValueOnce({
+      title: 'FHI Report',
+      content: 'This is an important report about existential risk.',
+      contentType: 'text/html',
+      archiveUrl: 'https://web.archive.org/web/20230101/https://www.fhi.ox.ac.uk/report',
+    });
 
     const result = await fetchWaybackContent('https://www.fhi.ox.ac.uk/report');
 
@@ -330,44 +325,13 @@ describe('fetchWaybackContent', () => {
     expect(result!.content).toContain('existential risk');
     expect(result!.fetchMethod).toBe('wayback');
     expect(result!.archiveUrl).toContain('web.archive.org');
+    expect(result!.httpStatus).toBe(200);
   });
 
-  it('returns null when no snapshot is available', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    // Availability API: no snapshot
-    fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({ archived_snapshots: {} }), { status: 200 }),
-    );
-
-    // Direct URL: 404
-    fetchSpy.mockResolvedValueOnce(
-      new Response('Not Found', { status: 404 }),
-    );
+  it('returns null when fetchWaybackPageContent returns null', async () => {
+    mockFetchWaybackPageContent.mockResolvedValueOnce(null);
 
     const result = await fetchWaybackContent('https://nonexistent-site.example.com/page');
-    expect(result).toBeNull();
-  });
-
-  it('returns null when archived content is too short', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch');
-
-    fetchSpy.mockResolvedValueOnce(
-      new Response(JSON.stringify({
-        archived_snapshots: {
-          closest: { url: 'https://web.archive.org/web/2023/test', timestamp: '20230101', available: true },
-        },
-      }), { status: 200 }),
-    );
-
-    fetchSpy.mockResolvedValueOnce(
-      new Response('<html><body>Too short</body></html>', {
-        status: 200,
-        headers: { 'content-type': 'text/html' },
-      }),
-    );
-
-    const result = await fetchWaybackContent('https://example.com/short');
     expect(result).toBeNull();
   });
 });

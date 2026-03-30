@@ -35,7 +35,13 @@ export const LESSWRONG: Forum = {
   baseUrl: 'https://www.lesswrong.com',
 };
 
-export const ALL_FORUMS: Forum[] = [EA_FORUM, LESSWRONG];
+export const ALIGNMENT_FORUM: Forum = {
+  name: 'Alignment Forum',
+  graphqlUrl: 'https://www.alignmentforum.org/graphql',
+  baseUrl: 'https://www.alignmentforum.org',
+};
+
+export const ALL_FORUMS: Forum[] = [EA_FORUM, LESSWRONG, ALIGNMENT_FORUM];
 
 /** Execute a GraphQL query against a forum API. Throws on HTTP or GraphQL errors. */
 export async function forumGraphql(
