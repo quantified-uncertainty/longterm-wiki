@@ -784,24 +784,52 @@ const resourcesApp = new Hono()
     const totalCitations = citationCountResult[0].count;
     const citedPages = Number(citedPagesResult[0].count);
 
-    // Extra stats: orphaned, metadata coverage, fetched count
+    // Extra stats: orphaned, metadata coverage, fetched count, enrichment status, content cache
     // Use raw postgres client for type-parameterized queries (avoids double-cast from db.execute())
-    const [orphanedResult, withMetadataResult, fetchedResult] = await Promise.all(
-      [
-        rawDb<CountRow[]>`
+    const [
+      orphanedResult,
+      withMetadataResult,
+      fetchedResult,
+      enrichmentStatusResult,
+      contentCacheResult,
+    ] = await Promise.all([
+      rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources r
         LEFT JOIN resource_citations rc ON rc.resource_id = r.id
         WHERE rc.resource_id IS NULL
       `,
-        rawDb<CountRow[]>`
+      rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources
         WHERE summary IS NOT NULL OR review IS NOT NULL OR key_points IS NOT NULL
       `,
-        rawDb<CountRow[]>`
+      rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources WHERE fetched_at IS NOT NULL
       `,
-      ]
-    );
+      rawDb<{ status: string | null; c: string }[]>`
+        SELECT enrichment_status AS status, count(*) AS c
+        FROM resources
+        GROUP BY enrichment_status
+      `,
+      rawDb<{ with_full_text: string; with_metadata_only: string }[]>`
+        SELECT
+          (SELECT count(*) FROM citation_content WHERE full_text IS NOT NULL) AS with_full_text,
+          (SELECT count(*) FROM citation_content WHERE full_text IS NULL AND page_title IS NOT NULL) AS with_metadata_only
+      `,
+    ]);
+
+    const byEnrichmentStatus: Record<string, number> = {};
+    for (const row of enrichmentStatusResult) {
+      byEnrichmentStatus[row.status ?? "none"] = Number(row.c);
+    }
+
+    const ccRow = contentCacheResult[0];
+    const withFullText = Number(ccRow?.with_full_text ?? 0);
+    const withMetadataOnly = Number(ccRow?.with_metadata_only ?? 0);
+    const contentCacheStats = {
+      withFullText,
+      withMetadataOnly,
+      uncached: Math.max(0, totalResources - withFullText - withMetadataOnly),
+    };
 
     const result: ResourceStatsResult = {
       totalResources,
@@ -813,6 +841,8 @@ const resourcesApp = new Hono()
       orphanedCount: Number(orphanedResult[0]?.c ?? 0),
       withMetadata: Number(withMetadataResult[0]?.c ?? 0),
       fetched: Number(fetchedResult[0]?.c ?? 0),
+      byEnrichmentStatus,
+      contentCacheStats,
     };
 
     return c.json(result);
