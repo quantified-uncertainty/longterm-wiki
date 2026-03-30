@@ -24,19 +24,12 @@ import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
-import {
-  detectPaywall,
-  isUnverifiableDomain,
-  classifyFetchError,
-} from '../lib/search/paywall-detection.ts';
+import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
 import type { VerificationVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const MAX_CONTENT_LENGTH = 8000;
 const PROMPT_CONTENT_LENGTH = 4000;
-const FETCH_TIMEOUT_MS = 15_000;
 const DEFAULT_BUDGET = 5;
 const DEFAULT_LIMIT = 50;
 
@@ -68,67 +61,17 @@ interface VerificationError {
 
 // ── Source fetching ──────────────────────────────────────────────────
 
+/**
+ * Thin wrapper around the shared cache-only fetchSourceContent.
+ * Adapts the FetchSourceResult type to the { text } | { error, errorType } union
+ * expected by the verify-entity pipeline.
+ */
 async function fetchSourceContent(url: string): Promise<{ text: string } | { error: string; errorType: string }> {
-  // Check for unverifiable domains
-  if (isUnverifiableDomain(url)) {
-    return { error: 'Unverifiable domain (social media, paywalled)', errorType: 'unverifiable_domain' };
+  const result = await fetchCachedContent(url, undefined, '[verify]');
+  if (result.content) {
+    return { text: result.content };
   }
-
-  // Try wiki-server citation content cache first
-  try {
-    const cached = await getCitationContentByUrl(url);
-    if (cached.ok && cached.data?.fullText && cached.data.fullText.length > 50) {
-      return { text: cached.data.fullText.slice(0, MAX_CONTENT_LENGTH) };
-    }
-  } catch (e) {
-    // Cache miss or wiki-server unavailable — fall through to direct fetch
-    console.warn(`[verify] Citation cache miss for ${url}: ${e instanceof Error ? e.message : String(e)}`);
-  }
-
-  // Direct fetch
-  try {
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'LongtermWiki-Verification/1.0' },
-      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      redirect: 'follow',
-    });
-
-    if (!res.ok) {
-      const errorType = classifyFetchError(res.status, null, null, url);
-      return { error: `HTTP ${res.status}`, errorType: errorType ?? 'http_error' };
-    }
-
-    const contentType = res.headers.get('content-type') ?? '';
-    if (!contentType.includes('text/html') && !contentType.includes('text/plain') && !contentType.includes('application/json')) {
-      return { error: `Unsupported content type: ${contentType}`, errorType: 'unsupported_content' };
-    }
-
-    const text = await res.text();
-
-    // Paywall detection
-    if (detectPaywall(text)) {
-      return { error: 'Content appears paywalled', errorType: 'paywall' };
-    }
-
-    // Strip HTML tags for a rough text extraction
-    const plainText = text
-      .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    if (plainText.length < 50) {
-      return { error: 'Source content too short to verify against', errorType: 'empty_content' };
-    }
-
-    return { text: plainText.slice(0, MAX_CONTENT_LENGTH) };
-  } catch (e) {
-    if (e instanceof Error && e.name === 'TimeoutError') {
-      return { error: 'Fetch timeout', errorType: 'timeout' };
-    }
-    return { error: e instanceof Error ? e.message : String(e), errorType: 'fetch_error' };
-  }
+  return { error: result.errorMessage ?? 'Source content not available', errorType: result.errorType ?? 'fetch_error' };
 }
 
 // ── Claim discovery ─────────────────────────────────────────────────
