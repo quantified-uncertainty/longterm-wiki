@@ -1,0 +1,18 @@
+{
+  "table": "personnel",
+  "recordCount": 6,
+  "submittedAt": "2026-03-30T11:33:03.169Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 6,
+    "verdicts": {"verified": 0, "contradicted": 0, "unverifiable": 0, "other": 0}
+  },
+  "records": [
+    {"id": "1lAzv7nW1b", "personId": "zTf5Sxo6xO", "organizationId": "sid_H74rOLotqg", "role": "Co-Founder & CEO", "source": "https://www.goodfire.ai/about", "verdict": "none"},
+    {"id": "bfiBQ9xtwn", "personId": "vgGIUBLpjI", "organizationId": "sid_H74rOLotqg", "role": "Co-Founder & CTO", "source": "https://www.goodfire.ai/about", "verdict": "none"},
+    {"id": "ywGaPT2yJx", "personId": "vXiQpP3ZIa", "organizationId": "sid_H74rOLotqg", "role": "Co-Founder & Chief Scientist", "source": "https://www.goodfire.ai/about", "verdict": "none"},
+    {"id": "dOC7GjZWQH", "personId": "KG3DGzEblY", "organizationId": "sid_H74rOLotqg", "role": "COO", "source": "https://www.goodfire.ai/about", "verdict": "none"},
+    {"id": "Fp3EDK86JO", "personId": "lnEDY7xGJH", "organizationId": "sid_H74rOLotqg", "role": "Research Scientist", "source": "https://www.goodfire.ai/about", "verdict": "none"},
+    {"id": "Rj3KY6ccnx", "personId": "nsUvTMM7sV", "organizationId": "sid_H74rOLotqg", "role": "Research Scientist", "source": "https://www.goodfire.ai/about", "verdict": "none"}
+  ]
+}
