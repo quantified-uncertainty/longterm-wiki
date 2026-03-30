@@ -53,7 +53,6 @@ export interface WikiPageVerifyItem {
 /** Constants shared across source-check modules */
 export const SOURCE_CHECK_CONSTANTS = {
   MAX_CONTENT_LENGTH: 8000,
-  FETCH_TIMEOUT_MS: 15_000,
   /** Estimated cost per LLM source-check call in USD */
   ESTIMATED_COST_PER_VERIFICATION: 0.01,
 } as const;
