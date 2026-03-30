@@ -15,7 +15,6 @@ import {
 import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
-import type { SourceCheckVerdict } from "@/components/verification/verdict-config";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -254,11 +253,9 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
-                      {person.verificationVerdict && (
-                        <RecordVerificationDot
-                          verdict={person.verificationVerdict as SourceCheckVerdict}
-                        />
-                      )}
+                      <RecordVerificationDot
+                        verdict={person.verificationVerdict}
+                      />
                       {href ? (
                         <Link
                           href={href}

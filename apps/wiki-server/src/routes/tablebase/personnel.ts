@@ -6,6 +6,12 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.js";
 import {
+  verdictJoinCondition,
+  verdictSelectFields,
+  formatVerification,
+  type VerdictJoinFields,
+} from "../shared/verification-join.js";
+import {
   parseJsonBody,
   validationError,
   invalidJsonError,
@@ -95,22 +101,15 @@ const joinedSelect = {
   personSlug: personEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
-  verificationVerdict: sourceCheckVerdicts.verdict,
-  verificationConfidence: sourceCheckVerdicts.confidence,
-  verificationSourcesChecked: sourceCheckVerdicts.sourcesChecked,
-  verificationCheckedAt: sourceCheckVerdicts.lastComputedAt,
+  ...verdictSelectFields,
 };
 
-interface JoinedRow {
+interface JoinedRow extends VerdictJoinFields {
   personnel: typeof personnel.$inferSelect;
   personTitle: string | null;
   personSlug: string | null;
   orgTitle: string | null;
   orgSlug: string | null;
-  verificationVerdict: string | null;
-  verificationConfidence: number | null;
-  verificationSourcesChecked: number | null;
-  verificationCheckedAt: Date | null;
 }
 
 function formatRow(r: JoinedRow) {
@@ -145,14 +144,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
-    verification: r.verificationVerdict
-      ? {
-          verdict: r.verificationVerdict,
-          confidence: r.verificationConfidence,
-          sourcesChecked: r.verificationSourcesChecked ?? 0,
-          checkedAt: r.verificationCheckedAt?.toISOString() ?? null,
-        }
-      : null,
+    verification: formatVerification(r),
   };
 }
 
@@ -197,14 +189,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "personnel"),
-          eq(sourceCheckVerdicts.recordId, personnel.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -239,14 +224,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "personnel"),
-          eq(sourceCheckVerdicts.recordId, personnel.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -278,14 +256,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "personnel"),
-          eq(sourceCheckVerdicts.recordId, personnel.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -315,14 +286,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "personnel"),
-          eq(sourceCheckVerdicts.recordId, personnel.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(
         or(
           isNull(personnel.personEntityId),

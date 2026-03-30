@@ -202,6 +202,42 @@ describe("pgPersonnelToEntries", () => {
     expect(result.unresolvedCount).toBe(1);
   });
 
+  it("rejects legacy hyphenated IDs like '8-JZq4lrlD'", () => {
+    const row = makeRow({
+      personId: "cEOljcVT3g",
+      person: { entityId: null, slug: null, name: null },
+      personResolvedName: "8-JZq4lrlD", // legacy bug ID with hyphen
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries).toHaveLength(0);
+    expect(result.unresolvedCount).toBe(1);
+  });
+
+  it("passes through verification verdict from PG row", () => {
+    const row = makeRow({
+      person: { entityId: "e1", slug: "alice", name: "Alice" },
+      verification: {
+        verdict: "confirmed",
+        confidence: 0.92,
+        sourcesChecked: 3,
+        checkedAt: "2026-03-01T00:00:00Z",
+      },
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].verificationVerdict).toBe("confirmed");
+  });
+
+  it("sets verificationVerdict to null when no verification data", () => {
+    const row = makeRow({
+      person: { entityId: "e1", slug: "bob", name: "Bob" },
+    });
+
+    const result = pgPersonnelToEntries([row]);
+    expect(result.entries[0].verificationVerdict).toBeNull();
+  });
+
   it("accepts real names that happen to be short", () => {
     const row = makeRow({
       personId: "li-wei",

@@ -7,6 +7,12 @@ import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
 import {
+  verdictJoinCondition,
+  verdictSelectFields,
+  formatVerification,
+  type VerdictJoinFields,
+} from "../shared/verification-join.js";
+import {
   parseJsonBody,
   validationError,
   invalidJsonError,
@@ -108,22 +114,15 @@ const joinedSelect = {
   granteeSlug: granteeEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
-  verificationVerdict: sourceCheckVerdicts.verdict,
-  verificationConfidence: sourceCheckVerdicts.confidence,
-  verificationSourcesChecked: sourceCheckVerdicts.sourcesChecked,
-  verificationCheckedAt: sourceCheckVerdicts.lastComputedAt,
+  ...verdictSelectFields,
 };
 
-interface JoinedRow {
+interface JoinedRow extends VerdictJoinFields {
   grants: typeof grants.$inferSelect;
   granteeTitle: string | null;
   granteeSlug: string | null;
   orgTitle: string | null;
   orgSlug: string | null;
-  verificationVerdict: string | null;
-  verificationConfidence: number | null;
-  verificationSourcesChecked: number | null;
-  verificationCheckedAt: Date | null;
 }
 
 function formatRow(r: JoinedRow) {
@@ -158,14 +157,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
-    verification: r.verificationVerdict
-      ? {
-          verdict: r.verificationVerdict,
-          confidence: r.verificationConfidence,
-          sourcesChecked: r.verificationSourcesChecked ?? 0,
-          checkedAt: r.verificationCheckedAt?.toISOString() ?? null,
-        }
-      : null,
+    verification: formatVerification(r),
   };
 }
 
@@ -222,14 +214,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "grant"),
-          eq(sourceCheckVerdicts.recordId, grants.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
       .orderBy(desc(grants.syncedAt), grants.id)
       .limit(limit)
       .offset(offset);
@@ -309,14 +294,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
-      .leftJoin(
-        sourceCheckVerdicts,
-        and(
-          eq(sourceCheckVerdicts.recordType, "grant"),
-          eq(sourceCheckVerdicts.recordId, grants.id),
-          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
-        ),
-      )
+      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
       .where(where)
       .orderBy(orderClause, grants.id)
       .limit(limit)

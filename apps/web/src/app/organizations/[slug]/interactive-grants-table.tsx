@@ -5,7 +5,6 @@ import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
 import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
-import type { SourceCheckVerdict } from "@/components/verification/verdict-config";
 
 // ── Serializable grant row (no JSX, no functions — pure JSON) ───────
 
@@ -755,7 +754,7 @@ function CellContent({
     case "verified":
       return (
         <RecordVerificationDot
-          verdict={grant.verificationVerdict as SourceCheckVerdict | null}
+          verdict={grant.verificationVerdict}
           size="md"
         />
       );

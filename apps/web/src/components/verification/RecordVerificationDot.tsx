@@ -15,7 +15,8 @@ import {
 } from "./verdict-config";
 
 interface RecordVerificationDotProps {
-  verdict: SourceCheckVerdict | null;
+  /** Verdict string from the API. Unknown values (including "unchecked") render nothing. */
+  verdict: string | null | undefined;
   /** Show the label text next to the dot (default: false) */
   showLabel?: boolean;
   /** Dot size: sm = 1.5px (inline), md = 2px (table cell) */
@@ -31,8 +32,9 @@ export function RecordVerificationDot({
 }: RecordVerificationDotProps) {
   if (!verdict) return null;
 
-  const config = SOURCE_CHECK_VERDICT_CONFIG[verdict];
-  if (!config) return null;
+  const config =
+    SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict];
+  if (!config) return null; // Unknown verdict (e.g., "unchecked") — render nothing
 
   const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
 
