@@ -23,7 +23,7 @@ import {
   apiRequest,
   type ApiResult,
 } from "../lib/wiki-server/client.ts";
-import { STABLE_ID_PATTERN } from '../../packages/id-utils/src/index.ts';
+import { isSid } from '../../packages/id-utils/src/index.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -378,7 +378,7 @@ export async function validateTable(
 
       // If it looks like a stableId pattern but didn't resolve, it's dangling
       // If it looks like a display name, it's a softer issue but still unresolved
-      const isStableIdLike = STABLE_ID_PATTERN.test(strValue);
+      const isStableIdLike = isSid(strValue);
       const isDisplayNameVal = isDisplayName(strValue);
 
       // Count as unresolved if:
@@ -556,13 +556,13 @@ export async function runValidation(opts: {
     // Print unresolved details
     const allUnresolved = allStats.flatMap((s) => s.unresolvedList);
     const danglingFks = allUnresolved.filter(
-      (u) => STABLE_ID_PATTERN.test(u.value)
+      (u) => isSid(u.value)
     );
     const displayNames = allUnresolved.filter(
-      (u) => isDisplayName(u.value) && !STABLE_ID_PATTERN.test(u.value)
+      (u) => isDisplayName(u.value) && !isSid(u.value)
     );
     const slugLike = allUnresolved.filter(
-      (u) => !STABLE_ID_PATTERN.test(u.value) && !isDisplayName(u.value)
+      (u) => !isSid(u.value) && !isDisplayName(u.value)
     );
 
     if (danglingFks.length > 0) {

@@ -100,45 +100,9 @@ describe("pgPersonnelToEntries", () => {
     expect(result.entries[0].name).toBe("Fallback Id");
   });
 
-  it("excludes bare stableId personId and counts as unresolved", () => {
+  it("excludes sid_-prefixed stableId personId and counts as unresolved", () => {
     const row = makeRow({
-      personId: "AbCdEfG12H",
-      person: { entityId: null, slug: null, name: null },
-      personResolvedName: null,
-    });
-
-    const result = pgPersonnelToEntries([row]);
-    expect(result.entries).toHaveLength(0);
-    expect(result.unresolvedCount).toBe(1);
-  });
-
-  it("excludes contaminated stableId personId (with hyphens) and counts as unresolved", () => {
-    const row = makeRow({
-      personId: "D-BpcrbThn",
-      person: { entityId: null, slug: null, name: null },
-      personResolvedName: null,
-    });
-
-    const result = pgPersonnelToEntries([row]);
-    expect(result.entries).toHaveLength(0);
-    expect(result.unresolvedCount).toBe(1);
-  });
-
-  it("excludes contaminated stableId personId (with underscores) and counts as unresolved", () => {
-    const row = makeRow({
-      personId: "Tw_Eo226h3",
-      person: { entityId: null, slug: null, name: null },
-      personResolvedName: null,
-    });
-
-    const result = pgPersonnelToEntries([row]);
-    expect(result.entries).toHaveLength(0);
-    expect(result.unresolvedCount).toBe(1);
-  });
-
-  it("excludes numeric PK personId and counts as unresolved", () => {
-    const row = makeRow({
-      personId: "12345",
+      personId: "sid_AbCdEfG12H",
       person: { entityId: null, slug: null, name: null },
       personResolvedName: null,
     });
@@ -201,24 +165,23 @@ describe("pgPersonnelToEntries", () => {
   it("correctly partitions mixed named and unnamed records", () => {
     const rows = [
       makeRow({ personId: "alice", person: { entityId: "e1", slug: "alice", name: "Alice" } }),
-      makeRow({ personId: "AbCdEfG12H", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+      makeRow({ personId: "sid_AbCdEfG12H", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
       makeRow({ personId: "bob-jones", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
-      makeRow({ personId: "XyZaBcDe99", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
-      makeRow({ personId: "D-BpcrbThn", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
+      makeRow({ personId: "sid_XyZaBcDe99", person: { entityId: null, slug: null, name: null }, personResolvedName: null }),
     ];
 
     const result = pgPersonnelToEntries(rows);
     expect(result.entries).toHaveLength(2); // Alice + Bob Jones (humanized)
-    expect(result.unresolvedCount).toBe(3); // 2 clean stableIds + 1 contaminated
+    expect(result.unresolvedCount).toBe(2); // 2 stableIds
     expect(result.entries[0].name).toBe("Alice");
     expect(result.entries[1].name).toBe("Bob Jones");
   });
 
   it("rejects stableId in personResolvedName and counts as unresolved", () => {
     const row = makeRow({
-      personId: "AbCdEfG12H",
+      personId: "sid_AbCdEfG12H",
       person: { entityId: null, slug: null, name: null },
-      personResolvedName: "AbCdEfG12H", // stableId leaked into display name
+      personResolvedName: "sid_AbCdEfG12H", // stableId leaked into display name
     });
 
     const result = pgPersonnelToEntries([row]);
@@ -228,21 +191,9 @@ describe("pgPersonnelToEntries", () => {
 
   it("rejects stableId in person.name and counts as unresolved", () => {
     const row = makeRow({
-      personId: "XyZ1234abc",
-      person: { entityId: null, slug: null, name: "XyZ1234abc" }, // stableId as name
+      personId: "sid_XyZ1234abc",
+      person: { entityId: null, slug: null, name: "sid_XyZ1234abc" }, // stableId as name
       personResolvedName: null,
-    });
-
-    const result = pgPersonnelToEntries([row]);
-    expect(result.entries).toHaveLength(0);
-    expect(result.unresolvedCount).toBe(1);
-  });
-
-  it("rejects legacy hyphenated IDs like '8-JZq4lrlD'", () => {
-    const row = makeRow({
-      personId: "cEOljcVT3g",
-      person: { entityId: null, slug: null, name: null },
-      personResolvedName: "8-JZq4lrlD", // legacy bug ID with hyphen
     });
 
     const result = pgPersonnelToEntries([row]);
