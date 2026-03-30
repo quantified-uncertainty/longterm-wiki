@@ -28,7 +28,8 @@ vi.mock('../../source-check/source-fetcher.ts', () => ({
     host === '127.0.0.1' ||
     host === '::1' ||
     host.startsWith('10.') ||
-    host.startsWith('192.168.'),
+    host.startsWith('192.168.') ||
+    /^172\.(1[6-9]|2\d|3[01])\./.test(host),
 }));
 
 // ---------------------------------------------------------------------------
@@ -186,6 +187,15 @@ describe('handleResourceVerify — URL security', () => {
   it('blocks private network 192.168.x (SSRF protection)', async () => {
     const result = await handleResourceVerify(
       { resourceId: 'res-1', url: 'https://192.168.1.1/router' },
+      CTX,
+    );
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('blocked');
+  });
+
+  it('blocks private network 172.16-31.x (SSRF protection)', async () => {
+    const result = await handleResourceVerify(
+      { resourceId: 'res-1', url: 'https://172.20.10.5/internal' },
       CTX,
     );
     expect(result.success).toBe(true);
