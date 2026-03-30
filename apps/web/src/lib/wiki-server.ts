@@ -181,6 +181,7 @@ import type { PredictionMarketsRoute } from "@wiki-server/prediction-markets-rou
 import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-prices-route";
 import type { DataQualityRoute } from "@wiki-server/data-quality-route";
 import type { TalentFlowsRoute } from "@wiki-server/talent-flows-route";
+import type { JobsRoute } from "@wiki-server/jobs-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -414,4 +415,19 @@ export type RpcTalentFlowEdge = RpcTalentFlowsResult['flows'][number];
 
 /** A single org net-flow row */
 export type RpcOrgNetFlow = RpcTalentFlowsResult['orgNetFlows'][number];
+
+// ============================================================================
+// Hono RPC client — Jobs API
+// ============================================================================
+
+type JobsClient = ReturnType<typeof hc<JobsRoute>>;
+
+/** Inferred response type for GET /api/jobs/stats */
+export type RpcJobsStatsResult = InferResponseType<JobsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/jobs/ (list) */
+export type RpcJobsListResult = InferResponseType<JobsClient['index']['$get'], 200>;
+
+/** A single job entry from the list endpoint */
+export type RpcJobEntry = RpcJobsListResult['entries'][number];
 

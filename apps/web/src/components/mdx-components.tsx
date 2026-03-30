@@ -90,6 +90,7 @@ import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profi
 import { EntitySourceChecksContent } from "@/app/internal/entity-source-checks/entity-source-checks-content";
 import { DataQualityContent } from "@/app/internal/data-quality/data-quality-content";
 import { TalentFlowsContent } from "@/app/internal/talent-flows/talent-flows-content";
+import { JobsDashboardContent } from "@/app/internal/jobs/jobs-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -260,6 +261,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   EntitySourceChecksContent,
   DataQualityContent,
   TalentFlowsContent,
+  JobsDashboardContent,
 
   // Table view components
   SafetyApproachesTableView,
