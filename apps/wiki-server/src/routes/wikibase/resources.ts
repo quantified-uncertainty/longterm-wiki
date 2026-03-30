@@ -963,8 +963,8 @@ const resourcesApp = new Hono()
       `,
       rawDb<{ with_full_text: string; with_metadata_only: string }[]>`
         SELECT
-          (SELECT count(*) FROM citation_content WHERE full_text IS NOT NULL) AS with_full_text,
-          (SELECT count(*) FROM citation_content WHERE full_text IS NULL AND page_title IS NOT NULL) AS with_metadata_only
+          (SELECT count(*) FROM citation_content WHERE resource_id IS NOT NULL AND full_text IS NOT NULL) AS with_full_text,
+          (SELECT count(*) FROM citation_content WHERE resource_id IS NOT NULL AND full_text IS NULL AND page_title IS NOT NULL) AS with_metadata_only
       `,
     ]);
 
