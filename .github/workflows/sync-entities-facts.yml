@@ -39,8 +39,50 @@ jobs:
     uses: ./.github/workflows/_preflight-wiki-server.yml
     secrets: inherit
 
-  sync:
+  # On production pushes, wait for the wiki-server deploy to complete before
+  # syncing. The deploy may include schema migrations that the sync depends on.
+  # Without this, the sync can race the migration and write data that conflicts
+  # with the migration's transforms (incident 2026-03-29, issue #3418).
+  wait-for-deploy:
+    if: github.ref == 'refs/heads/production'
     needs: [preflight]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for wiki-server deploy
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Waiting for wiki-server deploy workflow to complete..."
+          # Find the wiki-server deploy run for this same commit
+          for i in $(seq 1 40); do
+            RUN_STATUS=$(gh run list \
+              --workflow=wiki-server-docker.yml \
+              --commit "${{ github.sha }}" \
+              --json status,conclusion \
+              --jq '.[0].status // "not_found"' \
+              -R "${{ github.repository }}" 2>/dev/null || echo "not_found")
+
+            if [ "$RUN_STATUS" = "completed" ]; then
+              CONCLUSION=$(gh run list \
+                --workflow=wiki-server-docker.yml \
+                --commit "${{ github.sha }}" \
+                --json conclusion \
+                --jq '.[0].conclusion' \
+                -R "${{ github.repository }}")
+              echo "Wiki-server deploy completed: $CONCLUSION"
+              break
+            elif [ "$RUN_STATUS" = "not_found" ]; then
+              echo "No wiki-server deploy found for this commit (paths may not have changed)"
+              break
+            fi
+
+            echo "Attempt $i/40: deploy status=$RUN_STATUS, waiting 15s..."
+            sleep 15
+          done
+
+  sync:
+    needs: [preflight, wait-for-deploy]
+    if: ${{ !cancelled() && (needs.wait-for-deploy.result == 'success' || needs.wait-for-deploy.result == 'skipped') }}
     runs-on: ubuntu-latest
 
     steps:
