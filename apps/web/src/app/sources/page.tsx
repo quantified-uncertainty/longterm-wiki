@@ -66,6 +66,15 @@ export default function SourcesPage() {
     };
   });
 
+  // Resource type breakdown
+  const typeCounts = new Map<string, number>();
+  for (const r of resourceRows) {
+    typeCounts.set(r.type, (typeCounts.get(r.type) || 0) + 1);
+  }
+  const topTypes = [...typeCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4);
+
   // Compute summary stats
   const peerReviewed = publications.filter((p) => p.peer_reviewed).length;
   const withSummary = resources.filter((r) => r.summary).length;
@@ -73,13 +82,19 @@ export default function SourcesPage() {
     const pages = getPagesForResource(r.id);
     return pages.length > 0;
   }).length;
+  const enriched = resources.filter((r) => r.enrichment_status === "enriched").length;
 
   const stats = [
     { label: "Resources", value: String(resources.length) },
     { label: "Publications", value: String(publications.length) },
-    { label: "Peer-Reviewed Venues", value: String(peerReviewed) },
+    ...topTypes.map(([type, count]) => ({
+      label: type.charAt(0).toUpperCase() + type.slice(1) + "s",
+      value: String(count),
+    })),
+    { label: "Peer-Reviewed", value: String(peerReviewed) },
     { label: "With Summaries", value: String(withSummary) },
     { label: "Cited by Pages", value: String(citedResources) },
+    { label: "Enriched", value: String(enriched) },
   ];
 
   return (
@@ -96,7 +111,7 @@ export default function SourcesPage() {
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
         {stats.map((stat) => (
           <ProfileStatCard
             key={stat.label}

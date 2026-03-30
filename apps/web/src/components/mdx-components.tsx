@@ -136,7 +136,7 @@ const stubNames = [
   "KnowledgeTreemap",
   "OutcomesTable", "PageIndex", "PixelDensityMap",
   "PriorityMatrix", "QualityDashboard", "ResearchFrontier", "ResourceCite",
-  "ResourcesIndex", "RiskDashboard", "RiskTrajectoryExperiments",
+  "RiskDashboard", "RiskTrajectoryExperiments",
   "RootFactorsTable", "ScenariosTable", "SparseKnowledgeGrid",
   "Table", "TableBody", "TableCell", "TableHead", "TableHeader",
   "TableRow", "TagBrowser", "TimelineViz", "TopicQuestionGrid",

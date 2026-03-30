@@ -145,7 +145,7 @@ export default async function ResourcePage({ params }: PageProps) {
     <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Back link */}
       <Link
-        href="/resources"
+        href="/sources"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
