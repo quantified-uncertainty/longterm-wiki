@@ -14,6 +14,7 @@
  *   --max-jobs=<n>        Max jobs to process before exiting (default: Infinity in poll mode, 1 otherwise)
  *   --poll                Keep polling for jobs (instead of exit after max-jobs)
  *   --poll-interval=<ms>  Base polling interval in ms (default: 30000)
+ *   --concurrency=<n>     Max concurrent jobs per worker (default: 1)
  *   --verbose             Verbose output
  *   --worker-id=<id>      Custom worker ID (default: auto-generated)
  *   --smoke-test          Run a ping job round-trip and exit
@@ -47,6 +48,7 @@ interface WorkerConfig {
   maxJobs: number;
   poll: boolean;
   pollIntervalMs: number;
+  concurrency: number;
   verbose: boolean;
   projectRoot: string;
   smokeTest: boolean;
@@ -83,6 +85,7 @@ function parseConfig(): WorkerConfig {
     maxJobs: parseInt(opts['max-jobs'] as string || (poll ? '0' : '1'), 10) || Infinity,
     poll,
     pollIntervalMs: parseInt(opts['poll-interval'] as string || '30000', 10),
+    concurrency: Math.max(1, parseInt(opts['concurrency'] as string || '1', 10) || 1),
     verbose: opts['verbose'] === true,
     projectRoot: join(import.meta.dirname ?? process.cwd(), '..'),
     smokeTest: opts['smoke-test'] === true,
@@ -94,17 +97,18 @@ function parseConfig(): WorkerConfig {
 // ---------------------------------------------------------------------------
 
 let shuttingDown = false;
-let currentJobId: number | null = null;
+const activeJobIds = new Set<number>();
+const jobStartTimes = new Map<number, number>(); // jobId -> start timestamp
 
 for (const sig of ['SIGTERM', 'SIGINT'] as const) {
   process.on(sig, () => {
-    console.log(`[worker] Received ${sig}, finishing current job and shutting down...`);
+    console.log(`[worker] Received ${sig}, finishing ${activeJobIds.size} in-flight job(s) and shutting down...`);
     shuttingDown = true;
-    // If idle (no job in flight), exit immediately
-    if (!currentJobId) {
+    // If idle (no jobs in flight), exit immediately
+    if (activeJobIds.size === 0) {
       cleanup().then(() => process.exit(0));
     }
-    // Otherwise, the main loop will exit after the current job completes
+    // Otherwise, the main loop will exit after in-flight jobs complete
   });
 }
 
@@ -113,7 +117,6 @@ for (const sig of ['SIGTERM', 'SIGINT'] as const) {
 // ---------------------------------------------------------------------------
 
 let lastJobCompletedAt = Date.now();
-let jobsInFlight = 0;
 let totalProcessed = 0;
 let totalFailed = 0;
 const startedAt = Date.now();
@@ -125,7 +128,12 @@ function startHealthServer(): void {
   healthServer = createServer((req, res) => {
     if (req.url === '/healthz' || req.url === '/health') {
       const stuckThresholdMs = 20 * 60 * 1000; // 20 minutes
-      const isStuck = jobsInFlight > 0 && (Date.now() - lastJobCompletedAt) > stuckThresholdMs;
+      const now = Date.now();
+      // Check if ANY individual job has been running too long (not just time since last completion)
+      let isStuck = false;
+      for (const [, startTime] of jobStartTimes) {
+        if (now - startTime > stuckThresholdMs) { isStuck = true; break; }
+      }
       const status = shuttingDown ? 'shutting_down' : isStuck ? 'stuck' : 'ok';
       const statusCode = (status === 'ok') ? 200 : 503;
 
@@ -133,7 +141,7 @@ function startHealthServer(): void {
       res.end(JSON.stringify({
         status,
         shuttingDown,
-        jobsInFlight,
+        jobsInFlight: activeJobIds.size,
         totalProcessed,
         totalFailed,
         uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
@@ -205,9 +213,10 @@ async function sendHeartbeat(metadata: Record<string, unknown>): Promise<void> {
 
 function startHeartbeat(): void {
   heartbeatInterval = setInterval(() => {
+    const jobIds = [...activeJobIds];
     sendHeartbeat({
-      currentStep: currentJobId ? `Processing job #${currentJobId}` : 'Polling for jobs',
-      jobsInFlight,
+      currentStep: jobIds.length > 0 ? `Processing ${jobIds.length} job(s): #${jobIds.join(', #')}` : 'Polling for jobs',
+      jobsInFlight: jobIds.length,
       totalProcessed,
       totalFailed,
       uptimeSeconds: Math.floor((Date.now() - startedAt) / 1000),
@@ -417,13 +426,18 @@ async function runSmokeTest(workerId: string): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
-// Process one job
+// Claim a job from the queue (does NOT process it)
 // ---------------------------------------------------------------------------
 
-async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_job' | 'error'> {
-  const { workerId, types, verbose, projectRoot } = config;
+interface ClaimedJob {
+  id: number;
+  type: string;
+  params: Record<string, unknown>;
+}
 
-  // Claim a job
+async function claimOneJob(config: WorkerConfig): Promise<'no_job' | 'error' | ClaimedJob> {
+  const { workerId, types, verbose } = config;
+
   if (verbose) {
     const typeDesc = types.length > 0 ? types.join(', ') : 'any';
     console.log(`[worker] Claiming job (types: ${typeDesc})...`);
@@ -442,31 +456,36 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
     if (verbose) {
       console.log('[worker] No pending jobs available');
     }
-    consecutiveFailures = 0; // Server responded fine, just no jobs
+    consecutiveFailures = 0;
     return 'no_job';
   }
 
-  consecutiveFailures = 0; // Successful claim
+  consecutiveFailures = 0;
+  return {
+    id: claimed.id,
+    type: claimed.type,
+    params: (claimed.params ?? {}) as Record<string, unknown>,
+  };
+}
 
-  const jobId = claimed.id;
-  // C1: Set tracking state immediately after claim to prevent SIGTERM race condition.
-  // If SIGTERM arrives between claim and here, the job would be abandoned without this.
-  currentJobId = jobId;
-  jobsInFlight++;
+// ---------------------------------------------------------------------------
+// Execute a claimed job (handler + result reporting)
+// ---------------------------------------------------------------------------
 
-  const jobType = claimed.type;
-  const jobParams = (claimed.params ?? {}) as Record<string, unknown>;
+async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> {
+  const { workerId, verbose, projectRoot } = config;
+  const { id: jobId, type: jobType, params: jobParams } = job;
 
-  console.log(`[worker] Claimed job #${jobId} (type: ${jobType})`);
+  console.log(`[worker] Processing job #${jobId} (type: ${jobType})`);
 
   try {
-    // Mark as running -- if this fails (e.g. job was cancelled), fail the job back
+    // Mark as running
     const startResult = await startJob(jobId);
     if (!startResult.ok) {
       console.error(`[worker] Failed to start job #${jobId}: ${startResult.message}`);
       totalFailed++;
       await reportJobResult(jobId, false, null, `Failed to start: ${startResult.message}`);
-      return 'processed';
+      return;
     }
 
     // Look up the handler
@@ -477,22 +496,24 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
       console.error(`[worker] ${msg}`);
       totalFailed++;
       await reportJobResult(jobId, false, null, msg);
-      return 'processed';
+      return;
     }
 
-    // Execute the handler
+    // Execute the handler with timeout (clear timer to avoid leak with concurrency)
     const context: JobHandlerContext = { workerId, projectRoot, verbose };
+    let handlerTimer: ReturnType<typeof setTimeout>;
 
     try {
       const result = await Promise.race([
         handler(jobParams, context),
-        new Promise<never>((_, reject) =>
-          setTimeout(
+        new Promise<never>((_, reject) => {
+          handlerTimer = setTimeout(
             () => reject(new Error(`Handler timed out after ${HANDLER_TIMEOUT_MS / 1000}s`)),
             HANDLER_TIMEOUT_MS,
-          )
-        ),
+          );
+        }),
       ]);
+      clearTimeout(handlerTimer!);
 
       if (result.success) {
         console.log(`[worker] Job #${jobId} completed successfully`);
@@ -503,19 +524,18 @@ async function processOneJob(config: WorkerConfig): Promise<'processed' | 'no_jo
         await reportJobResult(jobId, false, result.data, result.error ?? 'Handler returned success: false');
       }
     } catch (err: unknown) {
+      clearTimeout(handlerTimer!);
       const error = err instanceof Error ? err.message : String(err);
       console.error(`[worker] Job #${jobId} threw exception: ${error}`);
       totalFailed++;
       await reportJobResult(jobId, false, null, error.slice(0, 500));
     }
   } finally {
-    currentJobId = null;
-    jobsInFlight--;
+    activeJobIds.delete(jobId);
+    jobStartTimes.delete(jobId);
     totalProcessed++;
     lastJobCompletedAt = Date.now();
   }
-
-  return 'processed';
 }
 
 // ---------------------------------------------------------------------------
@@ -529,6 +549,7 @@ async function runWorker(config: WorkerConfig): Promise<void> {
   console.log(`[worker] Max jobs: ${config.maxJobs === Infinity ? 'unlimited' : config.maxJobs}`);
   console.log(`[worker] Poll mode: ${config.poll}`);
   console.log(`[worker] Poll interval: ${config.pollIntervalMs}ms`);
+  console.log(`[worker] Concurrency: ${config.concurrency}`);
   console.log(`[worker] Memory limit: ${MAX_RSS_MB}MB`);
   console.log(`[worker] Known handler types: ${getRegisteredTypes().join(', ')}`);
 
@@ -546,53 +567,88 @@ async function runWorker(config: WorkerConfig): Promise<void> {
   await registerAgent(config.workerId, config.types);
   startHeartbeat();
 
-  let processed = 0;
+  let dispatched = 0; // Jobs claimed and dispatched (including in-flight)
+  const inFlightSlots = new Set<Promise<void>>();
 
   while (!shuttingDown) {
-    // Check if we've hit the max jobs limit
-    if (processed >= config.maxJobs) {
+    // Check if we've dispatched enough jobs — drain remaining and exit
+    if (dispatched >= config.maxJobs) {
       break;
     }
 
-    const outcome = await processOneJob(config);
+    // Wait for a slot to open if at concurrency limit
+    if (inFlightSlots.size >= config.concurrency) {
+      await Promise.race(inFlightSlots);
+      continue;
+    }
 
-    if (outcome === 'processed') {
-      processed++;
-      console.log(`[worker] Processed ${processed}${config.maxJobs === Infinity ? '' : `/${config.maxJobs}`} jobs`);
+    // Memory watchdog: stop claiming new jobs if memory is high
+    if (checkMemory()) {
+      console.log('[worker] Memory limit exceeded, draining in-flight jobs...');
+      break;
+    }
 
-      // Memory watchdog: exit gracefully if RSS is too high
-      if (checkMemory()) {
-        console.log('[worker] Memory limit exceeded, exiting for restart');
-        break;
-      }
+    // Try to claim a job
+    const outcome = await claimOneJob(config);
 
-      // In non-poll mode, check max jobs
-      if (!config.poll && processed >= config.maxJobs) {
-        break;
-      }
+    if (typeof outcome === 'object') {
+      // C1: Track job immediately before async dispatch to close SIGTERM race window.
+      // If SIGTERM arrives between claim and executeJob, the handler sees the job as in-flight.
+      activeJobIds.add(outcome.id);
+      jobStartTimes.set(outcome.id, Date.now());
+      dispatched++;
+      const slot = executeJob(outcome, config)
+        .catch((err: unknown) => {
+          // executeJob has its own try/finally, so this should never fire.
+          // Safety net to prevent unhandled rejection from crashing the process.
+          console.error(`[worker] Unexpected error in job #${outcome.id}: ${err instanceof Error ? err.message : String(err)}`);
+        })
+        .finally(() => {
+          inFlightSlots.delete(slot);
+          console.log(`[worker] Completed ${totalProcessed}${config.maxJobs === Infinity ? '' : `/${config.maxJobs}`} jobs (${inFlightSlots.size} in-flight)`);
+        });
+      inFlightSlots.add(slot);
 
-      // Small delay between jobs to avoid tight-looping on a burst of jobs
-      if (!shuttingDown) {
+      // Small delay between claims to avoid hammering the server
+      if (!shuttingDown && config.concurrency <= 1) {
         await new Promise(resolve => setTimeout(resolve, 1_000));
+      } else if (!shuttingDown) {
+        await new Promise(resolve => setTimeout(resolve, 100));
       }
     } else if (outcome === 'no_job') {
       if (!config.poll) {
-        // No job available and not polling -- exit
-        break;
+        if (inFlightSlots.size === 0) break;
+        await Promise.race(inFlightSlots);
+        continue;
       }
 
-      // Auto-sweep stale jobs during idle time
-      await maybeSweep(config.verbose);
+      // Auto-sweep stale jobs during idle time (only if fully idle)
+      if (inFlightSlots.size === 0) {
+        await maybeSweep(config.verbose);
+      }
 
       const interval = getEffectivePollInterval(config.pollIntervalMs);
       if (config.verbose) {
         console.log(`[worker] No jobs available, waiting ${interval}ms...`);
       }
-      await new Promise(resolve => setTimeout(resolve, interval));
+
+      // If we have in-flight jobs, race the poll interval against job completion
+      if (inFlightSlots.size > 0) {
+        let timer: ReturnType<typeof setTimeout>;
+        await Promise.race([
+          ...inFlightSlots,
+          new Promise<void>(resolve => { timer = setTimeout(resolve, interval); }),
+        ]);
+        clearTimeout(timer!);
+      } else {
+        await new Promise(resolve => setTimeout(resolve, interval));
+      }
     } else {
       // 'error' -- server issue
       if (!config.poll) {
-        break;
+        if (inFlightSlots.size === 0) break;
+        await Promise.race(inFlightSlots);
+        continue;
       }
 
       const interval = getEffectivePollInterval(config.pollIntervalMs);
@@ -603,10 +659,16 @@ async function runWorker(config: WorkerConfig): Promise<void> {
     }
   }
 
+  // Drain in-flight jobs before exiting
+  if (inFlightSlots.size > 0) {
+    console.log(`[worker] Draining ${inFlightSlots.size} in-flight job(s)...`);
+    await Promise.all(inFlightSlots);
+  }
+
   if (shuttingDown) {
-    console.log(`[worker] Shutdown requested, exiting after processing ${processed} jobs`);
+    console.log(`[worker] Shutdown requested, exiting after processing ${totalProcessed} jobs`);
   } else {
-    console.log(`[worker] Finished (processed ${processed} jobs)`);
+    console.log(`[worker] Finished (processed ${totalProcessed} jobs)`);
   }
 }
 
