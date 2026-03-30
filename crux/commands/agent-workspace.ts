@@ -418,6 +418,17 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
   const withClaude = args.includes('--claude');
   const windowName = `A${slot}`;
 
+  // Check if a window with this name already exists — reuse it instead of creating a duplicate
+  try {
+    const existing = execSync(`tmux list-windows -F '#{window_name}' 2>/dev/null`, { encoding: 'utf8' });
+    if (existing.split('\n').includes(windowName)) {
+      execSync(`tmux select-window -t "${windowName}"`, { stdio: 'inherit' });
+      return { exitCode: 0, output: `Switched to existing tmux window ${windowName}` };
+    }
+  } catch {
+    // tmux query failed — fall through to create a new window
+  }
+
   try {
     if (withClaude) {
       execSync(`tmux new-window -n "${windowName}" -c "${slotDir}" "claude"`, { stdio: 'inherit' });

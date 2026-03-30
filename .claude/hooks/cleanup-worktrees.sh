@@ -110,16 +110,30 @@ for i in "${!PATHS[@]}"; do
     continue
   fi
 
-  # Safety: skip worktrees with uncommitted changes
+  # Auto-generated worktree-agent-* branches are ephemeral subagent sessions.
+  # They never have PRs and should always be cleaned up, even with untracked files.
+  IS_AGENT_WORKTREE=false
+  if [[ "$WT_BRANCH" == worktree-agent-* ]] || [[ "$WT_PATH" == */.claude/worktrees/agent-* ]]; then
+    IS_AGENT_WORKTREE=true
+  fi
+
+  # Safety: skip worktrees with uncommitted changes (but not agent worktrees)
   if [ -n "$(git -C "$WT_PATH" status --porcelain 2>/dev/null | head -1)" ]; then
-    SKIPPED=$((SKIPPED + 1))
-    continue
+    if [ "$IS_AGENT_WORKTREE" = false ]; then
+      SKIPPED=$((SKIPPED + 1))
+      continue
+    fi
+    # Agent worktrees with untracked files are still cleaned — they're ephemeral
+    log "  Agent worktree has uncommitted changes, cleaning anyway: $WT_PATH"
   fi
 
   # Determine if the branch is stale
   SHOULD_REMOVE=false
 
-  if [ "$WT_BRANCH" = "__detached__" ]; then
+  # Agent worktrees are always stale once the session ends
+  if [ "$IS_AGENT_WORKTREE" = true ]; then
+    SHOULD_REMOVE=true
+  elif [ "$WT_BRANCH" = "__detached__" ]; then
     # Detached HEAD with clean working tree — safe to remove
     SHOULD_REMOVE=true
   elif [ -n "$WT_BRANCH" ]; then
