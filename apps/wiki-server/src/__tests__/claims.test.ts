@@ -235,16 +235,22 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const sourceUrls = params[8] as string[];
     const numRows = batchIds.length;
 
-    const rows: typeof claimStore = [];
+    const rows: Array<{ id: string; resource_id: string | null; source_url: string }> = [];
     for (let i = 0; i < numRows; i++) {
+      const numericId = nextClaimId++;
+      // postgres.js returns bigserial as string — simulate that here
       const row = {
-        id: nextClaimId++,
+        id: String(numericId),
+        resource_id: resourceIds[i] ?? null,
+        source_url: sourceUrls[i],
+      };
+      claimStore.push({
+        id: numericId,
         resource_id: resourceIds[i] ?? null,
         source_url: sourceUrls[i],
         batch_id: batchIds[i],
         verification_job_id: null,
-      };
-      claimStore.push(row);
+      });
       rows.push(row);
     }
     return rows;
@@ -254,12 +260,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("insert into") && q.includes("jobs")) {
     // Tagged template params: [JSON.stringify(jobParams), priority]
     const jobParamsJson = params[0] as string;
+    const numericId = nextJobId++;
     const row = {
-      id: nextJobId++,
+      // postgres.js returns bigserial as string — simulate that here
+      id: String(numericId),
       type: "claim-verification",
       params: typeof jobParamsJson === "string" ? JSON.parse(jobParamsJson) : jobParamsJson,
     };
-    jobStore.push(row);
+    jobStore.push({ id: numericId, type: row.type, params: row.params });
     return [row];
   }
 
@@ -412,6 +420,42 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(body.claims[0].verificationJobId).toBeDefined();
     expect(body.jobCount).toBe(1);
     expect(body.estimatedVerificationTime).toBe(SECONDS_PER_CLAIM_ESTIMATE);
+  });
+
+  it("stores numeric claimIds in job params (not strings from bigserial)", async () => {
+    const res = await postJson(app, "/api/claims/propose", {
+      targetTable: "facts",
+      claims: [
+        { claimText: "Claim 1", sourceUrl: "https://example.com/a" },
+        { claimText: "Claim 2", sourceUrl: "https://example.com/a" },
+      ],
+    });
+
+    expect(res.status).toBe(201);
+    expect(jobStore).toHaveLength(1);
+
+    const jobParams = jobStore[0].params as { claimIds: unknown[] };
+    // claimIds must be numbers, not strings — the claim-verification handler
+    // validates with z.number() and rejects string IDs.
+    for (const id of jobParams.claimIds) {
+      expect(typeof id).toBe("number");
+    }
+  });
+
+  it("returns numeric claim IDs and job IDs in response", async () => {
+    const res = await postJson(app, "/api/claims/propose", {
+      targetTable: "facts",
+      claims: [
+        { claimText: "Test claim", sourceUrl: "https://example.com" },
+      ],
+    });
+
+    expect(res.status).toBe(201);
+    const body = await res.json();
+
+    // Response IDs should be numbers, not strings
+    expect(typeof body.claims[0].id).toBe("number");
+    expect(typeof body.claims[0].verificationJobId).toBe("number");
   });
 
   it("rejects empty claims array", async () => {

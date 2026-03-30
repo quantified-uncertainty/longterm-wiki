@@ -12,7 +12,7 @@ alternative.
   ```
   node --import tsx/esm crux/worker/run.ts \
     --poll --poll-interval=5000 \
-    --types=claim-verification,citation-verify,ping \
+    --types=claim-verification,citation-verify,resource-verify,ping \
     --verbose
   ```
 - **Replicas**: 1 (scale to 2-3 when verification volume grows)
@@ -68,7 +68,7 @@ spec:
             - crux/worker/run.ts
             - --poll
             - --poll-interval=5000
-            - --types=claim-verification,citation-verify,ping
+            - --types=claim-verification,citation-verify,resource-verify,ping
             - --verbose
           ports:
             - name: health

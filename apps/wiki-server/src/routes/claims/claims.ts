@@ -182,7 +182,9 @@ const claimsApp = new Hono()
 
     await beginTransaction(async (tx) => {
       // 2. Insert all claims in a single batch
-      insertedClaims = await tx<InsertedClaimRow[]>`
+      // postgres.js returns bigserial id as string — coerce to number for
+      // downstream job params (claim-verification handler expects number[]).
+      const rawRows = await tx<InsertedClaimRow[]>`
         INSERT INTO proposed_claims (
           batch_id, claim_text, entity_id, target_table, target_field,
           proposed_value, proposed_data, resource_id, source_url,
@@ -204,6 +206,10 @@ const claimsApp = new Hono()
         )
         RETURNING id, resource_id, source_url
       `;
+      insertedClaims = rawRows.map((row) => ({
+        ...row,
+        id: Number(row.id),
+      }));
 
       if (insertedClaims.length !== claims.length) {
         logger.error(
@@ -235,7 +241,7 @@ const claimsApp = new Hono()
         `;
 
         if (jobRows.length > 0) {
-          jobEntries.push({ claimIds: chunk, resourceId, jobId: jobRows[0].id });
+          jobEntries.push({ claimIds: chunk, resourceId, jobId: Number(jobRows[0].id) });
         }
       }
 
