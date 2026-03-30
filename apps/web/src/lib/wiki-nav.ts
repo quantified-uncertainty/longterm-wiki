@@ -270,6 +270,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Source Checks", href: internalHref("entity-source-checks-dashboard") },
         { label: "Data Quality", href: internalHref("data-quality-dashboard") },
         { label: "Talent Flows", href: internalHref("talent-flows-dashboard") },
+        { label: "Jobs", href: internalHref("jobs-dashboard") },
       ],
     },
     {
