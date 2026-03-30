@@ -18,28 +18,29 @@ export const metadata: Metadata = {
     "Overview of external resources and publication venues tracked in the wiki — papers, articles, reports, and credibility ratings.",
 };
 
+const ENRICHMENT_STAGES: readonly {
+  key: string;
+  label: string;
+  color: string;
+}[] = [
+  { key: "none", label: "Not Started", color: "bg-zinc-300 dark:bg-zinc-700" },
+  { key: "pending", label: "Pending", color: "bg-amber-400 dark:bg-amber-600" },
+  { key: "fetched", label: "Fetched", color: "bg-sky-400 dark:bg-sky-600" },
+  { key: "classified", label: "Classified", color: "bg-violet-400 dark:bg-violet-600" },
+  { key: "enriched", label: "Enriched", color: "bg-emerald-500 dark:bg-emerald-600" },
+  { key: "reviewed", label: "Reviewed", color: "bg-emerald-700 dark:bg-emerald-400" },
+];
+
+const STAGE_LOOKUP = Object.fromEntries(
+  ENRICHMENT_STAGES.map((s) => [s.key, s])
+);
+
 function stageLabel(stage: string): string {
-  const labels: Record<string, string> = {
-    none: "Not Started",
-    pending: "Pending",
-    fetched: "Fetched",
-    classified: "Classified",
-    enriched: "Enriched",
-    reviewed: "Reviewed",
-  };
-  return labels[stage] ?? stage;
+  return STAGE_LOOKUP[stage]?.label ?? stage;
 }
 
 function enrichmentStageColor(stage: string): string {
-  const colors: Record<string, string> = {
-    none: "bg-zinc-300 dark:bg-zinc-700",
-    pending: "bg-amber-400 dark:bg-amber-600",
-    fetched: "bg-sky-400 dark:bg-sky-600",
-    classified: "bg-violet-400 dark:bg-violet-600",
-    enriched: "bg-emerald-500 dark:bg-emerald-600",
-    reviewed: "bg-emerald-700 dark:bg-emerald-400",
-  };
-  return colors[stage] ?? "bg-zinc-400";
+  return STAGE_LOOKUP[stage]?.color ?? "bg-zinc-400";
 }
 
 export default function SourcesPage() {
@@ -112,11 +113,18 @@ export default function SourcesPage() {
     const status = r.enrichment_status ?? "none";
     enrichmentCounts.set(status, (enrichmentCounts.get(status) || 0) + 1);
   }
-  // Ordered by pipeline stage
-  const enrichmentStages = ["none", "pending", "fetched", "classified", "enriched", "reviewed"];
-  const enrichmentStats = enrichmentStages
-    .filter((s) => enrichmentCounts.has(s))
-    .map((s) => ({ stage: s, count: enrichmentCounts.get(s)! }));
+  // Ordered by pipeline stage, with unknown stages collected as "other"
+  const knownKeys = new Set(ENRICHMENT_STAGES.map((s) => s.key));
+  const enrichmentStats = ENRICHMENT_STAGES
+    .filter((s) => enrichmentCounts.has(s.key))
+    .map((s) => ({ stage: s.key, count: enrichmentCounts.get(s.key)! }));
+  let otherCount = 0;
+  for (const [key, count] of enrichmentCounts) {
+    if (!knownKeys.has(key)) otherCount += count;
+  }
+  if (otherCount > 0) {
+    enrichmentStats.push({ stage: "other", count: otherCount });
+  }
 
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">

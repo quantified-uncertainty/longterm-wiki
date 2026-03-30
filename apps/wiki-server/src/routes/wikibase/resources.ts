@@ -810,11 +810,10 @@ const resourcesApp = new Hono()
         FROM resources
         GROUP BY enrichment_status
       `,
-      rawDb<{ with_full_text: string; with_metadata_only: string; total_resources: string }[]>`
+      rawDb<{ with_full_text: string; with_metadata_only: string }[]>`
         SELECT
           (SELECT count(*) FROM citation_content WHERE full_text IS NOT NULL) AS with_full_text,
-          (SELECT count(*) FROM citation_content WHERE full_text IS NULL AND page_title IS NOT NULL) AS with_metadata_only,
-          (SELECT count(*) FROM resources) AS total_resources
+          (SELECT count(*) FROM citation_content WHERE full_text IS NULL AND page_title IS NOT NULL) AS with_metadata_only
       `,
     ]);
 
@@ -829,7 +828,7 @@ const resourcesApp = new Hono()
     const contentCacheStats = {
       withFullText,
       withMetadataOnly,
-      uncached: totalResources - withFullText - withMetadataOnly,
+      uncached: Math.max(0, totalResources - withFullText - withMetadataOnly),
     };
 
     const result: ResourceStatsResult = {
