@@ -62,7 +62,7 @@ facts:
 
   - id: f_6hiba4OWK7
     property: program
-    value: "CyberAI Project — $5M Hewlett Foundation-funded program examining the intersection of AI, cybersecurity, and geopolitics"
+    value: "CyberAI Project — Hewlett Foundation-funded program examining the intersection of AI, cybersecurity, and geopolitics ($2M initial 2019, $3M renewal 2022, $5M total)"
     source: https://cset.georgetown.edu/article/cset-receives-2-million-grant-to-fund-new-cyberai-project/
 
   - id: f_RtJB5XxjsA

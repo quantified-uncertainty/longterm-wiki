@@ -232,7 +232,16 @@ ${item.sourceContext.slice(0, 500)}
 
 Does the source text confirm, contradict, or not address this claim?
 
-Consider:
+IMPORTANT — avoid these common false-positive errors:
+- **Approximate values**: Within 10% is "partial" or "confirmed", not "contradicted"
+- **URL format**: "example.com" and "https://www.example.com" are the same website — NOT a contradiction
+- **Date precision**: "2016-08" and "30 August 2016" are equivalent — NOT a contradiction
+- **Partial listings**: Listing one founder when there are multiple is "partial", not "contradicted"
+- **Opaque identifiers**: If a field has an opaque ID you can't resolve, that's "unverifiable" — never "contradicted"
+- **NaN/null values**: "$NaN" or null claimed values are data bugs — mark "unverifiable"
+- Reserve "contradicted" ONLY for direct, clear incompatibility where the source states a genuinely different value
+
+Other considerations:
 - Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
 - Dates may be approximate
 - If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
