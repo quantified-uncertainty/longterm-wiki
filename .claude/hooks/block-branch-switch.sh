@@ -32,6 +32,12 @@ fi
 
 COMMAND=$(echo "$INPUT" | jq -r '.tool_input.command // empty' 2>/dev/null)
 
+# Allow branch switching when AGENT_RESET=1 is set in the command
+# (used by /agent-reset to intentionally return to main)
+if echo "$COMMAND" | grep -qE 'AGENT_RESET=1'; then
+  exit 0
+fi
+
 # Strip heredocs and quoted strings to avoid false positives
 STRIPPED=$(echo "$COMMAND" | sed -E "s/<<'?[A-Za-z_]+'?//" | sed '/^EOF$/,$d' | sed -E 's/-m "[^"]*"//g' | sed -E "s/-m '[^']*'//g")
 

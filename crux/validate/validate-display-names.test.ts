@@ -30,30 +30,30 @@ function run(cmd: string): { stdout: string; exitCode: number } {
 }
 
 describe('looksLikeStableId', () => {
-  it('detects typical stableIds', () => {
-    expect(looksLikeStableId('mK9pX3rQ7n')).toBe(true);
-    expect(looksLikeStableId('A4XoubikkQ')).toBe(true); // has digits, mixed case
-    expect(looksLikeStableId('Z62bQynY4g')).toBe(true);
-    expect(looksLikeStableId('0u4J70VqFY')).toBe(true);
+  it('detects sid_-prefixed stableIds', () => {
+    expect(looksLikeStableId('sid_mK9pX3rQ7n')).toBe(true);
+    expect(looksLikeStableId('sid_A4XoubikkQ')).toBe(true);
+    expect(looksLikeStableId('sid_Z62bQynY4g')).toBe(true);
+    expect(looksLikeStableId('sid_0u4J70VqFY')).toBe(true);
   });
 
-  it('rejects real names that happen to be 10 chars', () => {
-    // Real words/names should not be flagged
-    expect(looksLikeStableId('Washington')).toBe(false); // no digits
-    expect(looksLikeStableId('Regulation')).toBe(false); // no digits
-    expect(looksLikeStableId('abcdefghij')).toBe(false); // all lowercase
-    expect(looksLikeStableId('ABCDEFGHIJ')).toBe(false); // all uppercase
+  it('rejects bare 10-char strings (legacy format no longer detected)', () => {
+    expect(looksLikeStableId('mK9pX3rQ7n')).toBe(false);
+    expect(looksLikeStableId('A4XoubikkQ')).toBe(false);
+    expect(looksLikeStableId('Z62bQynY4g')).toBe(false);
   });
 
-  it('rejects strings of wrong length', () => {
+  it('rejects real names', () => {
+    expect(looksLikeStableId('Washington')).toBe(false);
+    expect(looksLikeStableId('Regulation')).toBe(false);
+    expect(looksLikeStableId('abcdefghij')).toBe(false);
+    expect(looksLikeStableId('ABCDEFGHIJ')).toBe(false);
+  });
+
+  it('rejects strings without sid_ prefix', () => {
     expect(looksLikeStableId('abc')).toBe(false);
-    expect(looksLikeStableId('mK9pX3rQ7nX')).toBe(false); // 11 chars
     expect(looksLikeStableId('')).toBe(false);
-  });
-
-  it('rejects strings with special characters', () => {
     expect(looksLikeStableId('mK9pX3r.7n')).toBe(false);
-    expect(looksLikeStableId('mK9 X3rQ7n')).toBe(false);
   });
 });
 

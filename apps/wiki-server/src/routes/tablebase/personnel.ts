@@ -28,7 +28,7 @@ import { sqlInList } from "../shared/query-helpers.js";
 const MAX_PAGE_SIZE = 200;
 const VALID_ROLE_TYPES = ["key-person", "board", "career"] as const;
 
-import { STABLE_ID_PATTERN } from "../shared/entity-ref.js";
+import { isSid } from "@longterm-wiki/id-utils";
 
 // ---- Query schemas ----
 
@@ -81,7 +81,7 @@ const SyncPersonnelBatchSchema = z.object({
 /** Clean a raw personId for display: strip "new:" prefix, hide bare stableIds. */
 function cleanPersonId(pid: string): string | null {
   if (pid.startsWith("new:")) return pid.slice(4).trim();
-  if (STABLE_ID_PATTERN.test(pid)) return null;
+  if (isSid(pid)) return null;
   return pid;
 }
 
@@ -288,7 +288,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       let issueType: string;
       if (p.personId.startsWith("new:")) {
         issueType = "new-prefix";
-      } else if (STABLE_ID_PATTERN.test(p.personId)) {
+      } else if (isSid(p.personId)) {
         issueType = "unresolved-stableId";
       } else if (!p.personEntityId) {
         issueType = "no-entity-match";

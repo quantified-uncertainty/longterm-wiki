@@ -15,32 +15,15 @@ import { createHash } from 'node:crypto';
 // Shared ID detection helpers
 // ---------------------------------------------------------------------------
 
-/** Matches stableIds: exactly 10 alphanumeric chars with at least one uppercase letter.
- * Canonical definition: apps/web/src/lib/stable-id.ts */
-const STABLE_ID_RE = /^(?=.*[A-Z])[A-Za-z0-9]{10}$/;
-/** Matches pure numeric IDs (legacy DB PKs). */
-const NUMERIC_ID_RE = /^\d+$/;
+/** The prefix for all entity stableIds. */
+const SID_PREFIX = 'sid_';
 
 /**
- * Detect contaminated stableIds: machine-generated IDs with hyphens/underscores
- * from a legacy import bug. Examples: "D-BpcrbThn", "Tw_Eo226h3".
- * Real slugs are all-lowercase; contaminated IDs have uppercase letters.
- */
-function isContaminatedStableId(s) {
-  if (!s.includes('-') && !s.includes('_')) return false;
-  if (!/[A-Z]/.test(s)) return false;
-  const stripped = s.replace(/[-_]/g, '');
-  if (stripped.length < 8 || stripped.length > 12) return false;
-  if (!/^[A-Za-z0-9]+$/.test(stripped)) return false;
-  return true;
-}
-
-/**
- * Check if a string is a bare machine ID (stableId, numeric PK, or contaminated
- * stableId) that should never be displayed as a human-readable name.
+ * Check if a string is a sid_-prefixed stableId that should never be
+ * displayed as a human-readable name.
  */
 function isBareMachineId(s) {
-  return STABLE_ID_RE.test(s) || NUMERIC_ID_RE.test(s) || isContaminatedStableId(s);
+  return typeof s === 'string' && s.startsWith(SID_PREFIX);
 }
 
 // ---------------------------------------------------------------------------

@@ -12,7 +12,7 @@ import {
   type RpcPersonnelByEntityResult,
   type RpcPersonnelRow,
 } from "@/lib/wiki-server";
-import { isBareMachineId } from "@/lib/stable-id";
+import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -64,23 +64,10 @@ export async function fetchPgPersonnel(entityId: string): Promise<RpcPersonnelRo
  */
 /**
  * Check if a string is a displayable person name (not a machine-generated ID).
- * Rejects stableIds (both sid_-prefixed and legacy bare 10-char), numeric PKs,
- * contaminated IDs with hyphens/underscores, and short digit+uppercase strings
- * that look like legacy IDs.
+ * Rejects sid_-prefixed stableIds.
  */
 function isDisplayablePersonName(name: string): boolean {
-  if (isBareMachineId(name)) return false;
-  // Legacy IDs with hyphens from a fixed bug in id.ts (e.g., "8-JZq4lrlD").
-  // Real person names at this length always contain spaces or start with a letter
-  // followed by lowercase — IDs mix digits and uppercase without spaces.
-  if (
-    name.length <= 15 &&
-    !name.includes(" ") &&
-    /\d/.test(name) &&
-    /[A-Z]/.test(name)
-  )
-    return false;
-  return true;
+  return !isSid(name);
 }
 
 /**
@@ -89,16 +76,13 @@ function isDisplayablePersonName(name: string): boolean {
  * Strips "new:" prefix and converts slug-format IDs to title case.
  */
 function humanizePersonId(raw: string): string | null {
-  if (isBareMachineId(raw)) return null;
+  if (isSid(raw)) return null;
   const cleaned = raw.startsWith("new:") ? raw.slice(4).trim() : raw;
   if (!cleaned) return null;
-  if (isBareMachineId(cleaned)) return null;
+  if (isSid(cleaned)) return null;
   // If it looks like a slug (contains hyphens/underscores), humanize it
   if (cleaned.includes("-") || cleaned.includes("_")) {
-    const humanized = titleCase(cleaned);
-    // Reject if the result still looks like a machine ID
-    if (!isDisplayablePersonName(humanized)) return null;
-    return humanized;
+    return titleCase(cleaned);
   }
   if (!isDisplayablePersonName(cleaned)) return null;
   return cleaned;

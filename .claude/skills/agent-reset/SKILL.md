@@ -33,10 +33,10 @@ This command handles the full session transition: DB close + git reset + local c
    git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env
    ```
 
-5. **Switch to main and pull latest**:
+5. **Switch to main and pull latest** (prefix with `AGENT_RESET=1` to bypass the branch-switch hook):
    ```bash
    BRANCH=$(git branch --show-current)
-   git checkout main
+   AGENT_RESET=1 git checkout main
    git pull --ff-only origin main
    ```
 

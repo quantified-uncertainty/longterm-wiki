@@ -149,8 +149,9 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **GitHub API**: Use `crux gh issues/pr/ci/epic` commands — never raw `curl`
 - **Entity IDs — two tiers**:
-  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux tb ids allocate <slug>` to get a `numericId` (E-number) + `stableId`. These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
-  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only. NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
+  - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux tb ids allocate <slug>` to get a `numericId` (E-number) + `stableId` (`sid_` prefix, e.g. `sid_1LcLlMGLbw`). These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
+  - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only (`sid_` prefix). NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
+  - All stableIds use the `sid_` prefix format. Use `isSid()` from `@longterm-wiki/id-utils` to detect them.
   - **Never manually invent IDs** — use the functions above.
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
