@@ -781,9 +781,11 @@ async function _fetchSourceCore(
   }
 
   // ---- 5b. Wayback fallback for 404/dead URLs ----
-  // If the standard fetch got a 404/410 and we didn't already try Wayback,
-  // attempt Wayback as a last resort (#3457 P2).
-  if ((httpStatus === 404 || httpStatus === 410 || (httpStatus === 0 && fetchError)) &&
+  // Only for confirmed dead pages (404/410), not transient errors (timeouts, 5xx).
+  // A timeout (httpStatus === 0) is not evidence the page is dead — could be a
+  // momentary network issue. Triggering Wayback on transient errors would add
+  // up to 48s of serial latency on every cache miss for flaky URLs.
+  if ((httpStatus === 404 || httpStatus === 410) &&
       content.length === 0 && strategy !== 'wayback-only') {
     const waybackResult = await fetchWaybackContent(url);
     if (waybackResult && waybackResult.content.length > 0) {
@@ -820,7 +822,7 @@ async function _fetchSourceCore(
 
   // ---- 6b. Update archive URL on resource (fire-and-forget) ----
   if (archiveUrl && resource) {
-    updateResourceArchiveUrl(resource.id, archiveUrl);
+    updateResourceArchiveUrl(resource.id, url, archiveUrl);
   }
 
   // ---- 7. Extract excerpts ----

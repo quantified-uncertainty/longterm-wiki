@@ -119,9 +119,10 @@ export async function suggestResourcesApi(
  */
 export async function updateResourceArchiveUrl(
   id: string,
+  resourceUrl: string,
   archiveUrl: string,
 ): Promise<ApiResult<{ upserted: number; results: Array<{ id: string; url: string }> }>> {
   return apiRequest('POST', '/api/resources/batch', {
-    items: [{ id, archiveUrl }],
+    items: [{ id, url: resourceUrl, archiveUrl }],
   });
 }

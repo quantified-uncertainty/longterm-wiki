@@ -181,10 +181,11 @@ export function updateResourceFetchStatus(
  */
 export function updateResourceArchiveUrl(
   resourceId: string,
+  resourceUrl: string,
   archiveUrl: string,
 ): void {
   import('../wiki-server/resources.ts')
-    .then((mod) => mod.updateResourceArchiveUrl(resourceId, archiveUrl))
+    .then((mod) => mod.updateResourceArchiveUrl(resourceId, resourceUrl, archiveUrl))
     .then((result) => {
       if (!result.ok) {
         console.warn(

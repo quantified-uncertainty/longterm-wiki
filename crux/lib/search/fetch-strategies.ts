@@ -16,6 +16,7 @@
  */
 
 import { forumGraphql, type Forum } from '../forum-api.ts';
+import { extractDOI as extractDOIFromUtils } from '../../resource-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Strategy Types
@@ -46,33 +47,21 @@ export interface StrategyResult {
 /** Domains where Firecrawl should be tried first (known to block bots). */
 const FIRECRAWL_PRIORITY_DOMAINS = [
   'openai.com',
-  'www.rand.org',
-  'www.reuters.com',
+  'rand.org',
   'reuters.com',
-  'www.bloomberg.com',
   'bloomberg.com',
-  'www.cnas.org',
   'cnas.org',
   'medium.com',
-  'www.wired.com',
   'wired.com',
-  'www.nytimes.com',
   'nytimes.com',
-  'www.washingtonpost.com',
   'washingtonpost.com',
-  'www.theguardian.com',
   'theguardian.com',
-  'www.bbc.com',
   'bbc.com',
   'techcrunch.com',
-  'www.techcrunch.com',
-  'www.cnbc.com',
   'cnbc.com',
   'arstechnica.com',
-  'www.technologyreview.com',
   'technologyreview.com',
   'time.com',
-  'www.ft.com',
   'ft.com',
 ];
 
@@ -86,39 +75,30 @@ const DOI_DOMAINS = [
   'tandfonline.com',
   'pnas.org',
   'cell.com',
-  'journals.sagepub.com',
-  'link.springer.com',
+  'sagepub.com',
   'academic.oup.com',
-  'www.science.org',
+  'doi.org',
 ];
 
 /** Forum domains that support GraphQL content fetching. */
 const FORUM_DOMAINS = [
-  'www.lesswrong.com',
   'lesswrong.com',
-  'www.alignmentforum.org',
   'alignmentforum.org',
   'forum.effectivealtruism.org',
-  'www.effectivealtruism.org',
 ];
 
 /** Domains known to be permanently dead (site shut down). */
 const DEAD_DOMAINS = [
-  'www.fhi.ox.ac.uk',
   'fhi.ox.ac.uk',
   'ftxfuturefund.org',
-  'www.ftxfuturefund.org',
   'safesecureai.org',
-  'www.safesecureai.org',
   'maliciousaireport.com',
-  'www.maliciousaireport.com',
-  'www.thefilterbubble.com',
-  'www.redqueenbio.com',
+  'thefilterbubble.com',
+  'redqueenbio.com',
   'saferai.uk',
-  'www.saferai.uk',
-  'www.apollo-research.ai',
-  'www.sparprogram.org',
-  'www.deepfakedetectionchallenge.com',
+  'apollo-research.ai',
+  'sparprogram.org',
+  'deepfakedetectionchallenge.com',
 ];
 
 // ---------------------------------------------------------------------------
@@ -176,7 +156,6 @@ const FORUM_CONFIGS: Record<string, Forum> = {
   'www.alignmentforum.org': { name: 'Alignment Forum', graphqlUrl: 'https://www.alignmentforum.org/graphql', baseUrl: 'https://www.alignmentforum.org' },
   'alignmentforum.org': { name: 'Alignment Forum', graphqlUrl: 'https://www.alignmentforum.org/graphql', baseUrl: 'https://www.alignmentforum.org' },
   'forum.effectivealtruism.org': { name: 'EA Forum', graphqlUrl: 'https://forum.effectivealtruism.org/graphql', baseUrl: 'https://forum.effectivealtruism.org' },
-  'www.effectivealtruism.org': { name: 'EA Forum', graphqlUrl: 'https://forum.effectivealtruism.org/graphql', baseUrl: 'https://forum.effectivealtruism.org' },
 };
 
 /**
@@ -278,15 +257,14 @@ const CROSSREF_BASE = 'https://api.crossref.org';
 const CROSSREF_USER_AGENT = 'LongtermWiki/1.0 (mailto:contact@longtermwiki.com)';
 
 /**
- * Extract DOI from a URL. Handles direct doi.org links and publisher URLs
- * with DOI patterns embedded in the path.
+ * Extract a DOI from a URL. Tries the shared extractDOI utility first,
+ * then falls back to a broader regex for publisher URLs with embedded DOIs.
  */
 function extractDoi(url: string): string | null {
-  // Direct doi.org link
-  const doiOrgMatch = url.match(/doi\.org\/(10\.\d{4,}\/[^\s?#]+)/);
-  if (doiOrgMatch) return doiOrgMatch[1];
+  const fromUtils = extractDOIFromUtils(url);
+  if (fromUtils && fromUtils.startsWith('10.')) return fromUtils;
 
-  // DOI embedded in publisher URL path
+  // Broader match for DOIs embedded in publisher URL paths (e.g., pnas.org/doi/full/10.1073/...)
   const pathMatch = url.match(/(10\.\d{4,}\/[^\s?#]+)/);
   if (pathMatch) return pathMatch[1];
 

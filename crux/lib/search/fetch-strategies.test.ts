@@ -55,6 +55,7 @@ describe('getContentFetchStrategy', () => {
     expect(getContentFetchStrategy('https://www.science.org/doi/10.1126/science.abc1234')).toBe('doi');
     expect(getContentFetchStrategy('https://www.sciencedirect.com/science/article/pii/S0123456789')).toBe('doi');
     expect(getContentFetchStrategy('https://pnas.org/doi/10.1073/pnas.123')).toBe('doi');
+    expect(getContentFetchStrategy('https://doi.org/10.1038/s41586-021-03819-2')).toBe('doi');
   });
 
   it('returns firecrawl-priority for bot-blocked domains', () => {
