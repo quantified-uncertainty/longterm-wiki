@@ -178,7 +178,13 @@ function resolveRefs(
         );
       }
     }
-    return entity.id; // return the entity ID (stable 10-char)
+    // In facts context, pass through RefMarker so normalizeValue() preserves
+    // the ref type — otherwise properties without dataType: "ref" in
+    // properties.yaml lose their ref type and become plain text.
+    if (context.endsWith("/facts")) {
+      return new RefMarker(entity.id, value.expectedSlug);
+    }
+    return entity.id; // records context: return plain string
   }
 
   if (Array.isArray(value)) {
@@ -258,6 +264,12 @@ function normalizeValue(raw: unknown, dataType?: string): FactValue {
     return { type: "date", value: raw.value };
   }
 
+  // !ref YAML tag — passed through from resolveRefs() in facts context.
+  // This preserves ref type for properties not declared in properties.yaml.
+  if (raw instanceof RefMarker) {
+    return { type: "ref", value: raw.stableId };
+  }
+
   // Range/min detection — structural patterns that take priority over dataType.
   // A two-element numeric array is always a range, and an object with { min: N }
   // is always a min bound, regardless of what the property's dataType says.
@@ -284,10 +296,16 @@ function normalizeValue(raw: unknown, dataType?: string): FactValue {
   if (dataType) {
     switch (dataType) {
       case "ref":
-        return { type: "ref", value: String(raw) };
+        return { type: "ref", value: raw instanceof RefMarker ? raw.stableId : String(raw) };
       case "refs":
         if (Array.isArray(raw)) {
-          return { type: "refs", value: raw.map(String) };
+          return {
+            type: "refs",
+            value: raw.map((v) => (v instanceof RefMarker ? v.stableId : String(v))),
+          };
+        }
+        if (raw instanceof RefMarker) {
+          return { type: "refs", value: [raw.stableId] };
         }
         return { type: "refs", value: [String(raw)] };
       case "number":
@@ -319,6 +337,17 @@ function normalizeValue(raw: unknown, dataType?: string): FactValue {
   }
 
   if (Array.isArray(raw)) {
+    // Array of RefMarkers → refs type (from !ref tags in YAML arrays)
+    if (raw.every((v) => v instanceof RefMarker)) {
+      return { type: "refs", value: (raw as RefMarker[]).map((r) => r.stableId) };
+    }
+    // Mixed array of strings and RefMarkers → refs type
+    if (raw.every((v) => typeof v === "string" || v instanceof RefMarker)) {
+      return {
+        type: "refs",
+        value: raw.map((v) => (v instanceof RefMarker ? v.stableId : String(v))),
+      };
+    }
     if (raw.every((v) => typeof v === "string")) {
       return { type: "refs", value: raw as string[] };
     }
