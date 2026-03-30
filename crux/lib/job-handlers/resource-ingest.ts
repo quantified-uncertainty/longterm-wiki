@@ -203,8 +203,11 @@ export async function handleResourceIngest(
     // Content caching is already handled by fetchSource() internally.
     await persistFetchStatus(resourceId, status, ctx);
 
-    // Chain: enqueue resource-enrich job for reachable resources (best-effort)
-    if (status === 'reachable') {
+    // Chain: enqueue resource-enrich job for reachable resources with content.
+    // Skip if content is empty — fetchSource returns ok but no content for some
+    // pages (JS-only shells, empty responses). Enriching without content is wasteful
+    // and source-check would still see not_cached.
+    if (status === 'reachable' && result.content.length > 0) {
       createJob({
         type: 'resource-enrich',
         params: { resourceId, url },
