@@ -37,9 +37,12 @@ vi.mock('../../wiki-server/client.ts', () => ({
 const mockGetResource = vi.fn();
 const mockUpsertResourceBatch = vi.fn();
 
+const mockSuggestResourcesApi = vi.fn();
+
 vi.mock('../../wiki-server/resources.ts', () => ({
   getResource: (...args: unknown[]) => mockGetResource(...args),
   upsertResourceBatch: (...args: unknown[]) => mockUpsertResourceBatch(...args),
+  suggestResourcesApi: (...args: unknown[]) => mockSuggestResourcesApi(...args),
 }));
 
 // ---------------------------------------------------------------------------
@@ -162,6 +165,7 @@ const { handleResourceEnrich } = await import('../resource-enrich.ts');
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockSuggestResourcesApi.mockResolvedValue({ ok: true, data: { suggested: 0 } });
 });
 
 describe('handleResourceEnrich — param validation', () => {
@@ -471,3 +475,89 @@ describe('handleResourceEnrich — error handling', () => {
     expect(result.error).toContain('Rate limited');
   });
 });
+describe('handleResourceEnrich — URL discovery', () => {
+  it('suggests discovered URLs via suggestResourcesApi', async () => {
+    setupDefaultMocks();
+    const llmResult = validLlmResult();
+    (llmResult as Record<string, unknown>).discovered_urls = [
+      'https://arxiv.org/abs/2301.00001',
+      'https://alignment-forum.org/post/123',
+    ];
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 1500, output_tokens: 400 },
+      model: 'claude-sonnet-test',
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.discoveredUrls).toEqual([
+      'https://arxiv.org/abs/2301.00001',
+      'https://alignment-forum.org/post/123',
+    ]);
+    expect(mockSuggestResourcesApi).toHaveBeenCalledWith({
+      urls: [
+        'https://arxiv.org/abs/2301.00001',
+        'https://alignment-forum.org/post/123',
+      ],
+    });
+  });
+
+  it('filters out the source URL from discovered URLs', async () => {
+    setupDefaultMocks();
+    const llmResult = validLlmResult();
+    (llmResult as Record<string, unknown>).discovered_urls = [
+      'https://example.com/article',
+      'https://arxiv.org/abs/2301.00001',
+    ];
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 1500, output_tokens: 400 },
+      model: 'claude-sonnet-test',
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.discoveredUrls).toEqual(['https://arxiv.org/abs/2301.00001']);
+  });
+
+  it('does not call suggestResourcesApi when no URLs discovered', async () => {
+    setupDefaultMocks();
+
+    await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(mockSuggestResourcesApi).not.toHaveBeenCalled();
+  });
+
+  it('still succeeds when suggestResourcesApi fails', async () => {
+    setupDefaultMocks();
+    const llmResult = validLlmResult();
+    (llmResult as Record<string, unknown>).discovered_urls = ['https://arxiv.org/abs/2301.00001'];
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 1500, output_tokens: 400 },
+      model: 'claude-sonnet-test',
+    });
+    mockSuggestResourcesApi.mockRejectedValue(new Error('Server down'));
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.discoveredUrls).toEqual(['https://arxiv.org/abs/2301.00001']);
+  });
+});
+

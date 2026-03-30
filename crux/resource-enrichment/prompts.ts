@@ -105,6 +105,7 @@ Return a single JSON object with ALL of these fields:
   "summary": 1-3 sentence summary of the resource's key contribution,
   "key_points": array of 3-5 bullet points (strings, each max 200 chars),
   "tags": array of relevant tags (max 10, use existing wiki tag vocabulary: ai-safety, alignment, governance, interpretability, capabilities, existential-risk, policy, technical-safety, coordination, compute, deployment, evaluation, red-teaming, etc.),
-  "importance_score": integer 0-100 where 100 = foundational paper everyone should read, 50 = useful reference, 10 = tangential
+  "importance_score": integer 0-100 where 100 = foundational paper everyone should read, 50 = useful reference, 10 = tangential,
+  "discovered_urls": optional array of up to 5 of the most relevant URLs referenced or cited by this content (full HTTPS URLs only, no relative links, no links to the same domain as the source). Omit or set to [] if none found.
 }`;
 }

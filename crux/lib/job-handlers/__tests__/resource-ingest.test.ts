@@ -38,9 +38,12 @@ vi.mock('../../search/source-fetcher.ts', () => ({
   fetchSource: (req: unknown) => mockFetchSource(req),
 }));
 
+const mockFindResourcesByContentHash = vi.fn();
+
 vi.mock('../../wiki-server/resources.ts', () => ({
   updateResourceFetchStatus: vi.fn().mockResolvedValue({ ok: true, data: {} }),
   lookupResourceByUrl: vi.fn().mockResolvedValue({ ok: false }),
+  findResourcesByContentHash: (...args: unknown[]) => mockFindResourcesByContentHash(...args),
 }));
 
 const mockCreateJob = vi.fn<() => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
@@ -90,6 +93,8 @@ beforeEach(() => {
   mockCreateJob.mockClear();
   mockCreateJob.mockResolvedValue({ ok: true, data: { id: 999 } });
   mockFetchSource.mockResolvedValue(mockFetchResult());
+  mockFindResourcesByContentHash.mockClear();
+  mockFindResourcesByContentHash.mockResolvedValue({ ok: true, data: { resources: [] } });
 });
 
 // ---------------------------------------------------------------------------

@@ -26,7 +26,7 @@ import { z } from 'zod';
 import { isPrivateHost } from '../source-check/source-fetcher.ts';
 import { fetchSource, type FetchedSourceStatus } from '../search/source-fetcher.ts';
 import { createJob } from '../wiki-server/jobs.ts';
-import { updateResourceFetchStatus } from '../wiki-server/resources.ts';
+import { updateResourceFetchStatus, findResourcesByContentHash } from '../wiki-server/resources.ts';
 
 // ---------------------------------------------------------------------------
 // Params validation
@@ -199,6 +199,25 @@ export async function handleResourceIngest(
       ? contentHash !== previousContentHash
       : undefined;
 
+    // Duplicate detection: check for other resources with the same content hash.
+    // Log a warning but don't skip ingestion — still persist everything.
+    let duplicateOf: string | undefined;
+    if (contentHash) {
+      try {
+        const dupResult = await findResourcesByContentHash(contentHash, resourceId);
+        if (dupResult.ok && dupResult.data.resources.length > 0) {
+          const existing = dupResult.data.resources[0];
+          duplicateOf = existing.id;
+          console.warn(
+            `[resource-ingest] Duplicate content detected: ${resourceId} has same content hash as ${existing.id} (${existing.url})`,
+          );
+        }
+      } catch (e: unknown) {
+        // Best-effort — don't fail ingestion if duplicate check errors
+        console.warn(`[resource-ingest] Duplicate check failed: ${e instanceof Error ? e.message : String(e)}`);
+      }
+    }
+
     // Persist fetch_status to the resource record.
     // Content caching is already handled by fetchSource() internally.
     await persistFetchStatus(resourceId, status, ctx);
@@ -228,6 +247,7 @@ export async function handleResourceIngest(
       previousContentHash: previousContentHash ?? null,
       title: result.title || undefined,
       fetchMethod: result.contentType === 'pdf' ? 'pdf' : result.contentType === 'transcript' ? 'youtube' : 'shared-fetcher',
+      duplicateOf: duplicateOf ?? undefined,
     });
   } catch (err: unknown) {
     const error = err instanceof Error ? err.message : String(err);
