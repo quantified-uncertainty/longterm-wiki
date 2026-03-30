@@ -112,3 +112,16 @@ export async function suggestResourcesApi(
 ): Promise<ApiResult<SuggestResourcesResult>> {
   return apiRequest<SuggestResourcesResult>('POST', '/api/resources/suggest', input);
 }
+
+/**
+ * Update a resource's archive_url via the batch endpoint.
+ * Used by source-fetcher when Wayback Machine content is found for a dead link.
+ */
+export async function updateResourceArchiveUrl(
+  id: string,
+  archiveUrl: string,
+): Promise<ApiResult<{ upserted: number; results: Array<{ id: string; url: string }> }>> {
+  return apiRequest('POST', '/api/resources/batch', {
+    items: [{ id, archiveUrl }],
+  });
+}
