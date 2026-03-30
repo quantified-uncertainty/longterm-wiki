@@ -34,7 +34,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/wiki/E1043",
-        destination: "/resources",
+        destination: "/sources",
         permanent: true,
       },
       // Open Philanthropy rebranded to Coefficient Giving (E521)
