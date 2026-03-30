@@ -50,6 +50,34 @@ const healthApp = new Hono()
       logger.error({ err }, "Health check DB error");
     }
 
+    // Job queue health — separate try/catch so a failure here does NOT
+    // degrade the core health status (which gates deploy smoke tests).
+    let pendingJobs = 0;
+    let oldestPendingJobAgeSeconds: number | null = null;
+    try {
+      const rawDb = getDb();
+      interface PendingJobsRow {
+        pending_count: number;
+        oldest_pending_age_seconds: number | null;
+      }
+      const pendingResult = await rawDb<PendingJobsRow[]>`
+        SELECT
+          count(*)::int AS pending_count,
+          EXTRACT(EPOCH FROM (now() - min(created_at)))::int AS oldest_pending_age_seconds
+        FROM jobs
+        WHERE status = 'pending'
+      `;
+      pendingJobs = pendingResult[0]?.pending_count ?? 0;
+      oldestPendingJobAgeSeconds =
+        pendingResult[0]?.oldest_pending_age_seconds ?? null;
+    } catch (err) {
+      // Best-effort: job queue data is informational, not critical.
+      logger.warn(
+        { err: err instanceof Error ? err.message : String(err) },
+        "Health check: failed to query job queue stats",
+      );
+    }
+
     // Degraded if migration failed at startup OR DB queries are failing.
     // The post-deploy smoke test checks for status === "healthy", so a degraded
     // server will correctly fail the smoke test and trigger investigation.
@@ -68,6 +96,8 @@ const healthApp = new Hono()
       totalFacts,
       nextId,
       uptime: Math.floor((Date.now() - startTime) / 1000),
+      pendingJobs,
+      oldestPendingJobAgeSeconds,
     });
   })
   /**
