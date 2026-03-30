@@ -70,6 +70,10 @@ function formatRawJobRow(row: Record<string, unknown>) {
   };
 }
 
+const PLAIN_INSERT_SQL = `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
+ VALUES ($1, $2, $3, $4, $5, $6, $7)
+ RETURNING *`;
+
 const DEDUP_INSERT_SQL = `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
  VALUES ($1, $2, $3, $4, $5, $6, $7)
  ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
@@ -80,14 +84,14 @@ const DEDUP_SELECT_SQL = `SELECT * FROM "jobs"
  WHERE dedup_key = $1 AND status IN ('pending', 'claimed', 'running')
  LIMIT 1`;
 
-/** Build parameter array for dedup INSERT from a parsed CreateJob input. */
-function dedupInsertParams(j: CreateJob): (string | number | null)[] {
+/** Build parameter array for INSERT from a parsed CreateJob input. */
+function jobInsertParams(j: CreateJob & { dedupKey: string }): (string | number | null)[] {
   return [
     j.type,
     j.params ? JSON.stringify(j.params) : null,
     j.priority,
     j.maxRetries,
-    j.dedupKey!,
+    j.dedupKey,
     j.parentJobId ?? null,
     j.runAfter ?? null,
   ];
@@ -127,7 +131,7 @@ const jobsApp = new Hono()
           )
           .returning();
 
-        return c.json(rows.map(formatJob), 201);
+        return c.json(rows.map(r => ({ ...formatJob(r), dedupExisting: false as const })), 201);
       }
 
       // Dedup path: INSERT ... ON CONFLICT DO NOTHING per job, then resolve
@@ -138,25 +142,20 @@ const jobsApp = new Hono()
       for (const j of parsed.data) {
         if (!j.dedupKey) {
           // No dedup key — simple insert via raw SQL for consistent formatRawJobRow shape
-          const insertResult = await pgClient.unsafe(
-            `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             RETURNING *`,
-            [
-              j.type,
-              j.params ? JSON.stringify(j.params) : null,
-              j.priority,
-              j.maxRetries,
-              null,
-              j.parentJobId ?? null,
-              j.runAfter ?? null,
-            ]
-          );
+          const insertResult = await pgClient.unsafe(PLAIN_INSERT_SQL, [
+            j.type,
+            j.params ? JSON.stringify(j.params) : null,
+            j.priority,
+            j.maxRetries,
+            null,
+            j.parentJobId ?? null,
+            j.runAfter ?? null,
+          ]);
           results.push({ ...formatRawJobRow(insertResult[0] as Record<string, unknown>), dedupExisting: false });
           continue;
         }
 
-        const params = dedupInsertParams(j);
+        const params = jobInsertParams(j as CreateJob & { dedupKey: string });
 
         // INSERT ON CONFLICT for dedup
         const insertResult = await pgClient.unsafe(DEDUP_INSERT_SQL, params);
@@ -188,20 +187,17 @@ const jobsApp = new Hono()
         }
 
         // Extreme race: conflicting job completed between both attempts.
-        // Fall back to unconditional insert to guarantee a result.
-        const finalRows = await db
-          .insert(jobs)
-          .values({
-            type: j.type,
-            params: j.params ?? null,
-            priority: j.priority,
-            maxRetries: j.maxRetries,
-            dedupKey: j.dedupKey ?? null,
-            parentJobId: j.parentJobId ?? null,
-            runAfter: j.runAfter ? new Date(j.runAfter) : null,
-          })
-          .returning();
-        results.push({ ...formatJob(firstOrThrow(finalRows, "dedup fallback insert")) as ReturnType<typeof formatRawJobRow>, dedupExisting: false });
+        // Fall back to unconditional insert via raw SQL to guarantee a result.
+        const fallbackResult = await pgClient.unsafe(PLAIN_INSERT_SQL, [
+          j.type,
+          j.params ? JSON.stringify(j.params) : null,
+          j.priority,
+          j.maxRetries,
+          j.dedupKey ?? null,
+          j.parentJobId ?? null,
+          j.runAfter ?? null,
+        ]);
+        results.push({ ...formatRawJobRow(fallbackResult[0] as Record<string, unknown>), dedupExisting: false });
       }
 
       return c.json(results, 201);
@@ -216,7 +212,7 @@ const jobsApp = new Hono()
     // among active jobs (pending/claimed/running).
     if (d.dedupKey) {
       const pgClient = getDb();
-      const params = dedupInsertParams(d);
+      const params = jobInsertParams(d as CreateJob & { dedupKey: string });
 
       const insertResult = await pgClient.unsafe(DEDUP_INSERT_SQL, params);
 

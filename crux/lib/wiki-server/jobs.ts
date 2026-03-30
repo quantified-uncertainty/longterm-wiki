@@ -56,13 +56,13 @@ export async function createJob(
   return apiRequest<JobEntry>('POST', '/api/jobs', input);
 }
 
-/** Create multiple jobs in a batch. When dedupKey is present on any job,
- *  each entry in the response includes `dedupExisting` (true if an active
- *  duplicate was found instead of inserting a new row). */
+/** Create multiple jobs in a batch. Each entry in the response includes
+ *  `dedupExisting` (true if an active duplicate was found instead of
+ *  inserting a new row). */
 export async function createJobBatch(
   inputs: CreateJobInput[],
-): Promise<ApiResult<(JobEntry & { dedupExisting?: boolean })[]>> {
-  return apiRequest<(JobEntry & { dedupExisting?: boolean })[]>('POST', '/api/jobs', inputs);
+): Promise<ApiResult<(JobEntry & { dedupExisting: boolean })[]>> {
+  return apiRequest<(JobEntry & { dedupExisting: boolean })[]>('POST', '/api/jobs', inputs);
 }
 
 /** List jobs with optional filters. */

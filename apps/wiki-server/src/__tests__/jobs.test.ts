@@ -423,7 +423,7 @@ describe("Jobs API", () => {
       expect(body.priority).toBe(5);
     });
 
-    it("creates a batch of jobs and returns 201", async () => {
+    it("creates a batch of jobs and returns 201 with dedupExisting", async () => {
       const res = await postJson(app, "/api/jobs", [
         { type: "ping" },
         { type: "citation-verify", params: { pageId: "ai-safety" } },
@@ -433,7 +433,9 @@ describe("Jobs API", () => {
       expect(Array.isArray(body)).toBe(true);
       expect(body).toHaveLength(2);
       expect(body[0].type).toBe("ping");
+      expect(body[0].dedupExisting).toBe(false);
       expect(body[1].type).toBe("citation-verify");
+      expect(body[1].dedupExisting).toBe(false);
     });
 
     it("rejects missing type", async () => {
@@ -540,7 +542,9 @@ describe("Jobs API", () => {
       const body = await res.json();
       expect(body).toHaveLength(2);
       expect(body[0].dedupKey).toBe("dk1");
+      expect(body[0].dedupExisting).toBe(false);
       expect(body[1].dedupKey).toBeNull();
+      expect(body[1].dedupExisting).toBe(false);
     });
   });
 
