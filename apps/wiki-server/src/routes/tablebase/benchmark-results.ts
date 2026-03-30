@@ -170,16 +170,27 @@ const benchmarkResultsApp = new Hono()
     if (benchmarkIds.length > 0) {
       const placeholders = benchmarkIds.map((id) => sql`${id}`);
       const inList = sql.join(placeholders, sql`, `);
-      const found = await db.execute<{ id: string }>(sql`
-        SELECT id FROM benchmarks WHERE id IN (${inList})
+      // Check both id (10-char hash) and slug (e.g., "mmlu") since the enrichment
+      // agent may submit either format.
+      const found = await db.execute<{ id: string; slug: string }>(sql`
+        SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
       `);
-      const foundSet = new Set(found.map((r) => r.id));
-      const missing = benchmarkIds.filter((id) => !foundSet.has(id));
+      const foundIdSet = new Set(found.map((r) => r.id));
+      const foundSlugSet = new Set(found.map((r) => r.slug));
+      // Build slug→id mapping for auto-resolution
+      const slugToId = new Map(found.map((r) => [r.slug, r.id]));
+      const missing = benchmarkIds.filter((id) => !foundIdSet.has(id) && !foundSlugSet.has(id));
       if (missing.length > 0) {
         return validationError(
           c,
           `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
         );
+      }
+      // Auto-resolve slugs to IDs so the upsert uses the correct FK
+      for (const item of parsed.data.items) {
+        if (slugToId.has(item.benchmarkId)) {
+          item.benchmarkId = slugToId.get(item.benchmarkId)!;
+        }
       }
     }
 
