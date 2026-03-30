@@ -50,6 +50,7 @@ const SERVICE_LABELS: Record<string, string> = {
   "discord-bot": "Discord Bot",
   "vercel-frontend": "Vercel Frontend",
   "github-actions": "GitHub Actions",
+  "job-worker": "Job Worker",
 };
 
 // ── Columns ─────────────────────────────────────────────────────────────
