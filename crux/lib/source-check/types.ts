@@ -9,6 +9,8 @@ export interface FetchSourceResult {
   content: string | null;
   errorType?: SourceFetchErrorType;
   errorMessage?: string;
+  /** True if a resource-ingest job was auto-enqueued on cache miss */
+  ingestEnqueued?: boolean;
 }
 
 /** Result of an LLM source-check call */
