@@ -17,10 +17,10 @@ export function classificationPrompt(resource: {
 }): string {
   return `Classify this resource:
 
-URL: ${resource.url}
-Title: ${resource.title || '(none)'}
-Current type: ${resource.type || '(none)'}
-Content preview: ${resource.content_snippet || '(none)'}
+URL: ${escapeXml(resource.url)}
+Title: ${escapeXml(resource.title || '(none)')}
+Current type: ${escapeXml(resource.type || '(none)')}
+Content preview: ${escapeXml(resource.content_snippet || '(none)')}
 
 Return JSON with these fields:
 {
@@ -46,12 +46,12 @@ export function enrichmentPrompt(resource: {
 }): string {
   return `Analyze this resource and provide enriched metadata:
 
-URL: ${resource.url}
-Title: ${resource.title || '(none)'}
-Type: ${resource.type || '(none)'}
-Current summary: ${resource.summary || '(none)'}
-Content (first 4000 chars): ${resource.content?.slice(0, 4000) || '(none)'}
-Current tags: ${resource.existing_tags?.join(', ') || '(none)'}
+URL: ${escapeXml(resource.url)}
+Title: ${escapeXml(resource.title || '(none)')}
+Type: ${escapeXml(resource.type || '(none)')}
+Current summary: ${escapeXml(resource.summary || '(none)')}
+Content (first 4000 chars): ${escapeXml(resource.content?.slice(0, 4000) || '(none)')}
+Current tags: ${escapeXml(resource.existing_tags?.join(', ') || '(none)')}
 
 Return JSON:
 {
