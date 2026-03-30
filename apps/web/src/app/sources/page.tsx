@@ -18,6 +18,30 @@ export const metadata: Metadata = {
     "Overview of external resources and publication venues tracked in the wiki — papers, articles, reports, and credibility ratings.",
 };
 
+function stageLabel(stage: string): string {
+  const labels: Record<string, string> = {
+    none: "Not Started",
+    pending: "Pending",
+    fetched: "Fetched",
+    classified: "Classified",
+    enriched: "Enriched",
+    reviewed: "Reviewed",
+  };
+  return labels[stage] ?? stage;
+}
+
+function enrichmentStageColor(stage: string): string {
+  const colors: Record<string, string> = {
+    none: "bg-zinc-300 dark:bg-zinc-700",
+    pending: "bg-amber-400 dark:bg-amber-600",
+    fetched: "bg-sky-400 dark:bg-sky-600",
+    classified: "bg-violet-400 dark:bg-violet-600",
+    enriched: "bg-emerald-500 dark:bg-emerald-600",
+    reviewed: "bg-emerald-700 dark:bg-emerald-400",
+  };
+  return colors[stage] ?? "bg-zinc-400";
+}
+
 export default function SourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
@@ -82,6 +106,18 @@ export default function SourcesPage() {
     { label: "Cited by Pages", value: String(citedResources) },
   ];
 
+  // Enrichment pipeline breakdown
+  const enrichmentCounts = new Map<string, number>();
+  for (const r of resources) {
+    const status = r.enrichment_status ?? "none";
+    enrichmentCounts.set(status, (enrichmentCounts.get(status) || 0) + 1);
+  }
+  // Ordered by pipeline stage
+  const enrichmentStages = ["none", "pending", "fetched", "classified", "enriched", "reviewed"];
+  const enrichmentStats = enrichmentStages
+    .filter((s) => enrichmentCounts.has(s))
+    .map((s) => ({ stage: s, count: enrichmentCounts.get(s)! }));
+
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
       <div className="mb-8">
@@ -104,6 +140,29 @@ export default function SourcesPage() {
             value={stat.value}
           />
         ))}
+      </div>
+
+      {/* Enrichment pipeline progress */}
+      <div className="mb-8 rounded-xl border border-border/60 bg-card p-5">
+        <h2 className="text-sm font-semibold mb-3">Enrichment Pipeline</h2>
+        <div className="flex h-4 rounded-full overflow-hidden mb-3">
+          {enrichmentStats.map(({ stage, count }) => (
+            <div
+              key={stage}
+              className={`${enrichmentStageColor(stage)} transition-all`}
+              style={{ width: `${(count / resources.length) * 100}%` }}
+              title={`${stageLabel(stage)}: ${count.toLocaleString()}`}
+            />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-muted-foreground">
+          {enrichmentStats.map(({ stage, count }) => (
+            <span key={stage} className="flex items-center gap-1.5">
+              <span className={`inline-block w-2.5 h-2.5 rounded-sm ${enrichmentStageColor(stage)}`} />
+              {stageLabel(stage)}: {count.toLocaleString()}
+            </span>
+          ))}
+        </div>
       </div>
 
       <SourcesTabs

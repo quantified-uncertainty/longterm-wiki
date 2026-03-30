@@ -736,6 +736,14 @@ export interface ResourceStatsResult {
   withMetadata: number;
   /** Resources that have been fetched (fetchedAt is set). */
   fetched: number;
+  /** Breakdown by enrichment_status (null → "none"). */
+  byEnrichmentStatus: Record<string, number>;
+  /** Content cache (citation_content) population stats. */
+  contentCacheStats: {
+    withFullText: number;
+    withMetadataOnly: number;
+    uncached: number;
+  };
 }
 
 // -- Resources: Fetch status update ------------------------------------------
