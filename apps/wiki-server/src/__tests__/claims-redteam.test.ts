@@ -243,6 +243,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // ---- UPDATE proposed_claims (batch verdict via unnest) ----
+  if (q.includes("update") && q.includes("proposed_claims") && q.includes("unnest")) {
+    const claimIds = params[0] as number[];
+    // Only return IDs that exist in the store (simulates WHERE pc.id = v.claim_id)
+    return claimIds
+      .filter((id) => claimStore.some((c) => c.id === id))
+      .map((id) => ({ id }));
+  }
+
   if (q.includes("count(*)") && q.includes("entity_ids")) {
     return [{ count: 0 }];
   }

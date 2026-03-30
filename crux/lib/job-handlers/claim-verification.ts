@@ -22,6 +22,7 @@ import { escapeXml } from '../prompt-utils.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
 import { apiRequest } from '../wiki-server/client.ts';
+import { escapeXml } from '../prompt-utils.ts';
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import { z } from 'zod';
 

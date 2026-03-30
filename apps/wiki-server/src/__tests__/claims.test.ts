@@ -275,6 +275,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // ---- UPDATE proposed_claims (batch verdict via unnest) ----
+  if (q.includes("update") && q.includes("proposed_claims") && q.includes("unnest")) {
+    // params: [claimIds[], statuses[], confidences[], reasonings[], extractedValues[], checkerModels[]]
+    const claimIds = params[0] as number[];
+    return claimIds
+      .filter((id) => claimStore.some((c) => c.id === id))
+      .map((id) => ({ id }));
+  }
+
   // ---- entity_ids (for health check) ----
   if (q.includes("count(*)") && q.includes("entity_ids")) {
     return [{ count: 0 }];
