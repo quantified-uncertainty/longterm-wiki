@@ -93,6 +93,10 @@ const handlers: Record<string, JobHandler> = {
   // Resource URL liveness checking (#3209) — lazy for consistency
   'resource-verify': lazyHandler(async () =>
     (await import('./resource-verify.ts')).handleResourceVerify),
+
+  // Per-resource LLM enrichment (#3499) — lazy to avoid Anthropic SDK cycle
+  'resource-enrich': lazyHandler(async () =>
+    (await import('./resource-enrich.ts')).handleResourceEnrich),
 };
 
 /**
