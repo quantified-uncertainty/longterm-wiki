@@ -166,19 +166,16 @@ facts:
   - id: f_zBoko30S4g
     property: headcount
     value: 192
-    asOf: 2022-12
+    asOf: 2022
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Early-stage headcount"
+    notes: "Annual headcount figure for 2022"
 
   - id: f_a7TezcOwMA
     property: headcount
-    value:
-      - 870
-      - 2847
+    value: 1035
     asOf: 2024-09
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Point estimate 1097 from LinkedIn/consistent sources; full range
-      870-2847 depending on methodology"
+    notes: "As of September 2024 per seo.ai; 331% growth from 240 in 2023"
 
   - id: f_Z7oaVivRvE
     property: headcount
@@ -195,8 +192,7 @@ facts:
       - 500
       - 700
     asOf: 2024-03
-    source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Estimated headcount early 2024, pre rapid hiring"
+    notes: "Estimate; no published source for early 2024 specifically. Interpolated between 240 (2023) and 1,035 (Sep 2024)."
 
   - id: f_J3yAxRJ05k
     property: headcount
@@ -220,9 +216,8 @@ facts:
     property: headcount
     value: 4074
     asOf: 2026-01
-    source: https://tracxn.com/d/companies/anthropic/__SzoxXDMin-NK5tKB7ks8yHr6S9Mz68pjVCzFEcGFZ08
-    notes: "Tracxn estimate; Anthropic planned to triple international headcount in
-      late 2025"
+    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic planned
+      to triple international headcount in late 2025. Treat as rough estimate."
 
   # ── Organizational ──────────────────────────────────────────────
   - id: f_8kX2pQ7mNr

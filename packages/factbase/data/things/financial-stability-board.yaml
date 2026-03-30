@@ -11,11 +11,11 @@ facts:
 
   - id: f_tqtRCg9W6h
     property: founded-date
-    value: 2009
+    value: "2009-04"
     source: https://en.wikipedia.org/wiki/Financial_Stability_Board
     notes: >-
-      Established at the G20 London summit in April 2009. Successor to
-      the Financial Stability Forum (est. 1999).
+      Formation: April 2009 per Wikipedia infobox. Decision made at G20 London
+      summit (April 2009); successor to the Financial Stability Forum (est. 1999).
 
   - id: f_PLbv16FxaA
     property: headquarters

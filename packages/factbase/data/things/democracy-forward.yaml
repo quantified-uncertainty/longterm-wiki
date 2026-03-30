@@ -23,8 +23,9 @@ facts:
     value: "Filed FOIA lawsuit against HUD and State Department seeking records
       about Trump administration use of generative AI to rewrite rules, monitor
       employees, and target visa holders"
-    asOf: 2025-03
+    asOf: 2025-06-27
     source: https://democracyforward.org/updates/foia-ai-lawsuit/
+    notes: "Filed June 27, 2025 (initial FOIA requests were submitted in March 2025)"
 
   - id: f_9aYCt6tEaG
     property: litigation

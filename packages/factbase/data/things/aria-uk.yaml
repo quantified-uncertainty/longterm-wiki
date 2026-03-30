@@ -63,9 +63,10 @@ facts:
 
   - id: f_ZLM6Wsw64w
     property: description
-    value: "Scientific Director: Yoshua Bengio (joined Aug 2024)"
+    value: "Scientific Director for Safeguarded AI programme: Yoshua Bengio (joined Aug 2024)"
     asOf: 2024-08
     source: https://ariaresearch.substack.com/p/yoshua-bengio-joins-safeguarded-ai
+    notes: "Bengio joined the Safeguarded AI programme specifically, not ARIA as a whole"
 
   - id: f_L8Bx7t71DQ
     property: description

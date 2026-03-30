@@ -9,8 +9,8 @@ facts:
   - id: f_Fq8gK3sW5b
     property: headquarters
     value: "London, England"
-    source: https://www.adalovelaceinstitute.org/about/
-    notes: "28 Bedford Square, London WC1B 3JS"
+    source: https://www.nuffieldfoundation.org/news/we-have-moved
+    notes: "100 St John Street, London EC1M 4EH (moved from 28 Bedford Square in June 2021)"
 
   - id: f_Hw1vL6tN9c
     property: total-funding

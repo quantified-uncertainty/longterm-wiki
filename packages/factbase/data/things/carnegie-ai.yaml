@@ -2,9 +2,9 @@ entity: sid_5RV1WNLBCg
 facts:
   - id: f_Am3nT8xR5a
     property: founded-date
-    value: "1910-11-25"
+    value: "1910-12-14"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
-    notes: "Established November 25, 1910 by Andrew Carnegie with a $10 million gift"
+    notes: "Formal deed of gift presented December 14, 1910 (Carnegie announced intention on November 25, 1910). Established with $10 million gift."
 
   - id: f_Cp7gK2sW4b
     property: headquarters
