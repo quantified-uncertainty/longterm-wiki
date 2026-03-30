@@ -46,7 +46,7 @@ import {
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { urlVariants } from "../shared/url-variants.js";
-import { createHash } from "crypto";
+import { createHash, randomBytes } from "crypto";
 
 // ---- Raw SQL row types ----
 
@@ -100,6 +100,11 @@ const MAX_PAGE_SIZE = 200;
 /** Generate a 16-char hex hash ID from a URL. Matches crux/lib/hash-utils.ts hashId(). */
 function hashId(str: string): string {
   return createHash("sha256").update(str).digest("hex").slice(0, 16);
+}
+
+/** Generate a 12-char URL-safe random string for batch IDs. */
+function generateBatchId(): string {
+  return randomBytes(9).toString("base64url"); // 9 bytes → 12 base64url chars
 }
 
 // urlVariants is imported from ../shared/url-variants.js
@@ -665,7 +670,7 @@ const resourcesApp = new Hono()
       }
     }
 
-    // 4. Build response
+    // 4. Build results with content status
     const results = uniqueUrls.map((url) => {
       const r = urlToResource.get(url)!;
 
@@ -683,10 +688,156 @@ const resourcesApp = new Hono()
         resourceId: r.id,
         contentStatus,
         title: r.title,
+        jobId: null as number | null,
       };
     });
 
-    return c.json({ results });
+    // 5. Create ingestion jobs for non-fresh resources (Phase 2: batch workflow)
+    const toIngest = results.filter((r) => r.contentStatus !== "fresh");
+    let batchId: string | null = null;
+
+    if (toIngest.length > 0) {
+      batchId = generateBatchId();
+
+      // Fetch citation counts for priority calculation
+      const resourceIds = toIngest.map((r) => r.resourceId);
+      interface CitationCountRow {
+        resource_id: string;
+        cnt: string;
+      }
+      const citationCounts = await rawDb<CitationCountRow[]>`
+        SELECT resource_id, count(*)::text AS cnt
+        FROM resource_citations
+        WHERE resource_id = ANY(${resourceIds})
+        GROUP BY resource_id
+      `;
+      const citationCountMap = new Map<string, number>();
+      for (const row of citationCounts) {
+        citationCountMap.set(row.resource_id, Number(row.cnt));
+      }
+
+      // Insert jobs with dedup keys using raw SQL for ON CONFLICT dedup
+      // (same pattern as jobs.ts DEDUP_INSERT_SQL)
+      for (const item of toIngest) {
+        const citCount = citationCountMap.get(item.resourceId) ?? 0;
+        const priority = Math.min(100, citCount * 5);
+        const dedupKey = `batch:${batchId}:${item.resourceId}`;
+
+        const insertResult = await rawDb<{ id: number }[]>`
+          INSERT INTO jobs (type, params, priority, max_retries, dedup_key)
+          VALUES (
+            'resource-ingest',
+            ${JSON.stringify({ resourceId: item.resourceId, url: item.url })}::jsonb,
+            ${priority},
+            3,
+            ${dedupKey}
+          )
+          ON CONFLICT (dedup_key)
+            WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
+          DO NOTHING
+          RETURNING id
+        `;
+
+        if (insertResult.length > 0) {
+          item.jobId = insertResult[0].id;
+        } else {
+          // Active duplicate exists — fetch its ID
+          const existing = await rawDb<{ id: number }[]>`
+            SELECT id FROM jobs
+            WHERE dedup_key = ${dedupKey}
+              AND status IN ('pending', 'claimed', 'running')
+            LIMIT 1
+          `;
+          if (existing.length > 0) {
+            item.jobId = existing[0].id;
+          }
+        }
+      }
+    }
+
+    return c.json({ results, batchId });
+  })
+
+  // ---- GET /suggest/status/:batchId (poll batch ingestion progress) ----
+
+  .get("/suggest/status/:batchId", async (c) => {
+    const batchId = c.req.param("batchId");
+    if (!batchId || batchId.length > 50) {
+      return validationError(c, "Invalid batchId");
+    }
+
+    const rawDb = getDb();
+    const dedupPrefix = `batch:${batchId}:%`;
+
+    // Query all jobs for this batch with resource data
+    interface BatchJobRow {
+      job_id: number;
+      job_status: string;
+      dedup_key: string;
+      params: { resourceId?: string; url?: string } | null;
+      resource_id: string | null;
+      resource_url: string | null;
+      enrichment_status: string | null;
+      summary: string | null;
+    }
+    const jobRows = await rawDb<BatchJobRow[]>`
+      SELECT
+        j.id AS job_id,
+        j.status AS job_status,
+        j.dedup_key,
+        j.params,
+        r.id AS resource_id,
+        r.url AS resource_url,
+        r.enrichment_status,
+        r.summary
+      FROM jobs j
+      LEFT JOIN resources r ON r.id = (j.params->>'resourceId')
+      WHERE j.dedup_key LIKE ${dedupPrefix}
+      ORDER BY j.id
+    `;
+
+    if (jobRows.length === 0) {
+      return c.json({
+        batchId,
+        total: 0,
+        pending: 0,
+        completed: 0,
+        failed: 0,
+        results: [],
+      });
+    }
+
+    let pending = 0;
+    let completed = 0;
+    let failed = 0;
+
+    const batchResults = jobRows.map((row) => {
+      const status = row.job_status;
+      if (status === "completed") completed++;
+      else if (status === "failed") failed++;
+      else pending++; // pending, claimed, running
+
+      const resourceId = row.resource_id ?? row.params?.resourceId ?? null;
+      const url = row.resource_url ?? row.params?.url ?? null;
+
+      return {
+        resourceId,
+        url,
+        jobId: row.job_id,
+        jobStatus: status,
+        enrichmentStatus: row.enrichment_status,
+        summary: row.summary,
+      };
+    });
+
+    return c.json({
+      batchId,
+      total: jobRows.length,
+      pending,
+      completed,
+      failed,
+      results: batchResults,
+    });
   })
 
   // ---- GET /search?q=X (full-text search by title/summary/abstract/review) ----
@@ -945,6 +1096,28 @@ const resourcesApp = new Hono()
       limit,
       offset,
     });
+  })
+
+  // ---- GET /by-content-hash?hash=X&excludeId=Y (duplicate detection) ----
+
+  .get("/by-content-hash", async (c) => {
+    const hash = c.req.query("hash");
+    if (!hash) return validationError(c, "hash query parameter is required");
+
+    const excludeId = c.req.query("excludeId");
+    const db = getDrizzleDb();
+
+    const conditions = excludeId
+      ? sql`${resources.contentHash} = ${hash} AND ${resources.id} != ${excludeId}`
+      : eq(resources.contentHash, hash);
+
+    const rows = await db
+      .select({ id: resources.id, url: resources.url, title: resources.title })
+      .from(resources)
+      .where(conditions)
+      .limit(5);
+
+    return c.json({ resources: rows });
   })
 
   // ---- GET /:id/content (resource + linked fetched content) ----
