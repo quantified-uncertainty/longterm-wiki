@@ -671,10 +671,11 @@ async function enqueueResourceVerify(_args: string[], options: CommandOptions): 
 
   for (let i = 0; i < toEnqueue.length; i++) {
     const r = toEnqueue[i];
-    let attempts = 0;
-    const MAX_ATTEMPTS = 3;
+    let rateLimitRetries = 0;
+    const MAX_RATE_LIMIT_RETRIES = 10; // Rate limits always resolve — retry generously
 
-    while (attempts < MAX_ATTEMPTS) {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
       const result = await createJob({
         type: 'resource-verify',
         params: { resourceId: r.id, url: r.url },
@@ -684,13 +685,20 @@ async function enqueueResourceVerify(_args: string[], options: CommandOptions): 
       });
 
       if (!result.ok && result.message.includes('429')) {
+        if (rateLimitRetries >= MAX_RATE_LIMIT_RETRIES) {
+          failed++;
+          if (failed <= 3) {
+            process.stderr.write(`  ${c.red}Error: rate limit exhausted after ${MAX_RATE_LIMIT_RETRIES} retries for ${r.id}${c.reset}\n`);
+          }
+          break;
+        }
         // Rate limited — extract retry-after and wait
         const retryMatch = result.message.match(/retryAfter[":]+\s*(\d+)/i);
         const waitSec = retryMatch ? parseInt(retryMatch[1], 10) : 30;
         rateLimitPauses++;
+        rateLimitRetries++;
         process.stderr.write(`  ${c.yellow}Rate limited, waiting ${waitSec}s...${c.reset}\n`);
         await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
-        attempts++;
         continue;
       }
 
