@@ -11,7 +11,7 @@ import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { generateId } from '../lib/grant-import/id.ts';
-import { generateSid, isAnySid } from '../../packages/id-utils/src/index.ts';
+import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
 import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
@@ -61,7 +61,7 @@ export function getToolDefinitions() {
       },
       {
         name: 'resolve_entity',
-        description: 'Resolve an entity name to its stable ID. Use this to find entity IDs for people, organizations, benchmarks, etc. before submitting records.',
+        description: 'Resolve an entity name to its stable ID (returned as sid_XXXX). You MUST use this tool to get IDs for people, organizations, benchmarks, etc. before submitting records. Never fabricate IDs — only use the sid_-prefixed values returned by this tool or create_entity.',
         input_schema: {
           type: 'object',
           properties: {
@@ -72,7 +72,7 @@ export function getToolDefinitions() {
       },
       {
         name: 'submit_records',
-        description: 'Submit new or updated records to a table. Records are validated and deduplicated before insertion.',
+        description: 'Submit new or updated records to a table. Records are validated and deduplicated before insertion. Entity reference fields (personId, organizationId, etc.) MUST use sid_-prefixed IDs from resolve_entity or create_entity.',
         input_schema: {
           type: 'object',
           properties: {
@@ -92,7 +92,7 @@ export function getToolDefinitions() {
       },
       {
         name: 'create_entity',
-        description: 'Create a new entity (person, organization, benchmark, etc.) in the database. Use this when resolve_entity returns NOT_FOUND for a person or org you need to reference. Returns the new entity\'s stableId.',
+        description: 'Create a new entity (person, organization, benchmark, etc.) in the database. Use this when resolve_entity returns NOT_FOUND for a person or org you need to reference. Returns the new entity\'s stableId as sid_XXXX — use this prefixed value in submit_records.',
         input_schema: {
           type: 'object',
           properties: {
@@ -209,7 +209,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
 
   if (!result.ok) return `Error: ${result.message}`;
   return JSON.stringify(result.data.results.map(r => ({
-    id: r.stableId || r.id,
+    id: r.stableId ? SID_PREFIX + r.stableId : r.id,
     slug: r.id,
     title: r.title,
     entityType: r.entityType,
@@ -218,7 +218,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
 
 async function handleQueryExistingRecords(input: Record<string, unknown>): Promise<string> {
   const table = input.table as string;
-  const entityId = input.entityId as string;
+  const entityId = stripSid(input.entityId as string);
 
   const config = getTableConfig(table);
   if (!config) return `Error: Unknown table "${table}"`;
@@ -236,7 +236,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
   // Try direct match first
   const match = matcher.match(name);
   if (match) {
-    return JSON.stringify({ found: true, stableId: match.stableId, slug: match.slug, name: match.name });
+    return JSON.stringify({ found: true, stableId: SID_PREFIX + match.stableId, slug: match.slug, name: match.name });
   }
 
   // Try matching with grantee normalization (strips Inc, LLC, etc.)
@@ -245,7 +245,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
     const m = matcher.match(granteeMatch);
     return JSON.stringify({
       found: true,
-      stableId: granteeMatch,
+      stableId: SID_PREFIX + granteeMatch,
       slug: m?.slug || '',
       name: m?.name || name,
       matchedVia: 'normalization',
@@ -267,7 +267,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const matcher = getEntityMatcher();
   const existing = matcher.match(name);
   if (existing) {
-    return JSON.stringify({ created: false, existing: true, stableId: existing.stableId, name: existing.name });
+    return JSON.stringify({ created: false, existing: true, stableId: SID_PREFIX + existing.stableId, name: existing.name });
   }
 
   // Generate sid_-prefixed stableId (no wikiId — not a full wiki entity)
@@ -397,12 +397,12 @@ async function handleSubmitRecords(
   }
 
   // Validate and normalize entity reference fields.
-  // LLMs sometimes hallucinate plausible-looking 10-char stableIds instead of
-  // calling resolve_entity. We must verify ALL entity references exist — not
-  // just slug-formatted ones. See discussion #3387 for the full root cause.
+  // resolve_entity and create_entity return sid_-prefixed stableIds. We require
+  // the prefix (catches hallucinated IDs) AND verify the underlying ID exists in
+  // the known stableId set (catches fabricated sid_XXXX values). Belt + suspenders.
+  // See discussion #3387 for the full root cause.
   const entityFields = ['personId', 'organizationId', 'investorId', 'companyId', 'benchmarkId', 'modelId', 'granteeId'];
   const matcher = getEntityMatcher();
-  // Load idRegistry for stableId validation (matcher only indexes by name/slug/alias)
   const stableIdSet = getKnownStableIds();
   const invalidRefs: string[] = [];
   for (const record of records) {
@@ -413,6 +413,17 @@ async function handleSubmitRecords(
       // Skip "new:" prefixed values — these are unresolved names, handled downstream
       if (val.startsWith('new:')) continue;
 
+      // Best path: sid_-prefixed value from resolve_entity / create_entity
+      if (isSid(val)) {
+        const raw = stripSid(val);
+        if (stableIdSet.has(raw) || stableIdSet.has(val)) {
+          record[field] = raw;
+          continue;
+        }
+        invalidRefs.push(`${field}="${val}" — sid_-prefixed but ID not found in database. Use resolve_entity to get a valid ID.`);
+        continue;
+      }
+
       // Try to resolve via entity matcher (handles slugs, names, aliases)
       const match = matcher.match(val);
       if (match) {
@@ -420,12 +431,12 @@ async function handleSubmitRecords(
         continue;
       }
 
-      // If it looks like a stableId (sid_-prefixed or legacy 10-char), verify it exists
+      // Legacy bare stableId (10-char alphanumeric) — verify it exists
       if (isAnySid(val)) {
         if (stableIdSet.has(val)) {
-          continue; // Legitimate stableId from resolve_entity or create_entity
+          continue;
         }
-        invalidRefs.push(`${field}="${val}" in record for ${record.role || record.name || 'unknown'}`);
+        invalidRefs.push(`${field}="${val}" — looks like a fabricated stableId. Use resolve_entity to get a sid_-prefixed ID.`);
         continue;
       }
 
