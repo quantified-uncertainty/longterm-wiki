@@ -30,6 +30,15 @@ vi.mock('../../source-check/source-fetcher.ts', () => ({
     host.startsWith('10.') ||
     host.startsWith('192.168.') ||
     /^172\.(1[6-9]|2\d|3[01])\./.test(host),
+  htmlToText: (html: string) => html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+}));
+
+vi.mock('../../wiki-server/citations.ts', () => ({
+  upsertCitationContent: vi.fn().mockResolvedValue({ ok: true, data: { url: 'test' } }),
+}));
+
+vi.mock('../../wiki-server/resources.ts', () => ({
+  updateResourceFetchStatus: vi.fn().mockResolvedValue({ ok: true, data: {} }),
 }));
 
 // ---------------------------------------------------------------------------
@@ -599,5 +608,73 @@ describe('handleResourceVerify — large response handling', () => {
     expect(result.data.status).toBe('reachable');
     expect(result.data.skippedBody).toBe(true);
     expect(result.data.contentLength).toBe(15000000);
+  });
+});
+
+describe('handleResourceVerify — persistence', () => {
+  it('caches content and updates fetch_status on reachable URL', async () => {
+    const { upsertCitationContent } = await import('../../wiki-server/citations.ts');
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const body = '<html><body><h1>Title</h1><p>Content</p></body></html>';
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse(body));
+
+    await handleResourceVerify(
+      { resourceId: 'res-persist', url: 'https://example.com/persist-test' },
+      CTX,
+    );
+
+    expect(upsertCitationContent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        url: 'https://example.com/persist-test',
+        resourceId: 'res-persist',
+        fetchMethod: 'resource-verify',
+      }),
+    );
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-persist',
+      expect.objectContaining({
+        fetchStatus: 'ok',
+      }),
+    );
+  });
+
+  it('updates fetch_status to dead on 404', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    globalThis.fetch = vi.fn().mockResolvedValue(mockResponse('Not Found', { status: 404 }));
+
+    await handleResourceVerify(
+      { resourceId: 'res-dead', url: 'https://example.com/missing' },
+      CTX,
+    );
+
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-dead',
+      expect.objectContaining({
+        fetchStatus: 'dead',
+      }),
+    );
+  });
+
+  it('persists reachable status even when body is skipped (large response)', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const res = mockResponse('', {
+      headers: { 'content-length': '15000000', 'content-type': 'application/pdf' },
+    });
+    globalThis.fetch = vi.fn().mockResolvedValue(res);
+
+    await handleResourceVerify(
+      { resourceId: 'res-large', url: 'https://example.com/huge.pdf' },
+      CTX,
+    );
+
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-large',
+      expect.objectContaining({
+        fetchStatus: 'ok',
+      }),
+    );
   });
 });

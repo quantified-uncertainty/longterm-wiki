@@ -1,24 +1,29 @@
 /**
- * Source Fetcher — fetch and cache source documents for source-checking.
+ * Source Fetcher — read cached source documents for source-checking.
  *
- * Shared by factbase-source-check and source-check-orchestrate. Handles:
+ * Shared by factbase-source-check and source-check-orchestrate. This is a
+ * **read-only** layer: it reads from the citation_content cache populated by
+ * the resource-verify worker. It does NOT fetch URLs directly.
+ *
+ * If the cache misses, it returns errorType: 'not_cached' — signaling that the
+ * resource pipeline should process this URL first (Discussion #3499).
+ *
+ * Handles:
  * - SSRF protection (block private/internal hosts)
  * - Unverifiable domain detection
  * - Wiki-server citation content cache lookup
- * - Direct HTTP fetch with HTML-to-text stripping
- * - Paywall detection
+ * - Paywall detection on cached content
  */
 
 import {
   detectPaywall,
   isUnverifiableDomain,
-  classifyFetchError,
 } from '../search/paywall-detection.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import type { FetchSourceResult } from './types.ts';
 import { SOURCE_CHECK_CONSTANTS } from './types.ts';
 
-const { MAX_CONTENT_LENGTH, FETCH_TIMEOUT_MS } = SOURCE_CHECK_CONSTANTS;
+const { MAX_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 
 /**
  * Check if a hostname is a private/internal address that should be blocked (SSRF protection).
@@ -88,21 +93,19 @@ function extractMainContent(html: string): string | null {
 }
 
 /**
- * Fetch source content from a URL for source-checking.
+ * Read cached source content for source-checking.
  *
- * Attempts in order:
- * 1. Wiki-server citation content cache
- * 2. Direct HTTP fetch
+ * Reads from the citation_content cache only — does NOT fetch URLs.
+ * If the cache misses, returns errorType: 'not_cached' to signal that the
+ * resource-verify pipeline should process this URL first.
  *
- * Applies SSRF protection, unverifiable domain detection, and paywall detection.
- *
- * @param url - The source URL to fetch
- * @param userAgent - User-Agent string for direct HTTP fetches
+ * @param url - The source URL to look up
+ * @param _userAgent - Deprecated, ignored (kept for API compat)
  * @param logPrefix - Prefix for log messages (default: '[source-check]')
  */
 export async function fetchSourceContent(
   url: string,
-  userAgent = 'LongtermWiki-SourceChecker/1.0',
+  _userAgent = 'LongtermWiki-SourceChecker/1.0',
   logPrefix = '[source-check]',
 ): Promise<FetchSourceResult> {
   if (!url.startsWith('https://')) {
@@ -124,7 +127,7 @@ export async function fetchSourceContent(
     return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
-  // Try wiki-server citation_content cache
+  // Read from wiki-server citation_content cache (populated by resource-verify worker)
   try {
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
@@ -138,39 +141,9 @@ export async function fetchSourceContent(
       }
     }
   } catch (e: unknown) {
-    console.warn(`${logPrefix} Cache miss: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`${logPrefix} Cache lookup failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // Direct fetch
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        'User-Agent': userAgent,
-        'Accept': 'text/html,application/xhtml+xml,text/plain',
-      },
-    });
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      const errorType = classifyFetchError(response.status, null, null, url);
-      return { content: null, errorType: errorType ?? 'fetch_error', errorMessage: `HTTP ${response.status}` };
-    }
-
-    const html = await response.text();
-    const text = htmlToText(html).slice(0, MAX_CONTENT_LENGTH);
-
-    if (detectPaywall(text)) {
-      return { content: text, errorType: 'paywall', errorMessage: 'Content appears paywalled' };
-    }
-
-    return { content: text };
-  } catch (e: unknown) {
-    if (e instanceof DOMException && e.name === 'AbortError') {
-      return { content: null, errorType: 'timeout', errorMessage: 'Request timed out' };
-    }
-    return { content: null, errorType: 'fetch_error', errorMessage: e instanceof Error ? e.message : String(e) };
-  }
+  // No cached content — signal that the resource pipeline needs to process this URL
+  return { content: null, errorType: 'not_cached', errorMessage: 'Source content not in cache — run resource-verify first' };
 }
