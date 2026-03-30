@@ -4,7 +4,7 @@ import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-or
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { personnel, entities, things } from "../../schema.js";
+import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -88,13 +88,17 @@ function cleanPersonId(pid: string): string | null {
 const personEntity = alias(entities, "person_entity");
 const orgEntity = alias(entities, "org_entity");
 
-/** Selection shape for personnel + joined entity titles + slugs. */
+/** Selection shape for personnel + joined entity titles + slugs + verdicts. */
 const joinedSelect = {
   personnel: personnel,
   personTitle: personEntity.title,
   personSlug: personEntity.id,
   orgTitle: orgEntity.title,
   orgSlug: orgEntity.id,
+  verificationVerdict: sourceCheckVerdicts.verdict,
+  verificationConfidence: sourceCheckVerdicts.confidence,
+  verificationSourcesChecked: sourceCheckVerdicts.sourcesChecked,
+  verificationCheckedAt: sourceCheckVerdicts.lastComputedAt,
 };
 
 interface JoinedRow {
@@ -103,6 +107,10 @@ interface JoinedRow {
   personSlug: string | null;
   orgTitle: string | null;
   orgSlug: string | null;
+  verificationVerdict: string | null;
+  verificationConfidence: number | null;
+  verificationSourcesChecked: number | null;
+  verificationCheckedAt: Date | null;
 }
 
 function formatRow(r: JoinedRow) {
@@ -137,6 +145,14 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
+    verification: r.verificationVerdict
+      ? {
+          verdict: r.verificationVerdict,
+          confidence: r.verificationConfidence,
+          sourcesChecked: r.verificationSourcesChecked ?? 0,
+          checkedAt: r.verificationCheckedAt?.toISOString() ?? null,
+        }
+      : null,
   };
 }
 
@@ -181,6 +197,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(
+        sourceCheckVerdicts,
+        and(
+          eq(sourceCheckVerdicts.recordType, "personnel"),
+          eq(sourceCheckVerdicts.recordId, personnel.id),
+          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+        ),
+      )
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -215,6 +239,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(
+        sourceCheckVerdicts,
+        and(
+          eq(sourceCheckVerdicts.recordType, "personnel"),
+          eq(sourceCheckVerdicts.recordId, personnel.id),
+          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+        ),
+      )
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -246,6 +278,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(
+        sourceCheckVerdicts,
+        and(
+          eq(sourceCheckVerdicts.recordType, "personnel"),
+          eq(sourceCheckVerdicts.recordId, personnel.id),
+          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+        ),
+      )
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -275,6 +315,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+      .leftJoin(
+        sourceCheckVerdicts,
+        and(
+          eq(sourceCheckVerdicts.recordType, "personnel"),
+          eq(sourceCheckVerdicts.recordId, personnel.id),
+          sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+        ),
+      )
       .where(
         or(
           isNull(personnel.personEntityId),

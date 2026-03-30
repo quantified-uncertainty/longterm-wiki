@@ -76,6 +76,7 @@ describe("pgPersonnelToEntries", () => {
       start: "2020-01-01",
       end: undefined,
       roleType: "key-person",
+      verificationVerdict: null,
     });
   });
 
