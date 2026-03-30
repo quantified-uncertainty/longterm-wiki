@@ -192,3 +192,16 @@ Adding a new entity with a `wikiId` that's already used by another entity causes
 **Fix**: Run `pnpm crux w validate gate` to detect collisions. Use `pnpm crux tb ids allocate <slug>` to get a guaranteed-unique ID.
 
 **Prevention**: Always allocate IDs with `crux tb ids allocate` rather than manually picking a number. Never reuse an ID from a "deprecated" page. The gate check detects collisions — run it before committing any new entity.
+
+---
+
+## Database / Postgres
+
+### postgres.js returns bigserial columns as strings — causes type mismatches in handlers
+`postgres.js` (the DB driver) returns `bigserial`/`bigint` columns as JavaScript strings, not numbers. When code compares these string IDs against Zod-parsed number values (e.g., from LLM JSON output or route params), the comparison silently fails — all IDs appear "not found".
+
+**Pattern observed**: Claims system (#3423, #3443) — claim IDs from `/api/claims/by-ids` were strings, LLM response IDs were numbers, so all verdicts got marked "unknown claimId".
+
+**Fix**: Coerce after fetching: `Number(row.id)` or add `.transform(Number)` to the Zod schema for any column backed by `bigserial`/`bigint`.
+
+**Prevention**: When adding any route that reads a `bigserial` column and uses it in a comparison or passes it to a Zod schema expecting `number`, add a coercion step. Add a test that verifies the returned ID type is `number`, not `string`.
