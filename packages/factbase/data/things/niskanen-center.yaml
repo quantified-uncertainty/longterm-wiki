@@ -2,9 +2,9 @@ entity: sid_O5jCdIWixQ
 facts:
   - id: f_nc_founded
     property: founded-date
-    value: "2015"
+    value: "2015-01"
     source: https://en.wikipedia.org/wiki/Niskanen_Center
-    notes: "Founded 2015 by Jerry Taylor"
+    notes: "Founded January 2015 by Jerry Taylor. Named after libertarian economist William Niskanen."
 
   - id: f_nc_hq
     property: headquarters
@@ -28,6 +28,53 @@ facts:
 
   - id: f_nc_ai_note
     property: program-note
-    value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond, Jennifer Pahlka). AI policy addressed ad hoc through individual fellows (Samuel Hammond on AI and institutions, Jennifer Pahlka on AI in government). Policy departments: Climate, Criminal Justice, Immigration, Social Policy, State Capacity, Government Affairs, Legal."
+    value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond on AI and institutions, Jennifer Pahlka on AI in government). Policy departments: Climate, Criminal Justice, Immigration, Social Policy, State Capacity, Government Affairs, Legal."
     asOf: 2026-03
     source: https://www.niskanencenter.org/leadership-and-staff/
+
+  - id: f_nc_founder
+    property: founded-by
+    value: "Jerry Taylor"
+    source: https://en.wikipedia.org/wiki/Niskanen_Center
+    notes: "Former vice president of the Cato Institute. Resigned September 2021 after domestic violence charges. Core staff came from Cato during a 2012 leadership dispute."
+
+  - id: f_nc_legal
+    property: legal-structure
+    value: "501(c)(3) nonprofit think tank (EIN 45-5308952). Also has a 501(c)(4) lobbying arm, the Niskanen Center for Public Policy (EIN 47-4946572), spun off in 2016."
+    source: https://www.influencewatch.org/non-profit/niskanen-center/
+
+  - id: f_nc_leadership
+    property: leadership
+    value: "Acting President: R.J. Lyman (from March 2026). Board Chair: Bob Litterman. Previous presidents: Ted Gayer (Aug 2022 - Feb 2026), Jerry Taylor (2015-2021)."
+    asOf: 2026-03
+    source: https://www.niskanencenter.org/niskanen-center-announces-leadership-transition/
+    notes: "Gayer remains as senior advisor through May 2026, then senior fellow"
+
+  - id: f_nc_description
+    property: description
+    value: "Center-right policy think tank in Washington, DC advocating for evidence-based solutions to climate change, immigration reform, criminal justice reform, and effective governance. Promotes carbon tax, expanded legal immigration, and supply-side progressivism ('Abundance Agenda')."
+    asOf: 2026-03
+    source: https://en.wikipedia.org/wiki/Niskanen_Center
+
+  - id: f_nc_website
+    property: website
+    value: "https://www.niskanencenter.org/"
+    source: https://www.niskanencenter.org/
+
+  - id: f_nc_country
+    property: country
+    value: "United States"
+    source: https://www.niskanencenter.org/contact-us/
+
+  - id: f_nc_revenue_2022
+    property: annual-revenue
+    value: "7075571"
+    unit: USD
+    asOf: 2022
+    source: https://en.wikipedia.org/wiki/Niskanen_Center
+    notes: "Revenue $7.1M, expenses $7.6M"
+
+  - id: f_nc_funding_sources
+    property: funding-sources
+    value: "Key donors include Open Philanthropy, Hewlett Foundation ($400K operations grant), Linden Trust for Conservation. The 501(c)(4) arm received funding from Open Society Foundations ($500K in 2017), Democracy Fund Voice ($175K in 2018)."
+    source: https://www.influencewatch.org/non-profit/niskanen-center/
