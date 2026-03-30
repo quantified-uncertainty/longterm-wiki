@@ -790,21 +790,25 @@ function personnelRowToRecordEntry(row) {
   };
   const schema = schemaMap[row.roleType] || row.roleType;
 
+  // Prefer resolved FK columns (sid_-prefixed) over raw columns (may be bare IDs)
+  const resolvedPersonId = row.personEntityId || row.personId;
+  const resolvedOrgId = row.orgEntityId || row.organizationId;
+
   if (row.roleType === 'key-person') {
-    fields.person = row.personId;
+    fields.person = resolvedPersonId;
     fields.title = row.role;
     if (row.startDate) fields.start = row.startDate;
     if (row.endDate) fields.end = row.endDate;
     if (row.isFounder) fields.is_founder = true;
   } else if (row.roleType === 'board') {
-    fields.member = row.personId;
+    fields.member = resolvedPersonId;
     fields.role = row.role;
     if (row.startDate) fields.appointed = row.startDate;
     if (row.endDate) fields.departed = row.endDate;
     if (row.appointedBy) fields.appointed_by = row.appointedBy;
     if (row.background) fields.background = row.background;
   } else if (row.roleType === 'career') {
-    fields.organization = row.organizationId;
+    fields.organization = resolvedOrgId;
     fields.title = row.role;
     if (row.startDate) fields.start = row.startDate;
     if (row.endDate) fields.end = row.endDate;
@@ -816,7 +820,7 @@ function personnelRowToRecordEntry(row) {
   const entry = {
     key: row.id,
     schema,
-    ownerEntityId: row.roleType === 'career' ? row.personId : row.organizationId,
+    ownerEntityId: row.roleType === 'career' ? resolvedPersonId : resolvedOrgId,
     fields,
   };
   // Embed resolved display name from API JOIN (personnel API returns personResolvedName).
@@ -847,7 +851,7 @@ function grantRowToRecordEntry(row) {
   const entry = {
     key: row.id,
     schema: 'grant',
-    ownerEntityId: row.organizationId,
+    ownerEntityId: row.orgEntityId || row.organizationId,
     fields,
   };
   // Embed resolved grantee display name from entity ref.
@@ -896,7 +900,7 @@ function fundingRoundRowToRecordEntry(row) {
  */
 function investmentRowToRecordEntry(row) {
   const fields = {};
-  fields.investor = row.investorId;
+  fields.investor = row.investorEntityId || row.investorId;
   if (row.roundName) fields.round_name = row.roundName;
   if (row.date) fields.date = row.date;
   if (row.amount != null) fields.amount = row.amount;
@@ -923,7 +927,7 @@ function investmentRowToRecordEntry(row) {
   const entry = {
     key: row.id,
     schema: 'investment',
-    ownerEntityId: row.companyId,
+    ownerEntityId: row.companyEntityId || row.companyId,
     fields,
   };
   // Embed resolved investor display name from entity ref.
@@ -937,7 +941,7 @@ function investmentRowToRecordEntry(row) {
  */
 function equityPositionRowToRecordEntry(row) {
   const fields = {};
-  fields.holder = row.holderId;
+  fields.holder = row.holderEntityId || row.holderId;
   if (row.stake) {
     // Parse JSON array back to array if applicable, otherwise use as number
     try {
@@ -958,7 +962,7 @@ function equityPositionRowToRecordEntry(row) {
   const entry = {
     key: row.id,
     schema: 'equity-position',
-    ownerEntityId: row.companyId,
+    ownerEntityId: row.companyEntityId || row.companyId,
     fields,
   };
   if (row.asOf) entry.asOf = row.asOf;
@@ -1312,8 +1316,8 @@ export async function mergePGRecordsIntoKB(kb) {
     personnelResult,
     ['key-persons', 'board-seats', 'career-history'],
     (row) => {
-      if (row.roleType === 'career') return row.personId;
-      return row.organizationId;
+      if (row.roleType === 'career') return row.personEntityId || row.personId;
+      return row.orgEntityId || row.organizationId;
     },
     (row) => {
       if (row.roleType === 'key-person') return 'key-persons';
@@ -1329,7 +1333,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'grants',
     grantsResult,
     ['grants'],
-    (row) => row.organizationId,
+    (row) => row.orgEntityId || row.organizationId,
     () => 'grants',
     grantRowToRecordEntry,
   );
@@ -1349,7 +1353,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'investments',
     investmentsResult,
     ['investments'],
-    (row) => row.companyId,
+    (row) => row.companyEntityId || row.companyId,
     () => 'investments',
     investmentRowToRecordEntry,
   );
@@ -1359,7 +1363,7 @@ export async function mergePGRecordsIntoKB(kb) {
     'equity-positions',
     equityPositionsResult,
     ['equity-positions'],
-    (row) => row.companyId,
+    (row) => row.companyEntityId || row.companyId,
     () => 'equity-positions',
     equityPositionRowToRecordEntry,
   );

@@ -96,6 +96,9 @@ function reconstructFactValue(row: typeof facts.$inferSelect) {
     case "json":
       return { type: "json" as const, value: row.value ? JSON.parse(row.value) : null };
     default:
+      // Guard: reject stale "[object Object]" artifacts from pre-March 2026 sync
+      // (old data/facts/*.yaml had {min: N} objects that String() serialized as "[object Object]")
+      if (row.value === "[object Object]") return { type: "text" as const, value: "" };
       return { type: "text" as const, value: row.value ?? "" };
   }
 }

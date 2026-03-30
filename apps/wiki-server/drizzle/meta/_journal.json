@@ -1037,6 +1037,13 @@
       "when": 1782115200000,
       "tag": "0147_sid_prefix_migration",
       "breakpoints": true
+    },
+    {
+      "idx": 148,
+      "version": "7",
+      "when": 1782201600000,
+      "tag": "0148_delete_stale_object_object_facts",
+      "breakpoints": true
     }
   ]
 }
