@@ -204,13 +204,12 @@ facts:
       extrapolation; OpenAI does not officially disclose MAU"
 
   - id: f_OXCw5BvQtQ
-    property: monthly-active-users
+    property: weekly-active-users
     value: 8e+8
     asOf: 2025-10
     source: https://www.demandsage.com/chatgpt-statistics/
-    notes: "Estimated MAU based on web traffic and usage data; WAU was 800M in
-      October 2025 per Sam Altman, implying MAU significantly higher. Some
-      sources estimate 1B+ MAU by January 2026."
+    notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman.
+      Some sources estimate 1B+ MAU by January 2026."
 
   # ── Business Customers ────────────────────────────────────────
   - id: f_CAsPvnUElQ

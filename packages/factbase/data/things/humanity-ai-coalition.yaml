@@ -2,15 +2,15 @@ entity: sid_7WxlhX0LBn
 facts:
   - id: f_RR3W5s05Bq
     property: founded-date
-    value: "2025-08-14"
+    value: "2025-10-14"
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-    notes: "Launched August 14, 2025"
+    notes: "Launched October 14, 2025 per MacArthur Foundation press release"
 
   - id: f_eQxEIIrI9c
     property: total-funding
     value: "500000000"
     unit: USD
-    asOf: 2025-08
+    asOf: 2025-10
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
     notes: "$500M over 5 years"
 
@@ -24,7 +24,7 @@ facts:
   - id: f_JwqBzO6sxD
     property: founding-members
     value: "Doris Duke Foundation, Ford Foundation, Lumina Foundation, Kapor Foundation, Mellon Foundation, Mozilla Foundation, Siegel Family Endowment, David and Lucile Packard Foundation"
-    asOf: 2025-08
+    asOf: 2025-10
     source: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
 
   - id: f_sDIu9aTWHe
