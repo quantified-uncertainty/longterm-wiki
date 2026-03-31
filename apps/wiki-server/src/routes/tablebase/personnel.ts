@@ -293,7 +293,8 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           like(personnel.personId, "new:%"),
         )
       )
-      .orderBy(personnel.organizationId, personnel.personId);
+      .orderBy(personnel.organizationId, personnel.personId)
+      .limit(100);
 
     const classified = rows.map((r) => {
       const p = r.personnel;

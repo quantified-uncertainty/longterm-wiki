@@ -323,7 +323,8 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       })
       .from(grants)
       .groupBy(grants.organizationId)
-      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`);
+      .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`)
+      .limit(50);
 
     return c.json({
       organizations: rows.map((r) => ({
