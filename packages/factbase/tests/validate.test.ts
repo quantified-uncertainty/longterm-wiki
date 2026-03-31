@@ -228,6 +228,16 @@ describe("validate", () => {
       expect(formatErrors).toHaveLength(0);
     });
 
+    it("accepts sid_-prefixed stableId (new format)", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addEntity(ent("sid_WVHl7Ya8oQ", "org", "SidOrg"));
+
+      const results = validateEntity(g, "sid_WVHl7Ya8oQ");
+      const formatErrors = results.filter((r) => r.rule === "stableid-format");
+      expect(formatErrors).toHaveLength(0);
+    });
+
     it("rejects stableId that is too short", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
@@ -239,7 +249,7 @@ describe("validate", () => {
       expect(formatErrors[0].severity).toBe("error");
     });
 
-    it("rejects stableId with non-alphanumeric characters", () => {
+    it("rejects stableId with non-alphanumeric characters (not sid_ prefix)", () => {
       const g = new Graph();
       g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
       g.addEntity(ent("abc-123_fg", "org", "Bad"));
