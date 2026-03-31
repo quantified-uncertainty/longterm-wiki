@@ -724,7 +724,8 @@ describe('resource integration', () => {
     }));
   });
 
-  it('does not call updateResourceFetchStatus when updateResourceStatus is false', async () => {
+  it('always calls updateResourceFetchStatus when resource exists (#3520)', async () => {
+    // Since #3520, fetch status is always persisted regardless of updateResourceStatus flag
     const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
     const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
     updateMock.mockClear();
@@ -734,9 +735,13 @@ describe('resource integration', () => {
     await fetchSource({
       url: 'https://example.com/safety-paper',
       extractMode: 'full',
+      // updateResourceStatus not set — should still persist
     });
 
-    expect(updateMock).not.toHaveBeenCalled();
+    expect(updateMock).toHaveBeenCalledOnce();
+    expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
+      fetchStatus: 'ok',
+    }));
   });
 
   it('reflects dead status back to resource when updateResourceStatus is true', async () => {
@@ -755,6 +760,59 @@ describe('resource integration', () => {
     expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
       fetchStatus: 'dead',
     }));
+  });
+
+  it('persists error status for DNS failures (#3520)', async () => {
+    const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
+    const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
+    updateMock.mockClear();
+
+    // Simulate DNS resolution failure — fetch throws with empty content
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('fetch failed')));
+
+    const result = await fetchSource({
+      url: 'https://example.com/safety-paper',
+      extractMode: 'full',
+    });
+
+    expect(result.status).toBe('error');
+    expect(updateMock).toHaveBeenCalledOnce();
+    expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
+      fetchStatus: 'error',
+      fetchedAt: expect.any(String),
+    }));
+  });
+
+  it('persists error status for timeouts (#3520)', async () => {
+    vi.useFakeTimers();
+    try {
+      const { updateResourceFetchStatus } = await import('./resource-lookup.ts');
+      const updateMock = updateResourceFetchStatus as ReturnType<typeof vi.fn>;
+      updateMock.mockClear();
+
+      // Simulate timeout — fetch throws AbortError (triggers retries with backoff)
+      vi.stubGlobal('fetch', vi.fn().mockRejectedValue(
+        new DOMException('The operation was aborted', 'AbortError'),
+      ));
+
+      const fetchPromise = fetchSource({
+        url: 'https://example.com/safety-paper',
+        extractMode: 'full',
+      });
+
+      // Advance past retry backoff delays (2s + 4s)
+      await vi.advanceTimersByTimeAsync(10_000);
+
+      const result = await fetchPromise;
+
+      expect(result.status).toBe('error');
+      expect(updateMock).toHaveBeenCalledOnce();
+      expect(updateMock).toHaveBeenCalledWith('res-safety-paper', expect.objectContaining({
+        fetchStatus: 'error',
+      }));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('throws when neither url nor valid resourceId is provided', async () => {

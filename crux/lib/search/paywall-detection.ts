@@ -178,6 +178,95 @@ export function classifyFetchError(
 }
 
 // ---------------------------------------------------------------------------
+// Twitter/X soft-404 detection (#3521)
+// ---------------------------------------------------------------------------
+
+/** Domains that serve HTTP 200 for nonexistent profiles with very short pages. */
+const TWITTER_DOMAINS = ['twitter.com', 'x.com'];
+
+/**
+ * Detect Twitter/X soft-404: nonexistent profiles return HTTP 200 with a very
+ * short page (~493 chars). Normal Twitter pages with real content are much longer.
+ *
+ * @param url - The original or final (post-redirect) URL
+ * @param contentLength - Length of the fetched content
+ * @param httpStatus - HTTP status code (only 200 triggers detection)
+ */
+export function detectTwitterSoft404(
+  url: string,
+  contentLength: number,
+  httpStatus: number,
+): boolean {
+  if (httpStatus !== 200) return false;
+  if (contentLength > 1000) return false;
+  const domain = getDomain(url);
+  return TWITTER_DOMAINS.some(d => domain === d || domain.endsWith('.' + d));
+}
+
+// ---------------------------------------------------------------------------
+// Cookie consent page detection (#3522)
+// ---------------------------------------------------------------------------
+
+/** URL query parameters that indicate a cookie consent redirect. */
+const COOKIE_REDIRECT_PATTERNS = [
+  'error=cookies_not_supported',
+  'error=cookies',
+  'cookies_not_supported',
+  'cookie-consent',
+  'cookieconsent',
+  'consent-required',
+];
+
+/** Content signals for pages that are only a cookie consent/error page. */
+const COOKIE_CONSENT_SIGNALS = [
+  'cookies are required',
+  'cookies must be enabled',
+  'enable cookies to continue',
+  'cookies are disabled',
+  'cookies_not_supported',
+  'please enable cookies',
+  'this site requires cookies',
+  'accept cookies to continue',
+  'cookie consent required',
+  'cookies need to be enabled',
+];
+
+/**
+ * Detect cookie consent redirect pages — sites that redirect to a cookie
+ * error/consent page instead of serving the actual article (#3522).
+ *
+ * Checks both the final URL (for redirect query params) and the page content
+ * (for cookie consent messaging). Only flags short pages (< 10KB) to avoid
+ * false positives on real articles that mention cookies in a banner.
+ *
+ * @param finalUrl - The URL after following redirects
+ * @param content - The page content
+ * @param originalUrl - The originally requested URL
+ */
+export function detectCookieConsent(
+  finalUrl: string,
+  content: string,
+  originalUrl: string,
+): boolean {
+  // Check URL patterns — most reliable signal
+  const lowerFinalUrl = finalUrl.toLowerCase();
+  if (COOKIE_REDIRECT_PATTERNS.some(p => lowerFinalUrl.includes(p))) {
+    return true;
+  }
+
+  // Content check only for short pages (cookie consent pages are typically short)
+  if (!content || content.length > 10_000) return false;
+
+  // Only check if the URL actually changed (redirect happened) or content is very short
+  const redirected = finalUrl !== originalUrl;
+  const veryShort = content.length < 2000;
+  if (!redirected && !veryShort) return false;
+
+  const lower = content.toLowerCase();
+  return COOKIE_CONSENT_SIGNALS.some(s => lower.includes(s));
+}
+
+// ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 
