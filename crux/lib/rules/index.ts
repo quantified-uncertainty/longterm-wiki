@@ -20,19 +20,16 @@ import { componentRefsRule } from './component-refs.ts';
 import { preferEntityLinkRule } from './prefer-entitylink.ts';
 
 // Sidebar/structure rules
-import { sidebarIndexRule } from './sidebar-index.ts';
 import { kbSubcategoryCoverageRule } from './factbase-subcategory-coverage.ts';
 
 // File-level rules
 import { jsxInMdRule } from './jsx-in-md.ts';
-import { cruftFilesRule } from './cruft-files.ts';
 
 // Markdown formatting rules
 import { markdownListsRule } from './markdown-lists.ts';
 import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
 
 // Component validation rules
-import { componentPropsRule } from './component-props.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { citationUrlsRule } from './citation-urls.ts';
 import { vagueCitationsRule } from './vague-citations.ts';
@@ -51,9 +48,6 @@ import { editorialArtifactsRule } from './editorial-artifacts.ts';
 import { outdatedNamesRule } from './outdated-names.ts';
 
 import { hardcodedCalculationsRule } from './hardcoded-calculations.ts';
-
-// Squiggle model quality
-import { squiggleQualityRule } from './squiggle-quality.ts';
 
 // Content quality warning rules (used by grading pipeline)
 import { insiderJargonRule } from './insider-jargon.ts';
@@ -74,9 +68,6 @@ import { noUrlFootnotesRule } from './no-url-footnotes.ts';
 // Citation quality
 import { footnoteQualityRule } from './footnote-quality.ts';
 
-// Citation accuracy
-import { citationDoiMismatchRule } from './citation-doi-mismatch.ts';
-
 // Hallucination risk reduction (issue #200)
 import { citationDensityRule } from './citation-density.ts';
 import { balanceFlagsRule } from './balance-flags.ts';
@@ -95,9 +86,6 @@ import { noExecSyncRule } from './no-exec-sync.ts';
 import { resourceRefIntegrityRule } from './resource-ref-integrity.ts';
 import { kbfRefsRule } from './factbase-refs.ts';
 
-// Source-check verdict warnings (advisory)
-import { sourceCheckVerdictsRule } from './source-check-verdicts.ts';
-
 // Deprecated component detection
 import { noDeprecatedComponentsRule } from './no-deprecated-components.ts';
 
@@ -113,13 +101,6 @@ import { orphanedFootnotesRule } from './orphaned-footnotes.ts';
 // Numbered footnotes migration (issue #1162)
 import { numberedFootnotesRule } from './numbered-footnotes.ts';
 
-// Block-level structural quality (uses block-index.json IR)
-import { blockSectionQualityRule } from './block-section-quality.ts';
-
-// Component usage validation (issues #918, #920)
-import { datainfoboxEntityMatchRule } from './datainfobox-entity-match.ts';
-import { officialWebsiteLabelRule } from './official-website-label.ts';
-
 // Content quality rules (issues #916, #922)
 import { placeholderTextRule } from './placeholder-text.ts';
 import { personOrgAffiliationRule } from './person-org-affiliation.ts';
@@ -133,7 +114,6 @@ import { brokenLinksRule } from './broken-links.ts';
 // Cross-page consistency rules (ported from validate-consistency.ts)
 import { probabilityConsistencyRule } from './probability-consistency.ts';
 import { terminologyVariantsRule } from './terminology-variants.ts';
-import { causalRelationshipCoverageRule } from './causal-relationship-coverage.ts';
 
 // Re-export all rules individually
 export {
@@ -147,13 +127,10 @@ export {
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  sidebarIndexRule,
   kbSubcategoryCoverageRule,
   jsxInMdRule,
-  cruftFilesRule,
   markdownListsRule,
   consecutiveBoldLabelsRule,
-  componentPropsRule,
   componentImportsRule,
   citationUrlsRule,
   vagueCitationsRule,
@@ -171,13 +148,11 @@ export {
   toneMarkersRule,
   structuralQualityRule,
   evaluativeFramingRule,
-  squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
   footnoteQualityRule,
-  citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
   tableHeadersRule,
@@ -186,13 +161,9 @@ export {
   noExecSyncRule,
   resourceRefIntegrityRule,
   kbfRefsRule,
-  sourceCheckVerdictsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
-  blockSectionQualityRule,
-  datainfoboxEntityMatchRule,
-  officialWebsiteLabelRule,
   placeholderTextRule,
   personOrgAffiliationRule,
   numberedFootnotesRule,
@@ -201,7 +172,6 @@ export {
   styleGuideRule,
   probabilityConsistencyRule,
   terminologyVariantsRule,
-  causalRelationshipCoverageRule,
 };
 
 export const allRules: Rule[] = [
@@ -215,13 +185,10 @@ export const allRules: Rule[] = [
   internalLinksRule,
   componentRefsRule,
   preferEntityLinkRule,
-  sidebarIndexRule,
   kbSubcategoryCoverageRule,
   jsxInMdRule,
-  cruftFilesRule,
   markdownListsRule,
   consecutiveBoldLabelsRule,
-  componentPropsRule,
   componentImportsRule,
   citationUrlsRule,
   vagueCitationsRule,
@@ -239,13 +206,11 @@ export const allRules: Rule[] = [
   toneMarkersRule,
   structuralQualityRule,
   evaluativeFramingRule,
-  squiggleQualityRule,
   unsourcedBiographicalClaimsRule,
   evaluativeFlattery,
   footnoteCoverageRule,
   noUrlFootnotesRule,
   footnoteQualityRule,
-  citationDoiMismatchRule,
   citationDensityRule,
   balanceFlagsRule,
   tableHeadersRule,
@@ -254,13 +219,9 @@ export const allRules: Rule[] = [
   noExecSyncRule,
   resourceRefIntegrityRule,
   kbfRefsRule,
-  sourceCheckVerdictsRule,
   noDeprecatedComponentsRule,
   pipelineArtifactsRule,
   footnoteIntegrityRule,
-  blockSectionQualityRule,
-  datainfoboxEntityMatchRule,
-  officialWebsiteLabelRule,
   placeholderTextRule,
   personOrgAffiliationRule,
   numberedFootnotesRule,
@@ -269,7 +230,6 @@ export const allRules: Rule[] = [
   styleGuideRule,
   probabilityConsistencyRule,
   terminologyVariantsRule,
-  causalRelationshipCoverageRule,
 ];
 
 export default allRules;

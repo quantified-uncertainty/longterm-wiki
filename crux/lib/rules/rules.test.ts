@@ -12,7 +12,6 @@ import { placeholdersRule } from './placeholders.ts';
 import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
 import { temporalArtifactsRule } from './temporal-artifacts.ts';
 import { vagueCitationsRule } from './vague-citations.ts';
-import { componentPropsRule } from './component-props.ts';
 import { citationUrlsRule } from './citation-urls.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { frontmatterSchemaRule } from './frontmatter-schema.ts';
@@ -482,47 +481,6 @@ describe('shouldSkipValidation utility', () => {
 
   it('does not skip non-internal entity types', () => {
     expect(shouldSkipValidation({ entityType: 'risk' })).toBe(false);
-  });
-});
-
-// =============================================================================
-// component-props rule
-// =============================================================================
-
-describe('component-props rule', () => {
-  it('detects KeyPeople with children content', () => {
-    const content = mockContent('<KeyPeople>\n- Person A\n- Person B\n</KeyPeople>');
-    const issues = check(componentPropsRule, content);
-    expect(issues.length).toBe(1);
-    expect(issues[0].message).toContain('KeyPeople');
-    expect(issues[0].message).toContain('people');
-    expect(issues[0].severity).toBe(Severity.ERROR);
-  });
-
-  it('allows KeyPeople with people prop', () => {
-    const content = mockContent('<KeyPeople people={[{ name: "Alice", role: "CEO" }]} />');
-    const issues = check(componentPropsRule, content);
-    expect(issues.length).toBe(0);
-  });
-
-  it('detects KeyQuestions with children content', () => {
-    const content = mockContent('<KeyQuestions>\n- Question 1?\n</KeyQuestions>');
-    const issues = check(componentPropsRule, content);
-    expect(issues.length).toBe(1);
-    expect(issues[0].message).toContain('KeyQuestions');
-    expect(issues[0].message).toContain('questions');
-  });
-
-  it('allows KeyQuestions with questions prop', () => {
-    const content = mockContent('<KeyQuestions questions={["Q1?", "Q2?"]} />');
-    const issues = check(componentPropsRule, content);
-    expect(issues.length).toBe(0);
-  });
-
-  it('returns no issues for content without prop-required components', () => {
-    const content = mockContent('Just some regular content here.');
-    const issues = check(componentPropsRule, content);
-    expect(issues.length).toBe(0);
   });
 });
 
