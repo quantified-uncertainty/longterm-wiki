@@ -2,9 +2,10 @@
  * FactBase Source-Check Command
  *
  * Checks KB facts against their source URLs using an LLM.
- * For each fact with a source URL, fetches the source content (from DB cache
- * or directly), builds an LLM prompt, and parses the response to determine
- * whether the source confirms, contradicts, or doesn't address the claim.
+ * For each fact with a source URL, reads cached content from citation_content
+ * (populated by the resource-verify worker), builds an LLM prompt, and parses
+ * the response to determine whether the source confirms, contradicts, or
+ * doesn't address the claim.
  *
  * Usage:
  *   crux fb source-check --entity=anthropic         Check all facts for Anthropic
@@ -22,6 +23,11 @@ import { parseJsonResponse } from '../lib/anthropic.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
+import {
+  SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
+  SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
+  SOURCE_CHECK_RESPONSE_FORMAT,
+} from '../lib/source-check/prompt-guidelines.ts';
 import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
 
@@ -79,8 +85,6 @@ interface VerificationSummary {
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
-// LoadedKB, loadGraphFull, resolveEntity imported from ../lib/kb-loader.ts
-
 /**
  * Build the LLM source-check prompt for a single fact.
  */
@@ -108,34 +112,11 @@ ${sourceText}
 
 Does the source text confirm, contradict, or not address this claim?
 
-IMPORTANT — avoid these common false-positive errors:
-- **Range vs. point**: If the source gives a range (e.g., "51-200 employees") and the claimed value falls within that range (e.g., 91), that is "confirmed", NOT contradicted.
-- **Temporal mismatch**: Only compare values from the same time period. If the claim is "as of 2024" but the source discusses 2025 projections (or vice versa), that is "unverifiable" or "outdated", NOT contradicted.
-- **Wrong source relevance**: The source must actually discuss the specific claim. If the source is about entity X's own page but the claim is about a person's prior employment at entity Y, the source cannot contradict that — it's "unverifiable".
-- **Approximate values**: A claimed value within 10% of the source value is "partial" or "confirmed", not "contradicted". Only use "contradicted" when values clearly conflict (e.g., source says 500, claim says 2000).
-- **URL format**: "example.com", "https://www.example.com", and "http://example.com" all refer to the same website. Differences in protocol (http/https), "www" prefix, or trailing slashes are NOT contradictions — use "confirmed".
-- **Date precision**: "2016-08" and "30 August 2016" are equivalent. Month-level vs day-level dates for the same month are NOT contradictions — use "confirmed".
-- **Archive URLs**: A web.archive.org URL for a defunct/dissolved organization is intentional — not a contradiction with the original URL. Use "confirmed".
-- **Opaque identifiers**: If a field contains an opaque ID (e.g., "sid_xxxx", "pjaXzBneWf") you cannot resolve, that is "unverifiable" — never "contradicted".
-- **Partial listings**: Listing one founder/member when the source lists multiple is "partial", not "contradicted". The claim is incomplete, not wrong.
-- **NaN/null values**: If the claimed value is "$NaN", "NaN", null, or undefined, that is a data bug — mark "unverifiable", not "contradicted".
+${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
 
-Other considerations:
-- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
-- Dates may be approximate
-- If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
-- If the source has a newer value that supersedes the claimed value, that's "outdated"
-- If the source partially confirms (e.g., confirms the ballpark but not the exact figure), that's "partial"
+${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 
-Reserve "contradicted" ONLY for cases where the source clearly and directly states a value that is genuinely incompatible with the claim for the same time period — not just formatted differently or incomplete.
-
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "What the source actually says about this data point (quote or paraphrase)",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 /**
@@ -151,8 +132,8 @@ async function verifySingleFact(
   const formattedValue = formatFactValue(fact, property, graph);
   const sourceUrl = fact.source!;
 
-  // Fetch source content
-  const fetchResult = await fetchSourceContent(sourceUrl);
+  // Fetch source content from citation_content cache (populated by resource-verify worker)
+  const fetchResult = await fetchSourceContent(sourceUrl, undefined, '[fb-source-check]');
   if (!fetchResult.content) {
     return {
       factId: fact.id,

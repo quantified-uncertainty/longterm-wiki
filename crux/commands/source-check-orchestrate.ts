@@ -38,6 +38,11 @@ import {
   SOURCE_CHECK_CONSTANTS,
   MODELS,
 } from '../lib/source-check/index.ts';
+import {
+  SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
+  SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
+  SOURCE_CHECK_RESPONSE_FORMAT,
+} from '../lib/source-check/prompt-guidelines.ts';
 import { str, strOrNull, numOrNull, resolveName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -772,34 +777,11 @@ ${sourceText.slice(0, 4000)}
 
 Does the source text confirm, contradict, or not address this claim?
 
-IMPORTANT — avoid these common false-positive errors:
-- **Range vs. point**: If the source gives a range (e.g., "51-200 employees") and the claimed value falls within that range (e.g., 91), that is "confirmed", NOT contradicted.
-- **Temporal mismatch**: Only compare values from the same time period. If the claim is "as of 2024" but the source discusses 2025 projections (or vice versa), that is "unverifiable" or "outdated", NOT contradicted.
-- **Wrong source relevance**: The source must actually discuss the specific claim. If the source is about entity X's own page but the claim is about a person's prior employment at entity Y, the source cannot contradict that — it's "unverifiable".
-- **Approximate values**: A claimed value within 10% of the source value is "partial" or "confirmed", not "contradicted". Only use "contradicted" when values clearly conflict (e.g., source says 500, claim says 2000).
-- **URL format**: "example.com", "https://www.example.com", and "http://example.com" all refer to the same website. Differences in protocol, "www" prefix, or trailing slashes are NOT contradictions — use "confirmed".
-- **Date precision**: "2016-08" and "30 August 2016" are equivalent. Month-level vs day-level dates for the same month are NOT contradictions — use "confirmed".
-- **Archive URLs**: A web.archive.org URL for a defunct organization is intentional — not a contradiction with the original URL.
-- **Opaque identifiers**: If a field contains an opaque ID (e.g., "sid_xxxx") you cannot resolve, that is "unverifiable" — never "contradicted".
-- **Partial listings**: Listing one founder/member when the source lists multiple is "partial", not "contradicted".
-- **NaN/null values**: If the claimed value is "$NaN", "NaN", null, or undefined, that is a data bug — mark "unverifiable", not "contradicted".
+${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
 
-Other considerations:
-- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
-- Dates may be approximate
-- If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
-- If the source has a newer value that supersedes the claimed value, that's "outdated"
-- If the source partially confirms (e.g., confirms the ballpark but not the exact figure), that's "partial"
+${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 
-Reserve "contradicted" ONLY for cases where the source clearly and directly states a value that is genuinely incompatible with the claim — not just formatted differently or incomplete.
-
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "What the source actually says about this data point (quote or paraphrase)",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 function buildRecordVerificationPrompt(
@@ -826,34 +808,11 @@ ${sourceText.slice(0, 4000)}
 
 Does the source text confirm, contradict, or not address the claims in this record?
 
-IMPORTANT — avoid these common false-positive errors:
-- **Range vs. point**: If the source gives a range (e.g., "51-200 employees") and the claimed value falls within that range (e.g., 91), that is "confirmed", NOT contradicted.
-- **Temporal mismatch**: Only compare values from the same time period. If the claim is about 2024 but the source discusses 2025 (or vice versa), that is "unverifiable" or "outdated", NOT contradicted.
-- **Wrong source relevance**: The source must actually discuss the specific claim. A company's own page cannot contradict a person's prior employment at a different company — that's "unverifiable".
-- **Approximate values**: A claimed value within 10% of the source value is "partial" or "confirmed", not "contradicted".
-- **URL format**: "example.com", "https://www.example.com", and "http://example.com" refer to the same website. Protocol/prefix differences are NOT contradictions.
-- **Date precision**: "2016-08" and "30 August 2016" are equivalent — NOT a contradiction.
-- **Opaque identifiers**: If a person field contains an opaque ID (e.g., "sid_xxxx", "pjaXzBneWf") you cannot resolve to a name, that is "unverifiable" — never "contradicted". The ID may correctly map to the named person but you cannot verify this.
-- **Partial listings**: Listing one founder/member when there are multiple is "partial", not "contradicted".
-- **NaN/null values**: If a value is "$NaN", "NaN", null, or undefined, that is a data bug — mark "unverifiable".
+${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
 
-Other considerations:
-- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
-- Names may differ slightly (abbreviations, legal names vs common names)
-- Dates may be approximate
-- If the source discusses the topic but doesn't contain the specific data, that's "unverifiable"
-- If the source has newer data that supersedes the record, that's "outdated"
-- If the source partially confirms (e.g., confirms role but not dates), that's "partial"
+${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 
-Reserve "contradicted" ONLY for cases where the source clearly and directly states a value that is genuinely incompatible with the claim — not just formatted differently or incomplete.
-
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "What the source actually says about this record (quote or paraphrase)",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 function buildEntityVerificationPrompt(

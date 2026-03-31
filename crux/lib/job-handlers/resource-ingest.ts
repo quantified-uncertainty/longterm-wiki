@@ -21,6 +21,7 @@
  */
 
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
+import type { UpdateResourceFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import { createHash } from 'crypto';
 import { z } from 'zod';
 import { isPrivateHost } from '../source-check/source-fetcher.ts';
@@ -172,19 +173,23 @@ function mapFetchStatus(fetchStatus: FetchedSourceStatus, httpStatus: number): R
   }
 }
 
-/** Map ResourceStatus to the fetch_status enum used by the resources table. */
-function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'error' {
+/** Map ResourceStatus to the fetch_status stored in the resources table.
+ *  Fine-grained statuses (soft_404, not_found, timeout, unreachable) are stored as-is
+ *  instead of collapsing to 'dead'. This lets retry logic and analytics distinguish
+ *  transient failures (timeout) from permanent ones (not_found). */
+function toFetchStatus(status: ResourceStatus): UpdateResourceFetchStatus['fetchStatus'] {
   switch (status) {
     case 'reachable': return 'ok';
     case 'paywall': return 'paywall';
-    case 'soft_404':
-    case 'not_found':
-    case 'unreachable': return 'dead';
-    case 'invalid_url': return 'dead';
-    case 'error':
-    case 'timeout':
+    case 'not_found': return 'not_found';
+    case 'soft_404': return 'soft_404';
+    case 'unreachable': return 'unreachable';
+    case 'timeout': return 'timeout';
+    case 'invalid_url':
     case 'blocked':
-    case 'cookie_blocked': return 'error';
+    case 'cookie_blocked':
+    case 'error':
+      return 'error';
   }
 }
 

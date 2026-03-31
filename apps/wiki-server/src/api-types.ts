@@ -623,7 +623,7 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
-  fetchStatus: "ok" | "dead" | "paywall" | "error" | null;
+  fetchStatus: "ok" | "dead" | "soft_404" | "not_found" | "timeout" | "unreachable" | "paywall" | "error" | null;
   lastFetchedAt: string | null;
   archiveUrl: string | null;
   contextNote: string | null;
@@ -748,8 +748,13 @@ export interface ResourceStatsResult {
 
 // -- Resources: Fetch status update ------------------------------------------
 
+// Fine-grained statuses: soft_404, not_found, timeout, unreachable are subtypes
+// of the legacy "dead" bucket. Stored as-is in the text column for richer
+// retry logic and analytics. UI code should treat them as "dead" for display.
+export const DEAD_FETCH_STATUSES = ["dead", "soft_404", "not_found", "timeout", "unreachable"] as const;
+
 export const UpdateResourceFetchStatusSchema = z.object({
-  fetchStatus: z.enum(["ok", "dead", "paywall", "error"]),
+  fetchStatus: z.enum(["ok", "dead", "soft_404", "not_found", "timeout", "unreachable", "paywall", "error"]),
   lastFetchedAt: z.string().datetime(),
   fetchedTitle: z.string().max(1000).optional(),
 });

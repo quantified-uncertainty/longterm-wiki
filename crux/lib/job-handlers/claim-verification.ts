@@ -19,6 +19,7 @@ import { createLlmClient, MODELS } from '../llm.ts';
 import { callLlm } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import { escapeXml } from '../prompt-utils.ts';
+import { SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES } from '../source-check/prompt-guidelines.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
 import { apiRequest } from '../wiki-server/client.ts';
@@ -116,17 +117,7 @@ ${claimLines}
 
 For each claim, determine whether the source text confirms, contradicts, or does not address the claim.
 
-IMPORTANT — avoid common false-positive errors:
-- Range vs. point: if source says "51-200" and claim is 91, that's "confirmed" (within range)
-- Temporal mismatch: only compare the same time period
-- Approximate values: within 10% is "confirmed" or "partial"
-- URL format: "example.com", "https://www.example.com", and "http://example.com" all refer to the same website — differences in protocol (http/https), "www" prefix, or trailing slashes are NOT contradictions. Use "confirmed".
-- Date precision: "2016-08" and "30 August 2016" are equivalent. A month-level date vs a day-level date for the same month is NOT a contradiction. Use "confirmed".
-- Archive URLs: If the claim uses a web.archive.org URL for a defunct/dissolved organization, that is intentional — not a contradiction with the original URL.
-- Opaque identifiers: If a record field contains an opaque ID (e.g., "sid_xxxx", "pjaXzBneWf") that you cannot resolve to a name, that is "unverifiable" — you cannot determine if the ID maps to the correct person. Never mark these as "contradicted".
-- Partial listings: If the claim lists ONE founder/member but the source lists MULTIPLE (or vice versa), that is "partial" — not "contradicted". The claim is incomplete, not wrong.
-- NaN/null values: If the claimed value is literally "$NaN", "NaN", null, or undefined, that indicates a data bug — mark as "unverifiable", not "contradicted".
-- Reserve "contradicted" ONLY for direct, clear incompatibility where the source states a value that is genuinely wrong, not just formatted differently or incomplete
+${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
 
 Respond with a JSON array (one object per claim):
 [
