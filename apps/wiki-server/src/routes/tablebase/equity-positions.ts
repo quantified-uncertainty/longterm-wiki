@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql } from "drizzle-orm";
+import { eq, count, desc, sql, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { equityPositions, entities } from "../../schema.js";
@@ -15,6 +15,7 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { logAuditEntries } from "./audit-log.js";
 
 // ---- Constants ----
 
@@ -243,6 +244,14 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         };
       });
 
+      // Fetch existing records for audit log (before upsert)
+      const existingIds = items.map((i) => i.id);
+      const existing = await tx
+        .select()
+        .from(equityPositions)
+        .where(inArray(equityPositions.id, existingIds));
+      const existingMap = new Map(existing.map((r) => [r.id, r]));
+
       await tx
         .insert(equityPositions)
         .values(allVals)
@@ -262,6 +271,22 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             updatedAt: sql`now()`,
           },
         });
+
+      // Audit log
+      await logAuditEntries(
+        tx,
+        allVals.map((v) => {
+          const old = existingMap.get(v.id);
+          return {
+            recordType: "equity_positions",
+            recordId: v.id,
+            operation: old ? ("update" as const) : ("insert" as const),
+            oldData: old ? { ...old } : null,
+            newData: { ...v },
+            sourceUrl: v.source ?? null,
+          };
+        })
+      );
 
       // Post-sync: resolve entity FKs for newly synced rows
       await resolveEntityFKs(tx, {
