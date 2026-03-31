@@ -270,7 +270,7 @@
         Division enforcement, and changed the standard from "reasonable assurance" to "reasonable care."
   stakeholders:
     - name: Governor Gavin Newsom
-      entityId: tDwxa07Urw
+      entityId: sid_tDwxa07Urw
       position: oppose
       reason: "Vetoed SB 1047 on September 29, 2024, citing concerns that the bill focused on model size rather than deployment risk, and that smaller models in high-risk contexts would not be covered"
       source: https://www.gov.ca.gov/2024/09/29/governor-newsom-signs-suite-of-artificial-intelligence-legislation/
@@ -281,7 +281,7 @@
         - "Preferred federal regulation and appointed expert panel to draft alternative approach"
         - "Fei-Fei Li (opponent) was appointed to his alternative regulation panel"
     - name: Center for AI Safety
-      entityId: y4bieqSeag
+      entityId: sid_y4bieqSeag
       position: support
       role: Co-sponsor (via CAIS Action Fund)
       reason: "Co-sponsored SB 1047 through its CAIS Action Fund; helped build a broad coalition including 70+ academic researchers, 120+ frontier AI company employees, unions, and advocacy organizations"
@@ -292,7 +292,7 @@
         - "Director Dan Hendrycks (also listed as supporter) co-authored the Statement on AI Risk"
         - "Open Philanthropy also funds Anthropic (mixed position) and supported MIRI"
     - name: Future of Life Institute
-      entityId: d9sWZtyVwg
+      entityId: sid_d9sWZtyVwg
       position: support
       reason: "Published detailed analysis supporting SB 1047; after veto, Executive Director Anthony Aguirre warned the decision 'leaves Californians vulnerable to considerable risks' from unregulated advanced AI"
       source: https://futureoflife.org/statement/statement-veto-of-sb-1047/
@@ -303,7 +303,7 @@
         - "Organized the 2023 Pause Letter (33,000+ signatories) calling for 6-month AI training moratorium"
         - "Sister org FLF received $58.8M from FLI"
     - name: Yoshua Bengio
-      entityId: nGFBXZeM3d
+      entityId: sid_nGFBXZeM3d
       position: support
       reason: "Co-authored August 7, 2024 letter to California leadership with Hinton, Russell, and Lessig calling SB 1047 the 'bare minimum for effective regulation'; wrote Fortune op-ed arguing 'We cannot let corporations grade their own homework'"
       source: https://safesecureai.org/experts
@@ -314,7 +314,7 @@
         - "Member of UN High-Level Advisory Body on AI"
         - "Funded via Canadian government (CIFAR AI Chair) and Quebec government"
     - name: Geoffrey Hinton
-      entityId: 5N5UqXNkkg
+      entityId: sid_5N5UqXNkkg
       position: support
       reason: "Co-authored August 7, 2024 expert letter calling SB 1047 a 'very sensible approach'; stated 'it's critical that we have legislation with real teeth to address the risks' and endorsed the AI employee support letter"
       source: https://time.com/7008947/california-ai-bill-letter/
@@ -325,7 +325,7 @@
         - "Co-authored foundational deep learning papers with Bengio (also supporter)"
         - "Former advisor to Google DeepMind (which opposes the bill)"
     - name: Stuart Russell
-      entityId: ZxUirlzHke
+      entityId: sid_ZxUirlzHke
       position: support
       reason: "Co-authored August 7, 2024 expert letter with Bengio, Hinton, and Lessig arguing that catastrophic AI risks are imminent and SB 1047 represents the 'bare minimum' of needed regulation"
       source: https://safesecureai.org/experts
@@ -335,7 +335,7 @@
         - "CHAI funded by Open Philanthropy, Elon Musk Foundation"
         - "Author of 'Human Compatible' (2019); co-author of leading AI textbook"
     - name: Elon Musk
-      entityId: 69vftmr1jg
+      entityId: sid_69vftmr1jg
       position: support
       reason: Publicly endorsed the bill on X (Aug 26, 2024)
       source: https://sfstandard.com/2024/08/26/elon-musk-openai-scott-wiener-sb1046/
@@ -346,7 +346,7 @@
         - "Early funder of CHAI (Stuart Russell, also supporter) and DeepMind (pre-Google acquisition)"
         - "Owns X (Twitter), the platform where much SB-1047 debate occurred"
     - name: OpenAI
-      entityId: 1LcLlMGLbw
+      entityId: sid_1LcLlMGLbw
       position: oppose
       reason: "Sent opposition letter to Governor Newsom on August 20, 2024, arguing SB 1047 would stifle innovation, drive AI development out of California, and create 'impractical compliance requirements'; 113+ of its own employees later signed a letter supporting the bill"
       source: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
@@ -357,7 +357,7 @@
         - "Transitioning from nonprofit to for-profit; this bill would have increased compliance burden"
         - "113+ of its employees signed letter supporting the bill despite company opposition"
     - name: Anthropic
-      entityId: mK9pX3rQ7n
+      entityId: sid_mK9pX3rQ7n
       position: mixed
       reason: "Initial opposition Jul 25, 2024; revised to 'benefits likely outweigh costs' Aug 21, 2024 after amendments"
       source: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
@@ -369,7 +369,7 @@
         - "Funded by Open Philanthropy (early investment); Open Phil also funds CAIS (supporter)"
         - "Has its own Responsible Scaling Policy — bill aligned with their existing safety approach"
     - name: Google DeepMind
-      entityId: A4XoubikkQ
+      entityId: sid_A4XoubikkQ
       position: oppose
       reason: "Google claimed in letters to lawmakers that SB 1047 would make 'California one of the world's least favorable jurisdictions for AI development'; 19 DeepMind employees broke with company position to sign support letter"
       source: https://calmatters.org/economy/technology/2024/08/ai-regulation-showdown/
@@ -380,7 +380,7 @@
         - "Google is a major investor in Anthropic ($2B), which took a mixed position"
         - "Member of AI Alliance (also opposes)"
     - name: Meta AI
-      entityId: tt0f5PYDCw
+      entityId: sid_tt0f5PYDCw
       position: oppose
       reason: "Deputy chief privacy officer Rob Sherman argued in June letter that bill would 'deter AI innovation in California'; after passage, Meta stated it would 'stifle AI development' and 'break from the state's long tradition of fostering open-source innovation'"
       source: https://calmatters.org/economy/technology/2024/08/ai-regulation-showdown/
@@ -391,7 +391,7 @@
         - "Open-source AI strategy (Llama models) most affected by bill's liability provisions"
         - "Mark Zuckerberg personally lobbied Governor Newsom against the bill"
     - name: Y Combinator
-      entityId: d9BCHgtnlw
+      entityId: sid_d9BCHgtnlw
       position: oppose
       reason: "CEO Garry Tan signed June 2024 letter to California lawmakers claiming 'AI software developers could go to jail' under SB 1047; actively campaigned against the bill on social media"
       source: https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying
@@ -402,7 +402,7 @@
         - "YC-funded startups would face compliance costs under the bill"
         - "Garry Tan (YC CEO) was vocal opponent on social media"
     - name: Andreessen Horowitz
-      entityId: u2YCulQ1lg
+      entityId: sid_u2YCulQ1lg
       position: oppose
       reason: "Launched stopsb1047.com campaign; chief legal officer Jaikumar Ramaswamy submitted opposition letter arguing bill 'will burden startups'; spent $39,750 on SB-1047 lobbying in Q2 2024; hired one of Newsom's closest advisors as lobbyist"
       source: https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/
@@ -413,7 +413,7 @@
         - "Marc Andreessen and Ben Horowitz are vocal opponents of AI regulation generally"
         - "Spent $39,750 on SB-1047 lobbying in Q2 2024"
     - name: Yann LeCun
-      entityId: cMbVUVK29Q
+      entityId: sid_cMbVUVK29Q
       position: oppose
       reason: "Publicly rebuked SB 1047 supporters the day after Hinton endorsed the bill; argued it would have 'apocalyptic consequences on the AI ecosystem' and that 'without open-source AI, there is no AI start-up ecosystem and no academic research on large models'"
       source: https://venturebeat.com/ai/ai-safety-showdown-yann-lecun-slams-californias-sb-1047-as-geoffrey-hinton-backs-new-regulations
@@ -423,7 +423,7 @@
         - "Turing Award with Bengio (supporter) and Hinton (supporter) — all three took different positions"
         - "Strong advocate for open-source AI; bill's liability provisions threaten open model releases"
     - name: Andrew Ng
-      entityId: v13BF4zP2A
+      entityId: sid_v13BF4zP2A
       position: oppose
       reason: "Wrote TIME op-ed arguing SB 1047 makes 'a fundamental mistake of regulating AI technology instead of AI applications'; called it 'anti-open source, anti-innovation'; campaigned against the bill on X and LinkedIn throughout summer 2024"
       source: https://time.com/7016134/california-sb-1047-ai/
@@ -434,7 +434,7 @@
         - "Board member of Woebot Health; advisor to several AI startups"
         - "Vocal opponent of 'AI doomerism'; frames regulation debate as large-lab rent-seeking"
     - name: Fei-Fei Li
-      entityId: QzcX3bShmQ
+      entityId: sid_QzcX3bShmQ
       position: oppose
       reason: "Published Fortune open letter on August 6, 2024, warning SB 1047 would 'have significant unintended consequences' and 'cripple public sector and academic AI research'; later appointed by Newsom to expert panel drafting alternative regulation"
       source: https://fortune.com/2024/08/06/godmother-of-ai-says-californias-ai-bill-will-harm-us-ecosystem-tech-politics/
@@ -445,7 +445,7 @@
         - "Co-founded World Labs (spatial AI startup) with a16z (also opposes) funding"
         - "Appointed by Newsom to panel drafting alternative AI regulation after veto"
     - name: Max Tegmark
-      entityId: 3KjUCZCV8w
+      entityId: sid_3KjUCZCV8w
       position: support
       reason: "MIT professor and FLI co-founder; argued it would be 'incongruous to say that there is a 10-25% chance that advanced AI will cause an extinction-level catastrophe, but then argue that the culpable AI companies should only receive fines after a catastrophe occurs'"
       source: https://futureoflife.org/statement/statement-veto-of-sb-1047/
@@ -455,7 +455,7 @@
         - "MIT Physics professor; author of 'Life 3.0'"
         - "Jaan Tallinn also invested in Anthropic (mixed position)"
     - name: Dan Hendrycks
-      entityId: VoNqoBJkyg
+      entityId: sid_VoNqoBJkyg
       position: support
       reason: "CAIS director who helped draft the original bill; called its passage 'a landmark moment for AI safety'; organized AI safety research community support and stated the bill was 'in the long-term interest of industry' because 'a major safety incident would likely be the biggest roadblock to further advancement'"
       source: https://sd11.senate.ca.gov/news/senator-wieners-landmark-ai-bill-passes-assembly
@@ -501,7 +501,7 @@
         - "Signers included employees of companies that officially opposed the bill (OpenAI, DeepMind, Meta)"
         - "Highlighted tension between company positions and individual researcher views on AI safety"
     - name: Encode Justice
-      entityId: etCe7rcH1g
+      entityId: sid_etCe7rcH1g
       position: support
       role: Co-sponsor
       reason: "Youth-led AI accountability organization; co-sponsored SB 1047 alongside CAIS Action Fund and Economic Security California Action; founder Sneha Revanur described the bill as outlining 'responsible guardrails for large-scale AI systems'"
@@ -511,7 +511,7 @@
         - "Youth-led movement focused on AI governance and accountability"
         - "One of three official co-sponsors of the bill"
     - name: Imbue
-      entityId: hCtMHcUWaw
+      entityId: sid_hCtMHcUWaw
       position: support
       reason: "As a potential frontier model developer, submitted letter stating the bill 'strikes an appropriate balance between promoting responsible innovation and mitigating potential risks'; called itself 'proof that all frontier model developers can implement robust safety practices while remaining competitive'"
       source: https://safesecureai.org/support
@@ -520,102 +520,102 @@
         - "One of the few startups that could develop models covered under SB 1047"
         - "Its support countered industry claims that the bill would harm startups"
     - name: Gladstone AI
-      entityId: HkfUxsbBLQ
+      entityId: sid_HkfUxsbBLQ
       position: support
       reason: "AI safety advisory firm that authored a RAND-commissioned report on catastrophic AI risks; supported the bill as consistent with its findings on the need for frontier AI regulation"
       source: https://safesecureai.org/support
       importance: low
     - name: Nonlinear
-      entityId: PfIAYFXC9Q
+      entityId: sid_PfIAYFXC9Q
       position: support
       reason: "AI safety organization that endorsed SB 1047 as part of the broader effective altruism and AI safety community coalition supporting the bill"
       source: https://safesecureai.org/support
       importance: low
     - name: Economic Security Project Action
-      entityId: 2ecnsQqcRg
+      entityId: sid_2ecnsQqcRg
       position: support
       role: Co-sponsor
       reason: "Co-sponsored SB 1047 through its Economic Security California Action affiliate; Director Teri Olle represented the organization in legislative hearings; commissioned YouGov poll showing 80% national support for SB 1047's provisions"
       source: https://economicsecurity.us/news/assembly-advances-sb1047-positioning-california-as-the-leader-in-ai-safety/
       importance: medium
     - name: Apart Research
-      entityId: 5WqgebIWFQ
+      entityId: sid_5WqgebIWFQ
       position: support
       reason: "AI safety research organization that endorsed SB 1047 as part of the coalition of safety-focused labs supporting frontier model regulation"
       source: https://safesecureai.org/support
       importance: low
     - name: Elicit
-      entityId: 2VexoROapg
+      entityId: sid_2VexoROapg
       position: support
       reason: "AI research assistant company that endorsed SB 1047, adding to the coalition of AI companies demonstrating that safety regulation is compatible with building useful AI products"
       source: https://safesecureai.org/support
       importance: low
     - name: Panoplia Labs
-      entityId: NY4i2W6IVA
+      entityId: sid_NY4i2W6IVA
       position: support
       reason: "AI safety research lab that endorsed SB 1047 as part of the broader safety research community coalition"
       source: https://safesecureai.org/support
       importance: low
     - name: Kira Center
-      entityId: oMgy3kQqOg
+      entityId: sid_oMgy3kQqOg
       position: support
       reason: "Center for AI Risks and Impacts that endorsed SB 1047 as part of the safety-focused research community"
       source: https://safesecureai.org/support
       importance: low
     - name: Redwood Research
-      entityId: dwMzc9WzPa
+      entityId: sid_dwMzc9WzPa
       position: support
       reason: "AI safety research organization that endorsed SB 1047; CEO Buck Shlegeris was publicly critical of Newsom's veto decision"
       source: https://safesecureai.org/support
       importance: low
     - name: FAR AI
-      entityId: lCiT37k9pA
+      entityId: sid_lCiT37k9pA
       position: support
       reason: "AI safety research organization focused on robustness and alignment that endorsed SB 1047"
       source: https://safesecureai.org/support
       importance: low
     - name: Foresight Institute
-      entityId: NPPTvNqRXA
+      entityId: sid_NPPTvNqRXA
       position: support
       reason: "Research organization focused on beneficial emerging technologies that endorsed SB 1047 as part of the broad coalition supporting frontier AI safety regulation"
       source: https://safesecureai.org/support
       importance: low
     - name: Chamber of Progress
-      entityId: IEav94hygQ
+      entityId: sid_IEav94hygQ
       position: oppose
       reason: "Led tech coalition urging Newsom to veto; stated 'The California legislature is passing laws based on science fiction fantasies'; co-signed August 27, 2024 joint veto letter with Bay Area Council, Engine, NetChoice, R Street Institute, and others"
       source: https://progresschamber.org/news/ca-legislature-passes-ai-bill/
       importance: medium
     - name: TechNet
-      entityId: 0PNw6yTH0g
+      entityId: sid_0PNw6yTH0g
       position: oppose
       reason: "Bipartisan network of technology CEOs that joined the industry coalition opposing SB 1047, arguing the bill would create burdensome compliance costs and regulatory uncertainty"
       source: https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf
       importance: low
     - name: Consumer Technology Association
-      entityId: b89p7duRrQ
+      entityId: sid_b89p7duRrQ
       position: oppose
       reason: "CEO Gary Shapiro praised the veto; CTA had sent August 30, 2024 veto letter arguing the bill would 'restrict development of AI tools designed for safety' and 'direct users to less safe foreign models'"
       source: https://www.cta.tech/Resources/Newsroom/Media-Releases/2024/September/CTA-Statement-on-Governor-Newsom-Veto-of-AI-Bill
       importance: low
     - name: R Street Institute
-      entityId: yfAYuNTKxQ
+      entityId: sid_yfAYuNTKxQ
       position: oppose
       reason: "Free-market think tank that co-led coalition urging Newsom to veto; argued the bill 'regulates model development instead of misuse' and that the harms it addressed were 'entirely theoretical'"
       source: https://www.rstreet.org/outreach/coalition-urges-governor-newsom-to-consider-vetoing-sb-1047/
       importance: low
     - name: Competitive Enterprise Institute
-      entityId: Le8eSvx8EQ
+      entityId: sid_Le8eSvx8EQ
       position: oppose
       reason: "Free-market policy organization that joined the CalChamber-led coalition letter opposing SB 1047 on grounds that it would stifle innovation and impose impractical requirements"
       source: https://ccianet.org/wp-content/uploads/2024/03/CalChamber-Led-Coalition-Letter-in-Opposition-to-CA-SB-1047.pdf
       importance: low
   keyPoliticians:
     - name: Senator Scott Wiener
-      entityId: HLc6VrCh5w
+      entityId: sid_HLc6VrCh5w
       role: Primary Author / Sponsor
     - name: Governor Gavin Newsom
-      entityId: tDwxa07Urw
+      entityId: sid_tDwxa07Urw
       role: Vetoed the bill
     - name: Senator Richard Roth
       role: Co-author
@@ -625,7 +625,7 @@
       role: Co-author
   keyFigures:
     - name: Dan Hendrycks
-      entityId: VoNqoBJkyg
+      entityId: sid_VoNqoBJkyg
       role: Technical lead — CAIS director
       description: >-
         Director of CAIS, whose lobbying arm (CAIS Action Fund) co-sponsored the bill. The bill was
@@ -2163,7 +2163,7 @@
         - "US AISI continued operating within NIST but with reduced authority and uncertain funding"
         - "February 2025 executive order further challenged state-level AI regulations as 'onerous'"
     - name: Meta
-      entityId: tt0f5PYDCw
+      entityId: sid_tt0f5PYDCw
       position: support
       importance: medium
       reason: Signed voluntary commitments in July 2023 and supported AISI engagement; scored 67% compliance across 30 indicators
@@ -2305,7 +2305,7 @@
       category: Transparency
   stakeholders:
     - name: OpenAI
-      entityId: 1LcLlMGLbw
+      entityId: sid_1LcLlMGLbw
       position: support
       importance: high
       reason: Highest compliance score (83.3%) across 30 indicators; developed Preparedness Framework; one of the original seven signatories in July 2023
@@ -2315,7 +2315,7 @@
         - "Published Preparedness Framework (Dec 2023) aligning with commitment to pre-deployment testing"
         - "Strong on safety testing and cybersecurity commitments; weaker on information sharing (20-35% sector average)"
     - name: Anthropic
-      entityId: mK9pX3rQ7n
+      entityId: sid_mK9pX3rQ7n
       position: support
       importance: high
       reason: Second-highest compliance (80.0%); developed ASL framework (Responsible Scaling Policy) as direct implementation of safety commitments
@@ -2325,7 +2325,7 @@
         - "One of the original seven signatories; strong on pre-deployment testing and cybersecurity"
         - "Quietly removed Biden-era policy commitment page from website in March 2025 after Trump revocation"
     - name: Google DeepMind
-      entityId: A4XoubikkQ
+      entityId: sid_A4XoubikkQ
       position: support
       importance: high
       reason: Third-highest compliance (76.7%); published Frontier Safety Framework (May 2024) detailing capability evaluation and response protocols
@@ -2358,7 +2358,7 @@
         - "AWS hosts many frontier model providers; compliance with commitments affects broader ecosystem"
         - "Invested $4B in Anthropic (also a signatory)"
     - name: Meta
-      entityId: tt0f5PYDCw
+      entityId: sid_tt0f5PYDCw
       position: support
       importance: medium
       reason: Scored 66.7% compliance; one of the original seven signatories; open-source Llama releases raised unique transparency questions
@@ -3564,7 +3564,7 @@
       category: Infrastructure
   stakeholders:
     - name: Governor Gavin Newsom
-      entityId: tDwxa07Urw
+      entityId: sid_tDwxa07Urw
       position: support
       importance: high
       reason: "Signed SB 53 into law September 29, 2025, framing it as the balanced alternative after vetoing the more ambitious SB 1047 a year earlier"
@@ -3574,7 +3574,7 @@
         - "Signed 17 other AI bills alongside SB 53, signaling preference for targeted regulation"
         - "Appointed expert panel including Fei-Fei Li to draft alternative approach after SB 1047 veto"
     - name: Anthropic
-      entityId: mK9pX3rQ7n
+      entityId: sid_mK9pX3rQ7n
       position: support
       importance: high
       reason: "First major AI company to publicly endorse SB 53 (Sep 2025), breaking the united industry opposition front; stated transparency approach balances safety with innovation"
@@ -3584,7 +3584,7 @@
         - "Backed by Amazon ($4B), Google ($2B); their endorsement gave political cover for the bill"
         - "Founded by ex-OpenAI researchers (Dario/Daniela Amodei) — differed from OpenAI's continued opposition"
     - name: OpenAI
-      entityId: 1LcLlMGLbw
+      entityId: sid_1LcLlMGLbw
       position: oppose
       importance: high
       reason: "Lobbied against SB 53 alongside Meta and Alphabet through trade groups and direct advocacy; preferred federal regulation over state patchwork"
@@ -3594,7 +3594,7 @@
         - "Backed by Microsoft ($13B invested); transitioning to for-profit structure"
         - "Despite company opposition, 113+ employees had signed letter supporting the earlier SB 1047"
     - name: Meta AI (FAIR)
-      entityId: tt0f5PYDCw
+      entityId: sid_tt0f5PYDCw
       position: oppose
       importance: high
       reason: "Lobbied against SB 53 through trade groups; open-weight model strategy (Llama) made transparency requirements particularly burdensome"
@@ -3604,7 +3604,7 @@
         - "Co-founded AI Alliance with IBM to coordinate industry opposition to state AI regulation"
         - "Chief AI Scientist Yann LeCun was vocal opponent of both SB 1047 and SB 53"
     - name: Google DeepMind
-      entityId: A4XoubikkQ
+      entityId: sid_A4XoubikkQ
       position: oppose
       importance: high
       reason: "Alphabet lobbied against SB 53 through trade groups and direct advocacy; preferred voluntary commitments and federal approach"
@@ -3614,7 +3614,7 @@
         - "Also opposed SB 1047 — consistent opposition to California AI regulation"
         - "Member of AI Alliance (industry coalition opposing state-level AI bills)"
     - name: TechNet
-      entityId: 0PNw6yTH0g
+      entityId: sid_0PNw6yTH0g
       position: oppose
       importance: medium
       reason: "Coordinated tech industry opposition as a trade group representing major companies; advocated for federal regulation instead of state patchwork"
@@ -3640,7 +3640,7 @@
         - "Supported SB 1047 as well — consistent advocate for AI regulation"
   keyPoliticians:
     - name: Senator Scott Wiener
-      entityId: HLc6VrCh5w
+      entityId: sid_HLc6VrCh5w
       role: Primary Author / Sponsor
   votes:
     - chamber: Senate
@@ -4481,7 +4481,7 @@
         - "Targeted by Leading the Future super PAC (a16z-backed) for his role in the bill"
         - "Co-sponsored with Gounardes to ensure coordinated bicameral passage"
     - name: Anthropic
-      entityId: mK9pX3rQ7n
+      entityId: sid_mK9pX3rQ7n
       position: support
       importance: high
       reason: Publicly endorsed the RAISE Act; head of external affairs Sarah Heck stated that two large states enacting AI transparency legislation 'signals the critical importance of safety'
@@ -4491,7 +4491,7 @@
         - "Noted the legislation should 'inspire Congress to build on them' for federal action"
         - "Claude models above 10^26 FLOP threshold covered by the Act's frontier model definition"
     - name: OpenAI
-      entityId: 1LcLlMGLbw
+      entityId: sid_1LcLlMGLbw
       position: support
       importance: high
       reason: Endorsed the legislation as a reasonable state-level approach; indicated similar legislation in two large state economies is beneficial for the policy landscape
@@ -4501,7 +4501,7 @@
         - "GPT-4 and subsequent models above the 10^26 FLOP threshold covered by the Act"
         - "OpenAI insiders' super PAC networks poured over $125M into 2026 midterms with mixed stances on AI regulation"
     - name: Chamber of Progress
-      entityId: IEav94hygQ
+      entityId: sid_IEav94hygQ
       position: oppose
       importance: medium
       reason: "Argued the bill's passage would be tantamount to 'an eviction notice' for New York's AI startups; advocated for federal regulation instead"
@@ -6044,7 +6044,7 @@
       importance: high
       reason: Formed bipartisan coalition opposing federal preemption of state AI regulatory authority
     - name: American Civil Liberties Union
-      entityId: 7DpEvy5wQr
+      entityId: sid_7DpEvy5wQr
       position: oppose
       importance: medium
       reason: Called executive order unconstitutional

@@ -77,8 +77,8 @@ function looksLikeDate(value: unknown): boolean {
   return /^\d{4}(-\d{2}(-\d{2})?)?$/.test(value);
 }
 
-/** Entity ID format: exactly 10 alphanumeric characters. */
-const ENTITY_ID_RE = /^[A-Za-z0-9]{10}$/;
+/** Entity ID format: exactly 10 alphanumeric chars (legacy) OR sid_ + alphanumeric (new). */
+const ENTITY_ID_RE = /^([A-Za-z0-9]{10}|sid_[A-Za-z0-9]+)$/;
 
 /** Fact ID format: 10 alphanumeric chars (new), or f_ + 10 (legacy), or inv_ (computed). */
 const FACTID_RE = /^([A-Za-z0-9]{10}|f_[A-Za-z0-9]{10}|inv_.+)$/;
@@ -230,7 +230,7 @@ function checkCompleteness(
 
 // ── New per-entity checks (7–21) ─────────────────────────────────────────────
 
-/** Check 7: entity ID format — must be exactly 10 alphanumeric chars. */
+/** Check 7: entity ID format — must be 10 alphanumeric chars or sid_-prefixed. */
 function checkEntityIdFormat(
   entity: { id: string; name: string }
 ): ValidationResult[] {
@@ -241,7 +241,7 @@ function checkEntityIdFormat(
         entityId: entity.id,
         message:
           `Entity "${entity.name}" has invalid id "${entity.id}" ` +
-          `(must be exactly 10 alphanumeric characters).`,
+          `(must be exactly 10 alphanumeric characters or sid_-prefixed).`,
         rule: "stableid-format", // keep rule name for backward compat
       },
     ];
