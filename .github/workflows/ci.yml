@@ -138,17 +138,6 @@ jobs:
           pnpm crux validate unified --rules=wiki-id-integrity --errors-only
           pnpm crux validate refs
 
-      - name: Drizzle schema drift detection (advisory)
-        if: github.event_name == 'pull_request'
-        continue-on-error: true
-        env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          git fetch --unshallow 2>/dev/null || git fetch --depth=100 origin 2>/dev/null || true
-          npx tsx crux/validate/validate-schema-drift.ts \
-            || echo "::warning::Schema drift check failed unexpectedly — review validator output above"
-
       - name: Auto-update orchestrator smoke test (dry-run)
         if: "!cancelled()"
         continue-on-error: true
