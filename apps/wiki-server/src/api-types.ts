@@ -753,6 +753,11 @@ export interface ResourceStatsResult {
 // retry logic and analytics. UI code should treat them as "dead" for display.
 export const DEAD_FETCH_STATUSES = ["dead", "soft_404", "not_found", "timeout", "unreachable"] as const;
 
+/** Check if a fetch_status value indicates a dead/unreachable resource. */
+export function isDeadFetchStatus(status: string | null | undefined): boolean {
+  return status != null && (DEAD_FETCH_STATUSES as readonly string[]).includes(status);
+}
+
 export const UpdateResourceFetchStatusSchema = z.object({
   fetchStatus: z.enum(["ok", "dead", "soft_404", "not_found", "timeout", "unreachable", "paywall", "error"]),
   lastFetchedAt: z.string().datetime(),

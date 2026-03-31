@@ -5,13 +5,13 @@ import { AlertTriangle, Lock, ExternalLink, Archive } from "lucide-react";
 import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS, STANCE_COLORS, CREDIBILITY_COLORS } from "./resource-constants";
-import { DEAD_FETCH_STATUSES } from "@wiki-server/api-types";
+import { isDeadFetchStatus } from "@wiki-server/api-types";
 import { ResourcePreview } from "./ResourcePreview";
 
 export function ResourceCard({ resource: r }: { resource: OrgResourceRow }) {
   const typeLabel = RESOURCE_TYPE_LABELS[r.type] ?? r.type;
   const typeColor = RESOURCE_TYPE_COLORS[r.type] ?? RESOURCE_TYPE_COLORS._default;
-  const isDead = (DEAD_FETCH_STATUSES as readonly string[]).includes(r.fetchStatus ?? "");
+  const isDead = isDeadFetchStatus(r.fetchStatus);
   const isPaywall = r.fetchStatus === "paywall";
   const archiveHref = isDead && r.archiveUrl ? safeHref(r.archiveUrl) : null;
   const source = r.publicationName || r.domain;

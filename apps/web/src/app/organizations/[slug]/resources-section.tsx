@@ -26,7 +26,7 @@ import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "./org-data";
 import { ResourceList } from "@/components/resources/ResourceList";
 import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
-import { DEAD_FETCH_STATUSES } from "@wiki-server/api-types";
+import { isDeadFetchStatus } from "@wiki-server/api-types";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
 const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;
@@ -78,7 +78,7 @@ function makeColumns(opts: {
               >
                 {r.title}
               </Link>
-              {(DEAD_FETCH_STATUSES as readonly string[]).includes(r.fetchStatus ?? "") && (
+              {isDeadFetchStatus(r.fetchStatus) && (
                 <span title="Link may be broken">
                   <AlertTriangle className="h-3 w-3 text-red-400 shrink-0 mt-0.5" />
                 </span>
@@ -264,7 +264,7 @@ function makeColumns(opts: {
       header: "",
       cell: ({ row }) => {
         const r = row.original;
-        const isDead = (DEAD_FETCH_STATUSES as readonly string[]).includes(r.fetchStatus ?? "");
+        const isDead = isDeadFetchStatus(r.fetchStatus);
         const archiveHref = isDead && r.archiveUrl ? safeHref(r.archiveUrl) : null;
         return (
           <div className="flex items-center gap-1">

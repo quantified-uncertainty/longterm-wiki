@@ -35,6 +35,7 @@ import {
 } from '../lib/source-check/index.ts';
 import {
   SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
+  SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from '../lib/source-check/prompt-guidelines.ts';
 import type { WikiPageVerifyItem } from '../lib/source-check/types.ts';
@@ -237,6 +238,8 @@ ${item.sourceContext.slice(0, 500)}
 Does the source text confirm, contradict, or not address this claim?
 
 ${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
+
+${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 
 ${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
