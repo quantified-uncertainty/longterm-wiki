@@ -1,0 +1,25 @@
+{
+  "table": "personnel",
+  "recordCount": 1,
+  "submittedAt": "2026-03-31T11:57:32.544Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "795s3EyIu6",
+      "personId": "sid_k7Xw6otC8a",
+      "organizationId": "sid_w7mwNxGtCQ",
+      "role": "Co-Founder and Executive Director",
+      "source": "https://theaipi.org/about/",
+      "verdict": "none"
+    }
+  ]
+}

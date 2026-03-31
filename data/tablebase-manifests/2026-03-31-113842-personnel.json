@@ -1,0 +1,113 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "submittedAt": "2026-03-31T11:38:42.572Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 12,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "9pH9jG82tH",
+      "personId": "ANdg2ncDV8",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Director",
+      "source": "https://www.adalovelaceinstitute.org/news/gaia-marcus-new-director/",
+      "verdict": "none"
+    },
+    {
+      "id": "2QQYKPJRaV",
+      "personId": "spEbbvDORS",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Former Director",
+      "source": "https://www.adalovelaceinstitute.org/news/carly-kind-to-step-down-as-director/",
+      "verdict": "none"
+    },
+    {
+      "id": "dhpWfKNask",
+      "personId": "jglOZwebMM",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member / Interim Director",
+      "source": "https://www.nuffieldfoundation.org/news/first-board-members-appointed-to-lead-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "mnZakdzk0P",
+      "personId": "3KPnjZAOdI",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/first-board-members-appointed-to-lead-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "XOo9DYbInN",
+      "personId": "pgE1JYn4xA",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/first-board-members-appointed-to-lead-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "psY8AcyYId",
+      "personId": "sid_T6SowQJJbg",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/first-board-members-appointed-to-lead-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "S9YvtdKyZU",
+      "personId": "7jKImlNypJ",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/first-board-members-appointed-to-lead-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "mmnzi5jaXD",
+      "personId": "lJOAlKm9vb",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/four-new-board-members-appointed-to-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "J9qloHYyUN",
+      "personId": "S9tutXmnJX",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/four-new-board-members-appointed-to-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "1H79h9VWas",
+      "personId": "A4vmTGy5Sv",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Board Member",
+      "source": "https://www.nuffieldfoundation.org/news/four-new-board-members-appointed-to-ada-lovelace-institute",
+      "verdict": "none"
+    },
+    {
+      "id": "8UHMT5scn4",
+      "personId": "1LHbtlSYdv",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Associate Director, Public Participation & Research Practice",
+      "source": "https://www.adalovelaceinstitute.org/person/octavia-field-reid/",
+      "verdict": "none"
+    },
+    {
+      "id": "zLpSIHK3lW",
+      "personId": "9T9dmRt63c",
+      "organizationId": "sid_BgSnHHzV6g",
+      "role": "Associate Director, Emerging Technology and Industry Practice",
+      "source": "https://www.adalovelaceinstitute.org/person/andrew-strait/",
+      "verdict": "none"
+    }
+  ]
+}

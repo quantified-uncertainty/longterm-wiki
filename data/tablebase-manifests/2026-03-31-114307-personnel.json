@@ -1,0 +1,105 @@
+{
+  "table": "personnel",
+  "recordCount": 11,
+  "submittedAt": "2026-03-31T11:43:07.478Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 11,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "vVnwnLO2UR",
+      "personId": "7LJBOFSUH7",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "CEO and Co-founder",
+      "source": "https://www.againstmalaria.com/People.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "OMY49CiYEN",
+      "personId": "LzpVGrvpym",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Co-founder",
+      "source": "https://www.againstmalaria.com/People.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "ZohTIvSIls",
+      "personId": "l8lQhg2gGx",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "3P57V2d0LN",
+      "personId": "OY6uH1n70Y",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Staff",
+      "source": "https://www.againstmalaria.com/People.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "uWJSXcPsCy",
+      "personId": "fPio6nPYRC",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Staff",
+      "source": "https://www.againstmalaria.com/People.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "nJiuYwhU9T",
+      "personId": "ZoBaUD0uOy",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Staff",
+      "source": "https://www.againstmalaria.com/People.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "0yhZLofyMV",
+      "personId": "lk5xD96orU",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "AAi0QXw47x",
+      "personId": "flUN20V37P",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "aX2L2bFD55",
+      "personId": "dRoE9Q7jMs",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "d6pzyj8fyP",
+      "personId": "XtzLQDe9A6",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    },
+    {
+      "id": "qW6AFQHgCw",
+      "personId": "bJnib9qAtx",
+      "organizationId": "sid_c5rNf1vl2A",
+      "role": "Trustee",
+      "source": "https://www.againstmalaria.com/Trustees.aspx",
+      "verdict": "none"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "submittedAt": "2026-03-31T11:53:43.959Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "fYW3P9xEZW",
+      "personId": "ZZONkNifAR",
+      "organizationId": "sid_sgu6I0VtAA",
+      "role": "Co-Founder and CEO",
+      "source": "https://www.agora.xyz/about",
+      "verdict": "none"
+    },
+    {
+      "id": "w0vRtoxnvS",
+      "personId": "FQ6AxUpjiI",
+      "organizationId": "sid_sgu6I0VtAA",
+      "role": "Co-Founder and CTO",
+      "source": "https://www.agora.xyz/about",
+      "verdict": "none"
+    },
+    {
+      "id": "M3bfhRT8B9",
+      "personId": "VhGgVMp9MT",
+      "organizationId": "sid_sgu6I0VtAA",
+      "role": "Co-Founder",
+      "source": "https://www.agora.xyz/about",
+      "verdict": "none"
+    },
+    {
+      "id": "nAsUdL9srO",
+      "personId": "6GGhn9Gwgr",
+      "organizationId": "sid_sgu6I0VtAA",
+      "role": "Advisor (formerly CEO of Boardroom)",
+      "source": "https://www.agora.xyz/blogs/6-boardroom-acquisition",
+      "verdict": "none"
+    }
+  ]
+}
