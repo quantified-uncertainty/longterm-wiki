@@ -422,3 +422,253 @@ describe('handleResourceIngest — resilience', () => {
     expect(result.data.status).toBe('reachable');
   });
 });
+
+// ---------------------------------------------------------------------------
+// #3520 — fetchStatus persistence for DNS failures and timeouts
+// ---------------------------------------------------------------------------
+
+describe('handleResourceIngest — fetchStatus persistence (#3520)', () => {
+  it('persists fetchStatus=dead for unreachable (DNS failure)', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'dead' as FetchedSourceStatus,
+      httpStatus: 0,
+      content: '',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-dns', url: 'https://nonexistent.example.com' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('unreachable');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-dns',
+      expect.objectContaining({ fetchStatus: 'dead' }),
+    );
+  });
+
+  it('persists fetchStatus=dead for timeouts', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'error' as FetchedSourceStatus,
+      httpStatus: 0,
+      content: '',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-timeout', url: 'https://slow.example.com/page' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('timeout');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-timeout',
+      expect.objectContaining({ fetchStatus: 'error' }),
+    );
+  });
+
+  it('persists fetchStatus=dead for invalid URLs', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-invalid', url: 'http://example.com/page' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('invalid_url');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-invalid',
+      expect.objectContaining({ fetchStatus: 'dead' }),
+    );
+  });
+
+  it('persists fetchStatus=error for SSRF-blocked hosts', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-ssrf', url: 'https://localhost/admin' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('blocked');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-ssrf',
+      expect.objectContaining({ fetchStatus: 'error' }),
+    );
+  });
+
+  it('persists fetchStatus=ok for reachable pages', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-ok', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-ok',
+      expect.objectContaining({ fetchStatus: 'ok' }),
+    );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #3521 — Twitter/X soft-404 detection
+// ---------------------------------------------------------------------------
+
+describe('handleResourceIngest — Twitter soft-404 detection (#3521)', () => {
+  it('detects nonexistent Twitter profile (short page, no og:description)', async () => {
+    const body = '<html><head><meta charset="utf-8"><title>X</title></head><body><!-- empty --></body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://x.com/elaboratehoax',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-tw', url: 'https://twitter.com/elaboratehoax' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('soft_404');
+  });
+
+  it('does NOT flag real Twitter profile (has og:description)', async () => {
+    const body = '<html><head><meta property="og:description" content="AI researcher at DeepMind"></head><body>profile content</body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://x.com/realuser',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-tw2', url: 'https://twitter.com/realuser' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+
+  it('does NOT flag long Twitter page as soft-404', async () => {
+    const body = 'x'.repeat(2000);
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://x.com/someuser',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-tw3', url: 'https://twitter.com/someuser' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+
+  it('does NOT flag non-Twitter short pages as Twitter soft-404', async () => {
+    const body = '<html><head><title>Short Page</title></head><body>Hi</body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://example.com/short',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-other', url: 'https://example.com/short' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// #3522 — Cookie consent redirect detection
+// ---------------------------------------------------------------------------
+
+describe('handleResourceIngest — cookie consent detection (#3522)', () => {
+  it('detects cookie consent page via URL pattern (?error=cookies)', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    const body = '<html><body>Cookie settings page</body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://nature.com/articles/d41586?error=cookies_not_supported&code=abc',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie1', url: 'https://nature.com/articles/d41586' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('cookie_blocked');
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-cookie1',
+      expect.objectContaining({ fetchStatus: 'error' }),
+    );
+  });
+
+  it('detects cookie consent page via content pattern', async () => {
+    const body = '<html><body><h1>This site requires cookies</h1><p>Please enable cookies to continue.</p></body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content: body }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie2', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('cookie_blocked');
+  });
+
+  it('detects "we use cookies" consent wall on short page', async () => {
+    const body = '<div class="cookie-banner">We use cookies to improve your experience. Accept all cookies?</div>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content: body }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie3', url: 'https://example.com/page' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('cookie_blocked');
+  });
+
+  it('does NOT flag long articles mentioning cookies', async () => {
+    const body = 'x'.repeat(11000) + ' we use cookies to improve your experience';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content: body }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-long', url: 'https://example.com/real-article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+
+  it('detects cookie-consent URL redirect', async () => {
+    const body = '<html><body>Consent required</body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://example.com/cookie-consent?return=/article',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie4', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('cookie_blocked');
+  });
+});
