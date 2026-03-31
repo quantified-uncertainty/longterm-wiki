@@ -102,12 +102,12 @@ function detectTwitterSoft404(text: string, contentLength: number, finalUrl: str
  */
 const COOKIE_CONSENT_URL_PATTERNS = [
   /[?&]error=cookies/i,
-  /cookie.consent/i,
-  /cookie.policy/i,
-  /cookie.notice/i,
-  /gdpr.consent/i,
-  /consent.manager/i,
-  /cookie.wall/i,
+  /\/cookie[-_.]?consent/i,
+  /\/cookie[-_.]?policy/i,
+  /\/cookie[-_.]?notice/i,
+  /\/gdpr[-_.]?consent/i,
+  /\/consent[-_.]?manager/i,
+  /\/cookie[-_.]?wall/i,
 ];
 
 const COOKIE_CONSENT_CONTENT_PATTERNS = [
@@ -126,10 +126,18 @@ const COOKIE_CONSENT_CONTENT_PATTERNS = [
  * that mention cookies in their privacy notice footer.
  */
 function detectCookieConsent(text: string, contentLength: number, finalUrl: string): boolean {
-  // URL-based detection — redirect to a consent page
-  if (COOKIE_CONSENT_URL_PATTERNS.some((p) => p.test(finalUrl))) return true;
-  // Content-based detection — only on short pages
+  // Only check short pages (<10KB) — long pages with cookie mentions are real content
   if (contentLength > 10_000) return false;
+  // URL-based detection — check path + query only (not domain) to avoid
+  // false positives on domains like cookieconsent.org
+  try {
+    const { pathname, search } = new URL(finalUrl);
+    const pathAndQuery = pathname + search;
+    if (COOKIE_CONSENT_URL_PATTERNS.some((p) => p.test(pathAndQuery))) return true;
+  } catch {
+    // Malformed URL — skip URL-based detection, fall through to content check
+  }
+  // Content-based detection
   return COOKIE_CONSENT_CONTENT_PATTERNS.some((p) => p.test(text));
 }
 
@@ -319,6 +327,8 @@ export async function handleResourceIngest(
     });
   } catch (err: unknown) {
     const error = err instanceof Error ? err.message : String(err);
+    // Persist error status even for unexpected failures
+    await persistFetchStatus(resourceId, 'error', ctx);
     return {
       success: false,
       data: { resourceId, url, durationMs: Date.now() - startTime },

@@ -671,4 +671,20 @@ describe('handleResourceIngest — cookie consent detection (#3522)', () => {
     expect(result.success).toBe(true);
     expect(result.data.status).toBe('cookie_blocked');
   });
+
+  it('does NOT false-positive on domains containing "cookie" (e.g. cookieconsent.org)', async () => {
+    const body = '<html><body><h1>CookieConsent library docs</h1><p>How to add consent banners.</p></body></html>';
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: body,
+      url: 'https://cookieconsent.org/docs/getting-started',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-domain', url: 'https://cookieconsent.org/docs/getting-started' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
 });
