@@ -89,11 +89,19 @@ const PIPELINE_STAGES = [
 
 function getReachedStage(timelineEvents: Array<{ label: string }>, statusKey: string | null): number {
   const labels = new Set(timelineEvents.map((e) => e.label));
-  if (statusKey === "vetoed" || statusKey === "enacted" || statusKey === "in-effect" || statusKey === "revoked" || labels.has("Signed") || labels.has("Vetoed") || labels.has("Enacted")) return 4;
-  if (labels.has("Passed Legislature") || labels.has("Passed Assembly") || labels.has("Passed Senate")) return 3;
-  if (labels.has("Passed Committee")) return 2;
-  // Check for vote data
-  if (labels.has("Introduced")) return 0;
+  // Stage 4: Final / enacted
+  if (statusKey === "vetoed" || statusKey === "enacted" || statusKey === "in-effect" || statusKey === "revoked"
+    || labels.has("Signed") || labels.has("Vetoed") || labels.has("Enacted")
+    || labels.has("Entry into Force") || labels.has("Enforcement")
+    || labels.has("Effective") || labels.has("In Force")) return 4;
+  // Stage 3: Passed legislative body
+  if (labels.has("Passed Legislature") || labels.has("Passed Assembly") || labels.has("Passed Senate")
+    || labels.has("Parliament Final Vote") || labels.has("Council Adoption")) return 3;
+  // Stage 2: Committee / negotiation stage
+  if (labels.has("Passed Committee")
+    || labels.has("Parliament Committee Vote") || labels.has("Parliament Negotiating Mandate")) return 2;
+  // Stage 0: Introduced / proposed
+  if (labels.has("Introduced") || labels.has("Proposed")) return 0;
   return -1;
 }
 
@@ -115,8 +123,12 @@ export default async function LegislationDetailPage({
   const jurisdiction = entity.jurisdiction ?? null;
 
   const TIMELINE_LABELS = new Set([
+    // US legislative process
     "Introduced", "Passed Legislature", "Passed Committee", "Passed Senate",
     "Passed Assembly", "Signed", "Vetoed", "Enacted", "Effective", "Amended", "In Force",
+    // EU legislative process
+    "Proposed", "Parliament Committee Vote", "Parliament Negotiating Mandate",
+    "Parliament Final Vote", "Council Adoption", "Entry into Force", "Enforcement",
   ]);
   const timelineEvents = entity.customFields
     .filter((f) => TIMELINE_LABELS.has(f.label))

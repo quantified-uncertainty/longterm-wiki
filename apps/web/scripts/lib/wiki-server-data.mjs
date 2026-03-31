@@ -868,8 +868,8 @@ function fundingRoundRowToRecordEntry(row) {
     name: row.name,
   };
   if (row.date) fields.date = row.date;
-  if (row.raised != null) fields.raised = row.raised;
-  if (row.valuation != null) fields.valuation = row.valuation;
+  if (typeof row.raised === "number") fields.raised = row.raised;
+  if (typeof row.valuation === "number") fields.valuation = row.valuation;
   if (row.instrument) fields.instrument = row.instrument;
   if (row.leadInvestorRaw) fields.lead_investor = row.leadInvestorRaw;
   if (row.source) fields.source = row.source;
