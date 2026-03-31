@@ -9,7 +9,7 @@
  * Used by:
  *   - Build-time pipeline (build-data.mjs) → stored in database.json per page
  *   - PageStatus component (reads pre-computed coverage, overrides live citation data)
- *   - Page Coverage dashboard (/internal/page-coverage)
+ *   - Page Coverage dashboard (E899)
  */
 
 // ---------------------------------------------------------------------------

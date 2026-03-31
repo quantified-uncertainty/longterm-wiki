@@ -454,30 +454,30 @@ async function sweepCommand(
   const agentResult = await sweepStaleAgents(timeout);
   if (agentResult.ok) {
     if (agentResult.data.swept > 0) {
-      output += `Active agents (E925): swept ${agentResult.data.swept} stale agent(s):\n`;
+      output += `Active agents (E1281): swept ${agentResult.data.swept} stale agent(s):\n`;
       for (const a of agentResult.data.agents) {
         output += `  #${a.id} (${a.sessionId})\n`;
       }
     } else {
-      output += 'Active agents (E925): no stale agents.\n';
+      output += 'Active agents (E1281): no stale agents.\n';
     }
   } else {
-    output += `Active agents (E925): Error: ${agentResult.message}\n`;
+    output += `Active agents (E1281): Error: ${agentResult.message}\n`;
   }
 
   // Sweep E912 agent sessions (stale after 2 hours)
   const sessionResult = await sweepStaleSessions(2);
   if (sessionResult.ok) {
     if (sessionResult.data.swept > 0) {
-      output += `Agent sessions (E912): swept ${sessionResult.data.swept} stale session(s):\n`;
+      output += `Agent sessions (E1281): swept ${sessionResult.data.swept} stale session(s):\n`;
       for (const s of sessionResult.data.sessions) {
         output += `  #${s.id} (${s.branch})\n`;
       }
     } else {
-      output += 'Agent sessions (E912): no stale sessions.\n';
+      output += 'Agent sessions (E1281): no stale sessions.\n';
     }
   } else {
-    output += `Agent sessions (E912): Error: ${sessionResult.message}\n`;
+    output += `Agent sessions (E1281): Error: ${sessionResult.message}\n`;
   }
 
   return { exitCode: 0, output };
