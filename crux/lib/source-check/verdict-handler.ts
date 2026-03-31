@@ -67,6 +67,10 @@ export async function storeAggregateVerdict(params: {
   sourcesChecked: number;
   /** Entity ID to associate with this verdict (e.g., org stableId for personnel/division records) */
   entityId?: string | null;
+  /** Human-readable record name (persisted in verdict, survives record deletion) */
+  displayName?: string | null;
+  /** Human-readable entity name (persisted in verdict, survives record deletion) */
+  entityDisplayName?: string | null;
 }, logPrefix = '[source-check]'): Promise<void> {
   const body = {
     recordType: params.recordType,
@@ -76,6 +80,8 @@ export async function storeAggregateVerdict(params: {
     reasoning: params.reasoning,
     sourcesChecked: params.sourcesChecked,
     ...(params.entityId ? { entityId: params.entityId } : {}),
+    ...(params.displayName ? { displayName: params.displayName } : {}),
+    ...(params.entityDisplayName ? { entityDisplayName: params.entityDisplayName } : {}),
   };
 
   const response = await apiRequest<{ ok: boolean }>(

@@ -33,7 +33,7 @@ import {
   isPolicy,
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
-import { isSid } from "@/lib/stable-id";
+import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
 
 // Re-export for consumers
 export type { WithSource };
@@ -643,9 +643,9 @@ function entityStableIdIndex(): Map<string, AnyEntity> {
 }
 
 /**
- * Get a typed entity by stableId (10-char alphanumeric).
- * Resolves stableId → slug via idRegistry, then looks up the entity by slug.
- * Falls back to scanning the entity stableId index if the registry lookup fails.
+ * Get a typed entity by stableId.
+ * Handles both sid_-prefixed IDs (e.g. "sid_fVMqY7vpMA") and legacy bare IDs
+ * (e.g. "fVMqY7vpMA") — the latter appear in source_check_verdicts.entityId.
  */
 export function getTypedEntityByStableId(stableId: string): AnyEntity | undefined {
   const registry = getIdRegistry();
@@ -655,7 +655,22 @@ export function getTypedEntityByStableId(stableId: string): AnyEntity | undefine
     if (entity) return entity;
   }
   // Fallback: scan entities by their stableId field
-  return entityStableIdIndex().get(stableId);
+  const byIndex = entityStableIdIndex().get(stableId);
+  if (byIndex) return byIndex;
+
+  // If the ID is a bare 10-char ID (no sid_ prefix), try with the prefix.
+  // source_check_verdicts.entityId often stores bare IDs while entities use sid_ prefix.
+  if (!isSid(stableId) && isAnySid(stableId)) {
+    const prefixed = `${SID_PREFIX}${stableId}`;
+    const slugP = registry.byStableId?.[prefixed];
+    if (slugP) {
+      const entity = typedEntityIndex().get(slugP);
+      if (entity) return entity;
+    }
+    return entityStableIdIndex().get(prefixed);
+  }
+
+  return undefined;
 }
 
 function loadResources(): Resource[] {

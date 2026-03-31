@@ -111,15 +111,27 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   let names: Record<string, string> = {};
   const hrefs: Record<string, string> = {};
   if (verdicts.length > 0) {
+    // Phase 0: Use persisted display names from verdicts (most reliable, survive record deletion)
+    for (const v of verdicts) {
+      if ("displayName" in v && v.displayName) {
+        names[v.recordId] = v.displayName as string;
+      }
+      if ("entityDisplayName" in v && v.entityDisplayName && v.entityId) {
+        names[v.entityId] = v.entityDisplayName as string;
+      }
+    }
+
     // Group record IDs by type for batch resolution via wiki-server
     const byType = new Map<string, Set<string>>();
     const entityIds = new Set<string>();
     for (const v of verdicts) {
-      const existing = byType.get(v.recordType);
-      if (existing) {
-        existing.add(v.recordId);
-      } else {
-        byType.set(v.recordType, new Set([v.recordId]));
+      if (!names[v.recordId]) {
+        const existing = byType.get(v.recordType);
+        if (existing) {
+          existing.add(v.recordId);
+        } else {
+          byType.set(v.recordType, new Set([v.recordId]));
+        }
       }
       if (v.entityId) {
         entityIds.add(v.entityId);

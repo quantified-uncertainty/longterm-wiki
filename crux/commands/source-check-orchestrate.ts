@@ -38,7 +38,7 @@ import {
   SOURCE_CHECK_CONSTANTS,
   MODELS,
 } from '../lib/source-check/index.ts';
-import { str, strOrNull, numOrNull, resolveName, extractEntityId } from '../lib/source-check/record-fields.ts';
+import { str, strOrNull, numOrNull, resolveName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -121,6 +121,10 @@ interface RecordItemData {
   fields: Record<string, string | number | null>;
   /** Entity ID for the parent entity (org for personnel/divisions, company for funding-rounds, etc.) */
   entityId?: string | null;
+  /** Human-readable record description (persisted in verdict for name resolution) */
+  displayName?: string | null;
+  /** Human-readable entity name (persisted in verdict for name resolution) */
+  entityDisplayName?: string | null;
 }
 
 interface EntityItemData {
@@ -435,6 +439,7 @@ async function collectRecordItems(
         const priority = computeRecordPriority(recordType, existing);
 
         const entityId = extractEntityId(recordType, item);
+        const entityDisplayName = extractEntityDisplayName(recordType, item);
 
         items.push({
           kind: 'record',
@@ -452,6 +457,8 @@ async function collectRecordItems(
             recordId: id,
             fields,
             entityId,
+            displayName: description,
+            entityDisplayName,
           },
         });
       }
@@ -1045,6 +1052,8 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       reasoning: result.reasoning,
       sourcesChecked: 1,
       entityId: recordData.entityId,
+      displayName: recordData.displayName,
+      entityDisplayName: recordData.entityDisplayName,
     }, '[source-check]').catch((e: unknown) => {
       console.warn(`[source-check] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
     });
