@@ -26,6 +26,8 @@ config({ path: '.env.local' });
 /**
  * Date when MODELS were last verified as current.
  * Update this date after confirming models are still the latest versions.
+ * Model freshness: checked by periodic maintenance audits (.claude/audits.yaml),
+ * not by an automated validator.
  */
 export const MODELS_LAST_VERIFIED = '2026-02-18';
 

@@ -145,6 +145,19 @@ audits:
     last_checked: "2026-03-05"
     last_result: pass
 
+  - id: model-freshness
+    category: infrastructure
+    description: "MODELS in crux/lib/anthropic.ts use current Anthropic model versions and MODELS_LAST_VERIFIED is within 60 days"
+    check_type: manual
+    how_to_verify: |
+      1. Read MODELS_LAST_VERIFIED in crux/lib/anthropic.ts.
+      2. If the date is >60 days old, check the Anthropic API docs or changelog
+         for newer model versions.
+      3. Update MODELS, MODEL_ALIASES, and MODELS_LAST_VERIFIED if new versions exist.
+      4. Run `pnpm crux sys audits check model-freshness --pass` after verifying.
+    frequency: monthly
+    added: "2026-03-30"
+
   - id: explore-search-ranking
     category: feature-health
     description: "Explore page search ranks exact title matches above partial matches (e.g., 'Anthropic' page ranks #1 when searching 'Anthropic')"
