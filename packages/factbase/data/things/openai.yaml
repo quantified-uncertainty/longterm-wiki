@@ -148,9 +148,9 @@ facts:
   - id: f_irWobt0L9Q
     property: user-count
     value: 9e+8
-    asOf: 2025-12
+    asOf: 2026-02
     source: https://almcorp.com/blog/chatgpt-900-million-weekly-active-users/
-    notes: "ChatGPT approaching 900M weekly active users by end of 2025"
+    notes: "ChatGPT reached 900M weekly active users announced February 27, 2026"
 
   # ── Headcount ──────────────────────────────────────────────────
   - id: f_o1tcwe2T0w
