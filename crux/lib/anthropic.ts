@@ -25,7 +25,6 @@ config({ path: '.env.local' });
 
 /**
  * Date when MODELS were last verified as current.
- * validate-models.ts warns if this is more than 60 days old.
  * Update this date after confirming models are still the latest versions.
  */
 export const MODELS_LAST_VERIFIED = '2026-02-18';

@@ -11,11 +11,6 @@ import { buildCommands } from '../lib/cli.ts';
  * Script definitions: maps command names to script paths and metadata
  */
 const SCRIPTS = {
-  all: {
-    script: 'validate/validate-all.ts',
-    description: 'Run all validation checks',
-    passthrough: ['ci', 'failFast', 'skip', 'fix'],
-  },
   daily: {
     script: 'validate/validate-daily.ts',
     description: 'Run daily validation suite (local + server checks with unified report)',
@@ -41,21 +36,6 @@ const SCRIPTS = {
     description: 'Check EntityLink usage and conversion candidates',
     passthrough: ['ci', 'fix'],
   },
-  'cross-links': {
-    script: 'validate/validate-cross-links.ts',
-    description: 'Check for missing cross-links between related pages',
-    passthrough: ['ci', 'threshold', 'json'],
-  },
-  mermaid: {
-    script: 'validate/validate-mermaid.ts',
-    description: 'Validate Mermaid diagram syntax',
-    passthrough: ['ci', 'render'],
-  },
-  style: {
-    script: 'validate/validate-style-guide.ts',
-    description: 'Check style guide compliance',
-    passthrough: ['ci'],
-  },
   consistency: {
     script: 'validate/validate-consistency.ts',
     description: 'Cross-page consistency checks',
@@ -71,16 +51,6 @@ const SCRIPTS = {
     description: 'EntityLink and DataInfoBox references',
     passthrough: ['ci'],
   },
-  sidebar: {
-    script: 'validate/validate-sidebar.ts',
-    description: 'Sidebar configuration',
-    passthrough: ['ci'],
-  },
-  orphans: {
-    script: 'validate/validate-orphaned-files.ts',
-    description: 'Find orphaned/temp files',
-    passthrough: ['ci'],
-  },
   quality: {
     script: 'validate/validate-quality.ts',
     description: 'Content quality ratings (advisory)',
@@ -89,16 +59,6 @@ const SCRIPTS = {
   schema: {
     script: 'validate/validate-yaml-schema.ts',
     description: 'YAML schema validation',
-    passthrough: ['ci'],
-  },
-  'edit-logs': {
-    script: 'validate/validate-edit-logs.ts',
-    description: 'Edit log schema and integrity',
-    passthrough: ['ci'],
-  },
-  'session-logs': {
-    script: 'validate/validate-session-logs.ts',
-    description: 'Session log format and required fields',
     passthrough: ['ci'],
   },
   financials: {
@@ -120,11 +80,6 @@ const SCRIPTS = {
     script: 'validate/validate-gate.ts',
     description: 'CI-blocking checks (pre-push gate)',
     passthrough: ['ci', 'full', 'fix', 'fullGate', 'noTriage', 'noCache', 'scope'],
-  },
-  'id-server-sync': {
-    script: 'validate/validate-id-server-sync.ts',
-    description: 'Verify local wikiIds match wiki-server allocations',
-    passthrough: ['ci'],
   },
   'hallucination-risk': {
     script: 'validate/validate-hallucination-risk.ts',
@@ -213,7 +168,7 @@ const SCRIPTS = {
   },
 };
 
-export const commands = buildCommands(SCRIPTS, 'all');
+export const commands = buildCommands(SCRIPTS, 'gate');
 
 /**
  * Get help text for validate domain
@@ -232,15 +187,13 @@ ${commandList}
 Options:
   --ci            JSON output for CI pipelines
   --fix           Auto-fix issues (where supported)
-  --skip=a,b      Skip specific checks (all only)
   --rules=a,b     Run specific rules (unified only)
   --quick         Fast mode (compile only)
   --list          List available rules (unified only)
-  --fail-fast     Stop on first failure (all only)
   --scope=content Content-only gate: skip build-data/tests/typechecks (gate only)
 
 Examples:
-  crux w validate                           Run all checks
+  crux w validate                           Run CI-blocking gate checks
   crux w validate gate                      Run CI-blocking checks (with triage)
   crux w validate gate --full               Include full Next.js build
   crux w validate gate --no-triage          Skip LLM triage, run all checks
@@ -253,7 +206,6 @@ Examples:
   crux w validate entity-links --fix        Convert markdown links to EntityLink
   crux w validate entity-refs              Check KB record entity references
   crux w validate entity-refs --threshold=90  Fail if link rate < 90%
-  crux w validate all --skip=mermaid,style  Skip specific checks
   crux w validate daily                      Daily validation suite (local + server)
   crux w validate daily --local-only         Skip server-dependent checks
   crux w validate directory-pages            Audit directory page data quality

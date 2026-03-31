@@ -8,14 +8,13 @@ import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics
 
 describe('Validator scripts exist', () => {
   const validatorScripts: string[] = [
-    'crux/validate/validate-all.ts',
     'crux/validate/validate-data.ts',
     'crux/validate/validate-internal-links.ts',
-    'crux/validate/validate-mdx-syntax.ts',
-    'crux/validate/validate-style-guide.ts',
     'crux/validate/validate-consistency.ts',
     'crux/validate/check-staleness.ts',
-    'crux/validate/validate-sidebar.ts',
+    'crux/validate/validate-gate.ts',
+    'crux/validate/validate-unified.ts',
+    'crux/validate/validate-daily.ts',
   ];
 
   for (const script of validatorScripts) {
@@ -203,7 +202,7 @@ describe('getQualityDiscrepancy', () => {
 });
 
 // =============================================================================
-// MDX Syntax patterns (from validate-mdx-syntax)
+// MDX Syntax patterns (regex tests, not tied to a specific validator)
 // =============================================================================
 
 describe('MDX syntax validation patterns', () => {

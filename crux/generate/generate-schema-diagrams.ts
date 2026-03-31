@@ -337,7 +337,7 @@ flowchart TD
     subgraph Validation["Validation Suite"]
         V1[validate-yaml-schema.ts]
         V2[validate-data.ts]
-        V3[validate-all.ts]
+        V3[validate-gate.ts]
     end
 
     subgraph UI["UI Components"]
