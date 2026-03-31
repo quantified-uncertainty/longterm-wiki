@@ -23,7 +23,7 @@ This page documents what we learned, what similar systems do, and the operating 
 - `<FBFactValue>` component for programmatic/dashboard use
 - `<Calc>` component derives values from multiple KB facts
 - Build-time system computes fact timeseries, usage tracking, source resolution
-- Fact dashboard at `/internal/facts` (E898) for monitoring
+- Fact dashboard (E898, removed — superseded by FactBase)
 
 **Current usage:** `<FBF>` tags appear across \~19 pages, still concentrated on Anthropic pages (valuation, IPO, investors, stakeholders, headcount progression). The Anthropic entity alone has \~60 facts with temporal structure covering valuation rounds, revenue growth, and headcount over time.
 
@@ -259,7 +259,7 @@ Each phase is gated on the previous phase working reliably. Start with detection
 - Renamed `<F>` component to `<FBF>` with `entity` and `property` props as required attributes
 - Added `<FBFactValue>` component for programmatic/dashboard use
 - Self-closing `<FBF entity="x" property="y" />` is the standard form
-- Built fact dashboard at `/internal/facts` (E898)
+- Built fact dashboard at `/internal/facts` (E898, since removed)
 
 ### Done: Prune and migrate tags
 

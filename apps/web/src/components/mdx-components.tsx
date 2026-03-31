@@ -60,22 +60,16 @@ import { FBPublicationsContent } from "@/app/factbase/factbase-publications-cont
 import { SourcesOverviewContent } from "@/app/sources/sources-overview-content";
 
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
-import { FactsPageContent } from "@/app/internal/facts/facts-content";
-import { PageCoverageContent } from "@/app/internal/page-coverage/page-coverage-content";
 import { UpdateScheduleContent } from "@/app/internal/updates/updates-content";
 import { EntitiesContent } from "@/app/internal/entities/entities-content";
 import { PageChangesContent } from "@/app/internal/page-changes/page-changes-content";
 import { SuggestedPagesContent } from "@/app/internal/suggested-pages/suggested-pages-content";
 import { ImproveRunsContent } from "@/app/internal/improve-runs/improve-runs-content";
-import { AgentSessionsContent } from "@/app/internal/agent-sessions/agent-sessions-content";
-import { SessionInsightsContent } from "@/app/internal/session-insights/session-insights-content";
 import { AutoUpdateRunsContent } from "@/app/internal/auto-update-runs/auto-update-runs-content";
 import { AutoUpdateNewsContent } from "@/app/internal/auto-update-news/auto-update-news-content";
 import { CitationAccuracyContent } from "@/app/internal/citation-accuracy/citation-accuracy-content";
 import { CitationContentContent } from "@/app/internal/citation-content/citation-content-content";
 import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hallucination-risk-content";
-import { HallucinationEvalsContent } from "@/app/internal/hallucination-evals/hallucination-evals-content";
-import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
@@ -83,9 +77,7 @@ import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-d
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
-import { ThingsContent } from "@/app/internal/things/things-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
-import { EntityMatrixContent } from "@/app/internal/entity-matrix/entity-matrix-content";
 import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
 import { EntitySourceChecksContent } from "@/app/internal/entity-source-checks/entity-source-checks-content";
 import { DataQualityContent } from "@/app/internal/data-quality/data-quality-content";
@@ -231,22 +223,16 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   SourcesOverviewContent,
 
   // Dashboard content components
-  FactsPageContent,
-  PageCoverageContent,
   UpdateScheduleContent,
   EntitiesContent,
   PageChangesContent,
   SuggestedPagesContent,
   ImproveRunsContent,
-  AgentSessionsContent,
-  SessionInsightsContent,
   AutoUpdateRunsContent,
   AutoUpdateNewsContent,
   CitationAccuracyContent,
   CitationContentContent,
   HallucinationRiskContent,
-  HallucinationEvalsContent,
-  ActiveAgentsContent,
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
@@ -254,9 +240,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DivisionsDashboardContent,
   FundingProgramsDashboardContent,
   PeopleCoverageContent,
-  ThingsContent,
   AgentActivityContent,
-  EntityMatrixContent,
   EntityProfileContent,
   EntitySourceChecksContent,
   DataQualityContent,
