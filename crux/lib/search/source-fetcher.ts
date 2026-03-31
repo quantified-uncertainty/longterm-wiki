@@ -47,6 +47,8 @@ import { isYoutubeUrl } from '../../resource-utils.ts';
 import {
   detectPaywall,
   isUnverifiableDomain,
+  detectTwitterSoft404,
+  detectCookieConsent,
 } from './paywall-detection.ts';
 import {
   getContentFetchStrategy,
@@ -69,7 +71,10 @@ export interface FetchRequest {
   query?: string;
   /** Optional resource ID — inherits URL/title/description from resource YAML. */
   resourceId?: string;
-  /** If true, write fetch status (dead/paywall/ok) back to the resource YAML. Default: false. */
+  /**
+   * @deprecated Fetch status is now always persisted when a resource exists (#3520).
+   * This flag is retained for API compatibility but has no effect.
+   */
   updateResourceStatus?: boolean;
   /**
    * Maximum age (ms) for cached content before triggering a re-fetch.
@@ -387,6 +392,8 @@ interface BuiltinFetchResult {
   httpStatus: number;
   error: string | null;
   contentType: FetchedSourceContentType;
+  /** Final URL after following redirects (may differ from the requested URL). */
+  finalUrl?: string;
 }
 
 async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
@@ -435,7 +442,7 @@ async function fetchWithBuiltin(url: string): Promise<BuiltinFetchResult> {
       const title = extractTitle(html);
       const text = htmlToText(html).slice(0, MAX_CONTENT_CHARS);
 
-      return { title, content: text, httpStatus: status, error: null, contentType: 'html' };
+      return { title, content: text, httpStatus: status, error: null, contentType: 'html', finalUrl: response.url };
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       const isTransient = msg.includes('abort') || msg.includes('ECONNRESET') || msg.includes('timeout');
@@ -695,6 +702,7 @@ async function _fetchSourceCore(
   let fetchedContentType: FetchedSourceContentType = 'html';
   let fetchMethod: string = 'built-in';
   let archiveUrl: string | undefined;
+  let finalUrl: string | undefined;
 
   const strategy = getContentFetchStrategy(url);
 
@@ -763,12 +771,14 @@ async function _fetchSourceCore(
           httpStatus = fallbackResult.httpStatus;
           fetchError = fallbackResult.error;
           fetchedContentType = fallbackResult.contentType;
+          finalUrl = fallbackResult.finalUrl;
         } else {
           title = builtinResult.title;
           content = builtinResult.content;
           httpStatus = builtinResult.httpStatus;
           fetchError = builtinResult.error;
           fetchedContentType = builtinResult.contentType;
+          finalUrl = builtinResult.finalUrl;
         }
       } else {
         title = builtinResult.title;
@@ -776,6 +786,7 @@ async function _fetchSourceCore(
         httpStatus = builtinResult.httpStatus;
         fetchError = builtinResult.error;
         fetchedContentType = builtinResult.contentType;
+        finalUrl = builtinResult.finalUrl;
       }
     }
   }
@@ -797,11 +808,16 @@ async function _fetchSourceCore(
   }
 
   // ---- 5c. Determine status ----
+  const resolvedUrl = finalUrl ?? url;
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
     status = 'error';
   } else if (httpStatus >= 400) {
     status = 'dead';
+  } else if (detectTwitterSoft404(resolvedUrl, content.length, httpStatus)) {
+    status = 'dead'; // Twitter/X returns 200 for nonexistent profiles (#3521)
+  } else if (detectCookieConsent(resolvedUrl, content, url)) {
+    status = 'paywall'; // Cookie consent redirect — content is not the real article (#3522)
   } else if (detectPaywall(content)) {
     status = 'paywall';
   } else if (content.length > 0) {
@@ -839,9 +855,11 @@ async function _fetchSourceCore(
   // ---- 9. Store in session cache ----
   sessionCacheSet(url, result);
 
-  // ---- 10. Reflect status back to resource YAML (if requested) ----
+  // ---- 10. Reflect status back to resource record ----
+  // Always persist fetch status when we have a resource — DNS failures and
+  // timeouts must be recorded so fetchStatus doesn't stay null (#3520).
 
-  if (request.updateResourceStatus && resource) {
+  if (resource) {
     try {
       updateResourceFetchStatus(resource.id, {
         fetchStatus: status,
@@ -849,7 +867,7 @@ async function _fetchSourceCore(
         fetchedTitle: title || undefined,
       });
     } catch {
-      // Best-effort — don't fail the fetch if YAML update fails
+      // Best-effort — don't fail the fetch if status update fails
     }
   }
 

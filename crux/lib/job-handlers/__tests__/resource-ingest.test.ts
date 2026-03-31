@@ -406,6 +406,78 @@ describe('handleResourceIngest — enrichment chaining', () => {
   });
 });
 
+describe('handleResourceIngest — Twitter/X soft-404 (#3521)', () => {
+  it('maps dead status from fetchSource for Twitter soft-404', async () => {
+    // fetchSource now detects Twitter soft-404 internally and returns status: 'dead'
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'dead' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: '',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://twitter.com/elaboratehoax' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    // dead + httpStatus 200 maps to 'error' via mapFetchStatus (not 404)
+    // The actual soft-404 detection is in fetchSource/paywall-detection
+    expect(result.data.status).toBe('error');
+  });
+
+  it('passes through reachable for real Twitter profiles', async () => {
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: 'Real profile content. '.repeat(200),
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://twitter.com/realuser' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+});
+
+describe('handleResourceIngest — cookie consent detection (#3522)', () => {
+  it('maps paywall status from fetchSource for cookie consent pages', async () => {
+    // fetchSource detects cookie consent internally and returns status: 'paywall'
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'paywall' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: 'This site requires cookies to function properly.',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://nature.com/articles/123' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('paywall');
+  });
+
+  it('passes through reachable for normal redirects', async () => {
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: '<html><body><h1>Article Content</h1>' + '<p>Real content.</p>'.repeat(200) + '</body></html>',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://nature.com/articles/123' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.status).toBe('reachable');
+  });
+});
+
 describe('handleResourceIngest — resilience', () => {
   it('succeeds even when fetch_status persistence fails', async () => {
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
