@@ -33,6 +33,11 @@ import {
   storeSourceCheckEvidence,
   storeAggregateVerdict,
 } from '../lib/source-check/index.ts';
+import {
+  SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
+  SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
+  SOURCE_CHECK_RESPONSE_FORMAT,
+} from '../lib/source-check/prompt-guidelines.ts';
 import type { WikiPageVerifyItem } from '../lib/source-check/types.ts';
 import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import type { FactBaseFact } from '../lib/source-check/wiki-page-claims.ts';
@@ -232,29 +237,11 @@ ${item.sourceContext.slice(0, 500)}
 
 Does the source text confirm, contradict, or not address this claim?
 
-IMPORTANT — avoid these common false-positive errors:
-- **Approximate values**: Within 10% is "partial" or "confirmed", not "contradicted"
-- **URL format**: "example.com" and "https://www.example.com" are the same website — NOT a contradiction
-- **Date precision**: "2016-08" and "30 August 2016" are equivalent — NOT a contradiction
-- **Partial listings**: Listing one founder when there are multiple is "partial", not "contradicted"
-- **Opaque identifiers**: If a field has an opaque ID you can't resolve, that's "unverifiable" — never "contradicted"
-- **NaN/null values**: "$NaN" or null claimed values are data bugs — mark "unverifiable"
-- Reserve "contradicted" ONLY for direct, clear incompatibility where the source states a genuinely different value
+${SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES}
 
-Other considerations:
-- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
-- Dates may be approximate
-- If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
-- If the source has a newer value that supersedes the claimed value, that's "outdated"
-- If the source partially confirms (e.g., confirms the ballpark but not the exact figure), that's "partial"
+${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "What the source actually says about this data point (quote or paraphrase)",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 /**

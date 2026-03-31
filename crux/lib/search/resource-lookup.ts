@@ -13,10 +13,11 @@ import { loadResources, loadResourcesPGFirst } from '../../resource-io.ts';
 // Re-export Resource as ResourceEntry for consumers
 export type ResourceEntry = Resource;
 
-/** Status information to write back to a resource after fetching */
+/** Status information to write back to a resource after fetching.
+ *  Fine-grained statuses (soft_404, not_found, timeout, unreachable) are subtypes
+ *  of the legacy "dead" bucket — stored as-is for richer retry/analytics. */
 export interface ResourceFetchStatus {
-  /** HTTP-level status: 'ok', 'dead', 'paywall', 'error' */
-  fetchStatus: 'ok' | 'dead' | 'paywall' | 'error';
+  fetchStatus: 'ok' | 'dead' | 'soft_404' | 'not_found' | 'timeout' | 'unreachable' | 'paywall' | 'error';
   /** ISO timestamp of when the fetch happened */
   fetchedAt: string;
   /** Page title from the fetched content (may update resource title) */

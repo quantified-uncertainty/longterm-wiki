@@ -327,7 +327,7 @@ describe('handleResourceIngest — fetch_status persistence', () => {
     );
   });
 
-  it('persists dead for not_found', async () => {
+  it('persists not_found for 404', async () => {
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
 
     mockFetchSource.mockResolvedValue(mockFetchResult({
@@ -343,7 +343,7 @@ describe('handleResourceIngest — fetch_status persistence', () => {
 
     expect(updateResourceFetchStatus).toHaveBeenCalledWith(
       'res-1',
-      expect.objectContaining({ fetchStatus: 'dead' }),
+      expect.objectContaining({ fetchStatus: 'not_found' }),
     );
   });
 });
@@ -500,7 +500,7 @@ describe('handleResourceIngest — resilience', () => {
 // ---------------------------------------------------------------------------
 
 describe('handleResourceIngest — fetchStatus persistence (#3520)', () => {
-  it('persists fetchStatus=dead for unreachable (DNS failure)', async () => {
+  it('persists fetchStatus=unreachable for DNS failure', async () => {
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
 
     mockFetchSource.mockResolvedValue(mockFetchResult({
@@ -518,11 +518,11 @@ describe('handleResourceIngest — fetchStatus persistence (#3520)', () => {
     expect(result.data.status).toBe('unreachable');
     expect(updateResourceFetchStatus).toHaveBeenCalledWith(
       'res-dns',
-      expect.objectContaining({ fetchStatus: 'dead' }),
+      expect.objectContaining({ fetchStatus: 'unreachable' }),
     );
   });
 
-  it('persists fetchStatus=dead for timeouts', async () => {
+  it('persists fetchStatus=timeout for timeouts', async () => {
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
 
     mockFetchSource.mockResolvedValue(mockFetchResult({
@@ -540,11 +540,11 @@ describe('handleResourceIngest — fetchStatus persistence (#3520)', () => {
     expect(result.data.status).toBe('timeout');
     expect(updateResourceFetchStatus).toHaveBeenCalledWith(
       'res-timeout',
-      expect.objectContaining({ fetchStatus: 'error' }),
+      expect.objectContaining({ fetchStatus: 'timeout' }),
     );
   });
 
-  it('persists fetchStatus=dead for invalid URLs', async () => {
+  it('persists fetchStatus=error for invalid URLs', async () => {
     const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
 
     const result = await handleResourceIngest(
@@ -556,7 +556,7 @@ describe('handleResourceIngest — fetchStatus persistence (#3520)', () => {
     expect(result.data.status).toBe('invalid_url');
     expect(updateResourceFetchStatus).toHaveBeenCalledWith(
       'res-invalid',
-      expect.objectContaining({ fetchStatus: 'dead' }),
+      expect.objectContaining({ fetchStatus: 'error' }),
     );
   });
 
