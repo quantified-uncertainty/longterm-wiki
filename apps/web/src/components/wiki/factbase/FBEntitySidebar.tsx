@@ -51,6 +51,7 @@ const DEFAULT_PROPERTIES: Record<string, string[]> = {
     "enterprise-market-share",
     "coding-market-share",
     "monthly-active-users",
+    "weekly-active-users",
     "business-customers",
     "safety-level",
     "safety-researcher-count",

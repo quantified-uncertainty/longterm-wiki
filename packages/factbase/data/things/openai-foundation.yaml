@@ -237,7 +237,7 @@ facts:
     value: "OpenAI announces plan to restructure into PBC; initial plan would have removed nonprofit governance control"
     asOf: 2024-12
     source: https://openai.com/index/why-our-structure-must-evolve-to-advance-our-mission/
-    notes: "OpenAI framed this as evolving the mission; critics saw it as removing nonprofit control. Initial plan was later reversed under AG pressure."
+    notes: "OpenAI framed this as evolving the mission; critics saw it as removing nonprofit control."
 
   - id: f_oaif_ca_ag_investigation
     property: key-event
