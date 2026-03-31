@@ -186,7 +186,7 @@ const monitoringApp = new Hono()
     // Process DB counts result
     let wikiServerStatus: "healthy" | "degraded" | "down" = "healthy";
     let dbCounts = { pages: 0, entities: 0, facts: 0 };
-    if (dbCountsResult) {
+    if (dbCountsResult && dbCountsResult.length > 0) {
       const row = dbCountsResult[0] as DbCountsRow;
       dbCounts = {
         pages: row.pages,
