@@ -22,3 +22,15 @@ facts:
       - !ref sid_R8tDuupBTt
       - !ref sid_Z62bQynY4g
     source: https://www.redwoodresearch.org/
+
+  - id: f_C3NKJTUQVU
+    property: board-member
+    value: !ref sid_eQh3ZhWv8D
+    source: https://www.redwoodresearch.org/
+    notes: "Holden Karnofsky serves on the Redwood Research board"
+
+  - id: f_B7JWLYIUnx
+    property: board-member
+    value: !ref sid_vzxfzxBITd
+    source: https://www.redwoodresearch.org/
+    notes: "Paul Christiano serves on the Redwood Research board"
