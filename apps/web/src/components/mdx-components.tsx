@@ -65,14 +65,11 @@ import { EntitiesContent } from "@/app/internal/entities/entities-content";
 import { PageChangesContent } from "@/app/internal/page-changes/page-changes-content";
 import { SuggestedPagesContent } from "@/app/internal/suggested-pages/suggested-pages-content";
 import { ImproveRunsContent } from "@/app/internal/improve-runs/improve-runs-content";
-import { AgentSessionsContent } from "@/app/internal/agent-sessions/agent-sessions-content";
-import { SessionInsightsContent } from "@/app/internal/session-insights/session-insights-content";
 import { AutoUpdateRunsContent } from "@/app/internal/auto-update-runs/auto-update-runs-content";
 import { AutoUpdateNewsContent } from "@/app/internal/auto-update-news/auto-update-news-content";
 import { CitationAccuracyContent } from "@/app/internal/citation-accuracy/citation-accuracy-content";
 import { CitationContentContent } from "@/app/internal/citation-content/citation-content-content";
 import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hallucination-risk-content";
-import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
@@ -231,14 +228,11 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   PageChangesContent,
   SuggestedPagesContent,
   ImproveRunsContent,
-  AgentSessionsContent,
-  SessionInsightsContent,
   AutoUpdateRunsContent,
   AutoUpdateNewsContent,
   CitationAccuracyContent,
   CitationContentContent,
   HallucinationRiskContent,
-  ActiveAgentsContent,
   GroundskeeperRunsContent,
   SystemHealthContent,
   PRDashboardContent,
