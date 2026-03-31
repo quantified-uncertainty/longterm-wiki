@@ -109,3 +109,7 @@ crux/evals/results/
 .matrix-improved.txt
 .playwright-mcp/
 crux/scripts/career-data.json
+
+# Archived data exports (large JSON files that bloat the repo)
+data/archived/
+data/archive/
