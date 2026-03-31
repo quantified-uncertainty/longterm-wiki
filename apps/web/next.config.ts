@@ -235,6 +235,12 @@ const nextConfig: NextConfig = {
         destination: "/organizations/cea",
         permanent: true,
       },
+      // Research area intuitive-slug redirects (#3486)
+      {
+        source: "/research-areas/agentic-ai",
+        destination: "/research-areas/agentic-ai-research",
+        permanent: true,
+      },
       // AI model and benchmark alternate-name redirects
       {
         source: "/ai-models/gemini-ultra",
@@ -249,6 +255,11 @@ const nextConfig: NextConfig = {
       {
         source: "/benchmarks/hle",
         destination: "/benchmarks/humanitys-last-exam",
+        permanent: true,
+      },
+      {
+        source: "/benchmarks/browse-comp",
+        destination: "/benchmarks/browsecomp",
         permanent: true,
       },
     ];
