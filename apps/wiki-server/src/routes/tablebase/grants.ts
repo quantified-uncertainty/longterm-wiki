@@ -312,6 +312,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // ---- GET /by-org-summary ----
   .get("/by-org-summary", async (c) => {
     const db = getDrizzleDb();
+    const LIMIT = 50;
 
     const rows = await db
       .select({
@@ -324,7 +325,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .groupBy(grants.organizationId)
       .orderBy(sql`coalesce(sum(${grants.amount}), 0) desc`)
-      .limit(50);
+      .limit(LIMIT);
 
     return c.json({
       organizations: rows.map((r) => ({
@@ -334,6 +335,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         minDate: r.minDate,
         maxDate: r.maxDate,
       })),
+      truncated: rows.length >= LIMIT,
     });
   })
 
