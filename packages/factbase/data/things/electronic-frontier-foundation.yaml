@@ -13,10 +13,10 @@ facts:
 
   - id: f_SOKVCVHlDw
     property: employee-count
-    value: "100"
-    asOf: 2024
+    value: "125"
+    asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation
-    notes: "Approximately 100 staff. eff.org/about does not state the number directly."
+    notes: "Staff 125 (2025) per Wikipedia. Previously ~100 in 2024."
 
   - id: f_77xsyIGOey
     property: investigation

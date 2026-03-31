@@ -21,6 +21,7 @@ facts:
     property: website
     value: https://www.bis.doc.gov
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    notes: "bis.doc.gov is the canonical domain (under Department of Commerce); bis.gov redirects"
 
   - id: f_bis_wiki
     property: wikipedia-url

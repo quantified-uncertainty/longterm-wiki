@@ -60,7 +60,7 @@ facts:
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_amd_hc_2024
     property: headcount
-    value: 26000
+    value: 28000
     asOf: 2024-12
     source: https://stockanalysis.com/stocks/amd/employees/
-    notes: "Approximately 26,000 employees"
+    notes: "Approximately 28,000 employees as of December 31, 2024 (up from 26,000)"

@@ -32,9 +32,10 @@ facts:
     {
         id: XkyMqYZGww,
         property: revenue,
-        value: 1510616,
+        value: 10512947,
+        asOf: 2021,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: From Wikidata Q145590
+        notes: "Revenue $10.5M (2021). Wikidata listed $1.5M without year; actual range is $1.2M (2012) to $10.5M (2021)."
       },
     {
         id: LIyDWr009Q,
