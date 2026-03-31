@@ -76,6 +76,71 @@ function detectSoft404(text: string, contentLength: number): boolean {
   return SOFT_404_PATTERNS.some((pattern) => pattern.test(text));
 }
 
+/**
+ * Detect Twitter/X nonexistent profile pages.
+ * Twitter returns HTTP 200 with a very short page (~493 chars) for nonexistent
+ * profiles. Real profiles include Open Graph meta tags with the user's name.
+ */
+function detectTwitterSoft404(text: string, contentLength: number, finalUrl: string): boolean {
+  try {
+    const host = new URL(finalUrl).hostname.replace(/^www\./, '');
+    if (host !== 'twitter.com' && host !== 'x.com') return false;
+  } catch {
+    return false;
+  }
+  // Nonexistent Twitter profiles return very short pages (~493 chars).
+  // Real profiles include og:description with the user's bio and are longer.
+  if (contentLength > 1500) return false;
+  // Additional signal: real profiles have og:description with actual content
+  if (text.includes('og:description')) return false;
+  return true;
+}
+
+/**
+ * Cookie consent / cookie-wall redirect patterns.
+ * Sites like nature.com redirect to cookie consent pages instead of serving content.
+ */
+const COOKIE_CONSENT_URL_PATTERNS = [
+  /[?&]error=cookies/i,
+  /\/cookie[-_.]?consent/i,
+  /\/cookie[-_.]?policy/i,
+  /\/cookie[-_.]?notice/i,
+  /\/gdpr[-_.]?consent/i,
+  /\/consent[-_.]?manager/i,
+  /\/cookie[-_.]?wall/i,
+];
+
+const COOKIE_CONSENT_CONTENT_PATTERNS = [
+  /we\s+use\s+cookies/i,
+  /cookie\s+consent/i,
+  /accept\s+(all\s+)?cookies/i,
+  /cookies?\s+(are\s+)?(not\s+supported|disabled|required)/i,
+  /enable\s+cookies/i,
+  /this\s+site\s+requires?\s+cookies/i,
+  /cookies?\s+must\s+be\s+enabled/i,
+];
+
+/**
+ * Detect cookie consent pages that replace real article content.
+ * Only flags short pages (<10KB) to avoid false positives on real articles
+ * that mention cookies in their privacy notice footer.
+ */
+function detectCookieConsent(text: string, contentLength: number, finalUrl: string): boolean {
+  // Only check short pages (<10KB) — long pages with cookie mentions are real content
+  if (contentLength > 10_000) return false;
+  // URL-based detection — check path + query only (not domain) to avoid
+  // false positives on domains like cookieconsent.org
+  try {
+    const { pathname, search } = new URL(finalUrl);
+    const pathAndQuery = pathname + search;
+    if (COOKIE_CONSENT_URL_PATTERNS.some((p) => p.test(pathAndQuery))) return true;
+  } catch {
+    // Malformed URL — skip URL-based detection, fall through to content check
+  }
+  // Content-based detection
+  return COOKIE_CONSENT_CONTENT_PATTERNS.some((p) => p.test(text));
+}
+
 // ---------------------------------------------------------------------------
 // Status types
 // ---------------------------------------------------------------------------
@@ -89,7 +154,8 @@ type ResourceStatus =
   | 'timeout'
   | 'paywall'
   | 'blocked'
-  | 'invalid_url';
+  | 'invalid_url'
+  | 'cookie_blocked';
 
 /** Map fetchSource status to our more granular ResourceStatus. */
 function mapFetchStatus(fetchStatus: FetchedSourceStatus, httpStatus: number): ResourceStatus {
@@ -111,13 +177,14 @@ function toFetchStatus(status: ResourceStatus): 'ok' | 'dead' | 'paywall' | 'err
   switch (status) {
     case 'reachable': return 'ok';
     case 'paywall': return 'paywall';
-    case 'not_found':
     case 'soft_404':
-    case 'unreachable':
+    case 'not_found':
+    case 'unreachable': return 'dead';
+    case 'invalid_url': return 'dead';
+    case 'error':
     case 'timeout':
-      return 'dead';
-    default:
-      return 'error';
+    case 'blocked':
+    case 'cookie_blocked': return 'error';
   }
 }
 
@@ -151,12 +218,14 @@ export async function handleResourceIngest(
     try {
       parsedUrl = new URL(url);
     } catch {
+      await persistFetchStatus(resourceId, 'invalid_url', ctx);
       return buildResult(resourceId, url, 'invalid_url', startTime, {
         error: 'Malformed URL',
       });
     }
 
     if (parsedUrl.protocol !== 'https:') {
+      await persistFetchStatus(resourceId, 'invalid_url', ctx);
       return buildResult(resourceId, url, 'invalid_url', startTime, {
         error: `Unsupported protocol: ${parsedUrl.protocol}`,
       });
@@ -164,6 +233,7 @@ export async function handleResourceIngest(
 
     // SSRF protection — block private/internal hosts
     if (isPrivateHost(parsedUrl.hostname.toLowerCase())) {
+      await persistFetchStatus(resourceId, 'blocked', ctx);
       return buildResult(resourceId, url, 'blocked', startTime, {
         error: 'Private host blocked (SSRF protection)',
       });
@@ -185,8 +255,14 @@ export async function handleResourceIngest(
 
     // Additional soft-404 detection (fetchSource doesn't check for this)
     if (status === 'reachable' && result.content.length > 0) {
-      if (detectSoft404(result.content, result.content.length)) {
+      const finalUrl = result.url || url;
+      if (
+        detectSoft404(result.content, result.content.length) ||
+        detectTwitterSoft404(result.content, result.content.length, finalUrl)
+      ) {
         status = 'soft_404';
+      } else if (detectCookieConsent(result.content, result.content.length, finalUrl)) {
+        status = 'cookie_blocked';
       }
     }
 
@@ -251,6 +327,8 @@ export async function handleResourceIngest(
     });
   } catch (err: unknown) {
     const error = err instanceof Error ? err.message : String(err);
+    // Persist error status even for unexpected failures
+    await persistFetchStatus(resourceId, 'error', ctx);
     return {
       success: false,
       data: { resourceId, url, durationMs: Date.now() - startTime },
