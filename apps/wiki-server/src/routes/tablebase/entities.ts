@@ -606,8 +606,8 @@ const entitiesApp = new Hono()
     }
 
     // 4. Resolve ref-type fact values (entity IDs → names + slugs)
-    // Collect all values that look like entity stable IDs (10-char alphanumeric)
-    const refPattern = /^[a-zA-Z0-9]{10}$/;
+    // Collect all values that look like entity stable IDs (sid_ prefix + 10-char alphanumeric)
+    const refPattern = /^sid_[a-zA-Z0-9]{10}$/;
     const refCandidates = new Set<string>();
     for (const entityFacts of factMap.values()) {
       for (const f of entityFacts.values()) {
@@ -638,7 +638,7 @@ const entitiesApp = new Hono()
     }
 
     // 4b. Resolve metadata ref fields (entity slug IDs stored in metadata, e.g. metadata.developer = "anthropic").
-    // The FactBase ref resolution above (step 4) handles stableId-format values (10-char alphanumeric).
+    // The FactBase ref resolution above (step 4) handles stableId-format values (sid_ prefix + 10-char alphanumeric).
     // Metadata refs use the entity's short `id` field (e.g. "anthropic", "openai"), not stableId.
     // For each requested measure, collect metadata[measure] values and resolve them to entity titles.
     const metadataRefResolutionMap = new Map<string, { name: string; entityId: string }>();
