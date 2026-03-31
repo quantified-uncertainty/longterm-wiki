@@ -280,21 +280,30 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // ---- GET /broken ----
   .get("/broken", async (c) => {
     const db = getDrizzleDb();
+    const LIMIT = 100;
 
-    const rows = await db
-      .select(joinedSelect)
-      .from(personnel)
-      .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
-      .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
-      .where(
-        or(
-          isNull(personnel.personEntityId),
-          like(personnel.personId, "new:%"),
-        )
-      )
-      .orderBy(personnel.organizationId, personnel.personId)
-      .limit(100);
+    const brokenCondition = or(
+      isNull(personnel.personEntityId),
+      like(personnel.personId, "new:%"),
+    );
+
+    const [rows, countResult] = await Promise.all([
+      db
+        .select(joinedSelect)
+        .from(personnel)
+        .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
+        .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
+        .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+        .where(brokenCondition)
+        .orderBy(personnel.organizationId, personnel.personId)
+        .limit(LIMIT),
+      db
+        .select({ count: count() })
+        .from(personnel)
+        .where(brokenCondition),
+    ]);
+
+    const total = countResult[0]?.count ?? 0;
 
     const classified = rows.map((r) => {
       const p = r.personnel;
@@ -322,7 +331,8 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
 
     return c.json({
-      total: classified.length,
+      total,
+      truncated: rows.length >= LIMIT,
       byIssueType: {
         "new-prefix": classified.filter((r) => r.issueType === "new-prefix").length,
         "unresolved-stableId": classified.filter((r) => r.issueType === "unresolved-stableId").length,

@@ -86,6 +86,7 @@ const monitoringApp = new Hono()
     const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
 
     // Run all independent queries in parallel (#3485)
+    // Each query has .catch() so a single failure doesn't crash the whole endpoint.
     const [
       dbCountsResult,
       groundskeeperRows,
@@ -102,7 +103,7 @@ const monitoringApp = new Hono()
           (SELECT count(*) FROM wiki_pages)::int as pages,
           (SELECT count(*) FROM entities)::int as entities,
           (SELECT count(*) FROM facts)::int as facts
-      `.catch(() => null),
+      `.catch(catchWith("DB counts", null)),
 
       // 2. Groundskeeper — check last heartbeat from active_agents
       db
@@ -112,9 +113,10 @@ const monitoringApp = new Hono()
         })
         .from(activeAgents)
         .where(eq(activeAgents.sessionId, "groundskeeper"))
-        .limit(1),
+        .limit(1)
+        .catch(catchWith("groundskeeper status", [])),
 
-      // 2b. Job Worker — demand-aware status model
+      // 3. Job Worker — demand-aware status model
       db
         .select({
           heartbeatAt: activeAgents.heartbeatAt,
@@ -128,15 +130,17 @@ const monitoringApp = new Hono()
           ),
         )
         .orderBy(desc(activeAgents.heartbeatAt))
-        .limit(1),
+        .limit(1)
+        .catch(catchWith("job worker status", [])),
 
-      // Count pending jobs to distinguish "no worker needed" from "worker missing"
+      // 4. Count pending jobs to distinguish "no worker needed" from "worker missing"
       db
         .select({ count: count() })
         .from(jobs)
-        .where(eq(jobs.status, "pending")),
+        .where(eq(jobs.status, "pending"))
+        .catch(catchWith("pending job count", [{ count: 0 }])),
 
-      // 3. Open incidents per service
+      // 5. Open incidents per service
       db
         .select({
           service: serviceHealthIncidents.service,
@@ -144,26 +148,29 @@ const monitoringApp = new Hono()
         })
         .from(serviceHealthIncidents)
         .where(eq(serviceHealthIncidents.status, "open"))
-        .groupBy(serviceHealthIncidents.service),
+        .groupBy(serviceHealthIncidents.service)
+        .catch(catchWith("open incidents", [])),
 
-      // 5. Recent incidents (last 24h)
+      // 6. Recent incidents (last 24h)
       db
         .select()
         .from(serviceHealthIncidents)
         .where(gte(serviceHealthIncidents.detectedAt, since))
         .orderBy(desc(serviceHealthIncidents.detectedAt))
-        .limit(20),
+        .limit(20)
+        .catch(catchWith("recent incidents", [])),
 
-      // 6. Jobs queue health
+      // 7. Jobs queue health
       db
         .select({
           status: jobs.status,
           count: count(),
         })
         .from(jobs)
-        .groupBy(jobs.status),
+        .groupBy(jobs.status)
+        .catch(catchWith("job stats", [])),
 
-      // 7. Active agents count (exclude stale — no heartbeat in 15 min)
+      // 8. Active agents count (exclude stale — no heartbeat in 15 min)
       db
         .select({ count: count() })
         .from(activeAgents)
@@ -172,7 +179,8 @@ const monitoringApp = new Hono()
             eq(activeAgents.status, "active"),
             gte(activeAgents.heartbeatAt, staleThreshold)
           )
-        ),
+        )
+        .catch(catchWith("active agents count", [{ count: 0 }])),
     ]);
 
     // Process DB counts result
