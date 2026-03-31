@@ -169,7 +169,7 @@ async function verifySingleFact(
   const sourceText = fetchResult.content;
 
   // Truncate source text for prompt
-  const truncatedSource = sourceText.slice(0, 4000);
+  const truncatedSource = sourceText.slice(0, 12000);
 
   const prompt = buildVerificationPrompt(entity, fact, property, formattedValue, truncatedSource);
 

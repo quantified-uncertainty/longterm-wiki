@@ -42,7 +42,7 @@ import { str, strOrNull, numOrNull, resolveName, extractEntityId, extractEntityD
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const { ESTIMATED_COST_PER_VERIFICATION } = SOURCE_CHECK_CONSTANTS;
+const { ESTIMATED_COST_PER_VERIFICATION, PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -767,7 +767,7 @@ Source URL: ${data.fact.source}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text confirm, contradict, or not address this claim?
@@ -821,7 +821,7 @@ ${fieldsStr}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text confirm, contradict, or not address the claims in this record?
@@ -875,7 +875,7 @@ Source URL: ${sourceUrl}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text contain information about this entity? If so, does it confirm or contradict what we know?
