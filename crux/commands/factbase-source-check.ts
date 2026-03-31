@@ -25,6 +25,13 @@ import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
 import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
 
+// ── Constants ─────────────────────────────────────────────────────────
+
+/** Max characters of source content to retain after fetching */
+const MAX_CONTENT_LENGTH = 500_000;
+/** HTTP fetch timeout in milliseconds */
+const FETCH_TIMEOUT_MS = 15_000;
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 interface VerifyCommandOptions extends BaseOptions {

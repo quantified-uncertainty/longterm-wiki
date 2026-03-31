@@ -52,8 +52,10 @@ export interface WikiPageVerifyItem {
 
 /** Constants shared across source-check modules */
 export const SOURCE_CHECK_CONSTANTS = {
-  /** Max chars of source text to retain after fetching (before LLM truncation) */
-  MAX_CONTENT_LENGTH: 50000,
+  /** Max chars of source text to retain after fetching (before LLM truncation).
+   *  Set high — fetching is cheap, and full text enables future improvements
+   *  (smarter extraction, search within page). DB stores unlimited text. */
+  MAX_CONTENT_LENGTH: 500_000,
   FETCH_TIMEOUT_MS: 15_000,
   /** Max chars of source text to include in LLM verification prompts */
   PROMPT_CONTENT_LENGTH: 12000,
