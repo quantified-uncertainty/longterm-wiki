@@ -39,3 +39,9 @@ facts:
     value: https://paulfchristiano.com/
     source: https://www.wikidata.org/wiki/Q64769299
     notes: From Wikidata Q64769299
+
+  - id: f_ZOtu9lfv9j
+    property: board-member
+    value: !ref sid_dwMzc9WzPa
+    source: https://www.redwoodresearch.org/
+    notes: "Board member of Redwood Research"

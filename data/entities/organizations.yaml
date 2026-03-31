@@ -908,8 +908,6 @@
       type: organization
     - id: sid_A4XoubikkQ
       type: organization
-    - id: ian-hogarth
-      type: person
   sources:
     - title: UK AI Safety Institute Website
       url: https://www.aisi.gov.uk

@@ -506,9 +506,9 @@ async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> 
       return;
     }
 
-    // Execute the handler with timeout (clear timer to avoid leak with concurrency)
+    // Execute the handler with timeout
     const context: JobHandlerContext = { workerId, projectRoot, verbose };
-    let handlerTimer: ReturnType<typeof setTimeout>;
+    let handlerTimer: ReturnType<typeof setTimeout> | undefined;
 
     try {
       const result = await Promise.race([
@@ -520,7 +520,6 @@ async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> 
           );
         }),
       ]);
-      clearTimeout(handlerTimer!);
 
       if (result.success) {
         console.log(`[worker] Job #${jobId} completed successfully`);
@@ -531,11 +530,14 @@ async function executeJob(job: ClaimedJob, config: WorkerConfig): Promise<void> 
         await reportJobResult(jobId, false, result.data, result.error ?? 'Handler returned success: false');
       }
     } catch (err: unknown) {
-      clearTimeout(handlerTimer!);
       const error = err instanceof Error ? err.message : String(err);
       console.error(`[worker] Job #${jobId} threw exception: ${error}`);
       totalFailed++;
       await reportJobResult(jobId, false, null, error.slice(0, 500));
+    } finally {
+      // Always clear the timeout timer to prevent leaks when the handler
+      // resolves before the timeout fires (especially with concurrency > 1)
+      if (handlerTimer !== undefined) clearTimeout(handlerTimer);
     }
   } finally {
     activeJobIds.delete(jobId);
@@ -699,8 +701,9 @@ async function cleanup(): Promise<void> {
   if (agentId != null) {
     await apiRequest('PATCH', `/api/active-agents/${agentId}`, {
       status: 'completed',
-    }).catch(() => {
-      // Best-effort: don't block shutdown
+    }).catch((e: unknown) => {
+      // Best-effort: don't block shutdown, but log for diagnostics
+      console.warn(`[worker] Failed to deregister agent: ${e instanceof Error ? e.message : String(e)}`);
     });
   }
 

@@ -29,3 +29,9 @@ facts:
   - id: f_lagva40ag7
     property: website
     value: "https://www.cold-takes.com"
+
+  - id: f_4xoJQE7V6T
+    property: board-member
+    value: !ref sid_dwMzc9WzPa
+    source: https://www.redwoodresearch.org/
+    notes: "Board member of Redwood Research"
