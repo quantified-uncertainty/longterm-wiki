@@ -671,15 +671,16 @@ export default async function LegislationDetailPage({
     timelineResources
   );
 
-  // Show Timeline tab if there's any timeline content
+  // Show Timeline tab if there's any dated timeline content.
+  // Exclude undatedResources — they don't render in the timeline view,
+  // so including them inflates the count and causes the tab to appear empty.
   const timelineItemCount =
     unifiedTimeline.milestones.length +
     unifiedTimeline.milestones.reduce(
       (sum, m) => sum + m.children.length,
       0
     ) +
-    unifiedTimeline.earlyCoverage.length +
-    unifiedTimeline.undatedResources.length;
+    unifiedTimeline.earlyCoverage.length;
 
   if (timelineItemCount > 0) {
     tabs.push({
