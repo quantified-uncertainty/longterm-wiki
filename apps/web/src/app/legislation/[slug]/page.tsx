@@ -92,7 +92,8 @@ function getReachedStage(timelineEvents: Array<{ label: string }>, statusKey: st
   // Stage 4: Final / enacted
   if (statusKey === "vetoed" || statusKey === "enacted" || statusKey === "in-effect" || statusKey === "revoked"
     || labels.has("Signed") || labels.has("Vetoed") || labels.has("Enacted")
-    || labels.has("Entry into Force") || labels.has("Enforcement")) return 4;
+    || labels.has("Entry into Force") || labels.has("Enforcement")
+    || labels.has("Effective") || labels.has("In Force")) return 4;
   // Stage 3: Passed legislative body
   if (labels.has("Passed Legislature") || labels.has("Passed Assembly") || labels.has("Passed Senate")
     || labels.has("Parliament Final Vote") || labels.has("Council Adoption")) return 3;
