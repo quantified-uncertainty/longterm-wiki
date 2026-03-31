@@ -391,19 +391,19 @@ async function collectRecordItems(
   for (const recordType of typesToScan) {
     let apiPath: string;
     switch (recordType) {
-      case 'grant': apiPath = '/api/grants/all'; break;
-      case 'personnel': apiPath = '/api/personnel/all'; break;
-      case 'division': apiPath = '/api/divisions/all'; break;
-      case 'funding-program': apiPath = '/api/funding-programs/all'; break;
-      case 'funding-round': apiPath = '/api/funding-rounds/all'; break;
-      case 'investment': apiPath = '/api/investments/all'; break;
-      case 'equity-position': apiPath = '/api/equity-positions/all'; break;
-      case 'policy-stakeholder': apiPath = '/api/policy-stakeholders/all'; break;
-      case 'publication': apiPath = '/api/publications/all'; break;
-      case 'benchmark-result': apiPath = '/api/benchmark-results/all'; break;
-      case 'entity-event': apiPath = '/api/entity-events/all'; break;
-      case 'entity-assessment': apiPath = '/api/entity-assessments/all'; break;
-      case 'secondary-market-price': apiPath = '/api/secondary-market-prices/all'; break;
+      case 'grant': apiPath = '/api/grants/all?limit=5000'; break;
+      case 'personnel': apiPath = '/api/personnel/all?limit=5000'; break;
+      case 'division': apiPath = '/api/divisions/all?limit=5000'; break;
+      case 'funding-program': apiPath = '/api/funding-programs/all?limit=5000'; break;
+      case 'funding-round': apiPath = '/api/funding-rounds/all?limit=5000'; break;
+      case 'investment': apiPath = '/api/investments/all?limit=5000'; break;
+      case 'equity-position': apiPath = '/api/equity-positions/all?limit=5000'; break;
+      case 'policy-stakeholder': apiPath = '/api/policy-stakeholders/all?limit=5000'; break;
+      case 'publication': apiPath = '/api/publications/all?limit=5000'; break;
+      case 'benchmark-result': apiPath = '/api/benchmark-results/all?limit=5000'; break;
+      case 'entity-event': apiPath = '/api/entity-events/all?limit=5000'; break;
+      case 'entity-assessment': apiPath = '/api/entity-assessments/all?limit=5000'; break;
+      case 'secondary-market-price': apiPath = '/api/secondary-market-prices/all?limit=5000'; break;
       default: continue; // Skip unknown record types
     }
 
