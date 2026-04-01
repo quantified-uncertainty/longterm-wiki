@@ -26,7 +26,7 @@ const verbose = process.argv.includes("--verbose");
 // before the f_XXXXXXXXXX format was standardized. Migration tracked in #3329.
 // New violations beyond the baseline are still blocking.
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
-const LEGACY_FACTID_FORMAT_BASELINE = 293; // updated 2026-03-31 after FactBase enrichment increased count
+const LEGACY_FACTID_FORMAT_BASELINE = 294; // updated 2026-04-01: +1 for f_asml_rev_2025 (follows pre-existing asml naming convention)
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {
