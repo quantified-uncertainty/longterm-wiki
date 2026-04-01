@@ -50,7 +50,7 @@ audits:
       git branch -r --list 'origin/claude/*' 2>/dev/null | wc -l | tr -d ' '
     how_to_verify: |
       Compare the number of recent claude/* branches (from check_command output)
-      with session count in the Agent Sessions dashboard (E912).
+      with session count in the Agent Activity dashboard (E1281).
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
@@ -124,12 +124,12 @@ audits:
 
   - id: active-agents-dashboard-adoption
     category: feature-health
-    description: "Active Agents dashboard (E925) is populated with data and referenced by maintenance or agent sessions"
+    description: "Agent Activity dashboard (E1281) is populated with data and referenced by maintenance or agent sessions"
     check_type: manual
     how_to_verify: |
-      1. Visit the Active Agents dashboard to confirm it shows recent data.
+      1. Visit the Agent Activity dashboard (E1281) to confirm it shows recent data.
       2. Search session logs and maintenance reports for references to
-         "active-agents" or "E925".
+         "agent-activity" or "E1281".
       3. If the dashboard shows no data or is never referenced, consider
          whether to promote its use, simplify it, or remove it.
     frequency: monthly
@@ -210,6 +210,18 @@ audits:
       - date: "2026-03-31"
         result: pass
         checked_by: "manual"
+  - id: model-freshness
+    category: infrastructure
+    description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
+    check_type: manual
+    how_to_verify: |
+      1. Check the Anthropic API docs or release notes for the latest Claude model IDs.
+      2. Compare with MODELS in crux/lib/anthropic.ts and MODEL_ALIASES.
+      3. If new models are available, update MODELS, MODEL_ALIASES, and MODELS_LAST_VERIFIED.
+      4. Also check crux/lib/llm.ts for any hardcoded model references.
+    frequency: monthly
+    added: "2026-03-30"
+
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
