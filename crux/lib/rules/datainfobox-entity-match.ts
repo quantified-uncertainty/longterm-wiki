@@ -34,7 +34,7 @@ export const datainfoboxEntityMatchRule = createRule({
       return issues;
     }
 
-    const body = content.body;
+    const source = content.raw;
 
     // Match: entityId="E123" (double-quote form — the only form used in this codebase).
     // Note: The regex character class includes ' and ` as delimiters, but JSX expression
@@ -45,11 +45,11 @@ export const datainfoboxEntityMatchRule = createRule({
     let match: RegExpExecArray | null;
     datainfoboxPattern.lastIndex = 0;
 
-    while ((match = datainfoboxPattern.exec(body)) !== null) {
+    while ((match = datainfoboxPattern.exec(source)) !== null) {
       const entityId = match[1].trim();
 
       if (entityId !== pageWikiId) {
-        const linesBefore = body.substring(0, match.index).split('\n');
+        const linesBefore = source.substring(0, match.index).split('\n');
         const lineNumber = linesBefore.length;
 
         issues.push(new Issue({
