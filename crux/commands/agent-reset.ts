@@ -12,7 +12,7 @@
 
 import { execSync } from 'child_process';
 import { existsSync, readdirSync, statSync, unlinkSync } from 'fs';
-import { join } from 'path';
+import { basename, join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 
@@ -270,17 +270,30 @@ function scanWorktrees(): WorktreeInfo[] {
   const worktreeDir = join(process.cwd(), '.claude', 'worktrees');
   if (!existsSync(worktreeDir)) return [];
 
+  // Get registered worktree paths from git
+  const registeredPaths = new Set<string>();
+  const wtListOutput = execSafe('git worktree list --porcelain');
+  if (wtListOutput) {
+    for (const line of wtListOutput.split('\n')) {
+      if (line.startsWith('worktree ')) {
+        registeredPaths.add(line.slice('worktree '.length));
+      }
+    }
+  }
+
   const entries = readdirSync(worktreeDir, { withFileTypes: true });
-  const worktrees: WorktreeInfo[] = [];
+  const orphaned: WorktreeInfo[] = [];
 
   for (const entry of entries) {
     if (!entry.isDirectory()) continue;
     const wtPath = join(worktreeDir, entry.name);
+    // Only flag worktrees that are NOT registered with git (truly orphaned)
+    if (registeredPaths.has(wtPath)) continue;
     const branch = execSafe(`git -C "${wtPath}" rev-parse --abbrev-ref HEAD`) ?? '(detached)';
-    worktrees.push({ path: wtPath, branch });
+    orphaned.push({ path: wtPath, branch });
   }
 
-  return worktrees;
+  return orphaned;
 }
 
 // ---------------------------------------------------------------------------
@@ -333,14 +346,20 @@ function scanCleanupItems(): CleanupItem[] {
     });
   }
 
-  // Git stashes
+  // Git stashes — drop agent-related entries on reset
   const stashList = execSafe('git stash list') ?? '';
-  const stashCount = stashList ? stashList.split('\n').filter(Boolean).length : 0;
-  if (stashCount > 0) {
+  const stashLines = stashList.split('\n').filter(Boolean);
+  if (stashLines.length > 0) {
+    const agentCount = stashLines.filter(line =>
+      line.includes('.claude/') || /\/lw\/a\d+\//.test(line) || line.includes('agent')
+    ).length;
+    const label = agentCount > 0
+      ? `${stashLines.length} git stash${stashLines.length > 1 ? 'es' : ''} (${agentCount} agent-related)`
+      : `${stashLines.length} git stash${stashLines.length > 1 ? 'es' : ''} (none identifiably agent-related)`;
     items.push({
       category: 'stash',
-      description: `${stashCount} git stash${stashCount > 1 ? 'es' : ''}`,
-      detail: stashList.split('\n').slice(0, 3).join('; ') + (stashCount > 3 ? ` ... +${stashCount - 3} more` : ''),
+      description: label,
+      detail: stashLines.slice(0, 3).join('; ') + (stashLines.length > 3 ? ` ... +${stashLines.length - 3} more` : ''),
     });
   }
 
@@ -538,15 +557,16 @@ async function resetCommand(
     }
   }
 
-  // 4c. Remove stale WIP checklist
+  // 4c. Remove stale session artifacts
   for (const item of cleanupItems) {
     if (item.category === 'checklist') {
+      const filename = basename(item.detail);
       try {
         unlinkSync(item.detail);
-        output += `  ${c.green}✓${c.reset} Removed stale WIP checklist\n`;
+        output += `  ${c.green}✓${c.reset} Removed ${filename}\n`;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
-        output += `  ${c.red}✗ Failed to remove checklist: ${msg}${c.reset}\n`;
+        output += `  ${c.red}✗ Failed to remove ${filename}: ${msg}${c.reset}\n`;
         hadErrors = true;
       }
     }
@@ -565,10 +585,19 @@ async function resetCommand(
             .map(line => { const m = line.match(/^stash@\{(\d+)\}/); return m ? Number(m[1]) : -1; })
             .filter(i => i >= 0)
             .sort((a, b) => b - a);
+          let dropped = 0;
           for (const idx of indices) {
-            execSafe(`git stash drop stash@{${idx}}`);
+            if (execSafe(`git stash drop stash@{${idx}}`) !== null) {
+              dropped++;
+            } else {
+              hadErrors = true;
+            }
           }
-          output += `  ${c.green}✓${c.reset} Dropped ${agentStashes.length} agent-related stash${agentStashes.length !== 1 ? 'es' : ''}\n`;
+          output += `  ${c.green}✓${c.reset} Dropped ${dropped} agent-related stash${dropped !== 1 ? 'es' : ''}`;
+          if (dropped < agentStashes.length) {
+            output += ` (${c.red}${agentStashes.length - dropped} failed${c.reset})`;
+          }
+          output += '\n';
         } else {
           // No identifiable agent stashes — leave them alone and note for manual review
           output += `  ${c.yellow}⚠ Could not identify agent-owned stashes — review with \`git stash list\` and drop manually${c.reset}\n`;
