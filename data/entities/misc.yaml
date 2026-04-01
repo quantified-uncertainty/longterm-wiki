@@ -683,3 +683,38 @@
       type: organization
   lastUpdated: 2026-02
 
+- id: critical-political-races-2026
+  stableId: sid_7XSXNYjmmA
+  wikiId: E2127
+  type: analysis
+  title: Critical Political Races 2026
+  description: >-
+    Analysis of the most consequential 2026 US midterm races for AI safety policy and democratic resilience.
+    Covers competitive Senate, House, and gubernatorial races, the AI super PAC battle, third-party spoiler
+    dynamics, and which races could determine the trajectory of AI regulation and democratic backsliding.
+  customFields:
+    - label: Scope
+      value: 2026 US Midterm Elections
+    - label: Key Question
+      value: Which races most affect AI safety policy and democratic resilience?
+    - label: Status
+      value: Active — primaries underway, general election Nov 3, 2026
+  tags:
+    - elections
+    - ai-policy
+    - democracy
+    - governance
+    - midterms
+    - third-party
+  clusters:
+    - ai-safety
+    - governance
+  relatedEntries:
+    - id: sid_u54BJHByGQ
+      type: analysis
+      relationship: related
+    - id: sid_zkLy1cxn9Q
+      type: analysis
+      relationship: related
+  lastUpdated: 2026-04
+
