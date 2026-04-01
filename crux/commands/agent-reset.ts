@@ -11,7 +11,7 @@
  */
 
 import { execSync } from 'child_process';
-import { existsSync, readdirSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, statSync, unlinkSync } from 'fs';
 import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
@@ -290,14 +290,27 @@ function scanWorktrees(): WorktreeInfo[] {
 function scanCleanupItems(): CleanupItem[] {
   const items: CleanupItem[] = [];
 
-  // Stale WIP checklist — indicates previous session wasn't properly ended
+  // Stale WIP checklist — only flag if agent is not currently live
+  // A live agent writes .claude/last-heartbeat within the last 5 minutes.
   const checklistPath = join(process.cwd(), '.claude', 'wip-checklist.md');
   if (existsSync(checklistPath)) {
-    items.push({
-      category: 'checklist',
-      description: 'Previous session not ended (stale wip-checklist.md) — run /agent-end or /agent-ship first',
-      detail: checklistPath,
-    });
+    const heartbeatPath = join(process.cwd(), '.claude', 'last-heartbeat');
+    const agentIsLive = (() => {
+      if (!existsSync(heartbeatPath)) return false;
+      try {
+        const mtime = statSync(heartbeatPath).mtimeMs;
+        return Date.now() - mtime < 5 * 60 * 1000; // 5 minutes
+      } catch {
+        return false;
+      }
+    })();
+    if (!agentIsLive) {
+      items.push({
+        category: 'checklist',
+        description: 'Previous session not ended (stale wip-checklist.md) — run /agent-end or /agent-ship first',
+        detail: checklistPath,
+      });
+    }
   }
 
   // Stale review marker
@@ -485,6 +498,8 @@ async function resetCommand(
   // ── Kill mode: execute cleanup ─────────────────────────────────────────
   output += `${c.bold}Actions${c.reset}\n`;
 
+  let hadErrors = false;
+
   // 4a. Kill stale processes
   if (detected.length > 0) {
     let killed = 0;
@@ -496,10 +511,12 @@ async function resetCommand(
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         if (msg.includes('ESRCH')) {
+          // Process already gone — treat as success
           killed++;
         } else {
           output += `  ${c.red}Failed to kill PID ${p.pid}: ${msg}${c.reset}\n`;
           failed++;
+          hadErrors = true;
         }
       }
     }
@@ -517,6 +534,7 @@ async function resetCommand(
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       output += `  ${c.red}✗ Failed to remove worktree ${wt.path}: ${msg}${c.reset}\n`;
+      hadErrors = true;
     }
   }
 
@@ -529,27 +547,50 @@ async function resetCommand(
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         output += `  ${c.red}✗ Failed to remove checklist: ${msg}${c.reset}\n`;
+        hadErrors = true;
       }
     }
     if (item.category === 'stash') {
+      // Drop only agent-related stashes (entries referencing .claude/ or lw/a<N> slots).
+      // We never run `git stash clear` because that destroys ALL stashes irreversibly,
+      // including ones created outside agent sessions.
       try {
-        exec('git stash clear');
-        output += `  ${c.green}✓${c.reset} Cleared git stashes\n`;
+        const stashLines = (execSafe('git stash list') ?? '').split('\n').filter(Boolean);
+        const agentStashes = stashLines.filter(line =>
+          line.includes('.claude/') || /\/lw\/a\d+\//.test(line) || line.includes('agent')
+        );
+        if (agentStashes.length > 0) {
+          // Drop in reverse order so indices don't shift
+          const indices = agentStashes
+            .map(line => { const m = line.match(/^stash@\{(\d+)\}/); return m ? Number(m[1]) : -1; })
+            .filter(i => i >= 0)
+            .sort((a, b) => b - a);
+          for (const idx of indices) {
+            execSafe(`git stash drop stash@{${idx}}`);
+          }
+          output += `  ${c.green}✓${c.reset} Dropped ${agentStashes.length} agent-related stash${agentStashes.length !== 1 ? 'es' : ''}\n`;
+        } else {
+          // No identifiable agent stashes — leave them alone and note for manual review
+          output += `  ${c.yellow}⚠ Could not identify agent-owned stashes — review with \`git stash list\` and drop manually${c.reset}\n`;
+        }
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
-        output += `  ${c.red}✗ Failed to clear stashes: ${msg}${c.reset}\n`;
+        output += `  ${c.red}✗ Failed to drop agent stashes: ${msg}${c.reset}\n`;
+        hadErrors = true;
       }
     }
   }
 
-  // 4d. Delete merged branches
-  for (const branch of git.mergedBranches) {
+  // 4d. Delete merged branches (skip currently checked-out branch to avoid git error)
+  const branchesToDelete = git.mergedBranches.filter(b => b !== git.currentBranch);
+  for (const branch of branchesToDelete) {
     try {
       exec(`git branch -d "${branch}"`);
       output += `  ${c.green}✓${c.reset} Deleted merged branch ${branch}\n`;
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       output += `  ${c.red}✗ Failed to delete branch ${branch}: ${msg}${c.reset}\n`;
+      hadErrors = true;
     }
   }
 
@@ -568,11 +609,12 @@ async function resetCommand(
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
         output += `  ${c.red}✗ Failed to pull main: ${msg}${c.reset}\n`;
+        hadErrors = true;
       }
     }
   }
 
-  return { exitCode: 0, output: output.trimEnd() };
+  return { exitCode: hadErrors ? 1 : 0, output: output.trimEnd() };
 }
 
 // ---------------------------------------------------------------------------
