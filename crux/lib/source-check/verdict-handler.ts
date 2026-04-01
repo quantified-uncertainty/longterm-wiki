@@ -7,6 +7,7 @@
  */
 
 import { apiRequest } from '../wiki-server/client.ts';
+import { lookupResourceByUrl } from '../wiki-server/resources.ts';
 import { MODELS } from '../llm.ts';
 import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 
@@ -27,7 +28,20 @@ export async function storeSourceCheckEvidence(params: {
   isPrimarySource?: boolean;
   /** Entity ID to associate with this evidence (e.g., org stableId for personnel/division records) */
   entityId?: string | null;
+  resourceId?: string | null;
 }, logPrefix = '[source-check]'): Promise<void> {
+  let resolvedResourceId = params.resourceId ?? null;
+  if (!resolvedResourceId && params.sourceUrl) {
+    try {
+      const resource = await lookupResourceByUrl(params.sourceUrl);
+      if (resource.ok) {
+        resolvedResourceId = resource.data.id;
+      }
+    } catch {
+      // Best-effort: resource lookup failure should not block evidence storage
+    }
+  }
+
   const body = {
     recordType: params.recordType,
     recordId: params.recordId,
@@ -39,6 +53,7 @@ export async function storeSourceCheckEvidence(params: {
     notes: params.reasoning,
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
     ...(params.entityId ? { entityId: params.entityId } : {}),
+    resourceId: resolvedResourceId,
   };
 
   const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
