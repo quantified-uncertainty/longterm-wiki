@@ -4,7 +4,7 @@
 
 import { getTableBase, getIdRegistry, resolveId, getTypedEntityById, getEntityBundle, type BacklinkEntry } from "./tablebase";
 import type { WithSource } from "./tablebase";
-import { isSid } from "@/lib/stable-id";
+import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
 
 // ============================================================================
 // DIRECTORY URL RESOLUTION
@@ -67,6 +67,16 @@ export function getEntityHref(id: string, _type?: string): string {
     const wikiId = registry.bySlug[slug];
     return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;
   }
+  // If it's a bare 10-char ID (no sid_ prefix), try with the prefix.
+  // source_check_verdicts.entityId often stores bare IDs.
+  if (!isSid(id) && isAnySid(id)) {
+    const prefixed = `${SID_PREFIX}${id}`;
+    if (registry.byStableId?.[prefixed]) {
+      const slug = registry.byStableId[prefixed];
+      const wikiId = registry.bySlug[slug];
+      return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;
+    }
+  }
   // Otherwise look up slug → wiki ID
   const wikiId = registry.bySlug[id];
   return wikiId ? `/wiki/${wikiId}` : `/wiki/${id}`;
@@ -83,7 +93,17 @@ export function getWikiHref(id: string): string {
     return `/wiki/${id}`;
   }
   const wikiId = registry.bySlug[slug];
-  return wikiId ? `/wiki/${wikiId}` : `/wiki/${slug}`;
+  if (wikiId) return `/wiki/${wikiId}`;
+  // Bare stableId fallback (e.g. "fVMqY7vpMA" → "sid_fVMqY7vpMA")
+  if (!isSid(id) && isAnySid(id)) {
+    const prefixed = `${SID_PREFIX}${id}`;
+    if (registry.byStableId?.[prefixed]) {
+      const pSlug = registry.byStableId[prefixed];
+      const pWikiId = registry.bySlug[pSlug];
+      return pWikiId ? `/wiki/${pWikiId}` : `/wiki/${pSlug}`;
+    }
+  }
+  return `/wiki/${slug}`;
 }
 
 // ============================================================================

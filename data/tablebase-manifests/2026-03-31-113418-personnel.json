@@ -1,0 +1,129 @@
+{
+  "table": "personnel",
+  "recordCount": 14,
+  "submittedAt": "2026-03-31T11:34:18.429Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 14,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "OZkN3LWCFC",
+      "personId": "CT0FsrQ5cp",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Executive Director",
+      "source": "https://www.aclu.org/bios/anthony-d-romero",
+      "verdict": "none"
+    },
+    {
+      "id": "Gmg7BBLxbW",
+      "personId": "0AnMZj3nUp",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "President",
+      "source": "https://www.aclu.org/bios/deborah-archer",
+      "verdict": "none"
+    },
+    {
+      "id": "XeYiO69H60",
+      "personId": "GDQdIXWfow",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Secretary",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "caaxmtViqi",
+      "personId": "uCEnV4Ioqr",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Treasurer",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "JpWMJ5bcPM",
+      "personId": "cidNVfDTj7",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "General Counsel",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "lo6XKQhWGR",
+      "personId": "dF8qFMRoXb",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "JuvBTaWVMW",
+      "personId": "dOAD12YWtQ",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "9nohjoayT9",
+      "personId": "U6e8PFII2C",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "K5lcv0R1l9",
+      "personId": "rfHiZ9oCjY",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "NpSWHcd1KP",
+      "personId": "hGDY6SnjQC",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "qMl3DtnKvk",
+      "personId": "t7fBfzqBCn",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "HuM7l8hJOY",
+      "personId": "jpv0NoZ8JH",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "0Np0ic2dgN",
+      "personId": "X1viDn8DWu",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "JllUFPxH3o",
+      "personId": "tTgcdBMafm",
+      "organizationId": "sid_7DpEvy5wQr",
+      "role": "Board Member",
+      "source": "https://www.aclu.org/about/officers-board-directors",
+      "verdict": "none"
+    }
+  ]
+}

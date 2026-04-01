@@ -94,7 +94,7 @@ facts:
     value: "AI Now 2017 Report — second annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
     asOf: 2017
     source: https://ainowinstitute.org/publication/ai-now-2017-report
-    notes: "Second annual report (first was the 2016 workshop/report); published October 2017"
+    notes: "Second annual report; the first was the 2016 AI Now Report from the White House OSTP symposium"
 
   - id: f_bWrhn03JAn
     property: publication
@@ -123,8 +123,9 @@ facts:
   - id: f_mTj0FFarXf
     property: funder
     value: "Mozilla Foundation"
+    asOf: 2022
     source: https://ainowinstitute.org/about
-    notes: "Funder of AI Now"
+    notes: "Historical funder of AI Now prior to mid-2022. AI Now stopped accepting corporate and tech industry funding when it became independent in 2022."
 
   - id: f_vYiIVBXPH0
     property: grant-received
@@ -136,9 +137,8 @@ facts:
 
   - id: f_N10dTfD8W6
     property: funder
-    value: "Luminate (formerly Omidyar Network)"
+    value: "Omidyar Network / Luminate"
     source: https://ainowinstitute.org/about
-    notes: "Listed as a current supporter on AI Now's about page. AI Now does not accept corporate/big tech funding since mid-2022, but Luminate is a philanthropic funder, not big tech."
 
   - id: f_diDp4Ck5W9
     property: policy-influence

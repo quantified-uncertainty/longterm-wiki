@@ -264,8 +264,6 @@ export function getInternalNav(): NavSection[] {
         { label: "Divisions", href: internalHref("divisions-dashboard") },
         { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
         { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
-        { label: "Things", href: internalHref("things-dashboard") },
-        { label: "Entity Matrix", href: internalHref("entity-matrix-dashboard") },
         { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
         { label: "Source Checks", href: internalHref("entity-source-checks-dashboard") },
         { label: "Data Quality", href: internalHref("data-quality-dashboard") },
@@ -279,7 +277,6 @@ export function getInternalNav(): NavSection[] {
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },
-        { label: "Hallucination Evals", href: internalHref("hallucination-evals-dashboard") },
       ],
     },
     {

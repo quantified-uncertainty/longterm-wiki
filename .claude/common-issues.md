@@ -205,3 +205,27 @@ Adding a new entity with a `wikiId` that's already used by another entity causes
 **Fix**: Coerce after fetching: `Number(row.id)` or add `.transform(Number)` to the Zod schema for any column backed by `bigserial`/`bigint`.
 
 **Prevention**: When adding any route that reads a `bigserial` column and uses it in a comparison or passes it to a Zod schema expecting `number`, add a coercion step. Add a test that verifies the returned ID type is `number`, not `string`.
+
+---
+
+## Resource Pipeline
+
+### New job handlers consistently need robustness fixes post-merge (!! RECURRING)
+Resource pipeline job handlers (`resource-enrich`, `resource-ingest`, etc.) have repeatedly required immediate follow-up fix PRs after the initial feature PR lands. Fix chain examples (2026-03-30):
+- #3507 feat: resource-enrich handler → #3511 fix: enrich handler bugs + #3512 fix: resource pipeline robustness
+- #3515 feat: resource-ingest → #3511 fix (overlapping `types.ts`)
+- #3518 feat: agent batch workflow → #3512 fix (overlapping `resources.ts`)
+
+**Root causes observed**: LLM output field mismatches (wrong column names), missing status persistence on timeout, prompt injection escaping omissions, and Zod type mismatches from DB driver coercion.
+
+**Prevention**: Before merging any new job handler, verify:
+1. All LLM output fields match DB column names exactly
+2. Timeout/error paths persist a status update (don't leave jobs stuck in `processing`)
+3. Any user-controlled data in LLM prompts uses `escapeXml()` from `crux/lib/prompt-utils.ts`
+4. All `bigserial`/`bigint` DB fields are coerced to `number` after fetch
+5. Integration tests cover the actual job handler end-to-end
+
+### sid_ prefix migration generates repeated fix PRs for crux/tablebase/tools.ts
+The sid_ prefix unification (#3402) generated follow-up fixes in `crux/tablebase/tools.ts` across multiple PRs (#3419, #3500). Bare stableIds (without `sid_` prefix) were reintroduced by grant import, build-data, and enrichment code paths not updated in the original PR.
+
+**Prevention**: After any ID format migration, grep for ALL code paths producing/consuming those IDs — including build-data transformers, grant import scripts, and enrichment CLI commands.

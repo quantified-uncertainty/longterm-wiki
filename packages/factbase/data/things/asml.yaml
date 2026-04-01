@@ -71,7 +71,14 @@ facts:
     value: 2.83e+10
     asOf: 2024-12
     source: https://www.asml.com/en/investors/annual-report
-    notes: "2024 annual revenue (~EUR 28.3B)"
+    notes: "2024 annual revenue (~EUR 28.3B). 2025 full-year revenue rose to EUR 32.7B."
+
+  - id: f_asml_rev_2025
+    property: revenue
+    value: 3.27e+10
+    asOf: 2025-12
+    source: https://www.asml.com/en/investors/annual-report
+    notes: "2025 full-year revenue EUR 32.7B total net sales"
 
   # ── EUV monopoly ────────────────────────────────────────────────
   - id: f_asml_euv_share
@@ -93,10 +100,10 @@ facts:
   # ── Market cap ──────────────────────────────────────────────────
   - id: f_asml_mcap_2026
     property: market-cap
-    value: 5.11e+11
+    value: 4.91e+11
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/asml/market-cap/
-    notes: "Market cap ~$511B as of late March 2026"
+    notes: "Market cap ~$491B as of March 30, 2026"
 
   # ── Export control events ───────────────────────────────────────
   - id: f_asml_export_2023

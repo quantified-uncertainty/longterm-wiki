@@ -50,6 +50,33 @@ export function resolveName(item: Record<string, unknown>, ...keys: string[]): s
  *
  * Returns null if no entity ID is available.
  */
+/**
+ * Extract the display name for the parent entity (org, company, etc.).
+ * Used to persist a human-readable entity name alongside the entity ID in verdicts.
+ */
+export function extractEntityDisplayName(recordType: string, item: Record<string, unknown>): string | null {
+  switch (recordType) {
+    case 'personnel':
+      return strOrNull(item, 'orgResolvedName') ?? strOrNull(item, 'orgDisplayName') ?? null;
+    case 'division':
+      return strOrNull(item, 'parentOrgName') ?? strOrNull(item, 'name') ?? null;
+    case 'grant':
+      return strOrNull(item, 'orgResolvedName') ?? strOrNull(item, 'orgDisplayName') ?? null;
+    case 'funding-round':
+      return strOrNull(item, 'companyResolvedName') ?? strOrNull(item, 'companyDisplayName') ?? null;
+    case 'investment':
+      return strOrNull(item, 'investorResolvedName') ?? strOrNull(item, 'investorDisplayName') ?? null;
+    case 'equity-position':
+      return strOrNull(item, 'companyResolvedName') ?? strOrNull(item, 'companyDisplayName') ?? null;
+    case 'funding-program':
+      return strOrNull(item, 'orgResolvedName') ?? strOrNull(item, 'orgDisplayName') ?? null;
+    case 'policy-stakeholder':
+      return strOrNull(item, 'stakeholderResolvedName') ?? strOrNull(item, 'stakeholderDisplayName') ?? null;
+    default:
+      return null;
+  }
+}
+
 export function extractEntityId(recordType: string, item: Record<string, unknown>): string | null {
   switch (recordType) {
     case 'personnel':

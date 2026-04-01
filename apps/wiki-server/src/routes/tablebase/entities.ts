@@ -5,6 +5,7 @@ import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { entities, facts, things } from "../../schema.js";
+import { isAnySid, isSid } from "@longterm-wiki/id-utils";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -606,21 +607,23 @@ const entitiesApp = new Hono()
     }
 
     // 4. Resolve ref-type fact values (entity IDs → names + slugs)
-    // Collect all values that look like entity stable IDs (10-char alphanumeric)
-    const refPattern = /^[a-zA-Z0-9]{10}$/;
+    // Matches both sid_-prefixed and legacy bare 10-char IDs for robustness.
     const refCandidates = new Set<string>();
     for (const entityFacts of factMap.values()) {
       for (const f of entityFacts.values()) {
-        if (f.value && refPattern.test(f.value)) {
+        if (f.value && isAnySid(f.value)) {
           refCandidates.add(f.value);
         }
       }
     }
 
-    // Batch-resolve ref candidates to entity names and slugs
+    // Batch-resolve ref candidates to entity names and slugs.
+    // Normalize to sid_-prefixed format for DB lookup (entities.stableId is always prefixed).
     const refResolutionMap = new Map<string, { name: string; entityId: string }>();
     if (refCandidates.size > 0) {
-      const refIds = [...refCandidates];
+      const refIds = [...refCandidates].map((id) =>
+        isSid(id) ? id : `sid_${id}`
+      );
       const refRows = await db
         .select({
           stableId: entities.stableId,
@@ -632,13 +635,17 @@ const entitiesApp = new Hono()
 
       for (const r of refRows) {
         if (r.stableId) {
-          refResolutionMap.set(r.stableId, { name: r.title, entityId: r.id });
+          const resolved = { name: r.title, entityId: r.id };
+          refResolutionMap.set(r.stableId, resolved);
+          // Also map the bare (unprefixed) form so legacy fact values resolve
+          const bare = r.stableId.startsWith("sid_") ? r.stableId.slice(4) : r.stableId;
+          refResolutionMap.set(bare, resolved);
         }
       }
     }
 
     // 4b. Resolve metadata ref fields (entity slug IDs stored in metadata, e.g. metadata.developer = "anthropic").
-    // The FactBase ref resolution above (step 4) handles stableId-format values (10-char alphanumeric).
+    // The FactBase ref resolution above (step 4) handles stableId-format values (sid_ prefix + 10-char alphanumeric).
     // Metadata refs use the entity's short `id` field (e.g. "anthropic", "openai"), not stableId.
     // For each requested measure, collect metadata[measure] values and resolve them to entity titles.
     const metadataRefResolutionMap = new Map<string, { name: string; entityId: string }>();

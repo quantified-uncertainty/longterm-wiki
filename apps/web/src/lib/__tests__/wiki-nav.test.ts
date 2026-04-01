@@ -156,13 +156,9 @@ describe("getInternalNav (mocked data)", () => {
   beforeEach(() => {
     setMockRegistry({
       byWikiId: {
-        E898: "fact-dashboard",
-        E899: "page-coverage-dashboard",
         E900: "update-schedule-dashboard",
       },
       bySlug: {
-        "fact-dashboard": "E898",
-        "page-coverage-dashboard": "E899",
         "update-schedule-dashboard": "E900",
       },
     });
@@ -226,7 +222,7 @@ describe("getInternalNav (mocked data)", () => {
 
     const monitoringLabels = [
       "Citation Accuracy", "Citation Content",
-      "Hallucination Risk", "Hallucination Evals",
+      "Hallucination Risk",
     ];
     for (const label of monitoringLabels) {
       const item = citations.items.find(i => i.label === label);

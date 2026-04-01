@@ -10,7 +10,28 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["../apps/web/src/*"],
+      "@lib/*": ["../apps/web/src/lib/*"],
+      "@data": ["../apps/web/src/data/index.ts"],
+      "@data/*": ["../apps/web/src/data/*"],
+      "@components/*": ["../apps/web/src/components/*"],
+      "@wiki-server/api-types": ["../apps/wiki-server/src/api-types.ts"],
+      "@wiki-server/api-response-types": ["../apps/wiki-server/src/api-response-types.ts"],
+      "@wiki-server/facts-route": ["../apps/wiki-server/src/routes/factbase/facts.ts"],
+      "@wiki-server/source-checks-route": ["../apps/wiki-server/src/routes/source-check/source-checks.ts"],
+      "@wiki-server/grants-route": ["../apps/wiki-server/src/routes/tablebase/grants.ts"],
+      "@wiki-server/divisions-route": ["../apps/wiki-server/src/routes/tablebase/divisions.ts"],
+      "@wiki-server/funding-programs-route": ["../apps/wiki-server/src/routes/tablebase/funding-programs.ts"],
+      "@wiki-server/personnel-route": ["../apps/wiki-server/src/routes/tablebase/personnel.ts"],
+      "@wiki-server/prediction-markets-route": ["../apps/wiki-server/src/routes/tablebase/prediction-markets.ts"],
+      "@wiki-server/secondary-market-prices-route": ["../apps/wiki-server/src/routes/tablebase/secondary-market-prices.ts"],
+      "@wiki-server/data-quality-route": ["../apps/wiki-server/src/routes/operational/data-quality.ts"],
+      "@wiki-server/talent-flows-route": ["../apps/wiki-server/src/routes/tablebase/talent-flows.ts"],
+      "@wiki-server/jobs-route": ["../apps/wiki-server/src/routes/operational/jobs.ts"]
+    }
   },
   "include": [
     "lib/**/*.ts",

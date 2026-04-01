@@ -437,7 +437,6 @@ export const CRITICAL_RULES: string[] = [
   'prefer-entitylink',
   'internal-links',
   'fake-urls',
-  'component-props',
   'citation-urls',
 ];
 
@@ -449,7 +448,6 @@ export const QUALITY_RULES: string[] = [
   'placeholders',
   'vague-citations',
   'temporal-artifacts',
-  'citation-doi-mismatch',
   'evaluative-framing',
   'tone-markers',
   'false-certainty',

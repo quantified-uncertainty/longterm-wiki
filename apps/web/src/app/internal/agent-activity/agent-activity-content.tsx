@@ -1,6 +1,6 @@
-import { ActiveAgentsContent } from "@/app/internal/active-agents/active-agents-content";
-import { AgentSessionsContent } from "@/app/internal/agent-sessions/agent-sessions-content";
-import { SessionInsightsContent } from "@/app/internal/session-insights/session-insights-content";
+import { ActiveAgentsContent } from "./active-agents-content";
+import { AgentSessionsContent } from "./agent-sessions-content";
+import { SessionInsightsContent } from "./session-insights-content";
 import { AgentActivityTabs } from "./agent-activity-tabs";
 
 /**

@@ -5,4 +5,4 @@
  * contaminated IDs, and numeric PKs are no longer in use.
  */
 
-export { isSid, isDisplayableName, SID_PREFIX } from "@longterm-wiki/id-utils";
+export { isSid, isAnySid, isDisplayableName, SID_PREFIX } from "@longterm-wiki/id-utils";

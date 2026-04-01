@@ -87,6 +87,10 @@ const VerdictUpsertBody = z.object({
   recordId: z.string().min(1).max(MAX_ID_LENGTH),
   fieldName: z.string().max(200).nullable().optional(),
   entityId: z.string().max(200).nullable().optional(),
+  /** Human-readable record name, persisted at write time (survives record deletion). */
+  displayName: z.string().max(500).nullable().optional(),
+  /** Human-readable entity name, persisted at write time. */
+  entityDisplayName: z.string().max(500).nullable().optional(),
   verdict: z.enum(VALID_VERDICT_TYPES),
   confidence: z.number().min(0).max(1).optional(),
   reasoning: z.string().max(5000).optional(),
@@ -625,6 +629,8 @@ const sourceChecksApp = new Hono()
     // issues across PG versions with the postgres.js driver.
     const fieldNameVal = body.fieldName ?? null;
     const entityIdVal = body.entityId ?? null;
+    const displayNameVal = body.displayName ?? null;
+    const entityDisplayNameVal = body.entityDisplayName ?? null;
 
     // Use Drizzle ORM insert/update instead of raw SQL to avoid driver issues
     // with bare literals and COALESCE expressions.
@@ -639,6 +645,8 @@ const sourceChecksApp = new Hono()
       .update(sourceCheckVerdicts)
       .set({
         entityId: entityIdVal,
+        displayName: displayNameVal,
+        entityDisplayName: entityDisplayNameVal,
         verdict: body.verdict,
         confidence: confidenceVal,
         reasoning: reasoningVal,
@@ -666,6 +674,8 @@ const sourceChecksApp = new Hono()
             recordId: body.recordId,
             fieldName: fieldNameVal,
             entityId: entityIdVal,
+            displayName: displayNameVal,
+            entityDisplayName: entityDisplayNameVal,
             verdict: body.verdict,
             confidence: confidenceVal,
             reasoning: reasoningVal,
@@ -685,6 +695,8 @@ const sourceChecksApp = new Hono()
             .update(sourceCheckVerdicts)
             .set({
               entityId: entityIdVal,
+              displayName: displayNameVal,
+              entityDisplayName: entityDisplayNameVal,
               verdict: body.verdict,
               confidence: confidenceVal,
               reasoning: reasoningVal,
@@ -721,6 +733,36 @@ const sourceChecksApp = new Hono()
 
     const names: Record<string, string> = {};
 
+    // Phase 0: Check for persisted display names in source_check_verdicts.
+    // These survive record deletion and are the most reliable source.
+    const storedNames = await db
+      .select({
+        recordId: sourceCheckVerdicts.recordId,
+        displayName: sourceCheckVerdicts.displayName,
+      })
+      .from(sourceCheckVerdicts)
+      .where(
+        and(
+          eq(sourceCheckVerdicts.recordType, record_type),
+          inArray(sourceCheckVerdicts.recordId, record_ids),
+          isNull(sourceCheckVerdicts.fieldName),
+        )
+      );
+    for (const row of storedNames) {
+      if (row.displayName) {
+        names[row.recordId] = row.displayName;
+      }
+    }
+
+    // Only resolve IDs that don't have a stored display name
+    const remainingIds = record_ids.filter((id) => !names[id]);
+    // Replace record_ids with remainingIds for type-specific resolution below
+    const idsToResolve = remainingIds.length > 0 ? remainingIds : [];
+
+    if (idsToResolve.length === 0) {
+      return c.json({ names });
+    }
+
     if (record_type === "personnel") {
       // Personnel: join with entities to get person name + org name.
       // The join uses stableId, but some records have numeric IDs (e.g. "304")
@@ -745,7 +787,7 @@ const sourceChecksApp = new Hono()
           eq(personEntity.stableId, personnel.personEntityId)
         )
         .leftJoin(orgEntity, eq(orgEntity.stableId, personnel.orgEntityId))
-        .where(inArray(personnel.id, record_ids));
+        .where(inArray(personnel.id, idsToResolve));
 
       // Collect unresolved person/org entity IDs for secondary lookup
       const unresolvedPersonIds: string[] = [];
@@ -845,7 +887,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ id: divisions.id, name: divisions.name })
         .from(divisions)
-        .where(inArray(divisions.id, record_ids));
+        .where(inArray(divisions.id, idsToResolve));
 
       for (const row of rows) {
         names[row.id] = row.name;
@@ -855,7 +897,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ factId: facts.factId, label: facts.label })
         .from(facts)
-        .where(inArray(facts.factId, record_ids));
+        .where(inArray(facts.factId, idsToResolve));
 
       // Deduplicate: same factId may appear in multiple timeseries points
       for (const row of rows) {
@@ -868,7 +910,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ stableId: entities.stableId, title: entities.title })
         .from(entities)
-        .where(inArray(entities.stableId, record_ids));
+        .where(inArray(entities.stableId, idsToResolve));
 
       for (const row of rows) {
         if (row.stableId && row.title) {
@@ -879,7 +921,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ id: publications.id, title: publications.title })
         .from(publications)
-        .where(inArray(publications.id, record_ids));
+        .where(inArray(publications.id, idsToResolve));
 
       for (const row of rows) {
         names[row.id] = row.title;
@@ -894,7 +936,7 @@ const sourceChecksApp = new Hono()
         })
         .from(benchmarkResults)
         .leftJoin(benchmarks, eq(benchmarks.id, benchmarkResults.benchmarkId))
-        .where(inArray(benchmarkResults.id, record_ids));
+        .where(inArray(benchmarkResults.id, idsToResolve));
 
       for (const row of rows) {
         const bmName = row.benchmarkName ?? "Unknown benchmark";
@@ -905,7 +947,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ id: entityEvents.id, title: entityEvents.title })
         .from(entityEvents)
-        .where(inArray(entityEvents.id, record_ids));
+        .where(inArray(entityEvents.id, idsToResolve));
 
       for (const row of rows) {
         names[row.id] = row.title;
@@ -919,7 +961,7 @@ const sourceChecksApp = new Hono()
           rating: entityAssessments.rating,
         })
         .from(entityAssessments)
-        .where(inArray(entityAssessments.id, record_ids));
+        .where(inArray(entityAssessments.id, idsToResolve));
 
       for (const row of rows) {
         names[row.id] = `${row.dimension} (${row.entityId}): ${row.rating}`;
@@ -934,7 +976,7 @@ const sourceChecksApp = new Hono()
           platform: secondaryMarketPrices.platform,
         })
         .from(secondaryMarketPrices)
-        .where(inArray(secondaryMarketPrices.id, record_ids));
+        .where(inArray(secondaryMarketPrices.id, idsToResolve));
 
       for (const row of rows) {
         const company = row.companyDisplayName ?? row.companyId;
@@ -945,7 +987,7 @@ const sourceChecksApp = new Hono()
       // Resolve to "<page title> - Footnote N".
       const slugSet = new Set<string>();
       const parsed: Array<{ recordId: string; slug: string; footnote: string }> = [];
-      for (const rid of record_ids) {
+      for (const rid of idsToResolve) {
         const match = rid.match(/^page:(.+):fn(\d+)$/);
         if (match) {
           slugSet.add(match[1]);
@@ -978,7 +1020,7 @@ const sourceChecksApp = new Hono()
       const rows = await db
         .select({ slug: wikiPages.slug, title: wikiPages.title })
         .from(wikiPages)
-        .where(inArray(wikiPages.slug, record_ids));
+        .where(inArray(wikiPages.slug, idsToResolve));
 
       for (const row of rows) {
         names[row.slug] = row.title;
@@ -994,12 +1036,93 @@ const sourceChecksApp = new Hono()
         .where(
           and(
             eq(things.sourceTable, record_type),
-            inArray(things.sourceId, record_ids)
+            inArray(things.sourceId, idsToResolve)
           )
         );
 
       for (const row of rows) {
         names[row.sourceId] = row.title;
+      }
+    }
+
+    // ---- Fallback for orphaned records ----
+    // Records that were deleted/re-imported after source-checking won't be found
+    // by the type-specific queries above. For those, extract a display name from
+    // the verdict reasoning in source_check_verdicts + the linked entity title.
+    const unresolved = record_ids.filter((id) => !names[id]);
+    if (unresolved.length > 0) {
+      const fallbackRows = await db
+        .select({
+          recordId: sourceCheckVerdicts.recordId,
+          entityId: sourceCheckVerdicts.entityId,
+          reasoning: sourceCheckVerdicts.reasoning,
+          entityTitle: entities.title,
+        })
+        .from(sourceCheckVerdicts)
+        .leftJoin(entities, eq(entities.stableId, sourceCheckVerdicts.entityId))
+        .where(
+          and(
+            eq(sourceCheckVerdicts.recordType, record_type),
+            inArray(sourceCheckVerdicts.recordId, unresolved),
+            isNull(sourceCheckVerdicts.fieldName),
+          )
+        );
+
+      // If entity join failed (entityId stored without sid_ prefix), try with prefix
+      const stillMissing = new Map<string, typeof fallbackRows[number]>();
+      for (const row of fallbackRows) {
+        if (!row.entityTitle && row.entityId) {
+          stillMissing.set(row.entityId, row);
+        }
+      }
+      const prefixedLookup = new Map<string, string>();
+      if (stillMissing.size > 0) {
+        const prefixedIds = [...stillMissing.keys()].map((id) =>
+          id.startsWith("sid_") ? id : `sid_${id}`
+        );
+        const entityRows = await db
+          .select({ stableId: entities.stableId, title: entities.title })
+          .from(entities)
+          .where(inArray(entities.stableId, prefixedIds));
+        for (const row of entityRows) {
+          if (row.stableId && row.title) {
+            // Map bare ID → title
+            const bareId = row.stableId.startsWith("sid_")
+              ? row.stableId.slice(4)
+              : row.stableId;
+            prefixedLookup.set(bareId, row.title);
+            prefixedLookup.set(row.stableId, row.title);
+          }
+        }
+      }
+
+      for (const row of fallbackRows) {
+        if (names[row.recordId]) continue; // already resolved by dedup
+        const entityName =
+          row.entityTitle ??
+          (row.entityId ? prefixedLookup.get(row.entityId) : null) ??
+          null;
+
+        // Try to extract a person/item name from the reasoning text
+        // Common patterns: "confirms that [Name] joined..." / "The source confirms [Name]..."
+        let extractedName: string | null = null;
+        if (row.reasoning) {
+          const nameMatch = row.reasoning.match(
+            /(?:confirms?\s+(?:that\s+)?|identifies?\s+|mentions?\s+|states?\s+(?:that\s+)?)([A-Z][a-zA-Z.''-]+(?:\s+[A-Z][a-zA-Z.''-]+){0,4})/
+          );
+          if (nameMatch?.[1]) {
+            extractedName = nameMatch[1].trim();
+          }
+        }
+
+        if (extractedName && entityName) {
+          names[row.recordId] = `${extractedName} @ ${entityName}`;
+        } else if (extractedName) {
+          names[row.recordId] = extractedName;
+        } else if (entityName) {
+          names[row.recordId] = `${entityName} record`;
+        }
+        // If nothing resolves, the ID stays unresolved (shown as raw ID by frontend)
       }
     }
 

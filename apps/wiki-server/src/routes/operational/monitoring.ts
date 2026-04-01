@@ -82,36 +82,122 @@ const monitoringApp = new Hono()
     const db = getDrizzleDb();
     const rawDb = getDb();
 
-    // 1. Wiki-server self-check (DB connectivity + counts)
-    let wikiServerStatus: "healthy" | "degraded" | "down" = "healthy";
-    let dbCounts = { pages: 0, entities: 0, facts: 0 };
-    try {
-      const countsResult = await rawDb`
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
+
+    // Run all independent queries in parallel (#3485)
+    // Each query has .catch() so a single failure doesn't crash the whole endpoint.
+    const [
+      dbCountsResult,
+      groundskeeperRows,
+      workerRows,
+      pendingJobCountResult,
+      openIncidents,
+      recentIncidents,
+      jobStats,
+      agentCountResult,
+    ] = await Promise.all([
+      // 1. Wiki-server self-check (DB connectivity + counts)
+      rawDb`
         SELECT
           (SELECT count(*) FROM wiki_pages)::int as pages,
           (SELECT count(*) FROM entities)::int as entities,
           (SELECT count(*) FROM facts)::int as facts
-      `;
-      const row = countsResult[0] as DbCountsRow;
+      `.catch(catchWith("DB counts", null)),
+
+      // 2. Groundskeeper — check last heartbeat from active_agents
+      db
+        .select({
+          heartbeatAt: activeAgents.heartbeatAt,
+          status: activeAgents.status,
+        })
+        .from(activeAgents)
+        .where(eq(activeAgents.sessionId, "groundskeeper"))
+        .limit(1)
+        .catch(catchWith("groundskeeper status", [])),
+
+      // 3. Job Worker — demand-aware status model
+      db
+        .select({
+          heartbeatAt: activeAgents.heartbeatAt,
+          status: activeAgents.status,
+        })
+        .from(activeAgents)
+        .where(
+          and(
+            eq(activeAgents.model, "job-worker-daemon"),
+            eq(activeAgents.status, "active"),
+          ),
+        )
+        .orderBy(desc(activeAgents.heartbeatAt))
+        .limit(1)
+        .catch(catchWith("job worker status", [])),
+
+      // 4. Count pending jobs to distinguish "no worker needed" from "worker missing"
+      db
+        .select({ count: count() })
+        .from(jobs)
+        .where(eq(jobs.status, "pending"))
+        .catch(catchWith("pending job count", [{ count: 0 }])),
+
+      // 5. Open incidents per service
+      db
+        .select({
+          service: serviceHealthIncidents.service,
+          count: count(),
+        })
+        .from(serviceHealthIncidents)
+        .where(eq(serviceHealthIncidents.status, "open"))
+        .groupBy(serviceHealthIncidents.service)
+        .catch(catchWith("open incidents", [])),
+
+      // 6. Recent incidents (last 24h)
+      db
+        .select()
+        .from(serviceHealthIncidents)
+        .where(gte(serviceHealthIncidents.detectedAt, since))
+        .orderBy(desc(serviceHealthIncidents.detectedAt))
+        .limit(20)
+        .catch(catchWith("recent incidents", [])),
+
+      // 7. Jobs queue health
+      db
+        .select({
+          status: jobs.status,
+          count: count(),
+        })
+        .from(jobs)
+        .groupBy(jobs.status)
+        .catch(catchWith("job stats", [])),
+
+      // 8. Active agents count (exclude stale — no heartbeat in 15 min)
+      db
+        .select({ count: count() })
+        .from(activeAgents)
+        .where(
+          and(
+            eq(activeAgents.status, "active"),
+            gte(activeAgents.heartbeatAt, staleThreshold)
+          )
+        )
+        .catch(catchWith("active agents count", [{ count: 0 }])),
+    ]);
+
+    // Process DB counts result
+    let wikiServerStatus: "healthy" | "degraded" | "down" = "healthy";
+    let dbCounts = { pages: 0, entities: 0, facts: 0 };
+    if (dbCountsResult && dbCountsResult.length > 0) {
+      const row = dbCountsResult[0] as DbCountsRow;
       dbCounts = {
         pages: row.pages,
         entities: row.entities,
         facts: row.facts,
       };
-    } catch {
+    } else {
       wikiServerStatus = "down";
     }
 
-    // 2. Groundskeeper — check last heartbeat from active_agents
-    const groundskeeperRows = await db
-      .select({
-        heartbeatAt: activeAgents.heartbeatAt,
-        status: activeAgents.status,
-      })
-      .from(activeAgents)
-      .where(eq(activeAgents.sessionId, "groundskeeper"))
-      .limit(1);
-
+    // Process groundskeeper status
     const gkAgent = groundskeeperRows[0];
     let groundskeeperStatus: "healthy" | "degraded" | "down" | "unknown" =
       "unknown";
@@ -126,32 +212,8 @@ const monitoringApp = new Hono()
             : "down";
     }
 
-    // 2b. Job Worker — demand-aware status model.
-    // Unlike the singleton groundskeeper, workers are ephemeral (GHA or K8s)
-    // and may legitimately be absent when the queue is empty.
-    // Detect by model='job-worker-daemon' (set by crux/worker/run.ts).
-    const workerRows = await db
-      .select({
-        heartbeatAt: activeAgents.heartbeatAt,
-        status: activeAgents.status,
-      })
-      .from(activeAgents)
-      .where(
-        and(
-          eq(activeAgents.model, "job-worker-daemon"),
-          eq(activeAgents.status, "active"),
-        ),
-      )
-      .orderBy(desc(activeAgents.heartbeatAt))
-      .limit(1);
-
-    // Count pending jobs to distinguish "no worker needed" from "worker missing"
-    const pendingJobCountResult = await db
-      .select({ count: count() })
-      .from(jobs)
-      .where(eq(jobs.status, "pending"));
+    // Process job worker status
     const pendingJobCount = pendingJobCountResult[0]?.count ?? 0;
-
     const workerAgent = workerRows[0];
     let jobWorkerStatus: "healthy" | "degraded" | "down" | "unknown" =
       "unknown";
@@ -173,49 +235,9 @@ const monitoringApp = new Hono()
       jobWorkerStatus = "healthy";
     }
 
-    // 3. Open incidents per service
-    const openIncidents = await db
-      .select({
-        service: serviceHealthIncidents.service,
-        count: count(),
-      })
-      .from(serviceHealthIncidents)
-      .where(eq(serviceHealthIncidents.status, "open"))
-      .groupBy(serviceHealthIncidents.service);
-
     const incidentMap = new Map(
       openIncidents.map((r) => [r.service, r.count])
     );
-
-    // 5. Recent incidents (last 24h)
-    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-    const recentIncidents = await db
-      .select()
-      .from(serviceHealthIncidents)
-      .where(gte(serviceHealthIncidents.detectedAt, since))
-      .orderBy(desc(serviceHealthIncidents.detectedAt))
-      .limit(20);
-
-    // 6. Jobs queue health
-    const jobStats = await db
-      .select({
-        status: jobs.status,
-        count: count(),
-      })
-      .from(jobs)
-      .groupBy(jobs.status);
-
-    // 7. Active agents count (exclude stale — no heartbeat in 15 min)
-    const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
-    const agentCountResult = await db
-      .select({ count: count() })
-      .from(activeAgents)
-      .where(
-        and(
-          eq(activeAgents.status, "active"),
-          gte(activeAgents.heartbeatAt, staleThreshold)
-        )
-      );
 
     // Build service statuses
     const services = SERVICES.map((name) => {

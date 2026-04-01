@@ -5,7 +5,7 @@ facts:
     property: founded-date
     value: "2001"
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
-    notes: "Formed 2001 per Wikipedia infobox; successor to Bureau of Export Administration (BXA)"
+    notes: "Formed 2001 per Wikipedia; successor to Bureau of Export Administration (BXA)"
 
   - id: f_bis_hq
     property: headquarters
@@ -21,6 +21,7 @@ facts:
     property: website
     value: https://www.bis.doc.gov
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    notes: "bis.doc.gov is the canonical domain (under Department of Commerce); bis.gov redirects"
 
   - id: f_bis_wiki
     property: wikipedia-url

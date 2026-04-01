@@ -46,7 +46,7 @@ facts:
     notes: From Wikidata Q4961241
   - id: aSjBxHEOyw
     property: description
-    value: Brennan Center for Justice is a subsidiary/division of New York
-      University School of Law.
+    value: Brennan Center for Justice is an independent nonprofit organization
+      affiliated with New York University School of Law.
     source: https://www.wikidata.org/wiki/Q4961241
-    notes: Parent organization from Wikidata Q4961241
+    notes: "Affiliated with NYU School of Law but operates as an independent 501(c)(3) nonprofit; Wikidata lists NYU as parent org but the relationship is affiliation, not subsidiary"

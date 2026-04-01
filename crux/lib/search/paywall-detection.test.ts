@@ -10,6 +10,8 @@ import {
   detectPaywall,
   isUnverifiableDomain,
   classifyFetchError,
+  detectTwitterSoft404,
+  detectCookieConsent,
   PAYWALL_SIGNALS,
   NEGATIVE_PAYWALL_SIGNALS,
   UNVERIFIABLE_DOMAINS,
@@ -214,5 +216,123 @@ describe('classifyFetchError', () => {
   it('prioritizes timeout over HTTP errors', () => {
     // timeout error message takes precedence over HTTP status
     expect(classifyFetchError(500, 'abort', null, 'https://example.com')).toBe('timeout');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// detectTwitterSoft404 (#3521)
+// ---------------------------------------------------------------------------
+
+describe('detectTwitterSoft404', () => {
+  it('detects short pages from x.com as soft-404', () => {
+    expect(detectTwitterSoft404('https://x.com/nonexistent', 493, 200)).toBe(true);
+  });
+
+  it('detects short pages from twitter.com as soft-404', () => {
+    expect(detectTwitterSoft404('https://twitter.com/fakeuser', 500, 200)).toBe(true);
+  });
+
+  it('detects short pages from www.twitter.com as soft-404', () => {
+    expect(detectTwitterSoft404('https://www.twitter.com/fakeuser', 400, 200)).toBe(true);
+  });
+
+  it('does not flag longer Twitter pages (real profiles)', () => {
+    expect(detectTwitterSoft404('https://x.com/realuser', 5000, 200)).toBe(false);
+  });
+
+  it('does not flag non-Twitter short pages', () => {
+    expect(detectTwitterSoft404('https://example.com/short', 493, 200)).toBe(false);
+  });
+
+  it('does not flag Twitter pages with non-200 status', () => {
+    expect(detectTwitterSoft404('https://x.com/user', 493, 404)).toBe(false);
+  });
+
+  it('threshold is 1000 chars', () => {
+    expect(detectTwitterSoft404('https://x.com/user', 999, 200)).toBe(true);
+    expect(detectTwitterSoft404('https://x.com/user', 1000, 200)).toBe(true);
+    expect(detectTwitterSoft404('https://x.com/user', 1001, 200)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// detectCookieConsent (#3522)
+// ---------------------------------------------------------------------------
+
+describe('detectCookieConsent', () => {
+  it('detects cookie consent via URL query parameter', () => {
+    expect(detectCookieConsent(
+      'https://nature.com/articles/123?error=cookies_not_supported&code=abc',
+      'Some short page content',
+      'https://nature.com/articles/123',
+    )).toBe(true);
+  });
+
+  it('detects cookie consent via "error=cookies" in URL', () => {
+    expect(detectCookieConsent(
+      'https://example.com/page?error=cookies',
+      'Short content',
+      'https://example.com/page',
+    )).toBe(true);
+  });
+
+  it('detects cookie consent via "cookie-consent" in URL path', () => {
+    expect(detectCookieConsent(
+      'https://example.com/cookie-consent?return=/article',
+      'Please accept cookies',
+      'https://example.com/article',
+    )).toBe(true);
+  });
+
+  it('detects cookie consent from short redirect content', () => {
+    expect(detectCookieConsent(
+      'https://nature.com/cookiepage',
+      'This site requires cookies to function. Please enable cookies in your browser.',
+      'https://nature.com/articles/123',
+    )).toBe(true);
+  });
+
+  it('detects very short cookie consent content even without redirect', () => {
+    const url = 'https://example.com/page';
+    expect(detectCookieConsent(
+      url,
+      'Cookies are required to view this content.',
+      url,
+    )).toBe(true);
+  });
+
+  it('does not flag long pages that mention cookies', () => {
+    const longContent = 'We use cookies for analytics. ' + 'Real article content here. '.repeat(500);
+    expect(detectCookieConsent(
+      'https://example.com/article',
+      longContent,
+      'https://example.com/article',
+    )).toBe(false);
+  });
+
+  it('does not flag normal pages without cookie signals', () => {
+    expect(detectCookieConsent(
+      'https://example.com/article',
+      'Normal article about AI safety research with detailed analysis.',
+      'https://example.com/article',
+    )).toBe(false);
+  });
+
+  it('does not flag medium-length pages without redirect', () => {
+    // 3000 chars, no redirect, no cookie URL patterns
+    const content = 'Some content with cookies mentioned. ' + 'x'.repeat(2964);
+    expect(detectCookieConsent(
+      'https://example.com/page',
+      content,
+      'https://example.com/page',
+    )).toBe(false);
+  });
+
+  it('handles empty content gracefully', () => {
+    expect(detectCookieConsent(
+      'https://example.com/page',
+      '',
+      'https://example.com/page',
+    )).toBe(false);
   });
 });

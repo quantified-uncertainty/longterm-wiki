@@ -45,9 +45,10 @@ facts:
 
   - id: f_jRfnSSDMSM
     property: coalition
-    value: "Member of the Digital Democracy Project, a nonpartisan 501(c)(3) coalition working on tech accountability"
+    value: "Member of the Digital Democracy Project, a nonpartisan 501(c)(3) coalition working on tech accountability. Note: Tech Oversight Project itself is a 501(c)(4), not a 501(c)(3)."
     asOf: 2025
     source: https://digitaldemocracyproject.org/member-organizations/the-tech-oversight-project
+    notes: "The coalition (Digital Democracy Project) is 501(c)(3); Tech Oversight Project is 501(c)(4) per its own filings"
 
   - id: f_Muy2NNfehz
     property: focus-areas

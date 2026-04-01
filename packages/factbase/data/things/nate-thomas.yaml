@@ -1,11 +1,7 @@
 entity: sid_R8tDuupBTt
 facts:
-  [
-    {
-        id: mvP0UGboWw,
-        property: born-year,
-        value: 1957,
-        source: https://www.wikidata.org/wiki/Q6968733,
-        notes: From Wikidata Q6968733
-      }
-  ]
+  - id: f_XaOYmQuYFG
+    property: founder-of
+    value: !ref sid_dwMzc9WzPa
+    source: https://www.redwoodresearch.org/
+    notes: "Co-founded Redwood Research in 2021 with Buck Shlegeris"

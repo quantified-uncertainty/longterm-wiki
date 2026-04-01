@@ -332,7 +332,7 @@
   type: organization
   orgType: academic
   # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: ksqqi7fyeA
+  parentOrg: sid_ksqqi7fyeA
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
   aliases:
@@ -908,8 +908,6 @@
       type: organization
     - id: sid_A4XoubikkQ
       type: organization
-    - id: ian-hogarth
-      type: person
   sources:
     - title: UK AI Safety Institute Website
       url: https://www.aisi.gov.uk
@@ -949,7 +947,7 @@
   type: organization
   orgType: government
   # parentOrg: nist — changed to nist-ai (valid entity ID)
-  parentOrg: Eac7pHF06Q
+  parentOrg: sid_Eac7pHF06Q
   summaryPage: government-orgs-overview
   title: US AI Safety Institute (now CAISI)
   website: https://www.nist.gov/aisi

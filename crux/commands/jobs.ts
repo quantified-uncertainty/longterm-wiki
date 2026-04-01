@@ -618,14 +618,25 @@ async function enqueueResourceIngest(_args: string[], options: CommandOptions): 
   output += `${c.dim}Scanning resources...${c.reset}\n`;
 
   while (true) {
-    const result = await apiRequest<{
-      resources: Array<{ id: string; url: string; lastFetchedAt: string | null }>;
-      total: number;
-      limit: number;
-      offset: number;
-    }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${offset}`);
+    let result;
+    for (let retry = 0; retry < 10; retry++) {
+      result = await apiRequest<{
+        resources: Array<{ id: string; url: string; lastFetchedAt: string | null }>;
+        total: number;
+        limit: number;
+        offset: number;
+      }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${offset}`);
 
-    if (!result.ok) return handleApiError(result, c);
+      if (result.ok) break;
+      if (result.message.includes('429')) {
+        const waitSec = Math.min(30, 2 ** retry);
+        process.stderr.write(`  ${c.yellow}Rate limited on scan, waiting ${waitSec}s...${c.reset}\n`);
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+        continue;
+      }
+      return handleApiError(result, c);
+    }
+    if (!result?.ok) return handleApiError(result!, c);
 
     total = result.data.total;
     for (const r of result.data.resources) {
@@ -830,20 +841,31 @@ async function enqueueResourceReingest(_args: string[], options: CommandOptions)
   output += `${c.dim}Scanning resources...${c.reset}\n`;
 
   while (true) {
-    const result = await apiRequest<{
-      resources: Array<{
-        id: string;
-        url: string;
-        lastFetchedAt: string | null;
-        contentLifecycle: string | null;
-        contentHash: string | null;
-      }>;
-      total: number;
-      limit: number;
-      offset: number;
-    }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${pageOffset}`);
+    let result;
+    for (let retry = 0; retry < 10; retry++) {
+      result = await apiRequest<{
+        resources: Array<{
+          id: string;
+          url: string;
+          lastFetchedAt: string | null;
+          contentLifecycle: string | null;
+          contentHash: string | null;
+        }>;
+        total: number;
+        limit: number;
+        offset: number;
+      }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${pageOffset}`);
 
-    if (!result.ok) return handleApiError(result, c);
+      if (result.ok) break;
+      if (result.message.includes('429')) {
+        const waitSec = Math.min(30, 2 ** retry);
+        process.stderr.write(`  ${c.yellow}Rate limited on scan, waiting ${waitSec}s...${c.reset}\n`);
+        await new Promise((resolve) => setTimeout(resolve, waitSec * 1000));
+        continue;
+      }
+      return handleApiError(result, c);
+    }
+    if (!result?.ok) return handleApiError(result!, c);
 
     total = result.data.total;
     for (const r of result.data.resources) {

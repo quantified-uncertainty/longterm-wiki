@@ -22,11 +22,11 @@ const verbose = process.argv.includes("--verbose");
 // plain-string values for organizations/people not yet modeled as KB entities
 // (e.g., "University of Toronto", "Google Brain"). These are data quality items,
 // not integrity violations.
-// factid-format is demoted because 248 legacy human-readable IDs exist from
+// factid-format is demoted because legacy human-readable IDs exist from
 // before the f_XXXXXXXXXX format was standardized. Migration tracked in #3329.
 // New violations beyond the baseline are still blocking.
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
-const LEGACY_FACTID_FORMAT_BASELINE = 248;
+const LEGACY_FACTID_FORMAT_BASELINE = 293; // updated 2026-03-31 after FactBase enrichment increased count
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {

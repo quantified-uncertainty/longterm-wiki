@@ -1568,6 +1568,10 @@ export const sourceCheckVerdicts = pgTable(
     recordId: text("record_id").notNull(),
     fieldName: text("field_name"), // NULL = whole row verdict
     entityId: text("entity_id"), // for grouping/display
+    /** Human-readable name for this record, persisted at write time (survives record deletion). */
+    displayName: text("display_name"),
+    /** Human-readable name for the parent entity, persisted at write time. */
+    entityDisplayName: text("entity_display_name"),
     verdict: text("verdict").notNull(), // confirmed | contradicted | outdated | partial | unverifiable | unchecked
     confidence: real("confidence"),
     reasoning: text("reasoning"),

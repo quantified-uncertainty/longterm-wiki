@@ -298,10 +298,10 @@ facts:
 
   - id: f_qgj5UBfOAg
     property: coding-market-share
-    value: 42
+    value: 32
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "Enterprise coding market share; more than double OpenAI's 21%"
+    notes: "Enterprise coding market share per Menlo Ventures survey; Anthropic leads in coding use among enterprises"
 
   # ── Product & Usage ─────────────────────────────────────────────
   - id: f_JoN2Jr8liA
