@@ -112,6 +112,19 @@ const mockDatabase = {
       customFields: [],
       relatedTopics: [],
     },
+    {
+      id: "data-only-model",
+      entityType: "ai-model",
+      wikiId: "E7",
+      title: "Test Model",
+      description: "A data-only AI model entity with no wiki page",
+      tags: ["frontier"],
+      clusters: [],
+      relatedEntries: [],
+      sources: [],
+      customFields: [],
+      relatedTopics: [],
+    },
   ],
   resources: [
     {
@@ -161,8 +174,8 @@ const mockDatabase = {
     "internal-doc": "/internal/architecture",
   },
   idRegistry: {
-    byWikiId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table", E6: "internal-doc" },
-    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5", "internal-doc": "E6" },
+    byWikiId: { E1: "test-entity", E2: "other-entity", E3: "researcher-1", E4: "table-entity", E5: "orphan-table", E6: "internal-doc", E7: "data-only-model" },
+    bySlug: { "test-entity": "E1", "other-entity": "E2", "researcher-1": "E3", "table-entity": "E4", "orphan-table": "E5", "internal-doc": "E6", "data-only-model": "E7" },
   },
   pages: [
     {
@@ -393,12 +406,24 @@ describe("Data Layer", () => {
       expect(testItem?.riskCategory).toBe("accident");
     });
 
-    it("excludes entities without content pages from explore items", async () => {
+    it("excludes entities without content pages or wiki IDs from explore items", async () => {
       const { getExploreItems } = await import("../../data/index");
       const items = getExploreItems();
       const conceptItem = items.find((i) => i.id === "other-entity");
-      // other-entity has no page in the mock → should not appear in explore
+      // other-entity has no page and no wikiId → should not appear in explore
       expect(conceptItem).toBeUndefined();
+    });
+
+    it("includes data-only entities with wikiId but no content page", async () => {
+      const { getExploreItems } = await import("../../data/index");
+      const items = getExploreItems();
+      const modelItem = items.find((i) => i.id === "data-only-model");
+      expect(modelItem).toBeDefined();
+      expect(modelItem?.type).toBe("ai-model");
+      expect(modelItem?.wikiId).toBe("E7");
+      expect(modelItem?.description).toBe("A data-only AI model entity with no wiki page");
+      expect(modelItem?.wordCount).toBeNull();
+      expect(modelItem?.href).toBe("/ai-models/data-only-model");
     });
 
     it("uses contentFormat as type when page is a table (even with entity)", async () => {

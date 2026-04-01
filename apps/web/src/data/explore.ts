@@ -189,6 +189,42 @@ export function getExploreItems(): ExploreItem[] {
       };
     });
 
+  // Items from typed entities that have wiki IDs but no content pages
+  // (e.g., AI models, benchmarks — data-only entities shown in directory pages)
+  const dataOnlyItems: ExploreItem[] = typedEntities
+    .filter((entity) => {
+      // Skip entities already included via entityItems (they have pages)
+      if (entityPageIdMap.has(entity.id)) return false;
+      // Must have a wiki ID to be linkable
+      return !!entity.wikiId;
+    })
+    .map((entity) => {
+      const kbCounts = getKBCounts(entity.id, kb);
+      const rawDesc = entity.description || null;
+      return {
+        id: entity.id,
+        wikiId: entity.wikiId!,
+        title: entity.title,
+        type: entity.entityType,
+        description: rawDesc ? stripMdxEscapes(rawDesc) : null,
+        tags: entity.tags || [],
+        clusters: entity.clusters || [],
+        wordCount: null,
+        quality: null,
+        readerImportance: null,
+        researchImportance: null,
+        tacticalValue: null,
+        backlinkCount: null,
+        category: null,
+        riskCategory: isRisk(entity) ? (entity.riskCategory || null) : null,
+        lastUpdated: entity.lastUpdated || null,
+        dateCreated: null,
+        href: getEntityHref(entity.id),
+        kbFactCount: kbCounts.factCount || undefined,
+        kbItemCount: kbCounts.itemCount || undefined,
+      };
+    });
+
   // Diagram items — entities with causeEffectGraph data
   // Generic entities preserve all raw fields including causeEffectGraph.
   // Entity IDs may differ from page IDs, resolved via resolvePageId above.
@@ -233,5 +269,5 @@ export function getExploreItems(): ExploreItem[] {
       };
     });
 
-  return [...entityItems, ...pageOnlyItems, ...diagramItems];
+  return [...entityItems, ...pageOnlyItems, ...dataOnlyItems, ...diagramItems];
 }
