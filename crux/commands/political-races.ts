@@ -211,7 +211,7 @@ async function seedCommand(
 
   console.log("Seeding 2026 political races data...\n");
 
-  // ---- Races (8 original + 17 new = 25 total) ----
+  // ---- Races (25 original + 8 new = 33 total) ----
   const races = [
     // === FEDERAL HOUSE ===
     {
@@ -447,6 +447,117 @@ async function seedCommand(
       aiAngle: "Leading the Future pledged $5M for Donalds. He opposes DeSantis-backed AI regulation. Will determine Florida's AI regulatory posture.",
       source: "https://www.nbcnews.com/politics/2026-election/super-pac-backed-ai-titans-pledges-5-million-boost-byron-donalds-run-f-rcna258612",
     },
+    // === ADDITIONAL SENATE (competitive / third-party dynamics) ===
+    {
+      id: "aK5eNaT026",
+      name: "Alaska Senate 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "federal_senate" as const,
+      state: "AK",
+      district: "AK-Sen",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low AI policy salience. Sullivan is mainstream R with no strong AI position. Peltola focused on resource/fisheries issues. Ranked-choice voting neutralizes spoiler effect.",
+      notes: "Uses ranked-choice voting (top-4 jungle primary Aug 18). Spoiler dynamics mitigated by RCV.",
+      source: "https://centerforpolitics.org/crystalball/alaska-senate-race-comes-onto-the-competitive-board-with-peltolas-entry/",
+    },
+    {
+      id: "nH5eNaT026",
+      name: "New Hampshire Senate 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "federal_senate" as const,
+      state: "NH",
+      district: "NH-Sen",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI policy relevance. Open seat (Shaheen retiring). Lean D. Key for overall Senate control which determines AI legislation prospects.",
+      source: "https://ballotpedia.org/United_States_Senate_election_in_New_Hampshire,_2026",
+    },
+    {
+      id: "iA5eNaT026",
+      name: "Iowa Senate 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "federal_senate" as const,
+      state: "IA",
+      district: "IA-Sen",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI policy relevance. Open seat (Ernst retiring). Lean R but competitive. Key for overall Senate control.",
+      source: "https://en.wikipedia.org/wiki/2026_United_States_Senate_elections",
+    },
+    // === ADDITIONAL GOVERNORS (democratic resilience) ===
+    {
+      id: "mI5Gov2026",
+      name: "Michigan Governor 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "state_governor" as const,
+      state: "MI",
+      district: "MI-Gov",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Trifecta control at stake. Governor controls election admin in critical swing state. Michigan has independent redistricting commission but governor influences other democratic guardrails.",
+      notes: "Democratic backsliding relevance: HIGH. Controls election certification, voter access laws. 2024 margin <3%.",
+      source: "https://www.cookpolitical.com/ratings/governor-race-ratings",
+    },
+    {
+      id: "wI5Gov2026",
+      name: "Wisconsin Governor 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "state_governor" as const,
+      state: "WI",
+      district: "WI-Gov",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI relevance. Critical for democratic resilience: governor's veto protects recently restored fair legislative maps. A Republican governor could sign new gerrymandered maps.",
+      notes: "Democratic backsliding relevance: VERY HIGH. Veto power over redistricting is the firewall for fair maps.",
+      source: "https://www.cookpolitical.com/ratings/governor-race-ratings",
+    },
+    {
+      id: "gA5Gov2026",
+      name: "Georgia Governor 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "state_governor" as const,
+      state: "GA",
+      district: "GA-Gov",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI relevance. Democratic backsliding flashpoint: Raffensperger (who resisted pressure to overturn 2020 results) is running. Race is referendum on election integrity.",
+      notes: "Democratic backsliding relevance: VERY HIGH. Raffensperger candidacy = direct referendum on election integrity norms.",
+      source: "https://centerforpolitics.org/crystalball/handicapping-the-2026-state-legislative-map-a-first-look/",
+    },
+    {
+      id: "aZ5Gov2026",
+      name: "Arizona Governor 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "state_governor" as const,
+      state: "AZ",
+      district: "AZ-Gov",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI relevance. Governor controls election certification in state where 2022 certification was contested. Lean D.",
+      notes: "Democratic backsliding relevance: HIGH. Controls election certification process that was contested in 2022.",
+      source: "https://www.cookpolitical.com/ratings/governor-race-ratings",
+    },
+    {
+      id: "iA5Gov2026",
+      name: "Iowa Governor 2026",
+      raceType: "general" as const,
+      party: null,
+      level: "state_governor" as const,
+      state: "IA",
+      district: "IA-Gov",
+      electionDate: "2026-11-03",
+      status: "active" as const,
+      aiAngle: "Low direct AI relevance. Open seat (Reynolds retiring). Dem recruit Rob Sand (State Auditor) has strong cross-party approval. Tariff-hit economy may favor Democrats.",
+      source: "https://centerforpolitics.org/crystalball/the-governors-part-two-familiar-battlegrounds-dot-2026-map-but-watch-for-upsets-in-open-seats/",
+    },
     // === BALLOT MEASURES ===
     {
       id: "51a0on9XH1",
@@ -504,7 +615,7 @@ async function seedCommand(
 
   console.log(`  Races upserted: ${raceResult.data.upserted}`);
 
-  // ---- Candidates (12 original + 20 new = 32 total) ----
+  // ---- Candidates (32 original + 12 new = 44 total) ----
   const candidates = [
     // === NY-12 ===
     { id: "fxl5cRngKV", raceId: "TSXwV8b755", candidateEntityId: "W2B4vrLpsU", candidateDisplayName: "Alex Bores", status: "running" as const, party: "democrat", aiStance: "pro_regulation" as const, pacEntityId: "cI2xccoTjv", pacDisplayName: "Jobs and Democracy PAC", pacAmount: 450000, pacPosition: "support" as const, endorsements: "RAISE Act author, Anthropic-backed PAC support" },
@@ -545,6 +656,29 @@ async function seedCommand(
     { id: "VZPP4xzOKw", raceId: "p01cOr273G", candidateDisplayName: "Mike Collins", status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Used AI deepfake of Ossoff in attack ad" },
     // === ME Senate ===
     { id: "U8hQu1gcoX", raceId: "1VZyeYdjFS", candidateEntityId: "5NoqE8uJSr", candidateDisplayName: "Susan Collins", isIncumbent: true, status: "running" as const, party: "republican", aiStance: "mixed" as const, notes: "Only R incumbent in a state Harris won. Top D pickup target." },
+    { id: "mE3pL8Rich", raceId: "1VZyeYdjFS", candidateDisplayName: "Tim Rich", status: "running" as const, aiStance: "neutral" as const, notes: "Independent candidate. Hotelier. Maine has strong independent tradition (Angus King won governorship as independent). Could pull from either side." },
+    // === NC Senate — third-party candidates ===
+    { id: "nC3pBrayLb", raceId: "8mcyqvWkfB", candidateDisplayName: "Shannon Bray", status: "running" as const, party: "libertarian", aiStance: "neutral" as const, notes: "Libertarian nominee. NC historically decided by thin margins — Tillis never won a majority. Could draw libertarian-leaning voters from either side. Key spoiler risk." },
+    { id: "nC3pMcGnGr", raceId: "8mcyqvWkfB", candidateDisplayName: "Brian McGinnis", status: "running" as const, party: "green", aiStance: "neutral" as const, notes: "Green Party nominee. Presence alongside Libertarian creates cross-cutting third-party dynamics in a toss-up race." },
+    // === AK Senate ===
+    { id: "aK3pPeltla", raceId: "aK5eNaT026", candidateDisplayName: "Mary Peltola", status: "running" as const, party: "democrat", aiStance: "neutral" as const, notes: "Former House member, first Alaska Native in Congress. Won 2022 special election. Leads Sullivan in some polls (49-47%). Ranked-choice voting mitigates spoiler concerns." },
+    { id: "aK3pSullvn", raceId: "aK5eNaT026", candidateDisplayName: "Dan Sullivan", isIncumbent: true, status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Mainstream R incumbent. Trump won AK by 13 points but Peltola has shown crossover appeal." },
+    // === NH Senate ===
+    { id: "nH3pPappas", raceId: "nH5eNaT026", candidateDisplayName: "Chris Pappas", status: "running" as const, party: "democrat", aiStance: "neutral" as const, notes: "Current House member. First major candidate to enter the race." },
+    { id: "nH3pSununu", raceId: "nH5eNaT026", candidateDisplayName: "John Sununu", status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Former US Senator (lost to Shaheen 2008). Brother of Gov. Chris Sununu who declined to run." },
+    { id: "nH3pBrownR", raceId: "nH5eNaT026", candidateDisplayName: "Scott Brown", status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Former MA Senator. Was 2014 nominee, narrowly lost to Shaheen." },
+    // === IA Senate ===
+    // Candidates TBD — primaries not yet held. Ernst retiring creates open seat.
+    // === MI Governor ===
+    // Candidates TBD — primaries not yet held.
+    // === WI Governor ===
+    // Candidates TBD — primaries not yet held. Current gov is D.
+    // === GA Governor ===
+    { id: "gA3pRaffns", raceId: "gA5Gov2026", candidateDisplayName: "Brad Raffensperger", status: "running" as const, party: "republican", aiStance: "neutral" as const, notes: "Sec. of State who resisted Trump's pressure to overturn 2020 results. His candidacy is a direct referendum on election integrity norms." },
+    // === AZ Governor ===
+    // Candidates TBD — primaries not yet held. Lean D.
+    // === IA Governor ===
+    { id: "iA3pSandDm", raceId: "iA5Gov2026", candidateDisplayName: "Rob Sand", status: "running" as const, party: "democrat", aiStance: "neutral" as const, notes: "Iowa State Auditor. Surprisingly strong approval among Independents and Republicans. Strong D recruit in R-trending state." },
     // === TN Governor ===
     { id: "s6sZkb16IO", raceId: "WVvIzjS9NL", candidateEntityId: "enf2UNKyDx", candidateDisplayName: "Marsha Blackburn", status: "running" as const, party: "republican", aiStance: "pro_regulation" as const, pacEntityId: "r3zkBIfezx", pacDisplayName: "Defending Our Values PAC", pacPosition: "support" as const, endorsements: "Co-sponsor Future of AI Innovation Act, children's online safety legislation" },
     // === FL Governor ===

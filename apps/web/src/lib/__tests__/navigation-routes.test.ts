@@ -124,6 +124,7 @@ describe("MDX internal links", () => {
     "/tools",
     "/about",
     "/knowledge-base",  // redirects
+    "/races",
   ];
 
   it("all MDX internal links resolve to known pages or routes", () => {
