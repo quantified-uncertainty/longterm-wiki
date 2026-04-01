@@ -47,7 +47,10 @@ import { str, strOrNull, numOrNull, resolveName, extractEntityId, extractEntityD
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const { ESTIMATED_COST_PER_VERIFICATION } = SOURCE_CHECK_CONSTANTS;
+const { ESTIMATED_COST_PER_VERIFICATION, PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
+
+/** Limit passed to wiki-server /all endpoints when fetching records for source-checking */
+const API_PAGE_LIMIT = 5000;
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -303,7 +306,9 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
         total: number;
       }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
 
-      if (!response.ok || !response.data) break;
+      if (!response.ok || !response.data) {
+        throw new Error(`Failed to fetch record verdicts at offset ${offset}`);
+      }
 
       for (const v of response.data.verdicts) {
         map.set(`${v.recordType}:${v.recordId}`, {
@@ -319,7 +324,9 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
       offset += PAGE_SIZE;
     }
   } catch (e: unknown) {
+    // On pagination failure, discard partial data to avoid processing a truncated dataset
     console.warn(`[source-check] Could not fetch record verdicts: ${e instanceof Error ? e.message : String(e)}`);
+    return new Map();
   }
 
   return map;
@@ -396,19 +403,19 @@ async function collectRecordItems(
   for (const recordType of typesToScan) {
     let apiPath: string;
     switch (recordType) {
-      case 'grant': apiPath = '/api/grants/all'; break;
-      case 'personnel': apiPath = '/api/personnel/all'; break;
-      case 'division': apiPath = '/api/divisions/all'; break;
-      case 'funding-program': apiPath = '/api/funding-programs/all'; break;
-      case 'funding-round': apiPath = '/api/funding-rounds/all'; break;
-      case 'investment': apiPath = '/api/investments/all'; break;
-      case 'equity-position': apiPath = '/api/equity-positions/all'; break;
-      case 'policy-stakeholder': apiPath = '/api/policy-stakeholders/all'; break;
-      case 'publication': apiPath = '/api/publications/all'; break;
-      case 'benchmark-result': apiPath = '/api/benchmark-results/all'; break;
-      case 'entity-event': apiPath = '/api/entity-events/all'; break;
-      case 'entity-assessment': apiPath = '/api/entity-assessments/all'; break;
-      case 'secondary-market-price': apiPath = '/api/secondary-market-prices/all'; break;
+      case 'grant': apiPath = `/api/grants/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'personnel': apiPath = `/api/personnel/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'division': apiPath = `/api/divisions/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'funding-program': apiPath = `/api/funding-programs/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'funding-round': apiPath = `/api/funding-rounds/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'investment': apiPath = `/api/investments/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'equity-position': apiPath = `/api/equity-positions/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'policy-stakeholder': apiPath = `/api/policy-stakeholders/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'publication': apiPath = `/api/publications/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'benchmark-result': apiPath = `/api/benchmark-results/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'entity-event': apiPath = `/api/entity-events/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'entity-assessment': apiPath = `/api/entity-assessments/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'secondary-market-price': apiPath = `/api/secondary-market-prices/all?limit=${API_PAGE_LIMIT}`; break;
       default: continue; // Skip unknown record types
     }
 
@@ -424,8 +431,8 @@ async function collectRecordItems(
       const rawItems = (
         data.items ?? data.grants ?? data.personnel ?? data.divisions ??
         data.programs ?? data.rounds ?? data.investments ?? data.positions ??
-        data.publications ?? data.benchmarkResults ?? data.events ??
-        data.assessments ?? data.prices ??
+        data.stakeholders ?? data.publications ?? data.benchmarkResults ??
+        data.events ?? data.assessments ?? data.prices ??
         (Array.isArray(data) ? data : [])
       ) as Record<string, unknown>[];
 
@@ -772,7 +779,7 @@ Source URL: ${data.fact.source}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text confirm, contradict, or not address this claim?
@@ -803,7 +810,7 @@ ${fieldsStr}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text confirm, contradict, or not address the claims in this record?
@@ -834,7 +841,7 @@ Source URL: ${sourceUrl}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text contain information about this entity? If so, does it confirm or contradict what we know?

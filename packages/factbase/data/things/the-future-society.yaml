@@ -45,8 +45,9 @@ facts:
 
   - id: f_tfs_legal
     property: legal-structure
-    value: "501(c)(3) nonprofit (The Future Society Inc, EIN 81-3568099). Registered 2016. Independent organization funded through philanthropic donations and service contracts with IGOs and governments."
+    value: "501(c)(3) nonprofit (The Future Society Inc, EIN 81-3568099). Founded 2014 as student club at Harvard Kennedy School; incorporated as 501(c)(3) in 2016. Independent organization funded through philanthropic donations and service contracts with IGOs and governments."
     source: https://www.influencewatch.org/non-profit/the-future-society/
+    notes: "Founded 2014, incorporated 2016 — distinction matters for accuracy"
 
   - id: f_tfs_leadership
     property: leadership

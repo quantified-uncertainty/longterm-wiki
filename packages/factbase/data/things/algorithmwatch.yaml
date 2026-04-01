@@ -34,7 +34,7 @@ facts:
 
   - id: f_aw_fellowship
     property: program
-    value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026): 8 European journalists/researchers, EUR 7,400 each, 6-month investigation with editorial support and mentorship"
+    value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026): eight European journalists/researchers, EUR 7,400 each, 6-month investigation with editorial support and mentorship"
     asOf: 2025
     source: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/
 

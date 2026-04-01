@@ -124,8 +124,7 @@ facts:
     value: 4.27e+12
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/nvda/market-cap/
-    notes: "Market cap as of March 24, 2026; world's most valuable company. Crossed
-      $4T in July 2025 and $5T in October 2025."
+    notes: "Market cap as of March 24, 2026. Value fluctuates significantly; needs periodic re-verification."
 
   # ── Gross Margin ────────────────────────────────────────────────
   - id: f_k3tgTSGXzg

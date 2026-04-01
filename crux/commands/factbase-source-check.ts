@@ -31,6 +31,13 @@ import {
 import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
 
+// ── Constants ─────────────────────────────────────────────────────────
+
+/** Max characters of source content to retain after fetching */
+const MAX_CONTENT_LENGTH = 500_000;
+/** HTTP fetch timeout in milliseconds */
+const FETCH_TIMEOUT_MS = 15_000;
+
 // ── Types ──────────────────────────────────────────────────────────────
 
 interface VerifyCommandOptions extends BaseOptions {
@@ -150,7 +157,7 @@ async function verifySingleFact(
   const sourceText = fetchResult.content;
 
   // Truncate source text for prompt
-  const truncatedSource = sourceText.slice(0, 4000);
+  const truncatedSource = sourceText.slice(0, 12000);
 
   const prompt = buildVerificationPrompt(entity, fact, property, formattedValue, truncatedSource);
 

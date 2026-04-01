@@ -252,6 +252,17 @@ properties:
       divisor: 1e6
       suffix: "M"
 
+  weekly-active-users:
+    name: Weekly Active Users
+    description: "Weekly active users (WAU)"
+    dataType: number
+    category: product
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e6
+      suffix: "M"
+
   business-customers:
     name: Business Customers
     description: "Number of business/enterprise customers"

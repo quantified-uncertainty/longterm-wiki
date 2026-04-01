@@ -123,10 +123,11 @@ facts:
   - id: f_oaif_ssc_observer01
     property: notable-for
     value: >-
-      SSC Chair (Zico Kolter) has full observation rights to attend all PBC
+      SSC Chair (Zico Kolter) serves as a non-voting observer at PBC
       board meetings. Kolter sits exclusively on the Foundation board, not
       the PBC board.
     source: https://openai.com/our-structure/
+    notes: "Source says 'non-voting observer', not 'full observation rights'"
 
   - id: f_oaif_ag_constraint01
     property: notable-for
@@ -233,15 +234,17 @@ facts:
   # ── Restructuring Timeline ────────────────────────────────────
   - id: f_oaif_restruct_announce
     property: key-event
-    value: "OpenAI announces plan to restructure; nonprofit would lose control"
+    value: "OpenAI announces plan to restructure into PBC; initial plan would have removed nonprofit governance control"
     asOf: 2024-12
     source: https://openai.com/index/why-our-structure-must-evolve-to-advance-our-mission/
+    notes: "OpenAI framed this as evolving the mission; critics saw it as removing nonprofit control."
 
   - id: f_oaif_ca_ag_investigation
     property: key-event
-    value: "California AG opens investigation into restructuring"
-    asOf: 2025-01
+    value: "California AG investigation into OpenAI restructuring (ongoing since ~mid-2024, concluded Oct 2025)"
+    asOf: 2024-06
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
+    notes: "AG Bonta stated investigation was conducted over 'the last year and a half' as of Oct 2025"
 
   - id: f_oaif_musk_bid
     property: key-event
