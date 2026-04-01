@@ -1,11 +1,13 @@
 ---
-description: Verify the agent checklist is complete, polish the PR, and ship.
+description: Verify the agent checklist is complete, polish the PR, and ship. For sessions without a PR, use /agent-end instead.
 effort: medium
 ---
 
-# Agent Session Ready PR
+# Agent Ship — Build, Review, Push, and Close
 
-Verify the agent checklist is complete, polish the PR, and ship.
+Verify the agent checklist is complete, polish the PR, and ship. Includes session close-out (what `/agent-end` does standalone).
+
+**If this session doesn't have code to ship** (research, abandoned, maintenance), use `/agent-end` instead — it's the lightweight close without the build/review/push steps.
 
 This command assumes `/agent-init` was run earlier and `.claude/wip-checklist.md` exists.
 
@@ -156,6 +158,14 @@ Run `pnpm crux sys agent-checklist complete` — must exit 0 (all items checked 
 
 Run `/agent-push-and-verify`.
 
-## Step 9: Final report
+## Step 9: Session close-out
+
+Clean up local session artifacts:
+
+```bash
+rm -f .claude/wip-checklist.md .claude/review-done .claude/wip-context.md
+```
+
+## Step 10: Final report
 
 Output a summary with: checklist final state, issues found & fixed, follow-up issues filed, and verdict (SHIP IT or NEEDS WORK).

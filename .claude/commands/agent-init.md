@@ -52,4 +52,4 @@ Output is saved to `.claude/wip-context.md`. Read it once — it contains page m
 
 Read `.claude/wip-checklist.md` and output it to the user. Highlight any items that seem particularly important or risky for this specific task.
 
-Throughout the session, check items off in `.claude/wip-checklist.md` as they are completed. When it's time to ship, run `/agent-ship`.
+Throughout the session, check items off in `.claude/wip-checklist.md` as they are completed. When done, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not).
