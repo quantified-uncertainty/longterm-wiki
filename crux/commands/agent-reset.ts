@@ -290,13 +290,33 @@ function scanWorktrees(): WorktreeInfo[] {
 function scanCleanupItems(): CleanupItem[] {
   const items: CleanupItem[] = [];
 
-  // Stale WIP checklist
+  // Stale WIP checklist — indicates previous session wasn't properly ended
   const checklistPath = join(process.cwd(), '.claude', 'wip-checklist.md');
   if (existsSync(checklistPath)) {
     items.push({
       category: 'checklist',
-      description: 'Stale WIP checklist from previous session',
+      description: 'Previous session not ended (stale wip-checklist.md) — run /agent-end or /agent-ship first',
       detail: checklistPath,
+    });
+  }
+
+  // Stale review marker
+  const reviewDonePath = join(process.cwd(), '.claude', 'review-done');
+  if (existsSync(reviewDonePath)) {
+    items.push({
+      category: 'checklist',
+      description: 'Stale review marker (.claude/review-done)',
+      detail: reviewDonePath,
+    });
+  }
+
+  // Stale context file
+  const contextPath = join(process.cwd(), '.claude', 'wip-context.md');
+  if (existsSync(contextPath)) {
+    items.push({
+      category: 'checklist',
+      description: 'Stale context file (.claude/wip-context.md)',
+      detail: contextPath,
     });
   }
 

@@ -25,9 +25,11 @@ Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
 ## Step 2: Session End — BEFORE considering work complete
 
-Run `/agent-ship`. It verifies the checklist, polishes the PR description, updates GitHub issues, creates a session log, and ships.
+**If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
 
-See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
+**If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates GitHub issues, and cleans up local artifacts.
+
+Every session should end with one of these. See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
 
 ## Why this matters
 

@@ -34,17 +34,22 @@ Closes #533
 Closes #538
 ```
 
-## Preferred: `/agent-ship`
+## Ending a session
 
-The recommended end-of-session command is `/agent-ship`. It verifies the agent checklist (from `/agent-init`), polishes the PR description, updates GitHub issues, creates a session log, and calls `/agent-push-and-verify` to ship.
+Every session should end with one of:
 
-If `/agent-init` was run at session start and `.claude/wip-checklist.md` exists, just run `/agent-ship` — it handles everything.
+| Command | When to use |
+|---------|-------------|
+| `/agent-ship` | Shipping a PR — builds, reviews, pushes, monitors CI, closes session |
+| `/agent-end` | No PR to ship — research, abandoned work, maintenance, PR patrol |
 
-## Fallback: Quick fix sessions
+**`/agent-ship`** verifies the agent checklist (from `/agent-init`), polishes the PR description, updates GitHub issues, and calls `/agent-push-and-verify` to ship.
 
-If `/agent-init` was not run (e.g., a quick fix session), run `/agent-ship` directly — it will generate a checklist on the fly if one doesn't exist, then walk through completion and shipping.
+**`/agent-end`** is the lightweight close — marks the session completed, updates issue labels, removes local artifacts (wip-checklist, review-done, wip-context).
 
-As a bare minimum, always open a PR before considering work complete.
+If `/agent-init` was not run (e.g., a quick fix session), either command will still work — `/agent-ship` generates a checklist on the fly, `/agent-end` just cleans up.
+
+As a bare minimum, always open a PR before considering code work complete.
 
 ## Deploy task detection
 
