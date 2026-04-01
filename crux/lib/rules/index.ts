@@ -33,6 +33,8 @@ import { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
 import { componentImportsRule } from './component-imports.ts';
 import { citationUrlsRule } from './citation-urls.ts';
 import { vagueCitationsRule } from './vague-citations.ts';
+import { squiggleQualityRule } from './squiggle-quality.ts';
+import { datainfoboxEntityMatchRule } from './datainfobox-entity-match.ts';
 
 // External link validation
 import { externalLinksRule } from './external-links.ts';
@@ -172,6 +174,8 @@ export {
   styleGuideRule,
   probabilityConsistencyRule,
   terminologyVariantsRule,
+  squiggleQualityRule,
+  datainfoboxEntityMatchRule,
 };
 
 export const allRules: Rule[] = [
@@ -230,6 +234,8 @@ export const allRules: Rule[] = [
   styleGuideRule,
   probabilityConsistencyRule,
   terminologyVariantsRule,
+  squiggleQualityRule,
+  datainfoboxEntityMatchRule,
 ];
 
 export default allRules;
