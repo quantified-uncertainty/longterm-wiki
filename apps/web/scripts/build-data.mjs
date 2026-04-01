@@ -724,6 +724,7 @@ async function main() {
         }
       } else {
         wikiIdToSlug[page.wikiId] = page.id;
+        slugToWikiId[page.id] = page.wikiId;
       }
     }
   }
