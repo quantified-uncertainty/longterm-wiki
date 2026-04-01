@@ -1,16 +1,18 @@
 /**
- * Agent Reset — Find and clean stale processes left by Claude Code sessions
+ * Agent Reset — Reset an agent slot to a clean state between sessions
  *
- * Detects orphaned MCP servers, dev servers, test runners, and other Node
- * processes spawned by agent sessions that weren't cleaned up on exit.
+ * Scans for and cleans up: stale processes, orphaned worktrees, stale
+ * git branches, and WIP checklists. Pulls latest main.
  *
  * Usage:
- *   crux sys agent-reset                      Show stale processes (dry run)
- *   crux sys agent-reset --kill               Kill all detected stale processes
+ *   crux sys agent-reset                      Scan everything (dry run)
+ *   crux sys agent-reset --kill               Clean up + pull main
  *   crux sys agent-reset --kill --force       Kill without age threshold
  */
 
 import { execSync } from 'child_process';
+import { existsSync, readdirSync, unlinkSync } from 'fs';
+import { join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
 
@@ -29,6 +31,24 @@ interface DetectedProcess {
   memMB: number;
   ageMinutes: number;
   command: string;
+}
+
+interface GitStatus {
+  currentBranch: string;
+  isDirty: boolean;
+  behindMain: number;
+  mergedBranches: string[];
+}
+
+interface WorktreeInfo {
+  path: string;
+  branch: string;
+}
+
+interface CleanupItem {
+  category: 'worktree' | 'branch' | 'checklist' | 'stash';
+  description: string;
+  detail: string;
 }
 
 // Minimum age (minutes) before a process is considered stale.
@@ -131,7 +151,6 @@ function classifyProcess(
 
   // Other MCP servers (generic pattern)
   if (command.includes('/mcp-server-') || command.includes('/mcp-')) {
-    // Don't match if it's just "mcp" in a random path
     if (/\bmcp-server-\w+/.test(command) || /\/mcp-[a-z]+-/.test(command)) {
       return {
         pid, category: 'mcp-server',
@@ -155,7 +174,6 @@ function classifyProcess(
   }
 
   // next-server process (the actual Next.js server child)
-  // Only match if it's clearly from an agent slot
   if (command.includes('next-server') && /\/lw\/a\d+\//.test(command)) {
     const slotMatch = command.match(/\/lw\/a(\d+)\//);
     const slot = slotMatch ? slotMatch[1] : '?';
@@ -204,6 +222,130 @@ function formatAge(minutes: number): string {
   return `${days}d${hours % 24}h`;
 }
 
+function exec(cmd: string, timeoutMs = 10000): string {
+  return execSync(cmd, { encoding: 'utf-8', timeout: timeoutMs }).trim();
+}
+
+function execSafe(cmd: string, timeoutMs = 10000): string | null {
+  try {
+    return exec(cmd, timeoutMs);
+  } catch {
+    return null;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Git scanning
+// ---------------------------------------------------------------------------
+
+function scanGitStatus(): GitStatus {
+  const currentBranch = execSafe('git rev-parse --abbrev-ref HEAD') ?? '(unknown)';
+
+  // Check for uncommitted changes
+  const statusOutput = execSafe('git status --porcelain') ?? '';
+  const isDirty = statusOutput.length > 0;
+
+  // Fetch latest main (quick, only refs)
+  execSafe('git fetch origin main --quiet');
+
+  // How far behind main?
+  const behind = execSafe('git rev-list --count HEAD..origin/main');
+  const behindMain = behind ? Number(behind) : 0;
+
+  // Find local branches that have been merged into origin/main
+  const mergedOutput = execSafe('git branch --merged origin/main') ?? '';
+  const mergedBranches = mergedOutput
+    .split('\n')
+    .map(b => b.replace(/^\*?\s+/, '').trim())
+    .filter(b => b && b !== 'main' && b !== 'production' && !b.startsWith('remotes/'));
+
+  return { currentBranch, isDirty, behindMain, mergedBranches };
+}
+
+// ---------------------------------------------------------------------------
+// Worktree scanning
+// ---------------------------------------------------------------------------
+
+function scanWorktrees(): WorktreeInfo[] {
+  const worktreeDir = join(process.cwd(), '.claude', 'worktrees');
+  if (!existsSync(worktreeDir)) return [];
+
+  const entries = readdirSync(worktreeDir, { withFileTypes: true });
+  const worktrees: WorktreeInfo[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const wtPath = join(worktreeDir, entry.name);
+    const branch = execSafe(`git -C "${wtPath}" rev-parse --abbrev-ref HEAD`) ?? '(detached)';
+    worktrees.push({ path: wtPath, branch });
+  }
+
+  return worktrees;
+}
+
+// ---------------------------------------------------------------------------
+// Cleanup item scanning
+// ---------------------------------------------------------------------------
+
+function scanCleanupItems(): CleanupItem[] {
+  const items: CleanupItem[] = [];
+
+  // Stale WIP checklist
+  const checklistPath = join(process.cwd(), '.claude', 'wip-checklist.md');
+  if (existsSync(checklistPath)) {
+    items.push({
+      category: 'checklist',
+      description: 'Stale WIP checklist from previous session',
+      detail: checklistPath,
+    });
+  }
+
+  // Git stashes
+  const stashList = execSafe('git stash list') ?? '';
+  const stashCount = stashList ? stashList.split('\n').filter(Boolean).length : 0;
+  if (stashCount > 0) {
+    items.push({
+      category: 'stash',
+      description: `${stashCount} git stash${stashCount > 1 ? 'es' : ''}`,
+      detail: stashList.split('\n').slice(0, 3).join('; ') + (stashCount > 3 ? ` ... +${stashCount - 3} more` : ''),
+    });
+  }
+
+  return items;
+}
+
+// ---------------------------------------------------------------------------
+// Stale process scanning (existing logic)
+// ---------------------------------------------------------------------------
+
+function scanStaleProcesses(forceMode: boolean): DetectedProcess[] {
+  let psOutput: string;
+  try {
+    psOutput = execSync(
+      'ps -eo pid,%cpu,rss,etime,command | grep -E "node|next-server" | grep -v grep',
+      { encoding: 'utf-8', timeout: 5000 },
+    );
+  } catch {
+    return [];
+  }
+
+  const allProcs = parseProcesses(psOutput);
+  const myPid = process.pid;
+  const detected: DetectedProcess[] = [];
+
+  for (const proc of allProcs) {
+    const classified = classifyProcess(proc, myPid);
+    if (classified) {
+      const threshold = forceMode ? 0 : (STALE_THRESHOLDS[classified.category] ?? 60);
+      if (classified.ageMinutes >= threshold) {
+        detected.push(classified);
+      }
+    }
+  }
+
+  return detected;
+}
+
 // ---------------------------------------------------------------------------
 // Main command
 // ---------------------------------------------------------------------------
@@ -217,105 +359,200 @@ async function resetCommand(
   const killMode = Boolean(options.kill);
   const forceMode = Boolean(options.force);
 
-  // Get all node processes with resource info
-  let psOutput: string;
-  try {
-    psOutput = execSync(
-      'ps -eo pid,%cpu,rss,etime,command | grep -E "node|next-server" | grep -v grep',
-      { encoding: 'utf-8', timeout: 5000 },
-    );
-  } catch {
-    // grep returns exit 1 when no matches — that means no node processes
-    return { exitCode: 0, output: 'No Node processes found.' };
-  }
-
-  const allProcs = parseProcesses(psOutput);
-  const myPid = process.pid;
-
-  // Classify each process
-  const detected: DetectedProcess[] = [];
-  for (const proc of allProcs) {
-    const classified = classifyProcess(proc, myPid);
-    if (classified) {
-      const threshold = forceMode ? 0 : (STALE_THRESHOLDS[classified.category] ?? 60);
-      if (classified.ageMinutes >= threshold) {
-        detected.push(classified);
-      }
-    }
-  }
-
-  if (detected.length === 0) {
-    return { exitCode: 0, output: 'No stale processes detected.' };
-  }
-
-  // JSON output
-  if (options.json) {
-    const data = { processes: detected, killMode };
-    return { exitCode: 0, output: JSON.stringify(data, null, 2) };
-  }
-
-  // Group by category for display
-  const byCategory = new Map<string, DetectedProcess[]>();
-  for (const p of detected) {
-    const list = byCategory.get(p.category) || [];
-    list.push(p);
-    byCategory.set(p.category, list);
-  }
-
   let output = '';
-  const totalCpu = detected.reduce((sum, p) => sum + p.cpuPercent, 0);
-  const totalMem = detected.reduce((sum, p) => sum + p.memMB, 0);
+  let totalIssues = 0;
 
-  output += `${c.bold}Stale Processes${c.reset} — ${detected.length} found (${totalCpu.toFixed(0)}% CPU, ${totalMem}MB RAM)\n\n`;
+  // ── 1. Git status ──────────────────────────────────────────────────────
+  const git = scanGitStatus();
 
-  const categoryLabels: Record<string, string> = {
-    'mcp-server': 'MCP Servers',
-    'dev-server': 'Dev Servers',
-    'test-runner': 'Test Runners',
-    'build-data': 'Build Processes',
-  };
+  output += `${c.bold}Git${c.reset}\n`;
+  output += `  Branch: ${c.cyan}${git.currentBranch}${c.reset}`;
+  if (git.isDirty) output += ` ${c.yellow}(dirty)${c.reset}`;
+  output += '\n';
 
-  for (const [category, procs] of byCategory) {
-    const label = categoryLabels[category] ?? category;
-    output += `${c.cyan}${label}${c.reset} (${procs.length})\n`;
-    for (const p of procs) {
-      const cpuColor = p.cpuPercent > 50 ? c.red : p.cpuPercent > 10 ? c.yellow : '';
-      output += `  PID ${c.bold}${p.pid}${c.reset}  ${cpuColor}${p.cpuPercent.toFixed(0)}% CPU${c.reset}  ${p.memMB}MB  age ${formatAge(p.ageMinutes)}  ${c.dim}${p.description}${c.reset}\n`;
-    }
-    output += '\n';
+  if (git.behindMain > 0) {
+    output += `  ${c.yellow}${git.behindMain} commits behind origin/main${c.reset}\n`;
+    totalIssues++;
+  } else {
+    output += `  ${c.green}Up to date with origin/main${c.reset}\n`;
   }
 
-  if (!killMode) {
-    output += `${c.dim}Run with --kill to terminate these processes.${c.reset}\n`;
-    return { exitCode: 0, output: output.trimEnd() };
-  }
-
-  // Kill mode
-  let killed = 0;
-  let failed = 0;
-  for (const p of detected) {
-    try {
-      process.kill(p.pid, 'SIGTERM');
-      killed++;
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes('ESRCH')) {
-        // Process already exited
-        killed++;
-      } else {
-        output += `  ${c.red}Failed to kill PID ${p.pid}: ${msg}${c.reset}\n`;
-        failed++;
-      }
-    }
-  }
-
-  output += `${c.green}✓${c.reset} Killed ${killed} process${killed !== 1 ? 'es' : ''}`;
-  if (failed > 0) {
-    output += ` (${c.red}${failed} failed${c.reset})`;
+  if (git.mergedBranches.length > 0) {
+    output += `  ${c.yellow}${git.mergedBranches.length} merged branch${git.mergedBranches.length > 1 ? 'es' : ''}: ${git.mergedBranches.join(', ')}${c.reset}\n`;
+    totalIssues++;
   }
   output += '\n';
 
-  return { exitCode: failed > 0 ? 1 : 0, output: output.trimEnd() };
+  // ── 2. Worktrees ──────────────────────────────────────────────────────
+  const worktrees = scanWorktrees();
+  if (worktrees.length > 0) {
+    output += `${c.bold}Worktrees${c.reset} — ${worktrees.length} orphaned\n`;
+    for (const wt of worktrees) {
+      const name = wt.path.split('/').pop();
+      output += `  ${c.yellow}${name}${c.reset} (${wt.branch})\n`;
+    }
+    output += '\n';
+    totalIssues++;
+  }
+
+  // ── 3. Cleanup items ──────────────────────────────────────────────────
+  const cleanupItems = scanCleanupItems();
+  if (cleanupItems.length > 0) {
+    output += `${c.bold}Cleanup${c.reset}\n`;
+    for (const item of cleanupItems) {
+      output += `  ${c.yellow}${item.description}${c.reset}\n`;
+    }
+    output += '\n';
+    totalIssues++;
+  }
+
+  // ── 4. Stale processes ────────────────────────────────────────────────
+  const detected = scanStaleProcesses(forceMode);
+  if (detected.length > 0) {
+    const totalCpu = detected.reduce((sum, p) => sum + p.cpuPercent, 0);
+    const totalMem = detected.reduce((sum, p) => sum + p.memMB, 0);
+
+    output += `${c.bold}Stale Processes${c.reset} — ${detected.length} found (${totalCpu.toFixed(0)}% CPU, ${totalMem}MB RAM)\n`;
+
+    const categoryLabels: Record<string, string> = {
+      'mcp-server': 'MCP Servers',
+      'dev-server': 'Dev Servers',
+      'test-runner': 'Test Runners',
+      'build-data': 'Build Processes',
+    };
+
+    const byCategory = new Map<string, DetectedProcess[]>();
+    for (const p of detected) {
+      const list = byCategory.get(p.category) || [];
+      list.push(p);
+      byCategory.set(p.category, list);
+    }
+
+    for (const [category, procs] of byCategory) {
+      const label = categoryLabels[category] ?? category;
+      output += `  ${c.cyan}${label}${c.reset} (${procs.length})\n`;
+      for (const p of procs) {
+        const cpuColor = p.cpuPercent > 50 ? c.red : p.cpuPercent > 10 ? c.yellow : '';
+        output += `    PID ${c.bold}${p.pid}${c.reset}  ${cpuColor}${p.cpuPercent.toFixed(0)}% CPU${c.reset}  ${p.memMB}MB  age ${formatAge(p.ageMinutes)}  ${c.dim}${p.description}${c.reset}\n`;
+      }
+    }
+    output += '\n';
+    totalIssues++;
+  }
+
+  // ── JSON output ────────────────────────────────────────────────────────
+  if (options.json) {
+    const data = {
+      git,
+      worktrees: worktrees.map(w => ({ path: w.path, branch: w.branch })),
+      cleanupItems: cleanupItems.map(i => ({ category: i.category, description: i.description })),
+      processes: detected,
+      killMode,
+    };
+    return { exitCode: 0, output: JSON.stringify(data, null, 2) };
+  }
+
+  // ── Dry run summary ────────────────────────────────────────────────────
+  if (!killMode) {
+    if (totalIssues === 0) {
+      output += `${c.green}✓${c.reset} Slot is clean — nothing to reset.\n`;
+    } else {
+      output += `${c.dim}Run with --kill to clean up.${c.reset}\n`;
+    }
+    return { exitCode: 0, output: output.trimEnd() };
+  }
+
+  // ── Kill mode: execute cleanup ─────────────────────────────────────────
+  output += `${c.bold}Actions${c.reset}\n`;
+
+  // 4a. Kill stale processes
+  if (detected.length > 0) {
+    let killed = 0;
+    let failed = 0;
+    for (const p of detected) {
+      try {
+        process.kill(p.pid, 'SIGTERM');
+        killed++;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        if (msg.includes('ESRCH')) {
+          killed++;
+        } else {
+          output += `  ${c.red}Failed to kill PID ${p.pid}: ${msg}${c.reset}\n`;
+          failed++;
+        }
+      }
+    }
+    output += `  ${c.green}✓${c.reset} Killed ${killed} stale process${killed !== 1 ? 'es' : ''}`;
+    if (failed > 0) output += ` (${c.red}${failed} failed${c.reset})`;
+    output += '\n';
+  }
+
+  // 4b. Remove orphaned worktrees
+  for (const wt of worktrees) {
+    try {
+      exec(`git worktree remove "${wt.path}" --force`);
+      const name = wt.path.split('/').pop();
+      output += `  ${c.green}✓${c.reset} Removed worktree ${name}\n`;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      output += `  ${c.red}✗ Failed to remove worktree ${wt.path}: ${msg}${c.reset}\n`;
+    }
+  }
+
+  // 4c. Remove stale WIP checklist
+  for (const item of cleanupItems) {
+    if (item.category === 'checklist') {
+      try {
+        unlinkSync(item.detail);
+        output += `  ${c.green}✓${c.reset} Removed stale WIP checklist\n`;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        output += `  ${c.red}✗ Failed to remove checklist: ${msg}${c.reset}\n`;
+      }
+    }
+    if (item.category === 'stash') {
+      try {
+        exec('git stash clear');
+        output += `  ${c.green}✓${c.reset} Cleared git stashes\n`;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        output += `  ${c.red}✗ Failed to clear stashes: ${msg}${c.reset}\n`;
+      }
+    }
+  }
+
+  // 4d. Delete merged branches
+  for (const branch of git.mergedBranches) {
+    try {
+      exec(`git branch -d "${branch}"`);
+      output += `  ${c.green}✓${c.reset} Deleted merged branch ${branch}\n`;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      output += `  ${c.red}✗ Failed to delete branch ${branch}: ${msg}${c.reset}\n`;
+    }
+  }
+
+  // 4e. Pull latest main
+  if (git.behindMain > 0 || git.currentBranch !== 'main') {
+    if (git.isDirty) {
+      output += `  ${c.yellow}⚠ Working tree is dirty — skipping checkout/pull. Commit or stash changes first.${c.reset}\n`;
+    } else {
+      try {
+        if (git.currentBranch !== 'main') {
+          exec('git checkout main');
+          output += `  ${c.green}✓${c.reset} Checked out main\n`;
+        }
+        exec('git pull origin main --ff-only', 30000);
+        output += `  ${c.green}✓${c.reset} Pulled latest main\n`;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        output += `  ${c.red}✗ Failed to pull main: ${msg}${c.reset}\n`;
+      }
+    }
+  }
+
+  return { exitCode: 0, output: output.trimEnd() };
 }
 
 // ---------------------------------------------------------------------------
@@ -328,29 +565,32 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
 
 export function getHelp(): string {
   return `
-Agent Reset — Find and clean stale processes left by Claude Code sessions
+Agent Reset — Reset an agent slot to a clean state between sessions
 
-Detects orphaned MCP servers (playwright, puppeteer, filesystem), Next.js dev
-servers from agent slots, stale vitest runners, and build processes.
+Scans for stale processes, orphaned worktrees, merged branches, stale WIP
+checklists, and git stashes. Pulls latest main when cleaning up.
 
 Commands:
-  (default)    Scan for stale processes and display them
+  (default)    Scan everything and show what needs cleanup (dry run)
 
 Options:
-  --kill       Kill all detected stale processes (default: dry run)
-  --force      Kill regardless of age threshold
+  --kill       Execute cleanup: kill processes, remove worktrees,
+               delete merged branches, clear stashes, pull main
+  --force      Kill processes regardless of age threshold
   --json       JSON output
   --ci         CI-compatible output
 
-Age thresholds (bypassed with --force):
-  MCP servers:   always stale (0 min)
-  Dev servers:   >2 hours
-  Test runners:  >30 minutes
-  Build procs:   >1 hour
+Cleanup actions (with --kill):
+  1. Kill stale processes (MCP servers, dev servers, test runners)
+  2. Remove orphaned .claude/worktrees/
+  3. Delete stale .claude/wip-checklist.md
+  4. Clear git stashes
+  5. Delete local branches merged into main
+  6. Checkout main and pull latest
 
 Examples:
-  crux sys agent-reset                   # Show what's stale
-  crux sys agent-reset --kill            # Kill stale processes
-  crux sys agent-reset --kill --force    # Kill all detected (ignore age)
+  crux sys agent-reset                   # Scan — show what's stale
+  crux sys agent-reset --kill            # Full cleanup + pull main
+  crux sys agent-reset --kill --force    # Kill all processes (ignore age)
 `;
 }
