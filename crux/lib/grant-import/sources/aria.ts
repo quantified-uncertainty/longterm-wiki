@@ -7,6 +7,7 @@
  * Source: https://www.aria.org.uk/programme-safeguarded-ai/
  */
 
+import { writeFileSync } from "fs";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
@@ -138,7 +139,8 @@ export const source: GrantSource = {
   sourceUrl: "https://www.aria.org.uk/programme-safeguarded-ai/",
 
   ensureData() {
-    // No external data to download — grants are curated inline
+    // Serialize curated data to cache file for snapshot capture
+    writeFileSync('/tmp/aria-grants.json', JSON.stringify(GRANTS));
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {
