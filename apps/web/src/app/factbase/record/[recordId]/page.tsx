@@ -19,22 +19,13 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-shared";
-import { isSid } from "@longterm-wiki/id-utils";
+import { tryResolveEntityRef } from "@/components/wiki/factbase/ref-detection";
 
-/** FactBase entity IDs are exactly 10 alphanumeric characters (legacy format). */
-const ENTITY_ID_RE = /^[A-Za-z0-9]{10}$/;
-
-/**
- * Try to resolve a string value as a FactBase entity reference.
- * Matches sid_-prefixed IDs, legacy 10-char alphanumeric IDs, and entity slugs.
- * This is used as a heuristic fallback when schema field definitions are unavailable.
- */
+/** Wrapper that binds getFactBaseEntity to the shared tryResolveEntityRef. */
 function tryResolveRef(value: unknown) {
-  if (typeof value !== "string") return undefined;
-  if (isSid(value) || ENTITY_ID_RE.test(value)) return getFactBaseEntity(value);
-  // Also try resolving as a slug (e.g., "amazon", "employee-equity-pool")
-  if (!value.includes(" ") && !value.includes("://")) return getFactBaseEntity(value);
-  return undefined;
+  return tryResolveEntityRef(value, getFactBaseEntity) as
+    | { name: string; id: string }
+    | undefined;
 }
 
 // ── Rendering mode ───────────────────────────────────────────────────

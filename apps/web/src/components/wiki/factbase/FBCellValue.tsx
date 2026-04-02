@@ -6,7 +6,6 @@
  */
 
 import type { FieldDef } from "@longterm-wiki/factbase";
-import { isSid } from "@longterm-wiki/id-utils";
 import { getFactBaseEntity } from "@data/factbase";
 import {
   formatKBCellValue,
@@ -16,6 +15,7 @@ import {
   shortDomain,
 } from "./format";
 import { FBRefLink } from "./FBRefLink";
+import { shouldResolveAsRef } from "./ref-detection";
 
 /** Fields that store fractions (0-1) representing percentages. */
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
@@ -57,10 +57,8 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
   // Heuristic ref detection when schema is unavailable: resolve sid_ IDs
   // and entity slugs that map to known FactBase entities. Only tries strings
   // without spaces or protocols to avoid false-positives on prose values.
-  if (!fieldType && typeof value === "string" && !value.includes(" ") && !isUrl(value)) {
-    if (isSid(value) || getFactBaseEntity(value)) {
-      return <FBRefLink id={value} />;
-    }
+  if (typeof value === "string" && shouldResolveAsRef(value, fieldType, getFactBaseEntity)) {
+    return <FBRefLink id={value} />;
   }
 
   // Source / key-publication URLs
