@@ -35,6 +35,7 @@ interface CommandOptions extends BaseOptions {
   ci?: boolean;
   dryRun?: boolean;
   skipEntityValidation?: boolean;
+  skipVerification?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -134,7 +135,11 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
 
   const dryRun = !!options.dryRun;
   const model = options.model as string | undefined;
-  const result = await runEnrichmentAgent(task, { dryRun, model });
+  const result = await runEnrichmentAgent(task, {
+    dryRun,
+    model,
+    skipVerification: !!options.skipVerification,
+  });
 
   if (!dryRun) {
     const { markTaskDone } = await import('../tablebase/task-ranker.ts');
@@ -239,6 +244,28 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
   }
 
+  // Source verification gate: check records against their source URLs before submission.
+  let recordsToSubmit = records;
+  let verificationNote = '';
+  if (!options.skipVerification) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-verification.ts');
+    const verifyResult = await verifyBeforeSubmit(table, records);
+    console.log(formatPreSubmitSummary(verifyResult));
+
+    recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
+
+    if (verifyResult.rejected.length > 0) {
+      verificationNote = ` (${verifyResult.rejected.length} rejected by source verification)`;
+    }
+
+    if (recordsToSubmit.length === 0) {
+      return {
+        exitCode: 1,
+        output: `All ${records.length} records were rejected by source verification.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
+      };
+    }
+  }
+
   const { getTableConfig } = await import('../tablebase/table-registry.ts');
   const tableConfig = getTableConfig(table);
   if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
@@ -247,14 +274,14 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     ? `${tableConfig.syncPath}?skipEntityValidation=true`
     : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    tableConfig.syncMethod, syncPath, { [tableConfig.syncBodyKey]: records },
+    tableConfig.syncMethod, syncPath, { [tableConfig.syncBodyKey]: recordsToSubmit },
   );
 
   if (!result.ok) {
     return { exitCode: 1, output: `Submit failed: ${result.message}` };
   }
 
-  const count = result.data.upserted ?? result.data.updated ?? records.length;
+  const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
 
   // Write manifest file for PR audit trail
   const { promises: fsPromises } = await import('fs');
@@ -271,22 +298,23 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
 
   const manifest = {
     table,
-    recordCount: records.length,
+    recordCount: recordsToSubmit.length,
+    recordsRejected: records.length - recordsToSubmit.length,
     submittedAt: now.toISOString(),
     verificationSummary: {
-      withVerification: records.filter((r: Record<string, unknown>) => r.verification).length,
-      withoutVerification: records.filter((r: Record<string, unknown>) => !r.verification).length,
+      withVerification: recordsToSubmit.filter((r: Record<string, unknown>) => r.verification).length,
+      withoutVerification: recordsToSubmit.filter((r: Record<string, unknown>) => !r.verification).length,
       verdicts: {
-        verified: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
-        contradicted: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
-        unverifiable: records.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
-        other: records.filter((r: Record<string, unknown>) => {
+        verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
+        contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
+        unverifiable: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
+        other: recordsToSubmit.filter((r: Record<string, unknown>) => {
           const v = r.verification as Record<string, unknown> | undefined;
           return v && !['confirmed', 'contradicted', 'unverifiable'].includes(v.verdict as string);
         }).length,
       },
     },
-    records: records.map((r: Record<string, unknown>) => {
+    records: recordsToSubmit.map((r: Record<string, unknown>) => {
       const summary: Record<string, unknown> = { id: r.id };
       if (r.personId) summary.personId = r.personId;
       if (r.organizationId) summary.organizationId = r.organizationId;
@@ -310,7 +338,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     exitCode: 0,
     output: options.ci
       ? JSON.stringify({ submitted: count, table })
-      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}\n  Manifest: ${manifestPath}`,
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${verificationNote}\n  Manifest: ${manifestPath}`,
   };
 }
 
@@ -905,6 +933,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     taskTypes,
     entityTypes,
     model,
+    skipVerification: !!options.skipVerification,
   });
 
   if (options.ci) {
@@ -1205,6 +1234,7 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
+  --skip-verification       Skip source verification before submit (for testing)
   --ci                      JSON output
 
 Modes:
@@ -1236,6 +1266,7 @@ Examples:
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
+  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-verification  # Submit without source verification
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing

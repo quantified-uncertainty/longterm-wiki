@@ -1072,6 +1072,20 @@
       "when": 1782547200000,
       "tag": "0152_data_sources_and_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 153,
+      "version": "7",
+      "when": 1782720000000,
+      "tag": "0153_platform_accounts",
+      "breakpoints": true
+    },
+    {
+      "idx": 154,
+      "version": "7",
+      "when": 1782806400000,
+      "tag": "0154_create_political_scores_offices",
+      "breakpoints": true
     }
   ]
 }

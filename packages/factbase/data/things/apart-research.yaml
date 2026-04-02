@@ -45,6 +45,13 @@ facts:
     source: https://apartresearch.com/impact
     notes: "Founded by Esben Kran at age 22 after leaving grad school; currently Board Member per impact page"
 
+  - id: f_eUZm0ntEVw
+    property: annual-budget
+    value: 700000
+    asOf: 2024
+    source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
+    notes: "Raised approximately $700,000 in 2024. This was their biggest year; organization tripled core team size."
+
   - id: f_aR7kYmPfnZ
     property: annual-budget
     value: 954800

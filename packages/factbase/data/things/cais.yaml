@@ -85,6 +85,22 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310."
 
+  - id: f_2gFP8riiGw
+    property: annual-expenses
+    value: "816760"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990. First year of operations; low expenses relative to revenue."
+
+  - id: f_YgMeE4EFsw
+    property: annual-expenses
+    value: "8134449"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990. Significant increase as organization scaled up."
+
   - id: f_DrCHRnYm9V
     property: annual-expenses
     value: "7163607"
@@ -149,6 +165,30 @@ facts:
     asOf: 2023-10
     source: https://arxiv.org/abs/2310.01405
     notes: "By Zou, Phan, Chen, Campbell, Guo, Ren, Pan, Yin, Mazeika, Dombrowski, Goel, Li, Byun, Wang, Mallen, Basart, Koyejo, Song, Li, Hendrycks"
+
+  - id: f_BnRfdZYOjA
+    property: net-assets
+    value: "5843300"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990. End of first year."
+
+  - id: f_Wh3ZWtew6g
+    property: net-assets
+    value: "8538240"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990."
+
+  - id: f_DldXXRYERQ
+    property: net-assets
+    value: "11609718"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/881751310
+    notes: "From IRS Form 990."
 
   - id: f_apd264NL5h
     property: publication

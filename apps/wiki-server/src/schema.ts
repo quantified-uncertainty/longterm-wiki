@@ -3268,6 +3268,48 @@ export const blueskyPosts = pgTable(
 // ── Political Races ──────────────────────────────────────────────────────
 //
 // Tracks political races relevant to AI policy (2026 midterms, ballot measures).
+// ---------------------------------------------------------------------------
+// Platform accounts — external platform identities for wiki entities
+// ---------------------------------------------------------------------------
+
+/** Maps wiki entities (people, orgs) to accounts on external platforms. */
+export const platformAccounts = pgTable(
+  "platform_accounts",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    /** Platform identifier: 'lesswrong', 'eaforum', 'github', 'twitter', etc. */
+    platform: text("platform").notNull(),
+    /** Username/slug/handle on the platform */
+    platformUsername: text("platform_username").notNull(),
+    /** Immutable platform-internal ID (LW _id, GitHub numeric ID, etc.) */
+    platformUserId: text("platform_user_id"),
+    /** FK to entities.stable_id — nullable (accounts can exist before linking) */
+    entityStableId: text("entity_stable_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Cached display name from the platform */
+    displayName: text("display_name"),
+    /** Full URL to the profile page */
+    profileUrl: text("profile_url"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_pa_platform_username").on(table.platform, table.platformUsername),
+    index("idx_pa_entity").on(table.entityStableId),
+    index("idx_pa_platform_user_id").on(table.platform, table.platformUserId),
+  ]
+);
+
+// ---------------------------------------------------------------------------
+// Political races — election tracking
+// ---------------------------------------------------------------------------
+
 // Each race can have multiple candidates via the race_candidates join table.
 
 export const politicalRaces = pgTable(
@@ -3507,5 +3549,112 @@ export const operationsLog = pgTable(
     index("idx_ops_log_created").on(table.createdAt),
     index("idx_ops_log_pr").on(table.prNumber),
     index("idx_ops_log_session").on(table.agentSessionId),
+  ]
+);
+
+// ── Political Scores ────────────────────────────────────────────────────
+//
+// Scorecard ratings from interest groups (LCV, Humane Society, FP4A, etc.)
+// for politicians. One row per (politician, scorer, year, scoreType).
+
+export const politicalScores = pgTable(
+  "political_scores",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the politician */
+    politicianEntityId: text("politician_entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback when FK unresolved */
+    politicianDisplayName: text("politician_display_name"),
+    /** Scoring organization slug, e.g. 'lcv', 'humane_society', 'fp4a' */
+    scorerOrg: text("scorer_org").notNull(),
+    /** Optional FK to entities.stable_id for the scoring organization */
+    scorerEntityId: text("scorer_entity_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Score value, typically 0-100 */
+    score: numeric("score").notNull(),
+    /** Maximum possible score (default 100) */
+    maxScore: numeric("max_score").notNull().default("100"),
+    /** Year the score applies to */
+    year: integer("year").notNull(),
+    /** Category: 'environmental', 'animal_welfare', 'foreign_policy', etc. */
+    scoreType: text("score_type"),
+    /** URL to the scorecard page */
+    sourceUrl: text("source_url"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_polscore_politician").on(table.politicianEntityId),
+    index("idx_polscore_scorer").on(table.scorerEntityId),
+    index("idx_polscore_year").on(table.year),
+    index("idx_polscore_score_type").on(table.scoreType),
+    uniqueIndex("uq_political_scores_natural_key").on(
+      table.politicianEntityId,
+      table.scorerOrg,
+      table.year,
+      table.scoreType
+    ),
+  ]
+);
+
+// ── Political Offices ───────────────────────────────────────────────────
+//
+// Current and past political offices held by politicians.
+// Enables queries like "all current US senators" or "NC representatives".
+
+export const politicalOffices = pgTable(
+  "political_offices",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the politician */
+    politicianEntityId: text("politician_entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /** Display name fallback */
+    politicianDisplayName: text("politician_display_name"),
+    /** Office type: senator, representative, governor, state_senator, etc. */
+    officeType: text("office_type").notNull(),
+    /** Jurisdiction: 'US', 'NY', 'TX', etc. */
+    jurisdiction: text("jurisdiction").notNull(),
+    /** District: 'NC-4', 'NJ-5', etc. */
+    district: text("district"),
+    /** Party: 'democratic', 'republican', 'independent' */
+    party: text("party"),
+    /** Status: incumbent, candidate, former */
+    status: text("status").notNull().default("incumbent"),
+    /** Term start: YYYY or YYYY-MM */
+    termStart: text("term_start"),
+    /** Term end: YYYY or YYYY-MM */
+    termEnd: text("term_end"),
+    sourceUrl: text("source_url"),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_poloffice_politician").on(table.politicianEntityId),
+    index("idx_poloffice_type").on(table.officeType),
+    index("idx_poloffice_jurisdiction").on(table.jurisdiction),
+    index("idx_poloffice_party").on(table.party),
+    index("idx_poloffice_status").on(table.status),
   ]
 );

@@ -182,6 +182,7 @@ import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-p
 import type { DataQualityRoute } from "@wiki-server/data-quality-route";
 import type { TalentFlowsRoute } from "@wiki-server/talent-flows-route";
 import type { JobsRoute } from "@wiki-server/jobs-route";
+import type { DataSourcesRoute } from "@wiki-server/data-sources-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -430,4 +431,46 @@ export type RpcJobsListResult = InferResponseType<JobsClient['index']['$get'], 2
 
 /** A single job entry from the list endpoint */
 export type RpcJobEntry = RpcJobsListResult['entries'][number];
+
+// ============================================================================
+// Hono RPC client — Data Sources API
+// ============================================================================
+
+/**
+ * Create a typed Hono RPC client for the data sources API.
+ * Returns null if the wiki-server URL is not configured.
+ */
+export function getDataSourcesRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 60;
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<DataSourcesRoute>(`${config.serverUrl}/api/data-sources`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+type DataSourcesClient = NonNullable<ReturnType<typeof getDataSourcesRpcClient>>;
+
+/** Inferred response type for GET /api/data-sources/ (list all) */
+export type RpcDataSourceListResult = InferResponseType<DataSourcesClient['index']['$get'], 200>;
+
+/** A single data source from the list endpoint */
+export type RpcDataSource = RpcDataSourceListResult['dataSources'][number];
+
+/** Inferred response type for GET /api/data-sources/:id (used by detail page — PR 2) */
+export type RpcDataSourceDetailResult = InferResponseType<DataSourcesClient[':id']['$get'], 200>;
+
+/** Inferred response type for GET /api/data-sources/:id/snapshots (used by detail page — PR 2) */
+export type RpcSnapshotListResult = InferResponseType<DataSourcesClient[':id']['snapshots']['$get'], 200>;
 

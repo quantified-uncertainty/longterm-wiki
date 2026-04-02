@@ -216,7 +216,10 @@ function transformEntity(raw, expertMap, orgMap) {
         affiliation,
         affiliationId: expert?.affiliation || undefined,
         knownFor,
-        positions: expert?.positions ?? [],
+        positions: [
+          ...(expert?.positions ?? []),
+          ...(raw.positions ?? []),
+        ],
         customFields: filterCustomFields('Role', 'Known For', 'Affiliation'),
       };
     }
