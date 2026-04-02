@@ -97,7 +97,7 @@ facts:
     property: revenue
     value: 6.097e+10
     asOf: 2024-01
-    source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025
+    source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2024
     notes: "FY2024 annual revenue ($60.97B); 126% YoY growth"
 
   - id: f_ESnkMeEsww

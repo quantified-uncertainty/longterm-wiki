@@ -64,6 +64,7 @@ facts:
       2024. Decrease from 2023 likely due to reorganization of internal billing after
       Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
 
+  # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
     property: safety-researcher-count
     value: 120

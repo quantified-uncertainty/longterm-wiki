@@ -1578,7 +1578,10 @@ function buildChartData(
       // Try to match to a funding round for label
       const round = sortedRounds.find((r) => {
         const roundDate = r.fields.date ? String(r.fields.date) : "";
-        return roundDate && f.asOf && roundDate.startsWith(f.asOf.slice(0, 7));
+        const prefix = f.asOf!.slice(0, 7);
+        // Only match if we have month-level precision (7+ chars like "2024-03")
+        if (prefix.length < 7) return false;
+        return roundDate && roundDate.startsWith(prefix);
       });
       const roundName = round ? (round.fields.name ? String(round.fields.name) : titleCase(round.key)) : undefined;
       return { date: f.asOf!, value: factNumericValue(f)!, label: roundName };

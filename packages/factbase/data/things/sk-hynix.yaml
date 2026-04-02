@@ -53,11 +53,11 @@ facts:
 
   - id: f_skRv2023dw
     property: revenue
-    value: 2.45e+10
+    value: 2.5e+10
     asOf: 2023-12
     source: https://news.skhynix.com/sk-hynix-reports-fourth-quarter-2023-financial-results/
-    notes: "2023 annual revenue (~$24.5B; KRW 32.8T). Memory downturn year with
-      operating loss."
+    notes: "2023 annual revenue (~$25.0B; KRW 32.8T at ~1,310 KRW/USD avg rate).
+      Memory downturn year with operating loss."
 
   - id: f_skh_rev_2024
     property: revenue
@@ -73,7 +73,7 @@ facts:
     asOf: 2025-12
     source: https://news.skhynix.com/sk-hynix-announces-fy25-financial-results/
     notes: "2025 annual revenue (~$72B; KRW 97.1T). Record year; HBM revenue more
-      than doubled YoY."
+      than doubled YoY. (source URL unverified)"
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_skHc2024gv
