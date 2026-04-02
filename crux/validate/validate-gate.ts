@@ -476,6 +476,15 @@ const PARALLEL_STEPS: Step[] = [
     requiresServer: true,
   },
   {
+    id: 'factbase-record-refs',
+    name: 'FactBase record ref resolution (no unresolvable sid_ IDs in record fields)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-record-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: unresolvable entity references in FactBase records cause
+    // raw sid_ IDs to display in the UI on entity pages.
+  },
+  {
     id: 'soft-fks',
     name: 'Soft FK entity reference validation (advisory)',
     command: 'npx',

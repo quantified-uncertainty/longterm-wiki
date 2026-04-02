@@ -81,7 +81,7 @@ facts:
   - id: f_b56n3kcD2g
     property: valuation
     value: 1.57e+11
-    asOf: 2024-12
+    asOf: 2024-10
     notes: "October 2024 funding round valuation"
 
   - id: f_Qj7kR2pX9v
@@ -102,7 +102,7 @@ facts:
   - id: f_yvm9QNFjdA
     property: revenue
     value: 3.4e+9
-    asOf: 2024-10
+    asOf: 2024-06
     notes: "Annualized run rate as of mid-2024"
 
   - id: f_w3pWgejwIA
@@ -121,38 +121,8 @@ facts:
     notes: "Annualized revenue run rate as of February 2026 per Sacra; up from
       $20B at end of 2025"
 
-  # ── User Count ─────────────────────────────────────────────────
-  - id: f_5VcbvP89LA
-    property: user-count
-    value: 1e+8
-    asOf: 2023-02
-    notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
-      fastest-growing consumer application in history at that time"
-
-  - id: f_br0wYi0tog
-    property: user-count
-    value: 4e+8
-    asOf: 2025-02
-    source: https://openai.com/index/400-million-users/
-    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO
-      Sam Altman"
-
-  - id: f_D0oBnU732w
-    property: user-count
-    value: 8e+8
-    asOf: 2025-10
-    source: https://techcrunch.com/2025/10/06/sam-altman-says-chatgpt-has-hit-800m-weekly-active-users/
-    notes: "ChatGPT weekly active users as of October 6, 2025; announced by Sam
-      Altman. Up from 500M in March 2025 and 700M in August 2025."
-
-  - id: f_irWobt0L9Q
-    property: user-count
-    value: 9e+8
-    asOf: 2026-02
-    source: https://almcorp.com/blog/chatgpt-900-million-weekly-active-users/
-    notes: "ChatGPT reached 900M weekly active users announced February 27, 2026"
-
   # ── Headcount ──────────────────────────────────────────────────
+  # UNVERIFIED ESTIMATE
   - id: f_o1tcwe2T0w
     property: headcount
     value: 3500
@@ -195,6 +165,13 @@ facts:
       target. Inference costs reached $8.4B in 2025, constraining margins."
 
   # ── Monthly Active Users ──────────────────────────────────────
+  - id: f_5VcbvP89LA
+    property: monthly-active-users
+    value: 1e+8
+    asOf: 2023-02
+    notes: "ChatGPT reached 100M monthly active users within 2 months of launch;
+      fastest-growing consumer application in history at that time"
+
   - id: f_cIPm9agJVw
     property: monthly-active-users
     value: 2e+8
@@ -203,6 +180,15 @@ facts:
     notes: "Estimated MAU based on traffic data and weekly active user
       extrapolation; OpenAI does not officially disclose MAU"
 
+  # ── Weekly Active Users ──────────────────────────────────────
+  - id: f_br0wYi0tog
+    property: weekly-active-users
+    value: 4e+8
+    asOf: 2025-02
+    source: https://openai.com/index/400-million-users/
+    notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO
+      Sam Altman"
+
   - id: f_OXCw5BvQtQ
     property: weekly-active-users
     value: 8e+8
@@ -210,6 +196,13 @@ facts:
     source: https://www.demandsage.com/chatgpt-statistics/
     notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman.
       Some sources estimate 1B+ MAU by January 2026."
+
+  - id: f_irWobt0L9Q
+    property: weekly-active-users
+    value: 9e+8
+    asOf: 2026-02
+    source: https://almcorp.com/blog/chatgpt-900-million-weekly-active-users/
+    notes: "ChatGPT reached 900M weekly active users announced February 27, 2026"
 
   # ── Business Customers ────────────────────────────────────────
   - id: f_CAsPvnUElQ
@@ -321,6 +314,7 @@ facts:
       Daily human review audits exceed 500,000 samples."
 
   # ── Interpretability Team Size ────────────────────────────────
+  # UNVERIFIED ESTIMATE
   - id: f_oRir5z0yxA
     property: interpretability-team-size
     value: 40
@@ -351,6 +345,7 @@ facts:
       after three quarters, 68% at 12 months. Paid churn under 4% monthly."
 
   # ── Customer Concentration ────────────────────────────────────
+  # UNVERIFIED ESTIMATE
   - id: f_edr6LBOQ9A
     property: customer-concentration
     value: 10
@@ -420,6 +415,7 @@ facts:
       stock-based compensation in H1"
 
   # ── Safety Staffing Ratio ─────────────────────────────────────
+  # UNVERIFIED ESTIMATE
   - id: f_b0yb0usUYg
     property: safety-staffing-ratio
     value: 19

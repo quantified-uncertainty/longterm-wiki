@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
+import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFPRows, type SortDir } from "./funding-programs-sort";
@@ -341,7 +341,6 @@ export function FundingProgramsListTable({
                 onSort={handleSort}
                 className="text-center"
               />
-              <th className="text-center py-2.5 px-3 font-medium">Verified</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -352,12 +351,15 @@ export function FundingProgramsListTable({
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  <Link
-                    href={`/funding-programs/${row.id}`}
-                    className="font-medium text-foreground hover:text-primary transition-colors"
-                  >
-                    {row.name}
-                  </Link>
+                  <span className="flex items-center gap-1.5">
+                    <RecordVerificationDot verdict={row.verdict?.verdict} />
+                    <Link
+                      href={`/funding-programs/${row.id}`}
+                      className="font-medium text-foreground hover:text-primary transition-colors"
+                    >
+                      {row.name}
+                    </Link>
+                  </span>
                   {row.applicationUrl && (
                     <a
                       href={row.applicationUrl}
@@ -426,10 +428,6 @@ export function FundingProgramsListTable({
                   )}
                 </td>
 
-                {/* Verified */}
-                <td className="py-2.5 px-3 text-center">
-                  <SourceCheckBadge verdict={row.verdict} />
-                </td>
               </tr>
             ))}
           </tbody>

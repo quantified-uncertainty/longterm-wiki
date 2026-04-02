@@ -71,7 +71,8 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
     });
 
     if (!dsResult.ok) {
-      const msg = `Failed to sync data source ${sourceId}: ${dsResult.error}`;
+      const detail = !dsResult.ok ? dsResult.message : '';
+      const msg = `Failed to sync data source ${sourceId}: ${dsResult.error}${detail ? ` — ${detail}` : ''}`;
       console.warn(`  [snapshot] ${msg}`);
       return { ok: false, error: msg };
     }
@@ -93,7 +94,9 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
       }
       return { ok: true };
     } else {
-      const msg = `Failed to store snapshot for ${sourceId}: ${snapResult.error}`;
+      const sizeMB = (rawContent.length / (1024 * 1024)).toFixed(1);
+      const detail = !snapResult.ok ? snapResult.message : '';
+      const msg = `Failed to store snapshot for ${sourceId} (${sizeMB}MB): ${snapResult.error}${detail ? ` — ${detail}` : ''}`;
       console.warn(`  [snapshot] ${msg}`);
       return { ok: false, error: msg };
     }

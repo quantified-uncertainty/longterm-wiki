@@ -64,6 +64,14 @@ facts:
     source: https://www.builtinsf.com/articles/safe-superintelligence-raises-2b-32b-valuation-20250415
     notes: "Total venture capital raised across all rounds through April 2025"
 
+  - id: f_qPnB3Lk8Rg
+    property: headcount
+    value: 10
+    asOf: 2024-09
+    source: https://www.cio.com/article/3504983/ilya-sutskevers-safe-superintelligence-inc-lands-1b-investment.html
+    notes: "Approximately 10 employees at time of $1B funding round in September 2024;
+      company planned to use funds for compute and hiring"
+
   - id: f_H1fxwtcsOQ
     property: headcount
     value: 50

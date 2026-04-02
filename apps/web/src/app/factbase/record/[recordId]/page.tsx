@@ -19,19 +19,13 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable } from "@/components/wiki/factbase/factbase-detail-shared";
+import { tryResolveEntityRef } from "@/components/wiki/factbase/ref-detection";
 
-/** FactBase entity IDs are exactly 10 alphanumeric characters. */
-const ENTITY_ID_RE = /^[A-Za-z0-9]{10}$/;
-
-/**
- * Try to resolve a string value as a FactBase entity reference.
- * Returns the entity if the value matches the 10-char alphanumeric ID format
- * and corresponds to a known entity. This is used as a heuristic fallback when
- * schema field definitions are unavailable.
- */
+/** Wrapper that binds getFactBaseEntity to the shared tryResolveEntityRef. */
 function tryResolveRef(value: unknown) {
-  if (typeof value !== "string" || !ENTITY_ID_RE.test(value)) return undefined;
-  return getFactBaseEntity(value);
+  return tryResolveEntityRef(value, getFactBaseEntity) as
+    | { name: string; id: string }
+    | undefined;
 }
 
 // ── Rendering mode ───────────────────────────────────────────────────

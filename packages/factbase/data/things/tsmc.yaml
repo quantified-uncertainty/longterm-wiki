@@ -55,14 +55,35 @@ facts:
     asOf: 2026-03
 
   # ── Headcount ───────────────────────────────────────────────────
-  - id: f_tsmc_hc_2024
+  - id: f_tsHc2022kp
+    property: headcount
+    value: 73090
+    asOf: 2022-12
+    source: https://www.macrotrends.net/stocks/charts/TSM/taiwan-semiconductor-manufacturing/number-of-employees
+    notes: "73,090 employees at end of 2022; 12.2% increase from 2021"
+
+  - id: f_tsHc2023qv
     property: headcount
     value: 76478
+    asOf: 2023-12
+    source: https://www.macrotrends.net/stocks/charts/TSM/taiwan-semiconductor-manufacturing/number-of-employees
+    notes: "76,478 employees at end of 2023; 4.6% increase from 2022"
+
+  - id: f_tsmc_hc_2024
+    property: headcount
+    value: 83825
     asOf: 2024-12
-    source: https://investor.tsmc.com/english/annual-reports
-    notes: "End of 2024; primarily in Taiwan"
+    source: https://investor.tsmc.com/static/annualReports/2024/english/index.html
+    notes: "83,825 employees worldwide at end of 2024 per annual report; 9.6% increase from 2023"
 
   # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_tsRv2022wn
+    property: revenue
+    value: 7.588e+10
+    asOf: 2022-12
+    source: https://investor.tsmc.com/static/annualReports/2022/english/index.html
+    notes: "2022 annual revenue ($75.88B); record year, 33.5% growth from 2021"
+
   - id: f_tsmc_rev_2023
     property: revenue
     value: 6.94e+10
@@ -76,6 +97,13 @@ facts:
     asOf: 2024-12
     source: https://investor.tsmc.com/english/annual-reports
     notes: "2024 annual revenue ($87.8B); 26.5% YoY growth driven by AI chip demand"
+
+  - id: f_tsRv2025jt
+    property: revenue
+    value: 1.224e+11
+    asOf: 2025-12
+    source: https://www.manufacturingdive.com/news/tsmc-q4-full-year-2025-earnings-ai-taiwan/809775/
+    notes: "2025 annual revenue ($122.4B); 35.9% YoY growth driven by AI demand"
 
   # ── Market share ────────────────────────────────────────────────
   - id: f_tsmc_mshare_overall

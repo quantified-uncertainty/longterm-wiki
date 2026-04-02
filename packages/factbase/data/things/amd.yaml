@@ -50,6 +50,20 @@ facts:
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_adRv2022gk
+    property: revenue
+    value: 2.36e+10
+    asOf: 2022-12
+    source: https://ir.amd.com/news-events/press-releases/detail/1115/amd-reports-fourth-quarter-and-full-year-2022-financial
+    notes: "2022 annual revenue ($23.6B); first full year with Xilinx contribution"
+
+  - id: f_adRv2023px
+    property: revenue
+    value: 2.27e+10
+    asOf: 2023-12
+    source: https://www.macrotrends.net/stocks/charts/AMD/amd/revenue
+    notes: "2023 annual revenue ($22.7B); slight decline from 2022"
+
   - id: f_amd_rev_2024
     property: revenue
     value: 2.58e+10
@@ -57,10 +71,33 @@ facts:
     source: https://ir.amd.com/news-events/press-releases
     notes: "2024 annual revenue ($25.8B); Data Center segment grew significantly"
 
+  - id: f_adRv2025ht
+    property: revenue
+    value: 3.46e+10
+    asOf: 2025-12
+    source: https://ir.amd.com/news-events/press-releases/detail/1276/amd-reports-fourth-quarter-and-full-year-2025-financial-results
+    notes: "2025 annual revenue ($34.6B); record year, 34% YoY growth. Data Center
+      segment was $16.6B (48% of total)."
+
   # ── Headcount ───────────────────────────────────────────────────
+  - id: f_adHc2022ws
+    property: headcount
+    value: 15500
+    asOf: 2022-12
+    source: https://www.macrotrends.net/stocks/charts/AMD/amd/number-of-employees
+    notes: "15,500 employees at end of 2022; reflects partial-year Xilinx integration"
+
+  - id: f_adHc2023vr
+    property: headcount
+    value: 25000
+    asOf: 2023-12
+    source: https://www.macrotrends.net/stocks/charts/AMD/amd/number-of-employees
+    notes: "25,000 employees at end of 2023; 61% increase from 2022 due to Xilinx
+      and Pensando acquisitions fully integrated"
+
   - id: f_amd_hc_2024
     property: headcount
     value: 28000
     asOf: 2024-12
     source: https://stockanalysis.com/stocks/amd/employees/
-    notes: "Approximately 28,000 employees as of December 31, 2024 (up from 26,000)"
+    notes: "Approximately 28,000 employees as of December 31, 2024 (up from 25,000)"

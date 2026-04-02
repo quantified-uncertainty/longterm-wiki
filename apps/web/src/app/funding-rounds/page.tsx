@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
-import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
+import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
 import {
@@ -139,7 +139,6 @@ export default function FundingRoundsPage() {
                   Lead Investor
                 </th>
                 <th className="text-center py-2.5 px-3 font-medium">Date</th>
-                <th className="text-center py-2.5 px-3 font-medium">Verified</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -151,12 +150,15 @@ export default function FundingRoundsPage() {
                   className="hover:bg-muted/20 transition-colors"
                 >
                   <td className="py-2 px-3">
-                    <Link
-                      href={`/funding-rounds/${row.key}`}
-                      className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
+                    <span className="flex items-center gap-1.5">
+                      <RecordVerificationDot verdict={verdict?.verdict} />
+                      <Link
+                        href={`/funding-rounds/${row.key}`}
+                        className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                      >
+                        {row.name}
+                      </Link>
+                    </span>
                   </td>
                   <td className="py-2 px-3 text-xs">
                     {row.companyHref ? (
@@ -209,9 +211,6 @@ export default function FundingRoundsPage() {
                   </td>
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                     {row.date ? formatKBDate(row.date) : ""}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    <SourceCheckBadge verdict={verdict} />
                   </td>
                 </tr>
                 );

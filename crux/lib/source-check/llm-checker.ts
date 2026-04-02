@@ -15,7 +15,7 @@ import {
 } from '../../../apps/wiki-server/src/api-types.ts';
 import type { LlmSourceCheckResult } from './types.ts';
 
-const LlmResponseSchema = z.object({
+export const LlmResponseSchema = z.object({
   verdict: z.string().default('unverifiable'),
   confidence: z.number().min(0).max(1).default(0.5),
   extracted_value: z.string().default(''),

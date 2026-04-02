@@ -13,6 +13,7 @@ import {
 import { DIVISION_TYPE_LABELS } from "./division-constants";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { DivisionsTable, type DivisionRow, type TypeSummary } from "./divisions-table";
+import { VerificationSummaryBanner } from "@/components/directory/VerificationSummaryBanner";
 
 export const metadata: Metadata = {
   title: "Divisions",
@@ -143,6 +144,8 @@ export default function DivisionsPage() {
           areas tracked in the knowledge base.
         </p>
       </div>
+
+      <VerificationSummaryBanner recordType="division" totalOverride={totalDivisions} />
 
       <DivisionsTable
         rows={rows}

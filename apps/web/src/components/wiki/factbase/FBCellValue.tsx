@@ -6,6 +6,7 @@
  */
 
 import type { FieldDef } from "@longterm-wiki/factbase";
+import { getFactBaseEntity } from "@data/factbase";
 import {
   formatKBCellValue,
   formatKBDate,
@@ -14,6 +15,7 @@ import {
   shortDomain,
 } from "./format";
 import { FBRefLink } from "./FBRefLink";
+import { shouldResolveAsRef } from "./ref-detection";
 
 /** Fields that store fractions (0-1) representing percentages. */
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
@@ -47,8 +49,9 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
 
   const fieldType = fieldDef?.type;
 
-  // Entity references
-  if (fieldType === "ref" && typeof value === "string") {
+  // Entity references — handles both schema-confirmed refs (fieldType="ref")
+  // and heuristic detection (sid_ IDs, entity slugs) when schema is unavailable.
+  if (typeof value === "string" && shouldResolveAsRef(value, fieldType, getFactBaseEntity)) {
     return <FBRefLink id={value} />;
   }
 
@@ -153,6 +156,20 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
         </span>
       );
     }
+  }
+
+  // Generic URL strings in any column
+  if (typeof value === "string" && isUrl(value)) {
+    return (
+      <a
+        href={value}
+        className="text-primary hover:underline text-xs"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {shortDomain(value)}
+      </a>
+    );
   }
 
   // Fallback
