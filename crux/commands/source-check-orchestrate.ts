@@ -44,6 +44,9 @@ import {
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from '../lib/source-check/prompt-guidelines.ts';
 import { str, strOrNull, numOrNull, resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
+import { matchRecordAgainstSnapshot } from '../lib/source-check/deterministic-matcher.ts';
+import { getManifest } from '../lib/grant-import/manifests/index.ts';
+import { getLatestSnapshot } from '../lib/wiki-server/data-sources.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -151,6 +154,8 @@ interface VerifyResult {
   reasoning: string;
   sourceUrl: string;
   errorType?: SourceFetchErrorType;
+  /** 'deterministic-row-match' for snapshot matching, or undefined for LLM */
+  checkerModel?: string;
 }
 
 interface VerifyError {
@@ -867,11 +872,80 @@ Respond with ONLY a JSON object (no markdown code fences):
 }`;
 }
 
+/**
+ * Try deterministic row-matching for a grant record against its source snapshot.
+ * Returns a VerifyResult if deterministic matching produces a definitive answer,
+ * or null to fall through to LLM verification.
+ */
+async function tryDeterministicMatch(item: VerifyItem): Promise<VerifyResult | null> {
+  if (item.data.kind !== 'record') return null;
+
+  // Look up the source URL to find which data source this grant came from
+  const sourceUrl = item.sourceUrl;
+  if (!sourceUrl) return null;
+
+  // Find a manifest whose fetchUrl matches the grant's source URL
+  const { MANIFESTS } = await import('../lib/grant-import/manifests/index.ts');
+  const manifest = Object.values(MANIFESTS).find(m => m.fetchUrl && sourceUrl.includes(m.fetchUrl));
+  if (!manifest || manifest.schema.fields.length === 0) return null;
+
+  // Fetch the latest snapshot for this data source
+  const snapshotResult = await getLatestSnapshot(manifest.sourceId);
+  if (!snapshotResult.ok || !snapshotResult.data) return null;
+
+  const snapshot = snapshotResult.data as { rawContent: string; recordCount?: number };
+  if (!snapshot.rawContent) return null;
+
+  // Run deterministic matching
+  const result = matchRecordAgainstSnapshot(
+    item.data.fields as Record<string, unknown>,
+    snapshot.rawContent,
+    manifest,
+  );
+
+  // Only use deterministic result if it's definitive
+  if (!result.matched && result.confidence < 0.3) {
+    // Very low confidence — fall through to LLM for a second opinion
+    return null;
+  }
+
+  const verdict: SourceCheckVerdict = result.matched
+    ? (result.confidence >= 0.9 ? 'confirmed' : 'partial')
+    : 'unverifiable';
+
+  return {
+    itemId: item.id,
+    kind: item.kind,
+    description: item.description,
+    verdict,
+    confidence: result.confidence,
+    extractedValue: result.matchedRow
+      ? `Matched row: ${JSON.stringify(result.matchedRow).slice(0, 200)}`
+      : 'No matching row found in source snapshot',
+    reasoning: `[deterministic-row-match] ${result.reasoning}`,
+    sourceUrl: item.sourceUrl ?? manifest.fetchUrl ?? '',
+    checkerModel: 'deterministic-row-match',
+  };
+}
+
 async function verifySingleItem(
   item: VerifyItem,
   client: ReturnType<typeof createLlmClient>,
   useWebSearch: boolean,
 ): Promise<VerifyResult | VerifyError> {
+  // ── Deterministic matching path (Discussion #3567 Phase 3) ──
+  // For record-type items (grants, etc.), try deterministic row-matching
+  // against a source snapshot before falling back to LLM verification.
+  if (item.data.kind === 'record' && item.data.recordType === 'grant') {
+    try {
+      const deterministicResult = await tryDeterministicMatch(item);
+      if (deterministicResult) return deterministicResult;
+    } catch (e: unknown) {
+      // Fall through to LLM verification on any error
+      console.warn(`[source-check] Deterministic matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
   let sourceUrl = item.sourceUrl;
   let sourceContent: string | null = null;
 
@@ -1019,6 +1093,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       extractedValue: result.extractedValue,
       reasoning: result.reasoning,
       entityId: recordData.entityId,
+      checkerModel: result.checkerModel,
     }, '[source-check]');
 
     // Store aggregate verdict
