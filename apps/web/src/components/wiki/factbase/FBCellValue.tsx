@@ -54,9 +54,10 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
     return <FBRefLink id={value} />;
   }
 
-  // Heuristic ref detection when schema is unavailable: resolve sid_ IDs,
-  // legacy 10-char IDs, and entity slugs that map to known FactBase entities.
-  if (!fieldType && typeof value === "string" && !isUrl(value)) {
+  // Heuristic ref detection when schema is unavailable: resolve sid_ IDs
+  // and entity slugs that map to known FactBase entities. Only tries strings
+  // without spaces or protocols to avoid false-positives on prose values.
+  if (!fieldType && typeof value === "string" && !value.includes(" ") && !isUrl(value)) {
     if (isSid(value) || getFactBaseEntity(value)) {
       return <FBRefLink id={value} />;
     }

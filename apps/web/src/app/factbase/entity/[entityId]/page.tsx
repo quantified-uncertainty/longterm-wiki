@@ -16,7 +16,6 @@ import type { FactBaseRecordEntry } from "@/data/factbase";
 import {
   formatKBFactValue,
   formatKBDate,
-  formatKBCellValue,
   shortDomain,
   titleCase,
   isUrl,
