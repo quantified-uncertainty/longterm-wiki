@@ -68,7 +68,7 @@ interface IdRegistry {
 // Patterns
 // ---------------------------------------------------------------------------
 
-/** Check if a string is a sid_-prefixed stableId. */
+/** Check if a string is a sid_-prefixed stableId (mirrors isSid from @longterm-wiki/id-utils). */
 export function isSidRef(value: string): boolean {
   return value.startsWith("sid_");
 }

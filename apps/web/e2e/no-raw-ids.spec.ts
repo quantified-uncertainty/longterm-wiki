@@ -46,129 +46,74 @@ const RAW_ID_PATTERNS = [
  *  - Footer metadata
  *  - Dev-mode debug overlays
  */
-async function assertNoRawIds(page: Page, url: string) {
+/** Navigate to a URL and wait for main content. */
+async function loadPage(page: Page, url: string) {
   const response = await page.goto(url, {
     waitUntil: "networkidle",
     timeout: 45000,
   });
-
-  // Page must load successfully (200, or redirect-then-200)
-  expect(
-    response?.status(),
-    `Expected ${url} to return a successful status`
-  ).toBeLessThan(400);
-
-  // Wait for main content to be present
+  expect(response?.status(), `Expected ${url} to return a successful status`).toBeLessThan(400);
   const main = page.locator("main, article, [role='main']").first();
   await expect(main).toBeVisible({ timeout: 15000 });
+}
 
-  // Get all visible text from main content area
-  const visibleText = await page.evaluate(() => {
+/** Get visible text from the main content area. */
+function getMainText(page: Page) {
+  return page.evaluate(() => {
     const mainEl = document.querySelector("main") || document.body;
     return mainEl.innerText;
   });
+}
 
+/** Check text for raw ID patterns and report with context snippets. */
+function checkTextForRawIds(text: string, url: string, label?: string) {
   for (const { name, pattern } of RAW_ID_PATTERNS) {
-    const globalPattern = new RegExp(pattern.source, "g");
-    const matches = visibleText.match(globalPattern);
+    const matches = text.match(new RegExp(pattern.source, "g"));
     if (matches) {
-      // Show surrounding context for each match to help locate the bug
-      const contextSnippets = matches.slice(0, 5).map((m) => {
-        const idx = visibleText.indexOf(m);
-        const start = Math.max(0, idx - 40);
-        const end = Math.min(visibleText.length, idx + m.length + 40);
-        return `  "...${visibleText.slice(start, end).replace(/\n/g, "\\n")}..."`;
+      const unique = [...new Set(matches)];
+      const snippets = unique.slice(0, 5).map((m) => {
+        const idx = text.indexOf(m);
+        return `  "...${text.slice(Math.max(0, idx - 40), idx + m.length + 40).replace(/\n/g, "\\n")}..."`;
       });
-      const extra =
-        matches.length > 5 ? `\n  ... and ${matches.length - 5} more` : "";
-
-      // Use expect.soft so one failure doesn't abort — we want to see ALL problems
-      expect.soft(
-        matches,
-        `Found ${matches.length} raw ${name} pattern(s) in ${url}:\n${contextSnippets.join("\n")}${extra}`
-      ).toHaveLength(0);
+      const extra = unique.length > 5 ? `\n  ... and ${unique.length - 5} more` : "";
+      const suffix = label ? ` (${label})` : "";
+      expect.soft(unique, `Found ${unique.length} raw ${name} in ${url}${suffix}:\n${snippets.join("\n")}${extra}`).toHaveLength(0);
     }
   }
 }
 
+async function assertNoRawIds(page: Page, url: string) {
+  await loadPage(page, url);
+  const text = await getMainText(page);
+  checkTextForRawIds(text, url);
+}
+
 /**
- * Variant for pages with client-rendered tab content.
- * Clicks through each visible tab before scanning for raw IDs,
- * since tab content is only rendered when the tab is active.
+ * Variant that clicks through tabs before scanning — tab content is
+ * lazily rendered and won't be visible without clicking.
  */
 async function assertNoRawIdsWithTabs(page: Page, url: string) {
-  const response = await page.goto(url, {
-    waitUntil: "networkidle",
-    timeout: 45000,
-  });
+  await loadPage(page, url);
 
-  expect(
-    response?.status(),
-    `Expected ${url} to return a successful status`
-  ).toBeLessThan(400);
-
-  const main = page.locator("main, article, [role='main']").first();
-  await expect(main).toBeVisible({ timeout: 15000 });
-
-  // Find all tab triggers (shadcn Tabs use role="tab" or data-state)
   const tabs = page.locator("[role='tab'], button[data-state]");
   const tabCount = await tabs.count();
-
-  // Collect text from all tab panels by clicking through each tab
-  const allVisibleTexts: string[] = [];
+  const texts: string[] = [];
 
   if (tabCount > 1) {
     for (let i = 0; i < tabCount; i++) {
       const tab = tabs.nth(i);
-      // Skip tabs that are already selected (first tab is rendered on load)
       const state = await tab.getAttribute("data-state");
       if (state !== "active" && (await tab.isVisible())) {
         await tab.click();
-        // Give the panel time to render
         await page.waitForTimeout(500);
       }
-
-      const text = await page.evaluate(() => {
-        const mainEl = document.querySelector("main") || document.body;
-        return mainEl.innerText;
-      });
-      allVisibleTexts.push(text);
+      texts.push(await getMainText(page));
     }
   } else {
-    // No tabs — just grab the main text
-    const text = await page.evaluate(() => {
-      const mainEl = document.querySelector("main") || document.body;
-      return mainEl.innerText;
-    });
-    allVisibleTexts.push(text);
+    texts.push(await getMainText(page));
   }
 
-  // Deduplicate (some text repeats across tabs from shared header/footer)
-  const combinedText = allVisibleTexts.join("\n---TAB-BOUNDARY---\n");
-
-  for (const { name, pattern } of RAW_ID_PATTERNS) {
-    const globalPattern = new RegExp(pattern.source, "g");
-    const matches = combinedText.match(globalPattern);
-    if (matches) {
-      // Deduplicate matches (same ID may appear in header shared across tabs)
-      const uniqueMatches = [...new Set(matches)];
-      const contextSnippets = uniqueMatches.slice(0, 5).map((m) => {
-        const idx = combinedText.indexOf(m);
-        const start = Math.max(0, idx - 40);
-        const end = Math.min(combinedText.length, idx + m.length + 40);
-        return `  "...${combinedText.slice(start, end).replace(/\n/g, "\\n")}..."`;
-      });
-      const extra =
-        uniqueMatches.length > 5
-          ? `\n  ... and ${uniqueMatches.length - 5} more`
-          : "";
-
-      expect.soft(
-        uniqueMatches,
-        `Found ${uniqueMatches.length} unique raw ${name} pattern(s) in ${url} (across ${tabCount} tabs):\n${contextSnippets.join("\n")}${extra}`
-      ).toHaveLength(0);
-    }
-  }
+  checkTextForRawIds(texts.join("\n"), url, `across ${tabCount} tabs`);
 }
 
 // ─── Test suites by page type ───────────────────────────────────────────────

@@ -49,14 +49,8 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
 
   const fieldType = fieldDef?.type;
 
-  // Entity references (schema-confirmed)
-  if (fieldType === "ref" && typeof value === "string") {
-    return <FBRefLink id={value} />;
-  }
-
-  // Heuristic ref detection when schema is unavailable: resolve sid_ IDs
-  // and entity slugs that map to known FactBase entities. Only tries strings
-  // without spaces or protocols to avoid false-positives on prose values.
+  // Entity references — handles both schema-confirmed refs (fieldType="ref")
+  // and heuristic detection (sid_ IDs, entity slugs) when schema is unavailable.
   if (typeof value === "string" && shouldResolveAsRef(value, fieldType, getFactBaseEntity)) {
     return <FBRefLink id={value} />;
   }
