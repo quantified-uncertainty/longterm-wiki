@@ -11,8 +11,12 @@
  *   pnpm tsx crux/scripts/cleanup-personnel.ts              # actually delete
  */
 
+import 'dotenv/config';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { isSid } from '../../packages/id-utils/src/index.ts';
+
+/** Matches stableId format: sid_ prefix + 10 alphanumeric chars */
+const STABLE_ID_RE = /^sid_[A-Za-z0-9_-]{8,12}$/;
 
 function isMachineId(s: string): boolean {
   return isSid(s);
