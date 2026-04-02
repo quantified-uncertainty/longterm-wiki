@@ -35,27 +35,44 @@ export const LESSWRONG: Forum = {
   baseUrl: 'https://www.lesswrong.com',
 };
 
-export const ALL_FORUMS: Forum[] = [EA_FORUM, LESSWRONG];
+export const ALIGNMENT_FORUM: Forum = {
+  name: 'Alignment Forum',
+  graphqlUrl: 'https://www.alignmentforum.org/graphql',
+  baseUrl: 'https://www.alignmentforum.org',
+};
 
-/** Execute a GraphQL query against a forum API. Throws on HTTP or GraphQL errors. */
+export const ALL_FORUMS: Forum[] = [EA_FORUM, LESSWRONG];
+export const ALL_FORUMS_WITH_AF: Forum[] = [EA_FORUM, LESSWRONG, ALIGNMENT_FORUM];
+
+/** Execute a GraphQL query against a forum API. Retries on 429 with backoff. */
 export async function forumGraphql(
   forumUrl: string,
   query: string,
   variables?: Record<string, unknown>,
 ): Promise<unknown> {
-  const resp = await fetch(forumUrl, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query, variables }),
-  });
-  if (!resp.ok) throw new Error(`GraphQL HTTP error: ${resp.status}`);
-  const body = await resp.json() as { errors?: { message?: string }[] };
-  if (body.errors?.length) {
-    throw new Error(
-      body.errors.map((err) => err.message ?? 'Unknown GraphQL error').join('; ')
-    );
+  const maxRetries = 3;
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const resp = await fetch(forumUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, variables }),
+    });
+    if (resp.status === 429 && attempt < maxRetries) {
+      const delay = (attempt + 1) * 5000; // 5s, 10s, 15s
+      console.warn(`    Rate limited (429), retrying in ${delay / 1000}s...`);
+      await new Promise(r => setTimeout(r, delay));
+      continue;
+    }
+    if (!resp.ok) throw new Error(`GraphQL HTTP error: ${resp.status}`);
+    const body = await resp.json() as { errors?: { message?: string }[] };
+    if (body.errors?.length) {
+      throw new Error(
+        body.errors.map((err) => err.message ?? 'Unknown GraphQL error').join('; ')
+      );
+    }
+    return body;
   }
-  return body;
+  throw new Error('GraphQL request failed after retries');
 }
 
 /** Look up a user's internal ID by their slug. Returns null if not found. */
@@ -104,6 +121,133 @@ export async function getUserPosts(forum: Forum, userId: string, pageSize = 100)
   }
 
   return allPosts;
+}
+
+/**
+ * Fetch posts globally (not per-user) with karma threshold and date window.
+ * Uses half-year date windows to stay under the ~2500 skip limit.
+ */
+export async function getGlobalPosts(
+  forum: Forum,
+  options: {
+    karmaThreshold?: number;
+    after?: string;
+    before?: string;
+    sortedBy?: string;
+    limit?: number;
+    pageSize?: number;
+    delayMs?: number;
+    onPage?: (count: number, lastKarma: number) => void;
+  } = {},
+): Promise<ForumPost[]> {
+  const karmaThreshold = Math.floor(Number(options.karmaThreshold) || 10);
+  const after = options.after ?? '2015-01-01';
+  const before = options.before ?? new Date().toISOString().slice(0, 10);
+  const sortedBy = options.sortedBy ?? 'top';
+  const maxTotal = options.limit ?? Infinity;
+  const pageSize = options.pageSize ?? 500;
+  const delayMs = options.delayMs ?? 300;
+
+  // Generate half-year windows to stay under skip limit (~2500)
+  const windows: { after: string; before: string }[] = [];
+  const startYear = parseInt(after.slice(0, 4));
+  const endDate = before;
+  for (let y = startYear; ; y++) {
+    const h1Start = `${y}-01-01`;
+    const h1End = `${y}-07-01`;
+    const h2Start = `${y}-07-01`;
+    const h2End = `${y + 1}-01-01`;
+
+    if (h1Start >= endDate) break;
+    if (h1End > after && h1Start < endDate) {
+      windows.push({ after: h1Start < after ? after : h1Start, before: h1End > endDate ? endDate : h1End });
+    }
+    if (h2Start >= endDate) break;
+    if (h2End > after && h2Start < endDate) {
+      windows.push({ after: h2Start, before: h2End > endDate ? endDate : h2End });
+    }
+  }
+
+  const allPosts: ForumPost[] = [];
+  const OFFSET_CAP = 2400; // Forum backends enforce ~2500 offset limit
+
+  // Use a queue so we can subdivide windows that hit the offset cap
+  const windowQueue = [...windows];
+
+  while (windowQueue.length > 0 && allPosts.length < maxTotal) {
+    const window = windowQueue.shift()!;
+
+    let offset = 0;
+    let hitOffsetCap = false;
+
+    while (allPosts.length < maxTotal) {
+      const remaining = maxTotal - allPosts.length;
+      const thisPageSize = Math.min(pageSize, remaining);
+
+      const data = await forumGraphql(forum.graphqlUrl, `query GetGlobalPosts($limit: Int!, $offset: Int!, $after: String, $before: String, $karmaThreshold: Int) {
+        posts(input: {
+          terms: {
+            sortedBy: "${sortedBy}",
+            limit: $limit,
+            offset: $offset,
+            after: $after,
+            before: $before,
+            karmaThreshold: $karmaThreshold
+          }
+        }) {
+          results {
+            _id title slug postedAt baseScore voteCount
+            user { displayName slug }
+            coauthors { displayName slug }
+          }
+        }
+      }`, {
+        limit: thisPageSize,
+        offset,
+        after: window.after,
+        before: window.before,
+        karmaThreshold,
+      }) as { data?: { posts?: { results?: ForumPost[] } } };
+
+      const page = data?.data?.posts?.results ?? [];
+      if (page.length === 0) {
+        if (offset >= OFFSET_CAP) hitOffsetCap = true;
+        break;
+      }
+
+      allPosts.push(...page);
+      options.onPage?.(allPosts.length, page[page.length - 1].baseScore);
+
+      if (page.length < thisPageSize) {
+        if (offset + page.length >= OFFSET_CAP) hitOffsetCap = true;
+        break;
+      }
+      offset += page.length;
+
+      if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+    }
+
+    // If we hit the offset cap, subdivide the window into two halves
+    // and enqueue them so we can fetch the remaining posts
+    if (hitOffsetCap) {
+      const startDate = new Date(window.after);
+      const endDate = new Date(window.before);
+      const midMs = (startDate.getTime() + endDate.getTime()) / 2;
+      const midDate = new Date(midMs).toISOString().slice(0, 10);
+      // Only subdivide if the halves are at least 1 day apart
+      if (midDate > window.after && midDate < window.before) {
+        console.warn(`    ⚠ Offset cap hit in ${window.after}–${window.before}, subdividing`);
+        windowQueue.unshift(
+          { after: midDate, before: window.before },
+          { after: window.after, before: midDate },
+        );
+      } else {
+        console.warn(`    ⚠ Offset cap hit in ${window.after}–${window.before}, window too small to subdivide`);
+      }
+    }
+  }
+
+  return allPosts.slice(0, maxTotal);
 }
 
 /** Build the canonical permalink for a forum post (never uses linkpost URL). */
