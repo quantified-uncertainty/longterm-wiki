@@ -27,6 +27,7 @@ import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js
 import { politicalRacesRoute } from "./routes/tablebase/political-races.js";
 import { blueskyRoute } from "./routes/tablebase/bluesky.js";
 import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
+import { dataSourcesRoute } from "./routes/tablebase/data-sources.js";
 
 // Unified source-check system (replaces factbase-verifications + record-verifications)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
@@ -229,6 +230,7 @@ export function createApp() {
   app.route("/api/funding-programs", fundingProgramsRoute);
   app.route("/api/benchmarks", benchmarksRoute);
   app.route("/api/benchmark-results", benchmarkResultsRoute);
+  app.route("/api/data-sources", dataSourcesRoute);
   app.route("/api/assessments", assessmentsRoute);
 
   // Cross-Base: unified things index
