@@ -1308,6 +1308,7 @@
     - ai-governance
     - california
     - legislation
+    - politics
 - id: gavin-newsom
   stableId: sid_tDwxa07Urw
   wikiId: E1472
@@ -1321,6 +1322,8 @@
     - label: Known For
       value: SB 1047 veto, signing 18 AI bills, SB 53
   relatedEntries: []
+  tags:
+    - politics
 - id: josue-estrada
   stableId: sid_FeHrdAUKpQ
   type: person
@@ -2384,6 +2387,7 @@
   tags:
     - ai-policy
     - biosecurity
+    - politics
 - id: matt-clifford
   stableId: sid_EWTG4ReRam
   type: person
@@ -7316,3 +7320,470 @@
     - ai-governance
     - ai-policy
     - digital-rights
+- id: ted-lieu
+  stableId: sid_uo18E0eaWx
+  type: person
+  title: Ted Lieu
+  description: U.S. Representative for California's 36th district (D). Co-chair of the House Bipartisan Task Force on AI. Introduced the Block Nuclear Launch by Autonomous AI Act (2023). Co-led the House AI Task Force which produced a bipartisan final report with 66 findings and 89 recommendations (December 2024).
+  tags:
+    - politics
+    - ai-regulation
+    - ai-safety
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — co-chairs House AI Task Force, introduced nuclear AI safety bill
+  sources:
+    - title: Lieu AI Policy Page
+      url: https://lieu.house.gov/issues/artificial-intelligence
+  lastUpdated: 2026-04
+- id: richard-blumenthal
+  stableId: sid_33ExUKx4u_
+  type: person
+  title: Richard Blumenthal
+  description: U.S. Senator from Connecticut (D). As Chair of the Senate Judiciary Subcommittee on Privacy, Technology, and the Law, led five major AI oversight hearings in 2023-2024 including the landmark Sam Altman hearing. Co-authored a bipartisan AI oversight framework with Hawley proposing an independent AI oversight body.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — led Senate AI oversight hearings, proposed independent oversight body
+  sources:
+    - title: Blumenthal AI Oversight Hearings
+      url: https://www.blumenthal.senate.gov/newsroom/press/release/blumenthal-and-hawley-to-hold-hearing-on-oversight-of-artificial-intelligence
+  lastUpdated: 2026-04
+- id: josh-hawley
+  stableId: sid_C-3CLLkSFI
+  type: person
+  title: Josh Hawley
+  description: U.S. Senator from Missouri (R). Co-led AI oversight hearings with Blumenthal. Introduced the No Section 230 Immunity for AI Act and the AI LEAD Act (classifying AI as products for liability). Published guiding principles for AI legislation focused on private rights of action.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-led Senate AI oversight, proposes AI liability and Section 230 reform
+  sources:
+    - title: Hawley AI Legislation Principles
+      url: https://www.hawley.senate.gov/hawley-announces-guiding-principles-future-ai-legislation/
+  lastUpdated: 2026-04
+- id: jay-obernolte
+  stableId: sid_1uPlGv8dvv
+  type: person
+  title: Jay Obernolte
+  description: U.S. Representative for California's 23rd district (R). Co-chair of the House Bipartisan Task Force on AI (with Lieu). Now chairs the House Science, Space, and Technology Committee. Pushing to codify the National AI Research Resource.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-chairs House AI Task Force, chairs Science Committee
+    - topic: Science and technology funding
+      view: Strongly supportive — advocates National AI Research Resource
+  sources:
+    - title: Obernolte AI Task Force Report
+      url: https://obernolte.house.gov/AITFReport
+  lastUpdated: 2026-04
+- id: don-beyer
+  stableId: sid_SgSoI5UUh-
+  type: person
+  title: Don Beyer
+  description: U.S. Representative for Virginia's 8th district (D). Co-chair of the Congressional AI Caucus. Introduced the AI Foundation Model Transparency Act (bipartisan) directing FTC and NIST to set transparency standards for AI models. Led legislation to repeal Trump's AI moratorium on state laws.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — AI Caucus co-chair, transparency requirements for foundation models
+  sources:
+    - title: Beyer AI Foundation Model Transparency Act
+      url: https://beyer.house.gov/news/documentsingle.aspx?DocumentID=9013
+  lastUpdated: 2026-04
+- id: sara-jacobs
+  stableId: sid_5nLouvqhAZ
+  type: person
+  title: Sara Jacobs
+  description: U.S. Representative for California's 51st district (D). Member of the House AI Task Force. Led the NDAA provision preventing AI from autonomously launching nuclear weapons. Introduced the AI Talent Act. Ranking Member of the Communications and Technology Subcommittee.
+  tags:
+    - politics
+    - ai-regulation
+    - ai-safety
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — secured ban on autonomous AI nuclear launches in NDAA
+  sources:
+    - title: Jacobs AI Task Force Wins
+      url: https://sarajacobs.house.gov/news/press-releases/rep-sara-jacobs-secures-key-wins-in-bipartisan-ai-task-force-report
+  lastUpdated: 2026-04
+- id: chuck-schumer
+  stableId: sid_r8d8HT7B8w
+  type: person
+  title: Chuck Schumer
+  description: U.S. Senator from New York (D), Senate Minority Leader. Launched the SAFE Innovation Framework for AI. Organized nine bipartisan AI Insight Forums (2023) bringing all senators together with tech leaders. Led the four-member Bipartisan Senate AI Working Group that released the AI policy roadmap in May 2024 recommending B in emergency AI funding.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — launched SAFE Innovation Framework, organized Senate AI forums, proposed B AI funding
+  sources:
+    - title: Schumer Senate AI Roadmap
+      url: https://www.schumer.senate.gov/newsroom/press-releases/following-historic-ai-insight-forums-over-the-past-year-leader-schumer-senators-rounds-heinrich-and-young-reveal-bipartisan-roadmap-for-artificial-intelligence-policy-in-the-united-states-senate
+  lastUpdated: 2026-04
+- id: todd-young
+  stableId: sid_ikLZVi-pdx
+  type: person
+  title: Todd Young
+  description: U.S. Senator from Indiana (R). Member of the Bipartisan Senate AI Working Group. Co-led the AI policy roadmap. Co-introduced the Future of AI Innovation Act and the AI-Ready Bio-Data Standards Act.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — bipartisan AI Working Group member, co-led Senate AI roadmap
+  sources: []
+  lastUpdated: 2026-04
+- id: martin-heinrich
+  stableId: sid_nj9fU0en0b
+  type: person
+  title: Martin Heinrich
+  description: U.S. Senator from New Mexico (D). Co-founder and co-chair of the Senate AI Caucus (established 2019). Member of the Bipartisan Senate AI Working Group. Co-led the AI policy roadmap.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-founded Senate AI Caucus, bipartisan AI Working Group member
+  sources: []
+  lastUpdated: 2026-04
+- id: mike-rounds
+  stableId: sid_c3jsITFMPU
+  type: person
+  title: Mike Rounds
+  description: U.S. Senator from South Dakota (R). Co-chairs the Senate AI Caucus. Member of the Bipartisan Senate AI Working Group. Introduced a package of AI legislation covering AI literacy, financial services innovation, and healthcare outcomes.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-chairs Senate AI Caucus, bipartisan AI Working Group member
+  sources: []
+  lastUpdated: 2026-04
+- id: maria-cantwell
+  stableId: sid_7mfJiRjNn4
+  type: person
+  title: Maria Cantwell
+  description: U.S. Senator from Washington (D). Former Chair of the Senate Commerce Committee. Co-led the Future of AI Innovation Act establishing the NIST AI Safety Institute. Key figure in US AI competitiveness policy.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — led Future of AI Innovation Act, established NIST AI Safety Institute
+    - topic: Science and technology funding
+      view: Strongly supportive — NIST AI Safety Institute champion
+  sources: []
+  lastUpdated: 2026-04
+- id: john-thune
+  stableId: sid_eux4tGM2Vh
+  type: person
+  title: John Thune
+  description: U.S. Senator from South Dakota (R), Senate Majority Leader. Co-introduced the AI Research, Innovation, and Accountability Act (AIRIA) with Klobuchar — a risk-based, NIST-aligned approach to AI governance.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-introduced AIRIA, risk-based AI governance approach
+  sources: []
+  lastUpdated: 2026-04
+- id: amy-klobuchar
+  stableId: sid_uk5EhXsfmN
+  type: person
+  title: Amy Klobuchar
+  description: U.S. Senator from Minnesota (D). Co-introduced AIRIA with Thune. Led the TAKE IT DOWN Act (with Cruz) — first AI harms bill to become federal law. Led the Preventing Algorithmic Collusion Act. Championed AI Transparency in Elections Act.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — TAKE IT DOWN Act (first AI harms law), AIRIA, election AI transparency
+  sources: []
+  lastUpdated: 2026-04
+- id: mark-warner
+  stableId: sid_hXFxf2aOHZ
+  type: person
+  title: Mark Warner
+  description: U.S. Senator from Virginia (D). Chairman of the Senate Intelligence Committee. Introduced the Secure AI Act of 2024. Co-authored the CHIPS Act. Co-chair of the Senate Cybersecurity Caucus.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — Secure AI Act, Senate Intelligence Committee chair
+    - topic: Science and technology funding
+      view: Strongly supportive — CHIPS Act co-author
+  sources: []
+  lastUpdated: 2026-04
+- id: ted-cruz
+  stableId: sid_2m4yjRwAHA
+  type: person
+  title: Ted Cruz
+  description: U.S. Senator from Texas (R). Led the TAKE IT DOWN Act (with Klobuchar), the first federal law tackling AI harms — criminalizes non-consensual intimate imagery including AI deepfakes. Passed unanimously in the Senate and 409-2 in the House. Signed May 2025.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Mixed — led TAKE IT DOWN Act (deepfakes) but generally opposes broad AI regulation
+  sources: []
+  lastUpdated: 2026-04
+- id: gary-peters
+  stableId: sid_sGaHFUVLYz
+  type: person
+  title: Gary Peters
+  description: U.S. Senator from Michigan (D). Co-authored the Global Catastrophic Risk Management Act (signed into law in NDAA FY2023), establishing an interagency committee to assess catastrophic risks including AI, biotech accidents, pandemics, and supervolcanoes. Co-authored the BIOSECURE Act with Hagerty.
+  tags:
+    - politics
+    - biosecurity
+    - ai-regulation
+  positions:
+    - topic: Biosafety
+      view: Strongly supportive — authored Global Catastrophic Risk Management Act and BIOSECURE Act
+    - topic: AI safety and regulation
+      view: Supportive — introduced PREPARED for AI Act
+  sources: []
+  lastUpdated: 2026-04
+- id: patty-murray
+  stableId: sid_7Ai_otWUgC
+  type: person
+  title: Patty Murray
+  description: U.S. Senator from Washington (D). As Chair of the Senate HELP Committee, co-authored the PREVENT Pandemics Act (signed into law FY2023 omnibus). Includes reforms to CDC, White House Office of Pandemic Preparedness, and laboratory safety improvements.
+  tags:
+    - politics
+    - biosecurity
+  positions:
+    - topic: Biosafety
+      view: Strongly supportive — authored PREVENT Pandemics Act
+  sources: []
+  lastUpdated: 2026-04
+- id: rand-paul
+  stableId: sid_xWNqmjAoZw
+  type: person
+  title: Rand Paul
+  description: U.S. Senator from Kentucky (R). Introduced the Risky Research Review Act to establish an independent Life Sciences Research Security Board overseeing gain-of-function research funding. Passed Senate Homeland Security Committee 8-1. Major champion of biosafety oversight of dual-use research.
+  tags:
+    - politics
+    - biosecurity
+  positions:
+    - topic: Biosafety
+      view: Strongly supportive — Risky Research Review Act for gain-of-function oversight
+  sources: []
+  lastUpdated: 2026-04
+- id: bill-hagerty
+  stableId: sid_iYltIihNAl
+  type: person
+  title: Bill Hagerty
+  description: U.S. Senator from Tennessee (R). Co-authored the BIOSECURE Act with Peters, banning federal contracts with biotech companies controlled by foreign adversaries. Signed into law as part of the NDAA.
+  tags:
+    - politics
+    - biosecurity
+  positions:
+    - topic: Biosafety
+      view: Supportive — co-authored BIOSECURE Act
+  sources: []
+  lastUpdated: 2026-04
+- id: roger-marshall
+  stableId: sid_7_Z4yF2T33
+  type: person
+  title: Roger Marshall
+  description: U.S. Senator from Kansas (R). Introduced the Viral Gain-of-Function Research Moratorium Act. Co-introduced the National Biosecurity Improvement Act. Championed biosecurity provisions restricting HHS funding for risky research at foreign facilities.
+  tags:
+    - politics
+    - biosecurity
+  positions:
+    - topic: Biosafety
+      view: Strongly supportive — gain-of-function moratorium, National Biosecurity Improvement Act
+  sources: []
+  lastUpdated: 2026-04
+- id: cory-booker
+  stableId: sid_l1XYOu3ScV
+  type: person
+  title: Cory Booker
+  description: U.S. Senator from New Jersey (D). Humane Society's Legislator of the Year for leading opposition to the EATS Act. Most pro-animal-welfare voting record in the Senate. Introduced the Farm System Reform Act with Ro Khanna. Vegan.
+  tags:
+    - politics
+    - animal-welfare
+  positions:
+    - topic: Animal welfare
+      view: Strongly supportive — HSUS Legislator of the Year, Farm System Reform Act, strongest Senate record
+  sources: []
+  lastUpdated: 2026-04
+- id: ro-khanna
+  stableId: sid_Pf1vLeb7HI
+  type: person
+  title: Ro Khanna
+  description: U.S. Representative for California's 17th district (D). Represents Silicon Valley. Co-introduced the Farm System Reform Act with Booker. Major voice on AI and worker protection. Advocated for a "new tech social contract" and wealth redistribution from AI.
+  tags:
+    - politics
+    - ai-regulation
+    - animal-welfare
+  positions:
+    - topic: Animal welfare
+      view: Supportive — co-introduced Farm System Reform Act with Booker
+    - topic: AI safety and regulation
+      view: Supportive — advocates AI worker protections and tech social contract
+  sources: []
+  lastUpdated: 2026-04
+- id: brian-fitzpatrick
+  stableId: sid_7NUfhMTdcG
+  type: person
+  title: Brian Fitzpatrick
+  description: U.S. Representative for Pennsylvania's 1st district (R). Co-chair of the Congressional Animal Protection Caucus. Introduced Goldie's Act (Animal Welfare Act enforcement), the PAST Act, and the SAFE Act. Strong bipartisan animal welfare record.
+  tags:
+    - politics
+    - animal-welfare
+  positions:
+    - topic: Animal welfare
+      view: Strongly supportive — co-chairs Animal Protection Caucus, multiple animal welfare bills
+  sources: []
+  lastUpdated: 2026-04
+- id: vern-buchanan
+  stableId: sid_NlRWWyzFtF
+  type: person
+  title: Vern Buchanan
+  description: U.S. Representative for Florida's 16th district (R). Co-chair of the Congressional Animal Protection Caucus. One of only 13 Republicans to earn 100% on the HSUS 2023 scorecard. Co-sponsored the PAST Act and SAFE Act.
+  tags:
+    - politics
+    - animal-welfare
+  positions:
+    - topic: Animal welfare
+      view: Strongly supportive — Animal Protection Caucus co-chair, 100% HSUS score
+  sources: []
+  lastUpdated: 2026-04
+- id: ed-markey
+  stableId: sid_19wV7dp792
+  type: person
+  title: Ed Markey
+  description: U.S. Senator from Massachusetts (D). Founder of the national Nuclear Freeze movement. Co-chairs the Nuclear Weapons and Arms Control Working Group. Introduced the HALT Act (freeze on nuclear weapons testing/production/deployment), No Nuclear Weapons for Saudi Arabia Act, and SANE Act.
+  tags:
+    - politics
+    - nuclear-risk
+  positions:
+    - topic: Nuclear energy
+      view: Strongly supportive of arms control — founded Nuclear Freeze movement, HALT Act, SANE Act
+  sources: []
+  lastUpdated: 2026-04
+- id: jeff-merkley
+  stableId: sid_LZo4Tl9DZo
+  type: person
+  title: Jeff Merkley
+  description: U.S. Senator from Oregon (D). Co-chairs the Nuclear Weapons and Arms Control Working Group with Markey. Joined on the HALT Act, Saudi nuclear restrictions, and New START resolution.
+  tags:
+    - politics
+    - nuclear-risk
+  positions:
+    - topic: Nuclear energy
+      view: Strongly supportive of arms control — co-chairs Nuclear Arms Control Working Group
+  sources: []
+  lastUpdated: 2026-04
+- id: bill-foster
+  stableId: sid_KymIvDV-Lk
+  type: person
+  title: Bill Foster
+  description: U.S. Representative for Illinois' 11th district (D). Only PhD physicist in Congress (former Fermilab particle physicist). Co-chaired the House AI Task Force. Unique scientific perspective on nuclear nonproliferation and AI safety.
+  tags:
+    - politics
+    - ai-regulation
+    - nuclear-risk
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-chaired House AI Task Force, physicist perspective
+    - topic: Nuclear energy
+      view: Supportive of arms control — nuclear physicist in Congress
+  sources: []
+  lastUpdated: 2026-04
+- id: john-hickenlooper
+  stableId: sid_NUoHqSJmhP
+  type: person
+  title: John Hickenlooper
+  description: U.S. Senator from Colorado (D). Ranking Democrat on Consumer Protection, Technology, and Data Privacy subcommittee. Co-led the Future of AI Innovation Act. Introduced the VET AI Act for third-party AI evaluations.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — Future of AI Innovation Act, VET AI Act
+    - topic: Science and technology funding
+      view: Supportive — CHIPS Act advocate
+  sources: []
+  lastUpdated: 2026-04
+- id: ben-ray-lujan
+  stableId: sid_Eg2XuB7trq
+  type: person
+  title: Ben Ray Lujan
+  description: U.S. Senator from New Mexico (D). Authored the .5B DOE research amendment in the CHIPS and Science Act. Co-introduced the TEST AI Act for AI evaluation at national labs.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: Science and technology funding
+      view: Strongly supportive — .5B DOE research amendment in CHIPS Act
+    - topic: AI safety and regulation
+      view: Supportive — TEST AI Act for national lab AI evaluation
+  sources: []
+  lastUpdated: 2026-04
+- id: chris-coons
+  stableId: sid_oZFfWV8Z58
+  type: person
+  title: Chris Coons
+  description: U.S. Senator from Delaware (D). Introduced the EPIC Act (NIST foundation for R&D collaboration). Pushed for the SAFE Chips Act to restrict AI chip sales to adversaries. Key voice on tech competitiveness vs China.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — SAFE Chips Act restricting AI chip exports to adversaries
+    - topic: Science and technology funding
+      view: Supportive — EPIC Act for NIST R&D foundation
+  sources: []
+  lastUpdated: 2026-04
+- id: thom-tillis
+  stableId: sid_J2tvxv9XKB
+  type: person
+  title: Thom Tillis
+  description: U.S. Senator from North Carolina (R). Co-chair of the Senate Cybersecurity Caucus. Co-introduced the Secure AI Act of 2024 with Warner. Co-led the NO FAKES Act protecting voice/likeness from AI replicas.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — Secure AI Act, NO FAKES Act for AI likeness protection
+  sources: []
+  lastUpdated: 2026-04
+- id: doris-matsui
+  stableId: sid_Q06Nt3FVSN
+  type: person
+  title: Doris Matsui
+  description: U.S. Representative for California's 7th district (D). Vice Chair of the Congressional AI Caucus. Led 81 lawmakers opposing federal preemption of state AI laws in the NDAA.
+  tags:
+    - politics
+    - ai-regulation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — opposes federal preemption of state AI laws, AI Caucus vice chair
+  sources: []
+  lastUpdated: 2026-04
+- id: andrew-gounardes
+  stableId: sid_yvtkoSDQm-
+  type: person
+  title: Andrew Gounardes
+  description: New York State Senator (D-Brooklyn). Co-authored the RAISE Act with Alex Bores (signed into law December 2025) — the first major state-level AI safety law requiring frontier model developers to publish safety protocols for severe risks.
+  tags:
+    - politics
+    - ai-regulation
+    - ai-safety
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — co-authored NY RAISE Act
+  sources: []
+  lastUpdated: 2026-04
