@@ -46,49 +46,53 @@ async function fetchManifundProjects(): Promise<ManifundProject[]> {
   console.log("  (Manifund uses Vercel security checkpoint — requires headless browser)");
 
   const script = `
-    const { chromium } = require('playwright');
-    (async () => {
-      const browser = await chromium.launch({ headless: true });
-      const context = await browser.newContext();
-      const page = await context.newPage();
+const { chromium } = require('playwright');
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-      await page.goto('https://manifund.org/', { waitUntil: 'domcontentloaded', timeout: 20000 });
-      await page.waitForTimeout(5000);
+  await page.goto('https://manifund.org/', { waitUntil: 'domcontentloaded', timeout: 20000 });
+  await page.waitForTimeout(5000);
 
-      let allProjects = [];
-      let before = null;
-      let pageNum = 0;
+  let allProjects = [];
+  let before = null;
+  let pageNum = 0;
 
-      while (true) {
-        pageNum++;
-        const url = before
-          ? '/api/v0/projects?before=' + encodeURIComponent(before)
-          : '/api/v0/projects';
+  while (true) {
+    pageNum++;
+    const url = before
+      ? '/api/v0/projects?before=' + encodeURIComponent(before)
+      : '/api/v0/projects';
 
-        const text = await page.evaluate(async (u) => {
-          const resp = await fetch(u);
-          if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          return resp.text();
-        }, url);
+    const text = await page.evaluate(async (u) => {
+      const resp = await fetch(u);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      return resp.text();
+    }, url);
 
-        const data = JSON.parse(text);
-        process.stderr.write('  Page ' + pageNum + ': ' + data.length + ' projects\\n');
+    const data = JSON.parse(text);
+    process.stderr.write('  Page ' + pageNum + ': ' + data.length + ' projects\\n');
 
-        if (data.length === 0) break;
-        allProjects = allProjects.concat(data);
+    if (data.length === 0) break;
+    allProjects = allProjects.concat(data);
 
-        before = data[data.length - 1].created_at;
-        if (data.length < 100) break;
-      }
+    before = data[data.length - 1].created_at;
+    if (data.length < 100) break;
+  }
 
-      process.stdout.write(JSON.stringify(allProjects));
-      await browser.close();
-    })().catch(e => { process.stderr.write('ERROR: ' + e.message + '\\n'); process.exit(1); });
-  `;
+  process.stdout.write(JSON.stringify(allProjects));
+  await browser.close();
+})().catch(e => { process.stderr.write('ERROR: ' + e.message + '\\n'); process.exit(1); });
+`;
+
+  // Write script to temp file to avoid shell quoting issues with node -e
+  const scriptPath = '/tmp/manifund-fetch.cjs';
+  writeFileSync(scriptPath, script);
 
   try {
     const result = execSync(
-      `node -e ${JSON.stringify(script)}`,
+      `node ${scriptPath}`,
       { maxBuffer: 50 * 1024 * 1024, timeout: 120_000, encoding: "utf8", stdio: ["pipe", "pipe", "inherit"] }
     );
 

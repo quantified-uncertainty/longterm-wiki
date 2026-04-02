@@ -178,7 +178,7 @@ const fli: DataSourceManifest = {
   accessMethod: 'web_scrape',
   publisherEntityId: 'sid_d9sWZtyVwg',
   updateFrequency: 'annual',
-  cachePath: '/tmp/fli-grants.csv',
+  cachePath: '/tmp/fli-grants.sql',
   schema: {
     fields: [
       { sourceName: 'title', internalField: 'name', type: 'string' },
