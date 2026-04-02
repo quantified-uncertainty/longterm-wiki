@@ -1564,10 +1564,13 @@ function buildChartData(
   sortedRounds: KBRecordEntry[],
   equityPositions: ParsedEquityPositionRecord[],
 ): ChartDataBundle {
-  // Extract fact time series
-  const valuationFacts = getKBFacts(entityId, "valuation");
-  const revenueFacts = getKBFacts(entityId, "revenue");
-  const headcountFacts = getKBFacts(entityId, "headcount");
+  // Extract fact time series — exclude expired facts (validEnd in the past)
+  const now = new Date().toISOString().slice(0, 10);
+  const isActive = (f: Fact) => !f.validEnd || f.validEnd >= now;
+
+  const valuationFacts = getKBFacts(entityId, "valuation").filter(isActive);
+  const revenueFacts = getKBFacts(entityId, "revenue").filter(isActive);
+  const headcountFacts = getKBFacts(entityId, "headcount").filter(isActive);
 
   const valuationSeries = valuationFacts
     .filter((f) => f.asOf && factNumericValue(f) != null)
