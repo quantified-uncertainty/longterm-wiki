@@ -29,6 +29,8 @@ export async function storeSourceCheckEvidence(params: {
   /** Entity ID to associate with this evidence (e.g., org stableId for personnel/division records) */
   entityId?: string | null;
   resourceId?: string | null;
+  /** Override the default checker model (e.g., 'deterministic-row-match') */
+  checkerModel?: string;
 }, logPrefix = '[source-check]'): Promise<void> {
   let resolvedResourceId = params.resourceId ?? null;
   if (!resolvedResourceId && params.sourceUrl) {
@@ -49,7 +51,7 @@ export async function storeSourceCheckEvidence(params: {
     verdict: params.verdict,
     confidence: params.confidence,
     extractedValue: params.extractedValue,
-    checkerModel: MODELS.haiku,
+    checkerModel: params.checkerModel ?? MODELS.haiku,
     notes: params.reasoning,
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
     ...(params.entityId ? { entityId: params.entityId } : {}),
