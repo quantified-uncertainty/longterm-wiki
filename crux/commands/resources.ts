@@ -17,6 +17,7 @@ import { crossReferenceCommand } from '../resource-enrichment/cross-reference.ts
 import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
 import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
 import { enrichCrossrefCommand } from '../resource-enrichment/enrich-crossref.ts';
+import { discoverForumsCommand } from '../resource-enrichment/discover-forums.ts';
 
 interface ResourceCommandConfig {
   description: string;
@@ -155,6 +156,7 @@ commands['cross-reference'] = crossReferenceCommand;
 commands['fetch-wayback'] = fetchWaybackCommand;
 commands['archive-pdfs'] = archivePdfsCommand;
 commands['enrich-crossref'] = enrichCrossrefCommand;
+commands['discover-forums'] = discoverForumsCommand;
 
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
@@ -185,6 +187,9 @@ Resources Domain - External resource management
 
 Commands:
 ${commandList}
+
+Discovery:
+  discover-forums   Bulk import posts from LW/EAF/AF (free GraphQL API)
 
 Enrichment:
   enrich-papers     Enrich papers via Semantic Scholar API (→ resource_papers)
@@ -221,5 +226,8 @@ Examples:
   crux resources fetch-all --batch 50 --concurrency 5
   crux resources classify submit --dry-run
   crux resources deep-enrich submit --limit 1000
+  crux resources discover-forums --karma=30 --forums=lw,eaf,af
+  crux resources discover-forums --karma=50 --after=2020-01-01 --apply
 `;
+
 }
