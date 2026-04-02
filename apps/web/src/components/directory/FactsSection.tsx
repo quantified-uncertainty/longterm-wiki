@@ -121,6 +121,79 @@ export function FactValueDisplay({ fact, property }: { fact: Fact; property?: Pr
   return <span>{safeFormatted}</span>;
 }
 
+/** A single fact row with dot-leader connecting label to value. */
+function FactRow({
+  propId,
+  fact,
+}: {
+  propId: string;
+  fact: Fact;
+}) {
+  const property = getKBProperty(propId);
+  return (
+    <div className="flex items-baseline gap-1 py-[3px] group/row">
+      <span className="text-muted-foreground text-[12px] shrink-0 whitespace-nowrap">
+        {property?.name ?? titleCase(propId)}
+      </span>
+      <span
+        className="flex-1 border-b border-dotted border-border/40 min-w-[16px] translate-y-[-3px]"
+        aria-hidden="true"
+      />
+      <span className="font-medium text-[12px] tabular-nums text-right shrink-0 max-w-[60%] truncate">
+        <FactValueDisplay fact={fact} property={property} />
+      </span>
+    </div>
+  );
+}
+
+/** Single category card with its own border/background. */
+function CategoryCard({
+  label,
+  props,
+  latestByProp,
+}: {
+  label: string;
+  props: string[];
+  latestByProp: Map<string, Fact>;
+}) {
+  return (
+    <div className="rounded-lg border border-border/50 bg-gradient-to-br from-card to-muted/20 px-4 py-2.5">
+      <div className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/50 mb-1.5 pb-1 border-b border-border/30">
+        {label}
+      </div>
+      {props.map((propId) => {
+        const fact = latestByProp.get(propId);
+        if (!fact) return null;
+        return <FactRow key={propId} propId={propId} fact={fact} />;
+      })}
+    </div>
+  );
+}
+
+/**
+ * Distribute categories across N columns, balancing by item count.
+ * Greedy algorithm: assign each category to the shortest column.
+ */
+function distributeColumns<T extends { props: string[] }>(
+  groups: T[],
+  numCols: number,
+): T[][] {
+  const columns: T[][] = Array.from({ length: numCols }, () => []);
+  const heights: number[] = new Array(numCols).fill(0);
+
+  for (const group of groups) {
+    let minIdx = 0;
+    for (let i = 1; i < numCols; i++) {
+      if (heights[i] < heights[minIdx]) minIdx = i;
+    }
+    columns[minIdx].push(group);
+    // +1.5 accounts for category header + spacing
+    heights[minIdx] += group.props.length + 1.5;
+  }
+
+  return columns;
+}
+
 /** Full categorized facts display panel used on entity profile pages. */
 export function FactsPanel({
   facts,
@@ -134,50 +207,49 @@ export function FactsPanel({
 
   if (latestByProp.size === 0) return null;
 
+  // Use 2 columns when there are enough categories/facts to benefit
+  const useMultiCol = categoryGroups.length >= 3 && latestByProp.size >= 8;
+  const columns = useMultiCol
+    ? distributeColumns(categoryGroups, 2)
+    : [categoryGroups];
+
   return (
     <section>
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-lg font-bold tracking-tight">Facts</h2>
+      <div className="flex items-center gap-3 mb-3">
+        <h2 className="text-base font-bold tracking-tight">Facts</h2>
         <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
           {latestByProp.size}
         </span>
         <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" aria-hidden="true" />
       </div>
-      <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-        {categoryGroups.map(({ category, label, props }) => (
-          <div key={category} className="px-4 py-3">
-            <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60 mb-2">
-              {label}
-            </div>
-            <div className="space-y-1.5">
-              {props.map((propId) => {
-                const fact = latestByProp.get(propId);
-                if (!fact) return null;
-                const property = getKBProperty(propId);
-                return (
-                  <div
-                    key={propId}
-                    className="flex items-baseline justify-between gap-2 text-sm"
-                  >
-                    <span className="text-muted-foreground text-xs truncate">
-                      {property?.name ?? titleCase(propId)}
-                    </span>
-                    <span className="font-medium text-xs tabular-nums text-right shrink-0 max-w-[55%] truncate">
-                      <FactValueDisplay fact={fact} property={property} />
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+      <div
+        className={
+          useMultiCol
+            ? "grid grid-cols-1 md:grid-cols-2 gap-2.5 items-start"
+            : "space-y-2.5"
+        }
+      >
+        {columns.map((colGroups, colIdx) => (
+          <div key={colIdx} className="flex flex-col gap-2.5">
+            {colGroups.map(({ category, label, props }) => (
+              <CategoryCard
+                key={category}
+                label={label}
+                props={props}
+                latestByProp={latestByProp}
+              />
+            ))}
           </div>
         ))}
       </div>
-      <Link
-        href={`/factbase/entity/${entityId}`}
-        className="block mt-2 text-xs text-primary hover:underline text-center"
-      >
-        View all facts in KB explorer &rarr;
-      </Link>
+      <div className="mt-2 text-center">
+        <Link
+          href={`/factbase/entity/${entityId}`}
+          className="text-[11px] text-muted-foreground/60 hover:text-primary transition-colors"
+        >
+          View all facts in KB explorer &rarr;
+        </Link>
+      </div>
     </section>
   );
 }
