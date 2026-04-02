@@ -130,7 +130,7 @@ export function FBCompareChartClient({
 
   const minPositiveVal = allValues.length > 0 ? Math.min(...allValues) : 1;
   const maxRawVal = allValues.length > 0 ? Math.max(...allValues) : 1;
-  const showLogToggle = maxRawVal / minPositiveVal > 10;
+  const showLogToggle = maxRawVal / minPositiveVal > 5;
 
   const minVal = logScale ? Math.max(minPositiveVal * 0.5, 1) : 0;
   const maxVal = logScale ? maxRawVal * 1.5 : maxRawVal * 1.15;
