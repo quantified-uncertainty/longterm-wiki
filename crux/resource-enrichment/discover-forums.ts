@@ -76,29 +76,36 @@ export async function discoverForumsCommand(
 
   // Phase 1: Discover posts from each forum
   const allDiscovered: DiscoveredPost[] = [];
+  const perForumLimit = Math.ceil(limit / selectedForums.length);
 
   for (const forum of selectedForums) {
-    console.log(`  Fetching from ${forum.name}...`);
-    const posts = await getGlobalPosts(forum, {
-      karmaThreshold: karma,
-      after,
-      before,
-      limit,
-      onPage: (count, lastKarma) => {
-        process.stdout.write(`\r    ${count.toLocaleString()} posts so far (karma ≥${lastKarma})...`);
-      },
-    });
-    process.stdout.write('\r');
-    console.log(`    ${posts.length.toLocaleString()} posts from ${forum.name}                `);
-
-    for (const post of posts) {
-      const url = postPermalink(forum, post);
-      allDiscovered.push({
-        forum,
-        post,
-        url,
-        id: hashId(url),
+    console.log(`  Fetching from ${forum.name} (limit ${perForumLimit.toLocaleString()})...`);
+    try {
+      const posts = await getGlobalPosts(forum, {
+        karmaThreshold: karma,
+        after,
+        before,
+        limit: perForumLimit,
+        onPage: (count, lastKarma) => {
+          process.stdout.write(`\r    ${count.toLocaleString()} posts so far (karma ≥${lastKarma})...`);
+        },
       });
+      process.stdout.write('\r');
+      console.log(`    ${posts.length.toLocaleString()} posts from ${forum.name}                `);
+
+      for (const post of posts) {
+        const url = postPermalink(forum, post);
+        allDiscovered.push({
+          forum,
+          post,
+          url,
+          id: hashId(url),
+        });
+      }
+    } catch (err) {
+      process.stdout.write('\r');
+      console.error(`    ✗ ${forum.name} failed: ${err instanceof Error ? err.message : String(err)}`);
+      console.error(`      Continuing with other forums...`);
     }
   }
 
