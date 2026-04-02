@@ -1,4 +1,5 @@
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, writeFileSync } from "fs";
+import { execFileSync } from "child_process";
 import { parseCSVLine, reassembleCSVRows } from "../csv.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import { matchProgram } from "../program-matcher.ts";
@@ -6,19 +7,19 @@ import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
 
 /**
- * GiveWell publishes grants data via an Airtable view:
+ * GiveWell publishes grants data via:
+ * - Google Sheets (impact estimates, auto-downloadable):
+ *   https://docs.google.com/spreadsheets/d/1z065ab9PPMu9i5KiQ4yLyQJPFQCfEzHSgtHulPiZeBo
+ * - Airtable shared view (comprehensive, requires manual export):
  *   https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm
  *
- * Since Airtable doesn't offer a direct CSV export for shared views,
- * the user must manually export the data:
- *   1. Open the Airtable link above
- *   2. Click "..." menu → "Download CSV"
- *   3. Save as /tmp/givewell-grants.csv
- *
- * Expected CSV columns (based on the Airtable schema):
- *   Grant, Organization, Amount, Date, Topic, Funder
+ * We auto-download the Google Sheets CSV (131 grants, 2020-2024) as the
+ * primary source. The Airtable view has the full historical dataset but
+ * requires manual export.
  */
 const GIVEWELL_CSV_PATH = "/tmp/givewell-grants.csv";
+const GIVEWELL_SHEETS_URL =
+  "https://docs.google.com/spreadsheets/d/1z065ab9PPMu9i5KiQ4yLyQJPFQCfEzHSgtHulPiZeBo/export?format=csv&gid=0";
 
 /**
  * Parse an amount string that may contain "$", commas, or "M"/"K" suffixes.
@@ -83,13 +84,18 @@ export const source: GrantSource = {
   sourceUrl: "https://www.givewell.org/research/all-grants/August-2022-version",
 
   ensureData() {
-    if (!existsSync(GIVEWELL_CSV_PATH)) {
-      console.log(`\n  GiveWell grants CSV not found at ${GIVEWELL_CSV_PATH}`);
-      console.log("  To download:");
-      console.log("    1. Open: https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm");
-      console.log("    2. Click the '...' menu → 'Download CSV'");
-      console.log(`    3. Save the file to ${GIVEWELL_CSV_PATH}`);
-      console.log("  Skipping GiveWell source.\n");
+    if (existsSync(GIVEWELL_CSV_PATH)) return;
+    // Auto-download from Google Sheets
+    console.log("  Downloading GiveWell grants from Google Sheets...");
+    try {
+      execFileSync("curl", ["-sfL", "--retry", "3", "--connect-timeout", "15", "-o", GIVEWELL_CSV_PATH, GIVEWELL_SHEETS_URL], {
+        stdio: "inherit",
+        timeout: 30_000,
+      });
+    } catch {
+      console.warn("  Failed to download from Google Sheets.");
+      console.log("  Manual alternative: download CSV from Airtable:");
+      console.log("    https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm");
     }
   },
 
@@ -106,11 +112,11 @@ export const source: GrantSource = {
     const headerLine = text.split("\n")[0];
     const headers = parseCSVLine(headerLine).map((h) => h.toLowerCase().trim());
 
-    const grantCol = headers.findIndex((h) => h.includes("grant") && !h.includes("amount"));
-    const orgCol = headers.findIndex((h) => h.includes("organization") || h.includes("recipient") || h.includes("grantee"));
-    const amountCol = headers.findIndex((h) => h.includes("amount") || h.includes("usd") || h.includes("dollar"));
+    const grantCol = headers.findIndex((h) => h.includes("grant") && !h.includes("amount") && !h.includes("size"));
+    const orgCol = headers.findIndex((h) => h.includes("organization") || h.includes("recipient") || h.includes("grantee") || h.includes("top charity"));
+    const amountCol = headers.findIndex((h) => h.includes("total grant size") || h.includes("amount") || h.includes("usd") || h.includes("dollar"));
     const dateCol = headers.findIndex((h) => h.includes("date") || h.includes("year") || h.includes("approved"));
-    const topicCol = headers.findIndex((h) => h.includes("topic") || h.includes("program") || h.includes("area"));
+    const topicCol = headers.findIndex((h) => h.includes("topic") || h.includes("program") || h.includes("area") || h.includes("intervention"));
 
     if (orgCol === -1) {
       console.warn("  WARNING: Could not find organization column in GiveWell CSV. Headers:", headers);
