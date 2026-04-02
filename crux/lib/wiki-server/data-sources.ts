@@ -19,7 +19,7 @@ export type DataSourceList = InferResponseType<RpcClient['index']['$get'], 200>;
 export type DataSourceDetail = InferResponseType<RpcClient[':id']['$get'], 200>;
 export type SyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
 export type SnapshotList = InferResponseType<RpcClient[':id']['snapshots']['$get'], 200>;
-export type SnapshotCreateResult = InferResponseType<RpcClient[':id']['snapshots']['$post'], 201>;
+export type SnapshotCreateResult = InferResponseType<RpcClient[':id']['snapshots']['$post']>;
 export type SnapshotLatest = InferResponseType<RpcClient[':id']['snapshots']['latest']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
