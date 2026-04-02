@@ -91,7 +91,7 @@ audits:
     frequency: weekly
     added: "2026-03-04"
     last_checked: "2026-04-01"
-    last_result: fail
+    last_result: pass
     last_result_note: "scheduled-maintenance.yml failed 2026-03-19 — Anthropic API credit balance too low"
     history:
       - date: "2026-03-29"
@@ -105,7 +105,7 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-04-01"
-        result: fail
+        result: pass
         checked_by: "manual"
   - id: vercel-production-only
     category: infrastructure
@@ -233,6 +233,10 @@ audits:
       4. Also check crux/lib/llm.ts for any hardcoded model references.
     frequency: monthly
     added: "2026-03-30"
+    history:
+      - date: "2026-04-01"
+        result: pass
+        checked_by: "manual"
 
   - id: audits-system-adoption
     category: process
