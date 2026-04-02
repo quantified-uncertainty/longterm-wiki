@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
+import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 
 export const revalidate = 3600;
@@ -341,6 +342,18 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
                       </a>
+                      {(() => {
+                        const ds = inferDataSource(sourceUrl);
+                        if (!ds) return null;
+                        return (
+                          <Link
+                            href={`/sources?tab=data-sources`}
+                            className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
+                          >
+                            {ds.name}
+                          </Link>
+                        );
+                      })()}
                       <span className="text-xs text-muted-foreground ml-2">
                         ({checks.length} check{checks.length !== 1 ? "s" : ""})
                       </span>

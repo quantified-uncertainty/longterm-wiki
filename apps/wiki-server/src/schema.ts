@@ -1810,6 +1810,10 @@ export const grants = pgTable(
       () => fundingPrograms.id,
       { onDelete: "set null" }
     ),
+    dataSourceId: text("data_source_id").references(
+      () => dataSources.id,
+      { onDelete: "set null" }
+    ),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1827,6 +1831,7 @@ export const grants = pgTable(
     index("idx_grants_grantee_entity").on(table.granteeEntityId),
     index("idx_grants_status").on(table.status),
     index("idx_grants_program").on(table.programId),
+    index("idx_grants_data_source").on(table.dataSourceId),
   ]
 );
 

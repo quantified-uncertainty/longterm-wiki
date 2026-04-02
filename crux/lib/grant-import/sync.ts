@@ -70,6 +70,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     source: raw.sourceUrl?.trim() || getManifest(raw.source)?.fetchUrl || defaultSourceUrl,
     notes,
     programId: raw.programId ?? null,
+    dataSourceId: raw.source, // GrantSource ID matches data_sources.id (e.g., "coefficient-giving")
   };
 }
 
