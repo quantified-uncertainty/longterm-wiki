@@ -49,9 +49,8 @@ const eaFunds: DataSourceManifest = {
   cachePath: '/tmp/ea-funds-grants.csv',
   schema: {
     fields: [
-      { sourceName: 'title', internalField: 'name', type: 'string' },
+      { sourceName: 'description', internalField: 'name', type: 'string' },
       { sourceName: 'fund', internalField: 'fund', type: 'string' },
-      { sourceName: 'description', internalField: 'description', type: 'string' },
       { sourceName: 'grantee', internalField: 'grantee', type: 'string' },
       { sourceName: 'amount', internalField: 'amount', type: 'number' },
       { sourceName: 'round', internalField: 'round', type: 'string' },
@@ -179,7 +178,7 @@ const fli: DataSourceManifest = {
   accessMethod: 'web_scrape',
   publisherEntityId: 'sid_d9sWZtyVwg',
   updateFrequency: 'annual',
-  cachePath: '/tmp/fli-grants.sql',
+  cachePath: '/tmp/fli-grants.csv',
   schema: {
     fields: [
       { sourceName: 'title', internalField: 'name', type: 'string' },

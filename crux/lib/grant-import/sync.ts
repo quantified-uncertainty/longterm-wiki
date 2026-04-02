@@ -67,7 +67,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     currency: validateCurrency(raw.currency),
     date: raw.date,
     status: null,
-    source: raw.sourceUrl ?? getManifest(raw.source)?.fetchUrl ?? defaultSourceUrl,
+    source: raw.sourceUrl?.trim() || getManifest(raw.source)?.fetchUrl || defaultSourceUrl,
     notes,
     programId: raw.programId ?? null,
   };

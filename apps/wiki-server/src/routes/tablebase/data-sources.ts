@@ -270,10 +270,11 @@ const dataSourcesApp = new Hono()
       }
 
       // Update data source metadata within the same transaction
+      const snapshotFetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : new Date();
       await tx
         .update(dataSources)
         .set({
-          lastSnapshotAt: new Date(),
+          lastSnapshotAt: snapshotFetchedAt,
           snapshotRecordCount: body.recordCount ?? null,
           latestSnapshotHash: body.snapshotHash,
           updatedAt: new Date(),

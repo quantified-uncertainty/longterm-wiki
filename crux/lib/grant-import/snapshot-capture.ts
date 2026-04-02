@@ -17,12 +17,12 @@ import { getManifest, MANIFESTS } from './manifests/index.ts';
  * Skips silently if no manifest or cache file exists.
  * Fire-and-forget: errors are logged but don't block the import.
  */
-export async function captureSourceSnapshot(sourceId: string): Promise<void> {
+export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boolean; error?: string }> {
   const manifest = getManifest(sourceId);
-  if (!manifest || !manifest.cachePath) return;
+  if (!manifest || !manifest.cachePath) return { ok: false, error: 'no manifest or cachePath' };
   if (!existsSync(manifest.cachePath)) {
     console.log(`  [snapshot] No cache file at ${manifest.cachePath}, skipping snapshot`);
-    return;
+    return { ok: false, error: `no cache file at ${manifest.cachePath}` };
   }
 
   try {
@@ -30,7 +30,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<void> {
     const rawContent = readFileSync(manifest.cachePath, 'utf8');
     if (!rawContent || rawContent.length === 0) {
       console.log(`  [snapshot] Empty cache file for ${sourceId}, skipping`);
-      return;
+      return { ok: false, error: 'empty cache file' };
     }
 
     // Hash for dedup
@@ -66,8 +66,9 @@ export async function captureSourceSnapshot(sourceId: string): Promise<void> {
     });
 
     if (!dsResult.ok) {
-      console.warn(`  [snapshot] Failed to sync data source ${sourceId}: ${dsResult.error}`);
-      return;
+      const msg = `Failed to sync data source ${sourceId}: ${dsResult.error}`;
+      console.warn(`  [snapshot] ${msg}`);
+      return { ok: false, error: msg };
     }
 
     // Store snapshot (dedup by hash — no-op if content unchanged)
@@ -85,21 +86,35 @@ export async function captureSourceSnapshot(sourceId: string): Promise<void> {
       } else {
         console.log(`  [snapshot] ${sourceId}: new snapshot stored (${recordCount ?? '?'} records, ${(rawContent.length / 1024).toFixed(0)}KB)`);
       }
+      return { ok: true };
     } else {
-      console.warn(`  [snapshot] Failed to store snapshot for ${sourceId}: ${snapResult.error}`);
+      const msg = `Failed to store snapshot for ${sourceId}: ${snapResult.error}`;
+      console.warn(`  [snapshot] ${msg}`);
+      return { ok: false, error: msg };
     }
   } catch (e: unknown) {
     // Best-effort — don't fail the import if snapshot capture fails
-    console.warn(`  [snapshot] Error capturing snapshot for ${sourceId}: ${e instanceof Error ? e.message : String(e)}`);
+    const msg = `Error capturing snapshot for ${sourceId}: ${e instanceof Error ? e.message : String(e)}`;
+    console.warn(`  [snapshot] ${msg}`);
+    return { ok: false, error: msg };
   }
 }
 
 /**
  * Capture snapshots for all sources that have manifests with cache files.
  */
-export async function captureAllSnapshots(sourceIds: string[]): Promise<void> {
+export async function captureAllSnapshots(sourceIds: string[]): Promise<{ succeeded: number; failed: number }> {
   console.log('\nCapturing source snapshots...');
+  let succeeded = 0;
+  let failed = 0;
   for (const id of sourceIds) {
-    await captureSourceSnapshot(id);
+    const result = await captureSourceSnapshot(id);
+    if (result.ok) {
+      succeeded++;
+    } else {
+      failed++;
+    }
   }
+  console.log(`Snapshot capture complete: ${succeeded} succeeded, ${failed} failed`);
+  return { succeeded, failed };
 }
