@@ -87,6 +87,8 @@ interface OrchestrateOptions extends BaseOptions {
   budget?: string;
   limit?: string;
   type?: string;
+  /** Filter to a specific record type (e.g. personnel, grant, funding-round) */
+  table?: string;
   'entity-type'?: string;
   entityType?: string;
   source?: string;
@@ -433,13 +435,17 @@ function collectFactItems(
 async function collectRecordItems(
   existingVerdicts: Map<string, VerifiedRecordInfo>,
   entityTypeFilter?: string,
+  tableFilter?: string,
 ): Promise<VerifyItem[]> {
   const items: VerifyItem[] = [];
 
   // Determine which record types to scan
-  const typesToScan = entityTypeFilter
-    ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
-    : [...VALID_RECORD_TYPES];
+  // --table filters to a specific record type (e.g. "personnel", "grant")
+  const typesToScan = tableFilter
+    ? VALID_RECORD_TYPES.filter(t => t === tableFilter)
+    : entityTypeFilter
+      ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
+      : [...VALID_RECORD_TYPES];
 
   for (const recordType of typesToScan) {
     let apiBasePath: string;
@@ -1199,9 +1205,13 @@ export async function orchestrateCommand(
   const budgetLimit = options.budget ? parseFloat(String(options.budget)) : undefined;
   const itemLimit = options.limit ? parseInt(String(options.limit), 10) : undefined;
   const typeFilter = options.type as VerifyItemKind | 'all' | undefined;
+  const tableFilter = options.table as string | undefined;
   const entityTypeFilter = (options['entity-type'] || options.entityType) as string | undefined;
   const sourceMode = (options.source as string) ?? 'existing';
   const useWebSearch = sourceMode === 'web-search' || sourceMode === 'all';
+
+  // --table implies --type=record (filter to specific record type)
+  const effectiveTypeFilter = tableFilter && !typeFilter ? 'record' as const : typeFilter;
 
   // Validate type filter
   const validTypes = ['fact', 'record', 'entity', 'all'];
@@ -1221,9 +1231,9 @@ export async function orchestrateCommand(
     };
   }
 
-  const shouldCollectFacts = !typeFilter || typeFilter === 'all' || typeFilter === 'fact';
-  const shouldCollectRecords = !typeFilter || typeFilter === 'all' || typeFilter === 'record';
-  const shouldCollectEntities = (typeFilter === 'entity' || typeFilter === 'all') && useWebSearch;
+  const shouldCollectFacts = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'fact';
+  const shouldCollectRecords = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'record';
+  const shouldCollectEntities = (effectiveTypeFilter === 'entity' || effectiveTypeFilter === 'all') && useWebSearch;
 
   console.log('\x1b[1mVerification Orchestrator\x1b[0m');
   console.log('');
@@ -1257,7 +1267,7 @@ export async function orchestrateCommand(
   }
 
   if (shouldCollectRecords) {
-    const recordItems = await collectRecordItems(existingRecordVerdicts, entityTypeFilter);
+    const recordItems = await collectRecordItems(existingRecordVerdicts, entityTypeFilter, tableFilter);
     allItems.push(...recordItems);
     console.log(`  Records: ${recordItems.length} items`);
   }
@@ -1299,7 +1309,6 @@ export async function orchestrateCommand(
   // ── Live execution ──
   const useBatch = !!options.batch;
   const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
-  const client = createLlmClient();
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,
@@ -1348,10 +1357,14 @@ export async function orchestrateCommand(
             summary.results.push(deterministicResult);
             console.log(`  ${progress} ${item.description.slice(0, 80)}`);
             console.log(`    \x1b[32mdeterministic: ${deterministicResult.verdict}\x1b[0m`);
-            await storeResult(item, deterministicResult).catch(() => {});
+            await storeResult(item, deterministicResult).catch((e: unknown) => {
+              console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+            });
             return;
           }
-        } catch { /* fall through to batch */ }
+        } catch (e: unknown) {
+          console.warn(`[source-check] Deterministic matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+        }
       }
 
       // Fetch source content
@@ -1428,7 +1441,7 @@ export async function orchestrateCommand(
       // Phase 3: Poll for completion
       const completedBatch = await pollBatch(anthropicClient, batch.id, {
         intervalMs: 15_000,
-        timeoutMs: 3_600_000, // 1 hour max
+        timeoutMs: 4_500_000, // 75 min — fits within 90-min workflow timeout with setup buffer
         onPoll: (b) => {
           const counts = b.request_counts;
           console.log(`  ... processing: ${counts.processing}, succeeded: ${counts.succeeded}, errored: ${counts.errored}`);
@@ -1499,6 +1512,7 @@ export async function orchestrateCommand(
     }
   } else {
     // ── Real-time execution path ──
+    const client = createLlmClient();
     const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
     console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
 
