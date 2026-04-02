@@ -11,6 +11,7 @@ import { ProfileStatCard } from "@/components/directory";
 import { SourcesTabs } from "./sources-tabs";
 import type { ResourceRow } from "../resources/resources-table";
 import type { PublicationRow } from "../publications/publications-table";
+import { DataSourcesTabContent } from "../data-sources/data-sources-tab-content";
 
 export const metadata: Metadata = {
   title: "Sources",
@@ -253,6 +254,7 @@ export default function SourcesPage() {
         resourceCount={resources.length}
         publicationRows={publicationRows}
         publicationCount={publications.length}
+        dataSourcesContent={<DataSourcesTabContent />}
       />
     </div>
   );

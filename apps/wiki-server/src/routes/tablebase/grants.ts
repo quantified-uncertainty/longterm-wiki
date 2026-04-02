@@ -68,6 +68,7 @@ const SyncGrantItemSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
+  dataSourceId: z.string().max(100).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
@@ -142,6 +143,7 @@ function formatRow(r: JoinedRow) {
     source: g.source,
     notes: g.notes,
     programId: g.programId,
+    dataSourceId: g.dataSourceId,
     // Structured entity refs (slug + name for frontend URL/display)
     grantee: granteeRef,
     organization: orgRef,
@@ -637,6 +639,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         source: item.source ?? null,
         notes: item.notes ?? null,
         programId: item.programId ?? null,
+        dataSourceId: item.dataSourceId ?? null,
       }));
 
       // Fetch existing records for audit log (before upsert)
@@ -664,6 +667,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             source: sql`excluded.source`,
             notes: sql`excluded.notes`,
             programId: sql`excluded.program_id`,
+            dataSourceId: sql`excluded.data_source_id`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
           },

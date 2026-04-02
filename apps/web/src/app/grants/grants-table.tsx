@@ -36,6 +36,10 @@ export interface GrantRow {
   date: string | null;
   status: string | null;
   source: string | null;
+  /** Inferred data source ID (e.g., "coefficient-giving") */
+  dataSourceId: string | null;
+  /** Inferred data source display name */
+  dataSourceName: string | null;
 }
 
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "date" | "status";
@@ -62,6 +66,7 @@ export function GrantsTable({
 
   const [search, setSearch] = useState(() => searchParams.get("search") ?? "");
   const [funderFilter, setFunderFilter] = useState<string>(() => searchParams.get("funder") ?? "all");
+  const [dataSourceFilter, setDataSourceFilter] = useState<string>(() => searchParams.get("dataSource") ?? "all");
   const [statusFilter, setStatusFilter] = useState<string>(() => searchParams.get("status") ?? "all");
   const [sortKey, setSortKey] = useState<SortKey>(() => (searchParams.get("sort") as SortKey) || "amount");
   const [sortDir, setSortDir] = useState<SortDir>(() => (searchParams.get("dir") as SortDir) || "desc");
@@ -93,6 +98,20 @@ export function GrantsTable({
     () => rows.some((r) => r.status != null),
     [rows],
   );
+
+  const dataSourceOptions = useMemo(() => {
+    const dsMap = new Map<string, { name: string; count: number }>();
+    for (const r of rows) {
+      if (r.dataSourceId && r.dataSourceName) {
+        const existing = dsMap.get(r.dataSourceId);
+        if (existing) existing.count++;
+        else dsMap.set(r.dataSourceId, { name: r.dataSourceName, count: 1 });
+      }
+    }
+    return [...dsMap.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([id, { name, count }]) => ({ id, name, count }));
+  }, [rows]);
 
   const statuses = useMemo(() => {
     const set = new Set<string>();
@@ -132,6 +151,10 @@ export function GrantsTable({
       result = result.filter((r) => r.organizationId === funderFilter);
     }
 
+    if (dataSourceFilter !== "all") {
+      result = result.filter((r) => r.dataSourceId === dataSourceFilter);
+    }
+
     if (statusFilter !== "all") {
       result = result.filter((r) => r.status === statusFilter);
     }
@@ -151,7 +174,7 @@ export function GrantsTable({
     result = [...result].sort((a, b) => compareGrantRows(a, b, sortKey, sortDir));
 
     return result;
-  }, [rows, search, funderFilter, statusFilter, sortKey, sortDir]);
+  }, [rows, search, funderFilter, dataSourceFilter, statusFilter, sortKey, sortDir]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const pageRows = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
@@ -221,6 +244,30 @@ export function GrantsTable({
             </div>
           )}
         </div>
+
+        {/* Data source filter */}
+        {dataSourceOptions.length >= 2 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Source:</span>
+            <select
+              aria-label="Filter by data source"
+              value={dataSourceFilter}
+              onChange={(e) => {
+                setDataSourceFilter(e.target.value);
+                setPage(0);
+                updateUrl({ dataSource: e.target.value === "all" ? null : e.target.value, page: null });
+              }}
+              className="text-xs px-2 py-1.5 rounded-lg border border-border bg-card"
+            >
+              <option value="all">All sources ({rows.length})</option>
+              {dataSourceOptions.map(({ id, name, count }) => (
+                <option key={id} value={id}>
+                  {name} ({count})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Funder filter */}
         {funders.length > 1 && (

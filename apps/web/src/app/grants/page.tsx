@@ -9,6 +9,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { buildProgramNameMap, resolveProgramName } from "./grants-utils";
+import { inferDataSource } from "./grants-data-source";
 
 export const metadata: Metadata = {
   title: "Grants",
@@ -73,6 +74,9 @@ export default function GrantsPage() {
     // Resolve recipient to display name and link info
     const resolved = recipientId ? resolveGrantRecipient(recipientId, record.displayName) : null;
 
+    const sourceUrl = typeof record.fields.source === "string" ? record.fields.source : null;
+    const ds = inferDataSource(sourceUrl);
+
     return {
       compositeKey: `${orgId}-${record.key}`,
       recordKey: record.key,
@@ -101,10 +105,9 @@ export default function GrantsPage() {
         typeof record.fields.status === "string"
           ? record.fields.status
           : null,
-      source:
-        typeof record.fields.source === "string"
-          ? record.fields.source
-          : null,
+      source: sourceUrl,
+      dataSourceId: ds?.id ?? null,
+      dataSourceName: ds?.name ?? null,
     };
   });
 
