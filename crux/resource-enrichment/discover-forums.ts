@@ -77,28 +77,36 @@ export async function discoverForumsCommand(
   // Phase 1: Discover posts from each forum
   const allDiscovered: DiscoveredPost[] = [];
 
+  let remaining = limit;
   for (const forum of selectedForums) {
+    if (remaining <= 0) break;
     console.log(`  Fetching from ${forum.name}...`);
-    const posts = await getGlobalPosts(forum, {
-      karmaThreshold: karma,
-      after,
-      before,
-      limit,
-      onPage: (count, lastKarma) => {
-        process.stdout.write(`\r    ${count.toLocaleString()} posts so far (karma ≥${lastKarma})...`);
-      },
-    });
-    process.stdout.write('\r');
-    console.log(`    ${posts.length.toLocaleString()} posts from ${forum.name}                `);
-
-    for (const post of posts) {
-      const url = postPermalink(forum, post);
-      allDiscovered.push({
-        forum,
-        post,
-        url,
-        id: hashId(url),
+    try {
+      const posts = await getGlobalPosts(forum, {
+        karmaThreshold: karma,
+        after,
+        before,
+        limit: remaining,
+        onPage: (count, lastKarma) => {
+          process.stdout.write(`\r    ${count.toLocaleString()} posts so far (karma ≥${lastKarma})...`);
+        },
       });
+      process.stdout.write('\r');
+      console.log(`    ${posts.length.toLocaleString()} posts from ${forum.name}                `);
+
+      for (const post of posts) {
+        const url = postPermalink(forum, post);
+        allDiscovered.push({
+          forum,
+          post,
+          url,
+          id: hashId(url),
+        });
+      }
+      remaining -= posts.length;
+    } catch (e: unknown) {
+      process.stdout.write('\r');
+      console.warn(`    ✗ ${forum.name} failed: ${e instanceof Error ? e.message : String(e)}                `);
     }
   }
 
@@ -140,9 +148,9 @@ export async function discoverForumsCommand(
   }
 
   // Show karma distribution
-  const karmas = deduped.map(d => d.post.baseScore).sort((a, b) => b - a);
+  const karmas = deduped.map(d => d.post.baseScore).sort((a, b) => a - b);
   if (karmas.length > 0) {
-    console.log(`\n  Karma range: ${karmas[karmas.length - 1]} – ${karmas[0]}`);
+    console.log(`\n  Karma range: ${karmas[0]} – ${karmas[karmas.length - 1]}`);
     const p10 = karmas[Math.floor(karmas.length * 0.1)];
     const p50 = karmas[Math.floor(karmas.length * 0.5)];
     const p90 = karmas[Math.floor(karmas.length * 0.9)];

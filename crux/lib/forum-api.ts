@@ -204,12 +204,23 @@ export async function getGlobalPosts(
       }) as { data?: { posts?: { results?: ForumPost[] } } };
 
       const page = data?.data?.posts?.results ?? [];
-      if (page.length === 0) break;
+      if (page.length === 0) {
+        // Detect offset cap: empty page when we haven't reached the end naturally
+        if (offset >= 2400) {
+          console.warn(`    ⚠ Offset cap (~2500) hit in window ${window.after}–${window.before} at offset ${offset}. Some posts may be missing.`);
+        }
+        break;
+      }
 
       allPosts.push(...page);
       options.onPage?.(allPosts.length, page[page.length - 1].baseScore);
 
-      if (page.length < thisPageSize) break;
+      if (page.length < thisPageSize) {
+        if (offset + page.length >= 2400 && page.length > 0) {
+          console.warn(`    ⚠ Short page near offset cap in window ${window.after}–${window.before} (offset ${offset + page.length}). Some posts may be missing.`);
+        }
+        break;
+      }
       offset += page.length;
 
       // Throttle
