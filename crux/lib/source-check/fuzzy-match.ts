@@ -90,15 +90,38 @@ export function amountMatches(a: number | null, b: number | null, tolerancePct =
   return diff / maxVal <= tolerancePct;
 }
 
+const MONTH_NAMES: Record<string, string> = {
+  january: '01', february: '02', march: '03', april: '04',
+  may: '05', june: '06', july: '07', august: '08',
+  september: '09', october: '10', november: '11', december: '12',
+};
+
+/**
+ * Normalize a date string to ISO-ish format.
+ * Handles natural language like "March 2017" -> "2017-03".
+ */
+function normalizeDateString(d: string): string {
+  const monthMatch = d.trim().match(/^(\w+)\s+(\d{4})$/i);
+  if (monthMatch) {
+    const monthNum = MONTH_NAMES[monthMatch[1].toLowerCase()];
+    if (monthNum) return `${monthMatch[2]}-${monthNum}`;
+  }
+  return d;
+}
+
 /**
  * Check if two dates match with appropriate granularity.
  * - "2018" matches "2018-07" matches "2018-07-15" (year is sufficient)
  * - "2018-07" matches "2018-07-15" (month is sufficient)
- * - Tolerates format differences ("July 2018" should have been parsed to ISO already)
+ * - Handles natural language dates like "March 2017"
  */
 export function dateMatches(a: string | null, b: string | null): boolean {
   if (a == null || b == null) return a == null && b == null;
   if (a === b) return true;
+
+  // Normalize natural language dates to ISO format before parsing
+  const normA = normalizeDateString(a);
+  const normB = normalizeDateString(b);
 
   // Extract year and optional month from ISO-ish dates
   const parseDate = (d: string): { year: number; month?: number } | null => {
@@ -107,8 +130,8 @@ export function dateMatches(a: string | null, b: string | null): boolean {
     return { year: parseInt(m[1], 10), month: m[2] ? parseInt(m[2], 10) : undefined };
   };
 
-  const dateA = parseDate(a);
-  const dateB = parseDate(b);
+  const dateA = parseDate(normA);
+  const dateB = parseDate(normB);
   if (!dateA || !dateB) return false;
 
   // Year must match

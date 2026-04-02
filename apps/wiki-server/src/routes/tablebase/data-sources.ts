@@ -269,14 +269,29 @@ const dataSourcesApp = new Hono()
         return { id: existing?.id ?? 0, deduplicated: true } as const;
       }
 
-      // Update data source metadata within the same transaction
+      // Only advance latest-snapshot metadata when the incoming snapshot
+      // is newer than what's stored. This prevents backfills from overwriting
+      // the true "latest" and keeps data_sources in sync with the
+      // /snapshots/latest endpoint (which orders by fetched_at DESC).
       const snapshotFetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : new Date();
+      const [current] = await tx
+        .select({ lastSnapshotAt: dataSources.lastSnapshotAt })
+        .from(dataSources)
+        .where(eq(dataSources.id, dataSourceId));
+
+      const shouldAdvanceLatest =
+        !current?.lastSnapshotAt || snapshotFetchedAt >= current.lastSnapshotAt;
+
       await tx
         .update(dataSources)
         .set({
-          lastSnapshotAt: snapshotFetchedAt,
-          snapshotRecordCount: body.recordCount ?? null,
-          latestSnapshotHash: body.snapshotHash,
+          ...(shouldAdvanceLatest
+            ? {
+                lastSnapshotAt: snapshotFetchedAt,
+                snapshotRecordCount: body.recordCount ?? null,
+                latestSnapshotHash: body.snapshotHash,
+              }
+            : {}),
           updatedAt: new Date(),
         })
         .where(eq(dataSources.id, dataSourceId));
