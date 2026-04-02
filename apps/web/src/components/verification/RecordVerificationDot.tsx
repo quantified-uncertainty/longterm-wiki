@@ -12,6 +12,7 @@
 import {
   SOURCE_CHECK_VERDICT_CONFIG,
   type SourceCheckVerdict,
+  type VerdictDisplayConfig,
 } from "./verdict-config";
 
 interface RecordVerificationDotProps {
@@ -30,10 +31,15 @@ export function RecordVerificationDot({
   size = "sm",
   className = "",
 }: RecordVerificationDotProps) {
-  if (!verdict) return null;
+  const UNVERIFIED_CONFIG: VerdictDisplayConfig = {
+    color: "bg-muted-foreground/30",
+    label: "Unverified",
+    textColor: "text-muted-foreground/60",
+  };
 
-  const config =
-    SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict];
+  const config = verdict
+    ? SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict]
+    : UNVERIFIED_CONFIG;
   if (!config) return null; // Unknown verdict (e.g., "unchecked") — render nothing
 
   const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
