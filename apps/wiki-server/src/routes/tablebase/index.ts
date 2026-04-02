@@ -29,3 +29,4 @@ export { secondaryMarketPricesRoute, type SecondaryMarketPricesRoute } from "./s
 export { predictionMarketsRoute, type PredictionMarketsRoute } from "./prediction-markets.js";
 export { politicalRacesRoute, type PoliticalRacesRoute } from "./political-races.js";
 export { talentFlowsRoute, type TalentFlowsRoute } from "./talent-flows.js";
+export { platformAccountsRoute, type PlatformAccountsRoute } from "./platform-accounts.js";

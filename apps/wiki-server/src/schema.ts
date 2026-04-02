@@ -3268,6 +3268,48 @@ export const blueskyPosts = pgTable(
 // ── Political Races ──────────────────────────────────────────────────────
 //
 // Tracks political races relevant to AI policy (2026 midterms, ballot measures).
+// ---------------------------------------------------------------------------
+// Platform accounts — external platform identities for wiki entities
+// ---------------------------------------------------------------------------
+
+/** Maps wiki entities (people, orgs) to accounts on external platforms. */
+export const platformAccounts = pgTable(
+  "platform_accounts",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    /** Platform identifier: 'lesswrong', 'eaforum', 'github', 'twitter', etc. */
+    platform: text("platform").notNull(),
+    /** Username/slug/handle on the platform */
+    platformUsername: text("platform_username").notNull(),
+    /** Immutable platform-internal ID (LW _id, GitHub numeric ID, etc.) */
+    platformUserId: text("platform_user_id"),
+    /** FK to entities.stable_id — nullable (accounts can exist before linking) */
+    entityStableId: text("entity_stable_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Cached display name from the platform */
+    displayName: text("display_name"),
+    /** Full URL to the profile page */
+    profileUrl: text("profile_url"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_pa_platform_username").on(table.platform, table.platformUsername),
+    index("idx_pa_entity").on(table.entityStableId),
+    index("idx_pa_platform_user_id").on(table.platform, table.platformUserId),
+  ]
+);
+
+// ---------------------------------------------------------------------------
+// Political races — election tracking
+// ---------------------------------------------------------------------------
+
 // Each race can have multiple candidates via the race_candidates join table.
 
 export const politicalRaces = pgTable(
