@@ -5,7 +5,7 @@
  * Part of Phase 1: Data Source Resources (Discussion #3567).
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { DataSourcesRoute } from '../../../apps/wiki-server/src/routes/tablebase/data-sources.ts';
 
@@ -79,10 +79,14 @@ export async function createSnapshot(
   dataSourceId: string,
   input: CreateSnapshotInput,
 ): Promise<ApiResult<SnapshotCreateResult>> {
-  return apiRequest<SnapshotCreateResult>(
+  // Large snapshots (grant CSVs up to 40MB) need extended timeout
+  const payloadSizeMB = input.rawContent.length / (1024 * 1024);
+  const timeoutMs = payloadSizeMB > 1 ? 120_000 : 30_000;
+  return batchedRequest<SnapshotCreateResult>(
     'POST',
     `/api/data-sources/${encodeURIComponent(dataSourceId)}/snapshots`,
     input,
+    timeoutMs,
   );
 }
 

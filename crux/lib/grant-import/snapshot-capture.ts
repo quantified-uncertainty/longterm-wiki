@@ -13,6 +13,21 @@ import { syncDataSource, createSnapshot } from '../wiki-server/data-sources.ts';
 import { getManifest, MANIFESTS } from './manifests/index.ts';
 import { parseCSVContent, parseHTMLTable, parseJSONArray } from '../source-check/source-parsers.ts';
 
+const RATE_LIMIT_DELAY_MS = 6_000;
+const INTER_SOURCE_DELAY_MS = 2_000;
+const MAX_RETRIES = 2;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isRateLimited(result: { ok: false; error: string; message: string }): number | null {
+  const match = result.message.match(/retryAfter[":]\s*(\d+)/i);
+  if (match) return parseInt(match[1], 10) * 1000;
+  if (result.message.includes('429') || result.message.includes('rate_limit')) return RATE_LIMIT_DELAY_MS;
+  return null;
+}
+
 /**
  * Register data source and capture a snapshot for a grant source.
  * Skips silently if no manifest or cache file exists.
@@ -52,8 +67,8 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
       recordCount = null;
     }
 
-    // Register/update the data source
-    const dsResult = await syncDataSource({
+    // Register/update the data source (with retry on rate limit)
+    let dsResult = await syncDataSource({
       id: manifest.sourceId,
       name: manifest.name,
       dataFormat: manifest.format,
@@ -71,19 +86,42 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
     });
 
     if (!dsResult.ok) {
-      const detail = !dsResult.ok ? dsResult.message : '';
-      const msg = `Failed to sync data source ${sourceId}: ${dsResult.error}${detail ? ` — ${detail}` : ''}`;
+      const retryMs = isRateLimited(dsResult);
+      if (retryMs) {
+        console.log(`  [snapshot] ${sourceId}: rate limited, retrying in ${retryMs / 1000}s...`);
+        await sleep(retryMs);
+        dsResult = await syncDataSource({
+          id: manifest.sourceId, name: manifest.name, dataFormat: manifest.format,
+          accessMethod: manifest.accessMethod, recordType: 'grant', fetchUrl: manifest.fetchUrl,
+          publisherEntityId: manifest.publisherEntityId, updateFrequency: manifest.updateFrequency,
+          columnMapping: Object.fromEntries(manifest.schema.fields.filter(f => f.internalField).map(f => [f.sourceName, f.internalField!])),
+          verificationConfig: manifest.verification as unknown as Record<string, unknown>,
+        });
+      }
+    }
+
+    if (!dsResult.ok) {
+      const msg = `Failed to sync data source ${sourceId}: ${dsResult.error}${dsResult.message ? ` — ${dsResult.message}` : ''}`;
       console.warn(`  [snapshot] ${msg}`);
       return { ok: false, error: msg };
     }
 
-    // Store snapshot (dedup by hash — no-op if content unchanged)
-    const snapResult = await createSnapshot(manifest.sourceId, {
+    // Store snapshot (dedup by hash — no-op if content unchanged, retry on rate limit)
+    let snapResult = await createSnapshot(manifest.sourceId, {
       snapshotHash,
       rawContent,
       recordCount,
       parserVersion: '1',
     });
+
+    if (!snapResult.ok) {
+      const retryMs = isRateLimited(snapResult);
+      if (retryMs) {
+        console.log(`  [snapshot] ${sourceId}: rate limited, retrying in ${retryMs / 1000}s...`);
+        await sleep(retryMs);
+        snapResult = await createSnapshot(manifest.sourceId, { snapshotHash, rawContent, recordCount, parserVersion: '1' });
+      }
+    }
 
     if (snapResult.ok) {
       const data = snapResult.data as { deduplicated?: boolean; id?: number };
@@ -95,8 +133,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
       return { ok: true };
     } else {
       const sizeMB = (rawContent.length / (1024 * 1024)).toFixed(1);
-      const detail = !snapResult.ok ? snapResult.message : '';
-      const msg = `Failed to store snapshot for ${sourceId} (${sizeMB}MB): ${snapResult.error}${detail ? ` — ${detail}` : ''}`;
+      const msg = `Failed to store snapshot for ${sourceId} (${sizeMB}MB): ${snapResult.error}${snapResult.message ? ` — ${snapResult.message}` : ''}`;
       console.warn(`  [snapshot] ${msg}`);
       return { ok: false, error: msg };
     }
@@ -110,14 +147,16 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
 
 /**
  * Capture snapshots for all sources that have manifests with cache files.
+ * Adds inter-source delay to avoid rate limiting.
  */
 export async function captureAllSnapshots(sourceIds: string[]): Promise<{ succeeded: number; failed: number; skipped: number }> {
   console.log('\nCapturing source snapshots...');
   let succeeded = 0;
   let failed = 0;
   let skipped = 0;
-  for (const id of sourceIds) {
-    const result = await captureSourceSnapshot(id);
+  for (let i = 0; i < sourceIds.length; i++) {
+    if (i > 0) await sleep(INTER_SOURCE_DELAY_MS);
+    const result = await captureSourceSnapshot(sourceIds[i]);
     if (result.ok) {
       succeeded++;
     } else if (result.skipped) {
