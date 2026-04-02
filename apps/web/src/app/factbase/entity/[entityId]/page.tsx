@@ -16,11 +16,11 @@ import type { FactBaseRecordEntry } from "@/data/factbase";
 import {
   formatKBFactValue,
   formatKBDate,
-  formatKBCellValue,
   shortDomain,
   titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
+import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 
 import {
   WikiSidebar,
@@ -618,30 +618,13 @@ function GenericCollectionTable({
                       ? { type: "ref" as const }
                       : undefined);
 
-                  if (fieldDef?.type === "ref" && typeof cellValue === "string") {
-                    const refEntity = getKBEntity(cellValue);
-                    return (
-                      <td key={col} className="py-1.5 px-3">
-                        <Link href={`/factbase/entity/${cellValue}`} className="text-blue-600 hover:underline dark:text-blue-400">
-                          {refEntity?.name ?? cellValue}
-                        </Link>
-                      </td>
-                    );
-                  }
-
-                  if (typeof cellValue === "string" && isUrl(cellValue)) {
-                    return (
-                      <td key={col} className="py-1.5 px-3">
-                        <a href={cellValue} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline dark:text-blue-400">
-                          {shortDomain(cellValue)}
-                        </a>
-                      </td>
-                    );
-                  }
-
                   return (
                     <td key={col} className="py-1.5 px-3">
-                      {formatKBCellValue(cellValue, fieldDef)}
+                      <FBCellValue
+                        value={cellValue}
+                        fieldName={col}
+                        fieldDef={fieldDef}
+                      />
                     </td>
                   );
                 })}
