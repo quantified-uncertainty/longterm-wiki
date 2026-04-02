@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, writeFileSync } from "fs";
 import { execFileSync } from "child_process";
 import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
@@ -122,6 +122,15 @@ export const source: GrantSource = {
       execFileSync("curl", ["-fsSL", "--retry", "3", "--connect-timeout", "10", "-o", path, url], {
         stdio: "inherit",
       });
+    }
+    // Write combined SQL file for snapshot capture
+    const combined = FTX_SQL_FILES
+      .map(f => `${FTX_SQL_DIR}/${f}`)
+      .filter(p => existsSync(p))
+      .map(p => readFileSync(p, 'utf8'))
+      .join('\n');
+    if (combined.length > 0) {
+      writeFileSync('/tmp/ftx-future-fund-combined.sql', combined);
     }
   },
 
