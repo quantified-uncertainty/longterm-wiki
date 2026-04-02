@@ -29,14 +29,15 @@ describe("isSidRef", () => {
 });
 
 describe("isLegacyIdRef", () => {
-  it("returns true for 10-char alphanumeric IDs with uppercase", () => {
+  it("returns true for 10-char alphanumeric IDs", () => {
     expect(isLegacyIdRef("mK9pX3rQ7n")).toBe(true);
     expect(isLegacyIdRef("ABCDEFGHIJ")).toBe(true);
     expect(isLegacyIdRef("aB3dE5gH9j")).toBe(true);
   });
 
-  it("returns false for all-lowercase 10-char strings", () => {
-    expect(isLegacyIdRef("abcdefghij")).toBe(false);
+  it("returns true for all-lowercase 10-char strings", () => {
+    // Must match ref-detection.ts ENTITY_ID_RE which has no uppercase requirement
+    expect(isLegacyIdRef("abcdefghij")).toBe(true);
   });
 
   it("returns false for strings of wrong length", () => {

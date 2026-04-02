@@ -75,11 +75,12 @@ export function isSidRef(value: string): boolean {
 
 /**
  * Check if a string looks like a legacy 10-char alphanumeric entity ID.
- * Must be exactly 10 chars, alphanumeric, with at least one uppercase letter.
- * This heuristic matches the pattern used by generateId() / generateShortId().
+ * Must be exactly 10 chars, alphanumeric. Matches the ENTITY_ID_RE pattern
+ * used by the UI rendering code in ref-detection.ts — the validator must
+ * detect the same values that the rendering code treats as potential refs.
  */
 export function isLegacyIdRef(value: string): boolean {
-  return /^[A-Za-z0-9]{10}$/.test(value) && /[A-Z]/.test(value);
+  return /^[A-Za-z0-9]{10}$/.test(value);
 }
 
 // ---------------------------------------------------------------------------
