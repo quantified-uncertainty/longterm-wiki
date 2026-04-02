@@ -40,40 +40,103 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Estimated cumulative funding raised 2000-2025 based on summing 990 revenue filings. Major known sources: Open Philanthropy/Coefficient Giving ~$14.8M (2016-2020), Vitalik Buterin Ethereum donation ~$15M (2021), SFF grants (multiple rounds), FLI ~$250K (2015), and individual donors. Note: ProPublica shows ~$16.5M net assets as of 2024, which reflects current holdings not cumulative funding raised."
 
+  - id: f_RRODDJe5Xw
+    property: revenue
+    value: 25558423
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
+
+  - id: f_TYNzj3vH2g
+    property: revenue
+    value: 1906891
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
+  - id: f_LwVgJmwNRg
+    property: revenue
+    value: 1863044
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
   - id: f_DgTzpJumMg
     property: revenue
     value: 1534913
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Total revenue for fiscal year 2024 per ProPublica filing"
+    notes: "From IRS Form 990"
 
-  - id: f_I3Ifo1LuEg
-    property: cash-burn
+  - id: f_nnSVoNRUcQ
+    property: annual-expenses
+    value: 6805494
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
+  - id: f_eqcz5QOuQQ
+    property: annual-expenses
+    value: 5329275
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
+  - id: f_6iYdA7ZiRQ
+    property: annual-expenses
+    value: 6882810
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
+  - id: f_cDzkBRiTFg
+    property: annual-expenses
     value: 6508701
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Total expenses for fiscal year 2024 per ProPublica filing"
+    notes: "From IRS Form 990"
 
-  - id: f_WcIuEd2qNQ
-    property: description
-    value: "Net assets (2024): $15,242,215"
+  - id: f_pH9O3e0cZw
+    property: headcount
+    value: 28
+    asOf: "2023"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Net assets per ProPublica filing, not total funding raised; implies ~2
-      years operational runway"
+    notes: "From IRS Form 990. Note: MIRI's own 2023 review (f_EUnXQGwIzd) reports ~18 staff; the 990 figure may count employees who departed during the year."
 
   - id: f_61BEuj13Jg
     property: headcount
     value: 42
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Approximate headcount per ProPublica filing"
+    notes: "From IRS Form 990. Headcount increased as MIRI expanded into technical governance and communications."
 
-  - id: f_RRODDJe5Xw
-    property: revenue
-    value: 25600000
+  - id: f_mlv2KxJeyw
+    property: net-assets
+    value: 29612703
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
-    notes: "Revenue spike partly due to Vitalik Buterin Ethereum donation"
+    notes: "From IRS Form 990. Peak net assets after Buterin donation."
+
+  - id: f_XsbqGh1jaA
+    property: net-assets
+    value: 23759962
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990"
+
+  - id: f_EI6qlTJqcA
+    property: net-assets
+    value: 19657902
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990. Declining as expenses exceed revenue."
+
+  - id: f_L0YW4wTCdg
+    property: net-assets
+    value: 15242215
+    asOf: "2024"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "From IRS Form 990. Implies ~2 years operational runway at current burn rate."
   - id: naKZe9gv3A
     property: website
     value: http://intelligence.org/

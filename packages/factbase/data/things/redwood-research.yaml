@@ -22,3 +22,119 @@ facts:
       - !ref sid_R8tDuupBTt
       - !ref sid_Z62bQynY4g
     source: https://www.redwoodresearch.org/
+
+  - id: f_D7mjGeS1zw
+    property: legal-identifier
+    value: "87-1702255 (EIN)"
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "IRS 501(c)(3) nonprofit. Tax-exempt since September 2021."
+
+  - id: f_djeGq9dqSA
+    property: revenue
+    value: "13904248"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. First year of operations."
+
+  - id: f_NRg485oCJw
+    property: revenue
+    value: "12049894"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_2Renvd6yYg
+    property: revenue
+    value: "10036347"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_6L6LOTW5Hw
+    property: revenue
+    value: "22060"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. Dramatic revenue decline; organization drawing down reserves."
+
+  - id: f_zUSEWyPxrA
+    property: annual-expenses
+    value: "2341569"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. First year; ramping up operations."
+
+  - id: f_C7KMno2g6Q
+    property: annual-expenses
+    value: "12759191"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_Zi6S0NWlVg
+    property: annual-expenses
+    value: "12590834"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_kBjzUvpoiw
+    property: annual-expenses
+    value: "2922498"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. Significant reduction in spending."
+
+  - id: f_LwFpvv6x3w
+    property: headcount
+    value: 10
+    asOf: 2021-10
+    source: https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama
+    notes: "Ten people on staff per October 2021 EA Forum AMA."
+
+  - id: f_DtgrUgJ68g
+    property: headcount
+    value: 34
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. Additionally 3 volunteers."
+
+  - id: f_fuHk3Y2qpQ
+    property: net-assets
+    value: "11562679"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_eUlrCHH4uQ
+    property: net-assets
+    value: "10853382"
+    unit: USD
+    asOf: 2022
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_4DFAHutX6Q
+    property: net-assets
+    value: "8298895"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990"
+
+  - id: f_6uYJTha67A
+    property: net-assets
+    value: "6497522"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+    notes: "From IRS Form 990. Declining reserves."

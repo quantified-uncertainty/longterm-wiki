@@ -165,6 +165,22 @@ facts:
     source: https://www.openphilanthropy.org/grants/?q=govai
     notes: "Total identified Open Philanthropy/Coefficient Giving funding ~$13.3M+ across multiple grants 2020-2025"
 
+  - id: f_N5d3TF1C6Q
+    property: revenue
+    value: "5748996"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/994000294
+    notes: "From IRS Form 990 for the US entity (Centre for the Governance of AI Inc, EIN 99-4000294). First year of US filing; tax-exempt since September 2024. Nearly all revenue ($5.73M) from contributions."
+
+  - id: f_vBDNosn0YQ
+    property: annual-expenses
+    value: "919661"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/994000294
+    notes: "From IRS Form 990 for the US entity only. The UK entity (Companies House #15883729) has separate finances. Total organizational spending is significantly higher."
+
   - id: f_2odDfMQpHD
     property: advisory-board
     value: "Ajeya Cotra, Allan Dafoe, Helen Toner, Tasha McCauley, Toby Ord"
