@@ -2,12 +2,11 @@
  * Data Sources CLI — manage structured data sources and snapshots.
  *
  * Usage:
- *   crux tb data-sources list                          List all registered data sources
- *   crux tb data-sources show <id>                     Show details + snapshot history
- *   crux tb data-sources snapshot <id>                 Capture a new snapshot
- *   crux tb data-sources snapshot --all                Capture snapshots for all sources
- *   crux tb data-sources verify <id> [--dry-run]       Run deterministic verification
- *   crux tb data-sources health                        Check mapping validity, staleness
+ *   crux tb data-sources-list                          List all registered data sources
+ *   crux tb data-sources-show <id>                     Show details + snapshot history
+ *   crux tb data-sources-snapshot <id>                 Capture a new snapshot
+ *   crux tb data-sources-snapshot --all                Capture snapshots for all sources
+ *   crux tb data-sources-health                        Check mapping validity, staleness
  *
  * Part of Phase 4: Data Source Resources (Discussion #3567).
  */
@@ -57,7 +56,7 @@ async function listCommand(_args: string[], _options: Options): Promise<CommandR
 async function showCommand(args: string[], _options: Options): Promise<CommandResult> {
   const id = args[0];
   if (!id) {
-    return { exitCode: 1, output: 'Usage: crux tb data-sources show <id>' };
+    return { exitCode: 1, output: 'Usage: crux tb data-sources-show <id>' };
   }
 
   const { getDataSource, listSnapshots } = await import('../lib/wiki-server/data-sources.ts');
@@ -103,11 +102,8 @@ async function snapshotCommand(args: string[], options: Options): Promise<Comman
   const { captureSourceSnapshot, captureAllSnapshots } = await import('../lib/grant-import/snapshot-capture.ts');
   const { MANIFESTS } = await import('../lib/grant-import/manifests/index.ts');
   const { ALL_SOURCES } = await import('../lib/grant-import/sources/index.ts');
-  const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
-
   if (options.all) {
     // Ensure data is downloaded first
-    const matcher = buildEntityMatcher();
     for (const src of ALL_SOURCES) {
       console.log(`Downloading ${src.name}...`);
       try {
@@ -122,7 +118,7 @@ async function snapshotCommand(args: string[], options: Options): Promise<Comman
 
   const id = args[0];
   if (!id) {
-    return { exitCode: 1, output: 'Usage: crux tb data-sources snapshot <id> or --all' };
+    return { exitCode: 1, output: 'Usage: crux tb data-sources-snapshot <id> or --all' };
   }
 
   if (!MANIFESTS[id]) {
@@ -213,10 +209,10 @@ Commands:
   health                       Check mapping validity, staleness
 
 Examples:
-  crux tb data-sources list
-  crux tb data-sources show coefficient-giving
-  crux tb data-sources snapshot sff
-  crux tb data-sources snapshot --all
-  crux tb data-sources health
+  crux tb data-sources-list
+  crux tb data-sources-show coefficient-giving
+  crux tb data-sources-snapshot sff
+  crux tb data-sources-snapshot --all
+  crux tb data-sources-health
 `;
 }
