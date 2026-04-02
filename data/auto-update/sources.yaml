@@ -231,5 +231,44 @@ sources:
     # Supports watchlist entry for epstein-ai-connections page.
     # Disable when watchlist entry expires (2026-04-16).
 
+  # ── Political / AI Policy ─────────────────────────────────────────────────
+  # Track AI-related political developments, legislation, and candidate positions.
+
+  - id: ai-policy-congress
+    name: AI Policy in Congress
+    type: web-search
+    query: "AI safety regulation bill congress 2026"
+    frequency: daily
+    categories: [policy, governance, legislation]
+    reliability: medium
+    enabled: true
+
+  - id: ai-pac-elections
+    name: AI PAC & Election Spending
+    type: web-search
+    query: "AI PAC super PAC election spending 2026 Leading the Future OR Think Big OR Public First"
+    frequency: weekly
+    categories: [policy, funding, governance]
+    reliability: medium
+    enabled: true
+
+  - id: state-ai-legislation
+    name: State AI Legislation
+    type: web-search
+    query: "state AI regulation legislation bill 2026 signed enacted"
+    frequency: weekly
+    categories: [policy, governance, legislation]
+    reliability: medium
+    enabled: true
+
+  - id: biosecurity-policy-news
+    name: Biosecurity Policy
+    type: web-search
+    query: "biosecurity pandemic preparedness congress policy 2026"
+    frequency: weekly
+    categories: [policy, governance, biosecurity]
+    reliability: medium
+    enabled: true
+
 # State tracking is stored in data/auto-update/state.yaml (auto-maintained).
 # This file is only for source configuration — it is never rewritten by code.
