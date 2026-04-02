@@ -71,7 +71,8 @@ function fieldMatches(
   fuzzyFields: string[],
   exactFields: string[],
 ): boolean {
-  if (recordValue == null && sourceValue == null) return true;
+  // Both null: not a meaningful match — don't award points for missing data
+  if (recordValue == null && sourceValue == null) return false;
   if (recordValue == null || sourceValue == null) return false;
 
   // Amount fields — numeric comparison with tolerance
@@ -169,10 +170,11 @@ export function matchRecordAgainstSnapshot(
 
       if (fieldMatches(field, recordVal, sourceVal, fuzzyFields, exactFields)) {
         matchedFields.push(field);
-      } else if (recordVal != null && sourceVal != null) {
+      } else {
+        // Count as mismatch when values differ — including asymmetric nulls
+        // (one side has data, the other doesn't)
         mismatchedFields.push(field);
       }
-      // If one is null and the other isn't, don't count as mismatch (just not matched)
     }
 
     // Use ALL configured fields as denominator so null record fields count against the score
@@ -187,11 +189,11 @@ export function matchRecordAgainstSnapshot(
   if (!bestMatch || bestMatch.score === 0) {
     return {
       matched: false,
-      matchedRow: null,
+      matchedRow: bestMatch?.row ?? null,
       confidence: 0.1,
       reasoning: `Record not found in source snapshot (${rawRows.length} rows searched, matched on: ${matchFields.join(', ')})`,
-      fieldsMatched: [],
-      fieldsMismatched: matchFields,
+      fieldsMatched: bestMatch?.matched ?? [],
+      fieldsMismatched: bestMatch?.mismatched ?? matchFields,
     };
   }
 

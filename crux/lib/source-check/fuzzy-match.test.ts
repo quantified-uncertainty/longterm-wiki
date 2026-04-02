@@ -84,9 +84,9 @@ describe('amountMatches', () => {
     expect(amountMatches(5000000, 5100000)).toBe(false);
   });
 
-  it('requires exact match for small amounts', () => {
+  it('allows at most $1 tolerance for small amounts', () => {
     expect(amountMatches(100, 101)).toBe(true); // within $1
-    expect(amountMatches(100, 105)).toBe(false);
+    expect(amountMatches(100, 105)).toBe(false); // beyond $1
   });
 });
 

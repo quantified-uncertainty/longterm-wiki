@@ -143,7 +143,13 @@ async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = true) {
   // Capture source snapshots (best-effort, doesn't block import)
   if (!dryRun) {
     const sourceIds = sources.map(s => s.id);
-    await captureAllSnapshots(sourceIds);
+    try {
+      await captureAllSnapshots(sourceIds);
+    } catch (e: unknown) {
+      console.warn(
+        `[import-grants] Snapshot capture failed (non-blocking): ${e instanceof Error ? e.message : String(e)}`
+      );
+    }
   }
 }
 

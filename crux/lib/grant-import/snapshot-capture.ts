@@ -11,18 +11,19 @@ import { readFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 import { syncDataSource, createSnapshot } from '../wiki-server/data-sources.ts';
 import { getManifest, MANIFESTS } from './manifests/index.ts';
+import { parseCSVContent, parseHTMLTable, parseJSONArray } from '../source-check/source-parsers.ts';
 
 /**
  * Register data source and capture a snapshot for a grant source.
  * Skips silently if no manifest or cache file exists.
  * Fire-and-forget: errors are logged but don't block the import.
  */
-export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boolean; error?: string }> {
+export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
   const manifest = getManifest(sourceId);
-  if (!manifest || !manifest.cachePath) return { ok: false, error: 'no manifest or cachePath' };
+  if (!manifest || !manifest.cachePath) return { ok: false, skipped: true, error: 'no manifest or cachePath' };
   if (!existsSync(manifest.cachePath)) {
     console.log(`  [snapshot] No cache file at ${manifest.cachePath}, skipping snapshot`);
-    return { ok: false, error: `no cache file at ${manifest.cachePath}` };
+    return { ok: false, skipped: true, error: `no cache file at ${manifest.cachePath}` };
   }
 
   try {
@@ -36,15 +37,19 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
     // Hash for dedup
     const snapshotHash = createHash('sha256').update(rawContent).digest('hex').slice(0, 64);
 
-    // Count records (rough estimate from line count for CSVs)
+    // Count records using the same parsers used for deterministic matching
     let recordCount: number | null = null;
-    if (manifest.format === 'csv') {
-      recordCount = rawContent.split('\n').filter(l => l.trim()).length - 1; // subtract header
-    } else if (manifest.format === 'json_api') {
-      try {
-        const parsed = JSON.parse(rawContent);
-        recordCount = Array.isArray(parsed) ? parsed.length : null;
-      } catch { /* ignore parse errors for counting */ }
+    try {
+      if (manifest.format === 'csv' || manifest.format === 'spreadsheet') {
+        recordCount = parseCSVContent(rawContent).length;
+      } else if (manifest.format === 'json_api') {
+        recordCount = parseJSONArray(rawContent).length;
+      } else if (manifest.format === 'html_table') {
+        recordCount = parseHTMLTable(rawContent).length;
+      }
+    } catch {
+      // Fall back to null if parsing fails — recordCount is advisory
+      recordCount = null;
     }
 
     // Register/update the data source
@@ -103,18 +108,23 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
 /**
  * Capture snapshots for all sources that have manifests with cache files.
  */
-export async function captureAllSnapshots(sourceIds: string[]): Promise<{ succeeded: number; failed: number }> {
+export async function captureAllSnapshots(sourceIds: string[]): Promise<{ succeeded: number; failed: number; skipped: number }> {
   console.log('\nCapturing source snapshots...');
   let succeeded = 0;
   let failed = 0;
+  let skipped = 0;
   for (const id of sourceIds) {
     const result = await captureSourceSnapshot(id);
     if (result.ok) {
       succeeded++;
+    } else if (result.skipped) {
+      skipped++;
     } else {
       failed++;
     }
   }
-  console.log(`Snapshot capture complete: ${succeeded} succeeded, ${failed} failed`);
-  return { succeeded, failed };
+  const parts = [`${succeeded} succeeded`, `${failed} failed`];
+  if (skipped > 0) parts.push(`${skipped} skipped (no manifest/cache)`);
+  console.log(`Snapshot capture complete: ${parts.join(', ')}`);
+  return { succeeded, failed, skipped };
 }
