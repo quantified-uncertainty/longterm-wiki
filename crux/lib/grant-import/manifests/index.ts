@@ -121,7 +121,7 @@ const manifund: DataSourceManifest = {
 const gatesFoundation: DataSourceManifest = {
   sourceId: 'gates-foundation',
   name: 'Gates Foundation Grants',
-  fetchUrl: 'https://www.gatesfoundation.org/about/committed-grants',
+  fetchUrl: 'https://www.gatesfoundation.org/-/media/files/bmgf-grants.csv',
   format: 'csv',
   accessMethod: 'direct_download',
   publisherEntityId: 'sid_l4EHdNDZqg',
@@ -174,9 +174,9 @@ const givewell: DataSourceManifest = {
 const fli: DataSourceManifest = {
   sourceId: 'fli',
   name: 'Future of Life Institute Grants',
-  fetchUrl: 'https://futureoflife.org/project/all-grants-awarded/',
-  format: 'csv',
-  accessMethod: 'web_scrape',
+  fetchUrl: 'https://raw.githubusercontent.com/vipulnaik/donations/master/sql/donations/private-foundations/future-of-life-institute-grants.sql',
+  format: 'sql',
+  accessMethod: 'direct_download',
   publisherEntityId: 'sid_d9sWZtyVwg',
   updateFrequency: 'annual',
   cachePath: '/tmp/fli-grants.sql',
@@ -224,9 +224,9 @@ const ftxFutureFund: DataSourceManifest = {
 const aria: DataSourceManifest = {
   sourceId: 'aria',
   name: 'ARIA Safeguarded AI Programme',
-  fetchUrl: 'https://www.aria.org.uk/programmes/safeguarded-ai/',
+  fetchUrl: null,
   format: 'html_table',
-  accessMethod: 'web_scrape',
+  accessMethod: 'manual_export',
   publisherEntityId: 'sid_XqjV4mbMXQ',
   updateFrequency: 'quarterly',
   cachePath: '',
@@ -250,7 +250,7 @@ const wellcomeTrust: DataSourceManifest = {
 const fordFoundation: DataSourceManifest = {
   sourceId: 'ford-foundation',
   name: 'Ford Foundation Grants',
-  fetchUrl: 'https://www.fordfoundation.org/work/our-grants/grants-database/grants-all',
+  fetchUrl: 'https://www.fordfoundation.org/grant-api/grants',
   format: 'json_api',
   accessMethod: 'api_endpoint',
   publisherEntityId: 'sid_3ViojCH3Sw',

@@ -12,8 +12,8 @@ export interface DataSourceManifest {
   name: string;
   /** URL to download/scrape the raw data (nullable for manual exports) */
   fetchUrl: string | null;
-  /** csv | html_table | json_api | spreadsheet */
-  format: 'csv' | 'html_table' | 'json_api' | 'spreadsheet';
+  /** csv | html_table | json_api | spreadsheet | sql */
+  format: 'csv' | 'html_table' | 'json_api' | 'spreadsheet' | 'sql';
   /** How to access the data */
   accessMethod: 'direct_download' | 'api_endpoint' | 'web_scrape' | 'manual_export';
   /** Entity that publishes this data */
