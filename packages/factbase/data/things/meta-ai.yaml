@@ -73,17 +73,28 @@ facts:
     notes: "Reality Labs cumulative losses since late 2020 (~5 years); cited at time
       of January 2026 layoffs. This is a cumulative total, NOT an annual figure."
 
+  - id: f_bRw4Xn7K2g
+    property: parent-revenue
+    value: 1.645e+11
+    asOf: "2024"
+    source: https://investor.atmeta.com/investor-news/press-release-details/2025/Meta-Reports-Fourth-Quarter-and-Full-Year-2024-Results/
+    notes: "Meta Platforms parent company FY 2024 total revenue of $164.5B; 22%
+      increase YoY. AI division revenue not separately reported. Moved from
+      'revenue' to 'parent-revenue' — this is NOT Meta AI's own revenue."
+
   - id: f_TWxhXOjkvg
-    property: revenue
+    property: parent-revenue
     value: 2.0097e+11
     asOf: "2025"
-    notes: "Meta Platforms parent company FY 2025 total revenue"
+    notes: "Meta Platforms parent company FY 2025 total revenue. Moved from
+      'revenue' to 'parent-revenue' — this is NOT Meta AI's own revenue."
 
   - id: f_F2Y0SdI52g
-    property: headcount
+    property: parent-headcount
     value: 78800
     asOf: 2025-12
-    notes: "Meta Platforms parent company total headcount Q4 2025"
+    notes: "Meta Platforms parent company total headcount Q4 2025. Moved from
+      'headcount' to 'parent-headcount' — Meta AI division is ~1,500."
 
   - id: f_hpCI8c51YQ
     property: user-count

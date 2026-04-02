@@ -42,13 +42,46 @@ facts:
       SK Hynix and Samsung. Also a major DRAM and NAND flash producer.
     asOf: 2026-03
 
-  # ── Revenue ─────────────────────────────────────────────────────
+  # ── Revenue (USD, converted from KRW at approximate annual avg rates) ──
+  - id: f_skRv2022fm
+    property: revenue
+    value: 3.35e+10
+    asOf: 2022-12
+    source: https://news.skhynix.com/sk-hynix-reports-2022-and-fourth-quarter-financial-results/
+    notes: "2022 annual revenue (~$33.5B; KRW 44.6T). Strong year before memory
+      downturn."
+
+  - id: f_skRv2023dw
+    property: revenue
+    value: 2.45e+10
+    asOf: 2023-12
+    source: https://news.skhynix.com/sk-hynix-reports-fourth-quarter-2023-financial-results/
+    notes: "2023 annual revenue (~$24.5B; KRW 32.8T). Memory downturn year with
+      operating loss."
+
   - id: f_skh_rev_2024
     property: revenue
-    value: 6.63e+10
+    value: 4.7e+10
     asOf: 2024-12
-    source: https://news.skhynix.com/
-    notes: "2024 annual revenue (~KRW 66.3T / ~$47B); massive growth driven by HBM demand"
+    source: https://news.skhynix.com/sk-hynix-announces-4q24-financial-results/
+    notes: "2024 annual revenue (~$47B; KRW 66.2T). Record year driven by HBM
+      demand for AI chips."
+
+  - id: f_skRv2025bq
+    property: revenue
+    value: 7.2e+10
+    asOf: 2025-12
+    source: https://news.skhynix.com/sk-hynix-announces-fy25-financial-results/
+    notes: "2025 annual revenue (~$72B; KRW 97.1T). Record year; HBM revenue more
+      than doubled YoY."
+
+  # ── Headcount ───────────────────────────────────────────────────
+  - id: f_skHc2024gv
+    property: headcount
+    value: 33625
+    asOf: 2024-12
+    source: https://pitchbook.com/profiles/company/10195-03
+    notes: "Approximately 33,625 employees worldwide at end of 2024"
 
   # ── HBM market share ────────────────────────────────────────────
   - id: f_skh_hbm_share

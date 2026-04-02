@@ -51,12 +51,26 @@ facts:
     asOf: 2026-03
 
   # ── Headcount ───────────────────────────────────────────────────
+  - id: f_asHc2022bm
+    property: headcount
+    value: 39086
+    asOf: 2022-12
+    source: https://www.macrotrends.net/stocks/charts/ASML/asml-holding/number-of-employees
+    notes: "39,086 employees at end of 2022; 22% increase from 2021"
+
+  - id: f_asHc2023nt
+    property: headcount
+    value: 42416
+    asOf: 2023-12
+    source: https://www.asml.com/en/investors/annual-report/2023
+    notes: "42,416 FTE at end of 2023; 8.5% increase from 2022"
+
   - id: f_asml_hc_2024
     property: headcount
-    value: 43400
+    value: 44027
     asOf: 2024-12
     source: https://www.asml.com/en/investors/annual-report
-    notes: "Approximately 43,400 employees worldwide at end of 2024"
+    notes: "44,027 employees worldwide at end of 2024; 3.8% increase from 2023"
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_asml_rev_2023

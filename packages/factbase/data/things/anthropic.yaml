@@ -117,7 +117,7 @@ facts:
       OpenAI's $40B"
 
   - id: f_kR8wT3vN6m
-    property: valuation
+    property: secondary-valuation
     value: 5.95e+11
     asOf: 2026-03
     source: https://app.ventuals.com/trade/anthropic
@@ -368,10 +368,10 @@ facts:
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_Pd29CR24TA
-    property: valuation
+    property: secondary-valuation
     value: 3.5e+11
     asOf: 2025-11
-    notes: "Valuation at Microsoft/Nvidia commitment."
+    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to secondary-valuation."
 
   - id: f_U3LMAv6zjQ
     property: revenue-guidance

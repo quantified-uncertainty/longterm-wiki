@@ -45,13 +45,29 @@ facts:
     source: https://en.wikipedia.org/wiki/DeepSeek
 
   # ── Headcount ───────────────────────────────────────────────────
+  - id: f_Lm7wNd2kPg
+    property: headcount
+    value: 100
+    asOf: 2023-07
+    source: https://www.scmp.com/tech/big-tech/article/3294357/chinas-ai-disrupter-deepseek-bets-low-key-team-young-geniuses-beat-us-giants
+    notes: "Nearly 100 AI engineers assembled by parent company High-Flyer by the time
+      DeepSeek spun off in mid-2023"
+
+  - id: f_nkY9Jq4aTg
+    property: headcount
+    value: 150
+    asOf: 2024-06
+    source: https://www.scmp.com/tech/big-tech/article/3294357/chinas-ai-disrupter-deepseek-bets-low-key-team-young-geniuses-beat-us-giants
+    notes: "Approximately 150 employees by mid-2024; team maintained flat hierarchy
+      emphasizing collaboration over scale"
+
   - id: f_VX3CZVjbug
     property: headcount
     value: 200
     asOf: 2025-01
     source: https://seo.ai/blog/how-many-employees-does-deepseek-ai-have
-    notes: "Approximately 200 employees as of January 2025; LinkedIn lists 51-200 range. Relatively
-      small team for a frontier lab."
+    notes: "Approximately 200 employees as of January 2025; LinkedIn lists 51-200
+      range. Relatively small team for a frontier lab."
 
   # ── Funding ─────────────────────────────────────────────────────
   - id: f_2VCGO6sizA
@@ -70,6 +86,16 @@ facts:
     source: https://www.bloomberg.com/news/articles/2026-01-12/deepseek-founder-liang-s-funds-surge-57-as-china-quants-boom
     notes: "High-Flyer AUM peaked at $12B before shrinking; 2025 returns helped fund
       continued AI research"
+
+  # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_hTz8RqWm3g
+    property: revenue
+    value: 2.2e+8
+    asOf: 2025-06
+    source: https://www.businessofapps.com/data/deepseek-statistics/
+    notes: "$220M annual revenue run rate by mid-2025; primarily from API usage and
+      enterprise licenses. Actual billed revenue lower than theoretical due to free
+      web/app access and nighttime discounts."
 
   # ── Model Details ───────────────────────────────────────────────
   - id: f_qbe0bnJl8Q

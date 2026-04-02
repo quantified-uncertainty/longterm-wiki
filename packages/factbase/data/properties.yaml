@@ -17,7 +17,20 @@ properties:
 
   valuation:
     name: Valuation
-    description: "Post-money valuation at most recent funding round or mark-to-market"
+    description: "Post-money valuation from primary funding rounds"
+    dataType: number
+    unit: USD
+    category: financial
+    temporal: true
+    appliesTo: [organization]
+    display:
+      divisor: 1e9
+      prefix: "$"
+      suffix: "B"
+
+  secondary-valuation:
+    name: Secondary Market Valuation
+    description: "Implied valuation from secondary/derivatives markets, tender offers, or analyst estimates — not from primary funding rounds"
     dataType: number
     unit: USD
     category: financial

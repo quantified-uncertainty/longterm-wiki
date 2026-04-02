@@ -43,6 +43,14 @@ facts:
     source: https://en.wikipedia.org/wiki/Mistral_AI
 
   # ── Headcount ───────────────────────────────────────────────────
+  - id: f_mPbQ4kR7Dg
+    property: headcount
+    value: 500
+    asOf: 2024-03
+    source: https://aifundingtracker.com/mistral-ai-funding-unicorn-valuation/
+    notes: "Approximately 500 employees by March 2024; grew from ~50 at founding in
+      June 2023 — roughly 900% growth in nine months"
+
   - id: f_CSa0ePCYZw
     property: headcount
     value: 862
@@ -112,6 +120,14 @@ facts:
       participation from a16z, General Catalyst, DST Global"
 
   # ── Revenue ─────────────────────────────────────────────────────
+  - id: f_VnTz3QwR5g
+    property: revenue
+    value: 3e+7
+    asOf: "2024"
+    source: https://electroiq.com/stats/mistral-ai-statistics/
+    notes: "Approximately $30M (EUR28M) in annual revenue for 2024; up from ~$10M in
+      2023. Revenue primarily from model API licensing and enterprise contracts."
+
   - id: f_75QHFTc8ig
     property: revenue
     value: 3.3e+8
@@ -122,12 +138,12 @@ facts:
       subscriptions."
 
   - id: f_7Xou3dBrAA
-    property: revenue
+    property: revenue-guidance
     value: 1.1e+9
     asOf: 2026-12
     source: https://mlq.ai/news/mistral-ai-surges-revenue-20-fold-to-over-400-million-arr/
     notes: "Target to exceed EUR1B (~$1.1B) in revenue by end of 2026
-      (forward-looking)"
+      (forward-looking). Moved from 'revenue' to 'revenue-guidance'."
 
   # ── Product ─────────────────────────────────────────────────────
   - id: f_MvZxq7j5sA
