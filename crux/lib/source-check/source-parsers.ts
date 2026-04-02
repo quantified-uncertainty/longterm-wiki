@@ -68,9 +68,12 @@ function parseOneHTMLTable(tableHtml: string): Record<string, string>[] {
   // Extract header cells from <thead> or first <tr>
   const stripTags = (html: string) => html.replace(/<[^>]+>/g, '').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').trim();
 
-  const headerMatch = tableHtml.match(/<thead[^>]*>([\s\S]*?)<\/thead>/i)
-    ?? tableHtml.match(/<tr[^>]*>([\s\S]*?)<\/tr>/i);
+  const theadMatch = tableHtml.match(/<thead[^>]*>([\s\S]*?)<\/thead>/i);
+  const headerMatch = theadMatch ?? tableHtml.match(/<tr[^>]*>([\s\S]*?)<\/tr>/i);
   if (!headerMatch) return [];
+
+  // Track whether headers came from <thead> (don't skip first <tr>) or first <tr> (skip it)
+  const headersFromThead = theadMatch !== null;
 
   const headers: string[] = [];
   const thRegex = /<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi;
@@ -81,14 +84,15 @@ function parseOneHTMLTable(tableHtml: string): Record<string, string>[] {
 
   if (headers.length === 0) return [];
 
-  // Extract data rows (skip header row)
+  // Extract data rows — only skip first <tr> when headers were extracted from it
   const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
   const rows: Record<string, string>[] = [];
   let isFirst = true;
   let trMatch;
 
   while ((trMatch = trRegex.exec(tableHtml)) !== null) {
-    if (isFirst) { isFirst = false; continue; } // skip header row
+    if (isFirst && !headersFromThead) { isFirst = false; continue; } // skip header row only when headers came from first <tr>
+    isFirst = false;
 
     const cells: string[] = [];
     const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
