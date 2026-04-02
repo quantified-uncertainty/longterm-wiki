@@ -1137,6 +1137,17 @@ export function getRecordVerdict(recordType: string, recordId: string): RecordVe
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
 
+/** Batch-enrich an array of rows with their source-check verdicts. */
+export function enrichWithVerdicts<T extends { key: string | number }>(
+  rows: T[],
+  recordType: string,
+): (T & { verdict: RecordVerdict | null })[] {
+  return rows.map((r) => ({
+    ...r,
+    verdict: getRecordVerdict(recordType, String(r.key)),
+  }));
+}
+
 /** Get verification stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): {
   total: number;

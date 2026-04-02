@@ -100,6 +100,11 @@ export function collectionToRecordType(
     investments: "investment",
     "equity-positions": "equity-position",
     "policy-stakeholders": "policy-stakeholder",
+    publications: "publication",
+    "benchmark-results": "benchmark-result",
+    "entity-events": "entity-event",
+    "entity-assessments": "entity-assessment",
+    "secondary-market-prices": "secondary-market-price",
   };
   return MAP[collection] ?? null;
 }
@@ -120,6 +125,12 @@ export function schemaToRecordType(schema: string): string | null {
     investment: "investment",
     "equity-position": "equity-position",
     "division-personnel": "personnel",
+    publication: "publication",
+    "benchmark-result": "benchmark-result",
+    "policy-stakeholder": "policy-stakeholder",
+    "entity-event": "entity-event",
+    "entity-assessment": "entity-assessment",
+    "secondary-market-price": "secondary-market-price",
   };
   return MAP[schema] ?? null;
 }

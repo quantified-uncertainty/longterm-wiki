@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
-import { SourceCheckBadge } from "@/components/directory/SourceCheckBadge";
+import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
@@ -194,7 +194,6 @@ export function DivisionsTable({
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Type</th>
                 <th className="text-left py-2.5 px-3 font-medium">Status</th>
-                <th className="text-center py-2.5 px-3 font-medium">Verified</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -204,18 +203,21 @@ export function DivisionsTable({
                   className="hover:bg-muted/20 transition-colors"
                 >
                   <td className="py-2 px-3">
-                    {row.href ? (
-                      <Link
-                        href={row.href}
-                        className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                      >
-                        {row.name}
-                      </Link>
-                    ) : (
-                      <span className="font-medium text-foreground text-xs">
-                        {row.name}
-                      </span>
-                    )}
+                    <span className="flex items-center gap-1.5">
+                      <RecordVerificationDot verdict={row.verdict?.verdict} />
+                      {row.href ? (
+                        <Link
+                          href={row.href}
+                          className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                        >
+                          {row.name}
+                        </Link>
+                      ) : (
+                        <span className="font-medium text-foreground text-xs">
+                          {row.name}
+                        </span>
+                      )}
+                    </span>
                   </td>
                   <td className="py-2 px-3 text-xs">
                     {row.parentHref ? (
@@ -251,9 +253,6 @@ export function DivisionsTable({
                         {titleCase(row.status)}
                       </span>
                     )}
-                  </td>
-                  <td className="py-2 px-3 text-center">
-                    <SourceCheckBadge verdict={row.verdict} />
                   </td>
                 </tr>
               ))}
