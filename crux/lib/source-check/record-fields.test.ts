@@ -383,4 +383,8 @@ describe('isResolvableName', () => {
     expect(isResolvableName('fVMqY7vpMA')).toBe(false);
     expect(isResolvableName('NPPTvNqRXA')).toBe(false);
   });
+
+  it('returns false for empty strings', () => {
+    expect(isResolvableName('')).toBe(false);
+  });
 });

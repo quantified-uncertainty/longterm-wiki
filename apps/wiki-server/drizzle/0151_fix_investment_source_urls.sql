@@ -10,3 +10,18 @@ WHERE source IN (
   'https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying',
   'https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/'
 );
+
+-- Clear stale source-check evidence and verdicts for these investments
+-- so they don't display old results against the now-removed URLs.
+DELETE FROM source_check_evidence
+WHERE record_type = 'investment'
+  AND source_url IN (
+    'https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying',
+    'https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/'
+  );
+
+DELETE FROM source_check_verdicts
+WHERE record_type = 'investment'
+  AND record_id NOT IN (
+    SELECT DISTINCT record_id FROM source_check_evidence WHERE record_type = 'investment'
+  );

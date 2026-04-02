@@ -43,7 +43,7 @@ export function resolveName(item: Record<string, unknown>, ...keys: string[]): s
  * Returns false for '(unknown)' or stableId-like values that the LLM can't interpret.
  */
 export function isResolvableName(name: string): boolean {
-  return name !== '(unknown)' && !isAnySid(name);
+  return name.length > 0 && name !== '(unknown)' && !isAnySid(name);
 }
 
 /**
