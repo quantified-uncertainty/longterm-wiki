@@ -53,6 +53,8 @@ function getFormatter(format: ChartFormat): ValueFormatter {
 
 // ── Component ───────────────────────────────────────────────────────
 
+type ViewMode = "chart" | "table";
+
 export function FBCompareChartClient({
   series,
   format = "number",
@@ -68,6 +70,8 @@ export function FBCompareChartClient({
     svgX: number;
     svgY: number;
   } | null>(null);
+  const [logScale, setLogScale] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("chart");
   const containerRef = useRef<HTMLDivElement>(null);
   const formatter = getFormatter(format);
 
@@ -76,15 +80,20 @@ export function FBCompareChartClient({
   if (allPoints.length === 0) return null;
 
   const allDates = allPoints.map((p) => parseDate(p.date));
-  const allValues = allPoints.map((p) => p.value);
+  const allValues = allPoints.map((p) => p.value).filter((v) => v > 0);
 
   const minDate = Math.min(...allDates);
   const maxDate = Math.max(...allDates);
-  const minVal = 0;
-  const maxVal = Math.max(...allValues) * 1.15;
+
+  // Check if log scale would be useful (>10x range between min and max values)
+  const minPositiveVal = Math.min(...allValues);
+  const maxRawVal = Math.max(...allValues);
+  const showLogToggle = maxRawVal / minPositiveVal > 10;
+
+  const minVal = logScale ? Math.max(minPositiveVal * 0.5, 1) : 0;
+  const maxVal = logScale ? maxRawVal * 1.5 : maxRawVal * 1.15;
 
   const dateRange = maxDate - minDate || 1;
-  const valRange = maxVal - minVal || 1;
 
   const padding = { top: 16, right: 16, bottom: 28, left: 62 };
   const chartWidth = 600;
@@ -93,16 +102,45 @@ export function FBCompareChartClient({
 
   const xScale = (d: string) =>
     padding.left + ((parseDate(d) - minDate) / dateRange) * chartW;
-  const yScale = (v: number) =>
-    padding.top + chartH - ((v - minVal) / valRange) * chartH;
+  const yScale = (v: number) => {
+    if (logScale && v > 0) {
+      const logMin = Math.log10(minVal);
+      const logMax = Math.log10(maxVal);
+      const logRange = logMax - logMin || 1;
+      return padding.top + chartH - ((Math.log10(v) - logMin) / logRange) * chartH;
+    }
+    const valRange = maxVal - minVal || 1;
+    return padding.top + chartH - ((v - minVal) / valRange) * chartH;
+  };
 
   // Y-axis ticks
   const yTicks: number[] = [];
-  const rawTickStep = valRange / 4;
-  const tickStep = format === "number" ? Math.ceil(rawTickStep) : rawTickStep;
-  for (let i = 0; i <= 4; i++) {
-    const raw = minVal + tickStep * i;
-    yTicks.push(format === "number" ? Math.round(raw) : raw);
+  if (logScale) {
+    // Log-scale ticks: powers of 10 within the range
+    const logMin = Math.floor(Math.log10(minVal));
+    const logMax = Math.ceil(Math.log10(maxVal));
+    for (let exp = logMin; exp <= logMax; exp++) {
+      const val = Math.pow(10, exp);
+      if (val >= minVal * 0.9 && val <= maxVal * 1.1) yTicks.push(val);
+    }
+    // If too few ticks, add half-decade marks
+    if (yTicks.length < 3) {
+      for (let exp = logMin; exp <= logMax; exp++) {
+        const half = Math.pow(10, exp) * 3;
+        if (half >= minVal * 0.9 && half <= maxVal * 1.1 && !yTicks.includes(half)) {
+          yTicks.push(half);
+        }
+      }
+      yTicks.sort((a, b) => a - b);
+    }
+  } else {
+    const valRange = maxVal - minVal || 1;
+    const rawTickStep = valRange / 4;
+    const tickStep = format === "number" ? Math.ceil(rawTickStep) : rawTickStep;
+    for (let i = 0; i <= 4; i++) {
+      const raw = minVal + tickStep * i;
+      yTicks.push(format === "number" ? Math.round(raw) : raw);
+    }
   }
 
   // X-axis year labels
@@ -132,8 +170,8 @@ export function FBCompareChartClient({
 
   return (
     <div>
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1.5 mb-3">
+      {/* Legend + controls row */}
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 mb-3">
         {series.map((s, i) => (
           <div key={i} className="flex items-center gap-1.5 text-xs">
             <span
@@ -143,9 +181,85 @@ export function FBCompareChartClient({
             <span className="text-foreground/80">{s.entityName}</span>
           </div>
         ))}
+
+        {/* Spacer */}
+        <div className="flex-1" />
+
+        {/* View toggle controls */}
+        <div className="flex items-center gap-1 text-[10px]">
+          {showLogToggle && viewMode === "chart" && (
+            <button
+              onClick={() => setLogScale(!logScale)}
+              className={`px-1.5 py-0.5 rounded transition-colors ${
+                logScale
+                  ? "bg-foreground/10 text-foreground font-medium"
+                  : "text-muted-foreground hover:text-foreground/70"
+              }`}
+            >
+              Log
+            </button>
+          )}
+          <button
+            onClick={() => setViewMode("chart")}
+            className={`px-1.5 py-0.5 rounded transition-colors ${
+              viewMode === "chart"
+                ? "bg-foreground/10 text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground/70"
+            }`}
+          >
+            Chart
+          </button>
+          <button
+            onClick={() => setViewMode("table")}
+            className={`px-1.5 py-0.5 rounded transition-colors ${
+              viewMode === "table"
+                ? "bg-foreground/10 text-foreground font-medium"
+                : "text-muted-foreground hover:text-foreground/70"
+            }`}
+          >
+            Table
+          </button>
+        </div>
       </div>
 
-      {/* Chart */}
+      {/* Data table view */}
+      {viewMode === "table" && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-border/50">
+                <th className="text-left py-1.5 pr-3 font-medium text-muted-foreground">Entity</th>
+                {years.map((year) => (
+                  <th key={year} className="text-right py-1.5 px-2 font-medium text-muted-foreground tabular-nums">{year}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {series.map((s, si) => (
+                <tr key={si} className="border-b border-border/30">
+                  <td className="py-1.5 pr-3 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <span className="inline-block w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
+                      {s.entityName}
+                    </span>
+                  </td>
+                  {years.map((year) => {
+                    const point = s.points.find((p) => p.date.startsWith(year));
+                    return (
+                      <td key={year} className="text-right py-1.5 px-2 tabular-nums">
+                        {point ? formatter(point.value) : <span className="text-muted-foreground">—</span>}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Chart view */}
+      {viewMode === "chart" && (
       <div className="relative" ref={containerRef}>
         <svg
           viewBox={`0 0 ${chartWidth} ${height}`}
@@ -301,6 +415,7 @@ export function FBCompareChartClient({
           />
         )}
       </div>
+      )}
     </div>
   );
 }
