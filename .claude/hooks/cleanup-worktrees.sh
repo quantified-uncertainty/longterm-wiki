@@ -152,6 +152,18 @@ for i in "${!PATHS[@]}"; do
   fi
 
   if [ "$SHOULD_REMOVE" = true ]; then
+    # Safety: check if any process has its CWD inside this worktree.
+    # This prevents removing a worktree that a concurrent Claude session
+    # is still using (addresses CWD corruption bug — see .claude/rules/worktree-isolation-bug.md).
+    if command -v lsof >/dev/null 2>&1; then
+      # lsof -d cwd lists only CWD file descriptors — fast and targeted
+      if lsof -d cwd 2>/dev/null | grep -qF "$WT_PATH"; then
+        log "Skipping worktree (CWD in use by active process): $WT_PATH"
+        SKIPPED=$((SKIPPED + 1))
+        continue
+      fi
+    fi
+
     log "Removing stale worktree: $WT_PATH (branch: ${WT_BRANCH:-detached})"
     # Try without --force first to respect locks; fall back to --force only if needed
     if git worktree remove "$WT_PATH" 2>/dev/null || git worktree remove "$WT_PATH" --force 2>/dev/null; then
