@@ -56,8 +56,8 @@ const snapshotCache = new Map<string, { rawContent: string; manifest: DataSource
 
 const { ESTIMATED_COST_PER_VERIFICATION, PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 
-/** Limit passed to wiki-server /all endpoints when fetching records for source-checking */
-const API_PAGE_LIMIT = 5000;
+/** Limit passed to wiki-server /all endpoints (must respect server-side MAX_PAGE_SIZE of 200) */
+const API_PAGE_LIMIT = 200;
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -273,7 +273,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=5000');
+    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=500&offset=0');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -283,6 +283,33 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
           checkedAt: v.lastComputedAt,
           needsRecheck: v.needsRecheck,
         });
+      }
+
+      // Paginate if there are more verdicts
+      let offset = response.data.verdicts.length;
+      while (offset < response.data.total) {
+        const nextResponse = await apiRequest<{
+          verdicts: Array<{
+            recordType: string;
+            recordId: string;
+            verdict: string;
+            lastComputedAt?: string;
+            needsRecheck?: boolean;
+          }>;
+          total: number;
+        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=500&offset=${offset}`);
+
+        if (!nextResponse.ok || !nextResponse.data) break;
+        for (const v of nextResponse.data.verdicts) {
+          map.set(v.recordId, {
+            factId: v.recordId,
+            verdict: v.verdict,
+            checkedAt: v.lastComputedAt,
+            needsRecheck: v.needsRecheck,
+          });
+        }
+        if (nextResponse.data.verdicts.length < 500) break;
+        offset += nextResponse.data.verdicts.length;
       }
     }
   } catch (e: unknown) {
@@ -410,42 +437,56 @@ async function collectRecordItems(
     : [...VALID_RECORD_TYPES];
 
   for (const recordType of typesToScan) {
-    let apiPath: string;
+    let apiBasePath: string;
     switch (recordType) {
-      case 'grant': apiPath = `/api/grants/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'personnel': apiPath = `/api/personnel/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'division': apiPath = `/api/divisions/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'funding-program': apiPath = `/api/funding-programs/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'funding-round': apiPath = `/api/funding-rounds/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'investment': apiPath = `/api/investments/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'equity-position': apiPath = `/api/equity-positions/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'policy-stakeholder': apiPath = `/api/policy-stakeholders/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'publication': apiPath = `/api/publications/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'benchmark-result': apiPath = `/api/benchmark-results/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'entity-event': apiPath = `/api/entity-events/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'entity-assessment': apiPath = `/api/entity-assessments/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'secondary-market-price': apiPath = `/api/secondary-market-prices/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'grant': apiBasePath = '/api/grants/all'; break;
+      case 'personnel': apiBasePath = '/api/personnel/all'; break;
+      case 'division': apiBasePath = '/api/divisions/all'; break;
+      case 'funding-program': apiBasePath = '/api/funding-programs/all'; break;
+      case 'funding-round': apiBasePath = '/api/funding-rounds/all'; break;
+      case 'investment': apiBasePath = '/api/investments/all'; break;
+      case 'equity-position': apiBasePath = '/api/equity-positions/all'; break;
+      case 'policy-stakeholder': apiBasePath = '/api/policy-stakeholders/all'; break;
+      case 'publication': apiBasePath = '/api/publications/all'; break;
+      case 'benchmark-result': apiBasePath = '/api/benchmark-results/all'; break;
+      case 'entity-event': apiBasePath = '/api/entity-events/all'; break;
+      case 'entity-assessment': apiBasePath = '/api/entity-assessments/all'; break;
+      case 'secondary-market-price': apiBasePath = '/api/secondary-market-prices/all'; break;
       default: continue; // Skip unknown record types
     }
 
     try {
-      const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
-      if (!response.ok) {
-        console.warn(`[source-check] Failed to fetch ${recordType}: ${response.message}`);
-        continue;
+      // Paginate through all records (server-side MAX_PAGE_SIZE is typically 200)
+      const allRawItems: Record<string, unknown>[] = [];
+      let offset = 0;
+
+      while (true) {
+        const apiPath = `${apiBasePath}?limit=${API_PAGE_LIMIT}&offset=${offset}`;
+        const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
+        if (!response.ok) {
+          console.warn(`[source-check] Failed to fetch ${recordType}: ${response.message}`);
+          break;
+        }
+
+        // Extract items array from the response (API uses different keys)
+        const data = response.data;
+        const rawItems = (
+          data.items ?? data.grants ?? data.personnel ?? data.divisions ??
+          data.programs ?? data.rounds ?? data.investments ?? data.positions ??
+          data.stakeholders ?? data.publications ?? data.benchmarkResults ??
+          data.events ?? data.assessments ?? data.prices ??
+          (Array.isArray(data) ? data : [])
+        ) as Record<string, unknown>[];
+
+        allRawItems.push(...rawItems);
+
+        // Stop if we got fewer items than the page size, or we've reached the total
+        const total = typeof data.total === 'number' ? data.total : undefined;
+        if (rawItems.length < API_PAGE_LIMIT || (total !== undefined && allRawItems.length >= total)) break;
+        offset += API_PAGE_LIMIT;
       }
 
-      // Extract items array from the response (API uses different keys)
-      const data = response.data;
-      const rawItems = (
-        data.items ?? data.grants ?? data.personnel ?? data.divisions ??
-        data.programs ?? data.rounds ?? data.investments ?? data.positions ??
-        data.stakeholders ?? data.publications ?? data.benchmarkResults ??
-        data.events ?? data.assessments ?? data.prices ??
-        (Array.isArray(data) ? data : [])
-      ) as Record<string, unknown>[];
-
-      for (const item of rawItems) {
+      for (const item of allRawItems) {
         // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result)
         const source = item.source ?? item.sourceUrl;
         if (typeof source !== 'string' || !source) continue;
