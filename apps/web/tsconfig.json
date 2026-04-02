@@ -33,7 +33,8 @@
       "@wiki-server/secondary-market-prices-route": ["../wiki-server/src/routes/tablebase/secondary-market-prices.ts"],
       "@wiki-server/data-quality-route": ["../wiki-server/src/routes/operational/data-quality.ts"],
       "@wiki-server/talent-flows-route": ["../wiki-server/src/routes/tablebase/talent-flows.ts"],
-      "@wiki-server/jobs-route": ["../wiki-server/src/routes/operational/jobs.ts"]
+      "@wiki-server/jobs-route": ["../wiki-server/src/routes/operational/jobs.ts"],
+      "@wiki-server/data-sources-route": ["../wiki-server/src/routes/tablebase/data-sources.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
