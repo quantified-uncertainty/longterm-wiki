@@ -6,6 +6,8 @@
  */
 
 import type { FieldDef } from "@longterm-wiki/factbase";
+import { isSid } from "@longterm-wiki/id-utils";
+import { getFactBaseEntity } from "@data/factbase";
 import {
   formatKBCellValue,
   formatKBDate,
@@ -47,9 +49,17 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
 
   const fieldType = fieldDef?.type;
 
-  // Entity references
+  // Entity references (schema-confirmed)
   if (fieldType === "ref" && typeof value === "string") {
     return <FBRefLink id={value} />;
+  }
+
+  // Heuristic ref detection when schema is unavailable: resolve sid_ IDs,
+  // legacy 10-char IDs, and entity slugs that map to known FactBase entities.
+  if (!fieldType && typeof value === "string" && !isUrl(value)) {
+    if (isSid(value) || getFactBaseEntity(value)) {
+      return <FBRefLink id={value} />;
+    }
   }
 
   // Source / key-publication URLs
