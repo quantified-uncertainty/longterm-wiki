@@ -37,6 +37,8 @@ import {
   storeAggregateVerdict,
   SOURCE_CHECK_CONSTANTS,
   MODELS,
+  LlmResponseSchema,
+  validateVerdict,
 } from '../lib/source-check/index.ts';
 import {
   SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES,
@@ -1475,15 +1477,22 @@ export async function orchestrateCommand(
           continue;
         }
 
-        // Parse LLM response (same as real-time path)
-        const raw = parseJsonResponse(text) as Record<string, unknown> | null;
-        const rawVerdict = typeof raw?.verdict === 'string' ? raw.verdict : '';
-        const verdict: SourceCheckVerdict = (['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'] as const).includes(rawVerdict as SourceCheckVerdict)
-          ? rawVerdict as SourceCheckVerdict
-          : 'unverifiable';
-        const confidence = typeof raw?.confidence === 'number' ? raw.confidence : 0.5;
-        const extractedValue = typeof raw?.extracted_value === 'string' ? raw.extracted_value : '';
-        const reasoning = typeof raw?.reasoning === 'string' ? raw.reasoning : '';
+        // Parse LLM response with shared Zod schema (same validation as real-time path)
+        const raw = parseJsonResponse(text);
+        const parsed = LlmResponseSchema.safeParse(raw);
+        if (!parsed.success) {
+          summary.errors++;
+          summary.failures.push({
+            itemId: item.id, kind: item.kind, description: item.description,
+            error: `Invalid LLM response: ${parsed.error.message}`,
+          });
+          continue;
+        }
+
+        const verdict = validateVerdict(parsed.data.verdict);
+        const confidence = parsed.data.confidence;
+        const extractedValue = parsed.data.extracted_value;
+        const reasoning = parsed.data.reasoning;
 
         const verifyResult: VerifyResult = {
           itemId: item.id,
