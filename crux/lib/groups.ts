@@ -85,6 +85,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'legislation',
       'bluesky',
       'races',
+      'political',
     ],
     flattened: ['tablebase'],
   },
