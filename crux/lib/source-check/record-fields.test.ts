@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractEntityId, str, strOrNull, numOrNull, resolveName } from './record-fields.ts';
+import { extractEntityId, str, strOrNull, numOrNull, resolveName, isResolvableName } from './record-fields.ts';
 
 describe('extractEntityId', () => {
   // ── Personnel records ──
@@ -346,5 +346,45 @@ describe('resolveName', () => {
 
   it('returns (unknown) when no keys are provided', () => {
     expect(resolveName({ a: 'hello' })).toBe('(unknown)');
+  });
+
+  it('skips stableId-like values (sid_ prefix)', () => {
+    const item = { personResolvedName: 'sid_fVMqY7vpMA', personDisplayName: 'Jane Doe' };
+    expect(resolveName(item, 'personResolvedName', 'personDisplayName')).toBe('Jane Doe');
+  });
+
+  it('skips bare 10-char stableId values', () => {
+    const item: Record<string, unknown> = { personResolvedName: 'fVMqY7vpMA', personDisplayName: null, personId: 'fVMqY7vpMA' };
+    expect(resolveName(item, 'personResolvedName', 'personDisplayName', 'personId')).toBe('(unknown)');
+  });
+
+  it('returns (unknown) when all values are stableIds', () => {
+    const item = { a: 'sid_abc1234567', b: 'NPPTvNqRXA' };
+    expect(resolveName(item, 'a', 'b')).toBe('(unknown)');
+  });
+});
+
+describe('isResolvableName', () => {
+  it('returns true for human names', () => {
+    expect(isResolvableName('John Smith')).toBe(true);
+    expect(isResolvableName('Anthropic')).toBe(true);
+    expect(isResolvableName('MIT')).toBe(true);
+  });
+
+  it('returns false for (unknown)', () => {
+    expect(isResolvableName('(unknown)')).toBe(false);
+  });
+
+  it('returns false for sid_-prefixed stableIds', () => {
+    expect(isResolvableName('sid_fVMqY7vpMA')).toBe(false);
+  });
+
+  it('returns false for bare 10-char stableIds', () => {
+    expect(isResolvableName('fVMqY7vpMA')).toBe(false);
+    expect(isResolvableName('NPPTvNqRXA')).toBe(false);
+  });
+
+  it('returns false for empty strings', () => {
+    expect(isResolvableName('')).toBe(false);
   });
 });

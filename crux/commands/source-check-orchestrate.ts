@@ -43,7 +43,7 @@ import {
   SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from '../lib/source-check/prompt-guidelines.ts';
-import { str, strOrNull, numOrNull, resolveName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
+import { str, strOrNull, numOrNull, resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -447,6 +447,18 @@ async function collectRecordItems(
 
         const description = buildRecordDescription(recordType, item);
         const fields = extractRecordFields(recordType, item);
+
+        // Skip personnel/investment records where key names are unresolvable stableIds.
+        // The LLM can't verify "aAFe7DRvPv is a researcher at org X" against a source.
+        if (recordType === 'personnel') {
+          const personName = fields.person as string | undefined;
+          if (personName && !isResolvableName(personName)) continue;
+        }
+        if (recordType === 'investment') {
+          const investorName = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');
+          const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+          if (!isResolvableName(investorName) && !isResolvableName(companyName)) continue;
+        }
 
         const priority = computeRecordPriority(recordType, existing);
 
