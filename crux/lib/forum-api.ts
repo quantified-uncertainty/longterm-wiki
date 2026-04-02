@@ -169,11 +169,17 @@ export async function getGlobalPosts(
   }
 
   const allPosts: ForumPost[] = [];
+  const OFFSET_CAP = 2400; // Forum backends enforce ~2500 offset limit
 
-  for (const window of windows) {
-    if (allPosts.length >= maxTotal) break;
+  // Use a queue so we can subdivide windows that hit the offset cap
+  const windowQueue = [...windows];
+
+  while (windowQueue.length > 0 && allPosts.length < maxTotal) {
+    const window = windowQueue.shift()!;
 
     let offset = 0;
+    let hitOffsetCap = false;
+
     while (allPosts.length < maxTotal) {
       const remaining = maxTotal - allPosts.length;
       const thisPageSize = Math.min(pageSize, remaining);
@@ -205,10 +211,7 @@ export async function getGlobalPosts(
 
       const page = data?.data?.posts?.results ?? [];
       if (page.length === 0) {
-        // Detect offset cap: empty page when we haven't reached the end naturally
-        if (offset >= 2400) {
-          console.warn(`    ⚠ Offset cap (~2500) hit in window ${window.after}–${window.before} at offset ${offset}. Some posts may be missing.`);
-        }
+        if (offset >= OFFSET_CAP) hitOffsetCap = true;
         break;
       }
 
@@ -216,15 +219,31 @@ export async function getGlobalPosts(
       options.onPage?.(allPosts.length, page[page.length - 1].baseScore);
 
       if (page.length < thisPageSize) {
-        if (offset + page.length >= 2400 && page.length > 0) {
-          console.warn(`    ⚠ Short page near offset cap in window ${window.after}–${window.before} (offset ${offset + page.length}). Some posts may be missing.`);
-        }
+        if (offset + page.length >= OFFSET_CAP) hitOffsetCap = true;
         break;
       }
       offset += page.length;
 
-      // Throttle
       if (delayMs > 0) await new Promise(r => setTimeout(r, delayMs));
+    }
+
+    // If we hit the offset cap, subdivide the window into two halves
+    // and enqueue them so we can fetch the remaining posts
+    if (hitOffsetCap) {
+      const startDate = new Date(window.after);
+      const endDate = new Date(window.before);
+      const midMs = (startDate.getTime() + endDate.getTime()) / 2;
+      const midDate = new Date(midMs).toISOString().slice(0, 10);
+      // Only subdivide if the halves are at least 1 day apart
+      if (midDate > window.after && midDate < window.before) {
+        console.warn(`    ⚠ Offset cap hit in ${window.after}–${window.before}, subdividing`);
+        windowQueue.unshift(
+          { after: midDate, before: window.before },
+          { after: window.after, before: midDate },
+        );
+      } else {
+        console.warn(`    ⚠ Offset cap hit in ${window.after}–${window.before}, window too small to subdivide`);
+      }
     }
   }
 
