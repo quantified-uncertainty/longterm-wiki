@@ -144,17 +144,15 @@ export function FBCompareChart({
   });
 
   return (
-    <Card className="my-6">
-      <CardHeader className="flex-row items-center gap-2 space-y-0 pb-4">
-        <CardTitle className="text-base">{heading}</CardTitle>
-        <span className="text-xs text-muted-foreground">
-          {seriesList.length}{" "}
-          {seriesList.length === 1 ? "entity" : "entities"}
-        </span>
-      </CardHeader>
-      <CardContent className="pt-0">
+    <div className="my-6 rounded-xl bg-card/80 border border-border/40 shadow-[0_1px_3px_0_rgba(0,0,0,0.03)]">
+      <div className="px-5 pt-4 pb-1">
+        <h3 className="text-[15px] font-semibold tracking-[-0.01em] text-foreground/90">
+          {heading}
+        </h3>
+      </div>
+      <div className="px-5 pb-5">
         <FBCompareChartClient series={seriesList} format={resolvedFormat} />
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
