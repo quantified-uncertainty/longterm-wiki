@@ -39,7 +39,7 @@ const SyncDataSourceSchema = z.object({
 const CreateSnapshotSchema = z.object({
   snapshotHash: z.string().min(1).max(128),
   recordCount: z.number().int().min(0).nullable().optional(),
-  rawContent: z.string().min(1),
+  rawContent: z.string().min(1).max(50_000_000),
   fetchedAt: z.string().datetime().optional(),
   mappingValid: z.boolean().optional(),
   parserVersion: z.string().max(100).nullable().optional(),
@@ -176,7 +176,7 @@ const dataSourcesApp = new Hono()
           columnMapping: body.columnMapping ?? null,
           sourceSchema: body.sourceSchema ?? null,
           verificationConfig: body.verificationConfig ?? null,
-          sourceStatus: body.sourceStatus ?? "active",
+          ...(body.sourceStatus !== undefined ? { sourceStatus: body.sourceStatus } : {}),
           updatedAt: new Date(),
         },
       });
@@ -240,48 +240,53 @@ const dataSourcesApp = new Hono()
     const [ds] = await db.select({ id: dataSources.id }).from(dataSources).where(eq(dataSources.id, dataSourceId));
     if (!ds) return notFoundError(c, "Data source not found");
 
-    // Content-hash dedup: if this exact content already exists, return existing
-    const [existing] = await db
-      .select({ id: sourceSnapshots.id })
-      .from(sourceSnapshots)
-      .where(
-        and(
-          eq(sourceSnapshots.dataSourceId, dataSourceId),
-          eq(sourceSnapshots.snapshotHash, body.snapshotHash),
-        ),
-      );
+    // Atomic INSERT ... ON CONFLICT DO NOTHING to avoid race conditions
+    const result = await db.transaction(async (tx) => {
+      const [inserted] = await tx
+        .insert(sourceSnapshots)
+        .values({
+          dataSourceId,
+          snapshotHash: body.snapshotHash,
+          recordCount: body.recordCount ?? null,
+          rawContent: body.rawContent,
+          fetchedAt: body.fetchedAt ? new Date(body.fetchedAt) : new Date(),
+          mappingValid: body.mappingValid ?? true,
+          parserVersion: body.parserVersion ?? null,
+          notes: body.notes ?? null,
+        })
+        .onConflictDoNothing({ target: [sourceSnapshots.dataSourceId, sourceSnapshots.snapshotHash] })
+        .returning({ id: sourceSnapshots.id });
 
-    if (existing) {
-      return c.json({ ok: true, id: existing.id, deduplicated: true });
+      if (!inserted) {
+        // Content-hash dedup: this exact content already exists
+        const [existing] = await tx
+          .select({ id: sourceSnapshots.id })
+          .from(sourceSnapshots)
+          .where(and(
+            eq(sourceSnapshots.dataSourceId, dataSourceId),
+            eq(sourceSnapshots.snapshotHash, body.snapshotHash),
+          ));
+        return { id: existing?.id ?? 0, deduplicated: true } as const;
+      }
+
+      // Update data source metadata within the same transaction
+      await tx
+        .update(dataSources)
+        .set({
+          lastSnapshotAt: new Date(),
+          snapshotRecordCount: body.recordCount ?? null,
+          latestSnapshotHash: body.snapshotHash,
+          updatedAt: new Date(),
+        })
+        .where(eq(dataSources.id, dataSourceId));
+
+      return { id: inserted.id, deduplicated: false } as const;
+    });
+
+    if (result.deduplicated) {
+      return c.json({ ok: true, id: result.id, deduplicated: true });
     }
-
-    // Insert new snapshot
-    const [inserted] = await db
-      .insert(sourceSnapshots)
-      .values({
-        dataSourceId,
-        snapshotHash: body.snapshotHash,
-        recordCount: body.recordCount ?? null,
-        rawContent: body.rawContent,
-        fetchedAt: body.fetchedAt ? new Date(body.fetchedAt) : new Date(),
-        mappingValid: body.mappingValid ?? true,
-        parserVersion: body.parserVersion ?? null,
-        notes: body.notes ?? null,
-      })
-      .returning({ id: sourceSnapshots.id });
-
-    // Update data source metadata
-    await db
-      .update(dataSources)
-      .set({
-        lastSnapshotAt: new Date(),
-        snapshotRecordCount: body.recordCount ?? null,
-        latestSnapshotHash: body.snapshotHash,
-        updatedAt: new Date(),
-      })
-      .where(eq(dataSources.id, dataSourceId));
-
-    return c.json({ ok: true, id: inserted.id, deduplicated: false }, 201);
+    return c.json({ ok: true, id: result.id, deduplicated: false }, 201);
   })
 
   // GET /:id/snapshots/latest — most recent snapshot with raw_content

@@ -43,9 +43,9 @@ CREATE TABLE IF NOT EXISTS source_snapshots (
   mapping_valid boolean NOT NULL DEFAULT true,
   parser_version text,
   notes text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (data_source_id, snapshot_hash)
+  created_at timestamptz NOT NULL DEFAULT now()
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ss_dedup ON source_snapshots (data_source_id, snapshot_hash);
 CREATE INDEX IF NOT EXISTS idx_ss_data_source ON source_snapshots (data_source_id);
 CREATE INDEX IF NOT EXISTS idx_ss_fetched_at ON source_snapshots (fetched_at);
