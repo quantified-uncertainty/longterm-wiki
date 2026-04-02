@@ -167,6 +167,16 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. FLI was still in rapid growth phase in 2023."
 
+  - id: f_Gz4uyRC44r
+    property: one-time-donation
+    value: "549531672"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Vitalik Buterin SHIB token donation — one-time windfall,
+      not operational revenue. Moved from 'revenue' to 'one-time-donation' to avoid
+      distorting revenue time-series charts."
+
   - id: f_1tGoi9N3Fi
     property: subsidiary
     value: "Future of Life Action and Research, Inc. (FLARE) — 501(c)(4) advocacy arm"

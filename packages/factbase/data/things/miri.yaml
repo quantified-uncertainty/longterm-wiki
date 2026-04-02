@@ -137,6 +137,14 @@ facts:
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "From IRS Form 990. Implies ~2 years operational runway at current burn rate."
+
+  - id: f_RRODDJe5Xw
+    property: one-time-donation
+    value: 25600000
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/582565917
+    notes: "Revenue spike from Vitalik Buterin Ethereum donation — one-time windfall.
+      Moved from 'revenue' to 'one-time-donation' to avoid distorting charts."
   - id: naKZe9gv3A
     property: website
     value: http://intelligence.org/
