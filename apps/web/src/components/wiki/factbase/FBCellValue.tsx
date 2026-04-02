@@ -158,6 +158,20 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
     }
   }
 
+  // Generic URL strings in any column
+  if (typeof value === "string" && isUrl(value)) {
+    return (
+      <a
+        href={value}
+        className="text-primary hover:underline text-xs"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {shortDomain(value)}
+      </a>
+    );
+  }
+
   // Fallback
   return <>{formatKBCellValue(value, fieldDef)}</>;
 }
