@@ -369,6 +369,7 @@ async function handleSubmitRecords(
   input: Record<string, unknown>,
   task: EnrichmentTask,
   dryRun: boolean,
+  skipVerification: boolean = false,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -483,6 +484,27 @@ async function handleSubmitRecords(
     return `All ${records.length} records already exist (deduplication removed them all).`;
   }
 
+  // Source verification gate: check records against their source URLs before submission.
+  // Catches hallucinated data (e.g., wrong roles, fabricated affiliations).
+  let recordsToSubmit = deduped;
+  let verificationSummary = '';
+  if (!skipVerification && !dryRun) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('./pre-submit-verification.ts');
+    const verifyResult = await verifyBeforeSubmit(table, deduped);
+    console.log(formatPreSubmitSummary(verifyResult));
+
+    if (verifyResult.rejected.length > 0) {
+      verificationSummary = ` (${verifyResult.rejected.length} rejected by source verification)`;
+    }
+
+    // Combine accepted records and no-source records for submission
+    recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
+
+    if (recordsToSubmit.length === 0) {
+      return `All ${deduped.length} records were rejected by source verification.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`;
+    }
+  }
+
   if (dryRun) {
     return `[DRY RUN] Would submit ${deduped.length} records to ${table} (${records.length - deduped.length} duplicates filtered):\n${JSON.stringify(deduped, null, 2)}`;
   }
@@ -493,15 +515,16 @@ async function handleSubmitRecords(
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     syncConfig.syncMethod,
     syncConfig.syncPath,
-    { [syncConfig.syncBodyKey]: deduped },
+    { [syncConfig.syncBodyKey]: recordsToSubmit },
   );
 
   if (!result.ok) {
     return `Error submitting to ${table}: ${result.message}`;
   }
 
-  const count = result.data.upserted ?? result.data.updated ?? deduped.length;
-  return `Successfully submitted ${count} records to ${table} (${records.length - deduped.length} duplicates filtered).`;
+  const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
+  const dupCount = records.length - deduped.length;
+  return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${verificationSummary}.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -511,7 +534,9 @@ async function handleSubmitRecords(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
+  options: { skipVerification?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
+  const skipVerification = options.skipVerification ?? false;
   return {
     query_entities: handleQueryEntities,
     query_existing_records: handleQueryExistingRecords,
@@ -519,7 +544,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipVerification),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),

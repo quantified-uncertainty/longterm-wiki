@@ -16,6 +16,8 @@ const MAX_TOOL_TURNS = 25;
 export interface AgentRunOptions {
   dryRun?: boolean;
   model?: string;
+  /** Skip source verification before submitting records */
+  skipVerification?: boolean;
 }
 
 /**
@@ -26,7 +28,7 @@ export async function runEnrichmentAgent(
   task: EnrichmentTask,
   options: AgentRunOptions = {},
 ): Promise<TaskResult> {
-  const { dryRun = false, model = MODELS.sonnet } = options;
+  const { dryRun = false, model = MODELS.sonnet, skipVerification = false } = options;
   const startTime = Date.now();
   const tracker = new CostTracker();
 
@@ -34,7 +36,7 @@ export async function runEnrichmentAgent(
   const systemPrompt = getSystemPrompt(task);
   const userPrompt = getUserPrompt(task);
   const { tools: regularTools, serverTools } = getToolDefinitions();
-  const toolHandlers = buildToolHandlers(task, dryRun);
+  const toolHandlers = buildToolHandlers(task, dryRun, { skipVerification });
 
   let totalRecordsCreated = 0;
 
