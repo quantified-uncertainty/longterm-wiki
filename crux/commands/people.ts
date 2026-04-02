@@ -23,6 +23,7 @@ import { linkResourcesCommand } from './people/link-resources.ts';
 import { enrichCommand } from './people/enrich.ts';
 import { importKeyPersonsCommand } from './people/import-key-persons.ts';
 import { suggestLinksCommand } from './people/suggest-links.ts';
+import { platformAccountsCommand } from './people/platform-accounts.ts';
 
 // Re-export shared utilities that other files import from this module
 export { normalizeName, buildAuthorLookup, matchAuthor } from './people/shared.ts';
@@ -41,6 +42,7 @@ export const commands: Record<
   enrich: enrichCommand,
   'import-key-persons': importKeyPersonsCommand,
   'suggest-links': suggestLinksCommand,
+  'platform-accounts': platformAccountsCommand,
   default: discoverCommand,
 };
 
