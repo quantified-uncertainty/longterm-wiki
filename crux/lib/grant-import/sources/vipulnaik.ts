@@ -9,7 +9,7 @@
  * manifund, givewell, acx-grants, gates-foundation, wellcome-trust, ford-foundation, aria).
  */
 
-import { readFileSync, existsSync, mkdirSync } from "fs";
+import { readFileSync, existsSync, mkdirSync, writeFileSync } from "fs";
 import { execFileSync } from "child_process";
 import { truncateToMonth } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
@@ -299,6 +299,15 @@ export const source: GrantSource = {
       }
     }
     console.log(`  Downloaded ${downloaded} files, ${skipped} cached`);
+    // Write combined SQL file for snapshot capture
+    const parts: string[] = [];
+    for (const donor of DONOR_CONFIGS) {
+      const localPath = `${LOCAL_DIR}/${donor.sqlPath.replace(/\//g, "_")}`;
+      if (existsSync(localPath)) parts.push(readFileSync(localPath, 'utf8'));
+    }
+    if (parts.length > 0) {
+      writeFileSync('/tmp/vipulnaik-combined.sql', parts.join('\n'));
+    }
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {

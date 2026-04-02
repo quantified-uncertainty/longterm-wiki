@@ -19,6 +19,7 @@
  *   - Individual press releases and university announcements (see sourceUrl per award)
  */
 
+import { writeFileSync } from "fs";
 import { matchGrantee } from "../entity-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
 import { FUNDER_IDS } from "../constants.ts";
@@ -980,7 +981,8 @@ export const source: GrantSource = {
   sourceUrl: "https://foresight.org/prizes/feynman-prizes/",
 
   ensureData() {
-    // No external data to download — awards are curated inline
+    // Serialize curated data to cache file for snapshot capture
+    writeFileSync('/tmp/foresight-prizes.json', JSON.stringify({ feynman: FEYNMAN_AWARDS, normHardy: NORM_HARDY_AWARDS }));
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {

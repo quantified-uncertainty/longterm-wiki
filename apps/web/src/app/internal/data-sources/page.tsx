@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function DataSourcesPage() {
-  redirect("/data-sources");
+  redirect("/sources?tab=data-sources");
 }

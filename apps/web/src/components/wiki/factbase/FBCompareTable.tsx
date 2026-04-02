@@ -331,7 +331,7 @@ export function FBCompareTable({
             {years.length} {years.length === 1 ? "year" : "years"}
           </span>
         </CardHeader>
-        <CardContent className="px-0 pt-0 overflow-x-auto">
+        <CardContent className="px-0 pt-0 overflow-x-auto overflow-y-hidden">
           <TimeSeriesTable
             entityRows={entityRows}
             years={years}

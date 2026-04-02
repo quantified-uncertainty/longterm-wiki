@@ -118,9 +118,20 @@ const columns: ColumnDef<DataSourceRow>[] = [
     header: ({ column }) => (
       <SortableHeader column={column}>Name</SortableHeader>
     ),
-    cell: ({ row }) => (
-      <span className="text-sm font-medium">{row.original.name}</span>
-    ),
+    cell: ({ row }) => {
+      const { id, name, recordType } = row.original;
+      if (recordType === "grant") {
+        return (
+          <Link
+            href={`/grants?dataSource=${id}`}
+            className="text-sm font-medium text-accent-foreground hover:underline"
+          >
+            {name}
+          </Link>
+        );
+      }
+      return <span className="text-sm font-medium">{name}</span>;
+    },
     filterFn: "includesString",
     size: 240,
   },
@@ -226,12 +237,19 @@ const columns: ColumnDef<DataSourceRow>[] = [
       <SortableHeader column={column}>Records</SortableHeader>
     ),
     cell: ({ row }) => {
-      const count = row.original.snapshotRecordCount;
-      return (
-        <span className="text-xs tabular-nums">
-          {count != null ? count.toLocaleString() : "—"}
-        </span>
-      );
+      const { snapshotRecordCount: count, recordType, id } = row.original;
+      if (count == null) return <span className="text-xs text-muted-foreground">—</span>;
+      if (recordType === "grant") {
+        return (
+          <Link
+            href={`/grants?dataSource=${id}`}
+            className="text-xs tabular-nums text-accent-foreground hover:underline"
+          >
+            {count.toLocaleString()}
+          </Link>
+        );
+      }
+      return <span className="text-xs tabular-nums">{count.toLocaleString()}</span>;
     },
     size: 80,
   },

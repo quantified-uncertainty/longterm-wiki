@@ -28,6 +28,7 @@ import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollectio
 import { FBEntitySidebar } from "@/components/wiki/factbase/FBEntitySidebar";
 import { FBRefLink } from "@/components/wiki/factbase/FBRefLink";
 import { FBCompareTable } from "@/components/wiki/factbase/FBCompareTable";
+import { FBCompareChart } from "@/components/wiki/factbase/FBCompareChart";
 
 // Table view components
 import SafetyApproachesTableView from "@/components/tables/views/SafetyApproachesTableView";
@@ -195,6 +196,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   FBEntitySidebar,
   FBRefLink,
   FBCompareTable,
+  FBCompareChart,
   // Backwards compat aliases (remove after all MDX migrated)
   KBFactTable: FBFactTable,
   KBRecordTable: FBRecordTable,
@@ -204,6 +206,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBEntitySidebar: FBEntitySidebar,
   KBRefLink: FBRefLink,
   KBCompareTable: FBCompareTable,
+  KBCompareChart: FBCompareChart,
 
   // Verification status
   VerificationStatus,

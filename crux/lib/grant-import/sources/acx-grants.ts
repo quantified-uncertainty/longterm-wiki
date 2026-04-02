@@ -1,3 +1,4 @@
+import { writeFileSync } from "fs";
 import { matchGrantee } from "../entity-matcher.ts";
 import { matchProgram } from "../program-matcher.ts";
 import type { GrantSource, EntityMatcher, RawGrant } from "../types.ts";
@@ -176,7 +177,8 @@ export const source: GrantSource = {
   sourceUrl: "https://www.astralcodexten.com/p/acx-grants-results",
 
   ensureData() {
-    // Data is hardcoded — no download needed
+    // Data is hardcoded — serialize to cache file for snapshot capture
+    writeFileSync('/tmp/acx-grants.json', JSON.stringify(ACX_GRANTS_DATA));
   },
 
   parse(matcher: EntityMatcher): RawGrant[] {
