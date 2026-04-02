@@ -11,7 +11,7 @@
  */
 
 import { execSync } from 'child_process';
-import { existsSync, readdirSync, statSync, unlinkSync } from 'fs';
+import { existsSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'fs';
 import { basename, join } from 'path';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { createLogger } from '../lib/output.ts';
@@ -634,6 +634,12 @@ async function resetCommand(
           output += `  ${c.green}✓${c.reset} Checked out main\n`;
         }
         exec('git pull origin main --ff-only', 30000);
+        // Repair .agent-slot — git pull may overwrite it if still tracked
+        const cwd = process.cwd();
+        const slotMatch = cwd.match(/\/a(\d+)\/?$/);
+        if (slotMatch) {
+          writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
+        }
         output += `  ${c.green}✓${c.reset} Pulled latest main\n`;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
