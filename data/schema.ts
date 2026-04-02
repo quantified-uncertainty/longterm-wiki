@@ -582,6 +582,7 @@ export const PublicationType = z.enum([
   'academic_search',    // Google Scholar, Semantic Scholar
   'code_repository',    // GitHub
   'marketplace',        // Amazon (for book links)
+  'civic_data',         // GovTrack, Ballotpedia, OpenSecrets, LCV, etc.
 ]);
 export type PublicationType = z.infer<typeof PublicationType>;
 

@@ -665,3 +665,164 @@
   credibility: 3
   peer_reviewed: false
   description: Financial news publication
+
+# Civic Data & Political Tracking
+- id: govtrack
+  domains: [govtrack.us]
+  name: GovTrack.us
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Congressional votes, bill progress, legislator report cards since 1789
+
+- id: ballotpedia
+  domains: [ballotpedia.org]
+  name: Ballotpedia
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Political encyclopedia covering 580K+ officials, ballot measures, elections
+
+- id: opensecrets
+  domains: [opensecrets.org]
+  name: OpenSecrets
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Campaign contributions, PAC/Super PAC spending, lobbying, dark money
+
+- id: votesmart
+  domains: [justfacts.votesmart.org]
+  name: VoteSmart
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Aggregated interest group ratings, voting records, issue positions
+
+- id: fec
+  domains: [fec.gov]
+  name: Federal Election Commission
+  type: civic_data
+  credibility: 5
+  peer_reviewed: false
+  description: Official federal campaign finance filings and contribution data
+
+- id: voteview
+  domains: [voteview.com]
+  name: Voteview
+  type: civic_data
+  credibility: 5
+  peer_reviewed: false
+  description: DW-NOMINATE ideology scores for every member of Congress since 1789
+
+- id: lcv
+  domains: [lcv.org, scorecard.lcv.org]
+  name: League of Conservation Voters
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Annual environmental scores for all members of Congress (50+ years)
+
+- id: humane-scorecard
+  domains: [humaneaction.org]
+  name: Humane World Action Fund
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Annual animal protection scores for all federal legislators
+
+- id: fp4a
+  domains: [fp4america.org, scorecard.fp4america.org]
+  name: Foreign Policy for America
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Congressional scores on 20 foreign policy issues including global health
+
+- id: livable-world
+  domains: [livableworld.org]
+  name: Council for a Livable World
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Nuclear arms control endorsements and congressional candidate support
+
+- id: legiscan
+  domains: [legiscan.com]
+  name: LegiScan
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: 191K+ bills across Congress and all 50 state legislatures
+
+- id: open-states
+  domains: [openstates.org, pluralpolicy.com]
+  name: Open States
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: State legislator profiles, bill tracking across all US states
+
+- id: brennan-center
+  domains: [brennancenter.org]
+  name: Brennan Center for Justice
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: Federal AI legislation tracker, democracy and justice research
+
+- id: multistate-ai
+  domains: [multistate.ai]
+  name: MultiState.ai
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: AI-related bills across all 50 states (1500+ bills tracked)
+
+- id: center-ai-policy
+  domains: [centeraipolicy.org]
+  name: Center for AI Policy
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: AI safety policy advocacy focused on catastrophic risk mitigation
+
+- id: ontheissues
+  domains: [ontheissues.org]
+  name: OnTheIssues
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: Comprehensive politician issue positions from votes, speeches, statements
+
+- id: followthemoney
+  domains: [followthemoney.org]
+  name: FollowTheMoney
+  type: civic_data
+  credibility: 4
+  peer_reviewed: false
+  description: State-level campaign contributions and independent spending across 50 states
+
+- id: maplight
+  domains: [maplight.org]
+  name: MapLight
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: Maps connection between campaign contributions and legislative votes
+
+- id: techpolicy-press
+  domains: [techpolicy.press]
+  name: TechPolicy.Press
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: Technology policy, AI governance, and platform regulation coverage
+
+- id: polymarket
+  domains: [polymarket.com]
+  name: Polymarket
+  type: civic_data
+  credibility: 3
+  peer_reviewed: false
+  description: Real-money prediction markets on elections and policy outcomes
