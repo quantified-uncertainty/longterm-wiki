@@ -8,6 +8,8 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
+import { getRecordVerdict } from "@/data/tablebase";
+import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
 type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
@@ -228,10 +230,12 @@ export function DivisionsSection({
               const resolvedLead = leadResolved?.get(d.key);
               const stats = spending?.get(d.key);
               const divMembers = members?.get(d.key) ?? [];
+              const verdict = getRecordVerdict("division", String(d.key));
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
-                    <span className="font-medium text-foreground text-xs">
+                    <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
+                      <RecordVerificationDot verdict={verdict?.verdict} />
                       {(() => {
                         const href = getDivisionHref(d);
                         return href ? (
