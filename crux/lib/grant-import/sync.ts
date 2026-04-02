@@ -2,6 +2,7 @@ import { generateId } from "./id.ts";
 import { isSupportedCurrency } from "./currency.ts";
 import type { RawGrant, SyncGrant } from "./types.ts";
 import { apiRequest, getServerUrl } from "../wiki-server/client.ts";
+import { getManifest } from "./manifests/index.ts";
 
 export const SYNC_BATCH_SIZE = 500;
 
@@ -66,7 +67,7 @@ export function toSyncGrant(raw: RawGrant, defaultSourceUrl: string): SyncGrant 
     currency: validateCurrency(raw.currency),
     date: raw.date,
     status: null,
-    source: raw.sourceUrl ?? defaultSourceUrl,
+    source: raw.sourceUrl?.trim() || getManifest(raw.source)?.fetchUrl || defaultSourceUrl,
     notes,
     programId: raw.programId ?? null,
   };

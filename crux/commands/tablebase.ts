@@ -26,6 +26,7 @@ import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stabl
 import { commands as importGrantsCommands } from './import-grants.ts';
 import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
+import { commands as dataSourcesCommands } from './data-sources.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1139,6 +1140,12 @@ export const commands = {
   'markets-fetch': marketsFetchCommand,
   // ID normalization
   'normalize-ids': normalizeIdsCommand,
+  // Data source management
+  'data-sources': dataSourcesCommands.default,
+  'data-sources-list': dataSourcesCommands.list,
+  'data-sources-show': dataSourcesCommands.show,
+  'data-sources-snapshot': dataSourcesCommands.snapshot,
+  'data-sources-health': dataSourcesCommands.health,
 };
 
 export function getHelp(): string {
@@ -1175,6 +1182,13 @@ Commands:
   import-divisions-sync       Sync divisions to wiki-server
   import-funding-programs     List known funding programs (default)
   import-funding-programs-sync  Sync programs to wiki-server
+
+  Data Sources:
+  data-sources                Show data source help
+  data-sources-list           List all registered data sources
+  data-sources-show <id>      Show details + snapshot history
+  data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
+  data-sources-health         Check mapping validity, staleness
 
   Market data:
   markets-discover <entity>   Discover prediction market questions via LLM agent

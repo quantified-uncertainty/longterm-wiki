@@ -28,6 +28,7 @@ import {
 import { printDuplicateAnalysis, deduplicateGrants } from "../lib/grant-import/dedup.ts";
 import { ALL_SOURCES } from "../lib/grant-import/sources/index.ts";
 import type { GrantSource, RawGrant, SyncGrant } from "../lib/grant-import/types.ts";
+import { captureAllSnapshots } from "../lib/grant-import/snapshot-capture.ts";
 
 /** Map from source ID to sourceUrl, built once from ALL_SOURCES */
 const SOURCE_URL_MAP = new Map(ALL_SOURCES.map(s => [s.id, s.sourceUrl]));
@@ -138,6 +139,18 @@ async function cmdSync(dryRun: boolean, sourceFilter?: string, dedup = true) {
   }
 
   await syncToServer(syncGrants, dryRun);
+
+  // Capture source snapshots (best-effort, doesn't block import)
+  if (!dryRun) {
+    const sourceIds = sources.map(s => s.id);
+    try {
+      await captureAllSnapshots(sourceIds);
+    } catch (e: unknown) {
+      console.warn(
+        `[import-grants] Snapshot capture failed (non-blocking): ${e instanceof Error ? e.message : String(e)}`
+      );
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------

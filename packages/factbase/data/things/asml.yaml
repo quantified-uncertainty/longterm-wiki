@@ -73,7 +73,7 @@ facts:
     source: https://www.asml.com/en/investors/annual-report
     notes: "2024 annual revenue (~EUR 28.3B). 2025 full-year revenue rose to EUR 32.7B."
 
-  - id: f_asml_rev_2025
+  - id: f_gq5tiOrIkN
     property: revenue
     value: 3.27e+10
     asOf: 2025-12

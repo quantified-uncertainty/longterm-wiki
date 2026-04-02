@@ -56,7 +56,7 @@ const MIN_FACTS = 40; // Currently ~54; alert if drops dramatically
 // auto-update.yml schedule is disabled — it runs only via manual workflow_dispatch,
 // so the threshold must be generous to avoid false alarms.
 const MAX_AGE: Record<string, number> = {
-  'auto-update.yml': 336, // 14 days — schedule disabled, manual runs only
+  'auto-update.yml': 720, // 30 days — schedule disabled, manual runs only (see #2982)
   'database-backup.yml': 36,
   'scheduled-maintenance.yml': 216, // 9 days
   'server-health-monitor.yml': 192, // weekly dead-man-switch (8 days)

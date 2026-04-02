@@ -438,6 +438,7 @@ export const CRITICAL_RULES: string[] = [
   'internal-links',
   'fake-urls',
   'citation-urls',
+  'datainfobox-entity-match',
 ];
 
 /** Quality validation rules (should pass, but won't block deployment) */
@@ -455,4 +456,5 @@ export const QUALITY_RULES: string[] = [
   'unsourced-biographical-claims',
   'evaluative-flattery',
   'orphaned-footnotes',
+  'squiggle-quality',
 ];

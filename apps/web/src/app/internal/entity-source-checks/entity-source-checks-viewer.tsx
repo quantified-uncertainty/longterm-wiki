@@ -130,7 +130,7 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
     },
     {
       accessorKey: "recordId",
-      header: ({ column }) => <SortableHeader column={column}>Field</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column}>Claim</SortableHeader>,
       cell: ({ row }) => {
         const resolvedName = names[row.original.recordId];
         const recordId = row.original.recordId;
@@ -194,7 +194,7 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
         const r = row.original.reasoning;
         if (!r) return <span className="text-xs text-muted-foreground">-</span>;
         return (
-          <span className="text-xs text-muted-foreground line-clamp-2" title={r}>
+          <span className="text-xs text-muted-foreground line-clamp-1" title={r}>
             {r}
           </span>
         );
@@ -362,6 +362,17 @@ function ExpandedDetail({
               ) : (
                 <span className="text-xs text-muted-foreground italic">{sourceUrl}</span>
               )}
+              {(() => {
+                const withResource = items.find(e => e.resourceId);
+                if (!withResource) return null;
+                return (
+                  <a href={`/resources/${withResource.resourceId}`}
+                    className="text-xs text-emerald-600 hover:underline flex items-center gap-1 dark:text-emerald-400 shrink-0 ml-2"
+                    title="View resource details">
+                    Resource
+                  </a>
+                );
+              })()}
               <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
                 {items.length} check{items.length !== 1 ? "s" : ""}
               </span>
@@ -756,11 +767,7 @@ export function EntitySourceChecksViewer() {
   const rangeEnd = Math.min((pageIndex + 1) * ps, filteredCount);
 
   // Stats — computed from filtered data so they update with active filters
-  const withConfidence = filtered.filter((v) => v.confidence != null);
-  const avgConfidence = withConfidence.length > 0
-    ? withConfidence.reduce((s, v) => s + v.confidence!, 0) / withConfidence.length : 0;
   const contradictedCount = filtered.filter((v) => v.verdict === "contradicted").length;
-  const needsRecheckCount = filtered.filter((v) => v.needsRecheck).length;
 
   // Coverage stats — filter out rows with neither records nor verdicts
   const meaningfulCoverage = coverageData.filter((r) => r.total > 0 || r.verified > 0);
@@ -790,36 +797,54 @@ export function EntitySourceChecksViewer() {
     <div className="not-prose">
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-        {totalRecords > 0 && (
-          <div className="rounded-lg border border-border/60 p-4">
-            <p className="text-xs text-muted-foreground mb-1">Total Records</p>
-            <p className="text-2xl font-bold tabular-nums">{totalRecords.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground mt-1">{meaningfulCoverage.length} record types</p>
-          </div>
-        )}
-        {totalRecords > 0 && (
-          <div className="rounded-lg border border-border/60 p-4">
-            <p className="text-xs text-muted-foreground mb-1">Checked</p>
-            <p className={cn("text-2xl font-bold tabular-nums", overallCoveragePct < 50 ? "text-amber-600" : "text-emerald-600")}>{overallCoveragePct}%</p>
-            <p className="text-xs text-muted-foreground mt-1">{totalVerified.toLocaleString()} / {totalRecords.toLocaleString()}</p>
-          </div>
-        )}
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
-          <p className="text-2xl font-bold tabular-nums">{filtered.length}</p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>
-          <p className="text-2xl font-bold tabular-nums">{avgConfidence > 0 ? `${Math.round(avgConfidence * 100)}%` : "N/A"}</p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
-          <p className={cn("text-2xl font-bold tabular-nums", contradictedCount > 0 ? "text-red-600" : "")}>{contradictedCount}</p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
-          <p className={cn("text-2xl font-bold tabular-nums", needsRecheckCount > 0 ? "text-amber-600" : "")}>{needsRecheckCount}</p>
-        </div>
+        {(() => {
+          const confirmedCount = filtered.filter((v) => v.verdict === "confirmed").length;
+          const hasIssuesCount = filtered.filter((v) => v.verdict === "contradicted" || v.verdict === "outdated" || v.verdict === "partial").length;
+          const unverifiableCount = filtered.filter((v) => v.verdict === "unverifiable").length;
+          const accuracyDenom = confirmedCount + contradictedCount + filtered.filter((v) => v.verdict === "outdated").length;
+          const accuracyPct = accuracyDenom > 0 ? Math.round((confirmedCount / accuracyDenom) * 100) : null;
+          const checkedTotal = filtered.length;
+          const pctOf = (n: number) => checkedTotal > 0 ? `${Math.round((n / checkedTotal) * 100)}% of checked` : "0% of checked";
+
+          return (
+            <>
+              <div className="rounded-lg border border-border/60 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Verified Correct</p>
+                <p className="text-2xl font-bold tabular-nums text-emerald-600">{confirmedCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">{pctOf(confirmedCount)}</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Has Issues</p>
+                <p className="text-2xl font-bold tabular-nums text-amber-600">{hasIssuesCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">{pctOf(hasIssuesCount)}</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Unverifiable</p>
+                <p className="text-2xl font-bold tabular-nums">{unverifiableCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">{pctOf(unverifiableCount)}</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
+                <p className={cn("text-2xl font-bold tabular-nums", contradictedCount > 0 ? "text-red-600" : "")}>{contradictedCount}</p>
+                <p className="text-xs text-muted-foreground mt-1">Review and correct</p>
+              </div>
+              <div className="rounded-lg border border-border/60 p-4">
+                <p className="text-xs text-muted-foreground mb-1">Accuracy Rate</p>
+                <p className={cn("text-2xl font-bold tabular-nums", accuracyPct === null ? "" : accuracyPct >= 90 ? "text-emerald-600" : accuracyPct >= 75 ? "text-amber-600" : "text-red-600")}>
+                  {accuracyPct !== null ? `${accuracyPct}%` : "N/A"}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Excludes unverifiable</p>
+              </div>
+              {totalRecords > 0 && (
+                <div className="rounded-lg border border-border/60 p-4">
+                  <p className="text-xs text-muted-foreground mb-1">Coverage</p>
+                  <p className={cn("text-2xl font-bold tabular-nums", overallCoveragePct < 50 ? "text-amber-600" : "text-emerald-600")}>{overallCoveragePct}%</p>
+                  <p className="text-xs text-muted-foreground mt-1">{totalVerified.toLocaleString()} / {totalRecords.toLocaleString()}</p>
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
 
       {/* Contradictions alert section */}

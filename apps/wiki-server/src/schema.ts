@@ -743,6 +743,82 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
   index("idx_rpd_document_type").on(table.documentType),
 ]);
 
+// ── Data Sources & Snapshots ──────────────────────────────────────────
+
+/**
+ * Data Sources — standalone table describing structured data sources (CSVs, APIs,
+ * HTML tables) used by the grant import pipeline and other TableBase importers.
+ *
+ * Not a resource sub-table: data sources are identified by source_id (e.g.,
+ * "coefficient-giving"), not by URL. Some have no stable URL (manual exports,
+ * authenticated APIs). A data source MAY reference a resource via optional FK.
+ *
+ * Discussion #3567: Data Source Resources
+ */
+export const dataSources = pgTable("data_sources", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  /** csv | html_table | json_api | spreadsheet */
+  dataFormat: text("data_format").notNull(),
+  /** direct_download | api_endpoint | web_scrape | manual_export */
+  accessMethod: text("access_method").notNull(),
+  /** grant | personnel | investment | mixed */
+  recordType: text("record_type").notNull(),
+  /** URL to download/scrape (nullable for manual exports) */
+  fetchUrl: text("fetch_url"),
+  /** Optional link to a resource record */
+  resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
+  /** Entity that publishes this data */
+  publisherEntityId: text("publisher_entity_id"),
+  /** static | weekly | monthly | quarterly | annual */
+  updateFrequency: text("update_frequency"),
+  /** Maps source column names to internal field names */
+  columnMapping: jsonb("column_mapping").$type<Record<string, string>>(),
+  /** Frictionless-inspired field descriptions */
+  sourceSchema: jsonb("source_schema").$type<Record<string, unknown>>(),
+  /** { strategy, matchFields, fuzzyFields, exactFields } */
+  verificationConfig: jsonb("verification_config").$type<Record<string, unknown>>(),
+  lastSnapshotAt: timestamp("last_snapshot_at", { withTimezone: true }),
+  snapshotRecordCount: integer("snapshot_record_count"),
+  latestSnapshotHash: text("latest_snapshot_hash"),
+  /** active | archived | defunct */
+  sourceStatus: text("source_status").notNull().default("active"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_ds_record_type").on(table.recordType),
+  index("idx_ds_publisher").on(table.publisherEntityId),
+  index("idx_ds_source_status").on(table.sourceStatus),
+]);
+
+/**
+ * Source Snapshots — permanent storage of raw source content (CSV text, HTML, JSON).
+ *
+ * Snapshots are never deleted. Content-hash dedup prevents storing identical
+ * snapshots via UNIQUE(data_source_id, snapshot_hash). At ~1-3MB per snapshot
+ * across 14 grant sources, storage is negligible (~728MB/year at weekly cadence).
+ */
+export const sourceSnapshots = pgTable("source_snapshots", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  dataSourceId: text("data_source_id").notNull()
+    .references(() => dataSources.id, { onDelete: "cascade" }),
+  snapshotHash: text("snapshot_hash").notNull(),
+  recordCount: integer("record_count"),
+  /** Raw CSV/HTML/JSON text — the ground truth. Parsed on-demand. */
+  rawContent: text("raw_content").notNull(),
+  fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+  /** False if expected columns were missing during snapshot capture */
+  mappingValid: boolean("mapping_valid").notNull().default(true),
+  /** Tracks which parser version produced this snapshot */
+  parserVersion: text("parser_version"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_ss_data_source").on(table.dataSourceId),
+  index("idx_ss_fetched_at").on(table.fetchedAt),
+  uniqueIndex("idx_ss_dedup").on(table.dataSourceId, table.snapshotHash),
+]);
+
 // ── TableBase: Entity catalog (continued) ─────────────────────────────
 
 /**

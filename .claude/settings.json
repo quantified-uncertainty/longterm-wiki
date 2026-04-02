@@ -51,6 +51,16 @@
             "async": true
           }
         ]
+      },
+      {
+        "matcher": "Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/recover-cwd.sh\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionEnd": [

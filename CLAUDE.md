@@ -20,7 +20,7 @@ pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an 
 
 **"Before writing code" is not good enough** — quick fixes, research, and file reads all count. Run it first, then proceed. See `.claude/rules/agent-session-workflow.md` for full workflow.
 
-At session end, run `/agent-ship`. Always open a PR — never push directly to `main`.
+At session end, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not). Never push directly to `main`.
 
 ## Quick Reference
 
@@ -141,7 +141,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 
 ## Key Conventions
 
-- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. To work on another branch, use the Agent tool with `isolation: "worktree"`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
+- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. **Do NOT use `isolation: "worktree"` in Agent calls** — it has a [confirmed Claude Code bug](https://github.com/anthropics/claude-code/issues/42282) that corrupts the parent session's working directory and bricks the session. For branch isolation, use agent workspace slots (`lw/a1`–`lw/a15`). See `.claude/rules/worktree-isolation-bug.md`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
 - **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
 - **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
@@ -178,3 +178,4 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system
+- `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)

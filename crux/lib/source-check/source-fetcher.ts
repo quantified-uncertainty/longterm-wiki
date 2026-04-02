@@ -146,14 +146,45 @@ export async function fetchSourceContent(
     console.warn(`${logPrefix} Cache lookup failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // No cached content — auto-enqueue a resource-ingest job so the content
-  // gets fetched for next time (self-healing pipeline, Discussion #3499 Issue H).
-  // Fire-and-forget: don't block the caller or fail the source-check.
-  let ingestEnqueued = false;
+  // No cached content — try Wayback Machine archive URL as fallback.
+  // The resources table stores archive_url for dead/moved pages.
+  let resourceId: string | null = null;
   try {
     const resource = await lookupResourceByUrl(url);
     if (resource.ok && resource.data) {
-      const resourceId = (resource.data as { id: string }).id;
+      const resourceData = resource.data as { id: string; archiveUrl?: string };
+      resourceId = resourceData.id;
+
+      // Try archive URL if available
+      if (resourceData.archiveUrl) {
+        console.log(`${logPrefix} Primary URL not cached, trying archive: ${resourceData.archiveUrl}`);
+        try {
+          const archiveResult = await getCitationContentByUrl(resourceData.archiveUrl);
+          if (archiveResult.ok && archiveResult.data) {
+            const cached = archiveResult.data as Record<string, unknown>;
+            const content = cached.fullText as string | null;
+            if (content && content.length > 0) {
+              if (detectPaywall(content)) {
+                return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Archive content appears paywalled' };
+              }
+              return { content: content.slice(0, MAX_CONTENT_LENGTH) };
+            }
+          }
+        } catch (e: unknown) {
+          console.warn(`${logPrefix} Archive URL lookup failed: ${e instanceof Error ? e.message : String(e)}`);
+        }
+      }
+    }
+  } catch (e: unknown) {
+    console.warn(`${logPrefix} Resource lookup failed: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // Auto-enqueue a resource-ingest job so the content gets fetched for next time
+  // (self-healing pipeline, Discussion #3499 Issue H).
+  // Fire-and-forget: don't block the caller or fail the source-check.
+  let ingestEnqueued = false;
+  if (resourceId) {
+    try {
       await createJob({
         type: 'resource-ingest',
         params: { resourceId, url },
@@ -162,10 +193,10 @@ export async function fetchSourceContent(
       });
       ingestEnqueued = true;
       console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
+    } catch (e: unknown) {
+      // Best-effort — don't fail source-check if enqueue fails
+      console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
     }
-  } catch (e: unknown) {
-    // Best-effort — don't fail source-check if enqueue fails
-    console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return {

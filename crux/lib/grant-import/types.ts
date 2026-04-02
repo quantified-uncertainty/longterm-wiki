@@ -59,3 +59,6 @@ export interface GrantSource {
   parse(matcher: EntityMatcher): RawGrant[] | Promise<RawGrant[]>;
   printAnalysis?(grants: RawGrant[]): void;
 }
+
+/** Re-export manifest type for convenience */
+export type { DataSourceManifest } from './manifests/types.ts';

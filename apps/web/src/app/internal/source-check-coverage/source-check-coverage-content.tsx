@@ -119,39 +119,78 @@ export async function SourceCheckCoverageContent() {
       <DataSourceBanner source={source} apiError={apiError} />
 
       <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-        Source-check coverage across all record types. Data from the unified{" "}
-        <code className="text-[11px]">source_check_verdicts</code> and{" "}
-        <code className="text-[11px]">source_check_evidence</code> tables.
+        Data quality and coverage across all record types.
       </p>
 
       {/* ── (a) Summary cards ──────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 not-prose mb-8">
-        <StatCard
-          label="Total Entities"
-          value={totalEntities.toLocaleString()}
-          sub={`${entityTypes.length} entity types`}
-        />
-        <StatCard
-          label="Total Verdicts"
-          value={vStats.total.toLocaleString()}
-          sub={Object.entries(vStats.by_type ?? {}).map(([t, c]) => `${t}: ${c}`).join(", ") || "None yet"}
-        />
-        <StatCard
-          label="Avg Confidence"
-          value={
-            vStats.avg_confidence > 0
-              ? `${Math.round(vStats.avg_confidence * 100)}%`
-              : "N/A"
-          }
-          sub={`Across ${vStats.total.toLocaleString()} verdicts`}
-        />
-        <StatCard
-          label="Needs Recheck"
-          value={vStats.needs_recheck.toLocaleString()}
-          color={vStats.needs_recheck > 0 ? "text-amber-600" : ""}
-          sub={vStats.needs_recheck > 0 ? "Verdicts flagged for recheck" : "All up to date"}
-        />
-      </div>
+      {(() => {
+        const bv = vStats.by_verdict ?? {};
+        const confirmed = bv["confirmed"] ?? 0;
+        const contradicted = bv["contradicted"] ?? 0;
+        const outdated = bv["outdated"] ?? 0;
+        const partial = bv["partial"] ?? 0;
+        const unverifiable = bv["unverifiable"] ?? 0;
+        const unchecked = bv["unchecked"] ?? 0;
+        const totalChecked = vStats.total - unchecked;
+        const hasIssues = contradicted + outdated + partial;
+        const accuracyDenom = confirmed + contradicted + outdated;
+        const accuracyRate = accuracyDenom > 0 ? (confirmed / accuracyDenom) * 100 : 0;
+        const pct = (n: number) =>
+          totalChecked > 0 ? `${Math.round((n / totalChecked) * 100)}%` : "—";
+
+        return (
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 not-prose mb-8">
+            <StatCard
+              label="Verified Correct"
+              value={confirmed.toLocaleString()}
+              color="text-emerald-600"
+              sub={`${pct(confirmed)} of checked verdicts`}
+            />
+            <StatCard
+              label="Has Issues"
+              value={hasIssues.toLocaleString()}
+              color={hasIssues > 0 ? "text-amber-600" : ""}
+              sub={`${pct(hasIssues)} of checked verdicts`}
+            />
+            <StatCard
+              label="Unverifiable"
+              value={unverifiable.toLocaleString()}
+              color="text-muted-foreground"
+              sub={`${pct(unverifiable)} of checked verdicts`}
+            />
+            <StatCard
+              label="Contradicted"
+              value={contradicted.toLocaleString()}
+              color={contradicted > 0 ? "text-red-600" : ""}
+              sub={contradicted > 0 ? "Action required — data may be wrong" : "None found"}
+            />
+            <StatCard
+              label="Accuracy Rate"
+              value={
+                accuracyDenom > 0
+                  ? `${Math.round(accuracyRate)}%`
+                  : "N/A"
+              }
+              color={
+                accuracyDenom === 0
+                  ? ""
+                  : accuracyRate >= 90
+                    ? "text-emerald-600"
+                    : accuracyRate >= 75
+                      ? "text-amber-600"
+                      : "text-red-600"
+              }
+              sub="Confirmed / (Confirmed + Wrong + Outdated)"
+            />
+            <StatCard
+              label="Needs Recheck"
+              value={vStats.needs_recheck.toLocaleString()}
+              color={vStats.needs_recheck > 0 ? "text-amber-600" : ""}
+              sub={vStats.needs_recheck > 0 ? "Verdicts flagged for recheck" : "All up to date"}
+            />
+          </div>
+        );
+      })()}
 
       {/* ── (b) Entities by Type ────────────────────────────────── */}
       <div className="not-prose mb-8">

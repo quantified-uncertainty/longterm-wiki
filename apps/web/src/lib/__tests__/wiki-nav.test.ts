@@ -102,7 +102,7 @@ describe("detectSidebarType", () => {
   it("returns 'internal' for /internal/ paths", () => {
     expect(detectSidebarType("/internal/")).toBe("internal");
     expect(detectSidebarType("/internal/architecture")).toBe("internal");
-    expect(detectSidebarType("/internal/facts")).toBe("internal");
+    expect(detectSidebarType("/internal/entities")).toBe("internal");
   });
 
   it("returns 'about' for About page paths", () => {
