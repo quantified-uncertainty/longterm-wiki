@@ -42,8 +42,8 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
   }
 
   try {
-    // Read raw content
-    const rawContent = readFileSync(manifest.cachePath, 'utf8');
+    // Read raw content, strip BOM if present (gates-foundation CSV has one)
+    const rawContent = readFileSync(manifest.cachePath, 'utf8').replace(/^\uFEFF/, '');
     if (!rawContent || rawContent.length === 0) {
       console.log(`  [snapshot] Empty cache file for ${sourceId}, skipping`);
       return { ok: false, error: 'empty cache file' };

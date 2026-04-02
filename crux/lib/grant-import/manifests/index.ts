@@ -199,11 +199,11 @@ const acxGrants: DataSourceManifest = {
   sourceId: 'acx-grants',
   name: 'Astral Codex Ten Grants',
   fetchUrl: null,
-  format: 'csv',
+  format: 'json_api',
   accessMethod: 'manual_export',
   publisherEntityId: 'sid_LBr3ocKKyQ',
   updateFrequency: 'annual',
-  cachePath: '',
+  cachePath: '/tmp/acx-grants.json',
   schema: { fields: [] },
   verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
 };
@@ -215,7 +215,7 @@ const ftxFutureFund: DataSourceManifest = {
   format: 'csv',
   accessMethod: 'manual_export',
   updateFrequency: 'static',
-  cachePath: '',
+  cachePath: '/tmp/ftx-future-fund-combined.sql',
   schema: { fields: [] },
   verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
 };
@@ -266,7 +266,7 @@ const vipulnaik: DataSourceManifest = {
   format: 'csv',
   accessMethod: 'direct_download',
   updateFrequency: 'monthly',
-  cachePath: '',
+  cachePath: '/tmp/vipulnaik-combined.sql',
   schema: { fields: [] },
   verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
 };

@@ -1,5 +1,4 @@
 import { readFileSync, writeFileSync, existsSync, statSync } from "fs";
-import { execSync } from "child_process";
 import { extractISODate } from "../dates.ts";
 import { matchGrantee } from "../entity-matcher.ts";
 import { matchProgram } from "../program-matcher.ts";
@@ -42,77 +41,16 @@ async function fetchManifundProjects(): Promise<ManifundProject[]> {
     }
   }
 
-  console.log("  Fetching from Manifund API via Playwright...");
-  console.log("  (Manifund uses Vercel security checkpoint — requires headless browser)");
-
-  const script = `
-const { chromium } = require('playwright');
-(async () => {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext();
-  const page = await context.newPage();
-
-  await page.goto('https://manifund.org/', { waitUntil: 'domcontentloaded', timeout: 20000 });
-  await page.waitForTimeout(5000);
-
-  let allProjects = [];
-  let before = null;
-  let pageNum = 0;
-
-  while (true) {
-    pageNum++;
-    const url = before
-      ? '/api/v0/projects?before=' + encodeURIComponent(before)
-      : '/api/v0/projects';
-
-    const text = await page.evaluate(async (u) => {
-      const resp = await fetch(u);
-      if (!resp.ok) throw new Error('HTTP ' + resp.status);
-      return resp.text();
-    }, url);
-
-    const data = JSON.parse(text);
-    process.stderr.write('  Page ' + pageNum + ': ' + data.length + ' projects\\n');
-
-    if (data.length === 0) break;
-    allProjects = allProjects.concat(data);
-
-    before = data[data.length - 1].created_at;
-    if (data.length < 100) break;
-  }
-
-  process.stdout.write(JSON.stringify(allProjects));
-  await browser.close();
-})().catch(e => { process.stderr.write('ERROR: ' + e.message + '\\n'); process.exit(1); });
-`;
-
-  // Write script to temp file to avoid shell quoting issues with node -e
-  const scriptPath = '/tmp/manifund-fetch.cjs';
-  writeFileSync(scriptPath, script);
-
-  try {
-    const result = execSync(
-      `node ${scriptPath}`,
-      { maxBuffer: 50 * 1024 * 1024, timeout: 120_000, encoding: "utf8", stdio: ["pipe", "pipe", "inherit"] }
-    );
-
-    const projects: ManifundProject[] = JSON.parse(result);
-    console.log(`  Downloaded ${projects.length} projects`);
-
-    writeFileSync(MANIFUND_CACHE_PATH, JSON.stringify(projects));
-    return projects;
-  } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : String(e);
-    console.warn(`  Playwright fetch failed: ${msg}`);
-    console.log("  Trying direct fetch as fallback...");
-    return await fetchManifundDirect();
-  }
+  // Direct fetch — try with User-Agent and delays between pages to avoid 429
+  console.log("  Fetching from Manifund API...");
+  return await fetchManifundDirect();
 }
 
 async function fetchManifundDirect(): Promise<ManifundProject[]> {
   const allProjects: ManifundProject[] = [];
   let before: string | null = null;
   let pageNum = 0;
+  const MAX_RETRIES = 3;
 
   while (true) {
     pageNum++;
@@ -120,12 +58,25 @@ async function fetchManifundDirect(): Promise<ManifundProject[]> {
       ? `${MANIFUND_API_URL}?before=${encodeURIComponent(before)}`
       : MANIFUND_API_URL;
 
-    const response = await fetch(url, {
-      headers: { Accept: "application/json" },
-    });
+    let response: Response | null = null;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      response = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "longterm-wiki/1.0 (grant-import)",
+        },
+      });
+      if (response.status === 429) {
+        const retryAfter = parseInt(response.headers.get("retry-after") || "10", 10);
+        console.log(`  Rate limited, waiting ${retryAfter}s...`);
+        await new Promise(r => setTimeout(r, retryAfter * 1000));
+        continue;
+      }
+      break;
+    }
 
-    if (!response.ok) {
-      throw new Error(`Manifund API returned HTTP ${response.status}. Try again later or use cached data.`);
+    if (!response || !response.ok) {
+      throw new Error(`Manifund API returned HTTP ${response?.status ?? 'unknown'}. Try again later or use cached data.`);
     }
 
     const data: ManifundProject[] = await response.json();
@@ -136,6 +87,9 @@ async function fetchManifundDirect(): Promise<ManifundProject[]> {
 
     before = data[data.length - 1].created_at;
     if (data.length < 100) break;
+
+    // Delay between pages to avoid rate limiting
+    await new Promise(r => setTimeout(r, 1000));
   }
 
   console.log(`  Downloaded ${allProjects.length} projects`);
