@@ -112,6 +112,22 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "IRS 501(c)(3) nonprofit"
 
+  - id: f_Gz4uyRC44r
+    property: revenue
+    value: "549531672"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
+
+  - id: f_J3dYwWWqrw
+    property: revenue
+    value: "4717340"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990"
+
   - id: f_feRFvTG4CX
     property: revenue
     value: "21273381"
@@ -119,6 +135,22 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
+
+  - id: f_aEq32QQklw
+    property: annual-expenses
+    value: "16065773"
+    unit: USD
+    asOf: 2021
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990"
+
+  - id: f_s2O048D4tQ
+    property: annual-expenses
+    value: "16317712"
+    unit: USD
+    asOf: 2023
+    source: https://projects.propublica.org/nonprofits/organizations/471052538
+    notes: "From IRS Form 990"
 
   - id: f_A8f0X4bXW4
     property: annual-expenses
@@ -128,13 +160,12 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
 
-  - id: f_Gz4uyRC44r
-    property: revenue
-    value: "549531672"
-    unit: USD
-    asOf: 2021
+  - id: f_wwzIPj7vNQ
+    property: headcount
+    value: "11"
+    asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
-    notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
+    notes: "From IRS Form 990. FLI was still in rapid growth phase in 2023."
 
   - id: f_1tGoi9N3Fi
     property: subsidiary
