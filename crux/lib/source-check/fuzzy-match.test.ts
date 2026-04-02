@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { normalizeOrgName, editDistance, nameMatches, amountMatches, dateMatches } from './fuzzy-match.ts';
+import { parseAmount } from './deterministic-matcher.ts';
 
 describe('normalizeOrgName', () => {
   it('strips common suffixes', () => {
@@ -113,5 +114,52 @@ describe('dateMatches', () => {
   it('handles nulls', () => {
     expect(dateMatches(null, null)).toBe(true);
     expect(dateMatches('2018', null)).toBe(false);
+  });
+
+  it('matches natural language month with ISO date', () => {
+    expect(dateMatches('March 2017', '2017-03')).toBe(true);
+  });
+
+  it('matches natural language month with full ISO date', () => {
+    expect(dateMatches('February 2016', '2016-02-15')).toBe(true);
+  });
+
+  it('matches two identical natural language dates', () => {
+    expect(dateMatches('January 2020', 'January 2020')).toBe(true);
+  });
+
+  it('rejects natural language dates with different years', () => {
+    expect(dateMatches('March 2017', '2018-03')).toBe(false);
+  });
+});
+
+describe('parseAmount', () => {
+  it('strips dagger footnote markers', () => {
+    expect(parseAmount('$1,607,000‡')).toBe(1607000);
+  });
+
+  it('takes first amount from compound expressions', () => {
+    expect(parseAmount('$1,535,000 +$500,000‡')).toBe(1535000);
+  });
+
+  it('strips other footnote markers', () => {
+    expect(parseAmount('$500,000†')).toBe(500000);
+  });
+
+  it('handles plain currency strings', () => {
+    expect(parseAmount('$1,000,000')).toBe(1000000);
+  });
+
+  it('returns number as-is', () => {
+    expect(parseAmount(50000)).toBe(50000);
+  });
+
+  it('returns null for non-numeric strings', () => {
+    expect(parseAmount('N/A')).toBeNull();
+  });
+
+  it('returns null for non-string/non-number types', () => {
+    expect(parseAmount(null)).toBeNull();
+    expect(parseAmount(undefined)).toBeNull();
   });
 });

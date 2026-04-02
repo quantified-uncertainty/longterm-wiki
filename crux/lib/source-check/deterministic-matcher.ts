@@ -44,12 +44,18 @@ function parseSnapshotContent(
 }
 
 /**
- * Parse a numeric value from a string, stripping currency symbols and commas.
+ * Parse a numeric value from a string, stripping currency symbols, commas,
+ * footnote markers (‡†*), and compound amounts (takes first value only).
  */
-function parseAmount(val: unknown): number | null {
+export function parseAmount(val: unknown): number | null {
   if (typeof val === 'number') return val;
   if (typeof val !== 'string') return null;
-  const cleaned = val.replace(/[$£€¥,\s]/g, '');
+  // Strip compound amounts — take first value only
+  let s = val.split(/\s*[+]\s*/)[0];
+  // Strip footnote markers
+  s = s.replace(/[‡†*]/g, '');
+  // Strip currency symbols, commas, and whitespace
+  const cleaned = s.replace(/[$£€¥,\s]/g, '');
   const num = parseFloat(cleaned);
   return isNaN(num) ? null : num;
 }
