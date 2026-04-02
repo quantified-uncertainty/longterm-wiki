@@ -45,6 +45,9 @@ import {
 } from '../lib/source-check/prompt-guidelines.ts';
 import { str, strOrNull, numOrNull, resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 import { matchRecordAgainstSnapshot } from '../lib/source-check/deterministic-matcher.ts';
+import { submitBatch, pollBatch, getBatchResults, extractBatchResultText } from '../lib/anthropic-batch.ts';
+import type { BatchRequest } from '../lib/anthropic-batch.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getManifest } from '../lib/grant-import/manifests/index.ts';
 import type { DataSourceManifest } from '../lib/grant-import/manifests/types.ts';
 import { getLatestSnapshot } from '../lib/wiki-server/data-sources.ts';
@@ -56,8 +59,8 @@ const snapshotCache = new Map<string, { rawContent: string; manifest: DataSource
 
 const { ESTIMATED_COST_PER_VERIFICATION, PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 
-/** Limit passed to wiki-server /all endpoints when fetching records for source-checking */
-const API_PAGE_LIMIT = 5000;
+/** Limit passed to wiki-server /all endpoints (must respect server-side MAX_PAGE_SIZE of 200) */
+const API_PAGE_LIMIT = 200;
 
 /** Entity types ordered by change frequency (most volatile first) */
 const ENTITY_TYPE_PRIORITY: string[] = [
@@ -84,6 +87,8 @@ interface OrchestrateOptions extends BaseOptions {
   budget?: string;
   limit?: string;
   type?: string;
+  /** Filter to a specific record type (e.g. personnel, grant, funding-round) */
+  table?: string;
   'entity-type'?: string;
   entityType?: string;
   source?: string;
@@ -91,6 +96,8 @@ interface OrchestrateOptions extends BaseOptions {
   dryRun?: boolean;
   ci?: boolean;
   concurrency?: string;
+  /** Use Anthropic Batch API for 50% cost savings (async, may take minutes to hours) */
+  batch?: boolean;
 }
 
 type VerifyItemKind = 'fact' | 'record' | 'entity';
@@ -273,7 +280,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=5000');
+    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=500&offset=0');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -283,6 +290,33 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
           checkedAt: v.lastComputedAt,
           needsRecheck: v.needsRecheck,
         });
+      }
+
+      // Paginate if there are more verdicts
+      let offset = response.data.verdicts.length;
+      while (offset < response.data.total) {
+        const nextResponse = await apiRequest<{
+          verdicts: Array<{
+            recordType: string;
+            recordId: string;
+            verdict: string;
+            lastComputedAt?: string;
+            needsRecheck?: boolean;
+          }>;
+          total: number;
+        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=500&offset=${offset}`);
+
+        if (!nextResponse.ok || !nextResponse.data) break;
+        for (const v of nextResponse.data.verdicts) {
+          map.set(v.recordId, {
+            factId: v.recordId,
+            verdict: v.verdict,
+            checkedAt: v.lastComputedAt,
+            needsRecheck: v.needsRecheck,
+          });
+        }
+        if (nextResponse.data.verdicts.length < 500) break;
+        offset += nextResponse.data.verdicts.length;
       }
     }
   } catch (e: unknown) {
@@ -401,51 +435,69 @@ function collectFactItems(
 async function collectRecordItems(
   existingVerdicts: Map<string, VerifiedRecordInfo>,
   entityTypeFilter?: string,
+  tableFilter?: string,
 ): Promise<VerifyItem[]> {
   const items: VerifyItem[] = [];
 
   // Determine which record types to scan
-  const typesToScan = entityTypeFilter
-    ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
-    : [...VALID_RECORD_TYPES];
+  // --table filters to a specific record type (e.g. "personnel", "grant")
+  const typesToScan = tableFilter
+    ? VALID_RECORD_TYPES.filter(t => t === tableFilter)
+    : entityTypeFilter
+      ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
+      : [...VALID_RECORD_TYPES];
 
   for (const recordType of typesToScan) {
-    let apiPath: string;
+    let apiBasePath: string;
     switch (recordType) {
-      case 'grant': apiPath = `/api/grants/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'personnel': apiPath = `/api/personnel/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'division': apiPath = `/api/divisions/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'funding-program': apiPath = `/api/funding-programs/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'funding-round': apiPath = `/api/funding-rounds/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'investment': apiPath = `/api/investments/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'equity-position': apiPath = `/api/equity-positions/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'policy-stakeholder': apiPath = `/api/policy-stakeholders/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'publication': apiPath = `/api/publications/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'benchmark-result': apiPath = `/api/benchmark-results/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'entity-event': apiPath = `/api/entity-events/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'entity-assessment': apiPath = `/api/entity-assessments/all?limit=${API_PAGE_LIMIT}`; break;
-      case 'secondary-market-price': apiPath = `/api/secondary-market-prices/all?limit=${API_PAGE_LIMIT}`; break;
+      case 'grant': apiBasePath = '/api/grants/all'; break;
+      case 'personnel': apiBasePath = '/api/personnel/all'; break;
+      case 'division': apiBasePath = '/api/divisions/all'; break;
+      case 'funding-program': apiBasePath = '/api/funding-programs/all'; break;
+      case 'funding-round': apiBasePath = '/api/funding-rounds/all'; break;
+      case 'investment': apiBasePath = '/api/investments/all'; break;
+      case 'equity-position': apiBasePath = '/api/equity-positions/all'; break;
+      case 'policy-stakeholder': apiBasePath = '/api/policy-stakeholders/all'; break;
+      case 'publication': apiBasePath = '/api/publications/all'; break;
+      case 'benchmark-result': apiBasePath = '/api/benchmark-results/all'; break;
+      case 'entity-event': apiBasePath = '/api/entity-events/all'; break;
+      case 'entity-assessment': apiBasePath = '/api/entity-assessments/all'; break;
+      case 'secondary-market-price': apiBasePath = '/api/secondary-market-prices/all'; break;
       default: continue; // Skip unknown record types
     }
 
     try {
-      const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
-      if (!response.ok) {
-        console.warn(`[source-check] Failed to fetch ${recordType}: ${response.message}`);
-        continue;
+      // Paginate through all records (server-side MAX_PAGE_SIZE is typically 200)
+      const allRawItems: Record<string, unknown>[] = [];
+      let offset = 0;
+
+      while (true) {
+        const apiPath = `${apiBasePath}?limit=${API_PAGE_LIMIT}&offset=${offset}`;
+        const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
+        if (!response.ok) {
+          console.warn(`[source-check] Failed to fetch ${recordType}: ${response.message}`);
+          break;
+        }
+
+        // Extract items array from the response (API uses different keys)
+        const data = response.data;
+        const rawItems = (
+          data.items ?? data.grants ?? data.personnel ?? data.divisions ??
+          data.programs ?? data.rounds ?? data.investments ?? data.positions ??
+          data.stakeholders ?? data.publications ?? data.benchmarkResults ??
+          data.events ?? data.assessments ?? data.prices ??
+          (Array.isArray(data) ? data : [])
+        ) as Record<string, unknown>[];
+
+        allRawItems.push(...rawItems);
+
+        // Stop if we got fewer items than the page size, or we've reached the total
+        const total = typeof data.total === 'number' ? data.total : undefined;
+        if (rawItems.length < API_PAGE_LIMIT || (total !== undefined && allRawItems.length >= total)) break;
+        offset += API_PAGE_LIMIT;
       }
 
-      // Extract items array from the response (API uses different keys)
-      const data = response.data;
-      const rawItems = (
-        data.items ?? data.grants ?? data.personnel ?? data.divisions ??
-        data.programs ?? data.rounds ?? data.investments ?? data.positions ??
-        data.stakeholders ?? data.publications ?? data.benchmarkResults ??
-        data.events ?? data.assessments ?? data.prices ??
-        (Array.isArray(data) ? data : [])
-      ) as Record<string, unknown>[];
-
-      for (const item of rawItems) {
+      for (const item of allRawItems) {
         // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result)
         const source = item.source ?? item.sourceUrl;
         if (typeof source !== 'string' || !source) continue;
@@ -1153,9 +1205,13 @@ export async function orchestrateCommand(
   const budgetLimit = options.budget ? parseFloat(String(options.budget)) : undefined;
   const itemLimit = options.limit ? parseInt(String(options.limit), 10) : undefined;
   const typeFilter = options.type as VerifyItemKind | 'all' | undefined;
+  const tableFilter = options.table as string | undefined;
   const entityTypeFilter = (options['entity-type'] || options.entityType) as string | undefined;
   const sourceMode = (options.source as string) ?? 'existing';
   const useWebSearch = sourceMode === 'web-search' || sourceMode === 'all';
+
+  // --table implies --type=record (filter to specific record type)
+  const effectiveTypeFilter = tableFilter && !typeFilter ? 'record' as const : typeFilter;
 
   // Validate type filter
   const validTypes = ['fact', 'record', 'entity', 'all'];
@@ -1175,9 +1231,9 @@ export async function orchestrateCommand(
     };
   }
 
-  const shouldCollectFacts = !typeFilter || typeFilter === 'all' || typeFilter === 'fact';
-  const shouldCollectRecords = !typeFilter || typeFilter === 'all' || typeFilter === 'record';
-  const shouldCollectEntities = (typeFilter === 'entity' || typeFilter === 'all') && useWebSearch;
+  const shouldCollectFacts = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'fact';
+  const shouldCollectRecords = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'record';
+  const shouldCollectEntities = (effectiveTypeFilter === 'entity' || effectiveTypeFilter === 'all') && useWebSearch;
 
   console.log('\x1b[1mVerification Orchestrator\x1b[0m');
   console.log('');
@@ -1211,7 +1267,7 @@ export async function orchestrateCommand(
   }
 
   if (shouldCollectRecords) {
-    const recordItems = await collectRecordItems(existingRecordVerdicts, entityTypeFilter);
+    const recordItems = await collectRecordItems(existingRecordVerdicts, entityTypeFilter, tableFilter);
     allItems.push(...recordItems);
     console.log(`  Records: ${recordItems.length} items`);
   }
@@ -1251,8 +1307,8 @@ export async function orchestrateCommand(
   }
 
   // ── Live execution ──
+  const useBatch = !!options.batch;
   const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
-  const client = createLlmClient();
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,
@@ -1261,7 +1317,7 @@ export async function orchestrateCommand(
     outdated: 0,
     partial: 0,
     errors: 0,
-    estimatedCost,
+    estimatedCost: useBatch ? estimatedCost * 0.5 : estimatedCost,
     actualVerified: 0,
     byKind: {
       fact: { total: 0, verified: 0 },
@@ -1277,66 +1333,247 @@ export async function orchestrateCommand(
     summary.byKind[item.kind].total++;
   }
 
-  const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
-  console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
+  if (useBatch) {
+    // ── Batch API path (50% cost savings) ──
+    console.log(`\n\x1b[1mBatch mode: preparing ${itemsToVerify.length} items (est. \$${summary.estimatedCost.toFixed(2)} with 50% batch discount)...\x1b[0m\n`);
 
-  let completedCount = 0;
+    // Phase 1: Fetch source content and build prompts (with concurrency)
+    const batchRequests: BatchRequest[] = [];
+    const batchItemMap = new Map<string, VerifyItem>();
+    let preparedCount = 0;
 
-  async function processItem(item: VerifyItem, index: number): Promise<void> {
-    const kindLabel = item.kind.toUpperCase().padEnd(7);
+    async function prepareItem(item: VerifyItem): Promise<void> {
+      preparedCount++;
+      const progress = `[${preparedCount}/${itemsToVerify.length}]`;
 
-    const result = await verifySingleItem(item, client, useWebSearch);
-
-    // Synchronize output and summary updates
-    completedCount++;
-    const progress = `[${completedCount}/${itemsToVerify.length}]`;
-
-    if ('error' in result) {
-      summary.errors++;
-      summary.failures.push(result);
-      const typeTag = result.errorType ? ` [${result.errorType}]` : '';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
-      console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
-    } else {
-      summary[result.verdict]++;
-      summary.actualVerified++;
-      summary.byKind[item.kind].verified++;
-      summary.results.push(result);
-
-      const color = result.verdict === 'confirmed'
-        ? '\x1b[32m'
-        : result.verdict === 'contradicted'
-          ? '\x1b[31m'
-          : '\x1b[33m';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
-      console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
-
-      if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
-        console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
+      // Handle deterministic matching for grants first
+      if (item.data.kind === 'record' && item.data.recordType === 'grant') {
+        try {
+          const deterministicResult = await tryDeterministicMatch(item);
+          if (deterministicResult) {
+            summary[deterministicResult.verdict]++;
+            summary.actualVerified++;
+            summary.byKind[item.kind].verified++;
+            summary.results.push(deterministicResult);
+            console.log(`  ${progress} ${item.description.slice(0, 80)}`);
+            console.log(`    \x1b[32mdeterministic: ${deterministicResult.verdict}\x1b[0m`);
+            await storeResult(item, deterministicResult).catch((e: unknown) => {
+              console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+            });
+            return;
+          }
+        } catch (e: unknown) {
+          console.warn(`[source-check] Deterministic matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+        }
       }
 
-      // Store result (best-effort)
-      await storeResult(item, result).catch((e: unknown) => {
-        console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-      });
-    }
-  }
+      // Fetch source content
+      let sourceUrl = item.sourceUrl;
+      let sourceContent: string | null = null;
 
-  // Run with concurrency-limited pool
-  if (concurrency <= 1) {
-    for (let i = 0; i < itemsToVerify.length; i++) {
-      await processItem(itemsToVerify[i], i);
+      if (!sourceUrl) {
+        summary.errors++;
+        summary.failures.push({ itemId: item.id, kind: item.kind, description: item.description, error: 'No source URL' });
+        return;
+      }
+
+      const fetchResult = await fetchSourceContent(sourceUrl);
+      if (!fetchResult.content) {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: fetchResult.errorMessage ?? 'Could not fetch source content',
+          errorType: fetchResult.errorType,
+        });
+        return;
+      }
+      sourceContent = fetchResult.content;
+
+      // Build prompt
+      let prompt: string;
+      switch (item.data.kind) {
+        case 'fact':
+          prompt = buildFactVerificationPrompt(item.data, sourceContent);
+          break;
+        case 'record':
+          prompt = buildRecordVerificationPrompt(item.data, item.description, sourceContent);
+          break;
+        case 'entity':
+          prompt = buildEntityVerificationPrompt(item.data.entity, sourceContent, sourceUrl);
+          break;
+      }
+
+      const customId = `verify-${item.id}`;
+      batchRequests.push({
+        customId,
+        params: {
+          model: MODELS.haiku,
+          max_tokens: 500,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        },
+      });
+      batchItemMap.set(customId, item);
+      console.log(`  ${progress} Prepared: ${item.description.slice(0, 80)}`);
+    }
+
+    // Prepare items with concurrency
+    const prepExecuting = new Set<Promise<void>>();
+    for (const item of itemsToVerify) {
+      const p = prepareItem(item).finally(() => prepExecuting.delete(p));
+      prepExecuting.add(p);
+      if (prepExecuting.size >= concurrency) await Promise.race(prepExecuting);
+    }
+    await Promise.all(prepExecuting);
+
+    if (batchRequests.length === 0) {
+      console.log('\nNo items require LLM verification (all resolved deterministically or errored).');
+    } else {
+      // Phase 2: Submit batch
+      console.log(`\n\x1b[1mSubmitting batch of ${batchRequests.length} requests to Anthropic Batch API...\x1b[0m`);
+      const Anthropic = (await import('@anthropic-ai/sdk')).default;
+      const anthropicClient = new Anthropic();
+
+      const batch = await submitBatch(anthropicClient, batchRequests);
+      console.log(`  Batch ID: ${batch.id}`);
+      console.log(`  Polling for completion (may take minutes to hours)...`);
+
+      // Phase 3: Poll for completion
+      const completedBatch = await pollBatch(anthropicClient, batch.id, {
+        intervalMs: 15_000,
+        timeoutMs: 4_500_000, // 75 min — fits within 90-min workflow timeout with setup buffer
+        onPoll: (b) => {
+          const counts = b.request_counts;
+          console.log(`  ... processing: ${counts.processing}, succeeded: ${counts.succeeded}, errored: ${counts.errored}`);
+        },
+      });
+
+      console.log(`\n\x1b[1mBatch completed. Processing ${completedBatch.request_counts.succeeded} results...\x1b[0m\n`);
+
+      // Phase 4: Process results
+      const resultsMap = await getBatchResults(anthropicClient, batch.id);
+      for (const [customId, batchResult] of resultsMap) {
+        const item = batchItemMap.get(customId);
+        if (!item) continue;
+
+        if (batchResult.result.type !== 'succeeded') {
+          summary.errors++;
+          summary.failures.push({
+            itemId: item.id, kind: item.kind, description: item.description,
+            error: `Batch request ${batchResult.result.type}`,
+          });
+          continue;
+        }
+
+        const text = extractBatchResultText(batchResult);
+        if (!text) {
+          summary.errors++;
+          summary.failures.push({
+            itemId: item.id, kind: item.kind, description: item.description,
+            error: 'Empty batch result',
+          });
+          continue;
+        }
+
+        // Parse LLM response (same as real-time path)
+        const raw = parseJsonResponse(text) as Record<string, unknown> | null;
+        const rawVerdict = typeof raw?.verdict === 'string' ? raw.verdict : '';
+        const verdict: SourceCheckVerdict = (['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'] as const).includes(rawVerdict as SourceCheckVerdict)
+          ? rawVerdict as SourceCheckVerdict
+          : 'unverifiable';
+        const confidence = typeof raw?.confidence === 'number' ? raw.confidence : 0.5;
+        const extractedValue = typeof raw?.extracted_value === 'string' ? raw.extracted_value : '';
+        const reasoning = typeof raw?.reasoning === 'string' ? raw.reasoning : '';
+
+        const verifyResult: VerifyResult = {
+          itemId: item.id,
+          kind: item.kind,
+          description: item.description,
+          verdict,
+          confidence,
+          extractedValue,
+          reasoning,
+          sourceUrl: item.sourceUrl ?? '',
+        };
+
+        summary[verdict]++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(verifyResult);
+
+        const color = verdict === 'confirmed' ? '\x1b[32m' : verdict === 'contradicted' ? '\x1b[31m' : '\x1b[33m';
+        console.log(`  ${item.description.slice(0, 80)}`);
+        console.log(`    ${color}${verdict}\x1b[0m (confidence: ${(confidence * 100).toFixed(0)}%)`);
+
+        await storeResult(item, verifyResult).catch((e: unknown) => {
+          console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+        });
+      }
     }
   } else {
-    const executing = new Set<Promise<void>>();
-    for (let i = 0; i < itemsToVerify.length; i++) {
-      const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
-      executing.add(p);
-      if (executing.size >= concurrency) {
-        await Promise.race(executing);
+    // ── Real-time execution path ──
+    const client = createLlmClient();
+    const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
+    console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
+
+    let completedCount = 0;
+
+    async function processItem(item: VerifyItem, index: number): Promise<void> {
+      const kindLabel = item.kind.toUpperCase().padEnd(7);
+
+      const result = await verifySingleItem(item, client, useWebSearch);
+
+      // Synchronize output and summary updates
+      completedCount++;
+      const progress = `[${completedCount}/${itemsToVerify.length}]`;
+
+      if ('error' in result) {
+        summary.errors++;
+        summary.failures.push(result);
+        const typeTag = result.errorType ? ` [${result.errorType}]` : '';
+        console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+        console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
+      } else {
+        summary[result.verdict]++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(result);
+
+        const color = result.verdict === 'confirmed'
+          ? '\x1b[32m'
+          : result.verdict === 'contradicted'
+            ? '\x1b[31m'
+            : '\x1b[33m';
+        console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+        console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
+
+        if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
+          console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
+        }
+
+        // Store result (best-effort)
+        await storeResult(item, result).catch((e: unknown) => {
+          console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+        });
       }
     }
-    await Promise.all(executing);
+
+    // Run with concurrency-limited pool
+    if (concurrency <= 1) {
+      for (let i = 0; i < itemsToVerify.length; i++) {
+        await processItem(itemsToVerify[i], i);
+      }
+    } else {
+      const executing = new Set<Promise<void>>();
+      for (let i = 0; i < itemsToVerify.length; i++) {
+        const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
+        executing.add(p);
+        if (executing.size >= concurrency) {
+          await Promise.race(executing);
+        }
+      }
+      await Promise.all(executing);
+    }
   }
 
   // ── Build summary output ──

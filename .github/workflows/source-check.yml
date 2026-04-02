@@ -2,7 +2,7 @@ name: Scheduled Source-Check
 run-name: "Source-Check${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}${{ inputs.dry_run == true && ' [DRY RUN]' || '' }}"
 
 # Periodic source-checking of facts and records against cited URLs.
-# Uses the Anthropic Batch API (50% cost discount) via `crux source-check orchestrate`.
+# Uses the Anthropic Batch API (50% cost discount) via `crux verify-orchestrate --batch`.
 
 on:
   schedule:
@@ -44,36 +44,43 @@ jobs:
   source-check:
     needs: [preflight]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
+    env:
+      WIKI_SERVER_ENV: prod
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
+      INPUT_BUDGET: ${{ inputs.budget || '5' }}
+      INPUT_TABLE: ${{ inputs.table || 'all' }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
+        with:
+          version: 9
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Run source-check
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
-          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
         run: |
-          ARGS="--budget=${{ inputs.budget || '5' }} --verbose"
+          ARGS="--budget=${INPUT_BUDGET} --batch --verbose"
 
-          TABLE="${{ inputs.table || 'all' }}"
-          if [ "$TABLE" != "all" ]; then
-            ARGS="$ARGS --table=$TABLE"
+          if [ "${INPUT_TABLE}" != "all" ]; then
+            ARGS="$ARGS --table=${INPUT_TABLE}"
           fi
 
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "${INPUT_DRY_RUN}" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
 
-          pnpm crux source-check orchestrate $ARGS
+          pnpm crux verify-orchestrate $ARGS
