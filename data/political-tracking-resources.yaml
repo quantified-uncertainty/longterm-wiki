@@ -1,0 +1,455 @@
+# Political Tracking Resources
+# Websites and platforms that track US politicians, their positions,
+# voting records, donations, and related information.
+# Organized by category with EA-relevance ratings.
+
+# ── Voting Records & Legislative Tracking ──────────────────────────────
+
+- id: govtrack
+  title: GovTrack.us
+  url: https://www.govtrack.us
+  category: voting-records
+  description: >-
+    All congressional votes, bill progress, legislator activity, report
+    cards on ideology/leadership/bipartisanship. Data from 1789 to present.
+  free: true
+  hasApi: true
+  apiNotes: "Bulk data via @unitedstates project (github.com/unitedstates/congress) in JSON/XML"
+  eaRelevance: moderate
+  eaNotes: >-
+    Useful infrastructure for tracking any issue area. Report cards on
+    ideology and leadership provide baseline context.
+
+- id: congress-gov
+  title: Congress.gov
+  url: https://www.congress.gov
+  category: voting-records
+  description: >-
+    Official federal legislative information — bill text, status, roll call
+    votes, committee reports, Congressional Record. Votes from 1989 onward.
+  free: true
+  hasApi: true
+  apiNotes: "Congress.gov API (api.congress.gov) returns JSON/XML. Bulk data via GPO govinfo.gov"
+  eaRelevance: moderate
+  eaNotes: Authoritative primary source for any legislation tracking.
+
+- id: votesmart
+  title: VoteSmart
+  url: https://justfacts.votesmart.org
+  category: voting-records
+  description: >-
+    Voting records, interest group ratings (aggregated from hundreds of
+    organizations), candidate biographies, issue positions, campaign
+    finance. Non-partisan.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: >-
+    Best single aggregator of interest group scorecards — see a
+    legislator's ratings from animal welfare, environmental, science,
+    foreign policy, and other groups all in one place.
+
+- id: voteview
+  title: Voteview
+  url: https://voteview.com
+  category: voting-records
+  description: >-
+    DW-NOMINATE ideology scores for every member of Congress from 1789 to
+    present. Measures liberal-conservative positioning and polarization.
+  free: true
+  hasApi: true
+  apiNotes: "Full bulk CSV downloads at voteview.com/data"
+  eaRelevance: moderate
+  eaNotes: Useful for understanding ideological positioning and bipartisan potential.
+
+- id: lugar-bipartisan-index
+  title: Lugar Center Bipartisan Index
+  url: https://www.thelugarcenter.org/ourwork-Bipartisan-Index.html
+  category: voting-records
+  description: >-
+    Bipartisan cooperation scores for all members of Congress based on bill
+    sponsorship and co-sponsorship patterns.
+  free: true
+  hasApi: false
+  eaRelevance: moderate
+  eaNotes: Identifies legislators most likely to work across party lines on EA priorities.
+
+# ── Campaign Finance & Donations ───────────────────────────────────────
+
+- id: opensecrets
+  title: OpenSecrets (Center for Responsive Politics)
+  url: https://www.opensecrets.org
+  category: campaign-finance
+  description: >-
+    Campaign contributions, PAC/Super PAC spending, dark money, lobbying
+    expenditures, personal financial disclosures, industry influence,
+    revolving door data.
+  free: true
+  hasApi: false
+  apiNotes: "API discontinued April 2025. Bulk data downloads still available at opensecrets.org/open-data"
+  eaRelevance: high
+  eaNotes: >-
+    Essential for understanding who funds AI policy, biosecurity, and
+    animal welfare advocacy.
+
+- id: fec-data
+  title: Federal Election Commission (FEC)
+  url: https://www.fec.gov/data/
+  category: campaign-finance
+  description: >-
+    Official federal campaign finance filings — candidate fundraising,
+    committee expenditures, individual contributions, independent
+    expenditures. Updated nightly.
+  free: true
+  hasApi: true
+  apiNotes: "OpenFEC API (api.open.fec.gov) with comprehensive documentation"
+  eaRelevance: moderate
+  eaNotes: Raw authoritative data source. Useful for deep dives.
+
+- id: followthemoney
+  title: FollowTheMoney.org
+  url: https://www.followthemoney.org
+  category: campaign-finance
+  description: >-
+    State-level campaign contributions, independent spending, and lobbying
+    across all 50 states. Now merged with OpenSecrets.
+  free: true
+  hasApi: false
+  eaRelevance: moderate
+  eaNotes: Essential for state-level campaign finance, especially for state AI legislation.
+
+- id: maplight
+  title: MapLight
+  url: https://www.maplight.org
+  category: campaign-finance
+  description: >-
+    Maps the connection between campaign contributions and legislative
+    votes. Lobbying filings, campaign contribution search.
+  free: true
+  hasApi: false
+  apiNotes: "Campaign contribution search at search.maplight.org/contributions/"
+  eaRelevance: moderate
+  eaNotes: Uniquely maps donor money to specific votes.
+
+# ── Issue Positions & Scorecards ───────────────────────────────────────
+
+- id: ontheissues
+  title: OnTheIssues.org
+  url: https://www.ontheissues.org
+  category: issue-positions
+  description: >-
+    Comprehensive issue positions of all politicians based on voting
+    records, speeches, and public statements. Scores A-F.
+  free: true
+  hasApi: false
+  eaRelevance: moderate
+  eaNotes: Good for quick overview of where a politician stands across many issues.
+
+# ── EA-Relevant Scorecards ─────────────────────────────────────────────
+
+- id: humane-scorecard
+  title: Humane World Action Fund Scorecard
+  url: https://humaneaction.org/humane-scorecard
+  category: ea-scorecard
+  subcategory: animal-welfare
+  description: >-
+    Annual scores for every federal legislator on animal protection votes.
+    Covers farm animal welfare, wildlife protection, animal cruelty, puppy
+    mills. Formerly Humane Society Legislative Fund.
+  free: true
+  hasApi: false
+  eaRelevance: very-high
+  eaNotes: >-
+    The most comprehensive congressional scorecard for animal protection —
+    a core EA cause area.
+
+- id: lcv-scorecard
+  title: League of Conservation Voters (LCV) Scorecard
+  url: https://www.lcv.org/congressional-scorecard/
+  category: ea-scorecard
+  subcategory: climate-environment
+  description: >-
+    Annual scores for all members of Congress on energy, climate change,
+    public health, environmental justice, public lands, and wildlife.
+    Published for 50+ years. Includes lifetime scores.
+  free: true
+  hasApi: false
+  eaRelevance: moderate-high
+  eaNotes: The most established environmental rating system.
+
+- id: fp4a-scorecard
+  title: Foreign Policy for America (FP4A) Scorecard
+  url: https://www.fp4america.org/scorecard/
+  category: ea-scorecard
+  subcategory: foreign-policy
+  description: >-
+    Scores all members of Congress on 20 foreign policy issues including
+    alliances, China, climate, democracy, global health, immigration.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: >-
+    Directly relevant to EA concerns about global health funding (PEPFAR,
+    foreign aid), international cooperation, and responsible military use.
+
+- id: council-livable-world
+  title: Council for a Livable World
+  url: https://livableworld.org
+  category: ea-scorecard
+  subcategory: nuclear-risk
+  description: >-
+    Endorses and supports congressional candidates on nuclear arms control,
+    non-proliferation, and responsible Pentagon spending. Helped elect 400+
+    members of Congress since 1962.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: >-
+    Endorsement list is a useful proxy for identifying nuclear-risk-aware
+    legislators. Nuclear risk is a core EA/existential risk concern.
+
+- id: arms-control-center
+  title: Center for Arms Control and Non-Proliferation
+  url: https://armscontrolcenter.org
+  category: ea-scorecard
+  subcategory: nuclear-risk
+  description: >-
+    Research arm of the Council for a Livable World. Provides research to
+    members of Congress on arms control and non-proliferation.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: Directly relevant to nuclear existential risk.
+
+- id: jhu-health-security
+  title: Johns Hopkins Capitol Hill Steering Committee on Health Security
+  url: https://centerforhealthsecurity.org/our-work/the-capitol-hill-steering-committee
+  category: ea-scorecard
+  subcategory: biosecurity
+  description: >-
+    Bipartisan group of Senators and Representatives focused on health
+    security. Hosts quarterly Capitol Hill events. Not a scorecard, but
+    identifies congressional biosecurity champions.
+  free: true
+  hasApi: false
+  eaRelevance: very-high
+  eaNotes: >-
+    Closest thing to a "who cares about biosecurity in Congress" tracker.
+    Pandemic preparedness is a core EA priority. Notable gap: no formal
+    biosecurity congressional scorecard exists.
+
+- id: csis-global-health-security
+  title: CSIS Bipartisan Alliance for Global Health Security
+  url: https://www.csis.org/programs/global-health-policy-center/csis-bipartisan-alliance-global-health-security
+  category: ea-scorecard
+  subcategory: biosecurity
+  description: >-
+    Convenes members of Congress and experts to advance health security
+    policy.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: Identifies congressional engagement on global health security.
+
+# ── AI Policy Trackers ─────────────────────────────────────────────────
+
+- id: brennan-center-ai
+  title: Brennan Center AI Legislation Tracker
+  url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+  category: ai-policy
+  description: >-
+    Federal AI bills — restrictions on AI systems, evaluation requirements,
+    transparency/labeling mandates, regulatory authority proposals.
+  free: true
+  hasApi: false
+  eaRelevance: very-high
+  eaNotes: Directly tracks the federal AI governance landscape.
+
+- id: multistate-ai
+  title: MultiState.ai State AI Legislation Tracker
+  url: https://www.multistate.ai/artificial-intelligence-ai-legislation
+  category: ai-policy
+  description: >-
+    AI-related bills across all 50 states (1,561 bills in 45 states as of
+    March 2026).
+  free: true
+  hasApi: false
+  eaRelevance: very-high
+  eaNotes: Critical for understanding the state-level AI regulatory landscape.
+
+- id: ncsl-ai
+  title: NCSL AI Legislation Database
+  url: https://www.ncsl.org/financial-services/artificial-intelligence-legislation-database
+  category: ai-policy
+  description: >-
+    State-level AI legislation from 2024 onward. National Conference of
+    State Legislatures.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: Authoritative state-level AI legislation tracker.
+
+- id: cset-georgetown
+  title: Georgetown CSET (Center for Security and Emerging Technology)
+  url: https://cset.georgetown.edu
+  category: ai-policy
+  description: >-
+    Research and analysis on AI policy, advanced computing, and
+    biotechnology policy. Maintains AGORA dataset of AI-related
+    laws/regulations. Analyzed 147 AI-related laws enacted 2020-2025.
+  free: true
+  hasApi: true
+  apiNotes: "AGORA data on GitHub (georgetown-cset/Exploring-AI-legislation-in-Congress-with-AGORA)"
+  eaRelevance: very-high
+  eaNotes: >-
+    Directly focused on security implications of emerging tech. Closely
+    aligned with EA concerns about AI governance.
+
+- id: center-ai-policy
+  title: Center for AI Policy (CAIP)
+  url: https://www.centeraipolicy.org
+  category: ai-policy
+  description: >-
+    AI safety policy development and advocacy. Produces congressional
+    engagement strategies focused on catastrophic AI risk.
+  free: true
+  hasApi: false
+  eaRelevance: very-high
+  eaNotes: Explicitly focused on AI catastrophic risk mitigation through policy. EA-aligned.
+
+- id: transparency-coalition-ai
+  title: Transparency Coalition AI Legislation Tracker
+  url: https://www.transparencycoalition.ai/news/ai-legislation-tracker-all-2026-ai-bills
+  category: ai-policy
+  description: >-
+    All AI-related bills in the 2026 legislative session, focused on child
+    safety and generative AI.
+  free: true
+  hasApi: false
+  eaRelevance: moderate
+  eaNotes: Focused on child safety angle rather than existential risk.
+
+- id: techpolicy-press
+  title: TechPolicy.Press
+  url: https://www.techpolicy.press
+  category: ai-policy
+  description: >-
+    Dedicated publication covering technology policy, AI governance,
+    platform regulation, and related congressional activity.
+  free: true
+  hasApi: false
+  eaRelevance: high
+  eaNotes: Focused specifically on tech/AI policy.
+
+# ── General Political Profiles ─────────────────────────────────────────
+
+- id: ballotpedia
+  title: Ballotpedia
+  url: https://ballotpedia.org
+  category: profiles
+  description: >-
+    Comprehensive political encyclopedia covering 580,000+ elected
+    officials nationwide, ballot measures, elections, legislation, and
+    public policy at all levels.
+  free: true
+  hasApi: true
+  apiNotes: "Ballotpedia API for candidate data, biographical info, district maps. Bulk data for purchase."
+  eaRelevance: high
+  eaNotes: Most comprehensive non-partisan reference for any US politician at any level.
+
+# ── Prediction Markets & Forecasting ───────────────────────────────────
+
+- id: polymarket
+  title: Polymarket
+  url: https://polymarket.com
+  category: forecasting
+  description: >-
+    Real-money prediction markets on elections, policy outcomes, and
+    political events. Active 2026 midterm markets. Claims >94% accuracy
+    a month before events.
+  free: true
+  hasApi: true
+  eaRelevance: high
+  eaNotes: Prediction markets are a core EA/rationalist forecasting tool.
+
+- id: metaculus
+  title: Metaculus
+  url: https://www.metaculus.com
+  category: forecasting
+  description: >-
+    Reputation-based forecasting platform. Covers political events, AI
+    timelines, biosecurity scenarios, existential risk, nuclear risk. 0.111
+    Brier score.
+  free: true
+  hasApi: true
+  eaRelevance: very-high
+  eaNotes: >-
+    Deeply integrated with EA/rationalist communities. Has questions on AI
+    governance, pandemic preparedness, nuclear risk, and political outcomes.
+
+# ── State-Level Trackers ───────────────────────────────────────────────
+
+- id: legiscan
+  title: LegiScan
+  url: https://legiscan.com
+  category: state-level
+  description: >-
+    191,201 pieces of legislation across Congress and all 50 state
+    legislatures. Bill details, status, sponsors, full texts, roll calls.
+  free: true
+  hasApi: true
+  apiNotes: "LegiScan API provides structured JSON for all 50 states + Congress. Free tier available."
+  eaRelevance: high
+  eaNotes: Essential for tracking state-level AI, animal welfare, and other EA-relevant bills.
+
+- id: open-states
+  title: Open States (Plural Policy)
+  url: https://openstates.org
+  category: state-level
+  description: >-
+    State legislator profiles, bill tracking, and committee data across all
+    US states. Largest open legislative data collection.
+  free: true
+  hasApi: true
+  apiNotes: "Open States API is free and open. Bulk data downloads available."
+  eaRelevance: high
+  eaNotes: Critical infrastructure for state-level policy research.
+
+# ── Other Scorecards ──────────────────────────────────────────────────
+
+- id: aclu-scorecard
+  title: ACLU Congressional Scorecard
+  url: https://www.aclu.org/scorecard
+  category: scorecard
+  subcategory: civil-liberties
+  description: >-
+    Civil liberties votes — surveillance, free speech, criminal justice,
+    immigration, reproductive rights.
+  free: true
+  hasApi: false
+  eaRelevance: low-moderate
+  eaNotes: Relevant for surveillance positions (related to AI governance).
+
+- id: heritage-scorecard
+  title: Heritage Action Scorecard
+  url: https://heritageaction.com/scorecard
+  category: scorecard
+  subcategory: conservative
+  description: >-
+    Conservative policy priorities. Scores all members of Congress on key
+    votes.
+  free: true
+  hasApi: false
+  eaRelevance: low
+
+- id: chamber-scorecard
+  title: U.S. Chamber of Commerce Scorecard
+  url: https://www.uschamber.com/congressional-scorecard-and-legislative-leadership-list
+  category: scorecard
+  subcategory: business
+  description: >-
+    Business-friendly policy votes. Published for over 40 years.
+  free: true
+  hasApi: false
+  eaRelevance: low-moderate
+  eaNotes: Useful for understanding pro-business positioning on AI regulation.
