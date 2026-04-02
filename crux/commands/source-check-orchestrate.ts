@@ -45,6 +45,9 @@ import {
 } from '../lib/source-check/prompt-guidelines.ts';
 import { str, strOrNull, numOrNull, resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 import { matchRecordAgainstSnapshot } from '../lib/source-check/deterministic-matcher.ts';
+import { submitBatch, pollBatch, getBatchResults, extractBatchResultText } from '../lib/anthropic-batch.ts';
+import type { BatchRequest } from '../lib/anthropic-batch.ts';
+import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getManifest } from '../lib/grant-import/manifests/index.ts';
 import type { DataSourceManifest } from '../lib/grant-import/manifests/types.ts';
 import { getLatestSnapshot } from '../lib/wiki-server/data-sources.ts';
@@ -91,6 +94,8 @@ interface OrchestrateOptions extends BaseOptions {
   dryRun?: boolean;
   ci?: boolean;
   concurrency?: string;
+  /** Use Anthropic Batch API for 50% cost savings (async, may take minutes to hours) */
+  batch?: boolean;
 }
 
 type VerifyItemKind = 'fact' | 'record' | 'entity';
@@ -1292,6 +1297,7 @@ export async function orchestrateCommand(
   }
 
   // ── Live execution ──
+  const useBatch = !!options.batch;
   const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
   const client = createLlmClient();
   const summary: OrchestrationSummary = {
@@ -1302,7 +1308,7 @@ export async function orchestrateCommand(
     outdated: 0,
     partial: 0,
     errors: 0,
-    estimatedCost,
+    estimatedCost: useBatch ? estimatedCost * 0.5 : estimatedCost,
     actualVerified: 0,
     byKind: {
       fact: { total: 0, verified: 0 },
@@ -1318,66 +1324,242 @@ export async function orchestrateCommand(
     summary.byKind[item.kind].total++;
   }
 
-  const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
-  console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
+  if (useBatch) {
+    // ── Batch API path (50% cost savings) ──
+    console.log(`\n\x1b[1mBatch mode: preparing ${itemsToVerify.length} items (est. \$${summary.estimatedCost.toFixed(2)} with 50% batch discount)...\x1b[0m\n`);
 
-  let completedCount = 0;
+    // Phase 1: Fetch source content and build prompts (with concurrency)
+    const batchRequests: BatchRequest[] = [];
+    const batchItemMap = new Map<string, VerifyItem>();
+    let preparedCount = 0;
 
-  async function processItem(item: VerifyItem, index: number): Promise<void> {
-    const kindLabel = item.kind.toUpperCase().padEnd(7);
+    async function prepareItem(item: VerifyItem): Promise<void> {
+      preparedCount++;
+      const progress = `[${preparedCount}/${itemsToVerify.length}]`;
 
-    const result = await verifySingleItem(item, client, useWebSearch);
-
-    // Synchronize output and summary updates
-    completedCount++;
-    const progress = `[${completedCount}/${itemsToVerify.length}]`;
-
-    if ('error' in result) {
-      summary.errors++;
-      summary.failures.push(result);
-      const typeTag = result.errorType ? ` [${result.errorType}]` : '';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
-      console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
-    } else {
-      summary[result.verdict]++;
-      summary.actualVerified++;
-      summary.byKind[item.kind].verified++;
-      summary.results.push(result);
-
-      const color = result.verdict === 'confirmed'
-        ? '\x1b[32m'
-        : result.verdict === 'contradicted'
-          ? '\x1b[31m'
-          : '\x1b[33m';
-      console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
-      console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
-
-      if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
-        console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
+      // Handle deterministic matching for grants first
+      if (item.data.kind === 'record' && item.data.recordType === 'grant') {
+        try {
+          const deterministicResult = await tryDeterministicMatch(item);
+          if (deterministicResult) {
+            summary[deterministicResult.verdict]++;
+            summary.actualVerified++;
+            summary.byKind[item.kind].verified++;
+            summary.results.push(deterministicResult);
+            console.log(`  ${progress} ${item.description.slice(0, 80)}`);
+            console.log(`    \x1b[32mdeterministic: ${deterministicResult.verdict}\x1b[0m`);
+            await storeResult(item, deterministicResult).catch(() => {});
+            return;
+          }
+        } catch { /* fall through to batch */ }
       }
 
-      // Store result (best-effort)
-      await storeResult(item, result).catch((e: unknown) => {
-        console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-      });
-    }
-  }
+      // Fetch source content
+      let sourceUrl = item.sourceUrl;
+      let sourceContent: string | null = null;
 
-  // Run with concurrency-limited pool
-  if (concurrency <= 1) {
-    for (let i = 0; i < itemsToVerify.length; i++) {
-      await processItem(itemsToVerify[i], i);
+      if (!sourceUrl) {
+        summary.errors++;
+        summary.failures.push({ itemId: item.id, kind: item.kind, description: item.description, error: 'No source URL' });
+        return;
+      }
+
+      const fetchResult = await fetchSourceContent(sourceUrl);
+      if (!fetchResult.content) {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: fetchResult.errorMessage ?? 'Could not fetch source content',
+          errorType: fetchResult.errorType,
+        });
+        return;
+      }
+      sourceContent = fetchResult.content;
+
+      // Build prompt
+      let prompt: string;
+      switch (item.data.kind) {
+        case 'fact':
+          prompt = buildFactVerificationPrompt(item.data, sourceContent);
+          break;
+        case 'record':
+          prompt = buildRecordVerificationPrompt(item.data, item.description, sourceContent);
+          break;
+        case 'entity':
+          prompt = buildEntityVerificationPrompt(item.data.entity, sourceContent, sourceUrl);
+          break;
+      }
+
+      const customId = `verify-${item.id}`;
+      batchRequests.push({
+        customId,
+        params: {
+          model: MODELS.haiku,
+          max_tokens: 500,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        },
+      });
+      batchItemMap.set(customId, item);
+      console.log(`  ${progress} Prepared: ${item.description.slice(0, 80)}`);
+    }
+
+    // Prepare items with concurrency
+    const prepExecuting = new Set<Promise<void>>();
+    for (const item of itemsToVerify) {
+      const p = prepareItem(item).finally(() => prepExecuting.delete(p));
+      prepExecuting.add(p);
+      if (prepExecuting.size >= concurrency) await Promise.race(prepExecuting);
+    }
+    await Promise.all(prepExecuting);
+
+    if (batchRequests.length === 0) {
+      console.log('\nNo items require LLM verification (all resolved deterministically or errored).');
+    } else {
+      // Phase 2: Submit batch
+      console.log(`\n\x1b[1mSubmitting batch of ${batchRequests.length} requests to Anthropic Batch API...\x1b[0m`);
+      const Anthropic = (await import('@anthropic-ai/sdk')).default;
+      const anthropicClient = new Anthropic();
+
+      const batch = await submitBatch(anthropicClient, batchRequests);
+      console.log(`  Batch ID: ${batch.id}`);
+      console.log(`  Polling for completion (may take minutes to hours)...`);
+
+      // Phase 3: Poll for completion
+      const completedBatch = await pollBatch(anthropicClient, batch.id, {
+        intervalMs: 15_000,
+        timeoutMs: 3_600_000, // 1 hour max
+        onPoll: (b) => {
+          const counts = b.request_counts;
+          console.log(`  ... processing: ${counts.processing}, succeeded: ${counts.succeeded}, errored: ${counts.errored}`);
+        },
+      });
+
+      console.log(`\n\x1b[1mBatch completed. Processing ${completedBatch.request_counts.succeeded} results...\x1b[0m\n`);
+
+      // Phase 4: Process results
+      const resultsMap = await getBatchResults(anthropicClient, batch.id);
+      for (const [customId, batchResult] of resultsMap) {
+        const item = batchItemMap.get(customId);
+        if (!item) continue;
+
+        if (batchResult.result.type !== 'succeeded') {
+          summary.errors++;
+          summary.failures.push({
+            itemId: item.id, kind: item.kind, description: item.description,
+            error: `Batch request ${batchResult.result.type}`,
+          });
+          continue;
+        }
+
+        const text = extractBatchResultText(batchResult);
+        if (!text) {
+          summary.errors++;
+          summary.failures.push({
+            itemId: item.id, kind: item.kind, description: item.description,
+            error: 'Empty batch result',
+          });
+          continue;
+        }
+
+        // Parse LLM response (same as real-time path)
+        const raw = parseJsonResponse(text) as Record<string, unknown> | null;
+        const rawVerdict = typeof raw?.verdict === 'string' ? raw.verdict : '';
+        const verdict: SourceCheckVerdict = (['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'] as const).includes(rawVerdict as SourceCheckVerdict)
+          ? rawVerdict as SourceCheckVerdict
+          : 'unverifiable';
+        const confidence = typeof raw?.confidence === 'number' ? raw.confidence : 0.5;
+        const extractedValue = typeof raw?.extracted_value === 'string' ? raw.extracted_value : '';
+        const reasoning = typeof raw?.reasoning === 'string' ? raw.reasoning : '';
+
+        const verifyResult: VerifyResult = {
+          itemId: item.id,
+          kind: item.kind,
+          description: item.description,
+          verdict,
+          confidence,
+          extractedValue,
+          reasoning,
+          sourceUrl: item.sourceUrl ?? '',
+        };
+
+        summary[verdict]++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(verifyResult);
+
+        const color = verdict === 'confirmed' ? '\x1b[32m' : verdict === 'contradicted' ? '\x1b[31m' : '\x1b[33m';
+        console.log(`  ${item.description.slice(0, 80)}`);
+        console.log(`    ${color}${verdict}\x1b[0m (confidence: ${(confidence * 100).toFixed(0)}%)`);
+
+        await storeResult(item, verifyResult).catch((e: unknown) => {
+          console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+        });
+      }
     }
   } else {
-    const executing = new Set<Promise<void>>();
-    for (let i = 0; i < itemsToVerify.length; i++) {
-      const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
-      executing.add(p);
-      if (executing.size >= concurrency) {
-        await Promise.race(executing);
+    // ── Real-time execution path ──
+    const concurrencyLabel = concurrency > 1 ? `, concurrency=${concurrency}` : '';
+    console.log(`\n\x1b[1mVerifying ${itemsToVerify.length} items (est. \$${estimatedCost.toFixed(2)}${concurrencyLabel})...\x1b[0m\n`);
+
+    let completedCount = 0;
+
+    async function processItem(item: VerifyItem, index: number): Promise<void> {
+      const kindLabel = item.kind.toUpperCase().padEnd(7);
+
+      const result = await verifySingleItem(item, client, useWebSearch);
+
+      // Synchronize output and summary updates
+      completedCount++;
+      const progress = `[${completedCount}/${itemsToVerify.length}]`;
+
+      if ('error' in result) {
+        summary.errors++;
+        summary.failures.push(result);
+        const typeTag = result.errorType ? ` [${result.errorType}]` : '';
+        console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+        console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
+      } else {
+        summary[result.verdict]++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(result);
+
+        const color = result.verdict === 'confirmed'
+          ? '\x1b[32m'
+          : result.verdict === 'contradicted'
+            ? '\x1b[31m'
+            : '\x1b[33m';
+        console.log(`  ${progress} ${kindLabel} ${item.description.slice(0, 80)}`);
+        console.log(`    ${color}${result.verdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)`);
+
+        if (result.verdict === 'contradicted' || result.verdict === 'outdated') {
+          console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
+        }
+
+        // Store result (best-effort)
+        await storeResult(item, result).catch((e: unknown) => {
+          console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+        });
       }
     }
-    await Promise.all(executing);
+
+    // Run with concurrency-limited pool
+    if (concurrency <= 1) {
+      for (let i = 0; i < itemsToVerify.length; i++) {
+        await processItem(itemsToVerify[i], i);
+      }
+    } else {
+      const executing = new Set<Promise<void>>();
+      for (let i = 0; i < itemsToVerify.length; i++) {
+        const p = processItem(itemsToVerify[i], i).finally(() => executing.delete(p));
+        executing.add(p);
+        if (executing.size >= concurrency) {
+          await Promise.race(executing);
+        }
+      }
+      await Promise.all(executing);
+    }
   }
 
   // ── Build summary output ──

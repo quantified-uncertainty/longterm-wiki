@@ -2,7 +2,7 @@ name: Scheduled Source-Check
 run-name: "Source-Check${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}${{ inputs.dry_run == true && ' [DRY RUN]' || '' }}"
 
 # Periodic source-checking of facts and records against cited URLs.
-# Uses the Anthropic Batch API (50% cost discount) via `crux verify-orchestrate`.
+# Uses the Anthropic Batch API (50% cost discount) via `crux verify-orchestrate --batch`.
 
 on:
   schedule:
@@ -44,7 +44,7 @@ jobs:
   source-check:
     needs: [preflight]
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
     env:
       WIKI_SERVER_ENV: prod
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -73,7 +73,7 @@ jobs:
 
       - name: Run source-check
         run: |
-          ARGS="--budget=${INPUT_BUDGET} --verbose"
+          ARGS="--budget=${INPUT_BUDGET} --batch --verbose"
 
           if [ "${INPUT_TABLE}" != "all" ]; then
             ARGS="$ARGS --table=${INPUT_TABLE}"
