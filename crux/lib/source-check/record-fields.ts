@@ -5,6 +5,8 @@
  * from raw API response rows without runtime type assertions.
  */
 
+import { isAnySid } from '../../../packages/id-utils/src/index.ts';
+
 /** Get a string field value, falling back to String() or empty string */
 export function str(item: Record<string, unknown>, key: string): string {
   const v = item[key];
@@ -25,14 +27,23 @@ export function numOrNull(item: Record<string, unknown>, key: string): number | 
 
 /**
  * Resolve a human-readable name from multiple possible field names.
- * Returns the first non-empty string value found, or '(unknown)'.
+ * Returns the first non-empty string value found that is not an opaque stableId.
+ * Falls back to '(unknown)' if all values are null, empty, or stableId-like.
  */
 export function resolveName(item: Record<string, unknown>, ...keys: string[]): string {
   for (const key of keys) {
     const v = item[key];
-    if (typeof v === 'string' && v.length > 0) return v;
+    if (typeof v === 'string' && v.length > 0 && !isAnySid(v)) return v;
   }
   return '(unknown)';
+}
+
+/**
+ * Check if the resolved name is actually usable for LLM verification.
+ * Returns false for '(unknown)' or stableId-like values that the LLM can't interpret.
+ */
+export function isResolvableName(name: string): boolean {
+  return name !== '(unknown)' && !isAnySid(name);
 }
 
 /**
