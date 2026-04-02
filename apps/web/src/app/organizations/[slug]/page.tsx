@@ -249,16 +249,14 @@ export default async function OrgProfilePage({
       {/* Charts */}
       <ChartsSection chartData={data.chartData} orgName={entity.name} dilutionStages={data.dilutionStages} />
 
-      {/* Facts + Other Data */}
-      {(data.allFacts.length > 0 || data.otherCollections.length > 0) && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {data.allFacts.length > 0 && (
-            <FactsPanel facts={data.allFacts} entityId={entity.id} />
-          )}
-          {data.otherCollections.length > 0 && (
-            <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
-          )}
-        </div>
+      {/* Facts */}
+      {data.allFacts.length > 0 && (
+        <FactsPanel facts={data.allFacts} entityId={entity.id} />
+      )}
+
+      {/* Other Data */}
+      {data.otherCollections.length > 0 && (
+        <OtherDataSection collections={data.otherCollections} entityId={entity.id} />
       )}
 
       {/* Divisions overview */}
