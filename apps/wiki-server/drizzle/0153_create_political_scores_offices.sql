@@ -21,7 +21,7 @@ CREATE INDEX IF NOT EXISTS "idx_polscore_scorer" ON "political_scores" ("scorer_
 CREATE INDEX IF NOT EXISTS "idx_polscore_year" ON "political_scores" ("year");
 CREATE INDEX IF NOT EXISTS "idx_polscore_score_type" ON "political_scores" ("score_type");
 CREATE UNIQUE INDEX IF NOT EXISTS "uq_political_scores_natural_key"
-  ON "political_scores" ("politician_entity_id", "scorer_org", "year", "score_type");
+  ON "political_scores" ("politician_entity_id", "scorer_org", "year", COALESCE("score_type", ''));
 
 -- Political Offices: current and past offices held by politicians
 CREATE TABLE IF NOT EXISTS "political_offices" (
@@ -47,3 +47,5 @@ CREATE INDEX IF NOT EXISTS "idx_poloffice_type" ON "political_offices" ("office_
 CREATE INDEX IF NOT EXISTS "idx_poloffice_jurisdiction" ON "political_offices" ("jurisdiction");
 CREATE INDEX IF NOT EXISTS "idx_poloffice_party" ON "political_offices" ("party");
 CREATE INDEX IF NOT EXISTS "idx_poloffice_status" ON "political_offices" ("status");
+CREATE UNIQUE INDEX IF NOT EXISTS "uq_political_offices_natural_key"
+  ON "political_offices" ("politician_entity_id", "office_type", "jurisdiction", COALESCE("district", ''));

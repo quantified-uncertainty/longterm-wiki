@@ -13,6 +13,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import type {
   CommandOptions as BaseOptions,
@@ -349,13 +350,10 @@ async function seedOfficesCommand(
     status: "incumbent" | "candidate" | "former";
   }> = [];
 
-  function generateId(): string {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < 10; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+  function deterministicId(input: string): string {
+    // Deterministic 10-char ID from input string — makes seed-offices idempotent
+    const hash = createHash("sha256").update(input).digest("base64url");
+    return hash.substring(0, 10);
   }
 
   for (const p of politicians) {
@@ -401,7 +399,7 @@ async function seedOfficesCommand(
     }
 
     offices.push({
-      id: generateId(),
+      id: deterministicId(`office:${p.stableId}:${officeType}:${jurisdiction}:${district ?? ''}`),
       politicianEntityId: p.stableId!,
       politicianDisplayName: p.title,
       officeType,

@@ -54,7 +54,8 @@ function inferStatus(entity: PersonEntity): string | null {
   const desc = (entity.description ?? "").toLowerCase();
   if (desc.includes("incumbent") || desc.includes("u.s. senator") || desc.includes("u.s. representative") || desc.includes("state senator") || desc.includes("assemblymember")) return "incumbent";
   if (desc.includes("candidate") || desc.includes("running") || desc.includes("nominee") || desc.includes("runoff")) return "candidate";
-  if (desc.includes("former") || desc.includes("lost") || desc.includes("won the 2026")) return "former";
+  if (desc.includes("won the 2026") || desc.includes("won 2026")) return "incumbent";
+  if (desc.includes("former") || desc.includes("lost")) return "former";
   return "candidate";
 }
 

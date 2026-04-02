@@ -53,7 +53,7 @@ const SyncItemSchema = z.object({
   score: z.number().min(0).max(1000),
   maxScore: z.number().min(1).max(1000).default(100),
   year: z.number().int().min(1900).max(2100),
-  scoreType: z.string().max(100).nullable().optional(),
+  scoreType: z.enum(VALID_SCORE_TYPES).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
 });
@@ -226,6 +226,7 @@ const politicalScoresApp = new Hono()
     logger.info(`sync political-scores: upserting ${items.length} scores`);
 
     let upserted = 0;
+    const now = new Date();
 
     await db.transaction(async (tx) => {
       for (const item of items) {
@@ -243,8 +244,8 @@ const politicalScoresApp = new Hono()
             scoreType: item.scoreType ?? null,
             sourceUrl: item.sourceUrl ?? null,
             notes: item.notes ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
+            syncedAt: now,
+            updatedAt: now,
           })
           .onConflictDoUpdate({
             target: politicalScores.id,
@@ -259,8 +260,8 @@ const politicalScoresApp = new Hono()
               scoreType: item.scoreType ?? null,
               sourceUrl: item.sourceUrl ?? null,
               notes: item.notes ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
+              syncedAt: now,
+              updatedAt: now,
             },
           });
         upserted++;

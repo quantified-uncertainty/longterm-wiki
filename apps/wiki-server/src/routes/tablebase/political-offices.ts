@@ -55,10 +55,10 @@ const SyncItemSchema = z.object({
   id: z.string().length(10),
   politicianEntityId: z.string().min(1).max(200),
   politicianDisplayName: z.string().max(500).nullable().optional(),
-  officeType: z.string().min(1).max(100),
+  officeType: z.enum(VALID_OFFICE_TYPES),
   jurisdiction: z.string().min(1).max(50),
   district: z.string().max(50).nullable().optional(),
-  party: z.string().max(50).nullable().optional(),
+  party: z.enum(VALID_PARTIES).nullable().optional(),
   status: z.enum(VALID_STATUSES).default("incumbent"),
   termStart: z.string().max(20).nullable().optional(),
   termEnd: z.string().max(20).nullable().optional(),
@@ -215,6 +215,7 @@ const politicalOfficesApp = new Hono()
     logger.info(`sync political-offices: upserting ${items.length} offices`);
 
     let upserted = 0;
+    const now = new Date();
 
     await db.transaction(async (tx) => {
       for (const item of items) {
@@ -233,8 +234,8 @@ const politicalOfficesApp = new Hono()
             termEnd: item.termEnd ?? null,
             sourceUrl: item.sourceUrl ?? null,
             notes: item.notes ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
+            syncedAt: now,
+            updatedAt: now,
           })
           .onConflictDoUpdate({
             target: politicalOffices.id,
@@ -250,8 +251,8 @@ const politicalOfficesApp = new Hono()
               termEnd: item.termEnd ?? null,
               sourceUrl: item.sourceUrl ?? null,
               notes: item.notes ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
+              syncedAt: now,
+              updatedAt: now,
             },
           });
         upserted++;

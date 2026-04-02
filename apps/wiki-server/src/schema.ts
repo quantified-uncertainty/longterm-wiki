@@ -3614,5 +3614,11 @@ export const politicalOffices = pgTable(
     index("idx_poloffice_jurisdiction").on(table.jurisdiction),
     index("idx_poloffice_party").on(table.party),
     index("idx_poloffice_status").on(table.status),
+    uniqueIndex("uq_political_offices_natural_key").on(
+      table.politicianEntityId,
+      table.officeType,
+      table.jurisdiction,
+      table.district
+    ),
   ]
 );
