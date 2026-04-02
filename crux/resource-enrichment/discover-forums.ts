@@ -176,7 +176,7 @@ export async function discoverForumsCommand(
         id,
         url,
         title: post.title,
-        type: 'web' as const,
+        type: 'blog' as const,
         authors: authors.length > 0 ? authors : undefined,
         publishedDate: date,
         publicationId: PUBLICATION_ID_MAP[forum.name] ?? undefined,
