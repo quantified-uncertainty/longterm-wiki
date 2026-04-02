@@ -140,9 +140,10 @@ export function applyColumnMapping(
         mapped[internalField] = row[sourceCol];
       }
     }
-    // Keep unmapped fields too
+    // Keep unmapped fields too, but skip fields whose keys collide with mapping targets
+    const mappingTargets = new Set(Object.values(mapping));
     for (const [key, val] of Object.entries(row)) {
-      if (!Object.keys(mapping).includes(key)) {
+      if (!Object.keys(mapping).includes(key) && !mappingTargets.has(key)) {
         mapped[key] = val;
       }
     }

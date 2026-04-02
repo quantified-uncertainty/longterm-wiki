@@ -46,7 +46,11 @@ import {
 import { str, strOrNull, numOrNull, resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from '../lib/source-check/record-fields.ts';
 import { matchRecordAgainstSnapshot } from '../lib/source-check/deterministic-matcher.ts';
 import { getManifest } from '../lib/grant-import/manifests/index.ts';
+import type { DataSourceManifest } from '../lib/grant-import/manifests/types.ts';
 import { getLatestSnapshot } from '../lib/wiki-server/data-sources.ts';
+
+/** Cache parsed snapshots to avoid re-fetching and re-parsing per grant */
+const snapshotCache = new Map<string, { rawContent: string; manifest: DataSourceManifest } | null>();
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -886,20 +890,44 @@ async function tryDeterministicMatch(item: VerifyItem): Promise<VerifyResult | n
 
   // Find a manifest whose fetchUrl matches the grant's source URL
   const { MANIFESTS } = await import('../lib/grant-import/manifests/index.ts');
-  const manifest = Object.values(MANIFESTS).find(m => m.fetchUrl && sourceUrl.includes(m.fetchUrl));
+  const manifest = Object.values(MANIFESTS).find(m => {
+    if (!m.fetchUrl) return false;
+    // Exact match or the source URL contains the fetchUrl
+    if (sourceUrl === m.fetchUrl) return true;
+    if (sourceUrl.includes(m.fetchUrl)) return true;
+    // Domain-level match for per-record URLs (e.g., manifund.org/projects/X matches manifund.org/api/v0/projects)
+    try {
+      const sourceHost = new URL(sourceUrl).hostname;
+      const fetchHost = new URL(m.fetchUrl).hostname;
+      return sourceHost === fetchHost;
+    } catch { return false; }
+  });
   if (!manifest || manifest.schema.fields.length === 0) return null;
 
-  // Fetch the latest snapshot for this data source
-  const snapshotResult = await getLatestSnapshot(manifest.sourceId);
-  if (!snapshotResult.ok || !snapshotResult.data) return null;
-
-  const snapshot = snapshotResult.data as { rawContent: string; recordCount?: number };
-  if (!snapshot.rawContent) return null;
+  // Fetch the latest snapshot for this data source (cached to avoid re-fetching per grant)
+  const cacheKey = manifest.sourceId;
+  let cached = snapshotCache.get(cacheKey);
+  if (cached === undefined) {
+    // Not in cache — fetch and cache
+    const snapshotResult = await getLatestSnapshot(manifest.sourceId);
+    if (!snapshotResult.ok || !snapshotResult.data) {
+      snapshotCache.set(cacheKey, null);
+      return null;
+    }
+    const snapshot = snapshotResult.data as { rawContent: string };
+    if (!snapshot.rawContent) {
+      snapshotCache.set(cacheKey, null);
+      return null;
+    }
+    cached = { rawContent: snapshot.rawContent, manifest };
+    snapshotCache.set(cacheKey, cached);
+  }
+  if (cached === null) return null;
 
   // Run deterministic matching
   const result = matchRecordAgainstSnapshot(
     item.data.fields as Record<string, unknown>,
-    snapshot.rawContent,
+    cached.rawContent,
     manifest,
   );
 

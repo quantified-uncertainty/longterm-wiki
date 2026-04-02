@@ -108,6 +108,47 @@ describe('matchRecordAgainstSnapshot', () => {
   });
 });
 
+describe('matchRecordAgainstSnapshot — null-field handling', () => {
+  it('returns unverifiable when fewer than 2 non-null fields exist', () => {
+    const result = matchRecordAgainstSnapshot(
+      { grantee: 'MIRI', amount: null, date: null },
+      CSV_CONTENT,
+      testManifest,
+    );
+    expect(result.matched).toBe(false);
+    expect(result.confidence).toBe(0.1);
+    expect(result.reasoning).toContain('Insufficient data');
+    expect(result.reasoning).toContain('1 of 3');
+  });
+
+  it('returns unverifiable when all fields are null', () => {
+    const result = matchRecordAgainstSnapshot(
+      { grantee: null, amount: null, date: null },
+      CSV_CONTENT,
+      testManifest,
+    );
+    expect(result.matched).toBe(false);
+    expect(result.confidence).toBe(0.1);
+    expect(result.reasoning).toContain('Insufficient data');
+    expect(result.reasoning).toContain('0 of 3');
+  });
+
+  it('uses total match fields as denominator, not just non-null fields', () => {
+    // With 3 match fields (grantee, amount, date), only providing 2 means
+    // the maximum possible score is 2/3 (~0.67), not 2/2 (1.0)
+    const result = matchRecordAgainstSnapshot(
+      { grantee: 'MIRI', amount: 500000, date: null },
+      CSV_CONTENT,
+      testManifest,
+    );
+    // 2 fields match out of 3 total → score ~0.67, which is a partial match
+    expect(result.matched).toBe(true);
+    expect(result.confidence).toBeLessThanOrEqual(0.8); // capped at 0.8 for partial
+    expect(result.fieldsMatched).toContain('grantee');
+    expect(result.fieldsMatched).toContain('amount');
+  });
+});
+
 describe('matchRecordAgainstSnapshot with JSON', () => {
   const jsonManifest: DataSourceManifest = {
     ...testManifest,

@@ -137,6 +137,19 @@ export function matchRecordAgainstSnapshot(
 
   const { matchFields, fuzzyFields = [], exactFields = [] } = manifest.verification;
 
+  // Require at least 2 non-null fields for meaningful matching
+  const nonNullFields = matchFields.filter(f => record[f] != null).length;
+  if (nonNullFields < 2) {
+    return {
+      matched: false,
+      matchedRow: null,
+      confidence: 0.1,
+      reasoning: `Insufficient data for deterministic matching: only ${nonNullFields} of ${matchFields.length} match fields are non-null`,
+      fieldsMatched: [],
+      fieldsMismatched: [],
+    };
+  }
+
   // Score each row against the record
   let bestMatch: { row: Record<string, unknown>; score: number; matched: string[]; mismatched: string[] } | null = null;
 
@@ -156,7 +169,8 @@ export function matchRecordAgainstSnapshot(
       // If one is null and the other isn't, don't count as mismatch (just not matched)
     }
 
-    const totalFields = matchFields.filter(f => record[f] != null).length;
+    // Use ALL configured fields as denominator so null record fields count against the score
+    const totalFields = matchFields.length;
     const score = totalFields > 0 ? matchedFields.length / totalFields : 0;
 
     if (!bestMatch || score > bestMatch.score || (score === bestMatch.score && mismatchedFields.length < bestMatch.mismatched.length)) {
