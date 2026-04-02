@@ -491,6 +491,8 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
             execSync('git checkout main', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
             execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
             execSync(`git branch -d ${branch}`, { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+            // Repair .agent-slot — git operations may overwrite it if still tracked
+            writeFileSync(join(dir, '.agent-slot'), String(slot) + '\n');
             updated.push(`  a${slot}: returned to main (${branch} was merged)`);
             continue;
           } catch {
@@ -526,6 +528,8 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
 
     try {
       execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
+      // Repair .agent-slot — git operations may overwrite it if still tracked
+      writeFileSync(join(dir, '.agent-slot'), String(slot) + '\n');
       updated.push(`  a${slot}: pulled latest main`);
     } catch (e) {
       skipped.push(`  a${slot}: git pull failed (${e instanceof Error ? e.message.split('\n')[0] : 'unknown error'})`);
