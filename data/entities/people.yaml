@@ -3528,13 +3528,53 @@
   stableId: sid_W2B4vrLpsU
   type: person
   title: Alex Bores
+  website: https://www.alexbores.nyc/
   description: >-
-    New York State Assemblymember (District 73). Author of the RAISE Act,
-    landmark AI regulation legislation. Running in the NY-12 Democratic
-    primary for U.S. Congress (June 23, 2026). Flagship pro-regulation
-    candidate in the 2026 AI policy races.
-  tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+    New York State Assemblymember (District 73) and former Palantir engineer.
+    Author of the RAISE Act (signed December 2025), the nation's most
+    significant state-level AI frontier safety law requiring safety plans,
+    incident reporting, and cybersecurity controls from companies spending
+    \$100M+ on model training. Running in the NY-12 Democratic primary
+    (June 23, 2026). Ranked most effective new NYC legislator by the Center
+    for Effective Lawmaking (27+ bills passed). Strong EA community ties —
+    ~\$420K in donations from AI safety org employees (Redwood Research,
+    80,000 Hours, METR, CEA, Epoch AI, MIRI). Eight-point federal AI plan
+    includes independent safety testing, cybersecurity incident reporting,
+    and an "AI dividend." Also co-sponsored bill addressing zoonotic disease
+    risks (A2421) and led budget letter for alternative protein research.
+    Opposed by a16z-backed Leading the Future PAC (\$2.2M+); supported by
+    Anthropic-funded Public First Action (\$450K).
+  tags: [politics, ai-regulation, ai-safety, ea-aligned]
+  knownFor:
+    - Author of the RAISE Act (NY AI safety law)
+    - Most effective new NYC legislator (CEL ranking)
+    - Former Palantir engineer (resigned over ICE contracts)
+  positions:
+    - topic: AI safety and regulation
+      view: Strongly supportive — authored RAISE Act, proposes independent safety testing of frontier models
+      source: Eight-point congressional AI plan
+      sourceUrl: https://www.axios.com/2026/02/12/alex-bores-ai-super-pacs-plan
+    - topic: Biosafety
+      view: Supportive — co-sponsored bill on zoonotic disease risks, works on pandemic prevention
+      source: Assembly Bill 2421
+    - topic: Animal welfare
+      view: Supportive — led budget letter for alternative protein research center in NY
+      source: EA Forum profile
+      sourceUrl: https://forum.effectivealtruism.org/posts/EGxuPPKsf3CjhcdpM/consider-donating-to-alex-bores-author-of-the-raise-act
+  sources:
+    - title: EA Forum — Consider Donating to Alex Bores
+      url: https://forum.effectivealtruism.org/posts/EGxuPPKsf3CjhcdpM/consider-donating-to-alex-bores-author-of-the-raise-act
+    - title: NBC News — Candidate at Center of AI War Unveils Agenda
+      url: https://www.nbcnews.com/politics/2026-election/candidate-center-brewing-midterm-ai-war-unveils-agenda-rcna257735
+    - title: Carnegie — NY RAISE Act Analysis
+      url: https://carnegieendowment.org/emissary/2026/02/ai-state-law-new-york-raise-act-california-sb53
+    - title: TechCrunch — Anthropic-funded Group Backs Bores
+      url: https://techcrunch.com/2026/02/20/anthropic-funded-group-backs-candidate-attacked-by-rival-ai-super-pac/
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Alex_Bores
+    - title: GovTrack — RAISE Act
+      url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
+  lastUpdated: 2026-04
 
 - id: rebecca-lasher
   stableId: sid_YKtqDKysGb
@@ -3542,9 +3582,11 @@
   title: Rebecca Lasher
   description: >-
     Candidate in the NY-12 Democratic primary (2026). Backed by
-    anti-regulation PAC spending from Leading the Future.
+    anti-regulation PAC spending from Leading the Future. Note: research
+    found no public figure matching this name in the NY-12 race — may be
+    confused with Micah Lasher, who is a confirmed candidate.
   tags: [politics]
-  lastUpdated: 2026-03
+  lastUpdated: 2026-04
 
 - id: brad-schlossberg
   stableId: sid_6b2Vi6bhfX
@@ -3560,39 +3602,114 @@
   type: person
   title: Mike Conway
   description: >-
-    Candidate in the NY-12 Democratic primary (2026).
+    Candidate in the NY-12 Democratic primary (2026). Note: may refer to
+    George Conway, who is a confirmed candidate in the NY-12 primary.
   tags: [politics]
-  lastUpdated: 2026-03
+  lastUpdated: 2026-04
 
 - id: valerie-foushee
   stableId: sid_aJJNryIYDC
   type: person
   title: Valerie Foushee
+  website: https://foushee.house.gov/
   description: >-
-    U.S. Representative for North Carolina's 4th district. Won the 2026
-    Democratic primary. Incumbent.
-  tags: [politics]
-  lastUpdated: 2026-03
+    U.S. Representative for North Carolina's 4th district (Research Triangle).
+    Won the 2026 Democratic primary against progressive challenger Nida Allam.
+    Co-chairs the House Democratic Commission on AI and Innovation Economy,
+    the New Democrat Coalition AI Task Force, and serves on the House
+    Bipartisan AI Task Force. Introduced the Expanding AI Voices Act
+    (bipartisan, with Rep. Nunn) and the HBCU AI Research Leadership Act.
+    Co-authored the Bipartisan House Task Force AI policy recommendation
+    report, championing the civil rights chapter. Criticized Trump's EO
+    blocking states from regulating AI as "flawed, harmful, and
+    unconstitutional." Anthropic's Jobs and Democracy PAC spent ~\$700K
+    supporting her primary. Member of both the Congressional Progressive
+    Caucus and New Democrat Coalition. NC LCV lifetime score: 96%.
+  tags: [politics, ai-regulation]
+  knownFor:
+    - Co-chair of House Democratic AI Commission
+    - Expanding AI Voices Act and HBCU AI Research Leadership Act
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — leading House voice for AI guardrails and civil rights protections in AI
+      source: House AI Task Force policy report
+      sourceUrl: https://foushee.house.gov/media/press-releases/rep-foushee-and-members-of-the-bipartisan-house-task-force-on-artificial-intelligence-release-policy-recommendation-report
+    - topic: Science and technology funding
+      view: Supportive — multiple bills expanding NSF AI research at HBCUs and minority-serving institutions
+      source: HBCU AI Research Leadership Act
+      sourceUrl: https://foushee.house.gov/media/press-releases/rep-foushee-announces-legislation-to-close-ai-research-funding-gaps-and-establish-ai-institutes-at-hbcus
+  sources:
+    - title: Foushee — Bipartisan AI Task Force Report
+      url: https://foushee.house.gov/media/press-releases/rep-foushee-and-members-of-the-bipartisan-house-task-force-on-artificial-intelligence-release-policy-recommendation-report
+    - title: Foushee — HBCU AI Research Leadership Act
+      url: https://foushee.house.gov/media/press-releases/rep-foushee-announces-legislation-to-close-ai-research-funding-gaps-and-establish-ai-institutes-at-hbcus
+    - title: Foushee — Expanding AI Voices Act
+      url: https://foushee.house.gov/media/press-releases/reps-foushee-nunn-introduce-bipartisan-legislation-to-expand-participation-in-ai-education-research-and-workforce
+    - title: Foushee — Blasts Trump AI Framework
+      url: https://foushee.house.gov/media/press-releases/congresswoman-foushee-blasts-white-house-ai-framework-that-fails-to-put-people-first
+    - title: WRAL — AI PAC Spending in NC-4
+      url: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/valerie_foushee/456913
+  lastUpdated: 2026-04
 
 - id: jesse-jackson-jr
   stableId: sid_69tAH5XWON
   type: person
   title: Jesse Jackson Jr.
   description: >-
-    Former U.S. Representative for Illinois' 2nd district. Lost 2026
-    Democratic primary comeback attempt.
+    Former U.S. Representative for Illinois' 2nd district (1995-2012). Lost
+    2026 Democratic primary comeback attempt (28.6% vs Donna Miller's 40.8%).
+    Resigned in 2012, convicted of misusing \$750K in campaign funds (30-month
+    sentence). Think Big PAC (OpenAI/a16z-funded) spent \$1.4M boosting his
+    2026 comeback. Campaign used AI-enhanced Bobby Rush voice in campaign ad.
+    Platform focused on connecting underserved communities to the AI economy.
+    Anti-regulation stance on AI.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Opposed to regulation — embraced AI industry PAC support, frames AI purely as economic opportunity
+      source: Chicago Sun-Times
+      sourceUrl: https://chicago.suntimes.com/elections/2026/03/09/artificial-intelligence-bobby-rush-ad-jesse-jackson-jr-campaign
+  sources:
+    - title: Chicago Sun-Times — AI PAC Bobby Rush Ad
+      url: https://chicago.suntimes.com/elections/2026/03/09/artificial-intelligence-bobby-rush-ad-jesse-jackson-jr-campaign
+    - title: Fortune — AI/Crypto Spending in Illinois
+      url: https://fortune.com/2026/03/18/ai-crypto-illinois-primary-spending-fairshake-think-big-pac/
+    - title: GovTrack Voting Record
+      url: https://www.govtrack.us/congress/members/jesse_jackson/400198
+  lastUpdated: 2026-04
 
 - id: melissa-bean
   stableId: sid_PnwPk4Vcau
   type: person
   title: Melissa Bean
+  website: https://www.melissabeanforcongress.com/
   description: >-
-    Former U.S. Representative. Won the 2026 Democratic primary for
-    Illinois' 8th district.
+    Former 3-term U.S. Representative (IL-8, 2005-2011) who won the 2026
+    Democratic primary to reclaim her seat. Centrist Democrat (Blue Dog +
+    New Democrat Coalition). Post-Congress career at JPMorgan Chase and
+    Mesirow Wealth Advisors. Pro-AI-innovation: champions "U.S. leadership
+    in AI" through research investment and public-private partnerships while
+    establishing "clear rules that protect rights and safety without
+    hampering innovation." Primary supported by ~\$4M AIPAC-linked PAC and
+    ~\$1M Think Big (AI PAC). LCV lifetime score: 85%.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Mildly supportive (light-touch) — pro-innovation framing with "clear rules without hampering innovation"
+      source: Campaign issues page
+      sourceUrl: https://www.melissabeanforcongress.com/issues
+  sources:
+    - title: Campaign Issues Page
+      url: https://www.melissabeanforcongress.com/issues
+    - title: American Prospect — AIPAC and AI Buy a Seat
+      url: https://prospect.org/2026/03/12/illinois-eighth-congressional-district-aipac-ai-bean-ahmed/
+    - title: GovTrack Voting Record
+      url: https://www.govtrack.us/congress/members/melissa_bean/400631
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Melissa_Bean
+  lastUpdated: 2026-04
 
 - id: jake-gober
   stableId: sid_Zs43I3aG72
@@ -3600,29 +3717,91 @@
   title: Jake Gober
   description: >-
     Republican candidate in the TX-10 primary (2026). Anti-regulation
-    stance on AI policy.
+    stance on AI policy. Note: may be confused with Chris Gober, who won
+    the TX-10 Republican primary.
   tags: [politics]
-  lastUpdated: 2026-03
+  lastUpdated: 2026-04
 
 - id: pete-ricketts
   stableId: sid_E6W6VILiNn
   type: person
   title: Pete Ricketts
+  website: https://www.ricketts.senate.gov/
   description: >-
-    U.S. Senator from Nebraska. Up for election in 2026. Known for
-    tech-friendly policy positions.
-  tags: [politics]
-  lastUpdated: 2026-03
+    U.S. Senator from Nebraska (R). Former Governor. One of four lead
+    sponsors of the ADVANCE Act (signed July 2024, passed 88-2), which
+    accelerates advanced nuclear reactor deployment. Co-introduced the
+    bipartisan SAFE Chips Act (S.3374, with Sen. Coons) to codify export
+    controls preventing advanced AI chip sales to China, Russia, Iran, and
+    North Korea. Sits on Environment and Public Works Committee (Clean Air,
+    Climate, and Nuclear Innovation subcommittee).
+  tags: [politics, ai-regulation]
+  knownFor:
+    - Lead sponsor of ADVANCE Act (nuclear energy)
+    - SAFE Chips Act (AI chip export controls)
+  positions:
+    - topic: AI safety and regulation
+      view: Neutral to supportive on export controls — SAFE Chips Act addresses adversary access to AI capabilities
+      source: SAFE Chips Act introduction
+      sourceUrl: https://www.ricketts.senate.gov/news/press-releases/ricketts-coons-introduce-safe-chips-act/
+    - topic: Nuclear energy
+      view: Strongly supportive — lead sponsor of ADVANCE Act for civilian nuclear deployment
+      source: Senate press release
+      sourceUrl: https://www.ricketts.senate.gov/news/press-releases/ricketts-celebrates-passage-of-bipartisan-nuclear-energy-bill/
+  sources:
+    - title: ADVANCE Act Passage
+      url: https://www.ricketts.senate.gov/news/press-releases/ricketts-celebrates-passage-of-bipartisan-nuclear-energy-bill/
+    - title: SAFE Chips Act Introduction
+      url: https://www.ricketts.senate.gov/news/press-releases/ricketts-coons-introduce-safe-chips-act/
+    - title: The Hill — SAFE Chips Act
+      url: https://thehill.com/policy/technology/5635658-safe-chips-act-ai-export-control/
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/pete_ricketts/456952
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Pete_Ricketts
+  lastUpdated: 2026-04
 
 - id: marsha-blackburn
   stableId: sid_enf2UNKyDx
   type: person
   title: Marsha Blackburn
+  website: https://www.blackburn.senate.gov/
   description: >-
-    U.S. Senator from Tennessee, running for Governor in 2026. Has taken
-    positions on AI policy and technology regulation.
-  tags: [politics]
-  lastUpdated: 2026-03
+    U.S. Senator from Tennessee, running for Governor in 2026. Leading
+    Republican on AI policy — released the ~300-page "TRUMP AMERICA AI Act"
+    discussion draft (March 2026), a comprehensive federal AI framework
+    imposing a "duty of care" on AI developers and proposing to sunset
+    Section 230. Co-authored the Kids Online Safety Act (KOSA) with
+    Blumenthal (passed Senate 91-3 in July 2024). Strong nuclear energy
+    advocate, championing TVA Small Modular Reactor deployments. GovTrack
+    ranked 2nd most politically right senator (2024). Framework built around
+    "4 Cs": children, creators, conservatives, communities.
+  tags: [politics, ai-regulation]
+  knownFor:
+    - TRUMP AMERICA AI Act (300-page AI framework)
+    - Kids Online Safety Act (KOSA) — passed Senate 91-3
+    - Leading Republican on AI legislation
+  positions:
+    - topic: AI safety and regulation
+      view: Mixed/supportive on specific harms — duty of care for developers, child safety, creator rights, but conservative framing (anti-censorship audits)
+      source: TRUMP AMERICA AI Act draft
+      sourceUrl: https://www.blackburn.senate.gov/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/3b3b6458-b6c7-478b-9859-374949586765
+    - topic: Nuclear energy
+      view: Strongly supportive — champions Tennessee nuclear sector and TVA SMR deployments
+      source: Senate press release
+      sourceUrl: https://www.blackburn.senate.gov/2025/12/energy/america-s-nuclear-renaissance-runs-through-tennessee
+  sources:
+    - title: TRUMP AMERICA AI Act Draft
+      url: https://www.blackburn.senate.gov/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/3b3b6458-b6c7-478b-9859-374949586765
+    - title: Axios — Blackburn Rolls Out Updated AI Plan
+      url: https://www.axios.com/2026/03/18/blackburn-updated-ai-plan-trump
+    - title: KOSA Senate Passage
+      url: https://www.blackburn.senate.gov/2024/7/issues/technology/blackburn-blumenthal-celebrate-senate-passage-of-the-bipartisan-kids-online-safety-act
+    - title: Roll Call — AI Draft Bill Analysis
+      url: https://rollcall.com/2026/03/19/ai-draft-bill-would-revamp-online-landscape/
+    - title: Nuclear Renaissance in Tennessee
+      url: https://www.blackburn.senate.gov/2025/12/energy/america-s-nuclear-renaissance-runs-through-tennessee
+  lastUpdated: 2026-04
 
 - id: allison-duettmann
   stableId: sid_BvtUK0yEDv
@@ -5894,190 +6073,616 @@
   stableId: sid_mGJWs0I9DR
   type: person
   title: Laurie Buckhout
+  website: https://www.lauriebuckhoutforcongress.com/
   description: >-
-    Republican candidate for NC-1. Won 2026 GOP primary with American
-    Mission PAC support (\$500K). Former DOD deputy assistant secretary
-    for cyber policy. Faces incumbent Don Davis (D) in general election.
+    Republican candidate for NC-1. Retired Army Colonel (26 years), founded
+    Corvus Consulting (\$43M electronic warfare/cyber firm). Served as DOD
+    Deputy Assistant Secretary for Cyber Policy and Assistant National Cyber
+    Director for Policy under Trump before resigning to run. Won 2026 GOP
+    primary with ~\$500K AI PAC support (Leading the Future/Think Big).
+    Faces incumbent Don Davis (D) in general election. Stated: "Under my
+    watch, America will dominate AI, not China." Pro-AI-dominance framing
+    rather than safety-focused.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Neutral to opposed — pro-AI-dominance framing backed by AI industry PACs, genuine cyber expertise but emphasis on competition over safety
+      source: Campaign materials
+      sourceUrl: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
+  sources:
+    - title: WRAL — AI PACs Back Buckhout
+      url: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
+    - title: NBC — AI Industry Ads Flooding 2026 Election
+      url: https://www.nbcnews.com/politics/2026-election/ads-ai-industry-are-flooding-2026-election-artificial-intelligence-rcna260782
+    - title: DOD Biography
+      url: https://www.war.gov/About/Biographies/Biography/Article/4156734/laurie-buckhout/
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Laurie_Buckhout
+  lastUpdated: 2026-04
 
 - id: don-davis
   stableId: sid_NjPH3LAWxM
   type: person
   title: Don Davis
+  website: https://votedondavis.com/
   description: >-
-    U.S. Representative for North Carolina's 1st district (D). Incumbent
-    facing Laurie Buckhout (R) in 2026 general election after redistricting
-    made the district more competitive.
+    U.S. Representative for North Carolina's 1st district (D). Air Force
+    veteran, pastor, former NC state senator. Among the most moderate House
+    Democrats — member of New Democrat Coalition, Problem Solvers Caucus,
+    and Congressional Black Caucus. Serves on Armed Services and
+    Agriculture committees. Secured 17 bipartisan NDAA amendments including
+    an AI pilot program for Marine Corps supply chain logistics. Was one of
+    4 Democrats to vote for a Republican defense bill. LCV score: 64%.
+    Facing Laurie Buckhout (R) in 2026 general after redistricting.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Neutral — secured AI pilot in NDAA for military logistics but no broader AI safety positions
+      source: NDAA amendments press release
+      sourceUrl: https://dondavis.house.gov/media/press-releases/congressman-don-davis-advances-amendments-fy25-national-defense-authorization
+  sources:
+    - title: Davis — NDAA Amendments
+      url: https://dondavis.house.gov/media/press-releases/congressman-don-davis-advances-amendments-fy25-national-defense-authorization
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/donald_davis/456912
+    - title: Climate/Energy Positions (SACE)
+      url: https://cleanenergy.org/blog/don-davis-on-climate-energy-where-the-candidates-for-nc-congressional-district-1-stand
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Donald_Davis
+  lastUpdated: 2026-04
 
 - id: josh-gottheimer
   stableId: sid_tVEKHxyInn
   type: person
   title: Josh Gottheimer
+  website: https://gottheimer.house.gov/
   description: >-
-    U.S. Representative for New Jersey's 5th district (D). Co-chair of the
-    House Democratic Commission on AI and the Innovation Economy. Jobs and
-    Democracy PAC (Anthropic-backed) spent \$300K supporting his reelection.
-    Introduced the AI Workforce Training Act.
+    U.S. Representative for New Jersey's 5th district (D). Five-term
+    centrist Democrat, co-chair of the bipartisan Problem Solvers Caucus
+    and the House Democratic Commission on AI and the Innovation Economy.
+    Member of Blue Dog Coalition and New Democrat Coalition. Introduced the
+    AI Workforce Training Act, the Unleashing AI Innovation in Financial
+    Services Act, and the GUARD Act (defense AI). Pro-innovation rather
+    than safety-focused on AI — framing emphasizes "staying ahead of global
+    competitors." Former White House speechwriter. Humane Society score:
+    100% (2017). LCV scores: 100% (2023), 97% (2024). Strong Iran hawk —
+    led bipartisan letter demanding zero nuclear enrichment for Iran.
+    Anthropic's Jobs and Democracy PAC spent \$300K supporting his
+    reelection.
   tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+  knownFor:
+    - Co-chair of House AI Commission and Problem Solvers Caucus
+    - AI Workforce Training Act
+    - GUARD Act (defense AI)
+  positions:
+    - topic: AI safety and regulation
+      view: Mixed/pro-innovation — co-chairs House AI Commission but framing is competitiveness-oriented, not safety-oriented
+      source: AI Commission announcement
+      sourceUrl: https://gottheimer.house.gov/posts/release-gottheimer-to-co-chair-new-house-commission-on-artificial-intelligence
+    - topic: Animal welfare
+      view: Supportive — 100% Humane Society score (2017), endorsed by HSLF
+      source: Humane Society endorsement
+      sourceUrl: https://humaneaction.org/press-release/2018/07/humane-society-legislative-fund-endorses-rep-josh-gottheimer-new-jerseys-5th
+  sources:
+    - title: AI Commission Announcement
+      url: https://gottheimer.house.gov/posts/release-gottheimer-to-co-chair-new-house-commission-on-artificial-intelligence
+    - title: AI Workforce Training Act
+      url: https://gottheimer.house.gov/posts/release-gottheimer-introduces-bipartisan-ai-workforce-training-act
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/josh_gottheimer/412714
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Josh_Gottheimer
+  lastUpdated: 2026-04
 
 - id: chris-gober
   stableId: sid_jJ0yCaVU9E
   type: person
   title: Chris Gober
+  website: https://chrisgober.com/
   description: >-
-    Republican nominee for TX-10. Former Elon Musk attorney and America PAC
-    director. Won 2026 primary with American Mission PAC support (\$500K+).
-    First candidate backed by Leading the Future's GOP arm.
+    Republican nominee for TX-10. Austin-based election law attorney who
+    served as director and chief lawyer of Elon Musk's America PAC in 2024,
+    deploying ~\$300M for Trump's campaign. Won 2026 primary with 51%+ in
+    a 10-candidate field. Endorsed by Trump, Abbott, Cruz, Speaker Johnson,
+    and Club for Growth. Founded Lex Politica law firm. First candidate
+    backed by Leading the Future's GOP arm (\$500K+). Campaign focuses on
+    standard MAGA priorities (border, taxes, spending). No specific AI
+    safety positions but pledged to "boost investment in cutting-edge
+    defense and technology." Harvard Law, DOJ national security background.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Likely opposed to regulation — backed by AI industry PACs, Musk-adjacent, pro-innovation framing
+      source: Texas Tribune campaign profile
+      sourceUrl: https://www.texastribune.org/2026/02/12/texas-10th-congressional-district-gop-primary-chris-gober-trump/
+  sources:
+    - title: Texas Tribune — Former Elon Musk Lawyer Leads TX-10 Race
+      url: https://www.texastribune.org/2026/02/12/texas-10th-congressional-district-gop-primary-chris-gober-trump/
+    - title: Club for Growth Endorsement
+      url: https://www.clubforgrowth.org/candidates/alex-mealer/
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Chris_Gober
+  lastUpdated: 2026-04
 
 - id: alex-mealer
   stableId: sid_upZRDVRpEj
   type: person
   title: Alex Mealer
+  website: https://alexandramealer.com/
   description: >-
-    Republican candidate in TX-9 runoff. West Point graduate, Harvard
-    JD-MBA, combat veteran, oil and gas executive. Backed by Defending Our
-    Values PAC (Public First/Anthropic).
-  tags: [politics]
-  lastUpdated: 2026-03
+    Republican candidate in TX-9 runoff (May 26, 2026). West Point graduate,
+    Army Explosive Ordnance Disposal officer (Afghanistan), Harvard JD/MBA,
+    former oil and gas executive. Notably the most AI-safety-forward
+    Republican candidate — campaign explicitly calls for "rigorous safety
+    reviews for the most powerful AI systems," transparency when AI
+    impersonates humans, and "strong protections against nonconsensual
+    deepfakes and digital exploitation." Backed by Club for Growth (\$750K+)
+    and Trump-endorsed. Previously ran for Harris County Judge (2022).
+  tags: [politics, ai-regulation, ai-safety]
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — explicitly supports safety reviews for powerful AI, deepfake protections, transparency requirements
+      source: Campaign website
+      sourceUrl: https://alexandramealer.com/
+  sources:
+    - title: Campaign Website
+      url: https://alexandramealer.com/
+    - title: Club for Growth Candidate Page
+      url: https://www.clubforgrowth.org/candidates/alex-mealer/
+    - title: Houston Public Media — TX-9 Primary
+      url: https://www.houstonpublicmedia.org/articles/news/politics/election-2026/2026/02/17/543596/tx-9-republican-primary-election-cain-mealer/
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Alex_Mealer
+  lastUpdated: 2026-04
 
 - id: carlos-de-la-cruz
   stableId: sid_cuRfFRqEWH
   type: person
   title: Carlos De La Cruz
+  website: https://www.carlosforcongress.com/
   description: >-
-    Republican candidate in TX-35 runoff. Air Force veteran,
-    Trump-endorsed. Backed by Public First Action as part of their
-    pro-AI-regulation Republican slate.
+    Republican candidate in TX-35 runoff (May 26, 2026). Retired 20-year
+    Air Force veteran (Middle East deployments, southern border drug
+    interdiction). Brother of Rep. Monica De La Cruz (R-TX). Trump-endorsed.
+    Backed by Public First Action as part of their pro-AI-regulation
+    Republican slate. Thin policy platform — primarily cultural/loyalty-based.
+    Top stated priority: "stopping the radicalization of America's youth."
+    Self-described "President Trump's wingman in Congress."
   tags: [politics]
-  lastUpdated: 2026-03
+  sources:
+    - title: Campaign Website
+      url: https://www.carlosforcongress.com/
+    - title: San Antonio Report — TX-35 Runoff Q&A
+      url: https://sanantonioreport.org/carlos-de-la-cruz-qa-tx-35-runoff/
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Carlos_De_La_Cruz
+  lastUpdated: 2026-04
 
 - id: mallory-mcmorrow
   stableId: sid_MufHpHOmRJ
   type: person
   title: Mallory McMorrow
+  website: https://www.mcmorrowformichigan.com/
   description: >-
-    Michigan State Senator running for U.S. Senate in 2026. Built her
-    campaign explicitly on AI regulation for child safety. Key contender in
-    the August 2026 Democratic primary alongside Haley Stevens.
+    Michigan State Senator (13th district) and Senate Majority Whip — first
+    woman in Michigan history to hold the position. Running for U.S. Senate
+    in 2026 Democratic primary (leading in polls). Industrial designer
+    background (Notre Dame BA, worked at Mattel). Went viral in 2022 with
+    a floor speech pushing back against "grooming" accusations (13.7M
+    views). AI policy centers on child safety and consumer protection —
+    proposed banning cell phone use in classrooms, restricting infinite
+    scroll for children under 14, holding chatbot platforms accountable for
+    harmful content. Released seven-point data center plan requiring green
+    energy, union labor, and transparency. Authored Michigan's red flag gun
+    law (ERPO, 321 orders issued in first year). Helped pass Medicaid
+    expansion, \$15 minimum wage, and repeal of 1931 abortion ban.
   tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+  knownFor:
+    - First female Michigan Senate Majority Whip
+    - AI regulation for child safety
+    - Michigan red flag gun law (ERPO)
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive (narrow scope) — active on AI child safety and consumer protection, no engagement with frontier AI safety or existential risk
+      source: Campaign kids' online safety plan
+      sourceUrl: https://www.axios.com/2026/02/09/senate-mallory-mcmorrow-michigan-kids-online-safety
+    - topic: Data center regulation
+      view: Supportive — seven-point framework requiring green energy, union labor, community transparency
+      source: Michigan Advance
+      sourceUrl: https://michiganadvance.com/2026/03/27/mallory-mcmorrow-releases-plan-for-michigan-data-centers-done-right-with-a-focus-on-green-energy/
+  sources:
+    - title: Campaign Website — Agenda
+      url: https://www.mcmorrowformichigan.com/agenda
+    - title: Axios — Kids' Online Safety Plan
+      url: https://www.axios.com/2026/02/09/senate-mallory-mcmorrow-michigan-kids-online-safety
+    - title: Michigan Advance — Data Center Plan
+      url: https://michiganadvance.com/2026/03/27/mallory-mcmorrow-releases-plan-for-michigan-data-centers-done-right-with-a-focus-on-green-energy/
+    - title: Michigan Advance — AI/Social Media Legislation
+      url: https://michiganadvance.com/2026/01/22/predatory-ai-social-media-addiction-targeted-by-new-legislation-from-michigan-senate-democrats/
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Mallory_McMorrow
+  lastUpdated: 2026-04
 
 - id: haley-stevens
   stableId: sid_Wxqv54AslU
   type: person
   title: Haley Stevens
+  website: https://haleyformi.com/
   description: >-
-    Former U.S. Representative running for U.S. Senate in Michigan 2026
-    Democratic primary. Moderate, establishment-backed. Involved in tech
-    policy during her House tenure.
-  tags: [politics]
-  lastUpdated: 2026-03
+    Three-term U.S. Representative (MI-11) running for U.S. Senate in
+    Michigan 2026 Democratic primary. Former Chair of the House Science
+    Committee's Research and Technology Subcommittee. Named the most
+    effective Democrat on technology-based legislation. Key architect of the
+    CHIPS and Science Act (authored CHIPPING IN Act for semiconductor
+    workforce). Led the Small Business AI Advancement Act through the House
+    (directs NIST to provide AI adoption resources for SMBs). Introduced
+    the Building Blocks of STEM Act (signed into law). Previously worked at
+    NIST and NSF, served on Obama's auto industry task force. Member of
+    Problem Solvers Caucus and New Democrat Coalition. LCV lifetime: 98%.
+  tags: [politics, ai-regulation]
+  knownFor:
+    - Key architect of CHIPS and Science Act
+    - Small Business AI Advancement Act
+    - Most effective Democrat on technology legislation
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — led Small Business AI Advancement Act through NIST, safety framing is "responsible adoption"
+      source: House passage announcement
+      sourceUrl: https://stevens.house.gov/media/press-releases/house-passes-rep-stevens-bipartisan-bill-help-small-businesses-safely-navigate
+    - topic: Science and technology funding
+      view: Strongly supportive — CHIPS Act architect, NIST/NSF advocate, critical minerals bill, STEM education
+      source: CHIPS Act wins
+      sourceUrl: https://stevens.house.gov/media/press-releases/rep-stevens-secures-wins-chips-and-science-act-votes-historic-investments
+  sources:
+    - title: Stevens — CHIPS Act Wins
+      url: https://stevens.house.gov/media/press-releases/rep-stevens-secures-wins-chips-and-science-act-votes-historic-investments
+    - title: Stevens — Small Business AI Act
+      url: https://stevens.house.gov/media/press-releases/house-passes-rep-stevens-bipartisan-bill-help-small-businesses-safely-navigate
+    - title: Most Effective Lawmakers
+      url: https://michiganindependent.com/politics/stevens-and-peters-recognized-as-most-effective-lawmakers-in-key-policy-areas/
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/haley_stevens/412786
+    - title: LCV Profile
+      url: https://www.lcv.org/moc/haley-stevens/
+  lastUpdated: 2026-04
 
 - id: mike-rogers-mi
   stableId: sid_rTJq3v2HV6
   type: person
   title: Mike Rogers
+  website: https://rogersforsenate.com/
   description: >-
-    Republican nominee for U.S. Senate in Michigan. Former House Intel
-    Committee Chair. Trump-endorsed. Publicly endorsed the White House AI
-    framework calling for a single national deregulatory standard.
+    Republican nominee for U.S. Senate in Michigan. Former FBI special
+    agent, U.S. Army officer, and five-term U.S. Representative (MI-08,
+    2001-2015). Chaired the House Permanent Select Committee on Intelligence
+    (2011-2015), overseeing a \$70B intelligence community budget.
+    Introduced CISPA (Cyber Intelligence Sharing and Protection Act).
+    Defended NSA bulk surveillance post-Snowden. Publicly endorsed the
+    White House AI framework calling for a single national deregulatory
+    standard. Supports modular nuclear reactors for electric grid. LCV
+    lifetime score: 8%. Narrowly lost 2024 Michigan Senate race to Elissa
+    Slotkin.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Unknown — cybersecurity expertise could translate but endorsed deregulatory AI framework
+    - topic: Nuclear energy
+      view: Supportive — supports modular nuclear reactors
+  sources:
+    - title: Campaign Website
+      url: https://rogersforsenate.com/meet-mike
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Mike_Rogers_(Michigan_politician)
+    - title: LCV Score
+      url: https://www.lcv.org/moc/mike-j-rogers/
+    - title: Environmental Positions (WCMU)
+      url: https://radio.wcmu.org/local-regional-news/2024-10-24/where-slotkin-rogers-stand-on-michigan-environmental-issues
+  lastUpdated: 2026-04
 
 - id: john-cornyn
   stableId: sid_4TO1jXYozt
   type: person
   title: John Cornyn
+  website: https://www.cornyn.senate.gov/
   description: >-
-    U.S. Senator from Texas (R). Senate Commerce Committee member. In 2026
-    GOP primary runoff against Ken Paxton. AI preemption stance is a key
-    issue — Paxton led Texas legislators opposing federal override of state
-    AI laws.
+    Four-term U.S. Senator from Texas (R, since 2002). Former Senate
+    Majority Whip. Member of Intelligence, Judiciary, and Finance
+    committees. Original author of the CHIPS for America Act. His GUARD Act
+    (Growing University AI Research for Defense) was signed into law as part
+    of the FY2026 NDAA. Co-sponsored the ENFORCE Act to criminalize
+    AI-generated CSAM. Voted to strip the 10-year AI moratorium from the
+    "One Big Beautiful Bill" (99-1 vote). Co-sponsored the bipartisan
+    Preventing Future Pandemics Act (with Sen. Booker) to close wildlife
+    markets and prevent zoonotic spillover. However, co-introduced the EATS
+    Act to preempt state animal welfare standards — a major anti-animal-welfare
+    bill. In 2026 GOP primary runoff against Ken Paxton.
   tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+  knownFor:
+    - Original author of CHIPS for America Act
+    - GUARD Act (defense AI)
+    - Preventing Future Pandemics Act
+  positions:
+    - topic: AI safety and regulation
+      view: Moderate/defense-oriented — opposed federal AI moratorium (protecting state regulation), GUARD Act for defense AI, CSAM criminalization
+      source: GUARD Act signing
+      sourceUrl: https://www.cornyn.senate.gov/news/pres-trump-signs-cornyn-bill-to-advance-defense-innovation-artificial-intelligence-into-law/
+    - topic: Biosafety
+      view: Supportive — co-sponsored Preventing Future Pandemics Act to close wildlife markets and prevent zoonotic spillover
+      source: Senate press release
+      sourceUrl: https://www.cornyn.senate.gov/news/cornyn-booker-reintroduce-bipartisan-bill-to-help-prevent-future-pandemics/
+    - topic: Animal welfare
+      view: Opposed — co-introduced EATS Act to preempt state animal welfare standards for meat production
+  sources:
+    - title: GUARD Act Signing
+      url: https://www.cornyn.senate.gov/news/pres-trump-signs-cornyn-bill-to-advance-defense-innovation-artificial-intelligence-into-law/
+    - title: Preventing Future Pandemics Act
+      url: https://www.cornyn.senate.gov/news/cornyn-booker-reintroduce-bipartisan-bill-to-help-prevent-future-pandemics/
+    - title: Science & Technology Issues Page
+      url: https://www.cornyn.senate.gov/key-issues/science-tech/
+    - title: Texas Tribune — Cornyn vs Paxton
+      url: https://www.texastribune.org/2026/02/05/texas-us-senate-republicans-2026-primary-q-and-a-voter-guide-cornyn-hunt-paxton/
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/john_cornyn/300027
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/John_Cornyn
+  lastUpdated: 2026-04
 
 - id: ken-paxton
   stableId: sid_bIat5xswtM
   type: person
   title: Ken Paxton
+  website: https://www.kenpaxton.com/
   description: >-
-    Texas Attorney General challenging John Cornyn in 2026 GOP Senate
-    primary runoff. Led coalition of 16 Texas state senators opposing
-    federal moratorium on state AI laws. Used AI-generated attack ads
-    against Cornyn.
+    Texas Attorney General (since 2015) challenging John Cornyn in 2026 GOP
+    Senate primary runoff. Reached a first-of-its-kind settlement with
+    healthcare AI company Pieces Technologies for misleading safety claims.
+    Opened investigations into Meta AI Studio and Character.AI for deceptive
+    marketing to children. Negotiated the \$1.4B Meta biometric data
+    settlement. Used AI-generated attack ads against Cornyn. Note: the
+    16-state-senator coalition opposing federal AI preemption was actually
+    led by Angela Paxton (his wife), not Ken directly. Impeached by the
+    Texas House in 2023 (acquitted by Senate 16-14). Securities fraud
+    charges dismissed in 2025 after pretrial agreement. Sued the Biden
+    administration 100+ times. Firmly pro-fossil fuel — \$3.9M+ from oil/gas.
   tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Mixed/consumer protection — enforcement actions against misleading AI companies but no engagement with frontier safety or governance frameworks
+      source: TX AG AI healthcare settlement
+      sourceUrl: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-reaches-settlement-first-its-kind-healthcare-generative-ai-investigation
+  sources:
+    - title: TX AG — AI Healthcare Settlement
+      url: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-reaches-settlement-first-its-kind-healthcare-generative-ai-investigation
+    - title: TX AG — Meta/Character.AI Investigation
+      url: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-investigates-meta-and-characterai-misleading-children-deceptive-ai
+    - title: Texas Tribune — Cornyn vs Paxton Q&A
+      url: https://www.texastribune.org/2026/02/05/texas-us-senate-republicans-2026-primary-q-and-a-voter-guide-cornyn-hunt-paxton/
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Ken_Paxton
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Ken_Paxton
+  lastUpdated: 2026-04
 
 - id: roy-cooper
   stableId: sid_uOwPoVTf2h
   type: person
   title: Roy Cooper
+  website: https://roycooper.com/
   description: >-
-    Former Governor of North Carolina. Democratic nominee for U.S. Senate
-    in 2026 against Michael Whatley. Race projected to be the most expensive
-    Senate race in history.
+    Former two-term Governor of North Carolina (2017-2025) and four-term
+    Attorney General (2001-2017). Won 2026 Democratic Senate primary with
+    92% of the vote against Michael Whatley. Nearly 40 years of continuous
+    public service with an unbroken winning streak. Led NC's COVID-19
+    response with data-driven measures (one of the lowest per-capita death
+    rates in the Southeast). Signed Executive Order 80 setting aggressive
+    climate targets (40% GHG reduction by 2025, carbon neutrality by 2050).
+    Negotiated bipartisan Medicaid expansion (600K+ enrolled). NC's AI
+    responsible-use framework developed under his admin. Vetoed industrial
+    hog farm liability protections (overridden) and nuclear energy bill
+    (SB 678) that would have favored Duke Energy's nuclear plans over
+    lower-cost renewables (overridden). Won 2025 Levine Award for
+    Contributions to Public Health.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: Biosafety
+      view: Supportive — strong COVID-19 pandemic response, data-driven public health approach, won public health award
+    - topic: AI safety and regulation
+      view: Neutral to supportive — NC AI responsible-use framework developed under his admin
+    - topic: Nuclear energy
+      view: Mixed — vetoed nuclear expansion bill (preferred renewables) but not blanket anti-nuclear
+  sources:
+    - title: Governor's Accomplishments Page
+      url: https://www.govroycooper.org/accomplishments
+    - title: NC Governor — Executive Order 80
+      url: https://governor.nc.gov/issues/environment
+    - title: NC Governor — AI Executive Order 24
+      url: https://governor.nc.gov/executive-order-no-24-advancing-trustworthy-artificial-intelligence-benefits-all-north-carolinians
+    - title: WUNC — Medicaid Expansion Legacy
+      url: https://www.wunc.org/news/2024-12-06/medicaid-expansion-governor-roy-cooper
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Roy_Cooper
+  lastUpdated: 2026-04
 
 - id: jon-ossoff
   stableId: sid_N2rG9yPZ9K
   type: person
   title: Jon Ossoff
+  website: https://www.ossoff.senate.gov/
   description: >-
-    U.S. Senator from Georgia (D). Incumbent in 2026. Subject of AI
-    deepfake attack ad by opponent Mike Collins' campaign. Judiciary and
-    banking committee member.
+    U.S. Senator from Georgia (D). Chairs the Permanent Subcommittee on
+    Investigations (youngest PSI chairman in history at 34). Subject of AI
+    deepfake attack ad by opponent Mike Collins' campaign — pledged not to
+    use deepfakes in his own campaign. Launched inquiry into DoD's use of
+    xAI's Grok chatbot (cited "track record promoting Holocaust denial").
+    Federal Prison Oversight Act signed into law (bipartisan). Co-sponsored
+    Rural Hospital Cybersecurity Enhancement Act and Farm and Food
+    Cybersecurity Act. Voted for the Inflation Reduction Act. Secured \$65M
+    for poultry/avian health research (avian flu response). LCV lifetime:
+    97%.
   tags: [politics]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Neutral to supportive — personally affected by deepfake attack, probed DoD AI use, but not a primary AI legislator
+      source: DoD Grok AI inquiry
+      sourceUrl: https://www.ossoff.senate.gov/press-releases/sen-ossoff-colleagues-launch-inquiry-into-department-of-defenses-use-of-ai-software-known-for-antisemitic-content/
+  sources:
+    - title: Ossoff — Five-Year Report
+      url: https://www.ossoff.senate.gov/five-year-report/
+    - title: DoD Grok AI Inquiry
+      url: https://www.ossoff.senate.gov/press-releases/sen-ossoff-colleagues-launch-inquiry-into-department-of-defenses-use-of-ai-software-known-for-antisemitic-content/
+    - title: CBS Atlanta — Deepfake Attack Ad
+      url: https://www.cbsnews.com/atlanta/news/georgia-rep-mike-collins-campaign-uses-ai-generated-deepfake-of-senator-jon-ossoff-in-tight-senate-showdown/
+    - title: GovTrack 2024 Report Card
+      url: https://www.govtrack.us/congress/members/jon_ossoff/456857/report-card/2024
+    - title: LCV Endorsement
+      url: https://www.lcv.org/media-center/lcv-action-fund-endorses-jon-ossoff-for-u-s-senate/
+  lastUpdated: 2026-04
 
 - id: susan-collins
   stableId: sid_5NoqE8uJSr
   type: person
   title: Susan Collins
+  website: https://www.collins.senate.gov/
   description: >-
-    U.S. Senator from Maine (R). Incumbent in 2026. Only Republican
-    incumbent in a state Harris won in 2024 — top Democratic pickup target.
-    Historically bipartisan on technology policy. Rated Toss-Up.
-  tags: [politics]
-  lastUpdated: 2026-03
+    U.S. Senator from Maine (R). Current Chair of the Senate Appropriations
+    Committee. Ranked most bipartisan Senator 9 of 11 years (Lugar Center).
+    ACU lifetime rating: 46%. Has said current term (ending 2027) will be
+    her last. Co-authored key provisions of the PREVENT Pandemics Act
+    (signed 2022) including biosecurity measures for select biological
+    agents, high-containment lab oversight, and the National Science
+    Advisory Board for Biosecurity. Co-introduced the Preparing Election
+    Administrators for AI Act and co-sponsors the Protect Elections from
+    Deceptive AI Act. As Appropriations Chair, pushed back against NIH
+    funding cuts and secured ~\$8.8B for NSF. Advanced Intelligence
+    Authorization provisions strengthening cybersecurity oversight. LCV
+    score: 31%.
+  tags: [politics, ai-regulation]
+  knownFor:
+    - Senate Appropriations Committee Chair
+    - Most bipartisan Senator (Lugar Center)
+    - PREVENT Pandemics Act biosecurity provisions
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — bipartisan AI election safety bills targeting deepfakes and election interference
+      source: AI election safety bill
+      sourceUrl: https://www.collins.senate.gov/newsroom/senators-collins-klobuchar-introduce-bipartisan-bill-to-provide-ai-guidelines-for-election-offices
+    - topic: Biosafety
+      view: Supportive — co-authored PREVENT Pandemics Act biosecurity provisions, high-containment lab oversight
+      source: PREVENT Pandemics Act signing
+      sourceUrl: https://www.collins.senate.gov/newsroom/prevent-pandemics-act-provisions-authored-by-senator-collins-signed-into-law
+    - topic: Science and technology funding
+      view: Strongly supportive — Appropriations Chair defending NIH/NSF funding, secured ~\$8.8B for NSF
+  sources:
+    - title: PREVENT Pandemics Act Provisions
+      url: https://www.collins.senate.gov/newsroom/prevent-pandemics-act-provisions-authored-by-senator-collins-signed-into-law
+    - title: AI Election Safety Bill
+      url: https://www.collins.senate.gov/newsroom/senators-collins-klobuchar-introduce-bipartisan-bill-to-provide-ai-guidelines-for-election-offices
+    - title: NIH Research Funding Advocacy
+      url: https://www.collins.senate.gov/newsroom/senator-collins-colleagues-send-letter-to-omb-advocating-for-release-of-critical-nih-research-funding
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/susan_collins/300025
+    - title: Wikipedia — Political Positions
+      url: https://en.wikipedia.org/wiki/Political_positions_of_Susan_Collins
+  lastUpdated: 2026-04
 
 - id: byron-donalds
   stableId: sid_5mkCGqtYnA
   type: person
   title: Byron Donalds
   description: >-
-    U.S. Representative running for Florida Governor in 2026. Leading the
-    Future PAC pledged \$5M to support his candidacy. Opposes DeSantis-backed
-    AI regulation. Trump-endorsed.
+    U.S. Representative (FL-19) running for Florida Governor in 2026.
+    Freedom Caucus member. GovTrack ranked him the 2nd most politically
+    right representative (118th Congress). ACU rating: 100%. Leading the
+    Future PAC (OpenAI's Greg Brockman, Andreessen Horowitz) pledged \$5M
+    to support his candidacy. Explicitly broke with DeSantis on AI,
+    calling the technology "magical" and arguing Florida should be an AI
+    data center hub. Anti-AI-regulation: says parents and states should
+    lead regulation, not federal government. Was among 147 Republicans who
+    voted to overturn the 2020 election results.
   tags: [politics, ai-regulation]
-  lastUpdated: 2026-03
+  positions:
+    - topic: AI safety and regulation
+      view: Opposed — explicitly anti-regulation, backed by \$5M from pro-AI-industry PAC, favors state/parental oversight over federal rules
+      source: Florida Politics
+      sourceUrl: https://floridapolitics.com/archives/778801-byron-donalds-breaks-with-ron-desantis-on-magical-ai-embraces-technologys-creative-destruction/
+  sources:
+    - title: NBC News — AI PAC Pledges \$5M for Donalds
+      url: https://www.nbcnews.com/politics/2026-election/super-pac-backed-ai-titans-pledges-5-million-boost-byron-donalds-run-f-rcna258612
+    - title: Florida Politics — Breaks with DeSantis on AI
+      url: https://floridapolitics.com/archives/778801-byron-donalds-breaks-with-ron-desantis-on-magical-ai-embraces-technologys-creative-destruction/
+    - title: GovTrack Profile
+      url: https://www.govtrack.us/congress/members/byron_donalds/456808
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Byron_Donalds
+  lastUpdated: 2026-04
 
 - id: nida-allam
   stableId: sid_L9zuCKRaWC
   type: person
   title: Nida Allam
+  website: https://nidaallam.com/
   description: >-
-    Progressive challenger in NC-4 Democratic primary (2026). Lost to
-    incumbent Valerie Foushee by less than 1 percentage point despite Jobs
-    and Democracy PAC spending \$1.6M against her.
-  tags: [politics]
-  lastUpdated: 2026-03
+    Durham County Commissioner and progressive challenger in NC-4 Democratic
+    primary (2026). First Muslim woman elected to public office in NC. Lost
+    to incumbent Valerie Foushee by ~1,200 votes. Strongest anti-AI-industry
+    stance of any candidate — proposed a data center construction moratorium
+    until federal AI regulations were passed, rejected Super PAC spending
+    from AI/data center companies, signed Bernie Sanders' nationwide data
+    center moratorium pledge. After conceding, stated the AI lobby had
+    "bought" the race. Endorsed by Bernie Sanders, Justice Democrats, and
+    Sunrise Movement. Supports Green New Deal. Anthropic's Jobs and
+    Democracy PAC spent \$1.6M against her (boosting Foushee).
+  tags: [politics, ai-regulation]
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — strongest anti-AI-industry stance, proposed data center moratorium pending federal regulation
+      source: Campaign platform
+      sourceUrl: https://nidaallam.com/platform
+  sources:
+    - title: Campaign Platform
+      url: https://nidaallam.com/platform
+    - title: NPR — Allam Concedes to Foushee
+      url: https://www.npr.org/2026/03/04/nx-s1-5734577/north-carolina-election-results-foushee-allam
+    - title: The Intercept — Razor-thin Loss
+      url: https://theintercept.com/2026/03/05/nc-house-primary-valerie-foushee-nida-allam/
+    - title: The Nation — AI Is the New AIPAC
+      url: https://www.thenation.com/?post_type=article&p=591412
+    - title: NC Newsline — \$4.2M Outside Spending
+      url: https://ncnewsline.com/2026/02/27/outsiders-spent-nearly-4-2m-in-nc-04-primary-most-expensive-in-state-history/
+  lastUpdated: 2026-04
 
 - id: micah-lasher
   stableId: sid_bxc9r4rOAn
   type: person
   title: Micah Lasher
+  website: https://micahlasher.com/
   description: >-
-    Candidate in the NY-12 Democratic primary (2026). Leading in prediction
-    markets (47-52% on Polymarket). Former aide to ex-AG Eric Schneiderman.
-  tags: [politics]
-  lastUpdated: 2026-03
+    NY State Assemblymember (District 69) and Jerry Nadler's endorsed
+    successor for NY-12. Career in government at all levels: aide to
+    Congressman Nadler, Director of State Legislative Affairs under Mayor
+    Bloomberg, Chief of Staff to AG Eric Schneiderman, Director of Policy
+    for Governor Hochul (architected the 2023 Housing Compact). Co-sponsor
+    of the RAISE Act in the NY Assembly. Leading in prediction markets
+    (47-52% on Polymarket). Backed by a \$5M Bloomberg Super PAC. On AI
+    industry pushback: "At the end of the day, these entities want less
+    enforcement, not more." Also championed the FAIR Business Practices Act
+    protecting consumers from AI-based schemes. Supports Medicare for All.
+  tags: [politics, ai-regulation]
+  positions:
+    - topic: AI safety and regulation
+      view: Supportive — co-sponsor of RAISE Act, pro-enforcement stance against AI industry pushback
+      source: Campaign platform
+      sourceUrl: https://micahlasher.com/platform-and-policies/
+  sources:
+    - title: Campaign Platform
+      url: https://micahlasher.com/platform-and-policies/
+    - title: NBC News — AI War in NY-12
+      url: https://www.nbcnews.com/politics/2026-election/candidate-center-brewing-midterm-ai-war-unveils-agenda-rcna257735
+    - title: amNewYork — Bloomberg Endorsement
+      url: https://www.amny.com/news/ny-12-congress-lasher-bloomberg-endorsement/
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Micah_Lasher
+  lastUpdated: 2026-04
 
 - id: jack-schlossberg
   stableId: sid_XIHqP2pPI0
@@ -6085,21 +6690,60 @@
   title: Jack Schlossberg
   description: >-
     Candidate in the NY-12 Democratic primary (2026). Grandson of President
-    John F. Kennedy. Polling second in some surveys, 18-27% on prediction
-    markets.
+    JFK. JD/MBA from Harvard. Leads in early polling (25%) with Nancy
+    Pelosi's endorsement. Advocates for AI transparency, accountability,
+    and resilience in high-impact sectors, framing AI risk as "systemic
+    economic risk management." Refused Super PAC, corporate PAC, and "big
+    AI company" money. Criticized Democrats as "anti-everything, and
+    anti-business in particular" on tech issues. State Dept experience
+    (Bureau of Oceans and International Environmental and Scientific
+    Affairs).
   tags: [politics]
+  positions:
+    - topic: AI safety and regulation
+      view: Mildly supportive — supports transparency and accountability frameworks, frames AI as systemic risk, but also pro-tech/innovation
+      source: Fortune interview
+      sourceUrl: https://fortune.com/2026/03/18/jack-schlossberg-warning-america-ceos-150900639.html
+  sources:
+    - title: Fortune — Warning for CEOs
+      url: https://fortune.com/2026/03/18/jack-schlossberg-warning-america-ceos-150900639.html
+    - title: The Hill — Billionaires and AI Companies Spending
+      url: https://thehill.com/homenews/campaign/5806153-jfk-grandson-schlossberg-says-billionaires-massive-ai-companies-spending-millions-in-new-york-house-race/
+    - title: NBC News — Pelosi Endorsement
+      url: https://www.nbcnews.com/politics/elections/nancy-pelosi-set-endorse-jfks-grandson-new-york-house-seat-source-says-rcna257968
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Jack_Schlossberg
   lastUpdated: 2026-03
 
 - id: michael-whatley
   stableId: sid_7ucfe1TgTW
   type: person
   title: Michael Whatley
+  website: https://www.michaelwhatley.com/
   description: >-
     Republican nominee for U.S. Senate in North Carolina (2026) against Roy
-    Cooper. Former chairman of the Republican National Committee (2024-2025).
-    Trump-endorsed candidate.
+    Cooper. Former RNC Chairman (2024-2025) and NC Republican Party Chairman
+    (2019-2024). Career Republican operative and oil/gas industry lobbyist —
+    EVP of Consumer Energy Alliance (2008-2019), advocated for Keystone XL,
+    expanded offshore drilling, and against regulations on fracking, power
+    plant emissions, and water pollution. Chief of Staff to Sen. Elizabeth
+    Dole (2004-2007). Trump-appointed "Hurricane Recovery Czar" for western
+    NC. Supports "a mix of energy sources — carbon, nuclear, renewables."
+    Outraised by Cooper ~3:1 (\$6.5M vs \$21M). No documented positions on
+    AI safety, biosecurity, or animal welfare.
   tags: [politics]
-  lastUpdated: 2026-03
+  sources:
+    - title: Campaign Website
+      url: https://www.michaelwhatley.com/
+    - title: E&E News — Oil Ties in NC Senate Race
+      url: https://www.eenews.net/articles/republicans-oil-ties-a-focus-in-north-carolina-senate-race/
+    - title: The Assembly NC — What to Know About Whatley
+      url: https://www.theassemblync.com/news/politics/michael-whatley-nc-senate/
+    - title: Wikipedia
+      url: https://en.wikipedia.org/wiki/Michael_Whatley
+    - title: Ballotpedia
+      url: https://ballotpedia.org/Michael_Whatley
+  lastUpdated: 2026-04
 
 - id: elie-hassenfeld
   stableId: sid_xVfFkFIk3Q
