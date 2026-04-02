@@ -29,13 +29,42 @@ facts:
       - !ref sid_DBq1ddu8Mg
     source: https://en.wikipedia.org/wiki/Google_DeepMind
 
+  - id: f_R4dJwT8nPg
+    property: headcount
+    value: 1567
+    asOf: 2022-12
+    source: https://usesignhouse.com/blog/deepmind-stats/
+    notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023
+      merger with Google Brain to form Google DeepMind"
+
   - id: f_KtTrbGQynQ
     property: headcount
     value: 6000
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly after Google Brain merger in April 2023"
+    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly
+      after Google Brain merger in April 2023"
 
+  # ── Revenue (UK entity filings — internal R&D remuneration from Alphabet) ──
+  - id: f_Wq9Bxn5mKg
+    property: internal-revenue
+    value: 1.96e+9
+    asOf: "2023"
+    source: https://gwern.net/doc/reinforcement-learning/deepmind/2023-deepmind-fullaccounts.pdf
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for
+      2023. Represents R&D remuneration from other Alphabet group undertakings, not
+      external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
+
+  - id: f_8pLqVz3nRg
+    property: internal-revenue
+    value: 1.7e+9
+    asOf: "2024"
+    source: https://gwern.net/doc/reinforcement-learning/deepmind/2024-deepmind-fullaccounts.pdf
+    notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for
+      2024. Decrease from 2023 likely due to reorganization of internal billing after
+      Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
+
+  # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
     property: safety-researcher-count
     value: 120

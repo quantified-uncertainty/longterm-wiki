@@ -117,7 +117,7 @@ facts:
       OpenAI's $40B"
 
   - id: f_kR8wT3vN6m
-    property: valuation
+    property: secondary-valuation
     value: 5.95e+11
     asOf: 2026-03
     source: https://app.ventuals.com/trade/anthropic
@@ -138,6 +138,7 @@ facts:
       remains private. Launched Feb 2026 per Bloomberg."
 
   # ── Total Funding ───────────────────────────────────────────────
+  # UNVERIFIED ESTIMATE
   - id: f_V3qsrDVY3A
     property: total-funding
     value: 4.4e+9
@@ -145,6 +146,7 @@ facts:
     notes: "Estimate; no published source. After Google $2B investment and Amazon
       first tranche"
 
+  # UNVERIFIED ESTIMATE
   - id: f_oBMR5hGA6A
     property: total-funding
     value: 1.5e+10
@@ -186,6 +188,7 @@ facts:
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other sources suggest up to 300"
 
+  # UNVERIFIED ESTIMATE
   - id: f_0PxEBZyv45
     property: headcount
     value:
@@ -212,6 +215,7 @@ facts:
     source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
     notes: "At Series F announcement; tripling international headcount was announced but not yet completed"
 
+  # UNVERIFIED ESTIMATE
   - id: f_BdGi5l9dOg
     property: headcount
     value: 4074
@@ -368,10 +372,10 @@ facts:
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_Pd29CR24TA
-    property: valuation
+    property: secondary-valuation
     value: 3.5e+11
     asOf: 2025-11
-    notes: "Valuation at Microsoft/Nvidia commitment."
+    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to secondary-valuation."
 
   - id: f_U3LMAv6zjQ
     property: revenue-guidance

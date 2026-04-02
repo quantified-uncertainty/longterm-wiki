@@ -34,6 +34,83 @@ import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@compone
 | Official Website | [cnas.org – Secure, Governable Chips](https://www.cnas.org/publications/reports/secure-governable-chips) |
 | Wikipedia | [U.S. Export Controls on AI Chips and Semiconductors](https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors) |
 
+## Supply Chain Topology
+
+The AI chip supply chain flows through a small number of chokepoints, from equipment manufacturing through fabrication to chip design and ultimately to AI labs and data centers. The following diagram illustrates the key dependencies.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph EQUIPMENT["Equipment Suppliers"]
+        ASML["ASML\n(EUV Lithography)"]
+        AMAT["Applied Materials\n(Etch/Deposition)"]
+    end
+    subgraph MEMORY["Memory Producers"]
+        SKH["SK Hynix\n(HBM Memory)"]
+    end
+    subgraph FOUNDRIES["Foundries"]
+        TSMC["TSMC\n(90%+ advanced chips)"]
+        SMIC["SMIC\n(China; 5nm via DUV)"]
+    end
+    subgraph DESIGNERS["Chip Designers"]
+        NVDA["Nvidia\n(90-95% AI accelerators)"]
+        AMD["AMD\n(Instinct MI300)"]
+    end
+    subgraph CONSUMERS["AI Infrastructure"]
+        LABS["AI Labs & Hyperscalers\n(Google, Microsoft, Meta, etc.)"]
+    end
+
+    ASML -->|EUV machines| TSMC
+    ASML -.->|Restricted| SMIC
+    AMAT -->|Etch/deposition tools| TSMC
+    AMAT -->|Etch/deposition tools| SMIC
+    SKH -->|HBM chips| NVDA
+    SKH -->|HBM chips| AMD
+    TSMC -->|Fabrication| NVDA
+    TSMC -->|Fabrication| AMD
+    SMIC -->|Domestic fabrication| LABS
+    NVDA -->|"GPUs (H100, B200)"| LABS
+    AMD -->|"GPUs (MI300)"| LABS
+
+    style ASML fill:#dbeafe,stroke:#2563eb
+    style AMAT fill:#dbeafe,stroke:#2563eb
+    style SKH fill:#fef3c7,stroke:#d97706
+    style TSMC fill:#d1fae5,stroke:#059669
+    style SMIC fill:#fce7f3,stroke:#db2777
+    style NVDA fill:#ede9fe,stroke:#7c3aed
+    style AMD fill:#ede9fe,stroke:#7c3aed
+    style LABS fill:#f3f4f6,stroke:#6b7280
+`} />
+
+**Key takeaway:** The dashed line from ASML to SMIC represents the export control barrier. Without EUV, SMIC uses multi-patterning DUV techniques, which are slower and less efficient but have achieved 5nm-class results.
+
+## Key Players Compared
+
+The following tables draw from the FactBase to compare key metrics across the major semiconductor supply chain companies.
+
+### Revenue
+
+<FBCompareTable
+  property="revenue"
+  entities={["nvidia", "tsmc", "sk-hynix", "asml", "amd", "smic"]}
+  title="Annual Revenue — Semiconductor Supply Chain"
+/>
+
+### Headcount
+
+<FBCompareTable
+  property="headcount"
+  entities={["nvidia", "tsmc", "asml", "amd"]}
+  title="Employee Headcount — Semiconductor Supply Chain"
+/>
+
+### Market Capitalization
+
+<FBCompareTable
+  property="market-cap"
+  entities={["nvidia", "tsmc", "asml"]}
+  title="Market Capitalization — Semiconductor Supply Chain"
+/>
+
 ## Overview
 
 The global supply chain for advanced AI chips is extraordinarily concentrated. Taiwan's <EntityLink id="E2606">TSMC</EntityLink> manufactures over 60% of all semiconductors globally and more than 90% of the most advanced chips.[^3] The Netherlands' <EntityLink id="E2607">ASML</EntityLink> supplies the extreme ultraviolet (EUV) lithography machines without which cutting-edge chips cannot be fabricated. U.S. firms dominate chip design—Nvidia in particular has become synonymous with AI training hardware—while Japan and South Korea contribute critical materials, packaging tools, and memory. This concentration is not merely an economic fact; it is the structural foundation on which AI chip governance is built.
