@@ -51,9 +51,3 @@ export function inferDataSource(sourceUrl: string | null): DataSourceInfo | null
   return null;
 }
 
-/**
- * Get all known data source IDs and names (for filter dropdown).
- */
-export function getAllDataSourceNames(): DataSourceInfo[] {
-  return DATA_SOURCE_PATTERNS.map((p) => ({ id: p.id, name: p.name }));
-}

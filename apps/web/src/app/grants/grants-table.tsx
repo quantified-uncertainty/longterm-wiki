@@ -99,6 +99,20 @@ export function GrantsTable({
     [rows],
   );
 
+  const dataSourceOptions = useMemo(() => {
+    const dsMap = new Map<string, { name: string; count: number }>();
+    for (const r of rows) {
+      if (r.dataSourceId && r.dataSourceName) {
+        const existing = dsMap.get(r.dataSourceId);
+        if (existing) existing.count++;
+        else dsMap.set(r.dataSourceId, { name: r.dataSourceName, count: 1 });
+      }
+    }
+    return [...dsMap.entries()]
+      .sort((a, b) => b[1].count - a[1].count)
+      .map(([id, { name, count }]) => ({ id, name, count }));
+  }, [rows]);
+
   const statuses = useMemo(() => {
     const set = new Set<string>();
     for (const r of rows) {
@@ -232,41 +246,28 @@ export function GrantsTable({
         </div>
 
         {/* Data source filter */}
-        {(() => {
-          const dsSet = new Map<string, { name: string; count: number }>();
-          for (const r of rows) {
-            if (r.dataSourceId && r.dataSourceName) {
-              const existing = dsSet.get(r.dataSourceId);
-              if (existing) existing.count++;
-              else dsSet.set(r.dataSourceId, { name: r.dataSourceName, count: 1 });
-            }
-          }
-          if (dsSet.size < 2) return null;
-          return (
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Source:</span>
-              <select
-                aria-label="Filter by data source"
-                value={dataSourceFilter}
-                onChange={(e) => {
-                  setDataSourceFilter(e.target.value);
-                  setPage(0);
-                  updateUrl({ dataSource: e.target.value === "all" ? null : e.target.value, page: null });
-                }}
-                className="text-xs px-2 py-1.5 rounded-lg border border-border bg-card"
-              >
-                <option value="all">All sources ({rows.length})</option>
-                {[...dsSet.entries()]
-                  .sort((a, b) => b[1].count - a[1].count)
-                  .map(([id, { name, count }]) => (
-                    <option key={id} value={id}>
-                      {name} ({count})
-                    </option>
-                  ))}
-              </select>
-            </div>
-          );
-        })()}
+        {dataSourceOptions.length >= 2 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Source:</span>
+            <select
+              aria-label="Filter by data source"
+              value={dataSourceFilter}
+              onChange={(e) => {
+                setDataSourceFilter(e.target.value);
+                setPage(0);
+                updateUrl({ dataSource: e.target.value === "all" ? null : e.target.value, page: null });
+              }}
+              className="text-xs px-2 py-1.5 rounded-lg border border-border bg-card"
+            >
+              <option value="all">All sources ({rows.length})</option>
+              {dataSourceOptions.map(({ id, name, count }) => (
+                <option key={id} value={id}>
+                  {name} ({count})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* Funder filter */}
         {funders.length > 1 && (

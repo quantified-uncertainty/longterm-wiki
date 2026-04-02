@@ -12,7 +12,6 @@ import { SourcesTabs } from "./sources-tabs";
 import type { ResourceRow } from "../resources/resources-table";
 import type { PublicationRow } from "../publications/publications-table";
 import { DataSourcesTabContent } from "../data-sources/data-sources-tab-content";
-import { fetchDetailed, type RpcDataSourceListResult } from "@/lib/wiki-server";
 
 export const metadata: Metadata = {
   title: "Sources",
@@ -45,7 +44,7 @@ function enrichmentStageColor(stage: string): string {
   return STAGE_LOOKUP[stage]?.color ?? "bg-zinc-400";
 }
 
-export default async function SourcesPage() {
+export default function SourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
 
@@ -158,16 +157,6 @@ export default async function SourcesPage() {
     enrichmentStats.push({ stage: "other", count: otherCount });
   }
 
-  // Fetch data sources count for the tab badge (best-effort)
-  let dataSourcesCount: number | undefined;
-  const dsResult = await fetchDetailed<RpcDataSourceListResult>(
-    "/api/data-sources",
-    { revalidate: 60 },
-  );
-  if (dsResult.ok) {
-    dataSourcesCount = dsResult.data.dataSources.length;
-  }
-
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
       <div className="mb-8">
@@ -266,7 +255,6 @@ export default async function SourcesPage() {
         publicationRows={publicationRows}
         publicationCount={publications.length}
         dataSourcesContent={<DataSourcesTabContent />}
-        dataSourcesCount={dataSourcesCount}
       />
     </div>
   );

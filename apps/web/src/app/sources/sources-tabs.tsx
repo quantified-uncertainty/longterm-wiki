@@ -11,7 +11,6 @@ interface SourcesTabsProps {
   publicationCount: number;
   /** Pre-rendered data sources content (server component passed as children) */
   dataSourcesContent?: React.ReactNode;
-  dataSourcesCount?: number;
 }
 
 export function SourcesTabs({
@@ -20,7 +19,6 @@ export function SourcesTabs({
   publicationRows,
   publicationCount,
   dataSourcesContent,
-  dataSourcesCount,
 }: SourcesTabsProps) {
   return (
     <ProfileTabs
@@ -42,7 +40,6 @@ export function SourcesTabs({
               {
                 id: "data-sources",
                 label: "Data Sources",
-                count: dataSourcesCount,
                 content: dataSourcesContent,
               },
             ]
