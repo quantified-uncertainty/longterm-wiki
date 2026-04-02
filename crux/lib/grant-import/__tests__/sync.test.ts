@@ -55,7 +55,7 @@ describe("toSyncGrant", () => {
     expect(sync.granteeId).toBe("Unknown Org");
   });
 
-  it("uses defaultSourceUrl when no sourceUrl on raw grant", () => {
+  it("uses manifest fetchUrl over defaultSourceUrl for known sources", () => {
     const raw: RawGrant = {
       source: "coefficient-giving",
       funderId: "ULjDXpSLCI",
@@ -68,7 +68,24 @@ describe("toSyncGrant", () => {
       description: null,
     };
     const sync = toSyncGrant(raw, "https://coefficientgiving.org/funds/");
-    expect(sync.source).toBe("https://coefficientgiving.org/funds/");
+    // Manifest fetchUrl takes priority: the CSV download URL, not the generic org page
+    expect(sync.source).toBe("https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv");
+  });
+
+  it("uses defaultSourceUrl when source has no manifest", () => {
+    const raw: RawGrant = {
+      source: "unknown-source",
+      funderId: "ULjDXpSLCI",
+      granteeName: "Test Org",
+      granteeId: null,
+      name: "Test",
+      amount: 1000,
+      date: null,
+      focusArea: null,
+      description: null,
+    };
+    const sync = toSyncGrant(raw, "https://example.com/grants");
+    expect(sync.source).toBe("https://example.com/grants");
   });
 
   it("uses raw.sourceUrl when present (Manifund)", () => {
