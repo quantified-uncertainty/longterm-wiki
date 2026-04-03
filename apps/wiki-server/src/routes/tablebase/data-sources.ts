@@ -7,7 +7,7 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, and, count } from "drizzle-orm";
+import { eq, desc, and, count, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { dataSources, sourceSnapshots } from "../../schema.js";
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
@@ -240,8 +240,11 @@ const dataSourcesApp = new Hono()
     const [ds] = await db.select({ id: dataSources.id }).from(dataSources).where(eq(dataSources.id, dataSourceId));
     if (!ds) return notFoundError(c, "Data source not found");
 
-    // Atomic INSERT ... ON CONFLICT DO NOTHING to avoid race conditions
+    // Atomic INSERT ... ON CONFLICT DO NOTHING to avoid race conditions.
+    // Large snapshots (16-40MB raw_content) can exceed the default 30s
+    // statement_timeout, so we raise it for this transaction.
     const result = await db.transaction(async (tx) => {
+      await tx.execute(sql`SET LOCAL statement_timeout = '120000'`);
       const [inserted] = await tx
         .insert(sourceSnapshots)
         .values({

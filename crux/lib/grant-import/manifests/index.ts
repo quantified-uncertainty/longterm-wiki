@@ -210,7 +210,7 @@ const acxGrants: DataSourceManifest = {
     fields: [
       { sourceName: 'recipient', internalField: 'grantee', type: 'string' },
       { sourceName: 'amount', internalField: 'amount', type: 'number' },
-      { sourceName: 'round', internalField: 'date', type: 'string' },
+      { sourceName: 'round', internalField: 'round', type: 'string' },
       { sourceName: 'description', internalField: 'name', type: 'string' },
     ],
   },
@@ -269,8 +269,8 @@ const aria: DataSourceManifest = {
   },
   verification: {
     strategy: 'deterministic_row_match',
-    matchFields: ['grantee', 'title'],
-    fuzzyFields: ['grantee', 'title'],
+    matchFields: ['grantee', 'name'],
+    fuzzyFields: ['grantee', 'name'],
   },
 };
 
