@@ -10,26 +10,27 @@ const logger = rootLogger.child({ task: "auto-update-enqueue" });
  * Creates a job of type "auto-update" with budget and maxPages from config.
  * The job worker picks it up and runs `crux w auto-update run`.
  */
-export async function autoUpdateEnqueue(config: Config): Promise<void> {
+export async function autoUpdateEnqueue(config: Config): Promise<{ success: boolean; summary?: string }> {
   const { budget, maxPages } = config.tasks.autoUpdateEnqueue;
 
   logger.info({ budget, maxPages }, "Enqueuing auto-update job");
 
   try {
-    const result = await apiRequest<{ id: number }>("POST", "/api/jobs", {
+    const result = await apiRequest<{ id: number }>(config, "POST", "/api/jobs", {
       type: "auto-update",
       payload: { budget, maxPages },
     });
 
-    if (result.ok) {
+    if (result.ok && result.data) {
       logger.info({ jobId: result.data.id }, "Auto-update job enqueued");
-    } else {
-      logger.warn({ status: result.status }, "Failed to enqueue auto-update job");
+      return { success: true, summary: `Job #${result.data.id} enqueued` };
     }
+
+    logger.warn({ error: result.error }, "Failed to enqueue auto-update job");
+    return { success: false, summary: result.error ?? "Unknown error" };
   } catch (e: unknown) {
-    logger.error(
-      { error: e instanceof Error ? e.message : String(e) },
-      "Auto-update enqueue failed"
-    );
+    const msg = e instanceof Error ? e.message : String(e);
+    logger.error({ error: msg }, "Auto-update enqueue failed");
+    return { success: false, summary: msg };
   }
 }
