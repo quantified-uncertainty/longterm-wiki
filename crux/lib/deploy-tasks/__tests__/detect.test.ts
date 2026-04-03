@@ -418,6 +418,42 @@ describe('formatDeployTasksSection', () => {
     expect(section).not.toContain('- [x]');
   });
 
+  // 4b. Sub-PR tasks are included in output
+  it('includes sub-PR tasks alongside diff-detected tasks', () => {
+    const tasks: DeployTask[] = [
+      makeTask({ id: 'env-FOO', description: 'Set FOO in production', category: 'env' }),
+    ];
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #100)_',
+      '`migration` Run fix-data.sql _(from PR #200)_',
+    ];
+
+    const section = formatDeployTasksSection(tasks, subPrTasks);
+    expect(section).toContain('- [ ] `env` Set FOO in production');
+    expect(section).toContain('- [ ] `env` Set BAR in production _(from PR #100)_');
+    expect(section).toContain('- [ ] `migration` Run fix-data.sql _(from PR #200)_');
+    expect(section).not.toContain('No deploy tasks required.');
+
+    const checkboxLines = section.split('\n').filter((l) => l.startsWith('- [ ]'));
+    expect(checkboxLines).toHaveLength(3);
+  });
+
+  // 4c. Sub-PR tasks alone (no diff-detected tasks)
+  it('shows sub-PR tasks even when no diff-detected tasks exist', () => {
+    const subPrTasks = ['`env` Set BAZ in production _(from PR #300)_'];
+
+    const section = formatDeployTasksSection([], subPrTasks);
+    expect(section).toContain('- [ ] `env` Set BAZ in production _(from PR #300)_');
+    expect(section).not.toContain('No deploy tasks required.');
+  });
+
+  // 4d. Empty diff tasks + empty sub-PR tasks shows "No deploy tasks required"
+  it('shows "No deploy tasks required" when both sources are empty', () => {
+    const section = formatDeployTasksSection([], []);
+    expect(section).toContain('No deploy tasks required.');
+    expect(section).not.toContain('- [ ]');
+  });
+
   // 5. Tasks with special characters in description
   it('formats tasks with special characters in description', () => {
     const tasks: DeployTask[] = [

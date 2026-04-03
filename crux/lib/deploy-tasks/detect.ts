@@ -491,13 +491,19 @@ export function parseDeployTasksFromBody(body: string): ParsedDeployTasks | null
 
 /**
  * Format deploy tasks into a markdown section for PR descriptions.
+ *
+ * @param tasks - Tasks auto-detected from the file diff
+ * @param subPrTasks - Pre-formatted task strings from sub-PRs (already include PR ref)
  */
-export function formatDeployTasksSection(tasks: DeployTask[]): string {
+export function formatDeployTasksSection(
+  tasks: DeployTask[],
+  subPrTasks: string[] = []
+): string {
   const lines: string[] = [];
   lines.push("## Deploy Checklist");
   lines.push("<!-- deploy-tasks:v1 -->");
 
-  if (tasks.length === 0) {
+  if (tasks.length === 0 && subPrTasks.length === 0) {
     lines.push("No deploy tasks required.");
   } else {
     for (const task of tasks) {
@@ -506,6 +512,9 @@ export function formatDeployTasksSection(tasks: DeployTask[]): string {
         line += ` — \`${task.verifyCommand}\``;
       }
       lines.push(line);
+    }
+    for (const task of subPrTasks) {
+      lines.push(`- [ ] ${task}`);
     }
   }
 
