@@ -24,3 +24,14 @@ export type {
   StakeholderMatch,
   ResolverResult,
 } from "./stakeholder-resolver.ts";
+
+export {
+  generateVoteId,
+  buildSampleVotes,
+  syncVotesToServer,
+  fetchCongressGovRollCall,
+} from "./votes-ingest.ts";
+export type {
+  VoteRecord,
+  VoteIngestResult,
+} from "./votes-ingest.ts";

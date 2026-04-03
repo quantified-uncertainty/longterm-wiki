@@ -24,6 +24,11 @@ import type {
   PoliticalScoresByEntityResponse,
   PoliticalOffice,
   PoliticalOfficesByEntityResponse,
+  CampaignFinanceRecord,
+  CampaignFinanceByEntityResponse,
+  PoliticalVoteRecord,
+  PoliticalVotesByEntityResponse,
+  PoliticalVotesByLegislationResponse,
 } from "./types";
 
 /**
@@ -52,4 +57,46 @@ export async function fetchPoliticalOffices(
     { revalidate: 300, timeoutMs: 10_000 }
   );
   return data?.offices ?? [];
+}
+
+/**
+ * Fetch campaign finance records for an entity from the wiki-server.
+ * Returns an empty array if the server is unavailable or no data exists.
+ */
+export async function fetchCampaignFinance(
+  entityId: string
+): Promise<CampaignFinanceRecord[]> {
+  const data = await fetchFromWikiServer<CampaignFinanceByEntityResponse>(
+    `/api/campaign-finance/by-entity/${encodeURIComponent(entityId)}`,
+    { revalidate: 300, timeoutMs: 10_000 }
+  );
+  return data?.records ?? [];
+}
+
+/**
+ * Fetch political vote records for an entity (politician) from the wiki-server.
+ * Returns an empty array if the server is unavailable or no data exists.
+ */
+export async function fetchPoliticalVotes(
+  entityId: string
+): Promise<PoliticalVoteRecord[]> {
+  const data = await fetchFromWikiServer<PoliticalVotesByEntityResponse>(
+    `/api/political-votes/by-entity/${encodeURIComponent(entityId)}`,
+    { revalidate: 300, timeoutMs: 10_000 }
+  );
+  return data?.votes ?? [];
+}
+
+/**
+ * Fetch political vote records for a piece of legislation from the wiki-server.
+ * Returns an empty array if the server is unavailable or no data exists.
+ */
+export async function fetchLegislationVotes(
+  legislationEntityId: string
+): Promise<PoliticalVoteRecord[]> {
+  const data = await fetchFromWikiServer<PoliticalVotesByLegislationResponse>(
+    `/api/political-votes/by-legislation/${encodeURIComponent(legislationEntityId)}`,
+    { revalidate: 300, timeoutMs: 10_000 }
+  );
+  return data?.votes ?? [];
 }

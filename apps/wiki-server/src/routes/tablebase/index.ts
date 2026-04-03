@@ -30,3 +30,4 @@ export { predictionMarketsRoute, type PredictionMarketsRoute } from "./predictio
 export { politicalRacesRoute, type PoliticalRacesRoute } from "./political-races.js";
 export { talentFlowsRoute, type TalentFlowsRoute } from "./talent-flows.js";
 export { platformAccountsRoute, type PlatformAccountsRoute } from "./platform-accounts.js";
+export { politicalVotesRoute, type PoliticalVotesRoute } from "./political-votes.js";

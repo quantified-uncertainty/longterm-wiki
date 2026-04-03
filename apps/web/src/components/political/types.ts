@@ -64,3 +64,58 @@ export interface PoliticalOfficesByEntityResponse {
   offices: PoliticalOffice[];
   total: number;
 }
+
+// ── Campaign Finance ────────────────────────────────────────────────
+
+export interface CampaignFinanceRecord {
+  id: string;
+  politicianEntityId: string;
+  politicianDisplayName: string | null;
+  cycle: number;
+  totalRaised: string | null;
+  totalSpent: string | null;
+  cashOnHand: string | null;
+  individualContributions: string | null;
+  pacContributions: string | null;
+  smallDonorContributions: string | null;
+  selfFunding: string | null;
+  party: string | null;
+  officeType: string | null;
+  state: string | null;
+  district: string | null;
+  sourceUrl: string | null;
+  dataAsOf: string | null;
+}
+
+export interface CampaignFinanceByEntityResponse {
+  records: CampaignFinanceRecord[];
+  total: number;
+}
+
+// ── Political Vote Record ───────────────────────────────────────────
+
+export type VoteValue = "yea" | "nay" | "abstain" | "not_voting" | "present";
+
+export interface PoliticalVoteRecord {
+  id: string;
+  politicianEntityId: string;
+  politicianDisplayName: string | null;
+  legislationEntityId: string | null;
+  legislationTitle: string | null;
+  vote: string;
+  voteDate: string | null;
+  chamber: string | null;
+  rollCallNumber: number | null;
+  congressNumber: number | null;
+  sourceUrl: string | null;
+}
+
+export interface PoliticalVotesByEntityResponse {
+  votes: PoliticalVoteRecord[];
+  total: number;
+}
+
+export interface PoliticalVotesByLegislationResponse {
+  votes: PoliticalVoteRecord[];
+  total: number;
+}

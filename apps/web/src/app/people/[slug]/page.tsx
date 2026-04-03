@@ -41,6 +41,12 @@ import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-posit
 import { PoliticalInfo } from "./political-info";
 import { WikiOverview } from "./wiki-overview";
 import { EntitySources } from "./entity-sources";
+import {
+  ScorecardDisplay,
+  OfficeHistory,
+  fetchPoliticalScores,
+  fetchPoliticalOffices,
+} from "@/components/political";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
 // (e.g., entities created via tablebase enrichment in the wiki-server DB)
@@ -206,6 +212,12 @@ export default async function PersonProfilePage({
   // Policy positions (reverse lookup: find legislation where this person is a stakeholder)
   const policyPositions = getPersonPolicyPositions(entity.id, entity.name);
 
+  // Political data (scorecard ratings + office history from wiki-server)
+  const [politicalScores, politicalOffices] = await Promise.all([
+    fetchPoliticalScores(entity.id),
+    fetchPoliticalOffices(entity.id),
+  ]);
+
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
     (f) => f.propertyId !== "description",
@@ -311,12 +323,18 @@ export default async function PersonProfilePage({
     content: (
       <div className="space-y-8">
         {personEntity && <PoliticalInfo entity={personEntity} />}
+        <OfficeHistory offices={politicalOffices} />
         <ExpertPositions positions={positions} />
         <PolicyPositionsSection positions={policyPositions} />
+        <ScorecardDisplay scores={politicalScores} />
+        {/* VoteRecords — component will be created by another agent */}
+        {/* TODO: import VoteRecord from "@/components/political/vote-record" when available */}
+        {/* CampaignFinance — component will be created by another agent */}
+        {/* TODO: import CampaignFinance from "@/components/political/campaign-finance" when available */}
         <OrgRoles orgRoles={sortedOrgRoles} />
         <BoardSeats boardSeats={sortedBoardSeats} />
         {educationText && <EducationSection education={educationText} />}
-        {overviewCount === 0 && !hasWikiPage && (
+        {overviewCount === 0 && !hasWikiPage && politicalOffices.length === 0 && politicalScores.length === 0 && (
           <div className="border border-border/40 border-dashed rounded-xl px-6 py-10 text-center">
             <p className="text-sm text-muted-foreground/60">
               No positions, roles, or education recorded yet.
