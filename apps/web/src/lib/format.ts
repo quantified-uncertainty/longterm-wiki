@@ -2,6 +2,45 @@
  * Shared formatting utilities for dates, frequencies, and relative time.
  */
 
+const MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * Format an ISO date string deterministically (no locale/timezone variance).
+ *
+ * Parses the date string directly instead of using `new Date().toLocaleDateString()`
+ * which produces different results depending on server vs client timezone/locale.
+ * This prevents React hydration mismatches (error #418) in client components that
+ * render dates during the initial server-side and client-side render passes.
+ *
+ * Use this instead of `toLocaleDateString` in any "use client" component that
+ * renders a date during initial render (not just inside useEffect).
+ *
+ * @example
+ * formatDateDeterministic("2025-12-15T10:30:00Z") // "Dec 15, 2025"
+ * formatDateDeterministic("2025-12")               // "Dec 2025"
+ * formatDateDeterministic("2025")                  // "2025"
+ */
+export function formatDateDeterministic(iso: string): string {
+  try {
+    const parts = iso.split(/[-T]/);
+    const year = parts[0];
+    const month = parts[1] ? parseInt(parts[1], 10) : 0;
+    const day = parts[2] ? parseInt(parts[2], 10) : 0;
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return `${MONTH_ABBR[month - 1]} ${day}, ${year}`;
+    }
+    if (month >= 1 && month <= 12) {
+      return `${MONTH_ABBR[month - 1]} ${year}`;
+    }
+    return year || iso;
+  } catch {
+    return iso;
+  }
+}
+
 /**
  * Format a date string as relative time (e.g., "3 days ago", "2 weeks ago").
  * Uses a compact style suitable for tables and metadata displays.

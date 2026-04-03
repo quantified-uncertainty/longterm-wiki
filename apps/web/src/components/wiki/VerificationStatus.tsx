@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ShieldCheck, ChevronRight } from "lucide-react";
 import { cn } from "@lib/utils";
+import { formatDateDeterministic } from "@lib/format";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -227,7 +228,7 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
                         </td>
                         <td className="py-1.5 tabular-nums text-muted-foreground whitespace-nowrap">
                           {v.lastComputedAt
-                            ? new Date(v.lastComputedAt).toLocaleDateString()
+                            ? formatDateDeterministic(v.lastComputedAt)
                             : "-"}
                         </td>
                       </tr>

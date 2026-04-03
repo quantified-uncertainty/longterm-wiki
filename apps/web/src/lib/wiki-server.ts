@@ -426,6 +426,9 @@ type JobsClient = ReturnType<typeof hc<JobsRoute>>;
 /** Inferred response type for GET /api/jobs/stats */
 export type RpcJobsStatsResult = InferResponseType<JobsClient['stats']['$get'], 200>;
 
+/** Inferred response type for GET /api/jobs/dashboard (combined stats + failures) */
+export type RpcJobsDashboardResult = InferResponseType<JobsClient['dashboard']['$get'], 200>;
+
 /** Inferred response type for GET /api/jobs/ (list) */
 export type RpcJobsListResult = InferResponseType<JobsClient['index']['$get'], 200>;
 
