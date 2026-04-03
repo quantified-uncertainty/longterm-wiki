@@ -47,7 +47,9 @@ import { GITHUB_REPO_URL } from "@lib/site-config";
  * instead of rendering the MDX wiki page shell.
  */
 const STANDALONE_PAGE_REDIRECTS: Record<string, string> = {
+  E1043: "/resources",
   E1044: "/publications",
+  E1049: "/resources",
 };
 
 /**

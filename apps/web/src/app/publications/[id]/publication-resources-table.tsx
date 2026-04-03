@@ -27,10 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  RESOURCE_TYPE_COLORS,
-  DEFAULT_RESOURCE_TYPE_COLOR,
-} from "@/app/internal/resources/resources-data-table";
+import { RESOURCE_TYPE_COLORS } from "@/components/resources/resource-constants";
 import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 
 export interface PublicationResourceRow {
@@ -71,7 +68,7 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
       ),
       cell: ({ row }) => {
         const t = row.original.type;
-        const color = RESOURCE_TYPE_COLORS[t] || DEFAULT_RESOURCE_TYPE_COLOR;
+        const color = RESOURCE_TYPE_COLORS[t] || RESOURCE_TYPE_COLORS._default || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
         return (
           <span className={`text-xs px-1.5 py-0.5 rounded ${color}`}>{t}</span>
         );

@@ -483,7 +483,7 @@ export function FBFactsTable({ data }: { data: FactRow[] }) {
           <option value="without-source">Without source</option>
         </select>
 
-        {/* Column picker — same pattern as resources-data-table */}
+        {/* Column picker */}
         <div className="relative" ref={pickerRef}>
           <button
             onClick={() => setShowColumnPicker((v) => !v)}
