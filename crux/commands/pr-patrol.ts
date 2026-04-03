@@ -26,6 +26,8 @@ import {
   findMergeCandidates,
   JSONL_FILE,
   getParallelState,
+  getDaemonPid,
+  stopDaemon,
 } from '../pr-patrol/index.ts';
 import {
   readAllEntries,
@@ -221,9 +223,23 @@ async function mergeStatus(
   return { output: lines.join('\n') + '\n', exitCode: 0 };
 }
 
+async function stop(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const c = getColors();
+  const pid = getDaemonPid();
+  if (!pid) {
+    return { exitCode: 0, output: `${c.dim}No patrol daemon running.${c.reset}` };
+  }
+  const stopped = stopDaemon();
+  if (stopped) {
+    return { exitCode: 0, output: `${c.green}✓${c.reset} Patrol daemon stopped (PID ${pid})` };
+  }
+  return { exitCode: 1, output: `${c.red}✗ Failed to stop daemon (PID ${pid})${c.reset}` };
+}
+
 export const commands = {
   run,
   once,
+  stop,
   parallel,
   status,
   history,
@@ -240,6 +256,7 @@ PR Patrol Domain — Continuous PR maintenance daemon
 
 Commands:
   run (default)    Run the PR patrol daemon (continuous)
+  stop             Stop a running patrol daemon
   once             Single check cycle, then exit
   parallel         Parallel patrol: dispatch fixes to agent slots concurrently
   branch-agent     Per-PR persistent agent (Phase 1): dedicate full attention to one PR
