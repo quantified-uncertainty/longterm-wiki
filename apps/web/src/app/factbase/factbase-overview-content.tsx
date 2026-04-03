@@ -139,7 +139,7 @@ export function FBOverviewContent() {
         />
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Link
           href="/factbase/facts"
           className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
@@ -173,6 +173,18 @@ export function FBOverviewContent() {
           </h3>
           <p className="text-sm text-muted-foreground">
             See which entities have the most data and which need more coverage.
+          </p>
+        </Link>
+        <Link
+          href="/factbase/records"
+          className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
+        >
+          <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
+            Records Explorer
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Browse structured record collections — funding rounds, key people,
+            products, and more.
           </p>
         </Link>
       </div>
