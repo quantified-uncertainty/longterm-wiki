@@ -31,6 +31,8 @@ export interface PersonEntry {
   roleType?: "key-person" | "board" | "career";
   /** Source-check verification verdict (null if not checked) */
   verificationVerdict?: string | null;
+  /** Link to source-check detail page */
+  sourceCheckHref?: string;
 }
 
 /** Max page size accepted by the wiki-server personnel endpoint */
@@ -143,6 +145,9 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
       verificationVerdict: row.verification?.verdict ?? null,
+      sourceCheckHref: row.verification?.verdict
+        ? `/source-checks/personnel/${encodeURIComponent(row.id)}`
+        : undefined,
     });
   }
 
@@ -255,6 +260,7 @@ export function PeopleSection({
                     <span className="flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={person.verificationVerdict}
+                        href={person.sourceCheckHref}
                       />
                       {href ? (
                         <Link

@@ -151,7 +151,10 @@ export default function FundingRoundsPage() {
                 >
                   <td className="py-2 px-3">
                     <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot verdict={verdict?.verdict} />
+                      <RecordVerificationDot
+                        verdict={verdict?.verdict}
+                        href={verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(String(row.key))}` : undefined}
+                      />
                       <Link
                         href={`/funding-rounds/${row.key}`}
                         className="font-medium text-foreground text-xs hover:text-primary transition-colors"

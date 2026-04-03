@@ -352,7 +352,10 @@ export function FundingProgramsListTable({
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <span className="flex items-center gap-1.5">
-                    <RecordVerificationDot verdict={row.verdict?.verdict} />
+                    <RecordVerificationDot
+                      verdict={row.verdict?.verdict}
+                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    />
                     <Link
                       href={`/funding-programs/${row.id}`}
                       className="font-medium text-foreground hover:text-primary transition-colors"

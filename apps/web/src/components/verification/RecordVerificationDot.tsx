@@ -9,6 +9,8 @@
  * used by VerificationDot.tsx.
  */
 
+import Link from "next/link";
+
 import {
   SOURCE_CHECK_VERDICT_CONFIG,
   type SourceCheckVerdict,
@@ -20,8 +22,10 @@ interface RecordVerificationDotProps {
   verdict: string | null | undefined;
   /** Show the label text next to the dot (default: false) */
   showLabel?: boolean;
-  /** Dot size: sm = 1.5px (inline), md = 2px (table cell) */
+  /** Dot size: sm = 2px (inline), md = 2.5px (table cell) */
   size?: "sm" | "md";
+  /** Link to source-check detail page. When provided, the dot becomes clickable. */
+  href?: string;
   className?: string;
 }
 
@@ -29,6 +33,7 @@ export function RecordVerificationDot({
   verdict,
   showLabel = false,
   size = "sm",
+  href,
   className = "",
 }: RecordVerificationDotProps) {
   const UNVERIFIED_CONFIG: VerdictDisplayConfig = {
@@ -42,11 +47,11 @@ export function RecordVerificationDot({
     : UNVERIFIED_CONFIG;
   if (!config) return null; // Unknown verdict (e.g., "unchecked") — render nothing
 
-  const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
+  const dotSize = size === "md" ? "w-2.5 h-2.5" : "w-2 h-2";
 
-  return (
+  const dot = (
     <span
-      className={`inline-flex items-center gap-1 ${className}`}
+      className={`inline-flex items-center gap-1 ${href ? "cursor-pointer" : ""} ${className}`}
       title={config.label}
     >
       <span
@@ -59,4 +64,10 @@ export function RecordVerificationDot({
       )}
     </span>
   );
+
+  if (href) {
+    return <Link href={href}>{dot}</Link>;
+  }
+
+  return dot;
 }
