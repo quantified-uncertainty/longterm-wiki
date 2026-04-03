@@ -12,6 +12,10 @@
  * back to realistic sample data so the pipeline works end-to-end.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import type {
   ScorecardSource,
   FetchResult,
@@ -159,6 +163,7 @@ async function fetchLcvPage(year: number): Promise<string | null> {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on actual LCV 2024 scores.
   // Used as fallback when the LCV website blocks scraping.
+  const dir = dirname(fileURLToPath(import.meta.url));
   const sampleLegislators: Array<{
     name: string;
     party: string;
@@ -166,25 +171,7 @@ function getSampleData(year: number): ScoreRecord[] {
     district: string | null;
     score: number;
     chamber: string;
-  }> = [
-    // Senate
-    { name: "Ed Markey", party: "Democratic", state: "MA", district: null, score: 100, chamber: "Senate" },
-    { name: "Jeff Merkley", party: "Democratic", state: "OR", district: null, score: 97, chamber: "Senate" },
-    { name: "Sheldon Whitehouse", party: "Democratic", state: "RI", district: null, score: 94, chamber: "Senate" },
-    { name: "Ron Wyden", party: "Democratic", state: "OR", district: null, score: 100, chamber: "Senate" },
-    { name: "Susan Collins", party: "Republican", state: "ME", district: null, score: 31, chamber: "Senate" },
-    { name: "Bernie Sanders", party: "Independent", state: "VT", district: null, score: 94, chamber: "Senate" },
-    { name: "John Fetterman", party: "Democratic", state: "PA", district: null, score: 80, chamber: "Senate" },
-    { name: "David McCormick", party: "Republican", state: "PA", district: null, score: 0, chamber: "Senate" },
-    { name: "Ron Johnson", party: "Republican", state: "WI", district: null, score: 0, chamber: "Senate" },
-    { name: "Tammy Baldwin", party: "Democratic", state: "WI", district: null, score: 97, chamber: "Senate" },
-    // House
-    { name: "Jared Huffman", party: "Democratic", state: "CA", district: "CA-02", score: 100, chamber: "House" },
-    { name: "Alexandria Ocasio-Cortez", party: "Democratic", state: "NY", district: "NY-14", score: 100, chamber: "House" },
-    { name: "Maxwell Frost", party: "Democratic", state: "FL", district: "FL-10", score: 100, chamber: "House" },
-    { name: "Ro Khanna", party: "Democratic", state: "CA", district: "CA-17", score: 100, chamber: "House" },
-    { name: "Jahana Hayes", party: "Democratic", state: "CT", district: "CT-05", score: 100, chamber: "House" },
-  ];
+  }> = JSON.parse(readFileSync(join(dir, "fixtures/lcv-sample.json"), "utf-8"));
 
   return sampleLegislators.map((l) => ({
     id: generateScoreId(SCORER_ORG, l.name, year),

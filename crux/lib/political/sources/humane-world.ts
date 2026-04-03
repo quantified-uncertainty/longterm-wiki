@@ -14,6 +14,10 @@
  * If that fails, we use realistic sample data.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import type {
   ScorecardSource,
   FetchResult,
@@ -173,26 +177,14 @@ function normalizeParty(p: string): string {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on the 2025 Humane Scorecard "100+ Club"
   // and "Total Zeroes" lists.
+  const dir = dirname(fileURLToPath(import.meta.url));
   const samples: Array<{
     name: string;
     party: string;
     state: string;
     score: number;
     notes: string;
-  }> = [
-    // 100+ Club members (score = 100)
-    { name: "Cory Booker", party: "Democratic", state: "NJ", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Richard Blumenthal", party: "Democratic", state: "CT", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Maria Cantwell", party: "Democratic", state: "WA", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Tammy Duckworth", party: "Democratic", state: "IL", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Ed Markey", party: "Democratic", state: "MA", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Bernie Sanders", party: "Independent", state: "VT", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Susan Collins", party: "Republican", state: "ME", score: 100, notes: "100+ Club member, Senate" },
-    { name: "Brian Fitzpatrick", party: "Republican", state: "PA", score: 100, notes: "100+ Club member, House" },
-    // Total Zeroes (score = 0)
-    { name: "John Kennedy", party: "Republican", state: "LA", score: 0, notes: "Total Zeroes, Senate" },
-    { name: "Ted Cruz", party: "Republican", state: "TX", score: 0, notes: "Total Zeroes, Senate" },
-  ];
+  }> = JSON.parse(readFileSync(join(dir, "fixtures/humane-world-sample.json"), "utf-8"));
 
   return samples.map((s) => ({
     id: generateScoreId(SCORER_ORG, s.name, year),
