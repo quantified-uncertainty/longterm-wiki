@@ -51,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const org = resolveOrgBySlug(slug);
   const orgName = org?.title ?? slug;
   const parts = [grant.name];
-  if (grant.amount) parts.push(formatCompactCurrency(grant.amount, grant.currency ?? undefined));
+  if (grant.amount) parts.push(formatCompactCurrency(grant.amount));
 
   return {
     title: `${grant.name} | ${orgName} | Grants`,
@@ -135,7 +135,12 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
         {/* Amount hero */}
         {grant.amount != null && (
           <div className="text-3xl font-bold tabular-nums tracking-tight text-primary mb-1">
-            {formatCompactCurrency(grant.amount, grant.currency ?? undefined)}
+            {formatCompactCurrency(grant.amount)}
+            {grant.currency && grant.currency !== "USD" && (
+              <span className="text-base font-medium text-muted-foreground ml-2">
+                {grant.currency}
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -215,8 +220,8 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
           {grant.notes && (
             <DetailSection title="Notes">
-              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
-                {grant.notes}
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {grant.notes.replace(/\\n/g, "\n")}
               </p>
             </DetailSection>
           )}

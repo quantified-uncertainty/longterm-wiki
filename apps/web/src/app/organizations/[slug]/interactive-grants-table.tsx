@@ -747,8 +747,8 @@ function CellContent({
       ) : null;
     case "notes":
       return grant.notes ? (
-        <span className="text-muted-foreground text-xs line-clamp-2">
-          {grant.notes}
+        <span className="text-muted-foreground text-xs line-clamp-2 whitespace-pre-wrap">
+          {grant.notes.replace(/\\n/g, "\n")}
         </span>
       ) : null;
     case "verified":
