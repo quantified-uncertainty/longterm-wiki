@@ -38,9 +38,13 @@ export interface Resource {
   type_metadata?: Record<string, unknown>;
   publisher_entity_id?: string;
   related_entity_ids?: string[];
+  /** LLM enrichment pipeline stage: pending | fetched | classified | enriched | reviewed.
+   *  Distinct from fetch_status (HTTP reachability). */
   enrichment_status?: string;
   enrichment_date?: string;
   importance_score?: number;
+  /** HTTP reachability: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.
+   *  Distinct from enrichment_status (LLM pipeline stage). */
   fetch_status?: string;
   // Sub-table data (populated when fetched with details)
   paper?: ResourcePaper;

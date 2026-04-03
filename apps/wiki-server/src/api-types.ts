@@ -623,6 +623,7 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  /** HTTP reachability of the URL. Distinct from enrichmentStatus (LLM pipeline stage). */
   fetchStatus: "ok" | "dead" | "soft_404" | "not_found" | "timeout" | "unreachable" | "paywall" | "error" | null;
   lastFetchedAt: string | null;
   archiveUrl: string | null;
@@ -632,6 +633,7 @@ export interface ResourceRow {
   typeMetadata: Record<string, unknown> | null;
   publisherEntityId: string | null;
   relatedEntityIds: string[] | null;
+  /** LLM enrichment pipeline stage. Distinct from fetchStatus (HTTP reachability). */
   enrichmentStatus: string | null;
   enrichmentDate: string | null;
   importanceScore: number | null;
@@ -736,7 +738,7 @@ export interface ResourceStatsResult {
   withMetadata: number;
   /** Resources that have been fetched (fetchedAt is set). */
   fetched: number;
-  /** Breakdown by enrichment_status (null → "none"). */
+  /** Breakdown by enrichment_status (LLM pipeline stage; null → "none"). */
   byEnrichmentStatus: Record<string, number>;
   /** Content cache (citation_content) population stats. */
   contentCacheStats: {
@@ -746,8 +748,12 @@ export interface ResourceStatsResult {
   };
 }
 
-// -- Resources: Fetch status update ------------------------------------------
-
+// -- Resources: Fetch status (HTTP reachability) ----------------------------
+//
+// fetch_status tracks whether the resource URL is reachable. It is written by
+// resource-ingest (job handler) and source-fetcher after each HTTP fetch attempt.
+// This is distinct from enrichment_status (LLM pipeline stage).
+//
 // Fine-grained statuses: soft_404, not_found, timeout, unreachable are subtypes
 // of the legacy "dead" bucket. Stored as-is in the text column for richer
 // retry logic and analytics. UI code should treat them as "dead" for display.
