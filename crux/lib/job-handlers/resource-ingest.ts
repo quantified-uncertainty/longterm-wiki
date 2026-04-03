@@ -221,11 +221,9 @@ export async function handleResourceIngest(
   // throws "Resources snapshot not found" in environments without a local
   // snapshot file (e.g., GitHub Actions job workers).
   await initFromPG().catch((e: unknown) => {
-    if (ctx.verbose) {
-      console.warn(
-        `[resource-ingest] initFromPG failed: ${e instanceof Error ? e.message : String(e)}`,
-      );
-    }
+    console.warn(
+      `[resource-ingest] initFromPG failed: ${e instanceof Error ? e.message : String(e)}`,
+    );
   });
 
   const startTime = Date.now();
