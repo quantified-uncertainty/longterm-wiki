@@ -192,6 +192,11 @@ export default async function PoliticiansPage() {
         </p>
       </div>
 
+      <div className="rounded-lg border border-border/60 bg-muted/30 px-4 py-3 mb-8 text-sm text-muted-foreground">
+        This directory is actively being populated. Some entries may have
+        incomplete position data or missing sources.
+      </div>
+
       {/* Summary stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
         {stats.map((stat) => (
