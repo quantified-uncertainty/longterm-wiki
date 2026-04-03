@@ -3032,6 +3032,9 @@ export const pageSnapshots = pgTable(
       .defaultNow(),
   },
   (table) => [
+    // Note: actual SQL migration uses fetched_at DESC for most-recent-first lookups.
+    // Drizzle's index() doesn't support column-level DESC, so this is ASC here.
+    // The deployed index (0158_page_snapshots.sql) is authoritative.
     index("idx_ps_page_fetched").on(
       table.websiteSourcePageId,
       table.fetchedAt

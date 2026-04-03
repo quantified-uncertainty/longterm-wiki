@@ -13,6 +13,15 @@
 import { createHash } from 'crypto';
 import type { CommandResult } from '../lib/command-types.ts';
 
+/**
+ * Compute SHA-256 hex hash of content for dedup.
+ * Hash is computed on extracted text/markdown (not raw HTML), so minor
+ * HTML changes that don't affect content are deduplicated.
+ */
+export function computeContentHash(content: string): string {
+  return createHash('sha256').update(content).digest('hex');
+}
+
 interface Options {
   all?: boolean;
   dryRun?: boolean;
@@ -176,17 +185,14 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
 
         if (source.status !== 'ok') {
           console.warn(`    Status: ${source.status} (HTTP ${source.httpStatus})`);
-          if (source.status === 'dead' || source.status === 'error') {
+          if (source.status === 'dead' || source.status === 'error' || source.status === 'paywall') {
             totalStats.errors++;
             continue;
           }
         }
 
         // Compute content hash on extracted text (not raw HTML)
-        const contentHash = createHash('sha256')
-          .update(source.content)
-          .digest('hex')
-          .substring(0, 64);
+        const contentHash = computeContentHash(source.content);
 
         // Check if content has changed
         if (page.lastContentHash === contentHash) {

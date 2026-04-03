@@ -6,15 +6,11 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { createHash } from 'crypto';
+import { computeContentHash } from './website-sources.ts';
 
 // ---------------------------------------------------------------------------
-// Content-hash computation (mirrors the logic in website-sources.ts fetch)
+// Content-hash computation
 // ---------------------------------------------------------------------------
-
-function computeContentHash(content: string): string {
-  return createHash('sha256').update(content).digest('hex').substring(0, 64);
-}
 
 describe('computeContentHash', () => {
   it('produces a deterministic 64-char hex hash', () => {
@@ -66,7 +62,6 @@ describe('content-hash dedup logic', () => {
     const fetchedHash = computeContentHash(pageContent);
     const lastContentHash = computeContentHash(pageContent);
     expect(fetchedHash).toBe(lastContentHash);
-    // When hashes match, skip creating a snapshot
     const shouldSkip = fetchedHash === lastContentHash;
     expect(shouldSkip).toBe(true);
   });

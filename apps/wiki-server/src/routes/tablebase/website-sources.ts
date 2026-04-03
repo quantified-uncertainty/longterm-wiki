@@ -347,6 +347,14 @@ const websiteSourcesApp = new Hono()
       const { limit, offset } = c.req.valid("query");
       const db = getDrizzleDb();
 
+      // Verify source exists
+      const [source] = await db
+        .select({ id: websiteSources.id })
+        .from(websiteSources)
+        .where(eq(websiteSources.id, sourceId))
+        .limit(1);
+      if (!source) return notFoundError(c, "Website source not found");
+
       // Get all page IDs for this source
       const pages = await db
         .select({ id: websiteSourcePages.id })
@@ -406,31 +414,45 @@ const websiteSourcesApp = new Hono()
   )
 
   .get("/:sourceId/snapshots/:snapshotId", async (c) => {
+    const sourceId = c.req.param("sourceId");
     const snapshotId = c.req.param("snapshotId");
     const db = getDrizzleDb();
 
+    // Verify snapshot belongs to this source by joining through pages
     const [row] = await db
-      .select()
+      .select({
+        snapshot: pageSnapshots,
+      })
       .from(pageSnapshots)
-      .where(eq(pageSnapshots.id, snapshotId))
+      .innerJoin(
+        websiteSourcePages,
+        eq(pageSnapshots.websiteSourcePageId, websiteSourcePages.id)
+      )
+      .where(
+        and(
+          eq(pageSnapshots.id, snapshotId),
+          eq(websiteSourcePages.sourceId, sourceId)
+        )
+      )
       .limit(1);
 
     if (!row) return notFoundError(c, "Snapshot not found");
 
+    const s = row.snapshot;
     return c.json({
-      id: row.id,
-      websiteSourcePageId: row.websiteSourcePageId,
-      url: row.url,
-      fetchedAt: row.fetchedAt.toISOString(),
-      contentHash: row.contentHash,
-      fullText: row.fullText,
-      titleAtTime: row.titleAtTime,
-      httpStatus: row.httpStatus,
-      contentLength: row.contentLength,
-      extractionStatus: row.extractionStatus,
-      extractedAt: row.extractedAt?.toISOString() ?? null,
-      extractedFacts: row.extractedFacts,
-      createdAt: row.createdAt.toISOString(),
+      id: s.id,
+      websiteSourcePageId: s.websiteSourcePageId,
+      url: s.url,
+      fetchedAt: s.fetchedAt.toISOString(),
+      contentHash: s.contentHash,
+      fullText: s.fullText,
+      titleAtTime: s.titleAtTime,
+      httpStatus: s.httpStatus,
+      contentLength: s.contentLength,
+      extractionStatus: s.extractionStatus,
+      extractedAt: s.extractedAt?.toISOString() ?? null,
+      extractedFacts: s.extractedFacts,
+      createdAt: s.createdAt.toISOString(),
     });
   })
 
