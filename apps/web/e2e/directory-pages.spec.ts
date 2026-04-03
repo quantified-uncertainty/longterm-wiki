@@ -10,7 +10,8 @@ const DIRECTORY_PAGES = [
   { path: "/projects", heading: /project/i },
   { path: "/grants", heading: /grant/i },
   { path: "/funding-programs", heading: /funding/i },
-  { path: "/sources", heading: /source|publication/i },
+  { path: "/resources", heading: /resource/i },
+  { path: "/data-sources", heading: /data source/i },
 ];
 
 test.describe("Directory pages load", () => {
