@@ -8,9 +8,11 @@ import {
   getKBSlugMap,
   getKBEntities,
   resolveKBSlug,
+  getKBEntitySlug,
 } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getTypedEntities, getTypedEntityById, getTypedEntityByStableId, isPerson, isRisk, isOrganization, type AnyEntity } from "@/data";
+import { isAnySid } from "@/lib/stable-id";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
 
@@ -89,6 +91,13 @@ export function getEntityWikiHref(entity: { wikiId?: string }): string | null {
 // ── Slug utilities ──────────────────────────────────────────────
 
 /**
+ * Check if a string looks like a proper URL slug (lowercase, alphanumeric + hyphens).
+ */
+export function isProperSlug(s: string): boolean {
+  return /^[a-z0-9][a-z0-9-]*$/.test(s);
+}
+
+/**
  * Resolve a URL slug to a KB entity of a specific type.
  * Generic version of resolveOrgBySlug / resolvePersonBySlug.
  */
@@ -135,10 +144,18 @@ export function getEntitySlugs(type: "person" | "organization" | "risk"): string
   }
 
   // Entity YAML slugs (typed entities from database.json)
+  // Skip entities whose id looks like a stableId (placeholder from entity sync).
+  // For those, try to resolve to a canonical slug from the idRegistry instead.
   const filter = TYPE_FILTERS[type];
   if (filter) {
     for (const e of getTypedEntities()) {
-      if (filter(e)) allSlugs.add(e.id);
+      if (!filter(e)) continue;
+      if (isAnySid(e.id)) {
+        const canonicalSlug = e.stableId ? getKBEntitySlug(e.stableId) : undefined;
+        if (canonicalSlug) allSlugs.add(canonicalSlug);
+        continue;
+      }
+      allSlugs.add(e.id);
     }
   }
 
