@@ -52,6 +52,7 @@ function makeConfig(): Config {
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
       jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
+      autoUpdateEnqueue: { enabled: false, schedule: "0 6 * * *", budget: 30, maxPages: 5 },
     },
   };
 }
