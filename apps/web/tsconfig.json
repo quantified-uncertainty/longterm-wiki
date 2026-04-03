@@ -34,7 +34,11 @@
       "@wiki-server/data-quality-route": ["../wiki-server/src/routes/operational/data-quality.ts"],
       "@wiki-server/talent-flows-route": ["../wiki-server/src/routes/tablebase/talent-flows.ts"],
       "@wiki-server/jobs-route": ["../wiki-server/src/routes/operational/jobs.ts"],
-      "@wiki-server/data-sources-route": ["../wiki-server/src/routes/tablebase/data-sources.ts"]
+      "@wiki-server/data-sources-route": ["../wiki-server/src/routes/tablebase/data-sources.ts"],
+      "@wiki-server/political-scores-route": ["../wiki-server/src/routes/tablebase/political-scores.ts"],
+      "@wiki-server/political-offices-route": ["../wiki-server/src/routes/tablebase/political-offices.ts"],
+      "@wiki-server/political-votes-route": ["../wiki-server/src/routes/tablebase/political-votes.ts"],
+      "@wiki-server/campaign-finance-route": ["../wiki-server/src/routes/tablebase/campaign-finance.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
