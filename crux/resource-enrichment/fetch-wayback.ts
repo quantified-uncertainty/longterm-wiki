@@ -29,7 +29,7 @@ export async function fetchWaybackCommand(
   const verbose = options.verbose as boolean;
   const concurrency = (options.concurrency as number) || 3;
 
-  console.log(`\u{1f570}\ufe0f  Wayback Machine Fallback Fetcher${dryRun ? ' (DRY RUN)' : ''}\n`);
+  console.log(`🕰️  Wayback Machine Fallback Fetcher${dryRun ? ' (DRY RUN)' : ''}\n`);
 
   const resources = await loadResourcesPGFirst();
   const domainFilter = options.domain as string | undefined;
@@ -79,7 +79,7 @@ export async function fetchWaybackCommand(
 
   const toProcess = candidates.slice(0, limit);
   if (toProcess.length === 0) {
-    console.log('  \u2705 All resources already have cached content');
+    console.log('  ✅ All resources already have cached content');
     return { exitCode: 0, output: 'All resources have content' };
   }
 
@@ -100,7 +100,7 @@ export async function fetchWaybackCommand(
       const snapshot = await lookupWaybackSnapshot(r.url);
       if (!snapshot) {
         noSnapshot++;
-        if (verbose) console.log(`  \u2717 No snapshot: ${r.title || r.url}`);
+        if (verbose) console.log(`  ✗ No snapshot: ${r.title || r.url}`);
         await sleep(200); // Rate limit Wayback API
         continue;
       }
@@ -108,7 +108,7 @@ export async function fetchWaybackCommand(
       found++;
 
       if (dryRun) {
-        if (verbose) console.log(`  \u2713 Found: ${r.title || r.url} \u2192 ${snapshot.timestamp}`);
+        if (verbose) console.log(`  ✓ Found: ${r.title || r.url} → ${snapshot.timestamp}`);
         await sleep(200);
         continue;
       }
@@ -117,7 +117,7 @@ export async function fetchWaybackCommand(
       const result = await fetchWaybackContent(snapshot.url, snapshot.timestamp);
       if (!result || result.content.length < 100) {
         fetchFailed++;
-        if (verbose) console.log(`  \u2717 Fetch failed: ${r.title || r.url}`);
+        if (verbose) console.log(`  ✗ Fetch failed: ${r.title || r.url}`);
         await sleep(500);
         continue;
       }
@@ -137,11 +137,11 @@ export async function fetchWaybackCommand(
         });
         fetched++;
         if (verbose) {
-          console.log(`  \u2713 Fetched: ${r.title || r.url} (${(result.content.length / 1024).toFixed(0)}KB, ${snapshot.timestamp})`);
+          console.log(`  ✓ Fetched: ${r.title || r.url} (${(result.content.length / 1024).toFixed(0)}KB, ${snapshot.timestamp})`);
         }
       } catch (err) {
         fetchFailed++;
-        console.warn(`  \u2717 Save failed: ${r.title || r.url}: ${err instanceof Error ? err.message : String(err)}`);
+        console.warn(`  ✗ Save failed: ${r.title || r.url}: ${err instanceof Error ? err.message : String(err)}`);
       }
 
       // Update enrichment status

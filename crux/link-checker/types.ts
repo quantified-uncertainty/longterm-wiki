@@ -65,10 +65,4 @@ export interface LinkCheckReport {
   }>;
 }
 
-export interface ArchiveResult {
-  url: string;
-  archiveUrl: string | null;
-  timestamp?: string;
-}
-
 export type CheckStrategy = 'http' | 'doi' | 'arxiv' | 'forum-api' | 'unverifiable' | 'skip';

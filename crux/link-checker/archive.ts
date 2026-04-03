@@ -6,18 +6,7 @@
 
 import { sleep } from '../resource-utils.ts';
 import { lookupWaybackSnapshot } from '../lib/wayback.ts';
-import type { CheckResult, ArchiveResult } from './types.ts';
-
-// ── Archive.org Lookup ───────────────────────────────────────────────────────
-
-/** Query Wayback Machine for an archived snapshot of a URL. */
-async function lookupArchive(url: string): Promise<ArchiveResult> {
-  const snapshot = await lookupWaybackSnapshot(url);
-  if (snapshot) {
-    return { url, archiveUrl: snapshot.url, timestamp: snapshot.timestamp };
-  }
-  return { url, archiveUrl: null };
-}
+import type { CheckResult } from './types.ts';
 
 /** Look up archive.org snapshots for broken URLs. */
 export async function lookupArchiveForBroken(results: CheckResult[]): Promise<void> {
@@ -35,10 +24,10 @@ export async function lookupArchiveForBroken(results: CheckResult[]): Promise<vo
   let found = 0;
   for (let i = 0; i < broken.length; i++) {
     const result = broken[i];
-    const archive = await lookupArchive(result.url);
+    const snapshot = await lookupWaybackSnapshot(result.url);
 
-    if (archive.archiveUrl) {
-      result.archiveUrl = archive.archiveUrl;
+    if (snapshot) {
+      result.archiveUrl = snapshot.url;
       found++;
     }
 

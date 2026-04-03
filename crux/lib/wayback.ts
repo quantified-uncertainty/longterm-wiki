@@ -7,7 +7,6 @@
  */
 
 const USER_AGENT = 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)';
-const BROWSER_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)';
 
 export interface WaybackSnapshot {
   url: string;
@@ -73,7 +72,7 @@ export async function lookupWaybackSnapshot(url: string): Promise<WaybackSnapsho
 }
 
 /** Strip HTML to plain text, removing Wayback toolbar and common entities. */
-export function htmlToPlainText(html: string): string {
+function htmlToPlainText(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, '')
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -87,7 +86,7 @@ export function htmlToPlainText(html: string): string {
 }
 
 /** Extract <title> text from HTML. */
-export function extractTitleFromHtml(html: string): string | null {
+function extractTitleFromHtml(html: string): string | null {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   if (!m) return null;
   const raw = m[1].replace(/\s+/g, ' ').trim();
@@ -105,7 +104,7 @@ export async function fetchWaybackContent(
   try {
     const response = await fetch(archiveUrl, {
       headers: {
-        'User-Agent': BROWSER_USER_AGENT,
+        'User-Agent': USER_AGENT,
         Accept: 'text/html,application/xhtml+xml,*/*',
       },
       redirect: 'follow',
