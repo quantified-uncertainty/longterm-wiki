@@ -15,15 +15,14 @@
  *   crux tb political seed-offices                   Seed office data from YAML entities
  */
 
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { createHash } from "node:crypto";
 import { parse as parseYaml } from "yaml";
 import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../lib/command-types.ts";
-import { writeFileSync } from "node:fs";
-import { stringify as stringifyYaml } from "yaml";
 import {
   apiRequest,
   getServerUrl,
@@ -54,6 +53,7 @@ interface CommandOptions extends BaseOptions {
   cycle?: string;
   legislation?: string;
   dryRun?: boolean;
+  allowSample?: boolean;
 }
 
 // ---- stats command ----
@@ -574,13 +574,9 @@ async function seedOfficesCommand(
     (p) => p.tags && p.tags.includes("politics") && p.stableId
   );
 
-  function generateId(): string {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    let result = "";
-    for (let i = 0; i < 10; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+  function generateOfficeId(entityId: string, officeType: string, jurisdiction: string): string {
+    const key = `office:${entityId}:${officeType}:${jurisdiction}`;
+    return createHash("sha256").update(key).digest("base64url").substring(0, 10);
   }
 
   const offices: Array<Record<string, unknown>> = [];
@@ -596,7 +592,7 @@ async function seedOfficesCommand(
     }
 
     offices.push({
-      id: generateId(),
+      id: generateOfficeId(p.stableId!, parsed.officeType, parsed.jurisdiction),
       politicianEntityId: p.stableId!,
       politicianDisplayName: p.title,
       officeType: parsed.officeType,
@@ -858,6 +854,16 @@ async function votesIngestCommand(
       lines.push(`  ... and ${result.records.length - 10} more`);
     }
     lines.push("");
+
+    if (!dryRun && !options.allowSample) {
+      lines.push(
+        "⚠️  WARNING: This is SAMPLE data (fabricated votes for real politicians).",
+        "   Syncing sample data to the database is blocked by default.",
+        "   Pass --allow-sample to sync anyway, or use --dry-run to preview.",
+        "",
+      );
+      return { exitCode: 1, output: lines.join("\n") };
+    }
 
     if (!dryRun) {
       const syncResult = await syncVotesToServer(result.records);

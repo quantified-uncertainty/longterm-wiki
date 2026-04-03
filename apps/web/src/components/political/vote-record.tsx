@@ -15,6 +15,7 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
+import { getEntityHref } from "@/data/entity-nav";
 import type { PoliticalVoteRecord } from "./types";
 
 // ── Vote styling ────────────────────────────────────────────────────
@@ -141,7 +142,7 @@ function VoteRow({ vote }: { vote: PoliticalVoteRecord }) {
       <td className="px-4 py-2.5 font-medium max-w-[300px]">
         {vote.legislationEntityId ? (
           <a
-            href={`/wiki/${vote.legislationEntityId}`}
+            href={getEntityHref(vote.legislationEntityId)}
             className="text-foreground hover:text-primary transition-colors line-clamp-2"
           >
             {vote.legislationTitle ?? "Unknown Legislation"}

@@ -81,19 +81,19 @@ function formatRow(r: FinanceRow) {
       f.politicianEntityId,
     ),
     cycle: f.cycle,
-    totalRaised: f.totalRaised ? Number(f.totalRaised) : null,
-    totalSpent: f.totalSpent ? Number(f.totalSpent) : null,
-    cashOnHand: f.cashOnHand ? Number(f.cashOnHand) : null,
-    individualContributions: f.individualContributions
+    totalRaised: f.totalRaised != null ? Number(f.totalRaised) : null,
+    totalSpent: f.totalSpent != null ? Number(f.totalSpent) : null,
+    cashOnHand: f.cashOnHand != null ? Number(f.cashOnHand) : null,
+    individualContributions: f.individualContributions != null
       ? Number(f.individualContributions)
       : null,
-    pacContributions: f.pacContributions
+    pacContributions: f.pacContributions != null
       ? Number(f.pacContributions)
       : null,
-    smallDonorContributions: f.smallDonorContributions
+    smallDonorContributions: f.smallDonorContributions != null
       ? Number(f.smallDonorContributions)
       : null,
-    selfFunding: f.selfFunding ? Number(f.selfFunding) : null,
+    selfFunding: f.selfFunding != null ? Number(f.selfFunding) : null,
     party: f.party,
     officeType: f.officeType,
     state: f.state,

@@ -20,11 +20,9 @@ import type { CampaignFinanceRecord } from "./types";
 
 // ── Numeric parsing ─────────────────────────────────────────────────
 
-/** Parse a PG numeric string to number, returning 0 for null/invalid. */
-function toNum(value: string | null): number {
-  if (value == null) return 0;
-  const n = Number(value);
-  return isNaN(n) ? 0 : n;
+/** Convert a numeric value to number, returning 0 for null. */
+function toNum(value: number | null): number {
+  return value ?? 0;
 }
 
 // ── Funding breakdown ───────────────────────────────────────────────

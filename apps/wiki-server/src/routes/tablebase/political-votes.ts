@@ -54,7 +54,7 @@ const SyncItemSchema = z.object({
   legislationTitle: z.string().max(500).nullable().optional(),
   vote: z.enum(VALID_VOTES),
   voteDate: z.string().max(20).nullable().optional(),
-  chamber: z.string().max(20).nullable().optional(),
+  chamber: z.enum(VALID_CHAMBERS).nullable().optional(),
   rollCallNumber: z.number().int().nullable().optional(),
   congressNumber: z.number().int().nullable().optional(),
   session: z.number().int().min(1).max(2).nullable().optional(),

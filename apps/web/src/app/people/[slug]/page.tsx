@@ -216,10 +216,13 @@ export default async function PersonProfilePage({
   // TODO: These are live wiki-server calls. Political scores/offices are not yet
   // in database.json. Once they are, replace with local data reads.
   // See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
-  const [politicalScores, politicalOffices] = await Promise.all([
-    fetchPoliticalScores(entity.id),
-    fetchPoliticalOffices(entity.id),
-  ]);
+  const isPolitician = (personEntity?.tags ?? []).includes("politics");
+  const [politicalScores, politicalOffices] = isPolitician
+    ? await Promise.all([
+        fetchPoliticalScores(entity.id),
+        fetchPoliticalOffices(entity.id),
+      ])
+    : [[], []];
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
