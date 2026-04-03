@@ -14,7 +14,7 @@
  * - Unverifiable domain detection
  * - Wiki-server citation content cache lookup
  * - Paywall detection on cached content
- * - Wayback Machine fallback for dead links (configurable via DISABLE_WAYBACK_FALLBACK)
+ * - Wayback Machine fallback for dead links (configurable via WAYBACK_FALLBACK_ENABLED)
  */
 
 import {
@@ -134,7 +134,7 @@ export async function fetchSourceContent(
   }
 
   // Whether the Wayback Machine fallback is enabled (default: true).
-  // Set DISABLE_WAYBACK_FALLBACK=1 to disable.
+  // Set WAYBACK_FALLBACK_ENABLED=false to disable.
   const waybackEnabled = process.env.WAYBACK_FALLBACK_ENABLED !== 'false';
 
   // Track whether the primary URL is a dead link so we can try Wayback fallback
