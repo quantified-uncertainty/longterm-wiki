@@ -127,7 +127,7 @@ export async function fetchSubPrDeployTasks(): Promise<string[]> {
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
   const prs = await githubApi<SubPrData[]>(
-    `/repos/${REPO}/pulls?state=closed&base=main&sort=updated&direction=desc&per_page=50`
+    `/repos/${REPO}/pulls?state=closed&base=main&sort=created&direction=desc&per_page=50`
   );
 
   const tasks: string[] = [];
