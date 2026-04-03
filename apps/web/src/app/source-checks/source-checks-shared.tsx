@@ -1,25 +1,16 @@
 import { cn } from "@/lib/utils";
+import {
+  SOURCE_CHECK_VERDICT_STYLES,
+  SOURCE_CHECK_VERDICT_DESCRIPTIONS,
+  SOURCE_CHECK_VERDICT_PRIORITY,
+} from "@/components/shared/verdict-styles";
 
-// ── Verdict styling ─────────────────────────────────────────────────────
+// ── Verdict styling (from shared module) ────────────────────────────────
+// Cast to Record<string, ...> so consumers can index with `string` verdict keys
+// without needing to narrow to SourceCheckVerdictType first.
 
-export const VERDICT_STYLES: Record<string, { bg: string; text: string }> = {
-  confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600" },
-  contradicted: { bg: "bg-red-500/15", text: "text-red-600" },
-  outdated: { bg: "bg-amber-500/15", text: "text-amber-600" },
-  partial: { bg: "bg-amber-400/15", text: "text-amber-500" },
-  unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500" },
-  unchecked: { bg: "bg-gray-400/15", text: "text-gray-400" },
-};
-
-/** Tooltip descriptions for verdict types. */
-export const VERDICT_DESCRIPTIONS: Record<string, string> = {
-  confirmed: "Source evidence supports this claim.",
-  contradicted: "Source evidence contradicts this claim.",
-  outdated: "Source evidence suggests this information is no longer current.",
-  partial: "Source evidence partially supports this claim, but some details differ.",
-  unverifiable: "Unable to verify this claim from available sources.",
-  unchecked: "This claim has not yet been checked against sources.",
-};
+export const VERDICT_STYLES: Record<string, { bg: string; text: string }> = SOURCE_CHECK_VERDICT_STYLES;
+export const VERDICT_DESCRIPTIONS: Record<string, string> = SOURCE_CHECK_VERDICT_DESCRIPTIONS;
 
 export function VerdictBadge({ verdict, className }: { verdict: string; className?: string }) {
   const style = VERDICT_STYLES[verdict] || VERDICT_STYLES.unchecked;
@@ -58,14 +49,7 @@ export function buildFilterUrl(
 }
 
 /** Sort priority: most actionable verdicts first. Lower = higher priority. */
-export const VERDICT_PRIORITY: Record<string, number> = {
-  contradicted: 0,
-  outdated: 1,
-  partial: 2,
-  unverifiable: 3,
-  confirmed: 4,
-  unchecked: 5,
-};
+export const VERDICT_PRIORITY = SOURCE_CHECK_VERDICT_PRIORITY;
 
 /** Format a record type for display (capitalize). */
 export function formatRecordType(type: string): string {

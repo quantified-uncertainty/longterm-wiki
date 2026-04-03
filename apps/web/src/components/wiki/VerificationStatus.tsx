@@ -3,37 +3,17 @@
 import { useState, useEffect } from "react";
 import { ShieldCheck, ChevronRight } from "lucide-react";
 import { cn } from "@lib/utils";
+import {
+  SOURCE_CHECK_VERDICT_STYLES,
+  getSourceCheckVerdictStyle,
+  type VerdictRow,
+} from "@/components/shared/verdict-styles";
 import { formatDateDeterministic } from "@lib/format";
 
-// ── Types ────────────────────────────────────────────────────────────────
+// ── Verdict styling (from shared module) ─────────────────────────────────
 
-interface VerdictRow {
-  recordType: string;
-  recordId: string;
-  fieldName: string | null;
-  entityId: string | null;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number;
-  needsRecheck: boolean;
-  lastComputedAt: string | null;
-}
-
-// ── Verdict styling (matches entity-verifications-viewer) ────────────────
-
-const VERDICT_STYLES: Record<string, { bg: string; text: string; dot: string }> = {
-  confirmed: { bg: "bg-emerald-500/15", text: "text-emerald-600", dot: "bg-emerald-500" },
-  contradicted: { bg: "bg-red-500/15", text: "text-red-600", dot: "bg-red-500" },
-  outdated: { bg: "bg-amber-500/15", text: "text-amber-600", dot: "bg-amber-500" },
-  partial: { bg: "bg-amber-400/15", text: "text-amber-500", dot: "bg-amber-400" },
-  unverifiable: { bg: "bg-gray-500/15", text: "text-gray-500", dot: "bg-gray-400" },
-  unchecked: { bg: "bg-gray-400/15", text: "text-gray-400", dot: "bg-gray-300" },
-};
-
-function getVerdictStyle(verdict: string) {
-  return VERDICT_STYLES[verdict] ?? VERDICT_STYLES.unchecked;
-}
+const VERDICT_STYLES = SOURCE_CHECK_VERDICT_STYLES;
+const getVerdictStyle = getSourceCheckVerdictStyle;
 
 // ── Component ────────────────────────────────────────────────────────────
 
