@@ -23,6 +23,7 @@ import type { LoadedKB } from '../lib/factbase-loader.ts';
 import type { Fact, Entity as FBEntity } from '../../packages/factbase/src/types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient } from '../lib/llm.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
 import { listVerdicts, getVerificationStats } from '../lib/wiki-server/verifications.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import {
