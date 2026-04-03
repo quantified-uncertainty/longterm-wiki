@@ -271,6 +271,7 @@ properties:
     name: Monthly Active Users
     description: "Monthly active users (MAU)"
     dataType: number
+    unit: users
     category: product
     temporal: true
     appliesTo: [organization]
@@ -282,6 +283,7 @@ properties:
     name: Weekly Active Users
     description: "Weekly active users (WAU)"
     dataType: number
+    unit: users
     category: product
     temporal: true
     appliesTo: [organization]
@@ -293,6 +295,7 @@ properties:
     name: Business Customers
     description: "Number of business/enterprise customers"
     dataType: number
+    unit: count
     category: product
     temporal: true
     appliesTo: [organization]
@@ -304,6 +307,7 @@ properties:
     name: Monthly API Calls
     description: "Monthly API request volume"
     dataType: number
+    unit: count
     category: product
     temporal: true
     appliesTo: [organization]
@@ -388,6 +392,7 @@ properties:
     name: Safety Researchers
     description: "Number of employees working on safety-related research"
     dataType: number
+    unit: employees
     category: safety
     temporal: true
     appliesTo: [organization]
@@ -396,6 +401,7 @@ properties:
     name: Interpretability Team Size
     description: "Number of researchers focused on mechanistic interpretability"
     dataType: number
+    unit: employees
     category: safety
     temporal: true
     appliesTo: [organization]
@@ -519,6 +525,7 @@ properties:
     name: Grant Count
     description: "Total number of grants awarded by this organization"
     dataType: number
+    unit: count
     category: financial
     temporal: true
     appliesTo: [organization]
@@ -658,6 +665,7 @@ properties:
     name: Casualties
     description: "Number of people killed or seriously injured"
     dataType: number
+    unit: count
     category: incident
     appliesTo: [incident]
 
@@ -696,6 +704,7 @@ properties:
     name: Employee Letter Signatories
     description: "Number of AI company employees who signed a letter regarding the legislation"
     dataType: number
+    unit: count
     category: political
     appliesTo: [policy]
 
@@ -703,6 +712,7 @@ properties:
     name: Companion Bills Signed
     description: "Number of related bills signed alongside this legislation"
     dataType: number
+    unit: count
     category: legislative
     appliesTo: [policy]
 
@@ -710,6 +720,7 @@ properties:
     name: Total Amendments
     description: "Number of amendment versions the bill went through"
     dataType: number
+    unit: count
     category: legislative
     appliesTo: [policy]
 
