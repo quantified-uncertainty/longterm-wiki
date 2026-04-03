@@ -32,9 +32,9 @@ facts:
     {
         id: p78aOl0eQw,
         property: founded-by-name,
-        value: Ailsa Mellon Bruce,
+        value: Paul Mellon,
         source: https://www.wikidata.org/wiki/Q4758812,
-        notes: From Wikidata Q4758812; text value (not entity ref)
+        notes: "Founded by Paul Mellon (corrected from Ailsa Mellon Bruce per Wikidata). Ailsa Mellon Bruce was involved but is not listed as founder."
       },
     {
         id: cGuqhtGg4g,

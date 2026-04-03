@@ -48,12 +48,19 @@ export function resolveProgramName(
   return null;
 }
 
+/** Well-known acronyms that should stay uppercase after title-casing a slug. */
+const ACRONYMS = new Set(["ai", "nlp", "ml", "llm", "agi", "uk", "us", "eu", "un", "ngo", "cea", "gpi"]);
+
 /**
  * Convert a kebab-case slug to title case as a last-resort fallback.
- * e.g. "navigating-transformative-ai" -> "Navigating Transformative Ai"
+ * e.g. "navigating-transformative-ai" -> "Navigating Transformative AI"
  */
 function titleCaseFromSlug(slug: string): string {
   return slug
     .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/\b\w+/g, (word) =>
+      ACRONYMS.has(word.toLowerCase())
+        ? word.toUpperCase()
+        : word.charAt(0).toUpperCase() + word.slice(1),
+    );
 }
