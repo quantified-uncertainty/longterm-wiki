@@ -94,7 +94,10 @@ export function useServerTable<T>(
   }, [search, debounceMs]);
 
   // Build the query string (stable serialization for effect deps)
-  const extraParams = options.extraParams;
+  // Serialize extraParams to a string so inline object literals don't cause infinite re-renders
+  const extraParamsKey = options.extraParams
+    ? JSON.stringify(options.extraParams)
+    : "";
   const queryKey = useMemo(() => {
     const params = new URLSearchParams();
     params.set("limit", String(pageSize));
@@ -104,13 +107,15 @@ export function useServerTable<T>(
     for (const [k, v] of Object.entries(filters)) {
       if (v) params.set(k, v);
     }
-    if (extraParams) {
-      for (const [k, v] of Object.entries(extraParams)) {
+    if (extraParamsKey) {
+      for (const [k, v] of Object.entries(
+        JSON.parse(extraParamsKey) as Record<string, string>,
+      )) {
         params.set(k, v);
       }
     }
     return params.toString();
-  }, [pageSize, page, debouncedSearch, sort, filters, extraParams]);
+  }, [pageSize, page, debouncedSearch, sort, filters, extraParamsKey]);
 
   // Fetch data when query changes
   useEffect(() => {
