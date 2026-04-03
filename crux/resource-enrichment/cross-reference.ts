@@ -59,6 +59,8 @@ function buildDomainToOrgMap(entities: EntityEntry[]): Map<string, string> {
     'aisafety.com': 'center-for-ai-safety',
     'safe.ai': 'center-for-ai-safety',
     'aisi.gov.uk': 'uk-aisi',
+    'lesswrong.com': 'lesswrong',
+    'forum.effectivealtruism.org': 'cea',
   };
 
   for (const [domain, entityId] of Object.entries(knownMappings)) {

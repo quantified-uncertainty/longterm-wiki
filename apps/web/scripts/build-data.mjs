@@ -827,9 +827,14 @@ async function main() {
   // Uses 3 sources: inline <R id="...">, cited_by reverse index, URL matching.
   // Must run BEFORE rawContent is deleted (needs page body for URL extraction).
   // =========================================================================
-  // Build URL → resource ID map (used by pageResources)
+  // Build URL → resource ID map (used by pageResources URL matching).
+  // Exclude forum posts (lesswrong, ea-forum, alignment-forum) from URL matching
+  // to prevent casual links to forum posts from appearing as formal page citations.
+  // Forum posts should only be associated via explicit <R> citations or cited_by.
+  const FORUM_PUBLICATION_IDS = new Set(['lesswrong', 'ea-forum', 'alignment-forum']);
   const urlToId = new Map();
   for (const [url, resource] of urlToResource.entries()) {
+    if (resource.publication_id && FORUM_PUBLICATION_IDS.has(resource.publication_id)) continue;
     urlToId.set(url, resource.id);
   }
 
