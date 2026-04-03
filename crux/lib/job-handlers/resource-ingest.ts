@@ -26,6 +26,7 @@ import { createHash } from 'crypto';
 import { z } from 'zod';
 import { isPrivateHost } from '../source-check/source-fetcher.ts';
 import { fetchSource, type FetchedSourceStatus } from '../search/source-fetcher.ts';
+import { initFromPG } from '../search/resource-lookup.ts';
 import { createJob } from '../wiki-server/jobs.ts';
 import { updateResourceFetchStatus, findResourcesByContentHash } from '../wiki-server/resources.ts';
 
@@ -214,6 +215,18 @@ export async function handleResourceIngest(
   if (ctx.verbose) {
     console.log(`[resource-ingest] Ingesting ${url} (resource=${resourceId})`);
   }
+
+  // Initialize resource cache from PG before fetchSource() tries to look up
+  // resources. Without this, the synchronous fallback in resource-lookup.ts
+  // throws "Resources snapshot not found" in environments without a local
+  // snapshot file (e.g., GitHub Actions job workers).
+  await initFromPG().catch((e: unknown) => {
+    if (ctx.verbose) {
+      console.warn(
+        `[resource-ingest] initFromPG failed: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  });
 
   const startTime = Date.now();
 

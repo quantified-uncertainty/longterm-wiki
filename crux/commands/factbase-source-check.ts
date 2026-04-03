@@ -3,7 +3,7 @@
  *
  * Checks KB facts against their source URLs using an LLM.
  * For each fact with a source URL, reads cached content from citation_content
- * (populated by the resource-verify worker), builds an LLM prompt, and parses
+ * (populated by the resource-ingest worker), builds an LLM prompt, and parses
  * the response to determine whether the source confirms, contradicts, or
  * doesn't address the claim.
  *
@@ -139,7 +139,7 @@ async function verifySingleFact(
   const formattedValue = formatFactValue(fact, property, graph);
   const sourceUrl = fact.source!;
 
-  // Fetch source content from citation_content cache (populated by resource-verify worker)
+  // Fetch source content from citation_content cache (populated by resource-ingest worker)
   const fetchResult = await fetchSourceContent(sourceUrl, undefined, '[fb-source-check]');
   if (!fetchResult.content) {
     return {
