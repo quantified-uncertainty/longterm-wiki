@@ -8,6 +8,8 @@ const logger = rootLogger.child({ component: "db" });
 /**
  * Create a PaginationQuery schema with configurable limits.
  * Each route can call this with its own defaults while sharing the base shape.
+ * Values above maxLimit are clamped (not rejected) so clients requesting larger
+ * pages get the maximum allowed rather than a 400 error.
  */
 export function paginationQuery(opts?: {
   maxLimit?: number;

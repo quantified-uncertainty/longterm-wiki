@@ -276,7 +276,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
   const map = new Map<string, VerifiedFactInfo>();
 
   try {
-    const response = await listVerdicts({ recordType: 'fact', limit: 500, offset: 0 });
+    const response = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset: 0 });
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -291,7 +291,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
       // Paginate if there are more verdicts
       let offset = response.data.verdicts.length;
       while (offset < response.data.total) {
-        const nextResponse = await listVerdicts({ recordType: 'fact', limit: 500, offset });
+        const nextResponse = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset });
 
         if (!nextResponse.ok || !nextResponse.data) break;
         for (const v of nextResponse.data.verdicts) {
@@ -321,7 +321,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
   const map = new Map<string, VerifiedRecordInfo>();
 
   try {
-    const PAGE_SIZE = 500;
+    const PAGE_SIZE = 200; // Must not exceed wiki-server MAX_PAGE_SIZE (200)
     let offset = 0;
 
     while (true) {

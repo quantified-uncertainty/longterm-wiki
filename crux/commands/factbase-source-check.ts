@@ -15,6 +15,7 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
@@ -49,8 +50,6 @@ interface VerifyCommandOptions extends BaseOptions {
   ci?: boolean;
 }
 
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial';
-
 interface VerificationResult {
   factId: string;
   entityId: string;
@@ -60,7 +59,7 @@ interface VerificationResult {
   formattedValue: string;
   sourceUrl: string;
   asOf?: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
@@ -176,9 +175,9 @@ async function verifySingleFact(
       reasoning: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
 
     // Add archive provenance note to reasoning if verified via Wayback Machine

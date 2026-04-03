@@ -19,19 +19,30 @@
  *   - dryRun: boolean (optional) — if true, plans but doesn't create child jobs
  */
 
-import type { JobHandlerContext, JobHandlerResult, AutoUpdateDigestParams } from './types.ts';
+import { z } from 'zod';
+import type { JobHandlerContext, JobHandlerResult } from './types.ts';
 import { createJob, createJobBatch } from '../wiki-server/jobs.ts';
+
+// ---------------------------------------------------------------------------
+// Params validation
+// ---------------------------------------------------------------------------
+
+const AutoUpdateDigestParamsSchema = z.object({
+  budget: z.number().default(50),
+  maxPages: z.number().default(10),
+  sources: z.string().optional(),
+  dryRun: z.boolean().default(false),
+});
 
 export async function handleAutoUpdateDigest(
   params: Record<string, unknown>,
   ctx: JobHandlerContext,
 ): Promise<JobHandlerResult> {
-  const {
-    budget = 50,
-    maxPages = 10,
-    sources,
-    dryRun = false,
-  } = params as unknown as AutoUpdateDigestParams;
+  const parsed = AutoUpdateDigestParamsSchema.safeParse(params);
+  if (!parsed.success) {
+    return { success: false, data: {}, error: `Invalid params: ${parsed.error.message}` };
+  }
+  const { budget, maxPages, sources, dryRun } = parsed.data;
 
   if (ctx.verbose) {
     console.log(`[auto-update-digest] Starting (budget: $${budget}, maxPages: ${maxPages}, dryRun: ${dryRun})`);

@@ -26,7 +26,7 @@ import { parseJsonResponse } from '../lib/anthropic.ts';
 import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getVerificationStats } from '../lib/wiki-server/verifications.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
-import type { VerificationVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -48,7 +48,7 @@ interface VerifiableClaim {
 
 interface VerificationResult {
   claim: VerifiableClaim;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
@@ -222,7 +222,7 @@ Respond with ONLY a JSON object:
     });
 
     const parsed = parseJsonResponse(result.text) as {
-      verdict?: VerificationVerdict;
+      verdict?: SourceCheckVerdict;
       confidence?: number;
       extracted_value?: string;
       reasoning?: string;
@@ -275,7 +275,7 @@ async function storeAggregateVerdict(
   recordType: string,
   recordId: string,
   entityId: string,
-  verdict: VerificationVerdict,
+  verdict: SourceCheckVerdict,
   confidence: number,
   reasoning: string,
 ): Promise<void> {

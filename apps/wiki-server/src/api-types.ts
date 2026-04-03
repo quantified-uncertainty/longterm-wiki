@@ -63,11 +63,6 @@ export const VALID_SOURCE_CHECK_VERDICTS = [
 
 export type SourceCheckVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
 
-/** @deprecated Use VALID_SOURCE_CHECK_VERDICTS */
-export const VALID_VERIFICATION_VERDICTS = VALID_SOURCE_CHECK_VERDICTS;
-/** @deprecated Use SourceCheckVerdict */
-export type VerificationVerdict = SourceCheckVerdict;
-
 // ---------------------------------------------------------------------------
 // Edit Logs
 // ---------------------------------------------------------------------------
@@ -225,8 +220,8 @@ export const UpsertCitationContentSchema = z.object({
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
   pageTitle: z.string().max(1000).nullable().optional(),
-  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional(),
-  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional(),
+  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
+  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
   contentLength: z.number().int().nullable().optional(),
   contentHash: z.string().max(64).nullable().optional(),
   /** How content was fetched: firecrawl, built-in, youtube-transcript, abstract */

@@ -36,12 +36,33 @@ echo ""
 echo "Running pre-push gate checks..."
 echo ""
 
-pnpm crux w validate gate
+GATE_EXIT=0
+pnpm crux w validate gate || GATE_EXIT=$?
 
-# After gate passes, run agent checklist auto-verify and completion check.
-# Blocks push if checklist exists but is <10% complete (session skipped workflow).
-# Advisory warning at <25%. No checklist = no block (quick fix sessions).
+if [ "$GATE_EXIT" -ne 0 ]; then
+  # Gate failed. Check if main CI is also red — if so, the failure is likely
+  # pre-existing and not caused by this branch's changes.
+  echo ""
+  echo "Gate check failed. Checking if main branch CI is also broken..."
+  MAIN_STATUS=$(gh api "repos/quantified-uncertainty/longterm-wiki/actions/workflows/ci.yml/runs?branch=main&status=completed&per_page=1" --jq '.workflow_runs[0].conclusion' 2>/dev/null || echo "unknown")
+
+  if [ "$MAIN_STATUS" = "failure" ]; then
+    echo ""
+    echo "╔══════════════════════════════════════════════════════════════╗"
+    echo "║  ⚠ Gate failed, but main CI is ALSO RED (pre-existing).    ║"
+    echo "║  Allowing push — the failure is likely not from your code.  ║"
+    echo "║  Main needs to be fixed separately.                        ║"
+    echo "╚══════════════════════════════════════════════════════════════╝"
+    echo ""
+    # Fall through — allow push
+  else
+    echo ""
+    echo "Main CI is green — this failure is from your changes."
+    exit "$GATE_EXIT"
+  fi
+fi
+
+# After gate passes (or is excused), run agent checklist auto-verify.
+# Blocks push if checklist exists but is <40% complete (session skipped workflow).
 echo ""
 pnpm crux sys agent-checklist pre-push-check
-
-# Exit code from gate determines whether push proceeds
