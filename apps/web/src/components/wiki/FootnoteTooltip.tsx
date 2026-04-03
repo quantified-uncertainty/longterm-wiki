@@ -4,6 +4,7 @@ import React from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { ExternalLink, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
+import { formatDateDeterministic } from "@lib/format";
 import { isSafeUrl } from "@lib/url-utils";
 import { formatDateDeterministic } from "@lib/format";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
