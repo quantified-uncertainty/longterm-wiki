@@ -28,7 +28,6 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
-  getPublicationByDomain,
   getPagesForResource,
   getLiteraturePapers,
   type Resource,
@@ -763,10 +762,7 @@ export function resolveResourceAuthors(r: Resource): AuthorRef[] {
 function toOrgResourceRow(r: Resource): OrgResourceRow {
   const publication = getResourcePublication(r);
   const domain = extractDomain(r.url);
-  // Fall back to domain-based publication lookup when resource has no publication_id
-  const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
-  const effectivePub = publication ?? domainPub;
-  const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
+  const credibility = getResourceCredibility(r) ?? null;
   const citingPages = getPagesForResource(r.id);
   return {
     id: r.id,
@@ -774,7 +770,7 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     url: r.url,
     type: r.type,
     domain,
-    publicationName: effectivePub?.name ?? null,
+    publicationName: publication?.name ?? null,
     credibility,
     citingPageCount: citingPages.length,
     publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,

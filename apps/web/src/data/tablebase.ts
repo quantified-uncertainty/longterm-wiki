@@ -898,13 +898,27 @@ export function getPublicationByDomain(domain: string): Publication | undefined 
   return undefined;
 }
 
+/** Extract bare domain from a URL (no www prefix). Returns null on parse failure. */
+function extractDomainFromUrl(url: string): string | null {
+  try {
+    return new URL(url).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 export function getResourceCredibility(
   resource: Resource
 ): number | undefined {
   if (resource.credibility_override !== undefined) return resource.credibility_override;
   if (resource.publication_id) {
     const pub = getPublicationById(resource.publication_id);
-    return pub?.credibility;
+    if (pub?.credibility !== undefined) return pub.credibility;
+  }
+  const domain = extractDomainFromUrl(resource.url);
+  if (domain) {
+    const domainPub = getPublicationByDomain(domain);
+    if (domainPub?.credibility !== undefined) return domainPub.credibility;
   }
   return undefined;
 }
@@ -913,7 +927,12 @@ export function getResourcePublication(
   resource: Resource
 ): Publication | undefined {
   if (resource.publication_id) {
-    return getPublicationById(resource.publication_id);
+    const pub = getPublicationById(resource.publication_id);
+    if (pub) return pub;
+  }
+  const domain = extractDomainFromUrl(resource.url);
+  if (domain) {
+    return getPublicationByDomain(domain);
   }
   return undefined;
 }

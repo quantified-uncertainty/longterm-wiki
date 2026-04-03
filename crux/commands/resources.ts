@@ -160,6 +160,14 @@ commands['enrich-crossref'] = enrichCrossrefCommand;
 commands['discover-forums'] = discoverForumsCommand;
 commands['enrich-rand-dates'] = enrichRandDatesCommand;
 
+
+// map-publications
+commands["map-publications"] = async function (_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const { mapPublications } = await import("./resources/map-publications.ts");
+  await mapPublications({ apply: !!options.apply, top: options.top !== undefined ? Number(options.top) : undefined, verbose: !!options.verbose });
+  return { output: "", exitCode: 0 };
+};
+
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
   console.log('Running all free enrichment commands...\n');

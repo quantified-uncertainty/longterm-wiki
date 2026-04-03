@@ -13,7 +13,6 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
-  getPublicationByDomain,
   getPagesForResource,
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
@@ -584,13 +583,10 @@ export default async function LegislationDetailPage({
     if (!r) continue;
     const publication = getResourcePublication(r);
     const domain = extractDomain(r.url);
-    // Fall back to domain-based publication lookup when resource has no publication_id
-    const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
-    const effectivePub = publication ?? domainPub;
-    const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
+    const credibility = getResourceCredibility(r) ?? null;
     const citingPages = getPagesForResource(rid);
-    if (effectivePub?.type) {
-      pubTypeByResourceId.set(rid, effectivePub.type);
+    if (publication?.type) {
+      pubTypeByResourceId.set(rid, publication.type);
     }
     pressResources.push({
       id: rid,
@@ -598,7 +594,7 @@ export default async function LegislationDetailPage({
       url: r.url,
       type: r.type ?? "web",
       domain,
-      publicationName: effectivePub?.name ?? null,
+      publicationName: publication?.name ?? null,
       credibility,
       citingPageCount: citingPages.length,
       publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
