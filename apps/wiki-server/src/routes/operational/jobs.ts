@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, and, count, sql, desc, gte } from "drizzle-orm";
+import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDb, getDrizzleDb } from "../../db.js";
 import { jobs } from "../../schema.js";
 import {
@@ -558,19 +558,15 @@ const jobsApp = new Hono()
   })
 
   // ---- GET /stats (aggregate counts by type and status) ----
-  // Supports optional `since` query parameter (ISO 8601 timestamp) to filter
-  // jobs created after that time. Without `since`, returns all-time stats.
+  // Accepts optional ?hours=N query param (default 48) to time-window failure
+  // rate and avg-duration calculations. Status counts are always all-time.
 
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
+    const hours = Math.max(1, Number(c.req.query("hours")) || 48);
+    const recentCutoff = sql`NOW() - make_interval(hours => ${hours})`;
 
-    // Parse optional time window
-    const sinceParam = c.req.query("since");
-    const sinceDate = sinceParam ? new Date(sinceParam) : null;
-    const timeFilter = sinceDate && !isNaN(sinceDate.getTime())
-      ? gte(jobs.createdAt, sinceDate)
-      : undefined;
-
+    // Status counts are all-time (for pending/running visibility)
     const byTypeStatus = await db
       .select({
         type: jobs.type,
@@ -578,10 +574,9 @@ const jobsApp = new Hono()
         count: count(),
       })
       .from(jobs)
-      .where(timeFilter)
       .groupBy(jobs.type, jobs.status);
 
-    // Compute average duration for completed jobs
+    // Compute average duration for recently completed jobs
     const avgDuration = await db
       .select({
         type: jobs.type,
@@ -593,12 +588,12 @@ const jobsApp = new Hono()
           eq(jobs.status, "completed"),
           sql`${jobs.startedAt} IS NOT NULL`,
           sql`${jobs.completedAt} IS NOT NULL`,
-          timeFilter,
+          sql`${jobs.createdAt} >= ${recentCutoff}`
         )
       )
       .groupBy(jobs.type);
 
-    // Failure rate per type
+    // Failure rate per type — only recent jobs so stale history doesn't inflate rates
     const failureRate = await db
       .select({
         type: jobs.type,
@@ -606,10 +601,12 @@ const jobsApp = new Hono()
         failed: sql<number>`sum(case when ${jobs.status} = 'failed' then 1 else 0 end)`,
       })
       .from(jobs)
-      .where(and(
-        sql`${jobs.status} IN ('completed', 'failed')`,
-        timeFilter,
-      ))
+      .where(
+        and(
+          sql`${jobs.status} IN ('completed', 'failed')`,
+          sql`${jobs.createdAt} >= ${recentCutoff}`
+        )
+      )
       .groupBy(jobs.type);
 
     // Build summary

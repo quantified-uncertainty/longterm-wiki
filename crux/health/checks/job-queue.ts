@@ -2,17 +2,14 @@
  * Job Queue Health Check
  *
  * Fetches /api/jobs/stats from wiki-server and checks for:
- *   - High failure rates (>50% with >5 total jobs of that type) in the last 24h
- *   - Large pending backlogs (>100 pending for any single type)
+ *   - High failure rates (>70% with >20 recent jobs of that type)
+ *   - Large pending backlogs (>300 pending for any single type)
  *
- * Uses a 24-hour time window for failure rate calculations to avoid
- * historical failures permanently poisoning the health check.
+ * The stats endpoint returns failure rates computed over the last 48 hours
+ * by default, so stale historical failures don't inflate the rate.
  */
 
 import type { CheckResult } from '../health-check.ts';
-
-/** Time window for stats (24 hours). */
-const STATS_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 interface JobTypeStats {
   byStatus: Record<string, number>;
@@ -40,10 +37,9 @@ export async function checkJobQueue(): Promise<CheckResult> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-  const since = new Date(Date.now() - STATS_WINDOW_MS).toISOString();
   let data: JobStatsResponse;
   try {
-    const res = await fetch(`${serverUrl}/api/jobs/stats?since=${encodeURIComponent(since)}`, {
+    const res = await fetch(`${serverUrl}/api/jobs/stats`, {
       headers,
       signal: AbortSignal.timeout(15_000),
     });
@@ -68,7 +64,7 @@ export async function checkJobQueue(): Promise<CheckResult> {
   }
 
   const totalJobs = data.totalJobs ?? 0;
-  detail.push(`Total jobs (last 24h): ${totalJobs}`);
+  detail.push(`Total jobs: ${totalJobs}`);
 
   const byType = data.byType ?? {};
 
@@ -84,7 +80,7 @@ export async function checkJobQueue(): Promise<CheckResult> {
     // Total across all statuses for this job type
     const totalType = Object.values(statusCounts).reduce((sum, n) => sum + n, 0);
 
-    if (failurePct > 50 && totalType > 5) {
+    if (failurePct > 70 && totalType > 20) {
       detail.push(`WARN  ${jobType}: ${failurePct}% failure rate (${failed} failed)`);
       failures.push(`${jobType}: ${failurePct}% failure rate`);
     } else {
@@ -94,7 +90,7 @@ export async function checkJobQueue(): Promise<CheckResult> {
     }
 
     // Alert on large pending backlog
-    if (pending > 100) {
+    if (pending > 300) {
       detail.push(`WARN  ${jobType}: ${pending} pending jobs (backlog)`);
       failures.push(`${jobType}: ${pending} pending jobs (large backlog)`);
     }
