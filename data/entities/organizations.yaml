@@ -9510,7 +9510,7 @@
 - id: amazon
   stableId: sid_JGiOzSoZPc
   type: organization
-  orgType: company
+  orgType: generic
   title: Amazon
   website: https://www.amazon.com
   description: >-
@@ -9522,7 +9522,7 @@
 - id: ibm
   stableId: sid_9N0hqjccSg
   type: organization
-  orgType: company
+  orgType: generic
   title: IBM
   website: https://www.ibm.com
   description: >-
@@ -9546,7 +9546,7 @@
 - id: rainn
   stableId: sid_g5EKAHeU8m
   type: organization
-  orgType: nonprofit
+  orgType: other
   title: RAINN
   alternateNames:
     - Rape, Abuse & Incest National Network
@@ -9560,7 +9560,7 @@
 - id: common-sense-media
   stableId: sid_WchSgl5dux
   type: organization
-  orgType: nonprofit
+  orgType: other
   title: Common Sense Media
   website: https://www.commonsensemedia.org
   description: >-
@@ -9572,7 +9572,7 @@
 - id: netchoice
   stableId: sid_dGOSxJk8o6
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: NetChoice
   website: https://netchoice.org
   description: >-
@@ -9585,7 +9585,7 @@
 - id: digitaleurope
   stableId: sid_Qo6YeaRskH
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: DigitalEurope
   website: https://www.digitaleurope.org
   description: >-
@@ -9597,7 +9597,7 @@
 - id: ccia-europe
   stableId: sid_UEYMSjORoB
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: CCIA Europe
   alternateNames:
     - Computer & Communications Industry Association Europe
@@ -9611,7 +9611,7 @@
 - id: us-chamber-of-commerce
   stableId: sid_cQQdrABVv0
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: US Chamber of Commerce
   website: https://www.uschamber.com
   description: >-
@@ -9623,7 +9623,7 @@
 - id: california-chamber-of-commerce
   stableId: sid_dfTNfp0gNE
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: California Chamber of Commerce
   website: https://www.calchamber.com
   description: >-
@@ -9635,7 +9635,7 @@
 - id: techequity-action
   stableId: sid_UvwjWas2wl
   type: organization
-  orgType: nonprofit
+  orgType: other
   title: TechEquity Action
   website: https://techequitycollaborative.org
   description: >-
@@ -9647,7 +9647,7 @@
 - id: texas-public-policy-foundation
   stableId: sid_WHAEpX4KJm
   type: organization
-  orgType: think-tank
+  orgType: other
   title: Texas Public Policy Foundation
   website: https://www.texaspolicy.com
   description: >-
@@ -9659,7 +9659,7 @@
 - id: government-accountability-project
   stableId: sid_iqjACwHMCW
   type: organization
-  orgType: nonprofit
+  orgType: other
   title: Government Accountability Project
   website: https://www.whistleblower.org
   description: >-
@@ -9671,7 +9671,7 @@
 - id: council-of-europe
   stableId: sid_18BRxYIVxX
   type: organization
-  orgType: international
+  orgType: government
   title: Council of Europe
   website: https://www.coe.int
   description: >-
@@ -9684,7 +9684,7 @@
 - id: alliance-for-secure-ai
   stableId: sid_ewHH8hqYZD
   type: organization
-  orgType: advocacy
+  orgType: other
   title: Alliance for Secure AI
   description: >-
     Coalition advocating for AI safety standards and regulation. Opposes frameworks seen
@@ -9695,7 +9695,7 @@
 - id: ai-alliance
   stableId: sid_aF9wqaoCNa
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: AI Alliance
   website: https://thealliance.ai
   description: >-
@@ -9707,7 +9707,7 @@
 - id: edri
   stableId: sid_7h0u4ulMdb
   type: organization
-  orgType: nonprofit
+  orgType: other
   title: European Digital Rights (EDRi)
   alternateNames:
     - EDRi
@@ -9721,7 +9721,7 @@
 - id: cigi
   stableId: sid_CyKa5eLcCl
   type: organization
-  orgType: think-tank
+  orgType: other
   title: Centre for International Governance Innovation (CIGI)
   alternateNames:
     - CIGI
@@ -9735,7 +9735,7 @@
 - id: tech-nyc
   stableId: sid_CIiQ2Cjm4E
   type: organization
-  orgType: industry-group
+  orgType: generic
   title: Tech:NYC
   website: https://www.technyc.org
   description: >-
@@ -9747,7 +9747,7 @@
 - id: common-sense-institute
   stableId: sid_cXahhtwW2D
   type: organization
-  orgType: think-tank
+  orgType: other
   title: Common Sense Institute
   website: https://commonsenseinstituteco.org
   description: >-
