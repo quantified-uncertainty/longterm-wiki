@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#
+# Post-checkout hook — repairs .agent-slot after branch switches.
+#
+# .agent-slot gets deleted when checking out branches that predate the
+# April 2026 fix that untracked it from git. This hook recreates it
+# immediately from the directory name.
+#
+# See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3779
+#
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
+[ -z "$REPO_ROOT" ] && exit 0
+
+DIR_NAME=$(basename "$REPO_ROOT")
+AGENT_SLOT_FILE="$REPO_ROOT/.agent-slot"
+
+# Only applies to agent slot directories (a1, a2, ..., a20)
+if [[ "$DIR_NAME" =~ ^a([0-9]+)$ ]]; then
+  EXPECTED="${BASH_REMATCH[1]}"
+  CURRENT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
+  if [ "$CURRENT" != "$EXPECTED" ]; then
+    echo "$EXPECTED" > "$AGENT_SLOT_FILE"
+  fi
+fi

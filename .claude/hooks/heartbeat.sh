@@ -41,8 +41,18 @@ if curl -s --max-time 3 \
   -d '{}' >/dev/null 2>&1; then
   touch "$HEARTBEAT_FILE"
 
-  # Update tmux window with current branch + PR info
+  # Self-heal .agent-slot if missing (git operations on stale branches delete it)
+  # See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3779
   AGENT_SLOT_FILE="$REPO_ROOT/.agent-slot"
+  DIR_NAME=$(basename "$REPO_ROOT")
+  if [[ "$DIR_NAME" =~ ^a([0-9]+)$ ]]; then
+    SLOT_FROM_DIR="${BASH_REMATCH[1]}"
+    CURRENT_SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
+    if [ "$CURRENT_SLOT" != "$SLOT_FROM_DIR" ]; then
+      echo "$SLOT_FROM_DIR" > "$AGENT_SLOT_FILE"
+    fi
+  fi
+
   if [ -f "$AGENT_SLOT_FILE" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
     SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null || true)
     CURRENT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo "?")
