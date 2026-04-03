@@ -37,6 +37,7 @@ export interface PublicationResourceRow {
   id: string;
   title: string;
   type: string;
+  authors: string[];
   publishedDate: string | null;
   hasSummary: boolean;
   citingPageCount: number;
@@ -73,6 +74,33 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
         const color = RESOURCE_TYPE_COLORS[t] || DEFAULT_RESOURCE_TYPE_COLOR;
         return (
           <span className={`text-xs px-1.5 py-0.5 rounded ${color}`}>{t}</span>
+        );
+      },
+    },
+    {
+      accessorKey: "authors",
+      header: "Authors",
+      cell: ({ row }) => {
+        const authors = row.original.authors;
+        if (!authors.length)
+          return (
+            <span className="text-muted-foreground/40 text-xs">{"\u2014"}</span>
+          );
+        const display = authors.slice(0, 2);
+        const remaining = authors.length - display.length;
+        return (
+          <span
+            className="text-xs text-muted-foreground max-w-[180px] truncate block"
+            title={authors.join(", ")}
+          >
+            {display.join(", ")}
+            {remaining > 0 && ` +${remaining}`}
+          </span>
+        );
+      },
+      filterFn: (row, _columnId, filterValue: string) => {
+        return row.original.authors.some((a) =>
+          a.toLowerCase().includes(filterValue.toLowerCase()),
         );
       },
     },

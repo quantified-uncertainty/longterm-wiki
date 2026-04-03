@@ -85,6 +85,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
       id: r.id,
       title: r.title,
       type: r.type,
+      authors: r.authors ?? [],
       publishedDate: r.published_date ?? null,
       hasSummary: !!r.summary,
       citingPageCount: citingPages.length,

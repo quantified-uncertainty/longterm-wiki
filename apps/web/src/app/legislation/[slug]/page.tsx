@@ -481,11 +481,12 @@ export default async function LegislationDetailPage({
   }
 
   // History tab (amendments + key figures)
-  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0 || entity.keyFigures.length > 0) {
+  const historyItemCount = entity.amendments.length + entity.keyPoliticians.length + entity.keyFigures.length;
+  if (historyItemCount > 0) {
     tabs.push({
       id: "history",
       label: "History",
-      count: entity.amendments.length,
+      count: historyItemCount,
       content: (
         <div className="space-y-8">
           {/* Key Politicians */}
