@@ -11,6 +11,8 @@ export interface FetchSourceResult {
   errorMessage?: string;
   /** True if a resource-ingest job was auto-enqueued on cache miss */
   ingestEnqueued?: boolean;
+  /** HTTP status code from citation_content or resource fetch_status, if available */
+  httpStatus?: number | null;
 }
 
 /** Result of an LLM source-check call */

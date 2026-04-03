@@ -19,6 +19,7 @@ import {
   detectPaywall,
   isUnverifiableDomain,
 } from '../search/paywall-detection.ts';
+import { isDeadFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { createJob } from '../wiki-server/jobs.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
@@ -134,6 +135,18 @@ export async function fetchSourceContent(
     const result = await getCitationContentByUrl(url);
     if (result.ok && result.data) {
       const cached = result.data as Record<string, unknown>;
+      const httpStatus = cached.httpStatus as number | null;
+
+      // Detect dead links from cached HTTP status (4xx/5xx)
+      if (httpStatus != null && httpStatus >= 400) {
+        return {
+          content: null,
+          errorType: 'dead_link',
+          errorMessage: `Source URL returned HTTP ${httpStatus}`,
+          httpStatus,
+        };
+      }
+
       const content = cached.fullText as string | null;
       if (content && content.length > 0) {
         if (detectPaywall(content)) {
@@ -152,8 +165,17 @@ export async function fetchSourceContent(
   try {
     const resource = await lookupResourceByUrl(url);
     if (resource.ok && resource.data) {
-      const resourceData = resource.data as { id: string; archiveUrl?: string };
+      const resourceData = resource.data as { id: string; archiveUrl?: string; fetchStatus?: string | null };
       resourceId = resourceData.id;
+
+      // Detect dead links from resource fetch_status (dead, not_found, timeout, etc.)
+      if (isDeadFetchStatus(resourceData.fetchStatus)) {
+        return {
+          content: null,
+          errorType: 'dead_link',
+          errorMessage: `Resource fetch status: ${resourceData.fetchStatus}`,
+        };
+      }
 
       // Try archive URL if available
       if (resourceData.archiveUrl) {

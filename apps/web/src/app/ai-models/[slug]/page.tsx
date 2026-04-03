@@ -16,6 +16,7 @@ import {
 } from "../ai-model-constants";
 import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
 import { safeHref } from "@/lib/directory-utils";
+import { BenchmarkScorecard } from "./benchmark-scorecard";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));
@@ -234,34 +235,10 @@ export default async function AiModelDetailPage({
                   {entity.benchmarks.length}
                 </span>
               </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Benchmark
-                      </th>
-                      <th className="py-2.5 px-4 text-right font-medium">
-                        Score
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {entity.benchmarks.map((b) => (
-                      <tr
-                        key={b.name}
-                        className="hover:bg-muted/20 transition-colors"
-                      >
-                        <td className="py-2.5 px-4">{b.name}</td>
-                        <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                          {b.score}
-                          {b.unit === "%" ? "%" : b.unit ? ` ${b.unit}` : ""}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <BenchmarkScorecard
+                benchmarks={entity.benchmarks}
+                modelId={entity.id}
+              />
             </section>
           )}
 

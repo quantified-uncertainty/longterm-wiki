@@ -10,7 +10,6 @@ import { getTypedEntities } from "@data/tablebase";
 /** Stats shape returned by GET /api/source-checks/stats (unified) */
 interface UnifiedSourceCheckStatsResult {
   total: number;
-  avg_confidence: number;
   needs_recheck: number;
   by_verdict: Record<string, number>;
   by_type: Record<string, number>;
@@ -41,7 +40,6 @@ const BAR_COLORS: Record<string, string> = {
 function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
   return {
     total: 0,
-    avg_confidence: 0,
     needs_recheck: 0,
     by_verdict: {},
     by_type: {},

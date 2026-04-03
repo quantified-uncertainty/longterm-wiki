@@ -522,6 +522,8 @@ export interface OrgResourceRow {
   publishedDate: string | null;
   authors: AuthorRef[];
   summary: string | null;
+  abstract: string | null;
+  keyPoints: string[] | null;
   fetchStatus: string | null;
   archiveUrl: string | null;
   stance: string | null;
@@ -778,6 +780,8 @@ function toOrgResourceRow(r: Resource): OrgResourceRow {
     publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
     authors: resolveResourceAuthors(r),
     summary: r.summary ?? null,
+    abstract: r.abstract ?? null,
+    keyPoints: r.key_points?.length ? r.key_points : null,
     fetchStatus: r.fetch_status ?? null,
     archiveUrl: r.archive_url ?? null,
     stance: r.stance ?? null,
