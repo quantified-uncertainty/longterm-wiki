@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
-import { getDrizzleDb, getDb } from "../../db.js";
+import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
 import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
@@ -1236,22 +1236,29 @@ const citationsApp = new Hono()
       });
     }
 
+    // Use a transaction with elevated statement_timeout (2 minutes) since the
+    // default 30s pool timeout can be exceeded on large tables.
     logger.info({ keep }, "Deleting old citation accuracy snapshots");
-    const result = await rawDb`
-      DELETE FROM citation_accuracy_snapshots
-      WHERE id NOT IN (
-        SELECT id FROM (
-          SELECT id, ROW_NUMBER() OVER (
-            -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-            PARTITION BY COALESCE(page_id, -1) ORDER BY snapshot_at DESC
-          ) AS rn
-          FROM citation_accuracy_snapshots
-        ) ranked
-        WHERE rn <= ${keep}
-      )
-    `;
+    let deleted = 0;
+    await beginTransaction(async (tx) => {
+      await tx`SET LOCAL statement_timeout = '120000'`;
+      const result = await tx`
+        DELETE FROM citation_accuracy_snapshots
+        WHERE id NOT IN (
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (
+              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id, -1) ORDER BY snapshot_at DESC
+            ) AS rn
+            FROM citation_accuracy_snapshots
+          ) ranked
+          WHERE rn <= ${keep}
+        )
+      `;
+      deleted = result.count;
+    });
 
-    return c.json({ deleted: result.count, keep });
+    return c.json({ deleted, keep });
   });
 
 export const citationsRoute = citationsApp;

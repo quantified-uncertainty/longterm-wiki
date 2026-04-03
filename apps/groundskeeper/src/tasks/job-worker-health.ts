@@ -9,13 +9,16 @@ const HEARTBEAT_WARN_MS = 5 * 60 * 1000;
 const HEARTBEAT_CRITICAL_MS = 15 * 60 * 1000;
 
 /** Maximum pending jobs per type before warning. */
-const BACKLOG_THRESHOLD = 20;
+const BACKLOG_THRESHOLD = 50;
 
 /** Failure rate above which a warning is emitted. */
 const FAILURE_RATE_THRESHOLD = 0.3;
 
 /** Minimum completed+failed jobs to compute a meaningful failure rate. */
 const FAILURE_RATE_MIN_SAMPLE = 10;
+
+/** Time window for failure rate and backlog checks (24 hours). */
+const STATS_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 interface ActiveAgent {
   sessionId: string;
@@ -89,11 +92,13 @@ export async function jobWorkerHealth(
     );
   }
 
-  // 2. Check job backlog and failure rate via /api/jobs/stats
+  // 2. Check job backlog and failure rate via /api/jobs/stats (time-windowed)
+  // Use a 24h window so historical failures don't permanently poison the check.
+  const since = new Date(Date.now() - STATS_WINDOW_MS).toISOString();
   const statsResult = await apiRequest<JobStatsResponse>(
     config,
     "GET",
-    "/api/jobs/stats",
+    `/api/jobs/stats?since=${encodeURIComponent(since)}`,
   );
   if (statsResult.ok && statsResult.data) {
     checksPerformed++;

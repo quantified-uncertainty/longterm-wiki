@@ -21,6 +21,7 @@ export default defineConfig({
       'pr-patrol/**/*.test.ts',
       'tablebase/**/*.test.ts',
       'qa-sweep/**/*.test.ts',
+      'resource-enrichment/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,
