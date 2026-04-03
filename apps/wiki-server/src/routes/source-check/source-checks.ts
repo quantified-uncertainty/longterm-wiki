@@ -63,6 +63,7 @@ const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
  * Update this when the pipeline switches to a newer model.
  */
 export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
+export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
 
 // ---- Query schemas ----
 
@@ -368,28 +369,12 @@ const sourceChecksApp = new Hono()
         byType[row.recordType] = row.count;
       }
 
-      // Count stale evidence rows (checker_model != current model)
-      const [staleRow] = await db
-        .select({ count: count() })
-        .from(sourceCheckEvidence)
-        .where(
-          or(
-            ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
-            isNull(sourceCheckEvidence.checkerModel),
-          )
-        );
-
-      // Count dead link detections (evidence from dead-link-detector)
-      const deadLinkConditions = [
-        eq(sourceCheckEvidence.checkerModel, "dead-link-detector"),
-      ];
-      if (record_type) {
-        deadLinkConditions.push(eq(sourceCheckEvidence.recordType, record_type));
-      }
-      const [deadLinkRow] = await db
-        .select({ count: count() })
-        .from(sourceCheckEvidence)
-        .where(and(...deadLinkConditions));
+      const [evidenceStats] = await db
+        .select({
+          staleCount: sql<number>`count(*) filter (where ${sourceCheckEvidence.checkerModel} != ${CURRENT_CHECKER_MODEL} or ${sourceCheckEvidence.checkerModel} is null)`,
+          deadLinkCount: sql<number>`count(*) filter (where ${sourceCheckEvidence.checkerModel} = ${DEAD_LINK_CHECKER_MODEL}${record_type ? sql` and ${sourceCheckEvidence.recordType} = ${record_type}` : sql``})`,
+        })
+        .from(sourceCheckEvidence);
 
       return c.json({
         total: statsRow.total,
@@ -398,8 +383,8 @@ const sourceChecksApp = new Hono()
         needs_recheck: Number(statsRow.needsRecheck),
         avg_confidence:
           Math.round(Number(statsRow.avgConfidence) * 100) / 100,
-        stale_evidence_count: staleRow.count,
-        dead_link_count: deadLinkRow.count,
+        stale_evidence_count: Number(evidenceStats.staleCount),
+        dead_link_count: Number(evidenceStats.deadLinkCount),
         current_checker_model: CURRENT_CHECKER_MODEL,
       });
     }
