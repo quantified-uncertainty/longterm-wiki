@@ -11,7 +11,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   CAD: "CA$",
   AUD: "A$",
   JPY: "\u00A5",
-  CNY: "\u00A5",
+  CNY: "CN\u00A5",
   SEK: "SEK\u00A0",
   NOK: "NOK\u00A0",
   DKK: "DKK\u00A0",

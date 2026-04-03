@@ -163,7 +163,7 @@ function TimeSeriesTable({
               {years.map((year) => {
                 const fact = factsByYear.get(year);
                 return (
-                  <TableCell key={year} className="text-right">
+                  <TableCell key={year} className="text-right tabular-nums">
                     <FactCellValue fact={fact} property={property} />
                   </TableCell>
                 );
