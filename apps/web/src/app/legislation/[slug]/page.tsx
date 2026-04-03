@@ -45,11 +45,7 @@ import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
-
-// LegislationVotes — will be created by another agent.
-// TODO: import { LegislationVotes } from "@/components/political/legislation-votes";
-// Usage: <LegislationVotes entityId={entity.stableId ?? entity.id} />
-// This component will show how tracked politicians voted on this legislation.
+import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -150,6 +146,9 @@ export default async function LegislationDetailPage({
     .filter(Boolean) as Array<{ name: string; href: string; relationship?: string; type?: string }>;
 
   const wikiHref = getPolicyWikiHref(entity);
+
+  // Fetch vote breakdown from wiki-server for this legislation
+  const legislationVotes = await fetchLegislationVotes(entity.stableId ?? entity.id);
 
   const importanceOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
   const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
@@ -391,10 +390,7 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      {/* Politician Vote Breakdown — will render when LegislationVotes component is available */}
-      {/* TODO: Uncomment when @/components/political/legislation-votes is created:
-      <LegislationVotes entityId={entity.stableId ?? entity.id} />
-      */}
+      <LegislationVotes votes={legislationVotes} />
 
       <FBAutoFacts entityId={entity.id} />
 
