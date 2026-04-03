@@ -24,6 +24,54 @@ import { formatKBFactValue } from "@/components/wiki/factbase/format";
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+/** Format an extractedValue for display. Detects JSON and renders key-value summary. */
+function FormatExtractedValue({ value }: { value: string }) {
+  const trimmed = value.trim();
+
+  // Detect JSON objects or arrays
+  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+        const entries = Object.entries(parsed);
+        const shown = entries.slice(0, 3);
+        const remaining = entries.length - shown.length;
+        return (
+          <span className="text-sm">
+            {shown.map(([k, v], i) => (
+              <span key={k}>
+                {i > 0 && ", "}
+                <span className="font-medium text-foreground/70">{k}:</span>{" "}
+                {typeof v === "string" ? v : JSON.stringify(v)}
+              </span>
+            ))}
+            {remaining > 0 && (
+              <span className="text-muted-foreground"> (+{remaining} more)</span>
+            )}
+          </span>
+        );
+      }
+      if (Array.isArray(parsed)) {
+        const label = `[${parsed.length} items]`;
+        return <span className="text-sm text-muted-foreground">{label}</span>;
+      }
+    } catch {
+      // Not valid JSON — fall through to truncation
+    }
+  }
+
+  // Non-JSON: truncate long values
+  if (trimmed.length > 200) {
+    return (
+      <span className="text-sm" title={trimmed}>
+        {trimmed.slice(0, 200)}&hellip;
+      </span>
+    );
+  }
+
+  return <span className="text-sm">{trimmed}</span>;
+}
+
 interface PageProps {
   params: Promise<{ recordType: string; recordId: string }>;
 }
@@ -406,7 +454,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {e.extractedValue && (
                               <div>
                                 <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Found: </span>
-                                {e.extractedValue}
+                                <FormatExtractedValue value={e.extractedValue} />
                               </div>
                             )}
                           </div>
