@@ -950,7 +950,7 @@
 
 - id: tomshardware
   domains: [tomshardware.com]
-  name: Tom s Hardware
+  name: "Tom's Hardware"
   type: news
   credibility: 3
   peer_reviewed: false
