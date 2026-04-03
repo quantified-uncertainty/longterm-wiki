@@ -237,6 +237,7 @@ export function DivisionsSection({
                     <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={verdict?.verdict}
+                        variant="label"
                         href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
                       />
                       {(() => {

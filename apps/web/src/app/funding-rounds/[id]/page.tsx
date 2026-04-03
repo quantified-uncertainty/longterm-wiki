@@ -197,7 +197,7 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
           )}
           <RecordVerificationDot
             verdict={roundVerdict?.verdict}
-            showLabel
+            variant="label"
             href={roundVerdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(String(round.key))}` : undefined}
           />
         </div>

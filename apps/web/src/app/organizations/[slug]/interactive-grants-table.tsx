@@ -772,7 +772,7 @@ function CellContent({
       return (
         <RecordVerificationDot
           verdict={grant.verificationVerdict}
-          size="md"
+          variant="label"
           href={grant.sourceCheckHref}
         />
       );

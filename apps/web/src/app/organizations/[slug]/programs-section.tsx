@@ -66,6 +66,7 @@ export function FundingProgramsSection({
                     )}
                     <RecordVerificationDot
                       verdict={verdict?.verdict}
+                      variant="label"
                       href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
                     />
                     {p.description && (
