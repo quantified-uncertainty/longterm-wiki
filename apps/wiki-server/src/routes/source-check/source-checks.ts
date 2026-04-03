@@ -379,6 +379,18 @@ const sourceChecksApp = new Hono()
           )
         );
 
+      // Count dead link detections (evidence from dead-link-detector)
+      const deadLinkConditions = [
+        eq(sourceCheckEvidence.checkerModel, "dead-link-detector"),
+      ];
+      if (record_type) {
+        deadLinkConditions.push(eq(sourceCheckEvidence.recordType, record_type));
+      }
+      const [deadLinkRow] = await db
+        .select({ count: count() })
+        .from(sourceCheckEvidence)
+        .where(and(...deadLinkConditions));
+
       return c.json({
         total: statsRow.total,
         by_verdict: byVerdict,
@@ -387,6 +399,7 @@ const sourceChecksApp = new Hono()
         avg_confidence:
           Math.round(Number(statsRow.avgConfidence) * 100) / 100,
         stale_evidence_count: staleRow.count,
+        dead_link_count: deadLinkRow.count,
         current_checker_model: CURRENT_CHECKER_MODEL,
       });
     }
