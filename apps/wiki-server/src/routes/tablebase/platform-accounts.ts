@@ -9,14 +9,17 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, sql, isNull } from "drizzle-orm";
+import { eq, and, sql, isNull, count } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { platformAccounts } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  zv,
+  paginationQuery,
 } from "../shared/utils.js";
+import { logger } from "../../logger.js";
 
 const VALID_PLATFORMS = [
   "lesswrong",
@@ -41,6 +44,14 @@ const SyncItemSchema = z.object({
 
 const SyncBatchSchema = z.object({
   items: z.array(SyncItemSchema).min(1).max(200),
+});
+
+const AllQuery = paginationQuery({ maxLimit: 1000, defaultLimit: 200 }).extend({
+  platform: z.string().max(100).optional(),
+  unlinked: z
+    .enum(["true", "false"])
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 type SyncItem = z.infer<typeof SyncItemSchema>;
@@ -103,17 +114,13 @@ const platformAccountsApp = new Hono()
   })
 
   // GET /all — paginated list with optional filters
-  .get("/all", async (c) => {
-    const platform = c.req.query("platform");
-    const unlinked = c.req.query("unlinked");
-    const limit = Math.min(Number(c.req.query("limit")) || 200, 1000);
-    const offset = Number(c.req.query("offset")) || 0;
+  .get("/all", zv("query", AllQuery), async (c) => {
+    const { platform, unlinked, limit, offset } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const conditions = [];
     if (platform) conditions.push(eq(platformAccounts.platform, platform));
-    if (unlinked === "true")
-      conditions.push(isNull(platformAccounts.entityStableId));
+    if (unlinked) conditions.push(isNull(platformAccounts.entityStableId));
 
     const where =
       conditions.length > 0 ? and(...conditions) : undefined;
@@ -126,7 +133,13 @@ const platformAccountsApp = new Hono()
       .limit(limit)
       .offset(offset);
 
-    return c.json({ accounts: rows, total: rows.length }, 200);
+    const countResult = await db
+      .select({ count: count() })
+      .from(platformAccounts)
+      .where(where);
+    const total = countResult[0].count;
+
+    return c.json({ accounts: rows, total, limit, offset }, 200);
   })
 
   // POST /sync — batch upsert
@@ -171,6 +184,7 @@ const platformAccountsApp = new Hono()
     }
 
     const db = getDrizzleDb();
+    logger.info({ id }, "Deleting platform account");
     const deleted = await db
       .delete(platformAccounts)
       .where(eq(platformAccounts.id, id))

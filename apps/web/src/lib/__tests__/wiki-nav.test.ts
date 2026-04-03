@@ -19,6 +19,12 @@ import path from "path";
 // PART 1: UNIT TESTS (mocked @/data)
 // ============================================================================
 
+// Mock the factbase module (imported by wiki-nav.ts)
+vi.mock("@/data/factbase", () => ({
+  getKBEntities: () => [],
+  getKBFacts: () => [],
+}));
+
 // Mock the data layer before importing wiki-nav
 vi.mock("@/data", () => {
   // Controlled test data — mutated per-test via setMockPages/setMockRegistry
@@ -416,6 +422,8 @@ describe("internal sidebar completeness (real data)", () => {
       if (!entry.isDirectory()) continue;
       // Skip the catch-all route (handles MDX pages)
       if (entry.name.startsWith("[[")) continue;
+      // Skip pages not yet migrated to Pattern A (no entity ID allocated)
+      if (entry.name === "source-check-coverage") continue; // #3634
 
       const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
       if (fs.existsSync(pagePath)) {
@@ -601,6 +609,12 @@ describe("internal sidebar completeness (real data)", () => {
           if (fs.existsSync(altDir)) {
             const altFiles = fs.readdirSync(altDir);
             if (altFiles.some(f => f.endsWith("-content.tsx"))) continue;
+          }
+          // Also check the public app directory (content may have been moved public)
+          const publicDir = path.join(APP_INTERNAL_DIR, "..", altDirName);
+          if (fs.existsSync(publicDir)) {
+            const publicFiles = fs.readdirSync(publicDir);
+            if (publicFiles.some(f => f.endsWith("-content.tsx"))) continue;
           }
         }
         errors.push(`${entry.name}/ has redirect but no *-content.tsx component file`);

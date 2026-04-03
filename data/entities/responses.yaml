@@ -1896,6 +1896,8 @@
       description: 10+ national institutes with combined budgets of $100-400M annually
       category: Institutions
   customFields:
+    - label: Status
+      value: Active
     - label: First Summit
       value: Bletchley Park, UK (Nov 2023)
     - label: Second Summit

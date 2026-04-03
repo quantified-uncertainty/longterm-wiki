@@ -170,7 +170,7 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
             {filtered.map((row) => (
               <tr
                 key={row.id}
-                className="hover:bg-muted/20 transition-colors"
+                className={`hover:bg-muted/20 transition-colors ${row.modelsCount === 0 ? "opacity-50" : ""}`}
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
@@ -204,7 +204,11 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
 
                 {/* Models Count */}
                 <td className="py-2.5 px-3 text-right tabular-nums">
-                  {row.modelsCount > 0 ? row.modelsCount : <span className="text-muted-foreground/40">&mdash;</span>}
+                  {row.modelsCount > 0 ? (
+                    row.modelsCount
+                  ) : (
+                    <span className="text-muted-foreground/50 text-xs italic">no scores</span>
+                  )}
                 </td>
 
                 {/* Scoring */}

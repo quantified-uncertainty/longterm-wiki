@@ -34,9 +34,12 @@ facts:
     notes: From Wikidata Q5565607
   - id: JYF4S3yEAA
     property: revenue
-    value: 1346284
+    value: 269542773
+    asOf: "2024"
     source: https://www.wikidata.org/wiki/Q5565607
-    notes: From Wikidata Q5565607
+    notes: >-
+      From Wikidata Q5565607 (Nonprofit Explorer). Total revenue for 2024.
+      Historical: $219.6M (2023), $206.2M (2021), $151.0M (2022).
   - id: weNxifIMDA
     property: founded-by-name
     value: Holden Karnofsky

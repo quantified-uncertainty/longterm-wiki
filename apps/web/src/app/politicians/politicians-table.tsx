@@ -7,7 +7,6 @@ import { SortHeader } from "@/components/directory/SortHeader";
 import {
   AI_STANCE_COLORS,
   PARTY_COLORS,
-  STATUS_COLORS,
   EA_TOPICS,
   extractStanceLabel,
 } from "./politicians-constants";
