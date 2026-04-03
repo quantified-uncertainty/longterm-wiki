@@ -22,7 +22,7 @@ interface RecordVerificationDotProps {
   verdict: string | null | undefined;
   /** Show the label text next to the dot (default: false) */
   showLabel?: boolean;
-  /** Dot size: sm = 2px (inline), md = 2.5px (table cell) */
+  /** Dot size: sm = w-2 (8px), md = w-2.5 (10px) */
   size?: "sm" | "md";
   /** Link to source-check detail page. When provided, the dot becomes clickable. */
   href?: string;
@@ -51,7 +51,7 @@ export function RecordVerificationDot({
 
   const dot = (
     <span
-      className={`inline-flex items-center gap-1 ${href ? "cursor-pointer" : ""} ${className}`}
+      className={`inline-flex items-center gap-1 ${className}`}
       title={config.label}
     >
       <span
@@ -66,7 +66,7 @@ export function RecordVerificationDot({
   );
 
   if (href) {
-    return <Link href={href}>{dot}</Link>;
+    return <Link href={href} className="p-0.5 -m-0.5 rounded-full hover:bg-muted/50 transition-colors">{dot}</Link>;
   }
 
   return dot;
