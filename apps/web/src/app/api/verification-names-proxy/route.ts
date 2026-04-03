@@ -12,8 +12,58 @@ import { getKBFactById, getKBProperty, getKBEntity } from "@/data/factbase";
  * Returns { names: Record<string, string>, hrefs: Record<string, string> }.
  *
  * For all other types: proxies to the wiki-server's /api/verifications/resolve-names endpoint.
+ * Batches requests to stay within wiki-server's 10,000-char query string limit.
  * Returns { names: Record<string, string> }.
  */
+
+/**
+ * Maximum character length for the record_ids query parameter per batch.
+ * The wiki-server's Zod schema enforces max(10000), and long URLs can cause
+ * issues with HTTP servers. Use a conservative limit to leave room for
+ * URL encoding overhead and other query parameters.
+ */
+const MAX_IDS_CHARS_PER_BATCH = 6000;
+
+/**
+ * Validate and sanitize a record ID.
+ * Returns the trimmed ID if valid, or null if it should be filtered out.
+ */
+function sanitizeRecordId(id: string): string | null {
+  const trimmed = id.trim();
+  if (!trimmed) return null;
+  // Record IDs should be reasonable length (varchar(10) IDs, stableIds, or
+  // citation format like "page:<slug>:fn<N>"). Reject anything suspiciously long.
+  if (trimmed.length > 200) return null;
+  return trimmed;
+}
+
+/**
+ * Split an array of IDs into batches where each batch's comma-joined string
+ * stays within the character limit.
+ */
+function batchIds(ids: string[], maxChars: number): string[][] {
+  const batches: string[][] = [];
+  let current: string[] = [];
+  let currentLen = 0;
+
+  for (const id of ids) {
+    // +1 for the comma separator (except for the first item)
+    const addedLen = current.length === 0 ? id.length : id.length + 1;
+    if (currentLen + addedLen > maxChars && current.length > 0) {
+      batches.push(current);
+      current = [id];
+      currentLen = id.length;
+    } else {
+      current.push(id);
+      currentLen += addedLen;
+    }
+  }
+  if (current.length > 0) {
+    batches.push(current);
+  }
+  return batches;
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const recordType = searchParams.get("record_type");
@@ -26,7 +76,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (recordType.length > 50 || recordIds.length > 10_000) {
+  if (recordType.length > 50 || recordIds.length > 100_000) {
     return NextResponse.json(
       { error: "Parameter too long" },
       { status: 400 },
@@ -41,12 +91,21 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Parse and sanitize individual record IDs
+  const allIds = recordIds
+    .split(",")
+    .map(sanitizeRecordId)
+    .filter((id): id is string => id !== null);
+
+  if (allIds.length === 0) {
+    return NextResponse.json({ names: {} });
+  }
+
   // Fact resolution: use local FactBase data (fast, no wiki-server dependency)
   if (recordType === "fact") {
-    const ids = recordIds.split(",").filter(Boolean);
     const names: Record<string, string> = {};
 
-    for (const factId of ids) {
+    for (const factId of allIds) {
       const fact = getKBFactById(factId);
       if (fact) {
         const entity = getKBEntity(fact.subjectId);
@@ -62,12 +121,11 @@ export async function GET(request: NextRequest) {
 
   // Entity resolution: use local database.json (fast, no wiki-server dependency)
   if (recordType === "entity") {
-    const ids = recordIds.split(",").filter(Boolean);
     const names: Record<string, string> = {};
     const hrefs: Record<string, string> = {};
     const registry = getIdRegistry();
 
-    for (const stableId of ids) {
+    for (const stableId of allIds) {
       const entity = getTypedEntityByStableId(stableId);
       if (entity) {
         names[stableId] = entity.title;
@@ -81,7 +139,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ names, hrefs });
   }
 
-  // All other types: proxy to wiki-server
+  // All other types: proxy to wiki-server in batches
   const config = getWikiServerConfig();
   if (!config) {
     return NextResponse.json(
@@ -90,37 +148,74 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const batches = batchIds(allIds, MAX_IDS_CHARS_PER_BATCH);
+
+  // Cap outbound fan-out to prevent amplification attacks
+  if (batches.length > 10) {
+    return NextResponse.json(
+      { error: "Too many record IDs — reduce the request size" },
+      { status: 400 },
+    );
+  }
+
+  const names: Record<string, string> = {};
+  let hadError = false;
+
   try {
-    const params = new URLSearchParams({
-      record_type: recordType,
-      record_ids: recordIds,
-    });
-    const url = `${config.serverUrl}/api/verifications/resolve-names?${params.toString()}`;
-    const res = await fetch(url, {
-      headers: config.headers,
-      signal: AbortSignal.timeout(10_000),
-    });
+    const batchResults = await Promise.allSettled(
+      batches.map(async (batchIds) => {
+        const params = new URLSearchParams({
+          record_type: recordType,
+          record_ids: batchIds.join(","),
+        });
+        const url = `${config.serverUrl}/api/verifications/resolve-names?${params.toString()}`;
+        const res = await fetch(url, {
+          headers: config.headers,
+          signal: AbortSignal.timeout(10_000),
+        });
 
-    if (!res.ok) {
-      return NextResponse.json(
-        { error: "Wiki server error", names: {} },
-        { status: res.status },
-      );
-    }
-
-    const data = await res.json();
-    // Strip "new:" prefix from resolved names at API boundary
-    if (data.names) {
-      for (const key of Object.keys(data.names)) {
-        if (typeof data.names[key] === "string" && data.names[key].startsWith("new:")) {
-          data.names[key] = data.names[key].slice(4).trim();
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          console.warn(
+            `[verification-names-proxy] Wiki server returned ${res.status} for ${recordType} ` +
+            `(${batchIds.length} IDs, ${batchIds.join(",").length} chars): ${body.slice(0, 500)}`
+          );
+          hadError = true;
+          return null;
         }
+
+        return await res.json();
+      })
+    );
+
+    // Merge results from all successful batches
+    for (const result of batchResults) {
+      if (result.status === "fulfilled" && result.value?.names) {
+        for (const [id, name] of Object.entries(result.value.names as Record<string, string>)) {
+          // Strip "new:" prefix from resolved names at API boundary
+          if (typeof name === "string" && name.startsWith("new:")) {
+            names[id] = name.slice(4).trim();
+          } else if (typeof name === "string") {
+            names[id] = name;
+          }
+        }
+      } else if (result.status === "rejected") {
+        console.warn(
+          `[verification-names-proxy] Batch request failed for ${recordType}: ` +
+          `${result.reason instanceof Error ? result.reason.message : String(result.reason)}`
+        );
+        hadError = true;
       }
     }
-    return NextResponse.json(data);
+
+    // Return partial results even if some batches failed
+    return NextResponse.json({
+      names,
+      ...(hadError ? { partial: true } : {}),
+    });
   } catch (err) {
     console.warn(
-      `[verification-names-proxy] Failed to resolve names: ${err instanceof Error ? err.message : String(err)}`
+      `[verification-names-proxy] Failed to resolve names for ${recordType}: ${err instanceof Error ? err.message : String(err)}`
     );
     return NextResponse.json(
       { error: "Wiki server unreachable", names: {} },

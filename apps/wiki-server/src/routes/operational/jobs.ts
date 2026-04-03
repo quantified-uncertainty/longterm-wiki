@@ -646,6 +646,111 @@ const jobsApp = new Hono()
     });
   })
 
+  // ---- GET /dashboard (combined stats + recent failures for the dashboard UI) ----
+  // Single endpoint to avoid multiple API calls from the frontend, reducing
+  // rate-limit pressure during ISR revalidation bursts.
+
+  .get("/dashboard", async (c) => {
+    const db = getDrizzleDb();
+    const hours = Math.min(8760, Math.max(1, Number(c.req.query("hours")) || 48));
+    const failureLimit = Math.min(100, Math.max(1, Number(c.req.query("failureLimit")) || 50));
+    const recentCutoff = sql`NOW() - make_interval(hours => ${hours})`;
+
+    // ── Stats queries (same as /stats) ──
+    const [byTypeStatus, avgDuration, failureRate, totalResult, recentFailures] = await Promise.all([
+      // Status counts are all-time (for pending/running visibility)
+      db
+        .select({
+          type: jobs.type,
+          status: jobs.status,
+          count: count(),
+        })
+        .from(jobs)
+        .groupBy(jobs.type, jobs.status),
+
+      // Average duration for recently completed jobs
+      db
+        .select({
+          type: jobs.type,
+          avgMs: sql<number>`avg(extract(epoch from (${jobs.completedAt} - ${jobs.startedAt})) * 1000)`,
+        })
+        .from(jobs)
+        .where(
+          and(
+            eq(jobs.status, "completed"),
+            sql`${jobs.startedAt} IS NOT NULL`,
+            sql`${jobs.completedAt} IS NOT NULL`,
+            sql`${jobs.createdAt} >= ${recentCutoff}`
+          )
+        )
+        .groupBy(jobs.type),
+
+      // Failure rate per type (recent only)
+      db
+        .select({
+          type: jobs.type,
+          total: count(),
+          failed: sql<number>`sum(case when ${jobs.status} = 'failed' then 1 else 0 end)`,
+        })
+        .from(jobs)
+        .where(
+          and(
+            sql`${jobs.status} IN ('completed', 'failed')`,
+            sql`${jobs.createdAt} >= ${recentCutoff}`
+          )
+        )
+        .groupBy(jobs.type),
+
+      // Total count (recent)
+      db
+        .select({ count: count() })
+        .from(jobs)
+        .where(sql`${jobs.createdAt} >= ${recentCutoff}`),
+
+      // ── Recent failures (same as GET /?status=failed) ──
+      db
+        .select()
+        .from(jobs)
+        .where(eq(jobs.status, "failed"))
+        .orderBy(desc(jobs.createdAt))
+        .limit(failureLimit),
+    ]);
+
+    // Build stats summary
+    const typeSummary: Record<
+      string,
+      { byStatus: Record<string, number>; avgDurationMs?: number; failureRate?: number }
+    > = {};
+
+    for (const row of byTypeStatus) {
+      if (!typeSummary[row.type]) {
+        typeSummary[row.type] = { byStatus: {} };
+      }
+      typeSummary[row.type].byStatus[row.status] = row.count;
+    }
+
+    for (const row of avgDuration) {
+      if (typeSummary[row.type]) {
+        typeSummary[row.type].avgDurationMs = Math.round(Number(row.avgMs));
+      }
+    }
+
+    for (const row of failureRate) {
+      if (typeSummary[row.type] && row.total > 0) {
+        typeSummary[row.type].failureRate = Number(row.failed) / row.total;
+      }
+    }
+
+    return c.json({
+      stats: {
+        totalJobs: totalResult[0].count,
+        byType: typeSummary,
+        hours,
+      },
+      recentFailures: recentFailures.map(formatJob),
+    });
+  })
+
   // ---- POST /sweep (reset stale claimed/running jobs) ----
 
   .post("/sweep", async (c) => {
