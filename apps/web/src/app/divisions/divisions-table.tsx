@@ -204,7 +204,10 @@ export function DivisionsTable({
                 >
                   <td className="py-2 px-3">
                     <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot verdict={row.verdict?.verdict} />
+                      <RecordVerificationDot
+                        verdict={row.verdict?.verdict}
+                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                      />
                       {row.href ? (
                         <Link
                           href={row.href}

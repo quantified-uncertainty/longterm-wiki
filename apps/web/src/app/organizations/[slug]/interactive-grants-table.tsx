@@ -28,6 +28,8 @@ export interface GrantRow {
   funderHref?: string | null;
   /** Source-check verification verdict (null if not checked) */
   verificationVerdict?: string | null;
+  /** Link to source-check detail page */
+  sourceCheckHref?: string;
 }
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
@@ -83,6 +85,9 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     notes: g.notes,
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
     verificationVerdict: g.verification?.verdict ?? null,
+    sourceCheckHref: g.verification?.verdict
+      ? `/source-checks/grant/${encodeURIComponent(g.id)}`
+      : undefined,
   };
 }
 
@@ -756,6 +761,7 @@ function CellContent({
         <RecordVerificationDot
           verdict={grant.verificationVerdict}
           size="md"
+          href={grant.sourceCheckHref}
         />
       );
     default:

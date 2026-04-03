@@ -129,7 +129,11 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
               {titleCase(grant.status)}
             </span>
           )}
-          <RecordVerificationDot verdict={grantVerdict?.verdict} showLabel />
+          <RecordVerificationDot
+            verdict={grantVerdict?.verdict}
+            showLabel
+            href={grantVerdict?.verdict ? `/source-checks/grant/${encodeURIComponent(String(grant.key))}` : undefined}
+          />
         </div>
 
         {/* Amount hero */}
