@@ -352,6 +352,73 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
 }
 
 /**
+ * Build cross-links between FactBase fact source URLs and tracked Resources.
+ * Produces two maps:
+ *   - resourceUrlToFactIds: normalizedUrl → factId[] (for resource detail pages)
+ *   - factIdToResourceId: factId → resourceId (for fact detail pages)
+ *
+ * Uses normalizeUrlForMatch() for consistent URL normalization.
+ *
+ * @param {object} kb - Serialized KB data (from build-data)
+ * @param {Array<{id: string, url?: string, stable_id?: string}>} resources
+ * @returns {{ resourceUrlToFactIds: Record<string, string[]>, factIdToResourceId: Record<string, string> }}
+ */
+function buildResourceFactLinks(kb, resources) {
+  if (!kb || !kb.facts || !resources || resources.length === 0) {
+    console.log('  resourceFactLinks: skipped (no KB or resource data)');
+    return { resourceUrlToFactIds: {}, factIdToResourceId: {} };
+  }
+
+  // Build normalizedUrl → resourceId map from all resources with URLs
+  const urlToResourceId = new Map();
+  let resourceUrlCount = 0;
+  for (const r of resources) {
+    if (!r.url) continue;
+    const normalized = normalizeUrlForMatch(r.url);
+    urlToResourceId.set(normalized, r.id);
+    resourceUrlCount++;
+  }
+
+  if (urlToResourceId.size === 0) {
+    console.log('  resourceFactLinks: 0 matches (no resources with URLs)');
+    return { resourceUrlToFactIds: {}, factIdToResourceId: {} };
+  }
+
+  // Iterate all facts, match source URLs against resources
+  const resourceUrlToFactIds = {};
+  const factIdToResourceId = {};
+  let matchCount = 0;
+  let totalFactsWithUrls = 0;
+
+  for (const facts of Object.values(kb.facts)) {
+    for (const fact of facts) {
+      const url = (fact.source && typeof fact.source === 'string') ? fact.source : null;
+      if (!url) continue;
+      if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
+      totalFactsWithUrls++;
+
+      const normalizedSource = normalizeUrlForMatch(url);
+      const resourceId = urlToResourceId.get(normalizedSource);
+      if (resourceId) {
+        // Add to resourceUrl → factIds map (keyed by resource ID for lookup)
+        if (!resourceUrlToFactIds[resourceId]) {
+          resourceUrlToFactIds[resourceId] = [];
+        }
+        resourceUrlToFactIds[resourceId].push(fact.id);
+
+        // Add to factId → resourceId map
+        factIdToResourceId[fact.id] = resourceId;
+        matchCount++;
+      }
+    }
+  }
+
+  const resourcesWithFacts = Object.keys(resourceUrlToFactIds).length;
+  console.log(`  resourceFactLinks: ${matchCount} facts matched across ${resourcesWithFacts} resources (from ${totalFactsWithUrls} facts with URLs, ${resourceUrlCount} resources with URLs)`);
+  return { resourceUrlToFactIds, factIdToResourceId };
+}
+
+/**
  * Build git-based date maps for all content files.
  * Returns two Maps keyed by repo-relative file path:
  *   - gitCreatedMap: path → YYYY-MM-DD of first commit (approximate, when file was added)
@@ -695,6 +762,11 @@ async function main() {
   // KB FACT VERIFICATION — cross-reference KB source URLs with citation quotes
   // =========================================================================
   database.kbFactVerification = buildKBFactVerification(database.kb, citationQuotesBundle);
+
+  // =========================================================================
+  // RESOURCE ↔ FACT CROSS-LINKS — connect FactBase source URLs with Resources
+  // =========================================================================
+  database.resourceFactLinks = buildResourceFactLinks(database.kb, resources);
 
   // Build pages registry with frontmatter data (quality, etc.)
   const pages = buildPagesRegistry(urlToResource, editLogDates, gitDateMaps, earliestEditLogDates, assessmentMap);
