@@ -14,7 +14,7 @@
 import fs from "fs";
 import path from "path";
 
-const LOCAL_DATA_DIR = path.resolve(process.cwd(), "src/data");
+const localDataDir = path.resolve(process.cwd(), "src/data");
 
 interface ResourceFactLinksData {
   resourceUrlToFactIds: Record<string, string[]>;
@@ -26,10 +26,29 @@ let _data: ResourceFactLinksData | undefined | null = null; // null = not yet lo
 function loadData(): ResourceFactLinksData | undefined {
   if (_data !== null) return _data;
 
-  const filePath = path.join(LOCAL_DATA_DIR, "resource-fact-links.json");
+  const filePath = path.join(localDataDir, "resource-fact-links.json");
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
-    _data = JSON.parse(raw) as ResourceFactLinksData;
+    const parsed: unknown = JSON.parse(raw);
+
+    if (
+      typeof parsed !== "object" ||
+      parsed === null ||
+      typeof (parsed as Record<string, unknown>).resourceUrlToFactIds !==
+        "object" ||
+      (parsed as Record<string, unknown>).resourceUrlToFactIds === null ||
+      typeof (parsed as Record<string, unknown>).factIdToResourceId !==
+        "object" ||
+      (parsed as Record<string, unknown>).factIdToResourceId === null
+    ) {
+      console.error(
+        `resource-fact-links.json has unexpected shape — expected {resourceUrlToFactIds: object, factIdToResourceId: object}`,
+      );
+      _data = undefined;
+      return _data;
+    }
+
+    _data = parsed as ResourceFactLinksData;
   } catch {
     _data = undefined;
   }

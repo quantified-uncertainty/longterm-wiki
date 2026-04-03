@@ -23,8 +23,9 @@ export function SourcesOverviewContent() {
     <div>
       <p className="text-sm text-muted-foreground mb-6 max-w-prose">
         Sources tracks the external resources (papers, articles, reports) and
-        publication venues cited across the wiki. Resources are indexed from
-        PostgreSQL; publications define venue-level credibility ratings.
+        publication venues cited across the wiki. Resources are loaded from a
+        local snapshot (database.json) — no runtime API calls. Publications
+        define venue-level credibility ratings.
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
