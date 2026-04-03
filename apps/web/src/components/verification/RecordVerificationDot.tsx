@@ -37,8 +37,8 @@ export function RecordVerificationDot({
   className = "",
 }: RecordVerificationDotProps) {
   const UNVERIFIED_CONFIG: VerdictDisplayConfig = {
-    color: "bg-muted-foreground/30",
-    label: "Unverified",
+    color: "border border-muted-foreground/40",
+    label: "Not checked",
     textColor: "text-muted-foreground/60",
   };
 

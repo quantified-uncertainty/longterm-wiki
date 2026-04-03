@@ -46,7 +46,7 @@ const VERDICT_CONFIG: Record<string, VerdictConfig> = {
     label: "Unverifiable",
     title: "Source does not address this data",
     className:
-      "bg-gray-100 text-gray-500 dark:bg-gray-800/40 dark:text-gray-400",
+      "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400",
   },
 };
 

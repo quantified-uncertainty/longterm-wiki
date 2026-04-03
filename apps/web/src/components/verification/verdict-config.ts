@@ -43,8 +43,8 @@ export const SOURCE_CHECK_VERDICT_CONFIG: Record<
     textColor: "text-blue-700 dark:text-blue-400",
   },
   unverifiable: {
-    color: "bg-muted-foreground/40",
+    color: "bg-orange-400/70",
     label: "Unverifiable",
-    textColor: "text-muted-foreground",
+    textColor: "text-orange-600 dark:text-orange-400",
   },
 } as const;
