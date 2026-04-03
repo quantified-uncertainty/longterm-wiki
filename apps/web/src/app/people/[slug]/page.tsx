@@ -40,6 +40,7 @@ import { BoardSeats } from "./board-seats";
 import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-positions";
 import { PoliticalInfo } from "./political-info";
 import { WikiOverview } from "./wiki-overview";
+import { EntitySources } from "./entity-sources";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
 // (e.g., entities created via tablebase enrichment in the wiki-server DB)
@@ -182,6 +183,10 @@ export default async function PersonProfilePage({
   // Expert positions from typed entity (consolidated from experts.yaml at build time)
   const personEntity = getPersonEntityById(slug);
   const positions = personEntity?.positions ?? [];
+
+  // Entity-level sources and website (from YAML, not KB facts)
+  const entitySources = personEntity?.sources ?? [];
+  const entityWebsite = personEntity?.website;
 
   // Publications linked to this person (from people-resources.yaml via database.json).
   const publications = getPublicationsForPerson(slug);
@@ -382,6 +387,24 @@ export default async function PersonProfilePage({
             </p>
           )}
           <div className="flex items-center gap-4 mt-2 text-sm">
+            {entityWebsite && (
+              <a
+                href={entityWebsite}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="w-3.5 h-3.5"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                </svg>
+                Website &rarr;
+              </a>
+            )}
             {wikiHref && (
               <Link
                 href={wikiHref}
@@ -418,6 +441,9 @@ export default async function PersonProfilePage({
         {/* Sidebar */}
         <div className="space-y-8">
           <SocialLinks facts={socialLinkFacts} />
+          {entitySources.length > 0 && (
+            <EntitySources sources={entitySources} />
+          )}
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}

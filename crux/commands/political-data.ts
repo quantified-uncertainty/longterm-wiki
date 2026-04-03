@@ -4,11 +4,12 @@
  * Manage political scores, offices, and verify external profile links.
  *
  * Usage:
- *   crux tb political stats                    Show summary statistics
- *   crux tb political scores [--entity=<id>]   List scorecard ratings
- *   crux tb political offices [--entity=<id>]  List political offices
- *   crux tb political verify-links             Verify all politician source URLs
- *   crux tb political seed-offices             Seed office data from YAML entities
+ *   crux tb political stats                          Show summary statistics
+ *   crux tb political scores [--entity=<id>]         List scorecard ratings
+ *   crux tb political scores ingest [--source=X]     Ingest scorecard data from external sources
+ *   crux tb political offices [--entity=<id>]        List political offices
+ *   crux tb political verify-links                   Verify all politician source URLs
+ *   crux tb political seed-offices                   Seed office data from YAML entities
  */
 
 import { readFileSync } from "node:fs";
@@ -18,15 +19,28 @@ import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../lib/command-types.ts";
+import { writeFileSync } from "node:fs";
+import { stringify as stringifyYaml } from "yaml";
 import {
   apiRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
+import {
+  getSource,
+  getAvailableSources,
+  getAllSources,
+  syncScoresToServer,
+} from "../lib/political/scorecard-ingest.ts";
+import { parseOffice } from "../lib/political/office-parser.ts";
+import { resolveAllStakeholders } from "../lib/political/stakeholder-resolver.ts";
 
 interface CommandOptions extends BaseOptions {
   entity?: string;
   ci?: boolean;
   limit?: string;
+  source?: string;
+  year?: string;
+  dryRun?: boolean;
 }
 
 // ---- stats command ----
@@ -91,10 +105,25 @@ async function statsCommand(
   return { exitCode: 0, output: lines.join("\n") };
 }
 
-// ---- scores command ----
+// ---- scores command (dispatches to list or ingest subcommand) ----
 
 async function scoresCommand(
-  _args: string[],
+  args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const subcommand = args[0];
+
+  if (subcommand === "ingest") {
+    return scoresIngestCommand(args.slice(1), options);
+  }
+
+  // Default: list scores
+  return scoresListCommand(options);
+}
+
+// ---- scores list (default) ----
+
+async function scoresListCommand(
   options: CommandOptions
 ): Promise<CommandResult> {
   const serverUrl = getServerUrl();
@@ -146,6 +175,158 @@ async function scoresCommand(
   return {
     exitCode: 0,
     output: `Political Scores (${total} total)\n\n${lines.join("\n")}`,
+  };
+}
+
+// ---- scores ingest ----
+
+async function scoresIngestCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const sourceId = options.source as string | undefined;
+  const yearStr = options.year as string | undefined;
+  const dryRun = !!options.dryRun;
+
+  const currentYear = new Date().getFullYear();
+  const year = yearStr ? parseInt(yearStr, 10) : currentYear;
+
+  if (isNaN(year) || year < 1900 || year > 2100) {
+    return {
+      exitCode: 1,
+      output: `Error: Invalid year "${yearStr}". Must be between 1900 and 2100.`,
+    };
+  }
+
+  // Determine which sources to fetch
+  const availableSources = getAvailableSources();
+
+  if (sourceId && !availableSources.includes(sourceId)) {
+    return {
+      exitCode: 1,
+      output: [
+        `Error: Unknown source "${sourceId}".`,
+        `Available sources: ${availableSources.join(", ")}`,
+      ].join("\n"),
+    };
+  }
+
+  const sourcesToFetch = sourceId
+    ? [getSource(sourceId)!]
+    : getAllSources();
+
+  const lines: string[] = [
+    `Scorecard Ingestion — Year: ${year}`,
+    `Sources: ${sourcesToFetch.map((s) => s.id).join(", ")}`,
+    dryRun ? "Mode: DRY RUN (no data will be synced)" : "Mode: LIVE (will sync to wiki-server)",
+    "",
+  ];
+
+  let totalRecords = 0;
+  let totalUpserted = 0;
+  let hasErrors = false;
+
+  for (const source of sourcesToFetch) {
+    lines.push(`--- ${source.name} ---`);
+
+    try {
+      const fetchResult = await source.fetch(year);
+
+      if (fetchResult.warnings.length > 0) {
+        for (const w of fetchResult.warnings) {
+          lines.push(`  Warning: ${w}`);
+        }
+      }
+
+      if (fetchResult.usedSampleData) {
+        lines.push("  Data: Sample data (source could not be scraped)");
+      } else {
+        lines.push("  Data: Live data from source");
+      }
+
+      lines.push(`  Records fetched: ${fetchResult.records.length}`);
+
+      if (fetchResult.records.length === 0) {
+        lines.push("  No records to sync.");
+        lines.push("");
+        continue;
+      }
+
+      totalRecords += fetchResult.records.length;
+
+      // Show preview of first few records
+      const preview = fetchResult.records.slice(0, 5);
+      lines.push("  Preview:");
+      for (const r of preview) {
+        const pct =
+          r.maxScore > 1
+            ? `${((r.score / r.maxScore) * 100).toFixed(0)}%`
+            : r.score === 1
+              ? "Endorsed"
+              : `${r.score}/${r.maxScore}`;
+        lines.push(`    ${r.politicianDisplayName} | ${pct} | ${r.notes ?? ""}`);
+      }
+      if (fetchResult.records.length > 5) {
+        lines.push(`    ... and ${fetchResult.records.length - 5} more`);
+      }
+
+      // Sync to wiki-server (unless dry run)
+      if (!dryRun) {
+        const syncResult = await syncScoresToServer(fetchResult.records);
+
+        if (syncResult.errors.length > 0) {
+          hasErrors = true;
+          for (const err of syncResult.errors) {
+            lines.push(`  Sync error: ${err}`);
+          }
+        }
+
+        lines.push(
+          `  Synced: ${syncResult.upserted}/${syncResult.totalRecords} records ` +
+          `in ${syncResult.batches} batch(es)`,
+        );
+        totalUpserted += syncResult.upserted;
+      } else {
+        lines.push("  Sync: Skipped (dry run)");
+      }
+    } catch (err) {
+      hasErrors = true;
+      const msg = err instanceof Error ? err.message : String(err);
+      lines.push(`  Error: ${msg}`);
+    }
+
+    lines.push("");
+  }
+
+  // Summary
+  lines.push("=== Summary ===");
+  lines.push(`  Total records fetched: ${totalRecords}`);
+  if (!dryRun) {
+    lines.push(`  Total records synced: ${totalUpserted}`);
+  }
+  if (hasErrors) {
+    lines.push("  Status: Completed with errors");
+  } else {
+    lines.push("  Status: Success");
+  }
+
+  if (options.ci) {
+    return {
+      exitCode: hasErrors ? 1 : 0,
+      output: JSON.stringify({
+        year,
+        sources: sourcesToFetch.map((s) => s.id),
+        totalRecords,
+        totalUpserted,
+        dryRun,
+        hasErrors,
+      }, null, 2),
+    };
+  }
+
+  return {
+    exitCode: hasErrors ? 1 : 0,
+    output: lines.join("\n"),
   };
 }
 
@@ -312,7 +493,7 @@ async function verifyLinksCommand(
   return { exitCode: failed > 0 ? 1 : 0, output: lines.join("\n") };
 }
 
-// ---- seed-offices command ----
+// ---- seed-offices command (uses office-parser) ----
 
 async function seedOfficesCommand(
   _args: string[],
@@ -337,18 +518,6 @@ async function seedOfficesCommand(
     (p) => p.tags && p.tags.includes("politics") && p.stableId
   );
 
-  // Infer office data from descriptions
-  const offices: Array<{
-    id: string;
-    politicianEntityId: string;
-    politicianDisplayName: string;
-    officeType: string;
-    jurisdiction: string;
-    district: string | null;
-    party: string | null;
-    status: "incumbent" | "candidate" | "former";
-  }> = [];
-
   function generateId(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
@@ -358,58 +527,40 @@ async function seedOfficesCommand(
     return result;
   }
 
+  const offices: Array<Record<string, unknown>> = [];
+  const skipped: string[] = [];
+
   for (const p of politicians) {
     const desc = p.description ?? "";
-    let officeType = "other";
-    let jurisdiction = "US";
-    let district: string | null = null;
-    let party: string | null = null;
-    let status: "incumbent" | "candidate" | "former" = "candidate";
+    const parsed = parseOffice(desc, p.id);
 
-    // Infer office type
-    if (/U\.S\. Senator/i.test(desc)) officeType = "senator";
-    else if (/U\.S\. Representative/i.test(desc)) officeType = "representative";
-    else if (/State Senator/i.test(desc)) officeType = "state_senator";
-    else if (/State Assembl/i.test(desc)) officeType = "state_representative";
-    else if (/Governor/i.test(desc)) officeType = "governor";
-    else if (/Attorney General/i.test(desc)) officeType = "attorney_general";
-
-    // Infer district
-    const districtMatch = desc.match(/\b([A-Z]{2})-(\d+)\b/);
-    if (districtMatch) district = districtMatch[0];
-
-    // Infer state
-    const statePatterns: [RegExp, string][] = [
-      [/Nebraska/i, "NE"], [/Tennessee/i, "TN"], [/Maine/i, "ME"],
-      [/Texas/i, "TX"], [/Georgia/i, "GA"], [/Florida/i, "FL"],
-      [/Michigan/i, "MI"], [/North Carolina/i, "NC"], [/New York/i, "NY"],
-      [/New Jersey/i, "NJ"], [/Illinois/i, "IL"],
-    ];
-    for (const [pattern, abbr] of statePatterns) {
-      if (pattern.test(desc)) { jurisdiction = abbr; break; }
-    }
-
-    // Infer party
-    if (desc.includes("(D)") || /Democrat/i.test(desc)) party = "democratic";
-    else if (desc.includes("(R)") || /Republican/i.test(desc)) party = "republican";
-
-    // Infer status
-    if (/incumbent/i.test(desc) || /U\.S\. Senator from/i.test(desc) || /U\.S\. Representative for/i.test(desc)) {
-      status = "incumbent";
-    } else if (/former/i.test(desc) || /lost/i.test(desc)) {
-      status = "former";
+    if (!parsed) {
+      skipped.push(p.id);
+      continue;
     }
 
     offices.push({
       id: generateId(),
       politicianEntityId: p.stableId!,
       politicianDisplayName: p.title,
-      officeType,
-      jurisdiction,
-      district,
-      party,
-      status,
+      officeType: parsed.officeType,
+      jurisdiction: parsed.jurisdiction,
+      district: parsed.district,
+      party: parsed.party,
+      status: parsed.status,
+      termStart: parsed.termStart,
+      termEnd: parsed.termEnd,
     });
+  }
+
+  if (options.dryRun) {
+    const lines = [`Parsed ${offices.length} offices from ${politicians.length} politicians (${skipped.length} skipped)`, ""];
+    for (const o of offices.slice(0, 15)) {
+      lines.push(`  ${o.politicianDisplayName} | ${o.officeType} | ${o.jurisdiction} ${o.district ?? ""} | ${o.party ?? "?"} [${o.status}]`);
+    }
+    if (offices.length > 15) lines.push(`  ... and ${offices.length - 15} more`);
+    if (skipped.length > 0) lines.push("", `Skipped (no office parsed): ${skipped.join(", ")}`);
+    return { exitCode: 0, output: lines.join("\n") };
   }
 
   console.log(`Seeding ${offices.length} political offices...\n`);
@@ -424,10 +575,90 @@ async function seedOfficesCommand(
     return { exitCode: 1, output: `Error: ${result.message}` };
   }
 
-  return {
-    exitCode: 0,
-    output: `Seeded ${result.data.upserted} political offices from YAML entity descriptions.`,
-  };
+  const lines = [
+    `Seeded ${result.data.upserted} political offices from ${politicians.length} politician descriptions.`,
+  ];
+  if (skipped.length > 0) {
+    lines.push(`Skipped ${skipped.length} (no office parsed): ${skipped.join(", ")}`);
+  }
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- resolve-stakeholders command ----
+
+async function resolveStakeholdersCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const dataDir = join(process.cwd(), "data");
+  const result = resolveAllStakeholders(dataDir);
+
+  const lines = [
+    "Stakeholder Resolution Results",
+    "",
+    `  Total stakeholders: ${result.totalStakeholders}`,
+    `  Already linked: ${result.alreadyLinked}`,
+    `  Newly resolved: ${result.resolved.length}`,
+    `  Unresolved: ${result.unresolved.length}`,
+    "",
+  ];
+
+  if (result.resolved.length > 0) {
+    lines.push("Resolved matches:");
+    for (const m of result.resolved) {
+      lines.push(`  ${m.policyId}: "${m.stakeholderName}" → ${m.matchedEntityTitle} (${m.matchedEntitySlug}) [${m.method}]`);
+    }
+    lines.push("");
+  }
+
+  if (result.unresolved.length > 0) {
+    lines.push("Unresolved:");
+    for (const u of result.unresolved) {
+      lines.push(`  ${u.policyId}: "${u.name}"`);
+    }
+    lines.push("");
+  }
+
+  if (options.dryRun || result.resolved.length === 0) {
+    if (result.resolved.length > 0) {
+      lines.push("Dry run — no changes written. Run without --dry-run to apply.");
+    }
+    return { exitCode: 0, output: lines.join("\n") };
+  }
+
+  // Apply changes to responses.yaml
+  const responsesPath = join(dataDir, "entities", "responses.yaml");
+  const raw = readFileSync(responsesPath, "utf-8");
+  const policies = parseYaml(raw) as Array<{
+    id: string;
+    stakeholders?: Array<{ name: string; entityId?: string; role?: string }>;
+    [key: string]: unknown;
+  }>;
+
+  // Build lookup: policyId+stakeholderName -> entityId
+  const matchLookup = new Map<string, string>();
+  for (const m of result.resolved) {
+    matchLookup.set(`${m.policyId}::${m.stakeholderName}`, m.matchedEntityStableId);
+  }
+
+  let applied = 0;
+  for (const policy of policies) {
+    for (const s of policy.stakeholders ?? []) {
+      if (s.entityId) continue;
+      const key = `${policy.id}::${s.name}`;
+      const entityId = matchLookup.get(key);
+      if (entityId) {
+        s.entityId = entityId;
+        applied++;
+      }
+    }
+  }
+
+  writeFileSync(responsesPath, stringifyYaml(policies, { lineWidth: 120 }));
+
+  lines.push(`Applied ${applied} entity ID links to responses.yaml.`);
+
+  return { exitCode: 0, output: lines.join("\n") };
 }
 
 // ---- exports ----
@@ -438,6 +669,7 @@ export const commands = {
   offices: officesCommand,
   "verify-links": verifyLinksCommand,
   "seed-offices": seedOfficesCommand,
+  "resolve-stakeholders": resolveStakeholdersCommand,
 };
 
 export function getHelp(): string {
@@ -449,11 +681,19 @@ export function getHelp(): string {
     "Usage:",
     "  crux tb political stats                       Show summary statistics",
     "  crux tb political scores [--entity=<id>]      List scorecard ratings",
+    "  crux tb political scores ingest [--source=X]  Ingest scorecard data from external sources",
     "  crux tb political offices [--entity=<id>]     List political offices",
     "  crux tb political verify-links                Verify all politician source URLs",
     "  crux tb political seed-offices                Seed office data from YAML entities",
+    "  crux tb political resolve-stakeholders        Resolve legislation stakeholder names to entity IDs",
     "",
-    "Options:",
+    "Scores Ingest Options:",
+    "  --source=<id>         Source to ingest from (lcv, humane-world, council-livable-world)",
+    "                        Omit to ingest from all sources",
+    "  --year=<YYYY>         Year to fetch (default: current year)",
+    "  --dry-run             Preview without syncing to wiki-server",
+    "",
+    "General Options:",
     "  --entity=<stableId>   Filter by politician entity",
     "  --limit=<N>           Max results (default: 200)",
     "  --ci                  JSON output for CI/scripting",

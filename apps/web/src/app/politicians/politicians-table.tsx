@@ -179,7 +179,7 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
               <tr key={row.id} className="hover:bg-muted/20 transition-colors">
                 {/* Name */}
                 <td className="py-2.5 px-3 max-w-xs">
-                  <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1.5">
                     <Link
                       href={`/people/${row.id}`}
                       className="font-medium hover:text-primary transition-colors line-clamp-1"
@@ -187,8 +187,8 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                       {row.title}
                     </Link>
                     {row.jurisdiction && (
-                      <span className="text-[10px] text-muted-foreground/60 leading-tight">
-                        {row.jurisdiction}
+                      <span className="text-[10px] text-muted-foreground/60 shrink-0">
+                        &middot; {row.jurisdiction}
                       </span>
                     )}
                   </div>
