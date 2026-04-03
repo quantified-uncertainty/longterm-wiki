@@ -42,7 +42,9 @@ function FormatExtractedValue({ value }: { value: string }) {
               <span key={k}>
                 {i > 0 && ", "}
                 <span className="font-medium text-foreground/70">{k}:</span>{" "}
-                {typeof v === "string" ? v : JSON.stringify(v)}
+                {typeof v === "string"
+                  ? (v.length > 100 ? v.slice(0, 100) + "\u2026" : v)
+                  : JSON.stringify(v)}
               </span>
             ))}
             {remaining > 0 && (

@@ -39,7 +39,11 @@ export function formatCompactCurrency(n: number | null | undefined, currency?: s
     const formatted = Math.abs(m) < 10 ? m.toFixed(1).replace(/\.0$/, "") : m.toFixed(0);
     return `${sym}${formatted}M`;
   }
-  if (Math.abs(n) >= 1e3) return `${sym}${(n / 1e3).toFixed(0)}K`;
+  if (Math.abs(n) >= 1e3) {
+    const k = n / 1e3;
+    const formatted = Math.abs(k) < 10 ? k.toFixed(1).replace(/\.0$/, "") : k.toFixed(0);
+    return `${sym}${formatted}K`;
+  }
   return `${sym}${n.toLocaleString()}`;
 }
 
@@ -57,7 +61,11 @@ export function formatCompactNumber(n: number | null | undefined): string {
     const formatted = Math.abs(m) < 10 ? m.toFixed(1).replace(/\.0$/, "") : m.toFixed(0);
     return `${formatted}M`;
   }
-  if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
+  if (Math.abs(n) >= 1e3) {
+    const k = n / 1e3;
+    const formatted = Math.abs(k) < 10 ? k.toFixed(1).replace(/\.0$/, "") : k.toFixed(0);
+    return `${formatted}K`;
+  }
   return n.toLocaleString();
 }
 
