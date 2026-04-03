@@ -188,6 +188,13 @@ export default async function OrgProfilePage({
   }
   const pgGrantCount = pgGrantsData?.total ?? 0;
 
+  // Count PG grants where this org is the grantee (for server-mode received grants)
+  const pgReceivedData = await fetchFromWikiServer<RpcGrantsByEntityResult>(
+    `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?role=grantee&limit=1&offset=0`,
+    { revalidate: 3600, timeoutMs: 10_000 },
+  );
+  const pgReceivedCount = pgReceivedData?.total ?? 0;
+
   // ── Build tabs from available data ──────────────────────────────────
 
   const tabs: OrgTab[] = [];
@@ -453,11 +460,13 @@ export default async function OrgProfilePage({
               pgGrantCount={pgGrantCount}
             />
           )}
-          {data.grantsReceived.length > 0 && (
+          {(data.grantsReceived.length > 0 || pgReceivedCount > 0) && (
             <GrantsSection
               grants={data.grantsReceived}
               direction="received"
+              entityId={entityStableId}
               orgSlug={slug}
+              pgGrantCount={pgReceivedCount}
             />
           )}
 

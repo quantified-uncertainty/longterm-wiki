@@ -46,6 +46,8 @@ const ByEntityQuery = z.object({
   amountMin: z.coerce.number().optional(),
   amountMax: z.coerce.number().optional(),
   program: z.string().max(200).optional(),
+  /** Match entity as "funder" (organizationId, default) or "grantee" (granteeId). */
+  role: z.enum(["funder", "grantee"]).default("funder"),
 });
 
 const AllQuery = z.object({
@@ -239,12 +241,13 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // and filters (?status=, ?amountMin=, ?amountMax=, ?program=).
   .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
     const resolvedId = c.get("resolvedEntityId");
-    const { limit, offset, q, sort, status, amountMin, amountMax, program } =
+    const { limit, offset, q, sort, status, amountMin, amountMax, program, role } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Build WHERE conditions
-    const conditions: SQL[] = [eq(grants.organizationId, resolvedId)];
+    // Build WHERE conditions — match on funder or grantee based on role param
+    const entityCol = role === "grantee" ? grants.granteeId : grants.organizationId;
+    const conditions: SQL[] = [eq(entityCol, resolvedId)];
 
     if (q) {
       const searchCond = buildSearchCondition(
