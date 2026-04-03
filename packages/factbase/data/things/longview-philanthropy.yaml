@@ -21,9 +21,9 @@ facts:
     notes: From Wikidata Q126277820
   - id: hzk6bK3REA
     property: country
-    value: United States
+    value: United Kingdom
     source: https://www.wikidata.org/wiki/Q126277820
-    notes: From Wikidata Q126277820
+    notes: "Longview is UK-based (London). Wikidata lists both UK and US; corrected to primary location."
   - id: 4Ncez877ig
     property: founded-by-name
     value: Natalie Cargill

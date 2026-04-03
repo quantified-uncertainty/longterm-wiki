@@ -42,8 +42,12 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
   }
 
   try {
-    // Read raw content, strip BOM if present (gates-foundation CSV has one)
-    const rawContent = readFileSync(manifest.cachePath, 'utf8').replace(/^\uFEFF/, '');
+    // Read raw content, clean up common issues:
+    // - Strip BOM (gates-foundation CSV has one)
+    // - Strip null bytes (gates-foundation CSV has 5MB of null padding — Postgres rejects \0 in text)
+    const rawContent = readFileSync(manifest.cachePath, 'utf8')
+      .replace(/^\uFEFF/, '')
+      .replace(/\0/g, '');
     if (!rawContent || rawContent.length === 0) {
       console.log(`  [snapshot] Empty cache file for ${sourceId}, skipping`);
       return { ok: false, error: 'empty cache file' };

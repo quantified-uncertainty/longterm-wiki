@@ -138,7 +138,9 @@ facts:
   - id: f_N10dTfD8W6
     property: funder
     value: "Omidyar Network / Luminate"
+    asOf: 2021
     source: https://ainowinstitute.org/about
+    notes: "Historical funder prior to mid-2022 independence. AI Now stopped accepting corporate/tech funding when it became independent in 2022."
 
   - id: f_diDp4Ck5W9
     property: policy-influence

@@ -102,7 +102,8 @@ export default function InvestmentsPage() {
 
   // Summary stats
   const totalInvestments = rows.length;
-  const totalAmount = rows.reduce((sum, r) => sum + (r.amount ?? 0), 0);
+  const rowsWithAmount = rows.filter((r) => r.amount != null);
+  const totalAmount = rowsWithAmount.reduce((sum, r) => sum + r.amount!, 0);
   const uniqueInvestors = new Set(
     rows.filter((r) => r.investorName).map((r) => r.investorName),
   ).size;
@@ -110,7 +111,7 @@ export default function InvestmentsPage() {
 
   const stats = [
     { label: "Investments", value: totalInvestments.toLocaleString() },
-    { label: "Total Amount", value: formatCompactCurrency(totalAmount) },
+    { label: `Total Amount (${rowsWithAmount.length}/${totalInvestments})`, value: formatCompactCurrency(totalAmount) },
     { label: "Investors", value: String(uniqueInvestors) },
     { label: "Companies", value: String(uniqueCompanies) },
   ];

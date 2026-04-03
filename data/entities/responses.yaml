@@ -2025,9 +2025,26 @@
       url: https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
       author: NIST
       date: July 2024
+  stakeholders:
+    - name: NIST
+      position: support
+      importance: high
+      reason: Developed and maintains the framework; conducted extensive public consultation with 240+ organizations
+    - name: Microsoft
+      position: support
+      importance: medium
+      reason: Active participant in development; adopted AI RMF principles in its Responsible AI Standard
+    - name: Google
+      position: support
+      importance: medium
+      reason: Contributed to public consultation; references AI RMF in its AI governance approach
+    - name: Partnership on AI
+      position: support
+      importance: medium
+      reason: Advocated for the framework; contributed expertise during the public comment period
   description: The NIST AI Risk Management Framework (AI RMF) is a voluntary guidance document developed by the National
     Institute of Standards and Technology to help organizations manage risks associated with AI systems.
-  lastUpdated: 2025-12
+  lastUpdated: 2026-04
 - id: seoul-declaration
   stableId: sid_1i59OZ3q5w
   wikiId: E279
@@ -2053,9 +2070,30 @@
       url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
       author: AI Companies
       date: May 2024
+  stakeholders:
+    - name: United Kingdom
+      position: support
+      importance: high
+      reason: Co-hosted the summit with South Korea; led the Bletchley-to-Seoul AI safety summit series
+    - name: South Korea
+      position: support
+      importance: high
+      reason: Host country; positioned itself as bridge between Western and Asian AI governance approaches
+    - name: OpenAI
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments at the summit alongside other major AI companies
+    - name: Google DeepMind
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments; supported pre-deployment safety testing commitments
+    - name: Anthropic
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments; aligned with summit's risk-based approach
   description: The Seoul AI Safety Summit (May 21-22, 2024) was the second in a series of international AI safety summits,
     following the Bletchley Park Summit in November 2023.
-  lastUpdated: 2025-12
+  lastUpdated: 2026-04
 - id: standards-bodies
   stableId: sid_HXPEtPD1zw
   wikiId: E288
@@ -5219,10 +5257,35 @@
     treaty, establishing human rights-focused governance principles across 57+ countries, though it has significant
     enforcement gaps and excludes national security applications. While historically significant as the first binding AI
     treaty, its practical enforcement mechanisms remain weak.
+  stakeholders:
+    - name: Council of Europe
+      position: support
+      importance: high
+      reason: Initiated and adopted the convention; represents 46 member states committed to human rights-based AI governance
+    - name: European Union
+      position: support
+      importance: high
+      reason: Signed the convention alongside individual EU member states; complements the EU AI Act with an international treaty framework
+    - name: United Kingdom
+      position: support
+      importance: medium
+      reason: Early signatory despite Brexit; views the convention as compatible with its pro-innovation AI approach
+    - name: United States
+      position: support
+      importance: medium
+      reason: Participated as observer state in negotiations; signed the convention in September 2024 alongside the EU, UK, and Israel
+    - name: Access Now
+      position: mixed
+      importance: medium
+      reason: Supports the human rights framing but criticized the national security exemption as too broad, potentially undermining protections
+    - name: European Digital Rights (EDRi)
+      position: mixed
+      importance: medium
+      reason: Welcomed the binding nature but criticized weak enforcement mechanisms and the broad national security carve-out
   clusters:
     - governance
     - ai-safety
-  lastUpdated: 2026-02
+  lastUpdated: 2026-04
 - id: collective-epistemics-design-sketches
   stableId: sid_mPQolusDhA
   wikiId: E588
@@ -6222,6 +6285,27 @@
     - united-nations
     - ai-governance
     - scientific-panel
+  stakeholders:
+    - name: China
+      position: support
+      importance: high
+      reason: Strongly supported the resolution; aligned with developing countries seeking multilateral AI governance through the UN system
+    - name: UN Secretary-General
+      position: support
+      importance: high
+      reason: Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive governance
+    - name: Global South coalition
+      position: support
+      importance: high
+      reason: Developing nations backed the resolution as a way to ensure their voice in AI governance, countering Western-dominated forums like the G7
+    - name: United States
+      position: oppose
+      importance: high
+      reason: Explicitly rejected "centralized control and global governance" of AI at UN Security Council; views UN governance as potentially constraining US AI leadership
+    - name: European Union
+      position: mixed
+      importance: medium
+      reason: Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism
   clusters:
     - governance
   sources:
@@ -6229,7 +6313,7 @@
       url: https://press.un.org/en/2025/sgsm22776.doc.htm
     - title: WEF Explainer
       url: https://www.weforum.org/stories/2025/10/un-new-ai-governance-bodies/
-  lastUpdated: 2026-03
+  lastUpdated: 2026-04
 - id: utah-sb226
   stableId: sid_yxyu4w3Xup
   type: policy
