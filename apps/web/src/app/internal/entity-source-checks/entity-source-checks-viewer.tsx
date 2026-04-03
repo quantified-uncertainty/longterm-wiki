@@ -28,24 +28,7 @@ import {
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 import { VerdictBadge, VERDICT_STYLES, VERDICT_PRIORITY, getRecordHref, formatCheckerModel } from "@/app/source-checks/source-checks-shared";
-
-// -- Types --
-
-interface VerdictRow {
-  recordType: string;
-  recordId: string;
-  fieldName: string | null;
-  entityId: string | null;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number;
-  needsRecheck: boolean;
-  nextCheckDue: string | null;
-  lastComputedAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
+import type { VerdictRow } from "@/components/shared/verdict-styles";
 
 interface EvidenceRow {
   id: number;
@@ -565,7 +548,7 @@ function ContradictionsSummary({
                           Checked: {new Date(v.lastComputedAt).toLocaleDateString()}
                         </span>
                       )}
-                      {v.sourcesChecked > 0 && (
+                      {v.sourcesChecked != null && v.sourcesChecked > 0 && (
                         <span>{v.sourcesChecked} source{v.sourcesChecked !== 1 ? "s" : ""}</span>
                       )}
                     </div>
