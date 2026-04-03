@@ -8,12 +8,9 @@
 import { getPersonnelByEntity } from '../lib/wiki-server/personnel.ts';
 import { getFundingRoundsByEntity } from '../lib/wiki-server/funding-rounds.ts';
 import { getInvestmentsByEntity } from '../lib/wiki-server/investments.ts';
-import { getBenchmarkResultsByModel } from '../lib/wiki-server/benchmark-results.ts';
+import { getBenchmarkResultsByModel, type BenchmarkResultEntry } from '../lib/wiki-server/benchmark-results.ts';
 import { getFundingProgramsByOrg } from '../lib/wiki-server/funding-programs.ts';
 import { getGrantsByEntity } from '../lib/wiki-server/grants.ts';
-
-
-
 
 
 
@@ -25,58 +22,30 @@ import { getGrantsByEntity } from '../lib/wiki-server/grants.ts';
 async function fetchExistingPersonnel(entityId: string) {
   const result = await getPersonnelByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.personnel : [];
-}>(
-    'GET',
-    `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
-  return result.ok ? result.data.personnel : [];
 }
 
 async function fetchExistingFundingRounds(entityId: string) {
   const result = await getFundingRoundsByEntity(entityId, { limit: 200 });
-  return result.ok ? result.data.fundingRounds : [];
-}>(
-    'GET',
-    `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
   return result.ok ? result.data.fundingRounds : [];
 }
 
 async function fetchExistingInvestments(entityId: string) {
   const result = await getInvestmentsByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.investments : [];
-}>(
-    'GET',
-    `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
-  return result.ok ? result.data.investments : [];
 }
 
-async function fetchExistingBenchmarkResults(modelId: string): Promise<BenchmarkResultRecord[]> {
-  const result = await apiRequest<{ benchmarkResults: BenchmarkResultRecord[] }>(
-    'GET',
-    `/api/benchmark-results/by-model/${encodeURIComponent(modelId)}?limit=200`,
-  );
+async function fetchExistingBenchmarkResults(modelId: string): Promise<BenchmarkResultEntry[]> {
+  const result = await getBenchmarkResultsByModel(modelId, { limit: 200 });
   return result.ok ? result.data.benchmarkResults : [];
 }
 
 async function fetchExistingFundingPrograms(orgId: string) {
   const result = await getFundingProgramsByOrg(orgId, { limit: 500 });
   return result.ok ? result.data.fundingPrograms : [];
-}>(
-    'GET',
-    `/api/funding-programs/by-org/${encodeURIComponent(orgId)}?limit=500`,
-  );
-  return result.ok ? result.data.fundingPrograms : [];
 }
 
 async function fetchExistingGrantsForOrg(entityId: string) {
   const result = await getGrantsByEntity(entityId, { limit: 200 });
-  return result.ok ? result.data.grants : [];
-}>(
-    'GET',
-    `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
   return result.ok ? result.data.grants : [];
 }
 
