@@ -497,7 +497,7 @@ export async function citations(args: string[], options: Record<string, unknown>
     for (const b of broken) {
       const scoreStr = b.verificationScore !== null ? ` (score: ${b.verificationScore.toFixed(2)})` : '';
       output += `${c.bold}${b.pageId}${c.reset} — footnote ${b.footnote}${scoreStr}\n`;
-      if ('sourceTitle' in b && (b as any).sourceTitle) output += `  Source: ${(b as any).sourceTitle}\n`;
+      if ('sourceTitle' in b && (b as Record<string, unknown>).sourceTitle) output += `  Source: ${(b as Record<string, unknown>).sourceTitle}\n`;
       if (b.url) output += `  URL: ${c.dim}${b.url.slice(0, 80)}${b.url.length > 80 ? '…' : ''}${c.reset}\n`;
       output += `  ${c.dim}${b.claimText.slice(0, 100)}${b.claimText.length > 100 ? '…' : ''}${c.reset}\n\n`;
     }
