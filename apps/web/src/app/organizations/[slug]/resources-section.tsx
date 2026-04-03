@@ -26,6 +26,7 @@ import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "./org-data";
 import { ResourceList } from "@/components/resources/ResourceList";
 import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
+import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 import { isDeadFetchStatus } from "@wiki-server/api-types";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
@@ -74,9 +75,9 @@ function makeColumns(opts: {
               <Link
                 href={`/resources/${r.id}`}
                 className="text-primary hover:underline text-xs font-medium line-clamp-2"
-                title={r.title}
+                title={stripMarkdownFormatting(r.title)}
               >
-                {r.title}
+                {stripMarkdownFormatting(r.title)}
               </Link>
               {isDeadFetchStatus(r.fetchStatus) && (
                 <span title="Link may be broken">

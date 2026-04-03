@@ -323,6 +323,8 @@ const sourceChecksApp = new Hono()
         recordId: r.recordId,
         fieldName: r.fieldName,
         entityId: r.entityId,
+        displayName: r.displayName,
+        entityDisplayName: r.entityDisplayName,
         verdict: r.verdict,
         confidence: r.confidence,
         reasoning: r.reasoning,

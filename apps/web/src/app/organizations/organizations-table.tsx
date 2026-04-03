@@ -179,7 +179,7 @@ export function OrganizationsTable({
 
   // ── Local (static) state via URL-synced hook ──
   const url = useDirectoryUrl({
-    defaultSort: { field: "revenue", dir: "desc" },
+    defaultSort: { field: "name", dir: "asc" },
     filters: ["type", "stat"],
   });
   const {

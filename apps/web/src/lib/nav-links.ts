@@ -39,7 +39,7 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Policy",
     items: [
       { href: "/legislation", label: "Legislation" },
-      { href: "/races", label: "Races" },
+      // /races hidden from nav — page is empty (0 entries). Re-add when data exists.
       { href: "/funding-programs", label: "Funding" },
     ],
   },

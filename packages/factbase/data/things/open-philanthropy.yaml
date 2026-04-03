@@ -8,6 +8,6 @@ facts:
     notes: Migrated from old entity system
   - id: oT6jWFtI9A
     property: wikipedia-url
-    value: https://en.wikipedia.org/wiki/Open_philanthropy_(doctrine)
+    value: https://en.wikipedia.org/wiki/Open_Philanthropy
     source: https://www.wikidata.org/wiki/Q7096163
-    notes: From Wikidata Q7096163
+    notes: From Wikidata Q7096163; corrected from Open_philanthropy_(doctrine) which is about the philosophical doctrine, not the organization

@@ -33,6 +33,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 
 export interface ResourceDataRow {
   id: string;
@@ -96,15 +97,18 @@ function makeColumns(): ColumnDef<ResourceDataRow>[] {
       header: ({ column }) => (
         <SortableHeader column={column}>Title</SortableHeader>
       ),
-      cell: ({ row }) => (
-        <Link
-          href={`/resources/${row.original.id}`}
-          className="text-primary hover:underline text-xs font-medium max-w-[300px] truncate block"
-          title={row.original.title}
-        >
-          {row.original.title}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const displayTitle = stripMarkdownFormatting(row.original.title);
+        return (
+          <Link
+            href={`/resources/${row.original.id}`}
+            className="text-primary hover:underline text-xs font-medium max-w-[300px] truncate block"
+            title={displayTitle}
+          >
+            {displayTitle}
+          </Link>
+        );
+      },
       filterFn: "includesString",
     },
     {
