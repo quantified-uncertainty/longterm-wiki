@@ -11,7 +11,8 @@
  */
 
 import { generateId } from "../lib/grant-import/id.ts";
-import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
+import { getServerUrl } from "../lib/wiki-server/client.ts";
+import { deleteFundingPrograms, getFundingProgramsByOrg, syncFundingPrograms } from "../lib/wiki-server/funding-programs.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
