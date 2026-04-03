@@ -6,7 +6,7 @@ run-name: "Source-Check${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || ''
 
 on:
   schedule:
-    - cron: '0 4 * * 1'  # Weekly Monday 4am UTC
+    - cron: '0 4 * * *'  # Daily at 4am UTC
   workflow_dispatch:
     inputs:
       budget:

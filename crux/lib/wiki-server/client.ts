@@ -63,7 +63,7 @@ export function buildHeaders(): Record<string, string> {
 // ApiResult — discriminated union for typed errors
 // ---------------------------------------------------------------------------
 
-export type ApiError = 'unavailable' | 'timeout' | 'bad_request' | 'auth_error' | 'server_error';
+export type ApiError = 'unavailable' | 'timeout' | 'bad_request' | 'auth_error' | 'server_error' | 'rate_limited';
 
 export type ApiResult<T> =
   | { ok: true; data: T }
@@ -88,9 +88,13 @@ export function unwrap<T>(result: ApiResult<T>): T | null {
 
 function classifyStatus(status: number): ApiError {
   if (status === 401 || status === 403) return 'auth_error';
+  if (status === 429) return 'rate_limited';
   if (status >= 400 && status < 500) return 'bad_request';
   return 'server_error';
 }
+
+/** Max retries for rate-limited requests */
+const MAX_RATE_LIMIT_RETRIES = 3;
 
 // ---------------------------------------------------------------------------
 // Core request function
@@ -99,6 +103,8 @@ function classifyStatus(status: number): ApiError {
 /**
  * Make a JSON request to the wiki-server API.
  * Returns an `ApiResult<T>` with typed error discrimination.
+ * Automatically retries on 429 (rate limit) with backoff from the
+ * `x-ratelimit-reset` header.
  */
 export async function apiRequest<T>(
   method: 'GET' | 'POST' | 'PATCH',
@@ -112,37 +118,51 @@ export async function apiRequest<T>(
     return apiErr('unavailable', `${prefix}LONGTERMWIKI_SERVER_URL not set`);
   }
 
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+  for (let attempt = 0; attempt <= MAX_RATE_LIMIT_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-    const options: RequestInit = {
-      method,
-      headers: buildHeaders(),
-      signal: controller.signal,
-    };
+      const options: RequestInit = {
+        method,
+        headers: buildHeaders(),
+        signal: controller.signal,
+      };
 
-    if (body !== undefined) {
-      options.body = JSON.stringify(body);
+      if (body !== undefined) {
+        options.body = JSON.stringify(body);
+      }
+
+      const res = await fetch(`${serverUrl}${path}`, options);
+      clearTimeout(timer);
+
+      if (res.status === 429 && attempt < MAX_RATE_LIMIT_RETRIES) {
+        // Rate limited — wait for reset and retry
+        const resetEpoch = Number(res.headers.get('x-ratelimit-reset'));
+        const waitMs = resetEpoch
+          ? Math.max(0, resetEpoch * 1000 - Date.now()) + 500 // 500ms buffer
+          : (attempt + 1) * 2000; // Exponential fallback: 2s, 4s, 6s
+        await new Promise(resolve => setTimeout(resolve, Math.min(waitMs, 30_000)));
+        continue;
+      }
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        return apiErr(classifyStatus(res.status), `${res.status}: ${text.slice(0, 500)}`);
+      }
+
+      return apiOk((await res.json()) as T);
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return apiErr('timeout', `Request to ${path} timed out after ${timeoutMs}ms`);
+      }
+      const message = err instanceof Error ? err.message : String(err);
+      // Network errors (ECONNREFUSED, DNS failures, etc.) → unavailable
+      return apiErr('unavailable', message);
     }
-
-    const res = await fetch(`${serverUrl}${path}`, options);
-    clearTimeout(timer);
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => '');
-      return apiErr(classifyStatus(res.status), `${res.status}: ${text.slice(0, 500)}`);
-    }
-
-    return apiOk((await res.json()) as T);
-  } catch (err: unknown) {
-    if (err instanceof DOMException && err.name === 'AbortError') {
-      return apiErr('timeout', `Request to ${path} timed out after ${timeoutMs}ms`);
-    }
-    const message = err instanceof Error ? err.message : String(err);
-    // Network errors (ECONNREFUSED, DNS failures, etc.) → unavailable
-    return apiErr('unavailable', message);
   }
+
+  return apiErr('rate_limited', `Rate limited after ${MAX_RATE_LIMIT_RETRIES} retries on ${path}`);
 }
 
 /**
