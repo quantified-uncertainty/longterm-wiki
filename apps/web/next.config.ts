@@ -247,6 +247,161 @@ const nextConfig: NextConfig = {
         destination: "/research-areas/agentic-ai-research",
         permanent: true,
       },
+      // Legislation alternate-slug redirects (#3354)
+      // US Executive Order on AI (EO 14110) — many name variations
+      {
+        source: "/legislation/executive-order-14110",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      {
+        source: "/legislation/eo-14110",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      {
+        source: "/legislation/us-executive-order-14110",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      {
+        source: "/legislation/biden-executive-order",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      {
+        source: "/legislation/biden-ai-executive-order",
+        destination: "/legislation/us-executive-order",
+        permanent: true,
+      },
+      // California SB 1047 — hyphenation and prefix variations
+      {
+        source: "/legislation/sb-1047",
+        destination: "/legislation/california-sb1047",
+        permanent: true,
+      },
+      {
+        source: "/legislation/sb1047",
+        destination: "/legislation/california-sb1047",
+        permanent: true,
+      },
+      // California SB 53 — hyphenation variation
+      {
+        source: "/legislation/sb-53",
+        destination: "/legislation/california-sb53",
+        permanent: true,
+      },
+      {
+        source: "/legislation/sb53",
+        destination: "/legislation/california-sb53",
+        permanent: true,
+      },
+      // California SB 243 — hyphenation variation
+      {
+        source: "/legislation/sb-243",
+        destination: "/legislation/california-sb243",
+        permanent: true,
+      },
+      {
+        source: "/legislation/sb243",
+        destination: "/legislation/california-sb243",
+        permanent: true,
+      },
+      // China AI regulations — alternate phrasings
+      {
+        source: "/legislation/artificial-intelligence-act-china",
+        destination: "/legislation/china-ai-regulations",
+        permanent: true,
+      },
+      {
+        source: "/legislation/china-ai-act",
+        destination: "/legislation/china-ai-regulations",
+        permanent: true,
+      },
+      // EU AI Act — alternate phrasings
+      {
+        source: "/legislation/artificial-intelligence-act",
+        destination: "/legislation/eu-ai-act",
+        permanent: true,
+      },
+      {
+        source: "/legislation/european-ai-act",
+        destination: "/legislation/eu-ai-act",
+        permanent: true,
+      },
+      // Colorado AI Act — full name
+      {
+        source: "/legislation/colorado-artificial-intelligence-act",
+        destination: "/legislation/colorado-ai-act",
+        permanent: true,
+      },
+      // Trump EOs — alternate names
+      {
+        source: "/legislation/executive-order-14179",
+        destination: "/legislation/trump-eo-14179",
+        permanent: true,
+      },
+      {
+        source: "/legislation/eo-14179",
+        destination: "/legislation/trump-eo-14179",
+        permanent: true,
+      },
+      // NIST AI RMF — alternate phrasings
+      {
+        source: "/legislation/nist-ai-risk-management-framework",
+        destination: "/legislation/nist-ai-rmf",
+        permanent: true,
+      },
+      {
+        source: "/legislation/ai-rmf",
+        destination: "/legislation/nist-ai-rmf",
+        permanent: true,
+      },
+      // Canada AIDA — full name
+      {
+        source: "/legislation/artificial-intelligence-and-data-act",
+        destination: "/legislation/canada-aida",
+        permanent: true,
+      },
+      {
+        source: "/legislation/aida",
+        destination: "/legislation/canada-aida",
+        permanent: true,
+      },
+      // Council of Europe AI Convention — short names
+      {
+        source: "/legislation/ai-convention",
+        destination: "/legislation/coe-ai-convention",
+        permanent: true,
+      },
+      {
+        source: "/legislation/council-of-europe-ai-convention",
+        destination: "/legislation/coe-ai-convention",
+        permanent: true,
+      },
+      // Utah SB 226 — without state prefix
+      {
+        source: "/legislation/sb-226",
+        destination: "/legislation/utah-sb226",
+        permanent: true,
+      },
+      {
+        source: "/legislation/sb226",
+        destination: "/legislation/utah-sb226",
+        permanent: true,
+      },
+      // TAKE IT DOWN Act — case variations
+      {
+        source: "/legislation/take-it-down",
+        destination: "/legislation/take-it-down-act",
+        permanent: true,
+      },
+      // New York RAISE Act — alternate slug
+      {
+        source: "/legislation/raise-act",
+        destination: "/legislation/new-york-raise-act",
+        permanent: true,
+      },
       // AI model and benchmark alternate-name redirects
       {
         source: "/ai-models/gemini-ultra",

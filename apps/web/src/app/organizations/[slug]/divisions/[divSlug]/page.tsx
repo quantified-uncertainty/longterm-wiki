@@ -205,9 +205,15 @@ export default async function DivisionDetailPage({ params }: PageProps) {
       {/* Tabbed content */}
       <DivisionTabs data={data} />
       {data.personnel.length === 0 && data.grants.length === 0 && data.recipients.length === 0 && (
-        <p className="text-sm text-muted-foreground italic py-8 text-center">
-          No detailed data available for this division yet.
-        </p>
+        <div className="rounded-lg border border-border/60 bg-muted/30 px-6 py-8 text-center">
+          <p className="text-sm text-muted-foreground mb-1">
+            No detailed data available for this division yet.
+          </p>
+          <p className="text-xs text-muted-foreground/60">
+            People, grants, and funding programs for this division will be added
+            as the wiki grows.
+          </p>
+        </div>
       )}
 
       {/* Back to parent org */}

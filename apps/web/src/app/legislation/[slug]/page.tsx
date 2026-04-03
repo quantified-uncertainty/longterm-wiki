@@ -46,6 +46,11 @@ import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
 
+// LegislationVotes — will be created by another agent.
+// TODO: import { LegislationVotes } from "@/components/political/legislation-votes";
+// Usage: <LegislationVotes entityId={entity.stableId ?? entity.id} />
+// This component will show how tracked politicians voted on this legislation.
+
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
 }
@@ -385,6 +390,11 @@ export default async function LegislationDetailPage({
           </div>
         </section>
       )}
+
+      {/* Politician Vote Breakdown — will render when LegislationVotes component is available */}
+      {/* TODO: Uncomment when @/components/political/legislation-votes is created:
+      <LegislationVotes entityId={entity.stableId ?? entity.id} />
+      */}
 
       <FBAutoFacts entityId={entity.id} />
 

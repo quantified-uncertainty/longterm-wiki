@@ -3663,3 +3663,131 @@ export const politicalOffices = pgTable(
     index("idx_poloffice_status").on(table.status),
   ]
 );
+
+// ── Campaign Finance ──────────────────────────────────────────────────
+//
+// FEC campaign finance data for politicians.
+// One row per (fec_candidate_id, cycle).
+
+export const campaignFinance = pgTable(
+  "campaign_finance",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the politician */
+    politicianEntityId: varchar("politician_entity_id", { length: 40 }).references(
+      () => entities.stableId,
+      { onDelete: "set null" }
+    ),
+    /** Display name fallback */
+    politicianDisplayName: varchar("politician_display_name", { length: 200 }),
+    /** Election cycle year (2024, 2026, etc.) */
+    cycle: integer("cycle").notNull(),
+    /** Total raised during the cycle */
+    totalRaised: numeric("total_raised", { precision: 14, scale: 2 }),
+    /** Total spent during the cycle */
+    totalSpent: numeric("total_spent", { precision: 14, scale: 2 }),
+    /** Cash on hand */
+    cashOnHand: numeric("cash_on_hand", { precision: 14, scale: 2 }),
+    /** Contributions from individuals */
+    individualContributions: numeric("individual_contributions", {
+      precision: 14,
+      scale: 2,
+    }),
+    /** Contributions from PACs */
+    pacContributions: numeric("pac_contributions", { precision: 14, scale: 2 }),
+    /** Small-dollar contributions (under $200) */
+    smallDonorContributions: numeric("small_donor_contributions", {
+      precision: 14,
+      scale: 2,
+    }),
+    /** Self-funding by the candidate */
+    selfFunding: numeric("self_funding", { precision: 14, scale: 2 }),
+    /** Party affiliation */
+    party: varchar("party", { length: 20 }),
+    /** Office type: senate, house, president */
+    officeType: varchar("office_type", { length: 30 }),
+    /** State abbreviation */
+    state: varchar("state", { length: 5 }),
+    /** District (e.g., "01", "AL" for at-large) */
+    district: varchar("district", { length: 10 }),
+    /** FEC candidate ID (e.g., H2NC04290) */
+    fecCandidateId: varchar("fec_candidate_id", { length: 20 }),
+    /** URL to FEC source */
+    sourceUrl: text("source_url"),
+    /** Date the FEC data was last updated */
+    dataAsOf: date("data_as_of"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_campfin_politician").on(table.politicianEntityId),
+    index("idx_campfin_cycle").on(table.cycle),
+    index("idx_campfin_state").on(table.state),
+    index("idx_campfin_office_type").on(table.officeType),
+    uniqueIndex("uq_campaign_finance_natural_key").on(
+      table.fecCandidateId,
+      table.cycle
+    ),
+  ]
+);
+
+// ── Political Votes ───────────────────────────────────────────────────
+//
+// Roll call voting records for tracked legislation (congressional and state).
+// One row per (politician, legislation, roll_call_number, congress_number).
+
+export const politicalVotes = pgTable(
+  "political_votes",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to entities.stable_id for the politician (nullable for external politicians) */
+    politicianEntityId: varchar("politician_entity_id", { length: 40 }).references(
+      () => entities.stableId,
+      { onDelete: "cascade" }
+    ),
+    /** Display name fallback when FK unresolved */
+    politicianDisplayName: varchar("politician_display_name", { length: 200 }),
+    /** Legislation entity slug in responses.yaml (e.g., "california-sb1047") */
+    legislationEntityId: varchar("legislation_entity_id", { length: 100 }),
+    /** Human-readable title of the legislation */
+    legislationTitle: varchar("legislation_title", { length: 500 }),
+    /** Vote cast: yea, nay, abstain, not_voting, present */
+    vote: varchar("vote", { length: 20 }).notNull(),
+    /** Date the vote was cast */
+    voteDate: date("vote_date"),
+    /** Chamber: senate, house, state_senate, state_assembly */
+    chamber: varchar("chamber", { length: 20 }),
+    /** Roll call number for the vote */
+    rollCallNumber: integer("roll_call_number"),
+    /** Congress number (e.g., 118, 119) */
+    congressNumber: integer("congress_number"),
+    /** Session within a Congress (1 or 2) */
+    session: integer("session"),
+    /** URL to the vote record source */
+    sourceUrl: text("source_url"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_polvote_politician").on(table.politicianEntityId),
+    index("idx_polvote_legislation").on(table.legislationEntityId),
+    index("idx_polvote_date").on(table.voteDate),
+    index("idx_polvote_chamber").on(table.chamber),
+    uniqueIndex("uq_political_votes_natural_key").on(
+      table.politicianEntityId,
+      table.legislationEntityId,
+      table.rollCallNumber,
+      table.congressNumber,
+    ),
+  ]
+);

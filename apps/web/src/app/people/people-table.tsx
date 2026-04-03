@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useState } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
@@ -310,6 +310,37 @@ export function PeopleTable({
     ? serverFilters["affiliation"] ?? "all"
     : affiliationFilter;
 
+  // ── Column visibility ──
+  // Role and Affiliation are sparse (~9% and ~6% filled). Hide them by default
+  // in the unfiltered view, but auto-show when the column has data for the
+  // current filtered set (e.g., filtering by affiliation makes that column useful).
+  const [showAllColumns, setShowAllColumns] = useState(false);
+
+  const { roleFillRate, affiliationFillRate } = useMemo(() => {
+    const source = serverMode ? rows : localFiltered;
+    if (source.length === 0) return { roleFillRate: 0, affiliationFillRate: 0 };
+    const withRole = source.filter((r) => r.role != null).length;
+    const withAff = source.filter((r) => r.employerName != null).length;
+    return {
+      roleFillRate: withRole / source.length,
+      affiliationFillRate: withAff / source.length,
+    };
+  }, [serverMode, rows, localFiltered]);
+
+  // Auto-show a sparse column when >50% of the filtered view has data,
+  // or when the user explicitly toggled "Show all columns"
+  const showRole = showAllColumns || roleFillRate > 0.5;
+  const showAffiliation = showAllColumns || affiliationFillRate > 0.5 || activeAffiliation !== "all";
+  const hasSparseColumns = roleFillRate <= 0.5 || (affiliationFillRate <= 0.5 && activeAffiliation === "all");
+
+  // Compute dynamic column count for colSpan on empty/loading rows
+  // Base: Name + Born + Net Worth = 3, plus optional Role + Affiliation,
+  // plus 3 more in static mode (Positions, Pubs, Career Entries)
+  const colSpan = 3
+    + (showRole ? 1 : 0)
+    + (showAffiliation ? 1 : 0)
+    + (serverMode ? 0 : 3);
+
   // ── Status text ──
   const statusText = (() => {
     if (serverMode) {
@@ -378,7 +409,7 @@ export function PeopleTable({
 
       </div>
 
-      {/* Results count + show all toggle */}
+      {/* Results count + toggles */}
       <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
         <span>{statusText}</span>
         {!serverMode && stubCount > 0 && (
@@ -388,6 +419,15 @@ export function PeopleTable({
             className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
           >
             {showAll ? "Hide stub entries" : "Show all"}
+          </button>
+        )}
+        {!serverMode && hasSparseColumns && (
+          <button
+            type="button"
+            onClick={() => setShowAllColumns((v) => !v)}
+            className="text-xs text-primary hover:text-primary/80 underline underline-offset-2 transition-colors"
+          >
+            {showAllColumns ? "Hide sparse columns" : "Show all columns"}
           </button>
         )}
       </div>
@@ -406,22 +446,26 @@ export function PeopleTable({
                 onSort={handleSort}
                 className="text-left"
               />
-              <SortHeader
-                label="Role"
-                sortKey="role"
-                currentSort={sortKey}
-                currentDir={sortDir}
-                onSort={handleSort}
-                className="text-left"
-              />
-              <SortHeader
-                label="Affiliation"
-                sortKey="employer"
-                currentSort={sortKey}
-                currentDir={sortDir}
-                onSort={handleSort}
-                className="text-left"
-              />
+              {showRole && (
+                <SortHeader
+                  label="Role"
+                  sortKey="role"
+                  currentSort={sortKey}
+                  currentDir={sortDir}
+                  onSort={handleSort}
+                  className="text-left"
+                />
+              )}
+              {showAffiliation && (
+                <SortHeader
+                  label="Affiliation"
+                  sortKey="employer"
+                  currentSort={sortKey}
+                  currentDir={sortDir}
+                  onSort={handleSort}
+                  className="text-left"
+                />
+              )}
               <SortHeader
                 label="Born"
                 sortKey="bornYear"
@@ -472,7 +516,7 @@ export function PeopleTable({
             {isInitialLoad ? (
               <tr>
                 <td
-                  colSpan={serverMode ? 5 : 8}
+                  colSpan={colSpan}
                   role="status"
                   aria-live="polite"
                   className="py-8 text-center text-muted-foreground text-sm"
@@ -483,7 +527,7 @@ export function PeopleTable({
             ) : serverError && rows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={serverMode ? 5 : 8}
+                  colSpan={colSpan}
                   className="py-8 text-center text-sm"
                 >
                   <span className="text-destructive">{serverError}</span>
@@ -516,33 +560,37 @@ export function PeopleTable({
                     </td>
 
                     {/* Role */}
-                    <td className="py-2.5 px-3 text-muted-foreground">
-                      {row.role ?? (
-                        <span className="text-muted-foreground/40">
-                          &mdash;
-                        </span>
-                      )}
-                    </td>
+                    {showRole && (
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        {row.role ?? (
+                          <span className="text-muted-foreground/40">
+                            &mdash;
+                          </span>
+                        )}
+                      </td>
+                    )}
 
                     {/* Affiliation */}
-                    <td className="py-2.5 px-3">
-                      {row.employerSlug ? (
-                        <Link
-                          href={`/organizations/${row.employerSlug}`}
-                          className="text-foreground hover:text-primary transition-colors"
-                        >
-                          {row.employerName}
-                        </Link>
-                      ) : row.employerName ? (
-                        <span className="text-muted-foreground">
-                          {row.employerName}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/40">
-                          &mdash;
-                        </span>
-                      )}
-                    </td>
+                    {showAffiliation && (
+                      <td className="py-2.5 px-3">
+                        {row.employerSlug ? (
+                          <Link
+                            href={`/organizations/${row.employerSlug}`}
+                            className="text-foreground hover:text-primary transition-colors"
+                          >
+                            {row.employerName}
+                          </Link>
+                        ) : row.employerName ? (
+                          <span className="text-muted-foreground">
+                            {row.employerName}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground/40">
+                            &mdash;
+                          </span>
+                        )}
+                      </td>
+                    )}
 
                     {/* Born Year */}
                     <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
@@ -602,7 +650,7 @@ export function PeopleTable({
                 {rows.length === 0 && !isInitialLoad && (
                   <tr>
                     <td
-                      colSpan={serverMode ? 5 : 8}
+                      colSpan={colSpan}
                       className="py-8 text-center text-muted-foreground text-sm"
                     >
                       {search

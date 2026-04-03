@@ -2,11 +2,17 @@
  * Job Queue Health Check
  *
  * Fetches /api/jobs/stats from wiki-server and checks for:
- *   - High failure rates (>50% with >5 total jobs of that type)
+ *   - High failure rates (>50% with >5 total jobs of that type) in the last 24h
  *   - Large pending backlogs (>100 pending for any single type)
+ *
+ * Uses a 24-hour time window for failure rate calculations to avoid
+ * historical failures permanently poisoning the health check.
  */
 
 import type { CheckResult } from '../health-check.ts';
+
+/** Time window for stats (24 hours). */
+const STATS_WINDOW_MS = 24 * 60 * 60 * 1000;
 
 interface JobTypeStats {
   byStatus: Record<string, number>;
@@ -34,9 +40,10 @@ export async function checkJobQueue(): Promise<CheckResult> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
+  const since = new Date(Date.now() - STATS_WINDOW_MS).toISOString();
   let data: JobStatsResponse;
   try {
-    const res = await fetch(`${serverUrl}/api/jobs/stats`, {
+    const res = await fetch(`${serverUrl}/api/jobs/stats?since=${encodeURIComponent(since)}`, {
       headers,
       signal: AbortSignal.timeout(15_000),
     });
@@ -61,7 +68,7 @@ export async function checkJobQueue(): Promise<CheckResult> {
   }
 
   const totalJobs = data.totalJobs ?? 0;
-  detail.push(`Total jobs: ${totalJobs}`);
+  detail.push(`Total jobs (last 24h): ${totalJobs}`);
 
   const byType = data.byType ?? {};
 

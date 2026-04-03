@@ -1093,6 +1093,20 @@
       "when": 1782892800000,
       "tag": "0155_add_data_source_id_to_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 156,
+      "version": "7",
+      "when": 1782979200000,
+      "tag": "0156_create_campaign_finance",
+      "breakpoints": true
+    },
+    {
+      "idx": 157,
+      "version": "7",
+      "when": 1783065600000,
+      "tag": "0157_create_political_votes",
+      "breakpoints": true
     }
   ]
 }

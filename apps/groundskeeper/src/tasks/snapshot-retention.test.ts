@@ -94,6 +94,7 @@ describe("snapshotRetention", () => {
         })
         .mockResolvedValueOnce({
           ok: false,
+          status: 500,
           text: async () => "Internal Server Error",
         })
     );
@@ -102,7 +103,7 @@ describe("snapshotRetention", () => {
 
     expect(result.success).toBe(false);
     expect(result.summary).toContain("hallucination_risk: deleted 100");
-    expect(result.summary).toContain("citation_accuracy: FAILED");
+    expect(result.summary).toContain("citation_accuracy: FAILED (HTTP 500)");
   });
 
   it("returns success (skipped) when no API key is set", async () => {
@@ -128,7 +129,7 @@ describe("snapshotRetention", () => {
     const result = await snapshotRetention(config);
 
     expect(result.success).toBe(false);
-    expect(result.summary).toContain("hallucination_risk: FAILED");
+    expect(result.summary).toContain("hallucination_risk: FAILED (Connection refused)");
     expect(result.summary).toContain("citation_accuracy: deleted 10");
     expect(fetch).toHaveBeenCalledTimes(2);
   });

@@ -1,14 +1,18 @@
 /**
  * Political Data Command Handlers
  *
- * Manage political scores, offices, and verify external profile links.
+ * Manage political scores, offices, campaign finance, and verify external profile links.
  *
  * Usage:
- *   crux tb political stats                    Show summary statistics
- *   crux tb political scores [--entity=<id>]   List scorecard ratings
- *   crux tb political offices [--entity=<id>]  List political offices
- *   crux tb political verify-links             Verify all politician source URLs
- *   crux tb political seed-offices             Seed office data from YAML entities
+ *   crux tb political stats                          Show summary statistics
+ *   crux tb political scores [--entity=<id>]         List scorecard ratings
+ *   crux tb political scores ingest [--source=X]     Ingest scorecard data from external sources
+ *   crux tb political offices [--entity=<id>]        List political offices
+ *   crux tb political finance ingest [--cycle=YYYY]  Ingest FEC campaign finance data
+ *   crux tb political finance list [--entity=X]      List campaign finance records
+ *   crux tb political finance stats                  Campaign finance summary
+ *   crux tb political verify-links                   Verify all politician source URLs
+ *   crux tb political seed-offices                   Seed office data from YAML entities
  */
 
 import { readFileSync } from "node:fs";
@@ -18,15 +22,38 @@ import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../lib/command-types.ts";
+import { writeFileSync } from "node:fs";
+import { stringify as stringifyYaml } from "yaml";
 import {
   apiRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
+import {
+  getSource,
+  getAvailableSources,
+  getAllSources,
+  syncScoresToServer,
+} from "../lib/political/scorecard-ingest.ts";
+import {
+  fetchFecData,
+  syncFinanceToServer,
+} from "../lib/political/sources/fec.ts";
+import { parseOffice } from "../lib/political/office-parser.ts";
+import { resolveAllStakeholders } from "../lib/political/stakeholder-resolver.ts";
+import {
+  buildSampleVotes,
+  syncVotesToServer,
+} from "../lib/political/votes-ingest.ts";
 
 interface CommandOptions extends BaseOptions {
   entity?: string;
   ci?: boolean;
   limit?: string;
+  source?: string;
+  year?: string;
+  cycle?: string;
+  legislation?: string;
+  dryRun?: boolean;
 }
 
 // ---- stats command ----
@@ -40,12 +67,18 @@ async function statsCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const [scoresResult, officesResult] = await Promise.all([
+  const [scoresResult, officesResult, votesResult, financeResult] = await Promise.all([
     apiRequest<{ total: number; scorerOrgs: number; politicians: number }>(
       "GET", "/api/political-scores/stats"
     ),
     apiRequest<{ total: number; incumbents: number; candidates: number; former: number }>(
       "GET", "/api/political-offices/stats"
+    ),
+    apiRequest<{ total: number; politicians: number; legislation: number; chambers: number; breakdown: Record<string, number> }>(
+      "GET", "/api/political-votes/stats"
+    ),
+    apiRequest<{ total: number; totalRaisedSum: number; politicians: number; cycles: number }>(
+      "GET", "/api/campaign-finance/stats"
     ),
   ]);
 
@@ -55,6 +88,8 @@ async function statsCommand(
       output: JSON.stringify({
         scores: scoresResult.ok ? scoresResult.data : null,
         offices: officesResult.ok ? officesResult.data : null,
+        votes: votesResult.ok ? votesResult.data : null,
+        finance: financeResult.ok ? financeResult.data : null,
       }, null, 2),
     };
   }
@@ -88,13 +123,63 @@ async function statsCommand(
     lines.push(`  Offices: Error - ${officesResult.message}`);
   }
 
+  lines.push("");
+
+  if (votesResult.ok) {
+    const v = votesResult.data;
+    lines.push(
+      "  Votes:",
+      `    Total: ${v.total}`,
+      `    Politicians: ${v.politicians}`,
+      `    Legislation: ${v.legislation}`,
+    );
+    if (Object.keys(v.breakdown).length > 0) {
+      lines.push("    Breakdown:");
+      for (const [vote, count] of Object.entries(v.breakdown)) {
+        lines.push(`      ${vote}: ${count}`);
+      }
+    }
+  } else {
+    lines.push(`  Votes: Error - ${votesResult.message}`);
+  }
+
+  lines.push("");
+
+  if (financeResult.ok) {
+    const f = financeResult.data;
+    lines.push(
+      "  Campaign Finance:",
+      `    Total records: ${f.total}`,
+      `    Total raised: $${(f.totalRaisedSum / 1_000_000).toFixed(1)}M`,
+      `    Politicians tracked: ${f.politicians}`,
+      `    Election cycles: ${f.cycles}`,
+    );
+  } else {
+    lines.push(`  Campaign Finance: Error - ${financeResult.message}`);
+  }
+
   return { exitCode: 0, output: lines.join("\n") };
 }
 
-// ---- scores command ----
+// ---- scores command (dispatches to list or ingest subcommand) ----
 
 async function scoresCommand(
-  _args: string[],
+  args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const subcommand = args[0];
+
+  if (subcommand === "ingest") {
+    return scoresIngestCommand(args.slice(1), options);
+  }
+
+  // Default: list scores
+  return scoresListCommand(options);
+}
+
+// ---- scores list (default) ----
+
+async function scoresListCommand(
   options: CommandOptions
 ): Promise<CommandResult> {
   const serverUrl = getServerUrl();
@@ -146,6 +231,158 @@ async function scoresCommand(
   return {
     exitCode: 0,
     output: `Political Scores (${total} total)\n\n${lines.join("\n")}`,
+  };
+}
+
+// ---- scores ingest ----
+
+async function scoresIngestCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const sourceId = options.source as string | undefined;
+  const yearStr = options.year as string | undefined;
+  const dryRun = !!options.dryRun;
+
+  const currentYear = new Date().getFullYear();
+  const year = yearStr ? parseInt(yearStr, 10) : currentYear;
+
+  if (isNaN(year) || year < 1900 || year > 2100) {
+    return {
+      exitCode: 1,
+      output: `Error: Invalid year "${yearStr}". Must be between 1900 and 2100.`,
+    };
+  }
+
+  // Determine which sources to fetch
+  const availableSources = getAvailableSources();
+
+  if (sourceId && !availableSources.includes(sourceId)) {
+    return {
+      exitCode: 1,
+      output: [
+        `Error: Unknown source "${sourceId}".`,
+        `Available sources: ${availableSources.join(", ")}`,
+      ].join("\n"),
+    };
+  }
+
+  const sourcesToFetch = sourceId
+    ? [getSource(sourceId)!]
+    : getAllSources();
+
+  const lines: string[] = [
+    `Scorecard Ingestion — Year: ${year}`,
+    `Sources: ${sourcesToFetch.map((s) => s.id).join(", ")}`,
+    dryRun ? "Mode: DRY RUN (no data will be synced)" : "Mode: LIVE (will sync to wiki-server)",
+    "",
+  ];
+
+  let totalRecords = 0;
+  let totalUpserted = 0;
+  let hasErrors = false;
+
+  for (const source of sourcesToFetch) {
+    lines.push(`--- ${source.name} ---`);
+
+    try {
+      const fetchResult = await source.fetch(year);
+
+      if (fetchResult.warnings.length > 0) {
+        for (const w of fetchResult.warnings) {
+          lines.push(`  Warning: ${w}`);
+        }
+      }
+
+      if (fetchResult.usedSampleData) {
+        lines.push("  Data: Sample data (source could not be scraped)");
+      } else {
+        lines.push("  Data: Live data from source");
+      }
+
+      lines.push(`  Records fetched: ${fetchResult.records.length}`);
+
+      if (fetchResult.records.length === 0) {
+        lines.push("  No records to sync.");
+        lines.push("");
+        continue;
+      }
+
+      totalRecords += fetchResult.records.length;
+
+      // Show preview of first few records
+      const preview = fetchResult.records.slice(0, 5);
+      lines.push("  Preview:");
+      for (const r of preview) {
+        const pct =
+          r.maxScore > 1
+            ? `${((r.score / r.maxScore) * 100).toFixed(0)}%`
+            : r.score === 1
+              ? "Endorsed"
+              : `${r.score}/${r.maxScore}`;
+        lines.push(`    ${r.politicianDisplayName} | ${pct} | ${r.notes ?? ""}`);
+      }
+      if (fetchResult.records.length > 5) {
+        lines.push(`    ... and ${fetchResult.records.length - 5} more`);
+      }
+
+      // Sync to wiki-server (unless dry run)
+      if (!dryRun) {
+        const syncResult = await syncScoresToServer(fetchResult.records);
+
+        if (syncResult.errors.length > 0) {
+          hasErrors = true;
+          for (const err of syncResult.errors) {
+            lines.push(`  Sync error: ${err}`);
+          }
+        }
+
+        lines.push(
+          `  Synced: ${syncResult.upserted}/${syncResult.totalRecords} records ` +
+          `in ${syncResult.batches} batch(es)`,
+        );
+        totalUpserted += syncResult.upserted;
+      } else {
+        lines.push("  Sync: Skipped (dry run)");
+      }
+    } catch (err) {
+      hasErrors = true;
+      const msg = err instanceof Error ? err.message : String(err);
+      lines.push(`  Error: ${msg}`);
+    }
+
+    lines.push("");
+  }
+
+  // Summary
+  lines.push("=== Summary ===");
+  lines.push(`  Total records fetched: ${totalRecords}`);
+  if (!dryRun) {
+    lines.push(`  Total records synced: ${totalUpserted}`);
+  }
+  if (hasErrors) {
+    lines.push("  Status: Completed with errors");
+  } else {
+    lines.push("  Status: Success");
+  }
+
+  if (options.ci) {
+    return {
+      exitCode: hasErrors ? 1 : 0,
+      output: JSON.stringify({
+        year,
+        sources: sourcesToFetch.map((s) => s.id),
+        totalRecords,
+        totalUpserted,
+        dryRun,
+        hasErrors,
+      }, null, 2),
+    };
+  }
+
+  return {
+    exitCode: hasErrors ? 1 : 0,
+    output: lines.join("\n"),
   };
 }
 
@@ -312,7 +549,7 @@ async function verifyLinksCommand(
   return { exitCode: failed > 0 ? 1 : 0, output: lines.join("\n") };
 }
 
-// ---- seed-offices command ----
+// ---- seed-offices command (uses office-parser) ----
 
 async function seedOfficesCommand(
   _args: string[],
@@ -337,18 +574,6 @@ async function seedOfficesCommand(
     (p) => p.tags && p.tags.includes("politics") && p.stableId
   );
 
-  // Infer office data from descriptions
-  const offices: Array<{
-    id: string;
-    politicianEntityId: string;
-    politicianDisplayName: string;
-    officeType: string;
-    jurisdiction: string;
-    district: string | null;
-    party: string | null;
-    status: "incumbent" | "candidate" | "former";
-  }> = [];
-
   function generateId(): string {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let result = "";
@@ -358,58 +583,40 @@ async function seedOfficesCommand(
     return result;
   }
 
+  const offices: Array<Record<string, unknown>> = [];
+  const skipped: string[] = [];
+
   for (const p of politicians) {
     const desc = p.description ?? "";
-    let officeType = "other";
-    let jurisdiction = "US";
-    let district: string | null = null;
-    let party: string | null = null;
-    let status: "incumbent" | "candidate" | "former" = "candidate";
+    const parsed = parseOffice(desc, p.id);
 
-    // Infer office type
-    if (/U\.S\. Senator/i.test(desc)) officeType = "senator";
-    else if (/U\.S\. Representative/i.test(desc)) officeType = "representative";
-    else if (/State Senator/i.test(desc)) officeType = "state_senator";
-    else if (/State Assembl/i.test(desc)) officeType = "state_representative";
-    else if (/Governor/i.test(desc)) officeType = "governor";
-    else if (/Attorney General/i.test(desc)) officeType = "attorney_general";
-
-    // Infer district
-    const districtMatch = desc.match(/\b([A-Z]{2})-(\d+)\b/);
-    if (districtMatch) district = districtMatch[0];
-
-    // Infer state
-    const statePatterns: [RegExp, string][] = [
-      [/Nebraska/i, "NE"], [/Tennessee/i, "TN"], [/Maine/i, "ME"],
-      [/Texas/i, "TX"], [/Georgia/i, "GA"], [/Florida/i, "FL"],
-      [/Michigan/i, "MI"], [/North Carolina/i, "NC"], [/New York/i, "NY"],
-      [/New Jersey/i, "NJ"], [/Illinois/i, "IL"],
-    ];
-    for (const [pattern, abbr] of statePatterns) {
-      if (pattern.test(desc)) { jurisdiction = abbr; break; }
-    }
-
-    // Infer party
-    if (desc.includes("(D)") || /Democrat/i.test(desc)) party = "democratic";
-    else if (desc.includes("(R)") || /Republican/i.test(desc)) party = "republican";
-
-    // Infer status
-    if (/incumbent/i.test(desc) || /U\.S\. Senator from/i.test(desc) || /U\.S\. Representative for/i.test(desc)) {
-      status = "incumbent";
-    } else if (/former/i.test(desc) || /lost/i.test(desc)) {
-      status = "former";
+    if (!parsed) {
+      skipped.push(p.id);
+      continue;
     }
 
     offices.push({
       id: generateId(),
       politicianEntityId: p.stableId!,
       politicianDisplayName: p.title,
-      officeType,
-      jurisdiction,
-      district,
-      party,
-      status,
+      officeType: parsed.officeType,
+      jurisdiction: parsed.jurisdiction,
+      district: parsed.district,
+      party: parsed.party,
+      status: parsed.status,
+      termStart: parsed.termStart,
+      termEnd: parsed.termEnd,
     });
+  }
+
+  if (options.dryRun) {
+    const lines = [`Parsed ${offices.length} offices from ${politicians.length} politicians (${skipped.length} skipped)`, ""];
+    for (const o of offices.slice(0, 15)) {
+      lines.push(`  ${o.politicianDisplayName} | ${o.officeType} | ${o.jurisdiction} ${o.district ?? ""} | ${o.party ?? "?"} [${o.status}]`);
+    }
+    if (offices.length > 15) lines.push(`  ... and ${offices.length - 15} more`);
+    if (skipped.length > 0) lines.push("", `Skipped (no office parsed): ${skipped.join(", ")}`);
+    return { exitCode: 0, output: lines.join("\n") };
   }
 
   console.log(`Seeding ${offices.length} political offices...\n`);
@@ -424,10 +631,584 @@ async function seedOfficesCommand(
     return { exitCode: 1, output: `Error: ${result.message}` };
   }
 
+  const lines = [
+    `Seeded ${result.data.upserted} political offices from ${politicians.length} politician descriptions.`,
+  ];
+  if (skipped.length > 0) {
+    lines.push(`Skipped ${skipped.length} (no office parsed): ${skipped.join(", ")}`);
+  }
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- resolve-stakeholders command ----
+
+async function resolveStakeholdersCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const dataDir = join(process.cwd(), "data");
+  const result = resolveAllStakeholders(dataDir);
+
+  const lines = [
+    "Stakeholder Resolution Results",
+    "",
+    `  Total stakeholders: ${result.totalStakeholders}`,
+    `  Already linked: ${result.alreadyLinked}`,
+    `  Newly resolved: ${result.resolved.length}`,
+    `  Unresolved: ${result.unresolved.length}`,
+    "",
+  ];
+
+  if (result.resolved.length > 0) {
+    lines.push("Resolved matches:");
+    for (const m of result.resolved) {
+      lines.push(`  ${m.policyId}: "${m.stakeholderName}" → ${m.matchedEntityTitle} (${m.matchedEntitySlug}) [${m.method}]`);
+    }
+    lines.push("");
+  }
+
+  if (result.unresolved.length > 0) {
+    lines.push("Unresolved:");
+    for (const u of result.unresolved) {
+      lines.push(`  ${u.policyId}: "${u.name}"`);
+    }
+    lines.push("");
+  }
+
+  if (options.dryRun || result.resolved.length === 0) {
+    if (result.resolved.length > 0) {
+      lines.push("Dry run — no changes written. Run without --dry-run to apply.");
+    }
+    return { exitCode: 0, output: lines.join("\n") };
+  }
+
+  // Apply changes to responses.yaml
+  const responsesPath = join(dataDir, "entities", "responses.yaml");
+  const raw = readFileSync(responsesPath, "utf-8");
+  const policies = parseYaml(raw) as Array<{
+    id: string;
+    stakeholders?: Array<{ name: string; entityId?: string; role?: string }>;
+    [key: string]: unknown;
+  }>;
+
+  // Build lookup: policyId+stakeholderName -> entityId
+  const matchLookup = new Map<string, string>();
+  for (const m of result.resolved) {
+    matchLookup.set(`${m.policyId}::${m.stakeholderName}`, m.matchedEntityStableId);
+  }
+
+  let applied = 0;
+  for (const policy of policies) {
+    for (const s of policy.stakeholders ?? []) {
+      if (s.entityId) continue;
+      const key = `${policy.id}::${s.name}`;
+      const entityId = matchLookup.get(key);
+      if (entityId) {
+        s.entityId = entityId;
+        applied++;
+      }
+    }
+  }
+
+  writeFileSync(responsesPath, stringifyYaml(policies, { lineWidth: 120 }));
+
+  lines.push(`Applied ${applied} entity ID links to responses.yaml.`);
+
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- votes command (dispatches to list, ingest, or stats subcommand) ----
+
+async function votesCommand(
+  args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const subcommand = args[0];
+
+  if (subcommand === "ingest") {
+    return votesIngestCommand(args.slice(1), options);
+  }
+  if (subcommand === "stats") {
+    return votesStatsCommand(options);
+  }
+
+  // Default: list votes
+  return votesListCommand(options);
+}
+
+// ---- votes list (default) ----
+
+async function votesListCommand(
+  options: CommandOptions
+): Promise<CommandResult> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
+  }
+
+  const params = new URLSearchParams();
+  if (options.limit) params.set("limit", options.limit);
+
+  let endpoint: string;
+  if (options.entity) {
+    endpoint = `/api/political-votes/by-entity/${options.entity}`;
+  } else if (options.legislation) {
+    endpoint = `/api/political-votes/by-legislation/${options.legislation}`;
+  } else {
+    endpoint = `/api/political-votes/all?${params}`;
+  }
+
+  const result = await apiRequest<{
+    votes: Array<{
+      id: string;
+      politicianDisplayName: string | null;
+      politician: { name: string | null } | null;
+      legislationEntityId: string | null;
+      legislationTitle: string | null;
+      vote: string;
+      voteDate: string | null;
+      chamber: string | null;
+    }>;
+    total: number;
+    breakdown?: Record<string, number>;
+  }>("GET", endpoint);
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Error: ${result.message}` };
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
+  }
+
+  const { votes, total, breakdown } = result.data;
+  if (votes.length === 0) {
+    return { exitCode: 0, output: "No political votes found." };
+  }
+
+  const lines: string[] = [];
+
+  if (breakdown) {
+    lines.push("Vote Breakdown:");
+    for (const [vote, count] of Object.entries(breakdown)) {
+      lines.push(`  ${vote}: ${count}`);
+    }
+    lines.push("");
+  }
+
+  lines.push(`Votes (${total} total)`, "");
+
+  for (const v of votes) {
+    const name = v.politician?.name ?? v.politicianDisplayName ?? "Unknown";
+    const legTitle = v.legislationTitle ?? v.legislationEntityId ?? "Unknown";
+    const date = v.voteDate ?? "no date";
+    const chamber = v.chamber ?? "";
+    lines.push(`  ${name} | ${v.vote.toUpperCase()} | ${legTitle} | ${chamber} ${date}`);
+  }
+
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- votes ingest ----
+
+async function votesIngestCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun;
+  const legislationFilter = options.legislation;
+  const dataDir = join(process.cwd(), "data");
+
+  const lines: string[] = [
+    "Vote Data Ingestion",
+    dryRun ? "Mode: DRY RUN (no data will be synced)" : "Mode: LIVE (will sync to wiki-server)",
+    "",
+  ];
+
+  try {
+    const result = buildSampleVotes(dataDir, legislationFilter);
+
+    if (result.warnings.length > 0) {
+      for (const w of result.warnings) {
+        lines.push(`Warning: ${w}`);
+      }
+    }
+
+    lines.push(
+      `Legislation matched: ${result.legislationCount}`,
+      `Politicians matched: ${result.politicianCount}`,
+      `Vote records built: ${result.records.length}`,
+      "",
+    );
+
+    if (result.records.length === 0) {
+      lines.push("No vote records to sync.");
+      return { exitCode: 0, output: lines.join("\n") };
+    }
+
+    // Show preview
+    const preview = result.records.slice(0, 10);
+    lines.push("Preview:");
+    for (const r of preview) {
+      lines.push(
+        `  ${r.politicianDisplayName} | ${r.vote.toUpperCase()} | ${r.legislationTitle.substring(0, 40)} | ${r.chamber}`
+      );
+    }
+    if (result.records.length > 10) {
+      lines.push(`  ... and ${result.records.length - 10} more`);
+    }
+    lines.push("");
+
+    if (!dryRun) {
+      const syncResult = await syncVotesToServer(result.records);
+
+      if (syncResult.errors.length > 0) {
+        for (const err of syncResult.errors) {
+          lines.push(`Sync error: ${err}`);
+        }
+      }
+
+      lines.push(
+        `Synced: ${syncResult.upserted}/${syncResult.totalRecords} records in ${syncResult.batches} batch(es)`,
+      );
+
+      if (options.ci) {
+        return {
+          exitCode: syncResult.errors.length > 0 ? 1 : 0,
+          output: JSON.stringify({
+            legislationCount: result.legislationCount,
+            politicianCount: result.politicianCount,
+            totalRecords: result.records.length,
+            upserted: syncResult.upserted,
+            dryRun,
+            hasErrors: syncResult.errors.length > 0,
+          }, null, 2),
+        };
+      }
+    } else {
+      lines.push("Sync: Skipped (dry run)");
+    }
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    lines.push(`Error: ${msg}`);
+    return { exitCode: 1, output: lines.join("\n") };
+  }
+
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- votes stats ----
+
+async function votesStatsCommand(
+  options: CommandOptions
+): Promise<CommandResult> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
+  }
+
+  const result = await apiRequest<{
+    total: number;
+    politicians: number;
+    legislation: number;
+    chambers: number;
+    breakdown: Record<string, number>;
+  }>("GET", "/api/political-votes/stats");
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Error: ${result.message}` };
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
+  }
+
+  const s = result.data;
+  const lines = [
+    "Political Votes Stats",
+    "",
+    `  Total votes: ${s.total}`,
+    `  Politicians: ${s.politicians}`,
+    `  Legislation: ${s.legislation}`,
+    `  Chambers: ${s.chambers}`,
+    "",
+    "  Vote Breakdown:",
+  ];
+
+  for (const [vote, count] of Object.entries(s.breakdown)) {
+    lines.push(`    ${vote}: ${count}`);
+  }
+
+  return { exitCode: 0, output: lines.join("\n") };
+}
+
+// ---- finance command (dispatches to ingest, list, or stats subcommand) ----
+
+async function financeCommand(
+  args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const subcommand = args[0];
+
+  if (subcommand === "ingest") {
+    return financeIngestCommand(args.slice(1), options);
+  }
+  if (subcommand === "stats") {
+    return financeStatsCommand(options);
+  }
+  if (subcommand === "list" || !subcommand) {
+    return financeListCommand(options);
+  }
+
+  return {
+    exitCode: 1,
+    output: `Unknown finance subcommand: "${subcommand}". Use: ingest, list, stats`,
+  };
+}
+
+// ---- finance ingest ----
+
+async function financeIngestCommand(
+  _args: string[],
+  options: CommandOptions
+): Promise<CommandResult> {
+  const cycleStr = options.cycle as string | undefined;
+  const dryRun = !!options.dryRun;
+
+  // Default to current election cycle (even year)
+  const currentYear = new Date().getFullYear();
+  const defaultCycle = currentYear % 2 === 0 ? currentYear : currentYear + 1;
+  const cycle = cycleStr ? parseInt(cycleStr, 10) : defaultCycle;
+
+  if (isNaN(cycle) || cycle < 1990 || cycle > 2100) {
+    return {
+      exitCode: 1,
+      output: `Error: Invalid cycle "${cycleStr}". Must be an even year between 1990 and 2100.`,
+    };
+  }
+
+  if (cycle % 2 !== 0) {
+    return {
+      exitCode: 1,
+      output: `Error: FEC election cycles are even years (e.g. 2024, 2026). Got: ${cycle}`,
+    };
+  }
+
+  const lines: string[] = [
+    `FEC Campaign Finance Ingestion — Cycle: ${cycle}`,
+    dryRun ? "Mode: DRY RUN (no data will be synced)" : "Mode: LIVE (will sync to wiki-server)",
+    "",
+  ];
+
+  try {
+    const fetchResult = await fetchFecData(cycle);
+
+    if (fetchResult.warnings.length > 0) {
+      for (const w of fetchResult.warnings) {
+        lines.push(`  Warning: ${w}`);
+      }
+    }
+
+    if (fetchResult.usedSampleData) {
+      lines.push("  Data: Sample data (FEC API could not be reached)");
+    } else {
+      lines.push("  Data: Live data from FEC API");
+    }
+
+    lines.push(`  Records fetched: ${fetchResult.records.length}`);
+
+    if (fetchResult.records.length === 0) {
+      lines.push("  No records to sync.");
+      return { exitCode: 0, output: lines.join("\n") };
+    }
+
+    // Show preview
+    const preview = fetchResult.records.slice(0, 10);
+    lines.push("", "  Preview:");
+    for (const r of preview) {
+      const raised = r.totalRaised
+        ? `$${(r.totalRaised / 1_000_000).toFixed(1)}M`
+        : "N/A";
+      const entityMatch = r.politicianEntityId ? " [matched]" : "";
+      lines.push(
+        `    ${r.politicianDisplayName} (${r.party ?? "?"}-${r.state ?? "?"}) | ${r.officeType ?? "?"} | Raised: ${raised}${entityMatch}`,
+      );
+    }
+    if (fetchResult.records.length > 10) {
+      lines.push(`    ... and ${fetchResult.records.length - 10} more`);
+    }
+
+    // Count entity matches
+    const matched = fetchResult.records.filter(
+      (r) => r.politicianEntityId != null,
+    ).length;
+    lines.push(
+      "",
+      `  Entity matches: ${matched}/${fetchResult.records.length}`,
+    );
+
+    // Sync to wiki-server (unless dry run)
+    if (!dryRun) {
+      lines.push("");
+      const syncResult = await syncFinanceToServer(fetchResult.records);
+
+      if (syncResult.errors.length > 0) {
+        for (const err of syncResult.errors) {
+          lines.push(`  Sync error: ${err}`);
+        }
+      }
+
+      lines.push(
+        `  Synced: ${syncResult.upserted}/${syncResult.totalRecords} records ` +
+        `in ${syncResult.batches} batch(es)`,
+      );
+    } else {
+      lines.push("", "  Sync: Skipped (dry run)");
+    }
+
+    if (options.ci) {
+      return {
+        exitCode: 0,
+        output: JSON.stringify(
+          {
+            cycle,
+            totalRecords: fetchResult.records.length,
+            entityMatches: matched,
+            usedSampleData: fetchResult.usedSampleData,
+            dryRun,
+          },
+          null,
+          2,
+        ),
+      };
+    }
+
+    return { exitCode: 0, output: lines.join("\n") };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { exitCode: 1, output: `Error: ${msg}` };
+  }
+}
+
+// ---- finance list ----
+
+async function financeListCommand(
+  options: CommandOptions
+): Promise<CommandResult> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
+  }
+
+  const endpoint = options.entity
+    ? `/api/campaign-finance/by-entity/${options.entity}`
+    : `/api/campaign-finance/all?limit=${options.limit ?? "200"}${options.cycle ? `&cycle=${options.cycle}` : ""}`;
+
+  const result = await apiRequest<{
+    records: Array<{
+      id: string;
+      politicianDisplayName: string | null;
+      politician: { name: string | null } | null;
+      cycle: number;
+      totalRaised: number | null;
+      totalSpent: number | null;
+      party: string | null;
+      officeType: string | null;
+      state: string | null;
+    }>;
+    total: number;
+  }>("GET", endpoint);
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Error: ${result.message}` };
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
+  }
+
+  const { records, total } = result.data;
+  if (records.length === 0) {
+    return { exitCode: 0, output: "No campaign finance records found." };
+  }
+
+  const lines = records.map((r) => {
+    const name = r.politician?.name ?? r.politicianDisplayName ?? "Unknown";
+    const raised = r.totalRaised
+      ? `$${(r.totalRaised / 1_000_000).toFixed(1)}M`
+      : "N/A";
+    const spent = r.totalSpent
+      ? `$${(r.totalSpent / 1_000_000).toFixed(1)}M`
+      : "N/A";
+    const party = r.party ? `[${r.party.charAt(0)}]` : "";
+    return `  ${name} ${party} | ${r.officeType ?? "?"} ${r.state ?? ""} | Cycle ${r.cycle} | Raised: ${raised} | Spent: ${spent}`;
+  });
+
   return {
     exitCode: 0,
-    output: `Seeded ${result.data.upserted} political offices from YAML entity descriptions.`,
+    output: `Campaign Finance Records (${total} total)\n\n${lines.join("\n")}`,
   };
+}
+
+// ---- finance stats ----
+
+async function financeStatsCommand(
+  options: CommandOptions
+): Promise<CommandResult> {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
+  }
+
+  const result = await apiRequest<{
+    total: number;
+    totalRaisedSum: number;
+    politicians: number;
+    cycles: number;
+    topFundraisers: Array<{
+      politicianDisplayName: string | null;
+      politician: { name: string | null } | null;
+      totalRaised: number | null;
+      cycle: number;
+      party: string | null;
+      officeType: string | null;
+      state: string | null;
+    }>;
+  }>("GET", "/api/campaign-finance/stats");
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Error: ${result.message}` };
+  }
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
+  }
+
+  const s = result.data;
+  const lines = [
+    "Campaign Finance Stats",
+    "",
+    `  Total records: ${s.total}`,
+    `  Total raised (all records): $${(s.totalRaisedSum / 1_000_000).toFixed(1)}M`,
+    `  Politicians tracked: ${s.politicians}`,
+    `  Election cycles: ${s.cycles}`,
+  ];
+
+  if (s.topFundraisers.length > 0) {
+    lines.push("", "  Top Fundraisers:");
+    for (const t of s.topFundraisers.slice(0, 10)) {
+      const name = t.politician?.name ?? t.politicianDisplayName ?? "Unknown";
+      const raised = t.totalRaised
+        ? `$${(t.totalRaised / 1_000_000).toFixed(1)}M`
+        : "N/A";
+      const party = t.party ? `[${t.party.charAt(0)}]` : "";
+      lines.push(
+        `    ${name} ${party} | ${t.officeType ?? "?"} ${t.state ?? ""} | ${raised}`,
+      );
+    }
+  }
+
+  return { exitCode: 0, output: lines.join("\n") };
 }
 
 // ---- exports ----
@@ -436,24 +1217,49 @@ export const commands = {
   stats: statsCommand,
   scores: scoresCommand,
   offices: officesCommand,
+  votes: votesCommand,
+  finance: financeCommand,
   "verify-links": verifyLinksCommand,
   "seed-offices": seedOfficesCommand,
+  "resolve-stakeholders": resolveStakeholdersCommand,
 };
 
 export function getHelp(): string {
   return [
     "Political Data Management",
     "",
-    "Manage political scores, offices, and verify external profile links.",
+    "Manage political scores, offices, votes, campaign finance, and verify external profile links.",
     "",
     "Usage:",
-    "  crux tb political stats                       Show summary statistics",
-    "  crux tb political scores [--entity=<id>]      List scorecard ratings",
-    "  crux tb political offices [--entity=<id>]     List political offices",
-    "  crux tb political verify-links                Verify all politician source URLs",
-    "  crux tb political seed-offices                Seed office data from YAML entities",
+    "  crux tb political stats                             Show summary statistics",
+    "  crux tb political scores [--entity=<id>]            List scorecard ratings",
+    "  crux tb political scores ingest [--source=X]        Ingest scorecard data from external sources",
+    "  crux tb political offices [--entity=<id>]           List political offices",
+    "  crux tb political votes [--entity=X] [--legislation=X]  List voting records",
+    "  crux tb political votes ingest [--legislation=X]    Fetch and sync vote data",
+    "  crux tb political votes stats                       Vote summary statistics",
+    "  crux tb political finance ingest [--cycle=YYYY]     Ingest FEC campaign finance data",
+    "  crux tb political finance list [--entity=X]         List campaign finance records",
+    "  crux tb political finance stats                     Campaign finance summary",
+    "  crux tb political verify-links                      Verify all politician source URLs",
+    "  crux tb political seed-offices                      Seed office data from YAML entities",
+    "  crux tb political resolve-stakeholders              Resolve legislation stakeholder names to entity IDs",
     "",
-    "Options:",
+    "Scores Ingest Options:",
+    "  --source=<id>         Source to ingest from (lcv, humane-world, council-livable-world)",
+    "                        Omit to ingest from all sources",
+    "  --year=<YYYY>         Year to fetch (default: current year)",
+    "  --dry-run             Preview without syncing to wiki-server",
+    "",
+    "Finance Options:",
+    "  --cycle=<YYYY>        Election cycle year (default: current even year)",
+    "  --dry-run             Preview without syncing to wiki-server",
+    "",
+    "Votes Options:",
+    "  --legislation=<id>    Filter by legislation entity ID",
+    "  --dry-run             Preview without syncing to wiki-server",
+    "",
+    "General Options:",
     "  --entity=<stableId>   Filter by politician entity",
     "  --limit=<N>           Max results (default: 200)",
     "  --ci                  JSON output for CI/scripting",

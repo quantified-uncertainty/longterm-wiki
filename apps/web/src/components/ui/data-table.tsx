@@ -52,8 +52,8 @@ type DataTableProps<TData, TValue = unknown> =
   | DataTableWithTableProps<TData>
   | DataTableWithDataProps<TData, TValue>
 
-function isTableProps<TData>(
-  props: DataTableProps<TData, unknown>
+function isTableProps<TData, TValue>(
+  props: DataTableProps<TData, TValue>
 ): props is DataTableWithTableProps<TData> {
   return "table" in props && props.table !== undefined
 }
