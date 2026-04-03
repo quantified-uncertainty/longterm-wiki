@@ -8,6 +8,8 @@ const logger = rootLogger.child({ component: "db" });
 /**
  * Create a PaginationQuery schema with configurable limits.
  * Each route can call this with its own defaults while sharing the base shape.
+ * Values above maxLimit are clamped (not rejected) so clients requesting larger
+ * pages get the maximum allowed rather than a 400 error.
  */
 export function paginationQuery(opts?: {
   maxLimit?: number;
@@ -15,7 +17,12 @@ export function paginationQuery(opts?: {
 }) {
   const { maxLimit = 200, defaultLimit = 50 } = opts ?? {};
   return z.object({
-    limit: z.coerce.number().int().min(1).max(maxLimit).default(defaultLimit),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(defaultLimit)
+      .transform((v) => Math.min(v, maxLimit)),
     offset: z.coerce.number().int().min(0).default(0),
   });
 }

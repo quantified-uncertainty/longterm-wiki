@@ -538,9 +538,12 @@ describe("Auto-Update News API", () => {
       expect(res.status).toBe(400);
     });
 
-    it("rejects limit above MAX_PAGE_SIZE (1000)", async () => {
+    it("clamps limit above MAX_PAGE_SIZE instead of rejecting", async () => {
       const res = await app.request("/api/auto-update-news/recent?limit=9999");
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // Should succeed with clamped limit, not reject with 400
+      expect(body.limit).toBeLessThanOrEqual(1000);
     });
 
     it("returns empty result when no news exists", async () => {
