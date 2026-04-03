@@ -144,9 +144,9 @@ export function PoliticianScoresCell({
             </span>
           );
         })}
-        {scores.length > maxInline && (
+        {scores.length > topScores.length && (
           <span className="text-muted-foreground text-[10px] ml-0.5">
-            +{scores.length - maxInline}
+            +{scores.length - topScores.length}
           </span>
         )}
       </span>
@@ -166,7 +166,7 @@ export function PoliticianScoresCell({
             All Ratings ({scores.length})
           </p>
           <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
-            {scores
+            {[...scores]
               .sort((a, b) => {
                 if (b.year !== a.year) return b.year - a.year;
                 return a.scorerOrg.localeCompare(b.scorerOrg);

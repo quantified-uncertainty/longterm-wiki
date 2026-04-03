@@ -32,7 +32,7 @@ export function ExpertPositions({
   const hasAnyDates = positions.some((p) => p.date);
   const hasAnyEstimates = positions.some((p) => p.estimate);
   const hasAnyConfidence = positions.some((p) => p.confidence);
-  const hasAnySources = positions.some((p) => p.source);
+  const hasAnySources = positions.some((p) => p.source || p.sourceUrl);
 
   return (
     <section>
@@ -127,6 +127,15 @@ export function ExpertPositions({
                             {pos.source}
                           </span>
                         )
+                      ) : pos.sourceUrl ? (
+                        <a
+                          href={safeHref(pos.sourceUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          View source
+                        </a>
                       ) : (
                         <span className="text-muted-foreground/40">—</span>
                       )}

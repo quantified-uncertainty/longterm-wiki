@@ -341,7 +341,7 @@ describe("parseOffice", () => {
       expect(parseOffice("", "test")).toBeNull();
     });
 
-    it("returns null for non-political description", () => {
+    it("matches office when description mentions running for Congress", () => {
       expect(
         parseOffice(
           "AI policy researcher. Previously at RAND. Ran for US Congress in Oregon.",

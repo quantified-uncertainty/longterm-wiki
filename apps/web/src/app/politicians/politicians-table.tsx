@@ -43,6 +43,8 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
+  const hasFinance = useMemo(() => rows.some((r) => r.totalRaised != null), [rows]);
+
   const parties = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of rows) {
@@ -179,7 +181,7 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
               ))}
               <SortHeader label="Sources" sortKey="sourceCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <th className="py-2.5 px-3 text-left font-medium whitespace-nowrap">Scores</th>
-              <th className="py-2.5 px-3 text-right font-medium whitespace-nowrap">Finance</th>
+              {hasFinance && <th className="py-2.5 px-3 text-right font-medium whitespace-nowrap">Finance</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -256,19 +258,21 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                 </td>
 
                 {/* Campaign finance */}
-                <td className="py-2.5 px-3 text-right">
-                  {row.totalRaised != null ? (
-                    <span className="text-xs tabular-nums text-muted-foreground font-medium">
-                      ${row.totalRaised >= 1_000_000
-                        ? `${(row.totalRaised / 1_000_000).toFixed(1)}M`
-                        : row.totalRaised >= 1_000
-                          ? `${(row.totalRaised / 1_000).toFixed(0)}K`
-                          : row.totalRaised.toLocaleString()}
-                    </span>
-                  ) : (
-                    <span className="text-muted-foreground/40">&mdash;</span>
-                  )}
-                </td>
+                {hasFinance && (
+                  <td className="py-2.5 px-3 text-right">
+                    {row.totalRaised != null ? (
+                      <span className="text-xs tabular-nums text-muted-foreground font-medium">
+                        ${row.totalRaised >= 1_000_000
+                          ? `${(row.totalRaised / 1_000_000).toFixed(1)}M`
+                          : row.totalRaised >= 1_000
+                            ? `${(row.totalRaised / 1_000).toFixed(0)}K`
+                            : row.totalRaised.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground/40">&mdash;</span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

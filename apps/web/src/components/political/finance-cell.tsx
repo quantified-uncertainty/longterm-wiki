@@ -11,7 +11,7 @@
  *   <CampaignFinanceCell records={financeRecords} />
  */
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import type { CampaignFinanceRecord } from "./types";
@@ -59,6 +59,12 @@ export function CampaignFinanceCell({ records }: CampaignFinanceCellProps) {
 
   const handleMouseLeave = useCallback(() => {
     timeoutRef.current = setTimeout(() => setShowTooltip(false), 150);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   if (records.length === 0) {

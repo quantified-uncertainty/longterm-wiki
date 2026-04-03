@@ -31,3 +31,4 @@ export { politicalRacesRoute, type PoliticalRacesRoute } from "./political-races
 export { talentFlowsRoute, type TalentFlowsRoute } from "./talent-flows.js";
 export { platformAccountsRoute, type PlatformAccountsRoute } from "./platform-accounts.js";
 export { politicalVotesRoute, type PoliticalVotesRoute } from "./political-votes.js";
+export { campaignFinanceRoute, type CampaignFinanceRoute } from "./campaign-finance.js";

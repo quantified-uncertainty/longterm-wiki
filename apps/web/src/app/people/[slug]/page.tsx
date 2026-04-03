@@ -18,6 +18,7 @@ import {
   resolveEntityRef,
   formatAmount,
   getEntityWikiHref,
+  safeHref,
 } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
@@ -212,7 +213,9 @@ export default async function PersonProfilePage({
   // Policy positions (reverse lookup: find legislation where this person is a stakeholder)
   const policyPositions = getPersonPolicyPositions(entity.id, entity.name);
 
-  // Political data (scorecard ratings + office history from wiki-server)
+  // TODO: These are live wiki-server calls. Political scores/offices are not yet
+  // in database.json. Once they are, replace with local data reads.
+  // See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
   const [politicalScores, politicalOffices] = await Promise.all([
     fetchPoliticalScores(entity.id),
     fetchPoliticalOffices(entity.id),
@@ -405,9 +408,9 @@ export default async function PersonProfilePage({
             </p>
           )}
           <div className="flex items-center gap-4 mt-2 text-sm">
-            {entityWebsite && (
+            {entityWebsite && safeHref(entityWebsite) !== "#" && (
               <a
-                href={entityWebsite}
+                href={safeHref(entityWebsite)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"

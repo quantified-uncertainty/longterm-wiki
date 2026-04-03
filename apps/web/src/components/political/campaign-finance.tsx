@@ -293,16 +293,16 @@ function PreviousCyclesTable({
                   {record.cycle}
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
-                  {formatCompactCurrency(toNum(record.totalRaised)) || "\u2014"}
+                  {toNum(record.totalRaised) > 0 ? formatCompactCurrency(toNum(record.totalRaised)) : "\u2014"}
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
-                  {formatCompactCurrency(toNum(record.totalSpent)) || "\u2014"}
+                  {toNum(record.totalSpent) > 0 ? formatCompactCurrency(toNum(record.totalSpent)) : "\u2014"}
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
-                  {formatCompactCurrency(toNum(record.individualContributions)) || "\u2014"}
+                  {toNum(record.individualContributions) > 0 ? formatCompactCurrency(toNum(record.individualContributions)) : "\u2014"}
                 </td>
                 <td className="px-4 py-2 text-right tabular-nums">
-                  {formatCompactCurrency(toNum(record.pacContributions)) || "\u2014"}
+                  {toNum(record.pacContributions) > 0 ? formatCompactCurrency(toNum(record.pacContributions)) : "\u2014"}
                 </td>
                 <td className="px-4 py-2 text-xs">
                   {record.sourceUrl ? (

@@ -104,10 +104,14 @@ function formatTermDates(
 ): string {
   if (!termStart) return "";
   const start = termStart;
-  if (status === "incumbent" || !termEnd) {
+  if (termEnd) {
+    return `${start} \u2013 ${termEnd}`;
+  }
+  if (status === "incumbent") {
     return `${start} \u2013 present`;
   }
-  return `${start} \u2013 ${termEnd}`;
+  // No end date and not incumbent — just show the start date
+  return start;
 }
 
 // ── Sort offices ─────────────────────────────────────────────────────
