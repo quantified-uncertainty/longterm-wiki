@@ -38,6 +38,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  escapeIlike,
 } from "../shared/utils.js";
 
 // ---- Constants ----
@@ -288,7 +289,7 @@ const sourceChecksApp = new Hono()
       conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
     }
     if (q) {
-      const pattern = `%${q}%`;
+      const pattern = `%${escapeIlike(q)}%`;
       conditions.push(
         or(
           ilike(sourceCheckVerdicts.recordId, pattern),
@@ -322,6 +323,8 @@ const sourceChecksApp = new Hono()
         recordId: r.recordId,
         fieldName: r.fieldName,
         entityId: r.entityId,
+        displayName: r.displayName,
+        entityDisplayName: r.entityDisplayName,
         verdict: r.verdict,
         confidence: r.confidence,
         reasoning: r.reasoning,

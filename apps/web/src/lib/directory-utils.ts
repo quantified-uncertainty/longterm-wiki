@@ -10,7 +10,7 @@ import {
   resolveKBSlug,
 } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { getTypedEntities, getTypedEntityById, isPerson, isRisk, isOrganization, type AnyEntity } from "@/data";
+import { getTypedEntities, getTypedEntityById, getTypedEntityByStableId, isPerson, isRisk, isOrganization, type AnyEntity } from "@/data";
 
 import { formatCompactCurrency } from "@/lib/format-compact";
 
@@ -67,6 +67,15 @@ export function resolveEntityRef(ref: unknown): ResolvedEntity | null {
         slug: resolved.id,
       };
     }
+  }
+  // Fallback: try resolving as a stableId (bare 10-char or sid_-prefixed)
+  const byStableId = getTypedEntityByStableId(ref);
+  if (byStableId) {
+    return {
+      name: byStableId.title,
+      id: byStableId.stableId ?? byStableId.id,
+      slug: byStableId.id,
+    };
   }
   return { name: ref, id: ref, slug: undefined };
 }

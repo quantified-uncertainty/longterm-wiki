@@ -128,12 +128,12 @@ const gatesFoundation: DataSourceManifest = {
   cachePath: '/tmp/gates-foundation-grants.csv',
   schema: {
     fields: [
-      { sourceName: 'Grantee', internalField: 'grantee', type: 'string' },
-      { sourceName: 'Purpose', internalField: 'name', type: 'string' },
-      { sourceName: 'Division', internalField: 'focusArea', type: 'string' },
-      { sourceName: 'Date', internalField: 'date', type: 'date' },
-      { sourceName: 'Amount', internalField: 'amount', type: 'currency', transform: 'strip_currency' },
-      { sourceName: 'Duration (Months)', internalField: 'duration', type: 'number' },
+      { sourceName: 'GRANTEE', internalField: 'grantee', type: 'string' },
+      { sourceName: 'PURPOSE', internalField: 'name', type: 'string' },
+      { sourceName: 'TOPIC', internalField: 'focusArea', type: 'string' },
+      { sourceName: 'DATE COMMITTED', internalField: 'date', type: 'date' },
+      { sourceName: 'AMOUNT COMMITTED', internalField: 'amount', type: 'currency', transform: 'strip_currency' },
+      { sourceName: 'DURATION (MONTHS)', internalField: 'duration', type: 'number' },
     ],
     missingValues: [''],
   },
@@ -148,23 +148,25 @@ const gatesFoundation: DataSourceManifest = {
 const givewell: DataSourceManifest = {
   sourceId: 'givewell',
   name: 'GiveWell Grants Database',
-  fetchUrl: null,
+  fetchUrl: 'https://docs.google.com/spreadsheets/d/1z065ab9PPMu9i5KiQ4yLyQJPFQCfEzHSgtHulPiZeBo/export?format=csv&gid=0',
   format: 'csv',
-  accessMethod: 'manual_export',
+  accessMethod: 'direct_download',
   publisherEntityId: 'sid_OwXl35e7bg',
   updateFrequency: 'quarterly',
   cachePath: '/tmp/givewell-grants.csv',
   schema: {
     fields: [
-      { sourceName: 'Organization', internalField: 'grantee', type: 'string' },
-      { sourceName: 'Amount', internalField: 'amount', type: 'currency', transform: 'strip_currency' },
-      { sourceName: 'Date', internalField: 'date', type: 'date' },
-      { sourceName: 'Purpose', internalField: 'name', type: 'string' },
+      { sourceName: 'Top charity', internalField: 'grantee', type: 'string' },
+      { sourceName: 'Total grant size', internalField: 'amount', type: 'currency', transform: 'strip_currency' },
+      { sourceName: 'Date of grant approval', internalField: 'date', type: 'date' },
+      { sourceName: 'Grant name', internalField: 'name', type: 'string' },
+      { sourceName: 'Intervention', internalField: 'focusArea', type: 'string' },
+      { sourceName: 'Funding source', internalField: 'fund', type: 'string' },
     ],
   },
   verification: {
     strategy: 'deterministic_row_match',
-    matchFields: ['grantee', 'amount'],
+    matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
     exactFields: ['amount'],
   },
@@ -204,8 +206,20 @@ const acxGrants: DataSourceManifest = {
   publisherEntityId: 'sid_LBr3ocKKyQ',
   updateFrequency: 'annual',
   cachePath: '/tmp/acx-grants.json',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'recipient', internalField: 'grantee', type: 'string' },
+      { sourceName: 'amount', internalField: 'amount', type: 'number' },
+      { sourceName: 'round', internalField: 'round', type: 'string' },
+      { sourceName: 'description', internalField: 'name', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'amount'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['amount'],
+  },
 };
 
 const ftxFutureFund: DataSourceManifest = {
@@ -216,8 +230,22 @@ const ftxFutureFund: DataSourceManifest = {
   accessMethod: 'manual_export',
   updateFrequency: 'static',
   cachePath: '/tmp/ftx-future-fund-combined.sql',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'donee', internalField: 'grantee', type: 'string' },
+      { sourceName: 'amount', internalField: 'amount', type: 'number' },
+      { sourceName: 'date', internalField: 'date', type: 'date' },
+      { sourceName: 'causeArea', internalField: 'focusArea', type: 'string' },
+      { sourceName: 'intendedUse', internalField: 'description', type: 'string' },
+      { sourceName: 'earmark', internalField: 'name', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'amount', 'date'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['amount'],
+  },
 };
 
 const aria: DataSourceManifest = {
@@ -229,8 +257,21 @@ const aria: DataSourceManifest = {
   publisherEntityId: 'sid_XqjV4mbMXQ',
   updateFrequency: 'quarterly',
   cachePath: '/tmp/aria-grants.json',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['name', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'grantee', internalField: 'grantee', type: 'string' },
+      { sourceName: 'amount', internalField: 'amount', type: 'currency' },
+      { sourceName: 'ta', internalField: 'focusArea', type: 'string' },
+      { sourceName: 'title', internalField: 'name', type: 'string' },
+      { sourceName: 'leads', internalField: 'description', type: 'string' },
+      { sourceName: 'institutions', internalField: 'description', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'name'],
+    fuzzyFields: ['grantee', 'name'],
+  },
 };
 
 const wellcomeTrust: DataSourceManifest = {
@@ -242,8 +283,23 @@ const wellcomeTrust: DataSourceManifest = {
   publisherEntityId: 'sid_D3QcAF9wzQ',
   updateFrequency: 'quarterly',
   cachePath: '/tmp/wellcome-grants.csv',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'Recipient Org:Name', internalField: 'grantee', type: 'string' },
+      { sourceName: 'Title', internalField: 'name', type: 'string' },
+      { sourceName: 'Description', internalField: 'description', type: 'string' },
+      { sourceName: 'Amount Awarded', internalField: 'amount', type: 'currency' },
+      { sourceName: 'Currency', internalField: 'currency', type: 'string' },
+      { sourceName: 'Award Date', internalField: 'date', type: 'date' },
+      { sourceName: 'Grant Programme:Title', internalField: 'focusArea', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'amount', 'date'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['amount'],
+  },
 };
 
 const fordFoundation: DataSourceManifest = {
@@ -255,8 +311,21 @@ const fordFoundation: DataSourceManifest = {
   publisherEntityId: 'sid_3ViojCH3Sw',
   updateFrequency: 'quarterly',
   cachePath: '/tmp/ford-foundation-grants.json',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'grantee_name', internalField: 'grantee', type: 'string' },
+      { sourceName: 'grant_amount', internalField: 'amount', type: 'number' },
+      { sourceName: 'approval_date', internalField: 'date', type: 'date' },
+      { sourceName: 'description', internalField: 'name', type: 'string' },
+      { sourceName: 'programs', internalField: 'focusArea', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'amount', 'date'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['amount'],
+  },
 };
 
 const vipulnaik: DataSourceManifest = {
@@ -267,8 +336,23 @@ const vipulnaik: DataSourceManifest = {
   accessMethod: 'direct_download',
   updateFrequency: 'monthly',
   cachePath: '/tmp/vipulnaik-combined.sql',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount'] },
+  schema: {
+    fields: [
+      { sourceName: 'donee', internalField: 'grantee', type: 'string' },
+      { sourceName: 'amount', internalField: 'amount', type: 'number' },
+      { sourceName: 'donation_date', internalField: 'date', type: 'date' },
+      { sourceName: 'cause_area', internalField: 'focusArea', type: 'string' },
+      { sourceName: 'donation_earmark', internalField: 'name', type: 'string' },
+      { sourceName: 'notes', internalField: 'description', type: 'string' },
+      { sourceName: 'url', internalField: 'sourceUrl', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'amount', 'date'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['amount'],
+  },
 };
 
 const foresightPrizes: DataSourceManifest = {
@@ -280,8 +364,21 @@ const foresightPrizes: DataSourceManifest = {
   publisherEntityId: 'sid_NPPTvNqRXA',
   updateFrequency: 'annual',
   cachePath: '/tmp/foresight-prizes.json',
-  schema: { fields: [] },
-  verification: { strategy: 'deterministic_row_match', matchFields: ['grantee', 'amount', 'date'] },
+  schema: {
+    fields: [
+      { sourceName: 'recipient', internalField: 'grantee', type: 'string' },
+      { sourceName: 'year', internalField: 'date', type: 'number' },
+      { sourceName: 'achievement', internalField: 'description', type: 'string' },
+      { sourceName: 'institution', internalField: 'description', type: 'string' },
+      { sourceName: 'category', internalField: 'focusArea', type: 'string' },
+    ],
+  },
+  verification: {
+    strategy: 'deterministic_row_match',
+    matchFields: ['grantee', 'date'],
+    fuzzyFields: ['grantee'],
+    exactFields: ['date'],
+  },
 };
 
 // ---------------------------------------------------------------------------

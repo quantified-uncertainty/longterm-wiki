@@ -398,7 +398,7 @@ export function FundingProgramsListTable({
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                   {row.totalBudget != null && row.totalBudget > 0 ? (
                     <span className="font-semibold">
-                      {formatCompactCurrency(row.totalBudget)}
+                      {formatCompactCurrency(row.totalBudget, row.currency)}
                     </span>
                   ) : (
                     <span className="text-muted-foreground/40">{"\u2014"}</span>

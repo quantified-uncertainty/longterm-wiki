@@ -93,13 +93,25 @@ function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
   return null;
 }
 
+const MONTH_ABBR = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/** Format an ISO date string deterministically (no locale/timezone variance). */
 function formatDate(iso: string): string {
   try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
+    const parts = iso.split(/[-T]/);
+    const year = parts[0];
+    const month = parts[1] ? parseInt(parts[1], 10) : 0;
+    const day = parts[2] ? parseInt(parts[2], 10) : 0;
+    if (month >= 1 && month <= 12 && day >= 1) {
+      return `${MONTH_ABBR[month - 1]} ${day}, ${year}`;
+    }
+    if (month >= 1 && month <= 12) {
+      return `${MONTH_ABBR[month - 1]} ${year}`;
+    }
+    return year || iso;
   } catch {
     return iso;
   }

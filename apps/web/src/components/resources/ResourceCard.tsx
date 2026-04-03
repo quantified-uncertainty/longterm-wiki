@@ -7,6 +7,7 @@ import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS, STANCE_COLORS, CREDIBILITY_COLORS } from "./resource-constants";
 import { isDeadFetchStatus } from "@wiki-server/api-types";
 import { ResourcePreview } from "./ResourcePreview";
+import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 
 export function ResourceCard({ resource: r }: { resource: OrgResourceRow }) {
   const typeLabel = RESOURCE_TYPE_LABELS[r.type] ?? r.type;
@@ -27,7 +28,7 @@ export function ResourceCard({ resource: r }: { resource: OrgResourceRow }) {
                 href={`/resources/${r.id}`}
                 className="text-sm font-medium text-foreground hover:text-primary transition-colors line-clamp-2 leading-snug"
               >
-                {r.title}
+                {stripMarkdownFormatting(r.title)}
               </Link>
             </ResourcePreview>
             {isDead && (

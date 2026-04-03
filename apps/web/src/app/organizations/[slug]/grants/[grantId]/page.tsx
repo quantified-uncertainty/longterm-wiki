@@ -220,8 +220,8 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
           {grant.notes && (
             <DetailSection title="Notes">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {grant.notes}
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                {grant.notes.replace(/\\n/g, "\n")}
               </p>
             </DetailSection>
           )}

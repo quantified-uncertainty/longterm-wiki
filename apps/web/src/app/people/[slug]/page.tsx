@@ -38,6 +38,7 @@ import { FundingConnections } from "./funding-connections";
 import { OrgRoles } from "./org-roles";
 import { BoardSeats } from "./board-seats";
 import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-positions";
+import { PoliticalInfo } from "./political-info";
 import { WikiOverview } from "./wiki-overview";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
@@ -304,6 +305,7 @@ export default async function PersonProfilePage({
     label: "Overview",
     content: (
       <div className="space-y-8">
+        {personEntity && <PoliticalInfo entity={personEntity} />}
         <ExpertPositions positions={positions} />
         <PolicyPositionsSection positions={policyPositions} />
         <OrgRoles orgRoles={sortedOrgRoles} />

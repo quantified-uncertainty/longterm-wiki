@@ -3,22 +3,59 @@
  * No server-only imports — safe for "use client" components.
  */
 
-/** Format a number as compact currency: $1.2T, $850M, $42K */
-export function formatCompactCurrency(n: number | null | undefined): string {
-  if (n == null || isNaN(n) || !isFinite(n)) return "";
-  if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
-  if (Math.abs(n) >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (Math.abs(n) >= 1e6) return `$${(n / 1e6).toFixed(0)}M`;
-  if (Math.abs(n) >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
-  return `$${n.toLocaleString()}`;
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  GBP: "\u00A3",
+  EUR: "\u20AC",
+  CHF: "CHF\u00A0",
+  CAD: "CA$",
+  AUD: "A$",
+  JPY: "\u00A5",
+  CNY: "\u00A5",
+  SEK: "SEK\u00A0",
+  NOK: "NOK\u00A0",
+  DKK: "DKK\u00A0",
+};
+
+/** Get the currency symbol for a currency code, falling back to the code itself. */
+function currencySymbol(currency: string): string {
+  return CURRENCY_SYMBOLS[currency] ?? `${currency}\u00A0`;
 }
 
-/** Format a number as compact: 1.2T, 850M, 42K (no currency symbol) */
+/** Format a number as compact currency: $1.2T, $850M, $6.6M, $42K.
+ *  Accepts an optional currency code (default: USD). */
+export function formatCompactCurrency(n: number | null | undefined, currency?: string): string {
+  if (n == null || isNaN(n) || !isFinite(n)) return "";
+  const sym = currencySymbol(currency ?? "USD");
+  if (Math.abs(n) >= 1e12) return `${sym}${(n / 1e12).toFixed(1)}T`;
+  if (Math.abs(n) >= 1e9) {
+    const b = n / 1e9;
+    const formatted = Math.abs(b) < 10 ? b.toFixed(1).replace(/\.0$/, "") : b.toFixed(0);
+    return `${sym}${formatted}B`;
+  }
+  if (Math.abs(n) >= 1e6) {
+    const m = n / 1e6;
+    const formatted = Math.abs(m) < 10 ? m.toFixed(1).replace(/\.0$/, "") : m.toFixed(0);
+    return `${sym}${formatted}M`;
+  }
+  if (Math.abs(n) >= 1e3) return `${sym}${(n / 1e3).toFixed(0)}K`;
+  return `${sym}${n.toLocaleString()}`;
+}
+
+/** Format a number as compact: 1.2T, 850M, 6.6M, 42K (no currency symbol) */
 export function formatCompactNumber(n: number | null | undefined): string {
   if (n == null || isNaN(n) || !isFinite(n)) return "";
   if (Math.abs(n) >= 1e12) return `${(n / 1e12).toFixed(1)}T`;
-  if (Math.abs(n) >= 1e9) return `${(n / 1e9).toFixed(1)}B`;
-  if (Math.abs(n) >= 1e6) return `${(n / 1e6).toFixed(0)}M`;
+  if (Math.abs(n) >= 1e9) {
+    const b = n / 1e9;
+    const formatted = Math.abs(b) < 10 ? b.toFixed(1).replace(/\.0$/, "") : b.toFixed(0);
+    return `${formatted}B`;
+  }
+  if (Math.abs(n) >= 1e6) {
+    const m = n / 1e6;
+    const formatted = Math.abs(m) < 10 ? m.toFixed(1).replace(/\.0$/, "") : m.toFixed(0);
+    return `${formatted}M`;
+  }
   if (Math.abs(n) >= 1e3) return `${(n / 1e3).toFixed(0)}K`;
   return n.toLocaleString();
 }

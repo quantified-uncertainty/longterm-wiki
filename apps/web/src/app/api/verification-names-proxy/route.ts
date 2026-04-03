@@ -81,25 +81,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ names, hrefs });
   }
 
-  // Fact resolution: use local FactBase data (property name as label)
-  if (recordType === "fact") {
-    const ids = recordIds.split(",").filter(Boolean);
-    const names: Record<string, string> = {};
-
-    for (const factId of ids) {
-      const fact = getKBFactById(factId);
-      if (fact) {
-        const property = getKBProperty(fact.propertyId);
-        const entity = getKBEntity(fact.subjectId);
-        const propertyName = property?.name ?? fact.propertyId;
-        const entityName = entity?.name ?? fact.subjectId;
-        names[factId] = `${entityName} — ${propertyName}`;
-      }
-    }
-
-    return NextResponse.json({ names });
-  }
-
   // All other types: proxy to wiki-server
   const config = getWikiServerConfig();
   if (!config) {

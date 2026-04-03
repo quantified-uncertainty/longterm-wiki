@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function DataSourcesPage() {
-  redirect("/sources?tab=data-sources");
+  redirect("/wiki/E2131");
 }
