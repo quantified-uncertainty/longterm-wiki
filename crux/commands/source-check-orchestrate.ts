@@ -282,7 +282,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
         needsRecheck?: boolean;
       }>;
       total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=500&offset=0');
+    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=200&offset=0');
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -306,7 +306,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
             needsRecheck?: boolean;
           }>;
           total: number;
-        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=500&offset=${offset}`);
+        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=200&offset=${offset}`);
 
         if (!nextResponse.ok || !nextResponse.data) break;
         for (const v of nextResponse.data.verdicts) {
@@ -336,7 +336,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
   const map = new Map<string, VerifiedRecordInfo>();
 
   try {
-    const PAGE_SIZE = 500;
+    const PAGE_SIZE = 200; // Must not exceed wiki-server MAX_PAGE_SIZE (200)
     let offset = 0;
 
     while (true) {
