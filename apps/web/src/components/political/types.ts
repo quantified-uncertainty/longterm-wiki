@@ -1,121 +1,51 @@
 /**
  * Shared types for political data components.
  *
- * These types mirror the response shapes from the wiki-server
- * political-scores and political-offices API endpoints.
+ * These types are inferred from the wiki-server Hono RPC route definitions
+ * via `InferResponseType<>`, ensuring the frontend stays in sync with the
+ * server response shapes at compile time.
  */
+
+import type {
+  RpcPoliticalScore,
+  RpcPoliticalScoresByEntityResult,
+  RpcPoliticalOffice,
+  RpcPoliticalOfficesByEntityResult,
+  RpcCampaignFinanceRecord,
+  RpcCampaignFinanceByEntityResult,
+  RpcPoliticalVoteRecord,
+  RpcPoliticalVotesByEntityResult,
+  RpcPoliticalVotesByLegislationResult,
+} from "@/lib/wiki-server";
 
 // ── Political Score ──────────────────────────────────────────────────
 
-export interface EntityRef {
-  entityId: string | null;
-  slug: string | null;
-  name: string | null;
-}
-
-export interface PoliticalScore {
-  id: string;
-  politicianEntityId: string;
-  politicianDisplayName: string | null;
-  politician: EntityRef;
-  scorerOrg: string;
-  scorerEntityId: string | null;
-  scorer: EntityRef;
-  score: number;
-  maxScore: number;
-  year: number;
-  scoreType: string | null;
-  sourceUrl: string | null;
-  notes: string | null;
-  syncedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PoliticalScoresByEntityResponse {
-  scores: PoliticalScore[];
-  total: number;
-}
+export type PoliticalScore = RpcPoliticalScore;
+export type PoliticalScoresByEntityResponse = RpcPoliticalScoresByEntityResult;
 
 // ── Political Office ─────────────────────────────────────────────────
 
-export type OfficeStatus = "incumbent" | "candidate" | "former";
-
-export interface PoliticalOffice {
-  id: string;
-  politicianEntityId: string;
-  politicianDisplayName: string | null;
-  politician: EntityRef;
-  officeType: string;
-  jurisdiction: string;
-  district: string | null;
-  party: string | null;
-  status: string;
-  termStart: string | null;
-  termEnd: string | null;
-  sourceUrl: string | null;
-  notes: string | null;
-  syncedAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface PoliticalOfficesByEntityResponse {
-  offices: PoliticalOffice[];
-  total: number;
-}
+export type PoliticalOffice = RpcPoliticalOffice;
+export type PoliticalOfficesByEntityResponse = RpcPoliticalOfficesByEntityResult;
 
 // ── Campaign Finance ────────────────────────────────────────────────
 
-export interface CampaignFinanceRecord {
-  id: string;
-  politicianEntityId: string;
-  politicianDisplayName: string | null;
-  cycle: number;
-  totalRaised: string | null;
-  totalSpent: string | null;
-  cashOnHand: string | null;
-  individualContributions: string | null;
-  pacContributions: string | null;
-  smallDonorContributions: string | null;
-  selfFunding: string | null;
-  party: string | null;
-  officeType: string | null;
-  state: string | null;
-  district: string | null;
-  sourceUrl: string | null;
-  dataAsOf: string | null;
-}
-
-export interface CampaignFinanceByEntityResponse {
-  records: CampaignFinanceRecord[];
-  total: number;
-}
+export type CampaignFinanceRecord = RpcCampaignFinanceRecord;
+export type CampaignFinanceByEntityResponse = RpcCampaignFinanceByEntityResult;
 
 // ── Political Vote Record ───────────────────────────────────────────
 
+export type PoliticalVoteRecord = RpcPoliticalVoteRecord;
+export type PoliticalVotesByEntityResponse = RpcPoliticalVotesByEntityResult;
+export type PoliticalVotesByLegislationResponse = RpcPoliticalVotesByLegislationResult;
+
+// ── UI-only types (not derived from server responses) ───────────────
+
+/** Possible vote values for display styling. */
 export type VoteValue = "yea" | "nay" | "abstain" | "not_voting" | "present";
 
-export interface PoliticalVoteRecord {
-  id: string;
-  politicianEntityId: string;
-  politicianDisplayName: string | null;
-  legislationEntityId: string | null;
-  legislationTitle: string | null;
-  vote: string;
-  voteDate: string | null;
-  chamber: string | null;
-  rollCallNumber: number | null;
-  congressNumber: number | null;
-  sourceUrl: string | null;
-}
+/** Possible office statuses for display styling. */
+export type OfficeStatus = "incumbent" | "candidate" | "former";
 
-export interface PoliticalVotesByEntityResponse {
-  votes: PoliticalVoteRecord[];
-  total: number;
-}
-
-export interface PoliticalVotesByLegislationResponse {
-  votes: PoliticalVoteRecord[];
-  total: number;
-}
+/** Entity reference shape (inferred from server via the score/office types). */
+export type EntityRef = PoliticalScore["politician"];
