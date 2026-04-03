@@ -19,6 +19,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 /** Get the currency symbol for a currency code, falling back to the code itself. */
 function currencySymbol(currency: string): string {
+  if (!currency) return CURRENCY_SYMBOLS.USD;
   return CURRENCY_SYMBOLS[currency] ?? `${currency}\u00A0`;
 }
 

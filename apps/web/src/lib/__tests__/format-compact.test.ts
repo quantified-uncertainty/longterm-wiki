@@ -38,11 +38,11 @@ describe("formatCompactCurrency", () => {
   });
 
   it("uses CHF prefix for CHF currency", () => {
-    expect(formatCompactCurrency(500000, "CHF")).toBe("CHF 500K");
+    expect(formatCompactCurrency(500000, "CHF")).toBe("CHF\u00A0500K");
   });
 
   it("falls back to currency code for unknown currencies", () => {
-    expect(formatCompactCurrency(1e6, "SEK")).toBe("SEK 1M");
+    expect(formatCompactCurrency(1e6, "SEK")).toBe("SEK\u00A01M");
   });
 
   it("treats empty string currency as USD", () => {
