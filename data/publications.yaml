@@ -826,3 +826,428 @@
   credibility: 3
   peer_reviewed: false
   description: Real-money prediction markets on elections and policy outcomes
+
+# Additional News & Media
+- id: wired
+  domains: [wired.com]
+  name: WIRED
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Technology and culture magazine
+
+- id: wsj
+  domains: [wsj.com]
+  name: The Wall Street Journal
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: Major US financial newspaper
+
+- id: axios
+  domains: [axios.com]
+  name: Axios
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Business and technology news
+
+- id: venturebeat
+  domains: [venturebeat.com]
+  name: VentureBeat
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Technology industry news
+
+- id: cnn
+  domains: [cnn.com]
+  name: CNN
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Major US news network
+
+- id: ft
+  domains: [ft.com]
+  name: Financial Times
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: International business newspaper
+
+- id: bbc
+  domains: [bbc.com, bbc.co.uk]
+  name: BBC
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: British Broadcasting Corporation
+
+- id: washingtonpost
+  domains: [washingtonpost.com]
+  name: The Washington Post
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: Major US newspaper
+
+- id: politico
+  domains: [politico.com, politico.eu]
+  name: Politico
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Political journalism and policy news
+
+- id: businessinsider
+  domains: [businessinsider.com]
+  name: Business Insider
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Business and technology news
+
+- id: theguardian
+  domains: [theguardian.com]
+  name: The Guardian
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: British newspaper
+
+- id: fastcompany
+  domains: [fastcompany.com]
+  name: Fast Company
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Business and technology magazine
+
+- id: nextgov
+  domains: [nextgov.com]
+  name: Nextgov/FCW
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Federal technology and policy news
+
+- id: lawfare
+  domains: [lawfaremedia.org]
+  name: Lawfare
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: National security law and policy analysis
+
+- id: theatlantic
+  domains: [theatlantic.com]
+  name: The Atlantic
+  type: news
+  credibility: 4
+  peer_reviewed: false
+  description: News and literary magazine
+
+- id: tomshardware
+  domains: [tomshardware.com]
+  name: "Tom's Hardware"
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Computing hardware news and reviews
+
+- id: youtube
+  domains: [youtube.com]
+  name: YouTube
+  type: blog_platform
+  credibility: 2
+  peer_reviewed: false
+  description: Video hosting platform
+
+- id: substack
+  domains: [substack.com]
+  name: Substack
+  type: blog_platform
+  credibility: 2
+  peer_reviewed: false
+  description: Newsletter and blogging platform
+
+- id: pubmed
+  domains: [pmc.ncbi.nlm.nih.gov, pubmed.ncbi.nlm.nih.gov, ncbi.nlm.nih.gov]
+  name: PubMed Central
+  type: academic_journal
+  credibility: 4
+  peer_reviewed: true
+  description: NIH free full-text archive of biomedical literature
+
+- id: nber
+  domains: [nber.org]
+  name: NBER
+  type: academic
+  credibility: 4
+  peer_reviewed: false
+  description: National Bureau of Economic Research working papers
+
+- id: neurips
+  domains: [proceedings.neurips.cc, neurips.cc]
+  name: NeurIPS
+  type: academic_journal
+  credibility: 5
+  peer_reviewed: true
+  description: Conference on Neural Information Processing Systems
+
+- id: wiley
+  domains: [onlinelibrary.wiley.com]
+  name: Wiley Online Library
+  type: academic_journal
+  credibility: 4
+  peer_reviewed: true
+  description: Major academic publisher
+
+- id: oxford-academic
+  domains: [academic.oup.com]
+  name: Oxford Academic
+  type: academic_journal
+  credibility: 5
+  peer_reviewed: true
+  description: Oxford University Press academic journals
+
+- id: researchgate
+  domains: [researchgate.net]
+  name: ResearchGate
+  type: academic
+  credibility: 3
+  peer_reviewed: false
+  description: Academic social networking and paper sharing
+
+- id: far-ai
+  domains: [far.ai]
+  name: FAR AI
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: AI safety research organization
+
+- id: partnership-on-ai
+  domains: [partnershiponai.org]
+  name: Partnership on AI
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Multi-stakeholder AI safety and ethics organization
+
+- id: ai-now
+  domains: [ainowinstitute.org]
+  name: AI Now Institute
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: AI social implications research center
+
+- id: rethink-priorities
+  domains: [rethinkpriorities.org]
+  name: Rethink Priorities
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: EA research organization
+
+- id: cold-takes
+  domains: [cold-takes.com]
+  name: Cold Takes
+  type: blog_platform
+  credibility: 3
+  peer_reviewed: false
+  description: Blog by Holden Karnofsky on important topics
+
+- id: iaps
+  domains: [iaps.ai]
+  name: Institute for AI Policy and Strategy
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: AI policy research organization
+
+- id: frontier-model-forum
+  domains: [frontiermodelforum.org]
+  name: Frontier Model Forum
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Industry body for frontier AI safety standards
+
+- id: control-ai
+  domains: [controlai.com]
+  name: Control AI
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: AI safety advocacy organization
+
+- id: macarthur
+  domains: [macfound.org]
+  name: MacArthur Foundation
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: Major US philanthropic foundation
+
+- id: giving-what-we-can
+  domains: [givingwhatwecan.org]
+  name: Giving What We Can
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: EA pledging and giving community
+
+- id: founders-pledge
+  domains: [founderspledge.com]
+  name: Founders Pledge
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: EA giving pledge for entrepreneurs
+
+- id: cea
+  domains: [centreforeffectivealtruism.org, effectivealtruism.org]
+  name: Centre for Effective Altruism
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Umbrella organization for the EA community
+
+- id: inside-philanthropy
+  domains: [insidephilanthropy.com]
+  name: Inside Philanthropy
+  type: news
+  credibility: 3
+  peer_reviewed: false
+  description: Philanthropy news and analysis
+
+- id: nti
+  domains: [nti.org]
+  name: Nuclear Threat Initiative
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: Nuclear and biological security organization
+
+- id: cser
+  domains: [cser.ac.uk]
+  name: Centre for the Study of Existential Risk
+  type: academic
+  credibility: 4
+  peer_reviewed: false
+  description: Cambridge existential risk research center
+
+- id: good-judgment
+  domains: [goodjudgment.com]
+  name: Good Judgment
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Forecasting and superforecasting organization
+
+- id: cfr
+  domains: [cfr.org]
+  name: Council on Foreign Relations
+  type: think_tank
+  credibility: 4
+  peer_reviewed: false
+  description: Foreign policy and international affairs think tank
+
+- id: hrw
+  domains: [hrw.org]
+  name: Human Rights Watch
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: International human rights organization
+
+- id: elicit
+  domains: [elicit.com]
+  name: Elicit
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: AI-powered research assistant
+
+- id: rationality-org
+  domains: [rationality.org]
+  name: Center for Applied Rationality
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Rationality training organization
+
+- id: ibbis
+  domains: [ibbis.bio]
+  name: International Biosecurity and Biosafety Initiative
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: Biosecurity and biosafety initiative
+
+- id: blueprint-biosecurity
+  domains: [blueprintbiosecurity.org]
+  name: Blueprint Biosecurity
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: Biosecurity research and policy organization
+
+- id: cepi
+  domains: [cepi.net]
+  name: CEPI
+  type: organization
+  credibility: 4
+  peer_reviewed: false
+  description: Coalition for Epidemic Preparedness Innovations
+
+- id: longtermresilience
+  domains: [longtermresilience.org]
+  name: Long-Term Resilience
+  type: organization
+  credibility: 3
+  peer_reviewed: false
+  description: Existential risk policy organization
+
+- id: goodfire
+  domains: [goodfire.ai]
+  name: Goodfire
+  type: company_blog
+  credibility: 3
+  peer_reviewed: false
+  description: AI interpretability company
+
+- id: sec
+  domains: [sec.gov]
+  name: SEC
+  type: government
+  credibility: 5
+  peer_reviewed: false
+  description: US Securities and Exchange Commission
+
+- id: bls
+  domains: [bls.gov]
+  name: Bureau of Labor Statistics
+  type: government
+  credibility: 5
+  peer_reviewed: false
+  description: US labor market data
+
+- id: commerce
+  domains: [commerce.gov]
+  name: US Department of Commerce
+  type: government
+  credibility: 4
+  peer_reviewed: false
+  description: US Department of Commerce
+
+- id: wikidata
+  domains: [wikidata.org]
+  name: Wikidata
+  type: encyclopedia
+  credibility: 3
+  peer_reviewed: false
+  description: Collaborative structured knowledge base

@@ -34,6 +34,7 @@ import {
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
 import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
+import { extractDomain } from "@/lib/resource-types";
 
 // Re-export for consumers
 export type { WithSource };
@@ -904,7 +905,12 @@ export function getResourceCredibility(
   if (resource.credibility_override !== undefined) return resource.credibility_override;
   if (resource.publication_id) {
     const pub = getPublicationById(resource.publication_id);
-    return pub?.credibility;
+    if (pub?.credibility !== undefined) return pub.credibility;
+  }
+  const domain = extractDomain(resource.url);
+  if (domain) {
+    const domainPub = getPublicationByDomain(domain);
+    if (domainPub?.credibility !== undefined) return domainPub.credibility;
   }
   return undefined;
 }
@@ -913,7 +919,12 @@ export function getResourcePublication(
   resource: Resource
 ): Publication | undefined {
   if (resource.publication_id) {
-    return getPublicationById(resource.publication_id);
+    const pub = getPublicationById(resource.publication_id);
+    if (pub) return pub;
+  }
+  const domain = extractDomain(resource.url);
+  if (domain) {
+    return getPublicationByDomain(domain);
   }
   return undefined;
 }
