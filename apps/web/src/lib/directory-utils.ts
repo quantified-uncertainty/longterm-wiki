@@ -77,15 +77,6 @@ export function resolveEntityRef(ref: unknown): ResolvedEntity | null {
       };
     }
   }
-  // Fallback: try resolving as a stableId (bare 10-char or sid_-prefixed)
-  const byStableId = getTypedEntityByStableId(ref);
-  if (byStableId) {
-    return {
-      name: byStableId.title,
-      id: byStableId.stableId ?? byStableId.id,
-      slug: byStableId.id,
-    };
-  }
   return { name: ref, id: ref, slug: undefined };
 }
 

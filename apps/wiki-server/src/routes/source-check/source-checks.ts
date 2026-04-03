@@ -17,7 +17,6 @@ import {
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { escapeIlike } from "../shared/utils.js";
 import {
   sourceCheckEvidence,
   sourceCheckVerdicts,
