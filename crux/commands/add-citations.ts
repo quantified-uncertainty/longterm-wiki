@@ -152,7 +152,7 @@ Search the web and return the best source URL as JSON.`, {
 /**
  * Thin wrapper around the shared cache-only fetchSourceContent.
  * Returns the cached content as a plain string, or null on miss/error.
- * No live HTTP fetching — the resource-verify pipeline populates the cache.
+ * No live HTTP fetching — the resource-ingest pipeline populates the cache.
  */
 async function fetchSourceContent(url: string): Promise<string | null> {
   const result = await fetchCachedContent(url, undefined, '[add-citations]');

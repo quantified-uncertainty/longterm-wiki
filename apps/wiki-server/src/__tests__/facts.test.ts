@@ -451,13 +451,12 @@ describe("Facts API", () => {
       expect(typeof body.message).toBe("string");
     });
 
-    it("returns validation_error for exceeding max page size", async () => {
+    it("clamps limit above max page size instead of rejecting", async () => {
       const res = await app.request(
         "/api/facts/by-entity/anthropic?limit=999"
       );
-      expect(res.status).toBe(400);
-      const body = await res.json();
-      expect(body.error).toBe("validation_error");
+      // Should succeed with clamped limit, not reject with 400
+      expect(res.status).toBe(200);
     });
   });
 

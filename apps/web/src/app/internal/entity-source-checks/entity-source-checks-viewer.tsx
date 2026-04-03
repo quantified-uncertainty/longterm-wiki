@@ -419,7 +419,20 @@ async function resolveNames(
       const res = await fetch(
         `/api/verification-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
       );
-      if (!res.ok) return;
+      if (!res.ok) {
+        // Try to extract partial results even from error responses
+        const data = await res.json().catch(() => null);
+        if (data?.names) {
+          for (const [id, name] of Object.entries(data.names as Record<string, string>)) {
+            names[id] = name;
+          }
+        }
+        console.warn(
+          `[entity-source-checks] Name resolution returned ${res.status} for ${recordType} (${ids.size} IDs)` +
+          (data?.error ? `: ${data.error}` : "")
+        );
+        return;
+      }
       const data = await res.json();
       if (data.names) {
         for (const [id, name] of Object.entries(data.names as Record<string, string>)) {
@@ -430,6 +443,11 @@ async function resolveNames(
         for (const [id, href] of Object.entries(data.hrefs as Record<string, string>)) {
           hrefs[id] = href;
         }
+      }
+      if (data.partial) {
+        console.warn(
+          `[entity-source-checks] Partial name resolution for ${recordType}: some IDs could not be resolved`
+        );
       }
     } catch (e) {
       // Non-critical: display falls back to raw ID

@@ -43,7 +43,13 @@ If no PR was created (research/abandoned), just remove the working label:
 gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
 ```
 
-## Step 3: Clean up local artifacts
+## Step 3: Stop patrol daemon (if running)
+
+```bash
+pnpm crux gh pr-patrol stop
+```
+
+## Step 4: Clean up local artifacts
 
 Remove the WIP checklist and review marker:
 
@@ -51,7 +57,7 @@ Remove the WIP checklist and review marker:
 rm -f .claude/wip-checklist.md .claude/review-done .claude/wip-context.md
 ```
 
-## Step 4: Session summary
+## Step 5: Session summary
 
 Output a brief summary:
 - Branch name

@@ -23,20 +23,29 @@ const EXPORT_MAX_LIMIT = 50000;
 
 // ---- Query schemas ----
 
+/** Clamp limit to MAX_PAGE_SIZE instead of rejecting */
+const clampedLimit = (defaultVal: number) =>
+  z.coerce
+    .number()
+    .int()
+    .min(1)
+    .default(defaultVal)
+    .transform((v) => Math.min(v, MAX_PAGE_SIZE));
+
 const ByEntityQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(100),
   offset: z.coerce.number().int().min(0).default(0),
   measure: z.string().max(100).optional(),
 });
 
 const TimeseriesQuery = z.object({
   measure: z.string().min(1).max(100),
-  limit: z.coerce.number().int().min(1).max(500).default(100),
+  limit: z.coerce.number().int().min(1).default(100).transform((v) => Math.min(v, 500)),
 });
 
 const StalenessQuery = z.object({
   olderThan: z.string().max(20).optional(), // e.g. "2025-01" — facts with asOf before this
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(50),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -94,7 +103,12 @@ function reconstructFactValue(row: typeof facts.$inferSelect) {
     case "min":
       return { type: "min" as const, value: row.numeric ?? 0 };
     case "json":
-      return { type: "json" as const, value: row.value ? JSON.parse(row.value) : null };
+      if (row.value == null) return { type: "json" as const, value: null };
+      try {
+        return { type: "json" as const, value: JSON.parse(row.value) };
+      } catch {
+        return { type: "text" as const, value: row.value };
+      }
     default:
       // Guard: reject stale "[object Object]" artifacts from pre-March 2026 sync
       // (old data/facts/*.yaml had {min: N} objects that String() serialized as "[object Object]")

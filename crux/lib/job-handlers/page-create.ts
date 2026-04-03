@@ -12,23 +12,29 @@
  */
 
 import { execFileSync } from 'child_process';
-import type { JobHandlerContext, JobHandlerResult, PageCreateParams } from './types.ts';
+import { z } from 'zod';
+import type { JobHandlerContext, JobHandlerResult } from './types.ts';
 import { collectChangedFiles, restoreGitState, isContentFile } from './utils.ts';
+
+// ---------------------------------------------------------------------------
+// Params validation
+// ---------------------------------------------------------------------------
+
+const PageCreateParamsSchema = z.object({
+  title: z.string().min(1),
+  tier: z.enum(['budget', 'standard', 'premium']).default('standard'),
+  batchId: z.string().optional(),
+});
 
 export async function handlePageCreate(
   params: Record<string, unknown>,
   ctx: JobHandlerContext,
 ): Promise<JobHandlerResult> {
-  const { title, tier = 'standard', batchId } = params as unknown as PageCreateParams;
-
-  if (!title) {
-    return { success: false, data: {}, error: 'Missing required param: title' };
+  const parsed = PageCreateParamsSchema.safeParse(params);
+  if (!parsed.success) {
+    return { success: false, data: {}, error: `Invalid params: ${parsed.error.message}` };
   }
-
-  const validTiers = ['budget', 'standard', 'premium'];
-  if (!validTiers.includes(tier)) {
-    return { success: false, data: {}, error: `Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}` };
-  }
+  const { title, tier, batchId } = parsed.data;
 
   if (ctx.verbose) {
     console.log(`[page-create] Starting: "${title}" (tier: ${tier})`);

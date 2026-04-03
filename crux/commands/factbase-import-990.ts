@@ -20,11 +20,11 @@ import { loadGraphFull, resolveEntity, FACTBASE_DATA_DIR } from '../lib/factbase
 import {
   readEntityDocument,
   appendFact,
+  updateFact,
   writeEntityDocument,
   findEntityFilePath,
 } from '../lib/factbase-writer.ts';
 import type { RawFactInput } from '../lib/factbase-writer.ts';
-import { generateFactId } from '../../packages/factbase/src/ids.ts';
 import type { Entity, Fact } from '../../packages/factbase/src/types.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 
@@ -85,8 +85,6 @@ interface FinancialFact {
   asOf: string;
   source: string;
   notes: string;
-  /** Deterministic content-hash ID for idempotent writes */
-  contentId: string;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────
@@ -146,7 +144,7 @@ async function fetchOrganization(ein: string): Promise<ProPublicaOrg> {
 // ── Fact extraction ───────────────────────────────────────────────────
 
 function extractFinancialFacts(
-  entityId: string,
+  _entityId: string,
   org: ProPublicaOrg,
 ): FinancialFact[] {
   const ein = String(org.organization.ein);
@@ -165,7 +163,6 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for tax year ${year}.`,
-        contentId: generateFactId(entityId, 'revenue', filing.totrevenue, year),
       });
     }
 
@@ -177,7 +174,6 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for tax year ${year}.`,
-        contentId: generateFactId(entityId, 'annual-expenses', filing.totfuncexpns, year),
       });
     }
 
@@ -189,7 +185,6 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for tax year ${year}.`,
-        contentId: generateFactId(entityId, 'net-assets', filing.totnetassetend, year),
       });
     }
   }
@@ -207,31 +202,38 @@ function formatEin(ein: string): string {
 
 // ── Duplicate detection ───────────────────────────────────────────────
 
+/** Key for matching a fact by its property and asOf year. */
+function factKey(property: string, asOf: string): string {
+  return `${property}::${asOf}`;
+}
+
 /**
  * Find which proposed facts already exist in the entity's FactBase data.
  * Matches on (property, asOf) — if an existing fact has the same property
  * and year, we treat it as a duplicate regardless of whether the value
  * exactly matches (since 990 data for a given year is canonical).
+ *
+ * Returns a Set of `property::asOf` keys for duplicates.
  */
-function findDuplicates(
+function findDuplicateKeys(
   proposedFacts: FinancialFact[],
   existingFacts: Fact[],
 ): Set<string> {
   const existingKeys = new Set<string>();
   for (const f of existingFacts) {
     if (f.asOf) {
-      existingKeys.add(`${f.propertyId}::${f.asOf}`);
+      existingKeys.add(factKey(f.propertyId, f.asOf));
     }
   }
 
-  const duplicateIds = new Set<string>();
+  const duplicateKeys = new Set<string>();
   for (const pf of proposedFacts) {
-    const key = `${pf.property}::${pf.asOf}`;
+    const key = factKey(pf.property, pf.asOf);
     if (existingKeys.has(key)) {
-      duplicateIds.add(pf.contentId);
+      duplicateKeys.add(key);
     }
   }
-  return duplicateIds;
+  return duplicateKeys;
 }
 
 // ── Discover command ──────────────────────────────────────────────────
@@ -410,12 +412,26 @@ Examples:
     };
   }
 
-  // 5. Detect duplicates (--force updates existing facts in-place rather than appending)
+  // 5. Detect duplicates
   const existingFacts = graph.getFacts(entity.id);
-  const duplicateIds = findDuplicates(proposedFacts, existingFacts);
-  const newFacts = options.force
-    ? proposedFacts  // --force: write all facts (appendFact handles update-in-place)
-    : proposedFacts.filter((f) => !duplicateIds.has(f.contentId));
+  const duplicateKeys = findDuplicateKeys(proposedFacts, existingFacts);
+
+  // Split facts into new (no existing match) and updates (existing match, --force only)
+  const newFacts: FinancialFact[] = [];
+  const factsToUpdate: FinancialFact[] = [];
+  for (const f of proposedFacts) {
+    const key = factKey(f.property, f.asOf);
+    if (duplicateKeys.has(key)) {
+      if (options.force) {
+        factsToUpdate.push(f);
+      }
+      // else: skip silently (duplicate, no --force)
+    } else {
+      newFacts.push(f);
+    }
+  }
+
+  const totalToWrite = newFacts.length + factsToUpdate.length;
 
   // 6. Output
   const lines: string[] = [];
@@ -424,20 +440,26 @@ Examples:
   lines.push(`Filings available: ${org.filings_with_data.length} years (${getYearRange(org.filings_with_data)})`);
   lines.push('');
 
-  if (proposedFacts.length > newFacts.length) {
-    const skipped = proposedFacts.length - newFacts.length;
+  const skippedCount = proposedFacts.length - totalToWrite;
+  if (skippedCount > 0) {
+    const skipped = skippedCount;
     lines.push(`\x1b[2mSkipping ${skipped} facts already present (use --force to overwrite)\x1b[0m`);
     lines.push('');
   }
+  if (factsToUpdate.length > 0) {
+    lines.push(`\x1b[33mOverwriting ${factsToUpdate.length} existing facts (--force)\x1b[0m`);
+    lines.push('');
+  }
 
-  if (newFacts.length === 0) {
+  if (totalToWrite === 0) {
     lines.push('Nothing new to import — all available 990 data is already in the FactBase.');
     return { exitCode: 0, output: lines.join('\n') };
   }
 
   // Group by year for display
+  const allFactsToWrite = [...newFacts, ...factsToUpdate];
   const byYear = new Map<string, FinancialFact[]>();
-  for (const f of newFacts) {
+  for (const f of allFactsToWrite) {
     const existing = byYear.get(f.asOf);
     if (existing) {
       existing.push(f);
@@ -457,7 +479,7 @@ Examples:
   lines.push('');
 
   if (dryRun) {
-    lines.push(`\x1b[33m[DRY RUN]\x1b[0m ${newFacts.length} facts would be added to ${slug}.yaml`);
+    lines.push(`\x1b[33m[DRY RUN]\x1b[0m ${newFacts.length} new + ${factsToUpdate.length} updated = ${totalToWrite} facts would be written to ${slug}.yaml`);
 
     if (options.ci) {
       return {
@@ -467,9 +489,11 @@ Examples:
           entityId: entity.id,
           ein: formatEin(ein),
           orgName,
-          proposed: newFacts.length,
-          skipped: proposedFacts.length - newFacts.length,
-          facts: newFacts.map((f) => ({
+          proposed: totalToWrite,
+          new: newFacts.length,
+          updated: factsToUpdate.length,
+          skipped: skippedCount,
+          facts: allFactsToWrite.map((f) => ({
             property: f.property,
             value: f.value,
             asOf: f.asOf,
@@ -484,7 +508,21 @@ Examples:
   // 7. Write facts
   const doc = readEntityDocument(filePath);
   const writtenIds: string[] = [];
+  const updatedIds: string[] = [];
 
+  // Update existing facts in-place
+  for (const fact of factsToUpdate) {
+    const updatedId = updateFact(
+      doc,
+      { property: fact.property, asOf: fact.asOf },
+      { value: fact.value, source: fact.source, notes: fact.notes },
+    );
+    if (updatedId) {
+      updatedIds.push(updatedId);
+    }
+  }
+
+  // Append new facts
   for (const fact of newFacts) {
     const factInput: RawFactInput = {
       property: fact.property,
@@ -499,8 +537,14 @@ Examples:
 
   writeEntityDocument(filePath, doc);
 
-  lines.push(`\x1b[32m+${newFacts.length} facts\x1b[0m written to ${slug}.yaml`);
-  lines.push(`  IDs: ${writtenIds.join(', ')}`);
+  if (writtenIds.length > 0) {
+    lines.push(`\x1b[32m+${writtenIds.length} new facts\x1b[0m written to ${slug}.yaml`);
+    lines.push(`  IDs: ${writtenIds.join(', ')}`);
+  }
+  if (updatedIds.length > 0) {
+    lines.push(`\x1b[33m~${updatedIds.length} facts\x1b[0m updated in ${slug}.yaml`);
+    lines.push(`  IDs: ${updatedIds.join(', ')}`);
+  }
 
   if (options.ci) {
     return {
@@ -511,8 +555,9 @@ Examples:
         ein: formatEin(ein),
         orgName,
         written: writtenIds.length,
-        skipped: proposedFacts.length - newFacts.length,
-        factIds: writtenIds,
+        updated: updatedIds.length,
+        skipped: skippedCount,
+        factIds: [...writtenIds, ...updatedIds],
       }),
     };
   }

@@ -8,6 +8,7 @@ import {
   getSourceCheckVerdictStyle,
   type VerdictRow,
 } from "@/components/shared/verdict-styles";
+import { formatDateDeterministic } from "@lib/format";
 
 // ── Verdict styling (from shared module) ─────────────────────────────────
 
@@ -207,7 +208,7 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
                         </td>
                         <td className="py-1.5 tabular-nums text-muted-foreground whitespace-nowrap">
                           {v.lastComputedAt
-                            ? new Date(v.lastComputedAt).toLocaleDateString()
+                            ? formatDateDeterministic(v.lastComputedAt)
                             : "-"}
                         </td>
                       </tr>

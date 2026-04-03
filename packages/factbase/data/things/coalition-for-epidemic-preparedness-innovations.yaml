@@ -13,7 +13,7 @@ facts:
     property: founded-date
     value: "2017-01"
     source: https://www.wikidata.org/wiki/Q27133033
-    notes: "Launched January 2017 at World Economic Forum in Davos (corrected from 2016-08). Wikidata lists Jan 2017 inception."
+    notes: "Launched January 2017 at World Economic Forum in Davos (corrected from 2016-08). Wikidata lists 30 August 2016 as inception (the incorporation date); we use the formal public launch date per cepi.net/cepi-officially-launched."
   - id: rNpP4ZtDoA
     property: headquarters
     value: Oslo

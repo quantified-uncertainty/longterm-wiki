@@ -39,7 +39,7 @@ const SyncDataSourceSchema = z.object({
 const CreateSnapshotSchema = z.object({
   snapshotHash: z.string().min(1).max(128),
   recordCount: z.number().int().min(0).nullable().optional(),
-  rawContent: z.string().min(1).max(50_000_000),
+  rawContent: z.string().min(1).max(50_000_000).transform(s => s.replace(/\0/g, '')),
   fetchedAt: z.string().datetime().optional(),
   mappingValid: z.boolean().optional(),
   parserVersion: z.string().max(100).nullable().optional(),

@@ -18,7 +18,7 @@
  *   comments.ts  — structured PR status comments
  */
 
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { githubApi, REPO } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
@@ -115,6 +115,51 @@ import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 import { runReflection } from './reflection.ts';
 
 const cl = getColors();
+
+// ── PID file management ─────────────────────────────────────────────────────
+
+import { join as joinPath } from 'path';
+
+const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
+
+function writePidFile(): void {
+  try {
+    writeFileSync(PID_FILE, String(process.pid));
+  } catch { /* best-effort */ }
+}
+
+function removePidFile(): void {
+  try {
+    unlinkSync(PID_FILE);
+  } catch { /* best-effort */ }
+}
+
+/** Read the PID of a running patrol daemon, or null if none. */
+export function getDaemonPid(): number | null {
+  try {
+    const pid = parseInt(readFileSync(PID_FILE, 'utf-8').trim(), 10);
+    if (isNaN(pid)) return null;
+    // Check if process is alive
+    process.kill(pid, 0);
+    return pid;
+  } catch {
+    return null;
+  }
+}
+
+/** Stop a running patrol daemon. Returns true if one was stopped. */
+export function stopDaemon(): boolean {
+  const pid = getDaemonPid();
+  if (!pid) return false;
+  try {
+    process.kill(pid, 'SIGTERM');
+    removePidFile();
+    return true;
+  } catch {
+    removePidFile();
+    return false;
+  }
+}
 
 // ── Config builder ───────────────────────────────────────────────────────────
 
@@ -506,6 +551,9 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 
   ensureDirs();
 
+  // Write PID file so `pr-patrol stop` can find us
+  writePidFile();
+
   logHeader('PR Patrol starting');
   log(
     `Config: interval=${config.intervalSeconds}s, max-turns=${config.maxTurns}, cooldown=${config.cooldownSeconds}s, model=${config.model}`,
@@ -522,6 +570,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
     log('Shutting down...');
+    removePidFile();
     await releaseCurrentClaim(config.repo);
     process.exit(0);
   };
