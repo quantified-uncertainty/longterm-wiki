@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  if (recordType.length > 50 || recordIds.length > 100_000) {
+  if (recordType.length > 50 || recordIds.length > 60_000) {
     return NextResponse.json(
       { error: "Parameter too long" },
       { status: 400 },
@@ -91,7 +91,6 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Parse and sanitize individual record IDs
   const allIds = recordIds
     .split(",")
     .map(sanitizeRecordId)
@@ -159,14 +158,14 @@ export async function GET(request: NextRequest) {
   }
 
   const names: Record<string, string> = {};
-  let hadError = false;
 
   try {
     const batchResults = await Promise.allSettled(
-      batches.map(async (batchIds) => {
+      batches.map(async (ids) => {
+        const idsStr = ids.join(",");
         const params = new URLSearchParams({
           record_type: recordType,
-          record_ids: batchIds.join(","),
+          record_ids: idsStr,
         });
         const url = `${config.serverUrl}/api/verifications/resolve-names?${params.toString()}`;
         const res = await fetch(url, {
@@ -178,9 +177,8 @@ export async function GET(request: NextRequest) {
           const body = await res.text().catch(() => "");
           console.warn(
             `[verification-names-proxy] Wiki server returned ${res.status} for ${recordType} ` +
-            `(${batchIds.length} IDs, ${batchIds.join(",").length} chars): ${body.slice(0, 500)}`
+            `(${ids.length} IDs, ${idsStr.length} chars): ${body.slice(0, 500)}`
           );
-          hadError = true;
           return null;
         }
 
@@ -188,11 +186,9 @@ export async function GET(request: NextRequest) {
       })
     );
 
-    // Merge results from all successful batches
     for (const result of batchResults) {
       if (result.status === "fulfilled" && result.value?.names) {
         for (const [id, name] of Object.entries(result.value.names as Record<string, string>)) {
-          // Strip "new:" prefix from resolved names at API boundary
           if (typeof name === "string" && name.startsWith("new:")) {
             names[id] = name.slice(4).trim();
           } else if (typeof name === "string") {
@@ -204,11 +200,12 @@ export async function GET(request: NextRequest) {
           `[verification-names-proxy] Batch request failed for ${recordType}: ` +
           `${result.reason instanceof Error ? result.reason.message : String(result.reason)}`
         );
-        hadError = true;
       }
     }
 
-    // Return partial results even if some batches failed
+    const hadError = batchResults.some(
+      r => r.status === "rejected" || (r.status === "fulfilled" && r.value === null)
+    );
     return NextResponse.json({
       names,
       ...(hadError ? { partial: true } : {}),
