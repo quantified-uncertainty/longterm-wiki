@@ -11,9 +11,9 @@ facts:
     notes: Migrated from old entity system
   - id: Y2tpRyArBg
     property: founded-date
-    value: 2016-08
+    value: "2017-01"
     source: https://www.wikidata.org/wiki/Q27133033
-    notes: From Wikidata Q27133033
+    notes: "Launched January 2017 at World Economic Forum in Davos (corrected from 2016-08). Wikidata lists Jan 2017 inception."
   - id: rNpP4ZtDoA
     property: headquarters
     value: Oslo
