@@ -220,7 +220,7 @@ audits:
       - date: "2026-03-30"
         result: pass
         checked_by: "manual"
-        notes: "30 gate:rules-ok PRs out of 500+ merged in last 30 days (6%) — well under 20% threshold"
+        notes: "30 gate:rules-ok PRs out of 500+ merged in last 30 days (6%) — well under 20% threshold. Note: checked against full PR history, not --limit 50 sample."
 
       - date: "2026-03-30"
         result: pass
