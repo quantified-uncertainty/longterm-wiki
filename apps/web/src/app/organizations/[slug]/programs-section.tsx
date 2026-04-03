@@ -64,7 +64,10 @@ export function FundingProgramsSection({
                         source
                       </a>
                     )}
-                    <RecordVerificationDot verdict={verdict?.verdict} />
+                    <RecordVerificationDot
+                      verdict={verdict?.verdict}
+                      href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
+                    />
                     {p.description && (
                       <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                         {p.description}

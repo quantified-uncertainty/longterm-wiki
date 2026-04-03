@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
-import {
-  formatKBDate,
-  titleCase,
-} from "@/components/wiki/factbase/format";
+import { resolveEntityLink } from "@/lib/record-detail-ui";
 import { isSid } from "@/lib/stable-id";
+import { FundingRoundsTable, type FundingRoundRow } from "./funding-rounds-table";
 
 export const metadata: Metadata = {
   title: "Funding Rounds",
@@ -18,27 +13,10 @@ export const metadata: Metadata = {
     "Directory of funding rounds tracked in the knowledge base, including venture capital, grants, and other financing events for AI-related companies.",
 };
 
-/**
- * Filter out raw IDs that aren't human-readable names.
- * Returns null for stableIds and numeric PKs so the resolver can handle them.
- */
 function filterRawId(name: string | null): string | null {
   if (!name) return null;
   if (isSid(name)) return null;
   return name;
-}
-
-interface FundingRoundRow {
-  key: string;
-  name: string;
-  companyName: string;
-  companyHref: string | null;
-  date: string | null;
-  raised: number | null;
-  valuation: number | null;
-  instrument: string | null;
-  leadInvestorName: string;
-  leadInvestorHref: string | null;
 }
 
 export default function FundingRoundsPage() {
@@ -46,14 +24,12 @@ export default function FundingRoundsPage() {
 
   const rows: FundingRoundRow[] = allRecords.map((record) => {
     const f = record.fields;
-    // Filter out raw stableIds/numeric PKs that leaked through as company_name
     const preResolvedCompanyName = filterRawId(
       typeof f.company_name === "string" ? f.company_name : null,
     );
     const company = resolveEntityLink(record.ownerEntityId, preResolvedCompanyName);
     const leadInvestorId =
       typeof f.lead_investor === "string" ? f.lead_investor : null;
-    // Also filter lead investor pre-resolved name
     const preResolvedLeadName = filterRawId(
       typeof f.lead_investor_name === "string" ? f.lead_investor_name : null,
     );
@@ -72,10 +48,10 @@ export default function FundingRoundsPage() {
       instrument: typeof f.instrument === "string" ? f.instrument : null,
       leadInvestorName: leadInvestor.name,
       leadInvestorHref: leadInvestor.href,
+      verdict: getRecordVerdict("funding-round", String(record.key)),
     };
   });
 
-  // Sort by date descending, then by raised amount descending
   rows.sort((a, b) => {
     if (a.date && b.date) return b.date.localeCompare(a.date);
     if (a.date) return -1;
@@ -83,17 +59,19 @@ export default function FundingRoundsPage() {
     return (b.raised ?? 0) - (a.raised ?? 0);
   });
 
-  // Summary stats
   const totalRounds = rows.length;
-  const totalRaised = rows.reduce((sum, r) => sum + (r.raised ?? 0), 0);
+  const rowsWithRaised = rows.filter((r) => r.raised != null && r.raised > 0);
+  const totalRaised = rowsWithRaised.reduce((sum, r) => sum + (r.raised ?? 0), 0);
   const uniqueCompanies = new Set(rows.map((r) => r.companyName)).size;
-  const withValuation = rows.filter((r) => r.valuation != null).length;
+
+  const raisedLabel = rowsWithRaised.length < totalRounds
+    ? `Total Raised (${rowsWithRaised.length} of ${totalRounds} known)`
+    : "Total Raised";
 
   const stats = [
     { label: "Funding Rounds", value: totalRounds.toLocaleString() },
-    { label: "Total Raised", value: formatCompactCurrency(totalRaised) },
+    { label: raisedLabel, value: rowsWithRaised.length > 0 ? formatCompactCurrency(totalRaised) : "\u2014" },
     { label: "Companies", value: String(uniqueCompanies) },
-    { label: "With Valuation", value: String(withValuation) },
   ];
 
   return (
@@ -109,8 +87,7 @@ export default function FundingRoundsPage() {
         </p>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
         {stats.map((stat) => (
           <ProfileStatCard
             key={stat.label}
@@ -120,104 +97,8 @@ export default function FundingRoundsPage() {
         ))}
       </div>
 
-      {/* Table */}
       {totalRounds > 0 ? (
-        <div className="border border-border/60 rounded-xl overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                <th className="text-left py-2.5 px-3 font-medium">Round</th>
-                <th className="text-left py-2.5 px-3 font-medium">Company</th>
-                <th className="text-right py-2.5 px-3 font-medium">Raised</th>
-                <th className="text-right py-2.5 px-3 font-medium">
-                  Valuation
-                </th>
-                <th className="text-left py-2.5 px-3 font-medium">
-                  Instrument
-                </th>
-                <th className="text-left py-2.5 px-3 font-medium">
-                  Lead Investor
-                </th>
-                <th className="text-center py-2.5 px-3 font-medium">Date</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border/50">
-              {rows.map((row) => {
-                const verdict = getRecordVerdict("funding-round", String(row.key));
-                return (
-                <tr
-                  key={row.key}
-                  className="hover:bg-muted/20 transition-colors"
-                >
-                  <td className="py-2 px-3">
-                    <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot verdict={verdict?.verdict} />
-                      <Link
-                        href={`/funding-rounds/${row.key}`}
-                        className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                      >
-                        {row.name}
-                      </Link>
-                    </span>
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.companyHref ? (
-                      <Link
-                        href={row.companyHref}
-                        className="text-primary hover:underline"
-                      >
-                        {row.companyName}
-                      </Link>
-                    ) : (
-                      <span className="text-foreground">{row.companyName}</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                    {row.raised != null && (
-                      <span className="font-semibold">
-                        {formatCompactCurrency(row.raised)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs text-muted-foreground">
-                    {row.valuation != null &&
-                      formatCompactCurrency(row.valuation)}
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.instrument && (
-                      <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                          INSTRUMENT_COLORS[row.instrument] ??
-                          "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                        }`}
-                      >
-                        {titleCase(row.instrument)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-xs">
-                    {row.leadInvestorHref ? (
-                      <Link
-                        href={row.leadInvestorHref}
-                        className="text-primary hover:underline"
-                      >
-                        {row.leadInvestorName}
-                      </Link>
-                    ) : row.leadInvestorName ? (
-                      <span className="text-muted-foreground">
-                        {row.leadInvestorName}
-                      </span>
-                    ) : null}
-                  </td>
-                  <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
-                    {row.date ? formatKBDate(row.date) : ""}
-                  </td>
-                </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <FundingRoundsTable rows={rows} />
       ) : (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
           <p className="text-lg font-medium mb-2">

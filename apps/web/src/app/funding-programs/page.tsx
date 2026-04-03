@@ -59,9 +59,10 @@ export default function FundingProgramsPage() {
     };
   });
 
-  // Compute summary stats
+  // Compute summary stats -- exclude $0 budgets from total
   const totalPrograms = rows.length;
-  const totalBudget = rows.reduce((sum, r) => sum + (r.totalBudget ?? 0), 0);
+  const programsWithBudget = rows.filter((r) => r.totalBudget != null && r.totalBudget > 0);
+  const totalBudget = programsWithBudget.reduce((sum, r) => sum + (r.totalBudget ?? 0), 0);
   const uniqueOrgs = new Set(rows.map((r) => r.orgId)).size;
   const openCount = rows.filter((r) => r.status === "open").length;
 
@@ -108,9 +109,13 @@ export default function FundingProgramsPage() {
     (a, b) => b.totalBudget - a.totalBudget,
   );
 
+  const budgetLabel = programsWithBudget.length < totalPrograms
+    ? `Total Budget (${programsWithBudget.length} of ${totalPrograms} known)`
+    : "Total Budget";
+
   const summaryStats = [
     { label: "Total Programs", value: totalPrograms.toLocaleString() },
-    { label: "Total Budget", value: formatCompactCurrency(totalBudget) },
+    { label: budgetLabel, value: formatCompactCurrency(totalBudget) },
     { label: "Organizations", value: String(uniqueOrgs) },
     { label: "Currently Open", value: String(openCount) },
   ];
@@ -189,7 +194,9 @@ export default function FundingProgramsPage() {
                   </p>
                 </div>
                 <p className="text-sm font-semibold tabular-nums">
-                  {formatCompactCurrency(org.totalBudget)}
+                  {org.totalBudget > 0 ? formatCompactCurrency(org.totalBudget) : (
+                    <span className="text-muted-foreground/40">{"\u2014"}</span>
+                  )}
                 </p>
               </div>
             ))}

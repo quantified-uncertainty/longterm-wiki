@@ -43,6 +43,12 @@ const nextConfig: NextConfig = {
         destination: "/resources",
         permanent: true,
       },
+      // FactBase explorer pages — canonical URLs moved from wiki articles to standalone pages (#3675)
+      { source: "/wiki/E1019", destination: "/factbase", permanent: true },
+      { source: "/wiki/E1020", destination: "/factbase/facts", permanent: true },
+      { source: "/wiki/E1021", destination: "/factbase/properties", permanent: true },
+      { source: "/wiki/E1022", destination: "/factbase/entity-coverage", permanent: true },
+      { source: "/wiki/E1026", destination: "/factbase/records", permanent: true },
       // Open Philanthropy rebranded to Coefficient Giving (E521)
       {
         source: "/wiki/E552",

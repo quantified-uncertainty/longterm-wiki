@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources } from "../../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -18,6 +18,8 @@ import {
   MarkAccuracySchema as SharedMarkAccuracySchema,
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
+  type AccuracyVerdict,
+  type SourceCheckVerdict,
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -26,6 +28,141 @@ import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.j
 
 const BROKEN_SCORE_THRESHOLD = 0.5;
 const MAX_PAGE_SIZE = 5000;
+
+// ---- Verdict mapping: citation accuracy -> source-check (#3671) ----
+
+const ACCURACY_TO_SOURCE_CHECK_VERDICT: Record<AccuracyVerdict, SourceCheckVerdict> = {
+  accurate: "confirmed",
+  inaccurate: "contradicted",
+  unsupported: "unverifiable",
+  minor_issues: "partial",
+  not_verifiable: "unverifiable",
+};
+
+function buildCitationRecordId(pageSlug: string, footnote: number): string {
+  return `page:${pageSlug}:fn${footnote}`;
+}
+
+async function dualWriteToSourceCheck(
+  db: ReturnType<typeof getDrizzleDb>,
+  params: {
+    pageSlug: string;
+    footnote: number;
+    accuracyVerdict: AccuracyVerdict;
+    accuracyScore: number;
+    claimText: string;
+    issues: string | null;
+    url: string | null;
+  },
+): Promise<void> {
+  const mappedVerdict = ACCURACY_TO_SOURCE_CHECK_VERDICT[params.accuracyVerdict];
+  const recordId = buildCitationRecordId(params.pageSlug, params.footnote);
+  const now = new Date();
+
+  let entityId: string | null = null;
+  let entityDisplayName: string | null = null;
+  try {
+    const [entityRow] = await db
+      .select({ stableId: entities.stableId, title: entities.title })
+      .from(entities)
+      .where(eq(entities.id, params.pageSlug))
+      .limit(1);
+    if (entityRow) {
+      entityId = entityRow.stableId;
+      entityDisplayName = entityRow.title;
+    }
+  } catch { /* best-effort */ }
+
+  if (!entityDisplayName) {
+    try {
+      const [pageRow] = await db
+        .select({ title: wikiPages.title })
+        .from(wikiPages)
+        .where(eq(wikiPages.slug, params.pageSlug))
+        .limit(1);
+      if (pageRow) entityDisplayName = pageRow.title;
+    } catch { /* best-effort */ }
+  }
+
+  const displayName = `[${params.pageSlug}] fn${params.footnote}: ${params.claimText.slice(0, 100)}`;
+  const sourceUrlVal = params.url ?? "";
+  const checkerModelVal = "citation-accuracy-check";
+
+  const evidenceUpdated = await db
+    .update(sourceCheckEvidence)
+    .set({
+      entityId,
+      expectedValue: params.claimText.slice(0, 2000),
+      verdict: mappedVerdict,
+      confidence: params.accuracyScore,
+      notes: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
+      checkedAt: now,
+      updatedAt: now,
+    })
+    .where(
+      and(
+        eq(sourceCheckEvidence.recordType, "citation"),
+        eq(sourceCheckEvidence.recordId, recordId),
+        sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlVal || ""}`,
+        sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelVal}`,
+      )
+    )
+    .returning({ id: sourceCheckEvidence.id });
+
+  if (evidenceUpdated.length === 0) {
+    try {
+      await db.insert(sourceCheckEvidence).values({
+        recordType: "citation", recordId, entityId,
+        expectedValue: params.claimText.slice(0, 2000),
+        sourceUrl: sourceUrlVal || null, verdict: mappedVerdict,
+        confidence: params.accuracyScore, checkerModel: checkerModelVal,
+        notes: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
+        checkedAt: now, createdAt: now, updatedAt: now,
+      });
+    } catch (insertErr: unknown) {
+      const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
+      if (!(msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505"))) throw insertErr;
+    }
+  }
+
+  const verdictUpdated = await db
+    .update(sourceCheckVerdicts)
+    .set({
+      entityId,
+      displayName: displayName.slice(0, 500),
+      entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
+      verdict: mappedVerdict,
+      confidence: params.accuracyScore,
+      reasoning: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
+      sourcesChecked: 1, needsRecheck: false,
+      lastComputedAt: now, updatedAt: now,
+    })
+    .where(
+      and(
+        eq(sourceCheckVerdicts.recordType, "citation"),
+        eq(sourceCheckVerdicts.recordId, recordId),
+        sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${""}`,
+      )
+    )
+    .returning({ recordId: sourceCheckVerdicts.recordId });
+
+  if (verdictUpdated.length === 0) {
+    try {
+      await db.insert(sourceCheckVerdicts).values({
+        recordType: "citation", recordId, fieldName: null,
+        entityId, displayName: displayName.slice(0, 500),
+        entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
+        verdict: mappedVerdict, confidence: params.accuracyScore,
+        reasoning: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
+        sourcesChecked: 1, needsRecheck: false,
+        lastComputedAt: now, createdAt: now, updatedAt: now,
+      });
+    } catch (insertErr: unknown) {
+      const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
+      if (!(msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505"))) throw insertErr;
+    }
+  }
+}
 
 // ---- Deprecation helper (#1310) ----
 // Citation_quotes write endpoints are deprecated. Use claims + claim_sources instead.
@@ -435,12 +572,20 @@ const citationsApp = new Hono()
   })
 
   // ---- POST /quotes/mark-accuracy ---- [DEPRECATED: update claims.claimVerdict instead]
+  // Dual-writes to source_check_verdicts + source_check_evidence (#3671)
   .post("/quotes/mark-accuracy", zv("json", MarkAccuracySchema), async (c) => {
     deprecationWarning("POST /quotes/mark-accuracy");
     const { pageId, footnote, verdict, score, issues, supportingQuotes, verificationDifficulty } = c.req.valid("json");
     const db = getDrizzleDb();
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+
+    // Get the claim text and URL before updating (needed for source-check dual-write)
+    const [quoteRow] = await db
+      .select({ claimText: citationQuotes.claimText, url: citationQuotes.url })
+      .from(citationQuotes)
+      .where(and(eq(citationQuotes.pageId, intId), eq(citationQuotes.footnote, footnote)))
+      .limit(1);
 
     const rows = await db
       .update(citationQuotes)
@@ -466,6 +611,21 @@ const citationsApp = new Hono()
 
     if (rows.length === 0) {
       return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
+    }
+
+    // Dual-write to unified source-check system (#3671).
+    // Best-effort: failure logged but does not block the response.
+    if (quoteRow) {
+      dualWriteToSourceCheck(db, {
+        pageSlug: pageId, footnote, accuracyVerdict: verdict,
+        accuracyScore: score, claimText: quoteRow.claimText,
+        issues: issues ?? null, url: quoteRow.url,
+      }).catch((e: unknown) => {
+        logger.warn(
+          { error: e instanceof Error ? e.message : String(e), pageId, footnote },
+          "Dual-write to source-check failed for citation accuracy (#3671)"
+        );
+      });
     }
 
     return c.json({ updated: true, pageId, footnote, verdict });

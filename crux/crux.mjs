@@ -115,6 +115,7 @@ import * as politicalDataCommands from './commands/political-data.ts';
 import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
+import * as benchmarksCommands from './commands/benchmarks.ts';
 
 const domains = {
   validate: validateCommands,
@@ -194,6 +195,7 @@ const domains = {
   branches: branchesCommands,
   'deploy-tasks': deployTasksCommands,
   'agent-reset': agentResetCommands,
+  benchmarks: benchmarksCommands,
 };
 
 const shortcutMap = buildShortcutMap();

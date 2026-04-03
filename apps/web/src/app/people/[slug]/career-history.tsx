@@ -35,7 +35,10 @@ export function CareerHistory({
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
-                <RecordVerificationDot verdict={verdict?.verdict} />
+                <RecordVerificationDot
+                  verdict={verdict?.verdict}
+                  href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(entry.key))}` : undefined}
+                />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">
                 {orgSlug ? (

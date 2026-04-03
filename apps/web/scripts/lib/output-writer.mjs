@@ -52,6 +52,8 @@ export function writeMainOutputFiles({ database, outputFile }) {
     relatedGraph: _relatedGraph,
     // Phase 4: Large arrays moved to separate lazy-loaded files
     resources: _resources,
+    // Phase 5: Cross-linking data (separate lazy-loaded file)
+    resourceFactLinks: _resourceFactLinks,
     ...databaseForOutput
   } = database;
 
@@ -84,7 +86,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
   const strippedKeys = [
     'benchmarkResults', 'citationQuotes', 'recordVerdicts', 'kbFactVerification',
     'researchAreas', 'researchAreaDetails', 'pageReferenceIndex', 'prItems', 'updateSchedule',
-    'redundancyPairs', 'backlinks', 'relatedGraph', 'resources',
+    'redundancyPairs', 'backlinks', 'relatedGraph', 'resources', 'resourceFactLinks',
   ];
   console.log(`\n✓ Written: ${outputFile} (stripped: entities, KB, experts, ${strippedKeys.join(', ')})`);
   console.log(`  Page fields stripped: ${DASHBOARD_ONLY_PAGE_FIELDS.join(', ')}`);
@@ -94,6 +96,19 @@ export function writeMainOutputFiles({ database, outputFile }) {
   if (_resources) {
     writeFileSync(RESOURCES_OUTPUT_FILE, JSON.stringify(_resources));
     console.log(`✓ Written: ${RESOURCES_OUTPUT_FILE} (${_resources.length} resources)`);
+  }
+
+  // Write resource ↔ fact cross-links to a separate file (lazy-loaded by resource-fact-links.ts)
+  const RESOURCE_FACT_LINKS_FILE = join(OUTPUT_DIR, 'resource-fact-links.json');
+  if (_resourceFactLinks) {
+    const { resourceUrlToFactIds, factIdToResourceId } = _resourceFactLinks;
+    const hasData = Object.keys(resourceUrlToFactIds).length > 0 || Object.keys(factIdToResourceId).length > 0;
+    if (hasData) {
+      writeFileSync(RESOURCE_FACT_LINKS_FILE, JSON.stringify(_resourceFactLinks));
+      const resourceCount = Object.keys(resourceUrlToFactIds).length;
+      const factCount = Object.keys(factIdToResourceId).length;
+      console.log(`✓ Written: ${RESOURCE_FACT_LINKS_FILE} (${resourceCount} resources, ${factCount} facts)`);
+    }
   }
 
   // Write Phase-1 wiki-server-sourced data to separate lazy-loaded files.

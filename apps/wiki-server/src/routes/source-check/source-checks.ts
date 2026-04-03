@@ -144,6 +144,40 @@ const ResolveNamesQuery = z.object({
     ),
 });
 
+const ByEntityQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+  verdict: z.string().max(50).optional(),
+});
+
+const ByPageQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const VALID_ERROR_TYPES = [
+  "contradicted",
+  "outdated",
+  "unverifiable",
+  "partial",
+] as const;
+
+const FailuresQuery = z.object({
+  error_type: z.string().max(50).optional(),
+  record_type: z.string().max(50).optional(),
+  entity_id: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const StaleQuery = z.object({
+  days: z.coerce.number().int().min(1).max(3650).default(90),
+  record_type: z.string().max(50).optional(),
+  entity_id: z.string().max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 // ---- Helpers ----
 
 /** Check if a checker model is stale (different from the current model). */
@@ -189,6 +223,95 @@ function mapEvidenceRow(e: {
     isStale: isStaleModel(e.checkerModel),
     notes: e.notes,
     checkedAt: e.checkedAt,
+  };
+}
+
+/** Map a verdict DB row to the API response shape. */
+function mapVerdictRow(r: {
+  recordType: string;
+  recordId: string;
+  fieldName: string | null;
+  entityId: string | null;
+  displayName: string | null;
+  entityDisplayName: string | null;
+  verdict: string;
+  confidence: number | null;
+  reasoning: string | null;
+  sourcesChecked: number;
+  needsRecheck: boolean;
+  nextCheckDue: Date | null;
+  lastComputedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}) {
+  return {
+    recordType: r.recordType,
+    recordId: r.recordId,
+    fieldName: r.fieldName,
+    entityId: r.entityId,
+    displayName: r.displayName,
+    entityDisplayName: r.entityDisplayName,
+    verdict: r.verdict,
+    confidence: r.confidence,
+    reasoning: r.reasoning,
+    sourcesChecked: r.sourcesChecked,
+    needsRecheck: r.needsRecheck,
+    nextCheckDue: r.nextCheckDue,
+    lastComputedAt: r.lastComputedAt,
+    createdAt: r.createdAt,
+    updatedAt: r.updatedAt,
+  };
+}
+
+/** Helper for /by-page endpoint: query verdicts by entity stableId and return the data. */
+async function queryVerdictsByEntity(
+  db: ReturnType<typeof getDrizzleDb>,
+  entityId: string,
+  pageTitle: string,
+  limit: number,
+  offset: number,
+) {
+  const rows = await db
+    .select()
+    .from(sourceCheckVerdicts)
+    .where(eq(sourceCheckVerdicts.entityId, entityId))
+    .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+    .limit(limit)
+    .offset(offset);
+
+  const countResult = await db
+    .select({ count: count() })
+    .from(sourceCheckVerdicts)
+    .where(eq(sourceCheckVerdicts.entityId, entityId));
+  const total = countResult[0].count;
+
+  const countsByVerdictRows = await db
+    .select({
+      verdict: sourceCheckVerdicts.verdict,
+      count: count(),
+    })
+    .from(sourceCheckVerdicts)
+    .where(eq(sourceCheckVerdicts.entityId, entityId))
+    .groupBy(sourceCheckVerdicts.verdict);
+
+  const counts: Record<string, number> = {
+    confirmed: 0,
+    contradicted: 0,
+    outdated: 0,
+    partial: 0,
+    unverifiable: 0,
+    unchecked: 0,
+  };
+  for (const row of countsByVerdictRows) {
+    counts[row.verdict] = row.count;
+  }
+
+  return {
+    verdicts: rows.map(mapVerdictRow),
+    total,
+    counts,
+    pageTitle,
+    entityId,
   };
 }
 
@@ -617,6 +740,258 @@ const sourceChecksApp = new Hono()
       currentCheckerModel: CURRENT_CHECKER_MODEL,
     });
   })
+
+  // ---- GET /by-entity/:entityId ----
+  // Returns all verdicts for a given entity with aggregate counts by verdict type.
+  .get(
+    "/by-entity/:entityId",
+    zv("query", ByEntityQuery),
+    async (c) => {
+      const entityId = c.req.param("entityId");
+      const { limit, offset, verdict } = c.req.valid("query");
+
+      if (entityId.length > MAX_ID_LENGTH) {
+        return c.json({
+          verdicts: [] as ReturnType<typeof mapVerdictRow>[],
+          total: 0,
+          counts: { confirmed: 0, contradicted: 0, outdated: 0, partial: 0, unverifiable: 0, unchecked: 0 },
+        });
+      }
+
+      const db = getDrizzleDb();
+
+      const conditions = [eq(sourceCheckVerdicts.entityId, entityId)];
+      if (verdict) {
+        conditions.push(eq(sourceCheckVerdicts.verdict, verdict));
+      }
+      const whereClause = and(...conditions);
+
+      const rows = await db
+        .select()
+        .from(sourceCheckVerdicts)
+        .where(whereClause)
+        .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+        .limit(limit)
+        .offset(offset);
+
+      const countResult = await db
+        .select({ count: count() })
+        .from(sourceCheckVerdicts)
+        .where(whereClause);
+      const total = countResult[0].count;
+
+      // Aggregate counts by verdict type (always unfiltered by verdict param)
+      const countsByVerdictRows = await db
+        .select({
+          verdict: sourceCheckVerdicts.verdict,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .where(eq(sourceCheckVerdicts.entityId, entityId))
+        .groupBy(sourceCheckVerdicts.verdict);
+
+      const counts: Record<string, number> = {
+        confirmed: 0,
+        contradicted: 0,
+        outdated: 0,
+        partial: 0,
+        unverifiable: 0,
+        unchecked: 0,
+      };
+      for (const row of countsByVerdictRows) {
+        counts[row.verdict] = row.count;
+      }
+
+      return c.json({
+        verdicts: rows.map(mapVerdictRow),
+        total,
+        counts,
+      });
+    }
+  )
+
+  // ---- GET /by-page/:pageSlug ----
+  // Returns all verdicts for records whose entityId matches the page's entity stableId.
+  .get(
+    "/by-page/:pageSlug",
+    zv("query", ByPageQuery),
+    async (c) => {
+      const pageSlug = c.req.param("pageSlug");
+      const { limit, offset } = c.req.valid("query");
+
+      if (pageSlug.length > MAX_ID_LENGTH) {
+        return c.json({
+          verdicts: [] as ReturnType<typeof mapVerdictRow>[],
+          total: 0,
+          counts: { confirmed: 0, contradicted: 0, outdated: 0, partial: 0, unverifiable: 0, unchecked: 0 },
+          pageTitle: null as string | null,
+          entityId: null as string | null,
+        });
+      }
+
+      const db = getDrizzleDb();
+
+      // Resolve page slug to entity stableId
+      const entityRows = await db
+        .select({ stableId: entities.stableId, title: entities.title })
+        .from(entities)
+        .where(eq(entities.id, pageSlug))
+        .limit(1);
+
+      if (entityRows.length === 0) {
+        // Try looking up by wikiId via wikiPages
+        const pageRows = await db
+          .select({ slug: wikiPages.slug, wikiId: wikiPages.wikiId, title: wikiPages.title })
+          .from(wikiPages)
+          .where(eq(wikiPages.slug, pageSlug))
+          .limit(1);
+
+        if (pageRows.length === 0) {
+          return c.json({
+            verdicts: [] as ReturnType<typeof mapVerdictRow>[],
+            total: 0,
+            counts: { confirmed: 0, contradicted: 0, outdated: 0, partial: 0, unverifiable: 0, unchecked: 0 },
+            pageTitle: null as string | null,
+            entityId: null as string | null,
+          });
+        }
+
+        const wikiId = pageRows[0].wikiId;
+        if (wikiId) {
+          const entityByWikiId = await db
+            .select({ stableId: entities.stableId, title: entities.title })
+            .from(entities)
+            .where(eq(entities.wikiId, wikiId))
+            .limit(1);
+
+          if (entityByWikiId.length > 0) {
+            const data = await queryVerdictsByEntity(db, entityByWikiId[0].stableId, pageRows[0].title, limit, offset);
+            return c.json(data);
+          }
+        }
+
+        return c.json({
+          verdicts: [] as ReturnType<typeof mapVerdictRow>[],
+          total: 0,
+          counts: { confirmed: 0, contradicted: 0, outdated: 0, partial: 0, unverifiable: 0, unchecked: 0 },
+          pageTitle: pageRows[0].title,
+          entityId: null as string | null,
+        });
+      }
+
+      const data = await queryVerdictsByEntity(db, entityRows[0].stableId, entityRows[0].title, limit, offset);
+      return c.json(data);
+    }
+  )
+
+  // ---- GET /failures ----
+  // Returns verdicts with non-confirmed verdicts (contradicted, outdated, partial, unverifiable).
+  .get(
+    "/failures",
+    zv("query", FailuresQuery),
+    async (c) => {
+      const { error_type, record_type, entity_id, limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const failureVerdicts = error_type ? [error_type] : [...VALID_ERROR_TYPES];
+
+      const conditions = [inArray(sourceCheckVerdicts.verdict, failureVerdicts)];
+      if (record_type) {
+        conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+      }
+      if (entity_id) {
+        conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+      }
+
+      const whereClause = and(...conditions);
+
+      const rows = await db
+        .select()
+        .from(sourceCheckVerdicts)
+        .where(whereClause)
+        .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+        .limit(limit)
+        .offset(offset);
+
+      const countResult = await db
+        .select({ count: count() })
+        .from(sourceCheckVerdicts)
+        .where(whereClause);
+      const total = countResult[0].count;
+
+      // Breakdown by error type (always unfiltered by error_type param for the summary)
+      const byErrorTypeRows = await db
+        .select({
+          verdict: sourceCheckVerdicts.verdict,
+          count: count(),
+        })
+        .from(sourceCheckVerdicts)
+        .where(
+          and(
+            inArray(sourceCheckVerdicts.verdict, [...VALID_ERROR_TYPES]),
+            record_type ? eq(sourceCheckVerdicts.recordType, record_type) : undefined,
+            entity_id ? eq(sourceCheckVerdicts.entityId, entity_id) : undefined,
+          )
+        )
+        .groupBy(sourceCheckVerdicts.verdict);
+
+      const byErrorType: Record<string, number> = {};
+      for (const row of byErrorTypeRows) {
+        byErrorType[row.verdict] = row.count;
+      }
+
+      return c.json({
+        items: rows.map(mapVerdictRow),
+        total,
+        byErrorType,
+      });
+    }
+  )
+
+  // ---- GET /stale ----
+  // Returns verdicts that haven't been rechecked within N days.
+  .get(
+    "/stale",
+    zv("query", StaleQuery),
+    async (c) => {
+      const { days, record_type, entity_id, limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - days);
+
+      const conditions = [lte(sourceCheckVerdicts.lastComputedAt, cutoffDate)];
+      if (record_type) {
+        conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+      }
+      if (entity_id) {
+        conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+      }
+
+      const whereClause = and(...conditions);
+
+      const rows = await db
+        .select()
+        .from(sourceCheckVerdicts)
+        .where(whereClause)
+        .orderBy(sourceCheckVerdicts.lastComputedAt) // oldest first
+        .limit(limit)
+        .offset(offset);
+
+      const countResult = await db
+        .select({ count: count() })
+        .from(sourceCheckVerdicts)
+        .where(whereClause);
+      const total = countResult[0].count;
+
+      return c.json({
+        items: rows.map(mapVerdictRow),
+        total,
+        cutoffDate: cutoffDate.toISOString(),
+        days,
+      });
+    }
+  )
 
   // ---- POST /verdicts ----
   .post("/verdicts", async (c) => {
