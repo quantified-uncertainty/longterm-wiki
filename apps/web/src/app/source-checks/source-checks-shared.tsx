@@ -5,10 +5,7 @@ import {
   SOURCE_CHECK_VERDICT_PRIORITY,
 } from "@/components/shared/verdict-styles";
 
-// ── Verdict styling (from shared module) ────────────────────────────────
-// Cast to Record<string, ...> so consumers can index with `string` verdict keys
-// without needing to narrow to SourceCheckVerdictType first.
-
+// Widened to Record<string, ...> so consumers can index with string verdict keys.
 export const VERDICT_STYLES: Record<string, { bg: string; text: string }> = SOURCE_CHECK_VERDICT_STYLES;
 export const VERDICT_DESCRIPTIONS: Record<string, string> = SOURCE_CHECK_VERDICT_DESCRIPTIONS;
 
