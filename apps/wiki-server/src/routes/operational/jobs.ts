@@ -637,12 +637,12 @@ const jobsApp = new Hono()
     const totalResult = await db
       .select({ count: count() })
       .from(jobs)
-      .where(timeFilter);
+      .where(sql`${jobs.createdAt} >= ${recentCutoff}`);
 
     return c.json({
       totalJobs: totalResult[0].count,
       byType: typeSummary,
-      ...(sinceDate ? { since: sinceDate.toISOString() } : {}),
+      hours,
     });
   })
 
