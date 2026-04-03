@@ -4,8 +4,6 @@
  * Shared types for the job processing system.
  */
 
-import { z } from 'zod';
-
 // ---------------------------------------------------------------------------
 // File Change — the unit of work output from content-modifying jobs
 // ---------------------------------------------------------------------------
@@ -63,39 +61,35 @@ export interface BatchInfo {
 // Content job params
 // ---------------------------------------------------------------------------
 
-export const PageImproveParamsSchema = z.object({
-  pageId: z.string(),
-  tier: z.enum(['polish', 'standard', 'deep']).default('standard'),
-  directions: z.string().optional(),
-  batchId: z.string().optional(),
-  apply: z.boolean().optional(),
-});
-export type PageImproveParams = z.infer<typeof PageImproveParamsSchema>;
+export interface PageImproveParams {
+  pageId: string;
+  tier: 'polish' | 'standard' | 'deep';
+  directions?: string;
+  batchId?: string;
+  apply?: boolean;
+}
 
-export const PageCreateParamsSchema = z.object({
-  title: z.string(),
-  tier: z.enum(['budget', 'standard', 'premium']).default('standard'),
-  batchId: z.string().optional(),
-});
-export type PageCreateParams = z.infer<typeof PageCreateParamsSchema>;
+export interface PageCreateParams {
+  title: string;
+  tier: 'budget' | 'standard' | 'premium';
+  batchId?: string;
+}
 
-export const BatchCommitParamsSchema = z.object({
-  batchId: z.string(),
-  childJobIds: z.array(z.number()),
-  branchName: z.string().optional(),
-  prTitle: z.string(),
-  prBody: z.string().optional(),
-  prLabels: z.array(z.string()).optional(),
-});
-export type BatchCommitParams = z.infer<typeof BatchCommitParamsSchema>;
+export interface BatchCommitParams {
+  batchId: string;
+  childJobIds: number[];
+  branchName?: string;
+  prTitle: string;
+  prBody?: string;
+  prLabels?: string[];
+}
 
-export const AutoUpdateDigestParamsSchema = z.object({
-  budget: z.number().optional(),
-  maxPages: z.number().optional(),
-  sources: z.string().optional(),
-  dryRun: z.boolean().optional(),
-});
-export type AutoUpdateDigestParams = z.infer<typeof AutoUpdateDigestParamsSchema>;
+export interface AutoUpdateDigestParams {
+  budget?: number;
+  maxPages?: number;
+  sources?: string;
+  dryRun?: boolean;
+}
 
 export interface ResourceIngestParams {
   /** Resource stableId */
