@@ -56,6 +56,15 @@ export function resolveEntityRef(ref: unknown): ResolvedEntity | null {
       slug: entity.id, // entity.id is the slug in TableBase
     };
   }
+  // Try stableId lookup (handles sid_-prefixed IDs that aren't in the slug registry)
+  const byStableId = getTypedEntityByStableId(ref);
+  if (byStableId) {
+    return {
+      name: byStableId.title,
+      id: byStableId.stableId ?? byStableId.id,
+      slug: byStableId.id,
+    };
+  }
   // Fallback: try resolving as a FactBase slug
   const entityId = resolveKBSlug(ref);
   if (entityId) {

@@ -44,15 +44,20 @@ export async function storeSourceCheckEvidence(params: {
     }
   }
 
+  // Truncate fields to match server-side schema limits to avoid validation errors
+  const extractedValue = params.extractedValue?.slice(0, 2000) ?? null;
+  const notes = params.reasoning?.slice(0, 5000) ?? null;
+  const recordId = params.recordId?.slice(0, 500) ?? '';
+
   const body = {
     recordType: params.recordType,
-    recordId: params.recordId,
-    sourceUrl: params.sourceUrl,
+    recordId,
+    sourceUrl: params.sourceUrl || null,
     verdict: params.verdict,
     confidence: params.confidence,
-    extractedValue: params.extractedValue,
+    extractedValue,
     checkerModel: params.checkerModel ?? MODELS.haiku,
-    notes: params.reasoning,
+    notes,
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
     ...(params.entityId ? { entityId: params.entityId } : {}),
     resourceId: resolvedResourceId,
