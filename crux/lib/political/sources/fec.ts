@@ -14,9 +14,10 @@
 
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+
+import { loadFixture } from "./load-fixture.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -350,8 +351,8 @@ function getSampleData(
   // Realistic sample data based on FEC filings for the given cycle.
   // Includes a mix of senators, representatives, and candidates that
   // overlap with politician entities in people.yaml.
-  const dir = dirname(fileURLToPath(import.meta.url));
-  const sampleCandidates: Array<{
+
+  const sampleCandidates = loadFixture<Array<{
     name: string;
     fecId: string;
     party: string;
@@ -365,7 +366,7 @@ function getSampleData(
     pacContributions: number;
     smallDonorContributions: number;
     selfFunding: number;
-  }> = JSON.parse(readFileSync(join(dir, "fixtures/fec-sample.json"), "utf-8"));
+  }>>(import.meta.url, "fec-sample.json");
 
   const today = new Date().toISOString().split("T")[0];
 

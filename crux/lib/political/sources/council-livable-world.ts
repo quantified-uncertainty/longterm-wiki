@@ -21,10 +21,6 @@
  * If scraping fails, realistic sample data is used.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type {
   ScorecardSource,
   FetchResult,
@@ -34,6 +30,8 @@ import {
   generateScoreId,
   placeholderEntityId,
 } from "../scorecard-ingest.ts";
+
+import { loadFixture } from "./load-fixture.ts";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -170,13 +168,12 @@ async function fetchCandidatesPage(): Promise<string | null> {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on Council for a Livable World endorsements.
   // These are historically endorsed legislators known for arms control stances.
-  const dir = dirname(fileURLToPath(import.meta.url));
-  const samples: Array<{
+  const samples = loadFixture<Array<{
     name: string;
     party: string;
     state: string;
     chamber: string;
-  }> = JSON.parse(readFileSync(join(dir, "fixtures/council-livable-world-sample.json"), "utf-8"));
+  }>>(import.meta.url, "council-livable-world-sample.json");
 
   return samples.map((s) => ({
     id: generateScoreId(SCORER_ORG, s.name, year),

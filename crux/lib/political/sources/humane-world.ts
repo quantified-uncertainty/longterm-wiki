@@ -14,10 +14,6 @@
  * If that fails, we use realistic sample data.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
 import type {
   ScorecardSource,
   FetchResult,
@@ -27,6 +23,8 @@ import {
   generateScoreId,
   placeholderEntityId,
 } from "../scorecard-ingest.ts";
+
+import { loadFixture } from "./load-fixture.ts";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -177,14 +175,13 @@ function normalizeParty(p: string): string {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on the 2025 Humane Scorecard "100+ Club"
   // and "Total Zeroes" lists.
-  const dir = dirname(fileURLToPath(import.meta.url));
-  const samples: Array<{
+  const samples = loadFixture<Array<{
     name: string;
     party: string;
     state: string;
     score: number;
     notes: string;
-  }> = JSON.parse(readFileSync(join(dir, "fixtures/humane-world-sample.json"), "utf-8"));
+  }>>(import.meta.url, "humane-world-sample.json");
 
   return samples.map((s) => ({
     id: generateScoreId(SCORER_ORG, s.name, year),
