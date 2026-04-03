@@ -25,12 +25,19 @@ import type {
 import { writeFileSync } from "node:fs";
 import { stringify as stringifyYaml } from "yaml";
 import {
-  apiRequest,
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
 import {
   getScoreStats, getOfficeStats, getVoteStats, getFinanceStats,
   syncOffices,
+  getAllScores, getScoresByEntity,
+  getAllOffices, getOfficesByEntity,
+  getAllVotes, getVotesByEntity, getVotesByLegislation,
+  getAllFinance, getFinanceByEntity, getFinanceStats as getFinanceStatsTyped,
+  type ScoreAllResult, type ScoreByEntityResult,
+  type OfficeAllResult, type OfficeByEntityResult,
+  type VoteAllResult, type VoteByEntityResult, type VoteByLegislationResult,
+  type FinanceAllResult, type FinanceByEntityResult, type FinanceStatsResult,
 } from "../lib/wiki-server/political.ts";
 import {
   getSource,
@@ -183,27 +190,9 @@ async function scoresListCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const params = new URLSearchParams();
-  if (options.entity) params.set("politicianEntityId", options.entity);
-  if (options.limit) params.set("limit", options.limit);
-
-  const endpoint = options.entity
-    ? `/api/political-scores/by-entity/${options.entity}`
-    : `/api/political-scores/all?${params}`;
-
-  const result = await apiRequest<{
-    scores: Array<{
-      id: string;
-      politicianDisplayName: string | null;
-      politician: { name: string | null } | null;
-      scorerOrg: string;
-      score: number;
-      maxScore: number;
-      year: number;
-      scoreType: string | null;
-    }>;
-    total: number;
-  }>("GET", endpoint);
+  const result = options.entity
+    ? await getScoresByEntity(options.entity)
+    : await getAllScores({ limit: options.limit ? parseInt(options.limit, 10) : undefined });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -393,23 +382,9 @@ async function officesCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const endpoint = options.entity
-    ? `/api/political-offices/by-entity/${options.entity}`
-    : `/api/political-offices/all?limit=${options.limit ?? "200"}`;
-
-  const result = await apiRequest<{
-    offices: Array<{
-      id: string;
-      politicianDisplayName: string | null;
-      politician: { name: string | null } | null;
-      officeType: string;
-      jurisdiction: string;
-      district: string | null;
-      party: string | null;
-      status: string;
-    }>;
-    total: number;
-  }>("GET", endpoint);
+  const result = options.entity
+    ? await getOfficesByEntity(options.entity)
+    : await getAllOffices({ limit: options.limit ? parseInt(options.limit, 10) : 200 });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -738,32 +713,13 @@ async function votesListCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const params = new URLSearchParams();
-  if (options.limit) params.set("limit", options.limit);
+  const limitNum = options.limit ? parseInt(options.limit, 10) : undefined;
 
-  let endpoint: string;
-  if (options.entity) {
-    endpoint = `/api/political-votes/by-entity/${options.entity}`;
-  } else if (options.legislation) {
-    endpoint = `/api/political-votes/by-legislation/${options.legislation}`;
-  } else {
-    endpoint = `/api/political-votes/all?${params}`;
-  }
-
-  const result = await apiRequest<{
-    votes: Array<{
-      id: string;
-      politicianDisplayName: string | null;
-      politician: { name: string | null } | null;
-      legislationEntityId: string | null;
-      legislationTitle: string | null;
-      vote: string;
-      voteDate: string | null;
-      chamber: string | null;
-    }>;
-    total: number;
-    breakdown?: Record<string, number>;
-  }>("GET", endpoint);
+  const result = options.entity
+    ? await getVotesByEntity(options.entity, { limit: limitNum })
+    : options.legislation
+      ? await getVotesByLegislation(options.legislation, { limit: limitNum })
+      : await getAllVotes({ limit: limitNum });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -773,7 +729,8 @@ async function votesListCommand(
     return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
   }
 
-  const { votes, total, breakdown } = result.data;
+  const { votes, total } = result.data;
+  const breakdown = 'breakdown' in result.data ? (result.data as { breakdown?: Record<string, number> }).breakdown : undefined;
   if (votes.length === 0) {
     return { exitCode: 0, output: "No political votes found." };
   }
@@ -1086,24 +1043,12 @@ async function financeListCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const endpoint = options.entity
-    ? `/api/campaign-finance/by-entity/${options.entity}`
-    : `/api/campaign-finance/all?limit=${options.limit ?? "200"}${options.cycle ? `&cycle=${options.cycle}` : ""}`;
-
-  const result = await apiRequest<{
-    records: Array<{
-      id: string;
-      politicianDisplayName: string | null;
-      politician: { name: string | null } | null;
-      cycle: number;
-      totalRaised: number | null;
-      totalSpent: number | null;
-      party: string | null;
-      officeType: string | null;
-      state: string | null;
-    }>;
-    total: number;
-  }>("GET", endpoint);
+  const result = options.entity
+    ? await getFinanceByEntity(options.entity)
+    : await getAllFinance({
+        limit: options.limit ? parseInt(options.limit, 10) : 200,
+        cycle: options.cycle,
+      });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -1146,21 +1091,7 @@ async function financeStatsCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const result = await apiRequest<{
-    total: number;
-    totalRaisedSum: number;
-    politicians: number;
-    cycles: number;
-    topFundraisers: Array<{
-      politicianDisplayName: string | null;
-      politician: { name: string | null } | null;
-      totalRaised: number | null;
-      cycle: number;
-      party: string | null;
-      officeType: string | null;
-      state: string | null;
-    }>;
-  }>("GET", "/api/campaign-finance/stats");
+  const result = await getFinanceStats();
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };

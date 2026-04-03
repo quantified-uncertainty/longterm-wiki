@@ -59,8 +59,10 @@ export async function getAllPersonnel(
 /** Sync personnel records (upsert). */
 export async function syncPersonnel(
   items: Array<Record<string, unknown>>,
+  options?: { skipEntityValidation?: boolean },
 ): Promise<ApiResult<PersonnelSyncResult>> {
-  return apiRequest<PersonnelSyncResult>('POST', '/api/personnel/sync', { items });
+  const qs = options?.skipEntityValidation ? '?skipEntityValidation=true' : '';
+  return apiRequest<PersonnelSyncResult>('POST', `/api/personnel/sync${qs}`, { items });
 }
 
 /** Delete personnel records by ID. */
@@ -68,4 +70,9 @@ export async function deletePersonnel(
   ids: string[],
 ): Promise<ApiResult<PersonnelDeleteResult>> {
   return apiRequest<PersonnelDeleteResult>('POST', '/api/personnel/delete', { ids });
+}
+
+/** Get personnel statistics. */
+export async function getPersonnelStats(): Promise<ApiResult<PersonnelStatsResult>> {
+  return apiRequest<PersonnelStatsResult>('GET', '/api/personnel/stats');
 }

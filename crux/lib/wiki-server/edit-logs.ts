@@ -63,3 +63,18 @@ export async function getEditLogLatestDates(): Promise<ApiResult<LatestDatesResu
   return apiRequest<LatestDatesResult>('GET', '/api/edit-logs/latest-dates');
 }
 
+/** Fetch all edit log entries with pagination and optional date filter. */
+export async function getAllEditLogs(
+  options?: { limit?: number; offset?: number; since?: string },
+): Promise<ApiResult<GetAllEntriesResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  if (options?.offset != null) params.set('offset', String(options.offset));
+  if (options?.since) params.set('since', options.since);
+  const qs = params.toString();
+  return apiRequest<GetAllEntriesResult>(
+    'GET',
+    `/api/edit-logs/all${qs ? `?${qs}` : ''}`,
+  );
+}
+

@@ -15,8 +15,16 @@
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { storeSourceCheckEvidence, storeAggregateVerdict } from '../lib/source-check/index.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import {
+  getAllQuotes,
+  getQuotesByPage,
+  getCitationBrokenQuotes,
+  type AllQuotesResult,
+  type QuotesByPageResult,
+} from '../lib/wiki-server/citations.ts';
+import { listPages, type PageListResult } from '../lib/wiki-server/pages.ts';
+import { getVerdictByRecord } from '../lib/wiki-server/verifications.ts';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -103,27 +111,21 @@ async function fetchAllQuotes(): Promise<CitationQuoteRow[]> {
   let offset = 0;
 
   // First call to get total
-  const firstResult = await apiRequest<AllQuotesResponse>(
-    'GET',
-    `/api/citations/quotes/all?limit=${PAGE_SIZE}&offset=0`,
-  );
+  const firstResult = await getAllQuotes(PAGE_SIZE, 0);
   if (!firstResult.ok) {
     throw new Error(`Failed to fetch citations: ${firstResult.error} - ${firstResult.message}`);
   }
 
-  all.push(...firstResult.data.quotes);
+  all.push(...(firstResult.data.quotes as unknown as CitationQuoteRow[]));
   const total = firstResult.data.total;
   offset = PAGE_SIZE;
 
   while (offset < total) {
-    const result = await apiRequest<AllQuotesResponse>(
-      'GET',
-      `/api/citations/quotes/all?limit=${PAGE_SIZE}&offset=${offset}`,
-    );
+    const result = await getAllQuotes(PAGE_SIZE, offset);
     if (!result.ok) {
       throw new Error(`Failed to fetch citations at offset ${offset}: ${result.error} - ${result.message}`);
     }
-    all.push(...result.data.quotes);
+    all.push(...(result.data.quotes as unknown as CitationQuoteRow[]));
     offset += PAGE_SIZE;
   }
 
@@ -138,17 +140,15 @@ async function fetchPageSlugs(): Promise<Map<number, string>> {
   // We need to map integer pageId -> slug. The pages-with-quotes endpoint
   // only has pages with quotes, so we'll use a different approach:
   // fetch wiki pages list to build the mapping.
-  const result = await apiRequest<{ pages: Array<{ id: number; slug: string }> }>(
-    'GET',
-    '/api/pages?limit=5000',
-  );
+  const result = await listPages({ limit: 5000 });
   if (!result.ok) {
     throw new Error(`Failed to fetch page list: ${result.error} - ${result.message}`);
   }
 
   const map = new Map<number, string>();
   for (const page of result.data.pages) {
-    map.set(page.id, page.slug);
+    // The pages endpoint returns `slug` as the `id` field
+    map.set(page.id as unknown as number, page.id);
   }
   return map;
 }
@@ -157,24 +157,18 @@ async function fetchPageSlugs(): Promise<Map<number, string>> {
  * Fetch quotes for a single page by slug.
  */
 async function fetchQuotesForPage(pageSlug: string): Promise<CitationQuoteRow[]> {
-  const result = await apiRequest<QuotesByPageResponse>(
-    'GET',
-    `/api/citations/quotes?page_id=${encodeURIComponent(pageSlug)}&limit=500`,
-  );
+  const result = await getQuotesByPage(pageSlug, 500);
   if (!result.ok) {
     throw new Error(`Failed to fetch citations for page ${pageSlug}: ${result.error} - ${result.message}`);
   }
-  return result.data.quotes;
+  return result.data.quotes as unknown as CitationQuoteRow[];
 }
 
 /**
  * Check if a source-check verdict already exists for a given record.
  */
 async function hasExistingVerdict(recordId: string): Promise<boolean> {
-  const result = await apiRequest<{ verdicts: unknown[]; evidence: unknown[] }>(
-    'GET',
-    `/api/verifications/verdicts/citation/${encodeURIComponent(recordId)}`,
-  );
+  const result = await getVerdictByRecord('citation', recordId);
   // A 404 means no verdict exists
   if (!result.ok) return false;
   return result.data.verdicts.length > 0;

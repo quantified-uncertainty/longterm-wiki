@@ -5,7 +5,7 @@
  * Response types are inferred from the Hono RPC route type via InferResponseType<>.
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
 import type { UpsertResource, UpdateResourceFetchStatus, SuggestResources } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { ResourcesRoute } from '../../../apps/wiki-server/src/routes/wikibase/resources.ts';
@@ -28,6 +28,9 @@ export type ResourceStatsResult = InferResponseType<RpcClient['stats']['$get'], 
 export type ResourceSearchResult = InferResponseType<RpcClient['search']['$get'], 200>;
 export type ResourceListResult = InferResponseType<RpcClient['all']['$get'], 200>;
 export type UpdateFetchStatusResult = InferResponseType<RpcClient[':id']['fetch-status']['$patch'], 200>;
+export type BatchDetailsResult = InferResponseType<RpcClient['batch-details']['$post'], 201>;
+export type ResourceWithContentResult = InferResponseType<RpcClient[':id']['content']['$get'], 200>;
+export type UpdateAuthorEntityIdsResult = InferResponseType<RpcClient['author-entity-ids']['$patch'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -53,8 +56,8 @@ export async function getResource(
 
 export async function getResourceWithContent(
   id: string,
-): Promise<ApiResult<ResourceRow & { content: Record<string, unknown> | null }>> {
-  return apiRequest('GET', `/api/resources/${encodeURIComponent(id)}/content`);
+): Promise<ApiResult<ResourceWithContentResult>> {
+  return apiRequest<ResourceWithContentResult>('GET', `/api/resources/${encodeURIComponent(id)}/content`);
 }
 
 export async function lookupResourceByUrl(
@@ -133,6 +136,16 @@ export async function suggestResourcesApi(
 }
 
 /**
+ * Batch upsert resource sub-table details (papers, forum posts, policy docs).
+ * Uses a longer timeout for large batches.
+ */
+export async function batchResourceDetails(
+  body: Record<string, unknown>,
+): Promise<ApiResult<BatchDetailsResult>> {
+  return batchedRequest<BatchDetailsResult>('POST', '/api/resources/batch-details', body);
+}
+
+/**
  * Update a resource's archive_url via the batch endpoint.
  * Used by source-fetcher when Wayback Machine content is found for a dead link.
  */
@@ -143,4 +156,11 @@ export async function updateResourceArchiveUrl(
   return apiRequest('POST', '/api/resources/batch', {
     items: [{ id, archiveUrl }],
   });
+}
+
+/** Batch update authorEntityIds for resources. */
+export async function updateAuthorEntityIds(
+  items: Array<{ resourceId: string; authorEntityIds: string[] }>,
+): Promise<ApiResult<UpdateAuthorEntityIdsResult>> {
+  return apiRequest<UpdateAuthorEntityIdsResult>('PATCH', '/api/resources/author-entity-ids', { items });
 }

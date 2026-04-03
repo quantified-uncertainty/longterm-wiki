@@ -24,7 +24,7 @@
 
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { createLogger } from '../lib/output.ts';
-import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
+import { getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 import {
@@ -34,8 +34,11 @@ import {
   getBacklinks,
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
-import type { SessionPageChangesResult } from '../lib/wiki-server/sessions.ts';
-import type { RiskLatestResult } from '../lib/wiki-server/risk.ts';
+import { getSessionPageChanges } from '../lib/wiki-server/sessions.ts';
+import { getAllEditLogs, type GetAllEntriesResult } from '../lib/wiki-server/edit-logs.ts';
+import { getCitationBrokenQuotes, type CitationBrokenQuotesResult } from '../lib/wiki-server/citations.ts';
+import { getRiskHistory, getRiskLatest, type RiskHistoryResult } from '../lib/wiki-server/risk.ts';
+import { getHealth, type HealthResult } from '../lib/wiki-server/health.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -389,10 +392,7 @@ export async function recentChanges(_args: string[], options: Record<string, unk
   const cutoff = cutoffDate.toISOString().slice(0, 10);
 
   // Pass `since` to server so we get all sessions in the window, not just `limit` most recent
-  const result = await apiRequest<SessionPageChangesResult>(
-    'GET',
-    `/api/sessions/page-changes?limit=${limit}&since=${cutoff}`,
-  );
+  const result = await getSessionPageChanges({ limit, since: cutoff });
 
   if (!result.ok) return serverUnavailableError(log, result);
 
@@ -426,19 +426,6 @@ export async function recentChanges(_args: string[], options: Record<string, unk
 // recent-edits — recent edit log entries
 // ---------------------------------------------------------------------------
 
-interface EditLogAllResult {
-  entries: Array<{
-    id: number;
-    pageId: string;
-    date: string;
-    tool: string;
-    agency: string;
-    requestedBy: string | null;
-    note: string | null;
-  }>;
-  total: number;
-}
-
 export async function recentEdits(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -449,10 +436,7 @@ export async function recentEdits(_args: string[], options: Record<string, unkno
   cutoffDate.setDate(cutoffDate.getDate() - days);
   const cutoff = cutoffDate.toISOString().slice(0, 10);
 
-  const result = await apiRequest<EditLogAllResult>(
-    'GET',
-    `/api/edit-logs/all?limit=${limit}&offset=0&since=${cutoff}`,
-  );
+  const result = await getAllEditLogs({ limit, offset: 0, since: cutoff });
 
   if (!result.ok) return serverUnavailableError(log, result);
 
@@ -485,20 +469,6 @@ export async function recentEdits(_args: string[], options: Record<string, unkno
 // citations — citation health for a page
 // ---------------------------------------------------------------------------
 
-interface BrokenCitationsResult {
-  broken: Array<{
-    pageId: string;
-    footnote: number;
-    url: string | null;
-    claimText: string;
-    verificationScore: number | null;
-    accuracyVerdict: string | null;
-    accuracyScore: number | null;
-    sourceTitle: string | null;
-  }>;
-  total: number;
-}
-
 export async function citations(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -508,17 +478,15 @@ export async function citations(args: string[], options: Record<string, unknown>
 
   // crux query citations --broken [--limit=N]
   if (isBroken) {
-    const result = await apiRequest<BrokenCitationsResult>(
-      'GET',
-      `/api/citations/broken?limit=${limit}`,
-    );
+    const result = await getCitationBrokenQuotes({ limit });
     if (!result.ok) return serverUnavailableError(log, result);
 
     if (options.json || options.ci) {
       return { output: JSON.stringify(result.data, null, 2), exitCode: 0 };
     }
 
-    const { broken, total } = result.data;
+    const { broken } = result.data;
+    const total = broken.length;
     if (broken.length === 0) {
       return { output: `${c.green}No broken citations found.${c.reset}`, exitCode: 0 };
     }
@@ -529,7 +497,7 @@ export async function citations(args: string[], options: Record<string, unknown>
     for (const b of broken) {
       const scoreStr = b.verificationScore !== null ? ` (score: ${b.verificationScore.toFixed(2)})` : '';
       output += `${c.bold}${b.pageId}${c.reset} — footnote ${b.footnote}${scoreStr}\n`;
-      if (b.sourceTitle) output += `  Source: ${b.sourceTitle}\n`;
+      if ('sourceTitle' in b && (b as any).sourceTitle) output += `  Source: ${(b as any).sourceTitle}\n`;
       if (b.url) output += `  URL: ${c.dim}${b.url.slice(0, 80)}${b.url.length > 80 ? '…' : ''}${c.reset}\n`;
       output += `  ${c.dim}${b.claimText.slice(0, 100)}${b.claimText.length > 100 ? '…' : ''}${c.reset}\n\n`;
     }
@@ -604,10 +572,7 @@ export async function risk(args: string[], options: Record<string, unknown>): Pr
     }
     // Single page risk history — use --limit for history depth
     const historyLimit = Math.min(limit, 50);
-    const result = await apiRequest<{ pageId: string; snapshots: Array<{ score: number; level: string; factors: unknown; computedAt: string }> }>(
-      'GET',
-      `/api/hallucination-risk/history?page_id=${encodeURIComponent(pageId)}&limit=${historyLimit}`,
-    );
+    const result = await getRiskHistory(pageId, { limit: historyLimit });
 
     if (!result.ok) return serverUnavailableError(log, result);
 
@@ -630,7 +595,7 @@ export async function risk(args: string[], options: Record<string, unknown>): Pr
 
     if (latest.factors && typeof latest.factors === 'object') {
       output += `\n  ${c.bold}Risk Factors:${c.reset}\n`;
-      for (const [k, v] of Object.entries(latest.factors as Record<string, unknown>)) {
+      for (const [k, v] of Object.entries(latest.factors as unknown as Record<string, unknown>)) {
         output += `    ${k}: ${JSON.stringify(v)}\n`;
       }
     }
@@ -647,10 +612,7 @@ export async function risk(args: string[], options: Record<string, unknown>): Pr
   }
 
   // Wiki-wide risk listing
-  let path = `/api/hallucination-risk/latest?limit=${limit}`;
-  if (level) path += `&level=${encodeURIComponent(level)}`;
-
-  const result = await apiRequest<RiskLatestResult>('GET', path);
+  const result = await getRiskLatest({ limit, level });
   if (!result.ok) return serverUnavailableError(log, result);
 
   if (options.json || options.ci) {
@@ -681,22 +643,11 @@ export async function risk(args: string[], options: Record<string, unknown>): Pr
 // stats — wiki-wide statistics
 // ---------------------------------------------------------------------------
 
-interface HealthResult {
-  status: string;
-  database: string;
-  totalIds: number;
-  totalPages: number;
-  totalEntities: number;
-  totalFacts: number;
-  nextId: number;
-  uptime: number;
-}
-
 export async function stats(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
 
-  const healthResult = await apiRequest<HealthResult>('GET', '/health');
+  const healthResult = await getHealth();
   if (!healthResult.ok) return serverUnavailableError(log, healthResult);
 
   if (options.json || options.ci) {

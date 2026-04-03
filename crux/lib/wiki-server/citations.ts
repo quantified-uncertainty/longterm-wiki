@@ -192,8 +192,13 @@ export async function getCitationSourceTypeStats(): Promise<ApiResult<CitationSo
   return apiRequest<CitationSourceTypeStatsResult>('GET', '/api/citations/source-type-stats');
 }
 
-export async function getCitationBrokenQuotes(): Promise<ApiResult<CitationBrokenQuotesResult>> {
-  return apiRequest<CitationBrokenQuotesResult>('GET', '/api/citations/broken');
+export async function getCitationBrokenQuotes(
+  options?: { limit?: number },
+): Promise<ApiResult<CitationBrokenQuotesResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  const qs = params.toString();
+  return apiRequest<CitationBrokenQuotesResult>('GET', `/api/citations/broken${qs ? `?${qs}` : ''}`);
 }
 
 export async function getQuotesByPage(pageId: string, limit = 100): Promise<ApiResult<QuotesByPageResult>> {
