@@ -115,7 +115,7 @@ export async function fetchWaybackCommand(
 
       // Step 2: Fetch content from Wayback
       const result = await fetchWaybackContent(snapshot.url, snapshot.timestamp);
-      if (!result || result.content.length < 100) {
+      if (!result) {
         fetchFailed++;
         if (verbose) console.log(`  ✗ Fetch failed: ${r.title || r.url}`);
         await sleep(500);

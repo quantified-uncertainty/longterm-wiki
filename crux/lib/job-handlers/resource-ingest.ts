@@ -216,10 +216,7 @@ export async function handleResourceIngest(
     console.log(`[resource-ingest] Ingesting ${url} (resource=${resourceId})`);
   }
 
-  // Initialize resource cache from PG before fetchSource() tries to look up
-  // resources. Without this, the synchronous fallback in resource-lookup.ts
-  // throws "Resources snapshot not found" in environments without a local
-  // snapshot file (e.g., GitHub Actions job workers).
+  // Initialize resource cache from PG for environments without snapshot files.
   await initFromPG().catch((e: unknown) => {
     console.warn(
       `[resource-ingest] initFromPG failed: ${e instanceof Error ? e.message : String(e)}`,

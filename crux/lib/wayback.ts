@@ -1,12 +1,10 @@
 /**
  * Wayback Machine Utilities — shared lookup and content fetching.
- *
- * This is the single canonical module for all Wayback Machine interactions.
- * All callers (source-check, fetch-strategies, fetch-wayback, link-checker)
- * should import from here instead of reimplementing the Wayback API.
  */
 
 const USER_AGENT = 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)';
+/** Pages shorter than this are likely error pages or empty shells. */
+const MIN_CONTENT_LENGTH = 100;
 
 export interface WaybackSnapshot {
   url: string;
@@ -116,7 +114,7 @@ export async function fetchWaybackContent(
     const html = await response.text();
     const title = extractTitleFromHtml(html);
     const content = htmlToPlainText(html);
-    if (content.length < 100) return null;
+    if (content.length < MIN_CONTENT_LENGTH) return null;
     return { title, content, contentType: 'text/html', archiveUrl, archiveTimestamp };
   } catch (e) {
     console.warn(`[wayback] Content fetch failed for ${archiveUrl}: ${e instanceof Error ? e.message : String(e)}`);

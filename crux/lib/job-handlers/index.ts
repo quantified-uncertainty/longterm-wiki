@@ -98,8 +98,7 @@ const handlers: Record<string, JobHandler> = {
   'resource-enrich': lazyHandler(async () =>
     (await import('./resource-enrich.ts')).handleResourceEnrich),
 
-  // Legacy alias: resource-verify was renamed to resource-ingest.
-  // Some jobs may still be enqueued with the old name.
+  // Legacy alias: resource-verify → resource-ingest
   'resource-verify': lazyHandler(async () =>
     (await import('./resource-ingest.ts')).handleResourceIngest),
 };
