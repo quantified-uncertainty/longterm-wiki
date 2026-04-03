@@ -240,9 +240,9 @@ export function InteractiveGrantsTable({
   const transform = useMemo(() => makeTransform(orgSlug), [orgSlug]);
 
   // ── Server-side state (hook always called for consistent hook order) ──
-  const roleParam = mode === "received" ? "&role=grantee" : "";
   const server = useServerTable<GrantRow>({
-    endpoint: `/api/grants/by-entity/${entityId ?? ""}${roleParam}`,
+    endpoint: `/api/grants/by-entity/${entityId ?? ""}`,
+    extraParams: mode === "received" ? { role: "grantee" } : undefined,
     defaultPageSize: PAGE_SIZE,
     defaultSort: { field: "date", dir: "desc" },
     transform,

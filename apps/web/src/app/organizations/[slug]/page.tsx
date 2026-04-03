@@ -173,11 +173,15 @@ export default async function OrgProfilePage({
 
   // ── Fetch PG data (personnel + market data + grants) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
       `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?limit=200&offset=0`,
+      { revalidate: 3600, timeoutMs: 10_000 },
+    ),
+    fetchFromWikiServer<RpcGrantsByEntityResult>(
+      `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?role=grantee&limit=1&offset=0`,
       { revalidate: 3600, timeoutMs: 10_000 },
     ),
   ]);
@@ -187,12 +191,6 @@ export default async function OrgProfilePage({
     console.warn(`[org-profile] Failed to fetch PG grants for ${entityStableId} — wiki-server may be unavailable`);
   }
   const pgGrantCount = pgGrantsData?.total ?? 0;
-
-  // PG grants received: check how many grants this org received (as grantee)
-  const pgReceivedData = await fetchFromWikiServer<RpcGrantsByEntityResult>(
-    `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?role=grantee&limit=1&offset=0`,
-    { revalidate: 3600, timeoutMs: 10_000 },
-  );
   const pgReceivedCount = pgReceivedData?.total ?? 0;
 
   // ── Build tabs from available data ──────────────────────────────────
