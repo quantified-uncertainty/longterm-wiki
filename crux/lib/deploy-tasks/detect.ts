@@ -669,6 +669,47 @@ export function formatDeployTasksSection(
   return lines.join("\n");
 }
 
+/**
+ * Preserve checked state from an old PR body when generating a new one.
+ *
+ * When `crux gh release create` updates an existing release PR, it regenerates
+ * the body from scratch — wiping any deploy tasks that a human manually checked.
+ * This function merges the checked state from the old body into the new body by
+ * matching task text (ignoring the checkbox prefix).
+ */
+export function preserveCheckedState(newBody: string, oldBody: string): string {
+  const oldParsed = parseDeployTasksFromBody(oldBody);
+  if (!oldParsed || oldParsed.checked === 0) {
+    // Nothing was checked in the old body — no merging needed
+    return newBody;
+  }
+
+  const newParsed = parseDeployTasksFromBody(newBody);
+  if (!newParsed || newParsed.total === 0) {
+    // No deploy tasks in the new body — nothing to merge into
+    return newBody;
+  }
+
+  // Build a set of checked task texts from the old body
+  const checkedTexts = new Set<string>();
+  for (const item of oldParsed.items) {
+    if (item.checked) {
+      checkedTexts.add(item.text);
+    }
+  }
+
+  // Replace unchecked items in the new body whose text matches a checked old item
+  let result = newBody;
+  for (const item of newParsed.items) {
+    if (!item.checked && checkedTexts.has(item.text)) {
+      // Replace the first occurrence of this specific unchecked line with a checked one
+      result = result.replace(`- [ ] ${item.text}`, `- [x] ${item.text}`);
+    }
+  }
+
+  return result;
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // Main Detection Function
 // ────────────────────────────────────────────────────────────────────────────
