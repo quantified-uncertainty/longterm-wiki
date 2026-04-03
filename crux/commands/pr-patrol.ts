@@ -223,7 +223,7 @@ async function mergeStatus(
   return { output: lines.join('\n') + '\n', exitCode: 0 };
 }
 
-async function stop(_args: string[], options: CommandOptions): Promise<CommandResult> {
+async function stop(_args: string[], _options: CommandOptions): Promise<CommandResult> {
   const c = getColors();
   const pid = getDaemonPid();
   if (!pid) {

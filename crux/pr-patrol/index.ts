@@ -18,7 +18,7 @@
  *   comments.ts  — structured PR status comments
  */
 
-import { existsSync, readFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
 import { githubApi, REPO } from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
@@ -118,20 +118,19 @@ const cl = getColors();
 
 // ── PID file management ─────────────────────────────────────────────────────
 
-import { writeFileSync as writePidFileSync, unlinkSync as unlinkPidFile } from 'fs';
-import { join as joinPid } from 'path';
+import { join as joinPath } from 'path';
 
-const PID_FILE = joinPid(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
+const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
 
 function writePidFile(): void {
   try {
-    writePidFileSync(PID_FILE, String(process.pid));
+    writeFileSync(PID_FILE, String(process.pid));
   } catch { /* best-effort */ }
 }
 
 function removePidFile(): void {
   try {
-    unlinkPidFile(PID_FILE);
+    unlinkSync(PID_FILE);
   } catch { /* best-effort */ }
 }
 
