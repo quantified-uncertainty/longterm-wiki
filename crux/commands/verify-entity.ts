@@ -24,6 +24,7 @@ import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getVerificationStats } from '../lib/wiki-server/verifications.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
 import type { VerificationVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
