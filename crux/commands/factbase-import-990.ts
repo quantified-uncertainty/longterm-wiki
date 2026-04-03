@@ -24,7 +24,7 @@ import {
   findEntityFilePath,
 } from '../lib/factbase-writer.ts';
 import type { RawFactInput } from '../lib/factbase-writer.ts';
-import { generateContentFactId } from '../../packages/factbase/src/ids.ts';
+import { generateFactId } from '../../packages/factbase/src/ids.ts';
 import type { Entity, Fact } from '../../packages/factbase/src/types.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 
@@ -130,8 +130,11 @@ async function searchProPublica(query: string): Promise<ProPublicaSearchResult[]
 }
 
 async function fetchOrganization(ein: string): Promise<ProPublicaOrg> {
-  // Strip hyphens from EIN
+  // Validate and strip hyphens from EIN
   const cleanEin = ein.replace(/-/g, '');
+  if (!/^\d{9}$/.test(cleanEin)) {
+    throw new Error(`Invalid EIN "${ein}" — must be 9 digits (with or without hyphen, e.g. 58-2565917)`);
+  }
   const url = `${PROPUBLICA_API_BASE}/organizations/${cleanEin}.json`;
   const resp = await rateLimitedFetch(url);
   if (!resp.ok) {
@@ -162,7 +165,7 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for tax year ${year}.`,
-        contentId: generateContentFactId(entityId, 'revenue', filing.totrevenue, year),
+        contentId: generateFactId(entityId, 'revenue', filing.totrevenue, year),
       });
     }
 
@@ -174,7 +177,7 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for tax year ${year}.`,
-        contentId: generateContentFactId(entityId, 'annual-expenses', filing.totfuncexpns, year),
+        contentId: generateFactId(entityId, 'annual-expenses', filing.totfuncexpns, year),
       });
     }
 
@@ -186,7 +189,7 @@ function extractFinancialFacts(
         asOf: year,
         source: sourceUrl,
         notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for tax year ${year}.`,
-        contentId: generateContentFactId(entityId, 'net-assets', filing.totnetassetend, year),
+        contentId: generateFactId(entityId, 'net-assets', filing.totnetassetend, year),
       });
     }
   }
@@ -407,10 +410,12 @@ Examples:
     };
   }
 
-  // 5. Detect duplicates
+  // 5. Detect duplicates (--force updates existing facts in-place rather than appending)
   const existingFacts = graph.getFacts(entity.id);
-  const duplicateIds = options.force ? new Set<string>() : findDuplicates(proposedFacts, existingFacts);
-  const newFacts = proposedFacts.filter((f) => !duplicateIds.has(f.contentId));
+  const duplicateIds = findDuplicates(proposedFacts, existingFacts);
+  const newFacts = options.force
+    ? proposedFacts  // --force: write all facts (appendFact handles update-in-place)
+    : proposedFacts.filter((f) => !duplicateIds.has(f.contentId));
 
   // 6. Output
   const lines: string[] = [];
