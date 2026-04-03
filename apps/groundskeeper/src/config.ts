@@ -38,6 +38,7 @@ export interface Config {
     dataQualitySnapshot: TaskConfig;
     jobWorkerHealth: TaskConfig;
     autoUpdateEnqueue: AutoUpdateEnqueueConfig;
+    jobFailureTriage: TaskConfig;
   };
 }
 
@@ -128,6 +129,11 @@ export function loadConfig(): Config {
           process.env["TASK_AUTO_UPDATE_ENQUEUE_SCHEDULE"] ?? "0 6 * * *", // daily at 6am UTC
         budget: envInt("TASK_AUTO_UPDATE_ENQUEUE_BUDGET", 30),
         maxPages: envInt("TASK_AUTO_UPDATE_ENQUEUE_MAX_PAGES", 5),
+      },
+      jobFailureTriage: {
+        enabled: envBool("TASK_JOB_FAILURE_TRIAGE_ENABLED", true),
+        schedule:
+          process.env["TASK_JOB_FAILURE_TRIAGE_SCHEDULE"] ?? "0 */6 * * *", // every 6 hours
       },
     },
   };

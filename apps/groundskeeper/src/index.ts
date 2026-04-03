@@ -11,6 +11,7 @@ import { sessionSweep } from "./tasks/session-sweep.js";
 import { dataQualitySnapshot } from "./tasks/data-quality-snapshot.js";
 import { jobWorkerHealth } from "./tasks/job-worker-health.js";
 import { autoUpdateEnqueue } from "./tasks/auto-update-enqueue.js";
+import { jobFailureTriage } from "./tasks/job-failure-triage.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -54,6 +55,10 @@ logger.info({
       schedule: config.tasks.autoUpdateEnqueue.schedule,
       budget: config.tasks.autoUpdateEnqueue.budget,
       maxPages: config.tasks.autoUpdateEnqueue.maxPages,
+    },
+    jobFailureTriage: {
+      enabled: config.tasks.jobFailureTriage.enabled,
+      schedule: config.tasks.jobFailureTriage.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -124,6 +129,14 @@ registerTask(
   config.tasks.autoUpdateEnqueue.schedule,
   config.tasks.autoUpdateEnqueue.enabled,
   () => autoUpdateEnqueue(config)
+);
+
+registerTask(
+  config,
+  "job-failure-triage",
+  config.tasks.jobFailureTriage.schedule,
+  config.tasks.jobFailureTriage.enabled,
+  () => jobFailureTriage(config)
 );
 
 // Register as an active agent (best-effort)

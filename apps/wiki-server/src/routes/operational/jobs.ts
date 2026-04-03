@@ -708,6 +708,61 @@ const jobsApp = new Hono()
     });
   })
 
+  // ---- GET /failure-patterns (recurring failure detection) ----
+  // Groups recent failed jobs by type + truncated error message to surface
+  // patterns that may need a GitHub issue filed. Used by the groundskeeper
+  // job-failure-triage task.
+  //
+  // Query params:
+  //   ?hours=N       Time window (default 24, max 168)
+  //   ?minCount=N    Minimum failures to include (default 3)
+
+  .get("/failure-patterns", async (c) => {
+    const hours = Math.min(168, Math.max(1, Number(c.req.query("hours")) || 24));
+    const minCount = Math.max(1, Number(c.req.query("minCount")) || 3);
+
+    const pgClient = getDb();
+
+    interface FailurePatternRow {
+      type: string;
+      error_pattern: string;
+      count: number;
+      first_seen: string;
+      last_seen: string;
+      sample_ids: number[];
+    }
+
+    const rows = (await pgClient.unsafe(
+      `SELECT
+         type,
+         SUBSTRING(error FROM 1 FOR 100) AS error_pattern,
+         COUNT(*)::int AS count,
+         MIN(created_at) AS first_seen,
+         MAX(created_at) AS last_seen,
+         (ARRAY_AGG(id ORDER BY created_at DESC))[1:5] AS sample_ids
+       FROM jobs
+       WHERE status = 'failed'
+         AND created_at > NOW() - make_interval(hours => $1)
+       GROUP BY type, SUBSTRING(error FROM 1 FOR 100)
+       HAVING COUNT(*) >= $2
+       ORDER BY count DESC`,
+      [hours, minCount]
+    )) as FailurePatternRow[];
+
+    return c.json({
+      patterns: rows.map((r) => ({
+        type: r.type,
+        errorPattern: r.error_pattern,
+        count: r.count,
+        firstSeen: r.first_seen,
+        lastSeen: r.last_seen,
+        sampleJobIds: r.sample_ids,
+      })),
+      hours,
+      minCount,
+    });
+  })
+
   // ---- GET /:id (single job details) ----
 
   .get("/:id", async (c) => {
