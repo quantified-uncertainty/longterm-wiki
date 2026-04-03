@@ -4,16 +4,6 @@
 
 import safetyApproachesData from "./safety-approaches.json";
 
-export type RatingLevel =
-  | 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'NEGLIGIBLE'  // For safety uplift
-  | 'DOMINANT' | 'SIGNIFICANT' | 'SOME' | 'NEUTRAL' | 'TAX'  // For capability uplift
-  | 'HARMFUL' | 'UNCLEAR' | 'HELPFUL'  // For net effect
-  | 'NONE' | 'WEAK' | 'PARTIAL' | 'STRONG'  // For robustness
-  | 'NO' | 'UNLIKELY' | 'UNKNOWN' | 'MAYBE' | 'YES'  // For scalability
-  | 'NEGATIVE' | 'MODERATE' | 'CORE'  // For incentives
-  | 'EXPERIMENTAL' | 'WIDESPREAD' | 'UNIVERSAL'  // For adoption
-  | 'N/A' | '???';
-
 export interface RatedProperty {
   level: string;
   note: string;
@@ -118,7 +108,3 @@ export const CATEGORIES = [
   { id: 'theoretical', label: 'Theoretical & Research', color: '#6366f1' },
 ] as const;
 
-// Helper to get approaches by category
-export function getApproachesByCategory(category: string): SafetyApproach[] {
-  return SAFETY_APPROACHES.filter(a => a.category === category);
-}
