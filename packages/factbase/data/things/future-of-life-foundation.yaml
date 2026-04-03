@@ -42,10 +42,10 @@ facts:
     notes: Additional FLI grant in 2024
 
   - id: f70xd6480Q
-    property: parent-org
+    property: affiliated-org
     value: !ref sid_d9sWZtyVwg
     source: https://www.flf.org
-    notes: FLF is a sister organization to FLI, sharing board members (FLI stableId)
+    notes: "FLF is a sister organization to FLI with separate leadership, not a subsidiary. They share some board members but are distinct legal entities."
 
   - id: mVvmM5aSOA
     property: description
