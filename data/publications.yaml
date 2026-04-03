@@ -959,7 +959,7 @@
 - id: youtube
   domains: [youtube.com]
   name: YouTube
-  type: platform
+  type: blog_platform
   credibility: 2
   peer_reviewed: false
   description: Video hosting platform
