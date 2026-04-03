@@ -9506,3 +9506,281 @@
     R&D funding. Coordinates with BIS on export control compliance.
   tags: [semiconductors, government, policy]
   lastUpdated: 2026-03
+
+- id: amazon
+  stableId: sid_JGiOzSoZPc
+  type: organization
+  orgType: generic
+  title: Amazon
+  website: https://www.amazon.com
+  description: >-
+    Major technology company and cloud computing provider (AWS). Participant in AI governance
+    discussions and signatory to the White House voluntary AI commitments.
+  tags: [big-tech, ai-governance, cloud-computing]
+  lastUpdated: 2026-04
+
+- id: ibm
+  stableId: sid_9N0hqjccSg
+  type: organization
+  orgType: generic
+  title: IBM
+  website: https://www.ibm.com
+  description: >-
+    Global technology and consulting company. Active participant in AI policy discussions,
+    co-founder of the AI Alliance, and supporter of responsible AI governance frameworks.
+  tags: [big-tech, ai-governance, ai-ethics]
+  lastUpdated: 2026-04
+
+- id: european-parliament
+  stableId: sid_jWgzHpf77P
+  type: organization
+  orgType: government
+  title: European Parliament
+  website: https://www.europarl.europa.eu
+  description: >-
+    Legislative body of the European Union. Led the passage of the EU AI Act, the first
+    comprehensive AI regulation in a major jurisdiction.
+  tags: [government, eu, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: rainn
+  stableId: sid_g5EKAHeU8m
+  type: organization
+  orgType: other
+  title: RAINN
+  alternateNames:
+    - Rape, Abuse & Incest National Network
+  website: https://www.rainn.org
+  description: >-
+    Largest anti-sexual violence organization in the United States. Supporter of legislation
+    targeting AI-generated non-consensual intimate imagery, including the Take It Down Act.
+  tags: [advocacy, child-safety, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: common-sense-media
+  stableId: sid_WchSgl5dux
+  type: organization
+  orgType: other
+  title: Common Sense Media
+  website: https://www.commonsensemedia.org
+  description: >-
+    Nonprofit advocacy organization focused on children and technology safety. Supports AI
+    legislation targeting child protection and responsible technology use.
+  tags: [advocacy, child-safety, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: netchoice
+  stableId: sid_dGOSxJk8o6
+  type: organization
+  orgType: generic
+  title: NetChoice
+  website: https://netchoice.org
+  description: >-
+    Trade association representing technology companies including Google, Amazon, and Meta.
+    Often opposes state-level AI regulations, citing concerns about compliance burden and
+    innovation impact.
+  tags: [industry-group, ai-regulation, lobbying]
+  lastUpdated: 2026-04
+
+- id: digitaleurope
+  stableId: sid_Qo6YeaRskH
+  type: organization
+  orgType: generic
+  title: DigitalEurope
+  website: https://www.digitaleurope.org
+  description: >-
+    European trade association representing technology companies. Active in EU AI Act
+    discussions, advocating for industry-friendly provisions and practical implementation.
+  tags: [industry-group, eu, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: ccia-europe
+  stableId: sid_UEYMSjORoB
+  type: organization
+  orgType: generic
+  title: CCIA Europe
+  alternateNames:
+    - Computer & Communications Industry Association Europe
+  website: https://ccianet.org/europe
+  description: >-
+    European office of the Computer & Communications Industry Association. Represents
+    technology companies in EU policy discussions including the AI Act.
+  tags: [industry-group, eu, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: us-chamber-of-commerce
+  stableId: sid_cQQdrABVv0
+  type: organization
+  orgType: generic
+  title: US Chamber of Commerce
+  website: https://www.uschamber.com
+  description: >-
+    Largest business lobbying organization in the United States. Generally advocates for
+    lighter-touch AI regulation and has opposed proposals seen as overly burdensome.
+  tags: [industry-group, lobbying, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: california-chamber-of-commerce
+  stableId: sid_dfTNfp0gNE
+  type: organization
+  orgType: generic
+  title: California Chamber of Commerce
+  website: https://www.calchamber.com
+  description: >-
+    State business advocacy organization. Has opposed state-level AI regulation proposals
+    in California, including SB 1047.
+  tags: [industry-group, ai-regulation, california]
+  lastUpdated: 2026-04
+
+- id: techequity-action
+  stableId: sid_UvwjWas2wl
+  type: organization
+  orgType: other
+  title: TechEquity Action
+  website: https://techequitycollaborative.org
+  description: >-
+    Bay Area nonprofit focused on ensuring technology serves all communities. Supports
+    equitable AI governance policies including California AI legislation.
+  tags: [advocacy, ai-regulation, equity]
+  lastUpdated: 2026-04
+
+- id: texas-public-policy-foundation
+  stableId: sid_WHAEpX4KJm
+  type: organization
+  orgType: other
+  title: Texas Public Policy Foundation
+  website: https://www.texaspolicy.com
+  description: >-
+    Conservative think tank based in Austin, Texas. Supported the Texas Responsible AI
+    Governance Act (TRAIGA) and promotes market-oriented technology policy.
+  tags: [think-tank, ai-regulation, policy]
+  lastUpdated: 2026-04
+
+- id: government-accountability-project
+  stableId: sid_iqjACwHMCW
+  type: organization
+  orgType: other
+  title: Government Accountability Project
+  website: https://www.whistleblower.org
+  description: >-
+    Nonprofit organization supporting whistleblower protections. Advocates for AI industry
+    whistleblower rights and transparency in frontier AI development.
+  tags: [advocacy, whistleblower, transparency]
+  lastUpdated: 2026-04
+
+- id: council-of-europe
+  stableId: sid_18BRxYIVxX
+  type: organization
+  orgType: government
+  title: Council of Europe
+  website: https://www.coe.int
+  description: >-
+    International organization with 46 member states focused on human rights, democracy,
+    and rule of law. Developed the Framework Convention on Artificial Intelligence, Human
+    Rights, Democracy and the Rule of Law.
+  tags: [international, human-rights, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: alliance-for-secure-ai
+  stableId: sid_ewHH8hqYZD
+  type: organization
+  orgType: other
+  title: Alliance for Secure AI
+  description: >-
+    Coalition advocating for AI safety standards and regulation. Opposes frameworks seen
+    as insufficient for addressing frontier AI risks.
+  tags: [advocacy, ai-safety, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: ai-alliance
+  stableId: sid_aF9wqaoCNa
+  type: organization
+  orgType: generic
+  title: AI Alliance
+  website: https://thealliance.ai
+  description: >-
+    Industry coalition co-founded by IBM and Meta to promote open-source and collaborative
+    AI development. Has opposed some AI regulation proposals seen as restrictive to open models.
+  tags: [industry-group, open-source, ai-governance]
+  lastUpdated: 2026-04
+
+- id: edri
+  stableId: sid_7h0u4ulMdb
+  type: organization
+  orgType: other
+  title: European Digital Rights (EDRi)
+  alternateNames:
+    - EDRi
+  website: https://edri.org
+  description: >-
+    Network of European civil liberties organizations promoting digital rights and freedoms.
+    Active in EU AI Act discussions, advocating for fundamental rights protections in AI regulation.
+  tags: [advocacy, digital-rights, eu, ai-regulation]
+  lastUpdated: 2026-04
+
+- id: cigi
+  stableId: sid_CyKa5eLcCl
+  type: organization
+  orgType: other
+  title: Centre for International Governance Innovation (CIGI)
+  alternateNames:
+    - CIGI
+  website: https://www.cigionline.org
+  description: >-
+    Canadian think tank focused on international governance, including digital governance
+    and AI policy. Has published critical analysis of Canada's AIDA legislation.
+  tags: [think-tank, canada, ai-governance]
+  lastUpdated: 2026-04
+
+- id: tech-nyc
+  stableId: sid_CIiQ2Cjm4E
+  type: organization
+  orgType: generic
+  title: Tech:NYC
+  website: https://www.technyc.org
+  description: >-
+    New York City technology industry advocacy organization. Has engaged in state AI policy
+    discussions, sometimes opposing regulation seen as burdensome to the tech sector.
+  tags: [industry-group, ai-regulation, new-york]
+  lastUpdated: 2026-04
+
+- id: common-sense-institute
+  stableId: sid_cXahhtwW2D
+  type: organization
+  orgType: other
+  title: Common Sense Institute
+  website: https://commonsenseinstituteco.org
+  description: >-
+    Colorado-based nonpartisan research organization focused on economic policy analysis.
+    Engaged in Colorado AI Act discussions regarding impacts on state businesses.
+  tags: [think-tank, colorado, policy]
+  lastUpdated: 2026-04
+
+- id: us-department-of-energy
+  stableId: sid_IZ04n3ZvIZ
+  type: organization
+  orgType: government
+  title: US Department of Energy
+  alternateNames:
+    - DOE
+  website: https://www.energy.gov
+  description: >-
+    US federal department responsible for energy policy and nuclear safety. Plays a role
+    in AI safety evaluations through its national laboratories (Sandia, LLNL, Oak Ridge)
+    and computing infrastructure.
+  tags: [government, ai-safety, national-security]
+  lastUpdated: 2026-04
+
+- id: cyberspace-admin-china
+  stableId: sid_H1Ysc4diAp
+  type: organization
+  orgType: government
+  title: Cyberspace Administration of China (CAC)
+  alternateNames:
+    - CAC
+  website: http://www.cac.gov.cn
+  description: >-
+    China's primary internet and AI regulator. Responsible for implementing China's
+    generative AI regulations, algorithm registration requirements, and deepfake rules.
+  tags: [government, china, ai-regulation]
+  lastUpdated: 2026-04
