@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 import { Hono } from "hono";
 import {
   RateLimiter,
@@ -514,6 +514,121 @@ describe("rateLimitMiddleware", () => {
     // Request with a real IP should still succeed (different bucket)
     const res2 = await app.request("/api/pages", {
       headers: { "X-Forwarded-For": "1.2.3.4" },
+    });
+    expect(res2.status).toBe(200);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Authenticated requests skip rate limiting
+// ---------------------------------------------------------------------------
+
+describe("authenticated requests bypass rate limiting", () => {
+  const API_KEY = "test-secret-key";
+
+  function buildAuthApp(readConfig: RateLimitConfig) {
+    const readLimiter = new RateLimiter(readConfig);
+    const writeLimiter = new RateLimiter({ maxRequests: 10, windowMs: 60_000 });
+
+    const app = new Hono();
+
+    // Set the env var so the middleware recognizes the token
+    process.env.LONGTERMWIKI_SERVER_API_KEY = API_KEY;
+
+    app.use(
+      "*",
+      rateLimitMiddleware({
+        readLimiter,
+        writeLimiter,
+        skipPaths: ["/health"],
+      })
+    );
+
+    app.get("/api/jobs/stats", (c) => c.json({ ok: true }));
+    app.get("/api/pages", (c) => c.json({ ok: true }));
+
+    return { app, readLimiter };
+  }
+
+  afterEach(() => {
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+  });
+
+  it("skips rate limiting for requests with valid Bearer token", async () => {
+    // Set read limit to 1 — unauthenticated traffic would be blocked after 1 request
+    const { app } = buildAuthApp({ maxRequests: 1, windowMs: 60_000 });
+
+    // Authenticated requests should never be rate limited
+    for (let i = 0; i < 10; i++) {
+      const res = await app.request("/api/jobs/stats", {
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          "X-Forwarded-For": "1.2.3.4",
+        },
+      });
+      expect(res.status).toBe(200);
+    }
+  });
+
+  it("still rate limits unauthenticated requests", async () => {
+    const { app } = buildAuthApp({ maxRequests: 1, windowMs: 60_000 });
+
+    // First unauthenticated request succeeds
+    const res1 = await app.request("/api/pages", {
+      headers: { "X-Forwarded-For": "5.6.7.8" },
+    });
+    expect(res1.status).toBe(200);
+
+    // Second unauthenticated request is rate limited
+    const res2 = await app.request("/api/pages", {
+      headers: { "X-Forwarded-For": "5.6.7.8" },
+    });
+    expect(res2.status).toBe(429);
+  });
+
+  it("rate limits requests with invalid Bearer token", async () => {
+    const { app } = buildAuthApp({ maxRequests: 1, windowMs: 60_000 });
+
+    // First request with bad token succeeds (within limit)
+    const res1 = await app.request("/api/pages", {
+      headers: {
+        Authorization: "Bearer wrong-key",
+        "X-Forwarded-For": "9.0.0.1",
+      },
+    });
+    expect(res1.status).toBe(200);
+
+    // Second request with bad token is rate limited
+    const res2 = await app.request("/api/pages", {
+      headers: {
+        Authorization: "Bearer wrong-key",
+        "X-Forwarded-For": "9.0.0.1",
+      },
+    });
+    expect(res2.status).toBe(429);
+  });
+
+  it("does not consume unauthenticated rate limit bucket for authenticated requests", async () => {
+    const { app } = buildAuthApp({ maxRequests: 2, windowMs: 60_000 });
+
+    // Make several authenticated requests (should not count against the IP bucket)
+    for (let i = 0; i < 5; i++) {
+      await app.request("/api/pages", {
+        headers: {
+          Authorization: `Bearer ${API_KEY}`,
+          "X-Forwarded-For": "10.0.0.1",
+        },
+      });
+    }
+
+    // Unauthenticated requests from the same IP should still have their full budget
+    const res1 = await app.request("/api/pages", {
+      headers: { "X-Forwarded-For": "10.0.0.1" },
+    });
+    expect(res1.status).toBe(200);
+
+    const res2 = await app.request("/api/pages", {
+      headers: { "X-Forwarded-For": "10.0.0.1" },
     });
     expect(res2.status).toBe(200);
   });

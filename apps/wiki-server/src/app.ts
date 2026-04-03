@@ -112,25 +112,23 @@ export function createApp() {
 
   // Rate limiting middleware — applied before auth so that abusive traffic
   // is rejected early without touching the database or auth layer.
-  // Health endpoint is exempt so monitoring probes are never throttled.
-  // Authenticated traffic gets higher limits (1000 read/200 write per min)
-  // vs unauthenticated (100 read/20 write) to avoid blocking internal
-  // infrastructure (CI sync, Next.js ISR, crux CLI) while still providing
-  // a circuit breaker against runaway scripts.
-  const { readLimiter, writeLimiter, authReadLimiter, authWriteLimiter } =
-    createDefaultRateLimiters();
+  // Health and healthz endpoints are exempt so monitoring probes are never throttled.
+  //
+  // Authenticated requests (valid Bearer token) skip rate limiting entirely —
+  // the auth middleware already prevents abuse, and rate limiting internal
+  // traffic (Vercel ISR, CI sync, crux CLI) caused self-inflicted 429s during
+  // builds when 50+ pages revalidated concurrently from the same IP (#3720).
+  //
+  // Unauthenticated traffic gets stricter limits (100 read / 20 write per min).
+  const { readLimiter, writeLimiter } = createDefaultRateLimiters();
   readLimiter.startCleanup();
   writeLimiter.startCleanup();
-  authReadLimiter.startCleanup();
-  authWriteLimiter.startCleanup();
 
   app.use(
     "*",
     rateLimitMiddleware({
       readLimiter,
       writeLimiter,
-      authReadLimiter,
-      authWriteLimiter,
       skipPaths: ["/health", "/healthz"],
     })
   );
