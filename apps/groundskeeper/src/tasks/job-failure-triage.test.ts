@@ -314,6 +314,80 @@ describe("jobFailureTriage", () => {
     );
   });
 
+
+  it("logs warning and continues when GitHub issue creation fails", async () => {
+    mockApiRequest.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        patterns: [SAMPLE_PATTERN, SAMPLE_PATTERN_2],
+        hours: 24,
+        minCount: 3,
+      },
+    });
+
+    // First pattern: no existing issue → creation will fail
+    mockOctokit.rest.search.issuesAndPullRequests.mockResolvedValueOnce({
+      data: { items: [] },
+    });
+    mockOctokit.rest.issues.getLabel.mockResolvedValueOnce({});
+    mockOctokit.rest.issues.create.mockRejectedValueOnce(
+      new Error("GitHub API rate limit exceeded")
+    );
+
+    // Second pattern: no existing issue → creation succeeds
+    mockOctokit.rest.search.issuesAndPullRequests.mockResolvedValueOnce({
+      data: { items: [] },
+    });
+    mockOctokit.rest.issues.getLabel.mockResolvedValueOnce({});
+    mockOctokit.rest.issues.create.mockResolvedValueOnce({
+      data: { number: 500 },
+    });
+
+    const result = await jobFailureTriage(makeConfig());
+
+    // First pattern failed, second succeeded — overall has errors
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain("1 issue(s) created");
+    expect(result.summary).toContain("1 error(s)");
+
+    // Issue creation was attempted for both patterns
+    expect(mockOctokit.rest.issues.create).toHaveBeenCalledTimes(2);
+  });
+
+  it("logs error and continues when GitHub search fails", async () => {
+    mockApiRequest.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        patterns: [SAMPLE_PATTERN, SAMPLE_PATTERN_2],
+        hours: 24,
+        minCount: 3,
+      },
+    });
+
+    // First pattern: search throws → caught by outer try/catch, pattern skipped
+    mockOctokit.rest.search.issuesAndPullRequests.mockRejectedValueOnce(
+      new Error("GitHub search API unavailable")
+    );
+
+    // Second pattern: search succeeds, no existing issue, creation succeeds
+    mockOctokit.rest.search.issuesAndPullRequests.mockResolvedValueOnce({
+      data: { items: [] },
+    });
+    mockOctokit.rest.issues.getLabel.mockResolvedValueOnce({});
+    mockOctokit.rest.issues.create.mockResolvedValueOnce({
+      data: { number: 501 },
+    });
+
+    const result = await jobFailureTriage(makeConfig());
+
+    // First pattern errored, second succeeded
+    expect(result.success).toBe(false);
+    expect(result.summary).toContain("1 issue(s) created");
+    expect(result.summary).toContain("1 error(s)");
+
+    // Issue was only created for the second pattern (search failure skips the first)
+    expect(mockOctokit.rest.issues.create).toHaveBeenCalledTimes(1);
+  });
   it("handles multiple patterns — mix of new and existing issues", async () => {
     mockApiRequest.mockResolvedValueOnce({
       ok: true,
