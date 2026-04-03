@@ -212,11 +212,15 @@ export async function buildCitationQuotesBundle() {
       offset += limit;
     }
 
-    // Group by pageId
+    // Group by page slug (the /quotes/all endpoint now includes pageSlug
+    // via a join with wiki_pages). Fall back to pageId for backward compat
+    // with older wiki-server versions that don't include pageSlug.
     const byPage = {};
     for (const q of allQuotes) {
-      if (!byPage[q.pageId]) byPage[q.pageId] = [];
-      byPage[q.pageId].push({
+      const key = q.pageSlug || q.pageId;
+      if (!key) continue;
+      if (!byPage[key]) byPage[key] = [];
+      byPage[key].push({
         footnote: q.footnote,
         url: q.url,
         resourceId: q.resourceId,

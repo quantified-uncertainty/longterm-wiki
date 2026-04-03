@@ -490,8 +490,36 @@ const citationsApp = new Hono()
     const db = getDrizzleDb();
 
     const rows = await db
-      .select()
+      .select({
+        id: citationQuotes.id,
+        pageId: citationQuotes.pageId,
+        pageSlug: wikiPages.slug,
+        footnote: citationQuotes.footnote,
+        url: citationQuotes.url,
+        resourceId: citationQuotes.resourceId,
+        claimText: citationQuotes.claimText,
+        claimContext: citationQuotes.claimContext,
+        sourceQuote: citationQuotes.sourceQuote,
+        sourceLocation: citationQuotes.sourceLocation,
+        quoteVerified: citationQuotes.quoteVerified,
+        verificationMethod: citationQuotes.verificationMethod,
+        verificationScore: citationQuotes.verificationScore,
+        verifiedAt: citationQuotes.verifiedAt,
+        sourceTitle: citationQuotes.sourceTitle,
+        sourceType: citationQuotes.sourceType,
+        extractionModel: citationQuotes.extractionModel,
+        claimId: citationQuotes.claimId,
+        accuracyVerdict: citationQuotes.accuracyVerdict,
+        accuracyIssues: citationQuotes.accuracyIssues,
+        accuracyScore: citationQuotes.accuracyScore,
+        accuracyCheckedAt: citationQuotes.accuracyCheckedAt,
+        accuracySupportingQuotes: citationQuotes.accuracySupportingQuotes,
+        verificationDifficulty: citationQuotes.verificationDifficulty,
+        createdAt: citationQuotes.createdAt,
+        updatedAt: citationQuotes.updatedAt,
+      })
       .from(citationQuotes)
+      .leftJoin(wikiPages, eq(wikiPages.id, citationQuotes.pageId))
       .orderBy(asc(citationQuotes.pageId), asc(citationQuotes.footnote))
       .limit(limit)
       .offset(offset);

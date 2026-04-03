@@ -305,7 +305,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return found ? [quoteToSqlRow(found)] : [];
   }
 
-  // --- citation_quotes: SELECT * ORDER BY ... LIMIT (paginated all) ---
+  // --- citation_quotes: SELECT ... LEFT JOIN wiki_pages ORDER BY ... LIMIT (paginated all with slug) ---
   if (q.includes("citation_quotes") && q.includes("order by") && q.includes("limit") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by")) {
     const limit = (params[0] as number) || 100;
     const offset = (params[1] as number) || 0;
@@ -313,7 +313,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const pc = (a.pageId as number) - (b.pageId as number);
       return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
     });
-    return all.slice(offset, offset + limit).map(quoteToSqlRow);
+    return all.slice(offset, offset + limit).map((r) => ({
+      ...quoteToSqlRow(r),
+      // Include slug from wiki_pages join (used by build-data bundling)
+      slug: slugFromIntId(r.pageId as number),
+    }));
   }
 
   // --- citation_quotes: Accuracy-dashboard summary (count + count(case when accuracy_verdict) without group by) ---
@@ -835,7 +839,7 @@ describe("Citation Server API", () => {
   // ---- Get All Quotes (paginated) ----
 
   describe("GET /api/citations/quotes/all", () => {
-    it("returns paginated quotes", async () => {
+    it("returns paginated quotes with pageSlug", async () => {
       for (let i = 1; i <= 5; i++) {
         await upsertQuote(app, "page-x", i);
       }
@@ -847,6 +851,8 @@ describe("Citation Server API", () => {
       expect(body.total).toBe(5);
       expect(body.limit).toBe(3);
       expect(body.offset).toBe(0);
+      // Each quote should include the page slug for build-time bundling
+      expect(body.quotes[0].pageSlug).toBe("page-x");
     });
   });
 
