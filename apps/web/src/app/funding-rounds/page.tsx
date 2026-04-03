@@ -70,7 +70,7 @@ export default function FundingRoundsPage() {
 
   const stats = [
     { label: "Funding Rounds", value: totalRounds.toLocaleString() },
-    { label: raisedLabel, value: formatCompactCurrency(totalRaised) },
+    { label: raisedLabel, value: rowsWithRaised.length > 0 ? formatCompactCurrency(totalRaised) : "\u2014" },
     { label: "Companies", value: String(uniqueCompanies) },
   ];
 

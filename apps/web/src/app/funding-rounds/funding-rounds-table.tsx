@@ -10,9 +10,16 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFundingRoundRows, type SortDir, type FundingRoundSortKey } from "./funding-rounds-sort";
 import { INSTRUMENT_COLORS } from "./funding-rounds-constants";
 
-/** Simple title case for instrument names (client-safe, no server imports). */
-function titleCase(s: string): string {
-  return s.replace(/(?:^|\s|-)\w/g, (m) => m.toUpperCase());
+const INSTRUMENT_LABELS: Record<string, string> = {
+  "convertible-note": "Convertible Note",
+  safe: "SAFE",
+  equity: "Equity",
+  debt: "Debt",
+  grant: "Grant",
+};
+
+function instrumentLabel(s: string): string {
+  return INSTRUMENT_LABELS[s] ?? s.replace(/(?:^|\s|-)\w/g, (m) => m.toUpperCase());
 }
 
 export interface FundingRoundRow {
@@ -156,7 +163,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                     : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
                 }`}
               >
-                {titleCase(inst)}
+                {instrumentLabel(inst)}
                 <span className="ml-1 text-[10px] opacity-60">
                   {instrumentCounts[inst] ?? 0}
                 </span>
@@ -247,7 +254,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                         "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
                       }`}
                     >
-                      {titleCase(row.instrument)}
+                      {instrumentLabel(row.instrument)}
                     </span>
                   ) : (
                     <span className="text-muted-foreground/40">{"\u2014"}</span>
