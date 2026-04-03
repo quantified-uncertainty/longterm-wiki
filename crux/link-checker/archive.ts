@@ -1,43 +1,22 @@
 /**
  * Archive.org lookup — find Wayback Machine snapshots for broken URLs.
  *
- * Queries the Wayback Machine availability API to find archived
- * versions of URLs that returned broken or error status.
+ * Uses the shared wayback module (crux/lib/wayback.ts) for API calls.
  */
 
 import { sleep } from '../resource-utils.ts';
+import { lookupWaybackSnapshot } from '../lib/wayback.ts';
 import type { CheckResult, ArchiveResult } from './types.ts';
 
 // ── Archive.org Lookup ───────────────────────────────────────────────────────
 
 /** Query Wayback Machine for an archived snapshot of a URL. */
 async function lookupArchive(url: string): Promise<ArchiveResult> {
-  try {
-    const apiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(url)}`;
-    const response = await fetch(apiUrl, {
-      headers: { 'User-Agent': 'LongtermWikiLinkChecker/1.0' },
-      signal: AbortSignal.timeout(10000),
-    });
-
-    if (!response.ok) {
-      return { url, archiveUrl: null };
-    }
-
-    const data = await response.json() as {
-      archived_snapshots?: {
-        closest?: { url: string; timestamp: string; available: boolean };
-      };
-    };
-
-    const snapshot = data?.archived_snapshots?.closest;
-    if (snapshot?.available && snapshot.url) {
-      return { url, archiveUrl: snapshot.url, timestamp: snapshot.timestamp };
-    }
-
-    return { url, archiveUrl: null };
-  } catch {
-    return { url, archiveUrl: null };
+  const snapshot = await lookupWaybackSnapshot(url);
+  if (snapshot) {
+    return { url, archiveUrl: snapshot.url, timestamp: snapshot.timestamp };
   }
+  return { url, archiveUrl: null };
 }
 
 /** Look up archive.org snapshots for broken URLs. */

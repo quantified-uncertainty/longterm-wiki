@@ -1,16 +1,13 @@
 /**
  * Wayback Machine Utilities — shared lookup and content fetching.
  *
- * Provides Wayback Machine snapshot lookup and content fetching for use by:
- * - source-check pipeline (dead link fallback)
- * - resource-enrichment/fetch-wayback (batch enrichment)
- * - link-checker/archive (broken link reporting)
- *
- * Rate limit: Wayback Machine has a soft limit of ~15 req/s.
- * Callers are responsible for rate-limiting between calls.
+ * This is the single canonical module for all Wayback Machine interactions.
+ * All callers (source-check, fetch-strategies, fetch-wayback, link-checker)
+ * should import from here instead of reimplementing the Wayback API.
  */
 
-// ── Types ──────────────────────────────────────────────────────────────────────
+const USER_AGENT = 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)';
+const BROWSER_USER_AGENT = 'Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)';
 
 export interface WaybackSnapshot {
   url: string;
@@ -25,22 +22,19 @@ export interface WaybackContent {
   archiveTimestamp: string;
 }
 
-// ── Snapshot lookup ────────────────────────────────────────────────────────────
-
 /**
  * Look up a Wayback Machine snapshot using multiple strategies:
  * 1. Availability API (fast but sometimes unreliable)
  * 2. Direct web URL (follows redirect to closest snapshot — more reliable)
  */
 export async function lookupWaybackSnapshot(url: string): Promise<WaybackSnapshot | null> {
-  // Strategy 1: Availability API (fast when it works)
+  // Strategy 1: Availability API
   try {
     const apiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(url)}`;
     const response = await fetch(apiUrl, {
-      headers: { 'User-Agent': 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)' },
+      headers: { 'User-Agent': USER_AGENT },
       signal: AbortSignal.timeout(8_000),
     });
-
     if (response.ok) {
       const data = await response.json() as {
         archived_snapshots?: { closest?: { url: string; timestamp: string; available: boolean } };
@@ -50,43 +44,36 @@ export async function lookupWaybackSnapshot(url: string): Promise<WaybackSnapsho
         return { url: snapshot.url, timestamp: snapshot.timestamp };
       }
     }
-  } catch {
-    // API may be down — fall through to direct URL approach
+  } catch (e) {
+    console.warn(`[wayback] API lookup failed for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // Strategy 2: Direct web URL — Wayback redirects to closest snapshot
+  // Strategy 2: Direct Wayback URL — follows redirect to closest snapshot
   try {
-    const directUrl = `https://web.archive.org/web/2024/${url}`;
+    const directUrl = `https://web.archive.org/web/${new Date().getFullYear()}/${url}`;
     const response = await fetch(directUrl, {
       redirect: 'manual',
-      headers: { 'User-Agent': 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)' },
+      headers: { 'User-Agent': USER_AGENT },
       signal: AbortSignal.timeout(10_000),
     });
-
     if (response.status === 302 || response.status === 301) {
       const location = response.headers.get('location');
       if (location && location.includes('web.archive.org/web/')) {
         const tsMatch = location.match(/\/web\/(\d{14})\//);
-        return {
-          url: location,
-          timestamp: tsMatch?.[1] || 'unknown',
-        };
+        return { url: location, timestamp: tsMatch?.[1] || 'unknown' };
       }
     }
-
     if (response.ok) {
       return { url: directUrl, timestamp: 'unknown' };
     }
-  } catch {
-    // Direct URL also failed
+  } catch (e) {
+    console.warn(`[wayback] Direct URL fallback failed for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
-
   return null;
 }
 
-// ── Content fetching ───────────────────────────────────────────────────────────
-
-function htmlToPlainText(html: string): string {
+/** Strip HTML to plain text, removing Wayback toolbar and common entities. */
+export function htmlToPlainText(html: string): string {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, '')
     .replace(/<style[\s\S]*?<\/style>/gi, '')
@@ -94,27 +81,22 @@ function htmlToPlainText(html: string): string {
     .replace(/<div id="wm-ipp-base"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '')
     .replace(/<\/?(p|div|br|h[1-6]|li|tr|blockquote|section|article)[^>]*>/gi, '\n')
     .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "\'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
+    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&nbsp;/g, ' ')
+    .replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
 }
 
-function extractTitleFromHtml(html: string): string | null {
+/** Extract <title> text from HTML. */
+export function extractTitleFromHtml(html: string): string | null {
   const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   if (!m) return null;
   const raw = m[1].replace(/\s+/g, ' ').trim();
-  if (!raw || raw.length < 2) return null;
-  return raw;
+  return (!raw || raw.length < 2) ? null : raw;
 }
 
 /**
- * Fetch content from a Wayback Machine snapshot URL.
+ * Fetch HTML content from a Wayback Machine archive URL.
+ * Returns parsed title + plain text content.
  */
 export async function fetchWaybackContent(
   archiveUrl: string,
@@ -123,39 +105,38 @@ export async function fetchWaybackContent(
   try {
     const response = await fetch(archiveUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)',
+        'User-Agent': BROWSER_USER_AGENT,
         Accept: 'text/html,application/xhtml+xml,*/*',
       },
       redirect: 'follow',
       signal: AbortSignal.timeout(30_000),
     });
-
     if (!response.ok) return null;
-
     const ct = response.headers.get('content-type') || '';
-    if (!ct.includes('text/html') && !ct.includes('application/xhtml')) {
-      return null;
-    }
-
+    if (!ct.includes('text/html') && !ct.includes('application/xhtml')) return null;
     const html = await response.text();
     const title = extractTitleFromHtml(html);
     const content = htmlToPlainText(html);
-
     if (content.length < 100) return null;
-
     return { title, content, contentType: 'text/html', archiveUrl, archiveTimestamp };
-  } catch {
+  } catch (e) {
+    console.warn(`[wayback] Content fetch failed for ${archiveUrl}: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   }
 }
 
 /**
- * Format a Wayback timestamp (YYYYMMDDHHmmss) into a human-readable date.
+ * Combined lookup + fetch: find a Wayback snapshot for a URL and fetch its content.
+ * Convenience function for callers that just want content for a URL.
  */
+export async function lookupAndFetchWayback(url: string): Promise<WaybackContent | null> {
+  const snapshot = await lookupWaybackSnapshot(url);
+  if (!snapshot) return null;
+  return fetchWaybackContent(snapshot.url, snapshot.timestamp);
+}
+
+/** Format a 14-digit Wayback timestamp (e.g. 20240315123456) as YYYY-MM-DD. */
 export function formatWaybackTimestamp(timestamp: string): string {
   if (!timestamp || timestamp === 'unknown' || timestamp.length < 8) return timestamp;
-  const year = timestamp.slice(0, 4);
-  const month = timestamp.slice(4, 6);
-  const day = timestamp.slice(6, 8);
-  return `${year}-${month}-${day}`;
+  return `${timestamp.slice(0, 4)}-${timestamp.slice(4, 6)}-${timestamp.slice(6, 8)}`;
 }

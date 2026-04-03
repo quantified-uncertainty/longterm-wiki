@@ -135,7 +135,7 @@ export async function fetchSourceContent(
 
   // Whether the Wayback Machine fallback is enabled (default: true).
   // Set DISABLE_WAYBACK_FALLBACK=1 to disable.
-  const waybackEnabled = !process.env.DISABLE_WAYBACK_FALLBACK;
+  const waybackEnabled = process.env.WAYBACK_FALLBACK_ENABLED !== 'false';
 
   // Track whether the primary URL is a dead link so we can try Wayback fallback
   let isDeadLink = false;
