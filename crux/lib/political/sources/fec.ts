@@ -12,10 +12,10 @@
  * which has limited free access. Falls back to sample data if both fail.
  */
 
-import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parse as parseYaml } from "yaml";
+import { generateDeterministicId } from "../id-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -68,15 +68,7 @@ export function generateFinanceId(
   candidateKey: string,
   cycle: number,
 ): string {
-  const input = `campaign-finance:${candidateKey}:${cycle}`;
-  const hash = createHash("sha256").update(input).digest("base64url");
-  const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-  return hash
-    .substring(0, 10)
-    .replace(/[-_]/g, (ch) => {
-      const code = ch.charCodeAt(0);
-      return REPLACEMENT_CHARS[code % REPLACEMENT_CHARS.length];
-    });
+  return generateDeterministicId("campaign-finance", candidateKey, cycle);
 }
 
 // ---------------------------------------------------------------------------
