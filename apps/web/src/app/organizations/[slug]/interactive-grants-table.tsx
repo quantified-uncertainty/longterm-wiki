@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useRef, useEffect } from "react";
 import Link from "next/link";
+import { z } from "zod";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
 import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
@@ -34,32 +35,38 @@ export interface GrantRow {
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
 
-/** Structured entity reference from wiki-server API. */
-interface EntityRef {
-  entityId: string | null;
-  slug: string | null;
-  name: string | null;
-}
+const EntityRefSchema = z.object({
+  entityId: z.string().nullable(),
+  slug: z.string().nullable(),
+  name: z.string().nullable(),
+});
 
-interface ServerGrant {
-  id: string;
-  granteeId: string | null;
-  grantee: EntityRef;
-  name: string;
-  amount: number | null;
-  period: string | null;
-  date: string | null;
-  status: string | null;
-  source: string | null;
-  notes: string | null;
-  programId: string | null;
-  verification?: {
-    verdict: string;
-    confidence: number | null;
-    sourcesChecked: number;
-    checkedAt: string | null;
-  } | null;
-}
+const ServerGrantSchema = z.object({
+  id: z.string(),
+  granteeId: z.string().nullable(),
+  grantee: EntityRefSchema,
+  name: z.string(),
+  amount: z.number().nullable(),
+  period: z.string().nullable(),
+  date: z.string().nullable(),
+  status: z.string().nullable(),
+  source: z.string().nullable(),
+  notes: z.string().nullable(),
+  programId: z.string().nullable(),
+  verification: z.object({
+    verdict: z.string(),
+    confidence: z.number().nullable(),
+    sourcesChecked: z.number(),
+    checkedAt: z.string().nullable(),
+  }).nullable().optional(),
+});
+
+type ServerGrant = z.infer<typeof ServerGrantSchema>;
+
+const ServerGrantsResponseSchema = z.object({
+  grants: z.array(ServerGrantSchema).optional(),
+  total: z.number().optional(),
+});
 
 function formatSlug(slug: string): string {
   return slug
@@ -93,7 +100,12 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
 
 function makeTransform(orgSlug?: string) {
   return (json: unknown): { rows: GrantRow[]; total: number } => {
-    const data = json as { grants?: ServerGrant[]; total?: number };
+    const parsed = ServerGrantsResponseSchema.safeParse(json);
+    if (!parsed.success) {
+      console.warn("Grants API response schema mismatch:", parsed.error.message);
+      return { rows: [], total: 0 };
+    }
+    const data = parsed.data;
     return {
       rows: (data.grants ?? []).map((g) => serverGrantToRow(g, orgSlug)),
       total: data.total ?? 0,
