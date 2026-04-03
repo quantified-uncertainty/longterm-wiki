@@ -8,6 +8,20 @@ interface CleanupResult {
   keep: number;
 }
 
+interface CleanupError {
+  status?: number;
+  body?: string;
+  error?: string;
+}
+
+function formatCleanupError(err?: CleanupError): string {
+  if (!err) return "unknown";
+  if (err.status) return `HTTP ${err.status}`;
+  if (err.error) return err.error;
+  if (err.body) return err.body.slice(0, 50);
+  return "unknown";
+}
+
 function getWikiServerApiKey(): string | undefined {
   const prefix = process.env["WIKI_SERVER_ENV"] === "prod" ? "PROD_" : "";
   return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`];
@@ -21,13 +35,13 @@ async function callCleanupEndpoint(
   config: Config,
   path: string,
   keep: number,
-): Promise<CleanupResult | null> {
+): Promise<{ result: CleanupResult | null; error?: CleanupError }> {
   const url = `${config.wikiServerUrl}${path}?keep=${keep}`;
   const apiKey = getWikiServerApiKey();
 
   if (!apiKey) {
     logger.warn("LONGTERMWIKI_SERVER_API_KEY is not set — skipping cleanup.");
-    return null;
+    return { result: null, error: { error: "no API key" } };
   }
 
   try {
@@ -42,16 +56,17 @@ async function callCleanupEndpoint(
     if (!res.ok) {
       const text = await res.text().catch(() => "");
       logger.error({ status: res.status, body: text.slice(0, 200), path }, "Cleanup endpoint failed");
-      return null;
+      return { result: null, error: { status: res.status, body: text.slice(0, 100) } };
     }
 
-    return (await res.json()) as CleanupResult;
+    return { result: (await res.json()) as CleanupResult };
   } catch (err) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
     logger.error(
-      { error: err instanceof Error ? err.message : String(err), path },
+      { error: errorMsg, path },
       "Cleanup request failed",
     );
-    return null;
+    return { result: null, error: { error: errorMsg } };
   }
 }
 
@@ -78,30 +93,32 @@ export async function snapshotRetention(
   let anyFailed = false;
 
   // 1. Hallucination risk snapshots
-  const hrResult = await callCleanupEndpoint(
+  const hr = await callCleanupEndpoint(
     config,
     "/api/hallucination-risk/cleanup",
     keep,
   );
-  if (hrResult) {
-    results.push(`hallucination_risk: deleted ${hrResult.deleted}`);
-    logger.info({ table: "hallucination_risk_snapshots", deleted: hrResult.deleted, keep }, "Cleanup complete");
+  if (hr.result) {
+    results.push(`hallucination_risk: deleted ${hr.result.deleted}`);
+    logger.info({ table: "hallucination_risk_snapshots", deleted: hr.result.deleted, keep }, "Cleanup complete");
   } else {
-    results.push("hallucination_risk: FAILED");
+    const detail = formatCleanupError(hr.error);
+    results.push(`hallucination_risk: FAILED (${detail})`);
     anyFailed = true;
   }
 
   // 2. Citation accuracy snapshots
-  const caResult = await callCleanupEndpoint(
+  const ca = await callCleanupEndpoint(
     config,
     "/api/citations/accuracy-snapshots/cleanup",
     keep,
   );
-  if (caResult) {
-    results.push(`citation_accuracy: deleted ${caResult.deleted}`);
-    logger.info({ table: "citation_accuracy_snapshots", deleted: caResult.deleted, keep }, "Cleanup complete");
+  if (ca.result) {
+    results.push(`citation_accuracy: deleted ${ca.result.deleted}`);
+    logger.info({ table: "citation_accuracy_snapshots", deleted: ca.result.deleted, keep }, "Cleanup complete");
   } else {
-    results.push("citation_accuracy: FAILED");
+    const detail = formatCleanupError(ca.error);
+    results.push(`citation_accuracy: FAILED (${detail})`);
     anyFailed = true;
   }
 

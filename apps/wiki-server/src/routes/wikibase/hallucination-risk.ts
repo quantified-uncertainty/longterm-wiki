@@ -489,23 +489,28 @@ const hallucinationRiskApp = new Hono()
       });
     }
 
-    // Actually delete old snapshots, keeping latest `keep` per page
+    // Actually delete old snapshots, keeping latest `keep` per page.
+    // Use a transaction with elevated statement_timeout (2 minutes) since the
+    // default 30s pool timeout can be exceeded on large tables.
     logger.info({ keep }, "Deleting old hallucination risk snapshots");
-    const result = await rawDb`
-      DELETE FROM hallucination_risk_snapshots
-      WHERE id NOT IN (
-        SELECT id FROM (
-          SELECT id, ROW_NUMBER() OVER (
-            -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-            PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
-          ) AS rn
-          FROM hallucination_risk_snapshots
-        ) ranked
-        WHERE rn <= ${keep}
-      )
-    `;
-
-    const deleted = result.count;
+    let deleted = 0;
+    await beginTransaction(async (tx) => {
+      await tx`SET LOCAL statement_timeout = '120000'`;
+      const result = await tx`
+        DELETE FROM hallucination_risk_snapshots
+        WHERE id NOT IN (
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (
+              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+              PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
+            ) AS rn
+            FROM hallucination_risk_snapshots
+          ) ranked
+          WHERE rn <= ${keep}
+        )
+      `;
+      deleted = result.count;
+    });
 
     // Refresh materialized view after cleanup
     try {

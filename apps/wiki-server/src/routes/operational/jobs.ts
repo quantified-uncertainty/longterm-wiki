@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, and, count, sql, desc } from "drizzle-orm";
+import { eq, and, count, sql, desc, gte } from "drizzle-orm";
 import { getDb, getDrizzleDb } from "../../db.js";
 import { jobs } from "../../schema.js";
 import {
@@ -558,9 +558,18 @@ const jobsApp = new Hono()
   })
 
   // ---- GET /stats (aggregate counts by type and status) ----
+  // Supports optional `since` query parameter (ISO 8601 timestamp) to filter
+  // jobs created after that time. Without `since`, returns all-time stats.
 
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
+
+    // Parse optional time window
+    const sinceParam = c.req.query("since");
+    const sinceDate = sinceParam ? new Date(sinceParam) : null;
+    const timeFilter = sinceDate && !isNaN(sinceDate.getTime())
+      ? gte(jobs.createdAt, sinceDate)
+      : undefined;
 
     const byTypeStatus = await db
       .select({
@@ -569,6 +578,7 @@ const jobsApp = new Hono()
         count: count(),
       })
       .from(jobs)
+      .where(timeFilter)
       .groupBy(jobs.type, jobs.status);
 
     // Compute average duration for completed jobs
@@ -582,7 +592,8 @@ const jobsApp = new Hono()
         and(
           eq(jobs.status, "completed"),
           sql`${jobs.startedAt} IS NOT NULL`,
-          sql`${jobs.completedAt} IS NOT NULL`
+          sql`${jobs.completedAt} IS NOT NULL`,
+          timeFilter,
         )
       )
       .groupBy(jobs.type);
@@ -595,7 +606,10 @@ const jobsApp = new Hono()
         failed: sql<number>`sum(case when ${jobs.status} = 'failed' then 1 else 0 end)`,
       })
       .from(jobs)
-      .where(sql`${jobs.status} IN ('completed', 'failed')`)
+      .where(and(
+        sql`${jobs.status} IN ('completed', 'failed')`,
+        timeFilter,
+      ))
       .groupBy(jobs.type);
 
     // Build summary
@@ -623,11 +637,15 @@ const jobsApp = new Hono()
       }
     }
 
-    const totalResult = await db.select({ count: count() }).from(jobs);
+    const totalResult = await db
+      .select({ count: count() })
+      .from(jobs)
+      .where(timeFilter);
 
     return c.json({
       totalJobs: totalResult[0].count,
       byType: typeSummary,
+      ...(sinceDate ? { since: sinceDate.toISOString() } : {}),
     });
   })
 
