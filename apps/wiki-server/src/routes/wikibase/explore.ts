@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { getDb } from "../../db.js";
-import { validationError } from "../shared/utils.js";
+import { validationError, clampedLimit } from "../shared/utils.js";
 import {
   buildPrefixTsquery,
   titleMatchBoostExpr,
@@ -48,7 +48,7 @@ interface FacetCountRow {
 // ---- Query Schema ----
 
 const ExploreQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(200).default(50),
+  limit: clampedLimit(200, 50),
   offset: z.coerce.number().int().min(0).default(0),
   search: z.string().max(500).optional(),
   entityType: z.string().max(100).optional(),

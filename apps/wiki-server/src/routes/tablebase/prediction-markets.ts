@@ -13,6 +13,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   resolveEntityId,
@@ -41,7 +42,7 @@ const VALID_QUESTION_TYPES = [
 // ---- Query schemas ----
 
 const QuestionsQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   platform: z.string().optional(),
   category: z.string().optional(),
@@ -52,7 +53,7 @@ const QuestionsQuery = z.object({
 });
 
 const ByEntityQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   platform: z.string().optional(),
   category: z.string().optional(),
@@ -63,7 +64,7 @@ const ByEntityQuery = z.object({
 });
 
 const TimeseriesQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(500),
+  limit: clampedLimit(MAX_PAGE_SIZE, 500),
 });
 
 // ---- Sync schemas ----

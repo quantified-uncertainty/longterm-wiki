@@ -11,6 +11,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 
@@ -36,7 +37,7 @@ const VALID_CHAMBERS = [
 // ---- Query schemas ----
 
 const ListQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   chamber: z.string().max(50).optional(),
   vote: z.string().max(20).optional(),

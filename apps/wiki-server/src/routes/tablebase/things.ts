@@ -20,6 +20,7 @@ import {
   parseJsonBody,
   invalidJsonError,
   escapeIlike,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   normalizeSearchQuery,
@@ -41,14 +42,14 @@ const ListQuery = z.object({
   parent_id: z.string().max(100).optional(),
   sort: z.enum(["title", "updated_at", "created_at", "thing_type"]).default("title"),
   order: z.enum(["asc", "desc"]).default("asc"),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
   thing_type: z.string().max(50).optional(),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: clampedLimit(100, 20),
 });
 
 const StatsQuery = z.object({

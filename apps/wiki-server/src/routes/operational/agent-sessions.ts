@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   firstOrThrow,
   escapeIlike,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   CreateAgentSessionSchema,
@@ -22,7 +23,7 @@ import { parseCostCents, parseDurationMinutes } from "./sessions.js";
 // ---- Query schemas ----
 
 const PageChangesQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(2000).default(500),
+  limit: clampedLimit(2000, 500),
   since: DateStringSchema.optional(),
 });
 

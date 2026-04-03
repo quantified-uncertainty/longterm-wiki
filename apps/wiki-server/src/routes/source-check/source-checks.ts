@@ -35,6 +35,7 @@ import {
 } from "../../schema.js";
 import {
   zv,
+  clampedLimit,
   parseJsonBody,
   validationError,
   invalidJsonError,
@@ -101,12 +102,7 @@ const VerdictUpsertBody = z.object({
 });
 
 /** Limit field that clamps to MAX_PAGE_SIZE instead of rejecting */
-const clampedLimit = z.coerce
-  .number()
-  .int()
-  .min(1)
-  .default(50)
-  .transform((v) => Math.min(v, MAX_PAGE_SIZE));
+const defaultClampedLimit = clampedLimit(MAX_PAGE_SIZE, 50);
 
 const VerdictsQuery = z.object({
   record_type: z.string().max(50).optional(),
@@ -117,17 +113,17 @@ const VerdictsQuery = z.object({
     .transform((v) => v === "true")
     .optional(),
   q: z.string().max(500).optional(),
-  limit: clampedLimit,
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const EvidenceQuery = z.object({
-  limit: clampedLimit,
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const DueForRecheckQuery = z.object({
-  limit: clampedLimit,
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
   record_type: z.string().max(50).optional(),
   min_priority: z.coerce.number().optional(),
@@ -135,7 +131,7 @@ const DueForRecheckQuery = z.object({
 
 const StaleEvidenceQuery = z.object({
   record_type: z.string().max(50).optional(),
-  limit: clampedLimit,
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -154,13 +150,13 @@ const ResolveNamesQuery = z.object({
 });
 
 const ByEntityQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
   verdict: z.string().max(50).optional(),
 });
 
 const ByPageQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -175,7 +171,7 @@ const FailuresQuery = z.object({
   error_type: z.string().max(50).optional(),
   record_type: z.string().max(50).optional(),
   entity_id: z.string().max(200).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -183,7 +179,7 @@ const StaleQuery = z.object({
   days: z.coerce.number().int().min(1).max(3650).default(90),
   record_type: z.string().max(50).optional(),
   entity_id: z.string().max(200).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
 
