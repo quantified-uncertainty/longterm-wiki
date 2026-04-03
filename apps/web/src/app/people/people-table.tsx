@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback, useState } from "react";
 import Link from "next/link";
+import { z } from "zod";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
@@ -44,18 +45,25 @@ export interface PersonRow {
 
 // ── Server person shape (from wiki-server API) ──────────────────────
 
-interface ServerPerson {
-  id: string;
-  slug: string;
-  name: string;
-  wikiId: string | null;
-  description: string | null;
-  role: string | null;
-  employerId: string | null;
-  employerName: string | null;
-  bornYear: number | null;
-  netWorth: number | null;
-}
+const ServerPersonSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  wikiId: z.string().nullable(),
+  description: z.string().nullable().optional(),
+  role: z.string().nullable(),
+  employerId: z.string().nullable(),
+  employerName: z.string().nullable(),
+  bornYear: z.number().nullable(),
+  netWorth: z.number().nullable(),
+});
+
+type ServerPerson = z.infer<typeof ServerPersonSchema>;
+
+const ServerPeopleResponseSchema = z.object({
+  items: z.array(ServerPersonSchema).optional(),
+  total: z.number().optional(),
+});
 
 function serverPersonToRow(p: ServerPerson): PersonRow {
   return {
@@ -83,7 +91,12 @@ function transformPeopleResponse(json: unknown): {
   rows: PersonRow[];
   total: number;
 } {
-  const data = json as { items?: ServerPerson[]; total?: number };
+  const parsed = ServerPeopleResponseSchema.safeParse(json);
+  if (!parsed.success) {
+    console.warn("People API response schema mismatch:", parsed.error.message);
+    return { rows: [], total: 0 };
+  }
+  const data = parsed.data;
   return {
     rows: (data.items ?? []).map(serverPersonToRow),
     total: data.total ?? 0,
