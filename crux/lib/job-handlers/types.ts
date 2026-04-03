@@ -4,6 +4,8 @@
  * Shared types for the job processing system.
  */
 
+import { z } from 'zod';
+
 // ---------------------------------------------------------------------------
 // File Change — the unit of work output from content-modifying jobs
 // ---------------------------------------------------------------------------
@@ -61,45 +63,39 @@ export interface BatchInfo {
 // Content job params
 // ---------------------------------------------------------------------------
 
-export interface PageImproveParams {
-  pageId: string;
-  tier: 'polish' | 'standard' | 'deep';
-  directions?: string;
-  batchId?: string;
-  /** Whether to apply changes directly (default: true) */
-  apply?: boolean;
-}
+export const PageImproveParamsSchema = z.object({
+  pageId: z.string(),
+  tier: z.enum(['polish', 'standard', 'deep']).default('standard'),
+  directions: z.string().optional(),
+  batchId: z.string().optional(),
+  apply: z.boolean().optional(),
+});
+export type PageImproveParams = z.infer<typeof PageImproveParamsSchema>;
 
-export interface PageCreateParams {
-  title: string;
-  tier: 'budget' | 'standard' | 'premium';
-  batchId?: string;
-}
+export const PageCreateParamsSchema = z.object({
+  title: z.string(),
+  tier: z.enum(['budget', 'standard', 'premium']).default('standard'),
+  batchId: z.string().optional(),
+});
+export type PageCreateParams = z.infer<typeof PageCreateParamsSchema>;
 
-export interface BatchCommitParams {
-  batchId: string;
-  /** Job IDs to collect results from */
-  childJobIds: number[];
-  /** Branch name to create (default: auto-generated) */
-  branchName?: string;
-  /** PR title */
-  prTitle: string;
-  /** PR body description */
-  prBody?: string;
-  /** Labels to add to the PR */
-  prLabels?: string[];
-}
+export const BatchCommitParamsSchema = z.object({
+  batchId: z.string(),
+  childJobIds: z.array(z.number()),
+  branchName: z.string().optional(),
+  prTitle: z.string(),
+  prBody: z.string().optional(),
+  prLabels: z.array(z.string()).optional(),
+});
+export type BatchCommitParams = z.infer<typeof BatchCommitParamsSchema>;
 
-export interface AutoUpdateDigestParams {
-  /** Max budget in dollars */
-  budget?: number;
-  /** Max pages to update */
-  maxPages?: number;
-  /** Comma-separated source IDs (empty = all) */
-  sources?: string;
-  /** Whether this is a dry run (no child jobs created) */
-  dryRun?: boolean;
-}
+export const AutoUpdateDigestParamsSchema = z.object({
+  budget: z.number().optional(),
+  maxPages: z.number().optional(),
+  sources: z.string().optional(),
+  dryRun: z.boolean().optional(),
+});
+export type AutoUpdateDigestParams = z.infer<typeof AutoUpdateDigestParamsSchema>;
 
 export interface ResourceIngestParams {
   /** Resource stableId */

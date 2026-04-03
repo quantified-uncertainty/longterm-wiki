@@ -9,6 +9,14 @@ import { Severity, Issue, type ContentFile, type ValidationEngine } from '../val
 import { ALL_ENTITY_TYPE_NAMES } from '../../../apps/web/src/data/entity-type-names.ts';
 import { VALID_SUBCATEGORIES } from '../valid-subcategories.ts';
 
+/** Zod requires a non-empty tuple [T, ...T[]] for z.enum(). This helper provides
+ *  a type-safe assertion that a readonly string array is non-empty, avoiding
+ *  `as unknown as [string, ...string[]]` double-casts. Throws at startup if empty. */
+function asNonEmptyTuple<T extends string>(arr: readonly T[]): [T, ...T[]] {
+  if (arr.length === 0) throw new Error('Expected non-empty array for z.enum()');
+  return arr as unknown as [T, ...T[]];
+}
+
 // Mapping from entityType to subcategories that are typical for that type.
 // Used for cross-field validation (WARNING, not ERROR — judgment-based).
 // Entity types not listed here have no subcategory restrictions.
@@ -78,7 +86,7 @@ const frontmatterSchema = z.object({
   fullWidth: z.boolean().optional(),
   update_frequency: z.number().positive().optional(),
   evergreen: z.literal(false).optional(),
-  entityType: z.enum(ALL_ENTITY_TYPE_NAMES as unknown as [string, ...string[]]).optional(),
+  entityType: z.enum(asNonEmptyTuple(ALL_ENTITY_TYPE_NAMES)).optional(),
   entityId: z.string().optional(),
   wikiId: z.string().regex(/^E\d+$/, 'wikiId must match format "E" followed by digits (e.g. "E710")').optional(),
   subcategory: z.enum(VALID_SUBCATEGORIES).optional(),

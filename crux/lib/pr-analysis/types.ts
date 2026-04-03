@@ -118,6 +118,8 @@ export interface GqlPrNode {
   id: string; // GraphQL node ID (e.g. "PR_kwDON..."), needed for enqueuePullRequestForMerge
   number: number;
   title: string;
+  /** PR state: OPEN, CLOSED, or MERGED. Present when the GQL query requests it. */
+  state?: string;
   headRefName: string;
   headRefOid: string;
   mergeable: string;

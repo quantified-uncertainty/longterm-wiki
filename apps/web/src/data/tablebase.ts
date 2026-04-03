@@ -24,6 +24,7 @@ import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
 import {
   TypedEntitySchema,
+  GenericEntityPassthroughSchema,
   type TypedEntity,
   type GenericEntity,
   type PersonEntity,
@@ -563,9 +564,8 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types — keep all fields as-is.
-      // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
-      // like content, currentAssessment, ratings, causeEffectGraph.
+      // Unknown entity types — validate base fields via GenericEntityPassthroughSchema,
+      // which preserves extra keys (causeEffectGraph, content, currentAssessment, etc.).
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
@@ -573,7 +573,13 @@ export function getTypedEntities(): AnyEntity[] {
           `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
         );
       }
-      entities.push(raw as unknown as GenericEntity);
+      const genericResult = GenericEntityPassthroughSchema.safeParse(raw);
+      if (genericResult.success) {
+        entities.push(genericResult.data as GenericEntity);
+      } else if (isDev) {
+        const id = (raw as Record<string, unknown>).id;
+        console.warn(`[entity-validation] ${id}: failed generic parse too — skipping`);
+      }
     }
   }
 
