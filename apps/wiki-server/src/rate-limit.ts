@@ -382,15 +382,22 @@ export const DEFAULT_WRITE_LIMIT: RateLimitConfig = {
   windowMs: 60_000,
 };
 
-/** Authenticated rate limit: 1000 GET requests per minute per IP. */
+/**
+ * Authenticated rate limit: 5000 GET requests per minute per IP.
+ * Vercel ISR, CI sync, crux CLI, and snapshot capture all share this pool.
+ * 1000 was too low — snapshot runs + concurrent ISR exhausted it.
+ */
 export const DEFAULT_AUTH_READ_LIMIT: RateLimitConfig = {
-  maxRequests: 1000,
+  maxRequests: 5000,
   windowMs: 60_000,
 };
 
-/** Authenticated rate limit: 200 write requests per minute per IP. */
+/**
+ * Authenticated rate limit: 500 write requests per minute per IP.
+ * Snapshot --all fires sync + create for each of 14 sources.
+ */
 export const DEFAULT_AUTH_WRITE_LIMIT: RateLimitConfig = {
-  maxRequests: 200,
+  maxRequests: 500,
   windowMs: 60_000,
 };
 
