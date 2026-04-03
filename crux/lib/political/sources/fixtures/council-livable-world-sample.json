@@ -1,0 +1,50 @@
+[
+  {
+    "name": "Ed Markey",
+    "party": "Democratic",
+    "state": "MA",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Jeff Merkley",
+    "party": "Democratic",
+    "state": "OR",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Chris Murphy",
+    "party": "Democratic",
+    "state": "CT",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Elizabeth Warren",
+    "party": "Democratic",
+    "state": "MA",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Brian Schatz",
+    "party": "Democratic",
+    "state": "HI",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Tammy Duckworth",
+    "party": "Democratic",
+    "state": "IL",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Chris Van Hollen",
+    "party": "Democratic",
+    "state": "MD",
+    "chamber": "Senate"
+  },
+  {
+    "name": "Tim Kaine",
+    "party": "Democratic",
+    "state": "VA",
+    "chamber": "Senate"
+  }
+]

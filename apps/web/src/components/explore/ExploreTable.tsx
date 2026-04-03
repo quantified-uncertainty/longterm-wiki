@@ -12,15 +12,11 @@ import {
 import type { ExploreItem } from "@/data";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { getTypeLabel, getTypeColor } from "./explore-utils";
+import { formatDateDeterministic } from "@lib/format";
 
 function formatDate(dateStr: string | null): string {
-  if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
+  if (!dateStr) return "\u2014";
+  return formatDateDeterministic(dateStr);
 }
 
 function formatWordCountCompact(count: number | null): string {

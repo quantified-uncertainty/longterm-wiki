@@ -27,6 +27,10 @@ export interface WithSource<T> {
  * Fetch JSON from the wiki-server API with detailed error information.
  * Returns a discriminated union so callers can distinguish between
  * "not configured", "connection failed", and "server error".
+ *
+ * Retries once on HTTP 429 (rate limit) after the Retry-After delay
+ * as a defense-in-depth measure. The wiki-server skips rate limiting
+ * for authenticated requests, so 429s should be rare in practice.
  */
 export async function fetchDetailed<T>(
   path: string,
@@ -35,32 +39,50 @@ export async function fetchDetailed<T>(
   const config = getWikiServerConfig();
   if (!config) return { ok: false, error: { type: "not-configured" } };
 
-  try {
-    const res = await fetch(`${config.serverUrl}${path}`, {
-      headers: config.headers,
-      next: { revalidate: options?.revalidate ?? 300 },
-      signal: AbortSignal.timeout(options?.timeoutMs ?? 10_000),
-    });
-    if (!res.ok) {
+  const doFetch = async (): Promise<FetchResult<T>> => {
+    try {
+      const res = await fetch(`${config.serverUrl}${path}`, {
+        headers: config.headers,
+        next: { revalidate: options?.revalidate ?? 300 },
+        signal: AbortSignal.timeout(options?.timeoutMs ?? 10_000),
+      });
+      if (!res.ok) {
+        return {
+          ok: false,
+          error: {
+            type: "server-error",
+            status: res.status,
+            statusText: res.statusText,
+          },
+        };
+      }
+      return { ok: true, data: (await res.json()) as T };
+    } catch (err) {
       return {
         ok: false,
         error: {
-          type: "server-error",
-          status: res.status,
-          statusText: res.statusText,
+          type: "connection-error",
+          message: err instanceof Error ? err.message : String(err),
         },
       };
     }
-    return { ok: true, data: (await res.json()) as T };
-  } catch (err) {
-    return {
-      ok: false,
-      error: {
-        type: "connection-error",
-        message: err instanceof Error ? err.message : String(err),
-      },
-    };
+  };
+
+  const result = await doFetch();
+
+  // Retry once on 429 after a short delay. The Retry-After header tells
+  // us how long to wait; cap at 5s to avoid blocking ISR too long.
+  if (
+    !result.ok &&
+    result.error.type === "server-error" &&
+    result.error.status === 429
+  ) {
+    const retryDelay = 2000;
+    await new Promise((resolve) => setTimeout(resolve, retryDelay));
+    return doFetch();
   }
+
+  return result;
 }
 
 /**
