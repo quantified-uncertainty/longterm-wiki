@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -106,6 +107,12 @@ function getReachedStage(timelineEvents: Array<{ label: string }>, statusKey: st
   return -1;
 }
 
+/** Async child component so vote fetching doesn't block page render. */
+async function LegislationVotesSection({ entityId }: { entityId: string }) {
+  const votes = await fetchLegislationVotes(entityId);
+  return <LegislationVotes votes={votes} />;
+}
+
 export default async function LegislationDetailPage({
   params,
 }: {
@@ -146,9 +153,6 @@ export default async function LegislationDetailPage({
     .filter(Boolean) as Array<{ name: string; href: string; relationship?: string; type?: string }>;
 
   const wikiHref = getPolicyWikiHref(entity);
-
-  // Fetch vote breakdown from wiki-server for this legislation
-  const legislationVotes = await fetchLegislationVotes(entity.stableId ?? entity.id);
 
   const importanceOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
   const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
@@ -390,7 +394,9 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      <LegislationVotes votes={legislationVotes} />
+      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading votes...</div>}>
+        <LegislationVotesSection entityId={entity.stableId ?? entity.id} />
+      </Suspense>
 
       <FBAutoFacts entityId={entity.id} />
 
