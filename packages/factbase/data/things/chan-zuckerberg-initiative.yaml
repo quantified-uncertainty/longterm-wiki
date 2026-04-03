@@ -64,9 +64,9 @@ facts:
     notes: From Wikidata Q21623039
   - id: Ts2N71qCVA
     property: founded-by-name
-    value: Mark Zuckerberg
+    value: Mark Zuckerberg and Priscilla Chan
     source: https://www.wikidata.org/wiki/Q21623039
-    notes: From Wikidata Q21623039; text value (not entity ref)
+    notes: "Co-founded by Mark Zuckerberg and Priscilla Chan (corrected — previously listed only Mark)"
   - id: 9saf9wrWBA
     property: legal-structure
     value: limited liability company

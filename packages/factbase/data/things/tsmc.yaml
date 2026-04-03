@@ -37,8 +37,9 @@ facts:
 
   - id: f_tsmc_website
     property: website
-    value: https://www.tsmc.com
+    value: https://www.tsmc.com/
     source: https://en.wikipedia.org/wiki/TSMC
+    notes: "Wikipedia lists 'tsmc.com' but both resolve to the same site"
 
   - id: f_tsmc_wiki
     property: wikipedia-url
