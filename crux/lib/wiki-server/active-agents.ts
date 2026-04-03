@@ -34,6 +34,12 @@ export type ActiveAgentEntry = ActiveAgentListResponse['agents'][number];
 /** Conflict warnings. */
 export type ActiveAgentConflict = ActiveAgentListResponse['conflicts'][number];
 
+/** Shape returned by POST /:id/heartbeat. */
+export type HeartbeatResponse = InferResponseType<
+  RpcClient[':id']['heartbeat']['$post'],
+  200
+>;
+
 /** Shape returned by POST / (201 created or 200 updated). */
 export type RegisterAgentResponse = InferResponseType<
   RpcClient['index']['$post'],
@@ -85,8 +91,8 @@ export async function updateAgent(
  */
 export async function heartbeat(
   id: number,
-): Promise<ApiResult<{ ok: boolean; heartbeatAt: string }>> {
-  return apiRequest<{ ok: boolean; heartbeatAt: string }>('POST', `/api/active-agents/${id}/heartbeat`, {});
+): Promise<ApiResult<HeartbeatResponse>> {
+  return apiRequest<HeartbeatResponse>('POST', `/api/active-agents/${id}/heartbeat`, {});
 }
 
 /**

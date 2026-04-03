@@ -137,11 +137,7 @@ export async function syncKeyPersons(
 
     console.log(`  Batch ${batchNum}/${totalBatches}: ${batch.length} items...`);
 
-    const result = await apiRequest<{ upserted: number }>(
-      'POST',
-      '/api/personnel/sync',
-      { items: batch },
-    );
+    const result = await syncPersonnel(batch);
 
     if (result.ok) {
       totalUpserted += result.data.upserted;

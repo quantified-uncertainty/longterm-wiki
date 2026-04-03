@@ -6,8 +6,8 @@
  * - Storing aggregate verdicts via wiki-server API
  */
 
-import { apiRequest } from '../wiki-server/client.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
+import { storeEvidence as storeEvidenceRpc, storeVerdict as storeVerdictRpc } from '../wiki-server/verifications.ts';
 import { MODELS } from '../llm.ts';
 import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 
@@ -63,11 +63,7 @@ export async function storeSourceCheckEvidence(params: {
     resourceId: resolvedResourceId,
   };
 
-  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-    'POST',
-    '/api/verifications/evidence',
-    body,
-  );
+  const response = await storeEvidenceRpc(body);
 
   if (!response.ok) {
     console.warn(`${logPrefix} Failed to store evidence for ${params.recordType}/${params.recordId}: ${response.error}`);
@@ -106,11 +102,7 @@ export async function storeAggregateVerdict(params: {
     ...(params.entityDisplayName ? { entityDisplayName: params.entityDisplayName } : {}),
   };
 
-  const response = await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/verifications/verdicts',
-    body,
-  );
+  const response = await storeVerdictRpc(body);
 
   if (!response.ok) {
     console.warn(`${logPrefix} Failed to store verdict for ${params.recordType}/${params.recordId}: ${response.error}`);

@@ -145,10 +145,12 @@ export type UpsertCitationContentInput = UpsertCitationContent;
 
 export type { CitationContentRow, CitationContentListEntry, CitationContentListResult, CitationContentStatsResult };
 
+export type UpsertCitationContentResult = InferResponseType<RpcClient['content']['upsert']['$post'], 200>;
+
 export async function upsertCitationContent(
   item: UpsertCitationContentInput,
-): Promise<ApiResult<{ url: string }>> {
-  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
+): Promise<ApiResult<UpsertCitationContentResult>> {
+  return apiRequest<UpsertCitationContentResult>('POST', '/api/citations/content/upsert', item);
 }
 
 export async function getCitationContentByUrl(
