@@ -1339,9 +1339,53 @@ export async function mergePGRecordsIntoKB(kb) {
   );
 
   // --- Process funding rounds ---
+  // Deduplicate funding rounds where a legacy row (numeric companyId like "378")
+  // coexists with a corrected row (stableId like "sid_mK9pX3rQ7n") for the same
+  // entity+name.  Both map to the same companyRef.entityId after FK resolution,
+  // but the legacy row typically has wrong amounts/dates.  Drop the legacy row
+  // when a stableId-keyed row exists for the same (entityKey, name) pair.
+  //
+  // Rows where BOTH have stableId companyIds (e.g. two "Seed" rounds for the
+  // same company at different dates) are NOT duplicates — they are distinct
+  // funding events that happen to share a name.
+  let dedupedFundingRoundsResult = fundingRoundsResult;
+  if (fundingRoundsResult.status === 'fulfilled' && fundingRoundsResult.value) {
+    const rows = fundingRoundsResult.value;
+    // Index: "entityKey|name" → { stableIdRows, legacyRows[] }
+    const groups = new Map();
+    for (const row of rows) {
+      const entityKey = normalizePGEntityId(row.companyRef?.entityId ?? row.companyId);
+      const name = (row.name || '').toLowerCase().trim();
+      const dedupKey = `${entityKey}|${name}`;
+      const isLegacyNumericId = /^\d+$/.test(row.companyId);
+      if (!groups.has(dedupKey)) {
+        groups.set(dedupKey, { stableIdRows: [], legacyRows: [] });
+      }
+      const group = groups.get(dedupKey);
+      if (isLegacyNumericId) {
+        group.legacyRows.push(row);
+      } else {
+        group.stableIdRows.push(row);
+      }
+    }
+    // Collect rows to drop: legacy rows that have a stableId counterpart
+    const dropIds = new Set();
+    for (const group of groups.values()) {
+      if (group.stableIdRows.length > 0 && group.legacyRows.length > 0) {
+        for (const legacyRow of group.legacyRows) {
+          dropIds.add(legacyRow.id);
+        }
+      }
+    }
+    if (dropIds.size > 0) {
+      const deduped = rows.filter(row => !dropIds.has(row.id));
+      console.log(`  kb-pg funding-rounds: deduplicated ${dropIds.size} legacy duplicate(s)`);
+      dedupedFundingRoundsResult = { status: 'fulfilled', value: deduped };
+    }
+  }
   fundingRoundsCount = mergeCollection(
     'funding-rounds',
-    fundingRoundsResult,
+    dedupedFundingRoundsResult,
     ['funding-rounds'],
     (row) => row.companyRef?.entityId ?? row.companyId,
     () => 'funding-rounds',

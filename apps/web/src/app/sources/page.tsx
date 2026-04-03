@@ -3,13 +3,10 @@ import {
   getAllPublications,
   getAllResources,
   getPagesForResource,
-  getResourceCredibility,
-  getResourcePublication,
   getResourcesForPublication,
 } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
 import { SourcesTabs } from "./sources-tabs";
-import type { ResourceRow } from "../resources/resources-table";
 import type { PublicationRow } from "../publications/publications-table";
 import { DataSourcesTabContent } from "../data-sources/data-sources-tab-content";
 
@@ -48,30 +45,6 @@ export default function SourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
 
-  // Build resource rows for the table
-  const resourceRows: ResourceRow[] = resources.map((r) => {
-    const publication = getResourcePublication(r);
-    const credibility = getResourceCredibility(r);
-    const citingPages = getPagesForResource(r.id);
-    return {
-      id: r.id,
-      title: r.title,
-      url: r.url,
-      type: r.type,
-      publicationName: publication?.name ?? null,
-      credibility: credibility ?? null,
-      citingPageCount: citingPages.length,
-      tags: r.tags ?? [],
-      publishedDate: r.published_date ?? null,
-      contextNote: r.context_note ?? null,
-      resourceSubtype: r.resource_subtype ?? null,
-      importanceScore: r.importance_score ?? null,
-      enrichmentStatus: r.enrichment_status ?? null,
-      citationCount: r.paper?.citation_count ?? null,
-      karma: r.forum_post?.karma ?? null,
-    };
-  });
-
   // Build publication rows for the table
   const publicationRows: PublicationRow[] = publications.map((pub) => {
     const pubResources = getResourcesForPublication(pub.id);
@@ -94,7 +67,7 @@ export default function SourcesPage() {
 
   // Resource type breakdown
   const typeCounts = new Map<string, number>();
-  for (const r of resourceRows) {
+  for (const r of resources) {
     typeCounts.set(r.type, (typeCounts.get(r.type) || 0) + 1);
   }
   const topTypes = [...typeCounts.entries()]
@@ -250,7 +223,6 @@ export default function SourcesPage() {
       )}
 
       <SourcesTabs
-        resourceRows={resourceRows}
         resourceCount={resources.length}
         publicationRows={publicationRows}
         publicationCount={publications.length}
