@@ -4,7 +4,7 @@ import {
   getBenchmarkSlugByName,
   getBenchmarkEntities,
   type BenchmarkResultRow,
-} from "../../benchmarks/benchmark-utils";
+} from "@/app/benchmarks/benchmark-utils";
 import type { BenchmarkEntity } from "@/data";
 
 // --------------------------------------------------------------------------
@@ -181,8 +181,8 @@ function enrichBenchmarks(
       : [];
     const allScores = resultsForBenchmark.map((r) => r.score);
 
-    // If the current model's score isn't in the cross-model data, add it
-    if (!allScores.includes(b.score) && resultsForBenchmark.every(r => r.modelId !== modelId)) {
+    // If the current model isn't in the cross-model data, add its score
+    if (resultsForBenchmark.every(r => r.modelId !== modelId)) {
       allScores.push(b.score);
     }
 
