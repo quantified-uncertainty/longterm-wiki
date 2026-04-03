@@ -64,8 +64,7 @@ facts:
     value: 1.17e+8
     asOf: 2023-06
     source: https://www.polytechnique.edu/en/news/mistral-ai-french-ai-nugget-co-founded-two-x-alumni-raised-eu500-mlns-2023
-    notes: "Seed round of EUR105M ($117M); investors included Lightspeed Venture
-      Partners, Eric Schmidt, Xavier Niel"
+    notes: "Seed round only: EUR105M ($117M). Source URL mentions €500M total raised by end of 2023 across multiple rounds — this fact captures only the June 2023 seed. See later total-funding facts for cumulative figures."
 
   - id: f_OnBjHPgr6g
     property: total-funding
