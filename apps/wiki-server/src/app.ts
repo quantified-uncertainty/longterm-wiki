@@ -27,6 +27,8 @@ import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js
 import { politicalRacesRoute } from "./routes/tablebase/political-races.js";
 import { politicalScoresRoute } from "./routes/tablebase/political-scores.js";
 import { politicalOfficesRoute } from "./routes/tablebase/political-offices.js";
+import { politicalVotesRoute } from "./routes/tablebase/political-votes.js";
+import { campaignFinanceRoute } from "./routes/tablebase/campaign-finance.js";
 import { blueskyRoute } from "./routes/tablebase/bluesky.js";
 import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 import { dataSourcesRoute } from "./routes/tablebase/data-sources.js";
@@ -228,6 +230,8 @@ export function createApp() {
   app.route("/api/political-races", politicalRacesRoute);
   app.route("/api/political-scores", politicalScoresRoute);
   app.route("/api/political-offices", politicalOfficesRoute);
+  app.route("/api/political-votes", politicalVotesRoute);
+  app.route("/api/campaign-finance", campaignFinanceRoute);
   app.route("/api/bluesky", blueskyRoute);
   app.route("/api/talent-flows", talentFlowsRoute);
   app.route("/api/platform-accounts", platformAccountsRoute);

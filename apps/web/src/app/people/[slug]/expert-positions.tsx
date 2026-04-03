@@ -30,6 +30,9 @@ export function ExpertPositions({
   if (positions.length === 0) return null;
 
   const hasAnyDates = positions.some((p) => p.date);
+  const hasAnyEstimates = positions.some((p) => p.estimate);
+  const hasAnyConfidence = positions.some((p) => p.confidence);
+  const hasAnySources = positions.some((p) => p.source || p.sourceUrl);
 
   return (
     <section>
@@ -50,15 +53,24 @@ export function ExpertPositions({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   View
                 </th>
-                <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
-                  Estimate
-                </th>
-                <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
-                  Confidence
-                </th>
+                {hasAnyEstimates && (
+                  <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Estimate
+                  </th>
+                )}
+                {hasAnyConfidence && (
+                  <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Confidence
+                  </th>
+                )}
                 {hasAnyDates && (
                   <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                     Date
+                  </th>
+                )}
+                {hasAnySources && (
+                  <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
+                    Source
                   </th>
                 )}
               </tr>
@@ -75,21 +87,58 @@ export function ExpertPositions({
                   <td className="px-4 py-3 text-muted-foreground">
                     {pos.view}
                   </td>
-                  <td className="px-4 py-3 font-mono text-xs">
-                    {pos.estimate ?? "—"}
-                  </td>
-                  <td className="px-4 py-3">
-                    {pos.confidence && (
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${CONFIDENCE_STYLES[pos.confidence] ?? "bg-muted text-muted-foreground"}`}
-                      >
-                        {pos.confidence}
-                      </span>
-                    )}
-                  </td>
+                  {hasAnyEstimates && (
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {pos.estimate ?? "—"}
+                    </td>
+                  )}
+                  {hasAnyConfidence && (
+                    <td className="px-4 py-3">
+                      {pos.confidence ? (
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${CONFIDENCE_STYLES[pos.confidence] ?? "bg-muted text-muted-foreground"}`}
+                        >
+                          {pos.confidence}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/40">—</span>
+                      )}
+                    </td>
+                  )}
                   {hasAnyDates && (
                     <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
                       {pos.date ? formatPositionDate(pos.date) : "—"}
+                    </td>
+                  )}
+                  {hasAnySources && (
+                    <td className="px-4 py-3 text-xs">
+                      {pos.source ? (
+                        pos.sourceUrl ? (
+                          <a
+                            href={safeHref(pos.sourceUrl)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline"
+                          >
+                            {pos.source}
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground">
+                            {pos.source}
+                          </span>
+                        )
+                      ) : pos.sourceUrl ? (
+                        <a
+                          href={safeHref(pos.sourceUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                        >
+                          View source
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground/40">—</span>
+                      )}
                     </td>
                   )}
                 </tr>
@@ -97,32 +146,6 @@ export function ExpertPositions({
             </tbody>
           </table>
         </div>
-        {positions.some((p) => p.source) && (
-          <div className="px-4 py-2.5 border-t border-border/40 bg-muted/20">
-            <p className="text-xs text-muted-foreground">
-              Sources:{" "}
-              {positions
-                .filter((p) => p.source)
-                .map((p, i) => (
-                  <span key={p.topic}>
-                    {i > 0 && " · "}
-                    {p.sourceUrl ? (
-                      <a
-                        href={safeHref(p.sourceUrl)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {p.source}
-                      </a>
-                    ) : (
-                      p.source
-                    )}
-                  </span>
-                ))}
-            </p>
-          </div>
-        )}
       </div>
     </section>
   );

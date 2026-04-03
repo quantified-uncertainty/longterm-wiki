@@ -4,6 +4,7 @@ import { getTypedEntities, type PersonEntity } from "@/data";
 import { ProfileStatCard } from "@/components/directory";
 import { PoliticiansTable, type PoliticianRow } from "./politicians-table";
 import { EA_TOPICS, extractStanceLabel } from "./politicians-constants";
+import { fetchPoliticalScores } from "@/components/political";
 
 export const metadata: Metadata = {
   title: "Politicians",
@@ -151,9 +152,32 @@ function buildStats(rows: PoliticianRow[]): StatDef[] {
 
 // ── Page ──────────────────────────────────────────────────────────────────
 
-export default function PoliticiansPage() {
+export default async function PoliticiansPage() {
   const rows = loadPoliticians();
-  const stats = buildStats(rows);
+
+  // Fetch political scores for all politicians in parallel.
+  // Each row gets its stableId looked up; scores come from wiki-server.
+  // Failures are handled gracefully by fetchPoliticalScores (returns []).
+  const scoresMap = new Map<string, Awaited<ReturnType<typeof fetchPoliticalScores>>>();
+  const scoreResults = await Promise.all(
+    rows.map(async (row) => {
+      const scores = await fetchPoliticalScores(row.id);
+      return { id: row.id, scores };
+    })
+  );
+  for (const { id, scores } of scoreResults) {
+    if (scores.length > 0) scoresMap.set(id, scores);
+  }
+
+  // Enrich rows with political scores
+  const enrichedRows: PoliticianRow[] = rows.map((row) => ({
+    ...row,
+    politicalScores: scoresMap.get(row.id) ?? [],
+    // totalRaised: campaign finance data will be added when the component is available
+    totalRaised: null,
+  }));
+
+  const stats = buildStats(enrichedRows);
 
   return (
     <div className="max-w-[90rem] mx-auto px-6 py-8">
@@ -163,7 +187,7 @@ export default function PoliticiansPage() {
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
           Political candidates and officeholders tracked for EA-relevant policy
-          positions. Covers {rows.length} politicians across AI safety,
+          positions. Covers {enrichedRows.length} politicians across AI safety,
           biosecurity, animal welfare, science funding, and nuclear energy.
         </p>
       </div>
@@ -176,7 +200,7 @@ export default function PoliticiansPage() {
       </div>
 
       <Suspense fallback={<div>Loading...</div>}>
-        <PoliticiansTable rows={rows} />
+        <PoliticiansTable rows={enrichedRows} />
       </Suspense>
     </div>
   );

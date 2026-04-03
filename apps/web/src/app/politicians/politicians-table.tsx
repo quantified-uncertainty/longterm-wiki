@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { PoliticianScoresCell } from "@/components/political/politician-scores-cell";
+import type { PoliticalScore } from "@/components/political/types";
 import {
   AI_STANCE_COLORS,
   PARTY_COLORS,
@@ -26,6 +28,10 @@ export interface PoliticianRow {
   /** Number of external source links */
   sourceCount: number;
   tags: string[];
+  /** Political scorecard ratings (pre-fetched server-side) */
+  politicalScores?: PoliticalScore[];
+  /** Total campaign finance raised (pre-fetched server-side) */
+  totalRaised?: number | null;
 }
 
 type SortKey = "title" | "office" | "party" | "jurisdiction" | "sourceCount";
@@ -36,6 +42,8 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortKey, setSortKey] = useState<SortKey>("title");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
+
+  const hasFinance = useMemo(() => rows.some((r) => r.totalRaised != null), [rows]);
 
   const parties = useMemo(() => {
     const map = new Map<string, number>();
@@ -172,6 +180,8 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                 </th>
               ))}
               <SortHeader label="Sources" sortKey="sourceCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <th className="py-2.5 px-3 text-left font-medium whitespace-nowrap">Scores</th>
+              {hasFinance && <th className="py-2.5 px-3 text-right font-medium whitespace-nowrap">Finance</th>}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -179,7 +189,7 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
               <tr key={row.id} className="hover:bg-muted/20 transition-colors">
                 {/* Name */}
                 <td className="py-2.5 px-3 max-w-xs">
-                  <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1.5">
                     <Link
                       href={`/people/${row.id}`}
                       className="font-medium hover:text-primary transition-colors line-clamp-1"
@@ -187,8 +197,8 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                       {row.title}
                     </Link>
                     {row.jurisdiction && (
-                      <span className="text-[10px] text-muted-foreground/60 leading-tight">
-                        {row.jurisdiction}
+                      <span className="text-[10px] text-muted-foreground/60 shrink-0">
+                        &middot; {row.jurisdiction}
                       </span>
                     )}
                   </div>
@@ -241,6 +251,28 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                 <td className="py-2.5 px-3 text-center">
                   <span className="text-xs text-muted-foreground">{row.sourceCount}</span>
                 </td>
+
+                {/* Political scores */}
+                <td className="py-2.5 px-3">
+                  <PoliticianScoresCell scores={row.politicalScores ?? []} />
+                </td>
+
+                {/* Campaign finance */}
+                {hasFinance && (
+                  <td className="py-2.5 px-3 text-right">
+                    {row.totalRaised != null ? (
+                      <span className="text-xs tabular-nums text-muted-foreground font-medium">
+                        ${row.totalRaised >= 1_000_000
+                          ? `${(row.totalRaised / 1_000_000).toFixed(1)}M`
+                          : row.totalRaised >= 1_000
+                            ? `${(row.totalRaised / 1_000).toFixed(0)}K`
+                            : row.totalRaised.toLocaleString()}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground/40">&mdash;</span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
