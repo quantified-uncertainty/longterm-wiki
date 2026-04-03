@@ -1,0 +1,50 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-03T11:20:00.554Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "q8jfopvL5x",
+      "personId": "nZpNfXAIrf",
+      "organizationId": "sid_dbDEGrJbUp",
+      "role": "Co-Founder, General Partner",
+      "source": "https://en.wikipedia.org/wiki/Michael_Eisenberg",
+      "verdict": "none"
+    },
+    {
+      "id": "HnJZWCR0lA",
+      "personId": "m9d7cdu8ap",
+      "organizationId": "sid_dbDEGrJbUp",
+      "role": "Co-Founder, General Partner",
+      "source": "https://en.wikipedia.org/wiki/Eden_Shochat",
+      "verdict": "none"
+    },
+    {
+      "id": "hg4Ol0ZXXY",
+      "personId": "6sPiftTYb1",
+      "organizationId": "sid_dbDEGrJbUp",
+      "role": "General Partner",
+      "source": "https://www.aleph.vc/about",
+      "verdict": "none"
+    },
+    {
+      "id": "tkqkcFVYeo",
+      "personId": "Ak7y7yKzt9",
+      "organizationId": "sid_dbDEGrJbUp",
+      "role": "General Partner",
+      "source": "https://www.aleph.vc/about",
+      "verdict": "none"
+    }
+  ]
+}

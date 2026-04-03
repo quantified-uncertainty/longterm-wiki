@@ -141,7 +141,7 @@ export function FBOverviewContent() {
 
       <div className="grid md:grid-cols-3 gap-6 mb-8">
         <Link
-          href="/wiki/E1020"
+          href="/factbase/facts"
           className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
           <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
@@ -153,7 +153,7 @@ export function FBOverviewContent() {
           </p>
         </Link>
         <Link
-          href="/wiki/E1021"
+          href="/factbase/properties"
           className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
           <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
@@ -165,7 +165,7 @@ export function FBOverviewContent() {
           </p>
         </Link>
         <Link
-          href="/wiki/E1022"
+          href="/factbase/entity-coverage"
           className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
           <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">

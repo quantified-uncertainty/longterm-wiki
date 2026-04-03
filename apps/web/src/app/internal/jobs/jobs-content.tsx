@@ -66,7 +66,7 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
 
 function emptyData(): DashboardData {
   return {
-    stats: { totalJobs: 0, byType: {} },
+    stats: { totalJobs: 0, byType: {}, hours: 48 },
     recentFailures: [],
   };
 }

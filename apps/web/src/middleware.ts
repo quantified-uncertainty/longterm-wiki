@@ -34,14 +34,14 @@ export function middleware(request: NextRequest) {
   const segments = path.split("/").filter(Boolean);
 
   // /browse → /wiki (legacy browse pages merged into wiki)
-  // /browse/resources → /sources (E874 deleted; resources consolidated to sources)
+  // /browse/resources → /resources (E874 deleted; standalone resources page)
   // /browse/tags → /wiki/tags, etc.
   if (segments[0] === "browse") {
     const url = request.nextUrl.clone();
     if (segments.length <= 1) {
       url.pathname = "/wiki";
     } else if (segments[segments.length - 1] === "resources") {
-      url.pathname = "/sources";
+      url.pathname = "/resources";
     } else {
       url.pathname = `/wiki/${segments[segments.length - 1]}`;
     }

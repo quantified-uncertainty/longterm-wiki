@@ -1,9 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { WikiSidebar, MobileSidebarTrigger } from "@/components/wiki/WikiSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { getKBDataNav } from "@/lib/wiki-nav";
 import {
   getKBEntities,
   getKBEntity,
@@ -87,11 +84,11 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     <div>
       {/* Breadcrumbs */}
       <nav className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-        <Link href="/wiki/E1019" className="text-primary hover:underline">
-          KB Data
+        <Link href="/factbase" className="text-primary hover:underline">
+          FactBase
         </Link>
         <span>/</span>
-        <Link href="/wiki/E1021" className="text-primary hover:underline">
+        <Link href="/factbase/properties" className="text-primary hover:underline">
           Properties
         </Link>
         <span>/</span>
@@ -318,15 +315,5 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     </div>
   );
 
-  return (
-    <SidebarProvider>
-      <WikiSidebar sections={getKBDataNav()} />
-      <div className="flex-1 min-w-0">
-        <div className="md:hidden px-4 pt-3">
-          <MobileSidebarTrigger />
-        </div>
-        <div className="max-w-[65rem] mx-auto px-8 py-4">{content}</div>
-      </div>
-    </SidebarProvider>
-  );
+  return content;
 }

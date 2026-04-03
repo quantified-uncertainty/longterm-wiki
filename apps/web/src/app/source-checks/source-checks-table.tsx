@@ -12,9 +12,10 @@ interface SourceChecksTableProps {
   verdicts: RpcSourceCheckVerdictRow[];
   names: Record<string, string>;
   hrefs: Record<string, string>;
+  claims: Record<string, string>;
 }
 
-export function SourceChecksTable({ verdicts, names, hrefs }: SourceChecksTableProps) {
+export function SourceChecksTable({ verdicts, names, hrefs, claims }: SourceChecksTableProps) {
   if (verdicts.length === 0) {
     return (
       <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground">
@@ -31,7 +32,7 @@ export function SourceChecksTable({ verdicts, names, hrefs }: SourceChecksTableP
           <tr className="border-b border-border bg-muted/50 text-left text-xs text-muted-foreground">
             <th className="py-2.5 pl-4 pr-3 font-medium">Type</th>
             <th className="py-2.5 pr-3 font-medium">Entity</th>
-            <th className="py-2.5 pr-3 font-medium">Record</th>
+            <th className="py-2.5 pr-3 font-medium">Claim</th>
             <th className="py-2.5 pr-3 font-medium">Verdict</th>
             <th className="py-2.5 pr-3 font-medium">Confidence</th>
             <th className="py-2.5 pr-3 font-medium">Sources</th>
@@ -95,36 +96,40 @@ export function SourceChecksTable({ verdicts, names, hrefs }: SourceChecksTableP
                   )}
                 </td>
 
-                {/* Record */}
+                {/* Claim */}
                 <td className="py-2.5 pr-3">
-                  {recordName ? (
-                    (() => {
-                      const display = recordName.length > 40 ? recordName.slice(0, 38) + "\u2026" : recordName;
-                      const href = recordHref || detailHref;
+                  {(() => {
+                    const claimKey = `${v.recordType}:${v.recordId}:${v.fieldName ?? ""}`;
+                    const claim = claims[claimKey];
+                    const href = detailHref;
+                    if (claim) {
+                      const display = claim.length > 50 ? claim.slice(0, 48) + "\u2026" : claim;
                       return (
                         <Link
                           href={href}
+                          className="text-xs font-medium text-foreground hover:underline"
+                          title={claim}
+                        >
+                          {display}
+                        </Link>
+                      );
+                    }
+                    // Fallback: show record name or truncated ID
+                    if (recordName) {
+                      const display = recordName.length > 50 ? recordName.slice(0, 48) + "\u2026" : recordName;
+                      return (
+                        <Link
+                          href={recordHref || href}
                           className={`text-xs font-medium hover:underline ${recordHref ? "text-blue-600 dark:text-blue-400" : "text-foreground"}`}
                           title={recordName}
                         >
                           {display}
                         </Link>
                       );
-                    })()
-                  ) : (
-                    recordHref ? (
+                    }
+                    return (
                       <Link
-                        href={recordHref}
-                        className="text-xs font-mono text-blue-600/70 hover:underline dark:text-blue-400/70"
-                        title={v.recordId}
-                      >
-                        {v.recordId.length > 20
-                          ? v.recordId.slice(0, 18) + "\u2026"
-                          : v.recordId}
-                      </Link>
-                    ) : (
-                      <Link
-                        href={detailHref}
+                        href={href}
                         className="text-xs font-mono text-muted-foreground hover:underline"
                         title={v.recordId}
                       >
@@ -132,8 +137,8 @@ export function SourceChecksTable({ verdicts, names, hrefs }: SourceChecksTableP
                           ? v.recordId.slice(0, 18) + "\u2026"
                           : v.recordId}
                       </Link>
-                    )
-                  )}
+                    );
+                  })()}
                 </td>
 
                 {/* Verdict */}

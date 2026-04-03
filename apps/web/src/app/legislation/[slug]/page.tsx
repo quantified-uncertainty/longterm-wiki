@@ -601,6 +601,8 @@ export default async function LegislationDetailPage({
       publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,
       authors: resolveResourceAuthors(r),
       summary: r.summary ?? null,
+      abstract: r.abstract ?? null,
+      keyPoints: r.key_points?.length ? r.key_points : null,
       fetchStatus: r.fetch_status ?? null,
       archiveUrl: r.archive_url ?? null,
       stance: r.stance ?? null,

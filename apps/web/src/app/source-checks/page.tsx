@@ -11,6 +11,7 @@ import type {
 } from "@/lib/wiki-server";
 import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
+import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import { SourceChecksTable } from "./source-checks-table";
 import { SourceChecksSearch } from "./source-checks-filter";
 import {
@@ -206,13 +207,46 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     }
   }
 
+  // Build claim summaries for each verdict
+  // Key: `${recordType}:${recordId}:${fieldName ?? ""}` (matches table row key)
+  const claims: Record<string, string> = {};
+  for (const v of verdicts) {
+    const key = `${v.recordType}:${v.recordId}:${v.fieldName ?? ""}`;
+    if (v.recordType === "fact") {
+      const fact = getKBFactById(v.recordId);
+      if (fact) {
+        const property = getKBProperty(fact.propertyId);
+        const propertyName = property?.name ?? fact.propertyId;
+        const formattedValue = formatKBFactValue(fact, property?.unit, property?.display);
+        claims[key] = `${propertyName} = ${formattedValue}`;
+      } else if (v.fieldName) {
+        claims[key] = v.fieldName;
+      }
+    } else if (v.fieldName) {
+      // For non-fact record types, show the field name as the claim
+      claims[key] = v.fieldName;
+    }
+  }
+
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
-  // Stats — use filteredStats for cards (reflects type filter)
-  const avgConfidence =
-    filteredStats.avg_confidence > 0
-      ? `${Math.round(filteredStats.avg_confidence * 100)}%`
-      : "N/A";
+  // Data quality breakdown from verdict counts
+  const bv = filteredStats.by_verdict ?? {};
+  const confirmedCount = bv.confirmed ?? 0;
+  const contradictedCount = bv.contradicted ?? 0;
+  const outdatedCount = bv.outdated ?? 0;
+  const partialCount = bv.partial ?? 0;
+  const unverifiableCount = bv.unverifiable ?? 0;
+  const uncheckedCount = bv.unchecked ?? 0;
+  const hasIssuesCount = contradictedCount + outdatedCount + partialCount;
+  const checkedCount = filteredStats.total - uncheckedCount;
+  const accuracyDenom = confirmedCount + contradictedCount + outdatedCount;
+  const accuracyRate =
+    accuracyDenom > 0
+      ? Math.round((confirmedCount / accuracyDenom) * 100)
+      : null;
+  const pctOfChecked = (n: number) =>
+    checkedCount > 0 ? `${Math.round((n / checkedCount) * 100)}%` : "—";
 
   // Type tabs always use global stats (so all types are visible)
   const globalTotal = globalStats.by_type
@@ -246,39 +280,138 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
         </Link>
       </div>
 
-      {/* Stats cards — reflect active type filter */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Total Verdicts</p>
-          <p className="text-2xl font-bold tabular-nums">
-            {filteredStats.total}
+      {/* Row 1 — Data Quality breakdown */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+        <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Verified Correct</p>
+          <p className="text-2xl font-bold tabular-nums text-emerald-600">
+            {confirmedCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {pctOfChecked(confirmedCount)} of checked
           </p>
         </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Avg Confidence</p>
-          <p className="text-2xl font-bold tabular-nums">{avgConfidence}</p>
-        </div>
-        <div className="rounded-lg border border-border/60 p-4">
-          <p className="text-xs text-muted-foreground mb-1">Contradicted</p>
+        <div
+          className={cn(
+            "rounded-lg border p-4",
+            hasIssuesCount > 0
+              ? "border-amber-500/30 bg-amber-500/5"
+              : "border-border/60"
+          )}
+        >
+          <p className="text-xs text-muted-foreground mb-1">Has Issues</p>
           <p
             className={cn(
               "text-2xl font-bold tabular-nums",
-              (filteredStats.by_verdict.contradicted ?? 0) > 0 &&
-                "text-red-600"
+              hasIssuesCount > 0 && "text-amber-600"
             )}
           >
-            {filteredStats.by_verdict.contradicted ?? 0}
+            {hasIssuesCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {pctOfChecked(hasIssuesCount)} of checked
           </p>
         </div>
         <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Can&apos;t Verify</p>
+          <p className="text-2xl font-bold tabular-nums text-muted-foreground">
+            {unverifiableCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {pctOfChecked(unverifiableCount)} of checked
+          </p>
+        </div>
+        <div className="rounded-lg border border-dashed border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Not Yet Checked</p>
+          <p className="text-2xl font-bold tabular-nums text-muted-foreground">
+            {uncheckedCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            of {filteredStats.total.toLocaleString()} total
+          </p>
+        </div>
+      </div>
+
+      {/* Row 2 — Action Items */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+        <div
+          className={cn(
+            "rounded-lg border p-4",
+            contradictedCount > 0
+              ? "border-red-500/30 bg-red-500/5"
+              : "border-border/60"
+          )}
+        >
+          <p className="text-xs text-muted-foreground mb-1">
+            Contradicted
+          </p>
+          <p
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              contradictedCount > 0 && "text-red-600"
+            )}
+          >
+            {contradictedCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {contradictedCount > 0 ? "Fix now — data may be wrong" : "None found"}
+          </p>
+        </div>
+        <div
+          className={cn(
+            "rounded-lg border p-4",
+            outdatedCount > 0
+              ? "border-amber-500/30 bg-amber-500/5"
+              : "border-border/60"
+          )}
+        >
           <p className="text-xs text-muted-foreground mb-1">Outdated</p>
           <p
             className={cn(
               "text-2xl font-bold tabular-nums",
-              (filteredStats.by_verdict.outdated ?? 0) > 0 && "text-amber-600"
+              outdatedCount > 0 && "text-amber-600"
             )}
           >
-            {filteredStats.by_verdict.outdated ?? 0}
+            {outdatedCount.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {outdatedCount > 0 ? "Source has newer info" : "All current"}
+          </p>
+        </div>
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Accuracy Rate</p>
+          <p
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              accuracyRate === null
+                ? ""
+                : accuracyRate >= 90
+                  ? "text-emerald-600"
+                  : accuracyRate >= 75
+                    ? "text-amber-600"
+                    : "text-red-600"
+            )}
+          >
+            {accuracyRate !== null ? `${accuracyRate}%` : "N/A"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            confirmed / (confirmed + wrong + outdated)
+          </p>
+        </div>
+        <div className="rounded-lg border border-border/60 p-4">
+          <p className="text-xs text-muted-foreground mb-1">Needs Recheck</p>
+          <p
+            className={cn(
+              "text-2xl font-bold tabular-nums",
+              (filteredStats.needs_recheck ?? 0) > 0 && "text-amber-600"
+            )}
+          >
+            {(filteredStats.needs_recheck ?? 0).toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {(filteredStats.needs_recheck ?? 0) > 0
+              ? "Flagged for re-verification"
+              : "All up to date"}
           </p>
         </div>
       </div>
@@ -371,7 +504,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table */}
-      <SourceChecksTable verdicts={verdicts} names={names} hrefs={hrefs} />
+      <SourceChecksTable verdicts={verdicts} names={names} hrefs={hrefs} claims={claims} />
 
       {/* Pagination */}
       {totalPages > 1 && (

@@ -1,0 +1,34 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-03T11:15:34.719Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "7nXTnSxvM4",
+      "personId": "E7LYMjT9LO",
+      "organizationId": "sid_gCnFEWPFqw",
+      "role": "Co-founder",
+      "source": "https://www.aisafetysupport.org/about",
+      "verdict": "none"
+    },
+    {
+      "id": "vr3PEsmDwU",
+      "personId": "3qCeTR11GN",
+      "organizationId": "sid_gCnFEWPFqw",
+      "role": "Co-founder",
+      "source": "https://www.aisafetysupport.org/about",
+      "verdict": "none"
+    }
+  ]
+}

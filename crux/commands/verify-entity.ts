@@ -23,6 +23,7 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
+import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getVerificationStats } from '../lib/wiki-server/verifications.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
 import type { VerificationVerdict } from '../../apps/wiki-server/src/api-types.ts';
@@ -250,10 +251,7 @@ Respond with ONLY a JSON object:
 // ── Storage ─────────────────────────────────────────────────────────
 
 async function storeEvidence(result: VerificationResult): Promise<void> {
-  await apiRequest<{ id: number; verdictFlagged: boolean }>(
-    'POST',
-    '/api/verifications/evidence',
-    {
+  await storeEvidenceApi({
       recordType: result.claim.recordType,
       recordId: result.claim.recordId,
       fieldName: result.claim.fieldName ?? null,
@@ -281,10 +279,7 @@ async function storeAggregateVerdict(
   confidence: number,
   reasoning: string,
 ): Promise<void> {
-  await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/verifications/verdicts',
-    {
+  await storeVerdictApi({
       recordType,
       recordId,
       entityId,
@@ -311,13 +306,7 @@ const c = {
 };
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await apiRequest<{
-    total: number;
-    by_verdict: Record<string, number>;
-    by_type: Record<string, number>;
-    needs_recheck: number;
-    avg_confidence: number;
-  }>('GET', '/api/verifications/stats');
+  const response = await getVerificationStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };

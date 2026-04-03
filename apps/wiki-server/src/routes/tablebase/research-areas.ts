@@ -251,8 +251,9 @@ const researchAreasApp = new Hono()
         .groupBy(researchAreaRisks.researchAreaId),
     ]);
 
-    const orgCountMap = new Map(orgCounts.map((r) => [r.researchAreaId, r.count]));
-    const paperCountMap = new Map(paperCounts.map((r) => [r.researchAreaId, r.count]));
+    // Direct count maps (only counts resources linked directly to each area)
+    const directOrgCountMap = new Map(orgCounts.map((r) => [r.researchAreaId, r.count]));
+    const directPaperCountMap = new Map(paperCounts.map((r) => [r.researchAreaId, r.count]));
     const grantStatsMap = new Map(
       grantStats.map((r) => [
         r.researchAreaId,
@@ -261,12 +262,26 @@ const researchAreasApp = new Hono()
     );
     const riskCountMap = new Map(riskCounts.map((r) => [r.researchAreaId, r.count]));
 
+    // Build effective counts that inherit from parent areas.
+    // The hierarchy is max 2 levels deep (parent → child), so a simple
+    // lookup suffices — no recursive CTE needed.
+    // For each area: effective count = own direct count + parent's direct count
+    const getEffectiveCount = (
+      directMap: Map<string, number>,
+      areaId: string,
+      parentAreaId: string | null
+    ): number => {
+      const own = directMap.get(areaId) ?? 0;
+      const inherited = parentAreaId ? (directMap.get(parentAreaId) ?? 0) : 0;
+      return own + inherited;
+    };
+
     const enriched = rows.map((r) => {
       const gs = grantStatsMap.get(r.id);
       return {
         ...formatRow(r),
-        orgCount: orgCountMap.get(r.id) ?? 0,
-        paperCount: paperCountMap.get(r.id) ?? 0,
+        orgCount: getEffectiveCount(directOrgCountMap, r.id, r.parentAreaId),
+        paperCount: getEffectiveCount(directPaperCountMap, r.id, r.parentAreaId),
         grantCount: gs?.grantCount ?? 0,
         totalFunding: gs?.totalFunding ?? "0",
         riskCount: riskCountMap.get(r.id) ?? 0,

@@ -123,7 +123,7 @@ const STAT_DEFS: StatDef[] = [
     icon: ExternalLink,
     iconColor: "text-orange-500",
     getValue: (ctx) => ctx.resourceCount,
-    href: "/sources",
+    href: "/resources",
   },
 ];
 
@@ -274,7 +274,7 @@ export default function Home() {
               <span className="text-xs text-muted-foreground/40 tabular-nums">{totalPages}</span>
             </Link>
             <Link
-              href="/sources"
+              href="/resources"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border/60 text-sm text-foreground hover:bg-muted/50 transition-colors no-underline bg-background/60"
             >
               <ExternalLink size={13} className="text-orange-500" />

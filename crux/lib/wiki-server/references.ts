@@ -29,6 +29,11 @@ export type PageCitationRow = InferResponseType<
   201
 >;
 
+export type CreateCitationsBatchResult = InferResponseType<
+  RpcClient['citations']['batch']['$post'],
+  200
+>;
+
 // ---------------------------------------------------------------------------
 // API functions
 // ---------------------------------------------------------------------------
@@ -63,8 +68,8 @@ export async function createCitation(
  */
 export async function createCitationsBatch(
   items: PageCitationInsert[],
-): Promise<ApiResult<{ inserted: number }>> {
-  return apiRequest<{ inserted: number }>(
+): Promise<ApiResult<CreateCitationsBatchResult>> {
+  return apiRequest<CreateCitationsBatchResult>(
     'POST',
     '/api/references/citations/batch',
     { items }

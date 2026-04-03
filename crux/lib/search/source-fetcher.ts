@@ -791,10 +791,10 @@ async function _fetchSourceCore(
     }
   }
 
-  // ---- 5b. Wayback fallback for 404/dead URLs ----
-  // If the standard fetch got a 404/410 and we didn't already try Wayback,
-  // attempt Wayback as a last resort (#3457 P2).
-  if ((httpStatus === 404 || httpStatus === 410 || (httpStatus === 0 && fetchError)) &&
+  // ---- 5b. Wayback fallback for dead/error URLs ----
+  // If the standard fetch got an HTTP error (>= 400) or a network failure,
+  // and we didn't already try Wayback, attempt Wayback as a last resort (#3457 P2).
+  if ((httpStatus >= 400 || (httpStatus === 0 && fetchError)) &&
       content.length === 0 && strategy !== 'wayback-only') {
     const waybackResult = await fetchWaybackContent(url);
     if (waybackResult && waybackResult.content.length > 0) {

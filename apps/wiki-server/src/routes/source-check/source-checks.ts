@@ -296,6 +296,9 @@ const sourceChecksApp = new Hono()
           ilike(sourceCheckVerdicts.recordType, pattern),
           ilike(sourceCheckVerdicts.entityId, pattern),
           ilike(sourceCheckVerdicts.reasoning, pattern),
+          ilike(sourceCheckVerdicts.displayName, pattern),
+          ilike(sourceCheckVerdicts.entityDisplayName, pattern),
+          ilike(sourceCheckVerdicts.fieldName, pattern),
         )!
       );
     }

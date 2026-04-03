@@ -23,7 +23,7 @@ import type { LoadedKB } from '../lib/factbase-loader.ts';
 import type { Fact, Entity as FBEntity } from '../../packages/factbase/src/types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient } from '../lib/llm.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { listVerdicts, getVerificationStats } from '../lib/wiki-server/verifications.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import {
   VALID_RECORD_TYPES,
@@ -187,6 +187,8 @@ interface OrchestrationSummary {
   outdated: number;
   partial: number;
   errors: number;
+  /** Number of items skipped because source URL is dead (subset of unverifiable) */
+  deadLinks: number;
   estimatedCost: number;
   actualVerified: number;
   byKind: Record<VerifyItemKind, { total: number; verified: number }>;
@@ -273,16 +275,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
   const map = new Map<string, VerifiedFactInfo>();
 
   try {
-    const response = await apiRequest<{
-      verdicts: Array<{
-        recordType: string;
-        recordId: string;
-        verdict: string;
-        lastComputedAt?: string;
-        needsRecheck?: boolean;
-      }>;
-      total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=500&offset=0');
+    const response = await listVerdicts({ recordType: 'fact', limit: 500, offset: 0 });
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -297,16 +290,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
       // Paginate if there are more verdicts
       let offset = response.data.verdicts.length;
       while (offset < response.data.total) {
-        const nextResponse = await apiRequest<{
-          verdicts: Array<{
-            recordType: string;
-            recordId: string;
-            verdict: string;
-            lastComputedAt?: string;
-            needsRecheck?: boolean;
-          }>;
-          total: number;
-        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=500&offset=${offset}`);
+        const nextResponse = await listVerdicts({ recordType: 'fact', limit: 500, offset });
 
         if (!nextResponse.ok || !nextResponse.data) break;
         for (const v of nextResponse.data.verdicts) {
@@ -340,16 +324,7 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
     let offset = 0;
 
     while (true) {
-      const response = await apiRequest<{
-        verdicts: Array<{
-          recordType: string;
-          recordId: string;
-          verdict: string;
-          lastComputedAt?: string;
-          needsRecheck?: boolean;
-        }>;
-        total: number;
-      }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+      const response = await listVerdicts({ limit: PAGE_SIZE, offset });
 
       if (!response.ok || !response.data) {
         throw new Error(`Failed to fetch record verdicts at offset ${offset}`);
@@ -1073,6 +1048,22 @@ async function verifySingleItem(
   } else if (sourceUrl) {
     const fetchResult = await fetchSourceContent(sourceUrl);
     if (!fetchResult.content) {
+      // Dead links get a proper verdict instead of an error — saves LLM cost
+      // and makes dead links distinguishable from other unverifiable causes.
+      if (fetchResult.errorType === 'dead_link') {
+        return {
+          itemId: item.id,
+          kind: item.kind,
+          description: item.description,
+          verdict: 'unverifiable' as SourceCheckVerdict,
+          confidence: 1.0,
+          extractedValue: '',
+          reasoning: `[dead_link] ${fetchResult.errorMessage ?? 'Source URL is dead'}`,
+          sourceUrl,
+          errorType: fetchResult.errorType,
+          checkerModel: 'dead-link-detector',
+        };
+      }
       return {
         itemId: item.id,
         kind: item.kind,
@@ -1147,6 +1138,7 @@ async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void
       extractedValue: result.extractedValue,
       reasoning: result.reasoning,
       isPrimarySource: true,
+      checkerModel: result.checkerModel,
     }, '[source-check]');
 
     // Store aggregate verdict for facts too — ensures the most recent
@@ -1319,6 +1311,7 @@ export async function orchestrateCommand(
     outdated: 0,
     partial: 0,
     errors: 0,
+    deadLinks: 0,
     estimatedCost: useBatch ? estimatedCost * 0.5 : estimatedCost,
     actualVerified: 0,
     byKind: {
@@ -1381,6 +1374,31 @@ export async function orchestrateCommand(
 
       const fetchResult = await fetchSourceContent(sourceUrl);
       if (!fetchResult.content) {
+        // Dead links get a proper verdict instead of an error — saves LLM cost
+        if (fetchResult.errorType === 'dead_link') {
+          const deadLinkResult: VerifyResult = {
+            itemId: item.id,
+            kind: item.kind,
+            description: item.description,
+            verdict: 'unverifiable' as SourceCheckVerdict,
+            confidence: 1.0,
+            extractedValue: '',
+            reasoning: `[dead_link] ${fetchResult.errorMessage ?? 'Source URL is dead'}`,
+            sourceUrl,
+            checkerModel: 'dead-link-detector',
+          };
+          summary.unverifiable++;
+          summary.deadLinks++;
+          summary.actualVerified++;
+          summary.byKind[item.kind].verified++;
+          summary.results.push(deadLinkResult);
+          console.log(`  ${progress} ${item.description.slice(0, 80)}`);
+          console.log(`    \x1b[33mdead_link: unverifiable\x1b[0m`);
+          await storeResult(item, deadLinkResult).catch((e: unknown) => {
+            console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+          });
+          return;
+        }
         summary.errors++;
         summary.failures.push({
           itemId: item.id, kind: item.kind, description: item.description,
@@ -1544,6 +1562,9 @@ export async function orchestrateCommand(
         console.log(`    \x1b[31mERROR${typeTag}: ${result.error}\x1b[0m`);
       } else {
         summary[result.verdict]++;
+        if (result.checkerModel === 'dead-link-detector') {
+          summary.deadLinks++;
+        }
         summary.actualVerified++;
         summary.byKind[item.kind].verified++;
         summary.results.push(result);
@@ -1699,10 +1720,18 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
   lines.push('');
   lines.push(`\x1b[32mConfirmed:      ${summary.confirmed}\x1b[0m`);
   lines.push(`\x1b[31mContradicted:   ${summary.contradicted}\x1b[0m`);
-  lines.push(`\x1b[33mUnverifiable:   ${summary.unverifiable}\x1b[0m`);
+  lines.push(`\x1b[33mUnverifiable:   ${summary.unverifiable}\x1b[0m${summary.deadLinks > 0 ? ` (${summary.deadLinks} dead links)` : ''}`);
   lines.push(`\x1b[33mOutdated:       ${summary.outdated}\x1b[0m`);
   lines.push(`\x1b[33mPartial:        ${summary.partial}\x1b[0m`);
   lines.push(`\x1b[31mErrors:         ${summary.errors}\x1b[0m`);
+  if (summary.deadLinks > 0) {
+    // Derive unit price from the (possibly batch-discounted) estimated cost
+    const unitCost = summary.total > 0
+      ? summary.estimatedCost / summary.total
+      : ESTIMATED_COST_PER_VERIFICATION;
+    const savedCost = summary.deadLinks * unitCost;
+    lines.push(`\x1b[32mLLM calls saved: ${summary.deadLinks} (dead links skipped, ~\$${savedCost.toFixed(2)} saved)\x1b[0m`);
+  }
   lines.push('');
 
   // By kind
@@ -1773,13 +1802,7 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
 // ── Stats command (merged from records-verify) ───────────────────────
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await apiRequest<{
-    total: number;
-    by_verdict: Record<string, number>;
-    by_type: Record<string, number>;
-    needs_recheck: number;
-    avg_confidence: number;
-  }>('GET', '/api/verifications/stats');
+  const response = await getVerificationStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };

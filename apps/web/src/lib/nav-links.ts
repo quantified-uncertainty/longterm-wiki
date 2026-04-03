@@ -44,14 +44,15 @@ export const NAV_ITEMS: NavItem[] = [
     ],
   },
   {
-    label: "Data",
+    label: "Sources",
     items: [
-      { href: "/sources", label: "Sources" },
-      { href: "/sources?tab=data-sources", label: "Data Sources" },
-      { href: "/factbase", label: "FactBase" },
+      { href: "/resources", label: "Resources" },
+      { href: "/publications", label: "Publications" },
       { href: "/source-checks", label: "Source Checks" },
+      { href: "/data-sources", label: "Data Sources" },
     ],
   },
+  { href: "/factbase", label: "FactBase" },
   { href: "/wiki/E755", label: "About" },
   { href: "/wiki/E779", label: "Internal" },
 ];

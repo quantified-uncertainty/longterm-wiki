@@ -6,8 +6,8 @@
  * - Storing aggregate verdicts via wiki-server API
  */
 
-import { apiRequest } from '../wiki-server/client.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
+import { storeEvidence as storeEvidenceRpc, storeVerdict as storeVerdictRpc } from '../wiki-server/verifications.ts';
 import { MODELS } from '../llm.ts';
 import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 
@@ -44,25 +44,26 @@ export async function storeSourceCheckEvidence(params: {
     }
   }
 
+  // Truncate fields to match server-side schema limits to avoid validation errors
+  const extractedValue = params.extractedValue?.slice(0, 2000) ?? null;
+  const notes = params.reasoning?.slice(0, 5000) ?? null;
+  const recordId = params.recordId?.slice(0, 500) ?? '';
+
   const body = {
     recordType: params.recordType,
-    recordId: params.recordId,
-    sourceUrl: params.sourceUrl,
+    recordId,
+    sourceUrl: params.sourceUrl || null,
     verdict: params.verdict,
     confidence: params.confidence,
-    extractedValue: params.extractedValue,
+    extractedValue,
     checkerModel: params.checkerModel ?? MODELS.haiku,
-    notes: params.reasoning,
+    notes,
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
     ...(params.entityId ? { entityId: params.entityId } : {}),
     resourceId: resolvedResourceId,
   };
 
-  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-    'POST',
-    '/api/verifications/evidence',
-    body,
-  );
+  const response = await storeEvidenceRpc(body);
 
   if (!response.ok) {
     console.warn(`${logPrefix} Failed to store evidence for ${params.recordType}/${params.recordId}: ${response.error}`);
@@ -101,11 +102,7 @@ export async function storeAggregateVerdict(params: {
     ...(params.entityDisplayName ? { entityDisplayName: params.entityDisplayName } : {}),
   };
 
-  const response = await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/verifications/verdicts',
-    body,
-  );
+  const response = await storeVerdictRpc(body);
 
   if (!response.ok) {
     console.warn(`${logPrefix} Failed to store verdict for ${params.recordType}/${params.recordId}: ${response.error}`);

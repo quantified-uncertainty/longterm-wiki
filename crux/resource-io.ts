@@ -17,6 +17,7 @@ import { loadPages as loadPagesJson, type PageEntry, DATA_DIR_ABS as DATA_DIR } 
 import { PUBLICATIONS_FILE } from './resource-types.ts';
 import type { Resource, Publication } from './resource-types.ts';
 import { apiRequest } from './lib/wiki-server/client.ts';
+import { upsertResourceBatch } from './lib/wiki-server/resources.ts';
 import { generateId } from '../packages/factbase/src/ids.ts';
 import { normalizeDate, normalizeTimestamp } from './lib/date-utils.ts';
 import { generateSnapshot } from './wiki-server/snapshot-resources.ts';
@@ -254,11 +255,7 @@ export async function saveResources(resources: Resource[]): Promise<void> {
 
   for (let i = 0; i < items.length; i += PG_BATCH_SIZE) {
     const batch = items.slice(i, i + PG_BATCH_SIZE);
-    const result = await apiRequest<{ upserted: number }>(
-      'POST',
-      '/api/resources/batch',
-      { items: batch },
-    );
+    const result = await upsertResourceBatch(batch);
     if (!result.ok) {
       throw new Error(`Failed to save resources (batch ${Math.floor(i / PG_BATCH_SIZE) + 1}): ${result.message}`);
     }
