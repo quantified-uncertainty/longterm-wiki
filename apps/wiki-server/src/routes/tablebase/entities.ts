@@ -938,7 +938,7 @@ const entitiesApp = new Hono()
             SET id = LOWER(REGEXP_REPLACE(
               REGEXP_REPLACE(TRANSLATE(title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
               '-+', '-', 'g'
-            )) || '-displaced'
+            )) || '-displaced-' || SUBSTRING(stable_id FROM 5 FOR 6)
             WHERE id = ${slug} AND stable_id != ${stableId}
           `);
         }

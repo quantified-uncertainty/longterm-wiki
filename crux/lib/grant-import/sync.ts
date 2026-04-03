@@ -1,7 +1,8 @@
 import { generateId } from "./id.ts";
 import { isSupportedCurrency } from "./currency.ts";
 import type { RawGrant, SyncGrant } from "./types.ts";
-import { apiRequest, getServerUrl } from "../wiki-server/client.ts";
+import { getServerUrl } from "../wiki-server/client.ts";
+import { syncGrants } from "../wiki-server/grants.ts";
 import { getManifest } from "./manifests/index.ts";
 
 export const SYNC_BATCH_SIZE = 500;
