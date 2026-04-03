@@ -94,7 +94,12 @@ function reconstructFactValue(row: typeof facts.$inferSelect) {
     case "min":
       return { type: "min" as const, value: row.numeric ?? 0 };
     case "json":
-      return { type: "json" as const, value: row.value ? JSON.parse(row.value) : null };
+      if (!row.value) return { type: "json" as const, value: null };
+      try {
+        return { type: "json" as const, value: JSON.parse(row.value) };
+      } catch {
+        return { type: "text" as const, value: row.value };
+      }
     default:
       // Guard: reject stale "[object Object]" artifacts from pre-March 2026 sync
       // (old data/facts/*.yaml had {min: N} objects that String() serialized as "[object Object]")

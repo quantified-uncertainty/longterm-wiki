@@ -1023,7 +1023,8 @@ const resourcesApp = new Hono()
       })
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
-      .where(eq(resourceCitations.pageId, intId));
+      .where(eq(resourceCitations.pageId, intId))
+      .limit(500);
 
     return c.json({ resources: rows });
   })
@@ -1248,21 +1249,21 @@ const resourcesApp = new Hono()
 
   .patch("/author-entity-ids", zv("json", AuthorEntityIdsSchema), async (c) => {
     const db = getDrizzleDb();
-    let updated = 0;
+    const items = c.req.valid("json").items;
+    if (items.length === 0) return c.json({ updated: 0 });
 
-    // Batch update in a single transaction
-    await db.transaction(async (tx) => {
-      for (const item of c.req.valid("json").items) {
-        const jsonText = JSON.stringify(item.authorEntityIds);
-        await tx
-          .update(resources)
-          .set({ authorEntityIds: sql`${jsonText}::jsonb` })
-          .where(eq(resources.id, item.resourceId));
-        updated++;
-      }
-    });
+    // Bulk UPDATE using unnest arrays — single query instead of N+1
+    const ids = items.map((item) => item.resourceId);
+    const jsonValues = items.map((item) => JSON.stringify(item.authorEntityIds));
 
-    return c.json({ updated });
+    await db.execute(sql`
+      UPDATE resources AS r
+      SET author_entity_ids = v.ids::jsonb
+      FROM unnest(${ids}::text[], ${jsonValues}::text[]) AS v(rid, ids)
+      WHERE r.id = v.rid
+    `);
+
+    return c.json({ updated: items.length });
   })
 
   // ---- GET /:id/details (resource + sub-table data) ----
