@@ -14,6 +14,7 @@ import {
   escapeIlike,
   dbError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   SyncEntitySchema as SharedSyncEntitySchema,
@@ -105,7 +106,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: clampedLimit(100, 20),
 });
 
 // ---- Organizations query schema ----
@@ -113,7 +114,7 @@ const SearchQuery = z.object({
 const ORG_SORT_ALLOWED = ["name", "revenue", "valuation", "headcount", "totalFunding", "founded"] as const;
 
 const OrganizationsQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
   q: z.string().max(200).optional(),
   sort: z.string().max(50).optional(),

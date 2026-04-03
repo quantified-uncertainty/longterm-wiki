@@ -11,6 +11,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 
@@ -34,7 +35,7 @@ const VALID_SCORE_TYPES = [
 // ---- Query schemas ----
 
 const ListQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   politicianEntityId: z.string().max(200).optional(),
   scorerOrg: z.string().max(100).optional(),

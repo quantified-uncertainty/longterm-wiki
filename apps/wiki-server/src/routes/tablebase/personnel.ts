@@ -17,6 +17,7 @@ import {
   invalidJsonError,
   zv,
   noDuplicateIds,
+  clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
@@ -40,18 +41,18 @@ import { isSid } from "@longterm-wiki/id-utils";
 
 const ByEntityQuery = z.object({
   role_type: z.enum(VALID_ROLE_TYPES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const ByPersonQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const AllQuery = z.object({
   role_type: z.enum(VALID_ROLE_TYPES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
 });
 

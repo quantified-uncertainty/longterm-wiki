@@ -9,6 +9,7 @@ import {
   dbError,
   paginationQuery,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import {
@@ -53,7 +54,7 @@ export const SyncBatchSchema = SyncPagesBatchSchema;
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: clampedLimit(100, 20),
 });
 
 const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({

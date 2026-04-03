@@ -11,6 +11,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 
@@ -21,7 +22,7 @@ const MAX_PAGE_SIZE = 500;
 // ---- Query schemas ----
 
 const ListQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   cycle: z.coerce.number().int().optional(),
   state: z.string().max(5).optional(),
