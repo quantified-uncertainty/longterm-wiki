@@ -1024,7 +1024,7 @@ const resourcesApp = new Hono()
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
       .where(eq(resourceCitations.pageId, intId))
-      .orderBy(resourceCitations.id)
+      .orderBy(resourceCitations.createdAt)
       .limit(500);
 
     return c.json({ resources: rows });
@@ -1268,7 +1268,8 @@ const resourcesApp = new Hono()
       SELECT count(*)::int AS cnt FROM updated
     `);
 
-    const updated = (result.rows?.[0] as { cnt?: number })?.cnt ?? items.length;
+    const row = result[0] as { cnt?: number } | undefined;
+    const updated = row?.cnt ?? items.length;
     return c.json({ updated });
   })
 
