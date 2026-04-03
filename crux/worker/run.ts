@@ -382,8 +382,12 @@ async function runSmokeTest(workerId: string): Promise<void> {
   // C2: Verify we claimed the correct job (queue interference detection)
   if (claimedId !== jobId) {
     console.error(`[worker] Smoke test FAILED: queue interference — expected job #${jobId}, got #${claimedId}`);
-    await failJob(claimedId, 'Accidentally claimed by smoke test').catch(() => {});
-    await cancelJob(jobId).catch(() => {});
+    await failJob(claimedId, 'Accidentally claimed by smoke test').catch((e) =>
+      console.error(`[worker] Smoke test cleanup: failed to fail job #${claimedId}: ${e instanceof Error ? e.message : String(e)}`),
+    );
+    await cancelJob(jobId).catch((e) =>
+      console.error(`[worker] Smoke test cleanup: failed to cancel job #${jobId}: ${e instanceof Error ? e.message : String(e)}`),
+    );
     process.exit(1);
   }
 
@@ -398,7 +402,9 @@ async function runSmokeTest(workerId: string): Promise<void> {
   const handler = getHandler('ping');
   if (!handler) {
     console.error('[worker] Smoke test FAILED: ping handler not registered');
-    await failJob(claimedId, 'ping handler not registered').catch(() => {});
+    await failJob(claimedId, 'ping handler not registered').catch((e) =>
+      console.error(`[worker] Smoke test cleanup: failed to fail job #${claimedId}: ${e instanceof Error ? e.message : String(e)}`),
+    );
     process.exit(1);
   }
 
@@ -411,13 +417,17 @@ async function runSmokeTest(workerId: string): Promise<void> {
   } catch (err: unknown) {
     const error = err instanceof Error ? err.message : String(err);
     console.error(`[worker] Smoke test FAILED: handler threw: ${error}`);
-    await failJob(claimedId, `Smoke test handler exception: ${error}`).catch(() => {});
+    await failJob(claimedId, `Smoke test handler exception: ${error}`).catch((e) =>
+      console.error(`[worker] Smoke test cleanup: failed to fail job #${claimedId}: ${e instanceof Error ? e.message : String(e)}`),
+    );
     process.exit(1);
   }
 
   if (!handlerResult.success) {
     console.error(`[worker] Smoke test FAILED: handler error: ${handlerResult.error}`);
-    await failJob(claimedId, handlerResult.error ?? 'Handler returned failure').catch(() => {});
+    await failJob(claimedId, handlerResult.error ?? 'Handler returned failure').catch((e) =>
+      console.error(`[worker] Smoke test cleanup: failed to fail job #${claimedId}: ${e instanceof Error ? e.message : String(e)}`),
+    );
     process.exit(1);
   }
 

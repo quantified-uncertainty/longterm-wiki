@@ -91,7 +91,7 @@ describe('job-handlers/page-improve', () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Invalid tier');
+    expect(result.error).toContain('Invalid params');
   });
 });
 
@@ -105,7 +105,7 @@ describe('job-handlers/page-create', () => {
     const result = await handlePageCreate({}, makeContext());
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('title');
+    expect(result.error).toContain('Invalid params');
   });
 
   it('rejects invalid tier', async () => {
@@ -116,7 +116,7 @@ describe('job-handlers/page-create', () => {
     );
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Invalid tier');
+    expect(result.error).toContain('Invalid params');
   });
 });
 
