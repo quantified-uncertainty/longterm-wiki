@@ -25,23 +25,53 @@ Before measuring the whole codebase, use recent PRs as a **scoping lens**. This 
 ```bash
 # Parse lookback from arguments (default: 60 hours)
 # Accepts: "60h", "3d", "7d", "14d" — or empty for default
+LOOKBACK="${ARGUMENTS:-60h}"
+
+# Compute ISO8601 cutoff timestamp (macOS/Linux compatible)
+if [[ "$LOOKBACK" =~ ^([0-9]+)([hd])$ ]]; then
+  N="${BASH_REMATCH[1]}"
+  UNIT="${BASH_REMATCH[2]}"
+  [[ "$UNIT" == "h" ]] && UNIT_STR="hours" || UNIT_STR="days"
+  SINCE_ISO="$(date -u -v-${N}${UNIT} +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || \
+               date -u -d "${N} ${UNIT_STR} ago" +%Y-%m-%dT%H:%M:%SZ)"
+else
+  SINCE_ISO="$(date -u -v-60H +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || \
+               date -u -d '60 hours ago' +%Y-%m-%dT%H:%M:%SZ)"
+fi
+echo "Lookback: $LOOKBACK — cutoff: $SINCE_ISO"
 
 # List merged PRs in the lookback window (exclude release/bot PRs)
-gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
-  --json number,title,mergedAt,additions,deletions,author \
-  --jq '[.[] | select(.author.is_bot == false)] | sort_by(.mergedAt) | reverse | .[] | "\(.number)\t+\(.additions)/-\(.deletions)\t\(.title)"'
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 200 \
+  --search "merged:>=${SINCE_ISO}" \
+  --json number,title,mergedAt,additions,deletions,author,headRefName \
+  --jq '[.[] | select(.author.is_bot == false)
+             | select(.title | test("(?i)release") | not)
+             | select(.headRefName | test("(?i)^(release|production)") | not)]
+        | sort_by(.mergedAt) | reverse
+        | .[] | "\(.number)\t+\(.additions)/-\(.deletions)\t\(.title)"'
 
 # Collect all files changed across those PRs
-gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
-  --json number,mergedAt,author,files \
-  --jq '[.[] | select(.author.is_bot == false)] | [.[].files[].path] | unique | sort | .[]' \
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 200 \
+  --search "merged:>=${SINCE_ISO}" \
+  --json number,title,mergedAt,author,files,headRefName \
+  --jq '[.[] | select(.author.is_bot == false)
+             | select(.title | test("(?i)release") | not)
+             | select(.headRefName | test("(?i)^(release|production)") | not)]
+        | [.[].files[].path] | unique | sort | .[]' \
   > /tmp/audit-changed-files.txt
 wc -l < /tmp/audit-changed-files.txt
 echo "---"
 # Show file change frequency (most-touched files = highest cleanup ROI)
-gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
-  --json number,mergedAt,author,files \
-  --jq '[.[] | select(.author.is_bot == false)] | [.[].files[].path] | group_by(.) | map({file: .[0], count: length}) | sort_by(.count) | reverse | .[:20] | .[] | "\(.count)\t\(.file)"'
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 200 \
+  --search "merged:>=${SINCE_ISO}" \
+  --json number,title,mergedAt,author,files,headRefName \
+  --jq '[.[] | select(.author.is_bot == false)
+             | select(.title | test("(?i)release") | not)
+             | select(.headRefName | test("(?i)^(release|production)") | not)]
+        | [.[].files[].path] | group_by(.)
+        | map({file: .[0], count: length})
+        | sort_by(.count) | reverse | .[:20]
+        | .[] | "\(.count)\t\(.file)"'
 ```
 
 Read the output. This gives you:
