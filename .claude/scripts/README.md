@@ -8,6 +8,7 @@ macOS launchd jobs that run Claude Code via subscription. These poll on a schedu
 |-----|----------|-------------|-------------------|
 | **Auto-Update** | Daily at 9:00 AM | `lw/a10` | Always runs |
 | **Maintenance Sweep** | Every 4 hours | `lw/a11` | Only if >= 6 PRs merged since last run |
+| **Job Worker** | Every hour | `lw/a12` | Always runs (processes queued jobs) |
 
 ### Auto-Update (`com.longtermwiki.auto-update`)
 
@@ -27,11 +28,20 @@ Runs `/maintain` to review PRs, triage issues, fix TS errors, and clean up cruft
 - **Logs:** `~/.claude/maintenance-logs/`
 - **Env vars:** `FORCE=1` to skip PR count check, `DRY_RUN=1` to preview
 
+### Job Worker (`com.longtermwiki.job-worker`)
+
+Runs the Node.js job worker in one-shot mode hourly. Claims pending jobs from the wiki-server queue (page-improve, page-create, batch-commit, auto-update-digest, etc.), processes them, and reports results. The groundskeeper's `auto-update-enqueue` task creates daily `auto-update-digest` jobs at 6am UTC, which this worker picks up.
+
+- **Script:** `job-worker-cron.sh`
+- **Plist:** `com.longtermwiki.job-worker.plist`
+- **Logs:** `~/.claude/job-worker-logs/`
+- **Env vars:** `DRY_RUN=1` to preview, `MAX_JOBS=5` to limit per invocation
+
 ## Setup (all jobs)
 
 ```bash
 # 1. Create log directories
-mkdir -p ~/.claude/auto-update-logs ~/.claude/maintenance-logs
+mkdir -p ~/.claude/auto-update-logs ~/.claude/maintenance-logs ~/.claude/job-worker-logs
 
 # 2. Copy plists to LaunchAgents
 cp .claude/scripts/com.longtermwiki.*.plist ~/Library/LaunchAgents/
@@ -39,6 +49,7 @@ cp .claude/scripts/com.longtermwiki.*.plist ~/Library/LaunchAgents/
 # 3. Load all jobs
 launchctl load ~/Library/LaunchAgents/com.longtermwiki.auto-update.plist
 launchctl load ~/Library/LaunchAgents/com.longtermwiki.maintenance.plist
+launchctl load ~/Library/LaunchAgents/com.longtermwiki.job-worker.plist
 
 # 4. Verify
 launchctl list | grep longtermwiki
