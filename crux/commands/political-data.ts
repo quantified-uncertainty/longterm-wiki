@@ -33,11 +33,7 @@ import {
   getAllScores, getScoresByEntity,
   getAllOffices, getOfficesByEntity,
   getAllVotes, getVotesByEntity, getVotesByLegislation,
-  getAllFinance, getFinanceByEntity, getFinanceStats as getFinanceStatsTyped,
-  type ScoreAllResult, type ScoreByEntityResult,
-  type OfficeAllResult, type OfficeByEntityResult,
-  type VoteAllResult, type VoteByEntityResult, type VoteByLegislationResult,
-  type FinanceAllResult, type FinanceByEntityResult, type FinanceStatsResult,
+  getAllFinance, getFinanceByEntity,
 } from "../lib/wiki-server/political.ts";
 import {
   getSource,

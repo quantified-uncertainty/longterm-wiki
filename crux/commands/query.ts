@@ -35,10 +35,10 @@ import {
   getCitationQuotes,
 } from '../lib/wiki-server/pages.ts';
 import { getSessionPageChanges } from '../lib/wiki-server/sessions.ts';
-import { getAllEditLogs, type GetAllEntriesResult } from '../lib/wiki-server/edit-logs.ts';
-import { getCitationBrokenQuotes, type CitationBrokenQuotesResult } from '../lib/wiki-server/citations.ts';
-import { getRiskHistory, getRiskLatest, type RiskHistoryResult } from '../lib/wiki-server/risk.ts';
-import { getHealth, type HealthResult } from '../lib/wiki-server/health.ts';
+import { getAllEditLogs } from '../lib/wiki-server/edit-logs.ts';
+import { getCitationBrokenQuotes } from '../lib/wiki-server/citations.ts';
+import { getRiskHistory, getRiskLatest } from '../lib/wiki-server/risk.ts';
+import { getHealth } from '../lib/wiki-server/health.ts';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
