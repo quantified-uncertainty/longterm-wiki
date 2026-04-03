@@ -67,7 +67,14 @@ function normalizeUrlKey(url: string): string {
 function ensureLoaded(): void {
   if (cachedResources) return;
 
-  cachedResources = loadResources();
+  try {
+    cachedResources = loadResources();
+  } catch {
+    // Snapshot file may not exist (e.g., in GHA job workers that use PG
+    // directly). Set empty cache so callers get null lookups instead of a
+    // hard crash. Callers that need resources should call initFromPG() first.
+    cachedResources = [];
+  }
   buildIndexes(cachedResources);
 }
 

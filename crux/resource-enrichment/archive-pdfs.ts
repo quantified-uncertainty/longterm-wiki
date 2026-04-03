@@ -103,7 +103,7 @@ async function downloadPdf(url: string): Promise<{ buffer: ArrayBuffer; size: nu
 
     if (!response.ok) {
       // Try Wayback Machine fallback for dead sites
-      const waybackUrl = `https://web.archive.org/web/2024/${url}`;
+      const waybackUrl = `https://web.archive.org/web/${new Date().getFullYear()}/${url}`;
       const wbResponse = await fetch(waybackUrl, {
         redirect: 'follow',
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
