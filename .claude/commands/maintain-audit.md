@@ -5,11 +5,53 @@ effort: medium
 
 # Codebase Audit
 
-Strategic review of codebase health, complexity trends, and simplification opportunities. Produces a written report with concrete recommendations.
+Strategic review of codebase health, complexity trends, and simplification opportunities. Scopes analysis to recently-merged PRs so findings target code with active churn — where cleanup has the highest ROI. Produces a written report with concrete recommendations.
+
+**Usage:**
+- `/maintain-audit` — default 60-hour lookback
+- `/maintain-audit 7d` — 7-day lookback
+- `/maintain-audit 14d` — 14-day lookback
 
 **Recommended cadence:** Biweekly, or after a burst of infrastructure PRs.
 
-**Relationship to `/maintain`:** `/maintain` handles day-to-day cleanup (close issues, fix cruft, propagate learnings). `/maintain-audit` is the strategic counterpart — it asks whether systems are earning their complexity and whether the overall trajectory is healthy.
+**Relationship to `/maintain`:** `/maintain` handles day-to-day cleanup (close issues, fix cruft, propagate learnings). `/maintain-audit` is the strategic counterpart — it asks whether systems are earning their complexity and whether the overall trajectory is healthy. It uses recent PRs as the scoping lens to find fix chains, incomplete migrations, and duplication introduced by recent work.
+
+## Phase 0: Scope from Recent PRs
+
+Before measuring the whole codebase, use recent PRs as a **scoping lens**. This focuses the audit on areas with active churn — where cleanup has the highest ROI.
+
+**Default lookback:** 60 hours. Adjust with `$ARGUMENTS` (e.g., `/maintain-audit 7d`, `/maintain-audit 14d`).
+
+```bash
+# Parse lookback from arguments (default: 60 hours)
+# Accepts: "60h", "3d", "7d", "14d" — or empty for default
+
+# List merged PRs in the lookback window (exclude release/bot PRs)
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
+  --json number,title,mergedAt,additions,deletions,author \
+  --jq '[.[] | select(.author.is_bot == false)] | sort_by(.mergedAt) | reverse | .[] | "\(.number)\t+\(.additions)/-\(.deletions)\t\(.title)"'
+
+# Collect all files changed across those PRs
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
+  --json number,mergedAt,author,files \
+  --jq '[.[] | select(.author.is_bot == false)] | [.[].files[].path] | unique | sort | .[]' \
+  > /tmp/audit-changed-files.txt
+wc -l < /tmp/audit-changed-files.txt
+echo "---"
+# Show file change frequency (most-touched files = highest cleanup ROI)
+gh pr list -R quantified-uncertainty/longterm-wiki --state merged --limit 80 \
+  --json number,mergedAt,author,files \
+  --jq '[.[] | select(.author.is_bot == false)] | [.[].files[].path] | group_by(.) | map({file: .[0], count: length}) | sort_by(.count) | reverse | .[:20] | .[] | "\(.count)\t\(.file)"'
+```
+
+Read the output. This gives you:
+1. **PR list**: What was shipped and how big each PR was
+2. **Changed file list**: The full set of files touched — this scopes Phase 2 analysis
+3. **Hot files**: Files touched by multiple PRs — prime candidates for duplication, complexity, or incomplete refactoring
+
+**Identify fix chains**: Look for patterns where a feature PR was followed by 1+ fix PRs touching the same files. These indicate the original PR shipped incomplete and the affected code likely needs further cleanup.
+
+Save the changed files list — you will use it in Phase 2 to focus your analysis on recently-touched code rather than auditing the entire codebase.
 
 ## Phase 1: Measure
 
@@ -47,9 +89,11 @@ Read the output of each command. Note the numbers — you will reference them in
 
 With the numbers in hand, investigate these questions. Use Grep, Glob, and Read tools to gather evidence. Do NOT guess — find the actual code.
 
+**Use the Phase 0 file list to focus your analysis.** For each section below, prioritize files that appear in `/tmp/audit-changed-files.txt`. Files not touched by recent PRs can be noted but should not dominate the report — the goal is to find cleanup opportunities in recently-shipped code.
+
 ### 2a. Complexity hotspots
 
-Identify the 5 largest directories/files by line count. For each, ask:
+Identify the 5 largest recently-changed files by line count (cross-reference with Phase 0 hot files). For each, ask:
 - Is this size justified by what it does?
 - Could it be split, simplified, or partially removed?
 - How often is it modified? (Use `git log --oneline --since="30 days ago" -- <path> | wc -l`)
@@ -64,14 +108,30 @@ For each major infrastructure system (groundskeeper, active-agents, agent-checkl
 
 Flag any system where test code exceeds production code by more than 2:1 — this often indicates over-engineering.
 
-### 2c. Overlap and duplication
+### 2c. PR-driven duplication and incomplete refactoring
+
+Using the Phase 0 PR list, look specifically for:
+
+**Fix chains**: Where a feature PR was followed by 1+ fix PRs. Read the fix PRs to understand what broke — the underlying code likely needs further cleanup beyond the point fix. Common patterns:
+- Import breakage after a migration PR (incomplete migration)
+- Type errors from hand-written types drifting from actual shapes
+- Build failures from stale references after a rename/restructure
+
+**Duplication introduced by recent PRs**: Read the hot files from Phase 0. Check for:
+- Near-identical functions or type definitions added in different PRs (e.g., the same hash function in 4 files, the same interface defined in frontend and CLI)
+- Copy-pasted patterns that should be a shared utility
+- Hand-written types that duplicate what Hono RPC inference would provide
+
+**Incomplete migrations**: When a PR partially migrates a pattern (e.g., moves 36 of 100 calls from old API to new), check the current state — how many remain? Is the old pattern still growing? Should the gate check be made blocking?
+
+### 2d. Overlap and duplication
 
 Look for systems that partially overlap:
 - Multiple solutions to the same problem (e.g., two ways to track agent status)
 - Features that could be consolidated into one
 - Defensive checks that duplicate what another check already catches
 
-### 2d. Documentation staleness
+### 2e. Documentation staleness
 
 Quickly scan these files for accuracy:
 - `CLAUDE.md` — do the commands still work? Are the conventions current?
@@ -81,7 +141,7 @@ Quickly scan these files for accuracy:
 
 Don't fix documentation here — just note what's stale for the report.
 
-### 2e. Dead code signals
+### 2f. Dead code signals
 
 Look for:
 - Exported functions/types with zero importers (knip output, or manual grep)
@@ -97,6 +157,7 @@ Produce a structured report. Be specific and evidence-based — include line cou
 
 ```
 ## Codebase Audit — [DATE]
+### Lookback: [N] hours | PRs reviewed: [N] | Files changed: [N]
 
 ### Key Metrics
 - Total lines (TS/TSX/MJS): X
@@ -105,8 +166,18 @@ Produce a structured report. Be specific and evidence-based — include line cou
 - Internal dashboards: X
 - Health snapshot score: [paste key metrics]
 
+### Recent PR Summary
+- PRs in window: X (features: Y, fixes: Z, refactors: W)
+- Fix chains: [list each: Feature PR → Fix 1 → Fix 2]
+- Hot files (touched by 3+ PRs): [list]
+- Largest PRs: [top 3 by additions]
+
+### PR-Driven Cleanup Opportunities
+[Findings from Phase 2c — duplication, incomplete migrations, fix chain root causes]
+[For each: specific files, what to consolidate, estimated effort]
+
 ### Top Complexity Hotspots
-[Top 5 largest directories/files with size, churn, and assessment]
+[Top 5 largest recently-changed files with size, churn, and assessment]
 
 ### Systems Review
 [For each major system: size, usage, churn, verdict (keep/simplify/remove)]
