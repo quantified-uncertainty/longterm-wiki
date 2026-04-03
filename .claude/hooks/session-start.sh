@@ -143,14 +143,33 @@ if [ -n "$ISSUE_NUM" ]; then
   CONTEXT_LINES+=("→ Remember to run: pnpm crux gh issues start ${ISSUE_NUM}")
 fi
 
-# ─── 5b. Tmux window naming from agent slot ───────────────────────────────────
+# ─── 5b. Self-heal .agent-slot + Tmux window naming ──────────────────────────
+# .agent-slot gets deleted by git operations on stale branches that still track it.
+# See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3779
+# Self-heal: derive slot number from directory name (a7 → 7) and recreate if missing/wrong.
 AGENT_SLOT_FILE="$REPO_ROOT/.agent-slot"
-if [ -f "$AGENT_SLOT_FILE" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
-  SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null || true)
-  if [ -n "$SLOT" ]; then
-    tmux rename-window "A${SLOT}:${BRANCH}" 2>/dev/null || true
-    CONTEXT_LINES+=("Tmux: window renamed to A${SLOT}:${BRANCH}")
+DIR_NAME=$(basename "$REPO_ROOT")
+SLOT_FROM_DIR=""
+if [[ "$DIR_NAME" =~ ^a([0-9]+)$ ]]; then
+  SLOT_FROM_DIR="${BASH_REMATCH[1]}"
+fi
+
+if [ -n "$SLOT_FROM_DIR" ]; then
+  CURRENT_SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
+  if [ "$CURRENT_SLOT" != "$SLOT_FROM_DIR" ]; then
+    echo "$SLOT_FROM_DIR" > "$AGENT_SLOT_FILE"
+    if [ -z "$CURRENT_SLOT" ]; then
+      WARNINGS+=(".agent-slot was missing — recreated with value ${SLOT_FROM_DIR} (self-healed from dir name)")
+    else
+      WARNINGS+=(".agent-slot had wrong value '${CURRENT_SLOT}' — fixed to ${SLOT_FROM_DIR} (self-healed from dir name)")
+    fi
   fi
+fi
+
+SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
+if [ -n "$SLOT" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+  tmux rename-window "A${SLOT}:${BRANCH}" 2>/dev/null || true
+  CONTEXT_LINES+=("Tmux: window renamed to A${SLOT}:${BRANCH}")
 fi
 
 # ─── 6. Active agent registration/heartbeat ──────────────────────────────────────
