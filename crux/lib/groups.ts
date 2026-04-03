@@ -64,6 +64,7 @@ export const GROUPS: Record<string, GroupDef> = {
     domains: [
       'factbase',
       'wikidata-enrich',
+      'import-990',
     ],
     flattened: ['factbase'],
   },
