@@ -48,7 +48,8 @@ export type SourceFetchErrorType =
   | 'not_found'
   | 'fetch_error'
   | 'unverifiable_domain'
-  | 'not_cached';
+  | 'not_cached'
+  | 'dead_link';
 
 // ---------------------------------------------------------------------------
 // Detection functions

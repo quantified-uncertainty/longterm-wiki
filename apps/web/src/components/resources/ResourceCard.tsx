@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Lock, ExternalLink, Archive } from "lucide-react";
+import { AlertTriangle, Lock, ExternalLink, Archive, ChevronDown, ChevronUp } from "lucide-react";
 import { safeHref } from "@/lib/format-compact";
 import type { OrgResourceRow } from "@/app/organizations/[slug]/org-data";
 import { RESOURCE_TYPE_LABELS, RESOURCE_TYPE_COLORS, STANCE_COLORS, CREDIBILITY_COLORS } from "./resource-constants";
@@ -10,12 +11,14 @@ import { ResourcePreview } from "./ResourcePreview";
 import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 
 export function ResourceCard({ resource: r }: { resource: OrgResourceRow }) {
+  const [expanded, setExpanded] = useState(false);
   const typeLabel = RESOURCE_TYPE_LABELS[r.type] ?? r.type;
   const typeColor = RESOURCE_TYPE_COLORS[r.type] ?? RESOURCE_TYPE_COLORS._default;
   const isDead = isDeadFetchStatus(r.fetchStatus);
   const isPaywall = r.fetchStatus === "paywall";
   const archiveHref = isDead && r.archiveUrl ? safeHref(r.archiveUrl) : null;
   const source = r.publicationName || r.domain;
+  const hasExpandableContent = (r.keyPoints && r.keyPoints.length > 0) || (r.abstract && r.abstract !== r.summary);
 
   return (
     <div className="group py-3 border-b border-border/40 last:border-0">
@@ -91,6 +94,58 @@ export function ResourceCard({ resource: r }: { resource: OrgResourceRow }) {
             <p className="text-xs text-muted-foreground/55 mt-1 line-clamp-2 leading-relaxed">
               {r.summary}
             </p>
+          )}
+
+          {/* Expandable: abstract + key points */}
+          {hasExpandableContent && (
+            <div className="mt-1">
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="inline-flex items-center gap-0.5 text-[11px] text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                {expanded ? (
+                  <ChevronUp className="h-3 w-3" />
+                ) : (
+                  <ChevronDown className="h-3 w-3" />
+                )}
+                {expanded ? "Less" : "More details"}
+              </button>
+              {expanded && (
+                <div className="mt-1.5 space-y-1.5">
+                  {/* Abstract (only if different from summary) */}
+                  {r.abstract && r.abstract !== r.summary && (
+                    <div>
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/40">
+                        Abstract
+                      </span>
+                      <p className="text-xs text-muted-foreground/70 leading-relaxed mt-0.5">
+                        {r.abstract}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Key points */}
+                  {r.keyPoints && r.keyPoints.length > 0 && (
+                    <div>
+                      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground/40">
+                        Key Points
+                      </span>
+                      <ul className="mt-0.5 space-y-0.5">
+                        {r.keyPoints.map((point, i) => (
+                          <li
+                            key={i}
+                            className="text-xs text-muted-foreground/70 leading-relaxed flex items-start gap-1.5"
+                          >
+                            <span className="text-muted-foreground/30 mt-px shrink-0">&bull;</span>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           )}
         </div>
 

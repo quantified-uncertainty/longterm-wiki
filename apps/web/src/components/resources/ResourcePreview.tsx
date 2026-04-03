@@ -18,8 +18,11 @@ export function ResourcePreview({
   const [show, setShow] = useState(false);
 
   // Only show preview if there's meaningful content to display
-  const hasPreviewContent = r.summary;
+  const hasPreviewContent = r.summary || r.abstract || r.keyPoints;
   if (!hasPreviewContent) return <>{children}</>;
+
+  // Show summary if available, otherwise fall back to abstract
+  const displayText = r.summary || r.abstract;
 
   return (
     <div
@@ -37,11 +40,28 @@ export function ResourcePreview({
             {r.publishedDate && <span className="tabular-nums">{r.publishedDate.slice(0, 10)}</span>}
           </div>
 
-          {/* Summary */}
-          {r.summary && (
+          {/* Summary or abstract */}
+          {displayText && (
             <p className="text-muted-foreground leading-relaxed line-clamp-4">
-              {r.summary}
+              {displayText}
             </p>
+          )}
+
+          {/* Key points (max 3 in preview) */}
+          {r.keyPoints && r.keyPoints.length > 0 && (
+            <ul className="space-y-0.5 text-muted-foreground/80">
+              {r.keyPoints.slice(0, 3).map((point, i) => (
+                <li key={i} className="flex items-start gap-1.5 leading-relaxed">
+                  <span className="text-muted-foreground/40 mt-px shrink-0">&bull;</span>
+                  <span className="line-clamp-2">{point}</span>
+                </li>
+              ))}
+              {r.keyPoints.length > 3 && (
+                <li className="text-muted-foreground/40 pl-3">
+                  +{r.keyPoints.length - 3} more
+                </li>
+              )}
+            </ul>
           )}
 
           {/* Authors */}
