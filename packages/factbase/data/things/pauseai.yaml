@@ -1,40 +1,40 @@
 entity: sid_qtXe9VykMz
 facts:
-  - id: f_pai_founded
+  - id: rypAjEKKuA
     property: founded-date
     value: "2023-05"
     source: https://en.wikipedia.org/wiki/PauseAI
     notes: "First public action May 2023. Registered as Dutch foundation (Stichting) February 2024."
 
-  - id: f_pai_hq
+  - id: PEHQZRhx4Q
     property: headquarters
     value: "Utrecht, Netherlands"
     source: https://pauseai.info/organization
     notes: "PauseAI Global is a Dutch foundation (Stichting PauseAI, KvK 92951031). PauseAI US is a separate 501(c)(3)."
 
-  - id: f_pai_chapters
+  - id: ahoo25p8rQ
     property: scale
     value: "16 national chapters (Australia, Canada, Czechia, France, Germany, Italy, Kenya, Netherlands, Nigeria, Poland, Romania, Serbia, Spain, Sweden, UK, US). PauseAI US has 6 local groups."
     asOf: 2025
     source: https://pauseai.info/communities
 
-  - id: f_pai_actions
+  - id: NQcH8WsF8Q
     property: key-actions
     value: "May 2023: protest at Microsoft Brussels. Nov 2023: protest at Bletchley Park AI Safety Summit. Feb 2024: protest at OpenAI HQ. May 2024: coordinated protests in 13 countries before Seoul Summit. Feb 2025: global protest for Paris AI Summit."
     source: https://en.wikipedia.org/wiki/PauseAI
 
-  - id: f_pai_founder
+  - id: JkC9t7c7AQ
     property: founded-by
     value: "Joep Meindertsma"
     source: https://en.wikipedia.org/wiki/PauseAI
     notes: "Software entrepreneur who put his CEO role on hold due to concerns about existential risks from AI"
 
-  - id: f_pai_legal
+  - id: Pez0YyEquw
     property: legal-structure
     value: "Dutch foundation (Stichting PauseAI, KvK 92951031). PauseAI US is a separate 501(c)(3). Operates as a federation of national chapters coordinated by the global entity."
     source: https://pauseai.info/organization
 
-  - id: f_pai_total_funding
+  - id: 245ZHj4f0w
     property: total-funding
     value: 715000
     unit: EUR
@@ -42,25 +42,25 @@ facts:
     source: https://pauseai.info/funding
     notes: "Largest donors: Future of Life Institute (EUR 423K), Greg Colbourn (EUR 95K), Conjointly (EUR 83K), Lightspeed Grants (EUR 46K combined), SFF (EUR 9.5K)"
 
-  - id: f_pai_leadership
+  - id: i42OVZMGtw
     property: leadership
     value: "CEO: Maxime Fournes. Organizing Director: Irina Tavera. Communications Director: Jonathan Moody. Board: Joep Meindertsma (Chairman), Michiel van den Ingh (Treasurer), Otto Barten (Secretary)."
     asOf: 2025
     source: https://pauseai.info/organization
     notes: "Board members receive no remuneration"
 
-  - id: f_pai_description
+  - id: 84LTmJckHA
     property: description
     value: "International grassroots advocacy movement calling for a global moratorium on the development of more powerful AI systems until safety can be guaranteed and democratic control established. Seeks an international AI safety agency modeled on the IAEA."
     asOf: 2026-03
     source: https://pauseai.info/about
 
-  - id: f_pai_website
+  - id: aZAeiEdyVg
     property: website
     value: "https://pauseai.info/"
     source: https://pauseai.info/
 
-  - id: f_pai_country
+  - id: 8y5E4Q2SRQ
     property: country
     value: "Netherlands"
     source: https://pauseai.info/legal

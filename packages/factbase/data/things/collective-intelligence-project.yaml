@@ -1,47 +1,47 @@
 entity: sid_0TFmORNnKQ
 facts:
-  - id: f_cip_founded
+  - id: pnhV0jBXug
     property: founded-date
     value: "2022"
     source: https://forum.effectivealtruism.org/posts/suKkvQPxgG6ihvhfP/launching-the-collective-intelligence-project-whitepaper-and
     notes: "Co-founded late 2022; public launch February 2023"
 
-  - id: f_cip_hq
+  - id: Rqs7khb7zw
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.cip.org/
     notes: "Opened SF office in 2024. Tax filing: Encino, CA. EIN: 92-0327339."
 
-  - id: f_cip_alignment_assemblies
+  - id: qQN0bJ5WtQ
     property: program
     value: "Alignment Assemblies: democratic forums to surface public views on AI alignment. Launched Feb 2023. Engaged 1,200+ participants across 68 countries by 2024."
     asOf: 2024
     source: https://www.cip.org/alignmentassemblies
 
-  - id: f_cip_funding
+  - id: QZdCxspJLQ
     property: funding-sources
     value: "Funders: Omidyar Network (from $30M inclusive AI fund, 2023), Robert Wood Johnson Foundation, Google.org, Ford Foundation, ONE Project, Future of Life Institute, Amaranth Foundation, SFF. Partners: Anthropic, OpenAI, Mistral, Jigsaw, Mozilla, Chatham House, Taiwan MODA."
     source: https://www.cip.org/funding-partnerships
 
-  - id: f_cip_staff
+  - id: I0k7nrsl1A
     property: employee-count
     value: "10"
     asOf: 2026
     source: https://www.cip.org/team
     notes: "10 core team + 12-person Advisory Council + 20+ Community Council"
 
-  - id: f_cip_founders
+  - id: sny2brNYLg
     property: founded-by
     value: "Divya Siddarth, Saffron Huang, and Jasmine Wang"
     source: https://forum.effectivealtruism.org/posts/suKkvQPxgG6ihvhfP/launching-the-collective-intelligence-project-whitepaper-and
     notes: "Siddarth is executive director. Previously at Microsoft Office of the CTO and UK AI Safety Institute."
 
-  - id: f_cip_legal
+  - id: v5IIeTmkew
     property: legal-structure
     value: "501(c)(3) nonprofit (Collective Intelligence Project Inc, EIN 92-0327339). Tax-exempt status granted October 2024."
     source: https://projects.propublica.org/nonprofits/organizations/920327339
 
-  - id: f_cip_revenue
+  - id: OzcFpBk0Gw
     property: annual-revenue
     value: "1908186"
     unit: USD
@@ -49,18 +49,18 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/920327339
     notes: "Nearly all revenue from contributions ($1.91M). Total assets $2.47M. Net income $1.64M. Operates exclusively through philanthropic donations."
 
-  - id: f_cip_description
+  - id: H5Ncs1uc8g
     property: description
     value: "Experimental research organization advancing collective intelligence capabilities for the democratic governance of transformative technologies. Develops decision-making tools, processes, and institutions that expand groups' capacity to cooperate toward shared goals. Known for Alignment Assemblies and community-driven AI model alignment."
     asOf: 2026-03
     source: https://www.cip.org/
 
-  - id: f_cip_website
+  - id: jMOSCN9RwA
     property: website
     value: "https://www.cip.org/"
     source: https://www.cip.org/
 
-  - id: f_cip_country
+  - id: Z1nixE0EyA
     property: country
     value: "United States"
     source: https://projects.propublica.org/nonprofits/organizations/920327339

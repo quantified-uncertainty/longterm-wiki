@@ -1,23 +1,23 @@
 entity: sid_3ViojCH3Sw
 facts:
-  - id: f_ff_founded
+  - id: 8ePxbm3roQ
     property: founded-date
     value: "1936"
     source: https://en.wikipedia.org/wiki/Ford_Foundation
 
-  - id: f_ff_hq
+  - id: l1q4zPR52Q
     property: headquarters
     value: "320 E 43rd St, New York, NY 10017"
     source: https://www.fordfoundation.org
 
-  - id: f_ff_assets
+  - id: nBAs8fV5Ug
     property: total-assets
     value: "17480000000"
     unit: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131684331
 
-  - id: f_ff_revenue
+  - id: HB5Afxgwug
     property: annual-revenue
     value: "1150000000"
     unit: USD
@@ -25,7 +25,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/131684331
     notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B. Charitable disbursements ~$1.05B."
 
-  - id: f_ff_grantmaking
+  - id: 8fiRnrFahw
     property: annual-grantmaking
     value: "840000000"
     unit: USD
@@ -33,18 +33,18 @@ facts:
     source: https://www.fordfoundation.org/work/our-grants/
     notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400 grants/year worldwide."
 
-  - id: f_ff_tech_society
+  - id: GpAyM8AhtQ
     property: program
     value: "Technology and Society program, directed by Lori McGlinchey. Focus: equitable digital access, fair regulation, civil/human rights in digital spaces, tech capacity for social justice orgs."
     asOf: 2026-03
     source: https://www.fordfoundation.org/work/challenging-inequality/technology-and-society/
 
-  - id: f_ff_pai_grant
+  - id: k2cw5g73rw
     property: grant-given
     value: "Partnership on AI: $550K (2023, 3yr for AI openness/transparency), $250K (2022, 2yr for AI and workers), $200K (2020, 2yr for shared prosperity)"
     source: https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/partnership-on-ai-to-benefit-people-and-society-147330/
 
-  - id: f_ff_ai_coalition
+  - id: 5EUn10AXwA
     property: coalition
     value: "Co-led 2023 initiative where 10 major philanthropies committed $200M+ collectively to mitigate AI harms. Founding member of Humanity AI ($500M, 2025)."
     source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/philanthropies-launch-new-initiative-to-ensure-ai-advances-the-public-interest/
