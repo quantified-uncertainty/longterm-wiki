@@ -18,6 +18,7 @@ import { fetchWaybackCommand } from '../resource-enrichment/fetch-wayback.ts';
 import { archivePdfsCommand } from '../resource-enrichment/archive-pdfs.ts';
 import { enrichCrossrefCommand } from '../resource-enrichment/enrich-crossref.ts';
 import { discoverForumsCommand } from '../resource-enrichment/discover-forums.ts';
+import { enrichRandDatesCommand } from '../resource-enrichment/enrich-rand-dates.ts';
 
 interface ResourceCommandConfig {
   description: string;
@@ -157,6 +158,7 @@ commands['fetch-wayback'] = fetchWaybackCommand;
 commands['archive-pdfs'] = archivePdfsCommand;
 commands['enrich-crossref'] = enrichCrossrefCommand;
 commands['discover-forums'] = discoverForumsCommand;
+commands['enrich-rand-dates'] = enrichRandDatesCommand;
 
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
@@ -198,6 +200,7 @@ Enrichment:
   fetch-all         Fetch all resource URLs and extract meta tags
   fetch-wayback     Retry failed URLs via Wayback Machine (archive.org)
   archive-pdfs      Archive PDF files to DigitalOcean Spaces
+  enrich-rand-dates Fill missing dates for RAND resources (scrapes meta tags)
   enrich-free       Run all free enrichment (papers + forums + fetch)
   classify          LLM classification via Anthropic Batch API (Haiku, ~\$15)
   deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~\$100)
