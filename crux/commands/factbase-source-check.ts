@@ -181,6 +181,13 @@ async function verifySingleFact(
       ? (parsed.verdict as VerificationVerdict)
       : 'unverifiable';
 
+    // Add archive provenance note to reasoning if verified via Wayback Machine
+    let reasoning = parsed.reasoning ?? '';
+    if (fetchResult.sourceOrigin === 'archive') {
+      const dateNote = fetchResult.archiveDate ? ` (archived ${fetchResult.archiveDate})` : '';
+      reasoning = `[archive${dateNote}] ${reasoning}`;
+    }
+
     return {
       factId: fact.id,
       entityId: entity.id,
@@ -193,7 +200,7 @@ async function verifySingleFact(
       verdict,
       confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
       extractedValue: parsed.extracted_value ?? '',
-      reasoning: parsed.reasoning ?? '',
+      reasoning,
       ...(fetchResult.errorType && { errorType: fetchResult.errorType }),
     };
   } catch (e: unknown) {
@@ -435,6 +442,12 @@ export async function sourceCheckCommand(
   lines.push(`\x1b[33mOutdated:       ${summary.outdated}\x1b[0m`);
   lines.push(`\x1b[33mPartial:        ${summary.partial}\x1b[0m`);
   lines.push(`\x1b[31mErrors:         ${summary.errors}\x1b[0m`);
+
+  // Show archive fallback stats
+  const archiveCount = summary.results.filter((r) => r.reasoning.startsWith('[archive')).length;
+  if (archiveCount > 0) {
+    lines.push(`\x1b[36mArchive fallback: ${archiveCount} (verified via Wayback Machine)\x1b[0m`);
+  }
 
   // Show contradictions in detail
   const contradictions = summary.results.filter((r) => r.verdict === 'contradicted');

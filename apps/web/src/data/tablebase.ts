@@ -182,6 +182,8 @@ export interface Resource {
   publication_id?: string;
   credibility_override?: number;
   stable_id?: string;
+  /** HTTP reachability: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.
+   *  Distinct from enrichment_status (LLM pipeline stage). */
   fetch_status?: string;
   archive_url?: string;
   author_entity_ids?: string[];
@@ -193,6 +195,8 @@ export interface Resource {
   type_metadata?: Record<string, unknown>;
   publisher_entity_id?: string;
   related_entity_ids?: string[];
+  /** LLM enrichment pipeline stage: pending | fetched | classified | enriched | reviewed.
+   *  Distinct from fetch_status (HTTP reachability). */
   enrichment_status?: string;
   importance_score?: number;
   content_hash?: string;
