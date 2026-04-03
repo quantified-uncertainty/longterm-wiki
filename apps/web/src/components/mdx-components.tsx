@@ -54,11 +54,6 @@ import { FBFactsExplorerContent } from "@/app/factbase/factbase-facts-content";
 import { FBPropertiesExplorerContent } from "@/app/factbase/factbase-properties-content";
 import { FBEntityCoverageContent } from "@/app/factbase/factbase-entities-content";
 import { FBRecordsExplorerContent } from "@/app/factbase/factbase-records-content";
-import { FBResourcesContent } from "@/app/factbase/factbase-resources-content";
-import { FBPublicationsContent } from "@/app/factbase/factbase-publications-content";
-
-// Sources section content component
-import { SourcesOverviewContent } from "@/app/sources/sources-overview-content";
 
 // Dashboard content components (rendered via MDX stubs at /wiki/E<id>)
 import { UpdateScheduleContent } from "@/app/internal/updates/updates-content";
@@ -220,11 +215,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   FBPropertiesExplorerContent,
   FBEntityCoverageContent,
   FBRecordsExplorerContent,
-  FBResourcesContent,
-  FBPublicationsContent,
-
-  // Sources section
-  SourcesOverviewContent,
 
   // Dashboard content components
   UpdateScheduleContent,
