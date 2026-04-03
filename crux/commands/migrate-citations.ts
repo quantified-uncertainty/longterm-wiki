@@ -31,6 +31,7 @@ interface MigrateCitationsOptions extends BaseOptions {
 interface CitationQuoteRow {
   id: number;
   pageId: number;
+  pageSlug: string | null;
   footnote: number;
   url: string | null;
   resourceId: string | null;
