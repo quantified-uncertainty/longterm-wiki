@@ -15,7 +15,12 @@ export function paginationQuery(opts?: {
 }) {
   const { maxLimit = 200, defaultLimit = 50 } = opts ?? {};
   return z.object({
-    limit: z.coerce.number().int().min(1).max(maxLimit).default(defaultLimit),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .default(defaultLimit)
+      .transform((v) => Math.min(v, maxLimit)),
     offset: z.coerce.number().int().min(0).default(0),
   });
 }
