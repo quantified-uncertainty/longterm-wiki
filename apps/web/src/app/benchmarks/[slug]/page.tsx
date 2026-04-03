@@ -220,7 +220,7 @@ export default async function BenchmarkDetailPage({
           <h2 className="text-lg font-bold tracking-tight mb-4">
             Leaderboard
             <span className="ml-2 text-sm font-normal text-muted-foreground">
-              {sorted.length} models
+              {sorted.length} {sorted.length === 1 ? "model" : "models"}
             </span>
           </h2>
           <div className="border border-border rounded-xl overflow-x-auto">

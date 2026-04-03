@@ -36,6 +36,7 @@ import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 export interface PublicationResourceRow {
   id: string;
   title: string;
+  authors: string | null;
   type: string;
   publishedDate: string | null;
   hasSummary: boolean;
@@ -59,6 +60,25 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
           >
             {displayTitle}
           </Link>
+        );
+      },
+      filterFn: "includesString",
+    },
+    {
+      accessorKey: "authors",
+      header: ({ column }) => (
+        <SortableHeader column={column}>Authors</SortableHeader>
+      ),
+      cell: ({ row }) => {
+        const a = row.original.authors;
+        if (!a)
+          return (
+            <span className="text-muted-foreground/40 text-xs">{"\u2014"}</span>
+          );
+        return (
+          <span className="text-xs text-muted-foreground max-w-[200px] truncate block" title={a}>
+            {a}
+          </span>
         );
       },
       filterFn: "includesString",

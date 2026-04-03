@@ -84,6 +84,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
     return {
       id: r.id,
       title: r.title,
+      authors: r.authors?.join(", ") ?? null,
       type: r.type,
       publishedDate: r.published_date ?? null,
       hasSummary: !!r.summary,
