@@ -373,11 +373,11 @@ export function getFactBaseNav(): NavSection[] {
       title: "FactBase",
       defaultOpen: true,
       items: [
-        { label: "Overview", href: "/wiki/E1019" },
-        { label: "Facts Explorer", href: "/wiki/E1020" },
-        { label: "Properties", href: "/wiki/E1021" },
-        { label: "Entity Coverage", href: "/wiki/E1022" },
-        { label: "Records Explorer", href: "/wiki/E1026" },
+        { label: "Overview", href: "/factbase" },
+        { label: "Facts Explorer", href: "/factbase/facts" },
+        { label: "Properties", href: "/factbase/properties" },
+        { label: "Entity Coverage", href: "/factbase/entity-coverage" },
+        { label: "Records Explorer", href: "/factbase/records" },
       ],
     },
     {
@@ -390,8 +390,6 @@ export function getFactBaseNav(): NavSection[] {
   ];
 }
 
-/** @deprecated Use getFactBaseNav() */
-export const getKBDataNav = getFactBaseNav;
 
 // ============================================================================
 // DETECT WHICH SIDEBAR TO SHOW

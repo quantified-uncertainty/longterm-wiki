@@ -22,12 +22,6 @@ import {
 } from "@/components/wiki/factbase/format";
 import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 
-import {
-  WikiSidebar,
-  MobileSidebarTrigger,
-} from "@/components/wiki/WikiSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import { getKBDataNav } from "@/lib/wiki-nav";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import { formatAmount } from "@/lib/directory-utils";
 
@@ -744,18 +738,12 @@ export default async function KBEntityPage({
     .sort(([a], [b]) => a.localeCompare(b));
 
   return (
-    <SidebarProvider>
-      <WikiSidebar sections={getKBDataNav()} />
-      <div className="flex-1 min-w-0">
-        <div className="md:hidden px-4 pt-3">
-          <MobileSidebarTrigger />
-        </div>
-        <div className="max-w-[65rem] mx-auto px-8 py-4">
-          {/* ── Breadcrumbs ─────────────────────────────────────── */}
-          <nav className="text-sm text-muted-foreground mb-4">
-            <Link href="/wiki/E1019" className="hover:underline">
-              KB Data
-            </Link>
+    <div>
+      {/* ── Breadcrumbs ─────────────────────────────────────── */}
+      <nav className="text-sm text-muted-foreground mb-4">
+        <Link href="/factbase" className="hover:underline">
+          FactBase
+        </Link>
             <span className="mx-1.5">/</span>
             <span>{entity.name}</span>
           </nav>
@@ -960,8 +948,6 @@ export default async function KBEntityPage({
               </table>
             </div>
           </details>
-        </div>
-      </div>
-    </SidebarProvider>
+    </div>
   );
 }
