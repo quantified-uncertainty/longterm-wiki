@@ -2,11 +2,18 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, desc, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { websiteSources, websiteSourcePages, entities } from "../../schema.js";
+import {
+  websiteSources,
+  websiteSourcePages,
+  pageSnapshots,
+  entities,
+} from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  notFoundError,
+  paginationQuery,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
@@ -73,6 +80,28 @@ const SyncPageSchema = z.object({
 const SyncPageBatchSchema = z.object({
   items: z.array(SyncPageSchema).min(1).max(500),
 });
+
+const VALID_EXTRACTION_STATUSES = [
+  "pending",
+  "extracted",
+  "failed",
+  "skipped",
+] as const;
+
+const CreateSnapshotSchema = z.object({
+  id: z.string().length(10),
+  websiteSourcePageId: z.string().length(10),
+  url: z.string().min(1).max(4000),
+  contentHash: z.string().min(1).max(128),
+  fullText: z.string().min(1).max(10_000_000),
+  titleAtTime: z.string().max(1000).nullable().optional(),
+  httpStatus: z.number().int().min(0).max(999).default(200),
+  contentLength: z.number().int().min(0).default(0),
+  extractionStatus: z.enum(VALID_EXTRACTION_STATUSES).default("pending"),
+  fetchedAt: z.string().datetime().optional(),
+});
+
+const SnapshotListQuery = paginationQuery({ defaultLimit: 20, maxLimit: 100 });
 
 // ---- Typed row interfaces for raw SQL ----
 
@@ -306,7 +335,195 @@ const websiteSourcesApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  // ── Page Snapshot endpoints ───────────────────────────────────────
+
+  .get(
+    "/:sourceId/snapshots",
+    zv("query", SnapshotListQuery),
+    async (c) => {
+      const sourceId = c.req.param("sourceId");
+      const { limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      // Get all page IDs for this source
+      const pages = await db
+        .select({ id: websiteSourcePages.id })
+        .from(websiteSourcePages)
+        .where(eq(websiteSourcePages.sourceId, sourceId));
+
+      if (pages.length === 0) {
+        return c.json({ snapshots: [], total: 0, limit, offset });
+      }
+
+      const pageIds = pages.map((p) => p.id);
+
+      const [totalRow] = await db
+        .select({ count: count() })
+        .from(pageSnapshots)
+        .where(
+          sql`${pageSnapshots.websiteSourcePageId} IN (${sql.join(
+            pageIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        );
+      const total = totalRow?.count ?? 0;
+
+      const rows = await db
+        .select()
+        .from(pageSnapshots)
+        .where(
+          sql`${pageSnapshots.websiteSourcePageId} IN (${sql.join(
+            pageIds.map((id) => sql`${id}`),
+            sql`, `
+          )})`
+        )
+        .orderBy(desc(pageSnapshots.fetchedAt))
+        .limit(limit)
+        .offset(offset);
+
+      return c.json({
+        snapshots: rows.map((r) => ({
+          id: r.id,
+          websiteSourcePageId: r.websiteSourcePageId,
+          url: r.url,
+          fetchedAt: r.fetchedAt.toISOString(),
+          contentHash: r.contentHash,
+          titleAtTime: r.titleAtTime,
+          httpStatus: r.httpStatus,
+          contentLength: r.contentLength,
+          extractionStatus: r.extractionStatus,
+          extractedAt: r.extractedAt?.toISOString() ?? null,
+          createdAt: r.createdAt.toISOString(),
+          // fullText and extractedFacts excluded from list — fetch individually
+        })),
+        total,
+        limit,
+        offset,
+      });
+    }
+  )
+
+  .get("/:sourceId/snapshots/:snapshotId", async (c) => {
+    const snapshotId = c.req.param("snapshotId");
+    const db = getDrizzleDb();
+
+    const [row] = await db
+      .select()
+      .from(pageSnapshots)
+      .where(eq(pageSnapshots.id, snapshotId))
+      .limit(1);
+
+    if (!row) return notFoundError(c, "Snapshot not found");
+
+    return c.json({
+      id: row.id,
+      websiteSourcePageId: row.websiteSourcePageId,
+      url: row.url,
+      fetchedAt: row.fetchedAt.toISOString(),
+      contentHash: row.contentHash,
+      fullText: row.fullText,
+      titleAtTime: row.titleAtTime,
+      httpStatus: row.httpStatus,
+      contentLength: row.contentLength,
+      extractionStatus: row.extractionStatus,
+      extractedAt: row.extractedAt?.toISOString() ?? null,
+      extractedFacts: row.extractedFacts,
+      createdAt: row.createdAt.toISOString(),
+    });
+  })
+
+  .post(
+    "/:sourceId/snapshots",
+    zv("json", CreateSnapshotSchema),
+    async (c) => {
+      const sourceId = c.req.param("sourceId");
+      const body = c.req.valid("json");
+      const db = getDrizzleDb();
+
+      // Verify the page belongs to this source
+      const [page] = await db
+        .select({ id: websiteSourcePages.id })
+        .from(websiteSourcePages)
+        .where(
+          and(
+            eq(websiteSourcePages.id, body.websiteSourcePageId),
+            eq(websiteSourcePages.sourceId, sourceId)
+          )
+        )
+        .limit(1);
+
+      if (!page) {
+        return validationError(
+          c,
+          `Page ${body.websiteSourcePageId} not found under source ${sourceId}`
+        );
+      }
+
+      const fetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : new Date();
+
+      // Content-hash dedup: ON CONFLICT DO NOTHING
+      const [inserted] = await db
+        .insert(pageSnapshots)
+        .values({
+          id: body.id,
+          websiteSourcePageId: body.websiteSourcePageId,
+          url: body.url,
+          contentHash: body.contentHash,
+          fullText: body.fullText,
+          titleAtTime: body.titleAtTime ?? null,
+          httpStatus: body.httpStatus,
+          contentLength: body.contentLength,
+          extractionStatus: body.extractionStatus,
+          fetchedAt,
+        })
+        .onConflictDoNothing({
+          target: [
+            pageSnapshots.websiteSourcePageId,
+            pageSnapshots.contentHash,
+          ],
+        })
+        .returning({ id: pageSnapshots.id });
+
+      if (!inserted) {
+        // Content unchanged — return the existing snapshot
+        const [existing] = await db
+          .select({ id: pageSnapshots.id })
+          .from(pageSnapshots)
+          .where(
+            and(
+              eq(
+                pageSnapshots.websiteSourcePageId,
+                body.websiteSourcePageId
+              ),
+              eq(pageSnapshots.contentHash, body.contentHash)
+            )
+          );
+        return c.json({
+          ok: true,
+          id: existing?.id ?? body.id,
+          deduplicated: true,
+        });
+      }
+
+      // Update the parent page's tracking fields
+      await db
+        .update(websiteSourcePages)
+        .set({
+          lastFetchedAt: fetchedAt,
+          lastContentHash: body.contentHash,
+          lastSnapshotId: inserted.id,
+          updatedAt: new Date(),
+        })
+        .where(eq(websiteSourcePages.id, body.websiteSourcePageId));
+
+      return c.json(
+        { ok: true, id: inserted.id, deduplicated: false },
+        201
+      );
+    }
+  );
 
 export const websiteSourcesRoute = websiteSourcesApp;
 export type WebsiteSourcesRoute = typeof websiteSourcesApp;
