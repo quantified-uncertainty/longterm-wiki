@@ -46,7 +46,7 @@ const COLUMN_CONFIG: Array<{
 ];
 
 // ── CI Status Badge ────────────────────────────────────────────────────
-// TODO: extract CiStatusBadge, MergeStatusBadge, and their style objects
+// TODO #3533: extract CiStatusBadge, MergeStatusBadge, and their style objects
 // to shared pr-badges.tsx (also used by system-health/open-prs-table.tsx)
 
 const CI_STYLES: Record<string, { cls: string; label: string }> = {

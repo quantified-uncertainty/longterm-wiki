@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -45,11 +46,7 @@ import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
-
-// LegislationVotes — will be created by another agent.
-// TODO: import { LegislationVotes } from "@/components/political/legislation-votes";
-// Usage: <LegislationVotes entityId={entity.stableId ?? entity.id} />
-// This component will show how tracked politicians voted on this legislation.
+import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -108,6 +105,12 @@ function getReachedStage(timelineEvents: Array<{ label: string }>, statusKey: st
   // Stage 0: Introduced / proposed
   if (labels.has("Introduced") || labels.has("Proposed")) return 0;
   return -1;
+}
+
+/** Async child component so vote fetching doesn't block page render. */
+async function LegislationVotesSection({ entityId }: { entityId: string }) {
+  const votes = await fetchLegislationVotes(entityId);
+  return <LegislationVotes votes={votes} />;
 }
 
 export default async function LegislationDetailPage({
@@ -391,10 +394,9 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      {/* Politician Vote Breakdown — will render when LegislationVotes component is available */}
-      {/* TODO: Uncomment when @/components/political/legislation-votes is created:
-      <LegislationVotes entityId={entity.stableId ?? entity.id} />
-      */}
+      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading votes...</div>}>
+        <LegislationVotesSection entityId={entity.stableId ?? entity.id} />
+      </Suspense>
 
       <FBAutoFacts entityId={entity.id} />
 

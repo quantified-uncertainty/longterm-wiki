@@ -9,20 +9,27 @@ import type { CruftItem } from './types.ts';
 const EXEC_OPTS = { encoding: 'utf-8' as const, cwd: PROJECT_ROOT, timeout: 15_000, maxBuffer: 5 * 1024 * 1024 };
 
 /**
- * Find TODO/FIXME/HACK/XXX comments in source files.
+ * Find TODO/FIXME/HACK comments in source files.
+ *
+ * Uses a targeted grep that only matches actual code comments (// TODO, /* TODO, etc.)
+ * rather than string literals or pattern-matching code. This avoids false positives from
+ * format strings like "rc-XXXX", validator patterns that detect TODOs, and test fixtures.
  */
 export function findTodoComments(): CruftItem[] {
   const items: CruftItem[] = [];
   try {
+    // Match actual comments: // TODO, /* TODO, {/* TODO, /** TODO */, * TODO (JSDoc continuation)
     const todoOutput = execSync(
-      `grep -rn 'TODO\\|FIXME\\|HACK\\|XXX' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' --include='*.mjs' 2>/dev/null || true`,
+      `grep -rn '//\\s*TODO\\b\\|//\\s*FIXME\\b\\|//\\s*HACK\\b\\|/\\*\\+\\s*TODO\\b\\|/\\*\\+\\s*FIXME\\b\\|/\\*\\+\\s*HACK\\b\\|^\\s*\\*\\+\\s*TODO\\b\\|^\\s*\\*\\+\\s*FIXME\\b\\|^\\s*\\*\\+\\s*HACK\\b' crux/ apps/web/src/ --include='*.ts' --include='*.tsx' --include='*.mjs' 2>/dev/null || true`,
       EXEC_OPTS
     );
     for (const line of todoOutput.split('\n').filter(Boolean)) {
       const match = line.match(/^([^:]+):(\d+):(.+)$/);
       if (match) {
-        if (match[1].includes('.test.') || match[1].includes('maintain.ts') || match[1].includes('cruft-detection.ts')) continue;
-        if (match[3].includes('pattern:') || match[3].includes('Pattern') || match[3].includes("'TODO")) continue;
+        // Skip test files and this file itself
+        if (match[1].includes('.test.') || match[1].includes('cruft-detection.ts')) continue;
+        // Skip comments that already have an issue number (#NNNN)
+        if (/#\d+\b/.test(match[3])) continue;
         items.push({
           type: 'todo',
           path: match[1],
