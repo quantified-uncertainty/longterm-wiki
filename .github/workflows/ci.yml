@@ -370,6 +370,11 @@ jobs:
     # Sync wiki page content to wiki-server after build succeeds on main.
     needs: [ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    # Serialize syncs so concurrent pushes don't saturate the wiki-server rate limiter.
+    # cancel-in-progress: true drops stale queued runs — the latest state always subsumes them.
+    concurrency:
+      group: sync-content-main
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
