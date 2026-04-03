@@ -1,5 +1,62 @@
 import { describe, expect, it } from "vitest";
-import { formatIntroducedDate } from "../format-compact";
+import { formatCompactCurrency, formatIntroducedDate } from "../format-compact";
+
+describe("formatCompactCurrency", () => {
+  it("formats trillions", () => {
+    expect(formatCompactCurrency(1.5e12)).toBe("$1.5T");
+  });
+
+  it("formats billions", () => {
+    expect(formatCompactCurrency(2.3e9)).toBe("$2.3B");
+  });
+
+  it("formats millions", () => {
+    expect(formatCompactCurrency(850e6)).toBe("$850M");
+  });
+
+  it("formats thousands", () => {
+    expect(formatCompactCurrency(42000)).toBe("$42K");
+  });
+
+  it("formats small numbers", () => {
+    expect(formatCompactCurrency(500)).toBe("$500");
+  });
+
+  it("returns empty for null/undefined/NaN", () => {
+    expect(formatCompactCurrency(null)).toBe("");
+    expect(formatCompactCurrency(undefined)).toBe("");
+    expect(formatCompactCurrency(NaN)).toBe("");
+    expect(formatCompactCurrency(Infinity)).toBe("");
+  });
+
+  it("uses GBP symbol for GBP currency", () => {
+    expect(formatCompactCurrency(5e6, "GBP")).toBe("£5M");
+  });
+
+  it("uses EUR symbol for EUR currency", () => {
+    expect(formatCompactCurrency(1.2e9, "EUR")).toBe("€1.2B");
+  });
+
+  it("uses CHF prefix for CHF currency", () => {
+    expect(formatCompactCurrency(500000, "CHF")).toBe("CHF 500K");
+  });
+
+  it("falls back to currency code for unknown currencies", () => {
+    expect(formatCompactCurrency(1e6, "SEK")).toBe("SEK 1M");
+  });
+
+  it("treats empty string currency as USD", () => {
+    expect(formatCompactCurrency(1e6, "")).toBe("$1M");
+  });
+
+  it("defaults to USD when no currency provided", () => {
+    expect(formatCompactCurrency(1e6)).toBe("$1M");
+  });
+
+  it("handles negative values", () => {
+    expect(formatCompactCurrency(-5e6)).toBe("$-5M");
+  });
+});
 
 describe("formatIntroducedDate", () => {
   describe("year-only format", () => {
