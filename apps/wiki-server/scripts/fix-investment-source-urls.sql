@@ -65,19 +65,24 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------
--- Step 1: Clear known bad SB 1047 URLs
+-- Step 1: Clear known bad SB 1047 URLs, capturing affected IDs
 -- ---------------------------------------------------------------------------
 
 -- These two URLs were bulk-assigned to investment records by an LLM agent
 -- that used California AI regulation articles as sources for unrelated
 -- investment records.
 
-UPDATE investments
-SET source = NULL, updated_at = now()
-WHERE source IN (
-  'https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying',
-  'https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/'
-);
+-- Use a CTE to capture the IDs of records changed in step 1
+WITH step1_changed AS (
+  UPDATE investments
+  SET source = NULL, updated_at = now()
+  WHERE source IN (
+    'https://www.transformernews.ai/p/a16z-y-combinator-big-tech-sb1047-lobbying',
+    'https://a16z.com/sb-1047-what-you-need-to-know-with-anjney-midha/'
+  )
+  RETURNING id
+)
+SELECT COUNT(*) AS step1_cleared FROM step1_changed;
 
 -- ---------------------------------------------------------------------------
 -- Step 2: Clear any remaining source URL shared by >= 5 investment records
@@ -88,58 +93,72 @@ WHERE source IN (
 -- with multiple investors). Having 5+ records pointing to the same URL
 -- strongly suggests a pipeline bug.
 
-UPDATE investments
-SET source = NULL, updated_at = now()
-WHERE source IN (
-  SELECT source
-  FROM investments
-  WHERE source IS NOT NULL
-  GROUP BY source
-  HAVING COUNT(*) >= 5
-);
+-- Use a CTE to capture the IDs of records changed in step 2
+WITH step2_changed AS (
+  UPDATE investments
+  SET source = NULL, updated_at = now()
+  WHERE source IN (
+    SELECT source
+    FROM investments
+    WHERE source IS NOT NULL
+    GROUP BY source
+    HAVING COUNT(*) >= 5
+  )
+  RETURNING id
+)
+SELECT COUNT(*) AS step2_cleared FROM step2_changed;
 
 -- ---------------------------------------------------------------------------
--- Step 3: Clean up the things table mirror
+-- Step 3: Collect all affected IDs and clean up downstream tables
 -- ---------------------------------------------------------------------------
+-- Combine the IDs from steps 1 and 2 (now all have source IS NULL).
+-- Scope cleanup to only these investment records rather than scanning all.
+
+-- Use a CTE to identify affected investment IDs (those with NULL source
+-- that may have had stale data), then scope downstream cleanup to them.
+
+WITH affected_ids AS (
+  SELECT id FROM investments WHERE source IS NULL
+),
+-- Step 3a: Clean up the things table mirror
 -- The investments sync route dual-writes source URLs to the things table
 -- (via upsertThingsInTx). These need to be cleared too.
-
-UPDATE things
-SET source_url = NULL, updated_at = now()
-WHERE source_table = 'investments'
-  AND thing_type = 'investment'
-  AND source_url IS NOT NULL
-  AND id IN (
-    SELECT id FROM investments WHERE source IS NULL
-  );
-
--- ---------------------------------------------------------------------------
--- Step 4: Clear stale source_check_evidence for investments
--- ---------------------------------------------------------------------------
+things_cleanup AS (
+  UPDATE things
+  SET source_url = NULL, updated_at = now()
+  WHERE source_table = 'investments'
+    AND thing_type = 'investment'
+    AND source_url IS NOT NULL
+    AND id IN (SELECT id FROM affected_ids)
+  RETURNING id
+),
+-- Step 3b: Clear stale source_check_evidence for affected investments
 -- Evidence rows checked against the wrong URLs are misleading. Delete them
 -- so the records can be re-checked with correct (or no) source URLs.
--- We clear ALL evidence for investment records that now have NULL source,
--- since any previous checks were against the wrong URL.
-
-DELETE FROM source_check_evidence
-WHERE record_type = 'investment'
-  AND record_id IN (
-    SELECT id FROM investments WHERE source IS NULL
-  );
-
--- ---------------------------------------------------------------------------
--- Step 5: Clear orphaned source_check_verdicts for investments
--- ---------------------------------------------------------------------------
+evidence_cleanup AS (
+  DELETE FROM source_check_evidence
+  WHERE record_type = 'investment'
+    AND record_id IN (SELECT id FROM affected_ids)
+  RETURNING record_id
+),
+-- Step 3c: Clear orphaned source_check_verdicts for affected investments
 -- Verdicts are derived from evidence. If all evidence for a record was
 -- deleted, the verdict is stale and should be removed.
-
-DELETE FROM source_check_verdicts
-WHERE record_type = 'investment'
-  AND record_id NOT IN (
-    SELECT DISTINCT record_id
-    FROM source_check_evidence
-    WHERE record_type = 'investment'
-  );
+verdict_cleanup AS (
+  DELETE FROM source_check_verdicts
+  WHERE record_type = 'investment'
+    AND record_id IN (SELECT id FROM affected_ids)
+    AND record_id NOT IN (
+      SELECT DISTINCT record_id
+      FROM source_check_evidence
+      WHERE record_type = 'investment'
+    )
+  RETURNING record_id
+)
+SELECT
+  (SELECT COUNT(*) FROM things_cleanup) AS things_cleared,
+  (SELECT COUNT(*) FROM evidence_cleanup) AS evidence_cleared,
+  (SELECT COUNT(*) FROM verdict_cleanup) AS verdicts_cleared;
 
 -- ---------------------------------------------------------------------------
 -- Summary report

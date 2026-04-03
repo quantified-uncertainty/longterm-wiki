@@ -1752,7 +1752,11 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
   lines.push(`\x1b[33mPartial:        ${summary.partial}\x1b[0m`);
   lines.push(`\x1b[31mErrors:         ${summary.errors}\x1b[0m`);
   if (summary.deadLinks > 0) {
-    const savedCost = summary.deadLinks * ESTIMATED_COST_PER_VERIFICATION;
+    // Derive unit price from the (possibly batch-discounted) estimated cost
+    const unitCost = summary.total > 0
+      ? summary.estimatedCost / summary.total
+      : ESTIMATED_COST_PER_VERIFICATION;
+    const savedCost = summary.deadLinks * unitCost;
     lines.push(`\x1b[32mLLM calls saved: ${summary.deadLinks} (dead links skipped, ~\$${savedCost.toFixed(2)} saved)\x1b[0m`);
   }
   lines.push('');
