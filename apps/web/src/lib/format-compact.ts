@@ -11,7 +11,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
   CAD: "CA$",
   AUD: "A$",
   JPY: "\u00A5",
-  CNY: "\u00A5",
+  CNY: "CN\u00A5",
   SEK: "SEK\u00A0",
   NOK: "NOK\u00A0",
   DKK: "DKK\u00A0",
@@ -19,6 +19,7 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 
 /** Get the currency symbol for a currency code, falling back to the code itself. */
 function currencySymbol(currency: string): string {
+  if (!currency) return CURRENCY_SYMBOLS.USD;
   return CURRENCY_SYMBOLS[currency] ?? `${currency}\u00A0`;
 }
 

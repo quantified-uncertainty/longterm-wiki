@@ -53,6 +53,12 @@ vi.mock("@/data", () => {
   };
 });
 
+// Mock the factbase data layer
+vi.mock("@/data/factbase", () => ({
+  getKBEntities: () => [],
+  getKBFacts: () => [],
+}));
+
 // Import after mocking
 import {
   getInternalNav,
