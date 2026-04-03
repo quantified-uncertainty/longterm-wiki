@@ -6,7 +6,6 @@ import { ExternalLink, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
 import { formatDateDeterministic } from "@lib/format";
 import { isSafeUrl } from "@lib/url-utils";
-import { formatDateDeterministic } from "@lib/format";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
 import { useReferenceData } from "./ReferenceContext";
 import { VerdictBadge } from "./VerdictBadge";
