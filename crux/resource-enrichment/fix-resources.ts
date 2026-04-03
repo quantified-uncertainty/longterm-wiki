@@ -80,9 +80,14 @@ interface ResourceFix {
   source: string;
 }
 
+interface FetcherResult {
+  fixes: ResourceFix[];
+  apiFailures: number;
+}
+
 // ─── Fetchers (one per API) ─────────────────────────────────────────────────
 
-async function findArxivFixes(resources: Resource[], limit: number): Promise<ResourceFix[]> {
+async function findArxivFixes(resources: Resource[], limit: number): Promise<FetcherResult> {
   const arxiv = resources.filter(r => r.url?.includes('arxiv.org'));
   console.log(`   Found ${arxiv.length} arXiv resources`);
 
@@ -93,6 +98,7 @@ async function findArxivFixes(resources: Resource[], limit: number): Promise<Res
   }
 
   const fixes: ResourceFix[] = [];
+  let apiFailures = 0;
   const allIds = Array.from(idMap.keys());
 
   for (let i = 0; i < allIds.length; i += 20) {
@@ -120,21 +126,23 @@ async function findArxivFixes(resources: Resource[], limit: number): Promise<Res
       }
       if (i + 20 < allIds.length) await sleep(3000);
     } catch (err: unknown) {
+      apiFailures++;
       console.error(`\n   API error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
   console.log();
-  return fixes;
+  return { fixes, apiFailures };
 }
 
-async function findWikipediaFixes(resources: Resource[], limit: number): Promise<ResourceFix[]> {
+async function findWikipediaFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
   const wiki = resources.filter(r =>
     r.url?.includes('wikipedia.org/wiki/') || r.url?.includes('en.wikipedia.org')
   );
   console.log(`   Found ${wiki.length} Wikipedia resources`);
 
   const fixes: ResourceFix[] = [];
+  let apiFailures = 0;
   for (let i = 0; i < Math.min(wiki.length, limit); i++) {
     const resource = wiki[i];
     if ((i + 1) % 5 === 0) process.stdout.write(`\r   Checking ${i + 1}/${Math.min(wiki.length, limit)}...`);
@@ -151,16 +159,22 @@ async function findWikipediaFixes(resources: Resource[], limit: number): Promise
       if (resp.ok) {
         const data = await resp.json() as { title?: string };
         if (data.title) pushTitleFix(fixes, resource, data.title, 'wikipedia', articleTitle);
+      } else {
+        apiFailures++;
+        if (verbose) console.warn(`\n   Wikipedia API failure (${resp.status}) for ${resource.url}`);
       }
       await sleep(100);
-    } catch { /* skip */ }
+    } catch (err: unknown) {
+      apiFailures++;
+      if (verbose) console.warn(`\n   Wikipedia fetch error: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   console.log();
-  return fixes;
+  return { fixes, apiFailures };
 }
 
-async function findDoiFixes(resources: Resource[], limit: number): Promise<ResourceFix[]> {
+async function findDoiFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
   const dois = resources.filter(r => {
     if (r.url?.includes('arxiv.org')) return false;
     return r.doi || r.url?.includes('doi.org/') || r.url?.match(/10\.\d{4,}\/[^\s]+/);
@@ -168,6 +182,7 @@ async function findDoiFixes(resources: Resource[], limit: number): Promise<Resou
   console.log(`   Found ${dois.length} resources with DOIs`);
 
   const fixes: ResourceFix[] = [];
+  let apiFailures = 0;
   for (let i = 0; i < Math.min(dois.length, limit); i++) {
     const resource = dois[i];
     if ((i + 1) % 5 === 0) process.stdout.write(`\r   Checking ${i + 1}/${Math.min(dois.length, limit)}...`);
@@ -184,16 +199,22 @@ async function findDoiFixes(resources: Resource[], limit: number): Promise<Resou
         const data = await resp.json() as { message?: { title?: string[] } };
         const title = data.message?.title?.[0];
         if (title) pushTitleFix(fixes, resource, title, 'doi');
+      } else {
+        apiFailures++;
+        if (verbose) console.warn(`\n   DOI API failure (${resp.status}) for ${resource.url}`);
       }
       await sleep(100);
-    } catch { /* skip */ }
+    } catch (err: unknown) {
+      apiFailures++;
+      if (verbose) console.warn(`\n   DOI fetch error: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   console.log();
-  return fixes;
+  return { fixes, apiFailures };
 }
 
-async function findForumFixes(resources: Resource[], limit: number): Promise<ResourceFix[]> {
+async function findForumFixes(resources: Resource[], limit: number, verbose?: boolean): Promise<FetcherResult> {
   const forums = resources.filter(r => {
     const u = r.url || '';
     return u.includes('lesswrong.com') || u.includes('alignmentforum.org') || u.includes('forum.effectivealtruism.org');
@@ -201,6 +222,7 @@ async function findForumFixes(resources: Resource[], limit: number): Promise<Res
   console.log(`   Found ${forums.length} forum resources`);
 
   const fixes: ResourceFix[] = [];
+  let apiFailures = 0;
   for (let i = 0; i < Math.min(forums.length, limit); i++) {
     const resource = forums[i];
     if ((i + 1) % 5 === 0) process.stdout.write(`\r   Checking ${i + 1}/${Math.min(forums.length, limit)}...`);
@@ -223,20 +245,27 @@ async function findForumFixes(resources: Resource[], limit: number): Promise<Res
         const data = await resp.json() as { data?: { post?: { result?: { title: string } } } };
         const title = data?.data?.post?.result?.title;
         if (title) pushTitleFix(fixes, resource, title, 'forum');
+      } else {
+        apiFailures++;
+        if (verbose) console.warn(`\n   Forum API failure (${resp.status}) for ${resource.url}`);
       }
       await sleep(200);
-    } catch { /* skip */ }
+    } catch (err: unknown) {
+      apiFailures++;
+      if (verbose) console.warn(`\n   Forum fetch error: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   console.log();
-  return fixes;
+  return { fixes, apiFailures };
 }
 
 // ─── Apply & Command ────────────────────────────────────────────────────────
 
-async function applyFixes(fixes: ResourceFix[], resources: Resource[]): Promise<{ applied: number; failed: number }> {
+async function applyFixes(fixes: ResourceFix[], resources: Resource[]): Promise<{ applied: number; failed: number; apiFailures: number }> {
   let applied = 0;
   let failed = 0;
+  let apiFailures = 0;
 
   const resourceById = new Map(resources.map(r => [r.id, r]));
 
@@ -249,7 +278,23 @@ async function applyFixes(fixes: ResourceFix[], resources: Resource[]): Promise<
       url: resource.url,
     };
     if (fix.field === 'authors') {
-      body.authors = [fix.newValue];
+      if (Array.isArray(fix.newValue)) {
+        // newValue is already an array — use as-is
+        body.authors = fix.newValue;
+      } else if (resource.authors) {
+        // Preserve existing authors: find and replace the matching entry, or append
+        const idx = resource.authors.findIndex(a => a === fix.oldValue);
+        const updated = [...resource.authors];
+        if (idx >= 0) {
+          updated[idx] = fix.newValue;
+        } else {
+          updated.push(fix.newValue);
+        }
+        body.authors = updated;
+      } else {
+        // No existing authors — fall back to single-element array
+        body.authors = [fix.newValue];
+      }
     } else {
       body[fix.field] = fix.newValue;
     }
@@ -261,15 +306,17 @@ async function applyFixes(fixes: ResourceFix[], resources: Resource[]): Promise<
         console.log(`  ✓ Fixed ${fix.field} for ${fix.resourceId} [${fix.source}]`);
       } else {
         failed++;
+        apiFailures++;
         console.log(`  ✗ Failed ${fix.resourceId}: ${result.message}`);
       }
     } catch (err: unknown) {
       failed++;
+      apiFailures++;
       console.log(`  ✗ Error ${fix.resourceId}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
-  return { applied, failed };
+  return { applied, failed, apiFailures };
 }
 
 export async function fixResourcesCommand(
@@ -287,24 +334,40 @@ export async function fixResourcesCommand(
   console.log(`   Total resources: ${resources.length}\n`);
 
   const allFixes: ResourceFix[] = [];
+  let apiFailureCount = 0;
 
   console.log('📚 Checking arXiv papers...');
-  allFixes.push(...await findArxivFixes(resources, limit));
+  const arxivResult = await findArxivFixes(resources, limit);
+  allFixes.push(...arxivResult.fixes);
+  apiFailureCount += arxivResult.apiFailures;
 
   console.log('📖 Checking Wikipedia links...');
-  allFixes.push(...await findWikipediaFixes(resources, limit));
+  const wikiResult = await findWikipediaFixes(resources, limit, verbose);
+  allFixes.push(...wikiResult.fixes);
+  apiFailureCount += wikiResult.apiFailures;
 
   console.log('🔬 Checking DOIs...');
-  allFixes.push(...await findDoiFixes(resources, limit));
+  const doiResult = await findDoiFixes(resources, limit, verbose);
+  allFixes.push(...doiResult.fixes);
+  apiFailureCount += doiResult.apiFailures;
 
   console.log('💬 Checking forum posts...');
-  allFixes.push(...await findForumFixes(resources, limit));
+  const forumResult = await findForumFixes(resources, limit, verbose);
+  allFixes.push(...forumResult.fixes);
+  apiFailureCount += forumResult.apiFailures;
+
+  if (apiFailureCount > 0) {
+    console.log(`\n  ⚠ ${apiFailureCount} API failure(s) during fetching`);
+  }
 
   console.log('\n' + '='.repeat(60));
 
   if (allFixes.length === 0) {
-    console.log('\n✅ No fixable issues found!');
-    return { exitCode: 0, output: 'No fixes needed' };
+    const msg = apiFailureCount > 0
+      ? `No fixes found (${apiFailureCount} API failures)`
+      : 'No fixes needed';
+    console.log(`\n✅ ${msg}`);
+    return { exitCode: apiFailureCount > 0 ? 1 : 0, output: msg };
   }
 
   const bySource: Record<string, ResourceFix[]> = {};
@@ -322,13 +385,15 @@ export async function fixResourcesCommand(
   }
 
   if (dryRun) {
+    const msg = `${allFixes.length} fixes available${apiFailureCount > 0 ? `, ${apiFailureCount} API failures` : ''}`;
     console.log(`\n  Run with --apply to fix ${allFixes.length} issues.`);
-    return { exitCode: 0, output: `${allFixes.length} fixes available` };
+    return { exitCode: apiFailureCount > 0 ? 1 : 0, output: msg };
   }
 
   console.log(`\n  Applying ${allFixes.length} fixes...\n`);
-  const { applied, failed } = await applyFixes(allFixes, resources);
-  console.log(`\n  Results: ${applied} applied, ${failed} failed`);
+  const { applied, failed, apiFailures: applyApiFailures } = await applyFixes(allFixes, resources);
+  apiFailureCount += applyApiFailures;
+  console.log(`\n  Results: ${applied} applied, ${failed} failed${apiFailureCount > 0 ? `, ${apiFailureCount} total API failures` : ''}`);
 
-  return { exitCode: failed > 0 ? 1 : 0, output: `${applied} fixes applied, ${failed} failed` };
+  return { exitCode: failed > 0 || apiFailureCount > 0 ? 1 : 0, output: `${applied} fixes applied, ${failed} failed, ${apiFailureCount} API failures` };
 }
