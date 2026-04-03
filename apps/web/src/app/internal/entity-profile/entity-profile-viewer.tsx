@@ -113,7 +113,7 @@ function TypeBadge({ dataType }: { dataType: string }) {
 const VERDICT_COLORS: Record<string, string> = {
   confirmed: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
   contradicted: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800",
-  unverifiable: "bg-muted text-muted-foreground border-border",
+  unverifiable: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800",
   outdated: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
   partial: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-300 dark:border-yellow-800",
   unchecked: "bg-muted/50 text-muted-foreground/60 border-border/50",
