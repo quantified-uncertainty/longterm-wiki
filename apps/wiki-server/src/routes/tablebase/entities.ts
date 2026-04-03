@@ -928,12 +928,17 @@ const entitiesApp = new Hono()
         //
         // Instead: clear stale slugs first, then upsert on stableId (PK).
         // If a slug was reassigned to a different stableId, the old row's
-        // slug is set to a placeholder so the new row can claim it.
+        // slug is set to a title-derived fallback (with "-displaced" suffix)
+        // instead of the raw stable_id, to avoid exposing machine IDs in URLs.
         const slugToStableId = new Map(allVals.map((v) => [v.id, v.stableId]));
         for (const [slug, stableId] of slugToStableId) {
-          // If another entity currently holds this slug, clear it
+          // Reassign to title-derived slug instead of raw stable_id
           await tx.execute(sql`
-            UPDATE entities SET id = stable_id
+            UPDATE entities
+            SET id = LOWER(REGEXP_REPLACE(
+              REGEXP_REPLACE(TRANSLATE(title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
+              '-+', '-', 'g'
+            )) || '-displaced'
             WHERE id = ${slug} AND stable_id != ${stableId}
           `);
         }

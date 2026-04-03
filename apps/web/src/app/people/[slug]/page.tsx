@@ -1,7 +1,9 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { resolveSlugAlias } from "@/data/factbase";
+import { resolveSlugAlias, getKBEntitySlug } from "@/data/factbase";
+import { isAnySid } from "@/lib/stable-id";
+import { titleToSlug } from "@/lib/slug-utils";
 import {
   resolvePersonBySlug,
   getPersonSlugs,
@@ -45,8 +47,12 @@ import { EntitySources } from "./entity-sources";
 import {
   ScorecardDisplay,
   OfficeHistory,
+  CampaignFinance,
+  VoteRecord,
   fetchPoliticalScores,
   fetchPoliticalOffices,
+  fetchCampaignFinance,
+  fetchPoliticalVotes,
 } from "@/components/political";
 
 // Allow dynamic rendering of person pages not in generateStaticParams
@@ -158,6 +164,17 @@ export default async function PersonProfilePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+
+  // Redirect stableId-format URLs to canonical human-readable slug
+  if (isAnySid(slug)) {
+    const stableIdEntity = resolvePersonEntity(slug) ?? await resolvePersonFromServer(slug);
+    if (stableIdEntity) {
+      const canonicalSlug = getKBEntitySlug(stableIdEntity.id) ?? titleToSlug(stableIdEntity.name);
+      permanentRedirect(`/people/${canonicalSlug}`);
+    }
+    return notFound();
+  }
+
   const entity = resolvePersonEntity(slug) ?? await resolvePersonFromServer(slug);
   if (!entity) {
     const canonical = resolveSlugAlias(slug);
@@ -213,12 +230,13 @@ export default async function PersonProfilePage({
   // Policy positions (reverse lookup: find legislation where this person is a stakeholder)
   const policyPositions = getPersonPolicyPositions(entity.id, entity.name);
 
-  // TODO: These are live wiki-server calls. Political scores/offices are not yet
-  // in database.json. Once they are, replace with local data reads.
-  // See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
-  const [politicalScores, politicalOffices] = await Promise.all([
+  // Political data from wiki-server. Scores/offices/votes/finance are not yet
+  // in database.json — see https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
+  const [politicalScores, politicalOffices, campaignFinance, politicalVotes] = await Promise.all([
     fetchPoliticalScores(entity.id),
     fetchPoliticalOffices(entity.id),
+    fetchCampaignFinance(entity.id),
+    fetchPoliticalVotes(entity.id),
   ]);
 
   // All facts for count
@@ -330,10 +348,8 @@ export default async function PersonProfilePage({
         <ExpertPositions positions={positions} />
         <PolicyPositionsSection positions={policyPositions} />
         <ScorecardDisplay scores={politicalScores} />
-        {/* VoteRecords — component will be created by another agent */}
-        {/* TODO: import VoteRecord from "@/components/political/vote-record" when available */}
-        {/* CampaignFinance — component will be created by another agent */}
-        {/* TODO: import CampaignFinance from "@/components/political/campaign-finance" when available */}
+        <VoteRecord votes={politicalVotes} />
+        <CampaignFinance records={campaignFinance} />
         <OrgRoles orgRoles={sortedOrgRoles} />
         <BoardSeats boardSeats={sortedBoardSeats} />
         {educationText && <EducationSection education={educationText} />}

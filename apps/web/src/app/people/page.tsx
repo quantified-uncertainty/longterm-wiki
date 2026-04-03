@@ -8,6 +8,8 @@ import { PeopleTable, type PersonRow } from "./people-table";
 import { getPublicationsForPerson, getTypedEntities, getPersonEntityById, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import { partitionPersonRows } from "./people-filter";
+import { isAnySid } from "@/lib/stable-id";
+import { titleToSlug } from "@/lib/slug-utils";
 
 export const metadata: Metadata = {
   title: "People",
@@ -104,9 +106,12 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
     }
   }
 
+  // Generate proper slug when API entity id is a stableId placeholder
+  const slug = isAnySid(e.id) ? titleToSlug(e.title) : e.id;
+
   return {
     id: entityId,
-    slug: e.id,
+    slug,
     name: e.title,
     wikiId: e.wikiId ?? null,
     wikiPageId: e.wikiId ?? null,
@@ -268,9 +273,11 @@ function loadFromLocal(): PersonRow[] {
       continue;
     }
 
+    const tpSlug = isAnySid(tp.id) ? titleToSlug(tp.title) : tp.id;
+
     rows.push({
       id: tp.id,
-      slug: tp.id,
+      slug: tpSlug,
       name: tp.title,
       wikiId: tp.wikiId ?? null,
       wikiPageId: tp.wikiId ?? null,
