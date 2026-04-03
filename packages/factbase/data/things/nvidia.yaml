@@ -117,7 +117,7 @@ facts:
       record $68.1B."
 
   # ── Quarterly Data Center Revenue ───────────────────────────────
-  - id: f_co_pd_qlW0
+  - id: EpuVZ6VzMA
     property: quarterly-data-center-revenue
     value: 6.23e+10
     unit: USD

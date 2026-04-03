@@ -37,7 +37,7 @@ const verbose = process.argv.includes("--verbose");
 // ║  The baseline must only go DOWN (via migration of old IDs).    ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
-const LEGACY_FACTID_FORMAT_BASELINE = 294; // updated 2026-04-01 after FactBase enrichment increased count
+const LEGACY_FACTID_FORMAT_BASELINE = 0; // reset 2026-04-03: all legacy IDs normalized by normalize-ids.ts
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {
@@ -100,8 +100,13 @@ async function main(): Promise<void> {
     join(PROJECT_ROOT, "packages/factbase/src/validate.ts")
   );
 
+  const { buildTableBaseEntityMap } = await import(
+    join(PROJECT_ROOT, "crux/lib/factbase-loader.ts")
+  );
+
   const dataDir = join(PROJECT_ROOT, "packages/factbase/data");
-  const { graph } = await loadKB(dataDir);
+  const entities = buildTableBaseEntityMap();
+  const { graph } = await loadKB(dataDir, { entities });
   const results: ValidationResult[] = validate(graph);
 
   // Separate blocking errors from demoted/warning-level issues

@@ -1,39 +1,39 @@
 entity: sid_CABtVBdlnf
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: f_skh_found
+  - id: 0TIbMZ75tg
     property: founded-date
     value: "1983-02"
     source: https://en.wikipedia.org/wiki/SK_Hynix
     notes: "Founded as Hyundai Electronics; renamed SK Hynix in 2012"
 
-  - id: f_skh_hq
+  - id: zI3h5CcX1w
     property: headquarters
     value: "Icheon, South Korea"
     source: https://en.wikipedia.org/wiki/SK_Hynix
 
-  - id: f_skh_country
+  - id: lJt4np5gjA
     property: country
     value: South Korea
     source: https://en.wikipedia.org/wiki/SK_Hynix
 
-  - id: f_skh_legal
+  - id: IjSdPpnNCg
     property: legal-structure
     value: "Public company (KRX: 000660)"
     source: https://en.wikipedia.org/wiki/SK_Hynix
 
-  - id: f_skh_website
+  - id: cfW9SKmyGQ
     property: website
     value: https://www.skhynix.com
     source: https://en.wikipedia.org/wiki/SK_Hynix
 
-  - id: f_skh_wiki
+  - id: EyRAhWudRw
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/SK_Hynix
     source: https://en.wikipedia.org/wiki/SK_Hynix
 
   # ── Description ─────────────────────────────────────────────────
-  - id: f_skh_desc
+  - id: aUjdy9cqkg
     property: description
     value: >-
       World's leading producer of high-bandwidth memory (HBM), a critical component
@@ -59,7 +59,7 @@ facts:
     notes: "2023 annual revenue (~$25.0B; KRW 32.8T at ~1,310 KRW/USD avg rate).
       Memory downturn year with operating loss."
 
-  - id: f_skh_rev_2024
+  - id: 7SVUQ7yMDg
     property: revenue
     value: 4.7e+10
     asOf: 2024-12
@@ -84,7 +84,7 @@ facts:
     notes: "Approximately 33,625 employees worldwide at end of 2024"
 
   # ── HBM market share ────────────────────────────────────────────
-  - id: f_skh_hbm_share
+  - id: LrjvFRVjlw
     property: hbm-market-share
     value: 53
     unit: percent
