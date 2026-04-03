@@ -332,7 +332,7 @@
   type: organization
   orgType: academic
   # parentOrg = legally separate part of another org (not an internal division)
-  parentOrg: sid_ksqqi7fyeA
+  parentOrg: uc-berkeley
   summaryPage: safety-orgs-overview
   title: Center for Human-Compatible AI (CHAI)
   aliases:
@@ -946,8 +946,7 @@
   wikiId: E365
   type: organization
   orgType: government
-  # parentOrg: nist — changed to nist-ai (valid entity ID)
-  parentOrg: sid_Eac7pHF06Q
+  parentOrg: nist-ai
   summaryPage: government-orgs-overview
   title: US AI Safety Institute (now CAISI)
   website: https://www.nist.gov/aisi
