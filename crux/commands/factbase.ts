@@ -1132,6 +1132,8 @@ Commands:
   stale [days]          List facts older than N days (default: 180)
   needs-update <id>     Show missing and stale data for an entity
   add-fact <entity> <property> <value>   Add a fact to an entity YAML file
+  import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
+  import-990 --discover <query>         Search ProPublica by org name
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   source-check          Check KB facts against source URLs using LLM
@@ -1146,7 +1148,9 @@ Options:
   --rule=X              Filter by rule name (validate)
   --entity=X            (source-check) Check all facts for one entity
   --fact=X              (source-check) Check a single fact by ID
-  --dry-run             (source-check) Show what would be checked without calling LLM
+  --dry-run             Preview changes without writing (source-check, import-990)
+  --ein=XXXXXXXXX       (import-990) Specify EIN directly
+  --force               (import-990, add-fact) Overwrite existing facts
   --asOf=YYYY-MM        (add-fact) Temporal anchor date
   --source=URL          (add-fact) Source URL
   --notes=TEXT           (add-fact) Free-text annotation
@@ -1161,6 +1165,9 @@ Examples:
   crux fb needs-update anthropic      What's missing for Anthropic
   crux fb coverage --type=organization Organizations property coverage
   crux fb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
+  crux fb import-990 cais --dry-run   Preview 990 data for CAIS
+  crux fb import-990 givewell --ein=208625442  Import GiveWell 990 data
+  crux fb import-990 --discover "Machine Intelligence Research"  Search ProPublica
   crux fb sync-sources                Sync source URLs to wiki-server resources
   crux fb source-check --entity=anthropic   Check Anthropic facts against sources
   crux fb source-check --dry-run --limit=5  Preview 5 facts that would be checked
