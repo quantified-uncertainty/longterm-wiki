@@ -42,8 +42,6 @@ export interface CandidateRow {
   party: string | null;
 }
 
-const PAGE_SIZE = 20;
-
 export function RacesTable({ rows }: { rows: RaceRow[] }) {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [levelFilter, setLevelFilter] = useState<string>("all");
@@ -113,12 +111,12 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b text-left text-muted-foreground">
-              <th className="pb-2 pr-4 font-medium">Race</th>
-              <th className="pb-2 pr-4 font-medium">Level</th>
-              <th className="pb-2 pr-4 font-medium">Date</th>
-              <th className="pb-2 pr-4 font-medium">Status</th>
-              <th className="pb-2 pr-4 font-medium">AI Angle</th>
-              <th className="pb-2 pr-4 font-medium">Candidates</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">Race</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">Level</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">Date</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">Status</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">AI Angle</th>
+              <th scope="col" className="pb-2 pr-4 font-medium">Candidates</th>
             </tr>
           </thead>
           <tbody>
@@ -126,9 +124,18 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
               <Fragment key={race.id}>
                 <tr
                   className="border-b hover:bg-muted/50 cursor-pointer"
+                  tabIndex={0}
+                  role="button"
+                  aria-expanded={expandedRace === race.id}
                   onClick={() =>
                     setExpandedRace(expandedRace === race.id ? null : race.id)
                   }
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setExpandedRace(expandedRace === race.id ? null : race.id);
+                    }
+                  }}
                 >
                   <td className="py-2 pr-4">
                     <span className="inline-flex items-center gap-1">
@@ -189,13 +196,13 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                         <table className="w-full text-xs">
                           <thead>
                             <tr className="text-left text-muted-foreground">
-                              <th className="pb-1 pr-3">Candidate</th>
-                              <th className="pb-1 pr-3">Party</th>
-                              <th className="pb-1 pr-3">Status</th>
-                              <th className="pb-1 pr-3">AI Stance</th>
-                              <th className="pb-1 pr-3">PAC</th>
-                              <th className="pb-1 pr-3 text-right">PAC Spend</th>
-                              <th className="pb-1 pr-3 text-right">Vote %</th>
+                              <th scope="col" className="pb-1 pr-3">Candidate</th>
+                              <th scope="col" className="pb-1 pr-3">Party</th>
+                              <th scope="col" className="pb-1 pr-3">Status</th>
+                              <th scope="col" className="pb-1 pr-3">AI Stance</th>
+                              <th scope="col" className="pb-1 pr-3">PAC</th>
+                              <th scope="col" className="pb-1 pr-3 text-right">PAC Spend</th>
+                              <th scope="col" className="pb-1 pr-3 text-right">Vote %</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -216,7 +223,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                     <span className="ml-1 text-muted-foreground">(I)</span>
                                   )}
                                   {c.isWinner && (
-                                    <span className="ml-1 text-green-600">✓</span>
+                                    <span className="ml-1 text-green-600" aria-label="Winner" role="img">✓</span>
                                   )}
                                 </td>
                                 <td className="py-1 pr-3 capitalize">{c.party ?? "—"}</td>
