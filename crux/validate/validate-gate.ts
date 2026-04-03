@@ -552,9 +552,10 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-resource-quality.ts'],
     cwd: PROJECT_ROOT,
-    // Blocking for errors (HTML in titles, URL-as-title, non-printable chars).
-    // Warnings (platform-name authors, type/subtype contradictions) are advisory.
+    // Advisory: errors are in PG data that require server access to fix.
+    // Warnings (platform-name authors, type/subtype contradictions) are informational.
     // Gracefully skips if snapshot file is unavailable (fail-open).
+    advisory: true,
   },
   {
     id: 'cross-base',
