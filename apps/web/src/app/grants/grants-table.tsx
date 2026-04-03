@@ -435,7 +435,7 @@ export function GrantsTable({
 
                 {/* Amount */}
                 <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
-                  {row.amount != null ? (
+                  {row.amount != null && row.amount > 0 ? (
                     <span className="font-semibold">
                       {formatCompactCurrency(row.amount)}
                     </span>
