@@ -12,7 +12,6 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
 import { storeVerdict as storeVerdictRpc, getDueForRecheck, getEvidenceByRecord } from '../lib/wiki-server/verifications.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import {

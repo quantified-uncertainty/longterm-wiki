@@ -19,6 +19,7 @@ import {
   getServerUrl,
   type ApiResult,
 } from "../wiki-server/client.ts";
+import { generateDeterministicId } from "./id-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -99,15 +100,13 @@ export function generateVoteId(
   rollCallNumber: number | null,
   congressNumber: number | null,
 ): string {
-  const input = `political-vote:${legislationId}:${politicianName}:${rollCallNumber ?? 0}:${congressNumber ?? 0}`;
-  const hash = createHash("sha256").update(input).digest("base64url");
-  const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-  return hash
-    .substring(0, 10)
-    .replace(/[-_]/g, (ch) => {
-      const code = ch.charCodeAt(0);
-      return REPLACEMENT_CHARS[code % REPLACEMENT_CHARS.length];
-    });
+  return generateDeterministicId(
+    "political-vote",
+    legislationId,
+    politicianName,
+    rollCallNumber ?? 0,
+    congressNumber ?? 0,
+  );
 }
 
 // ---------------------------------------------------------------------------

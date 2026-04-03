@@ -19,9 +19,23 @@
  */
 
 import { execFileSync } from 'child_process';
-import type { JobHandlerContext, JobHandlerResult, BatchCommitParams, FileChange } from './types.ts';
+import { z } from 'zod';
+import type { JobHandlerContext, JobHandlerResult, FileChange } from './types.ts';
 import { getJob } from '../wiki-server/jobs.ts';
 import { applyFileChanges } from './utils.ts';
+
+// ---------------------------------------------------------------------------
+// Params validation
+// ---------------------------------------------------------------------------
+
+const BatchCommitParamsSchema = z.object({
+  batchId: z.string().min(1),
+  childJobIds: z.array(z.number()),
+  branchName: z.string().optional(),
+  prTitle: z.string().min(1),
+  prBody: z.string().optional(),
+  prLabels: z.array(z.string()).default([]),
+});
 
 /** Maximum number of incomplete child jobs before we give up waiting */
 const MAX_INCOMPLETE_TOLERANCE = 0;
@@ -44,23 +58,14 @@ export async function handleBatchCommit(
   params: Record<string, unknown>,
   ctx: JobHandlerContext,
 ): Promise<JobHandlerResult> {
-  const {
-    batchId,
-    childJobIds,
-    branchName,
-    prTitle,
-    prBody,
-    prLabels = [],
-  } = params as unknown as BatchCommitParams;
+  const parsed = BatchCommitParamsSchema.safeParse(params);
+  if (!parsed.success) {
+    return { success: false, data: {}, error: `Invalid params: ${parsed.error.message}` };
+  }
+  const { batchId, childJobIds, branchName, prTitle, prBody, prLabels } = parsed.data;
 
-  if (!batchId) {
-    return { success: false, data: {}, error: 'Missing required param: batchId' };
-  }
-  if (!childJobIds || childJobIds.length === 0) {
-    return { success: false, data: {}, error: 'Missing required param: childJobIds (must be non-empty array)' };
-  }
-  if (!prTitle) {
-    return { success: false, data: {}, error: 'Missing required param: prTitle' };
+  if (childJobIds.length === 0) {
+    return { success: false, data: {}, error: 'childJobIds must be non-empty' };
   }
 
   if (ctx.verbose) {

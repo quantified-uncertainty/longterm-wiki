@@ -97,6 +97,10 @@ const handlers: Record<string, JobHandler> = {
   // Per-resource LLM enrichment (#3499) — lazy to avoid Anthropic SDK cycle
   'resource-enrich': lazyHandler(async () =>
     (await import('./resource-enrich.ts')).handleResourceEnrich),
+
+  // Legacy alias: resource-verify → resource-ingest
+  'resource-verify': lazyHandler(async () =>
+    (await import('./resource-ingest.ts')).handleResourceIngest),
 };
 
 /**

@@ -183,6 +183,10 @@ import type { DataQualityRoute } from "@wiki-server/data-quality-route";
 import type { TalentFlowsRoute } from "@wiki-server/talent-flows-route";
 import type { JobsRoute } from "@wiki-server/jobs-route";
 import type { DataSourcesRoute } from "@wiki-server/data-sources-route";
+import type { PoliticalScoresRoute } from "@wiki-server/political-scores-route";
+import type { PoliticalOfficesRoute } from "@wiki-server/political-offices-route";
+import type { PoliticalVotesRoute } from "@wiki-server/political-votes-route";
+import type { CampaignFinanceRoute } from "@wiki-server/campaign-finance-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -426,6 +430,9 @@ type JobsClient = ReturnType<typeof hc<JobsRoute>>;
 /** Inferred response type for GET /api/jobs/stats */
 export type RpcJobsStatsResult = InferResponseType<JobsClient['stats']['$get'], 200>;
 
+/** Inferred response type for GET /api/jobs/dashboard (combined stats + failures) */
+export type RpcJobsDashboardResult = InferResponseType<JobsClient['dashboard']['$get'], 200>;
+
 /** Inferred response type for GET /api/jobs/ (list) */
 export type RpcJobsListResult = InferResponseType<JobsClient['index']['$get'], 200>;
 
@@ -473,4 +480,55 @@ export type RpcDataSourceDetailResult = InferResponseType<DataSourcesClient[':id
 
 /** Inferred response type for GET /api/data-sources/:id/snapshots (used by detail page — PR 2) */
 export type RpcSnapshotListResult = InferResponseType<DataSourcesClient[':id']['snapshots']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Political Scores API
+// ============================================================================
+
+type PoliticalScoresClient = ReturnType<typeof hc<PoliticalScoresRoute>>;
+
+/** Inferred response type for GET /api/political-scores/by-entity/:entityId */
+export type RpcPoliticalScoresByEntityResult = InferResponseType<PoliticalScoresClient['by-entity'][':entityId']['$get'], 200>;
+
+/** A single political score row */
+export type RpcPoliticalScore = RpcPoliticalScoresByEntityResult['scores'][number];
+
+// ============================================================================
+// Hono RPC client — Political Offices API
+// ============================================================================
+
+type PoliticalOfficesClient = ReturnType<typeof hc<PoliticalOfficesRoute>>;
+
+/** Inferred response type for GET /api/political-offices/by-entity/:entityId */
+export type RpcPoliticalOfficesByEntityResult = InferResponseType<PoliticalOfficesClient['by-entity'][':entityId']['$get'], 200>;
+
+/** A single political office row */
+export type RpcPoliticalOffice = RpcPoliticalOfficesByEntityResult['offices'][number];
+
+// ============================================================================
+// Hono RPC client — Campaign Finance API
+// ============================================================================
+
+type CampaignFinanceClient = ReturnType<typeof hc<CampaignFinanceRoute>>;
+
+/** Inferred response type for GET /api/campaign-finance/by-entity/:entityId */
+export type RpcCampaignFinanceByEntityResult = InferResponseType<CampaignFinanceClient['by-entity'][':entityId']['$get'], 200>;
+
+/** A single campaign finance record */
+export type RpcCampaignFinanceRecord = RpcCampaignFinanceByEntityResult['records'][number];
+
+// ============================================================================
+// Hono RPC client — Political Votes API
+// ============================================================================
+
+type PoliticalVotesClient = ReturnType<typeof hc<PoliticalVotesRoute>>;
+
+/** Inferred response type for GET /api/political-votes/by-entity/:entityId */
+export type RpcPoliticalVotesByEntityResult = InferResponseType<PoliticalVotesClient['by-entity'][':entityId']['$get'], 200>;
+
+/** Inferred response type for GET /api/political-votes/by-legislation/:legislationId */
+export type RpcPoliticalVotesByLegislationResult = InferResponseType<PoliticalVotesClient['by-legislation'][':legislationId']['$get'], 200>;
+
+/** A single political vote record */
+export type RpcPoliticalVoteRecord = RpcPoliticalVotesByEntityResult['votes'][number];
 

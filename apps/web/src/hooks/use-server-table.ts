@@ -137,7 +137,9 @@ export function useServerTable<T>(
       })
       .finally(() => {
         clearTimeout(timeout);
-        setIsLoading(false);
+        // Only clear loading if this is still the active request — prevents
+        // a stale .finally() from overwriting a newer request's loading state.
+        if (abortRef.current === controller) setIsLoading(false);
       });
 
     return () => { clearTimeout(timeout); controller.abort(); };

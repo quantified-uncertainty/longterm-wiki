@@ -21,9 +21,9 @@ facts:
     notes: From Wikidata Q4406987
   - id: sKYr07wHKQ
     property: website
-    value: http://www.samotsvetu.ru
-    source: https://www.wikidata.org/wiki/Q4406987
-    notes: From Wikidata Q4406987
+    value: https://samotsvety.org
+    source: https://samotsvety.org
+    notes: "Official website of Samotsvety Forecasting. Previous values (samotsvetu.ru, samotsvety.ru) were for the unrelated Russian pop band (Wikidata Q4406987)."
   - id: VLccWZ2UZw
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Samotsvety

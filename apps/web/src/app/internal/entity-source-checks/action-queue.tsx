@@ -3,31 +3,22 @@
 import { useState, useEffect } from "react";
 import { Loader2, AlertTriangle, Clock, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  SOURCE_CHECK_VERDICT_STYLES,
+  type VerdictRow,
+} from "@/components/shared/verdict-styles";
 
 // ── Types ──────────────────────────────────────────────────────────────────
-
-interface VerdictRow {
-  recordType: string;
-  recordId: string;
-  fieldName: string | null;
-  entityId: string | null;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number;
-  needsRecheck: boolean;
-  nextCheckDue: string | null;
-  lastComputedAt: string | null;
-}
 
 type NameMap = Record<string, string>;
 
 // ── Verdict styling ────────────────────────────────────────────────────────
+// Extends the shared source-check styles with lucide icons for the action queue.
 
-const VERDICT_STYLES: Record<string, { bg: string; text: string; icon: typeof AlertTriangle }> = {
-  contradicted: { bg: "bg-red-500/15", text: "text-red-600", icon: AlertTriangle },
-  outdated: { bg: "bg-amber-500/15", text: "text-amber-600", icon: Clock },
-  partial: { bg: "bg-amber-400/15", text: "text-amber-500", icon: RefreshCw },
+const VERDICT_STYLES_WITH_ICONS: Record<string, { bg: string; text: string; icon: typeof AlertTriangle }> = {
+  contradicted: { ...SOURCE_CHECK_VERDICT_STYLES.contradicted, icon: AlertTriangle },
+  outdated: { ...SOURCE_CHECK_VERDICT_STYLES.outdated, icon: Clock },
+  partial: { ...SOURCE_CHECK_VERDICT_STYLES.partial, icon: RefreshCw },
 };
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -247,7 +238,7 @@ function ActionGroup({
   names: NameMap;
   variant: "contradicted" | "outdated" | "partial";
 }) {
-  const style = VERDICT_STYLES[variant];
+  const style = VERDICT_STYLES_WITH_ICONS[variant];
   const Icon = style.icon;
 
   return (

@@ -18,6 +18,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
+import type { SourceCheckVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { PROJECT_ROOT } from '../../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
@@ -48,8 +49,6 @@ interface PolicyEntity {
   stakeholders?: Stakeholder[];
 }
 
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'partial' | 'unverifiable';
-
 interface VerificationResult {
   policyId: string;
   policyTitle: string;
@@ -57,7 +56,7 @@ interface VerificationResult {
   position: string;
   reason?: string;
   sourceUrl: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -131,7 +130,7 @@ async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | n
 // ---------------------------------------------------------------------------
 
 interface LlmVerificationResult {
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -198,9 +197,9 @@ If the position matches but the reason is different, use "partial".`;
       notes?: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
 
     const confidence = typeof parsed.confidence === 'number'
@@ -235,7 +234,7 @@ interface PostVerificationBody {
   sourceUrl: string;
   fieldName: string;
   expectedValue: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   checkerModel: string;
@@ -246,7 +245,7 @@ interface PostVerificationBody {
 interface PostVerdictBody {
   recordType: string;
   recordId: string;
-  verdict: VerificationVerdict | 'unchecked';
+  verdict: SourceCheckVerdict | 'unchecked';
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
@@ -350,7 +349,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
         position: item.stakeholder.position,
         reason: item.stakeholder.reason,
         sourceUrl: item.stakeholder.source!,
-        verdict: existingVerdict.verdict as VerificationVerdict,
+        verdict: existingVerdict.verdict as SourceCheckVerdict,
         confidence: existingVerdict.confidence ?? 0,
         extractedEvidence: '',
         notes: 'Already verified — skipped',

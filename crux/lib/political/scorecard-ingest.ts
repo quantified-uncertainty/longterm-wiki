@@ -9,12 +9,12 @@
  * IDs, and error reporting.
  */
 
-import { createHash } from "node:crypto";
 import {
   apiRequest,
   getServerUrl,
   type ApiResult,
 } from "../wiki-server/client.ts";
+import { generateDeterministicId } from "./id-utils.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -84,16 +84,7 @@ export function generateScoreId(
   politicianName: string,
   year: number,
 ): string {
-  const input = `political-score:${scorerOrg}:${politicianName}:${year}`;
-  const hash = createHash("sha256").update(input).digest("base64url");
-  // Strip non-alphanumeric chars from base64url output
-  const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-  return hash
-    .substring(0, 10)
-    .replace(/[-_]/g, (ch) => {
-      const code = ch.charCodeAt(0);
-      return REPLACEMENT_CHARS[code % REPLACEMENT_CHARS.length];
-    });
+  return generateDeterministicId("political-score", scorerOrg, politicianName, year);
 }
 
 /**
@@ -102,15 +93,7 @@ export function generateScoreId(
  * approach so re-imports produce the same placeholder.
  */
 export function placeholderEntityId(name: string): string {
-  const input = `politician:${name.toLowerCase().trim()}`;
-  const hash = createHash("sha256").update(input).digest("base64url");
-  const REPLACEMENT_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz";
-  return "sid_" + hash
-    .substring(0, 10)
-    .replace(/[-_]/g, (ch) => {
-      const code = ch.charCodeAt(0);
-      return REPLACEMENT_CHARS[code % REPLACEMENT_CHARS.length];
-    });
+  return "sid_" + generateDeterministicId("politician", name.toLowerCase().trim());
 }
 
 // ---------------------------------------------------------------------------

@@ -18,7 +18,7 @@ import type { CampaignFinanceRecord } from "./types";
 
 // ── Numeric parsing ─────────────────────────────────────────────────
 
-function toNum(value: string | null): number {
+function toNum(value: number | string | null): number {
   if (value == null) return 0;
   const n = Number(value);
   return isNaN(n) ? 0 : n;

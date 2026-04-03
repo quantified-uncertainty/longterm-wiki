@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { getAllKBRecords, getKBEntitySlug } from "@/data/factbase";
+import { getTypedEntityByStableId } from "@/data";
 
 /**
  * Legacy grant detail page — redirects to the org-scoped URL.
@@ -17,7 +18,13 @@ export default async function GrantRedirectPage({ params }: PageProps) {
 
   if (!record) notFound();
 
-  const funderSlug = getKBEntitySlug(record.ownerEntityId);
+  // Try FactBase slug map first, then fall back to TableBase entity lookup
+  let funderSlug = getKBEntitySlug(record.ownerEntityId);
+  if (!funderSlug && record.ownerEntityId) {
+    const entity = getTypedEntityByStableId(record.ownerEntityId);
+    if (entity) funderSlug = entity.id;
+  }
+
   if (funderSlug) {
     redirect(`/organizations/${funderSlug}/grants/${id}`);
   }

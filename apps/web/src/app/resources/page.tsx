@@ -60,8 +60,11 @@ export default function ResourcesPage() {
   const publications = getAllPublications();
   const resources = getAllResources();
 
-  // Build resource rows for the table
-  const resourceRows: ResourceRow[] = resources.map((r) => {
+  // Build resource rows for the table.
+  // Only ship resources that are cited by at least one page or have enrichment
+  // data — this avoids sending 21k+ rows (16 MB+) to the client when most
+  // uncited resources add no value to the directory view.
+  const allResourceRows: ResourceRow[] = resources.map((r) => {
     const publication = getResourcePublication(r);
     const credibility = getResourceCredibility(r);
     const citingPages = getPagesForResource(r.id);
@@ -75,7 +78,7 @@ export default function ResourcesPage() {
       citingPageCount: citingPages.length,
       tags: r.tags ?? [],
       publishedDate: r.published_date ?? null,
-      contextNote: r.context_note ?? null,
+      contextNote: null, // Omit long text — not shown in table columns
       resourceSubtype: r.resource_subtype ?? null,
       importanceScore: r.importance_score ?? null,
       enrichmentStatus: r.enrichment_status ?? null,
@@ -83,6 +86,11 @@ export default function ResourcesPage() {
       karma: r.forum_post?.karma ?? null,
     };
   });
+
+  // Filter to resources worth showing: cited by pages, enriched, or high credibility
+  const resourceRows = allResourceRows.filter(
+    (r) => r.citingPageCount > 0 || r.enrichmentStatus === "enriched" || r.enrichmentStatus === "reviewed" || (r.credibility !== null && r.credibility >= 3)
+  );
 
   // Resource type breakdown
   const typeCounts = new Map<string, number>();
@@ -252,6 +260,13 @@ export default function ResourcesPage() {
         </div>
       )}
 
+      {resourceRows.length < resources.length && (
+        <p className="text-xs text-muted-foreground mb-3">
+          Showing {resourceRows.length.toLocaleString()} of{" "}
+          {resources.length.toLocaleString()} resources (cited by pages, enriched,
+          or credibility &ge; 3). Use individual resource pages for the full catalog.
+        </p>
+      )}
       <ResourcesTable rows={resourceRows} />
     </div>
   );

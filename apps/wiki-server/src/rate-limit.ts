@@ -28,6 +28,7 @@
  */
 
 import type { Context, MiddlewareHandler } from "hono";
+import { verifyToken } from "./auth.js";
 import { logger } from "./logger.js";
 
 // ---------------------------------------------------------------------------
@@ -321,7 +322,14 @@ export function rateLimitMiddleware(
     // Use higher limits for authenticated requests (internal traffic:
     // CI sync, Next.js ISR, crux CLI). Unauthenticated traffic gets
     // the stricter default limits.
-    const isAuthenticated = c.req.header("Authorization")?.startsWith("Bearer ");
+    // Validate the token (not just the header format) to prevent bypass
+    // via fake "Bearer garbage" headers getting elevated rate limits.
+    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    const authHeader = c.req.header("Authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const isAuthenticated = token != null && (
+      !expectedKey || verifyToken(token, expectedKey)
+    );
     let limiter: RateLimiter;
     if (isAuthenticated && (options.authReadLimiter || options.authWriteLimiter)) {
       limiter = isRead

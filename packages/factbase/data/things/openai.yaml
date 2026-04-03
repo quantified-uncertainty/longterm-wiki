@@ -2,10 +2,10 @@ entity: sid_1LcLlMGLbw
 facts:
   - id: f_1Y4HfGVOvA
     property: founded-date
-    value: 2015-12
+    value: "2015-12-11"
     source: https://openai.com/blog/introducing-openai
-    notes: "Founded December 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon
-      Musk, Wojciech Zaremski, and John Schulman"
+    notes: "Founded December 11, 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon
+      Musk, Wojciech Zaremski, and John Schulman. Blog post dated Dec 11."
 
   - id: f_jyRF7MXyWw
     property: headquarters

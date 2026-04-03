@@ -13,6 +13,10 @@ export interface FetchSourceResult {
   ingestEnqueued?: boolean;
   /** HTTP status code from citation_content or resource fetch_status, if available */
   httpStatus?: number | null;
+  /** Where the content was sourced from: 'live' (primary URL cache), 'archive' (Wayback Machine) */
+  sourceOrigin?: 'live' | 'archive';
+  /** ISO date string of the Wayback Machine snapshot, if sourceOrigin is 'archive' */
+  archiveDate?: string;
 }
 
 /** Result of an LLM source-check call */

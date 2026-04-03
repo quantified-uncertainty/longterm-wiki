@@ -13,23 +13,31 @@
  */
 
 import { execFileSync } from 'child_process';
-import type { JobHandlerContext, JobHandlerResult, PageImproveParams } from './types.ts';
+import { z } from 'zod';
+import type { JobHandlerContext, JobHandlerResult } from './types.ts';
 import { collectChangedFiles, restoreGitState, isContentFile } from './utils.ts';
+
+// ---------------------------------------------------------------------------
+// Params validation
+// ---------------------------------------------------------------------------
+
+const PageImproveParamsSchema = z.object({
+  pageId: z.string().min(1),
+  tier: z.enum(['polish', 'standard', 'deep']).default('standard'),
+  directions: z.string().optional(),
+  batchId: z.string().optional(),
+  apply: z.boolean().optional(),
+});
 
 export async function handlePageImprove(
   params: Record<string, unknown>,
   ctx: JobHandlerContext,
 ): Promise<JobHandlerResult> {
-  const { pageId, tier = 'standard', directions, batchId } = params as unknown as PageImproveParams;
-
-  if (!pageId) {
-    return { success: false, data: {}, error: 'Missing required param: pageId' };
+  const parsed = PageImproveParamsSchema.safeParse(params);
+  if (!parsed.success) {
+    return { success: false, data: {}, error: `Invalid params: ${parsed.error.message}` };
   }
-
-  const validTiers = ['polish', 'standard', 'deep'];
-  if (!validTiers.includes(tier)) {
-    return { success: false, data: {}, error: `Invalid tier: ${tier}. Must be one of: ${validTiers.join(', ')}` };
-  }
+  const { pageId, tier, directions, batchId } = parsed.data;
 
   if (ctx.verbose) {
     console.log(`[page-improve] Starting: ${pageId} (tier: ${tier})`);

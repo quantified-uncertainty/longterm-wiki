@@ -13,9 +13,11 @@ import { loadResources, loadResourcesPGFirst } from '../../resource-io.ts';
 // Re-export Resource as ResourceEntry for consumers
 export type ResourceEntry = Resource;
 
-/** Status information to write back to a resource after fetching.
- *  Fine-grained statuses (soft_404, not_found, timeout, unreachable) are subtypes
- *  of the legacy "dead" bucket — stored as-is for richer retry/analytics. */
+/** HTTP reachability status to write back to a resource after fetching.
+ *  This updates the DB fetch_status column (HTTP reachability), NOT enrichment_status
+ *  (LLM pipeline stage). Fine-grained statuses (soft_404, not_found, timeout,
+ *  unreachable) are subtypes of the legacy "dead" bucket — stored as-is for
+ *  richer retry/analytics. */
 export interface ResourceFetchStatus {
   fetchStatus: 'ok' | 'dead' | 'soft_404' | 'not_found' | 'timeout' | 'unreachable' | 'paywall' | 'error';
   /** ISO timestamp of when the fetch happened */
@@ -65,7 +67,14 @@ function normalizeUrlKey(url: string): string {
 function ensureLoaded(): void {
   if (cachedResources) return;
 
-  cachedResources = loadResources();
+  try {
+    cachedResources = loadResources();
+  } catch {
+    // Snapshot file may not exist (e.g., in GHA job workers that use PG
+    // directly). Set empty cache so callers get null lookups instead of a
+    // hard crash. Callers that need resources should call initFromPG() first.
+    cachedResources = [];
+  }
   buildIndexes(cachedResources);
 }
 

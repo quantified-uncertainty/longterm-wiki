@@ -1,5 +1,20 @@
 /** Shared constants and helpers for resource rendering components */
 
+import {
+  CITATION_VERDICT_KEYS,
+  type CitationVerdictKey,
+  CITATION_VERDICT_STYLES,
+  CITATION_VERDICT_COLORS,
+  CITATION_VERDICT_SEVERITY,
+} from "@/components/shared/verdict-styles";
+
+// Re-export citation verdict constants under their original names for backward compatibility
+export const VERDICT_KEYS = CITATION_VERDICT_KEYS;
+export type VerdictKey = CitationVerdictKey;
+export const VERDICT_SEVERITY = CITATION_VERDICT_SEVERITY;
+export const VERDICT_COLORS = CITATION_VERDICT_COLORS;
+export const VERDICT_STYLES = CITATION_VERDICT_STYLES;
+
 /**
  * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
  * - Strips protocol and `www.` prefix
@@ -19,47 +34,6 @@ export function normalizeUrl(raw: string): string {
     return raw.replace(/\/+$/, "").toLowerCase();
   }
 }
-
-/** Canonical verdict keys used by the citation verification system */
-export const VERDICT_KEYS = [
-  "accurate",
-  "minor_issues",
-  "inaccurate",
-  "unsupported",
-  "not_verifiable",
-] as const;
-
-export type VerdictKey = (typeof VERDICT_KEYS)[number];
-
-/** Severity ordering for sorting (lower = more severe) */
-export const VERDICT_SEVERITY: Record<string, number> = {
-  inaccurate: 0,
-  unsupported: 1,
-  minor_issues: 2,
-  not_verifiable: 3,
-  accurate: 4,
-};
-
-/** Compact dot colors used by ReferenceCitationDot */
-export const VERDICT_COLORS: Record<string, { bg: string; title: string }> = {
-  accurate: { bg: "bg-emerald-500", title: "Verified accurate" },
-  minor_issues: { bg: "bg-amber-500", title: "Minor issues" },
-  inaccurate: { bg: "bg-red-500", title: "Inaccurate" },
-  unsupported: { bg: "bg-red-400", title: "Unsupported" },
-  not_verifiable: { bg: "bg-muted-foreground/40", title: "Not verifiable" },
-};
-
-/** Rich verdict styles used by ReferenceCitationDetails claim rows */
-export const VERDICT_STYLES: Record<
-  string,
-  { color: string; bg: string; label: string }
-> = {
-  accurate: { color: "text-emerald-700", bg: "bg-emerald-500/10", label: "Accurate" },
-  minor_issues: { color: "text-amber-700", bg: "bg-amber-500/10", label: "Minor issues" },
-  inaccurate: { color: "text-red-700", bg: "bg-red-500/10", label: "Inaccurate" },
-  unsupported: { color: "text-red-600", bg: "bg-red-500/10", label: "Unsupported" },
-  not_verifiable: { color: "text-muted-foreground", bg: "bg-muted", label: "Not verifiable" },
-};
 
 /** Maximum claims to display before showing "+N more" */
 export const MAX_CLAIMS_SHOWN = 8;

@@ -1,23 +1,12 @@
 "use client";
 
 import { cn } from "@lib/utils";
+import { formatDateDeterministic } from "@lib/format";
 import { useCitationQuotes } from "./CitationQuotesContext";
 import { normalizeUrl, VERDICT_STYLES, VERDICT_SEVERITY } from "./resource-utils";
 import type { CitationQuote } from "@/lib/citation-data";
 import { renderInlineMarkdown } from "@/lib/inline-markdown";
 import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Clock } from "lucide-react";
-
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
-}
 
 /** Icon per verdict — only needed in claim rows, not shared */
 const VERDICT_ICONS: Record<string, typeof CheckCircle2> = {
@@ -85,7 +74,7 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
         {checkedAt && (
           <span className="text-[10px] text-muted-foreground/60 flex items-center gap-0.5">
             <Clock className="w-2.5 h-2.5 shrink-0" />
-            {formatDate(checkedAt)}
+            {formatDateDeterministic(checkedAt)}
           </span>
         )}
       </div>

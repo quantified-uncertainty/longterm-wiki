@@ -10,7 +10,8 @@
  */
 
 import { generateId } from './grant-import/id.ts';
-import { apiRequest, getServerUrl } from './wiki-server/client.ts';
+import { getServerUrl } from './wiki-server/client.ts';
+import { syncPersonnel } from './wiki-server/personnel.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
 
