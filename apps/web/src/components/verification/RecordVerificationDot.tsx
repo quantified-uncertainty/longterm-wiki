@@ -47,12 +47,15 @@ export function RecordVerificationDot({
     ? SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict]
     : null;
 
-  // Label variant: render text for known verdicts, nothing for unchecked
+  // Label variant: dot + text for known verdicts, nothing for unchecked
   if (variant === "label") {
     if (!config) return null;
     const label = (
-      <span className={`text-xs font-medium ${config.textColor} ${className}`}>
-        {config.label}
+      <span className={`inline-flex items-center gap-1 ${className}`}>
+        <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${config.color}`} />
+        <span className={`text-xs font-medium ${config.textColor}`}>
+          {config.label}
+        </span>
       </span>
     );
     if (href) {
