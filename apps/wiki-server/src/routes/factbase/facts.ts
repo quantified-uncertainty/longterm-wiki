@@ -94,7 +94,7 @@ function reconstructFactValue(row: typeof facts.$inferSelect) {
     case "min":
       return { type: "min" as const, value: row.numeric ?? 0 };
     case "json":
-      if (!row.value) return { type: "json" as const, value: null };
+      if (row.value == null) return { type: "json" as const, value: null };
       try {
         return { type: "json" as const, value: JSON.parse(row.value) };
       } catch {

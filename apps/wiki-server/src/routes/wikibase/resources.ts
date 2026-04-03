@@ -1024,6 +1024,7 @@ const resourcesApp = new Hono()
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
       .where(eq(resourceCitations.pageId, intId))
+      .orderBy(resourceCitations.id)
       .limit(500);
 
     return c.json({ resources: rows });
@@ -1256,14 +1257,19 @@ const resourcesApp = new Hono()
     const ids = items.map((item) => item.resourceId);
     const jsonValues = items.map((item) => JSON.stringify(item.authorEntityIds));
 
-    await db.execute(sql`
-      UPDATE resources AS r
-      SET author_entity_ids = v.ids::jsonb
-      FROM unnest(${ids}::text[], ${jsonValues}::text[]) AS v(rid, ids)
-      WHERE r.id = v.rid
+    const result = await db.execute(sql`
+      WITH updated AS (
+        UPDATE resources AS r
+        SET author_entity_ids = v.ids::jsonb
+        FROM unnest(${ids}::text[], ${jsonValues}::text[]) AS v(rid, ids)
+        WHERE r.id = v.rid
+        RETURNING r.id
+      )
+      SELECT count(*)::int AS cnt FROM updated
     `);
 
-    return c.json({ updated: items.length });
+    const updated = (result.rows?.[0] as { cnt?: number })?.cnt ?? items.length;
+    return c.json({ updated });
   })
 
   // ---- GET /:id/details (resource + sub-table data) ----
