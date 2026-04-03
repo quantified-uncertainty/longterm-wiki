@@ -183,6 +183,8 @@ export default function InvestmentsPage() {
                       >
                         {row.companyName}
                       </Link>
+                    ) : row.companyName === "Unknown" ? (
+                      <span className="text-muted-foreground/60 italic">Undisclosed</span>
                     ) : (
                       <span className="text-foreground">{row.companyName}</span>
                     )}

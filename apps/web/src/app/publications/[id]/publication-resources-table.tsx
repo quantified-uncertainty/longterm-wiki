@@ -31,6 +31,7 @@ import {
   RESOURCE_TYPE_COLORS,
   DEFAULT_RESOURCE_TYPE_COLOR,
 } from "@/app/internal/resources/resources-data-table";
+import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 
 export interface PublicationResourceRow {
   id: string;
@@ -48,15 +49,18 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
       header: ({ column }) => (
         <SortableHeader column={column}>Title</SortableHeader>
       ),
-      cell: ({ row }) => (
-        <Link
-          href={`/resources/${row.original.id}`}
-          className="text-primary hover:underline text-xs font-medium max-w-[350px] truncate block"
-          title={row.original.title}
-        >
-          {row.original.title}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const displayTitle = stripMarkdownFormatting(row.original.title);
+        return (
+          <Link
+            href={`/resources/${row.original.id}`}
+            className="text-primary hover:underline text-xs font-medium max-w-[350px] truncate block"
+            title={displayTitle}
+          >
+            {displayTitle}
+          </Link>
+        );
+      },
       filterFn: "includesString",
     },
     {

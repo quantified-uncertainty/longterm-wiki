@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const funder = resolveEntityLink(program.ownerEntityId);
   const parts = [program.name];
   if (funder.name) parts.push(`by ${funder.name}`);
-  if (program.totalBudget) parts.push(formatCompactCurrency(program.totalBudget));
+  if (program.totalBudget) parts.push(formatCompactCurrency(program.totalBudget, program.currency));
 
   return {
     title: `${program.name} | Funding Programs`,
@@ -109,12 +109,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
         {/* Budget hero */}
         {data.program.totalBudget != null && (
           <div className="text-3xl font-bold tabular-nums tracking-tight text-primary mt-3 mb-1">
-            {formatCompactCurrency(data.program.totalBudget)}
-            {data.program.currency && data.program.currency !== "USD" && (
-              <span className="text-base font-medium text-muted-foreground ml-2">
-                {data.program.currency}
-              </span>
-            )}
+            {formatCompactCurrency(data.program.totalBudget, data.program.currency)}
             <span className="text-sm font-normal text-muted-foreground ml-2">budget</span>
           </div>
         )}
@@ -220,7 +215,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
 
           {data.program.notes && (
             <DetailSection title="Notes">
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
                 {data.program.notes}
               </p>
             </DetailSection>

@@ -282,17 +282,22 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
             {pageRows.map((row) => (
               <tr
                 key={row.id}
-                className={`hover:bg-muted/20 transition-colors ${row.isFamily ? "bg-muted/10" : ""}`}
+                className={`hover:bg-muted/20 transition-colors ${row.isFamily ? "bg-muted/30 border-l-2 border-l-primary/30" : ""}`}
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/ai-models/${row.id}`}
-                      className={`font-medium hover:text-primary transition-colors ${row.isFamily ? "text-foreground/80" : "text-foreground"}`}
+                      className={`hover:text-primary transition-colors ${row.isFamily ? "font-semibold text-foreground" : "font-medium text-foreground"}`}
                     >
                       {row.title}
                     </Link>
+                    {row.isFamily && (
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-medium bg-primary/10 text-primary border border-primary/20">
+                        Family
+                      </span>
+                    )}
                     {row.openWeight && (
                       <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
                         Open

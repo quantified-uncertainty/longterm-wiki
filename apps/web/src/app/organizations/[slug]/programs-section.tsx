@@ -82,7 +82,7 @@ export function FundingProgramsSection({
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
                     {p.totalBudget != null && (
-                      <span className="font-semibold">{formatCompactCurrency(p.totalBudget)}</span>
+                      <span className="font-semibold">{formatCompactCurrency(p.totalBudget, p.currency)}</span>
                     )}
                   </td>
                   <td className="py-2 px-3 text-center text-xs">

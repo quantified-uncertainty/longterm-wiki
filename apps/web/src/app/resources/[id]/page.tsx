@@ -16,7 +16,7 @@ import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { CitationContentResult } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
-import { renderInlineMarkdown } from "@/lib/inline-markdown";
+import { renderInlineMarkdown, stripMarkdownFormatting } from "@/lib/inline-markdown";
 import {
   ExternalLink,
   Clock,
@@ -45,9 +45,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const resource = resolveResource(id);
   if (!resource) return { title: "Source Not Found" };
 
+  const plainTitle = stripMarkdownFormatting(resource.title);
   return {
-    title: `Source: ${resource.title}`,
-    description: resource.summary || `Citation source: ${resource.title}`,
+    title: `Source: ${plainTitle}`,
+    description: resource.summary || `Citation source: ${plainTitle}`,
     robots: { index: false, follow: false },
   };
 }
@@ -155,7 +156,7 @@ export default async function ResourcePage({ params }: PageProps) {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-start gap-3 mb-1.5">
-          <h1 className="text-2xl font-bold">{resource.title}</h1>
+          <h1 className="text-2xl font-bold">{stripMarkdownFormatting(resource.title)}</h1>
           {resource.type && (
             <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
               <FileText className="w-3 h-3" />

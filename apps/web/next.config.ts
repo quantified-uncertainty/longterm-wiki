@@ -32,6 +32,12 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
+      // Vanity URL: /about → wiki page E755
+      {
+        source: "/about",
+        destination: "/wiki/E755",
+        permanent: false,
+      },
       {
         source: "/wiki/E1043",
         destination: "/sources",

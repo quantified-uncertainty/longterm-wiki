@@ -14,9 +14,18 @@ export const metadata: Metadata = {
 // ── Data loading ──────────────────────────────────────────────────────────
 
 function inferParty(entity: PersonEntity): string | null {
-  const desc = (entity.description ?? "").toLowerCase();
-  if (desc.includes("(d)") || desc.includes("democrat")) return "democratic";
-  if (desc.includes("(r)") || desc.includes("republican")) return "republican";
+  // Check description and all customField values (e.g. Role often
+  // contains "(D-…)" or "(R-…)" party indicators).
+  const textsToSearch: string[] = [(entity.description ?? "").toLowerCase()];
+  if (entity.customFields) {
+    for (const field of entity.customFields) {
+      textsToSearch.push(field.value.toLowerCase());
+    }
+  }
+  for (const text of textsToSearch) {
+    if (text.includes("(d)") || text.includes("(d-") || text.includes("democrat")) return "democratic";
+    if (text.includes("(r)") || text.includes("(r-") || text.includes("republican")) return "republican";
+  }
   return null;
 }
 
@@ -52,9 +61,18 @@ function inferJurisdiction(entity: PersonEntity): string | null {
 
 function inferStatus(entity: PersonEntity): string | null {
   const desc = (entity.description ?? "").toLowerCase();
-  if (desc.includes("incumbent") || desc.includes("u.s. senator") || desc.includes("u.s. representative") || desc.includes("state senator") || desc.includes("assemblymember")) return "incumbent";
-  if (desc.includes("candidate") || desc.includes("running") || desc.includes("nominee") || desc.includes("runoff")) return "candidate";
+  // Explicit markers first
   if (desc.includes("former") || desc.includes("lost") || desc.includes("won the 2026")) return "former";
+  if (desc.includes("incumbent")) return "incumbent";
+  // Officeholder titles imply incumbent
+  const incumbentTitles = [
+    "u.s. senator", "u.s. representative",
+    "state senator", "state representative", "assemblymember",
+    "governor", "attorney general", "secretary of state",
+    "mayor", "commissioner", "comptroller", "treasurer",
+  ];
+  if (incumbentTitles.some((t) => desc.includes(t))) return "incumbent";
+  if (desc.includes("candidate") || desc.includes("running") || desc.includes("nominee") || desc.includes("runoff")) return "candidate";
   return "candidate";
 }
 

@@ -36,6 +36,15 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
     return [...set].sort();
   }, [rows]);
 
+  const statusOptions = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const r of rows) {
+      counts[r.status] = (counts[r.status] ?? 0) + 1;
+    }
+    const allStatuses = ["active", "emerging", "mature", "declining", "archived"] as const;
+    return allStatuses.filter((s) => (counts[s] ?? 0) > 0);
+  }, [rows]);
+
   const clusterCounts = useMemo(() => {
     const counts: Record<string, number> = { all: rows.length };
     for (const r of rows) {
@@ -100,11 +109,11 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
         >
           <option value="all">All statuses</option>
-          <option value="active">Active</option>
-          <option value="emerging">Emerging</option>
-          <option value="mature">Mature</option>
-          <option value="declining">Declining</option>
-          <option value="archived">Archived</option>
+          {statusOptions.map((s) => (
+            <option key={s} value={s}>
+              {s.charAt(0).toUpperCase() + s.slice(1)}
+            </option>
+          ))}
         </select>
       </div>
 

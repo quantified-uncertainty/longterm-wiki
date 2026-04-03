@@ -113,11 +113,11 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   if (verdicts.length > 0) {
     // Phase 0: Use persisted display names from verdicts (most reliable, survive record deletion)
     for (const v of verdicts) {
-      if ("displayName" in v && v.displayName) {
-        names[v.recordId] = v.displayName as string;
+      if (v.displayName) {
+        names[v.recordId] = v.displayName;
       }
-      if ("entityDisplayName" in v && v.entityDisplayName && v.entityId) {
-        names[v.entityId] = v.entityDisplayName as string;
+      if (v.entityDisplayName && v.entityId) {
+        names[v.entityId] = v.entityDisplayName;
       }
     }
 

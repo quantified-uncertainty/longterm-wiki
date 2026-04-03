@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { ProfileTabs } from "@/components/directory/ProfileTabs";
 import { ResourcesTable, type ResourceRow } from "../resources/resources-table";
 import { PublicationsTable, type PublicationRow } from "../publications/publications-table";
@@ -9,8 +10,8 @@ interface SourcesTabsProps {
   resourceCount: number;
   publicationRows: PublicationRow[];
   publicationCount: number;
-  /** Pre-rendered data sources content (server component passed as children) */
-  dataSourcesContent?: React.ReactNode;
+  /** Pre-rendered server content for the Data Sources tab */
+  dataSourcesContent?: ReactNode;
 }
 
 export function SourcesTabs({

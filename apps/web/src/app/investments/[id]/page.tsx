@@ -88,13 +88,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return { title: "Investment Not Found" };
   }
   const investment = parseInvestment(record);
+  const companyDisplay = investment.companyName === "Unknown" ? "Undisclosed company" : investment.companyName;
   const parts: string[] = [];
   if (investment.investorName) parts.push(investment.investorName);
-  parts.push(`in ${investment.companyName}`);
+  parts.push(`in ${companyDisplay}`);
   if (investment.amount) parts.push(formatCompactCurrency(investment.amount));
 
   return {
-    title: `Investment: ${investment.investorName || "Unknown"} in ${investment.companyName} | Investments`,
+    title: `Investment: ${investment.investorName || "Unknown investor"} in ${companyDisplay} | Investments`,
     description: parts.join(" — "),
   };
 }
@@ -155,9 +156,11 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
     }
   }
 
+  const companyDisplayName = investment.companyName === "Unknown" ? "Undisclosed company" : investment.companyName;
+
   const displayTitle = investment.investorName
-    ? `${investment.investorName} → ${investment.companyName}`
-    : `Investment in ${investment.companyName}`;
+    ? `${investment.investorName} → ${companyDisplayName}`
+    : `Investment in ${companyDisplayName}`;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
@@ -166,7 +169,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
         items={[
           { label: "Organizations", href: "/organizations" },
           ...(investment.companyHref
-            ? [{ label: investment.companyName, href: investment.companyHref }]
+            ? [{ label: companyDisplayName, href: investment.companyHref }]
             : []),
           { label: investment.investorName ? `Investment by ${investment.investorName}` : "Investment" },
         ]}
@@ -221,7 +224,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
         <div className="space-y-4">
           <DetailSection title="Company">
             <EntityLinkDisplay
-              name={investment.companyName}
+              name={companyDisplayName}
               href={investment.companyHref}
             />
             {companyWikiPageId && (
@@ -301,7 +304,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
       {/* Other investments in same company */}
       {otherInSameCompany.length > 0 && (
         <RelatedInvestmentsSection
-          title={`Other Investments in ${investment.companyName}`}
+          title={`Other Investments in ${companyDisplayName}`}
           investments={otherInSameCompany.slice(0, 10)}
           totalCount={otherInSameCompany.length}
           showInvestor
@@ -325,7 +328,7 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
             href={investment.companyHref}
             className="text-sm text-primary hover:underline"
           >
-            &larr; Back to {investment.companyName}
+            &larr; Back to {companyDisplayName}
           </Link>
         ) : (
           <Link
@@ -399,6 +402,8 @@ function RelatedInvestmentsSection({
                         <Link href={inv.companyHref} className="text-primary hover:underline">
                           {inv.companyName}
                         </Link>
+                      ) : inv.companyName === "Unknown" ? (
+                        <span className="text-muted-foreground/60 italic">Undisclosed</span>
                       ) : (
                         <span className="text-foreground">{inv.companyName}</span>
                       )}

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -108,6 +108,15 @@ export async function generateMetadata({
   params: Promise<{ entityId: string }>;
 }): Promise<Metadata> {
   const { entityId } = await params;
+
+  // Normalize underscores to hyphens (YAML files use underscores internally)
+  if (entityId.includes("_")) {
+    const normalized = entityId.replace(/_/g, "-");
+    if (getKBEntity(normalized)) {
+      redirect(`/factbase/entity/${normalized}`);
+    }
+  }
+
   const entity = getKBEntity(entityId);
   return {
     title: entity ? `KB: ${entity.name}` : `KB: ${entityId}`,
@@ -679,6 +688,15 @@ export default async function KBEntityPage({
   params: Promise<{ entityId: string }>;
 }) {
   const { entityId } = await params;
+
+  // Normalize underscores to hyphens (YAML files use underscores internally)
+  if (entityId.includes("_")) {
+    const normalized = entityId.replace(/_/g, "-");
+    if (getKBEntity(normalized)) {
+      redirect(`/factbase/entity/${normalized}`);
+    }
+  }
+
   const entity = getKBEntity(entityId);
   if (!entity) return notFound();
 
