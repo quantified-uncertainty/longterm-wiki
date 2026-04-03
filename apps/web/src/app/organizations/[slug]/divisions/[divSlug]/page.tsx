@@ -19,6 +19,8 @@ import {
 } from "@/app/divisions/[slug]/division-data";
 import {
   TeamMembersSection,
+  FundingProgramsSection,
+  SiblingDivisionsSection,
   BackToParentLink,
 } from "@/app/divisions/[slug]/division-sections";
 import {
@@ -56,6 +58,15 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
       label: "Recipients",
       count: data.recipients.length,
       content: <PaginatedRecipientsTable recipients={data.recipients} />,
+    });
+  }
+
+  if (data.divisionPrograms.length > 0) {
+    tabs.push({
+      id: "programs",
+      label: "Funding Programs",
+      count: data.divisionPrograms.length,
+      content: <FundingProgramsSection programs={data.divisionPrograms} />,
     });
   }
 
@@ -204,16 +215,13 @@ export default async function DivisionDetailPage({ params }: PageProps) {
 
       {/* Tabbed content */}
       <DivisionTabs data={data} />
-      {data.personnel.length === 0 && data.grants.length === 0 && data.recipients.length === 0 && (
-        <div className="rounded-lg border border-border/60 bg-muted/30 px-6 py-8 text-center">
-          <p className="text-sm text-muted-foreground mb-1">
-            No detailed data available for this division yet.
-          </p>
-          <p className="text-xs text-muted-foreground/60">
-            People, grants, and funding programs for this division will be added
-            as the wiki grows.
-          </p>
-        </div>
+
+      {/* Sibling divisions for navigation */}
+      {data.siblingDivisions.length > 0 && (
+        <SiblingDivisionsSection
+          siblings={data.siblingDivisions}
+          parentName={data.parent.name}
+        />
       )}
 
       {/* Back to parent org */}

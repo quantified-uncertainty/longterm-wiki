@@ -341,6 +341,14 @@ export const PROGRAM_TYPE_COLORS: Record<string, string> = {
 
 // ── Main data loader ─────────────────────────────────────────────────
 
+export interface SiblingDivision {
+  key: string;
+  name: string;
+  divisionType: string;
+  status: string | null;
+  href: string | null;
+}
+
 export interface DivisionPageData {
   division: ParsedDivision;
   parent: { name: string; href: string | null };
@@ -351,6 +359,7 @@ export interface DivisionPageData {
   divisionPrograms: ParsedFundingProgram[];
   grants: ParsedDivisionGrant[];
   recipients: DivisionRecipient[];
+  siblingDivisions: SiblingDivision[];
 }
 
 export function loadDivisionPageData(record: import("@/data/factbase").KBRecordEntry): DivisionPageData {
@@ -448,6 +457,27 @@ export function loadDivisionPageData(record: import("@/data/factbase").KBRecordE
   const recipients = [...recipientMap.values()]
     .sort((a, b) => b.totalAmount - a.totalAmount);
 
+  // Find sibling divisions (other divisions in the same org, excluding current)
+  const allDivisions = getAllKBRecords("divisions");
+  const currentName = division.name;
+  const seenNames = new Set<string>([currentName]);
+  const siblingDivisions: SiblingDivision[] = [];
+  for (const d of allDivisions) {
+    if (d.ownerEntityId !== division.ownerEntityId) continue;
+    const name = (d.fields.name as string) ?? d.key;
+    if (seenNames.has(name)) continue;
+    seenNames.add(name);
+    const parsed = parseDivision(d);
+    siblingDivisions.push({
+      key: d.key,
+      name: parsed.name,
+      divisionType: parsed.divisionType,
+      status: parsed.status,
+      href: getDivisionHref(parsed),
+    });
+  }
+  siblingDivisions.sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     division,
     parent,
@@ -458,5 +488,6 @@ export function loadDivisionPageData(record: import("@/data/factbase").KBRecordE
     divisionPrograms,
     grants,
     recipients,
+    siblingDivisions,
   };
 }
