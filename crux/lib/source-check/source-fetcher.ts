@@ -3,7 +3,8 @@
  *
  * Shared by factbase-source-check and source-check-orchestrate. This is a
  * **read-only** layer: it reads from the citation_content cache populated by
- * the resource-ingest worker. It does NOT fetch URLs directly.
+ * the resource-ingest worker. It does NOT fetch URLs directly — except for
+ * the Wayback Machine fallback, which fetches archived copies of dead links.
  *
  * If the cache misses, it returns errorType: 'not_cached' — signaling that the
  * resource pipeline should process this URL first (Discussion #3499).
@@ -13,6 +14,7 @@
  * - Unverifiable domain detection
  * - Wiki-server citation content cache lookup
  * - Paywall detection on cached content
+ * - Wayback Machine fallback for dead links (configurable via DISABLE_WAYBACK_FALLBACK)
  */
 
 import {
@@ -23,6 +25,7 @@ import { isDeadFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { createJob } from '../wiki-server/jobs.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
+import { lookupWaybackSnapshot, fetchWaybackContent, formatWaybackTimestamp } from '../wayback.ts';
 import type { FetchSourceResult } from './types.ts';
 import { SOURCE_CHECK_CONSTANTS } from './types.ts';
 
@@ -130,6 +133,15 @@ export async function fetchSourceContent(
     return { content: null, errorType: 'unverifiable_domain', errorMessage: 'Domain blocks automated access' };
   }
 
+  // Whether the Wayback Machine fallback is enabled (default: true).
+  // Set DISABLE_WAYBACK_FALLBACK=1 to disable.
+  const waybackEnabled = !process.env.DISABLE_WAYBACK_FALLBACK;
+
+  // Track whether the primary URL is a dead link so we can try Wayback fallback
+  let isDeadLink = false;
+  let deadLinkMessage = '';
+  let deadLinkHttpStatus: number | null = null;
+
   // Read from wiki-server citation_content cache (populated by resource-ingest worker)
   try {
     const result = await getCitationContentByUrl(url);
@@ -139,28 +151,25 @@ export async function fetchSourceContent(
 
       // Detect dead links from cached HTTP status (4xx/5xx)
       if (httpStatus != null && httpStatus >= 400) {
-        return {
-          content: null,
-          errorType: 'dead_link',
-          errorMessage: `Source URL returned HTTP ${httpStatus}`,
-          httpStatus,
-        };
-      }
-
-      const content = cached.fullText as string | null;
-      if (content && content.length > 0) {
-        if (detectPaywall(content)) {
-          return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled' };
+        isDeadLink = true;
+        deadLinkMessage = `Source URL returned HTTP ${httpStatus}`;
+        deadLinkHttpStatus = httpStatus;
+        // Don't return immediately — try Wayback fallback below
+      } else {
+        const content = cached.fullText as string | null;
+        if (content && content.length > 0) {
+          if (detectPaywall(content)) {
+            return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Cached content appears paywalled', sourceOrigin: 'live' };
+          }
+          return { content: content.slice(0, MAX_CONTENT_LENGTH), sourceOrigin: 'live' };
         }
-        return { content: content.slice(0, MAX_CONTENT_LENGTH) };
       }
     }
   } catch (e: unknown) {
     console.warn(`${logPrefix} Cache lookup failed: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // No cached content — try Wayback Machine archive URL as fallback.
-  // The resources table stores archive_url for dead/moved pages.
+  // No cached content — try existing archive URL from resources table.
   let resourceId: string | null = null;
   try {
     const resource = await lookupResourceByUrl(url);
@@ -169,12 +178,9 @@ export async function fetchSourceContent(
       resourceId = resourceData.id;
 
       // Detect dead links from resource fetch_status (dead, not_found, timeout, etc.)
-      if (isDeadFetchStatus(resourceData.fetchStatus)) {
-        return {
-          content: null,
-          errorType: 'dead_link',
-          errorMessage: `Resource fetch status: ${resourceData.fetchStatus}`,
-        };
+      if (!isDeadLink && isDeadFetchStatus(resourceData.fetchStatus)) {
+        isDeadLink = true;
+        deadLinkMessage = `Resource fetch status: ${resourceData.fetchStatus}`;
       }
 
       // Try archive URL if available
@@ -187,9 +193,9 @@ export async function fetchSourceContent(
             const content = cached.fullText as string | null;
             if (content && content.length > 0) {
               if (detectPaywall(content)) {
-                return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Archive content appears paywalled' };
+                return { content: content.slice(0, MAX_CONTENT_LENGTH), errorType: 'paywall', errorMessage: 'Archive content appears paywalled', sourceOrigin: 'archive' };
               }
-              return { content: content.slice(0, MAX_CONTENT_LENGTH) };
+              return { content: content.slice(0, MAX_CONTENT_LENGTH), sourceOrigin: 'archive' };
             }
           }
         } catch (e: unknown) {
@@ -199,6 +205,54 @@ export async function fetchSourceContent(
     }
   } catch (e: unknown) {
     console.warn(`${logPrefix} Resource lookup failed: ${e instanceof Error ? e.message : String(e)}`);
+  }
+
+  // ── Wayback Machine live fallback ──────────────────────────────────────────────────
+  // If the URL is dead and we have no cached archive content, query Wayback
+  // Machine directly and fetch the archived page.
+  if (isDeadLink && waybackEnabled) {
+    console.log(`${logPrefix} Dead link detected, querying Wayback Machine for: ${url}`);
+    try {
+      const snapshot = await lookupWaybackSnapshot(url);
+      if (snapshot) {
+        console.log(`${logPrefix} Wayback snapshot found (${formatWaybackTimestamp(snapshot.timestamp)}), fetching content...`);
+        const archived = await fetchWaybackContent(snapshot.url, snapshot.timestamp);
+        if (archived && archived.content.length > 0) {
+          const archiveDate = formatWaybackTimestamp(snapshot.timestamp);
+          console.log(`${logPrefix} Wayback content retrieved (${(archived.content.length / 1024).toFixed(0)}KB, archived ${archiveDate})`);
+          if (detectPaywall(archived.content)) {
+            return {
+              content: archived.content.slice(0, MAX_CONTENT_LENGTH),
+              errorType: 'paywall',
+              errorMessage: `Archive content appears paywalled (archived ${archiveDate})`,
+              sourceOrigin: 'archive',
+              archiveDate,
+            };
+          }
+          return {
+            content: archived.content.slice(0, MAX_CONTENT_LENGTH),
+            sourceOrigin: 'archive',
+            archiveDate,
+          };
+        }
+        console.log(`${logPrefix} Wayback snapshot exists but content could not be extracted`);
+      } else {
+        console.log(`${logPrefix} No Wayback snapshot found for ${url}`);
+      }
+    } catch (e: unknown) {
+      // Best-effort: Wayback failure should not block the source-check pipeline
+      console.warn(`${logPrefix} Wayback lookup failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // If the URL was confirmed dead and Wayback couldn't help, return dead_link
+  if (isDeadLink) {
+    return {
+      content: null,
+      errorType: 'dead_link',
+      errorMessage: deadLinkMessage,
+      httpStatus: deadLinkHttpStatus,
+    };
   }
 
   // Auto-enqueue a resource-ingest job so the content gets fetched for next time
