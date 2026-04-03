@@ -9,7 +9,7 @@
  */
 
 import { loadResourcesPGFirst } from '../resource-io.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { listEntities } from '../lib/wiki-server/entities.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 

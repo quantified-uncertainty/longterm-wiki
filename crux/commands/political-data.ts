@@ -29,6 +29,10 @@ import {
   getServerUrl,
 } from "../lib/wiki-server/client.ts";
 import {
+  getScoreStats, getOfficeStats, getVoteStats, getFinanceStats,
+  syncOffices,
+} from "../lib/wiki-server/political.ts";
+import {
   getSource,
   getAvailableSources,
   getAllSources,
@@ -68,18 +72,10 @@ async function statsCommand(
   }
 
   const [scoresResult, officesResult, votesResult, financeResult] = await Promise.all([
-    apiRequest<{ total: number; scorerOrgs: number; politicians: number }>(
-      "GET", "/api/political-scores/stats"
-    ),
-    apiRequest<{ total: number; incumbents: number; candidates: number; former: number }>(
-      "GET", "/api/political-offices/stats"
-    ),
-    apiRequest<{ total: number; politicians: number; legislation: number; chambers: number; breakdown: Record<string, number> }>(
-      "GET", "/api/political-votes/stats"
-    ),
-    apiRequest<{ total: number; totalRaisedSum: number; politicians: number; cycles: number }>(
-      "GET", "/api/campaign-finance/stats"
-    ),
+    getScoreStats(),
+    getOfficeStats(),
+    getVoteStats(),
+    getFinanceStats(),
   ]);
 
   if (options.ci) {
@@ -621,11 +617,7 @@ async function seedOfficesCommand(
 
   console.log(`Seeding ${offices.length} political offices...\n`);
 
-  const result = await apiRequest<{ upserted: number }>(
-    "POST",
-    "/api/political-offices/sync",
-    { items: offices },
-  );
+  const result = await syncOffices(offices as Array<Record<string, unknown>>);
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -907,13 +899,7 @@ async function votesStatsCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const result = await apiRequest<{
-    total: number;
-    politicians: number;
-    legislation: number;
-    chambers: number;
-    breakdown: Record<string, number>;
-  }>("GET", "/api/political-votes/stats");
+  const result = await getVoteStats();
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };

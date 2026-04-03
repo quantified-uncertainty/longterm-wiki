@@ -12,6 +12,7 @@
  */
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getAllPersonnel, deletePersonnel } from '../lib/wiki-server/personnel.ts';
 import { isSid } from '../../packages/id-utils/src/index.ts';
 
 function isMachineId(s: string): boolean {
@@ -40,10 +41,7 @@ async function fetchAllPersonnel(): Promise<PersonnelRecord[]> {
   const all: PersonnelRecord[] = [];
   let offset = 0;
   while (true) {
-    const r = await apiRequest<{ personnel: PersonnelRecord[]; total: number }>(
-      'GET',
-      `/api/personnel/all?limit=200&offset=${offset}`,
-    );
+    const r = await getAllPersonnel({ limit: 200, offset });
     if (!r.ok) {
       console.error('Failed to fetch personnel:', r.error);
       break;
@@ -160,11 +158,7 @@ async function main() {
   let totalDeleted = 0;
   for (let i = 0; i < toDeleteIds.length; i += BATCH_SIZE) {
     const batch = toDeleteIds.slice(i, i + BATCH_SIZE);
-    const result = await apiRequest<{ deleted: number }>(
-      'POST',
-      '/api/personnel/delete',
-      { ids: batch, reason: 'Cleanup: unresolved stableId names and duplicate records' },
-    );
+    const result = await deletePersonnel(batch);
     if (result.ok) {
       totalDeleted += result.data.deleted;
       console.log(`  Deleted batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.data.deleted} records`);

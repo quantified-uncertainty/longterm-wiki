@@ -20,7 +20,7 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi } from '../lib/wiki-server/verifications.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
 import {
@@ -224,9 +224,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
     sourceUrl: result.sourceUrl,
   };
 
-  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-    'POST',
-    '/api/verifications/evidence',
+  const response = await storeEvidenceApi(
     body,
   );
 
@@ -245,9 +243,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
     sourcesChecked: 1,
   };
 
-  const verdictResponse = await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/verifications/verdicts',
+  const verdictResponse = await storeVerdictApi(
     verdictBody,
   );
 

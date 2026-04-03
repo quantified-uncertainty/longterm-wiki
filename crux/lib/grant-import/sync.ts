@@ -104,11 +104,7 @@ export async function syncToServer(
       `  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`
     );
 
-    const result = await apiRequest<{ upserted: number }>(
-      "POST",
-      "/api/grants/sync",
-      { items: batch },
-    );
+    const result = await syncGrants(batch);
 
     if (result.ok) {
       totalUpserted += result.data.upserted;
