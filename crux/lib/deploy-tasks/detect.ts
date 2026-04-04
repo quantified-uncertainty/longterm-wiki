@@ -684,30 +684,36 @@ export function preserveCheckedState(newBody: string, oldBody: string): string {
     return newBody;
   }
 
-  const newParsed = parseDeployTasksFromBody(newBody);
-  if (!newParsed || newParsed.total === 0) {
-    // No deploy tasks in the new body — nothing to merge into
+  const startMarker = "<!-- deploy-tasks:v1 -->";
+  const endMarker = "<!-- /deploy-tasks -->";
+  const startIdx = newBody.indexOf(startMarker);
+  const endIdx = newBody.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+    // No deploy tasks section in the new body — nothing to merge into
     return newBody;
   }
 
   // Build a set of checked task texts from the old body
-  const checkedTexts = new Set<string>();
-  for (const item of oldParsed.items) {
-    if (item.checked) {
-      checkedTexts.add(item.text);
-    }
-  }
+  const checkedTexts = new Set(
+    oldParsed.items.filter((i) => i.checked).map((i) => i.text)
+  );
 
-  // Replace unchecked items in the new body whose text matches a checked old item
-  let result = newBody;
-  for (const item of newParsed.items) {
-    if (!item.checked && checkedTexts.has(item.text)) {
-      // Replace the first occurrence of this specific unchecked line with a checked one
-      result = result.replace(`- [ ] ${item.text}`, `- [x] ${item.text}`);
-    }
-  }
+  // Scope replacements to within the deploy tasks section only
+  const sectionStart = startIdx + startMarker.length;
+  const section = newBody.slice(sectionStart, endIdx);
 
-  return result;
+  const updatedSection = section
+    .split("\n")
+    .map((line) => {
+      const match = line.trimStart().match(/^- \[ \] (.+)$/);
+      if (match && checkedTexts.has(match[1])) {
+        return line.replace("- [ ]", "- [x]");
+      }
+      return line;
+    })
+    .join("\n");
+
+  return newBody.slice(0, sectionStart) + updatedSection + newBody.slice(endIdx);
 }
 
 // ────────────────────────────────────────────────────────────────────────────

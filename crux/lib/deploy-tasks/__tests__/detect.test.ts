@@ -1262,4 +1262,31 @@ describe('preserveCheckedState', () => {
     expect(parsed!.checked).toBe(1);
     expect(parsed!.items[0].checked).toBe(true);
   });
+
+  it('does not replace task text that appears outside the deploy tasks section', () => {
+    // A commit message or summary line that looks like an unchecked task
+    const taskText = '`env` Set API_KEY in production';
+    const oldBody = buildBody([{ text: taskText, checked: true }]);
+
+    // newBody has the matching deploy task but also the same text outside the section
+    const newBody =
+      '## Summary\n' +
+      `- [ ] ${taskText}\n` + // same text in summary — should NOT be replaced
+      '\n' +
+      '## Deploy Checklist\n' +
+      '<!-- deploy-tasks:v1 -->\n' +
+      `- [ ] ${taskText}\n` + // this one SHOULD be replaced
+      '<!-- /deploy-tasks -->\n';
+
+    const result = preserveCheckedState(newBody, oldBody);
+
+    // The summary line should still be unchecked
+    const summaryLine = result.split('\n')[1];
+    expect(summaryLine).toBe(`- [ ] ${taskText}`);
+
+    // The deploy task should be checked
+    const parsed = parseDeployTasksFromBody(result);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.items[0]).toEqual({ text: taskText, checked: true });
+  });
 });
