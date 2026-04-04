@@ -27,6 +27,8 @@ export interface UseServerTableOptions<T> {
   transform: (json: unknown) => { rows: T[]; total: number };
   /** Set false to disable fetching (e.g., in static mode) */
   enabled?: boolean;
+  /** Extra query params appended to every request (e.g., { role: "grantee" }) */
+  extraParams?: Record<string, string>;
 }
 
 export interface UseServerTableResult<T> {
@@ -92,6 +94,10 @@ export function useServerTable<T>(
   }, [search, debounceMs]);
 
   // Build the query string (stable serialization for effect deps)
+  // Serialize extraParams to a string so inline object literals don't cause infinite re-renders
+  const extraParamsKey = options.extraParams
+    ? JSON.stringify(options.extraParams)
+    : "";
   const queryKey = useMemo(() => {
     const params = new URLSearchParams();
     params.set("limit", String(pageSize));
@@ -101,8 +107,15 @@ export function useServerTable<T>(
     for (const [k, v] of Object.entries(filters)) {
       if (v) params.set(k, v);
     }
+    if (extraParamsKey) {
+      for (const [k, v] of Object.entries(
+        JSON.parse(extraParamsKey) as Record<string, string>,
+      )) {
+        params.set(k, v);
+      }
+    }
     return params.toString();
-  }, [pageSize, page, debouncedSearch, sort, filters]);
+  }, [pageSize, page, debouncedSearch, sort, filters, extraParamsKey]);
 
   // Fetch data when query changes
   useEffect(() => {

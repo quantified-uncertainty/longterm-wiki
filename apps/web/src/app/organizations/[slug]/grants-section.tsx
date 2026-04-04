@@ -73,12 +73,13 @@ export function GrantsSection({
 
   const title = direction === "given" ? "Grants Given" : "Grants Received";
 
-  // Server mode: use when (a) large KB dataset, or (b) PG has grants but KB doesn't.
-  // This lets orgs with PG-only grants (imported via crux import-grants) display data.
+  // Server mode: use when (a) large KB dataset, (b) PG has grants but KB doesn't,
+  // or (c) received grants exist in PG (needed for verification verdict data).
   const useServerMode =
-    direction === "given" && entityId && (
+    entityId != null && (
       grants.length >= SERVER_MODE_THRESHOLD ||
-      (grants.length === 0 && (pgGrantCount ?? 0) > 0)
+      (grants.length === 0 && (pgGrantCount ?? 0) > 0) ||
+      (direction === "received" && (pgGrantCount ?? 0) > 0)
     );
 
   // Build rows — received grants use the funder's slug for grant detail links
