@@ -108,6 +108,34 @@ function git(dir: string, ...args: string[]): string {
   }
 }
 
+/** Sanitize a string for use in tmux commands — strip shell-unsafe characters */
+function sanitizeForTmux(s: string): string {
+  return s.replace(/[^a-zA-Z0-9/_.:@#-]/g, '_');
+}
+
+interface TmuxWindowInfo {
+  index: string;
+  cwd: string;
+  name: string;
+}
+
+/** Query tmux for all windows with their index, pane CWD, and name */
+function listTmuxWindows(): TmuxWindowInfo[] {
+  try {
+    // Use tab as delimiter — it cannot appear in file paths or window names
+    const raw = execSync(
+      `tmux list-windows -F '#{window_index}\t#{pane_current_path}\t#{window_name}'`,
+      { encoding: 'utf-8', timeout: 5000 },
+    ).trim();
+    return raw.split('\n').filter(Boolean).map((line) => {
+      const parts = line.split('\t');
+      return { index: parts[0] || '', cwd: parts[1] || '', name: parts[2] || '' };
+    });
+  } catch {
+    return [];
+  }
+}
+
 // ---------------------------------------------------------------------------
 // setup
 // ---------------------------------------------------------------------------
@@ -419,25 +447,19 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
 
   // Check if a window for this slot already exists — match by pane CWD, not window name
   // (window names get renamed to A${slot}:${branch} by hooks, so exact name match fails)
-  try {
-    const windowInfo = execSync(
-      `tmux list-windows -F '#{window_index}|#{pane_current_path}|#{window_name}'`,
-      { encoding: 'utf8', timeout: 5000 },
-    ).trim();
-    for (const line of windowInfo.split('\n')) {
-      const [idx, cwd] = line.split('|');
-      if (cwd === slotDir && idx) {
-        execSync(`tmux select-window -t "${idx}"`, { stdio: 'inherit' });
+  const windows = listTmuxWindows();
+  for (const win of windows) {
+    if (win.cwd === slotDir) {
+      try {
+        execSync(`tmux select-window -t "${win.index}"`, { stdio: 'inherit' });
         return { exitCode: 0, output: `Switched to existing tmux window for slot a${slot}` };
-      }
+      } catch { /* fall through to create */ }
     }
-  } catch {
-    // tmux query failed — fall through to create a new window
   }
 
   // Include current branch in initial window name
-  const branch = git(slotDir, 'branch', '--show-current') || 'main';
-  const fullWindowName = `A${slot}:${branch}`;
+  const branch = git(slotDir, 'branch', '--show-current') || 'detached';
+  const fullWindowName = sanitizeForTmux(`A${slot}:${branch}`);
 
   try {
     if (withClaude) {
@@ -577,39 +599,26 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
 function renameTmuxWindows(lwDir: string): string[] {
   if (!process.env.TMUX) return [];
 
-  let windowLines: string[];
-  try {
-    const raw = execSync(
-      `tmux list-windows -F '#{window_index}|#{pane_current_path}|#{window_name}'`,
-      { encoding: 'utf-8', timeout: 5000 },
-    ).trim();
-    windowLines = raw.split('\n').filter(Boolean);
-  } catch {
-    return [];
-  }
-
+  const windows = listTmuxWindows();
   const renamed: string[] = [];
-  for (const line of windowLines) {
-    const [idx, cwd, currentName] = line.split('|');
-    if (!cwd || !idx) continue;
 
-    // Check if this pane is in an agent slot directory
-    const match = cwd.match(/\/a(\d+)$/);
+  for (const win of windows) {
+    // Check if this pane is in an agent slot directory under lw/
+    const match = win.cwd.match(/\/a(\d+)$/);
     if (!match) continue;
 
-    // Verify it's actually under the lw/ directory
     const expectedDir = join(lwDir, `a${match[1]}`);
-    if (cwd !== expectedDir) continue;
+    if (win.cwd !== expectedDir) continue;
 
     const slot = match[1];
-    const branch = git(cwd, 'branch', '--show-current') || 'detached';
-    const newName = `A${slot}:${branch}`;
+    const branch = git(win.cwd, 'branch', '--show-current') || 'detached';
+    const newName = sanitizeForTmux(`A${slot}:${branch}`);
 
-    if (currentName !== newName) {
+    if (win.name !== newName) {
       try {
-        execSync(`tmux rename-window -t "${idx}" "${newName}"`, { timeout: 5000 });
-        renamed.push(`  A${slot}: ${currentName} → ${newName}`);
-      } catch { /* rename failed */ }
+        execSync(`tmux rename-window -t "${win.index}" "${newName}"`, { timeout: 5000 });
+        renamed.push(`  A${slot}: ${win.name} → ${newName}`);
+      } catch { /* tmux rename can fail if window was closed between query and rename */ }
     }
   }
 
