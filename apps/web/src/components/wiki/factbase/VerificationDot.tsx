@@ -14,6 +14,7 @@
  */
 
 import type { KBFactVerdict } from "@data/factbase";
+import { getFactBaseFactVerification } from "@data/factbase";
 
 interface VerificationDotConfig {
   dotColor: string;
@@ -75,4 +76,23 @@ export function VerificationDot({
       )}
     </span>
   );
+}
+
+/**
+ * FactVerificationDot — Convenience wrapper that looks up verification
+ * status for a FactBase fact by ID and renders a VerificationDot if found.
+ * Returns null when no verification data exists.
+ */
+export function FactVerificationDot({
+  factId,
+  showLabel = false,
+  className,
+}: {
+  factId: string;
+  showLabel?: boolean;
+  className?: string;
+}) {
+  const verification = getFactBaseFactVerification(factId);
+  if (!verification) return null;
+  return <VerificationDot verdict={verification} showLabel={showLabel} className={className} />;
 }

@@ -19,10 +19,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBProperty, isFactExpired, getFactBaseFactVerification } from "@data/factbase";
+import { getKBFacts, getKBProperty, isFactExpired } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { VerificationDot } from "./VerificationDot";
+import { FactVerificationDot } from "./VerificationDot";
 
 interface FBFactTableProps {
   /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
@@ -83,10 +83,7 @@ export function FBFactTable({ entity, property, title, includeExpired }: FBFactT
                   <FBFactValueDisplay fact={fact} property={prop} />
                 </TableCell>
                 <TableCell className="w-8 px-1">
-                  {(() => {
-                    const verification = getFactBaseFactVerification(fact.id);
-                    return verification ? <VerificationDot verdict={verification} /> : null;
-                  })()}
+                  <FactVerificationDot factId={fact.id} />
                 </TableCell>
                 <TableCell className="max-w-[200px] truncate">
                   {fact.source ? (

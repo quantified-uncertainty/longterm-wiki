@@ -101,20 +101,22 @@ function DivisionCard({
       className={`relative border border-border/50 border-l-[3px] ${accentBorder} rounded-md px-3 py-2 hover:bg-muted/40 hover:border-border transition-all group/card`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground truncate leading-tight">
+        <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0">
           <RecordVerificationDot
             verdict={getRecordVerdict("division", String(d.key))?.verdict}
           />
-          {divHref ? (
-            <Link
-              href={divHref}
-              className="after:absolute after:inset-0"
-            >
-              {d.name}
-            </Link>
-          ) : (
-            d.name
-          )}
+          <span className="truncate">
+            {divHref ? (
+              <Link
+                href={divHref}
+                className="after:absolute after:inset-0"
+              >
+                {d.name}
+              </Link>
+            ) : (
+              d.name
+            )}
+          </span>
         </span>
         {divHref && (
           <svg

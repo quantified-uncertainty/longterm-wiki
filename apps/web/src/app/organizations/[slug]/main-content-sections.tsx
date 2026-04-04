@@ -69,7 +69,7 @@ export function FundingHistorySection({
                     <span className="inline-flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
-                        href={`/source-checks/funding-round/${round.key}`}
+                        href={`/source-checks/funding-round/${encodeURIComponent(String(round.key))}`}
                       />
                       <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
                         {name}
@@ -149,7 +149,7 @@ export function InvestorParticipationSection({
                     <span className="inline-flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
-                        href={`/source-checks/investment/${inv.key}`}
+                        href={`/source-checks/investment/${encodeURIComponent(String(inv.key))}`}
                       />
                       {investorHref ? (
                         <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">

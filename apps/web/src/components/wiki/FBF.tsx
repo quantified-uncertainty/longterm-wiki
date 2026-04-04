@@ -16,7 +16,7 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getKBFacts, getKBLatest, getKBProperty, getFactBaseFactVerification } from "@data/factbase";
+import { getKBFacts, getKBLatest, getKBProperty } from "@data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
 import {
   formatKBFactValue,
@@ -24,7 +24,7 @@ import {
   isUrl,
   shortDomain,
 } from "./factbase/format";
-import { VerificationDot } from "./factbase/VerificationDot";
+import { FactVerificationDot } from "./factbase/VerificationDot";
 import styles from "./tooltip.module.css";
 
 interface FBFProps {
@@ -179,14 +179,7 @@ export function FBF({
         )}
 
         {/* Verification status */}
-        {(() => {
-          const verification = getFactBaseFactVerification(fact.id);
-          return verification ? (
-            <span className="block text-muted-foreground mt-1">
-              <VerificationDot verdict={verification} showLabel />
-            </span>
-          ) : null;
-        })()}
+        <FactVerificationDot factId={fact.id} showLabel className="mt-1" />
 
         {/* Fact detail link */}
         <span className="block mt-1.5">
