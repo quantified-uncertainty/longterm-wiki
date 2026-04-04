@@ -17,10 +17,11 @@
 
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
+import { getKBEntity, getKBLatest, getKBProperties, getFactBaseFactVerification } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
+import { VerificationDot } from "./VerificationDot";
 
 interface FBEntitySidebarProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -185,7 +186,13 @@ export function FBEntitySidebar({
               {property?.name ?? titleCase(propertyId)}
             </span>
             <div className="flex-1 text-xs break-words">
-              <FBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
+              <span className="inline-flex items-center gap-1">
+                <FBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
+                {(() => {
+                  const verification = getFactBaseFactVerification(fact.id);
+                  return verification ? <VerificationDot verdict={verification} /> : null;
+                })()}
+              </span>
               {fact.asOf && (
                 <span className="block text-xs text-muted-foreground/60 mt-0.5">
                   as of {formatKBDate(fact.asOf)}
