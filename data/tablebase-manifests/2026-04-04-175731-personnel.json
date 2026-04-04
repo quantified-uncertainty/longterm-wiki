@@ -1,0 +1,82 @@
+{
+  "table": "personnel",
+  "recordCount": 8,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-04T17:57:31.990Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 8,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "js2g9JY00D",
+      "personId": "0Cbzwqwp7G",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Founding Co-Chair",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "Avn2BIUAKK",
+      "personId": "RLjRVtmig9",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Board Member",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "dUjv4miePP",
+      "personId": "ec22NQ5ffa",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Board Member",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "nOhEDeva0Q",
+      "personId": "ZnutqeT9JA",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Board Member",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "qhTU7xZ6Tf",
+      "personId": "IBl0dGsICb",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Board Member",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "tXiVrCUH2J",
+      "personId": "qIZq5DAb1R",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Board Member",
+      "source": "https://thealliance.ai/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "IqwHyhlNLF",
+      "personId": "fhsl5EYCGx",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Founding Co-Launcher",
+      "source": "https://thealliance.ai/blog/alliance_launch",
+      "verdict": "none"
+    },
+    {
+      "id": "ciz0CtwER8",
+      "personId": "FEgSIo1hjY",
+      "organizationId": "sid_aF9wqaoCNa",
+      "role": "Founding Co-Launcher",
+      "source": "https://thealliance.ai/blog/alliance_launch",
+      "verdict": "none"
+    }
+  ]
+}
