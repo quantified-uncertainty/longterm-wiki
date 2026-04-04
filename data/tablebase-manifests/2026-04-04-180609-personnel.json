@@ -1,0 +1,154 @@
+{
+  "table": "personnel",
+  "recordCount": 17,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-04T18:06:09.639Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 17,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "pnlTcVHTlh",
+      "personId": "g4YSBxabMu",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Director & Co-founder",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "ZDONjp20Zf",
+      "personId": "hQyqZjM8mZ",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Co-founder, Food System Recovery & Preparedness",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "0GVULSwKAF",
+      "personId": "cii0ABnNm2",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Co-originator",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "vkEkAt9Mma",
+      "personId": "9xK33ApP4g",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Director of Operations",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "n7Zj5k0cSi",
+      "personId": "2ENdxRyhHU",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Head of Policy",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "ndOrPIrBXK",
+      "personId": "tmxLS5bokH",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Head of Communications",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "LxkkTF66FH",
+      "personId": "YdZSrxqx4i",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Research Manager",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "kWoFv8WXDh",
+      "personId": "aNQAS4DwAC",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Senior Researcher",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "dVRn1npuU3",
+      "personId": "U4uOiUKGEe",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Senior Economist",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "2nqok2wjuT",
+      "personId": "W2T5FKnlr7",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Coordinator / Project Lead",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "asSlwrZQIT",
+      "personId": "sid_6gjF5d3geg",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "wY1RVPj3z4",
+      "personId": "svnOKITbv0",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "5RXeGcvnTl",
+      "personId": "sid_7ojZDBA9wb",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "8NQkdv21I2",
+      "personId": "9Ly6CRrQcZ",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "OJBkAqeblP",
+      "personId": "sid_DmGXPl1h2g",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "m7yYv1CZqL",
+      "personId": "gloCLyAxCQ",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    },
+    {
+      "id": "FjDRmj83Dn",
+      "personId": "0doK0zWues",
+      "organizationId": "sid_Pc9GysNWZA",
+      "role": "Advisor",
+      "source": "https://allfed.info/about/team-and-board",
+      "verdict": "none"
+    }
+  ]
+}
