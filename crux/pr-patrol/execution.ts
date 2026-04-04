@@ -177,7 +177,7 @@ export async function checkMainBranch(config: PatrolConfig): Promise<MainBranchS
 
   // Check cooldown and abandoned status first
   if (isMainBranchAbandoned(MAIN_BRANCH_KEY)) {
-    log(`  ${cl.yellow}Main branch fix abandoned (${MAIN_BRANCH_ABANDON_THRESHOLD} attempts) — needs human intervention${cl.reset}`);
+    log(`  ${cl.yellow}Main branch fix abandoned (${MAIN_BRANCH_ABANDON_THRESHOLD} attempts) — escalating to coordinator (Opus)${cl.reset}`);
     return notRed;
   }
   if (isRecentlyProcessed(MAIN_BRANCH_KEY, MAIN_BRANCH_COOLDOWN_SECONDS)) {
@@ -296,7 +296,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       outcome = isNoOp ? 'no-op' : 'fixed';
       if (isNoOp) {
         recordFailure(MAIN_BRANCH_KEY);
-        reason = 'No-op: agent determined issue needs human intervention';
+        reason = 'No-op: agent determined issue needs escalation to coordinator';
         log(`${cl.yellow}⚠ Main branch fix no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
       } else {
         resetFailCount(MAIN_BRANCH_KEY);
@@ -629,7 +629,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
           // Don't reset fail count — treat like a soft failure so the PR
           // gets skipped on future cycles instead of being retried forever.
           const failCount = recordFailure(pr.number);
-          reason = `No-op: agent determined issue needs human intervention (attempt ${failCount})`;
+          reason = `No-op: agent determined issue needs escalation to coordinator (attempt ${failCount})`;
           log(`${cl.yellow}⚠ PR #${pr.number} no-op — agent stopped early${cl.reset} (${elapsedS}s)`);
         }
 

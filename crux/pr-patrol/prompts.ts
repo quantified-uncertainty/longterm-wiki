@@ -145,20 +145,19 @@ re-review is not required:
 
 ## Escalation order — exhaust automation before stopping
 
-Work through issues in this order. Only escalate to "needs human" after attempting all earlier steps:
+Work through issues in this order. Only escalate after attempting all earlier steps:
 
 1. **Fix the code** — address CI failures, conflicts, and bot review comments directly
 2. **Add labels you can verify** — if \`gate:rules-ok\` is needed, verify the rule is actually satisfied,
    then add the label yourself: \`gh pr edit ${num} --add-label gate:rules-ok\`
 3. **Address ALL bot comments** — don't skip CodeRabbit/bot comments; try to fix them even if they look complex
 4. **Complete checklist items** — update PR body unchecked items when you've verified the task is done
-5. **Only then escalate** — if after all the above there's still something only a human can do
-   (e.g., approve a security exception, provide missing context the bot flagged as ambiguous),
-   output a clear summary and stop
+5. **Only then escalate** — if after all the above there's still something you can't resolve,
+   output a clear summary of what you tried and what remains. The coordinator (Opus) will pick it up.
 
-## When to stop (escalate to human)
+## When to stop (escalate to coordinator)
 
-ONLY stop early for issues that **genuinely require human decision-making**:
+ONLY stop early for issues that **genuinely require higher-level decision-making**:
 - A named individual's approval is required (e.g., security team sign-off)
 - External service configuration that only an admin can change
 - The PR has intentional breaking changes that need owner confirmation
@@ -171,7 +170,7 @@ ONLY stop early for issues that **genuinely require human decision-making**:
 - Anything where you could plausibly make progress with more investigation
 
 If the issue is pre-existing (same failure on main branch, not caused by this PR):
-state that clearly and stop — this is not a human escalation, just a dead end.
+state that clearly and stop — this is not an escalation, just a dead end.
 
 If you've tried 2+ distinct approaches and none worked: stop and summarize what you tried.
 Do not keep cycling through the same strategies.`);

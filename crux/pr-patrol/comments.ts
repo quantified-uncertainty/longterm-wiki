@@ -173,7 +173,7 @@ function computeStage(blockReasons: MergeBlockReason[]): string {
     return 'Draft PR';
   }
 
-  return 'Waiting for human review';
+  return 'Waiting for coordinator review';
 }
 
 /**
@@ -311,7 +311,7 @@ export function buildAbandonmentComment(
   issues: string[],
 ): string {
   return [
-    `\u{1F916} **PR Patrol** \u{2014} Abandoning after ${failCount} failed fix attempts. This PR needs human intervention.`,
+    `\u{1F916} **PR Patrol** \u{2014} Abandoning after ${failCount} failed fix attempts. Escalating to coordinator (Opus).`,
     '',
     `**Issues**: ${issues.join(', ')}`,
   ].join('\n');
@@ -331,7 +331,7 @@ export function buildTimeoutComment(
 
 export function buildNoOpComment(issues: string[]): string {
   return [
-    '\u{1F916} **PR Patrol** \u{2014} Agent determined this issue needs human intervention (no code changes made).',
+    '\u{1F916} **PR Patrol** \u{2014} Agent determined this issue needs escalation to coordinator (Opus) (no code changes made).',
     '',
     `**Issues**: ${issues.join(', ')}`,
   ].join('\n');
