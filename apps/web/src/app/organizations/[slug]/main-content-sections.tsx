@@ -9,6 +9,7 @@
 import Link from "next/link";
 import type { KBRecordEntry } from "@/data/factbase";
 import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import {
   formatKBDate,
   titleCase,
@@ -69,7 +70,7 @@ export function FundingHistorySection({
                     <span className="inline-flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
-                        href={`/source-checks/funding-round/${encodeURIComponent(String(round.key))}`}
+                        href={getSourceCheckHref("funding-round", String(round.key))}
                       />
                       <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
                         {name}
@@ -149,7 +150,7 @@ export function InvestorParticipationSection({
                     <span className="inline-flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
-                        href={`/source-checks/investment/${encodeURIComponent(String(inv.key))}`}
+                        href={getSourceCheckHref("investment", String(inv.key))}
                       />
                       {investorHref ? (
                         <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
