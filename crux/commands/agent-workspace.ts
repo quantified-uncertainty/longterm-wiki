@@ -11,7 +11,7 @@
  *   crux sys agent-workspace clean [N]       Remove idle agent slots (on main, no changes)
  */
 
-import { existsSync, readFileSync, writeFileSync, readdirSync, statSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync, statSync, copyFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 import { execSync } from 'child_process';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -111,6 +111,34 @@ function git(dir: string, ...args: string[]): string {
 /** Sanitize a string for use in tmux commands — strip shell-unsafe characters */
 function sanitizeForTmux(s: string): string {
   return s.replace(/[^a-zA-Z0-9/_.:@#-]/g, '_');
+}
+
+/** Copy latest hooks from main/ to a slot directory.
+ * Hooks are tracked in git, so checking out old branches reverts them.
+ * Overlaying from main/ ensures slots always have the latest fixes
+ * (e.g., -t $TMUX_PANE for correct window targeting). */
+function overlayHooks(lwDir: string, slotDir: string): boolean {
+  const mainHooksDir = join(lwDir, 'main', '.claude', 'hooks');
+  const slotHooksDir = join(slotDir, '.claude', 'hooks');
+
+  if (!existsSync(mainHooksDir)) return false;
+
+  const hookFiles = ['session-start.sh', 'heartbeat.sh'];
+  let copied = false;
+
+  for (const file of hookFiles) {
+    const src = join(mainHooksDir, file);
+    const dst = join(slotHooksDir, file);
+    if (!existsSync(src)) continue;
+
+    mkdirSync(slotHooksDir, { recursive: true });
+    try {
+      copyFileSync(src, dst);
+      copied = true;
+    } catch { /* permission error or similar */ }
+  }
+
+  return copied;
 }
 
 interface TmuxWindowInfo {
@@ -458,6 +486,9 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
     }
   }
 
+  // Overlay latest hooks before starting — old branches revert hook files
+  overlayHooks(lwDir, slotDir);
+
   // Include current branch in initial window name
   const branch = git(slotDir, 'branch', '--show-current') || 'detached';
   const fullWindowName = sanitizeForTmux(`A${slot}:${branch}`);
@@ -583,6 +614,16 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
     output = 'No slots to refresh.';
   }
 
+  // Overlay latest hooks from main/ to all slots — prevents old branches
+  // from reverting critical fixes (e.g., -t $TMUX_PANE in heartbeat.sh)
+  let hooksOverlaid = 0;
+  for (const { dir } of slots) {
+    if (overlayHooks(lwDir, dir)) hooksOverlaid++;
+  }
+  if (hooksOverlaid > 0) {
+    output += `Hooks: overlaid latest from main/ to ${hooksOverlaid} slot(s)\n`;
+  }
+
   // Rename tmux windows to match current state after refresh
   const tabsRenamed = renameTmuxWindows(lwDir);
   if (tabsRenamed.length > 0) {
@@ -596,7 +637,7 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
 // fix-tabs — rename tmux windows to match actual slot + branch
 // ---------------------------------------------------------------------------
 
-/** Scan all tmux windows and rename those whose pane CWD is an agent slot */
+/** Scan all tmux windows and rename those whose pane CWD is an agent slot or the coordinator */
 function renameTmuxWindows(lwDir: string): string[] {
   if (!process.env.TMUX) return [];
 
@@ -604,6 +645,17 @@ function renameTmuxWindows(lwDir: string): string[] {
   const renamed: string[] = [];
 
   for (const win of windows) {
+    // Coordinator window — lw/ root (not a slot)
+    if (win.cwd === lwDir) {
+      if (win.name !== 'LW') {
+        try {
+          execSync(`tmux rename-window -t "${win.index}" "LW"`, { timeout: 5000 });
+          renamed.push(`  LW: ${win.name} → LW`);
+        } catch { /* ignore */ }
+      }
+      continue;
+    }
+
     // Check if this pane is in an agent slot directory under lw/
     const match = win.cwd.match(/\/a(\d+)$/);
     if (!match) continue;
