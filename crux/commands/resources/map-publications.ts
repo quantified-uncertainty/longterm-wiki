@@ -1,7 +1,7 @@
 /**
  * Map resource domains to publications.
  *
- * Analyzes resources that lack a publication_id and reports which ones
+ * Analyzes resources that lack a publicationId and reports which ones
  * could be matched via domain lookup against publications.yaml.
  *
  * Data source priority:
@@ -25,12 +25,12 @@ interface Publication {
 interface Resource {
   id: string;
   url: string;
-  title: string;
-  publication_id?: string;
+  title: string | null;
+  publicationId?: string | null;
   [key: string]: unknown;
 }
 
-function extractDomain(url: string): string | null {
+export function extractDomain(url: string): string | null {
   try {
     return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
   } catch {
@@ -38,7 +38,7 @@ function extractDomain(url: string): string | null {
   }
 }
 
-function buildDomainIndex(publications: Publication[]): Map<string, Publication> {
+export function buildDomainIndex(publications: Publication[]): Map<string, Publication> {
   const index = new Map<string, Publication>();
   for (const pub of publications) {
     for (const domain of pub.domains) {
@@ -48,7 +48,7 @@ function buildDomainIndex(publications: Publication[]): Map<string, Publication>
   return index;
 }
 
-function matchPublication(domain: string, index: Map<string, Publication>): Publication | undefined {
+export function matchPublication(domain: string, index: Map<string, Publication>): Publication | undefined {
   const normalized = domain.toLowerCase().replace(/^www\./, '');
   const exact = index.get(normalized);
   if (exact) return exact;
@@ -90,7 +90,7 @@ async function fetchAllResourcesFromServer(verbose: boolean): Promise<Resource[]
       if (verbose && offset === 0) {
         console.log(`Wiki-server reports ${total} total resources`);
       }
-      allResources.push(...(resources as Resource[]));
+      allResources.push(...resources.map((r) => ({ ...r }) as Resource));
       if (verbose && allResources.length % 2000 === 0) {
         console.log(`  Fetched ${allResources.length}/${total} resources...`);
       }
@@ -135,14 +135,14 @@ export async function mapPublications(options: MapPublicationsOptions): Promise<
   }
 
   const domainIndex = buildDomainIndex(publications);
-  const withPubId = resources.filter((r) => r.publication_id).length;
-  const withoutPubId = resources.filter((r) => !r.publication_id).length;
+  const withPubId = resources.filter((r) => r.publicationId).length;
+  const withoutPubId = resources.filter((r) => !r.publicationId).length;
 
   const domainMatched: { resource: Resource; publication: Publication; domain: string }[] = [];
   const unmappedDomains = new Map<string, number>();
 
   for (const r of resources) {
-    if (r.publication_id) continue;
+    if (r.publicationId) continue;
     const domain = extractDomain(r.url);
     if (!domain) continue;
     const pub = matchPublication(domain, domainIndex);
@@ -155,8 +155,8 @@ export async function mapPublications(options: MapPublicationsOptions): Promise<
 
   console.log('=== Publication Mapping Report ===\n');
   console.log(`Total resources:           ${resources.length}`);
-  console.log(`With publication_id:       ${withPubId} (${pct(withPubId, resources.length)})`);
-  console.log(`Without publication_id:    ${withoutPubId}`);
+  console.log(`With publicationId:       ${withPubId} (${pct(withPubId, resources.length)})`);
+  console.log(`Without publicationId:    ${withoutPubId}`);
   console.log(`  Domain-matchable:        ${domainMatched.length}`);
   console.log(`  Truly unmapped:          ${withoutPubId - domainMatched.length}`);
   console.log(`\nEffective coverage:        ${withPubId + domainMatched.length}/${resources.length} (${pct(withPubId + domainMatched.length, resources.length)})`);
@@ -184,7 +184,7 @@ export async function mapPublications(options: MapPublicationsOptions): Promise<
     console.log(`\n  Total unmapped: ${totalUnmapped} across ${sortedUnmapped.length} domains`);
   }
 
-  // ---- Apply mode: write publication_id back via batch upsert ----
+  // ---- Apply mode: write publicationId back via batch upsert ----
   if (options.apply && domainMatched.length > 0) {
     console.log(`\n=== Applying ${domainMatched.length} publication mappings ===\n`);
     const BATCH_SIZE = 200;
