@@ -31,6 +31,8 @@ const CURRENCY_FIELD_NAMES = new Set([
   "totalBudget", "totalRaised", "selfFunding", "pacAmount",
   // FactBase kebab-case properties
   "revenue", "internal-revenue", "secondary-valuation",
+  // FactBase snake_case properties (from claims-properties.yaml)
+  "funding_round_amount", "funding_total",
 ]);
 
 function isFractionField(fieldName: string, fieldDef?: FieldDef): boolean {
