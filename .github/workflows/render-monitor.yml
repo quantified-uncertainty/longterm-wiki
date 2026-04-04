@@ -40,44 +40,37 @@ jobs:
         continue-on-error: true
         env:
           PLAYWRIGHT_BASE_URL: https://www.longtermwiki.com
-        run: |
-          cd apps/web && npx playwright test e2e/render-audit.spec.ts --reporter=list 2>&1 | tee /tmp/audit-output.txt
-          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+        run: cd apps/web && npx playwright test e2e/render-audit.spec.ts --reporter=list
 
       - name: Manage GitHub issue on failure
-        if: steps.audit.outputs.exit_code != '0'
+        if: steps.audit.outcome == 'failure'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          FAILURES=$(grep -c '✘' /tmp/audit-output.txt || echo "0")
-          BODY="Render quality audit detected ${FAILURES} failure(s) against production.
-
-          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
-          <details>
-          <summary>Test output</summary>
-
-          \`\`\`
-          $(tail -30 /tmp/audit-output.txt)
-          \`\`\`
-          </details>"
-
           # Search for existing open issue
           EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
 
+          BODY_FILE=$(mktemp)
+          cat >| "$BODY_FILE" <<BODYEOF
+          Render quality audit failed against production.
+
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          BODYEOF
+
           if [ -n "$EXISTING" ]; then
             echo "Updating existing issue #${EXISTING}"
-            gh issue comment "$EXISTING" --body "$BODY"
+            gh issue comment "$EXISTING" --body-file "$BODY_FILE"
           else
             echo "Creating new issue"
             gh issue create \
               --title "Render quality regression detected" \
               --label "render-monitor" \
-              --body "$BODY"
+              --body-file "$BODY_FILE"
           fi
+          rm -f "$BODY_FILE"
 
       - name: Close issue on success
-        if: steps.audit.outputs.exit_code == '0'
+        if: steps.audit.outcome == 'success'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -91,5 +84,5 @@ jobs:
           fi
 
       - name: Fail workflow if audit failed
-        if: steps.audit.outputs.exit_code != '0'
+        if: steps.audit.outcome == 'failure'
         run: exit 1

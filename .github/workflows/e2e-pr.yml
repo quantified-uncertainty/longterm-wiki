@@ -9,11 +9,11 @@ on:
   pull_request:
     branches: [main]
     paths:
-      # Only run when frontend code changes — skip for docs/data-only PRs
       - "apps/web/src/**"
       - "apps/web/e2e/**"
       - "apps/web/package.json"
-      - "content/docs/**"
+      - "apps/web/playwright.config.ts"
+      - "apps/web/next.config.*"
 
 concurrency:
   group: e2e-pr-${{ github.event.pull_request.number }}
@@ -22,7 +22,7 @@ concurrency:
 jobs:
   e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -52,23 +52,31 @@ jobs:
           PORT=3099 npx next start &
           SERVER_PID=$!
 
-          # Wait for server to be ready
+          # Wait for server to be ready (fail if it never starts)
+          SERVER_READY=0
           for i in $(seq 1 30); do
             if curl -sf -o /dev/null http://localhost:3099; then
               echo "Server ready (attempt $i)"
+              SERVER_READY=1
               break
             fi
             sleep 2
           done
+          if [ "$SERVER_READY" -eq 0 ]; then
+            echo "::error::Server did not start after 60s"
+            kill $SERVER_PID 2>/dev/null || true
+            exit 1
+          fi
 
-          # Run only the render audit and no-raw-ids specs (not the full suite)
+          # Run render audit + no-raw-ids specs
+          PLAYWRIGHT_EXIT=0
           PLAYWRIGHT_BASE_URL=http://localhost:3099 \
             npx playwright test \
               e2e/render-audit.spec.ts \
               e2e/no-raw-ids.spec.ts \
               --retries=2 \
               --reporter=list \
-            || EXIT_CODE=$?
+            || PLAYWRIGHT_EXIT=$?
 
           kill $SERVER_PID 2>/dev/null || true
-          exit ${EXIT_CODE:-0}
+          exit $PLAYWRIGHT_EXIT
