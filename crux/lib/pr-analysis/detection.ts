@@ -101,14 +101,22 @@ export function extractBotComments(pr: GqlPrNode): BotComment[] {
 // ── Human-required CI checks ─────────────────────────────────────────────────
 
 /**
- * CI checks that require human intervention (e.g. adding a label) and cannot
- * be fixed by the bot. If ALL failing checks are in this set, we skip the
- * `ci-failure` issue since the bot would waste turns trying to fix them.
+ * CI checks that require a label (e.g. gate:rules-ok) and cannot be fixed
+ * by code changes alone. If ALL failing checks match this list, we skip the
+ * `ci-failure` issue since the bot would waste turns trying to "fix" them.
+ *
+ * Uses substring matching (case-insensitive) to handle variations in check
+ * naming between GitHub Actions job names and check-run names.
  */
-export const HUMAN_REQUIRED_CHECKS = new Set([
-  'check-protected-paths',
-  'coderabbit-security-gate',
-]);
+const LABEL_REQUIRED_CHECK_PATTERNS = [
+  'protected paths',
+  'coderabbit security gate',
+];
+
+function isLabelRequiredCheck(checkName: string): boolean {
+  const lower = checkName.toLowerCase();
+  return LABEL_REQUIRED_CHECK_PATTERNS.some((p) => lower.includes(p));
+}
 
 // ── Issue detection ──────────────────────────────────────────────────────────
 
@@ -134,12 +142,12 @@ export function detectIssues(
     .filter(Boolean);
 
   if (failingContexts.length > 0) {
-    // Check if ALL failing checks are human-required — if so, skip ci-failure
-    const allHumanRequired = failingContexts.every((c) => {
+    // Check if ALL failing checks just need a label — if so, skip ci-failure
+    const allLabelRequired = failingContexts.every((c) => {
       const checkName = c.name ?? c.context ?? '';
-      return HUMAN_REQUIRED_CHECKS.has(checkName);
+      return isLabelRequiredCheck(checkName);
     });
-    if (!allHumanRequired) {
+    if (!allLabelRequired) {
       issues.push('ci-failure');
     }
   }

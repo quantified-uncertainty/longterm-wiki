@@ -48,7 +48,6 @@ export {
   fetchOpenPrs,
   fetchSinglePr,
   detectOverlaps,
-  HUMAN_REQUIRED_CHECKS,
 } from './detection.ts';
 
 // ── Merge eligibility ────────────────────────────────────────────────────────
