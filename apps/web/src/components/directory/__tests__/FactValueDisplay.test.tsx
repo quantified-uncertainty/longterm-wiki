@@ -29,7 +29,7 @@ vi.mock("next/link", () => ({
   ),
 }));
 
-import { FactValueDisplay } from "../FactsSection";
+import { FactValueDisplay } from "@components/directory/FactsSection";
 
 // ── Test helpers ─────────────────────────────────────────────────────
 
