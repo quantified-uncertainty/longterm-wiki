@@ -131,7 +131,7 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
           )}
           <RecordVerificationDot
             verdict={grantVerdict?.verdict}
-            showLabel
+            variant="label"
             href={grantVerdict?.verdict ? `/source-checks/grant/${encodeURIComponent(String(grant.key))}` : undefined}
           />
         </div>

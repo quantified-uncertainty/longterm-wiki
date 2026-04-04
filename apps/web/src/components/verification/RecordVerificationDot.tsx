@@ -1,12 +1,16 @@
 /**
- * RecordVerificationDot — Small colored dot for source-check verification status.
+ * RecordVerificationDot — Verification status indicator for source-checked records.
  *
- * Used in table cells and inline with record names to indicate whether
- * a structured record (grant, personnel, etc.) has been source-checked.
+ * Two display variants:
+ * - "dot" (default): Small colored dot, used inline with record names
+ * - "label": Colored text label, used as a dedicated column in tables
+ *
+ * For "never checked" (verdict=null):
+ * - dot variant: hollow circle with "Not checked" tooltip
+ * - label variant: renders nothing (blank = unambiguous "not checked")
  *
  * Uses the source-check vocabulary (confirmed, contradicted, outdated, partial, unverifiable),
- * which is separate from the citation/FactBase vocabulary (accurate, minor_issues, etc.)
- * used by VerificationDot.tsx.
+ * which is separate from the citation/FactBase vocabulary used by VerificationDot.tsx.
  */
 
 import Link from "next/link";
@@ -20,46 +24,71 @@ import {
 interface RecordVerificationDotProps {
   /** Verdict string from the API. Unknown values (including "unchecked") render nothing. */
   verdict: string | null | undefined;
-  /** Show the label text next to the dot (default: false) */
+  /** Display variant: "dot" for inline dots, "label" for text column */
+  variant?: "dot" | "label";
+  /** Show the label text next to the dot (default: false). Only applies to dot variant. */
   showLabel?: boolean;
-  /** Dot size: sm = w-2 (8px), md = w-2.5 (10px) */
+  /** Dot size: sm = w-2 (8px), md = w-2.5 (10px). Only applies to dot variant. */
   size?: "sm" | "md";
-  /** Link to source-check detail page. When provided, the dot becomes clickable. */
+  /** Link to source-check detail page. When provided, the element becomes clickable. */
   href?: string;
   className?: string;
 }
 
 export function RecordVerificationDot({
   verdict,
+  variant = "dot",
   showLabel = false,
   size = "sm",
   href,
   className = "",
 }: RecordVerificationDotProps) {
+  const config = verdict
+    ? SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict]
+    : null;
+
+  // Label variant: dot + text for known verdicts, nothing for unchecked
+  if (variant === "label") {
+    if (!config) return null;
+    const label = (
+      <span className={`inline-flex items-center gap-1 ${className}`}>
+        <span className={`inline-block w-2 h-2 rounded-full shrink-0 ${config.color}`} />
+        <span className={`text-xs font-medium ${config.textColor}`}>
+          {config.label}
+        </span>
+      </span>
+    );
+    if (href) {
+      return (
+        <Link href={href} className="hover:underline transition-colors">
+          {label}
+        </Link>
+      );
+    }
+    return label;
+  }
+
+  // Dot variant (original behavior)
   const UNVERIFIED_CONFIG: VerdictDisplayConfig = {
-    color: "bg-muted-foreground/30",
-    label: "Unverified",
+    color: "border border-muted-foreground/40",
+    label: "Not checked",
     textColor: "text-muted-foreground/60",
   };
 
-  const config = verdict
-    ? SOURCE_CHECK_VERDICT_CONFIG[verdict as SourceCheckVerdict]
-    : UNVERIFIED_CONFIG;
-  if (!config) return null; // Unknown verdict (e.g., "unchecked") — render nothing
-
+  const dotConfig = config ?? UNVERIFIED_CONFIG;
   const dotSize = size === "md" ? "w-2.5 h-2.5" : "w-2 h-2";
 
   const dot = (
     <span
       className={`inline-flex items-center gap-1 ${className}`}
-      title={config.label}
+      title={dotConfig.label}
     >
       <span
-        className={`inline-block ${dotSize} rounded-full shrink-0 ${config.color}`}
+        className={`inline-block ${dotSize} rounded-full shrink-0 ${dotConfig.color}`}
       />
       {showLabel && (
-        <span className={`text-[10px] ${config.textColor}`}>
-          {config.label}
+        <span className={`text-[10px] ${dotConfig.textColor}`}>
+          {dotConfig.label}
         </span>
       )}
     </span>

@@ -166,6 +166,7 @@ export function EquityPositionsSection({
                       )}
                       <RecordVerificationDot
                         verdict={verdict?.verdict}
+                        variant="label"
                         href={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
                       />
                     </div>
