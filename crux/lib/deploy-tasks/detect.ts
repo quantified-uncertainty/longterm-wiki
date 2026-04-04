@@ -514,65 +514,11 @@ function extractTaskKeys(
   return { envVars, migrationNums, workflowNames };
 }
 
-/**
- * Check whether a sub-PR task is a duplicate of any diff-detected task.
- *
- * Uses two strategies:
- * 1. Key-based matching: extract env var names, migration numbers, workflow names
- *    and check for overlap.
- * 2. Substring matching: check if either task description is a substring of the
- *    other (after normalization).
- */
-function isSubPrTaskDuplicate(
-  subPrTask: string,
-  diffTasks: DeployTask[]
-): boolean {
-  const normalizedSubPr = normalizeForComparison(subPrTask);
-  const subPrKeys = extractTaskKeys(subPrTask);
-
-  for (const diffTask of diffTasks) {
-    const normalizedDiff = normalizeForComparison(diffTask.description);
-
-    // Strategy 1: Key-based matching
-    const diffKeys = extractTaskKeys(diffTask.description);
-
-    // Check env var overlap
-    if (subPrKeys.envVars.length > 0 && diffKeys.envVars.length > 0) {
-      for (const envVar of subPrKeys.envVars) {
-        if (diffKeys.envVars.includes(envVar)) return true;
-      }
-    }
-
-    // Check migration number overlap
-    if (
-      subPrKeys.migrationNums.length > 0 &&
-      diffKeys.migrationNums.length > 0
-    ) {
-      for (const migNum of subPrKeys.migrationNums) {
-        if (diffKeys.migrationNums.includes(migNum)) return true;
-      }
-    }
-
-    // Check workflow name overlap
-    if (
-      subPrKeys.workflowNames.length > 0 &&
-      diffKeys.workflowNames.length > 0
-    ) {
-      for (const wfName of subPrKeys.workflowNames) {
-        if (diffKeys.workflowNames.includes(wfName)) return true;
-      }
-    }
-
-    // Strategy 2: Substring matching on normalized descriptions
-    if (
-      normalizedSubPr.includes(normalizedDiff) ||
-      normalizedDiff.includes(normalizedSubPr)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
+/** True if two arrays share at least one element. */
+function hasOverlap(a: string[], b: string[]): boolean {
+  if (a.length === 0 || b.length === 0) return false;
+  const bSet = new Set(b);
+  return a.some((x) => bSet.has(x));
 }
 
 /**
@@ -581,13 +527,42 @@ function isSubPrTaskDuplicate(
  * Diff-detected tasks are preferred because they are more structured (have
  * category, phase, verify commands). Sub-PR tasks are free-text strings
  * scraped from PR bodies.
+ *
+ * Uses two strategies per pair:
+ * 1. Key-based matching: extract env var names, migration numbers, workflow
+ *    names and check for overlap. Needed because diff tasks use "Set env var
+ *    FOO" while sub-PR tasks may say "Set FOO in production".
+ * 2. Substring matching: either description is a substring of the other
+ *    (after normalization). Handles cases where wording is identical or nearly
+ *    so.
  */
 export function deduplicateSubPrTasks(
   diffTasks: DeployTask[],
   subPrTasks: string[]
 ): string[] {
   if (diffTasks.length === 0 || subPrTasks.length === 0) return subPrTasks;
-  return subPrTasks.filter((task) => !isSubPrTaskDuplicate(task, diffTasks));
+
+  // Precompute normalized text and extracted keys for each diff task once.
+  const diffMeta = diffTasks.map((t) => ({
+    normalized: normalizeForComparison(t.description),
+    keys: extractTaskKeys(t.description),
+  }));
+
+  return subPrTasks.filter((task) => {
+    const normalizedTask = normalizeForComparison(task);
+    const taskKeys = extractTaskKeys(task);
+
+    return !diffMeta.some(
+      ({ normalized, keys }) =>
+        // Strategy 1: shared env var name, migration number, or workflow name
+        hasOverlap(taskKeys.envVars, keys.envVars) ||
+        hasOverlap(taskKeys.migrationNums, keys.migrationNums) ||
+        hasOverlap(taskKeys.workflowNames, keys.workflowNames) ||
+        // Strategy 2: one description is a substring of the other
+        normalizedTask.includes(normalized) ||
+        normalized.includes(normalizedTask)
+    );
+  });
 }
 
 // ────────────────────────────────────────────────────────────────────────────
