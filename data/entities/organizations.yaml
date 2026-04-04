@@ -9507,3 +9507,224 @@
     R&D funding. Coordinates with BIS on export control compliance.
   tags: [semiconductors, government, policy]
   lastUpdated: 2026-03
+
+# ── Investment/Grant Entity Stubs ────────────────────────────────────────────
+# These stubs resolve broken entity references in investment and grant records.
+
+- id: index-ventures
+  stableId: sid_B5JzHeWvow
+  type: organization
+  orgType: generic
+  title: Index Ventures
+  website: https://www.indexventures.com
+  description: >-
+    European-American venture capital firm based in Geneva and San Francisco.
+    Notable investments include Dropbox, Adyen, Roblox, and Notion.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: aleph-vc
+  stableId: sid_dbDEGrJbUp
+  type: organization
+  orgType: generic
+  title: Aleph
+  website: https://aleph.vc
+  description: >-
+    Israeli venture capital firm focused on early-stage technology companies.
+    Portfolio includes monday.com, WalkMe, and HoneyBook.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: insight-partners
+  stableId: sid_69J7QKcqyX
+  type: organization
+  orgType: generic
+  title: Insight Partners
+  website: https://www.insightpartners.com
+  description: >-
+    Growth equity and venture capital firm headquartered in New York City.
+    Manages over $90B in regulatory assets under management.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: qumra-capital
+  stableId: sid_rWgCE08sfW
+  type: organization
+  orgType: generic
+  title: Qumra Capital
+  website: https://www.qumracapital.com
+  description: >-
+    Israeli growth equity fund focused on SaaS, marketplaces, and
+    enterprise software companies.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: river-park-ventures
+  stableId: sid_Kvfo7x5bqf
+  type: organization
+  orgType: generic
+  title: River Park Ventures
+  description: Venture capital firm investing in early-stage technology companies.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: maccabee-ventures
+  stableId: sid_dzlCIZ45dZ
+  type: organization
+  orgType: generic
+  title: Maccabee Ventures
+  description: Venture capital firm focusing on early-stage startups.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: metagov-org
+  stableId: sid_B6ZUV8iv17
+  type: organization
+  orgType: generic
+  title: Metagov
+  website: https://metagov.org
+  description: >-
+    Research collective focused on digital governance infrastructure,
+    online community governance, and interoperable deliberative tools.
+  tags: [governance, research]
+  lastUpdated: 2026-04
+
+- id: khosla-ventures
+  stableId: sid_F1bFJHm9RA
+  type: organization
+  orgType: generic
+  title: Khosla Ventures
+  website: https://www.khoslaventures.com
+  description: >-
+    Venture capital firm founded by Vinod Khosla. Focuses on transformative
+    technologies in energy, health, food, and computing.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: kleiner-perkins
+  stableId: sid_ntlgFVJrPg
+  type: organization
+  orgType: generic
+  title: Kleiner Perkins
+  website: https://www.kleinerperkins.com
+  description: >-
+    Venture capital firm in Menlo Park, California. Key early investor in
+    Google, Amazon, and Genentech.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+- id: sequoia-capital
+  stableId: sid_oEH5GwWtow
+  type: organization
+  orgType: generic
+  title: Sequoia Capital
+  website: https://www.sequoiacap.com
+  description: >-
+    American venture capital firm headquartered in Menlo Park, California.
+    Notable investments include Apple, Google, Oracle, and Airbnb.
+  tags: [venture-capital]
+  lastUpdated: 2026-04
+
+# NOTE: The following stubs use non-standard stableId formats (sid_<name>)
+# because historical grant records in the database reference them with these
+# malformed IDs. They are added here to prevent raw IDs from displaying in the
+# UI. See GitHub issue for tracking proper cleanup.
+
+- id: conjecture-grant-ref
+  stableId: sid_conjecture
+  type: organization
+  orgType: safety-org
+  title: Conjecture
+  website: https://conjecture.dev
+  description: >-
+    AI safety research company based in London, co-founded by Connor Leahy.
+    Note: canonical entity is conjecture (sid_0u4J70VqFY); this stub exists
+    because historical grant records reference the malformed ID sid_conjecture.
+  tags: [ai-safety]
+  lastUpdated: 2026-04
+
+- id: lightcone-grant-ref
+  stableId: sid_lighthaven
+  type: organization
+  orgType: safety-org
+  title: Lightcone Infrastructure
+  website: https://www.lightconeinfrastructure.com
+  description: >-
+    Operator of LessWrong and Lighthaven conference venue.
+    Note: canonical entity is lightcone-infrastructure (sid_47Rkb1DGmw);
+    this stub exists because historical grant records reference sid_lighthaven.
+  tags: [community-building]
+  lastUpdated: 2026-04
+
+- id: global-give
+  stableId: sid_GlobalGive
+  type: organization
+  orgType: generic
+  title: GlobalGive
+  description: >-
+    Organization exploring cross-country tax-deductible effective giving solutions.
+    Received EA Infrastructure Fund grant to explore this model.
+  tags: [effective-altruism, philanthropy]
+  lastUpdated: 2026-04
+
+- id: orthogonal-ea
+  stableId: sid_Orthogonal
+  type: organization
+  orgType: safety-org
+  title: Orthogonal
+  description: >-
+    EA-aligned organization (Ashgro Inc). Received SFF-2023-H2 general support
+    grant from Jaan Tallinn's Survival and Flourishing Fund.
+  tags: [effective-altruism]
+  lastUpdated: 2026-04
+
+- id: futurewise-wa
+  stableId: sid_Futurewise
+  type: organization
+  orgType: generic
+  title: Futurewise
+  website: https://futurewise.org
+  description: >-
+    Housing advocacy nonprofit in Washington state focusing on land use reform,
+    zoning, and urban growth management. Received Open Philanthropy grants
+    for housing policy reform work.
+  tags: [housing, policy]
+  lastUpdated: 2026-04
+
+- id: janaagraha-centre
+  stableId: sid_Janaagraha
+  type: organization
+  orgType: generic
+  title: Janaagraha Centre for Citizenship and Democracy
+  website: https://www.janaagraha.org
+  description: >-
+    Indian nonprofit working on urban governance, civic participation, and
+    air quality in South Asia. Received Open Philanthropy grant for air quality work.
+  tags: [governance, civic]
+  lastUpdated: 2026-04
+
+- id: kurzgesagt-studio
+  stableId: sid_Kurzgesagt
+  type: organization
+  orgType: generic
+  title: Kurzgesagt
+  website: https://kurzgesagt.org
+  description: >-
+    Munich-based animation studio and YouTube channel known for educational
+    science and philosophy content. Has received Open Philanthropy grants for
+    video production on topics including AI safety and global catastrophic risks.
+  tags: [media, education]
+  lastUpdated: 2026-04
+
+- id: exscientia
+  stableId: sid_Exscientia
+  type: organization
+  orgType: generic
+  title: Exscientia
+  website: https://www.exscientia.ai
+  description: >-
+    AI-driven drug discovery company founded in Oxford, UK. Uses AI to design
+    novel drug candidates. Received Open Philanthropy biosecurity grant
+    for interferon lambda agonist research.
+  tags: [biotech, drug-discovery]
+  lastUpdated: 2026-04
