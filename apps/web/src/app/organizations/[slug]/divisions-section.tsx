@@ -94,6 +94,7 @@ function DivisionCard({
   const leadHref = resolvedLead?.href ?? null;
   const divMembers = members?.get(d.key) ?? [];
   const accentBorder = DIVISION_ACCENT_BORDER[d.divisionType] ?? "border-l-gray-300 dark:border-l-gray-600";
+  const descriptionText = d.description || d.notes;
 
   const divHref = getDivisionHref(d);
   const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
@@ -121,15 +122,30 @@ function DivisionCard({
             )}
           </span>
         </span>
-        {divHref && (
-          <svg
-            aria-hidden="true"
-            className="shrink-0 w-3.5 h-3.5 text-muted-foreground/30 group-hover/card:text-muted-foreground/60 transition-colors"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        )}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {d.website && (
+            <a
+              href={safeHref(d.website)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 text-muted-foreground/40 hover:text-primary transition-colors"
+              title="Website"
+            >
+              <svg aria-hidden="true" className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          )}
+          {divHref && (
+            <svg
+              aria-hidden="true"
+              className="shrink-0 w-3.5 h-3.5 text-muted-foreground/30 group-hover/card:text-muted-foreground/60 transition-colors"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          )}
+        </div>
       </div>
       <div className="flex items-center gap-2 mt-0.5 flex-wrap">
         <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/50">
@@ -153,6 +169,11 @@ function DivisionCard({
           </>
         )}
       </div>
+      {descriptionText && (
+        <p className="text-[11px] text-muted-foreground/60 mt-1 line-clamp-2 leading-snug">
+          {descriptionText}
+        </p>
+      )}
       {divMembers.length > 0 && (
         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
           {divMembers.slice(0, 3).map((m, i) => (
@@ -242,36 +263,56 @@ export function DivisionsSection({
               return (
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
-                    <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(verdict?.verdict)}
-                        originalVerdict={verdict?.verdict}
-                        size="md"
-                        href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
-                      />
-                      {(() => {
-                        const href = getDivisionHref(d);
-                        return href ? (
-                          <Link
-                            href={href}
-                            className="text-primary hover:underline"
-                          >
-                            {d.name}
-                          </Link>
-                        ) : (
-                          d.name
-                        );
-                      })()}
-                    </span>
-                    {d.source && (
-                      <a
-                        href={safeHref(d.source)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="ml-1.5 text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                      >
-                        source
-                      </a>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
+                        <SourceCheckDot
+                          status={recordVerdictToStatus(verdict?.verdict)}
+                          originalVerdict={verdict?.verdict}
+                          size="md"
+                          href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
+                        />
+                        {(() => {
+                          const href = getDivisionHref(d);
+                          return href ? (
+                            <Link
+                              href={href}
+                              className="text-primary hover:underline"
+                            >
+                              {d.name}
+                            </Link>
+                          ) : (
+                            d.name
+                          );
+                        })()}
+                      </span>
+                      {d.website && (
+                        <a
+                          href={safeHref(d.website)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-muted-foreground/40 hover:text-primary transition-colors"
+                          title="Website"
+                        >
+                          <svg aria-hidden="true" className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                          </svg>
+                        </a>
+                      )}
+                      {d.source && (
+                        <a
+                          href={safeHref(d.source)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          source
+                        </a>
+                      )}
+                    </div>
+                    {(d.description || d.notes) && (
+                      <p className="text-[11px] text-muted-foreground/60 mt-0.5 line-clamp-2 leading-snug max-w-md">
+                        {d.description || d.notes}
+                      </p>
                     )}
                   </td>
                   <td className="py-2.5 px-3">

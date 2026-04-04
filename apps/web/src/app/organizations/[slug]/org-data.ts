@@ -357,6 +357,8 @@ export function parseDivisionRecord(record: KBRecordEntry) {
     endDate: (f.endDate as string) ?? null,
     website: (f.website as string) ?? null,
     source: (f.source as string) ?? null,
+    notes: (f.notes as string) ?? null,
+    description: (f.description as string) ?? null,
   };
 }
 
@@ -1107,7 +1109,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     } else {
       // Merge: fill in any null fields from the new copy
       divisionAltKeys.get(parsed.name)!.add(parsed.key);
-      for (const field of ["lead", "status", "startDate", "endDate", "slug", "website", "source"] as const) {
+      for (const field of ["lead", "status", "startDate", "endDate", "slug", "website", "source", "notes", "description"] as const) {
         if (!existing[field] && parsed[field]) {
           (existing as Record<string, unknown>)[field] = parsed[field];
         }

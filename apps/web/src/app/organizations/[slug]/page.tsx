@@ -95,6 +95,7 @@ import {
 // PG grants integration — fetch grants from wiki-server for orgs that are funders
 import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
+import Markdown from "react-markdown";
 
 // Client-side tabs
 import { OrgProfileTabs, type OrgTab } from "./org-tabs";
@@ -239,9 +240,9 @@ export default async function OrgProfilePage({
     <div className="space-y-8">
       {/* Description */}
       {data.descriptionText && (
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">
-          {data.descriptionText}
-        </p>
+        <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm prose-neutral dark:prose-invert max-w-none [&>p]:my-1.5">
+          <Markdown>{data.descriptionText}</Markdown>
+        </div>
       )}
 
       {/* Stat cards */}
