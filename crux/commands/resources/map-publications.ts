@@ -3,11 +3,16 @@
  *
  * Analyzes resources that lack a publication_id and reports which ones
  * could be matched via domain lookup against publications.yaml.
+ *
+ * Data source priority:
+ * 1. Wiki-server API (paginated fetch of all resources)
+ * 2. Local resources.json fallback (from `pnpm build-data`)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
+import { listResources, upsertResourceBatch } from '../../lib/wiki-server/resources.ts';
 
 interface Publication {
   id: string;
@@ -64,21 +69,70 @@ function pct(n: number, total: number): string {
   return `${((n / total) * 100).toFixed(1)}%`;
 }
 
+/**
+ * Fetch all resources from the wiki-server API, paginating through all results.
+ * Returns null if the server is unavailable.
+ */
+async function fetchAllResourcesFromServer(verbose: boolean): Promise<Resource[] | null> {
+  // Server caps at 200 per page — request that to avoid offset misalignment
+  const PAGE_SIZE = 200;
+  const allResources: Resource[] = [];
+  let offset = 0;
+
+  try {
+    while (true) {
+      const result = await listResources(PAGE_SIZE, offset);
+      if (!result.ok) {
+        console.error(`Wiki-server API error: ${result.error}`);
+        return null;
+      }
+      const { resources, total } = result.data;
+      if (verbose && offset === 0) {
+        console.log(`Wiki-server reports ${total} total resources`);
+      }
+      allResources.push(...(resources as Resource[]));
+      if (verbose && allResources.length % 2000 === 0) {
+        console.log(`  Fetched ${allResources.length}/${total} resources...`);
+      }
+      if (allResources.length >= total || resources.length === 0) break;
+      offset += resources.length;
+    }
+    return allResources;
+  } catch (e) {
+    console.error(`Failed to connect to wiki-server: ${e instanceof Error ? e.message : String(e)}`);
+    return null;
+  }
+}
+
 export async function mapPublications(options: MapPublicationsOptions): Promise<void> {
   const topN = options.top ?? 20;
+  const verbose = !!options.verbose;
   const repoRoot = path.resolve(import.meta.dirname, '..', '..', '..');
 
   const pubPath = path.join(repoRoot, 'data', 'publications.yaml');
   const publications = yaml.load(fs.readFileSync(pubPath, 'utf-8')) as Publication[];
   console.log(`Loaded ${publications.length} publications from publications.yaml`);
 
-  const resourcesPath = path.join(repoRoot, 'apps', 'web', 'src', 'data', 'resources.json');
-  if (!fs.existsSync(resourcesPath)) {
-    console.error('resources.json not found. Run `pnpm build-data` first.');
-    process.exit(1);
+  // Try wiki-server API first, fall back to local resources.json
+  let resources: Resource[];
+  const serverResources = await fetchAllResourcesFromServer(verbose);
+  if (serverResources !== null && serverResources.length > 0) {
+    resources = serverResources;
+    console.log(`Loaded ${resources.length} resources from wiki-server API\n`);
+  } else {
+    const resourcesPath = path.join(repoRoot, 'apps', 'web', 'src', 'data', 'resources.json');
+    if (!fs.existsSync(resourcesPath)) {
+      console.error('resources.json not found and wiki-server unavailable. Run `pnpm build-data` first or set WIKI_SERVER_ENV=prod.');
+      process.exit(1);
+    }
+    const localResources: Resource[] = JSON.parse(fs.readFileSync(resourcesPath, 'utf-8'));
+    if (localResources.length === 0) {
+      console.error('resources.json is empty and wiki-server unavailable. Set WIKI_SERVER_ENV=prod or run a full build-data.');
+      process.exit(1);
+    }
+    resources = localResources;
+    console.log(`Loaded ${resources.length} resources from local resources.json\n`);
   }
-  const resources: Resource[] = JSON.parse(fs.readFileSync(resourcesPath, 'utf-8'));
-  console.log(`Loaded ${resources.length} resources\n`);
 
   const domainIndex = buildDomainIndex(publications);
   const withPubId = resources.filter((r) => r.publication_id).length;
@@ -128,5 +182,40 @@ export async function mapPublications(options: MapPublicationsOptions): Promise<
     }
     const totalUnmapped = sortedUnmapped.reduce((sum, [, c]) => sum + c, 0);
     console.log(`\n  Total unmapped: ${totalUnmapped} across ${sortedUnmapped.length} domains`);
+  }
+
+  // ---- Apply mode: write publication_id back via batch upsert ----
+  if (options.apply && domainMatched.length > 0) {
+    console.log(`\n=== Applying ${domainMatched.length} publication mappings ===\n`);
+    const BATCH_SIZE = 200;
+    let applied = 0;
+    let errors = 0;
+
+    for (let i = 0; i < domainMatched.length; i += BATCH_SIZE) {
+      const batch = domainMatched.slice(i, i + BATCH_SIZE);
+      const items = batch.map(({ resource, publication }) => ({
+        id: resource.id,
+        url: resource.url,
+        publicationId: publication.id,
+      }));
+
+      const result = await upsertResourceBatch(items);
+      if (result.ok) {
+        applied += result.data.upserted;
+        if (verbose) {
+          console.log(`  Batch ${Math.floor(i / BATCH_SIZE) + 1}: ${result.data.upserted} upserted`);
+        }
+      } else {
+        errors++;
+        console.error(`  Batch ${Math.floor(i / BATCH_SIZE) + 1} failed: ${result.error}`);
+      }
+    }
+
+    console.log(`\nApply complete: ${applied} resources updated, ${errors} batch errors`);
+    console.log(`Coverage after: ${withPubId + applied}/${resources.length} (${pct(withPubId + applied, resources.length)})`);
+  } else if (options.apply && domainMatched.length === 0) {
+    console.log('\nNothing to apply — no domain-matchable resources found.');
+  } else if (!options.apply && domainMatched.length > 0) {
+    console.log(`\nDry run — pass --apply to write ${domainMatched.length} publication mappings.`);
   }
 }
