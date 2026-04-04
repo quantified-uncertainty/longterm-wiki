@@ -314,7 +314,7 @@ elif [ "$STRATEGY" = "by-type" ]; then
             pnpm crux fix escaping 2>&1 || true
             pnpm crux fix markdown 2>&1 || true
             if pnpm crux validate gate --fix 2>&1; then
-              git add -A && git reset HEAD .agent-slot 2>/dev/null; git commit -m "Improve $PID via matrix loop (type: $TYPE, tier: $TIER)" --quiet
+              git add -A && git commit -m "Improve $PID via matrix loop (type: $TYPE, tier: $TIER)" --quiet
               echo "Committed $PID"
               SUCCEEDED=$((SUCCEEDED + 1))
             else
