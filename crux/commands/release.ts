@@ -114,7 +114,6 @@ interface SubPrData {
   title: string;
   body: string | null;
   merged_at: string | null;
-  base: { ref: string };
 }
 
 /**
@@ -136,8 +135,6 @@ export async function fetchSubPrDeployTasks(): Promise<string[]> {
   for (const pr of prs) {
     if (!pr.merged_at || !pr.body) continue;
     if (new Date(pr.merged_at) < cutoff) continue;
-    // Skip release PRs (they target production, not main)
-    if (pr.base.ref !== 'main') continue;
 
     const parsed = parseDeployTasksFromBody(pr.body);
     if (!parsed || parsed.unchecked === 0) continue;
