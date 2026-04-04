@@ -126,27 +126,14 @@ function checkFile(filePath: string): Violation[] {
   const relPath = relative(PROJECT_ROOT, filePath);
 
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trimStart();
-
-    // Skip comment lines
-    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
-      continue;
-    }
-
-    // Skip if suppressed
-    if (line.includes(SUPPRESS_COMMENT)) continue;
-
-    for (const { pattern, reason } of VIOLATION_PATTERNS) {
-      if (pattern.test(line)) {
-        violations.push({
-          file: relPath,
-          line: i + 1,
-          text: trimmed,
-          reason,
-        });
-        break; // Only report one violation per line
-      }
+    const result = checkLine(lines[i]);
+    if (result.violation) {
+      violations.push({
+        file: relPath,
+        line: i + 1,
+        text: lines[i].trimStart(),
+        reason: result.reason!,
+      });
     }
   }
 
