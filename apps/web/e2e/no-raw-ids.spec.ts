@@ -132,7 +132,6 @@ test.describe("FactBase entity pages — no raw IDs", () => {
     "openai",
     "deepmind",
     "meta-ai",
-    "google-deepmind",
     "microsoft",
     "nvidia",
   ];

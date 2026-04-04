@@ -48,3 +48,10 @@ Before committing, re-read the diff and actively look for problems:
 7. **Test coverage**: Every new exported function has at least one test. Every error path has a test that triggers it.
 8. **Pattern fixes must be global**: When fixing a pattern (e.g., replacing `.max(N)` with `clampedLimit(N)`, replacing `as X` with Zod validation), grep the entire codebase for the same pattern before committing. If you find >3 instances, fix them all in the same PR. A partial fix guarantees a follow-up PR for the remainder. Mechanical sweeps across many files are fine — they're easy to review even at scale.
 9. **Multi-source aggregation requires an overlap test**: When adding a second data source that merges into the same output (e.g., combining diff-detected tasks with PR-scraped tasks), write at least one test where both sources produce overlapping items. The interesting behavior is always at the intersection, not in isolation.
+10. **Display bug fixes must include a regression check**: Every fixed display bug becomes a permanent check. Add it to the appropriate layer:
+
+| Bug type | Where to add check |
+|----------|-------------------|
+| Client-rendered display (stat cards, tables) | `apps/web/e2e/render-audit.spec.ts` — add page to test list + assertion |
+| Component formatting logic | Component `__tests__/*.test.tsx` — add test with exact input that caused the bug |
+| Data-layer display (YAML/MDX) | `crux/validate/validate-display-formatting.ts` — add pattern to validator |

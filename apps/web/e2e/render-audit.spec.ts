@@ -20,8 +20,6 @@ function findRawLargeNumbers(text: string): string[] {
   for (const m of text.matchAll(/(?<![a-zA-Z_])\d{10,}(?![a-zA-Z])/g)) {
     // Skip leading-zero numbers (phone numbers, codes, IDs — not financial values)
     if (m[0].startsWith("0")) continue;
-    // Skip date-like patterns (e.g., 20240115)
-    if (m[0].length === 8 && /^20\d{6}$/.test(m[0])) continue;
     matches.push(m[0]);
   }
   return matches;
