@@ -18,6 +18,8 @@ export interface OrchestrateOptions extends BaseOptions {
   table?: string;
   'entity-type'?: string;
   entityType?: string;
+  /** Filter to a specific entity by stableId */
+  entity?: string;
   source?: string;
   'dry-run'?: boolean;
   dryRun?: boolean;

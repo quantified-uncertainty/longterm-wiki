@@ -84,9 +84,18 @@ export async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFac
   const map = new Map<string, VerifiedFactInfo>();
 
   try {
-    const response = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset: 0 });
+    let offset = 0;
 
-    if (response.ok && response.data) {
+    while (true) {
+      const response = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset });
+
+      if (!response.ok || !response.data) {
+        if (offset === 0) break; // First page failed — return empty map
+        // Mid-pagination failure — discard partial data to avoid truncated dataset
+        console.warn(`[source-check] KB verdict pagination failed at offset ${offset}, discarding partial data`);
+        return new Map();
+      }
+
       for (const v of response.data.verdicts) {
         map.set(v.recordId, {
           factId: v.recordId,
@@ -96,23 +105,8 @@ export async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFac
         });
       }
 
-      // Paginate if there are more verdicts
-      let offset = response.data.verdicts.length;
-      while (offset < response.data.total) {
-        const nextResponse = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset });
-
-        if (!nextResponse.ok || !nextResponse.data) break;
-        for (const v of nextResponse.data.verdicts) {
-          map.set(v.recordId, {
-            factId: v.recordId,
-            verdict: v.verdict,
-            checkedAt: v.lastComputedAt,
-            needsRecheck: v.needsRecheck,
-          });
-        }
-        if (nextResponse.data.verdicts.length < API_PAGE_LIMIT) break;
-        offset += nextResponse.data.verdicts.length;
-      }
+      if (response.data.verdicts.length < API_PAGE_LIMIT || map.size >= response.data.total) break;
+      offset += API_PAGE_LIMIT;
     }
   } catch (e: unknown) {
     console.warn(`[source-check] Could not fetch KB verdicts: ${e instanceof Error ? e.message : String(e)}`);
@@ -249,7 +243,14 @@ export async function collectRecordItems(
       case 'entity-event': apiBasePath = '/api/entity-events/all'; break;
       case 'entity-assessment': apiBasePath = '/api/entity-assessments/all'; break;
       case 'secondary-market-price': apiBasePath = '/api/secondary-market-prices/all'; break;
-      default: continue; // Skip unknown record types
+      // citation and wiki-page are valid record types for verdicts but don't have
+      // /all API endpoints for bulk collection — skip them intentionally.
+      case 'citation':
+      case 'wiki-page':
+        continue;
+      default:
+        console.warn(`[source-check] Unknown record type '${recordType}' — skipping`);
+        continue;
     }
 
     try {
@@ -295,11 +296,12 @@ export async function collectRecordItems(
         const description = buildRecordDescription(recordType, item);
         const fields = extractRecordFields(recordType, item);
 
-        // Skip personnel/investment records where key names are unresolvable stableIds.
+        // Skip records where all key names are unresolvable stableIds.
         // The LLM can't verify "aAFe7DRvPv is a researcher at org X" against a source.
         if (recordType === 'personnel') {
-          const personName = fields.person as string | undefined;
-          if (personName && !isResolvableName(personName)) continue;
+          const personName = resolveName(item, 'personResolvedName', 'personDisplayName', 'personId');
+          const orgName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
+          if (!isResolvableName(personName) && !isResolvableName(orgName)) continue;
         }
         if (recordType === 'investment') {
           const investorName = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');

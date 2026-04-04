@@ -30,8 +30,39 @@ import { getColors } from '../lib/output.ts';
 
 const ROUTES_DIR = join(PROJECT_ROOT, 'apps/wiki-server/src/routes');
 
-/** Suppression comment */
+/** Suppression comment — must appear in a `// pagination-ok` comment */
 const SUPPRESS_COMMENT = 'pagination-ok';
+
+/**
+ * Check if a line contains the suppression comment in an actual // comment,
+ * not inside a string literal.
+ */
+function isSuppressed(line: string): boolean {
+  const commentIdx = findLineCommentStart(line);
+  if (commentIdx === -1) return false;
+  return line.slice(commentIdx).includes(SUPPRESS_COMMENT);
+}
+
+/**
+ * Find the start index of a // comment that isn't inside a string literal.
+ * Returns -1 if no line comment found.
+ */
+function findLineCommentStart(line: string): number {
+  let inSingle = false;
+  let inDouble = false;
+  let inTemplate = false;
+  for (let i = 0; i < line.length; i++) {
+    if (i > 0 && line[i - 1] === '\\') continue; // escaped character
+    const ch = line[i];
+    if (ch === "'" && !inDouble && !inTemplate) { inSingle = !inSingle; continue; }
+    if (ch === '"' && !inSingle && !inTemplate) { inDouble = !inDouble; continue; }
+    if (ch === '`' && !inSingle && !inDouble) { inTemplate = !inTemplate; continue; }
+    if (!inSingle && !inDouble && !inTemplate && ch === '/' && line[i + 1] === '/') {
+      return i;
+    }
+  }
+  return -1;
+}
 
 /**
  * Patterns that indicate unsafe inline limit handling.
@@ -51,6 +82,23 @@ const VIOLATION_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
   {
     // Old style: .limit(parseInt( — same problem
     pattern: /\.limit\(parseInt\(/,
+    reason: 'Use clampedLimit(max, default) in a Zod query schema to validate and clamp the limit',
+  },
+];
+
+/**
+ * Multi-line patterns — violations that can span two adjacent lines.
+ * Checked by joining consecutive lines with whitespace normalization.
+ */
+const MULTILINE_VIOLATION_PATTERNS: Array<{ pattern: RegExp; reason: string }> = [
+  {
+    // .limit(\n  Number( — split across two lines
+    pattern: /\.limit\(\s*Number\(/,
+    reason: 'Use clampedLimit(max, default) in a Zod query schema to validate and clamp the limit',
+  },
+  {
+    // .limit(\n  parseInt( — split across two lines
+    pattern: /\.limit\(\s*parseInt\(/,
     reason: 'Use clampedLimit(max, default) in a Zod query schema to validate and clamp the limit',
   },
 ];
@@ -105,8 +153,8 @@ export function checkLine(line: string): { violation: boolean; reason?: string }
     return { violation: false };
   }
 
-  // Skip if suppressed
-  if (line.includes(SUPPRESS_COMMENT)) {
+  // Skip if suppressed via // comment
+  if (isSuppressed(line)) {
     return { violation: false };
   }
 
@@ -134,6 +182,28 @@ function checkFile(filePath: string): Violation[] {
         text: lines[i].trimStart(),
         reason: result.reason!,
       });
+      continue; // Already flagged — skip multi-line check for this line
+    }
+
+    // Multi-line check: join current line with the next to catch patterns split across lines
+    if (i + 1 < lines.length) {
+      const nextLine = lines[i + 1];
+      const nextTrimmed = nextLine.trimStart();
+      const nextIsComment = nextTrimmed.startsWith('//') || nextTrimmed.startsWith('*') || nextTrimmed.startsWith('/*');
+      if (!nextIsComment && !isSuppressed(nextLine)) {
+        const joined = lines[i].trimEnd() + ' ' + nextTrimmed;
+        for (const { pattern, reason } of MULTILINE_VIOLATION_PATTERNS) {
+          if (pattern.test(joined)) {
+            violations.push({
+              file: relPath,
+              line: i + 1,
+              text: `${lines[i].trimStart()} ${nextTrimmed}`.trim(),
+              reason: `${reason} (pattern spans lines ${i + 1}-${i + 2})`,
+            });
+            break;
+          }
+        }
+      }
     }
   }
 

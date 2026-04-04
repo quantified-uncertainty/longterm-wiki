@@ -38,7 +38,7 @@ Follow existing patterns in `apps/web/src/app/internal/entities/` (Pattern A ref
 
 ## Existing dashboards
 
-All dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect).
+Most dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect). Exceptions are noted below.
 
 **Dashboards:** System Health (E927), PR Dashboard (E1011), Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Activity (E1281), Auto-Update Runs (E914), Auto-Update News (E915), Groundskeeper Runs (E926), Grants (E1055), Divisions (E1058), Funding Programs (E1059), People Coverage (E1099), Entity Profile (E1929), Source Checks (E2200), Data Quality (E2600), Data Sources (E2131), Talent Flows (E2084), Jobs (E2120), Source Check Coverage (no entity ID — needs Pattern A migration).
 

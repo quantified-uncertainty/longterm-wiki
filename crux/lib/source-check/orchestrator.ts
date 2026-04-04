@@ -48,12 +48,19 @@ export async function orchestrateCommand(
 ): Promise<CommandResult> {
   const isDryRun = options['dry-run'] || options.dryRun;
   const budgetLimit = options.budget ? parseFloat(String(options.budget)) : undefined;
-  const itemLimit = options.limit ? parseInt(String(options.limit), 10) : undefined;
+  const rawItemLimit = options.limit ? parseInt(String(options.limit), 10) : undefined;
   const typeFilter = options.type as 'fact' | 'record' | 'entity' | 'all' | undefined;
   const tableFilter = options.table as string | undefined;
   const entityTypeFilter = (options['entity-type'] || options.entityType) as string | undefined;
+  const entityFilter = options.entity as string | undefined;
   const sourceMode = (options.source as string) ?? 'existing';
   const useWebSearch = sourceMode === 'web-search' || sourceMode === 'all';
+
+  // Validate --limit
+  if (rawItemLimit !== undefined && (isNaN(rawItemLimit) || rawItemLimit <= 0)) {
+    return { exitCode: 1, output: `Invalid --limit: ${options.limit}\nMust be a positive integer.` };
+  }
+  const itemLimit = rawItemLimit;
 
   // --table implies --type=record (filter to specific record type)
   const effectiveTypeFilter = tableFilter && !typeFilter ? 'record' as const : typeFilter;
@@ -78,7 +85,7 @@ export async function orchestrateCommand(
 
   const shouldCollectFacts = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'fact';
   const shouldCollectRecords = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'record';
-  const shouldCollectEntities = (effectiveTypeFilter === 'entity' || effectiveTypeFilter === 'all') && useWebSearch;
+  const shouldCollectEntities = (!effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'entity') && useWebSearch;
 
   console.log('\x1b[1mVerification Orchestrator\x1b[0m');
   console.log('');
@@ -121,6 +128,26 @@ export async function orchestrateCommand(
     const entityItems = collectEntityItems(entities, pages, entityTypeFilter);
     allItems.push(...entityItems);
     console.log(`  Entities (web search): ${entityItems.length} items`);
+  }
+
+  // ── Step 2b: Apply --entity filter ──
+  if (entityFilter) {
+    const before = allItems.length;
+    const filtered: VerifyItem[] = [];
+    for (const item of allItems) {
+      let matches = false;
+      if (item.data.kind === 'fact') {
+        matches = item.data.entity.id === entityFilter;
+      } else if (item.data.kind === 'record') {
+        matches = item.data.entityId === entityFilter;
+      } else if (item.data.kind === 'entity') {
+        matches = item.data.entity.id === entityFilter;
+      }
+      if (matches) filtered.push(item);
+    }
+    allItems.length = 0;
+    allItems.push(...filtered);
+    console.log(`  --entity=${entityFilter}: ${allItems.length} of ${before} items match`);
   }
 
   if (allItems.length === 0) {
@@ -240,50 +267,70 @@ async function runBatchExecution(
     }
 
     // Fetch source content
-    const sourceUrl = item.sourceUrl;
+    let sourceUrl = item.sourceUrl;
+    let sourceContent: string | null = null;
 
-    if (!sourceUrl) {
+    if (!sourceUrl && item.data.kind === 'entity') {
+      // Entity items have no sourceUrl — perform web search to find one
+      const { searchForEntity } = await import('./item-collectors.ts');
+      const urls = await searchForEntity(item.data.entity);
+      for (const url of urls) {
+        const result = await fetchSourceContent(url);
+        if (result.content) {
+          sourceUrl = url;
+          sourceContent = result.content;
+          break;
+        }
+      }
+      if (!sourceContent || !sourceUrl) {
+        summary.errors++;
+        summary.failures.push({ itemId: item.id, kind: item.kind, description: item.description, error: 'No sources found via web search' });
+        return;
+      }
+    } else if (!sourceUrl) {
       summary.errors++;
       summary.failures.push({ itemId: item.id, kind: item.kind, description: item.description, error: 'No source URL' });
       return;
     }
 
-    const fetchResult = await fetchSourceContent(sourceUrl);
-    if (!fetchResult.content) {
-      // Dead links get a proper verdict instead of an error — saves LLM cost
-      if (fetchResult.errorType === 'dead_link') {
-        const deadLinkResult: VerifyResult = {
-          itemId: item.id,
-          kind: item.kind,
-          description: item.description,
-          verdict: 'unverifiable' as SourceCheckVerdict,
-          confidence: 1.0,
-          extractedValue: '',
-          reasoning: `[dead_link] ${fetchResult.errorMessage ?? 'Source URL is dead'}`,
-          sourceUrl,
-          checkerModel: 'dead-link-detector',
-        };
-        summary.unverifiable++;
-        summary.deadLinks++;
-        summary.actualVerified++;
-        summary.byKind[item.kind].verified++;
-        summary.results.push(deadLinkResult);
-        console.log(`  ${progress} ${item.description.slice(0, 80)}`);
-        console.log(`    \x1b[33mdead_link: unverifiable\x1b[0m`);
-        await storeResult(item, deadLinkResult).catch((e: unknown) => {
-          console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+    if (!sourceContent) {
+      const fetchResult = await fetchSourceContent(sourceUrl);
+      if (!fetchResult.content) {
+        // Dead links get a proper verdict instead of an error — saves LLM cost
+        if (fetchResult.errorType === 'dead_link') {
+          const deadLinkResult: VerifyResult = {
+            itemId: item.id,
+            kind: item.kind,
+            description: item.description,
+            verdict: 'unverifiable' as SourceCheckVerdict,
+            confidence: 1.0,
+            extractedValue: '',
+            reasoning: `[dead_link] ${fetchResult.errorMessage ?? 'Source URL is dead'}`,
+            sourceUrl,
+            checkerModel: 'dead-link-detector',
+          };
+          summary.unverifiable++;
+          summary.deadLinks++;
+          summary.actualVerified++;
+          summary.byKind[item.kind].verified++;
+          summary.results.push(deadLinkResult);
+          console.log(`  ${progress} ${item.description.slice(0, 80)}`);
+          console.log(`    \x1b[33mdead_link: unverifiable\x1b[0m`);
+          await storeResult(item, deadLinkResult).catch((e: unknown) => {
+            console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
+          });
+          return;
+        }
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: fetchResult.errorMessage ?? 'Could not fetch source content',
+          errorType: fetchResult.errorType,
         });
         return;
       }
-      summary.errors++;
-      summary.failures.push({
-        itemId: item.id, kind: item.kind, description: item.description,
-        error: fetchResult.errorMessage ?? 'Could not fetch source content',
-        errorType: fetchResult.errorType,
-      });
-      return;
+      sourceContent = fetchResult.content;
     }
-    const sourceContent = fetchResult.content;
 
     // Build prompt
     let prompt: string;
