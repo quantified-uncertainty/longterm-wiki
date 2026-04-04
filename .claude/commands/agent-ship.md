@@ -160,10 +160,12 @@ Run `/agent-push-and-verify`.
 
 ## Step 9: Session close-out
 
-Clean up local session artifacts:
+Clean up session artifacts and discard any unstaged changes (modified hooks, deleted markers, etc.):
 
 ```bash
-rm -f .claude/wip-checklist.md .claude/review-done .claude/wip-context.md
+rm -f .claude/wip-checklist.md .claude/wip-context.md
+git checkout -- .claude/review-done 2>/dev/null || rm -f .claude/review-done
+git checkout -- .claude/hooks/ 2>/dev/null || true
 ```
 
 ## Step 10: Final report

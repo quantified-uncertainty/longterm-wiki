@@ -623,10 +623,23 @@ async function resetCommand(
     }
   }
 
-  // 4e. Pull latest main
+  // 4e. Discard unstaged changes (session leftovers like modified hooks, deleted markers)
+  if (git.isDirty) {
+    try {
+      exec('git checkout -- .');
+      output += `  ${c.green}✓${c.reset} Discarded unstaged changes\n`;
+      git.isDirty = false;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      output += `  ${c.red}✗ Failed to discard unstaged changes: ${msg}${c.reset}\n`;
+      hadErrors = true;
+    }
+  }
+
+  // 4f. Pull latest main
   if (git.behindMain > 0 || git.currentBranch !== 'main') {
     if (git.isDirty) {
-      output += `  ${c.yellow}⚠ Working tree is dirty — skipping checkout/pull. Commit or stash changes first.${c.reset}\n`;
+      output += `  ${c.yellow}⚠ Working tree still dirty — skipping checkout/pull${c.reset}\n`;
     } else {
       try {
         if (git.currentBranch !== 'main') {
@@ -683,7 +696,8 @@ Cleanup actions (with --kill):
   3. Delete stale .claude/wip-checklist.md
   4. Clear git stashes
   5. Delete local branches merged into main
-  6. Checkout main and pull latest
+  6. Discard unstaged changes (session leftovers)
+  7. Checkout main and pull latest
 
 Examples:
   crux sys agent-reset                   # Scan — show what's stale
