@@ -499,7 +499,7 @@ export async function runOrchestrator(
       costEntries: ctx.costEntries.length > 0 ? ctx.costEntries : null,
       costBreakdown: Object.keys(costBreakdown).length > 0 ? costBreakdown : null,
       sectionDiffs: ctx.sectionDiffs.length > 0 ? ctx.sectionDiffs : null,
-      qualityMetrics: finalMetrics as unknown as Record<string, unknown>,
+      qualityMetrics: { ...finalMetrics } satisfies Record<string, unknown>,
       qualityGatePassed: finalGate.passed,
       qualityGaps: finalGate.gaps.length > 0 ? finalGate.gaps : null,
       toolCallCount: ctx.toolCallCount,

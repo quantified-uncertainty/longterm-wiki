@@ -102,7 +102,7 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
   const prs = await githubApi<PrData[]>(
-    `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=30`
+    `/repos/${REPO}/pulls?state=closed&sort=created&direction=desc&per_page=30`
   );
 
   const pendingPrs: Array<{

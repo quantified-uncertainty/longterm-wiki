@@ -14,7 +14,12 @@ import { execFileSync } from 'child_process';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
-import { detectDeployTasks, formatDeployTasksSection } from '../lib/deploy-tasks/detect.ts';
+import {
+  deduplicateSubPrTasks,
+  detectDeployTasks,
+  formatDeployTasksSection,
+  parseDeployTasksFromBody,
+} from '../lib/deploy-tasks/detect.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -102,16 +107,61 @@ export function groupCommits(subjects: string[]): Record<CommitCategory, string[
   return groups;
 }
 
+// ── Sub-PR deploy task aggregation ──────────────────────────────────────────
+
+interface SubPrData {
+  number: number;
+  title: string;
+  body: string | null;
+  merged_at: string | null;
+  base: { ref: string };
+}
+
+/**
+ * Fetch unchecked deploy tasks from PRs merged to main since the last release.
+ * These are tasks that individual PRs declared but that the file-diff detector
+ * wouldn't pick up (e.g., manually added tasks, env vars not yet in code).
+ */
+export async function fetchSubPrDeployTasks(): Promise<string[]> {
+  const lookbackDays = 14;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - lookbackDays);
+
+  const prs = await githubApi<SubPrData[]>(
+    `/repos/${REPO}/pulls?state=closed&base=main&sort=created&direction=desc&per_page=50`
+  );
+
+  const tasks: string[] = [];
+
+  for (const pr of prs) {
+    if (!pr.merged_at || !pr.body) continue;
+    if (new Date(pr.merged_at) < cutoff) continue;
+    // Skip release PRs (they target production, not main)
+    if (pr.base.ref !== 'main') continue;
+
+    const parsed = parseDeployTasksFromBody(pr.body);
+    if (!parsed || parsed.unchecked === 0) continue;
+
+    for (const item of parsed.items) {
+      if (!item.checked) {
+        tasks.push(`${item.text} _(from PR #${pr.number})_`);
+      }
+    }
+  }
+
+  return tasks;
+}
+
 /**
  * Generate a release PR body from commit data.
  */
-export function generateReleaseBody(opts: {
+export async function generateReleaseBody(opts: {
   date: string;
   ahead: number;
   behind: number;
   subjects: string[];
   repoSlug: string;
-}): string {
+}): Promise<string> {
   const { date, ahead, behind, subjects, repoSlug } = opts;
   const groups = groupCommits(subjects);
   const lines: string[] = [];
@@ -147,7 +197,22 @@ export function generateReleaseBody(opts: {
 
   // Detect deploy tasks from the diff
   const deployResult = detectDeployTasks('origin/production');
-  const deploySection = formatDeployTasksSection(deployResult.tasks);
+  const diffTasks = deployResult.tasks;
+
+  // Fetch unchecked deploy tasks from sub-PRs merged to main
+  let subPrTasks: string[] = [];
+  try {
+    subPrTasks = await fetchSubPrDeployTasks();
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.warn(`Warning: failed to fetch sub-PR deploy tasks: ${msg}`);
+  }
+
+  // Deduplicate: drop sub-PR tasks that overlap with diff-detected tasks
+  const dedupedSubPrTasks = deduplicateSubPrTasks(diffTasks, subPrTasks);
+
+  // Build the deploy checklist section
+  const deploySection = formatDeployTasksSection(diffTasks, dedupedSubPrTasks);
   lines.push(deploySection);
   lines.push('');
 
@@ -232,7 +297,7 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   // Generate changelog
   const date = new Date().toISOString().slice(0, 10); // YYYY-MM-DD in UTC
   const subjects = commitSubjects('origin/production', 'origin/main');
-  const body = generateReleaseBody({
+  const body = await generateReleaseBody({
     date,
     ahead,
     behind,

@@ -3,11 +3,18 @@
  */
 
 import { getTableBase, getTypedEntities, isRisk } from "./tablebase";
-import type { ContentFormat, RawEntity, AnyEntity } from "./tablebase";
+import type { ContentFormat, AnyEntity } from "./tablebase";
+import type { RawEntity } from "./tablebase";
 import { getEntityHref } from "./entity-nav";
 import { getKB } from "./factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 import { stripMdxEscapes } from "@/lib/inline-markdown";
+
+/** Type guard: checks if an entity has a causeEffectGraph property at runtime.
+ *  Generic entities preserve extra keys from JSON, but TypeScript doesn't know about them. */
+function hasCauseEffectGraph(e: AnyEntity): e is AnyEntity & Pick<RawEntity, 'causeEffectGraph'> {
+  return 'causeEffectGraph' in e && e.causeEffectGraph != null;
+}
 
 export interface ExploreItem {
   id: string;
@@ -91,9 +98,8 @@ function resolvePageId(entity: AnyEntity, pageMap: Map<string, unknown>): string
   // 1. Direct match: entity ID is the page ID
   if (pageMap.has(entity.id)) return entity.id;
   // 2. Entity has explicit path field → derive page ID from path
-  const raw = entity as unknown as RawEntity;
-  if (raw.path) {
-    const segments = raw.path.replace(/\/$/, "").split("/");
+  if (entity.path) {
+    const segments = entity.path.replace(/\/$/, "").split("/");
     const pageId = segments[segments.length - 1];
     if (pageId && pageMap.has(pageId)) return pageId;
   }
@@ -199,15 +205,18 @@ export function getExploreItems(): ExploreItem[] {
     return numId ? `/wiki/${numId}` : `/wiki/${pageId}`;
   }
 
-  const diagramItems: ExploreItem[] = typedEntities
+  // Pre-filter entities with causeEffectGraph data using the type guard,
+  // so TypeScript knows causeEffectGraph is present in the .map() callback.
+  const entitiesWithGraphs = typedEntities.filter(hasCauseEffectGraph);
+
+  const diagramItems: ExploreItem[] = entitiesWithGraphs
     .filter((e) => {
-      const ceg = (e as unknown as RawEntity).causeEffectGraph;
-      if (!ceg?.nodes?.length) return false;
+      if (!e.causeEffectGraph?.nodes?.length) return false;
       // Only include diagrams that resolve to a valid page
       return resolveDiagramHref(e) !== null;
     })
     .map((e) => {
-      const ceg = (e as unknown as RawEntity).causeEffectGraph!;
+      const ceg = e.causeEffectGraph!;
       const nodeCount = ceg.nodes?.length || 0;
       return {
         id: `diagram-${e.id}`,

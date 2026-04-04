@@ -151,7 +151,12 @@ export function PageCauseEffectGraph({
     return null;
   }
 
-  const entity = rawEntity as unknown as EntityWithGraph;
+  // Generic entities preserve extra keys (like causeEffectGraph) from JSON.
+  // Use runtime property check instead of a double-cast.
+  if (!('causeEffectGraph' in rawEntity) || !rawEntity.causeEffectGraph) {
+    return null;
+  }
+  const entity = rawEntity as EntityWithGraph;
 
   if (!entity.causeEffectGraph || entity.causeEffectGraph.nodes.length === 0) {
     // No graph data - return nothing

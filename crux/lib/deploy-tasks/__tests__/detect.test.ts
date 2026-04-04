@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseDeployTasksFromBody, formatDeployTasksSection } from '../detect.ts';
+import { deduplicateSubPrTasks, parseDeployTasksFromBody, formatDeployTasksSection } from '../detect.ts';
 import type { DeployTask } from '../types.ts';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -418,6 +418,42 @@ describe('formatDeployTasksSection', () => {
     expect(section).not.toContain('- [x]');
   });
 
+  // 4b. Sub-PR tasks are included in output
+  it('includes sub-PR tasks alongside diff-detected tasks', () => {
+    const tasks: DeployTask[] = [
+      makeTask({ id: 'env-FOO', description: 'Set FOO in production', category: 'env' }),
+    ];
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #100)_',
+      '`migration` Run fix-data.sql _(from PR #200)_',
+    ];
+
+    const section = formatDeployTasksSection(tasks, subPrTasks);
+    expect(section).toContain('- [ ] `env` Set FOO in production');
+    expect(section).toContain('- [ ] `env` Set BAR in production _(from PR #100)_');
+    expect(section).toContain('- [ ] `migration` Run fix-data.sql _(from PR #200)_');
+    expect(section).not.toContain('No deploy tasks required.');
+
+    const checkboxLines = section.split('\n').filter((l) => l.startsWith('- [ ]'));
+    expect(checkboxLines).toHaveLength(3);
+  });
+
+  // 4c. Sub-PR tasks alone (no diff-detected tasks)
+  it('shows sub-PR tasks even when no diff-detected tasks exist', () => {
+    const subPrTasks = ['`env` Set BAZ in production _(from PR #300)_'];
+
+    const section = formatDeployTasksSection([], subPrTasks);
+    expect(section).toContain('- [ ] `env` Set BAZ in production _(from PR #300)_');
+    expect(section).not.toContain('No deploy tasks required.');
+  });
+
+  // 4d. Empty diff tasks + empty sub-PR tasks shows "No deploy tasks required"
+  it('shows "No deploy tasks required" when both sources are empty', () => {
+    const section = formatDeployTasksSection([], []);
+    expect(section).toContain('No deploy tasks required.');
+    expect(section).not.toContain('- [ ]');
+  });
+
   // 5. Tasks with special characters in description
   it('formats tasks with special characters in description', () => {
     const tasks: DeployTask[] = [
@@ -785,5 +821,205 @@ Generated with Claude Code`;
     const parsed = parseDeployTasksFromBody(newBody);
     expect(parsed).not.toBeNull();
     expect(parsed!.total).toBe(2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// deduplicateSubPrTasks
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('deduplicateSubPrTasks', () => {
+  it('removes sub-PR task that matches a diff task by env var name', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-wayback-fallback-enabled',
+        description: 'Set env var WAYBACK_FALLBACK_ENABLED in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set env var WAYBACK_FALLBACK_ENABLED in production _(from PR #3780)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches by "Set FOO in production" pattern', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-api-secret',
+        description: 'Set env var API_SECRET in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set API_SECRET in production _(from PR #100)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches a diff task by migration number', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'migration-0060',
+        description: 'Verify migration 0060 applied on server start',
+        category: 'migration',
+        phase: 'post-deploy',
+        verifyCommand: 'psql "$DATABASE_URL" -c "SELECT 1"',
+      }),
+    ];
+    const subPrTasks = [
+      '`migration` Run migration 0060 after deploy _(from PR #200)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches a diff task by workflow name', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'ci-auto-update',
+        description: 'Modified workflow "auto update" — verify it runs successfully after merge',
+        category: 'ci',
+        phase: 'post-deploy',
+        verifyCommand: 'gh run list --workflow="auto-update.yml" --limit=1',
+      }),
+    ];
+    const subPrTasks = [
+      '`ci` Check workflow "auto-update" passes _(from PR #300)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task when diff task description is a substring', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-foo',
+        description: 'Set env var FOO in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      'Set env var FOO in production (requires ops approval) _(from PR #400)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('keeps sub-PR tasks that do not overlap with any diff task', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-foo',
+        description: 'Set env var FOO in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #500)_',
+      '`migration` Run fix-data.sql manually _(from PR #501)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toContain('BAR');
+    expect(result[1]).toContain('fix-data.sql');
+  });
+
+  it('keeps all sub-PR tasks when diff tasks are empty', () => {
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #500)_',
+    ];
+
+    const result = deduplicateSubPrTasks([], subPrTasks);
+    expect(result).toHaveLength(1);
+    expect(result).toEqual(subPrTasks);
+  });
+
+  it('returns empty array when sub-PR tasks are empty', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({ id: 'env-foo', description: 'Set FOO', category: 'env' }),
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, []);
+    expect(result).toHaveLength(0);
+  });
+
+  it('handles mixed duplicates and non-duplicates', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-api-key',
+        description: 'Set env var API_KEY in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+      makeTask({
+        id: 'migration-0070',
+        description: 'Verify migration 0070 applied on server start',
+        category: 'migration',
+        phase: 'post-deploy',
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set env var API_KEY in production _(from PR #600)_',  // duplicate
+      '`env` Set WEBHOOK_SECRET in production _(from PR #601)_',   // unique
+      '`migration` Verify migration 0070 applied _(from PR #602)_', // duplicate
+      '`config` Update vercel.json redirect rules _(from PR #603)_', // unique
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toContain('WEBHOOK_SECRET');
+    expect(result[1]).toContain('vercel.json');
+  });
+
+  it('handles backtick-wrapped env var names in sub-PR tasks', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-my-var',
+        description: 'Set env var MY_VAR in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set `MY_VAR` in production _(from PR #700)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('is case-insensitive for substring matching', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'docker-change',
+        description: 'Docker configuration changed — verify container builds',
+        category: 'docker',
+        phase: 'post-deploy',
+      }),
+    ];
+    const subPrTasks = [
+      'docker configuration changed — verify container builds _(from PR #800)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
   });
 });

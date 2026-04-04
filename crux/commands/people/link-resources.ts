@@ -165,7 +165,7 @@ async function syncAuthorEntityIds(
   lines: string[],
   verbose: boolean,
 ): Promise<void> {
-  const { apiRequest } = await import('../../lib/wiki-server/client.ts');
+  const { listResources, updateAuthorEntityIds } = await import('../../lib/wiki-server/resources.ts');
   const { buildEntityMatcher } = await import('../../lib/grant-import/entity-matcher.ts');
   const matcher = buildEntityMatcher();
 
@@ -173,14 +173,12 @@ async function syncAuthorEntityIds(
   let allResources: Array<{ id: string; authors: string[] | null; authorEntityIds: string[] | null }> = [];
   let offset = 0;
   while (true) {
-    const r = await apiRequest<{ resources: Array<{ id: string; authors: string[] | null; authorEntityIds: string[] | null }>; total: number }>(
-      'GET', `/api/resources/all?limit=200&offset=${offset}`,
-    );
+    const r = await listResources(200, offset);
     if (!r.ok) {
       lines.push(`\n  Warning: Could not fetch resources from wiki-server: ${r.message}`);
       return;
     }
-    allResources.push(...r.data.resources);
+    allResources.push(...(r.data.resources as Array<{ id: string; authors: string[] | null; authorEntityIds: string[] | null }>));
     if (allResources.length >= r.data.total) break;
     offset += 200;
   }
@@ -234,7 +232,7 @@ async function syncAuthorEntityIds(
   let totalUpdated = 0;
   for (let i = 0; i < updates.length; i += BATCH_SIZE) {
     const batch = updates.slice(i, i + BATCH_SIZE);
-    const r = await apiRequest<{ updated: number }>('PATCH', '/api/resources/author-entity-ids', { items: batch });
+    const r = await updateAuthorEntityIds(batch);
     if (r.ok) {
       totalUpdated += r.data.updated;
     } else {

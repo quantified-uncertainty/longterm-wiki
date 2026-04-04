@@ -130,8 +130,7 @@ async function waitForCi(
 // ── PR state helpers ─────────────────────────────────────────────────────────
 
 function isPrMergedOrClosed(pr: GqlPrNode): boolean {
-  return (pr as unknown as { state?: string }).state === 'MERGED'
-    || (pr as unknown as { state?: string }).state === 'CLOSED';
+  return pr.state === 'MERGED' || pr.state === 'CLOSED';
 }
 
 function hasMergeableIssues(pr: GqlPrNode, staleThresholdMs: number): boolean {
