@@ -90,7 +90,7 @@ async function fetchAllResourcesFromServer(verbose: boolean): Promise<Resource[]
       if (verbose && offset === 0) {
         console.log(`Wiki-server reports ${total} total resources`);
       }
-      allResources.push(...resources.map((r) => ({ ...r }) as Resource));
+      allResources.push(...(resources as Resource[]));
       if (verbose && allResources.length % 2000 === 0) {
         console.log(`  Fetched ${allResources.length}/${total} resources...`);
       }
@@ -136,7 +136,7 @@ export async function mapPublications(options: MapPublicationsOptions): Promise<
 
   const domainIndex = buildDomainIndex(publications);
   const withPubId = resources.filter((r) => r.publicationId).length;
-  const withoutPubId = resources.filter((r) => !r.publicationId).length;
+  const withoutPubId = resources.length - withPubId;
 
   const domainMatched: { resource: Resource; publication: Publication; domain: string }[] = [];
   const unmappedDomains = new Map<string, number>();
