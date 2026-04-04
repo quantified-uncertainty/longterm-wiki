@@ -4,6 +4,7 @@ import { DevModeToggle } from "@/components/DevModeToggle";
 import { SearchButton, SearchDialog } from "@/components/SearchDialog";
 import { MobileNav } from "@/components/MobileNav";
 import { DesktopNav } from "@/components/DesktopNav";
+import { GlobalErrorReporter } from "@/components/GlobalErrorReporter";
 import { SITE_URL } from "@/lib/site-config";
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -83,6 +84,8 @@ export default function RootLayout({
 
         {/* Global search dialog (Cmd+K) */}
         <SearchDialog />
+
+        <GlobalErrorReporter />
 
         {/* Main content */}
         <main id="main-content">
