@@ -55,9 +55,8 @@ describe("FactValueDisplay", () => {
   describe("monetary values (production data)", () => {
     it("renders Anthropic valuation as '$61.5 billion' not '61500000000'", () => {
       const fact = makeFact({ type: "number", value: 61_500_000_000, unit: "USD" });
-      const prop = makeProperty("USD", { divisor: 1e9, prefix: "$", suffix: "B" });
+      const prop = makeProperty("USD");
       render(<FactValueDisplay fact={fact} property={prop} />);
-      // formatKBFactValue with unit "USD" produces smart format
       expect(screen.getByText("$61.5 billion")).toBeInTheDocument();
     });
 
@@ -102,8 +101,7 @@ describe("FactValueDisplay", () => {
     it("renders ref as entity name link when entity exists", () => {
       const fact = makeFact({ type: "ref", value: "anthropic" });
       render(<FactValueDisplay fact={fact} />);
-      const link = screen.getByRole("link");
-      expect(link).toHaveTextContent("Anthropic");
+      const link = screen.getByRole("link", { name: "Anthropic" });
       expect(link).toHaveAttribute("href", expect.stringContaining("anthropic"));
     });
 
@@ -142,17 +140,16 @@ describe("FactValueDisplay", () => {
 
     it("filters [object Object] text artifacts to empty string", () => {
       const fact = makeFact({ type: "text", value: "[object Object]" });
-      render(<FactValueDisplay fact={fact} />);
+      const { container } = render(<FactValueDisplay fact={fact} />);
       // formatKBFactValue returns "" for [object Object] text
-      const span = document.querySelector("span");
-      expect(span?.textContent).toBe("");
+      expect(container.querySelector("span")?.textContent).toBe("");
     });
 
     it("renders range with currency", () => {
       const fact = makeFact({ type: "range", low: 1_000_000_000, high: 2_000_000_000 });
       const prop = makeProperty("USD");
-      render(<FactValueDisplay fact={fact} property={prop} />);
-      const text = document.querySelector("span")?.textContent ?? "";
+      const { container } = render(<FactValueDisplay fact={fact} property={prop} />);
+      const text = container.querySelector("span")?.textContent ?? "";
       expect(text).toContain("$1 billion");
       expect(text).toContain("$2 billion");
     });
@@ -169,8 +166,8 @@ describe("FactValueDisplay", () => {
     it("renders min value with >= prefix", () => {
       const fact = makeFact({ type: "min", value: 5_000_000_000 });
       const prop = makeProperty("USD");
-      render(<FactValueDisplay fact={fact} property={prop} />);
-      const text = document.querySelector("span")?.textContent ?? "";
+      const { container } = render(<FactValueDisplay fact={fact} property={prop} />);
+      const text = container.querySelector("span")?.textContent ?? "";
       expect(text).toContain("≥");
       expect(text).toContain("$5 billion");
     });

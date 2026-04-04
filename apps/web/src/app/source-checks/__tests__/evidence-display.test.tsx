@@ -144,9 +144,9 @@ describe("FormatExtractedValue", () => {
       expect(screen.getByText('{"incomplete: json')).toBeInTheDocument();
     });
 
-    it("handles JSON primitive (not object/array) as plain text", () => {
+    it("renders quoted string as plain text (does not start with { or [)", () => {
       render(<FormatExtractedValue value='"just a string"' />);
-      // JSON.parse succeeds but result is a string, not object/array
+      // Starts with " not { or [ — JSON parse path is never entered
       expect(screen.getByText('"just a string"')).toBeInTheDocument();
     });
   });
