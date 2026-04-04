@@ -168,8 +168,11 @@ fi
 
 # Tmux window naming — derive from directory name, not .agent-slot file
 # See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3798
-if [ -n "$SLOT_FROM_DIR" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
-  tmux rename-window "A${SLOT_FROM_DIR}:${BRANCH}" 2>/dev/null || true
+# IMPORTANT: Use -t with pane ID to target THIS session's window specifically.
+# Without -t, tmux rename-window targets the user's currently-viewed window,
+# which may belong to a different session entirely.
+if [ -n "$SLOT_FROM_DIR" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ] && [ -n "${TMUX_PANE:-}" ]; then
+  tmux rename-window -t "$TMUX_PANE" "A${SLOT_FROM_DIR}:${BRANCH}" 2>/dev/null || true
   CONTEXT_LINES+=("Tmux: window renamed to A${SLOT_FROM_DIR}:${BRANCH}")
 fi
 

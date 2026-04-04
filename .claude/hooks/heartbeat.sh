@@ -55,7 +55,9 @@ if curl -s --max-time 3 \
 
   # Tmux naming — derive from directory name, not .agent-slot file
   # See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3798
-  if [ -n "${SLOT_FROM_DIR:-}" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+  # IMPORTANT: Use -t with pane ID to target THIS session's window specifically.
+  # Without -t, tmux rename-window targets the user's currently-viewed window.
+  if [ -n "${SLOT_FROM_DIR:-}" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ] && [ -n "${TMUX_PANE:-}" ]; then
     SLOT="$SLOT_FROM_DIR"
     CURRENT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo "?")
     PR_NUM=$(
@@ -69,6 +71,6 @@ if curl -s --max-time 3 \
     ) 2>/dev/null || true
     LABEL="A${SLOT}:${CURRENT_BRANCH}"
     [ -n "$PR_NUM" ] && LABEL="${LABEL} #${PR_NUM}"
-    tmux rename-window "$LABEL" 2>/dev/null || true
+    tmux rename-window -t "$TMUX_PANE" "$LABEL" 2>/dev/null || true
   fi
 fi
