@@ -140,10 +140,6 @@ export const commands: Record<
     return { output: "", exitCode: 0 };
   },
 
-  default: undefined as unknown as (
-    args: string[],
-    options: Record<string, unknown>
-  ) => Promise<CommandResult>,
 };
 
 // Wire default to `latest`

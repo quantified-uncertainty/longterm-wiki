@@ -607,7 +607,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       totalCost: null,
       sourceCache: trimmedSourceCache.length > 0 ? trimmedSourceCache : null,
       researchSummary: r.research?.summary ?? null,
-      citationAudit: r.auditResult ? (r.auditResult as unknown as Record<string, unknown>) : null,
+      citationAudit: r.auditResult ? { ...r.auditResult } satisfies Record<string, unknown> : null,
       costEntries: null,
       costBreakdown: null,
       sectionDiffs: null,
