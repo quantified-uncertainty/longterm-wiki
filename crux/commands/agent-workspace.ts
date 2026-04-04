@@ -122,13 +122,14 @@ interface TmuxWindowInfo {
 /** Query tmux for all windows with their index, pane CWD, and name */
 function listTmuxWindows(): TmuxWindowInfo[] {
   try {
-    // Use tab as delimiter — it cannot appear in file paths or window names
+    // Use '|||' as delimiter — tmux's -F doesn't interpret \t as tab in single quotes,
+    // so we need a multi-char delimiter that won't appear in paths or window names.
     const raw = execSync(
-      `tmux list-windows -F '#{window_index}\t#{pane_current_path}\t#{window_name}'`,
+      `tmux list-windows -F '#{window_index}|||#{pane_current_path}|||#{window_name}'`,
       { encoding: 'utf-8', timeout: 5000 },
     ).trim();
     return raw.split('\n').filter(Boolean).map((line) => {
-      const parts = line.split('\t');
+      const parts = line.split('|||');
       return { index: parts[0] || '', cwd: parts[1] || '', name: parts[2] || '' };
     });
   } catch {
