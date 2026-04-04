@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { reportClientError } from "@/lib/client-error-reporter";
+
 export default function ErrorBoundary({
   error,
   reset,
@@ -7,6 +10,13 @@ export default function ErrorBoundary({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    reportClientError(error.message || "Unknown error boundary error", {
+      stack: error.stack,
+      source: "error-boundary",
+    });
+  }, [error]);
+
   return (
     <div className="flex flex-col items-center justify-center py-20 gap-4">
       <h2 className="text-xl font-semibold">Something went wrong</h2>
