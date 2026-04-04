@@ -157,8 +157,8 @@ for SLOT in "${SLOT_NUMS[@]}"; do
     err "Slot a${SLOT} not found at ${SLOT_DIR}"
     echo -e "    ${DIM}Run: pnpm crux agent-workspace setup ${SLOT}${RESET}"
     ERRORS=$((ERRORS + 1))
-  elif [ ! -f "${SLOT_DIR}/.agent-slot" ]; then
-    err "Slot a${SLOT} exists but has no .agent-slot file — may not be initialized"
+  elif [ ! -d "${SLOT_DIR}/.git" ]; then
+    err "Slot a${SLOT} exists but has no .git directory — may not be initialized"
     ERRORS=$((ERRORS + 1))
   else
     ok "Slot a${SLOT} exists at ${SLOT_DIR}"

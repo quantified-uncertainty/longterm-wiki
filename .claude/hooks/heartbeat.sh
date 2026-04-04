@@ -53,8 +53,10 @@ if curl -s --max-time 3 \
     fi
   fi
 
-  if [ -f "$AGENT_SLOT_FILE" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
-    SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null || true)
+  # Tmux naming — derive from directory name, not .agent-slot file
+  # See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3798
+  if [ -n "${SLOT_FROM_DIR:-}" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+    SLOT="$SLOT_FROM_DIR"
     CURRENT_BRANCH=$(git -C "$REPO_ROOT" branch --show-current 2>/dev/null || echo "?")
     PR_NUM=$(
       gh pr view --json number --jq .number 2>/dev/null &
