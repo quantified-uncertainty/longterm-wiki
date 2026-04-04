@@ -143,14 +143,34 @@ if [ -n "$ISSUE_NUM" ]; then
   CONTEXT_LINES+=("→ Remember to run: pnpm crux gh issues start ${ISSUE_NUM}")
 fi
 
-# ─── 5b. Tmux window naming from agent slot ───────────────────────────────────
+# ─── 5b. Self-heal .agent-slot + Tmux window naming ──────────────────────────
+# .agent-slot gets deleted by git operations on stale branches that still track it.
+# See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3779
+# Self-heal: derive slot number from directory name (a7 → 7) and recreate if missing/wrong.
 AGENT_SLOT_FILE="$REPO_ROOT/.agent-slot"
-if [ -f "$AGENT_SLOT_FILE" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
-  SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null || true)
-  if [ -n "$SLOT" ]; then
-    tmux rename-window "A${SLOT}:${BRANCH}" 2>/dev/null || true
-    CONTEXT_LINES+=("Tmux: window renamed to A${SLOT}:${BRANCH}")
+DIR_NAME=$(basename "$REPO_ROOT")
+SLOT_FROM_DIR=""
+if [[ "$DIR_NAME" =~ ^a([0-9]+)$ ]]; then
+  SLOT_FROM_DIR="${BASH_REMATCH[1]}"
+fi
+
+if [ -n "$SLOT_FROM_DIR" ]; then
+  CURRENT_SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
+  if [ "$CURRENT_SLOT" != "$SLOT_FROM_DIR" ]; then
+    echo "$SLOT_FROM_DIR" > "$AGENT_SLOT_FILE"
+    if [ -z "$CURRENT_SLOT" ]; then
+      WARNINGS+=(".agent-slot was missing — recreated with value ${SLOT_FROM_DIR} (self-healed from dir name)")
+    else
+      WARNINGS+=(".agent-slot had wrong value '${CURRENT_SLOT}' — fixed to ${SLOT_FROM_DIR} (self-healed from dir name)")
+    fi
   fi
+fi
+
+# Tmux window naming — derive from directory name, not .agent-slot file
+# See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3798
+if [ -n "$SLOT_FROM_DIR" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+  tmux rename-window "A${SLOT_FROM_DIR}:${BRANCH}" 2>/dev/null || true
+  CONTEXT_LINES+=("Tmux: window renamed to A${SLOT_FROM_DIR}:${BRANCH}")
 fi
 
 # ─── 6. Active agent registration/heartbeat ──────────────────────────────────────
@@ -177,11 +197,8 @@ if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detac
       AGENT_TASK="Session on ${BRANCH}"
     fi
 
-    # Include agent slot in metadata if available
-    SLOT_NUM=""
-    if [ -f "$REPO_ROOT/.agent-slot" ]; then
-      SLOT_NUM=$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]')
-    fi
+    # Include agent slot in metadata — derive from directory name, not file
+    SLOT_NUM="$SLOT_FROM_DIR"
 
     # Build JSON payload safely with jq
     REGISTER_JSON=$(jq -n \
@@ -219,8 +236,8 @@ fi
 
 if [ "$BRANCH" = "main" ] && [ ! -f ".claude/wip-checklist.md" ] && [ ! -f ".agent-task" ]; then
   SLOT_LABEL=""
-  if [ -f "$REPO_ROOT/.agent-slot" ]; then
-    SLOT_LABEL="Slot A$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]') is "
+  if [ -n "$SLOT_FROM_DIR" ]; then
+    SLOT_LABEL="Slot A${SLOT_FROM_DIR} is "
   fi
   CONTEXT_LINES+=("")
   CONTEXT_LINES+=("═══════════════════════════════════════════════════════")

@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 
@@ -30,7 +31,7 @@ const VALID_CATEGORIES = [
 
 const AllQuery = z.object({
   category: z.enum(VALID_CATEGORIES).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
 });
 

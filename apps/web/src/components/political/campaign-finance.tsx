@@ -17,15 +17,7 @@
 import { cn } from "@/lib/utils";
 import { safeHref, formatCompactCurrency } from "@/lib/format-compact";
 import type { CampaignFinanceRecord } from "./types";
-
-// ── Numeric parsing ─────────────────────────────────────────────────
-
-/** Convert a numeric value (number or string from PG) to number, returning 0 for null/invalid. */
-function toNum(value: number | string | null): number {
-  if (value == null) return 0;
-  const n = Number(value);
-  return isNaN(n) ? 0 : n;
-}
+import { toNum } from "./utils";
 
 // ── Funding breakdown ───────────────────────────────────────────────
 

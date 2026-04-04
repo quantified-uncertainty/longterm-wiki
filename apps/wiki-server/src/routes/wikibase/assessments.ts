@@ -9,6 +9,7 @@ import {
   invalidJsonError,
   firstOrThrow,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   PageAssessmentSchema,
@@ -59,12 +60,12 @@ interface UniqueCountRow {
 
 const HistoryQuery = z.object({
   pageId: z.string().min(1).max(300),
-  limit: z.coerce.number().int().min(1).max(200).default(50),
+  limit: clampedLimit(200, 50),
   assessor: z.enum(VALID_ASSESSORS).optional(),
 });
 
 const LatestQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(1000).default(200),
+  limit: clampedLimit(1000, 200),
   offset: z.coerce.number().int().min(0).default(0),
   assessor: z.enum(VALID_ASSESSORS).optional(),
 });

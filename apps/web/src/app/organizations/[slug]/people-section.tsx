@@ -260,6 +260,7 @@ export function PeopleSection({
                     <span className="flex items-center gap-1.5">
                       <RecordVerificationDot
                         verdict={person.verificationVerdict}
+                        variant="label"
                         href={person.sourceCheckHref}
                       />
                       {href ? (

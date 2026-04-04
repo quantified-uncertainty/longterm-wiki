@@ -6,6 +6,24 @@ import { logger as rootLogger } from "../../logger.js";
 const logger = rootLogger.child({ component: "db" });
 
 /**
+ * Create a clamped limit field for pagination schemas.
+ * Values above maxLimit are silently clamped (not rejected with 400)
+ * so clients requesting larger pages get the maximum allowed.
+ *
+ * Use this instead of `.max(N)` on limit fields — `.max()` rejects
+ * oversized values with a 400 error, which can cause retry storms
+ * when clients send large page sizes (see issue #3743).
+ */
+export function clampedLimit(maxLimit: number, defaultLimit: number) {
+  return z.coerce
+    .number()
+    .int()
+    .min(1)
+    .default(defaultLimit)
+    .transform((v) => Math.min(v, maxLimit));
+}
+
+/**
  * Create a PaginationQuery schema with configurable limits.
  * Each route can call this with its own defaults while sharing the base shape.
  * Values above maxLimit are clamped (not rejected) so clients requesting larger
@@ -17,12 +35,7 @@ export function paginationQuery(opts?: {
 }) {
   const { maxLimit = 200, defaultLimit = 50 } = opts ?? {};
   return z.object({
-    limit: z.coerce
-      .number()
-      .int()
-      .min(1)
-      .default(defaultLimit)
-      .transform((v) => Math.min(v, maxLimit)),
+    limit: clampedLimit(maxLimit, defaultLimit),
     offset: z.coerce.number().int().min(0).default(0),
   });
 }

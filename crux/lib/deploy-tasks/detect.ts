@@ -444,6 +444,153 @@ function detectDockerChanges(files: ChangedFile[]): DeployTask[] {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
+// Deduplication (sub-PR tasks vs diff-detected tasks)
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Normalize a string for fuzzy matching: lowercase, strip backticks and
+ * markdown formatting, collapse whitespace.
+ */
+function normalizeForComparison(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/`/g, "")
+    .replace(/_\(from PR #\d+\)_/g, "") // strip sub-PR attribution
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Extract specific identifiers from a task string that can be used for
+ * exact dedup matching. Returns extracted keys by category.
+ *
+ * Operates on normalized text (backticks stripped, lowercased) so that
+ * formatting differences don't prevent matching.
+ */
+function extractTaskKeys(
+  rawText: string
+): { envVars: string[]; migrationNums: string[]; workflowNames: string[] } {
+  // Strip backticks and markdown formatting before extracting keys
+  const text = rawText.replace(/`/g, "");
+
+  const envVars: string[] = [];
+  const migrationNums: string[] = [];
+  const workflowNames: string[] = [];
+
+  // Env var names: "Set env var FOO_BAR" or "Set FOO_BAR in production"
+  const envPattern = /\benv\s+var\s+([A-Z_][A-Z0-9_]*)\b/gi;
+  let match;
+  while ((match = envPattern.exec(text)) !== null) {
+    envVars.push(match[1].toUpperCase());
+  }
+  // Also match "Set FOO_BAR in production" without "var"
+  const envPattern2 = /\bset\s+([A-Z_][A-Z0-9_]*)\s+in\s+production\b/gi;
+  while ((match = envPattern2.exec(text)) !== null) {
+    envVars.push(match[1].toUpperCase());
+  }
+
+  // Migration numbers: "migration 0060" or "migration-0060"
+  const migPattern = /\bmigration[\s-]+(\d+)/gi;
+  while ((match = migPattern.exec(text)) !== null) {
+    migrationNums.push(match[1]);
+  }
+
+  // Workflow names: workflow "name" or workflow name.yml
+  // Handle both quoted ("auto update") and unquoted (auto-update.yml) names.
+  // Normalize hyphens to spaces so "auto-update" matches "auto update".
+  const wfQuotedPattern = /\bworkflow\s+["']([^"']+)["']/gi;
+  while ((match = wfQuotedPattern.exec(text)) !== null) {
+    workflowNames.push(
+      match[1].toLowerCase().replace(/\.yml$/, "").replace(/-/g, " ")
+    );
+  }
+  const wfUnquotedPattern = /\bworkflow\s+([a-z0-9][\w.-]*)/gi;
+  while ((match = wfUnquotedPattern.exec(text)) !== null) {
+    workflowNames.push(
+      match[1].toLowerCase().replace(/\.yml$/, "").replace(/-/g, " ")
+    );
+  }
+
+  return { envVars, migrationNums, workflowNames };
+}
+
+/**
+ * Check whether a sub-PR task is a duplicate of any diff-detected task.
+ *
+ * Uses two strategies:
+ * 1. Key-based matching: extract env var names, migration numbers, workflow names
+ *    and check for overlap.
+ * 2. Substring matching: check if either task description is a substring of the
+ *    other (after normalization).
+ */
+function isSubPrTaskDuplicate(
+  subPrTask: string,
+  diffTasks: DeployTask[]
+): boolean {
+  const normalizedSubPr = normalizeForComparison(subPrTask);
+  const subPrKeys = extractTaskKeys(subPrTask);
+
+  for (const diffTask of diffTasks) {
+    const normalizedDiff = normalizeForComparison(diffTask.description);
+
+    // Strategy 1: Key-based matching
+    const diffKeys = extractTaskKeys(diffTask.description);
+
+    // Check env var overlap
+    if (subPrKeys.envVars.length > 0 && diffKeys.envVars.length > 0) {
+      for (const envVar of subPrKeys.envVars) {
+        if (diffKeys.envVars.includes(envVar)) return true;
+      }
+    }
+
+    // Check migration number overlap
+    if (
+      subPrKeys.migrationNums.length > 0 &&
+      diffKeys.migrationNums.length > 0
+    ) {
+      for (const migNum of subPrKeys.migrationNums) {
+        if (diffKeys.migrationNums.includes(migNum)) return true;
+      }
+    }
+
+    // Check workflow name overlap
+    if (
+      subPrKeys.workflowNames.length > 0 &&
+      diffKeys.workflowNames.length > 0
+    ) {
+      for (const wfName of subPrKeys.workflowNames) {
+        if (diffKeys.workflowNames.includes(wfName)) return true;
+      }
+    }
+
+    // Strategy 2: Substring matching on normalized descriptions
+    if (
+      normalizedSubPr.includes(normalizedDiff) ||
+      normalizedDiff.includes(normalizedSubPr)
+    ) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Remove sub-PR tasks that duplicate diff-detected tasks.
+ *
+ * Diff-detected tasks are preferred because they are more structured (have
+ * category, phase, verify commands). Sub-PR tasks are free-text strings
+ * scraped from PR bodies.
+ */
+export function deduplicateSubPrTasks(
+  diffTasks: DeployTask[],
+  subPrTasks: string[]
+): string[] {
+  if (diffTasks.length === 0 || subPrTasks.length === 0) return subPrTasks;
+  return subPrTasks.filter((task) => !isSubPrTaskDuplicate(task, diffTasks));
+}
+
+// ────────────────────────────────────────────────────────────────────────────
 // PR Body Parsing & Formatting (shared with CLI command and tests)
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -491,13 +638,19 @@ export function parseDeployTasksFromBody(body: string): ParsedDeployTasks | null
 
 /**
  * Format deploy tasks into a markdown section for PR descriptions.
+ *
+ * @param tasks - Tasks auto-detected from the file diff
+ * @param subPrTasks - Pre-formatted task strings from sub-PRs (already include PR ref)
  */
-export function formatDeployTasksSection(tasks: DeployTask[]): string {
+export function formatDeployTasksSection(
+  tasks: DeployTask[],
+  subPrTasks: string[] = []
+): string {
   const lines: string[] = [];
   lines.push("## Deploy Checklist");
   lines.push("<!-- deploy-tasks:v1 -->");
 
-  if (tasks.length === 0) {
+  if (tasks.length === 0 && subPrTasks.length === 0) {
     lines.push("No deploy tasks required.");
   } else {
     for (const task of tasks) {
@@ -507,10 +660,60 @@ export function formatDeployTasksSection(tasks: DeployTask[]): string {
       }
       lines.push(line);
     }
+    for (const task of subPrTasks) {
+      lines.push(`- [ ] ${task}`);
+    }
   }
 
   lines.push("<!-- /deploy-tasks -->");
   return lines.join("\n");
+}
+
+/**
+ * Preserve checked state from an old PR body when generating a new one.
+ *
+ * When `crux gh release create` updates an existing release PR, it regenerates
+ * the body from scratch — wiping any deploy tasks that a human manually checked.
+ * This function merges the checked state from the old body into the new body by
+ * matching task text (ignoring the checkbox prefix).
+ */
+export function preserveCheckedState(newBody: string, oldBody: string): string {
+  const oldParsed = parseDeployTasksFromBody(oldBody);
+  if (!oldParsed || oldParsed.checked === 0) {
+    // Nothing was checked in the old body — no merging needed
+    return newBody;
+  }
+
+  const startMarker = "<!-- deploy-tasks:v1 -->";
+  const endMarker = "<!-- /deploy-tasks -->";
+  const startIdx = newBody.indexOf(startMarker);
+  const endIdx = newBody.indexOf(endMarker);
+  if (startIdx === -1 || endIdx === -1 || endIdx <= startIdx) {
+    // No deploy tasks section in the new body — nothing to merge into
+    return newBody;
+  }
+
+  // Build a set of checked task texts from the old body
+  const checkedTexts = new Set(
+    oldParsed.items.filter((i) => i.checked).map((i) => i.text)
+  );
+
+  // Scope replacements to within the deploy tasks section only
+  const sectionStart = startIdx + startMarker.length;
+  const section = newBody.slice(sectionStart, endIdx);
+
+  const updatedSection = section
+    .split("\n")
+    .map((line) => {
+      const match = line.trimStart().match(/^- \[ \] (.+)$/);
+      if (match && checkedTexts.has(match[1])) {
+        return line.replace("- [ ]", "- [x]");
+      }
+      return line;
+    })
+    .join("\n");
+
+  return newBody.slice(0, sectionStart) + updatedSection + newBody.slice(endIdx);
 }
 
 // ────────────────────────────────────────────────────────────────────────────

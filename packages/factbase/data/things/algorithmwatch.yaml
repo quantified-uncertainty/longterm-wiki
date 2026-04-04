@@ -1,23 +1,23 @@
 entity: sid_hyxooEhMZl
 facts:
-  - id: f_aw_founded
+  - id: MSvXT1E2sg
     property: founded-date
     value: "2017"
     source: https://algorithmwatch.org/en/transparency/
     notes: "Initiative started end of 2015; registered as gGmbH in February 2017"
 
-  - id: f_aw_hq
+  - id: JE8ekTmJlQ
     property: headquarters
     value: "Boyenstrasse 41, 10115 Berlin, Germany"
     source: https://algorithmwatch.org/en/transparency/
     notes: "Also has a Zurich presence"
 
-  - id: f_aw_legal
+  - id: LPZzgJeYCg
     property: legal-structure
     value: "German nonprofit (gGmbH), tax-exempt through March 2026. Tax ID 27/640/02364."
     source: https://algorithmwatch.org/en/transparency/
 
-  - id: f_aw_budget
+  - id: XHkIQuJmPQ
     property: annual-revenue
     value: "1200000"
     unit: EUR
@@ -25,43 +25,43 @@ facts:
     source: https://algorithmwatch.org/en/transparency/
     notes: "2022: grants EUR 1.12M + donations EUR 60K + other EUR 17K. Major funders: Alfred Landecker Foundation, BMBF, BMUV, Deutsche Postcode Lotterie"
 
-  - id: f_aw_staff
+  - id: zWop4bfMLw
     property: employee-count
     value: "20"
     asOf: 2024-02
     source: https://algorithmwatch.org/en/transparency/
     notes: "20 employees (full/part-time); team page lists 43 including fellows, interns, advisors"
 
-  - id: f_aw_fellowship
+  - id: qQXJ3az7cQ
     property: program
     value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026): 8 European journalists/researchers, EUR 7,400 each, 6-month investigation with editorial support and mentorship"
     asOf: 2025
     source: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/
     notes: "8 fellows per source (corrected from 'up to 6')"
 
-  - id: f_aw_founders
+  - id: xtBJjdkNKQ
     property: founded-by
     value: "Matthias Spielkamp, Lorena Jaume-Palasi, Lorenz Matzat, and Katharina Anna Zweig"
     source: https://algorithmwatch.org/de/about-en-alt/
     notes: "Jaume-Palasi departed in October 2018. Spielkamp remains executive director."
 
-  - id: f_aw_description
+  - id: 0LDfMy8oQg
     property: description
     value: "German nonprofit research and advocacy organization focused on the societal impacts of algorithmic decision-making (ADM). Investigates automated systems in hiring, credit scoring, social media, and public administration. Produces policy research, investigative journalism, and the Automating Society Report."
     asOf: 2026-03
     source: https://algorithmwatch.org/en/about/
 
-  - id: f_aw_website
+  - id: c3WACs0Lqw
     property: website
     value: "https://algorithmwatch.org/"
     source: https://algorithmwatch.org/
 
-  - id: f_aw_country
+  - id: mYSk1Pj8mQ
     property: country
     value: "Germany"
     source: https://algorithmwatch.org/en/transparency/
 
-  - id: f_aw_funding_sources
+  - id: avAxiWRv5g
     property: funding-sources
     value: "Alfred Landecker Foundation, Stiftung Mercator, Robert Bosch Foundation, Zeit Stiftung, German federal ministries (BMBF, BMUV, BMFSFJ, BMJV), Deutsche Postcode Lotterie, Schopflin Stiftung, European AI & Society Fund"
     asOf: 2024

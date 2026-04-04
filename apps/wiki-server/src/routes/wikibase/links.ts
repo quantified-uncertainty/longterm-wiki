@@ -1,10 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { getDb, getDrizzleDb, beginTransaction } from "../../db.js";
-import {
-  validationError,
-  zv,
-} from "../shared/utils.js";
+import { validationError, zv, clampedLimit } from "../shared/utils.js";
 import { SyncLinksBatchSchema } from "../../api-types.js";
 import { resolvePageIntId } from "../shared/page-id-helpers.js";
 
@@ -73,11 +70,11 @@ const INVERSE_LABEL: Record<string, string> = {
 const SyncBatchSchema = SyncLinksBatchSchema;
 
 const BacklinksQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(200).default(50),
+  limit: clampedLimit(200, 50),
 });
 
 const RelatedQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(50).default(MAX_RELATED),
+  limit: clampedLimit(50, MAX_RELATED),
 });
 
 // ---- Raw SQL row types ----

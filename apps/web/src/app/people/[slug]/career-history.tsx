@@ -37,6 +37,7 @@ export function CareerHistory({
                 {isCurrent && <CurrentBadge />}
                 <RecordVerificationDot
                   verdict={verdict?.verdict}
+                  variant="label"
                   href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(entry.key))}` : undefined}
                 />
               </div>

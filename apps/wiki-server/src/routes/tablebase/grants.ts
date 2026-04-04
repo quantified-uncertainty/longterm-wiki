@@ -18,6 +18,7 @@ import {
   invalidJsonError,
   zv,
   noDuplicateIds,
+  clampedLimit,
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
@@ -38,7 +39,7 @@ const MAX_PAGE_SIZE = 200;
 const SORT_ALLOWED = ["amount", "date", "name", "recipient"] as const;
 
 const ByEntityQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
   q: z.string().max(200).optional(),
   sort: z.string().max(50).optional(),
@@ -46,10 +47,12 @@ const ByEntityQuery = z.object({
   amountMin: z.coerce.number().optional(),
   amountMax: z.coerce.number().optional(),
   program: z.string().max(200).optional(),
+  /** Match entity as "funder" (organizationId, default) or "grantee" (granteeId). */
+  role: z.enum(["funder", "grantee"]).default("funder"),
 });
 
 const AllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -239,12 +242,13 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // and filters (?status=, ?amountMin=, ?amountMax=, ?program=).
   .get("/by-entity/:entityId", resolveEntityId(), zv("query", ByEntityQuery), async (c) => {
     const resolvedId = c.get("resolvedEntityId");
-    const { limit, offset, q, sort, status, amountMin, amountMax, program } =
+    const { limit, offset, q, sort, status, amountMin, amountMax, program, role } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Build WHERE conditions
-    const conditions: SQL[] = [eq(grants.organizationId, resolvedId)];
+    // Build WHERE conditions — match on funder or grantee based on role param
+    const entityCol = role === "grantee" ? grants.granteeId : grants.organizationId;
+    const conditions: SQL[] = [eq(entityCol, resolvedId)];
 
     if (q) {
       const searchCond = buildSearchCondition(

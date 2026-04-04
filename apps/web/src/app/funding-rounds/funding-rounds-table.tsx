@@ -210,7 +210,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3">
                   <span className="flex items-center gap-1.5">
                     {hasAnyVerdict && (
-                      <RecordVerificationDot verdict={row.verdict?.verdict} />
+                      <RecordVerificationDot verdict={row.verdict?.verdict} variant="label" />
                     )}
                     <Link
                       href={`/funding-rounds/${row.key}`}

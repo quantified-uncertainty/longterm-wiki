@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseDeployTasksFromBody, formatDeployTasksSection } from '../detect.ts';
+import { deduplicateSubPrTasks, parseDeployTasksFromBody, formatDeployTasksSection, preserveCheckedState } from '../detect.ts';
 import type { DeployTask } from '../types.ts';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -418,6 +418,42 @@ describe('formatDeployTasksSection', () => {
     expect(section).not.toContain('- [x]');
   });
 
+  // 4b. Sub-PR tasks are included in output
+  it('includes sub-PR tasks alongside diff-detected tasks', () => {
+    const tasks: DeployTask[] = [
+      makeTask({ id: 'env-FOO', description: 'Set FOO in production', category: 'env' }),
+    ];
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #100)_',
+      '`migration` Run fix-data.sql _(from PR #200)_',
+    ];
+
+    const section = formatDeployTasksSection(tasks, subPrTasks);
+    expect(section).toContain('- [ ] `env` Set FOO in production');
+    expect(section).toContain('- [ ] `env` Set BAR in production _(from PR #100)_');
+    expect(section).toContain('- [ ] `migration` Run fix-data.sql _(from PR #200)_');
+    expect(section).not.toContain('No deploy tasks required.');
+
+    const checkboxLines = section.split('\n').filter((l) => l.startsWith('- [ ]'));
+    expect(checkboxLines).toHaveLength(3);
+  });
+
+  // 4c. Sub-PR tasks alone (no diff-detected tasks)
+  it('shows sub-PR tasks even when no diff-detected tasks exist', () => {
+    const subPrTasks = ['`env` Set BAZ in production _(from PR #300)_'];
+
+    const section = formatDeployTasksSection([], subPrTasks);
+    expect(section).toContain('- [ ] `env` Set BAZ in production _(from PR #300)_');
+    expect(section).not.toContain('No deploy tasks required.');
+  });
+
+  // 4d. Empty diff tasks + empty sub-PR tasks shows "No deploy tasks required"
+  it('shows "No deploy tasks required" when both sources are empty', () => {
+    const section = formatDeployTasksSection([], []);
+    expect(section).toContain('No deploy tasks required.');
+    expect(section).not.toContain('- [ ]');
+  });
+
   // 5. Tasks with special characters in description
   it('formats tasks with special characters in description', () => {
     const tasks: DeployTask[] = [
@@ -785,5 +821,472 @@ Generated with Claude Code`;
     const parsed = parseDeployTasksFromBody(newBody);
     expect(parsed).not.toBeNull();
     expect(parsed!.total).toBe(2);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// deduplicateSubPrTasks
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('deduplicateSubPrTasks', () => {
+  it('removes sub-PR task that matches a diff task by env var name', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-wayback-fallback-enabled',
+        description: 'Set env var WAYBACK_FALLBACK_ENABLED in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set env var WAYBACK_FALLBACK_ENABLED in production _(from PR #3780)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches by "Set FOO in production" pattern', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-api-secret',
+        description: 'Set env var API_SECRET in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set API_SECRET in production _(from PR #100)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches a diff task by migration number', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'migration-0060',
+        description: 'Verify migration 0060 applied on server start',
+        category: 'migration',
+        phase: 'post-deploy',
+        verifyCommand: 'psql "$DATABASE_URL" -c "SELECT 1"',
+      }),
+    ];
+    const subPrTasks = [
+      '`migration` Run migration 0060 after deploy _(from PR #200)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task that matches a diff task by workflow name', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'ci-auto-update',
+        description: 'Modified workflow "auto update" — verify it runs successfully after merge',
+        category: 'ci',
+        phase: 'post-deploy',
+        verifyCommand: 'gh run list --workflow="auto-update.yml" --limit=1',
+      }),
+    ];
+    const subPrTasks = [
+      '`ci` Check workflow "auto-update" passes _(from PR #300)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('removes sub-PR task when diff task description is a substring', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-foo',
+        description: 'Set env var FOO in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      'Set env var FOO in production (requires ops approval) _(from PR #400)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('keeps sub-PR tasks that do not overlap with any diff task', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-foo',
+        description: 'Set env var FOO in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #500)_',
+      '`migration` Run fix-data.sql manually _(from PR #501)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toContain('BAR');
+    expect(result[1]).toContain('fix-data.sql');
+  });
+
+  it('keeps all sub-PR tasks when diff tasks are empty', () => {
+    const subPrTasks = [
+      '`env` Set BAR in production _(from PR #500)_',
+    ];
+
+    const result = deduplicateSubPrTasks([], subPrTasks);
+    expect(result).toHaveLength(1);
+    expect(result).toEqual(subPrTasks);
+  });
+
+  it('returns empty array when sub-PR tasks are empty', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({ id: 'env-foo', description: 'Set FOO', category: 'env' }),
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, []);
+    expect(result).toHaveLength(0);
+  });
+
+  it('handles mixed duplicates and non-duplicates', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-api-key',
+        description: 'Set env var API_KEY in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+      makeTask({
+        id: 'migration-0070',
+        description: 'Verify migration 0070 applied on server start',
+        category: 'migration',
+        phase: 'post-deploy',
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set env var API_KEY in production _(from PR #600)_',  // duplicate
+      '`env` Set WEBHOOK_SECRET in production _(from PR #601)_',   // unique
+      '`migration` Verify migration 0070 applied _(from PR #602)_', // duplicate
+      '`config` Update vercel.json redirect rules _(from PR #603)_', // unique
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(2);
+    expect(result[0]).toContain('WEBHOOK_SECRET');
+    expect(result[1]).toContain('vercel.json');
+  });
+
+  it('handles backtick-wrapped env var names in sub-PR tasks', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'env-my-var',
+        description: 'Set env var MY_VAR in production',
+        category: 'env',
+        phase: 'pre-merge',
+        automated: false,
+      }),
+    ];
+    const subPrTasks = [
+      '`env` Set `MY_VAR` in production _(from PR #700)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+
+  it('is case-insensitive for substring matching', () => {
+    const diffTasks: DeployTask[] = [
+      makeTask({
+        id: 'docker-change',
+        description: 'Docker configuration changed — verify container builds',
+        category: 'docker',
+        phase: 'post-deploy',
+      }),
+    ];
+    const subPrTasks = [
+      'docker configuration changed — verify container builds _(from PR #800)_',
+    ];
+
+    const result = deduplicateSubPrTasks(diffTasks, subPrTasks);
+    expect(result).toHaveLength(0);
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// preserveCheckedState
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('preserveCheckedState', () => {
+  // Helper to build a PR body with deploy tasks
+  function buildBody(tasks: Array<{ text: string; checked: boolean }>): string {
+    const lines = [
+      '## Summary',
+      'Some description.',
+      '',
+      '## Deploy Checklist',
+      '<!-- deploy-tasks:v1 -->',
+    ];
+    if (tasks.length === 0) {
+      lines.push('No deploy tasks required.');
+    } else {
+      for (const task of tasks) {
+        const checkbox = task.checked ? '[x]' : '[ ]';
+        lines.push(`- ${checkbox} ${task.text}`);
+      }
+    }
+    lines.push('<!-- /deploy-tasks -->');
+    lines.push('');
+    lines.push('---');
+    lines.push('[Full diff](https://github.com/example/repo/compare/production...main)');
+    return lines.join('\n');
+  }
+
+  it('preserves checked items from the old body in the new body', () => {
+    const oldBody = buildBody([
+      { text: '`migration` Verify migration 0060 applied', checked: true },
+      { text: '`env` Set API_KEY in production', checked: true },
+      { text: '`ci` Verify workflow runs', checked: false },
+    ]);
+    const newBody = buildBody([
+      { text: '`migration` Verify migration 0060 applied', checked: false },
+      { text: '`env` Set API_KEY in production', checked: false },
+      { text: '`ci` Verify workflow runs', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.total).toBe(3);
+    expect(parsed!.checked).toBe(2);
+    expect(parsed!.unchecked).toBe(1);
+    expect(parsed!.items[0]).toEqual({
+      text: '`migration` Verify migration 0060 applied',
+      checked: true,
+    });
+    expect(parsed!.items[1]).toEqual({
+      text: '`env` Set API_KEY in production',
+      checked: true,
+    });
+    expect(parsed!.items[2]).toEqual({
+      text: '`ci` Verify workflow runs',
+      checked: false,
+    });
+  });
+
+  it('returns new body unchanged when no items were checked in old body', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set API_KEY', checked: false },
+      { text: '`ci` Verify workflow', checked: false },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set API_KEY', checked: false },
+      { text: '`ci` Verify workflow', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    expect(result).toBe(newBody);
+  });
+
+  it('returns new body unchanged when old body has no deploy tasks section', () => {
+    const oldBody = '## Summary\nJust a PR with no deploy section.';
+    const newBody = buildBody([
+      { text: '`env` Set API_KEY', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    expect(result).toBe(newBody);
+  });
+
+  it('returns new body unchanged when new body has no deploy tasks', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set API_KEY', checked: true },
+    ]);
+    const newBody = buildBody([]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    expect(result).toBe(newBody);
+  });
+
+  it('handles tasks that exist in old body but not in new body (removed tasks)', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set OLD_KEY', checked: true },
+      { text: '`migration` Verify migration 0060', checked: true },
+    ]);
+    const newBody = buildBody([
+      { text: '`migration` Verify migration 0060', checked: false },
+      { text: '`ci` New workflow task', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.total).toBe(2);
+    // migration task should be checked (was checked in old body)
+    expect(parsed!.items[0]).toEqual({
+      text: '`migration` Verify migration 0060',
+      checked: true,
+    });
+    // new ci task should remain unchecked (not in old body)
+    expect(parsed!.items[1]).toEqual({
+      text: '`ci` New workflow task',
+      checked: false,
+    });
+  });
+
+  it('handles tasks that exist in new body but not in old body (added tasks)', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set API_KEY', checked: true },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set API_KEY', checked: false },
+      { text: '`migration` Verify migration 0070', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.total).toBe(2);
+    expect(parsed!.items[0]).toEqual({
+      text: '`env` Set API_KEY',
+      checked: true,
+    });
+    expect(parsed!.items[1]).toEqual({
+      text: '`migration` Verify migration 0070',
+      checked: false,
+    });
+  });
+
+  it('preserves all checked items when all tasks are checked', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set KEY_A', checked: true },
+      { text: '`env` Set KEY_B', checked: true },
+      { text: '`ci` Verify workflow', checked: true },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set KEY_A', checked: false },
+      { text: '`env` Set KEY_B', checked: false },
+      { text: '`ci` Verify workflow', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.total).toBe(3);
+    expect(parsed!.checked).toBe(3);
+    expect(parsed!.unchecked).toBe(0);
+  });
+
+  it('does not check items in new body that were unchecked in old body', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set KEY_A', checked: false },
+      { text: '`ci` Verify workflow', checked: true },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set KEY_A', checked: false },
+      { text: '`ci` Verify workflow', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.items[0]).toEqual({ text: '`env` Set KEY_A', checked: false });
+    expect(parsed!.items[1]).toEqual({ text: '`ci` Verify workflow', checked: true });
+  });
+
+  it('preserves content outside the deploy tasks section', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set API_KEY', checked: true },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set API_KEY', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    expect(result).toContain('## Summary');
+    expect(result).toContain('Some description.');
+    expect(result).toContain('[Full diff]');
+  });
+
+  it('handles sub-PR task text with italic PR references', () => {
+    const oldBody = buildBody([
+      { text: '`env` Set BAR in production _(from PR #100)_', checked: true },
+      { text: '`migration` Run fix-data.sql _(from PR #200)_', checked: false },
+    ]);
+    const newBody = buildBody([
+      { text: '`env` Set BAR in production _(from PR #100)_', checked: false },
+      { text: '`migration` Run fix-data.sql _(from PR #200)_', checked: false },
+    ]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.items[0]).toEqual({
+      text: '`env` Set BAR in production _(from PR #100)_',
+      checked: true,
+    });
+    expect(parsed!.items[1]).toEqual({
+      text: '`migration` Run fix-data.sql _(from PR #200)_',
+      checked: false,
+    });
+  });
+
+  it('handles task text with verify commands (em-dash + backtick)', () => {
+    const taskText =
+      '`migration` Verify migration 0060 applied — `psql "$DATABASE_URL" -c "SELECT 1"`';
+    const oldBody = buildBody([{ text: taskText, checked: true }]);
+    const newBody = buildBody([{ text: taskText, checked: false }]);
+
+    const result = preserveCheckedState(newBody, oldBody);
+    const parsed = parseDeployTasksFromBody(result);
+
+    expect(parsed).not.toBeNull();
+    expect(parsed!.total).toBe(1);
+    expect(parsed!.checked).toBe(1);
+    expect(parsed!.items[0].checked).toBe(true);
+  });
+
+  it('does not replace task text that appears outside the deploy tasks section', () => {
+    // A commit message or summary line that looks like an unchecked task
+    const taskText = '`env` Set API_KEY in production';
+    const oldBody = buildBody([{ text: taskText, checked: true }]);
+
+    // newBody has the matching deploy task but also the same text outside the section
+    const newBody =
+      '## Summary\n' +
+      `- [ ] ${taskText}\n` + // same text in summary — should NOT be replaced
+      '\n' +
+      '## Deploy Checklist\n' +
+      '<!-- deploy-tasks:v1 -->\n' +
+      `- [ ] ${taskText}\n` + // this one SHOULD be replaced
+      '<!-- /deploy-tasks -->\n';
+
+    const result = preserveCheckedState(newBody, oldBody);
+
+    // The summary line should still be unchecked
+    const summaryLine = result.split('\n')[1];
+    expect(summaryLine).toBe(`- [ ] ${taskText}`);
+
+    // The deploy task should be checked
+    const parsed = parseDeployTasksFromBody(result);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.items[0]).toEqual({ text: taskText, checked: true });
   });
 });

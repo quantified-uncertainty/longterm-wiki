@@ -361,6 +361,7 @@ export function FundingProgramsListTable({
                   <span className="flex items-center gap-1.5">
                     <RecordVerificationDot
                       verdict={row.verdict?.verdict}
+                      variant="label"
                       href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
                     />
                     <Link

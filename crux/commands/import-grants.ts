@@ -17,7 +17,7 @@
 
 import { buildEntityMatcher } from "../lib/grant-import/entity-matcher.ts";
 import { toSyncGrant, syncToServer } from "../lib/grant-import/sync.ts";
-import { apiRequest } from "../lib/wiki-server/client.ts";
+import { deleteGrantBatch } from "../lib/wiki-server/grants.ts";
 import {
   printMatchStats,
   printTopUnmatched,
@@ -243,11 +243,7 @@ async function dedupCommand(_args: string[], options: Record<string, unknown>): 
 
     console.log(`  Deleting batch ${batchNum}/${totalBatches}: ${batch.length} grants...`);
 
-    const result = await apiRequest<{ deleted: number }>(
-      "POST",
-      "/api/grants/delete-batch",
-      { ids: batch },
-    );
+    const result = await deleteGrantBatch(batch);
 
     if (result.ok) {
       totalDeleted += result.data.deleted;

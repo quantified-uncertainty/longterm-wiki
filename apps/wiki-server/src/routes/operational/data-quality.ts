@@ -20,7 +20,7 @@ import {
   wikiPages,
   facts,
 } from "../../schema.js";
-import { zv } from "../shared/utils.js";
+import { zv, clampedLimit } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 
 // ---------------------------------------------------------------------------
@@ -35,7 +35,7 @@ import { logger } from "../../logger.js";
 // ---------------------------------------------------------------------------
 
 const HistoryQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(200).optional().default(50),
+  limit: clampedLimit(200, 50),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
 

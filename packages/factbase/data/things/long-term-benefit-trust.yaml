@@ -1,7 +1,7 @@
 entity: sid_eNJ3h95yWw
 facts:
   # ── Description & Basics ──────────────────────────────────────
-  - id: f_ltbt_desc01
+  - id: mFQWGv20mw
     property: description
     value: >-
       Delaware purpose trust established in 2023 to ensure Anthropic responsibly
@@ -11,7 +11,7 @@ facts:
     asOf: 2026-03
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
 
-  - id: f_ltbt_found01
+  - id: V291KEL6Gw
     property: founded-date
     value: "2023-05"
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
@@ -19,7 +19,7 @@ facts:
       Charter amended to create Class T stock at Series C close (May 2023).
       Public announcement September 2023.
 
-  - id: f_ltbt_legal01
+  - id: UI4HRaqZ6w
     property: legal-structure
     value: "Delaware purpose trust (Del. Code tit. 12 §3556)"
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
@@ -27,26 +27,26 @@ facts:
       Novel application of Delaware trust law. Purpose trusts serve a stated
       purpose rather than specific beneficiaries.
 
-  - id: f_ltbt_hq01
+  - id: 2kMkA1152A
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.anthropic.com/company
 
-  - id: f_ltbt_country01
+  - id: 0l8jfTS09A
     property: country
     value: United States
 
-  - id: f_ltbt_website01
+  - id: 4xVl0chsLA
     property: website
     value: https://www.anthropic.com/news/the-long-term-benefit-trust
 
-  - id: f_ltbt_parent01
+  - id: 5K0FnbVnJw
     property: parent-org
     value: !ref sid_mK9pX3rQ7n
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Governance body of Anthropic PBC"
 
-  - id: f_ltbt_notable01
+  - id: KgiuN0sFnA
     property: notable-for
     value: >-
       First major AI company to establish an independent governance trust with
@@ -55,7 +55,7 @@ facts:
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
 
   # ── Governance Structure ──────────────────────────────────────
-  - id: f_ltbt_equity01
+  - id: pc1G5Ab8GA
     property: equity-stake-percent
     value: 0
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
@@ -63,7 +63,7 @@ facts:
       Class T Common Stock has negligible economic rights. Trustees have
       zero financial interest in Anthropic.
 
-  - id: f_ltbt_board_phase1
+  - id: 3Cx7jcZ21A
     property: board-seats-controlled
     value: "1 of 5"
     asOf: 2023-09
@@ -71,7 +71,7 @@ facts:
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Initial phase: power to elect 1 of 5 board directors"
 
-  - id: f_ltbt_board_phase2
+  - id: VS8Xi63kHg
     property: board-seats-controlled
     value: "2 of 5"
     asOf: 2024-07
@@ -79,7 +79,7 @@ facts:
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Phase 2: power to elect 2 of 5 board directors"
 
-  - id: f_ltbt_board_phase3
+  - id: 1BdrqgizxA
     property: board-seats-controlled
     value: "3 of 5"
     asOf: 2024-11
@@ -89,7 +89,7 @@ facts:
       Electing Preferred Holders (investors) and Voting Common Stock
       (founders/employees).
 
-  - id: f_ltbt_amend_pre
+  - id: YBIP79nZzg
     property: amendment-threshold
     value: "75% of voting power"
     asOf: 2023-09
@@ -99,7 +99,7 @@ facts:
       Supermajority of stockholder voting power required to amend trust
       provisions before November 2025.
 
-  - id: f_ltbt_amend_post
+  - id: Xo3uCrml2Q
     property: amendment-threshold
     value: "85% of voting power"
     asOf: 2025-11
@@ -108,7 +108,7 @@ facts:
       Increased threshold after November 2025 makes amendment harder as
       trust gains board majority.
 
-  - id: f_ltbt_trustee_count
+  - id: qzogkW81CQ
     property: trustee-count
     value: "3 of 5 voting seats filled"
     asOf: 2026-03
@@ -118,21 +118,21 @@ facts:
       trust institution). Currently 2 seats vacant.
 
   # ── Current Trustees ──────────────────────────────────────────
-  - id: f_ltbt_trustee_shah
+  - id: FvXqg87rww
     property: key-event
     value: "Neil Buddy Shah appointed founding trustee (Chair)"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Clinton Health Access Initiative. Serves as Trust Chair."
 
-  - id: f_ltbt_trustee_fontaine
+  - id: HUvykjmJIg
     property: key-event
     value: "Richard Fontaine appointed as trustee"
     asOf: 2025-06
     source: https://www.anthropic.com/news/national-security-expert-richard-fontaine-appointed-to-anthropic-s-long-term-benefit-trust
     notes: "CEO of Center for a New American Security (CNAS)"
 
-  - id: f_ltbt_trustee_cuellar
+  - id: bi70dz4e6g
     property: key-event
     value: "Mariano-Florentino Cuéllar appointed as trustee"
     asOf: 2026-01
@@ -140,56 +140,56 @@ facts:
     notes: "President of Carnegie Endowment. Former CA Supreme Court Justice."
 
   # ── Former Trustees ───────────────────────────────────────────
-  - id: f_ltbt_trustee_matheny_join
+  - id: 5lI0u3iaRw
     property: key-event
     value: "Jason Matheny appointed founding trustee"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of RAND Corporation"
 
-  - id: f_ltbt_trustee_matheny_depart
+  - id: IyQcpqghzA
     property: key-event
     value: "Jason Matheny departs as trustee"
     asOf: 2023-12
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Departed to avoid conflicts with RAND policy work"
 
-  - id: f_ltbt_trustee_christiano_join
+  - id: NJq728xQag
     property: key-event
     value: "Paul Christiano appointed founding trustee"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Founder of Alignment Research Center (ARC)"
 
-  - id: f_ltbt_trustee_christiano_depart
+  - id: UleJ1fi7yg
     property: key-event
     value: "Paul Christiano departs as trustee"
     asOf: 2024-04
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Left to become Head of AI Safety at U.S. AI Safety Institute"
 
-  - id: f_ltbt_trustee_bahl_join
+  - id: lVMP8IwA7A
     property: key-event
     value: "Kanika Bahl appointed founding trustee"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Evidence Action"
 
-  - id: f_ltbt_trustee_bahl_depart
+  - id: hFhR2zhsqA
     property: key-event
     value: "Kanika Bahl concludes founding term"
     asOf: 2026-01
     source: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
     notes: "Departed after completing founding term"
 
-  - id: f_ltbt_trustee_robinson_join
+  - id: rkRwI8dntQ
     property: key-event
     value: "Zachary Robinson appointed founding trustee"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Centre for Effective Altruism"
 
-  - id: f_ltbt_trustee_robinson_depart
+  - id: 3bfpQxvc3A
     property: key-event
     value: "Zachary Robinson concludes founding term"
     asOf: 2026-01
@@ -197,21 +197,21 @@ facts:
     notes: "Departed after completing founding term"
 
   # ── Board Appointments ────────────────────────────────────────
-  - id: f_ltbt_board_kreps
+  - id: G3bQtDosig
     property: key-event
     value: "Jay Kreps appointed to Anthropic board by LTBT (first trust-elected director)"
     asOf: 2024-05
     source: https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors
     notes: "Co-founder and CEO of Confluent"
 
-  - id: f_ltbt_board_hastings
+  - id: 2EL7wyXgCQ
     property: key-event
     value: "Reed Hastings appointed to Anthropic board by LTBT"
     asOf: 2025-05
     source: https://www.anthropic.com/news/reed-hastings
     notes: "Co-founder and executive chairman of Netflix"
 
-  - id: f_ltbt_board_liddell
+  - id: okCFwtm16Q
     property: key-event
     value: "Chris Liddell appointed to Anthropic board"
     asOf: 2026-02
@@ -221,20 +221,20 @@ facts:
       stockholders is not explicitly stated in the announcement.
 
   # ── Milestones & Concerns ─────────────────────────────────────
-  - id: f_ltbt_announce
+  - id: EizP1a8K6w
     property: key-event
     value: "Long-Term Benefit Trust publicly announced with five founding trustees"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
 
-  - id: f_ltbt_series_c
+  - id: Vi8pTI5x0g
     property: key-event
     value: "Trust formally established at Series C close; charter amended to create Class T stock"
     asOf: 2023-05
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Series C raised $450M"
 
-  - id: f_ltbt_composition_shift
+  - id: dxuJAEd5mw
     property: notable-for
     value: >-
       Trustee composition shifted from AI safety/EA backgrounds (Christiano,
@@ -243,7 +243,7 @@ facts:
     asOf: 2026-03
     source: https://www.anthropic.com/company
 
-  - id: f_ltbt_transparency
+  - id: GJzDhd2wyw
     property: notable-for
     value: >-
       Full Trust Agreement has never been published, limiting independent
@@ -251,7 +251,7 @@ facts:
       Delaware filing but contains less detail than the Trust Agreement.
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
 
-  - id: f_ltbt_selection
+  - id: uFfpkAWUCw
     property: notable-for
     value: >-
       Trustees are self-perpetuating: new trustees elected by existing trustees,

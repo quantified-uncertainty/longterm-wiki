@@ -372,10 +372,15 @@ const PoliticalRaceEntitySchema = BaseEntity.extend({
   entityType: z.literal("political-race"),
 });
 
-// Catch-all for entity types we haven't explicitly modeled
+// Catch-all for entity types we haven't explicitly modeled.
+// Exported with .passthrough() variant so tablebase.ts can validate unknown entities
+// while preserving extra keys (causeEffectGraph, content, currentAssessment, etc.).
 const GenericEntitySchema = BaseEntity.extend({
   entityType: z.string(),
 });
+
+/** GenericEntitySchema that preserves unknown keys during parsing. */
+export const GenericEntityPassthroughSchema = GenericEntitySchema.passthrough();
 
 // ============================================================================
 // DISCRIMINATED UNION

@@ -23,7 +23,7 @@ import { runOrchestratorPipeline } from './orchestrator/index.ts';
 import type { OrchestratorOptions, OrchestratorResult, OrchestratorTier } from './orchestrator/types.ts';
 import { TIER_BUDGETS } from './orchestrator/types.ts';
 import { createPhaseLogger } from '../lib/output.ts';
-import { loadPages as loadPagesFromRegistry } from '../lib/content-types.ts';
+import { loadPages as loadPagesFromRegistry, type PageEntry } from '../lib/content-types.ts';
 import {
   snapshotFromFile,
   computeDelta,
@@ -129,10 +129,11 @@ function saveState(state: BatchState): void {
 // File size helper
 // ---------------------------------------------------------------------------
 
-/** Cached pages registry (loaded once per process). */
-let _cachedPages: Array<{ id: string; path: string; [k: string]: unknown }> | null = null;
+/** Cached pages registry (loaded once per process).
+ *  Uses PageEntry from content-types — which has typed quality/metadata fields. */
+let _cachedPages: ReturnType<typeof loadPagesFromRegistry> | null = null;
 function getCachedPages() {
-  if (!_cachedPages) _cachedPages = loadPagesFromRegistry() as Array<{ id: string; path: string }>;
+  if (!_cachedPages) _cachedPages = loadPagesFromRegistry();
   return _cachedPages;
 }
 
@@ -143,9 +144,9 @@ function getCachedPages() {
 function getPageFileSize(pageId: string): { filePath: string; sizeBytes: number } | null {
   try {
     const pages = getCachedPages();
-    const page = pages.find((p: { id: string }) => p.id === pageId);
+    const page = pages.find((p) => p.id === pageId);
     if (!page) return null;
-    const pagePath = (page as { path: string }).path.replace(/^\/|\/$/g, '');
+    const pagePath = page.path.replace(/^\/|\/$/g, '');
     const filePath = path.join(ROOT, 'content/docs', pagePath + '.mdx');
     if (!fs.existsSync(filePath)) return null;
     const stat = fs.statSync(filePath);
@@ -300,12 +301,12 @@ export async function runBatchDryRun(options: {
   console.log('  Analyzing pages (no API calls, no cost)...\n');
 
   const pages = getCachedPages();
-  const knownIds = new Set(pages.map((p: { id: string }) => p.id));
+  const knownIds = new Set(pages.map((p) => p.id));
 
-  // Build a lookup map for page metadata (cast to access quality fields)
-  const pageMetaMap = new Map<string, Record<string, unknown>>();
+  // Build a lookup map for page metadata
+  const pageMetaMap = new Map<string, PageEntry>();
   for (const p of pages) {
-    pageMetaMap.set(p.id, p as unknown as Record<string, unknown>);
+    pageMetaMap.set(p.id, p);
   }
 
   const results: DryRunPageResult[] = [];
@@ -355,12 +356,10 @@ export async function runBatchDryRun(options: {
 
     // Get quality metadata from build artifacts (no API call)
     const meta = pageMetaMap.get(pageId);
-    const quality = typeof meta?.quality === 'number' ? meta.quality as number : null;
-    const readerImportance = typeof meta?.readerImportance === 'number' ? meta.readerImportance as number : null;
-    const metaMetrics = meta?.metrics as { footnoteCount?: number; wordCount?: number } | undefined;
-    const citationCount = typeof metaMetrics?.footnoteCount === 'number' ? metaMetrics.footnoteCount : null;
-    const wordCount = typeof metaMetrics?.wordCount === 'number' ? metaMetrics.wordCount
-      : typeof meta?.wordCount === 'number' ? meta.wordCount as number : null;
+    const quality = meta?.quality ?? null;
+    const readerImportance = meta?.readerImportance ?? null;
+    const citationCount = meta?.metrics?.footnoteCount ?? null;
+    const wordCount = meta?.metrics?.wordCount ?? null;
 
     // Check if already high quality
     if (quality !== null && quality >= HIGH_QUALITY_THRESHOLD) {
@@ -607,7 +606,7 @@ export async function runBatch(options: BatchOptions): Promise<PageResult[]> {
   }
 
   const pages = getCachedPages();
-  const knownIds = new Set(pages.map((p: { id: string }) => p.id));
+  const knownIds = new Set(pages.map((p) => p.id));
   const unknownIds = pageIds.filter(id => !knownIds.has(id));
   if (unknownIds.length > 0) {
     log('batch', `⚠ ${unknownIds.length} unknown page ID(s) will be skipped: ${unknownIds.join(', ')}`);

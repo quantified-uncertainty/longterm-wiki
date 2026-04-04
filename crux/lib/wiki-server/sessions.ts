@@ -76,6 +76,11 @@ export async function getSessionStats(): Promise<ApiResult<SessionStatsResult>> 
   return apiRequest<SessionStatsResult>('GET', '/api/sessions/stats');
 }
 
-export async function getSessionPageChanges(): Promise<ApiResult<SessionPageChangesResult>> {
-  return apiRequest<SessionPageChangesResult>('GET', '/api/sessions/page-changes?limit=500');
+export async function getSessionPageChanges(
+  options?: { limit?: number; since?: string },
+): Promise<ApiResult<SessionPageChangesResult>> {
+  const params = new URLSearchParams();
+  params.set('limit', String(options?.limit ?? 500));
+  if (options?.since) params.set('since', options.since);
+  return apiRequest<SessionPageChangesResult>('GET', `/api/sessions/page-changes?${params}`);
 }

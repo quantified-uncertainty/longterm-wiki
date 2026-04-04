@@ -242,6 +242,7 @@ export function InteractiveGrantsTable({
   // ── Server-side state (hook always called for consistent hook order) ──
   const server = useServerTable<GrantRow>({
     endpoint: `/api/grants/by-entity/${entityId ?? ""}`,
+    extraParams: mode === "received" ? { role: "grantee" } : undefined,
     defaultPageSize: PAGE_SIZE,
     defaultSort: { field: "date", dir: "desc" },
     transform,
@@ -772,7 +773,7 @@ function CellContent({
       return (
         <RecordVerificationDot
           verdict={grant.verificationVerdict}
-          size="md"
+          variant="label"
           href={grant.sourceCheckHref}
         />
       );

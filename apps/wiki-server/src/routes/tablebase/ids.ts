@@ -9,6 +9,7 @@ import {
   validationError,
   invalidJsonError,
   notFoundError,
+  clampedLimit,
 } from "../shared/utils.js";
 
 /**
@@ -83,7 +84,7 @@ const AllocateBatchSchema = z.object({
 });
 
 const ListQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(1000).default(100),
+  limit: clampedLimit(1000, 100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 

@@ -22,7 +22,7 @@ const VERDICT_COLORS: Record<string, string> = {
   contradicted: "text-red-600",
   outdated: "text-amber-600",
   partial: "text-amber-500",
-  unverifiable: "text-muted-foreground",
+  unverifiable: "text-orange-600",
   unchecked: "text-muted-foreground",
 };
 
@@ -31,7 +31,7 @@ const BAR_COLORS: Record<string, string> = {
   contradicted: "bg-red-500",
   outdated: "bg-amber-500",
   partial: "bg-amber-400",
-  unverifiable: "bg-gray-400",
+  unverifiable: "bg-orange-400",
   unchecked: "bg-gray-300",
 };
 

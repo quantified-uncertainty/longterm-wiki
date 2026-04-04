@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatCompactCurrency, formatIntroducedDate } from "../format-compact";
+import { formatCompactCurrency, formatCompactNumber, formatIntroducedDate } from "../format-compact";
 
 describe("formatCompactCurrency", () => {
   it("formats trillions", () => {
@@ -14,8 +14,17 @@ describe("formatCompactCurrency", () => {
     expect(formatCompactCurrency(850e6)).toBe("$850M");
   });
 
-  it("formats thousands", () => {
+  it("formats large thousands (>= 10K) with 0 decimal", () => {
     expect(formatCompactCurrency(42000)).toBe("$42K");
+  });
+
+  it("formats small thousands (< 10K) with 1 decimal", () => {
+    expect(formatCompactCurrency(4100)).toBe("$4.1K");
+    expect(formatCompactCurrency(1500)).toBe("$1.5K");
+  });
+
+  it("drops trailing .0 for even thousands", () => {
+    expect(formatCompactCurrency(4000)).toBe("$4K");
   });
 
   it("formats small numbers", () => {
@@ -55,6 +64,44 @@ describe("formatCompactCurrency", () => {
 
   it("handles negative values", () => {
     expect(formatCompactCurrency(-5e6)).toBe("$-5M");
+  });
+});
+
+describe("formatCompactNumber", () => {
+  it("returns empty for null/undefined/NaN", () => {
+    expect(formatCompactNumber(null)).toBe("");
+    expect(formatCompactNumber(undefined)).toBe("");
+    expect(formatCompactNumber(NaN)).toBe("");
+  });
+
+  it("formats billions", () => {
+    expect(formatCompactNumber(2_300_000_000)).toBe("2.3B");
+  });
+
+  it("formats millions", () => {
+    expect(formatCompactNumber(850_000_000)).toBe("850M");
+  });
+
+  it("formats small thousands (< 10K) with 1 decimal for headcount precision", () => {
+    expect(formatCompactNumber(4074)).toBe("4.1K");
+    expect(formatCompactNumber(1500)).toBe("1.5K");
+    expect(formatCompactNumber(7800)).toBe("7.8K");
+  });
+
+  it("formats large thousands (>= 10K) with 0 decimal", () => {
+    expect(formatCompactNumber(42000)).toBe("42K");
+  });
+
+  it("drops trailing .0 for even thousands", () => {
+    expect(formatCompactNumber(4000)).toBe("4K");
+  });
+
+  it("formats small numbers with locale separator", () => {
+    expect(formatCompactNumber(500)).toBe("500");
+  });
+
+  it("has no currency symbol", () => {
+    expect(formatCompactNumber(1_000_000)).not.toContain("$");
   });
 });
 

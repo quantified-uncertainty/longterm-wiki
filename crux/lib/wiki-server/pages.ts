@@ -22,6 +22,9 @@ type PagesRpcClient = ReturnType<typeof hc<PagesRoute>>;
 type LinksRpcClient = ReturnType<typeof hc<LinksRoute>>;
 type CitationsRpcClient = ReturnType<typeof hc<CitationsRoute>>;
 
+/** Response type for GET /api/pages (paginated list, inferred from server). */
+export type PageListResult = InferResponseType<PagesRpcClient['index']['$get'], 200>;
+
 /** Response type for GET /api/pages/search (inferred from server). */
 export type PageSearchResult = InferResponseType<PagesRpcClient['search']['$get'], 200>;
 
@@ -91,4 +94,15 @@ export function getCitationQuotes(pageId: string, limit = 100): Promise<ApiResul
     'GET',
     `/api/citations/quotes?page_id=${encodeURIComponent(pageId)}&limit=${limit}`,
   );
+}
+
+/** List pages with pagination. */
+export function listPages(
+  options?: { limit?: number; offset?: number },
+): Promise<ApiResult<PageListResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  if (options?.offset != null) params.set('offset', String(options.offset));
+  const qs = params.toString();
+  return apiRequest<PageListResult>('GET', `/api/pages${qs ? `?${qs}` : ''}`);
 }

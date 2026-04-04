@@ -276,6 +276,7 @@ async function runCheckCycle(
   logHeader(`Check cycle #${cycleCount}`);
 
   // 0a. Check if a tracked main-branch fix PR has been merged
+  let skipMainFix = false;
   const trackedFix = getTrackedMainFixPr();
   if (trackedFix) {
     try {
@@ -290,16 +291,19 @@ async function runCheckCycle(
         log(`${cl.yellow}⚠ Main branch fix PR #${trackedFix.prNumber} closed without merging${cl.reset}`);
         clearTrackedMainFixPr();
       } else {
-        log(`  ${cl.dim}Tracked fix PR #${trackedFix.prNumber} still open — waiting for merge${cl.reset}`);
+        log(`  ${cl.dim}Tracked fix PR #${trackedFix.prNumber} still open — skipping main branch fix${cl.reset}`);
+        skipMainFix = true;
       }
     } catch (e) {
       log(`  ${cl.yellow}Warning: could not check tracked fix PR: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     }
   }
 
-  // 0b. Check main branch CI first — highest priority
+  // 0b. Check main branch CI first — highest priority (skip if fix PR already open)
   const mainStatus = await daemonCheckMainBranch(config);
-  if (mainStatus.isRed) {
+  if (mainStatus.isRed && skipMainFix) {
+    log(`${cl.yellow}⚠ Main branch CI is red but fix PR #${trackedFix!.prNumber} already open — skipping${cl.reset}`);
+  } else if (mainStatus.isRed) {
     log(`${cl.red}Main branch CI is red${cl.reset} — prioritizing fix over PR queue`);
     await fixMainBranch(mainStatus, config);
     appendJsonl(JSONL_FILE_INTERNAL, {

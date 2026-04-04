@@ -13,10 +13,12 @@ import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../lib/command-types.ts";
+import { getServerUrl } from "../lib/wiki-server/client.ts";
 import {
-  apiRequest,
-  getServerUrl,
-} from "../lib/wiki-server/client.ts";
+  listBlueskyAccounts,
+  addBlueskyAccount,
+  syncBlueskyAccount,
+} from "../lib/wiki-server/bluesky.ts";
 
 interface CommandOptions extends BaseOptions {
   tags?: string;
@@ -40,22 +42,10 @@ async function accountsCommand(
     };
   }
 
-  const limit = options.limit ?? "100";
-  const offset = options.offset ?? "0";
-  const params = new URLSearchParams({ limit, offset });
+  const limit = options.limit ? parseInt(options.limit, 10) : 100;
+  const offset = options.offset ? parseInt(options.offset, 10) : 0;
 
-  const result = await apiRequest<{
-    accounts: Array<{
-      did: string;
-      handle: string;
-      displayName: string | null;
-      followerCount: number | null;
-      postCount: number | null;
-      relevanceTags: string[] | null;
-      lastFetchedAt: string | null;
-    }>;
-    total: number;
-  }>("GET", `/api/bluesky?${params}`);
+  const result = await listBlueskyAccounts({ limit, offset });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -163,11 +153,7 @@ Examples:
     relevanceTags: tags,
   };
 
-  const result = await apiRequest<{ ok: boolean; did: string }>(
-    "POST",
-    "/api/bluesky/accounts",
-    body
-  );
+  const result = await addBlueskyAccount(body);
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -235,12 +221,7 @@ Examples:
     }
   }
 
-  const result = await apiRequest<{
-    did: string;
-    handle: string;
-    postsUpserted: number;
-    profileUpdated: boolean;
-  }>("POST", `/api/bluesky/sync/${encodeURIComponent(did)}`);
+  const result = await syncBlueskyAccount(did);
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };

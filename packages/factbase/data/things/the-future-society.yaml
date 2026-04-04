@@ -1,18 +1,18 @@
 entity: sid_u3Yf4JXH4Q
 facts:
-  - id: f_tfs_founded
+  - id: QS6JtjNwmw
     property: founded-date
     value: "2014"
     source: https://www.influencewatch.org/non-profit/the-future-society/
     notes: "Founded 2014 as student club at Harvard Kennedy School; registered as US 501(c)(3) in 2016"
 
-  - id: f_tfs_hq
+  - id: 82FQ2bpOHg
     property: headquarters
     value: "Boston, MA"
     source: https://www.idealist.org/en/nonprofit/f7355327c3924e5989eabf6adbe7f9ae-the-future-society-boston
     notes: "Staff in 12 countries across US and Europe"
 
-  - id: f_tfs_revenue
+  - id: AxDROiQpng
     property: annual-revenue
     value: "3406697"
     unit: USD
@@ -20,60 +20,60 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/813568099
     notes: "Revenue $3.4M, expenses $1.9M, assets $3.7M. EIN: 81-3568099. Growing: was $755K in 2021."
 
-  - id: f_tfs_athens
+  - id: oujIhw09Gw
     property: program
     value: "Athens Roundtable on AI and the Rule of Law (annual since 2019). 6th edition Dec 2024: 135 in-person + 830 online participants from 108 countries."
     asOf: 2024-12
     source: https://thefuturesociety.org/theme/ai-and-the-rule-of-law/
 
-  - id: f_tfs_reach
+  - id: qylyZkvAhQ
     property: scale
     value: "4,000+ students taught, 8,000+ senior decision-makers engaged, 60+ institutional partners including OECD, UNESCO, Harvard Kennedy School"
     source: https://thefuturesociety.org/about-us/
 
-  - id: f_tfs_summit
+  - id: TSDSduEMCg
     property: campaign
     value: "Consulted 10,000+ citizens and 200+ experts worldwide for the 2025 AI Action Summit deliverables"
     asOf: 2025
     source: https://thefuturesociety.org/theme/global-ai-governance/
 
-  - id: f_tfs_founders
+  - id: gDYEd7JCoQ
     property: founded-by
     value: "Nicolas Miailhe, Simon Mueller, Ionuts Lacusta, and Hugo Zylberberg"
     source: https://thefuturesociety.org/team-member/nicolas-miailhe/
     notes: "Founded as student club at Harvard Kennedy School by then-MPA students in fall 2014"
 
-  - id: f_tfs_legal
+  - id: 3oXqIRaH1w
     property: legal-structure
     value: "501(c)(3) nonprofit (The Future Society Inc, EIN 81-3568099). Founded 2014 as student club at Harvard Kennedy School; incorporated as 501(c)(3) in 2016. Independent organization funded through philanthropic donations and service contracts with IGOs and governments."
     source: https://www.influencewatch.org/non-profit/the-future-society/
     notes: "Founded 2014, incorporated 2016 — distinction matters for accuracy"
 
-  - id: f_tfs_leadership
+  - id: P4O1L8aWZQ
     property: leadership
     value: "Executive Director: Nicolas Moes (from March 2024). Previous CEO: Nicolas Miailhe (co-founder, served until December 2023). Miailhe co-founded the AI Initiative under TFS in 2015."
     asOf: 2024-03
     source: https://thefuturesociety.org/leadership-transition-announcement/
     notes: "Moes had 5 years of senior management at TFS, led EU AI Act advocacy"
 
-  - id: f_tfs_description
+  - id: hN6FmEb0OQ
     property: description
     value: "Independent nonprofit policy think tank focused on AI governance. Works on Global Governance of AI, Responsible AI for Sustainable Development, and AI & the Rule of Law. Engages policymakers, academics, and industry through research, convenings, and advisory work with bodies including the OECD, UNESCO, and national governments."
     asOf: 2026-03
     source: https://thefuturesociety.org/about-us/
 
-  - id: f_tfs_website
+  - id: T6yodnDgng
     property: website
     value: "https://thefuturesociety.org/"
     source: https://thefuturesociety.org/
 
-  - id: f_tfs_country
+  - id: HRYNMXfEBg
     property: country
     value: "United States"
     source: https://www.influencewatch.org/non-profit/the-future-society/
     notes: "US-based but operates across US and Europe with staff in 12 countries"
 
-  - id: f_tfs_revenue_2021
+  - id: Yheagk6sSA
     property: annual-revenue
     value: "755388"
     unit: USD

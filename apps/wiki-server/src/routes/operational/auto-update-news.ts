@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   paginationQuery,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   AutoUpdateNewsItemSchema as SharedNewsItemSchema,
@@ -28,7 +29,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 const DashboardQuery = z.object({
   runs: z.coerce.number().int().min(1).max(50).default(10),
-  limit: z.coerce.number().int().min(1).max(500).default(200),
+  limit: clampedLimit(500, 200),
 });
 
 // ---- Helpers ----

@@ -315,7 +315,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
         </div>
         <div className="rounded-lg border border-border/60 p-4">
           <p className="text-xs text-muted-foreground mb-1">Can&apos;t Verify</p>
-          <p className="text-2xl font-bold tabular-nums text-muted-foreground">
+          <p className="text-2xl font-bold tabular-nums text-orange-600">
             {unverifiableCount.toLocaleString()}
           </p>
           <p className="text-xs text-muted-foreground mt-1">

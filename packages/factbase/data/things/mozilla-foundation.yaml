@@ -1,16 +1,16 @@
 entity: sid_DK0GbGg7Kf
 facts:
-  - id: f_mf_founded
+  - id: iZyBTfft2g
     property: founded-date
     value: "2003"
     source: https://en.wikipedia.org/wiki/Mozilla_Foundation
 
-  - id: f_mf_hq
+  - id: uFMqT5u9Wg
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.mozillafoundation.org
 
-  - id: f_mf_revenue
+  - id: YAVd2uYqQQ
     property: annual-revenue
     value: "37200000"
     unit: USD
@@ -18,25 +18,25 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/200097189
     notes: "Foundation only. Revenue: $37.2M (Major sources: license fees from Mozilla Corp and contributions). Assets: $123.3M."
 
-  - id: f_mf_layoffs
+  - id: fXd8rgdozw
     property: organizational-change
     value: "November 2024: laid off approximately 30% of Foundation workforce, eliminating advocacy and global programs divisions"
     asOf: 2024-11
     source: https://www.mozilla.org/en-US/foundation/annualreport/2024/
 
-  - id: f_mf_democracy_ai
+  - id: BjkIxQXVdQ
     property: program
     value: "Democracy x AI Cohort (2026): 10 projects at $50K each + 12 months mentorship. Top performers may receive up to $250K follow-on. Focus: information quality, institutional transparency, civic participation."
     asOf: 2026
     source: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
 
-  - id: f_mf_fellows
+  - id: QmfF7m9Shg
     property: program
     value: "Mozilla Fellows Program 2026: up to 10 fellows. Track I: $100K ($75K stipend + $25K project). Track II: $125K ($100K + $25K). Focus: democratizing data, open infrastructure, AI auditing."
     asOf: 2026
     source: https://www.mozillafoundation.org/en/what-we-do/grantmaking/fellowship/2026-nominations-request/
 
-  - id: f_mf_mozilla_ai
+  - id: HpykNXR1YA
     property: subsidiary
     value: "Mozilla.ai: $30M startup launched March 2023 to make open-source AI popular with developers. Pre-revenue/early stage."
     asOf: 2024

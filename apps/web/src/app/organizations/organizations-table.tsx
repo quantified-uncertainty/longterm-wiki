@@ -13,6 +13,7 @@ import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
 import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, computeCompletionScore } from "@/app/organizations/org-constants";
 import { useServerTable } from "@/hooks/use-server-table";
+import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
 
 export interface OrgRow {
   id: string;
@@ -48,24 +49,6 @@ export interface OrgRow {
 }
 
 type SortKey = OrgSortKey;
-
-function formatCompactNumber(n: number | null): string {
-  if (n == null) return "";
-  if (n >= 1e12) return `$${(n / 1e12).toFixed(1)}T`;
-  if (n >= 1e10) return `$${(n / 1e9).toFixed(0)}B`;
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(1)}B`;
-  if (n >= 1e7) return `$${(n / 1e6).toFixed(0)}M`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
-  if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
-  return `$${n.toLocaleString()}`;
-}
-
-function formatHeadcount(n: number | null): string {
-  if (n == null) return "";
-  if (n >= 1e6) return `${(n / 1e6).toFixed(1)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  return n.toLocaleString();
-}
 
 function DateHint({ date }: { date: string | null }) {
   if (!date) return null;
@@ -608,7 +591,7 @@ export function OrganizationsTable({
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                       {row.revenueNum != null ? (
                         <>
-                          <span className="font-semibold">{formatCompactNumber(row.revenueNum)}</span>
+                          <span className="font-semibold">{formatCompactCurrency(row.revenueNum)}</span>
                           <DateHint date={row.revenueDate} />
                         </>
                       ) : (
@@ -620,7 +603,7 @@ export function OrganizationsTable({
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                       {row.valuationNum != null ? (
                         <>
-                          <span className="font-semibold">{formatCompactNumber(row.valuationNum)}</span>
+                          <span className="font-semibold">{formatCompactCurrency(row.valuationNum)}</span>
                           <DateHint date={row.valuationDate} />
                         </>
                       ) : (
@@ -632,7 +615,7 @@ export function OrganizationsTable({
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                       {row.headcount != null ? (
                         <>
-                          <span>{formatHeadcount(row.headcount)}</span>
+                          <span>{formatCompactNum(row.headcount)}</span>
                           <DateHint date={row.headcountDate} />
                         </>
                       ) : (
@@ -643,7 +626,7 @@ export function OrganizationsTable({
                     {/* Total Funding */}
                     <td className="py-2.5 px-3 text-right tabular-nums whitespace-nowrap">
                       {row.totalFundingNum != null ? (
-                        <span className="font-semibold">{formatCompactNumber(row.totalFundingNum)}</span>
+                        <span className="font-semibold">{formatCompactCurrency(row.totalFundingNum)}</span>
                       ) : (
                         <span className="text-muted-foreground/40">{"\u2014"}</span>
                       )}

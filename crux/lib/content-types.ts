@@ -129,6 +129,7 @@ export interface PageEntry {
     sectionCount: number;
     hasOverview: boolean;
     structuralScore: number;
+    footnoteCount?: number;
   };
   suggestedQuality?: number;
   updateFrequency?: number | null;
