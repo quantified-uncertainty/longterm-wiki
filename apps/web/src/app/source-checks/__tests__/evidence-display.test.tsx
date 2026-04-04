@@ -1,12 +1,5 @@
 // @vitest-environment jsdom
-/**
- * Tests for source-check evidence value display.
- *
- * Tests the FormatExtractedValue rendering logic for JSON detection,
- * key-value formatting, array summaries, and long-string truncation.
- *
- * Phase 4 of Discussion #3768 (Rendering Quality & Test Infrastructure).
- */
+/** FormatExtractedValue tests — Phase 4 of #3768. */
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 

@@ -1,13 +1,5 @@
 // @vitest-environment jsdom
-/**
- * Component tests for FactValueDisplay — the primary fact value renderer
- * on organization and people detail pages.
- *
- * Tests rendering with actual production-like values (Anthropic valuation,
- * OpenAI headcount, etc.) to catch formatting regressions.
- *
- * Phase 4 of Discussion #3768 (Rendering Quality & Test Infrastructure).
- */
+/** FactValueDisplay component tests — Phase 4 of #3768. */
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import type { Fact, Property } from "@longterm-wiki/factbase";
@@ -46,10 +38,8 @@ function makeFact(value: Fact["value"], opts?: Partial<Fact>): Fact {
 }
 
 function makeProperty(unit?: string, display?: Property["display"]): Property {
-  return { id: "test-prop", name: "Test", unit, display } as Property;
+  return { id: "test-prop", name: "Test", dataType: "number", unit, display };
 }
-
-// ── Actual production values ─────────────────────────────────────────
 
 describe("FactValueDisplay", () => {
   describe("monetary values (production data)", () => {
@@ -120,10 +110,16 @@ describe("FactValueDisplay", () => {
   });
 
   describe("other value types", () => {
-    it("renders boolean as Yes/No", () => {
+    it("renders boolean true as Yes", () => {
       const fact = makeFact({ type: "boolean", value: true });
       render(<FactValueDisplay fact={fact} />);
       expect(screen.getByText("Yes")).toBeInTheDocument();
+    });
+
+    it("renders boolean false as No", () => {
+      const fact = makeFact({ type: "boolean", value: false });
+      render(<FactValueDisplay fact={fact} />);
+      expect(screen.getByText("No")).toBeInTheDocument();
     });
 
     it("renders date as formatted month/year", () => {
