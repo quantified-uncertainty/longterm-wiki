@@ -6,6 +6,21 @@ Every session that involves writing or changing code MUST follow this workflow.
 
 Always work on a `claude/short-description` branch. Never commit directly to `main`.
 
+### CI-fix dedup check (when triggered by a CI failure, not a GitHub issue)
+
+Before creating a branch to fix a CI failure, check for existing fix attempts:
+
+```bash
+# Check if someone is already working on this
+gh pr list -R quantified-uncertainty/longterm-wiki --search "head:claude/fix-" --state open --json number,title,headRefName --jq '.[] | "\(.number)\t\(.headRefName)\t\(.title)"'
+```
+
+If an open PR already targets the same failure, do NOT create a competing branch. Instead either:
+- Comment on the existing PR with your findings, or
+- Wait for it to resolve
+
+This prevents the duplicate-work pattern where multiple agents independently race to fix the same trivial CI break, wasting CI runs and creating abandoned PRs (e.g., 7 competing PRs for a single 5-line test fix on 2026-04-03).
+
 ## Step 1: Session Start — BEFORE taking any action
 
 Run `/agent-init` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
