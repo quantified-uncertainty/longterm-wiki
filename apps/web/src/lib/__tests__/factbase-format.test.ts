@@ -217,6 +217,43 @@ describe("formatKBFactValue", () => {
     });
   });
 
+  describe("render audit regression — no raw 10+ digit numbers", () => {
+    it("formats 15B without raw digits (Meta AI infra-investment)", () => {
+      const fact = makeFact("infrastructure-investment", { type: "number", value: 15_000_000_000 });
+      const result = formatKBFactValue(fact, "USD");
+      expect(result).toBe("$15 billion");
+      expect(result).not.toMatch(/\d{10,}/);
+    });
+
+    it("formats 13.5B without raw digits", () => {
+      const fact = makeFact("infrastructure-investment", { type: "number", value: 13_500_000_000 });
+      const result = formatKBFactValue(fact, "USD");
+      expect(result).toBe("$13.5 billion");
+      expect(result).not.toMatch(/\d{10,}/);
+    });
+
+    it("formats 380B without raw digits (Anthropic valuation)", () => {
+      const fact = makeFact("valuation", { type: "number", value: 380_000_000_000 });
+      const result = formatKBFactValue(fact, "USD");
+      expect(result).toBe("$380 billion");
+      expect(result).not.toMatch(/\d{10,}/);
+    });
+
+    it("formats large number without unit and produces no raw digits", () => {
+      const fact = makeFact("parent-revenue", { type: "number", value: 200_970_000_000 });
+      const result = formatKBFactValue(fact);
+      expect(result).not.toMatch(/\d{10,}/);
+      expect(result).toContain("billion");
+    });
+
+    it("formats number with 'users' unit", () => {
+      const fact = makeFact("user-count", { type: "number", value: 1_000_000_000 });
+      const result = formatKBFactValue(fact, "users");
+      expect(result).not.toMatch(/\d{10,}/);
+      expect(result).toContain("billion");
+    });
+  });
+
   describe("existing value types are unaffected", () => {
     it("formats boolean facts", () => {
       const fact = makeFact("some-bool", { type: "boolean", value: true });
