@@ -10,6 +10,7 @@ import {
   firstOrThrow,
   escapeIlike,
   clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import {
   CreateAgentSessionSchema,
@@ -25,6 +26,10 @@ import { parseCostCents, parseDurationMinutes } from "./sessions.js";
 const PageChangesQuery = z.object({
   limit: clampedLimit(2000, 500),
   since: DateStringSchema.optional(),
+});
+
+const ListSessionsQuery = z.object({
+  limit: clampedLimit(200, 50),
 });
 
 const InsightsQuery = z.object({
@@ -199,8 +204,8 @@ const agentSessionsApp = new Hono()
     if (!result) return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);
     return c.json(result);
   })
-  .get("/", async (c) => {
-    const limit = Math.min(Number(c.req.query("limit") || 50), 200);
+  .get("/", zv("query", ListSessionsQuery), async (c) => {
+    const { limit } = c.req.valid("query");
     const db = getDrizzleDb();
     const rows = await db.select().from(agentSessions)
       .orderBy(desc(agentSessions.startedAt)).limit(limit);

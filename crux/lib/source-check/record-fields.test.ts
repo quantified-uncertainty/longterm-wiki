@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { extractEntityId, str, strOrNull, numOrNull, resolveName, isResolvableName } from './record-fields.ts';
+import { extractEntityId, extractEntityDisplayName, str, strOrNull, numOrNull, resolveName, isResolvableName } from './record-fields.ts';
 
 describe('extractEntityId', () => {
   // ── Personnel records ──
@@ -386,5 +386,115 @@ describe('isResolvableName', () => {
 
   it('returns false for empty strings', () => {
     expect(isResolvableName('')).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// extractEntityDisplayName
+// ---------------------------------------------------------------------------
+
+describe('extractEntityDisplayName', () => {
+  describe('personnel', () => {
+    it('returns orgResolvedName as primary display name', () => {
+      const item = { orgResolvedName: 'Anthropic', orgDisplayName: 'Anthropic Inc' };
+      expect(extractEntityDisplayName('personnel', item)).toBe('Anthropic');
+    });
+
+    it('falls back to orgDisplayName when orgResolvedName is absent', () => {
+      const item = { orgDisplayName: 'Open Philanthropy' };
+      expect(extractEntityDisplayName('personnel', item)).toBe('Open Philanthropy');
+    });
+
+    it('returns null when both name fields are absent', () => {
+      expect(extractEntityDisplayName('personnel', { id: 'p-1' })).toBeNull();
+    });
+  });
+
+  describe('division', () => {
+    it('returns parentOrgName as primary display name', () => {
+      const item = { parentOrgName: 'DeepMind', name: 'Safety Team' };
+      expect(extractEntityDisplayName('division', item)).toBe('DeepMind');
+    });
+
+    it('falls back to name when parentOrgName is absent', () => {
+      const item = { name: 'Safety Team' };
+      expect(extractEntityDisplayName('division', item)).toBe('Safety Team');
+    });
+
+    it('returns null when both fields are absent', () => {
+      expect(extractEntityDisplayName('division', {})).toBeNull();
+    });
+  });
+
+  describe('grant', () => {
+    it('returns orgResolvedName', () => {
+      const item = { orgResolvedName: 'Open Philanthropy', orgDisplayName: 'OP' };
+      expect(extractEntityDisplayName('grant', item)).toBe('Open Philanthropy');
+    });
+
+    it('falls back to orgDisplayName', () => {
+      const item = { orgDisplayName: 'Open Philanthropy' };
+      expect(extractEntityDisplayName('grant', item)).toBe('Open Philanthropy');
+    });
+  });
+
+  describe('funding-round', () => {
+    it('returns companyResolvedName', () => {
+      const item = { companyResolvedName: 'Anthropic', companyDisplayName: 'Anthropic Inc' };
+      expect(extractEntityDisplayName('funding-round', item)).toBe('Anthropic');
+    });
+
+    it('falls back to companyDisplayName', () => {
+      const item = { companyDisplayName: 'Anthropic Inc' };
+      expect(extractEntityDisplayName('funding-round', item)).toBe('Anthropic Inc');
+    });
+
+    it('returns null when both are absent', () => {
+      expect(extractEntityDisplayName('funding-round', {})).toBeNull();
+    });
+  });
+
+  describe('investment', () => {
+    it('returns investorResolvedName', () => {
+      const item = { investorResolvedName: 'Sequoia', investorDisplayName: 'Sequoia Capital' };
+      expect(extractEntityDisplayName('investment', item)).toBe('Sequoia');
+    });
+
+    it('falls back to investorDisplayName', () => {
+      const item = { investorDisplayName: 'Sequoia Capital' };
+      expect(extractEntityDisplayName('investment', item)).toBe('Sequoia Capital');
+    });
+  });
+
+  describe('equity-position', () => {
+    it('returns companyResolvedName', () => {
+      const item = { companyResolvedName: 'OpenAI' };
+      expect(extractEntityDisplayName('equity-position', item)).toBe('OpenAI');
+    });
+  });
+
+  describe('funding-program', () => {
+    it('returns orgResolvedName', () => {
+      const item = { orgResolvedName: 'FTX Foundation' };
+      expect(extractEntityDisplayName('funding-program', item)).toBe('FTX Foundation');
+    });
+  });
+
+  describe('policy-stakeholder', () => {
+    it('returns stakeholderResolvedName', () => {
+      const item = { stakeholderResolvedName: 'OpenAI', stakeholderDisplayName: 'OpenAI LLC' };
+      expect(extractEntityDisplayName('policy-stakeholder', item)).toBe('OpenAI');
+    });
+
+    it('falls back to stakeholderDisplayName', () => {
+      const item = { stakeholderDisplayName: 'OpenAI LLC' };
+      expect(extractEntityDisplayName('policy-stakeholder', item)).toBe('OpenAI LLC');
+    });
+  });
+
+  describe('unknown record types', () => {
+    it('returns null for unrecognized record types', () => {
+      expect(extractEntityDisplayName('some-unknown-type', { orgResolvedName: 'foo' })).toBeNull();
+    });
   });
 });
