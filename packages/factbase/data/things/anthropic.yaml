@@ -18,9 +18,9 @@ facts:
   - id: f_i59sRXPSZw
     property: revenue
     value: 1e+9
-    asOf: 2024-12
+    asOf: 2025-01
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
-    notes: "ARR reached ~$1B by end of 2024"
+    notes: "ARR reached ~$1B by start of 2025 (corrected from end of 2024)"
 
   - id: f_pL4wK8vF2j
     property: revenue
@@ -31,10 +31,10 @@ facts:
 
   - id: f_WLpl0xLCEA
     property: revenue
-    value: 4e+9
-    asOf: 2025-07
+    value: 5e+9
+    asOf: 2025-08
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
-    notes: "ARR at time of Series F announcement"
+    notes: "ARR exceeded $5B by August 2025 per source (corrected from $4B)"
 
   - id: f_5KhEeJqXzg
     property: revenue
@@ -188,14 +188,12 @@ facts:
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other sources suggest up to 300"
 
-  # UNVERIFIED ESTIMATE
+  # UNVERIFIED ESTIMATE — range, not point value
   - id: f_0PxEBZyv45
     property: headcount
-    value:
-      - 500
-      - 700
+    value: 600
     asOf: 2024-03
-    notes: "Estimate; no published source for early 2024 specifically. Interpolated between 240 (2023) and 1,035 (Sep 2024)."
+    notes: "Rough mid-point estimate for early 2024. No published source; interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as range [500,700]; simplified to point estimate for consistency."
 
   - id: f_J3yAxRJ05k
     property: headcount
@@ -301,11 +299,11 @@ facts:
     notes: "Menlo Ventures survey; up from 12% two years prior. OpenAI at 50% → 25%"
 
   - id: f_qgj5UBfOAg
-    property: coding-market-share
+    property: enterprise-market-share
     value: 32
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "Enterprise coding market share per Menlo Ventures survey; Anthropic leads in coding use among enterprises"
+    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey (corrected from coding-market-share — source describes overall enterprise usage, not coding-specific)"
 
   # ── Product & Usage ─────────────────────────────────────────────
   - id: f_JoN2Jr8liA

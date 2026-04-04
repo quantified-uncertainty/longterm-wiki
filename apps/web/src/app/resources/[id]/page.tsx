@@ -32,6 +32,13 @@ import {
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { safeHref } from "@/lib/directory-utils";
+import { getFactIdsForResource } from "@/data/resource-fact-links";
+import {
+  getFactBaseFactById,
+  getFactBaseEntity,
+  getFactBaseProperty,
+} from "@/data/factbase";
+import { formatKBFactValue, formatKBDate } from "@/components/wiki/factbase/format";
 
 // Cache for 1 hour — these on-demand pages get heavy bot traffic with 0% cache hits.
 export const revalidate = 3600;
@@ -130,6 +137,25 @@ export default async function ResourcePage({ params }: PageProps) {
   const hasReview = !!resource.review;
   const hasContentSections = hasAbstract || hasSummary || hasKeyPoints || hasReview;
   const hasAuthors = resource.authors && resource.authors.length > 0;
+
+  // Get FactBase facts that cite this resource's URL
+  const citingFactIds = getFactIdsForResource(resource.id);
+  const citingFacts = citingFactIds
+    .map((factId) => {
+      const fact = getFactBaseFactById(factId);
+      if (!fact) return null;
+      const entity = getFactBaseEntity(fact.subjectId);
+      const property = getFactBaseProperty(fact.propertyId);
+      return {
+        factId: fact.id,
+        entityName: entity?.name ?? fact.subjectId,
+        entityId: fact.subjectId,
+        propertyName: property?.name ?? fact.propertyId,
+        formattedValue: formatKBFactValue(fact, property?.unit, property?.display),
+        asOf: formatKBDate(fact.asOf),
+      };
+    })
+    .filter((f): f is NonNullable<typeof f> => f !== null);
 
   // Build citing page info for the table
   const citingPageInfo = citingPages.map((pageId) => {
@@ -596,6 +622,68 @@ export default async function ResourcePage({ params }: PageProps) {
                       ) : (
                         <span className="text-muted-foreground/50">--</span>
                       )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* FactBase facts citing this source */}
+      {citingFacts.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <Database className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            {citingFacts.length} FactBase fact
+            {citingFacts.length !== 1 ? "s" : ""} citing this source
+          </h2>
+          <div className="rounded-lg border border-border overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50">
+                  <th className="text-left px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Entity
+                  </th>
+                  <th className="text-left px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Property
+                  </th>
+                  <th className="text-left px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Value
+                  </th>
+                  <th className="text-right px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    As Of
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {citingFacts.map(({ factId, entityName, entityId, propertyName, formattedValue, asOf }) => (
+                  <tr
+                    key={factId}
+                    className="border-t border-border hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="px-4 py-2">
+                      <Link
+                        href={`/factbase/entity/${entityId}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                      >
+                        {entityName}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 text-muted-foreground">
+                      {propertyName}
+                    </td>
+                    <td className="px-4 py-2">
+                      <Link
+                        href={`/factbase/fact/${factId}`}
+                        className="text-blue-600 dark:text-blue-400 hover:underline font-mono text-xs"
+                      >
+                        {formattedValue}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-2 text-right text-muted-foreground tabular-nums">
+                      {asOf}
                     </td>
                   </tr>
                 ))}

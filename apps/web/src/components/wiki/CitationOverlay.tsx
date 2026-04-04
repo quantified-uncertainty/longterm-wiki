@@ -12,6 +12,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { CitationQuote } from "@/lib/citation-data";
+import { formatDateDeterministic } from "@lib/format";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
 
 interface VerdictConfig {
@@ -93,30 +94,6 @@ function getVerdictConfig(quote: CitationQuote): VerdictConfig | null {
   return null;
 }
 
-const MONTH_ABBR = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
-
-/** Format an ISO date string deterministically (no locale/timezone variance). */
-function formatDate(iso: string): string {
-  try {
-    const parts = iso.split(/[-T]/);
-    const year = parts[0];
-    const month = parts[1] ? parseInt(parts[1], 10) : 0;
-    const day = parts[2] ? parseInt(parts[2], 10) : 0;
-    if (month >= 1 && month <= 12 && day >= 1) {
-      return `${MONTH_ABBR[month - 1]} ${day}, ${year}`;
-    }
-    if (month >= 1 && month <= 12) {
-      return `${MONTH_ABBR[month - 1]} ${year}`;
-    }
-    return year || iso;
-  } catch {
-    return iso;
-  }
-}
-
 /** A single footnote indicator rendered via portal next to the footnote ref link */
 function FootnoteIndicator({ quote, anchor }: { quote: CitationQuote; anchor: HTMLElement }) {
   const config = getVerdictConfig(quote);
@@ -182,7 +159,7 @@ function FootnoteIndicator({ quote, anchor }: { quote: CitationQuote; anchor: HT
             {checkedAt && (
               <span className="text-[11px] text-muted-foreground flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                Checked {formatDate(checkedAt)}
+                Checked {formatDateDeterministic(checkedAt)}
               </span>
             )}
             <SafeExternalLink

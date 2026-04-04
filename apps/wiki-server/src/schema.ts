@@ -603,6 +603,11 @@ export const resources = pgTable(
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
     contentHash: text("content_hash"),
     stableId: text("stable_id").unique(),
+    /** HTTP reachability of the resource URL.
+     *  Values: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.
+     *  Written by resource-ingest and source-fetcher after each fetch attempt.
+     *  UI should use isDeadFetchStatus() to detect broken links.
+     *  Distinct from enrichmentStatus which tracks the LLM pipeline stage. */
     fetchStatus: text("fetch_status"),
     lastFetchedAt: timestamp("last_fetched_at", { withTimezone: true }),
     /** Wayback Machine archive URL for this resource */
@@ -621,7 +626,10 @@ export const resources = pgTable(
     publisherEntityId: text("publisher_entity_id"),
     /** Entity stableIds this resource is about (approach, concept, policy, org entities) */
     relatedEntityIds: jsonb("related_entity_ids").$type<string[]>(),
-    /** Enrichment pipeline status: pending | fetched | classified | enriched | reviewed */
+    /** LLM enrichment pipeline stage: pending | fetched | classified | enriched | reviewed.
+     *  Tracks how far a resource has progressed through classify/enrich/review.
+     *  Written by fetch-all, classify, enrich, enrich-papers, enrich-crossref, resource-enrich.
+     *  Distinct from fetchStatus which tracks HTTP reachability of the URL. */
     enrichmentStatus: text("enrichment_status"),
     /** When enrichment pipeline last ran */
     enrichmentDate: timestamp("enrichment_date", { withTimezone: true }),

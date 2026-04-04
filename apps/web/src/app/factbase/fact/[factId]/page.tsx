@@ -9,6 +9,7 @@ import {
   isFactExpired,
 } from "@/data/factbase";
 import { getEntityHref } from "@/data";
+import { getResourceIdForFact } from "@/data/resource-fact-links";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
@@ -165,6 +166,9 @@ export default async function FactDetailPage({ params }: PageProps) {
     fact.dollarYear
   );
 
+  // Check if this fact's source URL matches a tracked resource
+  const trackedResourceId = getResourceIdForFact(factId);
+
   const entityHref = entity?.wikiId
     ? `/wiki/${entity.wikiId}`
     : getEntityHref(fact.subjectId);
@@ -229,15 +233,25 @@ export default async function FactDetailPage({ params }: PageProps) {
       <KVTable>
         <KVRow label="Source URL">
           {fact.source && isUrl(fact.source) ? (
-            <a
-              href={fact.source}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline font-mono text-xs break-all"
-            >
-              {shortDomain(fact.source)}
-              <span className="text-muted-foreground ml-1">{"\u2197"}</span>
-            </a>
+            <span className="flex flex-col gap-1">
+              <a
+                href={fact.source}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:underline font-mono text-xs break-all"
+              >
+                {shortDomain(fact.source)}
+                <span className="text-muted-foreground ml-1">{"\u2197"}</span>
+              </a>
+              {trackedResourceId && (
+                <Link
+                  href={`/resources/${trackedResourceId}`}
+                  className="text-primary hover:underline text-xs"
+                >
+                  View tracked resource {"\u2192"}
+                </Link>
+              )}
+            </span>
           ) : fact.source ? (
             <span className="font-mono text-xs break-all">{fact.source}</span>
           ) : (

@@ -225,6 +225,7 @@ interface PersonnelRow {
   personId: string;
   organizationId: string;
   role: string;
+  [key: string]: unknown;
 }
 
 interface DivisionRow {
@@ -232,6 +233,7 @@ interface DivisionRow {
   name: string;
   parentOrgId: string;
   status?: string | null;
+  [key: string]: unknown;
 }
 
 // ---------------------------------------------------------------------------
@@ -441,7 +443,7 @@ export async function checkPersonnel(): Promise<VocabIssue[]> {
   }
 
   for (const row of records) {
-    const r = row as unknown as PersonnelRow;
+    const r = row as PersonnelRow;
     checkValue(
       "personnel.roleType",
       r.roleType,
@@ -468,7 +470,7 @@ export async function checkDivisions(): Promise<VocabIssue[]> {
   }
 
   for (const row of records) {
-    const r = row as unknown as DivisionRow;
+    const r = row as DivisionRow;
     checkValue(
       "divisions.divisionType",
       r.divisionType,

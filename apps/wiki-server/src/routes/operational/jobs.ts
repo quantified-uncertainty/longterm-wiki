@@ -70,6 +70,61 @@ function formatRawJobRow(row: Record<string, unknown>) {
   };
 }
 
+type DrizzleDb = ReturnType<typeof getDrizzleDb>;
+
+/** Run the four stats queries in parallel and assemble the summary. */
+async function buildJobStats(db: DrizzleDb, hours: number) {
+  const recentCutoff = sql`NOW() - make_interval(hours => ${hours})`;
+
+  const [byTypeStatus, avgDuration, failureRate, totalResult] = await Promise.all([
+    db.select({ type: jobs.type, status: jobs.status, count: count() })
+      .from(jobs).groupBy(jobs.type, jobs.status),
+    db.select({
+        type: jobs.type,
+        avgMs: sql<number>`avg(extract(epoch from (${jobs.completedAt} - ${jobs.startedAt})) * 1000)`,
+      }).from(jobs).where(
+        and(
+          eq(jobs.status, "completed"),
+          sql`${jobs.startedAt} IS NOT NULL`,
+          sql`${jobs.completedAt} IS NOT NULL`,
+          sql`${jobs.createdAt} >= ${recentCutoff}`
+        )
+      ).groupBy(jobs.type),
+    db.select({
+        type: jobs.type,
+        total: count(),
+        failed: sql<number>`sum(case when ${jobs.status} = 'failed' then 1 else 0 end)`,
+      }).from(jobs).where(
+        and(
+          sql`${jobs.status} IN ('completed', 'failed')`,
+          sql`${jobs.createdAt} >= ${recentCutoff}`
+        )
+      ).groupBy(jobs.type),
+    db.select({ count: count() }).from(jobs)
+      .where(sql`${jobs.createdAt} >= ${recentCutoff}`),
+  ]);
+
+  const typeSummary: Record<
+    string,
+    { byStatus: Record<string, number>; avgDurationMs?: number; failureRate?: number }
+  > = {};
+
+  for (const row of byTypeStatus) {
+    if (!typeSummary[row.type]) typeSummary[row.type] = { byStatus: {} };
+    typeSummary[row.type].byStatus[row.status] = row.count;
+  }
+  for (const row of avgDuration) {
+    if (typeSummary[row.type]) typeSummary[row.type].avgDurationMs = Math.round(Number(row.avgMs));
+  }
+  for (const row of failureRate) {
+    if (typeSummary[row.type] && row.total > 0) {
+      typeSummary[row.type].failureRate = Number(row.failed) / row.total;
+    }
+  }
+
+  return { totalJobs: totalResult[0].count, byType: typeSummary, hours };
+}
+
 const DEDUP_INSERT_SQL = `INSERT INTO "jobs" (type, params, priority, max_retries, dedup_key, parent_job_id, run_after)
  VALUES ($1, $2, $3, $4, $5, $6, $7)
  ON CONFLICT (dedup_key) WHERE dedup_key IS NOT NULL AND status IN ('pending', 'claimed', 'running')
@@ -557,92 +612,37 @@ const jobsApp = new Hono()
     return c.json(formatJob(rows[0]));
   })
 
+  // ---- Shared stats query helper ----
+
   // ---- GET /stats (aggregate counts by type and status) ----
-  // Accepts optional ?hours=N query param (default 48) to time-window failure
-  // rate and avg-duration calculations. Status counts are always all-time.
 
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
-    const hours = Math.max(1, Number(c.req.query("hours")) || 48);
-    const recentCutoff = sql`NOW() - make_interval(hours => ${hours})`;
+    const hours = Math.min(8760, Math.max(1, Number(c.req.query("hours")) || 48));
+    const stats = await buildJobStats(db, hours);
+    return c.json(stats);
+  })
 
-    // Status counts are all-time (for pending/running visibility)
-    const byTypeStatus = await db
-      .select({
-        type: jobs.type,
-        status: jobs.status,
-        count: count(),
-      })
-      .from(jobs)
-      .groupBy(jobs.type, jobs.status);
+  // ---- GET /dashboard (stats + recent failures in one request) ----
 
-    // Compute average duration for recently completed jobs
-    const avgDuration = await db
-      .select({
-        type: jobs.type,
-        avgMs: sql<number>`avg(extract(epoch from (${jobs.completedAt} - ${jobs.startedAt})) * 1000)`,
-      })
-      .from(jobs)
-      .where(
-        and(
-          eq(jobs.status, "completed"),
-          sql`${jobs.startedAt} IS NOT NULL`,
-          sql`${jobs.completedAt} IS NOT NULL`,
-          sql`${jobs.createdAt} >= ${recentCutoff}`
-        )
-      )
-      .groupBy(jobs.type);
+  .get("/dashboard", async (c) => {
+    const db = getDrizzleDb();
+    const hours = Math.min(8760, Math.max(1, Number(c.req.query("hours")) || 48));
+    const failureLimit = Math.min(100, Math.max(1, Number(c.req.query("failureLimit")) || 50));
 
-    // Failure rate per type — only recent jobs so stale history doesn't inflate rates
-    const failureRate = await db
-      .select({
-        type: jobs.type,
-        total: count(),
-        failed: sql<number>`sum(case when ${jobs.status} = 'failed' then 1 else 0 end)`,
-      })
-      .from(jobs)
-      .where(
-        and(
-          sql`${jobs.status} IN ('completed', 'failed')`,
-          sql`${jobs.createdAt} >= ${recentCutoff}`
-        )
-      )
-      .groupBy(jobs.type);
-
-    // Build summary
-    const typeSummary: Record<
-      string,
-      { byStatus: Record<string, number>; avgDurationMs?: number; failureRate?: number }
-    > = {};
-
-    for (const row of byTypeStatus) {
-      if (!typeSummary[row.type]) {
-        typeSummary[row.type] = { byStatus: {} };
-      }
-      typeSummary[row.type].byStatus[row.status] = row.count;
-    }
-
-    for (const row of avgDuration) {
-      if (typeSummary[row.type]) {
-        typeSummary[row.type].avgDurationMs = Math.round(Number(row.avgMs));
-      }
-    }
-
-    for (const row of failureRate) {
-      if (typeSummary[row.type] && row.total > 0) {
-        typeSummary[row.type].failureRate = Number(row.failed) / row.total;
-      }
-    }
-
-    const totalResult = await db
-      .select({ count: count() })
-      .from(jobs)
-      .where(sql`${jobs.createdAt} >= ${recentCutoff}`);
+    const [stats, recentFailures] = await Promise.all([
+      buildJobStats(db, hours),
+      db
+        .select()
+        .from(jobs)
+        .where(eq(jobs.status, "failed"))
+        .orderBy(desc(jobs.createdAt))
+        .limit(failureLimit),
+    ]);
 
     return c.json({
-      totalJobs: totalResult[0].count,
-      byType: typeSummary,
-      hours,
+      stats,
+      recentFailures: recentFailures.map(formatJob),
     });
   })
 
@@ -705,6 +705,61 @@ const jobsApp = new Hono()
       parentJobId: id,
       children: summary,
       total: rows.reduce((sum, r) => sum + r.count, 0),
+    });
+  })
+
+  // ---- GET /failure-patterns (recurring failure detection) ----
+  // Groups recent failed jobs by type + truncated error message to surface
+  // patterns that may need a GitHub issue filed. Used by the groundskeeper
+  // job-failure-triage task.
+  //
+  // Query params:
+  //   ?hours=N       Time window (default 24, max 168)
+  //   ?minCount=N    Minimum failures to include (default 3)
+
+  .get("/failure-patterns", async (c) => {
+    const hours = Math.min(168, Math.max(1, Number(c.req.query("hours")) || 24));
+    const minCount = Math.max(1, Number(c.req.query("minCount")) || 3);
+
+    const pgClient = getDb();
+
+    interface FailurePatternRow {
+      type: string;
+      error_pattern: string;
+      count: number;
+      first_seen: string;
+      last_seen: string;
+      sample_ids: number[];
+    }
+
+    const rows = (await pgClient.unsafe(
+      `SELECT
+         type,
+         SUBSTRING(error FROM 1 FOR 100) AS error_pattern,
+         COUNT(*)::int AS count,
+         MIN(created_at) AS first_seen,
+         MAX(created_at) AS last_seen,
+         (ARRAY_AGG(id ORDER BY created_at DESC))[1:5] AS sample_ids
+       FROM jobs
+       WHERE status = 'failed'
+         AND created_at > NOW() - make_interval(hours => $1)
+       GROUP BY type, SUBSTRING(error FROM 1 FOR 100)
+       HAVING COUNT(*) >= $2
+       ORDER BY count DESC`,
+      [hours, minCount]
+    )) as FailurePatternRow[];
+
+    return c.json({
+      patterns: rows.map((r) => ({
+        type: r.type,
+        errorPattern: r.error_pattern,
+        count: r.count,
+        firstSeen: r.first_seen,
+        lastSeen: r.last_seen,
+        sampleJobIds: r.sample_ids,
+      })),
+      hours,
+      minCount,
     });
   })
 

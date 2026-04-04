@@ -23,8 +23,9 @@ export function SourcesOverviewContent() {
     <div>
       <p className="text-sm text-muted-foreground mb-6 max-w-prose">
         Sources tracks the external resources (papers, articles, reports) and
-        publication venues cited across the wiki. Resources are indexed from
-        PostgreSQL; publications define venue-level credibility ratings.
+        publication venues cited across the wiki. Resources are loaded from a
+        local snapshot (database.json) — no runtime API calls. Publications
+        define venue-level credibility ratings.
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
@@ -55,30 +56,69 @@ export function SourcesOverviewContent() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Link
           href="/resources"
-          className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
+          className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
-          <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
             Resources
           </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
+          <p className="text-sm text-muted-foreground">
             {resources.length.toLocaleString()} external documents (papers,
             articles, reports) indexed from citations across wiki pages.
             Includes metadata, summaries, and credibility ratings.
           </p>
+          <span className="text-xs font-medium text-primary mt-2 inline-block">
+            Browse &rarr;
+          </span>
         </Link>
 
         <Link
           href="/publications"
-          className="group block rounded-xl border border-border/60 bg-card p-6 no-underline transition-all hover:shadow-md hover:border-border"
+          className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
-          <h3 className="text-lg font-bold mb-2 group-hover:text-primary transition-colors">
+          <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
             Publications
           </h3>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            {publications.length} publications with credibility ratings
-            (1-5 scale). Maps domains to venues for automatic resource
+          <p className="text-sm text-muted-foreground">
+            {publications.length} publication venues with credibility ratings
+            (1&ndash;5 scale). Maps domains to venues for automatic resource
             credibility assignment.
           </p>
+          <span className="text-xs font-medium text-primary mt-2 inline-block">
+            Browse &rarr;
+          </span>
+        </Link>
+
+        <Link
+          href="/source-checks"
+          className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
+        >
+          <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
+            Source Checks
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Automated verification of FactBase claims against their cited
+            sources. Shows verdicts (supported, contradicted, unverifiable) and
+            coverage across entities.
+          </p>
+          <span className="text-xs font-medium text-primary mt-2 inline-block">
+            View &rarr;
+          </span>
+        </Link>
+
+        <Link
+          href="/data-sources"
+          className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
+        >
+          <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">
+            Data Sources
+          </h3>
+          <p className="text-sm text-muted-foreground">
+            Overview of the structured data powering the wiki &mdash; entities,
+            resources, publications, and FactBase coverage by entity type.
+          </p>
+          <span className="text-xs font-medium text-primary mt-2 inline-block">
+            View &rarr;
+          </span>
         </Link>
       </div>
     </div>

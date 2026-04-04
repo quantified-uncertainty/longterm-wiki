@@ -18,11 +18,17 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
+import type { SourceCheckVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { PROJECT_ROOT } from '../../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
 import { fetchSource } from '../../lib/search/source-fetcher.ts';
-import { apiRequest } from '../../lib/wiki-server/client.ts';
+import {
+  getVerdictByRecord,
+  storeEvidence,
+  storeVerdict,
+  type VerdictByRecordResult,
+} from '../../lib/wiki-server/verifications.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
 
@@ -48,8 +54,6 @@ interface PolicyEntity {
   stakeholders?: Stakeholder[];
 }
 
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'partial' | 'unverifiable';
-
 interface VerificationResult {
   policyId: string;
   policyTitle: string;
@@ -57,7 +61,7 @@ interface VerificationResult {
   position: string;
   reason?: string;
   sourceUrl: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -103,13 +107,10 @@ const STAKEHOLDER_RECORD_TYPE = 'policy-stakeholder';
 // ---------------------------------------------------------------------------
 
 async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | null> {
-  const result = await apiRequest<{ verdicts: ExistingVerdict[] }>(
-    'GET',
-    `/api/verifications/verdicts/${STAKEHOLDER_RECORD_TYPE}/${encodeURIComponent(recordId)}`
-  );
+  const result = await getVerdictByRecord(STAKEHOLDER_RECORD_TYPE, recordId);
 
   if (result.ok && result.data.verdicts.length > 0) {
-    return result.data.verdicts[0];
+    return result.data.verdicts[0] as unknown as ExistingVerdict;
   }
 
   // 404 = no verdict yet, which is fine
@@ -131,7 +132,7 @@ async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | n
 // ---------------------------------------------------------------------------
 
 interface LlmVerificationResult {
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -198,9 +199,9 @@ If the position matches but the reason is different, use "partial".`;
       notes?: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
 
     const confidence = typeof parsed.confidence === 'number'
@@ -235,7 +236,7 @@ interface PostVerificationBody {
   sourceUrl: string;
   fieldName: string;
   expectedValue: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   checkerModel: string;
@@ -246,14 +247,14 @@ interface PostVerificationBody {
 interface PostVerdictBody {
   recordType: string;
   recordId: string;
-  verdict: VerificationVerdict | 'unchecked';
+  verdict: SourceCheckVerdict | 'unchecked';
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
 }
 
 async function recordVerification(verification: PostVerificationBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/verifications/evidence', verification);
+  const result = await storeEvidence(verification as unknown as Record<string, unknown>);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verification: ${result.message}`);
     return false;
@@ -262,7 +263,7 @@ async function recordVerification(verification: PostVerificationBody): Promise<b
 }
 
 async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/verifications/verdicts', verdict);
+  const result = await storeVerdict(verdict as unknown as Record<string, unknown>);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verdict: ${result.message}`);
     return false;
@@ -350,7 +351,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
         position: item.stakeholder.position,
         reason: item.stakeholder.reason,
         sourceUrl: item.stakeholder.source!,
-        verdict: existingVerdict.verdict as VerificationVerdict,
+        verdict: existingVerdict.verdict as SourceCheckVerdict,
         confidence: existingVerdict.confidence ?? 0,
         extractedEvidence: '',
         notes: 'Already verified — skipped',

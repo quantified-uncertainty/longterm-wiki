@@ -16,6 +16,7 @@
  */
 
 import { forumGraphql, type Forum } from '../forum-api.ts';
+import { lookupAndFetchWayback } from '../wayback.ts';
 
 // ---------------------------------------------------------------------------
 // Strategy Types
@@ -380,130 +381,22 @@ export async function fetchDoiContent(url: string): Promise<StrategyResult | nul
 
 // ---------------------------------------------------------------------------
 // Wayback Machine Content Fetching
+// Uses the shared wayback module (crux/lib/wayback.ts) to avoid duplication.
 // ---------------------------------------------------------------------------
 
 /**
- * Look up a Wayback Machine snapshot URL.
- */
-async function lookupWaybackSnapshot(url: string): Promise<{ archiveUrl: string; timestamp: string } | null> {
-  // Strategy 1: Availability API
-  try {
-    const apiUrl = `https://archive.org/wayback/available?url=${encodeURIComponent(url)}`;
-    const response = await fetch(apiUrl, {
-      headers: { 'User-Agent': 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)' },
-      signal: AbortSignal.timeout(8_000),
-    });
-
-    if (response.ok) {
-      const data = await response.json() as {
-        archived_snapshots?: { closest?: { url: string; timestamp: string; available: boolean } };
-      };
-      const snapshot = data?.archived_snapshots?.closest;
-      if (snapshot?.available && snapshot.url) {
-        return { archiveUrl: snapshot.url, timestamp: snapshot.timestamp };
-      }
-    }
-  } catch {
-    // Fall through to direct URL approach
-  }
-
-  // Strategy 2: Direct Wayback URL — follows redirect to closest snapshot
-  try {
-    const directUrl = `https://web.archive.org/web/2024/${url}`;
-    const response = await fetch(directUrl, {
-      redirect: 'manual',
-      headers: { 'User-Agent': 'LongtermWikiBot/1.0 (+https://www.longtermwiki.com)' },
-      signal: AbortSignal.timeout(10_000),
-    });
-
-    if (response.status === 302 || response.status === 301) {
-      const location = response.headers.get('location');
-      if (location?.includes('web.archive.org/web/')) {
-        const tsMatch = location.match(/\/web\/(\d{14})\//);
-        return { archiveUrl: location, timestamp: tsMatch?.[1] ?? 'unknown' };
-      }
-    }
-    if (response.ok) {
-      return { archiveUrl: directUrl, timestamp: 'unknown' };
-    }
-  } catch {
-    // Both strategies failed
-  }
-
-  return null;
-}
-
-/**
- * Extract text content from a Wayback Machine archived HTML page.
- */
-function extractWaybackText(html: string): { title: string | null; content: string } {
-  // Extract title
-  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  const title = titleMatch
-    ? titleMatch[1].replace(/\s+/g, ' ').trim()
-    : null;
-
-  // Convert HTML to plain text
-  const content = html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    // Remove Wayback Machine toolbar
-    .replace(/<!-- BEGIN WAYBACK TOOLBAR[\s\S]*?END WAYBACK TOOLBAR -->/gi, '')
-    .replace(/<div id="wm-ipp-base"[\s\S]*?<\/div>\s*<\/div>\s*<\/div>/gi, '')
-    .replace(/<\/?(p|div|br|h[1-6]|li|tr|blockquote|section|article)[^>]*>/gi, '\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'")
-    .replace(/&nbsp;/g, ' ')
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-
-  return { title, content };
-}
-
-/**
  * Fetch content from the Wayback Machine for a dead or unreachable URL.
+ * Thin wrapper around the shared wayback module that returns a StrategyResult.
  */
 export async function fetchWaybackContent(url: string): Promise<StrategyResult | null> {
-  const snapshot = await lookupWaybackSnapshot(url);
-  if (!snapshot) return null;
+  const result = await lookupAndFetchWayback(url);
+  if (!result) return null;
 
-  try {
-    const response = await fetch(snapshot.archiveUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)',
-        Accept: 'text/html,application/xhtml+xml,*/*',
-      },
-      redirect: 'follow',
-      signal: AbortSignal.timeout(30_000),
-    });
-
-    if (!response.ok) return null;
-
-    const ct = response.headers.get('content-type') ?? '';
-    if (!ct.includes('text/html') && !ct.includes('application/xhtml')) {
-      return null; // Skip non-HTML (PDFs etc.)
-    }
-
-    const html = await response.text();
-    const { title, content } = extractWaybackText(html);
-
-    if (content.length < 100) return null; // Too little content
-
-    return {
-      title: title ?? '',
-      content: content.slice(0, 100_000),
-      httpStatus: 200,
-      fetchMethod: 'wayback',
-      archiveUrl: snapshot.archiveUrl,
-    };
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[fetch-strategies] Wayback fetch failed for ${url}: ${msg.slice(0, 200)}`);
-    return null;
-  }
+  return {
+    title: result.title ?? '',
+    content: result.content.slice(0, 100_000),
+    httpStatus: 200,
+    fetchMethod: 'wayback',
+    archiveUrl: result.archiveUrl,
+  };
 }

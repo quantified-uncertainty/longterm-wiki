@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { operationsLog } from "../../schema.js";
-import { zv } from "../shared/utils.js";
+import { zv, clampedLimit } from "../shared/utils.js";
 import { z } from "zod";
 
 const CreateOperationSchema = z.object({
@@ -13,11 +13,14 @@ const CreateOperationSchema = z.object({
   metadata: z.record(z.unknown()).optional(),
 });
 
+const ListQuery = z.object({
+  limit: clampedLimit(200, 50),
+});
+
 const operationsLogApp = new Hono()
-  .get("/", async (c) => {
+  .get("/", zv("query", ListQuery), async (c) => {
     const db = getDrizzleDb();
-    const raw = parseInt(c.req.query("limit") ?? "50", 10);
-    const limit = Math.min(Math.max(Number.isNaN(raw) || raw < 1 ? 50 : raw, 1), 200);
+    const { limit } = c.req.valid("query");
 
     const rows = await db
       .select()

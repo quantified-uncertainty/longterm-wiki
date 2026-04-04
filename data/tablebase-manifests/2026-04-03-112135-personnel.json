@@ -1,0 +1,66 @@
+{
+  "table": "personnel",
+  "recordCount": 6,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-03T11:21:35.101Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 6,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "69OQsYhGpN",
+      "personId": "Nu4uVwh0rh",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "Co-Founder",
+      "source": "https://www.crunchbase.com/person/nicolas-dessaigne",
+      "verdict": "none"
+    },
+    {
+      "id": "1MoYeGiyif",
+      "personId": "EiJnoOVXpQ",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "Co-Founder",
+      "source": "https://www.ycombinator.com/companies/algolia",
+      "verdict": "none"
+    },
+    {
+      "id": "Mmxyiissnp",
+      "personId": "0SKV4iSuvK",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "CEO",
+      "source": "https://salestechstar.com/scheduling-appointment-setting/algolia-appoints-stephen-lynch-as-chief-executive-officer/",
+      "verdict": "none"
+    },
+    {
+      "id": "nwibxvpYd5",
+      "personId": "f3aV3b4bNQ",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "CEO",
+      "source": "https://www.crunchbase.com/person/bernadette-nixon",
+      "verdict": "none"
+    },
+    {
+      "id": "5Cm4AL23qu",
+      "personId": "gdEDTLyudn",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "CTO & Chief Architect",
+      "source": "https://www.algolia.com/about/leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "qhavTl2Qc7",
+      "personId": "QP7pkErCFR",
+      "organizationId": "sid_p4zASaR2Tg",
+      "role": "CFO & CIO",
+      "source": "https://www.algolia.com/about/leadership",
+      "verdict": "none"
+    }
+  ]
+}

@@ -28,24 +28,7 @@ import {
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { cn } from "@/lib/utils";
 import { VerdictBadge, VERDICT_STYLES, VERDICT_PRIORITY, getRecordHref, formatCheckerModel } from "@/app/source-checks/source-checks-shared";
-
-// -- Types --
-
-interface VerdictRow {
-  recordType: string;
-  recordId: string;
-  fieldName: string | null;
-  entityId: string | null;
-  verdict: string;
-  confidence: number | null;
-  reasoning: string | null;
-  sourcesChecked: number;
-  needsRecheck: boolean;
-  nextCheckDue: string | null;
-  lastComputedAt: string | null;
-  createdAt: string | null;
-  updatedAt: string | null;
-}
+import type { VerdictRow } from "@/components/shared/verdict-styles";
 
 interface EvidenceRow {
   id: number;
@@ -436,7 +419,20 @@ async function resolveNames(
       const res = await fetch(
         `/api/verification-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
       );
-      if (!res.ok) return;
+      if (!res.ok) {
+        // Try to extract partial results even from error responses
+        const data = await res.json().catch(() => null);
+        if (data?.names) {
+          for (const [id, name] of Object.entries(data.names as Record<string, string>)) {
+            names[id] = name;
+          }
+        }
+        console.warn(
+          `[entity-source-checks] Name resolution returned ${res.status} for ${recordType} (${ids.size} IDs)` +
+          (data?.error ? `: ${data.error}` : "")
+        );
+        return;
+      }
       const data = await res.json();
       if (data.names) {
         for (const [id, name] of Object.entries(data.names as Record<string, string>)) {
@@ -447,6 +443,11 @@ async function resolveNames(
         for (const [id, href] of Object.entries(data.hrefs as Record<string, string>)) {
           hrefs[id] = href;
         }
+      }
+      if (data.partial) {
+        console.warn(
+          `[entity-source-checks] Partial name resolution for ${recordType}: some IDs could not be resolved`
+        );
       }
     } catch (e) {
       // Non-critical: display falls back to raw ID
@@ -565,7 +566,7 @@ function ContradictionsSummary({
                           Checked: {new Date(v.lastComputedAt).toLocaleDateString()}
                         </span>
                       )}
-                      {v.sourcesChecked > 0 && (
+                      {v.sourcesChecked != null && v.sourcesChecked > 0 && (
                         <span>{v.sourcesChecked} source{v.sourcesChecked !== 1 ? "s" : ""}</span>
                       )}
                     </div>

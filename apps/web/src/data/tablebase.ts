@@ -24,6 +24,7 @@ import { loadYaml } from "@lib/yaml";
 import { fetchFromWikiServer, withApiFallback, type WithSource } from "@lib/wiki-server";
 import {
   TypedEntitySchema,
+  GenericEntityPassthroughSchema,
   type TypedEntity,
   type GenericEntity,
   type PersonEntity,
@@ -34,6 +35,7 @@ import {
 } from "./entity-schemas";
 import type { ValidSubcategory } from "./valid-subcategories";
 import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
+import { extractDomain } from "@/lib/resource-types";
 
 // Re-export for consumers
 export type { WithSource };
@@ -109,7 +111,7 @@ export interface RawEntity {
   };
 }
 
-export interface RelatedGraphEntry {
+interface RelatedGraphEntry {
   id: string;
   type: string;
   title: string;
@@ -138,7 +140,7 @@ export interface ChangeEntry {
 }
 
 /** Serialized claim reference data stored in database.json */
-export interface SerializedClaimRef {
+interface SerializedClaimRef {
   claimId: number;
   claimText: string;
   sourceUrl?: string;
@@ -149,7 +151,7 @@ export interface SerializedClaimRef {
 }
 
 /** Serialized citation data stored in database.json */
-export interface SerializedCitation {
+interface SerializedCitation {
   title?: string;
   url?: string;
   note?: string;
@@ -181,6 +183,8 @@ export interface Resource {
   publication_id?: string;
   credibility_override?: number;
   stable_id?: string;
+  /** HTTP reachability: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.
+   *  Distinct from enrichment_status (LLM pipeline stage). */
   fetch_status?: string;
   archive_url?: string;
   author_entity_ids?: string[];
@@ -192,6 +196,8 @@ export interface Resource {
   type_metadata?: Record<string, unknown>;
   publisher_entity_id?: string;
   related_entity_ids?: string[];
+  /** LLM enrichment pipeline stage: pending | fetched | classified | enriched | reviewed.
+   *  Distinct from fetch_status (HTTP reachability). */
   enrichment_status?: string;
   importance_score?: number;
   content_hash?: string;
@@ -284,7 +290,7 @@ export interface LiteratureCategory {
 }
 
 /** Top-level structure of literature.yaml */
-export interface LiteratureData {
+interface LiteratureData {
   categories: LiteratureCategory[];
 }
 
@@ -558,9 +564,8 @@ export function getTypedEntities(): AnyEntity[] {
     if (result.success) {
       entities.push(result.data);
     } else {
-      // Unknown entity types — keep all fields as-is.
-      // Don't re-parse through GenericEntitySchema as Zod would strip extra keys
-      // like content, currentAssessment, ratings, causeEffectGraph.
+      // Unknown entity types — validate base fields via GenericEntityPassthroughSchema,
+      // which preserves extra keys (causeEffectGraph, content, currentAssessment, etc.).
       if (isDev) {
         const id = (raw as Record<string, unknown>).id;
         const type = (raw as Record<string, unknown>).entityType as string;
@@ -568,7 +573,13 @@ export function getTypedEntities(): AnyEntity[] {
           `[entity-validation] ${id} (${type}): ${result.error.issues.map(i => i.message).join(", ")}`
         );
       }
-      entities.push(raw as unknown as GenericEntity);
+      const genericResult = GenericEntityPassthroughSchema.safeParse(raw);
+      if (genericResult.success) {
+        entities.push(genericResult.data as GenericEntity);
+      } else if (isDev) {
+        const id = (raw as Record<string, unknown>).id;
+        console.warn(`[entity-validation] ${id}: failed generic parse too — skipping`);
+      }
     }
   }
 
@@ -619,7 +630,6 @@ let _entityStableIdIndex: Map<string, AnyEntity> | null = null;
 let _resourceIndex: Map<string, Resource> | null = null;
 let _stableIdIndex: Map<string, Resource> | null = null;
 let _publicationIndex: Map<string, Publication> | null = null;
-let _orgIndex: Map<string, Organization> | null = null;
 let _pageIndex: Map<string, Page> | null = null;
 
 function typedEntityIndex() {
@@ -720,14 +730,6 @@ function publicationIndex() {
     );
   }
   return _publicationIndex;
-}
-
-function orgIndex() {
-  if (!_orgIndex) {
-    const db = getTableBase();
-    _orgIndex = new Map((db.organizations || []).map((o) => [o.id, o]));
-  }
-  return _orgIndex;
 }
 
 function pageIndex() {
@@ -838,10 +840,6 @@ export function getPublicationsForPerson(
   return entry?.publications ?? [];
 }
 
-export function getOrganizationById(id: string): Organization | undefined {
-  return orgIndex().get(id);
-}
-
 export function getPageById(id: string): Page | undefined {
   const slug = resolveId(id);
   // Try per-entity bundle first (avoids loading full database for single-page lookups)
@@ -904,7 +902,12 @@ export function getResourceCredibility(
   if (resource.credibility_override !== undefined) return resource.credibility_override;
   if (resource.publication_id) {
     const pub = getPublicationById(resource.publication_id);
-    return pub?.credibility;
+    if (pub?.credibility !== undefined) return pub.credibility;
+  }
+  const domain = extractDomain(resource.url);
+  if (domain) {
+    const domainPub = getPublicationByDomain(domain);
+    if (domainPub?.credibility !== undefined) return domainPub.credibility;
   }
   return undefined;
 }
@@ -913,7 +916,12 @@ export function getResourcePublication(
   resource: Resource
 ): Publication | undefined {
   if (resource.publication_id) {
-    return getPublicationById(resource.publication_id);
+    const pub = getPublicationById(resource.publication_id);
+    if (pub) return pub;
+  }
+  const domain = extractDomain(resource.url);
+  if (domain) {
+    return getPublicationByDomain(domain);
   }
   return undefined;
 }
@@ -952,7 +960,7 @@ export function findPersonByName(name: string): string | undefined {
 // BENCHMARK RESULTS
 // ============================================================================
 
-export interface PGBenchmarkResult {
+interface PGBenchmarkResult {
   benchmarkId: string;
   score: number;
   unit: string | null;
@@ -985,7 +993,7 @@ export function getBenchmarkResultsByModel(modelId: string): PGBenchmarkResult[]
 // RESEARCH AREAS
 // ============================================================================
 
-export interface PGResearchArea {
+interface PGResearchArea {
   id: string;
   wikiId: string | null;
   title: string;
@@ -1042,13 +1050,13 @@ export function getResearchAreasFromPG(
 // Loaded from research-area-details.json (built from wiki-server at build time).
 // ============================================================================
 
-export interface ResearchAreaDetailOrg {
+interface ResearchAreaDetailOrg {
   organizationId: string;
   role: string;
   notes: string | null;
 }
 
-export interface ResearchAreaDetailPaper {
+interface ResearchAreaDetailPaper {
   id: number;
   resourceId: string | null;
   title: string;
@@ -1061,7 +1069,7 @@ export interface ResearchAreaDetailPaper {
   notes: string | null;
 }
 
-export interface ResearchAreaDetailGrant {
+interface ResearchAreaDetailGrant {
   id: string;
   name: string;
   amount: number | null;
@@ -1071,7 +1079,7 @@ export interface ResearchAreaDetailGrant {
   confidence: number | null;
 }
 
-export interface ResearchAreaDetailFundingByOrg {
+interface ResearchAreaDetailFundingByOrg {
   organizationId: string;
   grantCount: number;
   totalAmount: string;
@@ -1120,7 +1128,7 @@ let _recordVerdicts: Record<string, RecordVerdict> | null = null;
 
 /** Get all record verdicts (keyed by "recordType:recordId").
  * Loaded from a separate record-verdicts.json (split from database.json). */
-export function getRecordVerdicts(): Record<string, RecordVerdict> {
+function getRecordVerdicts(): Record<string, RecordVerdict> {
   if (_recordVerdicts) return _recordVerdicts;
   const filePath = path.join(LOCAL_DATA_DIR, "record-verdicts.json");
   try {
@@ -1135,17 +1143,6 @@ export function getRecordVerdicts(): Record<string, RecordVerdict> {
 /** Get the verification verdict for a specific record */
 export function getRecordVerdict(recordType: string, recordId: string): RecordVerdict | null {
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
-}
-
-/** Batch-enrich an array of rows with their source-check verdicts. */
-export function enrichWithVerdicts<T extends { key: string | number }>(
-  rows: T[],
-  recordType: string,
-): (T & { verdict: RecordVerdict | null })[] {
-  return rows.map((r) => ({
-    ...r,
-    verdict: getRecordVerdict(recordType, String(r.key)),
-  }));
 }
 
 /** Get verification stats for a specific record type */

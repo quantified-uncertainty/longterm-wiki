@@ -177,7 +177,7 @@ export default async function OrgProfilePage({
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
-      `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?limit=500&offset=0`,
+      `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?limit=200&offset=0`,
       { revalidate: 3600, timeoutMs: 10_000 },
     ),
   ]);

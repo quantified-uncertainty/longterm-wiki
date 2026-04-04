@@ -1,16 +1,17 @@
-import { permanentRedirect } from "next/navigation";
+import type { Metadata } from "next";
+import { SourcesOverviewContent } from "@/app/sources/sources-overview-content";
 
-export default async function SourcesPage({
-  searchParams,
-}: {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-}) {
-  const params = await searchParams;
-  const tab = typeof params.tab === "string" ? params.tab : undefined;
+export const metadata: Metadata = {
+  title: "Sources",
+  description:
+    "Citation infrastructure for the AI safety wiki — resources, publications, source checks, and data sources.",
+};
 
-  // Preserve known tab values as query params on the target
-  if (tab) {
-    permanentRedirect(`/resources?tab=${encodeURIComponent(tab)}`);
-  }
-  permanentRedirect("/resources");
+export default function SourcesPage() {
+  return (
+    <div>
+      <h1 className="text-3xl font-extrabold tracking-tight mb-4">Sources</h1>
+      <SourcesOverviewContent />
+    </div>
+  );
 }

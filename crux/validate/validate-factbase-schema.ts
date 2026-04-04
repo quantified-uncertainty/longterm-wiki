@@ -25,8 +25,19 @@ const verbose = process.argv.includes("--verbose");
 // factid-format is demoted because legacy human-readable IDs exist from
 // before the f_XXXXXXXXXX format was standardized. Migration tracked in #3329.
 // New violations beyond the baseline are still blocking.
+//
+// ╔══════════════════════════════════════════════════════════════════╗
+// ║  DO NOT BUMP THIS NUMBER.                                      ║
+// ║                                                                ║
+// ║  If you're hitting this baseline, your code is creating facts  ║
+// ║  with human-readable IDs (e.g., f_org_revenue) instead of     ║
+// ║  using generateFactId() from @longterm-wiki/factbase.          ║
+// ║                                                                ║
+// ║  Fix the ID generation, don't raise the baseline.              ║
+// ║  The baseline must only go DOWN (via migration of old IDs).    ║
+// ╚══════════════════════════════════════════════════════════════════╝
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
-const LEGACY_FACTID_FORMAT_BASELINE = 294; // updated 2026-04-01 after FactBase enrichment increased count
+const LEGACY_FACTID_FORMAT_BASELINE = 0; // reset 2026-04-03: all legacy IDs normalized by normalize-ids.ts
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {
@@ -89,8 +100,13 @@ async function main(): Promise<void> {
     join(PROJECT_ROOT, "packages/factbase/src/validate.ts")
   );
 
+  const { buildTableBaseEntityMap } = await import(
+    join(PROJECT_ROOT, "crux/lib/factbase-loader.ts")
+  );
+
   const dataDir = join(PROJECT_ROOT, "packages/factbase/data");
-  const { graph } = await loadKB(dataDir);
+  const entities = buildTableBaseEntityMap();
+  const { graph } = await loadKB(dataDir, { entities });
   const results: ValidationResult[] = validate(graph);
 
   // Separate blocking errors from demoted/warning-level issues
@@ -124,8 +140,30 @@ async function main(): Promise<void> {
   const newFactidFormatErrors = Math.max(0, factidFormatDemoted.length - LEGACY_FACTID_FORMAT_BASELINE);
   if (newFactidFormatErrors > 0) {
     console.error(
-      `\n${newFactidFormatErrors} new factid-format violation(s) beyond the legacy baseline of ${LEGACY_FACTID_FORMAT_BASELINE}`
+      `\n╔══════════════════════════════════════════════════════════════════╗`
     );
+    console.error(
+      `║  ${newFactidFormatErrors} NEW fact(s) with human-readable IDs (above baseline of ${LEGACY_FACTID_FORMAT_BASELINE})  ║`
+    );
+    console.error(
+      `║                                                                ║`
+    );
+    console.error(
+      `║  DO NOT bump the baseline. Fix the IDs instead:               ║`
+    );
+    console.error(
+      `║  Use generateFactId() from @longterm-wiki/factbase            ║`
+    );
+    console.error(
+      `║  or 'pnpm crux fb fix-ids' to migrate existing bad IDs.      ║`
+    );
+    console.error(
+      `╚══════════════════════════════════════════════════════════════════╝`
+    );
+    // Show the offending facts so agents know exactly what to fix
+    for (const e of factidFormatDemoted.slice(-newFactidFormatErrors)) {
+      console.error(`  → ${e.message}`);
+    }
   }
 
   if (blockingErrors.length > 0 || newFactidFormatErrors > 0) {

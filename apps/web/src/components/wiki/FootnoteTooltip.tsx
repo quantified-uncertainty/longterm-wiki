@@ -4,27 +4,13 @@ import React from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { ExternalLink, Clock } from "lucide-react";
 import { cn } from "@lib/utils";
+import { formatDateDeterministic } from "@lib/format";
 import { isSafeUrl } from "@lib/url-utils";
 import { SafeExternalLink } from "@components/ui/safe-external-link";
 import { useReferenceData } from "./ReferenceContext";
 import { VerdictBadge } from "./VerdictBadge";
 import { getDomain } from "./resource-utils";
 import type { RefMapEntry } from "./ReferenceContext";
-
-/**
- * Format an ISO date string for compact display.
- */
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  } catch {
-    return iso;
-  }
-}
 
 /** Check if accuracy-issues text just restates the verdict label */
 function isRedundantWithVerdict(
@@ -105,7 +91,7 @@ function ClaimContent({ entry }: { entry: RefMapEntry }) {
         {checkedAt && (
           <span className="text-[11px] text-muted-foreground flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            Checked {formatDate(checkedAt)}
+            Checked {formatDateDeterministic(checkedAt)}
           </span>
         )}
         <span className="flex-1" />

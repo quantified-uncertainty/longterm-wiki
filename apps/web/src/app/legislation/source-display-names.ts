@@ -51,7 +51,7 @@ const DOMAIN_DISPLAY_NAMES: Record<string, string> = {
   "calchamber.com": "CalChamber",
 
   // ── Think tanks & research ──
-  "cfr.org": "Council on Foreign Relations",
+  // cfr.org now in publications.yaml
   "cigionline.org": "CIGI",
   "rstreet.org": "R Street Institute",
   "montrealethics.ai": "Montreal AI Ethics Institute",
@@ -63,14 +63,12 @@ const DOMAIN_DISPLAY_NAMES: Record<string, string> = {
   "digichina.stanford.edu": "Stanford DigiChina",
 
   // ── News & media ──
+  // fastcompany.com, politico.com, venturebeat.com now in publications.yaml
   "euronews.com": "Euronews",
-  "fastcompany.com": "Fast Company",
   "sfstandard.com": "San Francisco Standard",
   "calmatters.org": "CalMatters",
   "coloradosun.com": "Colorado Sun",
-  "politico.com": "Politico",
   "fedscoop.com": "FedScoop",
-  "venturebeat.com": "VentureBeat",
   "biometricupdate.com": "Biometric Update",
   "techpolicy.press": "Tech Policy Press",
   "transformernews.ai": "Transformer",

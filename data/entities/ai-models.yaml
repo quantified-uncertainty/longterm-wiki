@@ -551,7 +551,7 @@
   inputPrice: 15
   outputPrice: 75
   contextWindow: 200000
-  safetyLevel: ASL-2
+  safetyLevel: ASL-3
   openWeight: false
   modality:
     - text
@@ -609,7 +609,7 @@
   inputPrice: 15
   outputPrice: 75
   contextWindow: 200000
-  safetyLevel: ASL-2
+  safetyLevel: ASL-3
   openWeight: false
   modality:
     - text
@@ -650,7 +650,7 @@
   inputPrice: 3
   outputPrice: 15
   contextWindow: 200000
-  safetyLevel: ASL-2
+  safetyLevel: ASL-3
   openWeight: false
   modality:
     - text
@@ -742,7 +742,7 @@
   inputPrice: 5
   outputPrice: 25
   contextWindow: 200000
-  safetyLevel: ASL-2
+  safetyLevel: ASL-3
   openWeight: false
   modality:
     - text

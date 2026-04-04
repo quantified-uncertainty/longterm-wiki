@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 
@@ -19,13 +20,13 @@ const BLUESKY_PUBLIC_API = "https://public.api.bsky.app/xrpc";
 // ---- Query schemas ----
 
 const AccountsQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   tag: z.string().optional(),
 });
 
 const PostsQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   accountDid: z.string().optional(),
   dateFrom: z.string().datetime({ message: "dateFrom must be an ISO-8601 datetime string" }).optional(),

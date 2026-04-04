@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { zv, escapeIlike } from "../shared/utils.js";
+import { zv, escapeIlike, clampedLimit } from "../shared/utils.js";
 import { parseSort, TRIGRAM_FALLBACK_THRESHOLD } from "../shared/query-helpers.js";
 import {
   buildPrefixTsquery,
@@ -25,7 +25,7 @@ const SORT_ALLOWED = [
 ] as const;
 
 const PeopleQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
   q: z.string().max(200).optional(),
   sort: z.string().max(50).optional(),

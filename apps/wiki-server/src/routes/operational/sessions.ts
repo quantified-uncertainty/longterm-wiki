@@ -4,7 +4,15 @@ import { eq, count, sql, desc, inArray, gte, like } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger as rootLogger } from "../../logger.js";
 import { sessions, sessionPages, wikiPages } from "../../schema.js";
-import { parseJsonBody, validationError, invalidJsonError, firstOrThrow, paginationQuery, dbError } from "../shared/utils.js";
+import {
+  parseJsonBody,
+  validationError,
+  invalidJsonError,
+  firstOrThrow,
+  paginationQuery,
+  dbError,
+  clampedLimit,
+} from "../shared/utils.js";
 import {
   CreateSessionSchema as SharedCreateSessionSchema,
   CreateSessionBatchSchema,
@@ -76,7 +84,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 const PageChangesQuery = z.object({
   /** Maximum number of sessions to return. Defaults to 500. */
-  limit: z.coerce.number().int().min(1).max(2000).default(500),
+  limit: clampedLimit(2000, 500),
   /** Only include sessions on or after this date (YYYY-MM-DD). */
   since: DateStringSchema.optional(),
 });

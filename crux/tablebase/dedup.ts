@@ -5,95 +5,47 @@
  * Queries the wiki-server for current records and filters out duplicates.
  */
 
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getPersonnelByEntity } from '../lib/wiki-server/personnel.ts';
+import { getFundingRoundsByEntity } from '../lib/wiki-server/funding-rounds.ts';
+import { getInvestmentsByEntity } from '../lib/wiki-server/investments.ts';
+import { getBenchmarkResultsByModel, type BenchmarkResultEntry } from '../lib/wiki-server/benchmark-results.ts';
+import { getFundingProgramsByOrg } from '../lib/wiki-server/funding-programs.ts';
+import { getGrantsByEntity } from '../lib/wiki-server/grants.ts';
 
-interface PersonnelRecord {
-  personId: string;
-  organizationId: string;
-  role: string;
-  [key: string]: unknown;
-}
 
-interface FundingRoundRecord {
-  companyId: string;
-  name: string;
-  [key: string]: unknown;
-}
 
-interface InvestmentRecord {
-  companyId: string;
-  investorId: string;
-  roundName?: string;
-  [key: string]: unknown;
-}
-
-interface BenchmarkResultRecord {
-  benchmarkId: string;
-  modelId: string;
-  [key: string]: unknown;
-}
-
-interface FundingProgramRecord {
-  orgId: string;
-  name: string;
-  [key: string]: unknown;
-}
-
-interface GrantRecord {
-  id: string;
-  granteeId?: string | null;
-  [key: string]: unknown;
-}
 
 // ---------------------------------------------------------------------------
 // Fetch existing records for an entity
 // ---------------------------------------------------------------------------
 
-async function fetchExistingPersonnel(entityId: string): Promise<PersonnelRecord[]> {
-  const result = await apiRequest<{ personnel: PersonnelRecord[] }>(
-    'GET',
-    `/api/personnel/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
+async function fetchExistingPersonnel(entityId: string) {
+  const result = await getPersonnelByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.personnel : [];
 }
 
-async function fetchExistingFundingRounds(entityId: string): Promise<FundingRoundRecord[]> {
-  const result = await apiRequest<{ fundingRounds: FundingRoundRecord[] }>(
-    'GET',
-    `/api/funding-rounds/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
+async function fetchExistingFundingRounds(entityId: string) {
+  const result = await getFundingRoundsByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.fundingRounds : [];
 }
 
-async function fetchExistingInvestments(entityId: string): Promise<InvestmentRecord[]> {
-  const result = await apiRequest<{ investments: InvestmentRecord[] }>(
-    'GET',
-    `/api/investments/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
+async function fetchExistingInvestments(entityId: string) {
+  const result = await getInvestmentsByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.investments : [];
 }
 
-async function fetchExistingBenchmarkResults(modelId: string): Promise<BenchmarkResultRecord[]> {
-  const result = await apiRequest<{ benchmarkResults: BenchmarkResultRecord[] }>(
-    'GET',
-    `/api/benchmark-results/by-model/${encodeURIComponent(modelId)}?limit=200`,
-  );
+async function fetchExistingBenchmarkResults(modelId: string): Promise<BenchmarkResultEntry[]> {
+  const result = await getBenchmarkResultsByModel(modelId, { limit: 200 });
   return result.ok ? result.data.benchmarkResults : [];
 }
 
-async function fetchExistingFundingPrograms(orgId: string): Promise<FundingProgramRecord[]> {
-  const result = await apiRequest<{ fundingPrograms: FundingProgramRecord[] }>(
-    'GET',
-    `/api/funding-programs/by-org/${encodeURIComponent(orgId)}?limit=500`,
-  );
+async function fetchExistingFundingPrograms(orgId: string) {
+  const result = await getFundingProgramsByOrg(orgId, { limit: 500 });
   return result.ok ? result.data.fundingPrograms : [];
 }
 
-async function fetchExistingGrantsForOrg(entityId: string): Promise<GrantRecord[]> {
-  const result = await apiRequest<{ grants: GrantRecord[] }>(
-    'GET',
-    `/api/grants/by-entity/${encodeURIComponent(entityId)}?limit=200`,
-  );
+async function fetchExistingGrantsForOrg(entityId: string) {
+  const result = await getGrantsByEntity(entityId, { limit: 200 });
   return result.ok ? result.data.grants : [];
 }
 
@@ -176,7 +128,7 @@ export async function dedupFundingPrograms(
 }
 
 /** Get grants for an org that are missing granteeId */
-export async function getUnlinkedGrants(entityId: string): Promise<GrantRecord[]> {
+export async function getUnlinkedGrants(entityId: string) {
   const grants = await fetchExistingGrantsForOrg(entityId);
   return grants.filter(g => !g.granteeId);
 }

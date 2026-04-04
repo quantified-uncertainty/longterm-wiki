@@ -273,6 +273,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // --- citation_quotes: SELECT WHERE (no ORDER BY, no COUNT, no GROUP BY) ---
   // Handles health endpoint (with or without LIMIT). First param is always pageId.
   if (q.includes("citation_quotes") && q.includes("where") && !q.includes("count(*)") && !q.includes("group by") && !q.includes("order by")) {
+    // Dual-write pre-read: SELECT claim_text, url ... WHERE page_id = ? AND footnote = ? LIMIT 1
+    if (params.length === 3 && q.includes("limit")) {
+      const intId = params[0] as number;
+      const footnote = params[1] as number;
+      const found = Array.from(quotesStore.values()).find(
+        (r) => r.pageId === intId && r.footnote === footnote
+      );
+      return found ? [quoteToSqlRow(found)] : [];
+    }
     // Health query: params[0] = pageId, optionally params[1] = limit value
     // Single-quote query: params[0] = pageId, params[1] = footnote (handled below if 2 non-limit params)
     if (params.length === 1 || (params.length === 2 && q.includes("limit"))) {
@@ -296,7 +305,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return found ? [quoteToSqlRow(found)] : [];
   }
 
-  // --- citation_quotes: SELECT * ORDER BY ... LIMIT (paginated all) ---
+  // --- citation_quotes: SELECT ... LEFT JOIN wiki_pages ORDER BY ... LIMIT (paginated all with slug) ---
   if (q.includes("citation_quotes") && q.includes("order by") && q.includes("limit") && !q.includes("where") && !q.includes("count(*)") && !q.includes("group by")) {
     const limit = (params[0] as number) || 100;
     const offset = (params[1] as number) || 0;
@@ -304,7 +313,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const pc = (a.pageId as number) - (b.pageId as number);
       return pc !== 0 ? pc : (a.footnote as number) - (b.footnote as number);
     });
-    return all.slice(offset, offset + limit).map(quoteToSqlRow);
+    return all.slice(offset, offset + limit).map((r) => ({
+      ...quoteToSqlRow(r),
+      // Include slug from wiki_pages join (used by build-data bundling)
+      slug: slugFromIntId(r.pageId as number),
+    }));
   }
 
   // --- citation_quotes: Accuracy-dashboard summary (count + count(case when accuracy_verdict) without group by) ---
@@ -660,7 +673,26 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && !q.includes("count(*)") && !q.includes("as id")) {
     return params
       .filter((p) => String(p) !== "no-entity-id")
-      .map((p) => ({ id: getIntIdForSlug(String(p)), slug: p }));
+      .map((p) => ({ id: getIntIdForSlug(String(p)), slug: p, title: `Page: ${p}` }));
+  }
+
+  // --- entities: SELECT WHERE id (dual-write entity lookup #3671) ---
+  if (q.includes('"entities"') && q.includes("where") && !q.includes("count(*)")) {
+    return [];
+  }
+
+  // --- source_check_evidence: UPDATE/INSERT (dual-write #3671) ---
+  if (q.includes("source_check_evidence")) {
+    if (q.includes("update")) return [];
+    if (q.includes("insert")) return [{ id: 9999 }];
+    return [];
+  }
+
+  // --- source_check_verdicts: UPDATE/INSERT (dual-write #3671) ---
+  if (q.includes("source_check_verdicts")) {
+    if (q.includes("update")) return [];
+    if (q.includes("insert")) return [{ record_id: "mock" }];
+    return [];
   }
 
   // --- entity_ids fallbacks (for health check count) ---
@@ -807,7 +839,7 @@ describe("Citation Server API", () => {
   // ---- Get All Quotes (paginated) ----
 
   describe("GET /api/citations/quotes/all", () => {
-    it("returns paginated quotes", async () => {
+    it("returns paginated quotes with pageSlug", async () => {
       for (let i = 1; i <= 5; i++) {
         await upsertQuote(app, "page-x", i);
       }
@@ -819,6 +851,8 @@ describe("Citation Server API", () => {
       expect(body.total).toBe(5);
       expect(body.limit).toBe(3);
       expect(body.offset).toBe(0);
+      // Each quote should include the page slug for build-time bundling
+      expect(body.quotes[0].pageSlug).toBe("page-x");
     });
   });
 
@@ -888,6 +922,31 @@ describe("Citation Server API", () => {
         score: 0.5,
       });
       expect(res.status).toBe(400);
+    });
+
+    it("dual-writes to source-check tables (#3671)", async () => {
+      await upsertQuote(app, "dual-write-page", 1, "Claim about AI safety");
+
+      const res = await postJson(app, "/api/citations/quotes/mark-accuracy", {
+        pageId: "dual-write-page",
+        footnote: 1,
+        verdict: "inaccurate",
+        score: 0.3,
+        issues: "The source contradicts this claim",
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.updated).toBe(true);
+      expect(body.verdict).toBe("inaccurate");
+
+      // Wait briefly for the fire-and-forget dual-write to complete
+      await new Promise((r) => setTimeout(r, 50));
+
+      // The citation_quotes row should have the verdict set
+      const key = "dual-write-page:1";
+      const row = quotesStore.get(key);
+      expect(row).toBeDefined();
+      expect(row!.accuracyVerdict).toBe("inaccurate");
     });
   });
 

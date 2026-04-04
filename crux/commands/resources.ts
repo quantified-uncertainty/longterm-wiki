@@ -162,6 +162,17 @@ commands['discover-forums'] = discoverForumsCommand;
 commands['enrich-rand-dates'] = enrichRandDatesCommand;
 commands['fix'] = fixResourcesCommand;
 
+// map-publications: match resource domains to known publications
+commands['map-publications'] = async function (_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const { mapPublications } = await import('./resources/map-publications.ts');
+  await mapPublications({
+    apply: !!options.apply,
+    top: options.top !== undefined ? Number(options.top) : undefined,
+    verbose: !!options.verbose,
+  });
+  return { output: '', exitCode: 0 };
+};
+
 // Convenience aliases
 commands['enrich-free'] = async (args, options) => {
   console.log('Running all free enrichment commands...\n');
@@ -194,6 +205,9 @@ ${commandList}
 
 Discovery:
   discover-forums   Bulk import posts from LW/EAF/AF (free GraphQL API)
+
+Publication Mapping:
+  map-publications  Match resource domains to publications.yaml (--apply --top=N)
 
 Enrichment:
   enrich-papers     Enrich papers via Semantic Scholar API (→ resource_papers)

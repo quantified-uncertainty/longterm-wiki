@@ -1,46 +1,46 @@
 entity: sid_uW7R22grHt
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: f_asml_found
+  - id: jiP0rcxKLw
     property: founded-date
     value: "1984-04"
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "Founded as a joint venture between ASM International and Philips"
 
-  - id: f_asml_hq
+  - id: TqYs0oI52Q
     property: headquarters
     value: "Veldhoven, Netherlands"
     source: https://en.wikipedia.org/wiki/ASML_Holding
 
-  - id: f_asml_country
+  - id: CSwdDcqyVg
     property: country
     value: Netherlands
     source: https://en.wikipedia.org/wiki/ASML_Holding
 
-  - id: f_asml_ceo
+  - id: YK7V22dGsw
     property: ceo
     value: Christophe Fouquet
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "CEO since April 2024, succeeding Peter Wennink"
 
-  - id: f_asml_legal
+  - id: wxPGcKsA9w
     property: legal-structure
     value: "Public company (Euronext: ASML, NASDAQ: ASML)"
     source: https://en.wikipedia.org/wiki/ASML_Holding
 
-  - id: f_asml_website
+  - id: VKU4i4Q8Zg
     property: website
     value: https://www.asml.com
     source: https://en.wikipedia.org/wiki/ASML_Holding
 
-  - id: f_asml_wiki
+  - id: dpNbDYBVDg
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/ASML_Holding
     source: https://en.wikipedia.org/wiki/ASML_Holding
 
   # ── Description ─────────────────────────────────────────────────
-  - id: f_asml_desc
+  - id: N0ffcZdKTg
     property: description
     value: >-
       Sole global supplier of extreme ultraviolet (EUV) lithography machines required
@@ -65,7 +65,7 @@ facts:
     source: https://www.asml.com/en/investors/annual-report/2023
     notes: "42,416 FTE at end of 2023; 8.5% increase from 2022"
 
-  - id: f_asml_hc_2024
+  - id: rOGH0RP1LA
     property: headcount
     value: 44027
     asOf: 2024-12
@@ -73,14 +73,14 @@ facts:
     notes: "44,027 employees worldwide at end of 2024; 3.8% increase from 2023"
 
   # ── Revenue ─────────────────────────────────────────────────────
-  - id: f_asml_rev_2023
+  - id: PlCjUMuN9Q
     property: revenue
     value: 2.98e+10
     asOf: 2023-12
     source: https://www.asml.com/en/investors/annual-report
     notes: "2023 annual revenue EUR 27.6B, converted at ~1.08 EUR/USD = ~$29.8B"
 
-  - id: f_asml_rev_2024
+  - id: 9IUTGDrY2w
     property: revenue
     value: 3.06e+10
     asOf: 2024-12
@@ -95,7 +95,7 @@ facts:
     notes: "2025 full-year revenue EUR 32.7B, converted at ~1.08 EUR/USD = ~$35.3B"
 
   # ── EUV monopoly ────────────────────────────────────────────────
-  - id: f_asml_euv_share
+  - id: QmCFJ3OVlg
     property: euv-market-share
     value: 100
     unit: percent
@@ -103,7 +103,7 @@ facts:
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "ASML is the sole supplier of EUV lithography machines globally; no competitor"
 
-  - id: f_asml_euv_price
+  - id: Knf5yexBLg
     property: euv-system-price
     value: 380000000
     unit: USD
@@ -112,7 +112,7 @@ facts:
     notes: "High-NA EUV systems cost approximately $380M each; standard EUV ~$150-200M"
 
   # ── Market cap ──────────────────────────────────────────────────
-  - id: f_asml_mcap_2026
+  - id: pbeDF42ubw
     property: market-cap
     value: 4.91e+11
     asOf: 2026-03
@@ -120,14 +120,14 @@ facts:
     notes: "Market cap ~$491B as of March 30, 2026"
 
   # ── Export control events ───────────────────────────────────────
-  - id: f_asml_export_2023
+  - id: b26ZkHWgjw
     property: key-event
     value: "Dutch government implemented export restrictions on ASML DUV equipment to China, aligned with U.S. policy"
     asOf: 2023-09
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "ASML had already been restricted from selling EUV systems to China since 2019"
 
-  - id: f_asml_export_2024
+  - id: YoezmaJJoQ
     property: key-event
     value: "Additional Dutch export controls expanded to cover maintenance and servicing of existing ASML machines in China"
     asOf: 2024-01

@@ -89,6 +89,11 @@ export function FundingProgramsListTable({
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
 
+  const showDeadlineColumn = useMemo(() => {
+    const withDeadline = rows.filter((r) => r.deadline != null).length;
+    return rows.length > 0 && withDeadline / rows.length >= 0.1;
+  }, [rows]);
+
   const statuses = useMemo(() => {
     const set = new Set<string>();
     for (const r of rows) {
@@ -325,14 +330,16 @@ export function FundingProgramsListTable({
                 onSort={handleSort}
                 className="text-right"
               />
-              <SortHeader
-                label="Deadline"
-                sortKey="deadline"
-                currentSort={sortKey}
-                currentDir={sortDir}
-                onSort={handleSort}
-                className="text-center"
-              />
+              {showDeadlineColumn && (
+                <SortHeader
+                  label="Deadline"
+                  sortKey="deadline"
+                  currentSort={sortKey}
+                  currentDir={sortDir}
+                  onSort={handleSort}
+                  className="text-center"
+                />
+              )}
               <SortHeader
                 label="Status"
                 sortKey="status"
@@ -352,7 +359,10 @@ export function FundingProgramsListTable({
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <span className="flex items-center gap-1.5">
-                    <RecordVerificationDot verdict={row.verdict?.verdict} />
+                    <RecordVerificationDot
+                      verdict={row.verdict?.verdict}
+                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    />
                     <Link
                       href={`/funding-programs/${row.id}`}
                       className="font-medium text-foreground hover:text-primary transition-colors"

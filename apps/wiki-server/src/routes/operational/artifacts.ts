@@ -10,6 +10,7 @@ import {
   invalidJsonError,
   notFoundError,
   paginationQuery,
+  clampedLimit,
 } from "../shared/utils.js";
 import { resolvePageIntId } from "../shared/page-id-helpers.js";
 
@@ -21,7 +22,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE, defaultLimit:
 
 const ByPageQuery = z.object({
   page_id: z.string().min(1).max(200),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(10),
+  limit: clampedLimit(MAX_PAGE_SIZE, 10),
 });
 
 // ---- Helpers ----

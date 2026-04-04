@@ -173,7 +173,8 @@ function deduplicateDivisions(divisions: KBRecordEntry[]): {
     const mapKey = `${d.ownerEntityId}::${name}`;
     const existing = byOwnerAndName.get(mapKey);
     if (!existing) {
-      byOwnerAndName.set(mapKey, d);
+      // Clone to avoid mutating the shared cache from getAllKBRecords()
+      byOwnerAndName.set(mapKey, { ...d, fields: { ...d.fields } });
       altKeys.set(mapKey, new Set([d.key]));
     } else {
       altKeys.get(mapKey)!.add(d.key);
@@ -238,21 +239,24 @@ export function findDivision(orgSlug: string, divId: string): KBRecordEntry | un
   });
   if (!match) return undefined;
 
-  // If this division has duplicates, merge fields from all copies into the match
-  const name = (match.fields.name as string) ?? match.key;
+  // Clone to avoid mutating the shared cache from getAllKBRecords()
+  const result: KBRecordEntry = { ...match, fields: { ...match.fields } };
+
+  // If this division has duplicates, merge fields from all copies
+  const name = (result.fields.name as string) ?? result.key;
   for (const d of allDivisions) {
-    if (d.key === match.key) continue;
-    if (d.ownerEntityId !== match.ownerEntityId) continue;
+    if (d.key === result.key) continue;
+    if (d.ownerEntityId !== result.ownerEntityId) continue;
     const dName = (d.fields.name as string) ?? d.key;
     if (dName !== name) continue;
     // Merge missing fields from the duplicate
     for (const field of ["lead", "status", "startDate", "endDate", "slug", "website", "source", "notes"]) {
-      if (!match.fields[field] && d.fields[field]) {
-        match.fields[field] = d.fields[field];
+      if (!result.fields[field] && d.fields[field]) {
+        result.fields[field] = d.fields[field];
       }
     }
   }
-  return match;
+  return result;
 }
 
 /** Legacy: find by old-style slug (key, fields.slug, or name-derived slug). Used for redirects. */
@@ -341,6 +345,14 @@ export const PROGRAM_TYPE_COLORS: Record<string, string> = {
 
 // ── Main data loader ─────────────────────────────────────────────────
 
+export interface SiblingDivision {
+  key: string;
+  name: string;
+  divisionType: string;
+  status: string | null;
+  href: string | null;
+}
+
 export interface DivisionPageData {
   division: ParsedDivision;
   parent: { name: string; href: string | null };
@@ -351,6 +363,7 @@ export interface DivisionPageData {
   divisionPrograms: ParsedFundingProgram[];
   grants: ParsedDivisionGrant[];
   recipients: DivisionRecipient[];
+  siblingDivisions: SiblingDivision[];
 }
 
 export function loadDivisionPageData(record: import("@/data/factbase").KBRecordEntry): DivisionPageData {
@@ -448,6 +461,27 @@ export function loadDivisionPageData(record: import("@/data/factbase").KBRecordE
   const recipients = [...recipientMap.values()]
     .sort((a, b) => b.totalAmount - a.totalAmount);
 
+  // Find sibling divisions (other divisions in the same org, excluding current)
+  const allDivisions = getAllKBRecords("divisions");
+  const currentName = division.name;
+  const seenNames = new Set<string>([currentName]);
+  const siblingDivisions: SiblingDivision[] = [];
+  for (const d of allDivisions) {
+    if (d.ownerEntityId !== division.ownerEntityId) continue;
+    const name = (d.fields.name as string) ?? d.key;
+    if (seenNames.has(name)) continue;
+    seenNames.add(name);
+    const parsed = parseDivision(d);
+    siblingDivisions.push({
+      key: d.key,
+      name: parsed.name,
+      divisionType: parsed.divisionType,
+      status: parsed.status,
+      href: getDivisionHref(parsed),
+    });
+  }
+  siblingDivisions.sort((a, b) => a.name.localeCompare(b.name));
+
   return {
     division,
     parent,
@@ -458,5 +492,6 @@ export function loadDivisionPageData(record: import("@/data/factbase").KBRecordE
     divisionPrograms,
     grants,
     recipients,
+    siblingDivisions,
   };
 }

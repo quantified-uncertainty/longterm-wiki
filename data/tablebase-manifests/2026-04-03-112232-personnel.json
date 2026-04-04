@@ -1,0 +1,42 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-03T11:22:32.959Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "8xzr58mrnN",
+      "personId": "nGlZcaBwP0",
+      "organizationId": "sid_UyAH46sPFN",
+      "role": "Founder & Executive Director",
+      "source": "https://www.ajl.org/about",
+      "verdict": "none"
+    },
+    {
+      "id": "6R4FxSSvXm",
+      "personId": "SWrzXB1AJL",
+      "organizationId": "sid_UyAH46sPFN",
+      "role": "Chief of Staff",
+      "source": "https://www.ajl.org/about",
+      "verdict": "none"
+    },
+    {
+      "id": "bu9tX68MpR",
+      "personId": "Tu0RDJWCVe",
+      "organizationId": "sid_UyAH46sPFN",
+      "role": "Research Director",
+      "source": "https://www.ajl.org/about",
+      "verdict": "none"
+    }
+  ]
+}

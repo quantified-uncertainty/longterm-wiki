@@ -200,7 +200,11 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
                 {titleCase(investment.instrument)}
               </span>
             )}
-            <RecordVerificationDot verdict={investmentVerdict?.verdict} showLabel />
+            <RecordVerificationDot
+              verdict={investmentVerdict?.verdict}
+              showLabel
+              href={investmentVerdict?.verdict ? `/source-checks/investment/${encodeURIComponent(String(investment.key))}` : undefined}
+            />
           </div>
         </div>
 

@@ -130,8 +130,7 @@ async function waitForCi(
 // ── PR state helpers ─────────────────────────────────────────────────────────
 
 function isPrMergedOrClosed(pr: GqlPrNode): boolean {
-  return (pr as unknown as { state?: string }).state === 'MERGED'
-    || (pr as unknown as { state?: string }).state === 'CLOSED';
+  return pr.state === 'MERGED' || pr.state === 'CLOSED';
 }
 
 function hasMergeableIssues(pr: GqlPrNode, staleThresholdMs: number): boolean {
@@ -179,7 +178,9 @@ export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
     shuttingDown = true;
     log(`\n${cl.yellow}Branch agent shutting down...${cl.reset}`);
     await releaseLabel();
-    await releaseCurrentClaim(repo).catch(() => {});
+    await releaseCurrentClaim(repo).catch((e) =>
+      log(`${cl.yellow}Warning: failed to release claim during shutdown — may need manual cleanup: ${e instanceof Error ? e.message : String(e)}${cl.reset}`),
+    );
     process.exit(0);
   };
   process.on('SIGINT', shutdown);
@@ -344,7 +345,9 @@ export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
   }
 
   await releaseLabel();
-  await releaseCurrentClaim(repo).catch(() => {});
+  await releaseCurrentClaim(repo).catch((e) =>
+    log(`${cl.yellow}Warning: failed to release claim — may need manual cleanup: ${e instanceof Error ? e.message : String(e)}${cl.reset}`),
+  );
   log(`\n${cl.bold}Branch agent for PR #${prNumber} stopped.${cl.reset}`);
   log(`  Total invocations used: ${invocations}/${maxInvocations}`);
 }

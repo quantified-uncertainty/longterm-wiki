@@ -239,6 +239,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   const unverifiableCount = bv.unverifiable ?? 0;
   const uncheckedCount = bv.unchecked ?? 0;
   const hasIssuesCount = contradictedCount + outdatedCount + partialCount;
+  const deadLinkCount = filteredStats.dead_link_count ?? 0;
   const checkedCount = filteredStats.total - uncheckedCount;
   const accuracyDenom = confirmedCount + contradictedCount + outdatedCount;
   const accuracyRate =
@@ -319,6 +320,11 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {pctOfChecked(unverifiableCount)} of checked
+            {deadLinkCount > 0 && (
+              <span className="block text-[10px] mt-0.5">
+                incl. {deadLinkCount.toLocaleString()} dead links
+              </span>
+            )}
           </p>
         </div>
         <div className="rounded-lg border border-dashed border-border/60 p-4">

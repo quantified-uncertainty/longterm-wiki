@@ -21,6 +21,10 @@
  * If scraping fails, realistic sample data is used.
  */
 
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import type {
   ScorecardSource,
   FetchResult,
@@ -166,21 +170,13 @@ async function fetchCandidatesPage(): Promise<string | null> {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on Council for a Livable World endorsements.
   // These are historically endorsed legislators known for arms control stances.
+  const dir = dirname(fileURLToPath(import.meta.url));
   const samples: Array<{
     name: string;
     party: string;
     state: string;
     chamber: string;
-  }> = [
-    { name: "Ed Markey", party: "Democratic", state: "MA", chamber: "Senate" },
-    { name: "Jeff Merkley", party: "Democratic", state: "OR", chamber: "Senate" },
-    { name: "Chris Murphy", party: "Democratic", state: "CT", chamber: "Senate" },
-    { name: "Elizabeth Warren", party: "Democratic", state: "MA", chamber: "Senate" },
-    { name: "Brian Schatz", party: "Democratic", state: "HI", chamber: "Senate" },
-    { name: "Tammy Duckworth", party: "Democratic", state: "IL", chamber: "Senate" },
-    { name: "Chris Van Hollen", party: "Democratic", state: "MD", chamber: "Senate" },
-    { name: "Tim Kaine", party: "Democratic", state: "VA", chamber: "Senate" },
-  ];
+  }> = JSON.parse(readFileSync(join(dir, "fixtures/council-livable-world-sample.json"), "utf-8"));
 
   return samples.map((s) => ({
     id: generateScoreId(SCORER_ORG, s.name, year),

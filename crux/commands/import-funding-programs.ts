@@ -11,7 +11,8 @@
  */
 
 import { generateId } from "../lib/grant-import/id.ts";
-import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
+import { getServerUrl } from "../lib/wiki-server/client.ts";
+import { deleteFundingPrograms, getFundingProgramsByOrg, syncFundingPrograms } from "../lib/wiki-server/funding-programs.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
@@ -1307,11 +1308,7 @@ async function cmdDelete(ids: string[], dryRun: boolean) {
 
   console.log(`  Sending delete request to ${serverUrl}...`);
 
-  const result = await apiRequest<{ deleted: number }>(
-    "POST",
-    "/api/funding-programs/delete-batch",
-    { ids }
-  );
+  const result = await deleteFundingPrograms(ids);
 
   if (result.ok) {
     console.log(`Deleted ${result.data.deleted} funding program(s)`);
@@ -1364,10 +1361,7 @@ async function cmdSync(dryRun: boolean) {
   const orgIds = [...new Set(items.map(i => i.orgId))];
   const existingByKey = new Map<string, string>(); // "orgId|name" -> existing id
   for (const orgId of orgIds) {
-    const existing = await apiRequest<{ fundingPrograms: Array<{ id: string; orgId: string; name: string }> }>(
-      'GET',
-      `/api/funding-programs/by-org/${encodeURIComponent(orgId)}?limit=500`,
-    ).catch((e: unknown) => {
+    const existing = await getFundingProgramsByOrg(orgId, { limit: 500 }).catch((e: unknown) => {
       // Non-critical: server-side dedup check is best-effort.
       // The DB unique index is the authoritative enforcement.
       console.warn(`  (skipping server dedup check for org ${orgId}: ${e instanceof Error ? e.message : String(e)})`);
@@ -1405,11 +1399,7 @@ async function cmdSync(dryRun: boolean) {
     return;
   }
 
-  const result = await apiRequest<{ upserted: number }>(
-    "POST",
-    "/api/funding-programs/sync",
-    { items }
-  );
+  const result = await syncFundingPrograms(items as Array<Record<string, unknown>>);
 
   if (result.ok) {
     console.log(`Upserted ${result.data.upserted} funding programs`);

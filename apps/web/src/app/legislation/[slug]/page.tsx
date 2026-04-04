@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -12,7 +13,6 @@ import {
   getResourceById,
   getResourceCredibility,
   getResourcePublication,
-  getPublicationByDomain,
   getPagesForResource,
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
@@ -45,11 +45,7 @@ import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
-
-// LegislationVotes — will be created by another agent.
-// TODO: import { LegislationVotes } from "@/components/political/legislation-votes";
-// Usage: <LegislationVotes entityId={entity.stableId ?? entity.id} />
-// This component will show how tracked politicians voted on this legislation.
+import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -108,6 +104,12 @@ function getReachedStage(timelineEvents: Array<{ label: string }>, statusKey: st
   // Stage 0: Introduced / proposed
   if (labels.has("Introduced") || labels.has("Proposed")) return 0;
   return -1;
+}
+
+/** Async child component so vote fetching doesn't block page render. */
+async function LegislationVotesSection({ entityId }: { entityId: string }) {
+  const votes = await fetchLegislationVotes(entityId);
+  return <LegislationVotes votes={votes} />;
 }
 
 export default async function LegislationDetailPage({
@@ -391,10 +393,9 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      {/* Politician Vote Breakdown — will render when LegislationVotes component is available */}
-      {/* TODO: Uncomment when @/components/political/legislation-votes is created:
-      <LegislationVotes entityId={entity.stableId ?? entity.id} />
-      */}
+      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading votes...</div>}>
+        <LegislationVotesSection entityId={entity.stableId ?? entity.id} />
+      </Suspense>
 
       <FBAutoFacts entityId={entity.id} />
 
@@ -479,11 +480,12 @@ export default async function LegislationDetailPage({
   }
 
   // History tab (amendments + key figures)
-  if (entity.amendments.length > 0 || entity.keyPoliticians.length > 0 || entity.keyFigures.length > 0) {
+  const historyItemCount = entity.amendments.length + entity.keyPoliticians.length + entity.keyFigures.length;
+  if (historyItemCount > 0) {
     tabs.push({
       id: "history",
       label: "History",
-      count: entity.amendments.length,
+      count: historyItemCount,
       content: (
         <div className="space-y-8">
           {/* Key Politicians */}
@@ -581,13 +583,10 @@ export default async function LegislationDetailPage({
     if (!r) continue;
     const publication = getResourcePublication(r);
     const domain = extractDomain(r.url);
-    // Fall back to domain-based publication lookup when resource has no publication_id
-    const domainPub = !publication && domain ? getPublicationByDomain(domain) : undefined;
-    const effectivePub = publication ?? domainPub;
-    const credibility = getResourceCredibility(r) ?? domainPub?.credibility ?? null;
+    const credibility = getResourceCredibility(r) ?? null;
     const citingPages = getPagesForResource(rid);
-    if (effectivePub?.type) {
-      pubTypeByResourceId.set(rid, effectivePub.type);
+    if (publication?.type) {
+      pubTypeByResourceId.set(rid, publication.type);
     }
     pressResources.push({
       id: rid,
@@ -595,7 +594,7 @@ export default async function LegislationDetailPage({
       url: r.url,
       type: r.type ?? "web",
       domain,
-      publicationName: effectivePub?.name ?? null,
+      publicationName: publication?.name ?? null,
       credibility,
       citingPageCount: citingPages.length,
       publishedDate: r.published_date ?? extractDateFromUrl(r.url) ?? null,

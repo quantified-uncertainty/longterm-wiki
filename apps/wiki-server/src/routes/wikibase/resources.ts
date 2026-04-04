@@ -30,6 +30,7 @@ import {
   dbError,
   paginationQuery,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -116,7 +117,7 @@ const UpsertBatchSchema = UpsertResourceBatchSchema;
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: clampedLimit(100, 20),
 });
 
 const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
@@ -1023,7 +1024,9 @@ const resourcesApp = new Hono()
       })
       .from(resourceCitations)
       .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
-      .where(eq(resourceCitations.pageId, intId));
+      .where(eq(resourceCitations.pageId, intId))
+      .orderBy(resourceCitations.createdAt)
+      .limit(500);
 
     return c.json({ resources: rows });
   })
@@ -1096,28 +1099,6 @@ const resourcesApp = new Hono()
       limit,
       offset,
     });
-  })
-
-  // ---- GET /by-content-hash?hash=X&excludeId=Y (duplicate detection) ----
-
-  .get("/by-content-hash", async (c) => {
-    const hash = c.req.query("hash");
-    if (!hash) return validationError(c, "hash query parameter is required");
-
-    const excludeId = c.req.query("excludeId");
-    const db = getDrizzleDb();
-
-    const conditions = excludeId
-      ? sql`${resources.contentHash} = ${hash} AND ${resources.id} != ${excludeId}`
-      : eq(resources.contentHash, hash);
-
-    const rows = await db
-      .select({ id: resources.id, url: resources.url, title: resources.title })
-      .from(resources)
-      .where(conditions)
-      .limit(5);
-
-    return c.json({ resources: rows });
   })
 
   // ---- GET /by-content-hash?hash=X&excludeId=Y (duplicate detection) ----
@@ -1270,20 +1251,26 @@ const resourcesApp = new Hono()
 
   .patch("/author-entity-ids", zv("json", AuthorEntityIdsSchema), async (c) => {
     const db = getDrizzleDb();
-    let updated = 0;
+    const items = c.req.valid("json").items;
+    if (items.length === 0) return c.json({ updated: 0 });
 
-    // Batch update in a single transaction
-    await db.transaction(async (tx) => {
-      for (const item of c.req.valid("json").items) {
-        const jsonText = JSON.stringify(item.authorEntityIds);
-        await tx
-          .update(resources)
-          .set({ authorEntityIds: sql`${jsonText}::jsonb` })
-          .where(eq(resources.id, item.resourceId));
-        updated++;
-      }
-    });
+    // Bulk UPDATE using unnest arrays — single query instead of N+1
+    const ids = items.map((item) => item.resourceId);
+    const jsonValues = items.map((item) => JSON.stringify(item.authorEntityIds));
 
+    const result = await db.execute(sql`
+      WITH updated AS (
+        UPDATE resources AS r
+        SET author_entity_ids = v.ids::jsonb
+        FROM unnest(${ids}::text[], ${jsonValues}::text[]) AS v(rid, ids)
+        WHERE r.id = v.rid
+        RETURNING r.id
+      )
+      SELECT count(*)::int AS cnt FROM updated
+    `);
+
+    const row = result[0] as { cnt?: number } | undefined;
+    const updated = row?.cnt ?? items.length;
     return c.json({ updated });
   })
 

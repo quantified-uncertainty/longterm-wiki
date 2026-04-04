@@ -18,6 +18,8 @@ import {
   getAllPlatformAccounts,
   type SyncPlatformAccountItem,
 } from '../../lib/wiki-server/platform-accounts.ts';
+import { listEntities } from '../../lib/wiki-server/entities.ts';
+import { listResources } from '../../lib/wiki-server/resources.ts';
 import { apiRequest } from '../../lib/wiki-server/client.ts';
 
 const PROFILE_URL_TEMPLATES: Record<string, string> = {
@@ -108,15 +110,14 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
   console.log(`  Author lookup: ${authorLookup.size} entries`);
 
   // Step 2: Load stableId lookup (slug → stableId)
-  const idRegistryResult = await apiRequest<{ entities: Array<{ slug: string; stableId: string; title: string }> }>(
-    'GET', '/api/entities/all?limit=5000',
-  );
+  const idRegistryResult = await listEntities(5000, 0);
   const stableIdMap = new Map<string, string>();
   const entityTitleMap = new Map<string, string>(); // stableId → title
   if (idRegistryResult.ok) {
     for (const e of idRegistryResult.data.entities) {
       if (e.stableId) {
-        stableIdMap.set(e.slug, e.stableId);
+        // entities list returns slug as `id`
+        stableIdMap.set(e.id, e.stableId);
         entityTitleMap.set(e.stableId, e.title);
       }
     }
@@ -139,9 +140,7 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
   }
 
   // Step 4: Fetch resources with authors
-  const resourcesResult = await apiRequest<{ resources: ResourceRow[] }>(
-    'GET', '/api/resources/all?limit=50000',
-  );
+  const resourcesResult = await listResources(50000, 0);
   const resourceMap = new Map<string, ResourceRow>();
   if (resourcesResult.ok) {
     for (const r of resourcesResult.data.resources) {

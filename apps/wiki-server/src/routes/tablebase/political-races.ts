@@ -16,6 +16,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -56,7 +57,7 @@ const VALID_PAC_POSITIONS = ["support", "oppose"] as const;
 // ---- Query schemas ----
 
 const ListQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   status: z.string().max(50).optional(),
   level: z.string().max(50).optional(),
@@ -65,12 +66,12 @@ const ListQuery = z.object({
 });
 
 const AllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(200),
+  limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const CandidatesAllQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(1000).default(1000),
+  limit: clampedLimit(1000, 1000),
   offset: z.coerce.number().int().min(0).default(0),
 });
 

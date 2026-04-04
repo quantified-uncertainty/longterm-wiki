@@ -3,7 +3,7 @@
  *
  * Checks KB facts against their source URLs using an LLM.
  * For each fact with a source URL, reads cached content from citation_content
- * (populated by the resource-verify worker), builds an LLM prompt, and parses
+ * (populated by the resource-ingest worker), builds an LLM prompt, and parses
  * the response to determine whether the source confirms, contradicts, or
  * doesn't address the claim.
  *
@@ -15,12 +15,13 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
+import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi } from '../lib/wiki-server/verifications.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
 import {
@@ -49,8 +50,6 @@ interface VerifyCommandOptions extends BaseOptions {
   ci?: boolean;
 }
 
-type VerificationVerdict = 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial';
-
 interface VerificationResult {
   factId: string;
   entityId: string;
@@ -60,7 +59,7 @@ interface VerificationResult {
   formattedValue: string;
   sourceUrl: string;
   asOf?: string;
-  verdict: VerificationVerdict;
+  verdict: SourceCheckVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
@@ -139,7 +138,7 @@ async function verifySingleFact(
   const formattedValue = formatFactValue(fact, property, graph);
   const sourceUrl = fact.source!;
 
-  // Fetch source content from citation_content cache (populated by resource-verify worker)
+  // Fetch source content from citation_content cache (populated by resource-ingest worker)
   const fetchResult = await fetchSourceContent(sourceUrl, undefined, '[fb-source-check]');
   if (!fetchResult.content) {
     return {
@@ -176,10 +175,17 @@ async function verifySingleFact(
       reasoning: string;
     };
 
-    const validVerdicts: VerificationVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
-    const verdict = validVerdicts.includes(parsed.verdict as VerificationVerdict)
-      ? (parsed.verdict as VerificationVerdict)
+    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
+      ? (parsed.verdict as SourceCheckVerdict)
       : 'unverifiable';
+
+    // Add archive provenance note to reasoning if verified via Wayback Machine
+    let reasoning = parsed.reasoning ?? '';
+    if (fetchResult.sourceOrigin === 'archive') {
+      const dateNote = fetchResult.archiveDate ? ` (archived ${fetchResult.archiveDate})` : '';
+      reasoning = `[archive${dateNote}] ${reasoning}`;
+    }
 
     return {
       factId: fact.id,
@@ -193,7 +199,7 @@ async function verifySingleFact(
       verdict,
       confidence: Math.max(0, Math.min(1, parsed.confidence ?? 0.5)),
       extractedValue: parsed.extracted_value ?? '',
-      reasoning: parsed.reasoning ?? '',
+      reasoning,
       ...(fetchResult.errorType && { errorType: fetchResult.errorType }),
     };
   } catch (e: unknown) {
@@ -224,9 +230,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
     sourceUrl: result.sourceUrl,
   };
 
-  const response = await apiRequest<{ id: number; verdictFlagged: boolean }>(
-    'POST',
-    '/api/verifications/evidence',
+  const response = await storeEvidenceApi(
     body,
   );
 
@@ -245,9 +249,7 @@ async function storeVerificationResult(result: VerificationResult): Promise<void
     sourcesChecked: 1,
   };
 
-  const verdictResponse = await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/verifications/verdicts',
+  const verdictResponse = await storeVerdictApi(
     verdictBody,
   );
 
@@ -439,6 +441,12 @@ export async function sourceCheckCommand(
   lines.push(`\x1b[33mOutdated:       ${summary.outdated}\x1b[0m`);
   lines.push(`\x1b[33mPartial:        ${summary.partial}\x1b[0m`);
   lines.push(`\x1b[31mErrors:         ${summary.errors}\x1b[0m`);
+
+  // Show archive fallback stats
+  const archiveCount = summary.results.filter((r) => r.reasoning.startsWith('[archive')).length;
+  if (archiveCount > 0) {
+    lines.push(`\x1b[36mArchive fallback: ${archiveCount} (verified via Wayback Machine)\x1b[0m`);
+  }
 
   // Show contradictions in detail
   const contradictions = summary.results.filter((r) => r.verdict === 'contradicted');

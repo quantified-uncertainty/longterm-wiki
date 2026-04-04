@@ -164,7 +164,10 @@ export function EquityPositionsSection({
                           source
                         </a>
                       )}
-                      <RecordVerificationDot verdict={verdict?.verdict} />
+                      <RecordVerificationDot
+                        verdict={verdict?.verdict}
+                        href={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
+                      />
                     </div>
                     {pos.notes && (
                       <div className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">

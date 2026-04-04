@@ -33,6 +33,24 @@
   description: Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and
     safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play
     a key role in pre-deployment evaluations and responsible scaling policy thresholds.
+  stakeholders:
+    - name: UK Government
+      position: support
+      importance: high
+      reason: Pioneered the first AI Safety Institute in 2023; hosts the international AISI network secretariat
+    - name: US Government (NIST)
+      entityId: sid_Eac7pHF06Q
+      position: support
+      importance: high
+      reason: Established USAISI within NIST to conduct pre-deployment evaluations of frontier AI systems
+    - name: Frontier AI companies (Anthropic, OpenAI, Google DeepMind)
+      position: support
+      importance: high
+      reason: Voluntarily cooperate with AISIs on pre-deployment evaluations and share model access for safety testing
+    - name: China
+      position: mixed
+      importance: medium
+      reason: Pursues its own parallel AI safety evaluation approach through domestic institutions rather than joining the international AISI network
   lastUpdated: 2025-12
 - id: california-sb1047
   stableId: sid_XcGTez1oFw
@@ -455,6 +473,7 @@
         - Lead author of the Statement on AI Risk (2023) signed by Hinton, Bengio, and others
         - Advisor to xAI (Elon Musk's company; Musk also supports)
     - name: Nancy Pelosi
+      entityId: sid_VlUzUy4fZs
       position: oppose
       reason: Led CA Congressional Democrats opposing; called bill 'well-intentioned but ill informed' (Aug 16, 2024)
       source: https://pelosi.house.gov/news/press-releases/pelosi-statement-opposition-california-senate-bill-1047
@@ -464,6 +483,7 @@
         - Her district includes headquarters of OpenAI, multiple a16z portfolio companies
         - Husband Paul Pelosi holds significant tech stock investments
     - name: California Chamber of Commerce
+      entityId: sid_dfTNfp0gNE
       position: oppose
       reason: Led industry opposition coalition from earliest stages; commissioned study concluding the bill would 'hurt
         economy/industry'; objected to 'vague and impractical' requirements and potential criminal liability
@@ -474,6 +494,7 @@
         - Members include major tech companies opposing the bill
         - Push poll methodology criticized; independent polls showed ~73% public support
     - name: AI Alliance
+      entityId: sid_aF9wqaoCNa
       position: oppose
       reason: Published formal opposition statement arguing the bill would 'slow innovation, thwart advancements in safety and
         security, and undermine California's economic growth'; raised concerns about technically infeasible shutdown
@@ -844,6 +865,7 @@
         - Concerned about ISED's dual role as economic development body and AI regulator
         - Criticized vague definitions of 'high-impact' AI systems and weak enforcement mechanisms
     - name: CIGI (Centre for International Governance Innovation)
+      entityId: sid_CyKa5eLcCl
       position: oppose
       importance: medium
       reason: Published analysis arguing proposed amendments 'do little to mitigate AI harms'; called for stronger, standalone
@@ -931,6 +953,7 @@
       date: "2024"
   stakeholders:
     - name: Cyberspace Administration of China (CAC)
+      entityId: sid_H1Ysc4diAp
       position: support
       importance: high
       reason: Primary enforcement agency for AI regulations; requires pre-deployment approval and model registration for
@@ -1040,6 +1063,7 @@
       noesRep: 16
   stakeholders:
     - name: Gov. Jared Polis
+      entityId: sid_TGWTD6b92y
       position: mixed
       importance: high
       reason: Signed the bill into law on May 17, 2024 but issued a public letter expressing concerns about the law being too
@@ -1051,6 +1075,7 @@
         - Called an August 2025 special session partly in response to industry pressure to delay enforcement
         - Signed SB 25B-004 delaying enforcement from February 1 to June 30, 2026
     - name: Google
+      entityId: sid_cMNszJMTPX
       position: support
       importance: medium
       reason: Applauded risk-based approach as preferable to size-based regulation like California's SB 1047; suggested
@@ -1059,8 +1084,8 @@
       context:
         - Preferred Colorado's risk-based framework over California's compute-threshold approach
         - Major AI deployer whose products (Search, Workspace, Cloud) would be covered as high-risk in multiple domains
-      entityId: sid_cMNszJMTPX
     - name: Microsoft
+      entityId: sid_OIY5gaPpBA
       position: mixed
       importance: high
       reason: Supported the general risk-based framework but opposed proactive AG notification requirements for discrimination
@@ -1070,8 +1095,8 @@
         - Major AI deployer (Copilot, Azure AI) with products spanning all eight covered high-risk domains
         - Invested $13B in OpenAI; supports regulation that aligns with its existing responsible AI practices
         - Active lobbyist during August 2025 special session alongside 150+ other industry lobbyists
-      entityId: sid_OIY5gaPpBA
     - name: IBM
+      entityId: sid_9N0hqjccSg
       position: support
       importance: medium
       reason: Endorsed the risk-based regulatory approach as a model for state-level AI governance; aligned with IBM's own AI
@@ -1102,6 +1127,7 @@
         - Advocated for the consumer right to human review of adverse AI decisions
       entityId: sid_XkqcWk46oQ
     - name: Common Sense Institute
+      entityId: sid_cXahhtwW2D
       position: oppose
       importance: medium
       reason: Published economic impact study estimating the act could cost Colorado approximately 40,000 jobs due to
@@ -1111,6 +1137,7 @@
         - Colorado-based free-market think tank; study widely cited by industry opponents during special session
         - Job loss estimate contested by act supporters as based on speculative assumptions
     - name: US Chamber of Commerce
+      entityId: sid_cQQdrABVv0
       position: oppose
       importance: medium
       reason: Argued the law may hamper small business AI adoption; preferred a gap-filling approach over the broad
@@ -1122,6 +1149,7 @@
     - name: Sen. Robert Rodriguez
       role: Prime sponsor and lead author in the Colorado Senate
     - name: Gov. Jared Polis
+      entityId: sid_TGWTD6b92y
       role: Signed into law with public concerns letter on May 17, 2024
   amendments:
     - date: August 28, 2025
@@ -1343,6 +1371,7 @@
       category: Education
   stakeholders:
     - name: European Commission
+      entityId: sid_3zsTSX6SFK
       position: support
       importance: high
       reason: Proposed the original regulation in April 2021; leads implementation through the European AI Office; positioned
@@ -1353,8 +1382,8 @@
           political guidelines
         - European AI Office established within the Commission to oversee GPAI enforcement
         - Can impose fines up to 3% of worldwide annual turnover for GPAI violations
-      entityId: sid_3zsTSX6SFK
     - name: European Parliament
+      entityId: sid_jWgzHpf77P
       position: support
       importance: high
       reason: Strengthened the Commission's proposal by adding GPAI provisions and broader prohibitions; passed with
@@ -1377,7 +1406,7 @@
         - "Final outcome: tiered GPAI approach was a compromise — binding rules with systemic risk threshold at 10^25
           FLOPs"
     - name: Mistral AI
-      entityId: mistral-ai
+      entityId: sid_RFHVboBnHg
       position: oppose
       importance: high
       reason: Led lobbying against GPAI rules; opened Brussels lobby office with former French digital secretary Cedric O; CEO
@@ -1390,7 +1419,7 @@
         - Called for a two-year delay in implementing GPAI rules alongside Airbus and BNP Paribas
         - Raised $415M Series B during negotiations, making it Europe's most valuable AI startup
     - name: Meta
-      entityId: meta-ai
+      entityId: sid_tt0f5PYDCw
       position: oppose
       importance: high
       reason: Opposed GPAI provisions and transparency requirements; argued rules would harm open-source AI development (Llama
@@ -1401,7 +1430,7 @@
         - Co-founded AI Alliance with IBM — lobbying vehicle against prescriptive GPAI rules
         - Open-source models with open weights exempt from most GPAI Tier 1 requirements except copyright compliance
     - name: Microsoft
-      entityId: microsoft
+      entityId: sid_OIY5gaPpBA
       position: support
       importance: high
       reason: Supported risk-based approach; President Brad Smith called the EU AI Act a 'strong foundation' and pledged
@@ -1412,7 +1441,7 @@
         - Azure AI and Copilot products span multiple high-risk domains covered by the Act
         - Existing responsible AI governance practices largely aligned with Act requirements
     - name: OpenAI
-      entityId: openai
+      entityId: sid_1LcLlMGLbw
       position: support
       importance: high
       reason: Publicly supported the risk-based regulatory framework; CEO Sam Altman initially threatened EU exit (May 2023)
@@ -1433,6 +1462,7 @@
         - Historically secretive about product internals; disclosure requirements conflict with business model
       entityId: sid_1kawFEPpVe
     - name: Amazon
+      entityId: sid_JGiOzSoZPc
       position: support
       importance: medium
       reason: Supported the risk-based approach while advocating for clear definitions and proportionate compliance
@@ -1442,7 +1472,7 @@
         - AWS cloud services used to train and deploy many GPAI models that would be regulated
         - Alexa and Amazon hiring/logistics AI systems could be classified as high-risk
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: sid_A4XoubikkQ
       position: mixed
       importance: high
       reason: Supported risk-based framework in principle but lobbied for narrower GPAI definitions and raised concerns about
@@ -1453,6 +1483,7 @@
         - Google's $2B investment in Anthropic and broad AI portfolio means extensive compliance obligations
         - DeepMind's London HQ means close proximity to UK AISI, a potential competing regulatory framework
     - name: Access Now
+      entityId: sid_DHWH2M0Ega
       position: support
       importance: medium
       reason: Digital rights organization that advocated for stronger prohibitions, particularly on biometric surveillance and
@@ -1462,8 +1493,8 @@
         - Co-drafted key amendment proposals on prohibiting biometric identification with EDRi, ARTICLE19, and others
         - Part of the Reclaim Your Face campaign (80+ organizations, 250,000+ supporters) pushing for biometric mass
           surveillance ban
-      entityId: sid_DHWH2M0Ega
     - name: European Digital Rights (EDRi)
+      entityId: sid_7h0u4ulMdb
       position: support
       importance: medium
       reason: Coalition of 40+ civil society groups that pushed for ban on biometric mass surveillance and predictive
@@ -1474,6 +1505,7 @@
         - Successfully opposed EPP's last-minute attempt to water down facial recognition bans in June 2023 plenary vote
         - Published practical legal guide for fighting biometric mass surveillance after the Act passed
     - name: DigitalEurope
+      entityId: sid_Qo6YeaRskH
       position: oppose
       importance: medium
       reason: Industry association representing major tech companies; argued GPAI provisions were too prescriptive and would
@@ -1483,6 +1515,7 @@
         - Members include Apple, Google, Microsoft, Samsung, and major European tech firms
         - Joined Airbus, BNP Paribas, and Mistral in calling for a two-year delay in GPAI rules implementation
     - name: CCIA Europe
+      entityId: sid_UEYMSjORoB
       position: oppose
       importance: medium
       reason: Computer and Communications Industry Association lobbied against broad GPAI obligations; argued for focusing
@@ -1778,14 +1811,17 @@
       category: Future Scope
   stakeholders:
     - name: Sen. Tom Cotton
+      entityId: sid_kGi3RooJe8
       position: support
       role: Primary Senate sponsor
       importance: high
     - name: Sen. Elizabeth Warren
+      entityId: sid_OyPBrUIpeS
       position: support
       role: Senate cosponsor
       importance: high
     - name: Rep. Bill Huizenga
+      entityId: sid_cYPfKeUa36
       position: support
       role: Primary House sponsor
       importance: high
@@ -1865,6 +1901,7 @@
       importance: high
       entityId: sid_hXFxf2aOHZ
     - name: Rep. Tom Kean Jr.
+      entityId: sid_bUlPBgOr3y
       position: support
       role: Primary House sponsor
       importance: medium
@@ -2025,9 +2062,30 @@
       url: https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
       author: NIST
       date: July 2024
+  stakeholders:
+    - name: NIST
+      entityId: sid_Eac7pHF06Q
+      position: support
+      importance: high
+      reason: Developed and maintains the framework; conducted extensive public consultation with 240+ organizations
+    - name: Microsoft
+      entityId: sid_OIY5gaPpBA
+      position: support
+      importance: medium
+      reason: Active participant in development; adopted AI RMF principles in its Responsible AI Standard
+    - name: Google
+      entityId: sid_cMNszJMTPX
+      position: support
+      importance: medium
+      reason: Contributed to public consultation; references AI RMF in its AI governance approach
+    - name: Partnership on AI
+      entityId: sid_lG1LEx80wg
+      position: support
+      importance: medium
+      reason: Advocated for the framework; contributed expertise during the public comment period
   description: The NIST AI Risk Management Framework (AI RMF) is a voluntary guidance document developed by the National
     Institute of Standards and Technology to help organizations manage risks associated with AI systems.
-  lastUpdated: 2025-12
+  lastUpdated: 2026-04
 - id: seoul-declaration
   stableId: sid_1i59OZ3q5w
   wikiId: E279
@@ -2053,9 +2111,33 @@
       url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
       author: AI Companies
       date: May 2024
+  stakeholders:
+    - name: United Kingdom
+      position: support
+      importance: high
+      reason: Co-hosted the summit with South Korea; led the Bletchley-to-Seoul AI safety summit series
+    - name: South Korea
+      position: support
+      importance: high
+      reason: Host country; positioned itself as bridge between Western and Asian AI governance approaches
+    - name: OpenAI
+      entityId: sid_1LcLlMGLbw
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments at the summit alongside other major AI companies
+    - name: Google DeepMind
+      entityId: sid_A4XoubikkQ
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments; supported pre-deployment safety testing commitments
+    - name: Anthropic
+      entityId: sid_mK9pX3rQ7n
+      position: support
+      importance: medium
+      reason: Signed voluntary Frontier AI Safety Commitments; aligned with summit's risk-based approach
   description: The Seoul AI Safety Summit (May 21-22, 2024) was the second in a series of international AI safety summits,
     following the Bletchley Park Summit in November 2023.
-  lastUpdated: 2025-12
+  lastUpdated: 2026-04
 - id: standards-bodies
   stableId: sid_HXPEtPD1zw
   wikiId: E288
@@ -2131,6 +2213,7 @@
       category: Standards
   stakeholders:
     - name: Biden Administration
+      entityId: sid_6kAEE9sPCg
       position: support
       importance: high
       reason: Authored and signed the order on October 30, 2023; framed as essential for safe AI development and national
@@ -2141,7 +2224,7 @@
         - Commerce Secretary Gina Raimondo led implementation including AISI creation
         - Secured voluntary commitments from 15 AI companies in July 2023 as a precursor
     - name: OpenAI
-      entityId: openai
+      entityId: sid_1LcLlMGLbw
       position: support
       importance: high
       reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in White House commitments
@@ -2152,7 +2235,7 @@
         - GPT-4 and subsequent models above the 10^26 FLOP threshold triggering mandatory reporting
         - Later quietly removed some Biden-era AI policy commitments from its website (March 2025)
     - name: Anthropic
-      entityId: anthropic
+      entityId: sid_mK9pX3rQ7n
       position: support
       importance: high
       reason: Signed voluntary pre-deployment testing agreement with AISI (Aug 2024); participated in joint US-UK model
@@ -2163,7 +2246,7 @@
         - Claude models above 10^26 FLOP threshold; existing Responsible Scaling Policy aligned with EO requirements
         - Quietly removed Biden-era policy commitments from website after Trump revocation (March 2025)
     - name: Google DeepMind
-      entityId: deepmind
+      entityId: sid_A4XoubikkQ
       position: mixed
       importance: high
       reason: Supported voluntary safety commitments and signed AISI testing agreement but expressed concerns about regulatory
@@ -2184,6 +2267,7 @@
         - CSET Georgetown published extensive analysis of the order's scope and implications
         - Many researchers noted the 10^26 FLOP threshold was the same later adopted by California SB 1047
     - name: US Chamber of Commerce
+      entityId: sid_cQQdrABVv0
       position: oppose
       importance: high
       reason: Raised concerns about mandatory reporting requirements; said 'substantive and process problems still exist' with
@@ -2194,6 +2278,7 @@
         - Disappointed in OMB's unwillingness to extend comment periods on Draft Guidance
         - Preferred voluntary industry-led frameworks over mandatory government reporting
     - name: Trump Administration
+      entityId: sid_BzGnB0qdGy
       position: oppose
       importance: high
       reason: Revoked the order on January 20, 2025 (day one of presidency) via EO 14179, stating it 'hindered AI innovation
@@ -2391,6 +2476,7 @@
         - Historically minimal public disclosure about AI safety testing or model evaluations
       entityId: sid_1kawFEPpVe
     - name: Microsoft
+      entityId: sid_OIY5gaPpBA
       position: support
       importance: high
       reason: Scored 73.3% compliance; one of the original seven signatories; strong on cybersecurity and safety testing
@@ -2399,8 +2485,8 @@
       context:
         - Major investor in OpenAI ($13B); both companies among original signatories
         - Existing responsible AI governance practices predated the commitments
-      entityId: sid_OIY5gaPpBA
     - name: Amazon
+      entityId: sid_JGiOzSoZPc
       position: support
       importance: medium
       reason: Scored 66.7% compliance; one of the original seven signatories; focused on AWS AI safety and Bedrock guardrails
@@ -3625,6 +3711,7 @@
         - Members include Google, Meta, OpenAI, Apple, Microsoft — all major frontier model developers
         - Also opposed SB 1047; consistent industry coalition against California AI bills
     - name: Common Sense Media
+      entityId: sid_WchSgl5dux
       position: support
       importance: medium
       reason: Backed SB 53 as a necessary consumer and child safety measure; advocated for transparency requirements
@@ -3633,6 +3720,7 @@
         - Leading child safety advocacy organization; Jim Steyer (founder) has long-standing relationship with Newsom
         - Focus on AI transparency aligns with their broader digital safety agenda
     - name: TechEquity Action
+      entityId: sid_UvwjWas2wl
       position: support
       importance: medium
       reason: Supported SB 53's transparency requirements for frontier AI developers as worker and public safety measure
@@ -4321,6 +4409,23 @@
   description: "Consensus document from the 2025 Singapore Conference on AI (SCAI), authored by 88 researchers from 11
     countries, organizing AI safety research into a defence-in-depth framework across three areas: Assessment,
     Development, and Control."
+  stakeholders:
+    - name: Academic AI safety researchers
+      position: support
+      importance: high
+      reason: 88 researchers from 11 countries authored the consensus; represents broad scientific agreement on safety research priorities
+    - name: AI safety organizations (MIRI, ARC, CAIS)
+      position: support
+      importance: high
+      reason: Endorse the defence-in-depth framework as aligned with existing safety research agendas
+    - name: Singapore government
+      position: support
+      importance: medium
+      reason: Hosted the SCAI conference and facilitated the consensus process as part of its AI governance leadership
+    - name: AI industry (major labs)
+      position: mixed
+      importance: medium
+      reason: Generally supportive of research priorities but consensus remains voluntary with no binding commitments on industry
   tags:
     - international-consensus
     - ai-safety-research
@@ -4419,6 +4524,7 @@
       category: Oversight
   stakeholders:
     - name: Governor Kathy Hochul
+      entityId: sid_T8cb9IYdlq
       position: support
       importance: high
       reason: Signed into law December 19, 2025 after negotiating chapter amendments that reduced civil penalties from
@@ -4479,6 +4585,7 @@
         - Center-left tech industry coalition; also opposed California's SB 1047
         - Positioned as pro-tech but supporting moderate regulation — opposed RAISE Act as overreach
     - name: NetChoice
+      entityId: sid_dGOSxJk8o6
       position: oppose
       importance: medium
       reason: Opposed on grounds of stifling innovation, creating a patchwork of state regulations, and preempting federal
@@ -4487,6 +4594,7 @@
       context:
         - Trade association representing major internet companies; has challenged state tech regulations in courts
     - name: Tech:NYC
+      entityId: sid_CIiQ2Cjm4E
       position: oppose
       importance: medium
       reason: Concerned about compliance burden on New York tech startups; argued the act would drive AI development to other
@@ -4496,6 +4604,7 @@
         - New York-focused tech industry group representing 1,000+ member companies
         - Particular concern about impact on startups lacking compliance resources of larger firms
     - name: Leading the Future
+      entityId: sid_pg7Ym4EQ9A
       position: oppose
       importance: medium
       reason: Super PAC backed by a16z (Andreessen Horowitz) and OpenAI president Greg Brockman; spent against the legislation
@@ -4505,6 +4614,7 @@
         - Part of broader a16z campaign against state-level AI regulation
         - Targeted Bores specifically as a political pressure tactic against the bill's sponsors
     - name: Trump Administration
+      entityId: sid_BzGnB0qdGy
       position: oppose
       importance: high
       reason: Opposed state-level AI regulation via December 2025 executive order directing federal agencies to challenge
@@ -4551,6 +4661,7 @@
     - name: Assemblymember Alex Bores
       role: Primary author and Assembly sponsor
     - name: Governor Kathy Hochul
+      entityId: sid_T8cb9IYdlq
       role: Signed into law December 19, 2025
   description: New York's Responsible AI Safety and Education (RAISE) Act, often described as a successor to California's
     vetoed SB 1047, requires safety protocols, incident reporting, and transparency from developers of frontier AI
@@ -4760,6 +4871,29 @@
   description: Legal and institutional frameworks for protecting AI researchers and employees who report safety concerns.
     The bipartisan AI Whistleblower Protection Act (S.1792) introduced May 2025 addresses critical gaps in current law,
     while EU AI Act Article 87 provides protections from August 2026.
+  stakeholders:
+    - name: Former OpenAI employees
+      position: support
+      importance: high
+      reason: Public letter from former employees highlighted restrictive NDAs preventing safety disclosures; directly motivated the legislation
+    - name: American Civil Liberties Union (ACLU)
+      entityId: sid_7DpEvy5wQr
+      position: support
+      importance: medium
+      reason: Advocates for whistleblower protections as essential to accountability and transparency in AI development
+    - name: Government Accountability Project
+      entityId: sid_iqjACwHMCW
+      position: support
+      importance: medium
+      reason: Leading whistleblower advocacy organization supporting legal frameworks for AI safety disclosures
+    - name: Major AI companies
+      position: oppose
+      importance: high
+      reason: Some companies have used restrictive NDAs and non-disparagement clauses that would be curtailed by the legislation
+    - name: Bipartisan Senate sponsors
+      position: support
+      importance: high
+      reason: Bipartisan introduction signals cross-party agreement on the need for AI whistleblower protections
   tags:
     - whistleblower
     - employee-protections
@@ -5219,10 +5353,38 @@
     treaty, establishing human rights-focused governance principles across 57+ countries, though it has significant
     enforcement gaps and excludes national security applications. While historically significant as the first binding AI
     treaty, its practical enforcement mechanisms remain weak.
+  stakeholders:
+    - name: Council of Europe
+      entityId: sid_18BRxYIVxX
+      position: support
+      importance: high
+      reason: Initiated and adopted the convention; represents 46 member states committed to human rights-based AI governance
+    - name: European Union
+      position: support
+      importance: high
+      reason: Signed the convention alongside individual EU member states; complements the EU AI Act with an international treaty framework
+    - name: United Kingdom
+      position: support
+      importance: medium
+      reason: Early signatory despite Brexit; views the convention as compatible with its pro-innovation AI approach
+    - name: United States
+      position: support
+      importance: medium
+      reason: Participated as observer state in negotiations; signed the convention in September 2024 alongside the EU, UK, and Israel
+    - name: Access Now
+      entityId: sid_DHWH2M0Ega
+      position: mixed
+      importance: medium
+      reason: Supports the human rights framing but criticized the national security exemption as too broad, potentially undermining protections
+    - name: European Digital Rights (EDRi)
+      entityId: sid_7h0u4ulMdb
+      position: mixed
+      importance: medium
+      reason: Welcomed the binding nature but criticized weak enforcement mechanisms and the broad national security carve-out
   clusters:
     - governance
     - ai-safety
-  lastUpdated: 2026-02
+  lastUpdated: 2026-04
 - id: collective-epistemics-design-sketches
   stableId: sid_mPQolusDhA
   wikiId: E588
@@ -5544,6 +5706,7 @@
       category: Innovation
   stakeholders:
     - name: Governor Greg Abbott
+      entityId: sid_meOi3DfVbJ
       position: support
       importance: high
       reason: Signed HB 149 into law on June 22, 2025; positioned Texas as a model for pro-innovation AI regulation
@@ -5552,6 +5715,7 @@
         - Signed alongside broader Texas tech-friendly legislative agenda
         - Texas hosts 1,500+ tech firms and 17% of US AI startups — significant business constituency
     - name: Rep. Giovanni Capriglione
+      entityId: sid_b4G8eurPFD
       position: support
       importance: high
       reason: Primary author; spent two years gathering stakeholder input from hundreds of groups to develop the intent-based
@@ -5562,6 +5726,7 @@
         - Worked closely with Texas Public Policy Foundation to convene stakeholders
         - Chose intent-based liability approach rather than comprehensive compliance requirements
     - name: Texas Public Policy Foundation
+      entityId: sid_WHAEpX4KJm
       position: support
       importance: high
       reason: Collaborated with Rep. Capriglione to convene stakeholders; TPPF director David Dunmoyer called it 'the
@@ -5941,6 +6106,7 @@
       category: Education
   stakeholders:
     - name: Michael Kratsios
+      entityId: sid_okZhiBvBoj
       position: support
       importance: high
       role: Assistant to the President for Science and Technology
@@ -5948,6 +6114,7 @@
         create jobs, lower costs, and improve lives"
       source: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
     - name: Alliance for Secure AI
+      entityId: sid_ewHH8hqYZD
       position: oppose
       importance: medium
       reason: CEO Brendan Steinhauser said the proposed regulations provide "no path to accountability" for harms caused by AI
@@ -6039,11 +6206,13 @@
       source: https://www.klobuchar.senate.gov/public/index.cfm/2025/5/klobuchar-s-bipartisan-take-it-down-act-signed-into-law
       entityId: sid_uk5EhXsfmN
     - name: RAINN
+      entityId: sid_g5EKAHeU8m
       position: support
       importance: medium
       reason: Testified in House hearing supporting the legislation as protection for victims
       source: https://rainn.org/federal-legislation/take-it-down-act/
     - name: Electronic Frontier Foundation
+      entityId: sid_H4tplAyDRX
       position: oppose
       importance: medium
       reason: Argued the bill "gives powerful people a new legal tool to force online platforms to remove lawful speech that
@@ -6056,6 +6225,7 @@
         requests
       entityId: sid_XkqcWk46oQ
     - name: First Lady Melania Trump
+      entityId: sid_VkDBxAXqHZ
       position: support
       importance: medium
       reason: Publicly championed the bill as protection for children and victims
@@ -6110,6 +6280,29 @@
       category: Enforcement
   description: Bipartisan bill introduced September 29, 2025, establishing product liability standards for AI systems.
     Sponsored by Senators Durbin (D-IL) and Hawley (R-MO). Referred to Committee on the Judiciary.
+  stakeholders:
+    - name: Consumer advocacy groups
+      position: support
+      importance: high
+      reason: Support establishing clear liability standards so consumers harmed by AI systems have legal recourse
+    - name: Senator Dick Durbin (D-IL)
+      entityId: sid_LNfQiSo5us
+      position: support
+      importance: high
+      reason: Lead sponsor; views AI liability as essential consumer protection analogous to product liability for physical goods
+    - name: Senator Josh Hawley (R-MO)
+      entityId: sid_C-3CLLkSFI
+      position: support
+      importance: high
+      reason: Co-sponsor; frames the bill as holding tech companies accountable while maintaining bipartisan approach
+    - name: Technology industry (TechNet, BSA)
+      position: oppose
+      importance: high
+      reason: Oppose expanded liability standards as potentially chilling AI innovation and creating legal uncertainty for developers
+    - name: Trial Lawyers Association
+      position: support
+      importance: medium
+      reason: Support new cause of action for AI-related harms as an extension of existing product liability frameworks
   tags:
     - ai-liability
     - product-liability
@@ -6150,6 +6343,30 @@
   description: Bipartisan bill introduced September 29, 2025 by Senators Hawley (R-MO) and Blumenthal (D-CT). Would
     require DOE to establish mandatory AI evaluation program with adversarial testing. Notable for \$1M/day
     non-compliance penalty and focus on dangerous capabilities. 7-year program duration. Referred to Commerce Committee.
+  stakeholders:
+    - name: AI safety research community
+      position: support
+      importance: high
+      reason: Supports mandatory evaluation of dangerous capabilities including self-replication, scheming, and autonomous decision-making
+    - name: Senator Josh Hawley (R-MO)
+      entityId: sid_C-3CLLkSFI
+      position: support
+      importance: high
+      reason: Lead sponsor; frames mandatory evaluation as essential national security measure for advanced AI systems
+    - name: Senator Richard Blumenthal (D-CT)
+      entityId: sid_33ExUKx4u_
+      position: support
+      importance: high
+      reason: Co-sponsor; advocates for government oversight of AI capabilities testing through established DOE infrastructure
+    - name: Department of Energy
+      entityId: sid_IZ04n3ZvIZ
+      position: mixed
+      importance: high
+      reason: Would gain new mandate and authority for AI evaluation but faces significant implementation burden within 90-day timeline
+    - name: AI industry (frontier labs)
+      position: mixed
+      importance: high
+      reason: Some labs support external evaluation in principle but oppose mandatory participation and the scale of penalties for non-compliance
   tags:
     - ai-evaluation
     - mandatory-testing
@@ -6185,6 +6402,27 @@
   description: International AI summit held February 10-11, 2025 at Grand Palais, Paris. 61 countries signed declaration
     on inclusive AI. Notable for US and UK refusal to sign. Launched the Current AI foundation with \$400M endowment.
     Anthropic CEO Dario Amodei called it a "missed opportunity" for AI safety.
+  stakeholders:
+    - name: France (President Macron)
+      position: support
+      importance: high
+      reason: Hosted and co-chaired the summit; championed inclusive AI development and the Current AI foundation
+    - name: Global South nations
+      position: support
+      importance: high
+      reason: 61 countries signed the declaration; developing nations view inclusive AI governance as essential to avoid being left behind
+    - name: India (PM Modi)
+      position: support
+      importance: high
+      reason: Co-chaired the summit with France; positioned India as a bridge between developed and developing world on AI governance
+    - name: United States
+      position: oppose
+      importance: high
+      reason: Refused to sign the declaration on inclusive and sustainable AI; prioritizes unilateral AI leadership over multilateral commitments
+    - name: United Kingdom
+      position: oppose
+      importance: high
+      reason: Joined the US in refusing to sign the declaration despite having hosted the previous AI Safety Summit at Bletchley Park
   tags:
     - international
     - summit
@@ -6222,6 +6460,27 @@
     - united-nations
     - ai-governance
     - scientific-panel
+  stakeholders:
+    - name: China
+      position: support
+      importance: high
+      reason: Strongly supported the resolution; aligned with developing countries seeking multilateral AI governance through the UN system
+    - name: UN Secretary-General
+      position: support
+      importance: high
+      reason: Championed the initiative through the High-level Advisory Body on AI; framed it as essential for inclusive governance
+    - name: Global South coalition
+      position: support
+      importance: high
+      reason: Developing nations backed the resolution as a way to ensure their voice in AI governance, countering Western-dominated forums like the G7
+    - name: United States
+      position: oppose
+      importance: high
+      reason: Explicitly rejected "centralized control and global governance" of AI at UN Security Council; views UN governance as potentially constraining US AI leadership
+    - name: European Union
+      position: mixed
+      importance: medium
+      reason: Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism
   clusters:
     - governance
   sources:
@@ -6229,7 +6488,7 @@
       url: https://press.un.org/en/2025/sgsm22776.doc.htm
     - title: WEF Explainer
       url: https://www.weforum.org/stories/2025/10/un-new-ai-governance-bodies/
-  lastUpdated: 2026-03
+  lastUpdated: 2026-04
 - id: utah-sb226
   stableId: sid_yxyu4w3Xup
   type: policy
@@ -6255,6 +6514,23 @@
   description: Signed March 2025, effective May 7, 2025. Refines Utah's AI transparency framework by narrowing disclosure
     requirements to explicit consumer requests and high-risk interactions. Represents a lighter-touch approach compared
     to Colorado and California AI regulation.
+  stakeholders:
+    - name: Utah tech industry (Silicon Slopes)
+      position: support
+      importance: high
+      reason: Supports the lighter-touch approach as business-friendly; narrower disclosure requirements reduce compliance burden compared to other states
+    - name: Utah State Legislature
+      position: support
+      importance: high
+      reason: Enacted the bill as part of Utah's pro-innovation regulatory approach to AI governance
+    - name: Consumer advocacy groups
+      position: mixed
+      importance: medium
+      reason: Concerned the narrowed disclosure requirements are too weak; only requiring disclosure when consumers explicitly ask limits practical transparency
+    - name: AI companies operating in Utah
+      position: support
+      importance: medium
+      reason: Safe harbor provision for AI self-disclosure provides legal certainty and a clear compliance pathway
   tags:
     - state-legislation
     - ai-disclosure
@@ -6287,6 +6563,23 @@
   description: Amends the Illinois Human Rights Act to prohibit employer use of AI systems that discriminate against
     protected classes in employment decisions. One of the first state laws specifically targeting AI-driven employment
     discrimination.
+  stakeholders:
+    - name: Civil rights organizations
+      position: support
+      importance: high
+      reason: Advocate for extending anti-discrimination protections to AI-driven employment decisions under the Illinois Human Rights Act
+    - name: Labor unions
+      position: support
+      importance: high
+      reason: Support protections for workers against algorithmic bias in hiring, promotion, and termination decisions
+    - name: Illinois General Assembly
+      position: support
+      importance: high
+      reason: Enacted the bill as an amendment to the existing Human Rights Act framework
+    - name: Business and employer groups
+      position: oppose
+      importance: medium
+      reason: Concerned about compliance costs and legal uncertainty around proving AI systems do not discriminate in employment decisions
   tags:
     - state-legislation
     - employment
@@ -6321,6 +6614,24 @@
   description: Two AI laws signed by Governor Sarah Huckabee Sanders. HB 1958 requires public entities to develop AI use
     policies. HB 1876 establishes that individuals who provide input to generative AI own the output (subject to
     copyright). Notable for being one of the first state laws addressing AI-generated content ownership.
+  stakeholders:
+    - name: Governor Sarah Huckabee Sanders
+      entityId: sid_mGe7ji1nok
+      position: support
+      importance: high
+      reason: Signed both bills into law as part of Arkansas's proactive approach to AI governance
+    - name: Arkansas state government agencies
+      position: support
+      importance: high
+      reason: HB 1958 provides clear frameworks for AI use in public entities
+    - name: Content creators and artists
+      position: support
+      importance: medium
+      reason: HB 1876 establishes ownership rights over AI-generated content, providing legal clarity for creators using AI tools
+    - name: AI companies
+      position: mixed
+      importance: medium
+      reason: AI output ownership provisions create new legal considerations around who owns AI-generated content and liability
   tags:
     - state-legislation
     - government-ai-use
@@ -6349,6 +6660,19 @@
       category: Government use
   description: Directs Kentucky's Commonwealth Office of Technology to develop policy standards for AI use across state
     government. Part of the wave of state-level AI governance laws in 2025.
+  stakeholders:
+    - name: Kentucky General Assembly
+      position: support
+      importance: high
+      reason: Enacted the bill to establish standards for AI use across state government agencies
+    - name: Commonwealth Office of Technology
+      position: support
+      importance: high
+      reason: Designated as the lead agency to develop and enforce AI policy standards for state government
+    - name: Kentucky state agencies
+      position: mixed
+      importance: medium
+      reason: Will need to comply with new AI policy standards; supportive of guidance but concerned about implementation costs
   tags:
     - state-legislation
     - government-ai-use
@@ -6377,6 +6701,23 @@
       category: Healthcare transparency
   description: Requires healthcare professionals and insurers to disclose AI use in healthcare decisions and patient
     communications. One of the first state laws targeting AI transparency in healthcare specifically.
+  stakeholders:
+    - name: Healthcare advocacy organizations
+      position: support
+      importance: high
+      reason: Support transparency requirements so patients know when AI influences their healthcare decisions
+    - name: Patient rights groups
+      position: support
+      importance: high
+      reason: Advocate for informed consent and patients' right to know about AI involvement in their care
+    - name: Indiana General Assembly
+      position: support
+      importance: high
+      reason: Enacted the disclosure requirement as part of healthcare transparency reforms
+    - name: Health insurance companies
+      position: mixed
+      importance: medium
+      reason: Required to disclose AI use in coverage decisions; compliance adds operational burden but aligns with transparency trends
   tags:
     - state-legislation
     - healthcare
@@ -6408,6 +6749,23 @@
   description: Prohibits AI systems from representing themselves as qualified mental health professionals. Passed
     Tennessee Senate unanimously. Responds to concerns about AI companion chatbots providing mental health advice
     without qualification.
+  stakeholders:
+    - name: Mental health professionals
+      position: support
+      importance: high
+      reason: Strongly support protecting the professional standards of mental health practice from unqualified AI systems
+    - name: Tennessee General Assembly
+      position: support
+      importance: high
+      reason: Passed unanimously in the Senate, reflecting broad bipartisan agreement on protecting mental health standards
+    - name: Child safety advocates
+      position: support
+      importance: medium
+      reason: Concerned about vulnerable youth relying on AI chatbots for mental health support instead of qualified professionals
+    - name: AI companion chatbot companies
+      position: oppose
+      importance: medium
+      reason: Restrictions limit the scope of mental health-related features that AI companion products can offer in Tennessee
   tags:
     - state-legislation
     - mental-health
@@ -6438,6 +6796,23 @@
   description: Regulates AI companion chatbots in California. Requires operators to disclose when users interact with AI
     rather than humans. Applies to systems designed to meet users' social needs. Part of California's continued
     leadership in state AI regulation despite federal preemption pressure.
+  stakeholders:
+    - name: Child safety advocacy groups
+      position: support
+      importance: high
+      reason: Primary proponents citing risks of AI companion chatbots to minors' emotional wellbeing and social development
+    - name: California Legislature
+      position: support
+      importance: high
+      reason: Enacted the bill as part of California's broader push to regulate AI systems that interact with consumers
+    - name: Consumer protection organizations
+      position: support
+      importance: medium
+      reason: Support disclosure requirements as baseline transparency for users interacting with AI companion systems
+    - name: AI companion chatbot companies
+      position: mixed
+      importance: high
+      reason: Some accept disclosure requirements as reasonable while others view the regulation as potentially restricting product design and user experience
   tags:
     - state-legislation
     - ai-chatbots
@@ -6478,6 +6853,23 @@
   description: Companion bills advancing through both chambers of Washington legislature. HB 2225 passed House 69-28; SB
     5984 passed Senate and advanced through House committee. Both address AI chatbot safety with disclosure
     requirements.
+  stakeholders:
+    - name: Child safety advocacy groups
+      position: support
+      importance: high
+      reason: Primary proponents of companion chatbot safety regulations to protect minors from harmful AI interactions
+    - name: Washington State Legislature
+      position: support
+      importance: high
+      reason: Both chambers advancing companion bills with strong bipartisan support (House 69-28)
+    - name: Parents and family advocacy organizations
+      position: support
+      importance: medium
+      reason: Support safety and disclosure requirements for AI chatbots that children may interact with
+    - name: AI chatbot companies
+      position: oppose
+      importance: medium
+      reason: Concerned about compliance requirements and potential restrictions on chatbot product features in Washington state
   tags:
     - state-legislation
     - ai-chatbots
@@ -6517,6 +6909,29 @@
   description: Bipartisan bill creating a federal civil cause of action for victims of nonconsensual sexually explicit
     deepfakes. Sponsored by Senators Durbin (D-IL) and Graham (R-SC). Passed Senate unanimously January 13, 2026. Held
     at desk in the House; not yet law. Complements the TAKE IT DOWN Act (criminal penalties) with civil remedies.
+  stakeholders:
+    - name: Victims' advocacy organizations
+      position: support
+      importance: high
+      reason: Strongly support civil remedies for deepfake victims; the Taylor Swift deepfake incident catalyzed public support
+    - name: Senator Dick Durbin (D-IL)
+      entityId: sid_LNfQiSo5us
+      position: support
+      importance: high
+      reason: Lead sponsor; champions the bill as essential protection for victims of nonconsensual intimate imagery
+    - name: Senator Lindsey Graham (R-SC)
+      entityId: sid_iSc4TztRuB
+      position: support
+      importance: high
+      reason: Co-sponsor; bipartisan support demonstrated by unanimous Senate passage
+    - name: US Senate (unanimous)
+      position: support
+      importance: high
+      reason: Passed unanimously January 13, 2026, reflecting rare complete bipartisan agreement on deepfake civil remedies
+    - name: Technology platforms
+      position: mixed
+      importance: medium
+      reason: Generally support combating deepfakes but concerned about potential liability exposure and content moderation obligations
   tags:
     - deepfakes
     - civil-remedies
@@ -6559,6 +6974,28 @@
     federal AI framework combining children's safety (KOSA), digital likeness (NO FAKES), copyright (anti-fair-use for
     training), and broad federal preemption of state laws. Not yet formally introduced as a bill. Released two days
     before the White House National AI Legislative Framework.
+  stakeholders:
+    - name: Senator Marsha Blackburn (R-TN)
+      entityId: sid_enf2UNKyDx
+      position: support
+      importance: high
+      reason: Author of the discussion draft; frames it as a comprehensive federal approach to AI governance combining multiple policy areas
+    - name: Content creators and artists
+      position: support
+      importance: high
+      reason: Support the anti-fair-use provision for AI training on copyrighted works and the NO FAKES Act digital likeness protections
+    - name: Child safety advocates
+      position: support
+      importance: high
+      reason: Support inclusion of KOSA provisions for children's safety in the comprehensive framework
+    - name: State legislators
+      position: oppose
+      importance: medium
+      reason: Oppose broad federal preemption of state AI laws that would override existing and emerging state-level regulations
+    - name: AI industry
+      position: mixed
+      importance: high
+      reason: Support federal preemption over state patchwork but oppose the anti-fair-use copyright provision that would restrict AI training data
   tags:
     - federal-legislation
     - comprehensive-framework

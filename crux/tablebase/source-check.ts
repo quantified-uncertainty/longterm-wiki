@@ -334,7 +334,7 @@ export function runDeterministicChecks(
 
     // Personnel-specific checks
     if (table === 'personnel') {
-      const prec = rec as unknown as PersonnelRecord;
+      const prec = rec as PersonnelRecord;
       if (prec.roleType && !['key-person', 'board', 'career'].includes(prec.roleType)) {
         issues.push({
           recordId: rec.id,
@@ -356,10 +356,10 @@ export function runDeterministicChecks(
   for (const rec of records) {
     let key: string;
     if (table === 'personnel') {
-      const p = rec as unknown as PersonnelRecord;
+      const p = rec as PersonnelRecord;
       key = `${p.personId}|${p.organizationId}|${(p.role || '').toLowerCase().trim()}`;
     } else if (table === 'funding-rounds') {
-      const f = rec as unknown as FundingRoundRecord;
+      const f = rec as FundingRoundRecord;
       key = `${f.companyId}|${(f.name || '').toLowerCase().trim()}`;
     } else {
       key = JSON.stringify(rec);

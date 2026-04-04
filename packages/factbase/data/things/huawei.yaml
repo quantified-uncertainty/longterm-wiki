@@ -1,39 +1,39 @@
 entity: sid_52UNnWZMFz
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: f_hw_found
+  - id: j9mw3hyNjQ
     property: founded-date
     value: "1987-09"
     source: https://en.wikipedia.org/wiki/Huawei
     notes: "Founded by Ren Zhengfei in Shenzhen"
 
-  - id: f_hw_hq
+  - id: sgM79xyjKQ
     property: headquarters
     value: "Shenzhen, China"
     source: https://en.wikipedia.org/wiki/Huawei
 
-  - id: f_hw_country
+  - id: G2HgcUKo3A
     property: country
     value: China
     source: https://en.wikipedia.org/wiki/Huawei
 
-  - id: f_hw_legal
+  - id: qo1aDtoOZQ
     property: legal-structure
     value: "Private company (employee-owned)"
     source: https://en.wikipedia.org/wiki/Huawei
 
-  - id: f_hw_website
+  - id: AaoL87Z6RQ
     property: website
     value: https://www.huawei.com
     source: https://en.wikipedia.org/wiki/Huawei
 
-  - id: f_hw_wiki
+  - id: 4eDJWWmFaw
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Huawei
     source: https://en.wikipedia.org/wiki/Huawei
 
   # ── Description ─────────────────────────────────────────────────
-  - id: f_hw_desc
+  - id: ebq3WaoCSQ
     property: description
     value: >-
       Chinese tech company that designs Ascend AI accelerator chips through its HiSilicon
@@ -43,7 +43,7 @@ facts:
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
-  - id: f_hw_rev_2024
+  - id: 8FrgGgB6nA
     property: revenue
     value: 8.62e+11
     asOf: 2024-12
@@ -51,7 +51,7 @@ facts:
     notes: "2024 annual revenue (~CNY 862B / ~$120B)"
 
   # ── Headcount ───────────────────────────────────────────────────
-  - id: f_hw_hc_2024
+  - id: AkOywfZNPw
     property: headcount
     value: 207000
     asOf: 2024-12
@@ -59,21 +59,21 @@ facts:
     notes: "Approximately 207,000 employees worldwide"
 
   # ── Key events ──────────────────────────────────────────────────
-  - id: f_hw_entity_list
+  - id: DmZeWAiJGw
     property: key-event
     value: "Placed on U.S. Entity List, restricting access to U.S. technology"
     asOf: 2019-05
     source: https://en.wikipedia.org/wiki/Huawei
     notes: "Blocked from accessing TSMC fabrication, Google services, and U.S. semiconductor tools"
 
-  - id: f_hw_ascend910b
+  - id: vjqq47HVmQ
     property: key-event
     value: "Ascend 910B AI chip entered mass production using SMIC fabrication"
     asOf: 2023-08
     source: https://www.tomshardware.com/news/huawei-mate-60-pro-teardown-reveals-smic-5nm-processor
     notes: "Demonstrated China's ability to produce competitive AI accelerators despite export controls"
 
-  - id: f_hw_ascend910c
+  - id: UjzOM8M8mA
     property: key-event
     value: "Ascend 910C reportedly in development as next-generation AI accelerator"
     asOf: 2025-01

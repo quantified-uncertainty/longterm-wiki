@@ -10,7 +10,8 @@
  */
 
 import { generateId } from './grant-import/id.ts';
-import { apiRequest, getServerUrl } from './wiki-server/client.ts';
+import { getServerUrl } from './wiki-server/client.ts';
+import { syncPersonnel } from './wiki-server/personnel.ts';
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -137,11 +138,7 @@ export async function syncKeyPersons(
 
     console.log(`  Batch ${batchNum}/${totalBatches}: ${batch.length} items...`);
 
-    const result = await apiRequest<{ upserted: number }>(
-      'POST',
-      '/api/personnel/sync',
-      { items: batch },
-    );
+    const result = await syncPersonnel(batch);
 
     if (result.ok) {
       totalUpserted += result.data.upserted;

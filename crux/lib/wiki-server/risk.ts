@@ -4,7 +4,7 @@
  * Input types are derived from the canonical Zod schemas in api-types.ts.
  */
 
-import { batchedRequest, getServerUrl, type ApiResult } from './client.ts';
+import { apiRequest, batchedRequest, getServerUrl, type ApiResult } from './client.ts';
 import type { RiskSnapshotInput } from '../../../apps/wiki-server/src/api-types.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { HallucinationRiskRoute } from '../../../apps/wiki-server/src/routes/wikibase/hallucination-risk.ts';
@@ -12,6 +12,7 @@ import type { HallucinationRiskRoute } from '../../../apps/wiki-server/src/route
 type RpcClient = ReturnType<typeof hc<HallucinationRiskRoute>>;
 export type RiskBatchResult = InferResponseType<RpcClient['batch']['$post'], 201>;
 export type RiskLatestResult = InferResponseType<RpcClient['latest']['$get'], 200>;
+export type RiskHistoryResult = InferResponseType<RpcClient['history']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
@@ -58,5 +59,27 @@ export async function recordRiskSnapshots(
   }
 
   return { ok: true, data: { inserted: totalInserted } };
+}
+
+/** Get latest risk scores with optional level filter. */
+export async function getRiskLatest(
+  options?: { limit?: number; level?: string },
+): Promise<ApiResult<RiskLatestResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  if (options?.level) params.set('level', options.level);
+  const qs = params.toString();
+  return apiRequest<RiskLatestResult>('GET', `/api/hallucination-risk/latest${qs ? `?${qs}` : ''}`);
+}
+
+/** Get risk history for a specific page. */
+export async function getRiskHistory(
+  pageId: string,
+  options?: { limit?: number },
+): Promise<ApiResult<RiskHistoryResult>> {
+  const params = new URLSearchParams();
+  params.set('page_id', pageId);
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  return apiRequest<RiskHistoryResult>('GET', `/api/hallucination-risk/history?${params}`);
 }
 

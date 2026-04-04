@@ -28,6 +28,7 @@
  */
 
 import type { Context, MiddlewareHandler } from "hono";
+import { verifyToken } from "./auth.js";
 import { logger } from "./logger.js";
 
 // ---------------------------------------------------------------------------
@@ -278,14 +279,10 @@ function getClientKey(c: Context): string {
 }
 
 export interface RateLimitMiddlewareOptions {
-  /** Rate limiter for GET requests (unauthenticated). */
+  /** Rate limiter for GET requests (unauthenticated only). */
   readLimiter: RateLimiter;
-  /** Rate limiter for non-GET requests (unauthenticated). */
+  /** Rate limiter for non-GET requests (unauthenticated only). */
   writeLimiter: RateLimiter;
-  /** Higher-limit read limiter for authenticated requests. */
-  authReadLimiter?: RateLimiter;
-  /** Higher-limit write limiter for authenticated requests. */
-  authWriteLimiter?: RateLimiter;
   /** Methods treated as "read". Defaults to ["GET", "HEAD", "OPTIONS"]. */
   readMethods?: string[];
   /** Paths to skip rate limiting entirely (exact match, not prefix). */
@@ -295,8 +292,12 @@ export interface RateLimitMiddlewareOptions {
 /**
  * Create a Hono middleware that applies per-IP rate limiting.
  *
- * Uses separate limiters for read vs. write requests, allowing generous
- * GET limits while restricting mutating operations more tightly.
+ * Authenticated requests (valid Bearer token matching LONGTERMWIKI_SERVER_API_KEY)
+ * skip rate limiting entirely — internal traffic (Vercel ISR, CI sync, crux CLI)
+ * is already protected by the auth middleware and should never be throttled.
+ *
+ * Unauthenticated requests use separate limiters for read vs. write, allowing
+ * generous GET limits while restricting mutating operations more tightly.
  */
 export function rateLimitMiddleware(
   options: RateLimitMiddlewareOptions
@@ -315,21 +316,29 @@ export function rateLimitMiddleware(
       return;
     }
 
-    const clientKey = getClientKey(c);
     const isRead = readMethods.has(c.req.method);
 
-    // Use higher limits for authenticated requests (internal traffic:
-    // CI sync, Next.js ISR, crux CLI). Unauthenticated traffic gets
-    // the stricter default limits.
-    const isAuthenticated = c.req.header("Authorization")?.startsWith("Bearer ");
-    let limiter: RateLimiter;
-    if (isAuthenticated && (options.authReadLimiter || options.authWriteLimiter)) {
-      limiter = isRead
-        ? (options.authReadLimiter ?? options.readLimiter)
-        : (options.authWriteLimiter ?? options.writeLimiter);
-    } else {
-      limiter = isRead ? options.readLimiter : options.writeLimiter;
+    // Authenticated requests (internal traffic: Vercel ISR, CI sync, crux
+    // CLI, groundskeeper) skip rate limiting entirely. The auth middleware
+    // (`validateApiKey()`) already validates tokens on /api/* routes, so
+    // there's no abuse vector. Rate limiting this traffic caused self-inflicted
+    // 429s during Vercel builds when 50+ ISR pages revalidated concurrently
+    // from the same IP, exhausting even the 5000 req/min authenticated pool.
+    // See: #3720, #3702.
+    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    const authHeader = c.req.header("Authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const isAuthenticated = token != null && (
+      !expectedKey || verifyToken(token, expectedKey)
+    );
+
+    if (isAuthenticated) {
+      await next();
+      return;
     }
+
+    const clientKey = getClientKey(c);
+    const limiter = isRead ? options.readLimiter : options.writeLimiter;
     const category = isRead ? "read" : "write";
 
     const result = limiter.check(clientKey);
@@ -382,31 +391,18 @@ export const DEFAULT_WRITE_LIMIT: RateLimitConfig = {
   windowMs: 60_000,
 };
 
-/** Authenticated rate limit: 1000 GET requests per minute per IP. */
-export const DEFAULT_AUTH_READ_LIMIT: RateLimitConfig = {
-  maxRequests: 1000,
-  windowMs: 60_000,
-};
-
-/** Authenticated rate limit: 200 write requests per minute per IP. */
-export const DEFAULT_AUTH_WRITE_LIMIT: RateLimitConfig = {
-  maxRequests: 200,
-  windowMs: 60_000,
-};
-
 /** Default maximum number of distinct IP keys tracked per limiter. */
 export const DEFAULT_MAX_KEYS = 10_000;
 
 /**
  * Create preconfigured rate limiters with default settings.
- * Returns separate limiters for unauthenticated and authenticated traffic.
+ * Only unauthenticated limiters are used — authenticated requests skip
+ * rate limiting entirely (see rateLimitMiddleware).
  * Override individual limits via the options parameter.
  */
 export function createDefaultRateLimiters(overrides?: {
   read?: Partial<RateLimitConfig>;
   write?: Partial<RateLimitConfig>;
-  authRead?: Partial<RateLimitConfig>;
-  authWrite?: Partial<RateLimitConfig>;
   maxKeys?: number;
 }) {
   const maxKeys = overrides?.maxKeys ?? DEFAULT_MAX_KEYS;
@@ -424,20 +420,6 @@ export function createDefaultRateLimiters(overrides?: {
     },
     maxKeys
   );
-  const authReadLimiter = new RateLimiter(
-    {
-      ...DEFAULT_AUTH_READ_LIMIT,
-      ...overrides?.authRead,
-    },
-    maxKeys
-  );
-  const authWriteLimiter = new RateLimiter(
-    {
-      ...DEFAULT_AUTH_WRITE_LIMIT,
-      ...overrides?.authWrite,
-    },
-    maxKeys
-  );
 
-  return { readLimiter, writeLimiter, authReadLimiter, authWriteLimiter };
+  return { readLimiter, writeLimiter };
 }

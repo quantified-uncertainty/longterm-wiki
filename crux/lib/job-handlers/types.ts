@@ -66,7 +66,6 @@ export interface PageImproveParams {
   tier: 'polish' | 'standard' | 'deep';
   directions?: string;
   batchId?: string;
-  /** Whether to apply changes directly (default: true) */
   apply?: boolean;
 }
 
@@ -78,26 +77,17 @@ export interface PageCreateParams {
 
 export interface BatchCommitParams {
   batchId: string;
-  /** Job IDs to collect results from */
   childJobIds: number[];
-  /** Branch name to create (default: auto-generated) */
   branchName?: string;
-  /** PR title */
   prTitle: string;
-  /** PR body description */
   prBody?: string;
-  /** Labels to add to the PR */
   prLabels?: string[];
 }
 
 export interface AutoUpdateDigestParams {
-  /** Max budget in dollars */
   budget?: number;
-  /** Max pages to update */
   maxPages?: number;
-  /** Comma-separated source IDs (empty = all) */
   sources?: string;
-  /** Whether this is a dry run (no child jobs created) */
   dryRun?: boolean;
 }
 

@@ -113,7 +113,8 @@ export default function GrantsPage() {
 
   // Compute summary stats
   const totalGrants = rows.length;
-  const totalAmount = rows.reduce((sum, r) => sum + (r.amount ?? 0), 0);
+  const grantsWithAmount = rows.filter((r) => r.amount != null && r.amount > 0);
+  const totalAmount = grantsWithAmount.reduce((sum, r) => sum + (r.amount ?? 0), 0);
   const uniqueOrgs = new Set(rows.map((r) => r.organizationId)).size;
   const uniqueRecipients = new Set(
     rows.filter((r) => r.recipient).map((r) => r.recipient),
@@ -154,7 +155,7 @@ export default function GrantsPage() {
 
   const stats = [
     { label: "Total Grants", value: totalGrants.toLocaleString() },
-    { label: "Total Funding", value: formatCompactCurrency(totalAmount) },
+    { label: grantsWithAmount.length < totalGrants ? `Total Funding (${grantsWithAmount.length} of ${totalGrants} known)` : "Total Funding", value: formatCompactCurrency(totalAmount) },
     { label: "Funding Orgs", value: String(uniqueOrgs) },
     { label: "Unique Recipients", value: String(uniqueRecipients) },
   ];

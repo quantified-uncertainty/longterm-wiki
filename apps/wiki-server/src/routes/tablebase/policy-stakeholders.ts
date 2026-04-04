@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
@@ -39,12 +40,12 @@ const SyncStakeholderBatchSchema = z.object({
 
 const ByPolicyQuery = z.object({
   position: z.enum(VALID_POSITIONS).optional(),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
 const ByStakeholderQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(100),
+  limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
 });
 

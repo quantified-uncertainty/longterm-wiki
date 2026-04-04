@@ -1,6 +1,7 @@
 import {
   fetchDetailed,
   withApiFallback,
+  type RpcJobsDashboardResult,
   type RpcJobsStatsResult,
   type RpcJobEntry,
   type FetchResult,
@@ -44,22 +45,20 @@ interface DashboardData {
 }
 
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
-  const [statsResult, failuresResult] = await Promise.all([
-    fetchDetailed<RpcJobsStatsResult>("/api/jobs/stats", { revalidate: 30 }),
-    fetchDetailed<{ entries: RpcJobEntry[]; total: number; limit: number; offset: number }>(
-      "/api/jobs?status=failed&limit=50",
-      { revalidate: 30 }
-    ),
-  ]);
+  // Use the combined /dashboard endpoint — single request instead of two,
+  // reducing rate-limit pressure during ISR revalidation bursts.
+  const result = await fetchDetailed<RpcJobsDashboardResult>(
+    "/api/jobs/dashboard?failureLimit=50",
+    { revalidate: 60 }
+  );
 
-  if (!statsResult.ok) return statsResult;
-  if (!failuresResult.ok) return failuresResult;
+  if (!result.ok) return result;
 
   return {
     ok: true as const,
     data: {
-      stats: statsResult.data,
-      recentFailures: failuresResult.data.entries,
+      stats: result.data.stats,
+      recentFailures: result.data.recentFailures,
     },
   };
 }

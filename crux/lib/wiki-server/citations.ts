@@ -145,10 +145,12 @@ export type UpsertCitationContentInput = UpsertCitationContent;
 
 export type { CitationContentRow, CitationContentListEntry, CitationContentListResult, CitationContentStatsResult };
 
+export type UpsertCitationContentResult = InferResponseType<RpcClient['content']['upsert']['$post'], 200>;
+
 export async function upsertCitationContent(
   item: UpsertCitationContentInput,
-): Promise<ApiResult<{ url: string }>> {
-  return apiRequest<{ url: string }>('POST', '/api/citations/content/upsert', item);
+): Promise<ApiResult<UpsertCitationContentResult>> {
+  return apiRequest<UpsertCitationContentResult>('POST', '/api/citations/content/upsert', item);
 }
 
 export async function getCitationContentByUrl(
@@ -190,8 +192,13 @@ export async function getCitationSourceTypeStats(): Promise<ApiResult<CitationSo
   return apiRequest<CitationSourceTypeStatsResult>('GET', '/api/citations/source-type-stats');
 }
 
-export async function getCitationBrokenQuotes(): Promise<ApiResult<CitationBrokenQuotesResult>> {
-  return apiRequest<CitationBrokenQuotesResult>('GET', '/api/citations/broken');
+export async function getCitationBrokenQuotes(
+  options?: { limit?: number },
+): Promise<ApiResult<CitationBrokenQuotesResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  const qs = params.toString();
+  return apiRequest<CitationBrokenQuotesResult>('GET', `/api/citations/broken${qs ? `?${qs}` : ''}`);
 }
 
 export async function getQuotesByPage(pageId: string, limit = 100): Promise<ApiResult<QuotesByPageResult>> {

@@ -8,6 +8,7 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   RiskSnapshotSchema as SharedSnapshotSchema,
@@ -54,13 +55,13 @@ const BatchSchema = RiskSnapshotBatchSchema;
 
 const HistoryQuery = z.object({
   page_id: z.string().min(1).max(300),
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
 });
 
 const StatsQuery = z.object({});
 
 const LatestQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
   level: z.enum(VALID_LEVELS).optional(),
 });

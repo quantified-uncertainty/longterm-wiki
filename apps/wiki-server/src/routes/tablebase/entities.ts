@@ -14,6 +14,7 @@ import {
   escapeIlike,
   dbError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   SyncEntitySchema as SharedSyncEntitySchema,
@@ -105,7 +106,7 @@ const PaginationQuery = paginationQuery({ maxLimit: MAX_PAGE_SIZE }).extend({
 
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
-  limit: z.coerce.number().int().min(1).max(100).default(20),
+  limit: clampedLimit(100, 20),
 });
 
 // ---- Organizations query schema ----
@@ -113,7 +114,7 @@ const SearchQuery = z.object({
 const ORG_SORT_ALLOWED = ["name", "revenue", "valuation", "headcount", "totalFunding", "founded"] as const;
 
 const OrganizationsQuery = z.object({
-  limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(50),
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
   q: z.string().max(200).optional(),
   sort: z.string().max(50).optional(),
@@ -928,12 +929,17 @@ const entitiesApp = new Hono()
         //
         // Instead: clear stale slugs first, then upsert on stableId (PK).
         // If a slug was reassigned to a different stableId, the old row's
-        // slug is set to a placeholder so the new row can claim it.
+        // slug is set to a title-derived fallback (with "-displaced" suffix)
+        // instead of the raw stable_id, to avoid exposing machine IDs in URLs.
         const slugToStableId = new Map(allVals.map((v) => [v.id, v.stableId]));
         for (const [slug, stableId] of slugToStableId) {
-          // If another entity currently holds this slug, clear it
+          // Reassign to title-derived slug instead of raw stable_id
           await tx.execute(sql`
-            UPDATE entities SET id = stable_id
+            UPDATE entities
+            SET id = LOWER(REGEXP_REPLACE(
+              REGEXP_REPLACE(TRANSLATE(title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
+              '-+', '-', 'g'
+            )) || '-displaced-' || SUBSTRING(stable_id FROM 5 FOR 6)
             WHERE id = ${slug} AND stable_id != ${stableId}
           `);
         }

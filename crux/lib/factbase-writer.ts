@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync, renameSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { Document, parseDocument, isSeq, isMap } from 'yaml';
-import { generateId } from '../../packages/factbase/src/ids.ts';
+import { generateFactId } from '../../packages/factbase/src/ids.ts';
 import { CUSTOM_TAGS } from '../../packages/factbase/src/loader.ts';
 
 // ── Public types ──────────────────────────────────────────────────────
@@ -39,10 +39,10 @@ export function readEntityDocument(filepath: string): Document {
 /**
  * Append a fact to an entity YAML document.
  * Adds to the `facts` sequence node, preserving existing structure.
- * Auto-generates a fact ID using `generateId()` (plain 10-char alphanumeric).
+ * Auto-generates a plain 10-char alphanumeric fact ID.
  */
 export function appendFact(doc: Document, fact: RawFactInput): string {
-  const factId = generateId();
+  const factId = generateFactId();
 
   // Build the fact object in the order we want it serialized
   const factObj: Record<string, unknown> = { id: factId, property: fact.property };
@@ -92,6 +92,35 @@ export function appendFact(doc: Document, fact: RawFactInput): string {
   factsNode.items.push(factNode);
 
   return factId;
+}
+
+/**
+ * Update an existing fact in a YAML document, matching by (property, asOf).
+ * Returns the ID of the updated fact, or null if no match was found.
+ */
+export function updateFact(
+  doc: Document,
+  match: { property: string; asOf: string },
+  updates: { value?: unknown; source?: string; notes?: string },
+): string | null {
+  const contents = doc.contents;
+  if (!isMap(contents)) return null;
+
+  const factsNode = contents.get('facts', true);
+  if (!isSeq(factsNode)) return null;
+
+  for (const item of factsNode.items) {
+    if (!isMap(item)) continue;
+    const prop = item.get('property');
+    const asOf = item.get('asOf');
+    if (prop === match.property && String(asOf) === match.asOf) {
+      if (updates.value !== undefined) item.set('value', updates.value);
+      if (updates.source !== undefined) item.set('source', updates.source);
+      if (updates.notes !== undefined) item.set('notes', updates.notes);
+      return String(item.get('id') ?? '');
+    }
+  }
+  return null;
 }
 
 /**

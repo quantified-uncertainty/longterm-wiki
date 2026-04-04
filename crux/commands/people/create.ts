@@ -84,7 +84,7 @@ export async function createCommand(
     const sourceTypes = [...new Set(c.sources.map((s) => s.type))].join(', ');
     lines.push('  description: >-');
     lines.push(
-      `    TODO: Add description for ${c.name}. Discovered from: ${sourceTypes}.`,
+      `    [Needs description] ${c.name}. Discovered from: ${sourceTypes}.`,
     );
     lines.push('');
   }

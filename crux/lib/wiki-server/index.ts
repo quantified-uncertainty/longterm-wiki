@@ -220,9 +220,20 @@ export type { AllocatedId, IdListResult } from './ids.ts';
 // Source Checks
 export {
   getVerdictsByType,
+  getVerdictsByEntity,
+  getVerdictsByPage,
+  getFailures,
+  getStaleVerdicts,
   getContradictedEntityIds,
 } from './source-checks.ts';
-export type { VerdictEntry, VerdictsResponse } from './source-checks.ts';
+export type {
+  VerdictEntry,
+  VerdictsResponse,
+  ByEntityResponse,
+  ByPageResponse,
+  FailuresResponse,
+  StaleResponse,
+} from './source-checks.ts';
 
 // Claims
 export { proposeClaims, getClaimStatus } from './claims.ts';

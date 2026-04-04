@@ -12,7 +12,7 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { apiRequest } from '../lib/wiki-server/client.ts';
+import { storeVerdict as storeVerdictRpc, getDueForRecheck, getEvidenceByRecord } from '../lib/wiki-server/verifications.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import {
   fetchSourceContent,
@@ -102,9 +102,7 @@ interface RecheckSummary {
  */
 async function resolveSourceUrl(recordType: string, recordId: string): Promise<string | null> {
   try {
-    const response = await apiRequest<{
-      evidence: Array<{ sourceUrl: string | null }>;
-    }>('GET', `/api/source-checks/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}?limit=5`);
+    const response = await getEvidenceByRecord(recordType, recordId, { limit: 5 });
 
     if (!response.ok || !response.data?.evidence) return null;
 
@@ -247,11 +245,7 @@ async function storeRecheckResult(result: RecheckResult): Promise<void> {
     nextCheckDue,
   };
 
-  const response = await apiRequest<{ ok: boolean }>(
-    'POST',
-    '/api/source-checks/verdicts',
-    body,
-  );
+  const response = await storeVerdictRpc(body);
 
   if (!response.ok) {
     console.warn(`${LOG_PREFIX} Failed to store verdict for ${result.recordType}/${result.recordId}: ${response.error}`);
@@ -281,10 +275,7 @@ async function recheckCommand(
     queryParams.set('record_type', typeFilter);
   }
 
-  const response = await apiRequest<{
-    items: DueItem[];
-    total: number;
-  }>('GET', `/api/source-checks/due-for-recheck?${queryParams.toString()}`);
+  const response = await getDueForRecheck({ recordType: typeFilter, limit: itemLimit });
 
   if (!response.ok) {
     return {

@@ -24,6 +24,7 @@ import type { Fact, Entity as FBEntity } from '../../packages/factbase/src/types
 import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { listVerdicts, getVerificationStats } from '../lib/wiki-server/verifications.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import {
   VALID_RECORD_TYPES,
@@ -275,16 +276,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
   const map = new Map<string, VerifiedFactInfo>();
 
   try {
-    const response = await apiRequest<{
-      verdicts: Array<{
-        recordType: string;
-        recordId: string;
-        verdict: string;
-        lastComputedAt?: string;
-        needsRecheck?: boolean;
-      }>;
-      total: number;
-    }>('GET', '/api/verifications/verdicts?record_type=fact&limit=500&offset=0');
+    const response = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset: 0 });
 
     if (response.ok && response.data) {
       for (const v of response.data.verdicts) {
@@ -299,16 +291,7 @@ async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>>
       // Paginate if there are more verdicts
       let offset = response.data.verdicts.length;
       while (offset < response.data.total) {
-        const nextResponse = await apiRequest<{
-          verdicts: Array<{
-            recordType: string;
-            recordId: string;
-            verdict: string;
-            lastComputedAt?: string;
-            needsRecheck?: boolean;
-          }>;
-          total: number;
-        }>('GET', `/api/verifications/verdicts?record_type=fact&limit=500&offset=${offset}`);
+        const nextResponse = await listVerdicts({ recordType: 'fact', limit: API_PAGE_LIMIT, offset });
 
         if (!nextResponse.ok || !nextResponse.data) break;
         for (const v of nextResponse.data.verdicts) {
@@ -338,20 +321,11 @@ async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecord
   const map = new Map<string, VerifiedRecordInfo>();
 
   try {
-    const PAGE_SIZE = 500;
+    const PAGE_SIZE = 200; // Must not exceed wiki-server MAX_PAGE_SIZE (200)
     let offset = 0;
 
     while (true) {
-      const response = await apiRequest<{
-        verdicts: Array<{
-          recordType: string;
-          recordId: string;
-          verdict: string;
-          lastComputedAt?: string;
-          needsRecheck?: boolean;
-        }>;
-        total: number;
-      }>('GET', `/api/verifications/verdicts?limit=${PAGE_SIZE}&offset=${offset}`);
+      const response = await listVerdicts({ limit: PAGE_SIZE, offset });
 
       if (!response.ok || !response.data) {
         throw new Error(`Failed to fetch record verdicts at offset ${offset}`);
@@ -1829,13 +1803,7 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
 // ── Stats command (merged from records-verify) ───────────────────────
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await apiRequest<{
-    total: number;
-    by_verdict: Record<string, number>;
-    by_type: Record<string, number>;
-    needs_recheck: number;
-    avg_confidence: number;
-  }>('GET', '/api/verifications/stats');
+  const response = await getVerificationStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };

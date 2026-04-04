@@ -63,11 +63,6 @@ export const VALID_SOURCE_CHECK_VERDICTS = [
 
 export type SourceCheckVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
 
-/** @deprecated Use VALID_SOURCE_CHECK_VERDICTS */
-export const VALID_VERIFICATION_VERDICTS = VALID_SOURCE_CHECK_VERDICTS;
-/** @deprecated Use SourceCheckVerdict */
-export type VerificationVerdict = SourceCheckVerdict;
-
 // ---------------------------------------------------------------------------
 // Edit Logs
 // ---------------------------------------------------------------------------
@@ -225,8 +220,8 @@ export const UpsertCitationContentSchema = z.object({
   httpStatus: z.number().int().nullable().optional(),
   contentType: z.string().max(200).nullable().optional(),
   pageTitle: z.string().max(1000).nullable().optional(),
-  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional(),
-  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional(),
+  fullTextPreview: z.string().max(CITATION_CONTENT_PREVIEW_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
+  fullText: z.string().max(CITATION_CONTENT_FULL_TEXT_MAX).nullable().optional().transform(v => v?.replace(/\0/g, '') ?? v),
   contentLength: z.number().int().nullable().optional(),
   contentHash: z.string().max(64).nullable().optional(),
   /** How content was fetched: firecrawl, built-in, youtube-transcript, abstract */
@@ -623,6 +618,7 @@ export interface ResourceRow {
   credibilityOverride: number | null;
   fetchedAt: string | null;
   contentHash: string | null;
+  /** HTTP reachability of the URL. Distinct from enrichmentStatus (LLM pipeline stage). */
   fetchStatus: "ok" | "dead" | "soft_404" | "not_found" | "timeout" | "unreachable" | "paywall" | "error" | null;
   lastFetchedAt: string | null;
   archiveUrl: string | null;
@@ -632,6 +628,7 @@ export interface ResourceRow {
   typeMetadata: Record<string, unknown> | null;
   publisherEntityId: string | null;
   relatedEntityIds: string[] | null;
+  /** LLM enrichment pipeline stage. Distinct from fetchStatus (HTTP reachability). */
   enrichmentStatus: string | null;
   enrichmentDate: string | null;
   importanceScore: number | null;
@@ -736,7 +733,7 @@ export interface ResourceStatsResult {
   withMetadata: number;
   /** Resources that have been fetched (fetchedAt is set). */
   fetched: number;
-  /** Breakdown by enrichment_status (null → "none"). */
+  /** Breakdown by enrichment_status (LLM pipeline stage; null → "none"). */
   byEnrichmentStatus: Record<string, number>;
   /** Content cache (citation_content) population stats. */
   contentCacheStats: {
@@ -746,8 +743,12 @@ export interface ResourceStatsResult {
   };
 }
 
-// -- Resources: Fetch status update ------------------------------------------
-
+// -- Resources: Fetch status (HTTP reachability) ----------------------------
+//
+// fetch_status tracks whether the resource URL is reachable. It is written by
+// resource-ingest (job handler) and source-fetcher after each HTTP fetch attempt.
+// This is distinct from enrichment_status (LLM pipeline stage).
+//
 // Fine-grained statuses: soft_404, not_found, timeout, unreachable are subtypes
 // of the legacy "dead" bucket. Stored as-is in the text column for richer
 // retry logic and analytics. UI code should treat them as "dead" for display.

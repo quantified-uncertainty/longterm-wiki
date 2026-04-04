@@ -1,7 +1,8 @@
 import { generateId } from "./id.ts";
 import { isSupportedCurrency } from "./currency.ts";
 import type { RawGrant, SyncGrant } from "./types.ts";
-import { apiRequest, getServerUrl } from "../wiki-server/client.ts";
+import { getServerUrl } from "../wiki-server/client.ts";
+import { syncGrants } from "../wiki-server/grants.ts";
 import { getManifest } from "./manifests/index.ts";
 
 export const SYNC_BATCH_SIZE = 500;
@@ -104,11 +105,7 @@ export async function syncToServer(
       `  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`
     );
 
-    const result = await apiRequest<{ upserted: number }>(
-      "POST",
-      "/api/grants/sync",
-      { items: batch },
-    );
+    const result = await syncGrants(batch);
 
     if (result.ok) {
       totalUpserted += result.data.upserted;

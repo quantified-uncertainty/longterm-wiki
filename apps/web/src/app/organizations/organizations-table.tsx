@@ -2,6 +2,7 @@
 
 import { useMemo, useCallback, useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import { z } from "zod";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
@@ -91,22 +92,29 @@ export interface OrgStatDef {
 
 // ── Server response shape ──────────────────────────────────────────
 
-interface ServerOrg {
-  id: string;
-  wikiId: string | null;
-  stableId: string | null;
-  title: string;
-  description: string | null;
-  website: string | null;
-  revenueNum: number | null;
-  revenueDate: string | null;
-  valuationNum: number | null;
-  valuationDate: string | null;
-  headcount: number | null;
-  headcountDate: string | null;
-  totalFundingNum: number | null;
-  foundedDate: string | null;
-}
+const ServerOrgSchema = z.object({
+  id: z.string(),
+  wikiId: z.string().nullable(),
+  stableId: z.string().nullable().optional(),
+  title: z.string(),
+  description: z.string().nullable().optional(),
+  website: z.string().nullable().optional(),
+  revenueNum: z.number().nullable(),
+  revenueDate: z.string().nullable(),
+  valuationNum: z.number().nullable(),
+  valuationDate: z.string().nullable(),
+  headcount: z.number().nullable(),
+  headcountDate: z.string().nullable(),
+  totalFundingNum: z.number().nullable(),
+  foundedDate: z.string().nullable(),
+});
+
+type ServerOrg = z.infer<typeof ServerOrgSchema>;
+
+const ServerOrgsResponseSchema = z.object({
+  organizations: z.array(ServerOrgSchema).optional(),
+  total: z.number().optional(),
+});
 
 // Map OrgSortKey to server sort field names.
 // orgType is not sortable server-side (not in DB).
@@ -123,7 +131,12 @@ const PAGE_SIZE = 50;
 
 // Stable module-level transform function — avoids re-renders
 function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number } {
-  const data = json as { organizations?: ServerOrg[]; total?: number };
+  const parsed = ServerOrgsResponseSchema.safeParse(json);
+  if (!parsed.success) {
+    console.warn("Organizations API response schema mismatch:", parsed.error.message);
+    return { rows: [], total: 0 };
+  }
+  const data = parsed.data;
   return {
     rows: (data.organizations ?? []).map((org) => ({
       id: org.id,

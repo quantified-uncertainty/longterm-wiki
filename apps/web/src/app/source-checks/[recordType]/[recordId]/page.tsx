@@ -31,7 +31,9 @@ interface PageProps {
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { recordType, recordId } = await params;
+  const rawParams = await params;
+  const recordType = decodeURIComponent(rawParams.recordType);
+  const recordId = decodeURIComponent(rawParams.recordId);
 
   // Try to resolve a human-readable name
   const namesResult = await fetchDetailed<RpcSourceChecksResolveNamesResult>(
@@ -52,7 +54,12 @@ export async function generateMetadata({
 }
 
 export default async function SourceCheckDetailPage({ params }: PageProps) {
-  const { recordType, recordId } = await params;
+  const rawParams = await params;
+  // Next.js may leave URL-encoded characters (e.g. %3A for :) in dynamic
+  // route params. Decode them so the wiki-server API receives the actual
+  // recordId (e.g. "page:1day-sooner:fn3" instead of "page%3A1day-sooner%3Afn3").
+  const recordType = decodeURIComponent(rawParams.recordType);
+  const recordId = decodeURIComponent(rawParams.recordId);
 
   // Fetch detail (verdicts + evidence) and names in parallel
   const [detailResult, namesResult] = await Promise.all([

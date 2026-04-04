@@ -1,7 +1,7 @@
 entity: sid_ezdMt069kA
 facts:
   # ── Global semiconductor market ─────────────────────────────────
-  - id: f_semi_rev_2023
+  - id: H0jWjnJQeA
     property: global-semiconductor-revenue
     value: 5.27e+11
     unit: USD
@@ -9,7 +9,7 @@ facts:
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue $527B in 2023; decline from 2022 peak"
 
-  - id: f_semi_rev_2024
+  - id: gDSiWN5TuQ
     property: global-semiconductor-revenue
     value: 6.27e+11
     unit: USD
@@ -17,7 +17,7 @@ facts:
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue ~$627B in 2024; 19% YoY growth"
 
-  - id: f_semi_rev_2026_proj
+  - id: WTGyHKuqLQ
     property: global-semiconductor-revenue
     value: 9.10e+11
     unit: USD
@@ -26,7 +26,7 @@ facts:
     notes: "Projected $910B by 2026; driven by AI chip demand"
 
   # ── CHIPS Act ───────────────────────────────────────────────────
-  - id: f_semi_chips_total
+  - id: nePcfbiIxw
     property: chips-act-total-funding
     value: 5.27e+10
     unit: USD
@@ -34,7 +34,7 @@ facts:
     source: https://en.wikipedia.org/wiki/CHIPS_and_Science_Act
     notes: "$52.7B in CHIPS Act funding for semiconductor manufacturing and R&D"
 
-  - id: f_semi_chips_private
+  - id: FQumWOEu9A
     property: chips-act-private-investment
     value: 6.30e+11
     unit: USD
@@ -42,7 +42,7 @@ facts:
     source: https://www.semiconductors.org/
     notes: "Over $630B in private investment catalyzed by CHIPS Act"
 
-  - id: f_semi_chips_rd
+  - id: Kq1rz7upLQ
     property: chips-act-rd-allocation
     value: 1.10e+10
     unit: USD
@@ -51,7 +51,7 @@ facts:
     notes: "$11B allocated for R&D, including $3.5B for defense 'secure enclave'"
 
   # ── Export control enforcement ──────────────────────────────────
-  - id: f_semi_smuggling_2024
+  - id: G65wqHuwLw
     property: estimated-chip-diversion
     value: 140000
     unit: chips
@@ -60,7 +60,7 @@ facts:
     notes: "CNAS median estimate of ~140,000 chips diverted to China in 2024, representing 6-10% of China's AI compute"
 
   # ── Hyperscaler AI CapEx ────────────────────────────────────────
-  - id: f_semi_hyperscaler_capex
+  - id: 3jZsUwmFfQ
     property: hyperscaler-ai-capex
     value: 6.50e+11
     unit: USD

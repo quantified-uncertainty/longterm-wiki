@@ -100,9 +100,9 @@ export default function InvestmentsPage() {
     return 0;
   });
 
-  // Summary stats
   const totalInvestments = rows.length;
-  const totalAmount = rows.reduce((sum, r) => sum + (r.amount ?? 0), 0);
+  const rowsWithAmount = rows.filter((r) => r.amount != null && r.amount > 0);
+  const totalAmount = rowsWithAmount.reduce((sum, r) => sum + (r.amount ?? 0), 0);
   const uniqueInvestors = new Set(
     rows.filter((r) => r.investorName).map((r) => r.investorName),
   ).size;
@@ -110,7 +110,7 @@ export default function InvestmentsPage() {
 
   const stats = [
     { label: "Investments", value: totalInvestments.toLocaleString() },
-    { label: "Total Amount", value: formatCompactCurrency(totalAmount) },
+    { label: rowsWithAmount.length < totalInvestments ? `Total (${rowsWithAmount.length} of ${totalInvestments} known)` : "Total Amount", value: formatCompactCurrency(totalAmount) },
     { label: "Investors", value: String(uniqueInvestors) },
     { label: "Companies", value: String(uniqueCompanies) },
   ];
@@ -169,6 +169,8 @@ export default function InvestmentsPage() {
                       >
                         {row.investorName}
                       </Link>
+                    ) : row.investorName === "Unknown" ? (
+                      <span className="text-muted-foreground/60 italic">Undisclosed</span>
                     ) : (
                       <span className="font-medium text-foreground">
                         {row.investorName}
@@ -193,10 +195,12 @@ export default function InvestmentsPage() {
                     {row.roundName ?? ""}
                   </td>
                   <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                    {row.amount != null && (
+                    {row.amount != null && row.amount > 0 ? (
                       <span className="font-semibold">
                         {formatCompactCurrency(row.amount)}
                       </span>
+                    ) : (
+                      <span className="text-muted-foreground/40">{"—"}</span>
                     )}
                   </td>
                   <td className="py-2 px-3 text-xs">

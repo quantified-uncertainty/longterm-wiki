@@ -235,7 +235,10 @@ export function DivisionsSection({
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
                     <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
-                      <RecordVerificationDot verdict={verdict?.verdict} />
+                      <RecordVerificationDot
+                        verdict={verdict?.verdict}
+                        href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
+                      />
                       {(() => {
                         const href = getDivisionHref(d);
                         return href ? (

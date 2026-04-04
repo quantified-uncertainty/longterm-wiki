@@ -12,6 +12,13 @@ export interface SnapshotRetentionConfig extends TaskConfig {
   keep: number;
 }
 
+export interface AutoUpdateEnqueueConfig extends TaskConfig {
+  /** Max dollars per auto-update run (default: 30). */
+  budget: number;
+  /** Max pages per auto-update run (default: 5). */
+  maxPages: number;
+}
+
 export interface Config {
   githubAppId: string;
   githubInstallationId: string;
@@ -30,6 +37,8 @@ export interface Config {
     sessionSweep: TaskConfig;
     dataQualitySnapshot: TaskConfig;
     jobWorkerHealth: TaskConfig;
+    autoUpdateEnqueue: AutoUpdateEnqueueConfig;
+    jobFailureTriage: TaskConfig;
   };
 }
 
@@ -113,6 +122,18 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_JOB_WORKER_HEALTH_ENABLED", true),
         schedule:
           process.env["TASK_JOB_WORKER_HEALTH_SCHEDULE"] ?? "*/5 * * * *", // every 5 minutes
+      },
+      autoUpdateEnqueue: {
+        enabled: envBool("TASK_AUTO_UPDATE_ENQUEUE_ENABLED", true),
+        schedule:
+          process.env["TASK_AUTO_UPDATE_ENQUEUE_SCHEDULE"] ?? "0 6 * * *", // daily at 6am UTC
+        budget: envInt("TASK_AUTO_UPDATE_ENQUEUE_BUDGET", 30),
+        maxPages: envInt("TASK_AUTO_UPDATE_ENQUEUE_MAX_PAGES", 5),
+      },
+      jobFailureTriage: {
+        enabled: envBool("TASK_JOB_FAILURE_TRIAGE_ENABLED", true),
+        schedule:
+          process.env["TASK_JOB_FAILURE_TRIAGE_SCHEDULE"] ?? "0 */6 * * *", // every 6 hours
       },
     },
   };
