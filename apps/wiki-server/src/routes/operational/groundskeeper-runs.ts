@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { eq, desc, and, sql, gte } from "drizzle-orm";
+import { z } from "zod";
 import { getDrizzleDb } from "../../db.js";
 import { groundskeeperRuns } from "../../schema.js";
 import {
@@ -7,11 +8,18 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import {
   RecordGroundskeeperRunSchema,
   RecordGroundskeeperRunBatchSchema,
 } from "../../api-types.js";
+
+const ListRunsQuery = z.object({
+  task: z.string().optional(),
+  limit: clampedLimit(500, 100),
+});
 
 const groundskeeperRunsApp = new Hono()
   // ---- POST / (record a single run) ----
@@ -75,9 +83,8 @@ const groundskeeperRunsApp = new Hono()
   })
 
   // ---- GET / (list runs) ----
-  .get("/", async (c) => {
-    const taskName = c.req.query("task");
-    const limit = Math.min(Number(c.req.query("limit") || 100), 500);
+  .get("/", zv("query", ListRunsQuery), async (c) => {
+    const { task: taskName, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions = taskName

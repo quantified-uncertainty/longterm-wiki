@@ -301,6 +301,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'inline-pagination',
+    name: 'No inline limit clamping in routes (use clampedLimit)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-inline-pagination.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'prompt-escaping',
     name: 'Prompt XML interpolation escaping',
     command: 'npx',
