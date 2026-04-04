@@ -166,10 +166,11 @@ if [ -n "$SLOT_FROM_DIR" ]; then
   fi
 fi
 
-SLOT=$(cat "$AGENT_SLOT_FILE" 2>/dev/null | tr -d '[:space:]' || true)
-if [ -n "$SLOT" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
-  tmux rename-window "A${SLOT}:${BRANCH}" 2>/dev/null || true
-  CONTEXT_LINES+=("Tmux: window renamed to A${SLOT}:${BRANCH}")
+# Tmux window naming — derive from directory name, not .agent-slot file
+# See: https://github.com/quantified-uncertainty/longterm-wiki/discussions/3798
+if [ -n "$SLOT_FROM_DIR" ] && command -v tmux >/dev/null 2>&1 && [ -n "${TMUX:-}" ]; then
+  tmux rename-window "A${SLOT_FROM_DIR}:${BRANCH}" 2>/dev/null || true
+  CONTEXT_LINES+=("Tmux: window renamed to A${SLOT_FROM_DIR}:${BRANCH}")
 fi
 
 # ─── 6. Active agent registration/heartbeat ──────────────────────────────────────
@@ -196,11 +197,8 @@ if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detac
       AGENT_TASK="Session on ${BRANCH}"
     fi
 
-    # Include agent slot in metadata if available
-    SLOT_NUM=""
-    if [ -f "$REPO_ROOT/.agent-slot" ]; then
-      SLOT_NUM=$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]')
-    fi
+    # Include agent slot in metadata — derive from directory name, not file
+    SLOT_NUM="$SLOT_FROM_DIR"
 
     # Build JSON payload safely with jq
     REGISTER_JSON=$(jq -n \
@@ -238,8 +236,8 @@ fi
 
 if [ "$BRANCH" = "main" ] && [ ! -f ".claude/wip-checklist.md" ] && [ ! -f ".agent-task" ]; then
   SLOT_LABEL=""
-  if [ -f "$REPO_ROOT/.agent-slot" ]; then
-    SLOT_LABEL="Slot A$(cat "$REPO_ROOT/.agent-slot" 2>/dev/null | tr -d '[:space:]') is "
+  if [ -n "$SLOT_FROM_DIR" ]; then
+    SLOT_LABEL="Slot A${SLOT_FROM_DIR} is "
   fi
   CONTEXT_LINES+=("")
   CONTEXT_LINES+=("═══════════════════════════════════════════════════════")
