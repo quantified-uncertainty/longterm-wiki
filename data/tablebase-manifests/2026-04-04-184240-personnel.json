@@ -1,0 +1,114 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-04T18:42:40.974Z",
+  "verificationSummary": {
+    "withVerification": 1,
+    "withoutVerification": 11,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 1
+    }
+  },
+  "records": [
+    {
+      "id": "y1ZfNQYbTj",
+      "personId": "rbLrBH9OG3",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Director",
+      "source": "https://blog.aiimpacts.org/about",
+      "verdict": "none"
+    },
+    {
+      "id": "9lH9obhiO0",
+      "personId": "MwQkWTJIYT",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Acting Director",
+      "source": "https://blog.aiimpacts.org/about",
+      "verdict": "none"
+    },
+    {
+      "id": "w8082YCmMq",
+      "personId": "sid_vzxfzxBITd",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Co-founder",
+      "source": "https://aiimpacts.org/about/",
+      "verdict": "partial"
+    },
+    {
+      "id": "XXV0m5diLe",
+      "personId": "u0Ja1FLXhu",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Operations Lead",
+      "source": "https://aiimpacts.org/december-2022-updates-and-fundraising/",
+      "verdict": "none"
+    },
+    {
+      "id": "TQxrDhPNzZ",
+      "personId": "Op7YUQv3Jj",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Research Analyst",
+      "source": "https://aiimpacts.org/december-2022-updates-and-fundraising/",
+      "verdict": "none"
+    },
+    {
+      "id": "s69MQqUP94",
+      "personId": "HH5pnSTW2M",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Research Analyst",
+      "source": "https://aiimpacts.org/december-2022-updates-and-fundraising/",
+      "verdict": "none"
+    },
+    {
+      "id": "h3ZHIcPtc6",
+      "personId": "LibRRBbNWt",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Research Analyst",
+      "source": "https://aiimpacts.org/december-2022-updates-and-fundraising/",
+      "verdict": "none"
+    },
+    {
+      "id": "l0ZRFphIz5",
+      "personId": "rc1AUNWIxL",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Research Assistant",
+      "source": "https://aiimpacts.org/december-2022-updates-and-fundraising/",
+      "verdict": "none"
+    },
+    {
+      "id": "8Rh1zneGp6",
+      "personId": "OaBqku9uoK",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Researcher",
+      "source": "https://aiimpacts.org/ai-impacts-2020-review/",
+      "verdict": "none"
+    },
+    {
+      "id": "Mw0SXPZtqC",
+      "personId": "sid_3rVnY5qWJW",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Researcher",
+      "source": "https://aiimpacts.org/ai-impacts-2020-review/",
+      "verdict": "none"
+    },
+    {
+      "id": "EPA7kAFEbS",
+      "personId": "sEB28tQ4fP",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Researcher",
+      "source": "https://aiimpacts.org/ai-impacts-2020-review/",
+      "verdict": "none"
+    },
+    {
+      "id": "aEqKofrn3x",
+      "personId": "45I5rWN2vr",
+      "organizationId": "sid_TdbypiKyCw",
+      "role": "Researcher",
+      "source": "https://aiimpacts.org/recently-at-ai-impacts/",
+      "verdict": "none"
+    }
+  ]
+}
