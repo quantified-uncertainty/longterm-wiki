@@ -42,3 +42,20 @@ export async function getAllBlueskyPosts(
   const qs = params.toString();
   return apiRequest<BlueskyPostsResult>('GET', `/api/bluesky/posts${qs ? `?${qs}` : ''}`);
 }
+
+export type BlueskyAddAccountResult = InferResponseType<RpcClient['accounts']['$post'], 200>;
+export type BlueskySyncResult = InferResponseType<RpcClient['sync'][':did']['$post'], 200>;
+
+/** Add a bluesky account to track. */
+export async function addBlueskyAccount(
+  body: Record<string, unknown>,
+): Promise<ApiResult<BlueskyAddAccountResult>> {
+  return apiRequest<BlueskyAddAccountResult>('POST', '/api/bluesky/accounts', body);
+}
+
+/** Sync posts from a tracked bluesky account. */
+export async function syncBlueskyAccount(
+  did: string,
+): Promise<ApiResult<BlueskySyncResult>> {
+  return apiRequest<BlueskySyncResult>('POST', `/api/bluesky/sync/${encodeURIComponent(did)}`);
+}

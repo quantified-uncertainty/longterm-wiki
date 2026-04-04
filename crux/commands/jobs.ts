@@ -21,11 +21,13 @@ import {
   listJobs,
   getJob,
   cancelJob,
+  failJob,
   sweepJobs,
   getJobStats,
   type JobEntry,
 } from '../lib/wiki-server/jobs.ts';
-import { apiRequest, type ApiResult } from '../lib/wiki-server/client.ts';
+import { type ApiResult } from '../lib/wiki-server/client.ts';
+import { listResources, type ResourceListResult } from '../lib/wiki-server/resources.ts';
 import { getRegisteredTypes } from '../lib/job-handlers/index.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { parseIntOpt } from '../lib/cli.ts';
@@ -302,10 +304,8 @@ async function retry(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
-  // Use a direct API request to reset to pending
-  const result = await apiRequest<JobEntry>('POST', `/api/jobs/${id}/fail`, {
-    error: 'Manual retry requested',
-  });
+  // Use failJob to reset to pending (it handles retry logic)
+  const result = await failJob(id, 'Manual retry requested');
 
   if (!result.ok) return handleApiError(result, c);
 
@@ -620,12 +620,7 @@ async function enqueueResourceIngest(_args: string[], options: CommandOptions): 
   while (true) {
     let result;
     for (let retry = 0; retry < 10; retry++) {
-      result = await apiRequest<{
-        resources: Array<{ id: string; url: string; lastFetchedAt: string | null }>;
-        total: number;
-        limit: number;
-        offset: number;
-      }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${offset}`);
+      result = await listResources(PAGE_SIZE, offset);
 
       if (result.ok) break;
       if (result.message.includes('429')) {
@@ -843,18 +838,7 @@ async function enqueueResourceReingest(_args: string[], options: CommandOptions)
   while (true) {
     let result;
     for (let retry = 0; retry < 10; retry++) {
-      result = await apiRequest<{
-        resources: Array<{
-          id: string;
-          url: string;
-          lastFetchedAt: string | null;
-          contentLifecycle: string | null;
-          contentHash: string | null;
-        }>;
-        total: number;
-        limit: number;
-        offset: number;
-      }>('GET', `/api/resources/all?limit=${PAGE_SIZE}&offset=${pageOffset}`);
+      result = await listResources(PAGE_SIZE, pageOffset);
 
       if (result.ok) break;
       if (result.message.includes('429')) {

@@ -12,7 +12,8 @@
  */
 
 import { generateId } from "../lib/grant-import/id.ts";
-import { apiRequest, getServerUrl } from "../lib/wiki-server/client.ts";
+import { getServerUrl } from "../lib/wiki-server/client.ts";
+import { syncDivisions } from "../lib/wiki-server/divisions.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
@@ -831,11 +832,7 @@ async function cmdSync(dryRun: boolean) {
     return;
   }
 
-  const result = await apiRequest<{ upserted: number }>(
-    "POST",
-    "/api/divisions/sync",
-    { items }
-  );
+  const result = await syncDivisions(items as unknown as Array<Record<string, unknown>>);
 
   if (result.ok) {
     console.log(`Upserted ${result.data.upserted} divisions`);

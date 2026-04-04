@@ -21,7 +21,12 @@ import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../../lib/command-types.ts";
-import { apiRequest, isServerAvailable } from "../../lib/wiki-server/client.ts";
+import { isServerAvailable, apiRequest } from "../../lib/wiki-server/client.ts";
+import {
+  getEvidenceByRecord,
+  storeEvidence,
+  storeVerdict,
+} from "../../lib/wiki-server/verifications.ts";
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -161,10 +166,7 @@ async function hasExistingVerification(
   sourceUrl: string | null,
   fieldName: string
 ): Promise<boolean> {
-  const result = await apiRequest<{ evidence: Array<{ sourceUrl: string | null; fieldName: string | null }> }>(
-    "GET",
-    `/api/verifications/evidence/policy-stakeholder/${encodeURIComponent(recordId)}?limit=50`
-  );
+  const result = await getEvidenceByRecord("policy-stakeholder", recordId, { limit: 50 });
   if (!result.ok) return false;
 
   return result.data.evidence.some(
@@ -182,28 +184,24 @@ async function createVerification(
   stakeholderName: string,
   policyTitle: string
 ): Promise<VerificationResponse | null> {
-  const result = await apiRequest<VerificationResponse>(
-    "POST",
-    "/api/verifications/evidence",
-    {
-      recordType: "policy-stakeholder",
-      recordId,
-      sourceUrl,
-      fieldName: "position",
-      expectedValue: position,
-      verdict: "confirmed",
-      confidence: 0.8,
-      isPrimarySource: true,
-      notes: `Source URL confirms ${stakeholderName}'s ${position} position on ${policyTitle}. Manually curated source link from YAML data.`,
-    }
-  );
+  const result = await storeEvidence({
+    recordType: "policy-stakeholder",
+    recordId,
+    sourceUrl,
+    fieldName: "position",
+    expectedValue: position,
+    verdict: "confirmed",
+    confidence: 0.8,
+    isPrimarySource: true,
+    notes: `Source URL confirms ${stakeholderName}'s ${position} position on ${policyTitle}. Manually curated source link from YAML data.`,
+  });
   if (!result.ok) {
     console.warn(
       `  Warning: Failed to create verification for ${recordId}: ${result.message}`
     );
     return null;
   }
-  return result.data;
+  return result.data as unknown as VerificationResponse;
 }
 
 /**
@@ -219,26 +217,22 @@ async function upsertVerdict(
     needsRecheck?: boolean;
   }
 ): Promise<VerdictResponse | null> {
-  const result = await apiRequest<VerdictResponse>(
-    "POST",
-    "/api/verifications/verdicts",
-    {
-      recordType: "policy-stakeholder",
-      recordId,
-      verdict,
-      confidence: opts.confidence ?? null,
-      reasoning: opts.reasoning ?? null,
-      sourcesChecked: opts.sourcesChecked ?? 0,
-      needsRecheck: opts.needsRecheck ?? false,
-    }
-  );
+  const result = await storeVerdict({
+    recordType: "policy-stakeholder",
+    recordId,
+    verdict,
+    confidence: opts.confidence ?? null,
+    reasoning: opts.reasoning ?? null,
+    sourcesChecked: opts.sourcesChecked ?? 0,
+    needsRecheck: opts.needsRecheck ?? false,
+  });
   if (!result.ok) {
     console.warn(
       `  Warning: Failed to upsert verdict for ${recordId}: ${result.message}`
     );
     return null;
   }
-  return result.data;
+  return result.data as unknown as VerdictResponse;
 }
 
 // ── Command Handler ──────────────────────────────────────────────────

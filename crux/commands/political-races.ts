@@ -14,10 +14,14 @@ import type {
   CommandOptions as BaseOptions,
   CommandResult,
 } from "../lib/command-types.ts";
+import { getServerUrl } from "../lib/wiki-server/client.ts";
 import {
-  apiRequest,
-  getServerUrl,
-} from "../lib/wiki-server/client.ts";
+  getAllRaces,
+  getRace,
+  getRaceStats,
+  syncRaces,
+  syncCandidates,
+} from "../lib/wiki-server/political.ts";
 
 interface CommandOptions extends BaseOptions {
   status?: string;
@@ -38,25 +42,12 @@ async function listCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const params = new URLSearchParams();
-  if (options.status) params.set("status", options.status);
-  if (options.level) params.set("level", options.level);
-  if (options.state) params.set("state", options.state);
-  if (options.limit) params.set("limit", options.limit);
-
-  const result = await apiRequest<{
-    races: Array<{
-      id: string;
-      name: string;
-      status: string;
-      electionDate: string | null;
-      state: string | null;
-      district: string | null;
-      level: string;
-      aiAngle: string | null;
-    }>;
-    total: number;
-  }>("GET", `/api/political-races/all?${params}`);
+  const result = await getAllRaces({
+    limit: options.limit ? parseInt(options.limit, 10) : undefined,
+    status: options.status,
+    level: options.level,
+    state: options.state,
+  });
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -106,29 +97,7 @@ async function showCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const result = await apiRequest<{
-    id: string;
-    name: string;
-    raceType: string;
-    party: string | null;
-    level: string;
-    state: string | null;
-    district: string | null;
-    electionDate: string | null;
-    status: string;
-    outcome: string | null;
-    aiAngle: string | null;
-    aiAngleSummary: string | null;
-    candidates: Array<{
-      id: string;
-      candidateDisplayName: string;
-      status: string;
-      aiStance: string | null;
-      pacDisplayName: string | null;
-      pacAmount: number | null;
-      voteShare: number | null;
-    }>;
-  }>("GET", `/api/political-races/${id}`);
+  const result = await getRace(id);
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -171,10 +140,7 @@ async function statsCommand(
     return { exitCode: 1, output: "Error: LONGTERMWIKI_SERVER_URL not configured" };
   }
 
-  const result = await apiRequest<{
-    races: { total: number; upcoming: number; active: number; resolved: number };
-    candidates: { total: number };
-  }>("GET", "/api/political-races/stats");
+  const result = await getRaceStats();
 
   if (!result.ok) {
     return { exitCode: 1, output: `Error: ${result.message}` };
@@ -603,11 +569,7 @@ async function seedCommand(
     },
   ];
 
-  const raceResult = await apiRequest<{ upserted: number }>(
-    "POST",
-    "/api/political-races/sync",
-    { items: races }
-  );
+  const raceResult = await syncRaces(races);
 
   if (!raceResult.ok) {
     return { exitCode: 1, output: `Error syncing races: ${raceResult.message}` };
@@ -692,11 +654,7 @@ async function seedCommand(
     { id: "RUsej9M8Lc", raceId: "jH4sV9WMpw", candidateDisplayName: "Against", status: "running" as const, aiStance: "anti_regulation" as const },
   ];
 
-  const candidateResult = await apiRequest<{ upserted: number }>(
-    "POST",
-    "/api/political-races/candidates/sync",
-    { items: candidates }
-  );
+  const candidateResult = await syncCandidates(candidates);
 
   if (!candidateResult.ok) {
     return { exitCode: 1, output: `Error syncing candidates: ${candidateResult.message}` };

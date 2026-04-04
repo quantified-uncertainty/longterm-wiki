@@ -395,18 +395,16 @@ async function createEntityCommand(args: string[], options: CommandOptions): Pro
 
   // Sync entity to wiki-server (no wikiId — not a full wiki entity)
   // Mark as stub so directory pages can exclude these reference-only entities
-  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const { syncEntities } = await import('../lib/wiki-server/entities.ts');
   const description = (options.description as string) || undefined;
-  const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
-    entities: [{
-      id: slug,
-      stableId,
-      entityType,
-      title: name,
-      ...(description && { description }),
-      metadata: { stub: true },
-    }],
-  });
+  const syncResult = await syncEntities([{
+    id: slug,
+    stableId,
+    entityType,
+    title: name,
+    ...(description && { description }),
+    metadata: { stub: true },
+  } as any]);
 
   if (!syncResult.ok) {
     return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
@@ -515,6 +513,8 @@ function isArrayIndex(value: string, fixMap: Map<string, { stableId: string; nam
 }
 
 async function verifyCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { getAllPersonnel } = await import('../lib/wiki-server/personnel.ts');
+  const { getEntity: getEntityFn } = await import('../lib/wiki-server/entities.ts');
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
   const matcher = buildEntityMatcher();
@@ -524,9 +524,9 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
   const allPersonnel: Array<Record<string, unknown>> = [];
   let offset = 0;
   while (true) {
-    const r = await apiRequest<{ personnel: Array<Record<string, unknown>>; total: number }>('GET', `/api/personnel/all?limit=200&offset=${offset}`);
+    const r = await getAllPersonnel({ limit: 200, offset });
     if (!r.ok) break;
-    allPersonnel.push(...r.data.personnel);
+    allPersonnel.push(...(r.data.personnel as Array<Record<string, unknown>>));
     if (allPersonnel.length >= r.data.total) break;
     offset += 200;
   }
@@ -575,7 +575,7 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
         pid = match.stableId;
         needsFix = true;
       } else {
-        const entityR = await apiRequest<{ id: string; stableId: string | null }>('GET', `/api/entities/${encodeURIComponent(pid)}`);
+        const entityR = await getEntityFn(pid);
         if (entityR.ok && entityR.data.stableId) {
           issues.push(`SLUG_PERSON_ID: Record ${rec.id} has personId="${pid}" → stableId "${entityR.data.stableId}" (via server)`);
           slugPersonIds++;
@@ -750,11 +750,10 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
   }
 
   // Fetch divisions for this entity (if personnel task)
+  const { getDivisionsByOrg } = await import('../lib/wiki-server/divisions.ts');
   let divisionsInfo = '';
   if (task.taskType === 'personnel-enrichment') {
-    const divResult = await apiRequest<{ divisions: Array<{ name: string; lead: string | null; divisionType: string; status: string }> }>(
-      'GET', `/api/divisions/by-org/${encodeURIComponent(task.entityId)}?limit=50`,
-    );
+    const divResult = await getDivisionsByOrg(task.entityId, { limit: 50 });
     if (divResult.ok && divResult.data.divisions.length > 0) {
       const divs = divResult.data.divisions.filter(d => d.status === 'active' || !d.status);
       if (divs.length > 0) {
@@ -837,7 +836,6 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
 
   const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
   const { generateId } = await import('../lib/grant-import/id.ts');
-  const { apiRequest } = await import('../lib/wiki-server/client.ts');
   const matcher = buildEntityMatcher();
 
   const results: Array<{ name: string; stableId: string; created: boolean }> = [];
@@ -870,15 +868,14 @@ async function ensureEntitiesCommand(_args: string[], options: CommandOptions): 
   // Batch sync all new entities (lightweight — no wikiId)
   // Mark as stub so directory pages can exclude these reference-only entities
   if (toCreate.length > 0 && !dryRun) {
-    const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
-      entities: toCreate.map(e => ({
-        id: e.slug,
-        stableId: e.stableId,
-        entityType,
-        title: e.name,
-        metadata: { stub: true },
-      })),
-    });
+    const { syncEntities } = await import('../lib/wiki-server/entities.ts');
+    const syncResult = await syncEntities(toCreate.map(e => ({
+      id: e.slug,
+      stableId: e.stableId,
+      entityType,
+      title: e.name,
+      metadata: { stub: true },
+    })) as any);
     if (!syncResult.ok) {
       return { exitCode: 1, output: `Entity sync failed: ${syncResult.message}` };
     }
@@ -980,6 +977,7 @@ async function sourceCheckRecordsCommand(args: string[], options: CommandOptions
 async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const { extractAllCareers } = await import('../lib/career-import/extract.ts');
   const { apiRequest, getServerUrl } = await import('../lib/wiki-server/client.ts');
+  const { getPersonnelStats: getPersonnelStatsFn } = await import('../lib/wiki-server/personnel.ts');
 
   const dryRun = !!options.dryRun;
   const serverUrl = getServerUrl();
@@ -1065,10 +1063,7 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   }
 
   // Show total personnel stats so users can see the full picture
-  const statsResult = await apiRequest<{
-    total: number;
-    byRoleType: { 'key-person': number; board: number; career: number };
-  }>('GET', '/api/personnel/stats');
+  const statsResult = await getPersonnelStatsFn();
 
   if (statsResult.ok) {
     const { total, byRoleType } = statsResult.data;

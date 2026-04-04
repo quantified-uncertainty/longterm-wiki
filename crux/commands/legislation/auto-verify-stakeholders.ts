@@ -23,7 +23,12 @@ import { PROJECT_ROOT } from '../../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
 import { fetchSource } from '../../lib/search/source-fetcher.ts';
-import { apiRequest } from '../../lib/wiki-server/client.ts';
+import {
+  getVerdictByRecord,
+  storeEvidence,
+  storeVerdict,
+  type VerdictByRecordResult,
+} from '../../lib/wiki-server/verifications.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
 
@@ -102,13 +107,10 @@ const STAKEHOLDER_RECORD_TYPE = 'policy-stakeholder';
 // ---------------------------------------------------------------------------
 
 async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | null> {
-  const result = await apiRequest<{ verdicts: ExistingVerdict[] }>(
-    'GET',
-    `/api/verifications/verdicts/${STAKEHOLDER_RECORD_TYPE}/${encodeURIComponent(recordId)}`
-  );
+  const result = await getVerdictByRecord(STAKEHOLDER_RECORD_TYPE, recordId);
 
   if (result.ok && result.data.verdicts.length > 0) {
-    return result.data.verdicts[0];
+    return result.data.verdicts[0] as unknown as ExistingVerdict;
   }
 
   // 404 = no verdict yet, which is fine
@@ -252,7 +254,7 @@ interface PostVerdictBody {
 }
 
 async function recordVerification(verification: PostVerificationBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/verifications/evidence', verification);
+  const result = await storeEvidence(verification as unknown as Record<string, unknown>);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verification: ${result.message}`);
     return false;
@@ -261,7 +263,7 @@ async function recordVerification(verification: PostVerificationBody): Promise<b
 }
 
 async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
-  const result = await apiRequest<unknown>('POST', '/api/verifications/verdicts', verdict);
+  const result = await storeVerdict(verdict as unknown as Record<string, unknown>);
   if (!result.ok) {
     console.warn(`[auto-verify] Failed to record verdict: ${result.message}`);
     return false;
