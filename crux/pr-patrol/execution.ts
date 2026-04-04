@@ -40,6 +40,8 @@ import {
   markPendingVerification,
   markProcessed,
   recordFailure,
+  recordFixAttempt,
+  hasExceededMaxAttempts,
   recordInstantFailure,
   resetCircuit,
   resetFailCount,
@@ -486,6 +488,24 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
   log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
 
+  // ── Anti-oscillation: check total fix attempts (#3755, #3757, #3826) ──
+  if (hasExceededMaxAttempts(pr.number)) {
+    log(`  ${cl.red}✗ PR #${pr.number} exceeded max total fix attempts — abandoning${cl.reset}`);
+    // Persist current HEAD SHA so future detection can clear abandonment on new push
+    const headSha = git('ls-remote', 'origin', pr.branch).split(/\s/)[0] || undefined;
+    markAbandoned(pr.number, headSha);
+    markProcessed(pr.number);
+    appendJsonl(JSONL_FILE, {
+      type: 'pr_result',
+      pr_num: pr.number,
+      issues: pr.issues,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: `Exceeded max total fix attempts (oscillation prevention)`,
+    });
+    return { mainIsRootCause: false };
+  }
+
   if (config.dryRun) {
     log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix${cl.reset}`);
     appendJsonl(JSONL_FILE, {
@@ -577,6 +597,9 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   }
   log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
 
+  // Record fix attempt after worktree creation (not before dry-run/early-return paths)
+  recordFixAttempt(pr.number);
+
   // Post "attempting fix" event comment before spawning Claude
   await postEventComment(pr.number, config.repo, buildFixAttemptComment(pr.issues))
     .catch((e: unknown) => log(`  Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
@@ -620,7 +643,10 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
 
       if (isNoOp) {
         if (looksLikeMainRootCause(result.output)) {
-          // PR's CI failure is caused by main being broken — don't penalize this PR
+          // PR's CI failure is caused by main being broken — don't penalize this PR.
+          // No recordFailure() here: main-root-cause no-ops shouldn't count against
+          // the PR's failure counter. The cooldown from markProcessed() prevents
+          // infinite retries, and the counter resets when main goes green.
           mainIsRootCause = true;
           reason = `No-op: CI failure is pre-existing on main branch`;
           log(`${cl.yellow}⚠ PR #${pr.number} no-op — root cause is on main branch${cl.reset} (${elapsedS}s)`);

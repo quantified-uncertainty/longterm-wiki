@@ -89,10 +89,10 @@ describe('computeBudget', () => {
     expect(budget.timeoutMinutes).toBe(45);
   });
 
-  it('gives full budget for conflict', () => {
+  it('gives reduced budget for conflict (#3776)', () => {
     const budget = computeBudget(['conflict']);
-    expect(budget.maxTurns).toBe(60);
-    expect(budget.timeoutMinutes).toBe(60);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
   it('uses highest budget when multiple issues present', () => {
@@ -103,14 +103,14 @@ describe('computeBudget', () => {
 
   it('conflict dominates when mixed with smaller issues', () => {
     const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
-    expect(budget.maxTurns).toBe(60);
-    expect(budget.timeoutMinutes).toBe(60);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
-  it('gives medium budget for bot-review-major', () => {
+  it('gives small budget for bot-review-major (#3827)', () => {
     const budget = computeBudget(['bot-review-major']);
-    expect(budget.maxTurns).toBe(15);
-    expect(budget.timeoutMinutes).toBe(10);
+    expect(budget.maxTurns).toBe(10);
+    expect(budget.timeoutMinutes).toBe(5);
   });
 
   it('gives small budget for bot-review-nitpick', () => {
@@ -175,14 +175,14 @@ describe('computeEffectiveBudget', () => {
     expect(budget.timeoutMinutes).toBe(2); // ceil(3 * 0.5) = 2
   });
 
-  it('conflict issue gets full 60 turns on first attempt, 30 on retry', () => {
+  it('conflict issue gets 30 turns on first attempt, 15 on retry (#3776)', () => {
     const first = computeEffectiveBudget(['conflict'], 60, 60, 0);
-    expect(first.maxTurns).toBe(60);
-    expect(first.timeoutMinutes).toBe(60);
+    expect(first.maxTurns).toBe(30);
+    expect(first.timeoutMinutes).toBe(20);
 
     const retry = computeEffectiveBudget(['conflict'], 60, 60, 1);
-    expect(retry.maxTurns).toBe(30);
-    expect(retry.timeoutMinutes).toBe(30);
+    expect(retry.maxTurns).toBe(15);
+    expect(retry.timeoutMinutes).toBe(10);
   });
 });
 
