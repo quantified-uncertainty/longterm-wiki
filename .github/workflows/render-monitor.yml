@@ -1,0 +1,95 @@
+name: Render Quality Monitor
+
+# Scheduled render quality checks against production.
+# Catches display regressions (raw numbers, JSON leaks) between deploys.
+# Runs every 6 hours + manual trigger.
+#
+# On failure: creates or updates a GitHub issue with label "render-monitor".
+# On success after prior failure: closes the issue with a resolution comment.
+#
+# Phase 3 of Discussion #3768 (Rendering Quality & Test Infrastructure).
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  render-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: cd apps/web && npx playwright install chromium --with-deps
+
+      - name: Run render audit against production
+        id: audit
+        continue-on-error: true
+        env:
+          PLAYWRIGHT_BASE_URL: https://www.longtermwiki.com
+        run: |
+          cd apps/web && npx playwright test e2e/render-audit.spec.ts --reporter=list 2>&1 | tee /tmp/audit-output.txt
+          echo "exit_code=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Manage GitHub issue on failure
+        if: steps.audit.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FAILURES=$(grep -c '✘' /tmp/audit-output.txt || echo "0")
+          BODY="Render quality audit detected ${FAILURES} failure(s) against production.
+
+          **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          <details>
+          <summary>Test output</summary>
+
+          \`\`\`
+          $(tail -30 /tmp/audit-output.txt)
+          \`\`\`
+          </details>"
+
+          # Search for existing open issue
+          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
+
+          if [ -n "$EXISTING" ]; then
+            echo "Updating existing issue #${EXISTING}"
+            gh issue comment "$EXISTING" --body "$BODY"
+          else
+            echo "Creating new issue"
+            gh issue create \
+              --title "Render quality regression detected" \
+              --label "render-monitor" \
+              --body "$BODY"
+          fi
+
+      - name: Close issue on success
+        if: steps.audit.outputs.exit_code == '0'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            echo "Closing resolved issue #${EXISTING}"
+            gh issue comment "$EXISTING" --body "Render quality audit passing again. Closing.
+
+            **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            gh issue close "$EXISTING"
+          fi
+
+      - name: Fail workflow if audit failed
+        if: steps.audit.outputs.exit_code != '0'
+        run: exit 1
