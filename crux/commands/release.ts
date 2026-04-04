@@ -19,6 +19,7 @@ import {
   detectDeployTasks,
   formatDeployTasksSection,
   parseDeployTasksFromBody,
+  preserveCheckedState,
 } from '../lib/deploy-tasks/detect.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -327,11 +328,12 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   );
 
   if (existingPRs.length > 0) {
-    // Update existing PR
+    // Update existing PR — preserve any manually checked deploy tasks
     const pr = existingPRs[0];
+    const updatedBody = pr.body ? preserveCheckedState(body, pr.body) : body;
     await githubApi<GitHubPR>(`/repos/${REPO}/pulls/${pr.number}`, {
       method: 'PATCH',
-      body: { title, body },
+      body: { title, body: updatedBody },
     });
 
     return {
