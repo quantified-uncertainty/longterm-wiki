@@ -80,8 +80,8 @@ describe('groupCommits', () => {
 // ── generateReleaseBody ──────────────────────────────────────────────────────
 
 describe('generateReleaseBody', () => {
-  it('generates a basic release body', () => {
-    const body = generateReleaseBody({
+  it('generates a basic release body', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 5,
       behind: 0,
@@ -98,8 +98,8 @@ describe('generateReleaseBody', () => {
     expect(body).toContain('[Full diff](https://github.com/org/repo/compare/production...main)');
   });
 
-  it('includes divergence warning when behind > 0', () => {
-    const body = generateReleaseBody({
+  it('includes divergence warning when behind > 0', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 3,
       behind: 2,
@@ -111,8 +111,8 @@ describe('generateReleaseBody', () => {
     expect(body).toContain('**2 commits** not on main');
   });
 
-  it('omits divergence warning when behind = 0', () => {
-    const body = generateReleaseBody({
+  it('omits divergence warning when behind = 0', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 3,
       behind: 0,
@@ -123,8 +123,8 @@ describe('generateReleaseBody', () => {
     expect(body).not.toContain('[!WARNING]');
   });
 
-  it('omits empty categories', () => {
-    const body = generateReleaseBody({
+  it('omits empty categories', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 1,
       behind: 0,
@@ -140,8 +140,8 @@ describe('generateReleaseBody', () => {
     expect(body).not.toContain('### Other');
   });
 
-  it('handles empty subjects', () => {
-    const body = generateReleaseBody({
+  it('handles empty subjects', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 0,
       behind: 0,
@@ -154,8 +154,8 @@ describe('generateReleaseBody', () => {
     expect(body).not.toContain('### Features');
   });
 
-  it('groups all conventional commit types correctly', () => {
-    const body = generateReleaseBody({
+  it('groups all conventional commit types correctly', async () => {
+    const body = await generateReleaseBody({
       date: '2026-03-04',
       ahead: 6,
       behind: 0,
