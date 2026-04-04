@@ -1,0 +1,194 @@
+{
+  "table": "personnel",
+  "recordCount": 22,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-04T18:45:08.041Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 22,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "BEoVnpRDd9",
+      "personId": "4otIRCCbCM",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Co-founder",
+      "source": "https://www.hewlett.org/about/",
+      "verdict": "none"
+    },
+    {
+      "id": "WZAK73z8Ie",
+      "personId": "iCvai3WlJq",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Co-founder",
+      "source": "https://www.hewlett.org/about/",
+      "verdict": "none"
+    },
+    {
+      "id": "VyW8PW9nAi",
+      "personId": "iSjElzv4Yg",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "President",
+      "source": "https://hewlett.org/newsroom/hewlett-foundation-names-astrophysicist-amber-d-miller-as-next-president/",
+      "verdict": "none"
+    },
+    {
+      "id": "hnYJFtwNwO",
+      "personId": "TyWNDTjie0",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Vice President and Chief Operating Officer",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "zGklFNf9n4",
+      "personId": "0Mi9EcrIYJ",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Vice President and Chief of Communications",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "NeglfXnMrs",
+      "personId": "2CtwHKq93L",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Vice President and Chief Investment Officer",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "zZBXSYF4xC",
+      "personId": "H2lfLbRBOu",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Chief Financial Officer and Treasurer",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "mAYCOvBnr5",
+      "personId": "SkUwnFCMth",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "General Counsel and Corporate Secretary",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "fsFkBXpIUL",
+      "personId": "ExYHiAxfIk",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Chief People Officer",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "hFOymJvWg6",
+      "personId": "lBNa3xSBax",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Chief of Staff",
+      "source": "https://hewlett.org/about-us/people/",
+      "verdict": "none"
+    },
+    {
+      "id": "eYF2iK96ys",
+      "personId": "yXqxKDOCrD",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Chair",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "6tTCtHPq94",
+      "personId": "1iEQ8u0mvw",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "OMYqwR65Sj",
+      "personId": "hcEli1XdhB",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "yo3niuiAdB",
+      "personId": "m5sJG7Hgzv",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "lZZOgXKWrr",
+      "personId": "QxH9co7HZx",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "b2J0dIJ1q4",
+      "personId": "2AaYNHLh4R",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "YhOhZXBGnq",
+      "personId": "KLPk9SRJ67",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "aox8YjnijI",
+      "personId": "PKp1zGVi2L",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "5xOfSc9ABy",
+      "personId": "nBuUSzVSXY",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "PQyRmbASF3",
+      "personId": "J6e4iyaMsf",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "7WcE6GQr33",
+      "personId": "iiCWUsMGWk",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    },
+    {
+      "id": "juo8n3iKMD",
+      "personId": "HAoCs0d52G",
+      "organizationId": "sid_9nUCGERzgQ",
+      "role": "Board Director",
+      "source": "https://hewlett.org/about-us/our-board/",
+      "verdict": "none"
+    }
+  ]
+}
