@@ -21,7 +21,17 @@ import { shouldResolveAsRef } from "./ref-detection";
 const FRACTION_FIELDS = new Set(["stake", "stake_acquired", "pledge"]);
 
 /** Fields that are typically monetary amounts (USD), used as fallback when schema is unavailable. */
-const CURRENCY_FIELD_NAMES = new Set(["amount", "investment_amount", "raised", "valuation", "compute_commitment"]);
+const CURRENCY_FIELD_NAMES = new Set([
+  "amount", "investment_amount", "raised", "valuation", "compute_commitment",
+  // PG-primary table variants (camelCase from Drizzle ORM)
+  "raisedLow", "raisedHigh",
+  "valuationLow", "valuationHigh",
+  "amountLow", "amountHigh",
+  "impliedValuation", "impliedValuationLow", "impliedValuationHigh",
+  "totalBudget", "totalRaised", "selfFunding", "pacAmount",
+  // FactBase kebab-case properties
+  "revenue", "internal-revenue", "secondary-valuation",
+]);
 
 function isFractionField(fieldName: string, fieldDef?: FieldDef): boolean {
   if (FRACTION_FIELDS.has(fieldName)) return true;
