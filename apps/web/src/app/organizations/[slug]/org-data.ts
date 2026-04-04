@@ -538,6 +538,7 @@ const SOURCE_NAMES = new Set([
   "rand", "fortune", "bloomberg", "the information", "time",
   "the economist", "mit technology review", "financial times",
   "associated press", "ap news", "vox", "politico", "axios",
+  "twitter", "x/twitter", "twitter/x", "facebook", "linkedin",
 ]);
 
 /**
@@ -669,6 +670,8 @@ function titleFromUrl(url: string): string | null {
     const path = new URL(url).pathname.replace(/\/$/, "");
     const lastSegment = path.split("/").filter(Boolean).pop();
     if (!lastSegment) return null;
+    // Pure-numeric segments are IDs (e.g., tweet status IDs), not titles
+    if (/^\d+$/.test(lastSegment)) return null;
     // Convert slug to title: "claude-3-model-card" → "Claude 3 Model Card"
     const raw = lastSegment
       .replace(/-/g, " ")
