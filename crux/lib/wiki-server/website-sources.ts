@@ -21,7 +21,7 @@ export type WebsiteSourceByEntity = InferResponseType<RpcClient['by-entity'][':e
 export type WebsiteSourcePages = InferResponseType<RpcClient[':sourceId']['pages']['$get'], 200>;
 export type PageSnapshotList = InferResponseType<RpcClient[':sourceId']['snapshots']['$get'], 200>;
 export type PageSnapshotDetail = InferResponseType<RpcClient[':sourceId']['snapshots'][':snapshotId']['$get'], 200>;
-export type PageSnapshotCreateResult = InferResponseType<RpcClient[':sourceId']['snapshots']['$post']>;
+export type PageSnapshotCreateResult = InferResponseType<RpcClient[':sourceId']['snapshots']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Client functions

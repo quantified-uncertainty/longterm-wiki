@@ -92,8 +92,8 @@ const CreateSnapshotSchema = z.object({
   id: z.string().length(10),
   websiteSourcePageId: z.string().length(10),
   url: z.string().min(1).max(4000),
-  contentHash: z.string().min(1).max(128),
-  fullText: z.string().min(1).max(10_000_000),
+  contentHash: z.string().length(64),
+  fullText: z.string().min(1).max(10_000_000).transform((s) => s.replace(/\0/g, "")),
   titleAtTime: z.string().max(1000).nullable().optional(),
   httpStatus: z.number().int().min(0).max(999).default(200),
   contentLength: z.number().int().min(0).default(0),
@@ -355,44 +355,37 @@ const websiteSourcesApp = new Hono()
         .limit(1);
       if (!source) return notFoundError(c, "Website source not found");
 
-      // Get all page IDs for this source
-      const pages = await db
-        .select({ id: websiteSourcePages.id })
-        .from(websiteSourcePages)
-        .where(eq(websiteSourcePages.sourceId, sourceId));
-
-      if (pages.length === 0) {
-        return c.json({ snapshots: [], total: 0, limit, offset });
-      }
-
-      const pageIds = pages.map((p) => p.id);
+      // Join through pages to get snapshots for this source
+      const sourcePageFilter = eq(websiteSourcePages.sourceId, sourceId);
 
       const [totalRow] = await db
         .select({ count: count() })
         .from(pageSnapshots)
-        .where(
-          sql`${pageSnapshots.websiteSourcePageId} IN (${sql.join(
-            pageIds.map((id) => sql`${id}`),
-            sql`, `
-          )})`
-        );
+        .innerJoin(
+          websiteSourcePages,
+          eq(pageSnapshots.websiteSourcePageId, websiteSourcePages.id)
+        )
+        .where(sourcePageFilter);
       const total = totalRow?.count ?? 0;
 
+      if (total === 0) {
+        return c.json({ snapshots: [], total: 0, limit, offset });
+      }
+
       const rows = await db
-        .select()
+        .select({ snapshot: pageSnapshots })
         .from(pageSnapshots)
-        .where(
-          sql`${pageSnapshots.websiteSourcePageId} IN (${sql.join(
-            pageIds.map((id) => sql`${id}`),
-            sql`, `
-          )})`
+        .innerJoin(
+          websiteSourcePages,
+          eq(pageSnapshots.websiteSourcePageId, websiteSourcePages.id)
         )
+        .where(sourcePageFilter)
         .orderBy(desc(pageSnapshots.fetchedAt))
         .limit(limit)
         .offset(offset);
 
       return c.json({
-        snapshots: rows.map((r) => ({
+        snapshots: rows.map(({ snapshot: r }) => ({
           id: r.id,
           websiteSourcePageId: r.websiteSourcePageId,
           url: r.url,
@@ -404,7 +397,6 @@ const websiteSourcesApp = new Hono()
           extractionStatus: r.extractionStatus,
           extractedAt: r.extractedAt?.toISOString() ?? null,
           createdAt: r.createdAt.toISOString(),
-          // fullText and extractedFacts excluded from list — fetch individually
         })),
         total,
         limit,
@@ -485,63 +477,80 @@ const websiteSourcesApp = new Hono()
 
       const fetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : new Date();
 
-      // Content-hash dedup: ON CONFLICT DO NOTHING
-      const [inserted] = await db
-        .insert(pageSnapshots)
-        .values({
-          id: body.id,
-          websiteSourcePageId: body.websiteSourcePageId,
-          url: body.url,
-          contentHash: body.contentHash,
-          fullText: body.fullText,
-          titleAtTime: body.titleAtTime ?? null,
-          httpStatus: body.httpStatus,
-          contentLength: body.contentLength,
-          extractionStatus: body.extractionStatus,
-          fetchedAt,
-        })
-        .onConflictDoNothing({
-          target: [
-            pageSnapshots.websiteSourcePageId,
-            pageSnapshots.contentHash,
-          ],
-        })
-        .returning({ id: pageSnapshots.id });
+      // Atomic insert + parent update in a transaction.
+      // Raise statement_timeout for large fullText (up to 10MB).
+      const result = await db.transaction(async (tx) => {
+        await tx.execute(sql`SET LOCAL statement_timeout = '120000'`);
 
-      if (!inserted) {
-        // Content unchanged — return the existing snapshot
-        const [existing] = await db
-          .select({ id: pageSnapshots.id })
-          .from(pageSnapshots)
-          .where(
-            and(
-              eq(
-                pageSnapshots.websiteSourcePageId,
-                body.websiteSourcePageId
-              ),
-              eq(pageSnapshots.contentHash, body.contentHash)
-            )
-          );
-        return c.json({
-          ok: true,
-          id: existing?.id ?? body.id,
-          deduplicated: true,
-        });
+        const [inserted] = await tx
+          .insert(pageSnapshots)
+          .values({
+            id: body.id,
+            websiteSourcePageId: body.websiteSourcePageId,
+            url: body.url,
+            contentHash: body.contentHash,
+            fullText: body.fullText,
+            titleAtTime: body.titleAtTime ?? null,
+            httpStatus: body.httpStatus,
+            contentLength: body.contentLength,
+            extractionStatus: body.extractionStatus,
+            fetchedAt,
+          })
+          .onConflictDoNothing({
+            target: [
+              pageSnapshots.websiteSourcePageId,
+              pageSnapshots.contentHash,
+            ],
+          })
+          .returning({ id: pageSnapshots.id });
+
+        if (!inserted) {
+          const [existing] = await tx
+            .select({ id: pageSnapshots.id })
+            .from(pageSnapshots)
+            .where(
+              and(
+                eq(
+                  pageSnapshots.websiteSourcePageId,
+                  body.websiteSourcePageId
+                ),
+                eq(pageSnapshots.contentHash, body.contentHash)
+              )
+            );
+          return { id: existing?.id ?? body.id, deduplicated: true } as const;
+        }
+
+        // Only advance parent tracking if this snapshot is newer
+        const [currentPage] = await tx
+          .select({ lastFetchedAt: websiteSourcePages.lastFetchedAt })
+          .from(websiteSourcePages)
+          .where(eq(websiteSourcePages.id, body.websiteSourcePageId));
+
+        const shouldAdvance =
+          !currentPage?.lastFetchedAt || fetchedAt >= currentPage.lastFetchedAt;
+
+        await tx
+          .update(websiteSourcePages)
+          .set({
+            ...(shouldAdvance
+              ? {
+                  lastFetchedAt: fetchedAt,
+                  lastContentHash: body.contentHash,
+                  lastSnapshotId: inserted.id,
+                }
+              : {}),
+            updatedAt: new Date(),
+          })
+          .where(eq(websiteSourcePages.id, body.websiteSourcePageId));
+
+        return { id: inserted.id, deduplicated: false } as const;
+      });
+
+      if (result.deduplicated) {
+        return c.json({ ok: true, id: result.id, deduplicated: true });
       }
-
-      // Update the parent page's tracking fields
-      await db
-        .update(websiteSourcePages)
-        .set({
-          lastFetchedAt: fetchedAt,
-          lastContentHash: body.contentHash,
-          lastSnapshotId: inserted.id,
-          updatedAt: new Date(),
-        })
-        .where(eq(websiteSourcePages.id, body.websiteSourcePageId));
-
       return c.json(
-        { ok: true, id: inserted.id, deduplicated: false },
+        { ok: true, id: result.id, deduplicated: false },
         201
       );
     }

@@ -191,7 +191,6 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
           }
         }
 
-        // Compute content hash on extracted text (not raw HTML)
         const contentHash = computeContentHash(source.content);
 
         // Check if content has changed
