@@ -166,7 +166,7 @@ describe('buildPrompt', () => {
     const pr = makeDetectedPr({ issues: ['conflict'] });
     const prompt = buildPrompt(pr, REPO);
     expect(prompt).toContain('## Guardrails');
-    expect(prompt).toContain('## When to stop (escalate to human)');
+    expect(prompt).toContain('## When to stop (escalate to coordinator)');
   });
 
   it('truncates long bot comment bodies', () => {

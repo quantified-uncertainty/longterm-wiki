@@ -353,7 +353,7 @@ async function runCheckCycle(
     // Filter cooldowns and abandoned
     const eligible = detected.filter((pr) => {
       if (isAbandoned(pr.number)) {
-        log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — needs human intervention)${cl.reset}`);
+        log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — escalated to coordinator)${cl.reset}`);
         return false;
       }
       if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {
