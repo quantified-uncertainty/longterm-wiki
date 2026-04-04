@@ -4,16 +4,10 @@ import { useState, useEffect } from "react";
 import { ShieldCheck, ChevronRight } from "lucide-react";
 import { cn } from "@lib/utils";
 import {
-  SOURCE_CHECK_VERDICT_STYLES,
   getSourceCheckVerdictStyle,
   type VerdictRow,
 } from "@/components/shared/verdict-styles";
 import { formatDateDeterministic } from "@lib/format";
-
-// ── Verdict styling (from shared module) ─────────────────────────────────
-
-const VERDICT_STYLES = SOURCE_CHECK_VERDICT_STYLES;
-const getVerdictStyle = getSourceCheckVerdictStyle;
 
 // ── Component ────────────────────────────────────────────────────────────
 
@@ -122,7 +116,7 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
         {/* Verdict distribution */}
         <div className="px-4 py-2.5 flex items-center gap-3 flex-wrap">
           {sortedVerdicts.map(([verdict, count]) => {
-            const style = getVerdictStyle(verdict);
+            const style = getSourceCheckVerdictStyle(verdict);
             return (
               <span
                 key={verdict}
@@ -172,7 +166,7 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
                 </thead>
                 <tbody>
                   {verdicts.map((v, i) => {
-                    const style = getVerdictStyle(v.verdict);
+                    const style = getSourceCheckVerdictStyle(v.verdict);
                     return (
                       <tr
                         key={`${v.recordType}:${v.recordId}:${v.fieldName ?? ""}:${i}`}

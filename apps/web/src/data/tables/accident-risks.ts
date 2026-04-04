@@ -100,26 +100,3 @@ export const riskCategories = [
   'Human-AI Interaction',
 ];
 
-// Abstraction level descriptions
-export const abstractionLevelDescriptions: Record<AbstractionLevel, string> = {
-  THEORETICAL: 'Foundational concepts and frameworks',
-  MECHANISM: 'How failures occur',
-  BEHAVIOR: 'Observable manifestations',
-  OUTCOME: 'Resulting states and scenarios',
-};
-
-// Get related risks for a given risk
-function getRelatedRisks(
-  riskId: string
-): { risk: AccidentRisk; relationship: RiskRelationship }[] {
-  const risk = accidentRisks.find((r) => r.id === riskId);
-  if (!risk) return [];
-
-  return risk.relatedRisks
-    .map((rel) => {
-      const relatedRisk = accidentRisks.find((r) => r.id === rel.riskId);
-      if (!relatedRisk) return null;
-      return { risk: relatedRisk, relationship: rel };
-    })
-    .filter((r): r is { risk: AccidentRisk; relationship: RiskRelationship } => r !== null);
-}

@@ -12,9 +12,7 @@
  * back to realistic sample data so the pipeline works end-to-end.
  */
 
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { loadFixture } from "./load-fixture.ts";
 
 import type {
   ScorecardSource,
@@ -163,15 +161,14 @@ async function fetchLcvPage(year: number): Promise<string | null> {
 function getSampleData(year: number): ScoreRecord[] {
   // Realistic sample data based on actual LCV 2024 scores.
   // Used as fallback when the LCV website blocks scraping.
-  const dir = dirname(fileURLToPath(import.meta.url));
-  const sampleLegislators: Array<{
+  const sampleLegislators = loadFixture<Array<{
     name: string;
     party: string;
     state: string;
     district: string | null;
     score: number;
     chamber: string;
-  }> = JSON.parse(readFileSync(join(dir, "fixtures/lcv-sample.json"), "utf-8"));
+  }>>(import.meta.url, "fixtures/lcv-sample.json");
 
   return sampleLegislators.map((l) => ({
     id: generateScoreId(SCORER_ORG, l.name, year),
