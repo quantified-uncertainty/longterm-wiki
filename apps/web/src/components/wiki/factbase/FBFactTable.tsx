@@ -68,7 +68,7 @@ export function FBFactTable({ entity, property, title, includeExpired }: FBFactT
             <TableRow>
               <TableHead scope="col">Date</TableHead>
               <TableHead scope="col">Value</TableHead>
-              <TableHead scope="col" className="w-8"></TableHead>
+              <TableHead scope="col" className="w-8"><span className="sr-only">Verification</span></TableHead>
               <TableHead scope="col">Source</TableHead>
               <TableHead scope="col">Notes</TableHead>
             </TableRow>
