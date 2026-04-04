@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { eq, desc } from "drizzle-orm";
+import { z } from "zod";
 import { getDrizzleDb } from "../../db.js";
 import { agentSessionEvents } from "../../schema.js";
 import {
@@ -7,8 +8,14 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import { CreateAgentEventSchema } from "../../api-types.js";
+
+const ListEventsQuery = z.object({
+  limit: clampedLimit(500, 200),
+});
 
 const agentSessionEventsApp = new Hono()
   // ---- POST / (append an event) ----
@@ -36,14 +43,14 @@ const agentSessionEventsApp = new Hono()
   })
 
   // ---- GET /by-agent/:agentId (list events for an agent) ----
-  .get("/by-agent/:agentId", async (c) => {
+  .get("/by-agent/:agentId", zv("query", ListEventsQuery), async (c) => {
     const raw = c.req.param("agentId");
     const agentId = Number(raw);
     if (!Number.isInteger(agentId) || agentId < 1) {
       return validationError(c, "Invalid agent ID");
     }
 
-    const limit = Math.min(Number(c.req.query("limit") || 200), 500);
+    const { limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const rows = await db

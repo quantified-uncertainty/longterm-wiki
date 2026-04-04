@@ -24,6 +24,21 @@ import { formatKBFactValue } from "@/components/wiki/factbase/format";
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+/** Format a single JSON value for display in a key-value summary. */
+function formatJsonValue(v: unknown): string {
+  if (typeof v === "string") return v.length > 100 ? v.slice(0, 100) + "\u2026" : v;
+  if (typeof v === "number") return v.toLocaleString("en-US");
+  if (typeof v === "boolean") return v ? "Yes" : "No";
+  if (v === null) return "\u2014";
+  if (Array.isArray(v)) return `[${v.length} items]`;
+  if (typeof v === "object") {
+    const entries = Object.entries(v);
+    if (entries.length <= 3) return entries.map(([k, val]) => `${k}: ${formatJsonValue(val)}`).join(", ");
+    return `{${entries.length} fields}`;
+  }
+  return String(v);
+}
+
 /** Format an extractedValue for display. Detects JSON and renders key-value summary. */
 function FormatExtractedValue({ value }: { value: string }) {
   const trimmed = value.trim();
@@ -34,7 +49,7 @@ function FormatExtractedValue({ value }: { value: string }) {
       const parsed = JSON.parse(trimmed);
       if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
         const entries = Object.entries(parsed);
-        const shown = entries.slice(0, 3);
+        const shown = entries.slice(0, 5);
         const remaining = entries.length - shown.length;
         return (
           <span className="text-sm">
@@ -42,9 +57,7 @@ function FormatExtractedValue({ value }: { value: string }) {
               <span key={k}>
                 {i > 0 && ", "}
                 <span className="font-medium text-foreground/70">{k}:</span>{" "}
-                {typeof v === "string"
-                  ? (v.length > 100 ? v.slice(0, 100) + "\u2026" : v)
-                  : JSON.stringify(v)}
+                {formatJsonValue(v)}
               </span>
             ))}
             {remaining > 0 && (
@@ -54,8 +67,19 @@ function FormatExtractedValue({ value }: { value: string }) {
         );
       }
       if (Array.isArray(parsed)) {
-        const label = `[${parsed.length} items]`;
-        return <span className="text-sm text-muted-foreground">{label}</span>;
+        if (parsed.length === 0) return <span className="text-sm text-muted-foreground">[empty]</span>;
+        // Show first few items for simple arrays
+        if (parsed.every((item) => typeof item !== "object" || item === null)) {
+          const shown = parsed.slice(0, 5).map((item) => formatJsonValue(item));
+          const remaining = parsed.length - shown.length;
+          return (
+            <span className="text-sm">
+              {shown.join(", ")}
+              {remaining > 0 && <span className="text-muted-foreground"> (+{remaining} more)</span>}
+            </span>
+          );
+        }
+        return <span className="text-sm text-muted-foreground">[{parsed.length} items]</span>;
       }
     } catch {
       // Not valid JSON — fall through to truncation

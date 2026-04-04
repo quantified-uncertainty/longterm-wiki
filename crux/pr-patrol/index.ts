@@ -68,7 +68,7 @@ export { checkMainBranch } from './execution.ts';
 
 // Daemon-specific exports
 export { computeBudget } from './scoring.ts';
-export { looksLikeNoOp, looksLikeMainRootCause, type FixPrResult } from './execution.ts';
+export { looksLikeNoOp, looksLikeMainRootCause, findExistingMainFixPr, type FixPrResult } from './execution.ts';
 export { JSONL_FILE, REFLECTION_FILE, PARALLEL_STATE_FILE, getParallelState } from './state.ts';
 
 // ── Internal imports (daemon-wrapped versions for the daemon loop) ──────────
@@ -353,7 +353,7 @@ async function runCheckCycle(
     // Filter cooldowns and abandoned
     const eligible = detected.filter((pr) => {
       if (isAbandoned(pr.number)) {
-        log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — needs human intervention)${cl.reset}`);
+        log(`  ${cl.dim}Skipping PR #${pr.number} (abandoned — escalated to coordinator)${cl.reset}`);
         return false;
       }
       if (isRecentlyProcessed(pr.number, config.cooldownSeconds)) {

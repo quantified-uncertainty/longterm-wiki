@@ -2991,6 +2991,62 @@ export const websiteSourcePages = pgTable(
   ]
 );
 
+// ── Page Snapshots ──────────────────────────────────────────────────────
+//
+// Dated snapshots of website source pages. Each snapshot stores the full
+// extracted text, a content hash for dedup, and extraction status for the
+// LLM fact-extraction pipeline. See Discussion #2928, Issue #3652.
+
+export const pageSnapshots = pgTable(
+  "page_snapshots",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** FK to website_source_pages.id */
+    websiteSourcePageId: varchar("website_source_page_id", { length: 10 })
+      .notNull()
+      .references(() => websiteSourcePages.id, { onDelete: "cascade" }),
+    /** Full URL that was fetched */
+    url: text("url").notNull(),
+    /** When the page was fetched */
+    fetchedAt: timestamp("fetched_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** SHA-256 of full_text for content-hash dedup */
+    contentHash: text("content_hash").notNull(),
+    /** Extracted text/markdown after HTML stripping */
+    fullText: text("full_text").notNull(),
+    /** Page <title> at time of fetch */
+    titleAtTime: text("title_at_time"),
+    /** HTTP status code from the fetch */
+    httpStatus: integer("http_status").notNull().default(200),
+    /** Length of full_text in characters */
+    contentLength: integer("content_length").notNull().default(0),
+    /** Extraction pipeline status: pending | extracted | failed | skipped */
+    extractionStatus: text("extraction_status").notNull().default("pending"),
+    /** When fact extraction was last run on this snapshot */
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    /** JSONB array of extracted facts (populated by extraction pipeline) */
+    extractedFacts: jsonb("extracted_facts"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    // Note: actual SQL migration uses fetched_at DESC for most-recent-first lookups.
+    // Drizzle's index() doesn't support column-level DESC, so this is ASC here.
+    // The deployed index (0158_page_snapshots.sql) is authoritative.
+    index("idx_ps_page_fetched").on(
+      table.websiteSourcePageId,
+      table.fetchedAt
+    ),
+    index("idx_ps_extraction_status").on(table.extractionStatus),
+    uniqueIndex("idx_ps_page_content_hash").on(
+      table.websiteSourcePageId,
+      table.contentHash
+    ),
+  ]
+);
+
 // ── Policy Stakeholders ──────────────────────────────────────────────────
 //
 // Cross-entity join table tracking organization/person positions on policy entities.

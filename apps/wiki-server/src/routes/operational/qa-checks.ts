@@ -7,6 +7,7 @@
 
 import { Hono } from "hono";
 import { eq, desc, and, sql } from "drizzle-orm";
+import { z } from "zod";
 import { getDrizzleDb } from "../../db.js";
 import { sqlInList } from "../shared/query-helpers.js";
 import { qaPageChecks } from "../../schema.js";
@@ -15,12 +16,27 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import { entityHref } from "../shared/thing-sync.js";
 import {
   RecordQaCheckSchema,
   RecordQaCheckBatchSchema,
 } from "../../api-types.js";
+
+const ListChecksQuery = z.object({
+  directory: z.string().optional(),
+  sweep_id: z.string().optional(),
+  limit: clampedLimit(500, 50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const QueueQuery = z.object({
+  directory: z.string().optional(),
+  entity_type: z.string().optional(),
+  limit: clampedLimit(200, 20),
+});
 
 /**
  * Hardcoded index pages that aren't in the things table but should appear
@@ -116,11 +132,8 @@ const qaChecksApp = new Hono()
   })
 
   // ---- GET / (list recent checks) ----
-  .get("/", async (c) => {
-    const directory = c.req.query("directory");
-    const sweepId = c.req.query("sweep_id");
-    const limit = Math.min(Number(c.req.query("limit") || 50), 500);
-    const offset = Number(c.req.query("offset") || 0);
+  .get("/", zv("query", ListChecksQuery), async (c) => {
+    const { directory, sweep_id: sweepId, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions = [];
@@ -141,10 +154,8 @@ const qaChecksApp = new Hono()
   })
 
   // ---- GET /queue (staleness-ordered page queue) ----
-  .get("/queue", async (c) => {
-    const directory = c.req.query("directory");
-    const entityType = c.req.query("entity_type");
-    const limit = Math.min(Number(c.req.query("limit") || 20), 200);
+  .get("/queue", zv("query", QueueQuery), async (c) => {
+    const { directory, entity_type: entityType, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Query things LEFT JOIN qa_page_checks to get last check time

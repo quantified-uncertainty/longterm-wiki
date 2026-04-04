@@ -178,7 +178,6 @@ export function FBF({
           </span>
         )}
 
-        {/* Verification status */}
         <FactVerificationDot factId={fact.id} showLabel className="mt-1" />
 
         {/* Fact detail link */}

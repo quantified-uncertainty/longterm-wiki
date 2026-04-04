@@ -220,7 +220,7 @@ export function classifyFixOutcome(
       const failCount = recordFailure(prNumber);
       return {
         outcome: 'no-op',
-        reason: `No-op: agent determined issue needs human intervention (attempt ${failCount})`,
+        reason: `No-op: agent determined issue needs escalation to coordinator (attempt ${failCount})`,
         mainIsRootCause: false,
       };
     }

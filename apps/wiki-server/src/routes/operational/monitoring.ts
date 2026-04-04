@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { eq, desc, and, count, gte, sql } from "drizzle-orm";
+import { z } from "zod";
 import { getDrizzleDb, getDb } from "../../db.js";
 import {
   serviceHealthIncidents,
@@ -14,12 +15,21 @@ import {
   invalidJsonError,
   notFoundError,
   firstOrThrow,
+  clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import {
   RecordIncidentSchema,
   UpdateIncidentSchema,
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
+
+const ListIncidentsQuery = z.object({
+  service: z.string().optional(),
+  status: z.string().optional(),
+  severity: z.string().optional(),
+  limit: clampedLimit(200, 50),
+});
 
 // Static service registry — no DB table needed.
 // Only includes services with actual health check wiring.
@@ -298,11 +308,8 @@ const monitoringApp = new Hono()
   })
 
   // ---- GET /incidents — list with filters ----
-  .get("/incidents", async (c) => {
-    const service = c.req.query("service");
-    const status = c.req.query("status");
-    const severity = c.req.query("severity");
-    const limit = Math.min(Number(c.req.query("limit") || 50), 200);
+  .get("/incidents", zv("query", ListIncidentsQuery), async (c) => {
+    const { service, status, severity, limit } = c.req.valid("query");
 
     const db = getDrizzleDb();
     const conditions = [];

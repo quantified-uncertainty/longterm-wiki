@@ -14,7 +14,6 @@ import {
   computeScore,
   rankPrs,
   ISSUE_SCORES,
-  HUMAN_REQUIRED_CHECKS,
 } from './index.ts';
 import type { GqlPrNode, DetectedPr } from './types.ts';
 
@@ -215,7 +214,7 @@ describe('detectIssues (lib)', () => {
             statusCheckRollup: {
               contexts: {
                 nodes: [
-                  { name: 'check-protected-paths', conclusion: 'FAILURE' },
+                  { name: 'Protected Paths Check', conclusion: 'FAILURE' },
                   { name: 'build', conclusion: 'SUCCESS' },
                 ],
               },
@@ -236,7 +235,7 @@ describe('detectIssues (lib)', () => {
             statusCheckRollup: {
               contexts: {
                 nodes: [
-                  { name: 'check-protected-paths', conclusion: 'FAILURE' },
+                  { name: 'Protected Paths Check', conclusion: 'FAILURE' },
                   { name: 'build', conclusion: 'FAILURE' },
                 ],
               },
@@ -277,7 +276,7 @@ describe('detectIssues (lib)', () => {
             statusCheckRollup: {
               contexts: {
                 nodes: [
-                  { context: 'check-protected-paths', state: 'FAILURE' },
+                  { context: 'Protected Paths Check', state: 'FAILURE' },
                 ],
               },
             },
@@ -310,11 +309,39 @@ describe('detectIssues (lib)', () => {
   });
 });
 
-// ── HUMAN_REQUIRED_CHECKS ────────────────────────────────────────────────────
+// ── Label-required check detection ──────────────────────────────────────────
 
-describe('HUMAN_REQUIRED_CHECKS', () => {
-  it('contains check-protected-paths', () => {
-    expect(HUMAN_REQUIRED_CHECKS.has('check-protected-paths')).toBe(true);
+describe('label-required checks skip ci-failure', () => {
+  function prWithChecks(checks: Array<{ name: string; conclusion: string }>): GqlPrNode {
+    return makePrNode({
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: checks },
+            },
+          },
+        }],
+      },
+    });
+  }
+
+  it('skips ci-failure when only Protected Paths Check fails', () => {
+    const pr = prWithChecks([
+      { name: 'Protected Paths Check', conclusion: 'FAILURE' },
+      { name: 'build-nextjs', conclusion: 'SUCCESS' },
+    ]);
+    const { issues } = detectIssues(pr, 48 * 60 * 60 * 1000);
+    expect(issues).not.toContain('ci-failure');
+  });
+
+  it('reports ci-failure when a real check fails alongside Protected Paths', () => {
+    const pr = prWithChecks([
+      { name: 'Protected Paths Check', conclusion: 'FAILURE' },
+      { name: 'test', conclusion: 'FAILURE' },
+    ]);
+    const { issues } = detectIssues(pr, 48 * 60 * 60 * 1000);
+    expect(issues).toContain('ci-failure');
   });
 });
 

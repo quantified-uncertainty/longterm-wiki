@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { eq, desc, and, lt, sql, or } from "drizzle-orm";
+import { z } from "zod";
 import { getDrizzleDb } from "../../db.js";
 import { activeAgents, agentSessionEvents } from "../../schema.js";
 import {
@@ -7,6 +8,8 @@ import {
   validationError,
   invalidJsonError,
   firstOrThrow,
+  clampedLimit,
+  zv,
 } from "../shared/utils.js";
 import {
   RegisterAgentSchema,
@@ -14,6 +17,11 @@ import {
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
 import { generateSessionName } from "../../session-name.js";
+
+const ListAgentsQuery = z.object({
+  status: z.string().optional(),
+  limit: clampedLimit(200, 50),
+});
 
 /** Default minutes before an agent without heartbeat is marked stale. */
 const STALE_TIMEOUT_MINUTES = 30;
@@ -81,9 +89,8 @@ const activeAgentsApp = new Hono()
   })
 
   // ---- GET / (list agents, optionally filtered by status) ----
-  .get("/", async (c) => {
-    const status = c.req.query("status"); // optional: "active", "completed", etc.
-    const limit = Math.min(Number(c.req.query("limit") || 50), 200);
+  .get("/", zv("query", ListAgentsQuery), async (c) => {
+    const { status, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
     const conditions = status ? eq(activeAgents.status, status) : undefined;

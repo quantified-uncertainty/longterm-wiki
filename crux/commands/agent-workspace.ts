@@ -108,6 +108,35 @@ function git(dir: string, ...args: string[]): string {
   }
 }
 
+/** Sanitize a string for use in tmux commands — strip shell-unsafe characters */
+function sanitizeForTmux(s: string): string {
+  return s.replace(/[^a-zA-Z0-9/_.:@#-]/g, '_');
+}
+
+interface TmuxWindowInfo {
+  index: string;
+  cwd: string;
+  name: string;
+}
+
+/** Query tmux for all windows with their index, pane CWD, and name */
+function listTmuxWindows(): TmuxWindowInfo[] {
+  try {
+    // Use '|||' as delimiter — tmux's -F doesn't interpret \t as tab in single quotes,
+    // so we need a multi-char delimiter that won't appear in paths or window names.
+    const raw = execSync(
+      `tmux list-windows -F '#{window_index}|||#{pane_current_path}|||#{window_name}'`,
+      { encoding: 'utf-8', timeout: 5000 },
+    ).trim();
+    return raw.split('\n').filter(Boolean).map((line) => {
+      const parts = line.split('|||');
+      return { index: parts[0] || '', cwd: parts[1] || '', name: parts[2] || '' };
+    });
+  } catch {
+    return [];
+  }
+}
+
 // ---------------------------------------------------------------------------
 // setup
 // ---------------------------------------------------------------------------
@@ -416,26 +445,30 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
   }
 
   const withClaude = args.includes('--claude');
-  const windowName = `A${slot}`;
 
-  // Check if a window with this name already exists — reuse it instead of creating a duplicate
-  try {
-    const existing = execSync(`tmux list-windows -F '#{window_name}' 2>/dev/null`, { encoding: 'utf8' });
-    if (existing.split('\n').includes(windowName)) {
-      execSync(`tmux select-window -t "${windowName}"`, { stdio: 'inherit' });
-      return { exitCode: 0, output: `Switched to existing tmux window ${windowName}` };
+  // Check if a window for this slot already exists — match by pane CWD, not window name
+  // (window names get renamed to A${slot}:${branch} by hooks, so exact name match fails)
+  const windows = listTmuxWindows();
+  for (const win of windows) {
+    if (win.cwd === slotDir) {
+      try {
+        execSync(`tmux select-window -t "${win.index}"`, { stdio: 'inherit' });
+        return { exitCode: 0, output: `Switched to existing tmux window for slot a${slot}` };
+      } catch { /* fall through to create */ }
     }
-  } catch {
-    // tmux query failed — fall through to create a new window
   }
+
+  // Include current branch in initial window name
+  const branch = git(slotDir, 'branch', '--show-current') || 'detached';
+  const fullWindowName = sanitizeForTmux(`A${slot}:${branch}`);
 
   try {
     if (withClaude) {
-      execSync(`tmux new-window -n "${windowName}" -c "${slotDir}" "claude"`, { stdio: 'inherit' });
+      execSync(`tmux new-window -n "${fullWindowName}" -c "${slotDir}" "claude"`, { stdio: 'inherit' });
     } else {
-      execSync(`tmux new-window -n "${windowName}" -c "${slotDir}"`, { stdio: 'inherit' });
+      execSync(`tmux new-window -n "${fullWindowName}" -c "${slotDir}"`, { stdio: 'inherit' });
     }
-    return { exitCode: 0, output: `Opened tmux window ${windowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
+    return { exitCode: 0, output: `Opened tmux window ${fullWindowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
   } catch (e) {
     return { exitCode: 1, output: `Error opening tmux window: ${e instanceof Error ? e.message : String(e)}` };
   }
@@ -550,7 +583,65 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
     output = 'No slots to refresh.';
   }
 
+  // Rename tmux windows to match current state after refresh
+  const tabsRenamed = renameTmuxWindows(lwDir);
+  if (tabsRenamed.length > 0) {
+    output += `Tmux tabs renamed:\n${tabsRenamed.join('\n')}\n`;
+  }
+
   return { exitCode: 0, output };
+}
+
+// ---------------------------------------------------------------------------
+// fix-tabs — rename tmux windows to match actual slot + branch
+// ---------------------------------------------------------------------------
+
+/** Scan all tmux windows and rename those whose pane CWD is an agent slot */
+function renameTmuxWindows(lwDir: string): string[] {
+  if (!process.env.TMUX) return [];
+
+  const windows = listTmuxWindows();
+  const renamed: string[] = [];
+
+  for (const win of windows) {
+    // Check if this pane is in an agent slot directory under lw/
+    const match = win.cwd.match(/\/a(\d+)$/);
+    if (!match) continue;
+
+    const expectedDir = join(lwDir, `a${match[1]}`);
+    if (win.cwd !== expectedDir) continue;
+
+    const slot = match[1];
+    const branch = git(win.cwd, 'branch', '--show-current') || 'detached';
+    const newName = sanitizeForTmux(`A${slot}:${branch}`);
+
+    if (win.name !== newName) {
+      try {
+        execSync(`tmux rename-window -t "${win.index}" "${newName}"`, { timeout: 5000 });
+        renamed.push(`  A${slot}: ${win.name} → ${newName}`);
+      } catch { /* tmux rename can fail if window was closed between query and rename */ }
+    }
+  }
+
+  return renamed;
+}
+
+async function fixTabs(_args: string[], _options: CommandOptions): Promise<CommandResult> {
+  if (!process.env.TMUX) {
+    return { exitCode: 1, output: 'Error: Not inside a tmux session.' };
+  }
+
+  const lwDir = getLwDir();
+  const renamed = renameTmuxWindows(lwDir);
+
+  if (renamed.length === 0) {
+    return { exitCode: 0, output: 'All tmux tabs already correct.' };
+  }
+
+  return {
+    exitCode: 0,
+    output: `Renamed ${renamed.length} tab(s):\n${renamed.join('\n')}`,
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -565,6 +656,7 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
   clean,
   open,
   refresh,
+  'fix-tabs': fixTabs,
 };
 
 export function getHelp(): string {
@@ -587,6 +679,7 @@ Commands:
   clean [N]         Show idle slots; use --force to remove them
   open <N>          Open a tmux window at slot N (--claude to launch claude)
   refresh           Pull latest main in idle slots (on main, clean)
+  fix-tabs          Rename tmux tabs to match actual slot + branch
 
 Port assignments (deterministic from slot number):
   Agent N → Next.js on port (3010+N), wiki-server on port (3110+N)

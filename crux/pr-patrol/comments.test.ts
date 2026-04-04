@@ -302,7 +302,7 @@ describe('event comment builders', () => {
   it('buildAbandonmentComment includes fail count and issues', () => {
     const result = buildAbandonmentComment(2, ['conflict', 'ci-failure']);
     expect(result).toContain('2 failed fix attempts');
-    expect(result).toContain('human intervention');
+    expect(result).toContain('Escalating to coordinator');
     expect(result).toContain('conflict');
     expect(result).toContain('ci-failure');
   });
@@ -317,7 +317,7 @@ describe('event comment builders', () => {
 
   it('buildNoOpComment includes issues', () => {
     const result = buildNoOpComment(['ci-failure']);
-    expect(result).toContain('human intervention');
+    expect(result).toContain('escalation to coordinator');
     expect(result).toContain('ci-failure');
   });
 });

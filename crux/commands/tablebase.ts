@@ -27,6 +27,7 @@ import { commands as importGrantsCommands } from './import-grants.ts';
 import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
 import { commands as dataSourcesCommands } from './data-sources.ts';
+import { commands as websiteSourcesCommands } from './website-sources.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1170,6 +1171,11 @@ export const commands = {
   'data-sources-show': dataSourcesCommands.show,
   'data-sources-snapshot': dataSourcesCommands.snapshot,
   'data-sources-health': dataSourcesCommands.health,
+  // Website source management
+  'website-sources': websiteSourcesCommands.default,
+  'website-sources-list': websiteSourcesCommands.list,
+  'website-sources-show': websiteSourcesCommands.show,
+  'website-sources-fetch': websiteSourcesCommands.fetch,
 };
 
 export function getHelp(): string {
@@ -1213,6 +1219,12 @@ Commands:
   data-sources-show <id>      Show details + snapshot history
   data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
   data-sources-health         Check mapping validity, staleness
+
+  Website Sources:
+  website-sources             Show website source help
+  website-sources-list        List all registered website sources
+  website-sources-show <id>   Show source details with pages
+  website-sources-fetch <id>  Fetch pages and store snapshots (--all for all sources)
 
   Market data:
   markets-discover <entity>   Discover prediction market questions via LLM agent
