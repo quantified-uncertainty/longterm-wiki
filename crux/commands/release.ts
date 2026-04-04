@@ -15,6 +15,7 @@ import { createLogger } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 import {
+  deduplicateSubPrTasks,
   detectDeployTasks,
   formatDeployTasksSection,
   parseDeployTasksFromBody,
@@ -207,8 +208,11 @@ export async function generateReleaseBody(opts: {
     console.warn(`Warning: failed to fetch sub-PR deploy tasks: ${msg}`);
   }
 
+  // Deduplicate: drop sub-PR tasks that overlap with diff-detected tasks
+  const dedupedSubPrTasks = deduplicateSubPrTasks(diffTasks, subPrTasks);
+
   // Build the deploy checklist section
-  const deploySection = formatDeployTasksSection(diffTasks, subPrTasks);
+  const deploySection = formatDeployTasksSection(diffTasks, dedupedSubPrTasks);
   lines.push(deploySection);
   lines.push('');
 
