@@ -12,6 +12,7 @@ import { spawn } from 'child_process';
 import { githubApi } from '../lib/github.ts';
 import { git, createWorktree, removeWorktree } from '../lib/git.ts';
 import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecentMerges } from '../lib/pr-analysis/index.ts';
+import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import type { RecentMerge } from '../lib/pr-analysis/index.ts';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
 import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
@@ -112,6 +113,55 @@ function extractFixPrNumber(output: string): number | null {
   return null;
 }
 
+// ── Concurrency pre-flight checks ───────────────────────────────────────────
+
+/**
+ * Check if there's already an open PR from a `claude/fix-*` branch targeting main.
+ * Prevents multiple agents from racing to fix the same CI failure by detecting
+ * existing fix attempts before creating a new branch.
+ *
+ * Returns the PR number if a competing fix is found, null otherwise.
+ */
+export async function findExistingMainFixPr(repo: string): Promise<{ number: number; branch: string } | null> {
+  try {
+    const result = await githubApi<{ items: Array<{ number: number; head: { ref: string } }> }>(
+      `/search/issues?q=repo:${repo}+is:pr+is:open+head:claude/fix-&per_page=5`,
+    );
+    if (result.items && result.items.length > 0) {
+      return { number: result.items[0].number, branch: result.items[0].head.ref };
+    }
+  } catch (e) {
+    // Non-fatal — fall through to allow the fix attempt
+    log(`  ${cl.yellow}Warning: pre-flight check for existing fix PRs failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+  }
+  return null;
+}
+
+/**
+ * Re-check a PR's labels immediately before claiming it.
+ * Prevents race conditions where another patrol instance claimed the PR
+ * between our initial scan and dispatch.
+ *
+ * Returns true if the PR is still available (no working labels).
+ */
+async function isPrStillAvailable(prNumber: number, repo: string): Promise<boolean> {
+  try {
+    const pr = await githubApi<{ labels: Array<{ name: string }> }>(
+      `/repos/${repo}/issues/${prNumber}`,
+    );
+    const labels = pr.labels.map((l) => l.name);
+    if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) {
+      log(`  ${cl.yellow}PR #${prNumber} already claimed by another agent — skipping${cl.reset}`);
+      return false;
+    }
+    return true;
+  } catch (e) {
+    // If we can't check, proceed cautiously — the claim will succeed or fail
+    log(`  ${cl.yellow}Warning: could not re-check PR #${prNumber} labels: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    return true;
+  }
+}
+
 // ── Main Branch CI Check (daemon wrapper) ────────────────────────────────────
 
 export { type MainBranchStatus };
@@ -182,6 +232,25 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
       elapsed_s: 0,
     });
     markProcessed(MAIN_BRANCH_KEY);
+    return;
+  }
+
+  // ── Pre-flight: check for existing fix PRs ───────────────────────
+  // Prevents the 7-agent race condition (#3814) where multiple patrol
+  // instances independently create fix branches for the same CI failure.
+  const existingFix = await findExistingMainFixPr(config.repo);
+  if (existingFix) {
+    log(`  ${cl.yellow}⚠ Existing fix PR #${existingFix.number} already open (${existingFix.branch}) — skipping duplicate fix${cl.reset}`);
+    trackMainFixPr(existingFix.number);
+    markProcessed(MAIN_BRANCH_KEY);
+    appendJsonl(JSONL_FILE, {
+      type: 'main_branch_result',
+      run_id: status.runId,
+      sha: status.sha,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: `Existing fix PR #${existingFix.number} already open`,
+    });
     return;
   }
 
@@ -427,6 +496,23 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       elapsed_s: 0,
     });
     markProcessed(pr.number);
+    return { mainIsRootCause: false };
+  }
+
+  // ── Pre-claim re-check: verify PR is still unclaimed ─────────────
+  // Prevents race conditions (#3814) where another patrol instance
+  // claimed the PR between our initial scan and this dispatch.
+  const available = await isPrStillAvailable(pr.number, config.repo);
+  if (!available) {
+    markProcessed(pr.number);
+    appendJsonl(JSONL_FILE, {
+      type: 'pr_result',
+      pr_num: pr.number,
+      issues: pr.issues,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: 'Already claimed by another agent',
+    });
     return { mainIsRootCause: false };
   }
 
