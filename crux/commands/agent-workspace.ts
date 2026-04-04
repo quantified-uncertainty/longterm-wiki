@@ -123,19 +123,20 @@ function overlayHooks(lwDir: string, slotDir: string): boolean {
 
   if (!existsSync(mainHooksDir)) return false;
 
+  // Only these two hooks contain tmux rename logic that needs the -t $TMUX_PANE fix
   const hookFiles = ['session-start.sh', 'heartbeat.sh'];
   let copied = false;
 
+  mkdirSync(slotHooksDir, { recursive: true });
   for (const file of hookFiles) {
     const src = join(mainHooksDir, file);
     const dst = join(slotHooksDir, file);
     if (!existsSync(src)) continue;
 
-    mkdirSync(slotHooksDir, { recursive: true });
     try {
       copyFileSync(src, dst);
       copied = true;
-    } catch { /* permission error or similar */ }
+    } catch { /* permission error — slot hooks stay as-is */ }
   }
 
   return copied;
@@ -159,7 +160,7 @@ function listTmuxWindows(): TmuxWindowInfo[] {
     return raw.split('\n').filter(Boolean).map((line) => {
       const parts = line.split('|||');
       return { index: parts[0] || '', cwd: parts[1] || '', name: parts[2] || '' };
-    });
+    }).filter((w) => /^\d+$/.test(w.index) && w.cwd);
   } catch {
     return [];
   }
@@ -476,9 +477,10 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
 
   // Check if a window for this slot already exists — match by pane CWD, not window name
   // (window names get renamed to A${slot}:${branch} by hooks, so exact name match fails)
+  // Use startsWith to handle cases where the user cd'd into a subdirectory
   const windows = listTmuxWindows();
   for (const win of windows) {
-    if (win.cwd === slotDir) {
+    if (win.cwd === slotDir || win.cwd.startsWith(slotDir + '/')) {
       try {
         execSync(`tmux select-window -t "${win.index}"`, { stdio: 'inherit' });
         return { exitCode: 0, output: `Switched to existing tmux window for slot a${slot}` };
