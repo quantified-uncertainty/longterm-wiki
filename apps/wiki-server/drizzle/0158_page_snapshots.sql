@@ -29,3 +29,20 @@ CREATE INDEX IF NOT EXISTS "idx_ps_extraction_status"
 -- Content-hash dedup: same page + same content = no duplicate snapshot
 CREATE UNIQUE INDEX IF NOT EXISTS "idx_ps_page_content_hash"
   ON "page_snapshots" ("website_source_page_id", "content_hash");
+
+-- Wire up FK: website_source_pages.last_snapshot_id → page_snapshots.id
+-- Column was added in 0124 without a FK; now that the target table exists, add it.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.table_constraints
+    WHERE constraint_name = 'fk_wsp_last_snapshot'
+      AND table_name = 'website_source_pages'
+  ) THEN
+    ALTER TABLE "website_source_pages"
+      ADD CONSTRAINT "fk_wsp_last_snapshot"
+      FOREIGN KEY ("last_snapshot_id")
+      REFERENCES "page_snapshots"("id")
+      ON DELETE SET NULL;
+  END IF;
+END $$;

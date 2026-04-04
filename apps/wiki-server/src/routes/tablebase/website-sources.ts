@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { createHash } from "crypto";
 import { z } from "zod";
 import { eq, count, desc, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
@@ -93,12 +94,23 @@ const CreateSnapshotSchema = z.object({
   websiteSourcePageId: z.string().length(10),
   url: z.string().min(1).max(4000),
   contentHash: z.string().length(64),
-  fullText: z.string().min(1).max(10_000_000).transform((s) => s.replace(/\0/g, "")),
+  fullText: z.string().min(1).max(10_000_000),
   titleAtTime: z.string().max(1000).nullable().optional(),
   httpStatus: z.number().int().min(0).max(999).default(200),
   contentLength: z.number().int().min(0).default(0),
   extractionStatus: z.enum(VALID_EXTRACTION_STATUSES).default("pending"),
   fetchedAt: z.string().datetime().optional(),
+}).transform((data) => {
+  // Strip NUL bytes from fullText, then recompute contentHash and contentLength
+  // to ensure consistency (CodeRabbit #3788 review).
+  const stripped = data.fullText.replace(/\0/g, "");
+  const recomputedHash = createHash("sha256").update(stripped).digest("hex");
+  return {
+    ...data,
+    fullText: stripped,
+    contentHash: recomputedHash,
+    contentLength: stripped.length,
+  };
 });
 
 const SnapshotListQuery = paginationQuery({ defaultLimit: 20, maxLimit: 100 });

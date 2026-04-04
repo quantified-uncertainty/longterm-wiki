@@ -114,6 +114,7 @@ interface FetchStats {
   pagesProcessed: number;
   snapshotsCreated: number;
   unchanged: number;
+  paywalls: number;
   errors: number;
 }
 
@@ -135,17 +136,27 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
   const { fetchSource } = await import('../lib/search/source-fetcher.ts');
   const { generateId } = await import('../lib/grant-import/id.ts');
 
-  // Build domain map from source list
-  const allSourcesResult = await listWebsiteSources(200);
-  if (!allSourcesResult.ok) {
-    return { exitCode: 1, output: `Failed to list sources: ${allSourcesResult.error}` };
+  // Build domain map from source list — paginate to fetch all sources
+  let allSources: Array<{ id: string; domain: string; enabled: boolean; [k: string]: unknown }> = [];
+  {
+    const PAGE_SIZE = 200;
+    let offset = 0;
+    while (true) {
+      const page = await listWebsiteSources(PAGE_SIZE, offset);
+      if (!page.ok) {
+        return { exitCode: 1, output: `Failed to list sources: ${page.error}` };
+      }
+      allSources.push(...page.data.sources);
+      if (page.data.sources.length < PAGE_SIZE) break;
+      offset += PAGE_SIZE;
+    }
   }
-  const domainMap = new Map(allSourcesResult.data.sources.map((s) => [s.id, s.domain]));
+  const domainMap = new Map(allSources.map((s) => [s.id, s.domain]));
 
   // Determine which sources to process
   let sourceIds: string[];
   if (fetchAll) {
-    sourceIds = allSourcesResult.data.sources.filter((s) => s.enabled).map((s) => s.id);
+    sourceIds = allSources.filter((s) => s.enabled).map((s) => s.id);
     console.log(`Found ${sourceIds.length} enabled sources to process`);
   } else {
     if (!domainMap.has(sourceId!)) {
@@ -155,7 +166,7 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
   }
 
   const limit = options.limit ? parseInt(options.limit, 10) : undefined;
-  const totalStats: FetchStats = { pagesProcessed: 0, snapshotsCreated: 0, unchanged: 0, errors: 0 };
+  const totalStats: FetchStats = { pagesProcessed: 0, snapshotsCreated: 0, unchanged: 0, paywalls: 0, errors: 0 };
 
   for (const sid of sourceIds) {
     const domain = domainMap.get(sid)!;
@@ -185,7 +196,11 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
 
         if (source.status !== 'ok') {
           console.warn(`    Status: ${source.status} (HTTP ${source.httpStatus})`);
-          if (source.status === 'dead' || source.status === 'error' || source.status === 'paywall') {
+          if (source.status === 'paywall') {
+            totalStats.paywalls++;
+            continue;
+          }
+          if (source.status === 'dead' || source.status === 'error') {
             totalStats.errors++;
             continue;
           }
@@ -251,6 +266,7 @@ async function fetchCommand(args: string[], options: Options): Promise<CommandRe
   console.log(`Pages processed: ${totalStats.pagesProcessed}`);
   console.log(`Snapshots created: ${totalStats.snapshotsCreated}`);
   console.log(`Unchanged (deduped): ${totalStats.unchanged}`);
+  console.log(`Paywalls (skipped): ${totalStats.paywalls}`);
   console.log(`Errors: ${totalStats.errors}`);
 
   return {
