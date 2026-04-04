@@ -516,10 +516,10 @@ describe('computeBudget', () => {
     expect(budget.timeoutMinutes).toBe(45);
   });
 
-  it('gives full budget for conflict', () => {
+  it('gives reduced budget for conflict (#3776)', () => {
     const budget = computeBudget(['conflict']);
-    expect(budget.maxTurns).toBe(60);
-    expect(budget.timeoutMinutes).toBe(60);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
   it('uses highest budget when multiple issues present', () => {
@@ -530,8 +530,8 @@ describe('computeBudget', () => {
 
   it('conflict dominates when mixed with smaller issues', () => {
     const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
-    expect(budget.maxTurns).toBe(60);
-    expect(budget.timeoutMinutes).toBe(60);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 });
 

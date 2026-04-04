@@ -310,6 +310,37 @@ export function isCircuitOpen(): boolean {
 /** Threshold in seconds below which a failure is considered "instant". */
 export const INSTANT_FAILURE_THRESHOLD_SECONDS = INSTANT_FAILURE_THRESHOLD_S;
 
+// ── Total fix attempt tracking (anti-oscillation) ───────────────────────────
+// Tracks cumulative fix attempts per PR regardless of intermediate successes.
+// Prevents the fix→verify-fail→fix→verify-fail oscillation pattern (#3755, #3757)
+// where intermittent CI passes reset the consecutive fail counter.
+// Total attempts are only cleared on new pushes (SHA change), not on CI pass.
+
+const MAX_TOTAL_FIX_ATTEMPTS = 4;
+
+export function getTotalFixAttempts(prNumber: number | string): number {
+  const file = join(STATE_DIR, `total-attempts-${prNumber}`);
+  if (!existsSync(file)) return 0;
+  return parseInt(readFileSync(file, 'utf-8').trim(), 10) || 0;
+}
+
+export function recordFixAttempt(prNumber: number | string): number {
+  const count = getTotalFixAttempts(prNumber) + 1;
+  writeFileSync(join(STATE_DIR, `total-attempts-${prNumber}`), String(count));
+  return count;
+}
+
+export function clearTotalFixAttempts(prNumber: number | string): void {
+  const file = join(STATE_DIR, `total-attempts-${prNumber}`);
+  if (existsSync(file)) {
+    try { unlinkSync(file); } catch { /* best-effort */ }
+  }
+}
+
+export function hasExceededMaxAttempts(prNumber: number | string): boolean {
+  return getTotalFixAttempts(prNumber) >= MAX_TOTAL_FIX_ATTEMPTS;
+}
+
 // ── Pending CI verification (post-fix) ──────────────────────────────────────
 // After a "fixed" outcome, we don't reset the fail counter immediately.
 // Instead we mark the PR as "pending verification" and only reset when CI passes.

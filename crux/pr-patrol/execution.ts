@@ -40,6 +40,8 @@ import {
   markPendingVerification,
   markProcessed,
   recordFailure,
+  recordFixAttempt,
+  hasExceededMaxAttempts,
   recordInstantFailure,
   resetCircuit,
   resetFailCount,
@@ -486,6 +488,23 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
   log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
 
+  // ── Anti-oscillation: check total fix attempts (#3755, #3757, #3826) ──
+  if (hasExceededMaxAttempts(pr.number)) {
+    log(`  ${cl.red}✗ PR #${pr.number} exceeded max total fix attempts — abandoning${cl.reset}`);
+    markAbandoned(pr.number);
+    markProcessed(pr.number);
+    appendJsonl(JSONL_FILE, {
+      type: 'pr_result',
+      pr_num: pr.number,
+      issues: pr.issues,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: `Exceeded max total fix attempts (oscillation prevention)`,
+    });
+    return { mainIsRootCause: false };
+  }
+  recordFixAttempt(pr.number);
+
   if (config.dryRun) {
     log(`  ${cl.dim}[DRY RUN] Would invoke Claude to fix${cl.reset}`);
     appendJsonl(JSONL_FILE, {
@@ -621,7 +640,10 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       if (isNoOp) {
         if (looksLikeMainRootCause(result.output)) {
           // PR's CI failure is caused by main being broken — don't penalize this PR
+          // but DO record a failure to prevent infinite retries (#3772).
+          // The fail counter will be cleared when main goes green.
           mainIsRootCause = true;
+          recordFailure(pr.number);
           reason = `No-op: CI failure is pre-existing on main branch`;
           log(`${cl.yellow}⚠ PR #${pr.number} no-op — root cause is on main branch${cl.reset} (${elapsedS}s)`);
         } else {
