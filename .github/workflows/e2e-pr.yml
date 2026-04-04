@@ -1,0 +1,74 @@
+name: E2E PR Check
+
+# Runs render quality audit and no-raw-ids specs against a local build
+# of the PR. Starts as an optional (non-required) check.
+#
+# Phase 6 of Discussion #3768 (Rendering Quality & Test Infrastructure).
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      # Only run when frontend code changes — skip for docs/data-only PRs
+      - "apps/web/src/**"
+      - "apps/web/e2e/**"
+      - "apps/web/package.json"
+      - "content/docs/**"
+
+concurrency:
+  group: e2e-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: cd apps/web && npx playwright install chromium --with-deps
+
+      - name: Build data
+        run: cd apps/web && node scripts/build-data.mjs
+
+      - name: Build Next.js
+        run: cd apps/web && npx next build
+
+      - name: Start server and run E2E
+        run: |
+          cd apps/web
+          PORT=3099 npx next start &
+          SERVER_PID=$!
+
+          # Wait for server to be ready
+          for i in $(seq 1 30); do
+            if curl -sf -o /dev/null http://localhost:3099; then
+              echo "Server ready (attempt $i)"
+              break
+            fi
+            sleep 2
+          done
+
+          # Run only the render audit and no-raw-ids specs (not the full suite)
+          PLAYWRIGHT_BASE_URL=http://localhost:3099 \
+            npx playwright test \
+              e2e/render-audit.spec.ts \
+              e2e/no-raw-ids.spec.ts \
+              --retries=2 \
+              --reporter=list \
+            || EXIT_CODE=$?
+
+          kill $SERVER_PID 2>/dev/null || true
+          exit ${EXIT_CODE:-0}
