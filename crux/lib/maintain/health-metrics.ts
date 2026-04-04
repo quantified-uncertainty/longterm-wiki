@@ -42,8 +42,10 @@ export function collectHealthMetrics(): HealthMetrics {
 
   const metrics: HealthMetrics = {
     date: new Date().toISOString().slice(0, 10),
-    todoCount: grepCount('TODO', dirs),
-    fixmeCount: grepCount('FIXME\\|HACK\\|XXX', dirs),
+    // Use comment-anchored patterns to avoid false positives from test fixtures,
+    // validator pattern definitions, and UI strings (#3832)
+    todoCount: grepCount('//\\s*TODO\\b\\|/\\*\\+\\s*TODO\\b\\|^\\s*\\*\\+\\s*TODO\\b', dirs),
+    fixmeCount: grepCount('//\\s*FIXME\\b\\|//\\s*HACK\\b\\|/\\*\\+\\s*FIXME\\b\\|/\\*\\+\\s*HACK\\b\\|^\\s*\\*\\+\\s*FIXME\\b\\|^\\s*\\*\\+\\s*HACK\\b', dirs),
     anyTypeCount: grepCount(': any\\b\\|as any\\b', dirs),
     largeFiles: [],
     largeFileCount: 0,
