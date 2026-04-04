@@ -45,8 +45,9 @@ export async function POST(request: NextRequest) {
       headers,
       body: JSON.stringify(incident),
       signal: AbortSignal.timeout(5000),
-    }).catch(() => {
-      // Intentionally silent — wiki-server may be down
+    }).catch((e: unknown) => {
+      // Intentionally quiet: wiki-server may be down. Client errors are best-effort.
+      void e;
     });
 
     return NextResponse.json({ ok: true });

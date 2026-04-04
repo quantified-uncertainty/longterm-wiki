@@ -38,7 +38,10 @@ export function reportClientError(
     const payload: ErrorPayload = {
       message: message.slice(0, 1000),
       stack: opts.stack?.slice(0, 2000),
-      url: window.location.href,
+      url: (() => {
+        try { const u = new URL(window.location.href); u.search = ""; return u.toString(); }
+        catch { return window.location.pathname; }
+      })(),
       source: opts.source,
       userAgent: navigator.userAgent.slice(0, 200),
       timestamp: new Date().toISOString(),
@@ -59,8 +62,9 @@ export function reportClientError(
         body,
         headers: { "Content-Type": "application/json" },
         keepalive: true,
-      }).catch(() => {
-        // Intentionally silent — reporter must never crash the page
+      }).catch((e: unknown) => {
+        // Intentionally quiet: client error reporting is best-effort.
+        void e;
       });
     }
   } catch {
