@@ -41,7 +41,7 @@ jobs:
         run: cd apps/web && npx playwright install chromium --with-deps
 
       - name: Build data
-        run: cd apps/web && node scripts/build-data.mjs
+        run: cd apps/web && node --import tsx/esm scripts/build-data.mjs
 
       - name: Build Next.js
         run: cd apps/web && npx next build
