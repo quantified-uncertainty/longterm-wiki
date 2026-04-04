@@ -134,6 +134,9 @@ export async function orchestrateCommand(
   let itemsToVerify = allItems;
 
   if (budgetLimit !== undefined) {
+    if (!isFinite(budgetLimit) || budgetLimit <= 0) {
+      return { exitCode: 1, output: `Invalid budget: ${budgetLimit}. Budget must be a positive number.` };
+    }
     const maxByBudget = Math.floor(budgetLimit / ESTIMATED_COST_PER_VERIFICATION);
     if (maxByBudget < itemsToVerify.length) {
       itemsToVerify = itemsToVerify.slice(0, maxByBudget);
@@ -153,7 +156,8 @@ export async function orchestrateCommand(
 
   // ── Live execution ──
   const useBatch = !!options.batch;
-  const concurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
+  const parsedConcurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
+  const concurrency = isNaN(parsedConcurrency) || parsedConcurrency < 1 ? 5 : parsedConcurrency;
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,

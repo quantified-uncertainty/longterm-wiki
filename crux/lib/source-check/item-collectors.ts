@@ -110,7 +110,7 @@ export async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFac
             needsRecheck: v.needsRecheck,
           });
         }
-        if (nextResponse.data.verdicts.length < 500) break;
+        if (nextResponse.data.verdicts.length < API_PAGE_LIMIT) break;
         offset += nextResponse.data.verdicts.length;
       }
     }
