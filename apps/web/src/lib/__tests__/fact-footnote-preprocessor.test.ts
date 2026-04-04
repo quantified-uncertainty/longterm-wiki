@@ -108,7 +108,7 @@ describe("preprocessFactFootnotes", () => {
 
     const result = preprocessFactFootnotes(content, lookup);
 
-    expect(result.content).toContain("[^fact-f_empty]: KB fact f_empty");
+    expect(result.content).toContain("[^fact-f_empty]: FactBase fact f_empty");
     expect(result.resolvedFactIds.has("f_empty")).toBe(true);
   });
 
@@ -163,7 +163,7 @@ describe("preprocessFactFootnotes", () => {
     expect(result.content).not.toContain("[^fact:f_nonexistent]");
 
     // Should generate a warning footnote
-    expect(result.content).toContain("[^fact-f_nonexistent]: Fact f_nonexistent (not found in KB data)");
+    expect(result.content).toContain("[^fact-f_nonexistent]: Fact f_nonexistent (not found in FactBase)");
 
     expect(result.unresolvedFactIds.has("f_nonexistent")).toBe(true);
     expect(result.resolvedFactIds.size).toBe(0);
@@ -373,7 +373,7 @@ describe("buildFactFootnoteDefinition", () => {
     const fact = makeFact({ id: "f_nada" });
 
     const def = buildFactFootnoteDefinition(fact);
-    expect(def).toBe("KB fact f_nada");
+    expect(def).toBe("FactBase fact f_nada");
   });
 
   it("handles non-URL source text", () => {

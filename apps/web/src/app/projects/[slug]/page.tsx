@@ -424,7 +424,7 @@ export default async function ProjectDetailPage({
                 href={`/factbase/entity/${entity.id}`}
                 className="text-xs text-primary hover:underline"
               >
-                KB data &rarr;
+                FactBase &rarr;
               </Link>
             </div>
           </section>

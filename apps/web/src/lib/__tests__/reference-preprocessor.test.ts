@@ -585,7 +585,7 @@ describe("preprocessReferences", () => {
       refData
     );
 
-    expect(result).toContain("[^1]: KB fact f_missing");
+    expect(result).toContain("[^1]: FactBase fact f_missing");
     expect(referenceMap.get(1)?.data).toBeNull();
     expect(referenceMap.get(1)?.kind).toBe("kb");
   });

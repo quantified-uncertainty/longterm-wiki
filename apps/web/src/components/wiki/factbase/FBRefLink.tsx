@@ -44,7 +44,7 @@ export function FBRefLink({ id, label, className }: FBRefLinkProps) {
   return (
     <span
       className={cn("text-muted-foreground", className)}
-      title={`KB entity: ${id}`}
+      title={`FactBase entity: ${id}`}
     >
       {displayName}
     </span>
