@@ -6,6 +6,8 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { compareGrantRows, type SortDir } from "./grants-sort";
 import { STATUS_COLORS } from "./grants-constants";
 
@@ -40,6 +42,8 @@ export interface GrantRow {
   dataSourceId: string | null;
   /** Inferred data source display name */
   dataSourceName: string | null;
+  /** Source-check verdict string, if available */
+  verdictString?: string | null;
 }
 
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "date" | "status";
@@ -347,6 +351,7 @@ export function GrantsTable({
               {hasAnyStatus && (
                 <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -463,6 +468,16 @@ export function GrantsTable({
                     )}
                   </td>
                 )}
+
+                {/* Verification */}
+                <td className="py-2.5 px-1">
+                  <SourceCheckDot
+                    status={recordVerdictToStatus(row.verdictString)}
+                    originalVerdict={row.verdictString}
+                    size="md"
+                    href={row.verdictString ? `/source-checks/grant/${encodeURIComponent(row.recordKey)}` : undefined}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

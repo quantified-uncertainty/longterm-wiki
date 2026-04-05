@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 const POSITION_COLORS: Record<string, string> = {
   support:
@@ -301,9 +303,7 @@ export function StakeholderTable({
               <th className="text-left py-1.5 px-3 font-medium w-[110px]">
                 Source
               </th>
-              <th className="text-left py-1.5 px-3 font-medium w-[60px]">
-                Status
-              </th>
+              <th className="py-1.5 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -370,8 +370,12 @@ export function StakeholderTable({
                     <span className="text-muted-foreground/30">&mdash;</span>
                   )}
                 </td>
-                <td className="py-1.5 px-3 text-center">
-                  <VerdictBadge verdict={stakeholder.verdict} />
+                <td className="py-1.5 px-1">
+                  <SourceCheckDot
+                    status={recordVerdictToStatus(stakeholder.verdict?.verdict)}
+                    originalVerdict={stakeholder.verdict?.verdict}
+                    size="md"
+                  />
                 </td>
               </tr>
             ))}

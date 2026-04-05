@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords, getKBEntity, getKBEntitySlug } from "@/data/factbase";
 import { getEntityHref } from "@/data/entity-nav";
-import { getTypedEntityById } from "@/data/tablebase";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { GrantsTable, type GrantRow, type FunderSummary } from "./grants-table";
@@ -108,6 +108,7 @@ export default function GrantsPage() {
       source: sourceUrl,
       dataSourceId: ds?.id ?? null,
       dataSourceName: ds?.name ?? null,
+      verdictString: getRecordVerdict("grant", record.key)?.verdict ?? null,
     };
   });
 

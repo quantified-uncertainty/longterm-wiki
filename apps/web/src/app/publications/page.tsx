@@ -4,6 +4,7 @@ import {
   getResourcesForPublication,
   getPagesForResource,
 } from "@/data";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { PublicationsTable, type PublicationRow } from "./publications-table";
 
@@ -33,6 +34,7 @@ export default function PublicationsPage() {
       peerReviewed: pub.peer_reviewed ?? false,
       resourceCount: resources.length,
       pageCount: pageSet.size,
+      verdictString: getRecordVerdict("publication", pub.id)?.verdict ?? null,
     };
   });
 
