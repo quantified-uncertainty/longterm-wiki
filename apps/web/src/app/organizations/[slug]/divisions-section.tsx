@@ -96,6 +96,7 @@ function DivisionCard({
   const accentBorder = DIVISION_ACCENT_BORDER[d.divisionType] ?? "border-l-gray-300 dark:border-l-gray-600";
 
   const divHref = getDivisionHref(d);
+  const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
 
   return (
     <div
@@ -104,8 +105,8 @@ function DivisionCard({
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0">
           <SourceCheckDot
-            status={recordVerdictToStatus(getRecordVerdict("division", String(d.key))?.verdict)}
-            originalVerdict={getRecordVerdict("division", String(d.key))?.verdict}
+            status={recordVerdictToStatus(cardVerdict)}
+            originalVerdict={cardVerdict}
           />
           <span className="truncate">
             {divHref ? (

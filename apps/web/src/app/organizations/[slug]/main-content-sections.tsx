@@ -64,14 +64,15 @@ export function FundingHistorySection({
               const { name: leadInvestorName, href: leadInvestorHref } =
                 resolveRefName(leadInvestor, undefined);
               const instrument = field(round, "instrument");
+              const roundVerdict = getRecordVerdict("funding-round", String(round.key))?.verdict;
 
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
                     <span className="inline-flex items-center gap-1.5">
                       <SourceCheckDot
-                        status={recordVerdictToStatus(getRecordVerdict("funding-round", String(round.key))?.verdict)}
-                        originalVerdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
+                        status={recordVerdictToStatus(roundVerdict)}
+                        originalVerdict={roundVerdict}
                         href={getSourceCheckHref("funding-round", String(round.key))}
                       />
                       <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
@@ -145,14 +146,15 @@ export function InvestorParticipationSection({
               const roundName = field(inv, "round_name");
               const amount = inv.fields.amount;
               const date = field(inv, "date");
+              const invVerdict = getRecordVerdict("investment", String(inv.key))?.verdict;
 
               return (
                 <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
                     <span className="inline-flex items-center gap-1.5">
                       <SourceCheckDot
-                        status={recordVerdictToStatus(getRecordVerdict("investment", String(inv.key))?.verdict)}
-                        originalVerdict={getRecordVerdict("investment", String(inv.key))?.verdict}
+                        status={recordVerdictToStatus(invVerdict)}
+                        originalVerdict={invVerdict}
                         href={getSourceCheckHref("investment", String(inv.key))}
                       />
                       {investorHref ? (
