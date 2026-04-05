@@ -8,6 +8,7 @@ import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { compareGrantRows, type SortDir } from "./grants-sort";
 import { STATUS_COLORS } from "./grants-constants";
 
@@ -475,7 +476,7 @@ export function GrantsTable({
                     status={recordVerdictToStatus(row.verdictString)}
                     originalVerdict={row.verdictString}
                     size="md"
-                    href={row.verdictString ? `/source-checks/grant/${encodeURIComponent(row.recordKey)}` : undefined}
+                    href={row.verdictString ? getSourceCheckHref("grant", row.recordKey) : undefined}
                   />
                 </td>
               </tr>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFPRows, type SortDir } from "./funding-programs-sort";
@@ -440,7 +441,7 @@ export function FundingProgramsListTable({
                     status={recordVerdictToStatus(row.verdict?.verdict)}
                     originalVerdict={row.verdict?.verdict}
                     size="md"
-                    href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    href={row.verdict?.verdict ? getSourceCheckHref("funding-program", row.id) : undefined}
                   />
                 </td>
               </tr>

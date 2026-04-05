@@ -8,6 +8,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
@@ -125,7 +126,7 @@ export function FundingProgramsSection({
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
+                      href={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>

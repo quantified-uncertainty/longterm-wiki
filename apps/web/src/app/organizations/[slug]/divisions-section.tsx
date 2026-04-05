@@ -11,6 +11,7 @@ import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
 type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
@@ -407,7 +408,7 @@ export function DivisionsSection({
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
+                      href={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
                     />
                   </td>
                 </tr>

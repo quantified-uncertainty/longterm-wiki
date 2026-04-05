@@ -15,6 +15,7 @@ import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { formatType } from "./publication-utils";
 import {
   Table,
@@ -159,7 +160,7 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
           status={recordVerdictToStatus(row.original.verdictString)}
           originalVerdict={row.original.verdictString}
           size="md"
-          href={row.original.verdictString ? `/source-checks/publication/${encodeURIComponent(row.original.id)}` : undefined}
+          href={row.original.verdictString ? getSourceCheckHref("publication", row.original.id) : undefined}
         />
       ),
       enableSorting: false,
