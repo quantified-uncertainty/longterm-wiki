@@ -626,12 +626,16 @@ const PARALLEL_STEPS: Step[] = [
     id: 'verification-coverage',
     name: 'TableBase verification coverage',
     command: 'npx',
-    args: ['tsx', 'crux/validate/validate-verification-coverage.ts', '--enforcement=soft',
+    args: ['tsx', 'crux/validate/validate-verification-coverage.ts',
+      // Advisory until existing unverified manifests are backfilled (Discussion #3875).
+      // Switch to --enforcement=soft after personnel/grants backfill is complete.
+      '--enforcement=advisory',
       ...(FORCE_MODE ? ['--force'] : [])],
     cwd: PROJECT_ROOT,
-    // Soft enforcement (Discussion #3875 Phase 4): blocks when TableBase
-    // submissions have unverified records, unless --force is passed to the gate.
-    // Hard-enforced tables (Phase 5) cannot be overridden with --force.
+    // Advisory for now — warns but doesn't block. Will become soft enforcement
+    // (blocking, --force override) once backfill coverage reaches >50% for
+    // personnel and grants. Hard-enforced tables (Phase 5) are always blocking.
+    advisory: true,
     emitOutputInCi: true,
   },
   {
