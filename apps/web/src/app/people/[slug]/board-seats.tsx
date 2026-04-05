@@ -5,6 +5,7 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge } from "@/components/directory";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 export interface BoardSeat {
   org: { id: string; name: string; type: string };
@@ -41,7 +42,7 @@ export function BoardSeats({ boardSeats }: { boardSeats: BoardSeat[] }) {
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
                   size="md"
-                  href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(record.key))}` : undefined}
+                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
                 />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">

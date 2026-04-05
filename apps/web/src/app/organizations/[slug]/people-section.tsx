@@ -236,7 +236,6 @@ export function PeopleSection({
                 Tenure
               </th>
               <th scope="col" className="py-2 px-1 w-8" />
-
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

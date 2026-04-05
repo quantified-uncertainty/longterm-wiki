@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
@@ -258,7 +259,7 @@ export function DivisionsTable({
                       status={recordVerdictToStatus(row.verdict?.verdict)}
                       originalVerdict={row.verdict?.verdict}
                       size="md"
-                      href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                      href={row.verdict?.verdict ? getSourceCheckHref("division", row.key) : undefined}
                     />
                   </td>
                 </tr>

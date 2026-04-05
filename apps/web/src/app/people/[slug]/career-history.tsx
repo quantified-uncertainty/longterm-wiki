@@ -5,6 +5,7 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -42,7 +43,7 @@ export function CareerHistory({
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
                   size="md"
-                  href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(entry.key))}` : undefined}
+                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
                 />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">

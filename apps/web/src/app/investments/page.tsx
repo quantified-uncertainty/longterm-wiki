@@ -7,6 +7,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import {
   formatKBDate,
   titleCase,
@@ -29,6 +30,7 @@ interface InvestmentRow {
   amount: number | null;
   instrument: string | null;
   role: string | null;
+  verdictString: string | null;
 }
 
 export default function InvestmentsPage() {
@@ -54,6 +56,7 @@ export default function InvestmentsPage() {
       amount: typeof f.amount === "number" ? f.amount : null,
       instrument: typeof f.instrument === "string" ? f.instrument : null,
       role: typeof f.role === "string" ? f.role : null,
+      verdictString: getRecordVerdict("investment", record.key)?.verdict ?? null,
     };
   });
 
@@ -226,17 +229,12 @@ export default function InvestmentsPage() {
                     {row.date ? formatKBDate(row.date) : ""}
                   </td>
                   <td className="py-2 px-1">
-                    {(() => {
-                      const verdict = getRecordVerdict("investment", String(row.key));
-                      return (
-                        <SourceCheckDot
-                          status={recordVerdictToStatus(verdict?.verdict)}
-                          originalVerdict={verdict?.verdict}
-                          size="md"
-                          href={verdict?.verdict ? `/source-checks/investment/${encodeURIComponent(String(row.key))}` : undefined}
-                        />
-                      );
-                    })()}
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdictString)}
+                      originalVerdict={row.verdictString}
+                      size="md"
+                      href={row.verdictString ? getSourceCheckHref("investment", String(row.key)) : undefined}
+                    />
                   </td>
                 </tr>
               ))}

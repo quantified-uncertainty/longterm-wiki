@@ -72,69 +72,6 @@ function ImportanceIndicator({
   );
 }
 
-// ── Verdict badge config (duplicated from VerificationBadge for client use) ──
-const VERDICT_CONFIG: Record<
-  string,
-  { label: string; title: string; className: string }
-> = {
-  confirmed: {
-    label: "Verified",
-    title: "Confirmed by source",
-    className:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-  },
-  contradicted: {
-    label: "Disputed",
-    title: "Source contradicts this data",
-    className:
-      "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
-  },
-  outdated: {
-    label: "Outdated",
-    title: "Source has newer data",
-    className:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  },
-  partial: {
-    label: "Partial",
-    title: "Partially confirmed by source",
-    className:
-      "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
-  },
-  unverifiable: {
-    label: "Unverifiable",
-    title: "Source does not address this data",
-    className:
-      "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400",
-  },
-};
-
-/** Inline verdict badge (client-safe, no server imports). */
-function VerdictBadge({
-  verdict,
-}: {
-  verdict: { verdict: string; confidence: number | null } | null;
-}) {
-  if (!verdict) return null;
-  const config = VERDICT_CONFIG[verdict.verdict];
-  if (!config) return null;
-  const pct =
-    verdict.confidence != null
-      ? `${Math.round(verdict.confidence * 100)}%`
-      : null;
-  const title = pct
-    ? `${config.title} (${pct} confidence)`
-    : config.title;
-  return (
-    <span
-      className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${config.className}`}
-      title={title}
-    >
-      {config.label}
-    </span>
-  );
-}
-
 /**
  * Enriched reason cell that shows source publication name instead of generic "[source]".
  */
