@@ -98,6 +98,9 @@ function DivisionCard({
 
   const divHref = getDivisionHref(d);
   const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
+  const cardSourceCheckHref = cardVerdict
+    ? `/source-checks/division/${encodeURIComponent(String(d.key))}`
+    : undefined;
 
   return (
     <div
@@ -122,6 +125,8 @@ function DivisionCard({
           <SourceCheckDot
             status={recordVerdictToStatus(cardVerdict)}
             originalVerdict={cardVerdict}
+            href={cardSourceCheckHref}
+            className="relative z-10"
           />
           {d.website && (
             <a
