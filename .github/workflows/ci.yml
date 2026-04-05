@@ -637,8 +637,11 @@ jobs:
     # code for mandatory human review. Without the `gate:rules-ok` label,
     # the check fails so these changes cannot merge unnoticed.
     name: Protected Paths Check
+    # Release PRs (main → production) are exempt: individual PRs already
+    # went through protected-paths review before merging to main.
     if: >-
-      github.event_name == 'pull_request' && (
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.base.ref != 'production' && (
         github.event.action != 'labeled' && github.event.action != 'unlabeled' ||
         github.event.label.name == 'gate:rules-ok'
       )
