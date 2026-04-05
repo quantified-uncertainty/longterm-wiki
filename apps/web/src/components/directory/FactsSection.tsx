@@ -247,7 +247,7 @@ export function FactsPanel({
           href={`/factbase/entity/${entityId}`}
           className="text-[11px] text-muted-foreground/60 hover:text-primary transition-colors"
         >
-          View all facts in KB explorer &rarr;
+          View all facts in FactBase &rarr;
         </Link>
       </div>
     </section>

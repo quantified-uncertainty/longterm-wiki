@@ -95,7 +95,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
   {
     accessorKey: "hasRole",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Has role in KB facts or entity data">
+      <SortableHeader column={column} title="Has role in FactBase facts or entity data">
         Role
       </SortableHeader>
     ),
@@ -108,7 +108,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        title="Has employed-by in KB facts or affiliation in entity"
+        title="Has employed-by in FactBase facts or affiliation in entity"
       >
         Employer
       </SortableHeader>
@@ -120,7 +120,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
   {
     accessorKey: "hasBornYear",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Has born-year KB fact">
+      <SortableHeader column={column} title="Has born-year FactBase fact">
         Born
       </SortableHeader>
     ),
@@ -131,7 +131,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
   {
     accessorKey: "hasNotableFor",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Has notable-for KB fact">
+      <SortableHeader column={column} title="Has notable-for FactBase fact">
         Notable
       </SortableHeader>
     ),
@@ -169,7 +169,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
     header: ({ column }) => (
       <SortableHeader
         column={column}
-        title="Has 2+ employed-by KB facts (career history)"
+        title="Has 2+ employed-by FactBase facts (career history)"
       >
         Career
       </SortableHeader>
@@ -181,7 +181,7 @@ const columns: ColumnDef<PersonCoverageRow>[] = [
   {
     accessorKey: "kbFactCount",
     header: ({ column }) => (
-      <SortableHeader column={column} title="Total KB facts for this person">
+      <SortableHeader column={column} title="Total FactBase facts for this person">
         Facts
       </SortableHeader>
     ),

@@ -74,7 +74,7 @@ export function FBF({
           "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
           className,
         )}
-        title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
+        title={`Missing FactBase fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
         {children || `[missing: ${entity}.${property}]`}
       </span>

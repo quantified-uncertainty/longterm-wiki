@@ -198,7 +198,7 @@ function buildKBFactFootnote(data: KBFactRefData): string {
     }
   }
   if (data.notes) parts.push(data.notes);
-  return sanitizeFootnoteText(parts.join(" \u2014 ") || `KB fact ${data.factId}`);
+  return sanitizeFootnoteText(parts.join(" \u2014 ") || `FactBase fact ${data.factId}`);
 }
 
 /**
@@ -296,7 +296,7 @@ export function preprocessReferences(
         data = kbData;
         definitionText = buildKBFactFootnote(kbData);
       } else {
-        definitionText = `KB fact ${factId}`;
+        definitionText = `FactBase fact ${factId}`;
       }
     } else {
       kind = "citation";

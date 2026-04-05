@@ -75,7 +75,7 @@ export function buildFactFootnoteDefinition(fact: Fact): string {
     parts.push(fact.notes);
   }
 
-  const text = parts.join(" \u2014 ") || `KB fact ${fact.id}`;
+  const text = parts.join(" \u2014 ") || `FactBase fact ${fact.id}`;
   return sanitizeFootnoteText(text);
 }
 
@@ -151,7 +151,7 @@ export function preprocessFactFootnotes(
       definitionText = buildFactFootnoteDefinition(fact);
     } else {
       unresolvedFactIds.add(factId);
-      definitionText = `Fact ${factId} (not found in KB data)`;
+      definitionText = `Fact ${factId} (not found in FactBase)`;
     }
 
     footnoteLines.push(`[^fact-${factId}]: ${definitionText}`);
