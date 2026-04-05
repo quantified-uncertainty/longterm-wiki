@@ -75,8 +75,9 @@ function formatFact(f: typeof facts.$inferSelect) {
 
 /**
  * Reconstruct a FactValue discriminated union from flat PG columns.
+ * Exported for testing — not part of the public API.
  */
-function reconstructFactValue(row: typeof facts.$inferSelect) {
+export function reconstructFactValue(row: typeof facts.$inferSelect) {
   switch (row.format) {
     case "number":
       return { type: "number" as const, value: row.numeric ?? 0 };
