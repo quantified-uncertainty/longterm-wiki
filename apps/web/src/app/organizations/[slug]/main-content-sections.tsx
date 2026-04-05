@@ -16,7 +16,8 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import {
   SectionHeader,
   SourceLink,
@@ -68,8 +69,9 @@ export function FundingHistorySection({
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
                     <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(getRecordVerdict("funding-round", String(round.key))?.verdict)}
+                        originalVerdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
                         href={getSourceCheckHref("funding-round", String(round.key))}
                       />
                       <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
@@ -148,8 +150,9 @@ export function InvestorParticipationSection({
                 <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
                     <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(getRecordVerdict("investment", String(inv.key))?.verdict)}
+                        originalVerdict={getRecordVerdict("investment", String(inv.key))?.verdict}
                         href={getSourceCheckHref("investment", String(inv.key))}
                       />
                       {investorHref ? (

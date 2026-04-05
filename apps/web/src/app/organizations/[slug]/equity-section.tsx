@@ -6,7 +6,8 @@
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -164,9 +165,10 @@ export function EquityPositionsSection({
                           source
                         </a>
                       )}
-                      <RecordVerificationDot
-                        verdict={verdict?.verdict}
-                        variant="label"
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict?.verdict)}
+                        originalVerdict={verdict?.verdict}
+                        size="md"
                         href={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
                       />
                     </div>

@@ -14,7 +14,8 @@ import {
 } from "@/lib/wiki-server";
 import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -258,9 +259,10 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={person.verificationVerdict}
-                        variant="label"
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(person.verificationVerdict)}
+                        originalVerdict={person.verificationVerdict}
+                        size="md"
                         href={person.sourceCheckHref}
                       />
                       {href ? (

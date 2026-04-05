@@ -10,7 +10,8 @@ import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -195,9 +196,10 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
               {titleCase(round.instrument)}
             </span>
           )}
-          <RecordVerificationDot
-            verdict={roundVerdict?.verdict}
-            variant="label"
+          <SourceCheckDot
+            status={recordVerdictToStatus(roundVerdict?.verdict)}
+            originalVerdict={roundVerdict?.verdict}
+            size="md"
             href={roundVerdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(String(round.key))}` : undefined}
           />
         </div>
