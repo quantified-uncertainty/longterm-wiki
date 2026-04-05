@@ -58,7 +58,7 @@ function ProfileTabsInner({ tabs, ariaLabel }: { tabs: ProfileTab[]; ariaLabel?:
           <TabsTrigger
             key={tab.id}
             value={tab.id}
-            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none cursor-pointer transition-colors hover:bg-muted/50 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
             aria-label={tab.count != null && tab.count > 0 ? `${tab.label} (${tab.count})` : tab.label}
           >
             {tab.label}
@@ -94,7 +94,7 @@ function ProfileTabsFallback({ tabs, ariaLabel }: { tabs: ProfileTab[]; ariaLabe
           <TabsTrigger
             key={tab.id}
             value={tab.id}
-            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
+            className="shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none cursor-pointer transition-colors hover:bg-muted/50 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none"
           >
             {tab.label}
             {tab.count != null && tab.count > 0 && (
