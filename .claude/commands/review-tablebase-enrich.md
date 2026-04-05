@@ -101,7 +101,23 @@ Every record **must** have:
 - A `notes` field stating when the info was confirmed (e.g., "Confirmed on team page as of 2026-03-16" or "Per Wikipedia, appointed October 2025")
 - A `startDate` if findable — search specifically for this. If unknown, leave it out but note "Start date unknown" in notes.
 
-### Step 5: Mark done and continue
+### Step 5: Verify submitted records
+
+After submitting, run source-check verification on what was just submitted to get immediate feedback:
+
+```bash
+# Verify the records just submitted for this entity
+pnpm crux tb verify <table> --entity=<entityStableId> --limit=50
+```
+
+For example, after submitting personnel for Anthropic:
+```bash
+pnpm crux tb verify personnel --entity=sid_anthropic --limit=50
+```
+
+This catches errors immediately — contradicted verdicts mean the submitted data doesn't match the source URL. Fix any contradictions before moving on.
+
+### Step 6: Mark done and continue
 
 ```bash
 pnpm crux tb mark-done <taskId>
@@ -119,17 +135,23 @@ Go back to Step 1.
 
 ## Verification
 
-After completing a batch of enrichment tasks, run verification to catch errors:
+Run verification after every enrichment batch to catch errors:
 
 ```bash
-# Fast structural checks (no API cost, ~10 seconds)
-pnpm crux tb verify-records --table=personnel --source=deterministic
+# Per-entity verification (run in Step 5 after each submission)
+pnpm crux tb verify personnel --entity=<stableId> --limit=50
 
-# Full verification with LLM cross-check via Batch API (~$0.01-0.03 per 100 records)
-pnpm crux tb verify-records --table=personnel --source=all --limit=200
+# Full table verification via Batch API (~$0.01/item with 50% batch discount)
+pnpm crux tb verify personnel --batch --limit=200
+
+# Dry run to preview what would be checked
+pnpm crux tb verify personnel --dry-run
+
+# Check coverage stats
+pnpm crux tb verify stats
 ```
 
-Verification catches: missing sources, invalid entity references, implausible dates, duplicate records, and (with LLM) suspicious role/date combinations. Run `--source=deterministic` after every enrichment batch. Run `--source=all` periodically (e.g., weekly) for deeper quality assurance.
+Verification catches: contradicted claims (data doesn't match source URL), dead links (source URL returns 404), and unverifiable records (source page lacks relevant content). Fix contradictions immediately — they indicate incorrect data.
 
 ## Cost Comparison
 

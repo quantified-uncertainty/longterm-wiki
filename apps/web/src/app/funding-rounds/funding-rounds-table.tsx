@@ -200,6 +200,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
               <SortHeader label="Instrument" sortKey="instrument" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Lead Investor" sortKey="leadInvestor" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              {hasAnyVerdict && <th scope="col" className="py-2 px-1 w-8" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -209,21 +210,12 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 className="hover:bg-muted/20 transition-colors"
               >
                 <td className="py-2 px-3">
-                  <span className="flex items-center gap-1.5">
-                    {hasAnyVerdict && (
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(row.verdict?.verdict)}
-                        originalVerdict={row.verdict?.verdict}
-                        size="md"
-                      />
-                    )}
-                    <Link
-                      href={`/funding-rounds/${row.key}`}
-                      className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  </span>
+                  <Link
+                    href={`/funding-rounds/${row.key}`}
+                    className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                  >
+                    {row.name}
+                  </Link>
                 </td>
                 <td className="py-2 px-3 text-xs">
                   {row.companyHref ? (
@@ -284,6 +276,15 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                   {row.date ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
+                {hasAnyVerdict && (
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdict?.verdict)}
+                      originalVerdict={row.verdict?.verdict}
+                      size="md"
+                    />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

@@ -1,27 +1,18 @@
-import type { Metadata } from "next";
-import { EntityDbPage } from "@components/directory/EntityDbPage";
+import { redirect } from "next/navigation";
 
-// Allow any slug — db pages fetch data client-side, no build-time pre-rendering needed
 export const dynamicParams = true;
 export function generateStaticParams() {
   return [];
 }
 
-export const metadata: Metadata = {
-  title: "Database Records",
-};
-
-export default async function DbPage({
+/**
+ * Redirect /organizations/[slug]/db -> /organizations/[slug]/data?tab=detail
+ */
+export default async function DbRedirectPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  return (
-    <EntityDbPage
-      slug={slug}
-      backHref={`/organizations/${slug}`}
-      backLabel="Back to Organizations profile"
-    />
-  );
+  redirect(`/organizations/${slug}/data?tab=detail`);
 }

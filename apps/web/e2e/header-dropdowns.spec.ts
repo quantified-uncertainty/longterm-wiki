@@ -28,7 +28,7 @@ test.describe("Header dropdown menus", () => {
     await researchButton.click();
 
     await expect(
-      page.locator("header a", { hasText: "Risks" })
+      page.locator("header a", { hasText: "Research Areas" })
     ).toBeVisible();
     await expect(
       page.locator("header a", { hasText: "Benchmarks" })

@@ -23,6 +23,7 @@
 import fs from "fs";
 import path from "path";
 import { getIdRegistry, getTypedEntityByStableId, getTypedEntities } from "@/data/tablebase";
+import { isSid } from "@/lib/stable-id";
 import type { Fact, Property, Entity } from "@longterm-wiki/factbase";
 import type { SerializedKB } from "@longterm-wiki/factbase";
 
@@ -106,9 +107,10 @@ export function getFactBaseFacts(entity: string, property?: string): Fact[] {
 
   const key = resolveEntityKey(entity);
   const facts = fb.facts[key] ?? [];
-  const filtered = property
-    ? facts.filter((f) => f.propertyId === property)
-    : facts;
+  // Filter out stale PG rows with malformed sid_-prefixed fact IDs (#3881)
+  const filtered = facts.filter(
+    (f) => !isSid(f.id) && (!property || f.propertyId === property),
+  );
 
   return sortByAsOfDesc(filtered);
 }

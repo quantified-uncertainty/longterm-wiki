@@ -132,7 +132,7 @@ Respond with ONLY a JSON object (no markdown code fences):
 // ── Deterministic matching ──────────────────────────────────────────
 
 /**
- * Try deterministic row-matching for a grant record against its source snapshot.
+ * Try deterministic row-matching for a record (grant or investment) against its source snapshot.
  * Returns a VerifyResult if deterministic matching produces a definitive answer,
  * or null to fall through to LLM verification.
  */
@@ -219,9 +219,12 @@ export async function verifySingleItem(
   useWebSearch: boolean,
 ): Promise<VerifyResult | VerifyError> {
   // ── Deterministic matching path (Discussion #3567 Phase 3) ──
-  // For record-type items (grants, etc.), try deterministic row-matching
+  // For record-type items (grants, investments), try deterministic row-matching
   // against a source snapshot before falling back to LLM verification.
-  if (item.data.kind === 'record' && item.data.recordType === 'grant') {
+  // Note: investments are included for when investment manifests are added to the
+  // grant-import registry. Until then, tryDeterministicMatch returns null (no manifest
+  // match) and falls through to LLM verification — this is intentional scaffolding.
+  if (item.data.kind === 'record' && (item.data.recordType === 'grant' || item.data.recordType === 'investment')) {
     try {
       const deterministicResult = await tryDeterministicMatch(item);
       if (deterministicResult) return deterministicResult;

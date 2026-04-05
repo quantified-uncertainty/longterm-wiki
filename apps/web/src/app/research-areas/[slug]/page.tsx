@@ -147,16 +147,22 @@ export default async function ResearchAreaDetailPage({
             {area.description}
           </p>
         )}
-        {area.wikiId && (
-          <div className="mt-3 text-sm">
+        <div className="flex items-center gap-4 mt-3 text-sm">
+          {area.wikiId && (
             <Link
               href={`/wiki/${area.wikiId}`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Wiki page &rarr;
             </Link>
-          </div>
-        )}
+          )}
+          <Link
+            href={`/research-areas/${slug}/data`}
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            Data &rarr;
+          </Link>
+        </div>
       </div>
 
       {/* Stat cards */}

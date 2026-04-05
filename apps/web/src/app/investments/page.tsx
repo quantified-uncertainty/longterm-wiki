@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import {
   formatKBDate,
   titleCase,
@@ -26,6 +30,7 @@ interface InvestmentRow {
   amount: number | null;
   instrument: string | null;
   role: string | null;
+  verdictString: string | null;
 }
 
 export default function InvestmentsPage() {
@@ -51,6 +56,7 @@ export default function InvestmentsPage() {
       amount: typeof f.amount === "number" ? f.amount : null,
       instrument: typeof f.instrument === "string" ? f.instrument : null,
       role: typeof f.role === "string" ? f.role : null,
+      verdictString: getRecordVerdict("investment", record.key)?.verdict ?? null,
     };
   });
 
@@ -153,6 +159,7 @@ export default function InvestmentsPage() {
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Role</th>
                 <th className="text-center py-2.5 px-3 font-medium">Date</th>
+                <th className="py-2.5 px-1 w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -220,6 +227,14 @@ export default function InvestmentsPage() {
                   </td>
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                     {row.date ? formatKBDate(row.date) : ""}
+                  </td>
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdictString)}
+                      originalVerdict={row.verdictString}
+                      size="md"
+                      href={row.verdictString ? getSourceCheckHref("investment", String(row.key)) : undefined}
+                    />
                   </td>
                 </tr>
               ))}

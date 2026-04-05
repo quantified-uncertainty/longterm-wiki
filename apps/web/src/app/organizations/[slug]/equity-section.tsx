@@ -8,6 +8,7 @@ import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -137,6 +138,7 @@ export function EquityPositionsSection({
               {hasPledges && (
                 <th scope="col" className="text-right py-2 px-3 font-medium">Pledge %</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -165,12 +167,6 @@ export function EquityPositionsSection({
                           source
                         </a>
                       )}
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(verdict?.verdict)}
-                        originalVerdict={verdict?.verdict}
-                        size="md"
-                        href={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
-                      />
                     </div>
                     {pos.notes && (
                       <div className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">
@@ -202,6 +198,14 @@ export function EquityPositionsSection({
                       )}
                     </td>
                   )}
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
+                      href={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
+                    />
+                  </td>
                 </tr>
               );
             })}
@@ -223,6 +227,7 @@ export function EquityPositionsSection({
                   </td>
                 )}
                 {hasPledges && <td />}
+                <td />
               </tr>
             </tfoot>
           )}

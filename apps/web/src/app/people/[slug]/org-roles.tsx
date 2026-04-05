@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { formatDateRange, fieldStr } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 export interface OrgRole {
   org: { id: string; name: string; type: string };
@@ -27,11 +31,21 @@ export function OrgRoles({ orgRoles }: { orgRoles: OrgRole[] }) {
           const isFounder = !!record.fields.is_founder;
           const orgSlug = getKBEntitySlug(org.id);
 
+          const verdict = getRecordVerdict("personnel", String(record.key));
+
           return (
             <div
               key={`${org.id}-${record.key}`}
-              className="px-4 py-3 border-b border-border/40 last:border-b-0"
+              className="px-4 py-3 border-b border-border/40 last:border-b-0 relative"
             >
+              <div className="absolute top-3 right-4">
+                <SourceCheckDot
+                  status={recordVerdictToStatus(verdict?.verdict)}
+                  originalVerdict={verdict?.verdict}
+                  size="md"
+                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
+                />
+              </div>
               <div className="flex items-center gap-1.5 flex-wrap">
                 {orgSlug ? (
                   <Link

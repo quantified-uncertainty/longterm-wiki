@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 const POSITION_COLORS: Record<string, string> = {
   support:
@@ -67,69 +69,6 @@ function ImportanceIndicator({
         strokeWidth="1.2"
       />
     </svg>
-  );
-}
-
-// ── Verdict badge config (duplicated from VerificationBadge for client use) ──
-const VERDICT_CONFIG: Record<
-  string,
-  { label: string; title: string; className: string }
-> = {
-  confirmed: {
-    label: "Verified",
-    title: "Confirmed by source",
-    className:
-      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-  },
-  contradicted: {
-    label: "Disputed",
-    title: "Source contradicts this data",
-    className:
-      "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
-  },
-  outdated: {
-    label: "Outdated",
-    title: "Source has newer data",
-    className:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  },
-  partial: {
-    label: "Partial",
-    title: "Partially confirmed by source",
-    className:
-      "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
-  },
-  unverifiable: {
-    label: "Unverifiable",
-    title: "Source does not address this data",
-    className:
-      "bg-orange-100 text-orange-600 dark:bg-orange-900/40 dark:text-orange-400",
-  },
-};
-
-/** Inline verdict badge (client-safe, no server imports). */
-function VerdictBadge({
-  verdict,
-}: {
-  verdict: { verdict: string; confidence: number | null } | null;
-}) {
-  if (!verdict) return null;
-  const config = VERDICT_CONFIG[verdict.verdict];
-  if (!config) return null;
-  const pct =
-    verdict.confidence != null
-      ? `${Math.round(verdict.confidence * 100)}%`
-      : null;
-  const title = pct
-    ? `${config.title} (${pct} confidence)`
-    : config.title;
-  return (
-    <span
-      className={`inline-flex items-center px-1.5 py-0.5 rounded-full text-[10px] font-semibold leading-none ${config.className}`}
-      title={title}
-    >
-      {config.label}
-    </span>
   );
 }
 
@@ -301,9 +240,7 @@ export function StakeholderTable({
               <th className="text-left py-1.5 px-3 font-medium w-[110px]">
                 Source
               </th>
-              <th className="text-left py-1.5 px-3 font-medium w-[60px]">
-                Status
-              </th>
+              <th className="py-1.5 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -370,8 +307,12 @@ export function StakeholderTable({
                     <span className="text-muted-foreground/30">&mdash;</span>
                   )}
                 </td>
-                <td className="py-1.5 px-3 text-center">
-                  <VerdictBadge verdict={stakeholder.verdict} />
+                <td className="py-1.5 px-1">
+                  <SourceCheckDot
+                    status={recordVerdictToStatus(stakeholder.verdict?.verdict)}
+                    originalVerdict={stakeholder.verdict?.verdict}
+                    size="md"
+                  />
                 </td>
               </tr>
             ))}

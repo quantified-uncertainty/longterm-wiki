@@ -125,6 +125,12 @@ export default async function ApproachDetailPage({
                   Wiki article &rarr;
                 </Link>
               )}
+              <Link
+                href={`/approaches/${slug}/data`}
+                className="text-primary hover:text-primary/80 font-medium transition-colors"
+              >
+                Data &rarr;
+              </Link>
             </div>
             {entity.description && (
               <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-prose">

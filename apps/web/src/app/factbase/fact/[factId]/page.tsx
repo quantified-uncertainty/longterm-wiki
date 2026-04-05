@@ -13,6 +13,7 @@ import { getResourceIdForFact } from "@/data/resource-fact-links";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
+import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
@@ -187,8 +188,9 @@ export default async function FactDetailPage({ params }: PageProps) {
       </nav>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-1">
+      <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
         <FactValueDisplay fact={fact} unit={property?.unit} display={property?.display} />
+        <FactSourceCheckDot factId={factId} sourceUrl={fact.source} size="md" />
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
         <FactLink href={`/factbase/entity/${fact.subjectId}`}>{entityName}</FactLink>
@@ -267,9 +269,12 @@ export default async function FactDetailPage({ params }: PageProps) {
         </KVRow>
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
         <KVRow label="Verification">
-          <FactLink href={`/source-checks/fact/${factId}`}>
-            view source checks {"\u2192"}
-          </FactLink>
+          <span className="inline-flex items-center gap-2">
+            <FactSourceCheckDot factId={factId} sourceUrl={fact.source} size="md" />
+            <FactLink href={`/source-checks/fact/${factId}`}>
+              view source checks {"\u2192"}
+            </FactLink>
+          </span>
         </KVRow>
       </KVTable>
 
@@ -325,6 +330,7 @@ export default async function FactDetailPage({ params }: PageProps) {
                   <th className="px-3 py-2 font-medium">Value</th>
                   <th className="px-3 py-2 font-medium">Source</th>
                   <th className="px-3 py-2 font-medium">Fact ID</th>
+                  <th className="px-3 py-2 font-medium w-5"></th>
                 </tr>
               </thead>
               <tbody>
@@ -361,6 +367,9 @@ export default async function FactDetailPage({ params }: PageProps) {
                         ) : (
                           <FactLink href={`/factbase/fact/${f.id}`}>{f.id}</FactLink>
                         )}
+                      </td>
+                      <td className="px-3 py-1.5">
+                        <FactSourceCheckDot factId={f.id} sourceUrl={f.source} size="sm" />
                       </td>
                     </tr>
                   );

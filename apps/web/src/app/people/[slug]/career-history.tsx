@@ -5,6 +5,7 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -31,16 +32,18 @@ export function CareerHistory({
           const verdict = getRecordVerdict("personnel", String(entry.key));
 
           return (
-            <div key={entry.key} className="px-5 py-3.5">
+            <div key={entry.key} className="px-5 py-3.5 relative">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
+              </div>
+              <div className="absolute top-3.5 right-4">
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
                   size="md"
-                  href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(entry.key))}` : undefined}
+                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
                 />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">

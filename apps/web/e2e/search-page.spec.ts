@@ -12,7 +12,7 @@ test.describe("/search page", () => {
   });
 
   test("renders search input and focuses it on load", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await expect(input).toBeVisible();
     await expect(input).toBeFocused();
   });
@@ -23,7 +23,7 @@ test.describe("/search page", () => {
   });
 
   test("typing triggers search and shows results", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     // Wait for results to appear
     await expect(page.locator('[role="listbox"]')).toBeVisible({ timeout: 5000 });
@@ -33,7 +33,7 @@ test.describe("/search page", () => {
   });
 
   test("URL updates with query", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     // Wait for debounce + URL update
     await page.waitForURL(/\/search\?q=Anthropic/i, { timeout: 3000 });
@@ -41,14 +41,14 @@ test.describe("/search page", () => {
 
   test("loads from URL with ?q= parameter", async ({ page }) => {
     await page.goto(`/search?q=Anthropic`);
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await expect(input).toHaveValue("Anthropic");
     // Results should load automatically
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
   });
 
   test("filter tabs appear and work", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -62,7 +62,7 @@ test.describe("/search page", () => {
   });
 
   test("clicking a filter tab filters results", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -89,7 +89,7 @@ test.describe("/search page", () => {
   });
 
   test("sort options work", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("AI safety");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -103,7 +103,7 @@ test.describe("/search page", () => {
   });
 
   test("keyboard navigation works: ArrowDown selects first result", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -115,7 +115,7 @@ test.describe("/search page", () => {
   });
 
   test("keyboard navigation: ArrowUp from first result returns to input", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -126,7 +126,7 @@ test.describe("/search page", () => {
   });
 
   test("keyboard navigation: Enter on selected result navigates", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -139,7 +139,7 @@ test.describe("/search page", () => {
   });
 
   test("no results shows appropriate message", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("zzzzxxxxxnonexistent12345");
     // Wait for search to complete
     await page.waitForTimeout(500);
@@ -149,7 +149,7 @@ test.describe("/search page", () => {
   });
 
   test("rapid typing doesn't cause stale results (race condition)", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
 
     // Type a broad query, then quickly narrow it
     await input.fill("a");
@@ -199,7 +199,7 @@ test.describe("/search page", () => {
   });
 
   test("special characters in query don't crash", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
 
     // Test various adversarial inputs
     const adversarial = [
@@ -221,7 +221,7 @@ test.describe("/search page", () => {
   });
 
   test("empty query after results clears results", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 
@@ -234,7 +234,7 @@ test.describe("/search page", () => {
   });
 
   test("result count display is accurate", async ({ page }) => {
-    const input = page.locator('input[placeholder="Search everything..."]');
+    const input = page.locator('input[placeholder="Search entities, articles, resources..."]');
     await input.fill("Anthropic");
     await expect(page.locator('[role="option"]').first()).toBeVisible({ timeout: 5000 });
 

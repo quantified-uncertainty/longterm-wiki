@@ -421,10 +421,10 @@ export default async function ProjectDetailPage({
                 </Link>
               )}
               <Link
-                href={`/factbase/entity/${entity.id}`}
+                href={`/projects/${slug}/data`}
                 className="text-xs text-primary hover:underline"
               >
-                FactBase &rarr;
+                Data &rarr;
               </Link>
             </div>
           </section>

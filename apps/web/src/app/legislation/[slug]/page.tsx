@@ -811,6 +811,9 @@ export default async function LegislationDetailPage({
                   Wiki article &rarr;
                 </Link>
               )}
+              <Link href={`/legislation/${slug}/data`} className="text-primary hover:text-primary/80 font-medium transition-colors">
+                Data &rarr;
+              </Link>
             </div>
           </div>
         </div>

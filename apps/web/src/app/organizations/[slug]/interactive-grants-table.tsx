@@ -152,13 +152,6 @@ interface ColumnDef {
 const ALL_COLUMNS: ColumnDef[] = [
   { id: "name", label: "Grant", defaultVisible: true, align: "left" },
   {
-    id: "verified",
-    label: "\u2713",
-    defaultVisible: true,
-    align: "center",
-    onlyIfData: (rows) => rows.some((r) => r.verificationVerdict),
-  },
-  {
     id: "recipient",
     label: "Recipient",
     defaultVisible: true,
@@ -208,6 +201,13 @@ const ALL_COLUMNS: ColumnDef[] = [
     defaultVisible: false,
     align: "left",
     onlyIfData: (rows) => rows.some((r) => r.notes),
+  },
+  {
+    id: "verified",
+    label: "\u2713",
+    defaultVisible: true,
+    align: "center",
+    onlyIfData: (rows) => rows.some((r) => r.verificationVerdict),
   },
 ];
 
