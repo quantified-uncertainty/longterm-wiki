@@ -57,7 +57,7 @@ function EntitySearch({
 
   // Sync input with URL param changes (e.g., browser back/forward, example entity clicks)
   useEffect(() => {
-    if (initialQuery && initialQuery !== query) {
+    if (initialQuery !== query) {
       setQuery(initialQuery);
     }
   // Only re-sync when the external prop changes, not when the user types

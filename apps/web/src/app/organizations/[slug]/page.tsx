@@ -241,7 +241,17 @@ export default async function OrgProfilePage({
       {/* Description */}
       {data.descriptionText && (
         <div className="text-sm text-muted-foreground leading-relaxed prose prose-sm prose-neutral dark:prose-invert max-w-none [&>p]:my-1.5">
-          <Markdown>{data.descriptionText}</Markdown>
+          <Markdown
+            components={{
+              // Sanitize links: only allow http/https URLs
+              a: ({ href, children, ...props }) => {
+                const safeLink = href && /^https?:\/\//.test(href) ? href : undefined;
+                return safeLink
+                  ? <a href={safeLink} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                  : <span {...props}>{children}</span>;
+              },
+            }}
+          >{data.descriptionText}</Markdown>
         </div>
       )}
 
