@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface ApproachRow {
   id: string;
@@ -93,6 +95,7 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
                 onSort={handleSort}
                 className="text-left"
               />
+              <th className="text-center py-2 px-3 font-medium">Coverage</th>
               <th className="text-center py-2 px-3 font-medium">Wiki</th>
             </tr>
           </thead>
@@ -132,6 +135,10 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
                       ))}
                     </div>
                   )}
+                </td>
+
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeGenericCoverage({ description: row.description, tags: row.tags, wikiId: row.wikiId })} />
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">

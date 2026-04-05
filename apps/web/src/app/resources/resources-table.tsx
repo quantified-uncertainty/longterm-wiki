@@ -2,6 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import type {
   ColumnDef,
   SortingState,
@@ -322,6 +324,16 @@ function makeColumns(): ColumnDef<ResourceRow>[] {
         >
           {row.original.id}
         </span>
+      ),
+    },
+    {
+      id: "coverage",
+      header: () => <span className="text-xs font-medium">Coverage</span>,
+      cell: ({ row }) => (
+        <CoverageDots score={computeGenericCoverage({
+          tags: row.original.tags,
+          filledFieldCount: (row.original.credibility != null ? 1 : 0) + (row.original.citingPageCount > 0 ? 1 : 0),
+        })} />
       ),
     },
   ];
