@@ -72,6 +72,7 @@ export function computePersonCoverage(row: PersonCoverageInput): number {
   if (row.netWorthNum != null) signals++;
   if ((row.careerHistoryCount ?? 0) >= 2) signals++;
   if ((row.careerHistoryCount ?? 0) >= 5) signals++;
+  if ((row.positionCount ?? 0) >= 1) signals++;
   if ((row.publicationCount ?? 0) >= 1) signals++;
   if (row.wikiPageId) signals++;
 
@@ -100,7 +101,7 @@ export function computeAiModelCoverage(row: AiModelCoverageInput): number {
 
   if (row.developer) signals++;
   if (row.releaseDate) signals++;
-  if (row.inputPrice != null) signals++;
+  if (row.inputPrice != null || row.outputPrice != null) signals++;
   if (row.contextWindow != null) signals++;
   if (row.parameterCount) signals++;
   if (row.safetyLevel) signals++;

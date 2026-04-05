@@ -56,7 +56,6 @@ export const PROGRAM_TYPE_LABELS: Record<string, string> = {
   call: "Call",
 };
 
-
 /** Tailwind class strings for funding program type badge colors. */
 export const PROGRAM_TYPE_COLORS: Record<string, string> = {
   rfp: "bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300",

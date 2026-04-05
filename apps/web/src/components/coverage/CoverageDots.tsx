@@ -32,8 +32,9 @@ export function CoverageDots({
   size = "sm",
   className = "",
 }: CoverageDotsProps) {
+  const clampedScore = Math.max(1, Math.min(4, Math.round(score)));
   const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
-  const ariaLabel = label ?? `Coverage: ${score} of 4`;
+  const ariaLabel = label ?? `Coverage: ${clampedScore} of 4`;
 
   return (
     <span
@@ -47,7 +48,7 @@ export function CoverageDots({
           key={i}
           aria-hidden="true"
           className={`inline-block ${dotSize} rounded-full ${
-            i <= score
+            i <= clampedScore
               ? "bg-primary/70"
               : "bg-muted-foreground/20"
           }`}
