@@ -33,7 +33,7 @@ function makeRow(overrides: Record<string, unknown> = {}) {
     createdAt: null,
     updatedAt: null,
     ...overrides,
-  } as Parameters<typeof reconstructFactValue>[0];
+  } as unknown as Parameters<typeof reconstructFactValue>[0];
 }
 
 describe("reconstructFactValue", () => {
