@@ -1,7 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
-import { resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 import { getRecordVerdict } from "@data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
@@ -22,10 +21,11 @@ import {
 import { formatCompactCurrency } from "@/lib/format-compact";
 import Link from "next/link";
 import {
-  Breadcrumbs,
   FactValueDisplay,
   FactsPanel,
 } from "@/components/directory";
+
+import { OrgProfileHeader } from "./org-profile-header";
 import { RelatedPages } from "@/components/RelatedPages";
 
 // Shared components & helpers
@@ -39,6 +39,7 @@ import {
 // Data loading & constants
 import {
   loadOrgPageData,
+  resolveOrgEntity,
   resolveAuthor,
   HERO_STATS,
   ORG_TYPE_LABELS,
@@ -145,37 +146,11 @@ export default async function OrgProfilePage({
 }) {
   const { slug } = await params;
 
-  // Try resolving slug to a typed entity, then build OrgEntity from it
-  let entity: OrgEntity;
-  const resolved = resolveOrgBySlug(slug);
-  if (resolved) {
-    entity = {
-      id: resolved.id,
-      stableId: resolved.stableId,
-      name: resolved.title,
-      wikiId: resolved.wikiId,
-      wikiPageId: resolved.wikiId,
-      ...(resolved.aliases && resolved.aliases.length > 0 && { aliases: resolved.aliases }),
-    };
-  } else {
-    const canonical = resolveSlugAlias(slug);
-    if (canonical) permanentRedirect(`/organizations/${canonical}`);
+  const result = resolveOrgEntity(slug);
+  if (!result) return notFound();
+  if ("redirect" in result) permanentRedirect(`/organizations/${result.redirect}`);
 
-    const typedEntity = getTypedEntityById(slug);
-    if (!typedEntity || !isOrganization(typedEntity)) {
-      return notFound();
-    }
-
-    entity = {
-      id: slug,
-      stableId: typedEntity.stableId,
-      name: typedEntity.title,
-      wikiId: typedEntity.wikiId,
-      wikiPageId: typedEntity.wikiId,
-      ...(typedEntity.aliases && typedEntity.aliases.length > 0 && { aliases: typedEntity.aliases }),
-    };
-  }
-
+  const { entity } = result;
   const data = loadOrgPageData(entity, slug);
 
   // ── Fetch PG data (personnel + market data + grants) in parallel ──
@@ -759,111 +734,23 @@ export default async function OrgProfilePage({
     });
   }
 
-  // ── Initials for avatar (skip stop words like "and", "the", "of", "for") ──
-  const STOP_WORDS = new Set(["and", "the", "of", "for", "in", "on", "at"]);
-  const initials = entity.name
-    .split(/\s+/)
-    .map((w) => w.replace(/[^a-zA-Z]/g, ""))
-    .filter((w) => w.length > 0 && !STOP_WORDS.has(w.toLowerCase()))
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const headerData = {
+    id: entity.id,
+    name: entity.name,
+    aliases: entity.aliases,
+    orgType: data.orgType,
+    orgStatus: data.orgStatus,
+    foundedDateStr: data.foundedDateStr ?? null,
+    orgAge: data.orgAge ?? null,
+    hqText: data.hqText,
+    websiteUrl: data.websiteUrl,
+    wikiHref: data.wikiHref,
+    founders: data.founders,
+  };
 
   return (
     <div className="max-w-[70rem] mx-auto px-6 py-8 overflow-x-hidden">
-      <Breadcrumbs
-        items={[
-          { label: "Organizations", href: "/organizations" },
-          { label: entity.name },
-        ]}
-      />
-
-      {/* ── Compact Header ─────────────────────────────────────── */}
-      <div className="mb-6">
-        <div className="flex items-start gap-5">
-          {/* Org avatar/icon */}
-          <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xl font-bold text-primary/70" aria-hidden="true">
-            {initials}
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h1 className="text-2xl font-extrabold tracking-tight">
-                {entity.name}
-              </h1>
-              {data.orgType && (
-                <Link
-                  href={`/organizations?type=${data.orgType}`}
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider hover:opacity-80 transition-opacity ${
-                    ORG_TYPE_COLORS[data.orgType] ?? DEFAULT_ORG_TYPE_COLOR
-                  }`}
-                >
-                  {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}
-                </Link>
-              )}
-              {data.orgStatus && data.orgStatus in ORG_STATUS_COLORS && (
-                <span
-                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                    ORG_STATUS_COLORS[data.orgStatus]
-                  }`}
-                >
-                  {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
-                </span>
-              )}
-            </div>
-            {entity.aliases && entity.aliases.length > 0 && (
-              <p className="text-xs text-muted-foreground/70 mb-0.5">
-                Also known as: {entity.aliases.join(", ")}
-              </p>
-            )}
-
-            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-              {data.foundedDateStr && (
-                <span>
-                  Founded {formatKBDate(data.foundedDateStr)}
-                  {data.orgAge && <span suppressHydrationWarning> ({data.orgAge})</span>}
-                </span>
-              )}
-              {data.hqText && <span>HQ: {data.hqText}</span>}
-              {data.websiteUrl && (
-                <a
-                  href={safeHref(data.websiteUrl)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary hover:text-primary/80 font-medium transition-colors"
-                >
-                  {shortDomain(data.websiteUrl)} &#8599;
-                </a>
-              )}
-              {data.wikiHref && (
-                <Link href={data.wikiHref} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  Wiki page &rarr;
-                </Link>
-              )}
-              <Link href={`/organizations/${entity.id}/data`} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                Data &rarr;
-              </Link>
-            </div>
-
-            {data.founders.length > 0 && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Founded by{" "}
-                {data.founders.map((f, i) => (
-                  <span key={i}>
-                    {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
-                    {f.href ? (
-                      <Link href={f.href} className="text-primary hover:underline">{f.name}</Link>
-                    ) : (
-                      f.name
-                    )}
-                  </span>
-                ))}
-              </p>
-            )}
-
-          </div>
-        </div>
-      </div>
+      <OrgProfileHeader data={headerData} activePage="profile" />
 
       {/* ── Tabbed content ─────────────────────────────────────── */}
       <OrgProfileTabs tabs={tabs} ariaLabel="Organization sections" />

@@ -6,7 +6,7 @@ export function generateStaticParams() {
 }
 
 /**
- * Redirect /organizations/[slug]/db -> /organizations/[slug]/data?tab=detail
+ * Redirect /organizations/[slug]/db -> /organizations/[slug]/data?tab=database
  */
 export default async function DbRedirectPage({
   params,
@@ -14,5 +14,5 @@ export default async function DbRedirectPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  redirect(`/organizations/${slug}/data?tab=detail`);
+  redirect(`/organizations/${slug}/data?tab=database`);
 }
