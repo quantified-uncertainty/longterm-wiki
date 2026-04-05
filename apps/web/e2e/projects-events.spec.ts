@@ -6,8 +6,8 @@ test.describe("Projects Directory", () => {
     await expect(page).toHaveTitle(/Projects/);
     await expect(page.locator("h1")).toContainText("Projects");
 
-    // Should have project rows in the table
-    const projectLinks = page.locator('a[href^="/projects/"]');
+    // Should have project rows in the main content area
+    const projectLinks = page.locator('main a[href^="/projects/"]');
     const linkCount = await projectLinks.count();
     expect(linkCount).toBeGreaterThan(5);
   });
