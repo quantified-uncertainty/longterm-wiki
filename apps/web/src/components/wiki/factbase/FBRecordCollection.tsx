@@ -26,6 +26,10 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBRecords, getKBRecordSchema, type FactBaseRecordEntry } from "@data/factbase";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { titleCase, sortKBRecords } from "./format";
 import { FBCellValue } from "./FBCellValue";
 
@@ -172,12 +176,15 @@ export function FBRecordCollection({
                   {titleCase(col)}
                 </TableHead>
               ))}
+              <TableHead scope="col" className="w-8 text-xs" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {sorted.map((item) => {
               // For endpoint columns, use displayName if the value is a slug/ID
               // and synthesize a ref fieldDef so FBCellValue renders it as an EntityLink
+              const recordId = String(item.key);
+              const verdict = getRecordVerdict(collection, recordId);
               return (
                 <TableRow key={item.key}>
                   {cols.map((col) => {
@@ -195,6 +202,14 @@ export function FBRecordCollection({
                       </TableCell>
                     );
                   })}
+                  <TableCell className="w-8 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
+                      href={verdict?.verdict ? getSourceCheckHref(collection, recordId) : undefined}
+                    />
+                  </TableCell>
                 </TableRow>
               );
             })}

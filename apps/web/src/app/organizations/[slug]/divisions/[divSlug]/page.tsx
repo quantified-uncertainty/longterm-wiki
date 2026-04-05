@@ -27,7 +27,10 @@ import {
   PaginatedGrantsTable,
   PaginatedRecipientsTable,
 } from "@/app/divisions/[slug]/paginated-tables";
+import type { GrantRow } from "@/app/divisions/[slug]/paginated-tables";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 // ── Tabs builder ──────────────────────────────────────────────────────
 
@@ -44,11 +47,19 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
   }
 
   if (data.grants.length > 0) {
+    const grantsWithVerdicts: GrantRow[] = data.grants.map((g) => {
+      const verdict = getRecordVerdict("grant", String(g.key));
+      return {
+        ...g,
+        verificationVerdict: verdict?.verdict ?? null,
+        sourceCheckHref: getSourceCheckHref("grant", String(g.key)),
+      };
+    });
     tabs.push({
       id: "grants",
       label: "Grants",
       count: data.grants.length,
-      content: <PaginatedGrantsTable grants={data.grants} />,
+      content: <PaginatedGrantsTable grants={grantsWithVerdicts} />,
     });
   }
 

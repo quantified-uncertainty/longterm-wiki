@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/directory-utils";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { FundingConnection } from "../people-utils";
 
 const FUNDING_CONNECTIONS_LIMIT = 20;
@@ -56,8 +60,18 @@ export function FundingConnections({
           )}
         </div>
         <div className="divide-y divide-border/40">
-          {displayed.map((conn) => (
-            <div key={conn.key} className="px-5 py-3.5">
+          {displayed.map((conn) => {
+            const verdict = getRecordVerdict("grant", String(conn.key))?.verdict;
+            return (
+            <div key={conn.key} className="px-5 py-3.5 relative">
+              <div className="absolute top-3.5 right-4">
+                <SourceCheckDot
+                  status={recordVerdictToStatus(verdict)}
+                  originalVerdict={verdict}
+                  size="md"
+                  href={getSourceCheckHref("grant", String(conn.key))}
+                />
+              </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${
@@ -152,7 +166,8 @@ export function FundingConnections({
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
         {fundingConnections.length > FUNDING_CONNECTIONS_LIMIT && (
           <div className="px-5 py-3 border-t border-border/40 text-center">

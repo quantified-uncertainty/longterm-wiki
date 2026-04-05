@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
+import { getRecordVerdict } from "@data/tablebase";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { isSid } from "@/lib/stable-id";
 import {
   getKBLatest,
@@ -541,6 +545,19 @@ export default async function OrgProfilePage({
     });
   }
 
+  // ── Build resource verdict maps (server-side, passed to client components) ──
+  function buildResourceVerdicts(resources: typeof data.resourcePublications): Record<string, string | null> {
+    const map: Record<string, string | null> = {};
+    for (const r of resources) {
+      const v = getRecordVerdict("resource", r.id);
+      map[r.id] = v?.verdict ?? null;
+    }
+    return map;
+  }
+  const pubVerdicts = buildResourceVerdicts(data.resourcePublications);
+  const announcementVerdicts = buildResourceVerdicts(data.resourceAnnouncements);
+  const pressVerdicts = buildResourceVerdicts(data.resourcesAboutOrg);
+
   // ── Publications tab (research papers + literature papers, deduplicated) ──
   // Deduplicate key publications that already appear in the resources table (by title match)
   const resourcePubTitles = new Set(
@@ -574,6 +591,7 @@ export default async function OrgProfilePage({
               resources={data.resourcePublications}
               title="Research & Technical Papers"
               emptyMessage=""
+              verdicts={pubVerdicts}
             />
           )}
           {dedupedKeyPubs.length > 0 && (
@@ -599,6 +617,7 @@ export default async function OrgProfilePage({
           title="News & Announcements"
           emptyMessage=""
           alwaysShowColumns={{ date: true }}
+          verdicts={announcementVerdicts}
         />
       ),
     });
@@ -616,6 +635,7 @@ export default async function OrgProfilePage({
           title="External Coverage & References"
           emptyMessage=""
           alwaysShowColumns={{ date: true, publication: true }}
+          verdicts={pressVerdicts}
         />
       ),
     });
@@ -680,6 +700,7 @@ export default async function OrgProfilePage({
                   <th className="text-left py-2 px-3 font-medium">Description</th>
                   <th className="text-center py-2 px-3 font-medium">Status</th>
                   <th className="text-center py-2 px-3 font-medium">Links</th>
+                  <th scope="col" className="py-2 px-1 w-8" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
@@ -687,6 +708,7 @@ export default async function OrgProfilePage({
                   const websiteFact = getKBLatest(p.id, "website");
                   const pUrl = (websiteFact?.value.type === "text" ? websiteFact.value.value : null) ?? p.projectUrl ?? p.website;
                   const pStatus = p.projectStatus ?? p.status;
+                  const projectVerdict = getRecordVerdict("project", p.id)?.verdict;
                   return (
                     <tr key={p.id} className="hover:bg-muted/20 transition-colors">
                       <td className="py-2.5 px-3 font-medium">
@@ -717,6 +739,14 @@ export default async function OrgProfilePage({
                             </Link>
                           )}
                         </div>
+                      </td>
+                      <td className="py-1.5 px-1">
+                        <SourceCheckDot
+                          status={recordVerdictToStatus(projectVerdict)}
+                          originalVerdict={projectVerdict}
+                          size="md"
+                          href={getSourceCheckHref("project", p.id)}
+                        />
                       </td>
                     </tr>
                   );

@@ -1,4 +1,8 @@
 import type { ExpertPosition } from "@/data/tablebase";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { topicLabel } from "@/data/topic-labels";
 import { safeHref } from "@/lib/directory-utils";
 
@@ -24,8 +28,10 @@ function formatPositionDate(date: string): string {
 
 export function ExpertPositions({
   positions,
+  personSlug,
 }: {
   positions: ExpertPosition[];
+  personSlug: string;
 }) {
   if (positions.length === 0) return null;
 
@@ -73,10 +79,14 @@ export function ExpertPositions({
                     Source
                   </th>
                 )}
+                <th scope="col" className="py-2 px-1 w-8" />
               </tr>
             </thead>
             <tbody>
-              {positions.map((pos) => (
+              {positions.map((pos) => {
+              const recordId = `${personSlug}:${pos.topic}`;
+              const verdict = getRecordVerdict("expert-position", recordId)?.verdict;
+              return (
                 <tr
                   key={pos.topic}
                   className="border-b border-border/30 last:border-b-0 hover:bg-muted/20 transition-colors"
@@ -141,8 +151,17 @@ export function ExpertPositions({
                       )}
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      size="md"
+                      href={getSourceCheckHref("expert-position", recordId)}
+                    />
+                  </td>
                 </tr>
-              ))}
+              );
+            })}
             </tbody>
           </table>
         </div>

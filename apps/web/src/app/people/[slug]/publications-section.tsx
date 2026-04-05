@@ -1,10 +1,16 @@
 import type { PersonPublicationEntry } from "@/data/tablebase";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { safeHref } from "@/lib/directory-utils";
 
 export function PublicationsSection({
   publications,
+  personSlug,
 }: {
   publications: PersonPublicationEntry[];
+  personSlug: string;
 }) {
   if (publications.length === 0) return null;
 
@@ -21,52 +27,65 @@ export function PublicationsSection({
         </span>
       </h2>
       <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-        {sorted.map((pub, idx) => (
-          <div key={`${idx}-${pub.title}`} className="px-4 py-3">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                {pub.link ? (
+        {sorted.map((pub, idx) => {
+          const recordKey = `${personSlug}:${pub.title}`;
+          const verdict = getRecordVerdict("publication", recordKey);
+
+          return (
+            <div key={`${idx}-${pub.title}`} className="px-4 py-3 relative">
+              <div className="absolute top-3 right-4">
+                <SourceCheckDot
+                  status={recordVerdictToStatus(verdict?.verdict)}
+                  originalVerdict={verdict?.verdict}
+                  size="md"
+                  href={verdict?.verdict ? getSourceCheckHref("publication", recordKey) : undefined}
+                />
+              </div>
+              <div className="flex items-start justify-between gap-2 pr-6">
+                <div className="min-w-0">
+                  {pub.link ? (
+                    <a
+                      href={safeHref(pub.link)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-sm text-foreground hover:text-primary transition-colors"
+                    >
+                      {pub.title}
+                    </a>
+                  ) : (
+                    <span className="font-medium text-sm">{pub.title}</span>
+                  )}
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {pub.year && (
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {pub.year}
+                      </span>
+                    )}
+                    {pub.type && (
+                      <span className="text-xs text-muted-foreground/60">
+                        {pub.type}
+                      </span>
+                    )}
+                    <span className="text-xs text-muted-foreground/40">
+                      {pub.category}
+                    </span>
+                  </div>
+                </div>
+                {pub.link && (
                   <a
-                    href={safeHref(pub.link)}
+                    href={pub.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-sm text-foreground hover:text-primary transition-colors"
+                    className="shrink-0 text-xs text-muted-foreground/50 hover:text-primary transition-colors"
+                    title="Open link"
                   >
-                    {pub.title}
+                    &rarr;
                   </a>
-                ) : (
-                  <span className="font-medium text-sm">{pub.title}</span>
                 )}
-                <div className="flex items-center gap-2 mt-0.5">
-                  {pub.year && (
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {pub.year}
-                    </span>
-                  )}
-                  {pub.type && (
-                    <span className="text-xs text-muted-foreground/60">
-                      {pub.type}
-                    </span>
-                  )}
-                  <span className="text-xs text-muted-foreground/40">
-                    {pub.category}
-                  </span>
-                </div>
               </div>
-              {pub.link && (
-                <a
-                  href={pub.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 text-xs text-muted-foreground/50 hover:text-primary transition-colors"
-                  title="Open link"
-                >
-                  &rarr;
-                </a>
-              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

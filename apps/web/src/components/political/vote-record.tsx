@@ -15,6 +15,7 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import type { PoliticalVoteRecord } from "./types";
 
 // ── Vote styling ────────────────────────────────────────────────────
@@ -116,6 +117,7 @@ export function VoteRecord({ votes }: VoteRecordProps) {
                 <th className="text-left px-4 py-2 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Source
                 </th>
+                <th className="px-4 py-2 w-8" />
               </tr>
             </thead>
             <tbody>
@@ -181,6 +183,9 @@ function VoteRow({ vote }: { vote: PoliticalVoteRecord }) {
         ) : (
           <span className="text-muted-foreground/40">&mdash;</span>
         )}
+      </td>
+      <td className="px-4 py-2.5 text-center">
+        <SourceCheckDot status="not_run" size="md" />
       </td>
     </tr>
   );

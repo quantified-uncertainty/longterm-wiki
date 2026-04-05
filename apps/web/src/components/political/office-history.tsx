@@ -12,6 +12,7 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import type { PoliticalOffice } from "./types";
 
 // ── Status styling ───────────────────────────────────────────────────
@@ -189,6 +190,7 @@ export function OfficeHistory({ offices }: OfficeHistoryProps) {
                     <span className="font-medium text-sm">
                       {officeTypeLabel(office.officeType)}
                     </span>
+                    <SourceCheckDot status="not_run" size="md" />
                     <span
                       className={cn(
                         "inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold",

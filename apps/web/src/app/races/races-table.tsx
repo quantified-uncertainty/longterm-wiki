@@ -9,6 +9,9 @@ import {
   AI_STANCE_LABELS,
   RACE_LEVEL_LABELS,
 } from "./races-constants";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 export interface RaceRow {
   id: string;
@@ -24,6 +27,8 @@ export interface RaceRow {
   outcomeDetails: string | null;
   aiAngle: string | null;
   candidates: CandidateRow[];
+  /** Source-check verdict string, if available */
+  verdictString?: string | null;
 }
 
 export interface CandidateRow {
@@ -40,6 +45,8 @@ export interface CandidateRow {
   isWinner: boolean;
   isIncumbent: boolean;
   party: string | null;
+  /** Source-check verdict string, if available */
+  verdictString?: string | null;
 }
 
 export function RacesTable({ rows }: { rows: RaceRow[] }) {
@@ -117,6 +124,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
               <th scope="col" className="pb-2 pr-4 font-medium">Status</th>
               <th scope="col" className="pb-2 pr-4 font-medium">AI Angle</th>
               <th scope="col" className="pb-2 pr-4 font-medium">Candidates</th>
+              <th scope="col" className="pb-2 w-8" />
             </tr>
           </thead>
           <tbody>
@@ -188,10 +196,18 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                   <td className="py-2 pr-4 text-center">
                     {race.candidates.length}
                   </td>
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(race.verdictString)}
+                      originalVerdict={race.verdictString}
+                      size="md"
+                      href={getSourceCheckHref("race", String(race.id))}
+                    />
+                  </td>
                 </tr>
                 {expandedRace === race.id && race.candidates.length > 0 && (
                   <tr key={`${race.id}-expanded`}>
-                    <td colSpan={6} className="pb-3 pt-1 pl-8">
+                    <td colSpan={7} className="pb-3 pt-1 pl-8">
                       <div className="rounded-md border bg-muted/30 p-3">
                         <table className="w-full text-xs">
                           <thead>
@@ -203,6 +219,7 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                               <th scope="col" className="pb-1 pr-3">PAC</th>
                               <th scope="col" className="pb-1 pr-3 text-right">PAC Spend</th>
                               <th scope="col" className="pb-1 pr-3 text-right">Vote %</th>
+                              <th scope="col" className="pb-1 w-6" />
                             </tr>
                           </thead>
                           <tbody>
@@ -262,6 +279,14 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                   {c.voteShare != null
                                     ? `${(c.voteShare * 100).toFixed(0)}%`
                                     : "—"}
+                                </td>
+                                <td className="py-1 px-1">
+                                  <SourceCheckDot
+                                    status={recordVerdictToStatus(c.verdictString)}
+                                    originalVerdict={c.verdictString}
+                                    size="md"
+                                    href={getSourceCheckHref("race-candidate", String(c.id))}
+                                  />
                                 </td>
                               </tr>
                             ))}

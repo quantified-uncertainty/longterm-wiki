@@ -345,7 +345,7 @@ export default async function PersonProfilePage({
       <div className="space-y-8">
         {personEntity && <PoliticalInfo entity={personEntity} />}
         <OfficeHistory offices={politicalOffices} />
-        <ExpertPositions positions={positions} />
+        <ExpertPositions positions={positions} personSlug={slug} />
         <PolicyPositionsSection positions={policyPositions} />
         <ScorecardDisplay scores={politicalScores} />
         <VoteRecord votes={politicalVotes} />
@@ -381,7 +381,7 @@ export default async function PersonProfilePage({
       id: "publications",
       label: "Publications",
       count: publications.length,
-      content: <PublicationsSection publications={publications} />,
+      content: <PublicationsSection publications={publications} personSlug={slug} />,
     });
   }
 
