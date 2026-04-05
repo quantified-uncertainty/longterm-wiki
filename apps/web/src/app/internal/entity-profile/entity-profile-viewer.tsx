@@ -55,6 +55,15 @@ function EntitySearch({
 }) {
   const [query, setQuery] = useState(initialQuery);
 
+  // Sync input with URL param changes (e.g., browser back/forward, example entity clicks)
+  useEffect(() => {
+    if (initialQuery !== query) {
+      setQuery(initialQuery);
+    }
+  // Only re-sync when the external prop changes, not when the user types
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuery]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) onSearch(query.trim());
@@ -765,6 +774,8 @@ export function EntityProfileViewer({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  // Track last manually-searched query to avoid duplicate requests from useEffect
+  const lastManualSearchRef = useRef<string | null>(null);
 
   const doSearch = useCallback(async (query: string) => {
     // Cancel any inflight request to prevent stale responses overwriting newer ones
@@ -805,6 +816,11 @@ export function EntityProfileViewer({
     const urlEntityParam = searchParams.get("entity");
     const target = urlEntityParam || initialEntity;
     if (target && !initialData) {
+      // Skip if this was already triggered by handleSearch to avoid double-fetching
+      if (lastManualSearchRef.current === target) {
+        lastManualSearchRef.current = null;
+        return;
+      }
       doSearch(target);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -812,6 +828,7 @@ export function EntityProfileViewer({
 
   const handleSearch = useCallback(
     (query: string) => {
+      lastManualSearchRef.current = query;
       const params = new URLSearchParams(searchParams.toString());
       params.set("entity", query);
       router.push(`?${params.toString()}`, { scroll: false });
@@ -857,6 +874,11 @@ export function EntityProfileViewer({
       {error && (
         <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 p-4 mb-5 text-sm text-red-700 dark:text-red-400">
           {error}
+          {/not found/i.test(error) && (
+            <p className="mt-1.5 text-xs text-red-600/70 dark:text-red-400/60">
+              Try using the exact slug (e.g. &quot;anthropic&quot;), a stableId (e.g. &quot;sid_...&quot;), or a wikiId (e.g. &quot;E22&quot;).
+            </p>
+          )}
         </div>
       )}
 
