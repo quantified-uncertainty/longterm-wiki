@@ -22,6 +22,7 @@
 
 import { readdirSync, readFileSync, existsSync, appendFileSync } from 'fs';
 import { join } from 'path';
+import { execSync } from 'child_process';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 const MANIFEST_DIR = join(PROJECT_ROOT, 'data', 'tablebase-manifests');
@@ -75,6 +76,7 @@ function main() {
   let totalVerified = 0;
   let totalUnverified = 0;
   const warnings: string[] = [];
+  const fatalErrors: string[] = [];
   const hardBlockedTables = new Set<string>();
 
   for (const file of files) {
@@ -82,14 +84,14 @@ function main() {
     try {
       manifest = JSON.parse(readFileSync(join(MANIFEST_DIR, file), 'utf-8')) as Manifest;
     } catch (e: unknown) {
-      warnings.push(`${file}: failed to parse — ${e instanceof Error ? e.message : String(e)}`);
+      fatalErrors.push(`${file}: failed to parse — ${e instanceof Error ? e.message : String(e)}`);
       continue;
     }
 
     const { table, recordCount, verificationSummary } = manifest;
 
     if (!verificationSummary || typeof recordCount !== 'number') {
-      warnings.push(`${file}: missing verificationSummary or recordCount`);
+      fatalErrors.push(`${file}: missing verificationSummary or recordCount`);
       continue;
     }
 
@@ -116,6 +118,17 @@ function main() {
   // Summary
   const coverage = totalRecords > 0 ? Math.round((totalVerified / totalRecords) * 100) : 100;
   console.log(`Verification coverage: ${totalVerified}/${totalRecords} records (${coverage}%)`);
+
+  // Fatal errors (malformed manifests) — cannot be overridden with --force
+  if (fatalErrors.length > 0) {
+    console.log('');
+    for (const err of fatalErrors) {
+      console.log(`  ERROR: ${err}`);
+    }
+    console.log('');
+    console.log('BLOCKED: Manifest files are unreadable or malformed. Fix them before proceeding.');
+    process.exit(1);
+  }
 
   if (warnings.length === 0) {
     console.log('All TableBase submissions have verification.');
@@ -159,7 +172,17 @@ function main() {
 /** Log --force usage for monitoring (Phase 4 guardrail) */
 function logForceUsage(warnings: string[]): void {
   try {
-    const logFile = join(PROJECT_ROOT, '.git', 'verification-force-log');
+    // Use git rev-parse to resolve the real git dir — handles worktrees where .git is a file
+    let logFile: string;
+    try {
+      logFile = execSync('git rev-parse --git-path verification-force-log', {
+        cwd: PROJECT_ROOT,
+        encoding: 'utf-8',
+      }).trim();
+    } catch {
+      // Fallback if git is unavailable
+      logFile = join(PROJECT_ROOT, '.git', 'verification-force-log');
+    }
     const entry = `${new Date().toISOString()} | ${warnings.length} warnings | ${warnings.join('; ')}\n`;
     appendFileSync(logFile, entry);
   } catch (e: unknown) {

@@ -246,7 +246,7 @@ async function runBatchExecution(
 
   // Phase 1: Fetch source content and build prompts (with concurrency)
   const batchRequests: BatchRequest[] = [];
-  const batchItemMap = new Map<string, VerifyItem>();
+  const batchItemMap = new Map<string, { item: VerifyItem; sourceUrl: string }>();
   let preparedCount = 0;
 
   async function prepareItem(item: VerifyItem): Promise<void> {
@@ -364,7 +364,7 @@ async function runBatchExecution(
         messages: [{ role: 'user', content: prompt }],
       },
     });
-    batchItemMap.set(customId, item);
+    batchItemMap.set(customId, { item, sourceUrl });
     console.log(`  ${progress} Prepared: ${item.description.slice(0, 80)}`);
   }
 
@@ -415,8 +415,9 @@ async function runBatchExecution(
     // Phase 4: Process results
     const resultsMap = await getBatchResults(anthropicClient, batch.id);
     for (const [customId, batchResult] of resultsMap) {
-      const item = batchItemMap.get(customId);
-      if (!item) continue;
+      const batchEntry = batchItemMap.get(customId);
+      if (!batchEntry) continue;
+      const { item, sourceUrl } = batchEntry;
 
       if (batchResult.result.type !== 'succeeded') {
         summary.errors++;
@@ -462,7 +463,7 @@ async function runBatchExecution(
         confidence,
         extractedValue,
         reasoning,
-        sourceUrl: item.sourceUrl ?? '',
+        sourceUrl: sourceUrl ?? '',
       };
 
       summary[verdict]++;
