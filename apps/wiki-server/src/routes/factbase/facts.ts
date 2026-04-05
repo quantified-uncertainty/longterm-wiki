@@ -105,6 +105,11 @@ function reconstructFactValue(row: typeof facts.$inferSelect) {
       // Guard: reject stale "[object Object]" artifacts from pre-March 2026 sync
       // (old data/facts/*.yaml had {min: N} objects that String() serialized as "[object Object]")
       if (row.value === "[object Object]") return { type: "text" as const, value: "" };
+      // Infer type from available columns when format is null (pre-format-column facts).
+      // Without this, numeric facts render as raw strings (e.g., "380000000000" instead
+      // of "$380 billion") because the default path returns { type: "text" }.
+      if (row.numeric != null) return { type: "number" as const, value: row.numeric };
+      if (row.low != null && row.high != null) return { type: "range" as const, low: row.low, high: row.high };
       return { type: "text" as const, value: row.value ?? "" };
   }
 }
