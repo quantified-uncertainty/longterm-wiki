@@ -41,6 +41,7 @@ import { loadEntityRegistry } from "./validate-kb-entity-slugs.ts";
 
 /**
  * FactBase property IDs that reference person entities via `!ref`.
+ * Derived from packages/factbase/data/properties.yaml — keep in sync.
  * When these properties use text values instead of refs, it's a data quality issue.
  */
 const PERSON_PROPERTIES = new Set([
@@ -93,40 +94,9 @@ interface EntityNameLookup {
 
 function buildNameLookup(entitiesDir: string): EntityNameLookup {
   const registry = loadEntityRegistry(entitiesDir);
-  const nameMap = new Map<string, string>();
-
-  let files: string[];
-  try {
-    files = readdirSync(entitiesDir).filter(
-      (f) => extname(f) === ".yaml" || extname(f) === ".yml",
-    );
-  } catch {
-    return { hasEntity: () => false, getName: () => null };
-  }
-
-  // Use a simple regex-based approach to avoid YAML tag issues.
-  // Entity YAML files are arrays of objects at 2-space indent. Match
-  // stableId/title at exactly that indent to avoid nested false positives.
-  for (const file of files) {
-    const content = readFileSync(join(entitiesDir, file), "utf-8");
-
-    // Parse blocks: each entity starts with "- id:" at column 0
-    const blocks = content.split(/^- /m).slice(1);
-    for (const block of blocks) {
-      // Match at 2-space indent (top-level entity fields, not nested)
-      const sidMatch = block.match(/^ {0,2}stableId:\s*(\S+)/m);
-      const titleMatch = block.match(/^ {0,2}title:\s*(.+)/m);
-      if (sidMatch && titleMatch) {
-        const sid = sidMatch[1].replace(/^["']|["']$/g, "");
-        const title = titleMatch[1].trim().replace(/^["']|["']$/g, "");
-        nameMap.set(sid, title);
-      }
-    }
-  }
-
   return {
     hasEntity: (sid) => registry.stableIds.has(sid),
-    getName: (sid) => nameMap.get(sid) ?? null,
+    getName: (sid) => registry.stableIdToTitle.get(sid) ?? null,
   };
 }
 
@@ -137,11 +107,7 @@ function buildNameLookup(entitiesDir: string): EntityNameLookup {
 interface FactBlock {
   factId: string;
   propertyId: string;
-  /** Whether the value uses !ref syntax */
-  hasRef: boolean;
-  /** The ref stableIds (from !ref) */
   refIds: string[];
-  /** The raw text value (when not using !ref) */
   textValue: string | null;
 }
 
@@ -181,7 +147,6 @@ function extractPersonFacts(content: string): FactBlock[] {
       facts.push({
         factId,
         propertyId,
-        hasRef: true,
         refIds: refMatches.map((m) => m[1]),
         textValue: null,
       });
@@ -200,7 +165,6 @@ function extractPersonFacts(content: string): FactBlock[] {
         facts.push({
           factId,
           propertyId,
-          hasRef: false,
           refIds: [],
           textValue,
         });
@@ -259,7 +223,7 @@ export function validatePersonRefs(
     for (const fact of personFacts) {
       totalPersonFacts++;
 
-      if (fact.hasRef) {
+      if (fact.refIds.length > 0) {
         // Check each ref target
         for (const refId of fact.refIds) {
           totalRefValues++;

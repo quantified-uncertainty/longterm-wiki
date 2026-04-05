@@ -56,19 +56,21 @@ export interface ValidationResult {
 // Detection
 // ---------------------------------------------------------------------------
 
-const SID_PATTERN = /\bsid_[A-Za-z0-9]{10}\b/;
+// We use custom patterns instead of isSid() from @longterm-wiki/id-utils because:
+// - isSid() only checks startsWith("sid_") — no length validation
+// - We need both exact-match (isBareStableId) and substring-match (containsSid)
+// - These stricter patterns match the actual sid_ format (prefix + 10 alphanumeric)
+const BARE_SID_RE = /^sid_[A-Za-z0-9]{10}$/;
+const EMBEDDED_SID_RE = /\bsid_[A-Za-z0-9]{10}\b/;
 
-function containsSid(value: unknown): boolean {
-  return typeof value === "string" && SID_PATTERN.test(value);
+/** Check if a string IS a bare sid_ (the entire string is just a stableId). */
+function isBareStableId(value: unknown): boolean {
+  return typeof value === "string" && BARE_SID_RE.test(value.trim());
 }
 
-/**
- * Check if a string IS a bare sid_ (the entire string is just a stableId).
- * More strict than containsSid — only flags values that are themselves IDs,
- * not prose that happens to mention one.
- */
-function isBareStableId(value: unknown): boolean {
-  return typeof value === "string" && /^sid_[A-Za-z0-9]{10}$/.test(value.trim());
+/** Check if a string contains a sid_ anywhere (substring match for displayNames). */
+function containsSid(value: unknown): boolean {
+  return typeof value === "string" && EMBEDDED_SID_RE.test(value);
 }
 
 // ---------------------------------------------------------------------------

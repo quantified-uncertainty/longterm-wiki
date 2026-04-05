@@ -79,15 +79,21 @@ interface EntityEntry {
 }
 
 /**
- * Load all stableIds and slugs from data/entities/*.yaml.
- * Returns a set of known stableIds and a map of slug<->stableId.
+ * Load all stableIds, slugs, and titles from data/entities/*.yaml.
+ * Returns sets/maps for entity lookup including a stableId→title map.
  */
 export function loadEntityRegistry(
   entitiesDir: string
-): { stableIds: Set<string>; slugToStableId: Map<string, string>; stableIdToSlug: Map<string, string> } {
+): {
+  stableIds: Set<string>;
+  slugToStableId: Map<string, string>;
+  stableIdToSlug: Map<string, string>;
+  stableIdToTitle: Map<string, string>;
+} {
   const stableIds = new Set<string>();
   const slugToStableId = new Map<string, string>();
   const stableIdToSlug = new Map<string, string>();
+  const stableIdToTitle = new Map<string, string>();
 
   let files: string[];
   try {
@@ -96,7 +102,7 @@ export function loadEntityRegistry(
     );
   } catch {
     // Expected: directory may not exist in test fixtures or fresh checkouts
-    return { stableIds, slugToStableId, stableIdToSlug };
+    return { stableIds, slugToStableId, stableIdToSlug, stableIdToTitle };
   }
 
   for (const file of files) {
@@ -123,11 +129,14 @@ export function loadEntityRegistry(
           slugToStableId.set(entity.id, entity.stableId);
           stableIdToSlug.set(entity.stableId, entity.id);
         }
+        if (typeof entity.title === "string" && entity.title.trim()) {
+          stableIdToTitle.set(entity.stableId, entity.title.trim());
+        }
       }
     }
   }
 
-  return { stableIds, slugToStableId, stableIdToSlug };
+  return { stableIds, slugToStableId, stableIdToSlug, stableIdToTitle };
 }
 
 // ---------------------------------------------------------------------------
