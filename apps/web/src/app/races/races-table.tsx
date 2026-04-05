@@ -124,7 +124,9 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
               <th scope="col" className="pb-2 pr-4 font-medium">Status</th>
               <th scope="col" className="pb-2 pr-4 font-medium">AI Angle</th>
               <th scope="col" className="pb-2 pr-4 font-medium">Candidates</th>
-              <th scope="col" className="pb-2 w-8" />
+              <th scope="col" className="pb-2 w-8">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -219,7 +221,9 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                               <th scope="col" className="pb-1 pr-3">PAC</th>
                               <th scope="col" className="pb-1 pr-3 text-right">PAC Spend</th>
                               <th scope="col" className="pb-1 pr-3 text-right">Vote %</th>
-                              <th scope="col" className="pb-1 w-6" />
+                              <th scope="col" className="pb-1 w-6">
+                                <span className="sr-only">Source check</span>
+                              </th>
                             </tr>
                           </thead>
                           <tbody>

@@ -38,7 +38,7 @@ export function PublicationsSection({
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
                   size="md"
-                  href={verdict?.verdict ? getSourceCheckHref("publication", recordKey) : undefined}
+                  href={getSourceCheckHref("publication", recordKey)}
                 />
               </div>
               <div className="flex items-start justify-between gap-2 pr-6">
@@ -73,7 +73,7 @@ export function PublicationsSection({
                 </div>
                 {pub.link && (
                   <a
-                    href={pub.link}
+                    href={safeHref(pub.link)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="shrink-0 text-xs text-muted-foreground/50 hover:text-primary transition-colors"

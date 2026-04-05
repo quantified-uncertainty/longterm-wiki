@@ -44,7 +44,9 @@ export function GenericCollectionTable({
                   {titleCase(col)}
                 </th>
               ))}
-              <th className="w-8 py-1.5 px-1" />
+              <th className="w-8 py-1.5 px-1">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -76,7 +78,7 @@ export function GenericCollectionTable({
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={verdict?.verdict ? getSourceCheckHref(collectionName, recordId) : undefined}
+                      href={getSourceCheckHref(collectionName, recordId)}
                     />
                   </td>
                 </tr>

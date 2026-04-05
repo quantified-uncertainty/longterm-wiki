@@ -96,7 +96,9 @@ export function FBRecordTable({
               {cols.map((col) => (
                 <TableHead key={col} scope="col">{titleCase(col)}</TableHead>
               ))}
-              <TableHead scope="col" className="w-8" />
+              <TableHead scope="col" className="w-8">
+                <span className="sr-only">Source check</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -119,7 +121,7 @@ export function FBRecordTable({
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={verdict?.verdict ? getSourceCheckHref(collection, recordId) : undefined}
+                      href={getSourceCheckHref(collection, recordId)}
                     />
                   </TableCell>
                 </TableRow>

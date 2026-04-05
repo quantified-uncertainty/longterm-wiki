@@ -79,7 +79,9 @@ export function ExpertPositions({
                     Source
                   </th>
                 )}
-                <th scope="col" className="py-2 px-1 w-8" />
+                <th scope="col" className="py-2 px-1 w-8">
+                  <span className="sr-only">Source check</span>
+                </th>
               </tr>
             </thead>
             <tbody>

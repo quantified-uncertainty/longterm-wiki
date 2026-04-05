@@ -13,6 +13,9 @@
 import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { PoliticalOffice } from "./types";
 
 // ── Status styling ───────────────────────────────────────────────────
@@ -190,7 +193,17 @@ export function OfficeHistory({ offices }: OfficeHistoryProps) {
                     <span className="font-medium text-sm">
                       {officeTypeLabel(office.officeType)}
                     </span>
-                    <SourceCheckDot status="not_run" size="md" />
+                    {(() => {
+                      const verdict = getRecordVerdict("political-office", String(office.id))?.verdict;
+                      return (
+                        <SourceCheckDot
+                          status={recordVerdictToStatus(verdict)}
+                          originalVerdict={verdict}
+                          size="md"
+                          href={getSourceCheckHref("political-office", String(office.id))}
+                        />
+                      );
+                    })()}
                     <span
                       className={cn(
                         "inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold",

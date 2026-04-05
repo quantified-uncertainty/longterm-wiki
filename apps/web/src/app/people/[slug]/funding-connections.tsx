@@ -63,7 +63,7 @@ export function FundingConnections({
           {displayed.map((conn) => {
             const verdict = getRecordVerdict("grant", String(conn.key))?.verdict;
             return (
-            <div key={conn.key} className="px-5 py-3.5 relative">
+            <div key={conn.key} className="px-5 pr-12 py-3.5 relative">
               <div className="absolute top-3.5 right-4">
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict)}
