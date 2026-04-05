@@ -67,7 +67,7 @@ const RECORD_VERDICT_MAP: Record<string, SourceCheckStatus> = {
   contradicted: "failed",
   outdated: "trouble",
   partial: "trouble",
-  unverifiable: "trouble",
+  unverifiable: "failed",
 };
 
 /**
@@ -90,7 +90,7 @@ const FACTBASE_VERDICT_MAP: Record<string, SourceCheckStatus> = {
   minor_issues: "trouble",
   inaccurate: "failed",
   unsupported: "failed",
-  not_verifiable: "trouble",
+  not_verifiable: "failed",
 };
 
 /**
