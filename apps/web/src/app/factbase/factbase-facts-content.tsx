@@ -92,8 +92,6 @@ export function FBFactsExplorerContent() {
 
     for (const fact of facts) {
       if (fact.propertyId === "description") continue;
-      // Skip stale PG rows with malformed sid_-prefixed fact IDs (#3881)
-      if (fact.id.startsWith("sid_")) continue;
 
       const property = propertiesById.get(fact.propertyId);
 

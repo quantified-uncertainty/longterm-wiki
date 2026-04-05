@@ -5,7 +5,8 @@ test.describe("FactBase pages", () => {
     // /factbase now renders the FactBase overview page directly
     const response = await page.goto("/factbase");
     expect(response?.status()).toBe(200);
-    await expect(page.locator("h1").first()).toBeVisible({ timeout: 10000 });
+    expect(page.url()).toMatch(/\/factbase$/);
+    await expect(page.locator("h1").first()).toContainText("FactBase", { timeout: 10000 });
   });
 
   test("/sources loads", async ({ page }) => {
