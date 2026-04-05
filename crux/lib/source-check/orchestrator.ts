@@ -245,11 +245,16 @@ async function runBatchExecution(
   console.log(`\n\x1b[1mBatch mode: preparing ${itemsToVerify.length} items (est. \$${summary.estimatedCost.toFixed(2)} with 50% batch discount)...\x1b[0m\n`);
 
   // Phase 1: Fetch source content and build prompts (with concurrency)
-  const batchRequests: BatchRequest[] = [];
+  // Results are stored by original index to preserve the priority sort order of
+  // itemsToVerify. Without this, concurrent prepareItem completions would push
+  // into batchRequests in arrival order, shuffling high-priority items into
+  // later chunks when they happened to be slower to prepare.
+  const preparedSlots: ({ request: BatchRequest; item: VerifyItem; sourceUrl: string } | null)[] =
+    new Array(itemsToVerify.length).fill(null);
   const batchItemMap = new Map<string, { item: VerifyItem; sourceUrl: string }>();
   let preparedCount = 0;
 
-  async function prepareItem(item: VerifyItem): Promise<void> {
+  async function prepareItem(item: VerifyItem, index: number): Promise<void> {
     preparedCount++;
     const progress = `[${preparedCount}/${itemsToVerify.length}]`;
 
@@ -355,27 +360,40 @@ async function runBatchExecution(
     }
 
     const customId = `verify-${item.id}`;
-    batchRequests.push({
-      customId,
-      params: {
-        model: MODELS.haiku,
-        max_tokens: 500,
-        temperature: 0,
-        messages: [{ role: 'user', content: prompt }],
+    preparedSlots[index] = {
+      request: {
+        customId,
+        params: {
+          model: MODELS.haiku,
+          max_tokens: 500,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        },
       },
-    });
-    batchItemMap.set(customId, { item, sourceUrl });
+      item,
+      sourceUrl,
+    };
     console.log(`  ${progress} Prepared: ${item.description.slice(0, 80)}`);
   }
 
-  // Prepare items with concurrency
+  // Prepare items with concurrency (index preserved for slot assignment)
   const prepExecuting = new Set<Promise<void>>();
-  for (const item of itemsToVerify) {
-    const p = prepareItem(item).finally(() => prepExecuting.delete(p));
+  for (let i = 0; i < itemsToVerify.length; i++) {
+    const idx = i;
+    const p = prepareItem(itemsToVerify[idx], idx).finally(() => prepExecuting.delete(p));
     prepExecuting.add(p);
     if (prepExecuting.size >= concurrency) await Promise.race(prepExecuting);
   }
   await Promise.all(prepExecuting);
+
+  // Compact prepared slots into batchRequests, preserving original priority order
+  const batchRequests: BatchRequest[] = [];
+  for (const slot of preparedSlots) {
+    if (slot) {
+      batchRequests.push(slot.request);
+      batchItemMap.set(slot.request.customId, { item: slot.item, sourceUrl: slot.sourceUrl });
+    }
+  }
 
   if (batchRequests.length === 0) {
     console.log('\nNo items require LLM verification (all resolved deterministically or errored).');
