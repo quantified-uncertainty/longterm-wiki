@@ -205,6 +205,50 @@ export const citationContent = pgTable(
   ]
 );
 
+/**
+ * Resource Content Versions — unified append-only content history for ALL resources.
+ *
+ * Stores every fetched version of resource content (web pages, CSVs, HTML tables,
+ * JSON API responses, etc.) with content-hash dedup. The existing `citation_content`
+ * table remains as a "latest content" hot cache for fast lookups — this table adds
+ * temporal depth.
+ *
+ * Replaces the old split between `citation_content` (web pages, overwritten) and
+ * `source_snapshots` (tabular data, versioned). Both content types now go here.
+ *
+ * Subtype-specific metadata (e.g., pageTitle for web pages, recordCount for tabular
+ * sources) is stored in the `metadata` JSONB column.
+ */
+export const resourceContentVersions = pgTable(
+  "resource_content_versions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    resourceId: text("resource_id").references(() => resources.id, {
+      onDelete: "set null",
+    }),
+    url: text("url").notNull(),
+    contentHash: text("content_hash").notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    content: text("content"),
+    contentLength: integer("content_length"),
+    httpStatus: integer("http_status"),
+    contentType: text("content_type"),
+    fetchMethod: text("fetch_method"),
+    /** Subtype-specific metadata: {pageTitle, fullTextPreview} for web pages,
+     *  {recordCount, mappingValid, parserVersion, notes} for tabular sources */
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_rcv_url_hash").on(table.url, table.contentHash),
+    index("idx_rcv_url_fetched").on(table.url, table.fetchedAt),
+    index("idx_rcv_resource_id").on(table.resourceId),
+    index("idx_rcv_fetched_at").on(table.fetchedAt),
+  ]
+);
+
 export const citationAccuracySnapshots = pgTable(
   "citation_accuracy_snapshots",
   {

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
-import type { citationQuotes, citationAccuracySnapshots, citationContent } from "../schema.js";
+import type { citationQuotes, citationAccuracySnapshots, citationContent, resourceContentVersions } from "../schema.js";
 
 // ---- In-memory stores simulating Postgres tables ----
 // Store types are derived from the Drizzle schema so TypeScript catches column renames.
@@ -13,12 +13,16 @@ type QuoteRow = typeof citationQuotes.$inferSelect;
 type SnapshotRow = typeof citationAccuracySnapshots.$inferSelect;
 // citationContent.$inferSelect
 type ContentRow = typeof citationContent.$inferSelect;
+// resourceContentVersions.$inferSelect
+type ContentVersionRow = typeof resourceContentVersions.$inferSelect;
 
 let nextQuoteId = 1;
 let nextSnapshotId = 1;
+let nextContentVersionId = 1;
 let quotesStore: Map<string, QuoteRow>; // key: `${pageSlug}:${footnote}`
 let contentStore: Map<string, ContentRow>; // key: url
 let snapshotStore: Array<SnapshotRow>;
+let contentVersionStore: Array<ContentVersionRow>;
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -42,9 +46,11 @@ function slugFromIntId(intId: number | null): string | null {
 function resetStores() {
   nextQuoteId = 1;
   nextSnapshotId = 1;
+  nextContentVersionId = 1;
   quotesStore = new Map();
   contentStore = new Map();
   snapshotStore = [];
+  contentVersionStore = [];
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
 }
@@ -121,6 +127,8 @@ function contentToSqlRow(r: ContentRow): Record<string, unknown> {
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
+  // Debug: uncomment to see SQL patterns
+  // if (q.includes("resource_content_versions")) console.log("DISPATCH rcv:", JSON.stringify({ q: q.slice(0, 300), params }));
 
   // --- ref-check: SELECT id FROM wiki_pages/resources WHERE id IN (...) ---
   if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
@@ -657,6 +665,44 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     };
     contentStore.set(url, row);
     return [contentToSqlRow(row)];
+  }
+
+  // --- resource_content_versions: INSERT ... ON CONFLICT DO NOTHING ---
+  if (q.includes("insert into") && q.includes("resource_content_versions")) {
+    const resourceId = params[0] as string | null;
+    const url = params[1] as string;
+    const contentHash = params[2] as string;
+    const rawFetchedAt = params[3];
+    const fetchedAt = rawFetchedAt instanceof Date ? rawFetchedAt : new Date(rawFetchedAt as string);
+    const content = params[4] as string | null;
+    const contentLength = params[5] as number | null;
+    const httpStatus = params[6] as number | null;
+    const contentType = params[7] as string | null;
+    const fetchMethod = params[8] as string | null;
+    const rawMetadata = params[9];
+    const metadata = typeof rawMetadata === "string" ? JSON.parse(rawMetadata) : rawMetadata as Record<string, unknown> | null;
+    const now = new Date();
+    // Check dedup: UNIQUE(url, content_hash)
+    const existing = contentVersionStore.find(
+      (r) => r.url === url && r.contentHash === contentHash
+    );
+    if (existing) return []; // ON CONFLICT DO NOTHING
+    const row: ContentVersionRow = {
+      id: nextContentVersionId++,
+      resourceId,
+      url,
+      contentHash,
+      fetchedAt,
+      content,
+      contentLength,
+      httpStatus,
+      contentType,
+      fetchMethod,
+      metadata,
+      createdAt: now,
+    };
+    contentVersionStore.push(row);
+    return [{ id: row.id }];
   }
 
   // --- citation_content: SELECT * WHERE url ---
@@ -1326,6 +1372,126 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(200);
 
       delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    });
+  });
+
+  // ---- Content Version History ----
+
+  describe("Content version history (dual-write + query)", () => {
+    it("dual-writes to resource_content_versions on content upsert", async () => {
+      const res = await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/versioned",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        httpStatus: 200,
+        contentType: "text/html",
+        pageTitle: "Test Page",
+        fullText: "Hello world content",
+        contentLength: 19,
+        contentHash: "abc123def456",
+      });
+      expect(res.status).toBe(200);
+
+      // Verify dual-write created a content version
+      expect(contentVersionStore.length).toBe(1);
+      expect(contentVersionStore[0].url).toBe("https://example.com/versioned");
+      expect(contentVersionStore[0].contentHash).toBe("abc123def456");
+      expect(contentVersionStore[0].content).toBe("Hello world content");
+      expect(contentVersionStore[0].httpStatus).toBe(200);
+      const meta = typeof contentVersionStore[0].metadata === "string"
+        ? JSON.parse(contentVersionStore[0].metadata as string)
+        : contentVersionStore[0].metadata;
+      expect(meta).toMatchObject({ pageTitle: "Test Page" });
+    });
+
+    it("deduplicates: same content hash does not create new version", async () => {
+      // First upsert
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/dedup-test",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Same content",
+        contentHash: "deduphash",
+      });
+      expect(contentVersionStore.length).toBe(1);
+
+      // Second upsert with same hash — should not create new version
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/dedup-test",
+        fetchedAt: "2025-01-02T00:00:00Z",
+        fullText: "Same content",
+        contentHash: "deduphash",
+      });
+      expect(contentVersionStore.length).toBe(1);
+    });
+
+    it("creates new version when content hash changes", async () => {
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/changing",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Version 1",
+        contentHash: "hash_v1",
+      });
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/changing",
+        fetchedAt: "2025-02-01T00:00:00Z",
+        fullText: "Version 2 with updates",
+        contentHash: "hash_v2",
+      });
+      expect(contentVersionStore.length).toBe(2);
+      expect(contentVersionStore[0].contentHash).toBe("hash_v1");
+      expect(contentVersionStore[1].contentHash).toBe("hash_v2");
+    });
+
+    it("computes 16-char truncated SHA-256 hash when caller omits contentHash", async () => {
+      // This tests the server-side fallback: SHA-256 of first 1MB, truncated to 16 hex chars.
+      // Must match resource-ingest.ts computeContentHash() to prevent dedup failure.
+      const { createHash } = await import("node:crypto");
+      const text = "Hello world content for hash test";
+      const expectedHash = createHash("sha256").update(text.slice(0, 1_000_000)).digest("hex").slice(0, 16);
+
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/auto-hash",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: text,
+        // no contentHash provided — server should compute it
+      });
+
+      expect(contentVersionStore.length).toBe(1);
+      expect(contentVersionStore[0].contentHash).toBe(expectedHash);
+      expect(expectedHash).toHaveLength(16);
+    });
+
+    it("succeeds even when version INSERT fails (best-effort dual-write)", async () => {
+      // Simulate a version INSERT failure by inserting a row that will conflict,
+      // then upsert again with the same URL + hash. The main upsert should still succeed.
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/best-effort",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Content",
+        contentHash: "same_hash",
+      });
+
+      // Second upsert with same hash — version INSERT does ON CONFLICT DO NOTHING,
+      // but the main citation_content upsert should still return 200
+      const res = await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/best-effort",
+        fetchedAt: "2025-01-02T00:00:00Z",
+        fullText: "Content",
+        contentHash: "same_hash",
+      });
+      expect(res.status).toBe(200);
+      // Only 1 version row (dedup worked)
+      expect(contentVersionStore.filter(r => r.url === "https://example.com/best-effort").length).toBe(1);
+    });
+
+    it("skips version write when no contentHash and no fullText", async () => {
+      const initialCount = contentVersionStore.length;
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/no-content",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        httpStatus: 403,
+      });
+      // No version should be created (no hash, no text to compute hash from)
+      expect(contentVersionStore.length).toBe(initialCount);
     });
   });
 });

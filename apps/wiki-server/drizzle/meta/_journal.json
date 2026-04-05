@@ -1114,6 +1114,13 @@
       "when": 1783152000000,
       "tag": "0158_page_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 159,
+      "version": "7",
+      "when": 1783238400000,
+      "tag": "0159_resource_content_versions",
+      "breakpoints": true
     }
   ]
 }
