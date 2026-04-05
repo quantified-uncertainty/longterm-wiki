@@ -15,6 +15,8 @@ import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
 import type { PeopleSortKey } from "./people-sort";
 import { isPersonMeaningful } from "./people-filter";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computePersonCoverage } from "@/components/coverage/coverage-score";
 
 export interface PersonRow {
   id: string;
@@ -347,9 +349,9 @@ export function PeopleTable({
   const hasSparseColumns = roleFillRate <= 0.5 || (affiliationFillRate <= 0.5 && activeAffiliation === "all");
 
   // Compute dynamic column count for colSpan on empty/loading rows
-  // Base: Name + Born + Net Worth = 3, plus optional Role + Affiliation,
+  // Base: Name + Born + Net Worth + Coverage = 4, plus optional Role + Affiliation,
   // plus 3 more in static mode (Positions, Pubs, Career Entries)
-  const colSpan = 3
+  const colSpan = 4
     + (showRole ? 1 : 0)
     + (showAffiliation ? 1 : 0)
     + (serverMode ? 0 : 3);
@@ -523,6 +525,7 @@ export function PeopleTable({
                   />
                 </>
               )}
+              <th scope="col" className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -658,6 +661,10 @@ export function PeopleTable({
                         </td>
                       </>
                     )}
+                    {/* Coverage */}
+                    <td className="py-2.5 px-3 text-center">
+                      <CoverageDots score={computePersonCoverage(row)} />
+                    </td>
                   </tr>
                 ))}
                 {rows.length === 0 && !isInitialLoad && (
