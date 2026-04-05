@@ -437,7 +437,7 @@ const entityProfileApp = new Hono()
     }
 
     // Batch-resolve stableIds to display names
-    let displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
+    const displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
     if (entityRefIds.size > 0) {
       const entityRows = await db.select({
         stableId: entities.stableId,

@@ -328,7 +328,7 @@ function ProfileSection({
     const hidden = HIDDEN_COLUMNS[section.key];
     if (!hidden) return section.schema.columns;
     return section.schema.columns.filter((col) => !hidden.has(col.name));
-  }, [section]);
+  }, [section.key, section.schema.columns]);
 
   return (
     <div
