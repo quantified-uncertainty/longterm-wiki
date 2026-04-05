@@ -1,30 +1,35 @@
 import { test, expect } from "@playwright/test";
 
+// Use platform-appropriate shortcut: Meta+k on macOS, Control+k on Linux/Windows
+const isMac = process.platform === "darwin";
+const searchShortcut = isMac ? "Meta+k" : "Control+k";
+
 test.describe("Search dialog (Cmd+K)", () => {
-  test("opens on Cmd+K", async ({ page }) => {
+  test("opens on keyboard shortcut", async ({ page }) => {
     await page.goto("/");
-    await page.keyboard.press("Meta+k");
-    const dialog = page.locator("[role='dialog'], [data-search-dialog]").first();
-    // Fallback: look for a search input that appeared
-    const searchInput = page.locator("input[placeholder*='earch']").first();
-    await expect(searchInput).toBeVisible({ timeout: 5000 });
+    await page.waitForTimeout(500); // Wait for hydration
+    await page.keyboard.press(searchShortcut);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 5000 });
   });
 
   test("closes on Escape", async ({ page }) => {
     await page.goto("/");
-    await page.keyboard.press("Meta+k");
-    const searchInput = page.locator("input[placeholder*='earch']").first();
-    await expect(searchInput).toBeVisible({ timeout: 5000 });
+    await page.waitForTimeout(500);
+    await page.keyboard.press(searchShortcut);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 5000 });
 
     await page.keyboard.press("Escape");
-    await expect(searchInput).not.toBeVisible({ timeout: 3000 });
+    await expect(dialog).not.toBeVisible({ timeout: 3000 });
   });
 
   test("opens via search button click", async ({ page }) => {
     await page.goto("/");
-    const searchBtn = page.locator("header button[title*='Search']");
+    // The search button has text "Search" and a keyboard shortcut hint
+    const searchBtn = page.locator('header button', { hasText: "Search" }).last();
     await searchBtn.click();
-    const searchInput = page.locator("input[placeholder*='earch']").first();
-    await expect(searchInput).toBeVisible({ timeout: 5000 });
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 5000 });
   });
 });

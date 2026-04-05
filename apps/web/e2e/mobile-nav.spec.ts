@@ -18,17 +18,18 @@ test.describe("Mobile navigation", () => {
 
   test("mobile menu opens and shows links", async ({ page }) => {
     await page.goto("/");
-    // Find the mobile menu trigger (usually the last button or one with menu icon)
-    const menuButtons = page.locator("header button");
-    const lastBtn = menuButtons.last();
-    await lastBtn.click();
+    // Find the mobile menu trigger by its aria-label
+    const menuBtn = page.locator('button[aria-label="Open navigation menu"]');
+    await menuBtn.click();
 
-    // Should show navigation links
+    // Should show navigation links within the mobile nav
+    const mobileNav = page.locator('nav[aria-label="Mobile navigation"]');
+    await expect(mobileNav).toBeVisible({ timeout: 5000 });
     await expect(
-      page.locator("a", { hasText: "Organizations" })
-    ).toBeVisible({ timeout: 5000 });
+      mobileNav.locator("a", { hasText: "Organizations" })
+    ).toBeVisible();
     await expect(
-      page.locator("a", { hasText: "People" })
+      mobileNav.locator("a", { hasText: "People" })
     ).toBeVisible();
   });
 });
