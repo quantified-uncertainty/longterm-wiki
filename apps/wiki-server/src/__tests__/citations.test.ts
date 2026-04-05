@@ -1441,6 +1441,48 @@ describe("Citation Server API", () => {
       expect(contentVersionStore[1].contentHash).toBe("hash_v2");
     });
 
+    it("computes 16-char truncated SHA-256 hash when caller omits contentHash", async () => {
+      // This tests the server-side fallback: SHA-256 of first 1MB, truncated to 16 hex chars.
+      // Must match resource-ingest.ts computeContentHash() to prevent dedup failure.
+      const { createHash } = await import("node:crypto");
+      const text = "Hello world content for hash test";
+      const expectedHash = createHash("sha256").update(text.slice(0, 1_000_000)).digest("hex").slice(0, 16);
+
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/auto-hash",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: text,
+        // no contentHash provided — server should compute it
+      });
+
+      expect(contentVersionStore.length).toBe(1);
+      expect(contentVersionStore[0].contentHash).toBe(expectedHash);
+      expect(expectedHash).toHaveLength(16);
+    });
+
+    it("succeeds even when version INSERT fails (best-effort dual-write)", async () => {
+      // Simulate a version INSERT failure by inserting a row that will conflict,
+      // then upsert again with the same URL + hash. The main upsert should still succeed.
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/best-effort",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Content",
+        contentHash: "same_hash",
+      });
+
+      // Second upsert with same hash — version INSERT does ON CONFLICT DO NOTHING,
+      // but the main citation_content upsert should still return 200
+      const res = await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/best-effort",
+        fetchedAt: "2025-01-02T00:00:00Z",
+        fullText: "Content",
+        contentHash: "same_hash",
+      });
+      expect(res.status).toBe(200);
+      // Only 1 version row (dedup worked)
+      expect(contentVersionStore.filter(r => r.url === "https://example.com/best-effort").length).toBe(1);
+    });
+
     it("skips version write when no contentHash and no fullText", async () => {
       const initialCount = contentVersionStore.length;
       await postJson(app, "/api/citations/content/upsert", {
