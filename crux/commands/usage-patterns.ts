@@ -60,7 +60,7 @@ interface ContentBlock {
 interface SessionSummary {
   sessionId: string;
   projectDir: string;
-  firstMessage: string;
+  firstTimestamp: string;
   lastTimestamp: string;
   userMessageCount: number;
   assistantMessageCount: number;
@@ -100,25 +100,30 @@ function findJournalFiles(baseDir: string): Array<{ path: string; projectDir: st
 
   const files: Array<{ path: string; projectDir: string }> = [];
 
-  try {
-    for (const entry of readdirSync(claudeDir)) {
-      const entryPath = join(claudeDir, entry);
-      const stat = statSync(entryPath);
-      if (!stat.isDirectory()) {
-        if (entry.endsWith('.jsonl')) {
-          files.push({ path: entryPath, projectDir: 'unknown' });
-        }
-        continue;
+  for (const entry of readdirSync(claudeDir)) {
+    const entryPath = join(claudeDir, entry);
+    let stat;
+    try {
+      stat = statSync(entryPath);
+    } catch {
+      continue; // Permission error on this entry — skip it, scan the rest
+    }
+    if (!stat.isDirectory()) {
+      if (entry.endsWith('.jsonl')) {
+        files.push({ path: entryPath, projectDir: 'unknown' });
       }
+      continue;
+    }
 
+    try {
       for (const file of readdirSync(entryPath)) {
         if (file.endsWith('.jsonl')) {
           files.push({ path: join(entryPath, file), projectDir: entry });
         }
       }
+    } catch {
+      continue; // Permission error reading subdirectory — skip it
     }
-  } catch {
-    // Permission errors etc.
   }
 
   return files;
@@ -133,7 +138,7 @@ function parseJournalFile(filePath: string, projectDir: string, since: Date | nu
   try {
     content = readFileSync(filePath, 'utf-8');
   } catch {
-    return null;
+    return null; // Unreadable file — skip silently (expected for permission issues)
   }
 
   const lines = content.split('\n').filter(Boolean);
@@ -154,7 +159,7 @@ function parseJournalFile(filePath: string, projectDir: string, since: Date | nu
     try {
       entry = JSON.parse(line);
     } catch {
-      continue;
+      continue; // Malformed JSONL line — skip
     }
 
     if (entry.sessionId) sessionId = entry.sessionId;
@@ -177,9 +182,8 @@ function parseJournalFile(filePath: string, projectDir: string, since: Date | nu
     if (entry.type === 'assistant' && entry.message?.role === 'assistant') {
       assistantMessageCount++;
 
-      const msgContent = entry.message.content;
-      if (Array.isArray(msgContent)) {
-        for (const block of msgContent) {
+      if (Array.isArray(entry.message.content)) {
+        for (const block of entry.message.content) {
           if (block.type === 'tool_use' && block.name) {
             toolUses[block.name] = (toolUses[block.name] || 0) + 1;
           }
@@ -204,7 +208,7 @@ function parseJournalFile(filePath: string, projectDir: string, since: Date | nu
   return {
     sessionId,
     projectDir,
-    firstMessage: firstTimestamp,
+    firstTimestamp,
     lastTimestamp,
     userMessageCount,
     assistantMessageCount,
@@ -262,33 +266,25 @@ function analyzePatterns(sessions: SessionSummary[]): PatternReport {
     .map(([tool, count]) => ({ tool, count }))
     .sort((a, b) => b.count - a.count);
 
-  // Sessions by day of week
+  // Sessions by day of week, hour, and date range (single pass)
   const sessionsByDay: Record<string, number> = {};
-  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-  for (const s of sessions) {
-    if (s.firstMessage) {
-      const day = days[new Date(s.firstMessage).getDay()];
-      sessionsByDay[day] = (sessionsByDay[day] || 0) + 1;
-    }
-  }
-
-  // Sessions by hour
   const sessionsByHour: Record<string, number> = {};
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  let minTimestamp = '';
+  let maxTimestamp = '';
   for (const s of sessions) {
-    if (s.firstMessage) {
-      const hour = new Date(s.firstMessage).getHours().toString().padStart(2, '0');
+    if (s.firstTimestamp) {
+      const d = new Date(s.firstTimestamp);
+      sessionsByDay[days[d.getDay()]] = (sessionsByDay[days[d.getDay()]] || 0) + 1;
+      const hour = d.getHours().toString().padStart(2, '0');
       sessionsByHour[`${hour}:00`] = (sessionsByHour[`${hour}:00`] || 0) + 1;
+      if (!minTimestamp || s.firstTimestamp < minTimestamp) minTimestamp = s.firstTimestamp;
+      if (!maxTimestamp || s.firstTimestamp > maxTimestamp) maxTimestamp = s.firstTimestamp;
     }
   }
-
-  // Date range
-  const timestamps = sessions
-    .map((s) => s.firstMessage)
-    .filter(Boolean)
-    .sort();
   const dateRange = {
-    from: timestamps[0]?.slice(0, 10) || 'unknown',
-    to: timestamps[timestamps.length - 1]?.slice(0, 10) || 'unknown',
+    from: minTimestamp?.slice(0, 10) || 'unknown',
+    to: maxTimestamp?.slice(0, 10) || 'unknown',
   };
 
   // Longest sessions
@@ -303,44 +299,46 @@ function analyzePatterns(sessions: SessionSummary[]): PatternReport {
       firstMessage: s.userMessages[0]?.slice(0, 80) || '(empty)',
     }));
 
-  // Short sessions (< 2 messages)
-  const shortSessions = sessions.filter((s) => s.userMessageCount <= 2).length;
-
-  // Slash command usage
+  // Short sessions, slash commands, message classification, durations (single pass over messages)
+  let shortSessions = 0;
   const slashCommands: Record<string, number> = {};
-  for (const s of sessions) {
-    for (const msg of s.userMessages) {
-      const match = msg.match(/^\/([\w-]+)/);
-      if (match) {
-        slashCommands[`/${match[1]}`] = (slashCommands[`/${match[1]}`] || 0) + 1;
-      }
-    }
-  }
-
-  // Classify all user messages
-  const allUserMessages = sessions.flatMap((s) => s.userMessages).filter((m) => m.length > 0);
-
-  // Questions vs directives
   let questions = 0;
   let directives = 0;
-  for (const msg of allUserMessages) {
-    if (msg.match(/\?(\s|$)/) || msg.match(/^(how|what|why|where|when|can|does|is|are|should|would|could)\b/i)) {
-      questions++;
-    } else {
-      directives++;
-    }
-  }
-
-  // Top message patterns (categorized)
   const patternBuckets: Record<string, { count: number; examples: string[] }> = {};
-  for (const msg of allUserMessages) {
-    const category = categorizeMessage(msg);
-    if (!patternBuckets[category]) {
-      patternBuckets[category] = { count: 0, examples: [] };
+  let durationSum = 0;
+  let durationCount = 0;
+
+  for (const s of sessions) {
+    if (s.userMessageCount <= 2) shortSessions++;
+    if (s.durationMinutes > 0) {
+      durationSum += s.durationMinutes;
+      durationCount++;
     }
-    patternBuckets[category].count++;
-    if (patternBuckets[category].examples.length < 3) {
-      patternBuckets[category].examples.push(msg.slice(0, 120));
+    for (const msg of s.userMessages) {
+      if (msg.length === 0) continue;
+
+      // Slash commands
+      const slashMatch = msg.match(/^\/([\w-]+)/);
+      if (slashMatch) {
+        slashCommands[`/${slashMatch[1]}`] = (slashCommands[`/${slashMatch[1]}`] || 0) + 1;
+      }
+
+      // Questions vs directives
+      if (/\?(\s|$)/.test(msg) || /^(how|what|why|where|when|can|does|is|are|should|would|could)\b/i.test(msg)) {
+        questions++;
+      } else {
+        directives++;
+      }
+
+      // Message categorization
+      const category = categorizeMessage(msg);
+      if (!patternBuckets[category]) {
+        patternBuckets[category] = { count: 0, examples: [] };
+      }
+      patternBuckets[category].count++;
+      if (patternBuckets[category].examples.length < 3) {
+        patternBuckets[category].examples.push(msg.slice(0, 120));
+      }
     }
   }
 
@@ -349,8 +347,7 @@ function analyzePatterns(sessions: SessionSummary[]): PatternReport {
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
 
-  const durations = sessions.map((s) => s.durationMinutes).filter((d) => d > 0);
-  const avgDuration = durations.length > 0 ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length) : 0;
+  const avgDuration = durationCount > 0 ? Math.round(durationSum / durationCount) : 0;
 
   return {
     sessionsAnalyzed: sessions.length,
@@ -375,17 +372,17 @@ function analyzePatterns(sessions: SessionSummary[]): PatternReport {
 function categorizeMessage(msg: string): string {
   const lower = msg.toLowerCase().trim();
 
-  if (lower.match(/^\//)) return 'slash-command';
-  if (lower.match(/^(fix|debug|resolve|diagnose)\b/)) return 'bug-fix-request';
-  if (lower.match(/^(add|create|implement|build|write|make)\b/)) return 'feature-request';
-  if (lower.match(/^(update|change|modify|edit|rename|move|refactor)\b/)) return 'modification-request';
-  if (lower.match(/^(delete|remove|clean|drop)\b/)) return 'removal-request';
-  if (lower.match(/^(test|check|verify|validate|run)\b/)) return 'verification-request';
-  if (lower.match(/^(show|list|find|search|look|where|what)\b/)) return 'information-query';
-  if (lower.match(/^(how|why|explain|help|can you|does|is there)\b/)) return 'question';
-  if (lower.match(/^(commit|push|ship|deploy|merge|pr)\b/)) return 'git-workflow';
-  if (lower.match(/^(review|improve|polish|simplify)\b/)) return 'review-request';
-  if (lower.match(/^(y|yes|no|ok|sure|go ahead|lgtm|do it|sounds good)\b/)) return 'confirmation';
+  if (lower.startsWith('/')) return 'slash-command';
+  if (/^(fix|debug|resolve|diagnose)\b/.test(lower)) return 'bug-fix-request';
+  if (/^(add|create|implement|build|write|make)\b/.test(lower)) return 'feature-request';
+  if (/^(update|change|modify|edit|rename|move|refactor)\b/.test(lower)) return 'modification-request';
+  if (/^(delete|remove|clean|drop)\b/.test(lower)) return 'removal-request';
+  if (/^(test|check|verify|validate|run)\b/.test(lower)) return 'verification-request';
+  if (/^(show|list|find|search|look|where|what)\b/.test(lower)) return 'information-query';
+  if (/^(how|why|explain|help|can you|does|is there)\b/.test(lower)) return 'question';
+  if (/^(commit|push|ship|deploy|merge|pr)\b/.test(lower)) return 'git-workflow';
+  if (/^(review|improve|polish|simplify)\b/.test(lower)) return 'review-request';
+  if (/^(y|yes|no|ok|sure|go ahead|lgtm|do it|sounds good)\b/.test(lower)) return 'confirmation';
   if (msg.length < 20) return 'short-response';
   return 'other';
 }
@@ -500,11 +497,18 @@ async function analyze(_args: string[], options: CommandOptions): Promise<Comman
   const c = log.colors;
 
   const homeDir = (options.dir as string) || homedir();
-  const since = options.all
-    ? null
-    : options.since
-      ? new Date(options.since as string)
-      : (() => { const d = new Date(); d.setDate(d.getDate() - 7); return d; })();
+  let since: Date | null = null;
+  if (!options.all) {
+    if (options.since) {
+      since = new Date(options.since as string);
+      if (isNaN(since.getTime())) {
+        return { output: `${c.yellow}Invalid date: ${options.since}${c.reset}\n`, exitCode: 1 };
+      }
+    } else {
+      since = new Date();
+      since.setDate(since.getDate() - 7);
+    }
+  }
 
   const journalFiles = findJournalFiles(homeDir);
 
