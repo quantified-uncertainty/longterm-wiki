@@ -3,7 +3,8 @@ import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -35,9 +36,10 @@ export function CareerHistory({
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
-                <RecordVerificationDot
-                  verdict={verdict?.verdict}
-                  variant="label"
+                <SourceCheckDot
+                  status={recordVerdictToStatus(verdict?.verdict)}
+                  originalVerdict={verdict?.verdict}
+                  size="md"
                   href={verdict?.verdict ? `/source-checks/personnel/${encodeURIComponent(String(entry.key))}` : undefined}
                 />
               </div>

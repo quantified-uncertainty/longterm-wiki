@@ -9,7 +9,8 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
 type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
@@ -95,6 +96,7 @@ function DivisionCard({
   const accentBorder = DIVISION_ACCENT_BORDER[d.divisionType] ?? "border-l-gray-300 dark:border-l-gray-600";
 
   const divHref = getDivisionHref(d);
+  const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
 
   return (
     <div
@@ -102,8 +104,9 @@ function DivisionCard({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0">
-          <RecordVerificationDot
-            verdict={getRecordVerdict("division", String(d.key))?.verdict}
+          <SourceCheckDot
+            status={recordVerdictToStatus(cardVerdict)}
+            originalVerdict={cardVerdict}
           />
           <span className="truncate">
             {divHref ? (
@@ -240,9 +243,10 @@ export function DivisionsSection({
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
                     <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={verdict?.verdict}
-                        variant="label"
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict?.verdict)}
+                        originalVerdict={verdict?.verdict}
+                        size="md"
                         href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
                       />
                       {(() => {

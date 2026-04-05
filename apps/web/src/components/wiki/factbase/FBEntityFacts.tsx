@@ -16,7 +16,8 @@ import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactVerif
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { VerificationDot } from "./VerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { factbaseVerdictToStatus } from "@/components/verification/source-check-status";
 
 interface FBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -103,7 +104,7 @@ function TimeSeriesProperty({
               </span>
               {item.fact.source && isUrl(item.fact.source) && (
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                  {verification && <VerificationDot verdict={verification} />}
+                  {verification && <SourceCheckDot status={factbaseVerdictToStatus(verification)} originalVerdict={verification} size="sm" />}
                   <a
                     href={item.fact.source}
                     className="text-xs text-primary/60 hover:text-primary hover:underline"
@@ -160,7 +161,7 @@ function SingleValueProperty({
             ({formatKBDate(fact.asOf)})
           </span>
         )}
-        {verification && <VerificationDot verdict={verification} />}
+        {verification && <SourceCheckDot status={factbaseVerdictToStatus(verification)} originalVerdict={verification} size="sm" />}
       </div>
     </div>
   );

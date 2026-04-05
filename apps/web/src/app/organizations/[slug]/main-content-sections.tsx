@@ -16,7 +16,8 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import {
   SectionHeader,
   SourceLink,
@@ -73,13 +74,15 @@ export function FundingHistorySection({
               const { name: leadInvestorName, href: leadInvestorHref } =
                 resolveRefName(leadInvestor, undefined);
               const instrument = field(round, "instrument");
+              const roundVerdict = getRecordVerdict("funding-round", String(round.key))?.verdict;
 
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
                     <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(roundVerdict)}
+                        originalVerdict={roundVerdict}
                         href={getSourceCheckHref("funding-round", String(round.key))}
                       />
                       <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
@@ -169,13 +172,15 @@ export function InvestorParticipationSection({
               const roundName = field(inv, "round_name");
               const amount = inv.fields.amount;
               const date = field(inv, "date");
+              const invVerdict = getRecordVerdict("investment", String(inv.key))?.verdict;
 
               return (
                 <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
                     <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(invVerdict)}
+                        originalVerdict={invVerdict}
                         href={getSourceCheckHref("investment", String(inv.key))}
                       />
                       {investorHref ? (
