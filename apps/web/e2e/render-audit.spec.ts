@@ -78,6 +78,7 @@ const SIMPLE_PAGES = [
   "/wiki/E755",  // About page
   "/wiki/E779",  // Internal overview
   "/wiki/E100",  // Anthropic wiki page
+  "/wiki/E815",  // Anthropic Stakeholders — critical table page
   "/browse",
 ];
 
@@ -145,4 +146,20 @@ test.describe("Render audit — simple pages", () => {
       checkAntiPatterns(await getMainText(page), url);
     });
   }
+});
+
+test.describe("Render audit — critical data tables", () => {
+  test("E815 Anthropic Stakeholders table renders (not error fallback)", async ({ page }) => {
+    await loadPage(page, "/wiki/E815");
+    const text = await getMainText(page);
+
+    // The table must NOT show the error fallback
+    expect(text).not.toContain("temporarily unavailable");
+    expect(text).not.toContain("valuation fact not found");
+
+    // The table should contain stakeholder data
+    expect(text).toContain("Stakeholder");
+    // Valuation should be formatted (e.g., "$380B"), not raw
+    expect(text).toMatch(/\$\d+[BMT]/);
+  });
 });

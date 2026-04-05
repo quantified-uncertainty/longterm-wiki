@@ -54,6 +54,9 @@ export function getFactBase(): SerializedKB | undefined {
  * Resolution: idRegistry stableIdBySlug → identity (pass-through if already a stableId).
  */
 function resolveEntityKey(entityOrSlug: string): string {
+  // Already a stableId (sid_ prefix) — return as-is
+  if (isSid(entityOrSlug)) return entityOrSlug;
+
   // Use idRegistry from TableBase (covers all entities)
   try {
     const registry = getIdRegistry();
@@ -62,6 +65,14 @@ function resolveEntityKey(entityOrSlug: string): string {
   } catch {
     // database.json not available yet (during build) — ignore
   }
+
+  // Fallback: if it looks like a bare 10-char ID, try with sid_ prefix.
+  // FactBase fact keys use sid_-prefixed stableIds, but callers sometimes
+  // pass bare IDs (e.g., "mK9pX3rQ7n" instead of "sid_mK9pX3rQ7n").
+  if (/^[A-Za-z0-9]{10}$/.test(entityOrSlug)) {
+    return `sid_${entityOrSlug}`;
+  }
+
   return entityOrSlug;
 }
 
