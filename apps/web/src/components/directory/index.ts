@@ -21,3 +21,4 @@ export {
   type FilterChipItem,
   type FilterChipsProps,
 } from "./FilterChips";
+export { EntityDataPage } from "./EntityDataPage";

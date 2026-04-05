@@ -451,10 +451,10 @@ export default async function PersonProfilePage({
               </Link>
             )}
             <Link
-              href={`/factbase/entity/${entity.id}`}
+              href={`/people/${slug}/data`}
               className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
-              FactBase &rarr;
+              Data &rarr;
             </Link>
           </div>
         </div>
