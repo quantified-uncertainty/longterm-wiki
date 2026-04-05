@@ -806,6 +806,10 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
  * from the old `data_sources.id` column. The resource's URL is the fetch URL or a
  * synthetic URN for URL-less sources ('urn:lw:tabular-source:<slug>').
  *
+ * Intentionally omits lastSnapshotAt, snapshotRecordCount, latestSnapshotHash —
+ * these are denormalized caches derivable from source_snapshots/resource_content_versions.
+ * The old data_sources table had them; they should not be re-added here.
+ *
  * Part of: Unify Data Sources into Resources (Discussion #3567, PR 2/5).
  */
 export const resourceTabularSources = pgTable("resource_tabular_sources", {
