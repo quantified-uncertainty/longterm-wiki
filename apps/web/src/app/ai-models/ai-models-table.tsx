@@ -401,6 +401,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                     developer: row.developer,
                     releaseDate: row.releaseDate,
                     inputPrice: row.inputPrice,
+                    outputPrice: row.outputPrice,
                     contextWindow: row.contextWindow,
                     parameterCount: row.parameterCount,
                     safetyLevel: row.safetyLevel,

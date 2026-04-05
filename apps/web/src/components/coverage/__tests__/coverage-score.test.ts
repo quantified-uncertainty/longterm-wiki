@@ -5,7 +5,7 @@ import {
   computeAiModelCoverage,
   computeLegislationCoverage,
   computeGenericCoverage,
-} from "../coverage-score";
+} from "@/components/coverage/coverage-score";
 
 describe("computeOrgCoverage", () => {
   it("returns 1 for empty/minimal data", () => {

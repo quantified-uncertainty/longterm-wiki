@@ -253,7 +253,7 @@ async function loadFromApi(
       foundedDate,
 
       peopleCount: null,
-      completionScore: computeOrgCoverage({}),
+      completionScore: computeOrgCoverage({ foundedDate }),
 
       searchText: searchParts.join(" ").toLowerCase(),
     });
