@@ -11,8 +11,6 @@ import {
 } from "@/components/wiki/factbase/format";
 import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
 
-import type { VerdictRow } from "./entity-detail-shared";
-import { VerdictBadge } from "./entity-verdict";
 import { SectionHeader } from "./entity-section-header";
 
 export function SourceCell({ fact }: { fact: Fact }) {
@@ -98,13 +96,11 @@ export function CategoryFactSection({
   categoryLabel,
   propertyIds,
   factGroups,
-  verdicts,
 }: {
   category: string;
   categoryLabel: string;
   propertyIds: string[];
   factGroups: Map<string, Fact[]>;
-  verdicts: Map<string, VerdictRow>;
 }) {
   return (
     <section className="mb-6">
@@ -123,7 +119,7 @@ export function CategoryFactSection({
             <details key={propertyId} id={propertyId} className="group scroll-mt-16">
               <summary className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 text-sm select-none transition-colors">
                 <span className="inline-flex items-center gap-1.5 font-semibold min-w-[10rem] text-foreground/90">
-                  <FactSourceCheckDot factId={latestFact.id} size="sm" />
+                  <FactSourceCheckDot factId={latestFact.id} sourceUrl={latestFact.source} size="sm" />
                   {property?.name ?? propertyId}
                 </span>
                 <span className="flex-1 text-muted-foreground truncate font-mono text-[13px]">
@@ -154,24 +150,16 @@ export function CategoryFactSection({
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-xs text-muted-foreground border-b border-border">
-                      <th className="text-left py-1 pr-1 font-medium w-5"></th>
                       <th className="text-left py-1 pr-3 font-medium">As Of</th>
                       <th className="text-left py-1 pr-3 font-medium">Value</th>
-                      <th className="text-left py-1 pr-3 font-medium">Source</th>
-                      {verdicts.size > 0 && (
-                        <th className="text-left py-1 pr-3 font-medium">Verified</th>
-                      )}
-                      <th className="text-left py-1 font-medium">Fact ID</th>
+                      <th className="text-left py-1 pr-3 font-medium">Fact ID</th>
+                      <th className="text-left py-1 font-medium w-5"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/50">
                     {facts.map((fact) => {
-                      const verdict = verdicts.get(fact.id);
                       return (
                         <tr key={fact.id} id={fact.id} className="scroll-mt-16">
-                          <td className="py-1.5 pr-1">
-                            <FactSourceCheckDot factId={fact.id} size="md" />
-                          </td>
                           <td className="py-1.5 pr-3 text-muted-foreground whitespace-nowrap">
                             {formatKBDate(fact.asOf)}
                           </td>
@@ -179,24 +167,15 @@ export function CategoryFactSection({
                             <FactValueDisplay fact={fact} property={property} />
                           </td>
                           <td className="py-1.5 pr-3">
-                            <SourceCell fact={fact} />
-                          </td>
-                          {verdicts.size > 0 && (
-                            <td className="py-1.5 pr-3">
-                              {verdict ? (
-                                <VerdictBadge verdict={verdict} />
-                              ) : (
-                                <span className="text-xs text-muted-foreground">&mdash;</span>
-                              )}
-                            </td>
-                          )}
-                          <td className="py-1.5">
                             <Link
                               href={`/factbase/fact/${fact.id}`}
                               className="text-blue-600 hover:underline dark:text-blue-400 font-mono text-xs"
                             >
                               {fact.id}
                             </Link>
+                          </td>
+                          <td className="py-1.5 pl-1">
+                            <FactSourceCheckDot factId={fact.id} sourceUrl={fact.source} size="md" />
                           </td>
                         </tr>
                       );

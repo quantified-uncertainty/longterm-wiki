@@ -10,10 +10,12 @@ import { factbaseVerdictToStatus } from "./source-check-status";
 
 export function FactSourceCheckDot({
   factId,
+  sourceUrl,
   size = "sm",
   className,
 }: {
   factId: string;
+  sourceUrl?: string | null;
   size?: "sm" | "md";
   className?: string;
 }) {
@@ -23,6 +25,7 @@ export function FactSourceCheckDot({
     <SourceCheckDot
       status={factbaseVerdictToStatus(verification)}
       originalVerdict={verification}
+      sourceUrl={sourceUrl}
       size={size}
       className={className}
     />
