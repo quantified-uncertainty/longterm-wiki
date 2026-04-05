@@ -177,43 +177,6 @@ export async function getCitationContentStats(): Promise<ApiResult<CitationConte
 }
 
 // ---------------------------------------------------------------------------
-// Content Version History API functions
-// ---------------------------------------------------------------------------
-
-type ContentHistoryResult = InferResponseType<RpcClient['content']['history']['$get'], 200>;
-type ContentVersionResult = InferResponseType<RpcClient['content']['history'][':id']['$get'], 200>;
-type ContentAtResult = InferResponseType<RpcClient['content']['at']['$get'], 200>;
-
-export type { ContentHistoryResult, ContentVersionResult, ContentAtResult };
-
-export async function listContentHistory(
-  url: string,
-  limit = 20,
-  offset = 0,
-): Promise<ApiResult<ContentHistoryResult>> {
-  return apiRequest<ContentHistoryResult>(
-    'GET',
-    `/api/citations/content/history?url=${encodeURIComponent(url)}&limit=${limit}&offset=${offset}`,
-  );
-}
-
-export async function getContentVersion(
-  id: number,
-): Promise<ApiResult<ContentVersionResult>> {
-  return apiRequest<ContentVersionResult>('GET', `/api/citations/content/history/${id}`);
-}
-
-export async function getContentAtDate(
-  url: string,
-  date: string,
-): Promise<ApiResult<ContentAtResult>> {
-  return apiRequest<ContentAtResult>(
-    'GET',
-    `/api/citations/content/at?url=${encodeURIComponent(url)}&date=${encodeURIComponent(date)}`,
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Citation Quotes Query API functions
 // ---------------------------------------------------------------------------
 
