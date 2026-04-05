@@ -37,6 +37,19 @@ gh issue list --limit 30 --json number,title,labels,createdAt --jq '.[] | "\(.nu
 
 Also read the session log review from `crux sys maintain` output if available — it extracts issues and learnings from session logs and flags recurring problems.
 
+### Claude Code Usage Patterns
+
+Analyze the user's actual Claude Code conversation logs to understand how they interact with the tool:
+
+```bash
+# Usage patterns from the same period (reads ~/.claude/projects/ JSONL files)
+pnpm crux sys usage-patterns --since=$(date -v-7d +%Y-%m-%d 2>/dev/null || date -d '7 days ago' +%Y-%m-%d) 2>/dev/null || echo "usage-patterns unavailable"
+```
+
+This surfaces: message style distribution (questions vs directives), slash command frequency, tool usage rankings, session timing (by hour/day), entrypoint breakdown (CLI vs mobile vs web), and session length distribution. Use this data in Phase 2 analysis.
+
+**Note:** On a multi-slot setup (lw/a1–a15), each slot has its own `~/.claude/projects/` directory. To get a full picture, run with `--dir=` pointing to each slot's home, or run on the main machine where all slots are visible.
+
 ## Phase 2: Analyze Patterns
 
 Work through each of these lenses. Use the data from Phase 1 as evidence.
@@ -79,9 +92,27 @@ If agents filed issues during the period, review them:
 Count:
 - Wiki content pages created or substantively updated
 - Lines of infrastructure code added (net)
-- Number of internal dashboards or monitoring systems added
 
-Is the ratio reasonable for the project's current goals?
+### 2f. Usage Patterns (from Claude Code logs)
+
+Using the `crux sys usage-patterns` output from Phase 1:
+
+**Interaction style:** What's the question-to-directive ratio? A high question ratio may indicate the user is exploring/uncertain; a high directive ratio means they know what they want. Look for shifts over time.
+
+**Session efficiency:** Are there many short sessions (≤2 messages)? These may indicate false starts, misrouted tasks, or sessions that should have been combined. Flag if short sessions exceed 30% of total.
+
+**Entrypoint distribution:** Where is the user primarily working from (CLI, mobile, web, IDE)? Different entrypoints suggest different usage contexts — mobile sessions tend to be shorter and more conversational.
+
+**Tool usage trends:** Which tools dominate? If Bash dominates over dedicated tools (Grep, Read, Edit), the agent may not be using the right tools. If Agent subagent calls are very high, check whether they're being used efficiently.
+
+**Slash command adoption:** Which slash commands are used most? Are there commands that should be used more (e.g., `/agent-init` should appear in most sessions)?
+
+**Timing patterns:** When does the user work? Are there productivity peaks at certain hours? Weekend vs weekday distribution?
+
+**Optimization opportunities:** Based on all the above, identify 2-3 concrete suggestions for improving the user's workflow. Examples:
+- "You ask 'where is X' frequently — consider using the Explore agent or grep more"
+- "40% of sessions are from mobile with short messages — consider a mobile-optimized prompt template"
+- "You rarely use /maintain — consider scheduling it weekly"
 
 ## Phase 3: Write the Report
 
@@ -115,6 +146,14 @@ Each recommendation should state:
 - What to change
 - Why (with evidence from this retrospective)
 - Expected impact
+
+### Usage Pattern Insights
+- Sessions: X total, Y short (≤2 msgs), Z avg messages/session
+- Interaction style: X% questions, Y% directives
+- Top entrypoints: [CLI: N, mobile: N, web: N]
+- Peak hours: [list top 3]
+- Most-used slash commands: [top 5]
+- Workflow optimization opportunities: [2-3 specific suggestions]
 ```
 
 ## Phase 4: Act

@@ -116,6 +116,7 @@ import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
 import * as benchmarksCommands from './commands/benchmarks.ts';
+import * as usagePatternsCommands from './commands/usage-patterns.ts';
 
 const domains = {
   validate: validateCommands,
@@ -196,6 +197,7 @@ const domains = {
   'deploy-tasks': deployTasksCommands,
   'agent-reset': agentResetCommands,
   benchmarks: benchmarksCommands,
+  'usage-patterns': usagePatternsCommands,
 };
 
 const shortcutMap = buildShortcutMap();
