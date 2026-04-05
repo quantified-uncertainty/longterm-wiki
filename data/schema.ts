@@ -733,6 +733,10 @@ export const Entity = z.object({
     'generic',        // General organizations
     'other',          // Catch-all for unclassified orgs
   ]).optional(),
+  // Organization operational lifecycle status — distinct from content maturity (status field)
+  orgStatus: z.enum([
+    'active', 'merged', 'acquired', 'defunct', 'dissolved', 'inactive',
+  ]).optional(),
   // InfoBox fields
   severity: z.enum([
     'low', 'medium', 'medium-high', 'high', 'critical', 'catastrophic',

@@ -159,7 +159,7 @@ export const CURATED_COLLECTIONS = new Set([
 
 export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
-export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
+export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, ORG_STATUS_LABELS, ORG_STATUS_COLORS } from "@/app/organizations/org-constants";
 
 export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
   { id: "financial", label: "Financial", order: 0 },
@@ -975,6 +975,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const typedEntity = getTypedEntityById(slug);
   const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
   const orgType = orgData?.orgType ?? null;
+  const orgStatus = orgData?.orgStatus ?? null;
 
   // Header facts (description/website come from entity YAML, not KB facts)
   const hqFact = getKBLatest(entity.id, "headquarters");
@@ -1454,6 +1455,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
 
   return {
     orgType,
+    orgStatus,
     hqText,
     allCollections,
     otherCollections,

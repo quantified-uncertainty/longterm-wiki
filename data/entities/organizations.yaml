@@ -1543,6 +1543,7 @@
   wikiId: E140
   type: organization
   orgType: academic
+  orgStatus: defunct
   summaryPage: safety-orgs-overview
   title: Future of Humanity Institute
   website: https://www.futureofhumanityinstitute.org
@@ -1550,7 +1551,6 @@
     Oxford University research center focused on existential risks, founded by
     Nick Bostrom. Closed in April 2024. Website (fhi.ox.ac.uk) no longer
     available.
-  status: stub
   relatedEntries:
     - id: sid_IQvWHA3OiF
       type: person
@@ -7046,6 +7046,7 @@
   wikiId: E1987
   type: organization
   orgType: safety-org
+  orgStatus: defunct
   summaryPage: safety-orgs-overview
   title: Center for AI Policy
   website: https://www.centeraipolicy.org
@@ -7162,6 +7163,7 @@
   type: organization
   orgType: other
   title: Google Brain
+  orgStatus: merged
   description: >-
     Deep learning research team at Google, founded in 2011. Merged with DeepMind in April 2023
     to form Google DeepMind. Produced foundational AI research including TensorFlow, the

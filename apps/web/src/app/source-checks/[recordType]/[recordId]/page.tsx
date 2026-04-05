@@ -39,36 +39,86 @@ function formatJsonValue(v: unknown): string {
   return String(v);
 }
 
+/** Try to parse a string as a JSON object and return non-empty entries, or null. */
+function parseJsonObjectEntries(text: string): [string, unknown][] | null {
+  if (!text.startsWith("{")) return null;
+  try {
+    const parsed = JSON.parse(text);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
+    const entries = Object.entries(parsed).filter(
+      ([, v]) => v !== null && v !== undefined && v !== ""
+    );
+    return entries.length > 0 ? entries : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Format an extractedQuote for display. Strips "Matched row:" prefix and renders JSON nicely. */
+function FormatQuote({ quote }: { quote: string }) {
+  let text = quote.trim();
+
+  // Strip "Matched row:" or similar prefixes
+  const prefixMatch = text.match(/^(?:Matched row|Found row|Row match)[:\s]*/i);
+  if (prefixMatch) {
+    text = text.slice(prefixMatch[0].length).trim();
+  }
+
+  const entries = parseJsonObjectEntries(text);
+  if (entries) {
+    return (
+      <div className="rounded-md bg-muted/40 px-3 py-2 mb-2 text-sm space-y-1">
+        {entries.slice(0, 8).map(([k, v]) => (
+          <div key={k} className="flex gap-2">
+            <span className="text-muted-foreground shrink-0">{k}:</span>
+            <span className="text-foreground/80 break-all">{formatJsonValue(v)}</span>
+          </div>
+        ))}
+        {entries.length > 8 && (
+          <div className="text-xs text-muted-foreground">+{entries.length - 8} more fields</div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-2">
+      {text}
+    </blockquote>
+  );
+}
+
 /** Format an extractedValue for display. Detects JSON and renders key-value summary. */
 function FormatExtractedValue({ value }: { value: string }) {
   const trimmed = value.trim();
 
-  // Detect JSON objects or arrays
-  if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+  // JSON objects
+  const entries = parseJsonObjectEntries(trimmed);
+  if (entries) {
+    const shown = entries.slice(0, 5);
+    const remaining = entries.length - shown.length;
+    return (
+      <span className="text-sm">
+        {shown.map(([k, v], i) => (
+          <span key={k}>
+            {i > 0 && ", "}
+            <span className="font-medium text-foreground/70">{k}:</span>{" "}
+            {formatJsonValue(v)}
+          </span>
+        ))}
+        {remaining > 0 && (
+          <span className="text-muted-foreground"> (+{remaining} more)</span>
+        )}
+      </span>
+    );
+  }
+
+  // JSON arrays
+  if (trimmed.startsWith("[")) {
     try {
       const parsed = JSON.parse(trimmed);
-      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
-        const entries = Object.entries(parsed);
-        const shown = entries.slice(0, 5);
-        const remaining = entries.length - shown.length;
-        return (
-          <span className="text-sm">
-            {shown.map(([k, v], i) => (
-              <span key={k}>
-                {i > 0 && ", "}
-                <span className="font-medium text-foreground/70">{k}:</span>{" "}
-                {formatJsonValue(v)}
-              </span>
-            ))}
-            {remaining > 0 && (
-              <span className="text-muted-foreground"> (+{remaining} more)</span>
-            )}
-          </span>
-        );
-      }
       if (Array.isArray(parsed)) {
         if (parsed.length === 0) return <span className="text-sm text-muted-foreground">[empty]</span>;
-        // Show first few items for simple arrays
         if (parsed.every((item) => typeof item !== "object" || item === null)) {
           const shown = parsed.slice(0, 5).map((item) => formatJsonValue(item));
           const remaining = parsed.length - shown.length;
@@ -227,8 +277,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       <div className="mb-6">
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
           <span className="capitalize">{formatRecordType(recordType)}</span>
-          <span>&middot;</span>
-          <span className="font-mono">{recordId}</span>
         </div>
         <h1 className="text-2xl font-bold mb-1">
           {claimSummary ?? displayName}
@@ -247,12 +295,12 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           {entityHref && (
             <Link href={entityHref} className="text-primary hover:underline">
               {recordType === "personnel"
-                ? "View organization page"
+                ? "Organization page"
                 : recordType === "division"
-                  ? "View parent organization"
+                  ? "Parent organization"
                   : claimEntityName
-                    ? `${claimEntityName} wiki page`
-                    : "View entity page"} &rarr;
+                    ? `${claimEntityName} page`
+                    : "Profile page"} &rarr;
             </Link>
           )}
         </div>
@@ -488,9 +536,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
                         {/* Quote */}
                         {e.extractedQuote && (
-                          <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-2">
-                            {e.extractedQuote}
-                          </blockquote>
+                          <FormatQuote quote={e.extractedQuote} />
                         )}
 
                         {/* Notes */}
