@@ -105,9 +105,11 @@ const CATEGORY_LABELS: Record<string, string> = Object.fromEntries(CATEGORIES.ma
 interface FactBaseEntityBodyProps {
   /** FactBase entity ID (slug, e.g. "anthropic") */
   entityId: string;
+  /** Skip fetching verdicts from wiki-server (for embedding in directory pages that use local data only). */
+  skipVerdicts?: boolean;
 }
 
-export async function FactBaseEntityBody({ entityId }: FactBaseEntityBodyProps) {
+export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEntityBodyProps) {
   const entity = getKBEntity(entityId);
   if (!entity) {
     return (
@@ -121,7 +123,9 @@ export async function FactBaseEntityBody({ entityId }: FactBaseEntityBodyProps) 
   const structuredFacts = allFacts.filter((f) => f.propertyId !== "description");
   const factGroups = groupFactsByProperty(allFacts);
   const itemCollections = getKBAllRecordCollections(entityId);
-  const verdicts = await fetchEntityVerdicts(entityId);
+  const verdicts = skipVerdicts
+    ? new Map<string, VerdictRow>()
+    : await fetchEntityVerdicts(entityId);
 
   const propertyCache = new Map<string, Property | undefined>();
   for (const propId of factGroups.keys()) {
