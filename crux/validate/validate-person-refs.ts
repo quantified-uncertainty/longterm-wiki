@@ -104,22 +104,18 @@ function buildNameLookup(entitiesDir: string): EntityNameLookup {
     return { hasEntity: () => false, getName: () => null };
   }
 
-  // Use a simple regex-based approach to avoid YAML tag issues
+  // Use a simple regex-based approach to avoid YAML tag issues.
+  // Entity YAML files are arrays of objects at 2-space indent. Match
+  // stableId/title at exactly that indent to avoid nested false positives.
   for (const file of files) {
     const content = readFileSync(join(entitiesDir, file), "utf-8");
-    // Entity YAML files are arrays of objects. Extract stableId + title pairs.
-    // The format is:
-    //   - id: slug
-    //     stableId: sid_XYZ
-    //     title: "Human Name"
-    const stableIdRegex = /^\s+stableId:\s*(\S+)/gm;
-    const titleRegex = /^\s+title:\s*(.+)/gm;
 
-    // Parse blocks: each entity starts with "- id:"
+    // Parse blocks: each entity starts with "- id:" at column 0
     const blocks = content.split(/^- /m).slice(1);
     for (const block of blocks) {
-      const sidMatch = block.match(/stableId:\s*(\S+)/);
-      const titleMatch = block.match(/title:\s*(.+)/);
+      // Match at 2-space indent (top-level entity fields, not nested)
+      const sidMatch = block.match(/^ {0,2}stableId:\s*(\S+)/m);
+      const titleMatch = block.match(/^ {0,2}title:\s*(.+)/m);
       if (sidMatch && titleMatch) {
         const sid = sidMatch[1].replace(/^["']|["']$/g, "");
         const title = titleMatch[1].trim().replace(/^["']|["']$/g, "");

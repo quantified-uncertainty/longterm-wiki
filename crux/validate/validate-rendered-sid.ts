@@ -142,14 +142,14 @@ function scanFactbaseDataJson(dataDir: string): {
   }
 
   // Check records for sid_ in displayName fields
-  const records = data.records as Record<
-    string,
-    Record<string, Array<Record<string, unknown>>>
-  > | undefined;
-  if (records) {
-    for (const [entityId, collections] of Object.entries(records)) {
-      for (const [collection, entries] of Object.entries(collections)) {
-        for (const entry of entries) {
+  const records = data.records;
+  if (records && typeof records === "object" && !Array.isArray(records)) {
+    for (const [entityId, collections] of Object.entries(records as Record<string, unknown>)) {
+      if (!collections || typeof collections !== "object" || Array.isArray(collections)) continue;
+      for (const [collection, entries] of Object.entries(collections as Record<string, unknown>)) {
+        if (!Array.isArray(entries)) continue;
+        for (const entry of entries as Array<Record<string, unknown>>) {
+          if (!entry || typeof entry !== "object") continue;
           recordsChecked++;
           // Check displayName field
           if (containsSid(entry.displayName)) {
@@ -188,13 +188,11 @@ function scanFactbaseDataJson(dataDir: string): {
   }
 
   // Check facts for sid_ leaking into text display values
-  const facts = data.facts as Record<
-    string,
-    Array<Record<string, unknown>>
-  > | undefined;
-  if (facts) {
-    for (const [entityId, entityFacts] of Object.entries(facts)) {
-      for (const fact of entityFacts) {
+  const facts = data.facts;
+  if (facts && typeof facts === "object" && !Array.isArray(facts)) {
+    for (const [entityId, entityFacts] of Object.entries(facts as Record<string, unknown>)) {
+      if (!Array.isArray(entityFacts)) continue;
+      for (const fact of entityFacts as Array<Record<string, unknown>>) {
         factsChecked++;
         const value = fact.value as Record<string, unknown> | undefined;
         if (!value) continue;
@@ -235,6 +233,18 @@ export function runValidation(opts: {
 
   const dbResult = scanDatabaseJson(dataDir);
   const fbResult = scanFactbaseDataJson(dataDir);
+
+  // Warn if no data was found — the check is vacuous without build artifacts
+  if (dbResult.entitiesChecked === 0 && fbResult.factsChecked === 0) {
+    if (!ci) {
+      console.log(
+        `${c.yellow}Warning: No built data files found — run pnpm build-data first.${c.reset}`,
+      );
+      console.log(
+        `${c.dim}This check is only meaningful after build-data generates database.json and factbase-data.json.${c.reset}\n`,
+      );
+    }
+  }
 
   const allLeaks = [...dbResult.leaks, ...fbResult.leaks];
   const passed = allLeaks.length === 0;
