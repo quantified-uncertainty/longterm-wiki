@@ -26,6 +26,7 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
+ *   --force        Override soft-enforcement blocks (e.g., verification coverage)
  *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
  *                    unified-blocking + yaml-schema (no stamp cache written)
  *
@@ -60,6 +61,7 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const FULL_GATE: boolean = args.includes('--full-gate');
 const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
 const NO_CACHE: boolean = args.includes('--no-cache') || FULL_GATE || CI_MODE;
+const FORCE_MODE: boolean = args.includes('--force');
 const SCOPE: string = args.find(a => a.startsWith('--scope='))?.split('=')[1] || '';
 const CONTENT_ONLY: boolean = SCOPE === 'content';
 
@@ -622,14 +624,14 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'verification-coverage',
-    name: 'TableBase verification coverage (advisory)',
+    name: 'TableBase verification coverage',
     command: 'npx',
-    args: ['tsx', 'crux/validate/validate-verification-coverage.ts'],
+    args: ['tsx', 'crux/validate/validate-verification-coverage.ts', '--enforcement=soft',
+      ...(FORCE_MODE ? ['--force'] : [])],
     cwd: PROJECT_ROOT,
-    // Advisory: warns when TableBase submissions in data/tablebase-manifests/
-    // include records without verification. Does not block — verification is
-    // encouraged but not yet mandatory for all tables.
-    advisory: true,
+    // Soft enforcement (Discussion #3875 Phase 4): blocks when TableBase
+    // submissions have unverified records, unless --force is passed to the gate.
+    // Hard-enforced tables (Phase 5) cannot be overridden with --force.
     emitOutputInCi: true,
   },
   {

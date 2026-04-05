@@ -271,8 +271,12 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   const tableConfig = getTableConfig(table);
   if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
 
-  const syncPath = options.skipEntityValidation
-    ? `${tableConfig.syncPath}?skipEntityValidation=true`
+  // Build sync path with query params
+  const queryParams: string[] = [];
+  if (options.skipEntityValidation) queryParams.push('skipEntityValidation=true');
+  if (tableConfig.requireVerification) queryParams.push('requireVerification=true');
+  const syncPath = queryParams.length > 0
+    ? `${tableConfig.syncPath}?${queryParams.join('&')}`
     : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     tableConfig.syncMethod, syncPath, { [tableConfig.syncBodyKey]: recordsToSubmit },
