@@ -32,9 +32,14 @@ describe("resolveEntityKey — Anthropic valuation lookup", () => {
   });
 
   it("returns equity-positions records for anthropic", () => {
-    // The stakeholders table also needs equity records
+    // The stakeholders table also needs equity records.
+    // Records require PG merge at build time — may be empty in some test envs.
     const records = getKBRecords("sid_mK9pX3rQ7n", "equity-positions");
-    // Records may be empty if PG isn't available, but the lookup shouldn't crash
     expect(Array.isArray(records)).toBe(true);
+    // If records exist, verify they have the expected shape
+    if (records.length > 0) {
+      expect(records[0]).toHaveProperty("fields");
+      expect(records[0].fields).toHaveProperty("holder");
+    }
   });
 });

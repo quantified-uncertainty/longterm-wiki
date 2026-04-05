@@ -66,9 +66,12 @@ function resolveEntityKey(entityOrSlug: string): string {
     // database.json not available yet (during build) — ignore
   }
 
-  // Fallback: if it looks like a bare 10-char ID, try with sid_ prefix.
-  // FactBase fact keys use sid_-prefixed stableIds, but callers sometimes
-  // pass bare IDs (e.g., "mK9pX3rQ7n" instead of "sid_mK9pX3rQ7n").
+  // Fallback: if it looks like a bare 10-char stableId (without sid_ prefix),
+  // try with prefix. FactBase fact keys use sid_-prefixed stableIds, but
+  // callers sometimes pass bare IDs (e.g., "mK9pX3rQ7n" instead of
+  // "sid_mK9pX3rQ7n"). Safe even if the input is a real slug like
+  // "truthfulqa" — those resolve via stableIdBySlug above, and if they
+  // don't, sid_truthfulqa simply won't match any fact key (same as before).
   if (/^[A-Za-z0-9]{10}$/.test(entityOrSlug)) {
     return `sid_${entityOrSlug}`;
   }
