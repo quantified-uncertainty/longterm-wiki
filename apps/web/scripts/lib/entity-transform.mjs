@@ -240,6 +240,7 @@ function transformEntity(raw, expertMap, orgMap) {
         // parentOrg: legally separate entity that is part of a larger org.
         // Distinct from "divisions" (internal sub-units stored in wiki-server).
         parentOrg: raw.parentOrg || orgData?.parentOrg || undefined,
+        orgStatus: raw.orgStatus || undefined,
         customFields: filterCustomFields('Founded', 'Established', 'Location', 'Headquarters', 'Employees', 'Funding'),
       };
     }

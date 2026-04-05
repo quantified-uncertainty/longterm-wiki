@@ -111,6 +111,14 @@ export const VALID_MATURITIES = new Set<string>(ResearchMaturityEnum.options);
 export const VALID_STATUSES = new Set<string>(EntityStatusEnum.options);
 
 /**
+ * Valid organization operational status values.
+ * Distinct from EntityStatus (stub/draft/published/verified) which tracks editorial state.
+ */
+export const VALID_ORG_STATUSES = new Set([
+  "active", "merged", "acquired", "defunct", "dissolved", "inactive",
+] as const);
+
+/**
  * Valid cluster values — extracted from data/schema.ts Entity.clusters enum.
  */
 export const VALID_CLUSTERS = new Set([
@@ -205,6 +213,7 @@ export interface EntityData {
   id: string;
   type?: string;
   orgType?: string;
+  orgStatus?: string;
   severity?: string;
   maturity?: string;
   status?: string;
@@ -354,6 +363,9 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
 
     // 2. orgType
     checkValue("orgType", entity.orgType, VALID_ORG_TYPES, id, src, issues);
+
+    // 2b. orgStatus (operational status — distinct from editorial status)
+    checkValue("orgStatus", entity.orgStatus, VALID_ORG_STATUSES, id, src, issues);
 
     // 3. severity
     checkValue("severity", entity.severity, VALID_SEVERITIES, id, src, issues);
@@ -610,6 +622,7 @@ export async function validateControlledVocab(options?: {
         { name: "type", values: VALID_ENTITY_TYPES },
         { name: "relatedEntries.relationship", values: VALID_RELATIONSHIPS },
         { name: "orgType", values: VALID_ORG_TYPES },
+        { name: "orgStatus", values: VALID_ORG_STATUSES },
         { name: "severity", values: VALID_SEVERITIES },
         { name: "maturity", values: VALID_MATURITIES },
         { name: "status", values: VALID_STATUSES },
