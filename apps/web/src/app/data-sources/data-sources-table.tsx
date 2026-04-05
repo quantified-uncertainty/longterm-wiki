@@ -12,6 +12,8 @@ import Link from "next/link";
 export interface DataSourceRow {
   id: string;
   name: string;
+  /** Resource ID from unified resources table (null if migration hasn't run) */
+  resourceId: string | null;
   dataFormat: string;
   recordType: string;
   publisherName: string | null;

@@ -21,6 +21,7 @@ function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
     return {
       id: s.id,
       name: s.name,
+      resourceId: s.resourceId,
       dataFormat: s.dataFormat,
       recordType: s.recordType,
       publisherName: publisher?.name ?? null,
@@ -154,7 +155,7 @@ export async function DataSourcesContent() {
       <DataSourcesTable rows={rows} />
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data from <code>data_sources</code> table via wiki-server API.
+        Data from <code>data_sources</code> + <code>resource_tabular_sources</code> tables via wiki-server API.
         Freshness computed from <code>lastSnapshotAt</code> relative to{" "}
         <code>updateFrequency</code>.
       </p>
