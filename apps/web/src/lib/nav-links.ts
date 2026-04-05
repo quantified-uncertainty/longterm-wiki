@@ -25,6 +25,7 @@ export const NAV_ITEMS: NavItem[] = [
       { href: "/people", label: "People" },
       { href: "/ai-models", label: "AI Models" },
       { href: "/projects", label: "Projects" },
+      { href: "/funding-programs", label: "Funding Programs" },
     ],
   },
   {
@@ -39,8 +40,8 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Policy",
     items: [
       { href: "/legislation", label: "Legislation" },
-      // /races hidden from nav — page is empty (0 entries). Re-add when data exists.
-      { href: "/funding-programs", label: "Funding" },
+      { href: "/politicians", label: "Politicians" },
+      { href: "/races", label: "Races" },
     ],
   },
   {
