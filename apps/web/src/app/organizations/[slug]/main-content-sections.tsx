@@ -62,6 +62,7 @@ export function FundingHistorySection({
               {hasInstrument && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -79,16 +80,9 @@ export function FundingHistorySection({
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
-                    <span className="inline-flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(roundVerdict)}
-                        originalVerdict={roundVerdict}
-                        href={getSourceCheckHref("funding-round", String(round.key))}
-                      />
-                      <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
-                        {name}
-                      </Link>
-                    </span>
+                    <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
+                      {name}
+                    </Link>
                   </td>
                   <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : "\u2014"}
@@ -119,6 +113,14 @@ export function FundingHistorySection({
                       {instrument && <Badge>{instrument}</Badge>}
                     </td>
                   )}
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(roundVerdict)}
+                      originalVerdict={roundVerdict}
+                      size="md"
+                      href={getSourceCheckHref("funding-round", String(round.key))}
+                    />
+                  </td>
                 </tr>
               );
             })}
@@ -159,6 +161,7 @@ export function InvestorParticipationSection({
               {hasDate && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -177,20 +180,13 @@ export function InvestorParticipationSection({
               return (
                 <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
-                    <span className="inline-flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(invVerdict)}
-                        originalVerdict={invVerdict}
-                        href={getSourceCheckHref("investment", String(inv.key))}
-                      />
-                      {investorHref ? (
-                        <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
-                          {investorName}
-                        </Link>
-                      ) : (
-                        <span className="font-medium">{investorName}</span>
-                      )}
-                    </span>
+                    {investorHref ? (
+                      <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
+                        {investorName}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{investorName}</span>
+                    )}
                   </td>
                   {hasRound && (
                     <td className="py-1.5 px-3 text-muted-foreground">
@@ -213,6 +209,14 @@ export function InvestorParticipationSection({
                       {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(invVerdict)}
+                      originalVerdict={invVerdict}
+                      size="md"
+                      href={getSourceCheckHref("investment", String(inv.key))}
+                    />
+                  </td>
                 </tr>
               );
             })}

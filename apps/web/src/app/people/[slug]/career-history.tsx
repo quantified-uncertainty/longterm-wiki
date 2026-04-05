@@ -31,11 +31,13 @@ export function CareerHistory({
           const verdict = getRecordVerdict("personnel", String(entry.key));
 
           return (
-            <div key={entry.key} className="px-5 py-3.5">
+            <div key={entry.key} className="px-5 py-3.5 relative">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold text-sm">{entry.title}</span>
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
+              </div>
+              <div className="absolute top-3.5 right-4">
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}

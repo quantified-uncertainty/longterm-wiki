@@ -349,6 +349,7 @@ export function FundingProgramsListTable({
                 onSort={handleSort}
                 className="text-center"
               />
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -359,20 +360,12 @@ export function FundingProgramsListTable({
               >
                 {/* Name */}
                 <td className="py-2.5 px-3">
-                  <span className="flex items-center gap-1.5">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(row.verdict?.verdict)}
-                      originalVerdict={row.verdict?.verdict}
-                      size="md"
-                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
-                    />
-                    <Link
-                      href={`/funding-programs/${row.id}`}
-                      className="font-medium text-foreground hover:text-primary transition-colors"
-                    >
-                      {row.name}
-                    </Link>
-                  </span>
+                  <Link
+                    href={`/funding-programs/${row.id}`}
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    {row.name}
+                  </Link>
                   {row.applicationUrl && (
                     <a
                       href={row.applicationUrl}
@@ -441,6 +434,15 @@ export function FundingProgramsListTable({
                   )}
                 </td>
 
+                {/* Verification */}
+                <td className="py-2.5 px-1">
+                  <SourceCheckDot
+                    status={recordVerdictToStatus(row.verdict?.verdict)}
+                    originalVerdict={row.verdict?.verdict}
+                    size="md"
+                    href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                  />
+                </td>
               </tr>
             ))}
           </tbody>

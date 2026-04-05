@@ -98,6 +98,9 @@ function DivisionCard({
 
   const divHref = getDivisionHref(d);
   const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
+  const cardSourceCheckHref = cardVerdict
+    ? `/source-checks/division/${encodeURIComponent(String(d.key))}`
+    : undefined;
 
   return (
     <div
@@ -105,10 +108,6 @@ function DivisionCard({
     >
       <div className="flex items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0">
-          <SourceCheckDot
-            status={recordVerdictToStatus(cardVerdict)}
-            originalVerdict={cardVerdict}
-          />
           <span className="truncate">
             {divHref ? (
               <Link
@@ -123,6 +122,12 @@ function DivisionCard({
           </span>
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
+          <SourceCheckDot
+            status={recordVerdictToStatus(cardVerdict)}
+            originalVerdict={cardVerdict}
+            href={cardSourceCheckHref}
+            className="relative z-10"
+          />
           {d.website && (
             <a
               href={safeHref(d.website)}
@@ -253,6 +258,7 @@ export function DivisionsSection({
               )}
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Status</th>
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Since</th>
+              <th scope="col" className="py-2.5 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -266,12 +272,6 @@ export function DivisionsSection({
                   <td className="py-2.5 px-3">
                     <div className="flex items-center gap-1.5">
                       <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
-                        <SourceCheckDot
-                          status={recordVerdictToStatus(verdict?.verdict)}
-                          originalVerdict={verdict?.verdict}
-                          size="md"
-                          href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
-                        />
                         {(() => {
                           const href = getDivisionHref(d);
                           return href ? (
@@ -401,6 +401,14 @@ export function DivisionsSection({
                   </td>
                   <td className="py-2.5 px-3 text-center text-muted-foreground text-xs">
                     {d.startDate && formatKBDate(d.startDate)}
+                  </td>
+                  <td className="py-2.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
+                      href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
+                    />
                   </td>
                 </tr>
               );

@@ -49,6 +49,7 @@ export function FundingProgramsSection({
               {hasDeadline && (
                 <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -75,12 +76,6 @@ export function FundingProgramsSection({
                         source
                       </a>
                     )}
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
-                    />
                     {p.description && (
                       <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                         {p.description}
@@ -125,6 +120,14 @@ export function FundingProgramsSection({
                       {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
+                      href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
+                    />
+                  </td>
                 </tr>
               );
             })}

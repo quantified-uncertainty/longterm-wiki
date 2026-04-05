@@ -195,6 +195,7 @@ export function DivisionsTable({
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Type</th>
                 <th className="text-left py-2.5 px-3 font-medium">Status</th>
+                <th className="py-2.5 px-1 w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -204,26 +205,18 @@ export function DivisionsTable({
                   className="hover:bg-muted/20 transition-colors"
                 >
                   <td className="py-2 px-3">
-                    <span className="flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(row.verdict?.verdict)}
-                        originalVerdict={row.verdict?.verdict}
-                        size="md"
-                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
-                      />
-                      {row.href ? (
-                        <Link
-                          href={row.href}
-                          className="font-medium text-foreground text-xs hover:text-primary transition-colors"
-                        >
-                          {row.name}
-                        </Link>
-                      ) : (
-                        <span className="font-medium text-foreground text-xs">
-                          {row.name}
-                        </span>
-                      )}
-                    </span>
+                    {row.href ? (
+                      <Link
+                        href={row.href}
+                        className="font-medium text-foreground text-xs hover:text-primary transition-colors"
+                      >
+                        {row.name}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground text-xs">
+                        {row.name}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2 px-3 text-xs">
                     {row.parentHref ? (
@@ -259,6 +252,14 @@ export function DivisionsTable({
                         {titleCase(row.status)}
                       </span>
                     )}
+                  </td>
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdict?.verdict)}
+                      originalVerdict={row.verdict?.verdict}
+                      size="md"
+                      href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                    />
                   </td>
                 </tr>
               ))}

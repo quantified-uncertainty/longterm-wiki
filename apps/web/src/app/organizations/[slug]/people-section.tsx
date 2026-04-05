@@ -235,6 +235,8 @@ export function PeopleSection({
               <th scope="col" className="py-2 px-3 text-left font-medium">
                 Tenure
               </th>
+              <th scope="col" className="py-2 px-1 w-8" />
+
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -259,12 +261,6 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(person.verificationVerdict)}
-                        originalVerdict={person.verificationVerdict}
-                        size="md"
-                        href={person.sourceCheckHref}
-                      />
                       {href ? (
                         <Link
                           href={href}
@@ -292,6 +288,14 @@ export function PeopleSection({
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">
                     {tenure}
+                  </td>
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(person.verificationVerdict)}
+                      originalVerdict={person.verificationVerdict}
+                      size="md"
+                      href={person.sourceCheckHref}
+                    />
                   </td>
                 </tr>
               );
