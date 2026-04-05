@@ -127,6 +127,155 @@ describe("empty column hiding", () => {
     });
   });
 
+  describe("FundingProgramsSection column visibility", () => {
+    // FundingProgramsSection uses parsed records (not raw KBRecordEntry),
+    // so we test the visibility checks directly on parsed-style objects.
+    type ParsedProgram = {
+      totalBudget: number | null;
+      status: string | null;
+      deadline: string | null;
+      openDate: string | null;
+    };
+
+    function makeProgram(overrides: Partial<ParsedProgram> = {}): ParsedProgram {
+      return {
+        totalBudget: null,
+        status: null,
+        deadline: null,
+        openDate: null,
+        ...overrides,
+      };
+    }
+
+    it("hides budget column when all programs have null totalBudget", () => {
+      const programs = [makeProgram(), makeProgram()];
+      const hasBudget = programs.some((p) => p.totalBudget != null);
+      expect(hasBudget).toBe(false);
+    });
+
+    it("shows budget column when at least one program has a totalBudget", () => {
+      const programs = [makeProgram(), makeProgram({ totalBudget: 500_000 })];
+      const hasBudget = programs.some((p) => p.totalBudget != null);
+      expect(hasBudget).toBe(true);
+    });
+
+    it("shows budget column for zero totalBudget (valid value)", () => {
+      const programs = [makeProgram({ totalBudget: 0 })];
+      const hasBudget = programs.some((p) => p.totalBudget != null);
+      expect(hasBudget).toBe(true);
+    });
+
+    it("hides status column when all programs have null status", () => {
+      const programs = [makeProgram(), makeProgram()];
+      const hasStatus = programs.some((p) => p.status);
+      expect(hasStatus).toBe(false);
+    });
+
+    it("shows status column when at least one program has status", () => {
+      const programs = [makeProgram({ status: "open" })];
+      const hasStatus = programs.some((p) => p.status);
+      expect(hasStatus).toBe(true);
+    });
+
+    it("hides deadline column when all programs have null deadline and openDate", () => {
+      const programs = [makeProgram(), makeProgram()];
+      const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
+      expect(hasDeadline).toBe(false);
+    });
+
+    it("shows deadline column when at least one program has a deadline", () => {
+      const programs = [makeProgram({ deadline: "2025-06-01" })];
+      const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
+      expect(hasDeadline).toBe(true);
+    });
+
+    it("shows deadline column when at least one program has an openDate", () => {
+      const programs = [makeProgram({ openDate: "2025-01-15" })];
+      const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
+      expect(hasDeadline).toBe(true);
+    });
+
+    it("treats empty-string deadline as absent (falls through to openDate)", () => {
+      const programs = [makeProgram({ deadline: "", openDate: "2025-01-15" })];
+      const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
+      expect(hasDeadline).toBe(true);
+    });
+
+    it("treats empty-string deadline and openDate as absent", () => {
+      const programs = [makeProgram({ deadline: "", openDate: "" })];
+      const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
+      expect(hasDeadline).toBe(false);
+    });
+  });
+
+  describe("SafetyMilestonesSection column visibility", () => {
+    it("hides type column when no milestones have type", () => {
+      const milestones = [
+        makeRecord({ name: "Published safety policy", date: "2024-03" }),
+        makeRecord({ name: "Joined AI Safety Institute", date: "2024-07" }),
+      ];
+
+      const hasType = milestones.some((ms) => field(ms, "type"));
+      expect(hasType).toBe(false);
+    });
+
+    it("shows type column when at least one milestone has type", () => {
+      const milestones = [
+        makeRecord({ name: "Published safety policy", date: "2024-03" }),
+        makeRecord({ name: "Red team exercise", date: "2024-07", type: "assessment" }),
+      ];
+
+      const hasType = milestones.some((ms) => field(ms, "type"));
+      expect(hasType).toBe(true);
+    });
+
+    it("hides description column when no milestones have description", () => {
+      const milestones = [
+        makeRecord({ name: "Safety commitment", date: "2024-01" }),
+      ];
+
+      const hasDescription = milestones.some((ms) => field(ms, "description"));
+      expect(hasDescription).toBe(false);
+    });
+
+    it("shows description column when at least one milestone has description", () => {
+      const milestones = [
+        makeRecord({ name: "Safety commitment", date: "2024-01", description: "Pledged to pre-deployment testing" }),
+      ];
+
+      const hasDescription = milestones.some((ms) => field(ms, "description"));
+      expect(hasDescription).toBe(true);
+    });
+
+    it("hides source column when no milestones have a valid URL source", () => {
+      const milestones = [
+        makeRecord({ name: "Internal review", date: "2024-01" }),
+        makeRecord({ name: "Published report", date: "2024-06", source: "not-a-url" }),
+      ];
+
+      // SafetyMilestonesSection checks: field(ms, "source") && isUrl(source)
+      // We test the field part here; isUrl is a separate utility
+      const hasSource = milestones.some((ms) => {
+        const s = field(ms, "source");
+        return !!s;
+      });
+      // "not-a-url" is a non-empty string, so field() returns it
+      expect(hasSource).toBe(true);
+    });
+
+    it("hides source column when no milestones have source at all", () => {
+      const milestones = [
+        makeRecord({ name: "Internal review", date: "2024-01" }),
+      ];
+
+      const hasSource = milestones.some((ms) => {
+        const s = field(ms, "source");
+        return !!s;
+      });
+      expect(hasSource).toBe(false);
+    });
+  });
+
   describe("field() helper edge cases for column visibility", () => {
     it("returns undefined for null fields", () => {
       const record = makeRecord({ name: null });

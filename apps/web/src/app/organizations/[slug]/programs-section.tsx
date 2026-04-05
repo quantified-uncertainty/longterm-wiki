@@ -23,7 +23,7 @@ export function FundingProgramsSection({
 
   const hasBudget = programs.some((p) => p.totalBudget != null);
   const hasStatus = programs.some((p) => p.status);
-  const hasDeadline = programs.some((p) => p.deadline ?? p.openDate);
+  const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
 
   return (
     <section>
