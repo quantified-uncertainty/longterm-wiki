@@ -61,11 +61,6 @@ function hashId(str: string): string {
   return createHash("sha256").update(str).digest("hex").slice(0, 16);
 }
 
-/** Compute the resource URL for a data source (real URL or synthetic URN). */
-function dataSourceUrl(slug: string, fetchUrl: string | null | undefined): string {
-  return fetchUrl ?? `urn:lw:tabular-source:${slug}`;
-}
-
 function formatDataSource(r: typeof dataSources.$inferSelect, resourceId?: string | null) {
   return {
     id: r.id,
@@ -200,49 +195,57 @@ const dataSourcesApp = new Hono()
         },
       });
 
-    // 2. Dual-write to new tables (best-effort — don't fail the sync)
-    const url = dataSourceUrl(body.id, body.fetchUrl);
+    // 2. Dual-write to new tables (best-effort — don't fail the sync).
+    // Wrapped in a transaction so we don't get orphaned resource rows.
+    const url = body.fetchUrl ?? `urn:lw:tabular-source:${body.id}`;
     const resId = hashId(url);
 
     try {
-      // Upsert resource row
-      await db
-        .insert(resources)
-        .values({
-          id: resId,
-          url,
-          title: body.name,
-          type: "dataset",
-          resourceSubtype: "tabular_source",
-          publisherEntityId: body.publisherEntityId ?? null,
-        })
-        .onConflictDoUpdate({
-          target: resources.id,
-          set: {
-            title: body.name,
-            publisherEntityId: body.publisherEntityId ?? null,
-            updatedAt: new Date(),
-          },
-        });
+      await db.transaction(async (tx) => {
+        // Upsert resource row. Check for existing URL first to avoid
+        // unique violation on idx_res_url when id differs (e.g., resource
+        // was created by resource-ingest with a different ID scheme).
+        const [existingByUrl] = await tx
+          .select({ id: resources.id })
+          .from(resources)
+          .where(eq(resources.url, url));
 
-      // Upsert resource_tabular_sources row
-      await db
-        .insert(resourceTabularSources)
-        .values({
-          resourceId: resId,
-          sourceSlug: body.id,
-          dataFormat: body.dataFormat,
-          accessMethod: body.accessMethod,
-          recordType: body.recordType,
-          updateFrequency: body.updateFrequency ?? null,
-          columnMapping: body.columnMapping ?? null,
-          sourceSchema: body.sourceSchema ?? null,
-          verificationConfig: body.verificationConfig ?? null,
-          sourceStatus: body.sourceStatus ?? "active",
-        })
-        .onConflictDoUpdate({
-          target: resourceTabularSources.resourceId,
-          set: {
+        const actualResId = existingByUrl?.id ?? resId;
+
+        if (existingByUrl) {
+          // Resource already exists at this URL — update it
+          await tx
+            .update(resources)
+            .set({
+              title: body.name,
+              type: "dataset",
+              resourceSubtype: "tabular_source",
+              publisherEntityId: body.publisherEntityId ?? null,
+              updatedAt: new Date(),
+            })
+            .where(eq(resources.id, actualResId));
+        } else {
+          // New resource — insert
+          await tx
+            .insert(resources)
+            .values({
+              id: resId,
+              url,
+              title: body.name,
+              type: "dataset",
+              resourceSubtype: "tabular_source",
+              publisherEntityId: body.publisherEntityId ?? null,
+            })
+            .onConflictDoNothing();
+        }
+
+        // Upsert resource_tabular_sources. Conflict on sourceSlug (not resourceId)
+        // so that changing a source's URL correctly updates the resourceId.
+        await tx
+          .insert(resourceTabularSources)
+          .values({
+            resourceId: actualResId,
+            sourceSlug: body.id,
             dataFormat: body.dataFormat,
             accessMethod: body.accessMethod,
             recordType: body.recordType,
@@ -250,10 +253,24 @@ const dataSourcesApp = new Hono()
             columnMapping: body.columnMapping ?? null,
             sourceSchema: body.sourceSchema ?? null,
             verificationConfig: body.verificationConfig ?? null,
-            ...(body.sourceStatus !== undefined ? { sourceStatus: body.sourceStatus } : {}),
-            updatedAt: new Date(),
-          },
-        });
+            sourceStatus: body.sourceStatus ?? "active",
+          })
+          .onConflictDoUpdate({
+            target: resourceTabularSources.sourceSlug,
+            set: {
+              resourceId: actualResId,
+              dataFormat: body.dataFormat,
+              accessMethod: body.accessMethod,
+              recordType: body.recordType,
+              updateFrequency: body.updateFrequency ?? null,
+              columnMapping: body.columnMapping ?? null,
+              sourceSchema: body.sourceSchema ?? null,
+              verificationConfig: body.verificationConfig ?? null,
+              ...(body.sourceStatus !== undefined ? { sourceStatus: body.sourceStatus } : {}),
+              updatedAt: new Date(),
+            },
+          });
+      });
     } catch (e: unknown) {
       // Best-effort: don't fail the sync if new table writes fail
       logger.warn({
@@ -322,17 +339,18 @@ const dataSourcesApp = new Hono()
     const [ds] = await db.select({ id: dataSources.id }).from(dataSources).where(eq(dataSources.id, dataSourceId));
     if (!ds) return notFoundError(c, "Data source not found");
 
-    // Resolve resourceId from new tables (best-effort, nullable)
-    const [rts] = await db
-      .select({ resourceId: resourceTabularSources.resourceId })
-      .from(resourceTabularSources)
-      .where(eq(resourceTabularSources.sourceSlug, dataSourceId));
-
     // Atomic INSERT ... ON CONFLICT DO NOTHING to avoid race conditions.
     // Large snapshots (16-40MB raw_content) can exceed the default 30s
     // statement_timeout, so we raise it for this transaction.
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SET LOCAL statement_timeout = '120000'`);
+
+      // Resolve resourceId inside the transaction to avoid TOCTOU race
+      const [rts] = await tx
+        .select({ resourceId: resourceTabularSources.resourceId })
+        .from(resourceTabularSources)
+        .where(eq(resourceTabularSources.sourceSlug, dataSourceId));
+
       const [inserted] = await tx
         .insert(sourceSnapshots)
         .values({
