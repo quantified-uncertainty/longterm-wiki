@@ -1,12 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("FactBase pages", () => {
-  test("/factbase redirects", async ({ page }) => {
-    // /factbase issues a 307 redirect to the wiki entity page
-    const response = await page.request.get("/factbase", {
-      maxRedirects: 0,
-    });
-    expect([307, 308]).toContain(response.status());
+  test("/factbase loads directly", async ({ page }) => {
+    // /factbase now renders the FactBase overview page directly
+    const response = await page.goto("/factbase");
+    expect(response?.status()).toBe(200);
+    await expect(page.locator("h1").first()).toBeVisible({ timeout: 10000 });
   });
 
   test("/sources loads", async ({ page }) => {

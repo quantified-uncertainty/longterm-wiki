@@ -8,9 +8,9 @@ test.describe("Homepage", () => {
 
   test("has working navigation links in header", async ({ page }) => {
     await page.goto("/");
-    const exploreLink = page.locator("header a", { hasText: "Explore" });
-    await expect(exploreLink).toBeVisible();
-    await expect(exploreLink).toHaveAttribute("href", "/wiki");
+    const searchLink = page.locator("header a", { hasText: "Search" });
+    await expect(searchLink).toBeVisible();
+    await expect(searchLink).toHaveAttribute("href", "/search");
   });
 
   test("has search button in header", async ({ page }) => {
