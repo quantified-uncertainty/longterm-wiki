@@ -124,6 +124,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'wiki-server',
       'quality',
       'agent-reset',
+      'usage-patterns',
     ],
   },
 };

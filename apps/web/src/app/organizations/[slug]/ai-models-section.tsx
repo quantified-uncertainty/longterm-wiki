@@ -4,8 +4,12 @@
  */
 import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
+import { getRecordVerdict } from "@data/tablebase";
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 
@@ -135,11 +139,13 @@ export function AiModelsSection({
               {hasBenchmarks && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Benchmarks</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
             {models.map((model) => {
               const href = model.wikiId ? `/wiki/${model.wikiId}` : getEntityHref(model.id, model.entityType);
+              const modelVerdict = getRecordVerdict("model-release", model.id)?.verdict;
               const benchmarks = benchmarksByModel?.get(model.id);
               const topBenchmarks = benchmarks
                 ? pickTopBenchmarks(benchmarks)
@@ -200,6 +206,14 @@ export function AiModelsSection({
                       ) : null}
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(modelVerdict)}
+                      originalVerdict={modelVerdict}
+                      size="md"
+                      href={getSourceCheckHref("model-release", model.id)}
+                    />
+                  </td>
                 </tr>
               );
             })}

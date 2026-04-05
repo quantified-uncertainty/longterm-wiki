@@ -12,6 +12,10 @@ import {
   titleCase,
 } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 // ── Team Members Section ─────────────────────────────────────────────
 
@@ -38,38 +42,50 @@ export function TeamMembersSection({
               <th scope="col" className="text-left py-2 px-3 font-medium">Name</th>
               <th scope="col" className="text-left py-2 px-3 font-medium">Role</th>
               <th scope="col" className="text-center py-2 px-3 font-medium">Dates</th>
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {personnel.map((p) => (
-              <tr key={p.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  {p.personHref ? (
-                    <Link
-                      href={p.personHref}
-                      className="font-medium text-primary text-xs hover:underline"
-                    >
-                      {p.personName}
-                    </Link>
-                  ) : (
-                    <span className="font-medium text-foreground text-xs">
-                      {p.personName}
-                    </span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-xs text-muted-foreground">
-                  {p.role}
-                </td>
-                <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                  {p.startDate && (
-                    <span>
-                      {p.startDate}
-                      {p.endDate ? ` - ${p.endDate}` : " - present"}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {personnel.map((p) => {
+              const verdict = getRecordVerdict("personnel", String(p.key))?.verdict;
+              return (
+                <tr key={p.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    {p.personHref ? (
+                      <Link
+                        href={p.personHref}
+                        className="font-medium text-primary text-xs hover:underline"
+                      >
+                        {p.personName}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-foreground text-xs">
+                        {p.personName}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-xs text-muted-foreground">
+                    {p.role}
+                  </td>
+                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                    {p.startDate && (
+                      <span>
+                        {p.startDate}
+                        {p.endDate ? ` - ${p.endDate}` : " - present"}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      size="md"
+                      href={verdict ? getSourceCheckHref("personnel", String(p.key)) : undefined}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -103,40 +119,52 @@ export function FundingProgramsSection({
               <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
               <th scope="col" className="text-right py-2 px-3 font-medium">Budget</th>
               <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {programs.map((p) => (
-              <tr key={p.key} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <span className="font-medium text-foreground text-xs">
-                    {p.name}
-                  </span>
-                  {p.description && (
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      {p.description}
-                    </p>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-xs text-muted-foreground whitespace-nowrap">
-                  {titleCase(p.programType)}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                  {p.totalBudget != null && (
-                    <span className="font-semibold">
-                      {formatCompactCurrency(p.totalBudget)}
+            {programs.map((p) => {
+              const verdict = getRecordVerdict("funding-program", String(p.key))?.verdict;
+              return (
+                <tr key={p.key} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <span className="font-medium text-foreground text-xs">
+                      {p.name}
                     </span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-center text-xs">
-                  {p.status && (
-                    <span className="text-muted-foreground">
-                      {titleCase(p.status)}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            ))}
+                    {p.description && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                        {p.description}
+                      </p>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-xs text-muted-foreground whitespace-nowrap">
+                    {titleCase(p.programType)}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                    {p.totalBudget != null && (
+                      <span className="font-semibold">
+                        {formatCompactCurrency(p.totalBudget)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-center text-xs">
+                    {p.status && (
+                      <span className="text-muted-foreground">
+                        {titleCase(p.status)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      size="md"
+                      href={verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

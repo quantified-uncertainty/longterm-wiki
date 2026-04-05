@@ -3,6 +3,10 @@ import { SectionHeader } from "./org-shared";
 import { getTypedEntities, isPolicy, type PolicyEntity } from "@/data";
 import { STATUS_COLORS, normalizeStatus } from "@/app/legislation/legislation-constants";
 import { deriveStatus } from "@/app/legislation/legislation-utils";
+import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 export interface OrgPolicyPosition {
   policyId: string;
@@ -10,6 +14,10 @@ export interface OrgPolicyPosition {
   position: string;
   reason: string | undefined;
   statusKey: string | null;
+  /** The stakeholder display name as it appears in the policy YAML. */
+  stakeholderName: string;
+  /** The policy entity's stableId (needed for getPolicyStakeholderId). */
+  policyStableId: string | undefined;
 }
 
 /**
@@ -30,6 +38,8 @@ export function getOrgPolicyPositions(orgEntityId: string, orgName: string): Org
           position: stakeholder.position,
           reason: stakeholder.reason,
           statusKey: normalizeStatus(deriveStatus(policy)),
+          stakeholderName: stakeholder.name,
+          policyStableId: policy.stableId,
         });
         break; // Don't double-count
       }
@@ -64,46 +74,67 @@ export function PolicyPositionsSection({
               <th className="text-left py-2 px-3 font-medium">Position</th>
               <th className="text-left py-2 px-3 font-medium">Status</th>
               <th className="text-left py-2 px-3 font-medium">Reason</th>
+              <th className="w-6" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {positions.map((pos) => (
-              <tr key={pos.policyId} className="hover:bg-muted/20 transition-colors">
-                <td className="py-2 px-3">
-                  <Link
-                    href={`/legislation/${pos.policyId}`}
-                    className="text-primary hover:underline font-medium"
-                  >
-                    {pos.policyTitle}
-                  </Link>
-                </td>
-                <td className="py-2 px-3">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
-                      POSITION_COLORS[pos.position] ?? "bg-gray-100 text-gray-600"
-                    }`}
-                  >
-                    {pos.position}
-                  </span>
-                </td>
-                <td className="py-2 px-3">
-                  {pos.statusKey ? (
+            {positions.map((pos) => {
+              const stakeholderId = pos.policyStableId
+                ? getPolicyStakeholderId(pos.policyStableId, pos.stakeholderName)
+                : null;
+              const verdict = stakeholderId
+                ? getRecordVerdict("policy-stakeholder", stakeholderId)?.verdict
+                : undefined;
+              const sourceCheckHref = stakeholderId
+                ? getSourceCheckHref("policy-stakeholder", stakeholderId)
+                : undefined;
+
+              return (
+                <tr key={pos.policyId} className="hover:bg-muted/20 transition-colors">
+                  <td className="py-2 px-3">
+                    <Link
+                      href={`/legislation/${pos.policyId}`}
+                      className="text-primary hover:underline font-medium"
+                    >
+                      {pos.policyTitle}
+                    </Link>
+                  </td>
+                  <td className="py-2 px-3">
                     <span
                       className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
-                        STATUS_COLORS[pos.statusKey] ?? "bg-gray-100 text-gray-600"
+                        POSITION_COLORS[pos.position] ?? "bg-gray-100 text-gray-600"
                       }`}
                     >
-                      {pos.statusKey}
+                      {pos.position}
                     </span>
-                  ) : (
-                    <span className="text-muted-foreground/40">&mdash;</span>
-                  )}
-                </td>
-                <td className="py-2 px-3 text-muted-foreground text-xs max-w-xs">
-                  {pos.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td className="py-2 px-3">
+                    {pos.statusKey ? (
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold capitalize ${
+                          STATUS_COLORS[pos.statusKey] ?? "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {pos.statusKey}
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground/40">&mdash;</span>
+                    )}
+                  </td>
+                  <td className="py-2 px-3 text-muted-foreground text-xs max-w-xs">
+                    {pos.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                  </td>
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      href={sourceCheckHref}
+                      size="md"
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

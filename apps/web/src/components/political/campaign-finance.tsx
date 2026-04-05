@@ -16,6 +16,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref, formatCompactCurrency } from "@/lib/format-compact";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { CampaignFinanceRecord } from "./types";
 import { toNum } from "./utils";
 
@@ -273,6 +277,9 @@ function PreviousCyclesTable({
               <th className="text-left px-4 py-2 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                 Source
               </th>
+              <th className="px-4 py-2 w-8">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -309,6 +316,19 @@ function PreviousCyclesTable({
                   ) : (
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
+                </td>
+                <td className="px-4 py-2 text-center">
+                  {(() => {
+                    const verdict = getRecordVerdict("campaign-finance", String(record.id))?.verdict;
+                    return (
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict)}
+                        originalVerdict={verdict}
+                        size="md"
+                        href={getSourceCheckHref("campaign-finance", String(record.id))}
+                      />
+                    );
+                  })()}
                 </td>
               </tr>
             ))}

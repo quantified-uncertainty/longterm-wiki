@@ -108,7 +108,7 @@ export function CategoryFactSection({
         title={categoryLabel}
         id={`cat-${category}`}
       />
-      <div className="border border-border/60 rounded-xl overflow-hidden divide-y divide-border/40">
+      <div className="border border-border/60 rounded-xl overflow-hidden divide-y divide-border/40 max-w-4xl">
         {propertyIds.map((propertyId) => {
           const facts = factGroups.get(propertyId) ?? [];
           if (facts.length === 0) return null;
@@ -133,7 +133,7 @@ export function CategoryFactSection({
                     {facts.length} pts
                   </span>
                 )}
-                <span className="text-muted-foreground/40 text-xs group-open:rotate-90 transition-transform">
+                <span className="text-muted-foreground/50 text-xs group-open:rotate-90 transition-transform">
                   &#9654;
                 </span>
               </summary>

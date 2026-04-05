@@ -1,8 +1,9 @@
+import { createHash } from "node:crypto";
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities } from "../../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities, resourceContentVersions } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -809,6 +810,50 @@ const citationsApp = new Hono()
         target: citationContent.url,
         set: { ...vals, updatedAt: sql`now()` },
       });
+
+    // Dual-write: append to resource_content_versions with content-hash dedup.
+    // Compute hash from fullText if not provided by the caller.
+    // IMPORTANT: Must match the caller's hash algorithm (resource-ingest.ts):
+    //   SHA-256 of first 1MB, truncated to 16 hex chars.
+    const HASH_INPUT_MAX = 1_000_000;
+    const HASH_PREFIX_LEN = 16;
+    const normalizedContentHash = d.contentHash?.trim() || null;
+    const versionHash = normalizedContentHash
+      ?? (d.fullText
+        ? createHash("sha256").update(d.fullText.slice(0, HASH_INPUT_MAX)).digest("hex").slice(0, HASH_PREFIX_LEN)
+        : null);
+
+    if (versionHash !== null) {
+      const metadata: Record<string, unknown> = {};
+      if (d.pageTitle) metadata.pageTitle = d.pageTitle;
+      const preview = d.fullTextPreview ?? (d.fullText ? d.fullText.slice(0, CITATION_CONTENT_PREVIEW_MAX) : null);
+      if (preview) metadata.fullTextPreview = preview;
+
+      await db
+        .insert(resourceContentVersions)
+        .values({
+          resourceId: d.resourceId ?? null,
+          url: d.url,
+          contentHash: versionHash,
+          fetchedAt: new Date(d.fetchedAt),
+          content: d.fullText ?? null,
+          contentLength: d.contentLength ?? null,
+          httpStatus: d.httpStatus ?? null,
+          contentType: d.contentType ?? null,
+          fetchMethod: d.fetchMethod ?? null,
+          metadata: Object.keys(metadata).length > 0 ? metadata : null,
+        })
+        .onConflictDoNothing({ target: [resourceContentVersions.url, resourceContentVersions.contentHash] })
+        .catch((e: unknown) => {
+          // Best-effort: don't fail the upsert if versioning fails
+          logger.warn({
+            error: e instanceof Error ? e.message : String(e),
+            url: d.url,
+            contentHash: versionHash,
+            resourceId: d.resourceId ?? null,
+          }, "Failed to write content version");
+        });
+    }
 
     return c.json({ url: d.url });
   })

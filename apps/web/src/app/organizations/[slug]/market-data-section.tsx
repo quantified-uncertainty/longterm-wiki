@@ -12,6 +12,10 @@ import {
   type RpcPredictionQuestion,
 } from "@/lib/wiki-server";
 import { formatCompactCurrency } from "@/lib/format-compact";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { SectionHeader } from "./org-shared";
 
 // ── Data Fetching ────────────────────────────────────────────────────
@@ -139,44 +143,56 @@ function SecondaryMarketSection({
               <th className="text-right py-2 px-3 font-medium">Valuation</th>
               <th className="text-left py-2 px-3 font-medium">Type</th>
               <th className="text-left py-2 px-3 font-medium">Source</th>
+              <th className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {prices.map((p) => (
-              <tr
-                key={p.id}
-                className="hover:bg-muted/20 transition-colors"
-              >
-                <td className="py-2 px-3 capitalize font-medium">
-                  {p.platform}
-                </td>
-                <td className="py-2 px-3 text-muted-foreground">
-                  {p.date}
-                </td>
-                <td className="py-2 px-3 text-right tabular-nums">
-                  {p.impliedValuation != null
-                    ? formatCompactCurrency(p.impliedValuation)
-                    : "–"}
-                </td>
-                <td className="py-2 px-3">
-                  <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                    {p.priceType}
-                  </span>
-                </td>
-                <td className="py-2 px-3">
-                  {p.source && (
-                    <a
-                      href={p.source}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-primary hover:underline"
-                    >
-                      link
-                    </a>
-                  )}
-                </td>
-              </tr>
-            ))}
+            {prices.map((p) => {
+              const verdict = getRecordVerdict("secondary-market-price", String(p.id))?.verdict;
+              return (
+                <tr
+                  key={p.id}
+                  className="hover:bg-muted/20 transition-colors"
+                >
+                  <td className="py-2 px-3 capitalize font-medium">
+                    {p.platform}
+                  </td>
+                  <td className="py-2 px-3 text-muted-foreground">
+                    {p.date}
+                  </td>
+                  <td className="py-2 px-3 text-right tabular-nums">
+                    {p.impliedValuation != null
+                      ? formatCompactCurrency(p.impliedValuation)
+                      : "–"}
+                  </td>
+                  <td className="py-2 px-3">
+                    <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                      {p.priceType}
+                    </span>
+                  </td>
+                  <td className="py-2 px-3">
+                    {p.source && (
+                      <a
+                        href={p.source}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline"
+                      >
+                        link
+                      </a>
+                    )}
+                  </td>
+                  <td className="py-2 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      size="md"
+                      href={getSourceCheckHref("secondary-market-price", String(p.id))}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -236,6 +252,7 @@ function PredictionMarketSection({
                 <th className="text-left py-2 px-3 font-medium w-28">
                   Resolves
                 </th>
+                <th className="py-2 px-1 w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -265,10 +282,13 @@ function PredictionMarketSection({
                   <th className="text-left py-2 px-3 font-medium w-24">
                     Platform
                   </th>
+                  <th className="py-2 px-1 w-8" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {resolved.map((q) => (
+                {resolved.map((q) => {
+                  const verdict = getRecordVerdict("prediction-question", String(q.id))?.verdict;
+                  return (
                   <tr
                     key={q.id}
                     className="hover:bg-muted/20 transition-colors opacity-60"
@@ -299,8 +319,17 @@ function PredictionMarketSection({
                     <td className="py-2 px-3">
                       {PLATFORM_LABELS[q.platform] ?? q.platform}
                     </td>
+                    <td className="py-2 px-1">
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict)}
+                        originalVerdict={verdict}
+                        size="md"
+                        href={getSourceCheckHref("prediction-question", String(q.id))}
+                      />
+                    </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -312,6 +341,7 @@ function PredictionMarketSection({
 
 function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
   const prob = q.currentProbability;
+  const verdict = getRecordVerdict("prediction-question", String(q.id))?.verdict;
 
   return (
     <tr className="hover:bg-muted/20 transition-colors">
@@ -350,6 +380,14 @@ function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
       </td>
       <td className="py-2.5 px-3 text-xs text-muted-foreground">
         {q.resolutionDate ?? "–"}
+      </td>
+      <td className="py-2.5 px-1">
+        <SourceCheckDot
+          status={recordVerdictToStatus(verdict)}
+          originalVerdict={verdict}
+          size="md"
+          href={getSourceCheckHref("prediction-question", String(q.id))}
+        />
       </td>
     </tr>
   );

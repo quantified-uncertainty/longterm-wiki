@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { RACE_LEVEL_LABELS } from "./races-constants";
 import { RacesTable, type RaceRow, type CandidateRow } from "./races-table";
@@ -50,11 +51,14 @@ export default async function RacesPage() {
     }>("/api/political-races/candidates/all?limit=1000", { revalidate: 300 }),
   ]);
 
-  // Group candidates by raceId for O(1) lookup
+  // Group candidates by raceId for O(1) lookup, attaching verdict data
   const candidatesByRace = new Map<string, CandidateRow[]>();
   for (const c of candidatesData?.candidates ?? []) {
     const list = candidatesByRace.get(c.raceId) ?? [];
-    list.push(c);
+    list.push({
+      ...c,
+      verdictString: getRecordVerdict("race-candidate", String(c.id))?.verdict ?? null,
+    });
     candidatesByRace.set(c.raceId, list);
   }
 
@@ -73,6 +77,7 @@ export default async function RacesPage() {
     outcomeDetails: race.outcomeDetails,
     aiAngle: race.aiAngle,
     candidates: candidatesByRace.get(race.id) ?? [],
+    verdictString: getRecordVerdict("race", String(race.id))?.verdict ?? null,
   }));
 
   const raceStats = stats?.races ?? { total: 0, upcoming: 0, active: 0, resolved: 0 };

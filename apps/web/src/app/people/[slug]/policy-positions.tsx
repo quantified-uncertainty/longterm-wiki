@@ -2,10 +2,16 @@ import Link from "next/link";
 import { getTypedEntities, isPolicy, type PolicyEntity } from "@/data";
 import { STATUS_COLORS, normalizeStatus } from "@/app/legislation/legislation-constants";
 import { deriveStatus } from "@/app/legislation/legislation-utils";
+import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 export interface PersonPolicyPosition {
   policyId: string;
   policyTitle: string;
+  policyStableId: string | undefined;
+  stakeholderName: string;
   position: string;
   reason: string | undefined;
   statusKey: string | null;
@@ -36,6 +42,8 @@ export function getPersonPolicyPositions(
         positions.push({
           policyId: policy.id,
           policyTitle: policy.title,
+          policyStableId: policy.stableId,
+          stakeholderName: stakeholder.name,
           position: stakeholder.position,
           reason: stakeholder.reason,
           statusKey: normalizeStatus(deriveStatus(policy)),
@@ -55,6 +63,8 @@ export function getPersonPolicyPositions(
           positions.push({
             policyId: policy.id,
             policyTitle: policy.title,
+            policyStableId: policy.stableId,
+            stakeholderName: politician.name,
             position: "key role",
             reason: politician.role,
             statusKey: normalizeStatus(deriveStatus(policy)),
@@ -109,10 +119,18 @@ export function PolicyPositionsSection({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Reason
                 </th>
+                <th scope="col" className="py-2 px-1 w-8" />
               </tr>
             </thead>
             <tbody>
-              {positions.map((pos) => (
+              {positions.map((pos) => {
+                const stakeholderId = pos.policyStableId
+                  ? getPolicyStakeholderId(pos.policyStableId, pos.stakeholderName)
+                  : null;
+                const verdict = stakeholderId
+                  ? getRecordVerdict("policy-stakeholder", stakeholderId)?.verdict
+                  : undefined;
+                return (
                 <tr
                   key={pos.policyId}
                   className="border-b border-border/30 last:border-b-0 hover:bg-muted/20 transition-colors"
@@ -152,8 +170,17 @@ export function PolicyPositionsSection({
                       <span className="text-muted-foreground/40">&mdash;</span>
                     )}
                   </td>
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict)}
+                      originalVerdict={verdict}
+                      size="md"
+                      href={stakeholderId ? getSourceCheckHref("policy-stakeholder", stakeholderId) : undefined}
+                    />
+                  </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
