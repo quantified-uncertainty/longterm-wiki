@@ -86,7 +86,7 @@ export async function AnthropicStakeholdersTable() {
   // via resolveEntityKey can fail during ISR if database.json isn't loaded)
   const valuationFact =
     getKBLatest("sid_mK9pX3rQ7n", "valuation") ??
-    getKBLatest("anthropic", "valuation");
+    getKBLatest("anthropic", "valuation"); // factbase-slug-ok — intentional fallback
 
   if (!valuationFact || valuationFact.value.type !== "number") {
     // Graceful fallback: render without valuation-dependent data

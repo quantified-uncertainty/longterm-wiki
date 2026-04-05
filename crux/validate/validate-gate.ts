@@ -317,6 +317,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'factbase-stableid',
+    name: 'FactBase lookups use stableIds (not slugs)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-stableid.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'manual-api-types',
     name: 'No inline apiRequest<{...}> types (advisory)', // api-type-ok
     command: 'npx',
