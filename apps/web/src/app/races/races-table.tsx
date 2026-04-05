@@ -198,7 +198,13 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                   <td className="py-2 pr-4 text-center">
                     {race.candidates.length}
                   </td>
-                  <td className="py-2 px-1">
+                  <td
+                    className="py-2 px-1"
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") e.stopPropagation();
+                    }}
+                  >
                     <SourceCheckDot
                       status={recordVerdictToStatus(race.verdictString)}
                       originalVerdict={race.verdictString}

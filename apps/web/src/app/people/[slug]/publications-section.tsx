@@ -29,7 +29,7 @@ export function PublicationsSection({
       <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
         {sorted.map((pub, idx) => {
           const recordKey = `${personSlug}:${pub.title}`;
-          const verdict = getRecordVerdict("publication", recordKey);
+          const verdict = getRecordVerdict("person-publication", recordKey);
 
           return (
             <div key={`${idx}-${pub.title}`} className="px-4 py-3 relative">
@@ -38,7 +38,7 @@ export function PublicationsSection({
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
                   size="md"
-                  href={getSourceCheckHref("publication", recordKey)}
+                  href={getSourceCheckHref("person-publication", recordKey)}
                 />
               </div>
               <div className="flex items-start justify-between gap-2 pr-6">
