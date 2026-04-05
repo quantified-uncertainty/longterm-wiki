@@ -38,6 +38,10 @@ export function FundingHistorySection({
 }) {
   if (rounds.length === 0) return null;
 
+  const hasValuation = rounds.some((r) => r.fields.valuation != null);
+  const hasLeadInvestor = rounds.some((r) => field(r, "lead_investor"));
+  const hasInstrument = rounds.some((r) => field(r, "instrument"));
+
   return (
     <section>
       <SectionHeader title="Funding History" count={rounds.length} />
@@ -48,9 +52,15 @@ export function FundingHistorySection({
               <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
               <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
               <th scope="col" className="py-2 px-3 text-right font-medium">Raised</th>
-              <th scope="col" className="py-2 px-3 text-right font-medium">Valuation</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Lead Investor</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
+              {hasValuation && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">Valuation</th>
+              )}
+              {hasLeadInvestor && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Lead Investor</th>
+              )}
+              {hasInstrument && (
+                <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -83,23 +93,29 @@ export function FundingHistorySection({
                   <td className="py-2 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
                     {raised != null ? formatAmount(raised) : "\u2014"}
                   </td>
-                  <td className="py-2 px-3 text-right tabular-nums text-muted-foreground whitespace-nowrap">
-                    {valuation != null ? formatAmount(valuation) : "\u2014"}
-                  </td>
-                  <td className="py-2 px-3">
-                    {leadInvestorHref ? (
-                      <Link href={leadInvestorHref} className="text-primary hover:underline">
-                        {leadInvestorName}
-                      </Link>
-                    ) : leadInvestor ? (
-                      <span>{leadInvestorName}</span>
-                    ) : (
-                      <span className="text-muted-foreground">{"\u2014"}</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 hidden lg:table-cell">
-                    {instrument && <Badge>{instrument}</Badge>}
-                  </td>
+                  {hasValuation && (
+                    <td className="py-2 px-3 text-right tabular-nums text-muted-foreground whitespace-nowrap">
+                      {valuation != null ? formatAmount(valuation) : "\u2014"}
+                    </td>
+                  )}
+                  {hasLeadInvestor && (
+                    <td className="py-2 px-3">
+                      {leadInvestorHref ? (
+                        <Link href={leadInvestorHref} className="text-primary hover:underline">
+                          {leadInvestorName}
+                        </Link>
+                      ) : leadInvestor ? (
+                        <span>{leadInvestorName}</span>
+                      ) : (
+                        <span className="text-muted-foreground">{"\u2014"}</span>
+                      )}
+                    </td>
+                  )}
+                  {hasInstrument && (
+                    <td className="py-2 px-3 hidden lg:table-cell">
+                      {instrument && <Badge>{instrument}</Badge>}
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -119,6 +135,10 @@ export function InvestorParticipationSection({
 }) {
   if (investments.length === 0) return null;
 
+  const hasRound = investments.some((inv) => field(inv, "round_name"));
+  const hasAmount = investments.some((inv) => inv.fields.amount != null);
+  const hasDate = investments.some((inv) => field(inv, "date"));
+
   return (
     <section>
       <SectionHeader title="Investor Participation" count={investments.length} />
@@ -127,9 +147,15 @@ export function InvestorParticipationSection({
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <th scope="col" className="py-2 px-3 text-left font-medium">Investor</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
-              <th scope="col" className="py-2 px-3 text-right font-medium">Amount</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              {hasRound && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
+              )}
+              {hasAmount && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">Amount</th>
+              )}
+              {hasDate && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -161,21 +187,27 @@ export function InvestorParticipationSection({
                       )}
                     </span>
                   </td>
-                  <td className="py-1.5 px-3 text-muted-foreground">
-                    {roundName ? (
-                      <Link href={`/investments/${inv.key}`} className="text-muted-foreground hover:text-primary transition-colors">
-                        {roundName}
-                      </Link>
-                    ) : (
-                      <span className="text-muted-foreground/40">{"\u2014"}</span>
-                    )}
-                  </td>
-                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {amount != null ? formatAmount(amount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
-                  <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
-                    {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
+                  {hasRound && (
+                    <td className="py-1.5 px-3 text-muted-foreground">
+                      {roundName ? (
+                        <Link href={`/investments/${inv.key}`} className="text-muted-foreground hover:text-primary transition-colors">
+                          {roundName}
+                        </Link>
+                      ) : (
+                        <span className="text-muted-foreground/40">{"\u2014"}</span>
+                      )}
+                    </td>
+                  )}
+                  {hasAmount && (
+                    <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                      {amount != null ? formatAmount(amount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
+                  {hasDate && (
+                    <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
+                      {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -260,6 +292,13 @@ export function SafetyMilestonesSection({
 }) {
   if (milestones.length === 0) return null;
 
+  const hasType = milestones.some((ms) => field(ms, "type"));
+  const hasDescription = milestones.some((ms) => field(ms, "description"));
+  const hasSource = milestones.some((ms) => {
+    const s = field(ms, "source");
+    return s && isUrl(s);
+  });
+
   return (
     <section>
       <SectionHeader title="Safety Milestones" count={milestones.length} />
@@ -268,10 +307,16 @@ export function SafetyMilestonesSection({
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <th scope="col" className="py-2 px-3 text-left font-medium">Milestone</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
+              {hasType && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
+              )}
               <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Description</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
+              {hasDescription && (
+                <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Description</th>
+              )}
+              {hasSource && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -285,27 +330,33 @@ export function SafetyMilestonesSection({
               return (
                 <tr key={ms.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3 font-medium">{name}</td>
-                  <td className="py-1.5 px-3">
-                    {msType && (
-                      <Badge
-                        color={
-                          MILESTONE_TYPE_COLORS[msType] ??
-                          "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-                        }
-                      >
-                        {titleCase(msType)}
-                      </Badge>
-                    )}
-                  </td>
+                  {hasType && (
+                    <td className="py-1.5 px-3">
+                      {msType && (
+                        <Badge
+                          color={
+                            MILESTONE_TYPE_COLORS[msType] ??
+                            "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                          }
+                        >
+                          {titleCase(msType)}
+                        </Badge>
+                      )}
+                    </td>
+                  )}
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
-                  <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
-                    {description ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
-                  <td className="py-1.5 px-3">
-                    <SourceLink source={source} />
-                  </td>
+                  {hasDescription && (
+                    <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
+                      {description ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
+                  {hasSource && (
+                    <td className="py-1.5 px-3">
+                      <SourceLink source={source} />
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -325,6 +376,11 @@ export function StrategicPartnershipsSection({
 }) {
   if (partnerships.length === 0) return null;
 
+  const hasType = partnerships.some((sp) => field(sp, "type"));
+  const hasInvestment = partnerships.some((sp) => sp.fields.investment_amount != null);
+  const hasCompute = partnerships.some((sp) => sp.fields.compute_commitment != null);
+  const hasNotes = partnerships.some((sp) => field(sp, "notes"));
+
   return (
     <section>
       <SectionHeader title="Strategic Partnerships" count={partnerships.length} />
@@ -333,11 +389,19 @@ export function StrategicPartnershipsSection({
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <th scope="col" className="py-2 px-3 text-left font-medium">Partner</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
-              <th scope="col" className="py-2 px-3 text-right font-medium">Investment</th>
-              <th scope="col" className="py-2 px-3 text-right font-medium">Compute</th>
+              {hasType && (
+                <th scope="col" className="py-2 px-3 text-left font-medium">Type</th>
+              )}
+              {hasInvestment && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">Investment</th>
+              )}
+              {hasCompute && (
+                <th scope="col" className="py-2 px-3 text-right font-medium">Compute</th>
+              )}
               <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
-              <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
+              {hasNotes && (
+                <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -362,21 +426,29 @@ export function StrategicPartnershipsSection({
                       <span className="font-medium">{partnerName}</span>
                     )}
                   </td>
-                  <td className="py-1.5 px-3">
-                    {spType && <Badge>{spType}</Badge>}
-                  </td>
-                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {investmentAmount != null ? formatAmount(investmentAmount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
-                  <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
-                    {computeCommitment != null ? formatAmount(computeCommitment) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
+                  {hasType && (
+                    <td className="py-1.5 px-3">
+                      {spType && <Badge>{spType}</Badge>}
+                    </td>
+                  )}
+                  {hasInvestment && (
+                    <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                      {investmentAmount != null ? formatAmount(investmentAmount) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
+                  {hasCompute && (
+                    <td className="py-1.5 px-3 text-right tabular-nums font-semibold whitespace-nowrap">
+                      {computeCommitment != null ? formatAmount(computeCommitment) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
-                  <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
-                    {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
+                  {hasNotes && (
+                    <td className="py-1.5 px-3 text-muted-foreground text-xs max-w-xs truncate hidden lg:table-cell">
+                      {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
                 </tr>
               );
             })}
