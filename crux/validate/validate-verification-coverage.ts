@@ -136,7 +136,10 @@ function main() {
     process.exit(1);
   }
 
-  // Soft enforcement — can be overridden with --force
+  // Soft enforcement — can be overridden with --force.
+  // Note: contradicted verdicts also land here and can be --force'd.
+  // This is intentional for soft enforcement — contradictions should be fixed
+  // but shouldn't block agents who are actively triaging them.
   if (enforcement === 'soft' || enforcement === 'hard') {
     if (forceOverride) {
       console.log('');
@@ -159,8 +162,9 @@ function logForceUsage(warnings: string[]): void {
     const logFile = join(PROJECT_ROOT, '.git', 'verification-force-log');
     const entry = `${new Date().toISOString()} | ${warnings.length} warnings | ${warnings.join('; ')}\n`;
     appendFileSync(logFile, entry);
-  } catch {
+  } catch (e: unknown) {
     // Non-fatal: logging failure shouldn't block the gate
+    console.warn(`[verification-coverage] Could not write force-log: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 

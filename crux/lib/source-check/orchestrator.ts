@@ -229,7 +229,12 @@ export async function orchestrateCommand(
 
 // ── Batch execution path ─────────────────────────────────────────────
 
-/** Maximum items per batch submission to avoid oversized requests and improve progress visibility */
+/**
+ * Maximum items per batch submission. The Anthropic Batch API has no hard per-batch
+ * limit, but 500 balances progress visibility (results stream in per chunk) with
+ * API overhead (one submit + poll cycle per chunk). For 3,000+ record backfills,
+ * this yields 6 sequential chunks rather than one opaque multi-hour batch.
+ */
 const BATCH_CHUNK_SIZE = 500;
 
 async function runBatchExecution(
