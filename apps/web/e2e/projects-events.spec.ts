@@ -6,10 +6,10 @@ test.describe("Projects Directory", () => {
     await expect(page).toHaveTitle(/Projects/);
     await expect(page.locator("h1")).toContainText("Projects");
 
-    // Should have project cards
-    const cards = page.locator("[class*='rounded-xl'][class*='bg-card']");
-    const cardCount = await cards.count();
-    expect(cardCount).toBeGreaterThan(5);
+    // Should have project rows in the table
+    const projectLinks = page.locator('a[href^="/projects/"]');
+    const linkCount = await projectLinks.count();
+    expect(linkCount).toBeGreaterThan(5);
   });
 
   test("squiggle detail page loads", async ({ page }) => {
@@ -39,10 +39,14 @@ test.describe("Projects Directory", () => {
 });
 
 test.describe("Navigation", () => {
-  test("nav bar has Projects link", async ({ page }) => {
+  test("Entities dropdown contains Projects link", async ({ page }) => {
     await page.goto("/");
-    const navLink = page.locator('nav a[href="/projects"]');
-    await expect(navLink).toBeVisible();
+    // Projects is inside the Entities dropdown — open it first
+    const entitiesButton = page.locator("header button", { hasText: "Entities" });
+    await entitiesButton.click();
+    const projectsLink = page.locator("header a", { hasText: "Projects" });
+    await expect(projectsLink).toBeVisible();
+    await expect(projectsLink).toHaveAttribute("href", "/projects");
   });
 });
 
