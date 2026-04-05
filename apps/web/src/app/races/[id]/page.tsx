@@ -176,6 +176,12 @@ export default async function RaceDetailPage({
           {race.party && (
             <span className="capitalize">{race.party}</span>
           )}
+          <Link
+            href={`/races/${race.id}/data`}
+            className="text-primary hover:text-primary/80 font-medium transition-colors"
+          >
+            Data &rarr;
+          </Link>
         </div>
       </div>
 
