@@ -329,7 +329,6 @@ export default async function KBEntityPage({
                 categoryLabel={CATEGORY_LABELS[category] ?? titleCase(category)}
                 propertyIds={propertyIds}
                 factGroups={factGroups}
-                verdicts={verdicts}
               />
             );
           })}
