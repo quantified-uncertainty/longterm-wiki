@@ -29,7 +29,7 @@ export default async function OrgDataPage({
   const headerData = loadOrgHeaderData(entity, slug);
 
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
+    <div className="max-w-[90rem] mx-auto px-6 py-8">
       <OrgProfileHeader
         data={headerData}
         breadcrumbSuffix="Data"

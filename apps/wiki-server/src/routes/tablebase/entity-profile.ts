@@ -107,6 +107,20 @@ const SECTION_ROW_LIMIT = 500;
  */
 const FETCH_LIMIT = SECTION_ROW_LIMIT + 1;
 
+// ---- Record type mapping (for source-check detail page URLs) ----
+
+const SECTION_RECORD_TYPE: Record<string, string> = {
+  personnel: "personnel",
+  grantsGiven: "grant",
+  grantsReceived: "grant",
+  fundingRounds: "funding-round",
+  investments: "investment",
+  equityPositions: "equity-position",
+  divisions: "division",
+  fundingPrograms: "funding-program",
+  policyStakeholders: "policy-stakeholder",
+};
+
 // ---- Section definition ----
 
 interface SectionDef {
@@ -363,6 +377,7 @@ const entityProfileApp = new Hono()
             rows: stripInternalColumns(capped),
             total: capped.length,
             truncated,
+            ...(SECTION_RECORD_TYPE[section.key] ? { recordType: SECTION_RECORD_TYPE[section.key] } : {}),
           };
         } catch (err) {
           logger.error(
@@ -405,6 +420,42 @@ const entityProfileApp = new Hono()
       }
     }
 
+    // Collect all entity stableIds from entity reference columns across all sections
+    const entityRefIds = new Set<string>();
+    for (const section of sectionResults) {
+      for (const row of section.rows) {
+        for (const [key, value] of Object.entries(row)) {
+          if (
+            typeof value === "string" &&
+            value.length === 10 &&
+            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId")
+          ) {
+            entityRefIds.add(value);
+          }
+        }
+      }
+    }
+
+    // Batch-resolve stableIds to display names
+    let displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
+    if (entityRefIds.size > 0) {
+      const entityRows = await db.select({
+        stableId: entities.stableId,
+        slug: entities.id,
+        title: entities.title,
+        entityType: entities.entityType,
+      }).from(entities).where(inArray(entities.stableId, [...entityRefIds]));
+      for (const e of entityRows) {
+        if (e.stableId && e.title) {
+          displayNames[e.stableId] = {
+            title: e.title,
+            slug: e.slug,
+            entityType: e.entityType ?? "",
+          };
+        }
+      }
+    }
+
     // Strip internal columns from entity row
     const { syncedAt, createdAt, updatedAt, ...entityData } = entityRow;
 
@@ -412,6 +463,7 @@ const entityProfileApp = new Hono()
       entity: entityData,
       sections: sectionResults,
       verdicts,
+      displayNames,
     });
   });
 
