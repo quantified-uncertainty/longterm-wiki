@@ -22,10 +22,13 @@ SELECT
   cc.http_status,
   cc.content_type,
   cc.fetch_method,
-  jsonb_strip_nulls(jsonb_build_object(
-    'pageTitle', cc.page_title,
-    'fullTextPreview', cc.full_text_preview
-  )),
+  NULLIF(
+    jsonb_strip_nulls(jsonb_build_object(
+      'pageTitle', cc.page_title,
+      'fullTextPreview', cc.full_text_preview
+    )),
+    '{}'::jsonb
+  ),
   cc.created_at
 FROM citation_content cc
 WHERE cc.content_hash IS NOT NULL

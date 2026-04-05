@@ -817,7 +817,8 @@ const citationsApp = new Hono()
     //   SHA-256 of first 1MB, truncated to 16 hex chars.
     const HASH_INPUT_MAX = 1_000_000;
     const HASH_PREFIX_LEN = 16;
-    const versionHash = d.contentHash
+    const normalizedContentHash = d.contentHash?.trim() || null;
+    const versionHash = normalizedContentHash
       ?? (d.fullText
         ? createHash("sha256").update(d.fullText.slice(0, HASH_INPUT_MAX)).digest("hex").slice(0, HASH_PREFIX_LEN)
         : null);
