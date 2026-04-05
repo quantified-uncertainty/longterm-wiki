@@ -17,7 +17,8 @@ import type { Fact } from "@longterm-wiki/factbase";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/factbase/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
-import { VerificationDot } from "./VerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { factbaseVerdictToStatus } from "@/components/verification/source-check-status";
 import styles from "../tooltip.module.css";
 
 interface FBFactValueProps {
@@ -54,7 +55,7 @@ export function FBFactValue({
           "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
           className,
         )}
-        title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
+        title={`Missing FactBase fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
         [missing: {entity}.{property}]
       </span>
@@ -134,19 +135,19 @@ export function FBFactValue({
                 >
                   Link
                 </a>
-                {verification && <VerificationDot verdict={verification} />}
+                {verification && <SourceCheckDot status={factbaseVerdictToStatus(verification)} originalVerdict={verification} size="sm" />}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
                 Source: {fact.source}
-                {verification && <VerificationDot verdict={verification} />}
+                {verification && <SourceCheckDot status={factbaseVerdictToStatus(verification)} originalVerdict={verification} size="sm" />}
               </span>
             )}
           </span>
         )}
         {verification && (
           <span className="block text-muted-foreground/80 mt-0.5">
-            <VerificationDot verdict={verification} showLabel />
+            <SourceCheckDot status={factbaseVerdictToStatus(verification)} originalVerdict={verification} size="sm" />
           </span>
         )}
         {/* Fact detail link */}

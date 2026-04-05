@@ -68,7 +68,7 @@ export function FBEntityCoverageContent() {
   return (
     <>
       <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-        {rows.length} entities with structured KB data (excluding
+        {rows.length} entities with structured FactBase data (excluding
         description-only entries). Sorted by fact count.
       </p>
       <FBEntitiesTable data={rows} />

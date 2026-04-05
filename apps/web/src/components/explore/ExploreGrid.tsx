@@ -812,7 +812,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
                 <option value="researchImportance">Research Importance</option>
                 <option value="tacticalValue">Tactical Value</option>
                 <option value="relevance">Relevance</option>
-                <option value="kbFacts">KB Facts</option>
+                <option value="kbFacts">FactBase Facts</option>
                 <option value="wordCount">Word Count</option>
                 <option value="title">Title (A-Z)</option>
               </select>

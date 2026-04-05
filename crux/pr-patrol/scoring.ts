@@ -29,9 +29,13 @@ export interface IssueBudget {
 // Note: missing-issue-ref is an advisory-only issue (see ADVISORY_ISSUES in types.ts)
 // and is filtered out before reaching the budget system, so it's not listed here.
 const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
-  conflict:            { maxTurns: 60, timeoutMinutes: 60 },
+  // Reduced from 60/60 — 60+ turns is counterproductive (#3776). Most conflicts
+  // resolve in <20 turns; beyond that, the agent is likely stuck in a loop.
+  conflict:            { maxTurns: 30, timeoutMinutes: 20 },
   'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
-  'bot-review-major':  { maxTurns: 15, timeoutMinutes: 10 },
+  // Reduced from 15/10 — large CodeRabbit reviews are systematically unfixable
+  // by patrol (#3827). Give enough turns to try, but fail fast.
+  'bot-review-major':  { maxTurns: 10, timeoutMinutes: 5 },
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
   'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },

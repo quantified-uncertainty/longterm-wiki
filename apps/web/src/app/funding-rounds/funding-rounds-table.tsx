@@ -4,7 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFundingRoundRows, type SortDir, type FundingRoundSortKey } from "./funding-rounds-sort";
@@ -210,7 +211,11 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3">
                   <span className="flex items-center gap-1.5">
                     {hasAnyVerdict && (
-                      <RecordVerificationDot verdict={row.verdict?.verdict} variant="label" />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(row.verdict?.verdict)}
+                        originalVerdict={row.verdict?.verdict}
+                        size="md"
+                      />
                     )}
                     <Link
                       href={`/funding-rounds/${row.key}`}

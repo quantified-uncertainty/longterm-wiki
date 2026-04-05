@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFPRows, type SortDir } from "./funding-programs-sort";
@@ -359,9 +360,10 @@ export function FundingProgramsListTable({
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <span className="flex items-center gap-1.5">
-                    <RecordVerificationDot
-                      verdict={row.verdict?.verdict}
-                      variant="label"
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdict?.verdict)}
+                      originalVerdict={row.verdict?.verdict}
+                      size="md"
                       href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
                     />
                     <Link

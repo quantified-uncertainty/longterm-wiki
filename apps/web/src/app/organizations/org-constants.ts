@@ -26,6 +26,26 @@ export const ORG_TYPE_COLORS: Record<string, string> = {
   other: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300",
 };
 
+/** Human-readable labels for organization operational status. */
+export const ORG_STATUS_LABELS: Record<string, string> = {
+  active: "Active",
+  merged: "Merged",
+  acquired: "Acquired",
+  defunct: "Defunct",
+  dissolved: "Dissolved",
+  inactive: "Inactive",
+};
+
+/** Tailwind class strings for organization status badge colors. */
+export const ORG_STATUS_COLORS: Record<string, string> = {
+  active: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+  merged: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  acquired: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+  defunct: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+  dissolved: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+  inactive: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300",
+};
+
 /** Human-readable labels for funding program types. */
 export const PROGRAM_TYPE_LABELS: Record<string, string> = {
   rfp: "RFP",

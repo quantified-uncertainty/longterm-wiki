@@ -98,6 +98,7 @@ async function runGrading(limit: number): Promise<RunResult> {
 interface Results {
   dollarFix: RunResult | null;
   comparisonFix: RunResult | null;
+  entityStubs: RunResult | null;
   grading: RunResult | null;
 }
 
@@ -109,6 +110,7 @@ async function main(): Promise<void> {
   const results: Results = {
     dollarFix: null,
     comparisonFix: null,
+    entityStubs: null,
     grading: null
   };
 
@@ -123,6 +125,14 @@ async function main(): Promise<void> {
     results.comparisonFix = run(
       'node --import tsx/esm --no-warnings crux/crux.mjs validate unified --rules=comparison-operators --fix',
       'Fixing comparison operators'
+    );
+
+    // Auto-create entity stubs for FactBase !ref targets missing from the registry.
+    // This ensures that person refs added during improve have proper entity entries
+    // so they display as names, not raw sid_ strings. (#3858)
+    results.entityStubs = run(
+      'npx tsx crux/validate/validate-kb-entity-slugs.ts --fix',
+      'Ensuring entity stubs for FactBase references'
     );
   }
 
@@ -141,6 +151,9 @@ async function main(): Promise<void> {
   }
   if (results.comparisonFix) {
     console.log(`  Comparisons:  ${results.comparisonFix.success ? '\u2705 Fixed' : '\u26A0\uFE0F  Check manually'}`);
+  }
+  if (results.entityStubs) {
+    console.log(`  Entity stubs: ${results.entityStubs.success ? '\u2705 Fixed' : '\u26A0\uFE0F  Check manually'}`);
   }
   if (results.grading) {
     console.log(`  Re-grading:   ${results.grading.success ? '\u2705 Done' : '\u26A0\uFE0F  Check manually'}`);

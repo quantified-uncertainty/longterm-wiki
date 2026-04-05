@@ -107,7 +107,7 @@ export function FBOverviewContent() {
   return (
     <>
       <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-        The Knowledge Base (KB) stores structured, sourced facts about entities
+        The FactBase stores structured, sourced facts about entities
         tracked by this wiki. Each fact has a typed value, optional date stamp,
         and source attribution. This section lets you explore the full dataset.
       </p>
@@ -123,7 +123,7 @@ export function FBOverviewContent() {
           icon={Layers}
           label="Entities with Data"
           value={stats.entitiesWithStructuredData}
-          sublabel={`of ${stats.totalEntities} total KB entities`}
+          sublabel={`of ${stats.totalEntities} total FactBase entities`}
         />
         <StatCard
           icon={BarChart3}

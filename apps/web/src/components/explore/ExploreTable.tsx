@@ -109,7 +109,7 @@ function buildColumns(onSearchChange: (value: string) => void): ColumnDef<Explor
     {
       id: "kbData",
       accessorFn: (row) => (row.kbFactCount ?? 0) + (row.kbItemCount ?? 0),
-      header: ({ column }) => <SortableHeader column={column} title="Structured KB facts and items">KB</SortableHeader>,
+      header: ({ column }) => <SortableHeader column={column} title="Structured FactBase facts and items">FB</SortableHeader>,
       cell: ({ row }) => {
         const facts = row.original.kbFactCount ?? 0;
         const items = row.original.kbItemCount ?? 0;

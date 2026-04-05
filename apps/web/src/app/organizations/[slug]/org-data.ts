@@ -159,7 +159,7 @@ export const CURATED_COLLECTIONS = new Set([
 
 export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
 
-export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
+export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, ORG_STATUS_LABELS, ORG_STATUS_COLORS } from "@/app/organizations/org-constants";
 
 export const FACT_CATEGORIES: { id: string; label: string; order: number }[] = [
   { id: "financial", label: "Financial", order: 0 },
@@ -538,6 +538,7 @@ const SOURCE_NAMES = new Set([
   "rand", "fortune", "bloomberg", "the information", "time",
   "the economist", "mit technology review", "financial times",
   "associated press", "ap news", "vox", "politico", "axios",
+  "twitter", "x/twitter", "twitter/x", "facebook", "linkedin",
 ]);
 
 /**
@@ -669,6 +670,8 @@ function titleFromUrl(url: string): string | null {
     const path = new URL(url).pathname.replace(/\/$/, "");
     const lastSegment = path.split("/").filter(Boolean).pop();
     if (!lastSegment) return null;
+    // Pure-numeric segments are IDs (e.g., tweet status IDs), not titles
+    if (/^\d+$/.test(lastSegment)) return null;
     // Convert slug to title: "claude-3-model-card" → "Claude 3 Model Card"
     const raw = lastSegment
       .replace(/-/g, " ")
@@ -972,6 +975,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const typedEntity = getTypedEntityById(slug);
   const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
   const orgType = orgData?.orgType ?? null;
+  const orgStatus = orgData?.orgStatus ?? null;
 
   // Header facts (description/website come from entity YAML, not KB facts)
   const hqFact = getKBLatest(entity.id, "headquarters");
@@ -1451,6 +1455,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
 
   return {
     orgType,
+    orgStatus,
     hqText,
     allCollections,
     otherCollections,

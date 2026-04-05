@@ -40,6 +40,8 @@ import {
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
   DEFAULT_ORG_TYPE_COLOR,
+  ORG_STATUS_LABELS,
+  ORG_STATUS_COLORS,
   type OrgEntity,
 } from "./org-data";
 import type { AuthorRef } from "./org-data";
@@ -757,6 +759,15 @@ export default async function OrgProfilePage({
                   {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}
                 </Link>
               )}
+              {data.orgStatus && data.orgStatus in ORG_STATUS_COLORS && (
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
+                    ORG_STATUS_COLORS[data.orgStatus]
+                  }`}
+                >
+                  {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
+                </span>
+              )}
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
               <p className="text-xs text-muted-foreground/70 mb-0.5">
@@ -788,7 +799,7 @@ export default async function OrgProfilePage({
                 </Link>
               )}
               <Link href={`/factbase/entity/${entity.id}`} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                KB data &rarr;
+                FactBase &rarr;
               </Link>
             </div>
 

@@ -141,6 +141,8 @@ const OrganizationEntitySchema = BaseEntity.extend({
   // (e.g., CHAI → UC Berkeley, UK AISI → DSIT).
   // Distinct from "divisions" which are internal sub-units.
   parentOrg: z.string().optional(),
+  // Operational status — distinct from BaseEntity.status which tracks editorial state (stub/draft/published)
+  orgStatus: z.enum(["active", "merged", "acquired", "defunct", "dissolved", "inactive"]).optional(),
 });
 
 const PolicyStakeholder = z.object({

@@ -217,7 +217,7 @@ export function formatKBCellValue(
   }
 
   // Fallback formatting without schema info
-  if (typeof value === "number") return value.toLocaleString();
+  if (typeof value === "number") return formatKBNumber(value);
   if (typeof value === "boolean") return value ? "Yes" : "No";
   if (Array.isArray(value)) return value.join(", ");
   if (typeof value === "object") return JSON.stringify(value);

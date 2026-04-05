@@ -30,6 +30,7 @@ import {
   cl,
   clearAbandoned,
   clearPendingVerification,
+  clearTotalFixAttempts,
   getAbandonedSha,
   isAbandoned,
   isPendingVerification,
@@ -94,7 +95,8 @@ export function detectAllPrIssuesFromNodes(
     const abandonedSha = getAbandonedSha(pr.number);
     if (abandonedSha && pr.headRefOid && abandonedSha !== pr.headRefOid) {
       clearAbandoned(pr.number);
-      log(`  PR #${pr.number}: new push detected (${abandonedSha.slice(0, 8)} → ${pr.headRefOid.slice(0, 8)}) — cleared abandoned state`);
+      clearTotalFixAttempts(pr.number);
+      log(`  PR #${pr.number}: new push detected (${abandonedSha.slice(0, 8)} → ${pr.headRefOid.slice(0, 8)}) — cleared abandoned state + fix attempts`);
     } else if (!abandonedSha && pr.headRefOid) {
       // Backfill: write the current SHA so future pushes can be detected
       markAbandoned(pr.number, pr.headRefOid);

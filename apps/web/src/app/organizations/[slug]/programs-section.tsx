@@ -6,7 +6,8 @@ import Link from "next/link";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
@@ -20,6 +21,10 @@ export function FundingProgramsSection({
   if (programs.length === 0) return null;
 
   const totalBudget = programs.reduce((sum, p) => sum + (p.totalBudget ?? 0), 0);
+
+  const hasBudget = programs.some((p) => p.totalBudget != null);
+  const hasStatus = programs.some((p) => p.status);
+  const hasDeadline = programs.some((p) => !!p.deadline || !!p.openDate);
 
   return (
     <section>
@@ -35,9 +40,15 @@ export function FundingProgramsSection({
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
               <th scope="col" className="text-left py-2 px-3 font-medium">Program</th>
               <th scope="col" className="text-left py-2 px-3 font-medium">Type</th>
-              <th scope="col" className="text-right py-2 px-3 font-medium">Budget</th>
-              <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
-              <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
+              {hasBudget && (
+                <th scope="col" className="text-right py-2 px-3 font-medium">Budget</th>
+              )}
+              {hasStatus && (
+                <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
+              )}
+              {hasDeadline && (
+                <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -64,9 +75,10 @@ export function FundingProgramsSection({
                         source
                       </a>
                     )}
-                    <RecordVerificationDot
-                      verdict={verdict?.verdict}
-                      variant="label"
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
                       href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
                     />
                     {p.description && (
@@ -84,29 +96,35 @@ export function FundingProgramsSection({
                       {PROGRAM_TYPE_LABELS[p.programType] ?? p.programType}
                     </span>
                   </td>
-                  <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
-                    {p.totalBudget != null && (
-                      <span className="font-semibold">{formatCompactCurrency(p.totalBudget, p.currency)}</span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-center text-xs">
-                    {p.status && (
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                          p.status === "open"
-                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                            : p.status === "awarded"
-                              ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-                              : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                        }`}
-                      >
-                        {titleCase(p.status)}
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-center text-muted-foreground text-xs">
-                    {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
-                  </td>
+                  {hasBudget && (
+                    <td className="py-2 px-3 text-right tabular-nums whitespace-nowrap text-xs">
+                      {p.totalBudget != null && (
+                        <span className="font-semibold">{formatCompactCurrency(p.totalBudget, p.currency)}</span>
+                      )}
+                    </td>
+                  )}
+                  {hasStatus && (
+                    <td className="py-2 px-3 text-center text-xs">
+                      {p.status && (
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                            p.status === "open"
+                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
+                              : p.status === "awarded"
+                                ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                                : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                          }`}
+                        >
+                          {titleCase(p.status)}
+                        </span>
+                      )}
+                    </td>
+                  )}
+                  {hasDeadline && (
+                    <td className="py-2 px-3 text-center text-muted-foreground text-xs">
+                      {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                    </td>
+                  )}
                 </tr>
               );
             })}

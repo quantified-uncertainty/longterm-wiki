@@ -8,7 +8,7 @@ import {
   getKBAllRecordCollections,
   getKBProperty,
 } from "@/data/factbase";
-import { getEntityHref } from "@/data";
+import { getEntityHref, getDirectoryHref } from "@/data";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { titleCase } from "@/components/wiki/factbase/format";
 
@@ -32,7 +32,7 @@ import {
 
 // ─── Rendering mode ──────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~724 pages x ~80KB each = ~56MB saved).
-// These are internal KB data pages with low traffic; SSG is unnecessary.
+// These are internal FactBase pages with low traffic; SSG is unnecessary.
 // Cache for 1 hour to avoid expensive re-renders from bot crawlers.
 export const revalidate = 3600;
 
@@ -53,7 +53,7 @@ export async function generateMetadata({
 
   const entity = getKBEntity(entityId);
   return {
-    title: entity ? `KB: ${entity.name}` : `KB: ${entityId}`,
+    title: entity ? `FactBase: ${entity.name}` : `FactBase: ${entityId}`,
     robots: { index: false },
   };
 }
@@ -177,9 +177,9 @@ export default async function KBEntityPage({
   );
   const totalCollections = Object.keys(itemCollections).length;
 
-  const wikiHref = entity.wikiId
-    ? `/wiki/${entity.wikiId}`
-    : getEntityHref(entityId);
+  // Separate profile (directory) and wiki page links
+  const profileHref = getDirectoryHref(entityId);
+  const wikiHref = entity.wikiId ? `/wiki/${entity.wikiId}` : null;
 
   // Hero stat properties for this entity type
   const heroProps = HERO_STAT_PROPERTIES[entity.type] ?? [];
@@ -214,12 +214,22 @@ export default async function KBEntityPage({
           </p>
         )}
         <div className="flex items-center gap-3 text-sm">
-          <Link
-            href={wikiHref}
-            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            Wiki page &rarr;
-          </Link>
+          {profileHref && (
+            <Link
+              href={profileHref}
+              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
+            >
+              Profile page &rarr;
+            </Link>
+          )}
+          {wikiHref && (
+            <Link
+              href={wikiHref}
+              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
+            >
+              Wiki page &rarr;
+            </Link>
+          )}
           {verdicts.size > 0 && (
             <VerificationSummary verdicts={verdicts} totalFacts={structuredFacts.length} />
           )}

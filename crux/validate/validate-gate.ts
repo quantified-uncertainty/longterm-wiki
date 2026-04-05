@@ -652,6 +652,26 @@ const PARALLEL_STEPS: Step[] = [
     // titles indicate serialization bugs or data contamination that produce
     // broken rendering.
   },
+  {
+    id: 'person-refs',
+    name: 'Person reference validation (FactBase person refs resolve with names)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-person-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: FactBase facts that reference people via !ref must resolve to
+    // entity registry entries with displayable names. Unresolved person refs
+    // cause raw sid_ strings or "Unknown" to display on org pages.
+  },
+  {
+    id: 'rendered-sid',
+    name: 'Rendered SID check (no sid_ leaks in built data)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-rendered-sid.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: sid_ stableIds must never appear in display positions in
+    // built data files (database.json, factbase-data.json). This is the
+    // last line of defense — catches the symptom regardless of cause.
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass

@@ -751,7 +751,7 @@ function RecordCollectionSection({
             href={`/factbase/entity/${entityId}`}
             className="text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
           >
-            View all {nonEmptyItems.length} {titleCase(collectionName).toLowerCase()} in full profile &rarr;
+            View all {nonEmptyItems.length} {titleCase(collectionName).toLowerCase()} in FactBase &rarr;
           </Link>
         </div>
       )}
@@ -863,7 +863,7 @@ export function FBAutoFacts({ entityId }: FBAutoFactsProps) {
             href={`/factbase/entity/${entityId}`}
             className="ml-auto text-xs text-primary/60 hover:text-primary hover:underline transition-colors"
           >
-            View full profile &rarr;
+            View in FactBase &rarr;
           </Link>
         </div>
 

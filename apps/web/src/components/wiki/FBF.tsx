@@ -24,7 +24,7 @@ import {
   isUrl,
   shortDomain,
 } from "./factbase/format";
-import { FactVerificationDot } from "./factbase/VerificationDot";
+import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
 import styles from "./tooltip.module.css";
 
 interface FBFProps {
@@ -74,7 +74,7 @@ export function FBF({
           "inline px-1 py-0.5 bg-destructive/10 text-destructive text-sm rounded",
           className,
         )}
-        title={`Missing KB fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
+        title={`Missing FactBase fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
         {children || `[missing: ${entity}.${property}]`}
       </span>
@@ -178,7 +178,7 @@ export function FBF({
           </span>
         )}
 
-        <FactVerificationDot factId={fact.id} showLabel className="mt-1" />
+        <FactSourceCheckDot factId={fact.id} className="mt-1" />
 
         {/* Fact detail link */}
         <span className="block mt-1.5">

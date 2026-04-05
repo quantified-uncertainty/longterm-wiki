@@ -117,7 +117,7 @@ export function PeopleCoverageContent() {
     <>
       <p className="text-muted-foreground text-sm leading-relaxed">
         Data completeness overview for {total} person entities. Shows which
-        people have complete structured data across KB facts, expert positions,
+        people have complete structured data across FactBase facts, expert positions,
         wiki pages, and career history. Sorted by completeness (least complete
         first) to prioritize data gaps.
       </p>
@@ -131,7 +131,7 @@ export function PeopleCoverageContent() {
           value={`${withWikiPage} (${pct(withWikiPage)}%)`}
         />
         <StatCard
-          label="With KB Facts"
+          label="With FactBase Facts"
           value={`${withKBFacts} (${pct(withKBFacts)}%)`}
         />
       </div>
@@ -153,7 +153,7 @@ export function PeopleCoverageContent() {
           count={withCareerHistory}
           total={total}
         />
-        <MiniStat label="Has Any KB Facts" count={withKBFacts} total={total} />
+        <MiniStat label="Has Any FactBase Facts" count={withKBFacts} total={total} />
       </div>
 
       <PeopleCoverageTable data={rows} />

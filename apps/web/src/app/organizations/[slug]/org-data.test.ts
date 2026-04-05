@@ -16,6 +16,7 @@ const SOURCE_NAMES = new Set([
   "rand", "fortune", "bloomberg", "the information", "time",
   "the economist", "mit technology review", "financial times",
   "associated press", "ap news", "vox", "politico", "axios",
+  "twitter", "x/twitter", "twitter/x", "facebook", "linkedin",
 ]);
 
 function isGenericTitle(title: string, orgName: string): boolean {
@@ -95,6 +96,8 @@ function titleFromUrl(url: string): string | null {
     const path = new URL(url).pathname.replace(/\/$/, "");
     const lastSegment = path.split("/").filter(Boolean).pop();
     if (!lastSegment) return null;
+    // Pure-numeric segments are IDs (e.g., tweet status IDs), not titles
+    if (/^\d+$/.test(lastSegment)) return null;
     const raw = lastSegment
       .replace(/-/g, " ")
       .replace(/\b\w/g, (c) => c.toUpperCase());
@@ -149,6 +152,9 @@ describe("isGenericTitle", () => {
     expect(isGenericTitle("Reuters", "Anthropic")).toBe(true);
     expect(isGenericTitle("CNBC", "OpenAI")).toBe(true);
     expect(isGenericTitle("The Guardian", "DeepMind")).toBe(true);
+    expect(isGenericTitle("X/Twitter", "OpenAI")).toBe(true);
+    expect(isGenericTitle("Twitter", "Anthropic")).toBe(true);
+    expect(isGenericTitle("Facebook", "DeepMind")).toBe(true);
   });
 
   it("matches bibliographic format", () => {
@@ -323,6 +329,11 @@ describe("titleFromUrl", () => {
 
   it("returns null for invalid URLs", () => {
     expect(titleFromUrl("not-a-url")).toBe(null);
+  });
+
+  it("returns null for pure-numeric URL segments (tweet/post IDs)", () => {
+    expect(titleFromUrl("https://twitter.com/janleike/status/1790064963966370209")).toBe(null);
+    expect(titleFromUrl("https://x.com/user/status/123456789")).toBe(null);
   });
 });
 
