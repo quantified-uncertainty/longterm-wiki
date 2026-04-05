@@ -874,7 +874,7 @@ export function EntityProfileViewer({
       {error && (
         <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 p-4 mb-5 text-sm text-red-700 dark:text-red-400">
           {error}
-          {error.includes("not found") && (
+          {/not found/i.test(error) && (
             <p className="mt-1.5 text-xs text-red-600/70 dark:text-red-400/60">
               Try using the exact slug (e.g. &quot;anthropic&quot;), a stableId (e.g. &quot;sid_...&quot;), or a wikiId (e.g. &quot;E22&quot;).
             </p>

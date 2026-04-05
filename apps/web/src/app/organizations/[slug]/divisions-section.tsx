@@ -128,6 +128,7 @@ function DivisionCard({
               href={safeHref(d.website)}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Open ${d.name} website (new tab)`}
               className="relative z-10 text-muted-foreground/40 hover:text-primary transition-colors"
               title="Website"
             >
@@ -290,6 +291,7 @@ export function DivisionsSection({
                           href={safeHref(d.website)}
                           target="_blank"
                           rel="noopener noreferrer"
+                          aria-label={`Open ${d.name} website (new tab)`}
                           className="text-muted-foreground/40 hover:text-primary transition-colors"
                           title="Website"
                         >

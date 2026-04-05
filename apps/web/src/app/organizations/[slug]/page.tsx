@@ -245,7 +245,8 @@ export default async function OrgProfilePage({
             components={{
               // Sanitize links: only allow http/https URLs
               a: ({ href, children, ...props }) => {
-                const safeLink = href && /^https?:\/\//.test(href) ? href : undefined;
+                const normalizedHref = typeof href === "string" ? href.trim() : "";
+                const safeLink = /^https?:\/\//i.test(normalizedHref) ? normalizedHref : undefined;
                 return safeLink
                   ? <a href={safeLink} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
                   : <span {...props}>{children}</span>;
