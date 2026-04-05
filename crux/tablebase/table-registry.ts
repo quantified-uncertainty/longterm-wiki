@@ -14,6 +14,12 @@ export interface TableConfig {
   syncMethod: 'POST' | 'PATCH';
   /** Body key wrapping the records array in sync request */
   syncBodyKey: string;
+  /**
+   * When true, the sync endpoint requires every record to include inline
+   * verification. Set for tables that have reached Phase 5 hard enforcement
+   * (Discussion #3875). The CLI appends ?requireVerification=true to the sync path.
+   */
+  requireVerification?: boolean;
 }
 
 const TABLE_CONFIGS: Record<string, TableConfig> = {

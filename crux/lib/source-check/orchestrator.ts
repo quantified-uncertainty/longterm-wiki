@@ -229,6 +229,14 @@ export async function orchestrateCommand(
 
 // ── Batch execution path ─────────────────────────────────────────────
 
+/**
+ * Maximum items per batch submission. The Anthropic Batch API has no hard per-batch
+ * limit, but 500 balances progress visibility (results stream in per chunk) with
+ * API overhead (one submit + poll cycle per chunk). For 3,000+ record backfills,
+ * this yields 6 sequential chunks rather than one opaque multi-hour batch.
+ */
+const BATCH_CHUNK_SIZE = 500;
+
 async function runBatchExecution(
   itemsToVerify: VerifyItem[],
   summary: OrchestrationSummary,
@@ -237,16 +245,21 @@ async function runBatchExecution(
   console.log(`\n\x1b[1mBatch mode: preparing ${itemsToVerify.length} items (est. \$${summary.estimatedCost.toFixed(2)} with 50% batch discount)...\x1b[0m\n`);
 
   // Phase 1: Fetch source content and build prompts (with concurrency)
-  const batchRequests: BatchRequest[] = [];
-  const batchItemMap = new Map<string, VerifyItem>();
+  // Results are stored by original index to preserve the priority sort order of
+  // itemsToVerify. Without this, concurrent prepareItem completions would push
+  // into batchRequests in arrival order, shuffling high-priority items into
+  // later chunks when they happened to be slower to prepare.
+  const preparedSlots: ({ request: BatchRequest; item: VerifyItem; sourceUrl: string } | null)[] =
+    new Array(itemsToVerify.length).fill(null);
+  const batchItemMap = new Map<string, { item: VerifyItem; sourceUrl: string }>();
   let preparedCount = 0;
 
-  async function prepareItem(item: VerifyItem): Promise<void> {
+  async function prepareItem(item: VerifyItem, index: number): Promise<void> {
     preparedCount++;
     const progress = `[${preparedCount}/${itemsToVerify.length}]`;
 
-    // Handle deterministic matching for grants first
-    if (item.data.kind === 'record' && item.data.recordType === 'grant') {
+    // Handle deterministic matching for grants and investments first
+    if (item.data.kind === 'record' && (item.data.recordType === 'grant' || item.data.recordType === 'investment')) {
       try {
         const deterministicResult = await tryDeterministicMatch(item);
         if (deterministicResult) {
@@ -347,119 +360,143 @@ async function runBatchExecution(
     }
 
     const customId = `verify-${item.id}`;
-    batchRequests.push({
-      customId,
-      params: {
-        model: MODELS.haiku,
-        max_tokens: 500,
-        temperature: 0,
-        messages: [{ role: 'user', content: prompt }],
+    preparedSlots[index] = {
+      request: {
+        customId,
+        params: {
+          model: MODELS.haiku,
+          max_tokens: 500,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        },
       },
-    });
-    batchItemMap.set(customId, item);
+      item,
+      sourceUrl,
+    };
     console.log(`  ${progress} Prepared: ${item.description.slice(0, 80)}`);
   }
 
-  // Prepare items with concurrency
+  // Prepare items with concurrency (index preserved for slot assignment)
   const prepExecuting = new Set<Promise<void>>();
-  for (const item of itemsToVerify) {
-    const p = prepareItem(item).finally(() => prepExecuting.delete(p));
+  for (let i = 0; i < itemsToVerify.length; i++) {
+    const idx = i;
+    const p = prepareItem(itemsToVerify[idx], idx).finally(() => prepExecuting.delete(p));
     prepExecuting.add(p);
     if (prepExecuting.size >= concurrency) await Promise.race(prepExecuting);
   }
   await Promise.all(prepExecuting);
+
+  // Compact prepared slots into batchRequests, preserving original priority order
+  const batchRequests: BatchRequest[] = [];
+  for (const slot of preparedSlots) {
+    if (slot) {
+      batchRequests.push(slot.request);
+      batchItemMap.set(slot.request.customId, { item: slot.item, sourceUrl: slot.sourceUrl });
+    }
+  }
 
   if (batchRequests.length === 0) {
     console.log('\nNo items require LLM verification (all resolved deterministically or errored).');
     return;
   }
 
-  // Phase 2: Submit batch
-  console.log(`\n\x1b[1mSubmitting batch of ${batchRequests.length} requests to Anthropic Batch API...\x1b[0m`);
+  // Phase 2-4: Submit, poll, and process in chunks
   const Anthropic = (await import('@anthropic-ai/sdk')).default;
   const anthropicClient = new Anthropic();
+  const totalChunks = Math.ceil(batchRequests.length / BATCH_CHUNK_SIZE);
 
-  const batch = await submitBatch(anthropicClient, batchRequests);
-  console.log(`  Batch ID: ${batch.id}`);
-  console.log(`  Polling for completion (may take minutes to hours)...`);
+  for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+    const chunkStart = chunkIdx * BATCH_CHUNK_SIZE;
+    const chunkEnd = Math.min(chunkStart + BATCH_CHUNK_SIZE, batchRequests.length);
+    const chunkRequests = batchRequests.slice(chunkStart, chunkEnd);
+    const chunkLabel = totalChunks > 1 ? ` (chunk ${chunkIdx + 1}/${totalChunks})` : '';
 
-  // Phase 3: Poll for completion
-  const completedBatch = await pollBatch(anthropicClient, batch.id, {
-    intervalMs: 15_000,
-    timeoutMs: 4_500_000, // 75 min — fits within 90-min workflow timeout with setup buffer
-    onPoll: (b) => {
-      const counts = b.request_counts;
-      console.log(`  ... processing: ${counts.processing}, succeeded: ${counts.succeeded}, errored: ${counts.errored}`);
-    },
-  });
+    // Phase 2: Submit batch chunk
+    console.log(`\n\x1b[1mSubmitting batch of ${chunkRequests.length} requests to Anthropic Batch API${chunkLabel}...\x1b[0m`);
 
-  console.log(`\n\x1b[1mBatch completed. Processing ${completedBatch.request_counts.succeeded} results...\x1b[0m\n`);
+    const batch = await submitBatch(anthropicClient, chunkRequests);
+    console.log(`  Batch ID: ${batch.id}`);
+    console.log(`  Polling for completion (may take minutes to hours)...`);
 
-  // Phase 4: Process results
-  const resultsMap = await getBatchResults(anthropicClient, batch.id);
-  for (const [customId, batchResult] of resultsMap) {
-    const item = batchItemMap.get(customId);
-    if (!item) continue;
-
-    if (batchResult.result.type !== 'succeeded') {
-      summary.errors++;
-      summary.failures.push({
-        itemId: item.id, kind: item.kind, description: item.description,
-        error: `Batch request ${batchResult.result.type}`,
-      });
-      continue;
-    }
-
-    const text = extractBatchResultText(batchResult);
-    if (!text) {
-      summary.errors++;
-      summary.failures.push({
-        itemId: item.id, kind: item.kind, description: item.description,
-        error: 'Empty batch result',
-      });
-      continue;
-    }
-
-    // Parse LLM response with shared Zod schema (same validation as real-time path)
-    const raw = parseJsonResponse(text);
-    const parsed = LlmResponseSchema.safeParse(raw);
-    if (!parsed.success) {
-      summary.errors++;
-      summary.failures.push({
-        itemId: item.id, kind: item.kind, description: item.description,
-        error: `Invalid LLM response: ${parsed.error.message}`,
-      });
-      continue;
-    }
-
-    const verdict = validateVerdict(parsed.data.verdict);
-    const confidence = parsed.data.confidence;
-    const extractedValue = parsed.data.extracted_value;
-    const reasoning = parsed.data.reasoning;
-
-    const verifyResult: VerifyResult = {
-      itemId: item.id,
-      kind: item.kind,
-      description: item.description,
-      verdict,
-      confidence,
-      extractedValue,
-      reasoning,
-      sourceUrl: item.sourceUrl ?? '',
-    };
-
-    summary[verdict]++;
-    summary.actualVerified++;
-    summary.byKind[item.kind].verified++;
-    summary.results.push(verifyResult);
-
-    const color = verdict === 'confirmed' ? '\x1b[32m' : verdict === 'contradicted' ? '\x1b[31m' : '\x1b[33m';
-    console.log(`  ${item.description.slice(0, 80)}`);
-    console.log(`    ${color}${verdict}\x1b[0m (confidence: ${(confidence * 100).toFixed(0)}%)`);
-
-    await storeResult(item, verifyResult).catch((e: unknown) => {
-      console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+    // Phase 3: Poll for completion
+    const completedBatch = await pollBatch(anthropicClient, batch.id, {
+      intervalMs: 15_000,
+      timeoutMs: 4_500_000, // 75 min — fits within 90-min workflow timeout with setup buffer
+      onPoll: (b) => {
+        const counts = b.request_counts;
+        console.log(`  ... processing: ${counts.processing}, succeeded: ${counts.succeeded}, errored: ${counts.errored}`);
+      },
     });
+
+    console.log(`\n\x1b[1mBatch completed${chunkLabel}. Processing ${completedBatch.request_counts.succeeded} results...\x1b[0m\n`);
+
+    // Phase 4: Process results
+    const resultsMap = await getBatchResults(anthropicClient, batch.id);
+    for (const [customId, batchResult] of resultsMap) {
+      const batchEntry = batchItemMap.get(customId);
+      if (!batchEntry) continue;
+      const { item, sourceUrl } = batchEntry;
+
+      if (batchResult.result.type !== 'succeeded') {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: `Batch request ${batchResult.result.type}`,
+        });
+        continue;
+      }
+
+      const text = extractBatchResultText(batchResult);
+      if (!text) {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: 'Empty batch result',
+        });
+        continue;
+      }
+
+      // Parse LLM response with shared Zod schema (same validation as real-time path)
+      const raw = parseJsonResponse(text);
+      const parsed = LlmResponseSchema.safeParse(raw);
+      if (!parsed.success) {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: `Invalid LLM response: ${parsed.error.message}`,
+        });
+        continue;
+      }
+
+      const verdict = validateVerdict(parsed.data.verdict);
+      const confidence = parsed.data.confidence;
+      const extractedValue = parsed.data.extracted_value;
+      const reasoning = parsed.data.reasoning;
+
+      const verifyResult: VerifyResult = {
+        itemId: item.id,
+        kind: item.kind,
+        description: item.description,
+        verdict,
+        confidence,
+        extractedValue,
+        reasoning,
+        sourceUrl: sourceUrl ?? '',
+      };
+
+      summary[verdict]++;
+      summary.actualVerified++;
+      summary.byKind[item.kind].verified++;
+      summary.results.push(verifyResult);
+
+      const color = verdict === 'confirmed' ? '\x1b[32m' : verdict === 'contradicted' ? '\x1b[31m' : '\x1b[33m';
+      console.log(`  ${item.description.slice(0, 80)}`);
+      console.log(`    ${color}${verdict}\x1b[0m (confidence: ${(confidence * 100).toFixed(0)}%)`);
+
+      await storeResult(item, verifyResult).catch((e: unknown) => {
+        console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
+      });
+    }
   }
 }
 

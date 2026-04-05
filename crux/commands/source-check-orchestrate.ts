@@ -111,10 +111,11 @@ async function verifyCommand(
   // Record type subcommands (grants, personnel, etc.)
   const mapped = subcommand ? RECORD_TYPE_MAP[subcommand] : undefined;
   if (mapped) {
-    // Route to orchestrate with --type=record and entity-type filter
+    // Route to orchestrate with --type=record and table filter for the specific record type
     const recordOptions: OrchestrateOptions = {
       ...options,
       type: 'record',
+      table: mapped,
     };
     return orchestrateCommand(args.slice(1), recordOptions);
   }

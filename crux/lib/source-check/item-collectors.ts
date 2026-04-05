@@ -296,17 +296,23 @@ export async function collectRecordItems(
         const description = buildRecordDescription(recordType, item);
         const fields = extractRecordFields(recordType, item);
 
-        // Skip records where all key names are unresolvable stableIds.
-        // The LLM can't verify "aAFe7DRvPv is a researcher at org X" against a source.
+        // Skip records where any key name is an unresolvable stableId.
+        // The LLM can't verify "aAFe7DRvPv is a researcher at Anthropic" against a source —
+        // it needs both the person and org names to be human-readable.
         if (recordType === 'personnel') {
           const personName = resolveName(item, 'personResolvedName', 'personDisplayName', 'personId');
           const orgName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
-          if (!isResolvableName(personName) && !isResolvableName(orgName)) continue;
-        }
-        if (recordType === 'investment') {
+          if (!isResolvableName(personName) || !isResolvableName(orgName)) continue;
+        } else if (recordType === 'investment') {
           const investorName = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');
           const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
-          if (!isResolvableName(investorName) && !isResolvableName(companyName)) continue;
+          if (!isResolvableName(investorName) || !isResolvableName(companyName)) continue;
+        } else if (recordType === 'funding-round') {
+          const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
+          if (!isResolvableName(companyName)) continue;
+        } else if (recordType === 'benchmark-result') {
+          const modelName = resolveName(item, 'modelResolvedName', 'modelDisplayName', 'modelId');
+          if (!isResolvableName(modelName)) continue;
         }
 
         const priority = computeRecordPriority(recordType, existing);
