@@ -13,6 +13,7 @@ import { getResourceIdForFact } from "@/data/resource-fact-links";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
+import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
@@ -187,7 +188,8 @@ export default async function FactDetailPage({ params }: PageProps) {
       </nav>
 
       {/* Header */}
-      <h1 className="text-2xl font-bold mb-1">
+      <h1 className="text-2xl font-bold mb-1 inline-flex items-center gap-2">
+        <FactSourceCheckDot factId={factId} size="md" />
         <FactValueDisplay fact={fact} unit={property?.unit} display={property?.display} />
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
@@ -267,9 +269,12 @@ export default async function FactDetailPage({ params }: PageProps) {
         </KVRow>
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
         <KVRow label="Verification">
-          <FactLink href={`/source-checks/fact/${factId}`}>
-            view source checks {"\u2192"}
-          </FactLink>
+          <span className="inline-flex items-center gap-2">
+            <FactSourceCheckDot factId={factId} size="md" />
+            <FactLink href={`/source-checks/fact/${factId}`}>
+              view source checks {"\u2192"}
+            </FactLink>
+          </span>
         </KVRow>
       </KVTable>
 
@@ -321,6 +326,7 @@ export default async function FactDetailPage({ params }: PageProps) {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="pl-3 py-2 font-medium w-5"></th>
                   <th className="px-3 py-2 font-medium">As Of</th>
                   <th className="px-3 py-2 font-medium">Value</th>
                   <th className="px-3 py-2 font-medium">Source</th>
@@ -335,6 +341,9 @@ export default async function FactDetailPage({ params }: PageProps) {
                       key={f.id}
                       className={`border-t border-border ${isCurrent ? "bg-primary/5" : "[&:nth-child(even)]:bg-muted/30"}`}
                     >
+                      <td className="pl-3 py-1.5">
+                        <FactSourceCheckDot factId={f.id} size="md" />
+                      </td>
                       <td className="px-3 py-1.5">{formatKBDate(f.asOf)}</td>
                       <td className="px-3 py-1.5 font-mono">
                         <FactValueDisplay fact={f} unit={property?.unit} display={property?.display} />
