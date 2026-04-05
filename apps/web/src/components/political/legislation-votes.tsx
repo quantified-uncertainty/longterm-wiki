@@ -14,6 +14,10 @@
 import { cn } from "@/lib/utils";
 import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
 import { getEntityHref } from "@/data/entity-nav";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { PoliticalVoteRecord } from "./types";
 
 // ── Vote styling ────────────────────────────────────────────────────
@@ -327,6 +331,9 @@ function VotesTable({ votes }: { votes: PoliticalVoteRecord[] }) {
               <th className="text-left px-4 py-2 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                 Source
               </th>
+              <th className="px-4 py-2 w-8">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -413,6 +420,19 @@ function LegislationVoteRow({ vote }: { vote: PoliticalVoteRecord }) {
         ) : (
           <span className="text-muted-foreground/40">&mdash;</span>
         )}
+      </td>
+      <td className="px-4 py-2.5 text-center">
+        {(() => {
+          const verdict = getRecordVerdict("political-vote", String(vote.id))?.verdict;
+          return (
+            <SourceCheckDot
+              status={recordVerdictToStatus(verdict)}
+              originalVerdict={verdict}
+              size="md"
+              href={getSourceCheckHref("political-vote", String(vote.id))}
+            />
+          );
+        })()}
       </td>
     </tr>
   );

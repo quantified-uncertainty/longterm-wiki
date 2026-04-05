@@ -28,6 +28,8 @@ import { ResourceList } from "@/components/resources/ResourceList";
 import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
 import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 import { isDeadFetchStatus } from "@wiki-server/api-types";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
 const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;
@@ -60,8 +62,25 @@ function makeColumns(opts: {
   showCredibility: boolean;
   showSource: boolean;
   showStance: boolean;
+  verdicts: Record<string, string | null>;
 }): ColumnDef<OrgResourceRow>[] {
   const cols: ColumnDef<OrgResourceRow>[] = [
+    {
+      id: "sourceCheck",
+      header: "",
+      cell: ({ row }) => {
+        const verdict = opts.verdicts[row.original.id] ?? null;
+        return (
+          <SourceCheckDot
+            status={recordVerdictToStatus(verdict)}
+            originalVerdict={verdict}
+            size="md"
+            href={verdict ? `/source-checks/resource/${encodeURIComponent(row.original.id)}` : undefined}
+          />
+        );
+      },
+      enableSorting: false,
+    },
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -307,12 +326,15 @@ export function OrgResourcesSection({
   emptyMessage,
   alwaysShowColumns,
   defaultView = "table",
+  verdicts = {},
 }: {
   resources: OrgResourceRow[];
   title: string;
   emptyMessage: string;
   alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
   defaultView?: ViewMode;
+  /** Map of resource ID → verdict string (e.g. "confirmed", "contradicted"). Computed server-side. */
+  verdicts?: Record<string, string | null>;
 }) {
   const [view, setView] = useState<ViewMode>(defaultView);
 
@@ -342,7 +364,7 @@ export function OrgResourcesSection({
       <div className="flex items-center justify-end mb-1">
         <ViewToggle view={view} onChange={setView} />
       </div>
-      <OrgResourcesTable resources={resources} title={title} alwaysShowColumns={alwaysShowColumns} />
+      <OrgResourcesTable resources={resources} title={title} alwaysShowColumns={alwaysShowColumns} verdicts={verdicts} />
     </section>
   );
 }
@@ -372,13 +394,15 @@ function OrgResourcesTable({
   resources,
   title,
   alwaysShowColumns,
+  verdicts,
 }: {
   resources: OrgResourceRow[];
   title: string;
   alwaysShowColumns?: { date?: boolean; publication?: boolean; credibility?: boolean };
+  verdicts: Record<string, string | null>;
 }) {
   const colVis = useMemo(() => computeColumnVisibility(resources, alwaysShowColumns), [resources, alwaysShowColumns]);
-  const columns = useMemo(() => makeColumns(colVis), [colVis]);
+  const columns = useMemo(() => makeColumns({ ...colVis, verdicts }), [colVis, verdicts]);
 
   const [sorting, setSorting] = useState<SortingState>(
     colVis.showDate

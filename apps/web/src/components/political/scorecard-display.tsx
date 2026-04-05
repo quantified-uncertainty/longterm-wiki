@@ -12,6 +12,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordVerdict } from "@data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { PoliticalScore } from "./types";
 
 // ── Score color logic ────────────────────────────────────────────────
@@ -157,6 +161,9 @@ function ScoreGroupSection({ group }: { group: ScoreGroup }) {
               <th className="text-left px-4 py-2 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                 Source
               </th>
+              <th className="px-4 py-2 w-8">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -231,6 +238,19 @@ function ScoreRow({ score }: { score: PoliticalScore }) {
         ) : (
           <span className="text-muted-foreground/40">&mdash;</span>
         )}
+      </td>
+      <td className="px-4 py-2.5 text-center">
+        {(() => {
+          const verdict = getRecordVerdict("political-score", String(score.id))?.verdict;
+          return (
+            <SourceCheckDot
+              status={recordVerdictToStatus(verdict)}
+              originalVerdict={verdict}
+              size="md"
+              href={getSourceCheckHref("political-score", String(score.id))}
+            />
+          );
+        })()}
       </td>
     </tr>
   );

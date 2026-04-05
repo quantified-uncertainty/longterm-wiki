@@ -257,6 +257,7 @@ export function ProductsSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -265,6 +266,7 @@ export function ProductsSection({
               const launched = field(prod, "launched");
               const description = field(prod, "description");
               const source = field(prod, "source");
+              const prodVerdict = getRecordVerdict("product", String(prod.key))?.verdict;
 
               return (
                 <tr key={prod.key} className="hover:bg-muted/20 transition-colors">
@@ -282,6 +284,14 @@ export function ProductsSection({
                       {source && isUrl(source) ? <SourceLink source={source} /> : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(prodVerdict)}
+                      originalVerdict={prodVerdict}
+                      size="md"
+                      href={getSourceCheckHref("product", String(prod.key))}
+                    />
+                  </td>
                 </tr>
               );
             })}
@@ -326,6 +336,7 @@ export function SafetyMilestonesSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -335,6 +346,7 @@ export function SafetyMilestonesSection({
               const msType = field(ms, "type");
               const description = field(ms, "description");
               const source = field(ms, "source");
+              const msVerdict = getRecordVerdict("safety-milestone", String(ms.key))?.verdict;
 
               return (
                 <tr key={ms.key} className="hover:bg-muted/20 transition-colors">
@@ -366,6 +378,14 @@ export function SafetyMilestonesSection({
                       <SourceLink source={source} />
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(msVerdict)}
+                      originalVerdict={msVerdict}
+                      size="md"
+                      href={getSourceCheckHref("safety-milestone", String(ms.key))}
+                    />
+                  </td>
                 </tr>
               );
             })}
@@ -411,6 +431,7 @@ export function StrategicPartnershipsSection({
               {hasNotes && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
               )}
+              <th scope="col" className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -423,6 +444,7 @@ export function StrategicPartnershipsSection({
               const investmentAmount = sp.fields.investment_amount;
               const computeCommitment = sp.fields.compute_commitment;
               const notes = field(sp, "notes");
+              const spVerdict = getRecordVerdict("strategic-partnership", String(sp.key))?.verdict;
 
               return (
                 <tr key={sp.key} className="hover:bg-muted/20 transition-colors">
@@ -458,6 +480,14 @@ export function StrategicPartnershipsSection({
                       {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
+                  <td className="py-1.5 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(spVerdict)}
+                      originalVerdict={spVerdict}
+                      size="md"
+                      href={getSourceCheckHref("strategic-partnership", String(sp.key))}
+                    />
+                  </td>
                 </tr>
               );
             })}

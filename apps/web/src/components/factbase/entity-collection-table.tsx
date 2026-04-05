@@ -1,5 +1,9 @@
 import { getKBRecordSchema } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 
@@ -40,31 +44,46 @@ export function GenericCollectionTable({
                   {titleCase(col)}
                 </th>
               ))}
+              <th className="w-8 py-1.5 px-1">
+                <span className="sr-only">Source check</span>
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {items.map((item) => (
-              <tr key={item.key}>
-                {columns.map((col) => {
-                  const cellValue = item.fields[col];
-                  const fieldDef =
-                    fieldDefs?.[col] ??
-                    (endpointDefs && col in endpointDefs
-                      ? { type: "ref" as const }
-                      : undefined);
+            {items.map((item) => {
+              const recordId = String(item.key);
+              const verdict = getRecordVerdict(collectionName, recordId);
+              return (
+                <tr key={item.key}>
+                  {columns.map((col) => {
+                    const cellValue = item.fields[col];
+                    const fieldDef =
+                      fieldDefs?.[col] ??
+                      (endpointDefs && col in endpointDefs
+                        ? { type: "ref" as const }
+                        : undefined);
 
-                  return (
-                    <td key={col} className="py-1.5 px-3">
-                      <FBCellValue
-                        value={cellValue}
-                        fieldName={col}
-                        fieldDef={fieldDef}
-                      />
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+                    return (
+                      <td key={col} className="py-1.5 px-3">
+                        <FBCellValue
+                          value={cellValue}
+                          fieldName={col}
+                          fieldDef={fieldDef}
+                        />
+                      </td>
+                    );
+                  })}
+                  <td className="w-8 px-1">
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(verdict?.verdict)}
+                      originalVerdict={verdict?.verdict}
+                      size="md"
+                      href={getSourceCheckHref(collectionName, recordId)}
+                    />
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
