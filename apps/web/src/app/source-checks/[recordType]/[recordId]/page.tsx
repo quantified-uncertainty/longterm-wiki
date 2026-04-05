@@ -39,6 +39,52 @@ function formatJsonValue(v: unknown): string {
   return String(v);
 }
 
+/** Format an extractedQuote for display. Strips "Matched row:" prefix and renders JSON nicely. */
+function FormatQuote({ quote }: { quote: string }) {
+  let text = quote.trim();
+
+  // Strip "Matched row:" or similar prefixes
+  const prefixMatch = text.match(/^(?:Matched row|Found row|Row match)[:\s]*/i);
+  if (prefixMatch) {
+    text = text.slice(prefixMatch[0].length).trim();
+  }
+
+  // If the remaining text is JSON, render as key-value pairs
+  if (text.startsWith("{") || text.startsWith("[")) {
+    try {
+      const parsed = JSON.parse(text);
+      if (typeof parsed === "object" && parsed !== null && !Array.isArray(parsed)) {
+        const entries = Object.entries(parsed).filter(
+          ([, v]) => v !== null && v !== undefined && v !== ""
+        );
+        if (entries.length > 0) {
+          return (
+            <div className="rounded-md bg-muted/40 px-3 py-2 mb-2 text-sm space-y-1">
+              {entries.slice(0, 8).map(([k, v]) => (
+                <div key={k} className="flex gap-2">
+                  <span className="text-muted-foreground shrink-0">{k}:</span>
+                  <span className="text-foreground/80 break-all">{formatJsonValue(v)}</span>
+                </div>
+              ))}
+              {entries.length > 8 && (
+                <div className="text-xs text-muted-foreground">+{entries.length - 8} more fields</div>
+              )}
+            </div>
+          );
+        }
+      }
+    } catch {
+      // Not valid JSON — render as plain quote
+    }
+  }
+
+  return (
+    <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-2">
+      {text}
+    </blockquote>
+  );
+}
+
 /** Format an extractedValue for display. Detects JSON and renders key-value summary. */
 function FormatExtractedValue({ value }: { value: string }) {
   const trimmed = value.trim();
@@ -227,8 +273,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       <div className="mb-6">
         <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
           <span className="capitalize">{formatRecordType(recordType)}</span>
-          <span>&middot;</span>
-          <span className="font-mono">{recordId}</span>
         </div>
         <h1 className="text-2xl font-bold mb-1">
           {claimSummary ?? displayName}
@@ -247,12 +291,12 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           {entityHref && (
             <Link href={entityHref} className="text-primary hover:underline">
               {recordType === "personnel"
-                ? "View organization page"
+                ? "Organization page"
                 : recordType === "division"
-                  ? "View parent organization"
+                  ? "Parent organization"
                   : claimEntityName
-                    ? `${claimEntityName} wiki page`
-                    : "View entity page"} &rarr;
+                    ? `${claimEntityName} page`
+                    : "Profile page"} &rarr;
             </Link>
           )}
         </div>
@@ -488,9 +532,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
                         {/* Quote */}
                         {e.extractedQuote && (
-                          <blockquote className="border-l-2 border-border pl-3 text-sm text-muted-foreground italic mb-2">
-                            {e.extractedQuote}
-                          </blockquote>
+                          <FormatQuote quote={e.extractedQuote} />
                         )}
 
                         {/* Notes */}
