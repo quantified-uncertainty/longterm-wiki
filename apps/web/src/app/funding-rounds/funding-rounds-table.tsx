@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeFundingRoundCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
@@ -200,6 +202,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
               <SortHeader label="Instrument" sortKey="instrument" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Lead Investor" sortKey="leadInvestor" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <th className="py-2.5 px-3 font-medium text-center hidden sm:table-cell">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -283,6 +286,9 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 </td>
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                   {row.date ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
+                </td>
+                <td className="py-2.5 px-3 text-center hidden sm:table-cell">
+                  <CoverageDots score={computeFundingRoundCoverage(row)} />
                 </td>
               </tr>
             ))}

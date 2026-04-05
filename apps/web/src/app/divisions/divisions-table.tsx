@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
@@ -195,6 +197,7 @@ export function DivisionsTable({
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Type</th>
                 <th className="text-left py-2.5 px-3 font-medium">Status</th>
+                <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -259,6 +262,9 @@ export function DivisionsTable({
                         {titleCase(row.status)}
                       </span>
                     )}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    <CoverageDots score={computeDivisionCoverage(row)} />
                   </td>
                 </tr>
               ))}

@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeBenchmarkCoverage } from "@/components/coverage/coverage-score";
 
 export interface BenchmarkRow {
   id: string;
@@ -164,6 +166,7 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
               <th className="py-2.5 px-3 font-medium text-left">Scoring</th>
               <SortHeader label="Introduced" sortKey="introducedDate" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Maintainer" sortKey="maintainer" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
+              <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -224,6 +227,10 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
                 {/* Maintainer */}
                 <td className="py-2.5 px-3 text-muted-foreground">
                   {row.maintainer ?? <span className="text-muted-foreground/40">&mdash;</span>}
+                </td>
+                {/* Coverage */}
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeBenchmarkCoverage(row)} />
                 </td>
               </tr>
             ))}

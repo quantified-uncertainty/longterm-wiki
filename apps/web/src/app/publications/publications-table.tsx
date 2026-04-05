@@ -14,6 +14,8 @@ import { Search } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { formatType } from "./publication-utils";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computePublicationCoverage } from "@/components/coverage/coverage-score";
 import {
   Table,
   TableBody,
@@ -145,6 +147,13 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
         <span className="text-xs tabular-nums text-muted-foreground">
           {row.original.pageCount}
         </span>
+      ),
+    },
+    {
+      id: "coverage",
+      header: () => <span className="text-xs font-medium">Coverage</span>,
+      cell: ({ row }) => (
+        <CoverageDots score={computePublicationCoverage(row.original)} />
       ),
     },
   ];

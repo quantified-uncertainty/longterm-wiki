@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGrantCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
 import { compareGrantRows, type SortDir } from "./grants-sort";
@@ -347,6 +349,7 @@ export function GrantsTable({
               {hasAnyStatus && (
                 <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               )}
+              <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -463,6 +466,9 @@ export function GrantsTable({
                     )}
                   </td>
                 )}
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeGrantCoverage({ amount: row.amount, recipient: row.recipientName, date: row.date, program: row.program, status: row.status, source: row.source })} />
+                </td>
               </tr>
             ))}
           </tbody>

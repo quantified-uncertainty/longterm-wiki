@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
@@ -349,6 +351,7 @@ export function FundingProgramsListTable({
                 onSort={handleSort}
                 className="text-center"
               />
+              <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -441,6 +444,9 @@ export function FundingProgramsListTable({
                   )}
                 </td>
 
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeFundingProgramCoverage(row)} />
+                </td>
               </tr>
             ))}
           </tbody>

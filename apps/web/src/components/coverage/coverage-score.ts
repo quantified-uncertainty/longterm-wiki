@@ -164,7 +164,192 @@ export function computeGenericCoverage(row: GenericCoverageInput): number {
   if (row.description) signals++;
   if ((row.tags?.length ?? 0) >= 1) signals++;
   if (row.wikiId) signals++;
-  signals += Math.min(row.filledFieldCount ?? 0, 4);
+  signals += Math.min(row.filledFieldCount ?? 0, 2);
+
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Project scoring ─────────────────────────────────────────────────
+
+export interface ProjectCoverageInput {
+  description?: string | null;
+  status?: string | null;
+  website?: string | null;
+  orgName?: string | null;
+  clusters?: string[];
+  wikiId?: string | null;
+}
+
+export function computeProjectCoverage(row: ProjectCoverageInput): number {
+  let signals = 0;
+
+  if (row.description) signals++;
+  if (row.status) signals++;
+  if (row.website) signals++;
+  if (row.orgName) signals++;
+  if ((row.clusters?.length ?? 0) >= 1) signals++;
+  if (row.wikiId) signals++;
+
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Benchmark scoring ───────────────────────────────────────────────
+
+export interface BenchmarkCoverageInput {
+  category?: string | null;
+  scoringMethod?: string | null;
+  introducedDate?: string | null;
+  maintainer?: string | null;
+  description?: string | null;
+  modelsCount?: number;
+  wikiId?: string | null;
+}
+
+export function computeBenchmarkCoverage(row: BenchmarkCoverageInput): number {
+  let signals = 0;
+
+  if (row.category) signals++;
+  if (row.scoringMethod) signals++;
+  if (row.introducedDate) signals++;
+  if (row.maintainer) signals++;
+  if (row.description) signals++;
+  if ((row.modelsCount ?? 0) >= 3) signals++;
+  if ((row.modelsCount ?? 0) >= 10) signals++;
+  if (row.wikiId) signals++;
+
+  if (signals >= 6) return 4;
+  if (signals >= 4) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Grant scoring ───────────────────────────────────────────────────
+
+export interface GrantCoverageInput {
+  amount?: number | null;
+  recipient?: string | null;
+  date?: string | null;
+  program?: string | null;
+  status?: string | null;
+  source?: string | null;
+}
+
+export function computeGrantCoverage(row: GrantCoverageInput): number {
+  let signals = 0;
+
+  if (row.amount != null) signals++;
+  if (row.recipient) signals++;
+  if (row.date) signals++;
+  if (row.program) signals++;
+  if (row.status) signals++;
+  if (row.source) signals++;
+
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Funding Program scoring ─────────────────────────────────────────
+
+export interface FundingProgramCoverageInput {
+  totalBudget?: number | null;
+  programType?: string | null;
+  deadline?: string | null;
+  status?: string | null;
+  description?: string | null;
+  applicationUrl?: string | null;
+}
+
+export function computeFundingProgramCoverage(row: FundingProgramCoverageInput): number {
+  let signals = 0;
+
+  if (row.totalBudget != null) signals++;
+  if (row.programType) signals++;
+  if (row.deadline) signals++;
+  if (row.status) signals++;
+  if (row.description) signals++;
+  if (row.applicationUrl) signals++;
+
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Funding Round scoring ───────────────────────────────────────────
+
+export interface FundingRoundCoverageInput {
+  raised?: number | null;
+  valuation?: number | null;
+  date?: string | null;
+  instrument?: string | null;
+  leadInvestorName?: string | null;
+}
+
+export function computeFundingRoundCoverage(row: FundingRoundCoverageInput): number {
+  let signals = 0;
+
+  if (row.raised != null) signals++;
+  if (row.valuation != null) signals++;
+  if (row.date) signals++;
+  if (row.instrument) signals++;
+  if (row.leadInvestorName) signals++;
+
+  if (signals >= 4) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Division scoring ────────────────────────────────────────────────
+
+export interface DivisionCoverageInput {
+  divisionType?: string | null;
+  status?: string | null;
+  hasData?: boolean;
+  href?: string | null;
+}
+
+export function computeDivisionCoverage(row: DivisionCoverageInput): number {
+  let signals = 0;
+
+  if (row.divisionType) signals++;
+  if (row.status) signals++;
+  if (row.hasData) signals++;
+  if (row.href) signals++;
+
+  if (signals >= 4) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
+  return 1;
+}
+
+// ── Publication scoring ─────────────────────────────────────────────
+
+export interface PublicationCoverageInput {
+  credibility?: number | null;
+  peerReviewed?: boolean;
+  resourceCount?: number;
+  pageCount?: number;
+  type?: string | null;
+}
+
+export function computePublicationCoverage(row: PublicationCoverageInput): number {
+  let signals = 0;
+
+  if (row.credibility != null) signals++;
+  if (row.peerReviewed) signals++;
+  if ((row.resourceCount ?? 0) >= 1) signals++;
+  if ((row.resourceCount ?? 0) >= 5) signals++;
+  if ((row.pageCount ?? 0) >= 1) signals++;
+  if (row.type) signals++;
 
   if (signals >= 5) return 4;
   if (signals >= 3) return 3;
