@@ -1,8 +1,9 @@
+import { createHash } from "node:crypto";
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities } from "../../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities, resourceContentVersions } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -810,7 +811,169 @@ const citationsApp = new Hono()
         set: { ...vals, updatedAt: sql`now()` },
       });
 
+    // Dual-write: append to resource_content_versions with content-hash dedup.
+    // Compute hash from fullText if not provided by the caller.
+    const versionHash = d.contentHash
+      ?? (d.fullText ? createHash("sha256").update(d.fullText).digest("hex") : null);
+
+    if (versionHash !== null) {
+      const metadata: Record<string, unknown> = {};
+      if (d.pageTitle) metadata.pageTitle = d.pageTitle;
+      const preview = d.fullTextPreview ?? (d.fullText ? d.fullText.slice(0, CITATION_CONTENT_PREVIEW_MAX) : null);
+      if (preview) metadata.fullTextPreview = preview;
+
+      await db
+        .insert(resourceContentVersions)
+        .values({
+          resourceId: d.resourceId ?? null,
+          url: d.url,
+          contentHash: versionHash,
+          fetchedAt: new Date(d.fetchedAt),
+          content: d.fullText ?? null,
+          contentLength: d.contentLength ?? null,
+          httpStatus: d.httpStatus ?? null,
+          contentType: d.contentType ?? null,
+          fetchMethod: d.fetchMethod ?? null,
+          metadata: Object.keys(metadata).length > 0 ? metadata : null,
+        })
+        .onConflictDoNothing({ target: [resourceContentVersions.url, resourceContentVersions.contentHash] })
+        .catch((e: unknown) => {
+          // Best-effort: don't fail the upsert if versioning fails
+          logger.warn({ error: e instanceof Error ? e.message : String(e), url: d.url }, "Failed to write content version");
+        });
+    }
+
     return c.json({ url: d.url });
+  })
+
+  // ---- GET /content/history ---- paginated version list for a URL (metadata only, no content)
+  .get("/content/history", zv("query", z.object({
+    url: z.string().min(1),
+    limit: z.coerce.number().int().min(1).max(100).default(20),
+    offset: z.coerce.number().int().min(0).default(0),
+  })), async (c) => {
+    const db = getDrizzleDb();
+    const { url, limit, offset } = c.req.valid("query");
+
+    const [totalRow] = await db
+      .select({ count: count() })
+      .from(resourceContentVersions)
+      .where(eq(resourceContentVersions.url, url));
+
+    const rows = await db
+      .select({
+        id: resourceContentVersions.id,
+        resourceId: resourceContentVersions.resourceId,
+        url: resourceContentVersions.url,
+        contentHash: resourceContentVersions.contentHash,
+        fetchedAt: resourceContentVersions.fetchedAt,
+        contentLength: resourceContentVersions.contentLength,
+        httpStatus: resourceContentVersions.httpStatus,
+        contentType: resourceContentVersions.contentType,
+        fetchMethod: resourceContentVersions.fetchMethod,
+        metadata: resourceContentVersions.metadata,
+        createdAt: resourceContentVersions.createdAt,
+      })
+      .from(resourceContentVersions)
+      .where(eq(resourceContentVersions.url, url))
+      .orderBy(desc(resourceContentVersions.fetchedAt))
+      .limit(limit)
+      .offset(offset);
+
+    return c.json({
+      versions: rows.map((r) => ({
+        id: r.id,
+        resourceId: r.resourceId,
+        url: r.url,
+        contentHash: r.contentHash,
+        fetchedAt: r.fetchedAt.toISOString(),
+        contentLength: r.contentLength,
+        httpStatus: r.httpStatus,
+        contentType: r.contentType,
+        fetchMethod: r.fetchMethod,
+        metadata: r.metadata,
+        createdAt: r.createdAt.toISOString(),
+      })),
+      total: totalRow?.count ?? 0,
+    });
+  })
+
+  // ---- GET /content/history/:id ---- single version with full content
+  .get("/content/history/:id", async (c) => {
+    const db = getDrizzleDb();
+    const id = Number(c.req.param("id"));
+    if (!Number.isFinite(id) || id < 1) return validationError(c, "Invalid version ID");
+
+    const [row] = await db
+      .select()
+      .from(resourceContentVersions)
+      .where(eq(resourceContentVersions.id, id));
+
+    if (!row) return notFoundError(c, "Content version not found");
+
+    return c.json({
+      id: row.id,
+      resourceId: row.resourceId,
+      url: row.url,
+      contentHash: row.contentHash,
+      fetchedAt: row.fetchedAt.toISOString(),
+      content: row.content,
+      contentLength: row.contentLength,
+      httpStatus: row.httpStatus,
+      contentType: row.contentType,
+      fetchMethod: row.fetchMethod,
+      metadata: row.metadata,
+      createdAt: row.createdAt.toISOString(),
+    });
+  })
+
+  // ---- GET /content/at ---- temporal query: latest version at or before a date
+  .get("/content/at", zv("query", z.object({
+    url: z.string().min(1),
+    date: z.string().datetime(),
+  })), async (c) => {
+    const db = getDrizzleDb();
+    const { url, date } = c.req.valid("query");
+
+    const [row] = await db
+      .select({
+        id: resourceContentVersions.id,
+        resourceId: resourceContentVersions.resourceId,
+        url: resourceContentVersions.url,
+        contentHash: resourceContentVersions.contentHash,
+        fetchedAt: resourceContentVersions.fetchedAt,
+        content: resourceContentVersions.content,
+        contentLength: resourceContentVersions.contentLength,
+        httpStatus: resourceContentVersions.httpStatus,
+        contentType: resourceContentVersions.contentType,
+        fetchMethod: resourceContentVersions.fetchMethod,
+        metadata: resourceContentVersions.metadata,
+        createdAt: resourceContentVersions.createdAt,
+      })
+      .from(resourceContentVersions)
+      .where(and(
+        eq(resourceContentVersions.url, url),
+        sql`${resourceContentVersions.fetchedAt} <= ${new Date(date)}`,
+      ))
+      .orderBy(desc(resourceContentVersions.fetchedAt))
+      .limit(1);
+
+    if (!row) return notFoundError(c, "No content version found at or before that date");
+
+    return c.json({
+      id: row.id,
+      resourceId: row.resourceId,
+      url: row.url,
+      contentHash: row.contentHash,
+      fetchedAt: row.fetchedAt.toISOString(),
+      content: row.content,
+      contentLength: row.contentLength,
+      httpStatus: row.httpStatus,
+      contentType: row.contentType,
+      fetchMethod: row.fetchMethod,
+      metadata: row.metadata,
+      createdAt: row.createdAt.toISOString(),
+    });
   })
 
   // ---- POST /accuracy-snapshot ----

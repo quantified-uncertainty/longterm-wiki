@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
-import type { citationQuotes, citationAccuracySnapshots, citationContent } from "../schema.js";
+import type { citationQuotes, citationAccuracySnapshots, citationContent, resourceContentVersions } from "../schema.js";
 
 // ---- In-memory stores simulating Postgres tables ----
 // Store types are derived from the Drizzle schema so TypeScript catches column renames.
@@ -13,12 +13,16 @@ type QuoteRow = typeof citationQuotes.$inferSelect;
 type SnapshotRow = typeof citationAccuracySnapshots.$inferSelect;
 // citationContent.$inferSelect
 type ContentRow = typeof citationContent.$inferSelect;
+// resourceContentVersions.$inferSelect
+type ContentVersionRow = typeof resourceContentVersions.$inferSelect;
 
 let nextQuoteId = 1;
 let nextSnapshotId = 1;
+let nextContentVersionId = 1;
 let quotesStore: Map<string, QuoteRow>; // key: `${pageSlug}:${footnote}`
 let contentStore: Map<string, ContentRow>; // key: url
 let snapshotStore: Array<SnapshotRow>;
+let contentVersionStore: Array<ContentVersionRow>;
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -42,9 +46,11 @@ function slugFromIntId(intId: number | null): string | null {
 function resetStores() {
   nextQuoteId = 1;
   nextSnapshotId = 1;
+  nextContentVersionId = 1;
   quotesStore = new Map();
   contentStore = new Map();
   snapshotStore = [];
+  contentVersionStore = [];
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
 }
@@ -121,6 +127,8 @@ function contentToSqlRow(r: ContentRow): Record<string, unknown> {
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
+  // Debug: uncomment to see SQL patterns
+  // if (q.includes("resource_content_versions")) console.log("DISPATCH rcv:", JSON.stringify({ q: q.slice(0, 300), params }));
 
   // --- ref-check: SELECT id FROM wiki_pages/resources WHERE id IN (...) ---
   if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
@@ -657,6 +665,97 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     };
     contentStore.set(url, row);
     return [contentToSqlRow(row)];
+  }
+
+  // --- resource_content_versions: INSERT ... ON CONFLICT DO NOTHING ---
+  if (q.includes("insert into") && q.includes("resource_content_versions")) {
+    const resourceId = params[0] as string | null;
+    const url = params[1] as string;
+    const contentHash = params[2] as string;
+    const rawFetchedAt = params[3];
+    const fetchedAt = rawFetchedAt instanceof Date ? rawFetchedAt : new Date(rawFetchedAt as string);
+    const content = params[4] as string | null;
+    const contentLength = params[5] as number | null;
+    const httpStatus = params[6] as number | null;
+    const contentType = params[7] as string | null;
+    const fetchMethod = params[8] as string | null;
+    const rawMetadata = params[9];
+    const metadata = typeof rawMetadata === "string" ? JSON.parse(rawMetadata) : rawMetadata as Record<string, unknown> | null;
+    const now = new Date();
+    // Check dedup: UNIQUE(url, content_hash)
+    const existing = contentVersionStore.find(
+      (r) => r.url === url && r.contentHash === contentHash
+    );
+    if (existing) return []; // ON CONFLICT DO NOTHING
+    const row: ContentVersionRow = {
+      id: nextContentVersionId++,
+      resourceId,
+      url,
+      contentHash,
+      fetchedAt,
+      content,
+      contentLength,
+      httpStatus,
+      contentType,
+      fetchMethod,
+      metadata,
+      createdAt: now,
+    };
+    contentVersionStore.push(row);
+    return [{ id: row.id }];
+  }
+
+  // --- resource_content_versions: SELECT ... WHERE url [AND fetched_at <=] ORDER BY fetched_at DESC ---
+  if (q.includes("resource_content_versions") && q.includes("where") && q.includes("order by")) {
+    const url = params[0] as string;
+    // Check if there's a date filter (temporal query: fetched_at <= $2)
+    const hasDateFilter = q.includes("<=");
+    const dateFilter = hasDateFilter && params[1] instanceof Date ? params[1] as Date : null;
+
+    let filtered = contentVersionStore
+      .filter((r) => r.url === url)
+      .sort((a, b) => b.fetchedAt.getTime() - a.fetchedAt.getTime());
+
+    if (dateFilter) {
+      filtered = filtered.filter((r) => r.fetchedAt.getTime() <= dateFilter.getTime());
+    }
+
+    // Handle LIMIT/OFFSET — find the positional params
+    const limitMatch = q.match(/limit\s+\$(\d+)/);
+    const limitIdx = limitMatch ? parseInt(limitMatch[1]) - 1 : -1;
+    const limit = limitIdx >= 0 ? (params[limitIdx] as number) : filtered.length;
+    const offsetMatch = q.match(/offset\s+\$(\d+)/);
+    const offsetIdx = offsetMatch ? parseInt(offsetMatch[1]) - 1 : -1;
+    const offset = offsetIdx >= 0 ? (params[offsetIdx] as number) : 0;
+    return filtered.slice(offset, offset + limit).map((r) => ({
+      id: r.id, resource_id: r.resourceId, url: r.url,
+      content_hash: r.contentHash, fetched_at: r.fetchedAt,
+      content: r.content, content_length: r.contentLength,
+      http_status: r.httpStatus, content_type: r.contentType,
+      fetch_method: r.fetchMethod, metadata: r.metadata,
+      created_at: r.createdAt,
+    }));
+  }
+
+  // --- resource_content_versions: SELECT count(*) WHERE url ---
+  if (q.includes("resource_content_versions") && q.includes("count(*)")) {
+    const url = params[0] as string;
+    return [{ count: contentVersionStore.filter((r) => r.url === url).length }];
+  }
+
+  // --- resource_content_versions: SELECT WHERE id (single version) ---
+  if (q.includes("resource_content_versions") && q.includes("where") && !q.includes("order by") && !q.includes("count(*)")) {
+    const id = params[0] as number;
+    const row = contentVersionStore.find((r) => r.id === id);
+    if (!row) return [];
+    return [{
+      id: row.id, resource_id: row.resourceId, url: row.url,
+      content_hash: row.contentHash, fetched_at: row.fetchedAt,
+      content: row.content, content_length: row.contentLength,
+      http_status: row.httpStatus, content_type: row.contentType,
+      fetch_method: row.fetchMethod, metadata: row.metadata,
+      created_at: row.createdAt,
+    }];
   }
 
   // --- citation_content: SELECT * WHERE url ---
@@ -1326,6 +1425,171 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(200);
 
       delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    });
+  });
+
+  // ---- Content Version History ----
+
+  describe("Content version history (dual-write + query)", () => {
+    it("dual-writes to resource_content_versions on content upsert", async () => {
+      const res = await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/versioned",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        httpStatus: 200,
+        contentType: "text/html",
+        pageTitle: "Test Page",
+        fullText: "Hello world content",
+        contentLength: 19,
+        contentHash: "abc123def456",
+      });
+      expect(res.status).toBe(200);
+
+      // Verify dual-write created a content version
+      expect(contentVersionStore.length).toBe(1);
+      expect(contentVersionStore[0].url).toBe("https://example.com/versioned");
+      expect(contentVersionStore[0].contentHash).toBe("abc123def456");
+      expect(contentVersionStore[0].content).toBe("Hello world content");
+      expect(contentVersionStore[0].httpStatus).toBe(200);
+      const meta = typeof contentVersionStore[0].metadata === "string"
+        ? JSON.parse(contentVersionStore[0].metadata as string)
+        : contentVersionStore[0].metadata;
+      expect(meta).toMatchObject({ pageTitle: "Test Page" });
+    });
+
+    it("deduplicates: same content hash does not create new version", async () => {
+      // First upsert
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/dedup-test",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Same content",
+        contentHash: "deduphash",
+      });
+      expect(contentVersionStore.length).toBe(1);
+
+      // Second upsert with same hash — should not create new version
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/dedup-test",
+        fetchedAt: "2025-01-02T00:00:00Z",
+        fullText: "Same content",
+        contentHash: "deduphash",
+      });
+      expect(contentVersionStore.length).toBe(1);
+    });
+
+    it("creates new version when content hash changes", async () => {
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/changing",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Version 1",
+        contentHash: "hash_v1",
+      });
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/changing",
+        fetchedAt: "2025-02-01T00:00:00Z",
+        fullText: "Version 2 with updates",
+        contentHash: "hash_v2",
+      });
+      expect(contentVersionStore.length).toBe(2);
+      expect(contentVersionStore[0].contentHash).toBe("hash_v1");
+      expect(contentVersionStore[1].contentHash).toBe("hash_v2");
+    });
+
+    it("GET /content/history returns paginated version list", async () => {
+      // Seed versions directly
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/history-test",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "V1",
+        contentHash: "h1",
+      });
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/history-test",
+        fetchedAt: "2025-02-01T00:00:00Z",
+        fullText: "V2",
+        contentHash: "h2",
+      });
+
+      const res = await app.request(
+        "/api/citations/content/history?url=https://example.com/history-test&limit=10"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(2);
+      expect(body.versions).toHaveLength(2);
+      // Newest first
+      expect(body.versions[0].contentHash).toBe("h2");
+      expect(body.versions[1].contentHash).toBe("h1");
+    });
+
+    it("GET /content/history/:id returns single version with content", async () => {
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/single-ver",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Full content here",
+        contentHash: "singlehash",
+      });
+
+      const verId = contentVersionStore[0].id;
+      const res = await app.request(`/api/citations/content/history/${verId}`);
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.id).toBe(verId);
+      expect(body.content).toBe("Full content here");
+      expect(body.contentHash).toBe("singlehash");
+    });
+
+    it("GET /content/history/:id returns 404 for unknown ID", async () => {
+      const res = await app.request("/api/citations/content/history/99999");
+      expect(res.status).toBe(404);
+    });
+
+    it("GET /content/at returns latest version at or before date", async () => {
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/temporal",
+        fetchedAt: "2025-01-15T00:00:00Z",
+        fullText: "January version",
+        contentHash: "jan",
+      });
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/temporal",
+        fetchedAt: "2025-03-15T00:00:00Z",
+        fullText: "March version",
+        contentHash: "mar",
+      });
+
+      // Query at Feb 1 — should get January version
+      const res = await app.request(
+        "/api/citations/content/at?url=https://example.com/temporal&date=2025-02-01T00:00:00Z"
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.contentHash).toBe("jan");
+      expect(body.content).toBe("January version");
+    });
+
+    it("GET /content/at returns 404 when no version exists before date", async () => {
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/future-only",
+        fetchedAt: "2025-06-01T00:00:00Z",
+        fullText: "Future content",
+        contentHash: "future",
+      });
+
+      const res = await app.request(
+        "/api/citations/content/at?url=https://example.com/future-only&date=2025-01-01T00:00:00Z"
+      );
+      expect(res.status).toBe(404);
+    });
+
+    it("skips version write when no contentHash and no fullText", async () => {
+      const initialCount = contentVersionStore.length;
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/no-content",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        httpStatus: 403,
+      });
+      // No version should be created (no hash, no text to compute hash from)
+      expect(contentVersionStore.length).toBe(initialCount);
     });
   });
 });
