@@ -303,17 +303,14 @@ export async function collectRecordItems(
           const personName = resolveName(item, 'personResolvedName', 'personDisplayName', 'personId');
           const orgName = resolveName(item, 'orgResolvedName', 'orgDisplayName', 'organizationId');
           if (!isResolvableName(personName) || !isResolvableName(orgName)) continue;
-        }
-        if (recordType === 'investment') {
+        } else if (recordType === 'investment') {
           const investorName = resolveName(item, 'investorResolvedName', 'investorDisplayName', 'investorId');
           const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
           if (!isResolvableName(investorName) || !isResolvableName(companyName)) continue;
-        }
-        if (recordType === 'funding-round') {
+        } else if (recordType === 'funding-round') {
           const companyName = resolveName(item, 'companyResolvedName', 'companyDisplayName', 'companyId');
           if (!isResolvableName(companyName)) continue;
-        }
-        if (recordType === 'benchmark-result') {
+        } else if (recordType === 'benchmark-result') {
           const modelName = resolveName(item, 'modelResolvedName', 'modelDisplayName', 'modelId');
           if (!isResolvableName(modelName)) continue;
         }
