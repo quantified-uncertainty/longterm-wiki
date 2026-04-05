@@ -759,14 +759,13 @@ export default async function OrgProfilePage({
                   {ORG_TYPE_LABELS[data.orgType] ?? data.orgType}
                 </Link>
               )}
-              {data.organizationStatus && (
+              {data.orgStatus && (
                 <span
                   className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${
-                    ORG_STATUS_COLORS[data.organizationStatus] ??
-                    "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                    ORG_STATUS_COLORS[data.orgStatus] ?? DEFAULT_ORG_TYPE_COLOR
                   }`}
                 >
-                  {ORG_STATUS_LABELS[data.organizationStatus] ?? data.organizationStatus}
+                  {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
                 </span>
               )}
             </div>

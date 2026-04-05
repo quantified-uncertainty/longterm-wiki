@@ -975,7 +975,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const typedEntity = getTypedEntityById(slug);
   const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
   const orgType = orgData?.orgType ?? null;
-  const organizationStatus = orgData?.status ?? null;
+  const orgStatus = orgData?.status ?? null;
 
   // Header facts (description/website come from entity YAML, not KB facts)
   const hqFact = getKBLatest(entity.id, "headquarters");
@@ -1455,7 +1455,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
 
   return {
     orgType,
-    organizationStatus,
+    orgStatus,
     hqText,
     allCollections,
     otherCollections,
