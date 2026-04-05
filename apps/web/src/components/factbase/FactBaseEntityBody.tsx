@@ -250,7 +250,7 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
                 className="text-[11px] font-medium px-3 py-1.5 rounded-lg border border-border/60 bg-card hover:bg-primary/5 hover:border-primary/30 text-muted-foreground hover:text-primary transition-all"
               >
                 {CATEGORY_LABELS[cat] ?? titleCase(cat)}
-                <span className="ml-1.5 text-muted-foreground/40 tabular-nums">
+                <span className="ml-1.5 text-muted-foreground/60 tabular-nums">
                   {categoryGroups.get(cat)?.length ?? 0}
                 </span>
               </a>

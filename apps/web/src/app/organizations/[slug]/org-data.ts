@@ -2,6 +2,7 @@
  * Data-fetching and parsing logic for organization profile pages.
  * Extracted from page.tsx as a pure refactor — no behavioral changes.
  */
+import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import type { KBRecordEntry } from "@/data/factbase";
 import {
   getKBLatest,
@@ -10,6 +11,7 @@ import {
   getKBEntities,
   getKBAllRecordCollections,
   resolveKBSlug,
+  resolveSlugAlias,
   getKBEntitySlug,
   getKBRecords,
   getAllKBRecords,
@@ -40,6 +42,7 @@ import {
 } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
+import type { OrgHeaderData } from "./org-profile-header";
 
 // ── Numeric / range helpers ──────────────────────────────────────────
 
@@ -969,6 +972,50 @@ export interface OrgEntity {
 }
 
 /**
+ * Resolve a slug to an OrgEntity. Returns null if not found.
+ * Handles slug aliases by returning the canonical slug via the redirect property.
+ * Shared by both the profile page and the data page to avoid duplication.
+ */
+export function resolveOrgEntity(
+  slug: string,
+): { entity: OrgEntity } | { redirect: string } | null {
+  const resolved = resolveOrgBySlug(slug);
+  if (resolved) {
+    return {
+      entity: {
+        id: resolved.id,
+        stableId: resolved.stableId,
+        name: resolved.title,
+        wikiId: resolved.wikiId,
+        wikiPageId: resolved.wikiId,
+        ...(resolved.aliases && resolved.aliases.length > 0 && {
+          aliases: resolved.aliases,
+        }),
+      },
+    };
+  }
+
+  const canonical = resolveSlugAlias(slug);
+  if (canonical) return { redirect: canonical };
+
+  const typedEntity = getTypedEntityById(slug);
+  if (!typedEntity || !isOrganization(typedEntity)) return null;
+
+  return {
+    entity: {
+      id: slug,
+      stableId: typedEntity.stableId,
+      name: typedEntity.title,
+      wikiId: typedEntity.wikiId,
+      wikiPageId: typedEntity.wikiId,
+      ...(typedEntity.aliases && typedEntity.aliases.length > 0 && {
+        aliases: typedEntity.aliases,
+      }),
+    },
+  };
+}
+
+/**
  * Load all data needed for an organization profile page.
  * This is a pure data function — no JSX rendering.
  */
@@ -1503,6 +1550,58 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     divisionSpending,
     chartData,
     dilutionStages,
+  };
+}
+
+// ── Lightweight header loader ────────────────────────────────────────
+
+/**
+ * Load only the data needed for the org profile header.
+ * Much cheaper than loadOrgPageData — skips grants, resources, divisions, etc.
+ */
+export function loadOrgHeaderData(entity: OrgEntity, slug: string): OrgHeaderData {
+  const typedEntity = getTypedEntityById(slug);
+  const orgData = typedEntity && isOrganization(typedEntity) ? typedEntity : null;
+
+  const hqFact = getKBLatest(entity.id, "headquarters");
+  const hqText = hqFact?.value.type === "text" ? hqFact.value.value : null;
+
+  const wikiHref = entity.wikiId
+    ? `/wiki/${entity.wikiId}`
+    : entity.wikiPageId
+      ? `/wiki/${entity.wikiPageId}`
+      : null;
+
+  const foundedDateFact = getKBLatest(entity.id, "founded-date");
+  const foundedDateStr = foundedDateFact?.value.type === "text" || foundedDateFact?.value.type === "date"
+    ? foundedDateFact.value.value
+    : foundedDateFact?.value.type === "number"
+      ? String(foundedDateFact.value.value)
+      : undefined;
+  const orgAge = computeOrgAge(foundedDateStr);
+
+  const foundedByFact = getKBLatest(entity.id, "founded-by");
+  const founders: AuthorRef[] = [];
+  if (foundedByFact?.value.type === "refs" && Array.isArray(foundedByFact.value.value)) {
+    for (const ref of foundedByFact.value.value) {
+      founders.push(resolveEntityName(String(ref)));
+    }
+  } else if (foundedByFact?.value.type === "ref") {
+    founders.push(resolveEntityName(foundedByFact.value.value));
+  }
+
+  return {
+    id: entity.id,
+    name: entity.name,
+    aliases: entity.aliases,
+    orgType: orgData?.orgType ?? null,
+    orgStatus: orgData?.orgStatus ?? null,
+    foundedDateStr: foundedDateStr ?? null,
+    orgAge: orgAge ?? null,
+    hqText,
+    websiteUrl: orgData?.website ?? null,
+    wikiHref,
+    founders,
   };
 }
 

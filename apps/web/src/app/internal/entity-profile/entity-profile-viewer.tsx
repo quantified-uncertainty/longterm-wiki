@@ -758,6 +758,7 @@ export function EntityProfileViewer({
   initialEntity,
   backHref,
   backLabel,
+  hideSearch,
 }: {
   initialData: EntityProfileData | null;
   initialEntity: string;
@@ -765,6 +766,8 @@ export function EntityProfileViewer({
   backHref?: string;
   /** Label for the back link (e.g., "Anthropic") */
   backLabel?: string;
+  /** Hide search bar — used when embedded in a page that already identifies the entity */
+  hideSearch?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -865,26 +868,49 @@ export function EntityProfileViewer({
           </Link>
         </div>
       )}
-      <EntitySearch
-        initialQuery={effectiveInitial}
-        onSearch={handleSearch}
-        isLoading={isLoading}
-      />
+      {!hideSearch && (
+        <EntitySearch
+          initialQuery={effectiveInitial}
+          onSearch={handleSearch}
+          isLoading={isLoading}
+        />
+      )}
 
       {error && (
-        <div className="rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 p-4 mb-5 text-sm text-red-700 dark:text-red-400">
-          {error}
-          {/not found/i.test(error) && (
-            <p className="mt-1.5 text-xs text-red-600/70 dark:text-red-400/60">
-              Try using the exact slug (e.g. &quot;anthropic&quot;), a stableId (e.g. &quot;sid_...&quot;), or a wikiId (e.g. &quot;E22&quot;).
-            </p>
+        <div className={hideSearch
+          ? "rounded-lg border border-border/60 bg-muted/30 p-6 mb-5 text-center"
+          : "rounded-lg border border-red-200 dark:border-red-800/50 bg-red-50 dark:bg-red-950/20 p-4 mb-5 text-sm text-red-700 dark:text-red-400"
+        }>
+          {hideSearch ? (
+            <>
+              <Database className="h-8 w-8 mx-auto mb-3 text-muted-foreground/30" />
+              <p className="text-sm font-medium text-muted-foreground">Database records unavailable</p>
+              <p className="mt-1.5 text-xs text-muted-foreground/60 max-w-md mx-auto">
+                The database server could not be reached. Records will appear here when the server is available.
+              </p>
+              <button
+                onClick={() => doSearch(effectiveInitial)}
+                className="mt-4 px-4 py-1.5 text-xs font-medium rounded-md border border-border/60 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors cursor-pointer"
+              >
+                Retry
+              </button>
+            </>
+          ) : (
+            <>
+              {error}
+              {/not found/i.test(error) && (
+                <p className="mt-1.5 text-xs text-red-600/70 dark:text-red-400/60">
+                  Try using the exact slug (e.g. &quot;anthropic&quot;), a stableId (e.g. &quot;sid_...&quot;), or a wikiId (e.g. &quot;E22&quot;).
+                </p>
+              )}
+            </>
           )}
         </div>
       )}
 
       {data && stats && (
         <>
-          <EntitySummary entity={data.entity} />
+          {!hideSearch && <EntitySummary entity={data.entity} />}
 
           <div className="flex gap-2 mb-5 flex-wrap">
             <StatPill icon={Database} label="Records" value={stats.totalRecords} />
@@ -914,7 +940,13 @@ export function EntityProfileViewer({
         </>
       )}
 
-      {!data && !error && !isLoading && <EmptyState onSearch={handleSearch} />}
+      {!data && !error && !isLoading && !hideSearch && <EmptyState onSearch={handleSearch} />}
+      {!data && !error && isLoading && hideSearch && (
+        <div className="flex items-center justify-center py-12 gap-2 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          Loading database records...
+        </div>
+      )}
     </div>
   );
 }
