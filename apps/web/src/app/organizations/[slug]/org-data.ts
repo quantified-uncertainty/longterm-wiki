@@ -1364,13 +1364,6 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     aboutOrg: resourcesAboutOrg,
   } = getOrgResources(entity.name, typedEntity?.stableId);
 
-  // ── Key Publications (from literature.yaml) ──
-  const orgMatchNames = new Set<string>([
-    entity.name.toLowerCase(),
-    slug.toLowerCase(),
-    entity.id.toLowerCase(),
-    ...(entity.aliases?.map((a) => a.toLowerCase()) ?? []),
-  ]);
   // ── Model benchmark data ──
   const modelBenchmarks = new Map<string, Array<{ name: string; score: number; unit?: string }>>();
   for (const model of orgModels) {
