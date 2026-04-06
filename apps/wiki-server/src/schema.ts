@@ -836,10 +836,7 @@ export const resourceTabularSources = pgTable("resource_tabular_sources", {
   sourceStatus: text("source_status").notNull().default("active"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-}, (table) => [
-  index("idx_rts_record_type").on(table.recordType),
-  index("idx_rts_source_status").on(table.sourceStatus),
-]);
+});
 
 // ── Data Sources & Snapshots ──────────────────────────────────────────
 
@@ -1938,7 +1935,6 @@ export const grants = pgTable(
     index("idx_grants_status").on(table.status),
     index("idx_grants_program").on(table.programId),
     index("idx_grants_data_source").on(table.dataSourceId),
-    index("idx_grants_data_source_resource").on(table.dataSourceResourceId),
   ]
 );
 

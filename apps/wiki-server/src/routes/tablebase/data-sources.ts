@@ -1,16 +1,22 @@
 /**
- * Data Sources API — CRUD for data_sources and source_snapshots tables.
+ * Data Sources API — CRUD for data sources (tabular import pipelines).
  *
- * Part of Phase 1: Data Source Resources (Discussion #3567).
+ * During transition (PR 3/5 of Discussion #3567), this route dual-writes to
+ * both old tables (data_sources, source_snapshots) and new tables (resources,
+ * resource_tabular_sources). Reads still use the old tables for guaranteed
+ * data availability, enriched with resourceId from the new tables.
+ *
  * Hono RPC method-chained route for type inference.
  */
 
 import { Hono } from "hono";
 import { z } from "zod";
 import { eq, desc, and, count, sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
 import { getDrizzleDb } from "../../db.js";
-import { dataSources, sourceSnapshots } from "../../schema.js";
+import { dataSources, sourceSnapshots, resources, resourceTabularSources } from "../../schema.js";
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
+import { logger } from "../../logger.js";
 
 // ---- Zod schemas ----
 
@@ -50,7 +56,12 @@ const SnapshotListQuery = paginationQuery({ defaultLimit: 20, maxLimit: 100 });
 
 // ---- Helpers ----
 
-function formatDataSource(r: typeof dataSources.$inferSelect) {
+/** Replicate the hashId() used for resource IDs: SHA-256, first 16 hex chars. */
+function hashId(str: string): string {
+  return createHash("sha256").update(str).digest("hex").slice(0, 16);
+}
+
+function formatDataSource(r: typeof dataSources.$inferSelect, resourceId?: string | null) {
   return {
     id: r.id,
     name: r.name,
@@ -58,7 +69,7 @@ function formatDataSource(r: typeof dataSources.$inferSelect) {
     accessMethod: r.accessMethod,
     recordType: r.recordType,
     fetchUrl: r.fetchUrl,
-    resourceId: r.resourceId,
+    resourceId: resourceId ?? r.resourceId,
     publisherEntityId: r.publisherEntityId,
     updateFrequency: r.updateFrequency,
     columnMapping: r.columnMapping,
@@ -73,37 +84,39 @@ function formatDataSource(r: typeof dataSources.$inferSelect) {
   };
 }
 
-function formatSnapshotMeta(r: typeof sourceSnapshots.$inferSelect) {
-  return {
-    id: r.id,
-    dataSourceId: r.dataSourceId,
-    snapshotHash: r.snapshotHash,
-    recordCount: r.recordCount,
-    fetchedAt: r.fetchedAt.toISOString(),
-    mappingValid: r.mappingValid,
-    parserVersion: r.parserVersion,
-    notes: r.notes,
-    createdAt: r.createdAt.toISOString(),
-    // rawContent excluded from list — fetch individually
-  };
-}
-
 // ---- Route ----
 
 const dataSourcesApp = new Hono()
 
-  // GET / — list all data sources
+  // GET / — list all data sources (enriched with resourceId from new tables)
   .get("/", async (c) => {
     const db = getDrizzleDb();
-    const rows = await db.select().from(dataSources).orderBy(dataSources.name);
-    return c.json({ dataSources: rows.map(formatDataSource) });
+    const rows = await db
+      .select({
+        ds: dataSources,
+        resourceId: resourceTabularSources.resourceId,
+      })
+      .from(dataSources)
+      .leftJoin(resourceTabularSources, eq(resourceTabularSources.sourceSlug, dataSources.id))
+      .orderBy(dataSources.name);
+    return c.json({ dataSources: rows.map((r) => formatDataSource(r.ds, r.resourceId)) });
   })
 
   // GET /:id — single data source with latest snapshot metadata
   .get("/:id", async (c) => {
     const db = getDrizzleDb();
     const id = c.req.param("id");
-    const [row] = await db.select().from(dataSources).where(eq(dataSources.id, id));
+
+    // Try old table first (slug lookup), enriched with new table resourceId
+    const [row] = await db
+      .select({
+        ds: dataSources,
+        resourceId: resourceTabularSources.resourceId,
+      })
+      .from(dataSources)
+      .leftJoin(resourceTabularSources, eq(resourceTabularSources.sourceSlug, dataSources.id))
+      .where(eq(dataSources.id, id));
+
     if (!row) return notFoundError(c, "Data source not found");
 
     // Get latest snapshot metadata (without raw_content)
@@ -124,7 +137,7 @@ const dataSourcesApp = new Hono()
       .limit(1);
 
     return c.json({
-      ...formatDataSource(row),
+      ...formatDataSource(row.ds, row.resourceId),
       latestSnapshot: latestSnapshot
         ? {
             id: latestSnapshot.id,
@@ -140,11 +153,12 @@ const dataSourcesApp = new Hono()
     });
   })
 
-  // POST /sync — upsert a data source
+  // POST /sync — upsert a data source (dual-write to old + new tables)
   .post("/sync", zv("json", SyncDataSourceSchema), async (c) => {
     const db = getDrizzleDb();
     const body = c.req.valid("json");
 
+    // 1. Write to old data_sources table (primary, maintains backward compat)
     await db
       .insert(dataSources)
       .values({
@@ -181,7 +195,82 @@ const dataSourcesApp = new Hono()
         },
       });
 
-    return c.json({ ok: true, id: body.id });
+    // 2. Dual-write to new tables (best-effort — don't fail the sync).
+    // Wrapped in a transaction so we don't get orphaned resource rows.
+    const url = body.fetchUrl ?? `urn:lw:tabular-source:${body.id}`;
+    const resId = hashId(url);
+    let actualResId = resId;
+
+    try {
+      await db.transaction(async (tx) => {
+        // Upsert resource row. ON CONFLICT on URL handles the case where
+        // a resource was created by resource-ingest with a different ID scheme.
+        const [upsertedResource] = await tx
+          .insert(resources)
+          .values({
+            id: resId,
+            url,
+            title: body.name,
+            type: "dataset",
+            resourceSubtype: "tabular_source",
+            publisherEntityId: body.publisherEntityId ?? null,
+          })
+          .onConflictDoUpdate({
+            target: resources.url,
+            set: {
+              title: body.name,
+              resourceSubtype: "tabular_source",
+              publisherEntityId: body.publisherEntityId ?? null,
+              updatedAt: new Date(),
+            },
+          })
+          .returning({ id: resources.id });
+
+        actualResId = upsertedResource.id;
+
+        // Upsert resource_tabular_sources. Conflict on sourceSlug (not resourceId)
+        // so that changing a source's URL correctly updates the resourceId.
+        await tx
+          .insert(resourceTabularSources)
+          .values({
+            resourceId: actualResId,
+            sourceSlug: body.id,
+            dataFormat: body.dataFormat,
+            accessMethod: body.accessMethod,
+            recordType: body.recordType,
+            updateFrequency: body.updateFrequency ?? null,
+            columnMapping: body.columnMapping ?? null,
+            sourceSchema: body.sourceSchema ?? null,
+            verificationConfig: body.verificationConfig ?? null,
+            sourceStatus: body.sourceStatus ?? "active",
+          })
+          .onConflictDoUpdate({
+            target: resourceTabularSources.sourceSlug,
+            set: {
+              resourceId: actualResId,
+              dataFormat: body.dataFormat,
+              accessMethod: body.accessMethod,
+              recordType: body.recordType,
+              updateFrequency: body.updateFrequency ?? null,
+              columnMapping: body.columnMapping ?? null,
+              sourceSchema: body.sourceSchema ?? null,
+              verificationConfig: body.verificationConfig ?? null,
+              ...(body.sourceStatus !== undefined ? { sourceStatus: body.sourceStatus } : {}),
+              updatedAt: new Date(),
+            },
+          });
+      });
+    } catch (e: unknown) {
+      // Best-effort: don't fail the sync if new table writes fail.
+      // actualResId falls back to the computed hash.
+      logger.warn({
+        error: e instanceof Error ? e.message : String(e),
+        slug: body.id,
+        resourceId: resId,
+      }, "Failed to dual-write to resource_tabular_sources");
+    }
+
+    return c.json({ ok: true, id: body.id, resourceId: actualResId });
   })
 
   // GET /:id/snapshots — list snapshots (paginated, most recent first)
@@ -245,10 +334,18 @@ const dataSourcesApp = new Hono()
     // statement_timeout, so we raise it for this transaction.
     const result = await db.transaction(async (tx) => {
       await tx.execute(sql`SET LOCAL statement_timeout = '120000'`);
+
+      // Resolve resourceId inside the transaction to avoid TOCTOU race
+      const [rts] = await tx
+        .select({ resourceId: resourceTabularSources.resourceId })
+        .from(resourceTabularSources)
+        .where(eq(resourceTabularSources.sourceSlug, dataSourceId));
+
       const [inserted] = await tx
         .insert(sourceSnapshots)
         .values({
           dataSourceId,
+          resourceId: rts?.resourceId ?? null,
           snapshotHash: body.snapshotHash,
           recordCount: body.recordCount ?? null,
           rawContent: body.rawContent,
@@ -273,9 +370,7 @@ const dataSourcesApp = new Hono()
       }
 
       // Only advance latest-snapshot metadata when the incoming snapshot
-      // is newer than what's stored. This prevents backfills from overwriting
-      // the true "latest" and keeps data_sources in sync with the
-      // /snapshots/latest endpoint (which orders by fetched_at DESC).
+      // is newer than what's stored.
       const snapshotFetchedAt = body.fetchedAt ? new Date(body.fetchedAt) : new Date();
       const [current] = await tx
         .select({ lastSnapshotAt: dataSources.lastSnapshotAt })
