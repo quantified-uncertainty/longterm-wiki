@@ -28,6 +28,7 @@ import {
   policyStakeholders,
   entityRecommendedResources,
 } from "../../schema.js";
+import { isAnySid } from "@longterm-wiki/id-utils";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import { notFoundError } from "../shared/utils.js";
 import { COLUMN_DESCRIPTIONS } from "./entity-profile-descriptions.js";
@@ -427,8 +428,8 @@ const entityProfileApp = new Hono()
         for (const [key, value] of Object.entries(row)) {
           if (
             typeof value === "string" &&
-            value.length === 10 &&
-            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId")
+            isAnySid(value) &&
+            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId" || key === "orgId" || key === "entityId" || key === "parentThingId")
           ) {
             entityRefIds.add(value);
           }

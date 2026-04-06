@@ -452,16 +452,12 @@ function ProfileSection({
                     })}
                     {section.recordType && (
                       <td className="px-2 py-2 align-top">
-                        {verdict ? (
-                          <SourceCheckDot
-                            status={recordVerdictToStatus(verdict.verdict)}
-                            originalVerdict={verdict.verdict}
-                            size="md"
-                            href={recordId ? `/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}` : undefined}
-                          />
-                        ) : (
-                          <SourceCheckDot status="not_run" size="md" />
-                        )}
+                        <SourceCheckDot
+                          status={verdict ? recordVerdictToStatus(verdict.verdict) : "not_run"}
+                          originalVerdict={verdict?.verdict}
+                          size="md"
+                          href={recordId ? `/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}` : undefined}
+                        />
                       </td>
                     )}
                   </tr>
