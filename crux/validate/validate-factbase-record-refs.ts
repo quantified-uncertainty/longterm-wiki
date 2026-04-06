@@ -134,6 +134,24 @@ export function buildEntityLookup(database: {
 }
 
 // ---------------------------------------------------------------------------
+// Known baseline — tracked by GitHub issues
+// ---------------------------------------------------------------------------
+
+/**
+ * Known unresolvable refs tracked by GitHub issues.
+ * Downgraded from error to warning so they don't block unrelated PRs.
+ * Remove entries as their issues are resolved.
+ */
+const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set([
+  // #3914: Investment/grant records reference non-existent entities
+  "sid_B5JzHeWvow", "sid_Kvfo7x5bqf", "sid_rWgCE08sfW", "sid_dbDEGrJbUp",
+  "sid_69J7QKcqyX", "sid_dzlCIZ45dZ", "sid_B6ZUV8iv17", "sid_F1bFJHm9RA",
+  "sid_ntlgFVJrPg", "sid_oEH5GwWtow",
+  "sid_GlobalGive", "sid_Orthogonal", "sid_Futurewise", "sid_lighthaven",
+  "sid_Janaagraha", "sid_conjecture", "sid_Kurzgesagt", "sid_Exscientia",
+]);
+
+// ---------------------------------------------------------------------------
 // Field scanning
 // ---------------------------------------------------------------------------
 
@@ -250,7 +268,11 @@ export function validateRecordRefs(
             };
 
             if (kind === "sid") {
-              errors.push(issue);
+              if (KNOWN_BASELINE_REFS.has(value)) {
+                warnings.push(issue); // known issue (#3914) — downgrade to warning
+              } else {
+                errors.push(issue);
+              }
             } else {
               warnings.push(issue);
             }
