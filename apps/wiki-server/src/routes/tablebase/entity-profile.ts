@@ -405,6 +405,47 @@ const entityProfileApp = new Hono()
       }
     }
 
+    // Batch-resolve entity reference stableIds to display names
+    const entityRefIds = new Set<string>();
+    for (const section of sectionResults) {
+      for (const row of section.rows) {
+        for (const [key, val] of Object.entries(row)) {
+          const isRef =
+            key.endsWith("EntityId") ||
+            key.endsWith("_entity_id") ||
+            key === "stableId" ||
+            key === "stable_id" ||
+            key === "parentOrgId" ||
+            key === "parent_org_id";
+          if (isRef && typeof val === "string" && val.length === 10) {
+            entityRefIds.add(val);
+          }
+        }
+      }
+    }
+
+    const displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
+    if (entityRefIds.size > 0) {
+      const entityRows = await db
+        .select({
+          stableId: entities.stableId,
+          slug: entities.id,
+          title: entities.title,
+          entityType: entities.entityType,
+        })
+        .from(entities)
+        .where(inArray(entities.stableId, [...entityRefIds]));
+      for (const e of entityRows) {
+        if (e.stableId && e.title) {
+          displayNames[e.stableId] = {
+            title: e.title,
+            slug: e.slug,
+            entityType: e.entityType ?? "",
+          };
+        }
+      }
+    }
+
     // Strip internal columns from entity row
     const { syncedAt, createdAt, updatedAt, ...entityData } = entityRow;
 
@@ -412,6 +453,7 @@ const entityProfileApp = new Hono()
       entity: entityData,
       sections: sectionResults,
       verdicts,
+      displayNames,
     });
   });
 

@@ -36,10 +36,17 @@ interface Section {
   error?: string;
 }
 
+interface DisplayNameEntry {
+  title: string;
+  slug: string;
+  entityType: string;
+}
+
 interface EntityProfileData {
   entity: Record<string, unknown>;
   sections: Section[];
   verdicts: Record<string, { verdict: string; confidence: number | null }>;
+  displayNames?: Record<string, DisplayNameEntry>;
 }
 
 // ── Entity search ──────────────────────────────────────────────────────────
@@ -140,9 +147,35 @@ function VerdictBadge({ verdict, confidence }: { verdict: string; confidence: nu
   );
 }
 
+// ── Entity directory mapping ───────────────────────────────────────────────
+
+const ENTITY_TYPE_DIRECTORY: Record<string, string> = {
+  person: "/people",
+  organization: "/organizations",
+  benchmark: "/benchmarks",
+  "ai-model": "/ai-models",
+  policy: "/legislation",
+  project: "/projects",
+  approach: "/approaches",
+  event: "/events",
+};
+
+function entityHref(entry: DisplayNameEntry): string {
+  const prefix = ENTITY_TYPE_DIRECTORY[entry.entityType];
+  return prefix ? `${prefix}/${entry.slug}` : `/wiki/E1929?entity=${encodeURIComponent(entry.slug)}`;
+}
+
 // ── Cell renderer ──────────────────────────────────────────────────────────
 
-function CellValue({ value, columnName }: { value: unknown; columnName: string }) {
+function CellValue({
+  value,
+  columnName,
+  displayNames,
+}: {
+  value: unknown;
+  columnName: string;
+  displayNames?: Record<string, DisplayNameEntry>;
+}) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground/30 select-none">&mdash;</span>;
   }
@@ -159,14 +192,28 @@ function CellValue({ value, columnName }: { value: unknown; columnName: string }
     return <JsonValue value={value} />;
   }
 
-  // Entity reference columns -> link to same dashboard
+  // Entity reference columns -> resolve to entity name with directory link
   const isEntityRef =
     columnName.endsWith("EntityId") ||
     columnName.endsWith("_entity_id") ||
     columnName === "stableId" ||
-    columnName === "stable_id";
+    columnName === "stable_id" ||
+    columnName === "parentOrgId" ||
+    columnName === "parent_org_id";
 
   if (isEntityRef && typeof value === "string" && value.length === 10) {
+    const resolved = displayNames?.[value];
+    if (resolved) {
+      return (
+        <Link
+          href={entityHref(resolved)}
+          className="text-blue-600 dark:text-blue-400 hover:underline text-[11px]"
+          title={`${resolved.entityType}: ${value}`}
+        >
+          {resolved.title}
+        </Link>
+      );
+    }
     return (
       <Link
         href={`/wiki/E1929?entity=${encodeURIComponent(value)}`}
@@ -249,10 +296,12 @@ function JsonValue({ value }: { value: unknown }) {
 function ProfileSection({
   section,
   verdicts,
+  displayNames,
   defaultExpanded,
 }: {
   section: Section;
   verdicts: Record<string, { verdict: string; confidence: number | null }>;
+  displayNames?: Record<string, DisplayNameEntry>;
   defaultExpanded: boolean;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -378,7 +427,7 @@ function ProfileSection({
                       const value = camelKey in row ? row[camelKey] : row[col.name];
                       return (
                         <td key={col.name} className="px-3 py-2 align-top max-w-xs">
-                          <CellValue value={value} columnName={col.name} />
+                          <CellValue value={value} columnName={col.name} displayNames={displayNames} />
                         </td>
                       );
                     })}
@@ -933,6 +982,7 @@ export function EntityProfileViewer({
                   key={section.key}
                   section={section}
                   verdicts={data.verdicts}
+                  displayNames={data.displayNames}
                   defaultExpanded={section.total > 0 && section.total <= 50}
                 />
               ))}
