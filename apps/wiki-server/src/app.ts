@@ -46,6 +46,7 @@ import { entityAssessmentsRoute } from "./routes/tablebase/entity-assessments.js
 import { publicationsRoute } from "./routes/tablebase/publications.js";
 import { websiteSourcesRoute } from "./routes/tablebase/website-sources.js";
 import { entityRecommendedResourcesRoute } from "./routes/tablebase/entity-recommended-resources.js";
+import { entityResourcesRoute } from "./routes/tablebase/entity-resources.js";
 import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
 
 // FactBase routes — structured triples with temporal data
@@ -250,6 +251,7 @@ export function createApp() {
   app.route("/api/publications", publicationsRoute);
   app.route("/api/website-sources", websiteSourcesRoute);
   app.route("/api/entity-recommended-resources", entityRecommendedResourcesRoute);
+  app.route("/api/entity-resources", entityResourcesRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);

@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/data", () => ({
   getTypedEntities: vi.fn(),
+  getTypedEntityById: vi.fn(),
   getEntityHref: vi.fn(),
   getPageById: vi.fn(),
   getPageCoverageItems: vi.fn(),
@@ -26,6 +27,10 @@ vi.mock("@/data", () => ({
 
 vi.mock("@lib/wiki-server", () => ({
   fetchDetailed: vi.fn(() => Promise.resolve({ ok: false, error: "mock" })),
+}));
+
+vi.mock("@/data/entity-coverage", () => ({
+  getEntityDataDepth: vi.fn(() => null),
 }));
 
 vi.mock("@/app/internal/entities/entities-data-table", () => ({

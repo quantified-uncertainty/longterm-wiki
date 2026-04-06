@@ -89,6 +89,14 @@ export const COLUMN_DESCRIPTIONS: Record<string, Record<string, string>> = {
     organization_id: "Entity stableId or slug",
     role: "pioneer | active | major | funder | emerging",
   },
+  entity_resources: {
+    entity_id: "FK to entities.stable_id",
+    resource_id: "FK to resources.id",
+    authored_by_entity: "Whether the entity authored/published this resource",
+    is_subject: "Whether the resource is about this entity",
+    inference_source:
+      "How this link was inferred: manual, publisher_entity_id, wiki_citation, llm_enrichment",
+  },
   entity_recommended_resources: {
     entity_id: "FK to entities.stable_id for the recommending entity",
     resource_id: "Optional FK to resources.id (when resource exists in catalog)",

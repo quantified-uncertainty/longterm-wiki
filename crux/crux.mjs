@@ -117,6 +117,7 @@ import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
 import * as benchmarksCommands from './commands/benchmarks.ts';
 import * as usagePatternsCommands from './commands/usage-patterns.ts';
+import * as entityResourcesCommands from './commands/entity-resources.ts';
 
 const domains = {
   validate: validateCommands,
@@ -139,6 +140,7 @@ const domains = {
   issues: issuesCommands,
   'agent-checklist': agentChecklistCommands,
   entity: entityCommands,
+  'entity-resources': entityResourcesCommands,
   pr: prCommands,
   'wiki-server': wikiServerCommands,
   query: queryCommands,

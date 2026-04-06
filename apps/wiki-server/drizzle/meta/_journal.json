@@ -1128,6 +1128,20 @@
       "when": 1783324800000,
       "tag": "0160_resource_tabular_sources",
       "breakpoints": true
+    },
+    {
+      "idx": 161,
+      "version": "7",
+      "when": 1783411200000,
+      "tag": "0161_drop_data_sources_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 162,
+      "version": "7",
+      "when": 1783497600000,
+      "tag": "0162_entity_resources",
+      "breakpoints": true
     }
   ]
 }

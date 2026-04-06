@@ -6,7 +6,7 @@
  */
 
 export interface DataSourceManifest {
-  /** Matches GrantSource.id and data_sources.id */
+  /** Matches GrantSource.id and resource_tabular_sources.source_slug */
   sourceId: string;
   /** Human-readable name */
   name: string;

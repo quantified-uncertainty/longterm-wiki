@@ -49,7 +49,7 @@ export interface SyncGrant {
   notes: string | null;
   /** Soft reference to funding_programs.id (nullable -- most grants won't have one) */
   programId?: string | null;
-  /** FK to data_sources.id — identifies which structured data source this grant came from */
+  /** FK to resource_tabular_sources.source_slug — identifies which data source this grant came from */
   dataSourceId?: string | null;
 }
 

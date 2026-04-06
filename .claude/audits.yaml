@@ -57,7 +57,7 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-05"
+    last_checked: "2026-04-06"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -77,6 +77,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-04-05"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-06"
         result: pass
         checked_by: "manual"
   - id: scheduled-workflows-running
@@ -99,7 +102,7 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-05"
+    last_checked: "2026-04-06"
     last_result: pass
     last_result_note: "scheduled-maintenance.yml failed 2026-03-19 — Anthropic API credit balance too low"
     history:
@@ -120,6 +123,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-04-05"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-06"
         result: pass
         checked_by: "manual"
   - id: vercel-production-only
@@ -199,7 +205,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-04-05"
+    last_checked: "2026-04-06"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -219,6 +225,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-04-05"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-06"
         result: pass
         checked_by: "manual"
   - id: gate-override-frequency
@@ -262,6 +271,9 @@ audits:
         checked_by: "manual"
         notes: "14% (7/50 PRs) — below 20% threshold"
       - date: "2026-04-05"
+        result: fail
+        checked_by: "manual"
+      - date: "2026-04-06"
         result: fail
         checked_by: "manual"
   - id: model-freshness

@@ -27,6 +27,7 @@ import {
   verificationVerdicts,
   policyStakeholders,
   entityRecommendedResources,
+  entityResources,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
@@ -269,6 +270,17 @@ const SECTIONS: SectionDef[] = [
       db.select().from(entityRecommendedResources)
         .where(eq(entityRecommendedResources.entityId, stableId))
         .orderBy(entityRecommendedResources.sortOrder)
+        .limit(FETCH_LIMIT),
+  },
+  {
+    key: "entityResources",
+    label: "Entity Resources",
+    description: "Resources authored by or about this entity",
+    table: entityResources,
+    tableName: "entity_resources",
+    query: (db, stableId) =>
+      db.select().from(entityResources)
+        .where(eq(entityResources.entityId, stableId))
         .limit(FETCH_LIMIT),
   },
   {
