@@ -73,7 +73,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
       offset: String(offset),
     });
     if (filterType) params.set("thing_type", filterType);
-    listUrl = `/api/things/?${params.toString()}`;
+    listUrl = `/api/things?${params.toString()}`;
   }
 
   const [statsResult, listResult] = await Promise.all([
