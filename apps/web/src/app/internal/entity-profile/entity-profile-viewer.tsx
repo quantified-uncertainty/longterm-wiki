@@ -266,7 +266,9 @@ const PERCENTAGE_COLUMNS = new Set([
 ]);
 
 function formatPercentage(n: number): string {
-  return `${(n * 100).toFixed(1).replace(/\.0$/, "")}%`;
+  // Values > 1 are likely already percentages (e.g., 15 = 15%), not decimals
+  const pct = Math.abs(n) > 1 ? n : n * 100;
+  return `${pct.toFixed(1).replace(/\.0$/, "")}%`;
 }
 
 /** Try to parse a value as a number. Returns null if not parseable or is a range string like "[0.07, 0.15]". */
@@ -662,7 +664,7 @@ function ProfileSection({
                 return (
                   <tr key={i} className="hover:bg-muted/20 transition-colors">
                     {(() => {
-                      const idStr = recordId != null ? String(recordId) : null;
+                      const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
                       const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
                       return section.recordType ? (
@@ -1167,7 +1169,11 @@ export function EntityProfileViewer({
     const totalRecords = data.sections.reduce((sum, s) => sum + s.total, 0);
     const populated = data.sections.filter((s) => s.total > 0).length;
     const verifiedCount = Object.keys(data.verdicts).length;
-    return { totalRecords, populated, total: data.sections.length, verifiedCount };
+    // Only count records from sections that support verification (have recordType)
+    const verifiableRecords = data.sections
+      .filter((s) => s.recordType)
+      .reduce((sum, s) => sum + s.total, 0);
+    return { totalRecords, populated, total: data.sections.length, verifiedCount, verifiableRecords };
   }, [data]);
 
   // Sort populated sections first — memoized to avoid re-sorting on every render
@@ -1264,7 +1270,7 @@ export function EntityProfileViewer({
               value={`${stats.populated}/${stats.total}`}
             />
             {stats.verifiedCount > 0 && (
-              <StatPill icon={ShieldCheck} label="Verified" value={`${stats.verifiedCount}/${stats.totalRecords}`} />
+              <StatPill icon={ShieldCheck} label="Verified" value={`${stats.verifiedCount}/${stats.verifiableRecords}`} />
             )}
           </div>
 
