@@ -32,18 +32,22 @@ export function CoverageDots({
 
   return (
     <span
-      className={`inline-block shrink-0 rounded-full ${className}`}
+      className={`inline-flex items-center shrink-0 ${className}`}
       role="img"
       aria-label={ariaLabel}
       title={tooltip ?? ariaLabel}
-      style={{
-        width: dim,
-        height: dim,
-        background:
-          pct >= 100
-            ? "color-mix(in srgb, currentColor 45%, transparent)"
-            : `conic-gradient(color-mix(in srgb, currentColor 45%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 12%, transparent) ${pct}% 100%)`,
-      }}
-    />
+    >
+      <span
+        className="inline-block shrink-0 rounded-full"
+        style={{
+          width: dim,
+          height: dim,
+          background:
+            pct >= 100
+              ? "color-mix(in srgb, currentColor 45%, transparent)"
+              : `conic-gradient(color-mix(in srgb, currentColor 45%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 12%, transparent) ${pct}% 100%)`,
+        }}
+      />
+    </span>
   );
 }
