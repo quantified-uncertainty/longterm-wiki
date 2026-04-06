@@ -398,18 +398,28 @@ jobs:
           ACTUAL_TIMESTAMP=""
           APPLIED_COUNT=""
           MIGRATION_RESPONSE=""
+          MIGRATION_HTTP_STATUS=""
           for i in 1 2 3; do
-            MIGRATION_RESPONSE=$(curl -s \
+            MIGRATION_HTTP_STATUS=$(curl -s -o /tmp/migration-response.json -w '%{http_code}' \
               -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
               "${LONGTERMWIKI_SERVER_URL}/health/migrations" 2>&1 || true)
-            ACTUAL_TIMESTAMP=$(echo "$MIGRATION_RESPONSE" | jq -r '.latestCreatedAt // empty' 2>/dev/null || true)
-            APPLIED_COUNT=$(echo "$MIGRATION_RESPONSE" | jq -r '.appliedCount // empty' 2>/dev/null || true)
-            if [ -n "$ACTUAL_TIMESTAMP" ]; then break; fi
-            echo "Migration check attempt $i/3: endpoint not ready ($MIGRATION_RESPONSE)"
-            if [ "$i" -lt 3 ]; then sleep 10; fi
+            MIGRATION_RESPONSE=$(cat /tmp/migration-response.json 2>/dev/null || true)
+            if [ "$MIGRATION_HTTP_STATUS" = "200" ]; then
+              ACTUAL_TIMESTAMP=$(echo "$MIGRATION_RESPONSE" | jq -r '.latestCreatedAt // empty' 2>/dev/null || true)
+              APPLIED_COUNT=$(echo "$MIGRATION_RESPONSE" | jq -r '.appliedCount // empty' 2>/dev/null || true)
+              if [ -n "$ACTUAL_TIMESTAMP" ]; then break; fi
+              echo "::error::Migration check returned 200 but response has no latestCreatedAt: $MIGRATION_RESPONSE"
+              exit 1
+            elif [ "$MIGRATION_HTTP_STATUS" = "404" ]; then
+              echo "Migration check attempt $i/3: endpoint returned 404 (old pod during rolling deploy)"
+              if [ "$i" -lt 3 ]; then sleep 10; fi
+            else
+              echo "::error::Migration check failed with HTTP $MIGRATION_HTTP_STATUS: $MIGRATION_RESPONSE"
+              exit 1
+            fi
           done
           if [ -z "$ACTUAL_TIMESTAMP" ]; then
-            echo "::error::Migration check failed — could not query /health/migrations after 3 attempts: $MIGRATION_RESPONSE"
+            echo "::error::Migration check failed — /health/migrations returned 404 after 3 attempts (endpoint may not exist in this version)"
             exit 1
           fi
           if [ "$ACTUAL_TIMESTAMP" != "$EXPECTED_TIMESTAMP" ]; then
