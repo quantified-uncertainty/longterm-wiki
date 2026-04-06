@@ -6,6 +6,8 @@ import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { STATUS_COLORS, SCOPE_COLORS, normalizeStatus } from "./legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeLegislationCoverage } from "@/components/coverage/coverage-score";
 
 export interface LegislationRow {
   id: string;
@@ -314,6 +316,9 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
             {renderCell(col, row)}
           </td>
         ))}
+        <td className="py-2.5 px-3 text-center">
+          <CoverageDots score={computeLegislationCoverage(row)} />
+        </td>
       </tr>
     );
   }
@@ -444,6 +449,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
                   className="text-left"
                 />
               ))}
+              <th scope="col" className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -454,7 +460,7 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
                     jurisdiction={jurisdictionLabel(groupRows[0]) ?? "Unknown"}
                     scope={groupRows[0].scope}
                     count={groupRows.length}
-                    colSpan={1 + activeColumns.length}
+                    colSpan={2 + activeColumns.length}
                   >
                     {groupRows.map(renderRow)}
                   </GroupSection>

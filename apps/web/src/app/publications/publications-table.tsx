@@ -13,10 +13,9 @@ import {
 import { Search } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { formatType } from "./publication-utils";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computePublicationCoverage } from "@/components/coverage/coverage-score";
 import {
   Table,
   TableBody,
@@ -34,8 +33,6 @@ export interface PublicationRow {
   peerReviewed: boolean;
   resourceCount: number;
   pageCount: number;
-  /** Source-check verdict string, if available */
-  verdictString?: string | null;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -153,17 +150,11 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
       ),
     },
     {
-      id: "verified",
-      header: () => <span className="sr-only">Verified</span>,
+      id: "coverage",
+      header: () => <span className="text-xs font-medium">Coverage</span>,
       cell: ({ row }) => (
-        <SourceCheckDot
-          status={recordVerdictToStatus(row.original.verdictString)}
-          originalVerdict={row.original.verdictString}
-          size="md"
-          href={row.original.verdictString ? getSourceCheckHref("publication", row.original.id) : undefined}
-        />
+        <CoverageDots score={computePublicationCoverage(row.original)} />
       ),
-      enableSorting: false,
     },
   ];
 }

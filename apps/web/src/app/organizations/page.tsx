@@ -9,7 +9,7 @@ import type { Fact, Property } from "@longterm-wiki/factbase";
 import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { computeCompletionScore } from "@/app/organizations/org-constants";
+import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 
 export const metadata: Metadata = {
   title: "Organizations",
@@ -203,7 +203,7 @@ async function loadFromApi(
       foundedDate: org.foundedDate,
 
       peopleCount: null, // Not available from API
-      completionScore: computeCompletionScore(org),
+      completionScore: computeOrgCoverage(org),
 
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -253,7 +253,7 @@ async function loadFromApi(
       foundedDate,
 
       peopleCount: null,
-      completionScore: computeCompletionScore({}),
+      completionScore: computeOrgCoverage({ foundedDate }),
 
       searchText: searchParts.join(" ").toLowerCase(),
     });
@@ -336,8 +336,10 @@ function loadFromLocal(): OrgPageData {
       foundedDate,
 
       peopleCount,
-      completionScore: computeCompletionScore({
+      completionScore: computeOrgCoverage({
         revenueNum, valuationNum, headcount: headcountVal, totalFundingNum, foundedDate,
+        peopleCount,
+        wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
       }),
 
       searchText: buildOrgSearchText(org, orgToEmployeeNames),

@@ -6,6 +6,8 @@ import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 
 export interface AiModelRow {
   id: string;
@@ -276,6 +278,7 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
               <SortHeader label="MMLU" sortKey="mmlu" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="GPQA Diamond" sortKey="gpqa" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="SWE-bench" sortKey="sweBench" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <th scope="col" className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -392,11 +395,25 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                     <span className="text-muted-foreground/40">&mdash;</span>
                   )}
                 </td>
+                {/* Coverage */}
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeAiModelCoverage({
+                    developer: row.developer,
+                    releaseDate: row.releaseDate,
+                    inputPrice: row.inputPrice,
+                    outputPrice: row.outputPrice,
+                    contextWindow: row.contextWindow,
+                    parameterCount: row.parameterCount,
+                    safetyLevel: row.safetyLevel,
+                    benchmarkCount: [row.mmluScore, row.gpqaScore, row.sweBenchScore].filter((s) => s != null).length,
+                    wikiId: row.wikiId,
+                  })} />
+                </td>
               </tr>
             ))}
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={10} className="text-center py-12 text-muted-foreground">
+                <td colSpan={11} className="text-center py-12 text-muted-foreground">
                   No models match your search.
                 </td>
               </tr>

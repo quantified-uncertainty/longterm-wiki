@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface EventRow {
   id: string;
@@ -107,6 +109,7 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
               />
               <th className="text-left py-2 px-3 font-medium">Description</th>
               <th className="text-left py-2 px-3 font-medium">Tags</th>
+              <th className="text-center py-2 px-3 font-medium">Coverage</th>
               <th className="text-center py-2 px-3 font-medium">Wiki</th>
             </tr>
           </thead>
@@ -163,6 +166,10 @@ export function EventsTable({ rows }: { rows: EventRow[] }) {
                       )}
                     </div>
                   )}
+                </td>
+
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeGenericCoverage({ description: row.description, tags: row.tags, wikiId: row.wikiId, filledFieldCount: (row.status ? 1 : 0) })} />
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">

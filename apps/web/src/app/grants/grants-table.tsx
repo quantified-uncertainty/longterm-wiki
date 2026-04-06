@@ -4,11 +4,10 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGrantCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { compareGrantRows, type SortDir } from "./grants-sort";
 import { STATUS_COLORS } from "./grants-constants";
 
@@ -43,8 +42,6 @@ export interface GrantRow {
   dataSourceId: string | null;
   /** Inferred data source display name */
   dataSourceName: string | null;
-  /** Source-check verdict string, if available */
-  verdictString?: string | null;
 }
 
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "date" | "status";
@@ -352,7 +349,7 @@ export function GrantsTable({
               {hasAnyStatus && (
                 <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -469,15 +466,8 @@ export function GrantsTable({
                     )}
                   </td>
                 )}
-
-                {/* Verification */}
-                <td className="py-2.5 px-1">
-                  <SourceCheckDot
-                    status={recordVerdictToStatus(row.verdictString)}
-                    originalVerdict={row.verdictString}
-                    size="md"
-                    href={row.verdictString ? getSourceCheckHref("grant", row.recordKey) : undefined}
-                  />
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeGrantCoverage({ amount: row.amount, recipient: row.recipientName, date: row.date, program: row.program, status: row.status, source: row.source })} />
                 </td>
               </tr>
             ))}
