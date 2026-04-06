@@ -45,7 +45,6 @@ import { BoardSeats } from "./board-seats";
 import { getPersonPolicyPositions, PolicyPositionsSection } from "./policy-positions";
 import { PoliticalInfo } from "./political-info";
 import { WikiOverview } from "./wiki-overview";
-import { EntitySources } from "./entity-sources";
 import {
   ScorecardDisplay,
   OfficeHistory,
@@ -210,8 +209,6 @@ export default async function PersonProfilePage({
   const personEntity = getPersonEntityById(slug);
   const positions = personEntity?.positions ?? [];
 
-  // Entity-level sources and website (from YAML, not KB facts)
-  const entitySources = personEntity?.sources ?? [];
   const entityWebsite = personEntity?.website;
 
   // Publications linked to this person (from people-resources.yaml via database.json).
@@ -501,9 +498,6 @@ export default async function PersonProfilePage({
         {/* Sidebar */}
         <div className="space-y-8">
           <SocialLinks facts={socialLinkFacts} />
-          {entitySources.length > 0 && (
-            <EntitySources sources={entitySources} />
-          )}
           {allFacts.length > 0 && (
             <FactsPanel facts={allFacts} entityId={entity.id} />
           )}

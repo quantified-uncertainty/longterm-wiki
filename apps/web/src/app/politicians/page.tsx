@@ -106,7 +106,6 @@ function loadPoliticians(): PoliticianRow[] {
       status: inferStatus(entity),
       website: entity.website ?? null,
       stances,
-      sourceCount: (entity.sources ?? []).length,
       tags: entity.tags ?? [],
     };
   });

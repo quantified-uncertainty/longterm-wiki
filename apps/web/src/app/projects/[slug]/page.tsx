@@ -369,30 +369,6 @@ export default async function ProjectDetailPage({
             </section>
           )}
 
-          {entity.sources.length > 0 && (
-            <section className="rounded-xl border border-border p-4">
-              <h3 className="text-sm font-bold mb-3">Sources</h3>
-              <ul className="space-y-2.5">
-                {entity.sources.map((source, i) => (
-                  <li key={i} className="text-sm">
-                    {source.url ? (
-                      <a
-                        href={source.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {source.title}
-                      </a>
-                    ) : (
-                      <span>{source.title}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
           {entity.tags.length > 0 && (
             <section className="rounded-xl border border-border p-4">
               <h3 className="text-sm font-bold mb-3">Tags</h3>

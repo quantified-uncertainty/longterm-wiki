@@ -137,7 +137,6 @@ const DirectoryQuery = z.object({
  * An entity is considered enriched if it has any of:
  *   - A non-empty description
  *   - Non-empty customFields array
- *   - Non-empty sources array
  *   - Non-empty relatedEntries array
  *   - A wikiId (wiki page assigned)
  *
@@ -146,7 +145,6 @@ const DirectoryQuery = z.object({
 export function clearStubIfEnriched(entity: {
   description?: string | null;
   customFields?: unknown[] | null;
-  sources?: unknown[] | null;
   relatedEntries?: unknown[] | null;
   wikiId?: string | null;
   metadata?: Record<string, unknown> | null;
@@ -158,11 +156,10 @@ export function clearStubIfEnriched(entity: {
 
   const hasDescription = !!entity.description;
   const hasCustomFields = Array.isArray(entity.customFields) && entity.customFields.length > 0;
-  const hasSources = Array.isArray(entity.sources) && entity.sources.length > 0;
   const hasRelatedEntries = Array.isArray(entity.relatedEntries) && entity.relatedEntries.length > 0;
   const hasWikiId = !!entity.wikiId;
 
-  if (hasDescription || hasCustomFields || hasSources || hasRelatedEntries || hasWikiId) {
+  if (hasDescription || hasCustomFields || hasRelatedEntries || hasWikiId) {
     const { stub: _, ...rest } = metadata;
     return Object.keys(rest).length > 0 ? rest : null;
   }
@@ -185,7 +182,6 @@ function formatEntity(e: typeof entities.$inferSelect) {
     lastUpdated: e.lastUpdated,
     customFields: e.customFields,
     relatedEntries: e.relatedEntries,
-    sources: e.sources,
     metadata: e.metadata,
     syncedAt: e.syncedAt,
     createdAt: e.createdAt,
@@ -513,7 +509,7 @@ const entitiesApp = new Hono()
     //
     // Filtering approach: Person/org entities use `metadata.stub` flag because
     // stubs are created programmatically by CLI commands. The flag is auto-cleared
-    // during sync when an entity gains enriched data (description, sources, etc.).
+    // during sync when an entity gains enriched data (description, customFields, etc.).
     // Research areas use data-presence checks (orgCount/paperCount) instead — see
     // getResearchAreasFromPG() in tablebase.ts for why the approaches differ.
     const metadataConditions = [
@@ -918,7 +914,6 @@ const entitiesApp = new Hono()
           lastUpdated: e.lastUpdated ?? null,
           customFields: e.customFields ?? null,
           relatedEntries: e.relatedEntries ?? null,
-          sources: e.sources ?? null,
           metadata: clearStubIfEnriched(e),
         }));
 
@@ -962,7 +957,6 @@ const entitiesApp = new Hono()
               lastUpdated: sql`excluded.last_updated`,
               customFields: sql`excluded.custom_fields`,
               relatedEntries: sql`excluded.related_entries`,
-              sources: sql`excluded.sources`,
               metadata: sql`excluded.metadata`,
               syncedAt: sql`now()`,
               updatedAt: sql`now()`,

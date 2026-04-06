@@ -24,21 +24,6 @@
       type: event
     - id: sid_1LcLlMGLbw
       type: organization
-  sources:
-    - title: "Anthropic's Claude AI being used in Iran war by U.S. military, sources say"
-      url: https://www.cbsnews.com/news/anthropic-claude-ai-iran-war-u-s/
-    - title: "Anthropic's AI tool Claude central to U.S. campaign in Iran, amid a bitter feud"
-      url: https://www.washingtonpost.com/technology/2026/03/04/anthropic-ai-iran-campaign/
-    - title: "Speeding Up the Kill Chain: Pentagon Bombs Thousands of Targets in Iran Using Palantir AI"
-      url: https://www.democracynow.org/2026/3/18/ai_warfare
-    - title: "AI Models Deployed Nuclear Weapons in 95% of War Simulations"
-      url: https://decrypt.co/359137/openai-google-anthropic-ai-models-nuclear-weapons-war-simulations
-    - title: "Claude Just Opened the Strait (satirical fiction)"
-      url: https://www.chinatalk.media/p/how-claude-opened-the-strait-of-hormuz
-    - title: "Hegseth wants Pentagon to dump Claude, but military users say it's not so easy"
-      url: https://www.militarytimes.com/news/pentagon-congress/2026/03/19/hegseth-wants-pentagon-to-dump-claude-but-military-users-say-its-not-so-easy/
-    - title: "U.S.-Iran War Raises Probability of an AI Doomsday"
-      url: https://foreignpolicy.com/2026/03/24/ai-artificial-intelligence-doomsday-iran-war/
   description: >-
     The 2026 Iran war, which began February 28, marks the first large-scale deployment of frontier AI models
     in active armed conflict. Claude AI (via Palantir's Maven Smart System) was used for intelligence assessments,
@@ -89,17 +74,6 @@
       type: risk
     - id: sid_khXUiwWtkg
       type: crux
-  sources:
-    - title: "Trump Orders US Government to Drop Anthropic After Pentagon Feud"
-      url: https://www.bloomberg.com/news/articles/2026-02-27/trump-orders-us-government-to-drop-anthropic-after-pentagon-feud
-    - title: "Anthropic vs the Pentagon: Why AI firm is taking on Trump administration"
-      url: https://www.aljazeera.com/news/2026/2/25/anthropic-vs-the-pentagon-why-ai-firm-is-taking-on-trump-administration
-    - title: "A Timeline of the Anthropic-Pentagon Dispute"
-      url: https://www.techpolicy.press/a-timeline-of-the-anthropic-pentagon-dispute/
-    - title: "Dario Amodei says he 'cannot in good conscience' bow to Pentagon demands"
-      url: https://fortune.com/2026/02/27/dario-amodei-says-he-cannot-in-good-conscience-bow-to-pentagons-demands-over-ai-use-in-military/
-    - title: "Trump admin blacklists Anthropic as AI firm refuses Pentagon demands"
-      url: https://www.cnbc.com/2026/02/27/trump-anthropic-ai-pentagon.html
   description: >-
     In February 2026, the Trump administration ordered all federal agencies to cease using Anthropic's technology
     and designated the company a "supply chain risk to national security" — a category normally reserved for
@@ -128,13 +102,6 @@
       value: Counterfactuals are hard to assess
     - label: Status
       value: Early, limited evidence
-  sources:
-    - title: 'AI Governance: A Research Agenda'
-      url: https://www.governance.ai/research-paper/research-agenda
-      author: GovAI
-    - title: Evaluating AI Governance
-      url: https://cset.georgetown.edu/
-      author: CSET Georgetown
   description: 'As AI governance efforts multiply, a critical question emerges: Which policies are actually working?'
   lastUpdated: 2025-12
 - id: openai-foundation-governance

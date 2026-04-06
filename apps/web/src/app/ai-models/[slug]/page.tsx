@@ -160,16 +160,6 @@ export default async function AiModelDetailPage({
               Wiki page &rarr;
             </Link>
           )}
-          {entity.sources?.length > 0 && entity.sources[0].url && (
-            <a
-              href={safeHref(entity.sources[0].url)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Source &rarr;
-            </a>
-          )}
           <Link
             href={`/ai-models/${slug}/data`}
             className="text-primary hover:text-primary/80 font-medium transition-colors"
@@ -425,43 +415,6 @@ export default async function AiModelDetailPage({
                   >
                     {cap}
                   </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Sources */}
-          {entity.sources.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Sources
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {entity.sources.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {entity.sources.map((source, i) => (
-                  <div key={`${i}-${source.title}`} className="px-4 py-3">
-                    {source.url ? (
-                      <a
-                        href={safeHref(source.url)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm font-medium hover:text-primary transition-colors"
-                      >
-                        {source.title}
-                      </a>
-                    ) : (
-                      <span className="text-sm font-medium">
-                        {source.title}
-                      </span>
-                    )}
-                    {source.date && (
-                      <div className="text-xs text-muted-foreground/60 mt-0.5">
-                        {source.date}
-                      </div>
-                    )}
-                  </div>
                 ))}
               </div>
             </section>

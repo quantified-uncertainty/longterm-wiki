@@ -30,15 +30,6 @@
       value: Co-founder, Head of Interpretability
     - label: Known For
       value: Mechanistic interpretability, neural network visualization, clarity of research communication
-  sources:
-    - title: Chris Olah's Blog
-      url: https://colah.github.io
-    - title: Distill Journal
-      url: https://distill.pub
-    - title: Anthropic Interpretability Research
-      url: https://www.anthropic.com/research#interpretability
-    - title: Scaling Monosemanticity
-      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
   description: |
     Chris Olah is one of the most influential figures in AI interpretability research. Before co-founding Anthropic in 2021, he worked at Google Brain and OpenAI, where he pioneered techniques for understanding what neural networks learn internally. His blog posts and papers on neural network visualization have become canonical references in the field.
 
@@ -72,13 +63,6 @@
       value: CEO & Co-founder
     - label: Known For
       value: Founding Conjecture, AI safety advocacy, interpretability research
-  sources:
-    - title: Conjecture
-      url: https://conjecture.dev
-    - title: Connor Leahy on Twitter/X
-      url: https://twitter.com/ConnorLeahy
-    - title: Various podcast appearances
-      url: https://www.youtube.com/results?search_query=connor+leahy
   description: |
     Connor Leahy is the CEO and co-founder of Conjecture, an AI safety research company based in London. He rose to prominence as a founding member of EleutherAI, an open-source collective that trained GPT-NeoX and other large language models to democratize access to AI research. This experience gave him direct insight into how frontier capabilities are developed.
 
@@ -112,15 +96,6 @@
       value: Director
     - label: Known For
       value: AI safety research, benchmark creation, CAIS leadership
-  sources:
-    - title: Dan Hendrycks' Website
-      url: https://hendrycks.com
-    - title: Center for AI Safety
-      url: https://safe.ai
-    - title: Statement on AI Risk
-      url: https://safe.ai/statement-on-ai-risk
-    - title: Google Scholar Profile
-      url: https://scholar.google.com/citations?user=VEvOFxQAAAAJ
   description: |
     Dan Hendrycks is the Director of the Center for AI Safety (CAIS) and one of the most prolific researchers in AI safety. His work spans technical safety research, benchmark creation, and public advocacy for taking AI risks seriously. He is known for combining rigorous empirical research with clear communication about catastrophic risks.
 
@@ -195,15 +170,6 @@
       value: Co-founder & Research Fellow
     - label: Known For
       value: Early AI safety work, decision theory, rationalist community
-  sources:
-    - title: MIRI Research
-      url: https://intelligence.org/research/
-    - title: LessWrong
-      url: https://www.lesswrong.com/users/eliezer_yudkowsky
-    - title: "AGI Ruin: A List of Lethalities"
-      url: https://www.lesswrong.com/posts/uMQ3cqWDPHhjtiesc/agi-ruin-a-list-of-lethalities
-    - title: The Sequences
-      url: https://www.lesswrong.com/rationality
   description: |
     Eliezer Yudkowsky is one of the founding figures of AI safety as a field. In 2000, he co-founded the Machine Intelligence Research Institute (MIRI), originally called the Singularity Institute for Artificial Intelligence, making it one of the first organizations dedicated to studying the risks from advanced AI. His early writings on AI risk predated academic interest in the topic by over a decade.
 
@@ -262,15 +228,6 @@
       value: Professor Emeritus, AI Safety Advocate
     - label: Known For
       value: Deep learning pioneer, backpropagation, now AI risk vocal advocate
-  sources:
-    - title: Geoffrey Hinton's Homepage
-      url: https://www.cs.toronto.edu/~hinton/
-    - title: CBS 60 Minutes Interview
-      url: https://www.cbsnews.com/news/geoffrey-hinton-ai-dangers-60-minutes-transcript/
-    - title: "NYT: 'Godfather of AI' Quits Google"
-      url: https://www.nytimes.com/2023/05/01/technology/ai-google-chatbot-engineer-quits-hinton.html
-    - title: Google Scholar Profile
-      url: https://scholar.google.com/citations?user=JicYPdAAAAAJ
   description: |
     Geoffrey Hinton is a cognitive psychologist and computer scientist who received the 2018 Turing Award for his foundational work on deep learning. Often called the "Godfather of AI," he developed many of the techniques that enabled the current AI revolution, including the backpropagation algorithm, Boltzmann machines, and key advances in neural network training.
 
@@ -315,15 +272,6 @@
       value: Member of Technical Staff, Anthropic
     - label: Known For
       value: Directing billions toward AI safety, effective altruism leadership, AI timelines work
-  sources:
-    - title: Coefficient Giving
-      url: https://coefficientgiving.org
-    - title: Cold Takes Blog
-      url: https://www.cold-takes.com/
-    - title: Most Important Century Series
-      url: https://www.cold-takes.com/most-important-century/
-    - title: AI Timelines Post
-      url: https://www.cold-takes.com/where-ai-forecasting-stands-today/
   description: |
     Holden Karnofsky is the former Co-CEO of Coefficient Giving (formerly Open Philanthropy), one of the largest funders of AI safety research and related work. Through Coefficient Giving, he directed hundreds of millions of dollars toward reducing existential risks from AI, making him one of the most influential figures in shaping the field's growth and direction. In 2025, he joined Anthropic.
 
@@ -368,13 +316,6 @@
       value: Co-founder & Chief Scientist
     - label: Known For
       value: Deep learning breakthroughs, OpenAI leadership, now focused on safe superintelligence
-  sources:
-    - title: Safe Superintelligence Inc.
-      url: https://ssi.inc
-    - title: SSI Founding Announcement
-      url: https://ssi.inc/announcement
-    - title: AlexNet Paper
-      url: https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks
   description: |
     Ilya Sutskever is one of the most influential figures in modern AI development. As a PhD student of Geoffrey Hinton, he co-authored the AlexNet paper that sparked the deep learning revolution. He went on to co-found OpenAI in 2015 and served as Chief Scientist for nearly a decade, leading the technical direction that produced GPT-3, GPT-4, and other breakthrough systems.
 
@@ -507,15 +448,6 @@
       value: Scientific Director of Mila, Professor; Scientific Director of ARIA Safeguarded AI (since Aug 2024)
     - label: Known For
       value: Deep learning pioneer, now AI safety advocate
-  sources:
-    - title: Yoshua Bengio's Website
-      url: https://yoshuabengio.org
-    - title: Mila Institute
-      url: https://mila.quebec/
-    - title: Statement on AI Risk
-      url: https://www.safe.ai/statement-on-ai-risk
-    - title: Google Scholar Profile
-      url: https://scholar.google.com/citations?user=kukA0LcAAAAJ
   description: |
     Yoshua Bengio is a pioneer of deep learning who shared the 2018 Turing Award with Geoffrey Hinton and Yann LeCun for their foundational work on neural networks. As Scientific Director of Mila, the Quebec AI Institute, he leads one of the world's largest academic AI research centers. His technical contributions include fundamental work on neural network optimization, recurrent networks, and attention mechanisms.
 
@@ -859,9 +791,6 @@
       value: 46th President of the United States
     - label: Known For
       value: Executive Order 14110 on AI safety, establishing US AI Safety Institute
-  sources:
-    - title: White House Executive Order on AI
-      url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
   lastUpdated: 2026-03
 - id: andrej-karpathy
   stableId: sid_Q9eaz6joHA
@@ -1159,11 +1088,6 @@
       value: UC Santa Cruz
     - label: Known For
       value: FLI, FLF, Metaculus, Wise Ancestors
-  sources:
-    - title: FLF Website
-      url: https://www.flf.org
-    - title: AXRP Episode 38.7
-      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
   lastUpdated: 2026-03
 - id: ben-goldhaber
   stableId: sid_0tQftJKP4Q
@@ -1209,9 +1133,6 @@
       value: COO, Future of Life Foundation
     - label: Known For
       value: Operations leadership across AI safety organizations
-  sources:
-    - title: AXRP Episode 38.7 - Anthony Aguirre
-      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
   lastUpdated: 2026-03
 - id: oliver-sourbut
   stableId: sid_sdM7KbGOGg
@@ -1641,11 +1562,6 @@
       value: Founder & Executive Director, QURI
     - label: Known For
       value: Guesstimate, Squiggle, QURI
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/oagr
-    - title: LessWrong Profile
-      url: https://www.lesswrong.com/users/ozziegooen
   lastUpdated: 2026-03
 - id: sam-nolan
   stableId: sid_2Ui200bHUQ
@@ -1712,9 +1628,6 @@
   relatedEntries:
     - id: rethink-priorities
       type: organization
-  sources:
-    - title: EA Forum Profile
-      url: https://forum.effectivealtruism.org/users/peter_wildeford
   lastUpdated: 2026-03
 - id: misha-yagudin
   stableId: sid_1oXRs4wqTA
@@ -1836,15 +1749,6 @@
     - id: sid_MEt9F7f50w
       type: approach
       relationship: leads-to
-  sources:
-    - title: davidad's CV
-      url: https://davidad.org/davidad_cv.pdf
-    - title: ARIA Safeguarded AI Programme
-      url: https://www.aria.org.uk/programme-safeguarded-ai/
-    - title: Towards Guaranteed Safe AI (arXiv)
-      url: https://arxiv.org/abs/2405.06624
-    - title: Programme Thesis on LessWrong
-      url: https://www.lesswrong.com/posts/qweXJ6v9heSn4wvdk/davidad-s-provably-safe-ai-architecture-aria-s-programme
   description: David "davidad" Dalrymple is a Programme Director at the UK's Advanced Research + Invention Agency (ARIA), where he leads the GBP 59 million Safeguarded AI programme aiming to develop AI systems with mathematical safety guarantees through formal verification. The youngest-ever MIT graduate degree recipient at age 16, he previously co-invented Filecoin and worked at Protocol Labs. Lead author of "Towards Guaranteed Safe AI" (2024) with co-authors including Yoshua Bengio, Stuart Russell, Max Tegmark, and Sanjit Seshia, proposing a framework of world models, safety specifications, and verifiers for provably safe AI systems.
   customFields:
     - label: Role
@@ -1873,9 +1777,6 @@
     - id: sid_XLLyzaEaCA
       type: organization
       relationship: leads-to
-  sources:
-    - title: GovAI Team Page
-      url: https://www.governance.ai/team
   description: Director of the Centre for the Governance of AI (GovAI). Previously a Research Fellow at the Future of Humanity Institute (FHI) at Oxford University, where he worked on AI governance and existential risk. Became Director of GovAI after its transition to independence.
   tags:
     - ai-governance
@@ -1903,9 +1804,6 @@
     - id: sid_VJacG0VE2w
       type: organization
       relationship: leads-to
-  sources:
-    - title: AI Now Institute Team
-      url: https://ainowinstitute.org/people
   description: Co-Executive Director of the AI Now Institute. Named to TIME's 100 Most Influential People in AI (2024). Addressed the UN General Assembly on AI governance. Previously at Mozilla Foundation and the Indian government's IT ministry. Legal and policy expert focusing on AI governance, competition, and digital rights.
   tags:
     - ai-governance
@@ -1961,11 +1859,6 @@
       value: Founder, Board Member
     - label: Affiliation
       value: Apart Research
-  sources:
-    - title: Apart Research — Impact (Team)
-      url: https://apartresearch.com/impact
-    - title: Esben Kran personal site
-      url: https://kran.ai
   tags:
     - ai-safety
     - alignment
@@ -2673,9 +2566,6 @@
   tags:
     - ai-governance
     - philanthropy
-  sources:
-    - title: Reid Hoffman - Wikipedia
-      url: https://en.wikipedia.org/wiki/Reid_Hoffman
   lastUpdated: 2026-03
 - id: mackenzie-scott
   stableId: sid_qXAd0hBawg
@@ -2684,9 +2574,6 @@
   description: Philanthropist and novelist. Former spouse of Jeff Bezos. Since 2019, has given away over \$17 billion through a distinctive no-strings-attached approach targeting neglected areas. One of the largest individual donors globally.
   tags:
     - philanthropy
-  sources:
-    - title: Mackenzie Scott - Wikipedia
-      url: https://en.wikipedia.org/wiki/MacKenzie_Scott
   lastUpdated: 2026-03
 - id: russell-moore
   stableId: sid_scmpCYKuBq
@@ -2695,9 +2582,6 @@
   description: Editor-in-chief of Christianity Today. Former president of the Ethics and Religious Liberty Commission of the Southern Baptist Convention. Left the SBC in 2021 over its political alignment with Trumpism. One of the most prominent evangelical voices opposing Christian nationalism from within the tradition.
   tags:
     - political-stability
-  sources:
-    - title: Russell Moore - Wikipedia
-      url: https://en.wikipedia.org/wiki/Russell_Moore
   lastUpdated: 2026-03
 - id: ben-horowitz
   stableId: sid_3SLFjy1eDj
@@ -2707,9 +2591,6 @@
   tags:
     - venture-capital
     - ai-governance
-  sources:
-    - title: Ben Horowitz - Wikipedia
-      url: https://en.wikipedia.org/wiki/Ben_Horowitz
 - id: alex-bores
   stableId: sid_W2B4vrLpsU
   type: person
@@ -2737,21 +2618,6 @@
       view: Supportive — led budget letter for alternative protein research center in NY
       source: EA Forum profile
       sourceUrl: https://forum.effectivealtruism.org/posts/EGxuPPKsf3CjhcdpM/consider-donating-to-alex-bores-author-of-the-raise-act
-  sources:
-    - title: EA Forum — Consider Donating to Alex Bores
-      url: https://forum.effectivealtruism.org/posts/EGxuPPKsf3CjhcdpM/consider-donating-to-alex-bores-author-of-the-raise-act
-    - title: NBC News — Candidate at Center of AI War Unveils Agenda
-      url: https://www.nbcnews.com/politics/2026-election/candidate-center-brewing-midterm-ai-war-unveils-agenda-rcna257735
-    - title: Carnegie — NY RAISE Act Analysis
-      url: https://carnegieendowment.org/emissary/2026/02/ai-state-law-new-york-raise-act-california-sb53
-    - title: TechCrunch — Anthropic-funded Group Backs Bores
-      url: https://techcrunch.com/2026/02/20/anthropic-funded-group-backs-candidate-attacked-by-rival-ai-super-pac/
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Alex_Bores
-    - title: GovTrack — RAISE Act
-      url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Alex_Bores
   lastUpdated: 2026-04
 - id: rebecca-lasher
   stableId: sid_YKtqDKysGb
@@ -2798,25 +2664,6 @@
       view: Supportive — multiple bills expanding NSF AI research at HBCUs and minority-serving institutions
       source: HBCU AI Research Leadership Act
       sourceUrl: https://foushee.house.gov/media/press-releases/rep-foushee-announces-legislation-to-close-ai-research-funding-gaps-and-establish-ai-institutes-at-hbcus
-  sources:
-    - title: Foushee — Bipartisan AI Task Force Report
-      url: https://foushee.house.gov/media/press-releases/rep-foushee-and-members-of-the-bipartisan-house-task-force-on-artificial-intelligence-release-policy-recommendation-report
-    - title: Foushee — HBCU AI Research Leadership Act
-      url: https://foushee.house.gov/media/press-releases/rep-foushee-announces-legislation-to-close-ai-research-funding-gaps-and-establish-ai-institutes-at-hbcus
-    - title: Foushee — Expanding AI Voices Act
-      url: https://foushee.house.gov/media/press-releases/reps-foushee-nunn-introduce-bipartisan-legislation-to-expand-participation-in-ai-education-research-and-workforce
-    - title: Foushee — Blasts Trump AI Framework
-      url: https://foushee.house.gov/media/press-releases/congresswoman-foushee-blasts-white-house-ai-framework-that-fails-to-put-people-first
-    - title: WRAL — AI PAC Spending in NC-4
-      url: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/valerie_foushee/456913
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/valerie-foushee/F000477
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Valerie_Foushee
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Valerie_Foushee
   lastUpdated: 2026-04
 - id: jesse-jackson-jr
   stableId: sid_69tAH5XWON
@@ -2830,19 +2677,6 @@
       view: Opposed to regulation — embraced AI industry PAC support, frames AI purely as economic opportunity
       source: Chicago Sun-Times
       sourceUrl: https://chicago.suntimes.com/elections/2026/03/09/artificial-intelligence-bobby-rush-ad-jesse-jackson-jr-campaign
-  sources:
-    - title: Chicago Sun-Times — AI PAC Bobby Rush Ad
-      url: https://chicago.suntimes.com/elections/2026/03/09/artificial-intelligence-bobby-rush-ad-jesse-jackson-jr-campaign
-    - title: Fortune — AI/Crypto Spending in Illinois
-      url: https://fortune.com/2026/03/18/ai-crypto-illinois-primary-spending-fairshake-think-big-pac/
-    - title: GovTrack Voting Record
-      url: https://www.govtrack.us/congress/members/jesse_jackson/400198
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/jesse-jackson/J000283
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Jesse_Jackson_Jr.
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Jesse_Jackson_Jr.
   lastUpdated: 2026-04
 - id: melissa-bean
   stableId: sid_PnwPk4Vcau
@@ -2857,19 +2691,6 @@
       view: Mildly supportive (light-touch) — pro-innovation framing with "clear rules without hampering innovation"
       source: Campaign issues page
       sourceUrl: https://www.melissabeanforcongress.com/issues
-  sources:
-    - title: Campaign Issues Page
-      url: https://www.melissabeanforcongress.com/issues
-    - title: American Prospect — AIPAC and AI Buy a Seat
-      url: https://prospect.org/2026/03/12/illinois-eighth-congressional-district-aipac-ai-bean-ahmed/
-    - title: GovTrack Voting Record
-      url: https://www.govtrack.us/congress/members/melissa_bean/400631
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Melissa_Bean
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/melissa-bean/B001253
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Melissa_Bean
   lastUpdated: 2026-04
 - id: jake-gober
   stableId: sid_Zs43I3aG72
@@ -2900,21 +2721,6 @@
       view: Strongly supportive — lead sponsor of ADVANCE Act for civilian nuclear deployment
       source: Senate press release
       sourceUrl: https://www.ricketts.senate.gov/news/press-releases/ricketts-celebrates-passage-of-bipartisan-nuclear-energy-bill/
-  sources:
-    - title: ADVANCE Act Passage
-      url: https://www.ricketts.senate.gov/news/press-releases/ricketts-celebrates-passage-of-bipartisan-nuclear-energy-bill/
-    - title: SAFE Chips Act Introduction
-      url: https://www.ricketts.senate.gov/news/press-releases/ricketts-coons-introduce-safe-chips-act/
-    - title: The Hill — SAFE Chips Act
-      url: https://thehill.com/policy/technology/5635658-safe-chips-act-ai-export-control/
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/pete_ricketts/456952
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Pete_Ricketts
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/pete-ricketts/R000618
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Pete_Ricketts
   lastUpdated: 2026-04
 - id: marsha-blackburn
   stableId: sid_enf2UNKyDx
@@ -2938,25 +2744,6 @@
       view: Strongly supportive — champions Tennessee nuclear sector and TVA SMR deployments
       source: Senate press release
       sourceUrl: https://www.blackburn.senate.gov/2025/12/energy/america-s-nuclear-renaissance-runs-through-tennessee
-  sources:
-    - title: TRUMP AMERICA AI Act Draft
-      url: https://www.blackburn.senate.gov/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/3b3b6458-b6c7-478b-9859-374949586765
-    - title: Axios — Blackburn Rolls Out Updated AI Plan
-      url: https://www.axios.com/2026/03/18/blackburn-updated-ai-plan-trump
-    - title: KOSA Senate Passage
-      url: https://www.blackburn.senate.gov/2024/7/issues/technology/blackburn-blumenthal-celebrate-senate-passage-of-the-bipartisan-kids-online-safety-act
-    - title: Roll Call — AI Draft Bill Analysis
-      url: https://rollcall.com/2026/03/19/ai-draft-bill-would-revamp-online-landscape/
-    - title: Nuclear Renaissance in Tennessee
-      url: https://www.blackburn.senate.gov/2025/12/energy/america-s-nuclear-renaissance-runs-through-tennessee
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/marsha-blackburn/B001243
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/marsha_blackburn/400032
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Marsha_Blackburn
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Marsha_Blackburn
   lastUpdated: 2026-04
 - id: allison-duettmann
   stableId: sid_BvtUK0yEDv
@@ -4703,17 +4490,6 @@
       view: Neutral to opposed — pro-AI-dominance framing backed by AI industry PACs, genuine cyber expertise but emphasis on competition over safety
       source: Campaign materials
       sourceUrl: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
-  sources:
-    - title: WRAL — AI PACs Back Buckhout
-      url: https://www.wral.com/news/nccapitol/ai-pacs-2m-nc-2026-primaries-foushee-buckhout-feb-27/
-    - title: NBC — AI Industry Ads Flooding 2026 Election
-      url: https://www.nbcnews.com/politics/2026-election/ads-ai-industry-are-flooding-2026-election-artificial-intelligence-rcna260782
-    - title: DOD Biography
-      url: https://www.war.gov/About/Biographies/Biography/Article/4156734/laurie-buckhout/
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Laurie_Buckhout
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Laurie_Buckhout
   lastUpdated: 2026-04
 - id: don-davis
   stableId: sid_NjPH3LAWxM
@@ -4728,19 +4504,6 @@
       view: Neutral — secured AI pilot in NDAA for military logistics but no broader AI safety positions
       source: NDAA amendments press release
       sourceUrl: https://dondavis.house.gov/media/press-releases/congressman-don-davis-advances-amendments-fy25-national-defense-authorization
-  sources:
-    - title: Davis — NDAA Amendments
-      url: https://dondavis.house.gov/media/press-releases/congressman-don-davis-advances-amendments-fy25-national-defense-authorization
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/donald_davis/456912
-    - title: Climate/Energy Positions (SACE)
-      url: https://cleanenergy.org/blog/don-davis-on-climate-energy-where-the-candidates-for-nc-congressional-district-1-stand
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Donald_Davis
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/donald-davis/D000230
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Don_Davis_(North_Carolina_politician)
   lastUpdated: 2026-04
 - id: josh-gottheimer
   stableId: sid_tVEKHxyInn
@@ -4764,19 +4527,6 @@
       view: Supportive — 100% Humane Society score (2017), endorsed by HSLF
       source: Humane Society endorsement
       sourceUrl: https://humaneaction.org/press-release/2018/07/humane-society-legislative-fund-endorses-rep-josh-gottheimer-new-jerseys-5th
-  sources:
-    - title: AI Commission Announcement
-      url: https://gottheimer.house.gov/posts/release-gottheimer-to-co-chair-new-house-commission-on-artificial-intelligence
-    - title: AI Workforce Training Act
-      url: https://gottheimer.house.gov/posts/release-gottheimer-introduces-bipartisan-ai-workforce-training-act
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/josh_gottheimer/412714
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Josh_Gottheimer
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/josh-gottheimer/G000583
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Josh_Gottheimer
   lastUpdated: 2026-04
 - id: chris-gober
   stableId: sid_jJ0yCaVU9E
@@ -4791,13 +4541,6 @@
       view: Likely opposed to regulation — backed by AI industry PACs, Musk-adjacent, pro-innovation framing
       source: Texas Tribune campaign profile
       sourceUrl: https://www.texastribune.org/2026/02/12/texas-10th-congressional-district-gop-primary-chris-gober-trump/
-  sources:
-    - title: Texas Tribune — Former Elon Musk Lawyer Leads TX-10 Race
-      url: https://www.texastribune.org/2026/02/12/texas-10th-congressional-district-gop-primary-chris-gober-trump/
-    - title: Club for Growth Endorsement
-      url: https://www.clubforgrowth.org/candidates/alex-mealer/
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Chris_Gober
   lastUpdated: 2026-04
 - id: alex-mealer
   stableId: sid_upZRDVRpEj
@@ -4814,15 +4557,6 @@
       view: Supportive — explicitly supports safety reviews for powerful AI, deepfake protections, transparency requirements
       source: Campaign website
       sourceUrl: https://alexandramealer.com/
-  sources:
-    - title: Campaign Website
-      url: https://alexandramealer.com/
-    - title: Club for Growth Candidate Page
-      url: https://www.clubforgrowth.org/candidates/alex-mealer/
-    - title: Houston Public Media — TX-9 Primary
-      url: https://www.houstonpublicmedia.org/articles/news/politics/election-2026/2026/02/17/543596/tx-9-republican-primary-election-cain-mealer/
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Alex_Mealer
   lastUpdated: 2026-04
 - id: carlos-de-la-cruz
   stableId: sid_cuRfFRqEWH
@@ -4832,13 +4566,6 @@
   description: "Republican candidate in TX-35 runoff (May 26, 2026). Retired 20-year Air Force veteran (Middle East deployments, southern border drug interdiction). Brother of Rep. Monica De La Cruz (R-TX). Trump-endorsed. Backed by Public First Action as part of their pro-AI-regulation Republican slate. Thin policy platform — primarily cultural/loyalty-based. Top stated priority: \"stopping the radicalization of America's youth.\" Self-described \"President Trump's wingman in Congress.\""
   tags:
     - politics
-  sources:
-    - title: Campaign Website
-      url: https://www.carlosforcongress.com/
-    - title: San Antonio Report — TX-35 Runoff Q&A
-      url: https://sanantonioreport.org/carlos-de-la-cruz-qa-tx-35-runoff/
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Carlos_De_La_Cruz
   lastUpdated: 2026-04
 - id: mallory-mcmorrow
   stableId: sid_MufHpHOmRJ
@@ -4862,19 +4589,6 @@
       view: Supportive — seven-point framework requiring green energy, union labor, community transparency
       source: Michigan Advance
       sourceUrl: https://michiganadvance.com/2026/03/27/mallory-mcmorrow-releases-plan-for-michigan-data-centers-done-right-with-a-focus-on-green-energy/
-  sources:
-    - title: Campaign Website — Agenda
-      url: https://www.mcmorrowformichigan.com/agenda
-    - title: Axios — Kids' Online Safety Plan
-      url: https://www.axios.com/2026/02/09/senate-mallory-mcmorrow-michigan-kids-online-safety
-    - title: Michigan Advance — Data Center Plan
-      url: https://michiganadvance.com/2026/03/27/mallory-mcmorrow-releases-plan-for-michigan-data-centers-done-right-with-a-focus-on-green-energy/
-    - title: Michigan Advance — AI/Social Media Legislation
-      url: https://michiganadvance.com/2026/01/22/predatory-ai-social-media-addiction-targeted-by-new-legislation-from-michigan-senate-democrats/
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Mallory_McMorrow
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Mallory_McMorrow
   lastUpdated: 2026-04
 - id: haley-stevens
   stableId: sid_Wxqv54AslU
@@ -4898,23 +4612,6 @@
       view: Strongly supportive — CHIPS Act architect, NIST/NSF advocate, critical minerals bill, STEM education
       source: CHIPS Act wins
       sourceUrl: https://stevens.house.gov/media/press-releases/rep-stevens-secures-wins-chips-and-science-act-votes-historic-investments
-  sources:
-    - title: Stevens — CHIPS Act Wins
-      url: https://stevens.house.gov/media/press-releases/rep-stevens-secures-wins-chips-and-science-act-votes-historic-investments
-    - title: Stevens — Small Business AI Act
-      url: https://stevens.house.gov/media/press-releases/house-passes-rep-stevens-bipartisan-bill-help-small-businesses-safely-navigate
-    - title: Most Effective Lawmakers
-      url: https://michiganindependent.com/politics/stevens-and-peters-recognized-as-most-effective-lawmakers-in-key-policy-areas/
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/haley_stevens/412786
-    - title: LCV Profile
-      url: https://www.lcv.org/moc/haley-stevens/
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/haley-stevens/S001215
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Haley_Stevens
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Haley_Stevens
   lastUpdated: 2026-04
 - id: mike-rogers-mi
   stableId: sid_rTJq3v2HV6
@@ -4929,21 +4626,6 @@
       view: Unknown — cybersecurity expertise could translate but endorsed deregulatory AI framework
     - topic: Nuclear energy
       view: Supportive — supports modular nuclear reactors
-  sources:
-    - title: Campaign Website
-      url: https://rogersforsenate.com/meet-mike
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Mike_Rogers_(Michigan_politician)
-    - title: LCV Score
-      url: https://www.lcv.org/moc/mike-j-rogers/
-    - title: Environmental Positions (WCMU)
-      url: https://radio.wcmu.org/local-regional-news/2024-10-24/where-slotkin-rogers-stand-on-michigan-environmental-issues
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/mike-rogers/R000572
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/mike_rogers/400342
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Mike_Rogers_(Michigan)
   lastUpdated: 2026-04
 - id: john-cornyn
   stableId: sid_4TO1jXYozt
@@ -4969,23 +4651,6 @@
       sourceUrl: https://www.cornyn.senate.gov/news/cornyn-booker-reintroduce-bipartisan-bill-to-help-prevent-future-pandemics/
     - topic: Animal welfare
       view: Opposed — co-introduced EATS Act to preempt state animal welfare standards for meat production
-  sources:
-    - title: GUARD Act Signing
-      url: https://www.cornyn.senate.gov/news/pres-trump-signs-cornyn-bill-to-advance-defense-innovation-artificial-intelligence-into-law/
-    - title: Preventing Future Pandemics Act
-      url: https://www.cornyn.senate.gov/news/cornyn-booker-reintroduce-bipartisan-bill-to-help-prevent-future-pandemics/
-    - title: Science & Technology Issues Page
-      url: https://www.cornyn.senate.gov/key-issues/science-tech/
-    - title: Texas Tribune — Cornyn vs Paxton
-      url: https://www.texastribune.org/2026/02/05/texas-us-senate-republicans-2026-primary-q-and-a-voter-guide-cornyn-hunt-paxton/
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/john_cornyn/300027
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/John_Cornyn
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/john-cornyn/C001056
-    - title: Ballotpedia
-      url: https://ballotpedia.org/John_Cornyn
   lastUpdated: 2026-04
 - id: ken-paxton
   stableId: sid_bIat5xswtM
@@ -5001,17 +4666,6 @@
       view: Mixed/consumer protection — enforcement actions against misleading AI companies but no engagement with frontier safety or governance frameworks
       source: TX AG AI healthcare settlement
       sourceUrl: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-reaches-settlement-first-its-kind-healthcare-generative-ai-investigation
-  sources:
-    - title: TX AG — AI Healthcare Settlement
-      url: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-reaches-settlement-first-its-kind-healthcare-generative-ai-investigation
-    - title: TX AG — Meta/Character.AI Investigation
-      url: https://www.texasattorneygeneral.gov/news/releases/attorney-general-ken-paxton-investigates-meta-and-characterai-misleading-children-deceptive-ai
-    - title: Texas Tribune — Cornyn vs Paxton Q&A
-      url: https://www.texastribune.org/2026/02/05/texas-us-senate-republicans-2026-primary-q-and-a-voter-guide-cornyn-hunt-paxton/
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Ken_Paxton
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Ken_Paxton
   lastUpdated: 2026-04
 - id: roy-cooper
   stableId: sid_uOwPoVTf2h
@@ -5028,19 +4682,6 @@
       view: Neutral to supportive — NC AI responsible-use framework developed under his admin
     - topic: Nuclear energy
       view: Mixed — vetoed nuclear expansion bill (preferred renewables) but not blanket anti-nuclear
-  sources:
-    - title: Governor's Accomplishments Page
-      url: https://www.govroycooper.org/accomplishments
-    - title: NC Governor — Executive Order 80
-      url: https://governor.nc.gov/issues/environment
-    - title: NC Governor — AI Executive Order 24
-      url: https://governor.nc.gov/executive-order-no-24-advancing-trustworthy-artificial-intelligence-benefits-all-north-carolinians
-    - title: WUNC — Medicaid Expansion Legacy
-      url: https://www.wunc.org/news/2024-12-06/medicaid-expansion-governor-roy-cooper
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Roy_Cooper
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Roy_Cooper
   lastUpdated: 2026-04
 - id: jon-ossoff
   stableId: sid_N2rG9yPZ9K
@@ -5055,23 +4696,6 @@
       view: Neutral to supportive — personally affected by deepfake attack, probed DoD AI use, but not a primary AI legislator
       source: DoD Grok AI inquiry
       sourceUrl: https://www.ossoff.senate.gov/press-releases/sen-ossoff-colleagues-launch-inquiry-into-department-of-defenses-use-of-ai-software-known-for-antisemitic-content/
-  sources:
-    - title: Ossoff — Five-Year Report
-      url: https://www.ossoff.senate.gov/five-year-report/
-    - title: DoD Grok AI Inquiry
-      url: https://www.ossoff.senate.gov/press-releases/sen-ossoff-colleagues-launch-inquiry-into-department-of-defenses-use-of-ai-software-known-for-antisemitic-content/
-    - title: CBS Atlanta — Deepfake Attack Ad
-      url: https://www.cbsnews.com/atlanta/news/georgia-rep-mike-collins-campaign-uses-ai-generated-deepfake-of-senator-jon-ossoff-in-tight-senate-showdown/
-    - title: GovTrack 2024 Report Card
-      url: https://www.govtrack.us/congress/members/jon_ossoff/456857/report-card/2024
-    - title: LCV Endorsement
-      url: https://www.lcv.org/media-center/lcv-action-fund-endorses-jon-ossoff-for-u-s-senate/
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/jon-ossoff/O000174
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Jon_Ossoff
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Jon_Ossoff
   lastUpdated: 2026-04
 - id: susan-collins
   stableId: sid_5NoqE8uJSr
@@ -5097,21 +4721,6 @@
       sourceUrl: https://www.collins.senate.gov/newsroom/prevent-pandemics-act-provisions-authored-by-senator-collins-signed-into-law
     - topic: Science and technology funding
       view: Strongly supportive — Appropriations Chair defending NIH/NSF funding, secured ~\$8.8B for NSF
-  sources:
-    - title: PREVENT Pandemics Act Provisions
-      url: https://www.collins.senate.gov/newsroom/prevent-pandemics-act-provisions-authored-by-senator-collins-signed-into-law
-    - title: AI Election Safety Bill
-      url: https://www.collins.senate.gov/newsroom/senators-collins-klobuchar-introduce-bipartisan-bill-to-provide-ai-guidelines-for-election-offices
-    - title: NIH Research Funding Advocacy
-      url: https://www.collins.senate.gov/newsroom/senator-collins-colleagues-send-letter-to-omb-advocating-for-release-of-critical-nih-research-funding
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/susan_collins/300025
-    - title: Wikipedia — Political Positions
-      url: https://en.wikipedia.org/wiki/Political_positions_of_Susan_Collins
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/susan-collins/C001035
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Susan_Collins_(Maine)
   lastUpdated: 2026-04
 - id: byron-donalds
   stableId: sid_5mkCGqtYnA
@@ -5126,19 +4735,6 @@
       view: Opposed — explicitly anti-regulation, backed by \$5M from pro-AI-industry PAC, favors state/parental oversight over federal rules
       source: Florida Politics
       sourceUrl: https://floridapolitics.com/archives/778801-byron-donalds-breaks-with-ron-desantis-on-magical-ai-embraces-technologys-creative-destruction/
-  sources:
-    - title: NBC News — AI PAC Pledges \$5M for Donalds
-      url: https://www.nbcnews.com/politics/2026-election/super-pac-backed-ai-titans-pledges-5-million-boost-byron-donalds-run-f-rcna258612
-    - title: Florida Politics — Breaks with DeSantis on AI
-      url: https://floridapolitics.com/archives/778801-byron-donalds-breaks-with-ron-desantis-on-magical-ai-embraces-technologys-creative-destruction/
-    - title: GovTrack Profile
-      url: https://www.govtrack.us/congress/members/byron_donalds/456808
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Byron_Donalds
-    - title: Congress.gov Profile
-      url: https://www.congress.gov/member/byron-donalds/D000032
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Byron_Donalds
   lastUpdated: 2026-04
 - id: nida-allam
   stableId: sid_L9zuCKRaWC
@@ -5154,21 +4750,6 @@
       view: Supportive — strongest anti-AI-industry stance, proposed data center moratorium pending federal regulation
       source: Campaign platform
       sourceUrl: https://nidaallam.com/platform
-  sources:
-    - title: Campaign Platform
-      url: https://nidaallam.com/platform
-    - title: NPR — Allam Concedes to Foushee
-      url: https://www.npr.org/2026/03/04/nx-s1-5734577/north-carolina-election-results-foushee-allam
-    - title: The Intercept — Razor-thin Loss
-      url: https://theintercept.com/2026/03/05/nc-house-primary-valerie-foushee-nida-allam/
-    - title: The Nation — AI Is the New AIPAC
-      url: https://www.thenation.com/?post_type=article&p=591412
-    - title: NC Newsline — \$4.2M Outside Spending
-      url: https://ncnewsline.com/2026/02/27/outsiders-spent-nearly-4-2m-in-nc-04-primary-most-expensive-in-state-history/
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Nida_Allam
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Nida_Allam
   lastUpdated: 2026-04
 - id: micah-lasher
   stableId: sid_bxc9r4rOAn
@@ -5184,17 +4765,6 @@
       view: Supportive — co-sponsor of RAISE Act, pro-enforcement stance against AI industry pushback
       source: Campaign platform
       sourceUrl: https://micahlasher.com/platform-and-policies/
-  sources:
-    - title: Campaign Platform
-      url: https://micahlasher.com/platform-and-policies/
-    - title: NBC News — AI War in NY-12
-      url: https://www.nbcnews.com/politics/2026-election/candidate-center-brewing-midterm-ai-war-unveils-agenda-rcna257735
-    - title: amNewYork — Bloomberg Endorsement
-      url: https://www.amny.com/news/ny-12-congress-lasher-bloomberg-endorsement/
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Micah_Lasher
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Micah_Lasher
   lastUpdated: 2026-04
 - id: jack-schlossberg
   stableId: sid_XIHqP2pPI0
@@ -5208,17 +4778,6 @@
       view: Mildly supportive — supports transparency and accountability frameworks, frames AI as systemic risk, but also pro-tech/innovation
       source: Fortune interview
       sourceUrl: https://fortune.com/2026/03/18/jack-schlossberg-warning-america-ceos-150900639.html
-  sources:
-    - title: Fortune — Warning for CEOs
-      url: https://fortune.com/2026/03/18/jack-schlossberg-warning-america-ceos-150900639.html
-    - title: The Hill — Billionaires and AI Companies Spending
-      url: https://thehill.com/homenews/campaign/5806153-jfk-grandson-schlossberg-says-billionaires-massive-ai-companies-spending-millions-in-new-york-house-race/
-    - title: NBC News — Pelosi Endorsement
-      url: https://www.nbcnews.com/politics/elections/nancy-pelosi-set-endorse-jfks-grandson-new-york-house-seat-source-says-rcna257968
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Jack_Schlossberg
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Jack_Schlossberg
   lastUpdated: 2026-03
 - id: michael-whatley
   stableId: sid_7ucfe1TgTW
@@ -5228,17 +4787,6 @@
   description: Republican nominee for U.S. Senate in North Carolina (2026) against Roy Cooper. Former RNC Chairman (2024-2025) and NC Republican Party Chairman (2019-2024). Career Republican operative and oil/gas industry lobbyist — EVP of Consumer Energy Alliance (2008-2019), advocated for Keystone XL, expanded offshore drilling, and against regulations on fracking, power plant emissions, and water pollution. Chief of Staff to Sen. Elizabeth Dole (2004-2007). Trump-appointed "Hurricane Recovery Czar" for western NC. Supports "a mix of energy sources — carbon, nuclear, renewables." Outraised by Cooper ~3:1 (\$6.5M vs \$21M). No documented positions on AI safety, biosecurity, or animal welfare.
   tags:
     - politics
-  sources:
-    - title: Campaign Website
-      url: https://www.michaelwhatley.com/
-    - title: E&E News — Oil Ties in NC Senate Race
-      url: https://www.eenews.net/articles/republicans-oil-ties-a-focus-in-north-carolina-senate-race/
-    - title: The Assembly NC — What to Know About Whatley
-      url: https://www.theassemblync.com/news/politics/michael-whatley-nc-senate/
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Michael_Whatley
-    - title: Ballotpedia
-      url: https://ballotpedia.org/Michael_Whatley
   lastUpdated: 2026-04
 - id: elie-hassenfeld
   stableId: sid_xVfFkFIk3Q
@@ -7332,9 +6880,6 @@
   positions:
     - topic: AI safety and regulation
       view: Strongly supportive — co-chairs House AI Task Force, introduced nuclear AI safety bill
-  sources:
-    - title: Lieu AI Policy Page
-      url: https://lieu.house.gov/issues/artificial-intelligence
   lastUpdated: 2026-04
 - id: richard-blumenthal
   stableId: sid_33ExUKx4u_
@@ -7347,9 +6892,6 @@
   positions:
     - topic: AI safety and regulation
       view: Strongly supportive — led Senate AI oversight hearings, proposed independent oversight body
-  sources:
-    - title: Blumenthal AI Oversight Hearings
-      url: https://www.blumenthal.senate.gov/newsroom/press/release/blumenthal-and-hawley-to-hold-hearing-on-oversight-of-artificial-intelligence
   lastUpdated: 2026-04
 - id: josh-hawley
   stableId: sid_C-3CLLkSFI
@@ -7362,9 +6904,6 @@
   positions:
     - topic: AI safety and regulation
       view: Supportive — co-led Senate AI oversight, proposes AI liability and Section 230 reform
-  sources:
-    - title: Hawley AI Legislation Principles
-      url: https://www.hawley.senate.gov/hawley-announces-guiding-principles-future-ai-legislation/
   lastUpdated: 2026-04
 - id: jay-obernolte
   stableId: sid_1uPlGv8dvv
@@ -7379,9 +6918,6 @@
       view: Supportive — co-chairs House AI Task Force, chairs Science Committee
     - topic: Science and technology funding
       view: Strongly supportive — advocates National AI Research Resource
-  sources:
-    - title: Obernolte AI Task Force Report
-      url: https://obernolte.house.gov/AITFReport
   lastUpdated: 2026-04
 - id: don-beyer
   stableId: sid_SgSoI5UUh-
@@ -7394,9 +6930,6 @@
   positions:
     - topic: AI safety and regulation
       view: Strongly supportive — AI Caucus co-chair, transparency requirements for foundation models
-  sources:
-    - title: Beyer AI Foundation Model Transparency Act
-      url: https://beyer.house.gov/news/documentsingle.aspx?DocumentID=9013
   lastUpdated: 2026-04
 - id: sara-jacobs
   stableId: sid_5nLouvqhAZ
@@ -7410,9 +6943,6 @@
   positions:
     - topic: AI safety and regulation
       view: Strongly supportive — secured ban on autonomous AI nuclear launches in NDAA
-  sources:
-    - title: Jacobs AI Task Force Wins
-      url: https://sarajacobs.house.gov/news/press-releases/rep-sara-jacobs-secures-key-wins-in-bipartisan-ai-task-force-report
   lastUpdated: 2026-04
 - id: chuck-schumer
   stableId: sid_r8d8HT7B8w
@@ -7425,9 +6955,6 @@
   positions:
     - topic: AI safety and regulation
       view: Supportive — launched SAFE Innovation Framework, organized Senate AI forums, proposed B AI funding
-  sources:
-    - title: Schumer Senate AI Roadmap
-      url: https://www.schumer.senate.gov/newsroom/press-releases/following-historic-ai-insight-forums-over-the-past-year-leader-schumer-senators-rounds-heinrich-and-young-reveal-bipartisan-roadmap-for-artificial-intelligence-policy-in-the-united-states-senate
   lastUpdated: 2026-04
 - id: todd-young
   stableId: sid_ikLZVi-pdx

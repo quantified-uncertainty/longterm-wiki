@@ -267,9 +267,8 @@ function loadFromLocal(): PersonRow[] {
     const hasDescription = !!tp.description;
     const hasWikiId = !!tp.wikiId;
     const hasCustomFields = Array.isArray(tp.customFields) && tp.customFields.length > 0;
-    const hasSources = Array.isArray(tp.sources) && tp.sources.length > 0;
     const hasRelatedEntries = Array.isArray(tp.relatedEntries) && tp.relatedEntries.length > 0;
-    if (!hasDescription && !hasWikiId && !hasCustomFields && !hasSources && !hasRelatedEntries) {
+    if (!hasDescription && !hasWikiId && !hasCustomFields && !hasRelatedEntries) {
       continue;
     }
 

@@ -17,13 +17,6 @@ const RelatedEntry = z.object({
   relationship: z.string().optional(),
 });
 
-const Source = z.object({
-  title: z.string(),
-  url: z.string().optional(),
-  author: z.string().optional(),
-  date: z.string().optional(),
-});
-
 const CustomField = z.object({
   label: z.string(),
   value: z.string(),
@@ -39,7 +32,6 @@ const BaseEntity = z.object({
   tags: z.array(z.string()).default([]),
   clusters: z.array(z.string()).default([]),
   relatedEntries: z.array(RelatedEntry).default([]),
-  sources: z.array(Source).default([]),
   lastUpdated: z.string().optional(),
   website: z.string().optional(),
   // Metadata fields carried from database.json

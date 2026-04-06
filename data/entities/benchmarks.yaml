@@ -14,9 +14,6 @@
   introducedDate: "2021-01"
   maintainer: "Dan Hendrycks et al."
   website: "https://github.com/hendrycks/test"
-  sources:
-    - title: "Measuring Massive Multitask Language Understanding"
-      url: "https://arxiv.org/abs/2009.03300"
 
 - id: swe-bench-verified
   stableId: sid_FaFyApPcNQ
@@ -30,9 +27,6 @@
   introducedDate: "2024-08"
   maintainer: "OpenAI / Princeton NLP"
   website: "https://www.swebench.com"
-  sources:
-    - title: "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?"
-      url: "https://arxiv.org/abs/2310.06770"
 
 - id: math-benchmark
   stableId: sid_j76swRBTVA
@@ -45,9 +39,6 @@
   higherIsBetter: true
   introducedDate: "2021-03"
   maintainer: "Dan Hendrycks et al."
-  sources:
-    - title: "Measuring Mathematical Problem Solving With the MATH Dataset"
-      url: "https://arxiv.org/abs/2103.03874"
 
 - id: humaneval
   stableId: sid_7nyWJfSgOQ
@@ -60,9 +51,6 @@
   higherIsBetter: true
   introducedDate: "2021-07"
   maintainer: OpenAI
-  sources:
-    - title: "Evaluating Large Language Models Trained on Code"
-      url: "https://arxiv.org/abs/2107.03374"
 
 - id: gpqa-diamond
   stableId: sid_TOj1uhYwMA
@@ -75,9 +63,6 @@
   higherIsBetter: true
   introducedDate: "2023-11"
   maintainer: "David Rein et al."
-  sources:
-    - title: "GPQA: A Graduate-Level Google-Proof Q&A Benchmark"
-      url: "https://arxiv.org/abs/2311.12022"
 
 - id: arc-agi
   stableId: sid_GtNBCWxnjA
@@ -91,9 +76,6 @@
   introducedDate: "2019-11"
   maintainer: "Francois Chollet"
   website: "https://arcprize.org"
-  sources:
-    - title: "On the Measure of Intelligence"
-      url: "https://arxiv.org/abs/1911.01547"
 
 - id: arc-agi-2
   stableId: sid_C7CZ1MleIQ
@@ -119,9 +101,6 @@
   higherIsBetter: true
   introducedDate: "2025-01"
   maintainer: "Terminal-Bench"
-  sources:
-    - title: "Terminal-Bench"
-      url: "https://github.com/terminal-bench/terminal-bench"
 
 - id: terminal-bench-2
   stableId: sid_lbTyjIb90A
@@ -160,9 +139,6 @@
   introducedDate: "2024-04"
   maintainer: "CMU / HKU"
   website: "https://os-world.github.io"
-  sources:
-    - title: "OSWorld: Benchmarking Multimodal Agents for Open-Ended Tasks in Real Computer Environments"
-      url: "https://arxiv.org/abs/2404.07972"
 
 - id: aime-2025
   stableId: sid_OiqJ2XUuMQ
@@ -188,9 +164,6 @@
   introducedDate: "2024-06"
   maintainer: "TIGER Lab"
   website: "https://github.com/TIGER-AI-Lab/MMLU-Pro"
-  sources:
-    - title: "MMLU-Pro: A More Robust and Challenging Multi-Task Language Understanding Benchmark"
-      url: "https://arxiv.org/abs/2406.01574"
 
 - id: simpleqa
   stableId: sid_oxtbxgfUUg
@@ -203,9 +176,6 @@
   higherIsBetter: true
   introducedDate: "2024-10"
   maintainer: "OpenAI"
-  sources:
-    - title: "SimpleQA: Measuring short-form factuality in large language models"
-      url: "https://openai.com/index/introducing-simpleqa/"
 
 - id: humanitys-last-exam
   stableId: sid_Lh6IqIxepw
@@ -219,9 +189,6 @@
   introducedDate: "2025-01"
   maintainer: "Scale AI / Center for AI Safety"
   website: "https://lastexam.ai"
-  sources:
-    - title: "Humanity's Last Exam"
-      url: "https://arxiv.org/abs/2501.14249"
 
 - id: ifeval
   stableId: sid_3DEqmUEGPQ
@@ -234,9 +201,6 @@
   higherIsBetter: true
   introducedDate: "2023-11"
   maintainer: "Google Research"
-  sources:
-    - title: "Instruction-Following Evaluation for Large Language Models"
-      url: "https://arxiv.org/abs/2311.07911"
 
 - id: chatbot-arena-elo
   stableId: sid_HcdwpPmRSw
@@ -250,9 +214,6 @@
   introducedDate: "2023-05"
   maintainer: "LMArena (formerly LMSYS)"
   website: "https://arena.ai"
-  sources:
-    - title: "Chatbot Arena: An Open Platform for Evaluating LLMs by Human Preference"
-      url: "https://arxiv.org/abs/2403.04132"
 
 - id: livecodebench
   stableId: sid_RoW25Cag2g
@@ -266,9 +227,6 @@
   introducedDate: "2024-06"
   maintainer: "LiveCodeBench Team"
   website: "https://livecodebench.github.io"
-  sources:
-    - title: "LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code"
-      url: "https://arxiv.org/abs/2403.07974"
 
 - id: livebench
   stableId: sid_QZHbwL6aHg
@@ -282,9 +240,6 @@
   introducedDate: "2024-06"
   maintainer: "LiveBench Team"
   website: "https://livebench.ai"
-  sources:
-    - title: "LiveBench: A Challenging, Contamination-Free LLM Benchmark"
-      url: "https://arxiv.org/abs/2406.19314"
 
 - id: bfcl
   stableId: sid_67KLm5yAHQ
@@ -298,9 +253,6 @@
   introducedDate: "2024-02"
   maintainer: "UC Berkeley"
   website: "https://gorilla.cs.berkeley.edu/leaderboard.html"
-  sources:
-    - title: "Berkeley Function Calling Leaderboard"
-      url: "https://arxiv.org/abs/2402.15491"
 
 - id: frontiermath
   stableId: sid_MnqcmhPTaQ
@@ -314,9 +266,6 @@
   introducedDate: "2024-11"
   maintainer: "Epoch AI"
   website: "https://epoch.ai/frontiermath"
-  sources:
-    - title: "FrontierMath: A Benchmark for Evaluating Advanced Mathematical Reasoning in AI"
-      url: "https://arxiv.org/abs/2411.04872"
 
 - id: aime-2024
   stableId: sid_lUijiPGVBw
@@ -341,9 +290,6 @@
   higherIsBetter: true
   introducedDate: "2022-10"
   maintainer: "Google / Stanford"
-  sources:
-    - title: "Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them"
-      url: "https://arxiv.org/abs/2210.09261"
 
 - id: hellaswag
   stableId: sid_Huw5YsSoMg
@@ -356,9 +302,6 @@
   higherIsBetter: true
   introducedDate: "2019-05"
   maintainer: "AI2 / University of Washington"
-  sources:
-    - title: "HellaSwag: Can a Machine Really Finish Your Sentence?"
-      url: "https://arxiv.org/abs/1905.07830"
 
 - id: re-bench
   stableId: sid_sOJOmnwGmA
@@ -371,9 +314,6 @@
   higherIsBetter: true
   introducedDate: "2024-11"
   maintainer: "METR"
-  sources:
-    - title: "RE-Bench: Evaluating frontier AI R&D capabilities of language model agents against human experts"
-      url: "https://arxiv.org/abs/2411.15114"
 
 - id: mle-bench
   stableId: sid_dPZFXNFXcA
@@ -386,9 +326,6 @@
   higherIsBetter: true
   introducedDate: "2024-09"
   maintainer: "OpenAI"
-  sources:
-    - title: "MLE-bench: Evaluating Machine Learning Agents on Machine Learning Engineering"
-      url: "https://arxiv.org/abs/2410.07095"
 
 - id: webarena
   stableId: sid_0HEF0o51UA
@@ -402,9 +339,6 @@
   introducedDate: "2023-07"
   maintainer: "CMU"
   website: "https://webarena.dev"
-  sources:
-    - title: "WebArena: A Realistic Web Environment for Building Autonomous Agents"
-      url: "https://arxiv.org/abs/2307.13854"
 
 - id: tau-bench
   stableId: sid_Z6tH7RnpHg
@@ -417,9 +351,6 @@
   higherIsBetter: true
   introducedDate: "2024-06"
   maintainer: "Sierra AI"
-  sources:
-    - title: "TAU-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains"
-      url: "https://arxiv.org/abs/2407.12841"
 
 - id: mgsm
   stableId: sid_tDWpiYrrkQ
@@ -432,9 +363,6 @@
   higherIsBetter: true
   introducedDate: "2022-10"
   maintainer: "Google Research"
-  sources:
-    - title: "Language Models are Multilingual Chain-of-Thought Reasoners"
-      url: "https://arxiv.org/abs/2210.03057"
 
 - id: mathvista
   stableId: sid_1mGW7D6lwQ
@@ -447,9 +375,6 @@
   higherIsBetter: true
   introducedDate: "2023-10"
   maintainer: "UCLA / Microsoft Research"
-  sources:
-    - title: "MathVista: Evaluating Mathematical Reasoning of Foundation Models in Visual Contexts"
-      url: "https://arxiv.org/abs/2310.02255"
 
 - id: codeforces-rating
   stableId: sid_2deBrz125g
@@ -474,9 +399,6 @@
   higherIsBetter: true
   introducedDate: "2021-10"
   maintainer: "OpenAI"
-  sources:
-    - title: "Training Verifiers to Solve Math Word Problems"
-      url: "https://arxiv.org/abs/2110.14168"
 
 - id: mmmu
   stableId: sid_Xp7mLc2fYa
@@ -487,9 +409,6 @@
   scoringMethod: accuracy
   higherIsBetter: true
   introducedDate: "2023-11"
-  sources:
-    - title: "MMMU: A Massive Multi-discipline Multimodal Understanding and Reasoning Benchmark for Expert AGI"
-      url: "https://arxiv.org/abs/2311.16502"
 
 - id: arena-hard
   stableId: sid_Bw4jNe9rTk
@@ -501,9 +420,6 @@
   higherIsBetter: true
   introducedDate: "2024-04"
   maintainer: "LMArena"
-  sources:
-    - title: "From Crowdsourced Data to High-Quality Benchmarks: Arena Hard and BenchBuilder Pipeline"
-      url: "https://arxiv.org/abs/2406.11939"
 
 - id: mbpp
   stableId: sid_Qh6sVd3wRn
@@ -515,9 +431,6 @@
   higherIsBetter: true
   introducedDate: "2021-08"
   maintainer: "Google Research"
-  sources:
-    - title: "Program Synthesis with Large Language Models"
-      url: "https://arxiv.org/abs/2108.07732"
 
 - id: truthfulqa
   stableId: sid_Jm5rPa1cUe
@@ -529,9 +442,6 @@
   higherIsBetter: true
   introducedDate: "2021-09"
   maintainer: "Oxford"
-  sources:
-    - title: "TruthfulQA: Measuring How Models Mimic Human Falsehoods"
-      url: "https://arxiv.org/abs/2109.07958"
 
 - id: winogrande
   stableId: sid_Yt8nKb6hWf
@@ -543,9 +453,6 @@
   higherIsBetter: true
   introducedDate: "2019-07"
   maintainer: "AI2"
-  sources:
-    - title: "WinoGrande: An Adversarial Winograd Schema Challenge at Scale"
-      url: "https://arxiv.org/abs/1907.10641"
 
 - id: drop
   stableId: sid_Zx2pMf7gDa
@@ -557,9 +464,6 @@
   higherIsBetter: true
   introducedDate: "2019-03"
   maintainer: "AI2"
-  sources:
-    - title: "DROP: A Reading Comprehension Benchmark Requiring Discrete Reasoning Over Paragraphs"
-      url: "https://arxiv.org/abs/1903.00161"
 
 - id: arc-challenge
   stableId: sid_Fw9qLk4jNc
@@ -571,9 +475,6 @@
   higherIsBetter: true
   introducedDate: "2018-03"
   maintainer: "AI2"
-  sources:
-    - title: "Think you have Solved Question Answering? Try ARC, the AI2 Reasoning Challenge"
-      url: "https://arxiv.org/abs/1803.05457"
 
 - id: mmmu-pro
   stableId: sid_Cn3tRw8dVm
@@ -584,9 +485,6 @@
   scoringMethod: accuracy
   higherIsBetter: true
   introducedDate: "2024-06"
-  sources:
-    - title: "MMMU-Pro: A More Robust Multi-discipline Multimodal Understanding Benchmark"
-      url: "https://arxiv.org/abs/2409.02813"
 
 - id: bigcodebench
   stableId: sid_Hk5vQn1eTb
@@ -597,9 +495,6 @@
   scoringMethod: pass_at_1
   higherIsBetter: true
   introducedDate: "2024-06"
-  sources:
-    - title: "BigCodeBench: Benchmarking Code Generation with Diverse Function Calls and Complex Instructions"
-      url: "https://arxiv.org/abs/2406.15877"
 
 - id: aider-polyglot
   stableId: sid_Lg7wSm2fXp
@@ -622,9 +517,6 @@
   scoringMethod: accuracy
   higherIsBetter: true
   introducedDate: "2020-07"
-  sources:
-    - title: "DocVQA: A Dataset for VQA on Document Images"
-      url: "https://arxiv.org/abs/2007.00398"
 
 - id: multi-if
   stableId: sid_Rd6yUj3cKm
@@ -635,9 +527,6 @@
   scoringMethod: accuracy
   higherIsBetter: true
   introducedDate: "2025-01"
-  sources:
-    - title: "Multi-IF: Benchmarking LLMs on Multi-Turn and Multilingual Instructions Following"
-      url: "https://arxiv.org/abs/2501.10921"
 
 - id: math-500
   stableId: sid_Wg8zTn5bHq
@@ -660,6 +549,3 @@
   higherIsBetter: true
   introducedDate: "2025-04"
   maintainer: "OpenAI"
-  sources:
-    - title: "BrowseComp: A Simple Challenge for Browsing Agents"
-      url: "https://arxiv.org/abs/2504.12345"

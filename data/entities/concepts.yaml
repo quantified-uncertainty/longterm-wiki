@@ -53,21 +53,6 @@
       type: organization
     - id: sid_SUZgWeZLNA
       type: risk
-  sources:
-    - title: Working at Frontier AI Labs
-      url: https://80000hours.org/career-reviews/artificial-intelligence-risk-research/#working-at-leading-ai-labs
-      author: 80,000 Hours
-    - title: Right to Warn About Advanced Artificial Intelligence
-      url: https://righttowarn.ai/
-      author: Current/former OpenAI, DeepMind, Anthropic employees
-    - title: Anthropic's Responsible Scaling Policy
-      url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
-    - title: OpenAI Governance Crisis Analysis
-      author: Various
-      date: 2023-2024
-    - title: Should You Work at a Frontier Lab?
-      url: https://forum.effectivealtruism.org/topics/working-at-ai-labs
-      author: EA Forum discussions
   description: >-
     Rather than working on AI safety from outside, this category involves directly influencing frontier AI labs from
     within or through stakeholder pressure. The theory is that since labs are building potentially dangerous systems,
@@ -101,19 +86,6 @@
       type: organization
     - id: sid_mK9pX3rQ7n
       type: organization
-  sources:
-    - title: ARENA Program
-      url: https://www.arena.education/
-    - title: MATS Program
-      url: https://www.matsprogram.org/
-    - title: BlueDot Impact
-      url: https://www.bluedot.org/
-    - title: 80,000 Hours - AI Safety Community Building
-      url: https://80000hours.org/articles/ai-policy-guide/
-    - title: Centre for Effective Altruism
-      url: https://www.centreforeffectivealtruism.org/
-    - title: Coefficient Giving AI Grants
-      url: https://coefficientgiving.org/funds/navigating-transformative-ai/
   description: >-
     Field-building focuses on growing the AI safety ecosystem rather than doing direct research or policy work. The
     theory is that by increasing the number and quality of people working on AI safety, we multiply the impact of all
@@ -150,22 +122,6 @@
       type: organization
     - id: sid_SUZgWeZLNA
       type: risk
-  sources:
-    - title: The Governance of AI
-      url: https://www.governance.ai/
-      author: Centre for the Governance of AI
-    - title: AI Policy Career Guide
-      url: https://80000hours.org/career-reviews/ai-policy-and-strategy/
-      author: 80,000 Hours
-    - title: Computing Power and the Governance of AI
-      url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
-      author: Heim et al.
-    - title: EU AI Act Summary
-      url: https://artificialintelligenceact.eu/
-    - title: AI Safety Summits
-      url: https://www.aisafetysummit.gov.uk/
-    - title: CSET Publications
-      url: https://cset.georgetown.edu/publications/
   description: "The broad domain of regulatory, legal, and institutional frameworks governing the development and deployment of AI systems. Encompasses national AI strategies, international coordination mechanisms, voluntary commitments by labs, and technical standards bodies."
   tags:
     - international
@@ -196,27 +152,6 @@
       type: organization
     - id: sid_dwMzc9WzPa
       type: organization
-  sources:
-    - title: Constitutional AI
-      url: https://arxiv.org/abs/2212.08073
-      author: Anthropic
-      date: '2022'
-    - title: Scaling Monosemanticity
-      url: https://www.anthropic.com/research/mapping-mind-language-model
-      author: Anthropic
-      date: '2024'
-    - title: AI Safety via Debate
-      url: https://arxiv.org/abs/1805.00899
-      author: Irving et al.
-      date: '2018'
-    - title: Eliciting Latent Knowledge
-      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8
-      author: Christiano et al.
-      date: '2021'
-    - title: AI Control
-      url: https://redwoodresearch.github.io/ai-control/
-      author: Redwood Research
-      date: '2024'
   description: Side-by-side comparison of major AI safety research agendas.
   tags:
     - research-agendas
@@ -252,21 +187,6 @@
       type: organization
     - id: sid_vc60Nthkcg
       type: risk
-  sources:
-    - title: AI Alignment Research Overview
-      url: https://www.alignmentforum.org/tag/ai-alignment
-      author: Alignment Forum
-    - title: Technical AI Safety Research
-      url: https://80000hours.org/articles/ai-safety-researcher/
-      author: 80,000 Hours
-    - title: Anthropic's Core Views on AI Safety
-      url: https://www.anthropic.com/news/core-views-on-ai-safety
-    - title: Redwood Research Approach
-      url: https://www.redwoodresearch.org/
-    - title: METR Evaluation Framework
-      url: https://metr.org/
-    - title: AGI Safety Fundamentals
-      url: https://www.agisafetyfundamentals.com/
   description: >-
     Technical AI safety research aims to make AI systems reliably safe and aligned with human values through direct
     scientific and engineering work. This is the most direct intervention—if successful, it solves the core problem that
