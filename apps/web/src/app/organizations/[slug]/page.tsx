@@ -783,11 +783,15 @@ export default async function OrgProfilePage({
                 </span>
               )}
               {(() => {
+                const rev = getKBLatest(entity.id, "revenue");
+                const val = getKBLatest(entity.id, "valuation");
+                const hc = getKBLatest(entity.id, "headcount");
+                const fund = getKBLatest(entity.id, "total-funding");
                 const covInput = {
-                  revenueNum: getKBLatest(entity.id, "revenue")?.value.type === "number" ? (getKBLatest(entity.id, "revenue")!.value as { value: number }).value : null,
-                  valuationNum: getKBLatest(entity.id, "valuation")?.value.type === "number" ? (getKBLatest(entity.id, "valuation")!.value as { value: number }).value : null,
-                  headcount: getKBLatest(entity.id, "headcount")?.value.type === "number" ? (getKBLatest(entity.id, "headcount")!.value as { value: number }).value : null,
-                  totalFundingNum: getKBLatest(entity.id, "total-funding")?.value.type === "number" ? (getKBLatest(entity.id, "total-funding")!.value as { value: number }).value : null,
+                  revenueNum: rev?.value.type === "number" ? rev.value.value : null,
+                  valuationNum: val?.value.type === "number" ? val.value.value : null,
+                  headcount: hc?.value.type === "number" ? hc.value.value : null,
+                  totalFundingNum: fund?.value.type === "number" ? fund.value.value : null,
                   foundedDate: data.foundedDateStr,
                   peopleCount: data.sortedPersons.length,
                   wikiPageId: entity.wikiPageId,

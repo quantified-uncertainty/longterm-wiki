@@ -367,7 +367,10 @@ export function getOrgSignals(row: OrgCoverageInput): string[] {
   if (row.headcount != null) signals.push("Headcount");
   if (row.totalFundingNum != null) signals.push("Total funding");
   if (row.foundedDate) signals.push("Founded date");
-  if (row.peopleCount != null && row.peopleCount >= 3) signals.push(`${row.peopleCount} people tracked`);
+  if (row.peopleCount != null && row.peopleCount >= 3) {
+    signals.push(`${row.peopleCount} people tracked`);
+    if (row.peopleCount >= 10) signals.push("10+ people (deep coverage)");
+  }
   if (row.wikiPageId) signals.push("Wiki page");
   return signals;
 }
@@ -379,7 +382,10 @@ export function getPersonSignals(row: PersonCoverageInput): string[] {
   if (row.employerId) signals.push("Employer");
   if (row.bornYear != null) signals.push("Birth year");
   if (row.netWorthNum != null) signals.push("Net worth");
-  if ((row.careerHistoryCount ?? 0) >= 2) signals.push(`${row.careerHistoryCount} career entries`);
+  if ((row.careerHistoryCount ?? 0) >= 2) {
+    signals.push(`${row.careerHistoryCount} career entries`);
+    if ((row.careerHistoryCount ?? 0) >= 5) signals.push("5+ career entries (deep)");
+  }
   if ((row.positionCount ?? 0) >= 1) signals.push(`${row.positionCount} positions`);
   if ((row.publicationCount ?? 0) >= 1) signals.push(`${row.publicationCount} publications`);
   if (row.wikiPageId) signals.push("Wiki page");

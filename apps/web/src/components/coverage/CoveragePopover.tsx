@@ -88,7 +88,9 @@ export function CoveragePopover({
               ? "This entity has minimal structured data."
               : clamped === 4
                 ? "This entity has comprehensive structured data."
-                : `${signals?.length ?? 0} of the expected data fields are populated.`}
+                : signals && signals.length > 0
+                  ? `${signals.length} data signals detected.`
+                  : "This entity has partial structured data."}
           </p>
         </div>
       </PopoverContent>

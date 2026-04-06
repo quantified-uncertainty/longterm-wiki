@@ -1,14 +1,15 @@
 /**
  * Entity coverage data access layer.
  *
- * Computes coverage scores on-the-fly from entity data already in database.json.
- * Scores are computed lazily and cached per entity ID.
+ * Computes coverage scores on-the-fly from entity data in database.json
+ * enriched with FactBase KB lookups for financial/relationship data.
  *
  * This approach avoids modifying build-data.mjs — the scoring functions
- * operate on typed entity data that's already available at runtime/SSR time.
+ * operate on typed entity data that's already available at SSR time.
  */
 
 import { getTypedEntityById, getTypedEntities, type AnyEntity } from "@/data";
+import { getKBLatest } from "@/data/factbase";
 import {
   computeOrgCoverage,
   computePersonCoverage,
@@ -19,6 +20,19 @@ import {
   computeGenericCoverage,
 } from "@/components/coverage/coverage-score";
 
+/** Extract a numeric KB fact value, or null. */
+function kbNum(entityId: string, prop: string): number | null {
+  const fact = getKBLatest(entityId, prop);
+  return fact?.value.type === "number" ? fact.value.value : null;
+}
+
+/** Extract a text/date KB fact value, or null. */
+function kbText(entityId: string, prop: string): string | null {
+  const fact = getKBLatest(entityId, prop);
+  if (fact?.value.type === "text" || fact?.value.type === "date") return fact.value.value;
+  return null;
+}
+
 /** Compute coverage score for any entity based on its type and available data. */
 export function getEntityDataDepth(entityId: string): number | null {
   const entity = getTypedEntityById(entityId);
@@ -28,20 +42,27 @@ export function getEntityDataDepth(entityId: string): number | null {
 
 /** Compute coverage for a typed entity. Dispatches to type-specific scorers. */
 function computeEntityCoverage(entity: AnyEntity): number {
+  const id = entity.id;
   const type = entity.entityType;
 
   switch (type) {
     case "organization":
       return computeOrgCoverage({
-        foundedDate: (entity as any).founded ?? null,
+        revenueNum: kbNum(id, "revenue"),
+        valuationNum: kbNum(id, "valuation"),
+        headcount: kbNum(id, "headcount"),
+        totalFundingNum: kbNum(id, "total-funding"),
+        foundedDate: kbText(id, "founded-date"),
         wikiPageId: entity.wikiId ?? null,
       });
 
     case "person":
     case "researcher":
       return computePersonCoverage({
-        role: (entity as any).role ?? null,
-        employerId: (entity as any).affiliation ?? null,
+        role: kbText(id, "role"),
+        employerId: (() => { const f = getKBLatest(id, "employed-by"); return f?.value.type === "ref" ? f.value.value : null; })(),
+        bornYear: kbNum(id, "born-year"),
+        netWorthNum: kbNum(id, "net-worth"),
         wikiPageId: entity.wikiId ?? null,
       });
 
@@ -49,11 +70,20 @@ function computeEntityCoverage(entity: AnyEntity): number {
       return computeAiModelCoverage({
         developer: (entity as any).developer ?? null,
         releaseDate: (entity as any).releaseDate ?? null,
+        contextWindow: (entity as any).contextWindow ?? null,
+        parameterCount: (entity as any).parameterCount ?? null,
+        safetyLevel: (entity as any).safetyLevel ?? null,
         wikiId: entity.wikiId ?? null,
       });
 
     case "policy":
       return computeLegislationCoverage({
+        introduced: (entity as any).introduced ?? null,
+        policyStatus: (entity as any).policyStatus ?? null,
+        author: (entity as any).author ?? null,
+        jurisdiction: (entity as any).jurisdiction ?? null,
+        billNumber: (entity as any).billNumber ?? null,
+        fullTextUrl: (entity as any).fullTextUrl ?? null,
         description: entity.description ?? null,
         tags: entity.tags,
         wikiId: entity.wikiId ?? null,
@@ -71,6 +101,9 @@ function computeEntityCoverage(entity: AnyEntity): number {
 
     case "benchmark":
       return computeBenchmarkCoverage({
+        category: (entity as any).category ?? null,
+        scoringMethod: (entity as any).scoringMethod ?? null,
+        maintainer: (entity as any).maintainer ?? null,
         description: entity.description ?? null,
         wikiId: entity.wikiId ?? null,
       });
