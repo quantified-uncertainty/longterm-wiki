@@ -96,15 +96,18 @@ export default async function ThingsPage({ searchParams }: PageProps) {
     );
   }
 
-  // Stats may fail independently — degrade gracefully
-  const stats: ThingsStatsResponse = statsResult.ok
-    ? statsResult.data
-    : { total: 0, byType: {}, byEntityType: {} };
   // The list endpoint returns { things, total } while the search endpoint
   // returns { results, total }. Normalize to a single shape.
   const listBody = listResult.data;
   const results = listBody.results ?? listBody.things ?? [];
   const total = listBody.total ?? results.length;
+
+  // Stats may fail independently — degrade gracefully.
+  // Use the list total as fallback so the header doesn't show "0 items total"
+  // while rows are visibly rendered.
+  const stats: ThingsStatsResponse = statsResult.ok
+    ? statsResult.data
+    : { total, byType: {}, byEntityType: {} };
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: { q?: string; type?: string; page?: number }) {
