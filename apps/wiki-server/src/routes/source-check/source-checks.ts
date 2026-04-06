@@ -1677,6 +1677,68 @@ const sourceChecksApp = new Hono()
       })),
       total,
     });
+  })
+
+  // ---- GET /entity-summary ----
+  // Returns per-entity aggregated source-check verdict counts in a single query.
+  // Used by the entities dashboard to show verification columns.
+  .get("/entity-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = (await db.execute(sql`
+      WITH verdict_counts AS (
+        SELECT
+          entity_id,
+          COUNT(*) FILTER (WHERE verdict = 'confirmed')   AS confirmed,
+          COUNT(*) FILTER (WHERE verdict = 'contradicted') AS contradicted,
+          COUNT(*) FILTER (WHERE verdict = 'outdated')     AS outdated,
+          COUNT(*) FILTER (WHERE verdict = 'partial')      AS partial_count,
+          COUNT(*) FILTER (WHERE verdict = 'unverifiable') AS unverifiable,
+          COUNT(*) FILTER (WHERE verdict = 'unchecked')    AS unchecked,
+          COUNT(*)                                         AS total_verdicts,
+          COALESCE(AVG(confidence), 0)                     AS avg_confidence
+        FROM source_check_verdicts
+        WHERE entity_id IS NOT NULL
+        GROUP BY entity_id
+      ),
+      record_counts AS (
+        SELECT
+          t2.source_id AS entity_id,
+          COUNT(t1.id) AS total_records
+        FROM things t1
+        JOIN things t2 ON t1.parent_thing_id = t2.id
+        WHERE t2.thing_type = 'entity'
+        GROUP BY t2.source_id
+      )
+      SELECT
+        vc.entity_id,
+        vc.confirmed,
+        vc.contradicted,
+        vc.outdated,
+        vc.partial_count,
+        vc.unverifiable,
+        vc.unchecked,
+        vc.total_verdicts,
+        vc.avg_confidence,
+        COALESCE(rc.total_records, 0) AS total_records
+      FROM verdict_counts vc
+      LEFT JOIN record_counts rc ON rc.entity_id = vc.entity_id
+    `)) as Record<string, unknown>[];
+
+    const summaries = rows.map((r) => ({
+      entityId: String(r.entity_id),
+      confirmed: Number(r.confirmed),
+      contradicted: Number(r.contradicted),
+      outdated: Number(r.outdated),
+      partial: Number(r.partial_count),
+      unverifiable: Number(r.unverifiable),
+      unchecked: Number(r.unchecked),
+      totalVerdicts: Number(r.total_verdicts),
+      avgConfidence: Number(Number(r.avg_confidence).toFixed(3)),
+      totalRecords: Number(r.total_records),
+    }));
+
+    return c.json({ summaries });
   });
 
 // ---- Exports ----

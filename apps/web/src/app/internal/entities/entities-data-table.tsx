@@ -100,6 +100,17 @@ export interface UnifiedEntityRow {
   accuracyActual: number | null;
   accuracyTotal: number | null;
   accuracy: "green" | "amber" | "red" | null;
+  // Source-check verification
+  scConfirmed: number | null;
+  scContradicted: number | null;
+  scOutdated: number | null;
+  scPartial: number | null;
+  scUnverifiable: number | null;
+  scUnchecked: number | null;
+  scTotalVerdicts: number | null;
+  scAvgConfidence: number | null;
+  scAccuracyRate: number | null;
+  scVerificationCoverage: number | null;
 }
 
 // ---------------------------------------------------------------------------
@@ -352,6 +363,17 @@ const COLUMN_LABELS: Record<string, string> = {
   referencesCov: "References",
   quotesCov: "Quotes Verified",
   accuracyCov: "Accuracy Verified",
+  // Source-check verification
+  scConfirmed: "Confirmed",
+  scContradicted: "Contradicted",
+  scOutdated: "Outdated",
+  scPartial: "Partial",
+  scUnverifiable: "Unverifiable",
+  scUnchecked: "Unchecked",
+  scTotalVerdicts: "Total Verdicts",
+  scAvgConfidence: "Avg Confidence",
+  scAccuracyRate: "Accuracy Rate",
+  scVerificationCoverage: "Verification %",
 };
 
 const columns: ColumnDef<UnifiedEntityRow>[] = [
@@ -818,6 +840,119 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     cell: ({ row }) => <RatioCell actual={row.original.accuracyActual} total={row.original.accuracyTotal} status={row.original.accuracy} />,
     sortUndefined: "last",
   },
+  // --- Source-Check Verification ---
+  {
+    accessorKey: "scConfirmed",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records with confirmed verdicts">Conf</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scConfirmed;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums font-medium text-emerald-500">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scContradicted",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records with contradicted verdicts">Contr</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scContradicted;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums font-medium text-red-500">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scOutdated",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records with outdated verdicts">Outd</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scOutdated;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums font-medium text-amber-500">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scPartial",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records with partial verdicts">Part</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scPartial;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums font-medium text-yellow-500">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scUnverifiable",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records that could not be verified">Unver</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scUnverifiable;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums font-medium text-orange-400">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scUnchecked",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Records not yet source-checked">Unchk</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scUnchecked;
+      if (v == null) return <Dash />;
+      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
+      return <span className="text-xs tabular-nums text-muted-foreground">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scTotalVerdicts",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Total source-check verdicts">Verd</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scTotalVerdicts;
+      if (v == null) return <Dash />;
+      return <span className="text-xs tabular-nums">{v}</span>;
+    },
+  },
+  {
+    accessorKey: "scAvgConfidence",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Average confidence across all verdicts">AvgC</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scAvgConfidence;
+      if (v == null) return <Dash />;
+      const pct = Math.round(v * 100);
+      const color = pct >= 80 ? "text-emerald-500" : pct >= 60 ? "text-amber-500" : "text-red-400";
+      return <span className={`text-xs tabular-nums font-medium ${color}`}>{pct}%</span>;
+    },
+  },
+  {
+    accessorKey: "scAccuracyRate",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Accuracy rate: confirmed / (confirmed + contradicted + outdated + partial)">AccR</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scAccuracyRate;
+      if (v == null) return <Dash />;
+      const pct = Math.round(v * 100);
+      const color = pct >= 90 ? "text-emerald-500" : pct >= 70 ? "text-amber-500" : "text-red-400";
+      return <span className={`text-xs tabular-nums font-medium ${color}`}>{pct}%</span>;
+    },
+  },
+  {
+    accessorKey: "scVerificationCoverage",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Verification coverage: verdicts / total records">VCov</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.scVerificationCoverage;
+      if (v == null) return <Dash />;
+      const pct = Math.round(v * 100);
+      const color = pct >= 80 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-red-400";
+      return <span className={`text-xs tabular-nums font-medium ${color}`}>{pct}%</span>;
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -893,6 +1028,18 @@ const PRESETS: Record<string, Preset> = {
     description: "Next Best Action score: importance x quality deficit x staleness x risk",
     columns: ["title", "priorityScore", "quality", "readerImportance", "researchImportance", "riskLevel", "lastUpdated", "wordCount", "entityType"],
     defaultSort: [{ id: "priorityScore", desc: true }],
+  },
+  verification: {
+    label: "Verification",
+    description: "Source-check verification status: accuracy rates, coverage, and verdict breakdown",
+    columns: ["title", "entityType", "scAccuracyRate", "scVerificationCoverage", "scTotalVerdicts", "scConfirmed", "scContradicted", "scOutdated", "scPartial", "scAvgConfidence"],
+    defaultSort: [{ id: "scTotalVerdicts", desc: true }],
+  },
+  worstEntities: {
+    label: "Worst Entities",
+    description: "Entities with the most contradicted or problematic source-check verdicts",
+    columns: ["title", "entityType", "scContradicted", "scOutdated", "scPartial", "scAccuracyRate", "scTotalVerdicts", "scVerificationCoverage", "quality", "riskLevel"],
+    defaultSort: [{ id: "scContradicted", desc: true }],
   },
   all: {
     label: "All",
