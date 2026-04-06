@@ -202,7 +202,11 @@ jobs:
             --server "${ARGOCD_SERVER}" \
             --grpc-web
 
+          # Wait for BOTH sync and health. --health alone returns immediately
+          # if the old pod is healthy, without waiting for ArgoCD to reconcile
+          # the new image tag (caused deploys #3944 and #3955 to fail).
           argocd app wait longterm-wiki-server \
+            --sync \
             --health \
             --timeout 300 \
             --auth-token "${ARGOCD_AUTH_TOKEN}" \
