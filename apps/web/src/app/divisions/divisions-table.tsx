@@ -208,12 +208,6 @@ export function DivisionsTable({
                 >
                   <td className="py-2 px-3">
                     <span className="flex items-center gap-1.5">
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(row.verdict?.verdict)}
-                        originalVerdict={row.verdict?.verdict}
-                        size="md"
-                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
-                      />
                       {row.href ? (
                         <Link
                           href={row.href}
@@ -263,8 +257,16 @@ export function DivisionsTable({
                       </span>
                     )}
                   </td>
-                  <td className="py-2.5 px-3 text-center">
-                    <CoverageDots score={computeDivisionCoverage(row)} />
+                  <td className="py-2.5 px-3 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeDivisionCoverage(row)} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(row.verdict?.verdict)}
+                        originalVerdict={row.verdict?.verdict}
+                        size="md"
+                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                      />
+                    </span>
                   </td>
                 </tr>
               ))}
