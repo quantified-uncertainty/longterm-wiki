@@ -52,7 +52,7 @@ export function FundingProgramsSection({
               {hasDeadline && (
                 <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

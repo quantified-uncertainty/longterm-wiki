@@ -121,7 +121,7 @@ export function PolicyPositionsSection({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Reason
                 </th>
-                <th scope="col" className="py-2 px-1 w-8" />
+                <th scope="col" className="py-2 px-2 w-16" />
               </tr>
             </thead>
             <tbody>

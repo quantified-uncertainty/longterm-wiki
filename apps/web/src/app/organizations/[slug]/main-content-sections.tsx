@@ -64,7 +64,7 @@ export function FundingHistorySection({
               {hasInstrument && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -118,8 +118,8 @@ export function FundingHistorySection({
                   <td className="py-2 px-2 text-right">
                     <span className="inline-flex items-center gap-2">
                       <CoverageDots score={computeFundingRoundCoverage({
-                        raised: raised as number | undefined,
-                        valuation: valuation as number | undefined,
+                        raised: typeof raised === "number" ? raised : undefined,
+                        valuation: typeof valuation === "number" ? valuation : undefined,
                         leadInvestorName: leadInvestorName,
                         date,
                         instrument,
@@ -172,7 +172,7 @@ export function InvestorParticipationSection({
               {hasDate && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -273,7 +273,7 @@ export function ProductsSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -358,7 +358,7 @@ export function SafetyMilestonesSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -459,7 +459,7 @@ export function StrategicPartnershipsSection({
               {hasNotes && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">

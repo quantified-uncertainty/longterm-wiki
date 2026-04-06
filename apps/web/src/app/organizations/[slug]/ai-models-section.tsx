@@ -141,7 +141,7 @@ export function AiModelsSection({
               {hasBenchmarks && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Benchmarks</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
