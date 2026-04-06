@@ -33,7 +33,45 @@ Run `pnpm test` and confirm existing tests still pass. If you added new logic (h
 
 Run `pnpm crux w validate gate --fix` to catch CI-blocking issues.
 
-## 4. Completeness check
+## 4. UI verification with Playwright (if modifying .tsx pages or components)
+
+When your PR changes pages or UI components, **verify them visually with Playwright** before opening the PR. Do not ask the user to manually check pages you could verify programmatically.
+
+```bash
+# Run against production (no local server needed):
+cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test e2e/render-audit.spec.ts
+
+# Run a specific test file:
+cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test e2e/homepage.spec.ts
+
+# Run against local dev server (starts automatically if not running):
+cd apps/web && DEV_PORT=3015 npx playwright test e2e/render-audit.spec.ts
+
+# Quick ad-hoc page check (no test file needed):
+cd apps/web && node -e "
+const { chromium } = require('@playwright/test');
+(async () => {
+  const browser = await chromium.launch({ headless: true });
+  const page = await browser.newPage();
+  await page.goto('http://localhost:3015/things', { waitUntil: 'networkidle' });
+  const text = await page.textContent('body');
+  console.log('Page loaded, length:', text.length);
+  // Check for error states:
+  const errors = await page.locator('.text-red-600, .text-red-500').count();
+  console.log('Error elements:', errors);
+  await browser.close();
+})();
+"
+```
+
+**When to run Playwright:**
+- New pages or routes — verify they render without errors
+- Changed layouts or tables — verify data displays correctly
+- Display bug fixes — add a regression check to `e2e/render-audit.spec.ts`
+
+**Existing e2e specs** (17 files in `apps/web/e2e/`): render-audit, directory-pages, entity-detail-pages, homepage, factbase, explore, mobile-nav, header-dropdowns, etc.
+
+## 5. Completeness check
 
 Before opening a PR, verify that **all acceptance criteria** from the issue or task description are met:
 
@@ -43,7 +81,7 @@ Before opening a PR, verify that **all acceptance criteria** from the issue or t
 - If the scope is too large to complete in one session, split the issue into independently-shippable pieces **before** starting work, not after
 - No "Part 1 of 3" PRs that break without Part 2
 
-## 5. What to do when verification fails
+## 6. What to do when verification fails
 
 Fix the issue before opening the PR. If you can't fix it:
 - Note the failure in the PR description
