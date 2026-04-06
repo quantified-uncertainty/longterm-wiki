@@ -1,11 +1,11 @@
 ---
-description: Run CI checks locally, push to GitHub, and monitor until green. Fix and retry if anything fails.
+description: Run CI checks locally, push to GitHub, monitor until CI green AND PR mergeable. Fix and retry if anything fails.
 effort: medium
 ---
 
 # Ship
 
-Run all CI checks locally, push to GitHub, and monitor until green. Fix and retry if anything fails.
+Run all CI checks locally, push to GitHub, and monitor until CI is green AND the PR is mergeable. Fix and retry if anything fails.
 
 ## Step 0: Pre-flight
 
@@ -18,6 +18,24 @@ Run all CI checks locally, push to GitHub, and monitor until green. Fix and retr
    - After any `git pull --rebase`, re-run `git status -b --short` to confirm the branch is only ahead (or up to date) before continuing.
 
 **Why "ahead N, behind M" happens:** When the auto-rebase workflow runs after another PR merges to main, it rebases this branch's commits on the remote and force-pushes. The local session hasn't pulled those changes yet, so it appears ahead (local commits) and behind (rebased remote commits).
+
+### Merge-conflict pre-check (MANDATORY)
+
+After the branch is synced with its remote, verify it can merge cleanly into current `origin/main`:
+
+```bash
+git merge-tree --write-tree HEAD origin/main > /dev/null 2>&1
+```
+
+- **Exit 0** (clean merge): Proceed to Step 1.
+- **Non-zero** (conflicts): The branch conflicts with current main. Rebase onto `origin/main`:
+  ```bash
+  git rebase origin/main
+  ```
+  - If rebase succeeds: proceed to Step 1 (local checks must re-run against the rebased code). Step 2 will push with `--force-with-lease` since the rebase rewrote history.
+  - If rebase has conflicts: run `git rebase --abort`, report the conflicting files to the user, and **stop**. Do not push a branch with known merge conflicts.
+
+**Why this matters:** Without this check, local tests pass against stale code, the push succeeds, but the PR shows "has conflicts" on GitHub — wasting a CI cycle and requiring a manual rebase later.
 
 ## Step 1: Run all local checks (be paranoid)
 
@@ -38,7 +56,7 @@ Run `pnpm crux w validate gate --fix` (auto-fixes escaping/markdown, then runs a
 1. Check `git status` for uncommitted changes. If there are any, ask the user what to do (commit, stash, etc.) — do NOT auto-commit without asking.
 2. **NEVER push directly to main.** If on `main`, stop and warn the user: "You are on the main branch. Create a feature branch first." Do not proceed.
 3. If on a feature branch:
-   - If you ran `git pull --rebase` in Step 0 (branch was diverged), push with `git push --force-with-lease -u origin HEAD` since the history was rewritten by the rebase.
+   - If you ran `git pull --rebase` or `git rebase origin/main` in Step 0 (branch was diverged or had merge conflicts), push with `git push --force-with-lease -u origin HEAD` since the rebase rewrote history.
    - Otherwise push normally with `git push -u origin HEAD`.
    - Check if a PR already exists using crux:
      ```bash
@@ -92,7 +110,34 @@ If any GitHub CI **check run** has `conclusion: failure`:
 2. Analyze the failure and fix the underlying issue.
 3. Go back to **Step 1** and repeat the full cycle.
 
-If all check runs show **success**: proceed to Step 4b (CodeRabbit review check) before reporting success.
+If all check runs show **success**: proceed to Step 3b (mergeability check).
+
+## Step 3b: Verify PR is mergeable (MANDATORY)
+
+CI green is necessary but not sufficient. The PR must also be mergeable (no conflicts with the base branch). GitHub computes mergeability asynchronously — poll until it resolves:
+
+```bash
+PR_NUM=$(gh pr view --json number --jq '.number')
+for i in 1 2 3 4 5; do
+  MERGEABLE=$(gh pr view "$PR_NUM" --json mergeable --jq '.mergeable')
+  if [ "$MERGEABLE" != "UNKNOWN" ]; then break; fi
+  sleep 10
+done
+echo "Mergeable: $MERGEABLE"
+```
+
+- **MERGEABLE**: Proceed to Step 4b.
+- **CONFLICTING**: The base branch has diverged since the push. Rebase locally and re-push:
+  ```bash
+  git fetch origin main
+  git rebase origin/main
+  # Fix conflicts if any, then:
+  git push --force-with-lease -u origin HEAD
+  ```
+  Then go back to **Step 3** — CI must re-run after a force-push, and mergeability must be re-verified.
+- **UNKNOWN** (after 5 attempts): Wait 30 more seconds and retry once. If still UNKNOWN, note it in the final report and warn the user — do not declare success.
+
+**Why this matters:** A PR can have all CI checks green but still show "This branch has conflicts that must be resolved" on GitHub. Without this check, the agent declares success on a PR that can't actually merge.
 
 ## Step 4b: Check for unresolved CodeRabbit comments
 
@@ -121,8 +166,9 @@ After addressing comments: commit, push, and go back to Step 3 to verify CI stay
 
 Only flag for human review AFTER you have:
 1. CI passing
-2. All CodeRabbit major/minor comments addressed (or confirmed as false positives)
-3. No unchecked PR checklist items
+2. PR mergeable (no conflicts — Step 3b verified)
+3. All CodeRabbit major/minor comments addressed (or confirmed as false positives)
+4. No unchecked PR checklist items
 
 If at that point something still requires human attention (e.g., design decision, security exception),
 note it clearly but do not block the PR from being labeled `stage:approved` for merge queue.
@@ -130,7 +176,7 @@ note it clearly but do not block the PR from being labeled `stage:approved` for 
 ## Guardrails
 
 - Maximum 3 full retry cycles. If still failing after 3 attempts, stop and report what's wrong so the user can decide how to proceed.
-- Never force-push unless explicitly asked, **except** after a `git pull --rebase` in Step 0 (where `--force-with-lease` is required and safe because the rebase rewrote local history to match the remote's rebased history).
+- Never force-push unless explicitly asked, **except** after a rebase in Step 0 or Step 3b (`git pull --rebase` or `git rebase origin/main`) where `--force-with-lease` is required and safe because the rebase rewrote local history.
 - Never skip pre-commit hooks.
 - Always show the user what failed and what you're fixing before making changes.
 
