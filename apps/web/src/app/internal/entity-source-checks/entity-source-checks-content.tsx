@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { EntitySourceChecksViewer } from "./entity-source-checks-viewer";
 import { SourceCheckCoverageContent } from "@/app/internal/source-check-coverage/source-check-coverage-content";
 import { SourceCheckTabs } from "./source-check-tabs";
+import { ClaimsViewer } from "./claims-viewer";
 
 /**
  * Consolidated source-check dashboard.
@@ -24,6 +25,11 @@ export function EntitySourceChecksContent() {
       coverageContent={
         <Suspense fallback={<div className="text-sm text-muted-foreground py-8 text-center">Loading coverage data...</div>}>
           <SourceCheckCoverageContent />
+        </Suspense>
+      }
+      claimsContent={
+        <Suspense fallback={<div className="text-sm text-muted-foreground py-8 text-center">Loading claims...</div>}>
+          <ClaimsViewer />
         </Suspense>
       }
     />

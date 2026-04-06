@@ -1390,3 +1390,18 @@ export const ClaimVerdictBatchSchema = z.object({
   ),
 });
 export type ClaimVerdictBatch = z.infer<typeof ClaimVerdictBatchSchema>;
+
+// -- Claims read query schemas --
+
+export const ClaimsAllQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(500).optional().default(100),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+  status: z.enum(VALID_CLAIM_STATUSES).optional(),
+  target_table: z.string().max(100).optional(),
+  entity_id: z.string().max(200).optional(),
+});
+
+export const ClaimsByEntityQuery = z.object({
+  limit: z.coerce.number().int().min(1).max(200).optional().default(50),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});

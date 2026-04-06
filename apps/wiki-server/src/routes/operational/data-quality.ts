@@ -144,6 +144,30 @@ const dataQualityApp = new Hono()
         };
       }
 
+      // 10. Claims pipeline
+      const claimsPipelineRows = (await db.execute(
+        sql`SELECT
+          COUNT(*)::text AS total,
+          COUNT(*) FILTER (WHERE status = 'verified')::text AS verified,
+          COUNT(*) FILTER (WHERE status = 'contradicted')::text AS contradicted,
+          COUNT(*) FILTER (WHERE status = 'pending')::text AS pending,
+          COUNT(*) FILTER (WHERE status = 'unverifiable')::text AS unverifiable
+        FROM proposed_claims`
+      )) as Array<{ total: string; verified: string; contradicted: string; pending: string; unverifiable: string }>;
+
+      const claimRecordLinksRows = (await db.execute(
+        sql`SELECT COUNT(*)::text AS cnt FROM claim_record_links`
+      )) as Array<{ cnt: string }>;
+
+      const claimsExtra = {
+        claimsTotal: parseInt(claimsPipelineRows[0]?.total ?? "0", 10),
+        claimsVerified: parseInt(claimsPipelineRows[0]?.verified ?? "0", 10),
+        claimsContradicted: parseInt(claimsPipelineRows[0]?.contradicted ?? "0", 10),
+        claimsPending: parseInt(claimsPipelineRows[0]?.pending ?? "0", 10),
+        claimsUnverifiable: parseInt(claimsPipelineRows[0]?.unverifiable ?? "0", 10),
+        claimRecordLinks: parseInt(claimRecordLinksRows[0]?.cnt ?? "0", 10),
+      };
+
       // ---- Insert snapshot ----
       const [snapshot] = await db
         .insert(dataQualitySnapshots)
@@ -171,6 +195,7 @@ const dataQualityApp = new Hono()
           extra: {
             entityResourcesTotal,
             sourceResourceCoverage,
+            ...claimsExtra,
           },
         })
         .returning();

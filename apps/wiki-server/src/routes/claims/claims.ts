@@ -15,11 +15,14 @@ import {
   parseJsonBody,
   dbError,
   zv,
+  clampedLimit,
 } from "../shared/utils.js";
 import {
   ProposeClaimsSchema,
   ClaimVerdictBatchSchema,
   VALID_CLAIM_STATUSES,
+  ClaimsAllQuery,
+  ClaimsByEntityQuery,
 } from "../../api-types.js";
 
 const logger = rootLogger.child({ component: "claims" });
@@ -400,6 +403,251 @@ const claimsApp = new Hono()
       claims: claims.map(formatClaim),
       allSettled,
       estimatedRemaining,
+    });
+  })
+
+  // ---- GET /all (paginated list of all claims) ----
+
+  .get("/all", zv("query", ClaimsAllQuery), async (c) => {
+    const { limit, offset, status, target_table, entity_id } = c.req.valid("query");
+    const db = getDb();
+
+    interface ClaimListRow {
+      id: number;
+      batch_id: string;
+      claim_text: string;
+      entity_id: string | null;
+      target_table: string;
+      target_field: string | null;
+      proposed_value: string | null;
+      source_url: string;
+      resource_id: string | null;
+      status: string;
+      verdict_confidence: number | null;
+      verdict_reasoning: string | null;
+      extracted_value: string | null;
+      checker_model: string | null;
+      verified_at: string | null;
+      submitted_by: string | null;
+      created_at: string;
+    }
+
+    // Build WHERE conditions dynamically
+    const conditions: string[] = [];
+    const params: unknown[] = [];
+    let paramIdx = 0;
+
+    if (status) {
+      conditions.push(`status = $${++paramIdx}`);
+      params.push(status);
+    }
+    if (target_table) {
+      conditions.push(`target_table = $${++paramIdx}`);
+      params.push(target_table);
+    }
+    if (entity_id) {
+      conditions.push(`entity_id = $${++paramIdx}`);
+      params.push(entity_id);
+    }
+
+    const whereClause = conditions.length > 0
+      ? `WHERE ${conditions.join(" AND ")}`
+      : "";
+
+    // Use tagged template for simple queries, unsafe() for dynamic WHERE
+    const claims = await db.unsafe<ClaimListRow[]>(
+      `SELECT id::int, batch_id, claim_text, entity_id, target_table, target_field,
+              proposed_value, source_url, resource_id, status,
+              verdict_confidence, verdict_reasoning, extracted_value,
+              checker_model, verified_at, submitted_by, created_at
+       FROM proposed_claims
+       ${whereClause}
+       ORDER BY created_at DESC
+       LIMIT $${++paramIdx} OFFSET $${++paramIdx}`,
+      [...params, limit, offset],
+    );
+
+    const countResult = await db.unsafe<Array<{ cnt: string }>>(
+      `SELECT COUNT(*)::text AS cnt FROM proposed_claims ${whereClause}`,
+      params,
+    );
+    const total = parseInt(countResult[0]?.cnt ?? "0", 10);
+
+    return c.json({
+      claims: claims.map((row) => ({
+        id: row.id,
+        batchId: row.batch_id,
+        claimText: row.claim_text,
+        entityId: row.entity_id,
+        targetTable: row.target_table,
+        targetField: row.target_field,
+        proposedValue: row.proposed_value,
+        sourceUrl: row.source_url,
+        resourceId: row.resource_id,
+        status: row.status,
+        confidence: row.verdict_confidence,
+        reasoning: row.verdict_reasoning,
+        extractedValue: row.extracted_value,
+        checkerModel: row.checker_model,
+        verifiedAt: row.verified_at,
+        submittedBy: row.submitted_by,
+        createdAt: row.created_at,
+      })),
+      total,
+      limit,
+      offset,
+    });
+  })
+
+  // ---- GET /stats (aggregate claim metrics) ----
+
+  .get("/stats", async (c) => {
+    const db = getDb();
+
+    interface StatsRow {
+      total: string;
+      pending: string;
+      verifying: string;
+      verified: string;
+      contradicted: string;
+      unverifiable: string;
+      expired: string;
+      unique_entities: string;
+      total_batches: string;
+      avg_confidence: string;
+    }
+
+    const [stats] = await db<StatsRow[]>`
+      SELECT
+        COUNT(*)::text AS total,
+        COUNT(*) FILTER (WHERE status = 'pending')::text AS pending,
+        COUNT(*) FILTER (WHERE status = 'verifying')::text AS verifying,
+        COUNT(*) FILTER (WHERE status = 'verified')::text AS verified,
+        COUNT(*) FILTER (WHERE status = 'contradicted')::text AS contradicted,
+        COUNT(*) FILTER (WHERE status = 'unverifiable')::text AS unverifiable,
+        COUNT(*) FILTER (WHERE status = 'expired')::text AS expired,
+        COUNT(DISTINCT entity_id)::text AS unique_entities,
+        COUNT(DISTINCT batch_id)::text AS total_batches,
+        COALESCE(AVG(verdict_confidence) FILTER (WHERE verdict_confidence IS NOT NULL), 0)::text AS avg_confidence
+      FROM proposed_claims
+    `;
+
+    interface LinksRow {
+      total_links: string;
+      linked_claims: string;
+    }
+
+    const [links] = await db<LinksRow[]>`
+      SELECT
+        COUNT(*)::text AS total_links,
+        COUNT(DISTINCT claim_id)::text AS linked_claims
+      FROM claim_record_links
+    `;
+
+    return c.json({
+      total: parseInt(stats?.total ?? "0", 10),
+      pending: parseInt(stats?.pending ?? "0", 10),
+      verifying: parseInt(stats?.verifying ?? "0", 10),
+      verified: parseInt(stats?.verified ?? "0", 10),
+      contradicted: parseInt(stats?.contradicted ?? "0", 10),
+      unverifiable: parseInt(stats?.unverifiable ?? "0", 10),
+      expired: parseInt(stats?.expired ?? "0", 10),
+      uniqueEntities: parseInt(stats?.unique_entities ?? "0", 10),
+      totalBatches: parseInt(stats?.total_batches ?? "0", 10),
+      avgConfidence: parseFloat(stats?.avg_confidence ?? "0"),
+      recordLinks: {
+        totalLinks: parseInt(links?.total_links ?? "0", 10),
+        linkedClaims: parseInt(links?.linked_claims ?? "0", 10),
+      },
+    });
+  })
+
+  // ---- GET /by-entity/:entityId (claims for a specific entity) ----
+
+  .get("/by-entity/:entityId", zv("query", ClaimsByEntityQuery), async (c) => {
+    const entityId = c.req.param("entityId");
+    const { limit, offset } = c.req.valid("query");
+    const db = getDb();
+
+    interface EntityClaimRow {
+      id: number;
+      batch_id: string;
+      claim_text: string;
+      target_table: string;
+      target_field: string | null;
+      proposed_value: string | null;
+      source_url: string;
+      resource_id: string | null;
+      status: string;
+      verdict_confidence: number | null;
+      verdict_reasoning: string | null;
+      extracted_value: string | null;
+      checker_model: string | null;
+      verified_at: string | null;
+      created_at: string;
+    }
+
+    const claims = await db<EntityClaimRow[]>`
+      SELECT id::int, batch_id, claim_text, target_table, target_field,
+             proposed_value, source_url, resource_id, status,
+             verdict_confidence, verdict_reasoning, extracted_value,
+             checker_model, verified_at, created_at
+      FROM proposed_claims
+      WHERE entity_id = ${entityId}
+      ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `;
+
+    const [countRow] = await db<Array<{ cnt: string }>>`
+      SELECT COUNT(*)::text AS cnt
+      FROM proposed_claims
+      WHERE entity_id = ${entityId}
+    `;
+    const total = parseInt(countRow?.cnt ?? "0", 10);
+
+    interface RecordLinkRow {
+      claim_id: number;
+      record_type: string;
+      record_id: string;
+      match_verdict: string | null;
+      match_confidence: number | null;
+    }
+
+    const recordLinks = await db<RecordLinkRow[]>`
+      SELECT crl.claim_id::int, crl.record_type, crl.record_id,
+             crl.match_verdict, crl.match_confidence
+      FROM claim_record_links crl
+      JOIN proposed_claims pc ON pc.id = crl.claim_id
+      WHERE pc.entity_id = ${entityId}
+    `;
+
+    return c.json({
+      entityId,
+      claims: claims.map((row) => ({
+        id: row.id,
+        batchId: row.batch_id,
+        claimText: row.claim_text,
+        targetTable: row.target_table,
+        targetField: row.target_field,
+        proposedValue: row.proposed_value,
+        sourceUrl: row.source_url,
+        resourceId: row.resource_id,
+        status: row.status,
+        confidence: row.verdict_confidence,
+        reasoning: row.verdict_reasoning,
+        extractedValue: row.extracted_value,
+        checkerModel: row.checker_model,
+        verifiedAt: row.verified_at,
+        createdAt: row.created_at,
+      })),
+      total,
+      recordLinks: recordLinks.map((r) => ({
+        claimId: r.claim_id,
+        recordType: r.record_type,
+        recordId: r.record_id,
+        matchVerdict: r.match_verdict,
+        matchConfidence: r.match_confidence,
+      })),
     });
   });
 

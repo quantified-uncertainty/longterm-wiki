@@ -138,6 +138,21 @@ export async function DataQualityContent() {
         </div>
       </section>
 
+      {/* Claims pipeline */}
+      {latest.extra && typeof latest.extra === "object" && "claimsTotal" in latest.extra && (latest.extra as Record<string, number>).claimsTotal > 0 && (
+        <section>
+          <h2 className="text-lg font-semibold mb-4">Claims Pipeline</h2>
+          <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+            <StatCard label="Total Claims" value={(latest.extra as Record<string, number>).claimsTotal} />
+            <StatCard label="Verified" value={(latest.extra as Record<string, number>).claimsVerified} />
+            <StatCard label="Contradicted" value={(latest.extra as Record<string, number>).claimsContradicted} />
+            <StatCard label="Pending" value={(latest.extra as Record<string, number>).claimsPending} />
+            <StatCard label="Unverifiable" value={(latest.extra as Record<string, number>).claimsUnverifiable} />
+            <StatCard label="Record Links" value={(latest.extra as Record<string, number>).claimRecordLinks} />
+          </div>
+        </section>
+      )}
+
       {/* History table */}
       <section>
         <h2 className="text-lg font-semibold mb-4">

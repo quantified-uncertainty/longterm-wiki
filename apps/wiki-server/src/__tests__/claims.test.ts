@@ -292,6 +292,63 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map((id) => ({ id }));
   }
 
+  // ---- GET /all — SELECT from proposed_claims with dynamic WHERE ----
+  if (q.includes("from proposed_claims") && q.includes("order by") && q.includes("limit") && !q.includes("insert") && !q.includes("update")) {
+    // Filter claims based on the store
+    let filtered = [...claimStore];
+    // Return camelCase rows as the endpoint expects
+    return filtered.map((c) => ({
+      id: c.id,
+      batch_id: c.batch_id,
+      claim_text: `Claim ${c.id}`,
+      entity_id: (c as any).entity_id ?? null,
+      target_table: (c as any).target_table ?? "personnel",
+      target_field: null,
+      proposed_value: null,
+      source_url: c.source_url,
+      resource_id: c.resource_id,
+      status: (c as any).status ?? "pending",
+      verdict_confidence: null,
+      verdict_reasoning: null,
+      extracted_value: null,
+      checker_model: null,
+      verified_at: null,
+      submitted_by: null,
+      created_at: new Date().toISOString(),
+    }));
+  }
+
+  // ---- GET /stats — aggregate counts ----
+  if (q.includes("count(*)") && q.includes("proposed_claims") && q.includes("filter")) {
+    return [{
+      total: String(claimStore.length),
+      pending: String(claimStore.filter((c) => (c as any).status === "pending" || !(c as any).status).length),
+      verifying: "0",
+      verified: String(claimStore.filter((c) => (c as any).status === "verified").length),
+      contradicted: "0",
+      unverifiable: "0",
+      expired: "0",
+      unique_entities: "0",
+      total_batches: String(new Set(claimStore.map((c) => c.batch_id)).size),
+      avg_confidence: "0",
+    }];
+  }
+
+  // ---- GET /stats — claim_record_links count ----
+  if (q.includes("count(*)") && q.includes("claim_record_links") && !q.includes("proposed_claims")) {
+    return [{ total_links: "0", linked_claims: "0" }];
+  }
+
+  // ---- GET /all — COUNT query ----
+  if (q.includes("count(*)") && q.includes("proposed_claims") && !q.includes("filter")) {
+    return [{ cnt: String(claimStore.length) }];
+  }
+
+  // ---- GET /by-entity — claim_record_links JOIN ----
+  if (q.includes("claim_record_links") && q.includes("join")) {
+    return [];
+  }
+
   // ---- entity_ids (for health check) ----
   if (q.includes("count(*)") && q.includes("entity_ids")) {
     return [{ count: 0 }];
@@ -473,5 +530,125 @@ describe("Claims API — POST /api/claims/propose", () => {
     });
 
     expect(res.status).toBe(400);
+  });
+});
+
+// ==========================================================================
+// Integration tests for read endpoints
+// ==========================================================================
+
+describe("Claims API — GET /api/claims/all", () => {
+  let app: Hono;
+
+  beforeEach(() => {
+    resetStores();
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    app = createApp();
+  });
+
+  it("returns paginated claims list", async () => {
+    // Seed some claims first
+    await postJson(app, "/api/claims/propose", {
+      targetTable: "personnel",
+      claims: [
+        { claimText: "Claim A", sourceUrl: "https://example.com/a" },
+        { claimText: "Claim B", sourceUrl: "https://example.com/b" },
+      ],
+    });
+
+    const res = await app.request("/api/claims/all?limit=10&offset=0");
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.claims).toHaveLength(2);
+    expect(body.total).toBe(2);
+    expect(body.limit).toBe(10);
+    expect(body.offset).toBe(0);
+    expect(body.claims[0]).toHaveProperty("claimText");
+    expect(body.claims[0]).toHaveProperty("status");
+  });
+
+  it("returns empty list when no claims exist", async () => {
+    const res = await app.request("/api/claims/all");
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.claims).toHaveLength(0);
+    expect(body.total).toBe(0);
+  });
+});
+
+describe("Claims API — GET /api/claims/stats", () => {
+  let app: Hono;
+
+  beforeEach(() => {
+    resetStores();
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    app = createApp();
+  });
+
+  it("returns aggregate claim metrics", async () => {
+    // Seed claims
+    await postJson(app, "/api/claims/propose", {
+      targetTable: "facts",
+      claims: [
+        { claimText: "Claim 1", sourceUrl: "https://example.com/1" },
+        { claimText: "Claim 2", sourceUrl: "https://example.com/2" },
+      ],
+    });
+
+    const res = await app.request("/api/claims/stats");
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.total).toBe(2);
+    expect(typeof body.pending).toBe("number");
+    expect(typeof body.verified).toBe("number");
+    expect(typeof body.contradicted).toBe("number");
+    expect(typeof body.uniqueEntities).toBe("number");
+    expect(typeof body.totalBatches).toBe("number");
+    expect(typeof body.avgConfidence).toBe("number");
+    expect(body.recordLinks).toBeDefined();
+    expect(typeof body.recordLinks.totalLinks).toBe("number");
+    expect(typeof body.recordLinks.linkedClaims).toBe("number");
+  });
+
+  it("returns zeros when no claims exist", async () => {
+    const res = await app.request("/api/claims/stats");
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.total).toBe(0);
+    expect(body.verified).toBe(0);
+  });
+});
+
+describe("Claims API — GET /api/claims/by-entity/:entityId", () => {
+  let app: Hono;
+
+  beforeEach(() => {
+    resetStores();
+    delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    app = createApp();
+  });
+
+  it("returns claims for a specific entity", async () => {
+    await postJson(app, "/api/claims/propose", {
+      targetTable: "personnel",
+      entityId: "anthropic",
+      claims: [
+        { claimText: "Dario is CEO", sourceUrl: "https://wiki.org/anthropic" },
+      ],
+    });
+
+    const res = await app.request("/api/claims/by-entity/anthropic");
+    expect(res.status).toBe(200);
+
+    const body = await res.json();
+    expect(body.entityId).toBe("anthropic");
+    expect(body.claims).toBeDefined();
+    expect(body.total).toBeGreaterThanOrEqual(0);
+    expect(body.recordLinks).toBeDefined();
+    expect(Array.isArray(body.recordLinks)).toBe(true);
   });
 });
