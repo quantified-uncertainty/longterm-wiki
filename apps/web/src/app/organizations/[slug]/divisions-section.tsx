@@ -9,10 +9,8 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
@@ -125,15 +123,14 @@ function DivisionCard({
           </span>
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
-          <CoverageDots score={computeDivisionCoverage({
-            divisionType: d.divisionType,
-            status: d.status,
-            hasData: !!(d.lead || d.source),
-          })} className="relative z-10" />
-          <SourceCheckDot
-            status={recordVerdictToStatus(cardVerdict)}
-            originalVerdict={cardVerdict}
-            href={cardSourceCheckHref}
+          <RecordStatusDots
+            coverageScore={computeDivisionCoverage({
+              divisionType: d.divisionType,
+              status: d.status,
+              hasData: !!(d.lead || d.source),
+            })}
+            verdict={cardVerdict}
+            sourceCheckHref={cardSourceCheckHref}
             className="relative z-10"
           />
           {d.website && (
@@ -411,19 +408,15 @@ export function DivisionsSection({
                     {d.startDate && formatKBDate(d.startDate)}
                   </td>
                   <td className="py-2.5 px-2 text-right">
-                    <span className="inline-flex items-center gap-2">
-                      <CoverageDots score={computeDivisionCoverage({
+                    <RecordStatusDots
+                      coverageScore={computeDivisionCoverage({
                         divisionType: d.divisionType,
                         status: d.status,
                         hasData: !!(d.lead || d.source),
-                      })} />
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(verdict?.verdict)}
-                        originalVerdict={verdict?.verdict}
-                        size="md"
-                        href={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
-                      />
-                    </span>
+                      })}
+                      verdict={verdict?.verdict}
+                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
+                    />
                   </td>
                 </tr>
               );

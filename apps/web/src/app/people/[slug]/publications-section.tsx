@@ -1,9 +1,7 @@
 import type { PersonPublicationEntry } from "@/data/tablebase";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { safeHref } from "@/lib/directory-utils";
 
@@ -35,15 +33,13 @@ export function PublicationsSection({
 
           return (
             <div key={`${idx}-${pub.title}`} className="px-4 py-3 relative">
-              <div className="absolute top-3 right-4 inline-flex items-center gap-2">
-                <CoverageDots score={computeGenericCoverage({
-                  filledFieldCount: (pub.title ? 1 : 0) + (pub.year ? 1 : 0),
-                })} />
-                <SourceCheckDot
-                  status={recordVerdictToStatus(verdict?.verdict)}
-                  originalVerdict={verdict?.verdict}
-                  size="md"
-                  href={getSourceCheckHref("person-publication", recordKey)}
+              <div className="absolute top-3 right-4">
+                <RecordStatusDots
+                  coverageScore={computeGenericCoverage({
+                    filledFieldCount: (pub.title ? 1 : 0) + (pub.year ? 1 : 0),
+                  })}
+                  verdict={verdict?.verdict}
+                  sourceCheckHref={getSourceCheckHref("person-publication", recordKey)}
                 />
               </div>
               <div className="flex items-start justify-between gap-2 pr-6">

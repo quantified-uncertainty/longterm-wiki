@@ -6,10 +6,8 @@ import Link from "next/link";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
@@ -124,21 +122,17 @@ export function FundingProgramsSection({
                     </td>
                   )}
                   <td className="py-2 px-2 text-right">
-                    <span className="inline-flex items-center gap-2">
-                      <CoverageDots score={computeFundingProgramCoverage({
+                    <RecordStatusDots
+                      coverageScore={computeFundingProgramCoverage({
                         totalBudget: p.totalBudget,
                         programType: p.programType,
                         deadline: p.deadline,
                         status: p.status,
                         description: p.description,
-                      })} />
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(verdict?.verdict)}
-                        originalVerdict={verdict?.verdict}
-                        size="md"
-                        href={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
-                      />
-                    </span>
+                      })}
+                      verdict={verdict?.verdict}
+                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                    />
                   </td>
                 </tr>
               );

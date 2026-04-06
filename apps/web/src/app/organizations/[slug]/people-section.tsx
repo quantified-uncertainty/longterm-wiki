@@ -14,9 +14,7 @@ import {
 } from "@/lib/wiki-server";
 import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 // ── Types ──────────────────────────────────────────────────────────────
@@ -291,17 +289,13 @@ export function PeopleSection({
                     {tenure}
                   </td>
                   <td className="py-1.5 px-2 text-right">
-                    <span className="inline-flex items-center gap-2">
-                      <CoverageDots score={computeGenericCoverage({
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
                         filledFieldCount: (person.title ? 1 : 0) + (person.start ? 1 : 0) + (person.slug ? 1 : 0),
-                      })} />
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(person.verificationVerdict)}
-                        originalVerdict={person.verificationVerdict}
-                        size="md"
-                        href={person.sourceCheckHref}
-                      />
-                    </span>
+                      })}
+                      verdict={person.verificationVerdict}
+                      sourceCheckHref={person.sourceCheckHref}
+                    />
                   </td>
                 </tr>
               );

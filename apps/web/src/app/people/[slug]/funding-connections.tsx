@@ -2,10 +2,8 @@ import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/directory-utils";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { FundingConnection } from "../people-utils";
 
 const FUNDING_CONNECTIONS_LIMIT = 20;
@@ -66,15 +64,13 @@ export function FundingConnections({
             const verdict = getRecordVerdict("grant", String(conn.key))?.verdict;
             return (
             <div key={conn.key} className="px-5 pr-12 py-3.5 relative">
-              <div className="absolute top-3.5 right-4 inline-flex items-center gap-2">
-                <CoverageDots score={computeGenericCoverage({
-                  filledFieldCount: (conn.amount ? 1 : 0) + (conn.date ? 1 : 0) + (conn.source ? 1 : 0),
-                })} />
-                <SourceCheckDot
-                  status={recordVerdictToStatus(verdict)}
-                  originalVerdict={verdict}
-                  size="md"
-                  href={getSourceCheckHref("grant", String(conn.key))}
+              <div className="absolute top-3.5 right-4">
+                <RecordStatusDots
+                  coverageScore={computeGenericCoverage({
+                    filledFieldCount: (conn.amount ? 1 : 0) + (conn.date ? 1 : 0) + (conn.source ? 1 : 0),
+                  })}
+                  verdict={verdict}
+                  sourceCheckHref={getSourceCheckHref("grant", String(conn.key))}
                 />
               </div>
               <div className="flex items-center gap-2 flex-wrap">

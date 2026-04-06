@@ -3,10 +3,8 @@ import { formatDateRange, fieldStr } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge } from "@/components/directory";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface BoardSeat {
@@ -39,15 +37,13 @@ export function BoardSeats({ boardSeats }: { boardSeats: BoardSeat[] }) {
               key={`${org.id}-${record.key}`}
               className="px-4 py-3 border-b border-border/40 last:border-b-0 relative"
             >
-              <div className="absolute top-3 right-4 inline-flex items-center gap-2">
-                <CoverageDots score={computeGenericCoverage({
-                  filledFieldCount: (role ? 1 : 0) + (appointed ? 1 : 0) + (departed ? 1 : 0),
-                })} />
-                <SourceCheckDot
-                  status={recordVerdictToStatus(verdict?.verdict)}
-                  originalVerdict={verdict?.verdict}
-                  size="md"
-                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
+              <div className="absolute top-3 right-4">
+                <RecordStatusDots
+                  coverageScore={computeGenericCoverage({
+                    filledFieldCount: (role ? 1 : 0) + (appointed ? 1 : 0) + (departed ? 1 : 0),
+                  })}
+                  verdict={verdict?.verdict}
+                  sourceCheckHref={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
                 />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">
