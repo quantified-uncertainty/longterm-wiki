@@ -28,6 +28,10 @@ vi.mock("@lib/wiki-server", () => ({
   fetchDetailed: vi.fn(() => Promise.resolve({ ok: false, error: "mock" })),
 }));
 
+vi.mock("@/data/entity-coverage", () => ({
+  getEntityDataDepth: vi.fn(() => null),
+}));
+
 vi.mock("@/app/internal/entities/entities-data-table", () => ({
   EntitiesDataTable: () => null,
 }));
