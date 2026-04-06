@@ -635,6 +635,9 @@ function ProfileSection({
           <table className="w-full text-[11px]">
             <thead>
               <tr className="bg-muted/50 dark:bg-muted/30">
+                <th className="px-2 py-2 w-16 border-b border-border/40 text-[10px] font-medium text-muted-foreground/40">
+                  ID
+                </th>
                 {visibleColumns.map((col) => (
                   <th
                     key={col.name}
@@ -657,6 +660,23 @@ function ProfileSection({
                 const verdict = recordId ? verdicts[recordId] : undefined;
                 return (
                   <tr key={i} className="hover:bg-muted/20 transition-colors">
+                    {recordId && section.recordType ? (
+                      <td className="px-2 py-2 align-top">
+                        <Link
+                          href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}`}
+                          className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                          title={`Record ${recordId}`}
+                        >
+                          {recordId.slice(0, 7)}
+                        </Link>
+                      </td>
+                    ) : recordId ? (
+                      <td className="px-2 py-2 align-top">
+                        <span className="font-mono text-[9px] text-muted-foreground/30" title={recordId}>
+                          {recordId.slice(0, 7)}
+                        </span>
+                      </td>
+                    ) : null}
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
                       const value = camelKey in row ? row[camelKey] : row[col.name];
