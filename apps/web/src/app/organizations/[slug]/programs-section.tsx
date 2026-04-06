@@ -6,9 +6,9 @@ import Link from "next/link";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
@@ -50,7 +50,7 @@ export function FundingProgramsSection({
               {hasDeadline && (
                 <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -121,12 +121,17 @@ export function FundingProgramsSection({
                       {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                  <td className="py-2 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeFundingProgramCoverage({
+                        totalBudget: p.totalBudget,
+                        programType: p.programType,
+                        deadline: p.deadline,
+                        status: p.status,
+                        description: p.description,
+                      })}
+                      verdict={verdict?.verdict}
+                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>

@@ -4,8 +4,8 @@ import { STATUS_COLORS, normalizeStatus } from "@/app/legislation/legislation-co
 import { deriveStatus } from "@/app/legislation/legislation-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface PersonPolicyPosition {
   policyId: string;
@@ -119,7 +119,7 @@ export function PolicyPositionsSection({
                 <th className="text-left px-4 py-2.5 font-semibold text-xs uppercase tracking-wider text-muted-foreground">
                   Reason
                 </th>
-                <th scope="col" className="py-2 px-1 w-8" />
+                <th scope="col" className="py-2 px-2 w-16" />
               </tr>
             </thead>
             <tbody>
@@ -170,12 +170,14 @@ export function PolicyPositionsSection({
                       <span className="text-muted-foreground/40">&mdash;</span>
                     )}
                   </td>
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict)}
-                      originalVerdict={verdict}
-                      size="md"
-                      href={stakeholderId ? getSourceCheckHref("policy-stakeholder", stakeholderId) : undefined}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: pos.reason,
+                        filledFieldCount: (pos.position ? 1 : 0) + (pos.policyStableId ? 1 : 0),
+                      })}
+                      verdict={verdict}
+                      sourceCheckHref={stakeholderId ? getSourceCheckHref("policy-stakeholder", stakeholderId) : undefined}
                     />
                   </td>
                 </tr>

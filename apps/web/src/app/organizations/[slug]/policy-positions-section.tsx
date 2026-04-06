@@ -5,8 +5,8 @@ import { STATUS_COLORS, normalizeStatus } from "@/app/legislation/legislation-co
 import { deriveStatus } from "@/app/legislation/legislation-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface OrgPolicyPosition {
   policyId: string;
@@ -124,12 +124,14 @@ export function PolicyPositionsSection({
                   <td className="py-2 px-3 text-muted-foreground text-xs max-w-xs">
                     {pos.reason ?? <span className="text-muted-foreground/40">&mdash;</span>}
                   </td>
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict)}
-                      originalVerdict={verdict}
-                      href={sourceCheckHref}
-                      size="md"
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: pos.reason,
+                        filledFieldCount: (pos.position ? 1 : 0) + (pos.statusKey ? 1 : 0),
+                      })}
+                      verdict={verdict}
+                      sourceCheckHref={sourceCheckHref}
                     />
                   </td>
                 </tr>

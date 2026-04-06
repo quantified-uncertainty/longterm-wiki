@@ -3,9 +3,9 @@ import { resolveEntityRef, formatDateRange } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -39,11 +39,12 @@ export function CareerHistory({
                 {isCurrent && <CurrentBadge />}
               </div>
               <div className="absolute top-3.5 right-4">
-                <SourceCheckDot
-                  status={recordVerdictToStatus(verdict?.verdict)}
-                  originalVerdict={verdict?.verdict}
-                  size="md"
-                  href={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
+                <RecordStatusDots
+                  coverageScore={computeGenericCoverage({
+                    filledFieldCount: (entry.title ? 1 : 0) + (entry.startDate ? 1 : 0) + (entry.endDate ? 1 : 0),
+                  })}
+                  verdict={verdict?.verdict}
+                  sourceCheckHref={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
                 />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">

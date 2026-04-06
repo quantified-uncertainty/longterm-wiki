@@ -6,9 +6,9 @@
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -138,7 +138,7 @@ export function EquityPositionsSection({
               {hasPledges && (
                 <th scope="col" className="text-right py-2 px-3 font-medium">Pledge %</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -198,12 +198,13 @@ export function EquityPositionsSection({
                       )}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
+                  <td className="py-2 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        filledFieldCount: (pos.stake != null ? 1 : 0) + (pos.source ? 1 : 0) + (pos.notes ? 1 : 0),
+                      })}
+                      verdict={verdict?.verdict}
+                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
                     />
                   </td>
                 </tr>

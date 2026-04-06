@@ -16,8 +16,8 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeFundingRoundCoverage, computeGenericCoverage } from "@/components/coverage/coverage-score";
 import {
   SectionHeader,
   SourceLink,
@@ -62,7 +62,7 @@ export function FundingHistorySection({
               {hasInstrument && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -113,12 +113,17 @@ export function FundingHistorySection({
                       {instrument && <Badge>{instrument}</Badge>}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(roundVerdict)}
-                      originalVerdict={roundVerdict}
-                      size="md"
-                      href={getSourceCheckHref("funding-round", String(round.key))}
+                  <td className="py-2 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeFundingRoundCoverage({
+                        raised: typeof raised === "number" ? raised : undefined,
+                        valuation: typeof valuation === "number" ? valuation : undefined,
+                        leadInvestorName: leadInvestorName,
+                        date,
+                        instrument,
+                      })}
+                      verdict={roundVerdict}
+                      sourceCheckHref={getSourceCheckHref("funding-round", String(round.key))}
                     />
                   </td>
                 </tr>
@@ -161,7 +166,7 @@ export function InvestorParticipationSection({
               {hasDate && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -209,12 +214,13 @@ export function InvestorParticipationSection({
                       {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(invVerdict)}
-                      originalVerdict={invVerdict}
-                      size="md"
-                      href={getSourceCheckHref("investment", String(inv.key))}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        filledFieldCount: (amount != null ? 1 : 0) + (roundName ? 1 : 0) + (date ? 1 : 0),
+                      })}
+                      verdict={invVerdict}
+                      sourceCheckHref={getSourceCheckHref("investment", String(inv.key))}
                     />
                   </td>
                 </tr>
@@ -257,7 +263,7 @@ export function ProductsSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -284,12 +290,14 @@ export function ProductsSection({
                       {source && isUrl(source) ? <SourceLink source={source} /> : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(prodVerdict)}
-                      originalVerdict={prodVerdict}
-                      size="md"
-                      href={getSourceCheckHref("product", String(prod.key))}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: field(prod, "description"),
+                        filledFieldCount: (field(prod, "status") ? 1 : 0) + (field(prod, "website") ? 1 : 0),
+                      })}
+                      verdict={prodVerdict}
+                      sourceCheckHref={getSourceCheckHref("product", String(prod.key))}
                     />
                   </td>
                 </tr>
@@ -336,7 +344,7 @@ export function SafetyMilestonesSection({
               {hasSource && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Source</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -378,12 +386,14 @@ export function SafetyMilestonesSection({
                       <SourceLink source={source} />
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(msVerdict)}
-                      originalVerdict={msVerdict}
-                      size="md"
-                      href={getSourceCheckHref("safety-milestone", String(ms.key))}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: field(ms, "description"),
+                        filledFieldCount: (field(ms, "date") ? 1 : 0) + (field(ms, "source") ? 1 : 0),
+                      })}
+                      verdict={msVerdict}
+                      sourceCheckHref={getSourceCheckHref("safety-milestone", String(ms.key))}
                     />
                   </td>
                 </tr>
@@ -431,7 +441,7 @@ export function StrategicPartnershipsSection({
               {hasNotes && (
                 <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Notes</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -480,12 +490,14 @@ export function StrategicPartnershipsSection({
                       {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(spVerdict)}
-                      originalVerdict={spVerdict}
-                      size="md"
-                      href={getSourceCheckHref("strategic-partnership", String(sp.key))}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: field(sp, "description"),
+                        filledFieldCount: (field(sp, "date") ? 1 : 0) + (field(sp, "partner") ? 1 : 0),
+                      })}
+                      verdict={spVerdict}
+                      sourceCheckHref={getSourceCheckHref("strategic-partnership", String(sp.key))}
                     />
                   </td>
                 </tr>
