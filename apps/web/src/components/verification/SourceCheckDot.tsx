@@ -119,7 +119,7 @@ export function SourceCheckDot({
     return (
       <Link
         href={href}
-        className="p-0.5 -m-0.5 rounded-full hover:bg-muted/50 transition-colors"
+        className="rounded-full hover:bg-muted/50 transition-colors"
       >
         {dot}
       </Link>

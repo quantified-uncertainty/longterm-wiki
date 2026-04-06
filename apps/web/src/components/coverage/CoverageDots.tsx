@@ -27,7 +27,7 @@ export function CoverageDots({
 }: CoverageDotsProps) {
   const clampedScore = Math.max(1, Math.min(4, Math.round(score)));
   const pct = clampedScore * 25; // 25%, 50%, 75%, 100%
-  const dim = size === "md" ? 6 : 5;
+  const dim = size === "md" ? 7 : 6;
   const ariaLabel = label ?? `Coverage: ${pct}%`;
 
   return (
