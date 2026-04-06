@@ -27,11 +27,12 @@ DROP INDEX IF EXISTS idx_ss_dedup;
 DROP INDEX IF EXISTS idx_ss_data_source;
 
 -- 4. Recreate the dedup index on (source_slug, snapshot_hash)
-CREATE UNIQUE INDEX idx_ss_dedup ON source_snapshots (source_slug, snapshot_hash);
-CREATE INDEX idx_ss_source_slug ON source_snapshots (source_slug);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ss_dedup ON source_snapshots (source_slug, snapshot_hash);
+CREATE INDEX IF NOT EXISTS idx_ss_source_slug ON source_snapshots (source_slug);
 
 -- 5. Make source_slug NOT NULL + add FK to resource_tabular_sources
 ALTER TABLE source_snapshots ALTER COLUMN source_slug SET NOT NULL;
+ALTER TABLE source_snapshots DROP CONSTRAINT IF EXISTS fk_ss_source_slug;
 ALTER TABLE source_snapshots
   ADD CONSTRAINT fk_ss_source_slug
   FOREIGN KEY (source_slug) REFERENCES resource_tabular_sources(source_slug) ON DELETE CASCADE;
@@ -45,6 +46,7 @@ ALTER TABLE grants DROP COLUMN IF EXISTS data_source_resource_id;
 -- 8. Re-point grants.data_source_id FK from data_sources → resource_tabular_sources
 --    Values are identical slugs (e.g., "coefficient-giving")
 ALTER TABLE grants DROP CONSTRAINT IF EXISTS grants_data_source_id_data_sources_id_fk;
+ALTER TABLE grants DROP CONSTRAINT IF EXISTS grants_data_source_id_rts_source_slug_fk;
 ALTER TABLE grants
   ADD CONSTRAINT grants_data_source_id_rts_source_slug_fk
   FOREIGN KEY (data_source_id) REFERENCES resource_tabular_sources(source_slug) ON DELETE SET NULL;
