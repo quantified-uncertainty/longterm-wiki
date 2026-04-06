@@ -398,9 +398,15 @@ export function runValidation(opts: {
     }
 
     if (result.warnings.length > 0) {
-      console.log(
-        `\n${c.yellow}Possible legacy ID references (WARNING):${c.reset}`,
-      );
+      const sidWarningCount = result.warnings.filter((w) => w.kind === "sid").length;
+      const legacyWarningCount = result.warnings.length - sidWarningCount;
+      const warningHeader =
+        sidWarningCount > 0 && legacyWarningCount > 0
+          ? "Unresolvable baseline sid_ refs + possible legacy ID references (WARNING)"
+          : sidWarningCount > 0
+            ? "Unresolvable baseline sid_ references (WARNING)"
+            : "Possible legacy ID references (WARNING)";
+      console.log(`\n${c.yellow}${warningHeader}:${c.reset}`);
       const toShow = verbose
         ? result.warnings
         : result.warnings.slice(0, 15);
