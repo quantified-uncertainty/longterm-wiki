@@ -240,8 +240,11 @@ jobs:
 
             echo "Attempt $i/$MAX_ATTEMPTS — images: ${IMAGES:-<none>} | sync: ${SYNC_STATUS} | health: ${HEALTH_STATUS}"
 
-            if echo "$IMAGES" | grep -q "${EXPECTED_TAG}"; then
-              echo "SHA verification passed: ${EXPECTED_TAG} is running"
+            # Require BOTH: new image tag is present AND sync status is "Synced".
+            # Without the sync check, verification passes while old pods still
+            # serve traffic during a rolling deployment (caused deploy #3944 failure).
+            if echo "$IMAGES" | grep -q "${EXPECTED_TAG}" && [ "$SYNC_STATUS" = "Synced" ]; then
+              echo "SHA verification passed: ${EXPECTED_TAG} is running, sync: Synced"
               VERIFIED=true
               break
             fi
@@ -392,14 +395,33 @@ jobs:
           # 6. Migration completeness check — verifies all Drizzle migrations were applied.
           #    Compares the latest created_at in __drizzle_migrations against the journal's
           #    last entry timestamp. A mismatch means migrations are missing.
+          #    Retries on 404 since the endpoint may not exist on old pods during rolling deploys.
           EXPECTED_TIMESTAMP=$(jq -r '.entries[-1].when' apps/wiki-server/drizzle/meta/_journal.json)
-          MIGRATION_RESPONSE=$(curl -s \
-            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
-            "${LONGTERMWIKI_SERVER_URL}/health/migrations" 2>&1 || true)
-          ACTUAL_TIMESTAMP=$(echo "$MIGRATION_RESPONSE" | jq -r '.latestCreatedAt // empty' 2>/dev/null || true)
-          APPLIED_COUNT=$(echo "$MIGRATION_RESPONSE" | jq -r '.appliedCount // empty' 2>/dev/null || true)
+          ACTUAL_TIMESTAMP=""
+          APPLIED_COUNT=""
+          MIGRATION_RESPONSE=""
+          MIGRATION_HTTP_STATUS=""
+          for i in 1 2 3; do
+            MIGRATION_HTTP_STATUS=$(curl -s -o /tmp/migration-response.json -w '%{http_code}' \
+              -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+              "${LONGTERMWIKI_SERVER_URL}/health/migrations" 2>&1 || true)
+            MIGRATION_RESPONSE=$(cat /tmp/migration-response.json 2>/dev/null || true)
+            if [ "$MIGRATION_HTTP_STATUS" = "200" ]; then
+              ACTUAL_TIMESTAMP=$(echo "$MIGRATION_RESPONSE" | jq -r '.latestCreatedAt // empty' 2>/dev/null || true)
+              APPLIED_COUNT=$(echo "$MIGRATION_RESPONSE" | jq -r '.appliedCount // empty' 2>/dev/null || true)
+              if [ -n "$ACTUAL_TIMESTAMP" ]; then break; fi
+              echo "::error::Migration check returned 200 but response has no latestCreatedAt: $MIGRATION_RESPONSE"
+              exit 1
+            elif [ "$MIGRATION_HTTP_STATUS" = "404" ]; then
+              echo "Migration check attempt $i/3: endpoint returned 404 (old pod during rolling deploy)"
+              if [ "$i" -lt 3 ]; then sleep 10; fi
+            else
+              echo "::error::Migration check failed with HTTP $MIGRATION_HTTP_STATUS: $MIGRATION_RESPONSE"
+              exit 1
+            fi
+          done
           if [ -z "$ACTUAL_TIMESTAMP" ]; then
-            echo "::error::Migration check failed — could not query /health/migrations: $MIGRATION_RESPONSE"
+            echo "::error::Migration check failed — /health/migrations returned 404 after 3 attempts (endpoint may not exist in this version)"
             exit 1
           fi
           if [ "$ACTUAL_TIMESTAMP" != "$EXPECTED_TIMESTAMP" ]; then
