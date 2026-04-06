@@ -18,6 +18,8 @@ import {
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeFundingRoundCoverage, computeGenericCoverage } from "@/components/coverage/coverage-score";
 import {
   SectionHeader,
   SourceLink,
@@ -113,13 +115,22 @@ export function FundingHistorySection({
                       {instrument && <Badge>{instrument}</Badge>}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(roundVerdict)}
-                      originalVerdict={roundVerdict}
-                      size="md"
-                      href={getSourceCheckHref("funding-round", String(round.key))}
-                    />
+                  <td className="py-2 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeFundingRoundCoverage({
+                        raised: raised as number | undefined,
+                        valuation: valuation as number | undefined,
+                        leadInvestorName: leadInvestorName,
+                        date,
+                        instrument,
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(roundVerdict)}
+                        originalVerdict={roundVerdict}
+                        size="md"
+                        href={getSourceCheckHref("funding-round", String(round.key))}
+                      />
+                    </span>
                   </td>
                 </tr>
               );
@@ -209,13 +220,18 @@ export function InvestorParticipationSection({
                       {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(invVerdict)}
-                      originalVerdict={invVerdict}
-                      size="md"
-                      href={getSourceCheckHref("investment", String(inv.key))}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        filledFieldCount: (amount != null ? 1 : 0) + (roundName ? 1 : 0) + (date ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(invVerdict)}
+                        originalVerdict={invVerdict}
+                        size="md"
+                        href={getSourceCheckHref("investment", String(inv.key))}
+                      />
+                    </span>
                   </td>
                 </tr>
               );
@@ -284,13 +300,19 @@ export function ProductsSection({
                       {source && isUrl(source) ? <SourceLink source={source} /> : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(prodVerdict)}
-                      originalVerdict={prodVerdict}
-                      size="md"
-                      href={getSourceCheckHref("product", String(prod.key))}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        description: field(prod, "description"),
+                        filledFieldCount: (field(prod, "status") ? 1 : 0) + (field(prod, "website") ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(prodVerdict)}
+                        originalVerdict={prodVerdict}
+                        size="md"
+                        href={getSourceCheckHref("product", String(prod.key))}
+                      />
+                    </span>
                   </td>
                 </tr>
               );
@@ -378,13 +400,19 @@ export function SafetyMilestonesSection({
                       <SourceLink source={source} />
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(msVerdict)}
-                      originalVerdict={msVerdict}
-                      size="md"
-                      href={getSourceCheckHref("safety-milestone", String(ms.key))}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        description: field(ms, "description"),
+                        filledFieldCount: (field(ms, "date") ? 1 : 0) + (field(ms, "source") ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(msVerdict)}
+                        originalVerdict={msVerdict}
+                        size="md"
+                        href={getSourceCheckHref("safety-milestone", String(ms.key))}
+                      />
+                    </span>
                   </td>
                 </tr>
               );
@@ -480,13 +508,19 @@ export function StrategicPartnershipsSection({
                       {notes ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(spVerdict)}
-                      originalVerdict={spVerdict}
-                      size="md"
-                      href={getSourceCheckHref("strategic-partnership", String(sp.key))}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        description: field(sp, "description"),
+                        filledFieldCount: (field(sp, "date") ? 1 : 0) + (field(sp, "partner") ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(spVerdict)}
+                        originalVerdict={spVerdict}
+                        size="md"
+                        href={getSourceCheckHref("strategic-partnership", String(sp.key))}
+                      />
+                    </span>
                   </td>
                 </tr>
               );

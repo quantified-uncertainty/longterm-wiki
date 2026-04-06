@@ -9,6 +9,8 @@ import { getRecordVerdict } from "@data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
@@ -121,13 +123,22 @@ export function FundingProgramsSection({
                       {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
-                    />
+                  <td className="py-2 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeFundingProgramCoverage({
+                        totalBudget: p.totalBudget,
+                        programType: p.programType,
+                        deadline: p.deadline,
+                        status: p.status,
+                        description: p.description,
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict?.verdict)}
+                        originalVerdict={verdict?.verdict}
+                        size="md"
+                        href={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                      />
+                    </span>
                   </td>
                 </tr>
               );

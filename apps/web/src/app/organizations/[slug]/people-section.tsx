@@ -16,6 +16,8 @@ import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -235,7 +237,7 @@ export function PeopleSection({
               <th scope="col" className="py-2 px-3 text-left font-medium">
                 Tenure
               </th>
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -288,13 +290,18 @@ export function PeopleSection({
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">
                     {tenure}
                   </td>
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(person.verificationVerdict)}
-                      originalVerdict={person.verificationVerdict}
-                      size="md"
-                      href={person.sourceCheckHref}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        filledFieldCount: (person.title ? 1 : 0) + (person.start ? 1 : 0) + (person.slug ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(person.verificationVerdict)}
+                        originalVerdict={person.verificationVerdict}
+                        size="md"
+                        href={person.sourceCheckHref}
+                      />
+                    </span>
                   </td>
                 </tr>
               );

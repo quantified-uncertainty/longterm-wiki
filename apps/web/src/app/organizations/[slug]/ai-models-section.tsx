@@ -10,6 +10,8 @@ import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 
@@ -206,13 +208,23 @@ export function AiModelsSection({
                       ) : null}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(modelVerdict)}
-                      originalVerdict={modelVerdict}
-                      size="md"
-                      href={getSourceCheckHref("model-release", model.id)}
-                    />
+                  <td className="py-1.5 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeAiModelCoverage({
+                        releaseDate: model.releaseDate,
+                        inputPrice: model.inputPrice,
+                        contextWindow: model.contextWindow,
+                        safetyLevel: model.safetyLevel,
+                        benchmarkCount: model.benchmarks?.length,
+                        wikiId: model.wikiId,
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(modelVerdict)}
+                        originalVerdict={modelVerdict}
+                        size="md"
+                        href={getSourceCheckHref("model-release", model.id)}
+                      />
+                    </span>
                   </td>
                 </tr>
               );

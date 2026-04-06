@@ -9,6 +9,8 @@ import { getRecordVerdict } from "@data/tablebase";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -198,13 +200,18 @@ export function EquityPositionsSection({
                       )}
                     </td>
                   )}
-                  <td className="py-2 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
-                    />
+                  <td className="py-2 px-2 text-right">
+                    <span className="inline-flex items-center gap-2">
+                      <CoverageDots score={computeGenericCoverage({
+                        filledFieldCount: (pos.stake != null ? 1 : 0) + (pos.source ? 1 : 0) + (pos.notes ? 1 : 0),
+                      })} />
+                      <SourceCheckDot
+                        status={recordVerdictToStatus(verdict?.verdict)}
+                        originalVerdict={verdict?.verdict}
+                        size="md"
+                        href={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
+                      />
+                    </span>
                   </td>
                 </tr>
               );

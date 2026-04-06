@@ -6,6 +6,8 @@ import { CurrentBadge } from "@/components/directory";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface BoardSeat {
   org: { id: string; name: string; type: string };
@@ -37,7 +39,10 @@ export function BoardSeats({ boardSeats }: { boardSeats: BoardSeat[] }) {
               key={`${org.id}-${record.key}`}
               className="px-4 py-3 border-b border-border/40 last:border-b-0 relative"
             >
-              <div className="absolute top-3 right-4">
+              <div className="absolute top-3 right-4 inline-flex items-center gap-2">
+                <CoverageDots score={computeGenericCoverage({
+                  filledFieldCount: (role ? 1 : 0) + (appointed ? 1 : 0) + (departed ? 1 : 0),
+                })} />
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}

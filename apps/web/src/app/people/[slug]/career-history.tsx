@@ -6,6 +6,8 @@ import { CurrentBadge, FounderBadge } from "@/components/directory";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import type { CareerHistoryEntry } from "../people-utils";
 
 export function CareerHistory({
@@ -38,7 +40,10 @@ export function CareerHistory({
                 {isFounder && <FounderBadge />}
                 {isCurrent && <CurrentBadge />}
               </div>
-              <div className="absolute top-3.5 right-4">
+              <div className="absolute top-3.5 right-4 inline-flex items-center gap-2">
+                <CoverageDots score={computeGenericCoverage({
+                  filledFieldCount: (entry.title ? 1 : 0) + (entry.startDate ? 1 : 0) + (entry.endDate ? 1 : 0),
+                })} />
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}

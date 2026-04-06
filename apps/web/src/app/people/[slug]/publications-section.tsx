@@ -3,6 +3,8 @@ import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { safeHref } from "@/lib/directory-utils";
 
 export function PublicationsSection({
@@ -33,7 +35,10 @@ export function PublicationsSection({
 
           return (
             <div key={`${idx}-${pub.title}`} className="px-4 py-3 relative">
-              <div className="absolute top-3 right-4">
+              <div className="absolute top-3 right-4 inline-flex items-center gap-2">
+                <CoverageDots score={computeGenericCoverage({
+                  filledFieldCount: (pub.title ? 1 : 0) + (pub.year ? 1 : 0),
+                })} />
                 <SourceCheckDot
                   status={recordVerdictToStatus(verdict?.verdict)}
                   originalVerdict={verdict?.verdict}
