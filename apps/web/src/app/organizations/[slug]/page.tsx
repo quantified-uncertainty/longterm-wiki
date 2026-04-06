@@ -40,7 +40,6 @@ import {
 import {
   loadOrgPageData,
   resolveOrgEntity,
-  resolveAuthor,
   HERO_STATS,
   ORG_TYPE_LABELS,
   ORG_TYPE_COLORS,
@@ -49,7 +48,6 @@ import {
   ORG_STATUS_COLORS,
   type OrgEntity,
 } from "./org-data";
-import type { AuthorRef } from "./org-data";
 
 // Section components
 
@@ -60,7 +58,6 @@ import { AiModelsSection } from "./ai-models-section";
 import { PolicyPositionsSection, getOrgPolicyPositions } from "./policy-positions-section";
 
 // Section components — publications
-import { KeyPublicationsSection } from "./publications-section";
 
 // Section components — grants (main content column)
 import { GrantsSection } from "./grants-section";
@@ -533,49 +530,19 @@ export default async function OrgProfilePage({
   const announcementVerdicts = buildResourceVerdicts(data.resourceAnnouncements);
   const pressVerdicts = buildResourceVerdicts(data.resourcesAboutOrg);
 
-  // ── Publications tab (research papers + literature papers, deduplicated) ──
-  // Deduplicate key publications that already appear in the resources table (by title match)
-  const resourcePubTitles = new Set(
-    data.resourcePublications.map((r) => r.title.toLowerCase().trim()),
-  );
-  const dedupedKeyPubs = data.keyPublications.filter(
-    (p) => !resourcePubTitles.has(p.title.toLowerCase().trim()),
-  );
-
-  // Build resolved author map for key publications author linking
-  const keyPubAuthorMap = new Map<string, AuthorRef>();
-  for (const pub of dedupedKeyPubs) {
-    for (const name of pub.authors) {
-      if (!keyPubAuthorMap.has(name)) {
-        keyPubAuthorMap.set(name, resolveAuthor(name));
-      }
-    }
-  }
-
-  const hasPublications = data.resourcePublications.length > 0 || dedupedKeyPubs.length > 0;
-  if (hasPublications) {
-    const pubCount = data.resourcePublications.length + dedupedKeyPubs.length;
+  // ── Publications tab (research papers from entity_resources) ──
+  if (data.resourcePublications.length > 0) {
     tabs.push({
       id: "publications",
       label: "Publications",
-      count: pubCount,
+      count: data.resourcePublications.length,
       content: (
-        <div className="space-y-8">
-          {data.resourcePublications.length > 0 && (
-            <OrgResourcesSection
-              resources={data.resourcePublications}
-              title="Research & Technical Papers"
-              emptyMessage=""
-              verdicts={pubVerdicts}
-            />
-          )}
-          {dedupedKeyPubs.length > 0 && (
-            <KeyPublicationsSection
-              publications={dedupedKeyPubs}
-              resolvedAuthors={keyPubAuthorMap}
-            />
-          )}
-        </div>
+        <OrgResourcesSection
+          resources={data.resourcePublications}
+          title="Research & Technical Papers"
+          emptyMessage=""
+          verdicts={pubVerdicts}
+        />
       ),
     });
   }

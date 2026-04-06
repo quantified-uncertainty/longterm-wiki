@@ -1156,6 +1156,13 @@
       "when": 1783670400000,
       "tag": "0164_drop_entity_recommended_resources",
       "breakpoints": true
+    },
+    {
+      "idx": 165,
+      "version": "7",
+      "when": 1783756800000,
+      "tag": "0165_add_source_resource_id",
+      "breakpoints": true
     }
   ]
 }
