@@ -35,7 +35,7 @@ const SUPPRESS_COMMENT = 'factbase-slug-ok';
  * Detect calls like getKBLatest("someSlug", ...) or getFactBaseFacts("someSlug", ...)
  * where the first argument is a hardcoded string that does NOT start with "sid_".
  *
- * Matches: getKBLatest("anthropic", ...) or getFactBaseRecords("anthropic", ...)
+ * Matches: getKBLatest("anthropic", ...) or getKBLatest('anthropic', ...) or getFactBaseRecords("anthropic", ...)
  * Skips:   getKBLatest("sid_abc123", ...) or getKBLatest(entity.id, ...)
  */
 const FACTBASE_CALL_PATTERN =
@@ -109,7 +109,7 @@ function checkFile(filePath: string): Violation[] {
 
     const match = FACTBASE_CALL_PATTERN.exec(line);
     if (match) {
-      const slug = match[1];
+      const slug = match[2];
       violations.push({
         file: relPath,
         line: i + 1,
