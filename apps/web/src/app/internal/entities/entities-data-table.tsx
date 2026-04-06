@@ -17,6 +17,7 @@ import {
 import { Search, Columns3, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
 
 // ---------------------------------------------------------------------------
 // Unified row type — merges entity metadata + page coverage + importance
@@ -51,6 +52,8 @@ export interface UnifiedEntityRow {
   // Coverage
   coverageScore: number | null;
   coverageTotal: number | null;
+  // Entity data depth (1-4 from coverage-score.ts)
+  dataDepth: number | null;
   // Hallucination risk
   riskLevel: "low" | "medium" | "high" | null;
   riskScore: number | null;
@@ -323,6 +326,7 @@ const COLUMN_LABELS: Record<string, string> = {
   updateFrequency: "Update Freq (days)",
   // Coverage
   coverageScore: "Coverage Score",
+  dataDepth: "Data Depth",
   // Risk
   riskLevel: "Hallucination Risk",
   riskScore: "Risk Score",
@@ -541,6 +545,13 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     accessorKey: "coverageScore",
     header: ({ column }) => <SortableHeader column={column} title="Coverage: passing items out of 13">Cov</SortableHeader>,
     cell: ({ row }) => <ScoreBadge score={row.original.coverageScore} total={row.original.coverageTotal} />,
+    sortUndefined: "last",
+  },
+  {
+    id: "dataDepth",
+    accessorKey: "dataDepth",
+    header: ({ column }) => <SortableHeader column={column} title="Entity data depth (1-4 from structured data scoring)">Depth</SortableHeader>,
+    cell: ({ row }) => row.original.dataDepth != null ? <CoverageDots score={row.original.dataDepth} /> : <span className="text-muted-foreground/30">—</span>,
     sortUndefined: "last",
   },
 
@@ -841,7 +852,7 @@ const PRESETS: Record<string, Preset> = {
   overview: {
     label: "Overview",
     description: "Key quality, risk, and status metrics for pages with content",
-    columns: ["title", "entityType", "quality", "readerImportance", "coverageScore", "riskLevel", "lastUpdated", "wordCount", "category"],
+    columns: ["title", "entityType", "quality", "readerImportance", "coverageScore", "dataDepth", "riskLevel", "lastUpdated", "wordCount", "category"],
     defaultSort: [{ id: "quality", desc: true }],
     filters: { pageFilter: "with" },
   },

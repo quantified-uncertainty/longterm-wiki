@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { SearchPageClient, type BrowseData } from "./search-client";
 import { getExploreItems } from "@data/explore";
+import { getAllEntityCoverageScores } from "@/data/entity-coverage";
 
 export const metadata: Metadata = {
   title: "Search | Longterm Wiki",
@@ -100,9 +101,16 @@ function buildBrowseData(): BrowseData {
 export default function SearchPage() {
   const browseData = buildBrowseData();
 
+  // Pre-compute coverage scores for all entities (server-side only)
+  const coverageScores = getAllEntityCoverageScores();
+  const coverageMap: Record<string, number> = {};
+  for (const entry of coverageScores) {
+    coverageMap[entry.id] = entry.score;
+  }
+
   return (
     <Suspense fallback={<SearchSkeleton />}>
-      <SearchPageClient browseData={browseData} />
+      <SearchPageClient browseData={browseData} coverageMap={coverageMap} />
     </Suspense>
   );
 }
