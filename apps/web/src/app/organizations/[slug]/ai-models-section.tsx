@@ -8,8 +8,8 @@ import { getRecordVerdict } from "@data/tablebase";
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 
@@ -139,7 +139,7 @@ export function AiModelsSection({
               {hasBenchmarks && (
                 <th scope="col" className="py-2 px-3 text-left font-medium">Benchmarks</th>
               )}
-              <th scope="col" className="py-2 px-1 w-8" />
+              <th scope="col" className="py-2 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -206,12 +206,18 @@ export function AiModelsSection({
                       ) : null}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(modelVerdict)}
-                      originalVerdict={modelVerdict}
-                      size="md"
-                      href={getSourceCheckHref("model-release", model.id)}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeAiModelCoverage({
+                        releaseDate: model.releaseDate,
+                        inputPrice: model.inputPrice,
+                        contextWindow: model.contextWindow,
+                        safetyLevel: model.safetyLevel,
+                        benchmarkCount: model.benchmarks?.length,
+                        wikiId: model.wikiId,
+                      })}
+                      verdict={modelVerdict}
+                      sourceCheckHref={getSourceCheckHref("model-release", model.id)}
                     />
                   </td>
                 </tr>

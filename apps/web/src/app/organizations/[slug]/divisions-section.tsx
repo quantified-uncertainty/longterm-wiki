@@ -9,9 +9,9 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
 type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
@@ -123,10 +123,14 @@ function DivisionCard({
           </span>
         </span>
         <div className="flex items-center gap-1.5 shrink-0">
-          <SourceCheckDot
-            status={recordVerdictToStatus(cardVerdict)}
-            originalVerdict={cardVerdict}
-            href={cardSourceCheckHref}
+          <RecordStatusDots
+            coverageScore={computeDivisionCoverage({
+              divisionType: d.divisionType,
+              status: d.status,
+              hasData: !!(d.lead || d.source),
+            })}
+            verdict={cardVerdict}
+            sourceCheckHref={cardSourceCheckHref}
             className="relative z-10"
           />
           {d.website && (
@@ -259,7 +263,7 @@ export function DivisionsSection({
               )}
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Status</th>
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Since</th>
-              <th scope="col" className="py-2.5 px-1 w-8" />
+              <th scope="col" className="py-2.5 px-2 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -403,12 +407,15 @@ export function DivisionsSection({
                   <td className="py-2.5 px-3 text-center text-muted-foreground text-xs">
                     {d.startDate && formatKBDate(d.startDate)}
                   </td>
-                  <td className="py-2.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict?.verdict)}
-                      originalVerdict={verdict?.verdict}
-                      size="md"
-                      href={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
+                  <td className="py-2.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeDivisionCoverage({
+                        divisionType: d.divisionType,
+                        status: d.status,
+                        hasData: !!(d.lead || d.source),
+                      })}
+                      verdict={verdict?.verdict}
+                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
                     />
                   </td>
                 </tr>

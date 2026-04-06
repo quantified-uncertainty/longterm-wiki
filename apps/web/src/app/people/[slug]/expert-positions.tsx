@@ -1,8 +1,8 @@
 import type { ExpertPosition } from "@/data/tablebase";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { topicLabel } from "@/data/topic-labels";
 import { safeHref } from "@/lib/directory-utils";
 
@@ -79,7 +79,7 @@ export function ExpertPositions({
                     Source
                   </th>
                 )}
-                <th scope="col" className="py-2 px-1 w-8">
+                <th scope="col" className="py-2 px-2 w-16">
                   <span className="sr-only">Source check</span>
                 </th>
               </tr>
@@ -153,12 +153,14 @@ export function ExpertPositions({
                       )}
                     </td>
                   )}
-                  <td className="py-1.5 px-1">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(verdict)}
-                      originalVerdict={verdict}
-                      size="md"
-                      href={getSourceCheckHref("expert-position", recordId)}
+                  <td className="py-1.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeGenericCoverage({
+                        description: pos.estimate,
+                        filledFieldCount: (pos.confidence ? 1 : 0) + (pos.source ? 1 : 0) + (pos.date ? 1 : 0),
+                      })}
+                      verdict={verdict}
+                      sourceCheckHref={getSourceCheckHref("expert-position", recordId)}
                     />
                   </td>
                 </tr>
