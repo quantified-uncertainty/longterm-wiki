@@ -3,11 +3,9 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingRoundCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFundingRoundRows, type SortDir, type FundingRoundSortKey } from "./funding-rounds-sort";
@@ -274,16 +272,12 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                   {row.date ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
-                <td className="py-2.5 px-3 text-right hidden sm:table-cell">
-                  <span className="inline-flex items-center gap-2">
-                    <CoverageDots score={computeFundingRoundCoverage(row)} />
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(row.verdict?.verdict)}
-                      originalVerdict={row.verdict?.verdict}
-                      size="md"
-                      href={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
-                    />
-                  </span>
+                <td className="py-2.5 px-2 text-right hidden sm:table-cell">
+                  <RecordStatusDots
+                    coverageScore={computeFundingRoundCoverage(row)}
+                    verdict={row.verdict?.verdict}
+                    sourceCheckHref={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
+                  />
                 </td>
               </tr>
             ))}

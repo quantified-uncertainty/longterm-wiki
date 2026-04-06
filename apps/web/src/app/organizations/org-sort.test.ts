@@ -261,9 +261,11 @@ describe("computeOrgCoverage", () => {
     })).toBe(4);
   });
 
-  it("counts people thresholds: 3+ gives 1 signal, 10+ gives 2", () => {
+  it("counts people thresholds: 10+ gives 1 signal", () => {
     expect(computeOrgCoverage({ peopleCount: 2 })).toBe(1);
-    expect(computeOrgCoverage({ peopleCount: 3, foundedDate: "2020" })).toBe(2);
+    // 3 people below threshold (10), foundedDate = 1 signal → score 1
+    expect(computeOrgCoverage({ peopleCount: 3, foundedDate: "2020" })).toBe(1);
+    // 10 people = 1 signal, foundedDate = 1 signal → 2 signals → score 2
     expect(computeOrgCoverage({ peopleCount: 10, foundedDate: "2020" })).toBe(2);
   });
 });

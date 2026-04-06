@@ -29,8 +29,9 @@ export function RecordStatusDots({
   className = "",
 }: RecordStatusDotsProps) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 ${className}`}>
       <CoverageDots score={coverageScore} />
+      <span className="w-px h-2.5 bg-border/60 shrink-0" aria-hidden="true" />
       <SourceCheckDot
         status={recordVerdictToStatus(verdict)}
         originalVerdict={verdict}
