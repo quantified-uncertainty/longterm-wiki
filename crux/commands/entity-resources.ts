@@ -23,12 +23,15 @@ import {
 import { listResources } from "../lib/wiki-server/resources.ts";
 
 const BATCH_SIZE = 500;
+const LIST_PAGE_SIZE = 500;
+
+type SeedSource = "publisher" | "wiki_citation" | "all";
 
 interface SeedOptions {
   "dry-run"?: boolean;
   dryRun?: boolean;
   verbose?: boolean;
-  source?: string; // 'publisher' | 'wiki_citation' | 'all'
+  source?: SeedSource;
   limit?: string;
 }
 
@@ -77,16 +80,14 @@ function loadPageResources(): Record<string, string[]> {
 
 async function seedFromPublisher(
   options: SeedOptions,
-): Promise<{ items: EntityResourceSyncItem[]; skipped: number }> {
+): Promise<{ items: EntityResourceSyncItem[] }> {
   const items: EntityResourceSyncItem[] = [];
   const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
   let offset = 0;
-  const pageSize = 500;
   let fetched = 0;
-  let skipped = 0;
 
   while (fetched < maxResources) {
-    const result = await listResources(pageSize, offset);
+    const result = await listResources(LIST_PAGE_SIZE, offset);
     if (!result.ok) {
       console.error(
         `Failed to fetch resources at offset ${offset}: ${result.message}`,
@@ -123,7 +124,7 @@ async function seedFromPublisher(
     if (offset >= total) break;
   }
 
-  return { items, skipped };
+  return { items };
 }
 
 // ---------------------------------------------------------------------------
@@ -207,12 +208,9 @@ async function seedCommand(
   // Pass 1: publisher_entity_id
   if (source === "all" || source === "publisher") {
     console.log("Pass 1: Seeding from publisher_entity_id...");
-    const { items, skipped } = await seedFromPublisher(options);
-    console.log(
-      `  Found ${items.length} authored-by relationships (${skipped} skipped)`,
-    );
+    const { items } = await seedFromPublisher(options);
+    console.log(`  Found ${items.length} authored-by relationships`);
     totalItems += items.length;
-    totalSkipped += skipped;
 
     const synced = await batchSync(items, dryRun);
     totalSynced += synced;
