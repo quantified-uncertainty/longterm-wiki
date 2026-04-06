@@ -16,6 +16,7 @@ import {
 import Link from "next/link";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -154,9 +155,9 @@ const HIDDEN_COLUMNS: Record<string, Set<string>> = {
   personnel: new Set(["person_id", "organization_id", "person_display_name", "org_display_name"]),
   grantsGiven: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
   grantsReceived: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
-  investments: new Set(["company_display_name", "investor_display_name"]),
-  equityPositions: new Set(["company_display_name", "holder_display_name"]),
-  fundingRounds: new Set(["company_display_name", "lead_investor_display_name"]),
+  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name"]),
+  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name"]),
+  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name"]),
   policyStakeholders: new Set(["stakeholder_display_name"]),
   divisionPersonnel: new Set(["person_display_name"]),
 };
@@ -178,16 +179,68 @@ const COLUMN_HEADER_OVERRIDES: Record<string, string> = {
   organization_id: "Organization",
 };
 
+// ── Numeric formatting columns ────────────────────────────────────────────
+
+/** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
+const CURRENCY_COLUMNS = new Set([
+  "amount", "raised", "raised_low", "raised_high",
+  "valuation", "valuation_low", "valuation_high",
+  "amount_low", "amount_high", "total_budget",
+  "usd_equivalent", "cost_usd",
+]);
+
+/** Columns representing 0-1 decimal fractions displayed as percentages */
+const PERCENTAGE_COLUMNS = new Set([
+  "stake_low", "stake_high",
+]);
+
+function formatPercentage(n: number): string {
+  return `${(n * 100).toFixed(1).replace(/\.0$/, "")}%`;
+}
+
+/** Try to parse a value as a number. Returns null if not parseable or is a range string like "[0.07, 0.15]". */
+function tryParseNumeric(value: unknown): number | null {
+  if (typeof value === "number") return isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.startsWith("[") || trimmed.startsWith("{")) return null;
+  const n = Number(trimmed);
+  return isFinite(n) ? n : null;
+}
+
+// ── Expandable text ───────────────────────────────────────────────────────
+
+function ExpandableText({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <span
+        className={`text-[11px] whitespace-pre-wrap break-words ${expanded ? "" : "line-clamp-2"}`}
+      >
+        {text}
+      </span>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline ml-1"
+      >
+        {expanded ? "less" : "more"}
+      </button>
+    </div>
+  );
+}
+
 // ── Cell renderer ──────────────────────────────────────────────────────────
 
 function CellValue({
   value,
   columnName,
   displayNames,
+  row,
 }: {
   value: unknown;
   columnName: string;
   displayNames?: Record<string, DisplayNameEntry>;
+  row?: Record<string, unknown>;
 }) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground/30 select-none">&mdash;</span>;
@@ -240,6 +293,43 @@ function CellValue({
     );
   }
 
+  // Currency columns -> formatted compact currency
+  if (CURRENCY_COLUMNS.has(columnName)) {
+    const n = tryParseNumeric(value);
+    if (n !== null) {
+      const currency = (row?.currency as string) ?? undefined;
+      return (
+        <span className="text-[11px] tabular-nums font-medium whitespace-nowrap" title={String(value)}>
+          {formatCompactCurrency(n, currency)}
+        </span>
+      );
+    }
+  }
+
+  // Percentage columns -> formatted as X.X%
+  if (PERCENTAGE_COLUMNS.has(columnName)) {
+    const n = tryParseNumeric(value);
+    if (n !== null) {
+      return (
+        <span className="text-[11px] tabular-nums font-medium" title={String(value)}>
+          {formatPercentage(n)}
+        </span>
+      );
+    }
+  }
+
+  // Generic number values (real/doublePrecision columns arrive as typeof number)
+  if (typeof value === "number" && isFinite(value)) {
+    const formatted = Math.abs(value) >= 1000
+      ? formatCompactNumber(value)
+      : Number.isInteger(value) ? value.toLocaleString() : value.toFixed(2);
+    return (
+      <span className="text-[11px] tabular-nums" title={String(value)}>
+        {formatted}
+      </span>
+    );
+  }
+
   // URL values
   if (typeof value === "string" && (value.startsWith("http://") || value.startsWith("https://"))) {
     const domain = (() => {
@@ -259,12 +349,19 @@ function CellValue({
   }
 
   const str = String(value);
-  if (str.length > 200) {
-    return (
-      <span className="text-[11px]" title={str}>
-        {str.slice(0, 200)}<span className="text-muted-foreground">&hellip;</span>
-      </span>
-    );
+
+  // Long text -> expandable with line-clamp
+  if (str.length > 80) {
+    // Check if it's stringified JSON — delegate to JsonValue if so
+    if (str.startsWith("[") || str.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(str);
+        if (typeof parsed === "object" && parsed !== null) {
+          return <JsonValue value={parsed} />;
+        }
+      } catch { /* not JSON, fall through */ }
+    }
+    return <ExpandableText text={str} />;
   }
 
   return <span className="text-[11px]">{str}</span>;
@@ -446,7 +543,7 @@ function ProfileSection({
                       const value = camelKey in row ? row[camelKey] : row[col.name];
                       return (
                         <td key={col.name} className="px-3 py-2 align-top">
-                          <CellValue value={value} columnName={col.name} displayNames={displayNames} />
+                          <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />
                         </td>
                       );
                     })}
