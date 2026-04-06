@@ -269,6 +269,12 @@ export type RpcSourceCheckDetailResult = InferResponseType<SourceChecksClient['v
 /** Inferred response type for GET /api/source-checks/resolve-names */
 export type RpcSourceChecksResolveNamesResult = InferResponseType<SourceChecksClient['resolve-names']['$get'], 200>;
 
+/** Inferred response type for GET /api/source-checks/entity-summary */
+export type RpcEntitySummaryResult = InferResponseType<SourceChecksClient['entity-summary']['$get'], 200>;
+
+/** A single entity summary row from the entity-summary endpoint */
+export type RpcEntitySummaryRow = RpcEntitySummaryResult['summaries'][number];
+
 // ============================================================================
 // Hono RPC client — Grants API
 // ============================================================================

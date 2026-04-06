@@ -28,6 +28,7 @@ import {
   policyStakeholders,
   entityRecommendedResources,
 } from "../../schema.js";
+import { isAnySid } from "@longterm-wiki/id-utils";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import { notFoundError } from "../shared/utils.js";
 import { COLUMN_DESCRIPTIONS } from "./entity-profile-descriptions.js";
@@ -106,6 +107,20 @@ const SECTION_ROW_LIMIT = 500;
  * without an additional COUNT query.
  */
 const FETCH_LIMIT = SECTION_ROW_LIMIT + 1;
+
+// ---- Record type mapping (for source-check detail page URLs) ----
+
+const SECTION_RECORD_TYPE: Record<string, string> = {
+  personnel: "personnel",
+  grantsGiven: "grant",
+  grantsReceived: "grant",
+  fundingRounds: "funding-round",
+  investments: "investment",
+  equityPositions: "equity-position",
+  divisions: "division",
+  fundingPrograms: "funding-program",
+  policyStakeholders: "policy-stakeholder",
+};
 
 // ---- Section definition ----
 
@@ -363,6 +378,7 @@ const entityProfileApp = new Hono()
             rows: stripInternalColumns(capped),
             total: capped.length,
             truncated,
+            ...(SECTION_RECORD_TYPE[section.key] ? { recordType: SECTION_RECORD_TYPE[section.key] } : {}),
           };
         } catch (err) {
           logger.error(
@@ -405,36 +421,31 @@ const entityProfileApp = new Hono()
       }
     }
 
-    // Batch-resolve entity reference stableIds to display names
+    // Collect all entity stableIds from entity reference columns across all sections
     const entityRefIds = new Set<string>();
     for (const section of sectionResults) {
       for (const row of section.rows) {
-        for (const [key, val] of Object.entries(row)) {
-          const isRef =
-            key.endsWith("EntityId") ||
-            key.endsWith("_entity_id") ||
-            key === "stableId" ||
-            key === "stable_id" ||
-            key === "parentOrgId" ||
-            key === "parent_org_id";
-          if (isRef && typeof val === "string" && val.length === 10) {
-            entityRefIds.add(val);
+        for (const [key, value] of Object.entries(row)) {
+          if (
+            typeof value === "string" &&
+            isAnySid(value) &&
+            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId" || key === "orgId" || key === "entityId" || key === "parentThingId")
+          ) {
+            entityRefIds.add(value);
           }
         }
       }
     }
 
+    // Batch-resolve stableIds to display names
     const displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
     if (entityRefIds.size > 0) {
-      const entityRows = await db
-        .select({
-          stableId: entities.stableId,
-          slug: entities.id,
-          title: entities.title,
-          entityType: entities.entityType,
-        })
-        .from(entities)
-        .where(inArray(entities.stableId, [...entityRefIds]));
+      const entityRows = await db.select({
+        stableId: entities.stableId,
+        slug: entities.id,
+        title: entities.title,
+        entityType: entities.entityType,
+      }).from(entities).where(inArray(entities.stableId, [...entityRefIds]));
       for (const e of entityRows) {
         if (e.stableId && e.title) {
           displayNames[e.stableId] = {
