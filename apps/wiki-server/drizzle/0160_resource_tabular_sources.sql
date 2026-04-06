@@ -24,9 +24,6 @@ CREATE TABLE IF NOT EXISTS resource_tabular_sources (
   updated_at        timestamptz NOT NULL DEFAULT now()
 );
 
--- Indexes on resource_tabular_sources omitted: the table has ~16 rows and
--- sequential scans are faster than index lookups at this scale.
-
 -- 2. Add resource_id to source_snapshots (nullable during transition)
 ALTER TABLE source_snapshots
   ADD COLUMN IF NOT EXISTS resource_id text REFERENCES resources(id) ON DELETE SET NULL;
@@ -38,5 +35,3 @@ CREATE INDEX IF NOT EXISTS idx_ss_resource_id
 ALTER TABLE grants
   ADD COLUMN IF NOT EXISTS data_source_resource_id text REFERENCES resources(id) ON DELETE SET NULL;
 
-CREATE INDEX IF NOT EXISTS idx_grants_data_source_resource
-  ON grants (data_source_resource_id);
