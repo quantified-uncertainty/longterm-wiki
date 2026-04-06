@@ -157,9 +157,9 @@ const HIDDEN_COLUMNS: Record<string, Set<string>> = {
   personnel: new Set(["person_id", "organization_id", "person_display_name", "org_display_name"]),
   grantsGiven: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
   grantsReceived: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
-  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name"]),
-  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name"]),
-  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name"]),
+  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name", "amount_low", "amount_high", "stake_low", "stake_high"]),
+  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name", "stake_low", "stake_high"]),
+  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name", "raised_low", "raised_high", "valuation_low", "valuation_high"]),
   policyStakeholders: new Set(["stakeholder_display_name"]),
   divisionPersonnel: new Set(["person_display_name"]),
 };
