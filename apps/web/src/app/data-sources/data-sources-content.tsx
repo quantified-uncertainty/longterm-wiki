@@ -154,8 +154,8 @@ export async function DataSourcesContent() {
       <DataSourcesTable rows={rows} />
 
       <p className="text-xs text-muted-foreground mt-4">
-        Data from <code>data_sources</code> table via wiki-server API.
-        Freshness computed from <code>lastSnapshotAt</code> relative to{" "}
+        Data from <code>resource_tabular_sources</code> table via wiki-server
+        API. Freshness computed from latest snapshot relative to{" "}
         <code>updateFrequency</code>.
       </p>
     </>
