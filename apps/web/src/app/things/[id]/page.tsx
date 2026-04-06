@@ -15,6 +15,7 @@ import {
   formatRecordType,
   getSourceCheckHref,
 } from "../../source-checks/source-checks-shared";
+import { isAnySid } from "@longterm-wiki/id-utils";
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -40,6 +41,16 @@ interface ThingDetail {
   childrenByType: Record<string, number>;
   href: string | null;
 }
+
+interface RecordLookupResult {
+  sourceTable: string;
+  sourceId: string;
+  record: Record<string, unknown>;
+  displayNames: Record<string, { title: string; slug: string; entityType: string }>;
+}
+
+/** Fields already shown in the Metadata section — skip in Record Data. */
+const METADATA_FIELDS = new Set(["source_table", "sourceTable", "source_id", "sourceId"]);
 
 /**
  * Map source_table names (DB) to the recordType format used by source-checks API.
@@ -130,6 +141,95 @@ function ChildrenSummary({ count, byType }: { count: number; byType: Record<stri
   );
 }
 
+function RecordValue({
+  fieldKey,
+  value,
+  displayNames,
+}: {
+  fieldKey: string;
+  value: unknown;
+  displayNames: Record<string, { title: string; slug: string; entityType: string }>;
+}) {
+  // Null / undefined
+  if (value === null || value === undefined) {
+    return <span className="text-muted-foreground">{"\u2014"}</span>;
+  }
+
+  // Boolean
+  if (typeof value === "boolean") {
+    return <span>{value ? "Yes" : "No"}</span>;
+  }
+
+  // Number
+  if (typeof value === "number") {
+    return <span className="tabular-nums">{value.toLocaleString("en-US")}</span>;
+  }
+
+  // String values
+  if (typeof value === "string") {
+    // Entity stableId reference (but not the record's own id field)
+    if (fieldKey !== "id" && isAnySid(value) && displayNames[value]) {
+      const dn = displayNames[value];
+      return (
+        <span>
+          <Link href={`/wiki/${dn.slug}`} className="text-primary hover:underline">
+            {dn.title}
+          </Link>
+          <span className="text-xs text-muted-foreground ml-1">({dn.entityType})</span>
+        </span>
+      );
+    }
+
+    // URL
+    if (value.startsWith("http://") || value.startsWith("https://")) {
+      return (
+        <a
+          href={value}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400 break-all"
+        >
+          <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+          {(() => {
+            try {
+              const url = new URL(value);
+              const display = url.hostname + url.pathname;
+              return display.length > 80 ? display.slice(0, 80) + "\u2026" : display;
+            } catch {
+              return value.length > 80 ? value.slice(0, 80) + "\u2026" : value;
+            }
+          })()}
+        </a>
+      );
+    }
+
+    // ISO date-like string (e.g. "2025-03-15T00:00:00.000Z" or "2025-03-15")
+    if (/^\d{4}-\d{2}-\d{2}(T|\s)/.test(value)) {
+      return <span>{formatTimestamp(value)}</span>;
+    }
+
+    // Long string — truncate
+    if (value.length > 300) {
+      return <span className="text-sm">{value.slice(0, 300)}{"\u2026"}</span>;
+    }
+
+    return <span className="text-sm">{value}</span>;
+  }
+
+  // Arrays and objects — JSON fallback
+  if (typeof value === "object") {
+    const json = JSON.stringify(value, null, 2);
+    const display = json.length > 300 ? json.slice(0, 300) + "\u2026" : json;
+    return (
+      <pre className="text-xs bg-muted px-2 py-1 rounded overflow-x-auto max-w-full whitespace-pre-wrap">
+        {display}
+      </pre>
+    );
+  }
+
+  return <span className="text-sm">{String(value)}</span>;
+}
+
 // ── Main Page ──────────────────────────────────────────────────────────
 
 export default async function ThingDetailPage({ params }: PageProps) {
@@ -164,18 +264,34 @@ export default async function ThingDetailPage({ params }: PageProps) {
 
   const thing = thingResult.data;
 
-  // Fetch source-check verdicts if the source table supports them
+  // Fetch source-check verdicts and record data in parallel
   const recordType = sourceTableToRecordType(thing.sourceTable);
-  let verdicts: RpcSourceCheckDetailResult | null = null;
 
-  if (VERDICT_SOURCE_TABLES.has(thing.sourceTable)) {
-    const verdictsResult = await fetchDetailed<RpcSourceCheckDetailResult>(
-      `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(thing.sourceId)}`,
-      { revalidate: 300 }
-    );
-    if (verdictsResult.ok) {
-      verdicts = verdictsResult.data;
-    }
+  const verdictsPromise = VERDICT_SOURCE_TABLES.has(thing.sourceTable)
+    ? fetchDetailed<RpcSourceCheckDetailResult>(
+        `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(thing.sourceId)}`,
+        { revalidate: 300 }
+      )
+    : Promise.resolve(null);
+
+  const recordPromise = fetchDetailed<RecordLookupResult>(
+    `/api/record-lookup/${encodeURIComponent(thing.sourceTable)}/${encodeURIComponent(thing.sourceId)}`,
+    { revalidate: 300 }
+  );
+
+  const [verdictsSettled, recordSettled] = await Promise.allSettled([
+    verdictsPromise,
+    recordPromise,
+  ]);
+
+  let verdicts: RpcSourceCheckDetailResult | null = null;
+  if (verdictsSettled.status === "fulfilled" && verdictsSettled.value && verdictsSettled.value.ok) {
+    verdicts = verdictsSettled.value.data;
+  }
+
+  let recordData: RecordLookupResult | null = null;
+  if (recordSettled.status === "fulfilled" && recordSettled.value.ok) {
+    recordData = recordSettled.value.data;
   }
 
   const hasVerdicts = verdicts && verdicts.verdicts.length > 0;
@@ -365,6 +481,42 @@ export default async function ThingDetailPage({ params }: PageProps) {
             </tbody>
           </table>
         </div>
+      </section>
+
+      {/* Record Data */}
+      <section className="mb-8">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+          <span className="inline-flex items-center gap-1.5">
+            <Database className="h-4 w-4" />
+            Record Data
+          </span>
+        </h2>
+        {recordData && Object.keys(recordData.record).length > 0 ? (
+          <div className="rounded-lg border border-border/60 overflow-hidden">
+            <table className="w-full text-sm">
+              <tbody className="divide-y divide-border/30">
+                {Object.entries(recordData.record)
+                  .filter(([key]) => !METADATA_FIELDS.has(key))
+                  .map(([key, value]) => (
+                    <tr key={key}>
+                      <td className="px-4 py-2.5 text-muted-foreground font-medium whitespace-nowrap w-48 align-top">
+                        <code className="text-[12px]">{key}</code>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <RecordValue
+                          fieldKey={key}
+                          value={value}
+                          displayNames={recordData!.displayNames}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Record data unavailable</p>
+        )}
       </section>
 
       {/* Source Check Verdicts */}

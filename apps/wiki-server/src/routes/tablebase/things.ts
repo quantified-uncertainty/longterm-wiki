@@ -50,6 +50,7 @@ const SearchQuery = z.object({
   q: z.string().min(1).max(500),
   thing_type: z.string().max(50).optional(),
   limit: clampedLimit(100, 20),
+  offset: z.coerce.number().int().min(0).default(0),
 });
 
 const StatsQuery = z.object({
@@ -118,7 +119,7 @@ const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
   .get("/search", zv("query", SearchQuery), async (c) => {
-    const { q: rawQ, thing_type, limit } = c.req.valid("query");
+    const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Normalize: insert spaces at letter/digit boundaries ("sb1047" → "sb 1047")
@@ -153,7 +154,8 @@ const thingsApp = new Hono()
           ? sql`ts_rank(${things}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
           : sql`ts_rank(${things}.search_vector, plainto_tsquery('english', ${q})) DESC`
       )
-      .limit(limit);
+      .limit(limit)
+      .offset(offset);
 
     // Phase 2: ILIKE fallback if FTS returned nothing
     if (rows.length === 0) {
@@ -176,7 +178,8 @@ const thingsApp = new Hono()
         .from(things)
         .where(ilikeWhere)
         .orderBy(things.title)
-        .limit(limit);
+        .limit(limit)
+        .offset(offset);
 
       if (fallbackRows.length > 0) {
         const countResult = await db
