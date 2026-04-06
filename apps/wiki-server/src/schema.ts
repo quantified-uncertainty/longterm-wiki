@@ -795,6 +795,52 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
   index("idx_rpd_document_type").on(table.documentType),
 ]);
 
+/**
+ * Type-specific metadata for tabular data sources (~16 resources).
+ *
+ * Follows the resourcePapers/resourceForumPosts/resourcePolicyDocs sub-table pattern.
+ * Stores import-pipeline configuration (column mappings, schemas, verification config)
+ * for structured data sources (CSVs, HTML tables, JSON APIs, spreadsheets).
+ *
+ * The `sourceSlug` preserves the human-readable identifier (e.g., 'coefficient-giving')
+ * from the old `data_sources.id` column. The resource's URL is the fetch URL or a
+ * synthetic URN for URL-less sources ('urn:lw:tabular-source:<slug>').
+ *
+ * Intentionally omits lastSnapshotAt, snapshotRecordCount, latestSnapshotHash —
+ * these are denormalized caches derivable from source_snapshots/resource_content_versions.
+ * The old data_sources table had them; they should not be re-added here.
+ *
+ * Part of: Unify Data Sources into Resources (Discussion #3567, PR 2/5).
+ */
+export const resourceTabularSources = pgTable("resource_tabular_sources", {
+  resourceId: text("resource_id")
+    .primaryKey()
+    .references(() => resources.id, { onDelete: "cascade" }),
+  /** Human-readable slug (was data_sources.id, e.g. 'coefficient-giving') */
+  sourceSlug: text("source_slug").notNull().unique(),
+  /** csv | html_table | json_api | spreadsheet */
+  dataFormat: text("data_format").notNull(),
+  /** direct_download | api_endpoint | web_scrape | manual_export */
+  accessMethod: text("access_method").notNull(),
+  /** grant | personnel | investment | publication | mixed */
+  recordType: text("record_type").notNull(),
+  /** static | weekly | monthly | quarterly | annual */
+  updateFrequency: text("update_frequency"),
+  /** Maps source column names to internal field names */
+  columnMapping: jsonb("column_mapping").$type<Record<string, string>>(),
+  /** Frictionless-inspired field descriptions */
+  sourceSchema: jsonb("source_schema").$type<Record<string, unknown>>(),
+  /** { strategy, matchFields, fuzzyFields, exactFields } */
+  verificationConfig: jsonb("verification_config").$type<Record<string, unknown>>(),
+  /** active | archived | defunct */
+  sourceStatus: text("source_status").notNull().default("active"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index("idx_rts_record_type").on(table.recordType),
+  index("idx_rts_source_status").on(table.sourceStatus),
+]);
+
 // ── Data Sources & Snapshots ──────────────────────────────────────────
 
 /**
@@ -854,6 +900,8 @@ export const sourceSnapshots = pgTable("source_snapshots", {
   id: bigserial("id", { mode: "number" }).primaryKey(),
   dataSourceId: text("data_source_id").notNull()
     .references(() => dataSources.id, { onDelete: "cascade" }),
+  /** Resource ID from unified resources table (filled during migration, nullable during transition) */
+  resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
   snapshotHash: text("snapshot_hash").notNull(),
   recordCount: integer("record_count"),
   /** Raw CSV/HTML/JSON text — the ground truth. Parsed on-demand. */
@@ -867,6 +915,7 @@ export const sourceSnapshots = pgTable("source_snapshots", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (table) => [
   index("idx_ss_data_source").on(table.dataSourceId),
+  index("idx_ss_resource_id").on(table.resourceId),
   index("idx_ss_fetched_at").on(table.fetchedAt),
   uniqueIndex("idx_ss_dedup").on(table.dataSourceId, table.snapshotHash),
 ]);
@@ -1866,6 +1915,11 @@ export const grants = pgTable(
       () => dataSources.id,
       { onDelete: "set null" }
     ),
+    /** Resource ID for the tabular source (filled during migration, nullable during transition) */
+    dataSourceResourceId: text("data_source_resource_id").references(
+      () => resources.id,
+      { onDelete: "set null" }
+    ),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -1884,6 +1938,7 @@ export const grants = pgTable(
     index("idx_grants_status").on(table.status),
     index("idx_grants_program").on(table.programId),
     index("idx_grants_data_source").on(table.dataSourceId),
+    index("idx_grants_data_source_resource").on(table.dataSourceResourceId),
   ]
 );
 

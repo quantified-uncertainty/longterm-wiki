@@ -1121,6 +1121,13 @@
       "when": 1783238400000,
       "tag": "0159_resource_content_versions",
       "breakpoints": true
+    },
+    {
+      "idx": 160,
+      "version": "7",
+      "when": 1783324800000,
+      "tag": "0160_resource_tabular_sources",
+      "breakpoints": true
     }
   ]
 }
