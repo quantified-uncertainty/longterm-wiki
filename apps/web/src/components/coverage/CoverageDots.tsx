@@ -27,7 +27,7 @@ export function CoverageDots({
 }: CoverageDotsProps) {
   const clampedScore = Math.max(1, Math.min(4, Math.round(score)));
   const pct = clampedScore * 25; // 25%, 50%, 75%, 100%
-  const dim = size === "md" ? 9 : 7;
+  const dim = size === "md" ? 7 : 6;
   const ariaLabel = label ?? `Coverage: ${pct}%`;
 
   return (
@@ -41,8 +41,8 @@ export function CoverageDots({
         height: dim,
         background:
           pct >= 100
-            ? "color-mix(in srgb, currentColor 30%, transparent)"
-            : `conic-gradient(color-mix(in srgb, currentColor 30%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 10%, transparent) ${pct}% 100%)`,
+            ? "color-mix(in srgb, currentColor 45%, transparent)"
+            : `conic-gradient(color-mix(in srgb, currentColor 45%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 12%, transparent) ${pct}% 100%)`,
       }}
     />
   );
