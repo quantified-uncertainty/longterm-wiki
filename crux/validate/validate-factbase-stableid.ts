@@ -39,7 +39,7 @@ const SUPPRESS_COMMENT = 'factbase-slug-ok';
  * Skips:   getKBLatest("sid_abc123", ...) or getKBLatest(entity.id, ...)
  */
 const FACTBASE_CALL_PATTERN =
-  /(?:getKBLatest|getKBFacts|getKBRecords|getFactBaseLatest|getFactBaseFacts|getFactBaseRecords)\(\s*"(?!sid_)([^"]+)"/;
+  /(?:getKBLatest|getKBFacts|getKBRecords|getFactBaseLatest|getFactBaseFacts|getFactBaseRecords)\(\s*(['"])(?!sid_)([^'"]+)\1/;
 
 interface Violation {
   file: string;
@@ -75,7 +75,8 @@ function collectTsxFiles(dir: string): string[] {
         (entry.endsWith('.ts') || entry.endsWith('.tsx')) &&
         !entry.endsWith('.test.ts') &&
         !entry.endsWith('.test.tsx') &&
-        !entry.endsWith('.spec.ts')
+        !entry.endsWith('.spec.ts') &&
+        !entry.endsWith('.spec.tsx')
       ) {
         results.push(fullPath);
       }

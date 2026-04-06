@@ -160,6 +160,6 @@ test.describe("Render audit — critical data tables", () => {
     // The table should contain stakeholder data
     expect(text).toContain("Stakeholder");
     // Valuation should be formatted (e.g., "$380B"), not raw
-    expect(text).toMatch(/\$\d+[BMT]/);
+    expect(text).toMatch(/\$\d+(?:\.\d+)?[BMT]/);
   });
 });
