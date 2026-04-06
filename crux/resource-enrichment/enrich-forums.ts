@@ -197,6 +197,23 @@ export async function enrichForumsCommand(
         console.error(`  ✗ Batch ${Math.floor(i / 200) + 1} failed: ${result.message}`);
       }
     }
+
+    // Also update enrichment_status on the base resource
+    const statusBatch = forumBatch.map((p) => ({
+      id: p.resourceId,
+      url: '', // will be COALESCED away
+      enrichmentStatus: 'enriched',
+    }));
+
+    for (let i = 0; i < statusBatch.length; i += 200) {
+      const batch = statusBatch.slice(i, i + 200);
+      await apiRequest(
+        'POST',
+        '/api/resources/batch',
+        { items: batch.map((b) => ({ ...b, url: resources.find((r) => r.id === b.id)?.url || '' })) },
+        30000,
+      );
+    }
   }
 
   return { exitCode: 0, output: `Enriched ${enriched} forum posts` };

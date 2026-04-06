@@ -121,7 +121,7 @@ function formatTimestamp(ts: string | null): string {
 }
 
 function ChildrenSummary({ count, byType }: { count: number; byType: Record<string, number> }) {
-  if (count === 0) return <span className="text-muted-foreground">\u2014</span>;
+  if (count === 0) return <span className="text-muted-foreground">{"\u2014"}</span>;
 
   const entries = Object.entries(byType).sort(([, a], [, b]) => b - a);
   return (

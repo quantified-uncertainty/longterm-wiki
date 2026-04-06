@@ -1799,6 +1799,7 @@ export const personnel = pgTable(
     appointedBy: text("appointed_by"), // board-seats only
     background: text("background"), // board-seats only
     source: text("source"), // URL confirming the role
+    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -1858,6 +1859,7 @@ export const grants = pgTable(
     date: text("date"), // announcement/start date (YYYY-MM)
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
+    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     programId: text("program_id").references(
       () => fundingPrograms.id,
@@ -1926,6 +1928,7 @@ export const fundingRounds = pgTable(
     /** Display name fallback when lead investor doesn't have an entity. */
     leadInvestorDisplayName: text("lead_investor_display_name"),
     source: text("source"), // URL to announcement
+    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -1983,6 +1986,7 @@ export const investments = pgTable(
     role: text("role"), // lead | participant | founder
     conditions: text("conditions"), // investment conditions
     source: text("source"), // URL to source
+    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -2037,6 +2041,7 @@ export const equityPositions = pgTable(
     stakeLow: numeric("stake_low"), // parsed low bound of stake
     stakeHigh: numeric("stake_high"), // parsed high bound of stake
     source: text("source"), // URL to source
+    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     asOf: text("as_of"), // when this position was valid from (YYYY or YYYY-MM)
     validEnd: text("valid_end"), // when this position expired

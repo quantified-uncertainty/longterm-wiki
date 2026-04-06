@@ -55,3 +55,5 @@ Before committing, re-read the diff and actively look for problems:
 | Client-rendered display (stat cards, tables) | `apps/web/e2e/render-audit.spec.ts` — add page to test list + assertion |
 | Component formatting logic | Component `__tests__/*.test.tsx` — add test with exact input that caused the bug |
 | Data-layer display (YAML/MDX) | `crux/validate/validate-display-formatting.ts` — add pattern to validator |
+
+11. **UI changes must be verified with Playwright before shipping**: Don't ask the user to manually check pages. Run Playwright e2e tests or write ad-hoc checks. See `.claude/rules/pre-pr-verification.md` section 4 for commands. At minimum, run `cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test e2e/render-audit.spec.ts` to catch broken renders.

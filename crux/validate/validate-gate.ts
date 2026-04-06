@@ -341,6 +341,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'dot-position',
+    name: 'Dot indicator position (SourceCheckDot / RecordStatusDots not in first column)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-dot-position.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: dots in the first column confuse visual scanning. The validator
+    // checks both HTML <td> tables and TanStack ColumnDef arrays.
+  },
+  {
     id: 'actions-yaml',
     name: 'GitHub Actions workflow YAML (actionlint)',
     command: 'npx',
