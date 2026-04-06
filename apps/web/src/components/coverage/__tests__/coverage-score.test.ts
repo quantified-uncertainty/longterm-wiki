@@ -38,11 +38,11 @@ describe("computeOrgCoverage", () => {
   });
 
   it("counts people thresholds correctly", () => {
-    // 2 people = 0 signals from people
+    // 2 people = 0 signals (threshold is 10)
     expect(computeOrgCoverage({ peopleCount: 2 })).toBe(1);
-    // 3 people = 1 signal, + foundedDate = 2 signals
-    expect(computeOrgCoverage({ peopleCount: 3, foundedDate: "2020" })).toBe(2);
-    // 10 people = 2 signals, + foundedDate = 3 signals (still score 2)
+    // 3 people = 0 signals (below threshold), foundedDate = 1 signal → score 1
+    expect(computeOrgCoverage({ peopleCount: 3, foundedDate: "2020" })).toBe(1);
+    // 10 people = 1 signal, foundedDate = 1 signal → 2 signals → score 2
     expect(computeOrgCoverage({ peopleCount: 10, foundedDate: "2020" })).toBe(2);
   });
 });
@@ -75,9 +75,16 @@ describe("computeAiModelCoverage", () => {
     expect(computeAiModelCoverage({})).toBe(1);
   });
 
-  it("returns 2 for model with 3 basic fields", () => {
+  it("returns 1 for model with only context window (developer+releaseDate are baseline)", () => {
     expect(computeAiModelCoverage({
       developer: "anthropic", releaseDate: "2025-01", contextWindow: 200000,
+    })).toBe(1);
+  });
+
+  it("returns 2 for model with 2 enrichment fields", () => {
+    expect(computeAiModelCoverage({
+      developer: "anthropic", releaseDate: "2025-01", contextWindow: 200000,
+      inputPrice: 3,
     })).toBe(2);
   });
 
@@ -134,9 +141,9 @@ describe("computeGenericCoverage", () => {
     })).toBe(4);
   });
 
-  it("caps filledFieldCount at 2", () => {
-    // filledFieldCount=5 should contribute at most 2 signals
-    expect(computeGenericCoverage({ filledFieldCount: 5 })).toBe(2);
+  it("caps filledFieldCount at 3", () => {
+    // filledFieldCount=5 should contribute at most 3 signals → score 3
+    expect(computeGenericCoverage({ filledFieldCount: 5 })).toBe(3);
   });
 });
 
@@ -145,8 +152,12 @@ describe("computeProjectCoverage", () => {
     expect(computeProjectCoverage({})).toBe(1);
   });
 
-  it("returns 2 for project with status + org", () => {
-    expect(computeProjectCoverage({ status: "active", orgName: "MIRI" })).toBe(2);
+  it("returns 1 for project with only status (orgName is baseline)", () => {
+    expect(computeProjectCoverage({ status: "active", orgName: "MIRI" })).toBe(1);
+  });
+
+  it("returns 2 for project with status + description", () => {
+    expect(computeProjectCoverage({ status: "active", description: "A tool" })).toBe(2);
   });
 
   it("returns 3 for project with 3+ fields", () => {
@@ -198,12 +209,16 @@ describe("computeGrantCoverage", () => {
     expect(computeGrantCoverage({})).toBe(1);
   });
 
-  it("returns 2 for grant with amount + recipient", () => {
-    expect(computeGrantCoverage({ amount: 100000, recipient: "MIRI" })).toBe(2);
+  it("returns 1 for grant with only baseline fields (amount + recipient)", () => {
+    expect(computeGrantCoverage({ amount: 100000, recipient: "MIRI" })).toBe(1);
   });
 
-  it("returns 3 for grant with 3+ fields", () => {
-    expect(computeGrantCoverage({ amount: 100000, recipient: "MIRI", date: "2024-01" })).toBe(3);
+  it("returns 1 for grant with 1 enrichment field (date)", () => {
+    expect(computeGrantCoverage({ amount: 100000, recipient: "MIRI", date: "2024-01" })).toBe(1);
+  });
+
+  it("returns 2 for grant with 2 enrichment fields", () => {
+    expect(computeGrantCoverage({ amount: 100000, recipient: "MIRI", date: "2024-01", program: "AI Safety" })).toBe(2);
   });
 
   it("returns 4 for comprehensive grant", () => {
@@ -219,10 +234,10 @@ describe("computeFundingProgramCoverage", () => {
     expect(computeFundingProgramCoverage({})).toBe(1);
   });
 
-  it("returns 3 for program with budget + type + deadline", () => {
+  it("returns 2 for program with budget + deadline (programType is baseline)", () => {
     expect(computeFundingProgramCoverage({
       totalBudget: 1e6, programType: "grant-round", deadline: "2025-06",
-    })).toBe(3);
+    })).toBe(2);
   });
 
   it("returns 4 for comprehensive program", () => {
@@ -238,8 +253,12 @@ describe("computeFundingRoundCoverage", () => {
     expect(computeFundingRoundCoverage({})).toBe(1);
   });
 
-  it("returns 2 for round with raised + date", () => {
-    expect(computeFundingRoundCoverage({ raised: 2e9, date: "2023-10" })).toBe(2);
+  it("returns 1 for round with only date (raised is baseline)", () => {
+    expect(computeFundingRoundCoverage({ raised: 2e9, date: "2023-10" })).toBe(1);
+  });
+
+  it("returns 2 for round with date + valuation", () => {
+    expect(computeFundingRoundCoverage({ raised: 2e9, date: "2023-10", valuation: 18e9 })).toBe(2);
   });
 
   it("returns 4 for comprehensive round", () => {

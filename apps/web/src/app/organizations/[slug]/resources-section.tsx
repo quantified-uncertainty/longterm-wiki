@@ -30,6 +30,8 @@ import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 import { isDeadFetchStatus } from "@wiki-server/api-types";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
 const DEFAULT_COLOR = RESOURCE_TYPE_COLORS._default;
@@ -278,6 +280,27 @@ function makeColumns(opts: {
           {row.original.citingPageCount || "-"}
         </span>
       ),
+    },
+    {
+      id: "coverage",
+      header: "",
+      cell: ({ row }) => {
+        const r = row.original;
+        const filledFieldCount =
+          (r.publishedDate ? 1 : 0) +
+          (r.publicationName ? 1 : 0) +
+          (r.credibility != null ? 1 : 0);
+        const score = computeGenericCoverage({
+          description: r.summary,
+          filledFieldCount,
+        });
+        return (
+          <div className="flex justify-end">
+            <CoverageDots score={score} size="sm" />
+          </div>
+        );
+      },
+      enableSorting: false,
     },
     {
       id: "link",

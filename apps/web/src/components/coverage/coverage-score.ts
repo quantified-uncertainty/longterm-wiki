@@ -2,14 +2,18 @@
  * Entity-type-aware coverage scoring.
  *
  * Each entity type has a scoring function that examines the available data
- * and returns a 1-4 score reflecting content depth. The scoring considers
- * structured data fields, relationship counts, and wiki page presence.
+ * and returns a 1-4 score reflecting content depth. Scoring only counts
+ * fields that represent genuine enrichment beyond baseline data — fields
+ * that are almost always present (name, type, etc.) are NOT counted.
  *
  * Score semantics:
- *   1 = Stub — minimal data, just a name and type
- *   2 = Basic — a few key fields populated
- *   3 = Moderate — substantial data across multiple dimensions
- *   4 = Comprehensive — rich data with relationships and content
+ *   1 = Stub — only baseline data (name, type)
+ *   2 = Basic — 1-2 enrichment fields populated
+ *   3 = Moderate — substantial enrichment across multiple dimensions
+ *   4 = Comprehensive — most optional fields filled, rich data
+ *
+ * Calibration principle: a "typical" record should score 2, not 3.
+ * Score 3 should mean "notably well-documented." Score 4 should be rare.
  */
 
 // ── Organization scoring ────────────────────────────────────────────
@@ -25,27 +29,21 @@ export interface OrgCoverageInput {
 }
 
 export function computeOrgCoverage(row: OrgCoverageInput): number {
+  // Baseline: name + type (always present, not counted)
+  // Enrichment signals: financial metrics, people tracking, wiki page
   let signals = 0;
 
-  // Financial metrics (0-4 signals)
   if (row.revenueNum != null) signals++;
   if (row.valuationNum != null) signals++;
   if (row.headcount != null) signals++;
   if (row.totalFundingNum != null) signals++;
-
-  // Basic metadata
   if (row.foundedDate) signals++;
-
-  // Relationships
-  if (row.peopleCount != null && row.peopleCount >= 3) signals++;
   if (row.peopleCount != null && row.peopleCount >= 10) signals++;
-
-  // Wiki page
   if (row.wikiPageId) signals++;
 
-  // Map signal count to 1-4 score
-  if (signals >= 6) return 4;
-  if (signals >= 4) return 3;
+  // 7 possible. Typical org has foundedDate + maybe 1 financial = 2.
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
   if (signals >= 2) return 2;
   return 1;
 }
@@ -64,20 +62,23 @@ export interface PersonCoverageInput {
 }
 
 export function computePersonCoverage(row: PersonCoverageInput): number {
+  // Baseline: name (always present, not counted)
+  // Enrichment: role, employer, birth year, net worth, career depth,
+  //   positions, publications, wiki page
   let signals = 0;
 
   if (row.role) signals++;
   if (row.employerId) signals++;
   if (row.bornYear != null) signals++;
   if (row.netWorthNum != null) signals++;
-  if ((row.careerHistoryCount ?? 0) >= 2) signals++;
-  if ((row.careerHistoryCount ?? 0) >= 5) signals++;
+  if ((row.careerHistoryCount ?? 0) >= 3) signals++;
   if ((row.positionCount ?? 0) >= 1) signals++;
   if ((row.publicationCount ?? 0) >= 1) signals++;
   if (row.wikiPageId) signals++;
 
-  if (signals >= 6) return 4;
-  if (signals >= 4) return 3;
+  // 8 possible. Typical person has role + employer = 2.
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
   if (signals >= 2) return 2;
   return 1;
 }
@@ -97,21 +98,21 @@ export interface AiModelCoverageInput {
 }
 
 export function computeAiModelCoverage(row: AiModelCoverageInput): number {
+  // Baseline: developer + releaseDate (almost always present, not counted)
+  // Enrichment: pricing, context window, params, safety level, benchmarks, wiki
   let signals = 0;
 
-  if (row.developer) signals++;
-  if (row.releaseDate) signals++;
   if (row.inputPrice != null || row.outputPrice != null) signals++;
   if (row.contextWindow != null) signals++;
   if (row.parameterCount) signals++;
   if (row.safetyLevel) signals++;
-  if ((row.benchmarkCount ?? 0) >= 1) signals++;
   if ((row.benchmarkCount ?? 0) >= 3) signals++;
   if (row.wikiId) signals++;
 
-  if (signals >= 7) return 4;
-  if (signals >= 5) return 3;
-  if (signals >= 3) return 2;
+  // 6 possible. Typical model has pricing + context = 2.
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
   return 1;
 }
 
@@ -130,21 +131,22 @@ export interface LegislationCoverageInput {
 }
 
 export function computeLegislationCoverage(row: LegislationCoverageInput): number {
+  // Baseline: title + policyStatus + jurisdiction (common, not counted)
+  // Enrichment: introduced date, author, bill number, full text, description, tags, wiki
   let signals = 0;
 
   if (row.introduced) signals++;
-  if (row.policyStatus) signals++;
   if (row.author) signals++;
-  if (row.jurisdiction) signals++;
   if (row.billNumber) signals++;
   if (row.fullTextUrl) signals++;
   if (row.description) signals++;
   if ((row.tags?.length ?? 0) >= 1) signals++;
   if (row.wikiId) signals++;
 
-  if (signals >= 7) return 4;
-  if (signals >= 5) return 3;
-  if (signals >= 3) return 2;
+  // 7 possible. Typical legislation has introduced + description = 2.
+  if (signals >= 5) return 4;
+  if (signals >= 3) return 3;
+  if (signals >= 2) return 2;
   return 1;
 }
 
@@ -159,13 +161,17 @@ export interface GenericCoverageInput {
 }
 
 export function computeGenericCoverage(row: GenericCoverageInput): number {
+  // Generic scorer for record types without a specialized function.
+  // filledFieldCount should only count genuinely optional enrichment fields,
+  // NOT baseline fields like name/type that are always present.
   let signals = 0;
 
   if (row.description) signals++;
   if ((row.tags?.length ?? 0) >= 1) signals++;
   if (row.wikiId) signals++;
-  signals += Math.min(row.filledFieldCount ?? 0, 2);
+  signals += Math.min(row.filledFieldCount ?? 0, 3);
 
+  // 6 possible (3 + filledFieldCount capped at 3). Typical record has 1-2.
   if (signals >= 5) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
@@ -184,16 +190,18 @@ export interface ProjectCoverageInput {
 }
 
 export function computeProjectCoverage(row: ProjectCoverageInput): number {
+  // Baseline: name + orgName (common, not counted)
+  // Enrichment: description, status, website, clusters, wiki
   let signals = 0;
 
   if (row.description) signals++;
   if (row.status) signals++;
   if (row.website) signals++;
-  if (row.orgName) signals++;
   if ((row.clusters?.length ?? 0) >= 1) signals++;
   if (row.wikiId) signals++;
 
-  if (signals >= 5) return 4;
+  // 5 possible. Typical project has description = 1.
+  if (signals >= 4) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
   return 1;
@@ -241,16 +249,18 @@ export interface GrantCoverageInput {
 }
 
 export function computeGrantCoverage(row: GrantCoverageInput): number {
+  // Baseline: recipient + amount (almost always present, not counted)
+  // Enrichment: date, program, status, source
   let signals = 0;
 
-  if (row.amount != null) signals++;
-  if (row.recipient) signals++;
   if (row.date) signals++;
   if (row.program) signals++;
-  if (row.status) signals++;
   if (row.source) signals++;
+  // Status is very rarely populated (<10%), so it's a strong signal when present
+  if (row.status) signals++;
 
-  if (signals >= 5) return 4;
+  // 4 possible. Typical grant has date = 1.
+  if (signals >= 4) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
   return 1;
@@ -268,16 +278,18 @@ export interface FundingProgramCoverageInput {
 }
 
 export function computeFundingProgramCoverage(row: FundingProgramCoverageInput): number {
+  // Baseline: name + programType (almost always present, not counted)
+  // Enrichment: budget, deadline, status, description, applicationUrl
   let signals = 0;
 
   if (row.totalBudget != null) signals++;
-  if (row.programType) signals++;
   if (row.deadline) signals++;
   if (row.status) signals++;
   if (row.description) signals++;
   if (row.applicationUrl) signals++;
 
-  if (signals >= 5) return 4;
+  // 5 possible. Typical program has maybe status = 1.
+  if (signals >= 4) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
   return 1;
@@ -294,14 +306,16 @@ export interface FundingRoundCoverageInput {
 }
 
 export function computeFundingRoundCoverage(row: FundingRoundCoverageInput): number {
+  // Baseline: name + raised (almost always present, not counted)
+  // Enrichment: valuation, date, instrument, lead investor
   let signals = 0;
 
-  if (row.raised != null) signals++;
   if (row.valuation != null) signals++;
   if (row.date) signals++;
   if (row.instrument) signals++;
   if (row.leadInvestorName) signals++;
 
+  // 4 possible. Typical round has date = 1.
   if (signals >= 4) return 4;
   if (signals >= 3) return 3;
   if (signals >= 2) return 2;
@@ -318,16 +332,18 @@ export interface DivisionCoverageInput {
 }
 
 export function computeDivisionCoverage(row: DivisionCoverageInput): number {
+  // Baseline: name + divisionType (almost always present, not counted)
+  // Enrichment: status, has detailed data (lead/source), has detail page
   let signals = 0;
 
-  if (row.divisionType) signals++;
   if (row.status) signals++;
   if (row.hasData) signals++;
   if (row.href) signals++;
 
-  if (signals >= 4) return 4;
-  if (signals >= 3) return 3;
-  if (signals >= 2) return 2;
+  // 3 possible. Typical division has status = 1.
+  if (signals >= 3) return 4;
+  if (signals >= 2) return 3;
+  if (signals >= 1) return 2;
   return 1;
 }
 
@@ -367,10 +383,7 @@ export function getOrgSignals(row: OrgCoverageInput): string[] {
   if (row.headcount != null) signals.push("Headcount");
   if (row.totalFundingNum != null) signals.push("Total funding");
   if (row.foundedDate) signals.push("Founded date");
-  if (row.peopleCount != null && row.peopleCount >= 3) {
-    signals.push(`${row.peopleCount} people tracked`);
-    if (row.peopleCount >= 10) signals.push("10+ people (deep coverage)");
-  }
+  if (row.peopleCount != null && row.peopleCount >= 10) signals.push("10+ people tracked");
   if (row.wikiPageId) signals.push("Wiki page");
   return signals;
 }
@@ -382,10 +395,7 @@ export function getPersonSignals(row: PersonCoverageInput): string[] {
   if (row.employerId) signals.push("Employer");
   if (row.bornYear != null) signals.push("Birth year");
   if (row.netWorthNum != null) signals.push("Net worth");
-  if ((row.careerHistoryCount ?? 0) >= 2) {
-    signals.push(`${row.careerHistoryCount} career entries`);
-    if ((row.careerHistoryCount ?? 0) >= 5) signals.push("5+ career entries (deep)");
-  }
+  if ((row.careerHistoryCount ?? 0) >= 3) signals.push(`${row.careerHistoryCount} career entries`);
   if ((row.positionCount ?? 0) >= 1) signals.push(`${row.positionCount} positions`);
   if ((row.publicationCount ?? 0) >= 1) signals.push(`${row.publicationCount} publications`);
   if (row.wikiPageId) signals.push("Wiki page");

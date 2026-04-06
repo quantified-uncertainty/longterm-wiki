@@ -95,7 +95,7 @@ export function SourceCheckDot({
   className = "",
 }: SourceCheckDotProps) {
   const config = SOURCE_CHECK_STATUS_CONFIG[status];
-  const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
+  const dotSize = size === "md" ? "w-[7px] h-[7px]" : "w-1.5 h-1.5";
   const tooltip = buildTooltip({
     status,
     lastChecked,
