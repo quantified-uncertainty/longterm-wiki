@@ -12,6 +12,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/data", () => ({
   getTypedEntities: vi.fn(),
+  getTypedEntityById: vi.fn(),
   getEntityHref: vi.fn(),
   getPageById: vi.fn(),
   getPageCoverageItems: vi.fn(),

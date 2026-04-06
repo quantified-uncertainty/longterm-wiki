@@ -48,6 +48,12 @@ interface DisplayNameEntry {
   entityType: string;
 }
 
+interface DisplayNameEntry {
+  title: string;
+  slug: string;
+  entityType: string;
+}
+
 interface EntityProfileData {
   entity: Record<string, unknown>;
   sections: Section[];
@@ -481,13 +487,13 @@ function JsonValue({ value }: { value: unknown }) {
 function ProfileSection({
   section,
   verdicts,
-  defaultExpanded,
   displayNames,
+  defaultExpanded,
 }: {
   section: Section;
   verdicts: Record<string, { verdict: string; confidence: number | null }>;
-  defaultExpanded: boolean;
   displayNames: Record<string, DisplayNameEntry>;
+  defaultExpanded: boolean;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [showSchema, setShowSchema] = useState(false);
@@ -1313,8 +1319,8 @@ export function EntityProfileViewer({
                   key={section.key}
                   section={section}
                   verdicts={data.verdicts}
-                  defaultExpanded={section.total > 0 && section.total <= 50}
                   displayNames={data.displayNames ?? {}}
+                  defaultExpanded={section.total > 0 && section.total <= 50}
                 />
               ))}
             {hiddenCount > 0 && !showAllSections && (
