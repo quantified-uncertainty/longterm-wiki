@@ -161,6 +161,11 @@ const SCRIPTS = {
     description: 'Detect serialization bugs and unescaped MDX in entity data',
     passthrough: ['ci'],
   },
+  'dot-position': {
+    script: 'validate/validate-dot-position.ts',
+    description: 'Check that SourceCheckDot / RecordStatusDots are never the first column',
+    passthrough: [],
+  },
   'to-rdjsonl': {
     script: 'validate/to-rdjsonl.ts',
     description: 'Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)',
