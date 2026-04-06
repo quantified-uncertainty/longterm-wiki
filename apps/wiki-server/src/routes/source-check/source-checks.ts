@@ -1677,6 +1677,74 @@ const sourceChecksApp = new Hono()
       })),
       total,
     });
+  })
+
+  // ---- GET /entity-summary ----
+  // Returns per-entity aggregated source-check verdict counts in a single query.
+  // Used by the entities dashboard to show verification columns.
+  .get("/entity-summary", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = (await db.execute(sql`
+      WITH verdict_counts AS (
+        SELECT
+          entity_id,
+          COUNT(*) FILTER (WHERE verdict = 'confirmed')   AS confirmed,
+          COUNT(*) FILTER (WHERE verdict = 'contradicted') AS contradicted,
+          COUNT(*) FILTER (WHERE verdict = 'outdated')     AS outdated,
+          COUNT(*) FILTER (WHERE verdict = 'partial')      AS partial_count,
+          COUNT(*) FILTER (WHERE verdict = 'unverifiable') AS unverifiable,
+          COUNT(*) FILTER (WHERE verdict = 'unchecked')    AS unchecked,
+          COUNT(*)                                         AS total_verdicts,
+          COALESCE(AVG(confidence), 0)                     AS avg_confidence
+        FROM source_check_verdicts
+        WHERE entity_id IS NOT NULL
+        GROUP BY entity_id
+      ),
+      record_counts AS (
+        SELECT
+          t2.source_id AS entity_id,
+          COUNT(t1.id) AS total_records
+        FROM things t1
+        JOIN things t2 ON t1.parent_thing_id = t2.id
+        WHERE t2.thing_type = 'entity'
+        GROUP BY t2.source_id
+      )
+      all_entities AS (
+        SELECT entity_id FROM verdict_counts
+        UNION
+        SELECT entity_id FROM record_counts
+      )
+      SELECT
+        e.entity_id,
+        COALESCE(vc.confirmed, 0) AS confirmed,
+        COALESCE(vc.contradicted, 0) AS contradicted,
+        COALESCE(vc.outdated, 0) AS outdated,
+        COALESCE(vc.partial_count, 0) AS partial_count,
+        COALESCE(vc.unverifiable, 0) AS unverifiable,
+        COALESCE(vc.unchecked, 0) AS unchecked,
+        COALESCE(vc.total_verdicts, 0) AS total_verdicts,
+        COALESCE(vc.avg_confidence, 0) AS avg_confidence,
+        COALESCE(rc.total_records, 0) AS total_records
+      FROM all_entities e
+      LEFT JOIN verdict_counts vc ON vc.entity_id = e.entity_id
+      LEFT JOIN record_counts rc ON rc.entity_id = e.entity_id
+    `)) as Record<string, unknown>[];
+
+    const summaries = rows.map((r) => ({
+      entityId: String(r.entity_id),
+      confirmed: Number(r.confirmed),
+      contradicted: Number(r.contradicted),
+      outdated: Number(r.outdated),
+      partial: Number(r.partial_count),
+      unverifiable: Number(r.unverifiable),
+      unchecked: Number(r.unchecked),
+      totalVerdicts: Number(r.total_verdicts),
+      avgConfidence: Number(Number(r.avg_confidence).toFixed(3)),
+      totalRecords: Number(r.total_records),
+    }));
+
+    return c.json({ summaries });
   });
 
 // ---- Exports ----

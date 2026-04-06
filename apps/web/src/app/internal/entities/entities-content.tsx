@@ -1,4 +1,5 @@
-import { getTypedEntities, getEntityHref, getPageById, getPageCoverageItems, getPageRankings } from "@/data";
+import { getTypedEntities, getEntityHref, getPageById, getPageCoverageItems, getPageRankings, getIdRegistry } from "@/data";
+import { fetchDetailed, type RpcEntitySummaryRow } from "@lib/wiki-server";
 import { EntitiesDataTable } from "./entities-data-table";
 import type { UnifiedEntityRow } from "./entities-data-table";
 
@@ -38,7 +39,29 @@ function computePriorityScore(row: {
   return Math.round(importance * qualityDeficit * stalenessFactor * riskFactor * 1000) / 1000;
 }
 
-export function EntitiesContent() {
+/** Fetch per-entity source-check summary from wiki-server. Returns a map keyed by entity slug. */
+async function loadSourceCheckSummary(): Promise<Map<string, RpcEntitySummaryRow>> {
+  const result = await fetchDetailed<{ summaries: RpcEntitySummaryRow[] }>(
+    "/api/source-checks/entity-summary",
+    { revalidate: 300 }
+  );
+
+  if (!result.ok) return new Map();
+
+  const registry = getIdRegistry();
+  const stableIdToSlug = registry.stableIdToSlug ?? registry.byStableId ?? {};
+  const map = new Map<string, RpcEntitySummaryRow>();
+
+  for (const row of result.data.summaries) {
+    // entityId may be a stableId or a slug — resolve to slug for lookup
+    const slug = stableIdToSlug[row.entityId] ?? row.entityId;
+    map.set(slug, row);
+  }
+
+  return map;
+}
+
+export async function EntitiesContent() {
   const entities = getTypedEntities();
   const coverageItems = getPageCoverageItems();
   const rankings = getPageRankings();
@@ -47,17 +70,34 @@ export function EntitiesContent() {
   const coverageById = new Map(coverageItems.map((c) => [c.id, c]));
   const rankingById = new Map(rankings.map((r) => [r.id, r]));
 
+  // Fetch source-check verification data (graceful degradation if unavailable)
+  const scSummary = await loadSourceCheckSummary();
+
   const rows: UnifiedEntityRow[] = entities.map((e) => {
     const page = getPageById(e.id);
     const cov = coverageById.get(e.id);
     const rank = rankingById.get(e.id);
     const href = getEntityHref(e.id);
+    const sc = scSummary.get(e.id);
 
     const quality = cov?.quality ?? rank?.quality ?? null;
     const readerImportance = cov?.readerImportance ?? rank?.readerImportance ?? null;
     const researchImportance = cov?.researchImportance ?? rank?.researchImportance ?? null;
     const lastUpdated = cov?.lastUpdated ?? (e.lastUpdated ?? null);
     const riskLevel = cov?.riskLevel ?? null;
+
+    // Compute derived source-check metrics
+    let scAccuracyRate: number | null = null;
+    let scVerificationCoverage: number | null = null;
+    if (sc) {
+      const checkedDenom = sc.confirmed + sc.contradicted + sc.outdated + sc.partial + sc.unverifiable;
+      scAccuracyRate = checkedDenom > 0
+        ? Math.round((sc.confirmed / checkedDenom) * 1000) / 1000
+        : null;
+      scVerificationCoverage = sc.totalRecords > 0
+        ? Math.round((sc.totalVerdicts / sc.totalRecords) * 1000) / 1000
+        : null;
+    }
 
     return {
       // Entity core
@@ -137,12 +177,24 @@ export function EntitiesContent() {
       accuracyActual: cov?.accuracyActual ?? null,
       accuracyTotal: cov?.accuracyTotal ?? null,
       accuracy: cov?.accuracy ?? null,
+      // Source-check verification
+      scConfirmed: sc?.confirmed ?? null,
+      scContradicted: sc?.contradicted ?? null,
+      scOutdated: sc?.outdated ?? null,
+      scPartial: sc?.partial ?? null,
+      scUnverifiable: sc?.unverifiable ?? null,
+      scUnchecked: sc?.unchecked ?? null,
+      scTotalVerdicts: sc?.totalVerdicts ?? null,
+      scAvgConfidence: sc?.avgConfidence ?? null,
+      scAccuracyRate,
+      scVerificationCoverage,
     };
   });
 
   const withPages = rows.filter((r) => r.hasPage).length;
   const withImportance = rows.filter((r) => r.readerImportance != null).length;
   const withCoverage = rows.filter((r) => r.coverageScore != null).length;
+  const withVerification = rows.filter((r) => r.scTotalVerdicts != null && r.scTotalVerdicts > 0).length;
 
   return (
     <>
@@ -153,10 +205,10 @@ export function EntitiesContent() {
         <span className="font-medium text-foreground">{withImportance}</span>{" "}
         have importance scores,{" "}
         <span className="font-medium text-foreground">{withCoverage}</span>{" "}
-        have coverage data. Use <strong>preset buttons</strong> to switch views.
-        The <strong>Overview</strong> preset defaults to pages with content; use{" "}
-        <strong>Content Authoring</strong> to focus on coverage gaps, stale
-        content, and citation problems.
+        have coverage data,{" "}
+        <span className="font-medium text-foreground">{withVerification}</span>{" "}
+        have source-check verdicts. Use <strong>preset buttons</strong> to switch views.
+        The <strong>Verification</strong> preset shows source-check accuracy and coverage.
       </p>
       <EntitiesDataTable entities={rows} />
     </>
