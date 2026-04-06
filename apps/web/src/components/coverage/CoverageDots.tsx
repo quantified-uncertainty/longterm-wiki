@@ -44,8 +44,8 @@ export function CoverageDots({
           height: dim,
           background:
             pct >= 100
-              ? "color-mix(in srgb, currentColor 45%, transparent)"
-              : `conic-gradient(color-mix(in srgb, currentColor 45%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 12%, transparent) ${pct}% 100%)`,
+              ? "color-mix(in srgb, currentColor 60%, transparent)"
+              : `conic-gradient(color-mix(in srgb, currentColor 60%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 10%, transparent) ${pct}% 100%)`,
         }}
       />
     </span>
