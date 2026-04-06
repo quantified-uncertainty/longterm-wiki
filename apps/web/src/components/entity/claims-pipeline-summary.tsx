@@ -124,10 +124,10 @@ export function ClaimsPipelineSummary({ entityId }: { entityId: string }) {
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">Claims Pipeline</h3>
         <a
-          href={`/wiki/E2200?tab=claims`}
+          href="/wiki/E2200"
           className="text-xs text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
         >
-          View all claims <ExternalLink className="h-3 w-3" />
+          Source Checks <ExternalLink className="h-3 w-3" />
         </a>
       </div>
 

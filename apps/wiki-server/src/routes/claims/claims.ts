@@ -15,7 +15,6 @@ import {
   parseJsonBody,
   dbError,
   zv,
-  clampedLimit,
 } from "../shared/utils.js";
 import {
   ProposeClaimsSchema,
@@ -619,6 +618,7 @@ const claimsApp = new Hono()
       FROM claim_record_links crl
       JOIN proposed_claims pc ON pc.id = crl.claim_id
       WHERE pc.entity_id = ${entityId}
+      LIMIT 500
     `;
 
     return c.json({

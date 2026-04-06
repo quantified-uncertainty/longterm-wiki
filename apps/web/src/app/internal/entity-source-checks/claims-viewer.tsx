@@ -5,7 +5,6 @@ import {
   useReactTable,
   getCoreRowModel,
   getSortedRowModel,
-  getPaginationRowModel,
   getExpandedRowModel,
   type SortingState,
   type ExpandedState,
@@ -321,8 +320,8 @@ export function ClaimsViewer() {
         if (res.ok) {
           setStats(await res.json());
         }
-      } catch {
-        // Stats are non-critical
+      } catch (e) {
+        console.warn(`[claims-viewer] Failed to load stats: ${e instanceof Error ? e.message : String(e)}`);
       }
     })();
   }, []);
@@ -358,10 +357,10 @@ export function ClaimsViewer() {
     onExpandedChange: setExpanded,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     getRowCanExpand: () => true,
-    initialState: { pagination: { pageSize: PAGE_SIZE } },
+    manualPagination: true,
+    pageCount: Math.ceil(total / PAGE_SIZE),
   });
 
   const handleStatusChange = (status: string) => {

@@ -320,6 +320,34 @@ async function queryVerdictsByEntity(
   };
 }
 
+// ---- Claim provenance helper ----
+
+async function fetchClaimProvenance(
+  db: ReturnType<typeof getDrizzleDb>,
+  recordType: string,
+  recordId: string,
+) {
+  const rows = (await db.execute(
+    sql`SELECT pc.id::int, pc.claim_text, pc.status, pc.verdict_confidence,
+               pc.source_url, pc.checker_model, pc.verified_at
+        FROM claim_record_links crl
+        JOIN proposed_claims pc ON pc.id = crl.claim_id
+        WHERE crl.record_type = ${recordType} AND crl.record_id = ${recordId}
+        ORDER BY pc.verified_at DESC NULLS LAST
+        LIMIT 50`
+  )) as Array<{ id: number; claim_text: string; status: string; verdict_confidence: number | null; source_url: string; checker_model: string | null; verified_at: string | null }>;
+
+  return rows.map((r) => ({
+    id: r.id,
+    claimText: r.claim_text,
+    status: r.status,
+    confidence: r.verdict_confidence,
+    sourceUrl: r.source_url,
+    checkerModel: r.checker_model,
+    verifiedAt: r.verified_at,
+  }));
+}
+
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
 const sourceChecksApp = new Hono()
@@ -506,24 +534,7 @@ const sourceChecksApp = new Hono()
       .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt))
       .limit(200);
 
-    // Fetch any linked claims from the claims pipeline
-    const claimProvenanceRows = (await db.execute(
-      sql`SELECT pc.id::int, pc.claim_text, pc.status, pc.verdict_confidence,
-                 pc.source_url, pc.checker_model, pc.verified_at
-          FROM claim_record_links crl
-          JOIN proposed_claims pc ON pc.id = crl.claim_id
-          WHERE crl.record_type = ${recordType} AND crl.record_id = ${recordId}
-          ORDER BY pc.verified_at DESC NULLS LAST
-          LIMIT 50`
-    )) as Array<{
-      id: number;
-      claim_text: string;
-      status: string;
-      verdict_confidence: number | null;
-      source_url: string;
-      checker_model: string | null;
-      verified_at: string | null;
-    }>;
+    const claimProvenance = await fetchClaimProvenance(db, recordType, recordId);
 
     return c.json({
       verdicts: verdictRows.map((v) => ({
@@ -540,15 +551,7 @@ const sourceChecksApp = new Hono()
         lastComputedAt: v.lastComputedAt,
       })),
       evidence: evidenceRows.map(mapEvidenceRow),
-      claimProvenance: claimProvenanceRows.map((r) => ({
-        id: r.id,
-        claimText: r.claim_text,
-        status: r.status,
-        confidence: r.verdict_confidence,
-        sourceUrl: r.source_url,
-        checkerModel: r.checker_model,
-        verifiedAt: r.verified_at,
-      })),
+      claimProvenance,
       currentCheckerModel: CURRENT_CHECKER_MODEL,
     });
   })
@@ -581,36 +584,11 @@ const sourceChecksApp = new Hono()
         .limit(limit)
         .offset(offset);
 
-      // Fetch linked claims from the claims pipeline
-      const claimRows = (await db.execute(
-        sql`SELECT pc.id::int, pc.claim_text, pc.status, pc.verdict_confidence,
-                   pc.source_url, pc.checker_model, pc.verified_at
-            FROM claim_record_links crl
-            JOIN proposed_claims pc ON pc.id = crl.claim_id
-            WHERE crl.record_type = ${recordType} AND crl.record_id = ${recordId}
-            ORDER BY pc.verified_at DESC NULLS LAST
-            LIMIT 50`
-      )) as Array<{
-        id: number;
-        claim_text: string;
-        status: string;
-        verdict_confidence: number | null;
-        source_url: string;
-        checker_model: string | null;
-        verified_at: string | null;
-      }>;
+      const claimProvenance = await fetchClaimProvenance(db, recordType, recordId);
 
       return c.json({
         evidence: rows.map(mapEvidenceRow),
-        claimProvenance: claimRows.map((r) => ({
-          id: r.id,
-          claimText: r.claim_text,
-          status: r.status,
-          confidence: r.verdict_confidence,
-          sourceUrl: r.source_url,
-          checkerModel: r.checker_model,
-          verifiedAt: r.verified_at,
-        })),
+        claimProvenance,
         currentCheckerModel: CURRENT_CHECKER_MODEL,
       });
     }

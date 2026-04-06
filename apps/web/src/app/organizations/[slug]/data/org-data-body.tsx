@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
 import { EntityDbPage } from "@/components/directory/EntityDbPage";
 import { DataViewTabs } from "@/components/directory/DataViewTabs";
@@ -21,9 +20,7 @@ export function OrgDataBody({ slug }: { slug: string }) {
 
   return (
     <div className="space-y-6">
-      <Suspense>
-        <ClaimsPipelineSummary entityId={slug} />
-      </Suspense>
+      <ClaimsPipelineSummary entityId={slug} />
       <DataViewTabs
         structuredContent={structuredContent}
         databaseContent={databaseContent}

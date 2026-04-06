@@ -646,9 +646,8 @@ describe("Claims API — GET /api/claims/by-entity/:entityId", () => {
 
     const body = await res.json();
     expect(body.entityId).toBe("anthropic");
-    expect(body.claims).toBeDefined();
-    expect(body.total).toBeGreaterThanOrEqual(0);
-    expect(body.recordLinks).toBeDefined();
+    expect(Array.isArray(body.claims)).toBe(true);
+    expect(typeof body.total).toBe("number");
     expect(Array.isArray(body.recordLinks)).toBe(true);
   });
 });
