@@ -21,6 +21,7 @@
 
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
+import { isSid } from '../../packages/id-utils/src/index.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 
@@ -33,13 +34,16 @@ const SUPPRESS_COMMENT = 'factbase-slug-ok';
 
 /**
  * Detect calls like getKBLatest("someSlug", ...) or getFactBaseFacts("someSlug", ...)
- * where the first argument is a hardcoded string that does NOT start with "sid_".
+ * where the first argument is a hardcoded string that is not a stableId.
  *
  * Matches: getKBLatest("anthropic", ...) or getKBLatest('anthropic', ...) or getFactBaseRecords("anthropic", ...)
  * Skips:   getKBLatest("sid_abc123", ...) or getKBLatest(entity.id, ...)
+ *
+ * Uses isSid() from @longterm-wiki/id-utils for stableId detection instead of
+ * a regex negative lookahead, per coding guidelines.
  */
 const FACTBASE_CALL_PATTERN =
-  /(?:getKBLatest|getKBFacts|getKBRecords|getFactBaseLatest|getFactBaseFacts|getFactBaseRecords)\(\s*(['"])(?!sid_)([^'"]+)\1/;
+  /(?:getKBLatest|getKBFacts|getKBRecords|getFactBaseLatest|getFactBaseFacts|getFactBaseRecords)\(\s*(['"])([^'"]+)\1/;
 
 interface Violation {
   file: string;
@@ -110,6 +114,7 @@ function checkFile(filePath: string): Violation[] {
     const match = FACTBASE_CALL_PATTERN.exec(line);
     if (match) {
       const slug = match[2];
+      if (isSid(slug)) continue;
       violations.push({
         file: relPath,
         line: i + 1,
