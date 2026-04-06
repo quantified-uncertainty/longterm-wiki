@@ -90,7 +90,7 @@ export async function EntitiesContent() {
     let scAccuracyRate: number | null = null;
     let scVerificationCoverage: number | null = null;
     if (sc) {
-      const checkedDenom = sc.confirmed + sc.contradicted + sc.outdated + sc.partial;
+      const checkedDenom = sc.confirmed + sc.contradicted + sc.outdated + sc.partial + sc.unverifiable;
       scAccuracyRate = checkedDenom > 0
         ? Math.round((sc.confirmed / checkedDenom) * 1000) / 1000
         : null;

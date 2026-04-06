@@ -997,7 +997,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   {
     accessorKey: "scAccuracyRate",
     sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Accuracy rate: confirmed / (confirmed + contradicted + outdated + partial)">Accuracy</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column} title="Accuracy rate: confirmed / checked (includes unverifiable)">Accuracy</SortableHeader>,
     cell: ({ row }) => <AccuracyRing value={row.original.scAccuracyRate} />,
   },
   {

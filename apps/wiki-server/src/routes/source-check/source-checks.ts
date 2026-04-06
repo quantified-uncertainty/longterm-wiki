@@ -1710,19 +1710,25 @@ const sourceChecksApp = new Hono()
         WHERE t2.thing_type = 'entity'
         GROUP BY t2.source_id
       )
+      all_entities AS (
+        SELECT entity_id FROM verdict_counts
+        UNION
+        SELECT entity_id FROM record_counts
+      )
       SELECT
-        vc.entity_id,
-        vc.confirmed,
-        vc.contradicted,
-        vc.outdated,
-        vc.partial_count,
-        vc.unverifiable,
-        vc.unchecked,
-        vc.total_verdicts,
-        vc.avg_confidence,
+        e.entity_id,
+        COALESCE(vc.confirmed, 0) AS confirmed,
+        COALESCE(vc.contradicted, 0) AS contradicted,
+        COALESCE(vc.outdated, 0) AS outdated,
+        COALESCE(vc.partial_count, 0) AS partial_count,
+        COALESCE(vc.unverifiable, 0) AS unverifiable,
+        COALESCE(vc.unchecked, 0) AS unchecked,
+        COALESCE(vc.total_verdicts, 0) AS total_verdicts,
+        COALESCE(vc.avg_confidence, 0) AS avg_confidence,
         COALESCE(rc.total_records, 0) AS total_records
-      FROM verdict_counts vc
-      LEFT JOIN record_counts rc ON rc.entity_id = vc.entity_id
+      FROM all_entities e
+      LEFT JOIN verdict_counts vc ON vc.entity_id = e.entity_id
+      LEFT JOIN record_counts rc ON rc.entity_id = e.entity_id
     `)) as Record<string, unknown>[];
 
     const summaries = rows.map((r) => ({
