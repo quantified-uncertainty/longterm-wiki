@@ -32,6 +32,11 @@ pnpm dev                         # Dev server on port 3001
 pnpm build                      # Production build
 pnpm test                        # Run vitest tests
 
+# Playwright e2e tests (run from apps/web/)
+cd apps/web && npx playwright test                    # All e2e tests (local server)
+cd apps/web && npx playwright test e2e/render-audit.spec.ts  # Render quality audit
+cd apps/web && PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test  # Against prod
+
 # Wiki content (w = wiki)
 pnpm crux w validate gate --fix              # Pre-push gate (CI-blocking checks)
 pnpm crux w validate gate --scope=content --fix  # Fast content-only (~15s)
