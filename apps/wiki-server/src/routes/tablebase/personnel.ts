@@ -59,7 +59,7 @@ const AllQuery = z.object({
 // ---- Sync schema ----
 
 const SyncPersonnelItemSchema = z.object({
-  id: z.string().regex(/^[A-Za-z0-9]{10}$/, "id must be 10 alphanumeric characters"),
+  id: z.string().regex(/^[A-Za-z0-9_-]{10}$/, "id must be 10 alphanumeric characters (hyphens and underscores allowed)"),
   personId: z.string().min(1).max(200),
   organizationId: z.string().min(1).max(200),
   role: z.string().min(1).max(500),
