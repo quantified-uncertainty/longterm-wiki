@@ -69,6 +69,7 @@ interface SnapshotMeta {
 /**
  * Compute snapshot metadata for a single sourceSlug by querying source_snapshots.
  * Returns the most recent snapshot's fetchedAt, recordCount, and snapshotHash.
+ * Uses fetchedAt DESC, id DESC for a stable deterministic ordering.
  */
 async function getSnapshotMeta(db: ReturnType<typeof getDrizzleDb>, sourceSlug: string): Promise<SnapshotMeta> {
   const [row] = await db
@@ -79,7 +80,7 @@ async function getSnapshotMeta(db: ReturnType<typeof getDrizzleDb>, sourceSlug: 
     })
     .from(sourceSnapshots)
     .where(eq(sourceSnapshots.sourceSlug, sourceSlug))
-    .orderBy(desc(sourceSnapshots.fetchedAt))
+    .orderBy(desc(sourceSnapshots.fetchedAt), desc(sourceSnapshots.id))
     .limit(1);
 
   return {
@@ -165,9 +166,8 @@ const dataSourcesApp = new Hono()
 
     if (!row) return notFoundError(c, "Data source not found");
 
-    const snap = await getSnapshotMeta(db, id);
-
-    // Get latest snapshot detail (without raw_content)
+    // Read the latest snapshot once and derive top-level metadata from it.
+    // Using fetchedAt DESC, id DESC for a stable deterministic ordering.
     const [latestSnapshot] = await db
       .select({
         id: sourceSnapshots.id,
@@ -181,8 +181,14 @@ const dataSourcesApp = new Hono()
       })
       .from(sourceSnapshots)
       .where(eq(sourceSnapshots.sourceSlug, id))
-      .orderBy(desc(sourceSnapshots.fetchedAt))
+      .orderBy(desc(sourceSnapshots.fetchedAt), desc(sourceSnapshots.id))
       .limit(1);
+
+    const snap: SnapshotMeta = {
+      lastSnapshotAt: latestSnapshot?.fetchedAt ?? null,
+      snapshotRecordCount: latestSnapshot?.recordCount ?? null,
+      latestSnapshotHash: latestSnapshot?.snapshotHash ?? null,
+    };
 
     return c.json({
       ...formatFromNewTables(row.res, row.rts, snap),
