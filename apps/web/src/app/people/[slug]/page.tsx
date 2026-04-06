@@ -1,6 +1,8 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computePersonCoverage } from "@/components/coverage/coverage-score";
 import { resolveSlugAlias, getKBEntitySlug } from "@/data/factbase";
 import { isAnySid } from "@/lib/stable-id";
 import { titleToSlug } from "@/lib/slug-utils";
@@ -410,9 +412,25 @@ export default async function PersonProfilePage({
           {initials}
         </div>
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight mb-1">
-            {entity.name}
-          </h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              {entity.name}
+            </h1>
+            <CoverageDots
+              score={computePersonCoverage({
+                role: roleFact?.value.type === "text" ? roleFact.value.value : null,
+                employerId: employedByFact?.value.type === "ref" ? employedByFact.value.value : null,
+                bornYear: bornYearFact?.value.type === "number" ? bornYearFact.value.value : null,
+                netWorthNum: netWorthFact?.value.type === "number" ? netWorthFact.value.value : null,
+                positionCount: positions.length,
+                publicationCount: publications.length,
+                careerHistoryCount: careerHistory.length,
+                wikiPageId: entity.wikiPageId,
+              })}
+              size="md"
+              tooltip="Content coverage"
+            />
+          </div>
           {entity.aliases && entity.aliases.length > 0 && (
             <p className="text-sm text-muted-foreground/70 mb-1">
               Also known as: {entity.aliases.join(", ")}

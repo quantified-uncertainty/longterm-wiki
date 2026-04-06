@@ -23,6 +23,8 @@ import {
   FactsPanel,
 } from "@/components/directory";
 import { RelatedPages } from "@/components/RelatedPages";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 
 // Shared components & helpers
 import {
@@ -780,6 +782,19 @@ export default async function OrgProfilePage({
                   {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
                 </span>
               )}
+              <CoverageDots
+                score={computeOrgCoverage({
+                  revenueNum: getKBLatest(entity.id, "revenue")?.value.type === "number" ? (getKBLatest(entity.id, "revenue")!.value as { value: number }).value : null,
+                  valuationNum: getKBLatest(entity.id, "valuation")?.value.type === "number" ? (getKBLatest(entity.id, "valuation")!.value as { value: number }).value : null,
+                  headcount: getKBLatest(entity.id, "headcount")?.value.type === "number" ? (getKBLatest(entity.id, "headcount")!.value as { value: number }).value : null,
+                  totalFundingNum: getKBLatest(entity.id, "total-funding")?.value.type === "number" ? (getKBLatest(entity.id, "total-funding")!.value as { value: number }).value : null,
+                  foundedDate: data.foundedDateStr,
+                  peopleCount: data.sortedPersons.length,
+                  wikiPageId: entity.wikiPageId,
+                })}
+                size="md"
+                tooltip="Content coverage"
+              />
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
               <p className="text-xs text-muted-foreground/70 mb-0.5">
