@@ -100,6 +100,21 @@ const entityResourcesApp = new Hono()
       .returning({ id: entityResources.id });
 
     return c.json({ total: upserted.length });
+  })
+
+  // GET /api/entity-resources/export — all rows (for build pipeline)
+  .get("/export", async (c) => {
+    const db = getDrizzleDb();
+    const rows = await db
+      .select({
+        entityId: entityResources.entityId,
+        resourceId: entityResources.resourceId,
+        authoredByEntity: entityResources.authoredByEntity,
+        isSubject: entityResources.isSubject,
+      })
+      .from(entityResources);
+
+    return c.json({ items: rows, total: rows.length });
   });
 
 export const entityResourcesRoute = entityResourcesApp;

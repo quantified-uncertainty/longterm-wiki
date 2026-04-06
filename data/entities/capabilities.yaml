@@ -18,13 +18,6 @@
       type: risk
     - id: sid_mK9pX3rQ7n
       type: organization
-  sources:
-    - title: Claude Computer Use
-      url: https://anthropic.com/claude/computer-use
-    - title: The Landscape of AI Agents
-      url: https://arxiv.org/abs/2308.11432
-    - title: 'AI Control: Improving Safety Despite Intentional Subversion'
-      url: https://arxiv.org/abs/2312.06942
   description: >-
     Agentic AI refers to AI systems that go beyond answering questions to autonomously taking actions in the world.
     These systems can browse the web, write and execute code, use tools, and pursue multi-step goals with minimal human
@@ -53,15 +46,6 @@
       type: capability
     - id: sid_1LcLlMGLbw
       type: organization
-  sources:
-    - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
-      url: https://arxiv.org/abs/2310.06770
-    - title: Evaluating Large Language Models Trained on Code
-      url: https://arxiv.org/abs/2107.03374
-    - title: Competition-Level Code Generation with AlphaCode
-      url: https://arxiv.org/abs/2203.07814
-    - title: GitHub Copilot Research
-      url: https://github.blog/category/research/
   description: "The ability of AI systems to write, analyze, debug, and generate software code across multiple programming languages and problem domains. Coding capability has advanced significantly, with frontier models now able to solve complex programming challenges, contribute to real codebases, and automate software development workflows."
   tags:
     - software-engineering
@@ -88,13 +72,6 @@
       type: capability
     - id: sid_1LcLlMGLbw
       type: organization
-  sources:
-    - title: Language Models are Few-Shot Learners (GPT-3)
-      url: https://arxiv.org/abs/2005.14165
-    - title: Scaling Laws for Neural Language Models
-      url: https://arxiv.org/abs/2001.08361
-    - title: Emergent Abilities of Large Language Models
-      url: https://arxiv.org/abs/2206.07682
   description: >-
     Large Language Models (LLMs) are neural networks trained on vast amounts of text data to predict the next token.
     Despite this simple objective, they develop sophisticated capabilities including reasoning, coding, and general
@@ -125,15 +102,6 @@
       type: risk
     - id: sid_sFjyY5xXZA
       type: research-area
-  sources:
-    - title: 'SWE-bench: Can Language Models Resolve Real-World GitHub Issues?'
-      url: https://arxiv.org/abs/2310.06770
-    - title: The Landscape of Emerging AI Agent Architectures
-      url: https://arxiv.org/abs/2404.11584
-    - title: On the Opportunities and Risks of Foundation Models
-      url: https://arxiv.org/abs/2108.07258
-    - title: Concrete Problems in AI Safety
-      url: https://arxiv.org/abs/1606.06565
   description: >-
     Long-horizon autonomy refers to AI systems' ability to work toward goals over extended time periods—hours, days, or
     even weeks—with minimal human intervention. This capability requires maintaining context, adapting to obstacles,
@@ -162,15 +130,6 @@
       type: capability
     - id: sid_DAaRZ9Q15A
       type: concept
-  sources:
-    - title: Personalized Persuasion with LLMs
-      url: https://arxiv.org/abs/2403.14380
-    - title: AI-Mediated Persuasion
-      url: https://arxiv.org/abs/2410.08003
-    - title: Language Models as Agent Models
-      url: https://arxiv.org/abs/2212.01681
-    - title: The Persuasion Tools of the 2020s
-      url: https://www.alignmentforum.org/posts/qKvn7rxP2mzJbKfcA/persuasion-tools-ai-takeover-without-agi-or-agency
   description: >-
     Persuasion capabilities refer to AI systems' ability to influence human beliefs, decisions, and behaviors through
     communication. This encompasses everything from subtle suggestion to sophisticated manipulation, personalized
@@ -200,16 +159,6 @@
       type: capability
     - id: sid_1LcLlMGLbw
       type: organization
-  sources:
-    - title: Learning to Reason with LLMs
-      url: https://openai.com/index/learning-to-reason-with-llms/
-      author: OpenAI
-    - title: Chain-of-Thought Prompting
-      url: https://arxiv.org/abs/2201.11903
-    - title: Tree of Thoughts
-      url: https://arxiv.org/abs/2305.10601
-    - title: Let's Verify Step by Step
-      url: https://arxiv.org/abs/2305.20050
   description: >-
     Reasoning and planning capabilities refer to AI systems' ability to break down complex problems into steps, maintain
     coherent chains of logic, and solve problems that require multiple inference steps.
@@ -238,16 +187,6 @@
       type: concept
     - id: sid_A4XoubikkQ
       type: organization
-  sources:
-    - title: Highly accurate protein structure prediction with AlphaFold
-      url: https://www.nature.com/articles/s41586-021-03819-2
-      author: DeepMind
-    - title: Scaling deep learning for materials discovery
-      url: https://www.nature.com/articles/s41586-023-06735-9
-    - title: 'The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery'
-      url: https://arxiv.org/abs/2408.06292
-    - title: 'GraphCast: Learning skillful medium-range global weather forecasting'
-      url: https://arxiv.org/abs/2212.12794
   description: >-
     Scientific research capabilities refer to AI systems' ability to conduct scientific investigations, generate
     hypotheses, design experiments, analyze results, and make discoveries. This ranges from narrow tools that assist
@@ -277,17 +216,6 @@
       type: capability
     - id: sid_3fyHbDnHIQ
       type: concept
-  sources:
-    - title: 'Intelligence Explosion: Evidence and Import'
-      url: https://intelligence.org/files/IE-EI.pdf
-      author: MIRI
-    - title: 'Neural Architecture Search: A Survey'
-      url: https://arxiv.org/abs/1808.05377
-    - title: 'AutoML: A Survey of the State-of-the-Art'
-      url: https://arxiv.org/abs/1908.00709
-    - title: 'Superintelligence: Paths, Dangers, Strategies'
-      url: https://en.wikipedia.org/wiki/Superintelligence:_Paths,_Dangers,_Strategies
-      author: Nick Bostrom
   description: >-
     Self-improvement refers to AI systems' ability to enhance their own capabilities or create more capable successor
     systems. This includes automated machine learning (AutoML), AI-assisted AI research, and the theoretical possibility
@@ -323,25 +251,6 @@
       type: organization
     - id: sid_mK9pX3rQ7n
       type: organization
-  sources:
-    - title: Sleeper Agents Paper
-      url: https://arxiv.org/abs/2401.05566
-      author: Anthropic
-      date: '2024'
-    - title: Situational Awareness (LessWrong)
-      url: https://www.lesswrong.com/tag/situational-awareness
-    - title: Model Organisms of Misalignment
-      url: https://www.anthropic.com/research/model-organisms-of-misalignment
-      author: Anthropic
-      date: '2024'
-    - title: Towards Understanding Sycophancy in Language Models
-      url: https://arxiv.org/abs/2310.13548
-      author: Sharma et al.
-      date: '2023'
-    - title: Situational Awareness paper
-      url: https://situational-awareness.ai/
-      author: Leopold Aschenbrenner
-      date: '2024'
   description: >
     Situational awareness in AI refers to a model's understanding of itself and its circumstances - knowing that it is
     an AI, that it is being trained or evaluated, what its training process involves, and how its behavior might affect
@@ -388,16 +297,6 @@
       type: capability
     - id: sid_mK9pX3rQ7n
       type: organization
-  sources:
-    - title: Claude Computer Use
-      url: https://www.anthropic.com/news/3-5-models-and-computer-use
-      author: Anthropic
-    - title: 'Gorilla: LLM Connected with Massive APIs'
-      url: https://arxiv.org/abs/2305.15334
-    - title: 'ToolLLM: Facilitating Large Language Models to Master 16000+ Real-world APIs'
-      url: https://arxiv.org/abs/2307.16789
-    - title: GPT-4 Function Calling
-      url: https://openai.com/index/function-calling-and-other-api-updates/
   description: >-
     Tool use capabilities allow AI systems to interact with external systems beyond just generating text. This includes
     calling APIs, executing code, browsing the web, and even controlling computers directly. These capabilities

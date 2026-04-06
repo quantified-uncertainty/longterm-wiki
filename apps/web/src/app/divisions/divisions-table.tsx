@@ -3,10 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
@@ -257,16 +255,12 @@ export function DivisionsTable({
                       </span>
                     )}
                   </td>
-                  <td className="py-2.5 px-3 text-right">
-                    <span className="inline-flex items-center gap-2">
-                      <CoverageDots score={computeDivisionCoverage(row)} />
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(row.verdict?.verdict)}
-                        originalVerdict={row.verdict?.verdict}
-                        size="md"
-                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
-                      />
-                    </span>
+                  <td className="py-2.5 px-2 text-right">
+                    <RecordStatusDots
+                      coverageScore={computeDivisionCoverage(row)}
+                      verdict={row.verdict?.verdict}
+                      sourceCheckHref={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                    />
                   </td>
                 </tr>
               ))}

@@ -1672,3 +1672,48 @@ export async function buildPageReferenceIndex() {
   // Unreachable — loop always returns, but TypeScript/eslint may require it
   return {};
 }
+
+/**
+ * Fetch entity_resources from wiki-server and group by entityId.
+ * Returns: { [stableId]: { authored: resourceId[], subject: resourceId[] } }
+ */
+export async function fetchEntityResourceLinks() {
+  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  if (!serverUrl) {
+    console.log('  entityResourceLinks: skipped (LONGTERMWIKI_SERVER_URL not set)');
+    return null;
+  }
+
+  const headers = buildHeaders();
+
+  try {
+    const url = `${serverUrl}/api/entity-resources/export`;
+    const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+    if (!resp.ok) {
+      logWikiServerWarning('entityResourceLinks', `HTTP ${resp.status}`);
+      return null;
+    }
+    const data = await resp.json();
+    const items = data.items || [];
+
+    // Group by entityId
+    const grouped = {};
+    for (const row of items) {
+      if (!grouped[row.entityId]) {
+        grouped[row.entityId] = { authored: [], subject: [] };
+      }
+      if (row.authoredByEntity) {
+        grouped[row.entityId].authored.push(row.resourceId);
+      }
+      if (row.isSubject) {
+        grouped[row.entityId].subject.push(row.resourceId);
+      }
+    }
+
+    console.log(`  entityResourceLinks: ${items.length} links across ${Object.keys(grouped).length} entities`);
+    return grouped;
+  } catch (err) {
+    logWikiServerWarning('entityResourceLinks', err.message || String(err));
+    return null;
+  }
+}

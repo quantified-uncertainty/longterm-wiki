@@ -163,7 +163,6 @@ function transformEntity(raw, expertMap, orgMap) {
     tags: raw.tags || [],
     clusters: raw.clusters || [],
     relatedEntries: raw.relatedEntries || [],
-    sources: raw.sources || [],
     lastUpdated: raw.lastUpdated,
     website: raw.website,
     wikiId: raw.wikiId,

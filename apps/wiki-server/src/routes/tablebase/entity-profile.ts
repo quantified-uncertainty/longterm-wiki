@@ -26,13 +26,13 @@ import {
   researchAreaOrganizations,
   verificationVerdicts,
   policyStakeholders,
-  entityRecommendedResources,
   entityResources,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import { notFoundError } from "../shared/utils.js";
 import { COLUMN_DESCRIPTIONS } from "./entity-profile-descriptions.js";
+import { stripInternalColumns } from "../shared/strip-internal-columns.js";
 import type { PgTable } from "drizzle-orm/pg-core";
 
 const logger = rootLogger.child({ component: "entity-profile" });
@@ -69,7 +69,7 @@ function buildSchemaForTable(table: PgTable, tableName: string): ColumnMeta[] {
   });
 }
 
-// ---- Columns to exclude from output (internal/noisy) ----
+// ---- Columns to exclude from schema output (still needed for buildSchemaForTable filter) ----
 
 const EXCLUDED_COLUMNS = new Set([
   "synced_at",
@@ -80,23 +80,6 @@ const EXCLUDED_COLUMNS = new Set([
   "synced_from_branch",
   "synced_from_commit",
 ]);
-
-// Also build a camelCase version for stripping from Drizzle query results
-const EXCLUDED_CAMEL = new Set(
-  [...EXCLUDED_COLUMNS].map((k) => k.replace(/_([a-z])/g, (_, c) => c.toUpperCase()))
-);
-
-function stripInternalColumns(rows: Record<string, unknown>[]): Record<string, unknown>[] {
-  return rows.map((row) => {
-    const cleaned: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(row)) {
-      if (!EXCLUDED_CAMEL.has(key)) {
-        cleaned[key] = value;
-      }
-    }
-    return cleaned;
-  });
-}
 
 // ---- Query safety ----
 
@@ -259,18 +242,6 @@ const SECTIONS: SectionDef[] = [
       db.select().from(policyStakeholders).where(
         or(eq(policyStakeholders.policyEntityId, stableId), eq(policyStakeholders.stakeholderEntityId, stableId))
       ).limit(FETCH_LIMIT),
-  },
-  {
-    key: "recommendedResources",
-    label: "Recommended Resources",
-    description: "Books, papers, videos, and other resources recommended by or for this entity",
-    table: entityRecommendedResources,
-    tableName: "entity_recommended_resources",
-    query: (db, stableId) =>
-      db.select().from(entityRecommendedResources)
-        .where(eq(entityRecommendedResources.entityId, stableId))
-        .orderBy(entityRecommendedResources.sortOrder)
-        .limit(FETCH_LIMIT),
   },
   {
     key: "entityResources",

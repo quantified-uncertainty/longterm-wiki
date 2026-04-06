@@ -3,10 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFPRows, type SortDir } from "./funding-programs-sort";
@@ -438,16 +436,12 @@ export function FundingProgramsListTable({
                   )}
                 </td>
 
-                <td className="py-2.5 px-3 text-right">
-                  <span className="inline-flex items-center gap-2">
-                    <CoverageDots score={computeFundingProgramCoverage(row)} />
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(row.verdict?.verdict)}
-                      originalVerdict={row.verdict?.verdict}
-                      size="md"
-                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
-                    />
-                  </span>
+                <td className="py-2.5 px-2 text-right">
+                  <RecordStatusDots
+                    coverageScore={computeFundingProgramCoverage(row)}
+                    verdict={row.verdict?.verdict}
+                    sourceCheckHref={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                  />
                 </td>
               </tr>
             ))}

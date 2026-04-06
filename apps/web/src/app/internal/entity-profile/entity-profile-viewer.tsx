@@ -17,6 +17,7 @@ import Link from "next/link";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordHref } from "@/app/source-checks/source-checks-shared";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 
@@ -673,10 +674,13 @@ function ProfileSection({
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
                       const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
-                      return section.recordType && verdict ? (
+                      const href = section.recordType
+                        ? getRecordHref(section.recordType, idStr)
+                        : null;
+                      return href ? (
                         <td className="px-2 py-2 align-top">
                           <Link
-                            href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(idStr)}`}
+                            href={href}
                             className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
                             title={`Record ${idStr}`}
                           >
@@ -892,7 +896,6 @@ function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
     : null;
   const customFields = Array.isArray(entity.customFields) ? entity.customFields as Array<{ label: string; value: string; link?: string }> : null;
   const relatedEntries = Array.isArray(entity.relatedEntries) ? entity.relatedEntries as Array<{ id: string; type: string; relationship?: string }> : null;
-  const sources = Array.isArray(entity.sources) ? entity.sources as Array<{ title: string; url?: string; author?: string; date?: string }> : null;
 
   // Extract interesting metadata keys (skip boring ones)
   const metadataEntries = metadata
@@ -900,7 +903,7 @@ function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
     : [];
 
   const hasData = metadataEntries.length > 0 || (customFields && customFields.length > 0) ||
-    (relatedEntries && relatedEntries.length > 0) || (sources && sources.length > 0);
+    (relatedEntries && relatedEntries.length > 0);
 
   if (!hasData) return null;
 
@@ -936,15 +939,6 @@ function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
         />
       )}
 
-      {/* Sources */}
-      {sources && sources.length > 0 && (
-        <CollapsibleTableSection
-          title="Sources"
-          description="Citations and references for this entity"
-          headers={["Title", "URL", "Author", "Date"]}
-          rows={sources.map((s) => [s.title, s.url ?? "", s.author ?? "", s.date ?? ""])}
-        />
-      )}
     </div>
   );
 }
@@ -1280,7 +1274,7 @@ export function EntityProfileViewer({
             )}
           </div>
 
-          {/* Entity JSONB fields (metadata, customFields, relatedEntries, sources) */}
+          {/* Entity JSONB fields (metadata, customFields, relatedEntries) */}
           <EntityDataSections entity={data.entity} />
 
           <div className="space-y-2">

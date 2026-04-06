@@ -1,26 +1,19 @@
 /**
- * CoverageDots — Reusable dot-ladder indicator for entity content depth.
+ * CoverageDots — Pie-chart coverage indicator for entity content depth.
  *
- * Renders 1-4 filled/unfilled dots showing how much structured data,
- * relationships, and content exists for an entity. Entity-type-aware
- * scoring functions determine the score; this component just renders it.
- *
- * Visual language:
- *   Filled dots   — teal/primary, proportional to coverage
- *   Unfilled dots  — faint gray placeholder
- *
- * Designed to be compact enough for table cells and inline use,
- * following the same pattern as SourceCheckDot.
+ * Renders a single small circle partially filled (like a pie chart)
+ * to show data completeness. Score 1-4 maps to 25%-100% fill.
+ * Gray filled portion + lighter gray unfilled portion.
  */
 
 interface CoverageDotsProps {
-  /** Score from 1-4 (number of filled dots) */
+  /** Score from 1-4 (fill level: 1=25%, 2=50%, 3=75%, 4=100%) */
   score: number;
   /** Accessible label describing the score */
   label?: string;
   /** Tooltip text (shown on hover) */
   tooltip?: string;
-  /** Dot size: sm = 6px (table rows), md = 8px (cards/headers) */
+  /** Circle size: sm = 7px (table rows), md = 9px (cards/headers) */
   size?: "sm" | "md";
   className?: string;
 }
@@ -33,27 +26,24 @@ export function CoverageDots({
   className = "",
 }: CoverageDotsProps) {
   const clampedScore = Math.max(1, Math.min(4, Math.round(score)));
-  const dotSize = size === "md" ? "w-2 h-2" : "w-1.5 h-1.5";
-  const ariaLabel = label ?? `Coverage: ${clampedScore} of 4`;
+  const pct = clampedScore * 25; // 25%, 50%, 75%, 100%
+  const dim = size === "md" ? 7 : 6;
+  const ariaLabel = label ?? `Coverage: ${pct}%`;
 
   return (
     <span
-      className={`inline-flex gap-0.5 ${className}`}
+      className={`inline-block shrink-0 rounded-full ${className}`}
       role="img"
       aria-label={ariaLabel}
-      title={tooltip}
-    >
-      {[1, 2, 3, 4].map((i) => (
-        <span
-          key={i}
-          aria-hidden="true"
-          className={`inline-block ${dotSize} rounded-full ${
-            i <= clampedScore
-              ? "bg-primary/70"
-              : "bg-muted-foreground/20"
-          }`}
-        />
-      ))}
-    </span>
+      title={tooltip ?? ariaLabel}
+      style={{
+        width: dim,
+        height: dim,
+        background:
+          pct >= 100
+            ? "color-mix(in srgb, currentColor 45%, transparent)"
+            : `conic-gradient(color-mix(in srgb, currentColor 45%, transparent) 0% ${pct}%, color-mix(in srgb, currentColor 12%, transparent) ${pct}% 100%)`,
+      }}
+    />
   );
 }

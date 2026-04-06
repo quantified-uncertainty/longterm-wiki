@@ -19,19 +19,6 @@
     - alignment
   clusters:
     - ai-safety
-  sources:
-    - title: "Training Language Models to Follow Instructions with Human Feedback"
-      url: https://arxiv.org/abs/2203.02155
-      author: Ouyang et al.
-      date: '2022'
-    - title: "A Survey of Reinforcement Learning from Human Feedback"
-      url: https://arxiv.org/abs/2312.14925
-      author: Kaufmann et al.
-      date: '2023'
-    - title: "Open Problems and Fundamental Limitations of RLHF"
-      url: https://arxiv.org/abs/2307.15217
-      author: Casper et al.
-      date: '2023'
   relatedEntries:
     - id: sid_1LcLlMGLbw
       type: organization
@@ -63,14 +50,6 @@
     - safety-research
   clusters:
     - ai-safety
-  sources:
-    - title: Anthropic Interpretability Research
-      url: https://www.anthropic.com/research/team/interpretability
-    - title: "A Practical Review of Mechanistic Interpretability for Transformer-Based Language Models"
-      url: https://arxiv.org/abs/2407.02646
-      date: '2024'
-    - title: "Is Interpretability Sufficient for Safety? (Alignment Survey)"
-      url: https://alignmentsurvey.com/materials/assurance/redteam/
   relatedEntries:
     - id: sid_mK9pX3rQ7n
       type: organization
@@ -100,18 +79,6 @@
     - neural-network-analysis
   clusters:
     - ai-safety
-  sources:
-    - title: "Scaling Monosemanticity: Extracting Interpretable Features from Claude 3 Sonnet"
-      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-      author: Anthropic
-      date: '2024'
-    - title: "Open Problems in Mechanistic Interpretability"
-      url: https://arxiv.org/abs/2501.16496
-      author: Sharkey et al.
-      date: '2025'
-    - title: Transformer Circuits Thread
-      url: https://transformer-circuits.pub/
-      author: Anthropic
   relatedEntries:
     - id: sid_mK9pX3rQ7n
       type: organization
@@ -143,17 +110,6 @@
     - safety-research
   clusters:
     - ai-safety
-  sources:
-    - title: "Holistic Safety and Responsibility Evaluations of Advanced AI Models"
-      url: https://arxiv.org/abs/2404.14068
-      author: Google DeepMind
-      date: '2024'
-    - title: "An AI System Evaluation Framework for Advancing AI Safety"
-      url: https://arxiv.org/abs/2404.05388
-      date: '2024'
-    - title: "Evaluating AI Evaluation: Perils and Prospects"
-      url: https://arxiv.org/abs/2407.09221
-      date: '2024'
   relatedEntries:
     - id: sid_rQEkFJxS5w
       type: organization
@@ -186,13 +142,6 @@
     - safety-testing
   clusters:
     - ai-safety
-  sources:
-    - title: "Against The Achilles' Heel: A Survey on Red Teaming for Generative Models"
-      url: https://arxiv.org/abs/2404.00629
-      date: '2024'
-    - title: "Red-Teaming for Generative AI: Silver Bullet or Security Theater?"
-      url: https://arxiv.org/abs/2401.15897
-      date: '2024'
   relatedEntries:
     - id: sid_pKeaWwP6sQ
       type: organization
@@ -218,14 +167,6 @@
     - safety-research
   clusters:
     - ai-safety
-  sources:
-    - title: "AI Control: Improving Safety Despite Intentional Subversion"
-      url: https://arxiv.org/abs/2312.06942
-      author: Greenblatt et al.
-      date: '2023'
-    - title: The Case for Ensuring That Powerful AIs Are Controlled
-      url: https://blog.redwoodresearch.org/p/the-case-for-ensuring-that-powerful
-      author: Redwood Research
   relatedEntries:
     - id: sid_dwMzc9WzPa
       type: organization
@@ -254,18 +195,6 @@
     - safety-research
   clusters:
     - ai-safety
-  sources:
-    - title: "AI Safety via Debate"
-      url: https://arxiv.org/abs/1805.00899
-      author: Irving, Christiano, Amodei
-      date: '2018'
-    - title: "Scalable AI Safety via Doubly-Efficient Debate"
-      url: https://arxiv.org/abs/2311.14125
-      author: Brown-Cohen et al.
-      date: '2023'
-    - title: "Scaling Laws for Scalable Oversight"
-      url: https://arxiv.org/abs/2504.18530
-      date: '2025'
   relatedEntries:
     - id: sid_vzxfzxBITd
       type: person
@@ -292,18 +221,6 @@
     - safety-research
   clusters:
     - ai-safety
-  sources:
-    - title: "Corrigibility"
-      url: https://intelligence.org/files/Corrigibility.pdf
-      author: Soares et al. (MIRI)
-      date: '2015'
-    - title: "Corrigibility with Utility Preservation"
-      url: https://arxiv.org/abs/1908.01695
-      date: '2019'
-    - title: "Core Safety Values for Provably Corrigible Agents"
-      url: https://arxiv.org/abs/2507.20964
-      author: Nayebi
-      date: '2025'
   relatedEntries:
     - id: sid_puAffUjWSS
       type: organization
@@ -330,18 +247,6 @@
     - alignment
   clusters:
     - ai-safety
-  sources:
-    - title: "AI Alignment: A Comprehensive Survey"
-      url: https://arxiv.org/abs/2310.19852
-      author: Ji et al.
-      date: '2023'
-    - title: "Artificial Intelligence, Values, and Alignment"
-      url: https://arxiv.org/abs/2001.09768
-      author: Gabriel
-      date: '2020'
-    - title: The Value Alignment Problem (LCFI)
-      url: https://www.lcfi.ac.uk/research/project/value-alignment-problem
-      author: Leverhulme Centre for the Future of Intelligence
   relatedEntries:
     - id: sid_ZxUirlzHke
       type: person

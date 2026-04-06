@@ -5,7 +5,7 @@ import { getTypedEntityById } from "@/data/tablebase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getPublicationsForPerson, getTypedEntities, getPersonEntityById, isPerson } from "@/data";
+import { getTypedEntities, getPersonEntityById, isPerson } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import { partitionPersonRows } from "./people-filter";
 import { isAnySid } from "@/lib/stable-id";
@@ -197,8 +197,6 @@ function loadFromLocal(): PersonRow[] {
     const positions = personEntity?.positions ?? [];
     const positionCount = positions.length;
     const topics = positions.map((p) => p.topic);
-    const publications = getPublicationsForPerson(slug);
-
     const roleText = roleFact?.value.type === "text" ? roleFact.value.value : null;
 
     const searchParts: string[] = [entity.name];
@@ -211,9 +209,6 @@ function loadFromLocal(): PersonRow[] {
       }
     }
     if (personEntity?.knownFor) searchParts.push(...personEntity.knownFor);
-    for (const pub of publications) {
-      searchParts.push(pub.title);
-    }
     for (const entry of careerHistory) {
       const fields = entry.fields;
       if (typeof fields.role === "string") searchParts.push(fields.role);
@@ -248,7 +243,7 @@ function loadFromLocal(): PersonRow[] {
       netWorthNum: numericValue(netWorthFact),
       positionCount,
       topics,
-      publicationCount: publications.length,
+      publicationCount: 0,
       careerHistoryCount: getLocalCareerCount(entity.id),
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -267,9 +262,8 @@ function loadFromLocal(): PersonRow[] {
     const hasDescription = !!tp.description;
     const hasWikiId = !!tp.wikiId;
     const hasCustomFields = Array.isArray(tp.customFields) && tp.customFields.length > 0;
-    const hasSources = Array.isArray(tp.sources) && tp.sources.length > 0;
     const hasRelatedEntries = Array.isArray(tp.relatedEntries) && tp.relatedEntries.length > 0;
-    if (!hasDescription && !hasWikiId && !hasCustomFields && !hasSources && !hasRelatedEntries) {
+    if (!hasDescription && !hasWikiId && !hasCustomFields && !hasRelatedEntries) {
       continue;
     }
 

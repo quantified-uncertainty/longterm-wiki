@@ -17,19 +17,6 @@
       value: Evaluation, research, policy advice
     - label: Network
       value: International coordination emerging
-  sources:
-    - title: UK AI Safety Institute
-      url: https://www.gov.uk/government/organisations/ai-safety-institute
-      author: UK Government
-    - title: US AI Safety Institute
-      url: https://www.nist.gov/aisi
-      author: NIST
-    - title: Inspect Framework
-      url: https://github.com/UKGovernmentBEIS/inspect_ai
-      author: UK AISI
-    - title: Seoul Declaration on AISI Network
-      url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai
-      author: Summit Participants
   description: Government-run institutions dedicated to evaluating frontier AI systems for dangerous capabilities and
     safety properties. Pioneered by the UK AISI in 2023, with analogues in the US (USAISI), EU, Japan, and others. Play
     a key role in pre-deployment evaluations and responsible scaling policy thresholds.
@@ -757,37 +744,6 @@
       type: person
     - id: us-executive-order
       type: policy
-  sources:
-    - title: SB 1047 Bill Text (Final Amended Version)
-      url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202320240SB1047
-      date: August 2024
-    - title: Governor Newsom's Veto Message
-      url: https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf
-      date: September 29, 2024
-    - title: Analysis from Future of Life Institute
-      url: https://futureoflife.org/project/sb-1047/
-      author: FLI
-    - title: OpenAI Letter Opposing SB 1047
-      url: https://openai.com/index/openai-letter-to-california-governor-newsom-on-sb-1047/
-    - title: Anthropic's Nuanced Position
-      url: https://www.anthropic.com/news/anthropics-letter-to-senator-wiener-on-sb-1047
-      date: August 2024
-    - title: Academic Analysis
-      url: https://law.stanford.edu/2024/09/25/sb-1047-analysis/
-      author: Stanford HAI
-    - title: Pelosi Statement Opposing SB 1047
-      url: https://pelosi.house.gov/news/press-releases/pelosi-statement-opposition-california-senate-bill-1047
-      date: August 16, 2024
-    - title: Carnegie Endowment Post-Veto Analysis
-      url: https://carnegieendowment.org/posts/2024/10/california-sb1047-ai-safety-bill-veto-lessons
-      date: October 2024
-    - title: CSET Georgetown Veto Analysis
-      url: https://cset.georgetown.edu/article/governor-newsom-vetoes-sweeping-ai-regulation-sb-1047/
-      date: October 2024
-    - title: Expert Panel Final Report
-      url: https://www.gov.ca.gov/wp-content/uploads/2025/06/June-17-2025-%E2%80%93-The-California-Report-on-Frontier-AI-Policy.pdf
-      date: June 17, 2025
-      author: Joint California Policy Working Group
   description: SB 1047, the Safe and Secure Innovation for Frontier Artificial Intelligence Models Act, was California
     state legislation that would have required safety testing and liability measures for developers of the most powerful
     AI models. Passed the legislature with strong majorities (Senate 32-1, Assembly 48-16) but was vetoed by Governor
@@ -831,17 +787,6 @@
       value: Died with Parliament dissolution (January 2025)
     - label: Approach
       value: Risk-based, principles-focused
-  sources:
-    - title: Bill C-27 Text
-      url: https://www.parl.ca/legisinfo/en/bill/44-1/c-27
-      author: Parliament of Canada
-    - title: AIDA Companion Document
-      url: https://ised-isde.canada.ca/site/innovation-better-canada/en/artificial-intelligence-and-data-act-aida-companion-document
-      author: ISED Canada
-    - title: Government Amendments to AIDA
-      url: https://ised-isde.canada.ca/site/innovation-better-canada/en/artificial-intelligence-and-data-act-aida-companion-document
-      author: Government of Canada
-      date: November 2023
   stakeholders:
     - name: Government of Canada (ISED)
       position: support
@@ -927,30 +872,6 @@
       type: concept
     - id: sid_B3alpHHvzg
       type: event
-  sources:
-    - title: "Translation: Interim Measures for Generative AI Management"
-      url: https://digichina.stanford.edu/work/translation-interim-measures-for-the-management-of-generative-artificial-intelligence-services-effective-august-15-2023/
-      author: DigiChina, Stanford
-      date: "2023"
-    - title: China's Algorithm Registry
-      url: https://digichina.stanford.edu/work/translation-algorithmic-recommendation-management-provisions-effective-march-1-2022/
-      author: DigiChina, Stanford
-    - title: Deep Synthesis Regulations
-      url: https://www.newamerica.org/cybersecurity-initiative/digichina/blog/translation-chinas-deep-synthesis-regulations/
-      author: New America
-      date: "2022"
-    - title: China AI Governance Overview
-      url: https://cset.georgetown.edu/publication/understanding-chinas-ai-regulation/
-      author: CSET Georgetown
-      date: "2024"
-    - title: China's New Generation AI Development Plan
-      url: https://www.newamerica.org/cybersecurity-initiative/digichina/blog/full-translation-chinas-new-generation-artificial-intelligence-development-plan-2017/
-      author: New America
-      date: "2017"
-    - title: Comparing US and China AI Regulation
-      url: https://carnegieendowment.org/research/2024/01/regulating-ai-in-china-and-the-united-states
-      author: Carnegie Endowment
-      date: "2024"
   stakeholders:
     - name: Cyberspace Administration of China (CAC)
       entityId: sid_H1Ysc4diAp
@@ -1172,37 +1093,6 @@
       value: June 30, 2026
     - label: Regulatory Approach
       value: Risk-based (contrast to California SB 1047 size-based approach)
-  sources:
-    - title: Colorado AI Act Full Text (SB 24-205)
-      url: https://leg.colorado.gov/bills/sb24-205
-      author: Colorado General Assembly
-    - title: Colorado AG Rulemaking on AI Act Implementation
-      url: https://coag.gov/ai-act-rulemaking/
-      author: Colorado Attorney General
-    - title: Colorado AI Act — What Attorneys General Should Know
-      url: https://www.naag.org/attorney-general-journal/colorado-ai-act-what-attorneys-general-should-know/
-      author: National Association of Attorneys General
-      date: "2024"
-    - title: Polis Signs AI Bill With Reservations
-      url: https://www.coloradosun.com/2024/05/17/jared-polis-signs-ai-bill-sb205/
-      author: Colorado Sun
-      date: May 2024
-    - title: Colorado AI Act Key Provisions and Compliance Implications
-      url: https://www.iapp.org/news/a/colorado-ai-act-key-provisions-and-compliance-implications/
-      author: IAPP
-      date: "2024"
-    - title: Comparing Colorado AI Act to EU AI Act
-      url: https://www.brookings.edu/articles/colorados-ai-act-and-what-it-means-for-state-level-regulation/
-      author: Brookings Institution
-      date: "2024"
-    - title: Economic Impact of Colorado AI Act
-      url: https://commonsenseinstituteco.org/colorado-artificial-intelligence-act/
-      author: Common Sense Institute
-      date: "2024"
-    - title: Colorado Governor Signs First Comprehensive State AI Law
-      url: https://www.reuters.com/technology/colorado-governor-signs-first-us-ai-regulation-law-2024-05-17/
-      author: Reuters
-      date: May 2024
   relatedEntries:
     - id: sid_XcGTez1oFw
       type: policy
@@ -1268,21 +1158,6 @@
       type: risk
     - id: sid_KpMBQkdQ5g
       type: risk
-  sources:
-    - title: Computing Power and the Governance of AI
-      url: https://www.governance.ai/research-papers/computing-power-and-the-governance-of-artificial-intelligence
-      author: Heim et al.
-      date: "2023"
-    - title: US Export Controls on Advanced Computing
-      url: https://www.bis.doc.gov/
-      author: Bureau of Industry and Security
-    - title: EU AI Act Compute Provisions
-      url: https://artificialintelligenceact.eu/
-    - title: CSET Semiconductor Reports
-      url: https://cset.georgetown.edu/publications/?fwp_publication_types=issue-brief&fwp_topics=semiconductors
-    - title: The Chips and Science Act
-      url: https://www.congress.gov/bill/117th-congress/house-bill/4346
-      date: "2022"
   description: Compute governance uses computational hardware as a lever to regulate AI development. Because advanced AI
     requires enormous amounts of computing power, and that compute comes from concentrated supply chains, controlling
     compute provides a tractable way to govern AI before models are built.
@@ -1626,28 +1501,6 @@
       type: organization
     - id: us-executive-order
       type: policy
-  sources:
-    - title: EU AI Act Full Text (Annotated)
-      url: https://artificialintelligenceact.eu/
-    - title: Official Regulation Text (EUR-Lex)
-      url: https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32024R1689
-    - title: European Commission AI Regulatory Framework
-      url: https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai
-    - title: European AI Office
-      url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
-    - title: European Parliament - AI Act Press Room
-      url: https://www.europarl.europa.eu/news/en/press-room/20240308IPR19015/artificial-intelligence-act-meps-adopt-landmark-law
-    - title: "Brookings: The EU AI Act Will Have Global Impact, but a Limited Brussels Effect"
-      url: https://www.brookings.edu/articles/the-eu-ai-act-will-have-global-impact-but-a-limited-brussels-effect/
-      author: Brookings Institution
-    - title: "Future of Life Institute: EU AI Act Analysis"
-      url: https://artificialintelligenceact.eu/assessment/eu-ai-act-compliance-checker/
-    - title: Stanford HAI EU AI Act Analysis
-      url: https://hai.stanford.edu/policy/eu-ai-act
-    - title: OECD AI Policy Observatory - EU AI Act
-      url: https://oecd.ai/en/dashboards/policy-initiatives/http:%2F%2Faipo.oecd.org%2F2023-data-policyInitiatives-69217
-    - title: GovAI EU AI Act Research
-      url: https://governance.ai/eu-ai-act
   tags:
     - regulation
     - gpai
@@ -1759,18 +1612,6 @@
       value: China
     - label: Enforcing Agency
       value: Bureau of Industry and Security (BIS)
-  sources:
-    - title: BIS Export Controls on Advanced Computing
-      url: https://www.bis.doc.gov/index.php/policy-guidance/country-guidance/china-prc
-      author: Bureau of Industry and Security
-    - title: Commerce Implements New Export Controls on Advanced Computing
-      url: https://www.commerce.gov/news/press-releases/2022/10/commerce-implements-new-export-controls-advanced-computing-and
-      author: US Department of Commerce
-      date: October 2022
-    - title: Choking Off China's Access to the Future of AI
-      url: https://www.csis.org/analysis/choking-chinas-access-future-ai
-      author: CSIS
-      date: "2022"
   description: The United States has implemented unprecedented export controls on advanced semiconductors and
     semiconductor manufacturing equipment, primarily targeting China. These controls represent one of the most
     significant attempts to constrain AI development through hardware governance.
@@ -1847,13 +1688,6 @@
       type: policy
     - id: iaps
       type: organization
-  sources:
-    - title: Chip Security Act (H.R.3447)
-      url: https://www.congress.gov/bill/119th-congress/house-bill/3447/text
-    - title: SIA Statement on Chip Security Act
-      url: https://www.semiconductors.org/sia-statement-on-chip-security-act/
-    - title: Atlantic Council Analysis
-      url: https://www.atlanticcouncil.org/blogs/geotech-cues/how-the-chip-security-act-could-usher-in-an-era-of-trusted-trade-with-us-partners/
   lastUpdated: 2026-03
 - id: stop-stealing-our-chips-act
   stableId: sid_dLGmQQU4yB
@@ -1920,11 +1754,6 @@
       type: approach
     - id: iaps
       type: organization
-  sources:
-    - title: Stop Stealing Our Chips Act (S.1473)
-      url: https://www.congress.gov/bill/119th-congress/senate-bill/1473/text
-    - title: IAPS Issue Brief
-      url: https://www.iaps.ai/research/issue-brief-the-stop-stealing-our-chips-act
   lastUpdated: 2026-03
 - id: failed-stalled-proposals
   stableId: sid_dj6xnXmB7A
@@ -1937,14 +1766,6 @@
       value: Learning from unsuccessful efforts
     - label: Coverage
       value: US, International
-  sources:
-    - title: California SB 1047 Veto Message
-      url: https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf
-      author: Governor Newsom
-      date: September 2024
-    - title: Hiroshima AI Process
-      url: https://www.mofa.go.jp/ecm/ec/page5e_000076.html
-      author: G7
   description: Understanding why AI governance proposals fail is as important as understanding successes. Failed efforts
     reveal political constraints, industry opposition patterns, and the challenges of regulating rapidly evolving
     technology.
@@ -1988,29 +1809,6 @@
       type: policy
     - id: sid_LyLbPk4iNQ
       type: policy
-  sources:
-    - title: The Bletchley Declaration
-      url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration/the-bletchley-declaration-by-countries-attending-the-ai-safety-summit-1-2-november-2023
-      date: November 1, 2023
-    - title: Seoul AI Safety Summit Outcomes
-      url: https://www.gov.uk/government/publications/ai-seoul-summit-2024-outcomes
-      date: May 2024
-    - title: Frontier AI Safety Commitments
-      url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
-      date: May 21, 2024
-    - title: UN AI Advisory Body Report
-      url: https://www.un.org/ai-advisory-body
-      date: "2024"
-    - title: G7 Hiroshima AI Process
-      url: https://www.g7hiroshima.go.jp/en/documents/
-      date: "2023"
-    - title: "Analysis: International AI Governance After Bletchley"
-      url: https://www.governance.ai/research-papers/international-ai-governance
-      author: GovAI
-      date: "2024"
-    - title: OECD AI Principles
-      url: https://oecd.ai/en/ai-principles
-      date: 2019, updated 2023
   description: The International AI Safety Summit series represents the first sustained effort at global coordination on
     AI safety, bringing together governments, AI companies, civil society, and researchers to address the risks from
     advanced AI.
@@ -2051,17 +1849,6 @@
       value: Voluntary framework
     - label: Referenced by
       value: US Executive Order, state laws
-  sources:
-    - title: AI Risk Management Framework
-      url: https://www.nist.gov/itl/ai-risk-management-framework
-      author: NIST
-    - title: AI RMF Playbook
-      url: https://airc.nist.gov/AI_RMF_Knowledge_Base/Playbook
-      author: NIST
-    - title: Generative AI Profile (AI 600-1)
-      url: https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence
-      author: NIST
-      date: July 2024
   stakeholders:
     - name: NIST
       entityId: sid_Eac7pHF06Q
@@ -2103,14 +1890,6 @@
       value: Paris Summit (Feb 2025)
     - label: Signatories
       value: 28 countries + EU
-  sources:
-    - title: Seoul Declaration
-      url: https://www.gov.uk/government/publications/seoul-declaration-for-safe-innovative-and-inclusive-ai
-      author: Summit Participants
-    - title: Frontier AI Safety Commitments
-      url: https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024
-      author: AI Companies
-      date: May 2024
   stakeholders:
     - name: United Kingdom
       position: support
@@ -2152,16 +1931,6 @@
       value: Active
     - label: Relevance
       value: Standards increasingly referenced in law
-  sources:
-    - title: ISO/IEC JTC 1/SC 42 Artificial Intelligence
-      url: https://www.iso.org/committee/6794475.html
-      author: ISO
-    - title: IEEE Ethically Aligned Design
-      url: https://ethicsinaction.ieee.org/
-      author: IEEE
-    - title: EU AI Act Standardisation
-      url: https://digital-strategy.ec.europa.eu/en/policies/ai-standards
-      author: European Commission
   description: International and national organizations that develop technical standards for AI systems, including
     measurement methodologies, safety requirements, and evaluation protocols. Key bodies include ISO/IEC JTC 1/SC 42,
     NIST, and IEEE, whose standards increasingly inform government AI regulation.
@@ -2342,30 +2111,6 @@
       type: policy
     - id: voluntary-commitments
       type: policy
-  sources:
-    - title: "Executive Order 14110: Full Text"
-      url: https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
-      date: October 30, 2023
-    - title: White House Fact Sheet
-      url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/10/30/fact-sheet-president-biden-issues-executive-order-on-safe-secure-and-trustworthy-artificial-intelligence/
-    - title: US AI Safety Institute
-      url: https://www.nist.gov/aisi
-    - title: NIST AI Risk Management Framework
-      url: https://www.nist.gov/itl/ai-risk-management-framework
-    - title: Analysis from CSET
-      url: https://cset.georgetown.edu/article/understanding-the-ai-executive-order/
-      author: CSET
-      date: "2023"
-    - title: "Analysis of Revocation: What To Know"
-      url: https://www.wiley.law/alert-President-Trump-Revokes-Biden-Administrations-AI-EO-What-To-Know
-      author: Wiley Law
-      date: January 2025
-    - title: "EO 14179: Removing Barriers to American Leadership in AI"
-      url: https://www.whitehouse.gov/presidential-actions/removing-barriers-to-american-leadership-in-artificial-intelligence/
-      date: January 23, 2025
-    - title: Stanford HAI AI Executive Order Tracker
-      url: https://hai.stanford.edu/policy/tracking-us-ai-executive-order
-      author: Stanford HAI
   description: Executive Order 14110 on Safe, Secure, and Trustworthy AI, signed by President Biden on October 30, 2023,
     was the most comprehensive US government action on AI governance. The 111-page directive established mandatory
     compute-based reporting thresholds (10^26 FLOP—the same threshold later used in California's SB 1047), created the
@@ -2396,13 +2141,6 @@
       value: 400+
     - label: Trend
       value: Rapidly increasing
-  sources:
-    - title: State AI Legislation Tracker
-      url: https://www.bsa.org/policy/artificial-intelligence
-      author: BSA
-    - title: AI Legislation in the States
-      url: https://www.ncsl.org/technology-and-communication/artificial-intelligence-2024-legislation
-      author: National Conference of State Legislatures
   description: In the absence of comprehensive federal AI legislation, US states have become laboratories for AI
     governance. As of 2024, hundreds of AI-related bills have been introduced across all 50 states, with several
     significant laws enacted.
@@ -2520,26 +2258,6 @@
       type: organization
     - id: us-executive-order
       type: policy
-  sources:
-    - title: "White House Fact Sheet: Voluntary AI Commitments"
-      url: https://www.whitehouse.gov/briefing-room/statements-releases/2023/07/21/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-leading-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/
-      date: July 21, 2023
-    - title: Anthropic's Responsible Scaling Policy
-      url: https://www.anthropic.com/news/anthropics-responsible-scaling-policy
-      date: September 2023
-    - title: OpenAI Preparedness Framework
-      url: https://openai.com/safety/preparedness
-      date: December 2023
-    - title: Google DeepMind Frontier Safety Framework
-      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-      date: May 2024
-    - title: Bletchley Declaration
-      url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration/the-bletchley-declaration-by-countries-attending-the-ai-safety-summit-1-2-november-2023
-      date: November 2023
-    - title: "Analysis: Are Voluntary AI Commitments Enough?"
-      url: https://www.governance.ai/research-papers/voluntary-commitments
-      author: GovAI
-      date: "2024"
   description: In July 2023, the White House secured voluntary commitments from leading AI companies on safety, security,
     and trust. These commitments represent the first coordinated industry-wide AI safety pledges, establishing baseline
     practices for frontier AI development.
@@ -2581,28 +2299,6 @@
       type: risk
     - id: sid_zzLBCdjXEw
       type: risk
-  sources:
-    - title: The Vulnerability of Democracies to Disinformation
-      url: https://www.rand.org/pubs/research_briefs/RB10088.html
-      author: RAND Corporation
-      date: "2019"
-    - title: "Deep Fakes: A Looming Challenge"
-      url: https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3213954
-      author: Chesney & Citron
-      date: "2019"
-    - title: The Oxygen of Amplification
-      url: https://datasociety.net/library/oxygen-of-amplification/
-      author: Whitney Phillips (Data & Society)
-      date: "2018"
-    - title: Inoculation Theory
-      url: https://www.sdlab.psychol.cam.ac.uk/research/inoculation-science
-      author: Sander van der Linden
-    - title: C2PA Specification
-      url: https://c2pa.org/specifications/specifications/1.0/specs/C2PA_Specification.html
-    - title: Synthetic Media and AI
-      url: https://partnershiponai.org/paper/responsible-practices-synthetic-media/
-      author: Partnership on AI
-      date: "2023"
   description: >
     Epistemic security refers to protecting society's collective capacity for truth-finding in an era when AI can
     generate convincing false content at unprecedented scale. Just as national security protects against physical
@@ -2648,14 +2344,6 @@
       type: research-area
     - id: sid_MBGtb3Qlkw
       type: research-area
-  sources:
-    - title: Core Views on AI Safety
-      url: https://anthropic.com/news/core-views-on-ai-safety
-      author: Anthropic
-      date: "2023"
-    - title: Responsible Scaling Policy
-      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
-      date: "2023"
   description: Anthropic's Core Views on AI Safety is their publicly stated research agenda and organizational philosophy.
     Published in 2023, it articulates why Anthropic believes safety-focused labs should be at the frontier of AI
     development.
@@ -2681,19 +2369,6 @@
       value: Calibration across domains
     - label: Key Players
       value: Metaculus, FutureSearch, Epoch AI
-  sources:
-    - title: Metaculus AI Forecasting
-      url: https://www.metaculus.com/project/ai-forecasting/
-    - title: FutureSearch
-      url: https://arxiv.org/abs/2312.07474
-      date: "2023"
-    - title: Epoch AI
-      url: https://epochai.org/
-    - title: Superforecasting
-      author: Philip Tetlock
-      date: "2015"
-    - title: Forecasting Research Institute
-      url: https://forecastingresearch.org/
   description: >
     AI-augmented forecasting combines the pattern-recognition and data-processing capabilities of AI systems with the
     contextual judgment and calibration of human forecasters. This hybrid approach aims to produce more accurate
@@ -2742,17 +2417,6 @@
       type: risk
     - id: sid_GnUTRJhA4g
       type: risk
-  sources:
-    - title: C2PA Technical Specification
-      url: https://c2pa.org/specifications/specifications/1.0/specs/C2PA_Specification.html
-    - title: Content Authenticity Initiative
-      url: https://contentauthenticity.org/
-    - title: Google SynthID
-      url: https://deepmind.google/technologies/synthid/
-    - title: Project Origin
-      url: https://www.originproject.info/
-    - title: "Witness: Video as Evidence"
-      url: https://www.witness.org/
   description: >
     Content authentication technologies aim to establish verifiable provenance for digital content - allowing users to
     confirm where content came from, whether it has been modified, and whether it was created by AI or humans. The goal
@@ -2802,18 +2466,6 @@
       type: risk
     - id: sid_Pr5xmThNfA
       type: risk
-  sources:
-    - title: The Strategy of Conflict
-      author: Thomas Schelling
-      date: "1960"
-    - title: Governing the Commons
-      author: Elinor Ostrom
-      date: "1990"
-    - title: GovAI Research
-      url: https://www.governance.ai/
-    - title: Computing Power and the Governance of AI
-      url: https://arxiv.org/abs/2402.08797
-      date: "2024"
   description: >
     Coordination technologies are tools and mechanisms that enable actors to cooperate on collective challenges when
     individual incentives favor defection. For AI safety, these technologies address the fundamental problem that racing
@@ -2853,20 +2505,6 @@
       value: Adoption and integration with governance
     - label: Key Players
       value: Polis, Anthropic (Collective Constitutional AI), Taiwan vTaiwan
-  sources:
-    - title: Polis
-      url: https://pol.is/
-    - title: Collective Constitutional AI
-      url: https://www.anthropic.com/news/collective-constitutional-ai-aligning-a-language-model-with-public-input
-      author: Anthropic
-      date: "2023"
-    - title: Stanford Deliberative Democracy Lab
-      url: https://deliberation.stanford.edu/
-    - title: Democracy When the People Are Thinking
-      author: James Fishkin
-      date: "2018"
-    - title: vTaiwan
-      url: https://info.vtaiwan.tw/
   description: >
     AI-assisted deliberation uses AI to scale meaningful democratic dialogue beyond the constraints of traditional town
     halls and focus groups. Rather than replacing human deliberation with AI decisions, these tools use AI to
@@ -2918,15 +2556,6 @@
       type: risk
     - id: sid_jiqdwTucCA
       type: risk
-  sources:
-    - title: Wikimedia Foundation
-      url: https://wikimediafoundation.org/
-    - title: Internet Archive
-      url: https://archive.org/
-    - title: Semantic Scholar
-      url: https://www.semanticscholar.org/
-    - title: International Fact-Checking Network
-      url: https://www.poynter.org/ifcn/
   description: >
     Epistemic infrastructure refers to the foundational systems that societies depend on for creating, verifying,
     preserving, and accessing knowledge. Just as physical infrastructure (roads, power grids) underlies economic
@@ -2981,18 +2610,6 @@
       type: risk
     - id: sid_ks0lqvZqUg
       type: risk
-  sources:
-    - title: "Humans and Automation: Use, Misuse, Disuse, Abuse"
-      author: Parasuraman & Riley
-      date: "1997"
-    - title: "High-Performance Medicine: Convergence of AI and Human Expertise"
-      url: https://www.nature.com/articles/s41591-018-0300-7
-      author: Eric Topol
-      date: "2019"
-    - title: Stanford HAI
-      url: https://hai.stanford.edu/
-    - title: Redwood Research
-      url: https://www.redwoodresearch.org/
   description: >
     AI-human hybrid systems are designs that deliberately combine AI capabilities with human judgment to achieve
     outcomes better than either could produce alone. Rather than full automation or human-only processes, hybrid systems
@@ -3039,21 +2656,6 @@
       type: risk
     - id: sid_gMaUtaXGaw
       type: risk
-  sources:
-    - title: Prediction Markets
-      url: https://www.aeaweb.org/articles?id=10.1257/0895330041371321
-      author: Wolfers & Zitzewitz
-      date: "2004"
-    - title: Superforecasting
-      author: Philip Tetlock
-      date: "2015"
-    - title: "Futarchy: Vote Values, Bet Beliefs"
-      url: https://mason.gmu.edu/~rhanson/futarchy.html
-      author: Robin Hanson
-    - title: Metaculus
-      url: https://www.metaculus.com/
-    - title: Good Judgment Project
-      url: https://goodjudgment.com/
   description: >
     Prediction markets use market mechanisms to aggregate beliefs about future events, producing probability estimates
     that reflect the collective knowledge of participants. Unlike polls or expert surveys, prediction markets create
@@ -3774,50 +3376,6 @@
       type: organization
     - id: sid_tt0f5PYDCw
       type: organization
-  sources:
-    - title: SB 53 Bill Text (Chaptered)
-      url: https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=202520260SB53
-      author: California Legislature
-      date: September 2025
-    - title: Governor Newsom Signs SB 53 (Official Press Release)
-      url: https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/
-      author: Office of the Governor
-      date: September 29, 2025
-    - title: "Governing Frontier AI: California's SB 53"
-      url: https://www.lawfaremedia.org/article/governing-frontier-ai--california-s-sb-53
-      author: Lam Tran
-      date: October 2025
-    - title: California Governor Newsom Signs Landmark AI Safety Bill SB 53
-      url: https://techcrunch.com/2025/09/29/california-governor-newsom-signs-landmark-ai-safety-bill-sb-53/
-      author: TechCrunch
-      date: September 29, 2025
-    - title: With SB 53, California Puts AI Disclosure Requirements on the Map
-      url: https://iapp.org/news/a/with-sb-53-california-puts-ai-disclosure-requirements-on-the-map
-      author: IAPP
-      date: October 2025
-    - title: What Is California's AI Safety Law?
-      url: https://www.brookings.edu/articles/what-is-californias-ai-safety-law/
-      author: Brookings Institution
-      date: October 2025
-    - title: California Just Passed the First U.S. Frontier AI Law. Here's What It Does.
-      url: https://carnegieendowment.org/emissary/2025/10/california-sb-53-frontier-ai-law-what-it-does
-      author: Carnegie Endowment for International Peace
-      date: October 2025
-    - title: "California's SB 53: The First Frontier AI Law, Explained"
-      url: https://fpf.org/blog/californias-sb-53-the-first-frontier-ai-law-explained/
-      author: Future of Privacy Forum
-      date: October 2025
-    - title: Anthropic Is Endorsing SB 53
-      url: https://www.anthropic.com/news/anthropic-is-endorsing-sb-53
-      author: Anthropic
-      date: September 2025
-    - title: "Anthropic: Compliance Framework for California SB 53"
-      url: https://www.anthropic.com/news/compliance-framework-SB53
-      author: Anthropic
-    - title: Newsom Signs AI Safety Law Opposed by Meta, Google, OpenAI
-      url: https://sfstandard.com/2025/09/29/gavin-newsom-california-ai-legislation-law-technology/
-      author: SF Standard
-      date: September 29, 2025
   lastUpdated: 2026-03
 - id: intervention-portfolio
   stableId: sid_1tYGw60kig
@@ -3943,19 +3501,6 @@
       type: organization
     - id: sid_rQEkFJxS5w
       type: organization
-  sources:
-    - title: Anthropic's Responsible Scaling Policy
-      url: https://www.anthropic.com/index/anthropics-responsible-scaling-policy
-      author: Anthropic
-      date: September 2023
-    - title: OpenAI Preparedness Framework
-      url: https://openai.com/safety/preparedness
-      author: OpenAI
-      date: December 2023
-    - title: Google DeepMind Frontier Safety Framework
-      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-      author: Google DeepMind
-      date: May 2024
   lastUpdated: 2026-02
 - id: corporate
   stableId: sid_KeRi5RnokQ
@@ -4137,13 +3682,6 @@
       relationship: leads-to
     - id: chips-alliance
       type: organization
-  sources:
-    - title: FlexHEG Interim Report
-      url: https://yoshuabengio.org/wp-content/uploads/2024/09/FlexHEG-Interim-Report_2024.pdf
-    - title: Technical Options for FlexHEGs
-      url: https://arxiv.org/abs/2506.03409
-    - title: International Security Applications of FlexHEGs
-      url: https://arxiv.org/abs/2506.15100
   lastUpdated: 2026-03
 - id: caliptra
   stableId: sid_3bNYPnhxCg
@@ -4167,11 +3705,6 @@
       type: organization
     - id: hardware-enabled-governance
       type: approach
-  sources:
-    - title: CHIPS Alliance Caliptra 2.1 RTL Release
-      url: https://www.chipsalliance.org/news/caliptra2-1/
-    - title: Caliptra GitHub Repository
-      url: https://github.com/chipsalliance/Caliptra
   lastUpdated: 2026-03
 - id: thresholds
   stableId: sid_3OTN6TAzhw
@@ -4444,13 +3977,6 @@
       type: policy
     - id: sid_4a6Sf9Fupg
       type: concept
-  sources:
-    - title: The Singapore Consensus on Global AI Safety Research Priorities
-      url: https://arxiv.org/abs/2506.20702
-      date: June 2025
-    - title: Singapore Consensus (Official Site)
-      url: https://aisafetypriorities.org/
-      date: April 2025
   lastUpdated: 2026-02
 - id: coordination-mechanisms
   stableId: sid_4a6Sf9Fupg
@@ -4677,26 +4203,6 @@
       value: December 19, 2025
     - label: Effective
       value: January 1, 2027
-  sources:
-    - title: Governor Hochul Signs Nation-Leading AI Legislation
-      url: https://www.governor.ny.gov/news/governor-hochul-signs-nation-leading-legislation-require-ai-frameworks-ai-frontier-models
-      author: Office of Governor Kathy Hochul
-      date: December 19, 2025
-    - title: "Senate Bill S6953B: RAISE Act"
-      url: https://www.nysenate.gov/legislation/bills/2025/S6953B
-      author: New York State Senate
-    - title: "New York RAISE Act: What Companies Need to Know"
-      url: https://iapp.org/news/a/new-york-raise-act-what-companies-need-to-know/
-      author: IAPP
-      date: "2025"
-    - title: New York RAISE Act Analysis
-      url: https://www.dwt.com/blogs/artificial-intelligence-law-advisor/2025/new-york-raise-act
-      author: Davis Wright Tremaine
-      date: "2025"
-    - title: Comparing New York's RAISE Act to California's SB 53
-      url: https://fpf.org/blog/comparing-new-yorks-raise-act-to-californias-sb-53/
-      author: Future of Privacy Forum
-      date: "2025"
   tags:
     - regulation
     - state-policy
@@ -4805,16 +4311,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: Superintelligence Strategy
-      url: https://arxiv.org/abs/2503.05628
-      author: Dan Hendrycks, Eric Schmidt, Alexandr Wang
-    - title: AI Deterrence Is Our Best Option
-      url: https://ai-frontiers.org/articles/ai-deterrence-is-our-best-option
-      author: Dan Hendrycks, Anka Khoja
-    - title: "Refining MAIM: Identifying Changes Required to Meet Conditions for Deterrence"
-      url: https://intelligence.org/2025/04/11/refining-maim-identifying-changes-required-to-meet-conditions-for-deterrence/
-      author: MIRI
   relatedEntries:
     - id: sid_VoNqoBJkyg
       type: person
@@ -5309,11 +4805,6 @@
       type: organization
     - id: sid_JzhBAecjaA
       type: organization
-  sources:
-    - title: EA Forum Fellowship Announcement
-      url: https://forum.effectivealtruism.org/posts/dQWHB2s3frDjXwGFe/funded-fellowship-ai-for-human-reasoning-fellowship-with-the
-    - title: AI for Human Reasoning Website
-      url: https://aiforhumanreasoning.com/
   lastUpdated: 2026-03
 - id: ai-watch
   stableId: sid_gDdFdUktjA
@@ -5899,17 +5390,6 @@
       type: policy
     - id: sid_7ptWHyqwBA
       type: resource
-  sources:
-    - title: Recoding America - Jennifer Pahlka
-      url: https://www.recodingamerica.us/
-      author: Jennifer Pahlka
-    - title: Pahlka Senate Testimony on AI in Government
-      url: https://fas.org/publication/pahlka-testifies-ai-govt-services/
-      author: Federation of American Scientists
-      date: January 2024
-    - title: AI Meets the Cascade of Rigidity
-      url: https://www.niskanencenter.org/ai-meets-the-cascade-of-rigidity/
-      author: Niskanen Center
   description: State capacity — the ability of government to implement its policy goals — is a binding constraint on AI
     governance. Without technical expertise, institutional agility, and implementation capacity, even well-designed AI
     regulations risk being toothless or counterproductive.
@@ -5933,13 +5413,6 @@
       type: concept
     - id: sid_lfvY1bGeoA
       type: concept
-  sources:
-    - title: Recoding America Official Website
-      url: https://www.recodingamerica.us/
-      author: Jennifer Pahlka
-    - title: "Recoding America: A Rallying Cry for State Capacity"
-      url: https://modernpower.substack.com/p/recoding-america-a-rallying-cry-for
-      author: Modern Power
   description: A 2023 book by Jennifer Pahlka arguing that government digital failures stem from institutional culture
     that separates policy from implementation, creating a "cascade of rigidity" with implications for AI governance and
     state capacity.
@@ -6011,13 +5484,6 @@
     - trump-administration
   clusters:
     - governance
-  sources:
-    - title: Federal Register
-      url: https://www.federalregister.gov/documents/2025/01/31/2025-02172/removing-barriers-to-american-leadership-in-artificial-intelligence
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/Executive_Order_14179
-    - title: CSET Analysis
-      url: https://cset.georgetown.edu/article/the-executive-order-on-removing-barriers-to-american-leadership-in-artificial-intelligence/
   lastUpdated: 2026-03
 - id: trump-ai-preemption-eo
   stableId: sid_1h93jgFv4l
@@ -6067,11 +5533,6 @@
     - federal-state-conflict
   clusters:
     - governance
-  sources:
-    - title: White House
-      url: https://www.whitehouse.gov/presidential-actions/2025/12/eliminating-state-law-obstruction-of-national-artificial-intelligence-policy/
-    - title: Ropes & Gray Analysis
-      url: https://www.ropesgray.com/en/insights/alerts/2025/12/trump-attempts-to-preempt-state-ai-regulation-through-executive-order
   lastUpdated: 2026-03
 - id: trump-ai-framework-2026
   stableId: sid_7rafBo4OER
@@ -6145,15 +5606,6 @@
     - preemption
   clusters:
     - governance
-  sources:
-    - title: White House Announcement
-      url: https://www.whitehouse.gov/articles/2026/03/president-donald-j-trump-unveils-national-ai-legislative-framework/
-    - title: CNN Coverage
-      url: https://www.cnn.com/2026/03/20/tech/white-house-ai-framework
-    - title: CNBC Coverage
-      url: https://www.cnbc.com/2026/03/20/trump-ai-policy-framework.html
-    - title: Sullivan & Cromwell Analysis
-      url: https://www.sullcrom.com/insights/memo/2026/March/White-House-Releases-National-Policy-Framework-AI
   lastUpdated: 2026-03
 - id: take-it-down-act
   stableId: sid_Nq8e8nItph
@@ -6242,15 +5694,6 @@
     - bipartisan
   clusters:
     - governance
-  sources:
-    - title: Congress.gov Bill Text
-      url: https://www.congress.gov/bill/119th-congress/senate-bill/146/text
-    - title: White House Signing Statement
-      url: https://www.whitehouse.gov/articles/2025/05/icymi-president-trump-signs-take-it-down-act-into-law/
-    - title: EFF Analysis
-      url: https://www.eff.org/deeplinks/2025/12/politicians-rushed-through-online-speech-solution-victims-deserve-better
-    - title: IAPP Overview
-      url: https://iapp.org/news/a/take-it-down-act-the-next-bipartisan-us-federal-privacy-ai-law
   lastUpdated: 2026-03
 - id: ai-lead-act
   stableId: sid_JCdMGaEZOj
@@ -6310,11 +5753,6 @@
     - federal-legislation
   clusters:
     - governance
-  sources:
-    - title: Congress.gov
-      url: https://www.congress.gov/bill/119th-congress/senate-bill/2937
-    - title: National Law Review Analysis
-      url: https://natlawreview.com/article/new-federal-legislation-proposes-product-liability-standards-ai-systems
   lastUpdated: 2026-03
 - id: ai-risk-evaluation-act
   stableId: sid_ZpeTfyauLM
@@ -6376,9 +5814,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: Congress.gov Bill Text
-      url: https://www.congress.gov/bill/119th-congress/senate-bill/2938/text
   lastUpdated: 2026-03
 - id: paris-ai-summit
   stableId: sid_Fghn4m4ekW
@@ -6430,9 +5865,6 @@
     - us-refusal
   clusters:
     - governance
-  sources:
-    - title: Wikipedia
-      url: https://en.wikipedia.org/wiki/AI_Action_Summit
   lastUpdated: 2026-03
 - id: un-ai-governance-resolution
   stableId: sid_TNWEEemXQd
@@ -6483,11 +5915,6 @@
       reason: Supported the scientific panel and dialogue framework but preferred its own AI Act as the primary governance mechanism
   clusters:
     - governance
-  sources:
-    - title: UN Press Release
-      url: https://press.un.org/en/2025/sgsm22776.doc.htm
-    - title: WEF Explainer
-      url: https://www.weforum.org/stories/2025/10/un-new-ai-governance-bodies/
   lastUpdated: 2026-04
 - id: utah-sb226
   stableId: sid_yxyu4w3Xup
@@ -6538,11 +5965,6 @@
     - utah
   clusters:
     - governance
-  sources:
-    - title: Utah Legislature
-      url: https://le.utah.gov/~2025/bills/static/SB0226.html
-    - title: Perkins Coie Analysis
-      url: https://perkinscoie.com/insights/update/new-utah-ai-laws-change-disclosure-requirements-and-identity-protections-target
   lastUpdated: 2026-03
 - id: illinois-ai-employment
   stableId: sid_ijQ2GcsXAQ
@@ -6587,9 +6009,6 @@
     - illinois
   clusters:
     - governance
-  sources:
-    - title: NCSL AI Legislation Tracker
-      url: https://www.ncsl.org/technology-and-communication/artificial-intelligence-2025-legislation
   lastUpdated: 2026-03
 - id: arkansas-ai-laws
   stableId: sid_Tt1wXsEjKw
@@ -6639,9 +6058,6 @@
     - arkansas
   clusters:
     - governance
-  sources:
-    - title: King & Spalding Analysis
-      url: https://www.kslaw.com/news-and-insights/new-state-ai-laws-are-effective-on-january-1-2026-but-a-new-executive-order-signals-disruption
   lastUpdated: 2026-03
 - id: kentucky-ai-governance
   stableId: sid_TVA6XJDdOO
@@ -6679,9 +6095,6 @@
     - kentucky
   clusters:
     - governance
-  sources:
-    - title: White & Case Analysis
-      url: https://www.whitecase.com/insight-alert/california-kentucky-tracking-rise-state-ai-laws-2025
   lastUpdated: 2026-03
 - id: indiana-ai-healthcare
   stableId: sid_I8mbdJyUjs
@@ -6725,9 +6138,6 @@
     - indiana
   clusters:
     - governance
-  sources:
-    - title: IAPP Analysis
-      url: https://iapp.org/news/a/us-state-ai-legislation-reviewing-the-2025-session
   lastUpdated: 2026-03
 - id: tennessee-ai-mental-health
   stableId: sid_CfUOvtha9O
@@ -6773,9 +6183,6 @@
     - tennessee
   clusters:
     - governance
-  sources:
-    - title: FPF Analysis
-      url: https://fpf.org/blog/the-state-of-state-ai-legislative-approaches-to-ai-in-2025/
   lastUpdated: 2026-03
 - id: california-sb243
   stableId: sid_38lWEn2OYr
@@ -6821,9 +6228,6 @@
     - companion-ai
   clusters:
     - governance
-  sources:
-    - title: Transparency Coalition Report
-      url: https://www.transparencycoalition.ai/news/transparency-coalition-publishes-2025-state-ai-legislation-report
   lastUpdated: 2026-03
 - id: washington-ai-chatbot
   stableId: sid_7xjjFPltc4
@@ -6877,9 +6281,6 @@
     - washington
   clusters:
     - governance
-  sources:
-    - title: IAPP Analysis
-      url: https://iapp.org/news/a/five-trends-in-the-new-state-ai-legislative-session
   lastUpdated: 2026-03
 - id: defiance-act
   stableId: sid_XOxFEPaf90
@@ -6940,11 +6341,6 @@
     - victim-protection
   clusters:
     - governance
-  sources:
-    - title: Congress.gov
-      url: https://www.congress.gov/bill/119th-congress/senate-bill/1837/text
-    - title: Roll Call Coverage
-      url: https://rollcall.com/2026/01/13/senate-passes-bill-targeting-nonconsensual-deepfake-images/
   lastUpdated: 2026-03
 - id: blackburn-trump-america-ai
   stableId: sid_Qz9kfJzEP7
@@ -7005,13 +6401,6 @@
     - discussion-draft
   clusters:
     - governance
-  sources:
-    - title: Blackburn Press Release
-      url: https://www.blackburn.senate.gov/2026/3/technology/blackburn-releases-discussion-draft-of-national-policy-framework-for-artificial-intelligence/3b3b6458-b6c7-478b-9859-374949586765
-    - title: IAPP Analysis
-      url: https://iapp.org/news/a/us-sen-blackburn-proposes-ai-framework-to-protect-children-copyrights
-    - title: National Law Review Analysis
-      url: https://natlawreview.com/article/proposed-senate-bill-could-bring-sweeping-changes-ai-liability-section-230-and
   lastUpdated: 2026-03
 - id: ai-litigation-democracy
   stableId: sid_Zl0fiVceDA
@@ -7052,13 +6441,6 @@
     - id: sid_Ygxw8JVW8X
       type: organization
       relationship: related
-  sources:
-    - title: Democracy Forward FOIA AI Lawsuit
-      url: https://democracyforward.org/updates/foia-ai-lawsuit/
-    - title: ACLU v. NSA FOIA
-      url: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
-    - title: DOJ AI Litigation Task Force
-      url: https://www.justice.gov/ag/media/1422986/dl?inline=
   lastUpdated: 2026-03
 - id: ai-policy-lobbying
   stableId: sid_RQVmYNQrbD
@@ -7111,11 +6493,6 @@
     - id: sid_d9sWZtyVwg
       type: organization
       relationship: related
-  sources:
-    - title: OpenSecrets - Center for AI Policy
-      url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
-    - title: ARI About
-      url: https://ari.us/about-us/
   lastUpdated: 2026-03
 - id: grassroots-ai-activism
   stableId: sid_6mDLLUdlQb
@@ -7157,11 +6534,6 @@
     - id: sid_DK0GbGg7Kf
       type: organization
       relationship: supports
-  sources:
-    - title: FLI Pro-Human AI Declaration
-      url: https://humanstatement.org/
-    - title: Mozilla Democracy x AI Cohort
-      url: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
   lastUpdated: 2026-03
 - id: ai-governance-research
   stableId: sid_jjCh8xw39l
@@ -7208,11 +6580,6 @@
     - id: sid_XkqcWk46oQ
       type: organization
       relationship: related
-  sources:
-    - title: Brennan Center AI Legislation Tracker
-      url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
-    - title: GovAI Website
-      url: https://governance.ai
   lastUpdated: 2026-03
 - id: government-ai-monitoring
   stableId: sid_bidMivQo1W
@@ -7255,11 +6622,6 @@
     - id: sid_yTlRworV1V
       type: organization
       relationship: supports
-  sources:
-    - title: Revolving Door Project AI Tracker
-      url: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
-    - title: Freedom on the Net 2025
-      url: https://freedomhouse.org/country/united-states/freedom-net/2025
   lastUpdated: 2026-03
 - id: us-government-technology-workforce
   stableId: sid_SrRJXshFlw

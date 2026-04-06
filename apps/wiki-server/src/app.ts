@@ -45,9 +45,9 @@ import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
 import { entityAssessmentsRoute } from "./routes/tablebase/entity-assessments.js";
 import { publicationsRoute } from "./routes/tablebase/publications.js";
 import { websiteSourcesRoute } from "./routes/tablebase/website-sources.js";
-import { entityRecommendedResourcesRoute } from "./routes/tablebase/entity-recommended-resources.js";
 import { entityResourcesRoute } from "./routes/tablebase/entity-resources.js";
 import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
+import { recordLookupRoute } from "./routes/tablebase/record-lookup.js";
 
 // FactBase routes — structured triples with temporal data
 import { factsRoute } from "./routes/factbase/facts.js";
@@ -250,11 +250,13 @@ export function createApp() {
   app.route("/api/entity-assessments", entityAssessmentsRoute);
   app.route("/api/publications", publicationsRoute);
   app.route("/api/website-sources", websiteSourcesRoute);
-  app.route("/api/entity-recommended-resources", entityRecommendedResourcesRoute);
   app.route("/api/entity-resources", entityResourcesRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);
+
+  // Single-record lookup by table + ID (for things detail views)
+  app.route("/api/record-lookup", recordLookupRoute);
 
 
   // Agent & session tracking (operational)
