@@ -28,6 +28,7 @@ Port 3001 belongs to the user's main dev server (`lw/main`). Agents must use the
 
 **Rules:**
 - **Never `pkill -f "next dev"`** — that kills ALL dev servers including the user's
+- **Never `kill $(lsof -ti:PORT)` without `-sTCP:LISTEN`** — bare `lsof -ti` matches browser connections too, which crashes the user's browser. Always use: `kill $(lsof -ti:PORT -sTCP:LISTEN) 2>/dev/null`
 - **Never start a dev server on port 3001** from a slot or worktree
 - **Never browse to localhost:3001** from a slot agent — you'll see the wrong branch
 - Worktree agents generally don't need dev servers (they're for quick fixes like rebases)

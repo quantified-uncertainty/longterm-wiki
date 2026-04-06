@@ -14,9 +14,11 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
+import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
+import { isAnySid } from "@longterm-wiki/id-utils";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -155,9 +157,9 @@ const HIDDEN_COLUMNS: Record<string, Set<string>> = {
   personnel: new Set(["person_id", "organization_id", "person_display_name", "org_display_name"]),
   grantsGiven: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
   grantsReceived: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
-  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name"]),
-  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name"]),
-  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name"]),
+  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name", "amount_low", "amount_high", "stake_low", "stake_high"]),
+  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name", "stake_low", "stake_high"]),
+  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name", "raised_low", "raised_high", "valuation_low", "valuation_high"]),
   policyStakeholders: new Set(["stakeholder_display_name"]),
   divisionPersonnel: new Set(["person_display_name"]),
 };
@@ -179,6 +181,75 @@ const COLUMN_HEADER_OVERRIDES: Record<string, string> = {
   organization_id: "Organization",
 };
 
+// ── Entity ref hover card ──────────────────────────────────────────────────
+
+function EntityRefHoverCard({
+  entry,
+  stableId,
+  children,
+}: {
+  entry: DisplayNameEntry;
+  stableId: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <HoverCard.Root openDelay={300} closeDelay={150}>
+      <HoverCard.Trigger asChild>{children}</HoverCard.Trigger>
+      <HoverCard.Portal>
+        <HoverCard.Content
+          className="z-50 w-[260px] rounded-lg border border-border bg-popover p-3 shadow-lg animate-in fade-in-0 zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=top]:slide-in-from-bottom-2"
+          side="bottom"
+          align="start"
+          sideOffset={4}
+        >
+          <div className="flex items-center gap-1.5 mb-1.5">
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground font-medium bg-muted/50 px-1.5 py-0.5 rounded">
+              {entry.entityType}
+            </span>
+          </div>
+          <div className="font-semibold text-sm mb-1">{entry.title}</div>
+          <div className="text-[10px] text-muted-foreground/60 font-mono mb-2">{stableId}</div>
+          <Link
+            href={entityHref(entry)}
+            className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline font-medium"
+          >
+            View entity →
+          </Link>
+          <HoverCard.Arrow className="fill-border" />
+        </HoverCard.Content>
+      </HoverCard.Portal>
+    </HoverCard.Root>
+  );
+}
+
+// ── Section grouping & entity-type filtering ──────────────────────────────
+
+const SECTION_GROUPS: { label: string; keys: string[] }[] = [
+  { label: "Core Data", keys: ["personnel", "divisions", "divisionPersonnel"] },
+  { label: "Financial", keys: ["grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms"] },
+  { label: "Knowledge", keys: ["facts", "wikiPages", "things", "recommendedResources"] },
+  { label: "Policy & Research", keys: ["policyStakeholders", "researchAreaOrganizations", "benchmarkResults"] },
+];
+
+/** Sections to EXCLUDE per entity type. Default: show all. */
+const SECTIONS_EXCLUDE: Record<string, Set<string>> = {
+  "ai-model": new Set(["personnel", "divisions", "divisionPersonnel", "grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "policyStakeholders"]),
+  benchmark: new Set(["personnel", "divisions", "divisionPersonnel", "grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "policyStakeholders"]),
+  person: new Set(["divisions", "divisionPersonnel", "grantsGiven", "fundingRounds", "fundingPrograms", "researchAreaOrganizations", "benchmarkResults"]),
+  policy: new Set(["divisions", "divisionPersonnel", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "researchAreaOrganizations", "benchmarkResults"]),
+  project: new Set(["divisions", "divisionPersonnel", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "benchmarkResults"]),
+  approach: new Set(["personnel", "divisions", "divisionPersonnel", "grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "benchmarkResults"]),
+  concept: new Set(["personnel", "divisions", "divisionPersonnel", "grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "benchmarkResults"]),
+  risk: new Set(["personnel", "divisions", "divisionPersonnel", "grantsGiven", "grantsReceived", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "benchmarkResults"]),
+  event: new Set(["divisions", "divisionPersonnel", "fundingRounds", "investments", "equityPositions", "fundingPrograms", "benchmarkResults"]),
+};
+
+/** Global columns to hide from all sections */
+const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
+
+/** Max rows to show initially before "Show all" */
+const INITIAL_ROW_LIMIT = 20;
+
 // ── Numeric formatting columns ────────────────────────────────────────────
 
 /** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
@@ -195,7 +266,9 @@ const PERCENTAGE_COLUMNS = new Set([
 ]);
 
 function formatPercentage(n: number): string {
-  return `${(n * 100).toFixed(1).replace(/\.0$/, "")}%`;
+  // Values > 1 are likely already percentages (e.g., 15 = 15%), not decimals
+  const pct = Math.abs(n) > 1 ? n : n * 100;
+  return `${pct.toFixed(1).replace(/\.0$/, "")}%`;
 }
 
 /** Try to parse a value as a number. Returns null if not parseable or is a range string like "[0.07, 0.15]". */
@@ -267,20 +340,21 @@ function CellValue({
     columnName === "parentOrgId" ||
     columnName === "parent_org_id";
 
-  if (isEntityRef && typeof value === "string" && value.length === 10) {
+  if (isEntityRef && typeof value === "string" && isAnySid(value)) {
     const resolved = displayNames?.[value];
     if (resolved) {
       return (
-        <Link
-          href={entityHref(resolved)}
-          className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
-          title={`${value} (${resolved.entityType})`}
-        >
-          {resolved.title}
-        </Link>
+        <EntityRefHoverCard entry={resolved} stableId={value}>
+          <Link
+            href={entityHref(resolved)}
+            className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+          >
+            {resolved.title}
+          </Link>
+        </EntityRefHoverCard>
       );
     }
-    // Fallback: show truncated stableId as link to DB profile
+    // Fallback: show stableId as link to DB profile
     return (
       <Link
         href={`/wiki/E1929?entity=${encodeURIComponent(value)}`}
@@ -417,15 +491,44 @@ function ProfileSection({
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [showSchema, setShowSchema] = useState(false);
+  const [showAllRows, setShowAllRows] = useState(false);
 
   const isEmpty = section.total === 0;
 
-  // Filter out hidden/redundant columns
+  // Filter out hidden/redundant columns (per-section + global)
   const visibleColumns = useMemo(() => {
     const hidden = HIDDEN_COLUMNS[section.key];
-    if (!hidden) return section.schema.columns;
-    return section.schema.columns.filter((col) => !hidden.has(col.name));
+    return section.schema.columns.filter((col) =>
+      !GLOBAL_HIDDEN_COLUMNS.has(col.name) && (!hidden || !hidden.has(col.name))
+    );
   }, [section.key, section.schema.columns]);
+
+  // Pagination: show first N rows unless expanded
+  const displayedRows = useMemo(() => {
+    if (showAllRows || section.rows.length <= INITIAL_ROW_LIMIT) return section.rows;
+    return section.rows.slice(0, INITIAL_ROW_LIMIT);
+  }, [section.rows, showAllRows]);
+
+  // Source-check summary for sections with verdicts
+  const verdictSummary = useMemo(() => {
+    if (!section.recordType) return null;
+    let checked = 0;
+    let confirmed = 0;
+    let contradicted = 0;
+    let outdated = 0;
+    for (const row of section.rows) {
+      const id = row.id as string | undefined;
+      if (id && verdicts[id]) {
+        checked++;
+        const v = verdicts[id].verdict;
+        if (v === "confirmed") confirmed++;
+        else if (v === "contradicted") contradicted++;
+        else if (v === "outdated" || v === "partial") outdated++;
+      }
+    }
+    if (checked === 0) return null;
+    return { checked, total: section.rows.length, confirmed, contradicted, outdated };
+  }, [section.rows, section.recordType, verdicts]);
 
   return (
     <div
@@ -468,7 +571,25 @@ function ProfileSection({
           {section.error && (
             <span className="text-[10px] text-red-500 font-medium shrink-0">error</span>
           )}
+          {verdictSummary && (
+            <span className="text-[10px] text-muted-foreground/70 shrink-0 ml-1">
+              {verdictSummary.checked}/{verdictSummary.total} checked
+              {verdictSummary.confirmed > 0 && <span className="text-emerald-600"> · {verdictSummary.confirmed} confirmed</span>}
+              {verdictSummary.contradicted > 0 && <span className="text-red-500"> · {verdictSummary.contradicted} disputed</span>}
+              {verdictSummary.outdated > 0 && <span className="text-amber-600"> · {verdictSummary.outdated} outdated</span>}
+            </span>
+          )}
         </div>
+        {section.recordType && (
+          <Link
+            href={`/internal/entity-source-checks`}
+            onClick={(e) => e.stopPropagation()}
+            className="shrink-0 text-[10px] text-muted-foreground/50 hover:text-muted-foreground mr-1"
+            title="Review source checks"
+          >
+            Source checks →
+          </Link>
+        )}
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -516,6 +637,9 @@ function ProfileSection({
           <table className="w-full text-[11px]">
             <thead>
               <tr className="bg-muted/50 dark:bg-muted/30">
+                <th className="px-2 py-2 w-16 border-b border-border/40 text-[10px] font-medium text-muted-foreground/40">
+                  ID
+                </th>
                 {visibleColumns.map((col) => (
                   <th
                     key={col.name}
@@ -533,11 +657,34 @@ function ProfileSection({
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
-              {section.rows.map((row, i) => {
-                const recordId = row.id as string | undefined;
+              {displayedRows.map((row, i) => {
+                const rawId = row.id;
+                const recordId = rawId != null ? String(rawId) : undefined;
                 const verdict = recordId ? verdicts[recordId] : undefined;
                 return (
                   <tr key={i} className="hover:bg-muted/20 transition-colors">
+                    {(() => {
+                      const idStr = recordId ?? null;
+                      if (!idStr) return <td className="px-2 py-2" />;
+                      const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
+                      return section.recordType ? (
+                        <td className="px-2 py-2 align-top">
+                          <Link
+                            href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(idStr)}`}
+                            className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                            title={`Record ${idStr}`}
+                          >
+                            {display}
+                          </Link>
+                        </td>
+                      ) : (
+                        <td className="px-2 py-2 align-top">
+                          <span className="font-mono text-[9px] text-muted-foreground/30" title={idStr}>
+                            {display}
+                          </span>
+                        </td>
+                      );
+                    })()}
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
                       const value = camelKey in row ? row[camelKey] : row[col.name];
@@ -562,6 +709,14 @@ function ProfileSection({
               })}
             </tbody>
           </table>
+          {!showAllRows && section.rows.length > INITIAL_ROW_LIMIT && (
+            <button
+              onClick={() => setShowAllRows(true)}
+              className="w-full py-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors border-t border-border/30"
+            >
+              Show all {section.rows.length} rows ({section.rows.length - INITIAL_ROW_LIMIT} more)
+            </button>
+          )}
         </div>
       )}
 
@@ -748,8 +903,8 @@ function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
       {/* Metadata fields (type-specific: stakeholders, provisions, votes, etc.) */}
       {metadataEntries.length > 0 && (
         <CollapsibleJsonSection
-          title="Entity Metadata"
-          description="Type-specific structured fields from YAML entity data"
+          title="Entity Properties"
+          description="Type-specific fields from the entity YAML definition"
           count={metadataEntries.length}
           data={metadata!}
         />
@@ -1014,16 +1169,42 @@ export function EntityProfileViewer({
     const totalRecords = data.sections.reduce((sum, s) => sum + s.total, 0);
     const populated = data.sections.filter((s) => s.total > 0).length;
     const verifiedCount = Object.keys(data.verdicts).length;
-    return { totalRecords, populated, total: data.sections.length, verifiedCount };
+    // Only count records from sections that support verification (have recordType)
+    const verifiableRecords = data.sections
+      .filter((s) => s.recordType)
+      .reduce((sum, s) => sum + s.total, 0);
+    return { totalRecords, populated, total: data.sections.length, verifiedCount, verifiableRecords };
   }, [data]);
 
   // Sort populated sections first — memoized to avoid re-sorting on every render
-  const sortedSections = useMemo(() => {
-    if (!data) return [];
-    return data.sections
-      .slice()
-      .sort((a, b) => (b.total > 0 ? 1 : 0) - (a.total > 0 ? 1 : 0));
-  }, [data]);
+  const [showAllSections, setShowAllSections] = useState(false);
+
+  // Filter sections by entity type relevance, then sort populated first
+  const { visibleSections, hiddenCount } = useMemo(() => {
+    if (!data) return { visibleSections: [], hiddenCount: 0 };
+    const entityType = String(data.entity.entityType ?? "");
+    const excludeSet = SECTIONS_EXCLUDE[entityType];
+
+    const all = data.sections.slice();
+    let filtered: Section[];
+    let hidden = 0;
+
+    if (showAllSections || !excludeSet) {
+      filtered = all;
+    } else {
+      filtered = all.filter((s) => {
+        if (excludeSet.has(s.key) && s.total === 0) {
+          hidden++;
+          return false;
+        }
+        return true;
+      });
+    }
+
+    // Sort: populated first, then alphabetically
+    filtered.sort((a, b) => (b.total > 0 ? 1 : 0) - (a.total > 0 ? 1 : 0));
+    return { visibleSections: filtered, hiddenCount: hidden };
+  }, [data, showAllSections]);
 
   return (
     <div>
@@ -1089,7 +1270,7 @@ export function EntityProfileViewer({
               value={`${stats.populated}/${stats.total}`}
             />
             {stats.verifiedCount > 0 && (
-              <StatPill icon={ShieldCheck} label="Verified" value={stats.verifiedCount} />
+              <StatPill icon={ShieldCheck} label="Verified" value={`${stats.verifiedCount}/${stats.verifiableRecords}`} />
             )}
           </div>
 
@@ -1097,7 +1278,37 @@ export function EntityProfileViewer({
           <EntityDataSections entity={data.entity} />
 
           <div className="space-y-2">
-            {sortedSections.map((section) => (
+            {SECTION_GROUPS.map((group) => {
+              const groupSections = visibleSections.filter((s) => group.keys.includes(s.key));
+              if (groupSections.length === 0) return null;
+              const groupTotal = groupSections.reduce((sum, s) => sum + s.total, 0);
+              return (
+                <div key={group.label}>
+                  <div className="flex items-center gap-2 mt-4 mb-1.5 px-1">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/50">
+                      {group.label}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground/30 tabular-nums">{groupTotal}</span>
+                    <div className="flex-1 border-t border-border/20" />
+                  </div>
+                  <div className="space-y-2">
+                    {groupSections.map((section) => (
+                      <ProfileSection
+                        key={section.key}
+                        section={section}
+                        verdicts={data.verdicts}
+                        defaultExpanded={section.total > 0 && section.total <= 50}
+                        displayNames={data.displayNames ?? {}}
+                      />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+            {/* Sections not in any group */}
+            {visibleSections
+              .filter((s) => !SECTION_GROUPS.some((g) => g.keys.includes(s.key)))
+              .map((section) => (
                 <ProfileSection
                   key={section.key}
                   section={section}
@@ -1106,6 +1317,14 @@ export function EntityProfileViewer({
                   displayNames={data.displayNames ?? {}}
                 />
               ))}
+            {hiddenCount > 0 && !showAllSections && (
+              <button
+                onClick={() => setShowAllSections(true)}
+                className="w-full py-2 text-xs text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+              >
+                Show {hiddenCount} hidden sections (irrelevant for this entity type)
+              </button>
+            )}
           </div>
         </>
       )}
