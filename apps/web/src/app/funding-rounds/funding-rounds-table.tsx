@@ -48,12 +48,6 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
 
-  // Only show verification dots if any row has a real verdict
-  const hasAnyVerdict = useMemo(
-    () => rows.some((r) => r.verdict != null && r.verdict.verdict !== "unchecked"),
-    [rows],
-  );
-
   // Instrument filter options
   const instruments = useMemo(() => {
     const set = new Set<string>();
@@ -213,13 +207,6 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
               >
                 <td className="py-2 px-3">
                   <span className="flex items-center gap-1.5">
-                    {hasAnyVerdict && (
-                      <SourceCheckDot
-                        status={recordVerdictToStatus(row.verdict?.verdict)}
-                        originalVerdict={row.verdict?.verdict}
-                        size="md"
-                      />
-                    )}
                     <Link
                       href={`/funding-rounds/${row.key}`}
                       className="font-medium text-foreground text-xs hover:text-primary transition-colors"
@@ -287,8 +274,16 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                   {row.date ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
-                <td className="py-2.5 px-3 text-center hidden sm:table-cell">
-                  <CoverageDots score={computeFundingRoundCoverage(row)} />
+                <td className="py-2.5 px-3 text-right hidden sm:table-cell">
+                  <span className="inline-flex items-center gap-2">
+                    <CoverageDots score={computeFundingRoundCoverage(row)} />
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdict?.verdict)}
+                      originalVerdict={row.verdict?.verdict}
+                      size="md"
+                      href={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
+                    />
+                  </span>
                 </td>
               </tr>
             ))}

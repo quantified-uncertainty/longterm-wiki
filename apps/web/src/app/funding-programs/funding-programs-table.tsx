@@ -363,12 +363,6 @@ export function FundingProgramsListTable({
                 {/* Name */}
                 <td className="py-2.5 px-3">
                   <span className="flex items-center gap-1.5">
-                    <SourceCheckDot
-                      status={recordVerdictToStatus(row.verdict?.verdict)}
-                      originalVerdict={row.verdict?.verdict}
-                      size="md"
-                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
-                    />
                     <Link
                       href={`/funding-programs/${row.id}`}
                       className="font-medium text-foreground hover:text-primary transition-colors"
@@ -444,8 +438,16 @@ export function FundingProgramsListTable({
                   )}
                 </td>
 
-                <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeFundingProgramCoverage(row)} />
+                <td className="py-2.5 px-3 text-right">
+                  <span className="inline-flex items-center gap-2">
+                    <CoverageDots score={computeFundingProgramCoverage(row)} />
+                    <SourceCheckDot
+                      status={recordVerdictToStatus(row.verdict?.verdict)}
+                      originalVerdict={row.verdict?.verdict}
+                      size="md"
+                      href={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    />
+                  </span>
                 </td>
               </tr>
             ))}
