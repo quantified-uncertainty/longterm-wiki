@@ -33,7 +33,7 @@ interface SeedOptions {
 }
 
 // ---------------------------------------------------------------------------
-// Slug → stableId resolution via database.json
+// database.json loader (single parse for both slug map and pageResources)
 // ---------------------------------------------------------------------------
 
 interface MinimalEntity {
@@ -41,10 +41,23 @@ interface MinimalEntity {
   stableId?: string;
 }
 
-function loadSlugToStableId(): Map<string, string> {
+interface DatabaseJson {
+  typedEntities?: MinimalEntity[];
+  pageResources?: Record<string, string[]>;
+}
+
+let _cachedDb: DatabaseJson | null = null;
+
+function loadDatabaseJson(): DatabaseJson {
+  if (_cachedDb) return _cachedDb;
   const dbPath = join(PROJECT_ROOT, "apps/web/src/data/database.json");
-  const db = JSON.parse(readFileSync(dbPath, "utf8"));
-  const entities: MinimalEntity[] = db.typedEntities ?? [];
+  _cachedDb = JSON.parse(readFileSync(dbPath, "utf8")) as DatabaseJson;
+  return _cachedDb;
+}
+
+function loadSlugToStableId(): Map<string, string> {
+  const db = loadDatabaseJson();
+  const entities = db.typedEntities ?? [];
   const map = new Map<string, string>();
   for (const e of entities) {
     if (e.stableId) {
@@ -55,9 +68,7 @@ function loadSlugToStableId(): Map<string, string> {
 }
 
 function loadPageResources(): Record<string, string[]> {
-  const dbPath = join(PROJECT_ROOT, "apps/web/src/data/database.json");
-  const db = JSON.parse(readFileSync(dbPath, "utf8"));
-  return db.pageResources ?? {};
+  return loadDatabaseJson().pageResources ?? {};
 }
 
 // ---------------------------------------------------------------------------
@@ -90,8 +101,7 @@ async function seedFromPublisher(
       if (fetched >= maxResources) break;
       fetched++;
 
-      const pubEntityId =
-        (r as Record<string, unknown>).publisherEntityId as string | null;
+      const pubEntityId = r.publisherEntityId;
       if (!pubEntityId) continue;
 
       items.push({

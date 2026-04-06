@@ -14,7 +14,7 @@ const SyncItemSchema = z.object({
   resourceId: z.string().min(1).max(200),
   authoredByEntity: z.boolean().optional().default(false),
   isSubject: z.boolean().optional().default(false),
-  inferenceSource: z.string().max(200).nullable().optional(),
+  inferenceSource: z.string().min(1).max(200).nullable().optional(),
 });
 
 const SyncBatchSchema = z.object({
@@ -62,7 +62,8 @@ const entityResourcesApp = new Hono()
     const rows = await db
       .select()
       .from(entityResources)
-      .where(and(...conditions));
+      .where(and(...conditions))
+      .limit(500);
 
     return c.json({ items: rows, total: rows.length });
   })
@@ -83,21 +84,20 @@ const entityResourcesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const upserted = await db.transaction(async (tx) => {
-      const rows = await tx
-        .insert(entityResources)
-        .values(items.map(toRow))
-        .onConflictDoUpdate({
-          target: [entityResources.entityId, entityResources.resourceId],
-          set: {
-            authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
-            isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
-            inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
-          },
-        })
-        .returning({ id: entityResources.id });
-      return rows;
-    });
+    // OR-merge: boolean flags accumulate across seed passes (e.g., publisher + wiki_citation).
+    // inferenceSource uses COALESCE (first-writer-wins) — the initial source is preserved.
+    const upserted = await db
+      .insert(entityResources)
+      .values(items.map(toRow))
+      .onConflictDoUpdate({
+        target: [entityResources.entityId, entityResources.resourceId],
+        set: {
+          authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
+          isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
+          inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
+        },
+      })
+      .returning({ id: entityResources.id });
 
     return c.json({ total: upserted.length });
   });
