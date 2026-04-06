@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
-  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = production ] || [ \"$VERCEL_GIT_COMMIT_REF\" = main ]; then exit 1; fi; exit 0",
+  "ignoreCommand": "if [ \"$VERCEL_GIT_COMMIT_REF\" = production ]; then exit 1; fi; exit 0",
   "installCommand": "cd .. && npx pnpm@9 install",
   "buildCommand": "node --import tsx/esm scripts/build-data.mjs && next build"
 }
