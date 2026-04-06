@@ -19,7 +19,6 @@
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { discoverCommand } from './people/discover.ts';
 import { createCommand } from './people/create.ts';
-import { linkResourcesCommand } from './people/link-resources.ts';
 import { enrichCommand } from './people/enrich.ts';
 import { importKeyPersonsCommand } from './people/import-key-persons.ts';
 import { suggestLinksCommand } from './people/suggest-links.ts';
@@ -38,7 +37,6 @@ export const commands: Record<
 > = {
   discover: discoverCommand,
   create: createCommand,
-  'link-resources': linkResourcesCommand,
   enrich: enrichCommand,
   'import-key-persons': importKeyPersonsCommand,
   'suggest-links': suggestLinksCommand,
@@ -53,7 +51,6 @@ export function getHelp(): string {
 \x1b[1mCommands:\x1b[0m
   discover             Find people across data sources who are not in people.yaml (default)
   create               Generate YAML entity stubs for discovered candidates
-  link-resources       Match literature papers to person entities by author name
   enrich               Enrich person KB entities with data from external sources
   import-key-persons   Extract key-persons from KB YAML and sync to PG
   suggest-links        Detect unlinked person mentions in MDX pages
@@ -62,10 +59,6 @@ export function getHelp(): string {
   --min-appearances=N   Only show people in N+ data sources (default: 1 for discover, 2 for create)
   --json                JSON output
   --ci                  JSON output (alias for --json)
-
-\x1b[1mLink-Resources Options:\x1b[0m
-  --apply          Write results to data/people-resources.yaml
-  --verbose        Show detailed output including unmatched authors
 
 \x1b[1mEnrich Options:\x1b[0m
   --source=wikidata     Data source (currently only wikidata is supported)
@@ -102,9 +95,6 @@ export function getHelp(): string {
   crux tb people discover --json              # JSON output
   crux tb people create                       # Generate YAML stubs (min 2 appearances)
   crux tb people create --min-appearances=1   # Include single-mention candidates
-  crux tb people link-resources               # Preview matches (dry run)
-  crux tb people link-resources --apply       # Generate people-resources.yaml
-  crux tb people link-resources --verbose     # Show all match details
   crux tb people enrich --source=wikidata --dry-run
   crux tb people enrich --source=wikidata --apply
   crux tb people enrich --source=wikidata --entity=dario-amodei --dry-run

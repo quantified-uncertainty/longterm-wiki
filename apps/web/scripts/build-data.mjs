@@ -57,6 +57,7 @@ import {
   fetchPolicyStakeholderIds,
   syncPolicyStakeholders,
   fetchResourcesFromPG,
+  fetchEntityResourceLinks,
   buildPageReferenceIndex,
   getWikiServerWarningCount,
 } from './lib/wiki-server-data.mjs';
@@ -118,7 +119,6 @@ const DATA_FILES = [
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
-  { key: 'peopleResources', file: 'people-resources.yaml' },
 ];
 
 /**
@@ -724,16 +724,20 @@ async function main() {
   // Fetch PG-sourced data in parallel (benchmark results, research areas, record verdicts, assessments)
   let assessmentMap = new Map();
   if (!CONTENT_ONLY) {
-    const [benchmarkResults, researchAreasData, recordVerdicts, assessments] = await Promise.all([
+    const [benchmarkResults, researchAreasData, recordVerdicts, assessments, entityResourceLinks] = await Promise.all([
       fetchBenchmarkResults(),
       fetchResearchAreas(),
       fetchRecordVerdicts(),
       fetchAssessments(),
+      fetchEntityResourceLinks(),
     ]);
     database.benchmarkResults = benchmarkResults;
     database.researchAreas = researchAreasData;
     database.recordVerdicts = recordVerdicts;
     assessmentMap = assessments;
+    if (entityResourceLinks) {
+      database.entityResourceLinks = entityResourceLinks;
+    }
 
     // Fetch detail data (orgs, papers, grants) for each research area
     const areaIds = researchAreasData.map(a => a.id);

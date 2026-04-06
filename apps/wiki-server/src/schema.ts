@@ -2733,43 +2733,6 @@ export const researchAreaRisks = pgTable(
 );
 
 /**
- * Recommended resources for any entity (books, papers, videos, blog posts).
- * General-purpose — any entity can have a reading list.
- */
-export const entityRecommendedResources = pgTable(
-  "entity_recommended_resources",
-  {
-    id: bigserial("id", { mode: "number" }).primaryKey(),
-    entityId: text("entity_id")
-      .notNull()
-      .references(() => entities.stableId, { onDelete: "cascade" }),
-    resourceId: text("resource_id").references(() => resources.id, {
-      onDelete: "set null",
-    }),
-    title: text("title").notNull(),
-    url: text("url"),
-    authors: text("authors"),
-    publishedDate: text("published_date"), // YYYY or YYYY-MM
-    category: text("category"), // book, textbook, paper, video, blog_post
-    topics: jsonb("topics").$type<string[]>(),
-    importance: integer("importance"), // 1-5
-    isSeminal: boolean("is_seminal").notNull().default(false),
-    sortOrder: integer("sort_order").notNull().default(0),
-    notes: text("notes"),
-    createdAt: timestamp("created_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
-  },
-  (table) => [
-    uniqueIndex("idx_err_entity_url")
-      .on(table.entityId, table.url)
-      .where(sql`url IS NOT NULL`),
-    index("idx_err_entity").on(table.entityId),
-    index("idx_err_resource").on(table.resourceId),
-  ]
-);
-
-/**
  * Entity–Resource join table with explicit relationship flags.
  * Replaces heuristic domain-matching in org-data.ts with relational data.
  *

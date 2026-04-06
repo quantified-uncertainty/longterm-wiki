@@ -32,6 +32,7 @@ import {
   getResourcePublication,
   getPagesForResource,
   getLiteraturePapers,
+  getEntityResourceLinks,
   type Resource,
   type LiteraturePaper,
 } from "@/data";
@@ -878,7 +879,88 @@ function getOrgResources(
   orgSlug: string,
   orgName: string,
   websiteUrl: string | null,
+  entityStableId?: string,
   /** Grant source URLs to exclude from aboutOrg (press tab) */
+  grantSourceUrls?: Set<string>,
+): {
+  publications: OrgResourceRow[];
+  announcements: OrgResourceRow[];
+  aboutOrg: OrgResourceRow[];
+} {
+  // Try entity_resources first (explicit relational data)
+  if (entityStableId) {
+    const links = getEntityResourceLinks(entityStableId);
+    if (links && (links.authored.length > 0 || links.subject.length > 0)) {
+      return getOrgResourcesFromLinks(links, orgName);
+    }
+  }
+
+  // Fallback: heuristic domain-matching (until entity_resources is seeded)
+  return getOrgResourcesFromHeuristics(orgSlug, orgName, websiteUrl, grantSourceUrls);
+}
+
+/** Use entity_resources links to split resources into publications/announcements/press */
+function getOrgResourcesFromLinks(
+  links: { authored: string[]; subject: string[] },
+  orgName: string,
+): {
+  publications: OrgResourceRow[];
+  announcements: OrgResourceRow[];
+  aboutOrg: OrgResourceRow[];
+} {
+  const authoredSet = new Set(links.authored);
+  const publications: OrgResourceRow[] = [];
+  const announcements: OrgResourceRow[] = [];
+  const aboutOrg: OrgResourceRow[] = [];
+
+  // Authored resources → split into publications vs announcements by publication type
+  for (const rid of links.authored) {
+    const r = getResourceById(rid);
+    if (!r) continue;
+    const row = normalizeRow(r, orgName);
+    if (!row) continue;
+
+    const pub = getResourcePublication(r);
+    const isResearch = pub?.type === "preprint_server" || pub?.type === "academic_journal"
+      || r.type === "paper" || isResearchUrl(r.url);
+    if (isResearch) {
+      publications.push(row);
+    } else {
+      announcements.push(row);
+    }
+  }
+
+  // Subject resources (not also authored) → press/coverage
+  for (const rid of links.subject) {
+    if (authoredSet.has(rid)) continue;
+    const r = getResourceById(rid);
+    if (!r) continue;
+    const row = normalizeRow(r, orgName);
+    if (!row) continue;
+    aboutOrg.push(row);
+  }
+
+  const sortByDate = (a: OrgResourceRow, b: OrgResourceRow) => {
+    const da = a.publishedDate;
+    const db = b.publishedDate;
+    if (da && !db) return -1;
+    if (!da && db) return 1;
+    if (da && db && da !== db) return db.localeCompare(da);
+    return (a.title ?? "").localeCompare(b.title ?? "");
+  };
+
+  return {
+    publications: publications.sort(sortByDate),
+    announcements: announcements.sort(sortByDate),
+    aboutOrg: aboutOrg.sort(sortByDate),
+  };
+}
+
+/** Legacy heuristic: domain-matching + URL path sniffing (fallback until entity_resources seeded) */
+function getOrgResourcesFromHeuristics(
+  orgSlug: string,
+  orgName: string,
+  websiteUrl: string | null,
   grantSourceUrls?: Set<string>,
 ): {
   publications: OrgResourceRow[];
@@ -1383,7 +1465,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     publications: resourcePublications,
     announcements: resourceAnnouncements,
     aboutOrg: resourcesAboutOrg,
-  } = getOrgResources(slug, entity.name, websiteUrl, grantSourceUrls);
+  } = getOrgResources(slug, entity.name, websiteUrl, typedEntity?.stableId, grantSourceUrls);
 
   // ── Key Publications (from literature.yaml) ──
   const orgMatchNames = new Set<string>([

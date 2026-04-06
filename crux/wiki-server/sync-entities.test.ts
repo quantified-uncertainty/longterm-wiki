@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { transformEntity, syncEntities, pruneEntities, mergeExpertData, loadExperts, loadPeopleResources, type SyncEntity } from "./sync-entities.ts";
+import { transformEntity, syncEntities, pruneEntities, mergeExpertData, loadExperts, type SyncEntity } from "./sync-entities.ts";
 
 const noSleep = async () => {};
 
@@ -222,9 +222,7 @@ describe("mergeExpertData", () => {
         ],
       }],
     ]);
-    const pubCounts = new Map<string, number>();
-
-    const result = mergeExpertData(entity, experts, pubCounts);
+    const result = mergeExpertData(entity, experts);
 
     expect(result.metadata).toEqual({
       expertPositions: [
@@ -233,18 +231,6 @@ describe("mergeExpertData", () => {
       knownFor: ["Constitutional AI", "Responsible Scaling Policy"],
       affiliation: "anthropic",
       expertRole: "Co-founder & CEO",
-    });
-  });
-
-  it("merges publication count into metadata", () => {
-    const entity = makeEntity("paul-christiano", { entityType: "person", metadata: null });
-    const experts = new Map<string, { id: string; name: string }>();
-    const pubCounts = new Map([["paul-christiano", 5]]);
-
-    const result = mergeExpertData(entity, experts, pubCounts);
-
-    expect(result.metadata).toEqual({
-      publicationCount: 5,
     });
   });
 
@@ -261,36 +247,21 @@ describe("mergeExpertData", () => {
         role: "CEO",
       }],
     ]);
-    const pubCounts = new Map([["dario-amodei", 6]]);
-
-    const result = mergeExpertData(entity, experts, pubCounts);
+    const result = mergeExpertData(entity, experts);
 
     expect(result.metadata).toEqual({
       orgType: "frontier-lab",
       affiliation: "anthropic",
       expertRole: "CEO",
-      publicationCount: 6,
     });
   });
 
   it("does not modify entity if no expert data or pub count exists", () => {
     const entity = makeEntity("openai", { entityType: "organization", metadata: { orgType: "lab" } });
     const experts = new Map<string, { id: string; name: string }>();
-    const pubCounts = new Map<string, number>();
-
-    const result = mergeExpertData(entity, experts, pubCounts);
+    const result = mergeExpertData(entity, experts);
 
     expect(result.metadata).toEqual({ orgType: "lab" });
-  });
-
-  it("does not set publicationCount for zero publications", () => {
-    const entity = makeEntity("nobody", { entityType: "person", metadata: null });
-    const experts = new Map<string, { id: string; name: string }>();
-    const pubCounts = new Map([["nobody", 0]]);
-
-    const result = mergeExpertData(entity, experts, pubCounts);
-
-    expect(result.metadata).toBeNull();
   });
 
   it("skips empty positions and knownFor arrays", () => {
@@ -304,9 +275,7 @@ describe("mergeExpertData", () => {
         positions: [],
       }],
     ]);
-    const pubCounts = new Map<string, number>();
-
-    const result = mergeExpertData(entity, experts, pubCounts);
+    const result = mergeExpertData(entity, experts);
 
     expect(result.metadata).toEqual({
       affiliation: "some-org",
@@ -320,13 +289,6 @@ describe("mergeExpertData", () => {
 describe("loadExperts", () => {
   it("returns empty map for non-existent file", () => {
     const result = loadExperts("/nonexistent/path.yaml");
-    expect(result.size).toBe(0);
-  });
-});
-
-describe("loadPeopleResources", () => {
-  it("returns empty map for non-existent file", () => {
-    const result = loadPeopleResources("/nonexistent/path.yaml");
     expect(result.size).toBe(0);
   });
 });

@@ -26,7 +26,6 @@ import {
   researchAreaOrganizations,
   verificationVerdicts,
   policyStakeholders,
-  entityRecommendedResources,
   entityResources,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
@@ -259,18 +258,6 @@ const SECTIONS: SectionDef[] = [
       db.select().from(policyStakeholders).where(
         or(eq(policyStakeholders.policyEntityId, stableId), eq(policyStakeholders.stakeholderEntityId, stableId))
       ).limit(FETCH_LIMIT),
-  },
-  {
-    key: "recommendedResources",
-    label: "Recommended Resources",
-    description: "Books, papers, videos, and other resources recommended by or for this entity",
-    table: entityRecommendedResources,
-    tableName: "entity_recommended_resources",
-    query: (db, stableId) =>
-      db.select().from(entityRecommendedResources)
-        .where(eq(entityRecommendedResources.entityId, stableId))
-        .orderBy(entityRecommendedResources.sortOrder)
-        .limit(FETCH_LIMIT),
   },
   {
     key: "entityResources",
