@@ -82,10 +82,11 @@ function resolveHolderName(holderSlug: string): string {
 }
 
 export async function AnthropicStakeholdersTable() {
-  // Get latest valuation from KB — try both slug and FactBase entity ID
+  // Get latest valuation from KB — use stableId directly (slug resolution
+  // via resolveEntityKey can fail during ISR if database.json isn't loaded)
   const valuationFact =
-    getKBLatest("anthropic", "valuation") ??
-    getKBLatest("mK9pX3rQ7n", "valuation");
+    getKBLatest("sid_mK9pX3rQ7n", "valuation") ??
+    getKBLatest("anthropic", "valuation"); // factbase-slug-ok — intentional fallback
 
   if (!valuationFact || valuationFact.value.type !== "number") {
     // Graceful fallback: render without valuation-dependent data
@@ -107,7 +108,8 @@ export async function AnthropicStakeholdersTable() {
   else valuationDisplay = `$${valuation.toLocaleString("en-US")}`;
 
   // Load equity positions from PG (merged into KB records at build time)
-  const equityRecords = getKBRecords("anthropic", "equity-positions");
+  // Use stableId directly for same ISR resilience as valuation lookup above
+  const equityRecords = getKBRecords("sid_mK9pX3rQ7n", "equity-positions");
 
   if (equityRecords.length === 0) {
     return (
