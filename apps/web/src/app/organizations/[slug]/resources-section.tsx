@@ -54,8 +54,6 @@ function computeColumnVisibility(
   };
 }
 
-// STANCE_COLORS imported from resource-constants
-
 function makeColumns(opts: {
   showDate: boolean;
   showPublication: boolean;

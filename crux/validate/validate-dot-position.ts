@@ -8,7 +8,7 @@
  *
  * Run: npx tsx crux/validate/validate-dot-position.ts
  */
-import { readFileSync, readdirSync, statSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { join, relative } from "path";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 
@@ -21,17 +21,13 @@ interface Violation {
 function collectTsx(dir: string): string[] {
   const results: string[] = [];
   function walk(d: string) {
-    for (const entry of readdirSync(d)) {
-      const fullPath = join(d, entry);
-      try {
-        const stat = statSync(fullPath);
-        if (stat.isDirectory()) {
-          if (entry !== "node_modules" && entry !== "__tests__") walk(fullPath);
-        } else if (entry.endsWith(".tsx")) {
-          results.push(fullPath);
+    for (const entry of readdirSync(d, { withFileTypes: true })) {
+      if (entry.isDirectory()) {
+        if (entry.name !== "node_modules" && entry.name !== "__tests__") {
+          walk(join(d, entry.name));
         }
-      } catch {
-        // Permission errors or broken symlinks — skip silently
+      } else if (entry.name.endsWith(".tsx")) {
+        results.push(join(d, entry.name));
       }
     }
   }
