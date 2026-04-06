@@ -2773,6 +2773,37 @@ export const entityRecommendedResources = pgTable(
 );
 
 /**
+ * Entity–Resource join table with explicit relationship flags.
+ * Replaces heuristic domain-matching in org-data.ts with relational data.
+ *
+ * authoredByEntity: the entity authored/published this resource
+ * isSubject: the resource is about this entity
+ */
+export const entityResources = pgTable(
+  "entity_resources",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    resourceId: text("resource_id")
+      .notNull()
+      .references(() => resources.id, { onDelete: "cascade" }),
+    authoredByEntity: boolean("authored_by_entity").notNull().default(false),
+    isSubject: boolean("is_subject").notNull().default(false),
+    inferenceSource: text("inference_source"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("idx_er_entity_resource").on(table.entityId, table.resourceId),
+    index("idx_er_entity").on(table.entityId),
+    index("idx_er_resource").on(table.resourceId),
+  ]
+);
+
+/**
  * Many-to-many link between grants and research areas.
  */
 export const grantResearchAreas = pgTable(
