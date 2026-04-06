@@ -19,6 +19,7 @@
 - [PG-primary for new features](feedback_pg_primary_for_new_features.md) — strongly prefer PG tables over YAML for new features with dedicated UI/directory pages
 - [Aggressive PR reviews](feedback_aggressive_reviews.md) — reviews must be adversarial with mandatory manual testing, not rubber-stamps
 - [Dev server ports](feedback_dev_server_ports.md) — always check .env DEV_PORT before starting dev server, never use 3001 from agent slots
+- [No long sleeps](feedback_no_long_sleep.md) — never sleep over 10 seconds when checking command output
 
 ## Project
 - [PG-first data layer direction](project_pg_first_direction.md) — entity data moving to Postgres, database.json being phased out (Epic #2428)
