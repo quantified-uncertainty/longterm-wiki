@@ -77,11 +77,11 @@ export default async function ThingsPage({ searchParams }: PageProps) {
   }
 
   const [statsResult, listResult] = await Promise.all([
-    fetchDetailed<ThingsStatsResponse>("/api/things/stats", { revalidate: 300 }),
-    fetchDetailed<ThingsListResponse>(listUrl, { revalidate: 300 }),
+    fetchDetailed<ThingsStatsResponse>("/api/things/stats", { revalidate: 300, timeoutMs: 20_000 }),
+    fetchDetailed<ThingsListResponse>(listUrl, { revalidate: 300, timeoutMs: 20_000 }),
   ]);
 
-  if (!statsResult.ok || !listResult.ok) {
+  if (!listResult.ok) {
     return (
       <div className="max-w-[90rem] mx-auto px-6 py-8">
         <h1 className="text-3xl font-extrabold tracking-tight mb-4">Things</h1>
@@ -89,18 +89,22 @@ export default async function ThingsPage({ searchParams }: PageProps) {
           <p className="font-medium mb-1">Unable to load things data</p>
           <p className="text-red-500/80">
             The wiki-server may be temporarily unavailable. Please try again later.
+            {!statsResult.ok && " (stats also failed)"}
           </p>
         </div>
       </div>
     );
   }
 
-  const stats = statsResult.data;
+  // Stats may fail independently — degrade gracefully
+  const stats: ThingsStatsResponse = statsResult.ok
+    ? statsResult.data
+    : { total: 0, byType: {}, byEntityType: {} };
   // The list endpoint returns { things, total } while the search endpoint
   // returns { results, total }. Normalize to a single shape.
   const listBody = listResult.data;
   const results = listBody.results ?? listBody.things ?? [];
-  const total = listBody.total ?? 0;
+  const total = listBody.total ?? results.length;
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
   function buildUrl(overrides: { q?: string; type?: string; page?: number }) {
