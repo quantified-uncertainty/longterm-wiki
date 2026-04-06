@@ -15,7 +15,7 @@ import {
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
 import {
   SectionHeader,
   SourceLink,
@@ -50,6 +50,7 @@ export function FundingHistorySection({
               <th scope="col" className="py-2 px-3 text-right font-medium">Valuation</th>
               <th scope="col" className="py-2 px-3 text-left font-medium">Lead Investor</th>
               <th scope="col" className="py-2 px-3 text-left font-medium hidden lg:table-cell">Type</th>
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -66,15 +67,9 @@ export function FundingHistorySection({
               return (
                 <tr key={round.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3 font-medium">
-                    <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
-                        href={`/source-checks/funding-round/${encodeURIComponent(String(round.key))}`}
-                      />
-                      <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
-                        {name}
-                      </Link>
-                    </span>
+                    <Link href={`/funding-rounds/${round.key}`} className="text-foreground hover:text-primary transition-colors">
+                      {name}
+                    </Link>
                   </td>
                   <td className="py-2 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : "\u2014"}
@@ -99,6 +94,10 @@ export function FundingHistorySection({
                   <td className="py-2 px-3 hidden lg:table-cell">
                     {instrument && <Badge>{instrument}</Badge>}
                   </td>
+                  <RecordStatusCell
+                    verdict={getRecordVerdict("funding-round", String(round.key))?.verdict}
+                    sourceCheckHref={`/source-checks/funding-round/${encodeURIComponent(String(round.key))}`}
+                  />
                 </tr>
               );
             })}
@@ -129,6 +128,7 @@ export function InvestorParticipationSection({
               <th scope="col" className="py-2 px-3 text-left font-medium">Round</th>
               <th scope="col" className="py-2 px-3 text-right font-medium">Amount</th>
               <th scope="col" className="py-2 px-3 text-left font-medium">Date</th>
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -146,19 +146,13 @@ export function InvestorParticipationSection({
               return (
                 <tr key={inv.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
-                    <span className="inline-flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
-                        href={`/source-checks/investment/${encodeURIComponent(String(inv.key))}`}
-                      />
-                      {investorHref ? (
-                        <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
-                          {investorName}
-                        </Link>
-                      ) : (
-                        <span className="font-medium">{investorName}</span>
-                      )}
-                    </span>
+                    {investorHref ? (
+                      <Link href={investorHref} className="font-medium text-foreground hover:text-primary transition-colors">
+                        {investorName}
+                      </Link>
+                    ) : (
+                      <span className="font-medium">{investorName}</span>
+                    )}
                   </td>
                   <td className="py-1.5 px-3 text-muted-foreground">
                     {roundName ? (
@@ -175,6 +169,10 @@ export function InvestorParticipationSection({
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap">
                     {date ? formatKBDate(date) : <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
+                  <RecordStatusCell
+                    verdict={getRecordVerdict("investment", String(inv.key))?.verdict}
+                    sourceCheckHref={`/source-checks/investment/${encodeURIComponent(String(inv.key))}`}
+                  />
                 </tr>
               );
             })}

@@ -14,7 +14,8 @@ import {
 } from "@/lib/wiki-server";
 import { isSid } from "@/lib/stable-id";
 import { SectionHeader } from "./org-shared";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
+import { computePersonnelCoverage } from "@/components/verification/coverage-scoring";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -234,6 +235,7 @@ export function PeopleSection({
               <th scope="col" className="py-2 px-3 text-left font-medium">
                 Tenure
               </th>
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -258,11 +260,6 @@ export function PeopleSection({
                 >
                   <td className="py-1.5 px-3">
                     <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={person.verificationVerdict}
-                        variant="label"
-                        href={person.sourceCheckHref}
-                      />
                       {href ? (
                         <Link
                           href={href}
@@ -291,6 +288,11 @@ export function PeopleSection({
                   <td className="py-1.5 px-3 text-muted-foreground whitespace-nowrap text-xs">
                     {tenure}
                   </td>
+                  <RecordStatusCell
+                    verdict={person.verificationVerdict}
+                    sourceCheckHref={person.sourceCheckHref}
+                    coverageScore={computePersonnelCoverage(person)}
+                  />
                 </tr>
               );
             })}

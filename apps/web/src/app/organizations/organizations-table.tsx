@@ -14,6 +14,7 @@ import type { OrgSortKey } from "@/app/organizations/org-sort";
 import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, computeCompletionScore } from "@/app/organizations/org-constants";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
+import { CoverageDots } from "@/components/verification/RecordStatusCell";
 
 export interface OrgRow {
   id: string;
@@ -583,7 +584,7 @@ export function OrganizationsTable({
                     {/* Completion Score */}
                     {visibleColumns.has("completionScore") && (
                       <td className="py-2.5 px-3 text-center">
-                        <CompletionDots score={row.completionScore} ariaLabel={`Completeness: ${row.completionScore}/4`} />
+                        <CoverageDots score={row.completionScore} ariaLabel={`Completeness: ${row.completionScore}/4`} />
                       </td>
                     )}
 
@@ -684,21 +685,3 @@ export function OrganizationsTable({
   );
 }
 
-/** Renders 1-4 filled/empty dots for data completeness. */
-function CompletionDots({ score, ariaLabel }: { score: number; ariaLabel: string }) {
-  return (
-    <span className="inline-flex gap-0.5" role="img" aria-label={ariaLabel}>
-      {[1, 2, 3, 4].map((i) => (
-        <span
-          key={i}
-          aria-hidden="true"
-          className={`inline-block w-1.5 h-1.5 rounded-full ${
-            i <= score
-              ? "bg-primary/70"
-              : "bg-muted-foreground/20"
-          }`}
-        />
-      ))}
-    </span>
-  );
-}

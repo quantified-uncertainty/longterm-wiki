@@ -6,7 +6,8 @@ import Link from "next/link";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
+import { computeFundingProgramCoverage } from "@/components/verification/coverage-scoring";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedFundingProgramRecord } from "./org-data";
@@ -38,6 +39,7 @@ export function FundingProgramsSection({
               <th scope="col" className="text-right py-2 px-3 font-medium">Budget</th>
               <th scope="col" className="text-center py-2 px-3 font-medium">Status</th>
               <th scope="col" className="text-center py-2 px-3 font-medium">Deadline</th>
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -64,11 +66,6 @@ export function FundingProgramsSection({
                         source
                       </a>
                     )}
-                    <RecordVerificationDot
-                      verdict={verdict?.verdict}
-                      variant="label"
-                      href={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
-                    />
                     {p.description && (
                       <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                         {p.description}
@@ -107,6 +104,11 @@ export function FundingProgramsSection({
                   <td className="py-2 px-3 text-center text-muted-foreground text-xs">
                     {p.deadline ?? p.openDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                   </td>
+                  <RecordStatusCell
+                    verdict={verdict?.verdict}
+                    sourceCheckHref={verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(String(p.key))}` : undefined}
+                    coverageScore={computeFundingProgramCoverage(p)}
+                  />
                 </tr>
               );
             })}

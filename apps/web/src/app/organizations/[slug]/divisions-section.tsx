@@ -9,7 +9,8 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
+import { computeDivisionCoverage } from "@/components/verification/coverage-scoring";
 
 type LeadMap = Map<string, { name: string; href: string | null }>;
 type MembersMap = Map<string, Array<{ name: string; href: string | null; role: string | null }>>;
@@ -101,10 +102,7 @@ function DivisionCard({
       className={`relative border border-border/50 border-l-[3px] ${accentBorder} rounded-md px-3 py-2 hover:bg-muted/40 hover:border-border transition-all group/card`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0">
-          <RecordVerificationDot
-            verdict={getRecordVerdict("division", String(d.key))?.verdict}
-          />
+        <span className="inline-flex items-center gap-1.5 font-medium text-[13px] text-foreground leading-tight min-w-0 flex-1">
           <span className="truncate">
             {divHref ? (
               <Link
@@ -118,6 +116,16 @@ function DivisionCard({
             )}
           </span>
         </span>
+        <RecordStatusCell
+          as="inline"
+          verdict={getRecordVerdict("division", String(d.key))?.verdict}
+          coverageScore={computeDivisionCoverage({
+            lead: leadDisplay ?? null,
+            totalAmount: null,
+            status: d.status ?? null,
+            startDate: d.startDate ?? null,
+          })}
+        />
         {divHref && (
           <svg
             aria-hidden="true"
@@ -228,6 +236,7 @@ export function DivisionsSection({
               )}
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Status</th>
               <th scope="col" className="text-center py-2.5 px-3 font-medium">Since</th>
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -240,11 +249,6 @@ export function DivisionsSection({
                 <tr key={d.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2.5 px-3">
                     <span className="font-medium text-foreground text-xs flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={verdict?.verdict}
-                        variant="label"
-                        href={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
-                      />
                       {(() => {
                         const href = getDivisionHref(d);
                         return href ? (
@@ -355,6 +359,16 @@ export function DivisionsSection({
                   <td className="py-2.5 px-3 text-center text-muted-foreground text-xs">
                     {d.startDate && formatKBDate(d.startDate)}
                   </td>
+                  <RecordStatusCell
+                    verdict={verdict?.verdict}
+                    sourceCheckHref={verdict?.verdict ? `/source-checks/division/${encodeURIComponent(String(d.key))}` : undefined}
+                    coverageScore={computeDivisionCoverage({
+                      lead: d.lead,
+                      totalAmount: stats?.totalAmount ?? null,
+                      status: d.status,
+                      startDate: d.startDate,
+                    })}
+                  />
                 </tr>
               );
             })}

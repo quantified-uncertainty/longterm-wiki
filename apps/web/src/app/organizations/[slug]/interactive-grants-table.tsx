@@ -5,7 +5,8 @@ import Link from "next/link";
 import { z } from "zod";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell } from "@/components/verification/RecordStatusCell";
+import { computeGrantCoverage } from "@/components/verification/coverage-scoring";
 
 // ── Serializable grant row (no JSX, no functions — pure JSON) ───────
 
@@ -129,7 +130,7 @@ type ColumnId =
   | "division"
   | "status"
   | "notes"
-  | "verified";
+  | "recordStatus";
 
 // Map column IDs to server sort field names
 const COLUMN_TO_SORT_FIELD: Partial<Record<ColumnId, string>> = {
@@ -150,13 +151,6 @@ interface ColumnDef {
 
 const ALL_COLUMNS: ColumnDef[] = [
   { id: "name", label: "Grant", defaultVisible: true, align: "left" },
-  {
-    id: "verified",
-    label: "\u2713",
-    defaultVisible: true,
-    align: "center",
-    onlyIfData: (rows) => rows.some((r) => r.verificationVerdict),
-  },
   {
     id: "recipient",
     label: "Recipient",
@@ -207,6 +201,12 @@ const ALL_COLUMNS: ColumnDef[] = [
     defaultVisible: false,
     align: "left",
     onlyIfData: (rows) => rows.some((r) => r.notes),
+  },
+  {
+    id: "recordStatus",
+    label: "",
+    defaultVisible: true,
+    align: "right",
   },
 ];
 
@@ -309,7 +309,7 @@ export function InteractiveGrantsTable({
         case "notes":
           cmp = (a.notes ?? "").localeCompare(b.notes ?? "");
           break;
-        case "verified":
+        case "recordStatus":
           cmp = (a.verificationVerdict ?? "").localeCompare(b.verificationVerdict ?? "");
           break;
       }
@@ -769,12 +769,18 @@ function CellContent({
           {grant.notes.replace(/\\n/g, "\n")}
         </span>
       ) : null;
-    case "verified":
+    case "recordStatus":
       return (
-        <RecordVerificationDot
+        <RecordStatusCell
+          as="inline"
           verdict={grant.verificationVerdict}
-          variant="label"
-          href={grant.sourceCheckHref}
+          sourceCheckHref={grant.sourceCheckHref}
+          coverageScore={computeGrantCoverage({
+            amount: grant.amount,
+            date: grant.date,
+            source: grant.source,
+            programName: grant.programName,
+          })}
         />
       );
     default:

@@ -6,7 +6,7 @@
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedEquityPositionRecord, ParsedInvestmentRecord, ParsedCharitablePledgeRecord, NumericOrRange } from "./org-data";
@@ -136,6 +136,7 @@ export function EquityPositionsSection({
               {hasPledges && (
                 <th scope="col" className="text-right py-2 px-3 font-medium">Pledge %</th>
               )}
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -164,11 +165,6 @@ export function EquityPositionsSection({
                           source
                         </a>
                       )}
-                      <RecordVerificationDot
-                        verdict={verdict?.verdict}
-                        variant="label"
-                        href={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
-                      />
                     </div>
                     {pos.notes && (
                       <div className="text-[11px] text-muted-foreground/70 leading-tight mt-0.5">
@@ -200,6 +196,10 @@ export function EquityPositionsSection({
                       )}
                     </td>
                   )}
+                  <RecordStatusCell
+                    verdict={verdict?.verdict}
+                    sourceCheckHref={verdict?.verdict ? `/source-checks/equity-position/${encodeURIComponent(String(pos.key))}` : undefined}
+                  />
                 </tr>
               );
             })}
@@ -221,6 +221,7 @@ export function EquityPositionsSection({
                   </td>
                 )}
                 {hasPledges && <td />}
+                <td />
               </tr>
             </tfoot>
           )}

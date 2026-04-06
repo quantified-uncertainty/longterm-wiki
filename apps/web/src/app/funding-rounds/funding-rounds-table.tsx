@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
 import type { RecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { compareFundingRoundRows, type SortDir, type FundingRoundSortKey } from "./funding-rounds-sort";
@@ -44,12 +44,6 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
   const [sortKey, setSortKey] = useState<FundingRoundSortKey>("date");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(0);
-
-  // Only show verification dots if any row has a real verdict
-  const hasAnyVerdict = useMemo(
-    () => rows.some((r) => r.verdict != null && r.verdict.verdict !== "unchecked"),
-    [rows],
-  );
 
   // Instrument filter options
   const instruments = useMemo(() => {
@@ -199,6 +193,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
               <SortHeader label="Instrument" sortKey="instrument" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Lead Investor" sortKey="leadInvestor" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Date" sortKey="date" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <RecordStatusHeader />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -209,9 +204,6 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
               >
                 <td className="py-2 px-3">
                   <span className="flex items-center gap-1.5">
-                    {hasAnyVerdict && (
-                      <RecordVerificationDot verdict={row.verdict?.verdict} variant="label" />
-                    )}
                     <Link
                       href={`/funding-rounds/${row.key}`}
                       className="font-medium text-foreground text-xs hover:text-primary transition-colors"
@@ -279,6 +271,10 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                 <td className="py-2 px-3 text-center text-muted-foreground text-xs whitespace-nowrap">
                   {row.date ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                 </td>
+                <RecordStatusCell
+                  verdict={row.verdict?.verdict}
+                  sourceCheckHref={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
+                />
               </tr>
             ))}
           </tbody>

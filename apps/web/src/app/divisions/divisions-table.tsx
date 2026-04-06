@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { ProfileStatCard } from "@/components/directory/ProfileStatCard";
-import { RecordVerificationDot } from "@/components/verification/RecordVerificationDot";
+import { RecordStatusCell, RecordStatusHeader } from "@/components/verification/RecordStatusCell";
 import type { RecordVerdict } from "@/data/tablebase";
 import { titleCase } from "@/components/wiki/factbase/format";
 import {
@@ -194,6 +194,7 @@ export function DivisionsTable({
                 </th>
                 <th className="text-left py-2.5 px-3 font-medium">Type</th>
                 <th className="text-left py-2.5 px-3 font-medium">Status</th>
+                <RecordStatusHeader />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -204,11 +205,6 @@ export function DivisionsTable({
                 >
                   <td className="py-2 px-3">
                     <span className="flex items-center gap-1.5">
-                      <RecordVerificationDot
-                        verdict={row.verdict?.verdict}
-                        variant="label"
-                        href={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
-                      />
                       {row.href ? (
                         <Link
                           href={row.href}
@@ -258,6 +254,10 @@ export function DivisionsTable({
                       </span>
                     )}
                   </td>
+                  <RecordStatusCell
+                    verdict={row.verdict?.verdict}
+                    sourceCheckHref={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                  />
                 </tr>
               ))}
             </tbody>
