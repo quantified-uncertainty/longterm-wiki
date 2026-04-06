@@ -45,6 +45,10 @@ ALTER TABLE grants DROP COLUMN IF EXISTS data_source_resource_id;
 
 -- 8. Re-point grants.data_source_id FK from data_sources → resource_tabular_sources
 --    Values are identical slugs (e.g., "coefficient-giving")
+--    The constraint was created via inline SQL in 0155 (`REFERENCES data_sources(id)`),
+--    so PostgreSQL named it with its default pattern: {table}_{column}_fkey.
+--    Drop both the default name and the Drizzle-style name for safety.
+ALTER TABLE grants DROP CONSTRAINT IF EXISTS grants_data_source_id_fkey;
 ALTER TABLE grants DROP CONSTRAINT IF EXISTS grants_data_source_id_data_sources_id_fk;
 ALTER TABLE grants DROP CONSTRAINT IF EXISTS grants_data_source_id_rts_source_slug_fk;
 ALTER TABLE grants
