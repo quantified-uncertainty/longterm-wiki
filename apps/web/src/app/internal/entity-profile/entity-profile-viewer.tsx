@@ -14,6 +14,9 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
+import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -34,12 +37,20 @@ interface Section {
   rows: Record<string, unknown>[];
   total: number;
   error?: string;
+  recordType?: string;
+}
+
+interface DisplayNameEntry {
+  title: string;
+  slug: string;
+  entityType: string;
 }
 
 interface EntityProfileData {
   entity: Record<string, unknown>;
   sections: Section[];
   verdicts: Record<string, { verdict: string; confidence: number | null }>;
+  displayNames: Record<string, DisplayNameEntry>;
 }
 
 // ── Entity search ──────────────────────────────────────────────────────────
@@ -117,32 +128,120 @@ function TypeBadge({ dataType }: { dataType: string }) {
   );
 }
 
-// ── Verdict badge ──────────────────────────────────────────────────────────
+// ── Entity type to directory mapping (client-side, for building links) ─────
 
-const VERDICT_COLORS: Record<string, string> = {
-  confirmed: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
-  contradicted: "bg-red-50 text-red-700 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-800",
-  unverifiable: "bg-orange-50 text-orange-600 border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800",
-  outdated: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
-  partial: "bg-yellow-50 text-yellow-700 border-yellow-200 dark:bg-yellow-950/40 dark:text-yellow-300 dark:border-yellow-800",
-  unchecked: "bg-muted/50 text-muted-foreground/60 border-border/50",
+const ENTITY_TYPE_DIRECTORY: Record<string, string> = {
+  person: "/people",
+  organization: "/organizations",
+  benchmark: "/benchmarks",
+  "ai-model": "/ai-models",
+  policy: "/legislation",
+  project: "/projects",
+  "research-area": "/research-areas",
+  approach: "/approaches",
+  event: "/events",
+  "political-race": "/races",
 };
 
-function VerdictBadge({ verdict, confidence }: { verdict: string; confidence: number | null }) {
-  const cls = VERDICT_COLORS[verdict] ?? "bg-muted text-muted-foreground border-border";
+function entityHref(entry: DisplayNameEntry): string {
+  const prefix = ENTITY_TYPE_DIRECTORY[entry.entityType];
+  return prefix ? `${prefix}/${entry.slug}` : `/wiki/E1929?entity=${encodeURIComponent(entry.slug)}`;
+}
+
+// ── Column configuration per section ──────────────────────────────────────
+
+/** Columns to hide per section (redundant legacy or consumed by entity ref rendering) */
+const HIDDEN_COLUMNS: Record<string, Set<string>> = {
+  personnel: new Set(["person_id", "organization_id", "person_display_name", "org_display_name"]),
+  grantsGiven: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
+  grantsReceived: new Set(["organization_id", "grantee_id", "org_display_name", "grantee_display_name"]),
+  investments: new Set(["company_id", "investor_id", "company_display_name", "investor_display_name"]),
+  equityPositions: new Set(["company_id", "holder_id", "company_display_name", "holder_display_name"]),
+  fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name"]),
+  policyStakeholders: new Set(["stakeholder_display_name"]),
+  divisionPersonnel: new Set(["person_display_name"]),
+};
+
+/** Human-readable header overrides for entity reference columns */
+const COLUMN_HEADER_OVERRIDES: Record<string, string> = {
+  person_entity_id: "Person",
+  org_entity_id: "Organization",
+  grantee_entity_id: "Grantee",
+  company_entity_id: "Company",
+  investor_entity_id: "Investor",
+  holder_entity_id: "Holder",
+  lead_investor_entity_id: "Lead Investor",
+  stakeholder_entity_id: "Stakeholder",
+  policy_entity_id: "Policy",
+  entity_id: "Entity",
+  parent_org_id: "Parent Org",
+  person_id: "Person",
+  organization_id: "Organization",
+};
+
+// ── Numeric formatting columns ────────────────────────────────────────────
+
+/** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
+const CURRENCY_COLUMNS = new Set([
+  "amount", "raised", "raised_low", "raised_high",
+  "valuation", "valuation_low", "valuation_high",
+  "amount_low", "amount_high", "total_budget",
+  "usd_equivalent", "cost_usd",
+]);
+
+/** Columns representing 0-1 decimal fractions displayed as percentages */
+const PERCENTAGE_COLUMNS = new Set([
+  "stake_low", "stake_high",
+]);
+
+function formatPercentage(n: number): string {
+  return `${(n * 100).toFixed(1).replace(/\.0$/, "")}%`;
+}
+
+/** Try to parse a value as a number. Returns null if not parseable or is a range string like "[0.07, 0.15]". */
+function tryParseNumeric(value: unknown): number | null {
+  if (typeof value === "number") return isFinite(value) ? value : null;
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.startsWith("[") || trimmed.startsWith("{")) return null;
+  const n = Number(trimmed);
+  return isFinite(n) ? n : null;
+}
+
+// ── Expandable text ───────────────────────────────────────────────────────
+
+function ExpandableText({ text }: { text: string }) {
+  const [expanded, setExpanded] = useState(false);
   return (
-    <span className={`inline-flex items-center gap-1 px-1.5 py-px rounded border text-[10px] font-medium leading-tight ${cls}`}>
-      {verdict}
-      {confidence != null && (
-        <span className="opacity-60">{(confidence * 100).toFixed(0)}%</span>
-      )}
-    </span>
+    <div>
+      <span
+        className={`text-[11px] whitespace-pre-wrap break-words ${expanded ? "" : "line-clamp-2"}`}
+      >
+        {text}
+      </span>
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="text-[10px] text-blue-600 dark:text-blue-400 hover:underline ml-1"
+      >
+        {expanded ? "less" : "more"}
+      </button>
+    </div>
   );
 }
 
 // ── Cell renderer ──────────────────────────────────────────────────────────
 
-function CellValue({ value, columnName }: { value: unknown; columnName: string }) {
+function CellValue({
+  value,
+  columnName,
+  displayNames,
+  row,
+}: {
+  value: unknown;
+  columnName: string;
+  displayNames?: Record<string, DisplayNameEntry>;
+  row?: Record<string, unknown>;
+}) {
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground/30 select-none">&mdash;</span>;
   }
@@ -159,14 +258,29 @@ function CellValue({ value, columnName }: { value: unknown; columnName: string }
     return <JsonValue value={value} />;
   }
 
-  // Entity reference columns -> link to same dashboard
+  // Entity reference columns -> show resolved name as link
   const isEntityRef =
     columnName.endsWith("EntityId") ||
     columnName.endsWith("_entity_id") ||
     columnName === "stableId" ||
-    columnName === "stable_id";
+    columnName === "stable_id" ||
+    columnName === "parentOrgId" ||
+    columnName === "parent_org_id";
 
   if (isEntityRef && typeof value === "string" && value.length === 10) {
+    const resolved = displayNames?.[value];
+    if (resolved) {
+      return (
+        <Link
+          href={entityHref(resolved)}
+          className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+          title={`${value} (${resolved.entityType})`}
+        >
+          {resolved.title}
+        </Link>
+      );
+    }
+    // Fallback: show truncated stableId as link to DB profile
     return (
       <Link
         href={`/wiki/E1929?entity=${encodeURIComponent(value)}`}
@@ -176,6 +290,43 @@ function CellValue({ value, columnName }: { value: unknown; columnName: string }
         {value}
         <ExternalLink className="h-2.5 w-2.5 opacity-40" />
       </Link>
+    );
+  }
+
+  // Currency columns -> formatted compact currency
+  if (CURRENCY_COLUMNS.has(columnName)) {
+    const n = tryParseNumeric(value);
+    if (n !== null) {
+      const currency = (row?.currency as string) ?? undefined;
+      return (
+        <span className="text-[11px] tabular-nums font-medium whitespace-nowrap" title={String(value)}>
+          {formatCompactCurrency(n, currency)}
+        </span>
+      );
+    }
+  }
+
+  // Percentage columns -> formatted as X.X%
+  if (PERCENTAGE_COLUMNS.has(columnName)) {
+    const n = tryParseNumeric(value);
+    if (n !== null) {
+      return (
+        <span className="text-[11px] tabular-nums font-medium" title={String(value)}>
+          {formatPercentage(n)}
+        </span>
+      );
+    }
+  }
+
+  // Generic number values (real/doublePrecision columns arrive as typeof number)
+  if (typeof value === "number" && isFinite(value)) {
+    const formatted = Math.abs(value) >= 1000
+      ? formatCompactNumber(value)
+      : Number.isInteger(value) ? value.toLocaleString() : value.toFixed(2);
+    return (
+      <span className="text-[11px] tabular-nums" title={String(value)}>
+        {formatted}
+      </span>
     );
   }
 
@@ -198,12 +349,19 @@ function CellValue({ value, columnName }: { value: unknown; columnName: string }
   }
 
   const str = String(value);
-  if (str.length > 200) {
-    return (
-      <span className="text-[11px]" title={str}>
-        {str.slice(0, 200)}<span className="text-muted-foreground">&hellip;</span>
-      </span>
-    );
+
+  // Long text -> expandable with line-clamp
+  if (str.length > 80) {
+    // Check if it's stringified JSON — delegate to JsonValue if so
+    if (str.startsWith("[") || str.startsWith("{")) {
+      try {
+        const parsed = JSON.parse(str);
+        if (typeof parsed === "object" && parsed !== null) {
+          return <JsonValue value={parsed} />;
+        }
+      } catch { /* not JSON, fall through */ }
+    }
+    return <ExpandableText text={str} />;
   }
 
   return <span className="text-[11px]">{str}</span>;
@@ -250,15 +408,24 @@ function ProfileSection({
   section,
   verdicts,
   defaultExpanded,
+  displayNames,
 }: {
   section: Section;
   verdicts: Record<string, { verdict: string; confidence: number | null }>;
   defaultExpanded: boolean;
+  displayNames: Record<string, DisplayNameEntry>;
 }) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [showSchema, setShowSchema] = useState(false);
 
   const isEmpty = section.total === 0;
+
+  // Filter out hidden/redundant columns
+  const visibleColumns = useMemo(() => {
+    const hidden = HIDDEN_COLUMNS[section.key];
+    if (!hidden) return section.schema.columns;
+    return section.schema.columns.filter((col) => !hidden.has(col.name));
+  }, [section.key, section.schema.columns]);
 
   return (
     <div
@@ -349,22 +516,20 @@ function ProfileSection({
           <table className="w-full text-[11px]">
             <thead>
               <tr className="bg-muted/50 dark:bg-muted/30">
-                {section.schema.columns.map((col) => (
+                {visibleColumns.map((col) => (
                   <th
                     key={col.name}
                     className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap border-b border-border/40"
                     title={col.description}
                   >
-                    <span className="mr-1.5">{formatColumnHeader(col.name)}</span>
-                    <TypeBadge dataType={col.dataType} />
+                    {formatColumnHeader(col.name)}
                   </th>
                 ))}
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground whitespace-nowrap border-b border-border/40">
-                  <span className="inline-flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3" />
-                    Verdict
-                  </span>
-                </th>
+                {section.recordType && (
+                  <th className="px-2 py-2 w-8 border-b border-border/40" title="Verification status">
+                    <ShieldCheck className="h-3 w-3 text-muted-foreground/50" />
+                  </th>
+                )}
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
@@ -373,22 +538,25 @@ function ProfileSection({
                 const verdict = recordId ? verdicts[recordId] : undefined;
                 return (
                   <tr key={i} className="hover:bg-muted/20 transition-colors">
-                    {section.schema.columns.map((col) => {
+                    {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
                       const value = camelKey in row ? row[camelKey] : row[col.name];
                       return (
-                        <td key={col.name} className="px-3 py-2 align-top max-w-xs">
-                          <CellValue value={value} columnName={col.name} />
+                        <td key={col.name} className="px-3 py-2 align-top">
+                          <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />
                         </td>
                       );
                     })}
-                    <td className="px-3 py-2 align-top">
-                      {verdict ? (
-                        <VerdictBadge verdict={verdict.verdict} confidence={verdict.confidence} />
-                      ) : (
-                        <span className="text-muted-foreground/20 select-none">&mdash;</span>
-                      )}
-                    </td>
+                    {section.recordType && (
+                      <td className="px-2 py-2 align-top">
+                        <SourceCheckDot
+                          status={verdict ? recordVerdictToStatus(verdict.verdict) : "not_run"}
+                          originalVerdict={verdict?.verdict}
+                          size="md"
+                          href={recordId ? `/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}` : undefined}
+                        />
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -419,6 +587,7 @@ function snakeToCamel(s: string): string {
 }
 
 function formatColumnHeader(name: string): string {
+  if (COLUMN_HEADER_OVERRIDES[name]) return COLUMN_HEADER_OVERRIDES[name];
   return name
     .replace(/_/g, " ")
     .replace(/\b[a-z]/g, (c) => c.toUpperCase())
@@ -934,6 +1103,7 @@ export function EntityProfileViewer({
                   section={section}
                   verdicts={data.verdicts}
                   defaultExpanded={section.total > 0 && section.total <= 50}
+                  displayNames={data.displayNames ?? {}}
                 />
               ))}
           </div>
