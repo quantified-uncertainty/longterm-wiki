@@ -29,6 +29,7 @@ import { logAuditEntries } from "./audit-log.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { enforceVerification } from "../shared/verification-enforcement.js";
 
 // ---- Constants ----
 
@@ -601,6 +602,11 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       }
       batchKeys.add(key);
     }
+
+    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
+    // config and client ?requireVerification=true param. See verification-enforcement.ts.
+    const verificationError = enforceVerification(c, "grants", items);
+    if (verificationError) return verificationError;
 
     // Validate programId references (skip if skipEntityValidation is set)
     const skipValidation = c.req.query("skipEntityValidation") === "true";
