@@ -5,7 +5,6 @@ import {
   Database,
   ShieldCheck,
   ExternalLink,
-  ArrowLeft,
   ArrowRight,
   Layers,
 } from "lucide-react";
@@ -41,22 +40,43 @@ interface ThingDetail {
   href: string | null;
 }
 
-// Source tables that support source-check verdicts
+/** Source tables (DB table names) that support source-check verdicts. */
 const VERDICT_SOURCE_TABLES = new Set([
-  "fact",
-  "grant",
+  "facts",
+  "grants",
   "personnel",
-  "division",
-  "funding_program",
-  "investment",
-  "funding_round",
-  "publication",
-  "wiki-page",
+  "divisions",
+  "funding_programs",
+  "investments",
+  "funding_rounds",
+  "publications",
+  "wiki_pages",
+  "equity_positions",
+  "policy_stakeholders",
+  "benchmark_results",
 ]);
 
-/** Map source_table names to the recordType format used by source-checks API */
+/**
+ * Map source_table names (DB) to the recordType format used by source-checks API.
+ * DB uses snake_case plural ("funding_rounds"), source-checks uses kebab-case singular ("funding-round").
+ */
+const SOURCE_TABLE_TO_RECORD_TYPE: Record<string, string> = {
+  facts: "fact",
+  grants: "grant",
+  personnel: "personnel",
+  divisions: "division",
+  funding_programs: "funding-program",
+  investments: "investment",
+  funding_rounds: "funding-round",
+  publications: "publication",
+  wiki_pages: "wiki-page",
+  equity_positions: "equity-position",
+  policy_stakeholders: "policy-stakeholder",
+  benchmark_results: "benchmark-result",
+};
+
 function sourceTableToRecordType(sourceTable: string): string {
-  return sourceTable.replace(/_/g, "-");
+  return SOURCE_TABLE_TO_RECORD_TYPE[sourceTable] ?? sourceTable.replace(/_/g, "-");
 }
 
 // ── Metadata ───────────────────────────────────────────────────────────

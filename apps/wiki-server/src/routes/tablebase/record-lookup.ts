@@ -115,7 +115,7 @@ const recordLookupApp = new Hono()
     // Validate sourceTable against whitelist
     const parseResult = sourceTableSchema.safeParse(rawSourceTable);
     if (!parseResult.success) {
-      return validationError(c, `Invalid source table: ${rawSourceTable}`);
+      return validationError(c, `Invalid source table: ${rawSourceTable.slice(0, 100)}`);
     }
     const sourceTable = parseResult.data;
 
@@ -127,25 +127,22 @@ const recordLookupApp = new Hono()
       if (sourceTable === "research_area_organizations") {
         // Composite PK table: sourceId is "researchAreaId:organizationId"
         const parts = sourceId.split(":");
-        if (parts.length === 2) {
-          rows = await db
-            .select()
-            .from(researchAreaOrganizations)
-            .where(
-              and(
-                eq(researchAreaOrganizations.researchAreaId, parts[0]),
-                eq(researchAreaOrganizations.organizationId, parts[1])
-              )
-            )
-            .limit(1);
-        } else {
-          // Fallback: try matching researchAreaId alone
-          rows = await db
-            .select()
-            .from(researchAreaOrganizations)
-            .where(eq(researchAreaOrganizations.researchAreaId, sourceId))
-            .limit(1);
+        if (parts.length !== 2) {
+          return validationError(
+            c,
+            `research_area_organizations requires sourceId in "researchAreaId:organizationId" format, got: ${sourceId.slice(0, 100)}`
+          );
         }
+        rows = await db
+          .select()
+          .from(researchAreaOrganizations)
+          .where(
+            and(
+              eq(researchAreaOrganizations.researchAreaId, parts[0]),
+              eq(researchAreaOrganizations.organizationId, parts[1])
+            )
+          )
+          .limit(1);
       } else {
         const table = TABLE_MAP[sourceTable];
         // All other tables have a single `id` primary key column.
