@@ -276,6 +276,9 @@ audits:
       - date: "2026-04-06"
         result: fail
         checked_by: "manual"
+      - date: "2026-04-06"
+        result: fail
+        checked_by: "manual"
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -300,6 +303,9 @@ audits:
         checked_by: "manual"
         notes: "All models current: opus-4-6, sonnet-4-6, haiku-4-5-20251001"
       - date: "2026-04-05"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-06"
         result: pass
         checked_by: "manual"
   - id: audits-system-adoption
