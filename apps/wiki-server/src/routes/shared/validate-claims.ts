@@ -53,13 +53,14 @@ export async function validateClaimRefs(
 
   const unique = [...new Set(claimIds)];
   const rows = await db<ClaimStatusRow[]>`
-    SELECT id, status, entity_id
+    SELECT id::int, status, entity_id
     FROM proposed_claims
     WHERE id = ANY(${unique})
   `;
 
   // Check for missing claims
-  const foundIds = new Set(rows.map((r) => r.id));
+  // Cast to Number because postgres.js may return bigserial as string
+  const foundIds = new Set(rows.map((r) => Number(r.id)));
   const missing = unique.filter((id) => !foundIds.has(id));
   if (missing.length > 0) {
     return `Claim IDs not found: ${missing.join(", ")}`;
