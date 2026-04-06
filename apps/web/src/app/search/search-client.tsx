@@ -23,6 +23,7 @@ import {
   ExternalLink,
   type LucideIcon,
 } from "lucide-react";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
 
 // ── Browse data (passed from server component) ──────────────────────
 
@@ -230,7 +231,7 @@ function decodeEntities(text: string): string {
 
 // ── Component ────────────────────────────────────────────────────────
 
-export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
+export function SearchPageClient({ browseData, coverageMap }: { browseData: BrowseData; coverageMap?: Record<string, number> }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "";
@@ -476,6 +477,7 @@ export function SearchPageClient({ browseData }: { browseData: BrowseData }) {
               query={query}
               showBadges={col.showBadges}
               selectedKey={selected >= 0 ? flatResults[selected]?.key : null}
+              coverageMap={coverageMap}
             />
           ))}
         </div>
@@ -507,6 +509,7 @@ function ResultColumnView({
   query,
   showBadges,
   selectedKey,
+  coverageMap,
 }: {
   title: string;
   icon: LucideIcon;
@@ -514,6 +517,7 @@ function ResultColumnView({
   query: string;
   showBadges: boolean;
   selectedKey: string | null;
+  coverageMap?: Record<string, number>;
 }) {
   return (
     <div className="min-w-0">
@@ -535,6 +539,7 @@ function ResultColumnView({
             query={query}
             showBadge={showBadges}
             isSelected={r.key === selectedKey}
+            coverageScore={coverageMap?.[r.key.split(":")[1]] ?? null}
           />
         ))}
       </div>
@@ -549,11 +554,13 @@ function ResultRow({
   query,
   showBadge,
   isSelected,
+  coverageScore,
 }: {
   result: UnifiedResult;
   query: string;
   showBadge: boolean;
   isSelected: boolean;
+  coverageScore: number | null;
 }) {
   const style = TYPE_STYLES[r.type] ?? FALLBACK_STYLE;
   const Icon = style.icon;
@@ -579,6 +586,9 @@ function ResultRow({
             <span className={`shrink-0 px-1.5 py-px text-[9px] font-semibold rounded ${style.badge}`}>
               {style.short}
             </span>
+          )}
+          {coverageScore != null && r.column === "entities" && (
+            <CoverageDots score={coverageScore} className="shrink-0 ml-0.5" />
           )}
           {isExternal && (
             <ExternalLink size={10} className="shrink-0 text-muted-foreground/25 mt-px" />
