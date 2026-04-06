@@ -17,6 +17,7 @@ import Link from "next/link";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { getRecordHref } from "@/app/source-checks/source-checks-shared";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 
@@ -673,10 +674,13 @@ function ProfileSection({
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
                       const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
-                      return section.recordType && verdict ? (
+                      const href = section.recordType
+                        ? getRecordHref(section.recordType, idStr)
+                        : null;
+                      return href ? (
                         <td className="px-2 py-2 align-top">
                           <Link
-                            href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(idStr)}`}
+                            href={href}
                             className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
                             title={`Record ${idStr}`}
                           >
