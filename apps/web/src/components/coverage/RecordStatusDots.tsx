@@ -1,7 +1,7 @@
 /**
  * RecordStatusDots — Combined coverage + source-check indicator.
  *
- * Renders CoverageDots (data completeness) + SourceCheckDot (verification status)
+ * Renders CoverageDots (pie chart) + SourceCheckDot (colored dot)
  * side by side. Used as the rightmost element in record tables and card layouts.
  */
 import { CoverageDots } from "./CoverageDots";
@@ -31,7 +31,6 @@ export function RecordStatusDots({
   return (
     <span className={`inline-flex items-center gap-1 ${className}`}>
       <CoverageDots score={coverageScore} />
-      <span className="w-px h-2.5 bg-border/60 shrink-0" aria-hidden="true" />
       <SourceCheckDot
         status={recordVerdictToStatus(verdict)}
         originalVerdict={verdict}
