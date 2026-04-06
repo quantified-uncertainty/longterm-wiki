@@ -101,11 +101,15 @@ function buildBrowseData(): BrowseData {
 export default function SearchPage() {
   const browseData = buildBrowseData();
 
-  // Pre-compute coverage scores for all entities (server-side only)
+  // Pre-compute coverage scores for directory-type entities only (server-side).
+  // Limits KB lookups and payload size vs. scoring all ~3800 entities.
+  const directoryTypes = new Set(Object.keys(DIRECTORY_TYPES));
   const coverageScores = getAllEntityCoverageScores();
   const coverageMap: Record<string, number> = {};
   for (const entry of coverageScores) {
-    coverageMap[entry.id] = entry.score;
+    if (directoryTypes.has(entry.entityType)) {
+      coverageMap[entry.id] = entry.score;
+    }
   }
 
   return (

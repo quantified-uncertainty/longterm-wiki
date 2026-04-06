@@ -9,7 +9,7 @@
  */
 
 import { getTypedEntityById, getTypedEntities, type AnyEntity } from "@/data";
-import { getKBLatest } from "@/data/factbase";
+import { getKBLatest, getKBEntities } from "@/data/factbase";
 import {
   computeOrgCoverage,
   computePersonCoverage,
@@ -19,6 +19,22 @@ import {
   computeBenchmarkCoverage,
   computeGenericCoverage,
 } from "@/components/coverage/coverage-score";
+
+/** Lazy-computed reverse index: org stableId → count of people employed there. */
+let _orgPeopleCount: Map<string, number> | null = null;
+function getOrgPeopleCount(orgStableId: string): number {
+  if (!_orgPeopleCount) {
+    _orgPeopleCount = new Map();
+    for (const person of getKBEntities().filter((e) => e.type === "person")) {
+      const fact = getKBLatest(person.id, "employed-by");
+      if (fact?.value.type === "ref") {
+        const orgId = fact.value.value;
+        _orgPeopleCount.set(orgId, (_orgPeopleCount.get(orgId) ?? 0) + 1);
+      }
+    }
+  }
+  return _orgPeopleCount.get(orgStableId) ?? 0;
+}
 
 /** Extract a numeric KB fact value, or null. */
 function kbNum(entityId: string, prop: string): number | null {
@@ -46,15 +62,19 @@ function computeEntityCoverage(entity: AnyEntity): number {
   const type = entity.entityType;
 
   switch (type) {
-    case "organization":
+    case "organization": {
+      const tbEntity = getTypedEntityById(id);
+      const stableId = tbEntity?.stableId;
       return computeOrgCoverage({
         revenueNum: kbNum(id, "revenue"),
         valuationNum: kbNum(id, "valuation"),
         headcount: kbNum(id, "headcount"),
         totalFundingNum: kbNum(id, "total-funding"),
         foundedDate: kbText(id, "founded-date"),
+        peopleCount: stableId ? getOrgPeopleCount(stableId) : 0,
         wikiPageId: entity.wikiId ?? null,
       });
+    }
 
     case "person":
     case "researcher":
