@@ -289,6 +289,93 @@ function RiskBadge({ level }: { level: "low" | "medium" | "high" | null }) {
   );
 }
 
+// Source-check cell renderers
+
+function VerdictBar({ row }: { row: UnifiedEntityRow }) {
+  const total = row.scTotalVerdicts;
+  if (total == null || total === 0) return <Dash />;
+
+  const segments = [
+    { key: "confirmed", count: row.scConfirmed ?? 0, color: "bg-emerald-500", label: "Confirmed" },
+    { key: "contradicted", count: row.scContradicted ?? 0, color: "bg-red-500", label: "Contradicted" },
+    { key: "outdated", count: row.scOutdated ?? 0, color: "bg-amber-500", label: "Outdated" },
+    { key: "partial", count: row.scPartial ?? 0, color: "bg-yellow-400", label: "Partial" },
+    { key: "unverifiable", count: row.scUnverifiable ?? 0, color: "bg-orange-400", label: "Unverifiable" },
+    { key: "unchecked", count: row.scUnchecked ?? 0, color: "bg-gray-300 dark:bg-gray-600", label: "Unchecked" },
+  ];
+
+  const tooltip = segments
+    .filter((s) => s.count > 0)
+    .map((s) => `${s.label}: ${s.count}`)
+    .join(", ");
+
+  return (
+    <div className="flex items-center gap-1.5" title={`${total} verdicts — ${tooltip}`}>
+      <div className="flex h-2 w-16 rounded-full overflow-hidden bg-muted/40">
+        {segments.map((seg) =>
+          seg.count > 0 ? (
+            <div
+              key={seg.key}
+              className={`${seg.color} transition-all`}
+              style={{ width: `${(seg.count / total) * 100}%` }}
+            />
+          ) : null
+        )}
+      </div>
+      <span className="text-[10px] tabular-nums text-muted-foreground">{total}</span>
+    </div>
+  );
+}
+
+function AccuracyRing({ value }: { value: number | null }) {
+  if (value == null) return <Dash />;
+  const pct = Math.round(value * 100);
+  const radius = 9;
+  const circumference = 2 * Math.PI * radius;
+  const filled = circumference * value;
+  const color = pct >= 90 ? "stroke-emerald-500" : pct >= 70 ? "stroke-amber-500" : "stroke-red-400";
+  const textColor = pct >= 90 ? "text-emerald-600" : pct >= 70 ? "text-amber-600" : "text-red-500";
+
+  return (
+    <div className="flex items-center gap-1" title={`Accuracy: ${pct}%`}>
+      <svg width="22" height="22" viewBox="0 0 22 22" className="shrink-0">
+        <circle cx="11" cy="11" r={radius} fill="none" className="stroke-muted/30" strokeWidth="2.5" />
+        <circle
+          cx="11"
+          cy="11"
+          r={radius}
+          fill="none"
+          className={color}
+          strokeWidth="2.5"
+          strokeDasharray={`${filled} ${circumference}`}
+          strokeLinecap="round"
+          transform="rotate(-90 11 11)"
+        />
+      </svg>
+      <span className={`text-[11px] tabular-nums font-semibold ${textColor}`}>{pct}%</span>
+    </div>
+  );
+}
+
+function VerdictCount({
+  value,
+  color,
+  icon,
+}: {
+  value: number | null;
+  color: string;
+  icon?: string;
+}) {
+  if (value == null) return <Dash />;
+  if (value === 0) return <span className="text-muted-foreground/25 text-xs tabular-nums">0</span>;
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-xs tabular-nums font-semibold ${color}`}>
+      {icon && <span className="text-[10px]">{icon}</span>}
+      {value}
+    </span>
+  );
+}
+
 function DateCell({ date }: { date: string | null }) {
   if (!date) return <Dash />;
   const d = new Date(date);
@@ -364,6 +451,7 @@ const COLUMN_LABELS: Record<string, string> = {
   quotesCov: "Quotes Verified",
   accuracyCov: "Accuracy Verified",
   // Source-check verification
+  scVerdictBar: "Verdict Distribution",
   scConfirmed: "Confirmed",
   scContradicted: "Contradicted",
   scOutdated: "Outdated",
@@ -842,79 +930,56 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   },
   // --- Source-Check Verification ---
   {
+    id: "scVerdictBar",
+    accessorFn: (row) => row.scTotalVerdicts,
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Verdict distribution (hover for breakdown)">Verdicts</SortableHeader>,
+    cell: ({ row }) => <VerdictBar row={row.original} />,
+  },
+  {
     accessorKey: "scConfirmed",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records with confirmed verdicts">Conf</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scConfirmed;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums font-medium text-emerald-500">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scConfirmed} color="text-emerald-500" icon="&#x2713;" />,
   },
   {
     accessorKey: "scContradicted",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records with contradicted verdicts">Contr</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scContradicted;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums font-medium text-red-500">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scContradicted} color="text-red-500" icon="&#x2717;" />,
   },
   {
     accessorKey: "scOutdated",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records with outdated verdicts">Outd</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scOutdated;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums font-medium text-amber-500">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scOutdated} color="text-amber-500" icon="&#x25F7;" />,
   },
   {
     accessorKey: "scPartial",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records with partial verdicts">Part</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scPartial;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums font-medium text-yellow-500">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scPartial} color="text-yellow-500" icon="&#x25D1;" />,
   },
   {
     accessorKey: "scUnverifiable",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records that could not be verified">Unver</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scUnverifiable;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums font-medium text-orange-400">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scUnverifiable} color="text-orange-400" icon="?" />,
   },
   {
     accessorKey: "scUnchecked",
     sortUndefined: "last",
     header: ({ column }) => <SortableHeader column={column} title="Records not yet source-checked">Unchk</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scUnchecked;
-      if (v == null) return <Dash />;
-      if (v === 0) return <span className="text-muted-foreground/30 text-xs tabular-nums">0</span>;
-      return <span className="text-xs tabular-nums text-muted-foreground">{v}</span>;
-    },
+    cell: ({ row }) => <VerdictCount value={row.original.scUnchecked} color="text-muted-foreground/60" icon="&#x25CB;" />,
   },
   {
     accessorKey: "scTotalVerdicts",
     sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Total source-check verdicts">Verd</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column} title="Total source-check verdicts">Total</SortableHeader>,
     cell: ({ row }) => {
       const v = row.original.scTotalVerdicts;
       if (v == null) return <Dash />;
-      return <span className="text-xs tabular-nums">{v}</span>;
+      return <span className="text-xs tabular-nums font-medium">{v}</span>;
     },
   },
   {
@@ -932,14 +997,8 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   {
     accessorKey: "scAccuracyRate",
     sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Accuracy rate: confirmed / (confirmed + contradicted + outdated + partial)">AccR</SortableHeader>,
-    cell: ({ row }) => {
-      const v = row.original.scAccuracyRate;
-      if (v == null) return <Dash />;
-      const pct = Math.round(v * 100);
-      const color = pct >= 90 ? "text-emerald-500" : pct >= 70 ? "text-amber-500" : "text-red-400";
-      return <span className={`text-xs tabular-nums font-medium ${color}`}>{pct}%</span>;
-    },
+    header: ({ column }) => <SortableHeader column={column} title="Accuracy rate: confirmed / (confirmed + contradicted + outdated + partial)">Accuracy</SortableHeader>,
+    cell: ({ row }) => <AccuracyRing value={row.original.scAccuracyRate} />,
   },
   {
     accessorKey: "scVerificationCoverage",
@@ -950,7 +1009,17 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
       if (v == null) return <Dash />;
       const pct = Math.round(v * 100);
       const color = pct >= 80 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-red-400";
-      return <span className={`text-xs tabular-nums font-medium ${color}`}>{pct}%</span>;
+      return (
+        <div className="flex items-center gap-1" title={`${pct}% of records verified`}>
+          <div className="h-1.5 w-10 rounded-full bg-muted/40 overflow-hidden">
+            <div
+              className={`h-full rounded-full ${pct >= 80 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-red-400"}`}
+              style={{ width: `${Math.min(pct, 100)}%` }}
+            />
+          </div>
+          <span className={`text-[11px] tabular-nums font-medium ${color}`}>{pct}%</span>
+        </div>
+      );
     },
   },
 ];
@@ -1032,13 +1101,13 @@ const PRESETS: Record<string, Preset> = {
   verification: {
     label: "Verification",
     description: "Source-check verification status: accuracy rates, coverage, and verdict breakdown",
-    columns: ["title", "entityType", "scAccuracyRate", "scVerificationCoverage", "scTotalVerdicts", "scConfirmed", "scContradicted", "scOutdated", "scPartial", "scAvgConfidence"],
-    defaultSort: [{ id: "scTotalVerdicts", desc: true }],
+    columns: ["title", "entityType", "scAccuracyRate", "scVerificationCoverage", "scVerdictBar", "scConfirmed", "scContradicted", "scOutdated", "scAvgConfidence"],
+    defaultSort: [{ id: "scVerdictBar", desc: true }],
   },
   worstEntities: {
     label: "Worst Entities",
     description: "Entities with the most contradicted or problematic source-check verdicts",
-    columns: ["title", "entityType", "scContradicted", "scOutdated", "scPartial", "scAccuracyRate", "scTotalVerdicts", "scVerificationCoverage", "quality", "riskLevel"],
+    columns: ["title", "entityType", "scContradicted", "scOutdated", "scPartial", "scAccuracyRate", "scVerdictBar", "scVerificationCoverage", "quality", "riskLevel"],
     defaultSort: [{ id: "scContradicted", desc: true }],
   },
   all: {
