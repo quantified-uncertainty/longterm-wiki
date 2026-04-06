@@ -32,32 +32,11 @@ import {
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { notFoundError, validationError } from "../shared/utils.js";
+import { stripInternalColumnsFromRow } from "../shared/strip-internal-columns.js";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { inArray } from "drizzle-orm";
 
 const logger = rootLogger.child({ component: "record-lookup" });
-
-// ---- Columns to exclude from output (internal/noisy) ----
-
-const EXCLUDED_CAMEL = new Set([
-  "syncedAt",
-  "createdAt",
-  "updatedAt",
-  "contentPlaintext",
-  "searchVector",
-  "syncedFromBranch",
-  "syncedFromCommit",
-]);
-
-function stripInternalColumns(row: Record<string, unknown>): Record<string, unknown> {
-  const cleaned: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(row)) {
-    if (!EXCLUDED_CAMEL.has(key)) {
-      cleaned[key] = value;
-    }
-  }
-  return cleaned;
-}
 
 // ---- Table map: sourceTable name → Drizzle table object ----
 //
@@ -173,7 +152,7 @@ const recordLookupApp = new Hono()
       return notFoundError(c, `Record not found: ${sourceTable}/${sourceId}`);
     }
 
-    const record = stripInternalColumns(rows[0]);
+    const record = stripInternalColumnsFromRow(rows[0]);
 
     // Collect all stableId values from the record for entity name resolution
     const entityRefIds = new Set<string>();

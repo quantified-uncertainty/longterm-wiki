@@ -13,6 +13,7 @@ import type { RpcSourceCheckDetailResult } from "@/lib/wiki-server";
 import {
   VerdictBadge,
   formatRecordType,
+  getSourceCheckHref,
 } from "../../source-checks/source-checks-shared";
 
 export const revalidate = 300;
@@ -40,25 +41,10 @@ interface ThingDetail {
   href: string | null;
 }
 
-/** Source tables (DB table names) that support source-check verdicts. */
-const VERDICT_SOURCE_TABLES = new Set([
-  "facts",
-  "grants",
-  "personnel",
-  "divisions",
-  "funding_programs",
-  "investments",
-  "funding_rounds",
-  "publications",
-  "wiki_pages",
-  "equity_positions",
-  "policy_stakeholders",
-  "benchmark_results",
-]);
-
 /**
  * Map source_table names (DB) to the recordType format used by source-checks API.
  * DB uses snake_case plural ("funding_rounds"), source-checks uses kebab-case singular ("funding-round").
+ * Only tables that support source-check verdicts are included.
  */
 const SOURCE_TABLE_TO_RECORD_TYPE: Record<string, string> = {
   facts: "fact",
@@ -74,6 +60,9 @@ const SOURCE_TABLE_TO_RECORD_TYPE: Record<string, string> = {
   policy_stakeholders: "policy-stakeholder",
   benchmark_results: "benchmark-result",
 };
+
+/** Source tables that support source-check verdicts (derived from the map above). */
+const VERDICT_SOURCE_TABLES = new Set(Object.keys(SOURCE_TABLE_TO_RECORD_TYPE));
 
 function sourceTableToRecordType(sourceTable: string): string {
   return SOURCE_TABLE_TO_RECORD_TYPE[sourceTable] ?? sourceTable.replace(/_/g, "-");
@@ -348,7 +337,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
         )}
         {hasVerdicts && (
           <Link
-            href={`/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(thing.sourceId)}`}
+            href={getSourceCheckHref(recordType, thing.sourceId)}
             className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
           >
             <ShieldCheck className="h-3.5 w-3.5" />
@@ -437,7 +426,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
           </div>
           <div className="mt-3">
             <Link
-              href={`/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(thing.sourceId)}`}
+              href={getSourceCheckHref(recordType, thing.sourceId)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               View full evidence
