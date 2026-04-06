@@ -183,6 +183,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
+
       - name: Update ArgoCD image tag
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
@@ -386,6 +388,26 @@ jobs:
             exit 1
           fi
           echo "Citations health smoke test passed"
+
+          # 6. Migration completeness check — verifies all Drizzle migrations were applied.
+          #    Compares the latest created_at in __drizzle_migrations against the journal's
+          #    last entry timestamp. A mismatch means migrations are missing.
+          EXPECTED_TIMESTAMP=$(jq -r '.entries[-1].when' apps/wiki-server/drizzle/meta/_journal.json)
+          MIGRATION_RESPONSE=$(curl -s \
+            -H "Authorization: Bearer ${LONGTERMWIKI_SERVER_API_KEY}" \
+            "${LONGTERMWIKI_SERVER_URL}/health/migrations" 2>&1 || true)
+          ACTUAL_TIMESTAMP=$(echo "$MIGRATION_RESPONSE" | jq -r '.latestCreatedAt // empty' 2>/dev/null || true)
+          APPLIED_COUNT=$(echo "$MIGRATION_RESPONSE" | jq -r '.appliedCount // empty' 2>/dev/null || true)
+          if [ -z "$ACTUAL_TIMESTAMP" ]; then
+            echo "::error::Migration check failed — could not query /health/migrations: $MIGRATION_RESPONSE"
+            exit 1
+          fi
+          if [ "$ACTUAL_TIMESTAMP" != "$EXPECTED_TIMESTAMP" ]; then
+            echo "::error::Migration mismatch! Expected latest timestamp $EXPECTED_TIMESTAMP but server reports $ACTUAL_TIMESTAMP (applied: $APPLIED_COUNT)"
+            exit 1
+          fi
+          EXPECTED_FILES=$(ls apps/wiki-server/drizzle/0*.sql | wc -l | tr -d ' ')
+          echo "Migration check passed: latest=$ACTUAL_TIMESTAMP, applied=$APPLIED_COUNT, files=$EXPECTED_FILES"
 
       - name: Rollback on post-deploy smoke test failure
         if: failure() && steps.post-deploy-smoke.conclusion == 'failure'

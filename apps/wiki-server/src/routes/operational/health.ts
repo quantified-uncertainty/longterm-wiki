@@ -101,6 +101,44 @@ const healthApp = new Hono()
     });
   })
   /**
+   * GET /migrations — Migration status for post-deploy verification.
+   * Returns the count and latest timestamp from drizzle.__drizzle_migrations.
+   * CI compares latestCreatedAt against the journal's last entry to confirm
+   * all migrations were applied. Requires Bearer auth.
+   */
+  .get("/migrations", async (c) => {
+    const authHeader = c.req.header("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return c.json({ error: "Bearer token required" }, 401);
+    }
+    const token = authHeader.slice(7);
+    const expectedKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (expectedKey && !verifyToken(token, expectedKey)) {
+      return c.json({ error: "Invalid API key" }, 401);
+    }
+
+    try {
+      const rawDb = getDb();
+      interface MigrationRow {
+        applied_count: number;
+        latest_created_at: string | null;
+      }
+      const result = await rawDb<MigrationRow[]>`
+        SELECT
+          count(*)::int AS applied_count,
+          max(created_at)::text AS latest_created_at
+        FROM drizzle.__drizzle_migrations
+      `;
+      return c.json({
+        appliedCount: result[0].applied_count,
+        latestCreatedAt: result[0].latest_created_at,
+      });
+    } catch (err) {
+      logger.error({ err }, "Migration status check failed");
+      return c.json({ error: "Failed to query migration status" }, 500);
+    }
+  })
+  /**
    * GET /auth — Check if a Bearer token is valid.
    * Returns 401 if no token or invalid token.
    */
