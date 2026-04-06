@@ -1,4 +1,5 @@
 import { getTypedEntities, getEntityHref, getPageById, getPageCoverageItems, getPageRankings, getIdRegistry } from "@/data";
+import { getEntityDataDepth } from "@/data/entity-coverage";
 import { fetchDetailed, type RpcEntitySummaryRow } from "@lib/wiki-server";
 import { EntitiesDataTable } from "./entities-data-table";
 import type { UnifiedEntityRow } from "./entities-data-table";
@@ -128,6 +129,7 @@ export async function EntitiesContent() {
       // Coverage
       coverageScore: cov?.score ?? null,
       coverageTotal: cov?.total ?? null,
+      dataDepth: getEntityDataDepth(e.id),
       // Risk
       riskLevel,
       riskScore: cov?.riskScore ?? null,
