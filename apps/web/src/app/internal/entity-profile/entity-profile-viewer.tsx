@@ -656,27 +656,33 @@ function ProfileSection({
             </thead>
             <tbody className="divide-y divide-border/30">
               {displayedRows.map((row, i) => {
-                const recordId = row.id as string | undefined;
+                const rawId = row.id;
+                const recordId = rawId != null ? String(rawId) : undefined;
                 const verdict = recordId ? verdicts[recordId] : undefined;
                 return (
                   <tr key={i} className="hover:bg-muted/20 transition-colors">
-                    {recordId && section.recordType ? (
-                      <td className="px-2 py-2 align-top">
-                        <Link
-                          href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}`}
-                          className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
-                          title={`Record ${recordId}`}
-                        >
-                          {recordId.slice(0, 7)}
-                        </Link>
-                      </td>
-                    ) : recordId ? (
-                      <td className="px-2 py-2 align-top">
-                        <span className="font-mono text-[9px] text-muted-foreground/30" title={recordId}>
-                          {recordId.slice(0, 7)}
-                        </span>
-                      </td>
-                    ) : null}
+                    {(() => {
+                      const idStr = recordId != null ? String(recordId) : null;
+                      if (!idStr) return <td className="px-2 py-2" />;
+                      const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
+                      return section.recordType ? (
+                        <td className="px-2 py-2 align-top">
+                          <Link
+                            href={`/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(idStr)}`}
+                            className="font-mono text-[9px] text-muted-foreground/40 hover:text-blue-600 dark:hover:text-blue-400 hover:underline"
+                            title={`Record ${idStr}`}
+                          >
+                            {display}
+                          </Link>
+                        </td>
+                      ) : (
+                        <td className="px-2 py-2 align-top">
+                          <span className="font-mono text-[9px] text-muted-foreground/30" title={idStr}>
+                            {display}
+                          </span>
+                        </td>
+                      );
+                    })()}
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
                       const value = camelKey in row ? row[camelKey] : row[col.name];
