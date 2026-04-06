@@ -24,10 +24,8 @@ CREATE TABLE IF NOT EXISTS resource_tabular_sources (
   updated_at        timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_rts_record_type
-  ON resource_tabular_sources (record_type);
-CREATE INDEX IF NOT EXISTS idx_rts_source_status
-  ON resource_tabular_sources (source_status);
+-- Indexes on resource_tabular_sources omitted: the table has ~16 rows and
+-- sequential scans are faster than index lookups at this scale.
 
 -- 2. Add resource_id to source_snapshots (nullable during transition)
 ALTER TABLE source_snapshots
