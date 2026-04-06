@@ -66,30 +66,6 @@
       type: person
     - id: jan-leike
       type: person
-  sources:
-    - title: Anthropic Company Website
-      url: https://anthropic.com
-    - title: Core Views on AI Safety
-      url: https://anthropic.com/news/core-views-on-ai-safety
-    - title: Responsible Scaling Policy
-      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
-    - title: Constitutional AI Paper
-      url: https://arxiv.org/abs/2212.08073
-    - title: Scaling Monosemanticity
-      url: https://transformer-circuits.pub/2024/scaling-monosemanticity/
-    - title: Sleeper Agents Paper
-      url: https://arxiv.org/abs/2401.05566
-    - title: Many-Shot Jailbreaking Paper
-      url: >-
-        https://www-cdn.anthropic.com/af5633c94ed2beb282f6a53c595eb437e8e7b630/Many_Shot_Jailbreaking__2024_04_02_0936.pdf
-    - title: Machines of Loving Grace (Dario Amodei essay)
-      url: https://darioamodei.com/machines-of-loving-grace
-    - title: Anthropic Funding News (Crunchbase)
-      url: https://www.crunchbase.com/organization/anthropic
-    - title: Amazon Anthropic Partnership
-      url: https://press.aboutamazon.com/2023/9/amazon-and-anthropic-announce-strategic-collaboration
-    - title: Google Anthropic Investment
-      url: https://blog.google/technology/ai/google-anthropic-investment/
   description: >-
     Anthropic is an AI safety company founded in January 2021 by former OpenAI researchers, including siblings Dario and
     Daniela Amodei. The company was created following disagreements with OpenAI's direction, particularly concerns about
@@ -157,32 +133,6 @@
       type: person
     - id: allan-dafoe
       type: person
-  sources:
-    - title: Google DeepMind Website
-      url: https://deepmind.google
-    - title: AlphaGo Documentary
-      url: https://www.youtube.com/watch?v=WXuK6gekU1Y
-    - title: AlphaFold Protein Structure Database
-      url: https://alphafold.ebi.ac.uk
-    - title: AlphaFold Nature Paper
-      url: https://www.nature.com/articles/s41586-021-03819-2
-    - title: Frontier Safety Framework
-      url: https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/
-    - title: AI Safety Gridworlds
-      url: https://arxiv.org/abs/1711.09883
-    - title: Specification Gaming Examples
-      url: https://deepmind.google/discover/blog/specification-gaming-the-flip-side-of-ai-ingenuity/
-    - title: DeepMind Safety Research
-      url: https://deepmind.google/discover/blog/building-safe-artificial-intelligence-insights-from-deepmind/
-    - title: Gemini Technical Report
-      url: https://arxiv.org/abs/2312.11805
-    - title: Google DeepMind Merger Announcement
-      url: https://blog.google/technology/ai/april-ai-update/
-    - title: GraphCast Weather Prediction
-      url: >-
-        https://deepmind.google/discover/blog/graphcast-ai-model-for-faster-and-more-accurate-global-weather-forecasting/
-    - title: Nobel Prize in Chemistry 2024
-      url: https://www.nobelprize.org/prizes/chemistry/2024/press-release/
   description: >-
     Google DeepMind was formed in April 2023 from the merger of DeepMind and Google Brain, uniting Google's two major AI
     research organizations. The combined entity represents one of the world's most formidable AI research labs, with
@@ -233,29 +183,6 @@
       relationship: addresses
     - id: sam-altman
       type: person
-  sources:
-    - title: OpenAI Website
-      url: https://openai.com
-    - title: OpenAI Charter
-      url: https://openai.com/charter
-    - title: GPT-4 System Card
-      url: https://cdn.openai.com/papers/gpt-4-system-card.pdf
-    - title: InstructGPT Paper
-      url: https://arxiv.org/abs/2203.02155
-    - title: Preparedness Framework
-      url: https://openai.com/safety/preparedness
-    - title: Weak-to-Strong Generalization
-      url: https://arxiv.org/abs/2312.09390
-    - title: Jan Leike Resignation Statement
-      url: https://twitter.com/janleike/status/1791498184887095344
-    - title: November 2023 Governance Crisis (reporting)
-      url: https://www.theverge.com/2023/11/17/23965982/openai-ceo-sam-altman-fired
-    - title: Microsoft OpenAI Partnership
-      url: https://blogs.microsoft.com/blog/2023/01/23/microsoftandopenaiextendpartnership/
-    - title: o1 System Card
-      url: https://openai.com/index/openai-o1-system-card/
-    - title: OpenAI Funding History (Crunchbase)
-      url: https://www.crunchbase.com/organization/openai
   description: >-
     OpenAI is the AI research company that brought large language models into mainstream consciousness through ChatGPT.
     Founded in December 2015 as a non-profit with the mission to ensure artificial general intelligence benefits all of
@@ -301,16 +228,6 @@
       type: concept
     - id: elon-musk
       type: person
-  sources:
-    - title: xAI Website
-      url: https://x.ai
-    - title: Grok Announcements
-      url: https://x.ai/blog
-    - title: Elon Musk on X (Twitter)
-      url: https://twitter.com/elonmusk
-    - title: xAI Funding Announcements
-    - title: Grok Technical Details
-      url: https://x.ai/blog/grok
   description: >-
     xAI is an artificial intelligence company founded by Elon Musk in July 2023 with the stated mission to "understand
     the true nature of the universe" through AI.
@@ -348,13 +265,6 @@
     - id: stuart-russell
       type: person
       relationship: leads-to
-  sources:
-    - title: CHAI Website
-      url: https://humancompatible.ai
-    - title: Human Compatible (Book)
-      url: https://www.penguinrandomhouse.com/books/566677/human-compatible-by-stuart-russell/
-    - title: Stuart Russell on AI Risk
-      url: https://www.youtube.com/watch?v=EBK-a94IFHY
   description: >-
     The Center for Human-Compatible AI (CHAI) is an academic research center at UC Berkeley focused on ensuring AI
     systems are beneficial to humans. Founded by Stuart Russell, author of the leading AI textbook, CHAI brings academic
@@ -389,19 +299,6 @@
       type: organization
     - id: sid_5maTNr0PGA
       type: capability
-  sources:
-    - title: Apollo Research Website
-      url: https://www.apolloresearch.ai
-    - title: Apollo Research Publications
-      url: https://www.apolloresearch.ai/research
-    - title: Evaluating Frontier Models for Dangerous Capabilities
-      url: https://www.apolloresearch.ai/research/scheming-evaluations
-    - title: Apollo on Sandbagging
-      url: https://www.apolloresearch.ai/blog/sandbagging
-    - title: Situational Awareness Research
-      url: https://www.apolloresearch.ai/research/situational-awareness
-    - title: Apollo Research Blog
-      url: https://www.apolloresearch.ai/blog
   description: >-
     Apollo Research is an AI safety research organization founded in 2023 with a specific focus on one of the most
     concerning potential failure modes: deceptive alignment and scheming behavior in advanced AI systems.
@@ -441,15 +338,6 @@
     - id: sid_TnHMQ4cMOw
       type: person
       relationship: leads-to
-  sources:
-    - title: CAIS Website
-      url: https://safe.ai
-    - title: Statement on AI Risk
-      url: https://www.safe.ai/statement-on-ai-risk
-    - title: Representation Engineering Paper
-      url: https://arxiv.org/abs/2310.01405
-    - title: CAIS About
-      url: https://safe.ai/about
   description: >-
     The Center for AI Safety (CAIS) is a nonprofit organization that works to reduce societal-scale risks from AI. CAIS
     combines research, field-building, and public communication to advance AI safety. Co-founded by Dan Hendrycks
@@ -489,18 +377,6 @@
       type: person
     - id: controlai
       type: organization
-  sources:
-    - title: Conjecture Website
-      url: https://conjecture.dev
-    - title: Connor Leahy Twitter/X
-      url: https://twitter.com/NPCollapse
-    - title: EleutherAI Background
-      url: https://www.eleuther.ai
-    - title: Conjecture Funding Announcement
-      url: https://techcrunch.com/2023/03/28/conjecture-raises-funding-for-ai-safety/
-    - title: Cognitive Emulation Research
-      url: https://conjecture.dev/research
-    - title: Connor Leahy Podcast Appearances
   description: >-
     Conjecture is an AI safety research organization founded in 2022 by Connor Leahy and a team of researchers concerned
     about existential risks from advanced AI.
@@ -538,17 +414,6 @@
       type: organization
     - id: sid_XcGTez1oFw
       type: policy
-  sources:
-    - title: FAR AI Website
-      url: https://far.ai
-    - title: Dan Hendrycks Google Scholar
-      url: https://scholar.google.com/citations?user=VUnTdTkAAAAJ
-    - title: MMLU Paper
-      url: https://arxiv.org/abs/2009.03300
-    - title: Natural Abstractions Research
-      url: https://www.alignmentforum.org/tag/natural-abstraction
-    - title: Dan Hendrycks on X-risk
-      url: https://arxiv.org/abs/2306.12001
   description: >-
     FAR AI (Forecasting AI Research) is an AI safety research organization founded in 2023 with a focus on adversarial
     robustness, model evaluation, and alignment research. The organization was co-founded by Dan Hendrycks, a prominent
@@ -596,15 +461,6 @@
       relationship: research
     - id: sid_GRrd7Z857X
       type: person
-  sources:
-    - title: GovAI Website
-      url: https://governance.ai
-    - title: Computing Power and AI Governance
-      url: https://governance.ai/compute
-    - title: GovAI Research Papers
-      url: https://governance.ai/research
-    - title: GovAI People
-      url: https://www.governance.ai/people
   description: >-
     The Centre for the Governance of AI (GovAI) is a research organization focused on AI policy and governance.
     Originally part of the Future of Humanity Institute at Oxford, GovAI began operating independently in 2021 and formally incorporated as a separate entity before FHI closed in April 2024.
@@ -652,21 +508,6 @@
       relationship: research
     - id: beth-barnes
       type: person
-  sources:
-    - title: METR Website
-      url: https://metr.org
-    - title: METR Evaluations
-      url: https://metr.org/evaluations
-    - title: GPT-4 System Card (ARC Evals section)
-      url: https://cdn.openai.com/papers/gpt-4-system-card.pdf
-    - title: OpenAI Preparedness Framework
-      url: https://openai.com/safety/preparedness
-    - title: Anthropic Responsible Scaling Policy
-      url: https://anthropic.com/news/anthropics-responsible-scaling-policy
-    - title: Beth Barnes on Twitter/X
-      url: https://twitter.com/beth_from_ba
-    - title: METR Research and Blog
-      url: https://metr.org/blog
   description: >-
     METR (Model Evaluation and Threat Research), formerly known as ARC Evals, is an organization dedicated to evaluating
     frontier AI models for dangerous capabilities before deployment.
@@ -711,23 +552,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: ARC Website
-      url: https://alignment.org
-    - title: ELK Report
-      url: https://docs.google.com/document/d/1WwsnJQstPq91_Yh-Ch2XRL8H_EpsnjrC1dwZXR37PC8/
-    - title: ARC Evals
-      url: https://evals.alignment.org
-    - title: GPT-4 Evaluation (ARC summary)
-      url: https://evals.alignment.org/blog/2023-03-18-update-on-recent-evals/
-    - title: Paul Christiano's AI Alignment Forum posts
-      url: https://www.alignmentforum.org/users/paulfchristiano
-    - title: Iterated Amplification
-      url: https://ai-alignment.com/iterated-distillation-and-amplification-157debfd1616
-    - title: AI Safety via Debate
-      url: https://arxiv.org/abs/1805.00899
-    - title: Ajeya Cotra's Bio Anchors
-      url: https://www.alignmentforum.org/posts/KrJfoZzpSDpnrv9va/draft-report-on-ai-timelines
   description: >-
     The Alignment Research Center (ARC) was founded in 2021 by Paul Christiano after his departure from OpenAI. ARC
     represents a distinctive approach to AI alignment: combining theoretical research on fundamental problems (like
@@ -763,21 +587,6 @@
       type: concept
     - id: sid_HLakK5zplg
       type: concept
-  sources:
-    - title: Epoch AI Website
-      url: https://epochai.org
-    - title: Epoch Parameter Database
-      url: https://epochai.org/data/epochdb/visualization
-    - title: Compute Trends Paper
-      url: https://epochai.org/blog/compute-trends
-    - title: Will We Run Out of Data?
-      url: https://epochai.org/blog/will-we-run-out-of-data
-    - title: Algorithmic Progress Research
-      url: https://epochai.org/blog/revisiting-algorithmic-progress
-    - title: Epoch Research Blog
-      url: https://epochai.org/blog
-    - title: Epoch on Twitter/X
-      url: https://twitter.com/epoch_ai
   description: >-
     Epoch AI is a research organization dedicated to producing rigorous, data-driven forecasts and analysis about
     artificial intelligence progress, with particular focus on compute trends, training datasets, algorithmic
@@ -828,27 +637,6 @@
       type: person
     - id: nate-soares
       type: person
-  sources:
-    - title: MIRI Website
-      url: https://intelligence.org
-    - title: MIRI 2023 Strategy Update
-      url: https://intelligence.org/2023/03/09/miri-announces-new-death-with-dignity-strategy/
-    - title: Risks from Learned Optimization (Hubinger et al.)
-      url: https://arxiv.org/abs/1906.01820
-    - title: Logical Induction Paper
-      url: https://arxiv.org/abs/1609.03543
-    - title: Embedded Agency (Demski, Garrabrant)
-      url: https://intelligence.org/2018/10/29/embedded-agency/
-    - title: LessWrong Sequences
-      url: https://www.lesswrong.com/sequences
-    - title: Eliezer Yudkowsky TIME Op-Ed
-      url: https://time.com/6266923/ai-eliezer-yudkowsky-open-letter-not-enough/
-    - title: Agent Foundations Research
-      url: https://intelligence.org/research-guide/
-    - title: Facing the Intelligence Explosion (Muehlhauser)
-      url: https://intelligence.org/files/IE-EI.pdf
-    - title: MIRI on GiveWell
-      url: https://www.givewell.org/charities/machine-intelligence-research-institute
   description: >-
     The Machine Intelligence Research Institute (MIRI) is one of the oldest organizations focused on AI existential
     risk, founded in 2000 as the Singularity Institute for Artificial Intelligence (SIAI).
@@ -908,19 +696,6 @@
       type: organization
     - id: sid_A4XoubikkQ
       type: organization
-  sources:
-    - title: UK AI Safety Institute Website
-      url: https://www.aisi.gov.uk
-    - title: Bletchley Declaration
-      url: https://www.gov.uk/government/publications/ai-safety-summit-2023-the-bletchley-declaration
-    - title: UK AI Safety Summit
-      url: https://www.aisafetysummit.gov.uk
-    - title: UK DSIT AI Policy
-      url: https://www.gov.uk/government/organisations/department-for-science-innovation-and-technology
-    - title: Ian Hogarth FT Op-Ed
-      url: https://www.ft.com/content/03895dc4-a3b7-481e-95cc-336a524f2ac2
-    - title: UK AI Safety Institute Announcements
-      url: https://www.gov.uk/search/news-and-communications?organisations%5B%5D=ai-safety-institute
   description: >-
     The UK AI Safety Institute, renamed to "AI Security Institute" on February 14, 2025 by Science
     Secretary Peter Kyle at Munich Security Conference. Focus shifted from broad existential/alignment
@@ -966,19 +741,6 @@
       relationship: leads-to
     - id: paul-christiano
       type: person
-  sources:
-    - title: US AI Safety Institute Website
-      url: https://www.nist.gov/aisi
-    - title: NIST AI Risk Management Framework
-      url: https://www.nist.gov/itl/ai-risk-management-framework
-    - title: Executive Order on AI (October 2023)
-      url: >-
-        https://www.whitehouse.gov/briefing-room/presidential-actions/2023/10/30/executive-order-on-the-safe-secure-and-trustworthy-development-and-use-of-artificial-intelligence/
-    - title: NIST AI Portal
-      url: https://www.nist.gov/artificial-intelligence
-    - title: US AISI Announcements
-      url: >-
-        https://www.commerce.gov/news/press-releases/2023/11/biden-harris-administration-announces-key-ai-actions-following-president
   description: >-
     The US AI Safety Institute (US AISI), renamed to the Center for AI Standards and Innovation (CAISI) in June 2025,
     is a government agency within the National Institute of Standards and Technology (NIST) established in 2023 to
@@ -1015,11 +777,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Japan AISI Website
-      url: https://aisi.go.jp/en/
-    - title: METI Announcement
-      url: https://www.meti.go.jp/english/press/2024/0214_002.html
   tags:
     - governance
     - government-oversight
@@ -1045,9 +802,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Singapore AISI Website
-      url: https://aisi.gov.sg/
   tags:
     - governance
     - government-oversight
@@ -1074,9 +828,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Canadian AI Safety Institute
-      url: https://ised-isde.canada.ca/site/artificial-intelligence/en/canadas-ai-safety-institute
   tags:
     - governance
     - government-oversight
@@ -1104,9 +855,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Inria INESIA Roadmap
-      url: https://www.inria.fr/en/ai-security-and-sovereignty-inesia-unveils-its-roadmap-2026-2027
   tags:
     - governance
     - government-oversight
@@ -1134,9 +882,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Cooley Analysis of South Korea AI Basic Act
-      url: https://www.cooley.com/news/insight/2026/2026-01-27-south-koreas-ai-basic-act-overview-and-key-takeaways
   tags:
     - governance
     - government-oversight
@@ -1166,9 +911,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: Department of Industry
-      url: https://www.industry.gov.au/science-technology-and-innovation/technology/artificial-intelligence/ai-safety-science
   tags:
     - governance
     - government-oversight
@@ -1199,9 +941,6 @@
       type: organization
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: IndiaAI Announcement
-      url: https://indiaai.gov.in/article/india-takes-the-lead-establishing-the-indiaai-safety-institute-for-responsible-ai-innovation
   tags:
     - governance
     - government-oversight
@@ -1231,13 +970,6 @@
       type: organization
     - id: sid_2avSHj60sQ
       type: organization
-  sources:
-    - title: USDS 2024 Impact Report
-      url: https://www.usds.gov/impact-report
-    - title: 21 Technologists Quit USDS (FedScoop)
-      url: https://fedscoop.com/usds-workers-quit-doge-tech-elon-musk/
-    - title: USDS Wikipedia
-      url: https://en.wikipedia.org/wiki/United_States_Digital_Service
   tags:
     - civic-tech
     - government-digital-services
@@ -1265,17 +997,6 @@
       type: organization
     - id: sid_ufdntmiWtQ
       type: organization
-  sources:
-    - title: How 18F Transformed Government Technology (The Conversation)
-      url: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
-    - title: GSA Eliminates 18F (Nextgov)
-      url: https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/
-    - title: 18F Retaliation Claim (Federal News Network)
-      url: https://federalnewsnetwork.com/workforce/2025/05/gsa-shutting-down-18f-was-retaliation-by-doge-former-staff-claim-in-appeal-for-their-jobs-back/
-    - title: Alt18F on Bluesky (unofficial alumni account, 60K followers)
-      url: https://bsky.app/profile/alt18f.bsky.social
-    - title: 18F Alumni Website
-      url: https://18f.org/
   tags:
     - civic-tech
     - government-digital-services
@@ -1307,15 +1028,6 @@
       type: organization
     - id: sid_lvsDuyzPcg
       type: organization
-  sources:
-    - title: Horizon Institute Website
-      url: https://horizonpublicservice.org
-    - title: Horizon 2025 Year in Review
-      url: https://horizonpublicservice.org/horizons-2025-year-in-review/
-    - title: Founders Pledge - Horizon Institute
-      url: https://www.founderspledge.com/research/horizon-institute-for-public-service
-    - title: Chronicle of Philanthropy - Can a Nonprofit Help Lawmakers Understand A.I.?
-      url: https://www.philanthropy.com/article/can-a-nonprofit-help-lawmakers-understand-a-i
   tags:
     - civic-tech
     - ai-policy
@@ -1346,9 +1058,6 @@
       type: organization
     - id: sid_2avSHj60sQ
       type: organization
-  sources:
-    - title: Code for America Website
-      url: https://codeforamerica.org
   tags:
     - civic-tech
     - government-digital-services
@@ -1455,15 +1164,6 @@
       relationship: research
     - id: sid_aX0jkoaekQ
       type: organization
-  sources:
-    - title: ARIA Website
-      url: https://www.aria.org.uk
-    - title: ARIA Safeguarded AI Programme
-      url: https://www.aria.org.uk/programme-safeguarded-ai/
-    - title: ARIA Safeguarded AI Funding
-      url: https://www.aria.org.uk/opportunity-spaces/mathematics-for-safe-ai/safeguarded-ai/funding/
-    - title: "Nov 2025 Pivot Announcement"
-      url: https://www.aria.org.uk/insights/ai-progress-and-a-safeguarded-ai-pivot/
   description: >-
     The UK's Advanced Research + Invention Agency (ARIA) is a government research funding
     body modeled on DARPA. Its Safeguarded AI programme, led by Programme Director David
@@ -1502,9 +1202,6 @@
       type: organization
     - id: sid_fYyAxYlHDQ
       type: organization
-  sources:
-    - title: EU AI Office
-      url: https://digital-strategy.ec.europa.eu/en/policies/ai-office
   tags:
     - governance
     - government-oversight
@@ -1532,11 +1229,6 @@
   tags:
     - evaluations
     - ai-safety
-  sources:
-    - title: Alignment Research Center - Wikipedia
-      url: https://en.wikipedia.org/wiki/Alignment_Research_Center
-    - title: ARC Evals Spin-out Announcement (METR)
-      url: https://metr.org/blog/2023-09-19-spin-out-announcement/
   lastUpdated: 2025-12
 - id: fhi
   stableId: sid_Zmw9nfUYWA
@@ -1565,13 +1257,6 @@
     - research-org
     - existential-risk
     - oxford
-  sources:
-    - title: Future of Humanity Institute (archived)
-      url: https://www.futureofhumanityinstitute.org
-    - title: Future of Humanity Institute - Wikipedia
-      url: https://en.wikipedia.org/wiki/Future_of_Humanity_Institute
-    - title: Nick Bostrom on FHI at Oxford
-      url: https://nickbostrom.com/oxfhi
   lastUpdated: 2025-12
 
 - id: macrostrategy-research-initiative
@@ -1635,13 +1320,6 @@
       type: person
     - id: sid_gNsqAes7Dw
       type: organization
-  sources:
-    - title: "Anthropic: The Long-Term Benefit Trust"
-      url: https://www.anthropic.com/news/the-long-term-benefit-trust
-    - title: "Harvard Law Forum: Anthropic Long-Term Benefit Trust"
-      url: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
-    - title: "AI Lab Watch: Anthropic's Certificate of Incorporation"
-      url: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
   lastUpdated: 2026-03
 
 - id: openai-foundation
@@ -1688,15 +1366,6 @@
       type: person
     - id: sid_3w5hW5liew
       type: organization
-  sources:
-    - title: "OpenAI: Built to Benefit Everyone"
-      url: https://openai.com/index/built-to-benefit-everyone/
-    - title: "OpenAI: Our Structure"
-      url: https://openai.com/our-structure/
-    - title: "Update on the OpenAI Foundation (March 2026)"
-      url: https://openai.com/index/update-on-the-openai-foundation/
-    - title: "CA AG MOU (October 2025)"
-      url: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
   lastUpdated: 2026-03
 
 - id: leading-the-future
@@ -1783,13 +1452,6 @@
     - id: sid_1CHfDs0vsg
       type: person
       relationship: leads-to
-  sources:
-    - title: NIST Artificial Intelligence
-      url: https://www.nist.gov/artificial-intelligence
-    - title: Artificial Intelligence Safety Institute - Wikipedia
-      url: https://en.wikipedia.org/wiki/Artificial_intelligence_safety_institute
-    - title: NIST AI Safety Institute Consortium
-      url: https://www.nist.gov/artificial-intelligence/artificial-intelligence-safety-institute-consortium-aisic
   lastUpdated: 2026-02
 
 - id: ssi
@@ -1828,11 +1490,6 @@
       type: organization
     - id: ilya-sutskever
       type: person
-  sources:
-    - title: Safe Superintelligence Inc. Website
-      url: https://ssi.inc
-    - title: Safe Superintelligence Inc. - Wikipedia
-      url: https://en.wikipedia.org/wiki/Safe_Superintelligence_Inc.
   lastUpdated: 2026-02
 
 - id: controlai
@@ -1862,11 +1519,6 @@
       type: organization
     - id: sid_CrXoCsIucX
       type: person
-  sources:
-    - title: ControlAI Website
-      url: https://controlai.com/
-    - title: ControlAI About Us
-      url: https://controlai.com/about
   lastUpdated: 2026-02
 
 - id: frontier-model-forum
@@ -1902,13 +1554,6 @@
       type: person
     - id: sid_tt0f5PYDCw
       type: organization
-  sources:
-    - title: Frontier Model Forum Website
-      url: https://www.frontiermodelforum.org/
-    - title: Frontier Model Forum About
-      url: https://www.frontiermodelforum.org/about-us/
-    - title: Launch Announcement (Microsoft)
-      url: https://blogs.microsoft.com/on-the-issues/2023/07/26/anthropic-google-microsoft-openai-launch-frontier-model-forum/
   lastUpdated: 2026-02
 
 - id: palisade-research
@@ -1944,11 +1589,6 @@
       type: organization
     - id: sid_rt6jVH9yuA
       type: approach
-  sources:
-    - title: Palisade Research Website
-      url: https://palisaderesearch.org/
-    - title: Palisade Research About
-      url: https://palisaderesearch.org/about
   lastUpdated: 2026-02
 
 - id: centre-for-long-term-resilience
@@ -2010,13 +1650,6 @@
       type: organization
     - id: sid_A4XoubikkQ
       type: organization
-  sources:
-    - title: Goodfire Website
-      url: https://www.goodfire.ai/
-    - title: Goodfire Company Page
-      url: https://www.goodfire.ai/company
-    - title: Goodfire Series A Announcement
-      url: https://www.goodfire.ai/blog/announcing-our-50m-series-a
   lastUpdated: 2026-02
 
 
@@ -2060,11 +1693,6 @@
     - id: sid_p1P9oQwB6w
       type: person
       relationship: leads-to
-  sources:
-    - title: 80,000 Hours Website
-      url: https://80000hours.org/
-    - title: 80,000 Hours - Wikipedia
-      url: https://en.wikipedia.org/wiki/80,000_Hours
   lastUpdated: 2026-02
 - id: ai-futures-project
   stableId: sid_KDYvrwkgtw
@@ -2295,11 +1923,6 @@
     - ai-governance
     - climate-security
     - fellowship
-  sources:
-    - title: CSR Website
-      url: https://councilonstrategicrisks.org/about/
-    - title: AI Fellowship Announcement
-      url: https://councilonstrategicrisks.org/2025/09/24/call-for-applications-ai-national-security-convergence-fellowship/
   lastUpdated: 2026-03
 - id: cser
   stableId: sid_Qns43S795w
@@ -2333,13 +1956,6 @@
     - id: sid_YsjgB5Gy0g
       type: person
       relationship: research
-  sources:
-    - title: CSER Website
-      url: https://www.cser.ac.uk/
-    - title: CSER About Us
-      url: https://www.cser.ac.uk/about-us/
-    - title: Centre for the Study of Existential Risk - Wikipedia
-      url: https://en.wikipedia.org/wiki/Centre_for_the_Study_of_Existential_Risk
   lastUpdated: 2026-02
 - id: cset
   stableId: sid_lvsDuyzPcg
@@ -2383,15 +1999,6 @@
     - community
     - governance
     - ai-safety
-  sources:
-    - title: CSET Website
-      url: https://cset.georgetown.edu/
-    - title: CSET About Us
-      url: https://cset.georgetown.edu/about-us/
-    - title: Center for Security and Emerging Technology - Wikipedia
-      url: https://en.wikipedia.org/wiki/Center_for_Security_and_Emerging_Technology
-    - title: CSET Team Page
-      url: https://cset.georgetown.edu/team/
   lastUpdated: 2026-03
 - id: ea-global
   stableId: sid_k4IPgRP98A
@@ -2469,15 +2076,6 @@
       type: person
     - id: sid_XvvppfgBPw
       type: person
-  sources:
-    - title: Future of Life Institute Website
-      url: https://futureoflife.org/
-    - title: Future of Life Institute - Wikipedia
-      url: https://en.wikipedia.org/wiki/Future_of_Life_Institute
-    - title: Pause Giant AI Experiments Open Letter
-      url: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
-    - title: FLI Our People
-      url: https://futureoflife.org/about-us/our-people/
   lastUpdated: 2026-03
 - id: founders-fund
   stableId: sid_LYfneQJbSA
@@ -2651,11 +2249,6 @@
       relationship: leads-to
     - id: sid_47Rkb1DGmw
       type: organization
-  sources:
-    - title: LessWrong Website
-      url: https://www.lesswrong.com/
-    - title: LessWrong - Wikipedia
-      url: https://en.wikipedia.org/wiki/LessWrong
   lastUpdated: 2026-02
 - id: lighthaven
   stableId: sid_7E2ylGl7Ug
@@ -2726,11 +2319,6 @@
     - ai-safety
     - governance
     - biorisks
-  sources:
-    - title: Longview Philanthropy Website
-      url: https://www.longview.org/
-    - title: Longview Philanthropy About
-      url: https://www.longview.org/about/
   lastUpdated: 2026-02
 - id: ltff
   stableId: sid_yA12C1KcjQ
@@ -2751,11 +2339,6 @@
   relatedEntries:
     - id: sid_ULjDXpSLCI
       type: organization
-  sources:
-    - title: Long-Term Future Fund
-      url: https://funds.effectivealtruism.org/funds/far-future
-    - title: Long-Term Future Fund - EA Forum
-      url: https://forum.effectivealtruism.org/topics/long-term-future-fund
   lastUpdated: 2026-02
 - id: macarthur-foundation
   stableId: sid_8q2GhtEmkA
@@ -2840,13 +2423,6 @@
   clusters:
     - community
     - ai-safety
-  sources:
-    - title: MATS Program Website
-      url: https://www.matsprogram.org/
-    - title: MATS Program Details
-      url: https://www.matsprogram.org/program
-    - title: MATS on Alignment Forum
-      url: https://www.alignmentforum.org/w/mats-program
   lastUpdated: 2026-02
 - id: meta-ai
   stableId: sid_tt0f5PYDCw
@@ -2882,11 +2458,6 @@
       relationship: research
     - id: yann-lecun
       type: person
-  sources:
-    - title: Meta AI Research
-      url: https://ai.meta.com/research/
-    - title: Meta AI - Wikipedia
-      url: https://en.wikipedia.org/wiki/Meta_AI
   lastUpdated: 2026-02
 - id: microsoft
   stableId: sid_OIY5gaPpBA
@@ -2915,11 +2486,6 @@
     - community
     - ai-safety
     - governance
-  sources:
-    - title: Microsoft AI
-      url: https://www.microsoft.com/en-us/ai
-    - title: Mustafa Suleyman Joins Microsoft to Lead AI
-      url: https://blogs.microsoft.com/blog/2024/03/19/mustafa-suleyman-deepmind-and-inflection-co-founder-joins-microsoft-to-lead-copilot/
   lastUpdated: 2026-02
 - id: nti-bio
   stableId: sid_D9lqMW2HVw
@@ -2961,11 +2527,6 @@
       type: person
     - id: sid_ULjDXpSLCI
       type: organization
-  sources:
-    - title: Open Philanthropy Website
-      url: https://www.openphilanthropy.org/
-    - title: Open Philanthropy - Wikipedia
-      url: https://en.wikipedia.org/wiki/Open_Philanthropy
   lastUpdated: 2026-02
 - id: pause-ai
   stableId: sid_woL5lkqLpg
@@ -2984,13 +2545,6 @@
     - ai-safety
     - community
     - governance
-  sources:
-    - title: PauseAI Website
-      url: https://pauseai.info/
-    - title: PauseAI About Us
-      url: https://pauseai.info/about
-    - title: PauseAI - Wikipedia
-      url: https://en.wikipedia.org/wiki/PauseAI
   lastUpdated: 2026-02
 - id: peter-thiel-philanthropy
   stableId: sid_y4AUeiPifQ
@@ -3070,17 +2624,6 @@
     - id: buck-shlegeris
       type: person
       relationship: leads-to
-  sources:
-    - title: Redwood Research Website
-      url: https://redwoodresearch.org
-    - title: AI Control Paper
-      url: https://arxiv.org/abs/2312.06942
-    - title: Causal Scrubbing
-      url: https://www.alignmentforum.org/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing
-    - title: Adversarial Training for High-Stakes Safety
-      url: https://arxiv.org/abs/2205.01663
-    - title: Redwood Research on Alignment Forum
-      url: https://www.alignmentforum.org/users/redwood-research
   description: >-
     A nonprofit AI safety and security research organization founded in 2021,
     known for pioneering AI Control research, developing causal scrubbing
@@ -3118,11 +2661,6 @@
     - ai-safety
     - governance
     - epistemics
-  sources:
-    - title: Rethink Priorities Website
-      url: https://rethinkpriorities.org/
-    - title: Rethink Priorities Research Areas
-      url: https://rethinkpriorities.org/our-research-areas/
   lastUpdated: 2026-02
 - id: samotsvety
   stableId: sid_9hPhtQ9AXw
@@ -3274,11 +2812,6 @@
     - community
     - ai-safety
     - governance
-  sources:
-    - title: Survival and Flourishing Fund Website
-      url: https://survivalandflourishing.fund/
-    - title: SFF S-Process
-      url: https://survivalandflourishing.fund/s-process.html
   lastUpdated: 2026-02
 - id: situational-awareness-lp
   stableId: sid_FxJ9jQ7SlA
@@ -3423,11 +2956,6 @@
     - id: sid_rQEkFJxS5w
       type: organization
       relationship: leads-to
-  sources:
-    - title: Astralis Foundation Website
-      url: https://astralisfoundation.org
-    - title: Astralis Foundation - Our People
-      url: https://astralisfoundation.org/our-people
   description: >-
     Astralis Foundation is a Swedish philanthropic organization focused on AI
     safety and governance. It operates the Shared Horizons Fund and supports
@@ -3465,11 +2993,6 @@
   clusters:
     - ai-safety
     - community
-  sources:
-    - title: NVIDIA Website
-      url: https://www.nvidia.com
-    - title: Jensen Huang - Wikipedia
-      url: https://en.wikipedia.org/wiki/Jensen_Huang
   lastUpdated: 2026-02
 - id: ftx
   stableId: sid_yevJm2XDsQ
@@ -3548,11 +3071,6 @@
       value: Toby Ord and Will MacAskill
     - label: Known For
       value: 10% pledge, effective giving, effective altruism community-building
-  sources:
-    - title: Giving What We Can
-      url: https://www.givingwhatwecan.org/
-    - title: About Giving What We Can
-      url: https://www.givingwhatwecan.org/about-us
   description: >-
     Giving What We Can (GWWC) is an effective altruism organization co-founded by Toby Ord and Will MacAskill
     at Oxford University in 2009. Its central initiative is the Pledge, where members commit to donate at
@@ -3591,13 +3109,6 @@
     - frontier-lab
     - european-ai
     - open-weight
-  sources:
-    - title: Mistral AI Website
-      url: https://mistral.ai
-    - title: Mistral AI About Page
-      url: https://mistral.ai/about
-    - title: Mistral AI - Wikipedia
-      url: https://en.wikipedia.org/wiki/Mistral_AI
   lastUpdated: 2025-04
 
 - id: deepseek
@@ -3625,13 +3136,6 @@
     - frontier-lab
     - chinese-ai
     - open-weight
-  sources:
-    - title: DeepSeek Website
-      url: https://www.deepseek.com
-    - title: DeepSeek - Wikipedia
-      url: https://en.wikipedia.org/wiki/DeepSeek
-    - title: DeepSeek on Hugging Face
-      url: https://huggingface.co/deepseek-ai
   lastUpdated: 2025-01
 
 # =============================================================================
@@ -4191,11 +3695,6 @@
       type: organization
     - id: sid_Qns43S795w
       type: organization
-  sources:
-    - title: BERI Website
-      url: https://www.existence.org
-    - title: BERI About
-      url: https://www.existence.org/about
   lastUpdated: 2026-03
 
 - id: ai-safety-support
@@ -4247,11 +3746,6 @@
     - id: sid_0tQftJKP4Q
       type: person
       relationship: leads-to
-  sources:
-    - title: Lightcone Infrastructure Website
-      url: https://www.lightconeinfrastructure.com/
-    - title: LessWrong Software (Lightcone)
-      url: https://www.lightconeinfrastructure.com/lesswrong-software.html
   lastUpdated: 2026-03
 
 - id: global-catastrophic-risk-institute
@@ -4329,16 +3823,6 @@
     - id: sid_knwcFNXNQQ
       type: organization
       relationship: related
-  sources:
-    - title: Apart Research — Impact
-      url: https://apartresearch.com/impact
-    - title: "How Apart Research Would Use Marginal Funding to Scale AI Safety Research"
-      url: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-      date: 2025-05
-    - title: Apart Research — Donate 2025
-      url: https://apartresearch.com/donate/2025
-    - title: Apart Research on Manifund
-      url: https://manifund.org/projects/keep-apart-research-going-global-ai-safety-research--talent-pipeline
   tags:
     - ai-safety
     - alignment
@@ -5038,11 +4522,6 @@
       relationship: leads-to
     - id: sid_hd3NTHWp0l
       type: person
-  sources:
-    - title: CNAS Website
-      url: https://www.cnas.org
-    - title: Secure, Governable Chips Working Paper
-      url: https://www.cnas.org/publications/reports/secure-governable-chips
   lastUpdated: 2026-03
 
 - id: federation-of-american-scientists
@@ -5114,11 +4593,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: IAPS Website
-      url: https://www.iaps.ai
-    - title: IAPS Team
-      url: https://www.iaps.ai/our-team
   lastUpdated: 2026-03
 
 - id: niskanen-center
@@ -5573,11 +5047,6 @@
     - id: sid_eQh3ZhWv8D
       type: person
       relationship: leads-to
-  sources:
-    - title: GiveWell Website
-      url: https://www.givewell.org/
-    - title: GiveWell - Wikipedia
-      url: https://en.wikipedia.org/wiki/GiveWell
   lastUpdated: 2026-03
 
 - id: gates-foundation
@@ -5964,13 +5433,6 @@
       type: person
     - id: sid_6gjF5d3geg
       type: person
-  sources:
-    - title: FLF Website
-      url: https://www.flf.org
-    - title: ProPublica Nonprofit Explorer - FLF (EIN 88-0926067)
-      url: https://projects.propublica.org/nonprofits/organizations/880926067
-    - title: AXRP Episode 38.7 - Anthony Aguirre
-      url: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
   customFields:
     - label: EIN
       value: 88-0926067
@@ -6018,9 +5480,6 @@
       relationship: leads-to
     - id: sid_dVQzYIAN3A
       type: person
-  sources:
-    - title: CARMA LinkedIn
-      url: https://www.linkedin.com/company/center-for-ai-risk-management-alignment
   customFields:
     - label: Executive Director
       value: Richard Mallah
@@ -6057,9 +5516,6 @@
       relationship: supports
     - id: sid_d9sWZtyVwg
       type: organization
-  sources:
-    - title: Wise Ancestors FLF Grant Announcement
-      url: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
   customFields:
     - label: Executive Director
       value: Ann Pace, PhD
@@ -6152,9 +5608,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: Encode Justice Website
-      url: https://encodejustice.org
   lastUpdated: 2026-03
 
 - id: imbue
@@ -6729,9 +6182,6 @@
     - existential-risk
     - collective-epistemics
     - governance
-  sources:
-    - title: Forethought Foundation
-      url: https://www.forethought.org
   lastUpdated: 2026-03
 
 - id: ada-lovelace-institute
@@ -6798,9 +6248,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: AI Now Institute About
-      url: https://ainowinstitute.org/about
   lastUpdated: 2026-03
 
 - id: partnership-on-ai
@@ -6851,15 +6298,6 @@
       type: person
     - id: sid_fPrCLKppF3
       type: person
-  sources:
-    - title: Partnership on AI Website
-      url: https://partnershiponai.org/
-    - title: Partnership on AI About
-      url: https://partnershiponai.org/about/
-    - title: Partnership on AI - Wikipedia
-      url: https://en.wikipedia.org/wiki/Partnership_on_AI
-    - title: Partnership on AI Team
-      url: https://partnershiponai.org/team/
   lastUpdated: 2026-03
 
 - id: ai-policy-institute
@@ -6929,13 +6367,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: ARI Website
-      url: https://ari.us/
-    - title: ARI About
-      url: https://ari.us/about-us/
-    - title: ARI Team
-      url: https://ari.us/team/
   lastUpdated: 2026-03
 
 - id: brookings-ai
@@ -6980,11 +6411,6 @@
       type: person
     - id: sid_gA9eoKhFAM
       type: person
-  sources:
-    - title: RAND AI Research
-      url: https://www.rand.org/topics/artificial-intelligence.html
-    - title: RAND CAST Staff
-      url: https://www.rand.org/global-and-emerging-risks/centers/ai-security-and-technology/staff.html
   lastUpdated: 2026-03
 
 - id: stanford-hai
@@ -7032,13 +6458,6 @@
       type: person
     - id: sid_BTOYhStYj8
       type: person
-  sources:
-    - title: Stanford HAI Website
-      url: https://hai.stanford.edu
-    - title: Stanford HAI Five Years
-      url: https://hai.stanford.edu/news/stanford-hai-five-pioneering-future-human-centered-ai
-    - title: Stanford HAI People
-      url: https://hai.stanford.edu/about/people
   lastUpdated: 2026-03
 
 - id: center-for-ai-policy
@@ -7071,13 +6490,6 @@
   clusters:
     - ai-safety
     - governance
-  sources:
-    - title: Center for AI Policy Website
-      url: https://www.centeraipolicy.org
-    - title: CAIP Shutdown Announcement (LessWrong)
-      url: https://www.lesswrong.com/posts/Ed3naAyEEe7zZvzsj/the-center-for-ai-policy-has-shut-down
-    - title: OpenSecrets Profile
-      url: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
   lastUpdated: 2026-03
 
 - id: center-for-democracy-and-technology
@@ -7980,15 +7392,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: ACLU Website
-      url: https://www.aclu.org
-    - title: ACLU AI Accountability Program
-      url: https://www.aclu.org/issues/racial-justice/accountability-in-artificial-intelligence
-    - title: ACLU v. NSA FOIA Lawsuit
-      url: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
-    - title: ACLU Statement on Trump AI Executive Order
-      url: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
   lastUpdated: 2026-03
 
 - id: electronic-frontier-foundation
@@ -8019,15 +7422,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: EFF Website
-      url: https://www.eff.org
-    - title: EFF AI Issues
-      url: https://www.eff.org/issues/ai
-    - title: EFF on OpenAI Pentagon Deal
-      url: https://www.eff.org/deeplinks/2026/03/weasel-words-openais-pentagon-deal-wont-stop-ai-powered-surveillance
-    - title: EFF on Anthropic-DOD Conflict
-      url: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
   lastUpdated: 2026-03
 
 - id: brennan-center
@@ -8064,13 +7458,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: Brennan Center Website
-      url: https://www.brennancenter.org
-    - title: AI Legislation Tracker
-      url: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
-    - title: Agenda to Strengthen US Democracy in the Age of AI
-      url: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
   lastUpdated: 2026-03
 
 - id: epic-privacy
@@ -8102,11 +7489,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: EPIC Website
-      url: https://epic.org
-    - title: EPIC AI & Human Rights
-      url: https://epic.org/issues/ai/
   lastUpdated: 2026-03
 
 - id: protect-democracy
@@ -8141,11 +7523,6 @@
       relationship: leads-to
   clusters:
     - governance
-  sources:
-    - title: Protect Democracy Website
-      url: https://protectdemocracy.org
-    - title: AI for Democracy Action Lab
-      url: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
   lastUpdated: 2026-03
 
 - id: democracy-forward
@@ -8175,13 +7552,6 @@
     - government-accountability
   clusters:
     - governance
-  sources:
-    - title: Democracy Forward Website
-      url: https://democracyforward.org
-    - title: Democracy Forward AI FOIA Lawsuit
-      url: https://democracyforward.org/updates/foia-ai-lawsuit/
-    - title: Democracy Forward AI Deregulation Lawsuit
-      url: https://democracyforward.org/updates/ai-deregulation/
   lastUpdated: 2026-03
 
 - id: cais-action-fund
@@ -8212,9 +7582,6 @@
     - id: sid_y4bieqSeag
       type: organization
       relationship: related
-  sources:
-    - title: CAIS Action Fund Website
-      url: https://action.safe.ai
   lastUpdated: 2026-03
 
 - id: freedom-house
@@ -8245,13 +7612,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: Freedom House Website
-      url: https://freedomhouse.org
-    - title: "Freedom on the Net 2025: United States"
-      url: https://freedomhouse.org/country/united-states/freedom-net/2025
-    - title: "Trump's Immigration Crackdown Built on AI Surveillance"
-      url: https://freedomhouse.org/article/trumps-immigration-crackdown-built-ai-surveillance-and-disregard-due-process
   lastUpdated: 2026-03
 
 - id: mozilla-foundation
@@ -8279,11 +7639,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: Mozilla Foundation Website
-      url: https://www.mozillafoundation.org
-    - title: Democracy x AI Cohort
-      url: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
   lastUpdated: 2026-03
 
 - id: access-now
@@ -8312,11 +7667,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: Access Now Website
-      url: https://www.accessnow.org
-    - title: Access Now AI and Human Rights
-      url: https://www.accessnow.org/ai-and-human-rights/
   lastUpdated: 2026-03
 
 - id: algorithmwatch
@@ -8343,11 +7693,6 @@
     - research
   clusters:
     - governance
-  sources:
-    - title: AlgorithmWatch Website
-      url: https://algorithmwatch.org
-    - title: AlgorithmWatch Fellowship
-      url: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/
   lastUpdated: 2026-03
 
 - id: algorithmic-justice-league
@@ -8377,11 +7722,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: AJL Website
-      url: https://www.ajl.org
-    - title: AJL Comply to Fly Report
-      url: https://www.ajl.org/flyreport
   lastUpdated: 2026-03
 
 - id: center-for-humane-technology
@@ -8407,9 +7747,6 @@
     - ai-ethics
   clusters:
     - governance
-  sources:
-    - title: Center for Humane Technology Website
-      url: https://www.humanetech.com
   lastUpdated: 2026-03
 
 - id: revolving-door-project
@@ -8437,11 +7774,6 @@
     - investigative-research
   clusters:
     - governance
-  sources:
-    - title: Revolving Door Project Website
-      url: https://therevolvingdoorproject.org
-    - title: Tracking AI in the Trump Administration
-      url: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
   lastUpdated: 2026-03
 
 - id: tech-oversight-project
@@ -8469,11 +7801,6 @@
   clusters:
     - governance
     - governance
-  sources:
-    - title: Tech Oversight Project Website
-      url: https://techoversight.org
-    - title: Tech Oversight Project About
-      url: https://techoversight.org/about-us/
   lastUpdated: 2026-03
 
 - id: pauseai
@@ -8495,9 +7822,6 @@
     - pause-ai
   clusters:
     - ai-safety
-  sources:
-    - title: PauseAI Website
-      url: https://pauseai.info
   lastUpdated: 2026-03
 
 - id: humanity-ai-coalition
@@ -8533,11 +7857,6 @@
     - id: sid_DK0GbGg7Kf
       type: organization
       relationship: related
-  sources:
-    - title: Humanity AI Launch Announcement (MacArthur)
-      url: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-    - title: Humanity AI (Mellon Foundation)
-      url: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
   lastUpdated: 2026-03
 
 # ── External orgs (career flow endpoints) ──────────────────────────
@@ -8833,11 +8152,6 @@
   tags:
     - ai-governance
     - international-coordination
-  sources:
-    - title: World Economic Forum
-      url: https://www.weforum.org/
-    - title: World Economic Forum - Wikipedia
-      url: https://en.wikipedia.org/wiki/World_Economic_Forum
   lastUpdated: 2026-03
 
 - id: financial-stability-board
@@ -8857,11 +8171,6 @@
   tags:
     - international-coordination
     - systemic-risk
-  sources:
-    - title: Financial Stability Board
-      url: https://www.fsb.org/
-    - title: Financial Stability Board - Wikipedia
-      url: https://en.wikipedia.org/wiki/Financial_Stability_Board
   lastUpdated: 2026-03
 
 - id: christianity-today
@@ -8877,11 +8186,6 @@
     Christian nationalism from within the evangelical tradition.
   tags:
     - media
-  sources:
-    - title: Christianity Today
-      url: https://www.christianitytoday.com/
-    - title: Christianity Today - Wikipedia
-      url: https://en.wikipedia.org/wiki/Christianity_Today
   lastUpdated: 2026-03
 
 - id: world-vision
@@ -8896,11 +8200,6 @@
     relief-and-development NGOs globally, operating in nearly 100 countries.
   tags:
     - humanitarian
-  sources:
-    - title: World Vision International
-      url: https://www.worldvision.org/
-    - title: World Vision International - Wikipedia
-      url: https://en.wikipedia.org/wiki/World_Vision_International
 # ── Political Action Committees (AI-related) ────────────────────────────
 
 - id: think-big-pac
@@ -9065,11 +8364,6 @@
     - id: sid_Tbq2qL6mbA
       type: organization
       relationship: enables
-  sources:
-    - title: TSMC Website
-      url: https://www.tsmc.com
-    - title: TSMC - Wikipedia
-      url: https://en.wikipedia.org/wiki/TSMC
   lastUpdated: 2026-03
 
 - id: asml
@@ -9095,11 +8389,6 @@
   clusters:
     - governance
     - ai-safety
-  sources:
-    - title: ASML Website
-      url: https://www.asml.com
-    - title: ASML - Wikipedia
-      url: https://en.wikipedia.org/wiki/ASML_Holding
   lastUpdated: 2026-03
 
 - id: smic
@@ -9123,11 +8412,6 @@
   clusters:
     - governance
     - ai-safety
-  sources:
-    - title: SMIC Website
-      url: https://www.smics.com
-    - title: SMIC - Wikipedia
-      url: https://en.wikipedia.org/wiki/SMIC
   lastUpdated: 2026-03
 
 - id: amd
@@ -9155,11 +8439,6 @@
     - id: sid_vr5HogmRLQ
       type: person
       relationship: leads-to
-  sources:
-    - title: AMD Website
-      url: https://www.amd.com
-    - title: AMD - Wikipedia
-      url: https://en.wikipedia.org/wiki/AMD
   lastUpdated: 2026-03
 
 - id: sk-hynix
@@ -9182,11 +8461,6 @@
   clusters:
     - governance
     - ai-safety
-  sources:
-    - title: SK Hynix Website
-      url: https://www.skhynix.com
-    - title: SK Hynix - Wikipedia
-      url: https://en.wikipedia.org/wiki/SK_Hynix
   lastUpdated: 2026-03
 
 - id: bureau-of-industry-and-security
@@ -9213,11 +8487,6 @@
   clusters:
     - governance
     - ai-safety
-  sources:
-    - title: BIS Website
-      url: https://www.bis.gov
-    - title: BIS - Wikipedia
-      url: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
   lastUpdated: 2026-03
 
 - id: applied-materials
@@ -9240,11 +8509,6 @@
     - equipment
   clusters:
     - governance
-  sources:
-    - title: Applied Materials Website
-      url: https://www.appliedmaterials.com
-    - title: Applied Materials - Wikipedia
-      url: https://en.wikipedia.org/wiki/Applied_Materials
   lastUpdated: 2026-03
 
 - id: huawei
@@ -9271,11 +8535,6 @@
   clusters:
     - governance
     - ai-safety
-  sources:
-    - title: Huawei Website
-      url: https://www.huawei.com
-    - title: Huawei - Wikipedia
-      url: https://en.wikipedia.org/wiki/Huawei
   lastUpdated: 2026-03
 
 - id: semiconductor-industry-association
@@ -9298,11 +8557,6 @@
     - trade-association
   clusters:
     - governance
-  sources:
-    - title: SIA Website
-      url: https://www.semiconductors.org
-    - title: SIA - Wikipedia
-      url: https://en.wikipedia.org/wiki/Semiconductor_Industry_Association
   lastUpdated: 2026-03
 
 # ── Lightweight semiconductor entities (stableId only, no wiki pages) ──

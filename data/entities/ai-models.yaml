@@ -74,11 +74,6 @@
     - id: sid_6sdr78k9kQ
       type: approach
       relationship: related
-  sources:
-    - title: Anthropic Claude Product Page
-      url: https://anthropic.com/claude
-    - title: Claude API Documentation
-      url: https://docs.anthropic.com
   tags:
     - claude
     - anthropic
@@ -122,9 +117,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Claude 2 Announcement
-      url: https://www.anthropic.com/news/claude-2
   tags:
     - claude
     - claude-2
@@ -181,9 +173,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing the Claude 3 Model Family
-      url: https://www.anthropic.com/news/claude-3-family
   tags:
     - claude
     - claude-3
@@ -221,9 +210,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing the Claude 3 Model Family
-      url: https://www.anthropic.com/news/claude-3-family
   tags:
     - claude
     - claude-3
@@ -260,9 +246,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing the Claude 3 Model Family
-      url: https://www.anthropic.com/news/claude-3-family
   tags:
     - claude
     - claude-3
@@ -346,11 +329,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude 3.5 Sonnet
-      url: https://www.anthropic.com/news/claude-3-5-sonnet
-    - title: Updated Claude 3.5 Sonnet and Computer Use
-      url: https://www.anthropic.com/news/3-5-models-and-computer-use
   tags:
     - claude
     - claude-3-5
@@ -407,11 +385,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Updated Claude 3.5 Sonnet and Claude 3.5 Haiku
-      url: https://www.anthropic.com/news/3-5-models-and-computer-use
-    - title: "Model Card Addendum: Claude 3.5 Haiku and Upgraded Claude 3.5 Sonnet"
-      url: https://assets.anthropic.com/m/1cd9d098ac3e6467/original/Claude-3-Model-Card-October-Addendum.pdf
   tags:
     - claude
     - claude-3-5
@@ -471,11 +444,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude 3.7 Sonnet
-      url: https://www.anthropic.com/news/claude-3-7-sonnet
-    - title: Visible Extended Thinking
-      url: https://www.anthropic.com/news/visible-extended-thinking
   tags:
     - claude
     - reasoning
@@ -530,9 +498,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude 4
-      url: https://www.anthropic.com/news/claude-4
   tags:
     - claude
     - claude-4
@@ -587,9 +552,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude 4
-      url: https://www.anthropic.com/news/claude-4
   tags:
     - claude
     - claude-4
@@ -629,9 +591,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Claude Opus 4.1
-      url: https://www.anthropic.com/news/claude-opus-4-1
   tags:
     - claude
     - claude-4
@@ -680,9 +639,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude Sonnet 4.5
-      url: https://www.anthropic.com/news/claude-sonnet-4-5
   tags:
     - claude
     - claude-4
@@ -721,9 +677,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude Haiku 4.5
-      url: https://www.anthropic.com/news/claude-haiku-4-5
   tags:
     - claude
     - claude-4
@@ -775,9 +728,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude Opus 4.5
-      url: https://www.anthropic.com/news/claude-opus-4-5
   tags:
     - claude
     - claude-4
@@ -836,9 +786,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude Opus 4.6
-      url: https://www.anthropic.com/news/claude-opus-4-6
   tags:
     - claude
     - claude-4
@@ -887,9 +834,6 @@
     - id: sid_mK9pX3rQ7n
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Claude Sonnet 4.6
-      url: https://www.anthropic.com/news/claude-sonnet-4-6
   tags:
     - claude
     - claude-4
@@ -941,9 +885,6 @@
     - id: sid_EvEua2w8IA
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: OpenAI Models Documentation
-      url: https://platform.openai.com/docs/models
   tags:
     - gpt
     - openai
@@ -990,11 +931,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: OpenAI ChatGPT Launch (November 2022)
-      url: https://openai.com/blog/chatgpt
-    - title: OpenAI Models Documentation — GPT-3.5 Turbo
-      url: https://platform.openai.com/docs/models/gpt-3-5-turbo
   tags:
     - gpt
     - gpt-3
@@ -1055,9 +991,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: "GPT-4 Technical Report"
-      url: https://arxiv.org/abs/2303.08774
   tags:
     - gpt
     - gpt-4
@@ -1109,11 +1042,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: New models and developer products announced at DevDay
-      url: https://openai.com/blog/new-models-and-developer-products-announced-at-devday
-    - title: OpenAI simple-evals (gpt-4-turbo-2024-04-09 results)
-      url: https://github.com/openai/simple-evals
   tags:
     - gpt
     - gpt-4
@@ -1201,9 +1129,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Hello GPT-4o
-      url: https://openai.com/index/hello-gpt-4o/
   tags:
     - gpt
     - gpt-4o
@@ -1261,9 +1186,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: GPT-4o mini
-      url: https://openai.com/index/gpt-4o-mini-advancing-cost-efficient-intelligence/
   tags:
     - gpt
     - gpt-4o
@@ -1318,9 +1240,6 @@
     - id: sid_KpR1gIwJZw
       type: ai-model
       relationship: related
-  sources:
-    - title: Learning to Reason with LLMs
-      url: https://openai.com/index/learning-to-reason-with-llms/
   tags:
     - openai
     - reasoning
@@ -1393,9 +1312,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: OpenAI o1
-      url: https://openai.com/index/openai-o1/
   tags:
     - openai
     - reasoning
@@ -1443,9 +1359,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Learning to Reason with LLMs
-      url: https://openai.com/index/learning-to-reason-with-llms/
   tags:
     - openai
     - reasoning
@@ -1505,9 +1418,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: OpenAI o3-mini
-      url: https://openai.com/index/openai-o3-mini/
   tags:
     - openai
     - reasoning
@@ -1585,9 +1495,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing OpenAI o3 and o4-mini
-      url: https://openai.com/index/introducing-o3-and-o4-mini/
   tags:
     - openai
     - reasoning
@@ -1650,9 +1557,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing GPT-4.1 in the API
-      url: https://openai.com/index/gpt-4-1/
   tags:
     - gpt
     - gpt-4-1
@@ -1692,9 +1596,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing GPT-4.1 in the API
-      url: https://openai.com/index/gpt-4-1/
   tags:
     - gpt
     - gpt-4-1
@@ -1734,9 +1635,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing GPT-4.1 in the API
-      url: https://openai.com/index/gpt-4-1/
   tags:
     - gpt
     - gpt-4-1
@@ -1807,9 +1705,6 @@
     - id: sid_1LcLlMGLbw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing OpenAI o3 and o4-mini
-      url: https://openai.com/index/introducing-o3-and-o4-mini/
   tags:
     - openai
     - reasoning
@@ -1861,9 +1756,6 @@
     - id: sid_a5llQhfVkw
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: Google DeepMind Gemini
-      url: https://deepmind.google/technologies/gemini/
   tags:
     - gemini
     - google
@@ -1922,9 +1814,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: "Gemini: A Family of Highly Capable Multimodal Models"
-      url: https://arxiv.org/abs/2312.11805
   tags:
     - gemini
     - google
@@ -1980,9 +1869,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context"
-      url: https://arxiv.org/abs/2403.05530
   tags:
     - gemini
     - google
@@ -2044,11 +1930,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: Google I/O 2024 Gemini Announcements
-      url: https://blog.google/technology/ai/google-gemini-update-flash-ai-assistant-io-2024/
-    - title: "Gemini 1.5: Unlocking multimodal understanding across millions of tokens of context (technical report)"
-      url: https://arxiv.org/abs/2403.05530
   tags:
     - gemini
     - google
@@ -2108,9 +1989,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Gemini 2.0
-      url: https://blog.google/technology/google-deepmind/google-gemini-ai-update-december-2024/
   tags:
     - gemini
     - google
@@ -2197,9 +2075,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Gemini 2.5 Pro
-      url: https://blog.google/technology/google-deepmind/gemini-model-thinking-updates-march-2025/
   tags:
     - gemini
     - google
@@ -2266,13 +2141,6 @@
     - id: sid_A4XoubikkQ
       type: organization
       relationship: created-by
-  sources:
-    - title: Google I/O 2025 Gemini Updates
-      url: https://blog.google/technology/ai/io-2025-keynote/
-    - title: Gemini 2.5 Flash Model Card
-      url: https://storage.googleapis.com/model-cards/documents/gemini-2.5-flash.pdf
-    - title: Gemini 2.5 Flash — Google DeepMind
-      url: https://deepmind.google/en/models/gemini/flash/
   tags:
     - gemini
     - google
@@ -2322,9 +2190,6 @@
     - id: sid_T3ipFW0POA
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: Meta Llama
-      url: https://llama.meta.com/
   tags:
     - llama
     - meta
@@ -2363,9 +2228,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: "Llama 2: Open Foundation and Fine-Tuned Chat Models"
-      url: https://arxiv.org/abs/2307.09288
   tags:
     - llama
     - meta
@@ -2412,9 +2274,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Meta Llama 3
-      url: https://ai.meta.com/blog/meta-llama-3/
   tags:
     - llama
     - meta
@@ -2473,9 +2332,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Llama 3.1
-      url: https://ai.meta.com/blog/meta-llama-3-1/
   tags:
     - llama
     - meta
@@ -2529,9 +2385,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: Llama 3.3 Release
-      url: https://ai.meta.com/blog/llama-3-3/
   tags:
     - llama
     - meta
@@ -2588,9 +2441,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Llama 4
-      url: https://ai.meta.com/blog/llama-4/
   tags:
     - llama
     - meta
@@ -2648,9 +2498,6 @@
     - id: sid_tt0f5PYDCw
       type: organization
       relationship: created-by
-  sources:
-    - title: Introducing Llama 4
-      url: https://ai.meta.com/blog/llama-4/
   tags:
     - llama
     - meta
@@ -2689,9 +2536,6 @@
     - id: sid_7aS5YclgSQ
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: Mistral AI Models
-      url: https://docs.mistral.ai/getting-started/models/
   tags:
     - mistral
     - european-ai
@@ -2730,9 +2574,6 @@
     - id: sid_RFHVboBnHg
       type: organization
       relationship: created-by
-  sources:
-    - title: "Mixtral of Experts"
-      url: https://arxiv.org/abs/2401.04088
   tags:
     - mistral
     - mixture-of-experts
@@ -2789,9 +2630,6 @@
     - id: sid_RFHVboBnHg
       type: organization
       relationship: created-by
-  sources:
-    - title: Mistral Large 2
-      url: https://mistral.ai/news/mistral-large-2407/
   tags:
     - mistral
     - frontier-ai
@@ -2828,9 +2666,6 @@
     - id: sid_ELbPFPb5vA
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: xAI
-      url: https://x.ai/
   tags:
     - grok
     - xai
@@ -2881,9 +2716,6 @@
     - id: sid_GLXKjYAEKw
       type: organization
       relationship: created-by
-  sources:
-    - title: Grok-2 Beta Release
-      url: https://x.ai/blog/grok-2
   tags:
     - grok
     - xai
@@ -2952,9 +2784,6 @@
     - id: sid_GLXKjYAEKw
       type: organization
       relationship: created-by
-  sources:
-    - title: Grok 3
-      url: https://x.ai/blog/grok-3
   tags:
     - grok
     - xai
@@ -2992,9 +2821,6 @@
     - id: sid_jhJqRVFXcg
       type: ai-model
       relationship: composed-of
-  sources:
-    - title: DeepSeek
-      url: https://www.deepseek.com/
   tags:
     - deepseek
     - chinese-ai
@@ -3069,9 +2895,6 @@
     - id: sid_otUkuVHDKw
       type: organization
       relationship: created-by
-  sources:
-    - title: "DeepSeek-V3 Technical Report"
-      url: https://arxiv.org/abs/2412.19437
   tags:
     - deepseek
     - mixture-of-experts
@@ -3151,9 +2974,6 @@
     - id: sid_otUkuVHDKw
       type: organization
       relationship: created-by
-  sources:
-    - title: "DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via Reinforcement Learning"
-      url: https://arxiv.org/abs/2501.12948
   tags:
     - deepseek
     - reasoning

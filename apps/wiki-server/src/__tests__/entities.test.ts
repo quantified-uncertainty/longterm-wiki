@@ -62,8 +62,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         last_updated: params[o + 10],
         custom_fields: params[o + 11],
         related_entries: params[o + 12],
-        sources: params[o + 13],
-        metadata: params[o + 14],
+        metadata: params[o + 13],
         synced_at: now,
         created_at: existing?.created_at ?? now,
         updated_at: now,
@@ -636,7 +635,7 @@ describe("Entities API", () => {
   // ---- Sync with JSONB fields ----
 
   describe("JSONB fields", () => {
-    it("syncs entities with tags, relatedEntries, sources", async () => {
+    it("syncs entities with tags and relatedEntries", async () => {
       // Pre-seed referenced entities so ref-check passes
       await seedEntity(app, "openai", "OpenAI", { stableId: "hI4jK5lM6n" });
       await seedEntity(app, "interpretability", "Interpretability", {
@@ -655,9 +654,6 @@ describe("Entities API", () => {
             relatedEntries: [
               { id: "openai", type: "organization" },
               { id: "interpretability", type: "safety-agenda", relationship: "research" },
-            ],
-            sources: [
-              { title: "Anthropic Website", url: "https://anthropic.com" },
             ],
           },
         ],
@@ -939,22 +935,6 @@ describe("Entities API", () => {
       expect(meta!.customTag).toBe("important");
     });
 
-    it("auto-clears stub flag when entity has sources", async () => {
-      await postJson(app, "/api/entities/sync", {
-        entities: [{
-          id: "stub-with-sources",
-          stableId: "sRc1234567",
-          title: "Person With Sources",
-          entityType: "person",
-          sources: [{ title: "Source 1", url: "https://example.com" }],
-          metadata: { stub: true },
-        }],
-      });
-
-      const row = entitiesStore.get("sRc1234567");
-      const meta = parseMeta(row!.metadata);
-      expect(meta?.stub).toBeUndefined();
-    });
   });
 
   // ---- Directory stub exclusion ----
@@ -1118,14 +1098,6 @@ describe("clearStubIfEnriched", () => {
     expect(result).toBe(null);
   });
 
-  it("clears stub when sources are present", () => {
-    const result = clearStubIfEnriched({
-      sources: [{ title: "Source" }],
-      metadata: { stub: true },
-    });
-    expect(result).toBe(null);
-  });
-
   it("clears stub when customFields are present", () => {
     const result = clearStubIfEnriched({
       customFields: [{ label: "Field", value: "Value" }],
@@ -1153,7 +1125,6 @@ describe("clearStubIfEnriched", () => {
   it("does not clear stub for empty arrays", () => {
     const result = clearStubIfEnriched({
       customFields: [],
-      sources: [],
       relatedEntries: [],
       metadata: { stub: true },
     });
@@ -1165,7 +1136,6 @@ describe("clearStubIfEnriched", () => {
       description: null,
       wikiId: null,
       customFields: null,
-      sources: null,
       relatedEntries: null,
       metadata: { stub: true },
     });

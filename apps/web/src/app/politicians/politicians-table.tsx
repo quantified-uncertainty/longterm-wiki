@@ -25,8 +25,6 @@ export interface PoliticianRow {
   website: string | null;
   /** Map of EA topic → stance view string */
   stances: Record<string, string>;
-  /** Number of external source links */
-  sourceCount: number;
   tags: string[];
   /** Political scorecard ratings (pre-fetched server-side) */
   politicalScores?: PoliticalScore[];
@@ -34,7 +32,7 @@ export interface PoliticianRow {
   totalRaised?: number | null;
 }
 
-type SortKey = "title" | "office" | "party" | "jurisdiction" | "sourceCount";
+type SortKey = "title" | "office" | "party" | "jurisdiction";
 
 export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
   const [search, setSearch] = useState("");
@@ -93,7 +91,6 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
         case "office": return (row.office ?? "").toLowerCase();
         case "party": return (row.party ?? "").toLowerCase();
         case "jurisdiction": return (row.jurisdiction ?? "").toLowerCase();
-        case "sourceCount": return row.sourceCount;
       }
     };
     return [...result].sort((a, b) => compareByValue(a, b, getValue, sortDir));
@@ -179,7 +176,6 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                   {topic.replace("AI safety and regulation", "AI Safety").replace("Science and technology funding", "Sci/Tech").replace("Nuclear energy", "Nuclear").replace("Animal welfare", "Animals")}
                 </th>
               ))}
-              <SortHeader label="Sources" sortKey="sourceCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               <th className="py-2.5 px-3 text-left font-medium whitespace-nowrap">Scores</th>
               {hasFinance && <th className="py-2.5 px-3 text-right font-medium whitespace-nowrap">Finance</th>}
             </tr>
@@ -246,11 +242,6 @@ export function PoliticiansTable({ rows }: { rows: PoliticianRow[] }) {
                     </td>
                   );
                 })}
-
-                {/* Source count */}
-                <td className="py-2.5 px-3 text-center">
-                  <span className="text-xs text-muted-foreground">{row.sourceCount}</span>
-                </td>
 
                 {/* Political scores */}
                 <td className="py-2.5 px-3">

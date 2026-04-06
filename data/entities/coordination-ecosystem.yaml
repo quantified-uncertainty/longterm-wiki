@@ -36,11 +36,6 @@
     - id: case-law-for-ai
       type: project
       relationship: composed-of
-  sources:
-    - title: AI & Democracy Foundation
-      url: https://aidemocracyfoundation.org
-    - title: "Democratic AI is Possible (arxiv 2411.09222)"
-      url: https://arxiv.org/abs/2411.09222
   customFields:
     - label: Founded
       value: "2024"
@@ -77,9 +72,6 @@
     - id: plurality-institute
       type: organization
       relationship: related
-  sources:
-    - title: RadicalxChange Foundation
-      url: https://www.radicalxchange.org
   customFields:
     - label: Founded
       value: "2018"
@@ -138,11 +130,6 @@
     - id: polis-platform
       type: project
       relationship: composed-of
-  sources:
-    - title: Computational Democracy Project
-      url: https://compdemocracy.org
-    - title: Polis
-      url: https://pol.is
 
 - id: govlab
   stableId: sid_4GF4eFBtHg
@@ -167,9 +154,6 @@
     - id: beth-noveck
       type: person
       relationship: leads-to
-  sources:
-    - title: The GovLab
-      url: https://thegovlab.org
   customFields:
     - label: Key Concept
       value: Smarter governance through data and collective intelligence
@@ -199,9 +183,6 @@
     - id: deliberation-io
       type: project
       relationship: related
-  sources:
-    - title: Stanford Deliberative Democracy Lab
-      url: https://deliberation.stanford.edu
 
 - id: mit-center-collective-intelligence
   stableId: sid_xFz84U1HN4
@@ -225,9 +206,6 @@
     - id: thomas-malone
       type: person
       relationship: leads-to
-  sources:
-    - title: MIT CCI
-      url: https://cci.mit.edu
 
 - id: cooperative-ai-foundation
   stableId: sid_iA0Nfo7fMw
@@ -255,11 +233,6 @@
     - id: allan-dafoe
       type: person
       relationship: leads-to
-  sources:
-    - title: Cooperative AI Foundation
-      url: https://www.cooperativeai.com
-    - title: "Open Problems in Cooperative AI"
-      url: https://arxiv.org/abs/2012.08630
   customFields:
     - label: Funding
       value: "$15M"
@@ -287,9 +260,6 @@
     - id: allan-dafoe
       type: person
       relationship: leads-to
-  sources:
-    - title: Centre for the Governance of AI
-      url: https://www.governance.ai
 
 - id: newdemocracy-foundation
   stableId: sid_7bmpbkSWVn
@@ -500,11 +470,6 @@
     - id: proof-of-humanity
       type: project
       relationship: composed-of
-  sources:
-    - title: Kleros
-      url: https://kleros.io
-    - title: "Kleros: A Socio-Legal Case Study (Stanford Law)"
-      url: https://law.stanford.edu/publications/kleros-a-socio-legal-case-study-of-decentralized-justice-blockchain-arbitration/
   customFields:
     - label: Founded
       value: "2017"
@@ -537,9 +502,6 @@
     - id: robin-hanson
       type: person
       relationship: related
-  sources:
-    - title: MetaDAO
-      url: https://www.metadao.fi
   customFields:
     - label: Market Cap
       value: "$76M"
@@ -611,9 +573,6 @@
     - id: glen-weyl
       type: person
       relationship: related
-  sources:
-    - title: Gitcoin
-      url: https://www.gitcoin.co
   customFields:
     - label: Total Distributed
       value: "$67M+"
@@ -638,9 +597,6 @@
     - governance
   clusters:
     - governance
-  sources:
-    - title: Safe Global
-      url: https://safe.global
   customFields:
     - label: Chains
       value: "14+"
@@ -1094,9 +1050,6 @@
     - id: pactum-negotiation
       type: project
       relationship: composed-of
-  sources:
-    - title: Pactum AI
-      url: https://pactum.com
   customFields:
     - label: Funding
       value: "$54M Series C"
@@ -1128,9 +1081,6 @@
     - id: thinkscape
       type: project
       relationship: composed-of
-  sources:
-    - title: Unanimous AI
-      url: https://unanimous.ai
   customFields:
     - label: Key Result
       value: Groups averaged IQ 128 (97th percentile)
@@ -1381,11 +1331,6 @@
     - id: case-law-for-ai
       type: project
       relationship: related
-  sources:
-    - title: Aviv Ovadya
-      url: https://aviv.me
-    - title: AI & Democracy Foundation
-      url: https://aidemocracyfoundation.org
   customFields:
     - label: Role
       value: Founder & CEO, AI & Democracy Foundation
@@ -1416,11 +1361,6 @@
     - id: radicalxchange
       type: organization
       relationship: related
-  sources:
-    - title: Divya Siddarth
-      url: https://divyasiddarth.com
-    - title: CIP
-      url: https://www.cip.org
   customFields:
     - label: Role
       value: Co-founder & Executive Director, CIP
@@ -1456,9 +1396,6 @@
     - id: gitcoin
       type: organization
       relationship: related
-  sources:
-    - title: Glen Weyl
-      url: https://glenweyl.com
   customFields:
     - label: Role
       value: Founder, RadicalxChange & Plurality Institute
@@ -2147,13 +2084,6 @@
     - id: ai-objectives-institute
       type: organization
       relationship: related
-  sources:
-    - title: Talk to the City
-      url: https://talktothe.city
-    - title: AI Objectives Institute
-      url: https://ai.objectives.institute/talk-to-the-city
-    - title: GitHub
-      url: https://github.com/AIObjectives/talk-to-the-city-reports
   customFields:
     - label: Open Source
       value: "Yes (October 2023)"
@@ -2189,11 +2119,6 @@
     - id: colin-megill
       type: person
       relationship: related
-  sources:
-    - title: Polis
-      url: https://pol.is
-    - title: GitHub
-      url: https://github.com/compdemocracy/polis
 
 - id: habermas-machine
   stableId: sid_5WYQzQZY3U
@@ -2218,9 +2143,6 @@
     - id: iason-gabriel
       type: person
       relationship: related
-  sources:
-    - title: "AI can help humans find common ground (Science)"
-      url: https://www.science.org/doi/10.1126/science.adq2852
   customFields:
     - label: Published
       value: Science, October 2024
@@ -2249,9 +2171,6 @@
     - id: stanford-deliberative-democracy-lab
       type: organization
       relationship: related
-  sources:
-    - title: Deliberation.io
-      url: https://deliberation.io
 
 - id: democracy-levels
   stableId: sid_51cJFHWoVK
@@ -2277,9 +2196,6 @@
     - id: ai-democracy-foundation
       type: organization
       relationship: related
-  sources:
-    - title: "Democratic AI is Possible (arxiv)"
-      url: https://arxiv.org/abs/2411.09222
 
 - id: case-law-for-ai
   stableId: sid_fC3kijt9Ms
@@ -2514,9 +2430,6 @@
     - governance
   clusters:
     - governance
-  sources:
-    - title: Coinbase x402
-      url: https://docs.cdp.coinbase.com/x402/welcome
 
 - id: snapshot-voting
   stableId: sid_wy1YkpMahP
@@ -2643,9 +2556,6 @@
     - governance
   clusters:
     - governance
-  sources:
-    - title: AAA AI Arbitrator
-      url: https://www.adr.org/ai-arbitrator/
   customFields:
     - label: Launched
       value: November 2025
@@ -2707,9 +2617,6 @@
     - id: noam-brown
       type: person
       relationship: related
-  sources:
-    - title: "Human-level play in the game of Diplomacy (Science)"
-      url: https://www.science.org/doi/10.1126/science.ade9097
 
 - id: ai-economist
   stableId: sid_WiaVpz27fg
@@ -2728,9 +2635,6 @@
     - governance
   clusters:
     - governance
-  sources:
-    - title: AI Economist (GitHub)
-      url: https://github.com/salesforce/ai-economist
 
 - id: spliddit
   stableId: sid_TchCqc3jO1

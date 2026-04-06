@@ -908,9 +908,6 @@ export const entities = pgTable(
     relatedEntries: jsonb("related_entries").$type<
       Array<{ id: string; type: string; relationship?: string }>
     >(),
-    sources: jsonb("sources").$type<
-      Array<{ title: string; url?: string; author?: string; date?: string }>
-    >(),
     metadata: jsonb("metadata").$type<Record<string, unknown>>(),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()

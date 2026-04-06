@@ -1142,6 +1142,13 @@
       "when": 1783497600000,
       "tag": "0162_entity_resources",
       "breakpoints": true
+    },
+    {
+      "idx": 163,
+      "version": "7",
+      "when": 1783584000000,
+      "tag": "0163_drop_entity_sources",
+      "breakpoints": true
     }
   ]
 }

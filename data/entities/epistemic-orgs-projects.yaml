@@ -71,11 +71,6 @@
     - id: ai-safety-papers
       type: project
       relationship: related
-  sources:
-    - title: QURI Website
-      url: https://quantifieduncertainty.org
-    - title: QURI GitHub
-      url: https://github.com/quantified-uncertainty
   customFields:
     - label: Founded
       value: "2019"

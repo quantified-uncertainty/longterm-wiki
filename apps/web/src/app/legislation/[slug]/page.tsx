@@ -234,25 +234,6 @@ export default async function LegislationDetailPage({
           </div>
         </section>
       )}
-      {entity.sources.length > 0 && (
-        <section className="rounded-xl border border-border p-4">
-          <h3 className="text-sm font-bold mb-3">Sources</h3>
-          <ul className="space-y-2.5">
-            {entity.sources.map((source, si) => (
-              <li key={si} className="text-sm">
-                {source.url ? (
-                  <a href={source.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{source.title}</a>
-                ) : (
-                  <span>{source.title}</span>
-                )}
-                {(source.author || source.date) && (
-                  <span className="text-xs text-muted-foreground ml-1">{[source.author, source.date].filter(Boolean).join(", ")}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
       {entity.tags.length > 0 && (
         <section className="rounded-xl border border-border p-4">
           <h3 className="text-sm font-bold mb-3">Tags</h3>

@@ -207,7 +207,6 @@ describe("resolveEntityName", () => {
       tags: [],
       clusters: [],
       relatedEntries: [],
-      sources: [],
       customFields: [],
       relatedTopics: [],
     });
@@ -231,7 +230,6 @@ describe("resolveEntityName", () => {
       tags: [],
       clusters: [],
       relatedEntries: [],
-      sources: [],
       customFields: [],
       relatedTopics: [],
     });
@@ -266,7 +264,6 @@ describe("resolveEntityName", () => {
       tags: [],
       clusters: [],
       relatedEntries: [],
-      sources: [],
       customFields: [],
       relatedTopics: [],
     });
@@ -328,7 +325,6 @@ describe("resolveEntityName", () => {
       tags: [],
       clusters: [],
       relatedEntries: [],
-      sources: [],
       customFields: [],
       relatedTopics: [],
     });
