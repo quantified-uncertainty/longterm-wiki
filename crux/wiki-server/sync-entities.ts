@@ -29,7 +29,6 @@ const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
 const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
 const EXPERTS_FILE = join(PROJECT_ROOT, "data/experts.yaml");
-const PEOPLE_RESOURCES_FILE = join(PROJECT_ROOT, "data/people-resources.yaml");
 
 // --- Configuration ---
 // Reduced from 100 to 50 — batches of 100 can exceed the 30s statement_timeout
@@ -105,18 +104,6 @@ interface ExpertEntry {
   positions?: ExpertPosition[];
 }
 
-interface PeopleResourceEntry {
-  personId: string;
-  personName: string;
-  publications?: Array<{
-    title: string;
-    year?: number;
-    type?: string;
-    link?: string;
-    category?: string;
-  }>;
-}
-
 // --- Helpers ---
 
 /** Fields that are part of the base entity schema (not metadata). */
@@ -167,44 +154,16 @@ export function loadExperts(
 }
 
 /**
- * Load people-resources data and return a map of personId → publication count.
- * Returns an empty map if the file doesn't exist or can't be parsed.
- */
-export function loadPeopleResources(
-  filePath: string = PEOPLE_RESOURCES_FILE
-): Map<string, number> {
-  const map = new Map<string, number>();
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = parseYaml(raw);
-    if (!Array.isArray(parsed)) {
-      console.warn(`  WARN: people-resources.yaml — not an array, skipping`);
-      return map;
-    }
-    for (const entry of parsed as PeopleResourceEntry[]) {
-      if (entry.personId) {
-        map.set(entry.personId, entry.publications?.length ?? 0);
-      }
-    }
-  } catch (err) {
-    console.warn(`  WARN: Could not load people-resources.yaml — ${err}`);
-  }
-  return map;
-}
-
-/**
- * Merge expert data and publication counts into entity metadata.
+ * Merge expert data into entity metadata.
  * Mutates the entity's metadata in place.
  */
 export function mergeExpertData(
   entity: SyncEntity,
   experts: Map<string, ExpertEntry>,
-  publicationCounts: Map<string, number>,
 ): SyncEntity {
   const expert = experts.get(entity.id);
-  const pubCount = publicationCounts.get(entity.id);
 
-  if (!expert && pubCount === undefined) {
+  if (!expert) {
     return entity;
   }
 
@@ -223,10 +182,6 @@ export function mergeExpertData(
     if (expert.role) {
       metadata.expertRole = expert.role;
     }
-  }
-
-  if (pubCount !== undefined && pubCount > 0) {
-    metadata.publicationCount = pubCount;
   }
 
   entity.metadata = Object.keys(metadata).length > 0 ? metadata : null;
@@ -512,10 +467,6 @@ async function main() {
   const experts = loadExperts();
   console.log(`  Loaded ${experts.size} experts`);
 
-  console.log(`Loading people-resources from: ${PEOPLE_RESOURCES_FILE}`);
-  const publicationCounts = loadPeopleResources();
-  console.log(`  Loaded publication counts for ${publicationCounts.size} people`);
-
   // Transform and merge expert data (skip entities without stableId)
   const transformed = yamlEntities.map(transformEntity);
   const dropped = transformed.filter((e) => e === null).length;
@@ -524,7 +475,7 @@ async function main() {
   }
   const syncPayloads = transformed
     .filter((e): e is SyncEntity => e !== null)
-    .map((e) => mergeExpertData(e, experts, publicationCounts));
+    .map((e) => mergeExpertData(e, experts));
 
   // Group by type for summary
   const byType = new Map<string, number>();

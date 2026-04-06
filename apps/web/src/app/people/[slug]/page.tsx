@@ -32,13 +32,12 @@ import {
   type ProfileTab,
 } from "@/components/directory";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { getPublicationsForPerson, getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
+import { getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
 import { ExpertPositions } from "./expert-positions";
 import { SocialLinks } from "./social-links";
 import { CareerHistory } from "./career-history";
 import { EducationSection } from "./education-section";
-import { PublicationsSection } from "./publications-section";
 import { FundingConnections } from "./funding-connections";
 import { OrgRoles } from "./org-roles";
 import { BoardSeats } from "./board-seats";
@@ -211,8 +210,6 @@ export default async function PersonProfilePage({
 
   const entityWebsite = personEntity?.website;
 
-  // Publications linked to this person (from people-resources.yaml via database.json).
-  const publications = getPublicationsForPerson(slug);
 
   // Reverse lookup: org key-person records referencing this person
   const orgRoles = getOrgRolesForPerson(entity.id);
@@ -374,16 +371,6 @@ export default async function PersonProfilePage({
     });
   }
 
-  // Publications (only shown when local publication records exist)
-  if (publications.length > 0) {
-    tabs.push({
-      id: "publications",
-      label: "Publications",
-      count: publications.length,
-      content: <PublicationsSection publications={publications} personSlug={slug} />,
-    });
-  }
-
   // Funding connections (hidden when empty to avoid unfulfilled expectations)
   if (fundingConnections.length > 0) {
     tabs.push({
@@ -420,7 +407,7 @@ export default async function PersonProfilePage({
                 bornYear: bornYearFact?.value.type === "number" ? bornYearFact.value.value : null,
                 netWorthNum: netWorthFact?.value.type === "number" ? netWorthFact.value.value : null,
                 positionCount: positions.length,
-                publicationCount: publications.length,
+                publicationCount: 0,
                 careerHistoryCount: careerHistory.length,
                 wikiPageId: entity.wikiPageId,
               };
