@@ -22,7 +22,6 @@ function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
     return {
       id: s.id,
       name: s.name,
-      resourceId: s.resourceId,
       dataFormat: s.dataFormat,
       recordType: s.recordType,
       publisherName: publisher?.name ?? null,
