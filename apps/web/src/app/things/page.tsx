@@ -61,7 +61,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
   // Build list/search URL
   let listUrl: string;
   if (searchQuery) {
-    const params = new URLSearchParams({ q: searchQuery, limit: String(PAGE_SIZE) });
+    const params = new URLSearchParams({ q: searchQuery, limit: String(PAGE_SIZE), offset: String(offset) });
     if (filterType) params.set("thing_type", filterType);
     listUrl = `/api/things/search?${params.toString()}`;
   } else {
