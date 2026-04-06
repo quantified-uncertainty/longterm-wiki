@@ -2,8 +2,8 @@
  * Render smoke tests for the Entities dashboard content component.
  *
  * EntitiesContent reads from local database.json via multiple data functions
- * and builds a unified entity row view. These tests verify the component
- * renders without throwing for typical and edge-case data shapes.
+ * and fetches source-check data from wiki-server. These tests verify the
+ * component renders without throwing for typical and edge-case data shapes.
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -16,6 +16,16 @@ vi.mock("@/data", () => ({
   getPageById: vi.fn(),
   getPageCoverageItems: vi.fn(),
   getPageRankings: vi.fn(),
+  getIdRegistry: vi.fn(() => ({
+    byWikiId: {},
+    bySlug: {},
+    stableIdToSlug: {},
+    stableIdBySlug: {},
+  })),
+}));
+
+vi.mock("@lib/wiki-server", () => ({
+  fetchDetailed: vi.fn(() => Promise.resolve({ ok: false, error: "mock" })),
 }));
 
 vi.mock("@/app/internal/entities/entities-data-table", () => ({
@@ -31,6 +41,7 @@ import {
   getPageCoverageItems,
   getPageRankings,
 } from "@/data";
+import { fetchDetailed } from "@lib/wiki-server";
 import { EntitiesContent } from "@/app/internal/entities/entities-content";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
@@ -80,23 +91,24 @@ describe("EntitiesContent", () => {
     vi.mocked(getPageRankings).mockReturnValue([]);
     vi.mocked(getEntityHref).mockReturnValue("/wiki/E1");
     vi.mocked(getPageById).mockReturnValue(undefined);
+    vi.mocked(fetchDetailed).mockResolvedValue({ ok: false, error: "mock" } as never);
   });
 
-  it("renders without throwing with entity data", () => {
+  it("renders without throwing with entity data", async () => {
     vi.mocked(getTypedEntities).mockReturnValue(mockEntities as never);
 
-    const element = EntitiesContent();
+    const element = await EntitiesContent();
     expect(element).toBeTruthy();
   });
 
-  it("renders without throwing with empty entities", () => {
+  it("renders without throwing with empty entities", async () => {
     vi.mocked(getTypedEntities).mockReturnValue([]);
 
-    const element = EntitiesContent();
+    const element = await EntitiesContent();
     expect(element).toBeTruthy();
   });
 
-  it("renders without throwing when entities have pages", () => {
+  it("renders without throwing when entities have pages", async () => {
     vi.mocked(getTypedEntities).mockReturnValue(mockEntities as never);
     vi.mocked(getPageById).mockImplementation((id: string) => {
       if (id === "openai")
@@ -104,11 +116,11 @@ describe("EntitiesContent", () => {
       return undefined;
     });
 
-    const element = EntitiesContent();
+    const element = await EntitiesContent();
     expect(element).toBeTruthy();
   });
 
-  it("renders without throwing with coverage and ranking data", () => {
+  it("renders without throwing with coverage and ranking data", async () => {
     vi.mocked(getTypedEntities).mockReturnValue(mockEntities as never);
     vi.mocked(getPageCoverageItems).mockReturnValue([
       {
@@ -140,18 +152,44 @@ describe("EntitiesContent", () => {
       },
     ] as never);
 
-    const element = EntitiesContent();
+    const element = await EntitiesContent();
     expect(element).toBeTruthy();
   });
 
-  it("renders without throwing when all descriptions are null", () => {
+  it("renders without throwing when all descriptions are null", async () => {
     const entitiesNoDesc = mockEntities.map((e) => ({
       ...e,
       description: null,
     }));
     vi.mocked(getTypedEntities).mockReturnValue(entitiesNoDesc as never);
 
-    const element = EntitiesContent();
+    const element = await EntitiesContent();
+    expect(element).toBeTruthy();
+  });
+
+  it("merges source-check data when API is available", async () => {
+    vi.mocked(getTypedEntities).mockReturnValue(mockEntities as never);
+    vi.mocked(fetchDetailed).mockResolvedValue({
+      ok: true,
+      data: {
+        summaries: [
+          {
+            entityId: "openai",
+            confirmed: 10,
+            contradicted: 2,
+            outdated: 1,
+            partial: 0,
+            unverifiable: 3,
+            unchecked: 5,
+            totalVerdicts: 21,
+            avgConfidence: 0.85,
+            totalRecords: 30,
+          },
+        ],
+      },
+    } as never);
+
+    const element = await EntitiesContent();
     expect(element).toBeTruthy();
   });
 });

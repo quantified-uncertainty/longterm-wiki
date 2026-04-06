@@ -734,6 +734,21 @@ export default async function OrgProfilePage({
     });
   }
 
+  // Coverage scoring input for the header popover
+  const revFact = getKBLatest(entity.id, "revenue");
+  const valFact = getKBLatest(entity.id, "valuation");
+  const hcFact = getKBLatest(entity.id, "headcount");
+  const fundFact = getKBLatest(entity.id, "total-funding");
+  const coverageInput = {
+    revenueNum: revFact?.value.type === "number" ? revFact.value.value : null,
+    valuationNum: valFact?.value.type === "number" ? valFact.value.value : null,
+    headcount: hcFact?.value.type === "number" ? hcFact.value.value : null,
+    totalFundingNum: fundFact?.value.type === "number" ? fundFact.value.value : null,
+    foundedDate: data.foundedDateStr,
+    peopleCount: data.sortedPersons.length,
+    wikiPageId: entity.wikiPageId,
+  };
+
   const headerData = {
     id: entity.id,
     name: entity.name,
@@ -746,6 +761,7 @@ export default async function OrgProfilePage({
     websiteUrl: data.websiteUrl,
     wikiHref: data.wikiHref,
     founders: data.founders,
+    coverageInput,
   };
 
   return (

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
+import { CoveragePopover } from "@/components/coverage/CoveragePopover";
+import { computeOrgCoverage, getOrgSignals, type OrgCoverageInput } from "@/components/coverage/coverage-score";
 import {
   formatKBDate,
   shortDomain,
@@ -32,6 +34,8 @@ export interface OrgHeaderData {
   websiteUrl: string | null;
   wikiHref: string | null;
   founders: AuthorRef[];
+  /** Pre-computed coverage scoring input for the popover */
+  coverageInput?: OrgCoverageInput;
 }
 
 export function OrgProfileHeader({
@@ -103,6 +107,13 @@ export function OrgProfileHeader({
                   {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
                 </span>
               )}
+            {data.coverageInput && (
+              <CoveragePopover
+                score={computeOrgCoverage(data.coverageInput)}
+                signals={getOrgSignals(data.coverageInput)}
+                size="md"
+              />
+            )}
           </div>
           {data.aliases && data.aliases.length > 0 && (
             <p className="text-xs text-muted-foreground/70 mb-0.5">
