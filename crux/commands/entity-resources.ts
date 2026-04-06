@@ -80,8 +80,10 @@ function loadPageResources(): Record<string, string[]> {
 
 async function seedFromPublisher(
   options: SeedOptions,
-): Promise<{ items: EntityResourceSyncItem[] }> {
+): Promise<{ items: EntityResourceSyncItem[]; skipped: number }> {
+  const slugToStableId = loadSlugToStableId();
   const items: EntityResourceSyncItem[] = [];
+  let skipped = 0;
   const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
   let offset = 0;
   let fetched = 0;
@@ -102,11 +104,22 @@ async function seedFromPublisher(
       if (fetched >= maxResources) break;
       fetched++;
 
-      const pubEntityId = r.publisherEntityId;
-      if (!pubEntityId) continue;
+      const pubEntitySlug = r.publisherEntityId;
+      if (!pubEntitySlug) continue;
+
+      // publisher_entity_id stores the entity slug, but the FK targets
+      // entities.stable_id. Resolve slug → stableId before syncing.
+      const stableId = slugToStableId.get(pubEntitySlug);
+      if (!stableId) {
+        skipped++;
+        if (options.verbose) {
+          console.log(`  skip: no stableId for slug "${pubEntitySlug}"`);
+        }
+        continue;
+      }
 
       items.push({
-        entityId: pubEntityId,
+        entityId: stableId,
         resourceId: r.id,
         authoredByEntity: true,
         isSubject: false,
@@ -115,7 +128,7 @@ async function seedFromPublisher(
 
       if (options.verbose) {
         console.log(
-          `  authored: ${pubEntityId} → ${r.id} (${r.title?.slice(0, 60)})`,
+          `  authored: ${stableId} (${pubEntitySlug}) → ${r.id} (${r.title?.slice(0, 60)})`,
         );
       }
     }
@@ -124,7 +137,7 @@ async function seedFromPublisher(
     if (offset >= total) break;
   }
 
-  return { items };
+  return { items, skipped };
 }
 
 // ---------------------------------------------------------------------------
@@ -208,9 +221,10 @@ async function seedCommand(
   // Pass 1: publisher_entity_id
   if (source === "all" || source === "publisher") {
     console.log("Pass 1: Seeding from publisher_entity_id...");
-    const { items } = await seedFromPublisher(options);
-    console.log(`  Found ${items.length} authored-by relationships`);
+    const { items, skipped } = await seedFromPublisher(options);
+    console.log(`  Found ${items.length} authored-by relationships (${skipped} slugs without stableId)`);
     totalItems += items.length;
+    totalSkipped += skipped;
 
     const synced = await batchSync(items, dryRun);
     totalSynced += synced;
