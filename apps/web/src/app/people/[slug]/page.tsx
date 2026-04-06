@@ -1,8 +1,8 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
-import { computePersonCoverage } from "@/components/coverage/coverage-score";
+import { CoveragePopover } from "@/components/coverage/CoveragePopover";
+import { computePersonCoverage, getPersonSignals } from "@/components/coverage/coverage-score";
 import { resolveSlugAlias, getKBEntitySlug } from "@/data/factbase";
 import { isAnySid } from "@/lib/stable-id";
 import { titleToSlug } from "@/lib/slug-utils";
@@ -416,8 +416,8 @@ export default async function PersonProfilePage({
             <h1 className="text-3xl font-extrabold tracking-tight">
               {entity.name}
             </h1>
-            <CoverageDots
-              score={computePersonCoverage({
+            {(() => {
+              const covInput = {
                 role: roleFact?.value.type === "text" ? roleFact.value.value : null,
                 employerId: employedByFact?.value.type === "ref" ? employedByFact.value.value : null,
                 bornYear: bornYearFact?.value.type === "number" ? bornYearFact.value.value : null,
@@ -426,10 +426,15 @@ export default async function PersonProfilePage({
                 publicationCount: publications.length,
                 careerHistoryCount: careerHistory.length,
                 wikiPageId: entity.wikiPageId,
-              })}
-              size="md"
-              tooltip="Content coverage"
-            />
+              };
+              return (
+                <CoveragePopover
+                  score={computePersonCoverage(covInput)}
+                  signals={getPersonSignals(covInput)}
+                  size="md"
+                />
+              );
+            })()}
           </div>
           {entity.aliases && entity.aliases.length > 0 && (
             <p className="text-sm text-muted-foreground/70 mb-1">

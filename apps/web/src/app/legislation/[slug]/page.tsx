@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
-import { computeLegislationCoverage } from "@/components/coverage/coverage-score";
+import { CoveragePopover } from "@/components/coverage/CoveragePopover";
+import { computeLegislationCoverage, getLegislationSignals } from "@/components/coverage/coverage-score";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
 import { RelatedPages } from "@/components/RelatedPages";
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
@@ -789,8 +789,8 @@ export default async function LegislationDetailPage({
                   {scope}
                 </span>
               )}
-              <CoverageDots
-                score={computeLegislationCoverage({
+              {(() => {
+                const covInput = {
                   introduced,
                   policyStatus: statusKey,
                   author,
@@ -800,10 +800,15 @@ export default async function LegislationDetailPage({
                   description: entity.description,
                   tags: entity.tags,
                   wikiId: entity.stableId,
-                })}
-                size="md"
-                tooltip="Content coverage"
-              />
+                };
+                return (
+                  <CoveragePopover
+                    score={computeLegislationCoverage(covInput)}
+                    signals={getLegislationSignals(covInput)}
+                    size="md"
+                  />
+                );
+              })()}
             </div>
             <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
               {jurisdiction && <span>{jurisdiction}</span>}

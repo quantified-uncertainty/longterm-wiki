@@ -356,3 +356,47 @@ export function computePublicationCoverage(row: PublicationCoverageInput): numbe
   if (signals >= 2) return 2;
   return 1;
 }
+
+// ── Signal extraction (for popover breakdown) ───────────────────────
+
+/** Extract human-readable signal names from an org entity. */
+export function getOrgSignals(row: OrgCoverageInput): string[] {
+  const signals: string[] = [];
+  if (row.revenueNum != null) signals.push("Revenue");
+  if (row.valuationNum != null) signals.push("Valuation");
+  if (row.headcount != null) signals.push("Headcount");
+  if (row.totalFundingNum != null) signals.push("Total funding");
+  if (row.foundedDate) signals.push("Founded date");
+  if (row.peopleCount != null && row.peopleCount >= 3) signals.push(`${row.peopleCount} people tracked`);
+  if (row.wikiPageId) signals.push("Wiki page");
+  return signals;
+}
+
+/** Extract human-readable signal names from a person entity. */
+export function getPersonSignals(row: PersonCoverageInput): string[] {
+  const signals: string[] = [];
+  if (row.role) signals.push("Role");
+  if (row.employerId) signals.push("Employer");
+  if (row.bornYear != null) signals.push("Birth year");
+  if (row.netWorthNum != null) signals.push("Net worth");
+  if ((row.careerHistoryCount ?? 0) >= 2) signals.push(`${row.careerHistoryCount} career entries`);
+  if ((row.positionCount ?? 0) >= 1) signals.push(`${row.positionCount} positions`);
+  if ((row.publicationCount ?? 0) >= 1) signals.push(`${row.publicationCount} publications`);
+  if (row.wikiPageId) signals.push("Wiki page");
+  return signals;
+}
+
+/** Extract human-readable signal names from a legislation entity. */
+export function getLegislationSignals(row: LegislationCoverageInput): string[] {
+  const signals: string[] = [];
+  if (row.introduced) signals.push("Introduced date");
+  if (row.policyStatus) signals.push("Status");
+  if (row.author) signals.push("Author");
+  if (row.jurisdiction) signals.push("Jurisdiction");
+  if (row.billNumber) signals.push("Bill number");
+  if (row.fullTextUrl) signals.push("Full text link");
+  if (row.description) signals.push("Description");
+  if ((row.tags?.length ?? 0) >= 1) signals.push("Tags");
+  if (row.wikiId) signals.push("Wiki page");
+  return signals;
+}

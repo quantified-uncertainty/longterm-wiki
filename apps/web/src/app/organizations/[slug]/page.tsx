@@ -23,8 +23,8 @@ import {
   FactsPanel,
 } from "@/components/directory";
 import { RelatedPages } from "@/components/RelatedPages";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
-import { computeOrgCoverage } from "@/components/coverage/coverage-score";
+import { CoveragePopover } from "@/components/coverage/CoveragePopover";
+import { computeOrgCoverage, getOrgSignals } from "@/components/coverage/coverage-score";
 
 // Shared components & helpers
 import {
@@ -782,8 +782,8 @@ export default async function OrgProfilePage({
                   {ORG_STATUS_LABELS[data.orgStatus] ?? data.orgStatus}
                 </span>
               )}
-              <CoverageDots
-                score={computeOrgCoverage({
+              {(() => {
+                const covInput = {
                   revenueNum: getKBLatest(entity.id, "revenue")?.value.type === "number" ? (getKBLatest(entity.id, "revenue")!.value as { value: number }).value : null,
                   valuationNum: getKBLatest(entity.id, "valuation")?.value.type === "number" ? (getKBLatest(entity.id, "valuation")!.value as { value: number }).value : null,
                   headcount: getKBLatest(entity.id, "headcount")?.value.type === "number" ? (getKBLatest(entity.id, "headcount")!.value as { value: number }).value : null,
@@ -791,10 +791,15 @@ export default async function OrgProfilePage({
                   foundedDate: data.foundedDateStr,
                   peopleCount: data.sortedPersons.length,
                   wikiPageId: entity.wikiPageId,
-                })}
-                size="md"
-                tooltip="Content coverage"
-              />
+                };
+                return (
+                  <CoveragePopover
+                    score={computeOrgCoverage(covInput)}
+                    signals={getOrgSignals(covInput)}
+                    size="md"
+                  />
+                );
+              })()}
             </div>
             {entity.aliases && entity.aliases.length > 0 && (
               <p className="text-xs text-muted-foreground/70 mb-0.5">
