@@ -39,7 +39,11 @@ apps/web/public/search-index.json
 
 # Test results (Playwright / Vitest artifacts)
 test-results/
-coverage/
+/coverage/
+apps/web/coverage/
+apps/wiki-server/coverage/
+apps/discord-bot/coverage/
+crux/coverage/
 
 # Knowledge cache
 .cache/

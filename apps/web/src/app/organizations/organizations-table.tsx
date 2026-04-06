@@ -11,7 +11,9 @@ import type { SortDir } from "@/lib/sort-utils";
 import { toggleSort } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
-import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, computeCompletionScore } from "@/app/organizations/org-constants";
+import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
 
@@ -140,7 +142,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       totalFundingNum: org.totalFundingNum,
       foundedDate: org.foundedDate,
       peopleCount: null, // Not available from API
-      completionScore: computeCompletionScore(org),
+      completionScore: computeOrgCoverage(org),
       searchText: "",
     })),
     total: data.total ?? 0,
@@ -392,7 +394,7 @@ export function OrganizationsTable({
   }, [showColumnPicker]);
   type OptionalColumnKey = "peopleCount" | "completionScore";
   const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
-    { key: "completionScore", label: "Data Completeness" },
+    { key: "completionScore", label: "Coverage" },
     { key: "peopleCount", label: "People Tracked" },
   ];
   const [visibleColumns, setVisibleColumns] = useState<Set<OptionalColumnKey>>(
@@ -583,7 +585,7 @@ export function OrganizationsTable({
                     {/* Completion Score */}
                     {visibleColumns.has("completionScore") && (
                       <td className="py-2.5 px-3 text-center">
-                        <CompletionDots score={row.completionScore} ariaLabel={`Completeness: ${row.completionScore}/4`} />
+                        <CoverageDots score={row.completionScore} label={`Coverage: ${row.completionScore}/4`} />
                       </td>
                     )}
 
@@ -684,21 +686,3 @@ export function OrganizationsTable({
   );
 }
 
-/** Renders 1-4 filled/empty dots for data completeness. */
-function CompletionDots({ score, ariaLabel }: { score: number; ariaLabel: string }) {
-  return (
-    <span className="inline-flex gap-0.5" role="img" aria-label={ariaLabel}>
-      {[1, 2, 3, 4].map((i) => (
-        <span
-          key={i}
-          aria-hidden="true"
-          className={`inline-block w-1.5 h-1.5 rounded-full ${
-            i <= score
-              ? "bg-primary/70"
-              : "bg-muted-foreground/20"
-          }`}
-        />
-      ))}
-    </span>
-  );
-}

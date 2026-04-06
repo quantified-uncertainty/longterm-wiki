@@ -3,6 +3,8 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeProjectCoverage } from "@/components/coverage/coverage-score";
 
 export interface ProjectRow {
   id: string;
@@ -101,6 +103,7 @@ export function ProjectsTable({ rows }: { rows: ProjectRow[] }) {
               <th className="text-left py-2 px-3 font-medium">Description</th>
               <SortHeader label="Organization" sortKey="org" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-left" />
               <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              <th className="text-center py-2 px-3 font-medium">Coverage</th>
               <th className="text-center py-2 px-3 font-medium">Links</th>
             </tr>
           </thead>
@@ -138,6 +141,10 @@ export function ProjectsTable({ rows }: { rows: ProjectRow[] }) {
                       {row.status}
                     </span>
                   )}
+                </td>
+
+                <td className="py-2.5 px-3 text-center">
+                  <CoverageDots score={computeProjectCoverage(row)} />
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">

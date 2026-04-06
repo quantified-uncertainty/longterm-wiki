@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { CLUSTER_COLORS, STATUS_COLORS, formatCluster } from "./research-area-constants";
 
 export interface ResearchAreaRow {
@@ -157,12 +159,13 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
               <SortHeader label="Cluster" sortKey="cluster" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
               <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} />
               <SortHeader label="Since" sortKey="firstProposedYear" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+              <th className="px-3 py-2.5 font-medium text-center">Coverage</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-3 py-12 text-center text-muted-foreground">
+                <td colSpan={5} className="px-3 py-12 text-center text-muted-foreground">
                   No research areas match your filters.
                 </td>
               </tr>
@@ -205,6 +208,9 @@ export function ResearchAreasTable({ rows }: { rows: ResearchAreaRow[] }) {
                 </td>
                 <td className="px-3 py-2.5 text-right tabular-nums text-muted-foreground">
                   {row.firstProposedYear ?? "-"}
+                </td>
+                <td className="px-3 py-2.5 text-center">
+                  <CoverageDots score={computeGenericCoverage({ description: row.description, wikiId: row.wikiId, filledFieldCount: (row.cluster ? 1 : 0) + (row.firstProposedYear != null ? 1 : 0) })} />
                 </td>
               </tr>
             ))}
