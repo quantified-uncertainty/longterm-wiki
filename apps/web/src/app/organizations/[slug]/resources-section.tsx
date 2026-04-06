@@ -28,9 +28,7 @@ import { ResourceList } from "@/components/resources/ResourceList";
 import { RESOURCE_TYPE_COLORS, STANCE_COLORS } from "@/components/resources/resource-constants";
 import { stripMarkdownFormatting } from "@/lib/inline-markdown";
 import { isDeadFetchStatus } from "@wiki-server/api-types";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 const TYPE_COLORS = RESOURCE_TYPE_COLORS;
@@ -67,22 +65,6 @@ function makeColumns(opts: {
   verdicts: Record<string, string | null>;
 }): ColumnDef<OrgResourceRow>[] {
   const cols: ColumnDef<OrgResourceRow>[] = [
-    {
-      id: "sourceCheck",
-      header: "",
-      cell: ({ row }) => {
-        const verdict = opts.verdicts[row.original.id] ?? null;
-        return (
-          <SourceCheckDot
-            status={recordVerdictToStatus(verdict)}
-            originalVerdict={verdict}
-            size="md"
-            href={verdict ? `/source-checks/resource/${encodeURIComponent(row.original.id)}` : undefined}
-          />
-        );
-      },
-      enableSorting: false,
-    },
     {
       accessorKey: "title",
       header: ({ column }) => (
@@ -294,9 +276,15 @@ function makeColumns(opts: {
           description: r.summary,
           filledFieldCount,
         });
+        const verdict = opts.verdicts[r.id] ?? null;
         return (
           <div className="flex justify-end">
-            <CoverageDots score={score} size="sm" />
+            <RecordStatusDots
+              coverageScore={score}
+              verdict={verdict}
+              sourceCheckHref={verdict ? `/source-checks/resource/${encodeURIComponent(r.id)}` : undefined}
+              size="md"
+            />
           </div>
         );
       },
