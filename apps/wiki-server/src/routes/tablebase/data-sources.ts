@@ -199,45 +199,34 @@ const dataSourcesApp = new Hono()
     // Wrapped in a transaction so we don't get orphaned resource rows.
     const url = body.fetchUrl ?? `urn:lw:tabular-source:${body.id}`;
     const resId = hashId(url);
+    let actualResId = resId;
 
     try {
       await db.transaction(async (tx) => {
-        // Upsert resource row. Check for existing URL first to avoid
-        // unique violation on idx_res_url when id differs (e.g., resource
-        // was created by resource-ingest with a different ID scheme).
-        const [existingByUrl] = await tx
-          .select({ id: resources.id })
-          .from(resources)
-          .where(eq(resources.url, url));
-
-        const actualResId = existingByUrl?.id ?? resId;
-
-        if (existingByUrl) {
-          // Resource already exists at this URL — update it
-          await tx
-            .update(resources)
-            .set({
+        // Upsert resource row. ON CONFLICT on URL handles the case where
+        // a resource was created by resource-ingest with a different ID scheme.
+        const [upsertedResource] = await tx
+          .insert(resources)
+          .values({
+            id: resId,
+            url,
+            title: body.name,
+            type: "dataset",
+            resourceSubtype: "tabular_source",
+            publisherEntityId: body.publisherEntityId ?? null,
+          })
+          .onConflictDoUpdate({
+            target: resources.url,
+            set: {
               title: body.name,
-              type: "dataset",
               resourceSubtype: "tabular_source",
               publisherEntityId: body.publisherEntityId ?? null,
               updatedAt: new Date(),
-            })
-            .where(eq(resources.id, actualResId));
-        } else {
-          // New resource — insert
-          await tx
-            .insert(resources)
-            .values({
-              id: resId,
-              url,
-              title: body.name,
-              type: "dataset",
-              resourceSubtype: "tabular_source",
-              publisherEntityId: body.publisherEntityId ?? null,
-            })
-            .onConflictDoNothing();
-        }
+            },
+          })
+          .returning({ id: resources.id });
+
+        actualResId = upsertedResource.id;
 
         // Upsert resource_tabular_sources. Conflict on sourceSlug (not resourceId)
         // so that changing a source's URL correctly updates the resourceId.
@@ -272,7 +261,8 @@ const dataSourcesApp = new Hono()
           });
       });
     } catch (e: unknown) {
-      // Best-effort: don't fail the sync if new table writes fail
+      // Best-effort: don't fail the sync if new table writes fail.
+      // actualResId falls back to the computed hash.
       logger.warn({
         error: e instanceof Error ? e.message : String(e),
         slug: body.id,
@@ -280,7 +270,7 @@ const dataSourcesApp = new Hono()
       }, "Failed to dual-write to resource_tabular_sources");
     }
 
-    return c.json({ ok: true, id: body.id, resourceId: resId });
+    return c.json({ ok: true, id: body.id, resourceId: actualResId });
   })
 
   // GET /:id/snapshots — list snapshots (paginated, most recent first)
