@@ -1,4 +1,4 @@
-import { getTypedEntities, getEntityHref, getPageById, getPageCoverageItems, getPageRankings, getIdRegistry } from "@/data";
+import { getTypedEntities, getEntityHref, getPageById, getPageCoverageItems, getPageRankings, getIdRegistry, getEntityResourceLinks } from "@/data";
 import { getEntityDataDepth } from "@/data/entity-coverage";
 import { fetchDetailed, type RpcEntitySummaryRow } from "@lib/wiki-server";
 import { EntitiesDataTable } from "./entities-data-table";
@@ -80,6 +80,8 @@ export async function EntitiesContent() {
     const rank = rankingById.get(e.id);
     const href = getEntityHref(e.id);
     const sc = scSummary.get(e.id);
+    const erLinks = e.stableId ? getEntityResourceLinks(e.stableId) : null;
+    const resourceLinkCount = erLinks ? erLinks.authored.length + erLinks.subject.length : 0;
 
     const quality = cov?.quality ?? rank?.quality ?? null;
     const readerImportance = cov?.readerImportance ?? rank?.readerImportance ?? null;
@@ -190,9 +192,11 @@ export async function EntitiesContent() {
       scAvgConfidence: sc?.avgConfidence ?? null,
       scAccuracyRate,
       scVerificationCoverage,
+      resourceLinkCount,
     };
   });
 
+  const withResourceLinks = rows.filter((r) => r.resourceLinkCount > 0).length;
   const withPages = rows.filter((r) => r.hasPage).length;
   const withImportance = rows.filter((r) => r.readerImportance != null).length;
   const withCoverage = rows.filter((r) => r.coverageScore != null).length;
@@ -209,7 +213,9 @@ export async function EntitiesContent() {
         <span className="font-medium text-foreground">{withCoverage}</span>{" "}
         have coverage data,{" "}
         <span className="font-medium text-foreground">{withVerification}</span>{" "}
-        have source-check verdicts. Use <strong>preset buttons</strong> to switch views.
+        have source-check verdicts,{" "}
+        <span className="font-medium text-foreground">{withResourceLinks}</span>{" "}
+        have resource links. Use <strong>preset buttons</strong> to switch views.
         The <strong>Verification</strong> preset shows source-check accuracy and coverage.
       </p>
       <EntitiesDataTable entities={rows} />

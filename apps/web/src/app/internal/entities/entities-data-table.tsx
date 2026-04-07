@@ -113,6 +113,8 @@ export interface UnifiedEntityRow {
   scAvgConfidence: number | null;
   scAccuracyRate: number | null;
   scVerificationCoverage: number | null;
+  // Entity-resource links
+  resourceLinkCount: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -1030,6 +1032,17 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
           <span className={`text-[11px] tabular-nums font-medium ${color}`}>{pct}%</span>
         </div>
       );
+    },
+  },
+  // ── Entity-resource links ──
+  {
+    accessorKey: "resourceLinkCount",
+    sortUndefined: "last",
+    header: ({ column }) => <SortableHeader column={column} title="Entity-resource links (authored + subject)">Links</SortableHeader>,
+    cell: ({ row }) => {
+      const v = row.original.resourceLinkCount;
+      if (!v) return <Dash />;
+      return <span className="text-[11px] tabular-nums font-medium">{v}</span>;
     },
   },
 ];
