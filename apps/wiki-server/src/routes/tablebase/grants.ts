@@ -6,6 +6,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
+import { resolveSourceResourceIds } from "../shared/resolve-source-resource.js";
 import {
   verdictJoinCondition,
   verdictSelectFields,
@@ -70,6 +71,7 @@ const SyncGrantItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   status: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
+  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
   dataSourceId: z.string().max(100).nullable().optional(),
@@ -145,6 +147,7 @@ function formatRow(r: JoinedRow) {
     date: g.date,
     status: g.status,
     source: g.source,
+    sourceResourceId: g.sourceResourceId,
     notes: g.notes,
     programId: g.programId,
     dataSourceId: g.dataSourceId,
@@ -636,6 +639,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
+      // Auto-resolve sourceResourceId from source URL when not explicitly provided
+      const urlsToResolve = items
+        .filter((i) => i.source && !i.sourceResourceId)
+        .map((i) => i.source!);
+      const resolvedResourceIds = urlsToResolve.length > 0
+        ? await resolveSourceResourceIds(tx, urlsToResolve)
+        : new Map<string, string>();
+
       const allVals = items.map((item) => ({
         id: item.id,
         organizationId: item.organizationId,
@@ -647,6 +658,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         date: item.date ?? null,
         status: item.status ?? null,
         source: item.source ?? null,
+        sourceResourceId: item.sourceResourceId ?? (item.source ? resolvedResourceIds.get(item.source) ?? null : null),
         notes: item.notes ?? null,
         programId: item.programId ?? null,
         dataSourceId: item.dataSourceId ?? null,
@@ -675,6 +687,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             date: sql`excluded.date`,
             status: sql`excluded.status`,
             source: sql`excluded.source`,
+            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             programId: sql`excluded.program_id`,
             dataSourceId: sql`excluded.data_source_id`,

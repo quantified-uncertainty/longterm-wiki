@@ -71,6 +71,7 @@ const SyncPersonnelItemSchema = z.object({
   appointedBy: z.string().max(500).nullable().optional(),
   background: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
+  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
@@ -132,6 +133,7 @@ function formatRow(r: JoinedRow) {
     appointedBy: p.appointedBy,
     background: p.background,
     source: p.source,
+    sourceResourceId: p.sourceResourceId,
     notes: p.notes,
     // Structured entity refs
     person: personRef,
@@ -409,6 +411,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         appointedBy: item.appointedBy ?? null,
         background: item.background ?? null,
         source: item.source ?? null,
+        sourceResourceId: item.sourceResourceId ?? null,
         notes: item.notes ?? null,
       }));
 
@@ -436,6 +439,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             appointedBy: sql`excluded.appointed_by`,
             background: sql`excluded.background`,
             source: sql`excluded.source`,
+            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
