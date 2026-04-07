@@ -40,6 +40,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const searchQuery = getParam(sp, "q") ?? "";
   const filterType = getParam(sp, "type") ?? "";
+  const filterSourceTable = getParam(sp, "source_table") ?? "";
 
   // Parse page (useDirectoryUrl stores as 1-indexed in URL)
   const pageNum = Math.max(1, parseInt(getParam(sp, "page") ?? "1", 10) || 1);
@@ -65,6 +66,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
       offset: String(offset),
     });
     if (filterType) params.set("thing_type", filterType);
+    if (filterSourceTable) params.set("source_table", filterSourceTable);
     listUrl = `/api/things?${params.toString()}`;
   }
 
@@ -94,7 +96,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
 
   const stats: ThingsStatsResponse = statsResult.ok
     ? statsResult.data
-    : { total, byType: {}, byEntityType: {} };
+    : { total, byType: {}, byEntityType: {}, bySourceTable: {} };
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Top types for stat cards (top 3 by count)

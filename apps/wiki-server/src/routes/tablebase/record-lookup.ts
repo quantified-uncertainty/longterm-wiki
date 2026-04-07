@@ -29,6 +29,9 @@ import {
   entityEvents,
   entityAssessments,
   researchAreaOrganizations,
+  resources,
+  researchAreas,
+  facts,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { notFoundError, validationError } from "../shared/utils.js";
@@ -59,6 +62,10 @@ const VALID_SOURCE_TABLES = [
   "entity_events",
   "entity_assessments",
   "research_area_organizations",
+  "resources",
+  "research_areas",
+  "facts",
+  "entities",
 ] as const;
 
 type SourceTableName = (typeof VALID_SOURCE_TABLES)[number];
@@ -79,6 +86,10 @@ const TABLE_MAP: Record<SourceTableName, PgTable> = {
   entity_events: entityEvents,
   entity_assessments: entityAssessments,
   research_area_organizations: researchAreaOrganizations,
+  resources,
+  research_areas: researchAreas,
+  facts,
+  entities,
 };
 
 const sourceTableSchema = z.enum(VALID_SOURCE_TABLES);
@@ -121,6 +132,36 @@ const recordLookupApp = new Hono()
               eq(researchAreaOrganizations.organizationId, parts[1])
             )
           )
+          .limit(1);
+      } else if (sourceTable === "facts") {
+        // Composite key: sourceId is "encodeURIComponent(entityId):encodeURIComponent(factId)"
+        const colonIdx = sourceId.indexOf(":");
+        if (colonIdx === -1) {
+          return validationError(
+            c,
+            `facts requires sourceId in "entityId:factId" format, got: ${sourceId.slice(0, 100)}`
+          );
+        }
+        let entityId: string;
+        let factId: string;
+        try {
+          entityId = decodeURIComponent(sourceId.slice(0, colonIdx));
+          factId = decodeURIComponent(sourceId.slice(colonIdx + 1));
+        } catch {
+          return validationError(c, `Malformed percent-encoding in facts sourceId: ${sourceId.slice(0, 100)}`);
+        }
+        rows = await db
+          .select()
+          .from(facts)
+          .where(and(eq(facts.entityId, entityId), eq(facts.factId, factId)))
+          .limit(1);
+      } else if (sourceTable === "entities") {
+        // entities.id is the slug column (not the PK which is stableId);
+        // things.sourceId stores the slug, so look up by entities.id.
+        rows = await db
+          .select()
+          .from(entities)
+          .where(eq(entities.id, sourceId))
           .limit(1);
       } else {
         const table = TABLE_MAP[sourceTable];

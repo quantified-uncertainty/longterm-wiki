@@ -59,7 +59,7 @@ export function ThingsTable({
 }: ThingsTableProps) {
   const url = useDirectoryUrl({
     defaultSort: { field: "updated_at", dir: "desc" },
-    filters: ["type"],
+    filters: ["type", "source_table"],
   });
 
   // Sort is ignored by the search API (results ranked by relevance),
@@ -88,9 +88,14 @@ export function ThingsTable({
   const typeEntries = Object.entries(stats.byType)
     .sort(([, a], [, b]) => b - a);
 
+  // Source table dropdown options
+  const sourceTableFilter = url.filters.source_table ?? "all";
+  const sourceTableEntries = Object.entries(stats.bySourceTable)
+    .sort(([, a], [, b]) => b - a);
+
   return (
     <div>
-      {/* Search input */}
+      {/* Search input + source table filter */}
       <div className="flex items-center gap-3 mb-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/50" />
@@ -103,6 +108,22 @@ export function ThingsTable({
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
           />
         </div>
+        {sourceTableEntries.length > 0 && (
+          <select
+            value={isSearchActive ? "all" : sourceTableFilter}
+            onChange={(e) => url.setFilter("source_table", e.target.value)}
+            disabled={isSearchActive}
+            aria-label="Filter by source table"
+            className="text-sm rounded-lg border border-border bg-card px-2 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <option value="all">All tables ({stats.total})</option>
+            {sourceTableEntries.map(([table, count]) => (
+              <option key={table} value={table}>
+                {formatType(table)} ({count})
+              </option>
+            ))}
+          </select>
+        )}
         <span className="text-sm text-muted-foreground whitespace-nowrap tabular-nums">
           {total.toLocaleString()} results
         </span>
