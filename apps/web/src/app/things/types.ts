@@ -19,6 +19,7 @@ export interface ThingsStatsResponse {
   total: number;
   byType: Record<string, number>;
   byEntityType: Record<string, number>;
+  bySourceTable: Record<string, number>;
 }
 
 /** Format a thingType value as a readable label (e.g. "funding-program" → "Funding Program"). */
