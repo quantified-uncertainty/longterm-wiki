@@ -270,9 +270,15 @@ export async function collectRecordItems(
         const data = response.data;
         const rawItems = (
           data.items ?? data.grants ?? data.personnel ?? data.divisions ??
-          data.programs ?? data.rounds ?? data.investments ?? data.positions ??
-          data.stakeholders ?? data.publications ?? data.benchmarkResults ??
-          data.events ?? data.assessments ?? data.prices ??
+          data.programs ?? data.fundingPrograms ??
+          data.rounds ?? data.fundingRounds ??
+          data.investments ??
+          data.positions ?? data.equityPositions ??
+          data.stakeholders ?? data.policyStakeholders ??
+          data.publications ?? data.benchmarkResults ??
+          data.events ?? data.entityEvents ??
+          data.assessments ?? data.entityAssessments ??
+          data.prices ?? data.secondaryMarketPrices ??
           (Array.isArray(data) ? data : [])
         ) as Record<string, unknown>[];
 
