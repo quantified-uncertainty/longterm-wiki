@@ -7,9 +7,12 @@ export interface ThingRow {
   sourceId: string;
   entityType: string | null;
   description: string | null;
+  sourceUrl: string | null;
+  wikiId: string | null;
   href: string | null;
   parentTitle: string | null;
   updatedAt: string | null;
+  verdict: string | null;
 }
 
 export interface ThingsStatsResponse {
