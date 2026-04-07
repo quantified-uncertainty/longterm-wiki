@@ -683,11 +683,11 @@ function ProfileSection({
                         if (section.recordType === "fact") {
                           const entityId = row.entityId ?? row.entity_id;
                           const factId = row.factId ?? row.fact_id;
-                          if (entityId && factId) {
-                            linkId = `${encodeURIComponent(String(entityId))}:${encodeURIComponent(String(factId))}`;
-                          }
+                          linkId = entityId && factId
+                            ? `${encodeURIComponent(String(entityId))}:${encodeURIComponent(String(factId))}`
+                            : "";
                         }
-                        href = `/things/${linkId}`;
+                        href = linkId ? `/things/${linkId}` : null;
                       }
                       return href ? (
                         <td className="px-2 py-2 align-top">
@@ -1351,3 +1351,4 @@ export function EntityProfileViewer({
     </div>
   );
 }
+
