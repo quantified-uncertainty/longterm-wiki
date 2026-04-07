@@ -290,7 +290,10 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
 
   // Update caches so subsequent resolve/validate calls find this entity
   _entityMatcher = null; // Force re-build on next resolve
-  if (_knownStableIds) _knownStableIds.add(stableId); // Avoid stale-cache rejection in submit_records
+  // Eagerly initialize the stableId set so newly created entities are recognized
+  // by submit_records validation. Without this, batch-creating entities before
+  // the first submit_records leaves them missing from the set (it was null).
+  getKnownStableIds().add(stableId);
 
   return JSON.stringify({
     created: true,
@@ -418,7 +421,10 @@ async function handleSubmitRecords(
       if (isSid(val)) {
         const raw = stripSid(val);
         if (stableIdSet.has(raw) || stableIdSet.has(val)) {
-          record[field] = raw;
+          // Keep the sid_ prefix — entities.stable_id stores the prefixed form,
+          // and validateEntityRefs checks against it. Stripping causes lookup misses
+          // for newly created entities (see: Arcadia Impact enrichment failure 2026-04-07).
+          record[field] = val;
           continue;
         }
         invalidRefs.push(`${field}="${val}" — sid_-prefixed but ID not found in database. Use resolve_entity to get a valid ID.`);
