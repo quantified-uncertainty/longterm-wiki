@@ -7,7 +7,7 @@ import type { CommandResult } from '../command-types.ts';
 import { loadDatabase, loadPages } from '../content-types.ts';
 import { loadGraphFull } from '../factbase-loader.ts';
 import { createLlmClient } from '../llm.ts';
-import { submitBatch, pollBatch, getBatchResults, extractBatchResultText } from '../anthropic-batch.ts';
+import { submitBatch, pollBatch, getBatchResults, extractBatchResultText, sanitizeBatchCustomId } from '../anthropic-batch.ts';
 import type { BatchRequest } from '../anthropic-batch.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import { SOURCE_CHECK_CONSTANTS, LlmResponseSchema, validateVerdict } from './index.ts';
@@ -359,7 +359,7 @@ async function runBatchExecution(
         break;
     }
 
-    const customId = `verify-${item.id}`;
+    const customId = sanitizeBatchCustomId(`verify-${item.id}`);
     preparedSlots[index] = {
       request: {
         customId,

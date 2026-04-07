@@ -28,6 +28,7 @@ import { logAuditEntries } from "./audit-log.js";
 import { InlineVerificationSchema } from "./verification-schema.js";
 import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { enforceVerification } from "../shared/verification-enforcement.js";
 import { sqlInList } from "../shared/query-helpers.js";
 
 // ---- Constants ----
@@ -355,19 +356,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 5 (Discussion #3875): Hard enforcement — require inline verification
-    // on every record when ?requireVerification=true is set. Agent sessions
-    // targeting hard-enforced tables must include verification data.
-    if (c.req.query("requireVerification") === "true") {
-      const unverified = items.filter((i) => !i.verification);
-      if (unverified.length > 0) {
-        return validationError(
-          c,
-          `requireVerification=true but ${unverified.length}/${items.length} records lack verification. ` +
-          `Run \`pnpm crux tb verify personnel\` before submitting, or remove ?requireVerification=true.`,
-        );
-      }
-    }
+    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
+    // config and client ?requireVerification=true param. See verification-enforcement.ts.
+    const verificationError = enforceVerification(c, "personnel", items);
+    if (verificationError) return verificationError;
 
     // Check for natural key collisions within the batch itself.
     // Natural key: (personId, organizationId, role, roleType)

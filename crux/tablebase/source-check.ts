@@ -17,7 +17,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { createLlmClient, MODELS } from '../lib/llm.ts';
-import { submitBatch, pollBatch, getBatchResults, extractBatchResultText } from '../lib/anthropic-batch.ts';
+import { submitBatch, pollBatch, getBatchResults, extractBatchResultText, sanitizeBatchCustomId } from '../lib/anthropic-batch.ts';
 import type { BatchRequest } from '../lib/anthropic-batch.ts';
 import { getTableConfig } from './table-registry.ts';
 import { calculateCost } from '../lib/pricing.ts';
@@ -499,17 +499,22 @@ export async function runBatchVerification(
   // Build name map once for the entire batch
   const nameMap = buildStableIdNameMap();
 
-  // Build batch requests
-  const batchRequests: BatchRequest[] = records.map((rec) => ({
-    customId: `verify-${table}-${rec.id}`,
-    params: {
-      model,
-      max_tokens: 1024,
-      messages: [
-        { role: 'user' as const, content: buildVerificationPrompt(table, rec, nameMap) },
-      ],
-    },
-  }));
+  // Build batch requests + customId→recordId map (sanitization may mangle IDs)
+  const customIdToRecordId = new Map<string, string>();
+  const batchRequests: BatchRequest[] = records.map((rec) => {
+    const customId = sanitizeBatchCustomId(`verify-${table}-${rec.id}`);
+    customIdToRecordId.set(customId, String(rec.id));
+    return {
+      customId,
+      params: {
+        model,
+        max_tokens: 1024,
+        messages: [
+          { role: 'user' as const, content: buildVerificationPrompt(table, rec, nameMap) },
+        ],
+      },
+    };
+  });
 
   if (batchRequests.length === 0) {
     return { issues: [], cost: 0 };
@@ -522,7 +527,7 @@ export async function runBatchVerification(
   // Parse results
   let totalCost = 0;
   for (const [customId, result] of results) {
-    const recordId = customId.replace(`verify-${table}-`, '');
+    const recordId = customIdToRecordId.get(customId) ?? customId;
     const text = extractBatchResultText(result);
 
     if (result.result.type === 'succeeded') {
