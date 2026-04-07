@@ -7,6 +7,8 @@ import { useDirectoryUrl } from "@/hooks/use-directory-url";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { FilterChips } from "@/components/directory/FilterChips";
 import { PaginationControls } from "@/components/directory/PaginationControls";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
+import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { formatType } from "./types";
 import type { ThingRow, ThingsStatsResponse } from "./types";
 
@@ -131,6 +133,7 @@ export function ThingsTable({
                   <th className="py-2.5 px-3 text-left font-medium">Title</th>
                   <th className="py-2.5 px-3 text-left font-medium w-48">Parent</th>
                   <th className="py-2.5 px-3 text-left font-medium w-32">Updated</th>
+                  <th className="py-2.5 px-2 w-12" />
                 </>
               ) : (
                 <>
@@ -159,6 +162,7 @@ export function ThingsTable({
                     onSort={handleSort}
                     className="text-left w-32"
                   />
+                  <th className="py-2.5 px-2 w-12" />
                 </>
               )}
             </tr>
@@ -210,6 +214,25 @@ export function ThingsTable({
                 </td>
                 <td className="py-2.5 px-3 text-muted-foreground text-xs tabular-nums">
                   {formatDate(row.updatedAt)}
+                </td>
+                <td className="py-2.5 px-2 text-right">
+                  <RecordStatusDots
+                    coverageScore={computeGenericCoverage({
+                      description: row.description,
+                      wikiId: row.wikiId,
+                      filledFieldCount:
+                        (row.sourceUrl ? 1 : 0) +
+                        (row.entityType ? 1 : 0) +
+                        (row.parentThingId ? 1 : 0),
+                    })}
+                    verdict={row.verdict}
+                    sourceCheckHref={
+                      row.verdict
+                        ? `/source-checks/${encodeURIComponent(row.sourceTable)}/${encodeURIComponent(row.sourceId)}`
+                        : undefined
+                    }
+                    size="sm"
+                  />
                 </td>
               </tr>
             ))}

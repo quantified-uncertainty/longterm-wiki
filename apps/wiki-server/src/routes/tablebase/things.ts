@@ -12,7 +12,7 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, VALID_THING_TYPES } from "../../schema.js";
+import { things, sourceCheckVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -79,11 +79,35 @@ interface ThingSearchRow {
   updated_at: string;
   synced_at: string | null;
   similarity: number;
+  verdict: string | null;
 }
 
 // ---- Helpers ----
 
-function formatThing(t: typeof things.$inferSelect) {
+/** Verdict select fields for the joined query. */
+const verdictFields = {
+  verdict: sourceCheckVerdicts.verdict,
+};
+
+/**
+ * Build the LEFT JOIN condition for source_check_verdicts on the things table.
+ *
+ * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
+ * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
+ * "funding-round"). We normalize sourceTable: replace '_' with '-', strip
+ * trailing 's'. This produces exactly the recordType that verdictJoinCondition
+ * uses (singular, hyphenated), ensuring at most one verdict match per thing.
+ */
+const verdictJoinOnThings = and(
+  sql`${sourceCheckVerdicts.recordType} = regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')`,
+  eq(sourceCheckVerdicts.recordId, things.sourceId),
+  sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+);
+
+function formatThing(
+  t: typeof things.$inferSelect,
+  v?: { verdict: string | null },
+) {
   return {
     id: t.id,
     thingType: t.thingType,
@@ -100,6 +124,7 @@ function formatThing(t: typeof things.$inferSelect) {
     createdAt: t.createdAt,
     updatedAt: t.updatedAt,
     syncedAt: t.syncedAt,
+    verdict: v?.verdict ?? null,
   };
 }
 
@@ -146,8 +171,9 @@ const thingsApp = new Hono()
     const ftsWhere = and(...conditions);
 
     const rows = await db
-      .select()
+      .select({ thing: things, ...verdictFields })
       .from(things)
+      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
       .where(ftsWhere)
       .orderBy(
         prefixQuery
@@ -174,8 +200,9 @@ const thingsApp = new Hono()
       const ilikeWhere = and(...ilikeConditions);
 
       const fallbackRows = await db
-        .select()
+        .select({ thing: things, ...verdictFields })
         .from(things)
+        .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
         .where(ilikeWhere)
         .orderBy(things.title)
         .limit(limit)
@@ -188,7 +215,7 @@ const thingsApp = new Hono()
           .where(ilikeWhere);
 
         return c.json({
-          results: fallbackRows.map(formatThing),
+          results: fallbackRows.map((r) => formatThing(r.thing, r)),
           query: q,
           total: countResult[0].count,
           searchMethod: "ilike" as const,
@@ -202,9 +229,9 @@ const thingsApp = new Hono()
     // too many low-quality trigram matches).
     if (rows.length < TRIGRAM_FALLBACK_THRESHOLD && q.trim().length >= 2) {
       const rawDb = getDb();
-      const existingIds = rows.map((r) => r.id);
+      const existingIds = rows.map((r) => r.thing.id);
       const thingTypeFilter = thing_type
-        ? `AND thing_type = $4`
+        ? `AND t.thing_type = $4`
         : "";
       const params: (string | number | string[])[] = [
         q,
@@ -217,15 +244,20 @@ const thingsApp = new Hono()
 
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
-          id, thing_type, title, parent_thing_id, source_table, source_id,
-          entity_type, description, source_url, wiki_id, parent_title,
-          created_at, updated_at, synced_at,
-          similarity(title, $1) AS similarity
-        FROM things
-        WHERE similarity(title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
-          AND id NOT IN (SELECT unnest($3::text[]))
+          t.id, t.thing_type, t.title, t.parent_thing_id, t.source_table, t.source_id,
+          t.entity_type, t.description, t.source_url, t.wiki_id, t.parent_title,
+          t.created_at, t.updated_at, t.synced_at,
+          similarity(t.title, $1) AS similarity,
+          scv.verdict
+        FROM things t
+        LEFT JOIN source_check_verdicts scv
+          ON scv.record_type = regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          AND scv.record_id = t.source_id
+          AND scv.field_name IS NULL
+        WHERE similarity(t.title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
+          AND t.id NOT IN (SELECT unnest($3::text[]))
           ${thingTypeFilter}
-        ORDER BY similarity(title, $1) DESC
+        ORDER BY similarity(t.title, $1) DESC
         LIMIT $2`,
         params,
       );
@@ -254,10 +286,11 @@ const thingsApp = new Hono()
           createdAt: r.created_at,
           updatedAt: r.updated_at,
           syncedAt: r.synced_at,
+          verdict: r.verdict ?? null,
         }));
 
         const combined = [
-          ...rows.map(formatThing),
+          ...rows.map((r) => formatThing(r.thing, r)),
           ...trigramFormatted,
         ];
 
@@ -285,7 +318,7 @@ const thingsApp = new Hono()
       .where(ftsWhere);
 
     return c.json({
-      results: rows.map(formatThing),
+      results: rows.map((r) => formatThing(r.thing, r)),
       query: q,
       total: rows.length > 0 ? ftsCountResult[0].count : 0,
       searchMethod: rows.length > 0 ? ("fts" as const) : ("none" as const),
@@ -364,8 +397,9 @@ const thingsApp = new Hono()
     const orderFn = order === "desc" ? desc(sortCol) : asc(sortCol);
 
     const rows = await db
-      .select()
+      .select({ thing: things, ...verdictFields })
       .from(things)
+      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -377,7 +411,7 @@ const thingsApp = new Hono()
       .where(whereClause);
 
     return c.json({
-      things: rows.map(formatThing),
+      things: rows.map((r) => formatThing(r.thing, r)),
       total: countResult[0].count,
       parentId,
     });
@@ -396,8 +430,9 @@ const thingsApp = new Hono()
     // nondeterministic since multiple things can share the same sourceId
     // across different sourceTables.
     const rows = await db
-      .select()
+      .select({ thing: things, ...verdictFields })
       .from(things)
+      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
       .where(eq(things.id, id))
       .limit(1);
 
@@ -408,13 +443,13 @@ const thingsApp = new Hono()
       );
     }
 
-    const thing = rows[0];
+    const row = rows[0];
 
     // Also fetch children count
     const childrenResult = await db
       .select({ count: count() })
       .from(things)
-      .where(eq(things.parentThingId, thing.id));
+      .where(eq(things.parentThingId, row.thing.id));
 
     // Fetch children summary by type
     const childTypeRows = await db
@@ -423,7 +458,7 @@ const thingsApp = new Hono()
         count: count(),
       })
       .from(things)
-      .where(eq(things.parentThingId, thing.id))
+      .where(eq(things.parentThingId, row.thing.id))
       .groupBy(things.thingType);
 
     const childrenByType: Record<string, number> = {};
@@ -432,7 +467,7 @@ const thingsApp = new Hono()
     }
 
     return c.json({
-      ...formatThing(thing),
+      ...formatThing(row.thing, row),
       childrenCount: childrenResult[0].count,
       childrenByType,
     });
@@ -463,8 +498,9 @@ const thingsApp = new Hono()
     const orderFn = order === "desc" ? desc(sortCol) : asc(sortCol);
 
     const rows = await db
-      .select()
+      .select({ thing: things, ...verdictFields })
       .from(things)
+      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -476,7 +512,7 @@ const thingsApp = new Hono()
       .where(whereClause);
 
     return c.json({
-      things: rows.map(formatThing),
+      things: rows.map((r) => formatThing(r.thing, r)),
       total: countResult[0].count,
       limit,
       offset,
