@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 import { getRecordVerdict } from "@data/tablebase";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import { isSid } from "@/lib/stable-id";
 import {

@@ -471,7 +471,7 @@ async function resolveNames(
     const idList = [...ids].join(",");
     try {
       const res = await fetch(
-        `/api/verification-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
+        `/api/source-check-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
       );
       if (!res.ok) {
         // Try to extract partial results even from error responses
@@ -671,7 +671,7 @@ export function EntitySourceChecksViewer() {
     (async () => {
       try {
         // Fetch verdicts and coverage in parallel
-        const coveragePromise = fetch("/api/verification-coverage-proxy")
+        const coveragePromise = fetch("/api/source-check-coverage-proxy")
           .then(async (res) => {
             if (!res.ok) return [];
             const data = await res.json();
@@ -686,7 +686,7 @@ export function EntitySourceChecksViewer() {
         let offset = 0;
         let allVerdicts: VerdictRow[] = [];
         while (true) {
-          const res = await fetch(`/api/entity-verifications-proxy?limit=${PAGE_SIZE}&offset=${offset}`);
+          const res = await fetch(`/api/source-check-verdicts-proxy?limit=${PAGE_SIZE}&offset=${offset}`);
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const data = await res.json();
           const page = data.verdicts ?? [];
@@ -803,7 +803,7 @@ export function EntitySourceChecksViewer() {
     const key = `${recordType}:${recordId}`;
     setDetailCache((prev) => ({ ...prev, [key]: { status: "loading" } }));
     try {
-      const res = await fetch(`/api/verification-detail?recordType=${encodeURIComponent(recordType)}&recordId=${encodeURIComponent(recordId)}`);
+      const res = await fetch(`/api/source-check-detail?recordType=${encodeURIComponent(recordType)}&recordId=${encodeURIComponent(recordId)}`);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setDetailCache((prev) => ({ ...prev, [key]: { status: "loaded", data: json } }));

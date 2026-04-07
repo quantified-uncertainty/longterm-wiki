@@ -1,5 +1,5 @@
 /**
- * Citation Report — summary of citation verification across all pages
+ * Citation Report — summary of citation checking across all pages
  *
  * Usage:
  *   pnpm crux citations report
@@ -81,7 +81,7 @@ async function main() {
         broken: totalBroken,
         unverifiable: totalUnverifiable,
         pagesWithBroken,
-        verificationRate: totalCitations > 0 ? Math.round((totalVerified / totalCitations) * 100) : 0,
+        checkRate: totalCitations > 0 ? Math.round((totalVerified / totalCitations) * 100) : 0,
       },
       pages: brokenOnly ? summaries.filter(s => s.broken > 0) : summaries,
     };
@@ -90,7 +90,7 @@ async function main() {
   }
 
   // Human-readable output
-  console.log(`\n${c.bold}${c.blue}Citation Verification Report${c.reset}\n`);
+  console.log(`\n${c.bold}${c.blue}Citation Source-Check Report${c.reset}\n`);
   console.log(`  Pages archived:    ${c.bold}${pageIds.length}${c.reset}`);
   console.log(`  Total citations:   ${totalCitations}`);
   console.log(`  ${c.green}Verified:${c.reset}          ${totalVerified} (${totalCitations > 0 ? Math.round((totalVerified / totalCitations) * 100) : 0}%)`);

@@ -124,25 +124,11 @@ const dataQualityApp = new Hono()
       const pagesTotalRows = await db.select({ count: count() }).from(wikiPages);
       const pagesTotal = pagesTotalRows[0].count;
 
-      // 9. Entity-resources and sourceResourceId coverage
+      // 9. Entity-resources count
       const entityResourceRows = (await db.execute(
         sql`SELECT COUNT(*)::text AS cnt FROM entity_resources`
       )) as Array<{ cnt: string }>;
       const entityResourcesTotal = parseInt(entityResourceRows[0]?.cnt ?? "0", 10);
-
-      const sourceResourceCoverage: Record<string, { total: number; linked: number }> = {};
-      for (const table of ["personnel", "grants", "funding_rounds", "investments", "equity_positions"] as const) {
-        const totalRows = (await db.execute(
-          sql.raw(`SELECT COUNT(*)::text AS cnt FROM ${table} WHERE source IS NOT NULL AND source != ''`)
-        )) as Array<{ cnt: string }>;
-        const linkedRows = (await db.execute(
-          sql.raw(`SELECT COUNT(*)::text AS cnt FROM ${table} WHERE source_resource_id IS NOT NULL`)
-        )) as Array<{ cnt: string }>;
-        sourceResourceCoverage[table] = {
-          total: parseInt(totalRows[0]?.cnt ?? "0", 10),
-          linked: parseInt(linkedRows[0]?.cnt ?? "0", 10),
-        };
-      }
 
       // 10. Claims pipeline
       const claimsPipelineRows = (await db.execute(
@@ -194,7 +180,6 @@ const dataQualityApp = new Hono()
           pagesTotal,
           extra: {
             entityResourcesTotal,
-            sourceResourceCoverage,
             ...claimsExtra,
           },
         })

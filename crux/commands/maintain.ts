@@ -359,7 +359,7 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
     'potentially-resolved': {
       label: 'Recently Resolved / Referenced',
       color: c.green,
-      desc: 'Recently closed issues or open issues referenced by merged PRs. Listed for awareness / verification.',
+      desc: 'Recently closed issues or open issues referenced by merged PRs. Listed for awareness / check.',
     },
     'stale': {
       label: 'Stale',

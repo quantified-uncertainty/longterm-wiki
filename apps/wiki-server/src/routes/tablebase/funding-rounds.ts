@@ -19,8 +19,8 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
@@ -53,9 +53,8 @@ const SyncFundingRoundItemSchema = z.object({
   leadInvestor: z.string().max(500).nullable().optional(),
   leadInvestorDisplayName: z.string().max(500).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -118,7 +117,6 @@ function formatRow(r: JoinedRow) {
     companyDisplayName: fr.companyDisplayName,
     companyResolvedName: (r.companyTitle ?? fr.companyDisplayName ?? fr.companyId) as string | null,
     source: fr.source,
-    sourceResourceId: fr.sourceResourceId,
     notes: fr.notes,
     syncedAt: fr.syncedAt,
     createdAt: fr.createdAt,
@@ -297,7 +295,6 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           leadInvestorEntityId: rawLI ? (entityStableIdMap.get(rawLI) ?? null) : null,
           leadInvestorDisplayName: item.leadInvestorDisplayName ?? null,
           source: item.source ?? null,
-        sourceResourceId: item.sourceResourceId ?? null,
           notes: item.notes ?? null,
         };
       });
@@ -324,7 +321,6 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             leadInvestorEntityId: sql`COALESCE(excluded.lead_investor_entity_id, ${fundingRounds.leadInvestorEntityId})`,
             leadInvestorDisplayName: sql`COALESCE(excluded.lead_investor_display_name, ${fundingRounds.leadInvestorDisplayName})`,
             source: sql`excluded.source`,
-            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
@@ -365,7 +361,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -373,14 +369,14 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.companyId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("funding-rounds/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("funding-rounds/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

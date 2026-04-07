@@ -25,7 +25,7 @@ export interface DivisionRow {
   href: string | null;
   /** Whether this division has meaningful data (personnel, grants, programs, lead, etc.) */
   hasData: boolean;
-  /** Source-check verification verdict, if available */
+  /** Source-check verdict, if available */
   verdict: RecordVerdict | null;
 }
 

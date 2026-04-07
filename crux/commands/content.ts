@@ -103,7 +103,7 @@ Options:
   --skip-session-log  Skip auto-posting session log to wiki-server after improve --apply
   --skip-citation-gate  Allow --apply even if citation audit fails (default: gate ON) (improve)
   --skip-citation-audit  Skip citation audit phase (improve)
-  --citation-audit-model Override LLM model for citation verification (improve)
+  --citation-audit-model Override LLM model for citation checking (improve)
   --batch=id1,id2     Batch mode: comma-separated page IDs (improve, requires --engine=v2)
   --batch-file=f.txt  Batch mode: file with page IDs (improve, requires --engine=v2)
   --batch-budget=N    Stop batch when cumulative cost exceeds $N (improve)

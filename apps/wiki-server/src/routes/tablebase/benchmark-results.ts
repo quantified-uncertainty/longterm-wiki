@@ -13,8 +13,8 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
@@ -49,7 +49,7 @@ const SyncBenchmarkResultItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -263,7 +263,7 @@ const benchmarkResultsApp = new Hono()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -271,12 +271,12 @@ const benchmarkResultsApp = new Hono()
           recordId: item.id,
           entityId: item.modelId,
           sourceUrl: item.sourceUrl ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
     });
 
-    logVerificationCoverage("benchmark-results/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("benchmark-results/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

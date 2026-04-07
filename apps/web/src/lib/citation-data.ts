@@ -37,13 +37,13 @@ export interface CitationQuote {
   sourceTitle: string | null;
   sourceType: string | null;
   quoteVerified: boolean;
-  verificationScore: number | null;
+  sourceCheckScore: number | null;
   verifiedAt: string | null;
   accuracyVerdict: AccuracyVerdict | null;
   accuracyScore: number | null;
   accuracyIssues: string | null;
   accuracySupportingQuotes: string | null;
-  verificationDifficulty: string | null;
+  sourceCheckDifficulty: string | null;
   accuracyCheckedAt: string | null;
 }
 
@@ -70,7 +70,7 @@ function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
 }
 
 /**
- * Get citation verification data for a specific page.
+ * Get citation source-check data for a specific page.
  *
  * Content pages always read from the build-time citation bundle in
  * database.json — zero runtime API calls. This avoids rate-limit
@@ -102,13 +102,13 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
       sourceTitle: q.sourceTitle as string | null,
       sourceType: q.sourceType as string | null,
       quoteVerified: q.quoteVerified as boolean,
-      verificationScore: q.verificationScore as number | null,
+      sourceCheckScore: q.verificationScore as number | null,
       verifiedAt: q.verifiedAt as string | null,
       accuracyVerdict: toAccuracyVerdict(q.accuracyVerdict as string | null),
       accuracyScore: q.accuracyScore as number | null,
       accuracyIssues: q.accuracyIssues as string | null,
       accuracySupportingQuotes: q.accuracySupportingQuotes as string | null,
-      verificationDifficulty: q.verificationDifficulty as string | null,
+      sourceCheckDifficulty: q.verificationDifficulty as string | null,
       accuracyCheckedAt: q.accuracyCheckedAt as string | null,
     }));
 }
@@ -160,7 +160,7 @@ export async function getSourceCheckVerdicts(
       lastComputedAt: string | null;
     }>;
     total: number;
-  }>(`/api/verifications/verdicts?record_type=citation&limit=200`);
+  }>(`/api/source-checks/verdicts?record_type=citation&limit=200`);
 
   if (!result.ok) return [];
 

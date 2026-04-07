@@ -9,15 +9,15 @@ import type { LoadedKB } from '../factbase-loader.ts';
 import type { Fact, Entity as FBEntity } from '../../../packages/factbase/src/types.ts';
 import { formatFactValue } from '../../../packages/factbase/src/format.ts';
 import { apiRequest } from '../wiki-server/client.ts';
-import { listVerdicts } from '../wiki-server/verifications.ts';
+import { listVerdicts } from '../wiki-server/source-check-client.ts';
 import { VALID_RECORD_TYPES, type RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 import { resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from './record-fields.ts';
 import {
   ENTITY_TYPE_PRIORITY,
   API_PAGE_LIMIT,
   type VerifyItem,
-  type VerifiedFactInfo,
-  type VerifiedRecordInfo,
+  type SourceCheckedFactInfo,
+  type SourceCheckedRecordInfo,
 } from './orchestrator-types.ts';
 import { buildRecordDescription, extractRecordFields } from './record-descriptions.ts';
 import { computeFactPriority, computeRecordPriority } from './priority.ts';
@@ -77,11 +77,11 @@ export async function searchForEntity(entity: Entity): Promise<string[]> {
 // ── Wiki-server stats fetching ───────────────────────────────────────
 
 /**
- * Fetch existing KB verification verdicts to identify already-verified facts.
- * Returns a Map from factId to verification info.
+ * Fetch existing KB source-check verdicts to identify already-checked facts.
+ * Returns a Map from factId to source-check info.
  */
-export async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFactInfo>> {
-  const map = new Map<string, VerifiedFactInfo>();
+export async function fetchExistingKBVerdicts(): Promise<Map<string, SourceCheckedFactInfo>> {
+  const map = new Map<string, SourceCheckedFactInfo>();
 
   try {
     let offset = 0;
@@ -116,11 +116,11 @@ export async function fetchExistingKBVerdicts(): Promise<Map<string, VerifiedFac
 }
 
 /**
- * Fetch existing record verification verdicts.
- * Returns a Map from "recordType:recordId" to verification info.
+ * Fetch existing record source-check verdicts.
+ * Returns a Map from "recordType:recordId" to source-check info.
  */
-export async function fetchExistingRecordVerdicts(): Promise<Map<string, VerifiedRecordInfo>> {
-  const map = new Map<string, VerifiedRecordInfo>();
+export async function fetchExistingRecordVerdicts(): Promise<Map<string, SourceCheckedRecordInfo>> {
+  const map = new Map<string, SourceCheckedRecordInfo>();
 
   try {
     const PAGE_SIZE = 200; // Must not exceed wiki-server MAX_PAGE_SIZE (200)
@@ -158,11 +158,11 @@ export async function fetchExistingRecordVerdicts(): Promise<Map<string, Verifie
 // ── Item collection ──────────────────────────────────────────────────
 
 /**
- * Collect FactBase facts as verification items.
+ * Collect FactBase facts as source-check items.
  */
 export function collectFactItems(
   kb: LoadedKB,
-  existingVerdicts: Map<string, VerifiedFactInfo>,
+  existingVerdicts: Map<string, SourceCheckedFactInfo>,
   pages: PageEntry[],
   entityTypeFilter?: string,
 ): VerifyItem[] {
@@ -210,10 +210,10 @@ export function collectFactItems(
 }
 
 /**
- * Collect structured records as verification items.
+ * Collect structured records as source-check items.
  */
 export async function collectRecordItems(
-  existingVerdicts: Map<string, VerifiedRecordInfo>,
+  existingVerdicts: Map<string, SourceCheckedRecordInfo>,
   entityTypeFilter?: string,
   tableFilter?: string,
 ): Promise<VerifyItem[]> {
@@ -350,7 +350,7 @@ export async function collectRecordItems(
 }
 
 /**
- * Collect entities for web-search-based verification (entities without sources).
+ * Collect entities for web-search-based source-check (entities without sources).
  */
 export function collectEntityItems(
   entities: Entity[],

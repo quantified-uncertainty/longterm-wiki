@@ -1,7 +1,7 @@
 /**
  * Source-Check Recheck Scheduler
  *
- * Queries items due for re-verification (next_check_due <= NOW or needs_recheck = true)
+ * Queries items due for re-check (next_check_due <= NOW or needs_recheck = true)
  * and re-runs the source-check pipeline on them. Prioritizes by verdict severity:
  * contradicted > outdated > partial > unverifiable > confirmed.
  *
@@ -12,7 +12,7 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { storeVerdict as storeVerdictRpc, getDueForRecheck, getEvidenceByRecord } from '../lib/wiki-server/verifications.ts';
+import { storeVerdict as storeVerdictRpc, getDueForRecheck, getEvidenceByRecord } from '../lib/wiki-server/source-check-client.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import {
   fetchSourceContent,
@@ -117,13 +117,13 @@ async function resolveSourceUrl(recordType: string, recordId: string): Promise<s
   }
 }
 
-// ── LLM re-verification ─────────────────────────────────────────────
+// ── LLM re-check ─────────────────────────────────────────────
 
 function buildRecheckPrompt(item: DueItem, sourceText: string): string {
   const previousVerdict = item.verdict;
   const previousReasoning = item.reasoning ?? 'No previous reasoning available';
 
-  return `You are a fact-checker performing a re-verification of a previously checked record.
+  return `You are a fact-checker performing a re-check of a previously checked record.
 
 Record type: ${item.recordType}
 Record ID: ${item.recordId}
@@ -181,7 +181,7 @@ async function recheckSingleItem(
     };
   }
 
-  // Step 3: LLM verification
+  // Step 3: LLM source-check
   try {
     const prompt = buildRecheckPrompt(item, fetchResult.content);
     const llmResult = await callLlmForSourceCheck(
@@ -229,7 +229,7 @@ async function storeRecheckResult(result: RecheckResult): Promise<void> {
     verdict: result.newVerdict,
     confidence: result.confidence,
     extractedValue: `Recheck: ${result.previousVerdict} -> ${result.newVerdict}`,
-    reasoning: `Re-verification. Previous verdict: ${result.previousVerdict}. ${result.changed ? 'Verdict changed.' : 'Verdict unchanged.'}`,
+    reasoning: `Re-check. Previous verdict: ${result.previousVerdict}. ${result.changed ? 'Verdict changed.' : 'Verdict unchanged.'}`,
   }, LOG_PREFIX);
 
   // Update aggregate verdict with new nextCheckDue
@@ -240,7 +240,7 @@ async function storeRecheckResult(result: RecheckResult): Promise<void> {
     recordId: result.recordId,
     verdict: result.newVerdict,
     confidence: result.confidence,
-    reasoning: `Re-verification. Previous: ${result.previousVerdict}. ${result.changed ? 'Changed.' : 'Unchanged.'}`,
+    reasoning: `Re-check. Previous: ${result.previousVerdict}. ${result.changed ? 'Changed.' : 'Unchanged.'}`,
     sourcesChecked: 1,
     nextCheckDue,
   };

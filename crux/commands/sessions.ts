@@ -90,7 +90,7 @@ function buildSessionYaml(fields: {
   if (fields.serverUnavailable) {
     lines.push(
       'constraints:',
-      '  - server-unavailable: "Wiki server was unreachable during this session. Cross-reference checks, citation verification, and backlink context were unavailable."',
+      '  - server-unavailable: "Wiki server was unreachable during this session. Cross-reference checks, citation checking, and backlink context were unavailable."',
     );
   }
 

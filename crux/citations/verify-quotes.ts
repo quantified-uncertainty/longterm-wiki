@@ -1,5 +1,5 @@
 /**
- * Quote Re-Verification Script
+ * Quote Re-Check Script
  *
  * Re-fetches source content and verifies that stored quotes still exist.
  * Flags quotes that have disappeared due to content drift.
@@ -81,20 +81,20 @@ async function verifyQuotesForPage(
     }
 
     // Verify the stored quote against the source
-    const verification = verifyQuoteInSource(q.sourceQuote!, sourceText);
+    const quoteMatch = verifyQuoteInSource(q.sourceQuote!, sourceText);
 
-    if (verification.verified) {
+    if (quoteMatch.verified) {
       result.stillValid++;
-      // Update verification status
+      // Update source-check status
       await markQuoteVerified(
         pageId,
         q.footnote,
-        verification.method,
-        verification.score,
+        quoteMatch.method,
+        quoteMatch.score,
       );
       if (verbose) {
         console.log(
-          `\u2713 still valid (${verification.method}, ${(verification.score * 100).toFixed(0)}%)`,
+          `\u2713 still valid (${quoteMatch.method}, ${(quoteMatch.score * 100).toFixed(0)}%)`,
         );
       }
     } else {
@@ -104,11 +104,11 @@ async function verifyQuotesForPage(
         pageId,
         q.footnote,
         'reverify-failed',
-        verification.score,
+        quoteMatch.score,
       );
       if (verbose) {
         console.log(
-          `\u2717 DRIFTED (score: ${(verification.score * 100).toFixed(0)}%)`,
+          `\u2717 DRIFTED (score: ${(quoteMatch.score * 100).toFixed(0)}%)`,
         );
       }
     }
@@ -161,7 +161,7 @@ async function main() {
     }
 
     console.log(
-      `\n${c.bold}${c.blue}Quote Re-Verification — Batch Mode${c.reset}\n`,
+      `\n${c.bold}${c.blue}Quote Re-Check — Batch Mode${c.reset}\n`,
     );
     console.log(`  ${pages.length} pages with quotes, processing ${pagesToProcess.length}\n`);
 
@@ -246,7 +246,7 @@ async function main() {
   }
 
   console.log(
-    `\n${c.bold}${c.blue}Quote Re-Verification: ${pageId}${c.reset}`,
+    `\n${c.bold}${c.blue}Quote Re-Check: ${pageId}${c.reset}`,
   );
   console.log(`  ${withQuotes.length} quotes to verify\n`);
 

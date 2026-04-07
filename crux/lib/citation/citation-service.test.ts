@@ -28,7 +28,7 @@ function makeFetchedSource(overrides: Record<string, unknown> = {}) {
     url: 'https://example.com/test',
     title: 'Test Page',
     fetchedAt: new Date().toISOString(),
-    content: 'Test content for verification purposes.',
+    content: 'Test content for checking purposes.',
     relevantExcerpts: [],
     status: 'ok',
     httpStatus: 200,

@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import {
   buildStableIdNameMap,
   humanizeRecord,
-  buildVerificationPrompt,
+  buildSourceCheckPrompt,
   runDeterministicChecks,
 } from './source-check.ts';
 
@@ -355,10 +355,10 @@ describe('humanizeRecord', () => {
 });
 
 // ---------------------------------------------------------------------------
-// buildVerificationPrompt
+// buildSourceCheckPrompt
 // ---------------------------------------------------------------------------
 
-describe('buildVerificationPrompt', () => {
+describe('buildSourceCheckPrompt', () => {
   const nameMap = new Map([
     ['ABCdef1234', 'Anthropic'],
     ['VoNqoBJkyg', 'Dan Hendrycks'],
@@ -373,7 +373,7 @@ describe('buildVerificationPrompt', () => {
       source: 'https://example.com',
     };
 
-    const prompt = buildVerificationPrompt('personnel', record, nameMap);
+    const prompt = buildSourceCheckPrompt('personnel', record, nameMap);
 
     // Should contain the resolved names
     expect(prompt).toContain('"Dan Hendrycks"');
@@ -384,24 +384,24 @@ describe('buildVerificationPrompt', () => {
   });
 
   it('includes the table name in the prompt', () => {
-    const prompt = buildVerificationPrompt('personnel', { id: 'r1' }, new Map());
+    const prompt = buildSourceCheckPrompt('personnel', { id: 'r1' }, new Map());
     expect(prompt).toContain('personnel');
   });
 
   it('includes the source URL in the prompt', () => {
     const record = { id: 'r1', source: 'https://example.com/team' };
-    const prompt = buildVerificationPrompt('personnel', record, new Map());
+    const prompt = buildSourceCheckPrompt('personnel', record, new Map());
     expect(prompt).toContain('https://example.com/team');
   });
 
   it('shows "(none)" when source URL is missing', () => {
     const record = { id: 'r1' };
-    const prompt = buildVerificationPrompt('personnel', record, new Map());
+    const prompt = buildSourceCheckPrompt('personnel', record, new Map());
     expect(prompt).toContain('(none)');
   });
 
   it('includes note about entity reference resolution', () => {
-    const prompt = buildVerificationPrompt('personnel', { id: 'r1' }, new Map());
+    const prompt = buildSourceCheckPrompt('personnel', { id: 'r1' }, new Map());
     expect(prompt).toContain('Entity reference fields');
     expect(prompt).toContain('resolved to human-readable names');
   });
@@ -416,7 +416,7 @@ describe('buildVerificationPrompt', () => {
       updatedAt: '2025-01-01',
     };
 
-    const prompt = buildVerificationPrompt('personnel', record, nameMap);
+    const prompt = buildSourceCheckPrompt('personnel', record, nameMap);
 
     // Internal fields should be stripped
     expect(prompt).not.toContain('personEntityId');
@@ -434,7 +434,7 @@ describe('buildVerificationPrompt', () => {
       source: 'https://example.com/funding',
     };
 
-    const prompt = buildVerificationPrompt('funding-rounds', record, nameMap);
+    const prompt = buildSourceCheckPrompt('funding-rounds', record, nameMap);
 
     expect(prompt).toContain('Series A');
     expect(prompt).toContain('100000000');

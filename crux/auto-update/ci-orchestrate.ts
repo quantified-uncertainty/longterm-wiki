@@ -534,12 +534,12 @@ export async function orchestrateCiAutoUpdate(
         if (citationResult.hasBroken) {
           console.warn('::warning::Broken citations detected');
         }
-        console.log(`Citation verification complete: ${citationResult.totalVerified} verified, ${citationResult.totalBroken} broken`);
+        console.log(`Citation check complete: ${citationResult.totalVerified} verified, ${citationResult.totalBroken} broken`);
       } catch (err) {
-        console.warn(`::warning::Citation verification failed: ${err instanceof Error ? err.message : String(err)}`);
+        console.warn(`::warning::Citation check failed: ${err instanceof Error ? err.message : String(err)}`);
       }
     } else {
-      console.log('No successful pages in report -- skipping citation verification');
+      console.log('No successful pages in report -- skipping citation checking');
     }
   }
 

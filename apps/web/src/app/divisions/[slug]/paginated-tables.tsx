@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 
 // ── Pagination controls ─────────────────────────────────────────────
 
@@ -77,8 +77,8 @@ export interface GrantRow {
   recipientHref: string | null;
   amount: number | null;
   date: string | null;
-  /** Source-check verification verdict (null if not checked) */
-  verificationVerdict?: string | null;
+  /** Source-check verdict (null if not checked) */
+  sourceCheckVerdict?: string | null;
   /** Link to source-check detail page */
   sourceCheckHref?: string;
 }
@@ -137,10 +137,10 @@ export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
                   </td>
                   <td className="py-1.5 px-1">
                     <SourceCheckDot
-                      status={recordVerdictToStatus(g.verificationVerdict ?? undefined)}
-                      originalVerdict={g.verificationVerdict ?? undefined}
+                      status={recordVerdictToStatus(g.sourceCheckVerdict ?? undefined)}
+                      originalVerdict={g.sourceCheckVerdict ?? undefined}
                       size="md"
-                      href={g.verificationVerdict ? g.sourceCheckHref : undefined}
+                      href={g.sourceCheckVerdict ? g.sourceCheckHref : undefined}
                     />
                   </td>
                 </tr>

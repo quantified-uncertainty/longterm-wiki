@@ -1593,7 +1593,7 @@ const sourceChecksApp = new Hono()
       }
     }
 
-    // Count distinct verified records per record_type from verification_verdicts
+    // Count distinct verified records per record_type from source_check_verdicts
     const verifiedRows = await db
       .select({
         recordType: sourceCheckVerdicts.recordType,
@@ -1715,7 +1715,7 @@ const sourceChecksApp = new Hono()
 
   // ---- GET /entity-summary ----
   // Returns per-entity aggregated source-check verdict counts in a single query.
-  // Used by the entities dashboard to show verification columns.
+  // Used by the entities dashboard to show source-check columns.
   .get("/entity-summary", async (c) => {
     const db = getDrizzleDb();
 

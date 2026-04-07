@@ -227,7 +227,7 @@ export async function extractSupportingQuote(
 ): Promise<QuoteExtractionResult> {
   const truncatedSource = truncateSource(sourceText);
 
-  const systemPrompt = `You are a citation verification assistant. Given a claim from a wiki article and the full text of a cited source, find the specific passage in the source that most directly supports the claim.
+  const systemPrompt = `You are a citation checking assistant. Given a claim from a wiki article and the full text of a cited source, find the specific passage in the source that most directly supports the claim.
 
 Rules:
 - Return the EXACT quote from the source text (copy it verbatim, do not paraphrase)

@@ -13,7 +13,7 @@ import { getResourceIdForFact } from "@/data/resource-fact-links";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
-import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
+import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
@@ -268,7 +268,7 @@ export default async function FactDetailPage({ params }: PageProps) {
           )}
         </KVRow>
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
-        <KVRow label="Verification">
+        <KVRow label="Source Check">
           <span className="inline-flex items-center gap-2">
             <FactSourceCheckDot factId={factId} sourceUrl={fact.source} size="md" />
             <FactLink href={`/source-checks/fact/${factId}`}>

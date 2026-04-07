@@ -6,13 +6,12 @@ import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
-import { resolveSourceResourceIds } from "../shared/resolve-source-resource.js";
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatVerification,
+  formatSourceCheck,
   type VerdictJoinFields,
-} from "../shared/verification-join.js";
+} from "../shared/source-check-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -27,10 +26,10 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceVerification } from "../shared/verification-enforcement.js";
+import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
 
 // ---- Constants ----
 
@@ -71,11 +70,10 @@ const SyncGrantItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   status: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
   dataSourceId: z.string().max(100).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -147,7 +145,6 @@ function formatRow(r: JoinedRow) {
     date: g.date,
     status: g.status,
     source: g.source,
-    sourceResourceId: g.sourceResourceId,
     notes: g.notes,
     programId: g.programId,
     dataSourceId: g.dataSourceId,
@@ -166,7 +163,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
-    verification: formatVerification(r),
+    sourceCheck: formatSourceCheck(r),
   };
 }
 
@@ -606,10 +603,10 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       batchKeys.add(key);
     }
 
-    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
-    // config and client ?requireVerification=true param. See verification-enforcement.ts.
-    const verificationError = enforceVerification(c, "grants", items);
-    if (verificationError) return verificationError;
+    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
+    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
+    const sourceCheckError = enforceSourceCheck(c, "grants", items);
+    if (sourceCheckError) return sourceCheckError;
 
     // Validate programId references (skip if skipEntityValidation is set)
     const skipValidation = c.req.query("skipEntityValidation") === "true";
@@ -639,14 +636,6 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     let verdictsResult = { written: 0 };
 
     await db.transaction(async (tx) => {
-      // Auto-resolve sourceResourceId from source URL when not explicitly provided
-      const urlsToResolve = items
-        .filter((i) => i.source && !i.sourceResourceId)
-        .map((i) => i.source!);
-      const resolvedResourceIds = urlsToResolve.length > 0
-        ? await resolveSourceResourceIds(tx, urlsToResolve)
-        : new Map<string, string>();
-
       const allVals = items.map((item) => ({
         id: item.id,
         organizationId: item.organizationId,
@@ -658,7 +647,6 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         date: item.date ?? null,
         status: item.status ?? null,
         source: item.source ?? null,
-        sourceResourceId: item.sourceResourceId ?? (item.source ? resolvedResourceIds.get(item.source) ?? null : null),
         notes: item.notes ?? null,
         programId: item.programId ?? null,
         dataSourceId: item.dataSourceId ?? null,
@@ -687,7 +675,6 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             date: sql`excluded.date`,
             status: sql`excluded.status`,
             source: sql`excluded.source`,
-            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             programId: sql`excluded.program_id`,
             dataSourceId: sql`excluded.data_source_id`,
@@ -750,7 +737,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -758,14 +745,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("grants/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("grants/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

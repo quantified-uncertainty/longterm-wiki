@@ -2,8 +2,8 @@ import { getKBRecordSchema } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 

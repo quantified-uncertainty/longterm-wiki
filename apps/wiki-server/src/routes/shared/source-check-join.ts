@@ -20,27 +20,27 @@ export function verdictJoinCondition(recordType: string, idColumn: Column) {
 
 /** Fields to include in the SELECT when joining source_check_verdicts. */
 export const verdictSelectFields = {
-  verificationVerdict: sourceCheckVerdicts.verdict,
-  verificationConfidence: sourceCheckVerdicts.confidence,
-  verificationSourcesChecked: sourceCheckVerdicts.sourcesChecked,
-  verificationCheckedAt: sourceCheckVerdicts.lastComputedAt,
+  sourceCheckVerdict: sourceCheckVerdicts.verdict,
+  sourceCheckConfidence: sourceCheckVerdicts.confidence,
+  sourceCheckSourcesChecked: sourceCheckVerdicts.sourcesChecked,
+  sourceCheckCheckedAt: sourceCheckVerdicts.lastComputedAt,
 };
 
 /** Shape of the verdict fields after selection. */
 export interface VerdictJoinFields {
-  verificationVerdict: string | null;
-  verificationConfidence: number | null;
-  verificationSourcesChecked: number | null;
-  verificationCheckedAt: Date | null;
+  sourceCheckVerdict: string | null;
+  sourceCheckConfidence: number | null;
+  sourceCheckSourcesChecked: number | null;
+  sourceCheckCheckedAt: Date | null;
 }
 
 /** Format joined verdict fields into the API response shape. Returns null if no verdict. */
-export function formatVerification(row: VerdictJoinFields) {
-  if (!row.verificationVerdict) return null;
+export function formatSourceCheck(row: VerdictJoinFields) {
+  if (!row.sourceCheckVerdict) return null;
   return {
-    verdict: row.verificationVerdict,
-    confidence: row.verificationConfidence,
-    sourcesChecked: row.verificationSourcesChecked ?? 0,
-    checkedAt: row.verificationCheckedAt?.toISOString() ?? null,
+    verdict: row.sourceCheckVerdict,
+    confidence: row.sourceCheckConfidence,
+    sourcesChecked: row.sourceCheckSourcesChecked ?? 0,
+    checkedAt: row.sourceCheckCheckedAt?.toISOString() ?? null,
   };
 }

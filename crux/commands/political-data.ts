@@ -499,7 +499,7 @@ async function verifyLinksCommand(
   }
 
   const lines = [
-    "Link Verification Results",
+    "Link Check Results",
     "",
     `  \u2705 Verified: ${verified}`,
     `  \u274C Failed: ${failed}`,

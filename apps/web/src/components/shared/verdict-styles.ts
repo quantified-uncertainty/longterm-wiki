@@ -3,9 +3,9 @@
  *
  * Two distinct verdict domains exist in the codebase:
  *
- * 1. **Source-check verdicts** — entity/FactBase verification results.
+ * 1. **Source-check verdicts** — entity/FactBase source-check results.
  *    Keys: confirmed, contradicted, outdated, partial, unverifiable, unchecked.
- *    Used by: entity-detail-components, VerificationStatus, source-checks pages,
+ *    Used by: entity-detail-components, SourceCheckStatus, source-checks pages,
  *    entity-source-checks dashboards.
  *
  * 2. **Citation verdicts** — wiki page citation accuracy checks.
@@ -30,7 +30,7 @@ export type SourceCheckVerdictType =
  * Full style set for source-check verdicts, covering all shape variants
  * used across the codebase:
  * - `label` + `className`: entity-detail-components badge
- * - `bg` + `text` + `dot`: VerificationStatus, source-checks-shared, action-queue
+ * - `bg` + `text` + `dot`: SourceCheckStatus, source-checks-shared, action-queue
  */
 export interface SourceCheckVerdictStyle {
   /** Human-readable label (e.g. "Confirmed") */
@@ -41,7 +41,7 @@ export interface SourceCheckVerdictStyle {
   bg: string;
   /** Text color class (e.g. "text-emerald-600") */
   text: string;
-  /** Dot color class used by VerificationStatus (e.g. "bg-emerald-500") */
+  /** Dot color class used by SourceCheckStatus (e.g. "bg-emerald-500") */
   dot: string;
 }
 
@@ -112,7 +112,7 @@ export const SOURCE_CHECK_VERDICT_PRIORITY: Record<string, number> = {
 
 // ── Citation verdict types ──────────────────────────────────────────────
 
-/** Canonical citation verdict keys used by the citation verification system. */
+/** Canonical citation verdict keys used by the citation source-check system. */
 export const CITATION_VERDICT_KEYS = [
   "accurate",
   "minor_issues",
@@ -170,9 +170,9 @@ export interface VerdictRow {
   sourcesChecked: number | null;
   needsRecheck: boolean | null;
   lastComputedAt: string | null;
-  /** Present in VerificationStatus and entity-source-checks views */
+  /** Present in SourceCheckStatus and entity-source-checks views */
   fieldName?: string | null;
-  /** Present in VerificationStatus and entity-source-checks views */
+  /** Present in SourceCheckStatus and entity-source-checks views */
   entityId?: string | null;
   /** Present in action-queue */
   nextCheckDue?: string | null;

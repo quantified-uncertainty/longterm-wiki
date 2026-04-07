@@ -8,9 +8,9 @@ import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.j
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatVerification,
+  formatSourceCheck,
   type VerdictJoinFields,
-} from "../shared/verification-join.js";
+} from "../shared/source-check-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -25,10 +25,10 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceVerification } from "../shared/verification-enforcement.js";
+import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
 import { sqlInList } from "../shared/query-helpers.js";
 
 // ---- Constants ----
@@ -71,9 +71,8 @@ const SyncPersonnelItemSchema = z.object({
   appointedBy: z.string().max(500).nullable().optional(),
   background: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -133,7 +132,6 @@ function formatRow(r: JoinedRow) {
     appointedBy: p.appointedBy,
     background: p.background,
     source: p.source,
-    sourceResourceId: p.sourceResourceId,
     notes: p.notes,
     // Structured entity refs
     person: personRef,
@@ -148,7 +146,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
-    verification: formatVerification(r),
+    sourceCheck: formatSourceCheck(r),
   };
 }
 
@@ -358,10 +356,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
-    // config and client ?requireVerification=true param. See verification-enforcement.ts.
-    const verificationError = enforceVerification(c, "personnel", items);
-    if (verificationError) return verificationError;
+    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
+    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
+    const sourceCheckError = enforceSourceCheck(c, "personnel", items);
+    if (sourceCheckError) return sourceCheckError;
 
     // Check for natural key collisions within the batch itself.
     // Natural key: (personId, organizationId, role, roleType)
@@ -411,7 +409,6 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         appointedBy: item.appointedBy ?? null,
         background: item.background ?? null,
         source: item.source ?? null,
-        sourceResourceId: item.sourceResourceId ?? null,
         notes: item.notes ?? null,
       }));
 
@@ -439,7 +436,6 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             appointedBy: sql`excluded.appointed_by`,
             background: sql`excluded.background`,
             source: sql`excluded.source`,
-            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
@@ -537,7 +533,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         })
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -545,14 +541,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("personnel/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("personnel/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

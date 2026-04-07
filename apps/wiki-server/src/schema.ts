@@ -169,9 +169,9 @@ export const wikiPages = pgTable(
 );
 
 // ============================================================================
-// Operational — Citation & verification tables
+// Operational — Citation & source-check tables
 //
-// These tables are not part of any Base. They track citation verification,
+// These tables are not part of any Base. They track citation source-checks,
 // fetched source content, accuracy scoring, and hallucination risk.
 // ============================================================================
 
@@ -799,7 +799,7 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
  * Type-specific metadata for tabular data sources (~16 resources).
  *
  * Follows the resourcePapers/resourceForumPosts/resourcePolicyDocs sub-table pattern.
- * Stores import-pipeline configuration (column mappings, schemas, verification config)
+ * Stores import-pipeline configuration (column mappings, schemas, source-check config)
  * for structured data sources (CSVs, HTML tables, JSON APIs, spreadsheets).
  *
  * The `sourceSlug` preserves the human-readable identifier (e.g., 'coefficient-giving')
@@ -1492,11 +1492,11 @@ export const statements = pgTable(
     attributedTo: text("attributed_to").references(() => entities.id, {
       onDelete: "set null",
     }),
-    // --- Verdict / verification ---
+    // --- Verdict / source-check ---
     verdict: text("verdict"), // "verified", "unsupported", "disputed", "unverified"
     verdictScore: real("verdict_score"), // 0–1 confidence
     verdictQuotes: text("verdict_quotes"), // external source quotes supporting verdict
-    verdictModel: text("verdict_model"), // LLM model used for verification
+    verdictModel: text("verdict_model"), // LLM model used for source-check
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     claimCategory: text("claim_category"), // factual, opinion, analytical, speculative, relational
     // --- Metadata ---
@@ -1633,9 +1633,8 @@ export const pageCitations = pgTable(
 
 // ── Unified Source-Check System ──────────────────────────────────────────
 //
-// Two tables replace the previous six (kb_fact_resource_verifications,
-// kb_fact_verdicts, record_verifications, record_verdicts,
-// thing_resource_verifications, thing_verdicts).
+// Two tables replace the previous six legacy source-check tables
+// (kb_fact_resource_*, record_*, thing_resource_* variants).
 // See discussion #2950 for architecture decisions.
 
 /**
@@ -1726,11 +1725,6 @@ export const sourceCheckVerdicts = pgTable(
   ]
 );
 
-/** @deprecated Use sourceCheckEvidence */
-export const verificationEvidence = sourceCheckEvidence;
-/** @deprecated Use sourceCheckVerdicts */
-export const verificationVerdicts = sourceCheckVerdicts;
-
 /**
  * Audit log for TableBase changes — records every insert/update/delete
  * to PG-primary tables (personnel, grants, funding_rounds, etc.).
@@ -1799,7 +1793,6 @@ export const personnel = pgTable(
     appointedBy: text("appointed_by"), // board-seats only
     background: text("background"), // board-seats only
     source: text("source"), // URL confirming the role
-    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -1859,7 +1852,6 @@ export const grants = pgTable(
     date: text("date"), // announcement/start date (YYYY-MM)
     status: text("status"), // active | completed | winding-down
     source: text("source"), // URL to announcement or report
-    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     programId: text("program_id").references(
       () => fundingPrograms.id,
@@ -1928,7 +1920,6 @@ export const fundingRounds = pgTable(
     /** Display name fallback when lead investor doesn't have an entity. */
     leadInvestorDisplayName: text("lead_investor_display_name"),
     source: text("source"), // URL to announcement
-    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -1986,7 +1977,6 @@ export const investments = pgTable(
     role: text("role"), // lead | participant | founder
     conditions: text("conditions"), // investment conditions
     source: text("source"), // URL to source
-    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -2041,7 +2031,6 @@ export const equityPositions = pgTable(
     stakeLow: numeric("stake_low"), // parsed low bound of stake
     stakeHigh: numeric("stake_high"), // parsed high bound of stake
     source: text("source"), // URL to source
-    sourceResourceId: text("source_resource_id").references(() => resources.id, { onDelete: "set null" }),
     notes: text("notes"),
     asOf: text("as_of"), // when this position was valid from (YYYY or YYYY-MM)
     validEnd: text("valid_end"), // when this position expired
@@ -2326,7 +2315,7 @@ export const fundingPrograms = pgTable(
 // divisions, funding programs, etc.). Mirrors the two-tier fact
 // source-check model: evidence (per-source checks) → verdicts (aggregate).
 
-// record_verifications and record_verdicts tables removed — replaced by
+// Legacy record source-check tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables above.
 // See migration 0127 and discussion #2950.
 
@@ -2495,7 +2484,7 @@ export const publications = pgTable(
 // ── Cross-Base: Unified Things Table ──────────────────────────────────
 //
 // Every identifiable item in the system gets a single row here. Enables
-// cross-domain queries, unified verification status, and a single browse UI.
+// cross-domain queries, unified source-check status, and a single browse UI.
 //
 // NAMING NOTE: This PG `things` table is a cross-base universal index.
 // It is NOT related to the FactBase "things" directory
@@ -2566,7 +2555,7 @@ export const things = pgTable(
   ]
 );
 
-// thing_resource_verifications and thing_verdicts tables removed — replaced by
+// Legacy thing source-check tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables.
 // See migration 0127 and discussion #2950.
 
@@ -3259,7 +3248,7 @@ export const predictionMarketSnapshots = pgTable(
 // Operational — Data Quality Snapshots
 //
 // Point-in-time snapshots of data quality metrics across all bases.
-// Captured periodically to track coverage and verification trends.
+// Captured periodically to track coverage and source-check trends.
 // ============================================================================
 
 export const dataQualitySnapshots = pgTable(
@@ -3548,9 +3537,9 @@ export const raceCandidates = pgTable(
 );
 
 // ============================================================================
-// Claims-first verification — proposed_claims + claim_record_links
+// Claims-first source-check — proposed_claims + claim_record_links
 //
-// Research agents propose structured claims about entities. A verification
+// Research agents propose structured claims about entities. A source-check
 // worker checks each claim against source evidence and records a verdict.
 // claim_record_links connects approved claims to the records they affected.
 //
@@ -3559,7 +3548,7 @@ export const raceCandidates = pgTable(
 
 /**
  * Proposed claims — structured assertions submitted by research agents
- * for verification before being applied to TableBase records.
+ * for source-checking before being applied to TableBase records.
  */
 export const proposedClaims = pgTable(
   "proposed_claims",
@@ -3580,7 +3569,7 @@ export const proposedClaims = pgTable(
     sourceUrl: text("source_url").notNull(),
     agentEvidence: text("agent_evidence"),
 
-    // Verification state (updated by worker)
+    // Source-check state (updated by worker)
     status: text("status").notNull().default("pending"),
     verdictConfidence: real("verdict_confidence"),
     verdictReasoning: text("verdict_reasoning"),

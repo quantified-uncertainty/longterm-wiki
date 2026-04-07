@@ -4,14 +4,14 @@ import { getTypedEntityByStableId, getIdRegistry } from "@/data/tablebase";
 import { getKBFactById, getKBProperty, getKBEntity } from "@/data/factbase";
 
 /**
- * GET /api/verification-names-proxy?record_type=...&record_ids=id1,id2,...
+ * GET /api/source-check-names-proxy?record_type=...&record_ids=id1,id2,...
  *
  * Resolves record IDs to human-readable names.
  *
  * For `record_type=entity`: resolves locally from database.json (no wiki-server needed).
  * Returns { names: Record<string, string>, hrefs: Record<string, string> }.
  *
- * For all other types: proxies to the wiki-server's /api/verifications/resolve-names endpoint.
+ * For all other types: proxies to the wiki-server's /api/source-checks/resolve-names endpoint.
  * Batches requests to stay within wiki-server's 10,000-char query string limit.
  * Returns { names: Record<string, string> }.
  */
@@ -167,7 +167,7 @@ export async function GET(request: NextRequest) {
           record_type: recordType,
           record_ids: idsStr,
         });
-        const url = `${config.serverUrl}/api/verifications/resolve-names?${params.toString()}`;
+        const url = `${config.serverUrl}/api/source-checks/resolve-names?${params.toString()}`;
         const res = await fetch(url, {
           headers: config.headers,
           signal: AbortSignal.timeout(10_000),
@@ -176,7 +176,7 @@ export async function GET(request: NextRequest) {
         if (!res.ok) {
           const body = await res.text().catch(() => "");
           console.warn(
-            `[verification-names-proxy] Wiki server returned ${res.status} for ${recordType} ` +
+            `[source-check-names-proxy] Wiki server returned ${res.status} for ${recordType} ` +
             `(${ids.length} IDs, ${idsStr.length} chars): ${body.slice(0, 500)}`
           );
           return null;
@@ -197,7 +197,7 @@ export async function GET(request: NextRequest) {
         }
       } else if (result.status === "rejected") {
         console.warn(
-          `[verification-names-proxy] Batch request failed for ${recordType}: ` +
+          `[source-check-names-proxy] Batch request failed for ${recordType}: ` +
           `${result.reason instanceof Error ? result.reason.message : String(result.reason)}`
         );
       }
@@ -212,7 +212,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (err) {
     console.warn(
-      `[verification-names-proxy] Failed to resolve names for ${recordType}: ${err instanceof Error ? err.message : String(err)}`
+      `[source-check-names-proxy] Failed to resolve names for ${recordType}: ${err instanceof Error ? err.message : String(err)}`
     );
     return NextResponse.json(
       { error: "Wiki server unreachable", names: {} },

@@ -105,7 +105,7 @@ export function getToolDefinitions() {
       },
       {
         name: 'submit_claims',
-        description: 'Submit structured claims for async verification. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
+        description: 'Submit structured claims for async source-check. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
         input_schema: {
           type: 'object',
           properties: {
@@ -132,7 +132,7 @@ export function getToolDefinitions() {
       },
       {
         name: 'check_claim_status',
-        description: 'Check verification status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
+        description: 'Check source-check status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
         input_schema: {
           type: 'object',
           properties: {
@@ -332,8 +332,8 @@ async function handleSubmitClaims(
       batchId: data.batchId,
       claimCount: data.claims.length,
       jobCount: data.jobCount,
-      estimatedVerificationTime: data.estimatedVerificationTime,
-      message: `Submitted ${data.claims.length} claims (${data.jobCount} verification jobs created). Use check_claim_status with batchId "${data.batchId}" to poll verification progress.`,
+      estimatedCheckTime: data.estimatedCheckTime,
+      message: `Submitted ${data.claims.length} claims (${data.jobCount} source-check jobs created). Use check_claim_status with batchId "${data.batchId}" to poll source-check progress.`,
     }, null, 2);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -369,7 +369,7 @@ async function handleSubmitRecords(
   input: Record<string, unknown>,
   task: EnrichmentTask,
   dryRun: boolean,
-  skipVerification: boolean = false,
+  skipSourceCheck: boolean = false,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -484,24 +484,24 @@ async function handleSubmitRecords(
     return `All ${records.length} records already exist (deduplication removed them all).`;
   }
 
-  // Source verification gate: check records against their source URLs before submission.
+  // Source-check gate: check records against their source URLs before submission.
   // Catches hallucinated data (e.g., wrong roles, fabricated affiliations).
   let recordsToSubmit = deduped;
-  let verificationSummary = '';
-  if (!skipVerification && !dryRun) {
-    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('./pre-submit-verification.ts');
+  let sourceCheckSummary = '';
+  if (!skipSourceCheck && !dryRun) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('./pre-submit-source-check.ts');
     const verifyResult = await verifyBeforeSubmit(table, deduped);
     console.log(formatPreSubmitSummary(verifyResult));
 
     if (verifyResult.rejected.length > 0) {
-      verificationSummary = ` (${verifyResult.rejected.length} rejected by source verification)`;
+      sourceCheckSummary = ` (${verifyResult.rejected.length} rejected by source-check)`;
     }
 
     // Combine accepted records and no-source records for submission
     recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
 
     if (recordsToSubmit.length === 0) {
-      return `All ${deduped.length} records were rejected by source verification.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`;
+      return `All ${deduped.length} records were rejected by source-check.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`;
     }
   }
 
@@ -524,7 +524,7 @@ async function handleSubmitRecords(
 
   const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
   const dupCount = records.length - deduped.length;
-  return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${verificationSummary}.`;
+  return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${sourceCheckSummary}.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -534,9 +534,9 @@ async function handleSubmitRecords(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipVerification?: boolean } = {},
+  options: { skipSourceCheck?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
-  const skipVerification = options.skipVerification ?? false;
+  const skipSourceCheck = options.skipSourceCheck ?? false;
   return {
     query_entities: handleQueryEntities,
     query_existing_records: handleQueryExistingRecords,
@@ -544,7 +544,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipVerification),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourceCheck),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),

@@ -197,7 +197,7 @@ This is a polish-tier improvement — you have NO new research sources. Therefor
 - **KEEP all existing citations exactly as they are** — do not renumber, modify, or remove existing footnotes.
 - You MAY fix formatting, improve prose clarity, add EntityLinks, fix escaping, and restructure sections.
 - You MAY add factual context from the existing content (moving info between sections, adding transitions).
-- If you add a NEW specific claim that needs verification, flag it with {/* NEEDS CITATION */} rather than inventing a source.
+- If you add a NEW specific claim that needs a citation, flag it with {/* NEEDS CITATION */} rather than inventing a source.
 - Do NOT add {/* NEEDS CITATION */} to claims that already existed in the original content — those claims were already accepted. Only mark NEW claims you're adding.
 - Use {/* NEEDS CITATION */} sparingly — at most 3-5 per page. An excess of citation markers makes the page look like an unfinished draft.
 ` : `

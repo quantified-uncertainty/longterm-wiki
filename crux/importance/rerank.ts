@@ -260,7 +260,7 @@ B: "${midInfo.title}" (${midInfo.id})${midInfo.description ? ` — ${midInfo.des
 }
 
 /**
- * Verification pass: re-sort overlapping windows to fix local inversions.
+ * Consistency pass: re-sort overlapping windows to fix local inversions.
  * Slides a window of VERIFY_WINDOW pages across the ranking with VERIFY_STRIDE overlap.
  */
 async function verifyRanking(
@@ -305,7 +305,7 @@ async function verifyRanking(
   }
   verifyProgress.done();
 
-  log.dim(`  Verification moved ${changes} pages`);
+  log.dim(`  Consistency pass moved ${changes} pages`);
   return result;
 }
 
@@ -431,8 +431,8 @@ async function main() {
       mergeProgress.done();
     }
 
-    // Phase 3: Verification pass to fix merge artifacts
-    log.info('Phase 3: Verification pass...');
+    // Phase 3: Consistency pass to fix merge artifacts
+    log.info('Phase 3: Consistency pass...');
     finalRanking = await verifyRanking(finalRanking, pagesMap, client);
   }
 

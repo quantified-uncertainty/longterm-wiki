@@ -39,7 +39,7 @@ export function resolveName(item: Record<string, unknown>, ...keys: string[]): s
 }
 
 /**
- * Check if the resolved name is actually usable for LLM verification.
+ * Check if the resolved name is actually usable for LLM source-check.
  * Returns false for '(unknown)' or stableId-like values that the LLM can't interpret.
  */
 export function isResolvableName(name: string): boolean {
@@ -47,7 +47,7 @@ export function isResolvableName(name: string): boolean {
 }
 
 /**
- * Extract the entity ID to associate with a record's verification verdict.
+ * Extract the entity ID to associate with a record's source-check verdict.
  *
  * Maps each record type to the most relevant parent entity ID:
  * - Personnel: orgEntityId (org context), falling back to personEntityId

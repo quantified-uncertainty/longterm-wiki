@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 
 const POSITION_COLORS: Record<string, string> = {
   support:
@@ -189,7 +189,7 @@ export interface StakeholderRow {
   sourceName?: string;
   context?: string[];
   href: string | null;
-  /** Pre-resolved verification verdict (serializable). Resolved server-side. */
+  /** Pre-resolved source-check verdict (serializable). Resolved server-side. */
   verdict: { verdict: string; confidence: number | null } | null;
 }
 

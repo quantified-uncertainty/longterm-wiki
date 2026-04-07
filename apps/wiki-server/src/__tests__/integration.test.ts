@@ -352,7 +352,7 @@ describeWithDb("Integration: Citation Quotes CRUD", () => {
     ).rejects.toThrow();
   });
 
-  it("updates verification status", async () => {
+  it("updates source-check status", async () => {
     await db.insert(citationQuotes).values({
       pageId: 400,
       footnote: 1,

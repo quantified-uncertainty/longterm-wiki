@@ -1,7 +1,7 @@
 /**
  * Data Quality Command Handlers
  *
- * Capture and view data quality snapshots that track coverage and verification
+ * Capture and view data quality snapshots that track coverage and source-check
  * metrics across all data bases.
  */
 
@@ -147,7 +147,7 @@ commands.default = commands.latest;
 
 export function getHelp() {
   return `
-Data Quality Domain — Track data coverage and verification metrics
+Data Quality Domain — Track data coverage and source-check metrics
 
 Commands:
   snapshot        Capture a new data quality snapshot

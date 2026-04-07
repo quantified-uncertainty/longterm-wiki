@@ -63,7 +63,7 @@ async function resolveNames(verdicts: VerdictRow[]): Promise<NameMap> {
     const idList = [...ids].join(",");
     try {
       const res = await fetch(
-        `/api/verification-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
+        `/api/source-check-names-proxy?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(idList)}`
       );
       if (!res.ok) return;
       const data = await res.json();
@@ -99,9 +99,9 @@ export function ActionQueue() {
       try {
         // Fetch contradicted, outdated, and needs-recheck items in parallel
         const [contradictedRes, outdatedRes, recheckRes] = await Promise.all([
-          fetch("/api/entity-verifications-proxy?verdict=contradicted&limit=20"),
-          fetch("/api/entity-verifications-proxy?verdict=outdated&limit=10"),
-          fetch("/api/entity-verifications-proxy?verdict=partial&limit=10"),
+          fetch("/api/source-check-verdicts-proxy?verdict=contradicted&limit=20"),
+          fetch("/api/source-check-verdicts-proxy?verdict=outdated&limit=10"),
+          fetch("/api/source-check-verdicts-proxy?verdict=partial&limit=10"),
         ]);
 
         const results: VerdictRow[] = [];

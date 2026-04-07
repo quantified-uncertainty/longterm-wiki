@@ -47,7 +47,7 @@ export interface VerifyItem {
   sourceUrl?: string;
   /** Whether this item has never been verified */
   neverVerified: boolean;
-  /** Last verification timestamp (ISO string) if available */
+  /** Last source-check timestamp (ISO string) if available */
   lastVerifiedAt?: string;
   /**
    * For facts: the fact + entity data.
@@ -123,14 +123,14 @@ export interface OrchestrationSummary {
   failures: VerifyError[];
 }
 
-export interface VerifiedFactInfo {
+export interface SourceCheckedFactInfo {
   factId: string;
   verdict: string;
   checkedAt?: string;
   needsRecheck?: boolean;
 }
 
-export interface VerifiedRecordInfo {
+export interface SourceCheckedRecordInfo {
   recordType: string;
   recordId: string;
   verdict: string;

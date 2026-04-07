@@ -1,6 +1,6 @@
 /**
- * Source-check item verification.
- * Handles LLM prompt building, deterministic matching, single-item verification,
+ * Source-check item source-check.
+ * Handles LLM prompt building, deterministic matching, single-item source-check,
  * and result storage for the orchestrator.
  */
 
@@ -39,7 +39,7 @@ export const snapshotCache = new Map<string, { rawContent: string; manifest: Dat
 
 // ── LLM prompt builders ─────────────────────────────────────────────
 
-export function buildFactVerificationPrompt(
+export function buildFactSourceCheckPrompt(
   data: FactItemData,
   sourceText: string,
 ): string {
@@ -66,7 +66,7 @@ ${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 ${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
-export function buildRecordVerificationPrompt(
+export function buildRecordSourceCheckPrompt(
   data: RecordItemData,
   description: string,
   sourceText: string,
@@ -97,7 +97,7 @@ ${SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS}
 ${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
-export function buildEntityVerificationPrompt(
+export function buildEntitySourceCheckPrompt(
   entity: Entity,
   sourceText: string,
   sourceUrl: string,
@@ -134,7 +134,7 @@ Respond with ONLY a JSON object (no markdown code fences):
 /**
  * Try deterministic row-matching for a record (grant or investment) against its source snapshot.
  * Returns a VerifyResult if deterministic matching produces a definitive answer,
- * or null to fall through to LLM verification.
+ * or null to fall through to LLM source-check.
  */
 export async function tryDeterministicMatch(item: VerifyItem): Promise<VerifyResult | null> {
   if (item.data.kind !== 'record') return null;
@@ -211,7 +211,7 @@ export async function tryDeterministicMatch(item: VerifyItem): Promise<VerifyRes
   };
 }
 
-// ── Single-item verification ────────────────────────────────────────
+// ── Single-item source-check ────────────────────────────────────────
 
 export async function verifySingleItem(
   item: VerifyItem,
@@ -220,16 +220,16 @@ export async function verifySingleItem(
 ): Promise<VerifyResult | VerifyError> {
   // ── Deterministic matching path (Discussion #3567 Phase 3) ──
   // For record-type items (grants, investments), try deterministic row-matching
-  // against a source snapshot before falling back to LLM verification.
+  // against a source snapshot before falling back to LLM source-check.
   // Note: investments are included for when investment manifests are added to the
   // grant-import registry. Until then, tryDeterministicMatch returns null (no manifest
-  // match) and falls through to LLM verification — this is intentional scaffolding.
+  // match) and falls through to LLM source-check — this is intentional scaffolding.
   if (item.data.kind === 'record' && (item.data.recordType === 'grant' || item.data.recordType === 'investment')) {
     try {
       const deterministicResult = await tryDeterministicMatch(item);
       if (deterministicResult) return deterministicResult;
     } catch (e: unknown) {
-      // Fall through to LLM verification on any error
+      // Fall through to LLM source-check on any error
       console.warn(`[source-check] Deterministic matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
@@ -321,13 +321,13 @@ export async function verifySingleItem(
   let prompt: string;
   switch (item.data.kind) {
     case 'fact':
-      prompt = buildFactVerificationPrompt(item.data, sourceContent);
+      prompt = buildFactSourceCheckPrompt(item.data, sourceContent);
       break;
     case 'record':
-      prompt = buildRecordVerificationPrompt(item.data, item.description, sourceContent);
+      prompt = buildRecordSourceCheckPrompt(item.data, item.description, sourceContent);
       break;
     case 'entity':
-      prompt = buildEntityVerificationPrompt(item.data.entity, sourceContent, verifiedSourceUrl);
+      prompt = buildEntitySourceCheckPrompt(item.data.entity, sourceContent, verifiedSourceUrl);
       break;
   }
 
@@ -388,7 +388,7 @@ export async function storeResult(item: VerifyItem, result: VerifyResult): Promi
   } else if (item.data.kind === 'record') {
     const recordData = item.data as RecordItemData;
 
-    // Store individual verification evidence
+    // Store individual source-check evidence
     await storeSourceCheckEvidence({
       recordType: recordData.recordType,
       recordId: recordData.recordId,
@@ -416,7 +416,7 @@ export async function storeResult(item: VerifyItem, result: VerifyResult): Promi
       console.warn(`[source-check] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
     });
   }
-  // Entity-type verifications are logged but not stored in a specific endpoint
+  // Entity-type source-checks are logged but not stored in a specific endpoint
   // since they are discovery-based (web search) rather than source-based
 }
 

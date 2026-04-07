@@ -30,7 +30,7 @@ export const DateStringSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 export const PageIdSchema = z.string().min(1).max(200);
 
 // ---------------------------------------------------------------------------
-// Record Verifications
+// Record Source-Checks
 // ---------------------------------------------------------------------------
 
 export const VALID_RECORD_TYPES = [

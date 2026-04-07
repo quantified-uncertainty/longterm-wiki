@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
- * GET /api/verification-coverage-proxy
+ * GET /api/source-check-coverage-proxy
  *
- * Proxies verification coverage requests to the wiki-server's
- * /api/verifications/coverage endpoint.
+ * Proxies source-check coverage requests to the wiki-server's
+ * /api/source-checks/coverage endpoint.
  * Returns { coverage: Array<{ recordType, total, verified, percentage }> }
  */
 export async function GET() {
@@ -18,7 +18,7 @@ export async function GET() {
   }
 
   try {
-    const url = `${config.serverUrl}/api/verifications/coverage`;
+    const url = `${config.serverUrl}/api/source-checks/coverage`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(15_000),
@@ -35,7 +35,7 @@ export async function GET() {
     return NextResponse.json(data);
   } catch (err) {
     console.warn(
-      `[verification-coverage-proxy] Failed to fetch coverage: ${err instanceof Error ? err.message : String(err)}`
+      `[source-check-coverage-proxy] Failed to fetch coverage: ${err instanceof Error ? err.message : String(err)}`
     );
     return NextResponse.json(
       { error: "Wiki server unreachable", coverage: [] },

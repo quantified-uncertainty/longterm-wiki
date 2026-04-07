@@ -34,10 +34,10 @@ import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 import { dataSourcesRoute } from "./routes/tablebase/data-sources.js";
 import { platformAccountsRoute } from "./routes/tablebase/platform-accounts.js";
 
-// Unified source-check system (replaces factbase-verifications + record-verifications)
+// Unified source-check system (replaces legacy factbase + record source-checks)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
 
-// Claims-first verification system (#3253)
+// Claims-first source-check system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
@@ -201,20 +201,18 @@ export function createApp() {
   app.route("/api/facts", factsRoute);
   // Unified source-check system
   app.route("/api/source-checks", sourceChecksRoute);
-  // Deprecated alias for /api/source-checks
-  app.route("/api/verifications", sourceChecksRoute);
 
   // WikiBase routes — prose content and page metadata
   app.route("/api/pages", pagesRoute);
   app.route("/api/edit-logs", editLogsRoute);
   app.route("/api/references", referencesRoute);
 
-  // Citation & verification system (operational, not part of a Base)
+  // Citation & source-check system (operational, not part of a Base)
   app.route("/api/citations", citationsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/integrity", integrityRoute);
 
-  // Claims-first verification (#3253)
+  // Claims-first source-check (#3253)
   app.route("/api/claims", claimsRoute);
 
   // Financial data routes (operational — personnel, grants, funding)

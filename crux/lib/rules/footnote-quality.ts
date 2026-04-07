@@ -34,7 +34,7 @@ const HEDGING_PHRASES = [
   'not independently confirmed',
   'unable to verify',
   'unable to confirm',
-  'verification pending',
+  'check pending',
   'unverified',
 ];
 

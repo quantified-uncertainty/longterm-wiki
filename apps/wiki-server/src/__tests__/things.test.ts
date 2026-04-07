@@ -534,7 +534,7 @@ describe("Things API", () => {
       }
     });
 
-    // has_verdict filter removed — verification now lives in unified system
+    // has_verdict filter removed — source-checks now live in unified system
 
     it("returns empty list when no things", async () => {
       const res = await app.request("/api/things");

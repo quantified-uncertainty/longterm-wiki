@@ -341,19 +341,19 @@ export function hasExceededMaxAttempts(prNumber: number | string): boolean {
   return getTotalFixAttempts(prNumber) >= MAX_TOTAL_FIX_ATTEMPTS;
 }
 
-// ── Pending CI verification (post-fix) ──────────────────────────────────────
+// ── Pending CI check (post-fix) ──────────────────────────────────────
 // After a "fixed" outcome, we don't reset the fail counter immediately.
-// Instead we mark the PR as "pending verification" and only reset when CI passes.
+// Instead we mark the PR as "pending CI check" and only reset when CI passes.
 
-export function markPendingVerification(prNumber: number): void {
+export function markPendingCICheck(prNumber: number): void {
   writeFileSync(join(STATE_DIR, `pending-verify-${prNumber}`), new Date().toISOString());
 }
 
-export function isPendingVerification(prNumber: number): boolean {
+export function isPendingCICheck(prNumber: number): boolean {
   return existsSync(join(STATE_DIR, `pending-verify-${prNumber}`));
 }
 
-export function clearPendingVerification(prNumber: number): void {
+export function clearPendingCICheck(prNumber: number): void {
   const file = join(STATE_DIR, `pending-verify-${prNumber}`);
   if (existsSync(file)) {
     try { unlinkSync(file); } catch { /* best-effort */ }

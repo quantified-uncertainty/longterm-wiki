@@ -1,5 +1,5 @@
 /**
- * Citation Verification Script
+ * Citation Check Script
  *
  * Fetches and verifies all citation URLs for a wiki page (or all pages).
  * Downloads each cited URL, extracts title + content snippet, and stores
@@ -61,7 +61,7 @@ async function main() {
     }
     // Verify all pages with citations
     let pages = findPagesWithCitations();
-    console.log(`\n${c.bold}${c.blue}Citation Verification — All Pages${c.reset}\n`);
+    console.log(`\n${c.bold}${c.blue}Citation Check — All Pages${c.reset}\n`);
     console.log(`  Found ${pages.length} pages with citations\n`);
 
     // Skip already-verified pages unless --recheck
@@ -70,7 +70,7 @@ async function main() {
         const existing = readCitationArchive(p.pageId);
         return !existing;
       });
-      console.log(`  ${pages.length} pages need verification (use --recheck to re-verify all)\n`);
+      console.log(`  ${pages.length} pages need checking (use --recheck to re-verify all)\n`);
     }
 
     if (limit > 0) {
@@ -138,7 +138,7 @@ async function main() {
     process.exit(totalBroken > 0 ? 1 : 0);
   }
 
-  // Single page verification
+  // Single page check
   const filePath = findPageFile(pageId);
   if (!filePath) {
     console.error(`${c.red}Error: page "${pageId}" not found${c.reset}`);
@@ -172,7 +172,7 @@ async function main() {
     process.exit(archive.broken > 0 ? 1 : 0);
   }
 
-  console.log(`\n${c.bold}${c.blue}Citation Verification: ${pageId}${c.reset}`);
+  console.log(`\n${c.bold}${c.blue}Citation Check: ${pageId}${c.reset}`);
   console.log(`  ${citations.length} citations to verify\n`);
 
   const archive = await verifyCitationsForPage(pageId, body, { verbose: true });
@@ -243,9 +243,9 @@ async function main() {
 
   console.log(`\n${c.dim}Archive saved to data/citation-archive/${pageId}.yaml${c.reset}\n`);
 
-  // Optional content verification: check if source actually supports each claim
+  // Optional content source-check: check if source actually supports each claim
   if (contentVerify && verified.length > 0) {
-    console.log(`\n${c.bold}${c.blue}Content Verification (--content-verify):${c.reset}`);
+    console.log(`\n${c.bold}${c.blue}Content Source-Check (--content-verify):${c.reset}`);
     console.log(`  Fetching source content and checking claim support...\n`);
 
     let supported = 0;

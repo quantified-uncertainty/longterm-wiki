@@ -74,7 +74,7 @@ export function GrantsSection({
   const title = direction === "given" ? "Grants Given" : "Grants Received";
 
   // Server mode: use when (a) large KB dataset, (b) PG has grants but KB doesn't,
-  // or (c) received grants exist in PG (needed for verification verdict data).
+  // or (c) received grants exist in PG (needed for source-check verdict data).
   const useServerMode =
     entityId != null && (
       grants.length >= SERVER_MODE_THRESHOLD ||

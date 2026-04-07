@@ -125,7 +125,7 @@ describe('parseVerifierResponse', () => {
   it('handles malformed JSON gracefully as unchecked', () => {
     const result = parseVerifierResponse('not json at all');
     expect(result.verdict).toBe('unchecked');
-    expect(result.explanation).toBe('Failed to parse verification response.');
+    expect(result.explanation).toBe('Failed to parse source-check response.');
   });
 
   it('handles missing fields with defaults', () => {
@@ -248,7 +248,7 @@ describe('auditCitations URL status handling', () => {
   });
 
   it('fetches missing URL when fetchMissing=true', async () => {
-    const longContent = 'Some content here about AI safety that is long enough to pass the minimum content length check for verification purposes.';
+    const longContent = 'Some content here about AI safety that is long enough to pass the minimum content length check for checking purposes.';
     mockFetchSource.mockResolvedValue(makeFetchedSource({ url: 'https://example.com/source', content: longContent }));
     mockCallOpenRouter.mockResolvedValue(
       JSON.stringify({ verdict: 'verified', relevantQuote: 'content', explanation: 'Found it.' }),
@@ -518,7 +518,7 @@ describe('auditCitations LLM error handling', () => {
     mockCallOpenRouter.mockRejectedValue(new Error('Rate limit exceeded'));
 
     // Content must be ≥ 50 chars so it reaches the LLM call
-    const longContent = 'This source has plenty of content about AI safety and other relevant topics for verification purposes.';
+    const longContent = 'This source has plenty of content about AI safety and other relevant topics for checking purposes.';
     const sourceCache: SourceCache = new Map([
       ['https://example.com/source', makeFetchedSource({ url: 'https://example.com/source', content: longContent })],
     ]);
@@ -582,7 +582,7 @@ describe('auditCitations relevantExcerpts', () => {
     const sourceCache: SourceCache = new Map([
       ['https://example.com/source', makeFetchedSource({
         url: 'https://example.com/source',
-        content: 'This is the full source content that should be used when no excerpts are available for verification.',
+        content: 'This is the full source content that should be used when no excerpts are available for source-check.',
         relevantExcerpts: [],
       })],
     ]);

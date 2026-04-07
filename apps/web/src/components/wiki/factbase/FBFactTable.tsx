@@ -22,7 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBProperty, isFactExpired } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
+import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
 
 interface FBFactTableProps {
   /** KB entity identifier — stableId (e.g., "mK9pX3rQ7n") or legacy slug */
@@ -68,7 +68,7 @@ export function FBFactTable({ entity, property, title, includeExpired }: FBFactT
             <TableRow>
               <TableHead scope="col">Date</TableHead>
               <TableHead scope="col">Value</TableHead>
-              <TableHead scope="col" className="w-8"><span className="sr-only">Verification</span></TableHead>
+              <TableHead scope="col" className="w-8"><span className="sr-only">Source Check</span></TableHead>
               <TableHead scope="col">Source</TableHead>
               <TableHead scope="col">Notes</TableHead>
             </TableRow>

@@ -26,7 +26,7 @@ export interface FundingProgramListRow {
   status: string | null;
   source: string | null;
   description: string | null;
-  /** Source-check verification verdict, if available */
+  /** Source-check verdict, if available */
   verdict: RecordVerdict | null;
 }
 

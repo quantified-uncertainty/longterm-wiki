@@ -27,7 +27,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 // Types
 // ---------------------------------------------------------------------------
 
-export interface VerificationIssue {
+export interface SourceCheckIssue {
   recordId: string;
   table: string;
   entityName?: string;
@@ -38,11 +38,11 @@ export interface VerificationIssue {
   source: 'deterministic' | 'llm';
 }
 
-export interface VerificationResult {
+export interface SourceCheckResult {
   table: string;
   totalRecords: number;
   recordsChecked: number;
-  issues: VerificationIssue[];
+  issues: SourceCheckIssue[];
   /** Batch API cost (0 for deterministic-only) */
   batchCost: number;
   durationMs: number;
@@ -179,7 +179,7 @@ const ENTITY_ID_FIELDS = [
 
 /**
  * Fields that are internal-only and should be stripped from the LLM prompt
- * because they are redundant with resolved names or not useful for verification.
+ * because they are redundant with resolved names or not useful for source-check.
  */
 const INTERNAL_ONLY_FIELDS = [
   'personEntityId', 'orgEntityId',
@@ -187,11 +187,11 @@ const INTERNAL_ONLY_FIELDS = [
 ];
 
 /**
- * Create a human-readable copy of a record for LLM verification.
+ * Create a human-readable copy of a record for LLM source-check.
  *
  * - Replaces stableId values in entity-reference fields with human-readable names
  * - Uses resolved name fields from the API response when available (e.g. personResolvedName)
- * - Strips internal-only fields that don't help verification
+ * - Strips internal-only fields that don't help source-checking
  * - Falls back to the original value if no name can be resolved
  */
 export function humanizeRecord(
@@ -264,8 +264,8 @@ function getResolvedNameField(idField: string): string | null {
 export function runDeterministicChecks(
   table: string,
   records: GenericRecord[],
-): VerificationIssue[] {
-  const issues: VerificationIssue[] = [];
+): SourceCheckIssue[] {
+  const issues: SourceCheckIssue[] = [];
   const knownIds = buildStableIdSet();
 
   for (const rec of records) {
@@ -348,7 +348,7 @@ export function runDeterministicChecks(
     }
 
     // Duplicate detection within the batch
-    // (handled by dedup.ts on submission, but good to flag in verification too)
+    // (handled by dedup.ts on submission, but good to flag in source-checking too)
   }
 
   // Cross-record duplicate check
@@ -383,11 +383,11 @@ export function runDeterministicChecks(
 }
 
 // ---------------------------------------------------------------------------
-// LLM batch verification
+// LLM batch source-check
 // ---------------------------------------------------------------------------
 
-/** Build a verification prompt for a single record */
-export function buildVerificationPrompt(
+/** Build a source-check prompt for a single record */
+export function buildSourceCheckPrompt(
   table: string,
   record: GenericRecord,
   nameMap: Map<string, string>,
@@ -435,13 +435,13 @@ If the record looks reasonable, return \`{"verdict":"pass","issues":[],"confiden
 Only flag issues you are confident about based on the record data alone.`;
 }
 
-/** Parse the LLM verification response */
-function parseVerificationResponse(
+/** Parse the LLM source-check response */
+function parseSourceCheckResponse(
   text: string,
   recordId: string,
   table: string,
-): VerificationIssue[] {
-  const issues: VerificationIssue[] = [];
+): SourceCheckIssue[] {
+  const issues: SourceCheckIssue[] = [];
 
   try {
     // Extract JSON from possible markdown code blocks
@@ -475,7 +475,7 @@ function parseVerificationResponse(
       table,
       field: '_parse',
       severity: 'info',
-      message: `Could not parse LLM verification response`,
+      message: `Could not parse LLM source-check response`,
       source: 'llm',
     });
   }
@@ -484,17 +484,17 @@ function parseVerificationResponse(
 }
 
 /**
- * Run LLM verification on records via the Batch API.
+ * Run LLM source-check on records via the Batch API.
  * Uses Haiku for cost efficiency (50% batch discount on top of cheap model).
  */
-export async function runBatchVerification(
+export async function runBatchSourceCheck(
   table: string,
   records: GenericRecord[],
   options: { model?: string } = {},
-): Promise<{ issues: VerificationIssue[]; cost: number }> {
+): Promise<{ issues: SourceCheckIssue[]; cost: number }> {
   const model = options.model || MODELS.haiku;
   const client = createLlmClient();
-  const issues: VerificationIssue[] = [];
+  const issues: SourceCheckIssue[] = [];
 
   // Build name map once for the entire batch
   const nameMap = buildStableIdNameMap();
@@ -510,7 +510,7 @@ export async function runBatchVerification(
         model,
         max_tokens: 1024,
         messages: [
-          { role: 'user' as const, content: buildVerificationPrompt(table, rec, nameMap) },
+          { role: 'user' as const, content: buildSourceCheckPrompt(table, rec, nameMap) },
         ],
       },
     };
@@ -520,7 +520,7 @@ export async function runBatchVerification(
     return { issues: [], cost: 0 };
   }
 
-  console.log(`[verify] Submitting batch of ${batchRequests.length} verification requests (model: ${model})...`);
+  console.log(`[verify] Submitting batch of ${batchRequests.length} source-check requests (model: ${model})...`);
 
   const results = await runBatchWithProgress(client, batchRequests);
 
@@ -539,7 +539,7 @@ export async function runBatchVerification(
     }
 
     if (text) {
-      const recordIssues = parseVerificationResponse(text, recordId, table);
+      const recordIssues = parseSourceCheckResponse(text, recordId, table);
       issues.push(...recordIssues);
     }
   }
@@ -571,7 +571,7 @@ async function runBatchWithProgress(
 }
 
 // ---------------------------------------------------------------------------
-// Fetch records for verification
+// Fetch records for source-check
 // ---------------------------------------------------------------------------
 
 async function fetchAllRecords(table: string, limit?: number): Promise<GenericRecord[]> {
@@ -618,13 +618,13 @@ export interface VerifyOptions {
   limit?: number;
   /** 'deterministic' = structural only, 'batch' = LLM via Batch API, 'all' = both */
   source?: 'deterministic' | 'batch' | 'all';
-  /** LLM model for batch verification (default: haiku) */
+  /** LLM model for batch source-check (default: haiku) */
   model?: string;
   /** Max records per batch request (Batch API limit is 10,000) */
   batchSize?: number;
 }
 
-export async function verifyRecords(options: VerifyOptions): Promise<VerificationResult> {
+export async function verifyRecords(options: VerifyOptions): Promise<SourceCheckResult> {
   const startTime = Date.now();
   const { table, limit, source = 'all', model, batchSize = 500 } = options;
 
@@ -632,7 +632,7 @@ export async function verifyRecords(options: VerifyOptions): Promise<Verificatio
   const records = await fetchAllRecords(table, limit);
   console.log(`[verify] Fetched ${records.length} records`);
 
-  const allIssues: VerificationIssue[] = [];
+  const allIssues: SourceCheckIssue[] = [];
   let batchCost = 0;
 
   // Phase 1: Deterministic checks
@@ -643,13 +643,13 @@ export async function verifyRecords(options: VerifyOptions): Promise<Verificatio
     console.log(`[verify] Deterministic: ${deterministicIssues.length} issues found`);
   }
 
-  // Phase 2: LLM batch verification
+  // Phase 2: LLM batch source-check
   if (source === 'batch' || source === 'all') {
     // Process in chunks to stay within Batch API limits
     for (let i = 0; i < records.length; i += batchSize) {
       const chunk = records.slice(i, i + batchSize);
       console.log(`[verify] LLM batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)}: ${chunk.length} records`);
-      const { issues: batchIssues, cost } = await runBatchVerification(table, chunk, { model });
+      const { issues: batchIssues, cost } = await runBatchSourceCheck(table, chunk, { model });
       allIssues.push(...batchIssues);
       batchCost += cost;
     }
@@ -669,10 +669,10 @@ export async function verifyRecords(options: VerifyOptions): Promise<Verificatio
 // Report formatting
 // ---------------------------------------------------------------------------
 
-export function formatVerificationReport(result: VerificationResult): string {
+export function formatSourceCheckReport(result: SourceCheckResult): string {
   const lines: string[] = [];
 
-  lines.push(`\x1b[1mVerification Report: ${result.table}\x1b[0m`);
+  lines.push(`\x1b[1mSource-Check Report: ${result.table}\x1b[0m`);
   lines.push(`Records checked: ${result.recordsChecked}/${result.totalRecords}`);
   lines.push(`Duration: ${Math.round(result.durationMs / 1000)}s`);
   if (result.batchCost > 0) {

@@ -1,5 +1,5 @@
 /**
- * Data Source Manifest — describes the schema, column mapping, and verification
+ * Data Source Manifest — describes the schema, column mapping, and source-check
  * strategy for a structured data source (CSV, API, HTML table).
  *
  * Part of Phase 2: Data Source Resources (Discussion #3567).
@@ -28,8 +28,8 @@ export interface DataSourceManifest {
     /** Strings that should be treated as null (e.g., ["", "N/A", "-"]) */
     missingValues?: string[];
   };
-  /** How to verify records against this source */
-  verification: {
+  /** How to source-check records against this source */
+  sourceCheck: {
     strategy: 'deterministic_row_match';
     /** Fields used for matching (internal field names, e.g., ['grantee', 'amount', 'date']) */
     matchFields: string[];

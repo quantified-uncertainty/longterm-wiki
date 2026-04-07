@@ -57,8 +57,7 @@ const StatsQuery = z.object({
   parent_id: z.string().max(100).optional(),
 });
 
-// Verification schemas removed — verification now lives in the unified
-// /api/verifications route. See discussion #2950.
+// Source-check schemas live in the unified /api/source-checks route. See discussion #2950.
 
 // ---- Raw SQL row types ----
 
@@ -128,8 +127,8 @@ function formatThing(
   };
 }
 
-// formatVerification and formatVerdict removed — verification now lives in
-// the unified /api/verifications route. See discussion #2950.
+// formatSourceCheck and formatVerdict removed — source-checks live in
+// the unified /api/source-checks route. See discussion #2950.
 
 const sortColumns = {
   title: things.title,
@@ -417,8 +416,7 @@ const thingsApp = new Hono()
     });
   })
 
-  // Verification endpoints (GET/POST /verifications, GET/POST /verdicts) removed.
-  // Verification now lives in the unified /api/verifications route.
+  // Source-check endpoints live in the unified /api/source-checks route.
   // See discussion #2950.
 
   // ---- GET /:id ----

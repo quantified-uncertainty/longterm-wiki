@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
- * GET /api/entity-verifications-proxy?entity_id=...&record_type=...&limit=...
+ * GET /api/source-check-verdicts-proxy?entity_id=...&record_type=...&limit=...
  *
- * Proxies verification verdict requests to the wiki-server.
+ * Proxies source-check verdict requests to the wiki-server.
  * entity_id is optional — omit it to fetch all verdicts.
  */
 export async function GET(request: NextRequest) {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Forward validated query params to the unified verifications endpoint
+    // Forward validated query params to the source-checks verdicts endpoint
     const params = new URLSearchParams();
     if (entityId && entityId.trim() && entityId !== "*") {
       params.set("entity_id", entityId.trim());
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     const verdict = request.nextUrl.searchParams.get("verdict");
     if (verdict && verdict.length <= 50) params.set("verdict", verdict);
 
-    const url = `${config.serverUrl}/api/verifications/verdicts?${params.toString()}`;
+    const url = `${config.serverUrl}/api/source-checks/verdicts?${params.toString()}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(15_000),

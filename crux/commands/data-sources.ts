@@ -90,16 +90,16 @@ async function showCommand(args: string[], _options: Options): Promise<CommandRe
     console.log(`\n  Column Mapping:  (none)`);
   }
 
-  // Verification config
+  // Source-check config
   const verificationConfig = ds.verificationConfig as Record<string, unknown> | null | undefined;
   if (verificationConfig && Object.keys(verificationConfig).length > 0) {
-    console.log(`\n  Verification Config:`);
+    console.log(`\n  Source-Check Config:`);
     for (const [key, value] of Object.entries(verificationConfig)) {
       const formatted = Array.isArray(value) ? value.join(', ') : String(value);
       console.log(`    ${key}: ${formatted}`);
     }
   } else {
-    console.log(`\n  Verification Config:  (none)`);
+    console.log(`\n  Source-Check Config:  (none)`);
   }
 
   // Show snapshot history
@@ -181,16 +181,16 @@ async function healthCommand(_args: string[], _options: Options): Promise<Comman
     const hasSnapshot = source?.lastSnapshotAt != null;
     const hasFields = manifest.schema.fields.length > 0;
 
-    // Check persisted column mapping and verification config
+    // Check persisted column mapping and source-check config
     const hasColumnMapping = source?.columnMapping != null && Object.keys(source.columnMapping as Record<string, unknown>).length > 0;
-    const hasVerificationConfig = source?.verificationConfig != null && Object.keys(source.verificationConfig as Record<string, unknown>).length > 0;
+    const hasSourceCheckConfig = source?.verificationConfig != null && Object.keys(source.verificationConfig as Record<string, unknown>).length > 0;
 
     const status = [];
     if (!isRegistered) { status.push('NOT REGISTERED'); issues++; }
     if (!hasSnapshot) { status.push('NO SNAPSHOT'); issues++; }
     if (!hasFields) { status.push('NO SCHEMA'); issues++; }
     if (isRegistered && !hasColumnMapping) { status.push('NO COLUMN MAPPING'); issues++; }
-    if (isRegistered && !hasVerificationConfig) { status.push('NO VERIFICATION CONFIG'); issues++; }
+    if (isRegistered && !hasSourceCheckConfig) { status.push('NO VERIFICATION CONFIG'); issues++; }
 
     const icon = status.length === 0 ? '✓' : '✗';
     console.log(`  ${icon} ${id.padEnd(25)} ${status.length > 0 ? status.join(', ') : 'OK'}`);

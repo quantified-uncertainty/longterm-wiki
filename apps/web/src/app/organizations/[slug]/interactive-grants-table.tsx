@@ -28,8 +28,8 @@ export interface GrantRow {
   // For grants received:
   funderName?: string;
   funderHref?: string | null;
-  /** Source-check verification verdict (null if not checked) */
-  verificationVerdict?: string | null;
+  /** Source-check verdict (null if not checked) */
+  sourceCheckVerdict?: string | null;
   /** Link to source-check detail page */
   sourceCheckHref?: string;
 }
@@ -54,7 +54,7 @@ const ServerGrantSchema = z.object({
   source: z.string().nullable(),
   notes: z.string().nullable(),
   programId: z.string().nullable(),
-  verification: z.object({
+  sourceCheck: z.object({
     verdict: z.string(),
     confidence: z.number().nullable(),
     sourcesChecked: z.number(),
@@ -92,8 +92,8 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     divisionName: null,
     notes: g.notes,
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
-    verificationVerdict: g.verification?.verdict ?? null,
-    sourceCheckHref: g.verification?.verdict
+    sourceCheckVerdict: g.sourceCheck?.verdict ?? null,
+    sourceCheckHref: g.sourceCheck?.verdict
       ? `/source-checks/grant/${encodeURIComponent(g.id)}`
       : undefined,
   };
@@ -207,7 +207,7 @@ const ALL_COLUMNS: ColumnDef[] = [
     label: "\u2713",
     defaultVisible: true,
     align: "center",
-    onlyIfData: (rows) => rows.some((r) => r.verificationVerdict),
+    onlyIfData: (rows) => rows.some((r) => r.sourceCheckVerdict),
   },
 ];
 
@@ -311,7 +311,7 @@ export function InteractiveGrantsTable({
           cmp = (a.notes ?? "").localeCompare(b.notes ?? "");
           break;
         case "verified":
-          cmp = (a.verificationVerdict ?? "").localeCompare(b.verificationVerdict ?? "");
+          cmp = (a.sourceCheckVerdict ?? "").localeCompare(b.sourceCheckVerdict ?? "");
           break;
       }
       return localSortDir === "asc" ? cmp : -cmp;
@@ -781,7 +781,7 @@ function CellContent({
             program: grant.programName,
             status: grant.status,
           })}
-          verdict={grant.verificationVerdict}
+          verdict={grant.sourceCheckVerdict}
           sourceCheckHref={grant.sourceCheckHref}
         />
       );

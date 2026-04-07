@@ -24,7 +24,7 @@ import {
   type QuotesByPageResult,
 } from '../lib/wiki-server/citations.ts';
 import { listPages, type PageListResult } from '../lib/wiki-server/pages.ts';
-import { getVerdictByRecord } from '../lib/wiki-server/verifications.ts';
+import { getVerdictByRecord } from '../lib/wiki-server/source-check-client.ts';
 
 // ── Types ──────────────────────────────────────────────────────────────
 

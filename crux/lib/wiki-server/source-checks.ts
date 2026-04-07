@@ -3,7 +3,7 @@
  *
  * Provides functions to fetch source-check verdicts from the wiki-server.
  * Used by the auto-update pipeline to skip pages with contradicted verdicts,
- * and by agents to query verification status by entity, page, or failure type.
+ * and by agents to query source-check status by entity, page, or failure type.
  *
  * Response types are inferred from the server route via Hono RPC type system.
  */

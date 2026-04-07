@@ -4,7 +4,7 @@ import { SourceCheckCoverageContent } from "./source-check-coverage-content";
 export const metadata: Metadata = {
   title: "Source Check Coverage",
   description:
-    "Data quality and coverage across all record types — verification verdicts, entity counts, and accuracy rates.",
+    "Data quality and coverage across all record types — source-check verdicts, entity counts, and accuracy rates.",
   robots: { index: false },
 };
 

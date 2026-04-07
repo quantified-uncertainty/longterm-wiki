@@ -96,7 +96,7 @@ export function SourcesOverviewContent() {
             Source Checks
           </h3>
           <p className="text-sm text-muted-foreground">
-            Automated verification of FactBase claims against their cited
+            Automated source checking of FactBase claims against their cited
             sources. Shows verdicts (supported, contradicted, unverifiable) and
             coverage across entities.
           </p>

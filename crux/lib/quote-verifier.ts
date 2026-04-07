@@ -1,5 +1,5 @@
 /**
- * Quote Verification
+ * Quote Matching
  *
  * Verifies that an extracted quote actually exists in the source text.
  * Uses three strategies in order of precision:
@@ -8,7 +8,7 @@
  *   3. Fuzzy match — sliding window with Jaccard similarity on word sets (score: 0.0-0.9)
  */
 
-export interface VerificationResult {
+export interface SourceCheckResult {
   verified: boolean;
   method: 'exact' | 'normalized' | 'fuzzy' | 'none';
   score: number;
@@ -58,12 +58,12 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
  *
  * @param quote - The extracted quote to verify
  * @param fullText - The full text of the source document
- * @returns Verification result with method used and confidence score
+ * @returns Source-check result with method used and confidence score
  */
 export function verifyQuoteInSource(
   quote: string,
   fullText: string,
-): VerificationResult {
+): SourceCheckResult {
   if (!quote || !fullText) {
     return { verified: false, method: 'none', score: 0 };
   }

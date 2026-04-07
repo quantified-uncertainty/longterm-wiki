@@ -36,7 +36,7 @@ interface CommandOptions extends BaseOptions {
   ci?: boolean;
   dryRun?: boolean;
   skipEntityValidation?: boolean;
-  skipVerification?: boolean;
+  skipSourceCheck?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -139,7 +139,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
   const result = await runEnrichmentAgent(task, {
     dryRun,
     model,
-    skipVerification: !!options.skipVerification,
+    skipSourceCheck: !!options.skipSourceCheck,
   });
 
   if (!dryRun) {
@@ -245,24 +245,24 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
   }
 
-  // Source verification gate: check records against their source URLs before submission.
+  // Source-check gate: check records against their source URLs before submission.
   let recordsToSubmit = records;
-  let verificationNote = '';
-  if (!options.skipVerification) {
-    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-verification.ts');
+  let sourceCheckNote = '';
+  if (!options.skipSourceCheck) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-source-check.ts');
     const verifyResult = await verifyBeforeSubmit(table, records);
     console.log(formatPreSubmitSummary(verifyResult));
 
     recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
 
     if (verifyResult.rejected.length > 0) {
-      verificationNote = ` (${verifyResult.rejected.length} rejected by source verification)`;
+      sourceCheckNote = ` (${verifyResult.rejected.length} rejected by source-check)`;
     }
 
     if (recordsToSubmit.length === 0) {
       return {
         exitCode: 1,
-        output: `All ${records.length} records were rejected by source verification.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
+        output: `All ${records.length} records were rejected by source-check.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
       };
     }
   }
@@ -273,7 +273,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
 
   const params = new URLSearchParams();
   if (options.skipEntityValidation) params.set('skipEntityValidation', 'true');
-  if (tableConfig.requireVerification) params.set('requireVerification', 'true');
+  if (tableConfig.requireSourceCheck) params.set('requireSourceCheck', 'true');
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
@@ -304,9 +304,9 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     recordCount: recordsToSubmit.length,
     recordsRejected: records.length - recordsToSubmit.length,
     submittedAt: now.toISOString(),
-    verificationSummary: {
-      withVerification: recordsToSubmit.filter((r: Record<string, unknown>) => r.verification).length,
-      withoutVerification: recordsToSubmit.filter((r: Record<string, unknown>) => !r.verification).length,
+    sourceCheckSummary: {
+      withSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => r.verification).length,
+      withoutSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => !r.verification).length,
       verdicts: {
         verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
         contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
@@ -341,7 +341,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     exitCode: 0,
     output: options.ci
       ? JSON.stringify({ submitted: count, table })
-      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${verificationNote}\n  Manifest: ${manifestPath}`,
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${sourceCheckNote}\n  Manifest: ${manifestPath}`,
   };
 }
 
@@ -933,7 +933,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     taskTypes,
     entityTypes,
     model,
-    skipVerification: !!options.skipVerification,
+    skipSourceCheck: !!options.skipSourceCheck,
   });
 
   if (options.ci) {
@@ -957,7 +957,7 @@ const PERSONNEL_SYNC_BATCH_SIZE = 200;
 // ---------------------------------------------------------------------------
 
 async function sourceCheckRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { verifyRecords, formatVerificationReport } = await import('../tablebase/source-check.ts');
+  const { verifyRecords, formatSourceCheckReport } = await import('../tablebase/source-check.ts');
 
   const table = options.table as string | undefined;
   if (!table) {
@@ -974,7 +974,7 @@ async function sourceCheckRecordsCommand(args: string[], options: CommandOptions
     return { exitCode: 0, output: JSON.stringify(result, null, 2) };
   }
 
-  return { exitCode: 0, output: formatVerificationReport(result) };
+  return { exitCode: 0, output: formatSourceCheckReport(result) };
 }
 
 async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1243,7 +1243,7 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
-  --skip-verification       Skip source verification before submit (for testing)
+  --skip-source-check       Skip source-check before submit (for testing)
   --ci                      JSON output
 
 Modes:
@@ -1275,7 +1275,7 @@ Examples:
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
-  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-verification  # Submit without source verification
+  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-source-check  # Submit without source-check
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing

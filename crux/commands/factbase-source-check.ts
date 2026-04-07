@@ -21,7 +21,7 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi } from '../lib/wiki-server/verifications.ts';
+import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi } from '../lib/wiki-server/source-check-client.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
 import {
@@ -50,7 +50,7 @@ interface VerifyCommandOptions extends BaseOptions {
   ci?: boolean;
 }
 
-interface VerificationResult {
+interface SourceCheckResult {
   factId: string;
   entityId: string;
   entityName: string;
@@ -67,7 +67,7 @@ interface VerificationResult {
   errorType?: SourceFetchErrorType;
 }
 
-interface VerificationError {
+interface SourceCheckError {
   factId: string;
   entityId: string;
   propertyId: string;
@@ -77,7 +77,7 @@ interface VerificationError {
   errorType?: SourceFetchErrorType;
 }
 
-interface VerificationSummary {
+interface SourceCheckSummary {
   total: number;
   confirmed: number;
   contradicted: number;
@@ -85,8 +85,8 @@ interface VerificationSummary {
   outdated: number;
   partial: number;
   errors: number;
-  results: VerificationResult[];
-  failures: VerificationError[];
+  results: SourceCheckResult[];
+  failures: SourceCheckError[];
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────
@@ -94,7 +94,7 @@ interface VerificationSummary {
 /**
  * Build the LLM source-check prompt for a single fact.
  */
-function buildVerificationPrompt(
+function buildSourceCheckPrompt(
   entity: Entity,
   fact: Fact,
   property: Property | undefined,
@@ -133,7 +133,7 @@ async function verifySingleFact(
   fact: Fact,
   graph: Graph,
   client: ReturnType<typeof createLlmClient>,
-): Promise<VerificationResult | VerificationError> {
+): Promise<SourceCheckResult | SourceCheckError> {
   const property = graph.getProperty(fact.propertyId);
   const formattedValue = formatFactValue(fact, property, graph);
   const sourceUrl = fact.source!;
@@ -152,13 +152,13 @@ async function verifySingleFact(
   }
 
   // If content was fetched but has issues (e.g., paywall), still attempt
-  // verification with the partial content — the LLM may still extract useful info.
+  // source-check with the partial content — the LLM may still extract useful info.
   const sourceText = fetchResult.content;
 
   // Truncate source text for prompt
   const truncatedSource = sourceText.slice(0, 12000);
 
-  const prompt = buildVerificationPrompt(entity, fact, property, formattedValue, truncatedSource);
+  const prompt = buildSourceCheckPrompt(entity, fact, property, formattedValue, truncatedSource);
 
   try {
     const result = await callLlm(client, prompt, {
@@ -217,7 +217,7 @@ async function verifySingleFact(
  * Store a source-check result in the wiki-server database.
  * Best-effort: logs a warning on failure but does not block the pipeline.
  */
-async function storeVerificationResult(result: VerificationResult): Promise<void> {
+async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> {
   const body = {
     recordType: 'fact',
     recordId: result.factId,
@@ -376,7 +376,7 @@ export async function sourceCheckCommand(
 
   // Live run: verify facts with LLM
   const client = createLlmClient();
-  const summary: VerificationSummary = {
+  const summary: SourceCheckSummary = {
     total: factsToVerify.length,
     confirmed: 0,
     contradicted: 0,
@@ -417,7 +417,7 @@ export async function sourceCheckCommand(
       }
 
       // Store result in wiki-server (best-effort, does not block pipeline)
-      storeVerificationResult(result).catch((e: unknown) => {
+      storeSourceCheckResult(result).catch((e: unknown) => {
         console.warn(`[fb-source-check] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
       });
     }
@@ -433,7 +433,7 @@ export async function sourceCheckCommand(
 
   const lines: string[] = [];
   lines.push('');
-  lines.push(`\x1b[1m═══ Verification Summary ═══\x1b[0m`);
+  lines.push(`\x1b[1m═══ Source-Check Summary ═══\x1b[0m`);
   lines.push(`Total checked:  ${summary.total}`);
   lines.push(`\x1b[32mConfirmed:      ${summary.confirmed}\x1b[0m`);
   lines.push(`\x1b[31mContradicted:   ${summary.contradicted}\x1b[0m`);

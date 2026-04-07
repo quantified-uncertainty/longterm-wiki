@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getWikiServerConfig } from "@lib/wiki-server";
 
 /**
- * GET /api/verification-detail?recordType=...&recordId=...
+ * GET /api/source-check-detail?recordType=...&recordId=...
  *
- * Proxies verification evidence requests to the wiki-server's
- * /api/verifications/evidence/:recordType/:recordId endpoint.
+ * Proxies source-check evidence requests to the wiki-server's
+ * /api/source-checks/evidence/:recordType/:recordId endpoint.
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const url = `${config.serverUrl}/api/verifications/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+    const url = `${config.serverUrl}/api/source-checks/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
     const res = await fetch(url, {
       headers: config.headers,
       signal: AbortSignal.timeout(10000),

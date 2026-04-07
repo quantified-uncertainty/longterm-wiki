@@ -1,5 +1,5 @@
 /**
- * Tests for validate-verification-coverage.ts enforcement logic.
+ * Tests for validate-source-check-coverage.ts enforcement logic.
  *
  * Tests the three enforcement levels (advisory, soft, hard) and the --force override.
  * Since the validator runs as a script with process.exit(), we test the logic by
@@ -51,7 +51,7 @@ function restoreManifests() {
 function runValidator(...args: string[]): { exitCode: number; output: string } {
   try {
     const output = execSync(
-      `npx tsx crux/validate/validate-verification-coverage.ts ${args.join(' ')}`,
+      `npx tsx crux/validate/validate-source-check-coverage.ts ${args.join(' ')}`,
       { cwd: PROJECT_ROOT, encoding: 'utf-8', timeout: 15_000, stdio: ['pipe', 'pipe', 'pipe'] },
     );
     return { exitCode: 0, output };
@@ -61,7 +61,7 @@ function runValidator(...args: string[]): { exitCode: number; output: string } {
   }
 }
 
-describe('validate-verification-coverage', () => {
+describe('validate-source-check-coverage', () => {
   beforeEach(() => {
     backupManifests();
     cleanupManifests();
@@ -77,14 +77,14 @@ describe('validate-verification-coverage', () => {
     expect(result.output).toContain('No tablebase-manifests/ directory');
   });
 
-  it('exits 0 when all records have verification', () => {
+  it('exits 0 when all records have source-checks', () => {
     createManifest('test-verified.json', {
       table: 'personnel',
       recordCount: 3,
       submittedAt: '2026-04-04T00:00:00Z',
-      verificationSummary: {
-        withVerification: 3,
-        withoutVerification: 0,
+      sourceCheckSummary: {
+        withSourceCheck: 3,
+        withoutSourceCheck: 0,
         verdicts: { verified: 3, contradicted: 0, unverifiable: 0, other: 0 },
       },
       records: [],
@@ -92,17 +92,17 @@ describe('validate-verification-coverage', () => {
 
     const result = runValidator('--enforcement=soft');
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('All TableBase submissions have verification');
+    expect(result.output).toContain('All TableBase submissions have source-checks');
   });
 
-  it('exits 1 in soft enforcement when records lack verification', () => {
+  it('exits 1 in soft enforcement when records lack source-checks', () => {
     createManifest('test-unverified.json', {
       table: 'personnel',
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
-      verificationSummary: {
-        withVerification: 2,
-        withoutVerification: 3,
+      sourceCheckSummary: {
+        withSourceCheck: 2,
+        withoutSourceCheck: 3,
         verdicts: { verified: 2, contradicted: 0, unverifiable: 0, other: 0 },
       },
       records: [],
@@ -110,7 +110,7 @@ describe('validate-verification-coverage', () => {
 
     const result = runValidator('--enforcement=soft');
     expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('3/5 personnel records submitted WITHOUT verification');
+    expect(result.output).toContain('3/5 personnel records submitted WITHOUT source-check');
     expect(result.output).toContain('--force');
   });
 
@@ -119,9 +119,9 @@ describe('validate-verification-coverage', () => {
       table: 'personnel',
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
-      verificationSummary: {
-        withVerification: 2,
-        withoutVerification: 3,
+      sourceCheckSummary: {
+        withSourceCheck: 2,
+        withoutSourceCheck: 3,
         verdicts: { verified: 2, contradicted: 0, unverifiable: 0, other: 0 },
       },
       records: [],
@@ -129,7 +129,7 @@ describe('validate-verification-coverage', () => {
 
     const result = runValidator('--enforcement=soft', '--force');
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('--force: verification warnings overridden');
+    expect(result.output).toContain('--force: source-check warnings overridden');
   });
 
   it('exits 1 when records have contradicted verdicts', () => {
@@ -137,9 +137,9 @@ describe('validate-verification-coverage', () => {
       table: 'personnel',
       recordCount: 4,
       submittedAt: '2026-04-04T00:00:00Z',
-      verificationSummary: {
-        withVerification: 4,
-        withoutVerification: 0,
+      sourceCheckSummary: {
+        withSourceCheck: 4,
+        withoutSourceCheck: 0,
         verdicts: { verified: 2, contradicted: 2, unverifiable: 0, other: 0 },
       },
       records: [],
@@ -155,9 +155,9 @@ describe('validate-verification-coverage', () => {
       table: 'personnel',
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
-      verificationSummary: {
-        withVerification: 0,
-        withoutVerification: 5,
+      sourceCheckSummary: {
+        withSourceCheck: 0,
+        withoutSourceCheck: 5,
         verdicts: { verified: 0, contradicted: 0, unverifiable: 0, other: 0 },
       },
       records: [],
@@ -165,6 +165,6 @@ describe('validate-verification-coverage', () => {
 
     const result = runValidator('--enforcement=advisory');
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('5/5 personnel records submitted WITHOUT verification');
+    expect(result.output).toContain('5/5 personnel records submitted WITHOUT source-check');
   });
 });

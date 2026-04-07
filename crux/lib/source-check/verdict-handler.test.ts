@@ -13,7 +13,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 // Mock wiki-server dependencies before importing the module under test
-vi.mock('../wiki-server/verifications.ts', () => ({
+vi.mock('../wiki-server/source-check-client.ts', () => ({
   storeEvidence: vi.fn(),
   storeVerdict: vi.fn(),
 }));
@@ -27,7 +27,7 @@ vi.mock('../llm.ts', () => ({
 }));
 
 import { storeSourceCheckEvidence, storeAggregateVerdict } from './verdict-handler.ts';
-import { storeEvidence, storeVerdict } from '../wiki-server/verifications.ts';
+import { storeEvidence, storeVerdict } from '../wiki-server/source-check-client.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
 
 const mockStoreEvidence = vi.mocked(storeEvidence);

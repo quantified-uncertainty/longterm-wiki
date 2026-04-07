@@ -59,7 +59,7 @@ describe('computeRecordPriority', () => {
     expect(priority).toBeGreaterThanOrEqual(80);
   });
 
-  it('ranks grant higher than equity-position for same verification state', () => {
+  it('ranks grant higher than equity-position for same source-check state', () => {
     const grantPriority = computeRecordPriority('grant', undefined);
     const equityPriority = computeRecordPriority('equity-position', undefined);
     expect(grantPriority).toBeGreaterThan(equityPriority);

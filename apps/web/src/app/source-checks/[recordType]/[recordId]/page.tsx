@@ -172,7 +172,7 @@ export async function generateMetadata({
 
   return {
     title,
-    description: `Source verification details for ${name ?? recordId} (${formatRecordType(recordType)}).`,
+    description: `Source check details for ${name ?? recordId} (${formatRecordType(recordType)}).`,
     robots: { index: false },
   };
 }
