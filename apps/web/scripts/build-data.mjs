@@ -115,7 +115,6 @@ const DATA_FILES = [
   { key: 'estimates', file: 'estimates.yaml' },
   { key: 'glossary', file: 'glossary.yaml' },
   { key: 'entities', dir: 'entities' }, // Split by entity type
-  { key: 'literature', file: 'literature.yaml' },
   { key: 'funders', file: 'funders.yaml' },
   { key: 'resources', dir: 'resources' }, // Split into multiple files
   { key: 'publications', file: 'publications.yaml' },
