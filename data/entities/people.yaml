@@ -1,4 +1,4 @@
-- id: buck-shlegeris
+[Resource from github at repo://quantified-uncertainty/longterm-wiki/sha/b89e82cc08bc5d5b516686a87ae2ef2104b77620/contents/data/entities/people.yaml] - id: buck-shlegeris
   stableId: sid_Z62bQynY4g
   wikiId: E46
   type: person
@@ -7570,10 +7570,6 @@
   stableId: sid_uxFp3iKgeJ
   type: person
   title: Yan-David Erlich
-- id: daniel-kokotajko
-  stableId: sid_VnQlQzYOjk
-  type: person
-  title: Daniel Kokotajko
 # Applied Materials
 - id: gary-dickerson
   stableId: sid_jVmO8PWHQ8
