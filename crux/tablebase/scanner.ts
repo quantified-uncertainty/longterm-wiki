@@ -473,7 +473,7 @@ async function scanSourceQuality(): Promise<TableScanResult> {
   }
 
   // Group by entityId
-  const byEntity = new Map<string, { count: number; displayName: string | null }>();
+  const byEntity = new Map<string, { count: number; displayName: string | null; entityType: string | null }>();
   for (const v of allVerdicts) {
     if (!v.entityId) continue;
     const existing = byEntity.get(v.entityId);
@@ -484,36 +484,38 @@ async function scanSourceQuality(): Promise<TableScanResult> {
         existing.displayName = v.entityDisplayName;
       }
     } else {
-      byEntity.set(v.entityId, { count: 1, displayName: v.entityDisplayName });
+      byEntity.set(v.entityId, { count: 1, displayName: v.entityDisplayName, entityType: null });
     }
   }
 
-  // Resolve missing entity names from the entities API
-  const missingNameIds = [...byEntity.entries()]
-    .filter(([, v]) => !v.displayName)
-    .map(([id]) => id);
-  if (missingNameIds.length > 0) {
-    for (const entityId of missingNameIds) {
-      const entityResult = await apiRequest<{ id: string; title: string }>(
-        'GET',
-        `/api/entities/${encodeURIComponent(entityId)}`,
-      );
-      if (entityResult.ok && entityResult.data.title) {
-        byEntity.get(entityId)!.displayName = entityResult.data.title;
+  // Resolve missing entity names and entity types from the entities API
+  // Entity type is always missing (verdicts don't carry it), so look up all entities.
+  // This also fills in missing display names.
+  for (const [entityId, entry] of byEntity) {
+    const entityResult = await apiRequest<{ id: string; title: string; entityType: string }>(
+      'GET',
+      `/api/entities/${encodeURIComponent(entityId)}`,
+    );
+    if (entityResult.ok) {
+      if (!entry.displayName && entityResult.data.title) {
+        entry.displayName = entityResult.data.title;
+      }
+      if (entityResult.data.entityType) {
+        entry.entityType = entityResult.data.entityType;
       }
     }
   }
 
   const profiles: TableProfile[] = [];
-  for (const [entityId, { count, displayName }] of byEntity) {
+  for (const [entityId, { count, displayName, entityType }] of byEntity) {
     // More unverifiable records = lower "completeness" (used as the gap signal)
-    // Cap at 50 — beyond that it's all high-priority
+    // Cap at 20 — beyond that it's all high-priority (20 × 5 = 100)
     const completeness = Math.max(0, 100 - count * 5);
 
     profiles.push({
       entityId,
       entityName: displayName || entityId,
-      entityType: 'organization',
+      entityType: entityType || 'organization',
       table: 'source_quality',
       totalRecords: count,
       completenessPercent: completeness,
