@@ -26,18 +26,43 @@ function makeThing(overrides: Record<string, unknown> = {}): Record<string, unkn
     description: null,
     source_url: null,
     wiki_id: null,
+    parent_title: null,
     created_at: now,
     updated_at: now,
     synced_at: now,
+    verdict: null,
     ...overrides,
   };
 }
 
 /**
+ * Extract the value of `$N` placeholder from the SQL WHERE clause for a given column.
+ * Drizzle generates SQL like: `where "things"."thing_type" = $25`
+ * This parses the `$N` index and returns the corresponding value from `params`.
+ */
+function extractWhereParam(
+  q: string,
+  column: string,
+  params: unknown[]
+): unknown | undefined {
+  const whereIdx = q.indexOf("where");
+  if (whereIdx < 0) return undefined;
+  const whereClause = q.substring(whereIdx);
+
+  // Match patterns like "thing_type" = $25 or "things"."thing_type" = $25
+  const regex = new RegExp(`"${column}"\\s*=\\s*\\$(\\d+)`);
+  const match = whereClause.match(regex);
+  if (!match) return undefined;
+
+  // $N is 1-indexed in SQL, params array is 0-indexed
+  const paramIndex = parseInt(match[1], 10) - 1;
+  return params[paramIndex];
+}
+
+/**
  * Apply WHERE clause filters for things queries.
- * Uses the WHERE part of the SQL and string params to filter the in-memory store.
- * The SQL SELECT clause always contains all column names, so we match the WHERE
- * clause specifically by checking for `"column_name" =` patterns.
+ * Uses `$N` placeholder parsing to extract filter values from params, which
+ * correctly handles extra params from LEFT JOIN CASE expressions.
  */
 function applyThingsFilters(
   q: string,
@@ -47,38 +72,92 @@ function applyThingsFilters(
 
   if (!q.includes("where")) return rows;
 
-  // Extract the WHERE clause portion to check filters
-  const whereIdx = q.indexOf("where");
-  const whereClause = q.substring(whereIdx);
-
-  // String params are filter values; numeric params are limit/offset
-  const stringParams = params.filter((p) => typeof p === "string") as string[];
-
-  // Check which columns appear in WHERE (using the pattern `"column" =`)
-  let paramIdx = 0;
-
-  if (whereClause.includes('"thing_type" =')) {
-    const filterVal = stringParams[paramIdx++];
-    if (filterVal) {
-      rows = rows.filter((r) => r.thing_type === filterVal);
-    }
+  const thingType = extractWhereParam(q, "thing_type", params);
+  if (thingType) {
+    rows = rows.filter((r) => r.thing_type === thingType);
   }
 
-  if (whereClause.includes('"entity_type" =')) {
-    const filterVal = stringParams[paramIdx++];
-    if (filterVal) {
-      rows = rows.filter((r) => r.entity_type === filterVal);
-    }
+  const entityType = extractWhereParam(q, "entity_type", params);
+  if (entityType) {
+    rows = rows.filter((r) => r.entity_type === entityType);
   }
 
-  if (whereClause.includes('"parent_thing_id" =')) {
-    const filterVal = stringParams[paramIdx++];
-    if (filterVal) {
-      rows = rows.filter((r) => r.parent_thing_id === filterVal);
-    }
+  const parentThingId = extractWhereParam(q, "parent_thing_id", params);
+  if (parentThingId) {
+    rows = rows.filter((r) => r.parent_thing_id === parentThingId);
+  }
+
+  const sourceTable = extractWhereParam(q, "source_table", params);
+  if (sourceTable) {
+    rows = rows.filter((r) => r.source_table === sourceTable);
   }
 
   return rows;
+}
+
+/**
+ * Apply FTS prefix filter on in-memory store.
+ * Finds the prefix query param by looking for the ":*" pattern.
+ */
+function applyFtsFilter(
+  q: string,
+  params: unknown[]
+): Record<string, unknown>[] {
+  const prefixParam = params.find(
+    (p) => typeof p === "string" && p.includes(":*")
+  ) as string | undefined;
+
+  if (!prefixParam) return [];
+
+  const words = prefixParam
+    .split("&")
+    .map((w) => w.replace(/:?\*?\s*/g, "").trim().toLowerCase())
+    .filter(Boolean);
+
+  if (words.length === 0) return [];
+
+  const results: Record<string, unknown>[] = [];
+  for (const row of thingsStore.values()) {
+    const title = ((row.title as string) || "").toLowerCase();
+    const desc = ((row.description as string) || "").toLowerCase();
+    const text = `${title} ${desc}`;
+    if (words.every((w) => text.includes(w))) {
+      results.push(row);
+    }
+  }
+  return results;
+}
+
+/**
+ * Apply ILIKE filter on in-memory store.
+ * Finds the ILIKE pattern param by looking for the `%...%` wrapper.
+ */
+function applyIlikeFilter(
+  _q: string,
+  params: unknown[]
+): Record<string, unknown>[] {
+  // Find the ILIKE pattern param — it's wrapped in `%...%`
+  const pattern = params.find(
+    (p) => typeof p === "string" && p.startsWith("%") && p.endsWith("%")
+  ) as string | undefined;
+
+  if (!pattern) return [];
+
+  const searchTerm = pattern.replace(/%/g, "").toLowerCase();
+  const results: Record<string, unknown>[] = [];
+  for (const row of thingsStore.values()) {
+    const title = ((row.title as string) || "").toLowerCase();
+    const id = ((row.id as string) || "").toLowerCase();
+    const desc = ((row.description as string) || "").toLowerCase();
+    if (
+      title.includes(searchTerm) ||
+      id.includes(searchTerm) ||
+      desc.includes(searchTerm)
+    ) {
+      results.push(row);
+    }
+  }
+  return results;
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -127,12 +206,24 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- things: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
   if (q.includes('"things"') && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
-    // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
-    if (q.includes("plainto_tsquery")) return [];
+    // Also handle COUNT queries that include FTS conditions (same WHERE clause)
+    if (q.includes("count(")) {
+      const filtered = applyFtsFilter(q, params);
+      return [{ count: filtered.length }];
+    }
 
-    // to_tsquery prefix search: extract the prefix query and match against titles/descriptions.
-    // The prefixQuery param looks like "word:* & word2:*", so extract the word stems.
-    const prefixParam = params[0] as string;
+    // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
+    if (q.includes("plainto_tsquery") && !q.includes("to_tsquery(")) return [];
+
+    // to_tsquery prefix search: find the prefix query param by looking for the
+    // characteristic ":*" pattern (e.g. "anthropic:*") in the params list.
+    // This is robust against extra params from LEFT JOIN CASE expressions.
+    const prefixParam = params.find(
+      (p) => typeof p === "string" && p.includes(":*")
+    ) as string | undefined;
+
+    if (!prefixParam) return [];
+
     const words = prefixParam
       .split("&")
       .map((w) => w.replace(/:?\*?\s*/g, "").trim().toLowerCase())
@@ -154,26 +245,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- things: ILIKE search (fallback) ---
   if (q.includes('"things"') && q.includes("ilike")) {
-    const pattern = params[0] as string;
-    const searchTerm = pattern.replace(/%/g, "").toLowerCase();
-    const limitParam = params.find(
-      (p, i) => i >= 3 && typeof p === "number"
-    ) as number | undefined;
-    const limit = limitParam ?? 20;
-    const results: Record<string, unknown>[] = [];
-    for (const row of thingsStore.values()) {
-      const title = ((row.title as string) || "").toLowerCase();
-      const id = ((row.id as string) || "").toLowerCase();
-      const desc = ((row.description as string) || "").toLowerCase();
-      if (
-        title.includes(searchTerm) ||
-        id.includes(searchTerm) ||
-        desc.includes(searchTerm)
-      ) {
-        results.push(row);
-      }
+    // Also handle COUNT queries with ILIKE conditions
+    if (q.includes("count(")) {
+      const filtered = applyIlikeFilter(q, params);
+      return [{ count: filtered.length }];
     }
-    return results.slice(0, limit);
+
+    const filtered = applyIlikeFilter(q, params);
+    // Find the limit param (last numeric param)
+    const numericParams = params.filter((p) => typeof p === "number") as number[];
+    const limit = numericParams.length > 0 ? numericParams[numericParams.length - 2] ?? numericParams[numericParams.length - 1] ?? 20 : 20;
+    return filtered.slice(0, limit);
   }
 
   // --- things: COUNT with GROUP BY (stats by type / entity_type) ---
@@ -206,6 +288,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }));
     }
 
+    if (q.includes("source_table")) {
+      // GROUP BY source_table
+      const bySourceTable = new Map<string, number>();
+      for (const row of thingsStore.values()) {
+        const st = row.source_table as string;
+        bySourceTable.set(st, (bySourceTable.get(st) || 0) + 1);
+      }
+      return [...bySourceTable.entries()].map(([source_table, count]) => ({
+        source_table,
+        count,
+      }));
+    }
+
     return [];
   }
 
@@ -216,7 +311,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // --- things: SELECT by id (single thing lookup) ---
-  // Matches: WHERE "id" = $1 LIMIT — no ORDER BY, no ILIKE, no FTS
+  // Matches: WHERE "id" = $N LIMIT — no ORDER BY, no ILIKE, no FTS
   if (
     q.includes('"things"') &&
     q.includes("where") &&
@@ -227,7 +322,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     !q.includes("plainto_tsquery") &&
     !q.includes("group by")
   ) {
-    const id = params[0] as string;
+    // Extract the id param from the WHERE clause using $N placeholder parsing
+    const id = extractWhereParam(q, "id", params) as string | undefined;
+    if (!id) return [];
     const row = thingsStore.get(id);
     return row ? [row] : [];
   }
