@@ -1,0 +1,50 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-07T11:31:27.232Z",
+  "verificationSummary": {
+    "withVerification": 1,
+    "withoutVerification": 3,
+    "verdicts": {
+      "confirmed": 1,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "WxQXSPARS0",
+      "personId": "sid_1oXRs4wqTA",
+      "organizationId": "sid_6rEo4U4WPw",
+      "role": "Co-Founder",
+      "source": "https://arbresearch.com/",
+      "verdict": "none"
+    },
+    {
+      "id": "UPi1womno6",
+      "personId": "sid_OMpcXnS3qJ",
+      "organizationId": "sid_6rEo4U4WPw",
+      "role": "Director",
+      "source": "https://foresight.org/people/gavin-leech/",
+      "verdict": "none"
+    },
+    {
+      "id": "Gj1QvZRnJj",
+      "personId": "sid_E9w4TpNXDZ",
+      "organizationId": "sid_6rEo4U4WPw",
+      "role": "Researcher",
+      "source": "https://forum.effectivealtruism.org/posts/CuPnmeS4v5sFE6nQj/impact-assessment-of-ai-safety-camp-arb-research",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "VxY8sTcpb5",
+      "personId": "sid_CT0Hmqs1wT",
+      "organizationId": "sid_6rEo4U4WPw",
+      "role": "Researcher",
+      "source": "https://arbresearch.com/",
+      "verdict": "none"
+    }
+  ]
+}

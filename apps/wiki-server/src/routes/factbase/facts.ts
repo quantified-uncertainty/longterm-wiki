@@ -14,7 +14,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { logger } from "../../logger.js";
 
 // ---- Constants ----
@@ -445,20 +445,29 @@ const factsApp = new Hono()
         const toFactThingKey = (entityId: string, factId: string) =>
           `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
 
+        // Resolve entity IDs to human-readable titles for thing titles
+        const entityIds = [...new Set(items.map((f) => f.entityId))];
+        const entityTitleMap = await resolveEntityTitles(tx, entityIds);
+
         await upsertThingsInTx(
           tx,
-          items.map((f) => ({
-            id: toFactThingKey(f.entityId, f.factId),
-            thingType: "fact" as const,
-            title: f.label || `${f.factId} for ${f.entityId}`,
-            sourceTable: "facts",
-            sourceId: toFactThingKey(f.entityId, f.factId),
-            description: f.value
-              ? `${f.label || f.factId}: ${f.value}`
-              : f.numeric != null
-                ? `${f.label || f.factId}: ${f.numeric}`
-                : undefined,
-          }))
+          items.map((f) => {
+            const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
+            const factLabel = f.label || f.factId;
+            return {
+              id: toFactThingKey(f.entityId, f.factId),
+              thingType: "fact" as const,
+              title: `${factLabel} — ${entityName}`,
+              sourceTable: "facts",
+              sourceId: toFactThingKey(f.entityId, f.factId),
+              parentThingId: f.entityId,
+              description: f.value
+                ? `${factLabel}: ${f.value}`
+                : f.numeric != null
+                  ? `${factLabel}: ${f.numeric}`
+                  : undefined,
+            };
+          })
         );
 
         upserted = allVals.length;

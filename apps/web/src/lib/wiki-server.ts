@@ -510,6 +510,17 @@ export type RpcDataSourceDetailResult = InferResponseType<DataSourcesClient[':id
 export type RpcSnapshotListResult = InferResponseType<DataSourcesClient[':id']['snapshots']['$get'], 200>;
 
 // ============================================================================
+// Hono RPC client — Resources API
+// ============================================================================
+
+import type { ResourcesRoute } from "@wiki-server/resources-route";
+
+type ResourcesClient = ReturnType<typeof hc<ResourcesRoute>>;
+
+/** Inferred response type for GET /api/resources/:id (single resource with sub-tables) */
+export type RpcResourceDetailResult = InferResponseType<ResourcesClient[':id']['$get'], 200>;
+
+// ============================================================================
 // Hono RPC client — Political Scores API
 // ============================================================================
 

@@ -49,6 +49,7 @@ interface CommandOptions extends BaseOptions {
   recordsFile?: string;
   model?: string;
   source?: string;
+  entity?: string;
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1025,7 +1026,21 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   }
 
   // Convert CareerEntry -> personnel sync format (roleType = "career")
-  const syncItems = entries.map((e) => ({
+  // Filter out entries with unresolvable org IDs (raw names like "Fathom Radiant"
+  // that didn't resolve to a stableId or slug in the entity table).
+  const validEntries = entries.filter((e) => {
+    const id = e.organizationId;
+    // stableIds (sid_xxx) and slugs (lowercase-with-hyphens) are valid
+    if (id.startsWith('sid_') || /^[a-z0-9-]+$/.test(id)) return true;
+    console.warn(`  Skipping career entry ${e.id}: unresolvable organizationId "${id}"`);
+    return false;
+  });
+
+  if (validEntries.length < entries.length) {
+    console.log(`  Filtered: ${entries.length - validEntries.length} entries with unresolvable org IDs`);
+  }
+
+  const syncItems = validEntries.map((e) => ({
     id: e.id,
     personId: e.personId,
     organizationId: e.organizationId,
@@ -1129,6 +1144,125 @@ async function normalizeIdsCommand(_args: string[], options: CommandOptions): Pr
   };
 }
 
+async function sourceDiscoverCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const entityArg = args.find(a => !a.startsWith('--')) || options.entity;
+  const dryRun = !!options.dryRun;
+  const apply = !!options.apply;
+  const model = options.model as string | undefined;
+  const limit = options.limit ? parseInt(options.limit as string, 10) : 10;
+  const budget = options.budget ? parseFloat(options.budget as string) : 10;
+
+  if (entityArg) {
+    // Single-entity mode: run source discovery for one entity
+    const { runEnrichmentAgent } = await import('../tablebase/agent.ts');
+    const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
+    const { getVerdictsByEntity } = await import('../lib/wiki-server/source-checks.ts');
+
+    // Resolve entity
+    const matcher = buildEntityMatcher();
+    const match = matcher.match(entityArg);
+    const entityId = match?.stableId || entityArg;
+    const entityName = match?.name || entityArg;
+
+    // Get unverifiable count for this entity
+    const verdictResult = await getVerdictsByEntity(entityId, { verdict: 'unverifiable', limit: 1 });
+    const unverifiableCount = verdictResult.ok ? verdictResult.data.counts.unverifiable : 0;
+
+    if (unverifiableCount === 0) {
+      return { exitCode: 0, output: `No unverifiable records found for "${entityName}" (${entityId}).` };
+    }
+
+    // Build a synthetic task
+    const task = {
+      id: `sd-${entityId.slice(0, 8)}`,
+      taskType: 'source-discovery' as const,
+      entityId,
+      entityName,
+      entityType: 'organization',
+      table: 'source_quality',
+      impactScore: unverifiableCount * 10,
+      reasons: [`${unverifiableCount} record(s) with unverifiable sources`],
+      existingRecordCount: unverifiableCount,
+    };
+
+    console.log(`[source-discover] Running for "${entityName}" (${entityId}): ${unverifiableCount} unverifiable records${dryRun ? ' [DRY RUN]' : ''}${apply ? ' [APPLY]' : ''}`);
+
+    const result = await runEnrichmentAgent(task, { dryRun, model, apply });
+
+    if (options.ci) {
+      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+    }
+
+    return {
+      exitCode: 0,
+      output: `\x1b[32m✓\x1b[0m Source discovery for "${entityName}": ${result.recordsCreated} resources suggested, $${result.cost.toFixed(4)}, ${Math.round(result.durationMs / 1000)}s`,
+    };
+  }
+
+  // Multi-entity mode: scan and process top entities
+  const { runFullScan } = await import('../tablebase/scanner.ts');
+  const { rankTasks } = await import('../tablebase/task-ranker.ts');
+  const { runEnrichmentAgent } = await import('../tablebase/agent.ts');
+
+  console.log('[source-discover] Scanning for entities with unverifiable records...');
+  const scan = await runFullScan();
+
+  const tasks = rankTasks(scan, {
+    taskTypes: ['source-discovery'],
+    limit,
+  });
+
+  if (tasks.length === 0) {
+    return { exitCode: 0, output: 'No entities with unverifiable records found.' };
+  }
+
+  console.log(`[source-discover] Found ${tasks.length} entities with unverifiable records:`);
+  for (const t of tasks.slice(0, 10)) {
+    console.log(`  ${t.entityName}: ${t.reasons.join('; ')} (impact: ${t.impactScore})`);
+  }
+
+  let totalCost = 0;
+  let totalResources = 0;
+  const results: Array<{ entity: string; resources: number; cost: number }> = [];
+
+  for (let i = 0; i < tasks.length; i++) {
+    if (totalCost >= budget) {
+      console.log(`[source-discover] Budget limit reached ($${totalCost.toFixed(2)} >= $${budget})`);
+      break;
+    }
+
+    const task = tasks[i];
+    console.log(`\n${'─'.repeat(50)}`);
+    console.log(`[source-discover] ${i + 1}/${tasks.length}: ${task.entityName} (${task.reasons.join('; ')})`);
+
+    try {
+      const agentModel = model === 'auto'
+        ? 'sonnet'
+        : model;
+      const result = await runEnrichmentAgent(task, { dryRun, model: agentModel, apply });
+      totalCost += result.cost;
+      totalResources += result.recordsCreated;
+      results.push({ entity: task.entityName, resources: result.recordsCreated, cost: result.cost });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[source-discover] Failed for ${task.entityName}: ${msg}`);
+      results.push({ entity: task.entityName, resources: 0, cost: 0 });
+    }
+  }
+
+  console.log(`\n${'═'.repeat(50)}`);
+  console.log(`[source-discover] Complete: ${results.length} entities, ${totalResources} resources, $${totalCost.toFixed(4)}`);
+
+  if (options.ci) {
+    return { exitCode: 0, output: JSON.stringify({ results, totalResources, totalCost }, null, 2) };
+  }
+
+  return {
+    exitCode: 0,
+    output: `Source discovery complete: ${results.length} entities processed, ${totalResources} resources suggested, $${totalCost.toFixed(4)}`,
+  };
+}
+
 export const commands = {
   scan: scanCommand,
   gaps: gapsCommand,
@@ -1145,6 +1279,7 @@ export const commands = {
   verify: verifyCommand, // personnel ID integrity check (not source-checking)
   'source-check-records': sourceCheckRecordsCommand,
   'verify-records': sourceCheckRecordsCommand, // deprecated alias
+  'source-discover': sourceDiscoverCommand,
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
   default: scanCommand,
@@ -1196,6 +1331,7 @@ Commands:
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
   source-check-records Batch source-check records using deterministic checks + Batch API
+  source-discover      Find better sources for records with unverifiable verdicts
   sync-careers   Sync FactBase career data to the personnel table
   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
 
@@ -1244,6 +1380,7 @@ Options:
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
   --skip-verification       Skip source verification before submit (for testing)
+  --apply                   For source-discover: also link discovered resources to records
   --ci                      JSON output
 
 Modes:
@@ -1256,6 +1393,7 @@ Task Types:
   funding-round-research     Add funding round data for companies
   investment-linking         Add investment records
   benchmark-result-fill      Add benchmark scores for AI models
+  source-discovery           Find better sources for unverifiable records
 
 Examples:
   crux tb tablebase scan                                   # Overview of all tables
@@ -1269,6 +1407,9 @@ Examples:
   crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
   crux tb tablebase source-check-records --table=personnel --source=batch --limit=100  # LLM check 100 records
   crux tb tablebase source-check-records --table=personnel --source=all   # Full source-check
+  crux tb tablebase source-discover anthropic --dry-run       # Preview source suggestions for Anthropic
+  crux tb tablebase source-discover --limit=5 --budget=5     # Discover sources for top 5 entities
+  crux tb tablebase source-discover anthropic --apply        # Discover + link sources to records
   crux tb tablebase normalize-ids                            # Dry-run: show slug-based IDs
   crux tb tablebase normalize-ids --apply                    # Fix slug-based IDs
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId

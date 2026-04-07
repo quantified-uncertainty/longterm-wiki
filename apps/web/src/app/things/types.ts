@@ -7,15 +7,19 @@ export interface ThingRow {
   sourceId: string;
   entityType: string | null;
   description: string | null;
+  sourceUrl: string | null;
+  wikiId: string | null;
   href: string | null;
   parentTitle: string | null;
   updatedAt: string | null;
+  verdict: string | null;
 }
 
 export interface ThingsStatsResponse {
   total: number;
   byType: Record<string, number>;
   byEntityType: Record<string, number>;
+  bySourceTable: Record<string, number>;
 }
 
 /** Format a thingType value as a readable label (e.g. "funding-program" → "Funding Program"). */

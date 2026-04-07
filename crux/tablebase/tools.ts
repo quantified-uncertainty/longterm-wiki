@@ -10,6 +10,8 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
+import { getVerdictsByEntity } from '../lib/wiki-server/source-checks.ts';
+import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
 import { buildEntityMatcher, matchGrantee } from '../lib/grant-import/entity-matcher.ts';
@@ -28,9 +30,58 @@ import {
 // ---------------------------------------------------------------------------
 
 /** Tool definitions for the enrichment agent. web_search is Anthropic's server tool. */
-export function getToolDefinitions() {
+export function getToolDefinitions(options?: { taskType?: TaskType; apply?: boolean }) {
+  const isSourceDiscovery = options?.taskType === 'source-discovery';
+
+  // Source-discovery-specific tools
+  const sourceDiscoveryTools = [
+    {
+      name: 'query_unverifiable_records',
+      description: 'Fetch records with unverifiable source-check verdicts for an entity. Returns the record type, record ID, reasoning why verification failed, and current source URL.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          entityId: { type: 'string', description: 'Entity ID to query unverifiable records for' },
+        },
+        required: ['entityId'],
+      },
+    },
+    {
+      name: 'suggest_resource',
+      description: 'Propose a URL as a resource that could verify one or more records. Registers the URL in the resource database and fetches its content for future verification.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          url: { type: 'string', description: 'The URL to suggest as a source' },
+          recordIds: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Record IDs this source could verify (from query_unverifiable_records)',
+          },
+          description: { type: 'string', description: 'What information this source contains that is relevant' },
+        },
+        required: ['url'],
+      },
+    },
+    ...(options?.apply ? [{
+      name: 'link_source',
+      description: 'Update a record\'s source URL to a better one. Only use this when you are confident the new source actually verifies the record.',
+      input_schema: {
+        type: 'object',
+        properties: {
+          recordType: { type: 'string', enum: ['personnel', 'grant', 'funding-round', 'investment', 'benchmark-result'], description: 'Type of the record to update' },
+          recordId: { type: 'string', description: 'ID of the record to update' },
+          newSourceUrl: { type: 'string', description: 'The new source URL' },
+          resourceId: { type: 'string', description: 'Resource ID from suggest_resource (if available)' },
+        },
+        required: ['recordType', 'recordId', 'newSourceUrl'],
+      },
+    }] : []),
+  ];
+
   return {
     tools: [
+      ...(isSourceDiscovery ? sourceDiscoveryTools : []),
       {
         name: 'query_entities',
         description: 'Search for entities in the wiki database. Returns entity IDs, names, and types.',
@@ -290,7 +341,10 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
 
   // Update caches so subsequent resolve/validate calls find this entity
   _entityMatcher = null; // Force re-build on next resolve
-  if (_knownStableIds) _knownStableIds.add(stableId); // Avoid stale-cache rejection in submit_records
+  // Eagerly initialize the stableId set so newly created entities are recognized
+  // by submit_records validation. Without this, batch-creating entities before
+  // the first submit_records leaves them missing from the set (it was null).
+  getKnownStableIds().add(stableId);
 
   return JSON.stringify({
     created: true,
@@ -418,7 +472,10 @@ async function handleSubmitRecords(
       if (isSid(val)) {
         const raw = stripSid(val);
         if (stableIdSet.has(raw) || stableIdSet.has(val)) {
-          record[field] = raw;
+          // Keep the sid_ prefix — entities.stable_id stores the prefixed form,
+          // and validateEntityRefs checks against it. Stripping causes lookup misses
+          // for newly created entities (see: Arcadia Impact enrichment failure 2026-04-07).
+          record[field] = val;
           continue;
         }
         invalidRefs.push(`${field}="${val}" — sid_-prefixed but ID not found in database. Use resolve_entity to get a valid ID.`);
@@ -528,16 +585,139 @@ async function handleSubmitRecords(
 }
 
 // ---------------------------------------------------------------------------
+// Source-discovery tool handlers
+// ---------------------------------------------------------------------------
+
+async function handleQueryUnverifiableRecords(input: Record<string, unknown>): Promise<string> {
+  const entityId = input.entityId as string;
+  if (!entityId) return 'Error: entityId is required';
+
+  const result = await getVerdictsByEntity(entityId, { verdict: 'unverifiable', limit: 50 });
+  if (!result.ok) return `Error fetching unverifiable records: ${result.message}`;
+
+  const { verdicts, total, counts } = result.data;
+
+  const summary = [
+    `Entity: ${entityId}`,
+    `Total verdicts: confirmed=${counts.confirmed}, unverifiable=${counts.unverifiable}, contradicted=${counts.contradicted}, partial=${counts.partial}`,
+    `Showing ${verdicts.length} of ${total} unverifiable records:`,
+  ].join('\n');
+
+  const records = verdicts.map((v: Record<string, unknown>) => ({
+    recordType: v.recordType,
+    recordId: v.recordId,
+    displayName: v.displayName,
+    reasoning: v.reasoning,
+    sourcesChecked: v.sourcesChecked,
+  }));
+
+  return `${summary}\n\n${JSON.stringify(records, null, 2)}`;
+}
+
+async function handleSuggestResource(
+  input: Record<string, unknown>,
+  dryRun: boolean,
+): Promise<string> {
+  const url = input.url as string;
+  if (!url) return 'Error: url is required';
+
+  const recordIds = input.recordIds as string[] | undefined;
+  const description = input.description as string | undefined;
+
+  if (dryRun) {
+    return `[DRY RUN] Would suggest resource: ${url}${recordIds ? ` for records: ${recordIds.join(', ')}` : ''}${description ? ` — ${description}` : ''}`;
+  }
+
+  try {
+    const result = await suggestResources({ urls: [url] });
+    const resource = result.resources[0];
+    if (!resource) return `Error: no resource returned for ${url}`;
+
+    return JSON.stringify({
+      url: resource.url,
+      resourceId: resource.resourceId,
+      status: resource.status,
+      contentLength: resource.contentLength,
+      title: resource.title,
+      forRecords: recordIds || [],
+      description: description || null,
+    }, null, 2);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return `Error suggesting resource: ${msg}`;
+  }
+}
+
+/** Map source-check recordType to table-registry table name */
+function recordTypeToTable(recordType: string): string {
+  switch (recordType) {
+    case 'personnel': return 'personnel';
+    case 'grant': return 'grants';
+    case 'funding-round': return 'funding-rounds';
+    case 'investment': return 'investments';
+    case 'benchmark-result': return 'benchmark-results';
+    default: return recordType;
+  }
+}
+
+async function handleLinkSource(
+  input: Record<string, unknown>,
+  dryRun: boolean,
+): Promise<string> {
+  const recordType = input.recordType as string;
+  const recordId = input.recordId as string;
+  const newSourceUrl = input.newSourceUrl as string;
+  const resourceId = input.resourceId as string | undefined;
+
+  if (!recordType || !recordId || !newSourceUrl) {
+    return 'Error: recordType, recordId, and newSourceUrl are required';
+  }
+
+  if (dryRun) {
+    return `[DRY RUN] Would update ${recordType} record ${recordId} source to: ${newSourceUrl}`;
+  }
+
+  // Fetch the existing record to get its full data
+  const table = recordTypeToTable(recordType);
+  const config = getTableConfig(table);
+  if (!config) return `Error: Unknown record type "${recordType}" (table: ${table})`;
+
+  // We need to fetch the specific record — use a search approach
+  // The sync endpoints do upserts, so we just need the record ID and the new source
+  const updatePayload: Record<string, unknown> = {
+    id: recordId,
+    source: newSourceUrl,
+  };
+  if (resourceId) {
+    updatePayload.sourceResourceId = resourceId;
+  }
+
+  const result = await apiRequest<{ upserted?: number; updated?: number }>(
+    config.syncMethod,
+    config.syncPath,
+    { [config.syncBodyKey]: [updatePayload] },
+  );
+
+  if (!result.ok) {
+    return `Error updating record: ${result.message}`;
+  }
+
+  return `Updated ${recordType} record ${recordId} source to: ${newSourceUrl}${resourceId ? ` (resourceId: ${resourceId})` : ''}`;
+}
+
+// ---------------------------------------------------------------------------
 // Build tool handlers map for runLlmAgent
 // ---------------------------------------------------------------------------
 
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipVerification?: boolean } = {},
+  options: { skipVerification?: boolean; apply?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
   const skipVerification = options.skipVerification ?? false;
-  return {
+  const isSourceDiscovery = task.taskType === 'source-discovery';
+
+  const handlers: Record<string, (input: Record<string, unknown>) => Promise<string>> = {
     query_entities: handleQueryEntities,
     query_existing_records: handleQueryExistingRecords,
     resolve_entity: async (input) => handleResolveEntity(input),
@@ -550,6 +730,16 @@ export function buildToolHandlers(
       : handleSubmitClaims(input, task),
     check_claim_status: handleCheckClaimStatus,
   };
+
+  if (isSourceDiscovery) {
+    handlers.query_unverifiable_records = handleQueryUnverifiableRecords;
+    handlers.suggest_resource = async (input) => handleSuggestResource(input, dryRun);
+    if (options.apply) {
+      handlers.link_source = async (input) => handleLinkSource(input, dryRun);
+    }
+  }
+
+  return handlers;
 }
 
 /** Get the table API name for a task type */
@@ -560,5 +750,6 @@ export function taskTypeToTable(taskType: TaskType): string {
     case 'funding-round-research': return 'funding-rounds';
     case 'investment-linking': return 'investments';
     case 'benchmark-result-fill': return 'benchmark-results';
+    case 'source-discovery': return 'source_quality';
   }
 }

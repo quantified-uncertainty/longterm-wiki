@@ -19,7 +19,7 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
@@ -497,34 +497,25 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         .from(personnel)
         .where(inArray(personnel.id, syncedIds));
 
-      // Build a map of stableId -> title for resolved person entities
+      // Resolve person + org IDs to human-readable titles in a single query
       const resolvedPersonIds = resolvedItems
         .filter((r) => r.personEntityId)
         .map((r) => r.personEntityId!);
-      let personTitleMap = new Map<string, string>();
-      if (resolvedPersonIds.length > 0) {
-        const personEntities = await tx
-          .select({ stableId: entities.stableId, title: entities.title })
-          .from(entities)
-          .where(inArray(entities.stableId, resolvedPersonIds));
-        personTitleMap = new Map(
-          personEntities
-            .filter((e) => e.stableId)
-            .map((e) => [e.stableId!, e.title])
-        );
-      }
+      const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
+      const titleMap = await resolveEntityTitles(tx, [...resolvedPersonIds, ...orgIds]);
 
       await upsertThingsInTx(
         tx,
         resolvedItems.map((p) => {
-          const personName = (p.personEntityId ? personTitleMap.get(p.personEntityId) : null)
+          const personName = (p.personEntityId ? titleMap.get(p.personEntityId) : null)
             ?? p.personDisplayName
             ?? cleanPersonId(p.personId)
             ?? p.personId;
+          const orgName = titleMap.get(p.organizationId) ?? p.organizationId;
           return {
             id: p.id,
             thingType: "personnel" as const,
-            title: `${personName} — ${p.role} at ${p.organizationId}`,
+            title: `${personName} — ${p.role} at ${orgName}`,
             sourceTable: "personnel",
             sourceId: p.id,
             sourceUrl: p.source,

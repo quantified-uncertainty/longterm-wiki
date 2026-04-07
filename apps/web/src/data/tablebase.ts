@@ -255,33 +255,6 @@ export interface Publication {
   website?: string;
 }
 
-/** A paper from literature.yaml */
-export interface LiteraturePaper {
-  title: string;
-  authors: string[];
-  organization?: string;
-  year: number;
-  type: string;
-  summary: string;
-  importance: string;
-  link?: string;
-  linkLabel?: string;
-}
-
-/** A category from literature.yaml */
-export interface LiteratureCategory {
-  id: string;
-  name: string;
-  papers: LiteraturePaper[];
-}
-
-/** Top-level structure of literature.yaml */
-interface LiteratureData {
-  categories: LiteratureCategory[];
-}
-
-
-
 export interface Organization {
   id: string;
   name: string;
@@ -408,7 +381,6 @@ export interface Page {
 interface TableBaseShape {
   typedEntities?: Array<Record<string, unknown>>;
   publications: Publication[];
-  literature?: LiteratureData;
   organizations: Organization[];
   pathRegistry: Record<string, string>;
   idRegistry: IdRegistryMaps;
@@ -809,13 +781,6 @@ export function getEntityResourceLinks(
 export function getAllPublications(): Publication[] {
   const db = getTableBase();
   return db.publications ?? [];
-}
-
-/** Get all literature papers (from literature.yaml loaded at build time). */
-export function getLiteraturePapers(): LiteraturePaper[] {
-  const db = getTableBase();
-  if (!db.literature?.categories) return [];
-  return db.literature.categories.flatMap((c) => c.papers ?? []);
 }
 
 /** Get resources that belong to a publication */

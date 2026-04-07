@@ -28,7 +28,7 @@ import { listResources } from "../lib/wiki-server/resources.ts";
 const BATCH_SIZE = 500;
 const LIST_PAGE_SIZE = 500;
 
-type SeedSource = "publisher" | "wiki_citation" | "literature" | "all";
+type SeedSource = "publisher" | "wiki_citation" | "literature" | "author" | "all";
 
 interface SeedOptions {
   "dry-run"?: boolean;
@@ -187,7 +187,7 @@ function buildOrgNameToStableId(): Map<string, string> {
 
 async function seedFromPublisher(
   options: SeedOptions,
-): Promise<{ items: EntityResourceSyncItem[] }> {
+): Promise<{ items: EntityResourceSyncItem[]; resourcesFetched: number }> {
   const items: EntityResourceSyncItem[] = [];
   const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
   let offset = 0;
@@ -231,7 +231,7 @@ async function seedFromPublisher(
     if (offset >= total) break;
   }
 
-  return { items };
+  return { items, resourcesFetched: fetched };
 }
 
 // ---------------------------------------------------------------------------
@@ -347,6 +347,63 @@ function seedFromLiterature(
 }
 
 // ---------------------------------------------------------------------------
+// Pass 4: author_entity_ids → authoredByEntity=true (person → resource)
+// ---------------------------------------------------------------------------
+
+async function seedFromAuthorEntityIds(
+  options: SeedOptions,
+): Promise<{ items: EntityResourceSyncItem[]; resourcesFetched: number }> {
+  const items: EntityResourceSyncItem[] = [];
+  const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
+  let offset = 0;
+  let fetched = 0;
+
+  while (fetched < maxResources) {
+    const result = await listResources(LIST_PAGE_SIZE, offset);
+    if (!result.ok) {
+      console.error(`Failed to fetch resources at offset ${offset}: ${result.message}`);
+      break;
+    }
+
+    const { resources: batch, total } = result.data;
+    if (batch.length === 0) break;
+
+    for (const r of batch) {
+      if (fetched >= maxResources) break;
+      fetched++;
+
+      const rawAuthorIds = (r as Record<string, unknown>).authorEntityIds;
+      if (!Array.isArray(rawAuthorIds) || rawAuthorIds.length === 0) continue;
+
+      // Filter to strings only and deduplicate per resource
+      const seen = new Set<string>();
+      for (const raw of rawAuthorIds) {
+        if (typeof raw !== "string" || !raw) continue;
+        if (seen.has(raw)) continue;
+        seen.add(raw);
+
+        items.push({
+          entityId: raw,
+          resourceId: r.id,
+          authoredByEntity: true,
+          isSubject: false,
+          inferenceSource: "author_entity_ids",
+        });
+
+        if (options.verbose) {
+          console.log(`  authored: ${raw} → ${r.id} (${r.title?.slice(0, 60)})`);
+        }
+      }
+    }
+
+    offset += batch.length;
+    if (offset >= total) break;
+  }
+
+  return { items, resourcesFetched: fetched };
+}
+
+// ---------------------------------------------------------------------------
 // Batch sync
 // ---------------------------------------------------------------------------
 
@@ -387,13 +444,16 @@ async function seedCommand(
   let totalItems = 0;
   let totalSynced = 0;
   let totalSkipped = 0;
+  // Track resources fetched across limit-aware passes (publisher + author) for global --limit enforcement
+  let totalResourcesFetched = 0;
 
   // Pass 1: publisher_entity_id
   if (source === "all" || source === "publisher") {
     console.log("Pass 1: Seeding from publisher_entity_id...");
-    const { items } = await seedFromPublisher(options);
+    const { items, resourcesFetched } = await seedFromPublisher(options);
     console.log(`  Found ${items.length} authored-by relationships`);
     totalItems += items.length;
+    totalResourcesFetched += resourcesFetched;
 
     const synced = await batchSync(items, dryRun);
     totalSynced += synced;
@@ -432,6 +492,29 @@ async function seedCommand(
     if (!dryRun) console.log(`  Synced ${synced} rows`);
   }
 
+  // Pass 4: author_entity_ids (person → resource authored-by)
+  if (source === "all" || source === "author") {
+    // Enforce global limit: subtract resources already fetched in pass 1
+    const globalLimit = options.limit ? parseInt(options.limit, 10) : Infinity;
+    const remaining = Math.max(0, globalLimit - totalResourcesFetched);
+    if (remaining === 0 && options.limit) {
+      console.log("Pass 4: Skipped (global --limit already reached)");
+    } else {
+      const passOptions = options.limit
+        ? { ...options, limit: String(remaining) }
+        : options;
+      console.log("Pass 4: Seeding from author_entity_ids...");
+      const { items, resourcesFetched } = await seedFromAuthorEntityIds(passOptions);
+      console.log(`  Found ${items.length} person-authored relationships`);
+      totalItems += items.length;
+      totalResourcesFetched += resourcesFetched;
+
+      const synced = await batchSync(items, dryRun);
+      totalSynced += synced;
+      if (!dryRun) console.log(`  Synced ${synced} rows`);
+    }
+  }
+
   console.log(
     `\nTotal: ${totalItems} items${dryRun ? " (dry run)" : `, ${totalSynced} synced`}, ${totalSkipped} skipped`,
   );
@@ -460,12 +543,13 @@ Commands:
 Options:
   --dry-run     Show what would be written without writing
   --verbose     Print each match
-  --source      Restrict to: publisher | wiki_citation | literature | all (default: all)
-  --limit       Max resources to process (publisher pass only)
+  --source      Restrict to: publisher | wiki_citation | literature | author | all (default: all)
+  --limit       Max resources to process (publisher/author passes only)
 
 Data sources:
   publisher       Resources with publisher_entity_id → authoredByEntity=true
   wiki_citation   pageResources mapping → isSubject=true
   literature      literature.yaml org+link → authoredByEntity=true
+  author          author_entity_ids on resources → authoredByEntity=true (person→paper)
 `;
 }

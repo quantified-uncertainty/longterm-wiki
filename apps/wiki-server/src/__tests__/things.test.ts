@@ -78,6 +78,13 @@ function applyThingsFilters(
     }
   }
 
+  if (whereClause.includes('"source_table" =')) {
+    const filterVal = stringParams[paramIdx++];
+    if (filterVal) {
+      rows = rows.filter((r) => r.source_table === filterVal);
+    }
+  }
+
   return rows;
 }
 
@@ -176,7 +183,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results.slice(0, limit);
   }
 
-  // --- things: COUNT with GROUP BY (stats by type / entity_type) ---
+  // --- things: COUNT with GROUP BY (stats by type / entity_type / source_table) ---
   if (q.includes('"things"') && q.includes("group by")) {
     if (q.includes("entity_type")) {
       // GROUP BY entity_type (with is not null filter)
@@ -189,6 +196,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
       return [...byEntityType.entries()].map(([entity_type, count]) => ({
         entity_type,
+        count,
+      }));
+    }
+
+    if (q.includes("source_table")) {
+      // GROUP BY source_table
+      const bySourceTable = new Map<string, number>();
+      for (const row of thingsStore.values()) {
+        const st = row.source_table as string;
+        bySourceTable.set(st, (bySourceTable.get(st) || 0) + 1);
+      }
+      return [...bySourceTable.entries()].map(([source_table, count]) => ({
+        source_table,
         count,
       }));
     }
@@ -534,7 +554,25 @@ describe("Things API", () => {
       }
     });
 
-    // has_verdict filter removed — verification now lives in unified system
+    it("filters by source_table query param", async () => {
+      await seedThing(app, "thing-grant", "Grant Thing", {
+        thingType: "grant",
+        sourceTable: "grants",
+        sourceId: "g1",
+      });
+      await seedThing(app, "thing-entity", "Entity Thing", {
+        thingType: "entity",
+        sourceTable: "entities",
+        sourceId: "e1",
+      });
+
+      const res = await app.request("/api/things?source_table=grants");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.things.length).toBe(1);
+      expect(body.things[0].sourceTable).toBe("grants");
+      expect(body.total).toBe(1);
+    });
 
     it("returns empty list when no things", async () => {
       const res = await app.request("/api/things");
@@ -653,6 +691,31 @@ describe("Things API", () => {
       expect(body.byEntityType).toBeDefined();
       expect(body.byEntityType.organization).toBe(1);
       expect(body.byEntityType.risk).toBe(1);
+    });
+
+    it("includes bySourceTable breakdown", async () => {
+      await seedThing(app, "thing-g1", "Grant 1", {
+        thingType: "grant",
+        sourceTable: "grants",
+        sourceId: "g1",
+      });
+      await seedThing(app, "thing-g2", "Grant 2", {
+        thingType: "grant",
+        sourceTable: "grants",
+        sourceId: "g2",
+      });
+      await seedThing(app, "thing-e1", "Entity 1", {
+        thingType: "entity",
+        sourceTable: "entities",
+        sourceId: "e1",
+      });
+
+      const res = await app.request("/api/things/stats");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.bySourceTable).toBeDefined();
+      expect(body.bySourceTable.grants).toBe(2);
+      expect(body.bySourceTable.entities).toBe(1);
     });
   });
 

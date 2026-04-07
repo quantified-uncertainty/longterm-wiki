@@ -81,7 +81,7 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
     case "funding-round":
       return `/funding-rounds/${recordId}`;
     case "personnel":
-      return `/people`;
+      return `/things/${recordId}`;
     // grant: /grants/:id expects FactBase key, not PG ID — fall through to /things
     // division: /divisions/:slug expects slug, not PG ID — fall through to /things
     default:

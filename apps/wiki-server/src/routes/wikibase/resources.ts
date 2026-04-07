@@ -18,6 +18,8 @@ import {
   resourcePapers,
   resourceForumPosts,
   resourcePolicyDocs,
+  resourceTabularSources,
+  sourceSnapshots,
   wikiPages,
   citationContent,
 } from "../../schema.js";
@@ -296,6 +298,44 @@ async function upsertResource(
   }
 
   return result;
+}
+
+/** Minimal RFC 4180-ish CSV line parser. Handles quoted fields with embedded commas. */
+export function parseCSVLine(line: string): string[] {
+  const fields: string[] = [];
+  let i = 0;
+  while (i < line.length) {
+    if (line[i] === '"') {
+      let value = "";
+      i++;
+      while (i < line.length) {
+        if (line[i] === '"') {
+          if (i + 1 < line.length && line[i + 1] === '"') {
+            value += '"';
+            i += 2;
+          } else {
+            i++;
+            break;
+          }
+        } else {
+          value += line[i];
+          i++;
+        }
+      }
+      fields.push(value);
+      if (i < line.length && line[i] === ',') i++;
+    } else {
+      const next = line.indexOf(',', i);
+      if (next === -1) {
+        fields.push(line.slice(i));
+        break;
+      }
+      fields.push(line.slice(i, next));
+      i = next + 1;
+    }
+  }
+  if (line.length > 0 && line[line.length - 1] === ',') fields.push("");
+  return fields;
 }
 
 function formatResource(r: typeof resources.$inferSelect) {
@@ -1642,9 +1682,8 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // Also fetch citations and sub-table data
-    // JOIN wiki_pages to recover slug from integer page ID
-    const [citations, paperRows, forumRows, policyRows] = await Promise.all([
+    // Also fetch citations, sub-table data, and tabular source metadata
+    const [citations, paperRows, forumRows, policyRows, tabularRows] = await Promise.all([
       db.select({ pageId: wikiPages.slug })
         .from(resourceCitations)
         .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
@@ -1652,13 +1691,88 @@ const resourcesApp = new Hono()
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, id)).limit(1),
+      db.select().from(resourceTabularSources).where(eq(resourceTabularSources.resourceId, id)).limit(1),
     ]);
+
+    // If tabular source, fetch latest snapshot metadata + preview
+    let tabularSource: {
+      sourceSlug: string;
+      dataFormat: string;
+      accessMethod: string;
+      recordType: string;
+      updateFrequency: string | null;
+      sourceStatus: string;
+      lastSnapshotAt: string | null;
+      snapshotRecordCount: number | null;
+      latestSnapshotHash: string | null;
+      previewHeaders: string[] | null;
+      previewRows: string[][] | null;
+    } | null = null;
+
+    if (tabularRows.length > 0) {
+      const rts = tabularRows[0];
+      const PREVIEW_BYTES = 16384;
+      const [latestSnap] = await db
+        .select({
+          fetchedAt: sourceSnapshots.fetchedAt,
+          recordCount: sourceSnapshots.recordCount,
+          snapshotHash: sourceSnapshots.snapshotHash,
+          contentPreview: sql<string>`LEFT(${sourceSnapshots.rawContent}, ${PREVIEW_BYTES})`,
+        })
+        .from(sourceSnapshots)
+        .where(eq(sourceSnapshots.sourceSlug, rts.sourceSlug))
+        .orderBy(desc(sourceSnapshots.fetchedAt), desc(sourceSnapshots.id))
+        .limit(1);
+
+      let previewHeaders: string[] | null = null;
+      let previewRows: string[][] | null = null;
+      const preview = latestSnap?.contentPreview;
+      if (preview && rts.dataFormat === "csv") {
+        const normalized = preview.replace(/\r\n?/g, "\n");
+        const lines = normalized.split("\n").filter((l) => l.trim());
+        if (lines.length > 0) {
+          previewHeaders = parseCSVLine(lines[0]);
+          previewRows = lines.slice(1, 11).map(parseCSVLine);
+        }
+      } else if (preview && rts.dataFormat === "json_api" && preview.length < PREVIEW_BYTES) {
+        try {
+          const parsed = JSON.parse(preview);
+          const items = Array.isArray(parsed) ? parsed : parsed.data ?? parsed.results ?? parsed.items ?? [];
+          if (Array.isArray(items) && items.length > 0 && typeof items[0] === "object") {
+            previewHeaders = Object.keys(items[0]);
+            previewRows = items.slice(0, 10).map((item: Record<string, unknown>) =>
+              previewHeaders!.map((h) => String(item[h] ?? ""))
+            );
+          }
+        } catch (e: unknown) {
+          logger.warn(
+            { sourceSlug: rts.sourceSlug, error: e instanceof Error ? e.message : String(e) },
+            "JSON preview parse failed for tabular source"
+          );
+        }
+      }
+
+      tabularSource = {
+        sourceSlug: rts.sourceSlug,
+        dataFormat: rts.dataFormat,
+        accessMethod: rts.accessMethod,
+        recordType: rts.recordType,
+        updateFrequency: rts.updateFrequency,
+        sourceStatus: rts.sourceStatus,
+        lastSnapshotAt: latestSnap?.fetchedAt?.toISOString() ?? null,
+        snapshotRecordCount: latestSnap?.recordCount ?? null,
+        latestSnapshotHash: latestSnap?.snapshotHash ?? null,
+        previewHeaders,
+        previewRows,
+      };
+    }
 
     return c.json({
       ...formatResource(rows[0]),
       paper: paperRows.length > 0 ? formatPaper(paperRows[0]) : null,
       forumPost: forumRows.length > 0 ? formatForumPost(forumRows[0]) : null,
       policyDoc: policyRows.length > 0 ? formatPolicyDoc(policyRows[0]) : null,
+      tabularSource,
       citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
   });
