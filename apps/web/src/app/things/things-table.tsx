@@ -222,7 +222,6 @@ export function ThingsTable({
                       wikiId: row.wikiId,
                       filledFieldCount:
                         (row.sourceUrl ? 1 : 0) +
-                        (row.entityType ? 1 : 0) +
                         (row.parentThingId ? 1 : 0),
                     })}
                     verdict={row.verdict}

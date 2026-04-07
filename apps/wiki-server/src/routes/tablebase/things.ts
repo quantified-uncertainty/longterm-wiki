@@ -99,7 +99,10 @@ const verdictFields = {
  * uses (singular, hyphenated), ensuring at most one verdict match per thing.
  */
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')`,
+  sql`${sourceCheckVerdicts.recordType} = CASE ${things.sourceTable}
+    WHEN 'entities' THEN 'entity'
+    ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
+  END`,
   eq(sourceCheckVerdicts.recordId, things.sourceId),
   sql`${sourceCheckVerdicts.fieldName} IS NULL`,
 );
@@ -251,7 +254,10 @@ const thingsApp = new Hono()
           scv.verdict
         FROM things t
         LEFT JOIN source_check_verdicts scv
-          ON scv.record_type = regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          ON scv.record_type = CASE t.source_table
+            WHEN 'entities' THEN 'entity'
+            ELSE regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          END
           AND scv.record_id = t.source_id
           AND scv.field_name IS NULL
         WHERE similarity(t.title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
