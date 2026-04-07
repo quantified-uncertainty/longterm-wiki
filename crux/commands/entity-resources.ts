@@ -1,19 +1,22 @@
 /**
  * Entity Resources — seed entity-resource relationships from existing data.
  *
- * Two data sources:
+ * Three data sources:
  *   1. publisher_entity_id on resources → authoredByEntity=true
  *   2. pageResources in database.json → isSubject=true
+ *   3. literature.yaml org+link → authoredByEntity=true
  *
  * Usage:
  *   pnpm crux entity-resources seed
  *   pnpm crux entity-resources seed --dry-run
  *   pnpm crux entity-resources seed --source=publisher
  *   pnpm crux entity-resources seed --source=wiki_citation
+ *   pnpm crux entity-resources seed --source=literature
  */
 
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
+import { parse as parseYaml } from "yaml";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -25,7 +28,7 @@ import { listResources } from "../lib/wiki-server/resources.ts";
 const BATCH_SIZE = 500;
 const LIST_PAGE_SIZE = 500;
 
-type SeedSource = "publisher" | "wiki_citation" | "all";
+type SeedSource = "publisher" | "wiki_citation" | "literature" | "all";
 
 interface SeedOptions {
   "dry-run"?: boolean;
@@ -42,11 +45,42 @@ interface SeedOptions {
 interface MinimalEntity {
   id: string; // slug
   stableId?: string;
+  title?: string;
+  aliases?: string[];
+  entityType?: string;
 }
 
 interface DatabaseJson {
   typedEntities?: MinimalEntity[];
   pageResources?: Record<string, string[]>;
+}
+
+interface MinimalResource {
+  id: string;
+  url?: string;
+}
+
+// ---------------------------------------------------------------------------
+// literature.yaml types
+// ---------------------------------------------------------------------------
+
+interface LiteraturePaper {
+  title: string;
+  authors?: string[];
+  organization?: string;
+  year?: number;
+  type?: string;
+  link?: string;
+}
+
+interface LiteratureCategory {
+  id: string;
+  name: string;
+  papers: LiteraturePaper[];
+}
+
+interface LiteratureYaml {
+  categories: LiteratureCategory[];
 }
 
 let _cachedDb: DatabaseJson | null = null;
@@ -72,6 +106,79 @@ function loadSlugToStableId(): Map<string, string> {
 
 function loadPageResources(): Record<string, string[]> {
   return loadDatabaseJson().pageResources ?? {};
+}
+
+// ---------------------------------------------------------------------------
+// Resource URL index (from resources.json)
+// ---------------------------------------------------------------------------
+
+let _cachedResources: MinimalResource[] | null = null;
+
+function loadResources(): MinimalResource[] {
+  if (_cachedResources) return _cachedResources;
+  const resPath = join(PROJECT_ROOT, "apps/web/src/data/resources.json");
+  _cachedResources = JSON.parse(readFileSync(resPath, "utf8")) as MinimalResource[];
+  return _cachedResources;
+}
+
+/**
+ * Normalize a URL for fuzzy matching. Strips protocol, www prefix, trailing
+ * slashes, and hash fragments. Preserves query string. Lowercases.
+ */
+function normalizeUrlForMatch(str: string): string {
+  try {
+    const url = new URL(str);
+    url.hostname = url.hostname.replace(/^www\./, "");
+    url.hash = "";
+    return (
+      url.host + url.pathname.replace(/\/+$/, "") + url.search
+    ).toLowerCase();
+  } catch {
+    return str.replace(/\/+$/, "").toLowerCase();
+  }
+}
+
+/**
+ * Build normalized-URL → resource ID map from resources.json.
+ */
+function buildUrlToResourceId(): Map<string, string> {
+  const resources = loadResources();
+  const map = new Map<string, string>();
+  for (const r of resources) {
+    if (r.url) {
+      map.set(normalizeUrlForMatch(r.url), r.id);
+    }
+  }
+  return map;
+}
+
+/**
+ * Build org name → stableId map for fuzzy matching of literature.yaml
+ * organization names. Indexes by lowercase slug, title, and aliases.
+ */
+function buildOrgNameToStableId(): Map<string, string> {
+  const db = loadDatabaseJson();
+  const entities = db.typedEntities ?? [];
+  const map = new Map<string, string>();
+  for (const e of entities) {
+    if (e.entityType !== "organization" || !e.stableId) continue;
+
+    // Index by slug (id)
+    map.set(e.id.toLowerCase(), e.stableId);
+
+    // Index by title
+    if (e.title) {
+      map.set(e.title.toLowerCase(), e.stableId);
+    }
+
+    // Index by each alias
+    if (e.aliases) {
+      for (const alias of e.aliases) {
+        map.set(alias.toLowerCase(), e.stableId);
+      }
+    }
+  }
+  return map;
 }
 
 // ---------------------------------------------------------------------------
@@ -164,6 +271,82 @@ function seedFromWikiCitations(
 }
 
 // ---------------------------------------------------------------------------
+// Pass 3: literature.yaml → authoredByEntity=true
+// ---------------------------------------------------------------------------
+
+function seedFromLiterature(
+  options: SeedOptions,
+): { items: EntityResourceSyncItem[]; skippedNoOrg: number; skippedNoLink: number; skippedOrgNotFound: number; skippedUrlNotFound: number } {
+  const litPath = join(PROJECT_ROOT, "data/literature.yaml");
+  const litData = parseYaml(readFileSync(litPath, "utf8")) as LiteratureYaml;
+
+  const orgNameMap = buildOrgNameToStableId();
+  const urlToResourceId = buildUrlToResourceId();
+  const items: EntityResourceSyncItem[] = [];
+
+  let skippedNoOrg = 0;
+  let skippedNoLink = 0;
+  let skippedOrgNotFound = 0;
+  let skippedUrlNotFound = 0;
+
+  for (const category of litData.categories) {
+    for (const paper of category.papers) {
+      // Skip papers without organization
+      if (!paper.organization) {
+        skippedNoOrg++;
+        continue;
+      }
+
+      // Skip papers without link
+      if (!paper.link) {
+        skippedNoLink++;
+        if (options.verbose) {
+          console.log(`  skip: no link for "${paper.title}"`);
+        }
+        continue;
+      }
+
+      // Resolve organization name to entity stableId
+      const orgStableId = orgNameMap.get(paper.organization.toLowerCase());
+      if (!orgStableId) {
+        skippedOrgNotFound++;
+        if (options.verbose) {
+          console.log(`  skip: org not found "${paper.organization}" for "${paper.title}"`);
+        }
+        continue;
+      }
+
+      // Resolve link URL to resource ID
+      const normalizedUrl = normalizeUrlForMatch(paper.link);
+      const resourceId = urlToResourceId.get(normalizedUrl);
+      if (!resourceId) {
+        skippedUrlNotFound++;
+        if (options.verbose) {
+          console.log(`  skip: resource not found for URL "${paper.link}" ("${paper.title}")`);
+        }
+        continue;
+      }
+
+      items.push({
+        entityId: orgStableId,
+        resourceId,
+        authoredByEntity: true,
+        isSubject: false,
+        inferenceSource: "literature_yaml",
+      });
+
+      if (options.verbose) {
+        console.log(
+          `  authored: ${orgStableId} (${paper.organization}) → ${resourceId} (${paper.title.slice(0, 60)})`,
+        );
+      }
+    }
+  }
+
+  return { items, skippedNoOrg, skippedNoLink, skippedOrgNotFound, skippedUrlNotFound };
+}
+
+// ---------------------------------------------------------------------------
 // Batch sync
 // ---------------------------------------------------------------------------
 
@@ -232,6 +415,23 @@ async function seedCommand(
     if (!dryRun) console.log(`  Synced ${synced} rows`);
   }
 
+  // Pass 3: literature.yaml (org → resource authored-by)
+  if (source === "all" || source === "literature") {
+    console.log("Pass 3: Seeding from literature.yaml...");
+    const { items, skippedNoOrg, skippedNoLink, skippedOrgNotFound, skippedUrlNotFound } =
+      seedFromLiterature(options);
+    const totalLitSkipped = skippedNoOrg + skippedNoLink + skippedOrgNotFound + skippedUrlNotFound;
+    console.log(
+      `  Found ${items.length} authored-by relationships (${totalLitSkipped} skipped: ${skippedNoOrg} no org, ${skippedNoLink} no link, ${skippedOrgNotFound} org not found, ${skippedUrlNotFound} URL not found)`,
+    );
+    totalItems += items.length;
+    totalSkipped += totalLitSkipped;
+
+    const synced = await batchSync(items, dryRun);
+    totalSynced += synced;
+    if (!dryRun) console.log(`  Synced ${synced} rows`);
+  }
+
   console.log(
     `\nTotal: ${totalItems} items${dryRun ? " (dry run)" : `, ${totalSynced} synced`}, ${totalSkipped} skipped`,
   );
@@ -260,11 +460,12 @@ Commands:
 Options:
   --dry-run     Show what would be written without writing
   --verbose     Print each match
-  --source      Restrict to: publisher | wiki_citation | all (default: all)
+  --source      Restrict to: publisher | wiki_citation | literature | all (default: all)
   --limit       Max resources to process (publisher pass only)
 
 Data sources:
   publisher       Resources with publisher_entity_id → authoredByEntity=true
   wiki_citation   pageResources mapping → isSubject=true
+  literature      literature.yaml org+link → authoredByEntity=true
 `;
 }
