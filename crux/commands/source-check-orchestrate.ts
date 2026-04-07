@@ -16,6 +16,10 @@
 
 import type { CommandResult } from '../lib/command-types.ts';
 import { getVerificationStats } from '../lib/wiki-server/verifications.ts';
+import { getFailures, type VerdictEntry } from '../lib/wiki-server/source-checks.ts';
+import { apiRequest } from '../lib/wiki-server/client.ts';
+import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
+import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { RecordType } from '../../apps/wiki-server/src/api-types.ts';
 import { orchestrateCommand } from '../lib/source-check/orchestrator.ts';
 import type { OrchestrateOptions } from '../lib/source-check/orchestrator-types.ts';
@@ -98,6 +102,16 @@ async function verifyCommand(
     return statsCommand();
   }
 
+  // Backfill subcommand
+  if (subcommand === 'backfill') {
+    return backfillCommand(args.slice(1), options);
+  }
+
+  // Contradicted subcommand
+  if (subcommand === 'contradicted') {
+    return contradictedCommand(args.slice(1), options);
+  }
+
   // sync-things subcommand (deprecated)
   if (subcommand === 'sync-things') {
     return { exitCode: 0, output: 'sync-things is no longer needed -- Things table no longer stores verdicts.' };
@@ -124,12 +138,174 @@ async function verifyCommand(
   return orchestrateCommand(args, options);
 }
 
+// ── Backfill command ─────────────────────────────────────────────────
+
+/**
+ * Automated backfill: sync source URLs → enqueue ingestion → run verification.
+ *
+ * Replaces the manual multi-step process:
+ *   1. fb sync-sources (sync FactBase URLs to resources)
+ *   2. Extract record source URLs from grants/personnel APIs
+ *   3. Create resource-ingest jobs for uncached URLs
+ *   4. Run verification orchestrator
+ *
+ * Usage: crux tb verify backfill --budget=20 --limit=2000 [--dry-run]
+ */
+async function backfillCommand(
+  _args: string[],
+  options: OrchestrateOptions,
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun;
+  const lines: string[] = [];
+  lines.push('\x1b[1m=== Verification Backfill ===\x1b[0m');
+  if (dryRun) lines.push('\x1b[33mDRY RUN — no jobs will be created\x1b[0m');
+  lines.push('');
+
+  // Step 1: Collect record source URLs from grants + personnel APIs
+  lines.push('\x1b[1mStep 1: Collecting record source URLs...\x1b[0m');
+  const urls = new Set<string>();
+  for (const endpoint of ['/api/grants/all', '/api/personnel/all']) {
+    let offset = 0;
+    while (true) {
+      const r = await apiRequest<{ grants?: Array<{ source?: string }>; personnel?: Array<{ source?: string }>; total: number }>(
+        'GET', `${endpoint}?limit=200&offset=${offset}`,
+      );
+      if (!r.ok) break;
+      const items = r.data.grants || r.data.personnel || [];
+      for (const item of items) {
+        if (item.source?.startsWith('https://')) urls.add(item.source);
+      }
+      if (items.length < 200) break;
+      offset += 200;
+    }
+  }
+  lines.push(`  Record source URLs: ${urls.size}`);
+
+  // Step 2: Check which URLs are uncached
+  lines.push('\x1b[1mStep 2: Checking cache coverage...\x1b[0m');
+  let cached = 0;
+  let uncached = 0;
+  const uncachedUrls: string[] = [];
+  for (const url of urls) {
+    const cc = await getCitationContentByUrl(url);
+    if (cc.ok && (cc.data as Record<string, unknown>)?.fullText) {
+      cached++;
+    } else {
+      uncached++;
+      uncachedUrls.push(url);
+    }
+  }
+  lines.push(`  Cached: ${cached} | Uncached: ${uncached}`);
+
+  // Step 3: Enqueue resource-ingest jobs for uncached URLs
+  if (uncachedUrls.length > 0 && !dryRun) {
+    lines.push(`\x1b[1mStep 3: Enqueuing ${uncachedUrls.length} resource-ingest jobs...\x1b[0m`);
+    let enqueued = 0;
+    for (const url of uncachedUrls) {
+      // Use URL hash as resource ID for simplicity
+      const id = 'rec-' + url.replace(/[^a-z0-9]/gi, '').slice(0, 16);
+      const r = await createJob({ type: 'resource-ingest', params: { url, resourceId: id } });
+      if (r.ok) enqueued++;
+    }
+    lines.push(`  Enqueued: ${enqueued}`);
+    lines.push('');
+    lines.push('  \x1b[33mResource-ingest jobs are queued. Dispatch workers to process them:\x1b[0m');
+    lines.push('  gh workflow run job-worker.yml -R quantified-uncertainty/longterm-wiki \\');
+    lines.push(`    --field job_type=resource-ingest --field max_jobs=${Math.min(enqueued + 50, 1000)}`);
+    lines.push('');
+    lines.push('  Then re-run this command to verify (after workers complete).');
+  } else if (uncachedUrls.length > 0) {
+    lines.push(`\x1b[1mStep 3: Would enqueue ${uncachedUrls.length} resource-ingest jobs (dry run)\x1b[0m`);
+  } else {
+    lines.push('\x1b[32mStep 3: All record sources are cached — skipping ingestion.\x1b[0m');
+  }
+
+  // Step 4: Run verification if cache coverage is reasonable
+  if (uncached === 0 || (cached > 0 && uncached < urls.size * 0.5)) {
+    lines.push('');
+    lines.push('\x1b[1mStep 4: Running verification...\x1b[0m');
+    console.log(lines.join('\n'));
+
+    return orchestrateCommand([], options);
+  }
+
+  lines.push('');
+  lines.push(`Cache coverage: ${((cached / Math.max(urls.size, 1)) * 100).toFixed(0)}% — ` +
+    'run resource-ingest workers first, then re-run backfill.');
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+// ── Contradicted command ─────────────────────────────────────────────
+
+/**
+ * List contradicted source-check verdicts with their reasoning.
+ *
+ * Usage: crux tb verify contradicted [--type=grant|personnel|...] [--limit=50]
+ */
+async function contradictedCommand(
+  _args: string[],
+  options: OrchestrateOptions,
+): Promise<CommandResult> {
+  const limit = options.limit ? parseInt(String(options.limit), 10) : 50;
+  const recordType = options.table as string | undefined;
+  const lines: string[] = [];
+
+  const result = await getFailures({
+    error_type: 'contradicted',
+    record_type: recordType,
+    limit,
+  });
+
+  if (!result.ok) {
+    return { exitCode: 1, output: `Failed to fetch contradicted verdicts: ${result.error}` };
+  }
+
+  const data = result.data as {
+    items: VerdictEntry[];
+    total: number;
+    byErrorType?: Record<string, number>;
+  };
+  const verdicts = data.items;
+  const total = data.total;
+
+  lines.push(`\x1b[1m\x1b[31m=== Contradicted Verdicts (${verdicts.length}/${total}) ===\x1b[0m`);
+  lines.push('');
+
+  if (data.byErrorType) {
+    lines.push('\x1b[1mBreakdown:\x1b[0m');
+    for (const [type, count] of Object.entries(data.byErrorType)) {
+      lines.push(`  ${type}: ${count}`);
+    }
+    lines.push('');
+  }
+
+  for (const v of verdicts) {
+    const conf = v.confidence != null ? ` (${(v.confidence * 100).toFixed(0)}%)` : '';
+    lines.push(`\x1b[31m✗\x1b[0m ${v.recordType}/${v.recordId} — ${v.displayName || 'unknown'}${conf}`);
+    if (v.reasoning) {
+      // Wrap reasoning to ~100 chars for readability
+      const reason = v.reasoning.slice(0, 300);
+      lines.push(`  \x1b[2m${reason}${v.reasoning.length > 300 ? '...' : ''}\x1b[0m`);
+    }
+    lines.push('');
+  }
+
+  if (total > verdicts.length) {
+    lines.push(`\x1b[2m...and ${total - verdicts.length} more. Use --limit=${total} to see all.\x1b[0m`);
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
 // ── Exports ──────────────────────────────────────────────────────────
 
 export const commands = {
   default: verifyCommand,
   orchestrate: orchestrateCommand,
   stats: statsCommand,
+  backfill: backfillCommand,
+  contradicted: contradictedCommand,
 };
 
 export function getHelp(): string {
@@ -140,6 +316,8 @@ Usage:
   crux tb verify [options]                 Run verification across all data layers
   crux tb verify orchestrate [options]     Full orchestrated verification with prioritization
   crux tb verify stats                     Show verification coverage report
+  crux tb verify backfill [options]        Automated: sync sources → enqueue ingest → verify
+  crux tb verify contradicted [options]    List contradicted verdicts with reasoning
   crux tb verify grants                    Verify all grants (shorthand for --type=record)
   crux tb verify personnel                 Verify all personnel records
   crux tb verify divisions                 Verify all divisions

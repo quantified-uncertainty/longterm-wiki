@@ -1025,7 +1025,21 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
   }
 
   // Convert CareerEntry -> personnel sync format (roleType = "career")
-  const syncItems = entries.map((e) => ({
+  // Filter out entries with unresolvable org IDs (raw names like "Fathom Radiant"
+  // that didn't resolve to a stableId or slug in the entity table).
+  const validEntries = entries.filter((e) => {
+    const id = e.organizationId;
+    // stableIds (sid_xxx) and slugs (lowercase-with-hyphens) are valid
+    if (id.startsWith('sid_') || /^[a-z0-9-]+$/.test(id)) return true;
+    console.warn(`  Skipping career entry ${e.id}: unresolvable organizationId "${id}"`);
+    return false;
+  });
+
+  if (validEntries.length < entries.length) {
+    console.log(`  Filtered: ${entries.length - validEntries.length} entries with unresolvable org IDs`);
+  }
+
+  const syncItems = validEntries.map((e) => ({
     id: e.id,
     personId: e.personId,
     organizationId: e.organizationId,
