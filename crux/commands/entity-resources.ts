@@ -187,7 +187,7 @@ function buildOrgNameToStableId(): Map<string, string> {
 
 async function seedFromPublisher(
   options: SeedOptions,
-): Promise<{ items: EntityResourceSyncItem[] }> {
+): Promise<{ items: EntityResourceSyncItem[]; resourcesFetched: number }> {
   const items: EntityResourceSyncItem[] = [];
   const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
   let offset = 0;
@@ -231,7 +231,7 @@ async function seedFromPublisher(
     if (offset >= total) break;
   }
 
-  return { items };
+  return { items, resourcesFetched: fetched };
 }
 
 // ---------------------------------------------------------------------------
@@ -352,7 +352,7 @@ function seedFromLiterature(
 
 async function seedFromAuthorEntityIds(
   options: SeedOptions,
-): Promise<{ items: EntityResourceSyncItem[] }> {
+): Promise<{ items: EntityResourceSyncItem[]; resourcesFetched: number }> {
   const items: EntityResourceSyncItem[] = [];
   const maxResources = options.limit ? parseInt(options.limit, 10) : Infinity;
   let offset = 0;
@@ -372,12 +372,18 @@ async function seedFromAuthorEntityIds(
       if (fetched >= maxResources) break;
       fetched++;
 
-      const authorIds = (r as Record<string, unknown>).authorEntityIds as string[] | null;
-      if (!authorIds || authorIds.length === 0) continue;
+      const rawAuthorIds = (r as Record<string, unknown>).authorEntityIds;
+      if (!Array.isArray(rawAuthorIds) || rawAuthorIds.length === 0) continue;
 
-      for (const authorId of authorIds) {
+      // Filter to strings only and deduplicate per resource
+      const seen = new Set<string>();
+      for (const raw of rawAuthorIds) {
+        if (typeof raw !== "string" || !raw) continue;
+        if (seen.has(raw)) continue;
+        seen.add(raw);
+
         items.push({
-          entityId: authorId,
+          entityId: raw,
           resourceId: r.id,
           authoredByEntity: true,
           isSubject: false,
@@ -385,7 +391,7 @@ async function seedFromAuthorEntityIds(
         });
 
         if (options.verbose) {
-          console.log(`  authored: ${authorId} → ${r.id} (${r.title?.slice(0, 60)})`);
+          console.log(`  authored: ${raw} → ${r.id} (${r.title?.slice(0, 60)})`);
         }
       }
     }
@@ -394,7 +400,7 @@ async function seedFromAuthorEntityIds(
     if (offset >= total) break;
   }
 
-  return { items };
+  return { items, resourcesFetched: fetched };
 }
 
 // ---------------------------------------------------------------------------
@@ -438,13 +444,16 @@ async function seedCommand(
   let totalItems = 0;
   let totalSynced = 0;
   let totalSkipped = 0;
+  // Track resources fetched across limit-aware passes (publisher + author) for global --limit enforcement
+  let totalResourcesFetched = 0;
 
   // Pass 1: publisher_entity_id
   if (source === "all" || source === "publisher") {
     console.log("Pass 1: Seeding from publisher_entity_id...");
-    const { items } = await seedFromPublisher(options);
+    const { items, resourcesFetched } = await seedFromPublisher(options);
     console.log(`  Found ${items.length} authored-by relationships`);
     totalItems += items.length;
+    totalResourcesFetched += resourcesFetched;
 
     const synced = await batchSync(items, dryRun);
     totalSynced += synced;
@@ -485,14 +494,25 @@ async function seedCommand(
 
   // Pass 4: author_entity_ids (person → resource authored-by)
   if (source === "all" || source === "author") {
-    console.log("Pass 4: Seeding from author_entity_ids...");
-    const { items } = await seedFromAuthorEntityIds(options);
-    console.log(`  Found ${items.length} person-authored relationships`);
-    totalItems += items.length;
+    // Enforce global limit: subtract resources already fetched in pass 1
+    const globalLimit = options.limit ? parseInt(options.limit, 10) : Infinity;
+    const remaining = Math.max(0, globalLimit - totalResourcesFetched);
+    if (remaining === 0 && options.limit) {
+      console.log("Pass 4: Skipped (global --limit already reached)");
+    } else {
+      const passOptions = options.limit
+        ? { ...options, limit: String(remaining) }
+        : options;
+      console.log("Pass 4: Seeding from author_entity_ids...");
+      const { items, resourcesFetched } = await seedFromAuthorEntityIds(passOptions);
+      console.log(`  Found ${items.length} person-authored relationships`);
+      totalItems += items.length;
+      totalResourcesFetched += resourcesFetched;
 
-    const synced = await batchSync(items, dryRun);
-    totalSynced += synced;
-    if (!dryRun) console.log(`  Synced ${synced} rows`);
+      const synced = await batchSync(items, dryRun);
+      totalSynced += synced;
+      if (!dryRun) console.log(`  Synced ${synced} rows`);
+    }
   }
 
   console.log(
