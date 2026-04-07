@@ -1,0 +1,170 @@
+{
+  "table": "personnel",
+  "recordCount": 19,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-07T11:25:33.840Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 19,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "I9i9j99R9q",
+      "personId": "sid_jVmO8PWHQ8",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "President and CEO",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-names-gary-e-dickerson-chief-executive-officer",
+      "verdict": "none"
+    },
+    {
+      "id": "MZBYskJ6I6",
+      "personId": "sid_1pYD39Ensi",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP and CFO",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-semiconductor-industry-veteran-brice",
+      "verdict": "none"
+    },
+    {
+      "id": "wU2FHPSvNt",
+      "personId": "sid_8jipIflPmB",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP and CTO",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "XI9Usmq5KM",
+      "personId": "sid_eg7pFW5fKW",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "President, Semiconductor Products Group",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "r8FJ8Sz51P",
+      "personId": "sid_x6eVm9pF23",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP, Chief Legal Officer and Corporate Secretary",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "8EBm51BHj9",
+      "personId": "sid_IAwYnvNAG7",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP, Chief Human Resources Officer",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "5xkJN1AoiI",
+      "personId": "sid_IVEpT2ciQB",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP, Joint Operations",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "tlojEHn3CR",
+      "personId": "sid_mnBRoKHmDV",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "SVP, Applied Global Services",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/executive-team.html",
+      "verdict": "none"
+    },
+    {
+      "id": "idVCfzH3Ag",
+      "personId": "sid_t6j8G3qtCU",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Chairman of the Board",
+      "source": "https://investor.appliedmaterials.com/news-releases/news-release-details/applied-materials-names-thomas-j-iannotti-chairman-board",
+      "verdict": "none"
+    },
+    {
+      "id": "9IstHQ8N9o",
+      "personId": "sid_jVmO8PWHQ8",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "edw5xU5o9g",
+      "personId": "sid_YPx5BA6wvQ",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-jim-anderson-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "pxXnatFz95",
+      "personId": "sid_Bx3zDtPylU",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-rani-borkar-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "cSf956qD2E",
+      "personId": "sid_tnhaYGzVh3",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-judy-bruner-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "9CRcf9Gl9Q",
+      "personId": "sid_YZgGAGnWQe",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-eric-chen-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "YTsRV5FULo",
+      "personId": "sid_w9Lkdn1KAP",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://www.appliedmaterials.com/us/en/about/leadership/board-of-directors.html",
+      "verdict": "none"
+    },
+    {
+      "id": "9knPMXJZq2",
+      "personId": "sid_b7fmfGJ9LS",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-alexander-karsner-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "QnAKJnFxDi",
+      "personId": "sid_JVCmpnSnft",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-kevin-march-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "YObxhzH4I1",
+      "personId": "sid_W0x1GKMWZJ",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-scott-mcgregor-board-directors",
+      "verdict": "none"
+    },
+    {
+      "id": "z0iglwY9D7",
+      "personId": "sid_mA8NuMtVzH",
+      "organizationId": "sid_AuPn7YbiaZ",
+      "role": "Board Member",
+      "source": "https://ir.appliedmaterials.com/news-releases/news-release-details/applied-materials-appoints-yvonne-mcgill-board-directors",
+      "verdict": "none"
+    }
+  ]
+}

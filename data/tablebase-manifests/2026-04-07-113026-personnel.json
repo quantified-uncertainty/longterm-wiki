@@ -1,0 +1,90 @@
+{
+  "table": "personnel",
+  "recordCount": 9,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-07T11:30:26.158Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 9,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "1Nt8hch1oM",
+      "personId": "sid_cwYgWTgwVI",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Co-Founder and CTO",
+      "source": "https://iq.wiki/wiki/jorge-izquierdo",
+      "verdict": "none"
+    },
+    {
+      "id": "38W7mpHOi2",
+      "personId": "sid_PCVZaKFGZB",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Co-Founder",
+      "source": "https://iq.wiki/wiki/luis-cuende",
+      "verdict": "none"
+    },
+    {
+      "id": "t0z0LEds38",
+      "personId": "sid_ZxfHAFnYzR",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "CEO, Aragon X",
+      "source": "https://x.com/A_Leutenegger/status/1750541343582019635",
+      "verdict": "none"
+    },
+    {
+      "id": "FDKrVoiR49",
+      "personId": "sid_VyGYZFImF8",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Former Executive Director",
+      "source": "https://medium.com/aragon-association/new-advisory-board-b5909bdd582b",
+      "verdict": "none"
+    },
+    {
+      "id": "FJsSeNn9zM",
+      "personId": "sid_u1R1O0wRj6",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Head of Operations",
+      "source": "https://blog.aragon.org/aragon-association-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "9IG7fPA0h5",
+      "personId": "sid_WQe9G62Ot6",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Head of Governance",
+      "source": "https://blog.aragon.org/aragon-association-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "IzdnkWnObX",
+      "personId": "sid_H9RBmXHFgL",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Advisor",
+      "source": "https://medium.com/aragon-association/new-advisory-board-b5909bdd582b",
+      "verdict": "none"
+    },
+    {
+      "id": "cHxXUTKohx",
+      "personId": "sid_UGnUMbV9p9",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Advisor",
+      "source": "https://medium.com/aragon-association/new-advisory-board-b5909bdd582b",
+      "verdict": "none"
+    },
+    {
+      "id": "m6LQ2EVGG3",
+      "personId": "sid_AU7BxOdS2x",
+      "organizationId": "sid_dimMUIEbhA",
+      "role": "Strategic Council Member",
+      "source": "https://www.aragonfoundation.org/",
+      "verdict": "none"
+    }
+  ]
+}
