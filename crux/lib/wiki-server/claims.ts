@@ -18,6 +18,9 @@ type RpcClient = ReturnType<typeof hc<ClaimsRoute>>;
 
 export type ClaimStatusResult = InferResponseType<RpcClient['status'][':batchId']['$get'], 200>;
 export type ProposeClaimsResult = InferResponseType<RpcClient['propose']['$post'], 201>;
+export type ClaimsAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
+export type ClaimsStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+export type ClaimsByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -44,5 +47,45 @@ export async function getClaimStatus(
   return apiRequest<ClaimStatusResult>(
     'GET',
     `/api/claims/status/${encodeURIComponent(batchId)}`,
+  );
+}
+
+/**
+ * Fetch paginated list of all claims with optional filters.
+ */
+export async function getAllClaims(
+  params?: { limit?: number; offset?: number; status?: string; target_table?: string; entity_id?: string },
+): Promise<ApiResult<ClaimsAllResult>> {
+  const query = new URLSearchParams();
+  if (params?.limit != null) query.set('limit', String(params.limit));
+  if (params?.offset != null) query.set('offset', String(params.offset));
+  if (params?.status) query.set('status', params.status);
+  if (params?.target_table) query.set('target_table', params.target_table);
+  if (params?.entity_id) query.set('entity_id', params.entity_id);
+  const qs = query.toString();
+  return apiRequest<ClaimsAllResult>('GET', `/api/claims/all${qs ? `?${qs}` : ''}`);
+}
+
+/**
+ * Fetch aggregate claim metrics.
+ */
+export async function getClaimsStats(): Promise<ApiResult<ClaimsStatsResult>> {
+  return apiRequest<ClaimsStatsResult>('GET', '/api/claims/stats');
+}
+
+/**
+ * Fetch claims for a specific entity.
+ */
+export async function getClaimsByEntity(
+  entityId: string,
+  params?: { limit?: number; offset?: number },
+): Promise<ApiResult<ClaimsByEntityResult>> {
+  const query = new URLSearchParams();
+  if (params?.limit != null) query.set('limit', String(params.limit));
+  if (params?.offset != null) query.set('offset', String(params.offset));
+  const qs = query.toString();
+  return apiRequest<ClaimsByEntityResult>(
+    'GET',
+    `/api/claims/by-entity/${encodeURIComponent(entityId)}${qs ? `?${qs}` : ''}`,
   );
 }

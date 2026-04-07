@@ -7,6 +7,7 @@ import { ActionQueue } from "./action-queue";
 interface SourceCheckTabsProps {
   verdictsContent: React.ReactNode;
   coverageContent: React.ReactNode;
+  claimsContent: React.ReactNode;
 }
 
 const tabTriggerClass =
@@ -24,6 +25,7 @@ const tabTriggerClass =
 export function SourceCheckTabs({
   verdictsContent,
   coverageContent,
+  claimsContent,
 }: SourceCheckTabsProps) {
   return (
     <Tabs defaultValue="verdicts">
@@ -37,6 +39,9 @@ export function SourceCheckTabs({
         <TabsTrigger value="action-queue" className={tabTriggerClass}>
           Action Queue
         </TabsTrigger>
+        <TabsTrigger value="claims" className={tabTriggerClass}>
+          Claims
+        </TabsTrigger>
       </TabsList>
       <TabsContent value="verdicts" className="mt-6">
         {verdictsContent}
@@ -49,6 +54,9 @@ export function SourceCheckTabs({
       </TabsContent>
       <TabsContent value="action-queue" className="mt-6">
         <ActionQueue />
+      </TabsContent>
+      <TabsContent value="claims" className="mt-6">
+        {claimsContent}
       </TabsContent>
     </Tabs>
   );
