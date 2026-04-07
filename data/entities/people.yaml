@@ -7452,3 +7452,353 @@
     - ai-regulation
     - ai-governance
   lastUpdated: 2026-04
+# --- Auto-added stub entities (2026-04-07, tablebase enrichment) ---
+# Apollo Research
+- id: marius-hobbhahn
+  stableId: sid_1XMO6wYcZn
+  type: person
+  title: Marius Hobbhahn
+- id: chris-akin
+  stableId: sid_1L32TlXi8G
+  type: person
+  title: Chris Akin
+- id: charlotte-stix
+  stableId: sid_n8tO6LS5Ky
+  type: person
+  title: Charlotte Stix
+- id: tzach-horowitz
+  stableId: sid_xU6imWegov
+  type: person
+  title: Tzach Horowitz
+- id: alexander-meinke
+  stableId: sid_CSTvb4yAGB
+  type: person
+  title: Alexander Meinke
+- id: jeremy-scheurer
+  stableId: sid_sR1cHveHrs
+  type: person
+  title: Jérémy Scheurer
+- id: rusheb-shah
+  stableId: sid_RYtemLySnE
+  type: person
+  title: Rusheb Shah
+- id: bronson-schoen
+  stableId: sid_Yln2k8sDOQ
+  type: person
+  title: Bronson Schoen
+- id: axel-hojmark
+  stableId: sid_yAjHvhK4q1
+  type: person
+  title: Axel Højmark
+- id: andrei-matveiakin
+  stableId: sid_59H2O9TZ25
+  type: person
+  title: Andrei Matveiakin
+- id: felix-hofstatter
+  stableId: sid_8EubcNKsiS
+  type: person
+  title: Felix Hofstätter
+- id: alex-lloyd
+  stableId: sid_1tCrGd7OPi
+  type: person
+  title: Alex Lloyd
+- id: teun-van-der-weij
+  stableId: sid_vqNhnZUZRN
+  type: person
+  title: Teun van der Weij
+- id: alex-kedryk
+  stableId: sid_Wf0quGGJpa
+  type: person
+  title: Alex Kedryk
+- id: glen-rodgers
+  stableId: sid_waWB4F6AKe
+  type: person
+  title: Glen Rodgers
+- id: jeremy-neiman
+  stableId: sid_H9ZPaakn7o
+  type: person
+  title: Jeremy Neiman
+- id: daniel-polatajko
+  stableId: sid_E1W9ilArKn
+  type: person
+  title: Daniel Polatajko
+- id: mia-hopman
+  stableId: sid_xEtbMD8tej
+  type: person
+  title: Mia Hopman
+- id: zak-walters
+  stableId: sid_S95H0fLo5j
+  type: person
+  title: Zak Walters
+- id: theodore-ehrenborg
+  stableId: sid_Mdz3K5B54r
+  type: person
+  title: Theodore Ehrenborg
+- id: kyle-dai
+  stableId: sid_WkPrKkwljQ
+  type: person
+  title: Kyle Dai
+- id: alejandro-ortega
+  stableId: sid_Qnp9a7fp2j
+  type: person
+  title: Alejandro Ortega
+- id: matteo-pistillo
+  stableId: sid_93Kwo93ooq
+  type: person
+  title: Matteo Pistillo
+- id: annika-hallensleben
+  stableId: sid_TjS8O7lVLB
+  type: person
+  title: Annika Hallensleben
+- id: jasvin-kaur
+  stableId: sid_RhECbZnv5q
+  type: person
+  title: Jasvin Kaur
+- id: joping-chai
+  stableId: sid_Qs6de8XSC9
+  type: person
+  title: Joping Chai
+- id: umar-akhtar
+  stableId: sid_ST2qFHVqCJ
+  type: person
+  title: Umar Akhtar
+- id: david-duvenaud
+  stableId: sid_vdiBeD3SVi
+  type: person
+  title: David Duvenaud
+- id: yan-david-erlich
+  stableId: sid_uxFp3iKgeJ
+  type: person
+  title: Yan-David Erlich
+- id: daniel-kokotajko
+  stableId: sid_VnQlQzYOjk
+  type: person
+  title: Daniel Kokotajko
+# Applied Materials
+- id: gary-dickerson
+  stableId: sid_jVmO8PWHQ8
+  type: person
+  title: Gary Dickerson
+- id: brice-hill
+  stableId: sid_1pYD39Ensi
+  type: person
+  title: Brice Hill
+- id: omkaram-nalamasu
+  stableId: sid_8jipIflPmB
+  type: person
+  title: Omkaram Nalamasu
+- id: prabu-raja
+  stableId: sid_eg7pFW5fKW
+  type: person
+  title: Prabu Raja
+- id: teri-little
+  stableId: sid_x6eVm9pF23
+  type: person
+  title: Teri Little
+- id: joji-gill
+  stableId: sid_IAwYnvNAG7
+  type: person
+  title: Joji Gill
+- id: raman-achutharaman
+  stableId: sid_IVEpT2ciQB
+  type: person
+  title: Raman Achutharaman
+- id: tim-deane
+  stableId: sid_mnBRoKHmDV
+  type: person
+  title: Tim Deane
+- id: paul-chhabra
+  stableId: sid_i2bhjCSvNB
+  type: person
+  title: Paul Chhabra
+- id: tristan-holtam
+  stableId: sid_9biDimTAPA
+  type: person
+  title: Tristan Holtam
+- id: kc-ong
+  stableId: sid_tB4ylPeq9n
+  type: person
+  title: KC Ong
+- id: brian-shieh
+  stableId: sid_TkWsnGKnDr
+  type: person
+  title: Brian Shieh
+- id: keith-wells
+  stableId: sid_1VOk8jCJre
+  type: person
+  title: Keith Wells
+- id: thomas-iannotti
+  stableId: sid_t6j8G3qtCU
+  type: person
+  title: Thomas Iannotti
+- id: jim-anderson
+  stableId: sid_YPx5BA6wvQ
+  type: person
+  title: Jim Anderson
+- id: rani-borkar
+  stableId: sid_Bx3zDtPylU
+  type: person
+  title: Rani Borkar
+- id: judy-bruner
+  stableId: sid_tnhaYGzVh3
+  type: person
+  title: Judy Bruner
+- id: eric-chen
+  stableId: sid_YZgGAGnWQe
+  type: person
+  title: Eric Chen
+- id: aart-de-geus
+  stableId: sid_w9Lkdn1KAP
+  type: person
+  title: Aart de Geus
+- id: alexander-karsner
+  stableId: sid_b7fmfGJ9LS
+  type: person
+  title: Alexander Karsner
+- id: kevin-march
+  stableId: sid_JVCmpnSnft
+  type: person
+  title: Kevin March
+- id: scott-mcgregor
+  stableId: sid_W0x1GKMWZJ
+  type: person
+  title: Scott McGregor
+- id: yvonne-mcgill
+  stableId: sid_mA8NuMtVzH
+  type: person
+  title: Yvonne McGill
+# Aquatic Life Institute
+- id: sophika-kostyniuk
+  stableId: sid_B4iti3XQ4n
+  type: person
+  title: Sophika Kostyniuk
+- id: william-bench
+  stableId: sid_TH28kNwFLl
+  type: person
+  title: William Bench
+- id: tessa-gonzalez
+  stableId: sid_xyVOtF7Vog
+  type: person
+  title: Tessa Gonzalez
+- id: catalina-lopez
+  stableId: sid_v6e6iplavr
+  type: person
+  title: Catalina Lopez
+- id: christine-xu
+  stableId: sid_SOnZfGKnf4
+  type: person
+  title: Christine Xu
+- id: giulia-malerbi
+  stableId: sid_SPEvRSFOrr
+  type: person
+  title: Giulia Malerbi
+- id: julia-seibel
+  stableId: sid_JJcqcdmNVF
+  type: person
+  title: Julia Seibel
+- id: cecilia-valenza
+  stableId: sid_BuixCPWNPs
+  type: person
+  title: Cecilia Valenza
+- id: steffan-edward
+  stableId: sid_dmahnKWmJV
+  type: person
+  title: Steffan Edward
+- id: jessie-lingenfelter
+  stableId: sid_XnZxoJOBdo
+  type: person
+  title: Jessie Lingenfelter
+- id: melissa-de-miranda
+  stableId: sid_0ir08bL0S1
+  type: person
+  title: Melissa de Miranda
+- id: albin-grans
+  stableId: sid_npDE0zPNoE
+  type: person
+  title: Albin Gräns
+- id: alice-diconcetto
+  stableId: sid_9sedCbpwxP
+  type: person
+  title: Alice DiConcetto
+- id: daniela-waldhorn
+  stableId: sid_b9BRSj81GG
+  type: person
+  title: Daniela Waldhorn
+- id: elise-bernal
+  stableId: sid_v3AmLh9MIl
+  type: person
+  title: Elise Bernal
+- id: joshua-barr
+  stableId: sid_ZLfcJZDbRP
+  type: person
+  title: Joshua Barr
+- id: lynne-sneddon
+  stableId: sid_MMCfYS8Bbx
+  type: person
+  title: Lynne Sneddon
+- id: nico-westermann
+  stableId: sid_savfwVTvWR
+  type: person
+  title: Nico Westermann
+- id: sean-gifford
+  stableId: sid_vuVcdfGbsQ
+  type: person
+  title: Sean Gifford
+- id: jorge-lugo
+  stableId: sid_jU86t1ueiH
+  type: person
+  title: Jorge Lugo
+- id: ana-bradley
+  stableId: sid_8rhA93t21k
+  type: person
+  title: Ana Bradley
+# Aragon
+- id: jorge-izquierdo
+  stableId: sid_cwYgWTgwVI
+  type: person
+  title: Jorge Izquierdo
+- id: luis-cuende
+  stableId: sid_PCVZaKFGZB
+  type: person
+  title: Luis Cuende
+- id: anthony-leutenegger
+  stableId: sid_ZxfHAFnYzR
+  type: person
+  title: Anthony Leutenegger
+- id: stefano-bernardi
+  stableId: sid_VyGYZFImF8
+  type: person
+  title: Stefano Bernardi
+- id: joe-charlesworth
+  stableId: sid_u1R1O0wRj6
+  type: person
+  title: Joe Charlesworth
+- id: john-light
+  stableId: sid_WQe9G62Ot6
+  type: person
+  title: John Light
+- id: tim-draper
+  stableId: sid_H9RBmXHFgL
+  type: person
+  title: Tim Draper
+- id: brayton-williams
+  stableId: sid_UGnUMbV9p9
+  type: person
+  title: Brayton Williams
+- id: sandeep-nailwal
+  stableId: sid_AU7BxOdS2x
+  type: person
+  title: Sandeep Nailwal
+# Arb Research
+- id: gavin-leech
+  stableId: sid_OMpcXnS3qJ
+  type: person
+  title: Gavin Leech
+- id: sam-holton
+  stableId: sid_E9w4TpNXDZ
+  type: person
+  title: Sam Holton
+- id: juan-vazquez
+  stableId: sid_CT0Hmqs1wT
+  type: person
+  title: Juan Vazquez
