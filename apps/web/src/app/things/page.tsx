@@ -40,6 +40,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
   const sp = await searchParams;
   const searchQuery = getParam(sp, "q") ?? "";
   const filterType = getParam(sp, "type") ?? "";
+  const filterSourceTable = getParam(sp, "source_table") ?? "";
 
   // Parse page (useDirectoryUrl stores as 1-indexed in URL)
   const pageNum = Math.max(1, parseInt(getParam(sp, "page") ?? "1", 10) || 1);
@@ -56,6 +57,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
   if (searchQuery) {
     const params = new URLSearchParams({ q: searchQuery, limit: String(PAGE_SIZE), offset: String(offset) });
     if (filterType) params.set("thing_type", filterType);
+    if (filterSourceTable) params.set("source_table", filterSourceTable);
     listUrl = `/api/things/search?${params.toString()}`;
   } else {
     const params = new URLSearchParams({
@@ -65,6 +67,7 @@ export default async function ThingsPage({ searchParams }: PageProps) {
       offset: String(offset),
     });
     if (filterType) params.set("thing_type", filterType);
+    if (filterSourceTable) params.set("source_table", filterSourceTable);
     listUrl = `/api/things?${params.toString()}`;
   }
 

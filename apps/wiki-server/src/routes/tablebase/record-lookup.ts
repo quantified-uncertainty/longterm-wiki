@@ -29,6 +29,9 @@ import {
   entityEvents,
   entityAssessments,
   researchAreaOrganizations,
+  facts,
+  resources,
+  researchAreas,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { notFoundError, validationError } from "../shared/utils.js";
@@ -59,6 +62,10 @@ const VALID_SOURCE_TABLES = [
   "entity_events",
   "entity_assessments",
   "research_area_organizations",
+  "entities",
+  "facts",
+  "resources",
+  "research_areas",
 ] as const;
 
 type SourceTableName = (typeof VALID_SOURCE_TABLES)[number];
@@ -79,6 +86,10 @@ const TABLE_MAP: Record<SourceTableName, PgTable> = {
   entity_events: entityEvents,
   entity_assessments: entityAssessments,
   research_area_organizations: researchAreaOrganizations,
+  entities,
+  facts,
+  resources,
+  research_areas: researchAreas,
 };
 
 const sourceTableSchema = z.enum(VALID_SOURCE_TABLES);
@@ -121,6 +132,22 @@ const recordLookupApp = new Hono()
               eq(researchAreaOrganizations.organizationId, parts[1])
             )
           )
+          .limit(1);
+      } else if (sourceTable === "facts") {
+        // Composite key: sourceId is "entityId:factId" (URL-encoded)
+        const colonIdx = sourceId.indexOf(":");
+        if (colonIdx === -1) {
+          return validationError(
+            c,
+            `facts requires sourceId in "entityId:factId" format, got: ${sourceId.slice(0, 100)}`
+          );
+        }
+        const entityId = decodeURIComponent(sourceId.slice(0, colonIdx));
+        const factId = decodeURIComponent(sourceId.slice(colonIdx + 1));
+        rows = await db
+          .select()
+          .from(facts)
+          .where(and(eq(facts.entityId, entityId), eq(facts.factId, factId)))
           .limit(1);
       } else {
         const table = TABLE_MAP[sourceTable];

@@ -59,7 +59,7 @@ export function ThingsTable({
 }: ThingsTableProps) {
   const url = useDirectoryUrl({
     defaultSort: { field: "updated_at", dir: "desc" },
-    filters: ["type"],
+    filters: ["type", "source_table"],
   });
 
   // Sort is ignored by the search API (results ranked by relevance),
@@ -88,6 +88,11 @@ export function ThingsTable({
   const typeEntries = Object.entries(stats.byType)
     .sort(([, a], [, b]) => b - a);
 
+  // Source table filter
+  const sourceTableFilter = url.filters.source_table ?? "all";
+  const sourceTableEntries = Object.entries(stats.bySourceTable ?? {})
+    .sort(([, a], [, b]) => b - a);
+
   return (
     <div>
       {/* Search input */}
@@ -108,18 +113,35 @@ export function ThingsTable({
         </span>
       </div>
 
-      {/* Type filter chips */}
-      <div className="mb-4">
-        <FilterChips
-          items={typeEntries.map(([type, count]) => ({
-            key: type,
-            label: formatType(type),
-            count,
-          }))}
-          selected={typeFilter}
-          onSelect={(key) => url.setFilter("type", key)}
-          allCount={stats.total}
-        />
+      {/* Filters row */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="flex-1 min-w-0">
+          <FilterChips
+            items={typeEntries.map(([type, count]) => ({
+              key: type,
+              label: formatType(type),
+              count,
+            }))}
+            selected={typeFilter}
+            onSelect={(key) => url.setFilter("type", key)}
+            allCount={stats.total}
+          />
+        </div>
+        {sourceTableEntries.length > 0 && (
+          <select
+            aria-label="Filter by source table"
+            value={sourceTableFilter}
+            onChange={(e) => url.setFilter("source_table", e.target.value)}
+            className="text-xs rounded-md border border-border bg-card px-2 py-1.5 text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            <option value="all">All sources</option>
+            {sourceTableEntries.map(([table, count]) => (
+              <option key={table} value={table}>
+                {formatType(table)} ({count.toLocaleString()})
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       {/* Table */}

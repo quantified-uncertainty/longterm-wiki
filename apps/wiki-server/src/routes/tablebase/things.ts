@@ -40,6 +40,7 @@ const ListQuery = z.object({
   thing_type: z.string().max(50).optional(),
   entity_type: z.string().max(100).optional(),
   parent_id: z.string().max(100).optional(),
+  source_table: z.string().max(100).optional(),
   sort: z.enum(["title", "updated_at", "created_at", "thing_type"]).default("title"),
   order: z.enum(["asc", "desc"]).default("asc"),
   limit: clampedLimit(MAX_PAGE_SIZE, 50),
@@ -49,6 +50,7 @@ const ListQuery = z.object({
 const SearchQuery = z.object({
   q: z.string().min(1).max(500),
   thing_type: z.string().max(50).optional(),
+  source_table: z.string().max(100).optional(),
   limit: clampedLimit(100, 20),
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -90,16 +92,49 @@ const verdictFields = {
 };
 
 /**
- * Build the LEFT JOIN condition for source_check_verdicts on the things table.
+ * Explicit mapping from things.sourceTable (PG table names) to
+ * source_check_verdicts.recordType (semantic names).
  *
- * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
- * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
- * "funding-round"). We normalize sourceTable: replace '_' with '-', strip
- * trailing 's'. This produces exactly the recordType that verdictJoinCondition
- * uses (singular, hyphenated), ensuring at most one verdict match per thing.
+ * Only tables that support source-check verdicts are included.
+ * Unmapped tables will get NULL verdicts (graceful degradation).
  */
+const SOURCE_TABLE_TO_RECORD_TYPE: Record<string, string> = {
+  facts: "fact",
+  grants: "grant",
+  personnel: "personnel",
+  divisions: "division",
+  funding_programs: "funding-program",
+  investments: "investment",
+  funding_rounds: "funding-round",
+  publications: "publication",
+  wiki_pages: "wiki-page",
+  equity_positions: "equity-position",
+  policy_stakeholders: "policy-stakeholder",
+  benchmark_results: "benchmark-result",
+};
+
+/**
+ * SQL CASE expression mapping things.sourceTable to verdict recordType.
+ * Used in the LEFT JOIN condition for source_check_verdicts.
+ */
+const sourceTableCaseExpr = sql.join([
+  sql`CASE ${things.sourceTable}`,
+  ...Object.entries(SOURCE_TABLE_TO_RECORD_TYPE).map(
+    ([table, recordType]) => sql` WHEN ${table} THEN ${recordType}`
+  ),
+  sql` ELSE NULL END`,
+]);
+
+/** Build a raw SQL CASE expression for use in raw queries (trigram fallback). */
+function buildRecordTypeCaseSql(): string {
+  const whenClauses = Object.entries(SOURCE_TABLE_TO_RECORD_TYPE)
+    .map(([table, recordType]) => `WHEN '${table}' THEN '${recordType}'`)
+    .join(" ");
+  return `CASE t.source_table ${whenClauses} ELSE NULL END`;
+}
+
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')`,
+  sql`${sourceCheckVerdicts.recordType} = ${sourceTableCaseExpr}`,
   eq(sourceCheckVerdicts.recordId, things.sourceId),
   sql`${sourceCheckVerdicts.fieldName} IS NULL`,
 );
@@ -144,7 +179,7 @@ const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
   .get("/search", zv("query", SearchQuery), async (c) => {
-    const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
+    const { q: rawQ, thing_type, source_table, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Normalize: insert spaces at letter/digit boundaries ("sb1047" → "sb 1047")
@@ -166,6 +201,9 @@ const thingsApp = new Hono()
 
     if (thing_type) {
       conditions.push(eq(things.thingType, thing_type));
+    }
+    if (source_table) {
+      conditions.push(eq(things.sourceTable, source_table));
     }
 
     const ftsWhere = and(...conditions);
@@ -195,6 +233,9 @@ const thingsApp = new Hono()
       ];
       if (thing_type) {
         ilikeConditions.push(eq(things.thingType, thing_type));
+      }
+      if (source_table) {
+        ilikeConditions.push(eq(things.sourceTable, source_table));
       }
 
       const ilikeWhere = and(...ilikeConditions);
@@ -230,9 +271,7 @@ const thingsApp = new Hono()
     if (rows.length < TRIGRAM_FALLBACK_THRESHOLD && q.trim().length >= 2) {
       const rawDb = getDb();
       const existingIds = rows.map((r) => r.thing.id);
-      const thingTypeFilter = thing_type
-        ? `AND t.thing_type = $4`
-        : "";
+      const extraFilters: string[] = [];
       const params: (string | number | string[])[] = [
         q,
         limit - rows.length,
@@ -240,7 +279,13 @@ const thingsApp = new Hono()
       ];
       if (thing_type) {
         params.push(thing_type);
+        extraFilters.push(`AND t.thing_type = $${params.length}`);
       }
+      if (source_table) {
+        params.push(source_table);
+        extraFilters.push(`AND t.source_table = $${params.length}`);
+      }
+      const extraFilterSql = extraFilters.join(" ");
 
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
@@ -251,12 +296,12 @@ const thingsApp = new Hono()
           scv.verdict
         FROM things t
         LEFT JOIN source_check_verdicts scv
-          ON scv.record_type = regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          ON scv.record_type = ${buildRecordTypeCaseSql()}
           AND scv.record_id = t.source_id
           AND scv.field_name IS NULL
         WHERE similarity(t.title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
           AND t.id NOT IN (SELECT unnest($3::text[]))
-          ${thingTypeFilter}
+          ${extraFilterSql}
         ORDER BY similarity(t.title, $1) DESC
         LIMIT $2`,
         params,
@@ -305,7 +350,7 @@ const thingsApp = new Hono()
         return c.json({
           results: combined,
           query: q,
-          total: Math.max(ftsTotal, combined.length),
+          total: ftsTotal,
           searchMethod: rows.length > 0 ? ("fts+trigram" as const) : ("trigram" as const),
         });
       }
@@ -375,10 +420,26 @@ const thingsApp = new Hono()
       if (row.entityType) byEntityType[row.entityType] = row.count;
     }
 
+    const bySourceTableRows = await db
+      .select({
+        sourceTable: things.sourceTable,
+        count: count(),
+      })
+      .from(things)
+      .where(baseCondition)
+      .groupBy(things.sourceTable)
+      .orderBy(sql`count(*) DESC`);
+
+    const bySourceTable: Record<string, number> = {};
+    for (const row of bySourceTableRows) {
+      bySourceTable[row.sourceTable] = row.count;
+    }
+
     return c.json({
       total,
       byType,
       byEntityType,
+      bySourceTable,
     });
   })
 
@@ -479,6 +540,7 @@ const thingsApp = new Hono()
       thing_type,
       entity_type,
       parent_id,
+      source_table,
       sort,
       order,
       limit,
@@ -490,6 +552,7 @@ const thingsApp = new Hono()
     if (thing_type) conditions.push(eq(things.thingType, thing_type));
     if (entity_type) conditions.push(eq(things.entityType, entity_type));
     if (parent_id) conditions.push(eq(things.parentThingId, parent_id));
+    if (source_table) conditions.push(eq(things.sourceTable, source_table));
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
