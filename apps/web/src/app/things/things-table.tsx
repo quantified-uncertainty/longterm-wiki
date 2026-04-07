@@ -1,44 +1,21 @@
 "use client";
 
-import { useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-interface ThingRow {
-  id: string;
-  thingType: string;
-  title: string;
-  parentThingId: string | null;
-  sourceTable: string;
-  sourceId: string;
-  entityType: string | null;
-  description: string | null;
-  href: string | null;
-  parentTitle: string | null;
-  updatedAt: string | null;
-}
-
-interface ThingsStatsResponse {
-  total: number;
-  byType: Record<string, number>;
-  byEntityType: Record<string, number>;
-}
+import { useDirectoryUrl } from "@/hooks/use-directory-url";
+import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { PaginationControls } from "@/components/directory/PaginationControls";
+import { formatType } from "./types";
+import type { ThingRow, ThingsStatsResponse } from "./types";
 
 interface ThingsTableProps {
   rows: ThingRow[];
   total: number;
+  totalPages: number;
   stats: ThingsStatsResponse;
-  currentQuery: string;
-  currentType: string;
-  currentPage: number;
   pageSize: number;
-}
-
-/** Format a thingType value as a readable badge label. */
-function formatType(type: string): string {
-  return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 /** Format an ISO date string to a short date. */
@@ -62,45 +39,52 @@ const TYPE_COLORS: Record<string, string> = {
   resource: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
   grant: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   division: "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300",
+  "funding-program": "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
   funding_program: "bg-pink-100 text-pink-700 dark:bg-pink-900/40 dark:text-pink-300",
   personnel: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
 };
 
 const DEFAULT_TYPE_COLOR = "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
 
+type SortKey = "thing_type" | "title" | "updated_at";
+
 export function ThingsTable({
   rows,
   total,
+  totalPages,
   stats,
-  currentQuery,
-  currentType,
-  currentPage,
   pageSize,
 }: ThingsTableProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const url = useDirectoryUrl({
+    defaultSort: { field: "updated_at", dir: "desc" },
+    filters: ["type"],
+  });
 
-  const updateUrl = useCallback(
-    (updates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams.toString());
-      for (const [key, value] of Object.entries(updates)) {
-        if (value === null || value === "") {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
+  // Sort is ignored by the search API (results ranked by relevance),
+  // so we disable sort controls when a search query is active.
+  const isSearchActive = url.search.length > 0;
+  const VALID_SORT_KEYS = new Set<string>(["thing_type", "title", "updated_at"]);
+  const rawField = url.sort.field;
+  const sortKey: SortKey = VALID_SORT_KEYS.has(rawField) ? (rawField as SortKey) : "updated_at";
+  const sortDir = url.sort.dir;
+
+  const handleSort = (key: SortKey) => {
+    if (isSearchActive) return;
+    if (sortKey === key) {
+      if (sortDir === "asc") {
+        url.setSort({ field: key, dir: "desc" });
+      } else {
+        url.setSort({ field: "updated_at", dir: "desc" });
       }
-      // Reset page when filters change
-      const query = params.toString();
-      router.push(`/things${query ? `?${query}` : ""}`, { scroll: false });
-    },
-    [router, searchParams],
-  );
+    } else {
+      url.setSort({ field: key, dir: "asc" });
+    }
+  };
 
-  // Sort types by count descending, take top 8
+  // Build filter chip items from stats — all types, sorted by count
+  const typeFilter = url.filters.type ?? "all";
   const typeEntries = Object.entries(stats.byType)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 8);
+    .sort(([, a], [, b]) => b - a);
 
   return (
     <div>
@@ -112,13 +96,8 @@ export function ThingsTable({
             type="text"
             placeholder="Search things..."
             aria-label="Search things"
-            defaultValue={currentQuery}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                const value = (e.target as HTMLInputElement).value;
-                updateUrl({ q: value || null, page: null });
-              }
-            }}
+            value={url.search}
+            onChange={(e) => url.setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
           />
         </div>
@@ -127,40 +106,18 @@ export function ThingsTable({
         </span>
       </div>
 
-      {/* Type filter badges */}
-      <div className="flex gap-1.5 flex-wrap mb-4">
-        <button
-          type="button"
-          onClick={() => updateUrl({ type: null, page: null })}
-          className={cn(
-            "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-            !currentType
-              ? "bg-foreground text-background"
-              : "bg-muted text-muted-foreground hover:bg-muted/80",
-          )}
-        >
-          All ({stats.total.toLocaleString()})
-        </button>
-        {typeEntries.map(([type, count]) => (
-          <button
-            key={type}
-            type="button"
-            onClick={() =>
-              updateUrl({
-                type: currentType === type ? null : type,
-                page: null,
-              })
-            }
-            className={cn(
-              "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-              currentType === type
-                ? "bg-foreground text-background"
-                : "bg-muted text-muted-foreground hover:bg-muted/80",
-            )}
-          >
-            {formatType(type)} ({count.toLocaleString()})
-          </button>
-        ))}
+      {/* Type filter chips */}
+      <div className="mb-4">
+        <FilterChips
+          items={typeEntries.map(([type, count]) => ({
+            key: type,
+            label: formatType(type),
+            count,
+          }))}
+          selected={typeFilter}
+          onSelect={(key) => url.setFilter("type", key)}
+          allCount={stats.total}
+        />
       </div>
 
       {/* Table */}
@@ -168,10 +125,42 @@ export function ThingsTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-muted-foreground border-b border-border bg-muted">
-              <th className="py-2.5 px-3 text-left font-medium w-24">Type</th>
-              <th className="py-2.5 px-3 text-left font-medium">Title</th>
-              <th className="py-2.5 px-3 text-left font-medium w-48">Parent</th>
-              <th className="py-2.5 px-3 text-left font-medium w-32">Updated</th>
+              {isSearchActive ? (
+                <>
+                  <th className="py-2.5 px-3 text-left font-medium w-24">Type</th>
+                  <th className="py-2.5 px-3 text-left font-medium">Title</th>
+                  <th className="py-2.5 px-3 text-left font-medium w-48">Parent</th>
+                  <th className="py-2.5 px-3 text-left font-medium w-32">Updated</th>
+                </>
+              ) : (
+                <>
+                  <SortHeader
+                    label="Type"
+                    sortKey="thing_type"
+                    currentSort={sortKey}
+                    currentDir={sortDir}
+                    onSort={handleSort}
+                    className="text-left w-24"
+                  />
+                  <SortHeader
+                    label="Title"
+                    sortKey="title"
+                    currentSort={sortKey}
+                    currentDir={sortDir}
+                    onSort={handleSort}
+                    className="text-left"
+                  />
+                  <th className="py-2.5 px-3 text-left font-medium w-48">Parent</th>
+                  <SortHeader
+                    label="Updated"
+                    sortKey="updated_at"
+                    currentSort={sortKey}
+                    currentDir={sortDir}
+                    onSort={handleSort}
+                    className="text-left w-32"
+                  />
+                </>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -231,6 +220,19 @@ export function ThingsTable({
       {rows.length === 0 && (
         <div className="text-center py-12 text-muted-foreground">
           No things match your search.
+        </div>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4">
+          <PaginationControls
+            page={url.page}
+            pageCount={totalPages}
+            totalItems={total}
+            pageSize={pageSize}
+            onPageChange={url.setPage}
+          />
         </div>
       )}
     </div>
