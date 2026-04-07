@@ -95,12 +95,17 @@ const verdictFields = {
  *
  * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
  * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
- * "funding-round"). We normalize sourceTable: replace '_' with '-', strip
- * trailing 's'. This produces exactly the recordType that verdictJoinCondition
- * uses (singular, hyphenated), ensuring at most one verdict match per thing.
+ * "funding-round"). We normalize: replace '_' with '-', strip trailing 's'.
+ * Irregular plural: entities → entity (handled via CASE).
+ *
+ * NOTE: The same CASE expression is duplicated in the raw-SQL trigram fallback
+ * query below. If you add more irregular plurals here, update that query too.
  */
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')`,
+  sql`${sourceCheckVerdicts.recordType} = CASE ${things.sourceTable}
+    WHEN 'entities' THEN 'entity'
+    ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
+  END`,
   eq(sourceCheckVerdicts.recordId, things.sourceId),
   sql`${sourceCheckVerdicts.fieldName} IS NULL`,
 );
@@ -252,7 +257,11 @@ const thingsApp = new Hono()
           scv.verdict
         FROM things t
         LEFT JOIN source_check_verdicts scv
-          ON scv.record_type = regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          -- CASE mirrors verdictJoinOnThings above; keep in sync if adding irregular plurals
+          ON scv.record_type = CASE t.source_table
+            WHEN 'entities' THEN 'entity'
+            ELSE regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          END
           AND scv.record_id = t.source_id
           AND scv.field_name IS NULL
         WHERE similarity(t.title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
