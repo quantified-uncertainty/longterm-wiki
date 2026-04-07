@@ -126,7 +126,7 @@ const columns: ColumnDef<DataSourceRow>[] = [
     cell: ({ row }) => {
       const fmt = row.original.dataFormat;
       const label = FORMAT_LABELS[fmt];
-      const color = FORMAT_COLORS[fmt];
+      const color = FORMAT_COLORS[fmt] ?? "text-muted-foreground";
       return label ? (
         <Badge label={label} color={color} />
       ) : (
@@ -143,7 +143,7 @@ const columns: ColumnDef<DataSourceRow>[] = [
     cell: ({ row }) => {
       const rt = row.original.recordType;
       const label = RECORD_TYPE_LABELS[rt];
-      const color = RECORD_TYPE_COLORS[rt];
+      const color = RECORD_TYPE_COLORS[rt] ?? "text-muted-foreground";
       return label ? (
         <Badge label={label} color={color} />
       ) : (

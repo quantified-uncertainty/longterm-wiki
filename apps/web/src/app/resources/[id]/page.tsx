@@ -39,6 +39,7 @@ import {
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/factbase/format";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { formatAge } from "@/lib/format";
+import { FORMAT_LABELS, RECORD_TYPE_LABELS } from "@/app/data-sources/data-source-labels";
 
 // Cache for 1 hour — these on-demand pages get heavy bot traffic with 0% cache hits.
 export const revalidate = 3600;
@@ -151,8 +152,6 @@ function AuthorName({ name }: { name: string }) {
   return <span>{name}</span>;
 }
 
-import { FORMAT_LABELS, RECORD_TYPE_LABELS } from "@/app/data-sources/data-source-labels";
-
 // ---------------------------------------------------------------------------
 // Server-fetched resource page (tabular sources, etc.)
 // ---------------------------------------------------------------------------
@@ -216,7 +215,7 @@ function ServerResourcePage({ resource }: { resource: ServerResource }) {
                 <span className="text-muted-foreground/30">&middot;</span>
               )}
               <a
-                href={resource.url}
+                href={safeHref(resource.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
