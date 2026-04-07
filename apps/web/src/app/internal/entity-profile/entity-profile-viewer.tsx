@@ -17,7 +17,7 @@ import Link from "next/link";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
 import { recordVerdictToStatus } from "@/components/verification/source-check-status";
-import { getRecordHref } from "@/app/source-checks/source-checks-shared";
+
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 
@@ -674,9 +674,21 @@ function ProfileSection({
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
                       const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
-                      const href = section.recordType
-                        ? getRecordHref(section.recordType, idStr)
-                        : null;
+                      // Compute thing key for linking to /things/<id>
+                      // Only link sections with recordType (those have things table entries)
+                      // Facts use a composite key (entityId:factId); all others use row.id
+                      let href: string | null = null;
+                      if (section.recordType) {
+                        let linkId = idStr;
+                        if (section.recordType === "fact") {
+                          const entityId = row.entityId ?? row.entity_id;
+                          const factId = row.factId ?? row.fact_id;
+                          if (entityId && factId) {
+                            linkId = `${encodeURIComponent(String(entityId))}:${encodeURIComponent(String(factId))}`;
+                          }
+                        }
+                        href = `/things/${linkId}`;
+                      }
                       return href ? (
                         <td className="px-2 py-2 align-top">
                           <Link

@@ -104,6 +104,7 @@ const SECTION_RECORD_TYPE: Record<string, string> = {
   divisions: "division",
   fundingPrograms: "funding-program",
   policyStakeholders: "policy-stakeholder",
+  facts: "fact",
 };
 
 // ---- Section definition ----
