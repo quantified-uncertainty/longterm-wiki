@@ -55,7 +55,7 @@ export async function validateClaimRefs(
   const rows = await db<ClaimStatusRow[]>`
     SELECT id::int, status, entity_id
     FROM proposed_claims
-    WHERE id = ANY(${unique})
+    WHERE id = ANY(${unique}::bigint[])
   `;
 
   // Check for missing claims

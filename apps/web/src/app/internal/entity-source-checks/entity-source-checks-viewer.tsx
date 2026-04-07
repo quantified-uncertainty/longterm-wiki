@@ -212,7 +212,17 @@ function buildColumns(names: NameMap, hrefs: HrefMap): ColumnDef<VerdictRow>[] {
 
 // -- Expanded evidence detail (grouped by source URL) --
 
-type DetailCache = Record<string, { status: "loading" | "error" | "loaded"; data?: { evidence: EvidenceRow[]; currentCheckerModel?: string }; error?: string }>;
+interface ClaimProvenanceRow {
+  id: number;
+  claimText: string;
+  status: string;
+  confidence: number | null;
+  sourceUrl: string;
+  checkerModel: string | null;
+  verifiedAt: string | null;
+}
+
+type DetailCache = Record<string, { status: "loading" | "error" | "loaded"; data?: { evidence: EvidenceRow[]; claimProvenance?: ClaimProvenanceRow[]; currentCheckerModel?: string }; error?: string }>;
 
 /** Group evidence rows by sourceUrl for display. */
 function groupBySourceUrl(evidence: EvidenceRow[]): Map<string, EvidenceRow[]> {
@@ -310,7 +320,9 @@ function ExpandedDetail({
   }
 
   const evidence = entry.data?.evidence ?? [];
-  if (evidence.length === 0) {
+  const claimProvenance: ClaimProvenanceRow[] = entry.data?.claimProvenance ?? [];
+
+  if (evidence.length === 0 && claimProvenance.length === 0) {
     return <div className="px-6 py-4 text-sm text-muted-foreground">No evidence records found.</div>;
   }
 
@@ -319,54 +331,96 @@ function ExpandedDetail({
 
   return (
     <div className="px-6 py-4 bg-muted/30">
-      <div className="flex items-center gap-3 mb-3">
-        <div className="text-xs font-semibold text-muted-foreground">
-          Evidence ({evidence.length} check{evidence.length !== 1 ? "s" : ""} across {grouped.size} source{grouped.size !== 1 ? "s" : ""})
+      {/* Claim Provenance section */}
+      {claimProvenance.length > 0 && (
+        <div className="mb-4">
+          <div className="text-xs font-semibold text-muted-foreground mb-2">
+            Claim Provenance ({claimProvenance.length} claim{claimProvenance.length !== 1 ? "s" : ""})
+          </div>
+          <div className="space-y-2">
+            {claimProvenance.map((claim) => (
+              <div key={claim.id} className="rounded-md border border-border/40 px-3 py-2 bg-background/50">
+                <div className="flex items-start gap-2">
+                  <span className={cn(
+                    "inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium shrink-0 mt-0.5",
+                    claim.status === "verified" && "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300",
+                    claim.status === "contradicted" && "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+                    claim.status !== "verified" && claim.status !== "contradicted" && "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-300",
+                  )}>
+                    {claim.status}
+                  </span>
+                  <span className="text-xs">{claim.claimText}</span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-[10px] text-muted-foreground">
+                  {claim.confidence != null && <span>Confidence: {(claim.confidence * 100).toFixed(0)}%</span>}
+                  {claim.checkerModel && <span>Model: {claim.checkerModel}</span>}
+                  {claim.verifiedAt && <span>Verified: {new Date(claim.verifiedAt).toLocaleDateString()}</span>}
+                  {claim.sourceUrl && (
+                    <a href={claim.sourceUrl} target="_blank" rel="noopener noreferrer"
+                      className="text-blue-600 hover:underline dark:text-blue-400 inline-flex items-center gap-0.5">
+                      Source <ExternalLink className="h-2.5 w-2.5" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-        {staleCount > 0 && (
-          <div className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">
-            <AlertTriangle className="h-3 w-3" />
-            {staleCount} stale
-          </div>
-        )}
-      </div>
+      )}
 
-      <div className="space-y-4">
-        {[...grouped.entries()].map(([sourceUrl, items]) => (
-          <div key={sourceUrl} className="rounded-md border border-border/40 overflow-hidden">
-            {/* Source URL header */}
-            <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-b border-border/30">
-              {sourceUrl !== "(no source URL)" ? (
-                <a href={sourceUrl} target="_blank" rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400 min-w-0">
-                  <ExternalLink className="h-3 w-3 shrink-0" />
-                  <span className="truncate">{(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}</span>
-                </a>
-              ) : (
-                <span className="text-xs text-muted-foreground italic">{sourceUrl}</span>
-              )}
-              {(() => {
-                const withResource = items.find(e => e.resourceId);
-                if (!withResource) return null;
-                return (
-                  <a href={`/resources/${withResource.resourceId}`}
-                    className="text-xs text-emerald-600 hover:underline flex items-center gap-1 dark:text-emerald-400 shrink-0 ml-2"
-                    title="View resource details">
-                    Resource
-                  </a>
-                );
-              })()}
-              <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
-                {items.length} check{items.length !== 1 ? "s" : ""}
-              </span>
+      {/* Evidence section */}
+      {evidence.length > 0 && (
+        <>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="text-xs font-semibold text-muted-foreground">
+              Evidence ({evidence.length} check{evidence.length !== 1 ? "s" : ""} across {grouped.size} source{grouped.size !== 1 ? "s" : ""})
             </div>
-            {/* Evidence rows for this source */}
-            <div className="overflow-x-auto px-3 py-1">
-              <EvidenceTable evidence={items} />
-            </div>
+            {staleCount > 0 && (
+              <div className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold bg-amber-500/15 text-amber-500">
+                <AlertTriangle className="h-3 w-3" />
+                {staleCount} stale
+              </div>
+            )}
           </div>
-        ))}
-      </div>
+
+          <div className="space-y-4">
+            {[...grouped.entries()].map(([sourceUrl, items]) => (
+              <div key={sourceUrl} className="rounded-md border border-border/40 overflow-hidden">
+                {/* Source URL header */}
+                <div className="flex items-center gap-2 px-3 py-2 bg-muted/50 border-b border-border/30">
+                  {sourceUrl !== "(no source URL)" ? (
+                    <a href={sourceUrl} target="_blank" rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline flex items-center gap-1 dark:text-blue-400 min-w-0">
+                      <ExternalLink className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}</span>
+                    </a>
+                  ) : (
+                    <span className="text-xs text-muted-foreground italic">{sourceUrl}</span>
+                  )}
+                  {(() => {
+                    const withResource = items.find(e => e.resourceId);
+                    if (!withResource) return null;
+                    return (
+                      <a href={`/resources/${withResource.resourceId}`}
+                        className="text-xs text-emerald-600 hover:underline flex items-center gap-1 dark:text-emerald-400 shrink-0 ml-2"
+                        title="View resource details">
+                        Resource
+                      </a>
+                    );
+                  })()}
+                  <span className="text-[10px] text-muted-foreground ml-auto shrink-0">
+                    {items.length} check{items.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+                {/* Evidence rows for this source */}
+                <div className="overflow-x-auto px-3 py-1">
+                  <EvidenceTable evidence={items} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

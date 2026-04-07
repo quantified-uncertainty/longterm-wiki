@@ -204,6 +204,16 @@ jobs:
             --server "${ARGOCD_SERVER}" \
             --grpc-web
 
+          # Trigger an explicit sync — the app uses Manual sync policy,
+          # so `app set` alone only queues the change without applying it.
+          # Without this, the deployment stays OutOfSync and the old pod
+          # continues serving traffic (caused deploy #3967 failure).
+          argocd app sync longterm-wiki-server \
+            --auth-token "${ARGOCD_AUTH_TOKEN}" \
+            --server "${ARGOCD_SERVER}" \
+            --grpc-web \
+            --timeout 300
+
           argocd app wait longterm-wiki-server \
             --health \
             --timeout 300 \

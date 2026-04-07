@@ -22,6 +22,21 @@ export interface BatchRequest {
   };
 }
 
+/** Anthropic Batch API custom_id constraint: [a-zA-Z0-9_-]{1,64} */
+const CUSTOM_ID_VALID = /^[a-zA-Z0-9_-]{1,64}$/;
+
+/**
+ * Sanitize a string for use as a Batch API custom_id.
+ * Replaces any character outside [a-zA-Z0-9_-] with underscore and truncates to 64 chars.
+ */
+export function sanitizeBatchCustomId(raw: string): string {
+  const sanitized = raw.replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 64);
+  if (sanitized.length === 0) {
+    throw new Error(`Cannot sanitize empty or all-invalid custom_id: "${raw}"`);
+  }
+  return sanitized;
+}
+
 export interface BatchStatus {
   id: string;
   type: 'message_batch';
@@ -59,6 +74,16 @@ function getAnthropicKey(): string {
  * Create a message batch. Returns the batch ID for polling.
  */
 export async function createBatch(requests: BatchRequest[]): Promise<string> {
+  // Validate custom_id format — Anthropic requires [a-zA-Z0-9_-]{1,64}
+  const invalid = requests.filter(r => !CUSTOM_ID_VALID.test(r.custom_id));
+  if (invalid.length > 0) {
+    const examples = invalid.slice(0, 3).map(r => `"${r.custom_id}"`).join(', ');
+    throw new Error(
+      `${invalid.length} custom_id(s) contain invalid characters (must match [a-zA-Z0-9_-]{1,64}): ${examples}. ` +
+      `Use sanitizeBatchCustomId() to fix.`
+    );
+  }
+
   const apiKey = getAnthropicKey();
 
   const response = await fetch(`${ANTHROPIC_API_BASE}/messages/batches`, {

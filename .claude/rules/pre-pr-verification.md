@@ -54,7 +54,7 @@ const { chromium } = require('@playwright/test');
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
   await page.goto('http://localhost:3015/things', { waitUntil: 'networkidle' });
-  const text = await page.textContent('body');
+  const text = await page.textContent('body') ?? '';
   console.log('Page loaded, length:', text.length);
   // Check for error states:
   const errors = await page.locator('.text-red-600, .text-red-500').count();

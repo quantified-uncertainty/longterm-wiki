@@ -2,12 +2,13 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { entityResources } from "../../schema.js";
+import { entityResources, resources } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
   invalidJsonError,
 } from "../shared/utils.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 
 const SyncItemSchema = z.object({
   entityId: z.string().min(1).max(200),
@@ -84,20 +85,52 @@ const entityResourcesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // OR-merge: boolean flags accumulate across seed passes (e.g., publisher + wiki_citation).
-    // inferenceSource uses COALESCE (first-writer-wins) — the initial source is preserved.
-    const upserted = await db
-      .insert(entityResources)
-      .values(items.map(toRow))
-      .onConflictDoUpdate({
-        target: [entityResources.entityId, entityResources.resourceId],
-        set: {
-          authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
-          isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
-          inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
-        },
-      })
-      .returning({ id: entityResources.id });
+    const upserted = await db.transaction(async (tx) => {
+      // OR-merge: boolean flags accumulate across seed passes (e.g., publisher + wiki_citation).
+      // inferenceSource uses COALESCE (first-writer-wins) — the initial source is preserved.
+      const rows = await tx
+        .insert(entityResources)
+        .values(items.map(toRow))
+        .onConflictDoUpdate({
+          target: [entityResources.entityId, entityResources.resourceId],
+          set: {
+            authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
+            isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
+            inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
+          },
+        })
+        .returning({ id: entityResources.id, entityId: entityResources.entityId, resourceId: entityResources.resourceId, authoredByEntity: entityResources.authoredByEntity, isSubject: entityResources.isSubject });
+
+      // Dual-write to things table for universal search/browse index
+      if (rows.length > 0) {
+        const resourceIds = [...new Set(rows.map((r) => r.resourceId))];
+        const entityIds = [...new Set(rows.map((r) => r.entityId))];
+
+        // Resolve resource titles and entity titles for search
+        const resourceRows = await tx
+          .select({ id: resources.id, title: resources.title, url: resources.url })
+          .from(resources)
+          .where(sql`${resources.id} IN (${sql.join(resourceIds.map(id => sql`${id}`), sql`, `)})`);
+        const resourceTitleMap = new Map(resourceRows.map((r) => [r.id, r.title ?? r.url ?? r.id]));
+
+        const entityTitleMap = await resolveEntityTitles(tx, entityIds);
+
+        await upsertThingsInTx(
+          tx,
+          rows.map((r) => ({
+            id: `er:${r.entityId}:${r.resourceId}`,
+            thingType: "entity-resource",
+            title: resourceTitleMap.get(r.resourceId) ?? r.resourceId,
+            sourceTable: "entity_resources",
+            sourceId: String(r.id),
+            description: r.authoredByEntity ? "authored" : r.isSubject ? "about" : null,
+            parentTitle: entityTitleMap.get(r.entityId) ?? r.entityId,
+          }))
+        );
+      }
+
+      return rows;
+    });
 
     return c.json({ total: upserted.length });
   })
