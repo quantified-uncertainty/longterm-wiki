@@ -19,7 +19,7 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
@@ -514,6 +514,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         );
       }
 
+      // Resolve org IDs to human-readable titles for thing titles
+      const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
+      const orgTitleMap = await resolveEntityTitles(tx, orgIds);
+
       await upsertThingsInTx(
         tx,
         resolvedItems.map((p) => {
@@ -521,10 +525,11 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             ?? p.personDisplayName
             ?? cleanPersonId(p.personId)
             ?? p.personId;
+          const orgName = orgTitleMap.get(p.organizationId) ?? p.organizationId;
           return {
             id: p.id,
             thingType: "personnel" as const,
-            title: `${personName} — ${p.role} at ${p.organizationId}`,
+            title: `${personName} — ${p.role} at ${orgName}`,
             sourceTable: "personnel",
             sourceId: p.id,
             sourceUrl: p.source,

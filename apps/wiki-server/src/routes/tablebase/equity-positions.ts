@@ -12,7 +12,7 @@ import {
   parseRange,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -303,13 +303,17 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         scopeIds: items.map((i) => i.id),
       });
 
-      // Dual-write to things table
+      // Dual-write to things table — resolve IDs to human-readable names
+      const holderIds = [...new Set(items.map((ep) => ep.holderId))];
+      const companyIds = [...new Set(items.map((ep) => ep.companyId))];
+      const epTitleMap = await resolveEntityTitles(tx, [...holderIds, ...companyIds]);
+
       await upsertThingsInTx(
         tx,
         items.map((ep) => ({
           id: ep.id,
           thingType: "equity-position" as const,
-          title: `${ep.holderId} stake in ${ep.companyId}`,
+          title: `${epTitleMap.get(ep.holderId) ?? ep.holderId} stake in ${epTitleMap.get(ep.companyId) ?? ep.companyId}`,
           sourceTable: "equity_positions",
           sourceId: ep.id,
           sourceUrl: ep.source,
