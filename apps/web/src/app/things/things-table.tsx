@@ -90,7 +90,7 @@ export function ThingsTable({
 
   // Source table dropdown options
   const sourceTableFilter = url.filters.source_table ?? "all";
-  const sourceTableEntries = Object.entries(stats.bySourceTable ?? {})
+  const sourceTableEntries = Object.entries(stats.bySourceTable)
     .sort(([, a], [, b]) => b - a);
 
   return (
@@ -110,10 +110,11 @@ export function ThingsTable({
         </div>
         {sourceTableEntries.length > 0 && (
           <select
-            value={sourceTableFilter}
+            value={isSearchActive ? "all" : sourceTableFilter}
             onChange={(e) => url.setFilter("source_table", e.target.value)}
+            disabled={isSearchActive}
             aria-label="Filter by source table"
-            className="text-sm rounded-lg border border-border bg-card px-2 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40"
+            className="text-sm rounded-lg border border-border bg-card px-2 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="all">All tables ({stats.total})</option>
             {sourceTableEntries.map(([table, count]) => (

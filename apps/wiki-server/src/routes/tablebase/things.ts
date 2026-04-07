@@ -338,56 +338,33 @@ const thingsApp = new Hono()
       ? eq(things.parentThingId, parent_id)
       : undefined;
 
-    const totalResult = await db
-      .select({ count: count() })
-      .from(things)
-      .where(baseCondition);
-    const total = totalResult[0].count;
+    const [totalResult, byTypeRows, byEntityTypeRows, bySourceTableRows] = await Promise.all([
+      db.select({ count: count() }).from(things).where(baseCondition),
+      db.select({ thingType: things.thingType, count: count() })
+        .from(things).where(baseCondition)
+        .groupBy(things.thingType).orderBy(sql`count(*) DESC`),
+      db.select({ entityType: things.entityType, count: count() })
+        .from(things)
+        .where(baseCondition
+          ? and(baseCondition, isNotNull(things.entityType))
+          : isNotNull(things.entityType))
+        .groupBy(things.entityType).orderBy(sql`count(*) DESC`),
+      db.select({ sourceTable: things.sourceTable, count: count() })
+        .from(things).where(baseCondition)
+        .groupBy(things.sourceTable).orderBy(sql`count(*) DESC`),
+    ]);
 
-    const byTypeRows = await db
-      .select({
-        thingType: things.thingType,
-        count: count(),
-      })
-      .from(things)
-      .where(baseCondition)
-      .groupBy(things.thingType)
-      .orderBy(sql`count(*) DESC`);
+    const total = totalResult[0].count;
 
     const byType: Record<string, number> = {};
     for (const row of byTypeRows) {
       byType[row.thingType] = row.count;
     }
 
-    // Count things with entity_type breakdown (entities only)
-    const byEntityTypeRows = await db
-      .select({
-        entityType: things.entityType,
-        count: count(),
-      })
-      .from(things)
-      .where(
-        baseCondition
-          ? and(baseCondition, isNotNull(things.entityType))
-          : isNotNull(things.entityType)
-      )
-      .groupBy(things.entityType)
-      .orderBy(sql`count(*) DESC`);
-
     const byEntityType: Record<string, number> = {};
     for (const row of byEntityTypeRows) {
       if (row.entityType) byEntityType[row.entityType] = row.count;
     }
-
-    const bySourceTableRows = await db
-      .select({
-        sourceTable: things.sourceTable,
-        count: count(),
-      })
-      .from(things)
-      .where(baseCondition)
-      .groupBy(things.sourceTable)
-      .orderBy(sql`count(*) DESC`);
 
     const bySourceTable: Record<string, number> = {};
     for (const row of bySourceTableRows) {
