@@ -8,7 +8,7 @@ interface CitationHealthBannerProps {
 }
 
 /**
- * Page-level banner showing aggregate citation verification health.
+ * Page-level banner showing aggregate citation source-check health.
  * Displayed below the ContentConfidenceBanner for pages with verified citations.
  */
 export function CitationHealthBanner({ health }: CitationHealthBannerProps) {

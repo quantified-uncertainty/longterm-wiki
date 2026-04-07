@@ -16,10 +16,10 @@ export interface TableConfig {
   syncBodyKey: string;
   /**
    * When true, the sync endpoint requires every record to include inline
-   * verification. Set for tables that have reached Phase 5 hard enforcement
-   * (Discussion #3875). The CLI appends ?requireVerification=true to the sync path.
+   * source-check. Set for tables that have reached Phase 5 hard enforcement
+   * (Discussion #3875). The CLI appends ?requireSourceCheck=true to the sync path.
    */
-  requireVerification?: boolean;
+  requireSourceCheck?: boolean;
 }
 
 const TABLE_CONFIGS: Record<string, TableConfig> = {

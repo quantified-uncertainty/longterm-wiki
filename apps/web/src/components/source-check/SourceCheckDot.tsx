@@ -1,7 +1,7 @@
 /**
- * SourceCheckDot — Unified colored dot for source-check verification status.
+ * SourceCheckDot — Unified colored dot for source-check status.
  *
- * A small colored dot indicating the verification state of a data record or fact.
+ * A small colored dot indicating the source-check state of a data record or fact.
  * Designed to be compact enough for table cells and inline use.
  *
  * Color scheme (5 states):

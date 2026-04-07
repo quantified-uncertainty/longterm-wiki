@@ -9,9 +9,9 @@ import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatVerification,
+  formatSourceCheck,
   type VerdictJoinFields,
-} from "../shared/verification-join.js";
+} from "../shared/source-check-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -26,10 +26,10 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceVerification } from "../shared/verification-enforcement.js";
+import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
 
 // ---- Constants ----
 
@@ -73,7 +73,7 @@ const SyncGrantItemSchema = z.object({
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
   dataSourceId: z.string().max(100).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -163,7 +163,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
-    verification: formatVerification(r),
+    sourceCheck: formatSourceCheck(r),
   };
 }
 
@@ -603,10 +603,10 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       batchKeys.add(key);
     }
 
-    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
-    // config and client ?requireVerification=true param. See verification-enforcement.ts.
-    const verificationError = enforceVerification(c, "grants", items);
-    if (verificationError) return verificationError;
+    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
+    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
+    const sourceCheckError = enforceSourceCheck(c, "grants", items);
+    if (sourceCheckError) return sourceCheckError;
 
     // Validate programId references (skip if skipEntityValidation is set)
     const skipValidation = c.req.query("skipEntityValidation") === "true";
@@ -737,7 +737,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -745,14 +745,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("grants/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("grants/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

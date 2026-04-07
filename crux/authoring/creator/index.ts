@@ -9,7 +9,7 @@ export { findCanonicalLinks } from './canonical-links.ts';
 export { runPerplexityResearch, runScryResearch } from './research.ts';
 export { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './source-fetching.ts';
 export { runSynthesis } from './synthesis.ts';
-export { runSourceVerification } from './verification.ts';
+export { runSourceCheck } from './source-check.ts';
 export { ensureComponentImports, runValidationLoop, runFullValidation } from './validation.ts';
 export { runGrading } from './grading.ts';
 export { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './deployment.ts';

@@ -68,7 +68,7 @@ export async function generateMetadata({
   };
 }
 
-/** Resolve verification verdict for a stakeholder (server-side only). */
+/** Resolve source-check verdict for a stakeholder (server-side only). */
 function resolveVerdict(
   policyStableId: string | undefined,
   stakeholderName: string,

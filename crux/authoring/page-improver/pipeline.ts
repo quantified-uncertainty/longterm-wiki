@@ -82,7 +82,7 @@ async function autoLogSession(
     // This surfaces in the page-changes dashboard so reviewers know cross-reference
     // checks and citation data may have been skipped.
     if (!serverAvailable) {
-      summary += '\n\nConstraint: wiki server was unreachable. Cross-reference checks, citation verification, and backlink context were unavailable during this session.';
+      summary += '\n\nConstraint: wiki server was unreachable. Cross-reference checks, citation checking, and backlink context were unavailable during this session.';
     }
 
     const entry = {
@@ -123,7 +123,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
   // Check wiki server availability upfront so the session log can record if the
   // server was unreachable (which means cross-reference checks and citation
-  // verification were silently skipped during this run).
+  // source-checks were silently skipped during this run).
   const serverAvailable = await isServerAvailable();
   if (!serverAvailable) {
     console.warn('  Warning: wiki server unavailable — cross-reference checks and citation data will be skipped.');

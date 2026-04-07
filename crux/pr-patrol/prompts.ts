@@ -77,7 +77,7 @@ ${failingCheckInfo}- Check CI status: gh pr checks ${num} --repo ${repo}
     sections.push(`
 ### Missing Test Plan
 - Read the PR diff to understand what changed
-- Update the PR body to add a "## Test plan" section with relevant verification steps
+- Update the PR body to add a "## Test plan" section with relevant check steps
 - Use gh pr edit to update the body`);
   }
 

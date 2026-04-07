@@ -1,7 +1,7 @@
 /**
- * Citation Auditor — independent post-hoc verification module
+ * Citation Auditor — independent post-hoc source-check module
  *
- * Stateless, database-free citation verification. Extracts citations from MDX
+ * Stateless, database-free citation checking. Extracts citations from MDX
  * content, fetches source URLs via the source-fetcher module (or uses a
  * pre-filled cache), and independently verifies each claim against the actual
  * source text using a cheap LLM call.
@@ -28,7 +28,7 @@ import { stripFrontmatter } from '../patterns.ts';
 import { getCachedContent } from './citation-content-cache.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 
-/** Minimum source content length (chars) required to attempt LLM verification. */
+/** Minimum source content length (chars) required to attempt LLM source-check. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;
 
 // ---------------------------------------------------------------------------
@@ -130,12 +130,12 @@ export interface CitationAudit {
   /** The URL cited by this footnote. */
   sourceUrl: string;
   /**
-   * Verdict from LLM verification, or 'unchecked' if no source was available
+   * Verdict from LLM source-check, or 'unchecked' if no source was available
    * (e.g., URL not in cache and fetchMissing=false, paywall, or unverifiable
    * domain such as social media).
    */
   verdict: AuditVerdict | 'unchecked';
-  /** The passage in the source most relevant to the claim (when LLM verification ran). */
+  /** The passage in the source most relevant to the claim (when LLM source-check ran). */
   relevantQuote?: string;
   /** Human-readable explanation of the verdict. */
   explanation: string;
@@ -204,7 +204,7 @@ export interface AuditRequest {
    */
   passThreshold?: number;
   /**
-   * LLM model for per-citation verification (passed to OpenRouter).
+   * LLM model for per-citation checking (passed to OpenRouter).
    * Default: google/gemini-2.0-flash-001 (cheap and fast).
    */
   model?: string;
@@ -214,14 +214,14 @@ export interface AuditRequest {
    */
   delayMs?: number;
   /**
-   * Maximum number of concurrent LLM verification calls.
+   * Maximum number of concurrent LLM source-check calls.
    * Default: 3.
    */
   concurrency?: number;
 }
 
 // ---------------------------------------------------------------------------
-// LLM verification
+// LLM source-check
 // ---------------------------------------------------------------------------
 
 /** Parsed response from the per-citation LLM verifier. */
@@ -231,7 +231,7 @@ interface VerifierResponse {
   explanation: string;
 }
 
-const VERIFIER_SYSTEM_PROMPT = `You are a citation verification assistant. Given a claim from a wiki article and the text of the cited source, determine whether the source supports the claim.
+const VERIFIER_SYSTEM_PROMPT = `You are a citation checking assistant. Given a claim from a wiki article and the text of the cited source, determine whether the source supports the claim.
 
 Use exactly one of these verdicts:
 - "verified": the source supports the core factual assertion in the claim. The source need not cover every detail in the sentence — wiki sentences often cite multiple sources, so this source may only support part of the claim.
@@ -287,7 +287,7 @@ export function parseVerifierResponse(raw: string): VerifierResponse {
     return {
       verdict: 'unchecked',
       relevantQuote: '',
-      explanation: 'Failed to parse verification response.',
+      explanation: 'Failed to parse source-check response.',
     };
   }
 }
@@ -340,7 +340,7 @@ async function verifyClaimBatchAgainstSource(
     .map((c, i) => `[${i + 1}] (footnote ^${c.footnoteRef}): ${c.claim}`)
     .join('\n');
 
-  const batchSystemPrompt = `You are a citation verification assistant. Given MULTIPLE claims from a wiki article and the text of a single cited source, determine whether the source supports each claim.
+  const batchSystemPrompt = `You are a citation checking assistant. Given MULTIPLE claims from a wiki article and the text of a single cited source, determine whether the source supports each claim.
 
 Use exactly one of these verdicts per claim:
 - "verified": the source supports the core factual assertion in the claim. The source need not cover every detail in the sentence — wiki sentences often cite multiple sources, so this source may only support part of the claim.
@@ -414,7 +414,7 @@ export function parseBatchVerifierResponse(raw: string, expectedCount: number): 
     return Array.from({ length: expectedCount }, () => ({
       verdict: 'unchecked' as const,
       relevantQuote: '',
-      explanation: 'Failed to parse batch verification response.',
+      explanation: 'Failed to parse batch source-check response.',
     }));
   }
 }
@@ -633,7 +633,7 @@ export function detectUnsourcedTableCells(body: string): UnsourcedTableCell[] {
  * 1. Extracts citations (footnote → URL + claim context) from the MDX body.
  * 2. Resolves sources and partitions citations into non-LLM (unchecked/dead)
  *    and LLM-verifiable groups (batched by source URL for efficiency).
- * 3. Runs LLM verification concurrently with a configurable concurrency limit.
+ * 3. Runs LLM source-check concurrently with a configurable concurrency limit.
  * 4. Returns AuditResult with per-citation verdicts, summary, and pass/fail gate.
  *
  * Cost estimate: ~$0.01–0.03 per citation at the default model.
@@ -715,7 +715,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
         claim,
         sourceUrl: ext.url,
         verdict: 'unchecked',
-        explanation: 'Source is behind a paywall — content not available for verification.',
+        explanation: 'Source is behind a paywall — content not available for source-check.',
       });
       continue;
     }
@@ -745,7 +745,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // Queue for LLM verification — group by source URL (#677).
+    // Queue for LLM source-check — group by source URL (#677).
     const sourceText = source.relevantExcerpts && source.relevantExcerpts.length > 0
       ? source.relevantExcerpts.join('\n\n---\n\n')
       : source.content;
@@ -756,7 +756,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
     llmGroups.get(ext.url)!.claims.push({ footnoteRef, claim, sourceUrl: ext.url });
   }
 
-  // Phase 2: Run LLM verification in parallel with concurrency limit (#677).
+  // Phase 2: Run LLM source-check in parallel with concurrency limit (#677).
   // Each group (same source URL) is a single batched LLM call.
   const limit = pLimit(concurrency);
   const groupTasks = [...llmGroups.entries()].map(([, group]) =>
@@ -789,7 +789,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
             claim: c.claim,
             sourceUrl: c.sourceUrl,
             verdict: 'unchecked',
-            explanation: `Verification error: ${msg.slice(0, 200)}`,
+            explanation: `Source-check error: ${msg.slice(0, 200)}`,
           });
         }
       }

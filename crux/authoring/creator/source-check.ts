@@ -1,5 +1,5 @@
 /**
- * Verification Module
+ * Source-Check Module
  *
  * Verifies source attributions, quotes, and URLs in generated content.
  */
@@ -9,7 +9,7 @@ import path from 'path';
 import { getFetchedSourceContent } from './source-fetching.ts';
 import type { TopicPhaseContext } from './types.ts';
 
-type VerificationContext = TopicPhaseContext;
+type SourceCheckContext = TopicPhaseContext;
 
 interface Warning {
   type: string;
@@ -35,7 +35,7 @@ interface ResearchData {
   sources?: Array<{ content?: string }>;
 }
 
-export async function runSourceVerification(topic: string, { log, saveResult, getTopicDir }: VerificationContext): Promise<{ success: boolean; warnings: Warning[] }> {
+export async function runSourceCheck(topic: string, { log, saveResult, getTopicDir }: SourceCheckContext): Promise<{ success: boolean; warnings: Warning[] }> {
   log('verify-sources', 'Checking content against research sources...');
 
   const topicDir = getTopicDir(topic);
@@ -43,7 +43,7 @@ export async function runSourceVerification(topic: string, { log, saveResult, ge
   const draftPath = path.join(topicDir, 'draft.mdx');
 
   if (!fs.existsSync(researchPath) || !fs.existsSync(draftPath)) {
-    log('verify-sources', 'Missing research or draft, skipping verification');
+    log('verify-sources', 'Missing research or draft, skipping source-check');
     return { success: true, warnings: [] };
   }
 
@@ -57,7 +57,7 @@ export async function runSourceVerification(topic: string, { log, saveResult, ge
 
   const fetchedContent = getFetchedSourceContent(topic, { getTopicDir });
   if (fetchedContent) {
-    log('verify-sources', `Using ${fetchedContent.sourceCount} fetched sources for verification (${Math.round(fetchedContent.combinedContent.length / 1000)}k chars)`);
+    log('verify-sources', `Using ${fetchedContent.sourceCount} fetched sources for source-check (${Math.round(fetchedContent.combinedContent.length / 1000)}k chars)`);
   } else {
     log('verify-sources', 'No fetched source content available, using Perplexity summaries only');
   }

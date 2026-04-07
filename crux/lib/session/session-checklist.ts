@@ -22,7 +22,7 @@ export interface ChecklistItem {
   applicableTypes: SessionType[] | 'all';
   /** blocking = must be checked or N/A before shipping. advisory = recommended. */
   priority: 'blocking' | 'advisory';
-  /** Shell command for auto-verification. Exit 0 = pass. */
+  /** Shell command for auto-check. Exit 0 = pass. */
   verifyCommand?: string;
 }
 

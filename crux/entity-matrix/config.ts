@@ -48,7 +48,7 @@ export const DIMENSION_GROUPS: DimensionGroupMeta[] = [
   },
   {
     id: "quality",
-    label: "Quality & Verification",
+    label: "Quality Quality & Source-Check Source-Check",
     shortLabel: "Quality",
   },
   {
@@ -327,19 +327,19 @@ export const DIMENSIONS: DimensionDef[] = [
     importance: 5,
   },
 
-  // --- Quality & Verification ---
+  // --- Quality Quality & Source-Check Source-Check ---
   {
-    id: "verification_tables",
-    label: "Verification Tables",
+    id: "source_check_tables",
+    label: "Source-Check Tables",
     group: "quality",
-    description: "Whether verification DB tables exist for this data type",
+    description: "Whether source-check DB tables exist for this data type",
     detection: "filesystem",
     valueType: "boolean",
     importance: 5,
   },
   {
-    id: "verification_coverage",
-    label: "Verification Coverage",
+    id: "source_check_coverage",
+    label: "Source-Check Coverage",
     group: "quality",
     description: "Percentage of records with non-unchecked verdicts",
     detection: "api",
@@ -759,10 +759,10 @@ export function scoreDimension(dimensionId: string, raw: unknown): number {
       return 15;
 
     // Quality
-    case "verification_tables":
+    case "source_check_tables":
     case "hallucination_scored":
       return scoreBoolean(raw as boolean);
-    case "verification_coverage":
+    case "source_check_coverage":
       return scorePercentage(raw as number);
 
     // Testing

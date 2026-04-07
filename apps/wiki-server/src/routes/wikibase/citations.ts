@@ -1329,7 +1329,7 @@ const citationsApp = new Hono()
 
   // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
   // Backward propagation from claims → citation_quotes is no longer needed
-  // since claims is now the single source of truth for verification data.
+  // since claims is now the single source of truth for source-check data.
 
   // ---- GET /source-type-stats ----
   .get("/source-type-stats", async (c) => {

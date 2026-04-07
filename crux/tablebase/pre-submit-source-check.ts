@@ -1,7 +1,7 @@
 /**
- * Pre-Submit Source Verification
+ * Pre-Submit Source Check
  *
- * Verifies enrichment records against their source URLs before they are
+ * Source-checks enrichment records against their source URLs before they are
  * submitted to the wiki-server. Catches hallucinated data (e.g., wrong roles,
  * fabricated affiliations) before it enters the database.
  *
@@ -9,7 +9,7 @@
  *   - handleSubmitRecords() in tools.ts (LLM agent path)
  *   - submitCommand() in commands/tablebase.ts (CLI path)
  *
- * Records that fail verification are excluded from submission with a warning.
+ * Records that fail source-checking are excluded from submission with a warning.
  */
 
 import { createLlmClient } from '../lib/llm.ts';
@@ -31,12 +31,12 @@ const { PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 // Types
 // ---------------------------------------------------------------------------
 
-export interface VerifiedRecord {
+export interface SourceCheckedRecord {
   record: Record<string, unknown>;
-  /** Whether the record passed verification and should be submitted */
+  /** Whether the record passed the source-check and should be submitted */
   passed: boolean;
-  /** Verification details attached to the record */
-  verification?: {
+  /** Source-check details attached to the record */
+  sourceCheck?: {
     verdict: string;
     confidence: number;
     reasoning: string;
@@ -46,13 +46,13 @@ export interface VerifiedRecord {
 }
 
 export interface PreSubmitResult {
-  /** Records that passed verification (include in submission) */
+  /** Records that passed the source-check (include in submission) */
   accepted: Array<Record<string, unknown>>;
-  /** Records that failed verification (excluded from submission) */
-  rejected: VerifiedRecord[];
-  /** Records that were skipped (no source URL) — included without verification */
+  /** Records that failed the source-check (excluded from submission) */
+  rejected: SourceCheckedRecord[];
+  /** Records that were skipped (no source URL) — included without source-check */
   noSource: Array<Record<string, unknown>>;
-  /** Total verification cost in USD */
+  /** Total source-check cost in USD */
   cost: number;
 }
 
@@ -121,23 +121,23 @@ ${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 // ---------------------------------------------------------------------------
-// Main verification function
+// Main source-check function
 // ---------------------------------------------------------------------------
 
 /**
- * Verify enrichment records against their source URLs before submission.
+ * Source-check enrichment records against their source URLs before submission.
  *
  * For each record with a source URL:
  *   1. Fetch cached source content from the citation_content cache
  *   2. Call the LLM source-checker (Haiku) to compare record vs source
  *   3. If verdict is "contradicted" or "unverifiable" with low confidence: reject
- *   4. Otherwise: accept with verification metadata attached
+ *   4. Otherwise: accept with source-check metadata attached
  *
  * Records without source URLs are included with a warning (some records
  * legitimately have no URL, e.g., manually confirmed data).
  *
  * @param table - Table name (e.g., "personnel")
- * @param records - Records to verify
+ * @param records - Records to source-check
  * @returns Categorized records: accepted, rejected, noSource
  */
 export async function verifyBeforeSubmit(
@@ -145,7 +145,7 @@ export async function verifyBeforeSubmit(
   records: Array<Record<string, unknown>>,
 ): Promise<PreSubmitResult> {
   const accepted: Array<Record<string, unknown>> = [];
-  const rejected: VerifiedRecord[] = [];
+  const rejected: SourceCheckedRecord[] = [];
   const noSource: Array<Record<string, unknown>> = [];
   let totalCost = 0;
 
@@ -160,7 +160,7 @@ export async function verifyBeforeSubmit(
 
     // No source URL — include with a warning but don't block
     if (!sourceUrl) {
-      console.warn(`[pre-verify] Record ${record.id ?? '?'}: no source URL — skipping verification`);
+      console.warn(`[pre-verify] Record ${record.id ?? '?'}: no source URL — skipping source-check`);
       noSource.push(record);
       continue;
     }
@@ -171,7 +171,7 @@ export async function verifyBeforeSubmit(
     if (!fetchResult.content) {
       // Source content not available — include the record but log why
       const reason = fetchResult.errorMessage ?? fetchResult.errorType ?? 'unknown';
-      console.warn(`[pre-verify] Record ${record.id ?? '?'}: source content unavailable (${reason}) — including without verification`);
+      console.warn(`[pre-verify] Record ${record.id ?? '?'}: source content unavailable (${reason}) — including without source-check`);
       accepted.push(record);
       continue;
     }
@@ -190,7 +190,7 @@ export async function verifyBeforeSubmit(
       // Estimated cost for Haiku: ~$0.005 per call
       totalCost += 0.005;
 
-      const verification = {
+      const sourceCheck = {
         verdict: result.verdict,
         confidence: result.confidence,
         reasoning: result.reasoning,
@@ -205,7 +205,7 @@ export async function verifyBeforeSubmit(
         rejected.push({
           record,
           passed: false,
-          verification,
+          sourceCheck,
           skipReason: `Source contradicts record: ${result.reasoning}`,
         });
         continue;
@@ -219,19 +219,20 @@ export async function verifyBeforeSubmit(
         rejected.push({
           record,
           passed: false,
-          verification,
+          sourceCheck,
           skipReason: `Unverifiable with low confidence: ${result.reasoning}`,
         });
         continue;
       }
 
-      // Record passed verification — attach verification data
-      record.verification = verification;
+      // Record passed source-check — attach source-check data
+      // Note: field name "verification" matches the wiki-server API schema (InlineSourceCheckSchema)
+      record.verification = sourceCheck;
       accepted.push(record);
     } catch (err: unknown) {
       // LLM call failed — include the record but log the error
       const msg = err instanceof Error ? err.message : String(err);
-      console.warn(`[pre-verify] Record ${record.id ?? '?'}: verification failed (${msg}) — including without verification`);
+      console.warn(`[pre-verify] Record ${record.id ?? '?'}: source-check failed (${msg}) — including without source-check`);
       accepted.push(record);
     }
   }
@@ -240,13 +241,13 @@ export async function verifyBeforeSubmit(
 }
 
 /**
- * Format a human-readable summary of the pre-submit verification results.
+ * Format a human-readable summary of the pre-submit source-check results.
  */
 export function formatPreSubmitSummary(result: PreSubmitResult): string {
   const lines: string[] = [];
   const total = result.accepted.length + result.rejected.length + result.noSource.length;
 
-  lines.push(`[pre-verify] Verification complete: ${total} records`);
+  lines.push(`[pre-verify] Source-check complete: ${total} records`);
   lines.push(`  Accepted: ${result.accepted.length}`);
   if (result.noSource.length > 0) {
     lines.push(`  No source (included): ${result.noSource.length}`);
@@ -261,7 +262,7 @@ export function formatPreSubmitSummary(result: PreSubmitResult): string {
     }
   }
   if (result.cost > 0) {
-    lines.push(`  Verification cost: $${result.cost.toFixed(4)}`);
+    lines.push(`  Source-check cost: $${result.cost.toFixed(4)}`);
   }
 
   return lines.join('\n');

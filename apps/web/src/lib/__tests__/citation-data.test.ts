@@ -15,13 +15,13 @@ function makeQuote(overrides: Partial<CitationQuote> = {}): CitationQuote {
     sourceTitle: null,
     sourceType: null,
     quoteVerified: false,
-    verificationScore: null,
+    sourceCheckScore: null,
     verifiedAt: null,
     accuracyVerdict: null,
     accuracyScore: null,
     accuracyIssues: null,
     accuracySupportingQuotes: null,
-    verificationDifficulty: null,
+    sourceCheckDifficulty: null,
     accuracyCheckedAt: null,
     ...overrides,
   };
@@ -148,11 +148,11 @@ describe("getCitationQuotes", () => {
     expect(result).toEqual([]);
   });
 
-  it("returns all quotes including those without verification data", async () => {
+  it("returns all quotes including those without source-check data", async () => {
     vi.resetModules();
     const localQuotes = [
-      makeQuote({ footnote: 1, quoteVerified: true }), // has verification
-      makeQuote({ footnote: 2 }), // no verification data — still included (NULL-verdict dots)
+      makeQuote({ footnote: 1, quoteVerified: true }), // has source-check
+      makeQuote({ footnote: 2 }), // no source-check data — still included (NULL-verdict dots)
       makeQuote({ footnote: 3, accuracyVerdict: "accurate" }), // has accuracy
     ];
     mockCitationDeps({ getLocalCitationQuotes: () => localQuotes });

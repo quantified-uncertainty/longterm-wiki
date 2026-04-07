@@ -24,7 +24,7 @@
  *   research.ts              — Perplexity + SCRY research
  *   source-fetching.ts       — URL registration, Firecrawl, directions
  *   synthesis.ts             — Claude article generation
- *   verification.ts          — source/quote verification
+ *   source-check.ts       — source/quote checking
  *   validation.ts            — validation loop + component imports
  *   grading.ts               — quality grading
  *   deployment.ts            — deploy, cross-links, review
@@ -41,7 +41,7 @@ import { findCanonicalLinks } from './creator/canonical-links.ts';
 import { runPerplexityResearch, runScryResearch } from './creator/research.ts';
 import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.ts';
 import { runSynthesis } from './creator/synthesis.ts';
-import { runSourceVerification } from './creator/verification.ts';
+import { runSourceCheck } from './creator/source-check.ts';
 import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.ts';
 import { runGrading } from './creator/grading.ts';
 import { createCategoryDirectory, deployToDestination, validateCrossLinks, runReview } from './creator/deployment.ts';
@@ -250,7 +250,7 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
           break;
 
         case 'verify-sources':
-          result = await runSourceVerification(topic, ctx);
+          result = await runSourceCheck(topic, ctx);
           if ((result.warnings as Array<unknown>)?.length > 0) {
             log(phase, `Found ${(result.warnings as Array<unknown>).length} potential hallucination(s) - review recommended`);
           }
@@ -518,7 +518,7 @@ async function main(): Promise<void> {
           : await runSynthesis(topic, tier === 'premium' ? 'quality' : 'standard', ctx, destPath);
         break;
       case 'verify-sources':
-        result = await runSourceVerification(topic, ctx);
+        result = await runSourceCheck(topic, ctx);
         break;
       case 'validate-loop':
         // Auto-fix missing component imports before validation

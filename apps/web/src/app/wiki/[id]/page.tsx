@@ -39,7 +39,7 @@ import { getCitationQuotes, computeCitationHealth, getSourceCheckVerdicts, compu
 import type { CitationQuote } from "@/lib/citation-data";
 
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
-import { VerificationStatus } from "@/components/wiki/VerificationStatus";
+import { SourceCheckStatus } from "@/components/wiki/SourceCheckStatus";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
@@ -98,7 +98,7 @@ function buildReferenceMap(
     }
   }
 
-  // Layer citation quotes on top (they have richer verification data)
+  // Layer citation quotes on top (they have richer source-check data)
   if (citationQuotes) {
     for (const q of citationQuotes) {
       map.set(q.footnote, {
@@ -424,8 +424,8 @@ async function ContentView({
       </CitationQuotesProvider>
       {/* KB facts section: auto-rendered for entities with substantive KB data */}
       {isArticle && !isInternal && entity && <FBAutoFacts entityId={slug} />}
-      {/* Verification status: shows entity-level verification verdicts when available */}
-      {isArticle && !isInternal && entity && <VerificationStatus entityId={slug} />}
+      {/* Source check status: shows entity-level source-check verdicts when available */}
+      {isArticle && !isInternal && entity && <SourceCheckStatus entityId={slug} />}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>

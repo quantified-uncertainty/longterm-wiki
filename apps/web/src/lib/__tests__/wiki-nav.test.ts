@@ -601,7 +601,7 @@ describe("internal sidebar completeness (real data)", () => {
 
       // This is a migrated dashboard — it should have a *-content.tsx file
       // UNLESS it's a pure backward-compat redirect to a dashboard whose
-      // content component lives in a different directory (e.g., entity-verifications → entity-source-checks).
+      // content component lives in a different directory (e.g., entity-source-checks).
       const dirPath = path.join(APP_INTERNAL_DIR, entry.name);
       const files = fs.readdirSync(dirPath);
       const hasContentFile = files.some(f => f.endsWith("-content.tsx"));

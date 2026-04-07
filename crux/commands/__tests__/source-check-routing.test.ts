@@ -16,9 +16,9 @@ vi.mock('../../lib/source-check/orchestrator.ts', () => ({
   orchestrateCommand: (...args: unknown[]) => mockOrchestrateCommand(...args),
 }));
 
-// Mock getVerificationStats (used by stats subcommand)
-vi.mock('../../lib/wiki-server/verifications.ts', () => ({
-  getVerificationStats: vi.fn().mockResolvedValue({
+// Mock getSourceCheckStats (used by stats subcommand)
+vi.mock('../../lib/wiki-server/source-check-client.ts', () => ({
+  getSourceCheckStats: vi.fn().mockResolvedValue({
     ok: true,
     data: { total: 0, avg_confidence: 0, needs_recheck: 0, by_verdict: {}, by_type: {} },
   }),

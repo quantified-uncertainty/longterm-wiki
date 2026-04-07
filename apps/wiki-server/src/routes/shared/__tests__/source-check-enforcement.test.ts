@@ -1,13 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { Hono } from 'hono';
-import { enforceVerification } from '../verification-enforcement.js';
+import { enforceSourceCheck } from '../source-check-enforcement.js';
 
 // Helper to create a minimal Hono test context with query params
 function createTestApp(queryParams: Record<string, string> = {}) {
   const app = new Hono();
   app.post('/test', async (c) => {
     const items = await c.req.json();
-    const error = enforceVerification(c, 'personnel', items);
+    const error = enforceSourceCheck(c, 'personnel', items);
     if (error) return error;
     return c.json({ ok: true });
   });
@@ -27,54 +27,54 @@ function makeRequest(app: Hono, items: unknown[], params: Record<string, string>
   });
 }
 
-describe('enforceVerification', () => {
-  it('allows records when no verification is required', async () => {
+describe('enforceSourceCheck', () => {
+  it('allows records when no source-check is required', async () => {
     const app = createTestApp();
     const res = await makeRequest(app, [{ id: '1' }, { id: '2' }]);
     expect(res.status).toBe(200);
   });
 
-  it('rejects unverified records when client sends requireVerification=true', async () => {
+  it('rejects unchecked records when client sends requireSourceCheck=true', async () => {
     const app = createTestApp();
     const res = await makeRequest(
       app,
-      [{ id: '1' }, { id: '2', verification: { verdict: 'confirmed' } }],
-      { requireVerification: 'true' },
+      [{ id: '1' }, { id: '2', sourceCheck: { verdict: 'confirmed' } }],
+      { requireSourceCheck: 'true' },
     );
     expect(res.status).toBe(400);
     const body = await res.json() as { message: string };
-    expect(body.message).toContain('1/2 records lack verification');
+    expect(body.message).toContain('1/2 records lack source-check');
   });
 
-  it('allows fully verified records when requireVerification=true', async () => {
+  it('allows fully checked records when requireSourceCheck=true', async () => {
     const app = createTestApp();
     const res = await makeRequest(
       app,
       [
-        { id: '1', verification: { verdict: 'confirmed' } },
-        { id: '2', verification: { verdict: 'partial' } },
+        { id: '1', sourceCheck: { verdict: 'confirmed' } },
+        { id: '2', sourceCheck: { verdict: 'partial' } },
       ],
-      { requireVerification: 'true' },
+      { requireSourceCheck: 'true' },
     );
     expect(res.status).toBe(200);
   });
 
-  it('respects forceSkipVerification escape hatch', async () => {
+  it('respects forceSkipSourceCheck escape hatch', async () => {
     const app = createTestApp();
     const res = await makeRequest(
       app,
-      [{ id: '1' }], // no verification
-      { requireVerification: 'true', forceSkipVerification: 'true', reason: 'migration backfill' },
+      [{ id: '1' }], // no source-check
+      { requireSourceCheck: 'true', forceSkipSourceCheck: 'true', reason: 'migration backfill' },
     );
     expect(res.status).toBe(200);
   });
 
-  it('forceSkipVerification works without a reason', async () => {
+  it('forceSkipSourceCheck works without a reason', async () => {
     const app = createTestApp();
     const res = await makeRequest(
       app,
       [{ id: '1' }],
-      { requireVerification: 'true', forceSkipVerification: 'true' },
+      { requireSourceCheck: 'true', forceSkipSourceCheck: 'true' },
     );
     expect(res.status).toBe(200);
   });
@@ -83,11 +83,11 @@ describe('enforceVerification', () => {
     const app = new Hono();
     app.post('/test', async (c) => {
       const items = await c.req.json();
-      const error = enforceVerification(c, 'grants', items);
+      const error = enforceSourceCheck(c, 'grants', items);
       if (error) return error;
       return c.json({ ok: true });
     });
-    const res = await makeRequest(app, [{ id: '1' }], { requireVerification: 'true' });
+    const res = await makeRequest(app, [{ id: '1' }], { requireSourceCheck: 'true' });
     expect(res.status).toBe(400);
     const body = await res.json() as { message: string };
     expect(body.message).toContain('pnpm crux tb verify grants');

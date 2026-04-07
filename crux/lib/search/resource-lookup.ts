@@ -2,7 +2,7 @@
  * Resource Lookup — cached resource index for source-fetcher integration
  *
  * Provides fast lookup by resource ID and by URL, used by source-fetcher and
- * citation verification to integrate with the Resources system.
+ * citation checking to integrate with the Resources system.
  *
  * Read path: loads resources from snapshot (sync) or PG (async via initFromPG).
  */

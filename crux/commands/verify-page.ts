@@ -1,5 +1,5 @@
 /**
- * Page Verification Command
+ * Page Source-Check Command
  *
  * Extracts factual claims from wiki page prose, identifies which are
  * cited vs uncited, and optionally verifies uncited claims against
@@ -50,7 +50,7 @@ interface VerifiedClaim extends ClaimWithCitation {
   reasoning?: string;
 }
 
-interface PageVerificationReport {
+interface PageSourceCheckReport {
   pageId: string;
   title: string;
   totalClaims: number;
@@ -101,7 +101,7 @@ function buildFootnoteMap(rawContent: string): FootnoteMap {
   };
 }
 
-// ── Web verification ─────────────────────────────────────────────────
+// ── Web source-check ─────────────────────────────────────────────────
 
 const VERIFY_SYSTEM_PROMPT = `You verify factual claims against web search evidence. For each claim, you will be given search results. Determine whether the evidence supports or contradicts the claim.
 
@@ -185,7 +185,7 @@ After searching, respond with ONLY a JSON object (no other text):
     return {
       ...claim,
       verdict: 'unverifiable',
-      reasoning: `Error during verification: ${e instanceof Error ? e.message : String(e)}`,
+      reasoning: `Error during source-check: ${e instanceof Error ? e.message : String(e)}`,
       searchQuery,
     };
   }
@@ -243,7 +243,7 @@ export async function verifyPageCommand(
 
   if (mode === 'quick') {
     // Quick mode: just report the breakdown
-    const report: PageVerificationReport = {
+    const report: PageSourceCheckReport = {
       pageId: page.slug,
       title: page.title,
       totalClaims: claims.length,
@@ -301,7 +301,7 @@ export async function verifyPageCommand(
     if (c.verdict) verdictCounts[c.verdict]++;
   }
 
-  const report: PageVerificationReport = {
+  const report: PageSourceCheckReport = {
     pageId: page.slug,
     title: page.title,
     totalClaims: claims.length,
@@ -320,10 +320,10 @@ export async function verifyPageCommand(
 
 // ── Report formatting ────────────────────────────────────────────────
 
-function formatReport(report: PageVerificationReport): string {
+function formatReport(report: PageSourceCheckReport): string {
   const lines: string[] = [];
 
-  lines.push(`\n  Page Verification Report: ${report.title}`);
+  lines.push(`\n  Page Source-Check Report: ${report.title}`);
   lines.push(`  ${'─'.repeat(50)}`);
   lines.push(`  Total claims extracted:  ${report.totalClaims}`);
   lines.push(`  Cited (have footnote):   ${report.citedClaims}`);
@@ -332,7 +332,7 @@ function formatReport(report: PageVerificationReport): string {
 
   if (report.verified > 0) {
     lines.push('');
-    lines.push(`  Web verification results (${report.verified} claims):`);
+    lines.push(`  Web source-check results (${report.verified} claims):`);
     lines.push(`    Supported:             ${report.verdicts.supported}`);
     lines.push(`    Contradicted:          ${report.verdicts.contradicted}`);
     lines.push(`    Partially supported:   ${report.verdicts.partially_supported}`);

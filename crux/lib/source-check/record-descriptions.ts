@@ -1,5 +1,5 @@
 /**
- * Record description builders and field extractors for source-check verification.
+ * Record description builders and field extractors for source-check.
  * Converts raw API record objects into human-readable descriptions and typed field maps.
  */
 

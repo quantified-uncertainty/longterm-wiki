@@ -71,7 +71,7 @@ describe('buildPrBody', () => {
     expect(body).toContain('citation audit gate');
     expect(body).toContain('This PR was created automatically');
     // No citation/risk sections
-    expect(body).not.toContain('### Citation Verification');
+    expect(body).not.toContain('### Citation Check');
     expect(body).not.toContain('### Hallucination Risk Scores');
   });
 
@@ -82,7 +82,7 @@ describe('buildPrBody', () => {
       citationSummary: '| Page | Verified |\n|------|----------|\n| `foo` | 5 |',
     });
 
-    expect(body).toContain('### Citation Verification');
+    expect(body).toContain('### Citation Check');
     expect(body).toContain('`foo`');
   });
 
@@ -106,7 +106,7 @@ describe('buildPrBody', () => {
     });
 
     const riskIdx = body.indexOf('### Hallucination Risk Scores');
-    const citIdx = body.indexOf('### Citation Verification');
+    const citIdx = body.indexOf('### Citation Check');
     expect(riskIdx).toBeLessThan(citIdx);
   });
 

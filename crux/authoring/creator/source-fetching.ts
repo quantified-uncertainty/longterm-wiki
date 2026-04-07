@@ -246,7 +246,7 @@ export async function fetchRegisteredSources(topic: string, options: FetchOption
 }
 
 /**
- * Get fetched content for quote verification.
+ * Get fetched content for quote checking.
  * Reads cached content from local files in SOURCES_DIR.
  */
 export function getFetchedSourceContent(topic: string, { getTopicDir }: GetTopicDirContext): FetchedSourceContent | null {
@@ -312,7 +312,7 @@ export async function loadSourceFile(topic: string, sourceFilePath: string, { lo
     timestamp: new Date().toISOString(),
   });
 
-  // Save a compatibility perplexity-research.json so verification works
+  // Save a compatibility perplexity-research.json so source-check works
   saveResult(topic, 'perplexity-research.json', {
     topic,
     depth: 'source-file',

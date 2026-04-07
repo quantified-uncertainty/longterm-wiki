@@ -9,8 +9,8 @@ import {
   AI_STANCE_LABELS,
   RACE_LEVEL_LABELS,
 } from "./races-constants";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 
 export interface RaceRow {

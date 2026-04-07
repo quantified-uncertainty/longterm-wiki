@@ -15,7 +15,7 @@
  */
 
 import type { CommandResult } from '../lib/command-types.ts';
-import { getVerificationStats } from '../lib/wiki-server/verifications.ts';
+import { getSourceCheckStats } from '../lib/wiki-server/source-check-client.ts';
 import { getFailures, type VerdictEntry } from '../lib/wiki-server/source-checks.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
@@ -29,7 +29,7 @@ export { orchestrateCommand } from '../lib/source-check/orchestrator.ts';
 // ── Stats command ─────────────────────────────────────────────────────
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await getVerificationStats();
+  const response = await getSourceCheckStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
@@ -37,7 +37,7 @@ async function statsCommand(): Promise<CommandResult> {
 
   const stats = response.data;
   const lines: string[] = [];
-  lines.push('\x1b[1m=== Verification Stats ===\x1b[0m');
+  lines.push('\x1b[1m=== Source-Check Stats ===\x1b[0m');
   lines.push(`Total verdicts: ${stats.total}`);
   lines.push(`Average confidence: ${(stats.avg_confidence * 100).toFixed(0)}%`);
   lines.push(`Needs recheck: ${stats.needs_recheck}`);
@@ -89,7 +89,7 @@ const RECORD_TYPE_MAP: Record<string, RecordType> = {
 
 /**
  * Unified verify command entry point.
- * Routes to orchestrate, stats, or record-type-specific verification.
+ * Routes to orchestrate, stats, or record-type-specific source-check.
  */
 async function verifyCommand(
   args: string[],
@@ -310,12 +310,12 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Verification — verify structured data against source URLs
+Source-Check — verify structured data against source URLs
 
 Usage:
-  crux tb verify [options]                 Run verification across all data layers
-  crux tb verify orchestrate [options]     Full orchestrated verification with prioritization
-  crux tb verify stats                     Show verification coverage report
+  crux tb verify [options]                 Run source-check across all data layers
+  crux tb verify orchestrate [options]     Full orchestrated source-check with prioritization
+  crux tb verify stats                     Show source-check coverage report
   crux tb verify backfill [options]        Automated: sync sources → enqueue ingest → verify
   crux tb verify contradicted [options]    List contradicted verdicts with reasoning
   crux tb verify grants                    Verify all grants (shorthand for --type=record)
@@ -338,7 +338,7 @@ Options:
   --entity-type=X        Filter by entity type (organization, person, ai-model, ...)
   --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
-  --concurrency=N        Number of parallel verifications (default: 5)
+  --concurrency=N        Number of parallel source-checks (default: 5)
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
 
@@ -347,14 +347,14 @@ Priority order:
   2. Items flagged needsRecheck
   3. High reader/research importance (from page data)
   4. Volatile entity types (ai-model, organization, person)
-  5. Staleness (oldest verification first)
+  5. Staleness (oldest source-check first)
 
 Examples:
-  crux tb verify --dry-run                              Preview verification plan
+  crux tb verify --dry-run                              Preview source-check plan
   crux tb verify orchestrate --budget=5 --limit=100     Verify up to 100 items, $5 cap
   crux tb verify grants --dry-run                       Preview which grants would be checked
   crux tb verify personnel --entity=anthropic           Verify Anthropic personnel records
-  crux tb verify stats                                  Show verification coverage
+  crux tb verify stats                                  Show source-check coverage
   crux tb verify --type=fact --entity-type=organization  Verify organization facts
   crux tb verify --type=record --limit=20               Verify 20 records
 `;

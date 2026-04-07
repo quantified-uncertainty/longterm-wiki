@@ -440,7 +440,7 @@ article.prose:has(section[aria-label="References"]) section[data-footnotes] {
    Rendered by CitationOverlay via React portals.
    ============================================================================ */
 
-.citation-verification-dot {
+.citation-source-check-dot {
   display: inline-flex;
   align-items: center;
   vertical-align: super;

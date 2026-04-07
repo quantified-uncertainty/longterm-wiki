@@ -35,7 +35,7 @@ const FACTOR_DESCRIPTIONS: Record<string, string> = {
     "Few citations relative to the number of claims made",
   "low-rigor-score": "Rated low on sourcing rigor by automated grading",
   "low-quality-score": "Below-average overall quality score",
-  "few-external-sources": "Few links to external sources for verification",
+  "few-external-sources": "Few links to external sources for source checking",
   "well-cited": "Good citation density — claims are traceable to sources",
   "moderately-cited": "Moderate citation coverage",
   "high-rigor": "Rated high on sourcing rigor by automated grading",
@@ -115,7 +115,7 @@ const RISK_CONFIG: Record<
  * Per-page confidence banner that replaces the old binary LlmWarningBanner.
  *
  * Shows tiered warnings based on computed hallucination risk. The risk data
- * is also available in pages.json for AI agents to use for verification triage.
+ * is also available in pages.json for AI agents to use for source-check triage.
  *
  * Machine-readable data is embedded as data-* attributes for automated consumers.
  */

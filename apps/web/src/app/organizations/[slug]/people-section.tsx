@@ -30,8 +30,8 @@ export interface PersonEntry {
   start?: string;
   end?: string;
   roleType?: "key-person" | "board" | "career";
-  /** Source-check verification verdict (null if not checked) */
-  verificationVerdict?: string | null;
+  /** Source-check verdict (null if not checked) */
+  sourceCheckVerdict?: string | null;
   /** Link to source-check detail page */
   sourceCheckHref?: string;
 }
@@ -145,8 +145,8 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
       roleType: VALID_ROLE_TYPES.has(row.roleType)
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
-      verificationVerdict: row.verification?.verdict ?? null,
-      sourceCheckHref: row.verification?.verdict
+      sourceCheckVerdict: row.sourceCheck?.verdict ?? null,
+      sourceCheckHref: row.sourceCheck?.verdict
         ? `/source-checks/personnel/${encodeURIComponent(row.id)}`
         : undefined,
     });
@@ -293,7 +293,7 @@ export function PeopleSection({
                       coverageScore={computeGenericCoverage({
                         filledFieldCount: (person.title ? 1 : 0) + (person.start ? 1 : 0) + (person.slug ? 1 : 0),
                       })}
-                      verdict={person.verificationVerdict}
+                      verdict={person.sourceCheckVerdict}
                       sourceCheckHref={person.sourceCheckHref}
                     />
                   </td>

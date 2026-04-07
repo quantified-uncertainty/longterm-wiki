@@ -1,5 +1,5 @@
 /**
- * Tests for claim-verification handler — LLM output validation logic.
+ * Tests for claim-source-check handler — LLM output validation logic.
  *
  * Covers:
  *  - Unknown claimId in LLM response is skipped
@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleClaimVerification } from '../claim-verification.ts';
+import { handleClaimSourceCheck } from '../claim-source-check.ts';
 import type { JobHandlerContext } from '../types.ts';
 
 // ---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ function setupStandardMocks(claims: ReturnType<typeof makeClaim>[]) {
   });
 }
 
-/** Build a JSON LLM response string from claim verification results. */
+/** Build a JSON LLM response string from claim source-check results. */
 function llmResponse(results: Array<{
   claimId: number;
   verdict?: string;
@@ -151,7 +151,7 @@ beforeEach(() => {
   vi.clearAllMocks();
 });
 
-describe('handleClaimVerification — LLM output validation', () => {
+describe('handleClaimSource-Check — LLM output validation', () => {
   it('skips unknown claimIds and marks expected claims as unverifiable', async () => {
     const claims = [makeClaim(1), makeClaim(2)];
     setupStandardMocks(claims);
@@ -164,7 +164,7 @@ describe('handleClaimVerification — LLM output validation', () => {
       ]),
     });
 
-    const result = await handleClaimVerification(makeParams([1, 2]), CTX);
+    const result = await handleClaimSourceCheck(makeParams([1, 2]), CTX);
 
     expect(result.success).toBe(true);
 
@@ -207,7 +207,7 @@ describe('handleClaimVerification — LLM output validation', () => {
       ]),
     });
 
-    const result = await handleClaimVerification(makeParams([10, 20]), CTX);
+    const result = await handleClaimSourceCheck(makeParams([10, 20]), CTX);
 
     expect(result.success).toBe(true);
 
@@ -242,7 +242,7 @@ describe('handleClaimVerification — LLM output validation', () => {
       ]),
     });
 
-    const result = await handleClaimVerification(makeParams([100, 200, 300]), CTX);
+    const result = await handleClaimSourceCheck(makeParams([100, 200, 300]), CTX);
 
     expect(result.success).toBe(true);
 
@@ -309,7 +309,7 @@ describe('handleClaimVerification — LLM output validation', () => {
       text: llmResponse([{ claimId: 5, verdict: 'confirmed' }]),
     });
 
-    const result = await handleClaimVerification(makeParams([5]), CTX);
+    const result = await handleClaimSourceCheck(makeParams([5]), CTX);
 
     expect(result.success).toBe(false);
     expect(result.error).toContain('Failed to persist verdicts');

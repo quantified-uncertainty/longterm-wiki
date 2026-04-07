@@ -37,7 +37,7 @@ import {
   MAIN_BRANCH_ABANDON_THRESHOLD,
   MAIN_BRANCH_COOLDOWN_SECONDS,
   markAbandoned,
-  markPendingVerification,
+  markPendingCICheck,
   markProcessed,
   recordFailure,
   recordFixAttempt,
@@ -307,7 +307,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
         const fixPrNum = extractFixPrNumber(result.output);
         if (fixPrNum) {
           trackMainFixPr(fixPrNum);
-          log(`  ${cl.cyan}Tracking fix PR #${fixPrNum} for merge verification${cl.reset}`);
+          log(`  ${cl.cyan}Tracking fix PR #${fixPrNum} for merge check${cl.reset}`);
         }
       }
     } else if (result.hitMaxTurns) {
@@ -662,10 +662,10 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
         await postEventComment(pr.number, config.repo, buildNoOpComment(pr.issues))
           .catch((e: unknown) => log(`  Warning: could not post no-op comment: ${e instanceof Error ? e.message : String(e)}`));
       } else {
-        // Don't reset fail count immediately — mark as pending CI verification.
+        // Don't reset fail count immediately — mark as pending CI check.
         // The fail counter will be reset when CI passes on the next cycle.
-        markPendingVerification(pr.number);
-        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s) — pending CI verification`);
+        markPendingCICheck(pr.number);
+        log(`${cl.green}✓ PR #${pr.number} processed successfully${cl.reset} (${elapsedS}s) — pending CI check`);
 
         // Post fix-complete summary comment
         const outputTail = result.output.slice(-500);

@@ -2,8 +2,8 @@
  * Paywall & Unverifiable Domain Detection
  *
  * Shared module for detecting paywalled content and unverifiable domains.
- * Used by both source-fetcher.ts (citation verification) and kb-verify.ts
- * (KB fact verification).
+ * Used by both source-fetcher.ts (citation checking) and kb-verify.ts
+ * (KB fact source-check).
  */
 
 // ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ export const NEGATIVE_PAYWALL_SIGNALS = [
 
 /**
  * Structured error types for source fetch failures.
- * Used in verification notes to provide machine-readable error classification.
+ * Used in source-check notes to provide machine-readable error classification.
  */
 export type SourceFetchErrorType =
   | 'paywall'

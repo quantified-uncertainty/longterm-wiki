@@ -118,7 +118,7 @@ Options:
   --section-level                 Use per-## section rewriting instead of single-pass improve (#671)
   --skip-citation-gate            Allow --apply even when citation audit fails (default: gate ON)
   --skip-citation-audit           Skip the post-improve citation audit phase
-  --citation-audit-model <model>  Override LLM model for per-citation verification
+  --citation-audit-model <model>  Override LLM model for per-citation checking
   --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
   --gap-analysis                  Run claims gap analysis: inject missing verified facts as structured directions
   --openrouter                    Route all Claude calls through OpenRouter (when Anthropic credits depleted)

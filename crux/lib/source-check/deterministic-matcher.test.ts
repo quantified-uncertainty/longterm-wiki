@@ -18,7 +18,7 @@ const testManifest: DataSourceManifest = {
       { sourceName: 'Grant Name', internalField: 'name', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -159,7 +159,7 @@ describe('matchRecordAgainstSnapshot with JSON', () => {
         { sourceName: 'funding_goal', internalField: 'amount', type: 'number' },
       ],
     },
-    verification: {
+    sourceCheck: {
       strategy: 'deterministic_row_match',
       matchFields: ['name', 'amount'],
       fuzzyFields: ['name'],

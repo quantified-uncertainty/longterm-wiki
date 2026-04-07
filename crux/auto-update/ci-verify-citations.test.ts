@@ -1,5 +1,5 @@
 /**
- * Tests for CI citation verification helpers
+ * Tests for CI citation checking helpers
  *
  * Focus areas:
  * - buildCitationSummary: generates correct markdown tables

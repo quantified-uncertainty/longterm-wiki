@@ -1,5 +1,5 @@
 /**
- * Verifications (Source-Check) API — wiki-server client module
+ * Source-Check API — wiki-server client module
  *
  * Handles source-check evidence and verdict storage.
  * Response types are inferred from the Hono RPC route type via InferResponseType<>.
@@ -21,7 +21,7 @@ export type ListVerdictsResult = InferResponseType<RpcClient['verdicts']['$get']
 export type VerdictByRecordResult = InferResponseType<RpcClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
 export type DueForRecheckResult = InferResponseType<RpcClient['due-for-recheck']['$get'], 200>;
 export type EvidenceByRecordResult = InferResponseType<RpcClient['evidence'][':recordType'][':recordId']['$get'], 200>;
-export type VerificationStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+export type SourceCheckStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 
 /** A single verdict entry from the list. */
 export type VerdictListEntry = ListVerdictsResult['verdicts'][number];
@@ -34,14 +34,14 @@ export type VerdictListEntry = ListVerdictsResult['verdicts'][number];
 export async function storeEvidence(
   body: Record<string, unknown>,
 ): Promise<ApiResult<StoreEvidenceResult>> {
-  return apiRequest<StoreEvidenceResult>('POST', '/api/verifications/evidence', body);
+  return apiRequest<StoreEvidenceResult>('POST', '/api/source-checks/evidence', body);
 }
 
 /** Store an aggregate verdict for a record. */
 export async function storeVerdict(
   body: Record<string, unknown>,
 ): Promise<ApiResult<StoreVerdictResult>> {
-  return apiRequest<StoreVerdictResult>('POST', '/api/verifications/verdicts', body);
+  return apiRequest<StoreVerdictResult>('POST', '/api/source-checks/verdicts', body);
 }
 
 /** List verdicts with optional filters. */
@@ -56,7 +56,7 @@ export async function listVerdicts(
   const qs = params.toString();
   return apiRequest<ListVerdictsResult>(
     'GET',
-    `/api/verifications/verdicts${qs ? `?${qs}` : ''}`,
+    `/api/source-checks/verdicts${qs ? `?${qs}` : ''}`,
   );
 }
 
@@ -67,7 +67,7 @@ export async function getVerdictByRecord(
 ): Promise<ApiResult<VerdictByRecordResult>> {
   return apiRequest<VerdictByRecordResult>(
     'GET',
-    `/api/verifications/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
+    `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
   );
 }
 
@@ -82,13 +82,13 @@ export async function getEvidenceByRecord(
   const qs = params.toString();
   return apiRequest<EvidenceByRecordResult>(
     'GET',
-    `/api/verifications/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
+    `/api/source-checks/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
   );
 }
 
-/** Get verification statistics. */
-export async function getVerificationStats(): Promise<ApiResult<VerificationStatsResult>> {
-  return apiRequest<VerificationStatsResult>('GET', '/api/verifications/stats');
+/** Get source-check statistics. */
+export async function getSourceCheckStats(): Promise<ApiResult<SourceCheckStatsResult>> {
+  return apiRequest<SourceCheckStatsResult>('GET', '/api/source-checks/stats');
 }
 
 /** Get records due for re-check. */
@@ -101,6 +101,6 @@ export async function getDueForRecheck(
   const qs = params.toString();
   return apiRequest<DueForRecheckResult>(
     'GET',
-    `/api/verifications/due-for-recheck${qs ? `?${qs}` : ''}`,
+    `/api/source-checks/due-for-recheck${qs ? `?${qs}` : ''}`,
   );
 }

@@ -51,7 +51,7 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
       const verdict = getRecordVerdict("grant", String(g.key));
       return {
         ...g,
-        verificationVerdict: verdict?.verdict ?? null,
+        sourceCheckVerdict: verdict?.verdict ?? null,
         sourceCheckHref: getSourceCheckHref("grant", String(g.key)),
       };
     });

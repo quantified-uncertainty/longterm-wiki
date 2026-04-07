@@ -86,7 +86,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
           .filter(f => f.internalField)
           .map(f => [f.sourceName, f.internalField!])
       ),
-      verificationConfig: { ...manifest.verification } satisfies Record<string, unknown>,
+      verificationConfig: { ...manifest.sourceCheck } satisfies Record<string, unknown>,
     });
 
     if (!dsResult.ok) {
@@ -99,7 +99,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
           accessMethod: manifest.accessMethod, recordType: 'grant', fetchUrl: manifest.fetchUrl,
           publisherEntityId: manifest.publisherEntityId, updateFrequency: manifest.updateFrequency,
           columnMapping: Object.fromEntries(manifest.schema.fields.filter(f => f.internalField).map(f => [f.sourceName, f.internalField!])),
-          verificationConfig: { ...manifest.verification } satisfies Record<string, unknown>,
+          verificationConfig: { ...manifest.sourceCheck } satisfies Record<string, unknown>,
         });
       }
     }

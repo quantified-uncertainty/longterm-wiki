@@ -20,8 +20,8 @@ import {
   type ResolvedEntityVars,
 } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -88,7 +88,7 @@ const SyncQuestionItemSchema = z.object({
   discoveryMethod: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
 });
 
 const SyncQuestionsBatchSchema = z.object({
@@ -107,7 +107,7 @@ const SyncSnapshotItemSchema = z.object({
   openInterest: z.number().nullable().optional(),
   communityPrediction: z.number().min(0).max(1).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourceCheck: InlineSourceCheckSchema.optional(),
 });
 
 const SyncSnapshotsBatchSchema = z.object({
@@ -427,7 +427,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           },
         });
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -435,14 +435,14 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.entityId ?? null,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
   })
@@ -517,7 +517,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           .where(inArray(predictionMarketQuestions.id, questionIds));
       }
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       snapshotVerdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -525,12 +525,12 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.questionId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourceCheck: item.sourceCheck ?? null,
         }))
       );
     });
 
-    logVerificationCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
+    logSourceCheckCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: snapshotVerdictsResult.written });
   });

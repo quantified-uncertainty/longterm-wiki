@@ -13,7 +13,7 @@
  *   - Awards/honors ("received the Turing Award")
  *
  * These are high-hallucination-risk claims that LLMs confidently generate
- * from training data without verification. Requiring citations for them
+ * from training data without citations. Requiring citations for them
  * significantly reduces the risk of publishing incorrect biographical details.
  *
  * Only applies to pages under /people/ or /organizations/ paths.

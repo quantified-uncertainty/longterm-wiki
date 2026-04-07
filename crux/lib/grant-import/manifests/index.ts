@@ -31,7 +31,7 @@ const coefficientGiving: DataSourceManifest = {
     ],
     missingValues: ['', 'N/A'],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -57,7 +57,7 @@ const eaFunds: DataSourceManifest = {
       { sourceName: 'year', internalField: 'date', type: 'date' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount'],
     fuzzyFields: ['grantee'],
@@ -84,7 +84,7 @@ const sff: DataSourceManifest = {
       { sourceName: 'Purpose', internalField: 'purpose', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount'],
     fuzzyFields: ['grantee'],
@@ -110,7 +110,7 @@ const manifund: DataSourceManifest = {
       { sourceName: 'blurb', internalField: 'description', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['name', 'amount'],
     fuzzyFields: ['name'],
@@ -137,7 +137,7 @@ const gatesFoundation: DataSourceManifest = {
     ],
     missingValues: [''],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -164,7 +164,7 @@ const givewell: DataSourceManifest = {
       { sourceName: 'Funding source', internalField: 'fund', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -188,7 +188,7 @@ const fli: DataSourceManifest = {
       { sourceName: 'amount', internalField: 'amount', type: 'number' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount'],
     fuzzyFields: ['grantee'],
@@ -214,7 +214,7 @@ const acxGrants: DataSourceManifest = {
       { sourceName: 'description', internalField: 'name', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount'],
     fuzzyFields: ['grantee'],
@@ -240,7 +240,7 @@ const ftxFutureFund: DataSourceManifest = {
       { sourceName: 'earmark', internalField: 'name', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -267,7 +267,7 @@ const aria: DataSourceManifest = {
       { sourceName: 'institutions', internalField: 'description', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'name'],
     fuzzyFields: ['grantee', 'name'],
@@ -294,7 +294,7 @@ const wellcomeTrust: DataSourceManifest = {
       { sourceName: 'Grant Programme:Title', internalField: 'focusArea', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -320,7 +320,7 @@ const fordFoundation: DataSourceManifest = {
       { sourceName: 'programs', internalField: 'focusArea', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -347,7 +347,7 @@ const vipulnaik: DataSourceManifest = {
       { sourceName: 'url', internalField: 'sourceUrl', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'amount', 'date'],
     fuzzyFields: ['grantee'],
@@ -373,7 +373,7 @@ const foresightPrizes: DataSourceManifest = {
       { sourceName: 'category', internalField: 'focusArea', type: 'string' },
     ],
   },
-  verification: {
+  sourceCheck: {
     strategy: 'deterministic_row_match',
     matchFields: ['grantee', 'date'],
     fuzzyFields: ['grantee'],

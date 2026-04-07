@@ -61,7 +61,7 @@ export async function checkAccuracyForPage(
   const quotes = quotesResult.data.quotes;
   const withQuotes = quotes.filter(
     (q) => q.sourceQuote && q.sourceQuote.length > 0
-      // Skip quotes with very low verification scores — likely bad extractions
+      // Skip quotes with very low match scores — likely bad extractions
       && (q.verificationScore === null || Number(q.verificationScore) >= 0.4),
   );
 

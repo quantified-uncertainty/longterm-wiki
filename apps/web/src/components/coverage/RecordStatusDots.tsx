@@ -5,8 +5,8 @@
  * side by side. Used as the rightmost element in record tables and card layouts.
  */
 import { CoverageDots } from "./CoverageDots";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 
 interface RecordStatusDotsProps {
   /** Coverage score 1-4 (number of filled dots) */

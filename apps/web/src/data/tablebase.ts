@@ -398,7 +398,7 @@ interface TableBaseShape {
     topFactors: Array<{ factor: string; count: number }>;
   };
   /** Policy stakeholder PG IDs, keyed by "policyEntityStableId:stakeholderDisplayName" -> stakeholder 10-char ID.
-   *  Used to look up verification verdicts for stakeholder rows on legislation pages. */
+   *  Used to look up source-check verdicts for stakeholder rows on legislation pages. */
   policyStakeholderIds?: Record<string, string>;
   /** Entity→resource relationship links from entity_resources table */
   entityResourceLinks?: Record<string, { authored: string[]; subject: string[] }>;
@@ -1061,7 +1061,7 @@ export function getResearchAreaDetail(areaId: string): ResearchAreaDetail | null
 
 // ============================================================================
 // RECORD VERDICTS
-// Used by VerificationBadge on organization, grant, and funding-round detail pages.
+// Used by SourceCheckBadge on organization, grant, and funding-round detail pages.
 // ============================================================================
 
 export interface RecordVerdict {
@@ -1088,12 +1088,12 @@ function getRecordVerdicts(): Record<string, RecordVerdict> {
   }
 }
 
-/** Get the verification verdict for a specific record */
+/** Get the source-check verdict for a specific record */
 export function getRecordVerdict(recordType: string, recordId: string): RecordVerdict | null {
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
 
-/** Get verification stats for a specific record type */
+/** Get source-check stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): {
   total: number;
   confirmed: number;
@@ -1119,7 +1119,7 @@ export function getRecordVerdictStats(recordType: string): {
 // ============================================================================
 // POLICY STAKEHOLDER IDS
 // Maps "policyEntityStableId:stakeholderDisplayName" -> PG stakeholder ID.
-// Used by legislation pages to look up verification verdicts for stakeholder rows.
+// Used by legislation pages to look up source-check verdicts for stakeholder rows.
 // ============================================================================
 
 /** Get the PG stakeholder ID for a YAML stakeholder on a specific policy entity. */

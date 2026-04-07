@@ -49,7 +49,7 @@ export const TIERS: Record<string, TierConfig> = {
     // citation-audit is intentionally last: it must run after adversarial-loop and gap-fill
     // so that any citations added by those phases are also verified.  Running it earlier
     // (e.g., before adversarial-loop) would leave newly-added citations unaudited.
-    // Cost impact: ~$0.01-0.03 extra per citation for the additional verification pass.
+    // Cost impact: ~$0.01-0.03 extra per citation for the additional consistency pass.
     phases: ['analyze', 'research-deep', 'improve', 'enrich', 'validate', 'adversarial-loop', 'review', 'gap-fill', 'citation-audit'],
     description: 'Full SCRY + web research, adversarial review + re-research loop, multi-phase improvement + citation audit'
   }

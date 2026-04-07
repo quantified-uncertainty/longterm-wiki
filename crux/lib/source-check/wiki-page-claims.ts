@@ -2,10 +2,10 @@
  * Wiki Page Claim Extractor
  *
  * Extracts verifiable claims from wiki page MDX content, categorizes them
- * by verification type, and cross-references against FactBase data.
+ * by source-check type, and cross-references against FactBase data.
  *
  * This module is purely extractive — it identifies claims and categorizes them
- * but does not perform verification (that's a downstream consumer's job).
+ * but does not perform source-checking (that's a downstream consumer's job).
  *
  * Reuses the semantic-diff claim extractor for LLM-based claim extraction.
  */
@@ -357,7 +357,7 @@ const PRIORITY_BASE: Record<WikiPageVerifyCategory, number> = {
 };
 
 /**
- * Calculate priority score for a verification item.
+ * Calculate priority score for a source-check item.
  */
 function calculatePriority(category: WikiPageVerifyCategory, claim: ExtractedClaim): number {
   let priority = PRIORITY_BASE[category];
@@ -394,7 +394,7 @@ function calculatePriority(category: WikiPageVerifyCategory, claim: ExtractedCla
  * @param mdxContent - Raw MDX content of the page
  * @param factbaseFacts - Optional FactBase facts for cross-referencing
  * @param currentYear - Current year for stale temporal detection (defaults to actual current year)
- * @returns Array of categorized verification items, sorted by priority (highest first)
+ * @returns Array of categorized source-check items, sorted by priority (highest first)
  */
 export async function extractWikiPageClaims(
   pageSlug: string,
@@ -425,7 +425,7 @@ export async function extractWikiPageClaims(
     // Check stale temporal
     const isStale = detectStaleTemporal(claim, year);
 
-    // A claim can generate multiple verification items if it falls
+    // A claim can generate multiple source-check items if it falls
     // into multiple categories. However, we pick the highest-priority
     // single category to avoid duplication noise.
 

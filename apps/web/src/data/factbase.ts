@@ -303,7 +303,7 @@ export function getFactBaseProperties(): Property[] {
 }
 
 /**
- * Verification verdict values that can be returned by getFactBaseFactVerification.
+ * Source-check verdict values that can be returned by getFactBaseFactSourceCheck.
  * Matches the accuracy verdicts from the citation system plus 'verified'
  * (source quote verified but not accuracy-checked).
  */
@@ -324,29 +324,29 @@ const VALID_VERDICTS: Set<string> = new Set([
   "verified",
 ]);
 
-let _kbFactVerification: Record<string, string> | null = null;
+let _kbFactSourceCheck: Record<string, string> | null = null;
 
-function loadKbFactVerification(): Record<string, string> {
-  if (_kbFactVerification) return _kbFactVerification;
-  const filePath = path.join(LOCAL_DATA_DIR, "kb-fact-verification.json");
+function loadKbFactSourceCheck(): Record<string, string> {
+  if (_kbFactSourceCheck) return _kbFactSourceCheck;
+  const filePath = path.join(LOCAL_DATA_DIR, "kb-fact-source-check.json");
   try {
-    _kbFactVerification = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    return _kbFactVerification!;
+    _kbFactSourceCheck = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    return _kbFactSourceCheck!;
   } catch {
-    _kbFactVerification = {};
-    return _kbFactVerification;
+    _kbFactSourceCheck = {};
+    return _kbFactSourceCheck;
   }
 }
 
 /**
- * Get the citation verification status for a FactBase fact.
+ * Get the citation source-check status for a FactBase fact.
  * Returns the best verdict found by cross-referencing the fact's source URL
  * against citation quotes at build time, or undefined if no match.
- * Loaded from a separate kb-fact-verification.json (split from database.json).
+ * Loaded from a separate kb-fact-source-check.json (split from database.json).
  */
-export function getFactBaseFactVerification(factId: string): FactBaseVerdict | undefined {
-  const verifications = loadKbFactVerification();
-  const verdict = verifications[factId];
+export function getFactBaseFactSourceCheck(factId: string): FactBaseVerdict | undefined {
+  const sourceChecks = loadKbFactSourceCheck();
+  const verdict = sourceChecks[factId];
   if (!verdict || !VALID_VERDICTS.has(verdict)) return undefined;
   return verdict as FactBaseVerdict;
 }
@@ -700,8 +700,8 @@ export const getKBEntity = getFactBaseEntity;
 export const getKBEntities = getFactBaseEntities;
 /** @deprecated Use getFactBaseProperties() */
 export const getKBProperties = getFactBaseProperties;
-/** @deprecated Use getFactBaseFactVerification() */
-export const getKBFactVerification = getFactBaseFactVerification;
+/** @deprecated Use getFactBaseFactSourceCheck() */
+export const getKBFactSourceCheck = getFactBaseFactSourceCheck;
 /** @deprecated Use getFactBaseFactsByProperty() */
 export const getKBFactsByProperty = getFactBaseFactsByProperty;
 /** @deprecated Use getFactBaseAllFactsByProperty() */

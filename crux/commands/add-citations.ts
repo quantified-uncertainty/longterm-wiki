@@ -159,7 +159,7 @@ async function fetchSourceContent(url: string): Promise<string | null> {
   return result.content;
 }
 
-// ── Independent claim verification ───────────────────────────────────
+// ── Independent claim source-check ───────────────────────────────────
 
 type VerifyVerdict = 'supported' | 'contradicted' | 'insufficient';
 
@@ -452,15 +452,15 @@ export async function addCitationsCommand(
       }
 
       // Step C: Independently verify the claim against fetched content
-      const verification = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
-      if (verification.verdict !== 'supported') {
+      const claimCheck = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
+      if (accuracyCheck.verdict !== 'supported') {
         const domain = new URL(source.url).hostname;
         avoidDomains.push(domain);
         if (attempt < MAX_SOURCE_ATTEMPTS - 1) {
-          console.log(`    [↻] Source doesn't verify (${verification.verdict}) — retrying...`);
+          console.log(`    [↻] Source doesn't verify (${accuracyCheck.verdict}) — retrying...`);
         } else {
           console.log(`    [✗] No verified source found: ${claim.text.slice(0, 50)}...`);
-          if (verification.reasoning) console.log(`        ${verification.reasoning}`);
+          if (claimCheck.reasoning) console.log(`        ${claimCheck.reasoning}`);
         }
         continue;
       }

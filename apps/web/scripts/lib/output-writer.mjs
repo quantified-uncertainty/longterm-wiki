@@ -120,7 +120,7 @@ export function writeMainOutputFiles({ database, outputFile }) {
     { key: '_researchAreas', varRef: _researchAreas, name: 'research-areas.json', label: 'research areas' },
     { key: '_researchAreaDetails', varRef: _researchAreaDetails, name: 'research-area-details.json', label: 'research area details' },
     { key: '_recordVerdicts', varRef: _recordVerdicts, name: 'record-verdicts.json', label: 'record verdicts' },
-    { key: '_kbFactVerification', varRef: _kbFactVerification, name: 'kb-fact-verification.json', label: 'KB fact verifications' },
+    { key: '_kbFactVerification', varRef: _kbFactVerification, name: 'kb-fact-source-check.json', label: 'KB fact source-checks' },
   ];
   for (const { varRef, name, label } of LAZY_FILES) {
     const filePath = join(OUTPUT_DIR, name);

@@ -2,7 +2,7 @@
  * Auto-Verify Stakeholder Positions
  *
  * Fetches source URLs for stakeholder positions on policy entities,
- * sends the content to an LLM for verification, and records results
+ * sends the content to an LLM for source-check, and records results
  * via the wiki-server API.
  *
  * Subcommands:
@@ -28,7 +28,7 @@ import {
   storeEvidence,
   storeVerdict,
   type VerdictByRecordResult,
-} from '../../lib/wiki-server/verifications.ts';
+} from '../../lib/wiki-server/source-check-client.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
 
@@ -54,7 +54,7 @@ interface PolicyEntity {
   stakeholders?: Stakeholder[];
 }
 
-interface VerificationResult {
+interface SourceCheckResult {
   policyId: string;
   policyTitle: string;
   stakeholderName: string;
@@ -93,7 +93,7 @@ function loadPolicyEntities(): PolicyEntity[] {
 }
 
 /**
- * Build a record ID for a stakeholder position verification.
+ * Build a record ID for a stakeholder position source-check.
  */
 function buildStakeholderRecordId(policyId: string, stakeholderName: string): string {
   const slug = stakeholderName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -128,10 +128,10 @@ async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | n
 }
 
 // ---------------------------------------------------------------------------
-// LLM verification
+// LLM source-check
 // ---------------------------------------------------------------------------
 
-interface LlmVerificationResult {
+interface LlmSourceCheckResult {
   verdict: SourceCheckVerdict;
   confidence: number;
   extractedEvidence: string;
@@ -144,7 +144,7 @@ async function verifyStakeholderPosition(
   stakeholder: Stakeholder,
   policyTitle: string,
   sourceContent: string,
-): Promise<LlmVerificationResult> {
+): Promise<LlmSourceCheckResult> {
   const prompt = `You are verifying a stakeholder position claim against a source document.
 
 CLAIM TO VERIFY:
@@ -230,7 +230,7 @@ If the position matches but the reason is different, use "partial".`;
 // Recording results to wiki-server
 // ---------------------------------------------------------------------------
 
-interface PostVerificationBody {
+interface PostSourceCheckBody {
   recordType: string;
   recordId: string;
   sourceUrl: string;
@@ -253,10 +253,10 @@ interface PostVerdictBody {
   sourcesChecked: number;
 }
 
-async function recordVerification(verification: PostVerificationBody): Promise<boolean> {
-  const result = await storeEvidence(verification as unknown as Record<string, unknown>);
+async function recordSourceCheck(body: PostSourceCheckBody): Promise<boolean> {
+  const result = await storeEvidence(body as unknown as Record<string, unknown>);
   if (!result.ok) {
-    console.warn(`[auto-verify] Failed to record verification: ${result.message}`);
+    console.warn(`[auto-verify] Failed to record source-check: ${result.message}`);
     return false;
   }
   return true;
@@ -272,7 +272,7 @@ async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
-// Main verification pipeline
+// Main source-check pipeline
 // ---------------------------------------------------------------------------
 
 interface VerifyOptions {
@@ -333,7 +333,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
   // 3. Filter out already-verified stakeholders
   const toVerify: StakeholderWithPolicy[] = [];
-  const skippedAlreadyVerified: VerificationResult[] = [];
+  const skippedAlreadyChecked: SourceCheckResult[] = [];
 
   for (const item of allStakeholders) {
     if (dryRun) {
@@ -344,7 +344,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
     const existingVerdict = await getExistingVerdict(item.thingId);
     if (existingVerdict && !existingVerdict.needsRecheck) {
-      skippedAlreadyVerified.push({
+      skippedAlreadyChecked.push({
         policyId: item.policy.id,
         policyTitle: item.policy.title,
         stakeholderName: item.stakeholder.name,
@@ -364,8 +364,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     toVerify.push(item);
   }
 
-  if (skippedAlreadyVerified.length > 0) {
-    console.log(`${c.dim}Skipping ${skippedAlreadyVerified.length} already-verified stakeholders${c.reset}`);
+  if (skippedAlreadyChecked.length > 0) {
+    console.log(`${c.dim}Skipping ${skippedAlreadyChecked.length} already-verified stakeholders${c.reset}`);
   }
 
   // 4. Apply budget limit
@@ -420,7 +420,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   const tracker = new CostTracker();
 
   // 7. Process each stakeholder
-  const results: VerificationResult[] = [...skippedAlreadyVerified];
+  const results: SourceCheckResult[] = [...skippedAlreadyChecked];
   let verified = 0;
   let failed = 0;
 
@@ -493,8 +493,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 7b. LLM verification
-    let llmResult: LlmVerificationResult;
+    // 7b. LLM source-check
+    let llmResult: LlmSourceCheckResult;
     try {
       llmResult = await verifyStakeholderPosition(
         client,
@@ -525,8 +525,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 7c. Record verification to wiki-server
-    const recordedVerification = await recordVerification({
+    // 7c. Record source-check to wiki-server
+    const recordedSourceCheck = await recordSourceCheck({
       recordType: STAKEHOLDER_RECORD_TYPE,
       recordId: thingId,
       sourceUrl,
@@ -540,8 +540,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       notes: llmResult.notes.slice(0, 10000),
     });
 
-    if (!recordedVerification) {
-      console.log(`    ${c.yellow}warning: failed to record verification to wiki-server${c.reset}`);
+    if (!recordedSourceCheck) {
+      console.log(`    ${c.yellow}warning: failed to record source-check to wiki-server${c.reset}`);
     }
 
     // 7d. Update aggregate verdict
@@ -593,7 +593,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   const partial = activeResults.filter((r) => r.verdict === 'partial').length;
   const unverifiable = activeResults.filter((r) => r.verdict === 'unverifiable').length;
 
-  let output = `\n${c.bold}Verification Summary${c.reset}\n`;
+  let output = `\n${c.bold}Source-Check Summary${c.reset}\n`;
   output += `${c.dim}${'─'.repeat(50)}${c.reset}\n`;
   output += `  ${c.green}Confirmed:${c.reset}    ${confirmed}\n`;
   output += `  ${c.red}Contradicted:${c.reset} ${contradicted}\n`;
@@ -609,7 +609,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       output: JSON.stringify(
         {
           results,
-          summary: { confirmed, contradicted, partial, unverifiable, skipped: skippedAlreadyVerified.length, failed },
+          summary: { confirmed, contradicted, partial, unverifiable, skipped: skippedAlreadyChecked.length, failed },
           cost: tracker.toJSON(),
         },
         null,
@@ -642,7 +642,7 @@ Commands:
 Options:
   --policy=<id>      Only verify stakeholders for one policy (e.g., --policy=california-sb1047)
   --dry-run          Show what would be verified without making any API calls
-  --budget=<N>       Maximum number of LLM verification calls (default: unlimited)
+  --budget=<N>       Maximum number of LLM source-check calls (default: unlimited)
   --json             Output results as JSON
 
 Examples:

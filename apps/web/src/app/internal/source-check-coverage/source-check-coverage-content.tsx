@@ -47,7 +47,7 @@ function emptySourceCheckStats(): UnifiedSourceCheckStatsResult {
 }
 
 async function loadSourceCheckStats() {
-  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/verifications/stats", {
+  return fetchDetailed<UnifiedSourceCheckStatsResult>("/api/source-checks/stats", {
     revalidate: 60,
   });
 }
@@ -83,18 +83,18 @@ function StatCard({
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function SourceCheckCoverageContent() {
-  const verificationResult = await withApiFallback(
+  const sourceCheckResult = await withApiFallback(
     loadSourceCheckStats,
     emptySourceCheckStats
   );
 
   const vStats: UnifiedSourceCheckStatsResult = {
     ...emptySourceCheckStats(),
-    ...verificationResult.data,
+    ...sourceCheckResult.data,
   };
 
-  const source = verificationResult.source === "api" ? "api" as const : "local" as const;
-  const apiError = verificationResult.apiError;
+  const source = sourceCheckResult.source === "api" ? "api" as const : "local" as const;
+  const apiError = sourceCheckResult.apiError;
 
   // Local entity data for entity type counts
   const entities = getTypedEntities();
@@ -197,7 +197,7 @@ export async function SourceCheckCoverageContent() {
         </h2>
         <p className="text-sm text-muted-foreground mb-3">
           Entity counts from local <code className="text-[11px]">database.json</code>.
-          Verification verdicts are tracked by record type (personnel, division, etc.), not entity type.
+          Source-check verdicts are tracked by record type (personnel, division, etc.), not entity type.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm border-collapse">

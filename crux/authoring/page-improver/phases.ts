@@ -16,7 +16,7 @@
  *   phases/enrich.ts               — Post-improve enrichment (entity-links, fact-refs)
  *   phases/adversarial-review.ts   — Adversarial reviewer (fact density, speculation, gaps)
  *   phases/adversarial-loop.ts     — Re-research feedback loop driven by adversarial review
- *   phases/citation-audit.ts       — Post-improve citation verification (advisory + gate modes)
+ *   phases/citation-audit.ts       — Post-improve citation checking (advisory + gate modes)
  */
 
 export {

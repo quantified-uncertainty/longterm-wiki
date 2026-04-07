@@ -166,7 +166,7 @@ export async function extractQuotesForPage(
 
           // Verify the quote exists in the source
           if (sourceQuote) {
-            const verification = verifyQuoteInSource(
+            const quoteMatch = verifyQuoteInSource(
               sourceQuote,
               sourceText,
             );

@@ -1,9 +1,9 @@
 /**
- * Citation Archive — per-page citation verification records
+ * Citation Archive — per-page citation checking records
  *
  * Stores metadata about every citation URL in a wiki page:
  * when it was fetched, what HTTP status it returned, what page title
- * was found, a content snippet for human verification, and the claim
+ * was found, a content snippet for human review, and the claim
  * context from the wiki page where the citation is used.
  *
  * Data is stored in data/citation-archive/<page-id>.yaml.
@@ -23,7 +23,7 @@ import { fetchSource, type FetchedSource } from '../search/source-fetcher.ts';
 // Types
 // ---------------------------------------------------------------------------
 
-export type VerificationStatus = 'verified' | 'broken' | 'unverifiable' | 'pending';
+export type CheckStatus = 'verified' | 'broken' | 'unverifiable' | 'pending';
 
 export interface CitationRecord {
   /** Footnote identifier, e.g. "1" for [^1], "rc-fec0" for [^rc-fec0] */
@@ -44,9 +44,9 @@ export interface CitationRecord {
   contentSnippet: string | null;
   /** Byte length of the fetched content */
   contentLength: number | null;
-  /** Overall verification status */
-  status: VerificationStatus;
-  /** Human or automated note about verification */
+  /** Overall source-check status */
+  status: CheckStatus;
+  /** Human or automated note about source-check */
   note: string | null;
 }
 
@@ -60,7 +60,7 @@ export interface CitationArchiveFile {
   citations: CitationRecord[];
 }
 
-/** Raw citation extracted from MDX content (before verification) */
+/** Raw citation extracted from MDX content (before source-check) */
 export interface ExtractedCitation {
   /** Footnote identifier: "1" for [^1], "rc-fec0" for [^rc-fec0], "kb-abc" for [^kb-abc] */
   footnote: string;
@@ -423,7 +423,7 @@ function sourceToFetchResult(source: FetchedSource): FetchResult {
 }
 
 /**
- * Fetch a URL and extract metadata for citation verification.
+ * Fetch a URL and extract metadata for citation checking.
  *
  * Delegates to source-fetcher.ts which handles:
  * - Multi-tier caching (session → PG → network)
@@ -441,13 +441,13 @@ async function fetchCitationUrl(url: string): Promise<FetchResult> {
 }
 
 /**
- * Map a FetchResult (from fetchCitationUrl → source-fetcher) to a VerificationStatus.
+ * Map a FetchResult (from fetchCitationUrl → source-fetcher) to a CheckStatus.
  *
  * source-fetcher returns httpStatus=0 for both unverifiable domains and network errors.
  * We map httpStatus 0 → 'unverifiable' (matches the old behavior for timeouts and
  * social media domains). HTTP 200-399 → 'verified'. Everything else → 'broken'.
  */
-function resultToVerificationStatus(result: FetchResult): VerificationStatus {
+function resultToCheckStatus(result: FetchResult): CheckStatus {
   if (result.httpStatus === 0) return 'unverifiable';
   if (result.httpStatus >= 200 && result.httpStatus < 400) return 'verified';
   return 'broken';
@@ -484,7 +484,7 @@ export async function verifyCitationsForPage(
         // fetchCitationUrl delegates to source-fetcher which handles unverifiable
         // domains, caching, retries, and PG writes internally
         const result = await fetchCitationUrl(ext.url);
-        const status = resultToVerificationStatus(result);
+        const status = resultToCheckStatus(result);
 
         const record: CitationRecord = {
           footnote: ext.footnote,

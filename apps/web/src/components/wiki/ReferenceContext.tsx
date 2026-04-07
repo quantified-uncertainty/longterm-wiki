@@ -17,9 +17,9 @@ export interface RefMapEntry {
   type: "claim" | "citation" | "kb";
 
   // --- Claim fields (populated when type === "claim") ---
-  /** Claim text from the citation verification system */
+  /** Claim text from the citation source-check system */
   claimText?: string;
-  /** Accuracy verdict from the citation verification pipeline */
+  /** Accuracy verdict from the citation source-check pipeline */
   verdict?: AccuracyVerdict | null;
   /** Accuracy confidence score (0-1) */
   verdictScore?: number | null;
@@ -74,10 +74,10 @@ const ReferenceContext = createContext<ReferenceContextValue>({
 
 /**
  * ReferenceProvider -- wraps MDX content with a map from footnote numbers
- * to rich reference data (claim verification + source metadata).
+ * to rich reference data (claim source-check + source metadata).
  *
  * The map is built in the wiki page server component from:
- * 1. Citation quotes from the wiki-server (claim verification data)
+ * 1. Citation quotes from the wiki-server (claim source-check data)
  * 2. DB-driven reference data (preprocessor map)
  *
  * Client components (FootnoteTooltip) consume this via useReferenceData().

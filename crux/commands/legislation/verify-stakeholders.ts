@@ -1,9 +1,9 @@
 /**
  * Verify Stakeholder Positions Command
  *
- * Populates verification evidence for policy stakeholder positions using the
- * Things table verification system. For each stakeholder that has a source URL
- * in the YAML data, creates a verification record and aggregate verdict. For
+ * Populates source-check evidence for policy stakeholder positions using the
+ * Things table source-check system. For each stakeholder that has a source URL
+ * in the YAML data, creates a source-check record and aggregate verdict. For
  * stakeholders without a source URL, creates an "unchecked" verdict.
  *
  * Usage:
@@ -26,7 +26,7 @@ import {
   getEvidenceByRecord,
   storeEvidence,
   storeVerdict,
-} from "../../lib/wiki-server/verifications.ts";
+} from "../../lib/wiki-server/source-check-client.ts";
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -79,7 +79,7 @@ interface ThingsListResponse {
   offset: number;
 }
 
-interface VerificationResponse {
+interface SourceCheckResponse {
   id: number;
   thingId: string;
   verdict: string;
@@ -91,8 +91,8 @@ interface VerdictResponse {
   confidence: number | null;
 }
 
-interface VerificationsListResponse {
-  verifications: Array<{
+interface SourceChecksListResponse {
+  sourceChecks: Array<{
     id: number;
     thingId: string;
     sourceUrl: string | null;
@@ -158,10 +158,10 @@ async function fetchStakeholderThings(): Promise<Map<string, ThingItem>> {
 }
 
 /**
- * Check if a verification already exists for a thing + sourceUrl + fieldName.
- * Returns true if a matching verification record exists.
+ * Check if a source-check already exists for a thing + sourceUrl + fieldName.
+ * Returns true if a matching source-check record exists.
  */
-async function hasExistingVerification(
+async function hasExistingSourceCheck(
   recordId: string,
   sourceUrl: string | null,
   fieldName: string
@@ -175,15 +175,15 @@ async function hasExistingVerification(
 }
 
 /**
- * Create a verification record for a stakeholder position.
+ * Create a source-check record for a stakeholder position.
  */
-async function createVerification(
+async function createSourceCheck(
   recordId: string,
   sourceUrl: string,
   position: string,
   stakeholderName: string,
   policyTitle: string
-): Promise<VerificationResponse | null> {
+): Promise<SourceCheckResponse | null> {
   const result = await storeEvidence({
     recordType: "policy-stakeholder",
     recordId,
@@ -197,11 +197,11 @@ async function createVerification(
   });
   if (!result.ok) {
     console.warn(
-      `  Warning: Failed to create verification for ${recordId}: ${result.message}`
+      `  Warning: Failed to create source-check for ${recordId}: ${result.message}`
     );
     return null;
   }
-  return result.data as unknown as VerificationResponse;
+  return result.data as unknown as SourceCheckResponse;
 }
 
 /**
@@ -295,7 +295,7 @@ async function verifyStakeholdersCommand(
   log(`  Found ${thingsMap.size} policy-stakeholder things in database`);
 
   // 4. Process each policy
-  let verificationsCreated = 0;
+  let sourceChecksCreated = 0;
   let verdictsCreated = 0;
   let skippedExisting = 0;
   let missingThings = 0;
@@ -321,15 +321,15 @@ async function verifyStakeholdersCommand(
       const thingId = thing.id;
 
       if (stakeholder.source) {
-        // Has a source URL -- create verification + confirmed verdict
+        // Has a source URL -- create source-check + confirmed verdict
         if (verbose) {
           log(
             `  ${stakeholder.name}: ${stakeholder.position} (source: ${stakeholder.source})`
           );
         }
 
-        // Check for existing verification (idempotency)
-        const exists = await hasExistingVerification(
+        // Check for existing source-check (idempotency)
+        const exists = await hasExistingSourceCheck(
           thingId,
           stakeholder.source,
           "position"
@@ -344,28 +344,28 @@ async function verifyStakeholdersCommand(
 
         if (dryRun) {
           log(
-            `  [DRY RUN] Would create verification for "${stakeholder.name}" (${stakeholder.position})`
+            `  [DRY RUN] Would create source-check for "${stakeholder.name}" (${stakeholder.position})`
           );
           log(
             `    thingId: ${thingId}, source: ${stakeholder.source}`
           );
-          verificationsCreated++;
+          sourceChecksCreated++;
           verdictsCreated++;
           continue;
         }
 
-        // Create verification record
-        const verification = await createVerification(
+        // Create source-check record
+        const sourceCheck = await createSourceCheck(
           thingId,
           stakeholder.source,
           stakeholder.position,
           stakeholder.name,
           policyTitle
         );
-        if (verification) {
-          verificationsCreated++;
+        if (sourceCheck) {
+          sourceChecksCreated++;
           if (verbose) {
-            log(`    Created verification #${verification.id}`);
+            log(`    Created source-check #${sourceCheck.id}`);
           }
         }
 
@@ -411,7 +411,7 @@ async function verifyStakeholdersCommand(
 
         const verdict = await upsertVerdict(thingId, "unchecked", {
           reasoning:
-            "No source URL provided in YAML data. Position needs independent verification.",
+            "No source URL provided in YAML data. Position needs independent source-check.",
           needsRecheck: true,
         });
         if (verdict) {
@@ -427,7 +427,7 @@ async function verifyStakeholdersCommand(
   // 5. Summary
   const prefix = dryRun ? "[DRY RUN] " : "";
   log(`\n${prefix}Summary:`);
-  log(`  Verifications created: ${verificationsCreated}`);
+  log(`  Source-checks created: ${sourceChecksCreated}`);
   log(`  Verdicts created/updated: ${verdictsCreated}`);
   log(`  Skipped (already exists): ${skippedExisting}`);
   log(`  Missing things (not synced to PG): ${missingThings}`);
@@ -446,7 +446,7 @@ async function verifyStakeholdersCommand(
       exitCode: 0,
       output: JSON.stringify(
         {
-          verificationsCreated,
+          sourceChecksCreated,
           verdictsCreated,
           skippedExisting,
           missingThings,
@@ -468,10 +468,10 @@ export const commands = {
 };
 
 export function getHelp(): string {
-  return `Legislation — Policy stakeholder verification
+  return `Legislation — Policy stakeholder source-check
 
 Commands:
-  verify-stakeholders     Populate verification evidence for stakeholder positions
+  verify-stakeholders     Populate source-check evidence for stakeholder positions
 
 Options:
   --policy=<id>          Only verify stakeholders for this policy (e.g. california-sb1047)

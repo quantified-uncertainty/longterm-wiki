@@ -124,7 +124,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
           {index}
         </a>
       </span>
-      {/* Title + verification dot + meta */}
+      {/* Title + source-check dot + meta */}
       <span className="flex-1 min-w-0">
         {resource.id ? (
           <a
@@ -245,7 +245,7 @@ async function CitationHealthFooter({ pageId }: { pageId: string }) {
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">
       <span className={cn("inline-block w-1.5 h-1.5 rounded-full", dotColor)} />
-      Citation verification: {parts.join(", ")} of {total} total
+      Citation source check: {parts.join(", ")} of {total} total
     </div>
   );
 }
