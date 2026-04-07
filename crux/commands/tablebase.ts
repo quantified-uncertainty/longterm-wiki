@@ -305,14 +305,14 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     recordsRejected: records.length - recordsToSubmit.length,
     submittedAt: now.toISOString(),
     sourceCheckSummary: {
-      withSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => r.verification).length,
-      withoutSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => !r.verification).length,
+      withSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => r.sourceCheck).length,
+      withoutSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => !r.sourceCheck).length,
       verdicts: {
-        verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
-        contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
-        unverifiable: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
+        verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourceCheck as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
+        contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourceCheck as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
+        unverifiable: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourceCheck as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
         other: recordsToSubmit.filter((r: Record<string, unknown>) => {
-          const v = r.verification as Record<string, unknown> | undefined;
+          const v = r.sourceCheck as Record<string, unknown> | undefined;
           return v && !['confirmed', 'contradicted', 'unverifiable'].includes(v.verdict as string);
         }).length,
       },
@@ -324,8 +324,8 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
       if (r.role) summary.role = r.role;
       if (r.name || r.title) summary.name = r.name || r.title;
       if (r.source) summary.source = r.source;
-      if (r.verification) {
-        const v = r.verification as Record<string, unknown>;
+      if (r.sourceCheck) {
+        const v = r.sourceCheck as Record<string, unknown>;
         summary.verdict = v.verdict;
         summary.evidence = v.evidence;
       } else {
