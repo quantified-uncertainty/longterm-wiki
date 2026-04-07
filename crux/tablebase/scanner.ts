@@ -479,8 +479,28 @@ async function scanSourceQuality(): Promise<TableScanResult> {
     const existing = byEntity.get(v.entityId);
     if (existing) {
       existing.count++;
+      // Prefer non-null display names
+      if (!existing.displayName && v.entityDisplayName) {
+        existing.displayName = v.entityDisplayName;
+      }
     } else {
       byEntity.set(v.entityId, { count: 1, displayName: v.entityDisplayName });
+    }
+  }
+
+  // Resolve missing entity names from the entities API
+  const missingNameIds = [...byEntity.entries()]
+    .filter(([, v]) => !v.displayName)
+    .map(([id]) => id);
+  if (missingNameIds.length > 0) {
+    for (const entityId of missingNameIds) {
+      const entityResult = await apiRequest<{ id: string; title: string }>(
+        'GET',
+        `/api/entities/${encodeURIComponent(entityId)}`,
+      );
+      if (entityResult.ok && entityResult.data.title) {
+        byEntity.get(entityId)!.displayName = entityResult.data.title;
+      }
     }
   }
 
