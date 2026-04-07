@@ -142,8 +142,17 @@ const recordLookupApp = new Hono()
             `facts requires sourceId in "entityId:factId" format, got: ${sourceId.slice(0, 100)}`
           );
         }
-        const entityId = decodeURIComponent(sourceId.slice(0, colonIdx));
-        const factId = decodeURIComponent(sourceId.slice(colonIdx + 1));
+        let entityId: string;
+        let factId: string;
+        try {
+          entityId = decodeURIComponent(sourceId.slice(0, colonIdx));
+          factId = decodeURIComponent(sourceId.slice(colonIdx + 1));
+        } catch {
+          return validationError(
+            c,
+            `Malformed percent-encoding in sourceId: ${sourceId.slice(0, 100)}`
+          );
+        }
         rows = await db
           .select()
           .from(facts)

@@ -98,6 +98,7 @@ function applyThingsFilters(
 /**
  * Apply FTS prefix filter on in-memory store.
  * Finds the prefix query param by looking for the ":*" pattern.
+ * Applies thing_type/source_table filters first (matching production behavior).
  */
 function applyFtsFilter(
   q: string,
@@ -116,8 +117,19 @@ function applyFtsFilter(
 
   if (words.length === 0) return [];
 
+  // Apply type/source filters first, matching production WHERE clause order
+  let rows = Array.from(thingsStore.values());
+  const thingType = extractWhereParam(q, "thing_type", params);
+  if (thingType) {
+    rows = rows.filter((r) => r.thing_type === thingType);
+  }
+  const sourceTable = extractWhereParam(q, "source_table", params);
+  if (sourceTable) {
+    rows = rows.filter((r) => r.source_table === sourceTable);
+  }
+
   const results: Record<string, unknown>[] = [];
-  for (const row of thingsStore.values()) {
+  for (const row of rows) {
     const title = ((row.title as string) || "").toLowerCase();
     const desc = ((row.description as string) || "").toLowerCase();
     const text = `${title} ${desc}`;
@@ -131,9 +143,10 @@ function applyFtsFilter(
 /**
  * Apply ILIKE filter on in-memory store.
  * Finds the ILIKE pattern param by looking for the `%...%` wrapper.
+ * Applies thing_type/source_table filters first (matching production behavior).
  */
 function applyIlikeFilter(
-  _q: string,
+  q: string,
   params: unknown[]
 ): Record<string, unknown>[] {
   // Find the ILIKE pattern param — it's wrapped in `%...%`
@@ -143,9 +156,20 @@ function applyIlikeFilter(
 
   if (!pattern) return [];
 
+  // Apply type/source filters first, matching production WHERE clause order
+  let rows = Array.from(thingsStore.values());
+  const thingType = extractWhereParam(q, "thing_type", params);
+  if (thingType) {
+    rows = rows.filter((r) => r.thing_type === thingType);
+  }
+  const sourceTable = extractWhereParam(q, "source_table", params);
+  if (sourceTable) {
+    rows = rows.filter((r) => r.source_table === sourceTable);
+  }
+
   const searchTerm = pattern.replace(/%/g, "").toLowerCase();
   const results: Record<string, unknown>[] = [];
-  for (const row of thingsStore.values()) {
+  for (const row of rows) {
     const title = ((row.title as string) || "").toLowerCase();
     const id = ((row.id as string) || "").toLowerCase();
     const desc = ((row.description as string) || "").toLowerCase();
@@ -215,32 +239,14 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
     if (q.includes("plainto_tsquery") && !q.includes("to_tsquery(")) return [];
 
-    // to_tsquery prefix search: find the prefix query param by looking for the
-    // characteristic ":*" pattern (e.g. "anthropic:*") in the params list.
-    // This is robust against extra params from LEFT JOIN CASE expressions.
-    const prefixParam = params.find(
-      (p) => typeof p === "string" && p.includes(":*")
-    ) as string | undefined;
+    // Delegate to applyFtsFilter which handles thing_type/source_table filters
+    const results = applyFtsFilter(q, params);
 
-    if (!prefixParam) return [];
-
-    const words = prefixParam
-      .split("&")
-      .map((w) => w.replace(/:?\*?\s*/g, "").trim().toLowerCase())
-      .filter(Boolean);
-
-    if (words.length === 0) return [];
-
-    const results: Record<string, unknown>[] = [];
-    for (const row of thingsStore.values()) {
-      const title = ((row.title as string) || "").toLowerCase();
-      const desc = ((row.description as string) || "").toLowerCase();
-      const text = `${title} ${desc}`;
-      if (words.every((w) => text.includes(w))) {
-        results.push(row);
-      }
-    }
-    return results;
+    // Apply offset (production route uses .offset())
+    const numericParams = params.filter((p) => typeof p === "number") as number[];
+    const limit = numericParams.length >= 2 ? numericParams[numericParams.length - 2] : (numericParams.length === 1 ? numericParams[0] : 20);
+    const offset = numericParams.length >= 2 ? numericParams[numericParams.length - 1] : 0;
+    return results.slice(offset, offset + limit);
   }
 
   // --- things: ILIKE search (fallback) ---
@@ -252,10 +258,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     }
 
     const filtered = applyIlikeFilter(q, params);
-    // Find the limit param (last numeric param)
+    // Apply limit and offset (production route uses .limit().offset())
     const numericParams = params.filter((p) => typeof p === "number") as number[];
-    const limit = numericParams.length > 0 ? numericParams[numericParams.length - 2] ?? numericParams[numericParams.length - 1] ?? 20 : 20;
-    return filtered.slice(0, limit);
+    const limit = numericParams.length >= 2 ? numericParams[numericParams.length - 2] : (numericParams.length === 1 ? numericParams[0] : 20);
+    const offset = numericParams.length >= 2 ? numericParams[numericParams.length - 1] : 0;
+    return filtered.slice(offset, offset + limit);
   }
 
   // --- things: COUNT with GROUP BY (stats by type / entity_type) ---
