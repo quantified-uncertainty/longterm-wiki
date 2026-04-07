@@ -321,7 +321,7 @@ for (const section of SECTIONS) {
 // Sections that have record verdicts
 const VERDICT_SECTIONS = new Set([
   "personnel", "grantsGiven", "grantsReceived", "fundingRounds",
-  "investments", "equityPositions", "divisions", "fundingPrograms",
+  "investments", "equityPositions", "divisions", "fundingPrograms", "facts",
 ]);
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
