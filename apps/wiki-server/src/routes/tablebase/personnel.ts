@@ -497,35 +497,21 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         .from(personnel)
         .where(inArray(personnel.id, syncedIds));
 
-      // Build a map of stableId -> title for resolved person entities
+      // Resolve person + org IDs to human-readable titles in a single query
       const resolvedPersonIds = resolvedItems
         .filter((r) => r.personEntityId)
         .map((r) => r.personEntityId!);
-      let personTitleMap = new Map<string, string>();
-      if (resolvedPersonIds.length > 0) {
-        const personEntities = await tx
-          .select({ stableId: entities.stableId, title: entities.title })
-          .from(entities)
-          .where(inArray(entities.stableId, resolvedPersonIds));
-        personTitleMap = new Map(
-          personEntities
-            .filter((e) => e.stableId)
-            .map((e) => [e.stableId!, e.title])
-        );
-      }
-
-      // Resolve org IDs to human-readable titles for thing titles
       const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
-      const orgTitleMap = await resolveEntityTitles(tx, orgIds);
+      const titleMap = await resolveEntityTitles(tx, [...resolvedPersonIds, ...orgIds]);
 
       await upsertThingsInTx(
         tx,
         resolvedItems.map((p) => {
-          const personName = (p.personEntityId ? personTitleMap.get(p.personEntityId) : null)
+          const personName = (p.personEntityId ? titleMap.get(p.personEntityId) : null)
             ?? p.personDisplayName
             ?? cleanPersonId(p.personId)
             ?? p.personId;
-          const orgName = orgTitleMap.get(p.organizationId) ?? p.organizationId;
+          const orgName = titleMap.get(p.organizationId) ?? p.organizationId;
           return {
             id: p.id,
             thingType: "personnel" as const,
