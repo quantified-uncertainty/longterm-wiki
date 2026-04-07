@@ -3,6 +3,10 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { freshnessSortKey, type Freshness } from "./freshness";
+import {
+  FORMAT_LABELS, FORMAT_COLORS,
+  RECORD_TYPE_LABELS, RECORD_TYPE_COLORS,
+} from "./data-source-labels";
 import Link from "next/link";
 
 // ---------------------------------------------------------------------------
@@ -12,6 +16,7 @@ import Link from "next/link";
 export interface DataSourceRow {
   id: string;
   name: string;
+  resourceId: string;
   dataFormat: string;
   recordType: string;
   publisherName: string | null;
@@ -23,25 +28,6 @@ export interface DataSourceRow {
   latestSnapshotHash: string | null;
   freshness: Freshness;
 }
-
-// ---------------------------------------------------------------------------
-// Badge helpers
-// ---------------------------------------------------------------------------
-
-const FORMAT_STYLES: Record<string, { label: string; color: string }> = {
-  csv: { label: "CSV", color: "text-blue-600" },
-  html_table: { label: "HTML", color: "text-purple-600" },
-  json_api: { label: "JSON", color: "text-green-600" },
-  spreadsheet: { label: "Sheet", color: "text-orange-600" },
-};
-
-const RECORD_TYPE_STYLES: Record<string, { label: string; color: string }> = {
-  grant: { label: "Grant", color: "text-violet-600" },
-  personnel: { label: "Personnel", color: "text-sky-600" },
-  investment: { label: "Investment", color: "text-amber-600" },
-  publication: { label: "Publication", color: "text-teal-600" },
-  mixed: { label: "Mixed", color: "text-gray-600" },
-};
 
 const FRESHNESS_STYLES: Record<
   Freshness,
@@ -119,18 +105,15 @@ const columns: ColumnDef<DataSourceRow>[] = [
       <SortableHeader column={column}>Name</SortableHeader>
     ),
     cell: ({ row }) => {
-      const { id, name, recordType } = row.original;
-      if (recordType === "grant") {
-        return (
-          <Link
-            href={`/grants?dataSource=${id}`}
-            className="text-sm font-medium text-accent-foreground hover:underline"
-          >
-            {name}
-          </Link>
-        );
-      }
-      return <span className="text-sm font-medium">{name}</span>;
+      const { name, resourceId } = row.original;
+      return (
+        <Link
+          href={`/resources/${resourceId}`}
+          className="text-sm font-medium text-accent-foreground hover:underline"
+        >
+          {name}
+        </Link>
+      );
     },
     filterFn: "includesString",
     size: 240,
@@ -141,13 +124,13 @@ const columns: ColumnDef<DataSourceRow>[] = [
       <SortableHeader column={column}>Format</SortableHeader>
     ),
     cell: ({ row }) => {
-      const style = FORMAT_STYLES[row.original.dataFormat];
-      return style ? (
-        <Badge label={style.label} color={style.color} />
+      const fmt = row.original.dataFormat;
+      const label = FORMAT_LABELS[fmt];
+      const color = FORMAT_COLORS[fmt];
+      return label ? (
+        <Badge label={label} color={color} />
       ) : (
-        <span className="text-xs text-muted-foreground">
-          {row.original.dataFormat}
-        </span>
+        <span className="text-xs text-muted-foreground">{fmt}</span>
       );
     },
     size: 80,
@@ -158,13 +141,13 @@ const columns: ColumnDef<DataSourceRow>[] = [
       <SortableHeader column={column}>Type</SortableHeader>
     ),
     cell: ({ row }) => {
-      const style = RECORD_TYPE_STYLES[row.original.recordType];
-      return style ? (
-        <Badge label={style.label} color={style.color} />
+      const rt = row.original.recordType;
+      const label = RECORD_TYPE_LABELS[rt];
+      const color = RECORD_TYPE_COLORS[rt];
+      return label ? (
+        <Badge label={label} color={color} />
       ) : (
-        <span className="text-xs text-muted-foreground">
-          {row.original.recordType}
-        </span>
+        <span className="text-xs text-muted-foreground">{rt}</span>
       );
     },
     size: 90,

@@ -12,23 +12,21 @@ import {
   findPersonByName,
 } from "@data";
 import { getEntityTypeLabel } from "@data/entity-ontology";
-import { fetchFromWikiServer } from "@/lib/wiki-server";
+import { fetchFromWikiServer, fetchDetailed, type RpcResourceDetailResult } from "@/lib/wiki-server";
 import type { CitationContentResult } from "@wiki-server/api-response-types";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { getDomain } from "@/components/wiki/resource-utils";
 import { renderInlineMarkdown, stripMarkdownFormatting } from "@/lib/inline-markdown";
 import {
   ExternalLink,
-  Clock,
   FileText,
-  Link2,
-  Download,
   Database,
-  FileQuestion,
   ArrowLeft,
   User,
   BookOpen,
   Shield,
+  Clock,
+  Table2,
 } from "lucide-react";
 import { cn } from "@lib/utils";
 import { safeHref } from "@/lib/directory-utils";
@@ -39,6 +37,8 @@ import {
   getFactBaseProperty,
 } from "@/data/factbase";
 import { formatKBFactValue, formatKBDate } from "@/components/wiki/factbase/format";
+import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { formatAge } from "@/lib/format";
 
 // Cache for 1 hour — these on-demand pages get heavy bot traffic with 0% cache hits.
 export const revalidate = 3600;
@@ -47,18 +47,60 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
+/** Resource detail from wiki-server — type inferred from Hono RPC route. */
+type ServerResource = RpcResourceDetailResult;
+
+/** Fetch a resource from the wiki-server by ID. Returns null on 404/not-configured. */
+async function fetchServerResource(id: string): Promise<ServerResource | null> {
+  const result = await fetchDetailed<ServerResource>(
+    `/api/resources/${encodeURIComponent(id)}`,
+    { revalidate: 3600 }
+  );
+  if (!result.ok) {
+    // Log non-trivial errors (skip 404 and not-configured — those are expected)
+    const err = result.error;
+    if (err.type === "server-error" && err.status !== 404) {
+      console.warn(`[resources/${id}] Wiki-server error: HTTP ${err.status}`);
+    } else if (err.type === "connection-error") {
+      console.warn(`[resources/${id}] Wiki-server connection error: ${err.message}`);
+    }
+    return null;
+  }
+  return result.data;
+}
+
+// ---------------------------------------------------------------------------
+// Metadata
+// ---------------------------------------------------------------------------
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const resource = resolveResource(id);
-  if (!resource) return { title: "Source Not Found" };
+  const localResource = resolveResource(id);
+  if (localResource) {
+    const plainTitle = stripMarkdownFormatting(localResource.title);
+    return {
+      title: `Source: ${plainTitle}`,
+      description: localResource.summary || `Citation source: ${plainTitle}`,
+      robots: { index: false, follow: false },
+    };
+  }
 
-  const plainTitle = stripMarkdownFormatting(resource.title);
-  return {
-    title: `Source: ${plainTitle}`,
-    description: resource.summary || `Citation source: ${plainTitle}`,
-    robots: { index: false, follow: false },
-  };
+  // Try wiki-server for resources not in local data (e.g., tabular sources)
+  const serverResource = await fetchServerResource(id);
+  if (serverResource) {
+    return {
+      title: `Source: ${serverResource.title ?? id}`,
+      description: serverResource.summary || `Data source: ${serverResource.title ?? id}`,
+      robots: { index: false, follow: false },
+    };
+  }
+
+  return { title: "Source Not Found" };
 }
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 function formatDate(iso: string): string {
   try {
@@ -78,7 +120,6 @@ function getPageTitle(pageId: string): string {
   if (entity?.title) return entity.title;
   const page = getPageById(pageId);
   if (page?.title) return page.title;
-  // Fall back to formatting the slug
   return pageId
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
@@ -93,7 +134,6 @@ const CREDIBILITY_DESCRIPTIONS: Record<number, string> = {
   1: "Low credibility. Unvetted or unreliable source. Use with caution and always cross-reference.",
 };
 
-/** Resolve an author name to a linked element or plain text */
 function AuthorName({ name }: { name: string }) {
   const personEntityId = findPersonByName(name);
   if (personEntityId) {
@@ -111,11 +151,284 @@ function AuthorName({ name }: { name: string }) {
   return <span>{name}</span>;
 }
 
+import { FORMAT_LABELS, RECORD_TYPE_LABELS } from "@/app/data-sources/data-source-labels";
+
+// ---------------------------------------------------------------------------
+// Server-fetched resource page (tabular sources, etc.)
+// ---------------------------------------------------------------------------
+
+function ServerResourcePage({ resource }: { resource: ServerResource }) {
+  const ts = resource.tabularSource;
+  const publisherInfo = resource.publisherEntityId
+    ? resolveEntityName(resource.publisherEntityId)
+    : null;
+  const isTabular = ts != null;
+  const hasExternalUrl = resource.url && !resource.url.startsWith("urn:");
+
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-8">
+      {/* Back link */}
+      <Link
+        href={isTabular ? "/wiki/E2131" : "/resources"}
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        {isTabular ? "Data Sources" : "Back"}
+      </Link>
+
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-start gap-3 mb-1.5">
+          <h1 className="text-2xl font-bold">{resource.title ?? resource.id}</h1>
+          {isTabular && (
+            <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400 font-medium">
+              <Database className="w-3 h-3" />
+              Data Source
+            </span>
+          )}
+          {!isTabular && resource.type && (
+            <span className="shrink-0 mt-1 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium capitalize">
+              <FileText className="w-3 h-3" />
+              {resource.type}
+            </span>
+          )}
+        </div>
+
+        {/* Metadata row */}
+        <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-sm text-muted-foreground">
+          {publisherInfo && (
+            <span className="inline-flex items-center gap-1.5">
+              {publisherInfo.href ? (
+                <Link
+                  href={publisherInfo.href}
+                  className="text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {publisherInfo.name}
+                </Link>
+              ) : (
+                <span>{publisherInfo.name}</span>
+              )}
+            </span>
+          )}
+          {hasExternalUrl && (
+            <span className="inline-flex items-center gap-1.5">
+              {publisherInfo && (
+                <span className="text-muted-foreground/30">&middot;</span>
+              )}
+              <a
+                href={resource.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                <ExternalLink className="w-3 h-3" />
+                {(() => {
+                  try {
+                    const u = new URL(resource.url);
+                    return u.hostname;
+                  } catch {
+                    return resource.url;
+                  }
+                })()}
+              </a>
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Summary */}
+      {resource.summary && (
+        <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+          {resource.summary}
+        </p>
+      )}
+
+      {/* Tabular Source Details */}
+      {ts && (
+        <section className="mb-6 p-4 rounded-lg border border-border bg-card">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <Table2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            Data Source Details
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+            <div>
+              <div className="text-xs text-muted-foreground">Format</div>
+              <div className="font-medium">{FORMAT_LABELS[ts.dataFormat] ?? ts.dataFormat}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Record Type</div>
+              <div className="font-medium">{RECORD_TYPE_LABELS[ts.recordType] ?? ts.recordType}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Update Frequency</div>
+              <div className="font-medium capitalize">{ts.updateFrequency ?? "Unknown"}</div>
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground">Status</div>
+              <div className={cn(
+                "font-medium capitalize",
+                ts.sourceStatus === "active" && "text-blue-600",
+                ts.sourceStatus === "archived" && "text-muted-foreground",
+                ts.sourceStatus === "defunct" && "text-red-600",
+              )}>
+                {ts.sourceStatus}
+              </div>
+            </div>
+          </div>
+
+          {/* Snapshot stats */}
+          <div className="mt-4 pt-4 border-t border-border/60 grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
+            <div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Last Snapshot
+              </div>
+              <div className="font-medium">
+                {ts.lastSnapshotAt ? formatAge(ts.lastSnapshotAt) : "Never"}
+              </div>
+              {ts.lastSnapshotAt && (
+                <div className="text-xs text-muted-foreground">
+                  {formatDate(ts.lastSnapshotAt)}
+                </div>
+              )}
+            </div>
+            <div>
+              <div className="text-xs text-muted-foreground flex items-center gap-1">
+                <Database className="w-3 h-3" />
+                Records
+              </div>
+              <div className="font-bold tabular-nums text-lg">
+                {ts.snapshotRecordCount?.toLocaleString() ?? "—"}
+              </div>
+            </div>
+            {ts.recordType === "grant" && (
+              <div className="flex items-end">
+                <Link
+                  href={`/grants?dataSource=${ts.sourceSlug}`}
+                  className="inline-flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  View all grants
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Data Preview */}
+      {ts?.previewHeaders && ts.previewRows && ts.previewRows.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <Table2 className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            Data Preview
+            <span className="text-xs font-normal ml-2">
+              (first {ts.previewRows.length} of {ts.snapshotRecordCount?.toLocaleString() ?? "?"} rows)
+            </span>
+          </h2>
+          <div className="rounded-lg border border-border overflow-hidden overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50">
+                  {ts.previewHeaders.slice(0, 8).map((header, idx) => (
+                    <th
+                      key={`${header}-${idx}`}
+                      className="text-left px-3 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground whitespace-nowrap"
+                    >
+                      {header}
+                    </th>
+                  ))}
+                  {ts.previewHeaders.length > 8 && (
+                    <th className="text-left px-3 py-2 text-xs text-muted-foreground/50">
+                      +{ts.previewHeaders.length - 8} more
+                    </th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {ts.previewRows.map((row, i) => (
+                  <tr
+                    key={i}
+                    className="border-t border-border hover:bg-muted/30 transition-colors"
+                  >
+                    {row.slice(0, 8).map((cell, j) => (
+                      <td
+                        key={j}
+                        className="px-3 py-2 text-xs max-w-[200px] truncate"
+                        title={cell}
+                      >
+                        {cell || <span className="text-muted-foreground/40">—</span>}
+                      </td>
+                    ))}
+                    {ts.previewHeaders!.length > 8 && (
+                      <td className="px-3 py-2 text-xs text-muted-foreground/50">...</td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Cited By (from wiki-server) */}
+      {resource.citedBy.length > 0 && (
+        <section className="mb-6">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <BookOpen className="w-4 h-4 inline mr-1.5 -mt-0.5" />
+            Cited by {resource.citedBy.length} page
+            {resource.citedBy.length !== 1 ? "s" : ""}
+          </h2>
+          <div className="rounded-lg border border-border overflow-hidden">
+            <ul className="divide-y divide-border">
+              {resource.citedBy.map((pageSlug) => {
+                const title = getPageTitle(pageSlug);
+                const entity = getTypedEntityById(pageSlug);
+                const href = getEntityHref(pageSlug, entity?.entityType);
+                return (
+                  <li key={pageSlug} className="px-4 py-2 hover:bg-muted/30 transition-colors">
+                    <Link
+                      href={href}
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    >
+                      {title}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      {/* Footer */}
+      <div className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
+        Resource ID: <code className="px-1 py-0.5 bg-muted rounded">{resource.id}</code>
+        {resource.stableId && (
+          <> | Stable ID: <code className="px-1 py-0.5 bg-muted rounded">{resource.stableId}</code></>
+        )}
+        {ts && (
+          <> | Source Slug: <code className="px-1 py-0.5 bg-muted rounded">{ts.sourceSlug}</code></>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Local resource page (existing behavior for literature resources)
+// ---------------------------------------------------------------------------
+
 export default async function ResourcePage({ params }: PageProps) {
   const { id } = await params;
   const resource = resolveResource(id);
 
-  if (!resource) notFound();
+  // Fallback to wiki-server for resources not in local data (e.g., tabular sources)
+  if (!resource) {
+    const serverResource = await fetchServerResource(id);
+    if (!serverResource) notFound();
+    return <ServerResourcePage resource={serverResource} />;
+  }
 
   const publication = getResourcePublication(resource);
   const credibility = getResourceCredibility(resource);
@@ -486,19 +799,16 @@ export default async function ResourcePage({ params }: PageProps) {
           Metadata
         </h2>
         <div className="flex flex-wrap gap-3">
-          {/* Importance score */}
           {resource.importance_score != null && (
             <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
               Importance: {Math.round(resource.importance_score * 100)}/100
             </span>
           )}
-          {/* Resource subtype */}
           {resource.resource_subtype && (
             <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
               {resource.resource_subtype.replace(/_/g, ' ')}
             </span>
           )}
-          {/* Resource purpose */}
           {resource.resource_purpose && resource.resource_purpose !== resource.resource_subtype && (
             <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
               {resource.resource_purpose.replace(/_/g, ' ')}
@@ -510,7 +820,6 @@ export default async function ResourcePage({ params }: PageProps) {
       {/* Content sections — consolidated in a bordered container */}
       {hasContentSections && (
         <section className="mb-6 rounded-lg border border-border overflow-hidden">
-          {/* Abstract */}
           {hasAbstract && (
             <div className="px-5 py-4 border-b border-border last:border-b-0">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
@@ -521,8 +830,6 @@ export default async function ResourcePage({ params }: PageProps) {
               </p>
             </div>
           )}
-
-          {/* Summary */}
           {hasSummary && (
             <div className="px-5 py-4 border-b border-border last:border-b-0">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
@@ -533,8 +840,6 @@ export default async function ResourcePage({ params }: PageProps) {
               </p>
             </div>
           )}
-
-          {/* Key Points */}
           {hasKeyPoints && (
             <div className="px-5 py-4 border-b border-border last:border-b-0">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">
@@ -546,17 +851,13 @@ export default async function ResourcePage({ params }: PageProps) {
                     key={i}
                     className="text-sm leading-relaxed text-foreground/90 flex items-start gap-2"
                   >
-                    <span className="text-muted-foreground/40 mt-0.5 shrink-0">
-                      &bull;
-                    </span>
+                    <span className="text-muted-foreground/40 mt-0.5 shrink-0">&bull;</span>
                     <span>{renderInlineMarkdown(point)}</span>
                   </li>
                 ))}
               </ul>
             </div>
           )}
-
-          {/* Review */}
           {hasReview && (
             <div className="px-5 py-4">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-2">

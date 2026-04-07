@@ -6,63 +6,11 @@
 import {
   fetchDetailed,
   type RpcDataSourceListResult,
-  type RpcDataSource,
 } from "@/lib/wiki-server";
 import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
-import { resolveEntityName } from "@/lib/resolve-entity-name";
-import { DataSourcesTable, type DataSourceRow } from "./data-sources-table";
-import { computeFreshness } from "./freshness";
+import { DataSourcesTable } from "./data-sources-table";
+import { enrichDataSources, StatCard } from "./data-sources-shared";
 
-function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
-  return sources.map((s) => {
-    const publisher = s.publisherEntityId
-      ? resolveEntityName(s.publisherEntityId)
-      : null;
-    const freshness = computeFreshness(s.lastSnapshotAt, s.updateFrequency);
-    return {
-      id: s.id,
-      name: s.name,
-      dataFormat: s.dataFormat,
-      recordType: s.recordType,
-      publisherName: publisher?.name ?? null,
-      publisherHref: publisher?.href ?? null,
-      updateFrequency: s.updateFrequency,
-      lastSnapshotAt: s.lastSnapshotAt,
-      snapshotRecordCount: s.snapshotRecordCount,
-      sourceStatus: s.sourceStatus,
-      latestSnapshotHash: s.latestSnapshotHash,
-      freshness,
-    };
-  });
-}
-
-function StatCard({
-  label,
-  value,
-  sub,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-border/60 p-4">
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className={`text-2xl font-bold tabular-nums ${color ?? ""}`}>
-        {value}
-      </p>
-      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-    </div>
-  );
-}
-
-/**
- * Server component that fetches and renders data sources.
- * Used as tab content within the /sources page tabs, and also
- * rendered standalone at /data-sources.
- */
 export async function DataSourcesTabContent() {
   const result = await fetchDetailed<RpcDataSourceListResult>(
     "/api/data-sources",
