@@ -7,7 +7,7 @@
     "withVerification": 1,
     "withoutVerification": 3,
     "verdicts": {
-      "verified": 1,
+      "confirmed": 1,
       "contradicted": 0,
       "unverifiable": 0,
       "other": 0
