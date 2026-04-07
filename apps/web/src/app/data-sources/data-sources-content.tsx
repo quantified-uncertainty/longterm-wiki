@@ -3,8 +3,8 @@ import {
   type RpcDataSourceListResult,
 } from "@/lib/wiki-server";
 import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
-import { DataSourcesTable } from "./data-sources-table";
-import { enrichDataSources, StatCard } from "./data-sources-shared";
+import { DataSourcesTable } from "@/app/data-sources/data-sources-table";
+import { enrichDataSources, StatCard } from "@/app/data-sources/data-sources-shared";
 
 export async function DataSourcesContent() {
   const result = await fetchDetailed<RpcDataSourceListResult>(

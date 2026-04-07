@@ -51,21 +51,35 @@ interface PageProps {
 /** Resource detail from wiki-server — type inferred from Hono RPC route. */
 type ServerResource = RpcResourceDetailResult;
 
-/** Fetch a resource from the wiki-server by ID. Returns null on 404/not-configured. */
+/**
+ * Fetch a resource from the wiki-server by ID.
+ * Returns null only for 404 or not-configured (expected cases).
+ * Throws for connection errors and non-404 server errors so the caller
+ * doesn't silently treat server failures as "resource not found".
+ */
 async function fetchServerResource(id: string): Promise<ServerResource | null> {
   const result = await fetchDetailed<ServerResource>(
     `/api/resources/${encodeURIComponent(id)}`,
     { revalidate: 3600 }
   );
   if (!result.ok) {
-    // Log non-trivial errors (skip 404 and not-configured — those are expected)
     const err = result.error;
-    if (err.type === "server-error" && err.status !== 404) {
-      console.warn(`[resources/${id}] Wiki-server error: HTTP ${err.status}`);
-    } else if (err.type === "connection-error") {
+    // Not configured — wiki-server URL not set, treat as absent
+    if (err.type === "not-configured") return null;
+    // 404 — resource genuinely doesn't exist
+    if (err.type === "server-error" && err.status === 404) return null;
+    // Connection errors and non-404 server errors — log and throw so the
+    // caller doesn't confuse a server outage with "resource not found"
+    if (err.type === "connection-error") {
       console.warn(`[resources/${id}] Wiki-server connection error: ${err.message}`);
+    } else if (err.type === "server-error") {
+      console.warn(`[resources/${id}] Wiki-server error: HTTP ${err.status}`);
     }
-    return null;
+    throw new Error(
+      err.type === "connection-error"
+        ? `Wiki-server connection error: ${err.message}`
+        : `Wiki-server error: HTTP ${(err as { status: number }).status}`
+    );
   }
   return result.data;
 }

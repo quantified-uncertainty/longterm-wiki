@@ -1,7 +1,7 @@
 import type { RpcDataSource } from "@/lib/wiki-server";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
-import type { DataSourceRow } from "./data-sources-table";
-import { computeFreshness } from "./freshness";
+import type { DataSourceRow } from "@/app/data-sources/data-sources-table";
+import { computeFreshness } from "@/app/data-sources/freshness";
 
 export function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
   return sources.map((s) => {
@@ -12,7 +12,7 @@ export function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
     return {
       id: s.id,
       name: s.name,
-      resourceId: s.resourceId,
+      resourceId: s.resourceId ?? null,
       dataFormat: s.dataFormat,
       recordType: s.recordType,
       publisherName: publisher?.name ?? null,

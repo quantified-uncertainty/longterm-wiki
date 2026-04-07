@@ -2,11 +2,11 @@
 
 import type { ColumnDef } from "@tanstack/react-table";
 import { DataTable, SortableHeader } from "@/components/ui/data-table";
-import { freshnessSortKey, type Freshness } from "./freshness";
+import { freshnessSortKey, type Freshness } from "@/app/data-sources/freshness";
 import {
   FORMAT_LABELS, FORMAT_COLORS,
   RECORD_TYPE_LABELS, RECORD_TYPE_COLORS,
-} from "./data-source-labels";
+} from "@/app/data-sources/data-source-labels";
 import Link from "next/link";
 
 // ---------------------------------------------------------------------------
@@ -16,7 +16,7 @@ import Link from "next/link";
 export interface DataSourceRow {
   id: string;
   name: string;
-  resourceId: string;
+  resourceId: string | null;
   dataFormat: string;
   recordType: string;
   publisherName: string | null;
@@ -106,6 +106,9 @@ const columns: ColumnDef<DataSourceRow>[] = [
     ),
     cell: ({ row }) => {
       const { name, resourceId } = row.original;
+      if (!resourceId) {
+        return <span className="text-sm font-medium">{name}</span>;
+      }
       return (
         <Link
           href={`/resources/${resourceId}`}
