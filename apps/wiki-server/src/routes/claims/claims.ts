@@ -433,7 +433,7 @@ const claimsApp = new Hono()
 
     // Build WHERE conditions dynamically
     const conditions: string[] = [];
-    const params: unknown[] = [];
+    const params: (string | number)[] = [];
     let paramIdx = 0;
 
     if (status) {
