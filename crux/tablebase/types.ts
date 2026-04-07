@@ -18,6 +18,7 @@ export const TASK_TYPES = [
   "funding-round-research",
   "investment-linking",
   "benchmark-result-fill",
+  "source-discovery",
 ] as const;
 
 export type TaskType = (typeof TASK_TYPES)[number];
@@ -25,6 +26,7 @@ export type TaskType = (typeof TASK_TYPES)[number];
 /** Weight multipliers for task type impact scoring */
 export const TASK_TYPE_WEIGHTS: Record<TaskType, number> = {
   "personnel-enrichment": 1.5,
+  "source-discovery": 1.3,
   "grant-grantee-backfill": 1.2,
   "funding-round-research": 1.0,
   "benchmark-result-fill": 1.0,
@@ -112,4 +114,5 @@ export const TASK_TYPE_RECOMMENDED_MODEL: Record<TaskType, string> = {
   "funding-round-research": "haiku",
   "grant-grantee-backfill": "sonnet",
   "personnel-enrichment": "sonnet",
+  "source-discovery": "sonnet",
 };
