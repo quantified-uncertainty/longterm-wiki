@@ -34,9 +34,11 @@ on:
         default: '1'
         type: string
 
-# Limit concurrent workers
+# Limit concurrent workers — use run_id so dispatched runs don't cancel each other.
+# Scheduled runs share a group (only 1 scheduled run at a time), but manual dispatches
+# each get their own group for parallel bulk processing.
 concurrency:
-  group: job-worker-${{ github.ref }}
+  group: job-worker-${{ github.event_name == 'schedule' && github.ref || github.run_id }}
   cancel-in-progress: false
 
 permissions:
