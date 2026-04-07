@@ -53,7 +53,6 @@ const SyncInvestmentItemSchema = z.object({
   role: z.string().max(50).nullable().optional(),
   conditions: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   verification: InlineVerificationSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
@@ -109,7 +108,6 @@ function formatRow(r: JoinedRow) {
     role: inv.role,
     conditions: inv.conditions,
     source: inv.source,
-    sourceResourceId: inv.sourceResourceId,
     notes: inv.notes,
     // Structured entity refs
     investor: investorRef,
@@ -306,7 +304,6 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           role: item.role ?? null,
           conditions: item.conditions ?? null,
           source: item.source ?? null,
-        sourceResourceId: item.sourceResourceId ?? null,
           notes: item.notes ?? null,
         };
       });
@@ -331,7 +328,6 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             role: sql`excluded.role`,
             conditions: sql`excluded.conditions`,
             source: sql`excluded.source`,
-            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
