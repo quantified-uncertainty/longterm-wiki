@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Layers,
 } from "lucide-react";
+import { Breadcrumbs } from "@/components/directory/Breadcrumbs";
 import { fetchDetailed } from "@/lib/wiki-server";
 import type { RpcSourceCheckDetailResult } from "@/lib/wiki-server";
 import {
@@ -216,9 +217,45 @@ function RecordValue({
     return <span className="text-sm">{value}</span>;
   }
 
-  // Arrays and objects — JSON fallback
+  // Arrays — check for stableId references first
+  if (Array.isArray(value)) {
+    const hasSids = value.some(
+      (v) => typeof v === "string" && isAnySid(v) && displayNames[v]
+    );
+    if (hasSids) {
+      return (
+        <span className="flex flex-wrap gap-1.5">
+          {value.map((item, i) => {
+            if (typeof item === "string" && isAnySid(item) && displayNames[item]) {
+              const dn = displayNames[item];
+              return (
+                <span key={`${item}-${i}`}>
+                  {i > 0 && <span className="text-muted-foreground">, </span>}
+                  <Link href={`/wiki/${dn.slug}`} className="text-primary hover:underline">
+                    {dn.title}
+                  </Link>
+                  <span className="text-xs text-muted-foreground ml-1">({dn.entityType})</span>
+                </span>
+              );
+            }
+            if (typeof item === "object" && item !== null) {
+              return <span key={`obj-${i}`} className="text-sm">{JSON.stringify(item)}</span>;
+            }
+            return <span key={`${item}-${i}`}>{String(item)}</span>;
+          })}
+        </span>
+      );
+    }
+  }
+
+  // Objects and non-stableId arrays — JSON fallback
   if (typeof value === "object") {
-    const json = JSON.stringify(value, null, 2);
+    let json: string;
+    try {
+      json = JSON.stringify(value, null, 2);
+    } catch {
+      json = "[Unable to serialize]";
+    }
     const display = json.length > 300 ? json.slice(0, 300) + "\u2026" : json;
     return (
       <pre className="text-xs bg-muted px-2 py-1 rounded overflow-x-auto max-w-full whitespace-pre-wrap">
@@ -407,6 +444,13 @@ export default async function ThingDetailPage({ params }: PageProps) {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
+      <Breadcrumbs
+        items={[
+          { label: "Things", href: "/things" },
+          { label: thing.title },
+        ]}
+      />
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
@@ -444,14 +488,14 @@ export default async function ThingDetailPage({ params }: PageProps) {
         )}
         {thing.parentThingId && (
           <Link
-            href={`/wiki/E1929?q=${encodeURIComponent(thing.parentThingId)}`}
+            href={`/wiki/E1929?entity=${encodeURIComponent(thing.parentThingId)}`}
             className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
           >
             <Layers className="h-3.5 w-3.5" />
             View entity profile
           </Link>
         )}
-        {hasVerdicts && (
+        {VERDICT_SOURCE_TABLES.has(thing.sourceTable) && (
           <Link
             href={getSourceCheckHref(recordType, thing.sourceId)}
             className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
@@ -520,7 +564,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
       </section>
 
       {/* Source Check Verdicts */}
-      {hasVerdicts && (
+      {hasVerdicts ? (
         <section className="mb-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             <span className="inline-flex items-center gap-1.5">
@@ -586,7 +630,28 @@ export default async function ThingDetailPage({ params }: PageProps) {
             </Link>
           </div>
         </section>
-      )}
+      ) : VERDICT_SOURCE_TABLES.has(thing.sourceTable) ? (
+        <section className="mb-8">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
+            <span className="inline-flex items-center gap-1.5">
+              <ShieldCheck className="h-4 w-4" />
+              Source Check
+            </span>
+          </h2>
+          <div className="rounded-lg border border-dashed border-border/60 p-4">
+            <p className="text-sm text-muted-foreground">
+              This record has not been source-checked yet.
+            </p>
+            <Link
+              href={getSourceCheckHref(recordType, thing.sourceId)}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-2"
+            >
+              View source check page
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </section>
+      ) : null}
 
       {/* Debug footer */}
       <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
