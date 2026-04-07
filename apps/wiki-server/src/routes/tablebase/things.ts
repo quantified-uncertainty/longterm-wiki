@@ -40,6 +40,7 @@ const ListQuery = z.object({
   thing_type: z.string().max(50).optional(),
   entity_type: z.string().max(100).optional(),
   parent_id: z.string().max(100).optional(),
+  source_table: z.string().max(100).optional(),
   sort: z.enum(["title", "updated_at", "created_at", "thing_type"]).default("title"),
   order: z.enum(["asc", "desc"]).default("asc"),
   limit: clampedLimit(MAX_PAGE_SIZE, 50),
@@ -93,12 +94,17 @@ const verdictFields = {
  *
  * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
  * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
- * "funding-round"). We normalize sourceTable: replace '_' with '-', strip
- * trailing 's'. This produces exactly the recordType that verdictJoinCondition
- * uses (singular, hyphenated), ensuring at most one verdict match per thing.
+ * "funding-round"). We normalize: replace '_' with '-', strip trailing 's'.
+ * Irregular plural: entities → entity (handled via CASE).
+ *
+ * NOTE: The same CASE expression is duplicated in the raw-SQL trigram fallback
+ * query below. If you add more irregular plurals here, update that query too.
  */
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')`,
+  sql`${sourceCheckVerdicts.recordType} = CASE ${things.sourceTable}
+    WHEN 'entities' THEN 'entity'
+    ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
+  END`,
   eq(sourceCheckVerdicts.recordId, things.sourceId),
   sql`${sourceCheckVerdicts.fieldName} IS NULL`,
 );
@@ -250,7 +256,11 @@ const thingsApp = new Hono()
           scv.verdict
         FROM things t
         LEFT JOIN source_check_verdicts scv
-          ON scv.record_type = regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          -- CASE mirrors verdictJoinOnThings above; keep in sync if adding irregular plurals
+          ON scv.record_type = CASE t.source_table
+            WHEN 'entities' THEN 'entity'
+            ELSE regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
+          END
           AND scv.record_id = t.source_id
           AND scv.field_name IS NULL
         WHERE similarity(t.title, $1) > ${TRIGRAM_SIMILARITY_THRESHOLD}
@@ -304,7 +314,10 @@ const thingsApp = new Hono()
         return c.json({
           results: combined,
           query: q,
-          total: Math.max(ftsTotal, combined.length),
+          // Use FTS total for pagination when FTS found results (trigram
+          // supplements are best-effort, not separately paginated). Fall
+          // back to combined.length when only trigram matched (ftsTotal=0).
+          total: rows.length > 0 ? ftsTotal : combined.length,
           searchMethod: rows.length > 0 ? ("fts+trigram" as const) : ("trigram" as const),
         });
       }
@@ -333,51 +346,44 @@ const thingsApp = new Hono()
       ? eq(things.parentThingId, parent_id)
       : undefined;
 
-    const totalResult = await db
-      .select({ count: count() })
-      .from(things)
-      .where(baseCondition);
-    const total = totalResult[0].count;
+    const [totalResult, byTypeRows, byEntityTypeRows, bySourceTableRows] = await Promise.all([
+      db.select({ count: count() }).from(things).where(baseCondition),
+      db.select({ thingType: things.thingType, count: count() })
+        .from(things).where(baseCondition)
+        .groupBy(things.thingType).orderBy(sql`count(*) DESC`),
+      db.select({ entityType: things.entityType, count: count() })
+        .from(things)
+        .where(baseCondition
+          ? and(baseCondition, isNotNull(things.entityType))
+          : isNotNull(things.entityType))
+        .groupBy(things.entityType).orderBy(sql`count(*) DESC`),
+      db.select({ sourceTable: things.sourceTable, count: count() })
+        .from(things).where(baseCondition)
+        .groupBy(things.sourceTable).orderBy(sql`count(*) DESC`),
+    ]);
 
-    const byTypeRows = await db
-      .select({
-        thingType: things.thingType,
-        count: count(),
-      })
-      .from(things)
-      .where(baseCondition)
-      .groupBy(things.thingType)
-      .orderBy(sql`count(*) DESC`);
+    const total = totalResult[0].count;
 
     const byType: Record<string, number> = {};
     for (const row of byTypeRows) {
       byType[row.thingType] = row.count;
     }
 
-    // Count things with entity_type breakdown (entities only)
-    const byEntityTypeRows = await db
-      .select({
-        entityType: things.entityType,
-        count: count(),
-      })
-      .from(things)
-      .where(
-        baseCondition
-          ? and(baseCondition, isNotNull(things.entityType))
-          : isNotNull(things.entityType)
-      )
-      .groupBy(things.entityType)
-      .orderBy(sql`count(*) DESC`);
-
     const byEntityType: Record<string, number> = {};
     for (const row of byEntityTypeRows) {
       if (row.entityType) byEntityType[row.entityType] = row.count;
+    }
+
+    const bySourceTable: Record<string, number> = {};
+    for (const row of bySourceTableRows) {
+      bySourceTable[row.sourceTable] = row.count;
     }
 
     return c.json({
       total,
       byType,
       byEntityType,
+      bySourceTable,
     });
   })
 
@@ -477,6 +483,7 @@ const thingsApp = new Hono()
       thing_type,
       entity_type,
       parent_id,
+      source_table,
       sort,
       order,
       limit,
@@ -488,6 +495,7 @@ const thingsApp = new Hono()
     if (thing_type) conditions.push(eq(things.thingType, thing_type));
     if (entity_type) conditions.push(eq(things.entityType, entity_type));
     if (parent_id) conditions.push(eq(things.parentThingId, parent_id));
+    if (source_table) conditions.push(eq(things.sourceTable, source_table));
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;

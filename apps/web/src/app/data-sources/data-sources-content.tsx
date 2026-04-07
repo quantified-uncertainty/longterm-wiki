@@ -1,69 +1,10 @@
 import {
   fetchDetailed,
   type RpcDataSourceListResult,
-  type RpcDataSource,
 } from "@/lib/wiki-server";
 import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
-import { resolveEntityName } from "@/lib/resolve-entity-name";
-import { DataSourcesTable, type DataSourceRow } from "./data-sources-table";
-import { computeFreshness } from "./freshness";
-
-// ---------------------------------------------------------------------------
-// Server-side enrichment
-// ---------------------------------------------------------------------------
-
-function enrichDataSources(sources: RpcDataSource[]): DataSourceRow[] {
-  return sources.map((s) => {
-    const publisher = s.publisherEntityId
-      ? resolveEntityName(s.publisherEntityId)
-      : null;
-    const freshness = computeFreshness(s.lastSnapshotAt, s.updateFrequency);
-    return {
-      id: s.id,
-      name: s.name,
-      dataFormat: s.dataFormat,
-      recordType: s.recordType,
-      publisherName: publisher?.name ?? null,
-      publisherHref: publisher?.href ?? null,
-      updateFrequency: s.updateFrequency,
-      lastSnapshotAt: s.lastSnapshotAt,
-      snapshotRecordCount: s.snapshotRecordCount,
-      sourceStatus: s.sourceStatus,
-      latestSnapshotHash: s.latestSnapshotHash,
-      freshness,
-    };
-  });
-}
-
-// ---------------------------------------------------------------------------
-// Stat card
-// ---------------------------------------------------------------------------
-
-function StatCard({
-  label,
-  value,
-  sub,
-  color,
-}: {
-  label: string;
-  value: string | number;
-  sub?: string;
-  color?: string;
-}) {
-  return (
-    <div className="rounded-lg border border-border/60 p-4">
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className={`text-2xl font-bold tabular-nums ${color ?? ""}`}>
-        {value}
-      </p>
-      {sub && <p className="text-xs text-muted-foreground mt-1">{sub}</p>}
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main content (server component)
-// ---------------------------------------------------------------------------
+import { DataSourcesTable } from "@/app/data-sources/data-sources-table";
+import { enrichDataSources, StatCard } from "@/app/data-sources/data-sources-shared";
 
 export async function DataSourcesContent() {
   const result = await fetchDetailed<RpcDataSourceListResult>(
@@ -110,7 +51,6 @@ export async function DataSourcesContent() {
 
   const rows = enrichDataSources(raw);
 
-  // Compute summary stats
   const totalSources = rows.length;
   const staleSources = rows.filter((r) => r.freshness === "overdue").length;
   const totalRecords = rows.reduce(

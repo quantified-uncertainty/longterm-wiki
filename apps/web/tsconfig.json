@@ -38,7 +38,8 @@
       "@wiki-server/political-scores-route": ["../wiki-server/src/routes/tablebase/political-scores.ts"],
       "@wiki-server/political-offices-route": ["../wiki-server/src/routes/tablebase/political-offices.ts"],
       "@wiki-server/political-votes-route": ["../wiki-server/src/routes/tablebase/political-votes.ts"],
-      "@wiki-server/campaign-finance-route": ["../wiki-server/src/routes/tablebase/campaign-finance.ts"]
+      "@wiki-server/campaign-finance-route": ["../wiki-server/src/routes/tablebase/campaign-finance.ts"],
+      "@wiki-server/resources-route": ["../wiki-server/src/routes/wikibase/resources.ts"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -51,7 +51,26 @@ const ByStakeholderQuery = z.object({
 
 // ---- Route ----
 
+const AllQuery = z.object({
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
 const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
+
+  // GET /all — paginated listing of all policy stakeholders
+  .get("/all", zv("query", AllQuery), async (c) => {
+    const { limit, offset } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    const rows = await db.select().from(policyStakeholders)
+      .limit(limit)
+      .offset(offset);
+
+    const [{ count: total }] = await db.select({ count: count() }).from(policyStakeholders);
+
+    return c.json({ policyStakeholders: rows, total, limit, offset });
+  })
 
   // GET /by-policy/:entityId — stakeholders for a specific policy
   .get("/by-policy/:entityId", resolveEntityId(), zv("query", ByPolicyQuery), async (c) => {

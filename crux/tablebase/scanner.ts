@@ -428,6 +428,115 @@ async function scanBenchmarkResultsCompleteness(prefetchedModels?: EntityListRes
 }
 
 // ---------------------------------------------------------------------------
+// Source quality scanner (unverifiable verdicts)
+// ---------------------------------------------------------------------------
+
+interface VerdictRow {
+  recordType: string;
+  recordId: string;
+  entityId: string | null;
+  displayName: string | null;
+  entityDisplayName: string | null;
+  verdict: string;
+  reasoning: string | null;
+}
+
+async function scanSourceQuality(): Promise<TableScanResult> {
+  // Fetch all unverifiable verdicts from the source-check API
+  const allVerdicts: VerdictRow[] = [];
+  let offset = 0;
+  const pageSize = 200;
+
+  while (true) {
+    const result = await apiRequest<{ verdicts: VerdictRow[]; total: number }>(
+      'GET',
+      `/api/source-checks/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
+    );
+    if (!result.ok) {
+      console.warn(`[tablebase] Failed to fetch unverifiable verdicts: ${result.message}`);
+      break;
+    }
+    allVerdicts.push(...result.data.verdicts);
+    if (allVerdicts.length >= result.data.total || result.data.verdicts.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  if (allVerdicts.length === 0) {
+    return {
+      table: 'source_quality',
+      totalEntities: 0,
+      entitiesWithRecords: 0,
+      totalRecords: 0,
+      avgCompleteness: 100,
+      profiles: [],
+    };
+  }
+
+  // Group by entityId
+  const byEntity = new Map<string, { count: number; displayName: string | null; entityType: string | null }>();
+  for (const v of allVerdicts) {
+    if (!v.entityId) continue;
+    const existing = byEntity.get(v.entityId);
+    if (existing) {
+      existing.count++;
+      // Prefer non-null display names
+      if (!existing.displayName && v.entityDisplayName) {
+        existing.displayName = v.entityDisplayName;
+      }
+    } else {
+      byEntity.set(v.entityId, { count: 1, displayName: v.entityDisplayName, entityType: null });
+    }
+  }
+
+  // Resolve missing entity names and entity types from the entities API
+  // Entity type is always missing (verdicts don't carry it), so look up all entities.
+  // This also fills in missing display names.
+  for (const [entityId, entry] of byEntity) {
+    const entityResult = await apiRequest<{ id: string; title: string; entityType: string }>(
+      'GET',
+      `/api/entities/${encodeURIComponent(entityId)}`,
+    );
+    if (entityResult.ok) {
+      if (!entry.displayName && entityResult.data.title) {
+        entry.displayName = entityResult.data.title;
+      }
+      if (entityResult.data.entityType) {
+        entry.entityType = entityResult.data.entityType;
+      }
+    }
+  }
+
+  const profiles: TableProfile[] = [];
+  for (const [entityId, { count, displayName, entityType }] of byEntity) {
+    // More unverifiable records = lower "completeness" (used as the gap signal)
+    // Cap at 20 — beyond that it's all high-priority (20 × 5 = 100)
+    const completeness = Math.max(0, 100 - count * 5);
+
+    profiles.push({
+      entityId,
+      entityName: displayName || entityId,
+      entityType: entityType || 'organization',
+      table: 'source_quality',
+      totalRecords: count,
+      completenessPercent: completeness,
+      missingFields: [`${count} record(s) with unverifiable sources`],
+      entityImportance: lookupImportance(entityId),
+    });
+  }
+
+  return {
+    table: 'source_quality',
+    totalEntities: profiles.length,
+    entitiesWithRecords: profiles.length,
+    totalRecords: allVerdicts.length,
+    avgCompleteness: profiles.length > 0
+      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
+      : 100,
+    profiles,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Full scan
 // ---------------------------------------------------------------------------
 
@@ -438,16 +547,21 @@ export async function runFullScan(): Promise<ScanSummary> {
     fetchEntitiesByType('ai-model'),
   ]);
 
-  const [grants, personnel, fundingRounds, investments, benchmarkResults] = await Promise.all([
+  const [grants, personnel, fundingRounds, investments, benchmarkResults, sourceQuality] = await Promise.all([
     scanGrantCompleteness(orgEntities),
     scanPersonnelCompleteness(orgEntities),
     scanFundingRoundsCompleteness(orgEntities),
     scanInvestmentsCompleteness(orgEntities),
     scanBenchmarkResultsCompleteness(modelEntities),
+    scanSourceQuality().catch((e: unknown) => {
+      // Source quality scanning is best-effort — wiki-server may not have source-check data
+      console.warn(`[tablebase] Source quality scan failed: ${e instanceof Error ? e.message : String(e)}`);
+      return { table: 'source_quality', totalEntities: 0, entitiesWithRecords: 0, totalRecords: 0, avgCompleteness: 100, profiles: [] } as TableScanResult;
+    }),
   ]);
 
   return {
-    tables: [grants, personnel, fundingRounds, investments, benchmarkResults],
+    tables: [grants, personnel, fundingRounds, investments, benchmarkResults, sourceQuality],
     timestamp: new Date().toISOString(),
   };
 }
@@ -459,6 +573,7 @@ export async function runTableScan(table: string): Promise<TableScanResult | nul
     case 'funding_rounds': case 'funding-rounds': return scanFundingRoundsCompleteness();
     case 'investments': return scanInvestmentsCompleteness();
     case 'benchmark_results': case 'benchmark-results': return scanBenchmarkResultsCompleteness();
+    case 'source_quality': case 'source-quality': return scanSourceQuality();
     default: return null;
   }
 }

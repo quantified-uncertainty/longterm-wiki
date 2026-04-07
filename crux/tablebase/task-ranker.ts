@@ -49,6 +49,7 @@ function tableToTaskType(table: string): TaskType | null {
     case 'funding_rounds': return 'funding-round-research';
     case 'investments': return 'investment-linking';
     case 'benchmark_results': return 'benchmark-result-fill';
+    case 'source_quality': return 'source-discovery';
     default: return null;
   }
 }

@@ -18,6 +18,8 @@ export interface AgentRunOptions {
   model?: string;
   /** Skip source-check before submitting records */
   skipSourceCheck?: boolean;
+  /** For source-discovery: also link discovered resources to records */
+  apply?: boolean;
 }
 
 /**
@@ -28,15 +30,15 @@ export async function runEnrichmentAgent(
   task: EnrichmentTask,
   options: AgentRunOptions = {},
 ): Promise<TaskResult> {
-  const { dryRun = false, model = MODELS.sonnet, skipSourceCheck = false } = options;
+  const { dryRun = false, model = MODELS.sonnet, skipSourceCheck = false, apply = false } = options;
   const startTime = Date.now();
   const tracker = new CostTracker();
 
   const client = createLlmClient();
   const systemPrompt = getSystemPrompt(task);
   const userPrompt = getUserPrompt(task);
-  const { tools: regularTools, serverTools } = getToolDefinitions();
-  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourceCheck });
+  const { tools: regularTools, serverTools } = getToolDefinitions({ taskType: task.taskType, apply });
+  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourceCheck, apply });
 
   let totalRecordsCreated = 0;
 
@@ -60,6 +62,9 @@ export async function runEnrichmentAgent(
       if (match) totalRecordsCreated += parseInt(match[1], 10);
       const dryMatch = result.match(/\[DRY RUN\] Would submit (\d+) records/);
       if (dryMatch) totalRecordsCreated += parseInt(dryMatch[1], 10);
+      // Track resources suggested (source-discovery)
+      if (toolName === 'suggest_resource' && result.includes('"resourceId"')) totalRecordsCreated++;
+      if (toolName === 'suggest_resource' && result.includes('[DRY RUN]')) totalRecordsCreated++;
     },
   });
 

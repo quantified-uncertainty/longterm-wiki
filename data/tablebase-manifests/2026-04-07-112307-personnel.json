@@ -1,0 +1,258 @@
+{
+  "table": "personnel",
+  "recordCount": 30,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-07T11:23:07.789Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 30,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "9ChvnWVTej",
+      "personId": "sid_1L32TlXi8G",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "COO",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "89Jmplyfdc",
+      "personId": "sid_n8tO6LS5Ky",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Head of AI Governance",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "2DBe9biErd",
+      "personId": "sid_xU6imWegov",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "CISO",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "4ZVHjSq1yI",
+      "personId": "sid_CSTvb4yAGB",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "7I9m50Hkdt",
+      "personId": "sid_sR1cHveHrs",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "hUhXeaAcP0",
+      "personId": "sid_RYtemLySnE",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "IhDrbSAiTv",
+      "personId": "sid_Yln2k8sDOQ",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "VmuyES063o",
+      "personId": "sid_yAjHvhK4q1",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "vknm9l1Rej",
+      "personId": "sid_59H2O9TZ25",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "5fAn57fqe2",
+      "personId": "sid_8EubcNKsiS",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "5ZnVLT0KNa",
+      "personId": "sid_1tCrGd7OPi",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "fLbdbyap34",
+      "personId": "sid_vqNhnZUZRN",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "hpAIFNkEQk",
+      "personId": "sid_Wf0quGGJpa",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "r4YTwXI2Mi",
+      "personId": "sid_waWB4F6AKe",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "wOdSv3dKFV",
+      "personId": "sid_H9ZPaakn7o",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "NtB0ktRPIw",
+      "personId": "sid_E1W9ilArKn",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "1NIDy2a8Ue",
+      "personId": "sid_xEtbMD8tej",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "oPVOS6IIsy",
+      "personId": "sid_S95H0fLo5j",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "NmIN9xOUFX",
+      "personId": "sid_Mdz3K5B54r",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "y22xQ2LCWX",
+      "personId": "sid_WkPrKkwljQ",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "SIFRaj4bl5",
+      "personId": "sid_Qnp9a7fp2j",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Policy Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "8HXxDAsqG1",
+      "personId": "sid_93Kwo93ooq",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Senior AI Governance Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "vP7CQuXybQ",
+      "personId": "sid_TjS8O7lVLB",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "AI Policy Researcher",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "OrxIkugOSo",
+      "personId": "sid_RhECbZnv5q",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Operations Generalist",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "qtNwDKRfYD",
+      "personId": "sid_Qs6de8XSC9",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "People & Operations Manager",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "kFa9WJqnJd",
+      "personId": "sid_ST2qFHVqCJ",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Senior Finance Manager",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "nB5DsVUYPX",
+      "personId": "sid_vdiBeD3SVi",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Advisor",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "VJlPM0p8xS",
+      "personId": "sid_uxFp3iKgeJ",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Advisor",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "3S9MCB9D3N",
+      "personId": "sid_lPByZwgBKC",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Advisor",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    },
+    {
+      "id": "ZFJjuK4qXc",
+      "personId": "sid_3rVnY5qWJW",
+      "organizationId": "sid_pKeaWwP6sQ",
+      "role": "Advisor",
+      "source": "https://www.apolloresearch.ai/team",
+      "verdict": "none"
+    }
+  ]
+}

@@ -1,0 +1,194 @@
+{
+  "table": "personnel",
+  "recordCount": 22,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-07T11:28:17.093Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 22,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "6zB4BuTaVU",
+      "personId": "sid_B4iti3XQ4n",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Managing Director",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "eC69Id9YdQ",
+      "personId": "sid_TH28kNwFLl",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Founder and President of the Board",
+      "source": "https://www.ali.fish/our-team/william-bench",
+      "verdict": "none"
+    },
+    {
+      "id": "n1xFTJSynj",
+      "personId": "sid_xyVOtF7Vog",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Director of Research and Impact",
+      "source": "https://www.ali.fish/our-team/tessa-gonzalez",
+      "verdict": "none"
+    },
+    {
+      "id": "uWTTlGlX6B",
+      "personId": "sid_v6e6iplavr",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Director of the Aquatic Animal Alliance",
+      "source": "https://www.ali.fish/our-team/catalina-lopez",
+      "verdict": "none"
+    },
+    {
+      "id": "4UAEpcs0Gf",
+      "personId": "sid_SOnZfGKnf4",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Head of Fisheries Welfare",
+      "source": "https://www.ali.fish/our-team/christine-xu",
+      "verdict": "none"
+    },
+    {
+      "id": "3DgghmtAPy",
+      "personId": "sid_SPEvRSFOrr",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Head of Global Policy",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "FvtG4Ko0vU",
+      "personId": "sid_JJcqcdmNVF",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Head of Corporate Engagement",
+      "source": "https://www.ali.fish/our-team/julia-seibel",
+      "verdict": "none"
+    },
+    {
+      "id": "LxDjlVSJqh",
+      "personId": "sid_BuixCPWNPs",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Development Lead",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "mMPUGVYB8n",
+      "personId": "sid_dmahnKWmJV",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Seafood Certification Lead",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "QqFv1zoPxS",
+      "personId": "sid_XnZxoJOBdo",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Strategic Communications Consultant",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "sWopuiqjS1",
+      "personId": "sid_0ir08bL0S1",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Communications & Design Lead",
+      "source": "https://www.ali.fish/our-team/melissa-de-miranda",
+      "verdict": "none"
+    },
+    {
+      "id": "QAnbOTT7jX",
+      "personId": "sid_npDE0zPNoE",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Research Advisor",
+      "source": "https://www.ali.fish/our-team/albin-grans",
+      "verdict": "none"
+    },
+    {
+      "id": "AP3trNn052",
+      "personId": "sid_9sedCbpwxP",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Policy Advisor",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "PIrXcGn6Zn",
+      "personId": "sid_b9BRSj81GG",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Strategic Advisor",
+      "source": "https://www.ali.fish/our-team/daniela-r-waldhorn",
+      "verdict": "none"
+    },
+    {
+      "id": "wQSHShs3a3",
+      "personId": "sid_v3AmLh9MIl",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Strategic Advisor",
+      "source": "https://www.ali.fish/our-team/elise-bernal",
+      "verdict": "none"
+    },
+    {
+      "id": "QMe7TcAh9Q",
+      "personId": "sid_ZLfcJZDbRP",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "DEIJ Advisor",
+      "source": "https://www.ali.fish/our-team/joshua-barr",
+      "verdict": "none"
+    },
+    {
+      "id": "ixqaaZ6vWT",
+      "personId": "sid_MMCfYS8Bbx",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Research Advisor",
+      "source": "https://www.ali.fish/our-team/lynne-sneddon",
+      "verdict": "none"
+    },
+    {
+      "id": "KOlO5rOPj7",
+      "personId": "sid_savfwVTvWR",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Strategic Marketing Consultant & Advisor",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "ZnrXog95KT",
+      "personId": "sid_TH28kNwFLl",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "President of the Board",
+      "source": "https://www.ali.fish/our-team/william-bench",
+      "verdict": "none"
+    },
+    {
+      "id": "61RZnfbEmJ",
+      "personId": "sid_vuVcdfGbsQ",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Board Member",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "bQY1Qwsd89",
+      "personId": "sid_jU86t1ueiH",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Board Member",
+      "source": "https://www.ali.fish/about",
+      "verdict": "none"
+    },
+    {
+      "id": "l4TQbKwzK6",
+      "personId": "sid_8rhA93t21k",
+      "organizationId": "sid_NDTZImcMyY",
+      "role": "Communications Advisor",
+      "source": "https://www.ali.fish/our-team/ana-bradley",
+      "verdict": "none"
+    }
+  ]
+}
