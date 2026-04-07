@@ -226,8 +226,7 @@ export async function verifyBeforeSubmit(
       }
 
       // Record passed source-check — attach source-check data
-      // Note: field name "verification" matches the wiki-server API schema (InlineSourceCheckSchema)
-      record.verification = sourceCheck;
+      record.sourceCheck = sourceCheck;
       accepted.push(record);
     } catch (err: unknown) {
       // LLM call failed — include the record but log the error
