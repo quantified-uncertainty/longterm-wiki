@@ -6,7 +6,7 @@ import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 
 export interface AiModelRow {
@@ -31,6 +31,7 @@ export interface AiModelRow {
   isFamily: boolean;
   openWeight: boolean | null;
   parameterCount: string | null;
+  verdictString: string | null;
 }
 
 type SortKey =
@@ -397,17 +398,20 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                 </td>
                 {/* Coverage */}
                 <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeAiModelCoverage({
-                    developer: row.developer,
-                    releaseDate: row.releaseDate,
-                    inputPrice: row.inputPrice,
-                    outputPrice: row.outputPrice,
-                    contextWindow: row.contextWindow,
-                    parameterCount: row.parameterCount,
-                    safetyLevel: row.safetyLevel,
-                    benchmarkCount: [row.mmluScore, row.gpqaScore, row.sweBenchScore].filter((s) => s != null).length,
-                    wikiId: row.wikiId,
-                  })} />
+                  <RecordStatusDots
+                    coverageScore={computeAiModelCoverage({
+                      developer: row.developer,
+                      releaseDate: row.releaseDate,
+                      inputPrice: row.inputPrice,
+                      outputPrice: row.outputPrice,
+                      contextWindow: row.contextWindow,
+                      parameterCount: row.parameterCount,
+                      safetyLevel: row.safetyLevel,
+                      benchmarkCount: [row.mmluScore, row.gpqaScore, row.sweBenchScore].filter((s) => s != null).length,
+                      wikiId: row.wikiId,
+                    })}
+                    verdict={row.verdictString}
+                  />
                 </td>
               </tr>
             ))}
