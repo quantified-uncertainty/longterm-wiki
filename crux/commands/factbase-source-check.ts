@@ -240,7 +240,9 @@ export async function storeSourceCheckResult(result: SourceCheckResult): Promise
     extractedValue: result.extractedValue,
     reasoning: result.reasoning,
     isPrimarySource: true,
-    checkerModel: 'claude-3-haiku',
+    // PR #4020 review M1: was 'claude-3-haiku' (a non-existent model string)
+    // — must match MODELS.haiku used in verifySingleFact above.
+    checkerModel: MODELS.haiku,
   }, '[fb-source-check]');
 
   // Also store aggregate verdict so re-runs update the displayed verdict.

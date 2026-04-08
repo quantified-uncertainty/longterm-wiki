@@ -87,6 +87,12 @@ interface RecheckSummary {
   rechecked: number;
   changed: number;
   errors: number;
+  /**
+   * Number of items where the recheck verdict was computed but the storage
+   * call failed. The verdict was lost — re-run after the underlying issue is
+   * fixed. Drives a non-zero exit code. Issue #4017.
+   */
+  storageErrors: number;
   estimatedCost: number;
   verdictChanges: Array<{ recordType: string; recordId: string; from: string; to: string }>;
   byVerdict: Record<string, number>;
@@ -316,6 +322,7 @@ async function recheckCommand(
     rechecked: 0,
     changed: 0,
     errors: 0,
+    storageErrors: 0,
     estimatedCost,
     verdictChanges: [],
     byVerdict: {},
@@ -364,22 +371,28 @@ async function recheckCommand(
           : '\x1b[33m';
       console.log(`    ${color}${result.newVerdict}\x1b[0m (confidence: ${(result.confidence * 100).toFixed(0)}%)${changeMarker}`);
 
-      // Store result (best-effort)
-      await storeRecheckResult(result).catch((e: unknown) => {
+      // Issue #4017: storage failure must surface, not be silently swallowed.
+      try {
+        await storeRecheckResult(result);
+      } catch (e: unknown) {
+        summary.storageErrors++;
         console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-      });
+      }
     }
   }
 
   // ── Build summary output ──
+  // Storage errors mean primary-data writes were lost — non-zero exit even
+  // if no verdict changes were detected. Issue #4017.
+  const exitCode = summary.changed > 0 || summary.storageErrors > 0 ? 1 : 0;
   if (options.ci) {
     return {
-      exitCode: summary.changed > 0 ? 1 : 0,
+      exitCode,
       output: JSON.stringify(summary),
     };
   }
 
-  return { exitCode: 0, output: formatSummaryOutput(summary) };
+  return { exitCode, output: formatSummaryOutput(summary) };
 }
 
 // ── Output formatting ────────────────────────────────────────────────
@@ -472,6 +485,11 @@ function formatSummaryOutput(summary: RecheckSummary): string {
   lines.push(`Total due:      ${summary.totalDue}`);
   lines.push(`Rechecked:      ${summary.rechecked}`);
   lines.push(`Errors:         ${summary.errors}`);
+  if (summary.storageErrors > 0) {
+    lines.push(
+      `\x1b[31mStorage errors: ${summary.storageErrors} verdict(s) computed but NOT persisted to wiki-server. Re-run after the underlying issue is fixed (issue #4017).\x1b[0m`,
+    );
+  }
   lines.push(`Est. cost:      \$${summary.estimatedCost.toFixed(2)}`);
   lines.push('');
 

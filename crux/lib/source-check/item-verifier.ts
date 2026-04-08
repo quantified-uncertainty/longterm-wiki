@@ -357,67 +357,89 @@ export async function verifySingleItem(
 // ── Result storage ───────────────────────────────────────────────────
 
 export async function storeResult(item: VerifyItem, result: VerifyResult): Promise<void> {
+  // PR #4020 hardening: storeSourceCheckEvidence now throws on failure (was
+  // silently log-and-resolve). We must NOT let an evidence-storage throw skip
+  // the subsequent storeAggregateVerdict call — operators rely on the
+  // aggregate verdicts table to display the most recent check result, and
+  // dropping it would silently revert the displayed verdict to whatever stale
+  // state existed before. Catch evidence errors locally, attempt the aggregate
+  // verdict regardless, then re-throw the first error so the caller still
+  // surfaces the failure (via the existing .catch in orchestrator.ts etc.).
+  let firstError: unknown = null;
+
   if (item.data.kind === 'fact') {
     const factId = (item.data as FactItemData).fact.id;
 
-    await storeSourceCheckEvidence({
-      recordType: 'fact',
-      recordId: factId,
-      sourceUrl: result.sourceUrl,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      extractedValue: result.extractedValue,
-      reasoning: result.reasoning,
-      isPrimarySource: true,
-      checkerModel: result.checkerModel,
-    }, '[source-check]');
+    try {
+      await storeSourceCheckEvidence({
+        recordType: 'fact',
+        recordId: factId,
+        sourceUrl: result.sourceUrl,
+        verdict: result.verdict,
+        confidence: result.confidence,
+        extractedValue: result.extractedValue,
+        reasoning: result.reasoning,
+        isPrimarySource: true,
+        checkerModel: result.checkerModel,
+      }, '[source-check]');
+    } catch (e: unknown) {
+      firstError = e;
+    }
 
     // Store aggregate verdict for facts too — ensures the most recent
     // check result is reflected in the verdicts table, fixing stale
     // contradictions that persisted after re-checks confirmed data.
-    await storeAggregateVerdict({
-      recordType: 'fact',
-      recordId: factId,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      reasoning: result.reasoning,
-      sourcesChecked: 1,
-    }, '[source-check]').catch((e: unknown) => {
-      console.warn(`[source-check] Failed to store fact verdict: ${e instanceof Error ? e.message : String(e)}`);
-    });
+    try {
+      await storeAggregateVerdict({
+        recordType: 'fact',
+        recordId: factId,
+        verdict: result.verdict,
+        confidence: result.confidence,
+        reasoning: result.reasoning,
+        sourcesChecked: 1,
+      }, '[source-check]');
+    } catch (e: unknown) {
+      if (firstError === null) firstError = e;
+    }
   } else if (item.data.kind === 'record') {
     const recordData = item.data as RecordItemData;
 
-    // Store individual source-check evidence
-    await storeSourceCheckEvidence({
-      recordType: recordData.recordType,
-      recordId: recordData.recordId,
-      sourceUrl: result.sourceUrl,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      extractedValue: result.extractedValue,
-      reasoning: result.reasoning,
-      entityId: recordData.entityId,
-      checkerModel: result.checkerModel,
-    }, '[source-check]');
+    try {
+      await storeSourceCheckEvidence({
+        recordType: recordData.recordType,
+        recordId: recordData.recordId,
+        sourceUrl: result.sourceUrl,
+        verdict: result.verdict,
+        confidence: result.confidence,
+        extractedValue: result.extractedValue,
+        reasoning: result.reasoning,
+        entityId: recordData.entityId,
+        checkerModel: result.checkerModel,
+      }, '[source-check]');
+    } catch (e: unknown) {
+      firstError = e;
+    }
 
-    // Store aggregate verdict
-    await storeAggregateVerdict({
-      recordType: recordData.recordType,
-      recordId: recordData.recordId,
-      verdict: result.verdict,
-      confidence: result.confidence,
-      reasoning: result.reasoning,
-      sourcesChecked: 1,
-      entityId: recordData.entityId,
-      displayName: recordData.displayName,
-      entityDisplayName: recordData.entityDisplayName,
-    }, '[source-check]').catch((e: unknown) => {
-      console.warn(`[source-check] Failed to store record verdict: ${e instanceof Error ? e.message : String(e)}`);
-    });
+    try {
+      await storeAggregateVerdict({
+        recordType: recordData.recordType,
+        recordId: recordData.recordId,
+        verdict: result.verdict,
+        confidence: result.confidence,
+        reasoning: result.reasoning,
+        sourcesChecked: 1,
+        entityId: recordData.entityId,
+        displayName: recordData.displayName,
+        entityDisplayName: recordData.entityDisplayName,
+      }, '[source-check]');
+    } catch (e: unknown) {
+      if (firstError === null) firstError = e;
+    }
   }
   // Entity-type source-checks are logged but not stored in a specific endpoint
-  // since they are discovery-based (web search) rather than source-based
+  // since they are discovery-based (web search) rather than source-based.
+
+  if (firstError !== null) throw firstError;
 }
 
 // Re-export MODELS so orchestrator.ts can use it without importing from index

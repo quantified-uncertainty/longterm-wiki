@@ -74,6 +74,55 @@ function formatFact(f: typeof facts.$inferSelect) {
 }
 
 /**
+ * True if a row's `format` declares a numeric value but the underlying
+ * column(s) are NULL — i.e. the row is malformed and cannot be rendered as
+ * a number/range/min without coercing NULL→0. Issue #4017.
+ *
+ * Used by `/by-entity` and `/timeseries` to skip malformed rows from the
+ * response (matching the `/export` behavior). The PR #4020 review found that
+ * the original fix only filtered in `/export`, leaving the other two routes
+ * exposing the same silent-zero bug.
+ */
+function isMalformedNumericRow(row: typeof facts.$inferSelect): boolean {
+  if (row.format === "number" || row.format === "min") {
+    return row.numeric == null;
+  }
+  if (row.format === "range") {
+    return row.low == null || row.high == null;
+  }
+  return false;
+}
+
+/**
+ * Filter raw fact rows to exclude malformed numeric rows, logging the count.
+ * Returns the filtered list. Used by routes that return raw rows to clients.
+ */
+function filterMalformedRows(
+  rows: Array<typeof facts.$inferSelect>,
+  logContext: string,
+): typeof rows {
+  let skipped = 0;
+  const kept = rows.filter((r) => {
+    if (isMalformedNumericRow(r)) {
+      skipped++;
+      logger.warn(
+        { factId: r.factId, entityId: r.entityId, format: r.format, logContext },
+        `[facts] Skipping malformed numeric row`
+      );
+      return false;
+    }
+    return true;
+  });
+  if (skipped > 0) {
+    logger.warn(
+      { skipped, total: rows.length, logContext },
+      `[facts] ${logContext}: skipped ${skipped} malformed row(s)`
+    );
+  }
+  return kept;
+}
+
+/**
  * Reconstruct a FactValue discriminated union from flat PG columns.
  *
  * Exported for testing — not part of the public API.
@@ -276,11 +325,16 @@ const factsApp = new Hono()
       .orderBy(asc(facts.asOf))
       .limit(limit);
 
+    // Issue #4017: drop malformed numeric rows so consumers don't see
+    // ghost zeros from NULL columns. The original PR only filtered in
+    // `/export`; this filter was added in PR #4020 review.
+    const cleanRows = filterMalformedRows(rows, "/timeseries");
+
     return c.json({
       entityId,
       measure,
-      points: rows.map(formatFact),
-      total: rows.length,
+      points: cleanRows.map(formatFact),
+      total: cleanRows.length,
     });
   })
 
@@ -313,9 +367,15 @@ const factsApp = new Hono()
       .where(whereClause);
     const total = countResult[0].count;
 
+    // Issue #4017: drop malformed numeric rows from the response. Note that
+    // `total` still reflects the database total (including malformed rows) so
+    // pagination consumers don't get stuck — see facts.test.ts for the
+    // documented contract.
+    const cleanRows = filterMalformedRows(rows, "/by-entity");
+
     return c.json({
       entityId,
-      facts: rows.map(formatFact),
+      facts: cleanRows.map(formatFact),
       total,
       limit,
       offset,

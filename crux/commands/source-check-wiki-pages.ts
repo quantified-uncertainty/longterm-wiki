@@ -732,6 +732,7 @@ async function sourceCheckWikiPagesCommand(
       totalOutdated,
       totalPartial,
       totalErrors,
+      totalStorageErrors,
       estimatedCost,
     }),
   };
@@ -803,6 +804,7 @@ function formatSummaryOutput(
     totalOutdated: number;
     totalPartial: number;
     totalErrors: number;
+    totalStorageErrors: number;
     estimatedCost: number;
   },
 ): string {
@@ -820,6 +822,11 @@ function formatSummaryOutput(
   lines.push(`\x1b[33mOutdated:         ${totals.totalOutdated}\x1b[0m`);
   lines.push(`Unverifiable:     ${totals.totalUnverifiable}`);
   lines.push(`Errors:           ${totals.totalErrors}`);
+  if (totals.totalStorageErrors > 0) {
+    lines.push(
+      `\x1b[31mStorage errors:   ${totals.totalStorageErrors} verdict(s) computed but NOT persisted to wiki-server. Re-run after the underlying issue is fixed (issue #4017).\x1b[0m`,
+    );
+  }
   lines.push('');
 
   // Per-page breakdown
