@@ -26,7 +26,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
-    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect', 'engine'],
+    passthrough: ['ci', 'tier', 'type', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect', 'engine', 'grep', 'files'],
     positional: true,
   },
   regrade: {

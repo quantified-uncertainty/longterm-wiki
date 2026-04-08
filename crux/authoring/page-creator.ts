@@ -40,6 +40,7 @@ import { checkForExistingPage } from './creator/duplicate-detection.ts';
 import { findCanonicalLinks } from './creator/canonical-links.ts';
 import { runPerplexityResearch, runScryResearch } from './creator/research.ts';
 import { registerResearchSources, fetchRegisteredSources, processDirections, loadSourceFile } from './creator/source-fetching.ts';
+import { runCodebaseAnalysis } from './creator/codebase-analysis.ts';
 import { runSynthesis } from './creator/synthesis.ts';
 import { runSourceCheck } from './creator/source-check.ts';
 import { ensureComponentImports, runValidationLoop, runFullValidation } from './creator/validation.ts';
@@ -102,6 +103,24 @@ function ensureDir(dirPath: string): void {
 
 const log = createPhaseLogger();
 
+/**
+ * Extract all values for a repeated CLI flag from argv.
+ * Supports both --flag=value and --flag value formats.
+ */
+function extractRepeatedFlag(argv: string[], flagName: string): string[] {
+  const values: string[] = [];
+  const prefix = `--${flagName}=`;
+  const exact = `--${flagName}`;
+  for (let i = 0; i < argv.length; i++) {
+    if (argv[i].startsWith(prefix)) {
+      values.push(argv[i].slice(prefix.length));
+    } else if (argv[i] === exact && i + 1 < argv.length && !argv[i + 1].startsWith('--')) {
+      values.push(argv[i + 1]);
+    }
+  }
+  return values;
+}
+
 function getTopicDir(topic: string): string {
   const sanitized = topic.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   return path.join(TEMP_DIR, sanitized);
@@ -138,7 +157,7 @@ interface PipelineResults {
   totalCost: number;
 }
 
-async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null, destPath: string | null = null, apiDirect: boolean = false): Promise<PipelineResults> {
+async function runPipeline(topic: string, tier: string = 'standard', directions: string | null = null, sourceFilePath: string | null = null, destPath: string | null = null, apiDirect: boolean = false, pageType: string | null = null, grepPatterns: string[] = [], fileGlobs: string[] = []): Promise<PipelineResults> {
   const config = TIERS[tier];
   if (!config) {
     console.error(`Unknown tier: ${tier}`);
@@ -157,6 +176,15 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
     phases.splice(canonicalIdx + 1, 0, 'load-source-file');
   }
 
+  // When --type=internal-reference is used, inject codebase-analysis before synthesis
+  if (pageType === 'internal-reference') {
+    // Find the first synthesis phase
+    const synthIdx = phases.findIndex(p => p.startsWith('synthesize'));
+    if (synthIdx !== -1) {
+      phases.splice(synthIdx, 0, 'codebase-analysis');
+    }
+  }
+
   console.log(`\n${'='.repeat(60)}`);
   console.log(`Page Creator - Cost Optimized`);
   console.log(`${'='.repeat(60)}`);
@@ -171,10 +199,19 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
   if (directions) {
     console.log(`Directions: ${directions.slice(0, 80)}${directions.length > 80 ? '...' : ''}`);
   }
+  if (pageType) {
+    console.log(`Type: ${pageType}`);
+  }
+  if (grepPatterns.length > 0) {
+    console.log(`Grep patterns: ${grepPatterns.join(', ')}`);
+  }
+  if (fileGlobs.length > 0) {
+    console.log(`File globs: ${fileGlobs.join(', ')}`);
+  }
   console.log(`Phases: ${phases.join(' → ')}`);
   console.log(`${'='.repeat(60)}\n`);
 
-  const pipelineContext: { directions: string | null; sourceFilePath: string | null } = { directions, sourceFilePath };
+  const pipelineContext: { directions: string | null; sourceFilePath: string | null; grepPatterns: string[]; fileGlobs: string[] } = { directions, sourceFilePath, grepPatterns, fileGlobs };
   const ctx = createContext();
 
   const results: PipelineResults = {
@@ -199,6 +236,10 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
 
         case 'load-source-file':
           result = await loadSourceFile(topic, pipelineContext.sourceFilePath!, ctx);
+          break;
+
+        case 'codebase-analysis':
+          result = await runCodebaseAnalysis(topic, pipelineContext.grepPatterns, pipelineContext.fileGlobs, ROOT, ctx);
           break;
 
         case 'canonical-links':
@@ -344,10 +385,13 @@ Usage:
 
 Options:
   --tier <tier>            Quality tier: budget, standard, premium (default: standard)
+  --type <type>            Page type: internal-reference (adds codebase analysis phase)
   --source-file <path>     Use a local file as research input (skips web research phases)
   --dest <path>            Deploy to content path (e.g., knowledge-base/people)
   --create-category <name> Create new category with index.mdx
   --directions <text>      Context, source URLs, and editorial guidance (see below)
+  --grep <pattern>         Codebase grep pattern (repeatable; used with --type=internal-reference)
+  --files <glob>           File glob pattern to include (repeatable; used with --type=internal-reference)
   --phase <phase>          Run a single phase only (for resuming/testing)
   --force                  Skip duplicate page check (create even if similar page exists)
   --api-direct             Use Anthropic API directly instead of spawning Claude CLI subprocess
@@ -373,6 +417,7 @@ Destination Examples:
 Phases:
   canonical-links       Find Wikipedia, LessWrong, EA Forum, official sites
   load-source-file      Load local file as research input (used with --source-file)
+  codebase-analysis     Search codebase for patterns and read files (used with --type=internal-reference)
   research-perplexity   Perplexity web research
   register-sources      Register citation URLs in knowledge database
   fetch-sources         Fetch actual page content via Firecrawl
@@ -395,6 +440,7 @@ Examples:
   node crux/authoring/page-creator.ts "Some Event" --dest knowledge-base/incidents --create-category "Incidents"
   node crux/authoring/page-creator.ts "SecureBio" --source-file ./reports/securebio-analysis.md
   node crux/authoring/page-creator.ts "SecureBio" --source-file ./notes.txt --directions "Focus on policy"
+  node crux/authoring/page-creator.ts "Page Creator" --type=internal-reference --grep "runPipeline" --grep "CreatorContext" --files "crux/authoring/creator/*.ts"
 `);
 }
 
@@ -416,6 +462,12 @@ async function main(): Promise<void> {
   const sourceFilePath: string | null = parsed['source-file'] ? path.resolve(parsed['source-file'] as string) : null;
   const createCategoryLabel: string | null = (parsed['create-category'] as string) || null;
   const forceCreate: boolean = parsed.force === true;
+  const pageType: string | null = (parsed.type as string) || null;
+
+  // --grep and --files can be passed multiple times. parseCliArgs overwrites on
+  // repeated keys, so extract all occurrences directly from argv.
+  const grepPatterns: string[] = extractRepeatedFlag(args, 'grep');
+  const fileGlobs: string[] = extractRepeatedFlag(args, 'files');
 
   // API-direct mode: use Anthropic API instead of spawning Claude CLI subprocess.
   // Auto-detects if --api-direct not explicitly set.
@@ -497,6 +549,9 @@ async function main(): Promise<void> {
         }
         result = await loadSourceFile(topic, sourceFilePath, ctx);
         break;
+      case 'codebase-analysis':
+        result = await runCodebaseAnalysis(topic, grepPatterns, fileGlobs, ROOT, ctx);
+        break;
       case 'canonical-links':
         result = await findCanonicalLinks(topic, ctx);
         break;
@@ -547,7 +602,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  await runPipeline(topic, tier, directions, sourceFilePath, destPath, apiDirect);
+  await runPipeline(topic, tier, directions, sourceFilePath, destPath, apiDirect, pageType, grepPatterns, fileGlobs);
 
   // Resource ref validation on the generated content
   const finalPath = path.join(getTopicDir(topic), 'final.mdx');
