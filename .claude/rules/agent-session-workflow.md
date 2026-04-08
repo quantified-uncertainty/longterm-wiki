@@ -6,20 +6,29 @@ Every session that involves writing or changing code MUST follow this workflow.
 
 Always work on a `claude/short-description` branch. Never commit directly to `main`.
 
-### CI-fix dedup check (when triggered by a CI failure, not a GitHub issue)
+### Duplicate work prevention (ALL sessions, not just CI fixes)
 
-Before creating a branch to fix a CI failure, check for existing fix attempts:
+Before creating a branch, check if someone is already working on the same thing:
 
 ```bash
-# Check if someone is already working on this
+# If working on a GitHub issue — check for agent:working label and open PRs
+pnpm crux gh issues search "is:open label:agent:working <ISSUE_NUM>"
+# Check for open PRs that close the same issue
+pnpm crux gh pr detect  # or search manually:
+gh pr list -R quantified-uncertainty/longterm-wiki --search "head:claude/" --state open --json number,title,headRefName --jq '.[] | "\(.number)\t\(.headRefName)\t\(.title)"'
+```
+
+```bash
+# If fixing a CI failure — check for existing fix PRs
 gh pr list -R quantified-uncertainty/longterm-wiki --search "head:claude/fix-" --state open --json number,title,headRefName --jq '.[] | "\(.number)\t\(.headRefName)\t\(.title)"'
 ```
 
-If an open PR already targets the same failure, do NOT create a competing branch. Instead either:
+**If an open PR or active session already targets the same issue/failure**, do NOT create a competing branch. Instead:
 - Comment on the existing PR with your findings, or
-- Wait for it to resolve
+- Wait for it to resolve, or
+- Ask the user whether to proceed
 
-This prevents the duplicate-work pattern where multiple agents independently race to fix the same trivial CI break, wasting CI runs and creating abandoned PRs (e.g., 7 competing PRs for a single 5-line test fix on 2026-04-03).
+This prevents duplicate-work waste: 13 competing PRs for a single test fix (2026-04-03), two independent PRs for the same issue #3983 (2026-04-07), and two competing 242-file renames for issue #4001 (2026-04-07).
 
 ## Step 1: Session Start — BEFORE taking any action
 

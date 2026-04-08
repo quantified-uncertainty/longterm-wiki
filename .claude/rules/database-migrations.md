@@ -21,6 +21,21 @@ If a migration fails at startup, the server starts in **degraded mode** instead 
 
 The post-deploy smoke test checks for `status === "healthy"`, so a degraded server will correctly fail the smoke test and prevent the bad image from receiving traffic.
 
+## Before adding columns or tables — check for redundancy
+
+Before writing a migration that adds new columns, FK relationships, or tables, **grep the existing schema** for related data:
+
+```bash
+# Search the Drizzle schema for related column names
+rg 'resourceId|source_resource' apps/wiki-server/src/db/schema.ts
+# Check if a join table already links these entities
+rg 'entity.*resource|resource.*entity' apps/wiki-server/src/db/schema.ts
+```
+
+If similar data already exists (e.g., a join table that links records to resources via a different path), **do not add a redundant column**. Instead, use the existing relationship or propose consolidation in a Discussion first.
+
+Incident context: In April 2026, `sourceResourceId` FK columns were added to 5 tables (migration 0165), wired into all sync APIs across 4 PRs, given a backfill script and monitoring dashboard — then removed entirely (migration 0166) one day later because `source_check_evidence.resourceId` already linked the same data. ~1,100 lines of churn across 6 PRs.
+
 ## Adding unique constraints — MANDATORY pattern
 
 **Never hardcode specific duplicate IDs in migrations.** Use dynamic dedup with `ROW_NUMBER()` window functions to find and remove ALL duplicates, including ones created after the migration was written.
