@@ -1483,14 +1483,14 @@ export const statements = pgTable(
       .notNull()
       .references(() => entities.id, { onDelete: "cascade" }),
     propertyId: text("property_id").references(() => properties.id, {
-      onDelete: "set null",
+      onDelete: "restrict",
     }),
     // --- Typed value columns (structured variety) ---
     valueNumeric: doublePrecision("value_numeric"),
     valueUnit: text("value_unit"), // e.g., "USD", "percent" — display hint
     valueText: text("value_text"),
     valueEntityId: text("value_entity_id").references(() => entities.id, {
-      onDelete: "set null",
+      onDelete: "restrict",
     }),
     valueDate: date("value_date"),
     valueSeries: jsonb("value_series"), // { low, high } for ranges
@@ -1784,14 +1784,14 @@ export const personnel = pgTable(
     /** FK to entities.stable_id for the person. Null when unresolved. */
     personEntityId: text("person_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when person doesn't have an entity. */
     personDisplayName: text("person_display_name"),
     /** FK to entities.stable_id for the organization. Null when unresolved. */
     orgEntityId: text("org_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when org doesn't have an entity. */
     orgDisplayName: text("org_display_name"),
@@ -1844,14 +1844,14 @@ export const grants = pgTable(
     /** FK to entities.stable_id for the grantor organization. Null when unresolved. */
     orgEntityId: text("org_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when grantor org doesn't have an entity. */
     orgDisplayName: text("org_display_name"),
     /** FK to entities.stable_id for the grantee. Null when unresolved. */
     granteeEntityId: text("grantee_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when grantee doesn't have an entity. */
     granteeDisplayName: text("grantee_display_name"),
