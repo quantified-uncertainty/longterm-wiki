@@ -5,10 +5,24 @@
  * The source-check logic itself is tested via integration with the command handler.
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { commands } from './factbase.ts';
 
 const sourceCheck = commands['source-check'];
+
+// ---------------------------------------------------------------------------
+// Mock verdict-handler so storeSourceCheckResult tests don't hit the wiki-server.
+// Issue #4017 — ensure the command goes through storeSourceCheckEvidence
+// (which auto-resolves resourceId) instead of the raw storeEvidence RPC.
+// ---------------------------------------------------------------------------
+
+const mockStoreSourceCheckEvidence = vi.fn<(...args: unknown[]) => Promise<void>>(async () => {});
+const mockStoreAggregateVerdict = vi.fn<(...args: unknown[]) => Promise<void>>(async () => {});
+
+vi.mock('../lib/source-check/verdict-handler.ts', () => ({
+  storeSourceCheckEvidence: (...args: unknown[]) => mockStoreSourceCheckEvidence(...args),
+  storeAggregateVerdict: (...args: unknown[]) => mockStoreAggregateVerdict(...args),
+}));
 
 describe('crux fb source-check --dry-run', () => {
   it('lists facts to verify for a specific entity', async () => {
@@ -107,5 +121,75 @@ describe('crux fb source-check --dry-run', () => {
       expect(fact.source).toBeTruthy();
       expect(fact.source).toMatch(/^https?:\/\//);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// storeSourceCheckResult — issue #4017
+// ---------------------------------------------------------------------------
+
+describe('storeSourceCheckResult (issue #4017)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockStoreSourceCheckEvidence.mockImplementation(async () => {});
+    mockStoreAggregateVerdict.mockImplementation(async () => {});
+  });
+
+  it('routes through storeSourceCheckEvidence with sourceUrl so resourceId can be auto-resolved', async () => {
+    // Re-import after mocks are set up
+    const { storeSourceCheckResult } = await import('./factbase-source-check.ts');
+
+    await storeSourceCheckResult({
+      factId: 'f_abc1234567',
+      entityId: 'sid_anthropic',
+      entityName: 'Anthropic',
+      propertyId: 'revenue',
+      propertyName: 'Revenue',
+      formattedValue: '$3B',
+      sourceUrl: 'https://example.com/anthropic-revenue',
+      verdict: 'confirmed',
+      confidence: 0.9,
+      extractedValue: '$3 billion',
+      reasoning: 'Confirmed by source',
+    });
+
+    expect(mockStoreSourceCheckEvidence).toHaveBeenCalledOnce();
+    const args = mockStoreSourceCheckEvidence.mock.calls[0][0] as {
+      sourceUrl: string;
+      recordType: string;
+      recordId: string;
+      verdict: string;
+    };
+    // Critical: sourceUrl is forwarded — verdict-handler will look up the
+    // matching resourceId via lookupResourceByUrl(). The previous direct
+    // storeEvidence RPC call didn't pass enough info for auto-resolution.
+    expect(args.sourceUrl).toBe('https://example.com/anthropic-revenue');
+    expect(args.recordType).toBe('fact');
+    expect(args.recordId).toBe('f_abc1234567');
+    expect(args.verdict).toBe('confirmed');
+
+    expect(mockStoreAggregateVerdict).toHaveBeenCalledOnce();
+  });
+
+  it('propagates storage failure as a thrown error', async () => {
+    const { storeSourceCheckResult } = await import('./factbase-source-check.ts');
+
+    mockStoreSourceCheckEvidence.mockRejectedValueOnce(new Error('wiki-server down'));
+
+    await expect(
+      storeSourceCheckResult({
+        factId: 'f_xyz',
+        entityId: 'sid_x',
+        entityName: 'X',
+        propertyId: 'revenue',
+        propertyName: 'Revenue',
+        formattedValue: '$1B',
+        sourceUrl: 'https://example.com',
+        verdict: 'confirmed',
+        confidence: 0.9,
+        extractedValue: '$1 billion',
+        reasoning: 'ok',
+      }),
+    ).rejects.toThrow(/wiki-server down/);
   });
 });

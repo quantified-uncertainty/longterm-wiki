@@ -116,6 +116,13 @@ export interface OrchestrationSummary {
   errors: number;
   /** Number of items skipped because source URL is dead (subset of unverifiable) */
   deadLinks: number;
+  /**
+   * Number of items where the verdict was computed but the storage call
+   * (storeSourceCheckEvidence/storeAggregateVerdict) failed. The verdict
+   * was lost — operators should re-run the check after the underlying
+   * issue is fixed. Drives a non-zero exit code. Issue #4017.
+   */
+  storageErrors: number;
   estimatedCost: number;
   actualVerified: number;
   byKind: Record<VerifyItemKind, { total: number; verified: number }>;

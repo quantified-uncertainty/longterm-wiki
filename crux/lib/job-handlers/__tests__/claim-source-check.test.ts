@@ -58,8 +58,9 @@ vi.mock('../../wiki-server/citations.ts', () => ({
 // Mock: source-check evidence storage
 // ---------------------------------------------------------------------------
 
+const mockStoreSourceCheckEvidence = vi.fn<(...args: unknown[]) => Promise<void>>(async () => {});
 vi.mock('../../source-check/verdict-handler.ts', () => ({
-  storeSourceCheckEvidence: vi.fn(async () => {}),
+  storeSourceCheckEvidence: (...args: unknown[]) => mockStoreSourceCheckEvidence(...args),
 }));
 
 // ---------------------------------------------------------------------------
@@ -149,6 +150,7 @@ function llmResponse(results: Array<{
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockStoreSourceCheckEvidence.mockImplementation(async () => {});
 });
 
 describe('handleClaimSource-Check — LLM output validation', () => {
@@ -277,6 +279,57 @@ describe('handleClaimSource-Check — LLM output validation', () => {
       expect(v!.status).toBe('unverifiable');
       expect(v!.reasoning).toContain('LLM omitted this claim');
     }
+  });
+
+  // Issue #4017 — evidence storage failures must mark the job as failed.
+  it('returns failure when evidence storage throws (issue #4017)', async () => {
+    const claims = [makeClaim(7), makeClaim(8)];
+    setupStandardMocks(claims);
+
+    // First storeSourceCheckEvidence call rejects, second succeeds.
+    mockStoreSourceCheckEvidence
+      .mockRejectedValueOnce(new Error('wiki-server unreachable'))
+      .mockResolvedValueOnce(undefined);
+
+    mockCallLlm.mockResolvedValueOnce({
+      text: llmResponse([
+        { claimId: 7, verdict: 'confirmed' },
+        { claimId: 8, verdict: 'confirmed' },
+      ]),
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await handleClaimSourceCheck(makeParams([7, 8]), CTX);
+    warnSpy.mockRestore();
+
+    // The job is marked failed because at least one evidence row was lost,
+    // even though the verdicts table was updated successfully.
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('evidence');
+    const data = result.data as { evidenceStorageFailures: number };
+    expect(data.evidenceStorageFailures).toBe(1);
+
+    // Both evidence calls should still have been attempted (no early exit).
+    expect(mockStoreSourceCheckEvidence).toHaveBeenCalledTimes(2);
+  });
+
+  it('marks job failed when ALL evidence storage calls throw (issue #4017)', async () => {
+    const claims = [makeClaim(11)];
+    setupStandardMocks(claims);
+
+    mockStoreSourceCheckEvidence.mockRejectedValue(new Error('connection refused'));
+
+    mockCallLlm.mockResolvedValueOnce({
+      text: llmResponse([{ claimId: 11, verdict: 'confirmed' }]),
+    });
+
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const result = await handleClaimSourceCheck(makeParams([11]), CTX);
+    warnSpy.mockRestore();
+
+    expect(result.success).toBe(false);
+    const data = result.data as { evidenceStorageFailures: number };
+    expect(data.evidenceStorageFailures).toBe(1);
   });
 
   it('returns failure when verdict write fails', async () => {

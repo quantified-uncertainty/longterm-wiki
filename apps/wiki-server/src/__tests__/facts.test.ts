@@ -274,6 +274,37 @@ function seedFact(
   });
 }
 
+/**
+ * Inject a row directly into the in-memory store, bypassing the sync endpoint
+ * validation. Used to seed legacy/corrupt rows that the new write-time
+ * superRefine would reject — e.g. format=number with numeric=null. Issue #4017.
+ */
+function injectRawRow(row: Record<string, unknown>) {
+  const key = factKey(row.entity_id as string, row.fact_id as string);
+  const now = new Date();
+  factsStore.set(key, {
+    id: nextId++,
+    label: null,
+    value: null,
+    numeric: null,
+    low: null,
+    high: null,
+    as_of: null,
+    valid_end: null,
+    currency: null,
+    measure: null,
+    subject: null,
+    note: null,
+    source: null,
+    format: null,
+    format_divisor: null,
+    synced_at: now,
+    created_at: now,
+    updated_at: now,
+    ...row,
+  });
+}
+
 // ---- Tests ----
 
 describe("Facts API", () => {
@@ -362,6 +393,69 @@ describe("Facts API", () => {
       const body = await res.json();
       expect(body.error).toBe("invalid_json");
     });
+
+    // Issue #4017 — numeric formats with NULL columns previously got
+    // silently coerced to 0 on read. Reject them at the write boundary.
+    it("rejects format=number with null numeric (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-number",
+            value: "unknown",
+            numeric: null,
+            format: "number",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects format=min with null numeric (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-min",
+            value: "≥unknown",
+            numeric: null,
+            format: "min",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects format=range with null low/high (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-range",
+            value: "?",
+            low: null,
+            high: null,
+            format: "range",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("accepts format=number with explicit zero (real zero is not null)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "real-zero",
+            value: "0",
+            numeric: 0,
+            format: "number",
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+    });
   });
 
   // ---- By Entity ----
@@ -391,6 +485,39 @@ describe("Facts API", () => {
       const body = await res.json();
       expect(body.facts).toHaveLength(0);
       expect(body.total).toBe(0);
+    });
+
+    // PR #4020 review H3 — the original PR only filtered malformed rows in
+    // /export, leaving /by-entity exposed. Inject a legacy row directly
+    // (bypassing the sync endpoint, which now rejects these via superRefine).
+    it("filters out legacy malformed numeric rows (issue #4017 H3)", async () => {
+      // Two valid rows + one malformed (format=number, numeric=null)
+      injectRawRow({ entity_id: "anthropic", fact_id: "valid-1", numeric: 100, format: "number" });
+      injectRawRow({ entity_id: "anthropic", fact_id: "bad-malformed", numeric: null, format: "number" });
+      injectRawRow({ entity_id: "anthropic", fact_id: "valid-2", numeric: 200, format: "number" });
+
+      const res = await app.request("/api/facts/by-entity/anthropic");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      // The malformed row is filtered from the response
+      expect(body.facts).toHaveLength(2);
+      expect(body.facts.map((f: { factId: string }) => f.factId).sort()).toEqual(["valid-1", "valid-2"]);
+
+      // total still reflects the database total (3) — pagination consumers
+      // need this contract so they don't hang waiting for more pages
+      expect(body.total).toBe(3);
+    });
+
+    it("filters malformed range rows from /by-entity", async () => {
+      injectRawRow({ entity_id: "anthropic", fact_id: "valid-range", low: 10, high: 20, format: "range" });
+      injectRawRow({ entity_id: "anthropic", fact_id: "bad-range-no-low", low: null, high: 20, format: "range" });
+      injectRawRow({ entity_id: "anthropic", fact_id: "bad-range-no-high", low: 10, high: null, format: "range" });
+
+      const res = await app.request("/api/facts/by-entity/anthropic");
+      const body = await res.json();
+      expect(body.facts).toHaveLength(1);
+      expect(body.facts[0].factId).toBe("valid-range");
     });
   });
 
@@ -427,6 +554,43 @@ describe("Facts API", () => {
       const body = await res.json();
       expect(body.error).toBe("validation_error");
       expect(body.message).toBeDefined();
+    });
+
+    // PR #4020 review H3 — same fix as /by-entity, applied to /timeseries
+    it("filters out legacy malformed numeric rows (issue #4017 H3)", async () => {
+      injectRawRow({
+        entity_id: "anthropic",
+        fact_id: "rev-q1",
+        numeric: 1000000000,
+        format: "number",
+        as_of: "2025-01",
+        measure: "revenue",
+      });
+      injectRawRow({
+        entity_id: "anthropic",
+        fact_id: "rev-bad",
+        numeric: null,
+        format: "number",
+        as_of: "2025-04",
+        measure: "revenue",
+      });
+      injectRawRow({
+        entity_id: "anthropic",
+        fact_id: "rev-q2",
+        numeric: 4000000000,
+        format: "number",
+        as_of: "2025-06",
+        measure: "revenue",
+      });
+
+      const res = await app.request("/api/facts/timeseries/anthropic?measure=revenue");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.points).toHaveLength(2);
+      // total reflects the FILTERED count for /timeseries (not the DB count)
+      // because the route doesn't run a separate count query
+      expect(body.total).toBe(2);
+      expect(body.points.map((p: { factId: string }) => p.factId).sort()).toEqual(["rev-q1", "rev-q2"]);
     });
   });
 

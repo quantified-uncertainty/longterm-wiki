@@ -74,13 +74,88 @@ function formatFact(f: typeof facts.$inferSelect) {
 }
 
 /**
- * Reconstruct a FactValue discriminated union from flat PG columns.
- * Exported for testing — not part of the public API.
+ * True if a row's `format` declares a numeric value but the underlying
+ * column(s) are NULL — i.e. the row is malformed and cannot be rendered as
+ * a number/range/min without coercing NULL→0. Issue #4017.
+ *
+ * Used by `/by-entity` and `/timeseries` to skip malformed rows from the
+ * response (matching the `/export` behavior). The PR #4020 review found that
+ * the original fix only filtered in `/export`, leaving the other two routes
+ * exposing the same silent-zero bug.
  */
-export function reconstructFactValue(row: typeof facts.$inferSelect) {
+function isMalformedNumericRow(row: typeof facts.$inferSelect): boolean {
+  if (row.format === "number" || row.format === "min") {
+    return row.numeric == null;
+  }
+  if (row.format === "range") {
+    return row.low == null || row.high == null;
+  }
+  return false;
+}
+
+/**
+ * Filter raw fact rows to exclude malformed numeric rows, logging the count.
+ * Returns the filtered list. Used by routes that return raw rows to clients.
+ */
+function filterMalformedRows(
+  rows: Array<typeof facts.$inferSelect>,
+  logContext: string,
+): typeof rows {
+  let skipped = 0;
+  const kept = rows.filter((r) => {
+    if (isMalformedNumericRow(r)) {
+      skipped++;
+      logger.warn(
+        { factId: r.factId, entityId: r.entityId, format: r.format, logContext },
+        `[facts] Skipping malformed numeric row`
+      );
+      return false;
+    }
+    return true;
+  });
+  if (skipped > 0) {
+    logger.warn(
+      { skipped, total: rows.length, logContext },
+      `[facts] ${logContext}: skipped ${skipped} malformed row(s)`
+    );
+  }
+  return kept;
+}
+
+/**
+ * Reconstruct a FactValue discriminated union from flat PG columns.
+ *
+ * Exported for testing — not part of the public API.
+ *
+ * Returns `null` for malformed rows (numeric formats with NULL columns) so
+ * the caller can skip them from the response. Previously these were silently
+ * coerced to `value: 0`, making "0 employees" indistinguishable from missing
+ * data. The YAML loader never produces such rows, so when they appear in PG
+ * they indicate corrupt or legacy data — see issue #4017.
+ */
+export function reconstructFactValue(
+  row: typeof facts.$inferSelect
+):
+  | { type: "number"; value: number }
+  | { type: "text"; value: string }
+  | { type: "date"; value: string }
+  | { type: "boolean"; value: boolean }
+  | { type: "ref"; value: string }
+  | { type: "refs"; value: string[] }
+  | { type: "range"; low: number; high: number }
+  | { type: "min"; value: number }
+  | { type: "json"; value: unknown }
+  | null {
   switch (row.format) {
     case "number":
-      return { type: "number" as const, value: row.numeric ?? 0 };
+      if (row.numeric == null) {
+        logger.warn(
+          { factId: row.factId, entityId: row.entityId, format: row.format },
+          `[reconstructFactValue] number-format fact has NULL numeric column — skipping row`
+        );
+        return null;
+      }
+      return { type: "number" as const, value: row.numeric };
     case "text":
       return { type: "text" as const, value: row.value ?? "" };
     case "date":
@@ -92,9 +167,23 @@ export function reconstructFactValue(row: typeof facts.$inferSelect) {
     case "refs":
       return { type: "refs" as const, value: row.value ? row.value.split(", ") : [] };
     case "range":
-      return { type: "range" as const, low: row.low ?? 0, high: row.high ?? 0 };
+      if (row.low == null || row.high == null) {
+        logger.warn(
+          { factId: row.factId, entityId: row.entityId, format: row.format, low: row.low, high: row.high },
+          `[reconstructFactValue] range-format fact has NULL low/high column — skipping row`
+        );
+        return null;
+      }
+      return { type: "range" as const, low: row.low, high: row.high };
     case "min":
-      return { type: "min" as const, value: row.numeric ?? 0 };
+      if (row.numeric == null) {
+        logger.warn(
+          { factId: row.factId, entityId: row.entityId, format: row.format },
+          `[reconstructFactValue] min-format fact has NULL numeric column — skipping row`
+        );
+        return null;
+      }
+      return { type: "min" as const, value: row.numeric };
     case "json":
       if (row.value == null) return { type: "json" as const, value: null };
       try {
@@ -118,13 +207,18 @@ export function reconstructFactValue(row: typeof facts.$inferSelect) {
 /**
  * Convert a PG facts row into the KB Fact shape used by SerializedKB.
  * Omits `unit` (comes from Property) and `derivedFrom` (display-only, not stored in PG).
+ *
+ * Returns `null` when the underlying row is malformed (e.g. number-format fact
+ * with a NULL numeric column). Callers must filter null entries from the response.
  */
 function pgRowToFact(row: typeof facts.$inferSelect) {
+  const value = reconstructFactValue(row);
+  if (value == null) return null;
   return {
     id: row.factId,
     subjectId: row.entityId,
     propertyId: row.measure ?? "",
-    value: reconstructFactValue(row),
+    value,
     ...(row.asOf != null && { asOf: row.asOf }),
     ...(row.validEnd != null && { validEnd: row.validEnd }),
     ...(row.source != null && { source: row.source }),
@@ -231,11 +325,16 @@ const factsApp = new Hono()
       .orderBy(asc(facts.asOf))
       .limit(limit);
 
+    // Issue #4017: drop malformed numeric rows so consumers don't see
+    // ghost zeros from NULL columns. The original PR only filtered in
+    // `/export`; this filter was added in PR #4020 review.
+    const cleanRows = filterMalformedRows(rows, "/timeseries");
+
     return c.json({
       entityId,
       measure,
-      points: rows.map(formatFact),
-      total: rows.length,
+      points: cleanRows.map(formatFact),
+      total: cleanRows.length,
     });
   })
 
@@ -268,9 +367,15 @@ const factsApp = new Hono()
       .where(whereClause);
     const total = countResult[0].count;
 
+    // Issue #4017: drop malformed numeric rows from the response. Note that
+    // `total` still reflects the database total (including malformed rows) so
+    // pagination consumers don't get stuck — see facts.test.ts for the
+    // documented contract.
+    const cleanRows = filterMalformedRows(rows, "/by-entity");
+
     return c.json({
       entityId,
-      facts: rows.map(formatFact),
+      facts: cleanRows.map(formatFact),
       total,
       limit,
       offset,
@@ -314,16 +419,30 @@ const factsApp = new Hono()
       const total = countResult[0].count;
 
       const grouped: Record<string, object[]> = {};
+      let skippedMalformed = 0;
       for (const row of rows) {
         const fact = pgRowToFact(row);
+        // pgRowToFact returns null for malformed rows (e.g. format=number with
+        // numeric=NULL). Skip them rather than emitting fake { value: 0 }.
+        // The warning is logged inside reconstructFactValue.
+        if (fact == null) {
+          skippedMalformed++;
+          continue;
+        }
         if (!grouped[row.entityId]) grouped[row.entityId] = [];
         grouped[row.entityId].push(fact);
+      }
+      if (skippedMalformed > 0) {
+        logger.warn(
+          { skippedMalformed, totalRows: rows.length },
+          `[facts/export] Skipped ${skippedMalformed} malformed fact row(s) — see warnings above`
+        );
       }
 
       return c.json({
         facts: grouped,
         total,
-        returned: rows.length,
+        returned: rows.length - skippedMalformed,
         limit,
         offset,
         entities: Object.keys(grouped).length,
