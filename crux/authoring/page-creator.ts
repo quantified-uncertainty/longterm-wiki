@@ -385,13 +385,13 @@ Usage:
 
 Options:
   --tier <tier>            Quality tier: budget, standard, premium (default: standard)
-  --type <type>            Page type: internal-reference (adds codebase analysis phase)
+  --type <type>            Page type: internal-reference (adds codebase analysis phase, V1 only)
   --source-file <path>     Use a local file as research input (skips web research phases)
   --dest <path>            Deploy to content path (e.g., knowledge-base/people)
   --create-category <name> Create new category with index.mdx
   --directions <text>      Context, source URLs, and editorial guidance (see below)
-  --grep <pattern>         Codebase grep pattern (repeatable; used with --type=internal-reference)
-  --files <glob>           File glob pattern to include (repeatable; used with --type=internal-reference)
+  --grep <pattern>         Codebase grep pattern (repeatable; V1 only, used with --type=internal-reference)
+  --files <glob>           File glob pattern to include (repeatable; V1 only, used with --type=internal-reference)
   --phase <phase>          Run a single phase only (for resuming/testing)
   --force                  Skip duplicate page check (create even if similar page exists)
   --api-direct             Use Anthropic API directly instead of spawning Claude CLI subprocess
@@ -491,6 +491,11 @@ async function main(): Promise<void> {
   // V2 orchestrator engine — short-circuit before the V1 pipeline
   const engine = parsed.engine as string | undefined;
   if (engine === 'v2' && !singlePhase) {
+    // --type, --grep, --files are V1-only (codebase analysis phase); warn if passed with V2
+    if (pageType || grepPatterns.length > 0 || fileGlobs.length > 0) {
+      console.warn('Warning: --type, --grep, and --files flags are only supported on the V1 pipeline.');
+      console.warn('         These flags will be ignored with --engine=v2. Remove --engine=v2 to use them.');
+    }
     await runOrchestratorCreate(topic, {
       tier: (tier as 'budget' | 'standard' | 'premium') || 'standard',
       directions: directions || '',
