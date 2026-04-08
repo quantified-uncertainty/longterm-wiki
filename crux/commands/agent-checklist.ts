@@ -26,6 +26,8 @@ import {
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from '../lib/wiki-server/agent-sessions.ts';
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
+import { syncToMain } from '../lib/git.ts';
+import { commands as issuesCommands } from './issues.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -43,6 +45,11 @@ interface CommandOptions extends BaseOptions {
   type?: string;
   issue?: string;
   reason?: string;
+  /** Skip the sync-to-main step. Used by tests and by scripted callers that
+   *  intentionally want to start a session on the current branch. */
+  noSync?: boolean;
+  /** Skip the auto-call to `gh issues start <N>`. Used by tests. */
+  noIssueStart?: boolean;
 }
 
 interface GitHubIssueResponse {
@@ -109,6 +116,28 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     return { output: `${c.red}Usage: crux sys agent-checklist init "Task" --type=X | --issue=N${c.reset}\n`, exitCode: 1 };
   }
 
+  // ── Sync to main ──────────────────────────────────────────────────────────
+  // Programmatic replacement for the old "Step 0: sync with main" instructions
+  // in /agent-init. Always runs unless explicitly opted out via --no-sync.
+  // If the working tree is dirty, this aborts BEFORE writing the checklist —
+  // the user must commit/stash/discard before retrying.
+  let syncOutput = '';
+  if (!options.noSync) {
+    const sync = syncToMain();
+    if (!sync.ok) {
+      return {
+        output:
+          `${c.red}✗ Failed to sync to main:${c.reset}\n${sync.error}\n\n` +
+          `${c.dim}If you intentionally want to start a session on the current branch ` +
+          `(e.g. continuing work after a crash), re-run with --no-sync.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    for (const step of sync.steps) {
+      syncOutput += `  ${c.dim}↻${c.reset} ${step}\n`;
+    }
+  }
+
   const branch = currentBranch();
   const worktree = PROJECT_ROOT;
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue };
@@ -173,8 +202,41 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     // Best-effort
   }
 
+  // ── Auto-call `gh issues start <N>` ───────────────────────────────────────
+  // Programmatic replacement for the old "Step 2: signal start on issue"
+  // instructions in /agent-init. Best-effort: failure here (e.g. GitHub down,
+  // wiki-server down, label conflict) does NOT fail the init — the local
+  // checklist is already on disk and that's the important state.
+  let issueStartOutput = '';
+  if (issue && !options.noIssueStart) {
+    try {
+      const startResult = await issuesCommands.start(
+        [String(issue)],
+        { ci: options.ci },
+      );
+      if (startResult.exitCode === 0) {
+        issueStartOutput = startResult.output;
+      } else {
+        issueStartOutput =
+          `${c.yellow}⚠ Auto-start of issue #${issue} returned non-zero exit:${c.reset}\n` +
+          startResult.output +
+          `${c.dim}(checklist created locally; you may want to run ` +
+          `\`crux gh issues start ${issue}\` manually)${c.reset}\n`;
+      }
+    } catch (e) {
+      issueStartOutput =
+        `${c.yellow}⚠ Could not signal start on issue #${issue}: ` +
+        `${e instanceof Error ? e.message : String(e)}${c.reset}\n` +
+        `${c.dim}(checklist created locally)${c.reset}\n`;
+    }
+  }
+
   const status = parseChecklist(markdown);
-  let output = `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
+  let output = '';
+  if (syncOutput) {
+    output += `${c.bold}Synced to main${c.reset}\n${syncOutput}\n`;
+  }
+  output += `${c.green}✓${c.reset} Agent checklist created: ${c.cyan}.claude/wip-checklist.md${c.reset}\n`;
   output += `  Type: ${c.bold}${type}${c.reset}\n`;
   output += `  Task: ${task}\n`;
   output += `  Branch: ${c.cyan}${branch}${c.reset}\n`;
@@ -184,9 +246,39 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
-  output += `\n${c.dim}Run \`crux sys agent-checklist status\` to check progress.${c.reset}\n`;
+  if (issueStartOutput) output += `\n${issueStartOutput}`;
+
+  // Render the full checklist so callers don't need a separate `status` call.
+  output += `\n${renderChecklistItems(status, c)}`;
 
   return { output, exitCode: 0 };
+}
+
+/**
+ * Render the checklist items as colored text. Shared between `init` and `status`
+ * so they format identically.
+ */
+function renderChecklistItems(
+  s: ReturnType<typeof parseChecklist>,
+  c: ReturnType<typeof createLogger>['colors'],
+): string {
+  const pct = s.totalItems > 0 ? Math.round((s.totalChecked / s.totalItems) * 100) : 0;
+  const color = s.allPassing ? c.green : pct >= 50 ? c.yellow : c.red;
+  let output = `${c.bold}Session Checklist${c.reset} ${color}${s.totalChecked}/${s.totalItems} (${pct}%)${c.reset}\n\n`;
+
+  for (const item of s.items) {
+    const isAdvisory = CHECKLIST_ITEMS.find(ci => ci.id === item.id)?.priority === 'advisory';
+    const prefix = isAdvisory ? `${c.dim}(advisory)${c.reset} ` : '';
+    if (item.status === 'checked') output += `  ${c.green}[x]${c.reset} ${prefix}${item.label}\n`;
+    else if (item.status === 'na') output += `  ${c.dim}[~] ${prefix}${item.label} (N/A${item.naReason ? `: ${item.naReason}` : ''})${c.reset}\n`;
+    else output += `  ${c.red}[ ]${c.reset} ${prefix}${item.label}\n`;
+  }
+
+  if (s.decisions.length > 0) {
+    output += `\n${c.bold}Key Decisions (${s.decisions.length}):${c.reset}\n`;
+    for (const d of s.decisions) output += `  ${c.cyan}-${c.reset} ${d}\n`;
+  }
+  return output;
 }
 
 async function status(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -204,24 +296,7 @@ async function status(_args: string[], options: CommandOptions): Promise<Command
     return { output: JSON.stringify({ totalChecked: s.totalChecked, totalItems: s.totalItems, allPassing: s.allPassing, decisions: s.decisions }, null, 2), exitCode: 0 };
   }
 
-  const pct = s.totalItems > 0 ? Math.round((s.totalChecked / s.totalItems) * 100) : 0;
-  const color = s.allPassing ? c.green : pct >= 50 ? c.yellow : c.red;
-  let output = `${c.bold}Session Checklist${c.reset} ${color}${s.totalChecked}/${s.totalItems} (${pct}%)${c.reset}\n\n`;
-
-  for (const item of s.items) {
-    const isAdvisory = CHECKLIST_ITEMS.find(ci => ci.id === item.id)?.priority === 'advisory';
-    const prefix = isAdvisory ? `${c.dim}(advisory)${c.reset} ` : '';
-    if (item.status === 'checked') output += `  ${c.green}[x]${c.reset} ${prefix}${item.label}\n`;
-    else if (item.status === 'na') output += `  ${c.dim}[~] ${prefix}${item.label} (N/A${item.naReason ? `: ${item.naReason}` : ''})${c.reset}\n`;
-    else output += `  ${c.red}[ ]${c.reset} ${prefix}${item.label}\n`;
-  }
-
-  if (s.decisions.length > 0) {
-    output += `\n${c.bold}Key Decisions (${s.decisions.length}):${c.reset}\n`;
-    for (const d of s.decisions) output += `  ${c.cyan}-${c.reset} ${d}\n`;
-  }
-
-  return { output, exitCode: 0 };
+  return { output: renderChecklistItems(s, c), exitCode: 0 };
 }
 
 async function complete(_args: string[], options: CommandOptions): Promise<CommandResult> {
