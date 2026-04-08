@@ -86,6 +86,26 @@ interface AgentActivityRow {
   completed_this_week: number;
 }
 
+/** Map raw SQL snake_case row to camelCase for API consistency with Drizzle-returned rows. */
+function formatIncidentRow(row: Record<string, unknown>) {
+  return {
+    id: row.id as number,
+    service: row.service as string,
+    severity: row.severity as string,
+    status: row.status as string,
+    title: row.title as string,
+    detail: row.detail as string | null,
+    detectedAt: row.detected_at as string,
+    resolvedAt: row.resolved_at as string | null,
+    resolvedBy: row.resolved_by as string | null,
+    checkSource: row.check_source as string | null,
+    metadata: row.metadata as Record<string, unknown> | null,
+    githubIssueNumber: row.github_issue_number as number | null,
+    createdAt: row.created_at as string,
+    updatedAt: row.updated_at as string,
+  };
+}
+
 const monitoringApp = new Hono()
   // ---- GET /status — aggregated system health ----
   .get("/status", async (c) => {
@@ -346,57 +366,42 @@ const monitoringApp = new Hono()
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     const d = parsed.data;
-    const db = getDrizzleDb();
+    const pgClient = getDb();
 
-    // Check for existing open incident for same service+title (dedup)
-    const existing = await db
-      .select({ id: serviceHealthIncidents.id })
-      .from(serviceHealthIncidents)
-      .where(
-        and(
-          eq(serviceHealthIncidents.service, d.service),
-          eq(serviceHealthIncidents.title, d.title),
-          eq(serviceHealthIncidents.status, "open")
-        )
-      )
-      .limit(1);
+    // Atomic upsert: INSERT or update existing open incident for same service+title.
+    // Uses the partial unique index idx_shi_open_service_title to avoid the TOCTOU
+    // race that existed in the previous SELECT-then-INSERT approach.
+    const rows = await pgClient.unsafe(
+      `INSERT INTO service_health_incidents
+         (service, severity, title, detail, check_source, metadata, github_issue_number)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (service, title) WHERE status = 'open'
+       DO UPDATE SET
+         detail = COALESCE($4, service_health_incidents.detail),
+         metadata = COALESCE($6, service_health_incidents.metadata),
+         updated_at = NOW()
+       RETURNING *`,
+      [
+        d.service,
+        d.severity,
+        d.title,
+        d.detail ?? null,
+        d.checkSource ?? null,
+        d.metadata ? JSON.stringify(d.metadata) : null,
+        d.githubIssueNumber ?? null,
+      ]
+    );
 
-    if (existing.length > 0) {
-      // Update existing instead of creating duplicate
-      const updated = await db
-        .update(serviceHealthIncidents)
-        .set({
-          detail: d.detail ?? undefined,
-          metadata: d.metadata ?? undefined,
-          updatedAt: new Date(),
-        })
-        .where(eq(serviceHealthIncidents.id, existing[0].id))
-        .returning();
-      return c.json(firstOrThrow(updated, "incident dedup update"), 200);
+    if (rows.length === 0) {
+      return c.json({ error: "Failed to insert or update incident" }, 500);
     }
 
-    const inserted = await db
-      .insert(serviceHealthIncidents)
-      .values({
-        service: d.service,
-        severity: d.severity,
-        title: d.title,
-        detail: d.detail ?? null,
-        checkSource: d.checkSource ?? null,
-        metadata: d.metadata ?? null,
-        githubIssueNumber: d.githubIssueNumber ?? null,
-      })
-      .returning();
+    const row = rows[0] as Record<string, unknown>;
+    // Determine if this was an insert (created_at === updated_at) or a dedup update
+    const wasInsert =
+      String(row.created_at) === String(row.updated_at);
 
-    const incident = firstOrThrow(inserted, "incident insert");
-
-    // Note: Previously created a "monitoring-alert" job for critical incidents,
-    // but no job handler exists for this type — every such job permanently failed
-    // with "Unknown job type: monitoring-alert". Removed in #2193.
-    // The incident is already recorded in service_health_incidents and the
-    // groundskeeper handles alerting via GitHub issues and Discord.
-
-    return c.json(incident, 201);
+    return c.json(formatIncidentRow(row), wasInsert ? 201 : 200);
   })
 
   // ---- PATCH /incidents/:id — update/resolve ----

@@ -102,17 +102,7 @@ const idsApp = new Hono()
     const { slug, description } = parsed.data;
     const db = getDrizzleDb();
 
-    // Check if slug already exists (avoids burning a sequence value on conflict)
-    const existing = await db
-      .select()
-      .from(entityIds)
-      .where(eq(entityIds.slug, slug));
-
-    if (existing.length > 0) {
-      return c.json(formatIdResponse(existing[0], false));
-    }
-
-    // Slug is new — allocate next sequence value + stable ID
+    // Try to allocate — if slug already exists, ON CONFLICT DO NOTHING returns []
     const inserted = await db
       .insert(entityIds)
       .values({
@@ -128,21 +118,21 @@ const idsApp = new Hono()
       return c.json(formatIdResponse(inserted[0], true), 201);
     }
 
-    // Race condition: another request inserted between our SELECT and INSERT.
-    // Re-fetch the existing row.
-    const raced = await db
+    // Slug already exists — return existing allocation
+    const [existing] = await db
       .select()
       .from(entityIds)
       .where(eq(entityIds.slug, slug));
 
-    if (raced.length === 0) {
+    if (!existing) {
+      // Should not happen — slug was just confirmed to exist via conflict
       return c.json(
-        { error: "internal_error", message: "Unexpected: slug not found after conflict" },
+        { error: "internal_error", message: "Race condition in ID allocation" },
         500
       );
     }
 
-    return c.json(formatIdResponse(raced[0], false));
+    return c.json(formatIdResponse(existing, false));
   })
 
   // ---- POST /allocate-batch ----
@@ -160,17 +150,7 @@ const idsApp = new Hono()
     // Run all allocations in a single transaction
     await db.transaction(async (tx) => {
       for (const item of items) {
-        // Check existence first to avoid burning sequence values
-        const existing = await tx
-          .select()
-          .from(entityIds)
-          .where(eq(entityIds.slug, item.slug));
-
-        if (existing.length > 0) {
-          results.push(formatIdResponse(existing[0], false));
-          continue;
-        }
-
+        // Try to allocate — if slug already exists, ON CONFLICT DO NOTHING returns []
         const inserted = await tx
           .insert(entityIds)
           .values({
@@ -185,14 +165,13 @@ const idsApp = new Hono()
         if (inserted.length > 0) {
           results.push(formatIdResponse(inserted[0], true));
         } else {
-          // Race condition: another request inserted between our SELECT and INSERT.
-          // Re-fetch the existing row.
-          const raced = await tx
+          // Slug already exists — return existing allocation
+          const [existing] = await tx
             .select()
             .from(entityIds)
             .where(eq(entityIds.slug, item.slug));
-          if (raced.length > 0) {
-            results.push(formatIdResponse(raced[0], false));
+          if (existing) {
+            results.push(formatIdResponse(existing, false));
           }
         }
       }
