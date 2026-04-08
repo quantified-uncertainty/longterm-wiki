@@ -606,10 +606,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const sourceCheckError = enforceSourceCheck(c, "grants", items);
     if (sourceCheckError) return sourceCheckError;
 
-    // Validate entity FK references (organizationId, granteeId)
+    // Validate entity FK references for organizationId only.
+    // granteeId is a LEGACY field that can hold either an entity ID or a
+    // display name string (grant-import falls back to granteeName when no
+    // entity match is found). Validating it would reject ~thousands of
+    // grants with display-name granteeIds. The real entity FK is
+    // granteeEntityId, which is validated by resolveEntityFKs downstream.
     const refError = await validateEntityRefs(c, db, [
       { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
-      { fieldName: "granteeId", ids: items.map((i) => i.granteeId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 

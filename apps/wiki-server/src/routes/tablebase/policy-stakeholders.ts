@@ -122,9 +122,11 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    // Validate policyEntityId only. stakeholderEntityId is optional and may
+    // reference entities not yet synced to PG (build-data explicitly expects
+    // some to be missing — wiki-server-data.mjs has fallback logic for this).
     const refError = await validateEntityRefs(c, db, [
       { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
-      { fieldName: "stakeholderEntityId", ids: items.map((i) => i.stakeholderEntityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 
