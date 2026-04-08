@@ -23,9 +23,24 @@ import { formatKBFactValue } from "@/components/wiki/factbase/format";
 export const revalidate = 3600;
 export const dynamicParams = true;
 
-/** Strip internal machine-readable tags like [deterministic-row-match] from user-visible text. */
+/** Known internal machine-readable tags that appear as leading prefixes in reasoning/notes
+ *  text written by source-check pipelines. Restricted to a closed set so that legitimate
+ *  bracketed content inside the body (e.g. "[USD]", "[2024]") is preserved. */
+const INTERNAL_TAG_NAMES = [
+  "deterministic-row-match",
+  "dead_link",
+  "archive",
+  "skip",
+] as const;
+const INTERNAL_TAG_PREFIX_RE = new RegExp(
+  `^(?:\\[(?:${INTERNAL_TAG_NAMES.join("|")})(?:[^\\]]*)?\\]\\s*)+`
+);
+
+/** Strip known internal machine-readable tags (e.g. [deterministic-row-match]) from the
+ *  start of user-visible text. Only leading tags are stripped; bracketed content elsewhere
+ *  in the string is preserved. */
 function stripInternalTags(text: string): string {
-  return text.replace(/^\[[\w-]+\]\s*/g, "").replace(/\s*\[[\w-]+\]\s*/g, " ").trim();
+  return text.replace(INTERNAL_TAG_PREFIX_RE, "").trim();
 }
 
 /** Format a single JSON value for display in a key-value summary. */
@@ -381,6 +396,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         c.verdict,
         c.expectedValue ?? "",
         c.extractedValue ?? "",
+        c.extractedQuote ?? "",
         (c.notes ?? "").slice(0, 100),
       ].join("::");
       const existing = seen.get(dedupeKey);
@@ -650,8 +666,12 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                         <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                       </a>
                       {(() => {
-                        const ds = inferDataSource(sourceUrl);
-                        const rid = checks.find((c) => c.resourceId)?.resourceId ?? ds?.resourceId;
+                        // inferDataSource() is grant-specific — only use its resourceId fallback
+                        // on grant record pages to avoid leaking grant resources into other types.
+                        const ds = recordType === "grant" ? inferDataSource(sourceUrl) : null;
+                        const rid =
+                          checks.find((c) => c.resourceId)?.resourceId ??
+                          (recordType === "grant" ? ds?.resourceId : undefined);
                         return (
                           <>
                             {ds && (
