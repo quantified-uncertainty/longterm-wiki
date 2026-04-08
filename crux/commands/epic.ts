@@ -998,6 +998,7 @@ export function parseAgentProjectMeta(body: string): AgentProjectMeta | null {
   if (!match) return null;
 
   const meta: AgentProjectMeta = {};
+  let hasRecognizedKey = false;
   for (const line of match[1].split('\n')) {
     const kv = line.match(/^\s*(\w[\w_]*):\s*(.+?)\s*$/);
     if (!kv) continue;
@@ -1007,15 +1008,15 @@ export function parseAgentProjectMeta(body: string): AgentProjectMeta | null {
       return isNaN(n) ? undefined : n;
     };
     switch (key) {
-      case 'priority': meta.priority = val; break;
-      case 'status': meta.status = val; break;
-      case 'phases_total': meta.phases_total = safeInt(val); break;
-      case 'phases_done': meta.phases_done = safeInt(val); break;
-      case 'last_agent_session': meta.last_agent_session = val; break;
-      case 'blocker': meta.blocker = val; break;
+      case 'priority': meta.priority = val; hasRecognizedKey = true; break;
+      case 'status': meta.status = val; hasRecognizedKey = true; break;
+      case 'phases_total': meta.phases_total = safeInt(val); hasRecognizedKey = true; break;
+      case 'phases_done': meta.phases_done = safeInt(val); hasRecognizedKey = true; break;
+      case 'last_agent_session': meta.last_agent_session = val; hasRecognizedKey = true; break;
+      case 'blocker': meta.blocker = val; hasRecognizedKey = true; break;
     }
   }
-  return meta;
+  return hasRecognizedKey ? meta : null;
 }
 
 // ---------------------------------------------------------------------------
@@ -1028,6 +1029,91 @@ interface AuditFinding {
   title: string;
   detail: string;
   meta: AgentProjectMeta | null;
+}
+
+/** Input for classifying a single discussion into audit findings. */
+export interface AuditDiscussionInput {
+  number: number;
+  title: string;
+  body: string;
+  createdAt: string;
+  commentCount: number;
+}
+
+/**
+ * Classify a single discussion into zero or more audit findings.
+ *
+ * Pure function — no I/O, no side effects, independently testable.
+ *
+ * Rules:
+ *   - drift: phases_done >= phases_total or status is complete/done
+ *   - stale: in-progress with last_agent_session > 30 days ago
+ *   - orphaned: 0 comments, 0 linked issues, > 14 days old
+ *   - missing_frontmatter: no agent-project block, > 7 days old (advisory)
+ */
+export function classifyDiscussion(d: AuditDiscussionInput, now: Date): AuditFinding[] {
+  const findings: AuditFinding[] = [];
+  const meta = parseAgentProjectMeta(d.body);
+  const linkedIssues = extractLinkedIssues(d.body);
+  const ageInDays = (now.getTime() - new Date(d.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+
+  if (meta) {
+    // Drift: phases complete or status done but still open
+    if (
+      (meta.phases_total != null && meta.phases_done != null &&
+       meta.phases_done >= meta.phases_total) ||
+      meta.status === 'complete' || meta.status === 'done'
+    ) {
+      findings.push({
+        category: 'drift',
+        number: d.number,
+        title: d.title,
+        detail: meta.phases_total != null
+          ? `phases_done: ${meta.phases_done}/${meta.phases_total}, status: ${meta.status ?? 'n/a'}`
+          : `status: ${meta.status}`,
+        meta,
+      });
+    }
+
+    // Stale in-progress: last_agent_session > 30 days ago
+    if (meta.status === 'in-progress' && meta.last_agent_session) {
+      const lastSession = new Date(meta.last_agent_session);
+      const daysSinceSession = (now.getTime() - lastSession.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceSession > 30) {
+        findings.push({
+          category: 'stale',
+          number: d.number,
+          title: d.title,
+          detail: `last_agent_session: ${meta.last_agent_session} (${Math.floor(daysSinceSession)} days ago)`,
+          meta,
+        });
+      }
+    }
+  } else {
+    // Missing frontmatter (advisory, only for discussions > 7 days old)
+    if (ageInDays > 7) {
+      findings.push({
+        category: 'missing_frontmatter',
+        number: d.number,
+        title: d.title,
+        detail: `created ${d.createdAt.split('T')[0]}, ${d.commentCount} comments`,
+        meta: null,
+      });
+    }
+  }
+
+  // Orphaned: 0 comments, 0 linked issues, > 14 days old
+  if (d.commentCount === 0 && linkedIssues.length === 0 && ageInDays > 14) {
+    findings.push({
+      category: 'orphaned',
+      number: d.number,
+      title: d.title,
+      detail: `created ${d.createdAt.split('T')[0]}, 0 comments, 0 linked issues`,
+      meta: parseAgentProjectMeta(d.body),
+    });
+  }
+
+  return findings;
 }
 
 /**
@@ -1093,65 +1179,13 @@ async function audit(_args: string[], options: CommandOptions): Promise<CommandR
   const findings: AuditFinding[] = [];
 
   for (const d of allDiscussions) {
-    const meta = parseAgentProjectMeta(d.body);
-    const linkedIssues = extractLinkedIssues(d.body);
-    const ageInDays = (now.getTime() - new Date(d.createdAt).getTime()) / (1000 * 60 * 60 * 24);
-
-    if (meta) {
-      // Drift: phases complete or status done but still open
-      if (
-        (meta.phases_total != null && meta.phases_done != null &&
-         meta.phases_done >= meta.phases_total) ||
-        meta.status === 'complete' || meta.status === 'done'
-      ) {
-        findings.push({
-          category: 'drift',
-          number: d.number,
-          title: d.title,
-          detail: meta.phases_total != null
-            ? `phases_done: ${meta.phases_done}/${meta.phases_total}, status: ${meta.status ?? 'n/a'}`
-            : `status: ${meta.status}`,
-          meta,
-        });
-      }
-
-      // Stale in-progress: last_agent_session > 30 days ago
-      if (meta.status === 'in-progress' && meta.last_agent_session) {
-        const lastSession = new Date(meta.last_agent_session);
-        const daysSinceSession = (now.getTime() - lastSession.getTime()) / (1000 * 60 * 60 * 24);
-        if (daysSinceSession > 30) {
-          findings.push({
-            category: 'stale',
-            number: d.number,
-            title: d.title,
-            detail: `last_agent_session: ${meta.last_agent_session} (${Math.floor(daysSinceSession)} days ago)`,
-            meta,
-          });
-        }
-      }
-    } else {
-      // Missing frontmatter (advisory, only for discussions > 7 days old)
-      if (ageInDays > 7) {
-        findings.push({
-          category: 'missing_frontmatter',
-          number: d.number,
-          title: d.title,
-          detail: `created ${d.createdAt.split('T')[0]}, ${d.comments.totalCount} comments`,
-          meta: null,
-        });
-      }
-    }
-
-    // Orphaned: 0 comments, 0 linked issues, > 14 days old
-    if (d.comments.totalCount === 0 && linkedIssues.length === 0 && ageInDays > 14) {
-      findings.push({
-        category: 'orphaned',
-        number: d.number,
-        title: d.title,
-        detail: `created ${d.createdAt.split('T')[0]}, 0 comments, 0 linked issues`,
-        meta: parseAgentProjectMeta(d.body),
-      });
-    }
+    findings.push(...classifyDiscussion({
+      number: d.number,
+      title: d.title,
+      body: d.body,
+      createdAt: d.createdAt,
+      commentCount: d.comments.totalCount,
+    }, now));
   }
 
   // Sort findings by severity: drift > stale > orphaned > missing_frontmatter
@@ -1212,7 +1246,8 @@ async function audit(_args: string[], options: CommandOptions): Promise<CommandR
     output += `${c.bold}Summary:${c.reset} ${driftCount} drift, ${staleCount} stale, ${orphanedCount} orphaned\n`;
   }
 
-  return { output, exitCode: 0 };
+  const hasDrift = findings.some((f) => f.category === 'drift');
+  return { output, exitCode: hasDrift ? 1 : 0 };
 }
 
 // ---------------------------------------------------------------------------
