@@ -50,6 +50,7 @@ export interface SyncDataSourceInput {
     strategy: string;
     matchFields?: string[];
     fuzzyFields?: string[];
+    exactFields?: string[];
     [key: string]: unknown; // passthrough for future fields
   } | null;
   sourceStatus?: 'active' | 'archived' | 'defunct';

@@ -831,11 +831,12 @@ export const resourceTabularSources = pgTable("resource_tabular_sources", {
   /** Frictionless-inspired field descriptions */
   sourceSchema: jsonb("source_schema").$type<Record<string, unknown>>(),
   /** { strategy, matchFields, fuzzyFields, exactFields } */
-  /** Source-check verification strategy. Shape: { strategy, matchFields?, fuzzyFields? }. Issue #4017 B5. */
+  /** Source-check verification strategy. Shape: { strategy, matchFields?, fuzzyFields?, exactFields? }. Issue #4017 B5. */
   verificationConfig: jsonb("verification_config").$type<{
     strategy: string;
     matchFields?: string[];
     fuzzyFields?: string[];
+    exactFields?: string[];
     [key: string]: unknown;
   }>(),
   /** active | archived | defunct */
