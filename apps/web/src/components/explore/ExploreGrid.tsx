@@ -82,6 +82,10 @@ function resolveEntityGroupIndex(param: string): number {
   return 0;
 }
 
+// Items with wordCount=0 are excluded unless they have a component-only contentFormat (tables, diagrams)
+const COMPONENT_ONLY_TYPES = new Set(["table", "diagram"]);
+const isVisibleItem = (item: ExploreItem) => item.wordCount || COMPONENT_ONLY_TYPES.has(item.type);
+
 function FilterRow({
   label,
   options,
@@ -95,28 +99,35 @@ function FilterRow({
   onSelect: (i: number) => void;
   counts: number[];
 }) {
+  // If the active filter has 0 items, reset to "All"
+  const effectiveActive = active > 0 && counts[active] === 0 ? 0 : active;
+
   return (
     <div className="flex items-center gap-3 mb-3">
       <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground w-16 flex-shrink-0">
         {label}
       </span>
       <div className="flex flex-wrap gap-1.5">
-        {options.map((opt, i) => (
-          <button
-            key={opt}
-            onClick={() => onSelect(i)}
-            className={`px-2.5 py-1 text-xs rounded-md border transition-colors ${
-              active === i
-                ? "bg-foreground text-background border-foreground"
-                : "bg-background text-foreground border-border hover:bg-muted"
-            }`}
-          >
-            {opt}{" "}
-            <span className={active === i ? "text-background/70" : "text-muted-foreground"}>
-              {counts[i]}
-            </span>
-          </button>
-        ))}
+        {options.map((opt, i) => {
+          // Hide filters with 0 items (but always show "All" at index 0)
+          if (i > 0 && counts[i] === 0) return null;
+          return (
+            <button
+              key={opt}
+              onClick={() => onSelect(i)}
+              className={`px-2.5 py-1 text-xs rounded-md border transition-colors ${
+                effectiveActive === i
+                  ? "bg-foreground text-background border-foreground"
+                  : "bg-background text-foreground border-border hover:bg-muted"
+              }`}
+            >
+              {opt}{" "}
+              <span className={effectiveActive === i ? "text-background/70" : "text-muted-foreground"}>
+                {counts[i]}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -465,6 +476,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     if (!fallbackToLocal) fetchFromServer({ sortKey: key });
   }
 
+
   // ---- Faceted counts (computed from server facets or client-side) ----
 
   const fieldCounts = useMemo(() => {
@@ -478,7 +490,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => item.wordCount);
+    const articleItems = fallbackItems.filter(isVisibleItem);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     return FIELD_GROUPS.map((group) => {
       if (group.entityType) return searchFiltered.filter((item) => item.type === group.entityType).length;
@@ -495,7 +507,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => item.wordCount);
+    const articleItems = fallbackItems.filter(isVisibleItem);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const fieldGroup = FIELD_GROUPS[activeField];
     const fieldFiltered = fieldGroup.entityType
@@ -517,7 +529,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => item.wordCount);
+    const articleItems = fallbackItems.filter(isVisibleItem);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const fieldGroup = FIELD_GROUPS[activeField];
     const fieldFiltered = fieldGroup.entityType
@@ -546,7 +558,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
       });
     }
     // Fallback: client-side counts
-    const articleItems = fallbackItems.filter((item) => item.wordCount);
+    const articleItems = fallbackItems.filter(isVisibleItem);
     const searchFiltered = search.trim() ? textFilter(articleItems, search) : articleItems;
     const riskItems = searchFiltered.filter((item) => item.type === "risk");
     return RISK_CATEGORY_GROUPS.map((group) => {
@@ -601,7 +613,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     }
 
     // Fallback: full client-side filtering pipeline
-    let items = fallbackItems.filter((item) => item.wordCount);
+    let items = fallbackItems.filter(isVisibleItem);
 
     // Search — filter and rank by title match quality
     const hasSearch = search.trim().length > 0;
