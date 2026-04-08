@@ -177,21 +177,26 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, Dashboards, Citations, Style Guides, Research, Architecture & Reference", () => {
+  it("returns hardcoded sections: Overview, hub sections, System & Data, Style Guides, Research, Architecture & Reference", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
-    expect(titles).toContain("Dashboards");
-    expect(titles).toContain("Citations");
+    expect(titles).toContain("Research & Discovery");
+    expect(titles).toContain("Verification & Source-Checking");
+    expect(titles).toContain("FactBase & Entities");
+    expect(titles).toContain("Content Pipelines");
+    expect(titles).toContain("System & Data");
     expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
     expect(titles).toContain("Architecture & Reference");
   });
 
-  it("dashboard section has defaultOpen: true", () => {
+  it("hub sections have defaultOpen: true", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards");
-    expect(dashboards?.defaultOpen).toBe(true);
+    for (const hubTitle of ["Research & Discovery", "Verification & Source-Checking", "FactBase & Entities", "Content Pipelines"]) {
+      const hub = sections.find(s => s.title === hubTitle);
+      expect(hub?.defaultOpen).toBe(true);
+    }
   });
 
   it("does not duplicate hrefs across sections", () => {
@@ -203,41 +208,42 @@ describe("getInternalNav (mocked data)", () => {
 
   it("migrated dashboards use internalHref (resolve to /wiki/E<id>)", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards")!;
+    const contentPipelines = sections.find(s => s.title === "Content Pipelines")!;
 
-    const updatesItem = dashboards.items.find(i => i.label === "Update Schedule");
+    const updatesItem = contentPipelines.items.find(i => i.label === "Update Schedule");
     expect(updatesItem).toBeDefined();
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
-  it("citation accuracy is in Citations section", () => {
+  it("citation accuracy is in Verification & Source-Checking section", () => {
     const sections = getInternalNav();
-    const citations = sections.find(s => s.title === "Citations")!;
+    const verification = sections.find(s => s.title === "Verification & Source-Checking")!;
 
-    const item = citations.items.find(i => i.label === "Citation Accuracy");
+    const item = verification.items.find(i => i.label === "Citation Accuracy");
     expect(item).toBeDefined();
   });
 
-  it("all dashboard items use /wiki/E<id> hrefs", () => {
+  it("all hub section items use /wiki/ hrefs", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards")!;
-
-    for (const item of dashboards.items) {
-      if (item.label === "Internal Home") continue; // Overview link
-      expect(item.href).toMatch(/^\/wiki\//);
+    const hubTitles = ["Research & Discovery", "Verification & Source-Checking", "FactBase & Entities", "Content Pipelines", "System & Data"];
+    for (const title of hubTitles) {
+      const section = sections.find(s => s.title === title)!;
+      for (const item of section.items) {
+        expect(item.href).toMatch(/^\/wiki\//);
+      }
     }
   });
 
-  it("all Citations items use /wiki/ hrefs (fully migrated)", () => {
+  it("verification section contains citation and hallucination dashboards", () => {
     const sections = getInternalNav();
-    const citations = sections.find(s => s.title === "Citations")!;
+    const verification = sections.find(s => s.title === "Verification & Source-Checking")!;
 
-    const monitoringLabels = [
+    const expectedLabels = [
       "Citation Accuracy", "Citation Content",
-      "Hallucination Risk",
+      "Hallucination Risk", "Source Checks",
     ];
-    for (const label of monitoringLabels) {
-      const item = citations.items.find(i => i.label === label);
+    for (const label of expectedLabels) {
+      const item = verification.items.find(i => i.label === label);
       expect(item).toBeDefined();
       expect(item!.href).toMatch(/^\/wiki\//);
     }
