@@ -100,6 +100,13 @@ When you've completed a meaningful chunk:
 
 5. **If you're done or blocked**, update status to `done` or `blocked` with a blocker description.
 
+6. **Auto-close when complete.** If after this session `phases_done == phases_total` (or `status: done`), close the discussion explicitly. Open discussions with all phases done accumulate as ambient noise that future sweeps have to clean up. Run:
+   ```bash
+   pnpm crux gh epic comment <N> "All phases complete. Closing — see PR #YYYY for the final shipping piece."
+   pnpm crux gh epic close <N>
+   ```
+   Use `--reason=outdated` only if the plan was abandoned rather than completed; default `resolved` is correct for "all phases shipped". This is a hard rule, not a judgment call: if `phases_done == phases_total`, close.
+
 ## Step 7: Continue or hand off
 
 If the session ends mid-discussion:
