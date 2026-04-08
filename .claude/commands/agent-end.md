@@ -49,7 +49,25 @@ gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:workin
 pnpm crux gh pr-patrol stop
 ```
 
-## Step 4: Clean up local artifacts
+## Step 4: Kill this slot's dev server (if running)
+
+Each slot uses its own port (`3010 + slot number`, e.g. `lw/a2` → 3012). Kill it so it doesn't linger:
+
+```bash
+# Read DEV_PORT from .env (set by the slot scaffolding); fall back to nothing.
+DEV_PORT=$(grep -m1 '^DEV_PORT=' .env 2>/dev/null | cut -d= -f2-)
+if [ -n "$DEV_PORT" ]; then
+  PIDS=$(lsof -ti:$DEV_PORT -sTCP:LISTEN 2>/dev/null)
+  if [ -n "$PIDS" ]; then
+    kill $PIDS 2>/dev/null
+    echo "Killed dev server on port $DEV_PORT (PIDs: $PIDS)"
+  fi
+fi
+```
+
+**Never** `pkill -f "next dev"` — that would kill dev servers in other slots and the user's main server. Always scope to this slot's port (use `lsof -ti:$PORT -sTCP:LISTEN`, never bare `lsof -ti:$PORT` which also matches browser connections).
+
+## Step 5: Clean up local artifacts
 
 Remove untracked session artifacts and discard any unstaged changes (modified hooks, deleted markers, etc.):
 
@@ -59,7 +77,7 @@ git checkout -- .claude/review-done 2>/dev/null || rm -f .claude/review-done
 git checkout -- .claude/hooks/ 2>/dev/null || true
 ```
 
-## Step 5: Session summary
+## Step 6: Session summary
 
 Output a brief summary:
 - Branch name
