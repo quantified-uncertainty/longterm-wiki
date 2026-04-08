@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Newsreader, JetBrains_Mono } from "next/font/google";
 import { ArrowLeft, Database, ExternalLink } from "lucide-react";
 import {
   fetchDetailed,
@@ -15,11 +16,23 @@ import {
   getRecordHref,
   formatCheckerModel,
 } from "../../source-checks-shared";
-import { cn } from "@/lib/utils";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
+
+// Editorial typography — scoped to this page only
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+});
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jb-mono",
+});
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -371,191 +384,284 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
     return [...seen.values()];
   }
 
+  // Get the verdict for the case-header treatment
+  const primaryVerdict = verdicts[0];
+  const primaryConfidence = primaryVerdict?.confidence ?? null;
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className={`${newsreader.variable} ${jetbrainsMono.variable} max-w-6xl mx-auto px-6 py-10`}>
       {/* Breadcrumbs */}
       <Link
         href="/source-checks"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors mb-8"
+        style={{ fontFamily: "var(--font-jb-mono)" }}
       >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        All Source Checks
+        <ArrowLeft className="w-3 h-3" />
+        Index
       </Link>
 
-      {/* Header */}
-      <div className="mb-4">
-        <h1 className="text-2xl font-bold mb-1 flex flex-wrap items-baseline gap-2">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground rounded bg-muted px-1.5 py-0.5">
-            {formatRecordType(recordType)}
-          </span>
-          <span>{claimSummary ?? displayName}</span>
+      {/* Editorial header — like a journal article masthead */}
+      <header className="mb-10 pb-6 border-b border-foreground/15">
+        {/* Case number — small mono treatment */}
+        <div
+          className="flex items-baseline gap-3 mb-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+          style={{ fontFamily: "var(--font-jb-mono)" }}
+        >
+          <span>Verification</span>
+          <span className="text-foreground/30">·</span>
+          <span>{formatRecordType(recordType)}</span>
+          <span className="text-foreground/30">·</span>
+          <span>№ {recordId}</span>
+        </div>
+
+        {/* Title in serif display */}
+        <h1
+          className="text-4xl md:text-5xl font-medium leading-[1.05] tracking-tight text-foreground mb-3"
+          style={{ fontFamily: "var(--font-newsreader)", fontFeatureSettings: '"ss01", "ss02"' }}
+        >
+          {(claimSummary ?? displayName).replace(/\s*->\s*/g, " → ")}
         </h1>
+
         {claimSummary && resolvedName && resolvedName !== claimSummary && (
-          <p className="text-sm text-muted-foreground mb-1">{resolvedName}</p>
+          <p
+            className="text-base text-muted-foreground italic mb-3"
+            style={{ fontFamily: "var(--font-newsreader)" }}
+          >
+            {resolvedName}
+          </p>
         )}
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          {/* Things page link — only for record types with PG primary keys (not facts or citations) */}
+
+        {/* Cross-reference links — editorial footer style */}
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs uppercase tracking-[0.1em] text-muted-foreground mt-5">
           {!recordType.startsWith("fact") && !recordType.startsWith("citation") && !recordType.includes("wiki-page") && (
-            <Link href={`/things/${encodeURIComponent(recordId)}`} className="text-primary hover:underline">
-              View record &rarr;
+            <Link
+              href={`/things/${encodeURIComponent(recordId)}`}
+              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+            >
+              View record
             </Link>
           )}
           {recordHref && !recordHref.startsWith("/things/") && (
-            <Link href={recordHref} className="text-primary hover:underline">
-              {recordType === "personnel"
-                ? "People directory"
-                : recordType === "fact"
-                  ? "View fact"
-                  : `View ${formatRecordType(recordType).toLowerCase()}`} &rarr;
+            <Link
+              href={recordHref}
+              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+            >
+              {recordType === "personnel" ? "People" : recordType === "fact" ? "Fact" : formatRecordType(recordType)}
             </Link>
           )}
           {entityHref && (
-            <Link href={entityHref} className="text-primary hover:underline">
+            <Link
+              href={entityHref}
+              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+            >
               {recordType === "personnel"
-                ? "Organization page"
+                ? "Organization"
                 : recordType === "division"
                   ? "Parent organization"
-                  : claimEntityName
-                    ? `${claimEntityName} page`
-                    : "Profile page"} &rarr;
+                  : claimEntityName ?? "Profile"}
             </Link>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Verdict summary cards */}
+      {/* Verdict — editorial treatment, like a verdict in a court ruling */}
       {verdicts.length > 0 ? (
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 mb-10">
           {verdicts.map((v, i) => {
-            // Count evidence items that match this verdict's fieldName
             const fieldEvidence = evidence.filter(
               (e) => (e.fieldName ?? null) === (v.fieldName ?? null)
             );
             const fieldUniqueUrls = new Set(
               fieldEvidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
             );
+            const verdictColor =
+              v.verdict === "confirmed" ? "text-emerald-700 dark:text-emerald-400"
+              : v.verdict === "contradicted" ? "text-red-700 dark:text-red-400"
+              : v.verdict === "outdated" ? "text-amber-700 dark:text-amber-400"
+              : v.verdict === "partial" ? "text-amber-700 dark:text-amber-400"
+              : "text-muted-foreground";
 
             return (
               <div
                 key={`${v.fieldName ?? "overall"}-${i}`}
-                className="rounded-lg border border-border/60 px-4 py-3"
+                className="flex flex-wrap items-baseline gap-x-4 gap-y-1"
               >
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                  <VerdictBadge verdict={v.verdict} />
+                <div className="flex items-baseline gap-3">
+                  <span
+                    className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
+                    style={{ fontFamily: "var(--font-jb-mono)" }}
+                  >
+                    Verdict
+                  </span>
+                  <span
+                    className={`text-2xl font-medium tracking-tight ${verdictColor}`}
+                    style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
+                  >
+                    {v.verdict}
+                  </span>
                   {v.confidence != null && (
-                    <span className="tabular-nums font-medium">
+                    <span
+                      className="text-sm tabular-nums text-foreground/70"
+                      style={{ fontFamily: "var(--font-jb-mono)" }}
+                    >
                       {Math.round(v.confidence * 100)}%
                     </span>
                   )}
-                  {v.fieldName && (
-                    <span className="text-xs text-muted-foreground">
-                      field:{" "}
-                      <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                        {v.fieldName}
-                      </code>
-                    </span>
-                  )}
-                  <span className="ml-auto text-xs text-muted-foreground">
-                    {fieldEvidence.length > 0 && (
-                      <>
-                        {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
-                        {fieldUniqueUrls.size > 0 && fieldUniqueUrls.size !== fieldEvidence.length && (
-                          <> &middot; {fieldUniqueUrls.size} source{fieldUniqueUrls.size !== 1 ? "s" : ""}</>
-                        )}
-                      </>
-                    )}
-                    {v.lastComputedAt && (
-                      <> &middot; {new Date(v.lastComputedAt).toLocaleDateString()}</>
-                    )}
-                    {v.needsRecheck && (
-                      <> &middot; <span className="text-amber-500 font-medium">needs recheck</span></>
-                    )}
-                  </span>
                 </div>
+                {v.fieldName && (
+                  <span
+                    className="text-xs text-muted-foreground"
+                    style={{ fontFamily: "var(--font-jb-mono)" }}
+                  >
+                    field: {v.fieldName}
+                  </span>
+                )}
+                <span
+                  className="ml-auto text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
+                  style={{ fontFamily: "var(--font-jb-mono)" }}
+                >
+                  {fieldEvidence.length > 0 && (
+                    <>
+                      {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
+                      {fieldUniqueUrls.size > 0 && fieldUniqueUrls.size !== fieldEvidence.length && (
+                        <> · {fieldUniqueUrls.size} src</>
+                      )}
+                    </>
+                  )}
+                  {v.lastComputedAt && (
+                    <> · {new Date(v.lastComputedAt).toLocaleDateString()}</>
+                  )}
+                  {v.needsRecheck && (
+                    <> · <span className="text-amber-600 font-semibold">recheck</span></>
+                  )}
+                </span>
                 {v.reasoning && (
-                  <p className="text-sm text-muted-foreground mt-1.5">{stripInternalTags(v.reasoning)}</p>
+                  <p
+                    className="basis-full text-sm text-muted-foreground italic leading-relaxed mt-1"
+                    style={{ fontFamily: "var(--font-newsreader)" }}
+                  >
+                    {stripInternalTags(v.reasoning)}
+                  </p>
                 )}
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="rounded-lg border border-border/60 p-6 text-center text-muted-foreground mb-8">
-          <p>No verdict records found for this item.</p>
+        <div className="mb-10 text-sm text-muted-foreground italic" style={{ fontFamily: "var(--font-newsreader)" }}>
+          No verdict on file.
         </div>
       )}
 
-      {/* Side-by-side: Our claim (left) | Source evidence (right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Left: Our claim */}
-        <section>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">
-            Our claim &mdash; {isHolistic ? "entire record" : "specific fields"}
-          </h2>
+      {/* Audit ledger: claim vs evidence with vertical rule between */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-foreground/15 mb-12">
+        {/* Left column: Our claim */}
+        <section className="lg:pr-8 pb-8 lg:pb-0">
+          <div className="flex items-baseline justify-between mb-5">
+            <h2
+              className="text-2xl font-medium tracking-tight"
+              style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
+            >
+              Our claim
+            </h2>
+            <span
+              className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
+              style={{ fontFamily: "var(--font-jb-mono)" }}
+            >
+              {isHolistic ? "entire record" : "specific fields"}
+            </span>
+          </div>
           {displayFields.length > 0 ? (
-            <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
-              <table className="w-full text-sm">
-                <tbody>
-                  {displayFields.map(([k, v]) => {
-                    const isLongText = typeof v === "string" && v.length > 300;
-                    return (
-                      <tr key={k} className="border-b border-border/30 last:border-0">
-                        <td className="pr-3 py-2 px-4 text-muted-foreground whitespace-nowrap align-top text-xs font-medium bg-muted/20">
-                          {k}
-                        </td>
-                        <td className="py-2 px-4 text-foreground/90 break-words whitespace-pre-wrap">
-                          {typeof v === "number" ? (
-                            v.toLocaleString("en-US")
-                          ) : isLongText ? (
-                            <details>
-                              <summary className="cursor-pointer list-none">
-                                <span>{String(v).slice(0, 300)}</span>
-                                <span className="text-muted-foreground">&hellip; </span>
-                                <span className="text-xs text-primary hover:underline">show more</span>
-                              </summary>
-                              <span className="block mt-1">{String(v)}</span>
-                            </details>
-                          ) : (
-                            String(v)
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            <dl className="space-y-3.5">
+              {displayFields.map(([k, v]) => {
+                const isLongText = typeof v === "string" && v.length > 300;
+                return (
+                  <div key={k} className="grid grid-cols-[7rem_1fr] gap-4 text-sm">
+                    <dt
+                      className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5"
+                      style={{ fontFamily: "var(--font-jb-mono)" }}
+                    >
+                      {k}
+                    </dt>
+                    <dd
+                      className="text-foreground/90 break-words whitespace-pre-wrap leading-relaxed"
+                      style={typeof v === "number" || /^\$|^\d+$|^\d{4}-\d{2}/.test(String(v))
+                        ? { fontFamily: "var(--font-jb-mono)", fontVariantNumeric: "tabular-nums" }
+                        : { fontFamily: "var(--font-newsreader)" }}
+                    >
+                      {typeof v === "number" ? (
+                        v.toLocaleString("en-US")
+                      ) : isLongText ? (
+                        <details>
+                          <summary className="cursor-pointer list-none">
+                            <span>{String(v).slice(0, 280)}</span>
+                            <span className="text-muted-foreground">… </span>
+                            <span
+                              className="text-xs uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground border-b border-dotted border-foreground/30"
+                              style={{ fontFamily: "var(--font-jb-mono)" }}
+                            >
+                              expand
+                            </span>
+                          </summary>
+                          <span className="block mt-2">{String(v)}</span>
+                        </details>
+                      ) : (
+                        String(v)
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
           ) : (
-            <div className="rounded-lg border border-border/60 p-4 text-sm text-muted-foreground">
+            <p
+              className="text-sm text-muted-foreground italic"
+              style={{ fontFamily: "var(--font-newsreader)" }}
+            >
               No record data available.
-            </div>
+            </p>
           )}
         </section>
 
-        {/* Right: Source evidence */}
-        <section>
-          <h2 className="text-sm font-medium text-muted-foreground mb-3">
-            Source evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
-          </h2>
+        {/* Right column: Source evidence */}
+        <section className="lg:pl-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-foreground/15">
+          <div className="flex items-baseline justify-between mb-5">
+            <h2
+              className="text-2xl font-medium tracking-tight"
+              style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
+            >
+              Source evidence
+            </h2>
+            <span
+              className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
+              style={{ fontFamily: "var(--font-jb-mono)" }}
+            >
+              {uniqueSourceUrls.size} src · {evidence.length} check{evidence.length !== 1 ? "s" : ""}
+            </span>
+          </div>
           {evidence.length === 0 ? (
-            <div className="rounded-lg border border-border/60 p-4 text-sm text-muted-foreground">
-              No evidence records found for this item.
-            </div>
+            <p
+              className="text-sm text-muted-foreground italic"
+              style={{ fontFamily: "var(--font-newsreader)" }}
+            >
+              No evidence on file.
+            </p>
           ) : (
-            <div className="space-y-4">
-              {[...evidenceBySource.entries()].map(([sourceUrl, checks]) => (
-                <div key={sourceUrl} className="rounded-lg border border-border/60 overflow-hidden">
-                  {/* Source header */}
+            <div className="space-y-6">
+              {[...evidenceBySource.entries()].map(([sourceUrl, checks], srcIdx) => (
+                <div key={sourceUrl} className={srcIdx > 0 ? "pt-6 border-t border-foreground/10" : ""}>
+                  {/* Source citation — like a footnote reference */}
                   {sourceUrl !== "(no source)" && (
-                    <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40 flex flex-wrap items-center gap-2">
+                    <div className="mb-3 text-xs">
                       <a
                         href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400 break-all"
+                        className="inline-flex items-baseline gap-1.5 text-foreground/80 hover:text-foreground border-b border-dotted border-foreground/40 hover:border-foreground break-all"
+                        style={{ fontFamily: "var(--font-jb-mono)" }}
                       >
-                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
+                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                       </a>
                       {(() => {
                         const ds = inferDataSource(sourceUrl);
@@ -565,7 +671,8 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {ds && (
                               <Link
                                 href={`/sources?tab=data-sources`}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
+                                className="inline-block ml-3 text-[10px] uppercase tracking-[0.15em] text-foreground/60 hover:text-foreground italic"
+                                style={{ fontFamily: "var(--font-newsreader)" }}
                               >
                                 {ds.name}
                               </Link>
@@ -573,10 +680,11 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {rid && (
                               <Link
                                 href={`/resources/${encodeURIComponent(rid)}`}
-                                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                                className="inline-flex items-center gap-1 ml-3 text-[10px] uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground"
+                                style={{ fontFamily: "var(--font-jb-mono)" }}
                               >
-                                <Database className="h-3 w-3" />
-                                Resource
+                                <Database className="h-2.5 w-2.5" />
+                                resource
                               </Link>
                             )}
                           </>
@@ -585,65 +693,145 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                     </div>
                   )}
 
-                  {/* Individual checks for this source (deduplicated) */}
-                  <div className="divide-y divide-border/30">
-                    {deduplicateChecks(checks).map((e) => (
-                      <div key={e.id} className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <VerdictBadge verdict={e.verdict} />
-                          {e.confidence != null && (
-                            <span className="text-xs tabular-nums text-muted-foreground">
-                              {Math.round(e.confidence * 100)}%
-                            </span>
-                          )}
-                          {e.isPrimarySource && (
-                            <span className="inline-flex items-center rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
-                              primary
-                            </span>
-                          )}
-                          {e.duplicateCount > 1 && (
-                            <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                              {e.duplicateCount} similar
-                            </span>
-                          )}
-                          <span className="ml-auto text-xs text-muted-foreground">
-                            {e.checkerModel && formatCheckerModel(e.checkerModel)}
-                            {e.checkedAt && <> &middot; {new Date(e.checkedAt).toLocaleDateString()}</>}
-                          </span>
-                        </div>
+                  {/* Individual checks */}
+                  <div className="space-y-5">
+                    {deduplicateChecks(checks).map((e) => {
+                      const evVerdictColor =
+                        e.verdict === "confirmed" ? "text-emerald-700 dark:text-emerald-400"
+                        : e.verdict === "contradicted" ? "text-red-700 dark:text-red-400"
+                        : "text-amber-700 dark:text-amber-400";
 
-                        {e.extractedQuote && <FormatQuote quote={e.extractedQuote} />}
+                      // Try to parse extracted value/quote as structured data for display
+                      const structuredEntries = (() => {
+                        const text = (e.extractedQuote || e.extractedValue || "").trim();
+                        if (!text) return null;
+                        const stripped = text.replace(/^(?:Matched row|Found row|Row match)[:\s]*/i, "").trim();
+                        return parseJsonObjectEntries(stripped);
+                      })();
 
-                        {(e.expectedValue || e.extractedValue) && !e.extractedQuote && (
-                          <div className="space-y-2 mb-2">
-                            {e.expectedValue && (
-                              <div className="text-sm">
-                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Expected: </span>
-                                {e.expectedValue}
-                              </div>
+                      return (
+                        <div key={e.id}>
+                          {/* Inline verdict line */}
+                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
+                            <span
+                              className={`text-base italic ${evVerdictColor}`}
+                              style={{ fontFamily: "var(--font-newsreader)" }}
+                            >
+                              {e.verdict}
+                            </span>
+                            {e.confidence != null && (
+                              <span
+                                className="text-xs tabular-nums text-muted-foreground"
+                                style={{ fontFamily: "var(--font-jb-mono)" }}
+                              >
+                                {Math.round(e.confidence * 100)}%
+                              </span>
                             )}
-                            {e.extractedValue && (
-                              <div>
-                                <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">Matched data</div>
-                                <FormatExtractedValue value={e.extractedValue} />
-                              </div>
+                            {e.isPrimarySource && (
+                              <span
+                                className="text-[10px] uppercase tracking-[0.15em] text-blue-700 dark:text-blue-400"
+                                style={{ fontFamily: "var(--font-jb-mono)" }}
+                              >
+                                primary
+                              </span>
                             )}
+                            {e.duplicateCount > 1 && (
+                              <span
+                                className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
+                                style={{ fontFamily: "var(--font-jb-mono)" }}
+                              >
+                                ×{e.duplicateCount}
+                              </span>
+                            )}
+                            <span
+                              className="ml-auto text-[10px] uppercase tracking-[0.1em] text-muted-foreground"
+                              style={{ fontFamily: "var(--font-jb-mono)" }}
+                            >
+                              {e.checkerModel && formatCheckerModel(e.checkerModel)}
+                              {e.checkedAt && <> · {new Date(e.checkedAt).toLocaleDateString()}</>}
+                            </span>
                           </div>
-                        )}
 
-                        {e.notes && (
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground/70">Note:</span> {stripInternalTags(e.notes)}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                          {/* Matched data — render as dl matching the claim style */}
+                          {structuredEntries && structuredEntries.length > 0 && (
+                            <dl className="space-y-2 mb-3 pl-3 border-l border-foreground/15">
+                              {structuredEntries.slice(0, 8).map(([k, val]) => (
+                                <div key={k} className="grid grid-cols-[7rem_1fr] gap-4 text-sm">
+                                  <dt
+                                    className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5"
+                                    style={{ fontFamily: "var(--font-jb-mono)" }}
+                                  >
+                                    {k}
+                                  </dt>
+                                  <dd
+                                    className="text-foreground/90 break-words"
+                                    style={typeof val === "number" || /^\$|^\d/.test(String(val))
+                                      ? { fontFamily: "var(--font-jb-mono)", fontVariantNumeric: "tabular-nums" }
+                                      : { fontFamily: "var(--font-newsreader)" }}
+                                  >
+                                    {formatJsonValue(val)}
+                                  </dd>
+                                </div>
+                              ))}
+                              {structuredEntries.length > 8 && (
+                                <div
+                                  className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground pl-[8.5rem]"
+                                  style={{ fontFamily: "var(--font-jb-mono)" }}
+                                >
+                                  +{structuredEntries.length - 8} more
+                                </div>
+                              )}
+                            </dl>
+                          )}
+
+                          {/* Fallback: extracted quote as a blockquote */}
+                          {!structuredEntries && e.extractedQuote && (
+                            <blockquote
+                              className="border-l-2 border-foreground/30 pl-4 my-2 text-sm italic text-foreground/80 leading-relaxed"
+                              style={{ fontFamily: "var(--font-newsreader)" }}
+                            >
+                              {e.extractedQuote}
+                            </blockquote>
+                          )}
+
+                          {/* Note */}
+                          {e.notes && (
+                            <p
+                              className="text-sm text-muted-foreground leading-relaxed mt-2"
+                              style={{ fontFamily: "var(--font-newsreader)" }}
+                            >
+                              <span
+                                className="text-[10px] uppercase tracking-[0.12em] text-foreground/60 mr-2 not-italic"
+                                style={{ fontFamily: "var(--font-jb-mono)" }}
+                              >
+                                Note
+                              </span>
+                              {stripInternalTags(e.notes)}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
             </div>
           )}
         </section>
+      </div>
+
+      {/* Editorial colophon — case number footer */}
+      <div
+        className="pt-6 border-t border-foreground/15 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 flex flex-wrap items-baseline gap-x-4 gap-y-1"
+        style={{ fontFamily: "var(--font-jb-mono)" }}
+      >
+        <span>Case № {recordId}</span>
+        {primaryVerdict?.lastComputedAt && (
+          <span>Filed {new Date(primaryVerdict.lastComputedAt).toLocaleDateString()}</span>
+        )}
+        {primaryConfidence != null && (
+          <span>Confidence {Math.round(primaryConfidence * 100)}%</span>
+        )}
       </div>
 
     </div>
