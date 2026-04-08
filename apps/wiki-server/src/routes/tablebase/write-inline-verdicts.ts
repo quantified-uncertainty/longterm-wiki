@@ -107,7 +107,7 @@ export async function writeInlineVerdicts(
     }
   }
 
-  return { written: withSourceCheck.length };
+  return { written: withSourcing.length };
 }
 
 /**

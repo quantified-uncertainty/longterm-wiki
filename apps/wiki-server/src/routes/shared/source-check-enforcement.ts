@@ -34,7 +34,7 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
 export function enforceSourceCheck(
   c: Context,
   tableName: string,
-  items: Array<{ sourceCheck?: unknown }>,
+  items: Array<{ sourcing?: unknown }>,
 ): Response | null {
   const serverRequired = SOURCE_CHECK_REQUIRED[tableName] === true;
   const clientRequired = c.req.query("requireSourceCheck") === "true";
