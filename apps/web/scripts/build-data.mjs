@@ -60,6 +60,8 @@ import {
   fetchEntityResourceLinks,
   buildPageReferenceIndex,
   getWikiServerWarningCount,
+  getSkippedDataSources,
+  setFullBuildMode,
 } from './lib/wiki-server-data.mjs';
 import {
   buildPagesRegistry,
@@ -93,6 +95,9 @@ const CONTENT_ONLY = SCOPE === 'content';
 
 if (CONTENT_ONLY) {
   console.log('⚡ Running in content-only scope (skipping git dates, block IR, redundancy, server sync, LLM files)\n');
+} else {
+  // In full build mode, wiki-server failures produce louder warnings
+  setFullBuildMode(true);
 }
 
 const OUTPUT_FILE = join(OUTPUT_DIR, 'database.json');
@@ -1219,6 +1224,16 @@ async function main() {
   }
 
   // =========================================================================
+  // PRE-WRITE SAFETY CHECK — abort before writing if data is corrupt
+  // =========================================================================
+  const totalYamlErrors = yamlParseErrorCount + getPagesBuilderYamlErrors();
+  if (totalYamlErrors > 0) {
+    console.error(`\n❌ Build aborted: ${totalYamlErrors} YAML parse error(s) found. Fix them before building.`);
+    console.error('database.json was NOT written — the previous version is preserved.');
+    process.exit(1);
+  }
+
+  // =========================================================================
   // WRITE OUTPUT FILES
   // =========================================================================
   const { databaseForOutput, strippedFields } = writeMainOutputFiles({ database, outputFile: OUTPUT_FILE });
@@ -1297,7 +1312,8 @@ async function main() {
   // ==========================================================================
   // BUILD HEALTH REPORT
   // ==========================================================================
-  const totalYamlErrors = yamlParseErrorCount + getPagesBuilderYamlErrors();
+  // Note: YAML errors are already checked before writing output files above.
+  // If we reach this point, totalYamlErrors is guaranteed to be 0.
   const totalWikiServerWarnings = getWikiServerWarningCount();
 
   console.log('\n--- Build Health ---');
@@ -1306,14 +1322,16 @@ async function main() {
   console.log(`  YAML parse errors:        ${totalYamlErrors}`);
   console.log(`  Wiki-server warnings:     ${totalWikiServerWarnings}`);
 
-  if (totalYamlErrors > 0) {
-    console.error(`\nFATAL: ${totalYamlErrors} YAML parse error(s) occurred. The output data is incomplete.`);
-    console.error('Fix the malformed YAML files listed above and re-run build-data.');
-    process.exit(1);
-  }
-
-  if (totalWikiServerWarnings > 0) {
-    console.warn(`\nNote: ${totalWikiServerWarnings} wiki-server API call(s) failed (non-fatal). Some dashboard data may be missing.`);
+  if (totalWikiServerWarnings > 0 && !CONTENT_ONLY) {
+    const skipped = getSkippedDataSources();
+    console.warn(`\n⚠️  ${totalWikiServerWarnings} wiki-server API call(s) failed during FULL build.`);
+    console.warn('   database.json was written but is missing data from:');
+    for (const source of skipped) {
+      console.warn(`     - ${source}`);
+    }
+    console.warn('   If this is CI, the build output is incomplete — investigate wiki-server availability.');
+  } else if (totalWikiServerWarnings > 0) {
+    console.warn(`\nNote: ${totalWikiServerWarnings} wiki-server API call(s) failed (expected in content-only mode).`);
   }
 }
 

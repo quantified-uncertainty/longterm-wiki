@@ -31,19 +31,47 @@ function isBareMachineId(s) {
 // Counts actual API failures (not "URL not set" which is expected for local dev).
 // ---------------------------------------------------------------------------
 let wikiServerWarningCount = 0;
+/** Tracks which data sources were skipped due to wiki-server failures. */
+const skippedDataSources = [];
+
+/**
+ * When true, wiki-server failures produce loud console.error messages.
+ * Set via setFullBuildMode() — should be true for full (CI) builds,
+ * false for --scope=content (local dev).
+ */
+let fullBuildMode = false;
+
+/**
+ * Signal that this is a full build (not content-only).
+ * Wiki-server failures will produce louder warnings in full mode.
+ */
+export function setFullBuildMode(enabled) {
+  fullBuildMode = enabled;
+}
 
 /** Return the number of wiki-server API warnings encountered by this module. */
 export function getWikiServerWarningCount() {
   return wikiServerWarningCount;
 }
 
+/** Return the list of data sources that were skipped due to wiki-server failures. */
+export function getSkippedDataSources() {
+  return [...skippedDataSources];
+}
+
 /**
  * Log a wiki-server API failure and increment the warning counter.
- * These are non-fatal: the build continues with fallback data.
+ * In full build mode, uses console.error for visibility.
+ * In content-only mode, uses console.log (expected behavior).
  */
 function logWikiServerWarning(context, reason) {
-  console.log(`  ${context}: skipped (${reason})`);
+  skippedDataSources.push(context);
   wikiServerWarningCount++;
+  if (fullBuildMode) {
+    console.error(`  ⚠️  ${context}: FAILED (${reason}) — data will be missing from output`);
+  } else {
+    console.log(`  ${context}: skipped (${reason})`);
+  }
 }
 
 /** Build headers for wiki-server API requests, including auth if configured. */
