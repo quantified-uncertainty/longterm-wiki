@@ -18,8 +18,8 @@ import {
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import {
-  sourceCheckEvidence,
-  sourceCheckVerdicts,
+  recordSources,
+  sourceVerdicts,
   personnel,
   entities,
   divisions,
@@ -278,26 +278,26 @@ async function queryVerdictsByEntity(
 ) {
   const rows = await db
     .select()
-    .from(sourceCheckVerdicts)
-    .where(eq(sourceCheckVerdicts.entityId, entityId))
-    .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+    .from(sourceVerdicts)
+    .where(eq(sourceVerdicts.entityId, entityId))
+    .orderBy(desc(sourceVerdicts.lastComputedAt))
     .limit(limit)
     .offset(offset);
 
   const countResult = await db
     .select({ count: count() })
-    .from(sourceCheckVerdicts)
-    .where(eq(sourceCheckVerdicts.entityId, entityId));
+    .from(sourceVerdicts)
+    .where(eq(sourceVerdicts.entityId, entityId));
   const total = countResult[0].count;
 
   const countsByVerdictRows = await db
     .select({
-      verdict: sourceCheckVerdicts.verdict,
+      verdict: sourceVerdicts.verdict,
       count: count(),
     })
-    .from(sourceCheckVerdicts)
-    .where(eq(sourceCheckVerdicts.entityId, entityId))
-    .groupBy(sourceCheckVerdicts.verdict);
+    .from(sourceVerdicts)
+    .where(eq(sourceVerdicts.entityId, entityId))
+    .groupBy(sourceVerdicts.verdict);
 
   const counts: Record<string, number> = {
     confirmed: 0,
@@ -361,26 +361,26 @@ const sourceChecksApp = new Hono()
       const db = getDrizzleDb();
 
       const typeCondition = record_type
-        ? eq(sourceCheckVerdicts.recordType, record_type)
+        ? eq(sourceVerdicts.recordType, record_type)
         : undefined;
 
       const [statsRow] = await db
         .select({
           total: count(),
-          needsRecheck: sql<number>`count(*) filter (where ${sourceCheckVerdicts.needsRecheck} = true)`,
-          avgConfidence: sql<number>`coalesce(avg(${sourceCheckVerdicts.confidence}), 0)`,
+          needsRecheck: sql<number>`count(*) filter (where ${sourceVerdicts.needsRecheck} = true)`,
+          avgConfidence: sql<number>`coalesce(avg(${sourceVerdicts.confidence}), 0)`,
         })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(typeCondition);
 
       const byVerdictRows = await db
         .select({
-          verdict: sourceCheckVerdicts.verdict,
+          verdict: sourceVerdicts.verdict,
           count: count(),
         })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(typeCondition)
-        .groupBy(sourceCheckVerdicts.verdict);
+        .groupBy(sourceVerdicts.verdict);
 
       const byVerdict: Record<string, number> = {};
       for (const row of byVerdictRows) {
@@ -390,11 +390,11 @@ const sourceChecksApp = new Hono()
       // by_type is always unfiltered (shows all types for the type-filter tabs)
       const byTypeRows = await db
         .select({
-          recordType: sourceCheckVerdicts.recordType,
+          recordType: sourceVerdicts.recordType,
           count: count(),
         })
-        .from(sourceCheckVerdicts)
-        .groupBy(sourceCheckVerdicts.recordType);
+        .from(sourceVerdicts)
+        .groupBy(sourceVerdicts.recordType);
 
       const byType: Record<string, number> = {};
       for (const row of byTypeRows) {
@@ -403,10 +403,10 @@ const sourceChecksApp = new Hono()
 
       const [evidenceStats] = await db
         .select({
-          staleCount: sql<number>`count(*) filter (where ${sourceCheckEvidence.checkerModel} != ${CURRENT_CHECKER_MODEL} or ${sourceCheckEvidence.checkerModel} is null)`,
-          deadLinkCount: sql<number>`count(*) filter (where ${sourceCheckEvidence.checkerModel} = ${DEAD_LINK_CHECKER_MODEL}${record_type ? sql` and ${sourceCheckEvidence.recordType} = ${record_type}` : sql``})`,
+          staleCount: sql<number>`count(*) filter (where ${recordSources.checkerModel} != ${CURRENT_CHECKER_MODEL} or ${recordSources.checkerModel} is null)`,
+          deadLinkCount: sql<number>`count(*) filter (where ${recordSources.checkerModel} = ${DEAD_LINK_CHECKER_MODEL}${record_type ? sql` and ${recordSources.recordType} = ${record_type}` : sql``})`,
         })
-        .from(sourceCheckEvidence);
+        .from(recordSources);
 
       return c.json({
         total: statsRow.total,
@@ -430,28 +430,28 @@ const sourceChecksApp = new Hono()
 
     const conditions = [];
     if (record_type) {
-      conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+      conditions.push(eq(sourceVerdicts.recordType, record_type));
     }
     if (verdict) {
-      conditions.push(eq(sourceCheckVerdicts.verdict, verdict));
+      conditions.push(eq(sourceVerdicts.verdict, verdict));
     }
     if (needs_recheck !== undefined) {
-      conditions.push(eq(sourceCheckVerdicts.needsRecheck, needs_recheck));
+      conditions.push(eq(sourceVerdicts.needsRecheck, needs_recheck));
     }
     if (entity_id) {
-      conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+      conditions.push(eq(sourceVerdicts.entityId, entity_id));
     }
     if (q) {
       const pattern = `%${escapeIlike(q)}%`;
       conditions.push(
         or(
-          ilike(sourceCheckVerdicts.recordId, pattern),
-          ilike(sourceCheckVerdicts.recordType, pattern),
-          ilike(sourceCheckVerdicts.entityId, pattern),
-          ilike(sourceCheckVerdicts.reasoning, pattern),
-          ilike(sourceCheckVerdicts.displayName, pattern),
-          ilike(sourceCheckVerdicts.entityDisplayName, pattern),
-          ilike(sourceCheckVerdicts.fieldName, pattern),
+          ilike(sourceVerdicts.recordId, pattern),
+          ilike(sourceVerdicts.recordType, pattern),
+          ilike(sourceVerdicts.entityId, pattern),
+          ilike(sourceVerdicts.reasoning, pattern),
+          ilike(sourceVerdicts.displayName, pattern),
+          ilike(sourceVerdicts.entityDisplayName, pattern),
+          ilike(sourceVerdicts.fieldName, pattern),
         )!
       );
     }
@@ -461,15 +461,15 @@ const sourceChecksApp = new Hono()
 
     const rows = await db
       .select()
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(whereClause)
-      .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+      .orderBy(desc(sourceVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
     const countResult = await db
       .select({ count: count() })
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(whereClause);
     const total = countResult[0].count;
 
@@ -508,11 +508,11 @@ const sourceChecksApp = new Hono()
 
     const verdictRows = await db
       .select()
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(
         and(
-          eq(sourceCheckVerdicts.recordType, recordType),
-          eq(sourceCheckVerdicts.recordId, recordId),
+          eq(sourceVerdicts.recordType, recordType),
+          eq(sourceVerdicts.recordId, recordId),
         )
       );
 
@@ -524,14 +524,14 @@ const sourceChecksApp = new Hono()
     // Order by sourceUrl first (for grouping), then by checkedAt descending
     const evidenceRows = await db
       .select()
-      .from(sourceCheckEvidence)
+      .from(recordSources)
       .where(
         and(
-          eq(sourceCheckEvidence.recordType, recordType),
-          eq(sourceCheckEvidence.recordId, recordId),
+          eq(recordSources.recordType, recordType),
+          eq(recordSources.recordId, recordId),
         )
       )
-      .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt))
+      .orderBy(recordSources.sourceUrl, desc(recordSources.checkedAt))
       .limit(200);
 
     const claimProvenance = await fetchClaimProvenance(db, recordType, recordId);
@@ -573,14 +573,14 @@ const sourceChecksApp = new Hono()
 
       const rows = await db
         .select()
-        .from(sourceCheckEvidence)
+        .from(recordSources)
         .where(
           and(
-            eq(sourceCheckEvidence.recordType, recordType),
-            eq(sourceCheckEvidence.recordId, recordId),
+            eq(recordSources.recordType, recordType),
+            eq(recordSources.recordId, recordId),
           )
         )
-        .orderBy(sourceCheckEvidence.sourceUrl, desc(sourceCheckEvidence.checkedAt))
+        .orderBy(recordSources.sourceUrl, desc(recordSources.checkedAt))
         .limit(limit)
         .offset(offset);
 
@@ -617,7 +617,7 @@ const sourceChecksApp = new Hono()
     const checkerModelForLookup = checkerModelVal ?? "";
 
     const updated = await db
-      .update(sourceCheckEvidence)
+      .update(recordSources)
       .set({
         fieldName: body.fieldName ?? null,
         entityId: body.entityId ?? null,
@@ -634,13 +634,13 @@ const sourceChecksApp = new Hono()
       })
       .where(
         and(
-          eq(sourceCheckEvidence.recordType, body.recordType),
-          eq(sourceCheckEvidence.recordId, body.recordId),
-          sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlForLookup}`,
-          sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelForLookup}`,
+          eq(recordSources.recordType, body.recordType),
+          eq(recordSources.recordId, body.recordId),
+          sql`COALESCE(${recordSources.sourceUrl}, '') = ${sourceUrlForLookup}`,
+          sql`COALESCE(${recordSources.checkerModel}, '') = ${checkerModelForLookup}`,
         )
       )
-      .returning({ id: sourceCheckEvidence.id });
+      .returning({ id: recordSources.id });
 
     let evidenceId: number;
     let wasUpdated: boolean;
@@ -652,7 +652,7 @@ const sourceChecksApp = new Hono()
       // No existing row found — insert a new one
       try {
         const [inserted] = await db
-          .insert(sourceCheckEvidence)
+          .insert(recordSources)
           .values({
             recordType: body.recordType,
             recordId: body.recordId,
@@ -672,7 +672,7 @@ const sourceChecksApp = new Hono()
             createdAt: now,
             updatedAt: now,
           })
-          .returning({ id: sourceCheckEvidence.id });
+          .returning({ id: recordSources.id });
 
         evidenceId = inserted.id;
         wasUpdated = false;
@@ -682,7 +682,7 @@ const sourceChecksApp = new Hono()
         const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
         if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
           const retried = await db
-            .update(sourceCheckEvidence)
+            .update(recordSources)
             .set({
               fieldName: body.fieldName ?? null,
               entityId: body.entityId ?? null,
@@ -699,13 +699,13 @@ const sourceChecksApp = new Hono()
             })
             .where(
               and(
-                eq(sourceCheckEvidence.recordType, body.recordType),
-                eq(sourceCheckEvidence.recordId, body.recordId),
-                sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlForLookup}`,
-                sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelForLookup}`,
+                eq(recordSources.recordType, body.recordType),
+                eq(recordSources.recordId, body.recordId),
+                sql`COALESCE(${recordSources.sourceUrl}, '') = ${sourceUrlForLookup}`,
+                sql`COALESCE(${recordSources.checkerModel}, '') = ${checkerModelForLookup}`,
               )
             )
-            .returning({ id: sourceCheckEvidence.id });
+            .returning({ id: recordSources.id });
 
           evidenceId = retried[0]?.id ?? 0;
           wasUpdated = true;
@@ -717,15 +717,15 @@ const sourceChecksApp = new Hono()
 
     // Auto-flag corresponding verdicts for recheck
     const verdictUpdated = await db
-      .update(sourceCheckVerdicts)
+      .update(sourceVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
       .where(
         and(
-          eq(sourceCheckVerdicts.recordType, body.recordType),
-          eq(sourceCheckVerdicts.recordId, body.recordId),
+          eq(sourceVerdicts.recordType, body.recordType),
+          eq(sourceVerdicts.recordId, body.recordId),
         )
       )
-      .returning({ recordId: sourceCheckVerdicts.recordId });
+      .returning({ recordId: sourceVerdicts.recordId });
 
     return c.json(
       {
@@ -745,28 +745,28 @@ const sourceChecksApp = new Hono()
 
     const conditions = [
       or(
-        ne(sourceCheckEvidence.checkerModel, CURRENT_CHECKER_MODEL),
-        isNull(sourceCheckEvidence.checkerModel),
+        ne(recordSources.checkerModel, CURRENT_CHECKER_MODEL),
+        isNull(recordSources.checkerModel),
       ),
     ];
 
     if (record_type) {
-      conditions.push(eq(sourceCheckEvidence.recordType, record_type));
+      conditions.push(eq(recordSources.recordType, record_type));
     }
 
     const whereClause = and(...conditions);
 
     const rows = await db
       .select()
-      .from(sourceCheckEvidence)
+      .from(recordSources)
       .where(whereClause)
-      .orderBy(desc(sourceCheckEvidence.checkedAt))
+      .orderBy(desc(recordSources.checkedAt))
       .limit(limit)
       .offset(offset);
 
     const countResult = await db
       .select({ count: count() })
-      .from(sourceCheckEvidence)
+      .from(recordSources)
       .where(whereClause);
     const total = countResult[0].count;
 
@@ -796,35 +796,35 @@ const sourceChecksApp = new Hono()
 
       const db = getDrizzleDb();
 
-      const conditions = [eq(sourceCheckVerdicts.entityId, entityId)];
+      const conditions = [eq(sourceVerdicts.entityId, entityId)];
       if (verdict) {
-        conditions.push(eq(sourceCheckVerdicts.verdict, verdict));
+        conditions.push(eq(sourceVerdicts.verdict, verdict));
       }
       const whereClause = and(...conditions);
 
       const rows = await db
         .select()
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause)
-        .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+        .orderBy(desc(sourceVerdicts.lastComputedAt))
         .limit(limit)
         .offset(offset);
 
       const countResult = await db
         .select({ count: count() })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause);
       const total = countResult[0].count;
 
       // Aggregate counts by verdict type (always unfiltered by verdict param)
       const countsByVerdictRows = await db
         .select({
-          verdict: sourceCheckVerdicts.verdict,
+          verdict: sourceVerdicts.verdict,
           count: count(),
         })
-        .from(sourceCheckVerdicts)
-        .where(eq(sourceCheckVerdicts.entityId, entityId))
-        .groupBy(sourceCheckVerdicts.verdict);
+        .from(sourceVerdicts)
+        .where(eq(sourceVerdicts.entityId, entityId))
+        .groupBy(sourceVerdicts.verdict);
 
       const counts: Record<string, number> = {
         confirmed: 0,
@@ -931,45 +931,45 @@ const sourceChecksApp = new Hono()
 
       const failureVerdicts = error_type ? [error_type] : [...VALID_ERROR_TYPES];
 
-      const conditions = [inArray(sourceCheckVerdicts.verdict, failureVerdicts)];
+      const conditions = [inArray(sourceVerdicts.verdict, failureVerdicts)];
       if (record_type) {
-        conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+        conditions.push(eq(sourceVerdicts.recordType, record_type));
       }
       if (entity_id) {
-        conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+        conditions.push(eq(sourceVerdicts.entityId, entity_id));
       }
 
       const whereClause = and(...conditions);
 
       const rows = await db
         .select()
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause)
-        .orderBy(desc(sourceCheckVerdicts.lastComputedAt))
+        .orderBy(desc(sourceVerdicts.lastComputedAt))
         .limit(limit)
         .offset(offset);
 
       const countResult = await db
         .select({ count: count() })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause);
       const total = countResult[0].count;
 
       // Breakdown by error type (always unfiltered by error_type param for the summary)
       const byErrorTypeRows = await db
         .select({
-          verdict: sourceCheckVerdicts.verdict,
+          verdict: sourceVerdicts.verdict,
           count: count(),
         })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(
           and(
-            inArray(sourceCheckVerdicts.verdict, [...VALID_ERROR_TYPES]),
-            record_type ? eq(sourceCheckVerdicts.recordType, record_type) : undefined,
-            entity_id ? eq(sourceCheckVerdicts.entityId, entity_id) : undefined,
+            inArray(sourceVerdicts.verdict, [...VALID_ERROR_TYPES]),
+            record_type ? eq(sourceVerdicts.recordType, record_type) : undefined,
+            entity_id ? eq(sourceVerdicts.entityId, entity_id) : undefined,
           )
         )
-        .groupBy(sourceCheckVerdicts.verdict);
+        .groupBy(sourceVerdicts.verdict);
 
       const byErrorType: Record<string, number> = {};
       for (const row of byErrorTypeRows) {
@@ -996,27 +996,27 @@ const sourceChecksApp = new Hono()
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - days);
 
-      const conditions = [lte(sourceCheckVerdicts.lastComputedAt, cutoffDate)];
+      const conditions = [lte(sourceVerdicts.lastComputedAt, cutoffDate)];
       if (record_type) {
-        conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+        conditions.push(eq(sourceVerdicts.recordType, record_type));
       }
       if (entity_id) {
-        conditions.push(eq(sourceCheckVerdicts.entityId, entity_id));
+        conditions.push(eq(sourceVerdicts.entityId, entity_id));
       }
 
       const whereClause = and(...conditions);
 
       const rows = await db
         .select()
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause)
-        .orderBy(sourceCheckVerdicts.lastComputedAt) // oldest first
+        .orderBy(sourceVerdicts.lastComputedAt) // oldest first
         .limit(limit)
         .offset(offset);
 
       const countResult = await db
         .select({ count: count() })
-        .from(sourceCheckVerdicts)
+        .from(sourceVerdicts)
         .where(whereClause);
       const total = countResult[0].count;
 
@@ -1059,7 +1059,7 @@ const sourceChecksApp = new Hono()
 
     // Try update first
     const updated = await db
-      .update(sourceCheckVerdicts)
+      .update(sourceVerdicts)
       .set({
         entityId: entityIdVal,
         displayName: displayNameVal,
@@ -1075,17 +1075,17 @@ const sourceChecksApp = new Hono()
       })
       .where(
         and(
-          eq(sourceCheckVerdicts.recordType, body.recordType),
-          eq(sourceCheckVerdicts.recordId, body.recordId),
-          sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+          eq(sourceVerdicts.recordType, body.recordType),
+          eq(sourceVerdicts.recordId, body.recordId),
+          sql`COALESCE(${sourceVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
         )
       )
-      .returning({ recordId: sourceCheckVerdicts.recordId });
+      .returning({ recordId: sourceVerdicts.recordId });
 
     if (updated.length === 0) {
       try {
         await db
-          .insert(sourceCheckVerdicts)
+          .insert(sourceVerdicts)
           .values({
             recordType: body.recordType,
             recordId: body.recordId,
@@ -1109,7 +1109,7 @@ const sourceChecksApp = new Hono()
         const msg = insertErr instanceof Error ? insertErr.message : String(insertErr);
         if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
           await db
-            .update(sourceCheckVerdicts)
+            .update(sourceVerdicts)
             .set({
               entityId: entityIdVal,
               displayName: displayNameVal,
@@ -1125,9 +1125,9 @@ const sourceChecksApp = new Hono()
             })
             .where(
               and(
-                eq(sourceCheckVerdicts.recordType, body.recordType),
-                eq(sourceCheckVerdicts.recordId, body.recordId),
-                sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
+                eq(sourceVerdicts.recordType, body.recordType),
+                eq(sourceVerdicts.recordId, body.recordId),
+                sql`COALESCE(${sourceVerdicts.fieldName}, '') = ${fieldNameForLookup}`,
               )
             );
         } else {
@@ -1154,15 +1154,15 @@ const sourceChecksApp = new Hono()
     // These survive record deletion and are the most reliable source.
     const storedNames = await db
       .select({
-        recordId: sourceCheckVerdicts.recordId,
-        displayName: sourceCheckVerdicts.displayName,
+        recordId: sourceVerdicts.recordId,
+        displayName: sourceVerdicts.displayName,
       })
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(
         and(
-          eq(sourceCheckVerdicts.recordType, record_type),
-          inArray(sourceCheckVerdicts.recordId, record_ids),
-          isNull(sourceCheckVerdicts.fieldName),
+          eq(sourceVerdicts.recordType, record_type),
+          inArray(sourceVerdicts.recordId, record_ids),
+          isNull(sourceVerdicts.fieldName),
         )
       );
     for (const row of storedNames) {
@@ -1470,18 +1470,18 @@ const sourceChecksApp = new Hono()
     if (unresolved.length > 0) {
       const fallbackRows = await db
         .select({
-          recordId: sourceCheckVerdicts.recordId,
-          entityId: sourceCheckVerdicts.entityId,
-          reasoning: sourceCheckVerdicts.reasoning,
+          recordId: sourceVerdicts.recordId,
+          entityId: sourceVerdicts.entityId,
+          reasoning: sourceVerdicts.reasoning,
           entityTitle: entities.title,
         })
-        .from(sourceCheckVerdicts)
-        .leftJoin(entities, eq(entities.stableId, sourceCheckVerdicts.entityId))
+        .from(sourceVerdicts)
+        .leftJoin(entities, eq(entities.stableId, sourceVerdicts.entityId))
         .where(
           and(
-            eq(sourceCheckVerdicts.recordType, record_type),
-            inArray(sourceCheckVerdicts.recordId, unresolved),
-            isNull(sourceCheckVerdicts.fieldName),
+            eq(sourceVerdicts.recordType, record_type),
+            inArray(sourceVerdicts.recordId, unresolved),
+            isNull(sourceVerdicts.fieldName),
           )
         );
 
@@ -1596,11 +1596,11 @@ const sourceChecksApp = new Hono()
     // Count distinct verified records per record_type from source_check_verdicts
     const verifiedRows = await db
       .select({
-        recordType: sourceCheckVerdicts.recordType,
-        verified: countDistinct(sourceCheckVerdicts.recordId),
+        recordType: sourceVerdicts.recordType,
+        verified: countDistinct(sourceVerdicts.recordId),
       })
-      .from(sourceCheckVerdicts)
-      .groupBy(sourceCheckVerdicts.recordType);
+      .from(sourceVerdicts)
+      .groupBy(sourceVerdicts.recordType);
 
     const verifiedByType: Record<string, number> = {};
     for (const row of verifiedRows) {
@@ -1632,7 +1632,7 @@ const sourceChecksApp = new Hono()
     const db = getDrizzleDb();
 
     // Build priority CASE expression based on verdict severity
-    const priorityExpr = sql<number>`CASE ${sourceCheckVerdicts.verdict}
+    const priorityExpr = sql<number>`CASE ${sourceVerdicts.verdict}
       WHEN 'contradicted' THEN 100
       WHEN 'outdated' THEN 80
       WHEN 'partial' THEN 50
@@ -1645,13 +1645,13 @@ const sourceChecksApp = new Hono()
     // 1. next_check_due <= NOW(), or
     // 2. needs_recheck = true
     const dueConditions = or(
-      lte(sourceCheckVerdicts.nextCheckDue, sql`NOW()`),
-      eq(sourceCheckVerdicts.needsRecheck, true),
+      lte(sourceVerdicts.nextCheckDue, sql`NOW()`),
+      eq(sourceVerdicts.needsRecheck, true),
     );
 
     const conditions = [dueConditions];
     if (record_type) {
-      conditions.push(eq(sourceCheckVerdicts.recordType, record_type));
+      conditions.push(eq(sourceVerdicts.recordType, record_type));
     }
     // Push min_priority into SQL so the total count and pagination are correct.
     // The CASE expression is wrapped in a subquery to avoid repeating it.
@@ -1664,31 +1664,31 @@ const sourceChecksApp = new Hono()
     // Fetch rows with computed priority
     const rows = await db
       .select({
-        recordType: sourceCheckVerdicts.recordType,
-        recordId: sourceCheckVerdicts.recordId,
-        fieldName: sourceCheckVerdicts.fieldName,
-        entityId: sourceCheckVerdicts.entityId,
-        verdict: sourceCheckVerdicts.verdict,
-        confidence: sourceCheckVerdicts.confidence,
-        reasoning: sourceCheckVerdicts.reasoning,
-        sourcesChecked: sourceCheckVerdicts.sourcesChecked,
-        needsRecheck: sourceCheckVerdicts.needsRecheck,
-        nextCheckDue: sourceCheckVerdicts.nextCheckDue,
-        lastComputedAt: sourceCheckVerdicts.lastComputedAt,
-        createdAt: sourceCheckVerdicts.createdAt,
-        updatedAt: sourceCheckVerdicts.updatedAt,
+        recordType: sourceVerdicts.recordType,
+        recordId: sourceVerdicts.recordId,
+        fieldName: sourceVerdicts.fieldName,
+        entityId: sourceVerdicts.entityId,
+        verdict: sourceVerdicts.verdict,
+        confidence: sourceVerdicts.confidence,
+        reasoning: sourceVerdicts.reasoning,
+        sourcesChecked: sourceVerdicts.sourcesChecked,
+        needsRecheck: sourceVerdicts.needsRecheck,
+        nextCheckDue: sourceVerdicts.nextCheckDue,
+        lastComputedAt: sourceVerdicts.lastComputedAt,
+        createdAt: sourceVerdicts.createdAt,
+        updatedAt: sourceVerdicts.updatedAt,
         priority: priorityExpr,
       })
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(whereClause)
-      .orderBy(sql`${priorityExpr} DESC`, desc(sourceCheckVerdicts.lastComputedAt))
+      .orderBy(sql`${priorityExpr} DESC`, desc(sourceVerdicts.lastComputedAt))
       .limit(limit)
       .offset(offset);
 
     // Count total matching rows (includes min_priority filter)
     const countResult = await db
       .select({ count: count() })
-      .from(sourceCheckVerdicts)
+      .from(sourceVerdicts)
       .where(whereClause);
     const total = countResult[0].count;
 

@@ -12,7 +12,7 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, sourceCheckVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import { things, sourceVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -86,7 +86,7 @@ interface ThingSearchRow {
 
 /** Verdict select fields for the joined query. */
 const verdictFields = {
-  verdict: sourceCheckVerdicts.verdict,
+  verdict: sourceVerdicts.verdict,
 };
 
 /**
@@ -101,12 +101,12 @@ const verdictFields = {
  * query below. If you add more irregular plurals here, update that query too.
  */
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = CASE ${things.sourceTable}
+  sql`${sourceVerdicts.recordType} = CASE ${things.sourceTable}
     WHEN 'entities' THEN 'entity'
     ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
   END`,
-  eq(sourceCheckVerdicts.recordId, things.sourceId),
-  sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+  eq(sourceVerdicts.recordId, things.sourceId),
+  sql`${sourceVerdicts.fieldName} IS NULL`,
 );
 
 function formatThing(
@@ -133,7 +133,7 @@ function formatThing(
   };
 }
 
-// formatSourceCheck and formatVerdict removed — source-checks live in
+// formatSourcing and formatVerdict removed — source-checks live in
 // the unified /api/source-checks route. See discussion #2950.
 
 const sortColumns = {
@@ -178,7 +178,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(ftsWhere)
       .orderBy(
         prefixQuery
@@ -207,7 +207,7 @@ const thingsApp = new Hono()
       const fallbackRows = await db
         .select({ thing: things, ...verdictFields })
         .from(things)
-        .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+        .leftJoin(sourceVerdicts, verdictJoinOnThings)
         .where(ilikeWhere)
         .orderBy(things.title)
         .limit(limit)
@@ -404,7 +404,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -436,7 +436,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(eq(things.id, id))
       .limit(1);
 
@@ -506,7 +506,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)

@@ -78,9 +78,9 @@ export interface GrantRow {
   amount: number | null;
   date: string | null;
   /** Source-check verdict (null if not checked) */
-  sourceCheckVerdict?: string | null;
+  sourcingVerdict?: string | null;
   /** Link to source-check detail page */
-  sourceCheckHref?: string;
+  sourcingHref?: string;
 }
 
 export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
@@ -137,10 +137,10 @@ export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
                   </td>
                   <td className="py-1.5 px-1">
                     <SourceCheckDot
-                      status={recordVerdictToStatus(g.sourceCheckVerdict ?? undefined)}
-                      originalVerdict={g.sourceCheckVerdict ?? undefined}
+                      status={recordVerdictToStatus(g.sourcingVerdict ?? undefined)}
+                      originalVerdict={g.sourcingVerdict ?? undefined}
                       size="md"
-                      href={g.sourceCheckVerdict ? g.sourceCheckHref : undefined}
+                      href={g.sourcingVerdict ? g.sourcingHref : undefined}
                     />
                   </td>
                 </tr>

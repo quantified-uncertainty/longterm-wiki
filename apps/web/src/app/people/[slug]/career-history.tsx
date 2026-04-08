@@ -44,7 +44,7 @@ export function CareerHistory({
                     filledFieldCount: (entry.title ? 1 : 0) + (entry.startDate ? 1 : 0) + (entry.endDate ? 1 : 0),
                   })}
                   verdict={verdict?.verdict}
-                  sourceCheckHref={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
+                  sourcingHref={verdict?.verdict ? getSourceCheckHref("personnel", String(entry.key)) : undefined}
                 />
               </div>
               <div className="text-sm text-muted-foreground mt-0.5">

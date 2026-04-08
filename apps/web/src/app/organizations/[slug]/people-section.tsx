@@ -31,9 +31,9 @@ export interface PersonEntry {
   end?: string;
   roleType?: "key-person" | "board" | "career";
   /** Source-check verdict (null if not checked) */
-  sourceCheckVerdict?: string | null;
+  sourcingVerdict?: string | null;
   /** Link to source-check detail page */
-  sourceCheckHref?: string;
+  sourcingHref?: string;
 }
 
 /** Max page size accepted by the wiki-server personnel endpoint */
@@ -145,8 +145,8 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
       roleType: VALID_ROLE_TYPES.has(row.roleType)
         ? (row.roleType as PersonEntry["roleType"])
         : undefined,
-      sourceCheckVerdict: row.sourceCheck?.verdict ?? null,
-      sourceCheckHref: row.sourceCheck?.verdict
+      sourcingVerdict: row.sourcing?.verdict ?? null,
+      sourcingHref: row.sourcing?.verdict
         ? `/source-checks/personnel/${encodeURIComponent(row.id)}`
         : undefined,
     });
@@ -293,8 +293,8 @@ export function PeopleSection({
                       coverageScore={computeGenericCoverage({
                         filledFieldCount: (person.title ? 1 : 0) + (person.start ? 1 : 0) + (person.slug ? 1 : 0),
                       })}
-                      verdict={person.sourceCheckVerdict}
-                      sourceCheckHref={person.sourceCheckHref}
+                      verdict={person.sourcingVerdict}
+                      sourcingHref={person.sourcingHref}
                     />
                   </td>
                 </tr>

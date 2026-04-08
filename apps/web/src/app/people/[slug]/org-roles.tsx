@@ -44,7 +44,7 @@ export function OrgRoles({ orgRoles }: { orgRoles: OrgRole[] }) {
                     filledFieldCount: (title ? 1 : 0) + (start ? 1 : 0) + (end ? 1 : 0),
                   })}
                   verdict={verdict?.verdict}
-                  sourceCheckHref={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
+                  sourcingHref={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
                 />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">

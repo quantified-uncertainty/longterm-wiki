@@ -1643,7 +1643,7 @@ export const pageCitations = pgTable(
  * Supports both row-level (fieldName=NULL) and cell-level (fieldName='amount')
  * source-checking for any record type (facts, grants, personnel, etc.).
  */
-export const sourceCheckEvidence = pgTable(
+export const recordSources = pgTable(
   "source_check_evidence",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
@@ -1689,7 +1689,7 @@ export const sourceCheckEvidence = pgTable(
  * Derived from source_check_evidence. Separates evidence (per-source checks)
  * from conclusions (all-things-considered verdict).
  */
-export const sourceCheckVerdicts = pgTable(
+export const sourceVerdicts = pgTable(
   "source_check_verdicts",
   {
     recordType: text("record_type").notNull(),

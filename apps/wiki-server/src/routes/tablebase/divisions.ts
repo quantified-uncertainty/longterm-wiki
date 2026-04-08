@@ -13,7 +13,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
@@ -54,7 +54,7 @@ const SyncDivisionItemSchema = z.object({
   website: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncDivisionsBatchSchema = z.object({
@@ -298,7 +298,7 @@ const divisionsApp = new Hono()
           recordId: item.id,
           entityId: item.parentOrgId,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 

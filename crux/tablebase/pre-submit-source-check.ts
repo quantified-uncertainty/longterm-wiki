@@ -226,7 +226,7 @@ export async function verifyBeforeSubmit(
       }
 
       // Record passed source-check — attach source-check data
-      record.sourceCheck = sourceCheck;
+      record.sourcing = sourceCheck;
       accepted.push(record);
     } catch (err: unknown) {
       // LLM call failed — include the record but log the error

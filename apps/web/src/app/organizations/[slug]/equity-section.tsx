@@ -204,7 +204,7 @@ export function EquityPositionsSection({
                         filledFieldCount: (pos.stake != null ? 1 : 0) + (pos.source ? 1 : 0) + (pos.notes ? 1 : 0),
                       })}
                       verdict={verdict?.verdict}
-                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
                     />
                   </td>
                 </tr>

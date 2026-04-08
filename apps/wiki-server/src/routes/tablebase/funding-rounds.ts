@@ -19,7 +19,7 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
@@ -54,7 +54,7 @@ const SyncFundingRoundItemSchema = z.object({
   leadInvestorDisplayName: z.string().max(500).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -369,7 +369,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.companyId,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 

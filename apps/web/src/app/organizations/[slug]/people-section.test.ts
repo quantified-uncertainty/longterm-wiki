@@ -76,7 +76,7 @@ describe("pgPersonnelToEntries", () => {
       start: "2020-01-01",
       end: undefined,
       roleType: "key-person",
-      sourceCheckVerdict: null,
+      sourcingVerdict: null,
     });
   });
 
@@ -205,7 +205,7 @@ describe("pgPersonnelToEntries", () => {
   it("passes through source-check verdict from PG row", () => {
     const row = makeRow({
       person: { entityId: "e1", slug: "alice", name: "Alice" },
-      sourceCheck: {
+      sourcing: {
         verdict: "confirmed",
         confidence: 0.92,
         sourcesChecked: 3,
@@ -214,16 +214,16 @@ describe("pgPersonnelToEntries", () => {
     });
 
     const result = pgPersonnelToEntries([row]);
-    expect(result.entries[0].sourceCheckVerdict).toBe("confirmed");
+    expect(result.entries[0].sourcingVerdict).toBe("confirmed");
   });
 
-  it("sets sourceCheckVerdict to null when no source-check data", () => {
+  it("sets sourcingVerdict to null when no source-check data", () => {
     const row = makeRow({
       person: { entityId: "e1", slug: "bob", name: "Bob" },
     });
 
     const result = pgPersonnelToEntries([row]);
-    expect(result.entries[0].sourceCheckVerdict).toBeNull();
+    expect(result.entries[0].sourcingVerdict).toBeNull();
   });
 
   it("accepts real names that happen to be short", () => {

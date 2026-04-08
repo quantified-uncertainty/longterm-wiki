@@ -20,7 +20,7 @@ import {
   type ResolvedEntityVars,
 } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
@@ -88,7 +88,7 @@ const SyncQuestionItemSchema = z.object({
   discoveryMethod: z.string().max(50).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncQuestionsBatchSchema = z.object({
@@ -107,7 +107,7 @@ const SyncSnapshotItemSchema = z.object({
   openInterest: z.number().nullable().optional(),
   communityPrediction: z.number().min(0).max(1).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncSnapshotsBatchSchema = z.object({
@@ -435,7 +435,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.entityId ?? null,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
@@ -525,7 +525,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.questionId,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
     });

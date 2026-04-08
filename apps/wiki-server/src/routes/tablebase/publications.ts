@@ -18,7 +18,7 @@ import {
   upsertThingsInTx,
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
@@ -67,7 +67,7 @@ const SyncItemSchema = z.object({
   abstract: z.string().max(10000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncBatchSchema = z.object({
@@ -256,7 +256,7 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.entityId,
           sourceUrl: item.url ?? item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
     });

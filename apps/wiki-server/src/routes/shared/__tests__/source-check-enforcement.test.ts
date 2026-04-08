@@ -38,7 +38,7 @@ describe('enforceSourceCheck', () => {
     const app = createTestApp();
     const res = await makeRequest(
       app,
-      [{ id: '1' }, { id: '2', sourceCheck: { verdict: 'confirmed' } }],
+      [{ id: '1' }, { id: '2', sourcing: { verdict: 'confirmed' } }],
       { requireSourceCheck: 'true' },
     );
     expect(res.status).toBe(400);
@@ -51,8 +51,8 @@ describe('enforceSourceCheck', () => {
     const res = await makeRequest(
       app,
       [
-        { id: '1', sourceCheck: { verdict: 'confirmed' } },
-        { id: '2', sourceCheck: { verdict: 'partial' } },
+        { id: '1', sourcing: { verdict: 'confirmed' } },
+        { id: '2', sourcing: { verdict: 'partial' } },
       ],
       { requireSourceCheck: 'true' },
     );

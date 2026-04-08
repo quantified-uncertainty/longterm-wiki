@@ -13,7 +13,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
@@ -49,7 +49,7 @@ const SyncBenchmarkResultItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -271,7 +271,7 @@ const benchmarkResultsApp = new Hono()
           recordId: item.id,
           entityId: item.modelId,
           sourceUrl: item.sourceUrl ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
     });

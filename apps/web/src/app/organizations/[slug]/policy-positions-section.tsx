@@ -85,7 +85,7 @@ export function PolicyPositionsSection({
               const verdict = stakeholderId
                 ? getRecordVerdict("policy-stakeholder", stakeholderId)?.verdict
                 : undefined;
-              const sourceCheckHref = stakeholderId
+              const sourcingHref = stakeholderId
                 ? getSourceCheckHref("policy-stakeholder", stakeholderId)
                 : undefined;
 
@@ -131,7 +131,7 @@ export function PolicyPositionsSection({
                         filledFieldCount: (pos.position ? 1 : 0) + (pos.statusKey ? 1 : 0),
                       })}
                       verdict={verdict}
-                      sourceCheckHref={sourceCheckHref}
+                      sourcingHref={sourcingHref}
                     />
                   </td>
                 </tr>

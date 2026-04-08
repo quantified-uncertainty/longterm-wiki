@@ -4,11 +4,11 @@ import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-or
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.js";
+import { personnel, entities, things, sourceVerdicts } from "../../schema.js";
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatSourceCheck,
+  formatSourcing,
   type VerdictJoinFields,
 } from "../shared/source-check-join.js";
 import {
@@ -25,7 +25,7 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
@@ -72,7 +72,7 @@ const SyncPersonnelItemSchema = z.object({
   background: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -146,7 +146,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
-    sourceCheck: formatSourceCheck(r),
+    sourcing: formatSourcing(r),
   };
 }
 
@@ -191,7 +191,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -226,7 +226,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -258,7 +258,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -295,7 +295,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         .from(personnel)
         .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
         .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-        .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+        .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
         .where(brokenCondition)
         .orderBy(personnel.organizationId, personnel.personId)
         .limit(LIMIT),
@@ -527,7 +527,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 

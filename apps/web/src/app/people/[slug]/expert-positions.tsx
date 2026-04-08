@@ -160,7 +160,7 @@ export function ExpertPositions({
                         filledFieldCount: (pos.confidence ? 1 : 0) + (pos.source ? 1 : 0) + (pos.date ? 1 : 0),
                       })}
                       verdict={verdict}
-                      sourceCheckHref={getSourceCheckHref("expert-position", recordId)}
+                      sourcingHref={getSourceCheckHref("expert-position", recordId)}
                     />
                   </td>
                 </tr>

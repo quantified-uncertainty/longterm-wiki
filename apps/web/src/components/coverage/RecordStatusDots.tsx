@@ -14,7 +14,7 @@ interface RecordStatusDotsProps {
   /** Source-check verdict string (null = not checked) */
   verdict: string | null | undefined;
   /** Link to source-check detail page */
-  sourceCheckHref?: string;
+  sourcingHref?: string;
   /** Dot size for SourceCheckDot */
   size?: "sm" | "md";
   /** Additional CSS classes on the wrapper */
@@ -24,7 +24,7 @@ interface RecordStatusDotsProps {
 export function RecordStatusDots({
   coverageScore,
   verdict,
-  sourceCheckHref,
+  sourcingHref,
   size = "md",
   className = "",
 }: RecordStatusDotsProps) {
@@ -35,7 +35,7 @@ export function RecordStatusDots({
         status={recordVerdictToStatus(verdict)}
         originalVerdict={verdict}
         size={size}
-        href={sourceCheckHref}
+        href={sourcingHref}
       />
     </span>
   );

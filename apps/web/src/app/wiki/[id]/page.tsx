@@ -352,9 +352,9 @@ async function ContentView({
     : pageData?.citationHealth ?? undefined;
 
   // Try unified source-check verdicts first; fall back to citation_quotes
-  const sourceCheckVerdicts = !isInternal ? await getSourceCheckVerdicts(slug) : [];
-  const citationHealthSummary = sourceCheckVerdicts.length > 0
-    ? computeHealthFromSourceCheck(sourceCheckVerdicts, citationQuotes?.length ?? 0)
+  const sourceVerdicts = !isInternal ? await getSourceCheckVerdicts(slug) : [];
+  const citationHealthSummary = sourceVerdicts.length > 0
+    ? computeHealthFromSourceCheck(sourceVerdicts, citationQuotes?.length ?? 0)
     : citationQuotes && citationQuotes.length > 0
       ? computeCitationHealth(citationQuotes)
       : null;

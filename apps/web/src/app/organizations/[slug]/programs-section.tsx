@@ -131,7 +131,7 @@ export function FundingProgramsSection({
                         description: p.description,
                       })}
                       verdict={verdict?.verdict}
-                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>

@@ -3,7 +3,7 @@ import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "../../schema.js";
-import type { InlineSourceCheck } from "./source-check-schema.js";
+import type { InlineSourcing } from "./sourcing-schema.js";
 import { logger } from "../../logger.js";
 
 type DbOrTx =
@@ -29,14 +29,14 @@ export async function writeInlineVerdicts(
     recordId: string;
     entityId?: string | null;
     sourceUrl?: string | null;
-    sourceCheck?: InlineSourceCheck | null;
+    sourcing?: InlineSourcing | null;
   }>
 ): Promise<{ written: number }> {
-  const withSourceCheck = records.filter((r) => r.sourceCheck);
-  if (withSourceCheck.length === 0) return { written: 0 };
+  const withSourcing = records.filter((r) => r.sourcing);
+  if (withSourcing.length === 0) return { written: 0 };
 
-  for (const record of withSourceCheck) {
-    const v = record.sourceCheck!;
+  for (const record of withSourcing) {
+    const v = record.sourcing!;
 
     // Upsert verdict — same conflict key as source-checks.ts
     // Note: `reasoning` is the verdict-level summary (not raw evidence text).

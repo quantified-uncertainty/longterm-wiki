@@ -52,7 +52,7 @@ export function enforceSourceCheck(
     return null;
   }
 
-  const unchecked = items.filter((i) => !i.sourceCheck);
+  const unchecked = items.filter((i) => !i.sourcing);
   if (unchecked.length === 0) return null;
 
   const source = serverRequired ? "server policy" : "client requireSourceCheck param";

@@ -5,11 +5,11 @@ import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { grants, things, entities, fundingPrograms, sourceCheckVerdicts } from "../../schema.js";
+import { grants, things, entities, fundingPrograms, sourceVerdicts } from "../../schema.js";
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatSourceCheck,
+  formatSourcing,
   type VerdictJoinFields,
 } from "../shared/source-check-join.js";
 import {
@@ -26,7 +26,7 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineSourceCheckSchema } from "./source-check-schema.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
@@ -73,7 +73,7 @@ const SyncGrantItemSchema = z.object({
   notes: z.string().max(5000).nullable().optional(),
   programId: z.string().max(200).nullable().optional(),
   dataSourceId: z.string().max(100).nullable().optional(),
-  sourceCheck: InlineSourceCheckSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -163,7 +163,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: g.syncedAt,
     createdAt: g.createdAt,
     updatedAt: g.updatedAt,
-    sourceCheck: formatSourceCheck(r),
+    sourcing: formatSourcing(r),
   };
 }
 
@@ -220,7 +220,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("grant", grants.id))
       .orderBy(desc(grants.syncedAt), grants.id)
       .limit(limit)
       .offset(offset);
@@ -301,7 +301,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants)
       .leftJoin(granteeEntity, eq(grants.granteeEntityId, granteeEntity.stableId))
       .leftJoin(orgEntity, eq(grants.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("grant", grants.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("grant", grants.id))
       .where(where)
       .orderBy(orderClause, grants.id)
       .limit(limit)
@@ -745,7 +745,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          sourceCheck: item.sourceCheck ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
