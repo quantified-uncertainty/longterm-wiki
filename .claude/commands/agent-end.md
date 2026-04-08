@@ -56,7 +56,7 @@ Each slot uses its own port (`3010 + slot number`, e.g. `lw/a2` → 3012). Kill 
 ```bash
 # Read DEV_PORT from .env (set by the slot scaffolding); fall back to nothing.
 DEV_PORT=$(grep -m1 '^DEV_PORT=' .env 2>/dev/null | cut -d= -f2-)
-if [ -n "$DEV_PORT" ]; then
+if [ -n "$DEV_PORT" ] && [[ "$DEV_PORT" =~ ^[0-9]+$ ]]; then
   PIDS=$(lsof -ti:$DEV_PORT -sTCP:LISTEN 2>/dev/null)
   if [ -n "$PIDS" ]; then
     kill $PIDS 2>/dev/null
