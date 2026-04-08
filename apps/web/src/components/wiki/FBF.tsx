@@ -24,7 +24,7 @@ import {
   isUrl,
   shortDomain,
 } from "./factbase/format";
-import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
+import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
 import styles from "./tooltip.module.css";
 
 interface FBFProps {

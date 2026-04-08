@@ -87,7 +87,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
       const result = await runEnrichmentAgent(task, {
         dryRun: options.dryRun,
         model,
-        skipVerification: options.skipVerification,
+        skipSourceCheck: options.skipSourceCheck,
       });
       results.push(result);
       totalCost += result.cost;

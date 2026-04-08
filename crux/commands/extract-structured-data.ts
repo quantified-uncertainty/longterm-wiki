@@ -2,7 +2,7 @@
  * Extract Structured Data from Wiki Pages
  *
  * Extracts structured data from wiki page prose for any entity type and
- * optionally writes it to the YAML entity data layer after verification
+ * optionally writes it to the YAML entity data layer after source-check
  * against footnote sources.
  *
  * Supported entity types:
@@ -189,7 +189,7 @@ interface VerifiedClaim {
   footnoteUrl: string | null;
   verified: boolean;
   confidence: number;
-  verificationNote: string;
+  sourceCheckNote: string;
 }
 
 interface ExtractionResult {
@@ -891,7 +891,7 @@ function validateStringArray(raw: unknown): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Verification
+// Source-Check
 // ---------------------------------------------------------------------------
 
 async function verifyClaim(
@@ -958,7 +958,7 @@ RULES:
 }
 
 /**
- * Build verification claims from extracted data based on entity type.
+ * Build source-check claims from extracted data based on entity type.
  * Returns a list of claims to verify, each with a description and search keyword for footnotes.
  */
 function buildClaimsToVerify(
@@ -1067,7 +1067,7 @@ function buildClaimsToVerify(
 }
 
 /**
- * Run verification on extracted data against footnote sources.
+ * Run source-check on extracted data against footnote sources.
  */
 async function verifyExtractedData(
   client: ReturnType<typeof createLlmClient>,
@@ -1086,11 +1086,11 @@ async function verifyExtractedData(
   const claimsToVerify = buildClaimsToVerify(extracted, entityType, mdxContent, footnotes);
 
   // Verify each claim that has a source URL
-  let verificationCount = 0;
+  let sourceCheckCount = 0;
   for (const claim of claimsToVerify) {
     // Check budget
     if (tracker.totalCost >= budgetUsd) {
-      console.log(`  ${c.yellow}Budget limit reached ($${tracker.totalCost.toFixed(4)} / $${budgetUsd}), skipping remaining verifications${c.reset}`);
+      console.log(`  ${c.yellow}Budget limit reached ($${tracker.totalCost.toFixed(4)} / $${budgetUsd}), skipping remaining source-checks${c.reset}`);
       claims.push({
         field: claim.field,
         value: claim.value,
@@ -1098,7 +1098,7 @@ async function verifyExtractedData(
         footnoteUrl: claim.footnoteUrl,
         verified: false,
         confidence: 0,
-        verificationNote: 'Skipped: budget limit reached',
+        sourceCheckNote: 'Skipped: budget limit reached',
       });
       continue;
     }
@@ -1111,7 +1111,7 @@ async function verifyExtractedData(
         footnoteUrl: null,
         verified: false,
         confidence: 0,
-        verificationNote: 'No source URL found for verification',
+        sourceCheckNote: 'No source URL found for source-check',
       });
       continue;
     }
@@ -1134,13 +1134,13 @@ async function verifyExtractedData(
           footnoteUrl: claim.footnoteUrl,
           verified: false,
           confidence: 0,
-          verificationNote: `Source fetch failed: ${fetched.status}`,
+          sourceCheckNote: `Source fetch failed: ${fetched.status}`,
         });
         console.log(`    ${c.yellow}Source unavailable (${fetched.status})${c.reset}`);
         continue;
       }
 
-      const verification = await verifyClaim(
+      const sourceCheckResult = await verifyClaim(
         client,
         tracker,
         claim.description,
@@ -1153,14 +1153,14 @@ async function verifyExtractedData(
         value: claim.value,
         footnoteRef: claim.footnoteRef,
         footnoteUrl: claim.footnoteUrl,
-        verified: verification.verified,
-        confidence: verification.confidence,
-        verificationNote: verification.note,
+        verified: sourceCheckResult.verified,
+        confidence: sourceCheckResult.confidence,
+        sourceCheckNote: sourceCheckResult.note,
       });
 
-      const color = verification.verified ? c.green : verification.confidence > 0.3 ? c.yellow : c.red;
-      console.log(`    ${color}${verification.verified ? 'VERIFIED' : 'UNVERIFIED'} (${(verification.confidence * 100).toFixed(0)}%)${c.reset} ${verification.note}`);
-      verificationCount++;
+      const color = sourceCheckResult.verified ? c.green : sourceCheckResult.confidence > 0.3 ? c.yellow : c.red;
+      console.log(`    ${color}${sourceCheckResult.verified ? 'VERIFIED' : 'UNVERIFIED'} (${(sourceCheckResult.confidence * 100).toFixed(0)}%)${c.reset} ${sourceCheckResult.note}`);
+      sourceCheckCount++;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
       claims.push({
@@ -1170,13 +1170,13 @@ async function verifyExtractedData(
         footnoteUrl: claim.footnoteUrl,
         verified: false,
         confidence: 0,
-        verificationNote: `Error: ${msg.slice(0, 150)}`,
+        sourceCheckNote: `Error: ${msg.slice(0, 150)}`,
       });
       console.log(`    ${c.red}Error: ${msg.slice(0, 100)}${c.reset}`);
     }
   }
 
-  console.log(`  ${c.dim}Verified ${verificationCount} claims${c.reset}`);
+  console.log(`  ${c.dim}Verified ${sourceCheckCount} claims${c.reset}`);
   return claims;
 }
 
@@ -1237,7 +1237,7 @@ function applyToEntity(
   extracted: ExtractedData,
   _entityType: string,
   verifiedClaims: VerifiedClaim[],
-  requireVerification: boolean,
+  requireSourceCheck: boolean,
 ): string[] {
   const applied: string[] = [];
 
@@ -1251,7 +1251,7 @@ function applyToEntity(
 
   // Helper: is a field's data usable?
   const isUsable = (field: string): boolean => {
-    if (!requireVerification) return true;
+    if (!requireSourceCheck) return true;
     const fieldClaims = verifiedFields.get(field);
     if (!fieldClaims || fieldClaims.length === 0) return false;
     // At least one claim must be verified with confidence >= 0.7
@@ -1539,10 +1539,10 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
 
     console.log(`  ${c.green}Extracted:${c.reset} ${formatExtractionSummary(extracted, entityType)}`);
 
-    // Step 3: Verification (optional)
+    // Step 3: Source-check (optional)
     let verifiedClaims: VerifiedClaim[] = [];
     if (doVerify) {
-      console.log(`  ${c.dim}Running verification...${c.reset}`);
+      console.log(`  ${c.dim}Running source-check...${c.reset}`);
       verifiedClaims = await verifyExtractedData(
         client,
         tracker,
@@ -1561,7 +1561,7 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
       if (appliedFields.length > 0) {
         console.log(`  ${c.green}Applied:${c.reset} ${appliedFields.join(', ')}`);
       } else {
-        console.log(`  ${c.dim}No fields applied${doVerify ? ' (none met verification threshold)' : ''}${c.reset}`);
+        console.log(`  ${c.dim}No fields applied${doVerify ? ' (none met source-check threshold)' : ''}${c.reset}`);
       }
     }
 
@@ -1674,7 +1674,7 @@ async function extract(args: string[], options: ExtractOptions): Promise<Command
       if (result.verifiedClaims.length > 0) {
         const verified = result.verifiedClaims.filter((vc) => vc.verified).length;
         const total = result.verifiedClaims.length;
-        output += `  ${c.cyan}Verification:${c.reset} ${verified}/${total} claims verified\n`;
+        output += `  ${c.cyan}Source-Check:${c.reset} ${verified}/${total} claims verified\n`;
       }
     }
   }
@@ -1869,7 +1869,7 @@ export function getHelp(): string {
 Extract Structured Data from Wiki Pages
 
 Extracts structured data from wiki page prose for any entity type and
-optionally writes to the YAML entity data layer after verification
+optionally writes to the YAML entity data layer after source-check
 against footnote sources.
 
 Supported entity types:

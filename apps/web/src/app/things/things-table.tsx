@@ -246,7 +246,7 @@ export function ThingsTable({
                         (row.parentThingId ? 1 : 0),
                     })}
                     verdict={row.verdict}
-                    sourceCheckHref={
+                    sourcingHref={
                       row.verdict
                         ? `/source-checks/${encodeURIComponent(row.sourceTable)}/${encodeURIComponent(row.sourceId)}`
                         : undefined

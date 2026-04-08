@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 export const metadata: Metadata = {
   title: "Source Checks",
   description:
-    "Directory of source verification checks across wiki data, including personnel records, grants, divisions, and more.",
+    "Directory of source checks across wiki data, including personnel records, grants, divisions, and more.",
   robots: { index: false },
 };
 
@@ -269,7 +269,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           Source Checks
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl mb-2">
-          Automated verification of wiki data against original sources. Each
+          Automated source checking of wiki data against original sources. Each
           record is checked against one or more external sources to confirm
           accuracy.
         </p>
@@ -416,7 +416,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             {(filteredStats.needs_recheck ?? 0) > 0
-              ? "Flagged for re-verification"
+              ? "Flagged for re-check"
               : "All up to date"}
           </p>
         </div>

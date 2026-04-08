@@ -377,7 +377,7 @@ function categorizeMessage(msg: string): string {
   if (/^(add|create|implement|build|write|make)\b/.test(lower)) return 'feature-request';
   if (/^(update|change|modify|edit|rename|move|refactor)\b/.test(lower)) return 'modification-request';
   if (/^(delete|remove|clean|drop)\b/.test(lower)) return 'removal-request';
-  if (/^(test|check|verify|validate|run)\b/.test(lower)) return 'verification-request';
+  if (/^(test|check|verify|validate|run)\b/.test(lower)) return 'check-request';
   if (/^(show|list|find|search|look|where|what)\b/.test(lower)) return 'information-query';
   if (/^(how|why|explain|help|can you|does|is there)\b/.test(lower)) return 'question';
   if (/^(commit|push|ship|deploy|merge|pr)\b/.test(lower)) return 'git-workflow';

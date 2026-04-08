@@ -105,7 +105,7 @@ export interface RiskInput {
   quality: number | null;
   /** Whether the page has been human-reviewed */
   hasHumanReview?: boolean;
-  /** Citation accuracy data from LLM verification */
+  /** Citation accuracy data from LLM source-check */
   accuracy?: { checked: number; inaccurate: number } | null;
   /** Page body content (stripped of frontmatter) for integrity checks. Null to skip. */
   contentBody?: string | null;
@@ -258,7 +258,7 @@ export function computeHallucinationRisk(input: RiskInput): RiskResult {
     factors.push('no-human-review');
   }
 
-  // Citation accuracy issues (from LLM verification)
+  // Citation accuracy issues (from LLM source-check)
   if (accuracy) {
     const accRisk = computeAccuracyRisk(accuracy.checked, accuracy.inaccurate);
     if (accRisk.factor) {

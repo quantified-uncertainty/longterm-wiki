@@ -1,0 +1,217 @@
+---
+wikiId: E2156
+title: "External Search & Extraction APIs"
+description: "Comparison of web search, content extraction, and fact retrieval APIs used or evaluated for the wiki's research and verification pipelines."
+subcategory: architecture
+contentFormat: article
+lastEdited: "2026-04-07"
+---
+
+## Overview
+
+The wiki uses several external APIs for web search, content extraction, and fact verification across its research, enrichment, and source-check pipelines. This page documents each service, its costs, where it's integrated, and what we've learned from production use.
+
+## Services We Use
+
+### Exa (Web Search)
+
+- **What it does**: Semantic web search API. Returns URLs + titles + text snippets ranked by relevance.
+- **Pricing**: \$7/1,000 searches (with contents for up to 10 results included). 1,000 free requests/month.
+- **Per-query cost**: ≈\$0.007
+- **Integration**: `crux/lib/search/research-agent.ts` (searchExa function), env var `EXA_API_KEY`
+- **Used by**: Research agent (content pipeline, auto-update), source discovery
+
+**What works well:**
+- Strong semantic search — finds relevant pages even without exact keyword matches
+- Good coverage of personal websites, Wikipedia, news articles, blog posts
+- Per-person queries like `"Josh Batson" "Anthropic" "Research Scientist"` reliably surface personal websites, Google Scholar profiles, conference bios, news mentions
+- Text snippets included in search results (up to 400 chars), reducing need for separate fetch
+
+**What works poorly:**
+- Entity-level topic queries return too-broad results (generic articles, unrelated repos)
+- No JS rendering — search results are indexed from crawled content, but if the crawled content was a JS shell, the snippet is empty
+- LinkedIn results always return 0 content chars (blocked by LinkedIn)
+
+**Lessons:**
+- Best used for per-person or per-fact targeted queries, not broad topic exploration
+- For source discovery, querying per-person (`"Person Name" "Org"`) outperforms querying per-entity (`"Org team leadership"`)
+
+### Perplexity Sonar (Search + Synthesis via OpenRouter)
+
+- **What it does**: AI-powered web search that returns cited answers. We access it via OpenRouter.
+- **Pricing**: \$1/M input tokens + \$1/M output tokens + \$5-12/1,000 requests (context-dependent). Via OpenRouter, roughly \$0.005-0.01 per search.
+- **Integration**: `crux/lib/search/research-agent.ts` (searchPerplexity function), env var `OPENROUTER_API_KEY`
+- **Used by**: Research agent
+
+**What works well:**
+- Returns cited URLs alongside synthesized answers
+- Good at finding authoritative sources for well-known topics
+- Citations are deduplicated against Exa results (research agent handles dedup)
+
+**What works poorly:**
+- Intermittent availability — sometimes doesn't return results (observed in testing: Perplexity provider absent from some runs while Exa succeeds)
+- JSON parsing of structured results is fragile (falls back to raw citation URLs)
+- Higher latency than Exa (~10-15s vs ~3-5s)
+
+**Lessons:**
+- Good as a supplementary provider alongside Exa, not as a primary
+- The citation URLs from Sonar answers often overlap with Exa results
+- Cost is comparable to Exa but less predictable due to token-based pricing
+
+### SCRY / Exopriors (EA Forum + LessWrong Search)
+
+- **What it does**: SQL-based semantic search over EA Forum and LessWrong posts.
+- **Pricing**: Free (public readonly API key available)
+- **Integration**: `crux/lib/search/research-agent.ts` (searchScry function), env var `SCRY_API_KEY` (falls back to public key)
+- **Used by**: Research agent
+
+**What works well:**
+- Excellent for finding EA/rationalist community discussions about specific organizations or people
+- Free
+- Good for finding announcement posts ("Announcing Epoch AI", "Why I'm leaving OpenAI")
+
+**What works poorly:**
+- Limited to EA Forum and LessWrong — no general web coverage
+- Snippets are sometimes truncated or missing
+- Not useful for most personnel verification (people aren't typically discussed on these forums)
+
+**Lessons:**
+- Valuable as a supplementary source for EA-adjacent organizations
+- Returns unique content not found by Exa or Perplexity (community discussions, job announcements)
+
+### Firecrawl (Content Extraction + JS Rendering)
+
+- **What it does**: Fetches web pages and converts to clean markdown. Handles JavaScript-rendered SPAs.
+- **Pricing**: Hobby \$16/mo (3,000 pages), Standard \$83/mo (100,000 pages). ≈\$0.005/page on Hobby, \$0.0008/page on Standard. 500 free pages.
+- **Per-page cost**: ≈\$0.001-0.005
+- **Integration**: `crux/lib/search/source-fetcher.ts` (fetchWithFirecrawl function), env var `FIRECRAWL_KEY`, requires `@mendable/firecrawl-js` package (optional dependency)
+- **Used by**: Source fetcher (used by all pipelines that fetch web content)
+
+**What works well:**
+- JS rendering works: `anthropic.com/company` goes from 72 bytes (plain fetch) to 6,572 chars (Firecrawl)
+- Clean markdown output suitable for LLM consumption
+- Handles SPAs, infinite scroll, dynamic content
+
+**What works poorly:**
+- Team pages with lazy-loaded member lists may still not fully render (e.g., `epoch.ai/team` returned only 1,933 chars and only found 1/3 tested people)
+- Not installed by default (optional dependency) — many agent sessions run without it
+- 1 credit per page regardless of whether useful content was extracted
+
+**Lessons:**
+- Critical for JS-rendered sites (Anthropic, OpenAI, many modern org websites)
+- Should be installed by default in all agent slots, not left as optional
+- For team pages, consider combining with targeted per-person searches rather than relying solely on team page extraction
+- The `epoch.ai/team` example shows that even with JS rendering, modern team pages often don't expose all personnel in the initial render
+
+### Anthropic Web Search (Server Tool)
+
+- **What it does**: Server-side web search tool available in Claude API calls. Returns search results directly in the conversation.
+- **Pricing**: Included in Claude API token costs (no separate per-search fee), but each search adds ~1,000-2,000 tokens to the response
+- **Integration**: Built into the Claude API via `web_search_20250305` server tool type. Used in `crux/tablebase/tools.ts`
+- **Used by**: Tablebase enrichment agents (personnel-enrichment, source-discovery V1)
+
+**What works well:**
+- Seamless integration with the LLM agent loop — no separate API call needed
+- The LLM can iteratively refine searches based on results
+- Good at finding person-specific sources when the agent crafts targeted queries
+
+**What works poorly:**
+- Expensive: bundled with Sonnet token costs means each search is ≈\$0.02-0.05 (vs \$0.007 for Exa)
+- No control over search parameters (can't specify max results, date range, domain filters)
+- Results are ephemeral — not cached or registered as resources
+
+**Lessons:**
+- Best for interactive agent research where the LLM needs to reason about results
+- For batch source discovery, standalone search APIs (Exa, Perplexity) are 5-10x cheaper
+- V1 source-discovery used this at ≈\$0.80/entity; switching to Exa reduced cost to ≈\$0.005/entity
+
+## Services We've Evaluated But Don't Use
+
+### Tavily (AI Search API)
+
+- **What it does**: AI-optimized search API for LLMs. Returns results with optional content extraction.
+- **Pricing**: 1,000 free searches/month. \$30/mo for 10K credits (\$0.003/basic search, \$0.006/advanced). Credits don't roll over.
+- **Why we might use it**: Cheapest per-query cost of the search APIs. Built specifically for LLM consumption.
+- **Why we don't currently**: Already have Exa + Perplexity covering search needs. Adding another provider adds integration complexity. Would be valuable if Exa costs become a concern.
+- **Verdict**: Strong candidate to add as a search provider in `research-agent.ts` if we need to reduce search costs or improve coverage.
+
+### Brave LLM Context API
+
+- **What it does**: Web search that returns "smart chunks" — clean markdown, JSON-LD schemas, query-optimized snippets designed for LLM context injection. Launched February 2026.
+- **Pricing**: \$5/1,000 requests. Free \$5 in credits monthly.
+- **Per-query cost**: \$0.005
+- **Why we might use it**: Combines search + extraction in one API call. Token-efficient output format. Independent index (not Google/Bing).
+- **Why we don't currently**: New service (Feb 2026), hasn't been tested. Would need integration work in research-agent.ts.
+- **Verdict**: Promising. The smart-chunk format could reduce token costs in LLM verification. Worth testing, especially for the source-check pipeline where we need both search and content extraction.
+
+### Jina Reader (URL-to-Markdown)
+
+- **What it does**: Converts any URL to clean markdown via `r.jina.ai/{url}`. Zero-config — just an HTTP GET.
+- **Pricing**: Token-based. Free tier: 100 RPM, 10M tokens for new users. Paid tiers scale to 5,000 RPM.
+- **Per-page cost**: Effectively free for our volume (under 10M tokens/month)
+- **Why we might use it**: Zero-config alternative to Firecrawl. No package to install — just `fetch('https://r.jina.ai/' + url)`. It could be used as a fallback when Firecrawl isn't available.
+- **Why we don't currently**: Haven't tested quality compared to Firecrawl. Unclear JS rendering support.
+- **Verdict**: High priority to evaluate as a Firecrawl fallback. The zero-config aspect is valuable since Firecrawl's optional dependency means many sessions run without content extraction.
+
+### Linkup (AI Fact Retrieval)
+
+- **What it does**: AI fact retrieval and verification API. "World's most accurate search" on OpenAI's SimpleQA benchmark. Returns verified facts with source URLs.
+- **Pricing**: \$5 free credits on signup, topped up monthly. Per-request pricing varies by depth parameter.
+- **Why we might use it**: Purpose-built for fact verification, which is literally our source-check use case. Could replace the Haiku-based source verification with a single API call.
+- **Why we don't currently**: New, limited documentation on pricing at scale. Would need testing to see if it handles our specific claim types (personnel roles, grant amounts, funding rounds).
+- **Verdict**: Worth evaluating for the source-check pipeline specifically. If it can verify "Person X has Role Y at Org Z" reliably, it could replace several steps in our verification pipeline.
+
+### Crawl4AI (Self-hosted Crawler)
+
+- **What it does**: Open-source web crawler with Playwright-based JS rendering, designed for AI applications.
+- **Pricing**: Free (self-hosted). Requires running Playwright/Chromium.
+- **Why we might use it**: Free, full JS rendering, LLM-optimized output. More control than Firecrawl.
+- **Why we don't currently**: Requires infrastructure to host. Our k8s setup could run it but adds operational complexity.
+- **Verdict**: Consider if Firecrawl costs become significant or if we need more control over rendering behavior (e.g., custom wait-for-selector logic for team pages).
+
+## Cost Comparison Summary
+
+| Service | Type | Cost per query/page | Free tier | Best for |
+|---------|------|-------------------|-----------|----------|
+| **Exa** | Search | \$0.007 | 1K/month | Per-person targeted search |
+| **Perplexity Sonar** | Search + synthesis | \$0.005-0.01 | via OpenRouter | Supplementary cited answers |
+| **SCRY** | Forum search | Free | Unlimited | EA/rationalist community content |
+| **Firecrawl** | Content extraction | \$0.001-0.005 | 500 pages | JS-rendered site content |
+| **Anthropic web_search** | Search (in-LLM) | \$0.02-0.05 | N/A | Interactive agent research |
+| **Tavily** | Search | \$0.003-0.006 | 1K/month | Cheapest batch search |
+| **Brave LLM Context** | Search + extraction | \$0.005 | \$5/month | Combined search+extract |
+| **Jina Reader** | Content extraction | ~Free | 10M tokens | Zero-config extraction fallback |
+| **Linkup** | Fact verification | ≈\$0.005 | \$5/month | Direct fact checking |
+| **Crawl4AI** | Content extraction | Free (self-hosted) | N/A | Full control, heavy JS sites |
+
+## Integration Architecture
+
+```
+Research Agent (crux/lib/search/research-agent.ts)
+  ├── Exa          (EXA_API_KEY)
+  ├── Perplexity   (OPENROUTER_API_KEY, via OpenRouter)
+  ├── SCRY         (SCRY_API_KEY or public key)
+  ├── GitHub       (GITHUB_TOKEN)
+  ├── Semantic Scholar (no key needed)
+  └── Federal Register (no key needed)
+        │
+        ▼
+Source Fetcher (crux/lib/search/source-fetcher.ts)
+  ├── Firecrawl    (FIRECRAWL_KEY + @mendable/firecrawl-js)
+  └── Built-in fetch (fallback)
+        │
+        ▼
+Citation Content Cache (wiki-server citation_content table)
+        │
+        ▼
+Source Check Pipeline (crux/lib/source-check/)
+  └── Claude Haiku  (ANTHROPIC_API_KEY)
+```
+
+## Recommendations
+
+1. **Install Firecrawl by default** in all agent slots. It's already a declared dependency — just needs `pnpm install --force` to install the optional package.
+2. **Add Jina Reader as a fallback** in `source-fetcher.ts` for when Firecrawl isn't available. Zero integration cost (just an HTTP fetch).
+3. **Evaluate Tavily** as a cheaper search alternative to Exa for batch operations (source discovery, auto-update).
+4. **Evaluate Linkup** for the source-check pipeline — if it can verify personnel claims directly, it could replace the fetch + Haiku verification two-step.
+5. **Use per-person Exa queries** for source discovery instead of the Sonnet agent loop — 100x cheaper with comparable hit rate.

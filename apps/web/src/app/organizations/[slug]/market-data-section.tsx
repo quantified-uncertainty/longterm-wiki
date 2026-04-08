@@ -14,8 +14,8 @@ import {
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import { SectionHeader } from "./org-shared";
 
 // ── Data Fetching ────────────────────────────────────────────────────

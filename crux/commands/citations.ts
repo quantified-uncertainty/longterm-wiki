@@ -8,7 +8,7 @@
  * Usage:
  *   crux w citations verify <page-id>         Verify citations for a page
  *   crux w citations verify --all             Verify all pages with citations
- *   crux w citations status <page-id>         Show verification status
+ *   crux w citations status <page-id>         Show source-check status
  *   crux w citations report                   Summary across all archived pages
  *
  * Part of the hallucination risk reduction initiative (issue #200).
@@ -25,13 +25,13 @@ const SCRIPTS = {
   },
   status: {
     script: 'citations/citation-status.ts',
-    description: 'Show citation verification status',
+    description: 'Show citation checking status',
     passthrough: ['ci', 'json', 'broken'],
     positional: true,
   },
   report: {
     script: 'citations/citation-report.ts',
-    description: 'Summary report of citation verification across all pages',
+    description: 'Summary report of citation checking across all pages',
     passthrough: ['ci', 'json', 'broken'],
   },
   'extract-quotes': {
@@ -42,7 +42,7 @@ const SCRIPTS = {
   },
   'quote-report': {
     script: 'citations/quote-report.ts',
-    description: 'Report on quote extraction and verification coverage',
+    description: 'Report on quote extraction and source-check coverage',
     passthrough: ['ci', 'json', 'broken'],
   },
   'verify-quotes': {
@@ -87,7 +87,7 @@ const SCRIPTS = {
   },
   'audit-check': {
     script: 'citations/audit-check.ts',
-    description: 'Independent post-hoc verification: check claims against source content',
+    description: 'Independent post-hoc check: check claims against source content',
     passthrough: ['json', 'no-fetch', 'threshold', 'model', 'delay'],
     positional: true,
   },
@@ -133,7 +133,7 @@ Examples:
   crux w citations verify existential-risk                    Verify one page
   crux w citations verify existential-risk --content-verify  Also check claim support
   crux w citations verify --all --limit=20                   Verify top 20 pages
-  crux w citations status existential-risk           Show verification results
+  crux w citations status existential-risk           Show source-check results
   crux w citations report                            Summary across all pages
   crux w citations report --broken                   List all broken citations
   crux w citations extract-quotes existential-risk   Extract quotes for a page
@@ -156,7 +156,7 @@ Examples:
   crux w citations fix-inaccuracies --max-score=0.5   Only worst citations
   crux w citations audit existential-risk             Full audit pipeline for one page
   crux w citations audit existential-risk --apply     Audit and auto-fix one page
-  crux w citations audit-check existential-risk       Independent verification (no DB, no fixes)
+  crux w citations audit-check existential-risk       Independent check (no DB, no fixes)
   crux w citations audit-check existential-risk --no-fetch  Use cached sources only
   crux w citations audit-check existential-risk --threshold=0.9  Require 90% verified
   crux w citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model

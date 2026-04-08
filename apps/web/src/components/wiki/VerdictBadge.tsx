@@ -85,7 +85,7 @@ export type VerdictType =
   | "unverified";
 
 interface VerdictBadgeProps {
-  /** Verdict key from the citation verification system */
+  /** Verdict key from the citation source-check system */
   verdict?: string | null;
   /** Whether the source quote was verified (used as fallback when no accuracy verdict) */
   quoteVerified?: boolean;
@@ -98,7 +98,7 @@ interface VerdictBadgeProps {
 }
 
 /**
- * VerdictBadge -- small colored pill showing claim verification status.
+ * VerdictBadge -- small colored pill showing claim source-check status.
  *
  * Renders a verdict icon + label with color coding:
  * - Green: "Verified" (accurate)

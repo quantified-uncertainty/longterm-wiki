@@ -845,25 +845,25 @@ function scanContentFreshness(meta: EntityTypeMeta): CellValue {
 
 // --- Quality ---
 
-function scanVerificationTables(meta: EntityTypeMeta): CellValue {
+function scanSourceCheckTables(meta: EntityTypeMeta): CellValue {
   if (!meta.dbTable) return naCell("No DB table");
 
   const schema = getWikiServerSchemaContent();
-  // Check for verification-related tables (unified verification system)
-  const hasVerification =
+  // Check for source-check-related tables (unified source-check system)
+  const hasSourceCheck =
     schema.includes(`verificationEvidence`) ||
     schema.includes(`verification_evidence`) ||
     schema.includes(`verificationVerdicts`) ||
     schema.includes(`verification_verdicts`);
 
   return cell(
-    hasVerification,
-    "verification_tables",
-    hasVerification ? "Has verification tables" : "No verification",
+    hasSourceCheck,
+    "source_check_tables",
+    hasSourceCheck ? "Has source-check tables" : "No source-check",
   );
 }
 
-function scanVerificationCoverage(_meta: EntityTypeMeta): CellValue {
+function scanSourceCheckCoverage(_meta: EntityTypeMeta): CellValue {
   // Requires API call — return placeholder
   return naCell("Requires wiki-server API");
 }
@@ -972,8 +972,8 @@ const SCANNERS: Record<string, DimensionScanner> = {
   content_freshness: scanContentFreshness,
 
   // Quality
-  verification_tables: scanVerificationTables,
-  verification_coverage: scanVerificationCoverage,
+  source_check_tables: scanSourceCheckTables,
+  source_check_coverage: scanSourceCheckCoverage,
   hallucination_scored: scanHallucinationScored,
 
   // Testing

@@ -14,8 +14,8 @@
 import { cn } from "@/lib/utils";
 import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
 import { getEntityHref } from "@/data/entity-nav";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import type { PoliticalVoteRecord } from "./types";

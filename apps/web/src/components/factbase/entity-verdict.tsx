@@ -15,7 +15,7 @@ export function VerdictBadge({ verdict }: { verdict: VerdictRow }) {
   );
 }
 
-export function VerificationSummary({
+export function SourceCheckSummary({
   verdicts,
   totalFacts,
 }: {

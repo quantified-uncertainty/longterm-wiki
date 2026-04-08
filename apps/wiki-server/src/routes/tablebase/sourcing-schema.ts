@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 /**
- * Optional verification data that can be submitted alongside any TableBase record.
+ * Optional source-check data that can be submitted alongside any TableBase record.
  * When present, a source_check_verdict is written atomically with the record.
  */
-export const InlineVerificationSchema = z.object({
+export const InlineSourcingSchema = z.object({
   verdict: z.enum([
     "confirmed",
     "contradicted",
@@ -19,4 +19,4 @@ export const InlineVerificationSchema = z.object({
   checkedBy: z.string().max(100).optional(),
 });
 
-export type InlineVerification = z.infer<typeof InlineVerificationSchema>;
+export type InlineSourcing = z.infer<typeof InlineSourcingSchema>;

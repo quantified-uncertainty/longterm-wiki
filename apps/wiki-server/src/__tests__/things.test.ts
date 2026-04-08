@@ -554,6 +554,8 @@ describe("Things API", () => {
       }
     });
 
+    // has_verdict filter removed — source-checks now live in unified system
+
     it("filters by source_table query param", async () => {
       await seedThing(app, "thing-grant", "Grant Thing", {
         thingType: "grant",

@@ -57,12 +57,19 @@ interface SourceFileData {
   content: string;
 }
 
+interface CodebaseAnalysisData {
+  context: string;
+  grepPatterns: string[];
+  filesRead: number;
+}
+
 export function getSynthesisPrompt(topic: string, quality: string, { loadResult }: LoadResultContext, destPath?: string | null, ROOT?: string): string {
   const researchData = loadResult(topic, 'perplexity-research.json') as ResearchData | null;
   const scryData = loadResult(topic, 'scry-research.json') as ScryData | null;
   const directionsData = loadResult(topic, 'directions.json') as DirectionsData | null;
   const canonicalLinksData = loadResult(topic, 'canonical-links.json') as CanonicalLinksData | null;
   const sourceFileData = loadResult(topic, 'source-file-content.json') as SourceFileData | null;
+  const codebaseAnalysisData = loadResult(topic, 'codebase-analysis.json') as CodebaseAnalysisData | null;
 
   // Format canonical links for display
   let canonicalLinksSection = '';
@@ -111,6 +118,16 @@ ${linksTable}
     `- [${r.title}](${r.uri}) by ${r.original_author} (${r.platform})\n  ${r.snippet?.slice(0, 200) || ''}`
   ).join('\n') || 'No SCRY results available';
 
+  let codebaseSection = '';
+  if (codebaseAnalysisData?.context) {
+    codebaseSection = `## Codebase Analysis
+
+**This is an internal-reference page.** The following codebase context was gathered by searching for relevant patterns and files. Use it to accurately describe implementation details, integration points, and architecture.
+
+${codebaseAnalysisData.context}
+`;
+  }
+
   let directionsSection = '';
   if (directionsData) {
     const parts: string[] = [];
@@ -152,6 +169,7 @@ ${citationWarning}
 
 ${directionsSection}
 
+${codebaseSection}
 ${canonicalLinksSection}
 ${(() => {
     const entityType = destPath ? inferEntityType(destPath) : null;

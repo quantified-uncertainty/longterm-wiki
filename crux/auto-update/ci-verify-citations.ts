@@ -1,5 +1,5 @@
 /**
- * CI Citation Verification for Auto-Update Pages
+ * CI Citation Check for Auto-Update Pages
  *
  * Verifies all citation URLs for a set of pages and produces a structured
  * summary for CI/PR use. Calls the citation archive library directly
@@ -35,7 +35,7 @@ export interface PageCitationResult {
   brokenUrls: Array<{ url: string; httpStatus: number | null }>;
 }
 
-export interface CitationVerificationResult {
+export interface CitationSourceCheckResult {
   pages: PageCitationResult[];
   totalVerified: number;
   totalBroken: number;
@@ -85,7 +85,7 @@ export function findRunReport(date: string): string | null {
   }
 }
 
-// ── Single page verification ─────────────────────────────────────────────────
+// ── Single page check ─────────────────────────────────────────────────
 
 async function verifyPage(pageId: string): Promise<PageCitationResult> {
   const filePath = findPageFile(pageId);
@@ -159,7 +159,7 @@ export function buildCitationSummary(pages: PageCitationResult[]): string {
 
 export async function verifyCitationsForPages(
   pageIds: string[],
-): Promise<CitationVerificationResult> {
+): Promise<CitationSourceCheckResult> {
   const pages: PageCitationResult[] = [];
 
   for (let i = 0; i < pageIds.length; i++) {

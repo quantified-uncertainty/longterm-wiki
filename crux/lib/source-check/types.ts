@@ -27,7 +27,7 @@ export interface LlmSourceCheckResult {
   reasoning: string;
 }
 
-/** Category of a wiki page verification item */
+/** Category of a wiki page source-check item */
 export type WikiPageVerifyCategory =
   | 'sourced-claim'
   | 'unfootnoted-claim'
@@ -35,7 +35,7 @@ export type WikiPageVerifyCategory =
   | 'stale-temporal-claim';
 
 /**
- * A verification item extracted from a wiki page's prose content.
+ * A source-check item extracted from a wiki page's prose content.
  *
  * Each item represents a factual claim that can be verified in some way:
  * - sourced-claim: Has a footnote URL, can be checked against the source
@@ -63,7 +63,7 @@ export const SOURCE_CHECK_CONSTANTS = {
    *  (smarter extraction, search within page). DB stores unlimited text. */
   MAX_CONTENT_LENGTH: 500_000,
   FETCH_TIMEOUT_MS: 15_000,
-  /** Max chars of source text to include in LLM verification prompts */
+  /** Max chars of source text to include in LLM source-check prompts */
   PROMPT_CONTENT_LENGTH: 12000,
   /** Estimated cost per LLM source-check call in USD */
   ESTIMATED_COST_PER_VERIFICATION: 0.01,

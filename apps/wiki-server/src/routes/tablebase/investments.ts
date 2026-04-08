@@ -19,8 +19,8 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
@@ -53,9 +53,8 @@ const SyncInvestmentItemSchema = z.object({
   role: z.string().max(50).nullable().optional(),
   conditions: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-  sourceResourceId: z.string().max(200).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -109,7 +108,6 @@ function formatRow(r: JoinedRow) {
     role: inv.role,
     conditions: inv.conditions,
     source: inv.source,
-    sourceResourceId: inv.sourceResourceId,
     notes: inv.notes,
     // Structured entity refs
     investor: investorRef,
@@ -306,7 +304,6 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           role: item.role ?? null,
           conditions: item.conditions ?? null,
           source: item.source ?? null,
-        sourceResourceId: item.sourceResourceId ?? null,
           notes: item.notes ?? null,
         };
       });
@@ -331,7 +328,6 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             role: sql`excluded.role`,
             conditions: sql`excluded.conditions`,
             source: sql`excluded.source`,
-            sourceResourceId: sql`excluded.source_resource_id`,
             notes: sql`excluded.notes`,
             syncedAt: sql`now()`,
             updatedAt: sql`now()`,
@@ -361,7 +357,7 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -369,14 +365,14 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.companyId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("investments/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("investments/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

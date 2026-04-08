@@ -43,10 +43,10 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
   // Show the source quote if available; otherwise fall back to accuracy issues or a generic label
   const sourceQuoteText = quote.sourceQuote;
 
-  // Build verification text, but suppress it when it just restates the verdict badge
+  // Build source-check text, but suppress it when it just restates the verdict badge
   const rawIssues = quote.accuracyIssues;
   const issuesRedundant = rawIssues ? isRedundantIssues(rawIssues, label) : false;
-  const verificationText = (rawIssues && !issuesRedundant) ? rawIssues : (
+  const sourceCheckText = (rawIssues && !issuesRedundant) ? rawIssues : (
     verdict === "accurate" && !sourceQuoteText ? "Supported by source" :
     quote.quoteVerified && !sourceQuoteText ? "Quote verified" :
     null
@@ -60,7 +60,7 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
       <div className="text-[12px] text-foreground/90 leading-relaxed mb-1.5 line-clamp-2">
         {renderInlineMarkdown(quote.claimText)}
       </div>
-      {/* Verification result */}
+      {/* Source-check result */}
       <div className="flex items-center gap-2 flex-wrap">
         {Icon && label && (
           <span className={cn("inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium", color, bg)}>
@@ -85,9 +85,9 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
         </blockquote>
       )}
       {/* Accuracy issues — only shown when they add info beyond the verdict badge */}
-      {verificationText && (
+      {sourceCheckText && (
         <p className="text-[11px] text-muted-foreground/70 m-0 mt-1 line-clamp-2">
-          {verificationText}
+          {sourceCheckText}
         </p>
       )}
     </div>
@@ -96,7 +96,7 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
 
 /**
  * Client component that reads citation quote data from context and renders
- * verification details for a specific resource URL in the expanded reference.
+ * source-check details for a specific resource URL in the expanded reference.
  *
  * Stacked layout: each claim shows its text, verdict badge, source quote,
  * and accuracy issues in a clean vertical arrangement.

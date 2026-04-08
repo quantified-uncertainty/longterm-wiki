@@ -1,7 +1,7 @@
 /**
  * Reference Sniffer Agent
  *
- * Deep citation verification that goes beyond the basic citation-auditor.
+ * Deep citation checking that goes beyond the basic citation-auditor.
  * For each page, it:
  * 1. Extracts every discrete factual claim
  * 2. Maps claims to their cited sources
@@ -97,7 +97,7 @@ export function extractClaims(content: string): ExtractedClaim[] {
 }
 
 // ---------------------------------------------------------------------------
-// LLM-based deep verification
+// LLM-based deep source-check
 // ---------------------------------------------------------------------------
 
 /**
@@ -116,7 +116,7 @@ export async function verifyClaimsBatch(
   try {
     client = createLlmClient();
   } catch {
-    console.warn('[reference-sniffer] No API key — skipping LLM verification');
+    console.warn('[reference-sniffer] No API key — skipping LLM source-check');
     return [];
   }
 
@@ -234,7 +234,7 @@ export async function sniffPage(
     });
   }
 
-  // Step 3: LLM-based deep verification (optional, costs money)
+  // Step 3: LLM-based deep source-check (optional, costs money)
   if (useLlm && claims.length > 0) {
     const llmFindings = await verifyClaimsBatch(claims, content, pageId);
     findings.push(...llmFindings);

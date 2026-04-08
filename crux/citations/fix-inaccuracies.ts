@@ -1002,26 +1002,26 @@ export async function findReplacementSources(
       let confidence: string = 'low';
       if (best.text && best.text.length > 100) {
         try {
-          const verification = await checkClaimAccuracy(claimText, best.text);
+          const accuracyCheck = await checkClaimAccuracy(claimText, best.text);
           // Strict: only accept "accurate" verdicts with high scores
-          if (verification.verdict !== 'accurate' || verification.score < 0.85) {
+          if (accuracyCheck.verdict !== 'accurate' || accuracyCheck.score < 0.85) {
             if (opts?.verbose) {
-              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${verification.verdict}, ${(verification.score * 100).toFixed(0)}%)`);
+              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${accuracyCheck.verdict}, ${(quoteMatch.score * 100).toFixed(0)}%)`);
             }
             continue; // Skip — candidate doesn't clearly support the claim
           }
-          confidence = verification.score >= 0.95 ? 'high' : 'medium';
+          confidence = accuracyCheck.score >= 0.95 ? 'high' : 'medium';
         } catch {
-          // Verification failed — skip (don't accept unverified candidates)
+          // Source-check failed — skip (don't accept unverified candidates)
           if (opts?.verbose) {
-            console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (verification failed)`);
+            console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (source-check failed)`);
           }
           continue;
         }
       } else {
         // Not enough text to verify — skip
         if (opts?.verbose) {
-          console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (insufficient text for verification)`);
+          console.log(`  [^${cit.footnote}] Skipped candidate: ${best.title.slice(0, 50)} (insufficient text for source-check)`);
         }
         continue;
       }
@@ -1648,7 +1648,7 @@ async function main() {
         {
           fixesProposed: totalProposed,
           fixesApplied: totalApplied,
-          reVerification: reVerifyResults,
+          reCheck: reVerifyResults,
           pages: allResults.map((r) => ({
             pageId: r.pageId,
             proposed: r.proposals.length,

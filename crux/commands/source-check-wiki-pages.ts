@@ -3,7 +3,7 @@
  *
  * Verifies factual claims in wiki page prose content against their cited sources.
  * Extracts claims via LLM, matches to footnotes, cross-references FactBase,
- * detects stale temporal references, and runs source-check verification.
+ * detects stale temporal references, and runs source-check.
  *
  * Usage:
  *   crux w source-check-wiki-pages --dry-run                Preview what would be checked
@@ -66,7 +66,7 @@ interface WikiPagesOptions extends BaseOptions {
   ci?: boolean;
 }
 
-interface PageVerificationResult {
+interface PageSourceCheckResult {
   pageSlug: string;
   pageTitle: string;
   totalClaims: number;
@@ -179,8 +179,8 @@ function getFactsForEntity(
 // ── Field name generation ──────────────────────────────────────────────
 
 /**
- * Generate a field name for a wiki page verification item.
- * This is used as part of the record key in the verification system.
+ * Generate a field name for a wiki page source-check item.
+ * This is used as part of the record key in the source-check system.
  */
 function generateFieldName(item: WikiPageVerifyItem): string {
   switch (item.category) {
@@ -210,12 +210,12 @@ function shortHash(text: string): string {
   return createHash('sha256').update(text).digest('hex').slice(0, 8);
 }
 
-// ── Claim verification ─────────────────────────────────────────────────
+// ── Claim source-check ─────────────────────────────────────────────────
 
 /**
- * Build a verification prompt for a wiki page claim.
+ * Build a source-check prompt for a wiki page claim.
  */
-function buildWikiClaimVerificationPrompt(
+function buildWikiClaimSourceCheckPrompt(
   item: WikiPageVerifyItem,
   sourceText: string,
 ): string {
@@ -274,7 +274,7 @@ async function verifySourcedClaim(
   }
 
   // Build prompt and call LLM
-  const prompt = buildWikiClaimVerificationPrompt(item, fetchResult.content);
+  const prompt = buildWikiClaimSourceCheckPrompt(item, fetchResult.content);
 
   try {
     const llmResult = await callLlmForSourceCheck(
@@ -306,7 +306,7 @@ async function verifySourcedClaim(
 // ── Result storage ───────────────────────────────────────────────────
 
 /**
- * Store verification results for a wiki page claim.
+ * Store source-check results for a wiki page claim.
  */
 async function storeClaimResult(
   pageSlug: string,
@@ -329,7 +329,7 @@ async function storeClaimResult(
  */
 async function storePageVerdict(
   pageSlug: string,
-  pageResult: PageVerificationResult,
+  pageResult: PageSourceCheckResult,
 ): Promise<void> {
   // Determine the aggregate verdict for the page
   let aggregateVerdict: SourceCheckVerdict;
@@ -378,7 +378,7 @@ async function processPage(
   mdxPath: string,
   client: ReturnType<typeof createLlmClient>,
   kb: LoadedKB | null,
-): Promise<PageVerificationResult> {
+): Promise<PageSourceCheckResult> {
   const pageSlug = extractPageSlug(page);
   const mdxContent = readFileSync(mdxPath, 'utf-8');
 
@@ -388,7 +388,7 @@ async function processPage(
   // Extract claims
   const claims = await extractWikiPageClaims(pageSlug, mdxContent, facts);
 
-  const result: PageVerificationResult = {
+  const result: PageSourceCheckResult = {
     pageSlug,
     pageTitle: page.title,
     totalClaims: claims.length,
@@ -623,7 +623,7 @@ async function sourceCheckWikiPagesCommand(
 
   // ── Live execution ──
   const client = createLlmClient();
-  const allResults: PageVerificationResult[] = [];
+  const allResults: PageSourceCheckResult[] = [];
 
   let totalConfirmed = 0;
   let totalContradicted = 0;
@@ -754,13 +754,13 @@ function formatDryRunOutput(
   }
 
   lines.push('');
-  lines.push('Use without --dry-run to run verification with LLM.');
+  lines.push('Use without --dry-run to run source-check with LLM.');
 
   return { exitCode: 0, output: lines.join('\n') };
 }
 
 function formatSummaryOutput(
-  results: PageVerificationResult[],
+  results: PageSourceCheckResult[],
   totals: {
     totalClaims: number;
     totalVerified: number;
@@ -850,7 +850,7 @@ For each page, the command:
   3. Cross-references claims against FactBase data
   4. Detects stale temporal references
   5. For sourced claims: fetches the source URL and verifies the claim via LLM
-  6. Stores results in the wiki-server verification system
+  6. Stores results in the wiki-server source-check system
 
 Record type: wiki-page
 Record IDs: page slugs (e.g., "anthropic", "openai")

@@ -24,7 +24,7 @@ import {
   things,
   wikiPages,
   researchAreaOrganizations,
-  verificationVerdicts,
+  sourceVerdicts,
   policyStakeholders,
   entityResources,
 } from "../../schema.js";
@@ -398,8 +398,8 @@ const entityProfileApp = new Hono()
 
     let verdicts: Record<string, { verdict: string; confidence: number | null }> = {};
     if (recordIds.length > 0) {
-      const verdictRows = await db.select().from(verificationVerdicts)
-        .where(inArray(verificationVerdicts.recordId, recordIds));
+      const verdictRows = await db.select().from(sourceVerdicts)
+        .where(inArray(sourceVerdicts.recordId, recordIds));
       for (const v of verdictRows) {
         verdicts[v.recordId] = { verdict: v.verdict, confidence: v.confidence };
       }

@@ -3,7 +3,7 @@
  * by row-matching instead of LLM reading comprehension.
  *
  * For tabular data (CSVs, HTML tables, API responses), this is more reliable
- * than LLM verification and costs nothing.
+ * than LLM source-check and costs nothing.
  *
  * Part of Phase 3: Data Source Resources (Discussion #3567).
  */
@@ -105,11 +105,11 @@ function fieldMatches(
 
 /**
  * Match a structured record against parsed source rows using the manifest's
- * verification config.
+ * source-check config.
  *
  * @param record - The grant/personnel record fields (e.g., { grantee: "MIT", amount: 50000 })
  * @param snapshotContent - Raw CSV/HTML/JSON text from a source snapshot
- * @param manifest - Schema, column mapping, and verification config
+ * @param manifest - Schema, column mapping, and source-check config
  */
 export function matchRecordAgainstSnapshot(
   record: Record<string, unknown>,
@@ -142,7 +142,7 @@ export function matchRecordAgainstSnapshot(
     ? applyColumnMapping(rawRows, columnMapping)
     : rawRows;
 
-  const { matchFields, fuzzyFields = [], exactFields = [] } = manifest.verification;
+  const { matchFields, fuzzyFields = [], exactFields = [] } = manifest.sourceCheck;
 
   // Require at least 2 non-null fields for meaningful matching
   const nonNullFields = matchFields.filter(f => record[f] != null).length;

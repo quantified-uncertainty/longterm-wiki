@@ -1,17 +1,17 @@
 /**
- * Priority computation for source-check verification items.
+ * Priority computation for source-check items.
  * Higher priority items are verified first by the orchestrator.
  */
 
 import type { Fact, Entity as FBEntity } from '../../../packages/factbase/src/types.ts';
 import type { PageEntry } from '../content-types.ts';
 import type { RecordType } from '../../../apps/wiki-server/src/api-types.ts';
-import { ENTITY_TYPE_PRIORITY, type VerifiedFactInfo, type VerifiedRecordInfo } from './orchestrator-types.ts';
+import { ENTITY_TYPE_PRIORITY, type SourceCheckedFactInfo, type SourceCheckedRecordInfo } from './orchestrator-types.ts';
 
 export function computeFactPriority(
   entity: FBEntity,
   _fact: Fact,
-  existing: VerifiedFactInfo | undefined,
+  existing: SourceCheckedFactInfo | undefined,
   page: PageEntry | undefined,
 ): number {
   let priority = 0;
@@ -22,7 +22,7 @@ export function computeFactPriority(
   } else if (existing.needsRecheck) {
     priority += 80;
   } else {
-    // Staleness: older verifications get higher priority
+    // Staleness: older source-checks get higher priority
     if (existing.checkedAt) {
       const ageMs = Date.now() - new Date(existing.checkedAt).getTime();
       const ageDays = ageMs / (24 * 60 * 60 * 1000);
@@ -46,7 +46,7 @@ export function computeFactPriority(
 
 export function computeRecordPriority(
   recordType: RecordType,
-  existing: VerifiedRecordInfo | undefined,
+  existing: SourceCheckedRecordInfo | undefined,
 ): number {
   let priority = 0;
 

@@ -101,7 +101,7 @@ const healthApp = new Hono()
     });
   })
   /**
-   * GET /migrations — Migration status for post-deploy verification.
+   * GET /migrations — Migration status for post-deploy checks.
    * Returns the count and latest timestamp from drizzle.__drizzle_migrations.
    * CI compares latestCreatedAt against the journal's last entry to confirm
    * all migrations were applied. Requires Bearer auth.

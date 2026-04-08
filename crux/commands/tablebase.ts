@@ -36,7 +36,7 @@ interface CommandOptions extends BaseOptions {
   ci?: boolean;
   dryRun?: boolean;
   skipEntityValidation?: boolean;
-  skipVerification?: boolean;
+  skipSourceCheck?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -140,7 +140,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
   const result = await runEnrichmentAgent(task, {
     dryRun,
     model,
-    skipVerification: !!options.skipVerification,
+    skipSourceCheck: !!options.skipSourceCheck,
   });
 
   if (!dryRun) {
@@ -246,24 +246,24 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     return { exitCode: 0, output: `[DRY RUN] Would submit ${records.length} records to ${table}:\n${JSON.stringify(records, null, 2)}` };
   }
 
-  // Source verification gate: check records against their source URLs before submission.
+  // Source-check gate: check records against their source URLs before submission.
   let recordsToSubmit = records;
-  let verificationNote = '';
-  if (!options.skipVerification) {
-    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-verification.ts');
+  let sourceCheckNote = '';
+  if (!options.skipSourceCheck) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-source-check.ts');
     const verifyResult = await verifyBeforeSubmit(table, records);
     console.log(formatPreSubmitSummary(verifyResult));
 
     recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
 
     if (verifyResult.rejected.length > 0) {
-      verificationNote = ` (${verifyResult.rejected.length} rejected by source verification)`;
+      sourceCheckNote = ` (${verifyResult.rejected.length} rejected by source-check)`;
     }
 
     if (recordsToSubmit.length === 0) {
       return {
         exitCode: 1,
-        output: `All ${records.length} records were rejected by source verification.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
+        output: `All ${records.length} records were rejected by source-check.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
       };
     }
   }
@@ -274,7 +274,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
 
   const params = new URLSearchParams();
   if (options.skipEntityValidation) params.set('skipEntityValidation', 'true');
-  if (tableConfig.requireVerification) params.set('requireVerification', 'true');
+  if (tableConfig.requireSourceCheck) params.set('requireSourceCheck', 'true');
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
@@ -305,15 +305,15 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     recordCount: recordsToSubmit.length,
     recordsRejected: records.length - recordsToSubmit.length,
     submittedAt: now.toISOString(),
-    verificationSummary: {
-      withVerification: recordsToSubmit.filter((r: Record<string, unknown>) => r.verification).length,
-      withoutVerification: recordsToSubmit.filter((r: Record<string, unknown>) => !r.verification).length,
+    sourceCheckSummary: {
+      withSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => r.sourcing).length,
+      withoutSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => !r.sourcing).length,
       verdicts: {
-        verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
-        contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
-        unverifiable: recordsToSubmit.filter((r: Record<string, unknown>) => (r.verification as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
+        verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourcing as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
+        contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourcing as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
+        unverifiable: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourcing as Record<string, unknown> | undefined)?.verdict === 'unverifiable').length,
         other: recordsToSubmit.filter((r: Record<string, unknown>) => {
-          const v = r.verification as Record<string, unknown> | undefined;
+          const v = r.sourcing as Record<string, unknown> | undefined;
           return v && !['confirmed', 'contradicted', 'unverifiable'].includes(v.verdict as string);
         }).length,
       },
@@ -325,8 +325,8 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
       if (r.role) summary.role = r.role;
       if (r.name || r.title) summary.name = r.name || r.title;
       if (r.source) summary.source = r.source;
-      if (r.verification) {
-        const v = r.verification as Record<string, unknown>;
+      if (r.sourcing) {
+        const v = r.sourcing as Record<string, unknown>;
         summary.verdict = v.verdict;
         summary.evidence = v.evidence;
       } else {
@@ -342,7 +342,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     exitCode: 0,
     output: options.ci
       ? JSON.stringify({ submitted: count, table })
-      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${verificationNote}\n  Manifest: ${manifestPath}`,
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${sourceCheckNote}\n  Manifest: ${manifestPath}`,
   };
 }
 
@@ -934,7 +934,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     taskTypes,
     entityTypes,
     model,
-    skipVerification: !!options.skipVerification,
+    skipSourceCheck: !!options.skipSourceCheck,
   });
 
   if (options.ci) {
@@ -958,7 +958,7 @@ const PERSONNEL_SYNC_BATCH_SIZE = 200;
 // ---------------------------------------------------------------------------
 
 async function sourceCheckRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { verifyRecords, formatVerificationReport } = await import('../tablebase/source-check.ts');
+  const { verifyRecords, formatSourceCheckReport } = await import('../tablebase/source-check.ts');
 
   const table = options.table as string | undefined;
   if (!table) {
@@ -975,7 +975,7 @@ async function sourceCheckRecordsCommand(args: string[], options: CommandOptions
     return { exitCode: 0, output: JSON.stringify(result, null, 2) };
   }
 
-  return { exitCode: 0, output: formatVerificationReport(result) };
+  return { exitCode: 0, output: formatSourceCheckReport(result) };
 }
 
 async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1148,118 +1148,42 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
   const entityArg = args.find(a => !a.startsWith('--')) || options.entity;
   const dryRun = !!options.dryRun;
   const apply = !!options.apply;
-  const model = options.model as string | undefined;
   const limit = options.limit ? parseInt(options.limit as string, 10) : 10;
-  const budget = options.budget ? parseFloat(options.budget as string) : 10;
+  const entityOnly = !!(options as Record<string, unknown>).entityOnly;
 
+  const { discoverSources } = await import('../tablebase/source-discovery.ts');
+
+  // Resolve entity name to ID if provided
+  let entityId: string | undefined;
+  let entityName: string | undefined;
   if (entityArg) {
-    // Single-entity mode: run source discovery for one entity
-    const { runEnrichmentAgent } = await import('../tablebase/agent.ts');
     const { buildEntityMatcher } = await import('../lib/grant-import/entity-matcher.ts');
-    const { getVerdictsByEntity } = await import('../lib/wiki-server/source-checks.ts');
-
-    // Resolve entity
     const matcher = buildEntityMatcher();
     const match = matcher.match(entityArg);
-    const entityId = match?.stableId || entityArg;
-    const entityName = match?.name || entityArg;
-
-    // Get unverifiable count for this entity
-    const verdictResult = await getVerdictsByEntity(entityId, { verdict: 'unverifiable', limit: 1 });
-    const unverifiableCount = verdictResult.ok ? verdictResult.data.counts.unverifiable : 0;
-
-    if (unverifiableCount === 0) {
-      return { exitCode: 0, output: `No unverifiable records found for "${entityName}" (${entityId}).` };
-    }
-
-    // Build a synthetic task
-    const task = {
-      id: `sd-${entityId.slice(0, 8)}`,
-      taskType: 'source-discovery' as const,
-      entityId,
-      entityName,
-      entityType: 'organization',
-      table: 'source_quality',
-      impactScore: unverifiableCount * 10,
-      reasons: [`${unverifiableCount} record(s) with unverifiable sources`],
-      existingRecordCount: unverifiableCount,
-    };
-
-    console.log(`[source-discover] Running for "${entityName}" (${entityId}): ${unverifiableCount} unverifiable records${dryRun ? ' [DRY RUN]' : ''}${apply ? ' [APPLY]' : ''}`);
-
-    const result = await runEnrichmentAgent(task, { dryRun, model, apply });
-
-    if (options.ci) {
-      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
-    }
-
-    return {
-      exitCode: 0,
-      output: `\x1b[32m✓\x1b[0m Source discovery for "${entityName}": ${result.recordsCreated} resources suggested, $${result.cost.toFixed(4)}, ${Math.round(result.durationMs / 1000)}s`,
-    };
+    entityId = match?.stableId || entityArg;
+    entityName = match?.name || entityArg;
   }
 
-  // Multi-entity mode: scan and process top entities
-  const { runFullScan } = await import('../tablebase/scanner.ts');
-  const { rankTasks } = await import('../tablebase/task-ranker.ts');
-  const { runEnrichmentAgent } = await import('../tablebase/agent.ts');
+  const result = await discoverSources({ entityId, entityName, limit, dryRun, apply, entityOnly });
 
-  console.log('[source-discover] Scanning for entities with unverifiable records...');
-  const scan = await runFullScan();
-
-  const tasks = rankTasks(scan, {
-    taskTypes: ['source-discovery'],
-    limit,
-  });
-
-  if (tasks.length === 0) {
-    return { exitCode: 0, output: 'No entities with unverifiable records found.' };
+  if (result.entities.length === 0) {
+    return { exitCode: 0, output: entityArg ? `No unverifiable records found for "${entityName}".` : 'No entities with unverifiable records found.' };
   }
-
-  console.log(`[source-discover] Found ${tasks.length} entities with unverifiable records:`);
-  for (const t of tasks.slice(0, 10)) {
-    console.log(`  ${t.entityName}: ${t.reasons.join('; ')} (impact: ${t.impactScore})`);
-  }
-
-  let totalCost = 0;
-  let totalResources = 0;
-  const results: Array<{ entity: string; resources: number; cost: number }> = [];
-
-  for (let i = 0; i < tasks.length; i++) {
-    if (totalCost >= budget) {
-      console.log(`[source-discover] Budget limit reached ($${totalCost.toFixed(2)} >= $${budget})`);
-      break;
-    }
-
-    const task = tasks[i];
-    console.log(`\n${'─'.repeat(50)}`);
-    console.log(`[source-discover] ${i + 1}/${tasks.length}: ${task.entityName} (${task.reasons.join('; ')})`);
-
-    try {
-      const agentModel = model === 'auto'
-        ? 'sonnet'
-        : model;
-      const result = await runEnrichmentAgent(task, { dryRun, model: agentModel, apply });
-      totalCost += result.cost;
-      totalResources += result.recordsCreated;
-      results.push({ entity: task.entityName, resources: result.recordsCreated, cost: result.cost });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error(`[source-discover] Failed for ${task.entityName}: ${msg}`);
-      results.push({ entity: task.entityName, resources: 0, cost: 0 });
-    }
-  }
-
-  console.log(`\n${'═'.repeat(50)}`);
-  console.log(`[source-discover] Complete: ${results.length} entities, ${totalResources} resources, $${totalCost.toFixed(4)}`);
 
   if (options.ci) {
-    return { exitCode: 0, output: JSON.stringify({ results, totalResources, totalCost }, null, 2) };
+    return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+  }
+
+  // Format summary
+  const lines: string[] = [];
+  for (const e of result.entities) {
+    const sources = e.entityLevelSources.length + e.perPersonSources.length;
+    lines.push(`  ${e.entityName}: ${e.recordsMatched}/${e.unverifiableCount} matched, ${sources} sources, $${e.cost.toFixed(4)}, ${Math.round(e.durationMs / 1000)}s${e.recordsUpdated > 0 ? ` (${e.recordsUpdated} updated)` : ''}`);
   }
 
   return {
     exitCode: 0,
-    output: `Source discovery complete: ${results.length} entities processed, ${totalResources} resources suggested, $${totalCost.toFixed(4)}`,
+    output: `Source discovery complete: ${result.entities.length} entities, ${result.totalRecordsMatched} records matched, $${result.totalCost.toFixed(4)}\n${lines.join('\n')}`,
   };
 }
 
@@ -1379,7 +1303,7 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
-  --skip-verification       Skip source verification before submit (for testing)
+  --skip-source-check       Skip source-check before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
   --ci                      JSON output
 
@@ -1416,7 +1340,7 @@ Examples:
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
-  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-verification  # Submit without source verification
+  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-source-check  # Submit without source-check
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing

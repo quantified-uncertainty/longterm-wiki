@@ -276,7 +276,7 @@ export function FundingRoundsTable({ rows }: { rows: FundingRoundRow[] }) {
                   <RecordStatusDots
                     coverageScore={computeFundingRoundCoverage(row)}
                     verdict={row.verdict?.verdict}
-                    sourceCheckHref={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
+                    sourcingHref={row.verdict?.verdict ? `/source-checks/funding-round/${encodeURIComponent(row.key)}` : undefined}
                   />
                 </td>
               </tr>

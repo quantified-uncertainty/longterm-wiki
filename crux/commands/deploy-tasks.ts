@@ -1,7 +1,7 @@
 /**
  * Deploy Tasks Command Handlers
  *
- * Track post-deploy verification tasks — auto-detect from diffs,
+ * Track post-deploy check tasks — auto-detect from diffs,
  * find pending tasks from merged PRs, inject into PR descriptions.
  *
  * Usage:
@@ -236,7 +236,7 @@ export const commands = {
 };
 
 export function getHelp(): string {
-  return `Deploy Tasks — Track post-deploy verification tasks
+  return `Deploy Tasks — Track post-deploy check tasks
 
 Commands:
   detect                Detect deploy tasks from current branch diff.

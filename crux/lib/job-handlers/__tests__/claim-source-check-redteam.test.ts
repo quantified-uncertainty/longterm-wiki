@@ -1,5 +1,5 @@
 /**
- * Red-team / adversarial tests for the claim verification handler.
+ * Red-team / adversarial tests for the claim source-check handler.
  *
  * Tests LLM output fuzzing, malformed data, and edge cases.
  */
@@ -28,7 +28,7 @@ vi.mock("../../wiki-server/client.ts", () => ({
   apiRequest: vi.fn(),
 }));
 
-const { handleClaimVerification } = await import("../claim-verification.ts");
+const { handleClaimSourceCheck } = await import("../claim-source-check.ts");
 const { apiRequest } = await import("../../wiki-server/client.ts");
 const { callLlm } = await import("../../llm.ts");
 const { parseJsonResponse } = await import("../../anthropic.ts");
@@ -62,7 +62,7 @@ function makeClaim(id: number, overrides: Partial<{
   };
 }
 
-describe("handleClaimVerification — adversarial inputs", () => {
+describe("handleClaimSource-Check — adversarial inputs", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockApiRequest.mockReset();
@@ -72,7 +72,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
   });
 
   it("rejects params with missing claimIds", async () => {
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -81,7 +81,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
   });
 
   it("rejects params with empty claimIds array", async () => {
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -90,7 +90,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
   });
 
   it("rejects params with non-array claimIds", async () => {
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: "not-an-array", batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -113,7 +113,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 20.0, verdict: "confirmed", confidence: 0.8, extracted_value: "val2", reasoning: "ok2" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [10, 20], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -142,7 +142,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -171,7 +171,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 1, verdict: "confirmed", confidence: NaN, extracted_value: "", reasoning: "" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -195,7 +195,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 1, verdict: "confirmed", confidence: Infinity, extracted_value: "", reasoning: "" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -220,7 +220,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       throw new Error("Unexpected end of JSON input");
     });
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1, 2], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -251,7 +251,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 2, verdict: "confirmed", confidence: 0.9, extracted_value: "2015", reasoning: "ok" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1, 2], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -283,7 +283,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 2, verdict: "unverifiable", confidence: 0.1, extracted_value: "", reasoning: "wrong source" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1, 2], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -293,7 +293,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
     expect(result.success).toBe(true);
   });
 
-  it("handles all claims failing verification (100% error rate)", async () => {
+  it("handles all claims failing source-check (100% error rate)", async () => {
     const claims = Array.from({ length: 5 }, (_, i) => makeClaim(i + 1));
 
     mockApiRequest
@@ -305,7 +305,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
     // LLM call throws
     mockCallLlm.mockRejectedValue(new Error("Rate limit exceeded"));
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1, 2, 3, 4, 5], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -328,7 +328,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       { claimId: 1, verdict: "confirmed", confidence: 0.9, extracted_value: "", reasoning: "" },
     ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -348,7 +348,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
     // Resource has content, but it's empty
     mockGetContent.mockResolvedValue({ ok: true, data: { fullText: "", pageTitle: null } } as any);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: [1], batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -378,7 +378,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       })),
     );
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: claims.map((c) => c.id), batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -413,7 +413,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
         { claimId: 21, verdict: "contradicted", confidence: 0.8, extracted_value: "", reasoning: "" },
       ]);
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: claims.map((c) => c.id), batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );
@@ -449,7 +449,7 @@ describe("handleClaimVerification — adversarial inputs", () => {
       );
     }
 
-    const result = await handleClaimVerification(
+    const result = await handleClaimSourceCheck(
       { claimIds: claims.map((c) => c.id), batchId: "test", resourceId: null, entityId: null },
       baseCtx,
     );

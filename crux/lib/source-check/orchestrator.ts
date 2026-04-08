@@ -22,9 +22,9 @@ import {
   tryDeterministicMatch,
   verifySingleItem,
   storeResult,
-  buildFactVerificationPrompt,
-  buildRecordVerificationPrompt,
-  buildEntityVerificationPrompt,
+  buildFactSourceCheckPrompt,
+  buildRecordSourceCheckPrompt,
+  buildEntitySourceCheckPrompt,
   MODELS,
 } from './item-verifier.ts';
 import { fetchSourceContent } from './source-fetcher.ts';
@@ -33,8 +33,8 @@ import type {
   VerifyItem,
   VerifyResult,
   OrchestrationSummary,
-  VerifiedFactInfo,
-  VerifiedRecordInfo,
+  SourceCheckedFactInfo,
+  SourceCheckedRecordInfo,
 } from './orchestrator-types.ts';
 import type { SourceCheckVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 
@@ -87,23 +87,23 @@ export async function orchestrateCommand(
   const shouldCollectRecords = !effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'record';
   const shouldCollectEntities = (!effectiveTypeFilter || effectiveTypeFilter === 'all' || effectiveTypeFilter === 'entity') && useWebSearch;
 
-  console.log('\x1b[1mVerification Orchestrator\x1b[0m');
+  console.log('\x1b[1mSource-Check Orchestrator\x1b[0m');
   console.log('');
 
-  // ── Step 1: Load data and fetch existing verification status ──
+  // ── Step 1: Load data and fetch existing source-check status ──
   console.log('Loading data...');
 
   const [db, pages, existingKBVerdicts, existingRecordVerdicts] = await Promise.all([
     Promise.resolve(loadDatabase()),
     Promise.resolve(loadPages()),
-    shouldCollectFacts ? fetchExistingKBVerdicts() : Promise.resolve(new Map<string, VerifiedFactInfo>()),
-    shouldCollectRecords ? fetchExistingRecordVerdicts() : Promise.resolve(new Map<string, VerifiedRecordInfo>()),
+    shouldCollectFacts ? fetchExistingKBVerdicts() : Promise.resolve(new Map<string, SourceCheckedFactInfo>()),
+    shouldCollectRecords ? fetchExistingRecordVerdicts() : Promise.resolve(new Map<string, SourceCheckedRecordInfo>()),
   ]);
 
   const entities = db.typedEntities ?? db.entities ?? [];
 
-  // ── Step 2: Collect verification items ──
-  console.log('Collecting verification items...');
+  // ── Step 2: Collect source-check items ──
+  console.log('Collecting source-check items...');
 
   const allItems: VerifyItem[] = [];
 
@@ -151,7 +151,7 @@ export async function orchestrateCommand(
   }
 
   if (allItems.length === 0) {
-    return { exitCode: 0, output: 'No verification items found.' };
+    return { exitCode: 0, output: 'No source-check items found.' };
   }
 
   // ── Step 3: Sort by priority (highest first) ──
@@ -349,13 +349,13 @@ async function runBatchExecution(
     let prompt: string;
     switch (item.data.kind) {
       case 'fact':
-        prompt = buildFactVerificationPrompt(item.data, sourceContent);
+        prompt = buildFactSourceCheckPrompt(item.data, sourceContent);
         break;
       case 'record':
-        prompt = buildRecordVerificationPrompt(item.data, item.description, sourceContent);
+        prompt = buildRecordSourceCheckPrompt(item.data, item.description, sourceContent);
         break;
       case 'entity':
-        prompt = buildEntityVerificationPrompt(item.data.entity, sourceContent, sourceUrl);
+        prompt = buildEntitySourceCheckPrompt(item.data.entity, sourceContent, sourceUrl);
         break;
     }
 
@@ -396,7 +396,7 @@ async function runBatchExecution(
   }
 
   if (batchRequests.length === 0) {
-    console.log('\nNo items require LLM verification (all resolved deterministically or errored).');
+    console.log('\nNo items require LLM source-check (all resolved deterministically or errored).');
     return;
   }
 
@@ -582,8 +582,8 @@ function formatDryRunOutput(
   allItems: VerifyItem[],
   selectedItems: VerifyItem[],
   estimatedCost: number,
-  kbVerdicts: Map<string, VerifiedFactInfo>,
-  recordVerdicts: Map<string, VerifiedRecordInfo>,
+  kbVerdicts: Map<string, SourceCheckedFactInfo>,
+  recordVerdicts: Map<string, SourceCheckedRecordInfo>,
   options: OrchestrateOptions,
 ): CommandResult {
   if (options.ci) {
@@ -614,7 +614,7 @@ function formatDryRunOutput(
   // Coverage summary
   const neverVerifiedFacts = allItems.filter(i => i.kind === 'fact' && i.neverVerified).length;
   const totalFacts = allItems.filter(i => i.kind === 'fact').length;
-  const neverVerifiedRecords = allItems.filter(i => i.kind === 'record' && i.neverVerified).length;
+  const neverSourceCheckedRecords = allItems.filter(i => i.kind === 'record' && i.neverVerified).length;
   const totalRecords = allItems.filter(i => i.kind === 'record').length;
   const totalEntities = allItems.filter(i => i.kind === 'entity').length;
 
@@ -623,7 +623,7 @@ function formatDryRunOutput(
     lines.push(`  Facts:    ${totalFacts} total, ${neverVerifiedFacts} never verified (${kbVerdicts.size} existing verdicts)`);
   }
   if (totalRecords > 0) {
-    lines.push(`  Records:  ${totalRecords} total, ${neverVerifiedRecords} never verified (${recordVerdicts.size} existing verdicts)`);
+    lines.push(`  Records:  ${totalRecords} total, ${neverSourceCheckedRecords} never verified (${recordVerdicts.size} existing verdicts)`);
   }
   if (totalEntities > 0) {
     lines.push(`  Entities: ${totalEntities} without sources (web search candidates)`);
@@ -664,7 +664,7 @@ function formatDryRunOutput(
   }
 
   lines.push('');
-  lines.push('Use without --dry-run to run verification with LLM.');
+  lines.push('Use without --dry-run to run source-check with LLM.');
 
   return { exitCode: 0, output: lines.join('\n') };
 }
@@ -672,7 +672,7 @@ function formatDryRunOutput(
 function formatSummaryOutput(summary: OrchestrationSummary): string {
   const lines: string[] = [];
   lines.push('');
-  lines.push('\x1b[1m=== Verification Orchestrator Summary ===\x1b[0m');
+  lines.push('\x1b[1m=== Source-Check Orchestrator Summary ===\x1b[0m');
   lines.push(`Total items:    ${summary.total}`);
   lines.push(`Verified:       ${summary.actualVerified}`);
   lines.push(`Est. cost:      \$${summary.estimatedCost.toFixed(2)}`);
@@ -694,7 +694,7 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
   lines.push('');
 
   // By kind
-  lines.push('\x1b[1mBy verification type:\x1b[0m');
+  lines.push('\x1b[1mBy source-check type:\x1b[0m');
   for (const [kind, counts] of Object.entries(summary.byKind)) {
     if (counts.total > 0) {
       lines.push(`  ${kind.padEnd(10)} ${counts.verified}/${counts.total} verified`);

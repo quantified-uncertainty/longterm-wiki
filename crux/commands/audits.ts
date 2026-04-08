@@ -2,7 +2,7 @@
  * Audits Command Handlers
  *
  * Manage system-level behavioral audits — ongoing properties we expect
- * to hold about the system, plus one-time post-merge verification items.
+ * to hold about the system, plus one-time post-merge check items.
  *
  * Unlike CI tests, these are higher-level expectations that require
  * periodic human or agent review (e.g., "groundskeeper produces
@@ -412,7 +412,7 @@ async function listCommand(
   const pendingPM = data.post_merge.filter(pm => pm.status === 'pending');
 
   if (overduePM.length > 0) {
-    lines.push('\x1b[1m\x1b[31mOverdue Post-Merge Verifications:\x1b[0m');
+    lines.push('\x1b[1m\x1b[31mOverdue Post-Merge Checks:\x1b[0m');
     for (const pm of overduePM) {
       lines.push(`  \x1b[31m●\x1b[0m  ${pm.id} — PR #${pm.pr} \x1b[31m(deadline: ${pm.deadline} OVERDUE)\x1b[0m`);
       lines.push(`    \x1b[2m${pm.claim}\x1b[0m`);
@@ -422,7 +422,7 @@ async function listCommand(
 
   const nonOverduePendingPM = pendingPM.filter(pm => !isPostMergeOverdue(pm));
   if (nonOverduePendingPM.length > 0 && !filterOverdue) {
-    lines.push('\x1b[1mPending Post-Merge Verifications:\x1b[0m');
+    lines.push('\x1b[1mPending Post-Merge Checks:\x1b[0m');
     for (const pm of nonOverduePendingPM) {
       const deadlineStr = pm.deadline ? ` (deadline: ${pm.deadline})` : '';
       lines.push(`  \x1b[33m●\x1b[0m  ${pm.id} — PR #${pm.pr}${deadlineStr}`);
@@ -458,7 +458,7 @@ async function checkCommand(
       exitCode: 1,
       output: `Usage: crux sys audits check <id> [--pass|--fail] [--notes="..."]
 
-  Record the result of checking an audit item or post-merge verification.
+  Record the result of checking an audit item or post-merge check.
   Results are auto-recorded to the item's history array in audits.yaml.
 
 Examples:
@@ -672,7 +672,7 @@ async function reportCommand(
 
   // Pending post-merge
   if (pendingPM.length > 0) {
-    lines.push('\x1b[1mPending Post-Merge Verifications (P1):\x1b[0m');
+    lines.push('\x1b[1mPending Post-Merge Checks (P1):\x1b[0m');
     for (const pm of pendingPM) {
       const deadlineStr = pm.deadline ? ` — deadline ${pm.deadline}` : '';
       lines.push(`  ● ${pm.id} (PR #${pm.pr})${deadlineStr}`);
@@ -719,7 +719,7 @@ Options:
   Post-merge options:
     --pr=N                    PR number (required for post_merge)
     --verify="how to verify"  How to verify the claim
-    --deadline=YYYY-MM-DD     Verification deadline [default: 14 days from now]
+    --deadline=YYYY-MM-DD     Check deadline [default: 14 days from now]
 
 Examples:
   crux sys audits add "Verify stableId migration applied" \\
@@ -844,7 +844,7 @@ Examples:
 
     return {
       exitCode: 0,
-      output: `\x1b[32m✓\x1b[0m Added post-merge verification: ${id}\n  PR: #${pr}\n  Deadline: ${deadline}`,
+      output: `\x1b[32m✓\x1b[0m Added post-merge check: ${id}\n  PR: #${pr}\n  Deadline: ${deadline}`,
     };
   }
 }
@@ -864,10 +864,10 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Audits Domain — System-level behavioral verification
+Audits Domain — System-level behavioral checking
 
 Track ongoing properties we expect to be true about the system,
-plus one-time post-merge verification items tied to specific PRs.
+plus one-time post-merge check items tied to specific PRs.
 
 Commands:
   list              Show all audit items (default), highlight overdue

@@ -8,8 +8,8 @@ import { SectionHeader } from "./org-shared";
 import type { RelatedOrg } from "./org-data";
 import { getRecordVerdict } from "@data/tablebase";
 import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 
 const MAX_RELATED = 15;
 

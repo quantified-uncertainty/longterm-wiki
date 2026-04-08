@@ -6,7 +6,7 @@
  * hallucination risk and require more citations to support factual claims.
  *
  * Minimum footnote requirements by entity type:
- *   - person: 5 (biographical claims need verification)
+ *   - person: 5 (biographical claims need citations)
  *   - organization: 3 (founding, funding, activities)
  *   - historical: 8 (dates, events, causes)
  *   - risk: 3 (risk assessments need evidence)

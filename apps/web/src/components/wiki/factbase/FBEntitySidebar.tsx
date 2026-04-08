@@ -21,7 +21,7 @@ import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
+import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
 
 interface FBEntitySidebarProps {
   /** KB entity ID (e.g., "anthropic") */

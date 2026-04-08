@@ -11,17 +11,17 @@ import { formatDateDeterministic } from "@lib/format";
 
 // ── Component ────────────────────────────────────────────────────────────
 
-interface VerificationStatusProps {
+interface SourceCheckStatusProps {
   entityId: string;
 }
 
 /**
- * VerificationStatus — compact summary of entity-level verification verdicts.
+ * SourceCheckStatus — compact summary of entity-level source-check verdicts.
  *
- * Client component that fetches verification verdicts for an entity and renders
+ * Client component that fetches source-check verdicts for an entity and renders
  * a summary section on wiki entity pages. Shows nothing if no verdicts exist.
  */
-export function VerificationStatus({ entityId }: VerificationStatusProps) {
+export function SourceCheckStatus({ entityId }: SourceCheckStatusProps) {
   const [verdicts, setVerdicts] = useState<VerdictRow[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +33,7 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
     (async () => {
       try {
         const res = await fetch(
-          `/api/entity-verifications-proxy?entity_id=${encodeURIComponent(entityId)}&limit=50`
+          `/api/source-check-verdicts-proxy?entity_id=${encodeURIComponent(entityId)}&limit=50`
         );
         if (!res.ok) {
           // Non-200 responses: if server is down or entity has no data, just hide
@@ -92,16 +92,16 @@ export function VerificationStatus({ entityId }: VerificationStatusProps) {
   const sortedVerdicts = [...verdictCounts.entries()].sort(([, a], [, b]) => b - a);
 
   return (
-    <section className="not-prose mt-6 mb-4" aria-labelledby="verification-status-heading">
+    <section className="not-prose mt-6 mb-4" aria-labelledby="source-check-status-heading">
       <div className="rounded-lg border border-border/60 bg-card/50">
         {/* Header */}
         <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border/40">
           <ShieldCheck size={14} className="text-emerald-500/70" />
           <h2
-            id="verification-status-heading"
+            id="source-check-status-heading"
             className="text-sm font-bold tracking-tight"
           >
-            Verification Status
+            Source Check Status
           </h2>
           <span className="text-xs text-muted-foreground ml-1">
             {confirmed} of {total} claims confirmed

@@ -40,7 +40,7 @@ const mockStatsWithData = {
   stats: {
     totalJobs: 150,
     byType: {
-      "claim-verification": {
+      "claim-source-check": {
         byStatus: { pending: 5, running: 2, completed: 80, failed: 3 },
         avgDurationMs: 12500,
         failureRate: 0.036,
@@ -55,7 +55,7 @@ const mockStatsWithData = {
   recentFailures: [
     {
       id: 42,
-      type: "claim-verification",
+      type: "claim-source-check",
       status: "failed",
       params: null,
       result: null,
@@ -123,7 +123,7 @@ describe("JobsDashboardContent", () => {
 
     const element = await JobsDashboardContent();
     const markup = renderToStaticMarkup(element as React.ReactElement);
-    // 5 pending from claim-verification + 0 from resource-ingest
+    // 5 pending from claim-source-check + 0 from resource-ingest
     expect(markup).toContain("5 pending");
     expect(markup).toContain("2 running");
     expect(markup).toContain("130 completed"); // 80 + 50

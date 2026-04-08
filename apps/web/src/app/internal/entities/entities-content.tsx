@@ -71,7 +71,7 @@ export async function EntitiesContent() {
   const coverageById = new Map(coverageItems.map((c) => [c.id, c]));
   const rankingById = new Map(rankings.map((r) => [r.id, r]));
 
-  // Fetch source-check verification data (graceful degradation if unavailable)
+  // Fetch source-check data (graceful degradation if unavailable)
   const scSummary = await loadSourceCheckSummary();
 
   const rows: UnifiedEntityRow[] = entities.map((e) => {
@@ -91,13 +91,13 @@ export async function EntitiesContent() {
 
     // Compute derived source-check metrics
     let scAccuracyRate: number | null = null;
-    let scVerificationCoverage: number | null = null;
+    let scSourceCheckCoverage: number | null = null;
     if (sc) {
       const checkedDenom = sc.confirmed + sc.contradicted + sc.outdated + sc.partial + sc.unverifiable;
       scAccuracyRate = checkedDenom > 0
         ? Math.round((sc.confirmed / checkedDenom) * 1000) / 1000
         : null;
-      scVerificationCoverage = sc.totalRecords > 0
+      scSourceCheckCoverage = sc.totalRecords > 0
         ? Math.round((sc.totalVerdicts / sc.totalRecords) * 1000) / 1000
         : null;
     }
@@ -181,7 +181,7 @@ export async function EntitiesContent() {
       accuracyActual: cov?.accuracyActual ?? null,
       accuracyTotal: cov?.accuracyTotal ?? null,
       accuracy: cov?.accuracy ?? null,
-      // Source-check verification
+      // Source-check
       scConfirmed: sc?.confirmed ?? null,
       scContradicted: sc?.contradicted ?? null,
       scOutdated: sc?.outdated ?? null,
@@ -191,7 +191,7 @@ export async function EntitiesContent() {
       scTotalVerdicts: sc?.totalVerdicts ?? null,
       scAvgConfidence: sc?.avgConfidence ?? null,
       scAccuracyRate,
-      scVerificationCoverage,
+      scSourceCheckCoverage,
       resourceLinkCount,
     };
   });
@@ -200,7 +200,7 @@ export async function EntitiesContent() {
   const withPages = rows.filter((r) => r.hasPage).length;
   const withImportance = rows.filter((r) => r.readerImportance != null).length;
   const withCoverage = rows.filter((r) => r.coverageScore != null).length;
-  const withVerification = rows.filter((r) => r.scTotalVerdicts != null && r.scTotalVerdicts > 0).length;
+  const withSourceChecks = rows.filter((r) => r.scTotalVerdicts != null && r.scTotalVerdicts > 0).length;
 
   return (
     <>
@@ -212,11 +212,11 @@ export async function EntitiesContent() {
         have importance scores,{" "}
         <span className="font-medium text-foreground">{withCoverage}</span>{" "}
         have coverage data,{" "}
-        <span className="font-medium text-foreground">{withVerification}</span>{" "}
+        <span className="font-medium text-foreground">{withSourceChecks}</span>{" "}
         have source-check verdicts,{" "}
         <span className="font-medium text-foreground">{withResourceLinks}</span>{" "}
         have resource links. Use <strong>preset buttons</strong> to switch views.
-        The <strong>Verification</strong> preset shows source-check accuracy and coverage.
+        The <strong>Source Check</strong> preset shows source-check accuracy and coverage.
       </p>
       <EntitiesDataTable entities={rows} />
     </>

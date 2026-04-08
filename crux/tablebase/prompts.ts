@@ -15,7 +15,7 @@ const SHARED_RULES = `
 - Use query_existing_records to see what data already exists before adding new records.
 - If you cannot find reliable data, say so — do not guess or make up records.
 
-## Claims-First Verification Workflow (preferred)
+## Claims-First Source-Check Workflow (preferred)
 When available, use the claims-first workflow for higher-quality data:
 1. After web_search, call **suggest_resources** with all URLs you plan to reference — this registers them and fetches their content.
 2. Extract specific, verifiable claims from the sources and submit them via **submit_claims** — each claim must reference a resourceId from step 1.
@@ -147,30 +147,6 @@ ${SHARED_RULES}
 - sourceUrl: URL where you found this result (REQUIRED)
 - notes: Any relevant context`;
 
-    case 'source-discovery':
-      return `You are a source-quality improvement agent. Records about "${task.entityName}" have been verified against their source URLs, but some sources couldn't confirm the data. Your job is to find BETTER, more specific source URLs that can verify these records.
-
-## Goal
-Find person-specific or record-specific source URLs to replace generic or broken sources. The existing sources are things like generic org homepages or dead links — you need to find pages that actually mention the specific people, roles, or data.
-
-## Research Strategy
-1. Start with **query_unverifiable_records** to see which records need better sources and why they failed verification.
-2. For personnel records, search for:
-   - Wikipedia articles about the person or organization (often mention key personnel by name)
-   - Press releases or blog posts announcing hires, promotions, or departures
-   - News articles mentioning the person's role at the organization
-   - The organization's team/about page (if it's a JavaScript-rendered site, note that — simple HTTP fetch may get empty HTML)
-   - LinkedIn profiles (public), Google Scholar profiles, personal websites
-3. For each good source you find, call **suggest_resource** with the URL and which record(s) it could verify.
-4. If --apply mode is active and you're confident in a source, use **link_source** to update the record's source URL.
-
-## Rules
-- Do NOT fabricate URLs — only suggest sources you found via web search.
-- A single Wikipedia article can verify multiple personnel records for the same organization — suggest it once and list all record IDs it could verify.
-- Prefer authoritative sources: Wikipedia > official team pages > news articles > blog posts > social media.
-- For each suggested source, explain what specific information it contains that verifies the record.
-- If a record's data appears to be wrong (not just unverifiable), note that in your summary — don't suggest sources that contradict the record.`;
-
     default:
       return `You are a research agent that enriches structured data for wiki entities.
 ${SHARED_RULES}`;
@@ -178,14 +154,6 @@ ${SHARED_RULES}`;
 }
 
 export function getUserPrompt(task: EnrichmentTask): string {
-  if (task.taskType === 'source-discovery') {
-    return `Find better source URLs for unverifiable records about "${task.entityName}" (${task.entityId}).
-Unverifiable records: ${task.existingRecordCount}
-Issues: ${task.reasons.join('; ')}
-
-Start by calling query_unverifiable_records to see which records need better sources and why they failed. Then use web_search to find person-specific or record-specific URLs that can verify the data. Call suggest_resource for each good URL you find.`;
-  }
-
   const base = `Research and enrich data for "${task.entityName}" (${task.entityId}).
 Task type: ${task.taskType}
 Current records: ${task.existingRecordCount}

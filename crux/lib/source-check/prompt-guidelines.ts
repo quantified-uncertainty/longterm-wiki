@@ -4,14 +4,14 @@
  * These guidelines are used by all source-check commands and handlers to reduce
  * false-positive "contradicted" verdicts. Extracted from duplicated prompt blocks
  * in factbase-source-check, source-check-orchestrate, source-check-wiki-pages,
- * and claim-verification.
+ * and claim-source-check.
  *
  * When updating these guidelines, all source-check prompts pick up the change.
  */
 
 /**
  * Common false-positive avoidance guidelines for source-check LLM prompts.
- * Append this block after the main verification question in any source-check prompt.
+ * Append this block after the main source-check question in any source-check prompt.
  */
 export const SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES = `IMPORTANT — avoid these common false-positive errors:
 - **Range vs. point**: If the source gives a range (e.g., "51-200 employees") and the claimed value falls within that range (e.g., 91), that is "confirmed", NOT contradicted.

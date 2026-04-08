@@ -25,7 +25,7 @@ export interface DivisionRow {
   href: string | null;
   /** Whether this division has meaningful data (personnel, grants, programs, lead, etc.) */
   hasData: boolean;
-  /** Source-check verification verdict, if available */
+  /** Source-check verdict, if available */
   verdict: RecordVerdict | null;
 }
 
@@ -259,7 +259,7 @@ export function DivisionsTable({
                     <RecordStatusDots
                       coverageScore={computeDivisionCoverage(row)}
                       verdict={row.verdict?.verdict}
-                      sourceCheckHref={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                      sourcingHref={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
                     />
                   </td>
                 </tr>

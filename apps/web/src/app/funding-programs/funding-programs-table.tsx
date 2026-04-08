@@ -26,7 +26,7 @@ export interface FundingProgramListRow {
   status: string | null;
   source: string | null;
   description: string | null;
-  /** Source-check verification verdict, if available */
+  /** Source-check verdict, if available */
   verdict: RecordVerdict | null;
 }
 
@@ -440,7 +440,7 @@ export function FundingProgramsListTable({
                   <RecordStatusDots
                     coverageScore={computeFundingProgramCoverage(row)}
                     verdict={row.verdict?.verdict}
-                    sourceCheckHref={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    sourcingHref={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
                   />
                 </td>
               </tr>

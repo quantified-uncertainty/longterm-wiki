@@ -64,7 +64,7 @@ describe('validateTestPlan', () => {
   });
 
   it('blocks when all items are unchecked (tests listed but not executed)', () => {
-    const body = `## Summary\nChanges\n\n## Test plan\n- [ ] Run unit tests\n- [ ] Manual verification\n`;
+    const body = `## Summary\nChanges\n\n## Test plan\n- [ ] Run unit tests\n- [ ] Manual check\n`;
     const result = validateTestPlan(body);
     expect(result.status).toBe('block');
     expect(result.checkedItems).toBe(0);
@@ -72,7 +72,7 @@ describe('validateTestPlan', () => {
   });
 
   it('warns when some items are unchecked', () => {
-    const body = `## Summary\nChanges\n\n## Test plan\n- [x] Run unit tests\n- [ ] Manual verification\n`;
+    const body = `## Summary\nChanges\n\n## Test plan\n- [x] Run unit tests\n- [ ] Manual check\n`;
     const result = validateTestPlan(body);
     expect(result.status).toBe('warn');
     expect(result.checkedItems).toBe(1);
@@ -80,7 +80,7 @@ describe('validateTestPlan', () => {
   });
 
   it('passes when all items are checked', () => {
-    const body = `## Summary\nChanges\n\n## Test plan\n- [x] Run unit tests\n- [x] Manual verification\n`;
+    const body = `## Summary\nChanges\n\n## Test plan\n- [x] Run unit tests\n- [x] Manual check\n`;
     const result = validateTestPlan(body);
     expect(result.status).toBe('ok');
     expect(result.checkedItems).toBe(2);

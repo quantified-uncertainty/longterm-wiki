@@ -12,7 +12,7 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, sourceCheckVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import { things, sourceVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -58,8 +58,7 @@ const StatsQuery = z.object({
   parent_id: z.string().max(100).optional(),
 });
 
-// Verification schemas removed — verification now lives in the unified
-// /api/verifications route. See discussion #2950.
+// Source-check schemas live in the unified /api/source-checks route. See discussion #2950.
 
 // ---- Raw SQL row types ----
 
@@ -87,7 +86,7 @@ interface ThingSearchRow {
 
 /** Verdict select fields for the joined query. */
 const verdictFields = {
-  verdict: sourceCheckVerdicts.verdict,
+  verdict: sourceVerdicts.verdict,
 };
 
 /**
@@ -102,12 +101,12 @@ const verdictFields = {
  * query below. If you add more irregular plurals here, update that query too.
  */
 const verdictJoinOnThings = and(
-  sql`${sourceCheckVerdicts.recordType} = CASE ${things.sourceTable}
+  sql`${sourceVerdicts.recordType} = CASE ${things.sourceTable}
     WHEN 'entities' THEN 'entity'
     ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
   END`,
-  eq(sourceCheckVerdicts.recordId, things.sourceId),
-  sql`${sourceCheckVerdicts.fieldName} IS NULL`,
+  eq(sourceVerdicts.recordId, things.sourceId),
+  sql`${sourceVerdicts.fieldName} IS NULL`,
 );
 
 function formatThing(
@@ -134,8 +133,8 @@ function formatThing(
   };
 }
 
-// formatVerification and formatVerdict removed — verification now lives in
-// the unified /api/verifications route. See discussion #2950.
+// formatSourcing and formatVerdict removed — source-checks live in
+// the unified /api/source-checks route. See discussion #2950.
 
 const sortColumns = {
   title: things.title,
@@ -179,7 +178,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(ftsWhere)
       .orderBy(
         prefixQuery
@@ -208,7 +207,7 @@ const thingsApp = new Hono()
       const fallbackRows = await db
         .select({ thing: things, ...verdictFields })
         .from(things)
-        .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+        .leftJoin(sourceVerdicts, verdictJoinOnThings)
         .where(ilikeWhere)
         .orderBy(things.title)
         .limit(limit)
@@ -405,7 +404,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -423,8 +422,7 @@ const thingsApp = new Hono()
     });
   })
 
-  // Verification endpoints (GET/POST /verifications, GET/POST /verdicts) removed.
-  // Verification now lives in the unified /api/verifications route.
+  // Source-check endpoints live in the unified /api/source-checks route.
   // See discussion #2950.
 
   // ---- GET /:id ----
@@ -438,7 +436,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(eq(things.id, id))
       .limit(1);
 
@@ -508,7 +506,7 @@ const thingsApp = new Hono()
     const rows = await db
       .select({ thing: things, ...verdictFields })
       .from(things)
-      .leftJoin(sourceCheckVerdicts, verdictJoinOnThings)
+      .leftJoin(sourceVerdicts, verdictJoinOnThings)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)

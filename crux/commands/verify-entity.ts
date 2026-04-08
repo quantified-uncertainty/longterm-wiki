@@ -1,18 +1,18 @@
 /**
- * Per-Entity Verification Command
+ * Per-Entity Source-Check Command
  *
- * Discovers all verifiable claims about a specific entity (FactBase facts +
- * TableBase records), verifies each against its source, stores evidence,
+ * Discovers all checkable claims about a specific entity (FactBase facts +
+ * TableBase records), source-checks each against its source, stores evidence,
  * and computes aggregate verdicts.
  *
  * Usage:
- *   crux verify <entity>                           Verify all claims for an entity
- *   crux verify <entity> --dry-run                 Preview what would be verified
+ *   crux verify <entity>                           Source-check all claims for an entity
+ *   crux verify <entity> --dry-run                 Preview what would be checked
  *   crux verify <entity> --budget=5                Limit spending to ~$5
- *   crux verify <entity> --type=fact               Only verify FactBase facts
- *   crux verify <entity> --type=record             Only verify TableBase records
- *   crux verify stats                              Show verification stats
- *   crux verify all --budget=10 --limit=100        Verify across all entities
+ *   crux verify <entity> --type=fact               Only check FactBase facts
+ *   crux verify <entity> --type=record             Only check TableBase records
+ *   crux verify stats                              Show source-check stats
+ *   crux verify all --budget=10 --limit=100        Check across all entities
  */
 
 import type { CommandResult } from '../lib/command-types.ts';
@@ -23,7 +23,7 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getVerificationStats } from '../lib/wiki-server/verifications.ts';
+import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getSourceCheckStats } from '../lib/wiki-server/source-check-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
 import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
@@ -39,14 +39,14 @@ const DEFAULT_LIMIT = 50;
 interface VerifiableClaim {
   recordType: string;      // 'fact', 'grant', 'personnel', 'division', etc.
   recordId: string;        // PK in the source table
-  fieldName?: string;      // specific field for cell-level verification
+  fieldName?: string;      // specific field for cell-level source-check
   entityId: string;        // entity this claim is about
   description: string;     // human-readable claim text
   sourceUrl: string;       // URL to verify against
   expectedValue?: string;  // what the record says
 }
 
-interface VerificationResult {
+interface SourceCheckResult {
   claim: VerifiableClaim;
   verdict: SourceCheckVerdict;
   confidence: number;
@@ -54,7 +54,7 @@ interface VerificationResult {
   reasoning: string;
 }
 
-interface VerificationError {
+interface SourceCheckError {
   claim: VerifiableClaim;
   error: string;
   errorType?: string;
@@ -185,14 +185,14 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
   return claims;
 }
 
-// ── LLM verification ────────────────────────────────────────────────
+// ── LLM source-check ────────────────────────────────────────────────
 
-async function verifyClaim(
+async function sourceCheckClaim(
   claim: VerifiableClaim,
   sourceText: string,
   client: ReturnType<typeof createLlmClient>,
   tracker: CostTracker,
-): Promise<VerificationResult | VerificationError> {
+): Promise<SourceCheckResult | SourceCheckError> {
   const prompt = `You are a fact-checker. Given the source text below, verify this claim.
 
 Claim: ${claim.description}
@@ -250,7 +250,7 @@ Respond with ONLY a JSON object:
 
 // ── Storage ─────────────────────────────────────────────────────────
 
-async function storeEvidence(result: VerificationResult): Promise<void> {
+async function storeEvidence(result: SourceCheckResult): Promise<void> {
   await storeEvidenceApi({
       recordType: result.claim.recordType,
       recordId: result.claim.recordId,
@@ -306,7 +306,7 @@ const c = {
 };
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await getVerificationStats();
+  const response = await getSourceCheckStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
@@ -314,7 +314,7 @@ async function statsCommand(): Promise<CommandResult> {
 
   const stats = response.data;
   const lines: string[] = [];
-  lines.push(`${c.bold}Verification Stats${c.reset}`);
+  lines.push(`${c.bold}Source-Check Stats${c.reset}`);
   lines.push(`Total verdicts: ${stats.total}`);
   lines.push(`Average confidence: ${(stats.avg_confidence * 100).toFixed(0)}%`);
   lines.push(`Needs recheck: ${stats.needs_recheck}`);
@@ -384,11 +384,11 @@ async function verifyEntityCommand(
     return { exitCode: 0, output: lines.join('\n') };
   }
 
-  // Execute verification
+  // Execute source-checks
   const client = createLlmClient();
   const tracker = new CostTracker();
-  const results: VerificationResult[] = [];
-  const errors: VerificationError[] = [];
+  const results: SourceCheckResult[] = [];
+  const errors: SourceCheckError[] = [];
 
   for (let i = 0; i < toVerify.length; i++) {
     const claim = toVerify[i];
@@ -409,8 +409,8 @@ async function verifyEntityCommand(
       continue;
     }
 
-    // Verify via LLM
-    const result = await verifyClaim(claim, sourceResult.text, client, tracker);
+    // Source-check via LLM
+    const result = await sourceCheckClaim(claim, sourceResult.text, client, tracker);
     if ('error' in result) {
       errors.push(result);
       console.log(`${c.red}ERROR${c.reset}`);
@@ -434,7 +434,7 @@ async function verifyEntityCommand(
   // Summary
   const lines: string[] = [];
   lines.push('');
-  lines.push(`${c.bold}Verification Summary${c.reset}`);
+  lines.push(`${c.bold}Source-Check Summary${c.reset}`);
   lines.push(`Entity: ${entityId}`);
   lines.push(`Verified: ${results.length} | Errors: ${errors.length} | Cost: $${tracker.totalCost.toFixed(3)}`);
   lines.push('');
@@ -476,32 +476,32 @@ export const commands = {
     if (!subcommand || subcommand === '--help') {
       return {
         exitCode: 0,
-        output: `${c.bold}Verification Pipeline${c.reset}
+        output: `${c.bold}Source-Check Pipeline${c.reset}
 
-Verify claims about entities against their sources using LLMs.
+Source-check claims about entities against their sources using LLMs.
 
 ${c.bold}Usage:${c.reset}
-  crux verify <entity>                     Verify all claims for an entity
-  crux verify <entity> --dry-run           Preview what would be verified
+  crux verify <entity>                     Source-check all claims for an entity
+  crux verify <entity> --dry-run           Preview what would be checked
   crux verify <entity> --budget=5          Limit spending (default: $5)
-  crux verify <entity> --limit=50          Max items to verify (default: 50)
-  crux verify <entity> --type=fact         Only verify FactBase facts
-  crux verify <entity> --type=record       Only verify TableBase records
-  crux verify stats                        Show verification stats
-  crux verify all --budget=10              Verify across all entities (uses orchestrator)
+  crux verify <entity> --limit=50          Max items to check (default: 50)
+  crux verify <entity> --type=fact         Only check FactBase facts
+  crux verify <entity> --type=record       Only check TableBase records
+  crux verify stats                        Show source-check stats
+  crux verify all --budget=10              Check across all entities (uses orchestrator)
 
 ${c.bold}Examples:${c.reset}
   crux verify anthropic                    Verify Anthropic's facts and records
   crux verify anthropic --type=fact        Only verify Anthropic's FactBase facts
   crux verify anthropic --dry-run          See what would be verified
-  crux verify page <page-id>               Verify wiki page prose (cited vs uncited claims)
+  crux verify page <page-id>               Check wiki page prose (cited vs uncited claims)
   crux verify page <page-id> --quick       Just count cited vs uncited (no web search)
-  crux verify page <page-id> --deep        Also verify uncited claims against web
+  crux verify page <page-id> --deep        Also check uncited claims against web
   crux verify page <page-id> --fix         Add citations to uncited claims (surgical)
   crux verify page <page-id> --fix --dry-run  Preview what citations would be added
   crux verify page --all                   Fast citation density audit across all pages
   crux verify page --all --limit=100       Show top 100 worst-cited pages
-  crux verify stats                        Show overall verification statistics`,
+  crux verify stats                        Show overall source-check statistics`,
       };
     }
 
@@ -527,12 +527,12 @@ ${c.bold}Examples:${c.reset}
     }
 
     if (subcommand === 'all') {
-      // Delegate to the orchestrator for cross-entity verification
+      // Delegate to the orchestrator for cross-entity source-checking
       const { orchestrateCommand } = await import('./source-check-orchestrate.ts');
       return orchestrateCommand(args.slice(1), options);
     }
 
-    // Per-entity verification
+    // Per-entity source-check
     return verifyEntityCommand(subcommand, options);
   },
 
