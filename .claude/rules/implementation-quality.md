@@ -35,6 +35,56 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 
 The `/agent-review-pr` skill includes a simplification pass — but don't rely on the review to catch what you should write simply in the first place.
 
+## Codebase-Wide Sweeps — Validator-First
+
+When applying a structural rule across more than 5 files (moving components, enforcing positioning, renaming patterns, adding a prop everywhere), **write a validator first, then fix violations.** Don't trust manual inspection to find every instance.
+
+### Why
+
+LLMs are bad at exhaustive codebase sweeps that require structural understanding (e.g., "which column is this component in?"). They miss files, misread structure, and produce PRs that need 2-3 follow-ups to reach 100% coverage. A validator finds violations mechanically and confirms when you're actually done.
+
+### The pattern
+
+1. **Write a validator** (`crux/validate/validate-<rule>.ts`) that defines the rule as code. Export a `runCheck()` function returning `{ passed, errors, violations }`. Make it runnable standalone: `npx tsx crux/validate/validate-<rule>.ts`.
+2. **Run it** to get the full violation list. This is your work queue.
+3. **Fix every violation.** The validator output tells you exactly which files and lines need changes.
+4. **Run the validator again** to confirm zero violations.
+5. **Wire it into the gate** by adding an entry to the `parallelChecks` array in `crux/validate/validate-gate.ts`. Decide blocking vs advisory — new rules that enforce a freshly-applied pattern should be blocking so the pattern doesn't regress.
+
+### Validator complexity tiers
+
+Not every rule needs a 200-line AST parser. Match the validator to the rule:
+
+| Rule type | Validator approach | Example |
+|-----------|-------------------|---------|
+| **Text pattern** (banned import, naming convention) | `grep` / regex scan over file contents | `validate-no-console-log.ts` — find `console.log` in server code |
+| **Structural pattern** (component position in JSX, column order) | Line-by-line state machine tracking open/close tags or braces | `validate-dot-position.ts` — track `<td>` nesting to find first-column dots |
+| **Cross-file invariant** (unique IDs, matching FK references) | Load data from multiple files, check constraints in memory | `validate-drizzle-journal.ts` — check migration prefixes are unique |
+| **Runtime check** (rendered output, computed values) | Playwright e2e test instead of a static validator | `e2e/render-audit.spec.ts` — verify pages render without errors |
+
+Start with the simplest validator that catches violations. A 10-line grep wrapper is better than no validator. You can always strengthen it later if edge cases slip through.
+
+### When to use this vs. direct sweep
+
+Use validator-first when:
+- The rule applies to **>5 files**
+- The rule is **structural** (not just text find-replace — involves understanding nesting, ordering, or context)
+- **100% coverage matters** (a missed file = a user-visible bug or inconsistency)
+
+Direct sweep is fine when:
+- The change is a **simple text replacement** (`rg --files-with-matches 'oldName' | xargs sed`)
+- Only **2-3 files** are affected
+- You can verify completeness with a grep (`rg 'oldName'` returns 0 results)
+
+### Anti-pattern: sweep first, validator as afterthought
+
+The validator loses most of its value if written after the sweep, because:
+- You've already shipped the "95% done" PR and moved on
+- The validator catches the remaining 5% in a follow-up PR
+- A third PR fixes the validator itself
+
+Write the validator *before* making any changes. The violation list from the first run is your TODO list.
+
 ## Pre-Commit Review
 
 Before committing, re-read the diff and actively look for problems:
