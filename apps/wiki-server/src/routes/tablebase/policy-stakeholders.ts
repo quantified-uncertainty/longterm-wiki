@@ -12,6 +12,7 @@ import {
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -120,6 +121,13 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
+      { fieldName: "stakeholderEntityId", ids: items.map((i) => i.stakeholderEntityId).filter((id): id is string => id != null) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 

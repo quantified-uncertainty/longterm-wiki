@@ -13,6 +13,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
@@ -228,6 +229,12 @@ const divisionsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate entity FK references before inserting
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "parentOrgId", ids: items.map((i) => i.parentOrgId) },
+    ]);
+    if (refError) return refError;
 
     let upserted = 0;
     let verdictsResult = { written: 0 };

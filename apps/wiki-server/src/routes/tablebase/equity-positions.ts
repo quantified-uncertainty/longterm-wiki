@@ -13,6 +13,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -225,6 +226,13 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate entity FK references before inserting
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+      { fieldName: "holderId", ids: items.map((i) => i.holderId) },
+    ]);
+    if (refError) return refError;
 
     let upserted = 0;
 

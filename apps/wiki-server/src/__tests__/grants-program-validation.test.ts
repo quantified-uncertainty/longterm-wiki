@@ -86,6 +86,15 @@ function seedFundingProgram(id: string) {
   });
 }
 
+function seedEntity(id: string, stableId?: string) {
+  entitiesStore.set(id, {
+    id,
+    stable_id: stableId ?? id,
+    entity_type: "organization",
+    title: `Entity ${id}`,
+  });
+}
+
 function patchJson(app: Hono, path: string, body: unknown) {
   return app.request(path, {
     method: "PATCH",
@@ -109,6 +118,7 @@ describe("Grants programId validation", () => {
 
   describe("POST /api/grants/sync", () => {
     it("accepts grants with null programId", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {
@@ -126,6 +136,7 @@ describe("Grants programId validation", () => {
     });
 
     it("accepts grants when programId exists in funding_programs", async () => {
+      seedEntity("org-test");
       seedFundingProgram("FP_ABC12345");
 
       const res = await postJson(app, "/api/grants/sync", {
@@ -145,6 +156,7 @@ describe("Grants programId validation", () => {
     });
 
     it("rejects grants when programId does not exist in funding_programs", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {
@@ -164,6 +176,7 @@ describe("Grants programId validation", () => {
     });
 
     it("reports all invalid programIds in one error", async () => {
+      seedEntity("org-test");
       seedFundingProgram("FP_VALID001");
 
       const res = await postJson(app, "/api/grants/sync", {
@@ -239,6 +252,7 @@ describe("Grants programId validation", () => {
     });
 
     it("accepts grants without programId field", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {

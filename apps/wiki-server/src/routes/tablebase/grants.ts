@@ -30,7 +30,7 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
-import { shouldSkipEntityValidation } from "../shared/validate-entity-refs.js";
+import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -605,6 +605,13 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
     const sourceCheckError = enforceSourceCheck(c, "grants", items);
     if (sourceCheckError) return sourceCheckError;
+
+    // Validate entity FK references (organizationId, granteeId)
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
+      { fieldName: "granteeId", ids: items.map((i) => i.granteeId).filter((id): id is string => id != null) },
+    ]);
+    if (refError) return refError;
 
     // Validate programId references (skip if requested via shouldSkipEntityValidation)
     if (!shouldSkipEntityValidation(c)) {
