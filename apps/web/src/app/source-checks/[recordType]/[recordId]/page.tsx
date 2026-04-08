@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Newsreader, JetBrains_Mono } from "next/font/google";
 import { ArrowLeft, Database, ExternalLink } from "lucide-react";
 import {
   fetchDetailed,
@@ -20,19 +19,6 @@ import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
-
-// Editorial typography — scoped to this page only
-const newsreader = Newsreader({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-newsreader",
-});
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-jb-mono",
-});
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -264,7 +250,10 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       `/api/source-checks/resolve-names?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
-    fetchDetailed<{ record: Record<string, unknown>; displayNames: Record<string, { title: string }> }>(
+    fetchDetailed<{
+      record: Record<string, unknown>;
+      displayNames: Record<string, { title: string; slug?: string; entityType?: string }>;
+    }>(
       `/api/record-lookup/${encodeURIComponent(sourceTable)}/${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
@@ -338,6 +327,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   // Compute claim/record data for the side-by-side layout
   const isHolistic = verdicts.every((v) => v.fieldName === null);
   const dbRecord = recordResult.ok ? recordResult.data.record : null;
+  const recordDisplayNames = recordResult.ok ? recordResult.data.displayNames : {};
   const skipFields = new Set([
     "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
     "organizationId", "orgEntityId", "granteeId", "programId",
@@ -389,79 +379,77 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const primaryConfidence = primaryVerdict?.confidence ?? null;
 
   return (
-    <div className={`${newsreader.variable} ${jetbrainsMono.variable} max-w-6xl mx-auto px-6 py-10`}>
+    <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Breadcrumbs */}
       <Link
         href="/source-checks"
         className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors mb-8"
-        style={{ fontFamily: "var(--font-jb-mono)" }}
       >
         <ArrowLeft className="w-3 h-3" />
         Index
       </Link>
 
-      {/* Editorial header — like a journal article masthead */}
-      <header className="mb-10 pb-6 border-b border-foreground/15">
-        {/* Case number — small mono treatment */}
-        <div
-          className="flex items-baseline gap-3 mb-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-          style={{ fontFamily: "var(--font-jb-mono)" }}
-        >
-          <span>Verification</span>
-          <span className="text-foreground/30">·</span>
+      {/* Editorial header — compact masthead */}
+      <header className="mb-8 pb-5 border-b border-foreground/15">
+        {/* Eyebrow: type · id · cross-references */}
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-3 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
           <span>{formatRecordType(recordType)}</span>
           <span className="text-foreground/30">·</span>
-          <span>№ {recordId}</span>
+          <span>{recordId}</span>
+          {!recordType.startsWith("fact") && !recordType.startsWith("citation") && !recordType.includes("wiki-page") && (
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={`/things/${encodeURIComponent(recordId)}`}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                Record
+              </Link>
+            </>
+          )}
+          {recordHref && !recordHref.startsWith("/things/") && (
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={recordHref}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                {recordType === "personnel" ? "People" : recordType === "fact" ? "Fact" : formatRecordType(recordType)}
+              </Link>
+            </>
+          )}
+          {entityHref && (
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={entityHref}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                {recordType === "personnel"
+                  ? "Organization"
+                  : recordType === "division"
+                    ? "Parent"
+                    : claimEntityName ?? "Profile"}
+              </Link>
+            </>
+          )}
         </div>
 
-        {/* Title in serif display */}
-        <h1
-          className="text-4xl md:text-5xl font-medium leading-[1.05] tracking-tight text-foreground mb-3"
-          style={{ fontFamily: "var(--font-newsreader)", fontFeatureSettings: '"ss01", "ss02"' }}
-        >
+        {/* Title */}
+        <h1 className="text-2xl font-bold leading-tight tracking-tight text-foreground">
           {(claimSummary ?? displayName).replace(/\s*->\s*/g, " → ")}
         </h1>
 
-        {claimSummary && resolvedName && resolvedName !== claimSummary && (
-          <p
-            className="text-base text-muted-foreground italic mb-3"
-            style={{ fontFamily: "var(--font-newsreader)" }}
-          >
-            {resolvedName}
-          </p>
-        )}
-
-        {/* Cross-reference links — editorial footer style */}
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs uppercase tracking-[0.1em] text-muted-foreground mt-5">
-          {!recordType.startsWith("fact") && !recordType.startsWith("citation") && !recordType.includes("wiki-page") && (
-            <Link
-              href={`/things/${encodeURIComponent(recordId)}`}
-              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
-            >
-              View record
-            </Link>
+        {/* Subtitle — only when meaningfully different and not a truncated stub */}
+        {claimSummary &&
+          resolvedName &&
+          resolvedName !== claimSummary &&
+          resolvedName.length > 6 &&
+          !claimSummary.includes(resolvedName) && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {resolvedName}
+            </p>
           )}
-          {recordHref && !recordHref.startsWith("/things/") && (
-            <Link
-              href={recordHref}
-              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
-            >
-              {recordType === "personnel" ? "People" : recordType === "fact" ? "Fact" : formatRecordType(recordType)}
-            </Link>
-          )}
-          {entityHref && (
-            <Link
-              href={entityHref}
-              className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
-            >
-              {recordType === "personnel"
-                ? "Organization"
-                : recordType === "division"
-                  ? "Parent organization"
-                  : claimEntityName ?? "Profile"}
-            </Link>
-          )}
-        </div>
       </header>
 
       {/* Verdict — editorial treatment, like a verdict in a court ruling */}
@@ -487,22 +475,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 className="flex flex-wrap items-baseline gap-x-4 gap-y-1"
               >
                 <div className="flex items-baseline gap-3">
-                  <span
-                    className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-                    style={{ fontFamily: "var(--font-jb-mono)" }}
-                  >
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">
                     Verdict
                   </span>
-                  <span
-                    className={`text-2xl font-medium tracking-tight ${verdictColor}`}
-                    style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
-                  >
+                  <span className={`text-xl font-semibold tracking-tight ${verdictColor}`}>
                     {v.verdict}
                   </span>
                   {v.confidence != null && (
                     <span
                       className="text-sm tabular-nums text-foreground/70"
-                      style={{ fontFamily: "var(--font-jb-mono)" }}
                     >
                       {Math.round(v.confidence * 100)}%
                     </span>
@@ -511,15 +492,11 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 {v.fieldName && (
                   <span
                     className="text-xs text-muted-foreground"
-                    style={{ fontFamily: "var(--font-jb-mono)" }}
                   >
                     field: {v.fieldName}
                   </span>
                 )}
-                <span
-                  className="ml-auto text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
-                  style={{ fontFamily: "var(--font-jb-mono)" }}
-                >
+                <span className="ml-auto text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
                   {fieldEvidence.length > 0 && (
                     <>
                       {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
@@ -538,7 +515,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 {v.reasoning && (
                   <p
                     className="basis-full text-sm text-muted-foreground italic leading-relaxed mt-1"
-                    style={{ fontFamily: "var(--font-newsreader)" }}
                   >
                     {stripInternalTags(v.reasoning)}
                   </p>
@@ -548,65 +524,62 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           })}
         </div>
       ) : (
-        <div className="mb-10 text-sm text-muted-foreground italic" style={{ fontFamily: "var(--font-newsreader)" }}>
+        <div className="mb-10 text-sm text-muted-foreground italic">
           No verdict on file.
         </div>
       )}
 
       {/* Audit ledger: claim vs evidence with vertical rule between */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-foreground/15 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-foreground/15 mb-12 min-w-0">
         {/* Left column: Our claim */}
-        <section className="lg:pr-8 pb-8 lg:pb-0">
+        <section className="lg:pr-8 pb-8 lg:pb-0 min-w-0">
           <div className="flex items-baseline justify-between mb-5">
-            <h2
-              className="text-2xl font-medium tracking-tight"
-              style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
-            >
+            <h2 className="text-base font-semibold tracking-tight">
               Our claim
             </h2>
-            <span
-              className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
-              style={{ fontFamily: "var(--font-jb-mono)" }}
-            >
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
               {isHolistic ? "entire record" : "specific fields"}
             </span>
           </div>
           {displayFields.length > 0 ? (
             <dl className="space-y-3.5">
               {displayFields.map(([k, v]) => {
+                const strV = typeof v === "string" ? v : String(v);
                 const isLongText = typeof v === "string" && v.length > 300;
+                const looksLikeId = typeof v === "string" && /^sid_[a-zA-Z0-9]+$/.test(v);
+                const displayName = looksLikeId ? recordDisplayNames[strV] : null;
+
                 return (
-                  <div key={k} className="grid grid-cols-[7rem_1fr] gap-4 text-sm">
-                    <dt
-                      className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5"
-                      style={{ fontFamily: "var(--font-jb-mono)" }}
-                    >
+                  <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
+                    <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
                       {k}
                     </dt>
-                    <dd
-                      className="text-foreground/90 break-words whitespace-pre-wrap leading-relaxed"
-                      style={typeof v === "number" || /^\$|^\d+$|^\d{4}-\d{2}/.test(String(v))
-                        ? { fontFamily: "var(--font-jb-mono)", fontVariantNumeric: "tabular-nums" }
-                        : { fontFamily: "var(--font-newsreader)" }}
-                    >
+                    <dd className="text-foreground/90 break-words whitespace-pre-wrap leading-relaxed min-w-0">
                       {typeof v === "number" ? (
                         v.toLocaleString("en-US")
+                      ) : displayName ? (
+                        <Link
+                          href={`/things/${encodeURIComponent(strV)}`}
+                          className="text-primary hover:underline"
+                        >
+                          {displayName.title}
+                          <span className="text-muted-foreground font-mono text-xs ml-2">{strV}</span>
+                        </Link>
                       ) : isLongText ? (
                         <details>
                           <summary className="cursor-pointer list-none">
-                            <span>{String(v).slice(0, 280)}</span>
+                            <span>{strV.slice(0, 280)}</span>
                             <span className="text-muted-foreground">… </span>
-                            <span
-                              className="text-xs uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground border-b border-dotted border-foreground/30"
-                              style={{ fontFamily: "var(--font-jb-mono)" }}
-                            >
+                            <span className="text-xs uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground border-b border-dotted border-foreground/30">
                               expand
                             </span>
                           </summary>
-                          <span className="block mt-2">{String(v)}</span>
+                          <span className="block mt-2">{strV}</span>
                         </details>
+                      ) : looksLikeId ? (
+                        <span className="font-mono text-xs">{strV}</span>
                       ) : (
-                        String(v)
+                        strV
                       )}
                     </dd>
                   </div>
@@ -616,7 +589,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           ) : (
             <p
               className="text-sm text-muted-foreground italic"
-              style={{ fontFamily: "var(--font-newsreader)" }}
             >
               No record data available.
             </p>
@@ -624,25 +596,18 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </section>
 
         {/* Right column: Source evidence */}
-        <section className="lg:pl-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-foreground/15">
+        <section className="lg:pl-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-foreground/15 min-w-0">
           <div className="flex items-baseline justify-between mb-5">
-            <h2
-              className="text-2xl font-medium tracking-tight"
-              style={{ fontFamily: "var(--font-newsreader)", fontStyle: "italic" }}
-            >
+            <h2 className="text-base font-semibold tracking-tight">
               Source evidence
             </h2>
-            <span
-              className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
-              style={{ fontFamily: "var(--font-jb-mono)" }}
-            >
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
               {uniqueSourceUrls.size} src · {evidence.length} check{evidence.length !== 1 ? "s" : ""}
             </span>
           </div>
           {evidence.length === 0 ? (
             <p
               className="text-sm text-muted-foreground italic"
-              style={{ fontFamily: "var(--font-newsreader)" }}
             >
               No evidence on file.
             </p>
@@ -657,8 +622,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                         href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-baseline gap-1.5 text-foreground/80 hover:text-foreground border-b border-dotted border-foreground/40 hover:border-foreground break-all"
-                        style={{ fontFamily: "var(--font-jb-mono)" }}
+                        className="inline-flex items-baseline gap-1.5 text-foreground/80 hover:text-foreground border-b border-dotted border-foreground/40 hover:border-foreground break-all font-mono"
                       >
                         {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
                         <ExternalLink className="h-2.5 w-2.5 shrink-0" />
@@ -671,8 +635,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {ds && (
                               <Link
                                 href={`/sources?tab=data-sources`}
-                                className="inline-block ml-3 text-[10px] uppercase tracking-[0.15em] text-foreground/60 hover:text-foreground italic"
-                                style={{ fontFamily: "var(--font-newsreader)" }}
+                                className="inline-block ml-3 text-[10px] uppercase tracking-[0.15em] text-foreground/60 hover:text-foreground font-mono"
                               >
                                 {ds.name}
                               </Link>
@@ -680,8 +643,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {rid && (
                               <Link
                                 href={`/resources/${encodeURIComponent(rid)}`}
-                                className="inline-flex items-center gap-1 ml-3 text-[10px] uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground"
-                                style={{ fontFamily: "var(--font-jb-mono)" }}
+                                className="inline-flex items-center gap-1 ml-3 text-[10px] uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground font-mono"
                               >
                                 <Database className="h-2.5 w-2.5" />
                                 resource
@@ -713,40 +675,25 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                         <div key={e.id}>
                           {/* Inline verdict line */}
                           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
-                            <span
-                              className={`text-base italic ${evVerdictColor}`}
-                              style={{ fontFamily: "var(--font-newsreader)" }}
-                            >
+                            <span className={`text-sm font-semibold ${evVerdictColor}`}>
                               {e.verdict}
                             </span>
                             {e.confidence != null && (
-                              <span
-                                className="text-xs tabular-nums text-muted-foreground"
-                                style={{ fontFamily: "var(--font-jb-mono)" }}
-                              >
+                              <span className="text-xs tabular-nums text-muted-foreground font-mono">
                                 {Math.round(e.confidence * 100)}%
                               </span>
                             )}
                             {e.isPrimarySource && (
-                              <span
-                                className="text-[10px] uppercase tracking-[0.15em] text-blue-700 dark:text-blue-400"
-                                style={{ fontFamily: "var(--font-jb-mono)" }}
-                              >
+                              <span className="text-[10px] uppercase tracking-[0.15em] text-blue-700 dark:text-blue-400 font-mono">
                                 primary
                               </span>
                             )}
                             {e.duplicateCount > 1 && (
-                              <span
-                                className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground"
-                                style={{ fontFamily: "var(--font-jb-mono)" }}
-                              >
+                              <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
                                 ×{e.duplicateCount}
                               </span>
                             )}
-                            <span
-                              className="ml-auto text-[10px] uppercase tracking-[0.1em] text-muted-foreground"
-                              style={{ fontFamily: "var(--font-jb-mono)" }}
-                            >
+                            <span className="ml-auto text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-mono">
                               {e.checkerModel && formatCheckerModel(e.checkerModel)}
                               {e.checkedAt && <> · {new Date(e.checkedAt).toLocaleDateString()}</>}
                             </span>
@@ -754,30 +701,19 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
                           {/* Matched data — render as dl matching the claim style */}
                           {structuredEntries && structuredEntries.length > 0 && (
-                            <dl className="space-y-2 mb-3 pl-3 border-l border-foreground/15">
+                            <dl className="space-y-2 mb-3 pl-3 border-l border-foreground/15 min-w-0">
                               {structuredEntries.slice(0, 8).map(([k, val]) => (
-                                <div key={k} className="grid grid-cols-[7rem_1fr] gap-4 text-sm">
-                                  <dt
-                                    className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5"
-                                    style={{ fontFamily: "var(--font-jb-mono)" }}
-                                  >
+                                <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
+                                  <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
                                     {k}
                                   </dt>
-                                  <dd
-                                    className="text-foreground/90 break-words"
-                                    style={typeof val === "number" || /^\$|^\d/.test(String(val))
-                                      ? { fontFamily: "var(--font-jb-mono)", fontVariantNumeric: "tabular-nums" }
-                                      : { fontFamily: "var(--font-newsreader)" }}
-                                  >
+                                  <dd className="text-foreground/90 break-words min-w-0">
                                     {formatJsonValue(val)}
                                   </dd>
                                 </div>
                               ))}
                               {structuredEntries.length > 8 && (
-                                <div
-                                  className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground pl-[8.5rem]"
-                                  style={{ fontFamily: "var(--font-jb-mono)" }}
-                                >
+                                <div className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-mono">
                                   +{structuredEntries.length - 8} more
                                 </div>
                               )}
@@ -788,7 +724,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           {!structuredEntries && e.extractedQuote && (
                             <blockquote
                               className="border-l-2 border-foreground/30 pl-4 my-2 text-sm italic text-foreground/80 leading-relaxed"
-                              style={{ fontFamily: "var(--font-newsreader)" }}
                             >
                               {e.extractedQuote}
                             </blockquote>
@@ -798,11 +733,9 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           {e.notes && (
                             <p
                               className="text-sm text-muted-foreground leading-relaxed mt-2"
-                              style={{ fontFamily: "var(--font-newsreader)" }}
                             >
                               <span
                                 className="text-[10px] uppercase tracking-[0.12em] text-foreground/60 mr-2 not-italic"
-                                style={{ fontFamily: "var(--font-jb-mono)" }}
                               >
                                 Note
                               </span>
@@ -823,7 +756,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       {/* Editorial colophon — case number footer */}
       <div
         className="pt-6 border-t border-foreground/15 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 flex flex-wrap items-baseline gap-x-4 gap-y-1"
-        style={{ fontFamily: "var(--font-jb-mono)" }}
       >
         <span>Case № {recordId}</span>
         {primaryVerdict?.lastComputedAt && (
