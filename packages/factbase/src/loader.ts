@@ -499,7 +499,7 @@ function parseFact(
 async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unknown }[]> {
   let entries: string[];
   try {
-    entries = await readdir(dir);
+    entries = (await readdir(dir)).sort();
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return []; // Directory doesn't exist — optional
@@ -535,7 +535,8 @@ async function discoverEntityFiles(
 ): Promise<{ name: string; parsed: unknown }[]> {
   let dirEntries: import("node:fs").Dirent[];
   try {
-    dirEntries = await readdir(thingsDir, { withFileTypes: true });
+    dirEntries = (await readdir(thingsDir, { withFileTypes: true }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return [];

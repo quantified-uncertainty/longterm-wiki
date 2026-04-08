@@ -1407,6 +1407,9 @@ export const serviceHealthIncidents = pgTable(
     index("idx_shi_severity").on(table.severity),
     index("idx_shi_detected_at").on(table.detectedAt),
     index("idx_shi_service_status").on(table.service, table.status),
+    uniqueIndex("idx_shi_open_service_title")
+      .on(table.service, table.title)
+      .where(sql`status = 'open'`),
   ]
 );
 
