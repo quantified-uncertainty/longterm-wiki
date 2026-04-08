@@ -25,6 +25,7 @@ function makeRow(overrides: Partial<GrantRow> = {}): GrantRow {
     source: null,
     dataSourceId: null,
     dataSourceName: null,
+    verdictString: null,
     ...overrides,
   };
 }

@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isPolicy } from "@/data";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
@@ -119,6 +120,7 @@ function apiEntityToRow(e: DirectoryEntity): LegislationRow {
     lastActionDate: lastActionInfo?.date ?? null,
     description: e.description ?? null,
     tags: e.tags ?? [],
+    verdictString: getRecordVerdict("policy", e.id)?.verdict ?? null,
   };
 }
 
@@ -167,6 +169,7 @@ function loadFromLocal(): LegislationPageData {
       lastActionDate: lastActionInfo?.date ?? null,
       description: entity.description ?? null,
       tags: entity.tags,
+      verdictString: getRecordVerdict("policy", entity.id)?.verdict ?? null,
     };
   });
 

@@ -6,7 +6,7 @@ import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { STATUS_COLORS, SCOPE_COLORS, normalizeStatus } from "./legislation-constants";
 import { formatIntroducedDate } from "@/lib/format-compact";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeLegislationCoverage } from "@/components/coverage/coverage-score";
 
 export interface LegislationRow {
@@ -31,6 +31,7 @@ export interface LegislationRow {
   lastActionDate: string | null;
   description: string | null;
   tags: string[];
+  verdictString: string | null;
 }
 
 /** Column definition for the table. */
@@ -317,7 +318,10 @@ export function LegislationTable({ rows }: { rows: LegislationRow[] }) {
           </td>
         ))}
         <td className="py-2.5 px-3 text-center">
-          <CoverageDots score={computeLegislationCoverage(row)} />
+          <RecordStatusDots
+            coverageScore={computeLegislationCoverage(row)}
+            verdict={row.verdictString}
+          />
         </td>
       </tr>
     );

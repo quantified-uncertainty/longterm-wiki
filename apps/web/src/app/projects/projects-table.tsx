@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeProjectCoverage } from "@/components/coverage/coverage-score";
 
 export interface ProjectRow {
@@ -16,6 +16,7 @@ export interface ProjectRow {
   clusters: string[];
   orgName: string | null;
   orgHref: string | null;
+  verdictString: string | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -144,7 +145,10 @@ export function ProjectsTable({ rows }: { rows: ProjectRow[] }) {
                 </td>
 
                 <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeProjectCoverage(row)} />
+                  <RecordStatusDots
+                    coverageScore={computeProjectCoverage(row)}
+                    verdict={row.verdictString}
+                  />
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">

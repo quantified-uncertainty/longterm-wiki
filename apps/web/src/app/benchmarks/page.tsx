@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getBenchmarkEntities, getBenchmarkResultsFromModels } from "./benchmark-utils";
+import { getRecordVerdict } from "@/data/tablebase";
 import type { BenchmarkRow } from "./benchmarks-table";
 import type { MatrixBenchmark, MatrixModel, ScoreGrid } from "./comparison-matrix";
 import { BenchmarksView } from "./benchmarks-view";
@@ -81,6 +82,7 @@ function apiEntityToRow(
     maintainer,
     description: e.description ?? null,
     modelsCount,
+    verdictString: getRecordVerdict("benchmark", e.id)?.verdict ?? null,
   };
 }
 
@@ -131,6 +133,7 @@ function loadFromLocal(): BenchmarksPageData {
       maintainer: resolveMaintainer(entity.maintainer),
       description: entity.description ?? null,
       modelsCount: results.length,
+      verdictString: getRecordVerdict("benchmark", entity.id)?.verdict ?? null,
     };
   });
 

@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
 export interface ApproachRow {
@@ -12,6 +12,7 @@ export interface ApproachRow {
   description: string | null;
   tags: string[];
   wikiId: string | null;
+  verdictString: string | null;
 }
 
 type SortKey = "title" | "tags";
@@ -138,7 +139,10 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
                 </td>
 
                 <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeGenericCoverage({ description: row.description, tags: row.tags, wikiId: row.wikiId })} />
+                  <RecordStatusDots
+                    coverageScore={computeGenericCoverage({ description: row.description, tags: row.tags, wikiId: row.wikiId })}
+                    verdict={row.verdictString}
+                  />
                 </td>
 
                 <td className="py-2.5 px-3 text-center whitespace-nowrap">

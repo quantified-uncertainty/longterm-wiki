@@ -14,7 +14,7 @@ import { Search } from "lucide-react";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { formatType } from "./publication-utils";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computePublicationCoverage } from "@/components/coverage/coverage-score";
 import {
   Table,
@@ -33,6 +33,7 @@ export interface PublicationRow {
   peerReviewed: boolean;
   resourceCount: number;
   pageCount: number;
+  verdictString: string | null;
 }
 
 const TYPE_COLORS: Record<string, string> = {
@@ -151,9 +152,13 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
     },
     {
       id: "coverage",
-      header: () => <span className="text-xs font-medium">Coverage</span>,
+      header: () => <span className="text-xs font-medium">Status</span>,
       cell: ({ row }) => (
-        <CoverageDots score={computePublicationCoverage(row.original)} />
+        <RecordStatusDots
+          coverageScore={computePublicationCoverage(row.original)}
+          verdict={row.original.verdictString}
+          sourcingHref={row.original.verdictString ? `/source-checks/publication/${encodeURIComponent(row.original.id)}` : undefined}
+        />
       ),
     },
   ];
