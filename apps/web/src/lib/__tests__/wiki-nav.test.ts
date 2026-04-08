@@ -177,67 +177,63 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, Dashboards, Citations, Style Guides, Research, Architecture & Reference", () => {
+  it("returns hardcoded sections matching three-bases model", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
-    expect(titles).toContain("Dashboards");
-    expect(titles).toContain("Citations");
-    expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
-    expect(titles).toContain("Architecture & Reference");
+    expect(titles).toContain("Verification");
+    expect(titles).toContain("FactBase");
+    expect(titles).toContain("TableBase");
+    expect(titles).toContain("WikiBase");
+    expect(titles).toContain("System");
+    expect(titles).toContain("Style Guides");
+    expect(titles).toContain("Reports");
+    expect(titles).toContain("Architecture");
+    expect(titles).toContain("Reference");
+    // No duplicate section names
+    const counts = new Map<string, number>();
+    for (const t of titles) counts.set(t, (counts.get(t) || 0) + 1);
+    for (const [t, c] of counts) {
+      expect(c, `Section "${t}" appears ${c} times`).toBe(1);
+    }
   });
 
-  it("dashboard section has defaultOpen: true", () => {
+  it("data layer sections have defaultOpen: true", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards");
-    expect(dashboards?.defaultOpen).toBe(true);
-  });
-
-  it("does not duplicate hrefs across sections", () => {
-    const sections = getInternalNav();
-    const allHrefs = sections.flatMap(s => s.items.map(i => i.href));
-    const uniqueHrefs = new Set(allHrefs);
-    expect(allHrefs.length).toBe(uniqueHrefs.size);
+    for (const title of ["Research", "Verification", "FactBase", "TableBase", "WikiBase"]) {
+      const section = sections.find(s => s.title === title);
+      expect(section?.defaultOpen).toBe(true);
+    }
   });
 
   it("migrated dashboards use internalHref (resolve to /wiki/E<id>)", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards")!;
+    const wikiBase = sections.find(s => s.title === "WikiBase")!;
 
-    const updatesItem = dashboards.items.find(i => i.label === "Update Schedule");
+    const updatesItem = wikiBase.items.find(i => i.label === "Update Schedule");
     expect(updatesItem).toBeDefined();
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
-  it("citation accuracy is in Citations section", () => {
+  it("Data Quality is in System (cross-cutting, not layer-specific)", () => {
     const sections = getInternalNav();
-    const citations = sections.find(s => s.title === "Citations")!;
-
-    const item = citations.items.find(i => i.label === "Citation Accuracy");
-    expect(item).toBeDefined();
+    const system = sections.find(s => s.title === "System")!;
+    expect(system.items.find(i => i.label === "Data Quality")).toBeDefined();
   });
 
-  it("all dashboard items use /wiki/E<id> hrefs", () => {
+  it("Data Sources is in TableBase (tracks PG pipelines)", () => {
     const sections = getInternalNav();
-    const dashboards = sections.find(s => s.title === "Dashboards")!;
-
-    for (const item of dashboards.items) {
-      if (item.label === "Internal Home") continue; // Overview link
-      expect(item.href).toMatch(/^\/wiki\//);
-    }
+    const tableBase = sections.find(s => s.title === "TableBase")!;
+    expect(tableBase.items.find(i => i.label === "Data Sources")).toBeDefined();
   });
 
-  it("all Citations items use /wiki/ hrefs (fully migrated)", () => {
+  it("verification section contains citation and hallucination dashboards", () => {
     const sections = getInternalNav();
-    const citations = sections.find(s => s.title === "Citations")!;
+    const verification = sections.find(s => s.title === "Verification")!;
 
-    const monitoringLabels = [
-      "Citation Accuracy", "Citation Content",
-      "Hallucination Risk",
-    ];
-    for (const label of monitoringLabels) {
-      const item = citations.items.find(i => i.label === label);
+    for (const label of ["Citation Accuracy", "Citation Content", "Hallucination Risk", "Source Checks"]) {
+      const item = verification.items.find(i => i.label === label);
       expect(item).toBeDefined();
       expect(item!.href).toMatch(/^\/wiki\//);
     }
@@ -252,15 +248,22 @@ describe("getInternalNav (mocked data)", () => {
     expect(labels).toContain("Canonical Facts & Calc");
   });
 
-  it("Architecture & Reference section contains expected entries", () => {
+  it("Architecture section contains expected entries", () => {
     const sections = getInternalNav();
-    const arch = sections.find(s => s.title === "Architecture & Reference")!;
+    const arch = sections.find(s => s.title === "Architecture")!;
     const labels = arch.items.map(i => i.label);
     expect(labels).toContain("Architecture");
-    expect(labels).toContain("Schema Diagrams");
-    expect(labels).toContain("Knowledge Graph Ontology");
+    expect(labels).toContain("Knowledge Graph");
+    expect(labels).toContain("Data Architecture");
+  });
+
+  it("Reference section contains expected entries", () => {
+    const sections = getInternalNav();
+    const ref = sections.find(s => s.title === "Reference")!;
+    const labels = ref.items.map(i => i.label);
     expect(labels).toContain("Automation Tools");
     expect(labels).toContain("Content Database");
+    expect(labels).toContain("Schema Diagrams");
   });
 });
 

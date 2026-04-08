@@ -1,0 +1,107 @@
+---
+wikiId: E2168
+title: "FactBase & Entities"
+description: "Hub for the wiki's structured data layer — FactBase facts, TableBase entities, ID allocation, and the query CLI. Links to dashboards, CLI commands, and architecture docs."
+subcategory: architecture
+contentFormat: article
+lastEdited: "2026-04-08"
+---
+
+import { EntityLink } from '@components/wiki';
+
+## What this is
+
+FactBase and TableBase together hold the wiki's **structured data**:
+
+- **FactBase** — typed facts with temporal anchors and source provenance, stored as YAML in `packages/factbase/data/things/`. Used by `<FBF>` components and Calc expressions in MDX pages.
+- **TableBase** — relational entities (people, orgs, grants, divisions, funding programs) stored in PostgreSQL and mirrored from `data/entities/*.yaml`.
+- **ID system** — every wiki entity gets an `E####` numeric ID and a `sid_` stable ID, allocated centrally by the wiki-server.
+
+<Callout variant="tip" title="When to start here">
+If you're trying to **add a new entity**, **read facts about an org**, **discover untracked people**, or **understand the data model**, this is the hub.
+</Callout>
+
+## Live dashboards
+
+| Dashboard | What it shows |
+|-----------|---------------|
+| [Entities & Pages](/internal/entities-dashboard) | All entities with type, aliases, KB fact counts |
+| [Entity Profile](/internal/entity-profile-dashboard) | Per-entity card: facts, related pages, usage tracking |
+| [Data Quality](/internal/data-quality-dashboard) | Field completeness and fact staleness per entity type |
+| [Data Sources](/internal/data-sources-dashboard) | Provenance tracking (Wikidata, manual, inferred) |
+| [People Coverage](/internal/people-coverage-dashboard) | Person entity coverage across pages |
+| [Grants](/internal/grants-dashboard) / [Divisions](/internal/divisions-dashboard) / [Funding Programs](/internal/funding-programs-dashboard) | PG-primary table dashboards |
+
+## CLI playbook
+
+```bash
+# FactBase: read structured facts
+pnpm crux fb show anthropic                       # Entity + all facts (resolved)
+pnpm crux fb list --type=person                   # List by type
+pnpm crux fb search "anthropic"                   # Find entities by name
+pnpm crux fb fact f_dW5cR9mJ8q                    # Show one fact's details
+pnpm crux fb stale 90                             # Facts older than 90 days
+pnpm crux fb needs-update anthropic               # What's missing
+pnpm crux fb coverage --type=organization         # Property coverage report
+
+# FactBase: write
+pnpm crux fb add-fact anthropic revenue 5e9 \
+  --asOf=2025-06 --source=https://example.com    # Add a single fact
+pnpm crux fb import-990 cais --dry-run            # Preview 990 import
+pnpm crux fb sync-sources                         # Sync source URLs to wiki-server resources
+
+# Query (cross-cutting wiki-server queries)
+pnpm crux query entity anthropic                  # Structured entity data
+pnpm crux query facts anthropic --measure=employees
+pnpm crux query related scheming                  # Related entities
+pnpm crux query backlinks rlhf                    # Pages linking to an entity
+pnpm crux query stats                             # Wiki-wide statistics
+
+# TableBase: ID allocation (wiki entities)
+pnpm crux tb ids allocate my-new-entity --description="..."
+pnpm crux tb ids check anthropic                  # Look up existing ID
+pnpm crux tb ids list --limit=100                 # Browse all IDs
+
+# TableBase: lightweight entity discovery
+pnpm crux tb people discover                      # Find untracked people
+pnpm crux tb ensure-entities --type=person        # Stable IDs only, no wiki page
+```
+
+## When to use what
+
+| I want to... | Run | Or check |
+|--------------|-----|----------|
+| Read all facts about an org | `pnpm crux fb show <slug>` | [Entity Profile dashboard](/internal/entity-profile-dashboard) |
+| See what's missing for an entity | `pnpm crux fb needs-update <slug>` | [Data Quality dashboard](/internal/data-quality-dashboard) |
+| Add a new structured fact | `pnpm crux fb add-fact <entity> <prop> <value> --asOf=YYYY-MM --source=URL` | <EntityLink id="E827" name="canonical-facts">Canonical Facts & Calc</EntityLink> |
+| Allocate an ID for a new wiki entity | `pnpm crux tb ids allocate <slug> --description="..."` | — |
+| Find people who appear in data but lack entities | `pnpm crux tb people discover` | [People Coverage dashboard](/internal/people-coverage-dashboard) |
+| Find stale facts (>90 days) | `pnpm crux fb stale 90` | — |
+| Understand the three-bases model | — | <EntityLink id="E1334" name="data-architecture">Data Architecture</EntityLink> |
+
+## Wiki entities vs. lightweight entities
+
+| Type | Has wiki page? | Has `numericId` (E#)? | Allocate via | Use for |
+|------|----------------|----------------------|--------------|---------|
+| **Wiki entity** | Yes (`/wiki/E#`) | Yes | `pnpm crux tb ids allocate <slug>` | Orgs, concepts, important people (≈200-300 total) |
+| **TableBase reference** | No | No (only `sid_` stable ID) | `pnpm crux tb ensure-entities` or `crux tb create-entity` | Paper authors, personnel, minor people |
+
+Both use the `sid_` prefix; use `isSid()` from `@longterm-wiki/id-utils` to detect them. **Never manually invent IDs.**
+
+## Architecture & deep dives
+
+- <EntityLink id="E1334" name="data-architecture">Data Architecture</EntityLink> — the three-bases model (TableBase, FactBase, WikiBase) and PG mapping
+- <EntityLink id="E886" name="fact-system-strategy">Fact System Strategy</EntityLink> — KB as canonical facts system; `<FBF>` component design
+- <EntityLink id="E759" name="content-database">Content Database</EntityLink> — storage layers: PG wiki-server, KB YAML, resources YAML, database.json
+- `packages/factbase/` — graph, types, validation, format
+- `crux/lib/factbase-loader.ts` / `factbase-writer.ts` — load and append
+- `data/entities/*.yaml` — entity definitions (orgs, persons, concepts)
+- `packages/factbase/data/things/*.yaml` — fact storage (e.g., `anthropic.yaml`)
+
+## Related hubs
+
+<CardGrid>
+  <LinkCard title="Research & Discovery" href="/wiki/E2166" description="Where new facts come from before they land in FactBase" />
+  <LinkCard title="Verification & Source-Checking" href="/wiki/E2167" description="How stored facts get checked against their cited sources" />
+  <LinkCard title="Content Pipelines" href="/wiki/E2169" description="How facts feed into wiki page rendering" />
+</CardGrid>
