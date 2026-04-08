@@ -16,6 +16,10 @@
 -- 1. statements.propertyId → properties.id: SET NULL → RESTRICT
 -- ============================================================================
 -- A statement without its property definition is unparseable.
+-- The constraint was created inline in 0051_create_statements_system.sql
+-- (PG auto-names as *_fkey). Drop both the PG auto-name and the Drizzle-style
+-- *_fk name to handle both fresh-DB and push-migrated-DB scenarios.
+ALTER TABLE "statements" DROP CONSTRAINT IF EXISTS "statements_property_id_fkey";
 ALTER TABLE "statements" DROP CONSTRAINT IF EXISTS "statements_property_id_properties_id_fk";
 ALTER TABLE "statements"
   ADD CONSTRAINT "statements_property_id_properties_id_fk"
@@ -26,6 +30,7 @@ ALTER TABLE "statements"
 -- 2. statements.valueEntityId → entities.id: SET NULL → RESTRICT
 -- ============================================================================
 -- Entity reference in a statement value is core data.
+ALTER TABLE "statements" DROP CONSTRAINT IF EXISTS "statements_value_entity_id_fkey";
 ALTER TABLE "statements" DROP CONSTRAINT IF EXISTS "statements_value_entity_id_entities_id_fk";
 ALTER TABLE "statements"
   ADD CONSTRAINT "statements_value_entity_id_entities_id_fk"
