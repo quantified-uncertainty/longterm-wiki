@@ -333,11 +333,33 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
     "organizationId", "orgEntityId", "granteeId", "programId",
     "entityId", "parentThingId", "stableId", "wikiId",
   ]);
-  const displayFields: [string, unknown][] = dbRecord
+  let displayFields: [string, unknown][] = dbRecord
     ? Object.entries(dbRecord).filter(
         ([k, v]) => v != null && v !== "" && !skipFields.has(k)
       )
     : [];
+
+  // For facts, populate displayFields from FactBase since record-lookup doesn't cover them
+  if (recordType === "fact" && displayFields.length === 0) {
+    const fact = getKBFactById(recordId);
+    if (fact) {
+      const entity = getKBEntity(fact.subjectId);
+      const property = getKBProperty(fact.propertyId);
+      const formattedValue = formatKBFactValue(fact, property?.unit, property?.display);
+      const fields: [string, unknown][] = [];
+      if (entity) fields.push(["subject", entity.name]);
+      if (property) fields.push(["property", property.name]);
+      fields.push(["value", formattedValue]);
+      if (fact.asOf) fields.push(["asOf", fact.asOf]);
+      if (fact.validEnd) fields.push(["validEnd", fact.validEnd]);
+      if (fact.source) fields.push(["source", fact.source]);
+      if (fact.sourceQuote) fields.push(["sourceQuote", fact.sourceQuote]);
+      if (fact.notes) fields.push(["notes", fact.notes]);
+      if (fact.currency) fields.push(["currency", fact.currency]);
+      if (fact.usdEquivalent != null) fields.push(["usdEquivalent", fact.usdEquivalent]);
+      displayFields = fields;
+    }
+  }
 
   // Group evidence by source URL for the right column
   const evidenceBySource = new Map<string, typeof evidence>();
