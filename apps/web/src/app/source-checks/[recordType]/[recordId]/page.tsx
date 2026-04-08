@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Database, ExternalLink } from "lucide-react";
 import {
   fetchDetailed,
 } from "@/lib/wiki-server";
@@ -39,19 +39,41 @@ function formatJsonValue(v: unknown): string {
   return String(v);
 }
 
-/** Try to parse a string as a JSON object and return non-empty entries, or null. */
+/** Try to parse a string as a JSON object and return non-empty entries, or null.
+ *  Also handles truncated JSON (missing closing `"` / `}`) by attempting repairs. */
 function parseJsonObjectEntries(text: string): [string, unknown][] | null {
   if (!text.startsWith("{")) return null;
-  try {
-    const parsed = JSON.parse(text);
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
-    const entries = Object.entries(parsed).filter(
-      ([, v]) => v !== null && v !== undefined && v !== ""
-    );
-    return entries.length > 0 ? entries : null;
-  } catch {
-    return null;
+
+  // Try parsing as-is first
+  for (const candidate of [text, text + '"}'  , text + '}']) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) continue;
+      const entries = Object.entries(parsed).filter(
+        ([, v]) => v !== null && v !== undefined && v !== ""
+      );
+      return entries.length > 0 ? entries : null;
+    } catch {
+      continue;
+    }
   }
+
+  // Fallback: extract key-value pairs via regex for truncated JSON
+  const kvRegex = /"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|[\d.]+|true|false|null)/g;
+  const entries: [string, unknown][] = [];
+  let match;
+  while ((match = kvRegex.exec(text)) !== null) {
+    const key = match[1];
+    let val: unknown = match[2];
+    if (typeof val === "string" && val.startsWith('"')) {
+      try { val = JSON.parse(val as string); } catch { val = (val as string).slice(1, -1); }
+    } else if (val === "true") val = true;
+    else if (val === "false") val = false;
+    else if (val === "null") val = null;
+    else { const n = Number(val); if (!isNaN(n)) val = n; }
+    if (val !== null && val !== undefined && val !== "") entries.push([key, val]);
+  }
+  return entries.length > 0 ? entries : null;
 }
 
 /** Format an extractedQuote for display. Strips "Matched row:" prefix and renders JSON nicely. */
@@ -67,15 +89,23 @@ function FormatQuote({ quote }: { quote: string }) {
   const entries = parseJsonObjectEntries(text);
   if (entries) {
     return (
-      <div className="rounded-md bg-muted/40 px-3 py-2 mb-2 text-sm space-y-1">
-        {entries.slice(0, 8).map(([k, v]) => (
-          <div key={k} className="flex gap-2">
-            <span className="text-muted-foreground shrink-0">{k}:</span>
-            <span className="text-foreground/80 break-all">{formatJsonValue(v)}</span>
-          </div>
-        ))}
+      <div className="rounded-md border border-border/40 bg-muted/20 px-3 py-2 mb-2 text-sm">
+        <table className="w-full">
+          <tbody>
+            {entries.slice(0, 8).map(([k, v]) => (
+              <tr key={k} className="border-b border-border/20 last:border-0">
+                <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
+                  {k}
+                </td>
+                <td className="py-0.5 text-foreground/80 break-all">
+                  {formatJsonValue(v)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         {entries.length > 8 && (
-          <div className="text-xs text-muted-foreground">+{entries.length - 8} more fields</div>
+          <div className="text-xs text-muted-foreground mt-1">+{entries.length - 8} more fields</div>
         )}
       </div>
     );
@@ -88,28 +118,39 @@ function FormatQuote({ quote }: { quote: string }) {
   );
 }
 
-/** Format an extractedValue for display. Detects JSON and renders key-value summary. */
+/** Format an extractedValue for display. Detects JSON and renders as a table. */
 function FormatExtractedValue({ value }: { value: string }) {
-  const trimmed = value.trim();
+  let trimmed = value.trim();
 
-  // JSON objects
+  // Strip "Matched row:" or similar prefixes before parsing
+  const prefixMatch = trimmed.match(/^(?:Matched row|Found row|Row match)[:\s]*/i);
+  if (prefixMatch) {
+    trimmed = trimmed.slice(prefixMatch[0].length).trim();
+  }
+
+  // JSON objects — render as structured table
   const entries = parseJsonObjectEntries(trimmed);
   if (entries) {
-    const shown = entries.slice(0, 5);
-    const remaining = entries.length - shown.length;
     return (
-      <span className="text-sm">
-        {shown.map(([k, v], i) => (
-          <span key={k}>
-            {i > 0 && ", "}
-            <span className="font-medium text-foreground/70">{k}:</span>{" "}
-            {formatJsonValue(v)}
-          </span>
-        ))}
-        {remaining > 0 && (
-          <span className="text-muted-foreground"> (+{remaining} more)</span>
+      <div className="rounded-md border border-border/40 bg-muted/20 px-3 py-2 text-sm">
+        <table className="w-full">
+          <tbody>
+            {entries.slice(0, 8).map(([k, v]) => (
+              <tr key={k} className="border-b border-border/20 last:border-0">
+                <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
+                  {k}
+                </td>
+                <td className="py-0.5 text-foreground/80 break-all">
+                  {formatJsonValue(v)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {entries.length > 8 && (
+          <div className="text-xs text-muted-foreground mt-1">+{entries.length - 8} more fields</div>
         )}
-      </span>
+      </div>
     );
   }
 
@@ -285,7 +326,10 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground mb-2">{resolvedName}</p>
         )}
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          {recordHref && (
+          <Link href={`/things/${encodeURIComponent(recordId)}`} className="text-primary hover:underline">
+            Things page &rarr;
+          </Link>
+          {recordHref && recordHref !== `/things/${recordId}` && (
             <Link href={recordHref} className="text-primary hover:underline">
               {recordType === "personnel"
                 ? "People directory"
@@ -483,6 +527,19 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           </Link>
                         );
                       })()}
+                      {(() => {
+                        const rid = checks.find((c) => c.resourceId)?.resourceId;
+                        if (!rid) return null;
+                        return (
+                          <Link
+                            href={`/resources/${encodeURIComponent(rid)}`}
+                            className="inline-flex items-center gap-1 ml-2 text-xs text-primary hover:underline"
+                          >
+                            <Database className="h-3 w-3" />
+                            Resource
+                          </Link>
+                        );
+                      })()}
                       <span className="text-xs text-muted-foreground ml-2">
                         ({checks.length} check{checks.length !== 1 ? "s" : ""})
                       </span>
@@ -516,27 +573,27 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           </span>
                         </div>
 
-                        {/* Expected vs Found */}
-                        {(e.expectedValue || e.extractedValue) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 text-sm">
+                        {/* Matched data — show extractedQuote as structured key-value pairs if JSON */}
+                        {e.extractedQuote && (
+                          <FormatQuote quote={e.extractedQuote} />
+                        )}
+
+                        {/* Expected vs Found — only show if not already covered by the quote */}
+                        {(e.expectedValue || e.extractedValue) && !e.extractedQuote && (
+                          <div className="space-y-2 mb-2">
                             {e.expectedValue && (
-                              <div>
+                              <div className="text-sm">
                                 <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Expected: </span>
                                 {e.expectedValue}
                               </div>
                             )}
                             {e.extractedValue && (
                               <div>
-                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Found: </span>
+                                <div className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground mb-1">Matched data</div>
                                 <FormatExtractedValue value={e.extractedValue} />
                               </div>
                             )}
                           </div>
-                        )}
-
-                        {/* Quote */}
-                        {e.extractedQuote && (
-                          <FormatQuote quote={e.extractedQuote} />
                         )}
 
                         {/* Notes */}
@@ -545,6 +602,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             <span className="font-medium text-foreground/70">Note:</span> {e.notes}
                           </p>
                         )}
+
                       </div>
                     ))}
                   </div>
