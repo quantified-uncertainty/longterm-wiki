@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGrantCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
 import { formatCompactCurrency, safeHref } from "@/lib/format-compact";
@@ -42,6 +42,8 @@ export interface GrantRow {
   dataSourceId: string | null;
   /** Inferred data source display name */
   dataSourceName: string | null;
+  /** Source-check verdict (null = not checked) */
+  verdictString: string | null;
 }
 
 type SortKey = "name" | "organization" | "recipient" | "program" | "amount" | "date" | "status";
@@ -349,7 +351,7 @@ export function GrantsTable({
               {hasAnyStatus && (
                 <SortHeader label="Status" sortKey="status" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
               )}
-              <th className="py-2.5 px-3 font-medium text-center">Coverage</th>
+              <th className="py-2.5 px-3 font-medium text-center">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -467,7 +469,11 @@ export function GrantsTable({
                   </td>
                 )}
                 <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeGrantCoverage({ amount: row.amount, recipient: row.recipientName, date: row.date, program: row.program, status: row.status, source: row.source })} />
+                  <RecordStatusDots
+                    coverageScore={computeGrantCoverage({ amount: row.amount, recipient: row.recipientName, date: row.date, program: row.program, status: row.status, source: row.source })}
+                    verdict={row.verdictString}
+                    sourcingHref={row.verdictString ? `/source-checks/grant/${encodeURIComponent(row.recordKey)}` : undefined}
+                  />
                 </td>
               </tr>
             ))}
