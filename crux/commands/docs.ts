@@ -24,13 +24,24 @@ function escapeMdx(text: string): string {
 
 /** Format a domain's help text into a markdown section */
 function formatDomainHelp(domainName: string, helpText: string): string {
-  const clean = escapeMdx(stripAnsi(helpText).trim());
+  const clean = stripAnsi(helpText).trim();
   if (!clean) return '';
 
-  return `### \`${domainName}\`
+  // Extract first line as description (shown outside code block)
+  const lines = clean.split('\n');
+  const firstLine = lines[0]?.trim() || '';
+  const rest = lines.slice(1).join('\n').trim();
 
-${clean}
-`;
+  let result = `### \`${domainName}\`\n\n`;
+  if (firstLine) {
+    result += `${escapeMdx(firstLine)}\n\n`;
+  }
+  if (rest) {
+    // Wrap detailed help in a code block to avoid MDX parsing issues
+    // (help text contains <t>, <path>, <id> etc. which look like JSX)
+    result += `\`\`\`\n${rest}\n\`\`\`\n`;
+  }
+  return result;
 }
 
 /** Generate the full CLI reference as MDX content */

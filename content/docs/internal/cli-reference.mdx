@@ -32,6 +32,7 @@ Wiki content — MDX pages, validation, fixes, citations
 
 Content Domain - Page management
 
+```
 Commands:
   improve        Improve an existing page with AI assistance
   iterate        Iteratively improve a page until quality stabilizes
@@ -40,26 +41,26 @@ Commands:
   grade          Grade pages by template compliance
   grade-content  Grade content quality with AI (3-step pipeline)
   polish         Post-improvement cleanup and polish
-  review         Adversarial review — find gaps in a page (≈\$0.50/page)
+  review         Adversarial review — find gaps in a page (~$0.50/page)
   suggest-links  Suggest relatedEntries cross-links for entities
   strip-scores   Strip scoring fields from MDX frontmatter (assessment migration)
 
 Options:
-  --tier=\<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
+  --tier=<t>        Quality tier: budget/standard/premium (create), polish/standard/deep (improve)
   --engine=v2       Use agent orchestrator instead of fixed pipeline (improve, create)
-  --directions=\<d>  Specific improvement directions (improve)
-  --output=\<path>   Output file path (create)
-  --batch=\<n>       Batch size (regrade, grade-content)
-  --model=\<m>       Model to use (grade-content)
+  --directions=<d>  Specific improvement directions (improve)
+  --output=<path>   Output file path (create)
+  --batch=<n>       Batch size (regrade, grade-content)
+  --model=<m>       Model to use (grade-content)
   --skip-warnings   Skip Steps 1-2, just rate (grade-content)
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
   --unscored        Only process pages without a quality score (grade-content)
   --api-direct      Use Anthropic API directly instead of Claude CLI (create)
-  --type=\<t>        Page type: internal-reference (create, V1 only) / entity type filter (suggest-links)
-  --grep=\<pattern>  Codebase grep pattern, repeatable (create --type=internal-reference, V1 only)
-  --files=\<glob>    File glob to include, repeatable (create --type=internal-reference, V1 only)
-  --entity=\<id>     Analyze specific entity (suggest-links)
-  --min-score=\<n>   Minimum suggestion score, default 2 (suggest-links)
+  --type=<t>        Page type: internal-reference (create, V1 only) / entity type filter (suggest-links)
+  --grep=<pattern>  Codebase grep pattern, repeatable (create --type=internal-reference, V1 only)
+  --files=<glob>    File glob to include, repeatable (create --type=internal-reference, V1 only)
+  --entity=<id>     Analyze specific entity (suggest-links)
+  --min-score=<n>   Minimum suggestion score, default 2 (suggest-links)
   --dry-run         Preview without changes
   --apply           Apply changes (suggest-links, improve)
   --skip-session-log  Skip auto-posting session log to wiki-server after improve --apply
@@ -68,7 +69,7 @@ Options:
   --citation-audit-model Override LLM model for citation checking (improve)
   --batch=id1,id2     Batch mode: comma-separated page IDs (improve, requires --engine=v2)
   --batch-file=f.txt  Batch mode: file with page IDs (improve, requires --engine=v2)
-  --batch-budget=N    Stop batch when cumulative cost exceeds \$N (improve)
+  --batch-budget=N    Stop batch when cumulative cost exceeds $N (improve)
   --page-timeout=N    Per-page timeout in seconds, default 900 (improve batch)
   --resume            Resume interrupted batch from batch-state.json (improve)
   --report-file=f.md  Write batch summary report to file (improve)
@@ -102,11 +103,13 @@ Examples:
   crux w content iterate anthropic --apply                              # iterate until quality stabilizes
   crux w content iterate anthropic --max-rounds=5 --tier=deep --apply   # deep iteration, up to 5 rounds
   crux w content iterate --pages=anthropic,miri,far-ai --apply          # iterate multiple pages
+```
 
 ### `fix`
 
 Fix Domain - Auto-fix operations
 
+```
 Commands:
   all            Run all auto-fixers
   entity-links   Convert markdown links to EntityLink
@@ -136,11 +139,13 @@ Examples:
   crux w fix orphaned-footnotes       Remove orphaned footnote definitions
   crux w fix frontmatter-order        Reorder frontmatter fields to canonical order
   crux w fix dollars                  Escape dollar signs only
+```
 
 ### `validate`
 
 Validate Domain - Run validation checks
 
+```
 Commands:
   daily          Run daily validation suite (local + server checks with unified report)
   unified        Run unified rule engine
@@ -201,11 +206,13 @@ Examples:
   crux w validate daily --local-only         Skip server-dependent checks
   crux w validate directory-pages            Audit directory page data quality
   crux w validate directory-pages --type=person  Check one entity type
+```
 
 ### `citations`
 
 Citations Domain - Verify, archive, and report on citation health
 
+```
 Commands:
   verify           Verify and archive citation URLs for a page
   status           Show citation checking status
@@ -251,14 +258,14 @@ Examples:
   crux w citations check-accuracy --all              Batch accuracy check
   crux w citations normalize-footnotes                Report footnote format issues
   crux w citations normalize-footnotes --fix          Auto-fix to [Title](URL) format
-  crux w citations normalize-footnotes --fix \<id>     Fix one page
+  crux w citations normalize-footnotes --fix <id>     Fix one page
   crux w citations export-dashboard                  Export data for web dashboard (prefers PG)
   crux w citations export-dashboard --local-only     Force local data only (skip wiki-server)
   crux w citations backfill-resource-ids               Backfill resource_id for existing quotes
   crux w citations backfill-resource-ids --dry-run    Preview matches without writing
   crux w citations fix-inaccuracies                   Dry-run fix proposals for all flagged
   crux w citations fix-inaccuracies --apply           Apply fixes to pages
-  crux w citations fix-inaccuracies \<id>              Fix one page
+  crux w citations fix-inaccuracies <id>              Fix one page
   crux w citations fix-inaccuracies --max-score=0.5   Only worst citations
   crux w citations audit existential-risk             Full audit pipeline for one page
   crux w citations audit existential-risk --apply     Audit and auto-fix one page
@@ -267,17 +274,19 @@ Examples:
   crux w citations audit-check existential-risk --threshold=0.9  Require 90% verified
   crux w citations audit-check existential-risk --model=google/gemini-flash-lite  Use a different model
   crux w citations audit-check existential-risk --delay=500  Slow down between LLM calls
+```
 
 ### `footnotes`
 
 Footnotes Domain — Migration tools for claim reference footnote markers
 
+```
 Commands:
   migrate-cr     Migrate [^cr-XXXX] markers to [^kb-factId] or [^rc-XXXX]
 
 Options:
   --apply         Write changes to MDX files (default: dry-run)
-  --page=\<id>     Only process a specific page (by slug)
+  --page=<id>     Only process a specific page (by slug)
   --ci            JSON output
   --offline       Skip wiki-server; convert all [^cr-] to [^rc-] (no KB matching)
 
@@ -298,11 +307,13 @@ Examples:
   crux w footnotes migrate-cr --apply          Apply changes to all files
   crux w footnotes migrate-cr --apply --offline Apply without wiki-server
   crux w footnotes migrate-cr --ci             JSON output for scripting
+```
 
 ### `generate`
 
 Generate Domain - Content generation
 
+```
 Commands:
   yaml             Generate YAML from MDX files
   summaries        Generate summaries with AI
@@ -311,13 +322,13 @@ Commands:
   schema-docs      Generate documentation from schema
 
 Options:
-  --type=\<t>         Entity type: articles, sources (summaries)
-  --batch=\<n>        Batch size (summaries)
-  --concurrency=\<n>  Parallel calls (summaries)
-  --model=\<m>        Model: haiku, sonnet, opus (summaries)
+  --type=<t>         Entity type: articles, sources (summaries)
+  --batch=<n>        Batch size (summaries)
+  --concurrency=<n>  Parallel calls (summaries)
+  --model=<m>        Model: haiku, sonnet, opus (summaries)
   --resummary        Re-summarize changed items (summaries)
-  --id=\<id>          Specific entity ID (summaries)
-  --output=\<path>    Output path (yaml)
+  --id=<id>          Specific entity ID (summaries)
+  --output=<path>    Output path (yaml)
   --dry-run          Preview without changes
   --verbose          Detailed output
 
@@ -326,11 +337,13 @@ Examples:
   crux w generate summaries --batch 50 --model haiku
   crux w generate diagrams
   crux w generate schema-docs
+```
 
 ### `visual`
 
 Visual Domain - Diagram, chart & model management
 
+```
 Commands:
   create         AI-generate a visual for a page (mermaid, squiggle, cause-effect, comparison)
   review         Render and review visuals with playwright + AI quality check
@@ -346,14 +359,14 @@ Visual Types:
   disagreement    DisagreementMap position comparison cards
 
 Options:
-  --type=\<t>       Visual type (mermaid, squiggle, cause-effect, comparison, disagreement)
-  --directions=\<d> Specific instructions for generation or improvement
-  --output=\<path>  Output file path (defaults to .claude/temp/visual/)
-  --model=\<m>      Model: haiku, sonnet (default: sonnet)
+  --type=<t>       Visual type (mermaid, squiggle, cause-effect, comparison, disagreement)
+  --directions=<d> Specific instructions for generation or improvement
+  --output=<path>  Output file path (defaults to .claude/temp/visual/)
+  --model=<m>      Model: haiku, sonnet (default: sonnet)
   --screenshot     Take playwright screenshot during review
   --fix            Auto-apply suggested fixes during review
-  --min-words=\<n>  Minimum word count for audit coverage (default: 500)
-  --format=\<f>     Audit output format: table, json (default: table)
+  --min-words=<n>  Minimum word count for audit coverage (default: 500)
+  --format=<f>     Audit output format: table, json (default: table)
   --dry-run        Preview without writing files
   --apply          Write changes directly to page
   --verbose        Detailed output
@@ -365,11 +378,13 @@ Examples:
   crux w visual audit --min-words=800
   crux w visual improve existential-risk --directions "simplify the flowchart"
   crux w visual embed existential-risk --visual ai-risk-taxonomy
+```
 
 ### `enrich`
 
 Enrich Domain - Standalone enrichment tools for wiki content
 
+```
 Commands:
   entity-links   Insert <EntityLink> tags for entity mentions
   fact-refs      Wrap canonical numbers with <F> fact-ref tags
@@ -400,11 +415,13 @@ Examples:
 
 Note: References are now auto-generated at build time (build-data.mjs → pageResources).
 The 'crux w enrich references' command has been removed.
+```
 
 ### `importance`
 
 Importance Domain - Ranking-based importance scoring
 
+```
 Two ranking dimensions:
   readership (default) — How important is this page for readers?
   research             — How much value would deeper investigation yield?
@@ -431,14 +448,14 @@ Files:
   data/research-ranking.yaml     Research importance ranking
 
 Options:
-  --dimension=\<d>   Ranking dimension: readership (default) or research
-  --top=\<n>         Show top N pages (show)
+  --dimension=<d>   Ranking dimension: readership (default) or research
+  --top=<n>         Show top N pages (show)
   --unranked        Also list unranked pages (show)
-  --batch=\<n>       Rank N unranked pages (rank)
-  --sample=\<n>      Test with N diverse pages (rerank)
+  --batch=<n>       Rank N unranked pages (rank)
+  --sample=<n>      Test with N diverse pages (rerank)
   --all             Rerank all pages (rerank)
   --verify          Fix local inversions in existing ranking (rerank)
-  --model=\<m>       Model: haiku (default) or sonnet (rerank)
+  --model=<m>       Model: haiku (default) or sonnet (rerank)
   --apply           Write changes
 
 Examples:
@@ -449,11 +466,13 @@ Examples:
   crux w importance rerank --all --apply
   crux w importance rerank --verify --apply
   crux w importance sync --apply
+```
 
 ### `updates`
 
 Updates Domain - Schedule-aware wiki page update system
 
+```
 Uses update_frequency (days) in page frontmatter to prioritize which
 pages need refreshing, combining staleness with readerImportance scoring.
 
@@ -463,14 +482,14 @@ pages need refreshing, combining staleness with readerImportance scoring.
 Commands:
   list                 Show pages due for update, ranked by priority (default)
   run                  Run content improve on top-priority pages
-  triage               Check overdue pages for new developments (≈\$0.08/page)
+  triage               Check overdue pages for new developments (~$0.08/page)
   stats                Show update frequency coverage statistics
 
 Options:
   --limit=N            Number of results for list (default: 10)
   --overdue            Only show overdue pages (staleness >= 1.0)
   --count=N            Number of pages to improve/triage (default: 1 for run, 5 for triage)
-  --tier=\<tier>        Improvement tier: polish, standard, deep (default: standard)
+  --tier=<tier>        Improvement tier: polish, standard, deep (default: standard)
   --no-triage          Skip news-check triage (triage is ON by default for run)
   --dry-run            Preview what run would do without executing
   --json               Output as JSON
@@ -483,12 +502,12 @@ Frontmatter fields:
 
 Cost-aware updating:
   The triage system checks for new developments before committing to
-  an expensive update. For each page it runs a cheap news check (≈\$0.08)
+  an expensive update. For each page it runs a cheap news check (~$0.08)
   using web search + SCRY, then recommends: skip, polish, standard, or deep.
 
   This can save significantly when many overdue pages have no real news.
-  Example: 10 pages at standard = ≈\$65. With triage, if 6 have no news,
-  cost drops to ≈\$26 + \$0.80 triage = ≈\$27.
+  Example: 10 pages at standard = ~$65. With triage, if 6 have no news,
+  cost drops to ~$26 + $0.80 triage = ~$27.
 
 Examples:
   crux w updates list                       Show top 10 update priorities
@@ -498,11 +517,13 @@ Examples:
   crux w updates run --count=3 --no-triage --tier=polish  Skip triage, force polish
   crux w updates run --dry-run              Preview without executing
   crux w updates stats                      Show coverage stats
+```
 
 ### `auto-update`
 
 Auto-Update Domain — News-driven wiki update system
 
+```
 Fetches news from configured RSS feeds, newsletters, and web searches,
 then routes relevant items to wiki pages for automatic improvement.
 
@@ -544,18 +565,18 @@ Options:
 
 Pipeline stages:
   1. Fetch:   Pull new items from RSS/Atom feeds and web searches
-  2. Digest:  Deduplicate, classify relevance, extract topics (≈\$0.02-0.05)
-  3. Route:   Map news items to wiki pages via entity matching + LLM (≈\$0.05-0.15)
-  4. Execute: Run page improvements via crux w content improve (≈\$2-12/page)
+  2. Digest:  Deduplicate, classify relevance, extract topics (~$0.02-0.05)
+  3. Route:   Map news items to wiki pages via entity matching + LLM (~$0.05-0.15)
+  4. Execute: Run page improvements via crux w content improve (~$2-12/page)
   5. Validate: Run validation gate (escaping, schema, frontmatter)
   6. Report:  Save run report to data/auto-update/runs/
 
 Cost model:
-  Triage/routing overhead: ≈\$0.15-0.25 per run
-  Per-page improvement: polish ≈\$2.50, standard ≈\$6.50, deep ≈\$12.50
-  With --batch (50% off): polish ≈\$1.25, standard ≈\$3.25, deep ≈\$6.25
+  Triage/routing overhead: ~$0.15-0.25 per run
+  Per-page improvement: polish ~$2.50, standard ~$6.50, deep ~$12.50
+  With --batch (50% off): polish ~$1.25, standard ~$3.25, deep ~$6.25
   With prompt caching (auto): ~15-25% input token savings on sequential runs
-  Typical daily run (5 pages): ≈\$15-35 (sequential), ≈\$7-18 (batch)
+  Typical daily run (5 pages): ~$15-35 (sequential), ~$7-18 (batch)
 
 Source configuration:
   Edit data/auto-update/sources.yaml to add/remove/configure news sources.
@@ -563,7 +584,7 @@ Source configuration:
 
 Examples:
   crux w auto-update plan                          Preview what would be updated
-  crux w auto-update run --budget=30               Run with \$30 budget
+  crux w auto-update run --budget=30               Run with $30 budget
   crux w auto-update run --count=3 --verbose       Update 3 pages with details
   crux w auto-update digest --sources=openai-blog  Check one source
   crux w auto-update sources                       List all sources
@@ -576,11 +597,13 @@ Examples:
   crux w auto-update submit --budget=30            Submit as parallel background jobs
   crux w auto-update submit --dry-run              Preview job plan without creating jobs
   crux w auto-update run-ci --budget=30 --count=5  Full CI pipeline (used by GitHub Actions)
+```
 
 ### `analyze`
 
 Analyze Domain - Analysis and reporting
 
+```
 Commands:
   all          Run all analysis checks (health report)
   links        Analyze cross-reference coverage
@@ -593,7 +616,7 @@ Options:
   --brief         Summary only (all)
   --orphans       Show poorly-linked pages (links)
   --top-linked    Show most linked pages (links)
-  --page=\<id>     Analyze specific page (links)
+  --page=<id>     Analyze specific page (links)
   --stats         Show statistics (scan)
 
 Examples:
@@ -602,11 +625,13 @@ Examples:
   crux w analyze links --orphans         Find orphaned pages
   crux w analyze links --top-linked      Find most linked pages
   crux w analyze entity-links sam-altman Check linking for an entity
+```
 
 ### `pages`
 
 Pages Domain — Page-level analysis and prioritization
 
+```
 Commands:
   next-action   Show pages ranked by "Next Best Action" priority score (default)
 
@@ -619,7 +644,7 @@ The NBA score combines:
   priority = importance * qualityDeficit * stalenessFactor * hallucinationRiskFactor
 
 Options:
-  --type=\<entityType>   Filter to specific entity type (e.g. person, organization)
+  --type=<entityType>   Filter to specific entity type (e.g. person, organization)
   --limit=N             Number of results (default: 20)
   --all                 Include pages with 0 importance scores
   --ci                  JSON output
@@ -629,11 +654,13 @@ Examples:
   crux w pages next-action --type=person        # Top person pages
   crux w pages next-action --limit=50           # Top 50
   crux w pages next-action --ci                 # JSON output
+```
 
 ### `resources`
 
 Resources Domain - External resource management
 
+```
 Commands:
   list               List pages with unconverted links
   show               Show unconverted links in a file
@@ -643,7 +670,7 @@ Commands:
   rebuild-citations  Rebuild cited_by relationships
   validate           Validate resources (all|arxiv)
   refresh-titles     Fetch real page titles and fix bad ones
-  classify-stance    Classify resource stance via LLM (--page=\<slug>)
+  classify-stance    Classify resource stance via LLM (--page=<slug>)
 
 Discovery:
   discover-forums   Bulk import posts from LW/EAF/AF (free GraphQL API)
@@ -661,18 +688,18 @@ Enrichment:
   enrich-rand-dates Fill missing dates for RAND resources (scrapes meta tags)
   enrich-free       Run all free enrichment (papers + forums + fetch)
   fix               Validate + auto-fix title/author mismatches (--apply to write)
-  classify          LLM classification via Anthropic Batch API (Haiku, ≈\$15)
-  deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ≈\$100)
+  classify          LLM classification via Anthropic Batch API (Haiku, ~$15)
+  deep-enrich       LLM deep enrichment via Anthropic Batch API (Sonnet, ~$100)
 
 Options:
-  --limit=\<n>       Limit results
-  --batch=\<n>       Batch size (metadata/fetch-all)
+  --limit=<n>       Limit results
+  --batch=<n>       Batch size (metadata/fetch-all)
   --apply           Apply changes (process)
   --dry-run         Preview without changes
   --json            JSON output
   --verbose         Verbose output
-  --concurrency=\<n> Concurrency for fetch-all (default 5)
-  --batch-id=\<id>   Batch ID for classify/deep-enrich status/poll/download
+  --concurrency=<n> Concurrency for fetch-all (default 5)
+  --batch-id=<id>   Batch ID for classify/deep-enrich status/poll/download
 
 Examples:
   crux resources list --limit 20
@@ -690,11 +717,13 @@ Examples:
   crux resources deep-enrich submit --limit 1000
   crux resources discover-forums --karma=30 --forums=lw,eaf,af
   crux resources discover-forums --karma=50 --after=2020-01-01 --apply
+```
 
 ### `check-links`
 
 Check-Links Domain - External URL health checking
 
+```
 Usage:
   crux w check-links                         Check all URLs across all sources
   crux w check-links --source=resources      Only check data/resources/*.yaml
@@ -704,10 +733,10 @@ Usage:
   crux w check-links --fix                   Suggest archive.org replacements
 
 Options:
-  --source=\<type>   Filter by source: resources, external, content, all (default: all)
+  --source=<type>   Filter by source: resources, external, content, all (default: all)
   --report          Generate JSON report to .cache/link-check-report.json
   --fix             Query archive.org for dead links and suggest replacements
-  --limit=\<n>       Limit number of URLs to check (for testing)
+  --limit=<n>       Limit number of URLs to check (for testing)
   --verbose         Show detailed per-URL output
   --clear-cache     Clear the link check cache before running
 
@@ -715,11 +744,13 @@ Examples:
   crux w check-links --limit=100             Quick test with 100 URLs
   crux w check-links --source=resources --report --fix
   crux w check-links --verbose               Detailed output for all checks
+```
 
 ### `qa-sweep`
 
 QA Sweep — Adversarial quality assurance with result persistence
 
+```
 Commands:
   run             Full sweep: recent changes + all checks (default)
   recent          Show recent PRs and changed files only
@@ -757,11 +788,13 @@ Examples:
   crux w qa-sweep diff --json           JSON diff output for CI
   crux w qa-sweep checks --json         JSON output for CI
   crux w qa-sweep recent                What changed recently
+```
 
 ### `qa-checks`
 
 QA Checks — Coverage tracking for QA sweeps
 
+```
 Commands:
   queue              Show staleness-ordered page queue (default)
   coverage           Per-directory coverage stats
@@ -785,11 +818,13 @@ Examples:
   crux qa-checks coverage                       Coverage stats per directory
   crux qa-checks record --url=/organizations/anthropic --result=clean
   crux qa-checks list --sweep-id=sweep-2026-03-19-abc
+```
 
 ### `evals`
 
 crux w evals — Hallucination detection evals & adversarial agents
 
+```
 Commands:
   run       Run an eval suite
   hunt      Run an adversarial agent on specific pages
@@ -810,13 +845,13 @@ Eval Suites:
   crux w evals run --suite=cross-ref [--limit=100]
 
 Adversarial Agents:
-  crux w evals hunt --agent=reference-sniffer --page=\<id> [--no-llm]
-  crux w evals hunt --agent=description-auditor --page=\<id> [--no-llm]
+  crux w evals hunt --agent=reference-sniffer --page=<id> [--no-llm]
+  crux w evals hunt --agent=description-auditor --page=<id> [--no-llm]
   crux w evals hunt --agent=cross-ref [--limit=100]
 
 Inject Errors:
-  crux w evals inject \<page-id> [--count=2] [--categories=wrong-number,exaggeration]
-  crux w evals inject \<page-id> --output=/tmp/corrupted.mdx
+  crux w evals inject <page-id> [--count=2] [--categories=wrong-number,exaggeration]
+  crux w evals inject <page-id> --output=/tmp/corrupted.mdx
 
 Scan Options:
   --agents=A,B       Agents: reference-sniffer, description-auditor, cross-ref (default: reference-sniffer)
@@ -839,11 +874,13 @@ Other Options:
   --expensive        Include expensive detectors (citation-auditor with network)
   --verbose          Detailed output
   --output=PATH      Write corrupted content to file
+```
 
 ### `grokipedia`
 
 Grokipedia Domain - Match wiki pages to Grokipedia articles
 
+```
 Commands:
   match           Find matching Grokipedia articles for wiki pages (default)
 
@@ -855,11 +892,13 @@ Examples:
   crux w grokipedia match              Preview matches (dry run)
   crux w grokipedia match --apply      Find and write matches
   crux w grokipedia match --verbose    Show detailed slug info
+```
 
 ### `extract-structured-data`
 
 Extract Structured Data from Wiki Pages
 
+```
 Extracts structured data from wiki page prose for any entity type and
 optionally writes to the YAML entity data layer after source-check
 against footnote sources.
@@ -892,11 +931,13 @@ Examples:
   pnpm crux w extract-structured-data --entity-type=person --budget=20 --limit=5
   pnpm crux w extract-structured-data --entity-type=organization --limit=10
   pnpm crux w extract-structured-data --entity-type=ai-model --limit=5
+```
 
 ### `verify-consistency`
 
 Unified Consistency Check — run all consistency checks with a combined report
 
+```
 Usage:
   crux w verify-consistency                     Run all consistency checks
   crux w verify-consistency --type=cross-entity Just cross-entity checks
@@ -918,11 +959,13 @@ Options:
 Exit Codes:
   0 = No actionable issues (info items and advisory numeric contradictions don't block)
   1 = Warnings or errors found
+```
 
 ### `source-check-wiki-pages`
 
 Wiki Page Source-Check — verify prose claims in wiki pages against their cited sources
 
+```
 Usage:
   crux w source-check-wiki-pages [options]             Check top pages by importance
   crux w source-check-wiki-pages --page=anthropic      Check a specific page
@@ -931,7 +974,7 @@ Usage:
 Options:
   --limit=N               Max number of pages to process (default: 10)
   --budget=N              Max dollars to spend on LLM calls (default: 5.0)
-  --page=\<slug>           Process a single specific page
+  --page=<slug>           Process a single specific page
   --min-importance=N      Minimum readerImportance threshold
   --dry-run               Show what would be processed without running
   --ci                    JSON output for CI pipelines
@@ -946,7 +989,8 @@ For each page, the command:
 
 Record type: wiki-page
 Record IDs: page slugs (e.g., "anthropic", "openai")
-Field names: fn:<N> for sourced claims, _unfootnoted:\<hash>, _cross-ref:\<factId>, _stale:\<hash>
+Field names: fn:<N> for sourced claims, _unfootnoted:<hash>, _cross-ref:<factId>, _stale:<hash>
+```
 
 ## factbase (`fb`)
 
@@ -956,21 +1000,22 @@ FactBase — structured facts with temporal data & provenance
 
 KB Domain -- Knowledge Base readability, authoring, and migration tools
 
+```
 Commands:
-  show \<entity-id>      Show a single entity with all data, resolving stableIds
+  show <entity-id>      Show a single entity with all data, resolving stableIds
   list [--type=X]       List all entities with name, type, stableId, and fact count
-  lookup \<stableId>     Look up an entity by its stableId
+  lookup <stableId>     Look up an entity by its stableId
   validate              Run all KB validation checks
   properties [--type=X] List all property definitions with usage counts
-  search \<query>        Search entities by name, ID, or alias
+  search <query>        Search entities by name, ID, or alias
   coverage [--type=X]   Show entity coverage against required/recommended properties
-  fact \<fact-id>        Show a single fact with full metadata
+  fact <fact-id>        Show a single fact with full metadata
   stale [days]          List facts older than N days (default: 180)
-  needs-update \<id>     Show missing and stale data for an entity
-  add-fact \<entity> \<property> \<value>   Add a fact to an entity YAML file
-  import-990 \<entity> [--ein=X]         Import IRS Form 990 data from ProPublica
-  import-990 --discover \<query>         Search ProPublica by org name
-  migrate \<slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
+  needs-update <id>     Show missing and stale data for an entity
+  add-fact <entity> <property> <value>   Add a fact to an entity YAML file
+  import-990 <entity> [--ein=X]         Import IRS Form 990 data from ProPublica
+  import-990 --discover <query>         Search ProPublica by org name
+  migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   source-check          Check KB facts against source URLs using LLM
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
@@ -1007,19 +1052,21 @@ Examples:
   crux fb sync-sources                Sync source URLs to wiki-server resources
   crux fb source-check --entity=anthropic   Check Anthropic facts against sources
   crux fb source-check --dry-run --limit=5  Preview 5 facts that would be checked
+```
 
 ### `wikidata-enrich`
 
 Wikidata Enrichment — Enrich FactBase entities with Wikidata SPARQL data
 
+```
 Usage:
   crux fb wikidata-enrich [options]
 
 Options:
   --dry-run         Preview discovered facts without writing to YAML files
   --limit=N         Process at most N entities (useful for testing)
-  --entity=\<slug>   Process a single entity by slug (e.g., --entity=anthropic)
-  --type=\<type>     Only process entities of a given type (e.g., --type=organization)
+  --entity=<slug>   Process a single entity by slug (e.g., --entity=anthropic)
+  --type=<type>     Only process entities of a given type (e.g., --type=organization)
 
 Wikidata Properties Queried:
   P571   Founded date        → founded-date
@@ -1045,6 +1092,7 @@ Examples:
   crux fb wikidata-enrich --entity=anthropic           Enrich a single entity
   crux fb wikidata-enrich --type=organization          Enrich all organizations
   crux fb wikidata-enrich --dry-run                    Preview all entities
+```
 
 ## tablebase (`tb`)
 
@@ -1054,6 +1102,7 @@ TableBase — PG entities, people, orgs, grants, imports
 
 TableBase Domain — Structured data enrichment via LLM agents
 
+```
 Commands:
   scan           Show per-table completeness scores
   gaps           Ranked list of missing data (enrichment targets)
@@ -1089,38 +1138,38 @@ Commands:
   Data Sources:
   data-sources                Show data source help
   data-sources-list           List all registered data sources
-  data-sources-show \<id>      Show details + snapshot history
-  data-sources-snapshot \<id>  Capture a new snapshot (--all for all sources)
+  data-sources-show <id>      Show details + snapshot history
+  data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
   data-sources-health         Check mapping validity, staleness
 
   Website Sources:
   website-sources             Show website source help
   website-sources-list        List all registered website sources
-  website-sources-show \<id>   Show source details with pages
-  website-sources-fetch \<id>  Fetch pages and store snapshots (--all for all sources)
+  website-sources-show <id>   Show source details with pages
+  website-sources-fetch <id>  Fetch pages and store snapshots (--all for all sources)
 
   Market data:
-  markets-discover \<entity>   Discover prediction market questions via LLM agent
+  markets-discover <entity>   Discover prediction market questions via LLM agent
   markets-fetch [entity]      Fetch latest snapshots from platform APIs (Metaculus, etc.)
 
 Options:
-  --table=\<name>            Filter scan to specific table; required for submit/existing
+  --table=<name>            Filter scan to specific table; required for submit/existing
   --top=N, --limit=N        Number of gaps to show (default: 20)
-  --task-type=\<type>        Filter by task type
-  --entity-type=\<type>      Filter by entity type (organization, ai-model)
+  --task-type=<type>        Filter by task type
+  --entity-type=<type>      Filter by entity type (organization, ai-model)
   --format=prompt|json      Output format for next-task
   --dry-run                 Run agent without writing to database
   --max=N                   Max tasks for loop (default: 5)
   --budget=N                Budget limit in USD for loop (default: 30)
-  --model=\<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
-  --records-file=\<path>     JSON file for submit command
+  --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
+  --records-file=<path>     JSON file for submit command
   --skip-source-check       Skip source-check before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
   --ci                      JSON output
 
 Modes:
-  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ≈\$1-2/task)
-  Subscription mode: /tablebase-enrich skill in Claude Code (\$0, uses subscription)
+  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:
   grant-grantee-backfill     Link grants to grantee entities
@@ -1136,7 +1185,7 @@ Examples:
   crux tb tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
   crux tb tablebase next-task --format=json                # JSON for scripting
   crux tb tablebase improve abc123def --dry-run            # Test run without writing
-  crux tb tablebase loop --max=3 --budget=10               # 3-task loop with \$10 cap
+  crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
   crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
@@ -1155,11 +1204,13 @@ Examples:
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing
+```
 
 ### `matrix`
 
 Matrix Domain — Entity matrix analysis and improvement targeting
 
+```
 Commands:
   scores      Show content dimension scores per entity type
   pages       List pages ranked by improvement potential
@@ -1167,14 +1218,14 @@ Commands:
   mark-done   Mark a page as improved (excluded from future picks)
 
 Options:
-  --type=\<entityType>     Filter to specific entity type
-  --dimension=\<dim>       content, coverage, quality, all (default: content)
-  --sort=\<key>            gap (default), score, pages, quality, coverage
+  --type=<entityType>     Filter to specific entity type
+  --dimension=<dim>       content, coverage, quality, all (default: content)
+  --sort=<key>            gap (default), score, pages, quality, coverage
   --limit=N               Number of pages (default: 20)
   --min-words=N           Minimum word count filter
   --include-stubs         Include stub pages (< 100 words)
-  --exclude=\<file>        Exclusion list file (default: .matrix-improved.txt)
-  --weights=\<w>           quality:30,coverage:25,citations:20,freshness:15,pages:10
+  --exclude=<file>        Exclusion list file (default: .matrix-improved.txt)
+  --weights=<w>           quality:30,coverage:25,citations:20,freshness:15,pages:10
   --threshold=N           Only pages below this quality/coverage score
   --format=prompt|json|ids Output format
   --ci                    JSON output
@@ -1188,13 +1239,15 @@ Examples:
   crux tb matrix next-task --include-stubs          # Include stub pages (create tasks)
   crux tb matrix next-task --type=person            # Only person pages
   crux tb matrix mark-done E357                     # Exclude from future picks
+```
 
 ### `entity`
 
 Entity Domain — Entity ID management tools
 
+```
 Commands:
-  rename \<old-id> \<new-id>   Safely rename an entity ID across all files
+  rename <old-id> <new-id>   Safely rename an entity ID across all files
 
 Options:
   --apply       Write changes to disk (default: dry-run preview)
@@ -1209,14 +1262,16 @@ Examples:
   crux tb entity rename E6 ai-control              Preview changes
   crux tb entity rename E6 ai-control --apply      Apply changes
   crux tb entity rename old-slug new-slug --apply  Rename a slug
+```
 
 ### `ids`
 
 IDs Domain — Entity ID allocation and lookup
 
+```
 Commands:
-  allocate \<slug>   Allocate a wiki ID (E##) for a slug from the wiki-server
-  check \<slug>      Check if a slug has an ID allocated
+  allocate <slug>   Allocate a wiki ID (E##) for a slug from the wiki-server
+  check <slug>      Check if a slug has an ID allocated
   list              List all allocated IDs
 
 Options:
@@ -1240,11 +1295,13 @@ Examples:
   crux tb ids allocate new-org --description="..."  # With description
   crux tb ids check anthropic                       # Look up existing ID
   crux tb ids list --limit=100                      # Browse all IDs
+```
 
 ### `people`
 
 People — Person entity discovery and data tools
 
+```
 Commands:
   discover             Find people across data sources who are not in people.yaml (default)
   create               Generate YAML entity stubs for discovered candidates
@@ -1261,7 +1318,7 @@ Enrich Options:
   --source=wikidata     Data source (currently only wikidata is supported)
   --dry-run             Preview what would be added without writing
   --apply               Actually write new facts to YAML files
-  --entity=\<slug>       Process a single entity (for testing)
+  --entity=<slug>       Process a single entity (for testing)
   --limit=N             Limit number of entities to process
   --ci                  JSON output
 
@@ -1306,11 +1363,13 @@ Examples:
 Suggest-Links Options:
   --apply          Wrap the first unlinked occurrence of each person in EntityLink
   --verbose        Show all mentions including already-linked ones
+```
 
 ### `orgs`
 
 Orgs — Organization entity data tools
 
+```
 Commands:
   enrich               Enrich organization KB entities with data from external sources
 
@@ -1318,7 +1377,7 @@ Enrich Options:
   --source=wikidata     Data source (currently only wikidata is supported)
   --dry-run             Preview what would be added without writing
   --apply               Actually write new facts to YAML files
-  --entity=\<slug>       Process a single entity (for testing)
+  --entity=<slug>       Process a single entity (for testing)
   --limit=N             Limit number of entities to process
   --ci                  JSON output
 
@@ -1335,6 +1394,7 @@ Examples:
   crux tb orgs enrich --source=wikidata --apply
   crux tb orgs enrich --source=wikidata --entity=anthropic --dry-run
   crux tb orgs enrich --source=wikidata --limit=10 --dry-run
+```
 
 ### `source-check`
 
@@ -1344,11 +1404,12 @@ Commands: `stats`
 
 Legislation — Policy stakeholder source-check
 
+```
 Commands:
   verify-stakeholders     Populate source-check evidence for stakeholder positions
 
 Options:
-  --policy=\<id>          Only verify stakeholders for this policy (e.g. california-sb1047)
+  --policy=<id>          Only verify stakeholders for this policy (e.g. california-sb1047)
   --dry-run              Preview what would be created without writing
   --verbose              Show detailed progress for each stakeholder
   --ci                   Output JSON summary
@@ -1357,11 +1418,13 @@ Examples:
   crux tb legislation verify-stakeholders --policy=california-sb1047
   crux tb legislation verify-stakeholders --dry-run --verbose
   crux tb legislation verify-stakeholders --ci
+```
 
 ### `benchmarks`
 
 Benchmarks — ingest benchmark data from external sources.
 
+```
 Commands:
   ingest-epoch     Ingest Epoch AI benchmark scores into wiki-server
 
@@ -1378,6 +1441,7 @@ Examples:
   pnpm crux tb benchmarks ingest-epoch --benchmark=mmlu     # Single benchmark
   pnpm crux tb benchmarks ingest-epoch --force-download     # Refresh cached data
   pnpm crux tb benchmarks ingest-epoch --data-dir=/tmp/epoch_benchmarks
+```
 
 ## gh (`gh`)
 
@@ -1387,12 +1451,13 @@ GitHub — issues, PRs, CI, epics, releases
 
 Issues Domain - Track Claude Code work on GitHub issues
 
+```
 Commands:
   list                List open issues ranked by priority (default)
   next                Show the single next issue to pick up
-  search \<query>      Search existing issues before filing a new one
-  create \<title>      Create a new GitHub issue (supports structured template)
-  comment <N> \<msg>   Post a comment on an existing issue
+  search <query>      Search existing issues before filing a new one
+  create <title>      Create a new GitHub issue (supports structured template)
+  comment <N> <msg>   Post a comment on an existing issue
   update-body <N>     Update an issue body using structured template args
   update-title <N>    Update an issue title
   lint [N]            Check issue formatting (all issues, or single by number)
@@ -1412,33 +1477,33 @@ Options (search):
   --json              JSON output with match details
 
 Options (comment):
-  --body-file=\<path>  Comment body from file (safe — avoids shell expansion)
+  --body-file=<path>  Comment body from file (safe — avoids shell expansion)
 
 Options (create):
   --label=X,Y         Comma-separated labels to apply
   --body="..."        Raw freeform body (bypasses --model/--criteria requirement)
-  --body-file=\<path>  Body from file (safe — avoids shell expansion of backticks/dollars)
+  --body-file=<path>  Body from file (safe — avoids shell expansion of backticks/dollars)
   --problem="..."     Problem/background description (## Problem section)
-  --problem-file=\<path>  Problem from file (safe — avoids shell expansion)
+  --problem-file=<path>  Problem from file (safe — avoids shell expansion)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
   --depends=N,M       Comma-separated dependent issue numbers
   --criteria="a|b|c"  Pipe-separated acceptance criteria items (REQUIRED)
   --model=haiku|sonnet|opus  Recommended model for this issue (REQUIRED)
-  --cost="≈\$2-4"      Estimated AI cost
+  --cost="~$2-4"      Estimated AI cost
   --draft             Skip --model/--criteria validation (for WIP issues)
 
 Options (update-title):
   --title="..."       New title for the issue (REQUIRED)
 
 Options (update-body):
-  --body-file=\<path>  Set raw body directly (no merge — use for rich multi-section bodies)
+  --body-file=<path>  Set raw body directly (no merge — use for rich multi-section bodies)
   --problem="..."     Problem/background description (## Problem section)
-  --problem-file=\<path>  Problem from file (safe — avoids shell expansion)
+  --problem-file=<path>  Problem from file (safe — avoids shell expansion)
   --fix="..."         Proposed fix or approach (## Proposed Fix section)
   --depends=N,M       Comma-separated dependent issue numbers
   --criteria="a|b|c"  Pipe-separated acceptance criteria items
   --model=haiku|sonnet|opus  Recommended model for this issue
-  --cost="≈\$2-4"      Estimated AI cost
+  --cost="~$2-4"      Estimated AI cost
 
 Options (done):
   --pr=URL            PR URL to include in the completion comment
@@ -1480,7 +1545,7 @@ Examples:
   crux gh issues lint 239               Check single issue #239
   crux gh issues create "Add validation rule for X" --label=tooling \
     --problem="X is not validated..." --model=haiku \
-    --criteria="Validation added|Tests pass|CI green" --cost="&lt;\$1"
+    --criteria="Validation added|Tests pass|CI green" --cost="<$1"
   # For bodies with backticks/dollars/parens, use --problem-file or --body-file:
   crux gh issues create "Title" --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
   crux gh issues update-body 239 --problem-file=/tmp/problem.md --model=sonnet --criteria="a|b"
@@ -1495,11 +1560,13 @@ Examples:
 
 Slash command:
   /next-issue    Claude Code command for the full "pick up next issue" workflow
+```
 
 ### `pr`
 
 PR Domain — GitHub Pull Request utilities
 
+```
 Commands:
   create                        Create a draft PR for the current branch (corruption-safe).
   ready [--pr=N]                Mark PR as ready (validates eligibility, removes draft status).
@@ -1515,7 +1582,7 @@ Commands:
 Options (create):
   --title="..."       Required. PR title.
   --body="..."        PR body (inline — avoid for multi-line bodies; use --body-file or stdin).
-  --body-file=\<path>  PR body from file (safe for markdown with backticks).
+  --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
   --no-draft          Create as ready PR (default: draft).
   --allow-empty-body  Allow creating PR without a description (not recommended).
@@ -1570,11 +1637,13 @@ Examples:
   pnpm crux gh pr overlaps --json           # Machine-readable output
   pnpm crux gh pr resolve-conflicts         # Resolve all conflicted PRs
   pnpm crux gh pr resolve-conflicts --verbose  # With detailed output
+```
 
 ### `ci`
 
 CI Domain - GitHub CI status and monitoring
 
+```
 Commands:
   status                 Check GitHub CI check-run status
   pause-actions          Pause all automated GitHub Actions workflows
@@ -1583,7 +1652,7 @@ Commands:
 
 Options:
   --wait          Poll every 30s until all checks complete
-  --sha=\<sha>     Check a specific commit (default: HEAD)
+  --sha=<sha>     Check a specific commit (default: HEAD)
   --ci            JSON output
   --json          JSON output (main-status)
 
@@ -1595,11 +1664,13 @@ Examples:
   crux gh ci main-status --json      Machine-readable output
   crux gh ci pause-actions            Pause all automated workflows
   crux gh ci resume-actions           Resume all automated workflows
+```
 
 ### `epic`
 
 Epic Management (via GitHub Discussions)
 
+```
 Manage multi-issue epics as living documents. Each epic is a GitHub Discussion
 with a structured body (task list, decisions, blockers) and a comment timeline
 of agent activity.
@@ -1607,10 +1678,10 @@ of agent activity.
 Usage:
   crux gh epic                                  List open epics
   crux gh epic list                             Same as above
-  crux gh epic create \<title> [--pin]           Create a new epic discussion
+  crux gh epic create <title> [--pin]           Create a new epic discussion
   crux gh epic view <N>                         View epic body + recent comments
-  crux gh epic comment <N> \<message>            Post a status update comment
-  crux gh epic update <N> --body-file=\<path>    Replace the epic body
+  crux gh epic comment <N> <message>            Post a status update comment
+  crux gh epic update <N> --body-file=<path>    Replace the epic body
   crux gh epic link <N> --issue=M               Link an issue to the epic
   crux gh epic unlink <N> --issue=M             Unlink an issue from the epic
   crux gh epic status <N>                       Progress bar + linked issue status
@@ -1618,11 +1689,11 @@ Usage:
   crux gh epic categories                       List discussion categories
 
 Options:
-  --body=\<text>          Inline body text
-  --body-file=\<path>     Read body from file (safer for markdown)
+  --body=<text>          Inline body text
+  --body-file=<path>     Read body from file (safer for markdown)
   --pin                  Pin the discussion to the repository index (create only)
   --issue=<N>            Issue number (for link/unlink)
-  --reason=\<reason>      Close reason: resolved (default) or outdated
+  --reason=<reason>      Close reason: resolved (default) or outdated
   --ci                   JSON output
 
 Examples:
@@ -1633,15 +1704,17 @@ Examples:
 
 Workflow:
   1. Create an epic:     crux gh epic create "Project Name" --pin
-  2. Link issues to it:  crux gh epic link \<epic> --issue=<N>
-  3. Track progress:     crux gh epic status \<epic>
-  4. Post updates:       crux gh epic comment \<epic> "Status update..."
-  5. Close when done:    crux gh epic close \<epic>
+  2. Link issues to it:  crux gh epic link <epic> --issue=<N>
+  3. Track progress:     crux gh epic status <epic>
+  4. Post updates:       crux gh epic comment <epic> "Status update..."
+  5. Close when done:    crux gh epic close <epic>
+```
 
 ### `release`
 
 Release Domain — Production release management
 
+```
 Commands:
   create                Create or update a release PR (main → production).
 
@@ -1658,11 +1731,13 @@ The release PR includes:
 Examples:
   pnpm crux gh release create               # Create or update release PR
   pnpm crux gh release create --dry-run     # Preview without creating
+```
 
 ### `deploy-tasks`
 
 Deploy Tasks — Track post-deploy check tasks
 
+```
 Commands:
   detect                Detect deploy tasks from current branch diff.
   pending               Find unchecked deploy tasks from recently merged PRs.
@@ -1670,7 +1745,7 @@ Commands:
   verify                Run embedded verify commands for unchecked deploy tasks.
 
 Options (detect):
-  --base=\<ref>          Base ref for diff (default: origin/main).
+  --base=<ref>          Base ref for diff (default: origin/main).
   --ci                  JSON output.
 
 Options (pending):
@@ -1679,7 +1754,7 @@ Options (pending):
 
 Options (inject):
   --pr=N                Update PR #N's description (otherwise prints to stdout).
-  --base=\<ref>          Base ref for diff (default: origin/main).
+  --base=<ref>          Base ref for diff (default: origin/main).
 
 Options (verify):
   --days=N              Lookback window in days (default: 14).
@@ -1688,7 +1763,7 @@ Options (verify):
   --ci                  JSON output.
 
 Environment for verify:
-  Tasks may reference shell variables like \$DATABASE_URL, \$WIKI_SERVER_URL.
+  Tasks may reference shell variables like $DATABASE_URL, $WIKI_SERVER_URL.
   Set these in the calling shell — verify inherits the parent environment.
 
 Examples:
@@ -1697,6 +1772,7 @@ Examples:
   pnpm crux gh deploy-tasks inject --pr=3270      # Add tasks section to PR #3270
   pnpm crux gh deploy-tasks verify                # Run verify commands for pending tasks
   pnpm crux gh deploy-tasks verify --dry-run      # Show what would run
+```
 
 ## system (`sys`)
 
@@ -1706,6 +1782,7 @@ System — agents, jobs, sessions, health, audits
 
 Agents Domain — Live agent coordination
 
+```
 Track active Claude Code agents to prevent duplicate work and detect conflicts.
 
 Commands:
@@ -1740,14 +1817,16 @@ Examples:
   crux sys agents close                    # Close current session (auto-discovers agent)
   crux sys agents close --reason="shipped" # Close with a reason
   crux sys agents sweep --timeout=60
+```
 
 ### `agent-checklist`
 
 Agent Checklist — simplified session workflow tracking
 
+```
 Commands:
-  init \<task>      Generate a checklist (default)
-  check \<id>...    Check off items by ID
+  init <task>      Generate a checklist (default)
+  check <id>...    Check off items by ID
   verify           Auto-run verifiable items
   status           Show progress
   complete         Validate all items checked
@@ -1767,11 +1846,13 @@ Examples:
   crux sys agent-checklist check tests-written security
   crux sys agent-checklist check --na fix-escaping --reason "no MDX changes"
   crux sys agent-checklist verify
+```
 
 ### `agent-workspace`
 
 Agent Workspace — Local multi-agent directory management
 
+```
 Manages the lw/ directory structure for running multiple Claude Code agents
 in parallel, each with its own clone and port configuration.
 
@@ -1803,17 +1884,19 @@ Examples:
   crux sys agent-workspace sync-env          Regenerate .env for all slots
   crux sys agent-workspace list              Show all slots and their status
   crux sys agent-workspace clean --force     Remove idle slots (on main, no changes)
+```
 
 ### `jobs`
 
 Jobs Domain - Background job queue management
 
+```
 Commands:
   list            List recent jobs (default)
-  create \<type>   Create a new job
-  status \<id>     Show single job details
-  cancel \<id>     Cancel a pending/claimed job
-  retry \<id>      Reset a failed job to pending
+  create <type>   Create a new job
+  status <id>     Show single job details
+  cancel <id>     Cancel a pending/claimed job
+  retry <id>      Reset a failed job to pending
   sweep           Trigger stale job cleanup
   ping            Create a ping job and wait for completion (smoke test)
   stats           Show aggregate job statistics
@@ -1890,39 +1973,43 @@ Examples:
   crux sys jobs enqueue-resource-reingest --dry-run  Preview stale resources
   crux sys jobs enqueue-resource-reingest            Enqueue all stale
   crux sys jobs enqueue-resource-reingest --limit=100  Enqueue first 100 stale
+```
 
 ### `sessions`
 
 Sessions Domain — Create and manage agent session log YAML files
 
+```
 Commands:
-  write \<title> [options]   Scaffold a session YAML in .claude/sessions/
+  write <title> [options]   Scaffold a session YAML in .claude/sessions/
 
 Options:
-  --title=\<text>            Session title (alternative to positional arg)
-  --summary=\<text>          Short summary of what was done
-  --model=\<name>            Model used (e.g. claude-sonnet-4-6)
-  --duration=\<text>         Approximate duration (e.g. "~30min")
-  --cost=\<text>             Approximate cost (e.g. "≈\$1.50")
-  --pr=\<url|number>         PR URL or number
-  --pages=\<id1,id2,...>     Comma-separated wiki page IDs edited
+  --title=<text>            Session title (alternative to positional arg)
+  --summary=<text>          Short summary of what was done
+  --model=<name>            Model used (e.g. claude-sonnet-4-6)
+  --duration=<text>         Approximate duration (e.g. "~30min")
+  --cost=<text>             Approximate cost (e.g. "~$1.50")
+  --pr=<url|number>         PR URL or number
+  --pages=<id1,id2,...>     Comma-separated wiki page IDs edited
   --sync                    Also sync to wiki-server after writing
-  --output=\<path>           Custom output path (default: .claude/sessions/\<date>_\<branch>.yaml)
+  --output=<path>           Custom output path (default: .claude/sessions/<date>_<branch>.yaml)
 
 Examples:
   pnpm crux sys sessions write "Fix citation parser bug"
   pnpm crux sys sessions write "Add dark mode" --model=claude-sonnet-4-6 --duration="~45min"
   pnpm crux sys sessions write "Update AI timelines page" --pages=ai-timelines,ai-forecasting --sync
+```
 
 ### `health`
 
 Health Domain — System wellness checks
 
+```
 Commands:
   check           Run all wellness checks (default)
 
 Options:
-  --check=\<name>  Run only a specific check:
+  --check=<name>  Run only a specific check:
                     server       Server & DB health
                     api          API smoke tests
                     actions      GitHub Actions workflow health
@@ -1949,17 +2036,19 @@ Examples:
   crux sys health --json             JSON output for scripting
   crux sys health --report           Full markdown report
   crux sys health --report --auto-issue --cleanup-labels   CI mode (full report + issue management)
+```
 
 ### `audits`
 
 Audits Domain — System-level behavioral checking
 
+```
 Track ongoing properties we expect to be true about the system,
 plus one-time post-merge check items tied to specific PRs.
 
 Commands:
   list              Show all audit items (default), highlight overdue
-  check \<id>        Record a check result (with auto-recorded history)
+  check <id>        Record a check result (with auto-recorded history)
   add "desc"        Add a new audit item via CLI (no manual YAML editing)
   run-auto          Run automated/hybrid checks, show output
   report            Full report for maintenance sweep
@@ -1998,11 +2087,13 @@ Examples:
   crux sys audits add "Check Y weekly" --type=ongoing --interval=weekly
   crux sys audits run-auto                            # Run automated checks
   crux sys audits report                              # Summary for maintenance
+```
 
 ### `quality`
 
 Data Quality Domain — Track data coverage and source-check metrics
 
+```
 Commands:
   snapshot        Capture a new data quality snapshot
   history         List recent snapshots (default: last 10)
@@ -2017,6 +2108,7 @@ Examples:
   crux sys quality history            Show recent snapshots
   crux sys quality latest             Show the latest snapshot
   crux sys quality --json             Latest snapshot as JSON
+```
 
 ## Cross-cutting commands
 
@@ -2026,25 +2118,26 @@ These are not part of any group — invoke directly as `pnpm crux <command>`.
 
 Query Domain - Query the wiki-server database
 
+```
 Uses the PostgreSQL database via wiki-server. Faster and more powerful
 than grepping YAML files. Requires LONGTERMWIKI_SERVER_URL.
 
 Commands:
-  search \<query>               Full-text search across all pages (ranked)
-  entity \<id>                  Structured entity data
-  facts \<entity-id>            Numeric facts for an entity
-  related \<page-id>            Related pages via graph query
-  backlinks \<page-id>          Pages that link here
-  page \<page-id>               Full page metadata
+  search <query>               Full-text search across all pages (ranked)
+  entity <id>                  Structured entity data
+  facts <entity-id>            Numeric facts for an entity
+  related <page-id>            Related pages via graph query
+  backlinks <page-id>          Pages that link here
+  page <page-id>               Full page metadata
   recent-changes               Recent session page changes (default: last 7 days)
   recent-edits                 Recent edit log entries (default: last 7 days)
-  citations \<page-id>          Citation health for a page
+  citations <page-id>          Citation health for a page
   citations --broken           Wiki-wide broken citations
   risk [page-id]               Hallucination risk scores
   stats                        Wiki-wide statistics (default)
-  blocks \<page-id>             Section structure from block-level IR
-  blocks --entity=\<id>         Sections referencing a given entity
-  blocks --component=\<type>    Pages using a component (squiggle, mermaid, etc.)
+  blocks <page-id>             Section structure from block-level IR
+  blocks --entity=<id>         Sections referencing a given entity
+  blocks --component=<type>    Pages using a component (squiggle, mermaid, etc.)
   blocks --uncited             Sections with >50 words and no citations
 
 Options:
@@ -2078,23 +2171,25 @@ Examples:
   crux query blocks --entity=anthropic
   crux query blocks --component=squiggle
   crux query blocks --uncited --min-words=100
+```
 
 ### `context`
 
 Context Domain - Assemble research bundles for Claude Code sessions
 
+```
 Eliminates the 5-15 manual tool calls needed to gather background context
 at the start of a session. Each command queries the wiki-server and GitHub
 to produce a single structured markdown file.
 
 Commands:
   for-issue <N>         Context bundle for GitHub issue N
-  for-page \<page-id>    Context bundle for a wiki page
-  for-entity \<id>       Context bundle for an entity
+  for-page <page-id>    Context bundle for a wiki page
+  for-entity <id>       Context bundle for an entity
   for-topic "topic"     Context bundle for a free-text topic
 
 Options:
-  --output=\<path>       Output file path (default: .claude/wip-context.md)
+  --output=<path>       Output file path (default: .claude/wip-context.md)
   --print               Write to stdout instead of a file
   --json                Machine-readable JSON output (implies stdout)
   --ci                  Alias for --json (CI-friendly machine-readable output)
@@ -2120,4 +2215,5 @@ Examples:
   crux context for-entity openai --output=openai-context.md
   crux context for-topic "AI safety compute governance"
   crux context for-topic "RLHF alignment tax" --limit=15
+```
 
