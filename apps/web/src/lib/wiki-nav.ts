@@ -334,6 +334,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Server Communication", href: internalHref("server-communication-investigation") },
         { label: "Schema Diagrams", href: internalHref("diagrams") },
         { label: "Automation Tools", href: internalHref("automation-tools") },
+        { label: "External Search APIs", href: internalHref("external-search-apis") },
         { label: "Content Database", href: internalHref("content-database") },
         { label: "DB Schema Overview", href: internalHref("db-schema-overview") },
         { label: "Skills Reference", href: internalHref("skills-reference") },

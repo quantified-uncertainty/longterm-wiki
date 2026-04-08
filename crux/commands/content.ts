@@ -26,7 +26,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   create: {
     script: 'authoring/page-creator.ts',
     description: 'Create a new page with research pipeline',
-    passthrough: ['ci', 'tier', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect', 'engine'],
+    passthrough: ['ci', 'tier', 'type', 'phase', 'output', 'help', 'sourceFile', 'source-file', 'dest', 'directions', 'force', 'create-category', 'api-direct', 'apiDirect', 'engine', 'grep', 'files'],
     positional: true,
   },
   regrade: {
@@ -95,7 +95,9 @@ Options:
   --warnings-only   Run Steps 1-2 only, skip rating (grade-content)
   --unscored        Only process pages without a quality score (grade-content)
   --api-direct      Use Anthropic API directly instead of Claude CLI (create)
-  --type=<t>        Entity type filter (suggest-links)
+  --type=<t>        Page type: internal-reference (create, V1 only) / entity type filter (suggest-links)
+  --grep=<pattern>  Codebase grep pattern, repeatable (create --type=internal-reference, V1 only)
+  --files=<glob>    File glob to include, repeatable (create --type=internal-reference, V1 only)
   --entity=<id>     Analyze specific entity (suggest-links)
   --min-score=<n>   Minimum suggestion score, default 2 (suggest-links)
   --dry-run         Preview without changes
@@ -122,6 +124,7 @@ Examples:
   crux w content improve far-ai --tier deep --directions "add recent papers"
   crux w content improve anthropic --engine=v2 --tier standard --apply
   crux w content create "SecureBio" --tier standard
+  crux w content create "Page Creator" --type=internal-reference --grep="runPipeline" --files="crux/authoring/creator/*.ts"
   crux w content review anthropic                     # review single page
   crux w content review --batch --limit=20            # review lowest-quality pages
   crux w content regrade --batch 10
