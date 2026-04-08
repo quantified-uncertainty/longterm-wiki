@@ -331,14 +331,11 @@ Include the coverage table in the report.
 
 ### Persist the full report to a GitHub Discussion
 
-After filing issues, post the **complete** Phase 3 report as a comment on Discussion #2650 (QA Sweep Reports).
+After filing issues, post the **complete** Phase 3 report as a comment on **Discussion #2650** (the canonical "QA Sweep Reports" archive). Always use #2650 — do **not** create a new discussion. Past attempts to "find or create" the discussion produced duplicates (#3220, #3724) which were closed in favor of #2650.
 
 ```bash
-# First run: create the discussion
-pnpm crux epic create "QA Sweep Reports" --body="Archive of /maintain-qa-sweep findings. Each comment is one sweep run."
-
-# Every run: post the report as a comment
-pnpm crux epic comment <DISCUSSION_NUMBER> "$(cat <<'REPORT'
+# Always post to #2650 — do not create a new discussion
+pnpm crux gh epic comment 2650 "$(cat <<'REPORT'
 ## QA Sweep — [DATE]
 ### Focus: [focus] | Depth: [depth]
 [Full report here — copy the entire Phase 3 output]
@@ -351,7 +348,7 @@ REPORT
 )"
 ```
 
-**To find the discussion number:** Search for "QA Sweep Reports" in discussions, or check the QA sweep discussion number stored in `.claude/memory/` if a previous sweep saved it. If no discussion exists yet, create one.
+If #2650 has been closed or replaced for some reason (verify by running `pnpm crux gh epic view 2650`), stop and ask the user — do **not** silently create a new discussion.
 
 ### Fix P0s
 
