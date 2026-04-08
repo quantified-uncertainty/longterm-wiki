@@ -231,14 +231,28 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const recordType = decodeURIComponent(rawParams.recordType);
   const recordId = decodeURIComponent(rawParams.recordId);
 
-  // Fetch detail (verdicts + evidence) and names in parallel
-  const [detailResult, namesResult] = await Promise.all([
+  // Map recordType back to source table name for record-lookup API
+  const RECORD_TYPE_TO_TABLE: Record<string, string> = {
+    grant: "grants", personnel: "personnel", division: "divisions",
+    investment: "investments", "funding-round": "funding_rounds",
+    "funding-program": "funding_programs", publication: "publications",
+    "wiki-page": "wiki_pages", "policy-stakeholder": "policy_stakeholders",
+    citation: "citation_quotes",
+  };
+  const sourceTable = RECORD_TYPE_TO_TABLE[recordType] ?? recordType.replace(/-/g, "_") + "s";
+
+  // Fetch detail (verdicts + evidence), names, and the actual DB record in parallel
+  const [detailResult, namesResult, recordResult] = await Promise.all([
     fetchDetailed<RpcSourceCheckDetailResult>(
       `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
     fetchDetailed<RpcSourceChecksResolveNamesResult>(
       `/api/source-checks/resolve-names?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(recordId)}`,
+      { revalidate: 3600 }
+    ),
+    fetchDetailed<{ record: Record<string, unknown>; displayNames: Record<string, { title: string }> }>(
+      `/api/record-lookup/${encodeURIComponent(sourceTable)}/${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
   ]);
@@ -360,30 +374,67 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* What's being checked — context for users */}
-      <div className="rounded-lg bg-muted/30 border border-border/40 px-4 py-3 mb-6 text-sm text-muted-foreground">
-        {recordType === "grant" && (
-          <p>Verifying that this grant record in our database matches the original funder&apos;s published data. Key fields (grantee, amount, date) are checked against the source.</p>
-        )}
-        {recordType === "personnel" && (
-          <p>Verifying that this personnel record (role, title, affiliation) is supported by the organization&apos;s public information.</p>
-        )}
-        {recordType === "fact" && (
-          <p>Verifying that this structured fact matches published sources. The claimed value is checked against primary and secondary sources.</p>
-        )}
-        {recordType === "division" && (
-          <p>Verifying that this organizational division exists and matches public information about the parent organization.</p>
-        )}
-        {recordType === "investment" && (
-          <p>Verifying that this investment record matches published funding data from the source.</p>
-        )}
-        {recordType === "funding-round" && (
-          <p>Verifying that this funding round record matches published financial data.</p>
-        )}
-        {!["grant", "personnel", "fact", "division", "investment", "funding-round"].includes(recordType) && (
-          <p>Verifying that this {formatRecordType(recordType).toLowerCase()} record matches its original source data.</p>
-        )}
-      </div>
+      {/* What's being checked — show our database record */}
+      {(() => {
+        const isHolistic = verdicts.every((v) => v.fieldName === null);
+        const dbRecord = recordResult.ok ? recordResult.data.record : null;
+        // Fields to skip — internal IDs, timestamps, and metadata
+        const skipFields = new Set([
+          "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
+          "organizationId", "orgEntityId", "granteeId", "programId",
+          "entityId", "parentThingId", "stableId", "wikiId",
+        ]);
+
+        // Filter to meaningful display fields
+        const displayFields = dbRecord
+          ? Object.entries(dbRecord).filter(
+              ([k, v]) => v != null && v !== "" && !skipFields.has(k)
+            )
+          : [];
+
+        return (
+          <div className="rounded-lg border border-border/40 bg-muted/20 px-4 py-3 mb-6 text-sm">
+            <p className="text-muted-foreground mb-2">
+              {isHolistic ? "Holistic verification" : "Field-level verification"} &mdash;{" "}
+              {isHolistic
+                ? `checking the entire ${formatRecordType(recordType).toLowerCase()} record against its original source.`
+                : `checking specific fields of this ${formatRecordType(recordType).toLowerCase()} record.`}
+            </p>
+            {displayFields.length > 0 && (
+              <details className="group">
+                <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground transition-colors select-none">
+                  Our database record ({displayFields.length} fields)
+                </summary>
+                <div className="mt-2 rounded-md border border-border/30 bg-background px-3 py-2">
+                  <table className="w-full text-sm">
+                    <tbody>
+                      {displayFields.slice(0, 12).map(([k, v]) => (
+                        <tr key={k} className="border-b border-border/20 last:border-0">
+                          <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
+                            {k}
+                          </td>
+                          <td className="py-0.5 text-foreground/80 break-all">
+                            {typeof v === "number"
+                              ? v.toLocaleString("en-US")
+                              : String(v).length > 150
+                                ? String(v).slice(0, 150) + "\u2026"
+                                : String(v)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {displayFields.length > 12 && (
+                    <div className="text-xs text-muted-foreground mt-1">
+                      +{displayFields.length - 12} more fields
+                    </div>
+                  )}
+                </div>
+              </details>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Verdict summary cards */}
       {verdicts.length > 0 ? (
