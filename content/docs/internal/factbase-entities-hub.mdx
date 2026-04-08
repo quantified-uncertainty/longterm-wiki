@@ -23,11 +23,11 @@ If you're trying to **add a new entity**, **read facts about an org**, **discove
 
 | Dashboard | What it shows |
 |-----------|---------------|
-| [Entities & Pages](/internal/entities) | All entities with type, aliases, KB fact counts |
-| [Entity Profile](/internal/entity-profile) | Per-entity card: facts, related pages, usage tracking |
-| [Data Quality](/internal/data-quality) | Field completeness and fact staleness per entity type |
-| [Data Sources](/internal/data-sources) | Provenance tracking (Wikidata, manual, inferred) |
-| [People Coverage](/internal/people-coverage) | Person entity coverage across pages |
+| [Entities & Pages](/internal/entities-dashboard) | All entities with type, aliases, KB fact counts |
+| [Entity Profile](/internal/entity-profile-dashboard) | Per-entity card: facts, related pages, usage tracking |
+| [Data Quality](/internal/data-quality-dashboard) | Field completeness and fact staleness per entity type |
+| [Data Sources](/internal/data-sources-dashboard) | Provenance tracking (Wikidata, manual, inferred) |
+| [People Coverage](/internal/people-coverage-dashboard) | Person entity coverage across pages |
 | [Grants](/internal/grants-dashboard) / [Divisions](/internal/divisions-dashboard) / [Funding Programs](/internal/funding-programs-dashboard) | PG-primary table dashboards |
 
 ## CLI playbook
@@ -69,11 +69,11 @@ pnpm crux tb ensure-entities --type=person        # Stable IDs only, no wiki pag
 
 | I want to... | Run | Or check |
 |--------------|-----|----------|
-| Read all facts about an org | `pnpm crux fb show <slug>` | [Entity Profile dashboard](/internal/entity-profile) |
-| See what's missing for an entity | `pnpm crux fb needs-update <slug>` | [Data Quality dashboard](/internal/data-quality) |
+| Read all facts about an org | `pnpm crux fb show <slug>` | [Entity Profile dashboard](/internal/entity-profile-dashboard) |
+| See what's missing for an entity | `pnpm crux fb needs-update <slug>` | [Data Quality dashboard](/internal/data-quality-dashboard) |
 | Add a new structured fact | `pnpm crux fb add-fact <entity> <prop> <value> --asOf=YYYY-MM --source=URL` | <EntityLink id="E827" name="canonical-facts">Canonical Facts & Calc</EntityLink> |
 | Allocate an ID for a new wiki entity | `pnpm crux tb ids allocate <slug> --description="..."` | — |
-| Find people who appear in data but lack entities | `pnpm crux tb people discover` | [People Coverage dashboard](/internal/people-coverage) |
+| Find people who appear in data but lack entities | `pnpm crux tb people discover` | [People Coverage dashboard](/internal/people-coverage-dashboard) |
 | Find stale facts (>90 days) | `pnpm crux fb stale 90` | — |
 | Understand the three-bases model | — | <EntityLink id="E1334" name="data-architecture">Data Architecture</EntityLink> |
 

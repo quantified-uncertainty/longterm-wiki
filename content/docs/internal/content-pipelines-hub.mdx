@@ -25,11 +25,11 @@ If you're trying to **create a new page**, **improve an existing page**, **fix a
 
 | Dashboard | What it shows |
 |-----------|---------------|
-| [Suggested Pages](/internal/suggested-pages) | Pages recommended for creation (gap analysis) |
-| [Improve Runs](/internal/improve-runs) | Improvement history, cost, quality delta |
-| [Page Changes](/internal/page-changes) | Recent edits across the wiki |
-| [Update Schedule](/internal/updates) | Auto-update run schedule and next executions |
-| [Groundskeeper Runs](/internal/groundskeeper-runs) | Maintenance job history (validation, fixes, audits) |
+| [Suggested Pages](/internal/suggested-pages-dashboard) | Pages recommended for creation (gap analysis) |
+| [Improve Runs](/internal/improve-runs-dashboard) | Improvement history, cost, quality delta |
+| [Page Changes](/internal/page-changes-dashboard) | Recent edits across the wiki |
+| [Update Schedule](/internal/update-schedule-dashboard) | Auto-update run schedule and next executions |
+| [Groundskeeper Runs](/internal/groundskeeper-runs-dashboard) | Maintenance job history (validation, fixes, audits) |
 
 ## CLI playbook
 
@@ -68,13 +68,13 @@ pnpm crux w auto-update audit-gate --diff --apply     # Audit changed pages
 
 | I want to... | Run | Or check |
 |--------------|-----|----------|
-| Create a new page on a topic | `pnpm crux w create "Title" --tier=standard` | [Suggested Pages dashboard](/internal/suggested-pages) |
-| Improve a page that needs polish | `pnpm crux w improve <id> --tier=standard --apply` | [Improve Runs dashboard](/internal/improve-runs) |
+| Create a new page on a topic | `pnpm crux w create "Title" --tier=standard` | [Suggested Pages dashboard](/internal/suggested-pages-dashboard) |
+| Improve a page that needs polish | `pnpm crux w improve <id> --tier=standard --apply` | [Improve Runs dashboard](/internal/improve-runs-dashboard) |
 | Fix a CI gate failure | `pnpm crux w validate gate --scope=content --fix` | — |
-| See recent edits across the wiki | — | [Page Changes dashboard](/internal/page-changes) |
+| See recent edits across the wiki | — | [Page Changes dashboard](/internal/page-changes-dashboard) |
 | Run news-driven updates | `pnpm crux w auto-update run --budget=30` | <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> |
-| See what gap analysis suggests creating | — | [Suggested Pages dashboard](/internal/suggested-pages) |
-| Find pages overdue for refresh | — | [Update Schedule dashboard](/internal/updates) |
+| See what gap analysis suggests creating | — | [Suggested Pages dashboard](/internal/suggested-pages-dashboard) |
+| Find pages overdue for refresh | — | [Update Schedule dashboard](/internal/update-schedule-dashboard) |
 | Understand the page-creator pipeline | — | <EntityLink id="E895" name="content-pipeline-architecture">Content Pipeline Architecture</EntityLink> |
 
 ## Tier and pipeline notes
