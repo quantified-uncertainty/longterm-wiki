@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { deduplicateSubPrTasks, parseDeployTasksFromBody, formatDeployTasksSection, preserveCheckedState } from '../detect.ts';
+import {
+  deduplicateSubPrTasks,
+  extractVerifyCommand,
+  parseDeployTasksFromBody,
+  formatDeployTasksSection,
+  preserveCheckedState,
+} from '../detect.ts';
 import type { DeployTask } from '../types.ts';
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -1288,5 +1294,89 @@ describe('preserveCheckedState', () => {
     const parsed = parseDeployTasksFromBody(result);
     expect(parsed).not.toBeNull();
     expect(parsed!.items[0]).toEqual({ text: taskText, checked: true });
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// extractVerifyCommand
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('extractVerifyCommand', () => {
+  it('extracts a simple curl verify command', () => {
+    const text =
+      '`schema` Drizzle schema changed — verify wiki-server redeployed and schema is in sync — `curl -sf "$WIKI_SERVER_URL/health" | jq .`';
+    expect(extractVerifyCommand(text)).toBe(
+      'curl -sf "$WIKI_SERVER_URL/health" | jq .'
+    );
+  });
+
+  it('extracts a psql verify command with embedded quotes and SQL', () => {
+    const text =
+      '`migration` Verify migration 0166 applied on server start — `psql "$DATABASE_URL" -c "SELECT * FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 5;"`';
+    expect(extractVerifyCommand(text)).toBe(
+      'psql "$DATABASE_URL" -c "SELECT * FROM drizzle.__drizzle_migrations ORDER BY created_at DESC LIMIT 5;"'
+    );
+  });
+
+  it('strips trailing sub-PR attribution before extracting', () => {
+    const text =
+      '`migration` Verify migration 0159 applied on server start — `psql "$DATABASE_URL" -c "SELECT 1;"` _(from PR #3936)_';
+    expect(extractVerifyCommand(text)).toBe(
+      'psql "$DATABASE_URL" -c "SELECT 1;"'
+    );
+  });
+
+  it('returns null when there is no embedded command', () => {
+    const text = '`manual-migration` Run manual migration script: foo.sql';
+    expect(extractVerifyCommand(text)).toBeNull();
+  });
+
+  it('returns null for an empty string', () => {
+    expect(extractVerifyCommand('')).toBeNull();
+  });
+
+  it('handles description that itself contains an em-dash', () => {
+    // The description has its own em-dash; the LAST `— `cmd`` segment is the command.
+    const text =
+      '`ci` Modified workflow "ci" — verify it runs successfully after merge — `gh run list --workflow="ci.yml" --limit=1`';
+    expect(extractVerifyCommand(text)).toBe(
+      'gh run list --workflow="ci.yml" --limit=1'
+    );
+  });
+
+  it('round-trips: formatDeployTasksSection output is parseable by extractVerifyCommand', () => {
+    // The interesting overlap: format produces task lines; parser reads them.
+    // If either side drifts (em-dash vs hyphen, backtick escaping), this breaks.
+    const tasks: DeployTask[] = [
+      makeTask({
+        id: 'm1',
+        category: 'migration',
+        description: 'Verify migration 0200 applied on server start',
+        verifyCommand: 'psql "$DATABASE_URL" -c "SELECT 1;"',
+      }),
+      makeTask({
+        id: 's1',
+        category: 'schema',
+        description: 'Drizzle schema changed',
+        verifyCommand: 'curl -sf "$WIKI_SERVER_URL/health"',
+      }),
+      makeTask({
+        id: 'r1',
+        category: 'route',
+        description: 'No-command task',
+        // no verifyCommand
+      }),
+    ];
+    const section = formatDeployTasksSection(tasks);
+    const parsed = parseDeployTasksFromBody(`<!-- deploy-tasks:v1 -->${section.split('<!-- deploy-tasks:v1 -->')[1]}`);
+    expect(parsed).not.toBeNull();
+    expect(parsed!.items).toHaveLength(3);
+    expect(extractVerifyCommand(parsed!.items[0].text)).toBe(
+      'psql "$DATABASE_URL" -c "SELECT 1;"'
+    );
+    expect(extractVerifyCommand(parsed!.items[1].text)).toBe(
+      'curl -sf "$WIKI_SERVER_URL/health"'
+    );
+    expect(extractVerifyCommand(parsed!.items[2].text)).toBeNull();
   });
 });
