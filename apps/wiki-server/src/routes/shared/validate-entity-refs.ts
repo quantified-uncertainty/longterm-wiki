@@ -62,12 +62,16 @@ export async function findMissingEntityRefs(
 
 /**
  * Check if the request asked to skip entity validation, and log loudly when it
- * does. Returns true if validation should be skipped.
+ * does. Returns true if validation should be skipped, false otherwise.
  *
- * Per epic #4017 Phase A, the `skipEntityValidation` bypass must be loud and
- * justified. The caller passes a `skipEntityValidationReason` query param
- * explaining why; if missing, we log at error level so the silent-bypass
- * pattern is visible in production logs and can be alerted on.
+ * Per epic #4017 Phase A, the `skipEntityValidation` bypass must be loud AND
+ * justified — both halves of the contract. The caller passes a
+ * `skipEntityValidationReason` query param explaining why:
+ *
+ *   - Reason present: log at warn level, return true (bypass allowed).
+ *   - Reason missing or whitespace-only: log at error level AND return false
+ *     (bypass DENIED — caller falls through to normal FK validation, which
+ *     will return 400 if any refs are missing). PR #4023 review hardening.
  *
  * Exported for use by routes (grants.ts, benchmark-results.ts) that have their
  * own custom validation logic and don't go through `validateEntityRefs()`.
@@ -76,22 +80,20 @@ export function shouldSkipEntityValidation(c: Context): boolean {
   const skip = c.req.query("skipEntityValidation");
   if (skip !== "true") return false;
 
-  const reason = c.req.query("skipEntityValidationReason");
+  const reason = c.req.query("skipEntityValidationReason")?.trim();
   const ctx = { path: c.req.path, method: c.req.method } as const;
-  if (!reason || reason.trim().length === 0) {
+  if (!reason) {
     skipLogger.error(
       // Include the raw reason value (whether undefined or whitespace) so
       // operators can distinguish "no param sent" from "param was blank".
-      { ...ctx, rawReason: reason ?? null },
+      { ...ctx, rawReason: c.req.query("skipEntityValidationReason") ?? null },
       // skipEntityValidation-ok: error message text mentions the bypass keyword
-      "skipEntityValidation=true called without skipEntityValidationReason — this bypass MUST be justified (issue #4017). Pass &skipEntityValidationReason=<why> in the query string.",
+      "skipEntityValidation=true called without skipEntityValidationReason — bypass DENIED. Pass &skipEntityValidationReason=<why> in the query string (issue #4017).",
     );
-  } else {
-    skipLogger.warn(
-      { ...ctx, reason },
-      "Entity FK validation skipped",
-    );
+    return false;
   }
+
+  skipLogger.warn({ ...ctx, reason }, "Entity FK validation skipped");
   return true;
 }
 

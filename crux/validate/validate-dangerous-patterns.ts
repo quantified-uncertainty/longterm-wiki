@@ -103,8 +103,16 @@ const PATTERN_META: Record<PatternId, PatternMeta> = {
 // Pattern detection — pure functions (exported for unit tests)
 // ---------------------------------------------------------------------------
 
-/** `.catch(() => {})` or `.catch(() => {  })` — silent swallow. */
-const SILENT_CATCH_PATTERN = /\.catch\s*\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/;
+/**
+ * `.catch(() => {})`, `.catch((e) => {})`, `.catch((_e: unknown) => {})`, etc.
+ * — silent swallow with an empty arrow body, regardless of the parameter form.
+ *
+ * The parameter list accepts: `()`, `(e)`, `(_e)`, `(e: any)`, `(e: unknown)`,
+ * or a bare identifier like `e`. PR #4023 review hardened this to catch
+ * parameterized forms that the original regex missed.
+ */
+const SILENT_CATCH_PATTERN =
+  /\.catch\s*\(\s*(?:\(\s*[^)]*\)|\w+)\s*=>\s*\{\s*\}\s*\)/;
 
 /**
  * `.catch((e) => console.warn(...))` / `.catch((e) => logger.warn(...))`
@@ -124,8 +132,15 @@ const SILENT_CATCH_PATTERN = /\.catch\s*\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/;
 const WARN_ONLY_CATCH_PATTERN =
   /\.catch\s*\(\s*(?:\(\s*[^)]*\)|\w*)\s*=>\s*(?:console\.warn|logger\.warn)\s*\(/;
 
-/** `as any` and `as unknown as` casts. */
-const AS_ANY_PATTERN = /\bas\s+(?:unknown\s+as\s+)?any\b/;
+/**
+ * `as any` and ALL `as unknown as <Type>` double-casts.
+ *
+ * PR #4023 review broadened this — the original regex only matched
+ * `as unknown as any`, missing the common `value as unknown as Row` form.
+ * Routes must use Zod or typed row interfaces; if a generic Drizzle table
+ * requires the cast, an `// as-any-ok: <reason>` marker suppresses it.
+ */
+const AS_ANY_PATTERN = /\bas\s+any\b|\bas\s+unknown\s+as\b/;
 
 /**
  * Hardcoded `?skipEntityValidation=true` in URL string literals (single, double,

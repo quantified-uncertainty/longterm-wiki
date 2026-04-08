@@ -238,25 +238,12 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(200);
     });
 
-    it("skips validation when skipEntityValidation=true", async () => {
-      const res = await postJson(
-        app,
-        "/api/personnel/sync?skipEntityValidation=true",
-        {
-          items: [
-            {
-              id: "Pabcde1234",
-              personId: "nxPerson01",
-              organizationId: "nxOrgani01",
-              role: "CEO",
-              roleType: "key-person",
-            },
-          ],
-        },
-      );
-
-      expect(res.status).toBe(200);
-    });
+    // PR #4023 review HIGH#1: bypass without a reason no longer succeeds —
+    // it logs at error level and falls through to normal FK validation (which
+    // returns 400 because the test refs don't exist). See the dedicated
+    // "DENIES bypass" tests below for the new behavior.
+    //
+    // The accepted bypass form REQUIRES a reason — see the next test.
 
     // Issue #4017 — bypass with reason should also pass and log a warn (the
     // log itself isn't asserted here; this just verifies the contract).
@@ -280,9 +267,11 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(200);
     });
 
-    // Issue #4017 — empty/whitespace reason is treated the same as no reason:
-    // bypass still works but the server logs at error level so misuse is alertable.
-    it("treats whitespace-only reason as missing AND logs at error level", async () => {
+    // PR #4023 review HIGH#1 — empty/whitespace reason now DENIES the bypass
+    // (the route falls through to normal FK validation, which returns 400 for
+    // missing entity refs). Previous behavior was "log error but allow"; the
+    // new behavior is "log error AND deny" so the contract is actually enforced.
+    it("DENIES bypass when reason is whitespace-only AND logs at error level", async () => {
       const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
 
       const res = await postJson(
@@ -300,7 +289,8 @@ describe("Entity FK validation", () => {
           ],
         },
       );
-      expect(res.status).toBe(200);
+      // 400 because validation runs and the FK refs don't exist.
+      expect(res.status).toBe(400);
 
       // Exactly one error log with the bypass message and the raw reason.
       // (Assertions BEFORE mockRestore — restore wipes mock.calls.)
@@ -310,9 +300,38 @@ describe("Entity FK validation", () => {
       expect(ctx as Record<string, unknown>).toMatchObject({
         path: "/api/personnel/sync",
         method: "POST",
-        // The whitespace string is preserved (not coerced to null) so operators
-        // can distinguish "param missing" from "param empty".
+        // The raw whitespace string is preserved (not coerced to null) so
+        // operators can distinguish "param missing" from "param empty".
         rawReason: "  ",
+      });
+
+      errorSpy.mockRestore();
+    });
+
+    it("DENIES bypass when reason param is omitted entirely", async () => {
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true",
+        {
+          items: [
+            {
+              id: "Pabcde4567",
+              personId: "nxPerson04",
+              organizationId: "nxOrgani04",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+      expect(res.status).toBe(400);
+
+      expect(errorSpy).toHaveBeenCalledOnce();
+      const [ctx] = errorSpy.mock.calls[0];
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        rawReason: null,
       });
 
       errorSpy.mockRestore();

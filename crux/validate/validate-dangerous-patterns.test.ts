@@ -16,6 +16,27 @@ describe('checkLine — silent-catch', () => {
     expect(result).toContain('silent-catch');
   });
 
+  // PR #4023 review HIGH — original regex missed parameterized empty bodies.
+  it('flags .catch((e) => {}) — parameterized empty body', () => {
+    const result = checkLine('foo().catch((e) => {});', { isRouteFile: false });
+    expect(result).toContain('silent-catch');
+  });
+
+  it('flags .catch((_e) => {}) — underscore-prefixed param', () => {
+    const result = checkLine('foo().catch((_e) => {});', { isRouteFile: false });
+    expect(result).toContain('silent-catch');
+  });
+
+  it('flags .catch((e: unknown) => {}) — typed param', () => {
+    const result = checkLine('foo().catch((e: unknown) => {});', { isRouteFile: false });
+    expect(result).toContain('silent-catch');
+  });
+
+  it('flags .catch(e => {}) — bare identifier param (no parens)', () => {
+    const result = checkLine('foo().catch(e => {});', { isRouteFile: false });
+    expect(result).toContain('silent-catch');
+  });
+
   it('does NOT flag .catch with a body', () => {
     const result = checkLine('foo().catch((e) => { logger.error(e); });', { isRouteFile: false });
     expect(result).not.toContain('silent-catch');
@@ -98,9 +119,35 @@ describe('checkLine — as-any-in-route', () => {
     expect(result).toContain('as-any-in-route');
   });
 
+  // PR #4023 review HIGH — broadened to catch ALL `as unknown as <Type>` casts,
+  // not just when the final type is `any`.
+  it('flags `as unknown as Row` (concrete target type)', () => {
+    const result = checkLine(
+      '  const row = result as unknown as Row;',
+      { isRouteFile: true },
+    );
+    expect(result).toContain('as-any-in-route');
+  });
+
+  it('flags `as unknown as MyType` (qualified target type)', () => {
+    const result = checkLine(
+      '  const x = thing as unknown as MyNamespace.MyType;',
+      { isRouteFile: true },
+    );
+    expect(result).toContain('as-any-in-route');
+  });
+
   it('does NOT flag `as string` or `as number`', () => {
     expect(checkLine('  const x = y as string;', { isRouteFile: true })).not.toContain('as-any-in-route');
     expect(checkLine('  const x = y as number;', { isRouteFile: true })).not.toContain('as-any-in-route');
+  });
+
+  it('does NOT flag `as const` (compile-time literal narrowing)', () => {
+    const result = checkLine(
+      '  const list = ["a", "b"] as const;',
+      { isRouteFile: true },
+    );
+    expect(result).not.toContain('as-any-in-route');
   });
 
   it('suppresses with as-any-ok marker', () => {
