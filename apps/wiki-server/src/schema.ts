@@ -1483,14 +1483,14 @@ export const statements = pgTable(
       .notNull()
       .references(() => entities.id, { onDelete: "cascade" }),
     propertyId: text("property_id").references(() => properties.id, {
-      onDelete: "restrict",
+      onDelete: "set null",
     }),
     // --- Typed value columns (structured variety) ---
     valueNumeric: doublePrecision("value_numeric"),
     valueUnit: text("value_unit"), // e.g., "USD", "percent" — display hint
     valueText: text("value_text"),
     valueEntityId: text("value_entity_id").references(() => entities.id, {
-      onDelete: "restrict",
+      onDelete: "set null",
     }),
     valueDate: date("value_date"),
     valueSeries: jsonb("value_series"), // { low, high } for ranges
