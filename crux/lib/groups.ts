@@ -125,6 +125,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'quality',
       'agent-reset',
       'usage-patterns',
+      'docs',
     ],
   },
 };
