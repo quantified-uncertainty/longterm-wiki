@@ -404,7 +404,7 @@ export const RESEARCH_AREAS: ResearchAreaSeed[] = [
     cluster: "scalable-oversight",
     status: "emerging",
     parentAreaId: "scalable-oversight",
-    tags: ["formal-methods", "verification", "proofs"],
+    tags: ["formal-methods", "formal-verification", "proofs"],
   },
   {
     id: "value-learning",

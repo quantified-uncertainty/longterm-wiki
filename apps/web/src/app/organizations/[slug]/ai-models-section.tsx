@@ -217,7 +217,7 @@ export function AiModelsSection({
                         wikiId: model.wikiId,
                       })}
                       verdict={modelVerdict}
-                      sourceCheckHref={getSourceCheckHref("model-release", model.id)}
+                      sourcingHref={getSourceCheckHref("model-release", model.id)}
                     />
                   </td>
                 </tr>

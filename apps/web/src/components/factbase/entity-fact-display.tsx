@@ -9,7 +9,7 @@ import {
   titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
-import { FactSourceCheckDot } from "@/components/verification/FactSourceCheckDot";
+import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
 
 import { SectionHeader } from "./entity-section-header";
 

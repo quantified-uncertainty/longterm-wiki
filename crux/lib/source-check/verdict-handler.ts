@@ -7,7 +7,7 @@
  */
 
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
-import { storeEvidence as storeEvidenceRpc, storeVerdict as storeVerdictRpc } from '../wiki-server/verifications.ts';
+import { storeEvidence as storeEvidenceRpc, storeVerdict as storeVerdictRpc } from '../wiki-server/source-check-client.ts';
 import { MODELS } from '../llm.ts';
 import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 

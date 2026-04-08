@@ -1,5 +1,5 @@
 /**
- * Section-level verification coverage summary.
+ * Section-level source-check coverage summary.
  *
  * Shows "12 of 47 records source-checked" above a table, with a breakdown
  * of verdict counts. Only renders when at least one record has been checked.
@@ -7,7 +7,7 @@
  */
 import { getRecordVerdictStats } from "@data/tablebase";
 
-export function VerificationSummaryBanner({
+export function SourceCheckSummaryBanner({
   recordType,
   totalOverride,
 }: {

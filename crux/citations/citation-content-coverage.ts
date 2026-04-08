@@ -2,7 +2,7 @@
  * Citation Content Coverage Stats
  *
  * Shows how many citation URLs have full text cached in PostgreSQL.
- * Useful for understanding backfill coverage before running verification.
+ * Useful for understanding backfill coverage before running source-check.
  *
  * Usage:
  *   pnpm crux citations content-coverage        # Show coverage stats

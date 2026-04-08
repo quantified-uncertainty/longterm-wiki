@@ -13,8 +13,8 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -54,7 +54,7 @@ const SyncDivisionItemSchema = z.object({
   website: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncDivisionsBatchSchema = z.object({
@@ -290,7 +290,7 @@ const divisionsApp = new Hono()
         }))
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -298,14 +298,14 @@ const divisionsApp = new Hono()
           recordId: item.id,
           entityId: item.parentOrgId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("divisions/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("divisions/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });

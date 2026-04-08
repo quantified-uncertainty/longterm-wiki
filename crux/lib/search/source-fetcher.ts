@@ -1,7 +1,7 @@
 /**
  * Source Fetcher — fetch & extract content from URLs
  *
- * Foundational module for content-grounded citation verification and research.
+ * Foundational module for content-grounded citation checking and research.
  * Fetches source URLs, converts HTML to clean text/markdown, extracts relevant
  * excerpts for a query, and caches results to avoid redundant network calls.
  *

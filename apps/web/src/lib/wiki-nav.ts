@@ -325,7 +325,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
         { label: "Citation Architecture", href: internalHref("citation-architecture") },
-        { label: "Verification Tiers", href: internalHref("content-verification-tiers") },
+        { label: "Source Check Tiers", href: internalHref("content-verification-tiers") },
         { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
         { label: "Structured Data Architecture", href: internalHref("structured-data-architecture") },
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },

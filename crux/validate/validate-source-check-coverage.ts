@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Gate rule: check verification coverage of TableBase submissions.
+ * Gate rule: check source-check coverage of TableBase submissions.
  *
  * Reads JSON manifests from data/tablebase-manifests/ and reports:
- * - Per-manifest: table, record count, verification coverage
+ * - Per-manifest: table, record count, source-check coverage
  * - Total coverage percentage across all manifests
- * - Warnings for unverified or contradicted records
+ * - Warnings for unchecked or contradicted records
  *
  * Enforcement levels (Discussion #3875):
  *   - advisory:  warn only, exit 0 (default when --enforcement=advisory)
@@ -16,8 +16,8 @@
  * This script's exit code is the only signal — the gate respects it accordingly.
  *
  * Exit codes:
- *   0 = All records have verification (or no manifests, or --force overrides soft block)
- *   1 = Unverified or contradicted records found (blocks unless overridden)
+ *   0 = All records have source-checks (or no manifests, or --force overrides soft block)
+ *   1 = Unchecked or contradicted records found (blocks unless overridden)
  */
 
 import { readdirSync, readFileSync, existsSync, appendFileSync } from 'fs';
@@ -30,7 +30,7 @@ const MANIFEST_DIR = join(PROJECT_ROOT, 'data', 'tablebase-manifests');
 /** Tables where hard enforcement is active — --force cannot override these */
 const HARD_ENFORCED_TABLES: string[] = [
   // Populated as tables reach >70% coverage (Phase 5, Discussion #3875).
-  // Example: 'personnel' once personnel verification >70%.
+  // Example: 'personnel' once personnel source-check coverage >70%.
 ];
 
 const cliArgs = process.argv.slice(2);
@@ -41,9 +41,9 @@ const enforcement: 'advisory' | 'soft' | 'hard' = (
     ? enforcementArg : 'soft'
 );
 
-interface VerificationSummary {
-  withVerification: number;
-  withoutVerification: number;
+interface SourceCheckSummary {
+  withSourceCheck: number;
+  withoutSourceCheck: number;
   verdicts: {
     verified: number;
     contradicted: number;
@@ -56,7 +56,7 @@ interface Manifest {
   table: string;
   recordCount: number;
   submittedAt: string;
-  verificationSummary: VerificationSummary;
+  sourceCheckSummary: SourceCheckSummary;
   records: Array<Record<string, unknown>>;
 }
 
@@ -88,36 +88,36 @@ function main() {
       continue;
     }
 
-    const { table, recordCount, verificationSummary } = manifest;
+    const { table, recordCount, sourceCheckSummary } = manifest;
 
-    if (!verificationSummary || typeof recordCount !== 'number') {
-      fatalErrors.push(`${file}: missing verificationSummary or recordCount`);
+    if (!sourceCheckSummary || typeof recordCount !== 'number') {
+      fatalErrors.push(`${file}: missing sourceCheckSummary or recordCount`);
       continue;
     }
 
     totalRecords += recordCount;
-    totalVerified += verificationSummary.withVerification;
-    totalUnverified += verificationSummary.withoutVerification;
+    totalVerified += sourceCheckSummary.withSourceCheck;
+    totalUnverified += sourceCheckSummary.withoutSourceCheck;
 
-    if (verificationSummary.withoutVerification > 0) {
+    if (sourceCheckSummary.withoutSourceCheck > 0) {
       warnings.push(
-        `${file}: ${verificationSummary.withoutVerification}/${recordCount} ${table} records submitted WITHOUT verification`
+        `${file}: ${sourceCheckSummary.withoutSourceCheck}/${recordCount} ${table} records submitted WITHOUT source-check`
       );
       if (HARD_ENFORCED_TABLES.includes(table)) {
         hardBlockedTables.add(table);
       }
     }
 
-    if (verificationSummary.verdicts.contradicted > 0) {
+    if (sourceCheckSummary.verdicts.contradicted > 0) {
       warnings.push(
-        `${file}: ${verificationSummary.verdicts.contradicted} ${table} records have CONTRADICTED verdicts`
+        `${file}: ${sourceCheckSummary.verdicts.contradicted} ${table} records have CONTRADICTED verdicts`
       );
     }
   }
 
   // Summary
   const coverage = totalRecords > 0 ? Math.round((totalVerified / totalRecords) * 100) : 100;
-  console.log(`Verification coverage: ${totalVerified}/${totalRecords} records (${coverage}%)`);
+  console.log(`Source-check coverage: ${totalVerified}/${totalRecords} records (${coverage}%)`);
 
   // Fatal errors (malformed manifests) — cannot be overridden with --force
   if (fatalErrors.length > 0) {
@@ -131,7 +131,7 @@ function main() {
   }
 
   if (warnings.length === 0) {
-    console.log('All TableBase submissions have verification.');
+    console.log('All TableBase submissions have source-checks.');
     process.exit(0);
   }
 
@@ -144,8 +144,8 @@ function main() {
   // Hard enforcement — cannot be overridden
   if (hardBlockedTables.size > 0) {
     console.log('');
-    console.log(`BLOCKED: Tables with hard enforcement have unverified records: ${[...hardBlockedTables].join(', ')}`);
-    console.log('Run `pnpm crux tb verify <table>` to verify records before submitting.');
+    console.log(`BLOCKED: Tables with hard enforcement have unchecked records: ${[...hardBlockedTables].join(', ')}`);
+    console.log('Run `pnpm crux tb verify <table>` to source-check records before submitting.');
     process.exit(1);
   }
 
@@ -156,7 +156,7 @@ function main() {
   if (enforcement === 'soft' || enforcement === 'hard') {
     if (forceOverride) {
       console.log('');
-      console.log('--force: verification warnings overridden.');
+      console.log('--force: source-check warnings overridden.');
       logForceUsage(warnings);
       process.exit(0);
     }
@@ -175,19 +175,19 @@ function logForceUsage(warnings: string[]): void {
     // Use git rev-parse to resolve the real git dir — handles worktrees where .git is a file
     let logFile: string;
     try {
-      logFile = execSync('git rev-parse --git-path verification-force-log', {
+      logFile = execSync('git rev-parse --git-path source-check-force-log', {
         cwd: PROJECT_ROOT,
         encoding: 'utf-8',
       }).trim();
     } catch {
       // Fallback if git is unavailable
-      logFile = join(PROJECT_ROOT, '.git', 'verification-force-log');
+      logFile = join(PROJECT_ROOT, '.git', 'source-check-force-log');
     }
     const entry = `${new Date().toISOString()} | ${warnings.length} warnings | ${warnings.join('; ')}\n`;
     appendFileSync(logFile, entry);
   } catch (e: unknown) {
     // Non-fatal: logging failure shouldn't block the gate
-    console.warn(`[verification-coverage] Could not write force-log: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[source-check-coverage] Could not write force-log: ${e instanceof Error ? e.message : String(e)}`);
   }
 }
 

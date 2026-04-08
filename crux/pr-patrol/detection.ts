@@ -29,11 +29,11 @@ import {
   appendJsonl,
   cl,
   clearAbandoned,
-  clearPendingVerification,
+  clearPendingCICheck,
   clearTotalFixAttempts,
   getAbandonedSha,
   isAbandoned,
-  isPendingVerification,
+  isPendingCICheck,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
@@ -103,21 +103,21 @@ export function detectAllPrIssuesFromNodes(
     }
   }
 
-  // Check pending CI verifications before filtering.
+  // Check pending CI checks before filtering.
   // PRs that were "fixed" in a previous cycle need their CI status verified.
   for (const pr of prs) {
-    if (!isPendingVerification(pr.number)) continue;
+    if (!isPendingCICheck(pr.number)) continue;
     const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs);
     const hasCiFailure = currentIssues.includes('ci-failure');
     if (!hasCiFailure) {
       // CI passed — the fix worked, reset the fail counter
       resetFailCount(pr.number);
-      clearPendingVerification(pr.number);
+      clearPendingCICheck(pr.number);
       log(`  PR #${pr.number}: CI passed after fix — fail counter reset`);
     } else {
       // CI still failing — the fix didn't work, increment fail counter
       recordFailure(pr.number);
-      clearPendingVerification(pr.number);
+      clearPendingCICheck(pr.number);
       log(`  PR #${pr.number}: CI still failing after fix — incrementing fail counter`);
     }
   }

@@ -1,10 +1,10 @@
 /**
- * FactSourceCheckDot — Convenience wrapper that looks up FactBase verification
+ * FactSourceCheckDot — Convenience wrapper that looks up FactBase source-check
  * status for a fact by ID and renders a SourceCheckDot if found.
- * Returns null when no verification data exists.
+ * Returns null when no source-check data exists.
  */
 
-import { getFactBaseFactVerification } from "@data/factbase";
+import { getFactBaseFactSourceCheck } from "@data/factbase";
 import { SourceCheckDot } from "./SourceCheckDot";
 import { factbaseVerdictToStatus } from "./source-check-status";
 
@@ -19,12 +19,12 @@ export function FactSourceCheckDot({
   size?: "sm" | "md";
   className?: string;
 }) {
-  const verification = getFactBaseFactVerification(factId);
-  if (!verification) return null;
+  const sourceCheck = getFactBaseFactSourceCheck(factId);
+  if (!sourceCheck) return null;
   return (
     <SourceCheckDot
-      status={factbaseVerdictToStatus(verification)}
-      originalVerdict={verification}
+      status={factbaseVerdictToStatus(sourceCheck)}
+      originalVerdict={sourceCheck}
       sourceUrl={sourceUrl}
       size={size}
       className={className}

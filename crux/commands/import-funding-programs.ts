@@ -1075,7 +1075,7 @@ const PROGRAMS: FundingProgramDef[] = [
     divisionIdSeed: "div|aria|ta1-1-theory",
     name: "Safeguarded AI TA1.1 — Theory",
     description:
-      "22 projects on mathematical representations and formal semantics for world-models, specifications, and proofs. Covers category theory, probabilistic logic, string diagrams, and verification foundations.",
+      "22 projects on mathematical representations and formal semantics for world-models, specifications, and proofs. Covers category theory, probabilistic logic, string diagrams, and formal-verification foundations.",
     programType: "solicitation",
     totalBudget: 3_500_000,
     currency: "GBP",

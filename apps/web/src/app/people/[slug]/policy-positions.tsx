@@ -177,7 +177,7 @@ export function PolicyPositionsSection({
                         filledFieldCount: (pos.position ? 1 : 0) + (pos.policyStableId ? 1 : 0),
                       })}
                       verdict={verdict}
-                      sourceCheckHref={stakeholderId ? getSourceCheckHref("policy-stakeholder", stakeholderId) : undefined}
+                      sourcingHref={stakeholderId ? getSourceCheckHref("policy-stakeholder", stakeholderId) : undefined}
                     />
                   </td>
                 </tr>

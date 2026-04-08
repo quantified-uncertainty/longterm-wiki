@@ -70,7 +70,7 @@ export function FundingConnections({
                     filledFieldCount: (conn.amount ? 1 : 0) + (conn.date ? 1 : 0) + (conn.source ? 1 : 0),
                   })}
                   verdict={verdict}
-                  sourceCheckHref={getSourceCheckHref("grant", String(conn.key))}
+                  sourcingHref={getSourceCheckHref("grant", String(conn.key))}
                 />
               </div>
               <div className="flex items-center gap-2 flex-wrap">

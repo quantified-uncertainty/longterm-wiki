@@ -13,8 +13,8 @@ import {
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 
 // ---- Constants ----
 
@@ -82,7 +82,7 @@ const SyncSecondaryMarketPriceItemSchema = z.object({
   priceType: z.enum(VALID_PRICE_TYPES).default("last_trade"),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncBatchSchema = z.object({
@@ -396,7 +396,7 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
           },
         });
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -404,14 +404,14 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.companyId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
   });

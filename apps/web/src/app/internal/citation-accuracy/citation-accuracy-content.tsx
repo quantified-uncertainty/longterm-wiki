@@ -170,7 +170,7 @@ export async function CitationAccuracyContent() {
   return (
     <>
       <p className="text-muted-foreground">
-        Accuracy verification results from LLM-powered citation checking.{" "}
+        Accuracy source-check results from LLM-powered citation checking.{" "}
         <span className="font-medium text-foreground">
           {summary.checkedCitations}
         </span>{" "}
@@ -236,7 +236,7 @@ export async function CitationAccuracyContent() {
       {Object.keys(data.difficultyDistribution).length > 0 && (
         <div className="not-prose mb-6">
           <h3 className="text-sm font-semibold mb-3">
-            Verification Difficulty
+            Source Check Difficulty
           </h3>
           <div className="flex gap-2 flex-wrap">
             {Object.entries(data.difficultyDistribution)

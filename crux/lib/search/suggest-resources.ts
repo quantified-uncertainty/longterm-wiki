@@ -1,7 +1,7 @@
 /**
  * Resource Suggestion — ensure URLs have resource records and fresh content.
  *
- * Part of the claims-first verification pipeline (#3253).
+ * Part of the claims-first source-check pipeline (#3253).
  * Research agents call this before submitting claims that reference URLs.
  *
  * Flow:

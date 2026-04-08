@@ -1,7 +1,7 @@
 /**
  * Quote Report Script
  *
- * Shows statistics about citation quote extraction and verification
+ * Shows statistics about citation quote extraction and checking
  * across all processed pages.
  *
  * Usage:
@@ -76,7 +76,7 @@ async function main() {
   console.log(`  Pages processed:          ${stats.totalPages}`);
   if (stats.averageScore !== null) {
     console.log(
-      `  Average verification:     ${(stats.averageScore * 100).toFixed(0)}%`,
+      `  Average match score:     ${(stats.averageScore * 100).toFixed(0)}%`,
     );
   }
 

@@ -1,5 +1,5 @@
 /**
- * Unified Consistency Verification Command
+ * Unified Consistency Check Command
  *
  * Runs all three consistency validators and produces a combined report:
  *   1. Cross-entity consistency (person<->org, model<->org, bidirectional refs)
@@ -521,7 +521,7 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Unified Consistency Verification — run all consistency checks with a combined report
+Unified Consistency Check — run all consistency checks with a combined report
 
 Usage:
   crux w verify-consistency                     Run all consistency checks

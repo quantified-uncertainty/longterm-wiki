@@ -15,7 +15,7 @@ const SHARED_RULES = `
 - Use query_existing_records to see what data already exists before adding new records.
 - If you cannot find reliable data, say so — do not guess or make up records.
 
-## Claims-First Verification Workflow (preferred)
+## Claims-First Source-Check Workflow (preferred)
 When available, use the claims-first workflow for higher-quality data:
 1. After web_search, call **suggest_resources** with all URLs you plan to reference — this registers them and fetches their content.
 2. Extract specific, verifiable claims from the sources and submit them via **submit_claims** — each claim must reference a resourceId from step 1.

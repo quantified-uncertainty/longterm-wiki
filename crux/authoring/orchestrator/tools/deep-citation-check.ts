@@ -18,7 +18,7 @@ export const tool: ToolRegistration = {
   definition: {
     name: 'deep_citation_check',
     description:
-      'Extract and analyze all citations on the current page. Returns structured citation data: footnote numbers, URLs, link text, and surrounding claim context. Use this to identify uncited claims, duplicate sources, or weak citations before rewriting. For full LLM-based verification against source URLs, use audit_citations instead. Cost: $0 (local parsing).',
+      'Extract and analyze all citations on the current page. Returns structured citation data: footnote numbers, URLs, link text, and surrounding claim context. Use this to identify uncited claims, duplicate sources, or weak citations before rewriting. For full LLM-based source-check against source URLs, use audit_citations instead. Cost: $0 (local parsing).',
     input_schema: {
       type: 'object' as const,
       properties: {},

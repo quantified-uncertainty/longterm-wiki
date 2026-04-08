@@ -130,7 +130,7 @@ function DivisionCard({
               hasData: !!(d.lead || d.source),
             })}
             verdict={cardVerdict}
-            sourceCheckHref={cardSourceCheckHref}
+            sourcingHref={cardSourceCheckHref}
             className="relative z-10"
           />
           {d.website && (
@@ -415,7 +415,7 @@ export function DivisionsSection({
                         hasData: !!(d.lead || d.source),
                       })}
                       verdict={verdict?.verdict}
-                      sourceCheckHref={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
                     />
                   </td>
                 </tr>

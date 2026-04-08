@@ -1,7 +1,7 @@
 /**
  * Unified source-check status model.
  *
- * Maps all existing verification vocabularies (TableBase verdicts, FactBase verdicts)
+ * Maps all existing source-check vocabularies (TableBase verdicts, FactBase verdicts)
  * into a single 5-state model for display.
  *
  * States:
@@ -45,7 +45,7 @@ export const SOURCE_CHECK_STATUS_CONFIG: Record<
   failed: {
     dotColor: "bg-red-500",
     borderColor: "",
-    label: "Failed verification",
+    label: "Failed source check",
   },
   trouble: {
     dotColor: "bg-amber-500",
@@ -83,7 +83,7 @@ export function recordVerdictToStatus(
 
 // ── Mapping from FactBase (citation) verdicts ───────────────────────
 
-/** Verdicts from the citation verification system for KB facts */
+/** Verdicts from the citation source-check system for KB facts */
 const FACTBASE_VERDICT_MAP: Record<string, SourceCheckStatus> = {
   accurate: "verified",
   verified: "verified",

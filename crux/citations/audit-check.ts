@@ -1,7 +1,7 @@
 /**
- * Citation Audit Check — independent post-hoc verification CLI
+ * Citation Audit Check — independent post-hoc check CLI
  *
- * Stateless citation verification for a single wiki page. Extracts citations
+ * Stateless citation checking for a single wiki page. Extracts citations
  * from the page content, fetches source URLs (or uses the in-memory cache via
  * the source-fetcher module), and independently verifies each claim with a cheap
  * LLM call.

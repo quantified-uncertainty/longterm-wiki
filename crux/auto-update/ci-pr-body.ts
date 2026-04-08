@@ -72,9 +72,9 @@ export function buildPrBody(options: PrBodyOptions): string {
     sections.push('');
   }
 
-  // Citation verification
+  // Citation check
   if (citationSummary) {
-    sections.push('### Citation Verification');
+    sections.push('### Citation Check');
     sections.push('');
     sections.push(citationSummary);
     sections.push('');

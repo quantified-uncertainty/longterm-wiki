@@ -4,13 +4,13 @@ import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-or
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb, getDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { personnel, entities, things, sourceCheckVerdicts } from "../../schema.js";
+import { personnel, entities, things, sourceVerdicts } from "../../schema.js";
 import {
   verdictJoinCondition,
   verdictSelectFields,
-  formatVerification,
+  formatSourcing,
   type VerdictJoinFields,
-} from "../shared/verification-join.js";
+} from "../shared/source-check-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -25,10 +25,10 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
-import { InlineVerificationSchema } from "./verification-schema.js";
-import { writeInlineVerdicts, logVerificationCoverage } from "./write-inline-verdicts.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceVerification } from "../shared/verification-enforcement.js";
+import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
 import { sqlInList } from "../shared/query-helpers.js";
 
 // ---- Constants ----
@@ -72,7 +72,7 @@ const SyncPersonnelItemSchema = z.object({
   background: z.string().max(2000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-  verification: InlineVerificationSchema.optional(),
+  sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
@@ -146,7 +146,7 @@ function formatRow(r: JoinedRow) {
     syncedAt: p.syncedAt,
     createdAt: p.createdAt,
     updatedAt: p.updatedAt,
-    verification: formatVerification(r),
+    sourcing: formatSourcing(r),
   };
 }
 
@@ -191,7 +191,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -226,7 +226,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(whereClause)
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -258,7 +258,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(personnel)
       .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
       .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-      .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+      .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
       .where(eq(personnel.personId, personId))
       .orderBy(desc(personnel.syncedAt), personnel.id)
       .limit(limit)
@@ -295,7 +295,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         .from(personnel)
         .leftJoin(personEntity, eq(personnel.personEntityId, personEntity.stableId))
         .leftJoin(orgEntity, eq(personnel.orgEntityId, orgEntity.stableId))
-        .leftJoin(sourceCheckVerdicts, verdictJoinCondition("personnel", personnel.id))
+        .leftJoin(sourceVerdicts, verdictJoinCondition("personnel", personnel.id))
         .where(brokenCondition)
         .orderBy(personnel.organizationId, personnel.personId)
         .limit(LIMIT),
@@ -356,10 +356,10 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Phase 5 (Discussion #3875): Verification enforcement — checks both server-side
-    // config and client ?requireVerification=true param. See verification-enforcement.ts.
-    const verificationError = enforceVerification(c, "personnel", items);
-    if (verificationError) return verificationError;
+    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
+    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
+    const sourceCheckError = enforceSourceCheck(c, "personnel", items);
+    if (sourceCheckError) return sourceCheckError;
 
     // Check for natural key collisions within the batch itself.
     // Natural key: (personId, organizationId, role, roleType)
@@ -519,7 +519,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         })
       );
 
-      // Write inline verification verdicts atomically within the same transaction
+      // Write inline source-check verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -527,14 +527,14 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           recordId: item.id,
           entityId: item.organizationId,
           sourceUrl: item.source ?? null,
-          verification: item.verification ?? null,
+          sourcing: item.sourcing ?? null,
         }))
       );
 
       upserted = allVals.length;
     });
 
-    logVerificationCoverage("personnel/sync", items.length, verdictsResult.written);
+    logSourceCheckCoverage("personnel/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

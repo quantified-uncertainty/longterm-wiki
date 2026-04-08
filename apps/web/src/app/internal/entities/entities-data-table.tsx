@@ -102,7 +102,7 @@ export interface UnifiedEntityRow {
   accuracyActual: number | null;
   accuracyTotal: number | null;
   accuracy: "green" | "amber" | "red" | null;
-  // Source-check verification
+  // Source-check
   scConfirmed: number | null;
   scContradicted: number | null;
   scOutdated: number | null;
@@ -112,7 +112,7 @@ export interface UnifiedEntityRow {
   scTotalVerdicts: number | null;
   scAvgConfidence: number | null;
   scAccuracyRate: number | null;
-  scVerificationCoverage: number | null;
+  scSourceCheckCoverage: number | null;
   // Entity-resource links
   resourceLinkCount: number;
 }
@@ -455,7 +455,7 @@ const COLUMN_LABELS: Record<string, string> = {
   referencesCov: "References",
   quotesCov: "Quotes Verified",
   accuracyCov: "Accuracy Verified",
-  // Source-check verification
+  // Source-check
   scVerdictBar: "Verdict Distribution",
   scConfirmed: "Confirmed",
   scContradicted: "Contradicted",
@@ -466,7 +466,7 @@ const COLUMN_LABELS: Record<string, string> = {
   scTotalVerdicts: "Total Verdicts",
   scAvgConfidence: "Avg Confidence",
   scAccuracyRate: "Accuracy Rate",
-  scVerificationCoverage: "Verification %",
+  scSourceCheckCoverage: "Source Check %",
 };
 
 const columns: ColumnDef<UnifiedEntityRow>[] = [
@@ -808,7 +808,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
   },
   {
     accessorKey: "citationAccuracyChecked",
-    header: ({ column }) => <SortableHeader column={column} title="Citations with accuracy verification">CitA</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column} title="Citations with accuracy source-check">CitA</SortableHeader>,
     cell: ({ row }) => {
       const v = row.original.citationAccuracyChecked;
       if (v == null) return <Dash />;
@@ -940,7 +940,7 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     cell: ({ row }) => <RatioCell actual={row.original.accuracyActual} total={row.original.accuracyTotal} status={row.original.accuracy} />,
     sortUndefined: "last",
   },
-  // --- Source-Check Verification ---
+  // --- Source-Check ---
   {
     id: "scVerdictBar",
     accessorFn: (row) => row.scTotalVerdicts,
@@ -1013,11 +1013,11 @@ const columns: ColumnDef<UnifiedEntityRow>[] = [
     cell: ({ row }) => <AccuracyRing value={row.original.scAccuracyRate} />,
   },
   {
-    accessorKey: "scVerificationCoverage",
+    accessorKey: "scSourceCheckCoverage",
     sortUndefined: "last",
-    header: ({ column }) => <SortableHeader column={column} title="Verification coverage: verdicts / total records">VCov</SortableHeader>,
+    header: ({ column }) => <SortableHeader column={column} title="Source-check coverage: verdicts / total records">VCov</SortableHeader>,
     cell: ({ row }) => {
-      const v = row.original.scVerificationCoverage;
+      const v = row.original.scSourceCheckCoverage;
       if (v == null) return <Dash />;
       const pct = Math.round(v * 100);
       const color = pct >= 80 ? "text-emerald-500" : pct >= 40 ? "text-amber-500" : "text-red-400";
@@ -1121,16 +1121,16 @@ const PRESETS: Record<string, Preset> = {
     columns: ["title", "priorityScore", "quality", "readerImportance", "researchImportance", "riskLevel", "lastUpdated", "wordCount", "entityType"],
     defaultSort: [{ id: "priorityScore", desc: true }],
   },
-  verification: {
-    label: "Verification",
-    description: "Source-check verification status: accuracy rates, coverage, and verdict breakdown",
-    columns: ["title", "entityType", "scAccuracyRate", "scVerificationCoverage", "scVerdictBar", "scConfirmed", "scContradicted", "scOutdated", "scAvgConfidence"],
+  sourceCheck: {
+    label: "Source Check",
+    description: "Source-check status: accuracy rates, coverage, and verdict breakdown",
+    columns: ["title", "entityType", "scAccuracyRate", "scSourceCheckCoverage", "scVerdictBar", "scConfirmed", "scContradicted", "scOutdated", "scAvgConfidence"],
     defaultSort: [{ id: "scVerdictBar", desc: true }],
   },
   worstEntities: {
     label: "Worst Entities",
     description: "Entities with the most contradicted or problematic source-check verdicts",
-    columns: ["title", "entityType", "scContradicted", "scOutdated", "scPartial", "scAccuracyRate", "scVerdictBar", "scVerificationCoverage", "quality", "riskLevel"],
+    columns: ["title", "entityType", "scContradicted", "scOutdated", "scPartial", "scAccuracyRate", "scVerdictBar", "scSourceCheckCoverage", "quality", "riskLevel"],
     defaultSort: [{ id: "scContradicted", desc: true }],
   },
   all: {

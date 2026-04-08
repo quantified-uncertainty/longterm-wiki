@@ -28,10 +28,10 @@ export interface GrantRow {
   // For grants received:
   funderName?: string;
   funderHref?: string | null;
-  /** Source-check verification verdict (null if not checked) */
-  verificationVerdict?: string | null;
+  /** Source-check verdict (null if not checked) */
+  sourcingVerdict?: string | null;
   /** Link to source-check detail page */
-  sourceCheckHref?: string;
+  sourcingHref?: string;
 }
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
@@ -54,7 +54,7 @@ const ServerGrantSchema = z.object({
   source: z.string().nullable(),
   notes: z.string().nullable(),
   programId: z.string().nullable(),
-  verification: z.object({
+  sourcing: z.object({
     verdict: z.string(),
     confidence: z.number().nullable(),
     sourcesChecked: z.number(),
@@ -92,8 +92,8 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     divisionName: null,
     notes: g.notes,
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
-    verificationVerdict: g.verification?.verdict ?? null,
-    sourceCheckHref: g.verification?.verdict
+    sourcingVerdict: g.sourcing?.verdict ?? null,
+    sourcingHref: g.sourcing?.verdict
       ? `/source-checks/grant/${encodeURIComponent(g.id)}`
       : undefined,
   };
@@ -207,7 +207,7 @@ const ALL_COLUMNS: ColumnDef[] = [
     label: "\u2713",
     defaultVisible: true,
     align: "center",
-    onlyIfData: (rows) => rows.some((r) => r.verificationVerdict),
+    onlyIfData: (rows) => rows.some((r) => r.sourcingVerdict),
   },
 ];
 
@@ -311,7 +311,7 @@ export function InteractiveGrantsTable({
           cmp = (a.notes ?? "").localeCompare(b.notes ?? "");
           break;
         case "verified":
-          cmp = (a.verificationVerdict ?? "").localeCompare(b.verificationVerdict ?? "");
+          cmp = (a.sourcingVerdict ?? "").localeCompare(b.sourcingVerdict ?? "");
           break;
       }
       return localSortDir === "asc" ? cmp : -cmp;
@@ -781,8 +781,8 @@ function CellContent({
             program: grant.programName,
             status: grant.status,
           })}
-          verdict={grant.verificationVerdict}
-          sourceCheckHref={grant.sourceCheckHref}
+          verdict={grant.sourcingVerdict}
+          sourcingHref={grant.sourcingHref}
         />
       );
     default:

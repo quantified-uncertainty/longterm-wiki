@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as HoverCard from "@radix-ui/react-hover-card";
-import { SourceCheckDot } from "@/components/verification/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/verification/source-check-status";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
@@ -657,7 +657,7 @@ function ProfileSection({
                   </th>
                 ))}
                 {section.recordType && (
-                  <th className="px-2 py-2 w-8 border-b border-border/40" title="Verification status">
+                  <th className="px-2 py-2 w-8 border-b border-border/40" title="Source check status">
                     <ShieldCheck className="h-3 w-3 text-muted-foreground/50" />
                   </th>
                 )}
@@ -1181,7 +1181,7 @@ export function EntityProfileViewer({
     const totalRecords = data.sections.reduce((sum, s) => sum + s.total, 0);
     const populated = data.sections.filter((s) => s.total > 0).length;
     const verifiedCount = Object.keys(data.verdicts).length;
-    // Only count records from sections that support verification (have recordType)
+    // Only count records from sections that support source checking (have recordType)
     const verifiableRecords = data.sections
       .filter((s) => s.recordType)
       .reduce((sum, s) => sum + s.total, 0);

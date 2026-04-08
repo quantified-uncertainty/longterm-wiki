@@ -123,7 +123,7 @@ export function FundingHistorySection({
                         instrument,
                       })}
                       verdict={roundVerdict}
-                      sourceCheckHref={getSourceCheckHref("funding-round", String(round.key))}
+                      sourcingHref={getSourceCheckHref("funding-round", String(round.key))}
                     />
                   </td>
                 </tr>
@@ -220,7 +220,7 @@ export function InvestorParticipationSection({
                         filledFieldCount: (amount != null ? 1 : 0) + (roundName ? 1 : 0) + (date ? 1 : 0),
                       })}
                       verdict={invVerdict}
-                      sourceCheckHref={getSourceCheckHref("investment", String(inv.key))}
+                      sourcingHref={getSourceCheckHref("investment", String(inv.key))}
                     />
                   </td>
                 </tr>
@@ -297,7 +297,7 @@ export function ProductsSection({
                         filledFieldCount: (field(prod, "status") ? 1 : 0) + (field(prod, "website") ? 1 : 0),
                       })}
                       verdict={prodVerdict}
-                      sourceCheckHref={getSourceCheckHref("product", String(prod.key))}
+                      sourcingHref={getSourceCheckHref("product", String(prod.key))}
                     />
                   </td>
                 </tr>
@@ -393,7 +393,7 @@ export function SafetyMilestonesSection({
                         filledFieldCount: (field(ms, "date") ? 1 : 0) + (field(ms, "source") ? 1 : 0),
                       })}
                       verdict={msVerdict}
-                      sourceCheckHref={getSourceCheckHref("safety-milestone", String(ms.key))}
+                      sourcingHref={getSourceCheckHref("safety-milestone", String(ms.key))}
                     />
                   </td>
                 </tr>
@@ -497,7 +497,7 @@ export function StrategicPartnershipsSection({
                         filledFieldCount: (field(sp, "date") ? 1 : 0) + (field(sp, "partner") ? 1 : 0),
                       })}
                       verdict={spVerdict}
-                      sourceCheckHref={getSourceCheckHref("strategic-partnership", String(sp.key))}
+                      sourcingHref={getSourceCheckHref("strategic-partnership", String(sp.key))}
                     />
                   </td>
                 </tr>

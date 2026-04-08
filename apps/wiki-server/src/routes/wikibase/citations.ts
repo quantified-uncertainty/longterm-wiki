@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, avg, sql, asc, desc, isNotNull, lt } from "drizzle-orm";
 import { getDrizzleDb, getDb, beginTransaction } from "../../db.js";
-import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, sourceCheckEvidence, sourceCheckVerdicts, entities, resourceContentVersions } from "../../schema.js";
+import { citationQuotes, citationContent, citationAccuracySnapshots, wikiPages, resources, recordSources, sourceVerdicts, entities, resourceContentVersions } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
   validationError,
@@ -91,7 +91,7 @@ async function dualWriteToSourceCheck(
   const checkerModelVal = "citation-accuracy-check";
 
   const evidenceUpdated = await db
-    .update(sourceCheckEvidence)
+    .update(recordSources)
     .set({
       entityId,
       expectedValue: params.claimText.slice(0, 2000),
@@ -103,17 +103,17 @@ async function dualWriteToSourceCheck(
     })
     .where(
       and(
-        eq(sourceCheckEvidence.recordType, "citation"),
-        eq(sourceCheckEvidence.recordId, recordId),
-        sql`COALESCE(${sourceCheckEvidence.sourceUrl}, '') = ${sourceUrlVal || ""}`,
-        sql`COALESCE(${sourceCheckEvidence.checkerModel}, '') = ${checkerModelVal}`,
+        eq(recordSources.recordType, "citation"),
+        eq(recordSources.recordId, recordId),
+        sql`COALESCE(${recordSources.sourceUrl}, '') = ${sourceUrlVal || ""}`,
+        sql`COALESCE(${recordSources.checkerModel}, '') = ${checkerModelVal}`,
       )
     )
-    .returning({ id: sourceCheckEvidence.id });
+    .returning({ id: recordSources.id });
 
   if (evidenceUpdated.length === 0) {
     try {
-      await db.insert(sourceCheckEvidence).values({
+      await db.insert(recordSources).values({
         recordType: "citation", recordId, entityId,
         expectedValue: params.claimText.slice(0, 2000),
         sourceUrl: sourceUrlVal || null, verdict: mappedVerdict,
@@ -128,7 +128,7 @@ async function dualWriteToSourceCheck(
   }
 
   const verdictUpdated = await db
-    .update(sourceCheckVerdicts)
+    .update(sourceVerdicts)
     .set({
       entityId,
       displayName: displayName.slice(0, 500),
@@ -141,16 +141,16 @@ async function dualWriteToSourceCheck(
     })
     .where(
       and(
-        eq(sourceCheckVerdicts.recordType, "citation"),
-        eq(sourceCheckVerdicts.recordId, recordId),
-        sql`COALESCE(${sourceCheckVerdicts.fieldName}, '') = ${""}`,
+        eq(sourceVerdicts.recordType, "citation"),
+        eq(sourceVerdicts.recordId, recordId),
+        sql`COALESCE(${sourceVerdicts.fieldName}, '') = ${""}`,
       )
     )
-    .returning({ recordId: sourceCheckVerdicts.recordId });
+    .returning({ recordId: sourceVerdicts.recordId });
 
   if (verdictUpdated.length === 0) {
     try {
-      await db.insert(sourceCheckVerdicts).values({
+      await db.insert(sourceVerdicts).values({
         recordType: "citation", recordId, fieldName: null,
         entityId, displayName: displayName.slice(0, 500),
         entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
@@ -1329,7 +1329,7 @@ const citationsApp = new Hono()
 
   // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
   // Backward propagation from claims → citation_quotes is no longer needed
-  // since claims is now the single source of truth for verification data.
+  // since claims is now the single source of truth for source-check data.
 
   // ---- GET /source-type-stats ----
   .get("/source-type-stats", async (c) => {

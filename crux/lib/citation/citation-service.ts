@@ -1,7 +1,7 @@
 /**
- * Unified Citation Service — single entry point for all citation verification
+ * Unified Citation Service — single entry point for all citation checking
  *
- * Consolidates the two verification paths:
+ * Consolidates the two check paths:
  *   1. HTTP-only ("http"): fetch each URL, check HTTP status → verified/broken/unverifiable
  *   2. LLM-based ("llm"): fetch each URL, then verify claims against source text via LLM
  *
@@ -16,7 +16,7 @@
  *   // Quick HTTP check
  *   const httpResult = await verifyCitations({ content, mode: 'http' });
  *
- *   // Full LLM verification
+ *   // Full LLM source-check
  *   const llmResult = await verifyCitations({ content, mode: 'llm', fetchMissing: true });
  *
  * Part of the citation consolidation initiative (#1479).
@@ -42,11 +42,11 @@ import { stripFrontmatter } from '../patterns.ts';
 // Public types
 // ---------------------------------------------------------------------------
 
-/** Verification mode. */
-export type VerificationMode = 'http' | 'llm';
+/** Check mode. */
+export type CheckMode = 'http' | 'llm';
 
-/** Status from HTTP-only verification. */
-export type HttpVerificationStatus = 'verified' | 'broken' | 'unverifiable';
+/** Status from HTTP-only check. */
+export type HttpCheckStatus = 'verified' | 'broken' | 'unverifiable';
 
 /** Result for a single citation (HTTP mode). */
 export interface HttpCitationResult {
@@ -58,12 +58,12 @@ export interface HttpCitationResult {
   pageTitle: string | null;
   contentSnippet: string | null;
   contentLength: number;
-  status: HttpVerificationStatus;
+  status: HttpCheckStatus;
   error: string | null;
 }
 
-/** Aggregate result for HTTP-mode verification. */
-export interface HttpVerificationResult {
+/** Aggregate result for HTTP-mode check. */
+export interface HttpSourceCheckResult {
   mode: 'http';
   citations: HttpCitationResult[];
   summary: {
@@ -74,8 +74,8 @@ export interface HttpVerificationResult {
   };
 }
 
-/** Aggregate result for LLM-mode verification. */
-export interface LlmVerificationResult {
+/** Aggregate result for LLM-mode check. */
+export interface LlmSourceCheckResult {
   mode: 'llm';
   /** Per-citation LLM verdicts (from citation-auditor). */
   citations: CitationAudit[];
@@ -85,15 +85,15 @@ export interface LlmVerificationResult {
 }
 
 /** Union result type — discriminated on `mode`. */
-export type VerificationResult = HttpVerificationResult | LlmVerificationResult;
+export type SourceCheckResult = HttpSourceCheckResult | LlmSourceCheckResult;
 
 /** Options for verifyCitations(). */
 export interface VerifyCitationsRequest {
   /** Raw MDX content (with or without frontmatter). */
   content: string;
 
-  /** Verification mode: 'http' for quick status check, 'llm' for claim verification. */
-  mode: VerificationMode;
+  /** Check mode: 'http' for quick status check, 'llm' for claim source-check. */
+  mode: CheckMode;
 
   // ---- HTTP mode options ----
 
@@ -112,7 +112,7 @@ export interface VerifyCitationsRequest {
   fetchMissing?: boolean;
   /** Fraction of citations that must be verified for pass=true. Default: 0.8. */
   passThreshold?: number;
-  /** LLM model for verification. LLM mode only. */
+  /** LLM model for source-check. LLM mode only. */
   model?: string;
   /** Max concurrent LLM calls. Default: 3. LLM mode only. */
   llmConcurrency?: number;
@@ -124,10 +124,10 @@ export interface VerifyCitationsRequest {
 }
 
 // ---------------------------------------------------------------------------
-// HTTP-only verification (extracted from citation-archive.verifyCitationsForPage)
+// HTTP-only check (extracted from citation-archive.verifyCitationsForPage)
 // ---------------------------------------------------------------------------
 
-function httpStatusToVerification(httpStatus: number): HttpVerificationStatus {
+function httpStatusToCheck(httpStatus: number): HttpCheckStatus {
   if (httpStatus === 0) return 'unverifiable';
   if (httpStatus >= 200 && httpStatus < 400) return 'verified';
   return 'broken';
@@ -136,7 +136,7 @@ function httpStatusToVerification(httpStatus: number): HttpVerificationStatus {
 async function verifyHttp(
   content: string,
   opts: VerifyCitationsRequest,
-): Promise<HttpVerificationResult> {
+): Promise<HttpSourceCheckResult> {
   const concurrency = opts.concurrency ?? 5;
   const delayMs = opts.delayMs ?? 1000;
   const verbose = opts.verbose ?? false;
@@ -160,7 +160,7 @@ async function verifyHttp(
         if (source.status === 'error') errorMsg = 'fetch error';
         else if (source.status === 'dead') errorMsg = `HTTP ${source.httpStatus}`;
 
-        const status = httpStatusToVerification(source.httpStatus);
+        const status = httpStatusToCheck(source.httpStatus);
 
         const result: HttpCitationResult = {
           footnote: ext.footnote,
@@ -205,13 +205,13 @@ async function verifyHttp(
 }
 
 // ---------------------------------------------------------------------------
-// LLM verification (delegates to citation-auditor)
+// LLM source-check (delegates to citation-auditor)
 // ---------------------------------------------------------------------------
 
 async function verifyLlm(
   content: string,
   opts: VerifyCitationsRequest,
-): Promise<LlmVerificationResult> {
+): Promise<LlmSourceCheckResult> {
   const request: AuditRequest = {
     content,
     sourceCache: opts.sourceCache,
@@ -241,15 +241,15 @@ async function verifyLlm(
 /**
  * Verify citations in MDX content.
  *
- * @param request - Verification options including content and mode.
- * @returns VerificationResult discriminated by mode ('http' or 'llm').
+ * @param request - Check options including content and mode.
+ * @returns SourceCheckResult discriminated by mode ('http' or 'llm').
  *
  * HTTP mode: Fetches each URL and checks HTTP status. Fast, no LLM cost.
  * LLM mode: Fetches sources and verifies claims against source text via LLM.
  */
 export async function verifyCitations(
   request: VerifyCitationsRequest,
-): Promise<VerificationResult> {
+): Promise<SourceCheckResult> {
   if (request.mode === 'http') {
     return verifyHttp(request.content, request);
   }

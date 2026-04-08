@@ -26,7 +26,7 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
- *   --force        Override soft-enforcement blocks (e.g., verification coverage)
+ *   --force        Override soft-enforcement blocks (e.g., source-check coverage)
  *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
  *                    unified-blocking + yaml-schema (no stamp cache written)
  *
@@ -639,10 +639,10 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
-    id: 'verification-coverage',
-    name: 'TableBase verification coverage',
+    id: 'source-check-coverage',
+    name: 'TableBase source-check coverage',
     command: 'npx',
-    args: ['tsx', 'crux/validate/validate-verification-coverage.ts',
+    args: ['tsx', 'crux/validate/validate-source-check-coverage.ts',
       // Advisory until existing unverified manifests are backfilled (Discussion #3875).
       // Switch to --enforcement=soft after personnel/grants backfill is complete.
       '--enforcement=advisory',

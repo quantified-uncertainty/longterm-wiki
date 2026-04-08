@@ -19,7 +19,7 @@ vi.mock('../wiki-server/client.ts', () => ({
   apiRequest: vi.fn(),
 }));
 
-vi.mock('../wiki-server/verifications.ts', () => ({
+vi.mock('../wiki-server/source-check-client.ts', () => ({
   listVerdicts: vi.fn().mockResolvedValue({
     ok: true,
     data: { verdicts: [], total: 0 },

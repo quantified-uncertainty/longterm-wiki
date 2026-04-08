@@ -63,7 +63,7 @@ export async function DataSourcesContent() {
     <>
       <p className="text-muted-foreground text-sm leading-relaxed mb-6">
         Structured data sources for grants, personnel, and investments —
-        tracked with versioned snapshots and deterministic verification.
+        tracked with versioned snapshots and deterministic source checking.
       </p>
 
       <DataSourceBanner source="api" />

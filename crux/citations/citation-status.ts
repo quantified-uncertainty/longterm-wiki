@@ -1,5 +1,5 @@
 /**
- * Citation Status — show verification results for a page
+ * Citation Status — show source-check results for a page
  *
  * Usage:
  *   pnpm crux citations status <page-id>

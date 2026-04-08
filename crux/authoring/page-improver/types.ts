@@ -140,7 +140,7 @@ export interface PipelineOptions {
    */
   skipCitationAudit?: boolean;
   /**
-   * LLM model for per-citation verification (passed to citation-auditor).
+   * LLM model for per-citation checking (passed to citation-auditor).
    * Defaults to the citation-auditor default (google/gemini-2.0-flash-001).
    */
   citationAuditModel?: string;

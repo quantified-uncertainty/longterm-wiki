@@ -13,7 +13,7 @@ interface CoverageRow {
 
 /**
  * Visual coverage summary with horizontal progress bars per record type.
- * Fetches data from the /api/verification-coverage-proxy endpoint.
+ * Fetches data from the /api/source-check-coverage-proxy endpoint.
  */
 export function CoverageBars() {
   const [coverage, setCoverage] = useState<CoverageRow[]>([]);
@@ -23,7 +23,7 @@ export function CoverageBars() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/verification-coverage-proxy");
+        const res = await fetch("/api/source-check-coverage-proxy");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setCoverage(data.coverage ?? []);
