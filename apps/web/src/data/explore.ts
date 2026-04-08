@@ -174,7 +174,7 @@ export function getExploreItems(): ExploreItem[] {
         id: page.id,
         wikiId: db.idRegistry!.bySlug[page.id],
         title: page.title,
-        type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : CATEGORY_TO_TYPE[page.category] || "concept",
+        type: page.contentFormat === "table" ? "table" : page.contentFormat === "diagram" ? "diagram" : page.category === "internal" ? "internal" : page.id.endsWith("-overview") ? "overview" : CATEGORY_TO_TYPE[page.category] || "concept",
         description: rawPageDesc ? stripMdxEscapes(rawPageDesc) : null,
         tags: page.tags || [],
         clusters: page.clusters || [],
