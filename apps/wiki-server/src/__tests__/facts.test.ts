@@ -362,6 +362,69 @@ describe("Facts API", () => {
       const body = await res.json();
       expect(body.error).toBe("invalid_json");
     });
+
+    // Issue #4017 — numeric formats with NULL columns previously got
+    // silently coerced to 0 on read. Reject them at the write boundary.
+    it("rejects format=number with null numeric (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-number",
+            value: "unknown",
+            numeric: null,
+            format: "number",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects format=min with null numeric (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-min",
+            value: "≥unknown",
+            numeric: null,
+            format: "min",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects format=range with null low/high (issue #4017)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "bad-range",
+            value: "?",
+            low: null,
+            high: null,
+            format: "range",
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("accepts format=number with explicit zero (real zero is not null)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "real-zero",
+            value: "0",
+            numeric: 0,
+            format: "number",
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+    });
   });
 
   // ---- By Entity ----

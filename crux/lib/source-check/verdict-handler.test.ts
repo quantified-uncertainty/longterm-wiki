@@ -6,7 +6,8 @@
  * 1. Successful evidence storage — correct body construction, field truncation
  * 2. Successful verdict storage — correct body construction
  * 3. Resource ID resolution — looked up from URL when not supplied
- * 4. Error handling — warnings logged but not thrown on API failure
+ * 4. Error handling — warnings logged AND errors thrown on API failure
+ *    (changed from silent .resolves in #4017 to surface lost primary-data writes)
  * 5. Edge cases — null/empty fields, optional fields, custom logPrefix
  */
 
@@ -132,8 +133,9 @@ describe('storeSourceCheckEvidence', () => {
     expect(body.resourceId).toBe('preresolved-id');
   });
 
-  it('sets resourceId to null when lookup fails', async () => {
+  it('sets resourceId to null AND logs warning when lookup fails (issue #4017)', async () => {
     mockLookupResourceByUrl.mockRejectedValueOnce(new Error('network error'));
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     await storeSourceCheckEvidence({
       recordType: 'grant',
@@ -147,6 +149,13 @@ describe('storeSourceCheckEvidence', () => {
 
     const body = mockStoreEvidence.mock.calls[0][0];
     expect(body.resourceId).toBeNull();
+
+    // The lookup failure used to be a silent `catch {}` — now it warns so the
+    // operator can see why evidence rows have NULL resourceId.
+    expect(warnSpy).toHaveBeenCalledOnce();
+    expect(warnSpy.mock.calls[0][0]).toContain('Resource lookup failed');
+    expect(warnSpy.mock.calls[0][0]).toContain('NULL resourceId');
+    warnSpy.mockRestore();
   });
 
   it('truncates extractedValue to 2000 chars', async () => {
@@ -197,11 +206,11 @@ describe('storeSourceCheckEvidence', () => {
     expect((body.recordId as string).length).toBe(500);
   });
 
-  it('logs a warning (not throws) when storeEvidence returns not-ok', async () => {
+  // Issue #4017 — primary-data writes must surface failures.
+  it('throws AND warns when storeEvidence returns not-ok (issue #4017)', async () => {
     mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'server error' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    // Should resolve without throwing
     await expect(
       storeSourceCheckEvidence({
         recordType: 'grant',
@@ -212,7 +221,7 @@ describe('storeSourceCheckEvidence', () => {
         extractedValue: '',
         reasoning: '',
       }),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow(/grant\/grant-1/);
 
     expect(warnSpy).toHaveBeenCalledOnce();
     expect(warnSpy.mock.calls[0][0]).toContain('grant/grant-1');
@@ -223,18 +232,21 @@ describe('storeSourceCheckEvidence', () => {
     mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'oops' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    await storeSourceCheckEvidence(
-      {
-        recordType: 'personnel',
-        recordId: 'p-1',
-        sourceUrl: '',
-        verdict: 'inconclusive',
-        confidence: 0.4,
-        extractedValue: '',
-        reasoning: '',
-      },
-      '[custom-prefix]',
-    );
+    // Catches the throw to keep the test focused on the warning text.
+    await expect(
+      storeSourceCheckEvidence(
+        {
+          recordType: 'personnel',
+          recordId: 'p-1',
+          sourceUrl: '',
+          verdict: 'inconclusive',
+          confidence: 0.4,
+          extractedValue: '',
+          reasoning: '',
+        },
+        '[custom-prefix]',
+      ),
+    ).rejects.toThrow();
 
     expect(warnSpy.mock.calls[0][0]).toContain('[custom-prefix]');
     warnSpy.mockRestore();
@@ -389,7 +401,8 @@ describe('storeAggregateVerdict', () => {
     expect(body).not.toHaveProperty('entityDisplayName');
   });
 
-  it('logs a warning (not throws) when storeVerdict returns not-ok', async () => {
+  // Issue #4017 — primary-data writes must surface failures.
+  it('throws AND warns when storeVerdict returns not-ok (issue #4017)', async () => {
     mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'server error' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
@@ -402,7 +415,7 @@ describe('storeAggregateVerdict', () => {
         reasoning: '',
         sourcesChecked: 1,
       }),
-    ).resolves.toBeUndefined();
+    ).rejects.toThrow(/grant\/grant-1/);
 
     expect(warnSpy).toHaveBeenCalledOnce();
     expect(warnSpy.mock.calls[0][0]).toContain('grant/grant-1');
@@ -413,17 +426,19 @@ describe('storeAggregateVerdict', () => {
     mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'oops' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    await storeAggregateVerdict(
-      {
-        recordType: 'personnel',
-        recordId: 'p-1',
-        verdict: 'contradicted',
-        confidence: 0.2,
-        reasoning: '',
-        sourcesChecked: 1,
-      },
-      '[factbase-check]',
-    );
+    await expect(
+      storeAggregateVerdict(
+        {
+          recordType: 'personnel',
+          recordId: 'p-1',
+          verdict: 'contradicted',
+          confidence: 0.2,
+          reasoning: '',
+          sourcesChecked: 1,
+        },
+        '[factbase-check]',
+      ),
+    ).rejects.toThrow();
 
     expect(warnSpy.mock.calls[0][0]).toContain('[factbase-check]');
     warnSpy.mockRestore();

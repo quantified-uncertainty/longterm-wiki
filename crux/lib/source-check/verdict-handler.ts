@@ -14,6 +14,11 @@ import type { SourceCheckVerdict, RecordType } from '../../../apps/wiki-server/s
 /**
  * Store individual source-check evidence in the wiki-server.
  *
+ * Throws on storage failure. Previously this function logged a warning and
+ * resolved silently, which let primary-data writes vanish without surfacing
+ * to the caller — see issue #4017. Callers that need fire-and-forget semantics
+ * must wrap the call in try/catch.
+ *
  * @param params - Evidence parameters
  * @param logPrefix - Prefix for warning messages (default: '[source-check]')
  */
@@ -39,8 +44,13 @@ export async function storeSourceCheckEvidence(params: {
       if (resource.ok) {
         resolvedResourceId = resource.data.id;
       }
-    } catch {
-      // Best-effort: resource lookup failure should not block evidence storage
+    } catch (e: unknown) {
+      // Best-effort: resource lookup failure should not block evidence storage,
+      // but log so the failure is visible in the operator's terminal. Without
+      // this warning, evidence rows quietly land with NULL resourceId — issue #4017.
+      console.warn(
+        `${logPrefix} Resource lookup failed for ${params.sourceUrl}: ${e instanceof Error ? e.message : String(e)} — storing evidence with NULL resourceId`,
+      );
     }
   }
 
@@ -66,12 +76,16 @@ export async function storeSourceCheckEvidence(params: {
   const response = await storeEvidenceRpc(body);
 
   if (!response.ok) {
-    console.warn(`${logPrefix} Failed to store evidence for ${params.recordType}/${params.recordId}: ${response.error}`);
+    const message = `Failed to store evidence for ${params.recordType}/${params.recordId}: ${response.error}`;
+    console.warn(`${logPrefix} ${message}`);
+    throw new Error(message);
   }
 }
 
 /**
  * Store an aggregate verdict for a record.
+ *
+ * Throws on storage failure (see {@link storeSourceCheckEvidence} for rationale).
  *
  * @param params - Verdict parameters
  * @param logPrefix - Prefix for warning messages (default: '[source-check]')
@@ -105,6 +119,8 @@ export async function storeAggregateVerdict(params: {
   const response = await storeVerdictRpc(body);
 
   if (!response.ok) {
-    console.warn(`${logPrefix} Failed to store verdict for ${params.recordType}/${params.recordId}: ${response.error}`);
+    const message = `Failed to store verdict for ${params.recordType}/${params.recordId}: ${response.error}`;
+    console.warn(`${logPrefix} ${message}`);
+    throw new Error(message);
   }
 }

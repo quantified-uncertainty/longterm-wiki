@@ -195,7 +195,7 @@ const claimsApp = new Hono()
         SELECT * FROM unnest(
           ${claims.map(() => batchId)}::text[],
           ${claims.map((cl) => cl.claimText)}::text[],
-          ${claims.map(() => entityId ?? null)}::text[],
+          ${claims.map(() => entityId)}::text[],
           ${claims.map(() => targetTable)}::text[],
           ${claims.map((cl) => cl.targetField ?? null)}::text[],
           ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
@@ -228,7 +228,7 @@ const claimsApp = new Hono()
           claimIds: chunk,
           resourceId,
           batchId,
-          entityId: entityId ?? null,
+          entityId,
         };
 
         const jobRows = await tx<InsertedJobRow[]>`

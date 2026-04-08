@@ -75,7 +75,8 @@ describe("reconstructFactValue", () => {
       numeric: 380000000000,
       value: "380000000000",
     }));
-    expect(result.type).toBe("number");
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("number");
     expect(result).toEqual({ type: "number", value: 380000000000 });
   });
 
@@ -86,7 +87,8 @@ describe("reconstructFactValue", () => {
       high: 80000000000,
       value: "53000000000–80000000000",
     }));
-    expect(result.type).toBe("range");
+    expect(result).not.toBeNull();
+    expect(result!.type).toBe("range");
     expect(result).toEqual({ type: "range", low: 53000000000, high: 80000000000 });
   });
 
@@ -118,5 +120,40 @@ describe("reconstructFactValue", () => {
   it("json format falls back to text for invalid JSON", () => {
     const result = reconstructFactValue(makeRow({ format: "json", value: "not json" }));
     expect(result).toEqual({ type: "text", value: "not json" });
+  });
+
+  // ── Malformed numeric rows (issue #4017) ──────────────────────
+  // Previously these returned `value: 0` (or `low: 0, high: 0`), making
+  // missing data look identical to a stored zero. They now return null so
+  // the calling /export route can skip the row from the response.
+
+  it("number format with NULL numeric returns null (NOT value: 0)", () => {
+    const result = reconstructFactValue(makeRow({ format: "number", numeric: null }));
+    expect(result).toBeNull();
+  });
+
+  it("min format with NULL numeric returns null (NOT value: 0)", () => {
+    const result = reconstructFactValue(makeRow({ format: "min", numeric: null }));
+    expect(result).toBeNull();
+  });
+
+  it("range format with NULL low returns null (NOT { low: 0, high: 200 })", () => {
+    const result = reconstructFactValue(makeRow({ format: "range", low: null, high: 200 }));
+    expect(result).toBeNull();
+  });
+
+  it("range format with NULL high returns null (NOT { low: 100, high: 0 })", () => {
+    const result = reconstructFactValue(makeRow({ format: "range", low: 100, high: null }));
+    expect(result).toBeNull();
+  });
+
+  it("range format with both NULL returns null (NOT { low: 0, high: 0 })", () => {
+    const result = reconstructFactValue(makeRow({ format: "range", low: null, high: null }));
+    expect(result).toBeNull();
+  });
+
+  it("number format with explicit zero is preserved (a real zero is not null)", () => {
+    const result = reconstructFactValue(makeRow({ format: "number", numeric: 0 }));
+    expect(result).toEqual({ type: "number", value: 0 });
   });
 });

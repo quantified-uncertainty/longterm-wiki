@@ -81,6 +81,12 @@ interface PageSourceCheckResult {
   outdated: number;
   partial: number;
   errors: number;
+  /**
+   * Number of times an evidence/verdict storage call failed (issue #4017).
+   * The verdict was computed but never persisted to the wiki-server.
+   * Caller should treat any value > 0 as a hard failure (non-zero exit code).
+   */
+  storageErrors: number;
   claimResults: ClaimVerifyResult[];
   claimErrors: ClaimVerifyError[];
 }
@@ -356,16 +362,20 @@ async function storePageVerdict(
     pageResult.errors > 0 ? `${pageResult.errors} errors` : '',
   ].filter(Boolean).join('. ');
 
-  await storeAggregateVerdict({
-    recordType: 'wiki-page',
-    recordId: pageSlug,
-    verdict: aggregateVerdict,
-    confidence,
-    reasoning,
-    sourcesChecked: pageResult.verified,
-  }, LOG_PREFIX).catch((e: unknown) => {
-    console.warn(`${LOG_PREFIX} Failed to store page verdict: ${e instanceof Error ? e.message : String(e)}`);
-  });
+  try {
+    await storeAggregateVerdict({
+      recordType: 'wiki-page',
+      recordId: pageSlug,
+      verdict: aggregateVerdict,
+      confidence,
+      reasoning,
+      sourcesChecked: pageResult.verified,
+    }, LOG_PREFIX);
+  } catch (e: unknown) {
+    // Issue #4017 — storage failure must surface, not be silently swallowed.
+    pageResult.storageErrors++;
+    console.warn(`${LOG_PREFIX} Failed to store page verdict for ${pageSlug}: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
 // ── Page processing ───────────────────────────────────────────────────
@@ -403,6 +413,7 @@ async function processPage(
     outdated: 0,
     partial: 0,
     errors: 0,
+    storageErrors: 0,
     claimResults: [],
     claimErrors: [],
   };
@@ -430,10 +441,13 @@ async function processPage(
               : '\x1b[33m';
           console.log(`      ${color}${verifyResult.verdict}\x1b[0m [fn:${claim.footnoteNumber}] ${claim.claimText.slice(0, 60)}`);
 
-          // Store result (best-effort)
-          await storeClaimResult(pageSlug, verifyResult).catch((e: unknown) => {
+          // Issue #4017 — primary-data write must surface failures, not silently swallow.
+          try {
+            await storeClaimResult(pageSlug, verifyResult);
+          } catch (e: unknown) {
+            result.storageErrors++;
             console.warn(`      \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-          });
+          }
         }
         break;
       }
@@ -469,18 +483,21 @@ async function processPage(
         result.claimResults.push(crossRefResult);
         console.log(`      \x1b[31mcross-ref mismatch\x1b[0m [fact:${claim.factId}] ${claim.claimText.slice(0, 60)}`);
 
-        // Store as evidence
-        await storeSourceCheckEvidence({
-          recordType: 'wiki-page',
-          recordId: pageSlug,
-          sourceUrl: '',
-          verdict: 'contradicted',
-          confidence: 0.7,
-          extractedValue: `FactBase says: ${claim.factValue ?? 'unknown'}`,
-          reasoning: `Cross-reference mismatch with FactBase fact ${claim.factId}`,
-        }, LOG_PREFIX).catch((e: unknown) => {
+        // Issue #4017 — primary-data write must surface failures, not silently swallow.
+        try {
+          await storeSourceCheckEvidence({
+            recordType: 'wiki-page',
+            recordId: pageSlug,
+            sourceUrl: '',
+            verdict: 'contradicted',
+            confidence: 0.7,
+            extractedValue: `FactBase says: ${claim.factValue ?? 'unknown'}`,
+            reasoning: `Cross-reference mismatch with FactBase fact ${claim.factId}`,
+          }, LOG_PREFIX);
+        } catch (e: unknown) {
+          result.storageErrors++;
           console.warn(`      \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-        });
+        }
         break;
       }
 
@@ -502,18 +519,21 @@ async function processPage(
         result.claimResults.push(staleResult);
         console.log(`      \x1b[33mstale temporal\x1b[0m ${claim.claimText.slice(0, 60)}`);
 
-        // Store as evidence
-        await storeSourceCheckEvidence({
-          recordType: 'wiki-page',
-          recordId: pageSlug,
-          sourceUrl: '',
-          verdict: 'outdated',
-          confidence: 0.6,
-          extractedValue: '',
-          reasoning: `Stale temporal reference in claim: ${claim.claimText.slice(0, 200)}`,
-        }, LOG_PREFIX).catch((e: unknown) => {
+        // Issue #4017 — primary-data write must surface failures, not silently swallow.
+        try {
+          await storeSourceCheckEvidence({
+            recordType: 'wiki-page',
+            recordId: pageSlug,
+            sourceUrl: '',
+            verdict: 'outdated',
+            confidence: 0.6,
+            extractedValue: '',
+            reasoning: `Stale temporal reference in claim: ${claim.claimText.slice(0, 200)}`,
+          }, LOG_PREFIX);
+        } catch (e: unknown) {
+          result.storageErrors++;
           console.warn(`      \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-        });
+        }
         break;
       }
     }
@@ -633,6 +653,7 @@ async function sourceCheckWikiPagesCommand(
   let totalErrors = 0;
   let totalVerified = 0;
   let totalClaims = 0;
+  let totalStorageErrors = 0;
 
   for (let i = 0; i < selectedPages.length; i++) {
     const { page, mdxPath } = selectedPages[i];
@@ -651,8 +672,10 @@ async function sourceCheckWikiPagesCommand(
       totalOutdated += pageResult.outdated;
       totalPartial += pageResult.partial;
       totalErrors += pageResult.errors;
+      totalStorageErrors += pageResult.storageErrors;
 
-      console.log(`    Summary: ${pageResult.totalClaims} claims, ${pageResult.verified} verified, ${pageResult.errors} errors`);
+      const storageNote = pageResult.storageErrors > 0 ? `, \x1b[31m${pageResult.storageErrors} storage errors\x1b[0m` : '';
+      console.log(`    Summary: ${pageResult.totalClaims} claims, ${pageResult.verified} verified, ${pageResult.errors} errors${storageNote}`);
       console.log('');
     } catch (e: unknown) {
       console.error(`    \x1b[31mFailed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
@@ -661,10 +684,14 @@ async function sourceCheckWikiPagesCommand(
     }
   }
 
+  // Storage errors mean primary-data writes were lost — non-zero exit
+  // even if no contradictions were found. Issue #4017.
+  const exitCode = totalContradicted > 0 || totalStorageErrors > 0 ? 1 : 0;
+
   // ── Build summary output ──
   if (options.ci) {
     return {
-      exitCode: totalContradicted > 0 ? 1 : 0,
+      exitCode,
       output: JSON.stringify({
         pagesChecked: allResults.length,
         totalClaims,
@@ -675,6 +702,7 @@ async function sourceCheckWikiPagesCommand(
         outdated: totalOutdated,
         partial: totalPartial,
         errors: totalErrors,
+        storageErrors: totalStorageErrors,
         estimatedCost,
         pages: allResults.map(r => ({
           slug: r.pageSlug,
@@ -683,13 +711,18 @@ async function sourceCheckWikiPagesCommand(
           verified: r.verified,
           confirmed: r.confirmed,
           contradicted: r.contradicted,
+          storageErrors: r.storageErrors,
         })),
       }),
     };
   }
 
+  if (totalStorageErrors > 0) {
+    console.error(`\n\x1b[31m${totalStorageErrors} storage error(s) occurred — verdicts were computed but not persisted to wiki-server. Re-run after the underlying issue is fixed.\x1b[0m`);
+  }
+
   return {
-    exitCode: totalContradicted > 0 ? 1 : 0,
+    exitCode,
     output: formatSummaryOutput(allResults, {
       totalClaims,
       totalVerified,
