@@ -517,27 +517,28 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                       </a>
                       {(() => {
                         const ds = inferDataSource(sourceUrl);
-                        if (!ds) return null;
+                        // Resource ID: prefer from evidence, fall back to data source pattern
+                        const rid = checks.find((c) => c.resourceId)?.resourceId ?? ds?.resourceId;
                         return (
-                          <Link
-                            href={`/sources?tab=data-sources`}
-                            className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
-                          >
-                            {ds.name}
-                          </Link>
-                        );
-                      })()}
-                      {(() => {
-                        const rid = checks.find((c) => c.resourceId)?.resourceId;
-                        if (!rid) return null;
-                        return (
-                          <Link
-                            href={`/resources/${encodeURIComponent(rid)}`}
-                            className="inline-flex items-center gap-1 ml-2 text-xs text-primary hover:underline"
-                          >
-                            <Database className="h-3 w-3" />
-                            Resource
-                          </Link>
+                          <>
+                            {ds && (
+                              <Link
+                                href={`/sources?tab=data-sources`}
+                                className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
+                              >
+                                {ds.name}
+                              </Link>
+                            )}
+                            {rid && (
+                              <Link
+                                href={`/resources/${encodeURIComponent(rid)}`}
+                                className="inline-flex items-center gap-1 ml-2 text-xs text-primary hover:underline"
+                              >
+                                <Database className="h-3 w-3" />
+                                Resource
+                              </Link>
+                            )}
+                          </>
                         );
                       })()}
                       <span className="text-xs text-muted-foreground ml-2">
