@@ -46,7 +46,12 @@ export interface SyncDataSourceInput {
   updateFrequency?: 'static' | 'weekly' | 'monthly' | 'quarterly' | 'annual' | null;
   columnMapping?: Record<string, string> | null;
   sourceSchema?: Record<string, unknown> | null;
-  verificationConfig?: Record<string, unknown> | null;
+  verificationConfig?: {
+    strategy: string;
+    matchFields?: string[];
+    fuzzyFields?: string[];
+    [key: string]: unknown; // passthrough for future fields
+  } | null;
   sourceStatus?: 'active' | 'archived' | 'defunct';
 }
 

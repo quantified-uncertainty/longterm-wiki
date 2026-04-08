@@ -36,7 +36,13 @@ const SyncDataSourceSchema = z.object({
   updateFrequency: z.enum(VALID_UPDATE_FREQUENCIES).nullable().optional(),
   columnMapping: z.record(z.string()).nullable().optional(),
   sourceSchema: z.record(z.unknown()).nullable().optional(),
-  verificationConfig: z.record(z.unknown()).nullable().optional(),
+  // Issue #4017 B5: typed schema replaces z.record(z.unknown()). The shape
+  // is {strategy, matchFields, fuzzyFields} from grant-import manifests.
+  verificationConfig: z.object({
+    strategy: z.string().max(100),
+    matchFields: z.array(z.string().max(100)).optional(),
+    fuzzyFields: z.array(z.string().max(100)).optional(),
+  }).passthrough().nullable().optional(),
   sourceStatus: z.enum(VALID_SOURCE_STATUSES).optional(),
 });
 

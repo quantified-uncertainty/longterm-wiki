@@ -831,7 +831,13 @@ export const resourceTabularSources = pgTable("resource_tabular_sources", {
   /** Frictionless-inspired field descriptions */
   sourceSchema: jsonb("source_schema").$type<Record<string, unknown>>(),
   /** { strategy, matchFields, fuzzyFields, exactFields } */
-  verificationConfig: jsonb("verification_config").$type<Record<string, unknown>>(),
+  /** Source-check verification strategy. Shape: { strategy, matchFields?, fuzzyFields? }. Issue #4017 B5. */
+  verificationConfig: jsonb("verification_config").$type<{
+    strategy: string;
+    matchFields?: string[];
+    fuzzyFields?: string[];
+    [key: string]: unknown;
+  }>(),
   /** active | archived | defunct */
   sourceStatus: text("source_status").notNull().default("active"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
