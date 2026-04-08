@@ -270,8 +270,6 @@ export function getInternalNav(): NavSection[] {
       defaultOpen: true,
       items: [
         { label: "Overview", href: internalHref("factbase-entities-hub") },
-        { label: "Data Quality", href: internalHref("data-quality-dashboard") },
-        { label: "Data Sources", href: internalHref("data-sources-dashboard") },
       ],
     },
     {
@@ -282,6 +280,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Entities & Pages", href: internalHref("entities-dashboard") },
         { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
         { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
+        { label: "Data Sources", href: internalHref("data-sources-dashboard") },
         { label: "Grants", href: internalHref("grants-dashboard") },
         { label: "Divisions", href: internalHref("divisions-dashboard") },
         { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
@@ -305,6 +304,7 @@ export function getInternalNav(): NavSection[] {
       title: "System",
       items: [
         { label: "System Health", href: internalHref("system-health-dashboard") },
+        { label: "Data Quality", href: internalHref("data-quality-dashboard") },
         { label: "PR Dashboard", href: internalHref("pr-dashboard") },
         { label: "Agent Activity", href: internalHref("agent-activity-dashboard") },
       ],
@@ -330,7 +330,7 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "Research",
+      title: "Reports",
       items: [
         { label: "Reports Index", href: internalHref("__index__/internal/reports", "/wiki/E780") },
         { label: "AI Research Workflows", href: internalHref("ai-research-workflows") },
@@ -346,17 +346,22 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "Architecture & Reference",
+      title: "Architecture",
       items: [
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Data Architecture", href: internalHref("data-architecture") },
-        { label: "Wiki Generation Architecture", href: internalHref("wiki-generation-architecture") },
-        { label: "Content Pipeline Architecture", href: internalHref("content-pipeline-architecture") },
+        { label: "Wiki Generation", href: internalHref("wiki-generation-architecture") },
+        { label: "Content Pipeline", href: internalHref("content-pipeline-architecture") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
         { label: "Citation Architecture", href: internalHref("citation-architecture") },
-        { label: "Source Check Tiers", href: internalHref("content-verification-tiers") },
-        { label: "Knowledge Graph Ontology", href: internalHref("knowledge-graph-ontology") },
-        { label: "Structured Data Architecture", href: internalHref("structured-data-architecture") },
+        { label: "Verification Tiers", href: internalHref("content-verification-tiers") },
+        { label: "Knowledge Graph", href: internalHref("knowledge-graph-ontology") },
+        { label: "Structured Data", href: internalHref("structured-data-architecture") },
+      ],
+    },
+    {
+      title: "Reference",
+      items: [
         { label: "Schema Overview", href: internalHref("__index__/internal/schema", "/wiki/E781") },
         { label: "Entity Reference", href: internalHref("entities") },
         { label: "Server Environments", href: internalHref("wiki-server-architecture") },
