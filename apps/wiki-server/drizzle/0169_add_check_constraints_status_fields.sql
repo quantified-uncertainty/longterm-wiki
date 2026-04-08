@@ -18,9 +18,12 @@ ALTER TABLE "auto_update_results"
   CHECK (status IN ('success', 'failed', 'skipped'));
 
 -- 3. source_check_verdicts.verdict
+-- 'unchecked' is a valid verdict used by POST /verdicts (VALID_VERDICT_TYPES
+-- in source-checks.ts includes it). Omitting it would cause a BLOCKER on
+-- deploy because existing rows with 'unchecked' verdicts exist in production.
 ALTER TABLE "source_check_verdicts"
   ADD CONSTRAINT chk_source_check_verdicts_verdict
-  CHECK (verdict IN ('confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'));
+  CHECK (verdict IN ('confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked'));
 
 -- 4. grants.status (nullable — NULL is allowed, but non-null values must be valid)
 ALTER TABLE "grants"
