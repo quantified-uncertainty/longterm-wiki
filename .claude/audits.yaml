@@ -102,8 +102,8 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-06"
-    last_result: pass
+    last_checked: "2026-04-08"
+    last_result: fail
     last_result_note: "scheduled-maintenance.yml failed 2026-03-19 — Anthropic API credit balance too low"
     history:
       - date: "2026-03-29"
@@ -128,6 +128,10 @@ audits:
       - date: "2026-04-06"
         result: pass
         checked_by: "manual"
+      - date: "2026-04-08"
+        result: fail
+        checked_by: "manual"
+        notes: "ci-pr-health.yml failing 2026-04-07 (2 failures), scheduled-maintenance 2026-04-08 in progress (null result)"
   - id: vercel-production-only
     category: infrastructure
     description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
@@ -205,7 +209,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-04-06"
+    last_checked: "2026-04-08"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -228,6 +232,9 @@ audits:
         result: pass
         checked_by: "manual"
       - date: "2026-04-06"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-08"
         result: pass
         checked_by: "manual"
   - id: gate-override-frequency
@@ -279,6 +286,13 @@ audits:
       - date: "2026-04-06"
         result: fail
         checked_by: "manual"
+      - date: "2026-04-08"
+        result: pass
+        checked_by: "manual"
+      - date: "2026-04-08"
+        result: pass
+        checked_by: "manual"
+        notes: "0 overrides out of 50 merged PRs in last 30 days (0%)"
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -308,6 +322,10 @@ audits:
       - date: "2026-04-06"
         result: pass
         checked_by: "manual"
+      - date: "2026-04-08"
+        result: pass
+        checked_by: "manual"
+        notes: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. All match latest Claude 4.5/4.6 family per system context."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
