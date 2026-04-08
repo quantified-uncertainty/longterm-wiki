@@ -149,6 +149,65 @@ describe('matchRecordAgainstSnapshot — null-field handling', () => {
   });
 });
 
+describe('matchRecordAgainstSnapshot — duplicate grantee+amount disambiguation', () => {
+  // Regression test for EA Funds bug: multiple grants with identical grantee+amount
+  // in the same month would collide when matchFields only contained ['grantee', 'amount'].
+  // Adding 'name' (and 'date') to matchFields resolves the collision.
+  const eaFundsStyleManifest: DataSourceManifest = {
+    ...testManifest,
+    sourceId: 'ea-funds',
+    sourceCheck: {
+      strategy: 'deterministic_row_match',
+      matchFields: ['grantee', 'amount', 'date', 'name'],
+      fuzzyFields: ['grantee', 'name'],
+      exactFields: ['amount'],
+    },
+  };
+
+  const DUPLICATE_CSV = `Organization,Amount,Date,Grant Name
+"Effective Giving Quest","$40,000","2023-03","Creation of a new organisation that increases the philanthropic impact of the gaming space via promotion of EA and EAA charities"
+"Effective Giving Quest","$40,000","2023-03","Top-up funding to enable us to gauge viability of strategy before deciding to pursue additional exte..."
+"Other Org","$100,000","2023-01","Some other grant"
+`;
+
+  it('matches the correct row when grantee+amount are duplicated but name differs', () => {
+    const result = matchRecordAgainstSnapshot(
+      {
+        grantee: 'Effective Giving Quest',
+        amount: 40000,
+        date: '2023-03',
+        name: 'Creation of a new organisation that increases the philanthropic impact of the gaming space via promotion of EA and EAA charities',
+      },
+      DUPLICATE_CSV,
+      eaFundsStyleManifest,
+    );
+    expect(result.matched).toBe(true);
+    expect(result.fieldsMatched).toContain('name');
+    // The matched row should have the correct grant name, not the top-up grant
+    expect(JSON.stringify(result.matchedRow)).toContain('Creation of a new organisation');
+    expect(JSON.stringify(result.matchedRow)).not.toContain('Top-up funding');
+  });
+
+  it('does NOT match a row with a different grant name even when grantee+amount match', () => {
+    // With only grantee+amount, both rows would score equally and a wrong row could be chosen.
+    // With name in matchFields, the wrong name causes a mismatch field and lowers the score.
+    const result = matchRecordAgainstSnapshot(
+      {
+        grantee: 'Effective Giving Quest',
+        amount: 40000,
+        date: '2023-03',
+        name: 'Top-up funding to enable us to gauge viability of strategy before deciding to pursue additional exte...',
+      },
+      DUPLICATE_CSV,
+      eaFundsStyleManifest,
+    );
+    expect(result.matched).toBe(true);
+    // The matched row should be the top-up grant, not the gaming space grant
+    expect(JSON.stringify(result.matchedRow)).toContain('Top-up funding');
+    expect(JSON.stringify(result.matchedRow)).not.toContain('Creation of a new organisation');
+  });
+});
+
 describe('matchRecordAgainstSnapshot with JSON', () => {
   const jsonManifest: DataSourceManifest = {
     ...testManifest,

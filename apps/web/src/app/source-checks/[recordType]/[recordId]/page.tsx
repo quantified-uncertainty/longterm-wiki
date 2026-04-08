@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, ExternalLink } from "lucide-react";
+import { ArrowLeft, Database, ExternalLink } from "lucide-react";
 import {
   fetchDetailed,
 } from "@/lib/wiki-server";
@@ -14,8 +14,8 @@ import {
   formatRecordType,
   getRecordHref,
   formatCheckerModel,
+  humanizeFieldLabel,
 } from "../../source-checks-shared";
-import { cn } from "@/lib/utils";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
@@ -23,6 +23,26 @@ import { formatKBFactValue } from "@/components/wiki/factbase/format";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
+
+/** Known internal machine-readable tags that appear as leading prefixes in reasoning/notes
+ *  text written by source-check pipelines. Restricted to a closed set so that legitimate
+ *  bracketed content inside the body (e.g. "[USD]", "[2024]") is preserved. */
+const INTERNAL_TAG_NAMES = [
+  "deterministic-row-match",
+  "dead_link",
+  "archive",
+  "skip",
+] as const;
+const INTERNAL_TAG_PREFIX_RE = new RegExp(
+  `^(?:\\[(?:${INTERNAL_TAG_NAMES.join("|")})(?:[^\\]]*)?\\]\\s*)+`
+);
+
+/** Strip known internal machine-readable tags (e.g. [deterministic-row-match]) from the
+ *  start of user-visible text. Only leading tags are stripped; bracketed content elsewhere
+ *  in the string is preserved. */
+function stripInternalTags(text: string): string {
+  return text.replace(INTERNAL_TAG_PREFIX_RE, "").trim();
+}
 
 /** Format a single JSON value for display in a key-value summary. */
 function formatJsonValue(v: unknown): string {
@@ -39,19 +59,41 @@ function formatJsonValue(v: unknown): string {
   return String(v);
 }
 
-/** Try to parse a string as a JSON object and return non-empty entries, or null. */
+/** Try to parse a string as a JSON object and return non-empty entries, or null.
+ *  Also handles truncated JSON (missing closing `"` / `}`) by attempting repairs. */
 function parseJsonObjectEntries(text: string): [string, unknown][] | null {
   if (!text.startsWith("{")) return null;
-  try {
-    const parsed = JSON.parse(text);
-    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) return null;
-    const entries = Object.entries(parsed).filter(
-      ([, v]) => v !== null && v !== undefined && v !== ""
-    );
-    return entries.length > 0 ? entries : null;
-  } catch {
-    return null;
+
+  // Try parsing as-is first
+  for (const candidate of [text, text + '"}'  , text + '}']) {
+    try {
+      const parsed = JSON.parse(candidate);
+      if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) continue;
+      const entries = Object.entries(parsed).filter(
+        ([, v]) => v !== null && v !== undefined && v !== ""
+      );
+      return entries.length > 0 ? entries : null;
+    } catch {
+      continue;
+    }
   }
+
+  // Fallback: extract key-value pairs via regex for truncated JSON
+  const kvRegex = /"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|[\d.]+|true|false|null)/g;
+  const entries: [string, unknown][] = [];
+  let match;
+  while ((match = kvRegex.exec(text)) !== null) {
+    const key = match[1];
+    let val: unknown = match[2];
+    if (typeof val === "string" && val.startsWith('"')) {
+      try { val = JSON.parse(val as string); } catch { val = (val as string).slice(1, -1); }
+    } else if (val === "true") val = true;
+    else if (val === "false") val = false;
+    else if (val === "null") val = null;
+    else { const n = Number(val); if (!isNaN(n)) val = n; }
+    if (val !== null && val !== undefined && val !== "") entries.push([key, val]);
+  }
+  return entries.length > 0 ? entries : null;
 }
 
 /** Format an extractedQuote for display. Strips "Matched row:" prefix and renders JSON nicely. */
@@ -67,15 +109,23 @@ function FormatQuote({ quote }: { quote: string }) {
   const entries = parseJsonObjectEntries(text);
   if (entries) {
     return (
-      <div className="rounded-md bg-muted/40 px-3 py-2 mb-2 text-sm space-y-1">
-        {entries.slice(0, 8).map(([k, v]) => (
-          <div key={k} className="flex gap-2">
-            <span className="text-muted-foreground shrink-0">{k}:</span>
-            <span className="text-foreground/80 break-all">{formatJsonValue(v)}</span>
-          </div>
-        ))}
+      <div className="rounded-md border border-border/40 bg-muted/20 px-3 py-2 mb-2 text-sm">
+        <table className="w-full">
+          <tbody>
+            {entries.slice(0, 8).map(([k, v]) => (
+              <tr key={k} className="border-b border-border/20 last:border-0">
+                <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
+                  {k}
+                </td>
+                <td className="py-0.5 text-foreground/80 break-all">
+                  {formatJsonValue(v)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
         {entries.length > 8 && (
-          <div className="text-xs text-muted-foreground">+{entries.length - 8} more fields</div>
+          <div className="text-xs text-muted-foreground mt-1">+{entries.length - 8} more fields</div>
         )}
       </div>
     );
@@ -88,28 +138,39 @@ function FormatQuote({ quote }: { quote: string }) {
   );
 }
 
-/** Format an extractedValue for display. Detects JSON and renders key-value summary. */
+/** Format an extractedValue for display. Detects JSON and renders as a table. */
 function FormatExtractedValue({ value }: { value: string }) {
-  const trimmed = value.trim();
+  let trimmed = value.trim();
 
-  // JSON objects
+  // Strip "Matched row:" or similar prefixes before parsing
+  const prefixMatch = trimmed.match(/^(?:Matched row|Found row|Row match)[:\s]*/i);
+  if (prefixMatch) {
+    trimmed = trimmed.slice(prefixMatch[0].length).trim();
+  }
+
+  // JSON objects — render as structured table
   const entries = parseJsonObjectEntries(trimmed);
   if (entries) {
-    const shown = entries.slice(0, 5);
-    const remaining = entries.length - shown.length;
     return (
-      <span className="text-sm">
-        {shown.map(([k, v], i) => (
-          <span key={k}>
-            {i > 0 && ", "}
-            <span className="font-medium text-foreground/70">{k}:</span>{" "}
-            {formatJsonValue(v)}
-          </span>
-        ))}
-        {remaining > 0 && (
-          <span className="text-muted-foreground"> (+{remaining} more)</span>
+      <div className="rounded-md border border-border/40 bg-muted/20 px-3 py-2 text-sm">
+        <table className="w-full">
+          <tbody>
+            {entries.slice(0, 8).map(([k, v]) => (
+              <tr key={k} className="border-b border-border/20 last:border-0">
+                <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
+                  {k}
+                </td>
+                <td className="py-0.5 text-foreground/80 break-all">
+                  {formatJsonValue(v)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {entries.length > 8 && (
+          <div className="text-xs text-muted-foreground mt-1">+{entries.length - 8} more fields</div>
         )}
-      </span>
+      </div>
     );
   }
 
@@ -185,14 +246,31 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
   const recordType = decodeURIComponent(rawParams.recordType);
   const recordId = decodeURIComponent(rawParams.recordId);
 
-  // Fetch detail (verdicts + evidence) and names in parallel
-  const [detailResult, namesResult] = await Promise.all([
+  // Map recordType back to source table name for record-lookup API
+  const RECORD_TYPE_TO_TABLE: Record<string, string> = {
+    grant: "grants", personnel: "personnel", division: "divisions",
+    investment: "investments", "funding-round": "funding_rounds",
+    "funding-program": "funding_programs", publication: "publications",
+    "wiki-page": "wiki_pages", "policy-stakeholder": "policy_stakeholders",
+    citation: "citation_quotes",
+  };
+  const sourceTable = RECORD_TYPE_TO_TABLE[recordType] ?? recordType.replace(/-/g, "_") + "s";
+
+  // Fetch detail (verdicts + evidence), names, and the actual DB record in parallel
+  const [detailResult, namesResult, recordResult] = await Promise.all([
     fetchDetailed<RpcSourceCheckDetailResult>(
       `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
     fetchDetailed<RpcSourceChecksResolveNamesResult>(
       `/api/source-checks/resolve-names?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(recordId)}`,
+      { revalidate: 3600 }
+    ),
+    fetchDetailed<{
+      record: Record<string, unknown>;
+      displayNames: Record<string, { title: string; slug?: string; entityType?: string }>;
+    }>(
+      `/api/record-lookup/${encodeURIComponent(sourceTable)}/${encodeURIComponent(recordId)}`,
       { revalidate: 3600 }
     ),
   ]);
@@ -262,320 +340,609 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
   const recordHref = getRecordHref(recordType, recordId);
 
+  // Compute claim/record data for the side-by-side layout
+  const isHolistic = verdicts.every((v) => v.fieldName === null);
+  const dbRecord = recordResult.ok ? recordResult.data.record : null;
+  const recordDisplayNames = recordResult.ok ? recordResult.data.displayNames : {};
+  const skipFields = new Set([
+    "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
+    "organizationId", "orgEntityId", "granteeId", "programId",
+    "entityId", "parentThingId", "stableId", "wikiId",
+    // Always redundant: personEntityId duplicates personId; sourceResourceId shown in source header
+    "personEntityId", "sourceResourceId",
+  ]);
+  // Per-type extra skip fields
+  if (recordType === "grant") {
+    skipFields.add("granteeDisplayName"); // redundant with `name` for grants
+  }
+  let displayFields: [string, unknown][] = dbRecord
+    ? Object.entries(dbRecord).filter(
+        ([k, v]) => v != null && v !== "" && !skipFields.has(k)
+      )
+    : [];
+
+  // For facts, populate displayFields from FactBase since record-lookup doesn't cover them
+  if (recordType === "fact" && displayFields.length === 0) {
+    const fact = getKBFactById(recordId);
+    if (fact) {
+      const entity = getKBEntity(fact.subjectId);
+      const property = getKBProperty(fact.propertyId);
+      const formattedValue = formatKBFactValue(fact, property?.unit, property?.display);
+      const fields: [string, unknown][] = [];
+      if (entity) fields.push(["subject", entity.name]);
+      if (property) fields.push(["property", property.name]);
+      fields.push(["value", formattedValue]);
+      if (fact.asOf) fields.push(["asOf", fact.asOf]);
+      if (fact.validEnd) fields.push(["validEnd", fact.validEnd]);
+      if (fact.source) fields.push(["source", fact.source]);
+      if (fact.sourceQuote) fields.push(["sourceQuote", fact.sourceQuote]);
+      if (fact.notes) fields.push(["notes", fact.notes]);
+      if (fact.currency) fields.push(["currency", fact.currency]);
+      if (fact.usdEquivalent != null) fields.push(["usdEquivalent", fact.usdEquivalent]);
+      displayFields = fields;
+    }
+  }
+
+  // Build a supplemental sid-resolution map from FactBase for cases where
+  // recordDisplayNames (from record-lookup) is empty (e.g. facts).
+  // Scan displayFields for comma-separated sid lists and resolve each via getKBEntity.
+  const factbaseSidNames: Record<string, { title: string }> = {};
+  for (const [, v] of displayFields) {
+    if (typeof v !== "string") continue;
+    const parts = v.split(",").map((s) => s.trim());
+    for (const part of parts) {
+      if (/^sid_[a-zA-Z0-9]+$/.test(part) && !recordDisplayNames[part]) {
+        const kbEntity = getKBEntity(part);
+        if (kbEntity?.name) {
+          factbaseSidNames[part] = { title: kbEntity.name };
+        }
+      }
+    }
+  }
+  // Merge factbase resolutions into recordDisplayNames (recordDisplayNames takes precedence)
+  const allDisplayNames: Record<string, { title: string; slug?: string; entityType?: string }> = {
+    ...factbaseSidNames,
+    ...recordDisplayNames,
+  };
+
+  // Group evidence by source URL for the right column
+  const evidenceBySource = new Map<string, typeof evidence>();
+  for (const e of evidence) {
+    const key = e.sourceUrl || "(no source)";
+    const group = evidenceBySource.get(key);
+    if (group) group.push(e);
+    else evidenceBySource.set(key, [e]);
+  }
+
+  // Deduplicate within each source group
+  type DeduplicatedCheck = (typeof evidence)[number] & { duplicateCount: number };
+  function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
+    const seen = new Map<string, DeduplicatedCheck>();
+    for (const c of checks) {
+      const dedupeKey = [
+        c.fieldName ?? "",
+        c.entityId ?? "",
+        c.verdict,
+        c.expectedValue ?? "",
+        c.extractedValue ?? "",
+        c.extractedQuote ?? "",
+        (c.notes ?? "").slice(0, 100),
+      ].join("::");
+      const existing = seen.get(dedupeKey);
+      if (existing) {
+        existing.duplicateCount++;
+        if (c.checkedAt && existing.checkedAt && c.checkedAt > existing.checkedAt) {
+          seen.set(dedupeKey, { ...c, duplicateCount: existing.duplicateCount });
+        }
+      } else {
+        seen.set(dedupeKey, { ...c, duplicateCount: 1 });
+      }
+    }
+    return [...seen.values()];
+  }
+
+  // Get the verdict for the case-header treatment
+  const primaryVerdict = verdicts[0];
+  const primaryConfidence = primaryVerdict?.confidence ?? null;
+
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Breadcrumbs */}
       <Link
         href="/source-checks"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+        className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.15em] text-muted-foreground hover:text-foreground transition-colors mb-8"
       >
-        <ArrowLeft className="w-3.5 h-3.5" />
-        All Source Checks
+        <ArrowLeft className="w-3 h-3" />
+        Index
       </Link>
 
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <span className="capitalize">{formatRecordType(recordType)}</span>
-        </div>
-        <h1 className="text-2xl font-bold mb-1">
-          {claimSummary ?? displayName}
-        </h1>
-        {claimSummary && resolvedName && resolvedName !== claimSummary && (
-          <p className="text-sm text-muted-foreground mb-2">{resolvedName}</p>
-        )}
-        <div className="flex flex-wrap items-center gap-3 text-sm">
-          {recordHref && (
-            <Link href={recordHref} className="text-primary hover:underline">
-              {recordType === "personnel"
-                ? "People directory"
-                : `View ${formatRecordType(recordType).toLowerCase()} record`} &rarr;
-            </Link>
+      {/* Editorial header — compact masthead */}
+      <header className="mb-8 pb-5 border-b border-foreground/15">
+        {/* Eyebrow: type · id · cross-references */}
+        <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1 mb-3 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+          <span>{formatRecordType(recordType)}</span>
+          <span className="text-foreground/30">·</span>
+          <span>{recordId}</span>
+          {!recordType.startsWith("fact") && !recordType.startsWith("citation") && !recordType.includes("wiki-page") && (
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={`/things/${encodeURIComponent(recordId)}`}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                Record
+              </Link>
+            </>
+          )}
+          {recordHref && !recordHref.startsWith("/things/") && (
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={recordHref}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                {recordType === "personnel" ? "People" : recordType === "fact" ? "Fact" : formatRecordType(recordType)}
+              </Link>
+            </>
           )}
           {entityHref && (
-            <Link href={entityHref} className="text-primary hover:underline">
-              {recordType === "personnel"
-                ? "Organization page"
-                : recordType === "division"
-                  ? "Parent organization"
-                  : claimEntityName
-                    ? `${claimEntityName} page`
-                    : "Profile page"} &rarr;
-            </Link>
+            <>
+              <span className="text-foreground/30">·</span>
+              <Link
+                href={entityHref}
+                className="hover:text-foreground transition-colors border-b border-dotted border-foreground/30 hover:border-foreground"
+              >
+                {recordType === "personnel"
+                  ? "Organization"
+                  : recordType === "division"
+                    ? "Parent"
+                    : claimEntityName ?? "Profile"}
+              </Link>
+            </>
           )}
         </div>
-      </div>
 
-      {/* Verdict summary cards */}
+        {/* Title */}
+        <h1 className="text-2xl font-bold leading-tight tracking-tight text-foreground">
+          {(claimSummary ?? displayName).replace(/\s*->\s*/g, " → ")}
+        </h1>
+
+        {/* Subtitle — only when meaningfully different and not a truncated stub */}
+        {claimSummary &&
+          resolvedName &&
+          resolvedName !== claimSummary &&
+          resolvedName.length > 6 &&
+          !claimSummary.includes(resolvedName) && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {resolvedName}
+            </p>
+          )}
+      </header>
+
+      {/* Verdict — editorial treatment, like a verdict in a court ruling */}
       {verdicts.length > 0 ? (
-        <div className="space-y-4 mb-8">
+        <div className="space-y-3 mb-10">
           {verdicts.map((v, i) => {
-            // Count evidence items that match this verdict's fieldName
             const fieldEvidence = evidence.filter(
               (e) => (e.fieldName ?? null) === (v.fieldName ?? null)
             );
             const fieldUniqueUrls = new Set(
               fieldEvidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
             );
+            const verdictColor =
+              v.verdict === "confirmed" ? "text-emerald-700 dark:text-emerald-400"
+              : v.verdict === "contradicted" ? "text-red-700 dark:text-red-400"
+              : v.verdict === "outdated" ? "text-amber-700 dark:text-amber-400"
+              : v.verdict === "partial" ? "text-amber-700 dark:text-amber-400"
+              : "text-muted-foreground";
+
+            // Detect cross-check disagreement: multiple distinct verdict values in evidence
+            const evidenceVerdicts = fieldEvidence.map((e) => e.verdict);
+            const uniqueEvidenceVerdicts = [...new Set(evidenceVerdicts)];
+            const hasDisagreement = uniqueEvidenceVerdicts.length > 1;
+            const disagreementCounts = uniqueEvidenceVerdicts.map(
+              (ev) => `${evidenceVerdicts.filter((x) => x === ev).length} ${ev}`
+            );
 
             return (
               <div
                 key={`${v.fieldName ?? "overall"}-${i}`}
-                className="rounded-lg border border-border/60 p-5"
+                className="flex flex-wrap items-baseline gap-x-4 gap-y-1"
               >
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div>
-                    {v.fieldName && (
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Field:{" "}
-                        <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                          {v.fieldName}
-                        </code>
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3">
-                      <VerdictBadge verdict={v.verdict} />
-                      {v.confidence != null && (
-                        <span className="text-sm tabular-nums font-medium">
-                          {Math.round(v.confidence * 100)}% confidence
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-muted-foreground">
-                    {fieldEvidence.length > 0 && (
-                      <p>
-                        {fieldEvidence.length} evidence check
-                        {fieldEvidence.length !== 1 ? "s" : ""}
-                        {fieldUniqueUrls.size > 0 &&
-                          fieldUniqueUrls.size !== fieldEvidence.length && (
-                            <>
-                              {" "}from {fieldUniqueUrls.size} unique source
-                              {fieldUniqueUrls.size !== 1 ? "s" : ""}
-                            </>
-                          )}
-                      </p>
-                    )}
-                    {v.lastComputedAt && (
-                      <p>
-                        Last checked:{" "}
-                        {new Date(v.lastComputedAt).toLocaleDateString()}
-                      </p>
-                    )}
-                    {v.needsRecheck && (
-                      <p className="text-amber-500 font-medium mt-0.5">
-                        Needs recheck
-                      </p>
-                    )}
-                  </div>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">
+                    Verdict
+                  </span>
+                  <span className={`text-xl font-semibold tracking-tight ${verdictColor}`}>
+                    {v.verdict}
+                  </span>
+                  {v.confidence != null && (
+                    <span
+                      className="text-sm tabular-nums text-foreground/70"
+                    >
+                      {Math.round(v.confidence * 100)}%
+                    </span>
+                  )}
                 </div>
-
-                {/* Confidence bar */}
-                {v.confidence != null && (
-                  <div
-                    className="w-full bg-muted rounded-full h-2 mb-3"
-                    role="progressbar"
-                    aria-valuenow={Math.round(v.confidence * 100)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`${v.verdict} confidence: ${Math.round(v.confidence * 100)}%`}
+                {v.fieldName && (
+                  <span
+                    className="text-xs text-muted-foreground"
                   >
-                    <div
-                      className={cn(
-                        "h-2 rounded-full transition-all",
-                        v.verdict === "confirmed"
-                          ? "bg-emerald-500"
-                          : v.verdict === "contradicted"
-                            ? "bg-red-500"
-                            : v.verdict === "outdated"
-                              ? "bg-amber-500"
-                              : v.verdict === "partial"
-                                ? "bg-amber-400"
-                                : "bg-gray-400"
+                    field: {v.fieldName}
+                  </span>
+                )}
+                <span className="ml-auto text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+                  {fieldEvidence.length > 0 && (
+                    <>
+                      {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
+                      {fieldUniqueUrls.size > 0 && fieldUniqueUrls.size !== fieldEvidence.length && (
+                        <> · {fieldUniqueUrls.size} src</>
                       )}
-                      style={{ width: `${Math.round(v.confidence * 100)}%` }}
-                    />
+                    </>
+                  )}
+                  {v.lastComputedAt && (
+                    <> · {new Date(v.lastComputedAt).toLocaleDateString()}</>
+                  )}
+                  {v.needsRecheck && (
+                    <> · <span className="text-amber-600 font-semibold">recheck</span></>
+                  )}
+                </span>
+                {hasDisagreement && (
+                  <div className="basis-full mt-1">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded px-2 py-0.5">
+                      ⚠ Checks disagree: {disagreementCounts.join(", ")}
+                    </span>
                   </div>
                 )}
-
                 {v.reasoning && (
-                  <p className="text-sm text-muted-foreground">{v.reasoning}</p>
+                  <p
+                    className="basis-full text-sm text-muted-foreground italic leading-relaxed mt-1"
+                  >
+                    {stripInternalTags(v.reasoning)}
+                  </p>
                 )}
               </div>
             );
           })}
         </div>
       ) : (
-        <div className="rounded-lg border border-border/60 p-6 text-center text-muted-foreground mb-8">
-          <p>No verdict records found for this item.</p>
+        <div className="mb-10 text-sm text-muted-foreground italic">
+          No verdict on file.
         </div>
       )}
 
-      {/* Evidence — grouped by source URL, deduplicated */}
-      {evidence.length > 0 && (() => {
-        // Group evidence by source URL
-        const bySource = new Map<string, typeof evidence>();
-        for (const e of evidence) {
-          const key = e.sourceUrl || "(no source)";
-          const group = bySource.get(key);
-          if (group) group.push(e);
-          else bySource.set(key, [e]);
-        }
-
-        // Deduplicate within each source group: collapse checks with same verdict + similar notes
-        // Keep the most recent check, show count of duplicates
-        type DeduplicatedCheck = (typeof evidence)[number] & { duplicateCount: number };
-        function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
-          const seen = new Map<string, DeduplicatedCheck>();
-          for (const c of checks) {
-            // Key on field + entity + verdict + values + notes to avoid collapsing distinct field checks
-            const dedupeKey = [
-              c.fieldName ?? "",
-              c.entityId ?? "",
-              c.verdict,
-              c.expectedValue ?? "",
-              c.extractedValue ?? "",
-              (c.notes ?? "").slice(0, 100),
-            ].join("::");
-            const existing = seen.get(dedupeKey);
-            if (existing) {
-              existing.duplicateCount++;
-              // Keep the more recent one
-              if (c.checkedAt && existing.checkedAt && c.checkedAt > existing.checkedAt) {
-                seen.set(dedupeKey, { ...c, duplicateCount: existing.duplicateCount });
-              }
-            } else {
-              seen.set(dedupeKey, { ...c, duplicateCount: 1 });
-            }
-          }
-          return [...seen.values()];
-        }
-
-        return (
-          <section className="mb-8">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
-              Evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
+      {/* Audit ledger: claim vs evidence with vertical rule between */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 lg:divide-x lg:divide-foreground/15 mb-12 min-w-0">
+        {/* Left column: Our claim */}
+        <section className="lg:pr-8 pb-8 lg:pb-0 min-w-0">
+          <div className="flex items-baseline justify-between mb-5">
+            <h2 className="text-base font-semibold tracking-tight">
+              Our claim
             </h2>
-            <div className="space-y-4">
-              {[...bySource.entries()].map(([sourceUrl, checks]) => (
-                <div key={sourceUrl} className="rounded-lg border border-border/60 overflow-hidden">
-                  {/* Source header */}
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+              {isHolistic ? "entire record" : "specific fields"}
+            </span>
+          </div>
+          {displayFields.length > 0 ? (
+            <dl className="space-y-3.5">
+              {displayFields.map(([k, v]) => {
+                const strV = typeof v === "string" ? v : String(v);
+                const isLongText = typeof v === "string" && v.length > 300;
+
+                // Multi-sid: comma-separated list of sid_ IDs
+                const multiSidMatch = typeof v === "string"
+                  ? v.split(",").map((s) => s.trim()).filter((s) => /^sid_[a-zA-Z0-9]+$/.test(s))
+                  : [];
+                const isMultiSid = multiSidMatch.length > 1;
+
+                // Single sid
+                const looksLikeId = !isMultiSid && typeof v === "string" && /^sid_[a-zA-Z0-9]+$/.test(v);
+                const resolvedIdEntry = looksLikeId ? allDisplayNames[strV] : null;
+
+                // Currency formatting: keys "amount" or "usdEquivalent" with numeric string
+                const isCurrencyKey = k === "amount" || k === "usdEquivalent";
+                const numericVal = typeof v === "string" ? parseFloat(v) : typeof v === "number" ? v : NaN;
+                const isCurrencyVal = isCurrencyKey && !isNaN(numericVal) && isFinite(numericVal);
+                const currencyCode = isCurrencyVal
+                  ? (k === "usdEquivalent" ? "USD" : (typeof dbRecord?.["currency"] === "string" ? dbRecord["currency"] : "USD"))
+                  : null;
+
+                // Date formatting
+                const fullDateMatch = typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v);
+                const partialDateMatch = typeof v === "string" && /^\d{4}-\d{2}$/.test(v);
+
+                // URL detection
+                const isUrl = typeof v === "string" && (v.startsWith("http://") || v.startsWith("https://"));
+
+                // Boolean
+                const isBoolVal = typeof v === "boolean" || strV === "true" || strV === "false";
+
+                return (
+                  <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
+                    <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
+                      {humanizeFieldLabel(k)}
+                    </dt>
+                    <dd className="text-foreground/90 break-words whitespace-pre-wrap leading-relaxed min-w-0">
+                      {isCurrencyVal ? (
+                        <span>
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: currencyCode ?? "USD",
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(numericVal)}
+                        </span>
+                      ) : isBoolVal ? (
+                        <span>{(v === true || strV === "true") ? "Yes" : "No"}</span>
+                      ) : isMultiSid ? (
+                        <span>
+                          {multiSidMatch.map((sid, idx) => {
+                            const entry = allDisplayNames[sid];
+                            return (
+                              <span key={sid}>
+                                {idx > 0 && ", "}
+                                {entry ? (
+                                  <Link
+                                    href={`/things/${encodeURIComponent(sid)}`}
+                                    className="text-primary hover:underline"
+                                    title={sid}
+                                  >
+                                    {entry.title}
+                                  </Link>
+                                ) : (
+                                  <span className="font-mono text-xs">{sid}</span>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </span>
+                      ) : resolvedIdEntry ? (
+                        <Link
+                          href={`/things/${encodeURIComponent(strV)}`}
+                          className="text-primary hover:underline"
+                          title={strV}
+                        >
+                          {resolvedIdEntry.title}
+                        </Link>
+                      ) : isUrl ? (
+                        <a
+                          href={strV}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline break-all"
+                          title={strV}
+                        >
+                          {strV.length > 80 ? strV.slice(0, 80) + "…" : strV}
+                        </a>
+                      ) : partialDateMatch ? (
+                        <span>
+                          {new Date(strV + "-01").toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+                        </span>
+                      ) : fullDateMatch ? (
+                        <span>
+                          {new Date(strV).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                        </span>
+                      ) : typeof v === "number" ? (
+                        v.toLocaleString("en-US")
+                      ) : isLongText ? (
+                        <details>
+                          <summary className="cursor-pointer list-none">
+                            <span>{stripInternalTags(strV).slice(0, 280)}</span>
+                            <span className="text-muted-foreground">… </span>
+                            <span className="text-xs uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground border-b border-dotted border-foreground/30">
+                              expand
+                            </span>
+                          </summary>
+                          <span className="block mt-2">{stripInternalTags(strV).replace(/\[ref\][^\[]*\[\/ref\]/g, "")}</span>
+                        </details>
+                      ) : looksLikeId ? (
+                        <span className="font-mono text-xs">{strV}</span>
+                      ) : (
+                        stripInternalTags(strV).replace(/\[ref\][^\[]*\[\/ref\]/g, "")
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          ) : (
+            <p
+              className="text-sm text-muted-foreground italic"
+            >
+              No record data available.
+            </p>
+          )}
+        </section>
+
+        {/* Right column: Source evidence */}
+        <section className="lg:pl-8 pt-8 lg:pt-0 border-t lg:border-t-0 border-foreground/15 min-w-0">
+          <div className="flex items-baseline justify-between mb-5">
+            <h2 className="text-base font-semibold tracking-tight">
+              Source evidence
+            </h2>
+            <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+              {uniqueSourceUrls.size} src · {evidence.length} check{evidence.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          {evidence.length === 0 ? (
+            <p
+              className="text-sm text-muted-foreground italic"
+            >
+              No evidence on file.
+            </p>
+          ) : (
+            <div className="space-y-6">
+              {[...evidenceBySource.entries()].map(([sourceUrl, checks], srcIdx) => (
+                <div key={sourceUrl} className={srcIdx > 0 ? "pt-6 border-t border-foreground/10" : ""}>
+                  {/* Source citation — like a footnote reference */}
                   {sourceUrl !== "(no source)" && (
-                    <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40">
+                    <div className="mb-3 text-xs">
                       <a
                         href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                        className="inline-flex items-baseline gap-1.5 text-foreground/80 hover:text-foreground border-b border-dotted border-foreground/40 hover:border-foreground break-all font-mono"
                       >
-                        <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
+                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                       </a>
                       {(() => {
-                        const ds = inferDataSource(sourceUrl);
-                        if (!ds) return null;
+                        // inferDataSource() is grant-specific — only use its resourceId fallback
+                        // on grant record pages to avoid leaking grant resources into other types.
+                        const ds = recordType === "grant" ? inferDataSource(sourceUrl) : null;
+                        const rid =
+                          checks.find((c) => c.resourceId)?.resourceId ??
+                          (recordType === "grant" ? ds?.resourceId : undefined);
                         return (
-                          <Link
-                            href={`/sources?tab=data-sources`}
-                            className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
-                          >
-                            {ds.name}
-                          </Link>
+                          <>
+                            {ds && (
+                              <Link
+                                href={`/sources?tab=data-sources`}
+                                className="inline-block ml-3 text-[10px] uppercase tracking-[0.15em] text-foreground/60 hover:text-foreground font-mono"
+                              >
+                                {ds.name}
+                              </Link>
+                            )}
+                            {rid && (
+                              <Link
+                                href={`/resources/${encodeURIComponent(rid)}`}
+                                className="inline-flex items-center gap-1 ml-3 text-[10px] uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground font-mono"
+                              >
+                                <Database className="h-2.5 w-2.5" />
+                                resource
+                              </Link>
+                            )}
+                          </>
                         );
                       })()}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({checks.length} check{checks.length !== 1 ? "s" : ""})
-                      </span>
                     </div>
                   )}
 
-                  {/* Individual checks for this source (deduplicated) */}
-                  <div className="divide-y divide-border/30">
-                    {deduplicateChecks(checks).map((e) => (
-                      <div key={e.id} className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <VerdictBadge verdict={e.verdict} />
-                          {e.confidence != null && (
-                            <span className="text-xs tabular-nums text-muted-foreground">
-                              {Math.round(e.confidence * 100)}%
-                            </span>
-                          )}
-                          {e.isPrimarySource && (
-                            <span className="inline-flex items-center rounded-full bg-blue-500/15 px-2 py-0.5 text-[11px] font-semibold text-blue-600">
-                              primary
-                            </span>
-                          )}
-                          {e.duplicateCount > 1 && (
-                            <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                              {e.duplicateCount} similar checks
-                            </span>
-                          )}
-                          <span className="ml-auto text-xs text-muted-foreground">
-                            {e.checkerModel && formatCheckerModel(e.checkerModel)}
-                            {e.checkedAt && <> &middot; {new Date(e.checkedAt).toLocaleDateString()}</>}
-                          </span>
-                        </div>
+                  {/* Individual checks */}
+                  <div className="space-y-5">
+                    {deduplicateChecks(checks).map((e) => {
+                      const evVerdictColor =
+                        e.verdict === "confirmed" ? "text-emerald-700 dark:text-emerald-400"
+                        : e.verdict === "contradicted" ? "text-red-700 dark:text-red-400"
+                        : "text-amber-700 dark:text-amber-400";
 
-                        {/* Expected vs Found */}
-                        {(e.expectedValue || e.extractedValue) && (
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2 text-sm">
-                            {e.expectedValue && (
-                              <div>
-                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Expected: </span>
-                                {e.expectedValue}
-                              </div>
+                      // Try to parse extracted value/quote as structured data for display
+                      const structuredEntries = (() => {
+                        const text = (e.extractedQuote || e.extractedValue || "").trim();
+                        if (!text) return null;
+                        const stripped = text.replace(/^(?:Matched row|Found row|Row match)[:\s]*/i, "").trim();
+                        return parseJsonObjectEntries(stripped);
+                      })();
+
+                      return (
+                        <div key={e.id}>
+                          {/* Inline verdict line */}
+                          <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-2">
+                            <span className={`text-sm font-semibold ${evVerdictColor}`}>
+                              {e.verdict}
+                            </span>
+                            {e.confidence != null && (
+                              <span className="text-xs tabular-nums text-muted-foreground font-mono">
+                                {Math.round(e.confidence * 100)}%
+                              </span>
                             )}
-                            {e.extractedValue && (
-                              <div>
-                                <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">Found: </span>
-                                <FormatExtractedValue value={e.extractedValue} />
-                              </div>
+                            {e.isPrimarySource && (
+                              <span className="text-[10px] uppercase tracking-[0.15em] text-blue-700 dark:text-blue-400 font-mono">
+                                primary
+                              </span>
                             )}
+                            {e.duplicateCount > 1 && (
+                              <span className="text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+                                ×{e.duplicateCount}
+                              </span>
+                            )}
+                            <span className="ml-auto text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-mono">
+                              {e.checkerModel && formatCheckerModel(e.checkerModel)}
+                              {e.checkedAt && <> · {new Date(e.checkedAt).toLocaleDateString()}</>}
+                            </span>
                           </div>
-                        )}
 
-                        {/* Quote */}
-                        {e.extractedQuote && (
-                          <FormatQuote quote={e.extractedQuote} />
-                        )}
+                          {/* Contradicted diff: show expected vs extracted side-by-side */}
+                          {e.verdict === "contradicted" && e.expectedValue && e.extractedValue && !structuredEntries && (
+                            <div className="mb-3 pl-3 border-l-2 border-red-400/60 space-y-1 text-sm">
+                              <div className="flex gap-2">
+                                <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-mono w-14 shrink-0 pt-0.5">Claimed</span>
+                                <span className="text-foreground/90">{e.expectedValue}</span>
+                              </div>
+                              <div className="flex gap-2">
+                                <span className="text-[10px] uppercase tracking-[0.12em] text-red-600 dark:text-red-400 font-mono w-14 shrink-0 pt-0.5">Found</span>
+                                <span className="text-red-700 dark:text-red-300 font-medium">{e.extractedValue}</span>
+                              </div>
+                            </div>
+                          )}
 
-                        {/* Notes */}
-                        {e.notes && (
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground/70">Note:</span> {e.notes}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                          {/* Matched data — render as dl matching the claim style */}
+                          {structuredEntries && structuredEntries.length > 0 && (
+                            <dl className="space-y-2 mb-3 pl-3 border-l border-foreground/15 min-w-0">
+                              {structuredEntries.slice(0, 8).map(([k, val]) => (
+                                <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
+                                  <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
+                                    {humanizeFieldLabel(k)}
+                                  </dt>
+                                  <dd className="text-foreground/90 break-words min-w-0">
+                                    {formatJsonValue(val)}
+                                  </dd>
+                                </div>
+                              ))}
+                              {structuredEntries.length > 8 && (
+                                <div className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground font-mono">
+                                  +{structuredEntries.length - 8} more
+                                </div>
+                              )}
+                            </dl>
+                          )}
+
+                          {/* Fallback: extracted quote as a blockquote */}
+                          {!structuredEntries && e.extractedQuote && (
+                            <blockquote
+                              className="border-l-2 border-foreground/30 pl-4 my-2 text-sm italic text-foreground/80 leading-relaxed"
+                            >
+                              {e.extractedQuote}
+                            </blockquote>
+                          )}
+
+                          {/* Note */}
+                          {e.notes && (
+                            <p
+                              className="text-sm text-muted-foreground leading-relaxed mt-2"
+                            >
+                              <span
+                                className="text-[10px] uppercase tracking-[0.12em] text-foreground/60 mr-2 not-italic"
+                              >
+                                Note
+                              </span>
+                              {stripInternalTags(e.notes)}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-        );
-      })()}
-
-      {evidence.length === 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Evidence
-          </h2>
-          <div className="rounded-lg border border-border/60 p-6 text-center text-muted-foreground">
-            <p>No evidence records found for this item.</p>
-          </div>
+          )}
         </section>
-      )}
+      </div>
 
-      {/* Footer */}
-      <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        <summary className="cursor-pointer hover:text-foreground transition-colors">
-          Debug info
-        </summary>
-        <div className="mt-2 space-y-0.5">
-          <p>Record type: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordType}</code></p>
-          <p>Record ID: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordId}</code></p>
-        </div>
-      </details>
+      {/* Editorial colophon — case number footer */}
+      <div
+        className="pt-6 border-t border-foreground/15 text-[10px] uppercase tracking-[0.2em] text-muted-foreground/70 flex flex-wrap items-baseline gap-x-4 gap-y-1"
+      >
+        <span>Case № {recordId}</span>
+        {primaryVerdict?.lastComputedAt && (
+          <span>Filed {new Date(primaryVerdict.lastComputedAt).toLocaleDateString()}</span>
+        )}
+        {primaryConfidence != null && (
+          <span>Confidence {Math.round(primaryConfidence * 100)}%</span>
+        )}
+      </div>
+
     </div>
   );
 }

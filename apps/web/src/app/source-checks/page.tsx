@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import {
   fetchDetailed,
 } from "@/lib/wiki-server";
@@ -170,10 +170,20 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
     }
 
     // Strip "new:" prefix from display names (artefact of record creation)
+    // Also strip type-prefix pattern "TypeName: ..." (e.g. "Personnel: Josh Batson at Anthropic")
+    // since the Type column already shows the record type.
+    const TYPE_PREFIX_RE = /^[A-Z][A-Za-z -]+:\s+/;
     for (const [key, value] of Object.entries(names)) {
-      if (value.startsWith("new:")) {
-        names[key] = value.slice(4);
+      let cleaned = value;
+      if (cleaned.startsWith("new:")) {
+        cleaned = cleaned.slice(4);
       }
+      // Strip type prefix like "Personnel: " / "Grant: " / "Fact: " from record names.
+      // Only strip if the key is NOT an entity stableId (entity names should be preserved).
+      if (!key.startsWith("sid_") && TYPE_PREFIX_RE.test(cleaned)) {
+        cleaned = cleaned.replace(TYPE_PREFIX_RE, "");
+      }
+      names[key] = cleaned;
     }
 
     // Resolve fact names locally from FactBase as fallback (wiki-server may not
@@ -256,8 +266,13 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
   const typeEntries = Object.entries(globalStats.by_type).sort(
     ([, a], [, b]) => b - a
   );
-  // Verdict tabs use filteredStats (contextual to selected type)
-  const verdictEntries = Object.entries(filteredStats.by_verdict).sort(
+  // Verdict tabs use filteredStats (contextual to selected type).
+  // Ensure "partial" is always present in the verdict filter (2,040+ records use it).
+  const byVerdictWithPartial = { ...filteredStats.by_verdict };
+  if (!("partial" in byVerdictWithPartial)) {
+    byVerdictWithPartial.partial = 0;
+  }
+  const verdictEntries = Object.entries(byVerdictWithPartial).sort(
     ([, a], [, b]) => b - a
   );
 
@@ -266,7 +281,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">
-          Source Checks
+          All Source Checks
         </h1>
         <p className="text-muted-foreground text-sm max-w-2xl mb-2">
           Automated source checking of wiki data against original sources. Each
@@ -450,7 +465,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
               })}
               className={cn(
                 "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                filterType === type
+                filterType === type && filterType !== "all"
                   ? "bg-foreground text-background"
                   : "bg-muted text-muted-foreground hover:bg-muted/80"
               )}
@@ -460,7 +475,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           ))}
         </div>
 
-        {/* Filter tabs — verdict */}
+        {/* Filter tabs — verdict (independent of type filter) */}
         <div className="flex gap-1.5 flex-wrap">
           <Link
             href={buildFilterUrl("/source-checks", {
@@ -479,6 +494,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
           </Link>
           {verdictEntries.map(([v, count]) => {
             const style = VERDICT_STYLES[v] || VERDICT_STYLES.unchecked;
+            const isActive = filterVerdict === v && filterVerdict !== "all";
             return (
               <Link
                 key={v}
@@ -489,7 +505,7 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
                 })}
                 className={cn(
                   "px-3 py-1.5 rounded-md text-xs font-medium transition-colors",
-                  filterVerdict === v
+                  isActive
                     ? `${style.bg} ${style.text}`
                     : "bg-muted text-muted-foreground hover:bg-muted/80"
                 )}
@@ -514,12 +530,32 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-1 mt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 px-1 mt-4">
           <span className="text-sm text-muted-foreground">
             Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of{" "}
-            {total}
+            {total.toLocaleString()}
           </span>
           <div className="flex items-center gap-1">
+            {/* First page */}
+            {pageNum > 1 ? (
+              <Link
+                href={buildFilterUrl("/source-checks", {
+                  type: filterType,
+                  verdict: filterVerdict,
+                  q: searchQuery,
+                  page: 1,
+                })}
+                className="inline-flex items-center gap-0.5 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 transition-colors"
+                title="First page"
+              >
+                <ChevronsLeft className="h-3.5 w-3.5" />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-0.5 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-30 cursor-not-allowed">
+                <ChevronsLeft className="h-3.5 w-3.5" />
+              </span>
+            )}
+            {/* Prev page */}
             {pageNum > 1 ? (
               <Link
                 href={buildFilterUrl("/source-checks", {
@@ -533,13 +569,15 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
                 <ChevronLeft className="h-3.5 w-3.5" /> Prev
               </Link>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-40 cursor-not-allowed">
+              <span className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-30 cursor-not-allowed">
                 <ChevronLeft className="h-3.5 w-3.5" /> Prev
               </span>
             )}
-            <span className="px-2 text-xs text-muted-foreground tabular-nums">
-              {pageNum} / {totalPages}
+            {/* Page indicator */}
+            <span className="px-3 py-1 text-xs font-medium text-muted-foreground tabular-nums whitespace-nowrap">
+              Page {pageNum} of {totalPages}
             </span>
+            {/* Next page */}
             {pageNum < totalPages ? (
               <Link
                 href={buildFilterUrl("/source-checks", {
@@ -553,8 +591,27 @@ export default async function SourceChecksPage({ searchParams }: PageProps) {
                 Next <ChevronRight className="h-3.5 w-3.5" />
               </Link>
             ) : (
-              <span className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-40 cursor-not-allowed">
+              <span className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-30 cursor-not-allowed">
                 Next <ChevronRight className="h-3.5 w-3.5" />
+              </span>
+            )}
+            {/* Last page */}
+            {pageNum < totalPages ? (
+              <Link
+                href={buildFilterUrl("/source-checks", {
+                  type: filterType,
+                  verdict: filterVerdict,
+                  q: searchQuery,
+                  page: totalPages,
+                })}
+                className="inline-flex items-center gap-0.5 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground hover:bg-muted/50 transition-colors"
+                title="Last page"
+              >
+                <ChevronsRight className="h-3.5 w-3.5" />
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-0.5 rounded-md border border-border/60 px-2 py-1 text-xs text-muted-foreground opacity-30 cursor-not-allowed">
+                <ChevronsRight className="h-3.5 w-3.5" />
               </span>
             )}
           </div>

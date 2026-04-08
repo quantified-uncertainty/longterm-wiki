@@ -59,8 +59,10 @@ const eaFunds: DataSourceManifest = {
   },
   sourceCheck: {
     strategy: 'deterministic_row_match',
-    matchFields: ['grantee', 'amount'],
-    fuzzyFields: ['grantee'],
+    // EA Funds has many grants with the same grantee + amount (e.g. "Effective Giving Quest", $40,000),
+    // so we must include 'name' (grant description) and 'date' to disambiguate.
+    matchFields: ['grantee', 'amount', 'date', 'name'],
+    fuzzyFields: ['grantee', 'name'],
     exactFields: ['amount'],
   },
 };

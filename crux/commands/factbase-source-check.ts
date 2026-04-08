@@ -221,6 +221,7 @@ async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> 
   const body = {
     recordType: 'fact',
     recordId: result.factId,
+    entityId: result.entityId,
     verdict: result.verdict,
     confidence: result.confidence,
     extractedValue: result.extractedValue,
@@ -243,6 +244,7 @@ async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> 
   const verdictBody = {
     recordType: 'fact',
     recordId: result.factId,
+    entityId: result.entityId,
     verdict: result.verdict,
     confidence: result.confidence,
     reasoning: result.reasoning,
