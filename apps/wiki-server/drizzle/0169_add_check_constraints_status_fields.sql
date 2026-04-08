@@ -1,4 +1,4 @@
--- Epic #4017 Phase B2: Add CHECK constraints on 14 status/enum columns.
+-- Epic #4017 Phase B2: Add CHECK constraints on 13 status/enum columns.
 --
 -- These columns already have Zod validation at the API layer. This migration
 -- adds the matching DB-level constraints so bad data can't enter even via
@@ -47,33 +47,27 @@ ALTER TABLE "resources"
   ADD CONSTRAINT chk_resources_fetch_status
   CHECK (fetch_status IS NULL OR fetch_status IN ('ok', 'dead', 'soft_404', 'not_found', 'timeout', 'unreachable', 'paywall', 'error'));
 
--- 9. incidents.status
-ALTER TABLE "incidents"
-  ADD CONSTRAINT chk_incidents_status
-  CHECK (status IN ('open', 'acknowledged', 'resolved'));
-
--- 10. political_races.status
+-- 9. political_races.status
 ALTER TABLE "political_races"
   ADD CONSTRAINT chk_political_races_status
   CHECK (status IN ('upcoming', 'active', 'resolved', 'cancelled'));
 
--- 11. race_candidates.status (the schema table is race_candidates, not political_candidates)
+-- 10. race_candidates.status
 ALTER TABLE "race_candidates"
   ADD CONSTRAINT chk_race_candidates_status
   CHECK (status IN ('running', 'won', 'lost', 'withdrew'));
 
--- 12. agent_sessions.status
+-- 11. agent_sessions.status
 ALTER TABLE "agent_sessions"
   ADD CONSTRAINT chk_agent_sessions_status
   CHECK (status IN ('active', 'completed', 'errored', 'stale'));
 
--- 13. research_areas.status
+-- 12. research_areas.status
 ALTER TABLE "research_areas"
   ADD CONSTRAINT chk_research_areas_status
   CHECK (status IN ('active', 'emerging', 'mature', 'declining', 'archived'));
 
--- 14. source_check_evidence.verdict (same enum as verdicts table)
--- The evidence table also has a verdict column that should be constrained.
+-- 13. source_check_evidence.verdict (same enum as verdicts table)
 ALTER TABLE "source_check_evidence"
   ADD CONSTRAINT chk_source_check_evidence_verdict
   CHECK (verdict IS NULL OR verdict IN ('confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial'));
