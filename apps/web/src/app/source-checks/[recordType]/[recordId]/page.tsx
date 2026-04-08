@@ -383,15 +383,15 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       </Link>
 
       {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-          <span className="capitalize">{formatRecordType(recordType)}</span>
-        </div>
-        <h1 className="text-2xl font-bold mb-1">
-          {claimSummary ?? displayName}
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold mb-1 flex flex-wrap items-baseline gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground rounded bg-muted px-1.5 py-0.5">
+            {formatRecordType(recordType)}
+          </span>
+          <span>{claimSummary ?? displayName}</span>
         </h1>
         {claimSummary && resolvedName && resolvedName !== claimSummary && (
-          <p className="text-sm text-muted-foreground mb-2">{resolvedName}</p>
+          <p className="text-sm text-muted-foreground mb-1">{resolvedName}</p>
         )}
         <div className="flex flex-wrap items-center gap-3 text-sm">
           {/* Things page link — only for record types with PG primary keys (not facts or citations) */}
@@ -438,85 +438,42 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
             return (
               <div
                 key={`${v.fieldName ?? "overall"}-${i}`}
-                className="rounded-lg border border-border/60 p-5"
+                className="rounded-lg border border-border/60 px-4 py-3"
               >
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div>
-                    {v.fieldName && (
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Field:{" "}
-                        <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
-                          {v.fieldName}
-                        </code>
-                      </p>
-                    )}
-                    <div className="flex items-center gap-3">
-                      <VerdictBadge verdict={v.verdict} />
-                      {v.confidence != null && (
-                        <span className="text-sm tabular-nums font-medium">
-                          {Math.round(v.confidence * 100)}% confidence
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right text-xs text-muted-foreground">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <VerdictBadge verdict={v.verdict} />
+                  {v.confidence != null && (
+                    <span className="tabular-nums font-medium">
+                      {Math.round(v.confidence * 100)}%
+                    </span>
+                  )}
+                  {v.fieldName && (
+                    <span className="text-xs text-muted-foreground">
+                      field:{" "}
+                      <code className="text-[11px] bg-muted px-1 py-0.5 rounded">
+                        {v.fieldName}
+                      </code>
+                    </span>
+                  )}
+                  <span className="ml-auto text-xs text-muted-foreground">
                     {fieldEvidence.length > 0 && (
-                      <p>
-                        {fieldEvidence.length} evidence check
-                        {fieldEvidence.length !== 1 ? "s" : ""}
-                        {fieldUniqueUrls.size > 0 &&
-                          fieldUniqueUrls.size !== fieldEvidence.length && (
-                            <>
-                              {" "}from {fieldUniqueUrls.size} unique source
-                              {fieldUniqueUrls.size !== 1 ? "s" : ""}
-                            </>
-                          )}
-                      </p>
+                      <>
+                        {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
+                        {fieldUniqueUrls.size > 0 && fieldUniqueUrls.size !== fieldEvidence.length && (
+                          <> &middot; {fieldUniqueUrls.size} source{fieldUniqueUrls.size !== 1 ? "s" : ""}</>
+                        )}
+                      </>
                     )}
                     {v.lastComputedAt && (
-                      <p>
-                        Last checked:{" "}
-                        {new Date(v.lastComputedAt).toLocaleDateString()}
-                      </p>
+                      <> &middot; {new Date(v.lastComputedAt).toLocaleDateString()}</>
                     )}
                     {v.needsRecheck && (
-                      <p className="text-amber-500 font-medium mt-0.5">
-                        Needs recheck
-                      </p>
+                      <> &middot; <span className="text-amber-500 font-medium">needs recheck</span></>
                     )}
-                  </div>
+                  </span>
                 </div>
-
-                {/* Confidence bar */}
-                {v.confidence != null && (
-                  <div
-                    className="w-full bg-muted rounded-full h-2 mb-3"
-                    role="progressbar"
-                    aria-valuenow={Math.round(v.confidence * 100)}
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-label={`${v.verdict} confidence: ${Math.round(v.confidence * 100)}%`}
-                  >
-                    <div
-                      className={cn(
-                        "h-2 rounded-full transition-all",
-                        v.verdict === "confirmed"
-                          ? "bg-emerald-500"
-                          : v.verdict === "contradicted"
-                            ? "bg-red-500"
-                            : v.verdict === "outdated"
-                              ? "bg-amber-500"
-                              : v.verdict === "partial"
-                                ? "bg-amber-400"
-                                : "bg-gray-400"
-                      )}
-                      style={{ width: `${Math.round(v.confidence * 100)}%` }}
-                    />
-                  </div>
-                )}
-
                 {v.reasoning && (
-                  <p className="text-sm text-muted-foreground">{stripInternalTags(v.reasoning)}</p>
+                  <p className="text-sm text-muted-foreground mt-1.5">{stripInternalTags(v.reasoning)}</p>
                 )}
               </div>
             );
@@ -539,20 +496,32 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
             <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <tbody>
-                  {displayFields.map(([k, v]) => (
-                    <tr key={k} className="border-b border-border/30 last:border-0">
-                      <td className="pr-3 py-2 px-4 text-muted-foreground whitespace-nowrap align-top text-xs font-medium bg-muted/20">
-                        {k}
-                      </td>
-                      <td className="py-2 px-4 text-foreground/90 break-words">
-                        {typeof v === "number"
-                          ? v.toLocaleString("en-US")
-                          : String(v).length > 250
-                            ? String(v).slice(0, 250) + "\u2026"
-                            : String(v)}
-                      </td>
-                    </tr>
-                  ))}
+                  {displayFields.map(([k, v]) => {
+                    const isLongText = typeof v === "string" && v.length > 300;
+                    return (
+                      <tr key={k} className="border-b border-border/30 last:border-0">
+                        <td className="pr-3 py-2 px-4 text-muted-foreground whitespace-nowrap align-top text-xs font-medium bg-muted/20">
+                          {k}
+                        </td>
+                        <td className="py-2 px-4 text-foreground/90 break-words whitespace-pre-wrap">
+                          {typeof v === "number" ? (
+                            v.toLocaleString("en-US")
+                          ) : isLongText ? (
+                            <details>
+                              <summary className="cursor-pointer list-none">
+                                <span>{String(v).slice(0, 300)}</span>
+                                <span className="text-muted-foreground">&hellip; </span>
+                                <span className="text-xs text-primary hover:underline">show more</span>
+                              </summary>
+                              <span className="block mt-1">{String(v)}</span>
+                            </details>
+                          ) : (
+                            String(v)
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -677,16 +646,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </section>
       </div>
 
-      {/* Footer */}
-      <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
-        <summary className="cursor-pointer hover:text-foreground transition-colors">
-          Debug info
-        </summary>
-        <div className="mt-2 space-y-0.5">
-          <p>Record type: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordType}</code></p>
-          <p>Record ID: <code className="text-[11px] bg-muted px-1 py-0.5 rounded">{recordId}</code></p>
-        </div>
-      </details>
     </div>
   );
 }
