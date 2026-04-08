@@ -602,6 +602,29 @@ export interface ParsedDeployTasks {
 }
 
 /**
+ * Extract the verification shell command embedded in a deploy task text line.
+ *
+ * Tasks formatted by `formatDeployTasksSection` look like:
+ *   `category` Description goes here — `verify command`
+ *
+ * Sub-PR tasks may have a trailing attribution suffix:
+ *   `category` Description — `verify command` _(from PR #1234)_
+ *
+ * Returns the command string (without backticks) or null if no embedded command
+ * is found. Uses an em-dash (U+2014) as the command separator since that's what
+ * `formatDeployTasksSection` writes.
+ */
+export function extractVerifyCommand(text: string): string | null {
+  // Strip trailing sub-PR attribution before matching
+  const cleaned = text.replace(/\s*_\(from PR #\d+\)_\s*$/, "").trim();
+  // Match the LAST `— \`...\`` segment so descriptions containing em-dashes work.
+  // Backticks inside the command itself are not supported (deploy task formatter
+  // doesn't produce them).
+  const match = cleaned.match(/—\s+`([^`]+)`\s*$/);
+  return match ? match[1] : null;
+}
+
+/**
  * Parse deploy tasks from a PR body. Returns null if no deploy tasks section found.
  */
 export function parseDeployTasksFromBody(body: string): ParsedDeployTasks | null {

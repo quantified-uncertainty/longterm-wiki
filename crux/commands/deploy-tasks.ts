@@ -8,12 +8,16 @@
  *   crux gh deploy-tasks detect             Detect deploy tasks from current branch diff
  *   crux gh deploy-tasks pending            Find unchecked tasks from recently merged PRs
  *   crux gh deploy-tasks inject             Output deploy tasks section (or update a PR)
+ *   crux gh deploy-tasks verify             Run embedded verify commands for unchecked tasks
  */
+
+import { spawnSync } from 'child_process';
 
 import { createLogger } from '../lib/output.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 import {
   detectDeployTasks,
+  extractVerifyCommand,
   parseDeployTasksFromBody,
   formatDeployTasksSection,
 } from '../lib/deploy-tasks/detect.ts';
@@ -163,6 +167,185 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
   return { output: lines.join('\n').trimEnd() + '\n', exitCode: 0 };
 }
 
+// ── verify ──────────────────────────────────────────────────────────────────
+
+interface VerifyResult {
+  pr: number;
+  prTitle: string;
+  task: string;
+  command: string | null;
+  status: 'pass' | 'fail' | 'skip';
+  exitCode?: number;
+  output?: string;
+}
+
+/**
+ * Run a shell command via `bash -c` with a timeout. Captures combined stdout +
+ * stderr (truncated to keep output reviewable). Returns exit code 124 on
+ * timeout, mirroring GNU coreutils' `timeout` exit convention.
+ */
+function runVerifyCommand(
+  command: string,
+  timeoutMs: number
+): { exitCode: number; output: string } {
+  const result = spawnSync('bash', ['-c', command], {
+    encoding: 'utf-8',
+    timeout: timeoutMs,
+    stdio: ['ignore', 'pipe', 'pipe'],
+    maxBuffer: 1024 * 1024, // 1MB cap
+  });
+
+  // spawnSync sets `signal` on timeout (typically SIGTERM); the docs are
+  // explicit that exit code is null in that case.
+  if (result.signal) {
+    return {
+      exitCode: 124,
+      output: `[timeout after ${timeoutMs}ms] ${result.stdout ?? ''}${result.stderr ?? ''}`.trim(),
+    };
+  }
+  // spawnSync.error fires for things like ENOENT (bash missing) — surface it.
+  if (result.error) {
+    return { exitCode: 1, output: `[spawn error] ${result.error.message}` };
+  }
+  const combined = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim();
+  // Truncate to keep terminal output reviewable. Full output stays in JSON mode.
+  const truncated =
+    combined.length > 500 ? combined.slice(0, 500) + '\n... [truncated]' : combined;
+  return { exitCode: result.status ?? 1, output: truncated };
+}
+
+async function verify(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+  const lookbackDays = Number(options.days) || 14;
+  const dryRun = Boolean(options.dryRun ?? options['dry-run']);
+  const timeoutMs = Number(options.timeout) || 30_000;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - lookbackDays);
+
+  const prs = await githubApi<PrData[]>(
+    `/repos/${REPO}/pulls?state=closed&sort=created&direction=desc&per_page=30`
+  );
+
+  const results: VerifyResult[] = [];
+
+  for (const pr of prs) {
+    if (!pr.merged_at) continue;
+    if (new Date(pr.merged_at) < cutoff) continue;
+    if (!pr.body) continue;
+
+    const parsed = parseDeployTasksFromBody(pr.body);
+    if (!parsed || parsed.unchecked === 0) continue;
+
+    for (const item of parsed.items) {
+      if (item.checked) continue;
+
+      const command = extractVerifyCommand(item.text);
+      if (!command) {
+        results.push({
+          pr: pr.number,
+          prTitle: pr.title,
+          task: item.text,
+          command: null,
+          status: 'skip',
+        });
+        continue;
+      }
+
+      if (dryRun) {
+        results.push({
+          pr: pr.number,
+          prTitle: pr.title,
+          task: item.text,
+          command,
+          status: 'skip',
+          output: '[dry-run]',
+        });
+        continue;
+      }
+
+      const { exitCode, output } = runVerifyCommand(command, timeoutMs);
+      results.push({
+        pr: pr.number,
+        prTitle: pr.title,
+        task: item.text,
+        command,
+        status: exitCode === 0 ? 'pass' : 'fail',
+        exitCode,
+        output,
+      });
+    }
+  }
+
+  const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.filter((r) => r.status === 'fail').length;
+  const skipped = results.filter((r) => r.status === 'skip').length;
+
+  if (options.ci) {
+    return {
+      output:
+        JSON.stringify(
+          { results, summary: { passed, failed, skipped, total: results.length } },
+          null,
+          2
+        ) + '\n',
+      exitCode: failed > 0 ? 1 : 0,
+    };
+  }
+
+  if (results.length === 0) {
+    return {
+      output: `${c.green}No pending deploy tasks to verify.${c.reset}\n`,
+      exitCode: 0,
+    };
+  }
+
+  // Group by PR for human-readable output
+  const byPr = new Map<number, VerifyResult[]>();
+  for (const r of results) {
+    if (!byPr.has(r.pr)) byPr.set(r.pr, []);
+    byPr.get(r.pr)!.push(r);
+  }
+
+  const lines: string[] = [];
+  lines.push(
+    `${c.bold}Deploy Tasks Verification${c.reset}${dryRun ? ' (dry-run)' : ''}\n`
+  );
+
+  for (const [prNum, prResults] of byPr) {
+    const title = prResults[0].prTitle;
+    lines.push(`${c.cyan}PR #${prNum}${c.reset} ${c.dim}"${title}"${c.reset}`);
+    for (const r of prResults) {
+      let badge: string;
+      if (r.status === 'pass') badge = `${c.green}PASS${c.reset}`;
+      else if (r.status === 'fail') badge = `${c.red}FAIL${c.reset}`;
+      else badge = `${c.yellow}SKIP${c.reset}`;
+      lines.push(`  ${badge}  ${r.task}`);
+      if (r.status === 'fail' && r.output) {
+        // Indent failure output for readability
+        const indented = r.output
+          .split('\n')
+          .map((l) => `        ${c.dim}${l}${c.reset}`)
+          .join('\n');
+        lines.push(`        ${c.dim}exit=${r.exitCode}${c.reset}`);
+        lines.push(indented);
+      }
+    }
+    lines.push('');
+  }
+
+  lines.push(
+    `${c.bold}Summary:${c.reset} ${c.green}${passed} passed${c.reset}, ${
+      failed > 0 ? c.red : c.dim
+    }${failed} failed${c.reset}, ${c.dim}${skipped} skipped${c.reset}`
+  );
+
+  return {
+    output: lines.join('\n').trimEnd() + '\n',
+    exitCode: failed > 0 ? 1 : 0,
+  };
+}
+
 // ── inject ──────────────────────────────────────────────────────────────────
 
 async function inject(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -233,6 +416,7 @@ export const commands = {
   detect,
   pending,
   inject,
+  verify,
 };
 
 export function getHelp(): string {
@@ -242,6 +426,7 @@ Commands:
   detect                Detect deploy tasks from current branch diff.
   pending               Find unchecked deploy tasks from recently merged PRs.
   inject                Inject deploy tasks section into a PR description.
+  verify                Run embedded verify commands for unchecked deploy tasks.
 
 Options (detect):
   --base=<ref>          Base ref for diff (default: origin/main).
@@ -255,8 +440,20 @@ Options (inject):
   --pr=N                Update PR #N's description (otherwise prints to stdout).
   --base=<ref>          Base ref for diff (default: origin/main).
 
+Options (verify):
+  --days=N              Lookback window in days (default: 14).
+  --timeout=N           Per-command timeout in milliseconds (default: 30000).
+  --dry-run             Print commands without executing them.
+  --ci                  JSON output.
+
+Environment for verify:
+  Tasks may reference shell variables like \$DATABASE_URL, \$WIKI_SERVER_URL.
+  Set these in the calling shell — verify inherits the parent environment.
+
 Examples:
   pnpm crux gh deploy-tasks detect                # Show tasks for current branch
   pnpm crux gh deploy-tasks pending               # Show unchecked tasks from recent PRs
-  pnpm crux gh deploy-tasks inject --pr=3270      # Add tasks section to PR #3270`;
+  pnpm crux gh deploy-tasks inject --pr=3270      # Add tasks section to PR #3270
+  pnpm crux gh deploy-tasks verify                # Run verify commands for pending tasks
+  pnpm crux gh deploy-tasks verify --dry-run      # Show what would run`;
 }
