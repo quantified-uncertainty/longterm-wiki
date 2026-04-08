@@ -35,7 +35,10 @@ interface CommandOptions extends BaseOptions {
   format?: string;
   ci?: boolean;
   dryRun?: boolean;
+  /** Bypass FK validation. Requires --skipEntityValidationReason. Issue #4017. */
   skipEntityValidation?: boolean;
+  /** Required when --skipEntityValidation is set. */
+  skipEntityValidationReason?: string;
   skipSourceCheck?: boolean;
   fix?: boolean;
   apply?: boolean;
@@ -273,7 +276,17 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   if (!tableConfig) return { exitCode: 1, output: `Unknown table: ${table}` };
 
   const params = new URLSearchParams();
-  if (options.skipEntityValidation) params.set('skipEntityValidation', 'true');
+  if (options.skipEntityValidation) {
+    const reason = options.skipEntityValidationReason?.trim();
+    if (!reason) {
+      return {
+        exitCode: 1,
+        output: 'Error: --skipEntityValidation requires --skipEntityValidationReason="<why>" (issue #4017)',
+      };
+    }
+    params.set('skipEntityValidation', 'true'); // skipEntityValidation-ok: CLI flag enforces reason above
+    params.set('skipEntityValidationReason', reason);
+  }
   if (tableConfig.requireSourceCheck) params.set('requireSourceCheck', 'true');
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;

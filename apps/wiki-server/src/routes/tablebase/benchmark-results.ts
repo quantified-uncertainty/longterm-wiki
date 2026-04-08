@@ -195,14 +195,14 @@ const benchmarkResultsApp = new Hono()
       }
     }
 
-    // Check modelIds against the entities table (skippable via ?skipEntityValidation=true
-    // because entity sync order may vary, but benchmark refs are always required).
-    if (c.req.query("skipEntityValidation") !== "true") {
-      const modelRefError = await validateEntityRefs(c, db, [
-        { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
-      ]);
-      if (modelRefError) return modelRefError;
-    }
+    // Check modelIds against the entities table. validateEntityRefs() handles
+    // the ?skipEntityValidation=true bypass internally and logs loudly when used
+    // (issue #4017). Entity sync order may vary, but benchmark refs are always
+    // required, hence the bypass exists for migration scenarios only.
+    const modelRefError = await validateEntityRefs(c, db, [
+      { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
+    ]);
+    if (modelRefError) return modelRefError;
 
     // Validate claim references
     const items = parsed.data.items;

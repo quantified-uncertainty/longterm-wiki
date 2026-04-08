@@ -56,13 +56,44 @@ export async function getAllPersonnel(
   );
 }
 
-/** Sync personnel records (upsert). */
+/**
+ * Sync personnel records (upsert).
+ *
+ * If `skipEntityValidation` is requested, the caller MUST also provide
+ * `skipEntityValidationReason` — this is a "loud bypass" requirement from
+ * epic #4017 Phase A. The reason is forwarded to the wiki-server, which logs
+ * it at warn level for every request that uses the bypass.
+ *
+ * Throws `Error` synchronously (before issuing the request) if the reason is
+ * missing. The thrown error has a clear message pointing at issue #4017.
+ */
 export async function syncPersonnel(
   items: Array<Record<string, unknown>>,
-  options?: { skipEntityValidation?: boolean },
+  options?: {
+    skipEntityValidation?: boolean;
+    /** Required when skipEntityValidation is true. Logged on every bypass. */
+    skipEntityValidationReason?: string;
+  },
 ): Promise<ApiResult<PersonnelSyncResult>> {
-  const qs = options?.skipEntityValidation ? '?skipEntityValidation=true' : '';
-  return apiRequest<PersonnelSyncResult>('POST', `/api/personnel/sync${qs}`, { items });
+  if (options?.skipEntityValidation) {
+    const reason = options.skipEntityValidationReason?.trim();
+    if (!reason) {
+      throw new Error(
+        'syncPersonnel: skipEntityValidation requires skipEntityValidationReason — entity-validation bypass must be justified (issue #4017)',
+      );
+    }
+  }
+  const params = new URLSearchParams();
+  if (options?.skipEntityValidation) {
+    params.set('skipEntityValidation', 'true'); // skipEntityValidation-ok: typed wrapper enforces reason above
+    params.set('skipEntityValidationReason', options.skipEntityValidationReason!);
+  }
+  const qs = params.toString();
+  return apiRequest<PersonnelSyncResult>(
+    'POST',
+    `/api/personnel/sync${qs ? '?' + qs : ''}`,
+    { items },
+  );
 }
 
 /** Delete personnel records by ID. */

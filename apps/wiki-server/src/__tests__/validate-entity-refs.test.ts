@@ -256,6 +256,52 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(200);
     });
 
+    // Issue #4017 — bypass with reason should also pass and log a warn (the
+    // log itself isn't asserted here; this just verifies the contract).
+    it("skips validation with reason: 200 OK", async () => {
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
+        {
+          items: [
+            {
+              id: "Pabcde2345",
+              personId: "nxPerson02",
+              organizationId: "nxOrgani02",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    // Issue #4017 — empty-string reason is treated the same as no reason
+    // (still bypasses, but logs at error level — verified manually in logs).
+    it("treats whitespace-only reason as missing (still allows bypass)", async () => {
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=%20%20",
+        {
+          items: [
+            {
+              id: "Pabcde3456",
+              personId: "nxPerson03",
+              organizationId: "nxOrgani03",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+
+      // The bypass still works (we don't want to break existing pipelines),
+      // but the server logs at error level so the misuse is visible.
+      expect(res.status).toBe(200);
+    });
+
     it("reports multiple missing fields in one error", async () => {
       const res = await postJson(app, "/api/personnel/sync", {
         items: [

@@ -531,7 +531,7 @@ function saveToPostgres(url: string, title: string, content: string, httpStatus:
     fullText: content,
     contentLength: content.length,
     fetchMethod: fetchMethod ?? null,
-  }).catch((e) => console.warn('[source-fetcher] PG write failed:', e.message));
+  }).catch((e) => console.warn('[source-fetcher] PG write failed:', e.message)); // catch-ok: best-effort cache write per JSDoc above; PG is a secondary store
 }
 
 // ---------------------------------------------------------------------------

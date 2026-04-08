@@ -317,6 +317,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'dangerous-patterns',
+    name: 'Data-integrity anti-patterns (silent catch, as any in routes, skipEntityValidation without reason)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-dangerous-patterns.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'factbase-stableid',
     name: 'FactBase lookups use stableIds (not slugs)',
     command: 'npx',
