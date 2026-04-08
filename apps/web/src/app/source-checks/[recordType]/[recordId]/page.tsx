@@ -24,6 +24,11 @@ import { formatKBFactValue } from "@/components/wiki/factbase/format";
 export const revalidate = 3600;
 export const dynamicParams = true;
 
+/** Strip internal machine-readable tags like [deterministic-row-match] from user-visible text. */
+function stripInternalTags(text: string): string {
+  return text.replace(/^\[[\w-]+\]\s*/g, "").replace(/\s*\[[\w-]+\]\s*/g, " ").trim();
+}
+
 /** Format a single JSON value for display in a key-value summary. */
 function formatJsonValue(v: unknown): string {
   if (typeof v === "string") return v.length > 100 ? v.slice(0, 100) + "\u2026" : v;
@@ -326,14 +331,19 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           <p className="text-sm text-muted-foreground mb-2">{resolvedName}</p>
         )}
         <div className="flex flex-wrap items-center gap-3 text-sm">
-          <Link href={`/things/${encodeURIComponent(recordId)}`} className="text-primary hover:underline">
-            Things page &rarr;
-          </Link>
-          {recordHref && recordHref !== `/things/${recordId}` && (
+          {/* Things page link — only for record types with PG primary keys (not facts or citations) */}
+          {!recordType.startsWith("fact") && !recordType.startsWith("citation") && !recordType.includes("wiki-page") && (
+            <Link href={`/things/${encodeURIComponent(recordId)}`} className="text-primary hover:underline">
+              View record &rarr;
+            </Link>
+          )}
+          {recordHref && !recordHref.startsWith("/things/") && (
             <Link href={recordHref} className="text-primary hover:underline">
               {recordType === "personnel"
                 ? "People directory"
-                : `View ${formatRecordType(recordType).toLowerCase()} record`} &rarr;
+                : recordType === "fact"
+                  ? "View fact"
+                  : `View ${formatRecordType(recordType).toLowerCase()}`} &rarr;
             </Link>
           )}
           {entityHref && (
@@ -443,7 +453,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                 )}
 
                 {v.reasoning && (
-                  <p className="text-sm text-muted-foreground">{v.reasoning}</p>
+                  <p className="text-sm text-muted-foreground">{stripInternalTags(v.reasoning)}</p>
                 )}
               </div>
             );
@@ -497,7 +507,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
         return (
           <section className="mb-8">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-4">
+            <h2 className="text-sm font-medium text-muted-foreground mb-4">
               Evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
             </h2>
             <div className="space-y-4">
@@ -600,7 +610,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                         {/* Notes */}
                         {e.notes && (
                           <p className="text-sm text-muted-foreground">
-                            <span className="font-medium text-foreground/70">Note:</span> {e.notes}
+                            <span className="font-medium text-foreground/70">Note:</span> {stripInternalTags(e.notes)}
                           </p>
                         )}
 

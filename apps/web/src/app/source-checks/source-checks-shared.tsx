@@ -74,8 +74,8 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
       return `/factbase/fact/${recordId}`;
     case "wiki-page":
       return `/wiki/${recordId}`;
-    case "publication":
-      return `/publications/${recordId}`;
+    // publication: /publications/:id expects a different ID format — fall through to /things
+    // case "publication":
     case "investment":
       return `/investments/${recordId}`;
     case "funding-round":
