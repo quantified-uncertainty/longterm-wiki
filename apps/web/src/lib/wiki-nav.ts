@@ -246,19 +246,19 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "Research & Discovery",
+      title: "Research",
       defaultOpen: true,
       items: [
-        { label: "Hub Overview", href: internalHref("research-discovery-hub") },
+        { label: "Overview", href: internalHref("research-discovery-hub") },
         { label: "Auto-Update Runs", href: internalHref("auto-update-runs-dashboard") },
         { label: "Auto-Update News", href: internalHref("auto-update-news-dashboard") },
       ],
     },
     {
-      title: "Verification & Source-Checking",
+      title: "Verification",
       defaultOpen: true,
       items: [
-        { label: "Hub Overview", href: internalHref("verification-source-checking-hub") },
+        { label: "Overview", href: internalHref("verification-source-checking-hub") },
         { label: "Source Checks", href: internalHref("entity-source-checks-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
@@ -266,22 +266,34 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "FactBase & Entities",
+      title: "FactBase",
       defaultOpen: true,
       items: [
-        { label: "Hub Overview", href: internalHref("factbase-entities-hub") },
-        { label: "Entities & Pages", href: internalHref("entities-dashboard") },
-        { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
+        { label: "Overview", href: internalHref("factbase-entities-hub") },
         { label: "Data Quality", href: internalHref("data-quality-dashboard") },
         { label: "Data Sources", href: internalHref("data-sources-dashboard") },
-        { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
       ],
     },
     {
-      title: "Content Pipelines",
+      title: "TableBase",
       defaultOpen: true,
       items: [
-        { label: "Hub Overview", href: internalHref("content-pipelines-hub") },
+        { label: "Overview", href: internalHref("factbase-entities-hub") },
+        { label: "Entities & Pages", href: internalHref("entities-dashboard") },
+        { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
+        { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
+        { label: "Grants", href: internalHref("grants-dashboard") },
+        { label: "Divisions", href: internalHref("divisions-dashboard") },
+        { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
+        { label: "Talent Flows", href: internalHref("talent-flows-dashboard") },
+        { label: "Jobs", href: internalHref("jobs-dashboard") },
+      ],
+    },
+    {
+      title: "WikiBase",
+      defaultOpen: true,
+      items: [
+        { label: "Overview", href: internalHref("content-pipelines-hub") },
         { label: "Suggested Pages", href: internalHref("suggested-pages-dashboard") },
         { label: "Improve Runs", href: internalHref("improve-runs-dashboard") },
         { label: "Page Changes", href: internalHref("page-changes-dashboard") },
@@ -290,16 +302,11 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
-      title: "System & Data",
+      title: "System",
       items: [
         { label: "System Health", href: internalHref("system-health-dashboard") },
         { label: "PR Dashboard", href: internalHref("pr-dashboard") },
         { label: "Agent Activity", href: internalHref("agent-activity-dashboard") },
-        { label: "Grants", href: internalHref("grants-dashboard") },
-        { label: "Divisions", href: internalHref("divisions-dashboard") },
-        { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
-        { label: "Talent Flows", href: internalHref("talent-flows-dashboard") },
-        { label: "Jobs", href: internalHref("jobs-dashboard") },
       ],
     },
     {

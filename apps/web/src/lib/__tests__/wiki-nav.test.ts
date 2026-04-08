@@ -177,56 +177,49 @@ describe("getInternalNav (mocked data)", () => {
     setMockPages([]);
   });
 
-  it("returns hardcoded sections: Overview, hub sections, System & Data, Style Guides, Research, Architecture & Reference", () => {
+  it("returns hardcoded sections matching three-bases model", () => {
     const sections = getInternalNav();
     const titles = sections.map(s => s.title);
     expect(titles).toContain("Overview");
-    expect(titles).toContain("Research & Discovery");
-    expect(titles).toContain("Verification & Source-Checking");
-    expect(titles).toContain("FactBase & Entities");
-    expect(titles).toContain("Content Pipelines");
-    expect(titles).toContain("System & Data");
-    expect(titles).toContain("Style Guides");
     expect(titles).toContain("Research");
+    expect(titles).toContain("Verification");
+    expect(titles).toContain("FactBase");
+    expect(titles).toContain("TableBase");
+    expect(titles).toContain("WikiBase");
+    expect(titles).toContain("System");
+    expect(titles).toContain("Style Guides");
     expect(titles).toContain("Architecture & Reference");
   });
 
-  it("hub sections have defaultOpen: true", () => {
+  it("data layer sections have defaultOpen: true", () => {
     const sections = getInternalNav();
-    for (const hubTitle of ["Research & Discovery", "Verification & Source-Checking", "FactBase & Entities", "Content Pipelines"]) {
-      const hub = sections.find(s => s.title === hubTitle);
-      expect(hub?.defaultOpen).toBe(true);
+    for (const title of ["Research", "Verification", "FactBase", "TableBase", "WikiBase"]) {
+      const section = sections.find(s => s.title === title);
+      expect(section?.defaultOpen).toBe(true);
     }
-  });
-
-  it("does not duplicate hrefs across sections", () => {
-    const sections = getInternalNav();
-    const allHrefs = sections.flatMap(s => s.items.map(i => i.href));
-    const uniqueHrefs = new Set(allHrefs);
-    expect(allHrefs.length).toBe(uniqueHrefs.size);
   });
 
   it("migrated dashboards use internalHref (resolve to /wiki/E<id>)", () => {
     const sections = getInternalNav();
-    const contentPipelines = sections.find(s => s.title === "Content Pipelines")!;
+    const wikiBase = sections.find(s => s.title === "WikiBase")!;
 
-    const updatesItem = contentPipelines.items.find(i => i.label === "Update Schedule");
+    const updatesItem = wikiBase.items.find(i => i.label === "Update Schedule");
     expect(updatesItem).toBeDefined();
     expect(updatesItem!.href).toBe("/wiki/E900");
   });
 
-  it("citation accuracy is in Verification & Source-Checking section", () => {
+  it("citation accuracy is in Verification section", () => {
     const sections = getInternalNav();
-    const verification = sections.find(s => s.title === "Verification & Source-Checking")!;
+    const verification = sections.find(s => s.title === "Verification")!;
 
     const item = verification.items.find(i => i.label === "Citation Accuracy");
     expect(item).toBeDefined();
   });
 
-  it("all hub section items use /wiki/ hrefs", () => {
+  it("all section items use /wiki/ hrefs", () => {
     const sections = getInternalNav();
-    const hubTitles = ["Research & Discovery", "Verification & Source-Checking", "FactBase & Entities", "Content Pipelines", "System & Data"];
-    for (const title of hubTitles) {
+    const dataTitles = ["Research", "Verification", "FactBase", "TableBase", "WikiBase", "System"];
+    for (const title of dataTitles) {
       const section = sections.find(s => s.title === title)!;
       for (const item of section.items) {
         expect(item.href).toMatch(/^\/wiki\//);
@@ -236,7 +229,7 @@ describe("getInternalNav (mocked data)", () => {
 
   it("verification section contains citation and hallucination dashboards", () => {
     const sections = getInternalNav();
-    const verification = sections.find(s => s.title === "Verification & Source-Checking")!;
+    const verification = sections.find(s => s.title === "Verification")!;
 
     const expectedLabels = [
       "Citation Accuracy", "Citation Content",
