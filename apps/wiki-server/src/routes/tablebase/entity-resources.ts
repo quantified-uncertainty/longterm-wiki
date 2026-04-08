@@ -9,6 +9,7 @@ import {
   invalidJsonError,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 const SyncItemSchema = z.object({
   entityId: z.string().min(1).max(200),
@@ -84,6 +85,11 @@ const entityResourcesApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
 
     const upserted = await db.transaction(async (tx) => {
       // OR-merge: boolean flags accumulate across seed passes (e.g., publisher + wiki_citation).

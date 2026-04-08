@@ -30,7 +30,7 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
-import { shouldSkipEntityValidation } from "../shared/validate-entity-refs.js";
+import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -605,6 +605,17 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
     const sourceCheckError = enforceSourceCheck(c, "grants", items);
     if (sourceCheckError) return sourceCheckError;
+
+    // Validate entity FK references for organizationId only.
+    // granteeId is a LEGACY field that can hold either an entity ID or a
+    // display name string (grant-import falls back to granteeName when no
+    // entity match is found). Validating it would reject ~thousands of
+    // grants with display-name granteeIds. The real entity FK is
+    // granteeEntityId, which is validated by resolveEntityFKs downstream.
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
+    ]);
+    if (refError) return refError;
 
     // Validate programId references (skip if requested via shouldSkipEntityValidation)
     if (!shouldSkipEntityValidation(c)) {

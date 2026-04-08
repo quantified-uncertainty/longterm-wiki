@@ -18,6 +18,7 @@ import {
   upsertThingsInTx,
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -129,6 +130,13 @@ const entityAssessmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate entity FK references before inserting
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 
