@@ -1,0 +1,103 @@
+---
+wikiId: E2169
+title: "Content Pipelines"
+description: "Hub for the wiki's content pipelines — page creation, AI-assisted improvement, validation, and groundskeeper maintenance. Links to dashboards, CLI commands, and architecture docs."
+subcategory: architecture
+contentFormat: article
+lastEdited: "2026-04-08"
+---
+
+import { EntityLink } from '@components/wiki';
+
+## What this is
+
+Content pipelines are how **MDX wiki pages get written, improved, and maintained**. There are several stages:
+
+- **Create** — research → synthesis → draft → validation → save
+- **Improve** — read existing page, run AI improvement, audit citations, apply
+- **Validate** — gate checks (CI-blocking), fix commands, compile checks
+- **Auto-update** — news-driven updates triggered on a schedule
+- **Groundskeeper** — background maintenance jobs (validation, fixes, audits)
+
+If you're trying to **create a new page**, **improve an existing page**, **fix a CI failure**, or **understand why a page failed validation**, this is the hub.
+
+## Live dashboards
+
+| Dashboard | What it shows |
+|-----------|---------------|
+| [Suggested Pages](/internal/suggested-pages) | Pages recommended for creation (gap analysis) |
+| [Improve Runs](/internal/improve-runs) | Improvement history, cost, quality delta |
+| [Page Changes](/internal/page-changes) | Recent edits across the wiki |
+| [Update Schedule](/internal/updates) | Auto-update run schedule and next executions |
+| [Groundskeeper Runs](/internal/groundskeeper-runs) | Maintenance job history (validation, fixes, audits) |
+
+## CLI playbook
+
+```bash
+# Create a new page
+pnpm crux w create "Page Title" --tier=standard       # budget | standard | premium
+pnpm crux w create "Page Title" --tier=premium
+
+# Improve an existing page
+pnpm crux w improve <page-id> --tier=standard --apply # polish | standard | deep
+pnpm crux w improve <page-id> --tier=deep --apply
+pnpm crux w improve <page-id> --directions "Add sections on X, Y"
+
+# Polish, grade, review
+pnpm crux w polish <page-id>
+pnpm crux w grade <page-id>
+pnpm crux w review <page-id>
+pnpm crux w iterate <page-id>
+
+# Validation gate (CI-blocking checks)
+pnpm crux w validate gate --fix                       # Full gate with auto-fixes
+pnpm crux w validate gate --scope=content --fix       # Content-only (~15s)
+pnpm crux w validate compile --quick                  # Quick MDX compile check
+
+# Fix commands (run after any page edit)
+pnpm crux w fix escaping                              # Dollar/comparison escaping
+pnpm crux w fix markdown                              # Markdown normalization
+
+# Auto-update (news-driven)
+pnpm crux w auto-update plan                          # Preview
+pnpm crux w auto-update run --budget=30               # Run with budget
+pnpm crux w auto-update audit-gate --diff --apply     # Audit changed pages
+```
+
+## When to use what
+
+| I want to... | Run | Or check |
+|--------------|-----|----------|
+| Create a new page on a topic | `pnpm crux w create "Title" --tier=standard` | [Suggested Pages dashboard](/internal/suggested-pages) |
+| Improve a page that needs polish | `pnpm crux w improve <id> --tier=standard --apply` | [Improve Runs dashboard](/internal/improve-runs) |
+| Fix a CI gate failure | `pnpm crux w validate gate --scope=content --fix` | — |
+| See recent edits across the wiki | — | [Page Changes dashboard](/internal/page-changes) |
+| Run news-driven updates | `pnpm crux w auto-update run --budget=30` | <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> |
+| See what gap analysis suggests creating | — | [Suggested Pages dashboard](/internal/suggested-pages) |
+| Find pages overdue for refresh | — | [Update Schedule dashboard](/internal/updates) |
+| Understand the page-creator pipeline | — | <EntityLink id="E895" name="content-pipeline-architecture">Content Pipeline Architecture</EntityLink> |
+
+## Tier and pipeline notes
+
+- **Tiers** (`budget` | `standard` | `premium` for create; `polish` | `standard` | `deep` for improve) trade off cost vs. quality. Standard is the default.
+- **`--apply`** is required for improve commands to actually write changes — without it, you get a dry-run.
+- **The improve pipeline** includes a semantic-diff safety check that compares facts before/after and warns on contradictions. Snapshots are stored in `.claude/snapshots/`.
+- **Always use the pipeline** — do not manually write pages from scratch. Manually written pages are missing citations, EntityLink validation, frontmatter syncing, and quality grading. If the pipeline fails, fix the pipeline.
+- **After any page edit**, run `pnpm crux w fix escaping` and `pnpm crux w fix markdown`, then `pnpm crux w validate gate --fix`.
+
+## Architecture & deep dives
+
+- <EntityLink id="E895" name="content-pipeline-architecture">Content Pipeline Architecture</EntityLink> — design document for faster page creation
+- <EntityLink id="E766" name="wiki-generation-architecture">Wiki Generation Architecture</EntityLink> — multi-agent, multi-pass design
+- <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> — full reference for all scripts and CLI workflows
+- `crux/authoring/page-creator.ts` — create pipeline entry point
+- `crux/authoring/page-improver/` — improve pipeline (phases, batch runner)
+- `crux/validate/` — validation gate, individual checks
+- `.github/workflows/auto-update.yml` — daily auto-update schedule
+- `.claude/rules/page-authoring.md` — page authoring rules and self-review checklist
+
+## Related hubs
+
+- <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> — the research stage that feeds page creation
+- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — validates citations on created/improved pages
+- <EntityLink id="E2168" name="factbase-entities-hub">FactBase & Entities</EntityLink> — the structured data layer that pages reference via `<FBF>`

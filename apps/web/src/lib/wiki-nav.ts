@@ -246,6 +246,16 @@ export function getInternalNav(): NavSection[] {
       ],
     },
     {
+      title: "Operations Hubs",
+      defaultOpen: true,
+      items: [
+        { label: "Research & Discovery", href: internalHref("research-discovery-hub") },
+        { label: "Verification & Source-Checking", href: internalHref("verification-source-checking-hub") },
+        { label: "FactBase & Entities", href: internalHref("factbase-entities-hub") },
+        { label: "Content Pipelines", href: internalHref("content-pipelines-hub") },
+      ],
+    },
+    {
       title: "Dashboards",
       defaultOpen: true,
       items: [

@@ -11,6 +11,15 @@ import {EntityLink} from '@components/wiki';
 
 This section contains internal documentation for maintaining and contributing to the knowledge base.
 
+## Operations Hubs
+
+Start here. Each hub gives you the dashboards, CLI commands, decision tables, and architecture deep-dives for one part of the wiki.
+
+- <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> — finding new information (web search, news ingestion, context bundles)
+- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — keeping facts correct (citations, source-checks, hallucination risk)
+- <EntityLink id="E2168" name="factbase-entities-hub">FactBase & Entities</EntityLink> — structured data layer (FactBase, TableBase, IDs, queries)
+- <EntityLink id="E2169" name="content-pipelines-hub">Content Pipelines</EntityLink> — page creation, improvement, validation, auto-update
+
 ## Getting Started
 
 - <EntityLink id="E755" name="about-this-wiki">About This Wiki</EntityLink> - Comprehensive overview of how the wiki works, technical architecture, and content organization
