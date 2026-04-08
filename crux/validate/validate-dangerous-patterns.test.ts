@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkLine, runCheck } from './validate-dangerous-patterns.ts';
+import { checkLine, extractInlineComment, runCheck } from './validate-dangerous-patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Pure-function tests for checkLine — no filesystem
@@ -113,7 +113,15 @@ describe('checkLine — as-any-in-route', () => {
 });
 
 describe('checkLine — skip-entity-validation', () => {
-  it('flags `skipEntityValidation=true` in URL strings', () => {
+  it('flags `?skipEntityValidation=true` in URL string literals (single quotes)', () => {
+    const result = checkLine(
+      "  const url = '/api/foo?skipEntityValidation=true';",
+      { isRouteFile: false },
+    );
+    expect(result).toContain('skip-entity-validation');
+  });
+
+  it('flags `?skipEntityValidation=true` in URL string literals (double quotes)', () => {
     const result = checkLine(
       '  const url = "/api/foo?skipEntityValidation=true";',
       { isRouteFile: false },
@@ -121,15 +129,42 @@ describe('checkLine — skip-entity-validation', () => {
     expect(result).toContain('skip-entity-validation');
   });
 
-  it('flags `skipEntityValidation: true` in object literals', () => {
+  it('flags `?skipEntityValidation=true` in template literals', () => {
     const result = checkLine(
-      '  syncPersonnel(items, { skipEntityValidation: true });',
+      '  const url = `/api/foo?skipEntityValidation=true&batch=${id}`;',
       { isRouteFile: false },
     );
     expect(result).toContain('skip-entity-validation');
   });
 
-  it('suppresses with same-line skipEntityValidation-ok marker', () => {
+  it('flags `&skipEntityValidation=true` mid-querystring', () => {
+    const result = checkLine(
+      '  const url = "/api/foo?batch=1&skipEntityValidation=true";',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('skip-entity-validation');
+  });
+
+  it('does NOT flag option-passing code (typed wrapper enforces it at runtime)', () => {
+    // The narrowed regex (PR review HIGH#3) intentionally only matches URL string
+    // literals. Object-literal option passing goes through the typed wrapper,
+    // which throws if a reason is missing.
+    const result = checkLine(
+      '  syncPersonnel(items, { skipEntityValidation: true });',
+      { isRouteFile: false },
+    );
+    expect(result).not.toContain('skip-entity-validation');
+  });
+
+  it('does NOT flag default param values', () => {
+    const result = checkLine(
+      '  function foo(options = { skipEntityValidation: true }) {',
+      { isRouteFile: false },
+    );
+    expect(result).not.toContain('skip-entity-validation');
+  });
+
+  it('suppresses with same-line marker form `// skipEntityValidation-ok: <reason>`', () => {
     const result = checkLine(
       '  const url = "/api/foo?skipEntityValidation=true"; // skipEntityValidation-ok: backfill',
       { isRouteFile: false },
@@ -154,6 +189,156 @@ describe('checkLine — skip-entity-validation', () => {
       { isRouteFile: false },
     );
     expect(result).not.toContain('skip-entity-validation');
+  });
+});
+
+describe('checkLine — strict suppression marker form (PR review HIGH#1)', () => {
+  // The substring `catch-ok` no longer suppresses unless it appears in the
+  // strict `// catch-ok: <reason>` form. This prevents accidental suppression
+  // by mentioning the keyword in unrelated contexts.
+
+  it('does NOT suppress when marker substring appears in a string literal', () => {
+    const result = checkLine(
+      '  const msg = "catch-ok pattern"; foo().catch(() => {});',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('does NOT suppress when marker has no reason after the colon', () => {
+    const result = checkLine(
+      '  foo().catch(() => {}); // catch-ok:',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('does NOT suppress when marker uses wrong separator (no colon)', () => {
+    const result = checkLine(
+      '  foo().catch(() => {}); // catch-ok stream cancel',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('suppresses with strict `// catch-ok: <reason>` form', () => {
+    const result = checkLine(
+      '  foo().catch(() => {}); // catch-ok: stream cancel',
+      { isRouteFile: false },
+    );
+    expect(result).not.toContain('silent-catch');
+  });
+
+  it('suppresses with `/* catch-ok: <reason> */` block-comment form', () => {
+    const result = checkLine(
+      '  foo().catch(() => {}); /* catch-ok: stream cancel */',
+      { isRouteFile: false },
+    );
+    expect(result).not.toContain('silent-catch');
+  });
+
+  it('does NOT suppress when only the marker is in code (e.g. variable name)', () => {
+    const result = checkLine(
+      '  const catch_ok_count = 0; foo().catch(() => {});',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+});
+
+describe('extractInlineComment — string-literal awareness (PR review HIGH#1)', () => {
+  it('returns the comment for a simple inline comment', () => {
+    expect(extractInlineComment('foo(); // hello')).toBe(' hello');
+  });
+
+  it('returns null when there is no inline comment', () => {
+    expect(extractInlineComment('foo();')).toBeNull();
+  });
+
+  it('does NOT see // inside a single-quoted string', () => {
+    expect(extractInlineComment("const x = '// fake';")).toBeNull();
+  });
+
+  it('does NOT see // inside a double-quoted string', () => {
+    expect(extractInlineComment('const x = "// fake";')).toBeNull();
+  });
+
+  it('does NOT see // inside a backtick string', () => {
+    expect(extractInlineComment('const x = `// fake`;')).toBeNull();
+  });
+
+  it('handles escaped quotes inside strings', () => {
+    expect(extractInlineComment('const x = "say \\"// fake\\""; // real')).toBe(' real');
+  });
+
+  it('returns block-comment text for /* */', () => {
+    expect(extractInlineComment('foo(); /* note */')).toBe(' note */');
+  });
+
+  it('finds the comment after a string literal', () => {
+    expect(extractInlineComment('const x = "hello"; // real')).toBe(' real');
+  });
+});
+
+describe('checkLine — string-literal-aware suppression (PR review HIGH#1 follow-up)', () => {
+  // The marker check now operates on extracted comment text only, so a marker
+  // substring inside a string literal cannot suppress a real violation.
+
+  it('does NOT suppress when marker is inside a string literal', () => {
+    const result = checkLine(
+      '  const msg = "// catch-ok: real"; foo().catch(() => {});',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('does NOT suppress when escaped marker appears in a string', () => {
+    const result = checkLine(
+      `  const x = "say \\"// catch-ok: fake\\""; foo().catch(() => {});`,
+      { isRouteFile: false },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('does NOT suppress when previous line is code (not a comment)', () => {
+    const result = checkLine(
+      '  foo().catch(() => {});',
+      {
+        isRouteFile: false,
+        previousLine: '  const x = "catch-ok: hi";',
+      },
+    );
+    expect(result).toContain('silent-catch');
+  });
+
+  it('flags template-literal URL bypasses (not just plain strings)', () => {
+    const result = checkLine(
+      '  await fetch(`/api/foo?skipEntityValidation=true&x=${y}`);',
+      { isRouteFile: false },
+    );
+    expect(result).toContain('skip-entity-validation');
+  });
+});
+
+describe('checkLine — warn-only-catch tightened (PR review HIGH#2)', () => {
+  // The bare `warn(` alternative was removed; only `console.warn` and
+  // `logger.warn` are matched.
+
+  it('does NOT flag a bare warn() call (no console./logger. prefix)', () => {
+    const result = checkLine(
+      '  foo().catch((e) => warn(e));',
+      { isRouteFile: false },
+    );
+    expect(result).not.toContain('warn-only-catch');
+  });
+
+  it('still flags console.warn and logger.warn', () => {
+    expect(
+      checkLine('  foo().catch((e) => console.warn(e));', { isRouteFile: false }),
+    ).toContain('warn-only-catch');
+    expect(
+      checkLine('  foo().catch((e) => logger.warn({}, "fail"));', { isRouteFile: false }),
+    ).toContain('warn-only-catch');
   });
 });
 

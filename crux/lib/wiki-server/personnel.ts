@@ -75,6 +75,7 @@ export async function syncPersonnel(
     skipEntityValidationReason?: string;
   },
 ): Promise<ApiResult<PersonnelSyncResult>> {
+  const params = new URLSearchParams();
   if (options?.skipEntityValidation) {
     const reason = options.skipEntityValidationReason?.trim();
     if (!reason) {
@@ -82,11 +83,8 @@ export async function syncPersonnel(
         'syncPersonnel: skipEntityValidation requires skipEntityValidationReason — entity-validation bypass must be justified (issue #4017)',
       );
     }
-  }
-  const params = new URLSearchParams();
-  if (options?.skipEntityValidation) {
     params.set('skipEntityValidation', 'true'); // skipEntityValidation-ok: typed wrapper enforces reason above
-    params.set('skipEntityValidationReason', options.skipEntityValidationReason!);
+    params.set('skipEntityValidationReason', reason);
   }
   const qs = params.toString();
   return apiRequest<PersonnelSyncResult>(

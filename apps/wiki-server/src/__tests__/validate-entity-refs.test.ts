@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
+// Eager static import so the spy operates on the same instance the routes use.
+import { skipLogger } from "../routes/shared/validate-entity-refs.js";
 
 // ---- In-memory stores simulating Postgres ----
 
@@ -278,9 +280,11 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(200);
     });
 
-    // Issue #4017 — empty-string reason is treated the same as no reason
-    // (still bypasses, but logs at error level — verified manually in logs).
-    it("treats whitespace-only reason as missing (still allows bypass)", async () => {
+    // Issue #4017 — empty/whitespace reason is treated the same as no reason:
+    // bypass still works but the server logs at error level so misuse is alertable.
+    it("treats whitespace-only reason as missing AND logs at error level", async () => {
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
       const res = await postJson(
         app,
         "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=%20%20",
@@ -296,10 +300,55 @@ describe("Entity FK validation", () => {
           ],
         },
       );
-
-      // The bypass still works (we don't want to break existing pipelines),
-      // but the server logs at error level so the misuse is visible.
       expect(res.status).toBe(200);
+
+      // Exactly one error log with the bypass message and the raw reason.
+      // (Assertions BEFORE mockRestore — restore wipes mock.calls.)
+      expect(errorSpy).toHaveBeenCalledOnce();
+      const [ctx, msg] = errorSpy.mock.calls[0];
+      expect(msg as string).toContain("skipEntityValidation=true called without");
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        path: "/api/personnel/sync",
+        method: "POST",
+        // The whitespace string is preserved (not coerced to null) so operators
+        // can distinguish "param missing" from "param empty".
+        rawReason: "  ",
+      });
+
+      errorSpy.mockRestore();
+    });
+
+    // Sibling positive case: a real reason logs at warn (not error).
+    it("with valid reason: logs at warn level (NOT error)", async () => {
+      const warnSpy = vi.spyOn(skipLogger, "warn").mockImplementation(() => {});
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill%20with%20reason",
+        {
+          items: [
+            {
+              id: "Pabcde9999",
+              personId: "nxPerson99",
+              organizationId: "nxOrgani99",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+      expect(res.status).toBe(200);
+
+      expect(warnSpy).toHaveBeenCalledOnce();
+      const [ctx] = warnSpy.mock.calls[0];
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        reason: "test backfill with reason",
+      });
+      expect(errorSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+      errorSpy.mockRestore();
     });
 
     it("reports multiple missing fields in one error", async () => {

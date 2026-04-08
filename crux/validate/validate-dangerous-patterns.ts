@@ -115,23 +115,111 @@ const SILENT_CATCH_PATTERN = /\.catch\s*\(\s*\(\s*\)\s*=>\s*\{\s*\}\s*\)/;
  * "fire and forget plus a log" anti-pattern from issue #4017.
  *
  * The `[^)]*` parameter list happily matches `(e)`, `(e: unknown)`, `e`, `()`, etc.
+ *
+ * Known limitation: only matches single-line arrow bodies. A `.catch((e) =>\n  warn(...))`
+ * split across lines is NOT detected. This is documented as out-of-scope for the
+ * regex-based detector; the gate is a deterrent, not a proof. A reviewer should
+ * still flag obvious bypasses regardless of formatting.
  */
 const WARN_ONLY_CATCH_PATTERN =
-  /\.catch\s*\(\s*(?:\(\s*[^)]*\)|\w*)\s*=>\s*(?:console\.warn|logger\.warn|warn)\s*\(/;
+  /\.catch\s*\(\s*(?:\(\s*[^)]*\)|\w*)\s*=>\s*(?:console\.warn|logger\.warn)\s*\(/;
 
 /** `as any` and `as unknown as` casts. */
 const AS_ANY_PATTERN = /\bas\s+(?:unknown\s+as\s+)?any\b/;
 
-/** `?skipEntityValidation=true` in any string literal. */
-const SKIP_ENTITY_VALIDATION_PATTERN = /skipEntityValidation\s*[:=]\s*['"]?true['"]?|skipEntityValidation=true/; // skipEntityValidation-ok: regex literal references the bypass keyword by design
+/**
+ * Hardcoded `?skipEntityValidation=true` in URL string literals (single, double,
+ * or backtick), or as a `?...&skipEntityValidation=true` query param.
+ *
+ * Narrowed in PR review to URL-string-literal context only — the previous
+ * `skipEntityValidation: true` form was matching legitimate option-passing
+ * code (default params, destructured options) without justification.
+ *
+ * The wrapper functions in `personnel.ts` and `tablebase.ts` now enforce the
+ * reason at runtime, so option-passing code is already covered defensively;
+ * the gate check focuses on raw URL bypasses that don't go through the wrapper.
+ */
+// skipEntityValidation-ok: regex pattern references the bypass keyword by design
+const SKIP_ENTITY_VALIDATION_PATTERN = /["'`][^"'`]*[?&]skipEntityValidation=true/;
+
+/**
+ * Build a strict suppression-marker regex. The marker MUST appear in the form
+ * `<marker>: <reason>` (with a non-empty reason after the colon). The caller
+ * passes only the comment portion of a line, so this regex never sees code
+ * outside of comments.
+ *
+ * Reviewed from the diff subagent finding HIGH#1 — `String.includes()` was
+ * too permissive.
+ */
+function buildSuppressionRegex(marker: string): RegExp {
+  const escaped = marker.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return new RegExp(`\\b${escaped}\\s*:\\s*\\S`);
+}
+
+const SUPPRESSION_REGEXES: Record<PatternId, RegExp> = Object.fromEntries(
+  Object.entries(PATTERN_META).map(([id, meta]) => [
+    id,
+    buildSuppressionRegex(meta.suppressionMarker),
+  ]),
+) as Record<PatternId, RegExp>;
+
+/**
+ * Extract the inline comment portion of a line, ignoring `//` sequences that
+ * appear inside string or template literals. Returns the comment text (the
+ * substring after the `//`) or `null` if there is no real inline comment.
+ *
+ * Implementation: walk the line character-by-character tracking string state.
+ * Handles single quotes, double quotes, backticks, and escape sequences.
+ *
+ * This protects suppression detection from false positives where a marker
+ * keyword appears inside a string literal (PR review HIGH#1 follow-up).
+ *
+ * Exported for unit tests.
+ */
+export function extractInlineComment(line: string): string | null {
+  let i = 0;
+  let inSingle = false;
+  let inDouble = false;
+  let inBacktick = false;
+  while (i < line.length) {
+    const ch = line[i];
+    const next = line[i + 1];
+    if (inSingle) {
+      if (ch === '\\') { i += 2; continue; }
+      if (ch === "'") inSingle = false;
+    } else if (inDouble) {
+      if (ch === '\\') { i += 2; continue; }
+      if (ch === '"') inDouble = false;
+    } else if (inBacktick) {
+      if (ch === '\\') { i += 2; continue; }
+      if (ch === '`') inBacktick = false;
+    } else {
+      if (ch === "'") inSingle = true;
+      else if (ch === '"') inDouble = true;
+      else if (ch === '`') inBacktick = true;
+      else if (ch === '/' && next === '/') {
+        return line.slice(i + 2);
+      }
+      else if (ch === '/' && next === '*') {
+        // Block comment — return everything after `/*`. The regex tolerates
+        // trailing `*/` because the marker form is `<marker>: <reason>` and
+        // a trailing `*/` doesn't match `\b<marker>`.
+        return line.slice(i + 2);
+      }
+    }
+    i++;
+  }
+  return null;
+}
 
 /**
  * Check a single line for all enabled patterns. Returns the patterns matched,
- * minus any whose suppression marker is on the same line OR the immediately
- * preceding line (a comment-only line).
+ * minus any whose suppression marker appears in a comment on the same line OR
+ * a comment-only line immediately above.
  *
- * Adjacent-line suppression is supported because long lines (e.g. log strings,
- * URL builders) become unreadable with trailing comments.
+ * Suppression markers must be in the form `// <marker>: <reason>` — a stricter
+ * form than substring inclusion to prevent accidental over-suppression
+ * (PR review HIGH#1).
  *
  * Exported for unit tests.
  */
@@ -167,16 +255,23 @@ export function checkLine(
     matched.push('skip-entity-validation');
   }
 
-  // Filter out anything suppressed on the same line, OR by a leading comment
-  // line that is purely a comment (no code) and contains the marker.
+  // Filter out anything suppressed by a marker in a real comment — either
+  // inline on the same line, or on a comment-only line immediately above.
+  // The marker is searched in COMMENT TEXT only, not the full line, so a
+  // marker substring inside a string literal does not accidentally suppress.
+  const inlineComment = extractInlineComment(line);
   const prev = options.previousLine?.trimStart() ?? '';
   const prevIsCommentOnly =
-    prev.startsWith('//') || prev.startsWith('*');
+    prev.startsWith('//') || prev.startsWith('/*') || prev.startsWith('*');
+  // Strip the comment opener so the marker regex sees just the comment text.
+  const prevComment = prevIsCommentOnly
+    ? prev.replace(/^\/\/\s*|^\/\*\s*|^\*\s*/, '')
+    : null;
 
   return matched.filter((id) => {
-    const marker = PATTERN_META[id].suppressionMarker;
-    if (line.includes(marker)) return false;
-    if (prevIsCommentOnly && prev.includes(marker)) return false;
+    const re = SUPPRESSION_REGEXES[id];
+    if (inlineComment !== null && re.test(inlineComment)) return false;
+    if (prevComment !== null && re.test(prevComment)) return false;
     return true;
   });
 }

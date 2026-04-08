@@ -4,7 +4,11 @@ import type { Context } from "hono";
 import { validationError } from "./utils.js";
 import { logger as rootLogger } from "../../logger.js";
 
-const skipLogger = rootLogger.child({ component: "validate-entity-refs" });
+/**
+ * Exported for tests so they can `vi.spyOn(skipLogger, "warn"|"error")` to
+ * assert on bypass-logging behavior. Production callers should not import this.
+ */
+export const skipLogger = rootLogger.child({ component: "validate-entity-refs" });
 
 /**
  * Describes a foreign-key reference field to validate against the entities table.
@@ -76,7 +80,9 @@ export function shouldSkipEntityValidation(c: Context): boolean {
   const ctx = { path: c.req.path, method: c.req.method } as const;
   if (!reason || reason.trim().length === 0) {
     skipLogger.error(
-      ctx,
+      // Include the raw reason value (whether undefined or whitespace) so
+      // operators can distinguish "no param sent" from "param was blank".
+      { ...ctx, rawReason: reason ?? null },
       // skipEntityValidation-ok: error message text mentions the bypass keyword
       "skipEntityValidation=true called without skipEntityValidationReason — this bypass MUST be justified (issue #4017). Pass &skipEntityValidationReason=<why> in the query string.",
     );
