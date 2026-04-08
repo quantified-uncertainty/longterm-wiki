@@ -139,8 +139,9 @@ async function discoverForEntity(
   // Step 1: Get unverifiable records for this entity
   const verdictResult = await getVerdictsByEntity(entityId, { verdict: 'unverifiable', limit: 50 });
   if (!verdictResult.ok) {
-    console.warn(`[source-discover] Failed to get verdicts for ${entityName}: ${verdictResult.message}`);
-    return emptyResult(entityId, entityName, startMs);
+    // Propagate server errors so callers can distinguish "server down" from "no records."
+    // Silently returning emptyResult() would make failures invisible.
+    throw new Error(`[source-discover] Failed to get verdicts for ${entityName}: ${verdictResult.message}`);
   }
 
   const records: UnverifiableRecord[] = verdictResult.data.verdicts.map((v: Record<string, unknown>) => ({
@@ -156,10 +157,30 @@ async function discoverForEntity(
     return emptyResult(entityId, entityName, startMs);
   }
 
+  // Currently source-discovery only handles personnel-style records (those with
+  // a parseable personName in their displayName). Non-personnel record types
+  // (grant, investment, funding_round, benchmark-result) are logged and skipped
+  // because their displayName format doesn't contain person names to match against
+  // fetched content. TODO: extend matching to handle these record types (#4012).
   const personRecords = records.filter(r => r.personName);
+  const nonPersonRecords = records.filter(r => !r.personName);
   const personNames = [...new Set(personRecords.map(r => r.personName!))];
 
-  console.log(`[source-discover] ${entityName}: ${records.length} unverifiable records, ${personNames.length} unique people`);
+  if (nonPersonRecords.length > 0) {
+    const typeCounts = new Map<string, number>();
+    for (const r of nonPersonRecords) {
+      typeCounts.set(r.recordType, (typeCounts.get(r.recordType) || 0) + 1);
+    }
+    const typeBreakdown = [...typeCounts.entries()].map(([t, c]) => `${t}=${c}`).join(', ');
+    console.warn(`[source-discover] ${entityName}: skipping ${nonPersonRecords.length} non-personnel records (${typeBreakdown}) — not yet supported`);
+  }
+
+  console.log(`[source-discover] ${entityName}: ${records.length} unverifiable records (${personRecords.length} personnel, ${nonPersonRecords.length} other), ${personNames.length} unique people`);
+
+  if (personRecords.length === 0) {
+    // All records are non-personnel types — nothing we can match yet
+    return emptyResult(entityId, entityName, startMs);
+  }
 
   // Step 2: Entity-level research (finds Wikipedia, team pages, news)
   console.log(`[source-discover]   Phase 1: entity-level research...`);
@@ -404,8 +425,13 @@ export async function discoverSources(options: SourceDiscoveryOptions): Promise<
 
     for (const task of tasks) {
       console.log(`\n${'─'.repeat(50)}`);
-      const result = await discoverForEntity(task.entityId, task.entityName, options);
-      results.push(result);
+      try {
+        const result = await discoverForEntity(task.entityId, task.entityName, options);
+        results.push(result);
+      } catch (err: unknown) {
+        console.error(`[source-discover] Entity ${task.entityName} failed: ${err instanceof Error ? err.message : String(err)}`);
+        // Continue with remaining entities — don't let one failure stop the batch
+      }
     }
   }
 

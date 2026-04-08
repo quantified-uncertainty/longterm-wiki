@@ -149,7 +149,7 @@ The wiki uses several external APIs for web search, content extraction, and fact
 - **What it does**: Converts any URL to clean markdown via `r.jina.ai/{url}`. Zero-config — just an HTTP GET.
 - **Pricing**: Token-based. Free tier: 100 RPM, 10M tokens for new users. Paid tiers scale to 5,000 RPM.
 - **Per-page cost**: Effectively free for our volume (under 10M tokens/month)
-- **Why we might use it**: Zero-config alternative to Firecrawl. No package to install — just `fetch('https://r.jina.ai/' + url)`. Could be used as a fallback when Firecrawl isn't available.
+- **Why we might use it**: Zero-config alternative to Firecrawl. No package to install — just `fetch('https://r.jina.ai/' + url)`. It could be used as a fallback when Firecrawl isn't available.
 - **Why we don't currently**: Haven't tested quality compared to Firecrawl. Unclear JS rendering support.
 - **Verdict**: High priority to evaluate as a Firecrawl fallback. The zero-config aspect is valuable since Firecrawl's optional dependency means many sessions run without content extraction.
 
