@@ -14,6 +14,7 @@ import {
   formatRecordType,
   getRecordHref,
   formatCheckerModel,
+  humanizeFieldLabel,
 } from "../../source-checks-shared";
 import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
@@ -347,7 +348,13 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
     "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
     "organizationId", "orgEntityId", "granteeId", "programId",
     "entityId", "parentThingId", "stableId", "wikiId",
+    // Always redundant: personEntityId duplicates personId; sourceResourceId shown in source header
+    "personEntityId", "sourceResourceId",
   ]);
+  // Per-type extra skip fields
+  if (recordType === "grant") {
+    skipFields.add("granteeDisplayName"); // redundant with `name` for grants
+  }
   let displayFields: [string, unknown][] = dbRecord
     ? Object.entries(dbRecord).filter(
         ([k, v]) => v != null && v !== "" && !skipFields.has(k)
@@ -375,6 +382,28 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
       displayFields = fields;
     }
   }
+
+  // Build a supplemental sid-resolution map from FactBase for cases where
+  // recordDisplayNames (from record-lookup) is empty (e.g. facts).
+  // Scan displayFields for comma-separated sid lists and resolve each via getKBEntity.
+  const factbaseSidNames: Record<string, { title: string }> = {};
+  for (const [, v] of displayFields) {
+    if (typeof v !== "string") continue;
+    const parts = v.split(",").map((s) => s.trim());
+    for (const part of parts) {
+      if (/^sid_[a-zA-Z0-9]+$/.test(part) && !recordDisplayNames[part]) {
+        const kbEntity = getKBEntity(part);
+        if (kbEntity?.name) {
+          factbaseSidNames[part] = { title: kbEntity.name };
+        }
+      }
+    }
+  }
+  // Merge factbase resolutions into recordDisplayNames (recordDisplayNames takes precedence)
+  const allDisplayNames: Record<string, { title: string; slug?: string; entityType?: string }> = {
+    ...factbaseSidNames,
+    ...recordDisplayNames,
+  };
 
   // Group evidence by source URL for the right column
   const evidenceBySource = new Map<string, typeof evidence>();
@@ -507,6 +536,14 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
               : v.verdict === "partial" ? "text-amber-700 dark:text-amber-400"
               : "text-muted-foreground";
 
+            // Detect cross-check disagreement: multiple distinct verdict values in evidence
+            const evidenceVerdicts = fieldEvidence.map((e) => e.verdict);
+            const uniqueEvidenceVerdicts = [...new Set(evidenceVerdicts)];
+            const hasDisagreement = uniqueEvidenceVerdicts.length > 1;
+            const disagreementCounts = uniqueEvidenceVerdicts.map(
+              (ev) => `${evidenceVerdicts.filter((x) => x === ev).length} ${ev}`
+            );
+
             return (
               <div
                 key={`${v.fieldName ?? "overall"}-${i}`}
@@ -550,6 +587,13 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                     <> · <span className="text-amber-600 font-semibold">recheck</span></>
                   )}
                 </span>
+                {hasDisagreement && (
+                  <div className="basis-full mt-1">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded px-2 py-0.5">
+                      ⚠ Checks disagree: {disagreementCounts.join(", ")}
+                    </span>
+                  </div>
+                )}
                 {v.reasoning && (
                   <p
                     className="basis-full text-sm text-muted-foreground italic leading-relaxed mt-1"
@@ -584,40 +628,117 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
               {displayFields.map(([k, v]) => {
                 const strV = typeof v === "string" ? v : String(v);
                 const isLongText = typeof v === "string" && v.length > 300;
-                const looksLikeId = typeof v === "string" && /^sid_[a-zA-Z0-9]+$/.test(v);
-                const displayName = looksLikeId ? recordDisplayNames[strV] : null;
+
+                // Multi-sid: comma-separated list of sid_ IDs
+                const multiSidMatch = typeof v === "string"
+                  ? v.split(",").map((s) => s.trim()).filter((s) => /^sid_[a-zA-Z0-9]+$/.test(s))
+                  : [];
+                const isMultiSid = multiSidMatch.length > 1;
+
+                // Single sid
+                const looksLikeId = !isMultiSid && typeof v === "string" && /^sid_[a-zA-Z0-9]+$/.test(v);
+                const resolvedIdEntry = looksLikeId ? allDisplayNames[strV] : null;
+
+                // Currency formatting: keys "amount" or "usdEquivalent" with numeric string
+                const isCurrencyKey = k === "amount" || k === "usdEquivalent";
+                const numericVal = typeof v === "string" ? parseFloat(v) : typeof v === "number" ? v : NaN;
+                const isCurrencyVal = isCurrencyKey && !isNaN(numericVal) && isFinite(numericVal);
+                const currencyCode = isCurrencyVal
+                  ? (k === "usdEquivalent" ? "USD" : (typeof dbRecord?.["currency"] === "string" ? dbRecord["currency"] : "USD"))
+                  : null;
+
+                // Date formatting
+                const fullDateMatch = typeof v === "string" && /^\d{4}-\d{2}-\d{2}/.test(v);
+                const partialDateMatch = typeof v === "string" && /^\d{4}-\d{2}$/.test(v);
+
+                // URL detection
+                const isUrl = typeof v === "string" && (v.startsWith("http://") || v.startsWith("https://"));
+
+                // Boolean
+                const isBoolVal = typeof v === "boolean" || strV === "true" || strV === "false";
 
                 return (
                   <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
                     <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
-                      {k}
+                      {humanizeFieldLabel(k)}
                     </dt>
                     <dd className="text-foreground/90 break-words whitespace-pre-wrap leading-relaxed min-w-0">
-                      {typeof v === "number" ? (
-                        v.toLocaleString("en-US")
-                      ) : displayName ? (
+                      {isCurrencyVal ? (
+                        <span>
+                          {new Intl.NumberFormat("en-US", {
+                            style: "currency",
+                            currency: currencyCode ?? "USD",
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                          }).format(numericVal)}
+                        </span>
+                      ) : isBoolVal ? (
+                        <span>{(v === true || strV === "true") ? "Yes" : "No"}</span>
+                      ) : isMultiSid ? (
+                        <span>
+                          {multiSidMatch.map((sid, idx) => {
+                            const entry = allDisplayNames[sid];
+                            return (
+                              <span key={sid}>
+                                {idx > 0 && ", "}
+                                {entry ? (
+                                  <Link
+                                    href={`/things/${encodeURIComponent(sid)}`}
+                                    className="text-primary hover:underline"
+                                    title={sid}
+                                  >
+                                    {entry.title}
+                                  </Link>
+                                ) : (
+                                  <span className="font-mono text-xs">{sid}</span>
+                                )}
+                              </span>
+                            );
+                          })}
+                        </span>
+                      ) : resolvedIdEntry ? (
                         <Link
                           href={`/things/${encodeURIComponent(strV)}`}
                           className="text-primary hover:underline"
+                          title={strV}
                         >
-                          {displayName.title}
-                          <span className="text-muted-foreground font-mono text-xs ml-2">{strV}</span>
+                          {resolvedIdEntry.title}
                         </Link>
+                      ) : isUrl ? (
+                        <a
+                          href={strV}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline break-all"
+                          title={strV}
+                        >
+                          {strV.length > 80 ? strV.slice(0, 80) + "…" : strV}
+                        </a>
+                      ) : partialDateMatch ? (
+                        <span>
+                          {new Date(strV + "-01").toLocaleDateString("en-US", { year: "numeric", month: "long" })}
+                        </span>
+                      ) : fullDateMatch ? (
+                        <span>
+                          {new Date(strV).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                        </span>
+                      ) : typeof v === "number" ? (
+                        v.toLocaleString("en-US")
                       ) : isLongText ? (
                         <details>
                           <summary className="cursor-pointer list-none">
-                            <span>{strV.slice(0, 280)}</span>
+                            <span>{stripInternalTags(strV).slice(0, 280)}</span>
                             <span className="text-muted-foreground">… </span>
                             <span className="text-xs uppercase tracking-[0.1em] text-foreground/60 hover:text-foreground border-b border-dotted border-foreground/30">
                               expand
                             </span>
                           </summary>
-                          <span className="block mt-2">{strV}</span>
+                          <span className="block mt-2">{stripInternalTags(strV).replace(/\[ref\][^\[]*\[\/ref\]/g, "")}</span>
                         </details>
                       ) : looksLikeId ? (
                         <span className="font-mono text-xs">{strV}</span>
                       ) : (
-                        strV
+                        stripInternalTags(strV).replace(/\[ref\][^\[]*\[\/ref\]/g, "")
                       )}
                     </dd>
                   </div>
@@ -741,13 +862,27 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             </span>
                           </div>
 
+                          {/* Contradicted diff: show expected vs extracted side-by-side */}
+                          {e.verdict === "contradicted" && e.expectedValue && e.extractedValue && !structuredEntries && (
+                            <div className="mb-3 pl-3 border-l-2 border-red-400/60 space-y-1 text-sm">
+                              <div className="flex gap-2">
+                                <span className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground font-mono w-14 shrink-0 pt-0.5">Claimed</span>
+                                <span className="text-foreground/90">{e.expectedValue}</span>
+                              </div>
+                              <div className="flex gap-2">
+                                <span className="text-[10px] uppercase tracking-[0.12em] text-red-600 dark:text-red-400 font-mono w-14 shrink-0 pt-0.5">Found</span>
+                                <span className="text-red-700 dark:text-red-300 font-medium">{e.extractedValue}</span>
+                              </div>
+                            </div>
+                          )}
+
                           {/* Matched data — render as dl matching the claim style */}
                           {structuredEntries && structuredEntries.length > 0 && (
                             <dl className="space-y-2 mb-3 pl-3 border-l border-foreground/15 min-w-0">
                               {structuredEntries.slice(0, 8).map(([k, val]) => (
                                 <div key={k} className="grid grid-cols-[6rem_1fr] gap-3 text-sm min-w-0">
                                   <dt className="text-[10px] uppercase tracking-[0.12em] text-muted-foreground pt-0.5 font-mono break-all">
-                                    {k}
+                                    {humanizeFieldLabel(k)}
                                   </dt>
                                   <dd className="text-foreground/90 break-words min-w-0">
                                     {formatJsonValue(val)}

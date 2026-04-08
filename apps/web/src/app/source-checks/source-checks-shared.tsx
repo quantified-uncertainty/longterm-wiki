@@ -94,6 +94,22 @@ export function getSourceCheckHref(recordType: string, recordId: string): string
   return `/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
 }
 
+/**
+ * Convert a raw DB field key to a human-readable label.
+ * Examples: "granteeDisplayName" → "Grantee Display Name",
+ *           "isFounder" → "Is Founder", "amount" → "Amount"
+ */
+export function humanizeFieldLabel(key: string): string {
+  // Strip suffix noise
+  let s = key.replace(/(EntityId|DisplayName|Id)$/, "");
+  // If stripping left nothing (e.g. key was just "Id"), fall back to original
+  if (!s) s = key;
+  // Split camelCase: "isFounder" → "is Founder"
+  s = s.replace(/([a-z])([A-Z])/g, "$1 $2");
+  // Capitalize first character
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 /** Format a checker model ID for display (e.g. "claude-haiku-4-5-20251001" → "Haiku 4.5"). */
 export function formatCheckerModel(model: string): string {
   if (model.includes("haiku-4-5") || model.includes("haiku-4.5")) return "Haiku 4.5";
