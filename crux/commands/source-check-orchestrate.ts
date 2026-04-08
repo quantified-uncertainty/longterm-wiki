@@ -141,13 +141,13 @@ async function verifyCommand(
 // ── Backfill command ─────────────────────────────────────────────────
 
 /**
- * Automated backfill: sync source URLs → enqueue ingestion → run verification.
+ * Automated backfill: sync source URLs → enqueue ingestion → run source-check.
  *
  * Replaces the manual multi-step process:
  *   1. fb sync-sources (sync FactBase URLs to resources)
  *   2. Extract record source URLs from grants/personnel APIs
  *   3. Create resource-ingest jobs for uncached URLs
- *   4. Run verification orchestrator
+ *   4. Run source-check orchestrator
  *
  * Usage: crux tb verify backfill --budget=20 --limit=2000 [--dry-run]
  */
@@ -157,7 +157,7 @@ async function backfillCommand(
 ): Promise<CommandResult> {
   const dryRun = !!options.dryRun;
   const lines: string[] = [];
-  lines.push('\x1b[1m=== Verification Backfill ===\x1b[0m');
+  lines.push('\x1b[1m=== Source-Check Backfill ===\x1b[0m');
   if (dryRun) lines.push('\x1b[33mDRY RUN — no jobs will be created\x1b[0m');
   lines.push('');
 
@@ -220,10 +220,10 @@ async function backfillCommand(
     lines.push('\x1b[32mStep 3: All record sources are cached — skipping ingestion.\x1b[0m');
   }
 
-  // Step 4: Run verification if cache coverage is reasonable
+  // Step 4: Run source-check if cache coverage is reasonable
   if (uncached === 0 || (cached > 0 && uncached < urls.size * 0.5)) {
     lines.push('');
-    lines.push('\x1b[1mStep 4: Running verification...\x1b[0m');
+    lines.push('\x1b[1mStep 4: Running source-check...\x1b[0m');
     console.log(lines.join('\n'));
 
     return orchestrateCommand([], options);

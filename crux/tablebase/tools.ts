@@ -37,7 +37,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
   const sourceDiscoveryTools = [
     {
       name: 'query_unverifiable_records',
-      description: 'Fetch records with unverifiable source-check verdicts for an entity. Returns the record type, record ID, reasoning why verification failed, and current source URL.',
+      description: 'Fetch records with unverifiable source-check verdicts for an entity. Returns the record type, record ID, reasoning why source-check failed, and current source URL.',
       input_schema: {
         type: 'object',
         properties: {
@@ -48,7 +48,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
     },
     {
       name: 'suggest_resource',
-      description: 'Propose a URL as a resource that could verify one or more records. Registers the URL in the resource database and fetches its content for future verification.',
+      description: 'Propose a URL as a resource that could verify one or more records. Registers the URL in the resource database and fetches its content for future source-check.',
       input_schema: {
         type: 'object',
         properties: {
