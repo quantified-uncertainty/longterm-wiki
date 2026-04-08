@@ -17,7 +17,9 @@ FactBase and TableBase together hold the wiki's **structured data**:
 - **TableBase** — relational entities (people, orgs, grants, divisions, funding programs) stored in PostgreSQL and mirrored from `data/entities/*.yaml`.
 - **ID system** — every wiki entity gets an `E####` numeric ID and a `sid_` stable ID, allocated centrally by the wiki-server.
 
+<Callout variant="tip" title="When to start here">
 If you're trying to **add a new entity**, **read facts about an org**, **discover untracked people**, or **understand the data model**, this is the hub.
+</Callout>
 
 ## Live dashboards
 
@@ -98,6 +100,8 @@ Both use the `sid_` prefix; use `isSid()` from `@longterm-wiki/id-utils` to dete
 
 ## Related hubs
 
-- <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> — where new facts come from before they land in FactBase
-- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — how stored facts get checked against their cited sources
-- <EntityLink id="E2169" name="content-pipelines-hub">Content Pipelines</EntityLink> — how facts feed into wiki page rendering
+<CardGrid>
+  <LinkCard title="Research & Discovery" href="/wiki/E2166" description="Where new facts come from before they land in FactBase" />
+  <LinkCard title="Verification & Source-Checking" href="/wiki/E2167" description="How stored facts get checked against their cited sources" />
+  <LinkCard title="Content Pipelines" href="/wiki/E2169" description="How facts feed into wiki page rendering" />
+</CardGrid>

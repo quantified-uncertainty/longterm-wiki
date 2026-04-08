@@ -13,7 +13,9 @@ import { EntityLink } from '@components/wiki';
 
 Research and discovery is how we **find new information** for the wiki — searching the web, crawling RSS feeds, fetching pages from external APIs, and assembling that material into context bundles for page authoring or improvement. It is the *first stage* of the data lifecycle, before verification and storage.
 
+<Callout variant="tip" title="When to start here">
 If you're trying to **answer a question that needs current sources**, **draft a new page**, or **react to news**, this is your starting point.
+</Callout>
 
 ## Live dashboards
 
@@ -66,6 +68,8 @@ pnpm crux w auto-update history               # Show recent run history
 
 ## Related hubs
 
-- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — once you've found sources, this is how you check them
-- <EntityLink id="E2168" name="factbase-entities-hub">FactBase & Entities</EntityLink> — where structured facts from research get stored
-- <EntityLink id="E2169" name="content-pipelines-hub">Content Pipelines</EntityLink> — how research feeds the page creation and improvement workflows
+<CardGrid>
+  <LinkCard title="Verification & Source-Checking" href="/wiki/E2167" description="Once you've found sources, this is how you check them" />
+  <LinkCard title="FactBase & Entities" href="/wiki/E2168" description="Where structured facts from research get stored" />
+  <LinkCard title="Content Pipelines" href="/wiki/E2169" description="How research feeds the page creation and improvement workflows" />
+</CardGrid>

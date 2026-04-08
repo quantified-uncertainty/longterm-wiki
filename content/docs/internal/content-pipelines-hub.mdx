@@ -19,7 +19,9 @@ Content pipelines are how **MDX wiki pages get written, improved, and maintained
 - **Auto-update** — news-driven updates triggered on a schedule
 - **Groundskeeper** — background maintenance jobs (validation, fixes, audits)
 
+<Callout variant="tip" title="When to start here">
 If you're trying to **create a new page**, **improve an existing page**, **fix a CI failure**, or **understand why a page failed validation**, this is the hub.
+</Callout>
 
 ## Live dashboards
 
@@ -98,6 +100,8 @@ pnpm crux w auto-update audit-gate --diff --apply     # Audit changed pages
 
 ## Related hubs
 
-- <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> — the research stage that feeds page creation
-- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — validates citations on created/improved pages
-- <EntityLink id="E2168" name="factbase-entities-hub">FactBase & Entities</EntityLink> — the structured data layer that pages reference via `<FBF>`
+<CardGrid>
+  <LinkCard title="Research & Discovery" href="/wiki/E2166" description="The research stage that feeds page creation" />
+  <LinkCard title="Verification & Source-Checking" href="/wiki/E2167" description="Validates citations on created/improved pages" />
+  <LinkCard title="FactBase & Entities" href="/wiki/E2168" description="The structured data layer that pages reference via FBF" />
+</CardGrid>
