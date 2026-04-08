@@ -322,8 +322,57 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
 
   const recordHref = getRecordHref(recordType, recordId);
 
+  // Compute claim/record data for the side-by-side layout
+  const isHolistic = verdicts.every((v) => v.fieldName === null);
+  const dbRecord = recordResult.ok ? recordResult.data.record : null;
+  const skipFields = new Set([
+    "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
+    "organizationId", "orgEntityId", "granteeId", "programId",
+    "entityId", "parentThingId", "stableId", "wikiId",
+  ]);
+  const displayFields: [string, unknown][] = dbRecord
+    ? Object.entries(dbRecord).filter(
+        ([k, v]) => v != null && v !== "" && !skipFields.has(k)
+      )
+    : [];
+
+  // Group evidence by source URL for the right column
+  const evidenceBySource = new Map<string, typeof evidence>();
+  for (const e of evidence) {
+    const key = e.sourceUrl || "(no source)";
+    const group = evidenceBySource.get(key);
+    if (group) group.push(e);
+    else evidenceBySource.set(key, [e]);
+  }
+
+  // Deduplicate within each source group
+  type DeduplicatedCheck = (typeof evidence)[number] & { duplicateCount: number };
+  function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
+    const seen = new Map<string, DeduplicatedCheck>();
+    for (const c of checks) {
+      const dedupeKey = [
+        c.fieldName ?? "",
+        c.entityId ?? "",
+        c.verdict,
+        c.expectedValue ?? "",
+        c.extractedValue ?? "",
+        (c.notes ?? "").slice(0, 100),
+      ].join("::");
+      const existing = seen.get(dedupeKey);
+      if (existing) {
+        existing.duplicateCount++;
+        if (c.checkedAt && existing.checkedAt && c.checkedAt > existing.checkedAt) {
+          seen.set(dedupeKey, { ...c, duplicateCount: existing.duplicateCount });
+        }
+      } else {
+        seen.set(dedupeKey, { ...c, duplicateCount: 1 });
+      }
+    }
+    return [...seen.values()];
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8">
       {/* Breadcrumbs */}
       <Link
         href="/source-checks"
@@ -373,68 +422,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
           )}
         </div>
       </div>
-
-      {/* What's being checked — show our database record */}
-      {(() => {
-        const isHolistic = verdicts.every((v) => v.fieldName === null);
-        const dbRecord = recordResult.ok ? recordResult.data.record : null;
-        // Fields to skip — internal IDs, timestamps, and metadata
-        const skipFields = new Set([
-          "id", "createdAt", "updatedAt", "syncedAt", "sourceId",
-          "organizationId", "orgEntityId", "granteeId", "programId",
-          "entityId", "parentThingId", "stableId", "wikiId",
-        ]);
-
-        // Filter to meaningful display fields
-        const displayFields = dbRecord
-          ? Object.entries(dbRecord).filter(
-              ([k, v]) => v != null && v !== "" && !skipFields.has(k)
-            )
-          : [];
-
-        return (
-          <div className="rounded-lg border border-border/40 bg-muted/20 px-4 py-3 mb-6 text-sm">
-            <p className="text-muted-foreground mb-2">
-              {isHolistic ? "Holistic verification" : "Field-level verification"} &mdash;{" "}
-              {isHolistic
-                ? `checking the entire ${formatRecordType(recordType).toLowerCase()} record against its original source.`
-                : `checking specific fields of this ${formatRecordType(recordType).toLowerCase()} record.`}
-            </p>
-            {displayFields.length > 0 && (
-              <details className="group">
-                <summary className="cursor-pointer text-xs font-medium text-muted-foreground hover:text-foreground transition-colors select-none">
-                  Our database record ({displayFields.length} fields)
-                </summary>
-                <div className="mt-2 rounded-md border border-border/30 bg-background px-3 py-2">
-                  <table className="w-full text-sm">
-                    <tbody>
-                      {displayFields.slice(0, 12).map(([k, v]) => (
-                        <tr key={k} className="border-b border-border/20 last:border-0">
-                          <td className="pr-3 py-0.5 text-muted-foreground whitespace-nowrap align-top text-xs font-medium">
-                            {k}
-                          </td>
-                          <td className="py-0.5 text-foreground/80 break-all">
-                            {typeof v === "number"
-                              ? v.toLocaleString("en-US")
-                              : String(v).length > 150
-                                ? String(v).slice(0, 150) + "\u2026"
-                                : String(v)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {displayFields.length > 12 && (
-                    <div className="text-xs text-muted-foreground mt-1">
-                      +{displayFields.length - 12} more fields
-                    </div>
-                  )}
-                </div>
-              </details>
-            )}
-          </div>
-        );
-      })()}
 
       {/* Verdict summary cards */}
       {verdicts.length > 0 ? (
@@ -541,76 +528,75 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </div>
       )}
 
-      {/* Evidence — grouped by source URL, deduplicated */}
-      {evidence.length > 0 && (() => {
-        // Group evidence by source URL
-        const bySource = new Map<string, typeof evidence>();
-        for (const e of evidence) {
-          const key = e.sourceUrl || "(no source)";
-          const group = bySource.get(key);
-          if (group) group.push(e);
-          else bySource.set(key, [e]);
-        }
+      {/* Side-by-side: Our claim (left) | Source evidence (right) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Left: Our claim */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">
+            Our claim &mdash; {isHolistic ? "entire record" : "specific fields"}
+          </h2>
+          {displayFields.length > 0 ? (
+            <div className="rounded-lg border border-border/60 bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <tbody>
+                  {displayFields.map(([k, v]) => (
+                    <tr key={k} className="border-b border-border/30 last:border-0">
+                      <td className="pr-3 py-2 px-4 text-muted-foreground whitespace-nowrap align-top text-xs font-medium bg-muted/20">
+                        {k}
+                      </td>
+                      <td className="py-2 px-4 text-foreground/90 break-words">
+                        {typeof v === "number"
+                          ? v.toLocaleString("en-US")
+                          : String(v).length > 250
+                            ? String(v).slice(0, 250) + "\u2026"
+                            : String(v)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border/60 p-4 text-sm text-muted-foreground">
+              No record data available.
+            </div>
+          )}
+        </section>
 
-        // Deduplicate within each source group: collapse checks with same verdict + similar notes
-        // Keep the most recent check, show count of duplicates
-        type DeduplicatedCheck = (typeof evidence)[number] & { duplicateCount: number };
-        function deduplicateChecks(checks: typeof evidence): DeduplicatedCheck[] {
-          const seen = new Map<string, DeduplicatedCheck>();
-          for (const c of checks) {
-            // Key on field + entity + verdict + values + notes to avoid collapsing distinct field checks
-            const dedupeKey = [
-              c.fieldName ?? "",
-              c.entityId ?? "",
-              c.verdict,
-              c.expectedValue ?? "",
-              c.extractedValue ?? "",
-              (c.notes ?? "").slice(0, 100),
-            ].join("::");
-            const existing = seen.get(dedupeKey);
-            if (existing) {
-              existing.duplicateCount++;
-              // Keep the more recent one
-              if (c.checkedAt && existing.checkedAt && c.checkedAt > existing.checkedAt) {
-                seen.set(dedupeKey, { ...c, duplicateCount: existing.duplicateCount });
-              }
-            } else {
-              seen.set(dedupeKey, { ...c, duplicateCount: 1 });
-            }
-          }
-          return [...seen.values()];
-        }
-
-        return (
-          <section className="mb-8">
-            <h2 className="text-sm font-medium text-muted-foreground mb-4">
-              Evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
-            </h2>
+        {/* Right: Source evidence */}
+        <section>
+          <h2 className="text-sm font-medium text-muted-foreground mb-3">
+            Source evidence &mdash; {uniqueSourceUrls.size} source{uniqueSourceUrls.size !== 1 ? "s" : ""}, {evidence.length} check{evidence.length !== 1 ? "s" : ""}
+          </h2>
+          {evidence.length === 0 ? (
+            <div className="rounded-lg border border-border/60 p-4 text-sm text-muted-foreground">
+              No evidence records found for this item.
+            </div>
+          ) : (
             <div className="space-y-4">
-              {[...bySource.entries()].map(([sourceUrl, checks]) => (
+              {[...evidenceBySource.entries()].map(([sourceUrl, checks]) => (
                 <div key={sourceUrl} className="rounded-lg border border-border/60 overflow-hidden">
                   {/* Source header */}
                   {sourceUrl !== "(no source)" && (
-                    <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40">
+                    <div className="bg-muted/30 px-4 py-2.5 border-b border-border/40 flex flex-wrap items-center gap-2">
                       <a
                         href={sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                        className="inline-flex items-center gap-1.5 text-sm text-blue-600 hover:underline dark:text-blue-400 break-all"
                       >
                         <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                         {(() => { try { return new URL(sourceUrl).hostname + new URL(sourceUrl).pathname; } catch { return sourceUrl; } })()}
                       </a>
                       {(() => {
                         const ds = inferDataSource(sourceUrl);
-                        // Resource ID: prefer from evidence, fall back to data source pattern
                         const rid = checks.find((c) => c.resourceId)?.resourceId ?? ds?.resourceId;
                         return (
                           <>
                             {ds && (
                               <Link
                                 href={`/sources?tab=data-sources`}
-                                className="inline-flex items-center gap-1 ml-2 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300 hover:underline"
                               >
                                 {ds.name}
                               </Link>
@@ -618,7 +604,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                             {rid && (
                               <Link
                                 href={`/resources/${encodeURIComponent(rid)}`}
-                                className="inline-flex items-center gap-1 ml-2 text-xs text-primary hover:underline"
+                                className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
                               >
                                 <Database className="h-3 w-3" />
                                 Resource
@@ -627,9 +613,6 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           </>
                         );
                       })()}
-                      <span className="text-xs text-muted-foreground ml-2">
-                        ({checks.length} check{checks.length !== 1 ? "s" : ""})
-                      </span>
                     </div>
                   )}
 
@@ -651,7 +634,7 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           )}
                           {e.duplicateCount > 1 && (
                             <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
-                              {e.duplicateCount} similar checks
+                              {e.duplicateCount} similar
                             </span>
                           )}
                           <span className="ml-auto text-xs text-muted-foreground">
@@ -660,12 +643,8 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           </span>
                         </div>
 
-                        {/* Matched data — show extractedQuote as structured key-value pairs if JSON */}
-                        {e.extractedQuote && (
-                          <FormatQuote quote={e.extractedQuote} />
-                        )}
+                        {e.extractedQuote && <FormatQuote quote={e.extractedQuote} />}
 
-                        {/* Expected vs Found — only show if not already covered by the quote */}
                         {(e.expectedValue || e.extractedValue) && !e.extractedQuote && (
                           <div className="space-y-2 mb-2">
                             {e.expectedValue && (
@@ -683,33 +662,20 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
                           </div>
                         )}
 
-                        {/* Notes */}
                         {e.notes && (
                           <p className="text-sm text-muted-foreground">
                             <span className="font-medium text-foreground/70">Note:</span> {stripInternalTags(e.notes)}
                           </p>
                         )}
-
                       </div>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
-          </section>
-        );
-      })()}
-
-      {evidence.length === 0 && (
-        <section className="mb-8">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
-            Evidence
-          </h2>
-          <div className="rounded-lg border border-border/60 p-6 text-center text-muted-foreground">
-            <p>No evidence records found for this item.</p>
-          </div>
+          )}
         </section>
-      )}
+      </div>
 
       {/* Footer */}
       <details className="text-xs text-muted-foreground border-t border-border pt-4 mt-8">
