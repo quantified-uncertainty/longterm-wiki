@@ -45,6 +45,13 @@ function buildCitationRecordId(pageSlug: string, footnote: number): string {
   return `page:${pageSlug}:fn${footnote}`;
 }
 
+/**
+ * Dual-write citation accuracy to the unified source-check system.
+ *
+ * Wrapped in a Drizzle transaction so the evidence and verdict rows are
+ * written atomically — a partial failure can't leave evidence without a
+ * verdict or vice versa. Issue #4017 Phase C4.
+ */
 async function dualWriteToSourceCheck(
   db: ReturnType<typeof getDrizzleDb>,
   params: {
@@ -61,6 +68,8 @@ async function dualWriteToSourceCheck(
   const recordId = buildCitationRecordId(params.pageSlug, params.footnote);
   const now = new Date();
 
+  // Entity resolution is best-effort (outside the write transaction so a
+  // failure here doesn't abort the writes).
   let entityId: string | null = null;
   let entityDisplayName: string | null = null;
   try {
@@ -73,7 +82,7 @@ async function dualWriteToSourceCheck(
       entityId = entityRow.stableId;
       entityDisplayName = entityRow.title;
     }
-  } catch { /* best-effort */ }
+  } catch { /* best-effort entity resolution */ }
 
   if (!entityDisplayName) {
     try {
@@ -83,14 +92,17 @@ async function dualWriteToSourceCheck(
         .where(eq(wikiPages.slug, params.pageSlug))
         .limit(1);
       if (pageRow) entityDisplayName = pageRow.title;
-    } catch { /* best-effort */ }
+    } catch { /* best-effort page title resolution */ }
   }
 
   const displayName = `[${params.pageSlug}] fn${params.footnote}: ${params.claimText.slice(0, 100)}`;
   const sourceUrlVal = params.url ?? "";
   const checkerModelVal = "citation-accuracy-check";
 
-  const evidenceUpdated = await db
+  // Wrap evidence + verdict writes in a transaction for atomicity (#4017 C4).
+  await db.transaction(async (tx) => {
+
+  const evidenceUpdated = await tx
     .update(recordSources)
     .set({
       entityId,
@@ -113,7 +125,7 @@ async function dualWriteToSourceCheck(
 
   if (evidenceUpdated.length === 0) {
     try {
-      await db.insert(recordSources).values({
+      await tx.insert(recordSources).values({
         recordType: "citation", recordId, entityId,
         expectedValue: params.claimText.slice(0, 2000),
         sourceUrl: sourceUrlVal || null, verdict: mappedVerdict,
@@ -127,7 +139,7 @@ async function dualWriteToSourceCheck(
     }
   }
 
-  const verdictUpdated = await db
+  const verdictUpdated = await tx
     .update(sourceVerdicts)
     .set({
       entityId,
@@ -150,7 +162,7 @@ async function dualWriteToSourceCheck(
 
   if (verdictUpdated.length === 0) {
     try {
-      await db.insert(sourceVerdicts).values({
+      await tx.insert(sourceVerdicts).values({
         recordType: "citation", recordId, fieldName: null,
         entityId, displayName: displayName.slice(0, 500),
         entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
@@ -164,6 +176,8 @@ async function dualWriteToSourceCheck(
       if (!(msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505"))) throw insertErr;
     }
   }
+
+  }); // end transaction
 }
 
 // ---- Deprecation helper (#1310) ----
@@ -644,18 +658,24 @@ const citationsApp = new Hono()
     }
 
     // Dual-write to unified source-check system (#3671).
-    // Best-effort: failure logged but does not block the response.
+    // Issue #4017 C4: now awaited (was fire-and-forget) and wrapped in a
+    // transaction internally. Failure is still non-fatal for the response
+    // (the citation accuracy update already succeeded above), but we log
+    // at warn level so the failure is visible and the caller gets the
+    // response after the write attempt completes.
     if (quoteRow) {
-      dualWriteToSourceCheck(db, {
-        pageSlug: pageId, footnote, accuracyVerdict: verdict,
-        accuracyScore: score, claimText: quoteRow.claimText,
-        issues: issues ?? null, url: quoteRow.url,
-      }).catch((e: unknown) => {
+      try {
+        await dualWriteToSourceCheck(db, {
+          pageSlug: pageId, footnote, accuracyVerdict: verdict,
+          accuracyScore: score, claimText: quoteRow.claimText,
+          issues: issues ?? null, url: quoteRow.url,
+        });
+      } catch (e: unknown) {
         logger.warn(
           { error: e instanceof Error ? e.message : String(e), pageId, footnote },
           "Dual-write to source-check failed for citation accuracy (#3671)"
         );
-      });
+      }
     }
 
     return c.json({ updated: true, pageId, footnote, verdict });
