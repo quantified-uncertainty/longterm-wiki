@@ -23,6 +23,7 @@ import { SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES } from '../source-check/prompt-g
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
 import { apiRequest } from '../wiki-server/client.ts';
+import { storeClaimVerdicts } from '../wiki-server/claims.ts';
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import { z } from 'zod';
 
@@ -220,7 +221,7 @@ export async function handleClaimSourceCheck(
     const MAX_VERDICTS_PER_REQUEST_NS = 100;
     for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST_NS) {
       const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST_NS);
-      const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts: batch });
+      const result = await storeClaimVerdicts(batch);
 
       if (!result.ok) {
         return {
@@ -368,11 +369,7 @@ export async function handleClaimSourceCheck(
   const MAX_VERDICTS_PER_REQUEST = 100;
   for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST) {
     const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST);
-    const updateResult = await apiRequest<{ updated: number; total: number }>(
-      'POST',
-      '/api/claims/verdicts',
-      { verdicts: batch },
-    );
+    const updateResult = await storeClaimVerdicts(batch);
 
     if (!updateResult.ok) {
       return {

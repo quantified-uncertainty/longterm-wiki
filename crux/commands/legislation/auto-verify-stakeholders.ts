@@ -25,10 +25,12 @@ import { CostTracker } from '../../lib/cost-tracker.ts';
 import { fetchSource } from '../../lib/search/source-fetcher.ts';
 import {
   getVerdictByRecord,
-  storeEvidence,
-  storeVerdict,
   type VerdictByRecordResult,
 } from '../../lib/wiki-server/source-check-client.ts';
+import {
+  storeSourceCheckEvidence,
+  storeAggregateVerdict,
+} from '../../lib/source-check/verdict-handler.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
 
@@ -254,21 +256,42 @@ interface PostVerdictBody {
 }
 
 async function recordSourceCheck(body: PostSourceCheckBody): Promise<boolean> {
-  const result = await storeEvidence(body as unknown as Record<string, unknown>);
-  if (!result.ok) {
-    console.warn(`[auto-verify] Failed to record source-check: ${result.message}`);
+  try {
+    await storeSourceCheckEvidence({
+      recordType: body.recordType as Parameters<typeof storeSourceCheckEvidence>[0]['recordType'],
+      recordId: body.recordId,
+      sourceUrl: body.sourceUrl,
+      verdict: body.verdict,
+      confidence: body.confidence,
+      extractedValue: body.extractedValue,
+      reasoning: body.notes,
+      isPrimarySource: body.isPrimarySource,
+      checkerModel: body.checkerModel,
+      fieldName: body.fieldName,
+      expectedValue: body.expectedValue,
+    }, '[auto-verify]');
+    return true;
+  } catch (e: unknown) {
+    console.warn(`[auto-verify] Failed to record source-check: ${e instanceof Error ? e.message : String(e)}`);
     return false;
   }
-  return true;
 }
 
 async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
-  const result = await storeVerdict(verdict as unknown as Record<string, unknown>);
-  if (!result.ok) {
-    console.warn(`[auto-verify] Failed to record verdict: ${result.message}`);
+  try {
+    await storeAggregateVerdict({
+      recordType: verdict.recordType as Parameters<typeof storeAggregateVerdict>[0]['recordType'],
+      recordId: verdict.recordId,
+      verdict: verdict.verdict,
+      confidence: verdict.confidence,
+      reasoning: verdict.reasoning,
+      sourcesChecked: verdict.sourcesChecked,
+    }, '[auto-verify]');
+    return true;
+  } catch (e: unknown) {
+    console.warn(`[auto-verify] Failed to record verdict: ${e instanceof Error ? e.message : String(e)}`);
     return false;
   }
-  return true;
 }
 
 // ---------------------------------------------------------------------------

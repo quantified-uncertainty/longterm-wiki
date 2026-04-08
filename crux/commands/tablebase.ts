@@ -638,6 +638,9 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
     const BATCH_SIZE = 100;
     for (let i = 0; i < fixBatch.length; i += BATCH_SIZE) {
       const batch = fixBatch.slice(i, i + BATCH_SIZE);
+      // Uses raw apiRequest instead of syncPersonnel() because this is a generic
+      // data-quality fix path, not a full personnel sync. The CLI-level --fix flag
+      // already enforces the reason context. See issue #4017 Phase A.
       const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', { items: batch });
       if (fixR.ok) {
         fixed += fixR.data.upserted;
