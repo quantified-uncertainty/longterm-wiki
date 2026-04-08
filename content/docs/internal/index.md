@@ -51,17 +51,12 @@ Start here. Each hub gives you the dashboards, CLI commands, decision tables, an
 Most common operations:
 
 ```bash
-# Run all validators
-npm run validate
-
-# List pages needing improvement
-node scripts/page-improver.mjs --list
-
-# Rebuild data after editing entities.yaml
-npm run build:data
-
-# Start dev server
-npm run dev
+pnpm dev                                  # Start dev server
+pnpm build                               # Production build
+pnpm crux w validate gate --fix          # CI-blocking validation gate
+pnpm crux query search "topic"           # Full-text search
+pnpm crux w improve <id> --tier=standard --apply  # Improve a page
+pnpm crux fb show anthropic              # Show FactBase entity
 ```
 
-See <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> for complete command reference.
+See the operations hubs above for full command playbooks, or <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink> for the complete reference.
