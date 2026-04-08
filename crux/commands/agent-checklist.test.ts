@@ -54,14 +54,20 @@ describe('agent-checklist init', () => {
     vi.clearAllMocks();
   });
 
+  // Wrap `commands.init` so every test bypasses the real git/GitHub side
+  // effects (sync-to-main and auto-call to `gh issues start`). Tests that want
+  // to exercise those paths can call `commands.init` directly.
+  const initNoSideEffects = (args: string[], options: Record<string, unknown> = {}) =>
+    commands.init(args, { noSync: true, noIssueStart: true, ...options });
+
   it('returns usage error when no task description and no --issue', async () => {
-    const result = await commands.init([], {});
+    const result = await initNoSideEffects([], {});
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Usage');
   });
 
   it('creates checklist with --type=infrastructure', async () => {
-    const result = await commands.init(['Build new feature'], { type: 'infrastructure' });
+    const result = await initNoSideEffects(['Build new feature'], { type: 'infrastructure' });
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('checklist created');
     expect(result.output).toContain('infrastructure');
@@ -73,7 +79,7 @@ describe('agent-checklist init', () => {
   });
 
   it('creates checklist with --type=bugfix', async () => {
-    const result = await commands.init(['Fix scoring bug'], { type: 'bugfix' });
+    const result = await initNoSideEffects(['Fix scoring bug'], { type: 'bugfix' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
@@ -81,7 +87,7 @@ describe('agent-checklist init', () => {
   });
 
   it('creates checklist with --type=content', async () => {
-    const result = await commands.init(['Write AI safety page'], { type: 'content' });
+    const result = await initNoSideEffects(['Write AI safety page'], { type: 'content' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
@@ -91,7 +97,7 @@ describe('agent-checklist init', () => {
   });
 
   it('creates checklist with --type=commands', async () => {
-    const result = await commands.init(['Add session CLI'], { type: 'commands' });
+    const result = await initNoSideEffects(['Add session CLI'], { type: 'commands' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
@@ -100,7 +106,7 @@ describe('agent-checklist init', () => {
   });
 
   it('creates checklist with --type=refactor', async () => {
-    const result = await commands.init(['Refactor validation'], { type: 'refactor' });
+    const result = await initNoSideEffects(['Refactor validation'], { type: 'refactor' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
@@ -109,7 +115,7 @@ describe('agent-checklist init', () => {
   });
 
   it('rejects invalid --type', async () => {
-    const result = await commands.init(['Task'], { type: 'invalid' });
+    const result = await initNoSideEffects(['Task'], { type: 'invalid' });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Invalid type');
     expect(result.output).toContain('content');
@@ -123,7 +129,7 @@ describe('agent-checklist init', () => {
       html_url: 'https://github.com/test/repo/issues/42',
     });
 
-    const result = await commands.init([], { issue: '42' });
+    const result = await initNoSideEffects([], { issue: '42' });
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('bugfix');
     expect(result.output).toContain('#42');
@@ -142,7 +148,7 @@ describe('agent-checklist init', () => {
       html_url: 'https://github.com/test/repo/issues/42',
     });
 
-    const result = await commands.init([], { issue: '42', type: 'infrastructure' });
+    const result = await initNoSideEffects([], { issue: '42', type: 'infrastructure' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
@@ -150,20 +156,20 @@ describe('agent-checklist init', () => {
   });
 
   it('rejects invalid issue number', async () => {
-    const result = await commands.init([], { issue: 'abc' });
+    const result = await initNoSideEffects([], { issue: 'abc' });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Invalid issue number');
   });
 
   it('handles GitHub API failure gracefully', async () => {
     mockGithubApi.mockRejectedValueOnce(new Error('Not found'));
-    const result = await commands.init([], { issue: '999' });
+    const result = await initNoSideEffects([], { issue: '999' });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Failed to fetch');
   });
 
   it('auto-marks issue-tracking as N/A with reason when no issue provided', async () => {
-    const result = await commands.init(['Build a feature'], { type: 'infrastructure' });
+    const result = await initNoSideEffects(['Build a feature'], { type: 'infrastructure' });
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('issue-tracking auto-marked N/A');
 
@@ -181,7 +187,7 @@ describe('agent-checklist init', () => {
       html_url: 'https://github.com/test/repo/issues/5',
     });
 
-    const result = await commands.init([], { issue: '5' });
+    const result = await initNoSideEffects([], { issue: '5' });
     expect(result.exitCode).toBe(0);
     expect(result.output).not.toContain('issue-tracking auto-marked N/A');
 
@@ -197,7 +203,7 @@ describe('agent-checklist init', () => {
       html_url: 'https://github.com/test/repo/issues/10',
     });
 
-    const result = await commands.init([], { issue: '10' });
+    const result = await initNoSideEffects([], { issue: '10' });
     expect(result.exitCode).toBe(0);
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;

@@ -256,3 +256,102 @@ export function hasChanges(): boolean {
   const unstaged = gitSafe('diff', '--quiet');
   return !staged.ok || !unstaged.ok;
 }
+
+// ── Sync to main ─────────────────────────────────────────────────────────────
+
+/**
+ * Result of attempting to sync the working tree to the latest origin/main.
+ *
+ * `ok=false` means no destructive action was taken — the caller should surface
+ * the error to the user instead of proceeding with stale state.
+ */
+export interface SyncToMainResult {
+  ok: boolean;
+  /** Human-readable steps that were performed (in order). */
+  steps: string[];
+  /** Error message if ok=false. */
+  error?: string;
+  /** True if we switched off another branch onto main. */
+  switchedBranch: boolean;
+  /** The branch we were on before syncing. */
+  startBranch: string;
+}
+
+/**
+ * Sync the working tree to the latest origin/main:
+ *
+ *   1. Verify the working tree is clean (no uncommitted or untracked files).
+ *      If dirty, abort without making any changes.
+ *   2. If not on main, run `git checkout main`.
+ *   3. Run `git pull --ff-only origin main`.
+ *
+ * Used by `crux sys agent-checklist init` so every new session starts from a
+ * fresh main, instead of inheriting whatever stale branch the slot happened
+ * to be on.
+ */
+export function syncToMain(): SyncToMainResult {
+  const startBranch = currentBranch();
+  const steps: string[] = [];
+
+  // Step 1: clean tree check (porcelain catches both modified and untracked).
+  const status = gitSafe('status', '--porcelain');
+  if (!status.ok) {
+    return {
+      ok: false,
+      steps,
+      error: `git status failed: ${status.stderr || status.output}`,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+  if (status.output.length > 0) {
+    return {
+      ok: false,
+      steps,
+      error:
+        `Working tree is not clean. Commit, stash, or discard before syncing:\n` +
+        status.output,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+
+  // Step 2: switch to main if needed.
+  let switchedBranch = false;
+  if (startBranch !== 'main') {
+    const checkout = gitSafe('checkout', 'main');
+    if (!checkout.ok) {
+      return {
+        ok: false,
+        steps,
+        error: `git checkout main failed: ${checkout.stderr || checkout.output}`,
+        switchedBranch: false,
+        startBranch,
+      };
+    }
+    switchedBranch = true;
+    steps.push(`Switched ${startBranch} → main`);
+  } else {
+    steps.push('Already on main');
+  }
+
+  // Step 3: pull (fast-forward only — diverged local main is a real problem).
+  const pull = gitSafe('pull', '--ff-only', 'origin', 'main');
+  if (!pull.ok) {
+    return {
+      ok: false,
+      steps,
+      error: `git pull --ff-only origin main failed: ${pull.stderr || pull.output}`,
+      switchedBranch,
+      startBranch,
+    };
+  }
+  if (pull.output.includes('Already up to date')) {
+    steps.push('Pulled main (already up to date)');
+  } else {
+    const summary = pull.output.split('\n').slice(-2)[0]?.trim() || 'updated';
+    steps.push(`Pulled main (${summary})`);
+  }
+
+  return { ok: true, steps, switchedBranch, startBranch };
+}

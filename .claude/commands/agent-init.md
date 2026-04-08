@@ -9,28 +9,32 @@ Initialize an agent checklist and establish working context.
 
 Run this at the start of a session, after understanding what the task is.
 
-## Step 1: Generate the checklist
+## Step 1: Run `crux sys agent-checklist init`
 
-Run `pnpm crux sys agent-checklist init` with the appropriate arguments:
+This single command does everything below in order:
 
-- **If working on a GitHub issue**: `pnpm crux sys agent-checklist init --issue=N` (auto-detects type from labels)
-- **If not on an issue**: `pnpm crux sys agent-checklist init "Task description" --type=X`
+1. **Syncs to main** — verifies the working tree is clean, switches to `main` if needed, and runs `git pull --ff-only origin main`. If the tree is dirty, it aborts and tells you what's uncommitted.
+2. Generates `.claude/wip-checklist.md` for the session type.
+3. Auto-marks `issue-tracking` as N/A when no `--issue` is given.
+4. **Signals start on the GitHub issue** (when `--issue=N` is given) — adds the `agent:working` label and posts the start comment. Best-effort: a GitHub failure does not fail init.
+5. Prints the full checklist so you can scan it.
 
-Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`
+Pick the right invocation:
 
-If unsure about the type, `infrastructure` is the default.
+- **Working on a GitHub issue**: `pnpm crux sys agent-checklist init --issue=N` (auto-detects type from labels)
+- **Not on an issue**: `pnpm crux sys agent-checklist init "Task description" --type=X`
 
-## Step 2: Signal start on GitHub issue (if applicable)
+Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands` (default: `infrastructure`).
 
-If this session is working on a specific GitHub issue and `--issue` was used in step 1, also run:
+### Recovery cases
 
-```bash
-pnpm crux gh issues start <ISSUE_NUM>
-```
+- **Dirty working tree** → Stop. Ask the user whether to commit, stash, or discard. Do NOT bypass — the sync exists to keep sessions from accumulating cross-branch debris.
+- **Pull is non-fast-forward** → Local main has diverged. Surface the error to the user; don't try to force-pull.
+- **Intentionally continuing on the current branch** (e.g. resuming after a crash) → Re-run with `--no-sync`.
 
-## Step 3: Assemble research context (optional but recommended)
+## Step 2: Assemble research context (optional but recommended)
 
-For content sessions (editing a page or working with an entity), gather context upfront to avoid 5-15 separate file reads:
+For content sessions or any task tied to specific pages/entities/issues, gather context upfront to avoid 5-15 separate file reads:
 
 ```bash
 # Context for a specific page you'll be editing:
@@ -48,8 +52,8 @@ pnpm crux context for-topic "topic description"
 
 Output is saved to `.claude/wip-context.md`. Read it once — it contains page metadata, related pages, backlinks, citation health, entity YAML, and frontmatter.
 
-## Step 4: Present the checklist
+## Step 3: Highlight risky items
 
-Read `.claude/wip-checklist.md` and output it to the user. Highlight any items that seem particularly important or risky for this specific task.
+The init output already shows the full checklist. Briefly call out any items that look particularly important or risky for *this specific task* (e.g. "tests-written" matters more for a bugfix, "fix-escaping" matters for content edits, etc.). Don't re-paste the whole list — the user just saw it.
 
 Throughout the session, check items off in `.claude/wip-checklist.md` as they are completed. When done, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not).
