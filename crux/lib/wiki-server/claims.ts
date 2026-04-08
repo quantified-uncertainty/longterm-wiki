@@ -21,6 +21,7 @@ export type ProposeClaimsResult = InferResponseType<RpcClient['propose']['$post'
 export type ClaimsAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
 export type ClaimsStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 export type ClaimsByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
+export type ClaimVerdictsResult = InferResponseType<RpcClient['verdicts']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // API functions
@@ -88,4 +89,21 @@ export async function getClaimsByEntity(
     'GET',
     `/api/claims/by-entity/${encodeURIComponent(entityId)}${qs ? `?${qs}` : ''}`,
   );
+}
+
+/**
+ * Store source-check verdicts for a batch of claims.
+ * Wraps the raw `/api/claims/verdicts` endpoint with typed response.
+ */
+export async function storeClaimVerdicts(
+  verdicts: Array<{
+    claimId: number;
+    status: string;
+    confidence: number;
+    reasoning: string;
+    extractedValue?: string;
+    checkerModel?: string;
+  }>,
+): Promise<ApiResult<ClaimVerdictsResult>> {
+  return apiRequest<ClaimVerdictsResult>('POST', '/api/claims/verdicts', { verdicts });
 }

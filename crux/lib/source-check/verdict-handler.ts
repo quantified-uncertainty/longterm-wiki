@@ -36,6 +36,10 @@ export async function storeSourceCheckEvidence(params: {
   resourceId?: string | null;
   /** Override the default checker model (e.g., 'deterministic-row-match') */
   checkerModel?: string;
+  /** Specific field being checked (e.g., 'position' for stakeholder checks) */
+  fieldName?: string | null;
+  /** Expected value from the source data (e.g., stakeholder position + reason) */
+  expectedValue?: string | null;
 }, logPrefix = '[source-check]'): Promise<void> {
   let resolvedResourceId = params.resourceId ?? null;
   if (!resolvedResourceId && params.sourceUrl) {
@@ -71,6 +75,8 @@ export async function storeSourceCheckEvidence(params: {
     ...(params.isPrimarySource !== undefined ? { isPrimarySource: params.isPrimarySource } : {}),
     ...(params.entityId ? { entityId: params.entityId } : {}),
     resourceId: resolvedResourceId,
+    ...(params.fieldName != null ? { fieldName: params.fieldName } : {}),
+    ...(params.expectedValue != null ? { expectedValue: params.expectedValue.slice(0, 2000) } : {}),
   };
 
   const response = await storeEvidenceRpc(body);

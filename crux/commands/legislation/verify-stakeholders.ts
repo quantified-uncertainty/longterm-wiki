@@ -24,9 +24,11 @@ import type {
 import { isServerAvailable, apiRequest } from "../../lib/wiki-server/client.ts";
 import {
   getEvidenceByRecord,
-  storeEvidence,
-  storeVerdict,
 } from "../../lib/wiki-server/source-check-client.ts";
+import {
+  storeSourceCheckEvidence,
+  storeAggregateVerdict,
+} from "../../lib/source-check/verdict-handler.ts";
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -184,24 +186,27 @@ async function createSourceCheck(
   stakeholderName: string,
   policyTitle: string
 ): Promise<SourceCheckResponse | null> {
-  const result = await storeEvidence({
-    recordType: "policy-stakeholder",
-    recordId,
-    sourceUrl,
-    fieldName: "position",
-    expectedValue: position,
-    verdict: "confirmed",
-    confidence: 0.8,
-    isPrimarySource: true,
-    notes: `Source URL confirms ${stakeholderName}'s ${position} position on ${policyTitle}. Manually curated source link from YAML data.`,
-  });
-  if (!result.ok) {
+  try {
+    await storeSourceCheckEvidence({
+      recordType: "policy-stakeholder",
+      recordId,
+      sourceUrl,
+      verdict: "confirmed",
+      confidence: 0.8,
+      extractedValue: "",
+      reasoning: `Source URL confirms ${stakeholderName}'s ${position} position on ${policyTitle}. Manually curated source link from YAML data.`,
+      isPrimarySource: true,
+      fieldName: "position",
+      expectedValue: position,
+    }, '[verify-stakeholders]');
+    // The wrapper doesn't return the created record; return a placeholder
+    return { id: 0, thingId: recordId, verdict: "confirmed" };
+  } catch (e: unknown) {
     console.warn(
-      `  Warning: Failed to create source-check for ${recordId}: ${result.message}`
+      `  Warning: Failed to create source-check for ${recordId}: ${e instanceof Error ? e.message : String(e)}`
     );
     return null;
   }
-  return result.data as unknown as SourceCheckResponse;
 }
 
 /**
@@ -217,22 +222,23 @@ async function upsertVerdict(
     needsRecheck?: boolean;
   }
 ): Promise<VerdictResponse | null> {
-  const result = await storeVerdict({
-    recordType: "policy-stakeholder",
-    recordId,
-    verdict,
-    confidence: opts.confidence ?? null,
-    reasoning: opts.reasoning ?? null,
-    sourcesChecked: opts.sourcesChecked ?? 0,
-    needsRecheck: opts.needsRecheck ?? false,
-  });
-  if (!result.ok) {
+  try {
+    await storeAggregateVerdict({
+      recordType: "policy-stakeholder",
+      recordId,
+      verdict,
+      confidence: opts.confidence ?? 0,
+      reasoning: opts.reasoning ?? "",
+      sourcesChecked: opts.sourcesChecked ?? 0,
+    }, '[verify-stakeholders]');
+    // The wrapper doesn't return the created record; return a placeholder
+    return { thingId: recordId, verdict, confidence: opts.confidence ?? null };
+  } catch (e: unknown) {
     console.warn(
-      `  Warning: Failed to upsert verdict for ${recordId}: ${result.message}`
+      `  Warning: Failed to upsert verdict for ${recordId}: ${e instanceof Error ? e.message : String(e)}`
     );
     return null;
   }
-  return result.data as unknown as VerdictResponse;
 }
 
 // ── Command Handler ──────────────────────────────────────────────────

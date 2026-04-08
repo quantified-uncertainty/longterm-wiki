@@ -23,9 +23,10 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi, getSourceCheckStats } from '../lib/wiki-server/source-check-client.ts';
+import { getSourceCheckStats } from '../lib/wiki-server/source-check-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
+import { storeSourceCheckEvidence, storeAggregateVerdict } from '../lib/source-check/verdict-handler.ts';
 import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -251,27 +252,27 @@ Respond with ONLY a JSON object:
 // ── Storage ─────────────────────────────────────────────────────────
 
 async function storeEvidence(result: SourceCheckResult): Promise<void> {
-  await storeEvidenceApi({
+  try {
+    await storeSourceCheckEvidence({
       recordType: result.claim.recordType,
       recordId: result.claim.recordId,
-      fieldName: result.claim.fieldName ?? null,
       entityId: result.claim.entityId,
-      expectedValue: result.claim.expectedValue,
       sourceUrl: result.claim.sourceUrl,
       verdict: result.verdict,
       confidence: result.confidence,
       extractedValue: result.extractedValue,
-      checkerModel: MODELS.haiku,
+      reasoning: result.reasoning,
       isPrimarySource: true,
-      notes: result.reasoning,
-    },
-  ).then(
-    (res) => { if (!res.ok) console.warn(`[verify] Evidence storage failed: ${res.error}`); },
-    (e: unknown) => console.warn(`[verify] Evidence storage error: ${e instanceof Error ? e.message : String(e)}`),
-  );
+      checkerModel: MODELS.haiku,
+      fieldName: result.claim.fieldName ?? null,
+      expectedValue: result.claim.expectedValue ?? null,
+    }, '[verify]');
+  } catch (e: unknown) {
+    console.warn(`[verify] Evidence storage error: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
-async function storeAggregateVerdict(
+async function storeLocalAggregateVerdict(
   recordType: string,
   recordId: string,
   entityId: string,
@@ -279,7 +280,8 @@ async function storeAggregateVerdict(
   confidence: number,
   reasoning: string,
 ): Promise<void> {
-  await storeVerdictApi({
+  try {
+    await storeAggregateVerdict({
       recordType,
       recordId,
       entityId,
@@ -287,11 +289,10 @@ async function storeAggregateVerdict(
       confidence,
       reasoning,
       sourcesChecked: 1,
-    },
-  ).then(
-    (res) => { if (!res.ok) console.warn(`[verify] Verdict storage failed: ${res.error}`); },
-    (e: unknown) => console.warn(`[verify] Verdict storage error: ${e instanceof Error ? e.message : String(e)}`),
-  );
+    }, '[verify]');
+  } catch (e: unknown) {
+    console.warn(`[verify] Verdict storage error: ${e instanceof Error ? e.message : String(e)}`);
+  }
 }
 
 // ── Main command ────────────────────────────────────────────────────
@@ -425,7 +426,7 @@ async function verifyEntityCommand(
 
     // Store evidence + aggregate verdict
     await storeEvidence(result);
-    await storeAggregateVerdict(
+    await storeLocalAggregateVerdict(
       claim.recordType, claim.recordId, claim.entityId,
       result.verdict, result.confidence, result.reasoning,
     );
