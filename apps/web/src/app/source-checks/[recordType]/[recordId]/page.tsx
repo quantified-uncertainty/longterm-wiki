@@ -360,6 +360,31 @@ export default async function SourceCheckDetailPage({ params }: PageProps) {
         </div>
       </div>
 
+      {/* What's being checked — context for users */}
+      <div className="rounded-lg bg-muted/30 border border-border/40 px-4 py-3 mb-6 text-sm text-muted-foreground">
+        {recordType === "grant" && (
+          <p>Verifying that this grant record in our database matches the original funder&apos;s published data. Key fields (grantee, amount, date) are checked against the source.</p>
+        )}
+        {recordType === "personnel" && (
+          <p>Verifying that this personnel record (role, title, affiliation) is supported by the organization&apos;s public information.</p>
+        )}
+        {recordType === "fact" && (
+          <p>Verifying that this structured fact matches published sources. The claimed value is checked against primary and secondary sources.</p>
+        )}
+        {recordType === "division" && (
+          <p>Verifying that this organizational division exists and matches public information about the parent organization.</p>
+        )}
+        {recordType === "investment" && (
+          <p>Verifying that this investment record matches published funding data from the source.</p>
+        )}
+        {recordType === "funding-round" && (
+          <p>Verifying that this funding round record matches published financial data.</p>
+        )}
+        {!["grant", "personnel", "fact", "division", "investment", "funding-round"].includes(recordType) && (
+          <p>Verifying that this {formatRecordType(recordType).toLowerCase()} record matches its original source data.</p>
+        )}
+      </div>
+
       {/* Verdict summary cards */}
       {verdicts.length > 0 ? (
         <div className="space-y-4 mb-8">
