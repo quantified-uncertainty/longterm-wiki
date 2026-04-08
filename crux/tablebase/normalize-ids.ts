@@ -294,11 +294,12 @@ export async function normalizeIds(
       // Send in batches
       const items = [...fixMap.values()];
       const BATCH_SIZE = 100;
+      const SKIP_REASON = encodeURIComponent("normalize-ids: fixing broken FK refs in-place; refs may not yet exist as entities");
       for (let i = 0; i < items.length; i += BATCH_SIZE) {
         const batch = items.slice(i, i + BATCH_SIZE);
         const r = await apiRequest<{ upserted: number }>(
           "POST",
-          "/api/personnel/sync?skipEntityValidation=true",
+          `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}`, // skipEntityValidation-ok: normalize-ids backfill, see SKIP_REASON above
           { items: batch }
         );
         if (r.ok) {

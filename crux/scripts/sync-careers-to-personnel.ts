@@ -204,7 +204,9 @@ for (let i = 0; i < syncItems.length; i += BATCH_SIZE) {
   const batch = syncItems.slice(i, i + BATCH_SIZE);
   console.log(`\nSyncing batch ${Math.floor(i / BATCH_SIZE) + 1} (${batch.length} items)...`);
 
-  const result = await apiRequest("POST", "/api/personnel/sync?skipEntityValidation=true", { items: batch });
+  const SKIP_REASON = encodeURIComponent("backfill: career records sync before/independent of person and org entity sync");
+  // eslint-disable-next-line max-len
+  const result = await apiRequest("POST", `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}`, { items: batch }); // skipEntityValidation-ok: one-shot backfill, see SKIP_REASON above
   if (result.ok) {
     totalUpserted += result.data?.upserted ?? 0;
     console.log(`  ✓ Upserted: ${result.data?.upserted}`);

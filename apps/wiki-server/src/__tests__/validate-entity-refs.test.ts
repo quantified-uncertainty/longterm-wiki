@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
+// Eager static import so the spy operates on the same instance the routes use.
+import { skipLogger } from "../routes/shared/validate-entity-refs.js";
 
 // ---- In-memory stores simulating Postgres ----
 
@@ -236,16 +238,25 @@ describe("Entity FK validation", () => {
       expect(res.status).toBe(200);
     });
 
-    it("skips validation when skipEntityValidation=true", async () => {
+    // PR #4023 review HIGH#1: bypass without a reason no longer succeeds —
+    // it logs at error level and falls through to normal FK validation (which
+    // returns 400 because the test refs don't exist). See the dedicated
+    // "DENIES bypass" tests below for the new behavior.
+    //
+    // The accepted bypass form REQUIRES a reason — see the next test.
+
+    // Issue #4017 — bypass with reason should also pass and log a warn (the
+    // log itself isn't asserted here; this just verifies the contract).
+    it("skips validation with reason: 200 OK", async () => {
       const res = await postJson(
         app,
-        "/api/personnel/sync?skipEntityValidation=true",
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
         {
           items: [
             {
-              id: "Pabcde1234",
-              personId: "nxPerson01",
-              organizationId: "nxOrgani01",
+              id: "Pabcde2345",
+              personId: "nxPerson02",
+              organizationId: "nxOrgani02",
               role: "CEO",
               roleType: "key-person",
             },
@@ -254,6 +265,109 @@ describe("Entity FK validation", () => {
       );
 
       expect(res.status).toBe(200);
+    });
+
+    // PR #4023 review HIGH#1 — empty/whitespace reason now DENIES the bypass
+    // (the route falls through to normal FK validation, which returns 400 for
+    // missing entity refs). Previous behavior was "log error but allow"; the
+    // new behavior is "log error AND deny" so the contract is actually enforced.
+    it("DENIES bypass when reason is whitespace-only AND logs at error level", async () => {
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=%20%20",
+        {
+          items: [
+            {
+              id: "Pabcde3456",
+              personId: "nxPerson03",
+              organizationId: "nxOrgani03",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+      // 400 because validation runs and the FK refs don't exist.
+      expect(res.status).toBe(400);
+
+      // Exactly one error log with the bypass message and the raw reason.
+      // (Assertions BEFORE mockRestore — restore wipes mock.calls.)
+      expect(errorSpy).toHaveBeenCalledOnce();
+      const [ctx, msg] = errorSpy.mock.calls[0];
+      expect(msg as string).toContain("skipEntityValidation=true called without");
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        path: "/api/personnel/sync",
+        method: "POST",
+        // The raw whitespace string is preserved (not coerced to null) so
+        // operators can distinguish "param missing" from "param empty".
+        rawReason: "  ",
+      });
+
+      errorSpy.mockRestore();
+    });
+
+    it("DENIES bypass when reason param is omitted entirely", async () => {
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true",
+        {
+          items: [
+            {
+              id: "Pabcde4567",
+              personId: "nxPerson04",
+              organizationId: "nxOrgani04",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+      expect(res.status).toBe(400);
+
+      expect(errorSpy).toHaveBeenCalledOnce();
+      const [ctx] = errorSpy.mock.calls[0];
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        rawReason: null,
+      });
+
+      errorSpy.mockRestore();
+    });
+
+    // Sibling positive case: a real reason logs at warn (not error).
+    it("with valid reason: logs at warn level (NOT error)", async () => {
+      const warnSpy = vi.spyOn(skipLogger, "warn").mockImplementation(() => {});
+      const errorSpy = vi.spyOn(skipLogger, "error").mockImplementation(() => {});
+
+      const res = await postJson(
+        app,
+        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill%20with%20reason",
+        {
+          items: [
+            {
+              id: "Pabcde9999",
+              personId: "nxPerson99",
+              organizationId: "nxOrgani99",
+              role: "CEO",
+              roleType: "key-person",
+            },
+          ],
+        },
+      );
+      expect(res.status).toBe(200);
+
+      expect(warnSpy).toHaveBeenCalledOnce();
+      const [ctx] = warnSpy.mock.calls[0];
+      expect(ctx as Record<string, unknown>).toMatchObject({
+        reason: "test backfill with reason",
+      });
+      expect(errorSpy).not.toHaveBeenCalled();
+
+      warnSpy.mockRestore();
+      errorSpy.mockRestore();
     });
 
     it("reports multiple missing fields in one error", async () => {
