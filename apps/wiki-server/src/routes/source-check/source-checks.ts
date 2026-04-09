@@ -1887,7 +1887,9 @@ const sourceChecksApp = new Hono()
 
     // Coverage is based on distinct checked records, not verdict row counts.
     // A record can have multiple verdict rows (one per fieldName), so we use
-    // COUNT(DISTINCT record_id) to avoid exceeding 100%.
+    // COUNT(DISTINCT record_id) to avoid exceeding 100%. Orphaned verdicts
+    // (where the underlying record no longer exists) are excluded via the
+    // live_records CTE join.
     const checkedRows = (await db.execute(sql`
       WITH ${liveRecordsCte}
       SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
