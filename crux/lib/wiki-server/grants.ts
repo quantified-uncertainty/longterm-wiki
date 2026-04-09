@@ -43,8 +43,21 @@ export async function getGrantsByEntity(
 /** Sync grants (upsert). */
 export async function syncGrants(
   items: Array<Record<string, unknown>>,
+  options?: {
+    /** Bypass server-side source-check enforcement. Requires reason for audit logging. */
+    forceSkipSourceCheck?: boolean;
+    forceSkipSourceCheckReason?: string;
+  },
 ): Promise<ApiResult<GrantsSyncResult>> {
-  return apiRequest<GrantsSyncResult>('POST', '/api/grants/sync', { items });
+  const params = new URLSearchParams();
+  if (options?.forceSkipSourceCheck) {
+    params.set('forceSkipSourceCheck', 'true');
+    if (options.forceSkipSourceCheckReason) {
+      params.set('reason', options.forceSkipSourceCheckReason);
+    }
+  }
+  const qs = params.toString();
+  return apiRequest<GrantsSyncResult>('POST', `/api/grants/sync${qs ? `?${qs}` : ''}`, { items });
 }
 
 /** Fetch all grant grantee IDs (for normalize-ids). */

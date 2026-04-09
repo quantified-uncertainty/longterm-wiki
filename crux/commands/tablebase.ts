@@ -641,7 +641,7 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
       // Uses raw apiRequest instead of syncPersonnel() because this is a generic
       // data-quality fix path, not a full personnel sync. The CLI-level --fix flag
       // already enforces the reason context. See issue #4017 Phase A.
-      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync', { items: batch });
+      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync?forceSkipSourceCheck=true&reason=verify-fix%3A+personnel+data+normalization', { items: batch });
       if (fixR.ok) {
         fixed += fixR.data.upserted;
       } else {
@@ -1081,7 +1081,7 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
 
     const result = await apiRequest<{ upserted: number }>(
       'POST',
-      '/api/personnel/sync',
+      '/api/personnel/sync?forceSkipSourceCheck=true&reason=bulk-import%3A+career+data+sync+from+FactBase',
       { items: batch },
     );
 

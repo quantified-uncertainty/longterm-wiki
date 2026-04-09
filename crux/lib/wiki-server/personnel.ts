@@ -73,6 +73,9 @@ export async function syncPersonnel(
     skipEntityValidation?: boolean;
     /** Required when skipEntityValidation is true. Logged on every bypass. */
     skipEntityValidationReason?: string;
+    /** Bypass server-side source-check enforcement. Requires reason for audit logging. */
+    forceSkipSourceCheck?: boolean;
+    forceSkipSourceCheckReason?: string;
   },
 ): Promise<ApiResult<PersonnelSyncResult>> {
   const params = new URLSearchParams();
@@ -85,6 +88,12 @@ export async function syncPersonnel(
     }
     params.set('skipEntityValidation', 'true'); // skipEntityValidation-ok: typed wrapper enforces reason above
     params.set('skipEntityValidationReason', reason);
+  }
+  if (options?.forceSkipSourceCheck) {
+    params.set('forceSkipSourceCheck', 'true');
+    if (options.forceSkipSourceCheckReason) {
+      params.set('reason', options.forceSkipSourceCheckReason);
+    }
   }
   const qs = params.toString();
   return apiRequest<PersonnelSyncResult>(

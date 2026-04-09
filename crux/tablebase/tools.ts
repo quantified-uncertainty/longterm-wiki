@@ -569,9 +569,19 @@ async function handleSubmitRecords(
   const syncConfig = getTableConfig(table);
   if (!syncConfig) return `Error: Unknown table "${table}"`;
 
+  // Build sync URL with source-check params
+  const syncParams = new URLSearchParams();
+  if (syncConfig.requireSourceCheck) syncParams.set('requireSourceCheck', 'true');
+  if (skipSourceCheck) {
+    syncParams.set('forceSkipSourceCheck', 'true');
+    syncParams.set('reason', 'agent-tool: --skipSourceCheck flag set by caller');
+  }
+  const syncQs = syncParams.toString();
+  const syncUrl = syncQs ? `${syncConfig.syncPath}?${syncQs}` : syncConfig.syncPath;
+
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     syncConfig.syncMethod,
-    syncConfig.syncPath,
+    syncUrl,
     { [syncConfig.syncBodyKey]: recordsToSubmit },
   );
 

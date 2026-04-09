@@ -72,6 +72,11 @@ vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 
+// Source-check bypass for tests that focus on programId validation, not source-check enforcement.
+// Grants have server-side source-check enforcement; this bypass ensures these tests
+// exercise FK validation without being blocked by source-check.
+const SC_BYPASS = "forceSkipSourceCheck=true&reason=test";
+
 // ---- Helpers ----
 
 function seedFundingProgram(id: string) {
@@ -119,7 +124,7 @@ describe("Grants programId validation", () => {
   describe("POST /api/grants/sync", () => {
     it("accepts grants with null programId", async () => {
       seedEntity("org-test");
-      const res = await postJson(app, "/api/grants/sync", {
+      const res = await postJson(app, `/api/grants/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "G_12345678",
@@ -139,7 +144,7 @@ describe("Grants programId validation", () => {
       seedEntity("org-test");
       seedFundingProgram("FP_ABC12345");
 
-      const res = await postJson(app, "/api/grants/sync", {
+      const res = await postJson(app, `/api/grants/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "G_12345678",
@@ -157,7 +162,7 @@ describe("Grants programId validation", () => {
 
     it("rejects grants when programId does not exist in funding_programs", async () => {
       seedEntity("org-test");
-      const res = await postJson(app, "/api/grants/sync", {
+      const res = await postJson(app, `/api/grants/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "G_12345678",
@@ -179,7 +184,7 @@ describe("Grants programId validation", () => {
       seedEntity("org-test");
       seedFundingProgram("FP_VALID001");
 
-      const res = await postJson(app, "/api/grants/sync", {
+      const res = await postJson(app, `/api/grants/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "G_00000001",
@@ -215,7 +220,7 @@ describe("Grants programId validation", () => {
     it("skips validation when skipEntityValidation=true with a reason", async () => {
       const res = await postJson(
         app,
-        "/api/grants/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
+        `/api/grants/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill&${SC_BYPASS}`,
         {
           items: [
             {
@@ -234,7 +239,7 @@ describe("Grants programId validation", () => {
     it("DENIES skipEntityValidation=true without a reason", async () => {
       const res = await postJson(
         app,
-        "/api/grants/sync?skipEntityValidation=true",
+        `/api/grants/sync?skipEntityValidation=true&${SC_BYPASS}`,
         {
           items: [
             {
@@ -253,7 +258,7 @@ describe("Grants programId validation", () => {
 
     it("accepts grants without programId field", async () => {
       seedEntity("org-test");
-      const res = await postJson(app, "/api/grants/sync", {
+      const res = await postJson(app, `/api/grants/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "G_12345678",
