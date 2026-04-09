@@ -21,7 +21,7 @@ import {
   detectPaywall,
   isUnverifiableDomain,
 } from '../search/paywall-detection.ts';
-import { isDeadFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
+import { isDeadFetchStatus } from './types.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { createJob } from '../wiki-server/jobs.ts';
 import { lookupResourceByUrl } from '../wiki-server/resources.ts';
