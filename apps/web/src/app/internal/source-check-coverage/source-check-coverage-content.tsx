@@ -20,6 +20,7 @@ interface CoverageMatrixResult {
   tables: Array<{
     recordType: string;
     totalRecords: number;
+    checkedRecords?: number;
     verdicts: {
       confirmed: number;
       partial: number;
@@ -157,8 +158,12 @@ export async function SourceCheckCoverageContent() {
     ...verdictMatrixResult.data,
   };
 
-  const source = sourceCheckResult.source === "api" ? "api" as const : "local" as const;
-  const apiError = sourceCheckResult.apiError;
+  // Surface failures from any of the three endpoints in the banner
+  const allResults = [sourceCheckResult, coverageMatrixResult, verdictMatrixResult];
+  const source = allResults.every((r) => r.source === "api")
+    ? ("api" as const)
+    : ("local" as const);
+  const apiError = allResults.find((r) => r.apiError)?.apiError;
 
   // Local entity data for entity type counts
   const entities = getTypedEntities();
@@ -474,7 +479,12 @@ export async function SourceCheckCoverageContent() {
           "outdated",
           "unchecked",
         ];
-        const recordTypes = Object.keys(verdictMatrix.matrix).sort();
+        // Include all record types from coverage matrix (not just those with verdicts)
+        // so that zero-verdict types still appear in the heatmap
+        const recordTypes = Array.from(new Set([
+          ...coverageMatrix.tables.map((t) => t.recordType),
+          ...Object.keys(verdictMatrix.matrix),
+        ])).sort();
 
         // Find max count for color intensity scaling
         let maxCount = 0;
