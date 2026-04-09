@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { entityEvents } from "../../schema.js";
 import {
@@ -102,9 +102,11 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     zv("query", ByEntityQuery),
     async (c) => {
       const resolvedId = c.get("resolvedEntityId");
-      const { limit, offset } = c.req.valid("query");
+      const { limit, offset, eventType } = c.req.valid("query");
       const db = getDrizzleDb();
-      const where = eq(entityEvents.entityId, resolvedId);
+      const conditions = [eq(entityEvents.entityId, resolvedId)];
+      if (eventType) conditions.push(eq(entityEvents.eventType, eventType));
+      const where = and(...conditions);
       const { rows: events, total } = await paginatedQuery({
         query: db.select().from(entityEvents).where(where)
           .orderBy(desc(entityEvents.date), entityEvents.id)
