@@ -30,6 +30,7 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
@@ -782,41 +783,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
   })
 
-  // ---- POST /delete-batch ----
-  // Delete grants by ID (for deduplication). Also removes corresponding things.
-  .post("/delete-batch", async (c) => {
-    const raw = await parseJsonBody(c);
-    if (!raw) return invalidJsonError(c);
-
-    const parsed = z.object({
-      ids: z.array(z.string().min(1).max(20)).min(1).max(500),
-    }).safeParse(raw);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { ids } = parsed.data;
-    const db = getDrizzleDb();
-
-    logger.info({ count: ids.length }, "Deleting grants batch");
-
-    await db.transaction(async (tx) => {
-      // Delete from things table first (FK-safe)
-      await tx
-        .delete(things)
-        .where(
-          and(
-            eq(things.sourceTable, "grants"),
-            inArray(things.sourceId, ids),
-          ),
-        );
-
-      // Delete the grants
-      await tx
-        .delete(grants)
-        .where(inArray(grants.id, ids));
-    });
-
-    return c.json({ deleted: ids.length });
-  });
+  .post("/delete-batch", deleteBatchHandler(grants, "grants"));
 
 // ---- Exports ----
 
