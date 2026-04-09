@@ -401,11 +401,12 @@ export async function SourceCheckCoverageContent() {
               <tbody>
                 {coverageMatrix.tables.map((t) => {
                   const checked =
-                    t.verdicts.confirmed +
+                    t.checkedRecords ??
+                    (t.verdicts.confirmed +
                     t.verdicts.partial +
                     t.verdicts.unverifiable +
                     t.verdicts.contradicted +
-                    t.verdicts.outdated;
+                    t.verdicts.outdated);
                   return (
                     <tr
                       key={t.recordType}
@@ -470,7 +471,7 @@ export async function SourceCheckCoverageContent() {
       )}
 
       {/* ── (e) Verdict Heatmap ──────────────────────────────────────── */}
-      {Object.keys(verdictMatrix.matrix).length > 0 && (() => {
+      {(Object.keys(verdictMatrix.matrix).length > 0 || coverageMatrix.tables.length > 0) && (() => {
         const allVerdictTypes = [
           "confirmed",
           "partial",
