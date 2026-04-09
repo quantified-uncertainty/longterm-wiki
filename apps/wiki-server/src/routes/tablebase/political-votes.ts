@@ -53,7 +53,7 @@ const SyncItemSchema = z.object({
   id: z.string().length(10),
   politicianEntityId: z.string().min(1).max(40).nullable().optional(),
   politicianDisplayName: z.string().max(200).nullable().optional(),
-  legislationEntityId: z.string().max(100).nullable().optional(),
+  legislationEntityId: z.string().min(1).max(100).nullable().optional(),
   legislationTitle: z.string().max(500).nullable().optional(),
   vote: z.enum(VALID_VOTES),
   voteDate: z.string().max(20).nullable().optional(),
@@ -271,8 +271,8 @@ const politicalVotesApp = new Hono()
     const db = getDrizzleDb();
 
     const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => !!id) },
-      { fieldName: "legislationEntityId", ids: items.map((i) => i.legislationEntityId).filter((id): id is string => !!id) },
+      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => id != null) },
+      { fieldName: "legislationEntityId", ids: items.map((i) => i.legislationEntityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 

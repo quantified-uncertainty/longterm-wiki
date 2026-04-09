@@ -116,6 +116,10 @@ interface RouteAnalysis {
   file: string;
   hasSync: boolean;
   hasDelete: boolean;
+  /** Number of /sync endpoints (including sub-resource: /questions/sync, etc.) */
+  syncCount: number;
+  /** Number of delete endpoints (delete-batch, /delete, HTTP DELETE) */
+  deleteCount: number;
   hasThingsSync: boolean;
   hasEntityRefValidation: boolean;
   acceptsEntityRefs: boolean;
@@ -149,13 +153,18 @@ function analyzeRoute(filePath: string): RouteAnalysis {
 
   // Match /sync, /questions/sync, /snapshots/sync, etc.
   // Use [\w-]+ to support hyphenated sub-paths like /funding-rounds/sync.
-  const hasSync = /\.post\(["']\/(?:[\w-]+\/)?sync["']/.test(content);
+  const syncMatches = content.match(/\.post\(["']\/(?:[\w-]+\/)?sync["']/g) ?? [];
+  const syncCount = syncMatches.length;
+  const hasSync = syncCount > 0;
   // Match POST /delete-batch, POST /delete, POST /questions/delete-batch, or HTTP DELETE methods
   // Exclude drizzle .delete() calls (those are `tx.delete(table)`, not `.delete("/path"`)
-  const hasDelete =
-    /\.post\(["']\/(?:[\w-]+\/)?delete-batch["']/.test(content) ||
-    /\.post\(["']\/delete["']/.test(content) ||
-    /\.delete\(["']\//.test(content);
+  const deleteMatches = [
+    ...(content.match(/\.post\(["']\/(?:[\w-]+\/)?delete-batch["']/g) ?? []),
+    ...(content.match(/\.post\(["']\/delete["']/g) ?? []),
+    ...(content.match(/\.delete\(["']\//g) ?? []),
+  ];
+  const deleteCount = deleteMatches.length;
+  const hasDelete = deleteCount > 0;
   const hasThingsSync = /upsertThingsInTx/.test(content);
   const hasEntityRefValidation =
     /validateEntityRefs/.test(content) ||
@@ -168,6 +177,8 @@ function analyzeRoute(filePath: string): RouteAnalysis {
     file,
     hasSync,
     hasDelete,
+    syncCount,
+    deleteCount,
     hasThingsSync,
     hasEntityRefValidation,
     acceptsEntityRefs,
@@ -194,12 +205,21 @@ function findViolations(routes: RouteAnalysis[]): Violation[] {
     // Check 1: Missing delete endpoint
     // Blocking: all pre-existing gaps fixed by the shared delete factory.
     // New routes must include delete-batch or add an exemption with a reason.
+    // Scoped: if a file has N sync endpoints, it should have at least N delete endpoints
+    // (each synced resource should be deletable).
     if (!route.hasDelete && !route.exemptions.delete) {
       violations.push({
         file: route.file,
         check: "delete",
         message: `Has /sync but no /delete-batch endpoint`,
         blocking: true,
+      });
+    } else if (route.syncCount > route.deleteCount && !route.exemptions.delete) {
+      violations.push({
+        file: route.file,
+        check: "delete",
+        message: `Has ${route.syncCount} /sync endpoints but only ${route.deleteCount} /delete endpoint(s) — some synced resources have no delete`,
+        blocking: false, // non-blocking: existing gap, flag for awareness
       });
     }
 

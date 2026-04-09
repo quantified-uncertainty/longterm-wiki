@@ -36,7 +36,7 @@ const ListQuery = z.object({
 
 const SyncItemSchema = z.object({
   id: z.string().length(10),
-  politicianEntityId: z.string().max(40).nullable().optional(),
+  politicianEntityId: z.string().min(1).max(40).nullable().optional(),
   politicianDisplayName: z.string().max(200).nullable().optional(),
   cycle: z.number().int().min(1990).max(2100),
   totalRaised: z.number().nullable().optional(),
@@ -228,7 +228,7 @@ const campaignFinanceApp = new Hono()
     const db = getDrizzleDb();
 
     const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => !!id) },
+      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 

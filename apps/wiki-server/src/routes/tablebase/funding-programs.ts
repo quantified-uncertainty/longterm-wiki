@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
+import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { fundingPrograms, things } from "../../schema.js";
+import { fundingPrograms } from "../../schema.js";
 import { logger } from "../../logger.js";
 import {
   paginationQuery,
@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -410,41 +411,7 @@ const fundingProgramsApp = new Hono()
     return c.json({ upserted });
   })
 
-  // ---- POST /delete-batch ----
-  // Delete funding programs by ID (for deduplication). Also removes corresponding things.
-  .post("/delete-batch", async (c) => {
-    const raw = await parseJsonBody(c);
-    if (!raw) return invalidJsonError(c);
-
-    const parsed = z.object({
-      ids: z.array(z.string().min(1).max(20)).min(1).max(100),
-    }).safeParse(raw);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { ids } = parsed.data;
-    const db = getDrizzleDb();
-
-    logger.info({ count: ids.length }, "Deleting funding programs batch");
-
-    await db.transaction(async (tx) => {
-      // Delete from things table first (FK-safe)
-      await tx
-        .delete(things)
-        .where(
-          and(
-            eq(things.sourceTable, "funding_programs"),
-            inArray(things.sourceId, ids),
-          ),
-        );
-
-      // Delete the funding programs
-      await tx
-        .delete(fundingPrograms)
-        .where(inArray(fundingPrograms.id, ids));
-    });
-
-    return c.json({ deleted: ids.length });
-  });
+  .post("/delete-batch", deleteBatchHandler(fundingPrograms, "funding_programs"));
 
 // ---- Exports ----
 
