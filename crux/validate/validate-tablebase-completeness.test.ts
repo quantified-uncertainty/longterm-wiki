@@ -26,14 +26,27 @@ describe("validate-tablebase-completeness", () => {
     expect(personnelViolations).toHaveLength(0);
   });
 
-  it("has no delete violations after factory rollout", () => {
+  it("has no blocking delete violations after factory rollout", () => {
     const result = runCheck();
-    const deleteViolations = result.violations.filter(
-      (v) => v.check === "delete"
+    const blockingDeleteViolations = result.violations.filter(
+      (v) => v.check === "delete" && v.blocking
     );
     // After the shared delete factory was added to all routes,
-    // there should be zero delete violations
-    expect(deleteViolations).toHaveLength(0);
+    // there should be zero blocking delete violations
+    expect(blockingDeleteViolations).toHaveLength(0);
+  });
+
+  it("flags files where sync count exceeds delete count", () => {
+    const result = runCheck();
+    const advisoryDeleteViolations = result.violations.filter(
+      (v) => v.check === "delete" && !v.blocking
+    );
+    // Files with more sync endpoints than delete endpoints get advisory warnings
+    // (e.g., political-races.ts has /sync + /candidates/sync but only one delete)
+    expect(advisoryDeleteViolations.length).toBeGreaterThan(0);
+    for (const v of advisoryDeleteViolations) {
+      expect(v.message).toContain("/sync endpoints but only");
+    }
   });
 
   it("does not flag exempt routes", () => {

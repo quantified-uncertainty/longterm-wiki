@@ -269,7 +269,7 @@ const websiteSourcesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const entityIds = items.map((i) => i.entityId).filter((id): id is string => !!id);
+    const entityIds = items.map((i) => i.entityId).filter((id): id is string => id != null);
     if (entityIds.length > 0) {
       const refError = await validateEntityRefs(c, db, [
         { fieldName: "entityId", ids: entityIds },
