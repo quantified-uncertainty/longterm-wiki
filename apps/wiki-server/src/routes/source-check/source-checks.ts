@@ -1831,21 +1831,71 @@ const sourceChecksApp = new Hono()
     }
 
     // 2. Verdict counts grouped by record_type and verdict
+    // 3. Distinct checked records per type
+    //
+    // Both queries filter out orphaned verdicts (verdict rows referencing records
+    // that have been deleted from their source table) by JOINing against a CTE
+    // of all live (record_type, record_id) pairs.
+    //
+    // Note: for 'fact' type, record_id stores fact_id (not the serial PK),
+    // and for 'citation' type, record_id stores citation_quotes.id::text.
+    const liveRecordsCte = sql`
+      live_records AS (
+        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+        UNION ALL
+        SELECT 'division', id::text FROM divisions
+        UNION ALL
+        SELECT 'grant', id::text FROM grants
+        UNION ALL
+        SELECT 'funding-round', id::text FROM funding_rounds
+        UNION ALL
+        SELECT 'investment', id::text FROM investments
+        UNION ALL
+        SELECT 'funding-program', id::text FROM funding_programs
+        UNION ALL
+        SELECT 'publication', id::text FROM publications
+        UNION ALL
+        SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+        UNION ALL
+        SELECT 'equity-position', id::text FROM equity_positions
+        UNION ALL
+        SELECT 'entity-event', id::text FROM entity_events
+        UNION ALL
+        SELECT 'entity-assessment', id::text FROM entity_assessments
+        UNION ALL
+        SELECT 'benchmark-result', id::text FROM benchmark_results
+        UNION ALL
+        SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+        UNION ALL
+        SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+        UNION ALL
+        SELECT 'wiki-page', id::text FROM wiki_pages
+        UNION ALL
+        SELECT 'fact', fact_id FROM facts
+      )
+    `;
+
     const verdictRows = (await db.execute(sql`
-      SELECT record_type, verdict, count(*)::int AS cnt
-      FROM source_check_verdicts
-      GROUP BY record_type, verdict
-      ORDER BY record_type, verdict
+      WITH ${liveRecordsCte}
+      SELECT v.record_type, v.verdict, count(*)::int AS cnt
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      GROUP BY v.record_type, v.verdict
+      ORDER BY v.record_type, v.verdict
     `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
 
-    // 3. Distinct checked records per type
-    // A record can have multiple verdict rows (one per fieldName), so coverage
-    // must be computed from COUNT(DISTINCT record_id) to avoid exceeding 100%.
+    // Coverage is based on distinct checked records, not verdict row counts.
+    // A record can have multiple verdict rows (one per fieldName), so we use
+    // COUNT(DISTINCT record_id) to avoid exceeding 100%.
     const checkedRows = (await db.execute(sql`
-      SELECT record_type, count(DISTINCT record_id)::int AS checked_records
-      FROM source_check_verdicts
-      WHERE verdict != 'unchecked'
-      GROUP BY record_type
+      WITH ${liveRecordsCte}
+      SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      WHERE v.verdict != 'unchecked'
+      GROUP BY v.record_type
     `)) as Array<{ record_type: string; checked_records: number }>;
 
     const checkedByType: Record<string, number> = {};
@@ -1945,11 +1995,32 @@ const sourceChecksApp = new Hono()
   .get("/verdict-matrix", async (c) => {
     const db = getDrizzleDb();
 
+    // Exclude orphaned verdicts for deleted records (same CTE pattern as /coverage-matrix)
     const rows = (await db.execute(sql`
-      SELECT record_type, verdict, count(*)::int AS cnt
-      FROM source_check_verdicts
-      GROUP BY record_type, verdict
-      ORDER BY record_type, verdict
+      WITH live_records AS (
+        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+        UNION ALL SELECT 'division', id::text FROM divisions
+        UNION ALL SELECT 'grant', id::text FROM grants
+        UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
+        UNION ALL SELECT 'investment', id::text FROM investments
+        UNION ALL SELECT 'funding-program', id::text FROM funding_programs
+        UNION ALL SELECT 'publication', id::text FROM publications
+        UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+        UNION ALL SELECT 'equity-position', id::text FROM equity_positions
+        UNION ALL SELECT 'entity-event', id::text FROM entity_events
+        UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
+        UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
+        UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+        UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+        UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
+        UNION ALL SELECT 'fact', fact_id FROM facts
+      )
+      SELECT v.record_type, v.verdict, count(*)::int AS cnt
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      GROUP BY v.record_type, v.verdict
+      ORDER BY v.record_type, v.verdict
     `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
 
     // Build the matrix: { recordType: { verdict: count } }
