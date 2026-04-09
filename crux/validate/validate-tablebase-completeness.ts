@@ -192,14 +192,14 @@ function findViolations(routes: RouteAnalysis[]): Violation[] {
     if (!route.hasSync) continue;
 
     // Check 1: Missing delete endpoint
-    // Advisory for now — 20 pre-existing routes lack delete.
-    // Will become blocking once the shared delete factory is added.
+    // Blocking: all pre-existing gaps fixed by the shared delete factory.
+    // New routes must include delete-batch or add an exemption with a reason.
     if (!route.hasDelete && !route.exemptions.delete) {
       violations.push({
         file: route.file,
         check: "delete",
         message: `Has /sync but no /delete-batch endpoint`,
-        blocking: false,
+        blocking: true,
       });
     }
 
@@ -214,6 +214,7 @@ function findViolations(routes: RouteAnalysis[]): Violation[] {
     }
 
     // Check 3: Accepts entity refs but doesn't validate them
+    // Blocking: all pre-existing gaps fixed. New routes with entity refs must validate.
     if (
       route.acceptsEntityRefs &&
       !route.hasEntityRefValidation &&
@@ -223,7 +224,7 @@ function findViolations(routes: RouteAnalysis[]): Violation[] {
         file: route.file,
         check: "entityRefValidation",
         message: `Accepts entity reference fields but doesn't call validateEntityRefs`,
-        blocking: false,
+        blocking: true,
       });
     }
   }
