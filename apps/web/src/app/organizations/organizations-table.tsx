@@ -12,7 +12,7 @@ import { toggleSort } from "@/lib/sort-utils";
 import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
 import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
@@ -45,6 +45,8 @@ export interface OrgRow {
   peopleCount: number | null;
   /** Completeness score 1-4 based on available data */
   completionScore: number;
+  /** Source-check verdict string (confirmed, contradicted, etc.) or null */
+  verdictString: string | null;
 
   /** Pre-computed lowercase text blob for full-text search across all fields */
   searchText: string;
@@ -92,6 +94,7 @@ const ServerOrgSchema = z.object({
   headcountDate: z.string().nullable(),
   totalFundingNum: z.number().nullable(),
   foundedDate: z.string().nullable(),
+  verdictString: z.string().nullable().optional(),
 });
 
 type ServerOrg = z.infer<typeof ServerOrgSchema>;
@@ -143,6 +146,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       foundedDate: org.foundedDate,
       peopleCount: null, // Not available from API
       completionScore: computeOrgCoverage(org),
+      verdictString: org.verdictString ?? null,
       searchText: "",
     })),
     total: data.total ?? 0,
@@ -585,7 +589,7 @@ export function OrganizationsTable({
                     {/* Completion Score */}
                     {visibleColumns.has("completionScore") && (
                       <td className="py-2.5 px-3 text-center">
-                        <CoverageDots score={row.completionScore} label={`Coverage: ${row.completionScore}/4`} />
+                        <RecordStatusDots coverageScore={row.completionScore} verdict={row.verdictString} />
                       </td>
                     )}
 

@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBRecords, getKBEntities, resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntityById } from "@/data/tablebase";
+import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
@@ -204,6 +204,7 @@ async function loadFromApi(
 
       peopleCount: null, // Not available from API
       completionScore: computeOrgCoverage(org),
+      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
 
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -254,6 +255,7 @@ async function loadFromApi(
 
       peopleCount: null,
       completionScore: computeOrgCoverage({ foundedDate }),
+      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
 
       searchText: searchParts.join(" ").toLowerCase(),
     });
@@ -341,6 +343,7 @@ function loadFromLocal(): OrgPageData {
         peopleCount,
         wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
       }),
+      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
 
       searchText: buildOrgSearchText(org, orgToEmployeeNames),
     };
