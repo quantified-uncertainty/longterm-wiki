@@ -56,6 +56,14 @@ export interface WikiPageVerifyItem {
   priority: number;          // Higher = more important to verify
 }
 
+/** Fetch statuses that indicate a dead/unreachable resource */
+export const DEAD_FETCH_STATUSES = ["dead", "soft_404", "not_found", "timeout", "unreachable"] as const;
+
+/** Check if a fetch_status value indicates a dead/unreachable resource. */
+export function isDeadFetchStatus(status: string | null | undefined): boolean {
+  return status != null && (DEAD_FETCH_STATUSES as readonly string[]).includes(status);
+}
+
 /** Constants shared across source-check modules */
 export const SOURCE_CHECK_CONSTANTS = {
   /** Max chars of source text to retain after fetching (before LLM truncation).

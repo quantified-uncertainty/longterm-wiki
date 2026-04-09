@@ -24,6 +24,9 @@
 ## Project
 - [PG-first data layer direction](project_pg_first_direction.md) — entity data moving to Postgres, database.json being phased out (Epic #2428)
 
+## References
+- [Loki log querying](reference_loki_logs.md) — query prod logs via Loki port-forward with relative timestamps
+
 ## Architecture Notes
 - **SCRY_PUBLIC_KEY** is defined in `crux/lib/api-keys.ts`. All consumers import from there (consolidated Feb 2026).
 - **crux/ import direction**: `lib → authoring`, never `authoring → lib`.
