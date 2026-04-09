@@ -105,7 +105,10 @@ export async function syncToServer(
       `  Batch ${batchNum}/${totalBatches}: ${batch.length} grants...`
     );
 
-    const result = await syncGrants(batch);
+    const result = await syncGrants(batch, {
+      forceSkipSourceCheck: true,
+      forceSkipSourceCheckReason: 'bulk-import: grant import pipeline syncs raw data before source-check',
+    });
 
     if (result.ok) {
       totalUpserted += result.data.upserted;

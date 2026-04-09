@@ -95,9 +95,11 @@ describe('validate-source-check-coverage', () => {
     expect(result.output).toContain('All TableBase submissions have source-checks');
   });
 
-  it('exits 1 in soft enforcement when records lack source-checks', () => {
+  // --- Soft enforcement for non-hard-enforced tables ---
+
+  it('exits 1 in soft enforcement when records lack source-checks (non-hard table)', () => {
     createManifest('test-unverified.json', {
-      table: 'personnel',
+      table: 'investments',  // not in HARD_ENFORCED_TABLES
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
       sourceCheckSummary: {
@@ -110,13 +112,13 @@ describe('validate-source-check-coverage', () => {
 
     const result = runValidator('--enforcement=soft');
     expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('3/5 personnel records submitted WITHOUT source-check');
+    expect(result.output).toContain('3/5 investments records submitted WITHOUT source-check');
     expect(result.output).toContain('--force');
   });
 
-  it('exits 0 in soft enforcement with --force override', () => {
+  it('exits 0 in soft enforcement with --force override (non-hard table)', () => {
     createManifest('test-unverified.json', {
-      table: 'personnel',
+      table: 'investments',
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
       sourceCheckSummary: {
@@ -132,9 +134,9 @@ describe('validate-source-check-coverage', () => {
     expect(result.output).toContain('--force: source-check warnings overridden');
   });
 
-  it('exits 1 when records have contradicted verdicts', () => {
+  it('exits 1 when records have contradicted verdicts (non-hard table)', () => {
     createManifest('test-contradicted.json', {
-      table: 'personnel',
+      table: 'investments',
       recordCount: 4,
       submittedAt: '2026-04-04T00:00:00Z',
       sourceCheckSummary: {
@@ -147,12 +149,12 @@ describe('validate-source-check-coverage', () => {
 
     const result = runValidator('--enforcement=soft');
     expect(result.exitCode).toBe(1);
-    expect(result.output).toContain('2 personnel records have CONTRADICTED verdicts');
+    expect(result.output).toContain('2 investments records have CONTRADICTED verdicts');
   });
 
-  it('advisory mode exits 0 even with unverified records', () => {
+  it('advisory mode exits 0 even with unverified records (non-hard table)', () => {
     createManifest('test-unverified.json', {
-      table: 'personnel',
+      table: 'investments',
       recordCount: 5,
       submittedAt: '2026-04-04T00:00:00Z',
       sourceCheckSummary: {
@@ -165,6 +167,63 @@ describe('validate-source-check-coverage', () => {
 
     const result = runValidator('--enforcement=advisory');
     expect(result.exitCode).toBe(0);
-    expect(result.output).toContain('5/5 personnel records submitted WITHOUT source-check');
+    expect(result.output).toContain('5/5 investments records submitted WITHOUT source-check');
+  });
+
+  // --- Hard enforcement for personnel and grants ---
+
+  it('blocks personnel manifests with unchecked records even in advisory mode', () => {
+    createManifest('test-hard-personnel.json', {
+      table: 'personnel',
+      recordCount: 5,
+      submittedAt: '2026-04-04T00:00:00Z',
+      sourceCheckSummary: {
+        withSourceCheck: 0,
+        withoutSourceCheck: 5,
+        verdicts: { verified: 0, contradicted: 0, unverifiable: 0, other: 0 },
+      },
+      records: [],
+    });
+
+    const result = runValidator('--enforcement=advisory');
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('BLOCKED: Tables with hard enforcement');
+    expect(result.output).toContain('personnel');
+  });
+
+  it('blocks grants manifests with unchecked records even with --force', () => {
+    createManifest('test-hard-grants.json', {
+      table: 'grants',
+      recordCount: 3,
+      submittedAt: '2026-04-04T00:00:00Z',
+      sourceCheckSummary: {
+        withSourceCheck: 1,
+        withoutSourceCheck: 2,
+        verdicts: { verified: 1, contradicted: 0, unverifiable: 0, other: 0 },
+      },
+      records: [],
+    });
+
+    const result = runValidator('--enforcement=soft', '--force');
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('BLOCKED: Tables with hard enforcement');
+    expect(result.output).toContain('grants');
+  });
+
+  it('allows personnel manifests when all records have source-checks', () => {
+    createManifest('test-hard-ok.json', {
+      table: 'personnel',
+      recordCount: 3,
+      submittedAt: '2026-04-04T00:00:00Z',
+      sourceCheckSummary: {
+        withSourceCheck: 3,
+        withoutSourceCheck: 0,
+        verdicts: { verified: 3, contradicted: 0, unverifiable: 0, other: 0 },
+      },
+      records: [],
+    });
+
+    const result = runValidator('--enforcement=soft');
+    expect(result.exitCode).toBe(0);
   });
 });

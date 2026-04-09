@@ -206,7 +206,7 @@ for (let i = 0; i < syncItems.length; i += BATCH_SIZE) {
 
   const SKIP_REASON = encodeURIComponent("backfill: career records sync before/independent of person and org entity sync");
   // eslint-disable-next-line max-len
-  const result = await apiRequest("POST", `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}`, { items: batch }); // skipEntityValidation-ok: one-shot backfill, see SKIP_REASON above
+  const result = await apiRequest("POST", `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}&forceSkipSourceCheck=true&reason=${encodeURIComponent("bulk-import: career data backfill from FactBase")}`, { items: batch }); // skipEntityValidation-ok: one-shot backfill, see SKIP_REASON above
   if (result.ok) {
     totalUpserted += result.data?.upserted ?? 0;
     console.log(`  ✓ Upserted: ${result.data?.upserted}`);
