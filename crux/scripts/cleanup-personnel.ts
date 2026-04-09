@@ -80,7 +80,7 @@ async function main() {
   //    The !hasDisplayableName guard prevents deleting records that are merely
   //    waiting for entity resolution (e.g., synced before their person entity).
   const fabricatedId = all.filter(
-    (r) => STABLE_ID_RE.test(r.personId) && !r.personEntityId && !hasDisplayableName(r),
+    (r) => isMachineId(r.personId) && !r.personEntityId && !hasDisplayableName(r),
   );
   console.log(`\nRecords with fabricated personId (stableId, no entity, no name): ${fabricatedId.length}`);
 
