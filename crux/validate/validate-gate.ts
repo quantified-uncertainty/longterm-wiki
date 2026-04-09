@@ -677,9 +677,8 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-tablebase-completeness.ts'],
     cwd: PROJECT_ROOT,
-    // Advisory: 20+ pre-existing routes lack delete endpoints and ~12 lack
-    // entity ref validation. Will become blocking after the shared delete
-    // factory lands and fixes the bulk of violations.
+    // Advisory: some pre-existing routes still lack entity ref validation.
+    // The shared delete factory is now deployed; delete coverage is enforced.
     advisory: true,
     emitOutputInCi: true,
   },

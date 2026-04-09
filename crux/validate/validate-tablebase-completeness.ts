@@ -148,11 +148,12 @@ function analyzeRoute(filePath: string): RouteAnalysis {
   const file = basename(filePath);
 
   // Match /sync, /questions/sync, /snapshots/sync, etc.
-  const hasSync = /\.post\(["']\/(?:\w+\/)?sync["']/.test(content);
+  // Use [\w-]+ to support hyphenated sub-paths like /funding-rounds/sync.
+  const hasSync = /\.post\(["']\/(?:[\w-]+\/)?sync["']/.test(content);
   // Match POST /delete-batch, POST /delete, POST /questions/delete-batch, or HTTP DELETE methods
   // Exclude drizzle .delete() calls (those are `tx.delete(table)`, not `.delete("/path"`)
   const hasDelete =
-    /\.post\(["']\/(?:\w+\/)?delete-batch["']/.test(content) ||
+    /\.post\(["']\/(?:[\w-]+\/)?delete-batch["']/.test(content) ||
     /\.post\(["']\/delete["']/.test(content) ||
     /\.delete\(["']\//.test(content);
   const hasThingsSync = /upsertThingsInTx/.test(content);

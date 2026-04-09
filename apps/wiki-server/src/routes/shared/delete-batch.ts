@@ -39,16 +39,19 @@ import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
 export function deleteBatchHandler<T extends PgTable>(
   table: T,
   thingsSourceTable: string | null,
-  options?: { maxBatchSize?: number; label?: string; pkColumn?: PgColumn }
+  options?: { maxBatchSize?: number; label?: string; pkColumn?: PgColumn; maxIdLength?: number }
 ) {
   const maxBatchSize = options?.maxBatchSize ?? 500;
   const label = options?.label ?? thingsSourceTable ?? "records";
   // Default to table.id; override with options.pkColumn for tables with non-standard PKs.
   // All standard tablebase tables have an `id` column; non-standard PKs must pass pkColumn.
   const pkColumn: PgColumn = options?.pkColumn ?? (table as any).id; // as-any-ok: PgTable generic doesn't expose column names; all 20+ callers have .id
+  // Most IDs are varchar(10) but text-type PKs (resources, research areas, benchmarks)
+  // can be longer slugs or composite keys. Default 200 accommodates all current formats.
+  const maxIdLength = options?.maxIdLength ?? 200;
 
   const schema = z.object({
-    ids: z.array(z.string().min(1).max(40)).min(1).max(maxBatchSize),
+    ids: z.array(z.string().min(1).max(maxIdLength)).min(1).max(maxBatchSize),
   });
 
   return async (c: Context) => {
