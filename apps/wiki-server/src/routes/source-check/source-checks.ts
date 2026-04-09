@@ -1779,6 +1779,174 @@ const sourceChecksApp = new Hono()
     }));
 
     return c.json({ summaries });
+  })
+
+  // ---- GET /coverage-matrix ----
+  // Per-record-type breakdown of total records vs verdict distribution.
+  // Shows which record types have coverage and where the gaps are.
+  .get("/coverage-matrix", async (c) => {
+    const db = getDrizzleDb();
+
+    // 1. Total records per table (same query as /coverage)
+    const tableCountResult = await db.execute(sql`
+      SELECT 'personnel' AS record_type, count(*)::int AS total FROM personnel
+      UNION ALL
+      SELECT 'division', count(*)::int FROM divisions
+      UNION ALL
+      SELECT 'grant', count(*)::int FROM grants
+      UNION ALL
+      SELECT 'funding-round', count(*)::int FROM funding_rounds
+      UNION ALL
+      SELECT 'investment', count(*)::int FROM investments
+      UNION ALL
+      SELECT 'funding-program', count(*)::int FROM funding_programs
+      UNION ALL
+      SELECT 'publication', count(*)::int FROM publications
+      UNION ALL
+      SELECT 'secondary-market-price', count(*)::int FROM secondary_market_prices
+      UNION ALL
+      SELECT 'equity-position', count(*)::int FROM equity_positions
+      UNION ALL
+      SELECT 'entity-event', count(*)::int FROM entity_events
+      UNION ALL
+      SELECT 'entity-assessment', count(*)::int FROM entity_assessments
+      UNION ALL
+      SELECT 'benchmark-result', count(*)::int FROM benchmark_results
+      UNION ALL
+      SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
+      UNION ALL
+      SELECT 'wiki-page', count(*)::int FROM wiki_pages
+      UNION ALL
+      SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
+    `);
+
+    const totalsByType: Record<string, number> = {};
+    for (const row of tableCountResult) {
+      const r = row as { record_type: string; total: number };
+      if (typeof r.record_type === "string" && typeof r.total === "number") {
+        totalsByType[r.record_type] = r.total;
+      }
+    }
+
+    // 2. Verdict counts grouped by record_type and verdict
+    const verdictRows = (await db.execute(sql`
+      SELECT record_type, verdict, count(*)::int AS cnt
+      FROM source_check_verdicts
+      GROUP BY record_type, verdict
+      ORDER BY record_type, verdict
+    `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
+
+    // Build per-type verdict maps
+    const verdictsByType: Record<string, Record<string, number>> = {};
+    for (const row of verdictRows) {
+      if (!verdictsByType[row.record_type]) {
+        verdictsByType[row.record_type] = {};
+      }
+      verdictsByType[row.record_type][row.verdict] = row.cnt;
+    }
+
+    // 3. Merge into tables array
+    const allTypes = new Set([
+      ...Object.keys(totalsByType),
+      ...Object.keys(verdictsByType),
+    ]);
+
+    let grandTotalRecords = 0;
+    let grandTotalVerdicts = 0;
+    let grandConfirmed = 0;
+
+    const tables = Array.from(allTypes)
+      .map((recordType) => {
+        const totalRecords = totalsByType[recordType] ?? 0;
+        const verdicts = verdictsByType[recordType] ?? {};
+
+        const confirmed = verdicts["confirmed"] ?? 0;
+        const partial = verdicts["partial"] ?? 0;
+        const unverifiable = verdicts["unverifiable"] ?? 0;
+        const contradicted = verdicts["contradicted"] ?? 0;
+        const outdated = verdicts["outdated"] ?? 0;
+        const unchecked = verdicts["unchecked"] ?? 0;
+
+        const totalVerdicts =
+          confirmed + partial + unverifiable + contradicted + outdated + unchecked;
+        const checkedVerdicts = totalVerdicts - unchecked;
+
+        const coveragePercent =
+          totalRecords > 0
+            ? Math.round((checkedVerdicts / totalRecords) * 1000) / 10
+            : 0;
+        const greenPercent =
+          totalVerdicts > 0
+            ? Math.round((confirmed / totalVerdicts) * 1000) / 10
+            : 0;
+
+        grandTotalRecords += totalRecords;
+        grandTotalVerdicts += totalVerdicts;
+        grandConfirmed += confirmed;
+
+        return {
+          recordType,
+          totalRecords,
+          verdicts: {
+            confirmed,
+            partial,
+            unverifiable,
+            contradicted,
+            outdated,
+            unchecked,
+          },
+          coveragePercent,
+          greenPercent,
+        };
+      })
+      .sort((a, b) => b.totalRecords - a.totalRecords);
+
+    const grandChecked = grandTotalVerdicts -
+      tables.reduce((s, t) => s + t.verdicts.unchecked, 0);
+
+    return c.json({
+      tables,
+      totals: {
+        totalRecords: grandTotalRecords,
+        totalVerdicts: grandTotalVerdicts,
+        confirmedPercent:
+          grandTotalVerdicts > 0
+            ? Math.round((grandConfirmed / grandTotalVerdicts) * 1000) / 10
+            : 0,
+        coveragePercent:
+          grandTotalRecords > 0
+            ? Math.round((grandChecked / grandTotalRecords) * 1000) / 10
+            : 0,
+      },
+    });
+  })
+
+  // ---- GET /verdict-matrix ----
+  // Cross-tabulation of verdict x record_type.
+  // Rows are record types, columns are verdict types, cells are counts.
+  .get("/verdict-matrix", async (c) => {
+    const db = getDrizzleDb();
+
+    const rows = (await db.execute(sql`
+      SELECT record_type, verdict, count(*)::int AS cnt
+      FROM source_check_verdicts
+      GROUP BY record_type, verdict
+      ORDER BY record_type, verdict
+    `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
+
+    // Build the matrix: { recordType: { verdict: count } }
+    const matrix: Record<string, Record<string, number>> = {};
+    const totals: Record<string, number> = {};
+
+    for (const row of rows) {
+      if (!matrix[row.record_type]) {
+        matrix[row.record_type] = {};
+      }
+      matrix[row.record_type][row.verdict] = row.cnt;
+      totals[row.verdict] = (totals[row.verdict] ?? 0) + row.cnt;
+    }
+
+    return c.json({ matrix, totals });
   });
 
 // ---- Exports ----

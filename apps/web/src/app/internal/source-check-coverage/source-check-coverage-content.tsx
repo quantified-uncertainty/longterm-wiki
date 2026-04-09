@@ -15,6 +15,36 @@ interface UnifiedSourceCheckStatsResult {
   by_type: Record<string, number>;
 }
 
+/** Shape returned by GET /api/source-checks/coverage-matrix */
+interface CoverageMatrixResult {
+  tables: Array<{
+    recordType: string;
+    totalRecords: number;
+    verdicts: {
+      confirmed: number;
+      partial: number;
+      unverifiable: number;
+      contradicted: number;
+      outdated: number;
+      unchecked: number;
+    };
+    coveragePercent: number;
+    greenPercent: number;
+  }>;
+  totals: {
+    totalRecords: number;
+    totalVerdicts: number;
+    confirmedPercent: number;
+    coveragePercent: number;
+  };
+}
+
+/** Shape returned by GET /api/source-checks/verdict-matrix */
+interface VerdictMatrixResult {
+  matrix: Record<string, Record<string, number>>;
+  totals: Record<string, number>;
+}
+
 // ── Verdict colors ────────────────────────────────────────────────────────
 
 const VERDICT_COLORS: Record<string, string> = {
@@ -52,6 +82,29 @@ async function loadSourceCheckStats() {
   });
 }
 
+function emptyCoverageMatrix(): CoverageMatrixResult {
+  return {
+    tables: [],
+    totals: { totalRecords: 0, totalVerdicts: 0, confirmedPercent: 0, coveragePercent: 0 },
+  };
+}
+
+async function loadCoverageMatrix() {
+  return fetchDetailed<CoverageMatrixResult>("/api/source-checks/coverage-matrix", {
+    revalidate: 60,
+  });
+}
+
+function emptyVerdictMatrix(): VerdictMatrixResult {
+  return { matrix: {}, totals: {} };
+}
+
+async function loadVerdictMatrix() {
+  return fetchDetailed<VerdictMatrixResult>("/api/source-checks/verdict-matrix", {
+    revalidate: 60,
+  });
+}
+
 // ── Stat Card ─────────────────────────────────────────────────────────────
 
 function StatCard({
@@ -83,14 +136,25 @@ function StatCard({
 // ── Main Component ────────────────────────────────────────────────────────
 
 export async function SourceCheckCoverageContent() {
-  const sourceCheckResult = await withApiFallback(
-    loadSourceCheckStats,
-    emptySourceCheckStats
-  );
+  const [sourceCheckResult, coverageMatrixResult, verdictMatrixResult] = await Promise.all([
+    withApiFallback(loadSourceCheckStats, emptySourceCheckStats),
+    withApiFallback(loadCoverageMatrix, emptyCoverageMatrix),
+    withApiFallback(loadVerdictMatrix, emptyVerdictMatrix),
+  ]);
 
   const vStats: UnifiedSourceCheckStatsResult = {
     ...emptySourceCheckStats(),
     ...sourceCheckResult.data,
+  };
+
+  const coverageMatrix: CoverageMatrixResult = {
+    ...emptyCoverageMatrix(),
+    ...coverageMatrixResult.data,
+  };
+
+  const verdictMatrix: VerdictMatrixResult = {
+    ...emptyVerdictMatrix(),
+    ...verdictMatrixResult.data,
   };
 
   const source = sourceCheckResult.source === "api" ? "api" as const : "local" as const;
@@ -306,6 +370,220 @@ export async function SourceCheckCoverageContent() {
           )}
         </div>
       )}
+
+      {/* ── (d) Coverage Matrix ──────────────────────────────────────── */}
+      {coverageMatrix.tables.length > 0 && (
+        <div className="not-prose mb-8">
+          <h2 className="text-lg font-semibold mb-3">
+            Coverage Matrix
+          </h2>
+          <p className="text-sm text-muted-foreground mb-3">
+            Per-record-type breakdown: total records in each table vs how many have been source-checked,
+            and what percentage are confirmed green.
+          </p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b border-border/60">
+                  <th className="text-left py-2 px-3 font-medium">Record Type</th>
+                  <th className="text-right py-2 px-3 font-medium">Total Records</th>
+                  <th className="text-right py-2 px-3 font-medium">Checked</th>
+                  <th className="text-right py-2 px-3 font-medium">Unchecked</th>
+                  <th className="text-right py-2 px-3 font-medium">Coverage %</th>
+                  <th className="text-right py-2 px-3 font-medium">Green %</th>
+                </tr>
+              </thead>
+              <tbody>
+                {coverageMatrix.tables.map((t) => {
+                  const checked =
+                    t.verdicts.confirmed +
+                    t.verdicts.partial +
+                    t.verdicts.unverifiable +
+                    t.verdicts.contradicted +
+                    t.verdicts.outdated;
+                  return (
+                    <tr
+                      key={t.recordType}
+                      className="border-b border-border/30 hover:bg-muted/30"
+                    >
+                      <td className="py-2 px-3 font-medium">{t.recordType}</td>
+                      <td className="text-right py-2 px-3 tabular-nums">
+                        {t.totalRecords.toLocaleString()}
+                      </td>
+                      <td className="text-right py-2 px-3 tabular-nums">
+                        {checked.toLocaleString()}
+                      </td>
+                      <td className="text-right py-2 px-3 tabular-nums">
+                        {t.verdicts.unchecked.toLocaleString()}
+                      </td>
+                      <td
+                        className={`text-right py-2 px-3 tabular-nums font-medium ${
+                          t.coveragePercent >= 80
+                            ? "text-emerald-600"
+                            : t.coveragePercent >= 40
+                              ? "text-amber-600"
+                              : "text-red-600"
+                        }`}
+                      >
+                        {t.coveragePercent}%
+                      </td>
+                      <td
+                        className={`text-right py-2 px-3 tabular-nums font-medium ${
+                          t.greenPercent >= 80
+                            ? "text-emerald-600"
+                            : t.greenPercent >= 50
+                              ? "text-amber-600"
+                              : "text-red-600"
+                        }`}
+                      >
+                        {t.greenPercent}%
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t-2 border-border/60 font-semibold">
+                  <td className="py-2 px-3">Totals</td>
+                  <td className="text-right py-2 px-3 tabular-nums">
+                    {coverageMatrix.totals.totalRecords.toLocaleString()}
+                  </td>
+                  <td colSpan={2} className="text-right py-2 px-3 tabular-nums">
+                    {coverageMatrix.totals.totalVerdicts.toLocaleString()} verdicts
+                  </td>
+                  <td className="text-right py-2 px-3 tabular-nums">
+                    {coverageMatrix.totals.coveragePercent}%
+                  </td>
+                  <td className="text-right py-2 px-3 tabular-nums">
+                    {coverageMatrix.totals.confirmedPercent}%
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ── (e) Verdict Heatmap ──────────────────────────────────────── */}
+      {Object.keys(verdictMatrix.matrix).length > 0 && (() => {
+        const allVerdictTypes = [
+          "confirmed",
+          "partial",
+          "unverifiable",
+          "contradicted",
+          "outdated",
+          "unchecked",
+        ];
+        const recordTypes = Object.keys(verdictMatrix.matrix).sort();
+
+        // Find max count for color intensity scaling
+        let maxCount = 0;
+        for (const rt of recordTypes) {
+          for (const v of allVerdictTypes) {
+            const val = verdictMatrix.matrix[rt]?.[v] ?? 0;
+            if (val > maxCount) maxCount = val;
+          }
+        }
+
+        const VERDICT_RGB: Record<string, string> = {
+          confirmed: "16, 185, 129",    // emerald-500
+          partial: "251, 191, 36",      // amber-400
+          unverifiable: "251, 146, 60", // orange-400
+          contradicted: "239, 68, 68",  // red-500
+          outdated: "245, 158, 11",     // amber-500
+          unchecked: "209, 213, 219",   // gray-300
+        };
+
+        const cellStyle = (verdict: string, count: number): React.CSSProperties => {
+          if (count === 0) return {};
+          const rgb = VERDICT_RGB[verdict];
+          if (!rgb) return {};
+          const opacity = maxCount > 0 ? Math.max(0.1, (count / maxCount) * 0.5) : 0;
+          return { backgroundColor: `rgba(${rgb}, ${opacity})` };
+        };
+
+        return (
+          <div className="not-prose mb-8">
+            <h2 className="text-lg font-semibold mb-3">
+              Verdict Heatmap
+            </h2>
+            <p className="text-sm text-muted-foreground mb-3">
+              Cross-tabulation of verdict counts per record type. Color intensity indicates
+              relative count (darker = more records).
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm border-collapse">
+                <thead>
+                  <tr className="border-b border-border/60">
+                    <th className="text-left py-2 px-3 font-medium">Record Type</th>
+                    {allVerdictTypes.map((v) => (
+                      <th
+                        key={v}
+                        className={`text-right py-2 px-3 font-medium capitalize ${VERDICT_COLORS[v] ?? ""}`}
+                      >
+                        {v}
+                      </th>
+                    ))}
+                    <th className="text-right py-2 px-3 font-medium">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recordTypes.map((rt) => {
+                    const row = verdictMatrix.matrix[rt] ?? {};
+                    const rowTotal = allVerdictTypes.reduce(
+                      (s, v) => s + (row[v] ?? 0),
+                      0
+                    );
+                    return (
+                      <tr
+                        key={rt}
+                        className="border-b border-border/30 hover:bg-muted/30"
+                      >
+                        <td className="py-2 px-3 font-medium">{rt}</td>
+                        {allVerdictTypes.map((v) => {
+                          const val = row[v] ?? 0;
+                          return (
+                            <td
+                              key={v}
+                              className="text-right py-2 px-3 tabular-nums"
+                              style={cellStyle(v, val)}
+                            >
+                              {val > 0 ? val.toLocaleString() : (
+                                <span className="text-muted-foreground/50">0</span>
+                              )}
+                            </td>
+                          );
+                        })}
+                        <td className="text-right py-2 px-3 tabular-nums font-medium">
+                          {rowTotal.toLocaleString()}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-border/60 font-semibold">
+                    <td className="py-2 px-3">Totals</td>
+                    {allVerdictTypes.map((v) => (
+                      <td
+                        key={v}
+                        className={`text-right py-2 px-3 tabular-nums ${VERDICT_COLORS[v] ?? ""}`}
+                      >
+                        {(verdictMatrix.totals[v] ?? 0).toLocaleString()}
+                      </td>
+                    ))}
+                    <td className="text-right py-2 px-3 tabular-nums">
+                      {Object.values(verdictMatrix.totals)
+                        .reduce((s, c) => s + c, 0)
+                        .toLocaleString()}
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── Data source footer ─────────────────────────────────────────── */}
       <p className="text-xs text-muted-foreground mt-4">
