@@ -110,7 +110,9 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
--- 13. source_check_evidence.verdict (same enum as verdicts table)
+-- 13. source_check_evidence.verdict (subset of verdicts — excludes 'unchecked'
+-- because evidence rows are always post-check; 'unchecked' only applies to the
+-- aggregate verdict in source_check_verdicts when no evidence exists yet)
 DO $$ BEGIN
   ALTER TABLE "source_check_evidence"
     ADD CONSTRAINT chk_source_check_evidence_verdict
