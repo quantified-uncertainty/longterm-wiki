@@ -1,0 +1,34 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-09T11:30:56.006Z",
+  "sourceCheckSummary": {
+    "withSourceCheck": 0,
+    "withoutSourceCheck": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "6WiUncJn0Y",
+      "personId": "sid_H6GOwDIzbw",
+      "organizationId": "sid_fVMqY7vpMA",
+      "role": "Founder and Executive Chair",
+      "source": "https://www.bezosearthfund.org/who-we-are",
+      "verdict": "none"
+    },
+    {
+      "id": "BNomjkcK9F",
+      "personId": "sid_QWMkNoodwA",
+      "organizationId": "sid_fVMqY7vpMA",
+      "role": "President and CEO",
+      "source": "https://www.bezosearthfund.org/news-and-insights/meet-andrew-steer",
+      "verdict": "none"
+    }
+  ]
+}
