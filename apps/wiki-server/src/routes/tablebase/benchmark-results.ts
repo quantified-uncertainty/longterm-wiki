@@ -16,6 +16,7 @@ import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -298,7 +299,9 @@ const benchmarkResultsApp = new Hono()
     }
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(benchmarkResults, "benchmark_results"));
 
 export const benchmarkResultsRoute = benchmarkResultsApp;
 export type BenchmarkResultsRoute = typeof benchmarkResultsApp;

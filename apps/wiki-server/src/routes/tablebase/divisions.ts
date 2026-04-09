@@ -16,6 +16,8 @@ import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
 
@@ -140,31 +142,18 @@ const divisionsApp = new Hono()
     const db = getDrizzleDb();
 
     const conditions = [];
-    if (division_type)
-      conditions.push(eq(divisions.divisionType, division_type));
+    if (division_type) conditions.push(eq(divisions.divisionType, division_type));
     if (status) conditions.push(eq(divisions.status, status));
-    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const where = conditions.length > 0 ? and(...conditions) : undefined;
 
-    const rows = await db
-      .select()
-      .from(divisions)
-      .where(whereClause)
-      .orderBy(desc(divisions.syncedAt), desc(divisions.id))
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(divisions)
-      .where(whereClause);
-    const total = countResult[0].count;
-
-    return c.json({
-      divisions: rows.map(formatRow),
-      total,
-      limit,
-      offset,
+    const { rows, total } = await paginatedQuery({
+      query: db.select().from(divisions).where(where)
+        .orderBy(desc(divisions.syncedAt), desc(divisions.id))
+        .limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(divisions).where(where),
+      formatRow,
     });
+    return c.json({ divisions: rows, total, limit, offset });
   })
 
   // ---- GET /by-org/:orgId ----
@@ -174,31 +163,17 @@ const divisionsApp = new Hono()
     const db = getDrizzleDb();
 
     const conditions = [eq(divisions.parentOrgId, orgId)];
-    if (division_type)
-      conditions.push(eq(divisions.divisionType, division_type));
-    const whereClause = and(...conditions);
+    if (division_type) conditions.push(eq(divisions.divisionType, division_type));
+    const where = and(...conditions);
 
-    const rows = await db
-      .select()
-      .from(divisions)
-      .where(whereClause)
-      .orderBy(desc(divisions.syncedAt), desc(divisions.id))
-      .limit(limit)
-      .offset(offset);
-
-    const countResult = await db
-      .select({ count: count() })
-      .from(divisions)
-      .where(whereClause);
-    const total = countResult[0].count;
-
-    return c.json({
-      orgId,
-      divisions: rows.map(formatRow),
-      total,
-      limit,
-      offset,
+    const { rows, total } = await paginatedQuery({
+      query: db.select().from(divisions).where(where)
+        .orderBy(desc(divisions.syncedAt), desc(divisions.id))
+        .limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(divisions).where(where),
+      formatRow,
     });
+    return c.json({ orgId, divisions: rows, total, limit, offset });
   })
 
   // ---- GET /:id ----
@@ -315,7 +290,9 @@ const divisionsApp = new Hono()
     logSourceCheckCoverage("divisions/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(divisions, "divisions"));
 
 // ---- Exports ----
 

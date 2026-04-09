@@ -34,6 +34,28 @@ Port 3001 belongs to the user's main dev server (`lw/main`). Agents must use the
 - Worktree agents generally don't need dev servers (they're for quick fixes like rebases)
 - If you need to verify UI changes, start on your slot's port: `npx next dev -p 3011`
 
+## Wiki-server access — ALWAYS use prod from agent slots
+
+Agent slots (`lw/a1`–`lw/a20`) do **not** run a local wiki-server. The `.env` file points `LONGTERMWIKI_SERVER_URL` at `localhost:3113`, which is never running in slots.
+
+**Every `pnpm crux` command that hits the wiki-server API MUST use `WIKI_SERVER_ENV=prod`:**
+
+```bash
+# CORRECT — always do this in agent slots:
+WIKI_SERVER_ENV=prod pnpm crux tb ids allocate my-slug
+WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"
+WIKI_SERVER_ENV=prod pnpm crux context for-page anthropic
+WIKI_SERVER_ENV=prod pnpm crux fb source-check --entity=anthropic
+
+# WRONG — will fail with "Wiki server is not reachable":
+pnpm crux tb ids allocate my-slug
+pnpm crux query search "anthropic"
+```
+
+**Commands that need `WIKI_SERVER_ENV=prod`:** `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb source-check`, `w source-check-wiki-pages`, `sys` commands, `gh` commands that fetch server data, and anything that fails with "Wiki server is not reachable".
+
+**Commands that do NOT need it:** `w validate gate`, `build-data`, `w fix escaping`, `w fix markdown` — these are local-only.
+
 ## LSP support (recommended)
 
 Enable LSP in Claude Code for IDE-quality code navigation — go-to-definition, find-references, and type-aware search instead of grep.

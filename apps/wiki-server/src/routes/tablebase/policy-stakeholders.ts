@@ -13,6 +13,7 @@ import {
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -192,7 +193,9 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(policyStakeholders, "policy_stakeholders"));
 
 export const policyStakeholdersRoute = policyStakeholdersApp;
 export type PolicyStakeholdersRoute = typeof policyStakeholdersApp;

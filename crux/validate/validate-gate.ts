@@ -672,6 +672,17 @@ const PARALLEL_STEPS: Step[] = [
     // These indicate data pipeline bugs that should be caught immediately.
   },
   {
+    id: 'tablebase-completeness',
+    name: 'Tablebase route completeness (delete, things sync, entity ref validation)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-tablebase-completeness.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: some pre-existing routes still lack entity ref validation.
+    // The shared delete factory is now deployed; delete coverage is enforced.
+    advisory: true,
+    emitOutputInCi: true,
+  },
+  {
     id: 'display-formatting',
     name: 'Display formatting quality (no [object Object], no unescaped MDX in titles)',
     command: 'npx',

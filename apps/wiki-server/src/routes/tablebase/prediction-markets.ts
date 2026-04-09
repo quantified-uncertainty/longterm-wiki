@@ -22,6 +22,7 @@ import {
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -533,7 +534,9 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     logSourceCheckCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: snapshotVerdictsResult.written });
-  });
+  })
+
+  .post("/questions/delete-batch", deleteBatchHandler(predictionMarketQuestions, null, { label: "prediction-market-questions" }));
 
 // ---- Exports ----
 

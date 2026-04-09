@@ -12,7 +12,7 @@ on:
       budget:
         description: 'Max budget in dollars'
         required: false
-        default: '5'
+        default: '15'
         type: string
       table:
         description: 'Table to check (personnel|grants|funding-rounds|all)'
@@ -52,7 +52,7 @@ jobs:
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
-      INPUT_BUDGET: ${{ inputs.budget || '5' }}
+      INPUT_BUDGET: ${{ inputs.budget || '15' }}
       INPUT_TABLE: ${{ inputs.table || 'all' }}
       INPUT_DRY_RUN: ${{ inputs.dry_run }}
 

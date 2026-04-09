@@ -18,6 +18,7 @@ import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -328,7 +329,9 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(equityPositions, "equity_positions"));
 
 // ---- Exports ----
 

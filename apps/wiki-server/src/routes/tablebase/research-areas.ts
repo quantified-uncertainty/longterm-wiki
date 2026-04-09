@@ -12,6 +12,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 import {
   researchAreas,
   researchAreaOrganizations,
@@ -932,7 +933,9 @@ const researchAreasApp = new Hono()
       });
 
     return c.json({ recomputed: allVals.length });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(researchAreas, "research_areas"));
 
 export const researchAreasRoute = researchAreasApp;
 export type ResearchAreasRoute = typeof researchAreasApp;
