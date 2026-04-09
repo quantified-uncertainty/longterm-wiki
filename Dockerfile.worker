@@ -28,6 +28,9 @@ RUN echo 'export const X = 1;' > /tmp/test.ts && \
 # Copy crux source (worker + all transitive imports)
 COPY crux/ ./crux/
 
+# Copy shared packages (factbase, id-utils) — crux has runtime imports from these
+COPY packages/ ./packages/
+
 # NOTE: No apps/wiki-server/ files needed — all imports are type-only (erased by tsx)
 # NOTE: No content/, data/, apps/web/ needed — worker is stateless
 # NOTE: Only stateless handlers (claim-verification, ping) work in this image.
