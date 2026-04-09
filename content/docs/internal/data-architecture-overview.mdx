@@ -1,7 +1,7 @@
 ---
 wikiId: E2179
 title: "Data Architecture Overview"
-description: "High-level overview of the wiki's layered data architecture — from raw schema through scraping, sourcing, and the three derived data bases. Includes diagrams, tables, and a guide to common naming confusions."
+description: "High-level overview of the wiki's three data layers — Resources, Source-Check, and the Three Bases (TableBase, FactBase, WikiBase). Includes diagrams, tables, population mechanisms, and a guide to common naming confusions."
 subcategory: architecture
 contentFormat: article
 lastEdited: "2026-04-09"
@@ -32,9 +32,11 @@ flowchart TB
         L3B["FactBase\nstructured facts"]
         L3C["WikiBase\nMDX prose pages"]
     end
-    L1 --> L2
-    L2 --> L3
-    L1 --> L3
+    L1 -->|"cached content"| L2
+    L2 -->|"verdicts inform"| L3
+    L1 -->|"news triggers\npage improvements"| L3
+    L3 -.->|"claims to verify"| L2
+    L2 -.->|"verdict confidence\nfilters news priority"| L1
 `} />
 
 Each layer is a **self-contained data system** with its own schema, storage tables, CLI commands, and health checks. The layers feed into each other: the Resources layer collects and archives external content, the Source-Check layer verifies claims against that content, and the Three Bases layer holds the wiki's own knowledge — informed by verification results.
@@ -49,10 +51,11 @@ The Resources layer is the wiki's interface with the outside world. It collects,
 
 | Table | What It Stores | How Content Arrives |
 |-------|---------------|-------------------|
-| `resources` | Metadata for external papers, blog posts, reports | Build-data sync from YAML + API discovery |
-| `citation_content` | Latest HTML/text from cited URLs | Fetched on-demand during source-checks and citation verification |
+| `resources` | Metadata for external papers, blog posts, reports | PG-native; populated via wiki-server API and build-data sync |
+| `resource_tabular_sources` | Configured data sources (grant databases, career pages, etc.) | Manual configuration per tracked website |
+| `citation_content` | Latest HTML/text from cited URLs (hot cache) | Fetched on-demand during source-checks and citation verification |
 | `resource_content_versions` | **Versioned** content snapshots with content-hash dedup | Fetched by source-check pipeline and website monitors |
-| `website_source_pages` | Monitored pages from tracked websites | Configured per website source (e.g., org career pages, grant databases) |
+| `website_source_pages` | Monitored pages from tracked websites | Configured per `resource_tabular_sources` entry |
 | `website_source_page_snapshots` | Point-in-time snapshots of monitored pages | Periodic fetches; diffed against previous to detect changes |
 | `auto_update_news_items` | Discovered news items from RSS/web search | Auto-update pipeline (daily) |
 | `auto_update_runs` | Execution history of auto-update pipeline | Recorded per run |
@@ -90,17 +93,19 @@ flowchart TB
 |----------------|-------|------|---------|
 | AI Lab Blogs | 4 | RSS + web-search | OpenAI, Anthropic, DeepMind, Meta AI |
 | AI Safety / Alignment | 3 | RSS | Alignment Forum, LessWrong, EA Forum |
-| Academic | 3 | RSS | arXiv cs.AI, cs.CL, cs.LG |
-| Policy / Governance | 3 | Web-search | AI legislation, executive orders, policy news |
-| News Aggregators | 5 | RSS + web-search | AI safety newsletters, The Decoder, etc. |
-| Other | 7 | Various | YouTube channels, podcast feeds, govt sources |
+| Newsletters / Aggregators | 7 | RSS | Import AI, The Gradient, ML Safety Newsletter, Zvi, CAIS, etc. |
+| Arxiv | 3 | RSS | arXiv cs.AI, cs.CL, cs.LG |
+| Political / AI Policy | 4 | Web-search | AI policy in Congress, PAC elections, state legislation, biosecurity |
+| Policy / Governance | 2 | Web-search | AI safety news, executive orders |
+| Compute / Industry | 1 | Web-search | AI industry news |
+| Watchlist-Supporting | 1 | Web-search | Entity-specific monitoring searches |
 
 ### CLI
 
 ```bash
 # Auto-update (news collection)
 pnpm crux w auto-update plan              # Preview what would be updated
-pnpm crux w auto-update run --budget=30   # Execute with \$30 budget cap
+pnpm crux w auto-update run --budget=30   # Execute with $30 budget cap
 pnpm crux w auto-update digest            # Fetch and display news digest
 pnpm crux w auto-update sources           # List configured sources
 pnpm crux w auto-update history           # Show past runs
@@ -141,6 +146,7 @@ flowchart TB
     subgraph Input["What Gets Checked"]
         FB_FACTS["FactBase Facts"]
         WIKI_CLAIMS["Wiki Page Claims"]
+        TB_RECORDS["TableBase Records\npersonnel, grants,\ninvestments, etc."]
     end
     subgraph Archive["Resources Layer"]
         CACHED["Cached source content"]
@@ -155,6 +161,7 @@ flowchart TB
     end
     FB_FACTS --> COLLECT
     WIKI_CLAIMS --> COLLECT
+    TB_RECORDS --> COLLECT
     CACHED --> VERIFY
     COLLECT --> VERIFY
     VERIFY --> EVIDENCE
@@ -179,7 +186,7 @@ flowchart TB
 | `unverifiable` | Source doesn't address the claim either way |
 | `unchecked` | Not yet checked |
 
-Each verdict carries a **confidence score** (0.0--1.0) and is timestamped so stale checks can be detected.
+Each verdict carries a **confidence score** (0.0 to 1.0) and is timestamped so stale checks can be detected.
 
 ### CLI
 
@@ -213,9 +220,9 @@ The Three Bases layer is the wiki's own knowledge — the entities, facts, and p
 
 | Base | What It Stores | Source of Truth | Build Artifact | Key CLI Group |
 |------|---------------|----------------|---------------|--------------|
-| **TableBase** | Typed entity catalog (orgs, people, models, risks, concepts) | `data/entities/*.yaml` (15 files) | `database.json` | `crux tb` |
+| **TableBase** | Typed entity catalog (≈2,000 entities: orgs, people, models, risks, concepts) | `data/entities/*.yaml` (15 files) + MDX frontmatter | `database.json` | `crux tb` |
 | **FactBase** | Structured temporal facts with provenance | `packages/factbase/data/things/*.yaml` (539 files) | `factbase-data.json` | `crux fb` |
-| **WikiBase** | Long-form prose articles | `content/docs/**/*.mdx` (≈730 pages) | `database.json` (pages section) | `crux w` |
+| **WikiBase** | Long-form prose articles | `content/docs/**/*.mdx` (≈720 pages) | `database.json` (pages section) | `crux w` |
 
 Each base has:
 - **A source of truth** (YAML or MDX files in git)
@@ -249,6 +256,7 @@ flowchart TB
         YAML["YAML Entities"]
         FB_YAML2["FactBase YAML"]
         MDX2["MDX Pages"]
+        API["Wiki-server API\nfacts, resources,\nassessments"]
     end
     subgraph Phases["build-data.mjs (20 phases)"]
         direction TB
@@ -266,6 +274,7 @@ flowchart TB
     YAML --> P1
     FB_YAML2 --> P1
     MDX2 --> P1
+    API --> P2
     P4 --> DB_JSON2
     P4 --> FB_JSON2
     P4 --> PG_SYNC
@@ -312,8 +321,8 @@ WikiBase has two pipeline engines:
 
 | Engine | How It Works | When to Use |
 |--------|-------------|------------|
-| **V1** (fixed pipeline) | Sequential phases: research → generate → review. Deterministic order. | Single-page creation/improvement, `crux w create` |
-| **V2** (agent orchestrator) | LLM agent with modules as tools. Decides its own phase order. Supports batch mode + Anthropic Batch API (50% cost savings). | Batch improvements, auto-update, `--engine=v2` |
+| **V1** (fixed pipeline) | Sequential phases: research → generate → review. Deterministic order. Default engine. | Single-page work: `crux w create`, `crux w improve` |
+| **V2** (agent orchestrator) | LLM agent with modules as tools. Decides its own phase order. Supports batch mode + Anthropic Batch API (50% cost savings). | Batch improvements, auto-update: `--engine=v2` |
 
 **Page creation** (`crux w create "Title" --tier=standard`):
 - Tiers: `budget` (\$8-12), `standard` (\$15-25), `premium` (\$30-50)
@@ -339,12 +348,12 @@ TableBase uses a **scan → rank → agent** loop to systematically fill gaps in
 1. **Scanner** queries wiki-server for completeness per entity per table
 2. **Task ranker** scores gaps: `(100 - completeness) * taskWeight * importance`
 3. **Agent** runs web search + LLM to fill specific fields for one entity
-4. **Pre-submit verification** checks each record against its source URL before writing — records are born with verdicts (the "defensive pipeline" from [Discussion \#3958](https://github.com/quantified-uncertainty/longterm-wiki/discussions/3958))
+4. **Pre-submit verification** checks each record against its source URL before writing — records are born with verdicts
 
 ```bash
 pnpm crux tb tablebase scan        # Per-table completeness scores
 pnpm crux tb tablebase gaps        # Ranked gap list
-pnpm crux tb tablebase improve     # Fill one gap (~\$0.50-1.50/task)
+pnpm crux tb tablebase improve     # Fill one gap (~$0.50-1.50/task)
 pnpm crux tb tablebase loop        # Autonomous loop with --budget
 ```
 
@@ -365,7 +374,7 @@ pnpm crux fb show anthropic                        # View all facts
 pnpm crux fb validate                              # 40+ validation rules
 ```
 
-The improve pipeline extracts some facts as a side effect (wrapping claims in `\<FBFactValue\>` tags), but there is no dedicated automated fact discovery loop yet.
+The improve pipeline extracts some facts as a side effect (wrapping claims in `<FBFactValue>` tags). See Known Gaps for the lack of automated fact discovery.
 
 ---
 
@@ -409,26 +418,22 @@ Each layer has its own health infrastructure:
 |-------|-----------|--------------|------------|
 | **Resources** | Link health checks, CI audit | Content freshness, auto-update run tracking | <EntityLink id="E2131">Data Sources</EntityLink>, <EntityLink id="E914">Auto-Update Runs</EntityLink>, <EntityLink id="E915">Auto-Update News</EntityLink> |
 | **Source-Check** | Source-check coverage metrics | Verdict freshness tracking | <EntityLink id="E2200">Source Checks</EntityLink>, <EntityLink id="E2600">Data Quality</EntityLink> |
-| **Three Bases** | 94 validators in `crux/validate/`, build phase validation | Gate checks (6 CI-blocking), build-time error detection | <EntityLink id="E908">Entities</EntityLink>, <EntityLink id="E909">Page Changes</EntityLink>, <EntityLink id="E900">Update Schedule</EntityLink>, <EntityLink id="E1054">DB Schema</EntityLink> |
+| **Three Bases** | 96 validators in `crux/validate/`, build phase validation | Gate checks (6 CI-blocking), build-time error detection | <EntityLink id="E908">Entities</EntityLink>, <EntityLink id="E909">Page Changes</EntityLink>, <EntityLink id="E900">Update Schedule</EntityLink>, <EntityLink id="E1054">DB Schema</EntityLink> |
 
 ### CI-Blocking Gate Checks
 
-Six validators are CI-blocking (code cannot merge if they fail):
+The gate (`pnpm crux w validate gate --fix`) runs ~50 checks. Most are blocking — 17 are advisory (warnings only). The blocking checks include:
 
-1. **comparison-operators** — MDX `<` must be escaped as `\<`
-2. **dollar-signs** — MDX `$` must be escaped as `\$`
-3. **schema** — Entity YAML must match type schema
-4. **frontmatter-schema** — MDX frontmatter must be valid
-5. **wiki-id-integrity** — No duplicate or missing wikiIds
-6. **prefer-entitylink** — Use `<EntityLink>` not raw markdown links for entities
-
-Run all: `pnpm crux w validate gate --fix`
+- **Unified content rules** (13 rules in one pass): comparison-operators, dollar-signs, frontmatter-schema, wiki-id-integrity, prefer-entitylink, entitylink-ids, footnote-integrity, kbf-refs, no-deprecated-components, pipeline-artifacts, resource-ref-integrity, url-safety, no-quoted-subcategory
+- **Code quality**: TypeScript type checks, `.returning()` guard, no untyped row casts, no console.log in server, prompt escaping, dangerous patterns, conflict markers
+- **Data integrity**: YAML schema, FactBase stableId usage, KB schema, entity reference integrity, temporal invariants, controlled vocab, cross-base consistency
+- **Build**: tests, build-data, MDX compilation smoke-test
 
 ---
 
 ## How Data Flows End-to-End
 
-Putting it all together — from a real-world event to a reader seeing updated information:
+Putting it all together — here's the **auto-update path** (the most common flow) from a real-world event to a reader seeing updated information. Other paths exist: TableBase enrichment (scan → rank → agent → pre-submit verify → PG), on-demand source-checks, and manual edits.
 
 1. **Resources**: Auto-update pipeline fetches RSS feeds, discovers "Anthropic announces new model"
 2. **Resources**: Source fetcher downloads the blog post content and caches it in `resource_content_versions`
@@ -461,7 +466,7 @@ flowchart TB
     end
     NEWS --> CACHED
     CACHED --> CHECK
-    NEWS -->|"improves"| MDX_E
+    NEWS -->|"triggers improve\npipeline for"| MDX_E
     CHECK -->|"verdicts for"| FB_E
     YAML_E --> BUILD_E
     FB_E --> BUILD_E
@@ -492,6 +497,7 @@ This is a critical distinction: **content pages make zero runtime API calls**, w
 | **Source-check pipeline** | Local data files + wiki-server + external URLs | On-demand / scheduled | Fact verification, claim extraction |
 | **Crux CLI commands** | Local files and/or wiki-server API | On-demand | `crux query search`, `crux fb show` |
 | **Build pipeline** | YAML + MDX + wiki-server API | At build time | `build-data.mjs` 20 phases |
+| **Groundskeeper daemon** | Wiki-server API | Continuous | Health checks, job queue, maintenance tasks |
 
 **Key implication**: A wiki-server outage does NOT break the public-facing wiki. Content pages are fully static. Only internal dashboards and CLI tools are affected.
 
@@ -550,6 +556,7 @@ flowchart TB
     RES_CIT -->|"resource_id"| RESOURCES
     PAGE_LINKS -->|"source + target"| WIKI
     EDIT_LOGS -->|"page_id"| WIKI
+    SOURCE_CHK -->|"entity_id"| ENTITIES
     THINGS -->|"parent_thing_id"| THINGS
 `} />
 
@@ -608,7 +615,7 @@ The architecture has known limitations and missing pieces. Documenting them prev
 | **No incremental builds** | `build-data.mjs` rebuilds everything from scratch each time (≈30s for content-only, ~2min full). No caching or dirty-file detection | Use `--scope=content` for faster content-only builds |
 | **No real-time updates** | Wiki content is fully static — changes require a build + deploy cycle. ISR helps dashboards but content pages are build-time only | Deploy pipeline; auto-update runs daily |
 | **No FactBase → WikiBase auto-sync** | When a FactBase fact changes, the wiki page prose isn't automatically updated to match | `crux w improve` can update pages, but must be triggered manually |
-| **Source-check coverage is partial** | Only ≈15% of wiki pages have been source-checked. Many facts lack source URLs entirely | `crux fb source-check` and `crux w source-check-wiki-pages` are available but expensive (≈\$0.07/page) |
+| **Source-check coverage is partial** | Only about 15% of wiki pages have been source-checked. Many facts lack source URLs entirely | `crux fb source-check` and `crux w source-check-wiki-pages` are available but expensive (about \$0.07/page) |
 | **No rollback for PG-primary data** | YAML-primary data has full git history. PG-primary data (grants, personnel) has no version history beyond edit logs | Consider adding a changelog table for PG-primary records |
 | **`things` table can go stale** | The cross-base index is synced at build time. Between builds, newly created PG records won't appear in `things` search | Rebuild or wait for next deploy |
 
