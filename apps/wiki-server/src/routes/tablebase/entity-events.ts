@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc } from "drizzle-orm";
+import { eq, and, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { entityEvents } from "../../schema.js";
 import {
@@ -19,6 +19,7 @@ import {
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
@@ -102,9 +103,11 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     zv("query", ByEntityQuery),
     async (c) => {
       const resolvedId = c.get("resolvedEntityId");
-      const { limit, offset } = c.req.valid("query");
+      const { limit, offset, eventType } = c.req.valid("query");
       const db = getDrizzleDb();
-      const where = eq(entityEvents.entityId, resolvedId);
+      const conditions = [eq(entityEvents.entityId, resolvedId)];
+      if (eventType) conditions.push(eq(entityEvents.eventType, eventType));
+      const where = and(...conditions);
       const { rows: events, total } = await paginatedQuery({
         query: db.select().from(entityEvents).where(where)
           .orderBy(desc(entityEvents.date), entityEvents.id)
@@ -124,6 +127,12 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 

@@ -12,12 +12,12 @@ on:
       budget:
         description: 'Max budget in dollars'
         required: false
-        default: '5'
+        default: '15'
         type: string
       limit:
         description: 'Max items to recheck'
         required: false
-        default: '100'
+        default: '500'
         type: string
       record_type:
         description: 'Filter by record type (empty = all)'
@@ -53,8 +53,8 @@ jobs:
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
-      INPUT_BUDGET: ${{ inputs.budget || '5' }}
-      INPUT_LIMIT: ${{ inputs.limit || '100' }}
+      INPUT_BUDGET: ${{ inputs.budget || '15' }}
+      INPUT_LIMIT: ${{ inputs.limit || '500' }}
       INPUT_RECORD_TYPE: ${{ inputs.record_type }}
       INPUT_DRY_RUN: ${{ inputs.dry_run }}
 

@@ -20,6 +20,7 @@ import {
   paginationQuery,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 const VALID_PLATFORMS = [
   "lesswrong",
@@ -157,6 +158,14 @@ const platformAccountsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const entityIds = items.map((i) => i.entityStableId).filter((id): id is string => !!id);
+    if (entityIds.length > 0) {
+      const refError = await validateEntityRefs(c, db, [
+        { fieldName: "entityStableId", ids: entityIds },
+      ]);
+      if (refError) return refError;
+    }
 
     const result = await db
       .insert(platformAccounts)
