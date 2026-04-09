@@ -64,8 +64,8 @@ const EXEMPTIONS: Record<string, Record<string, string>> = {
 
   // Domain routes with legitimate exemptions from things sync
   "entities.ts": {
-    // entities has its own prune/delete mechanism
     delete: "Has POST /prune for bulk removal + individual entity management",
+    entityRefValidation: "Has custom ref validation via checkRefsExist() that strips invalid refs",
   },
   "data-sources.ts": {
     thingsSync: "Data sources are metadata about where data comes from, not indexed entities",

@@ -45,12 +45,12 @@ describe("validate-tablebase-completeness", () => {
     expect(thingsDeleteViolations).toHaveLength(0);
   });
 
-  it("detects entity ref validation gaps", () => {
+  it("has no entity ref validation gaps after QUA-145 rollout", () => {
     const result = runCheck();
     const refViolations = result.violations.filter(
       (v) => v.check === "entityRefValidation"
     );
-    // There should be several routes accepting entity refs without validation
-    expect(refViolations.length).toBeGreaterThan(5);
+    // All routes with entity refs now validate them (or are exempt)
+    expect(refViolations).toHaveLength(0);
   });
 });

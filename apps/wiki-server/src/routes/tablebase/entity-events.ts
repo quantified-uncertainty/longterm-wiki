@@ -19,6 +19,7 @@ import {
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
@@ -126,6 +127,12 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 
