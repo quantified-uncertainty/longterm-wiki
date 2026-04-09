@@ -8,6 +8,7 @@
 import https from 'https';
 import http from 'http';
 import { sleep, extractArxivId } from '../resource-utils.ts';
+import { getHostname, matchesDomainList } from '../lib/url-utils.ts';
 import type { CheckStrategy } from './types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -36,20 +37,8 @@ const SKIP_DOMAINS = [
 
 // ── Domain Classification ────────────────────────────────────────────────────
 
-function getDomain(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return 'unknown';
-  }
-}
-
-function matchesDomainList(hostname: string, domains: string[]): boolean {
-  return domains.some(d => hostname === d || hostname.endsWith('.' + d));
-}
-
 export function getCheckStrategy(url: string): CheckStrategy {
-  const hostname = getDomain(url);
+  const hostname = getHostname(url) || 'unknown';
 
   if (matchesDomainList(hostname, UNVERIFIABLE_DOMAINS)) return 'unverifiable';
   if (matchesDomainList(hostname, SKIP_DOMAINS)) return 'skip';

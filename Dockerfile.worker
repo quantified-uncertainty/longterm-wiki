@@ -1,5 +1,5 @@
 # ---- Stage 1: Install only worker dependencies ----
-FROM node:20-alpine AS deps
+FROM node:20-slim AS deps
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
@@ -11,14 +11,34 @@ RUN pnpm install --prod
 # ---- Stage 2: Runtime image ----
 # Node 20 required: tsx's ESM loader hits ERR_REQUIRE_CYCLE_MODULE on Node 22
 # due to its require(esm) cycle detection. Track tsx Node 22 support for upgrade.
-FROM node:20-alpine
+# Uses node:20-slim (Debian) instead of Alpine for Playwright/Chromium compatibility.
+FROM node:20-slim
 WORKDIR /repo
+
+# Install Chromium system dependencies for Playwright.
+# Uses Debian's chromium package rather than Playwright's bundled download
+# to keep the image smaller and avoid version drift.
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    fonts-liberation \
+    libnss3 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxkbcommon0 \
+    libgbm1 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Tell Playwright to use system Chromium instead of downloading its own
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 
 # Minimal package.json with "type": "module" so Node treats .ts files as ESM.
 # Without this, Node defaults to CJS and tsx's ESM hooks don't apply.
 RUN echo '{"type":"module"}' > package.json
 
-# Copy only the deps we need (~30MB vs ~1GB full monorepo)
+# Copy only the deps we need
 COPY --from=deps /deps/node_modules ./node_modules
 
 # Verify tsx can load .ts files (catches missing deps or ESM config issues)
@@ -39,8 +59,8 @@ COPY packages/ ./packages/
 
 ENV NODE_ENV=production
 
-# Non-root user for security
-RUN addgroup -S worker && adduser -S worker -G worker
+# Non-root user for security (use standard Debian adduser)
+RUN groupadd -r worker && useradd -r -g worker worker
 USER worker
 
 # Health endpoint port

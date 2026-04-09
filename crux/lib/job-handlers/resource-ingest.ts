@@ -24,7 +24,7 @@ import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import type { UpdateResourceFetchStatus } from '../../../apps/wiki-server/src/api-types.ts';
 import { createHash } from 'crypto';
 import { z } from 'zod';
-import { isPrivateHost } from '../source-check/source-fetcher.ts';
+import { isPrivateHost } from '../url-utils.ts';
 import { fetchSource, type FetchedSourceStatus } from '../search/source-fetcher.ts';
 import { initFromPG } from '../search/resource-lookup.ts';
 import { createJob } from '../wiki-server/jobs.ts';
