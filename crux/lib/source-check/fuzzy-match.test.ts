@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeOrgName, editDistance, nameMatches, amountMatches, dateMatches } from './fuzzy-match.ts';
+import { normalizeOrgName, editDistance, nameMatches, amountMatches, dateMatches, urlMatches } from './fuzzy-match.ts';
 import { parseAmount } from './deterministic-matcher.ts';
 
 describe('normalizeOrgName', () => {
@@ -130,6 +130,37 @@ describe('dateMatches', () => {
 
   it('rejects natural language dates with different years', () => {
     expect(dateMatches('March 2017', '2018-03')).toBe(false);
+  });
+});
+
+describe('urlMatches', () => {
+  it('matches identical URLs', () => {
+    expect(urlMatches('https://anthropic.com', 'https://anthropic.com')).toBe(true);
+  });
+
+  it('normalizes http vs https', () => {
+    expect(urlMatches('http://anthropic.com', 'https://anthropic.com')).toBe(true);
+  });
+
+  it('strips www prefix', () => {
+    expect(urlMatches('https://www.anthropic.com', 'https://anthropic.com')).toBe(true);
+  });
+
+  it('strips trailing slashes', () => {
+    expect(urlMatches('https://anthropic.com/', 'https://anthropic.com')).toBe(true);
+    expect(urlMatches('https://anthropic.com/', 'https://anthropic.com/')).toBe(true);
+  });
+
+  it('handles combined normalization', () => {
+    expect(urlMatches('http://www.anthropic.com/', 'https://anthropic.com')).toBe(true);
+  });
+
+  it('rejects different domains', () => {
+    expect(urlMatches('https://anthropic.com', 'https://openai.com')).toBe(false);
+  });
+
+  it('preserves path differences', () => {
+    expect(urlMatches('https://anthropic.com/about', 'https://anthropic.com/team')).toBe(false);
   });
 });
 
