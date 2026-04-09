@@ -26,15 +26,14 @@ describe("validate-tablebase-completeness", () => {
     expect(personnelViolations).toHaveLength(0);
   });
 
-  it("flags routes with sync but no delete", () => {
+  it("has no delete violations after factory rollout", () => {
     const result = runCheck();
     const deleteViolations = result.violations.filter(
       (v) => v.check === "delete"
     );
-    // There should be many pre-existing violations
-    expect(deleteViolations.length).toBeGreaterThan(10);
-    // They should all be advisory (not blocking) for now
-    expect(deleteViolations.every((v) => !v.blocking)).toBe(true);
+    // After the shared delete factory was added to all routes,
+    // there should be zero delete violations
+    expect(deleteViolations).toHaveLength(0);
   });
 
   it("does not flag exempt routes", () => {

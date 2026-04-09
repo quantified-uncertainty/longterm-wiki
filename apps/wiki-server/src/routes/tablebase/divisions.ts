@@ -16,6 +16,7 @@ import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -315,7 +316,9 @@ const divisionsApp = new Hono()
     logSourceCheckCoverage("divisions/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(divisions, "divisions"));
 
 // ---- Exports ----
 

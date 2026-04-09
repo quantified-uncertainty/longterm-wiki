@@ -18,6 +18,7 @@ import {
   zv,
   clampedLimit,
 } from "../shared/utils.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -566,7 +567,9 @@ const websiteSourcesApp = new Hono()
         201
       );
     }
-  );
+  )
+
+  .post("/delete-batch", deleteBatchHandler(websiteSources, null));
 
 export const websiteSourcesRoute = websiteSourcesApp;
 export type WebsiteSourcesRoute = typeof websiteSourcesApp;

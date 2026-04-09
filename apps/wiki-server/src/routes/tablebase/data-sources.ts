@@ -15,6 +15,7 @@ import { createHash } from "node:crypto";
 import { getDrizzleDb } from "../../db.js";
 import { sourceSnapshots, resources, resourceTabularSources } from "../../schema.js";
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Zod schemas ----
 
@@ -414,7 +415,12 @@ const dataSourcesApp = new Hono()
       notes: row.notes,
       createdAt: row.createdAt.toISOString(),
     });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(resourceTabularSources, null, {
+    label: "data-sources",
+    pkColumn: resourceTabularSources.resourceId,
+  }));
 
 export const dataSourcesRoute = dataSourcesApp;
 export type DataSourcesRoute = typeof dataSourcesApp;

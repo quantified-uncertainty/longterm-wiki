@@ -10,6 +10,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 const SyncItemSchema = z.object({
   entityId: z.string().min(1).max(200),
@@ -154,7 +155,9 @@ const entityResourcesApp = new Hono()
       .from(entityResources);
 
     return c.json({ items: rows, total: rows.length });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(entityResources, "entity_resources"));
 
 export const entityResourcesRoute = entityResourcesApp;
 export type EntityResourcesRoute = typeof entityResourcesApp;

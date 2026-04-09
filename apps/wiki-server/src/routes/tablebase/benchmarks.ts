@@ -11,6 +11,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -210,7 +211,9 @@ const benchmarksApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(benchmarks, "benchmarks"));
 
 export const benchmarksRoute = benchmarksApp;
 export type BenchmarksRoute = typeof benchmarksApp;

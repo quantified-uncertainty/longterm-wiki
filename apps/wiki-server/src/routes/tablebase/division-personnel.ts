@@ -13,6 +13,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Query schemas ----
 
@@ -227,7 +228,9 @@ const divisionPersonnelApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(divisionPersonnel, "division_personnel"));
 
 // ---- Exports ----
 

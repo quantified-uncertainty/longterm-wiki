@@ -18,6 +18,7 @@ import {
   upsertThingsInTx,
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
@@ -197,7 +198,9 @@ const entityAssessmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(entityAssessments, "entity_assessments"));
 
 export const entityAssessmentsRoute = entityAssessmentsApp;
 export type EntityAssessmentsRoute = typeof entityAssessmentsApp;
