@@ -476,6 +476,12 @@ export async function SourceCheckCoverageContent() {
         ];
         const recordTypes = Object.keys(verdictMatrix.matrix).sort();
 
+        // Build lookup from coverage matrix for total record counts per type
+        const totalRecordsByType = new Map<string, number>();
+        for (const t of coverageMatrix.tables) {
+          totalRecordsByType.set(t.recordType, t.totalRecords);
+        }
+
         // Find max count for color intensity scaling
         let maxCount = 0;
         for (const rt of recordTypes) {
@@ -516,6 +522,7 @@ export async function SourceCheckCoverageContent() {
                 <thead>
                   <tr className="border-b border-border/60">
                     <th className="text-left py-2 px-3 font-medium">Record Type</th>
+                    <th className="text-right py-2 px-3 font-medium">Records</th>
                     {allVerdictTypes.map((v) => (
                       <th
                         key={v}
@@ -524,7 +531,8 @@ export async function SourceCheckCoverageContent() {
                         {v}
                       </th>
                     ))}
-                    <th className="text-right py-2 px-3 font-medium">Total</th>
+                    <th className="text-right py-2 px-3 font-medium">Verdicts</th>
+                    <th className="text-right py-2 px-3 font-medium">Coverage</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -534,12 +542,21 @@ export async function SourceCheckCoverageContent() {
                       (s, v) => s + (row[v] ?? 0),
                       0
                     );
+                    const totalRecords = totalRecordsByType.get(rt);
+                    const coveragePct = totalRecords != null && totalRecords > 0
+                      ? Math.round((rowTotal / totalRecords) * 100)
+                      : null;
                     return (
                       <tr
                         key={rt}
                         className="border-b border-border/30 hover:bg-muted/30"
                       >
                         <td className="py-2 px-3 font-medium">{rt}</td>
+                        <td className="text-right py-2 px-3 tabular-nums text-muted-foreground">
+                          {totalRecords != null ? totalRecords.toLocaleString() : (
+                            <span className="text-muted-foreground/50">—</span>
+                          )}
+                        </td>
                         {allVerdictTypes.map((v) => {
                           const val = row[v] ?? 0;
                           return (
@@ -557,27 +574,54 @@ export async function SourceCheckCoverageContent() {
                         <td className="text-right py-2 px-3 tabular-nums font-medium">
                           {rowTotal.toLocaleString()}
                         </td>
+                        <td className={`text-right py-2 px-3 tabular-nums font-medium ${
+                          coveragePct == null ? "text-muted-foreground/50"
+                            : coveragePct >= 80 ? "text-emerald-600"
+                            : coveragePct >= 40 ? "text-amber-600"
+                            : "text-red-600"
+                        }`}>
+                          {coveragePct != null ? `${coveragePct}%` : "—"}
+                        </td>
                       </tr>
                     );
                   })}
                 </tbody>
                 <tfoot>
-                  <tr className="border-t-2 border-border/60 font-semibold">
-                    <td className="py-2 px-3">Totals</td>
-                    {allVerdictTypes.map((v) => (
-                      <td
-                        key={v}
-                        className={`text-right py-2 px-3 tabular-nums ${VERDICT_COLORS[v] ?? ""}`}
-                      >
-                        {(verdictMatrix.totals[v] ?? 0).toLocaleString()}
-                      </td>
-                    ))}
-                    <td className="text-right py-2 px-3 tabular-nums">
-                      {Object.values(verdictMatrix.totals)
-                        .reduce((s, c) => s + c, 0)
-                        .toLocaleString()}
-                    </td>
-                  </tr>
+                  {(() => {
+                    const totalAllRecords = coverageMatrix.totals.totalRecords;
+                    const totalAllVerdicts = Object.values(verdictMatrix.totals)
+                      .reduce((s, c) => s + c, 0);
+                    const totalCoverage = totalAllRecords > 0
+                      ? Math.round((totalAllVerdicts / totalAllRecords) * 100)
+                      : null;
+                    return (
+                      <tr className="border-t-2 border-border/60 font-semibold">
+                        <td className="py-2 px-3">Totals</td>
+                        <td className="text-right py-2 px-3 tabular-nums">
+                          {totalAllRecords > 0 ? totalAllRecords.toLocaleString() : "—"}
+                        </td>
+                        {allVerdictTypes.map((v) => (
+                          <td
+                            key={v}
+                            className={`text-right py-2 px-3 tabular-nums ${VERDICT_COLORS[v] ?? ""}`}
+                          >
+                            {(verdictMatrix.totals[v] ?? 0).toLocaleString()}
+                          </td>
+                        ))}
+                        <td className="text-right py-2 px-3 tabular-nums">
+                          {totalAllVerdicts.toLocaleString()}
+                        </td>
+                        <td className={`text-right py-2 px-3 tabular-nums ${
+                          totalCoverage == null ? ""
+                            : totalCoverage >= 80 ? "text-emerald-600"
+                            : totalCoverage >= 40 ? "text-amber-600"
+                            : "text-red-600"
+                        }`}>
+                          {totalCoverage != null ? `${totalCoverage}%` : "—"}
+                        </td>
+                      </tr>
+                    );
+                  })()}
                 </tfoot>
               </table>
             </div>
