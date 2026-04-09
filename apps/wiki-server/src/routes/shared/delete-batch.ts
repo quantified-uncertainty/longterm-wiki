@@ -35,6 +35,7 @@ import { parseJsonBody, validationError, invalidJsonError } from "./utils.js";
  * @param options.maxBatchSize - Maximum IDs per request (default: 500)
  * @param options.label - Human-readable name for log messages (default: thingsSourceTable)
  * @param options.pkColumn - Primary key column to match against (default: table.id)
+ * @param options.maxIdLength - Maximum ID string length (default: 200)
  */
 export function deleteBatchHandler<T extends PgTable>(
   table: T,
@@ -45,7 +46,10 @@ export function deleteBatchHandler<T extends PgTable>(
   const label = options?.label ?? thingsSourceTable ?? "records";
   // Default to table.id; override with options.pkColumn for tables with non-standard PKs.
   // All standard tablebase tables have an `id` column; non-standard PKs must pass pkColumn.
-  const pkColumn: PgColumn = options?.pkColumn ?? (table as any).id; // as-any-ok: PgTable generic doesn't expose column names; all 20+ callers have .id
+  const pkColumn: PgColumn | undefined = options?.pkColumn ?? (table as any).id; // as-any-ok: PgTable generic doesn't expose column names; all 20+ callers have .id
+  if (!pkColumn) {
+    throw new Error(`deleteBatchHandler: table has no .id column and no pkColumn option was provided (label: ${label})`);
+  }
   // Most IDs are varchar(10) but text-type PKs (resources, research areas, benchmarks)
   // can be longer slugs or composite keys. Default 200 accommodates all current formats.
   const maxIdLength = options?.maxIdLength ?? 200;
@@ -66,8 +70,10 @@ export function deleteBatchHandler<T extends PgTable>(
 
     logger.info({ count: ids.length }, `Deleting ${label} batch`);
 
+    let deleted = 0;
     await db.transaction(async (tx) => {
-      // Delete from things table first (FK-safe)
+      // Delete from things table first (FK-safe).
+      // Other cascade relationships are handled by DB-level ON DELETE constraints.
       if (thingsSourceTable) {
         await tx
           .delete(things)
@@ -79,10 +85,11 @@ export function deleteBatchHandler<T extends PgTable>(
           );
       }
 
-      // Delete the domain records
-      await tx.delete(table).where(inArray(pkColumn, ids));
+      // Delete the domain records and count actual deletions
+      const result = await tx.delete(table).where(inArray(pkColumn, ids)).returning({ id: pkColumn });
+      deleted = result.length;
     });
 
-    return c.json({ deleted: ids.length });
+    return c.json({ deleted });
   };
 }

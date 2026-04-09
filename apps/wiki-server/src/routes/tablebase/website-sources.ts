@@ -19,6 +19,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -267,6 +268,15 @@ const websiteSourcesApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const entityIds = items.map((i) => i.entityId).filter((id): id is string => !!id);
+    if (entityIds.length > 0) {
+      const refError = await validateEntityRefs(c, db, [
+        { fieldName: "entityId", ids: entityIds },
+      ]);
+      if (refError) return refError;
+    }
+
     const now = new Date();
     let upserted = 0;
 

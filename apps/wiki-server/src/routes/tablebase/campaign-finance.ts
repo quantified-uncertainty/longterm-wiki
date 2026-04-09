@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -225,6 +226,11 @@ const campaignFinanceApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => !!id) },
+    ]);
+    if (refError) return refError;
 
     logger.info(`sync campaign-finance: upserting ${items.length} records`);
 

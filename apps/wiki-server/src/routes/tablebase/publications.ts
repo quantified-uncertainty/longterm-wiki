@@ -21,6 +21,7 @@ import {
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -176,6 +177,12 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
     let verdictsResult = { written: 0 };

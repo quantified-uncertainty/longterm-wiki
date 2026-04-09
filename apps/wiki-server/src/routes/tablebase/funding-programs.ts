@@ -14,6 +14,7 @@ import {
   zv,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -267,6 +268,11 @@ const fundingProgramsApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "orgId", ids: items.map((i) => i.orgId) },
+    ]);
+    if (refError) return refError;
 
     // Check for natural key collisions within the batch itself
     const batchKeys = new Set<string>();

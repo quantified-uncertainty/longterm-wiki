@@ -20,6 +20,7 @@ import {
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -403,6 +404,11 @@ const politicalRacesApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId).filter((id): id is string => !!id) },
+    ]);
+    if (refError) return refError;
+
     logger.info(`sync political-races: upserting ${items.length} races`);
 
     // Resolve entity titles for things table
@@ -496,6 +502,12 @@ const politicalRacesApp = new Hono()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    const candidateRefError = await validateEntityRefs(c, db, [
+      { fieldName: "candidateEntityId", ids: items.map((i) => i.candidateEntityId).filter((id): id is string => !!id) },
+      { fieldName: "pacEntityId", ids: items.map((i) => i.pacEntityId).filter((id): id is string => !!id) },
+    ]);
+    if (candidateRefError) return candidateRefError;
 
     logger.info(`sync race-candidates: upserting ${items.length} candidates`);
 

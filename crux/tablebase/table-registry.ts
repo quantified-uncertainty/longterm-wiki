@@ -213,7 +213,9 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncPath: '/api/political-races/sync',
     syncMethod: 'POST',
     syncBodyKey: 'items',
-    deletePath: '/api/political-races/batch',
+    // Uses HTTP DELETE (not POST) — hand-written endpoint that also cleans up race_candidates things.
+    // The generic deleteBatch() client won't work for this route; use direct apiRequest instead.
+    deletePath: null,
     thingsSourceTable: 'political_races',
   },
   'political-scores': {
