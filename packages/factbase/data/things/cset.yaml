@@ -72,6 +72,8 @@ facts:
 
   - id: f_QGx6d8Eut1
     property: grant-received
-    value: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"
+    value: "5000000"
+    unit: USD
     asOf: 2022
     source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
+    notes: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"

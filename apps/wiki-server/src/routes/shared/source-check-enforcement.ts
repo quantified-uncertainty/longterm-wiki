@@ -14,9 +14,11 @@ const logger = rootLogger.child({ component: "source-check-enforcement" });
  * Rollout per Discussion #3875: tables are enabled here as they reach Phase 5.
  */
 const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
-  // Enable as tables reach Phase 5 hard enforcement:
-  // personnel: true,
-  // grants: true,
+  // Phase 5 hard enforcement (Discussion #3875):
+  // Personnel: 91% coverage (380 confirmed / 417 actionable), enabled 2026-04-08
+  personnel: true,
+  // Grants: 99.5% coverage (5078 confirmed / 5102 actionable), enabled 2026-04-08
+  grants: true,
 };
 
 /**

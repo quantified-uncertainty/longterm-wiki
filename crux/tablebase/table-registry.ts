@@ -29,6 +29,7 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncPath: '/api/personnel/sync',
     syncMethod: 'POST',
     syncBodyKey: 'items',
+    requireSourceCheck: true,
   },
   grants: {
     fetchByEntityPath: (id) => `/api/grants/by-entity/${encodeURIComponent(id)}`,
@@ -36,6 +37,7 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncPath: '/api/grants/batch-update-grantee',
     syncMethod: 'PATCH',
     syncBodyKey: 'items',
+    requireSourceCheck: true,
   },
   'funding-rounds': {
     fetchByEntityPath: (id) => `/api/funding-rounds/by-entity/${encodeURIComponent(id)}`,

@@ -113,6 +113,11 @@ vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 
+// Source-check bypass for tests that focus on FK validation, not source-check enforcement.
+// Personnel and grants have server-side source-check enforcement; this bypass ensures
+// these tests exercise entity-ref validation without being blocked by source-check.
+const SC_BYPASS = "forceSkipSourceCheck=true&reason=test";
+
 // ---- Helpers ----
 
 function seedEntity(id: string, stableId: string | null = null) {
@@ -157,7 +162,7 @@ describe("Entity FK validation", () => {
     it("rejects when personId does not exist in entities", async () => {
       seedEntity("org-acme", "acmeORG001");
 
-      const res = await postJson(app, "/api/personnel/sync", {
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "Pabcde1234",
@@ -179,7 +184,7 @@ describe("Entity FK validation", () => {
     it("rejects when organizationId does not exist in entities", async () => {
       seedEntity("person-john", "johnPER001");
 
-      const res = await postJson(app, "/api/personnel/sync", {
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "Pabcde1234",
@@ -202,7 +207,7 @@ describe("Entity FK validation", () => {
       seedEntity("person-john", "johnPER001");
       seedEntity("org-acme", "acmeORG001");
 
-      const res = await postJson(app, "/api/personnel/sync", {
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "Pabcde1234",
@@ -223,7 +228,7 @@ describe("Entity FK validation", () => {
       seedEntity("person-john", "johnPER001");
       seedEntity("org-acme", "acmeORG001");
 
-      const res = await postJson(app, "/api/personnel/sync", {
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "Pabcde1234",
@@ -250,7 +255,7 @@ describe("Entity FK validation", () => {
     it("skips validation with reason: 200 OK", async () => {
       const res = await postJson(
         app,
-        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
+        `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill&${SC_BYPASS}`,
         {
           items: [
             {
@@ -276,7 +281,7 @@ describe("Entity FK validation", () => {
 
       const res = await postJson(
         app,
-        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=%20%20",
+        `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=%20%20&${SC_BYPASS}`,
         {
           items: [
             {
@@ -313,7 +318,7 @@ describe("Entity FK validation", () => {
 
       const res = await postJson(
         app,
-        "/api/personnel/sync?skipEntityValidation=true",
+        `/api/personnel/sync?skipEntityValidation=true&${SC_BYPASS}`,
         {
           items: [
             {
@@ -344,7 +349,7 @@ describe("Entity FK validation", () => {
 
       const res = await postJson(
         app,
-        "/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill%20with%20reason",
+        `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill%20with%20reason&${SC_BYPASS}`,
         {
           items: [
             {
@@ -371,7 +376,7 @@ describe("Entity FK validation", () => {
     });
 
     it("reports multiple missing fields in one error", async () => {
-      const res = await postJson(app, "/api/personnel/sync", {
+      const res = await postJson(app, `/api/personnel/sync?${SC_BYPASS}`, {
         items: [
           {
             id: "Pabcde1234",

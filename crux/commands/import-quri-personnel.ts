@@ -160,7 +160,10 @@ async function syncCommand(
     return { exitCode: 0, output: lines.join('\n') };
   }
 
-  const result = await syncPersonnel(QURI_PERSONNEL);
+  const result = await syncPersonnel(QURI_PERSONNEL, {
+    forceSkipSourceCheck: true,
+    forceSkipSourceCheckReason: 'bulk-import: curated QURI personnel data',
+  });
 
   if (!result.ok) {
     lines.push(`\n  Sync failed: ${result.message}`);

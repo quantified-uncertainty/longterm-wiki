@@ -29,8 +29,9 @@ const MANIFEST_DIR = join(PROJECT_ROOT, 'data', 'tablebase-manifests');
 
 /** Tables where hard enforcement is active — --force cannot override these */
 const HARD_ENFORCED_TABLES: string[] = [
-  // Populated as tables reach >70% coverage (Phase 5, Discussion #3875).
-  // Example: 'personnel' once personnel source-check coverage >70%.
+  // Phase 5 hard enforcement (Discussion #3875), enabled 2026-04-08:
+  'personnel',
+  'grants',
 ];
 
 const cliArgs = process.argv.slice(2);
