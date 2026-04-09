@@ -7,4 +7,6 @@ contentFormat: dashboard
 lastEdited: "2026-02-27"
 ---
 
+Each row is one execution of the auto-update pipeline (`pnpm crux w auto-update run`). Check this after a scheduled or manual run to see how many pages were updated, what it cost, and whether any sources failed to fetch. If a run shows 0 pages updated, check the news digest for that day — it may mean no relevant news was found.
+
 <AutoUpdateRunsContent />

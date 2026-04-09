@@ -538,6 +538,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;
+    let claimLinkingError: string | null = null;
     if (allClaimIds.length > 0) {
       try {
         const rawDb = getDb();
@@ -549,11 +550,12 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         claimsLinked = linkResult.linked;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
+        claimLinkingError = msg;
         logger.warn({ error: msg }, "claim linking failed (records already committed)");
       }
     }
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
   })
 
   // ---- POST /delete ----

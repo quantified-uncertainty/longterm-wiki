@@ -171,7 +171,7 @@ const recordLookupApp = new Hono()
         rows = await db
           .select()
           .from(table)
-          .where(eq((table as any).id, sourceId))
+          .where(eq((table as any).id, sourceId)) // as-any-ok: generic PgTable type erases column types; sourceTable validated via Zod enum whitelist above
           .limit(1);
       }
     } catch (err) {

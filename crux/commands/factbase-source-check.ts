@@ -21,7 +21,7 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, Property } from '../../packages/factbase/src/types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { storeEvidence as storeEvidenceApi, storeVerdict as storeVerdictApi } from '../lib/wiki-server/source-check-client.ts';
+import { storeSourceCheckEvidence, storeAggregateVerdict } from '../lib/source-check/verdict-handler.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/source-check/source-fetcher.ts';
 import {
@@ -85,6 +85,11 @@ interface SourceCheckSummary {
   outdated: number;
   partial: number;
   errors: number;
+  /**
+   * Number of times the storage call (storeSourceCheckResult) failed for an
+   * otherwise-successful verdict. Issue #4017. Drives a non-zero exit code.
+   */
+  storageErrors: number;
   results: SourceCheckResult[];
   failures: SourceCheckError[];
 }
@@ -215,47 +220,42 @@ async function verifySingleFact(
 
 /**
  * Store a source-check result in the wiki-server database.
- * Best-effort: logs a warning on failure but does not block the pipeline.
+ *
+ * Uses {@link storeSourceCheckEvidence} (not the raw `storeEvidence` RPC) so the
+ * resourceId is auto-resolved from the source URL via lookupResourceByUrl().
+ * Issue #4017 — the previous direct RPC call left resourceId blank.
+ *
+ * Throws on storage failure so the caller can track and surface losses.
+ *
+ * Exported for unit testing — not part of the command's public API.
  */
-async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> {
-  const body = {
+export async function storeSourceCheckResult(result: SourceCheckResult): Promise<void> {
+  await storeSourceCheckEvidence({
     recordType: 'fact',
     recordId: result.factId,
+    entityId: result.entityId,
+    sourceUrl: result.sourceUrl,
     verdict: result.verdict,
     confidence: result.confidence,
     extractedValue: result.extractedValue,
-    checkerModel: 'claude-3-haiku', // matches MODELS.haiku used in verifySingleFact
+    reasoning: result.reasoning,
     isPrimarySource: true,
-    notes: result.reasoning,
-    sourceUrl: result.sourceUrl,
-  };
-
-  const response = await storeEvidenceApi(
-    body,
-  );
-
-  if (!response.ok) {
-    console.warn(`[fb-source-check] Failed to store evidence for ${result.factId}: ${response.error}`);
-  }
+    // PR #4020 review M1: was 'claude-3-haiku' (a non-existent model string)
+    // — must match MODELS.haiku used in verifySingleFact above.
+    checkerModel: MODELS.haiku,
+  }, '[fb-source-check]');
 
   // Also store aggregate verdict so re-runs update the displayed verdict.
   // Without this, stale contradictions persist even after re-checks confirm data.
-  const verdictBody = {
+  await storeAggregateVerdict({
     recordType: 'fact',
     recordId: result.factId,
+    entityId: result.entityId,
     verdict: result.verdict,
     confidence: result.confidence,
     reasoning: result.reasoning,
     sourcesChecked: 1,
-  };
-
-  const verdictResponse = await storeVerdictApi(
-    verdictBody,
-  );
-
-  if (!verdictResponse.ok) {
-    console.warn(`[fb-source-check] Failed to store verdict for ${result.factId}: ${verdictResponse.error}`);
-  }
+  }, '[fb-source-check]');
 }
 
 /**
@@ -384,6 +384,7 @@ export async function sourceCheckCommand(
     outdated: 0,
     partial: 0,
     errors: 0,
+    storageErrors: 0,
     results: [],
     failures: [],
   };
@@ -416,17 +417,25 @@ export async function sourceCheckCommand(
         console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
       }
 
-      // Store result in wiki-server (best-effort, does not block pipeline)
-      storeSourceCheckResult(result).catch((e: unknown) => {
+      // Store result in wiki-server. Issue #4017 — this used to be silent
+      // fire-and-forget; now it tracks failures so the exit code reflects them.
+      try {
+        await storeSourceCheckResult(result);
+      } catch (e: unknown) {
+        summary.storageErrors++;
         console.warn(`[fb-source-check] Failed to store result for ${result.factId}: ${e instanceof Error ? e.message : String(e)}`);
-      });
+      }
     }
   }
+
+  // Storage errors mean primary-data writes were lost — non-zero exit even if
+  // no contradictions were found. Issue #4017.
+  const exitCode = summary.contradicted > 0 || summary.storageErrors > 0 ? 1 : 0;
 
   // Build output
   if (options.ci) {
     return {
-      exitCode: summary.contradicted > 0 ? 1 : 0,
+      exitCode,
       output: JSON.stringify(summary),
     };
   }
@@ -500,8 +509,13 @@ export async function sourceCheckCommand(
     }
   }
 
+  if (summary.storageErrors > 0) {
+    lines.push('');
+    lines.push(`\x1b[31mStorage errors: ${summary.storageErrors} verdict(s) failed to persist to wiki-server. Re-run after the underlying issue is fixed.\x1b[0m`);
+  }
+
   return {
-    exitCode: summary.contradicted > 0 ? 1 : 0,
+    exitCode,
     output: lines.join('\n'),
   };
 }

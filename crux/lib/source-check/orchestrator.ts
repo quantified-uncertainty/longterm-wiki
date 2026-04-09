@@ -194,6 +194,7 @@ export async function orchestrateCommand(
     partial: 0,
     errors: 0,
     deadLinks: 0,
+    storageErrors: 0,
     estimatedCost: useBatch ? estimatedCost * 0.5 : estimatedCost,
     actualVerified: 0,
     byKind: {
@@ -217,14 +218,17 @@ export async function orchestrateCommand(
   }
 
   // ── Build summary output ──
+  // Storage errors mean primary-data writes were lost — non-zero exit even
+  // if no contradictions were found. Issue #4017.
+  const exitCode = summary.contradicted > 0 || summary.storageErrors > 0 ? 1 : 0;
   if (options.ci) {
     return {
-      exitCode: summary.contradicted > 0 ? 1 : 0,
+      exitCode,
       output: JSON.stringify(summary),
     };
   }
 
-  return { exitCode: summary.contradicted > 0 ? 1 : 0, output: formatSummaryOutput(summary) };
+  return { exitCode, output: formatSummaryOutput(summary) };
 }
 
 // ── Batch execution path ─────────────────────────────────────────────
@@ -269,9 +273,13 @@ async function runBatchExecution(
           summary.results.push(deterministicResult);
           console.log(`  ${progress} ${item.description.slice(0, 80)}`);
           console.log(`    \x1b[32mdeterministic: ${deterministicResult.verdict}\x1b[0m`);
-          await storeResult(item, deterministicResult).catch((e: unknown) => {
+          // Issue #4017: storage failure must surface, not be silently swallowed.
+          try {
+            await storeResult(item, deterministicResult);
+          } catch (e: unknown) {
+            summary.storageErrors++;
             console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
-          });
+          }
           return;
         }
       } catch (e: unknown) {
@@ -329,9 +337,13 @@ async function runBatchExecution(
           summary.results.push(deadLinkResult);
           console.log(`  ${progress} ${item.description.slice(0, 80)}`);
           console.log(`    \x1b[33mdead_link: unverifiable\x1b[0m`);
-          await storeResult(item, deadLinkResult).catch((e: unknown) => {
+          // Issue #4017: storage failure must surface, not be silently swallowed.
+          try {
+            await storeResult(item, deadLinkResult);
+          } catch (e: unknown) {
+            summary.storageErrors++;
             console.warn(`[source-check] Storage failed: ${e instanceof Error ? e.message : String(e)}`);
-          });
+          }
           return;
         }
         summary.errors++;
@@ -493,9 +505,13 @@ async function runBatchExecution(
       console.log(`  ${item.description.slice(0, 80)}`);
       console.log(`    ${color}${verdict}\x1b[0m (confidence: ${(confidence * 100).toFixed(0)}%)`);
 
-      await storeResult(item, verifyResult).catch((e: unknown) => {
+      // Issue #4017: storage failure must surface, not be silently swallowed.
+      try {
+        await storeResult(item, verifyResult);
+      } catch (e: unknown) {
+        summary.storageErrors++;
         console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-      });
+      }
     }
   }
 }
@@ -551,10 +567,13 @@ async function runRealtimeExecution(
         console.log(`    Source says: ${result.extractedValue.slice(0, 100)}`);
       }
 
-      // Store result (best-effort)
-      await storeResult(item, result).catch((e: unknown) => {
+      // Issue #4017: storage failure must surface, not be silently swallowed.
+      try {
+        await storeResult(item, result);
+      } catch (e: unknown) {
+        summary.storageErrors++;
         console.warn(`    \x1b[33mStorage failed: ${e instanceof Error ? e.message : String(e)}\x1b[0m`);
-      });
+      }
     }
   }
 
@@ -683,6 +702,11 @@ function formatSummaryOutput(summary: OrchestrationSummary): string {
   lines.push(`\x1b[33mOutdated:       ${summary.outdated}\x1b[0m`);
   lines.push(`\x1b[33mPartial:        ${summary.partial}\x1b[0m`);
   lines.push(`\x1b[31mErrors:         ${summary.errors}\x1b[0m`);
+  if (summary.storageErrors > 0) {
+    lines.push(
+      `\x1b[31mStorage errors: ${summary.storageErrors} verdict(s) computed but NOT persisted to wiki-server. Re-run after the underlying issue is fixed (issue #4017).\x1b[0m`,
+    );
+  }
   if (summary.deadLinks > 0) {
     // Derive unit price from the (possibly batch-discounted) estimated cost
     const unitCost = summary.total > 0

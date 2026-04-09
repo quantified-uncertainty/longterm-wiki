@@ -977,6 +977,280 @@ async function categories(_args: string[], options: CommandOptions): Promise<Com
 }
 
 // ---------------------------------------------------------------------------
+// Agent-project frontmatter parser
+// ---------------------------------------------------------------------------
+
+export interface AgentProjectMeta {
+  priority?: string;
+  status?: string;
+  phases_total?: number;
+  phases_done?: number;
+  last_agent_session?: string;
+  blocker?: string;
+}
+
+/**
+ * Parse the `<!-- agent-project ... -->` HTML comment block from a discussion body.
+ * Returns null if no block found.
+ */
+export function parseAgentProjectMeta(body: string): AgentProjectMeta | null {
+  const match = body.match(/<!--\s*agent-project\s*\n([\s\S]*?)-->/);
+  if (!match) return null;
+
+  const meta: AgentProjectMeta = {};
+  let hasRecognizedKey = false;
+  for (const line of match[1].split('\n')) {
+    const kv = line.match(/^\s*(\w[\w_]*):\s*(.+?)\s*$/);
+    if (!kv) continue;
+    const [, key, val] = kv;
+    const safeInt = (s: string): number | undefined => {
+      const n = parseInt(s, 10);
+      return isNaN(n) ? undefined : n;
+    };
+    switch (key) {
+      case 'priority': meta.priority = val; hasRecognizedKey = true; break;
+      case 'status': meta.status = val; hasRecognizedKey = true; break;
+      case 'phases_total': meta.phases_total = safeInt(val); hasRecognizedKey = true; break;
+      case 'phases_done': meta.phases_done = safeInt(val); hasRecognizedKey = true; break;
+      case 'last_agent_session': meta.last_agent_session = val; hasRecognizedKey = true; break;
+      case 'blocker': meta.blocker = val; hasRecognizedKey = true; break;
+    }
+  }
+  return hasRecognizedKey ? meta : null;
+}
+
+// ---------------------------------------------------------------------------
+// Audit
+// ---------------------------------------------------------------------------
+
+interface AuditFinding {
+  category: 'drift' | 'stale' | 'orphaned' | 'missing_frontmatter';
+  number: number;
+  title: string;
+  detail: string;
+  meta: AgentProjectMeta | null;
+}
+
+/** Input for classifying a single discussion into audit findings. */
+export interface AuditDiscussionInput {
+  number: number;
+  title: string;
+  body: string;
+  createdAt: string;
+  commentCount: number;
+}
+
+/**
+ * Classify a single discussion into zero or more audit findings.
+ *
+ * Pure function — no I/O, no side effects, independently testable.
+ *
+ * Rules:
+ *   - drift: phases_done >= phases_total or status is complete/done
+ *   - stale: in-progress with last_agent_session > 30 days ago
+ *   - orphaned: 0 comments, 0 linked issues, > 14 days old
+ *   - missing_frontmatter: no agent-project block, > 7 days old (advisory)
+ */
+export function classifyDiscussion(d: AuditDiscussionInput, now: Date): AuditFinding[] {
+  const findings: AuditFinding[] = [];
+  const meta = parseAgentProjectMeta(d.body);
+  const linkedIssues = extractLinkedIssues(d.body);
+  const ageInDays = (now.getTime() - new Date(d.createdAt).getTime()) / (1000 * 60 * 60 * 24);
+
+  if (meta) {
+    // Drift: phases complete or status done but still open
+    if (
+      (meta.phases_total != null && meta.phases_done != null &&
+       meta.phases_done >= meta.phases_total) ||
+      meta.status === 'complete' || meta.status === 'done'
+    ) {
+      findings.push({
+        category: 'drift',
+        number: d.number,
+        title: d.title,
+        detail: meta.phases_total != null
+          ? `phases_done: ${meta.phases_done}/${meta.phases_total}, status: ${meta.status ?? 'n/a'}`
+          : `status: ${meta.status}`,
+        meta,
+      });
+    }
+
+    // Stale in-progress: last_agent_session > 30 days ago
+    if (meta.status === 'in-progress' && meta.last_agent_session) {
+      const lastSession = new Date(meta.last_agent_session);
+      const daysSinceSession = (now.getTime() - lastSession.getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceSession > 30) {
+        findings.push({
+          category: 'stale',
+          number: d.number,
+          title: d.title,
+          detail: `last_agent_session: ${meta.last_agent_session} (${Math.floor(daysSinceSession)} days ago)`,
+          meta,
+        });
+      }
+    }
+  } else {
+    // Missing frontmatter (advisory, only for discussions > 7 days old)
+    if (ageInDays > 7) {
+      findings.push({
+        category: 'missing_frontmatter',
+        number: d.number,
+        title: d.title,
+        detail: `created ${d.createdAt.split('T')[0]}, ${d.commentCount} comments`,
+        meta: null,
+      });
+    }
+  }
+
+  // Orphaned: 0 comments, 0 linked issues, > 14 days old
+  if (d.commentCount === 0 && linkedIssues.length === 0 && ageInDays > 14) {
+    findings.push({
+      category: 'orphaned',
+      number: d.number,
+      title: d.title,
+      detail: `created ${d.createdAt.split('T')[0]}, 0 comments, 0 linked issues`,
+      meta: parseAgentProjectMeta(d.body),
+    });
+  }
+
+  return findings;
+}
+
+/**
+ * Audit open discussions for lifecycle issues.
+ *
+ * Detects:
+ *   - drift: open discussions where phases_done == phases_total or status is complete/done
+ *   - stale: in-progress discussions with last_agent_session > 30 days ago
+ *   - orphaned: 0-comment, 0-linked-issue planning docs > 14 days old
+ *   - missing_frontmatter: discussions with no agent-project block (advisory)
+ */
+async function audit(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const c = log.colors;
+
+  // Fetch all open discussions (paginated)
+  let allDiscussions: Discussion[] = [];
+  let hasNextPage = true;
+  let endCursor: string | null = null;
+
+  while (hasNextPage) {
+    const variables: Record<string, unknown> = {
+      owner: OWNER,
+      name: REPO_NAME,
+      ...(endCursor ? { after: endCursor } : {}),
+    };
+
+    const data = await githubGraphQL<{
+      repository: {
+        discussions: {
+          nodes: Discussion[];
+          pageInfo: { hasNextPage: boolean; endCursor: string | null };
+        };
+      };
+    }>(
+      `query($owner: String!, $name: String!, $after: String) {
+        repository(owner: $owner, name: $name) {
+          discussions(
+            first: 100,
+            orderBy: { field: UPDATED_AT, direction: DESC },
+            after: $after,
+            states: OPEN
+          ) {
+            pageInfo { hasNextPage endCursor }
+            nodes {
+              id number title body url createdAt updatedAt closed
+              category { name }
+              labels(first: 10) { nodes { name } }
+              comments { totalCount }
+            }
+          }
+        }
+      }`,
+      variables,
+    );
+
+    allDiscussions = allDiscussions.concat(data.repository.discussions.nodes);
+    hasNextPage = data.repository.discussions.pageInfo.hasNextPage;
+    endCursor = data.repository.discussions.pageInfo.endCursor;
+  }
+
+  const now = new Date();
+  const findings: AuditFinding[] = [];
+
+  for (const d of allDiscussions) {
+    findings.push(...classifyDiscussion({
+      number: d.number,
+      title: d.title,
+      body: d.body,
+      createdAt: d.createdAt,
+      commentCount: d.comments.totalCount,
+    }, now));
+  }
+
+  // Sort findings by severity: drift > stale > orphaned > missing_frontmatter
+  const severityOrder: Record<string, number> = {
+    drift: 0,
+    stale: 1,
+    orphaned: 2,
+    missing_frontmatter: 3,
+  };
+  findings.sort((a, b) => severityOrder[a.category] - severityOrder[b.category]);
+
+  if (options.ci) {
+    return {
+      output: JSON.stringify({
+        total_open: allDiscussions.length,
+        findings,
+        summary: {
+          drift: findings.filter((f) => f.category === 'drift').length,
+          stale: findings.filter((f) => f.category === 'stale').length,
+          orphaned: findings.filter((f) => f.category === 'orphaned').length,
+          missing_frontmatter: findings.filter((f) => f.category === 'missing_frontmatter').length,
+        },
+      }, null, 2),
+      exitCode: findings.some((f) => f.category === 'drift') ? 1 : 0,
+    };
+  }
+
+  // Human-readable output
+  let output = `${c.bold}${c.blue}Discussion Audit${c.reset}\n`;
+  output += `${c.dim}${allDiscussions.length} open discussions scanned${c.reset}\n\n`;
+
+  const categories: Array<{ key: AuditFinding['category']; label: string; color: string }> = [
+    { key: 'drift', label: 'DRIFT (complete but still open)', color: c.red },
+    { key: 'stale', label: 'STALE IN-PROGRESS (no activity >30 days)', color: c.yellow },
+    { key: 'orphaned', label: 'ORPHANED PLANS (0 comments / 0 issues, >14 days)', color: c.yellow },
+    { key: 'missing_frontmatter', label: 'MISSING FRONTMATTER (>7 days, advisory)', color: c.dim },
+  ];
+
+  let hasFindings = false;
+  for (const cat of categories) {
+    const catFindings = findings.filter((f) => f.category === cat.key);
+    if (catFindings.length === 0) continue;
+    hasFindings = true;
+    output += `${cat.color}${cat.label}:${c.reset}\n`;
+    for (const f of catFindings) {
+      output += `  ${c.cyan}#${f.number}${c.reset} ${f.title}\n`;
+      output += `    ${c.dim}${f.detail}${c.reset}\n`;
+    }
+    output += '\n';
+  }
+
+  if (!hasFindings) {
+    output += `${c.green}✓ No lifecycle issues found.${c.reset}\n`;
+  } else {
+    const driftCount = findings.filter((f) => f.category === 'drift').length;
+    const staleCount = findings.filter((f) => f.category === 'stale').length;
+    const orphanedCount = findings.filter((f) => f.category === 'orphaned').length;
+    output += `${c.bold}Summary:${c.reset} ${driftCount} drift, ${staleCount} stale, ${orphanedCount} orphaned\n`;
+  }
+
+  const hasDrift = findings.some((f) => f.category === 'drift');
+  return { output, exitCode: hasDrift ? 1 : 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Export
 // ---------------------------------------------------------------------------
 
@@ -992,6 +1266,7 @@ export const commands = {
   status,
   close,
   categories,
+  audit,
 };
 
 export function getHelp(): string {
@@ -1014,6 +1289,7 @@ of agent activity.
   crux gh epic status <N>                       Progress bar + linked issue status
   crux gh epic close <N> [--reason=outdated]    Close a completed epic
   crux gh epic categories                       List discussion categories
+  crux gh epic audit [--ci]                     Audit open discussions for lifecycle issues
 
 \x1b[1mOptions:\x1b[0m
   --body=<text>          Inline body text

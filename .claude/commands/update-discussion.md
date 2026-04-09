@@ -103,6 +103,13 @@ mutation {
 
 If the discussion body has an `<!-- agent-project -->` metadata block, update `last_agent_session` to today's date and adjust `phases_done` if applicable.
 
+**If `phases_done == phases_total` (or `status: done`) after your update, close the discussion.** Open discussions with all phases done accumulate as ambient noise that future cleanup sweeps have to triage. Run:
+
+```bash
+pnpm crux gh epic comment <N> "All phases complete. Closing per status update."
+pnpm crux gh epic close <N>
+```
+
 ## What this is NOT
 
 - This is not `/work-on-discussion` — you are **reporting**, not implementing

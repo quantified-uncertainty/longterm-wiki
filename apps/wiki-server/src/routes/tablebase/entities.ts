@@ -926,16 +926,27 @@ const entitiesApp = new Hono()
         // If a slug was reassigned to a different stableId, the old row's
         // slug is set to a title-derived fallback (with "-displaced" suffix)
         // instead of the raw stable_id, to avoid exposing machine IDs in URLs.
-        const slugToStableId = new Map(allVals.map((v) => [v.id, v.stableId]));
-        for (const [slug, stableId] of slugToStableId) {
-          // Reassign to title-derived slug instead of raw stable_id
+        // Issue #4017 D3: Consolidate the per-slug UPDATE loop into a single
+        // bulk statement. The old loop issued N individual UPDATEs followed by
+        // a batch INSERT — a concurrent sync request could interleave between
+        // them, claiming a slug that was about to be displaced.
+        //
+        // The bulk UPDATE uses unnest() to match ALL incoming slugs in one
+        // atomic statement, displacing any stale slug assignments before the
+        // INSERT runs. Both statements are inside the same transaction (tx),
+        // so the sequence is serialized against concurrent syncs.
+        const slugs = allVals.map((v) => v.id);
+        const stableIds = allVals.map((v) => v.stableId);
+        if (slugs.length > 0) {
           await tx.execute(sql`
-            UPDATE entities
+            UPDATE entities e
             SET id = LOWER(REGEXP_REPLACE(
-              REGEXP_REPLACE(TRANSLATE(title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
+              REGEXP_REPLACE(TRANSLATE(e.title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
               '-+', '-', 'g'
-            )) || '-displaced-' || SUBSTRING(stable_id FROM 5 FOR 6)
-            WHERE id = ${slug} AND stable_id != ${stableId}
+            )) || '-displaced-' || SUBSTRING(e.stable_id FROM 5 FOR 6)
+            FROM unnest(${slugs}::text[], ${stableIds}::text[])
+              AS incoming(slug, sid)
+            WHERE e.id = incoming.slug AND e.stable_id != incoming.sid
           `);
         }
 

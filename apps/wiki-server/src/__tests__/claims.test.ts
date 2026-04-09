@@ -375,6 +375,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("creates separate jobs for claims with different sourceUrls and no resourceId", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         { claimText: "Claim about paper A", sourceUrl: "https://arxiv.org/paper-a" },
@@ -409,6 +410,7 @@ describe("Claims API — POST /api/claims/propose", () => {
     }));
 
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims,
     });
@@ -441,6 +443,7 @@ describe("Claims API — POST /api/claims/propose", () => {
     ];
 
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims,
     });
@@ -460,6 +463,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("returns 201 with correct structure for a basic propose request", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "openai",
       targetTable: "facts",
       claims: [
         { claimText: "OpenAI was founded in 2015", sourceUrl: "https://en.wikipedia.org/wiki/OpenAI" },
@@ -481,6 +485,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("stores numeric claimIds in job params (not strings from bigserial)", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         { claimText: "Claim 1", sourceUrl: "https://example.com/a" },
@@ -501,6 +506,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("returns numeric claim IDs and job IDs in response", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         { claimText: "Test claim", sourceUrl: "https://example.com" },
@@ -517,6 +523,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("rejects empty claims array", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [],
     });
@@ -526,6 +533,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
   it("rejects missing targetTable", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       claims: [{ claimText: "test", sourceUrl: "https://example.com" }],
     });
 
@@ -549,6 +557,7 @@ describe("Claims API — GET /api/claims/all", () => {
   it("returns paginated claims list", async () => {
     // Seed some claims first
     await postJson(app, "/api/claims/propose", {
+      entityId: "anthropic",
       targetTable: "personnel",
       claims: [
         { claimText: "Claim A", sourceUrl: "https://example.com/a" },
@@ -590,6 +599,7 @@ describe("Claims API — GET /api/claims/stats", () => {
   it("returns aggregate claim metrics", async () => {
     // Seed claims
     await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         { claimText: "Claim 1", sourceUrl: "https://example.com/1" },

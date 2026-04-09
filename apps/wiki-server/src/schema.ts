@@ -831,7 +831,14 @@ export const resourceTabularSources = pgTable("resource_tabular_sources", {
   /** Frictionless-inspired field descriptions */
   sourceSchema: jsonb("source_schema").$type<Record<string, unknown>>(),
   /** { strategy, matchFields, fuzzyFields, exactFields } */
-  verificationConfig: jsonb("verification_config").$type<Record<string, unknown>>(),
+  /** Source-check verification strategy. Shape: { strategy, matchFields?, fuzzyFields?, exactFields? }. Issue #4017 B5. */
+  verificationConfig: jsonb("verification_config").$type<{
+    strategy: string;
+    matchFields?: string[];
+    fuzzyFields?: string[];
+    exactFields?: string[];
+    [key: string]: unknown;
+  }>(),
   /** active | archived | defunct */
   sourceStatus: text("source_status").notNull().default("active"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -1400,6 +1407,9 @@ export const serviceHealthIncidents = pgTable(
     index("idx_shi_severity").on(table.severity),
     index("idx_shi_detected_at").on(table.detectedAt),
     index("idx_shi_service_status").on(table.service, table.status),
+    uniqueIndex("idx_shi_open_service_title")
+      .on(table.service, table.title)
+      .where(sql`status = 'open'`),
   ]
 );
 
@@ -1774,14 +1784,14 @@ export const personnel = pgTable(
     /** FK to entities.stable_id for the person. Null when unresolved. */
     personEntityId: text("person_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when person doesn't have an entity. */
     personDisplayName: text("person_display_name"),
     /** FK to entities.stable_id for the organization. Null when unresolved. */
     orgEntityId: text("org_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when org doesn't have an entity. */
     orgDisplayName: text("org_display_name"),
@@ -1834,14 +1844,14 @@ export const grants = pgTable(
     /** FK to entities.stable_id for the grantor organization. Null when unresolved. */
     orgEntityId: text("org_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when grantor org doesn't have an entity. */
     orgDisplayName: text("org_display_name"),
     /** FK to entities.stable_id for the grantee. Null when unresolved. */
     granteeEntityId: text("grantee_entity_id").references(
       () => entities.stableId,
-      { onDelete: "set null" }
+      { onDelete: "restrict" }
     ),
     /** Display name fallback when grantee doesn't have an entity. */
     granteeDisplayName: text("grantee_display_name"),

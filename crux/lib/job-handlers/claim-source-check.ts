@@ -23,6 +23,7 @@ import { SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES } from '../source-check/prompt-g
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { storeSourceCheckEvidence } from '../source-check/verdict-handler.ts';
 import { apiRequest } from '../wiki-server/client.ts';
+import { storeClaimVerdicts } from '../wiki-server/claims.ts';
 import type { JobHandlerResult, JobHandlerContext } from './types.ts';
 import { z } from 'zod';
 
@@ -220,7 +221,7 @@ export async function handleClaimSourceCheck(
     const MAX_VERDICTS_PER_REQUEST_NS = 100;
     for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST_NS) {
       const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST_NS);
-      const result = await apiRequest<{ updated: number; total: number }>('POST', '/api/claims/verdicts', { verdicts: batch });
+      const result = await storeClaimVerdicts(batch);
 
       if (!result.ok) {
         return {
@@ -317,24 +318,31 @@ export async function handleClaimSourceCheck(
   }
 
   // 4. Store evidence for each verified claim
+  // Issue #4017 — evidence is primary data, not telemetry. A storage failure
+  // here means the verdict will be written to proposed_claims (step 5) but
+  // the evidence row that supports it never landed in the DB. Track failures
+  // and surface them by failing the job; the worker will retry per maxRetries.
+  let evidenceStorageFailures = 0;
   for (const r of allResults) {
     const claim = claims.find((cl) => Number(cl.id) === r.claimId);
     if (!claim) continue;
 
-    await storeSourceCheckEvidence({
-      recordType: (claim.target_table || 'fact') as 'fact',
-      recordId: String(claim.id),
-      sourceUrl: claim.source_url,
-      verdict: r.verdict,
-      confidence: r.confidence,
-      extractedValue: r.extractedValue,
-      reasoning: r.reasoning,
-      entityId: (entityId as string) ?? null,
-    }).catch((e: unknown) => {
-      // Best-effort: evidence storage failure shouldn't block verdict updates
+    try {
+      await storeSourceCheckEvidence({
+        recordType: (claim.target_table || 'fact') as 'fact',
+        recordId: String(claim.id),
+        sourceUrl: claim.source_url,
+        verdict: r.verdict,
+        confidence: r.confidence,
+        extractedValue: r.extractedValue,
+        reasoning: r.reasoning,
+        entityId: (entityId as string) ?? null,
+      });
+    } catch (e: unknown) {
+      evidenceStorageFailures++;
       const msg = e instanceof Error ? e.message : String(e);
       console.warn(`[claim-source-check] Failed to store evidence for claim ${r.claimId}: ${msg}`);
-    });
+    }
   }
 
   // 5. Update claim verdicts via the verdicts endpoint
@@ -361,11 +369,7 @@ export async function handleClaimSourceCheck(
   const MAX_VERDICTS_PER_REQUEST = 100;
   for (let i = 0; i < verdicts.length; i += MAX_VERDICTS_PER_REQUEST) {
     const batch = verdicts.slice(i, i + MAX_VERDICTS_PER_REQUEST);
-    const updateResult = await apiRequest<{ updated: number; total: number }>(
-      'POST',
-      '/api/claims/verdicts',
-      { verdicts: batch },
-    );
+    const updateResult = await storeClaimVerdicts(batch);
 
     if (!updateResult.ok) {
       return {
@@ -391,6 +395,28 @@ export async function handleClaimSourceCheck(
   const unverifiable = allResults.filter((r) => r.verdict === 'unverifiable').length + errors.length;
   const partial = allResults.filter((r) => r.verdict === 'partial').length;
   const outdated = allResults.filter((r) => r.verdict === 'outdated').length;
+
+  // Issue #4017 — if evidence rows failed to persist, mark the job as failed
+  // even though the verdicts were written. The worker's retry path will
+  // re-run the storage attempts (storeSourceCheckEvidence is idempotent).
+  if (evidenceStorageFailures > 0) {
+    return {
+      success: false,
+      data: {
+        batchId,
+        resourceId,
+        totalClaims: claims.length,
+        confirmed,
+        contradicted,
+        unverifiable,
+        partial,
+        outdated,
+        errors: errors.length,
+        evidenceStorageFailures,
+      },
+      error: `${evidenceStorageFailures} of ${allResults.length} evidence row(s) failed to persist to wiki-server`,
+    };
+  }
 
   return {
     success: true,

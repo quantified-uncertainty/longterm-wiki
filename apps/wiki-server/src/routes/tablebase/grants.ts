@@ -30,6 +30,7 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
+import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -493,17 +494,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    // Validate programId references
-    const skipValidation = c.req.query("skipEntityValidation") === "true";
-    if (!skipValidation) {
+    // Validate programId references (skip if requested via shouldSkipEntityValidation)
+    if (!shouldSkipEntityValidation(c)) {
       const programIds = items.map((item) => item.programId);
       const invalid = await findInvalidProgramIds(db, programIds);
       if (invalid.length > 0) {
-        return validationError(
-          c,
-          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
-          `Use ?skipEntityValidation=true to bypass.`,
-        );
+        // skipEntityValidation-ok: error message tells callers how to bypass after providing a reason
+        const msg = `programId references not found in funding_programs: ${invalid.join(", ")}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`;
+        return validationError(c, msg);
       }
     }
 
@@ -608,19 +606,27 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const sourceCheckError = enforceSourceCheck(c, "grants", items);
     if (sourceCheckError) return sourceCheckError;
 
-    // Validate programId references (skip if skipEntityValidation is set)
-    const skipValidation = c.req.query("skipEntityValidation") === "true";
-    if (!skipValidation) {
+    // Validate entity FK references for organizationId only.
+    // granteeId is a LEGACY field that can hold either an entity ID or a
+    // display name string (grant-import falls back to granteeName when no
+    // entity match is found). Validating it would reject ~thousands of
+    // grants with display-name granteeIds. The real entity FK is
+    // granteeEntityId, which is validated by resolveEntityFKs downstream.
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
+    ]);
+    if (refError) return refError;
+
+    // Validate programId references (skip if requested via shouldSkipEntityValidation)
+    if (!shouldSkipEntityValidation(c)) {
       const programIds = items
         .map((item) => item.programId)
         .filter((id): id is string => id != null);
       const invalid = await findInvalidProgramIds(db, programIds);
       if (invalid.length > 0) {
-        return validationError(
-          c,
-          `programId references not found in funding_programs: ${invalid.join(", ")}. ` +
-          `Use ?skipEntityValidation=true to bypass.`,
-        );
+        // skipEntityValidation-ok: error message tells callers how to bypass after providing a reason
+        const msg = `programId references not found in funding_programs: ${invalid.join(", ")}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`;
+        return validationError(c, msg);
       }
     }
 
@@ -756,6 +762,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;
+    let claimLinkingError: string | null = null;
     if (allClaimIds.length > 0) {
       try {
         const rawDb = getDb();
@@ -767,11 +774,12 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         claimsLinked = linkResult.linked;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
+        claimLinkingError = msg;
         logger.warn({ error: msg }, "claim linking failed (records already committed)");
       }
     }
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
   })
 
   // ---- POST /delete-batch ----

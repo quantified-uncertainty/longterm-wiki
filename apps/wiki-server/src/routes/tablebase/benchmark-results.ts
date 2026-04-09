@@ -195,14 +195,14 @@ const benchmarkResultsApp = new Hono()
       }
     }
 
-    // Check modelIds against the entities table (skippable via ?skipEntityValidation=true
-    // because entity sync order may vary, but benchmark refs are always required).
-    if (c.req.query("skipEntityValidation") !== "true") {
-      const modelRefError = await validateEntityRefs(c, db, [
-        { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
-      ]);
-      if (modelRefError) return modelRefError;
-    }
+    // Check modelIds against the entities table. validateEntityRefs() handles
+    // the ?skipEntityValidation=true bypass internally and logs loudly when used
+    // (issue #4017). Entity sync order may vary, but benchmark refs are always
+    // required, hence the bypass exists for migration scenarios only.
+    const modelRefError = await validateEntityRefs(c, db, [
+      { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
+    ]);
+    if (modelRefError) return modelRefError;
 
     // Validate claim references
     const items = parsed.data.items;
@@ -280,6 +280,7 @@ const benchmarkResultsApp = new Hono()
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;
+    let claimLinkingError: string | null = null;
     if (allClaimIds.length > 0) {
       try {
         const rawDb = getDb();
@@ -291,11 +292,12 @@ const benchmarkResultsApp = new Hono()
         claimsLinked = linkResult.linked;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
+        claimLinkingError = msg;
         logger.warn({ error: msg }, "claim linking failed (records already committed)");
       }
     }
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked });
+    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
   });
 
 export const benchmarkResultsRoute = benchmarkResultsApp;

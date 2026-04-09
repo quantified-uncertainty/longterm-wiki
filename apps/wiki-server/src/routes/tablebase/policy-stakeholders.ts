@@ -12,6 +12,7 @@ import {
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -120,6 +121,15 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
 
     const { items } = parsed.data;
     const db = getDrizzleDb();
+
+    // Validate policyEntityId only. stakeholderEntityId is optional and may
+    // reference entities not yet synced to PG (build-data explicitly expects
+    // some to be missing — wiki-server-data.mjs has fallback logic for this).
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
+    ]);
+    if (refError) return refError;
+
     const now = new Date();
     let upserted = 0;
 

@@ -277,6 +277,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("rejects claim with XSS in claimText (stored correctly, not executed)", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -295,6 +296,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("rejects claim with SQL injection attempt in targetTable", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts; DROP TABLE proposed_claims; --",
       claims: [
         { claimText: "test", sourceUrl: "https://example.com" },
@@ -313,6 +315,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("handles maximum-length claim text (5000 chars)", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -326,6 +329,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("rejects claim text exceeding 5000 chars", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -344,6 +348,7 @@ describe("Claims API — adversarial HTTP requests", () => {
     }));
 
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims,
     });
@@ -361,6 +366,7 @@ describe("Claims API — adversarial HTTP requests", () => {
     }));
 
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims,
     });
@@ -392,6 +398,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("handles unicode in claim text", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -406,6 +413,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("rejects invalid sourceUrl format", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -420,6 +428,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("rejects claims with missing sourceUrl", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         { claimText: "test" },
@@ -427,6 +436,51 @@ describe("Claims API — adversarial HTTP requests", () => {
     });
 
     expect(res.status).toBe(400);
+  });
+
+  // Issue #4017 — claims with no entityId become orphan rows that the
+  // verification job cannot resolve, leaving them stuck in pending forever.
+  it("rejects propose request with missing entityId (issue #4017)", async () => {
+    const res = await postJson(app, "/api/claims/propose", {
+      targetTable: "facts",
+      claims: [
+        { claimText: "test claim", sourceUrl: "https://example.com" },
+      ],
+    });
+    expect(res.status).toBe(400);
+    // Sanity: nothing inserted
+    expect(claimStore).toHaveLength(0);
+    expect(jobStore).toHaveLength(0);
+  });
+
+  it("rejects propose request with empty-string entityId (issue #4017)", async () => {
+    const res = await postJson(app, "/api/claims/propose", {
+      entityId: "",
+      targetTable: "facts",
+      claims: [
+        { claimText: "test claim", sourceUrl: "https://example.com" },
+      ],
+    });
+    expect(res.status).toBe(400);
+    expect(claimStore).toHaveLength(0);
+  });
+
+  it("accepts propose request with valid entityId (issue #4017)", async () => {
+    const res = await postJson(app, "/api/claims/propose", {
+      entityId: "sid_AbCdEfGhIj",
+      targetTable: "facts",
+      claims: [
+        { claimText: "test claim", sourceUrl: "https://example.com" },
+      ],
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.claims).toHaveLength(1);
+    // The job params must carry the entityId so the verification handler
+    // can resolve it — not null/undefined.
+    expect(jobStore).toHaveLength(1);
+    const params = jobStore[0].params as { entityId: string };
+    expect(params.entityId).toBe("sid_AbCdEfGhIj");
   });
 
   it("handles multiple claims creating exactly 1 job per unique source URL", async () => {
@@ -437,6 +491,7 @@ describe("Claims API — adversarial HTTP requests", () => {
     }));
 
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims,
     });
@@ -449,6 +504,7 @@ describe("Claims API — adversarial HTTP requests", () => {
 
   it("correctly handles proposedData with nested objects", async () => {
     const res = await postJson(app, "/api/claims/propose", {
+      entityId: "test-entity",
       targetTable: "facts",
       claims: [
         {
@@ -473,6 +529,7 @@ describe("Claims API — adversarial HTTP requests", () => {
     for (let i = 0; i < 20; i++) {
       resetStores();
       const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
         targetTable: "facts",
         claims: [
           { claimText: "test", sourceUrl: "https://example.com" },

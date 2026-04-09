@@ -11,6 +11,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import {
   researchAreas,
   researchAreaOrganizations,
@@ -495,6 +496,11 @@ const researchAreasApp = new Hono()
 
     const db = getDrizzleDb();
     const { items } = parsed.data;
+
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
+    ]);
+    if (refError) return refError;
 
     const allVals = items.map((item) => ({
       researchAreaId: item.researchAreaId,

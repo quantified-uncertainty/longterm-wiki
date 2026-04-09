@@ -86,6 +86,15 @@ function seedFundingProgram(id: string) {
   });
 }
 
+function seedEntity(id: string, stableId?: string) {
+  entitiesStore.set(id, {
+    id,
+    stable_id: stableId ?? id,
+    entity_type: "organization",
+    title: `Entity ${id}`,
+  });
+}
+
 function patchJson(app: Hono, path: string, body: unknown) {
   return app.request(path, {
     method: "PATCH",
@@ -109,6 +118,7 @@ describe("Grants programId validation", () => {
 
   describe("POST /api/grants/sync", () => {
     it("accepts grants with null programId", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {
@@ -126,6 +136,7 @@ describe("Grants programId validation", () => {
     });
 
     it("accepts grants when programId exists in funding_programs", async () => {
+      seedEntity("org-test");
       seedFundingProgram("FP_ABC12345");
 
       const res = await postJson(app, "/api/grants/sync", {
@@ -145,6 +156,7 @@ describe("Grants programId validation", () => {
     });
 
     it("rejects grants when programId does not exist in funding_programs", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {
@@ -164,6 +176,7 @@ describe("Grants programId validation", () => {
     });
 
     it("reports all invalid programIds in one error", async () => {
+      seedEntity("org-test");
       seedFundingProgram("FP_VALID001");
 
       const res = await postJson(app, "/api/grants/sync", {
@@ -196,10 +209,13 @@ describe("Grants programId validation", () => {
       expect(body.message).not.toContain("FP_VALID001");
     });
 
-    it("skips validation when skipEntityValidation=true", async () => {
+    // PR #4023 review HIGH#1 — bypass requires a non-empty reason. The
+    // skipEntityValidation=true alone path now denies; only the form with
+    // skipEntityValidationReason=<why> succeeds.
+    it("skips validation when skipEntityValidation=true with a reason", async () => {
       const res = await postJson(
         app,
-        "/api/grants/sync?skipEntityValidation=true",
+        "/api/grants/sync?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
         {
           items: [
             {
@@ -215,7 +231,28 @@ describe("Grants programId validation", () => {
       expect(res.status).toBe(200);
     });
 
+    it("DENIES skipEntityValidation=true without a reason", async () => {
+      const res = await postJson(
+        app,
+        "/api/grants/sync?skipEntityValidation=true",
+        {
+          items: [
+            {
+              id: "G_12345678",
+              organizationId: "org-test",
+              name: "Test Grant",
+              programId: "NONEXIST01",
+            },
+          ],
+        },
+      );
+
+      // Validation runs and the program ref doesn't exist → 400
+      expect(res.status).toBe(400);
+    });
+
     it("accepts grants without programId field", async () => {
+      seedEntity("org-test");
       const res = await postJson(app, "/api/grants/sync", {
         items: [
           {
@@ -264,7 +301,22 @@ describe("Grants programId validation", () => {
       expect(body.message).not.toContain("FP_PROG0001");
     });
 
-    it("skips validation when skipEntityValidation=true", async () => {
+    // PR #4023 review HIGH#1 — bypass requires a non-empty reason.
+    it("skips validation when skipEntityValidation=true with a reason", async () => {
+      const res = await patchJson(
+        app,
+        "/api/grants/batch-update-program?skipEntityValidation=true&skipEntityValidationReason=test%20backfill",
+        {
+          items: [
+            { id: "G_00000001", programId: "NONEXIST01" },
+          ],
+        },
+      );
+
+      expect(res.status).toBe(200);
+    });
+
+    it("DENIES skipEntityValidation=true without a reason", async () => {
       const res = await patchJson(
         app,
         "/api/grants/batch-update-program?skipEntityValidation=true",
@@ -274,8 +326,7 @@ describe("Grants programId validation", () => {
           ],
         },
       );
-
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(400);
     });
 
     it("deduplicates programIds for validation", async () => {

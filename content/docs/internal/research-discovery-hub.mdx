@@ -1,0 +1,75 @@
+---
+wikiId: E2166
+title: "Research & Discovery"
+description: "Hub for the wiki's research and discovery operations — multi-source web search, news ingestion, and context bundles. Links to dashboards, CLI commands, and deep-dive architecture docs."
+subcategory: architecture
+contentFormat: article
+lastEdited: "2026-04-08"
+---
+
+import { EntityLink } from '@components/wiki';
+
+## What this is
+
+Research and discovery is how we **find new information** for the wiki — searching the web, crawling RSS feeds, fetching pages from external APIs, and assembling that material into context bundles for page authoring or improvement. It is the *first stage* of the data lifecycle, before verification and storage.
+
+<Callout variant="tip" title="When to start here">
+If you're trying to **answer a question that needs current sources**, **draft a new page**, or **react to news**, this is your starting point.
+</Callout>
+
+## Live dashboards
+
+| Dashboard | What it shows |
+|-----------|---------------|
+| [Auto-Update News](/internal/auto-update-news-dashboard) | News items pulled from RSS feeds, grouped by source |
+| [Auto-Update Runs](/internal/auto-update-runs-dashboard) | Pipeline run history — what was fetched, routed, and applied |
+
+## CLI playbook
+
+The most useful commands, in rough order of frequency:
+
+```bash
+# Multi-source web search (Exa + Perplexity + SCRY + GitHub)
+pnpm crux query search "compute governance"
+pnpm crux query search "MIRI funding" --limit=5
+
+# Assemble a research bundle for a specific page or topic
+pnpm crux context for-page anthropic
+pnpm crux context for-topic "RLHF alignment tax" --limit=15
+pnpm crux context for-entity openai
+
+# Auto-update news pipeline (RSS + web search → routing → page updates)
+pnpm crux w auto-update digest                # Fetch sources, show digest
+pnpm crux w auto-update plan                  # Preview what would be updated
+pnpm crux w auto-update run --budget=30       # Run with $30 budget cap
+pnpm crux w auto-update sources               # List configured sources
+pnpm crux w auto-update sources --check       # Test source URL reachability
+pnpm crux w auto-update history               # Show recent run history
+```
+
+## When to use what
+
+| I want to... | Run | Or check |
+|--------------|-----|----------|
+| Find pages/sources about a topic | `pnpm crux query search "topic"` | — |
+| Gather context to draft a new page | `pnpm crux context for-topic "topic"` | Output in `.claude/wip-context.md` |
+| See if there's recent news on something | `pnpm crux w auto-update digest` | [Auto-Update News dashboard](/internal/auto-update-news-dashboard) |
+| Trigger a news-driven update of pages | `pnpm crux w auto-update run --budget=30` | [Auto-Update Runs dashboard](/internal/auto-update-runs-dashboard) |
+| Add a new RSS / news source | Edit `data/auto-update/sources.yaml`, then `pnpm crux w auto-update sources --check` | — |
+| Compare external search APIs (cost, quality) | — | <EntityLink id="E2156" name="external-search-apis">External Search APIs</EntityLink> |
+
+## Architecture & deep dives
+
+- <EntityLink id="E2156" name="external-search-apis">External Search APIs</EntityLink> — Exa, Perplexity, SCRY, Firecrawl, GitHub, Semantic Scholar — pricing, integration points, what works and what doesn't
+- `crux/lib/search/` — research agent, providers, deduplication
+- `crux/auto-update/` — news pipeline orchestration (fetch → digest → route → update)
+- `data/auto-update/sources.yaml` — RSS feed and web-search source configuration
+- `.github/workflows/auto-update.yml` — daily 06:00 UTC scheduled run
+
+## Related hubs
+
+<CardGrid>
+  <LinkCard title="Verification & Source-Checking" href="/wiki/E2167" description="Once you've found sources, this is how you check them" />
+  <LinkCard title="FactBase & Entities" href="/wiki/E2168" description="Where structured facts from research get stored" />
+  <LinkCard title="Content Pipelines" href="/wiki/E2169" description="How research feeds the page creation and improvement workflows" />
+</CardGrid>

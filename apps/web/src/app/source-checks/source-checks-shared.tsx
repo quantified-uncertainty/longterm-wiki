@@ -74,8 +74,8 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
       return `/factbase/fact/${recordId}`;
     case "wiki-page":
       return `/wiki/${recordId}`;
-    case "publication":
-      return `/publications/${recordId}`;
+    // publication: /publications/:id expects a different ID format — fall through to /things
+    // case "publication":
     case "investment":
       return `/investments/${recordId}`;
     case "funding-round":
@@ -92,6 +92,22 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
 /** Get the URL for the source-check detail page. */
 export function getSourceCheckHref(recordType: string, recordId: string): string {
   return `/source-checks/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+}
+
+/**
+ * Convert a raw DB field key to a human-readable label.
+ * Examples: "granteeDisplayName" → "Grantee Display Name",
+ *           "isFounder" → "Is Founder", "amount" → "Amount"
+ */
+export function humanizeFieldLabel(key: string): string {
+  // Strip suffix noise
+  let s = key.replace(/(EntityId|DisplayName|Id)$/, "");
+  // If stripping left nothing (e.g. key was just "Id"), fall back to original
+  if (!s) s = key;
+  // Split camelCase: "isFounder" → "is Founder"
+  s = s.replace(/([a-z])([A-Z])/g, "$1 $2");
+  // Capitalize first character
+  return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 /** Format a checker model ID for display (e.g. "claude-haiku-4-5-20251001" → "Haiku 4.5"). */

@@ -10,7 +10,8 @@
  */
 
 import type { CommandResult } from '../lib/command-types.ts';
-import { apiRequest, getServerUrl } from '../lib/wiki-server/client.ts';
+import { getServerUrl } from '../lib/wiki-server/client.ts';
+import { syncPersonnel } from '../lib/wiki-server/personnel.ts';
 
 // ---------------------------------------------------------------------------
 // Personnel type (matches wiki-server SyncPersonnelItemSchema)
@@ -159,9 +160,7 @@ async function syncCommand(
     return { exitCode: 0, output: lines.join('\n') };
   }
 
-  const result = await apiRequest('POST', '/api/personnel/sync', {
-    items: QURI_PERSONNEL,
-  });
+  const result = await syncPersonnel(QURI_PERSONNEL);
 
   if (!result.ok) {
     lines.push(`\n  Sync failed: ${result.message}`);

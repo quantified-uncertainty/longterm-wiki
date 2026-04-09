@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isApproach } from "@/data";
+import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { ApproachesTable, type ApproachRow } from "./approaches-table";
 
@@ -19,6 +20,7 @@ export default function ApproachesPage() {
     description: a.description ?? null,
     tags: a.tags ?? [],
     wikiId: a.wikiId ?? null,
+    verdictString: getRecordVerdict("approach", a.id)?.verdict ?? null,
   }));
 
   const uniqueTagCount = new Set(rows.flatMap((r) => r.tags)).size;

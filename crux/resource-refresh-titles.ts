@@ -205,7 +205,7 @@ async function fetchTitle(url: string): Promise<string | null> {
       // Stop early if we've found the closing </title> tag
       if (html.includes('</title>') || html.includes('</head>')) break;
     }
-    reader.cancel().catch(() => {});
+    reader.cancel().catch(() => {}); // catch-ok: stream cancel after early-exit; failure means reader was already closed by the runtime
 
     // Try og:title first (often cleaner), fall back to <title>
     const title = extractOgTitle(html) || extractTitleFromHtml(html);

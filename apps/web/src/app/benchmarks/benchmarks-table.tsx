@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeBenchmarkCoverage } from "@/components/coverage/coverage-score";
 
 export interface BenchmarkRow {
@@ -18,6 +18,7 @@ export interface BenchmarkRow {
   maintainer: string | null;
   description: string | null;
   modelsCount: number;
+  verdictString: string | null;
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -230,7 +231,10 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
                 </td>
                 {/* Coverage */}
                 <td className="py-2.5 px-3 text-center">
-                  <CoverageDots score={computeBenchmarkCoverage(row)} />
+                  <RecordStatusDots
+                    coverageScore={computeBenchmarkCoverage(row)}
+                    verdict={row.verdictString}
+                  />
                 </td>
               </tr>
             ))}

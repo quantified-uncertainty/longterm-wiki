@@ -861,29 +861,53 @@ export const SyncEntitiesBatchSchema = z.object({
 // Facts
 // ---------------------------------------------------------------------------
 
-export const SyncFactSchema = z.object({
-  entityId: z.string().min(1).max(300),
-  factId: z.string().min(1).max(100),
-  label: z.string().max(500).nullable().optional(),
-  value: z.string().max(5000).nullable().optional(),
-  numeric: z.number().nullable().optional(),
-  low: z.number().nullable().optional(),
-  high: z.number().nullable().optional(),
-  asOf: z.string().max(20).nullable().optional(),
-  validEnd: z.string().max(20).nullable().optional(),
-  currency: z.string().max(10).nullable().optional(),
-  measure: z.string().max(100).nullable().optional(),
-  subject: z.string().max(300).nullable().optional(),
-  note: z.string().max(5000).nullable().optional(),
-  source: z.string().max(2000).nullable().optional(),
-  format: z.string().max(100).nullable().optional(),
-  formatDivisor: z.number().nullable().optional(),
-  sourceQuote: z.string().max(5000).nullable().optional(),
-  usdEquivalent: z.number().nullable().optional(),
-  exchangeRate: z.number().nullable().optional(),
-  exchangeRateDate: z.string().max(20).nullable().optional(),
-  dollarYear: z.number().int().nullable().optional(),
-});
+export const SyncFactSchema = z
+  .object({
+    entityId: z.string().min(1).max(300),
+    factId: z.string().min(1).max(100),
+    label: z.string().max(500).nullable().optional(),
+    value: z.string().max(5000).nullable().optional(),
+    numeric: z.number().nullable().optional(),
+    low: z.number().nullable().optional(),
+    high: z.number().nullable().optional(),
+    asOf: z.string().max(20).nullable().optional(),
+    validEnd: z.string().max(20).nullable().optional(),
+    currency: z.string().max(10).nullable().optional(),
+    measure: z.string().max(100).nullable().optional(),
+    subject: z.string().max(300).nullable().optional(),
+    note: z.string().max(5000).nullable().optional(),
+    source: z.string().max(2000).nullable().optional(),
+    format: z.string().max(100).nullable().optional(),
+    formatDivisor: z.number().nullable().optional(),
+    sourceQuote: z.string().max(5000).nullable().optional(),
+    usdEquivalent: z.number().nullable().optional(),
+    exchangeRate: z.number().nullable().optional(),
+    exchangeRateDate: z.string().max(20).nullable().optional(),
+    dollarYear: z.number().int().nullable().optional(),
+  })
+  // Numeric formats must have populated numeric/low/high columns. Otherwise the
+  // read path silently coerced NULL → 0, masking missing data as legitimate
+  // zeros (e.g. "0 employees" indistinguishable from "unknown"). Issue #4017.
+  .superRefine((fact, ctx) => {
+    if (fact.format === "number" || fact.format === "min") {
+      if (fact.numeric == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["numeric"],
+          message: `format='${fact.format}' requires numeric to be a number, got null/undefined (factId=${fact.factId})`,
+        });
+      }
+    }
+    if (fact.format === "range") {
+      if (fact.low == null || fact.high == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["low"],
+          message: `format='range' requires both low and high to be numbers (factId=${fact.factId}, low=${fact.low}, high=${fact.high})`,
+        });
+      }
+    }
+  });
 export type SyncFact = z.infer<typeof SyncFactSchema>;
 
 export const SyncFactsBatchSchema = z.object({
@@ -1353,7 +1377,10 @@ export const VALID_CLAIM_STATUSES = [
 export type ClaimStatus = (typeof VALID_CLAIM_STATUSES)[number];
 
 export const ProposeClaimsSchema = z.object({
-  entityId: z.string().min(1).max(200).optional(),
+  // entityId is required: claims for "unknown entity" become orphan rows that
+  // verification jobs cannot resolve, leaving them stuck in pending forever.
+  // Issue #4017.
+  entityId: z.string().min(1).max(200),
   targetTable: z.string().min(1).max(100),
   agentSessionId: z.string().max(200).optional(),
   claims: z
