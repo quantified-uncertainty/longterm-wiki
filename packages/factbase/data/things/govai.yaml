@@ -152,7 +152,7 @@ facts:
     notes: "GovAI US entity is a 501(c)(3) nonprofit"
 
   - id: f_oR8N4NAJhQ
-    property: lobbying-spend
+    property: legal-identifier
     value: "EU Transparency Register ID: 644024391866-32"
     asOf: 2024-05
     source: https://www.lobbyfacts.eu/datacard/the-centre-for-the-governance-of-ai?rid=644024391866-32
