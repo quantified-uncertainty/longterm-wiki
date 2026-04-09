@@ -19,6 +19,7 @@ import {
   resolveEntityTitles,
 } from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
 
@@ -86,19 +87,13 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   .get("/all", zv("query", AllQuery), async (c) => {
     const { limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
-
-    const rows = await db
-      .select()
-      .from(entityEvents)
-      .orderBy(desc(entityEvents.date), entityEvents.id)
-      .limit(limit)
-      .offset(offset);
-
-    const [{ count: total }] = await db
-      .select({ count: count() })
-      .from(entityEvents);
-
-    return c.json({ events: rows, total, limit, offset });
+    const { rows: events, total } = await paginatedQuery({
+      query: db.select().from(entityEvents)
+        .orderBy(desc(entityEvents.date), entityEvents.id)
+        .limit(limit).offset(offset),
+      countQuery: db.select({ count: count() }).from(entityEvents),
+    });
+    return c.json({ events, total, limit, offset });
   })
 
   .get(
@@ -107,35 +102,16 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     zv("query", ByEntityQuery),
     async (c) => {
       const resolvedId = c.get("resolvedEntityId");
-      const { limit, offset, eventType } = c.req.valid("query");
+      const { limit, offset } = c.req.valid("query");
       const db = getDrizzleDb();
-
-      const baseWhere = eq(entityEvents.entityId, resolvedId);
-
-      const rows = await db
-        .select()
-        .from(entityEvents)
-        .where(baseWhere)
-        .orderBy(desc(entityEvents.date), entityEvents.id)
-        .limit(limit)
-        .offset(offset);
-
-      const filtered = eventType
-        ? rows.filter((r) => r.eventType === eventType)
-        : rows;
-
-      const [{ count: total }] = await db
-        .select({ count: count() })
-        .from(entityEvents)
-        .where(baseWhere);
-
-      return c.json({
-        entityId: resolvedId,
-        events: filtered,
-        total,
-        limit,
-        offset,
+      const where = eq(entityEvents.entityId, resolvedId);
+      const { rows: events, total } = await paginatedQuery({
+        query: db.select().from(entityEvents).where(where)
+          .orderBy(desc(entityEvents.date), entityEvents.id)
+          .limit(limit).offset(offset),
+        countQuery: db.select({ count: count() }).from(entityEvents).where(where),
       });
+      return c.json({ entityId: resolvedId, events, total, limit, offset });
     }
   )
 
