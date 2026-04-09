@@ -20,6 +20,7 @@ import {
 } from "../shared/thing-sync.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -264,7 +265,9 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     logSourceCheckCoverage("publications/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(publications, "publications"));
 
 export const publicationsRoute = publicationsApp;
 export type PublicationsRoute = typeof publicationsApp;

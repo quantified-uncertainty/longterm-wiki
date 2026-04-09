@@ -14,6 +14,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -291,7 +292,9 @@ const campaignFinanceApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(campaignFinance, null));
 
 export const campaignFinanceRoute = campaignFinanceApp;
 export type CampaignFinanceRoute = typeof campaignFinanceApp;

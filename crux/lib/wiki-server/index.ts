@@ -238,3 +238,7 @@ export type {
 // Claims
 export { proposeClaims, getClaimStatus } from './claims.ts';
 export type { ProposeClaimsResult, ClaimStatusResult } from './claims.ts';
+
+// Generic delete-batch (works for any registered tablebase entity type)
+export { deleteBatch } from './delete-batch.ts';
+export type { DeleteBatchResult } from './delete-batch.ts';

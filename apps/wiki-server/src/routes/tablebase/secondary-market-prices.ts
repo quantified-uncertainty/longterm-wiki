@@ -15,6 +15,7 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -414,7 +415,9 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
     logSourceCheckCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(secondaryMarketPrices, "secondary_market_prices"));
 
 // ---- Exports ----
 

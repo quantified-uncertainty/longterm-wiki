@@ -21,6 +21,7 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 
 // ---- Constants ----
@@ -394,7 +395,9 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
 
     return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(investments, "investments"));
 
 // ---- Exports ----
 

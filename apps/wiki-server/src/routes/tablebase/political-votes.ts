@@ -14,6 +14,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -315,7 +316,9 @@ const politicalVotesApp = new Hono()
     });
 
     return c.json({ upserted });
-  });
+  })
+
+  .post("/delete-batch", deleteBatchHandler(politicalVotes, null));
 
 export const politicalVotesRoute = politicalVotesApp;
 export type PoliticalVotesRoute = typeof politicalVotesApp;
