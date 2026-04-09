@@ -22,6 +22,7 @@ import {
   SOURCE_CHECK_CONSTANTS,
 } from '../lib/source-check/index.ts';
 import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import { extractQid } from '../lib/source-check/wikidata-matcher.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -174,6 +175,23 @@ async function recheckSingleItem(
       recordType: item.recordType,
       recordId: item.recordId,
       error: 'No source URL found in evidence history',
+    };
+  }
+
+  // Step 1b: Skip LLM for Wikidata-sourced facts (QUA-92)
+  // Facts with Wikidata sources are verified deterministically by tryWikidataMatch()
+  // in the primary pipeline. Re-running them through LLM causes verdict flip-flopping
+  // because the LLM inconsistently reads Wikidata HTML. Instead, preserve the existing
+  // verdict and extend the recheck interval.
+  if (item.recordType === 'fact' && extractQid(sourceUrl)) {
+    return {
+      recordType: item.recordType,
+      recordId: item.recordId,
+      previousVerdict: item.verdict,
+      newVerdict: item.verdict,
+      confidence: item.confidence ?? 0.95,
+      changed: false,
+      sourceUrl,
     };
   }
 
