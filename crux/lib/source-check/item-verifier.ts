@@ -23,6 +23,7 @@ import {
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from './prompt-guidelines.ts';
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
+import { tryWikidataMatch } from './wikidata-matcher.ts';
 import { searchForEntity } from './item-collectors.ts';
 import type {
   VerifyItem,
@@ -231,6 +232,19 @@ export async function verifySingleItem(
     } catch (e: unknown) {
       // Fall through to LLM source-check on any error
       console.warn(`[source-check] Deterministic matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // ── Wikidata deterministic matching (QUA-92) ──
+  // For fact-type items sourced from Wikidata, use the structured API to verify
+  // instead of fetching HTML + LLM. Saves ~$4.25/week for ~414 Wikidata-sourced facts.
+  if (item.data.kind === 'fact' && item.sourceUrl?.includes('wikidata.org')) {
+    try {
+      const wikidataResult = await tryWikidataMatch(item);
+      if (wikidataResult) return wikidataResult;
+    } catch (e: unknown) {
+      // Fall through to LLM source-check on any error
+      console.warn(`[source-check] Wikidata matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 

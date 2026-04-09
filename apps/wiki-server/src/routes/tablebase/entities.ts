@@ -938,13 +938,18 @@ const entitiesApp = new Hono()
         const slugs = allVals.map((v) => v.id);
         const stableIds = allVals.map((v) => v.stableId);
         if (slugs.length > 0) {
+          // Drizzle's sql tag expands JS arrays as row constructors ($1,$2,...) which
+          // is not valid for unnest() (which expects an array type). Use ARRAY[...] syntax
+          // with sqlInList to correctly parameterize each element. See query-helpers.ts.
+          const slugsSql = sqlInList(slugs);
+          const stableIdsSql = sqlInList(stableIds);
           await tx.execute(sql`
             UPDATE entities e
             SET id = LOWER(REGEXP_REPLACE(
               REGEXP_REPLACE(TRANSLATE(e.title, ' ', '-'), '[^a-zA-Z0-9-]', '', 'g'),
               '-+', '-', 'g'
             )) || '-displaced-' || SUBSTRING(e.stable_id FROM 5 FOR 6)
-            FROM unnest(${slugs}::text[], ${stableIds}::text[])
+            FROM unnest(ARRAY[${slugsSql}]::text[], ARRAY[${stableIdsSql}]::text[])
               AS incoming(slug, sid)
             WHERE e.id = incoming.slug AND e.stable_id != incoming.sid
           `);

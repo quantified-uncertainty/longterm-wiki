@@ -110,6 +110,21 @@ function normalizeDateString(d: string): string {
 }
 
 /**
+ * Check if two URLs match after normalization.
+ * Strips trailing `/`, normalizes http<->https, strips `www.` prefix.
+ */
+export function urlMatches(a: string, b: string): boolean {
+  function normalizeUrl(url: string): string {
+    return url
+      .trim()
+      .replace(/^https?:\/\//, '')    // strip protocol
+      .replace(/^www\./, '')           // strip www.
+      .replace(/\/+$/, '');            // strip trailing slashes
+  }
+  return normalizeUrl(a) === normalizeUrl(b);
+}
+
+/**
  * Check if two dates match with appropriate granularity.
  * - "2018" matches "2018-07" matches "2018-07-15" (year is sufficient)
  * - "2018-07" matches "2018-07-15" (month is sufficient)

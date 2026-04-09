@@ -27,6 +27,7 @@ import {
   buildEntitySourceCheckPrompt,
   MODELS,
 } from './item-verifier.ts';
+import { prefetchWikidataEntities } from './wikidata-matcher.ts';
 import { fetchSourceContent } from './source-fetcher.ts';
 import type {
   OrchestrateOptions,
@@ -172,6 +173,20 @@ export async function orchestrateCommand(
 
   if (itemLimit !== undefined && itemLimit > 0 && itemLimit < itemsToVerify.length) {
     itemsToVerify = itemsToVerify.slice(0, itemLimit);
+  }
+
+  // ── Step 4b: Pre-fetch Wikidata entities (QUA-92) ──
+  // Warm the entity cache by batching all Wikidata QIDs in items.
+  // This avoids per-item API calls during verification.
+  if (shouldCollectFacts && itemsToVerify.some(i => i.data.kind === 'fact')) {
+    try {
+      const prefetched = await prefetchWikidataEntities(itemsToVerify);
+      if (prefetched > 0) {
+        console.log(`  Wikidata: pre-fetched ${prefetched} entities`);
+      }
+    } catch (e: unknown) {
+      console.warn(`  Wikidata pre-fetch failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
   }
 
   // ── Step 5: Report or execute ──

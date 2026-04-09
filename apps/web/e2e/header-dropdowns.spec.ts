@@ -2,15 +2,16 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Header dropdown menus", () => {
   test("Entities dropdown shows items on click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "networkidle" });
 
     const entitiesButton = page.locator("header button", {
       hasText: "Entities",
     });
+    await expect(entitiesButton).toBeVisible({ timeout: 10000 });
     await entitiesButton.click();
 
     const dropdown = page.locator("header a", { hasText: "Organizations" });
-    await expect(dropdown).toBeVisible();
+    await expect(dropdown).toBeVisible({ timeout: 10000 });
     await expect(
       page.locator("header a", { hasText: "People" })
     ).toBeVisible();

@@ -1,0 +1,26 @@
+{
+  "table": "personnel",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-09T11:27:38.197Z",
+  "sourceCheckSummary": {
+    "withSourceCheck": 1,
+    "withoutSourceCheck": 0,
+    "verdicts": {
+      "verified": 1,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "mSZcKQiW7r",
+      "personId": "sid_ZvfLhIm7pw",
+      "organizationId": "sid_QeknHipQPA",
+      "role": "Board Member / Advisor",
+      "source": "https://astralisfoundation.org/our-people",
+      "verdict": "confirmed"
+    }
+  ]
+}
