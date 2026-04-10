@@ -16,9 +16,6 @@ import { things, sourceVerdicts, VALID_THING_TYPES } from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
-  validationError,
-  parseJsonBody,
-  invalidJsonError,
   escapeIlike,
   clampedLimit,
 } from "../shared/utils.js";
@@ -28,6 +25,7 @@ import {
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
 } from "../../search-utils.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -142,6 +140,22 @@ const sortColumns = {
   created_at: things.createdAt,
   thing_type: things.thingType,
 } as const;
+
+// ---- Sync schema ----
+
+const SyncThingSchema = z.object({
+  id: z.string().min(1).max(200),
+  thingType: z.enum(VALID_THING_TYPES),
+  title: z.string().min(1).max(2000),
+  parentThingId: z.string().max(200).optional(),
+  sourceTable: z.string().min(1).max(100),
+  sourceId: z.string().min(1).max(200),
+  entityType: z.string().max(100).optional(),
+  description: z.string().max(10000).optional(),
+  sourceUrl: z.string().max(2048).optional(),
+  wikiId: z.string().max(20).optional(),
+  parentTitle: z.string().max(500).optional(),
+});
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
 
@@ -526,88 +540,45 @@ const thingsApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const raw = await parseJsonBody(c);
-    if (!raw) return invalidJsonError(c);
-
-    const SyncThingSchema = z.object({
-      id: z.string().min(1).max(200),
-      thingType: z.enum(VALID_THING_TYPES),
-      title: z.string().min(1).max(2000),
-      parentThingId: z.string().max(200).optional(),
-      sourceTable: z.string().min(1).max(100),
-      sourceId: z.string().min(1).max(200),
-      entityType: z.string().max(100).optional(),
-      description: z.string().max(10000).optional(),
-      sourceUrl: z.string().max(2048).optional(),
-      wikiId: z.string().max(20).optional(),
-      parentTitle: z.string().max(500).optional(),
-    });
-
-    const SyncBatchSchema = z.object({
+  .post("/sync", createSyncHandler({
+    name: "things",
+    table: things,
+    // Request body uses `{ things: [...] }` not `{ items: [...] }`.
+    // .transform() renames the key; type assertion needed because ZodEffects'
+    // _input type is { things: ... } while batchSchema expects { items: ... }.
+    // Runtime behavior is correct: safeParse outputs { items: [...] }.
+    batchSchema: z.object({
       things: z.array(SyncThingSchema).min(1).max(MAX_SYNC_BATCH),
-    });
-
-    const parsed = SyncBatchSchema.safeParse(raw);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const items = parsed.data.things;
-
-    // Reject duplicate (sourceTable, sourceId) within the batch — duplicates
-    // would cause the multi-row upsert to fail and roll back.
-    const seenSourceKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.sourceTable}\0${item.sourceId}`;
-      if (seenSourceKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate source key in batch: (${item.sourceTable}, ${item.sourceId})`
-        );
-      }
-      seenSourceKeys.add(key);
-    }
-
-    const db = getDrizzleDb();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        thingType: item.thingType,
-        title: item.title,
-        parentThingId: item.parentThingId ?? null,
-        sourceTable: item.sourceTable,
-        sourceId: item.sourceId,
-        entityType: item.entityType ?? null,
-        description: item.description ?? null,
-        sourceUrl: item.sourceUrl ?? null,
-        wikiId: item.wikiId ?? null,
-      }));
-
-      await tx
-        .insert(things)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [things.sourceTable, things.sourceId],
-          set: {
-            // Do NOT update `id` — it's the PK and may be referenced
-            // by external systems. Changing it would break links.
-            thingType: sql`excluded.thing_type`,
-            title: sql`excluded.title`,
-            parentThingId: sql`excluded.parent_thing_id`,
-            entityType: sql`excluded.entity_type`,
-            description: sql`excluded.description`,
-            sourceUrl: sql`excluded.source_url`,
-            wikiId: sql`excluded.wiki_id`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-      upserted = allVals.length;
-    });
-
-    return c.json({ upserted });
-  });
+    }).transform((val) => ({ items: val.things })) as unknown as z.ZodType<{ items: z.infer<typeof SyncThingSchema>[] }>, // as-any-ok: z.transform changes output type; factory ZodType constraint requires cast; runtime shape matches
+    toRow: (item) => ({
+      id: item.id,
+      thingType: item.thingType,
+      title: item.title,
+      parentThingId: item.parentThingId ?? null,
+      sourceTable: item.sourceTable,
+      sourceId: item.sourceId,
+      entityType: item.entityType ?? null,
+      description: item.description ?? null,
+      sourceUrl: item.sourceUrl ?? null,
+      wikiId: item.wikiId ?? null,
+    }),
+    conflictTarget: [things.sourceTable, things.sourceId],
+    conflictSet: {
+      // Do NOT update `id`, `sourceTable`, `sourceId` — composite key + PK must stay stable
+      thingType: sql`excluded.thing_type`,
+      title: sql`excluded.title`,
+      parentThingId: sql`excluded.parent_thing_id`,
+      entityType: sql`excluded.entity_type`,
+      description: sql`excluded.description`,
+      sourceUrl: sql`excluded.source_url`,
+      wikiId: sql`excluded.wiki_id`,
+      syncedAt: sql`now()`,
+      updatedAt: sql`now()`,
+    },
+    naturalKey: (item) => `${item.sourceTable}\0${item.sourceId}`,
+    naturalKeyError: "Duplicate source key in batch",
+    // No toThing — this IS the things table
+  }));
 
 // ---- Exports ----
 
