@@ -13,14 +13,11 @@ import { eq, and, sql, isNull, count } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { platformAccounts } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   paginationQuery,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 const VALID_PLATFORMS = [
   "lesswrong",
@@ -43,10 +40,6 @@ const SyncItemSchema = z.object({
   profileUrl: z.string().max(2000).nullable().optional(),
 });
 
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(200),
-});
-
 const AllQuery = paginationQuery({ maxLimit: 1000, defaultLimit: 200 }).extend({
   platform: z.string().max(100).optional(),
   unlinked: z
@@ -54,19 +47,6 @@ const AllQuery = paginationQuery({ maxLimit: 1000, defaultLimit: 200 }).extend({
     .optional()
     .transform((v) => v === "true"),
 });
-
-type SyncItem = z.infer<typeof SyncItemSchema>;
-
-function toRow(item: SyncItem) {
-  return {
-    platform: item.platform,
-    platformUsername: item.platformUsername,
-    platformUserId: item.platformUserId ?? null,
-    entityStableId: item.entityStableId ?? null,
-    displayName: item.displayName ?? null,
-    profileUrl: item.profileUrl ?? null,
-  };
-}
 
 const platformAccountsApp = new Hono()
 
@@ -144,46 +124,23 @@ const platformAccountsApp = new Hono()
   })
 
   // POST /sync — batch upsert
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(
-        c,
-        parsed.error.issues.map((i) => i.message).join(", ")
-      );
-    }
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const entityIds = items.map((i) => i.entityStableId).filter((id): id is string => id != null);
-    if (entityIds.length > 0) {
-      const refError = await validateEntityRefs(c, db, [
-        { fieldName: "entityStableId", ids: entityIds },
-      ]);
-      if (refError) return refError;
-    }
-
-    const result = await db
-      .insert(platformAccounts)
-      .values(items.map(toRow))
-      .onConflictDoUpdate({
-        target: [platformAccounts.platform, platformAccounts.platformUsername],
-        set: {
-          platformUserId: sql`COALESCE(EXCLUDED.platform_user_id, platform_accounts.platform_user_id)`,
-          entityStableId: sql`COALESCE(EXCLUDED.entity_stable_id, platform_accounts.entity_stable_id)`,
-          displayName: sql`COALESCE(EXCLUDED.display_name, platform_accounts.display_name)`,
-          profileUrl: sql`COALESCE(EXCLUDED.profile_url, platform_accounts.profile_url)`,
-          updatedAt: sql`now()`,
-        },
-      })
-      .returning({ id: platformAccounts.id });
-
-    return c.json({ upserted: result.length }, 201);
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "platform-accounts",
+      table: platformAccounts,
+      syncSchema: SyncItemSchema,
+      entityRefs: ["entityStableId"],
+      conflictTarget: [platformAccounts.platform, platformAccounts.platformUsername],
+      conflictSet: {
+        platformUserId: sql`COALESCE(EXCLUDED.platform_user_id, platform_accounts.platform_user_id)`,
+        entityStableId: sql`COALESCE(EXCLUDED.entity_stable_id, platform_accounts.entity_stable_id)`,
+        displayName: sql`COALESCE(EXCLUDED.display_name, platform_accounts.display_name)`,
+        profileUrl: sql`COALESCE(EXCLUDED.profile_url, platform_accounts.profile_url)`,
+        updatedAt: sql`now()`,
+      },
+    }),
+  )
 
   // DELETE /:id — remove a mapping
   .delete("/:id", async (c) => {

@@ -170,10 +170,17 @@ function analyzeRoute(filePath: string): RouteAnalysis {
   ];
   const deleteCount = deleteMatches.length;
   const hasDelete = deleteCount > 0;
-  const hasThingsSync = /upsertThingsInTx/.test(content);
+  // Routes using createSyncHandler get things sync and entity ref validation
+  // via the factory's config (toThing, entityRefs/entityRefFields). The factory
+  // calls upsertThingsInTx and validateEntityRefs internally — the route file
+  // doesn't need to import them directly.
+  const usesFactory = /createSyncHandler/.test(content);
+  const hasThingsSync = /upsertThingsInTx/.test(content) ||
+    (usesFactory && /toThing/.test(content));
   const hasEntityRefValidation =
     /validateEntityRefs/.test(content) ||
-    /findMissingEntityRefs/.test(content);
+    /findMissingEntityRefs/.test(content) ||
+    (usesFactory && (/entityRefs/.test(content) || /entityRefFields/.test(content)));
 
   // Check if the sync schema references entity ID fields
   const acceptsEntityRefs = ENTITY_REF_PATTERNS.some((p) => p.test(content));

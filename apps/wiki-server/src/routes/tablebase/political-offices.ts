@@ -4,18 +4,14 @@ import { eq, and, count, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { logger } from "../../logger.js";
 import { politicalOffices, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -67,10 +63,6 @@ const SyncItemSchema = z.object({
   termEnd: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(200),
 });
 
 // ---- Helpers ----
@@ -205,69 +197,12 @@ const politicalOfficesApp = new Hono()
   })
 
   // POST /sync
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId) },
-    ]);
-    if (refError) return refError;
-
-    logger.info(`sync political-offices: upserting ${items.length} offices`);
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(politicalOffices)
-          .values({
-            id: item.id,
-            politicianEntityId: item.politicianEntityId,
-            politicianDisplayName: item.politicianDisplayName ?? null,
-            officeType: item.officeType,
-            jurisdiction: item.jurisdiction,
-            district: item.district ?? null,
-            party: item.party ?? null,
-            status: item.status,
-            termStart: item.termStart ?? null,
-            termEnd: item.termEnd ?? null,
-            sourceUrl: item.sourceUrl ?? null,
-            notes: item.notes ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: politicalOffices.id,
-            set: {
-              politicianEntityId: item.politicianEntityId,
-              politicianDisplayName: item.politicianDisplayName ?? null,
-              officeType: item.officeType,
-              jurisdiction: item.jurisdiction,
-              district: item.district ?? null,
-              party: item.party ?? null,
-              status: item.status,
-              termStart: item.termStart ?? null,
-              termEnd: item.termEnd ?? null,
-              sourceUrl: item.sourceUrl ?? null,
-              notes: item.notes ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
-        upserted++;
-      }
-    });
-
-    return c.json({ upserted });
-  })
+  .post("/sync", createSyncHandler({
+    name: "political-offices",
+    table: politicalOffices,
+    syncSchema: SyncItemSchema,
+    entityRefs: ["politicianEntityId"],
+  }))
 
   .post("/delete-batch", deleteBatchHandler(politicalOffices, null));
 

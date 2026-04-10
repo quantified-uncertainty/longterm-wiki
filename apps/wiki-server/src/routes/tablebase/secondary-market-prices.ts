@@ -5,18 +5,14 @@ import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { secondaryMarketPrices, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -85,10 +81,6 @@ const SyncSecondaryMarketPriceItemSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   sourcing: InlineSourcingSchema.optional(),
-});
-
-const SyncBatchSchema = z.object({
-  items: z.array(SyncSecondaryMarketPriceItemSchema).min(1).max(500),
 });
 
 // ---- Helpers ----
@@ -337,27 +329,21 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
+  // ---- POST /sync — uses sync-factory ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "secondary-market-prices",
+      table: secondaryMarketPrices,
+      syncSchema: SyncSecondaryMarketPriceItemSchema,
+      entityRefs: ["companyId"],
+      conflictTarget: [
+        secondaryMarketPrices.companyId,
+        secondaryMarketPrices.platform,
+        secondaryMarketPrices.date,
+        secondaryMarketPrices.priceType,
+      ],
+      toRow: (item, now) => ({
         id: item.id,
         companyId: item.companyId,
         platform: item.platform,
@@ -374,54 +360,18 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
         priceType: item.priceType,
         source: item.source ?? null,
         notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(secondaryMarketPrices)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [
-            secondaryMarketPrices.companyId,
-            secondaryMarketPrices.platform,
-            secondaryMarketPrices.date,
-            secondaryMarketPrices.priceType,
-          ],
-          set: {
-            pricePerShare: sql`excluded.price_per_share`,
-            impliedValuation: sql`excluded.implied_valuation`,
-            impliedValuationLow: sql`excluded.implied_valuation_low`,
-            impliedValuationHigh: sql`excluded.implied_valuation_high`,
-            volume: sql`excluded.volume`,
-            openInterest: sql`excluded.open_interest`,
-            bidPrice: sql`excluded.bid_price`,
-            askPrice: sql`excluded.ask_price`,
-            spreadPercent: sql`excluded.spread_percent`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "secondary-market-price",
-          recordId: item.id,
-          entityId: item.companyId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  })
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      toVerdict: (item) => ({
+        recordType: "secondary-market-price",
+        recordId: item.id,
+        entityId: item.companyId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(secondaryMarketPrices, "secondary_market_prices"));
 

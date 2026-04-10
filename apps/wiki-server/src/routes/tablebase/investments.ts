@@ -2,27 +2,19 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb, getDb } from "../../db.js";
-import { logger } from "../../logger.js";
+import { getDrizzleDb } from "../../db.js";
 import { investments, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   parseRange,
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
-import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -239,71 +231,39 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncInvestmentsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Reject items with "Unknown" investor or company names.
-    // These create low-quality rows that display poorly on the public page.
-    const unknownItems = items.filter(
-      (i) =>
-        i.investorId.toLowerCase() === "unknown" ||
-        i.companyId.toLowerCase() === "unknown"
-    );
-    if (unknownItems.length > 0) {
-      const ids = unknownItems.map((i) => i.id).join(", ");
-      return validationError(
-        c,
-        `Investments with "Unknown" investor or company are not allowed. ` +
-        `Affected IDs: ${ids}. ` +
-        `Use a specific entity slug or display name instead.`
-      );
-    }
-
-    // Check for natural key collisions within the batch itself.
-    // Must match the DB unique index: LOWER(COALESCE(entity_id, raw_id))
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.companyId.toLowerCase()}::${item.investorId.toLowerCase()}::${(item.roundName ?? "").toLowerCase()}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (companyId, investorId, roundName) in batch: ` +
-          `companyId=${item.companyId}, investorId=${item.investorId}, ` +
-          `roundName="${item.roundName ?? ""}". ` +
-          `Each investment must be unique by company + investor + round.`
+  // ---- POST /sync — uses sync-factory ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "investments",
+      table: investments,
+      batchSchema: SyncInvestmentsBatchSchema,
+      naturalKey: (item) =>
+        `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`,
+      naturalKeyError:
+        "Duplicate (companyId, investorId, roundName) in batch",
+      entityRefFields: (items) => [
+        { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+        { fieldName: "investorId", ids: items.map((i) => i.investorId) },
+      ],
+      // Reject items with "Unknown" investor or company names.
+      // These create low-quality rows that display poorly on the public page.
+      preValidate: async (c, _db, items) => {
+        const unknownItems = items.filter(
+          (i) =>
+            i.investorId.toLowerCase() === "unknown" ||
+            i.companyId.toLowerCase() === "unknown"
         );
-      }
-      batchKeys.add(key);
-    }
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-      { fieldName: "investorId", ids: items.map((i) => i.investorId) },
-    ]);
-    if (refError) return refError;
-
-    // Validate claim references
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => {
+        if (unknownItems.length > 0) {
+          const ids = unknownItems.map((i) => i.id).join(", ");
+          return c.json(
+            { error: `Investments with "Unknown" investor or company are not allowed. Affected IDs: ${ids}` },
+            400,
+          );
+        }
+        return null;
+      },
+      toRow: (item, now) => {
         const amountRange = parseRange(item.amount);
         const stakeRange = parseRange(item.stakeAcquired);
         return {
@@ -323,96 +283,38 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           conditions: item.conditions ?? null,
           source: item.source ?? null,
           notes: item.notes ?? null,
+          syncedAt: now,
+          updatedAt: now,
         };
-      });
-
-      await tx
-        .insert(investments)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: investments.id,
-          set: {
-            companyId: sql`excluded.company_id`,
-            investorId: sql`excluded.investor_id`,
-            roundName: sql`excluded.round_name`,
-            date: sql`excluded.date`,
-            amount: sql`excluded.amount`,
-            amountLow: sql`excluded.amount_low`,
-            amountHigh: sql`excluded.amount_high`,
-            stakeAcquired: sql`excluded.stake_acquired`,
-            stakeLow: sql`excluded.stake_low`,
-            stakeHigh: sql`excluded.stake_high`,
-            instrument: sql`excluded.instrument`,
-            role: sql`excluded.role`,
-            conditions: sql`excluded.conditions`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Post-sync: resolve entity FKs for newly synced rows
-      await resolveEntityFKs(tx, {
+      },
+      fkResolve: {
         tableName: "investments",
         fields: [
           { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
           { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
         ],
-        scopeIds: items.map((i) => i.id),
-      });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "investment" as const,
-          title: `${i.investorId} → ${i.companyId}${i.roundName ? ` (${i.roundName})` : ""}`,
-          sourceTable: "investments",
-          sourceId: i.id,
-          sourceUrl: i.source,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "investment",
-          recordId: item.id,
-          entityId: item.companyId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("investments/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "investments",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  })
+      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "investment" as const,
+        title: `${item.investorId} → ${item.companyId}${item.roundName ? ` (${item.roundName})` : ""}`,
+        sourceTable: "investments",
+        sourceId: item.id,
+        sourceUrl: item.source,
+      }),
+      toVerdict: (item) => ({
+        recordType: "investment",
+        recordId: item.id,
+        entityId: item.companyId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+      claimSupport: {
+        recordType: "investments",
+        getClaimIds: (item) => item.claimIds ?? [],
+      },
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(investments, "investments"));
 

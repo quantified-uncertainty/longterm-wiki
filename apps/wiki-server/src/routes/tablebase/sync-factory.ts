@@ -454,7 +454,7 @@ async function runPhase<T>(
  *     }))
  */
 export function createSyncHandler<
-  TItem extends { id?: string },
+  TItem extends Record<string, unknown>,
   TTable extends PgTable,
 >(config: SyncConfig<TItem, TTable>) {
   return async (c: Context): Promise<Response> => {
