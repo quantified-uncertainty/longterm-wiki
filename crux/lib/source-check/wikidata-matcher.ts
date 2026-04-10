@@ -51,6 +51,7 @@ type MatchStrategy =
   | { type: 'date'; pid: string }
   | { type: 'year'; pid: string }
   | { type: 'entityRef'; pid: string; multiValued?: boolean }
+  | { type: 'quantity'; pid: string; tolerance?: number }
   | { type: 'skip' };
 
 // ── Property-to-PID map ─────────────────────────────────────────────
@@ -80,6 +81,8 @@ const PROPERTY_MAP: Record<string, MatchStrategy> = {
   'born-year': { type: 'year', pid: 'P569' },
   'ceo': { type: 'entityRef', pid: 'P169' },
   'parent-organization': { type: 'entityRef', pid: 'P749' },
+  'headcount': { type: 'quantity', pid: 'P1128', tolerance: 0.15 },
+  'revenue': { type: 'quantity', pid: 'P2139', tolerance: 0.10 },
   'description': { type: 'skip' },
 };
 
@@ -222,6 +225,18 @@ function getYearFromTime(claim: WikidataClaim): string | null {
 }
 
 /**
+ * Extract a numeric quantity from a claim's datavalue.
+ * Wikidata quantities look like { amount: "+1234", unit: "http://..." }
+ */
+function getQuantityValue(claim: WikidataClaim): number | null {
+  const dv = claim.mainsnak.datavalue;
+  if (!dv || dv.type !== 'quantity') return null;
+  const val = dv.value as { amount: string; unit?: string };
+  const num = parseFloat(val.amount);
+  return isNaN(num) ? null : num;
+}
+
+/**
  * Extract an entity reference QID from a claim.
  * Entity references have datavalue.type === 'wikibase-entityid'
  */
@@ -304,6 +319,8 @@ export async function tryWikidataMatch(item: VerifyItem): Promise<VerifyResult |
         return matchYear(item, entity, strategy.pid, factValue, qid);
       case 'entityRef':
         return await matchEntityRef(item, entity, strategy.pid, factValue, qid, !!strategy.multiValued);
+      case 'quantity':
+        return matchQuantity(item, entity, strategy.pid, factValue, qid, strategy.tolerance ?? 0.10);
     }
   } catch (e: unknown) {
     console.warn(`[wikidata-matcher] Match failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
@@ -529,6 +546,45 @@ async function matchEntityRef(
   }
 }
 
+function matchQuantity(
+  item: VerifyItem,
+  entity: WikidataEntity,
+  pid: string,
+  factValue: string,
+  qid: string,
+  tolerance: number,
+): VerifyResult | null {
+  const claims = getClaimsForProperty(entity, pid);
+  if (claims.length === 0) {
+    return makeResult(item, 'unverifiable', 0.80,
+      `Wikidata ${pid} not present on ${qid}`,
+      `[wikidata-api] Property ${pid} missing from ${qid}`);
+  }
+
+  // Parse the fact value as a number (strip currency symbols, commas, whitespace)
+  const cleanedFact = factValue.replace(/[$€£¥,\s]/g, '');
+  const factNum = parseFloat(cleanedFact);
+  if (isNaN(factNum)) return null; // Can't parse — fall through to LLM
+
+  for (const claim of claims) {
+    const wdNum = getQuantityValue(claim);
+    if (wdNum == null) continue;
+
+    // Compare with tolerance (e.g., 10% for revenue, 15% for headcount)
+    const ratio = Math.abs(factNum - wdNum) / Math.max(Math.abs(wdNum), 1);
+    if (ratio <= tolerance) {
+      return makeResult(item, 'confirmed', 0.95,
+        `Wikidata ${pid} (${propertyLabel(pid)}) = ${wdNum}`,
+        `[wikidata-api] FactBase value '${factValue}' (~${factNum}) matches Wikidata ${pid} = ${wdNum} (within ${(tolerance * 100).toFixed(0)}% tolerance)`);
+    }
+  }
+
+  const wdValues = claims.map(c => getQuantityValue(c)).filter((v): v is number => v != null);
+  return makeResult(item, 'contradicted', 0.90,
+    `Wikidata ${pid} (${propertyLabel(pid)}) = ${wdValues.join(', ')}`,
+    `[wikidata-api] FactBase value '${factValue}' (~${factNum}) does not match Wikidata ${pid} = ${wdValues.join(', ')}`);
+}
+
 // ── Utility ─────────────────────────────────────────────────────────
 
 /** Human-readable labels for common Wikidata properties */
@@ -543,6 +599,8 @@ const PID_LABELS: Record<string, string> = {
   P569: 'date of birth',
   P169: 'CEO',
   P749: 'parent organization',
+  P1128: 'employees',
+  P2139: 'revenue',
 };
 
 function propertyLabel(pid: string): string {

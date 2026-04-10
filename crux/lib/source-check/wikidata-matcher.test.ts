@@ -127,6 +127,23 @@ function makeEntityRefClaim(pid: string, refQid: string, rank: string = 'normal'
   };
 }
 
+function makeQuantityClaim(pid: string, amount: number, unit?: string, rank: string = 'normal') {
+  return {
+    mainsnak: {
+      snaktype: 'value',
+      property: pid,
+      datavalue: {
+        type: 'quantity',
+        value: {
+          amount: amount >= 0 ? `+${amount}` : `${amount}`,
+          unit: unit ?? '1',
+        },
+      },
+    },
+    rank,
+  };
+}
+
 // ── Tests ───────────────────────────────────────────────────────────
 
 describe('extractQid', () => {
@@ -636,6 +653,95 @@ describe('tryWikidataMatch', () => {
       });
       const result = await tryWikidataMatch(item);
       // No English label -> can't compare -> return null -> LLM fallback
+      expect(result).toBeNull();
+    });
+  });
+
+  // ── Quantity matching (P1128 headcount, P2139 revenue) ──
+
+  describe('headcount (P1128 quantity)', () => {
+    it('confirms matching headcount within tolerance', async () => {
+      setMockEntity('Q1000', makeWikidataEntity('Q1000', {
+        claims: { P1128: [makeQuantityClaim('P1128', 3200)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '3100',
+        source: 'https://www.wikidata.org/wiki/Q1000',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
+      expect(result!.confidence).toBe(0.95);
+    });
+
+    it('contradicts headcount outside tolerance', async () => {
+      setMockEntity('Q1001', makeWikidataEntity('Q1001', {
+        claims: { P1128: [makeQuantityClaim('P1128', 5000)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '2000',
+        source: 'https://www.wikidata.org/wiki/Q1001',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('contradicted');
+    });
+
+    it('returns unverifiable when P1128 missing', async () => {
+      setMockEntity('Q1002', makeWikidataEntity('Q1002', { claims: {} }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '1000',
+        source: 'https://www.wikidata.org/wiki/Q1002',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('unverifiable');
+    });
+  });
+
+  describe('revenue (P2139 quantity)', () => {
+    it('confirms matching revenue within 10% tolerance', async () => {
+      setMockEntity('Q1100', makeWikidataEntity('Q1100', {
+        claims: { P2139: [makeQuantityClaim('P2139', 6000000000)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$5,800,000,000',
+        source: 'https://www.wikidata.org/wiki/Q1100',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
+    });
+
+    it('contradicts revenue far outside tolerance', async () => {
+      setMockEntity('Q1101', makeWikidataEntity('Q1101', {
+        claims: { P2139: [makeQuantityClaim('P2139', 10000000000)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$1000000000',
+        source: 'https://www.wikidata.org/wiki/Q1101',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('contradicted');
+    });
+
+    it('returns null for unparseable fact value', async () => {
+      setMockEntity('Q1102', makeWikidataEntity('Q1102', {
+        claims: { P2139: [makeQuantityClaim('P2139', 5000000)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: 'approximately five billion',
+        source: 'https://www.wikidata.org/wiki/Q1102',
+      });
+      const result = await tryWikidataMatch(item);
+      // Can't parse "approximately five billion" as a number -> fall through to LLM
       expect(result).toBeNull();
     });
   });
