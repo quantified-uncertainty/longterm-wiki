@@ -4,7 +4,7 @@ Subsystem map for the wiki's ID schemes (`numericId`, `stableId`, slugs, legacy 
 
 ## Why this file exists
 
-Last 100 PRs had 21 ID-related rework incidents: regex bugs (#4065), allocation races (#4043), personnel ID regex (#3964), `sid_` prefix handling (#4008), string/number type confusion from `postgres.js` returning strings where Sets expected numbers. The failure mode is always the same: agent assumes ID system is simpler than it is, picks the wrong helper, or invents a new ID format.
+Recent ID-related rework incidents: regex bugs (#4065), allocation races (#4043), personnel ID regex (#3964), `sid_` prefix handling (#4008), string/number type confusion from `postgres.js` returning strings where Sets expected numbers. The failure mode is always the same: agent assumes ID system is simpler than it is, picks the wrong helper, or invents a new ID format.
 
 ---
 
@@ -71,7 +71,7 @@ Currently imported by: `apps/wiki-server/src/routes/tablebase/{entities,record-l
 
 ## Validation (run before PR)
 
-Four SID/ID validators in `crux/validate/`:
+Five SID/ID validators in `crux/validate/`:
 
 | Validator | What it catches |
 |-----------|-----------------|
@@ -81,7 +81,7 @@ Four SID/ID validators in `crux/validate/`:
 | `validate-factbase-entity-ids.ts` | FactBase ↔ TableBase entity ID consistency (no duplicates, no orphans) |
 | `validate-kb-entity-slugs.ts` | FactBase refs have matching entity registry entries |
 
-`validate-gate.ts` runs all of these in blocking mode (see lines 500, 512, 648). If you touch IDs, run `pnpm crux w validate gate --fix` before PR.
+`validate-gate.ts` runs all of these in blocking mode (see the `factbase-stableid`, `factbase-entity-ids`, `kb-entity-slugs`, `sid-display`, and `rendered-sid` entries in `parallelChecks`). If you touch IDs, run `pnpm crux w validate gate --fix` before PR.
 
 ## Migration scripts (when you need them)
 
