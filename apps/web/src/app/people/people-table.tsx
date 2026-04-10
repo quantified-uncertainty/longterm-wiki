@@ -15,7 +15,7 @@ import { useServerTable } from "@/hooks/use-server-table";
 import { comparePersonRows } from "./people-sort";
 import type { PeopleSortKey } from "./people-sort";
 import { isPersonMeaningful } from "./people-filter";
-import { CoverageDots } from "@/components/coverage/CoverageDots";
+import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computePersonCoverage } from "@/components/coverage/coverage-score";
 
 export interface PersonRow {
@@ -41,6 +41,9 @@ export interface PersonRow {
   publicationCount: number;
   careerHistoryCount: number;
 
+  /** Source-check verdict string or null */
+  verdictString: string | null;
+
   /** Pre-computed lowercase text blob for full-text search across all fields */
   searchText: string;
 }
@@ -58,6 +61,7 @@ const ServerPersonSchema = z.object({
   employerName: z.string().nullable(),
   bornYear: z.number().nullable(),
   netWorth: z.number().nullable(),
+  verdictString: z.string().nullable().optional(),
 });
 
 type ServerPerson = z.infer<typeof ServerPersonSchema>;
@@ -84,6 +88,7 @@ function serverPersonToRow(p: ServerPerson): PersonRow {
     topics: [],
     publicationCount: 0,
     careerHistoryCount: 0,
+    verdictString: p.verdictString ?? null,
     searchText: "", // Not needed in server mode
   };
 }
@@ -663,7 +668,7 @@ export function PeopleTable({
                     )}
                     {/* Coverage */}
                     <td className="py-2.5 px-3 text-center">
-                      <CoverageDots score={computePersonCoverage(row)} />
+                      <RecordStatusDots coverageScore={computePersonCoverage(row)} verdict={row.verdictString} />
                     </td>
                   </tr>
                 ))}
