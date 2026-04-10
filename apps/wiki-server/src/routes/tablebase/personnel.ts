@@ -2,8 +2,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb, getDb } from "../../db.js";
-import { logger } from "../../logger.js";
+import { getDrizzleDb } from "../../db.js";
 import { personnel, entities, things, sourceVerdicts } from "../../schema.js";
 import {
   verdictJoinCondition,
@@ -20,16 +19,12 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
-import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
-import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
 import { sqlInList } from "../shared/query-helpers.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -345,59 +340,28 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncPersonnelBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
-    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
-    const sourceCheckError = enforceSourceCheck(c, "personnel", items);
-    if (sourceCheckError) return sourceCheckError;
-
-    // Check for natural key collisions within the batch itself.
-    // Natural key: (personId, organizationId, role, roleType)
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.personId}::${item.organizationId}::${item.role}::${item.roleType}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (personId, organizationId, role, roleType) in batch: ` +
-          `personId=${item.personId}, organizationId=${item.organizationId}, ` +
-          `role="${item.role}", roleType=${item.roleType}. ` +
-          `Each personnel record must be unique by person + org + role.`
-        );
-      }
-      batchKeys.add(key);
-    }
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "personId", ids: items.map((i) => i.personId) },
-      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
-    ]);
-    if (refError) return refError;
-
-    // Validate claim references (if any records cite verified claims)
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
+  // ---- POST /sync — uses sync-factory (Phase 1 pilot, Tier 1) ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "personnel",
+      table: personnel,
+      batchSchema: SyncPersonnelBatchSchema,
+      enforceSourceCheck: true,
+      naturalKey: (item) =>
+        `${item.personId}::${item.organizationId}::${item.role}::${item.roleType}`,
+      naturalKeyError:
+        "Duplicate (personId, organizationId, role, roleType) in batch — each personnel record must be unique by person + org + role",
+      entityRefFields: (items) => [
+        { fieldName: "personId", ids: items.map((i) => i.personId) },
+        { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
+      ],
+      auditRecordType: "personnel",
+      claimSupport: {
+        recordType: "personnel",
+        getClaimIds: (item) => item.claimIds ?? [],
+      },
+      toRow: (item) => ({
         id: item.id,
         personId: item.personId,
         organizationId: item.organizationId,
@@ -410,153 +374,88 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         background: item.background ?? null,
         source: item.source ?? null,
         notes: item.notes ?? null,
-      }));
-
-      // Fetch existing records for audit log (before upsert)
-      const existingIds = items.map((i) => i.id);
-      const existing = await tx
-        .select()
-        .from(personnel)
-        .where(inArray(personnel.id, existingIds));
-      const existingMap = new Map(existing.map((r) => [r.id, r]));
-
-      await tx
-        .insert(personnel)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: personnel.id,
-          set: {
-            personId: sql`excluded.person_id`,
-            organizationId: sql`excluded.organization_id`,
-            role: sql`excluded.role`,
-            roleType: sql`excluded.role_type`,
-            startDate: sql`excluded.start_date`,
-            endDate: sql`excluded.end_date`,
-            isFounder: sql`excluded.is_founder`,
-            appointedBy: sql`excluded.appointed_by`,
-            background: sql`excluded.background`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Audit log
-      await logAuditEntries(
-        tx,
-        allVals.map((v) => {
-          const old = existingMap.get(v.id);
-          return {
-            recordType: "personnel",
-            recordId: v.id,
-            operation: old ? ("update" as const) : ("insert" as const),
-            oldData: old ? { ...old } : null,
-            newData: { ...v },
-            sourceUrl: v.source ?? null,
-          };
-        })
-      );
-
-      // Post-sync: resolve entity FKs for newly synced rows
-      const syncedIds = items.map((i) => i.id);
-      await resolveEntityFKs(tx, {
+      }),
+      fkResolve: {
         tableName: "personnel",
         fields: [
           { rawIdColumn: "person_id", entityIdColumn: "person_entity_id", displayNameColumn: "person_display_name", entityTypeFilter: "person" },
           { rawIdColumn: "organization_id", entityIdColumn: "org_entity_id", displayNameColumn: "org_display_name", entityTypeFilter: "organization" },
         ],
-        scopeIds: syncedIds,
-      });
+      },
+      toVerdict: (item) => ({
+        recordType: "personnel",
+        recordId: item.id,
+        entityId: item.organizationId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+      // Personnel has unique post-fkResolve handling that the factory's
+      // standard `toThing` can't express:
+      //   1. Strip the "new:" prefix from personId for display name backfill
+      //   2. Re-fetch rows from PG (because fkResolve has updated person_entity_id)
+      //   3. Resolve person + org titles for the things table
+      //   4. Compose title as "personName — role at orgName"
+      // This is the personnel route's 1-hook escape hatch (per Phase 0 audit).
+      postUpsert: async (tx, items) => {
+        const syncedIds = items.map((i) => i.id);
+        const idList = sqlInList(syncedIds);
 
-      // Special handling: backfill display name from "new:" prefix (strip prefix)
-      const idList = sqlInList(syncedIds);
-      await tx.execute(sql`
-        UPDATE personnel SET
-          person_display_name = trim(substring(person_id FROM 5))
-        WHERE person_id LIKE 'new:%'
-          AND person_display_name IS NULL
-          AND id IN (${idList})
-      `);
+        // 1. Backfill display name from "new:" prefix (strip prefix)
+        await tx.execute(sql`
+          UPDATE personnel SET
+            person_display_name = trim(substring(person_id FROM 5))
+          WHERE person_id LIKE 'new:%'
+            AND person_display_name IS NULL
+            AND id IN (${idList})
+        `);
 
-      // Dual-write to things table with resolved names
-      const resolvedItems = await tx
-        .select({
-          id: personnel.id,
-          personId: personnel.personId,
-          personDisplayName: personnel.personDisplayName,
-          personEntityId: personnel.personEntityId,
-          role: personnel.role,
-          organizationId: personnel.organizationId,
-          source: personnel.source,
-        })
-        .from(personnel)
-        .where(inArray(personnel.id, syncedIds));
+        // 2. Re-fetch rows so things sync uses fkResolve-updated values
+        const resolvedItems = await tx
+          .select({
+            id: personnel.id,
+            personId: personnel.personId,
+            personDisplayName: personnel.personDisplayName,
+            personEntityId: personnel.personEntityId,
+            role: personnel.role,
+            organizationId: personnel.organizationId,
+            source: personnel.source,
+          })
+          .from(personnel)
+          .where(inArray(personnel.id, syncedIds));
 
-      // Resolve person + org IDs to human-readable titles in a single query
-      const resolvedPersonIds = resolvedItems
-        .filter((r) => r.personEntityId)
-        .map((r) => r.personEntityId!);
-      const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
-      const titleMap = await resolveEntityTitles(tx, [...resolvedPersonIds, ...orgIds]);
+        // 3. Resolve person + org IDs to human-readable titles in a single query
+        const resolvedPersonIds = resolvedItems
+          .filter((r) => r.personEntityId)
+          .map((r) => r.personEntityId!);
+        const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
+        const titleMap = await resolveEntityTitles(tx, [
+          ...resolvedPersonIds,
+          ...orgIds,
+        ]);
 
-      await upsertThingsInTx(
-        tx,
-        resolvedItems.map((p) => {
-          const personName = (p.personEntityId ? titleMap.get(p.personEntityId) : null)
-            ?? p.personDisplayName
-            ?? cleanPersonId(p.personId)
-            ?? p.personId;
-          const orgName = titleMap.get(p.organizationId) ?? p.organizationId;
-          return {
-            id: p.id,
-            thingType: "personnel" as const,
-            title: `${personName} — ${p.role} at ${orgName}`,
-            sourceTable: "personnel",
-            sourceId: p.id,
-            sourceUrl: p.source,
-          };
-        })
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "personnel",
-          recordId: item.id,
-          entityId: item.organizationId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("personnel/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "personnel",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  })
+        // 4. Dual-write to things table
+        await upsertThingsInTx(
+          tx,
+          resolvedItems.map((p) => {
+            const personName =
+              (p.personEntityId ? titleMap.get(p.personEntityId) : null) ??
+              p.personDisplayName ??
+              cleanPersonId(p.personId) ??
+              p.personId;
+            const orgName = titleMap.get(p.organizationId) ?? p.organizationId;
+            return {
+              id: p.id,
+              thingType: "personnel" as const,
+              title: `${personName} — ${p.role} at ${orgName}`,
+              sourceTable: "personnel",
+              sourceId: p.id,
+              sourceUrl: p.source,
+            };
+          }),
+        );
+      },
+    }),
+  )
 
   // ---- POST /delete ----
   .post("/delete", async (c) => {
