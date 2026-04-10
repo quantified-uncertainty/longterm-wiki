@@ -21,6 +21,10 @@ type DbOrTx =
  * Uses the same upsert pattern as source-checks.ts verdict writes:
  *   - Verdicts keyed on (record_type, record_id, COALESCE(field_name, ''))
  *   - Evidence keyed on (record_type, record_id, COALESCE(source_url, ''), COALESCE(checker_model, ''))
+ *
+ * When `sourcing.fieldVerdicts` is present, additional per-field verdict rows
+ * are written alongside the row-level verdict. Evidence rows are only written
+ * at the row level (the evidence dedup index does not include field_name).
  */
 export async function writeInlineVerdicts(
   tx: DbOrTx,
@@ -31,14 +35,16 @@ export async function writeInlineVerdicts(
     sourceUrl?: string | null;
     sourcing?: InlineSourcing | null;
   }>
-): Promise<{ written: number }> {
+): Promise<{ written: number; fieldVerdictsWritten: number }> {
   const withSourcing = records.filter((r) => r.sourcing);
-  if (withSourcing.length === 0) return { written: 0 };
+  if (withSourcing.length === 0) return { written: 0, fieldVerdictsWritten: 0 };
+
+  let fieldVerdictsWritten = 0;
 
   for (const record of withSourcing) {
     const v = record.sourcing!;
 
-    // Upsert verdict — same conflict key as source-checks.ts
+    // Upsert row-level verdict (field_name = NULL) — same conflict key as source-checks.ts
     // Note: `reasoning` is the verdict-level summary (not raw evidence text).
     // Raw evidence goes in source_check_evidence.extracted_quote.
     const reasoning = v.evidence
@@ -75,7 +81,49 @@ export async function writeInlineVerdicts(
         updated_at = NOW()
     `);
 
-    // Also write evidence row if we have a source URL
+    // Write per-field verdicts if present
+    if (v.fieldVerdicts) {
+      for (const [fieldName, fv] of Object.entries(v.fieldVerdicts)) {
+        const fieldReasoning = `Inline field source-check: ${fieldName} = ${fv.verdict}`;
+        await tx.execute(sql`
+          INSERT INTO source_check_verdicts (
+            record_type, record_id, field_name, entity_id,
+            verdict, confidence, reasoning, sources_checked,
+            needs_recheck, next_check_due,
+            last_computed_at, created_at, updated_at
+          ) VALUES (
+            ${record.recordType},
+            ${record.recordId},
+            ${fieldName},
+            ${record.entityId ?? null},
+            ${fv.verdict},
+            ${fv.confidence ?? null},
+            ${fieldReasoning},
+            1,
+            false,
+            NOW() + INTERVAL '90 days',
+            NOW(), NOW(), NOW()
+          )
+          ON CONFLICT (record_type, record_id, COALESCE(field_name, ''))
+          DO UPDATE SET
+            verdict = EXCLUDED.verdict,
+            confidence = EXCLUDED.confidence,
+            reasoning = EXCLUDED.reasoning,
+            sources_checked = EXCLUDED.sources_checked,
+            needs_recheck = false,
+            next_check_due = NOW() + INTERVAL '90 days',
+            last_computed_at = NOW(),
+            updated_at = NOW()
+        `);
+        fieldVerdictsWritten++;
+      }
+    }
+
+    // Also write evidence row if we have a source URL.
+    // Note: evidence rows are only written at the row level (field_name = NULL).
+    // The evidence dedup index (idx_sce_dedup) does not include field_name,
+    // so per-field evidence rows would conflict. Per-field evidence can be
+    // added in a follow-up after the dedup index is extended.
     if (record.sourceUrl) {
       await tx.execute(sql`
         INSERT INTO source_check_evidence (
@@ -107,7 +155,7 @@ export async function writeInlineVerdicts(
     }
   }
 
-  return { written: withSourcing.length };
+  return { written: withSourcing.length, fieldVerdictsWritten };
 }
 
 /**

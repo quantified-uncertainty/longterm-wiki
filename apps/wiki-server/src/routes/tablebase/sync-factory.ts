@@ -280,6 +280,7 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
 export interface SyncResponse {
   upserted: number;
   verdictsWritten: number;
+  fieldVerdictsWritten: number;
   claimsLinked: number;
   claimLinkingError?: string;
 }
@@ -499,7 +500,7 @@ export function createSyncHandler<
     const chunkSize = computeChunkSize(columnCount);
 
     let upserted = 0;
-    let verdictsResult = { written: 0 };
+    let verdictsResult = { written: 0, fieldVerdictsWritten: 0 };
 
     const conflictTarget = config.conflictTarget ?? (table as unknown as { id: PgColumn }).id; // as-any-ok: PgTable generic doesn't expose column names; same pattern as deleteBatchHandler
     const conflictSet =
@@ -647,6 +648,7 @@ export function createSyncHandler<
     const response: SyncResponse = {
       upserted,
       verdictsWritten: verdictsResult.written,
+      fieldVerdictsWritten: verdictsResult.fieldVerdictsWritten,
       claimsLinked,
       ...(claimLinkingError ? { claimLinkingError } : {}),
     };
