@@ -19,6 +19,7 @@ import { currentBranch } from '../lib/session/session-checklist.ts';
 import { rebaseAllPrs } from '../lib/pr-rebase.ts';
 import { resolveAllConflicts } from '../lib/conflict-resolution.ts';
 import { parseDeployTasksFromBody } from '../lib/deploy-tasks/detect.ts';
+import { parseLinearId } from '../lib/linear/parse-id.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Test plan validation ─────────────────────────────────────────────────────
@@ -137,6 +138,47 @@ export function bigramSimilarity(a: string, b: string): number {
   }
 
   return intersection / (setA.size + setB.size - intersection);
+}
+
+/**
+ * Collect Linear IDs from branch name, explicit flag, and checklist metadata,
+ * then inject `Fixes QUA-NNN` lines into the PR body for any not already referenced.
+ * Linear's GitHub integration auto-moves issues to Done on PR merge when it sees these.
+ */
+export function injectLinearRefs(
+  body: string,
+  branch: string,
+  explicitLinear: string | undefined,
+  checklistLinearId: string | null,
+): { body: string; injected: string[] } {
+  const linearIds: string[] = [];
+
+  const branchLinearId = parseLinearId(branch);
+  if (branchLinearId) linearIds.push(branchLinearId);
+
+  if (explicitLinear) {
+    for (const token of explicitLinear.split(',')) {
+      const parsed = parseLinearId(token.trim());
+      if (parsed && !linearIds.includes(parsed)) linearIds.push(parsed);
+    }
+  }
+
+  if (checklistLinearId && !linearIds.includes(checklistLinearId)) {
+    linearIds.push(checklistLinearId);
+  }
+
+  const alreadyReferenced = new Set(
+    [...body.matchAll(/(?:Fixes|Closes|Resolves)\s+(QUA-\d+)/gi)].map(m => m[1].toUpperCase())
+  );
+  const toInject = linearIds.filter(id => !alreadyReferenced.has(id));
+
+  if (toInject.length === 0) return { body, injected: [] };
+
+  const refs = toInject.map(id => `Fixes ${id}`).join('\n');
+  return {
+    body: body.trimEnd() + '\n\n' + refs + '\n',
+    injected: toInject,
+  };
 }
 
 interface GitHubPR {
@@ -347,6 +389,24 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
       } else {
         log.info(testPlanResult.message);
       }
+    }
+  }
+
+  // ── Auto-inject Linear issue reference ──────────────────────────────────
+  if (body) {
+    let checklistLinearId: string | null = null;
+    try {
+      const checklist = readFileSync('.claude/wip-checklist.md', 'utf-8');
+      const match = checklist.match(/^> Linear: ([A-Z]+-\d+)/m);
+      if (match) checklistLinearId = match[1];
+    } catch {
+      // No checklist — skip
+    }
+
+    const result = injectLinearRefs(body, branch, options.linear as string | undefined, checklistLinearId);
+    if (result.injected.length > 0) {
+      body = result.body;
+      log.info(`Auto-injected Linear reference(s): ${result.injected.join(', ')}`);
     }
   }
 
@@ -974,6 +1034,8 @@ Options (create):
   --no-draft          Create as ready PR (default: draft).
   --allow-empty-body  Allow creating PR without a description (not recommended).
   --skip-test-plan    Skip test plan validation (not recommended).
+  --linear=QUA-NNN    Inject Linear issue references (comma-separated for epics: QUA-155,QUA-151).
+                      Auto-detected from branch name and .claude/wip-checklist.md if omitted.
   (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
 
 Options (ready):

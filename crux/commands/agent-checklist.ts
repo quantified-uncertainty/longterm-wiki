@@ -29,7 +29,7 @@ import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agent
 import { syncToMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands } from './linear.ts';
-import { resolveLinearId } from '../lib/linear/parse-id.ts';
+import { resolveLinearId, parseLinearId } from '../lib/linear/parse-id.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -155,6 +155,19 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   if (!linearId) {
     const detected = resolveLinearId([branch, task]);
     if (detected) linearId = detected;
+  }
+
+  // Warn if Linear ID detected but branch name doesn't encode it.
+  // Linear's GitHub integration auto-moves issues on PR merge only when it can
+  // link the PR — which requires the branch name to contain the issue ID.
+  let linearBranchWarning = '';
+  if (linearId && !parseLinearId(branch)) {
+    const suggested = `claude/${linearId.toLowerCase()}-${task.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/,'').slice(0, 40)}`;
+    linearBranchWarning =
+      `\n${c.yellow}⚠ Branch "${branch}" does not contain the Linear ID ${linearId}.${c.reset}\n` +
+      `  Linear's GitHub integration won't auto-close the issue on PR merge.\n` +
+      `  ${c.dim}Suggested: git checkout -b ${suggested}${c.reset}\n` +
+      `  ${c.dim}Or: include "Fixes ${linearId}" in the PR description (done automatically by \`crux gh pr create\`).${c.reset}\n`;
   }
 
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
@@ -294,6 +307,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
+  if (linearBranchWarning) output += linearBranchWarning;
   if (issueStartOutput) output += `\n${issueStartOutput}`;
   if (linearStartOutput) output += `\n${linearStartOutput}`;
 
