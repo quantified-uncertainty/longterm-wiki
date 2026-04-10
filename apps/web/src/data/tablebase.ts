@@ -1170,6 +1170,11 @@ export function pickWorstVerdict(
  * org→personnel, publication→citation). Callers are responsible for resolving
  * their domain-specific name→id mapping before calling this.
  *
+ * This is a workaround for parent record types that lack their own
+ * source-check coverage yet (QUA-214). When coverage lands, call sites should
+ * prefer the parent's own verdict and/or combine it with the aggregated
+ * children via pickWorstVerdict.
+ *
  * Returns null if `recordIds` is empty or none of the ids have a verdict.
  */
 export function aggregateRecordVerdicts(

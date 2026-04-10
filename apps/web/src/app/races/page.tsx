@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
-import { getRecordVerdict } from "@/data/tablebase";
+import { getRecordVerdict, pickWorstVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { RACE_LEVEL_LABELS } from "./races-constants";
 import { RacesTable, type RaceRow, type CandidateRow } from "./races-table";
@@ -63,22 +63,32 @@ export default async function RacesPage() {
   }
 
   const races = racesData?.races ?? [];
-  const raceRows: RaceRow[] = races.map((race) => ({
-    id: race.id,
-    name: race.name,
-    raceType: race.raceType,
-    party: race.party,
-    level: race.level,
-    state: race.state,
-    district: race.district,
-    electionDate: race.electionDate,
-    status: race.status,
-    outcome: race.outcome,
-    outcomeDetails: race.outcomeDetails,
-    aiAngle: race.aiAngle,
-    candidates: candidatesByRace.get(race.id) ?? [],
-    verdictString: getRecordVerdict("race", String(race.id))?.verdict ?? null,
-  }));
+  const raceRows: RaceRow[] = races.map((race) => {
+    const candidates = candidatesByRace.get(race.id) ?? [];
+    return {
+      id: race.id,
+      name: race.name,
+      raceType: race.raceType,
+      party: race.party,
+      level: race.level,
+      state: race.state,
+      district: race.district,
+      electionDate: race.electionDate,
+      status: race.status,
+      outcome: race.outcome,
+      outcomeDetails: race.outcomeDetails,
+      aiAngle: race.aiAngle,
+      candidates,
+      // Source-check doesn't verify the `race` record type yet (QUA-214);
+      // roll up the worst candidate verdict so the row dot surfaces any
+      // known issues instead of always rendering as unchecked.
+      verdictString: pickWorstVerdict(
+        candidates
+          .map((c) => c.verdictString)
+          .filter((v): v is string => v !== null),
+      ),
+    };
+  });
 
   const raceStats = stats?.races ?? { total: 0, upcoming: 0, active: 0, resolved: 0 };
   const candidateStats = stats?.candidates ?? { total: 0 };
