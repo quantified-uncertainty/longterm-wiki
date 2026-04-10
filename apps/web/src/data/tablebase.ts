@@ -1132,6 +1132,58 @@ export function getPolicyStakeholderId(
   return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
+// Severity order for rolling up per-stakeholder verdicts to a policy-level dot.
+// Lower index = worse. Mirrors the display mapping in source-check-status.ts
+// (contradicted/unverifiable → failed; outdated/partial → trouble; confirmed → verified).
+const POLICY_VERDICT_SEVERITY = [
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+  "confirmed",
+] as const;
+
+/**
+ * Pick the worst-case verdict from a list of verdict strings, ignoring any
+ * values not in the known severity ladder. Exported for unit tests.
+ */
+export function pickWorstPolicyVerdict(
+  verdicts: readonly string[],
+): string | null {
+  let worstIdx = -1;
+  for (const v of verdicts) {
+    const idx = POLICY_VERDICT_SEVERITY.indexOf(
+      v as (typeof POLICY_VERDICT_SEVERITY)[number],
+    );
+    if (idx === -1) continue;
+    if (worstIdx === -1 || idx < worstIdx) worstIdx = idx;
+  }
+  return worstIdx === -1 ? null : POLICY_VERDICT_SEVERITY[worstIdx];
+}
+
+/**
+ * Aggregate source-check verdicts for a policy by rolling up its stakeholders'
+ * `policy-stakeholder` verdicts to a single worst-case verdict string.
+ *
+ * Policies don't have their own source-check verdict type — only stakeholders do.
+ * Returns null if the policy has no stableId, no stakeholders, or none of the
+ * stakeholders have a verdict yet.
+ */
+export function getAggregatePolicyVerdict(
+  policyStableId: string | null | undefined,
+  stakeholderNames: readonly string[],
+): string | null {
+  if (!policyStableId || stakeholderNames.length === 0) return null;
+  const verdicts: string[] = [];
+  for (const name of stakeholderNames) {
+    const stakeholderId = getPolicyStakeholderId(policyStableId, name);
+    if (!stakeholderId) continue;
+    const v = getRecordVerdict("policy-stakeholder", stakeholderId);
+    if (v) verdicts.push(v.verdict);
+  }
+  return pickWorstPolicyVerdict(verdicts);
+}
+
 // Re-export loadYaml for use in domain modules
 export { loadYaml };
 // Re-export wiki-server helpers
