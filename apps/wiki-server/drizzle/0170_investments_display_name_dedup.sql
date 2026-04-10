@@ -7,13 +7,16 @@
 --
 -- Solution:
 -- 1. Deduplicate using display-name-based grouping (covers both resolved and
---    unresolved rows).
+--    unresolved rows) to clean up historical data.
 -- 2. Drop the old partial index.
 -- 3. Create a new NON-partial unique index on
---    (LOWER(COALESCE(investor_display_name, investor_id)),
---     LOWER(COALESCE(company_display_name, company_id)),
+--    (LOWER(COALESCE(investor_entity_id, investor_id)),
+--     LOWER(COALESCE(company_entity_id, company_id)),
 --     LOWER(COALESCE(round_name, '')))
---    This covers ALL rows, not just those with resolved entity IDs.
+--    Uses entity_id when resolved, falls back to raw_id. This covers ALL rows.
+--    Note: resolveEntityFKs() runs post-insert and may trigger a unique violation
+--    if two different raw IDs resolve to the same entity — this is intentional,
+--    as it catches duplicates that are only detectable after entity resolution.
 
 -- ============================================================================
 -- Step 1: Deduplicate existing rows using display-name grouping.
@@ -64,11 +67,12 @@ WHERE source_table = 'investments'
 
 DROP INDEX IF EXISTS uq_investments_natural_key;
 
--- New index covers ALL rows (not partial), using display names as the grouping
--- key. This prevents duplicates regardless of entity resolution status.
-CREATE UNIQUE INDEX IF NOT EXISTS uq_investments_display_name_key
+-- New index covers ALL rows (not partial), using entity_id when resolved and
+-- raw_id as fallback. This is stable at insert time (uses raw_id) and catches
+-- same-entity duplicates after resolveEntityFKs populates entity_id.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_investments_entity_key
   ON investments (
-    LOWER(COALESCE(investor_display_name, investor_id)),
-    LOWER(COALESCE(company_display_name, company_id)),
+    LOWER(COALESCE(investor_entity_id, investor_id)),
+    LOWER(COALESCE(company_entity_id, company_id)),
     LOWER(COALESCE(round_name, ''))
   );

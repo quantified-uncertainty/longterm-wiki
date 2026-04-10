@@ -268,10 +268,10 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
 
     // Check for natural key collisions within the batch itself.
-    // Natural key: (companyId, investorId, roundName)
+    // Must match the DB unique index: LOWER(COALESCE(entity_id, raw_id))
     const batchKeys = new Set<string>();
     for (const item of items) {
-      const key = `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`;
+      const key = `${item.companyId.toLowerCase()}::${item.investorId.toLowerCase()}::${(item.roundName ?? "").toLowerCase()}`;
       if (batchKeys.has(key)) {
         return validationError(
           c,
