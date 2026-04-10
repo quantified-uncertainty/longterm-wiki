@@ -553,9 +553,14 @@ export async function SourceCheckCoverageContent() {
                       (s, v) => s + (row[v] ?? 0),
                       0
                     );
+                    // Coverage numerator excludes `unchecked` to match the
+                    // checked-coverage definition used elsewhere on the page.
+                    const checkedTotal = allVerdictTypes
+                      .filter((v) => v !== "unchecked")
+                      .reduce((s, v) => s + (row[v] ?? 0), 0);
                     const totalRecords = totalRecordsByType.get(rt);
                     const coveragePct = totalRecords != null && totalRecords > 0
-                      ? Math.round((rowTotal / totalRecords) * 100)
+                      ? Math.round((checkedTotal / totalRecords) * 100)
                       : null;
                     return (
                       <tr
@@ -602,8 +607,13 @@ export async function SourceCheckCoverageContent() {
                     const totalAllRecords = coverageMatrix.totals.totalRecords;
                     const totalAllVerdicts = Object.values(verdictMatrix.totals)
                       .reduce((s, c) => s + c, 0);
+                    // Coverage numerator excludes `unchecked` to match the
+                    // checked-coverage definition used elsewhere on the page.
+                    const totalCheckedVerdicts = allVerdictTypes
+                      .filter((v) => v !== "unchecked")
+                      .reduce((s, v) => s + (verdictMatrix.totals[v] ?? 0), 0);
                     const totalCoverage = totalAllRecords > 0
-                      ? Math.round((totalAllVerdicts / totalAllRecords) * 100)
+                      ? Math.round((totalCheckedVerdicts / totalAllRecords) * 100)
                       : null;
                     return (
                       <tr className="border-t-2 border-border/60 font-semibold">
