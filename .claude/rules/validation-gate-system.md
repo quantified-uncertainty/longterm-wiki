@@ -170,7 +170,7 @@ Four complexity tiers:
 
 ## Adding functionality — checklist
 
-1. **Does a similar validator exist?** Grep the 80+ list above first.
+1. **Does a similar validator exist?** Grep the list above first.
 2. **Wire it into gate, not daily**, if it must run on every PR.
 3. **Blocking vs advisory**: blocking unless you have a documented reason (see `validate-gate.ts` comments on fail-open exceptions — e.g., `assign-ids`, `typecheck-crux`, `mdx-compile`, `gate-triage`).
 4. **Standalone-runnable**: `npx tsx crux/validate/validate-<name>.ts` should work.

@@ -4,7 +4,7 @@ Subsystem map for the YAML → sync → PG pipeline and the tablebase route infr
 
 ## Why this file exists
 
-The last 100 PRs had 18 rework incidents in this subsystem:
+Recent rework incidents in this subsystem include:
 - **PR #4059** broke `unnest()` array parameterization across 8 endpoints — `sqlInList` helper existed but wasn't used
 - **PR #4029** added `validateEntityRefs` calls to 8 endpoints that had silently been missing it
 - **PR #4045** fixed an entity slug reassignment race
@@ -56,14 +56,16 @@ Crux-side scripts that read YAML source and batch POST to wiki-server. All use `
 
 All under `apps/wiki-server/src/routes/tablebase/`. Each route file is one PG table.
 
-**Routes with BOTH `/sync` and `/delete-batch`** (25 — the baseline):
-`grants`, `funding-rounds`, `investments`, `equity-positions`, `benchmarks`, `benchmark-results`, `funding-programs`, `entity-profile`, `entity-profile-descriptions`, `entity-assessments`, `entity-resources`, `entity-events`, `research-areas`, `political-votes`, `political-offices`, `political-scores`, `policy-stakeholders`, `prediction-markets`, `publications`, `secondary-market-prices`, `website-sources`, `division-personnel`, `divisions`, `campaign-finance`, `data-sources`
+**Routes with BOTH `/sync` and `/delete-batch`** (23 — the baseline):
+`grants`, `funding-rounds`, `investments`, `equity-positions`, `benchmarks`, `benchmark-results`, `funding-programs`, `entity-assessments`, `entity-resources`, `entity-events`, `research-areas`, `political-votes`, `political-offices`, `political-scores`, `policy-stakeholders`, `prediction-markets`, `publications`, `secondary-market-prices`, `website-sources`, `division-personnel`, `divisions`, `campaign-finance`, `data-sources`
 
-**Read-only / utility routes** (no `/sync` or `/delete-batch` expected): `audit-log`, `ids`, `people`, `record-lookup`, `sourcing-schema`, `talent-flows`, `write-inline-verdicts`.
+**Read-only / utility routes** (no `/sync` or `/delete-batch` expected): `audit-log`, `ids`, `index`, `people`, `record-lookup`, `sourcing-schema`, `sync-factory` (types only), `talent-flows`, `write-inline-verdicts`.
 
-**Routes still missing `/delete-batch` (PR #4064 gap)** (6):
+**Routes still missing `/delete-batch` (PR #4064 gap)** (8):
 - `bluesky.ts`
 - `entities.ts`
+- `entity-profile.ts`
+- `entity-profile-descriptions.ts`
 - `personnel.ts`
 - `platform-accounts.ts`
 - `political-races.ts`

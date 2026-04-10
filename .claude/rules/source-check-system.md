@@ -55,7 +55,7 @@ All in `apps/wiki-server/src/routes/source-check/source-checks.ts`, mounted in `
 - `components/coverage/coverage-score.ts` — **12 entity-type scorers**, all return 1–4: `computeOrgCoverage`, `computePersonCoverage`, `computeAiModelCoverage`, `computeLegislationCoverage`, `computeProjectCoverage`, `computeBenchmarkCoverage`, `computeGrantCoverage`, `computeFundingProgramCoverage`, `computeFundingRoundCoverage`, `computeDivisionCoverage`, `computePublicationCoverage`, `computeGenericCoverage`. Also signal extractors: `getOrgSignals`, `getPersonSignals`, `getLegislationSignals`.
 - `data/entity-coverage.ts` — `getEntityDataDepth()`, `computeEntityCoverage()` (dispatches to type scorers), `getAllEntityCoverageScores()` (batch, for dashboards)
 - `data/page-coverage.ts` — `getPageCoverageItems()` (wiki page coverage from database.json)
-- `lib/coverage.ts` — `getRatioStatus(num, denom)` (≥75% green, >0 amber, 0 red), `getMetricStatus(actual, target)`
+- `apps/web/src/lib/coverage.ts` — `getRatioStatus(num, denom)` (≥75% green, >0 amber, 0 red), `getMetricStatus(actual, target)`
 
 **Adding coverage for a new entity type**: add a scorer in `coverage-score.ts` + dispatch it in `data/entity-coverage.ts::computeEntityCoverage()`. Don't create a parallel scoring system.
 
@@ -83,7 +83,7 @@ If you're about to add a "show source-check status on X page", first grep for `R
 - **Entity coverage scale**: 1=stub, 2=basic, 3=moderate, 4=comprehensive. Typical record is 2, not 3.
 - **Source-check verdict states** (6): `confirmed | contradicted | outdated | partial | unverifiable | unchecked`
 - **Citation verdict states** (5): `accurate | minor_issues | inaccurate | unsupported | not_verifiable`
-- **Unified display status** (5): `not_run | error | failed | trouble | verified`. Mapping in `recordVerdictToStatus()` / `factbaseVerdictToStatus()` at `source-check-status.ts:65-105`.
+- **Unified display status** (5): `not_run | error | failed | trouble | verified`. Mapping in `recordVerdictToStatus()` / `factbaseVerdictToStatus()` at `apps/web/src/components/source-check/source-check-status.ts`.
 - **Color scheme**: canonical source is `components/shared/verdict-styles.ts` — `SOURCE_CHECK_VERDICT_STYLES`, `CITATION_VERDICT_STYLES`, `CITATION_VERDICT_COLORS`, `SOURCE_CHECK_VERDICT_PRIORITY`, `CITATION_VERDICT_SEVERITY`. **Do not inline your own color map** — `source-check-coverage-content.tsx` did this at lines 51-67 and it's a known duplication.
 - **Checker model**: `claude-haiku-4-5-20251001` (source-checks.ts:66). Stale model → rerun flagged.
 - **Build-time vs runtime**: entity coverage is computed on-demand from database.json + FactBase KB. Source-check verdicts/evidence are runtime PG queries.
@@ -94,7 +94,7 @@ If you're about to add a "show source-check status on X page", first grep for `R
 - Two parallel scoring systems: entity coverage (type scorers) vs page coverage (database.json green/amber/red). No single "data completeness" score.
 - Per-field verdicts are stored (`source_check_verdicts.field_name`) but `EntityProfileViewer` aggregates by record, not field. Public tables don't show per-field granularity.
 - Color-map duplication: `source-check-coverage-content.tsx:51-67` redefines verdict colors independently of `verdict-styles.ts`.
-- Coverage ratio thresholds hardcoded at 75% in `lib/coverage.ts:17`.
+- Coverage ratio thresholds hardcoded at 75% in `apps/web/src/lib/coverage.ts::getRatioStatus`.
 - No automatic entity-level verdict aggregation ("entity has contradicted info") — only per-record.
 
 ## Adding new functionality — checklist
