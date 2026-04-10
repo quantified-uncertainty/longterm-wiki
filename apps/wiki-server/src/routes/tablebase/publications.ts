@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, count, desc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
@@ -22,6 +23,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -168,34 +171,122 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
   )
 
+  // ---- POST /sync ----
+  //
+  // Phase 2 Batch C migration (issue #4090, discussion #4088): factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // Rollback: set `USE_SYNC_FACTORY_ROUTES=!publications` to fall back
+  // to the legacy handler instantly without redeploying.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
+    if (useFactoryFor("publications")) {
+      return factorySyncHandler(c);
+    }
+    return legacySyncHandler(c);
+  })
 
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+  .post("/delete-batch", deleteBatchHandler(publications, "publications"));
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+// ---- Factory implementation (Phase 2 Batch C) ----
 
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
+const factorySyncHandler = createSyncHandler({
+  name: "publications",
+  table: publications,
+  batchSchema: SyncBatchSchema,
+  entityRefFields: (items) => [
+    { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+  ],
+  toRow: (item, now) => ({
+    id: item.id,
+    entityId: item.entityId,
+    entityDisplayName: item.entityDisplayName ?? null,
+    resourceId: item.resourceId ?? null,
+    title: item.title,
+    authors: item.authors ?? null,
+    url: item.url ?? null,
+    venue: item.venue ?? null,
+    publishedDate: item.publishedDate ?? null,
+    publicationType: item.publicationType,
+    citationCount: item.citationCount ?? null,
+    isFlagship: item.isFlagship,
+    abstract: item.abstract ?? null,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+    syncedAt: now,
+    updatedAt: now,
+  }),
+  toThing: (item, titleMap) => ({
+    id: item.id,
+    thingType: "publication" as const,
+    title: item.title,
+    sourceTable: "publications",
+    sourceId: item.id,
+    parentThingId: item.entityId,
+    parentTitle: titleMap.get(item.entityId) ?? item.entityId,
+    sourceUrl: item.url ?? item.source ?? null,
+    description:
+      [item.authors, item.venue, item.publishedDate].filter(Boolean).join(", ") ||
+      null,
+  }),
+  thingsTitleIds: (items) => [...new Set(items.map((i) => i.entityId))],
+  toVerdict: (item) => ({
+    recordType: "publication",
+    recordId: item.id,
+    entityId: item.entityId,
+    sourceUrl: item.url ?? item.source ?? null,
+    sourcing: item.sourcing ?? null,
+  }),
+});
 
-    const now = new Date();
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
 
-    await db.transaction(async (tx) => {
-      const entityIds = [...new Set(items.map((i) => i.entityId))];
-      const titleMap = await resolveEntityTitles(tx, entityIds);
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
 
-      for (const item of items) {
-        await tx
-          .insert(publications)
-          .values({
-            id: item.id,
+  const parsed = SyncBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+  ]);
+  if (refError) return refError;
+
+  const now = new Date();
+  let upserted = 0;
+  let verdictsResult = { written: 0 };
+
+  await db.transaction(async (tx) => {
+    const entityIds = [...new Set(items.map((i) => i.entityId))];
+    const titleMap = await resolveEntityTitles(tx, entityIds);
+
+    for (const item of items) {
+      await tx
+        .insert(publications)
+        .values({
+          id: item.id,
+          entityId: item.entityId,
+          entityDisplayName: item.entityDisplayName ?? null,
+          resourceId: item.resourceId ?? null,
+          title: item.title,
+          authors: item.authors ?? null,
+          url: item.url ?? null,
+          venue: item.venue ?? null,
+          publishedDate: item.publishedDate ?? null,
+          publicationType: item.publicationType,
+          citationCount: item.citationCount ?? null,
+          isFlagship: item.isFlagship,
+          abstract: item.abstract ?? null,
+          source: item.source ?? null,
+          notes: item.notes ?? null,
+          syncedAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: publications.id,
+          set: {
             entityId: item.entityId,
             entityDisplayName: item.entityDisplayName ?? null,
             resourceId: item.resourceId ?? null,
@@ -212,69 +303,47 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             notes: item.notes ?? null,
             syncedAt: now,
             updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: publications.id,
-            set: {
-              entityId: item.entityId,
-              entityDisplayName: item.entityDisplayName ?? null,
-              resourceId: item.resourceId ?? null,
-              title: item.title,
-              authors: item.authors ?? null,
-              url: item.url ?? null,
-              venue: item.venue ?? null,
-              publishedDate: item.publishedDate ?? null,
-              publicationType: item.publicationType,
-              citationCount: item.citationCount ?? null,
-              isFlagship: item.isFlagship,
-              abstract: item.abstract ?? null,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
+          },
+        });
+      upserted++;
+    }
 
-      const entityTitle = (id: string) => titleMap.get(id) ?? id;
+    const entityTitle = (id: string) => titleMap.get(id) ?? id;
 
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "publication" as const,
-          title: i.title,
-          sourceTable: "publications",
-          sourceId: i.id,
-          parentThingId: i.entityId,
-          parentTitle: entityTitle(i.entityId),
-          sourceUrl: i.url ?? i.source ?? null,
-          description:
-            [i.authors, i.venue, i.publishedDate].filter(Boolean).join(", ") ||
-            null,
-        }))
-      );
+    await upsertThingsInTx(
+      tx,
+      items.map((i) => ({
+        id: i.id,
+        thingType: "publication" as const,
+        title: i.title,
+        sourceTable: "publications",
+        sourceId: i.id,
+        parentThingId: i.entityId,
+        parentTitle: entityTitle(i.entityId),
+        sourceUrl: i.url ?? i.source ?? null,
+        description:
+          [i.authors, i.venue, i.publishedDate].filter(Boolean).join(", ") ||
+          null,
+      }))
+    );
 
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "publication",
-          recordId: item.id,
-          entityId: item.entityId,
-          sourceUrl: item.url ?? item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-    });
+    // Write inline source-check verdicts atomically within the same transaction
+    verdictsResult = await writeInlineVerdicts(
+      tx,
+      items.map((item) => ({
+        recordType: "publication",
+        recordId: item.id,
+        entityId: item.entityId,
+        sourceUrl: item.url ?? item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }))
+    );
+  });
 
-    logSourceCheckCoverage("publications/sync", items.length, verdictsResult.written);
+  logSourceCheckCoverage("publications/sync", items.length, verdictsResult.written);
 
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  })
-
-  .post("/delete-batch", deleteBatchHandler(publications, "publications"));
+  return c.json({ upserted, verdictsWritten: verdictsResult.written });
+}
 
 export const publicationsRoute = publicationsApp;
 export type PublicationsRoute = typeof publicationsApp;

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, and, count } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
@@ -14,6 +15,8 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -113,37 +116,107 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
   })
 
   // POST /sync — upsert stakeholders batch
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // Rollback: set `USE_SYNC_FACTORY_ROUTES=!policy-stakeholders` to fall back.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
+    if (useFactoryFor("policy-stakeholders")) {
+      return factorySyncHandler(c);
+    }
+    return legacySyncHandler(c);
+  })
 
-    const parsed = SyncStakeholderBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+  .post("/delete-batch", deleteBatchHandler(policyStakeholders, "policy_stakeholders"));
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+// ---- Factory implementation (Phase 2 migration) ----
 
-    // Validate policyEntityId only. stakeholderEntityId is optional and may
-    // reference entities not yet synced to PG (build-data explicitly expects
-    // some to be missing — wiki-server-data.mjs has fallback logic for this).
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
-    ]);
-    if (refError) return refError;
+const factorySyncHandler = createSyncHandler({
+  name: "policy-stakeholders",
+  table: policyStakeholders,
+  batchSchema: SyncStakeholderBatchSchema,
+  // Validate policyEntityId only. stakeholderEntityId is optional and may
+  // reference entities not yet synced to PG (build-data explicitly expects
+  // some to be missing — wiki-server-data.mjs has fallback logic for this).
+  entityRefFields: (items) => [
+    { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
+  ],
+  toRow: (item, now) => ({
+    id: item.id,
+    policyEntityId: item.policyEntityId,
+    stakeholderEntityId: item.stakeholderEntityId ?? null,
+    stakeholderDisplayName: item.stakeholderDisplayName,
+    position: item.position,
+    importance: item.importance ?? null,
+    reason: item.reason ?? null,
+    source: item.source ?? null,
+    context: item.context ?? null,
+    syncedAt: now,
+    updatedAt: now,
+  }),
+  thingsTitleIds: (items) => [...new Set(items.map((i) => i.policyEntityId))],
+  toThing: (item, titleMap) => {
+    const policyTitle = titleMap.get(item.policyEntityId) ?? item.policyEntityId;
+    return {
+      id: item.id,
+      thingType: "policy-stakeholder" as const,
+      title: `${item.stakeholderDisplayName} on ${policyTitle}`,
+      sourceTable: "policy_stakeholders",
+      sourceId: item.id,
+      parentThingId: item.policyEntityId,
+      parentTitle: policyTitle,
+      sourceUrl: item.source ?? null,
+    };
+  },
+});
 
-    const now = new Date();
-    let upserted = 0;
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
 
-    await db.transaction(async (tx) => {
-      // Resolve policy entity titles for thing titles
-      const policyIds = [...new Set(items.map((i) => i.policyEntityId))];
-      const titleMap = await resolveEntityTitles(tx, policyIds);
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
 
-      for (const item of items) {
-        await tx
-          .insert(policyStakeholders)
-          .values({
-            id: item.id,
+  const parsed = SyncStakeholderBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  // Validate policyEntityId only. stakeholderEntityId is optional and may
+  // reference entities not yet synced to PG (build-data explicitly expects
+  // some to be missing — wiki-server-data.mjs has fallback logic for this).
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId) },
+  ]);
+  if (refError) return refError;
+
+  const now = new Date();
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    // Resolve policy entity titles for thing titles
+    const policyIds = [...new Set(items.map((i) => i.policyEntityId))];
+    const titleMap = await resolveEntityTitles(tx, policyIds);
+
+    for (const item of items) {
+      await tx
+        .insert(policyStakeholders)
+        .values({
+          id: item.id,
+          policyEntityId: item.policyEntityId,
+          stakeholderEntityId: item.stakeholderEntityId ?? null,
+          stakeholderDisplayName: item.stakeholderDisplayName,
+          position: item.position,
+          importance: item.importance ?? null,
+          reason: item.reason ?? null,
+          source: item.source ?? null,
+          context: item.context ?? null,
+          syncedAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: policyStakeholders.id,
+          set: {
             policyEntityId: item.policyEntityId,
             stakeholderEntityId: item.stakeholderEntityId ?? null,
             stakeholderDisplayName: item.stakeholderDisplayName,
@@ -154,48 +227,32 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
             context: item.context ?? null,
             syncedAt: now,
             updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: policyStakeholders.id,
-            set: {
-              policyEntityId: item.policyEntityId,
-              stakeholderEntityId: item.stakeholderEntityId ?? null,
-              stakeholderDisplayName: item.stakeholderDisplayName,
-              position: item.position,
-              importance: item.importance ?? null,
-              reason: item.reason ?? null,
-              source: item.source ?? null,
-              context: item.context ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
+          },
+        });
+      upserted++;
+    }
 
-      // Dual-write to things table
-      const policyTitle = (policyId: string) =>
-        titleMap.get(policyId) ?? policyId;
+    // Dual-write to things table
+    const policyTitle = (policyId: string) =>
+      titleMap.get(policyId) ?? policyId;
 
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "policy-stakeholder" as const,
-          title: `${i.stakeholderDisplayName} on ${policyTitle(i.policyEntityId)}`,
-          sourceTable: "policy_stakeholders",
-          sourceId: i.id,
-          parentThingId: i.policyEntityId,
-          parentTitle: policyTitle(i.policyEntityId),
-          sourceUrl: i.source ?? null,
-        }))
-      );
-    });
+    await upsertThingsInTx(
+      tx,
+      items.map((i) => ({
+        id: i.id,
+        thingType: "policy-stakeholder" as const,
+        title: `${i.stakeholderDisplayName} on ${policyTitle(i.policyEntityId)}`,
+        sourceTable: "policy_stakeholders",
+        sourceId: i.id,
+        parentThingId: i.policyEntityId,
+        parentTitle: policyTitle(i.policyEntityId),
+        sourceUrl: i.source ?? null,
+      }))
+    );
+  });
 
-    return c.json({ upserted });
-  })
-
-  .post("/delete-batch", deleteBatchHandler(policyStakeholders, "policy_stakeholders"));
+  return c.json({ upserted });
+}
 
 export const policyStakeholdersRoute = policyStakeholdersApp;
 export type PolicyStakeholdersRoute = typeof policyStakeholdersApp;

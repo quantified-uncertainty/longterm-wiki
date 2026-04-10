@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, and, count, desc, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
@@ -16,6 +17,8 @@ import {
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -260,32 +263,102 @@ const politicalVotesApp = new Hono()
   })
 
   // POST /sync — batch upsert
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // Rollback: set `USE_SYNC_FACTORY_ROUTES=!political-votes` to fall back.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
+    if (useFactoryFor("political-votes")) {
+      return factorySyncHandler(c);
+    }
+    return legacySyncHandler(c);
+  })
 
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+  .post("/delete-batch", deleteBatchHandler(politicalVotes, null));
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+// ---- Factory implementation (Phase 2 migration) ----
 
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => id != null) },
-      { fieldName: "legislationEntityId", ids: items.map((i) => i.legislationEntityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
+const factorySyncHandler = createSyncHandler({
+  name: "political-votes",
+  table: politicalVotes,
+  batchSchema: SyncBatchSchema,
+  entityRefFields: (items) => [
+    {
+      fieldName: "politicianEntityId",
+      ids: items
+        .map((i) => i.politicianEntityId)
+        .filter((id): id is string => id != null),
+    },
+    {
+      fieldName: "legislationEntityId",
+      ids: items
+        .map((i) => i.legislationEntityId)
+        .filter((id): id is string => id != null),
+    },
+  ],
+  toRow: (item, now) => ({
+    id: item.id,
+    politicianEntityId: item.politicianEntityId ?? null,
+    politicianDisplayName: item.politicianDisplayName ?? null,
+    legislationEntityId: item.legislationEntityId ?? null,
+    legislationTitle: item.legislationTitle ?? null,
+    vote: item.vote,
+    voteDate: item.voteDate ?? null,
+    chamber: item.chamber ?? null,
+    rollCallNumber: item.rollCallNumber ?? null,
+    congressNumber: item.congressNumber ?? null,
+    session: item.session ?? null,
+    sourceUrl: item.sourceUrl ?? null,
+    notes: item.notes ?? null,
+    updatedAt: now,
+  }),
+});
 
-    logger.info(`sync political-votes: upserting ${items.length} votes`);
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
 
-    let upserted = 0;
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
 
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(politicalVotes)
-          .values({
-            id: item.id,
+  const parsed = SyncBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => id != null) },
+    { fieldName: "legislationEntityId", ids: items.map((i) => i.legislationEntityId).filter((id): id is string => id != null) },
+  ]);
+  if (refError) return refError;
+
+  logger.info(`sync political-votes: upserting ${items.length} votes`);
+
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      await tx
+        .insert(politicalVotes)
+        .values({
+          id: item.id,
+          politicianEntityId: item.politicianEntityId ?? null,
+          politicianDisplayName: item.politicianDisplayName ?? null,
+          legislationEntityId: item.legislationEntityId ?? null,
+          legislationTitle: item.legislationTitle ?? null,
+          vote: item.vote,
+          voteDate: item.voteDate ?? null,
+          chamber: item.chamber ?? null,
+          rollCallNumber: item.rollCallNumber ?? null,
+          congressNumber: item.congressNumber ?? null,
+          session: item.session ?? null,
+          sourceUrl: item.sourceUrl ?? null,
+          notes: item.notes ?? null,
+          updatedAt: new Date(),
+        })
+        .onConflictDoUpdate({
+          target: politicalVotes.id,
+          set: {
             politicianEntityId: item.politicianEntityId ?? null,
             politicianDisplayName: item.politicianDisplayName ?? null,
             legislationEntityId: item.legislationEntityId ?? null,
@@ -299,33 +372,14 @@ const politicalVotesApp = new Hono()
             sourceUrl: item.sourceUrl ?? null,
             notes: item.notes ?? null,
             updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: politicalVotes.id,
-            set: {
-              politicianEntityId: item.politicianEntityId ?? null,
-              politicianDisplayName: item.politicianDisplayName ?? null,
-              legislationEntityId: item.legislationEntityId ?? null,
-              legislationTitle: item.legislationTitle ?? null,
-              vote: item.vote,
-              voteDate: item.voteDate ?? null,
-              chamber: item.chamber ?? null,
-              rollCallNumber: item.rollCallNumber ?? null,
-              congressNumber: item.congressNumber ?? null,
-              session: item.session ?? null,
-              sourceUrl: item.sourceUrl ?? null,
-              notes: item.notes ?? null,
-              updatedAt: new Date(),
-            },
-          });
-        upserted++;
-      }
-    });
+          },
+        });
+      upserted++;
+    }
+  });
 
-    return c.json({ upserted });
-  })
-
-  .post("/delete-batch", deleteBatchHandler(politicalVotes, null));
+  return c.json({ upserted });
+}
 
 export const politicalVotesRoute = politicalVotesApp;
 export type PoliticalVotesRoute = typeof politicalVotesApp;

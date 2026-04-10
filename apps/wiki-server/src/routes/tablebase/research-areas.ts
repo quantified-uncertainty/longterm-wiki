@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, count, sql, and } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
@@ -13,6 +14,8 @@ import {
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 import {
   researchAreas,
   researchAreaOrganizations,
@@ -405,81 +408,22 @@ const researchAreasApp = new Hono()
   })
 
   // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!research-areas` falls back to legacy.
+  //
+  // NOTE: only the main /sync endpoint is migrated. The secondary endpoints
+  // (/sync-organizations, /sync-papers, /sync-grant-links, /sync-risks) are
+  // left unchanged — they sync link tables, not research_areas itself.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncResearchAreaBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(
-        c,
-        parsed.error.issues.map((i) => i.message).join(", ")
-      );
+    if (useFactoryFor("research-areas")) {
+      return factorySyncHandler(c);
     }
-
-    const db = getDrizzleDb();
-    const now = new Date();
-    const { items } = parsed.data;
-
-    const allVals = items.map((item) => ({
-      id: item.id,
-      wikiId: item.wikiId ?? null,
-      title: item.title,
-      description: item.description ?? null,
-      status: item.status,
-      cluster: item.cluster ?? null,
-      parentAreaId: item.parentAreaId ?? null,
-      firstProposed: item.firstProposed ?? null,
-      firstProposedYear: item.firstProposedYear ?? null,
-      tags: item.tags,
-      metadata: item.metadata,
-      source: item.source ?? null,
-      notes: item.notes ?? null,
-      syncedAt: now,
-      updatedAt: now,
-    }));
-
-    await db.transaction(async (tx) => {
-      await tx
-        .insert(researchAreas)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: researchAreas.id,
-          set: {
-            wikiId: sql`excluded.wiki_id`,
-            title: sql`excluded.title`,
-            description: sql`excluded.description`,
-            status: sql`excluded.status`,
-            cluster: sql`excluded.cluster`,
-            parentAreaId: sql`excluded.parent_area_id`,
-            firstProposed: sql`excluded.first_proposed`,
-            firstProposedYear: sql`excluded.first_proposed_year`,
-            tags: sql`excluded.tags`,
-            metadata: sql`excluded.metadata`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`excluded.synced_at`,
-            updatedAt: sql`excluded.updated_at`,
-          },
-        });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((ra) => ({
-          id: ra.id,
-          thingType: "research-area" as const,
-          title: ra.title,
-          sourceTable: "research_areas",
-          sourceId: ra.id,
-          description: ra.description,
-          sourceUrl: ra.source,
-          href: `/research-areas/${ra.id}`,
-        }))
-      );
-    });
-
-    return c.json({ upserted: items.length });
+    return legacySyncHandler(c);
   })
 
   // ---- POST /sync-organizations ----
@@ -936,6 +880,118 @@ const researchAreasApp = new Hono()
   })
 
   .post("/delete-batch", deleteBatchHandler(researchAreas, "research_areas"));
+
+// ---- Factory implementation (Phase 2 migration) ----
+
+const factorySyncHandler = createSyncHandler({
+  name: "research-areas",
+  table: researchAreas,
+  batchSchema: SyncResearchAreaBatchSchema,
+  toRow: (item) => ({
+    id: item.id,
+    wikiId: item.wikiId ?? null,
+    title: item.title,
+    description: item.description ?? null,
+    status: item.status,
+    cluster: item.cluster ?? null,
+    parentAreaId: item.parentAreaId ?? null,
+    firstProposed: item.firstProposed ?? null,
+    firstProposedYear: item.firstProposedYear ?? null,
+    tags: item.tags,
+    metadata: item.metadata,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+  }),
+  toThing: (item) => ({
+    id: item.id,
+    thingType: "research-area" as const,
+    title: item.title,
+    sourceTable: "research_areas",
+    sourceId: item.id,
+    description: item.description,
+    sourceUrl: item.source,
+    href: `/research-areas/${item.id}`,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncResearchAreaBatchSchema.safeParse(body);
+  if (!parsed.success) {
+    return validationError(
+      c,
+      parsed.error.issues.map((i) => i.message).join(", ")
+    );
+  }
+
+  const db = getDrizzleDb();
+  const now = new Date();
+  const { items } = parsed.data;
+
+  const allVals = items.map((item) => ({
+    id: item.id,
+    wikiId: item.wikiId ?? null,
+    title: item.title,
+    description: item.description ?? null,
+    status: item.status,
+    cluster: item.cluster ?? null,
+    parentAreaId: item.parentAreaId ?? null,
+    firstProposed: item.firstProposed ?? null,
+    firstProposedYear: item.firstProposedYear ?? null,
+    tags: item.tags,
+    metadata: item.metadata,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+    syncedAt: now,
+    updatedAt: now,
+  }));
+
+  await db.transaction(async (tx) => {
+    await tx
+      .insert(researchAreas)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: researchAreas.id,
+        set: {
+          wikiId: sql`excluded.wiki_id`,
+          title: sql`excluded.title`,
+          description: sql`excluded.description`,
+          status: sql`excluded.status`,
+          cluster: sql`excluded.cluster`,
+          parentAreaId: sql`excluded.parent_area_id`,
+          firstProposed: sql`excluded.first_proposed`,
+          firstProposedYear: sql`excluded.first_proposed_year`,
+          tags: sql`excluded.tags`,
+          metadata: sql`excluded.metadata`,
+          source: sql`excluded.source`,
+          notes: sql`excluded.notes`,
+          syncedAt: sql`excluded.synced_at`,
+          updatedAt: sql`excluded.updated_at`,
+        },
+      });
+
+    // Dual-write to things table
+    await upsertThingsInTx(
+      tx,
+      items.map((ra) => ({
+        id: ra.id,
+        thingType: "research-area" as const,
+        title: ra.title,
+        sourceTable: "research_areas",
+        sourceId: ra.id,
+        description: ra.description,
+        sourceUrl: ra.source,
+        href: `/research-areas/${ra.id}`,
+      }))
+    );
+  });
+
+  return c.json({ upserted: items.length });
+}
 
 export const researchAreasRoute = researchAreasApp;
 export type ResearchAreasRoute = typeof researchAreasApp;

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, count, desc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
@@ -17,6 +18,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -151,157 +154,253 @@ const benchmarkResultsApp = new Hono()
   })
 
   // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!benchmark-results` falls back to legacy.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBenchmarkResultBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(c, parsed.error.issues.map((i) => i.message).join(", "));
+    if (useFactoryFor("benchmark-results")) {
+      return factorySyncHandler(c);
     }
-
-    const db = getDrizzleDb();
-
-    // Validate FK references before inserting.
-    // benchmarkId references the `benchmarks` table (not entities), so check it separately.
-    // modelId references entities.stable_id, so use the standard entity validation.
-    // Check benchmarkIds against the benchmarks table.
-    // This always runs — benchmarkId is a real FK to `benchmarks`, and skipping
-    // this check would let invalid references through to the upsert.
-    const benchmarkIds = [...new Set(parsed.data.items.map((i) => i.benchmarkId))];
-    if (benchmarkIds.length > 0) {
-      const placeholders = benchmarkIds.map((id) => sql`${id}`);
-      const inList = sql.join(placeholders, sql`, `);
-      // Check both id (10-char hash) and slug (e.g., "mmlu") since the enrichment
-      // agent may submit either format.
-      const found = await db.execute<{ id: string; slug: string }>(sql`
-        SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
-      `);
-      const foundIdSet = new Set(found.map((r) => r.id));
-      const foundSlugSet = new Set(found.map((r) => r.slug));
-      // Build slug→id mapping for auto-resolution
-      const slugToId = new Map(found.map((r) => [r.slug, r.id]));
-      const missing = benchmarkIds.filter((id) => !foundIdSet.has(id) && !foundSlugSet.has(id));
-      if (missing.length > 0) {
-        return validationError(
-          c,
-          `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
-        );
-      }
-      // Auto-resolve slugs to IDs so the upsert uses the correct FK
-      for (const item of parsed.data.items) {
-        if (slugToId.has(item.benchmarkId)) {
-          item.benchmarkId = slugToId.get(item.benchmarkId)!;
-        }
-      }
-    }
-
-    // Check modelIds against the entities table. validateEntityRefs() handles
-    // the ?skipEntityValidation=true bypass internally and logs loudly when used
-    // (issue #4017). Entity sync order may vary, but benchmark refs are always
-    // required, hence the bypass exists for migration scenarios only.
-    const modelRefError = await validateEntityRefs(c, db, [
-      { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
-    ]);
-    if (modelRefError) return modelRefError;
-
-    // Validate claim references
-    const items = parsed.data.items;
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    const now = new Date();
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        benchmarkId: item.benchmarkId,
-        modelId: item.modelId,
-        score: item.score,
-        unit: item.unit ?? null,
-        date: item.date ?? null,
-        sourceUrl: item.sourceUrl ?? null,
-        notes: item.notes ?? null,
-        syncedAt: now,
-        updatedAt: now,
-      }));
-
-      await tx
-        .insert(benchmarkResults)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: benchmarkResults.id,
-          set: {
-            benchmarkId: sql`excluded.benchmark_id`,
-            modelId: sql`excluded.model_id`,
-            score: sql`excluded.score`,
-            unit: sql`excluded.unit`,
-            date: sql`excluded.date`,
-            sourceUrl: sql`excluded.source_url`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`excluded.synced_at`,
-            updatedAt: sql`excluded.updated_at`,
-          },
-        });
-      upserted = allVals.length;
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((br) => ({
-          id: br.id,
-          thingType: "benchmark-result" as const,
-          title: `${br.modelId} on ${br.benchmarkId}: ${br.score}`,
-          sourceTable: "benchmark_results",
-          sourceId: br.id,
-          sourceUrl: br.sourceUrl,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "benchmark-result",
-          recordId: item.id,
-          entityId: item.modelId,
-          sourceUrl: item.sourceUrl ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-    });
-
-    logSourceCheckCoverage("benchmark-results/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "benchmark-result",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
+    return legacySyncHandler(c);
   })
 
   .post("/delete-batch", deleteBatchHandler(benchmarkResults, "benchmark_results"));
+
+// ---- Factory implementation (Phase 2 migration) ----
+//
+// Escape hatch: `preValidate` handles the benchmark FK check (against the
+// `benchmarks` table, NOT entities) AND mutates items in place to auto-resolve
+// benchmark slugs → ids before the upsert. Both responsibilities share the
+// same DB query, so they count as a single hook per the factory's 1-hook rule.
+// The modelId entity FK is validated via the standard `entityRefFields`.
+
+const factorySyncHandler = createSyncHandler({
+  name: "benchmark-results",
+  table: benchmarkResults,
+  batchSchema: SyncBenchmarkResultBatchSchema,
+  entityRefFields: (items) => [
+    { fieldName: "modelId", ids: items.map((i) => i.modelId) },
+  ],
+  claimSupport: {
+    recordType: "benchmark-result",
+    getClaimIds: (item) => item.claimIds ?? [],
+  },
+  // preValidate: check benchmarkId against benchmarks table (non-entities FK)
+  // and auto-resolve slug → id in place. Both operations share one query.
+  preValidate: async (c, db, items) => {
+    const benchmarkIds = [...new Set(items.map((i) => i.benchmarkId))];
+    if (benchmarkIds.length === 0) return null;
+
+    const placeholders = benchmarkIds.map((id) => sql`${id}`);
+    const inList = sql.join(placeholders, sql`, `);
+    // Check both id (10-char hash) and slug (e.g., "mmlu") since the enrichment
+    // agent may submit either format.
+    const found = await db.execute<{ id: string; slug: string }>(sql`
+      SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
+    `);
+    const foundIdSet = new Set(found.map((r) => r.id));
+    const foundSlugSet = new Set(found.map((r) => r.slug));
+    // Build slug→id mapping for auto-resolution
+    const slugToId = new Map(found.map((r) => [r.slug, r.id]));
+    const missing = benchmarkIds.filter((id) => !foundIdSet.has(id) && !foundSlugSet.has(id));
+    if (missing.length > 0) {
+      return validationError(
+        c,
+        `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
+      );
+    }
+    // Auto-resolve slugs to IDs so the upsert uses the correct FK
+    for (const item of items) {
+      if (slugToId.has(item.benchmarkId)) {
+        item.benchmarkId = slugToId.get(item.benchmarkId)!;
+      }
+    }
+    return null;
+  },
+  toRow: (item, now) => ({
+    id: item.id,
+    benchmarkId: item.benchmarkId,
+    modelId: item.modelId,
+    score: item.score,
+    unit: item.unit ?? null,
+    date: item.date ?? null,
+    sourceUrl: item.sourceUrl ?? null,
+    notes: item.notes ?? null,
+    syncedAt: now,
+    updatedAt: now,
+  }),
+  toThing: (item) => ({
+    id: item.id,
+    thingType: "benchmark-result" as const,
+    title: `${item.modelId} on ${item.benchmarkId}: ${item.score}`,
+    sourceTable: "benchmark_results",
+    sourceId: item.id,
+    sourceUrl: item.sourceUrl,
+  }),
+  toVerdict: (item) => ({
+    recordType: "benchmark-result",
+    recordId: item.id,
+    entityId: item.modelId,
+    sourceUrl: item.sourceUrl ?? null,
+    sourcing: item.sourcing ?? null,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncBenchmarkResultBatchSchema.safeParse(body);
+  if (!parsed.success) {
+    return validationError(c, parsed.error.issues.map((i) => i.message).join(", "));
+  }
+
+  const db = getDrizzleDb();
+
+  // Validate FK references before inserting.
+  // benchmarkId references the `benchmarks` table (not entities), so check it separately.
+  // modelId references entities.stable_id, so use the standard entity validation.
+  // Check benchmarkIds against the benchmarks table.
+  // This always runs — benchmarkId is a real FK to `benchmarks`, and skipping
+  // this check would let invalid references through to the upsert.
+  const benchmarkIds = [...new Set(parsed.data.items.map((i) => i.benchmarkId))];
+  if (benchmarkIds.length > 0) {
+    const placeholders = benchmarkIds.map((id) => sql`${id}`);
+    const inList = sql.join(placeholders, sql`, `);
+    // Check both id (10-char hash) and slug (e.g., "mmlu") since the enrichment
+    // agent may submit either format.
+    const found = await db.execute<{ id: string; slug: string }>(sql`
+      SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
+    `);
+    const foundIdSet = new Set(found.map((r) => r.id));
+    const foundSlugSet = new Set(found.map((r) => r.slug));
+    // Build slug→id mapping for auto-resolution
+    const slugToId = new Map(found.map((r) => [r.slug, r.id]));
+    const missing = benchmarkIds.filter((id) => !foundIdSet.has(id) && !foundSlugSet.has(id));
+    if (missing.length > 0) {
+      return validationError(
+        c,
+        `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
+      );
+    }
+    // Auto-resolve slugs to IDs so the upsert uses the correct FK
+    for (const item of parsed.data.items) {
+      if (slugToId.has(item.benchmarkId)) {
+        item.benchmarkId = slugToId.get(item.benchmarkId)!;
+      }
+    }
+  }
+
+  // Check modelIds against the entities table. validateEntityRefs() handles
+  // the ?skipEntityValidation=true bypass internally and logs loudly when used
+  // (issue #4017). Entity sync order may vary, but benchmark refs are always
+  // required, hence the bypass exists for migration scenarios only.
+  const modelRefError = await validateEntityRefs(c, db, [
+    { fieldName: "modelId", ids: parsed.data.items.map((i) => i.modelId) },
+  ]);
+  if (modelRefError) return modelRefError;
+
+  // Validate claim references
+  const items = parsed.data.items;
+  const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
+  if (allClaimIds.length > 0) {
+    const rawDb = getDb();
+    const claimError = await validateClaimRefs(rawDb, allClaimIds);
+    if (claimError) return validationError(c, claimError);
+  }
+
+  const now = new Date();
+  let upserted = 0;
+  let verdictsResult = { written: 0 };
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((item) => ({
+      id: item.id,
+      benchmarkId: item.benchmarkId,
+      modelId: item.modelId,
+      score: item.score,
+      unit: item.unit ?? null,
+      date: item.date ?? null,
+      sourceUrl: item.sourceUrl ?? null,
+      notes: item.notes ?? null,
+      syncedAt: now,
+      updatedAt: now,
+    }));
+
+    await tx
+      .insert(benchmarkResults)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: benchmarkResults.id,
+        set: {
+          benchmarkId: sql`excluded.benchmark_id`,
+          modelId: sql`excluded.model_id`,
+          score: sql`excluded.score`,
+          unit: sql`excluded.unit`,
+          date: sql`excluded.date`,
+          sourceUrl: sql`excluded.source_url`,
+          notes: sql`excluded.notes`,
+          syncedAt: sql`excluded.synced_at`,
+          updatedAt: sql`excluded.updated_at`,
+        },
+      });
+    upserted = allVals.length;
+
+    // Dual-write to things table
+    await upsertThingsInTx(
+      tx,
+      items.map((br) => ({
+        id: br.id,
+        thingType: "benchmark-result" as const,
+        title: `${br.modelId} on ${br.benchmarkId}: ${br.score}`,
+        sourceTable: "benchmark_results",
+        sourceId: br.id,
+        sourceUrl: br.sourceUrl,
+      }))
+    );
+
+    // Write inline source-check verdicts atomically within the same transaction
+    verdictsResult = await writeInlineVerdicts(
+      tx,
+      items.map((item) => ({
+        recordType: "benchmark-result",
+        recordId: item.id,
+        entityId: item.modelId,
+        sourceUrl: item.sourceUrl ?? null,
+        sourcing: item.sourcing ?? null,
+      }))
+    );
+  });
+
+  logSourceCheckCoverage("benchmark-results/sync", items.length, verdictsResult.written);
+
+  // Link verified claims to records (best-effort — records already committed)
+  let claimsLinked = 0;
+  let claimLinkingError: string | null = null;
+  if (allClaimIds.length > 0) {
+    try {
+      const rawDb = getDb();
+      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+        recordId: item.id,
+        recordType: "benchmark-result",
+        claimIds: item.claimIds,
+      })));
+      claimsLinked = linkResult.linked;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      claimLinkingError = msg;
+      logger.warn({ error: msg }, "claim linking failed (records already committed)");
+    }
+  }
+
+  return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
+}
 
 export const benchmarkResultsRoute = benchmarkResultsApp;
 export type BenchmarkResultsRoute = typeof benchmarkResultsApp;

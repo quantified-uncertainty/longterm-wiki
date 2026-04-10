@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import {
   eq,
@@ -28,6 +29,8 @@ import {
   TRIGRAM_SIMILARITY_THRESHOLD,
   TRIGRAM_FALLBACK_THRESHOLD,
 } from "../../search-utils.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -56,6 +59,47 @@ const SearchQuery = z.object({
 
 const StatsQuery = z.object({
   parent_id: z.string().max(100).optional(),
+});
+
+// ---- Sync schemas (hoisted to module scope so the factory handler can use them) ----
+
+const SyncThingSchema = z.object({
+  id: z.string().min(1).max(200),
+  thingType: z.enum(VALID_THING_TYPES),
+  title: z.string().min(1).max(2000),
+  parentThingId: z.string().max(200).optional(),
+  sourceTable: z.string().min(1).max(100),
+  sourceId: z.string().min(1).max(200),
+  entityType: z.string().max(100).optional(),
+  description: z.string().max(10000).optional(),
+  sourceUrl: z.string().max(2048).optional(),
+  wikiId: z.string().max(20).optional(),
+  parentTitle: z.string().max(500).optional(),
+});
+
+type SyncThingItem = z.infer<typeof SyncThingSchema>;
+
+/**
+ * Factory batch schema — the request body uses `things` as the array key,
+ * but the factory contract requires `items`. We use `z.preprocess` to rename
+ * the incoming `things` key to `items` so the output type matches the factory
+ * contract `{ items: TItem[] }` while still accepting the original body shape.
+ */
+const SyncThingsFactoryBatchSchema = z.preprocess(
+  (raw) => {
+    if (raw && typeof raw === "object" && "things" in raw) {
+      return { items: (raw as { things: unknown }).things };
+    }
+    return raw;
+  },
+  z.object({
+    items: z.array(SyncThingSchema).min(1).max(MAX_SYNC_BATCH),
+  })
+);
+
+/** Legacy batch schema — untransformed, used by the legacy handler for shape parity. */
+const SyncThingsLegacyBatchSchema = z.object({
+  things: z.array(SyncThingSchema).min(1).max(MAX_SYNC_BATCH),
 });
 
 // Source-check schemas live in the unified /api/source-checks route. See discussion #2950.
@@ -526,88 +570,137 @@ const thingsApp = new Hono()
   })
 
   // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!things` falls back to legacy.
+  //
+  // NOTE: things is the destination table for all other routes' `toThing`
+  // dual-writes, so the factory config here deliberately omits `toThing` —
+  // the handler doesn't dual-write to itself.
   .post("/sync", async (c) => {
-    const raw = await parseJsonBody(c);
-    if (!raw) return invalidJsonError(c);
-
-    const SyncThingSchema = z.object({
-      id: z.string().min(1).max(200),
-      thingType: z.enum(VALID_THING_TYPES),
-      title: z.string().min(1).max(2000),
-      parentThingId: z.string().max(200).optional(),
-      sourceTable: z.string().min(1).max(100),
-      sourceId: z.string().min(1).max(200),
-      entityType: z.string().max(100).optional(),
-      description: z.string().max(10000).optional(),
-      sourceUrl: z.string().max(2048).optional(),
-      wikiId: z.string().max(20).optional(),
-      parentTitle: z.string().max(500).optional(),
-    });
-
-    const SyncBatchSchema = z.object({
-      things: z.array(SyncThingSchema).min(1).max(MAX_SYNC_BATCH),
-    });
-
-    const parsed = SyncBatchSchema.safeParse(raw);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const items = parsed.data.things;
-
-    // Reject duplicate (sourceTable, sourceId) within the batch — duplicates
-    // would cause the multi-row upsert to fail and roll back.
-    const seenSourceKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.sourceTable}\0${item.sourceId}`;
-      if (seenSourceKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate source key in batch: (${item.sourceTable}, ${item.sourceId})`
-        );
-      }
-      seenSourceKeys.add(key);
+    if (useFactoryFor("things")) {
+      return factorySyncHandler(c);
     }
-
-    const db = getDrizzleDb();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        thingType: item.thingType,
-        title: item.title,
-        parentThingId: item.parentThingId ?? null,
-        sourceTable: item.sourceTable,
-        sourceId: item.sourceId,
-        entityType: item.entityType ?? null,
-        description: item.description ?? null,
-        sourceUrl: item.sourceUrl ?? null,
-        wikiId: item.wikiId ?? null,
-      }));
-
-      await tx
-        .insert(things)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [things.sourceTable, things.sourceId],
-          set: {
-            // Do NOT update `id` — it's the PK and may be referenced
-            // by external systems. Changing it would break links.
-            thingType: sql`excluded.thing_type`,
-            title: sql`excluded.title`,
-            parentThingId: sql`excluded.parent_thing_id`,
-            entityType: sql`excluded.entity_type`,
-            description: sql`excluded.description`,
-            sourceUrl: sql`excluded.source_url`,
-            wikiId: sql`excluded.wiki_id`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-      upserted = allVals.length;
-    });
-
-    return c.json({ upserted });
+    return legacySyncHandler(c);
   });
+
+// ---- Factory implementation (Phase 2 migration) ----
+//
+// Escape hatch: `conflictSet` — things has a composite conflict target
+// `(sourceTable, sourceId)`, and we must not overwrite `id` or the conflict
+// key columns themselves on update. The auto-derived SET clause would include
+// them, so we supply an explicit conflictSet that excludes those columns.
+const factorySyncHandler = createSyncHandler<SyncThingItem, typeof things>({
+  name: "things",
+  table: things,
+  // Cast is required because `z.preprocess` widens the schema's input type
+  // to `unknown`, and the factory's `z.ZodType<{ items: ... }>` constraint is
+  // invariant on the input generic. The runtime output shape matches exactly.
+  batchSchema: SyncThingsFactoryBatchSchema as unknown as z.ZodType<{ items: SyncThingItem[] }>, // as-any-ok: z.preprocess widens input type to unknown, factory's ZodType is invariant on input. Output shape matches exactly.
+  naturalKey: (item) => `${item.sourceTable}\0${item.sourceId}`,
+  naturalKeyError: "Duplicate source key in batch",
+  conflictTarget: [things.sourceTable, things.sourceId],
+  // Explicit conflictSet: the auto-derived clause would include
+  // `id`, `sourceTable`, and `sourceId` — none of which should be written on
+  // an update. `id` is the PK and may be externally referenced; sourceTable
+  // and sourceId are the conflict key itself. The legacy handler produced
+  // exactly this SET clause.
+  conflictSet: {
+    thingType: sql`excluded.thing_type`,
+    title: sql`excluded.title`,
+    parentThingId: sql`excluded.parent_thing_id`,
+    entityType: sql`excluded.entity_type`,
+    description: sql`excluded.description`,
+    sourceUrl: sql`excluded.source_url`,
+    wikiId: sql`excluded.wiki_id`,
+    syncedAt: sql`now()`,
+    updatedAt: sql`now()`,
+  },
+  toRow: (item) => ({
+    id: item.id,
+    thingType: item.thingType,
+    title: item.title,
+    parentThingId: item.parentThingId ?? null,
+    sourceTable: item.sourceTable,
+    sourceId: item.sourceId,
+    entityType: item.entityType ?? null,
+    description: item.description ?? null,
+    sourceUrl: item.sourceUrl ?? null,
+    wikiId: item.wikiId ?? null,
+  }),
+  // No toThing — things is itself the things table; no dual-write.
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const raw = await parseJsonBody(c);
+  if (!raw) return invalidJsonError(c);
+
+  const parsed = SyncThingsLegacyBatchSchema.safeParse(raw);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const items = parsed.data.things;
+
+  // Reject duplicate (sourceTable, sourceId) within the batch — duplicates
+  // would cause the multi-row upsert to fail and roll back.
+  const seenSourceKeys = new Set<string>();
+  for (const item of items) {
+    const key = `${item.sourceTable}\0${item.sourceId}`;
+    if (seenSourceKeys.has(key)) {
+      return validationError(
+        c,
+        `Duplicate source key in batch: (${item.sourceTable}, ${item.sourceId})`
+      );
+    }
+    seenSourceKeys.add(key);
+  }
+
+  const db = getDrizzleDb();
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((item) => ({
+      id: item.id,
+      thingType: item.thingType,
+      title: item.title,
+      parentThingId: item.parentThingId ?? null,
+      sourceTable: item.sourceTable,
+      sourceId: item.sourceId,
+      entityType: item.entityType ?? null,
+      description: item.description ?? null,
+      sourceUrl: item.sourceUrl ?? null,
+      wikiId: item.wikiId ?? null,
+    }));
+
+    await tx
+      .insert(things)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [things.sourceTable, things.sourceId],
+        set: {
+          // Do NOT update `id` — it's the PK and may be referenced
+          // by external systems. Changing it would break links.
+          thingType: sql`excluded.thing_type`,
+          title: sql`excluded.title`,
+          parentThingId: sql`excluded.parent_thing_id`,
+          entityType: sql`excluded.entity_type`,
+          description: sql`excluded.description`,
+          sourceUrl: sql`excluded.source_url`,
+          wikiId: sql`excluded.wiki_id`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+    upserted = allVals.length;
+  });
+
+  return c.json({ upserted });
+}
 
 // ---- Exports ----
 

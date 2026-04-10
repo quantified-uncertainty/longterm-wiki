@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, and, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
@@ -21,6 +22,8 @@ import {
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -118,33 +121,102 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
   )
 
+  // ---- POST /sync ----
+  //
+  // Phase 2 Batch C migration (issue #4090, discussion #4088): factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // Rollback: set `USE_SYNC_FACTORY_ROUTES=!entity-events` to fall back
+  // to the legacy handler instantly without redeploying.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
+    if (useFactoryFor("entity-events")) {
+      return factorySyncHandler(c);
+    }
+    return legacySyncHandler(c);
+  })
 
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
+  .post("/delete-batch", deleteBatchHandler(entityEvents, "entity_events"));
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+// ---- Factory implementation (Phase 2 Batch C) ----
 
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
+const factorySyncHandler = createSyncHandler({
+  name: "entity-events",
+  table: entityEvents,
+  batchSchema: SyncBatchSchema,
+  entityRefFields: (items) => [
+    { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+  ],
+  toRow: (item, now) => ({
+    id: item.id,
+    entityId: item.entityId,
+    entityDisplayName: item.entityDisplayName ?? null,
+    date: item.date,
+    title: item.title,
+    description: item.description ?? null,
+    eventType: item.eventType,
+    significance: item.significance ?? null,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+    syncedAt: now,
+    updatedAt: now,
+  }),
+  toThing: (item, titleMap) => ({
+    id: item.id,
+    thingType: "entity-event" as const,
+    title: `${item.title} (${item.date})`,
+    sourceTable: "entity_events",
+    sourceId: item.id,
+    parentThingId: item.entityId,
+    parentTitle: titleMap.get(item.entityId) ?? item.entityId,
+    sourceUrl: item.source ?? null,
+    description: item.description ?? null,
+  }),
+  thingsTitleIds: (items) => [...new Set(items.map((i) => i.entityId))],
+});
 
-    const now = new Date();
-    let upserted = 0;
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
 
-    await db.transaction(async (tx) => {
-      const entityIds = [...new Set(items.map((i) => i.entityId))];
-      const titleMap = await resolveEntityTitles(tx, entityIds);
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
 
-      for (const item of items) {
-        await tx
-          .insert(entityEvents)
-          .values({
-            id: item.id,
+  const parsed = SyncBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+  ]);
+  if (refError) return refError;
+
+  const now = new Date();
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    const entityIds = [...new Set(items.map((i) => i.entityId))];
+    const titleMap = await resolveEntityTitles(tx, entityIds);
+
+    for (const item of items) {
+      await tx
+        .insert(entityEvents)
+        .values({
+          id: item.id,
+          entityId: item.entityId,
+          entityDisplayName: item.entityDisplayName ?? null,
+          date: item.date,
+          title: item.title,
+          description: item.description ?? null,
+          eventType: item.eventType,
+          significance: item.significance ?? null,
+          source: item.source ?? null,
+          notes: item.notes ?? null,
+          syncedAt: now,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: entityEvents.id,
+          set: {
             entityId: item.entityId,
             entityDisplayName: item.entityDisplayName ?? null,
             date: item.date,
@@ -156,48 +228,31 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             notes: item.notes ?? null,
             syncedAt: now,
             updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: entityEvents.id,
-            set: {
-              entityId: item.entityId,
-              entityDisplayName: item.entityDisplayName ?? null,
-              date: item.date,
-              title: item.title,
-              description: item.description ?? null,
-              eventType: item.eventType,
-              significance: item.significance ?? null,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
+          },
+        });
+      upserted++;
+    }
 
-      const entityTitle = (id: string) => titleMap.get(id) ?? id;
+    const entityTitle = (id: string) => titleMap.get(id) ?? id;
 
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "entity-event" as const,
-          title: `${i.title} (${i.date})`,
-          sourceTable: "entity_events",
-          sourceId: i.id,
-          parentThingId: i.entityId,
-          parentTitle: entityTitle(i.entityId),
-          sourceUrl: i.source ?? null,
-          description: i.description ?? null,
-        }))
-      );
-    });
+    await upsertThingsInTx(
+      tx,
+      items.map((i) => ({
+        id: i.id,
+        thingType: "entity-event" as const,
+        title: `${i.title} (${i.date})`,
+        sourceTable: "entity_events",
+        sourceId: i.id,
+        parentThingId: i.entityId,
+        parentTitle: entityTitle(i.entityId),
+        sourceUrl: i.source ?? null,
+        description: i.description ?? null,
+      }))
+    );
+  });
 
-    return c.json({ upserted });
-  })
-
-  .post("/delete-batch", deleteBatchHandler(entityEvents, "entity_events"));
+  return c.json({ upserted });
+}
 
 export const entityEventsRoute = entityEventsApp;
 export type EntityEventsRoute = typeof entityEventsApp;
