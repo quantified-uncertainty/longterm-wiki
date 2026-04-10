@@ -45,24 +45,30 @@ gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:workin
 
 ## Step 2b: Update Linear issue (if applicable)
 
-If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate:
+If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate.
+
+Set `PR_URL` first — if a PR was created during this session, export it; if not, leave it empty so the issue goes straight to `Done`:
 
 ```bash
+# Example: if you created a PR during this session
+# export PR_URL="https://github.com/quantified-uncertainty/longterm-wiki/pull/123"
+PR_URL="${PR_URL:-}"
+
 # Read the Linear ID from the checklist. If absent, skip this step entirely.
 LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
 
 if [ -n "$LINEAR_ID" ]; then
   if [ -n "$PR_URL" ]; then
     # PR exists but hasn't merged → In Review
-    pnpm crux linear issues done "$LINEAR_ID" --pr="$PR_URL"
+    pnpm crux linear issues done "$LINEAR_ID" --pr="$PR_URL" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
   else
     # No PR (research, abandoned, quick fix) → straight to Done
-    pnpm crux linear issues done "$LINEAR_ID"
+    pnpm crux linear issues done "$LINEAR_ID" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
   fi
 fi
 ```
 
-Requires `LINEAR_API_KEY` (synced from `.env.base`). If unset, the command fails loudly and should be rerun after the key is available — Linear is the source of truth for project status and a missing update leaves "In Progress" drift.
+Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` suffix makes the Linear update best-effort so a missing key doesn't interrupt the rest of `/agent-end`. If Linear updates fail, fix the key and rerun `pnpm crux linear issues done <QUA-NNN>` manually — Linear is the source of truth for project status and leaving "In Progress" drift is bad.
 
 ## Step 3: Stop patrol daemon (if running)
 

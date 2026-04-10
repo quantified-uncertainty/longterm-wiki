@@ -225,9 +225,12 @@ describe('agent-checklist init', () => {
   // --- Linear ID detection (QUA-196) ---------------------------------------
 
   it('auto-detects Linear ID from a claude/qua-NNN-* branch name', async () => {
-    vi.mocked(await import('child_process')).execSync.mockReturnValueOnce(
-      'claude/qua-184-linear-integration' as unknown as Buffer
-    );
+    // currentBranch() calls execSync with encoding:'utf-8' so the runtime
+    // return type is string — the Buffer type the vitest spy sees is a
+    // TypeScript artifact from the execSync overloads.
+    const { execSync } = await import('child_process');
+    (vi.mocked(execSync) as unknown as { mockReturnValueOnce: (v: string) => void })
+      .mockReturnValueOnce('claude/qua-184-linear-integration');
 
     const result = await initNoSideEffects(['Build Linear client library'], {
       type: 'infrastructure',
@@ -274,9 +277,9 @@ describe('agent-checklist init', () => {
   });
 
   it('prefers --linear flag over branch or task detection', async () => {
-    vi.mocked(await import('child_process')).execSync.mockReturnValueOnce(
-      'claude/qua-184-foo' as unknown as Buffer
-    );
+    const { execSync } = await import('child_process');
+    (vi.mocked(execSync) as unknown as { mockReturnValueOnce: (v: string) => void })
+      .mockReturnValueOnce('claude/qua-184-foo');
 
     const result = await initNoSideEffects(['mentions QUA-200 in task'], {
       type: 'infrastructure',

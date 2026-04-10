@@ -10,7 +10,7 @@
  *   crux linear issues comment <QUA-NNN> <msg> Post a comment
  *   crux linear issues start <QUA-NNN>         Move to In Progress + start comment
  *   crux linear issues done <QUA-NNN> --pr=URL Move to In Review + done comment
- *   crux linear states list                    Print current QUA team workflow states
+ *   crux linear states-list                    Print current QUA team workflow states
  *   crux linear parse <string>                 Extract a Linear ID from a string (debug)
  */
 

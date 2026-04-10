@@ -6,22 +6,34 @@
  * current session without requiring a manual `--linear=QUA-NNN` flag.
  * Companion to the GitHub issue-number detection already in agent-checklist.
  *
- * Team keys are 2–5 uppercase letters followed by a dash and digits. The
- * default team key is "QUA" but the regex accepts any valid Linear key so
- * the same helper can be reused if the workspace ever adds another team.
+ * The bare-token matcher is deliberately restricted to a known team-key
+ * allowlist (currently just `QUA`) to avoid false positives on tokens like
+ * `UTF-8`, `CVE-2024`, `PR-1234`, `HTTP2-3`, `ISO-8601` that otherwise look
+ * like Linear identifiers but aren't. The branch-pattern matcher is more
+ * permissive since the `claude/` prefix already disambiguates intent.
  */
 
-const LINEAR_ID_RE = /\b([A-Z][A-Z0-9]{1,4})-(\d{1,6})\b/;
+/**
+ * Known Linear team keys recognised by bare-token matching.
+ *
+ * Add new team keys here as the workspace grows. The branch-pattern matcher
+ * doesn't use this list — any 2–5 letter key inside a `claude/<key>-N-*`
+ * branch is accepted since the `claude/` prefix signals explicit intent.
+ */
+export const KNOWN_LINEAR_TEAM_KEYS = ['QUA'] as const;
+
+const knownTeamKeyAlt = KNOWN_LINEAR_TEAM_KEYS.join('|');
+const BARE_ID_RE = new RegExp(`\\b(${knownTeamKeyAlt})-(\\d{1,6})\\b`);
 
 /** Case-insensitive branch-name matcher: `claude/qua-184-description` */
-const BRANCH_ID_RE = /\bclaude\/([a-z][a-z0-9]{1,4})-(\d{1,6})(?:[-/]|$)/i;
+const BRANCH_ID_RE = /\bclaude\/([a-z]{2,5})-(\d{1,6})(?:[-/]|$)/i;
 
 /**
  * Parse a Linear issue identifier from an unstructured string.
  *
  * Search order:
- *   1. Explicit branch-name pattern: `claude/qua-184-*`
- *   2. Any bare `QUA-184` token
+ *   1. Explicit branch-name pattern: `claude/qua-184-*` — any 2–5 letter key
+ *   2. Bare `QUA-184` token — restricted to the known-team-keys allowlist
  *
  * Returns the identifier in canonical form (`QUA-184`) or `null`.
  */
@@ -33,7 +45,7 @@ export function parseLinearId(input: string | null | undefined): string | null {
     return `${branchMatch[1].toUpperCase()}-${branchMatch[2]}`;
   }
 
-  const bareMatch = LINEAR_ID_RE.exec(input);
+  const bareMatch = BARE_ID_RE.exec(input);
   if (bareMatch) {
     return `${bareMatch[1]}-${bareMatch[2]}`;
   }

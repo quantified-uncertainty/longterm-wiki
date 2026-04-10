@@ -18,9 +18,26 @@ describe('parseLinearId', () => {
     expect(parseLinearId('(see QUA-91) for context')).toBe('QUA-91');
   });
 
-  it('normalises different team keys', () => {
+  it('normalises different team keys inside a claude/ branch prefix', () => {
+    // Branch-pattern match accepts any 2-5 letter key — the `claude/`
+    // prefix is the disambiguator, not the team identity.
     expect(parseLinearId('claude/abc-5-test')).toBe('ABC-5');
-    expect(parseLinearId('refs XYZ-999')).toBe('XYZ-999');
+  });
+
+  it('bare-token match is restricted to known team keys (QUA)', () => {
+    expect(parseLinearId('refs QUA-999')).toBe('QUA-999');
+    // Other keys are not matched as bare tokens — avoids false positives.
+    expect(parseLinearId('refs XYZ-999')).toBeNull();
+    expect(parseLinearId('refs ABC-5')).toBeNull();
+  });
+
+  it('does not false-match common tokens that look like Linear IDs', () => {
+    expect(parseLinearId('fix UTF-8 encoding bug')).toBeNull();
+    expect(parseLinearId('patches CVE-2024 vulnerability')).toBeNull();
+    expect(parseLinearId('see RFC-8446 section 4')).toBeNull();
+    expect(parseLinearId('upgrade HTTP2-3 fallback')).toBeNull();
+    expect(parseLinearId('serialize ISO-8601 timestamps')).toBeNull();
+    expect(parseLinearId('PR-1234 is open')).toBeNull();
   });
 
   it('returns null when no ID is present', () => {
@@ -36,12 +53,12 @@ describe('parseLinearId', () => {
     expect(parseLinearId('qua-184 lowercase')).toBeNull();
   });
 
-  it('does not match 6+ digit numbers (out of range for team identifiers)', () => {
+  it('does not match 7+ digit numbers (out of range for team identifiers)', () => {
     expect(parseLinearId('QUA-1234567')).toBeNull();
   });
 
-  it('does not match keys with too many letters', () => {
-    expect(parseLinearId('TEAMNAME-5')).toBeNull();
+  it('does not match keys with too many letters (branch pattern)', () => {
+    expect(parseLinearId('claude/teamname-5-foo')).toBeNull();
   });
 
   it('prefers the branch-pattern match when both appear', () => {
