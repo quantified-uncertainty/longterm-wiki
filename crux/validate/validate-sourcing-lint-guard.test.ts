@@ -1,0 +1,96 @@
+import { describe, it, expect } from 'vitest';
+import { countInText, runCheck } from './validate-sourcing-lint-guard.ts';
+
+describe('countInText', () => {
+  it('returns all zeros for clean text', () => {
+    expect(countInText('const x = sourcing;')).toEqual({
+      hyphenated: 0,
+      camelCase: 0,
+      PascalCase: 0,
+      route: 0,
+      total: 0,
+    });
+  });
+
+  it('counts a single hyphenated occurrence', () => {
+    const c = countInText('// TODO: wire the source-check orchestrator');
+    expect(c.hyphenated).toBe(1);
+    expect(c.route).toBe(0);
+    expect(c.total).toBe(1);
+  });
+
+  it('counts multiple hyphenated occurrences on one line', () => {
+    const c = countInText('source-check source-check');
+    expect(c.hyphenated).toBe(2);
+  });
+
+  it('subtracts route matches from hyphenated count to avoid double counting', () => {
+    const c = countInText(`fetch("/api/source-check/verdicts")`);
+    expect(c.route).toBe(1);
+    expect(c.hyphenated).toBe(0);
+    expect(c.total).toBe(1);
+  });
+
+  it('handles a mix of hyphenated and route references', () => {
+    const text = `
+      // wire up the source-check pipeline
+      const url = "/api/source-check/run";
+      console.log("source-check done");
+    `;
+    const c = countInText(text);
+    expect(c.route).toBe(1);
+    expect(c.hyphenated).toBe(2);
+    expect(c.total).toBe(3);
+  });
+
+  it('counts camelCase identifiers only when followed by another identifier char', () => {
+    const c = countInText('const sourceCheckClient = new SourceCheckOrchestrator();');
+    // `sourceCheckC` — the pattern requires sourceCheck followed by [A-Z_0-9]
+    expect(c.camelCase).toBe(1);
+    // `SourceCheckO` — pattern requires SourceCheck followed by identifier char
+    expect(c.PascalCase).toBe(1);
+  });
+
+  it('does not double-count camel/pascal when the prefix happens to also match hyphenated', () => {
+    // "sourceCheck" and "SourceCheck" do not contain a hyphen, so they are
+    // categorized separately from `source-check`.
+    const c = countInText('sourceCheckX SourceCheckY source-check');
+    expect(c.camelCase).toBe(1);
+    expect(c.PascalCase).toBe(1);
+    expect(c.hyphenated).toBe(1);
+    expect(c.total).toBe(3);
+  });
+
+  it('ignores substrings that are not on a word boundary for camelCase', () => {
+    // "mySourceCheckX" starts with a letter before sourceCheck, so \b fails.
+    const c = countInText('mySourceCheckX');
+    // PascalCase pattern still matches `SourceCheckX` — its leading char is a
+    // word boundary on the capital S preceded by a lowercase letter.
+    // But camelCase requires \bsourceCheck which is blocked here.
+    expect(c.camelCase).toBe(0);
+  });
+
+  it('matches PascalCase for type names like SourceCheckResult', () => {
+    const c = countInText('type T = SourceCheckResult | null;');
+    expect(c.PascalCase).toBe(1);
+  });
+
+  it('counts route once per occurrence even if it appears inside strings', () => {
+    const c = countInText(`
+      const r1 = "/api/source-check";
+      const r2 = '/api/source-check';
+      const r3 = \`/api/source-check\`;
+    `);
+    expect(c.route).toBe(3);
+    expect(c.hyphenated).toBe(0);
+  });
+
+  it('runCheck passes on the current codebase (baseline must not regress)', () => {
+    // Regression guard: if someone adds new source-check references without
+    // updating the baseline, this test fails. This is the same behavior the
+    // gate check enforces at the CI level.
+    const result = runCheck();
+    expect(result.passed).toBe(true);
+    expect(result.baseline).not.toBeNull();
+  });
+});

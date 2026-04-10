@@ -303,6 +303,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'sourcing-lint-guard',
+    name: 'Sourcing rename ratchet (legacy terminology counts only fall)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-sourcing-lint-guard.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new legacy-term references from accumulating
+    // while the rename (QUA-102, QUA-105..QUA-109) is parked. Baseline
+    // at crux/validate/.sourcing-baseline.json — only adjusts downward.
+    // See QUA-103 for context.
+  },
+  {
     id: 'inline-pagination',
     name: 'No inline limit clamping in routes (use clampedLimit)',
     command: 'npx',
