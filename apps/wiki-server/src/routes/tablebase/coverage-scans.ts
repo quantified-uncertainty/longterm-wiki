@@ -5,6 +5,7 @@ import { getDrizzleDb } from "../../db.js";
 import { tablebaseCoverageScans } from "../../schema.js";
 import { zv, clampedLimit, parseJsonBody, validationError, invalidJsonError } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { logger } from "../../logger.js";
 
 const MAX_PAGE_SIZE = 500;
@@ -50,8 +51,6 @@ function formatRow(r: CoverageScanRow) {
   };
 }
 
-// Hand-rolled sync handler because this table uses entityId as the upsert
-// key, not a standard `id` PK (factory requires { id?: string } items).
 const coverageScansApp = new Hono()
   .get("/all", zv("query", ListQuery), async (c) => {
     const { limit, offset, entityType } = c.req.valid("query");
@@ -80,17 +79,27 @@ const coverageScansApp = new Hono()
     const { items } = parsed.data;
     const now = new Date();
     const db = getDrizzleDb();
+
+    // Check for duplicate entityIds in batch
     const seen = new Set<string>();
     for (const item of items) {
       if (seen.has(item.entityId)) return validationError(c, `Duplicate entityId in batch: ${item.entityId}`);
       seen.add(item.entityId);
     }
+
+    // Validate entity references
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
+
     const rows = items.map((item) => ({
       entityType: item.entityType, entityId: item.entityId,
       coverageScore: item.coverageScore, signalsFilled: item.signalsFilled,
       signalsTotal: item.signalsTotal, signals: item.signals,
       scannedAt: item.scannedAt ? new Date(item.scannedAt) : now, updatedAt: now,
     }));
+
     await db.insert(tablebaseCoverageScans).values(rows).onConflictDoUpdate({
       target: tablebaseCoverageScans.entityId,
       set: {
