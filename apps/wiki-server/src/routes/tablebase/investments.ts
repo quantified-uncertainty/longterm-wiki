@@ -250,6 +250,23 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
+    // Reject items with "Unknown" investor or company names.
+    // These create low-quality rows that display poorly on the public page.
+    const unknownItems = items.filter(
+      (i) =>
+        i.investorId.toLowerCase() === "unknown" ||
+        i.companyId.toLowerCase() === "unknown"
+    );
+    if (unknownItems.length > 0) {
+      const ids = unknownItems.map((i) => i.id).join(", ");
+      return validationError(
+        c,
+        `Investments with "Unknown" investor or company are not allowed. ` +
+        `Affected IDs: ${ids}. ` +
+        `Use a specific entity slug or display name instead.`
+      );
+    }
+
     // Check for natural key collisions within the batch itself.
     // Natural key: (companyId, investorId, roundName)
     const batchKeys = new Set<string>();

@@ -2004,10 +2004,11 @@ export const investments = pgTable(
     index("idx_inv_company_entity").on(table.companyEntityId),
     index("idx_inv_investor_entity").on(table.investorEntityId),
     index("idx_inv_date").on(table.date),
-    // Natural key uniqueness: uq_investments_natural_key
-    // Expression index on (investor_entity_id, company_entity_id, COALESCE(round_name, ''))
-    // WHERE investor_entity_id IS NOT NULL AND company_entity_id IS NOT NULL
-    // Managed in migration 0108_natural_key_uniqueness.sql (not representable in Drizzle API).
+    // Natural key uniqueness: uq_investments_display_name_key
+    // Expression index on (LOWER(COALESCE(investor_display_name, investor_id)),
+    //   LOWER(COALESCE(company_display_name, company_id)), LOWER(COALESCE(round_name, '')))
+    // Non-partial — covers ALL rows regardless of entity resolution status.
+    // Managed in migration 0170_investments_display_name_dedup.sql (not representable in Drizzle API).
   ]
 );
 
