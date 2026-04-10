@@ -39,6 +39,10 @@ const skipLlm = args.includes("--skip-llm");
 const entityFilter = args.find((a) => a.startsWith("--entity="))?.split("=")[1];
 const limitArg = args.find((a) => a.startsWith("--limit="))?.split("=")[1];
 const fetchLimit = limitArg ? parseInt(limitArg, 10) : 200;
+if (!Number.isFinite(fetchLimit) || fetchLimit < 1) {
+  console.error(`Invalid --limit value: "${limitArg}" — must be a positive integer`);
+  process.exit(1);
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -256,10 +260,12 @@ export function parseExtractionResponse(text: string): Extraction {
 
     if (parsed.is_numeric) {
       const numericValue = Number(parsed.value);
-      if (isNaN(numericValue)) {
+      // Reject NaN, Infinity, -Infinity — malformed model output must not be
+      // written back to authoritative YAML as a "numeric" fact.
+      if (!Number.isFinite(numericValue)) {
         return {
           correctValue: null,
-          description: `LLM said numeric but value "${parsed.value}" is not a valid number`,
+          description: `LLM said numeric but value "${parsed.value}" is not a valid finite number`,
           isNumeric: false,
           rawExtraction: parsed.value,
         };
@@ -427,6 +433,26 @@ async function main(): Promise<void> {
     console.log(
       `Processing ${verdict.recordId} (${location.entitySlug}/${location.property})...`,
     );
+
+    // Skip verdicts with no reasoning — in --apply mode, sending an empty
+    // string to the LLM could produce a fabricated numeric extraction that
+    // gets written back to authoritative YAML without any source basis.
+    if (!verdict.reasoning?.trim()) {
+      console.log("  SKIP: no reasoning in verdict (manual review needed)");
+      results.push({
+        factId: verdict.recordId,
+        entitySlug: location.entitySlug,
+        property: location.property,
+        currentValue: location.currentValueRaw,
+        correctValue: "N/A",
+        reasoning: "",
+        applied: false,
+        skipped: true,
+        skipReason: "no reasoning in verdict",
+      });
+      skipped++;
+      continue;
+    }
 
     // Skip multi-line values
     if (location.isMultiLineValue) {
