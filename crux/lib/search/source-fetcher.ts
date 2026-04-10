@@ -57,6 +57,7 @@ import {
   fetchWaybackContent,
   type StrategyResult,
 } from './fetch-strategies.ts';
+import { fetchWithPlaywright as playwrightFetch } from './playwright-fetcher.ts';
 
 // ---------------------------------------------------------------------------
 // Public interfaces (spec from issue #633)
@@ -183,38 +184,8 @@ function sessionCacheSet(url: string, value: FetchedSource): void {
   }
 }
 
-// ---------------------------------------------------------------------------
-// HTML-to-text conversion (fallback when Firecrawl unavailable)
-// ---------------------------------------------------------------------------
-
-function extractTitle(html: string): string {
-  const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  if (!m) return '';
-  return m[1]
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#039;/g, "'")
-    .replace(/\s+/g, ' ').trim();
-}
-
-function htmlToText(html: string): string {
-  return html
-    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
-    .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, '')
-    .replace(/<header[^>]*>[\s\S]*?<\/header>/gi, '')
-    .replace(/<footer[^>]*>[\s\S]*?<\/footer>/gi, '')
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n\n')
-    .replace(/<\/h[1-6]>/gi, '\n\n')
-    .replace(/<\/li>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"').replace(/&#039;/g, "'")
-    .replace(/[ \t]+/g, ' ')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
+// HTML-to-text conversion — shared utilities from crux/lib/html-utils.ts
+import { htmlToText, extractTitle } from '../html-utils.ts';
 
 // ---------------------------------------------------------------------------
 // Relevant excerpt extraction
@@ -735,6 +706,22 @@ async function _fetchSourceCore(
         // If Firecrawl failed, fall through to built-in as a last resort
       }
       break;
+    case 'playwright-priority':
+      // For JS-heavy domains, try Playwright first (renders JavaScript).
+      // Falls back to Firecrawl → built-in in the standard path if unavailable.
+      {
+        const pwResult = await playwrightFetch(url);
+        if (pwResult && pwResult.content.length > 0) {
+          strategyResult = {
+            title: pwResult.title,
+            content: pwResult.content,
+            httpStatus: pwResult.httpStatus,
+            fetchMethod: 'playwright',
+          };
+        }
+        // If Playwright unavailable or returned empty, fall through to standard path
+      }
+      break;
     default:
       // 'default' — handled below in the standard fetch path
       break;
@@ -791,7 +778,28 @@ async function _fetchSourceCore(
     }
   }
 
-  // ---- 5b. Wayback fallback for dead/error URLs ----
+  // ---- 5b. Playwright fallback for empty JS-rendered pages ----
+  // If the standard fetch got HTTP 200 but returned empty/minimal content,
+  // the page likely renders via JavaScript. Try Playwright as a fallback.
+  // Skip if we already used Playwright, or if this is a firecrawl-priority
+  // domain (those block headless browsers too — 30s timeout would just waste time).
+  const PLAYWRIGHT_FALLBACK_THRESHOLD = 200; // chars
+  if (content.length < PLAYWRIGHT_FALLBACK_THRESHOLD &&
+      httpStatus >= 200 && httpStatus < 400 &&
+      strategy !== 'playwright-priority' &&
+      strategy !== 'firecrawl-priority') {
+    console.log(`[source-fetcher] Content too short (${content.length} chars) for ${url}, trying Playwright fallback`);
+    const pwFallback = await playwrightFetch(url);
+    if (pwFallback && pwFallback.content.length > content.length) {
+      title = pwFallback.title || title;
+      content = pwFallback.content;
+      httpStatus = pwFallback.httpStatus;
+      fetchMethod = 'playwright';
+      fetchError = null;
+    }
+  }
+
+  // ---- 5c. Wayback fallback for dead/error URLs ----
   // If the standard fetch got an HTTP error (>= 400) or a network failure,
   // and we didn't already try Wayback, attempt Wayback as a last resort (#3457 P2).
   if ((httpStatus >= 400 || (httpStatus === 0 && fetchError)) &&
@@ -807,7 +815,7 @@ async function _fetchSourceCore(
     }
   }
 
-  // ---- 5c. Determine status ----
+  // ---- 5d. Determine status ----
   const resolvedUrl = finalUrl ?? url;
   let status: FetchedSourceStatus;
   if (fetchError && httpStatus === 0) {
