@@ -28,7 +28,6 @@ import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
 import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
-import { commands as syncScaffoldCommands } from './tablebase-sync-scaffold.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1254,8 +1253,6 @@ export const commands = {
   'website-sources-list': websiteSourcesCommands.list,
   'website-sources-show': websiteSourcesCommands.show,
   'website-sources-fetch': websiteSourcesCommands.fetch,
-  // Sync handler scaffolder (for new tablebase routes)
-  'sync-scaffold': syncScaffoldCommands.scaffold,
 };
 
 export function getHelp(): string {
@@ -1310,10 +1307,6 @@ Commands:
   Market data:
   markets-discover <entity>   Discover prediction market questions via LLM agent
   markets-fetch [entity]      Fetch latest snapshots from platform APIs (Metaculus, etc.)
-
-  Sync handler scaffolding (Phase 2 of factory rollout):
-  sync-scaffold <name>        Emit a starter sync route file using createSyncHandler
-                              Options: --table-name, --output, --tier=1|2|3, --force
 
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing
