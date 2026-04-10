@@ -2,6 +2,9 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/directory";
 import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { computeOrgCoverage, getOrgSignals, type OrgCoverageInput } from "@/components/coverage/coverage-score";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
 import {
   formatKBDate,
   shortDomain,
@@ -36,6 +39,8 @@ export interface OrgHeaderData {
   founders: AuthorRef[];
   /** Pre-computed coverage scoring input for the popover */
   coverageInput?: OrgCoverageInput;
+  /** Aggregate source-check verdict for the entity (e.g. "confirmed", "contradicted") */
+  verdict?: string | null;
 }
 
 export function OrgProfileHeader({
@@ -114,6 +119,12 @@ export function OrgProfileHeader({
                 size="md"
               />
             )}
+            <SourceCheckDot
+              status={recordVerdictToStatus(data.verdict)}
+              originalVerdict={data.verdict}
+              size="md"
+              href={getSourceCheckHref("entity", data.id)}
+            />
           </div>
           {data.aliases && data.aliases.length > 0 && (
             <p className="text-xs text-muted-foreground/70 mb-0.5">
