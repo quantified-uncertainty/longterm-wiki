@@ -3899,3 +3899,26 @@ export const politicalVotes = pgTable(
     ),
   ]
 );
+
+// ── Coverage Scans ─────────────────────────────────────────────────
+
+export const tablebaseCoverageScans = pgTable(
+  "tablebase_coverage_scans",
+  {
+    id: serial("id").primaryKey(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    coverageScore: integer("coverage_score").notNull(),
+    signalsFilled: integer("signals_filled").notNull().default(0),
+    signalsTotal: integer("signals_total").notNull().default(0),
+    signals: jsonb("signals").notNull().default({}),
+    scannedAt: timestamp("scanned_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_coverage_scans_entity").on(table.entityId),
+    index("idx_coverage_scans_type_score").on(table.entityType, table.coverageScore),
+    index("idx_coverage_scans_scanned_at").on(table.scannedAt),
+  ],
+);
