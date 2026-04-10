@@ -92,11 +92,20 @@ const ZERO_COUNTS: Counts = {
   total: 0,
 };
 
-/** Patterns scanned, in order of specificity so route matches are subtracted from hyphenated. */
+/**
+ * Patterns scanned. Route matches are a strict subset of hyphenated matches
+ * and are subtracted in `countInText`.
+ *
+ * The camelCase and PascalCase patterns match either bare identifiers
+ * (`sourceCheck`, `SourceCheck`) or extended forms (`sourceCheckClient`,
+ * `SourceCheckResult`, `sourceChecker`, `sourceChecking`) — anything that
+ * starts with the legacy prefix at a word boundary and continues to a word
+ * boundary.
+ */
 const ROUTE_RE = /\/api\/source-check/g;
 const HYPHEN_RE = /source-check/g;
-const CAMEL_RE = /\bsourceCheck[A-Z_0-9]/g;
-const PASCAL_RE = /\bSourceCheck[A-Z_a-z0-9]/g;
+const CAMEL_RE = /\bsourceCheck[A-Za-z0-9_]*\b/g;
+const PASCAL_RE = /\bSourceCheck[A-Za-z0-9_]*\b/g;
 
 export function countInText(text: string): Counts {
   const routeMatches = text.match(ROUTE_RE)?.length ?? 0;
@@ -216,51 +225,48 @@ export function runCheck(): CheckResult {
     };
   }
 
-  const categories: (keyof Counts)[] = [
+  // The ratchet compares total counts only — refactors that redistribute
+  // references across categories (e.g., renaming a route to a non-route
+  // hyphenated form) are allowed as long as the overall total doesn't rise.
+  const perCategoryDeltas: string[] = [];
+  const bucketCategories: (keyof Counts)[] = [
     'hyphenated',
     'camelCase',
     'PascalCase',
     'route',
-    'total',
   ];
-  const regressions: string[] = [];
-  for (const cat of categories) {
-    if (counts[cat] > baseline[cat]) {
-      regressions.push(
-        `  ${cat}: ${baseline[cat]} → ${counts[cat]} (+${counts[cat] - baseline[cat]})`,
+  for (const cat of bucketCategories) {
+    const delta = counts[cat] - baseline[cat];
+    if (delta !== 0) {
+      const sign = delta > 0 ? '+' : '';
+      perCategoryDeltas.push(
+        `  ${cat}: ${baseline[cat]} → ${counts[cat]} (${sign}${delta})`,
       );
     }
   }
 
-  if (regressions.length > 0) {
+  if (counts.total > baseline.total) {
     const message =
-      'New source-check references detected beyond baseline:\n' +
-      regressions.join('\n') +
+      `Total legacy-term count rose from ${baseline.total} to ${counts.total} ` +
+      `(+${counts.total - baseline.total}):\n` +
+      perCategoryDeltas.join('\n') +
       '\n\nThe sourcing rename (QUA-102, QUA-105..QUA-109) is in progress. ' +
-      'New code should use "sourcing" terminology, not "source-check".\n' +
-      'If this change is a legitimate refactor of existing source-check code ' +
-      'and the overall count should stay flat or fall, check whether the code ' +
-      'being edited already contains these patterns (the ratchet compares ' +
-      'total counts, not per-file counts).';
+      'New code should use "sourcing" terminology. Refactors that redistribute ' +
+      'existing references across categories are allowed as long as the total ' +
+      'stays flat or falls — only the total is enforced.';
     return { passed: false, current: counts, baseline, filesScanned, message };
   }
 
-  const drops: string[] = [];
-  for (const cat of categories) {
-    if (counts[cat] < baseline[cat]) {
-      drops.push(`  ${cat}: ${baseline[cat]} → ${counts[cat]} (-${baseline[cat] - counts[cat]})`);
-    }
-  }
-
-  if (drops.length > 0) {
+  if (counts.total < baseline.total) {
     return {
       passed: true,
       current: counts,
       baseline,
       filesScanned,
       message:
-        `Sourcing references reduced — consider lowering the baseline:\n` +
-        drops.join('\n') +
+        `Total dropped from ${baseline.total} to ${counts.total} ` +
+        `(-${baseline.total - counts.total}) — consider lowering the baseline:\n` +
+        perCategoryDeltas.join('\n') +
         `\n\nRun \`npx tsx crux/validate/validate-sourcing-lint-guard.ts --update\` ` +
         `and commit .sourcing-baseline.json.`,
     };
