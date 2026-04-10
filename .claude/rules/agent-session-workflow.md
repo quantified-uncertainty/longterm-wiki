@@ -18,6 +18,8 @@ When the session is working on a tracked issue, encode the issue ID in the branc
 
 Both GitHub (`fix-NNN`) and Linear (`qua-NNN`) patterns are auto-detected by `crux sys agent-checklist init`. Linear detection also falls back to any bare `QUA-NNN` token in the task description, and can be overridden with `--linear=QUA-NNN`.
 
+**Linear branch naming is critical for auto-close.** Linear's GitHub integration auto-moves issues to Done on PR merge, but only if the branch name contains `qua-NNN`. If you name the branch `claude/tier0-data-integrity` instead of `claude/qua-155-tier0-data-integrity`, Linear won't link the PR and the issue stays open after merge. `agent-checklist init` warns about this. As a fallback, `crux gh pr create` auto-injects `Fixes QUA-NNN` into the PR body.
+
 ### CI-fix dedup check (when triggered by a CI failure, not a GitHub issue)
 
 Before creating a branch to fix a CI failure, check for existing fix attempts:

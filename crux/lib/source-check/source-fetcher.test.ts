@@ -1,8 +1,29 @@
 /**
  * Tests for source-fetcher.ts
  */
-import { describe, it, expect } from 'vitest';
-import { isPrivateHost, htmlToText } from './source-fetcher.ts';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { isPrivateHost, htmlToText, fetchSourceContent } from './source-fetcher.ts';
+
+// Mock wiki-server dependencies so fetchSourceContent runs offline.
+vi.mock('../wiki-server/citations.ts', () => ({
+  getCitationContentByUrl: vi.fn(),
+}));
+vi.mock('../wiki-server/resources.ts', () => ({
+  lookupResourceByUrl: vi.fn(),
+  suggestResourcesApi: vi.fn().mockResolvedValue({ ok: true, data: { results: [], batchId: 'test' } }),
+}));
+vi.mock('../wiki-server/jobs.ts', () => ({
+  createJob: vi.fn().mockResolvedValue({ ok: true, data: { id: 123 } }),
+}));
+vi.mock('../wayback.ts', () => ({
+  lookupWaybackSnapshot: vi.fn().mockResolvedValue(null),
+  fetchWaybackContent: vi.fn(),
+  formatWaybackTimestamp: vi.fn(),
+}));
+
+import { getCitationContentByUrl } from '../wiki-server/citations.ts';
+import { lookupResourceByUrl, suggestResourcesApi } from '../wiki-server/resources.ts';
+import { createJob } from '../wiki-server/jobs.ts';
 
 describe('isPrivateHost', () => {
   it('blocks localhost', () => {
@@ -159,5 +180,111 @@ describe('htmlToText', () => {
     const text = htmlToText(html);
     // <main> has < 200 chars, so falls back to full HTML
     expect(text).toContain('Full body content');
+  });
+});
+
+describe('fetchSourceContent self-healing ingest enqueue', () => {
+  beforeEach(() => {
+    vi.mocked(getCitationContentByUrl).mockReset();
+    vi.mocked(lookupResourceByUrl).mockReset();
+    vi.mocked(createJob).mockReset();
+    vi.mocked(suggestResourcesApi).mockReset();
+    vi.mocked(createJob).mockResolvedValue({ ok: true, data: { id: 123 } } as any);
+    vi.mocked(suggestResourcesApi).mockResolvedValue({ ok: true, data: { results: [], batchId: 'test' } } as any);
+  });
+
+  it('enqueues a resource-ingest job when resource row exists but content is missing', async () => {
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({
+      ok: true,
+      data: { id: 'res-abc123', url: 'https://example.com/page', fetchStatus: null },
+    } as any);
+
+    const result = await fetchSourceContent('https://example.com/page');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — resource-ingest job enqueued');
+    expect(result.ingestEnqueued).toBe(true);
+    // Should have used createJob (fast path) for existing resource
+    expect(vi.mocked(createJob)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-ingest',
+        params: { resourceId: 'res-abc123', url: 'https://example.com/page' },
+        dedupKey: 'ingest:res-abc123',
+      }),
+    );
+    // Should NOT have called suggestResourcesApi when we already have a resource row
+    expect(vi.mocked(suggestResourcesApi)).not.toHaveBeenCalled();
+  });
+
+  it('registers via /suggest when URL has no resource row (the bug fix)', async () => {
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    // lookupResourceByUrl returns 404 / not found
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({ ok: false, error: 'not_found', message: 'no row' } as any);
+
+    const result = await fetchSourceContent('https://brand-new-url.example.com/path');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — resource-ingest job enqueued');
+    expect(result.ingestEnqueued).toBe(true);
+    // Should have used suggestResourcesApi (the new branch) — registers + enqueues in one shot
+    expect(vi.mocked(suggestResourcesApi)).toHaveBeenCalledWith({
+      urls: ['https://brand-new-url.example.com/path'],
+    });
+    // Should NOT have called createJob directly — /suggest does that server-side
+    expect(vi.mocked(createJob)).not.toHaveBeenCalled();
+  });
+
+  it('gracefully reports enqueue failure without throwing', async () => {
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({ ok: false, error: 'not_found', message: 'no row' } as any);
+    vi.mocked(suggestResourcesApi).mockRejectedValue(new Error('network down'));
+
+    const result = await fetchSourceContent('https://example.com/failing');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
+    expect(result.ingestEnqueued).toBe(false);
+  });
+
+  it('reports enqueue failure when suggestResourcesApi resolves with ok:false', async () => {
+    // Regression: suggestResourcesApi returns ApiResult (discriminated union) and
+    // never throws on API-level failures. A resolved { ok: false } must be
+    // treated the same as a rejected promise — otherwise ingestEnqueued would
+    // be silently true and the record would sit stuck forever.
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({ ok: false, error: 'not_found', message: 'no row' } as any);
+    vi.mocked(suggestResourcesApi).mockResolvedValue({
+      ok: false,
+      error: 'server_error',
+      message: 'wiki-server down',
+    } as any);
+
+    const result = await fetchSourceContent('https://example.com/failing-ok-false');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
+    expect(result.ingestEnqueued).toBe(false);
+  });
+
+  it('reports enqueue failure when createJob resolves with ok:false', async () => {
+    // Same class of bug on the resourceId branch: createJob returns ApiResult
+    // and a non-throwing failure must not be silently treated as success.
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({
+      ok: true,
+      data: { id: 'res_1', url: 'https://example.com/failing-job', numericId: 1 },
+    } as any);
+    vi.mocked(createJob).mockResolvedValue({
+      ok: false,
+      error: 'server_error',
+      message: 'job queue rejected',
+    } as any);
+
+    const result = await fetchSourceContent('https://example.com/failing-job');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
+    expect(result.ingestEnqueued).toBe(false);
   });
 });
