@@ -127,6 +127,23 @@ function makeEntityRefClaim(pid: string, refQid: string, rank: string = 'normal'
   };
 }
 
+function makeQuantityClaim(pid: string, amount: number, unit?: string, rank: string = 'normal') {
+  return {
+    mainsnak: {
+      snaktype: 'value',
+      property: pid,
+      datavalue: {
+        type: 'quantity',
+        value: {
+          amount: amount >= 0 ? `+${amount}` : `${amount}`,
+          unit: unit ?? '1',
+        },
+      },
+    },
+    rank,
+  };
+}
+
 // ── Tests ───────────────────────────────────────────────────────────
 
 describe('extractQid', () => {
@@ -637,6 +654,142 @@ describe('tryWikidataMatch', () => {
       const result = await tryWikidataMatch(item);
       // No English label -> can't compare -> return null -> LLM fallback
       expect(result).toBeNull();
+    });
+  });
+
+  // ── Quantity matching (P1128 headcount, P2139 revenue) ──
+
+  describe('headcount (P1128 quantity)', () => {
+    it('confirms matching headcount within tolerance', async () => {
+      setMockEntity('Q1000', makeWikidataEntity('Q1000', {
+        claims: { P1128: [makeQuantityClaim('P1128', 3200)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '3100',
+        source: 'https://www.wikidata.org/wiki/Q1000',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
+      expect(result!.confidence).toBe(0.95);
+    });
+
+    it('contradicts headcount outside tolerance', async () => {
+      setMockEntity('Q1001', makeWikidataEntity('Q1001', {
+        claims: { P1128: [makeQuantityClaim('P1128', 5000)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '2000',
+        source: 'https://www.wikidata.org/wiki/Q1001',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('contradicted');
+    });
+
+    it('returns unverifiable when P1128 missing', async () => {
+      setMockEntity('Q1002', makeWikidataEntity('Q1002', { claims: {} }));
+      const item = makeFactItem({
+        propertyName: 'headcount',
+        formattedValue: '1000',
+        source: 'https://www.wikidata.org/wiki/Q1002',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('unverifiable');
+    });
+  });
+
+  describe('revenue (P2139 quantity)', () => {
+    const USD_UNIT = 'http://www.wikidata.org/entity/Q4917';
+    const EUR_UNIT = 'http://www.wikidata.org/entity/Q4916';
+
+    it('confirms matching USD revenue within 10% tolerance', async () => {
+      setMockEntity('Q1100', makeWikidataEntity('Q1100', {
+        claims: { P2139: [makeQuantityClaim('P2139', 6000000000, USD_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$5,800,000,000',
+        source: 'https://www.wikidata.org/wiki/Q1100',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
+    });
+
+    it('contradicts USD revenue far outside tolerance', async () => {
+      setMockEntity('Q1101', makeWikidataEntity('Q1101', {
+        claims: { P2139: [makeQuantityClaim('P2139', 10000000000, USD_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$1000000000',
+        source: 'https://www.wikidata.org/wiki/Q1101',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('contradicted');
+    });
+
+    it('returns null for unparseable fact value', async () => {
+      setMockEntity('Q1102', makeWikidataEntity('Q1102', {
+        claims: { P2139: [makeQuantityClaim('P2139', 5000000, USD_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: 'approximately five billion',
+        source: 'https://www.wikidata.org/wiki/Q1102',
+      });
+      const result = await tryWikidataMatch(item);
+      // Can't parse "approximately five billion" as a number -> fall through to LLM
+      expect(result).toBeNull();
+    });
+
+    it('rejects mixed-text numeric values like "$5.8 billion" (strict parse)', async () => {
+      setMockEntity('Q1103', makeWikidataEntity('Q1103', {
+        claims: { P2139: [makeQuantityClaim('P2139', 5800000000, USD_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$5.8 billion',
+        source: 'https://www.wikidata.org/wiki/Q1103',
+      });
+      const result = await tryWikidataMatch(item);
+      // "$5.8 billion" after stripping -> "5.8billion", strict numeric regex rejects.
+      // Must fall through to LLM instead of partial-parsing as 5.8.
+      expect(result).toBeNull();
+    });
+
+    it('falls through to LLM when fact currency mismatches Wikidata unit', async () => {
+      // Wikidata claim is in EUR; fact is in USD. Same magnitude but different currency
+      // must NOT be confirmed — a cross-currency confirmation would be a false positive.
+      setMockEntity('Q1104', makeWikidataEntity('Q1104', {
+        claims: { P2139: [makeQuantityClaim('P2139', 6000000000, EUR_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '$6,000,000,000',
+        source: 'https://www.wikidata.org/wiki/Q1104',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).toBeNull();
+    });
+
+    it('confirms matching EUR revenue when both sides are EUR', async () => {
+      setMockEntity('Q1105', makeWikidataEntity('Q1105', {
+        claims: { P2139: [makeQuantityClaim('P2139', 6000000000, EUR_UNIT)] },
+      }));
+      const item = makeFactItem({
+        propertyName: 'revenue',
+        formattedValue: '€5,800,000,000',
+        source: 'https://www.wikidata.org/wiki/Q1105',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
     });
   });
 
