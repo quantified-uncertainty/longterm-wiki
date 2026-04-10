@@ -68,6 +68,7 @@ crux/coverage/
 .claude/review-done
 .claude/worktree-cleanup.log
 .claude/worktrees/
+.claude/backups/
 
 # MCP config (contains tokens)
 .mcp.json

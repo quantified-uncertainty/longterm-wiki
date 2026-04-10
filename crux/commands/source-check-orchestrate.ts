@@ -23,6 +23,7 @@ import { createJob } from '../lib/wiki-server/jobs.ts';
 import type { RecordType } from '../../apps/wiki-server/src/api-types.ts';
 import { orchestrateCommand } from '../lib/source-check/orchestrator.ts';
 import type { OrchestrateOptions } from '../lib/source-check/orchestrator-types.ts';
+import { cleanContradictedCommand } from './clean-contradicted.ts';
 
 export { orchestrateCommand } from '../lib/source-check/orchestrator.ts';
 
@@ -110,6 +111,11 @@ async function verifyCommand(
   // Contradicted subcommand
   if (subcommand === 'contradicted') {
     return contradictedCommand(args.slice(1), options);
+  }
+
+  // Clean subcommand — export + delete contradicted records
+  if (subcommand === 'clean') {
+    return cleanContradictedCommand(args.slice(1), options);
   }
 
   // sync-things subcommand (deprecated)
@@ -306,6 +312,7 @@ export const commands = {
   stats: statsCommand,
   backfill: backfillCommand,
   contradicted: contradictedCommand,
+  clean: cleanContradictedCommand,
 };
 
 export function getHelp(): string {
@@ -318,6 +325,7 @@ Usage:
   crux tb verify stats                     Show source-check coverage report
   crux tb verify backfill [options]        Automated: sync sources → enqueue ingest → verify
   crux tb verify contradicted [options]    List contradicted verdicts with reasoning
+  crux tb verify clean [--apply]           Export + delete contradicted PG records
   crux tb verify grants                    Verify all grants (shorthand for --type=record)
   crux tb verify personnel                 Verify all personnel records
   crux tb verify divisions                 Verify all divisions
