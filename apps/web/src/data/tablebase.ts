@@ -1132,10 +1132,14 @@ export function getPolicyStakeholderId(
   return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
-// Severity order for rolling up per-stakeholder verdicts to a policy-level dot.
-// Lower index = worse. Mirrors the display mapping in source-check-status.ts
-// (contradicted/unverifiable → failed; outdated/partial → trouble; confirmed → verified).
-const POLICY_VERDICT_SEVERITY = [
+// Severity order for source-check record verdicts. Lower index = worse.
+// Mirrors the display mapping in source-check-status.ts:
+//   contradicted/unverifiable → failed (red)
+//   outdated/partial          → trouble (orange)
+//   confirmed                 → verified (green)
+// Any verdict string not in this list (including 'unchecked' or unknown
+// values) is treated as "no data" and excluded from aggregation.
+const VERDICT_SEVERITY = [
   "contradicted",
   "unverifiable",
   "outdated",
@@ -1145,43 +1149,40 @@ const POLICY_VERDICT_SEVERITY = [
 
 /**
  * Pick the worst-case verdict from a list of verdict strings, ignoring any
- * values not in the known severity ladder. Exported for unit tests.
+ * values not in the known severity ladder. Pure function — exported for unit
+ * tests and for any caller that has already resolved a list of verdicts.
  */
-export function pickWorstPolicyVerdict(
+export function pickWorstVerdict(
   verdicts: readonly string[],
 ): string | null {
   let worstIdx = -1;
   for (const v of verdicts) {
-    const idx = POLICY_VERDICT_SEVERITY.indexOf(
-      v as (typeof POLICY_VERDICT_SEVERITY)[number],
-    );
+    const idx = VERDICT_SEVERITY.indexOf(v as (typeof VERDICT_SEVERITY)[number]);
     if (idx === -1) continue;
     if (worstIdx === -1 || idx < worstIdx) worstIdx = idx;
   }
-  return worstIdx === -1 ? null : POLICY_VERDICT_SEVERITY[worstIdx];
+  return worstIdx === -1 ? null : VERDICT_SEVERITY[worstIdx];
 }
 
 /**
- * Aggregate source-check verdicts for a policy by rolling up its stakeholders'
- * `policy-stakeholder` verdicts to a single worst-case verdict string.
+ * Roll up per-child source-check verdicts to a single worst-case verdict
+ * string. Generic across any parent→child relationship (e.g. policy→stakeholder,
+ * org→personnel, publication→citation). Callers are responsible for resolving
+ * their domain-specific name→id mapping before calling this.
  *
- * Policies don't have their own source-check verdict type — only stakeholders do.
- * Returns null if the policy has no stableId, no stakeholders, or none of the
- * stakeholders have a verdict yet.
+ * Returns null if `recordIds` is empty or none of the ids have a verdict.
  */
-export function getAggregatePolicyVerdict(
-  policyStableId: string | null | undefined,
-  stakeholderNames: readonly string[],
+export function aggregateRecordVerdicts(
+  recordType: string,
+  recordIds: readonly string[],
 ): string | null {
-  if (!policyStableId || stakeholderNames.length === 0) return null;
+  if (recordIds.length === 0) return null;
   const verdicts: string[] = [];
-  for (const name of stakeholderNames) {
-    const stakeholderId = getPolicyStakeholderId(policyStableId, name);
-    if (!stakeholderId) continue;
-    const v = getRecordVerdict("policy-stakeholder", stakeholderId);
+  for (const id of recordIds) {
+    const v = getRecordVerdict(recordType, id);
     if (v) verdicts.push(v.verdict);
   }
-  return pickWorstPolicyVerdict(verdicts);
+  return pickWorstVerdict(verdicts);
 }
 
 // Re-export loadYaml for use in domain modules

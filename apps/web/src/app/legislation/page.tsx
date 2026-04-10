@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isPolicy } from "@/data";
-import { getAggregatePolicyVerdict } from "@/data/tablebase";
+import { aggregateRecordVerdicts, getPolicyStakeholderId } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
@@ -91,6 +91,24 @@ interface ApiStakeholderLite {
   name?: string;
 }
 
+/**
+ * Resolve the given stakeholder display names to PG stakeholder record IDs
+ * for a specific policy entity. Missing/unresolvable entries are dropped.
+ * Policy-specific — stakeholder rows are keyed by (policyStableId, displayName).
+ */
+function resolvePolicyStakeholderIds(
+  policyStableId: string | null | undefined,
+  names: readonly string[],
+): string[] {
+  if (!policyStableId) return [];
+  const ids: string[] = [];
+  for (const name of names) {
+    const id = getPolicyStakeholderId(policyStableId, name);
+    if (id) ids.push(id);
+  }
+  return ids;
+}
+
 function extractStakeholderNames(meta: Record<string, unknown>): string[] {
   const raw = meta.stakeholders;
   if (!Array.isArray(raw)) return [];
@@ -132,7 +150,10 @@ function apiEntityToRow(e: DirectoryEntity): LegislationRow {
     lastActionDate: lastActionInfo?.date ?? null,
     description: e.description ?? null,
     tags: e.tags ?? [],
-    verdictString: getAggregatePolicyVerdict(e.stableId, extractStakeholderNames(meta)),
+    verdictString: aggregateRecordVerdicts(
+      "policy-stakeholder",
+      resolvePolicyStakeholderIds(e.stableId, extractStakeholderNames(meta)),
+    ),
   };
 }
 
@@ -181,9 +202,12 @@ function loadFromLocal(): LegislationPageData {
       lastActionDate: lastActionInfo?.date ?? null,
       description: entity.description ?? null,
       tags: entity.tags,
-      verdictString: getAggregatePolicyVerdict(
-        entity.stableId,
-        entity.stakeholders.map((s) => s.name),
+      verdictString: aggregateRecordVerdicts(
+        "policy-stakeholder",
+        resolvePolicyStakeholderIds(
+          entity.stableId,
+          entity.stakeholders.map((s) => s.name),
+        ),
       ),
     };
   });
