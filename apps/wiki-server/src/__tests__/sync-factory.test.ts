@@ -24,6 +24,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { z } from "zod";
 import { mockDbModule, postJson } from "./test-utils.js";
+// Static type-only import — used for `expect(...).toBeInstanceOf(SyncPhaseError)`
+// and `(err as SyncPhaseErrorType)` casts. The runtime value is loaded
+// dynamically below (via `await import`) to keep the vi.mock() ordering correct.
+import type { SyncPhaseError as SyncPhaseErrorType } from "../routes/tablebase/sync-factory.js";
 
 // ---- In-memory stores ----
 
@@ -368,8 +372,8 @@ describe("createSyncHandler — phase 7: preValidate hook", () => {
     expect(res.status).toBe(500);
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(SyncPhaseError);
-    expect((errors[0] as SyncPhaseError).route).toBe("my-route");
-    expect((errors[0] as SyncPhaseError).phase).toBe("preValidate");
+    expect((errors[0] as SyncPhaseErrorType).route).toBe("my-route");
+    expect((errors[0] as SyncPhaseErrorType).phase).toBe("preValidate");
     expect((errors[0] as Error).message).toContain("my-route/preValidate");
     expect((errors[0] as Error).message).toContain("upstream service exploded");
   });
@@ -427,7 +431,7 @@ describe("createSyncHandler — postUpsert hook", () => {
     expect(res.status).toBe(500);
     expect(errors.length).toBe(1);
     expect(errors[0]).toBeInstanceOf(SyncPhaseError);
-    expect((errors[0] as SyncPhaseError).phase).toBe("postUpsert");
+    expect((errors[0] as SyncPhaseErrorType).phase).toBe("postUpsert");
     expect((errors[0] as Error).message).toContain("display name backfill failed");
   });
 });
