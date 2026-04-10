@@ -1,11 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntitySlug } from "@/data/factbase";
-import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getTypedEntities, getPersonEntityById, isPerson } from "@/data";
+import { getTypedEntities, getPersonEntityById, isPerson, getTypedEntityById, getRecordVerdict } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import { partitionPersonRows } from "./people-filter";
 import { isAnySid } from "@/lib/stable-id";

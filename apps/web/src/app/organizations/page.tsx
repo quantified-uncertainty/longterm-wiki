@@ -1,8 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBRecords, getKBEntities, resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
-import { getTypedEntities, isOrganization, getPageById, type OrganizationEntity } from "@/data";
+import { getTypedEntities, isOrganization, getPageById, getTypedEntityById, getRecordVerdict, type OrganizationEntity } from "@/data";
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
