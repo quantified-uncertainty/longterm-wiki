@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -23,6 +24,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -240,164 +243,244 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   })
 
   // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!investments` falls back to legacy.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncInvestmentsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Check for natural key collisions within the batch itself.
-    // Natural key: (companyId, investorId, roundName)
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (companyId, investorId, roundName) in batch: ` +
-          `companyId=${item.companyId}, investorId=${item.investorId}, ` +
-          `roundName="${item.roundName ?? ""}". ` +
-          `Each investment must be unique by company + investor + round.`
-        );
-      }
-      batchKeys.add(key);
+    if (useFactoryFor("investments")) {
+      return factorySyncHandler(c);
     }
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-      { fieldName: "investorId", ids: items.map((i) => i.investorId) },
-    ]);
-    if (refError) return refError;
-
-    // Validate claim references
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => {
-        const amountRange = parseRange(item.amount);
-        const stakeRange = parseRange(item.stakeAcquired);
-        return {
-          id: item.id,
-          companyId: item.companyId,
-          investorId: item.investorId,
-          roundName: item.roundName ?? null,
-          date: item.date ?? null,
-          amount: item.amount != null ? String(item.amount) : null,
-          amountLow: amountRange.low,
-          amountHigh: amountRange.high,
-          stakeAcquired: item.stakeAcquired ?? null,
-          stakeLow: stakeRange.low,
-          stakeHigh: stakeRange.high,
-          instrument: item.instrument ?? null,
-          role: item.role ?? null,
-          conditions: item.conditions ?? null,
-          source: item.source ?? null,
-          notes: item.notes ?? null,
-        };
-      });
-
-      await tx
-        .insert(investments)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: investments.id,
-          set: {
-            companyId: sql`excluded.company_id`,
-            investorId: sql`excluded.investor_id`,
-            roundName: sql`excluded.round_name`,
-            date: sql`excluded.date`,
-            amount: sql`excluded.amount`,
-            amountLow: sql`excluded.amount_low`,
-            amountHigh: sql`excluded.amount_high`,
-            stakeAcquired: sql`excluded.stake_acquired`,
-            stakeLow: sql`excluded.stake_low`,
-            stakeHigh: sql`excluded.stake_high`,
-            instrument: sql`excluded.instrument`,
-            role: sql`excluded.role`,
-            conditions: sql`excluded.conditions`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Post-sync: resolve entity FKs for newly synced rows
-      await resolveEntityFKs(tx, {
-        tableName: "investments",
-        fields: [
-          { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
-          { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
-        ],
-        scopeIds: items.map((i) => i.id),
-      });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "investment" as const,
-          title: `${i.investorId} → ${i.companyId}${i.roundName ? ` (${i.roundName})` : ""}`,
-          sourceTable: "investments",
-          sourceId: i.id,
-          sourceUrl: i.source,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "investment",
-          recordId: item.id,
-          entityId: item.companyId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("investments/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "investments",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
+    return legacySyncHandler(c);
   })
 
   .post("/delete-batch", deleteBatchHandler(investments, "investments"));
+
+// ---- Factory implementation (Phase 2 migration) ----
+
+const factorySyncHandler = createSyncHandler({
+  name: "investments",
+  table: investments,
+  batchSchema: SyncInvestmentsBatchSchema,
+  naturalKey: (item) =>
+    `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`,
+  naturalKeyError:
+    "Duplicate (companyId, investorId, roundName) in batch — each investment must be unique by company + investor + round",
+  entityRefFields: (items) => [
+    { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+    { fieldName: "investorId", ids: items.map((i) => i.investorId) },
+  ],
+  claimSupport: {
+    recordType: "investments",
+    getClaimIds: (item) => item.claimIds ?? [],
+  },
+  toRow: (item) => {
+    const amountRange = parseRange(item.amount);
+    const stakeRange = parseRange(item.stakeAcquired);
+    return {
+      id: item.id,
+      companyId: item.companyId,
+      investorId: item.investorId,
+      roundName: item.roundName ?? null,
+      date: item.date ?? null,
+      amount: item.amount != null ? String(item.amount) : null,
+      amountLow: amountRange.low,
+      amountHigh: amountRange.high,
+      stakeAcquired: item.stakeAcquired ?? null,
+      stakeLow: stakeRange.low,
+      stakeHigh: stakeRange.high,
+      instrument: item.instrument ?? null,
+      role: item.role ?? null,
+      conditions: item.conditions ?? null,
+      source: item.source ?? null,
+      notes: item.notes ?? null,
+    };
+  },
+  fkResolve: {
+    tableName: "investments",
+    fields: [
+      { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
+      { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
+    ],
+  },
+  toThing: (item) => ({
+    id: item.id,
+    thingType: "investment" as const,
+    title: `${item.investorId} → ${item.companyId}${item.roundName ? ` (${item.roundName})` : ""}`,
+    sourceTable: "investments",
+    sourceId: item.id,
+    sourceUrl: item.source,
+  }),
+  toVerdict: (item) => ({
+    recordType: "investment",
+    recordId: item.id,
+    entityId: item.companyId,
+    sourceUrl: item.source ?? null,
+    sourcing: item.sourcing ?? null,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncInvestmentsBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  // Check for natural key collisions within the batch itself.
+  // Natural key: (companyId, investorId, roundName)
+  const batchKeys = new Set<string>();
+  for (const item of items) {
+    const key = `${item.companyId}::${item.investorId}::${item.roundName ?? ""}`;
+    if (batchKeys.has(key)) {
+      return validationError(
+        c,
+        `Duplicate (companyId, investorId, roundName) in batch: ` +
+        `companyId=${item.companyId}, investorId=${item.investorId}, ` +
+        `roundName="${item.roundName ?? ""}". ` +
+        `Each investment must be unique by company + investor + round.`
+      );
+    }
+    batchKeys.add(key);
+  }
+
+  // Validate entity FK references before inserting
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+    { fieldName: "investorId", ids: items.map((i) => i.investorId) },
+  ]);
+  if (refError) return refError;
+
+  // Validate claim references
+  const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
+  if (allClaimIds.length > 0) {
+    const rawDb = getDb();
+    const claimError = await validateClaimRefs(rawDb, allClaimIds);
+    if (claimError) return validationError(c, claimError);
+  }
+
+  let upserted = 0;
+  let verdictsResult = { written: 0 };
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((item) => {
+      const amountRange = parseRange(item.amount);
+      const stakeRange = parseRange(item.stakeAcquired);
+      return {
+        id: item.id,
+        companyId: item.companyId,
+        investorId: item.investorId,
+        roundName: item.roundName ?? null,
+        date: item.date ?? null,
+        amount: item.amount != null ? String(item.amount) : null,
+        amountLow: amountRange.low,
+        amountHigh: amountRange.high,
+        stakeAcquired: item.stakeAcquired ?? null,
+        stakeLow: stakeRange.low,
+        stakeHigh: stakeRange.high,
+        instrument: item.instrument ?? null,
+        role: item.role ?? null,
+        conditions: item.conditions ?? null,
+        source: item.source ?? null,
+        notes: item.notes ?? null,
+      };
+    });
+
+    await tx
+      .insert(investments)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: investments.id,
+        set: {
+          companyId: sql`excluded.company_id`,
+          investorId: sql`excluded.investor_id`,
+          roundName: sql`excluded.round_name`,
+          date: sql`excluded.date`,
+          amount: sql`excluded.amount`,
+          amountLow: sql`excluded.amount_low`,
+          amountHigh: sql`excluded.amount_high`,
+          stakeAcquired: sql`excluded.stake_acquired`,
+          stakeLow: sql`excluded.stake_low`,
+          stakeHigh: sql`excluded.stake_high`,
+          instrument: sql`excluded.instrument`,
+          role: sql`excluded.role`,
+          conditions: sql`excluded.conditions`,
+          source: sql`excluded.source`,
+          notes: sql`excluded.notes`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+
+    // Post-sync: resolve entity FKs for newly synced rows
+    await resolveEntityFKs(tx, {
+      tableName: "investments",
+      fields: [
+        { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
+        { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
+      ],
+      scopeIds: items.map((i) => i.id),
+    });
+
+    // Dual-write to things table
+    await upsertThingsInTx(
+      tx,
+      items.map((i) => ({
+        id: i.id,
+        thingType: "investment" as const,
+        title: `${i.investorId} → ${i.companyId}${i.roundName ? ` (${i.roundName})` : ""}`,
+        sourceTable: "investments",
+        sourceId: i.id,
+        sourceUrl: i.source,
+      }))
+    );
+
+    // Write inline source-check verdicts atomically within the same transaction
+    verdictsResult = await writeInlineVerdicts(
+      tx,
+      items.map((item) => ({
+        recordType: "investment",
+        recordId: item.id,
+        entityId: item.companyId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }))
+    );
+
+    upserted = allVals.length;
+  });
+
+  logSourceCheckCoverage("investments/sync", items.length, verdictsResult.written);
+
+  // Link verified claims to records (best-effort — records already committed)
+  let claimsLinked = 0;
+  let claimLinkingError: string | null = null;
+  if (allClaimIds.length > 0) {
+    try {
+      const rawDb = getDb();
+      const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
+        recordId: item.id,
+        recordType: "investments",
+        claimIds: item.claimIds,
+      })));
+      claimsLinked = linkResult.linked;
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      claimLinkingError = msg;
+      logger.warn({ error: msg }, "claim linking failed (records already committed)");
+    }
+  }
+
+  return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
+}
 
 // ---- Exports ----
 

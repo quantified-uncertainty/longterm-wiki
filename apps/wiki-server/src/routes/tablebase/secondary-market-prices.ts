@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, and, count, desc, asc, sql, gte, lte } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -17,6 +18,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -338,92 +341,172 @@ const secondaryMarketPricesApp = new Hono<{ Variables: ResolvedEntityVars }>()
   })
 
   // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!secondary-market-prices`
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        companyId: item.companyId,
-        platform: item.platform,
-        date: item.date,
-        pricePerShare: toNum(item.pricePerShare),
-        impliedValuation: toNum(item.impliedValuation),
-        impliedValuationLow: toNum(item.impliedValuationLow),
-        impliedValuationHigh: toNum(item.impliedValuationHigh),
-        volume: toNum(item.volume),
-        openInterest: toNum(item.openInterest),
-        bidPrice: toNum(item.bidPrice),
-        askPrice: toNum(item.askPrice),
-        spreadPercent: toNum(item.spreadPercent),
-        priceType: item.priceType,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(secondaryMarketPrices)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [
-            secondaryMarketPrices.companyId,
-            secondaryMarketPrices.platform,
-            secondaryMarketPrices.date,
-            secondaryMarketPrices.priceType,
-          ],
-          set: {
-            pricePerShare: sql`excluded.price_per_share`,
-            impliedValuation: sql`excluded.implied_valuation`,
-            impliedValuationLow: sql`excluded.implied_valuation_low`,
-            impliedValuationHigh: sql`excluded.implied_valuation_high`,
-            volume: sql`excluded.volume`,
-            openInterest: sql`excluded.open_interest`,
-            bidPrice: sql`excluded.bid_price`,
-            askPrice: sql`excluded.ask_price`,
-            spreadPercent: sql`excluded.spread_percent`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "secondary-market-price",
-          recordId: item.id,
-          entityId: item.companyId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
+    if (useFactoryFor("secondary-market-prices")) {
+      return factorySyncHandler(c);
+    }
+    return legacySyncHandler(c);
   })
 
   .post("/delete-batch", deleteBatchHandler(secondaryMarketPrices, "secondary_market_prices"));
+
+// ---- Factory implementation (Phase 2 migration) ----
+//
+// Notable: this route uses a COMPOSITE conflict target — the unique key
+// is (companyId, platform, date, priceType), not the row id. The factory
+// supports composite targets via `conflictTarget: [col1, col2, ...]`.
+// The conflictSet override omits the conflict-target columns since they
+// match by definition on conflict.
+
+const factorySyncHandler = createSyncHandler({
+  name: "secondary-market-prices",
+  table: secondaryMarketPrices,
+  batchSchema: SyncBatchSchema,
+  entityRefFields: (items) => [
+    { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+  ],
+  toRow: (item) => ({
+    id: item.id,
+    companyId: item.companyId,
+    platform: item.platform,
+    date: item.date,
+    pricePerShare: toNum(item.pricePerShare),
+    impliedValuation: toNum(item.impliedValuation),
+    impliedValuationLow: toNum(item.impliedValuationLow),
+    impliedValuationHigh: toNum(item.impliedValuationHigh),
+    volume: toNum(item.volume),
+    openInterest: toNum(item.openInterest),
+    bidPrice: toNum(item.bidPrice),
+    askPrice: toNum(item.askPrice),
+    spreadPercent: toNum(item.spreadPercent),
+    priceType: item.priceType,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+  }),
+  conflictTarget: [
+    secondaryMarketPrices.companyId,
+    secondaryMarketPrices.platform,
+    secondaryMarketPrices.date,
+    secondaryMarketPrices.priceType,
+  ],
+  // Explicit SET clause to omit the conflict-target columns (no-op on conflict).
+  conflictSet: {
+    pricePerShare: sql`excluded.price_per_share`,
+    impliedValuation: sql`excluded.implied_valuation`,
+    impliedValuationLow: sql`excluded.implied_valuation_low`,
+    impliedValuationHigh: sql`excluded.implied_valuation_high`,
+    volume: sql`excluded.volume`,
+    openInterest: sql`excluded.open_interest`,
+    bidPrice: sql`excluded.bid_price`,
+    askPrice: sql`excluded.ask_price`,
+    spreadPercent: sql`excluded.spread_percent`,
+    source: sql`excluded.source`,
+    notes: sql`excluded.notes`,
+    syncedAt: sql`now()`,
+    updatedAt: sql`now()`,
+  },
+  toVerdict: (item) => ({
+    recordType: "secondary-market-price",
+    recordId: item.id,
+    entityId: item.companyId,
+    sourceUrl: item.source ?? null,
+    sourcing: item.sourcing ?? null,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+  ]);
+  if (refError) return refError;
+
+  let upserted = 0;
+  let verdictsResult = { written: 0 };
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((item) => ({
+      id: item.id,
+      companyId: item.companyId,
+      platform: item.platform,
+      date: item.date,
+      pricePerShare: toNum(item.pricePerShare),
+      impliedValuation: toNum(item.impliedValuation),
+      impliedValuationLow: toNum(item.impliedValuationLow),
+      impliedValuationHigh: toNum(item.impliedValuationHigh),
+      volume: toNum(item.volume),
+      openInterest: toNum(item.openInterest),
+      bidPrice: toNum(item.bidPrice),
+      askPrice: toNum(item.askPrice),
+      spreadPercent: toNum(item.spreadPercent),
+      priceType: item.priceType,
+      source: item.source ?? null,
+      notes: item.notes ?? null,
+    }));
+
+    await tx
+      .insert(secondaryMarketPrices)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          secondaryMarketPrices.companyId,
+          secondaryMarketPrices.platform,
+          secondaryMarketPrices.date,
+          secondaryMarketPrices.priceType,
+        ],
+        set: {
+          pricePerShare: sql`excluded.price_per_share`,
+          impliedValuation: sql`excluded.implied_valuation`,
+          impliedValuationLow: sql`excluded.implied_valuation_low`,
+          impliedValuationHigh: sql`excluded.implied_valuation_high`,
+          volume: sql`excluded.volume`,
+          openInterest: sql`excluded.open_interest`,
+          bidPrice: sql`excluded.bid_price`,
+          askPrice: sql`excluded.ask_price`,
+          spreadPercent: sql`excluded.spread_percent`,
+          source: sql`excluded.source`,
+          notes: sql`excluded.notes`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+
+    // Write inline source-check verdicts atomically within the same transaction
+    verdictsResult = await writeInlineVerdicts(
+      tx,
+      items.map((item) => ({
+        recordType: "secondary-market-price",
+        recordId: item.id,
+        entityId: item.companyId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }))
+    );
+
+    upserted = allVals.length;
+  });
+
+  logSourceCheckCoverage("secondary-market-prices/sync", items.length, verdictsResult.written);
+
+  return c.json({ upserted, verdictsWritten: verdictsResult.written });
+}
 
 // ---- Exports ----
 
