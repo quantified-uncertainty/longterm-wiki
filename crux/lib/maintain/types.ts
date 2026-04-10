@@ -38,6 +38,8 @@ export interface CruftItem {
 
 export type TriageCategory = 'potentially-resolved' | 'stale' | 'actionable' | 'keep';
 
+export type LinearTriageCategory = 'stale-in-progress' | 'stuck-in-review' | 'ready-dispatch' | 'active';
+
 export interface HealthMetrics {
   date: string;
   todoCount: number;
