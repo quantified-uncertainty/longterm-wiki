@@ -45,6 +45,9 @@ export interface ChecklistMetadata {
   task: string;
   branch: string;
   issue?: number;
+  /** Linear issue identifier, e.g. "QUA-184". Stored alongside the GitHub
+   *  issue number; a session can have either, both, or neither. */
+  linearId?: string;
   timestamp: string;
 }
 
@@ -217,6 +220,7 @@ export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): 
   lines.push(`> Branch: \`${metadata.branch}\``);
   lines.push(`> Task: ${metadata.task}`);
   if (metadata.issue) lines.push(`> Issue: #${metadata.issue}`);
+  if (metadata.linearId) lines.push(`> Linear: ${metadata.linearId}`);
   lines.push('');
 
   for (let i = 0; i < items.length; i++) {

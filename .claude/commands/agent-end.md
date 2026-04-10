@@ -43,6 +43,39 @@ If no PR was created (research/abandoned), just remove the working label:
 gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
 ```
 
+## Step 2b: Update Linear issue (if applicable)
+
+If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate.
+
+Set `PR_URL` first — if a PR was created during this session, export it; if not, leave it empty so the issue goes straight to `Done`:
+
+```bash
+# Example: if you created a PR during this session
+# export PR_URL="https://github.com/quantified-uncertainty/longterm-wiki/pull/123"
+PR_URL="${PR_URL:-}"
+
+# Read the Linear ID from the checklist first; if that's missing, fall back
+# to parsing the current branch (so sessions that didn't run /agent-init still
+# update Linear on `claude/qua-NNN-*` branches).
+LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
+if [ -z "$LINEAR_ID" ]; then
+  BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  LINEAR_ID=$(echo "$BRANCH" | grep -oE '\bclaude/qua-[0-9]+' | sed 's|claude/||' | tr 'a-z' 'A-Z')
+fi
+
+if [ -n "$LINEAR_ID" ]; then
+  if [ -n "$PR_URL" ]; then
+    # PR exists but hasn't merged → In Review
+    pnpm crux linear done "$LINEAR_ID" --pr="$PR_URL" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
+  else
+    # No PR (research, abandoned, quick fix) → straight to Done
+    pnpm crux linear done "$LINEAR_ID" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
+  fi
+fi
+```
+
+Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` suffix makes the Linear update best-effort so a missing key doesn't interrupt the rest of `/agent-end`. If Linear updates fail, fix the key and rerun `pnpm crux linear done <QUA-NNN>` manually — Linear is the source of truth for project status and leaving "In Progress" drift is bad.
+
 ## Step 3: Stop patrol daemon (if running)
 
 ```bash
