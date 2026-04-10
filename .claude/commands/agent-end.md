@@ -43,6 +43,27 @@ If no PR was created (research/abandoned), just remove the working label:
 gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
 ```
 
+## Step 2b: Update Linear issue (if applicable)
+
+If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate:
+
+```bash
+# Read the Linear ID from the checklist. If absent, skip this step entirely.
+LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
+
+if [ -n "$LINEAR_ID" ]; then
+  if [ -n "$PR_URL" ]; then
+    # PR exists but hasn't merged → In Review
+    pnpm crux linear issues done "$LINEAR_ID" --pr="$PR_URL"
+  else
+    # No PR (research, abandoned, quick fix) → straight to Done
+    pnpm crux linear issues done "$LINEAR_ID"
+  fi
+fi
+```
+
+Requires `LINEAR_API_KEY` (synced from `.env.base`). If unset, the command fails loudly and should be rerun after the key is available — Linear is the source of truth for project status and a missing update leaves "In Progress" drift.
+
 ## Step 3: Stop patrol daemon (if running)
 
 ```bash

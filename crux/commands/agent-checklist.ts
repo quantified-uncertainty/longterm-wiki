@@ -28,6 +28,8 @@ import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from 
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
 import { syncToMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
+import { commands as linearCommands } from './linear.ts';
+import { resolveLinearId } from '../lib/linear/parse-id.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -44,12 +46,17 @@ interface CommandOptions extends BaseOptions {
   ci?: boolean;
   type?: string;
   issue?: string;
+  /** Explicit Linear issue identifier, e.g. "QUA-184". If omitted, auto-detected
+   *  from the branch name (claude/qua-NNN-*) and task description. */
+  linear?: string;
   reason?: string;
   /** Skip the sync-to-main step. Used by tests and by scripted callers that
    *  intentionally want to start a session on the current branch. */
   noSync?: boolean;
   /** Skip the auto-call to `gh issues start <N>`. Used by tests. */
   noIssueStart?: boolean;
+  /** Skip the auto-call to `linear issues start <QUA-NNN>`. Used by tests. */
+  noLinearStart?: boolean;
 }
 
 interface GitHubIssueResponse {
@@ -140,7 +147,17 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   const branch = currentBranch();
   const worktree = PROJECT_ROOT;
-  const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue };
+
+  // Detect Linear issue ID: explicit --linear flag wins, else parse from branch + task.
+  // Branch pattern: `claude/qua-184-description` → QUA-184. Task/description fallback
+  // matches any bare QUA-NNN token. Returns null if neither source yields a match.
+  let linearId: string | undefined = options.linear;
+  if (!linearId) {
+    const detected = resolveLinearId([branch, task]);
+    if (detected) linearId = detected;
+  }
+
+  const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
   let markdown = buildChecklist(type, metadata);
 
   if (!issue) {
@@ -231,6 +248,36 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     }
   }
 
+  // ── Auto-call `linear issues start <QUA-NNN>` ────────────────────────────
+  // Same best-effort semantics as the GitHub start above: failure (missing
+  // LINEAR_API_KEY, network error, issue already Done) never fails the init.
+  let linearStartOutput = '';
+  if (linearId && !options.noLinearStart) {
+    if (!process.env.LINEAR_API_KEY) {
+      linearStartOutput =
+        `${c.dim}Linear ID ${linearId} detected but LINEAR_API_KEY is not set — ` +
+        `skipping auto-start. Sync .env.base or export the key to enable.${c.reset}\n`;
+    } else {
+      try {
+        const startResult = await linearCommands.start([linearId], { ci: options.ci });
+        if (startResult.exitCode === 0) {
+          linearStartOutput = startResult.output;
+        } else {
+          linearStartOutput =
+            `${c.yellow}⚠ Auto-start of Linear ${linearId} returned non-zero exit:${c.reset}\n` +
+            startResult.output +
+            `${c.dim}(checklist created locally; you may want to run ` +
+            `\`crux linear issues start ${linearId}\` manually)${c.reset}\n`;
+        }
+      } catch (e) {
+        linearStartOutput =
+          `${c.yellow}⚠ Could not signal start on Linear ${linearId}: ` +
+          `${e instanceof Error ? e.message : String(e)}${c.reset}\n` +
+          `${c.dim}(checklist created locally)${c.reset}\n`;
+      }
+    }
+  }
+
   const status = parseChecklist(markdown);
   let output = '';
   if (syncOutput) {
@@ -243,10 +290,12 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Directory: ${c.dim}${worktree}${c.reset}\n`;
   if (issue) output += `  Issue: ${c.cyan}#${issue}${c.reset}\n`;
   else output += `  ${c.dim}issue-tracking auto-marked N/A (no GitHub issue)${c.reset}\n`;
+  if (linearId) output += `  Linear: ${c.cyan}${linearId}${c.reset}\n`;
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
   if (issueStartOutput) output += `\n${issueStartOutput}`;
+  if (linearStartOutput) output += `\n${linearStartOutput}`;
 
   // Render the full checklist so callers don't need a separate `status` call.
   output += `\n${renderChecklistItems(status, c)}`;

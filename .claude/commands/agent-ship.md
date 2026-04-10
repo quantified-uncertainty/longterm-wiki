@@ -123,6 +123,22 @@ If working on a GitHub issue:
 pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 ```
 
+## Step 5b: Update Linear issue (if applicable)
+
+If this session was tracking a Linear issue, move it to In Review so the Linear backlog reflects the open PR:
+
+```bash
+# Pull the Linear ID from the checklist metadata (added by /agent-init when it
+# auto-detects `claude/qua-NNN-*` branches or a QUA-NNN in the task description).
+LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
+
+if [ -n "$LINEAR_ID" ] && [ -n "$PR_URL" ]; then
+  pnpm crux linear issues done "$LINEAR_ID" --pr="$PR_URL"
+fi
+```
+
+Requires `LINEAR_API_KEY` (synced from `.env.base`). Linear → Done happens automatically when the PR merges, via the release workflow.
+
 ## Step 6: Session log
 
 Run `pnpm crux sys agent-checklist snapshot` and capture the output — this is the `checks:` block for the session log.

@@ -118,6 +118,7 @@ import * as benchmarksCommands from './commands/benchmarks.ts';
 import * as usagePatternsCommands from './commands/usage-patterns.ts';
 import * as entityResourcesCommands from './commands/entity-resources.ts';
 import * as docsCommands from './commands/docs.ts';
+import * as linearCommands from './commands/linear.ts';
 
 const domains = {
   validate: validateCommands,
@@ -200,6 +201,7 @@ const domains = {
   benchmarks: benchmarksCommands,
   'usage-patterns': usagePatternsCommands,
   docs: docsCommands,
+  linear: linearCommands,
 };
 
 const shortcutMap = buildShortcutMap();

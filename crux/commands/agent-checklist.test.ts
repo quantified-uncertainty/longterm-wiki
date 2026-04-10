@@ -23,9 +23,21 @@ vi.mock('../lib/github.ts', () => ({
   githubApi: vi.fn(),
 }));
 
-// Mock child_process for currentBranch
+// Mock child_process for currentBranch — default to a branch without any
+// Linear ID so Linear-detection tests only fire when they opt in via a mock
+// override below.
 vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/test-branch-ABC'),
+}));
+
+// Mock the Linear command module so auto-start doesn't hit the network.
+// `vi.mock` is hoisted above imports, so the mock factory uses `vi.hoisted`
+// to expose the spy back to the test body.
+const { linearStartMock } = vi.hoisted(() => ({
+  linearStartMock: vi.fn(async () => ({ output: '', exitCode: 0 })),
+}));
+vi.mock('./linear.ts', () => ({
+  commands: { start: linearStartMock },
 }));
 
 // Mock wiki-server agent-sessions (best-effort DB sync)
@@ -208,6 +220,73 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Add dark mode');
+  });
+
+  // --- Linear ID detection (QUA-196) ---------------------------------------
+
+  it('auto-detects Linear ID from a claude/qua-NNN-* branch name', async () => {
+    vi.mocked(await import('child_process')).execSync.mockReturnValueOnce(
+      'claude/qua-184-linear-integration' as unknown as Buffer
+    );
+
+    const result = await initNoSideEffects(['Build Linear client library'], {
+      type: 'infrastructure',
+    });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('QUA-184');
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).toContain('> Linear: QUA-184');
+  });
+
+  it('accepts an explicit --linear flag', async () => {
+    const result = await initNoSideEffects(['A task'], {
+      type: 'infrastructure',
+      linear: 'QUA-200',
+    });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('QUA-200');
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).toContain('> Linear: QUA-200');
+  });
+
+  it('extracts Linear ID from the task description when the branch is plain', async () => {
+    const result = await initNoSideEffects(
+      ['working on QUA-91 cleanup'],
+      { type: 'infrastructure' }
+    );
+    expect(result.exitCode).toBe(0);
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).toContain('> Linear: QUA-91');
+  });
+
+  it('does not render a Linear line when no ID is detected', async () => {
+    const result = await initNoSideEffects(['just a plain task'], {
+      type: 'infrastructure',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).not.toContain('> Linear:');
+    expect(result.output).not.toContain('QUA-');
+  });
+
+  it('prefers --linear flag over branch or task detection', async () => {
+    vi.mocked(await import('child_process')).execSync.mockReturnValueOnce(
+      'claude/qua-184-foo' as unknown as Buffer
+    );
+
+    const result = await initNoSideEffects(['mentions QUA-200 in task'], {
+      type: 'infrastructure',
+      linear: 'QUA-999',
+    });
+    expect(result.exitCode).toBe(0);
+
+    const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
+    expect(writtenContent).toContain('> Linear: QUA-999');
+    expect(writtenContent).not.toContain('> Linear: QUA-184');
   });
 });
 

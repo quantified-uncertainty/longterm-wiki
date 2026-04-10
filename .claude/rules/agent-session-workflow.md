@@ -6,6 +6,18 @@ Every session that involves writing or changing code MUST follow this workflow.
 
 Always work on a `claude/short-description` branch. Never commit directly to `main`.
 
+### Naming convention when the task is tracked in an issue tracker
+
+When the session is working on a tracked issue, encode the issue ID in the branch name so `/agent-init` can auto-detect it and post start/done signals without manual flags:
+
+| Source | Pattern | Example |
+|--------|---------|---------|
+| GitHub issue | `claude/fix-NNN-description` | `claude/fix-239-broken-scoring` |
+| Linear issue | `claude/qua-NNN-description` | `claude/qua-184-linear-integration` |
+| No tracker | `claude/<verb>-<noun>` | `claude/refactor-gate-helpers` |
+
+Both GitHub (`fix-NNN`) and Linear (`qua-NNN`) patterns are auto-detected by `crux sys agent-checklist init`. Linear detection also falls back to any bare `QUA-NNN` token in the task description, and can be overridden with `--linear=QUA-NNN`.
+
 ### CI-fix dedup check (when triggered by a CI failure, not a GitHub issue)
 
 Before creating a branch to fix a CI failure, check for existing fix attempts:
@@ -26,15 +38,19 @@ This prevents the duplicate-work pattern where multiple agents independently rac
 Run `/agent-init` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
 
 ```bash
-# If working on a GitHub issue:
+# If working on a GitHub issue (auto-starts tracking):
 pnpm crux sys agent-checklist init --issue=N
-pnpm crux gh issues start <N>
 
-# If not on an issue:
+# If working on a Linear issue (auto-detected from branch, or explicit):
+pnpm crux sys agent-checklist init "Task description" --linear=QUA-184
+
+# If not on any tracked issue:
 pnpm crux sys agent-checklist init "Task description" --type=X
 ```
 
 Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`. Default: `infrastructure`.
+
+`init` automatically signals start on both GitHub (`gh issues start`) and Linear (`linear issues start`) when the respective IDs are known — you do not need to call them by hand. Both calls are best-effort: a GitHub or Linear outage never fails init.
 
 Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
