@@ -1,0 +1,136 @@
+# TableBase Sync Handler Factory
+
+The `createSyncHandler<T>()` factory in `apps/wiki-server/src/routes/tablebase/sync-factory.ts` is the canonical pattern for new TableBase POST /sync routes. Mass migration of existing routes is in progress (discussion #4088, issue #4090).
+
+## When to use it
+
+**Always use the factory for new sync routes.** Use the scaffolder:
+
+```bash
+pnpm crux tb sync-scaffold <route-name>             # Tier 2 (default)
+pnpm crux tb sync-scaffold <route-name> --tier=1    # Full features
+pnpm crux tb sync-scaffold <route-name> --tier=3    # Minimal
+pnpm crux tb sync-scaffold <route-name> --output=apps/wiki-server/src/routes/tablebase/<route-name>.ts
+```
+
+The scaffolder emits a starter route file with the minimum factory config. Replace the `TODO` placeholders with the real schema and field mappings.
+
+## When NOT to use it
+
+5 routes are permanently excluded from the factory (per Phase 0 audit, [issue #4089](https://github.com/quantified-uncertainty/longterm-wiki/issues/4089)):
+
+| Route | Reason |
+|-------|--------|
+| `entities.ts` | Slug displacement, statement_timeout overrides, relatedEntries validation |
+| `things.ts` | IT IS the things table, not a dual-write target |
+| `bluesky.ts` | Only `/sync/:did` (external API fetch), no main `/sync` |
+| `data-sources.ts` | Multi-table writes per call (resources + tabular sources + snapshots) |
+| `ids.ts` | Uses `nextval('entity_id_seq')` for ID allocation, fundamentally different semantics |
+
+If you're adding a route that needs >1 escape hatch (`preValidate`, `postUpsert`, `conflictSet`), the factory is the wrong fit. Hand-roll the route and document why in a comment.
+
+## Migration pattern (Phase 2)
+
+When migrating an existing route to the factory, use the per-route feature flag for safe rollback:
+
+```typescript
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
+
+// Keep both implementations for the 7-day soak period.
+const factoryHandler = createSyncHandler({
+  name: "my-route",
+  table: myTable,
+  // ...
+});
+
+const legacyHandler = async (c: Context) => {
+  // ... existing hand-rolled handler, unchanged ...
+};
+
+const myApp = new Hono()
+  .post("/sync", async (c) => {
+    if (useFactoryFor("my-route")) {
+      return factoryHandler(c);
+    }
+    return legacyHandler(c);
+  });
+```
+
+Operators can roll back any single route by setting the env var:
+
+```bash
+USE_SYNC_FACTORY_ROUTES=!my-route
+```
+
+After 7 days of clean metrics with the factory enabled (default), a follow-up PR removes the legacy handler and the conditional, leaving only the direct factory call.
+
+See `apps/wiki-server/src/routes/tablebase/sync-factory-flag.ts` for the full truth table.
+
+## Hook budget: max 1 per route
+
+The factory provides three escape hatches: `preValidate`, `postUpsert`, `conflictSet`. **Routes should use at most 1.** If you find yourself reaching for a second hook, that's a signal the factory isn't the right fit — hand-roll the route instead.
+
+The 3 Phase 1 pilot routes follow this rule:
+
+| Route | Hook | Reason |
+|-------|------|--------|
+| `personnel.ts` | `postUpsert` | `new:` prefix display-name backfill + things sync refetch (after `fkResolve`) |
+| `divisions.ts` | `conflictSet` | COALESCE preservation for nullable fields |
+| `political-scores.ts` | (none) | Pure batch upsert with auto-derived SET clause |
+
+## Hook contract
+
+Hooks (`preValidate`, `postUpsert`) receive the Drizzle transaction handle `tx`. They MUST:
+
+1. **Only do DB work via `tx`**. No external HTTP calls, file writes, Discord notifications, or `getDb()` calls for a separate connection.
+2. **Throw on failure**. The factory wraps thrown errors in `SyncPhaseError({ route, phase, cause })` and rolls back the transaction. The route returns 500.
+3. **Be synchronous within the transaction**. No fire-and-forget patterns.
+
+`preValidate` returns `Response | null`. If a Response is returned, the factory short-circuits and returns it (used for custom 400 errors before the transaction). `postUpsert` returns `void`.
+
+## What the factory handles automatically
+
+- **Parse + Zod validation** — invalid JSON → 400, schema errors → 400
+- **Natural key collision** (gated by `naturalKey` config) — intra-batch dedup → 400
+- **Source-check enforcement** (gated by `enforceSourceCheck` config) — calls `enforceSourceCheck()` from `source-check-enforcement.ts`
+- **Entity FK validation** (gated by `entityRefFields` config) — calls `validateEntityRefs()`
+- **Claim validation + linking** (gated by `claimSupport` config) — calls `validateClaimRefs()` pre-tx, `linkClaimsToRecords()` post-tx
+- **Batch upsert** — single `INSERT...ON CONFLICT`, auto-chunked based on Postgres parameter limit (`60000 / columnCount`)
+- **Auto-derived SET clause** — derived from `toRow()` output keys + `getTableColumns(table)`. Override with `conflictSet`.
+- **Audit logging** (gated by `auditRecordType` config) — single batch insert per chunk; existing-row pre-fetch in batch
+- **Entity FK resolution** (gated by `fkResolve` config) — calls `resolveEntityFKs()` post-upsert
+- **Things dual-write** (gated by `toThing` config) — calls `resolveEntityTitles()` + `upsertThingsInTx()`
+- **Inline source-check verdicts** (gated by `toVerdict` config) — calls `writeInlineVerdicts()` in tx
+- **Standard response shape** — `{ upserted, verdictsWritten, claimsLinked }`
+
+## What the factory does NOT handle
+
+- **GET /all, /stats, /by-entity** endpoints — hand-roll these. Use the existing `paginatedQuery` helper from `crux/lib/wiki-server/` for pagination.
+- **Slug displacement** — `entities.ts` is excluded from the factory permanently
+- **Multiple sync endpoints per route** — only the primary `/sync` is in scope. Secondary endpoints (e.g., `research-areas.ts /sync-papers`) stay hand-rolled.
+- **Non-standard primary keys** — the factory assumes `table.id` is the conflict target unless `conflictTarget` is overridden
+- **Custom response shapes** — routes that need to return additional fields beyond the standard shape should hand-roll
+
+## Testing
+
+The factory is tested in `apps/wiki-server/src/__tests__/sync-factory.test.ts`. The test pattern uses:
+
+- A fake `entities`-shaped Drizzle table (the factory needs SOMETHING to introspect via `getTableColumns()`)
+- The existing `mockDbModule` from `test-utils.ts` for transaction + dispatch mocking
+- A `buildAppWithErrorCapture()` helper that registers a Hono `onError` handler so tests can assert on `SyncPhaseError` instances
+
+When you migrate a route to the factory, write a new test in `apps/wiki-server/src/__tests__/<route-name>.test.ts` that:
+
+1. Uses `mockDbModule` with a dispatcher that handles your table's queries
+2. Tests happy path, FK-invalid, duplicate-id, and any custom hook behavior
+3. For routes with `postUpsert` hooks, test that the hook runs and that throwing rolls back
+
+## References
+
+- Discussion: [#4088](https://github.com/quantified-uncertainty/longterm-wiki/discussions/4088)
+- Phase 0 audit: [#4089](https://github.com/quantified-uncertainty/longterm-wiki/issues/4089)
+- Phase 1 implementation: [#4090](https://github.com/quantified-uncertainty/longterm-wiki/issues/4090)
+- Factory source: `apps/wiki-server/src/routes/tablebase/sync-factory.ts`
+- Feature flag: `apps/wiki-server/src/routes/tablebase/sync-factory-flag.ts`
+- Type-level test: `apps/wiki-server/src/routes/tablebase/sync-factory.test-d.ts`
