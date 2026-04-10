@@ -18,10 +18,19 @@ describe('parseLinearId', () => {
     expect(parseLinearId('(see QUA-91) for context')).toBe('QUA-91');
   });
 
-  it('normalises different team keys inside a claude/ branch prefix', () => {
-    // Branch-pattern match accepts any 2-5 letter key — the `claude/`
-    // prefix is the disambiguator, not the team identity.
-    expect(parseLinearId('claude/abc-5-test')).toBe('ABC-5');
+  it('branch-pattern match is restricted to known team keys (QUA)', () => {
+    // Unknown team keys inside a `claude/` prefix are NOT matched — tightened
+    // to prevent GitHub-flavored branches from polluting Linear metadata.
+    expect(parseLinearId('claude/abc-5-test')).toBeNull();
+  });
+
+  it('does not misclassify GitHub-style fix branches as Linear IDs', () => {
+    // Regression test for CodeRabbit finding: `claude/fix-239-...` must NOT
+    // parse as `FIX-239`, which would pollute Linear checklist metadata and
+    // trigger failing start/done calls against a non-existent team.
+    expect(parseLinearId('claude/fix-239-broken-test')).toBeNull();
+    expect(parseLinearId('claude/cve-2024-foo')).toBeNull();
+    expect(parseLinearId('claude/pr-1234-fix')).toBeNull();
   });
 
   it('bare-token match is restricted to known team keys (QUA)', () => {

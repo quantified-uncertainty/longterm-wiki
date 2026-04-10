@@ -69,24 +69,34 @@ export async function getIssue(identifier: string): Promise<LinearIssue | null> 
 
 /**
  * Fetch recent comments on an issue. Returns comments in creation order.
+ * Returns an empty array if the issue doesn't exist (same missing-issue
+ * semantics as `getIssue()`).
  */
 export async function getComments(
   identifier: string,
   limit = 20,
 ): Promise<LinearComment[]> {
-  const data = await linearGraphQL<{
-    issue: { comments: { nodes: LinearComment[] } } | null;
-  }>(
-    `query GetComments($id: String!, $limit: Int!) {
-      issue(id: $id) {
-        comments(first: $limit) {
-          nodes { id body createdAt user { name } }
+  try {
+    const data = await linearGraphQL<{
+      issue: { comments: { nodes: LinearComment[] } } | null;
+    }>(
+      `query GetComments($id: String!, $limit: Int!) {
+        issue(id: $id) {
+          comments(first: $limit) {
+            nodes { id body createdAt user { name } }
+          }
         }
-      }
-    }`,
-    { id: identifier, limit },
-  );
-  return data.issue?.comments.nodes ?? [];
+      }`,
+      { id: identifier, limit },
+    );
+    return data.issue?.comments.nodes ?? [];
+  } catch (e) {
+    // Mirror getIssue()'s missing-issue handling: Linear returns an error
+    // rather than null when the issue identifier doesn't exist.
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/Entity not found|EntityNotFound/i.test(msg)) return [];
+    throw e;
+  }
 }
 
 /**

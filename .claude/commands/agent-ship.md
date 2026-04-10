@@ -137,7 +137,7 @@ PR_URL="${PR_URL:-}"
 LINEAR_ID=$(grep -oE '^> Linear: [A-Z]+-[0-9]+' .claude/wip-checklist.md 2>/dev/null | awk '{print $3}')
 
 if [ -n "$LINEAR_ID" ] && [ -n "$PR_URL" ]; then
-  pnpm crux linear issues done "$LINEAR_ID" --pr="$PR_URL" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
+  pnpm crux linear done "$LINEAR_ID" --pr="$PR_URL" || echo "⚠ Linear update failed — check LINEAR_API_KEY and rerun"
 fi
 ```
 

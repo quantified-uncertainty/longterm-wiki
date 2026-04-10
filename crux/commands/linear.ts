@@ -5,11 +5,11 @@
  * signal start/done. Mirrors `crux gh issues` for Linear.
  *
  * Usage:
- *   crux linear issues view <QUA-NNN>          Show full issue + comments
- *   crux linear issues search <query>          Search QUA team issues
- *   crux linear issues comment <QUA-NNN> <msg> Post a comment
- *   crux linear issues start <QUA-NNN>         Move to In Progress + start comment
- *   crux linear issues done <QUA-NNN> --pr=URL Move to In Review + done comment
+ *   crux linear view <QUA-NNN>          Show full issue + comments
+ *   crux linear search <query>          Search QUA team issues
+ *   crux linear comment <QUA-NNN> <msg> Post a comment
+ *   crux linear start <QUA-NNN>         Move to In Progress + start comment
+ *   crux linear done <QUA-NNN> --pr=URL Move to In Review + done comment
  *   crux linear states-list                    Print current QUA team workflow states
  *   crux linear parse <string>                 Extract a Linear ID from a string (debug)
  */
@@ -57,7 +57,7 @@ async function view(args: string[], options: CommandOptions): Promise<CommandRes
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear issues view <QUA-NNN>${c.reset}\n`,
+      output: `${c.red}Usage: crux linear view <QUA-NNN>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -107,7 +107,7 @@ async function search(args: string[], options: CommandOptions): Promise<CommandR
   const query = args.filter((a) => !a.startsWith('--')).join(' ').trim();
   if (!query) {
     return {
-      output: `${c.red}Usage: crux linear issues search <query>${c.reset}\n`,
+      output: `${c.red}Usage: crux linear search <query>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -137,7 +137,7 @@ async function comment(args: string[], options: CommandOptions): Promise<Command
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear issues comment <QUA-NNN> <message>${c.reset}\n`,
+      output: `${c.red}Usage: crux linear comment <QUA-NNN> <message>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -165,7 +165,7 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear issues start <QUA-NNN>${c.reset}\n`,
+      output: `${c.red}Usage: crux linear start <QUA-NNN>${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -196,7 +196,7 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear issues done <QUA-NNN> [--pr=URL]${c.reset}\n`,
+      output: `${c.red}Usage: crux linear done <QUA-NNN> [--pr=URL]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -294,12 +294,12 @@ Environment:
   LINEAR_API_KEY      Required. Stored in .env.base at the workspace root.
 
 Examples:
-  crux linear issues view QUA-184
-  crux linear issues search "agent checklist"
-  crux linear issues start QUA-184
-  crux linear issues done QUA-184 --pr=https://github.com/.../pull/42
-  crux linear issues comment QUA-184 "Landed in commit abc123"
-  crux linear issues comment QUA-184 --body-file=/tmp/note.md
+  crux linear view QUA-184
+  crux linear search "agent checklist"
+  crux linear start QUA-184
+  crux linear done QUA-184 --pr=https://github.com/.../pull/42
+  crux linear comment QUA-184 "Landed in commit abc123"
+  crux linear comment QUA-184 --body-file=/tmp/note.md
   crux linear states-list
 `;
 }

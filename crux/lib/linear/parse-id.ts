@@ -6,34 +6,40 @@
  * current session without requiring a manual `--linear=QUA-NNN` flag.
  * Companion to the GitHub issue-number detection already in agent-checklist.
  *
- * The bare-token matcher is deliberately restricted to a known team-key
- * allowlist (currently just `QUA`) to avoid false positives on tokens like
- * `UTF-8`, `CVE-2024`, `PR-1234`, `HTTP2-3`, `ISO-8601` that otherwise look
- * like Linear identifiers but aren't. The branch-pattern matcher is more
- * permissive since the `claude/` prefix already disambiguates intent.
+ * Both the bare-token matcher AND the branch-pattern matcher are restricted
+ * to the known team-key allowlist (currently just `QUA`). Without that, a
+ * GitHub-style branch like `claude/fix-239-...` would be misclassified as
+ * `FIX-239` and pollute Linear checklist metadata.
  */
 
 /**
- * Known Linear team keys recognised by bare-token matching.
- *
- * Add new team keys here as the workspace grows. The branch-pattern matcher
- * doesn't use this list — any 2–5 letter key inside a `claude/<key>-N-*`
- * branch is accepted since the `claude/` prefix signals explicit intent.
+ * Known Linear team keys recognised by branch and bare-token matching.
+ * Add new team keys here as the workspace grows.
  */
 export const KNOWN_LINEAR_TEAM_KEYS = ['QUA'] as const;
 
 const knownTeamKeyAlt = KNOWN_LINEAR_TEAM_KEYS.join('|');
 const BARE_ID_RE = new RegExp(`\\b(${knownTeamKeyAlt})-(\\d{1,6})\\b`);
 
-/** Case-insensitive branch-name matcher: `claude/qua-184-description` */
-const BRANCH_ID_RE = /\bclaude\/([a-z]{2,5})-(\d{1,6})(?:[-/]|$)/i;
+/**
+ * Case-insensitive branch-name matcher: `claude/qua-184-description`.
+ * Restricted to the known-team-keys allowlist so that GitHub-flavored branches
+ * like `claude/fix-239-...` or `claude/cve-2024-...` don't get misclassified.
+ */
+const BRANCH_ID_RE = new RegExp(
+  `\\bclaude\\/(${knownTeamKeyAlt})-(\\d{1,6})(?:[-/]|$)`,
+  'i',
+);
 
 /**
  * Parse a Linear issue identifier from an unstructured string.
  *
  * Search order:
- *   1. Explicit branch-name pattern: `claude/qua-184-*` — any 2–5 letter key
- *   2. Bare `QUA-184` token — restricted to the known-team-keys allowlist
+ *   1. Explicit branch-name pattern: `claude/qua-184-*`
+ *   2. Bare `QUA-184` token
+ *
+ * Both matchers use the known-team-keys allowlist so tokens like
+ * `UTF-8`, `CVE-2024`, `FIX-239`, `PR-1234` aren't mis-parsed.
  *
  * Returns the identifier in canonical form (`QUA-184`) or `null`.
  */

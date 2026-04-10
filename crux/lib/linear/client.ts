@@ -87,14 +87,30 @@ export async function linearGraphQL<T = unknown>(
     }
   }
 
-  const resp = await fetch('https://api.linear.app/graphql', {
-    method: 'POST',
-    headers: {
-      Authorization: key,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-  });
+  // Best-effort timeout: these calls sit on agent init/close-out paths and must
+  // not hang the CLI for minutes if Linear is unreachable. `fetch()` has no
+  // built-in timeout — use AbortController with a 15s budget.
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  let resp: Response;
+  try {
+    resp = await fetch('https://api.linear.app/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: key,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: controller.signal,
+    });
+  } catch (e) {
+    if ((e as { name?: string }).name === 'AbortError') {
+      throw new Error('Linear GraphQL request timed out after 15s');
+    }
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => '(no body)');

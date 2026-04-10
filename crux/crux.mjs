@@ -270,6 +270,8 @@ ${B}Examples:${R}
   crux tb people discover             ${D}# Discover people${R}
   crux tb ids allocate my-slug        ${D}# Allocate entity ID${R}
   crux gh issues start 42             ${D}# Start working on issue #42${R}
+  crux linear start QUA-184           ${D}# Start a Linear issue (agent-session tracking)${R}
+  crux linear done QUA-184 --pr=URL   ${D}# Close out a Linear issue${R}
   crux sys health check               ${D}# System health check${R}
   crux query search "topic"           ${D}# Full-text search${R}
 
