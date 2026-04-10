@@ -246,4 +246,45 @@ describe('fetchSourceContent self-healing ingest enqueue', () => {
     expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
     expect(result.ingestEnqueued).toBe(false);
   });
+
+  it('reports enqueue failure when suggestResourcesApi resolves with ok:false', async () => {
+    // Regression: suggestResourcesApi returns ApiResult (discriminated union) and
+    // never throws on API-level failures. A resolved { ok: false } must be
+    // treated the same as a rejected promise — otherwise ingestEnqueued would
+    // be silently true and the record would sit stuck forever.
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({ ok: false, error: 'not_found', message: 'no row' } as any);
+    vi.mocked(suggestResourcesApi).mockResolvedValue({
+      ok: false,
+      error: 'server_error',
+      message: 'wiki-server down',
+    } as any);
+
+    const result = await fetchSourceContent('https://example.com/failing-ok-false');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
+    expect(result.ingestEnqueued).toBe(false);
+  });
+
+  it('reports enqueue failure when createJob resolves with ok:false', async () => {
+    // Same class of bug on the resourceId branch: createJob returns ApiResult
+    // and a non-throwing failure must not be silently treated as success.
+    vi.mocked(getCitationContentByUrl).mockResolvedValue({ ok: false, error: 'miss', message: 'no content' } as any);
+    vi.mocked(lookupResourceByUrl).mockResolvedValue({
+      ok: true,
+      data: { id: 'res_1', url: 'https://example.com/failing-job', numericId: 1 },
+    } as any);
+    vi.mocked(createJob).mockResolvedValue({
+      ok: false,
+      error: 'server_error',
+      message: 'job queue rejected',
+    } as any);
+
+    const result = await fetchSourceContent('https://example.com/failing-job');
+
+    expect(result.errorType).toBe('not_cached');
+    expect(result.errorMessage).toBe('Source content not in cache — enqueue failed');
+    expect(result.ingestEnqueued).toBe(false);
+  });
 });

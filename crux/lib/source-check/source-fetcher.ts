@@ -209,16 +209,26 @@ export async function fetchSourceContent(
   // Fire-and-forget: don't block the caller or fail the source-check.
   let ingestEnqueued = false;
   try {
+    // `createJob` and `suggestResourcesApi` both return `Promise<ApiResult<...>>`
+    // (a discriminated union — they never throw on API-level failures). We must
+    // check `.ok` explicitly, otherwise a failing API call silently produces
+    // `ingestEnqueued = true` and the record sits stuck forever.
     if (resourceId) {
-      await createJob({
+      const jobResult = await createJob({
         type: 'resource-ingest',
         params: { resourceId, url },
         priority: 1, // Slightly elevated — source-check is actively waiting for this
         dedupKey: `ingest:${resourceId}`,
       });
+      if (!jobResult.ok) {
+        throw new Error(jobResult.message ?? 'createJob returned ok=false');
+      }
     } else {
       // Brand-new URL: register + enqueue via /suggest in one call.
-      await suggestResourcesApi({ urls: [url] });
+      const suggestResult = await suggestResourcesApi({ urls: [url] });
+      if (!suggestResult.ok) {
+        throw new Error(suggestResult.message ?? 'suggestResourcesApi returned ok=false');
+      }
     }
     ingestEnqueued = true;
     console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
