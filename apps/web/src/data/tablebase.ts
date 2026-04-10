@@ -1132,6 +1132,64 @@ export function getPolicyStakeholderId(
   return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
+// Severity order for source-check record verdicts. Lower index = worse.
+// Mirrors the display mapping in source-check-status.ts:
+//   contradicted/unverifiable → failed (red)
+//   outdated/partial          → trouble (orange)
+//   confirmed                 → verified (green)
+// Any verdict string not in this list (including 'unchecked' or unknown
+// values) is treated as "no data" and excluded from aggregation.
+const VERDICT_SEVERITY = [
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+  "confirmed",
+] as const;
+
+/**
+ * Pick the worst-case verdict from a list of verdict strings, ignoring any
+ * values not in the known severity ladder. Pure function — exported for unit
+ * tests and for any caller that has already resolved a list of verdicts.
+ */
+export function pickWorstVerdict(
+  verdicts: readonly string[],
+): string | null {
+  let worstIdx = -1;
+  for (const v of verdicts) {
+    const idx = VERDICT_SEVERITY.indexOf(v as (typeof VERDICT_SEVERITY)[number]);
+    if (idx === -1) continue;
+    if (worstIdx === -1 || idx < worstIdx) worstIdx = idx;
+  }
+  return worstIdx === -1 ? null : VERDICT_SEVERITY[worstIdx];
+}
+
+/**
+ * Roll up per-child source-check verdicts to a single worst-case verdict
+ * string. Generic across any parent→child relationship (e.g. policy→stakeholder,
+ * org→personnel, publication→citation). Callers are responsible for resolving
+ * their domain-specific name→id mapping before calling this.
+ *
+ * This is a workaround for parent record types that lack their own
+ * source-check coverage yet (QUA-214). When coverage lands, call sites should
+ * prefer the parent's own verdict and/or combine it with the aggregated
+ * children via pickWorstVerdict.
+ *
+ * Returns null if `recordIds` is empty or none of the ids have a verdict.
+ */
+export function aggregateRecordVerdicts(
+  recordType: string,
+  recordIds: readonly string[],
+): string | null {
+  if (recordIds.length === 0) return null;
+  const verdicts: string[] = [];
+  for (const id of recordIds) {
+    const v = getRecordVerdict(recordType, id);
+    if (v) verdicts.push(v.verdict);
+  }
+  return pickWorstVerdict(verdicts);
+}
+
 // Re-export loadYaml for use in domain modules
 export { loadYaml };
 // Re-export wiki-server helpers

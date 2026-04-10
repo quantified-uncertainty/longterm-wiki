@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isPolicy } from "@/data";
-import { getRecordVerdict } from "@/data/tablebase";
+import { aggregateRecordVerdicts, getPolicyStakeholderId } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { LegislationTable, type LegislationRow } from "./legislation-table";
 import { normalizeStatus } from "./legislation-constants";
@@ -87,6 +87,36 @@ interface StatDef {
 
 const VALID_SCOPES = new Set(["state", "federal", "international", "national"]);
 
+interface ApiStakeholderLite {
+  name?: string;
+}
+
+/**
+ * Resolve the given stakeholder display names to PG stakeholder record IDs
+ * for a specific policy entity. Missing/unresolvable entries are dropped.
+ * Policy-specific — stakeholder rows are keyed by (policyStableId, displayName).
+ */
+function resolvePolicyStakeholderIds(
+  policyStableId: string | null | undefined,
+  names: readonly string[],
+): string[] {
+  if (!policyStableId) return [];
+  const ids: string[] = [];
+  for (const name of names) {
+    const id = getPolicyStakeholderId(policyStableId, name);
+    if (id) ids.push(id);
+  }
+  return ids;
+}
+
+function extractStakeholderNames(meta: Record<string, unknown>): string[] {
+  const raw = meta.stakeholders;
+  if (!Array.isArray(raw)) return [];
+  return (raw as ApiStakeholderLite[])
+    .map((s) => (typeof s?.name === "string" ? s.name : null))
+    .filter((n): n is string => n !== null && n.length > 0);
+}
+
 function apiEntityToRow(e: DirectoryEntity): LegislationRow {
   const meta = e.metadata ?? {};
   const policyStatus = (meta.policyStatus as string | undefined) ?? null;
@@ -120,7 +150,10 @@ function apiEntityToRow(e: DirectoryEntity): LegislationRow {
     lastActionDate: lastActionInfo?.date ?? null,
     description: e.description ?? null,
     tags: e.tags ?? [],
-    verdictString: getRecordVerdict("policy", e.id)?.verdict ?? null,
+    verdictString: aggregateRecordVerdicts(
+      "policy-stakeholder",
+      resolvePolicyStakeholderIds(e.stableId, extractStakeholderNames(meta)),
+    ),
   };
 }
 
@@ -169,7 +202,13 @@ function loadFromLocal(): LegislationPageData {
       lastActionDate: lastActionInfo?.date ?? null,
       description: entity.description ?? null,
       tags: entity.tags,
-      verdictString: getRecordVerdict("policy", entity.id)?.verdict ?? null,
+      verdictString: aggregateRecordVerdicts(
+        "policy-stakeholder",
+        resolvePolicyStakeholderIds(
+          entity.stableId,
+          entity.stakeholders.map((s) => s.name),
+        ),
+      ),
     };
   });
 
