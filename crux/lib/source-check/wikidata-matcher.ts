@@ -226,14 +226,41 @@ function getYearFromTime(claim: WikidataClaim): string | null {
 
 /**
  * Extract a numeric quantity from a claim's datavalue.
- * Wikidata quantities look like { amount: "+1234", unit: "http://..." }
+ * Wikidata quantities look like { amount: "+1234", unit: "http://www.wikidata.org/entity/Q4917" }
+ * for typed quantities (e.g. USD), or { amount: "+1234", unit: "1" } for dimensionless counts.
+ * Returns the amount alongside the unit QID (or null for dimensionless) so callers can
+ * enforce unit compatibility before comparing.
  */
-function getQuantityValue(claim: WikidataClaim): number | null {
+function getQuantityValue(
+  claim: WikidataClaim,
+): { amount: number; unit: string | null } | null {
   const dv = claim.mainsnak.datavalue;
   if (!dv || dv.type !== 'quantity') return null;
   const val = dv.value as { amount: string; unit?: string };
-  const num = parseFloat(val.amount);
-  return isNaN(num) ? null : num;
+  const amount = Number(val.amount);
+  if (!Number.isFinite(amount)) return null;
+  if (!val.unit || val.unit === '1') return { amount, unit: null };
+  const unitMatch = val.unit.match(/\/(Q\d+)$/);
+  return { amount, unit: unitMatch ? unitMatch[1] : val.unit };
+}
+
+/**
+ * Map currency symbols in a FactBase value to Wikidata currency QIDs.
+ * Only unambiguous symbols are included — "$" is treated as USD (the most common
+ * and the default used across the FactBase), "¥" is deliberately omitted because
+ * it's ambiguous between JPY and CNY.
+ */
+const CURRENCY_SYMBOL_TO_QID: Record<string, string> = {
+  $: 'Q4917', // United States dollar
+  '€': 'Q4916', // Euro
+  '£': 'Q25224', // Pound sterling
+};
+
+function detectCurrencyQid(factValue: string): string | null {
+  for (const [symbol, qid] of Object.entries(CURRENCY_SYMBOL_TO_QID)) {
+    if (factValue.includes(symbol)) return qid;
+  }
+  return null;
 }
 
 /**
@@ -561,25 +588,46 @@ function matchQuantity(
       `[wikidata-api] Property ${pid} missing from ${qid}`);
   }
 
-  // Parse the fact value as a number (strip currency symbols, commas, whitespace)
+  // Detect the fact's currency (if any) BEFORE stripping symbols, so we can
+  // enforce unit compatibility against Wikidata claims below.
+  const factCurrency = detectCurrencyQid(factValue);
+
+  // Parse the fact value as a number (strip currency symbols, commas, whitespace).
+  // Enforce a strict numeric match so values like "$5.8 billion" or "3100 employees"
+  // fall through to LLM verification instead of being silently partial-parsed.
   const cleanedFact = factValue.replace(/[$€£¥,\s]/g, '');
-  const factNum = parseFloat(cleanedFact);
-  if (isNaN(factNum)) return null; // Can't parse — fall through to LLM
+  if (!/^[+-]?(?:\d+\.?\d*|\.\d+)$/.test(cleanedFact)) {
+    return null; // Can't parse cleanly — fall through to LLM
+  }
+  const factNum = Number(cleanedFact);
 
+  // Only compare against claims whose unit matches the fact's currency
+  // (or both sides are dimensionless, e.g. for P1128 employee counts).
+  // Cross-currency comparisons like €6B vs $6B would otherwise produce
+  // false confirmations.
+  const compatibleClaims: Array<{ amount: number; unit: string | null }> = [];
   for (const claim of claims) {
-    const wdNum = getQuantityValue(claim);
-    if (wdNum == null) continue;
+    const wd = getQuantityValue(claim);
+    if (wd == null) continue;
+    if (wd.unit === factCurrency) compatibleClaims.push(wd);
+  }
 
-    // Compare with tolerance (e.g., 10% for revenue, 15% for headcount)
-    const ratio = Math.abs(factNum - wdNum) / Math.max(Math.abs(wdNum), 1);
+  if (compatibleClaims.length === 0) {
+    // No unit-compatible claim — fall through to LLM rather than risk a false
+    // contradiction across different currencies / units.
+    return null;
+  }
+
+  for (const wd of compatibleClaims) {
+    const ratio = Math.abs(factNum - wd.amount) / Math.max(Math.abs(wd.amount), 1);
     if (ratio <= tolerance) {
       return makeResult(item, 'confirmed', 0.95,
-        `Wikidata ${pid} (${propertyLabel(pid)}) = ${wdNum}`,
-        `[wikidata-api] FactBase value '${factValue}' (~${factNum}) matches Wikidata ${pid} = ${wdNum} (within ${(tolerance * 100).toFixed(0)}% tolerance)`);
+        `Wikidata ${pid} (${propertyLabel(pid)}) = ${wd.amount}`,
+        `[wikidata-api] FactBase value '${factValue}' (~${factNum}) matches Wikidata ${pid} = ${wd.amount} (within ${(tolerance * 100).toFixed(0)}% tolerance)`);
     }
   }
 
-  const wdValues = claims.map(c => getQuantityValue(c)).filter((v): v is number => v != null);
+  const wdValues = compatibleClaims.map(v => v.amount);
   return makeResult(item, 'contradicted', 0.90,
     `Wikidata ${pid} (${propertyLabel(pid)}) = ${wdValues.join(', ')}`,
     `[wikidata-api] FactBase value '${factValue}' (~${factNum}) does not match Wikidata ${pid} = ${wdValues.join(', ')}`);
