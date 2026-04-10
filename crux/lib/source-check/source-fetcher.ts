@@ -24,7 +24,7 @@ import {
 import { isDeadFetchStatus } from './types.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { createJob } from '../wiki-server/jobs.ts';
-import { lookupResourceByUrl } from '../wiki-server/resources.ts';
+import { lookupResourceByUrl, suggestResourcesApi } from '../wiki-server/resources.ts';
 import { lookupWaybackSnapshot, fetchWaybackContent, formatWaybackTimestamp } from '../wayback.ts';
 import { isPrivateHost } from '../url-utils.ts';
 import { htmlToText } from '../html-utils.ts';
@@ -196,22 +196,35 @@ export async function fetchSourceContent(
 
   // Auto-enqueue a resource-ingest job so the content gets fetched for next time
   // (self-healing pipeline, Discussion #3499 Issue H).
+  //
+  // Two cases:
+  //   1. resourceId exists → enqueue ingest job directly (fast path)
+  //   2. resourceId is null → URL has never been seen; call /api/resources/suggest
+  //      which hashIds the URL, inserts a bare resources row, and enqueues the
+  //      ingest job in one shot. Without this branch, records with brand-new
+  //      source URLs (common after manual curation or agentic source-discover)
+  //      stall forever — the error message said "run resource-ingest first" but
+  //      no self-healing actually happened. See milestone "Anthropic → 100% green".
+  //
   // Fire-and-forget: don't block the caller or fail the source-check.
   let ingestEnqueued = false;
-  if (resourceId) {
-    try {
+  try {
+    if (resourceId) {
       await createJob({
         type: 'resource-ingest',
         params: { resourceId, url },
         priority: 1, // Slightly elevated — source-check is actively waiting for this
         dedupKey: `ingest:${resourceId}`,
       });
-      ingestEnqueued = true;
-      console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
-    } catch (e: unknown) {
-      // Best-effort — don't fail source-check if enqueue fails
-      console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
+    } else {
+      // Brand-new URL: register + enqueue via /suggest in one call.
+      await suggestResourcesApi({ urls: [url] });
     }
+    ingestEnqueued = true;
+    console.log(`${logPrefix} Auto-enqueued resource-ingest for ${url}`);
+  } catch (e: unknown) {
+    // Best-effort — don't fail source-check if enqueue fails
+    console.warn(`${logPrefix} Failed to auto-enqueue ingest for ${url}: ${e instanceof Error ? e.message : String(e)}`);
   }
 
   return {
@@ -219,7 +232,7 @@ export async function fetchSourceContent(
     errorType: 'not_cached',
     errorMessage: ingestEnqueued
       ? 'Source content not in cache — resource-ingest job enqueued'
-      : 'Source content not in cache — run resource-ingest first',
+      : 'Source content not in cache — enqueue failed',
     ingestEnqueued,
   };
 }
