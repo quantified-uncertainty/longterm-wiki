@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { createHash } from "crypto";
 import { z } from "zod";
 import { eq, count, desc, and, sql } from "drizzle-orm";
@@ -20,6 +21,8 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -259,60 +262,23 @@ const websiteSourcesApp = new Hono()
     return c.json({ sourceId, pages });
   })
 
+  // ---- POST /sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacySyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!website-sources` falls back to legacy.
+  //
+  // NOTE: only the main /sync endpoint is migrated. The secondary /sync-pages
+  // endpoint (which syncs website_source_pages, a different table) is left
+  // unchanged.
   .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncSourceBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const entityIds = items.map((i) => i.entityId).filter((id): id is string => id != null);
-    if (entityIds.length > 0) {
-      const refError = await validateEntityRefs(c, db, [
-        { fieldName: "entityId", ids: entityIds },
-      ]);
-      if (refError) return refError;
+    if (useFactoryFor("website-sources")) {
+      return factorySyncHandler(c);
     }
-
-    const now = new Date();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(websiteSources)
-          .values({
-            id: item.id,
-            domain: item.domain,
-            entityId: item.entityId ?? null,
-            entityDisplayName: item.entityDisplayName ?? null,
-            reliability: item.reliability,
-            refreshIntervalDays: item.refreshIntervalDays,
-            enabled: item.enabled,
-            notes: item.notes ?? null,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: websiteSources.id,
-            set: {
-              domain: item.domain,
-              entityId: item.entityId ?? null,
-              entityDisplayName: item.entityDisplayName ?? null,
-              reliability: item.reliability,
-              refreshIntervalDays: item.refreshIntervalDays,
-              enabled: item.enabled,
-              notes: item.notes ?? null,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
-    });
-
-    return c.json({ upserted });
+    return legacySyncHandler(c);
   })
 
   .post("/sync-pages", async (c) => {
@@ -580,6 +546,95 @@ const websiteSourcesApp = new Hono()
   )
 
   .post("/delete-batch", deleteBatchHandler(websiteSources, null));
+
+// ---- Factory implementation (Phase 2 migration) ----
+//
+// Tier 3 → batched: the legacy handler looped and upserted one row at a
+// time. The factory converts this into a single batched INSERT ... ON
+// CONFLICT using the auto-derived SET clause.
+
+const factorySyncHandler = createSyncHandler({
+  name: "website-sources",
+  table: websiteSources,
+  batchSchema: SyncSourceBatchSchema,
+  entityRefFields: (items) => [
+    {
+      fieldName: "entityId",
+      ids: items
+        .map((i) => i.entityId)
+        .filter((id): id is string => id != null),
+    },
+  ],
+  toRow: (item, now) => ({
+    id: item.id,
+    domain: item.domain,
+    entityId: item.entityId ?? null,
+    entityDisplayName: item.entityDisplayName ?? null,
+    reliability: item.reliability,
+    refreshIntervalDays: item.refreshIntervalDays,
+    enabled: item.enabled,
+    notes: item.notes ?? null,
+    updatedAt: now,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacySyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncSourceBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const entityIds = items.map((i) => i.entityId).filter((id): id is string => id != null);
+  if (entityIds.length > 0) {
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: entityIds },
+    ]);
+    if (refError) return refError;
+  }
+
+  const now = new Date();
+  let upserted = 0;
+
+  await db.transaction(async (tx) => {
+    for (const item of items) {
+      await tx
+        .insert(websiteSources)
+        .values({
+          id: item.id,
+          domain: item.domain,
+          entityId: item.entityId ?? null,
+          entityDisplayName: item.entityDisplayName ?? null,
+          reliability: item.reliability,
+          refreshIntervalDays: item.refreshIntervalDays,
+          enabled: item.enabled,
+          notes: item.notes ?? null,
+          updatedAt: now,
+        })
+        .onConflictDoUpdate({
+          target: websiteSources.id,
+          set: {
+            domain: item.domain,
+            entityId: item.entityId ?? null,
+            entityDisplayName: item.entityDisplayName ?? null,
+            reliability: item.reliability,
+            refreshIntervalDays: item.refreshIntervalDays,
+            enabled: item.enabled,
+            notes: item.notes ?? null,
+            updatedAt: now,
+          },
+        });
+      upserted++;
+    }
+  });
+
+  return c.json({ upserted });
+}
 
 export const websiteSourcesRoute = websiteSourcesApp;
 export type WebsiteSourcesRoute = typeof websiteSourcesApp;

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import { z } from "zod";
 import { eq, and, count, desc, asc, sql, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
@@ -24,6 +25,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
+import { useFactoryFor } from "./sync-factory-flag.js";
 
 // ---- Constants ----
 
@@ -365,93 +368,22 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   )
 
   // ---- POST /questions/sync ----
+  //
+  // Phase 2 migration (issue #4090, discussion #4088): both factory and
+  // legacy handlers coexist behind USE_SYNC_FACTORY_ROUTES feature flag.
+  // After 7 days of clean metrics with the factory enabled (default), a
+  // follow-up PR will remove `legacyQuestionsSyncHandler` and the conditional.
+  //
+  // Rollback: `USE_SYNC_FACTORY_ROUTES=!prediction-markets` falls back to legacy.
+  //
+  // NOTE: only the main /questions/sync endpoint is migrated. The secondary
+  // /snapshots/sync endpoint is left unchanged — it has a post-upsert bulk
+  // UPDATE to denormalize latest probability onto the question records.
   .post("/questions/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncQuestionsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        platform: item.platform,
-        platformQuestionId: item.platformQuestionId,
-        entityId: item.entityId ?? null,
-        entityDisplayName: item.entityDisplayName ?? null,
-        questionText: item.questionText,
-        questionUrl: item.questionUrl ?? null,
-        resolutionDate: item.resolutionDate ?? null,
-        resolutionCriteria: item.resolutionCriteria ?? null,
-        questionType: item.questionType,
-        category: item.category ?? null,
-        isResolved: item.isResolved,
-        resolutionValue: toNum(item.resolutionValue),
-        resolutionNotes: item.resolutionNotes ?? null,
-        currentProbability: toNum(item.currentProbability),
-        discoveryMethod: item.discoveryMethod ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(predictionMarketQuestions)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [
-            predictionMarketQuestions.platform,
-            predictionMarketQuestions.platformQuestionId,
-          ],
-          set: {
-            entityId: sql`excluded.entity_id`,
-            entityDisplayName: sql`excluded.entity_display_name`,
-            questionText: sql`excluded.question_text`,
-            questionUrl: sql`excluded.question_url`,
-            resolutionDate: sql`excluded.resolution_date`,
-            resolutionCriteria: sql`excluded.resolution_criteria`,
-            questionType: sql`excluded.question_type`,
-            category: sql`excluded.category`,
-            isResolved: sql`excluded.is_resolved`,
-            resolutionValue: sql`excluded.resolution_value`,
-            resolutionNotes: sql`excluded.resolution_notes`,
-            currentProbability: sql`excluded.current_probability`,
-            discoveryMethod: sql`excluded.discovery_method`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "prediction-market-question",
-          recordId: item.id,
-          entityId: item.entityId ?? null,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
+    if (useFactoryFor("prediction-markets")) {
+      return factoryQuestionsSyncHandler(c);
+    }
+    return legacyQuestionsSyncHandler(c);
   })
 
   // ---- POST /snapshots/sync ----
@@ -543,6 +475,169 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   })
 
   .post("/questions/delete-batch", deleteBatchHandler(predictionMarketQuestions, null, { label: "prediction-market-questions" }));
+
+// ---- Factory implementation (Phase 2 migration) ----
+//
+// Notable: this route uses a COMPOSITE conflict target — the unique key for
+// upserts is (platform, platformQuestionId), not the row id. The factory
+// supports composite targets via `conflictTarget: [col1, col2]`. The
+// conflictSet override omits the conflict-target columns (no-op on conflict).
+
+const factoryQuestionsSyncHandler = createSyncHandler({
+  name: "prediction-markets",
+  table: predictionMarketQuestions,
+  batchSchema: SyncQuestionsBatchSchema,
+  entityRefFields: (items) => [
+    {
+      fieldName: "entityId",
+      ids: items
+        .map((i) => i.entityId)
+        .filter((id): id is string => id != null),
+    },
+  ],
+  toRow: (item) => ({
+    id: item.id,
+    platform: item.platform,
+    platformQuestionId: item.platformQuestionId,
+    entityId: item.entityId ?? null,
+    entityDisplayName: item.entityDisplayName ?? null,
+    questionText: item.questionText,
+    questionUrl: item.questionUrl ?? null,
+    resolutionDate: item.resolutionDate ?? null,
+    resolutionCriteria: item.resolutionCriteria ?? null,
+    questionType: item.questionType,
+    category: item.category ?? null,
+    isResolved: item.isResolved,
+    resolutionValue: toNum(item.resolutionValue),
+    resolutionNotes: item.resolutionNotes ?? null,
+    currentProbability: toNum(item.currentProbability),
+    discoveryMethod: item.discoveryMethod ?? null,
+    source: item.source ?? null,
+    notes: item.notes ?? null,
+  }),
+  conflictTarget: [
+    predictionMarketQuestions.platform,
+    predictionMarketQuestions.platformQuestionId,
+  ],
+  // Explicit SET clause to omit the conflict-target columns (no-op on conflict).
+  conflictSet: {
+    entityId: sql`excluded.entity_id`,
+    entityDisplayName: sql`excluded.entity_display_name`,
+    questionText: sql`excluded.question_text`,
+    questionUrl: sql`excluded.question_url`,
+    resolutionDate: sql`excluded.resolution_date`,
+    resolutionCriteria: sql`excluded.resolution_criteria`,
+    questionType: sql`excluded.question_type`,
+    category: sql`excluded.category`,
+    isResolved: sql`excluded.is_resolved`,
+    resolutionValue: sql`excluded.resolution_value`,
+    resolutionNotes: sql`excluded.resolution_notes`,
+    currentProbability: sql`excluded.current_probability`,
+    discoveryMethod: sql`excluded.discovery_method`,
+    source: sql`excluded.source`,
+    notes: sql`excluded.notes`,
+    syncedAt: sql`now()`,
+    updatedAt: sql`now()`,
+  },
+  toVerdict: (item) => ({
+    recordType: "prediction-market-question",
+    recordId: item.id,
+    entityId: item.entityId ?? null,
+    sourceUrl: item.source ?? null,
+    sourcing: item.sourcing ?? null,
+  }),
+});
+
+// ---- Legacy sync handler (kept for 7-day soak window after Phase 2 migration) ----
+
+async function legacyQuestionsSyncHandler(c: Context) {
+  const body = await parseJsonBody(c);
+  if (!body) return invalidJsonError(c);
+
+  const parsed = SyncQuestionsBatchSchema.safeParse(body);
+  if (!parsed.success) return validationError(c, parsed.error.message);
+
+  const { items } = parsed.data;
+  const db = getDrizzleDb();
+
+  const refError = await validateEntityRefs(c, db, [
+    { fieldName: "entityId", ids: items.map((i) => i.entityId).filter((id): id is string => id != null) },
+  ]);
+  if (refError) return refError;
+
+  let upserted = 0;
+  let verdictsResult = { written: 0 };
+
+  await db.transaction(async (tx) => {
+    const allVals = items.map((item) => ({
+      id: item.id,
+      platform: item.platform,
+      platformQuestionId: item.platformQuestionId,
+      entityId: item.entityId ?? null,
+      entityDisplayName: item.entityDisplayName ?? null,
+      questionText: item.questionText,
+      questionUrl: item.questionUrl ?? null,
+      resolutionDate: item.resolutionDate ?? null,
+      resolutionCriteria: item.resolutionCriteria ?? null,
+      questionType: item.questionType,
+      category: item.category ?? null,
+      isResolved: item.isResolved,
+      resolutionValue: toNum(item.resolutionValue),
+      resolutionNotes: item.resolutionNotes ?? null,
+      currentProbability: toNum(item.currentProbability),
+      discoveryMethod: item.discoveryMethod ?? null,
+      source: item.source ?? null,
+      notes: item.notes ?? null,
+    }));
+
+    await tx
+      .insert(predictionMarketQuestions)
+      .values(allVals)
+      .onConflictDoUpdate({
+        target: [
+          predictionMarketQuestions.platform,
+          predictionMarketQuestions.platformQuestionId,
+        ],
+        set: {
+          entityId: sql`excluded.entity_id`,
+          entityDisplayName: sql`excluded.entity_display_name`,
+          questionText: sql`excluded.question_text`,
+          questionUrl: sql`excluded.question_url`,
+          resolutionDate: sql`excluded.resolution_date`,
+          resolutionCriteria: sql`excluded.resolution_criteria`,
+          questionType: sql`excluded.question_type`,
+          category: sql`excluded.category`,
+          isResolved: sql`excluded.is_resolved`,
+          resolutionValue: sql`excluded.resolution_value`,
+          resolutionNotes: sql`excluded.resolution_notes`,
+          currentProbability: sql`excluded.current_probability`,
+          discoveryMethod: sql`excluded.discovery_method`,
+          source: sql`excluded.source`,
+          notes: sql`excluded.notes`,
+          syncedAt: sql`now()`,
+          updatedAt: sql`now()`,
+        },
+      });
+
+    // Write inline source-check verdicts atomically within the same transaction
+    verdictsResult = await writeInlineVerdicts(
+      tx,
+      items.map((item) => ({
+        recordType: "prediction-market-question",
+        recordId: item.id,
+        entityId: item.entityId ?? null,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }))
+    );
+
+    upserted = allVals.length;
+  });
+
+  logSourceCheckCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
+
+  return c.json({ upserted, verdictsWritten: verdictsResult.written });
+}
 
 // ---- Exports ----
 
