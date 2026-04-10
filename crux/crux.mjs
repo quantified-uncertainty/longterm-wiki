@@ -118,6 +118,7 @@ import * as benchmarksCommands from './commands/benchmarks.ts';
 import * as usagePatternsCommands from './commands/usage-patterns.ts';
 import * as entityResourcesCommands from './commands/entity-resources.ts';
 import * as docsCommands from './commands/docs.ts';
+import * as linearCommands from './commands/linear.ts';
 
 const domains = {
   validate: validateCommands,
@@ -200,6 +201,7 @@ const domains = {
   benchmarks: benchmarksCommands,
   'usage-patterns': usagePatternsCommands,
   docs: docsCommands,
+  linear: linearCommands,
 };
 
 const shortcutMap = buildShortcutMap();
@@ -268,6 +270,8 @@ ${B}Examples:${R}
   crux tb people discover             ${D}# Discover people${R}
   crux tb ids allocate my-slug        ${D}# Allocate entity ID${R}
   crux gh issues start 42             ${D}# Start working on issue #42${R}
+  crux linear start QUA-184           ${D}# Start a Linear issue (agent-session tracking)${R}
+  crux linear done QUA-184 --pr=URL   ${D}# Close out a Linear issue${R}
   crux sys health check               ${D}# System health check${R}
   crux query search "topic"           ${D}# Full-text search${R}
 

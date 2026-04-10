@@ -17,12 +17,16 @@ This single command does everything below in order:
 2. Generates `.claude/wip-checklist.md` for the session type.
 3. Auto-marks `issue-tracking` as N/A when no `--issue` is given.
 4. **Signals start on the GitHub issue** (when `--issue=N` is given) — adds the `agent:working` label and posts the start comment. Best-effort: a GitHub failure does not fail init.
-5. Prints the full checklist so you can scan it.
+5. **Signals start on the Linear issue** — auto-detects a Linear ID from the branch name (`claude/qua-NNN-*`) or task description (any bare `QUA-NNN` token), or takes `--linear=QUA-NNN` explicitly. Moves the issue to "In Progress" and posts a start comment. Best-effort: a Linear failure does not fail init.
+6. Prints the full checklist so you can scan it.
 
 Pick the right invocation:
 
 - **Working on a GitHub issue**: `pnpm crux sys agent-checklist init --issue=N` (auto-detects type from labels)
+- **Working on a Linear issue**: start a branch `claude/qua-NNN-description` and the ID is detected automatically, or pass `--linear=QUA-NNN` explicitly
 - **Not on an issue**: `pnpm crux sys agent-checklist init "Task description" --type=X`
+
+Both `--issue` and `--linear` can be passed together if the same task is tracked in both systems.
 
 Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands` (default: `infrastructure`).
 

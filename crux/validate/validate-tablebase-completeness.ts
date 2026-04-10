@@ -108,6 +108,11 @@ const NON_ROUTE_FILES = new Set([
   "sourcing-schema.ts",
   "write-inline-verdicts.ts",
   "audit-log.ts",
+  // Sync handler factory infrastructure (Phase 1 of factory rollout, #4090).
+  // These are utilities used BY route files, not routes themselves.
+  "sync-factory.ts",
+  "sync-factory-flag.ts",
+  "sync-factory.test-d.ts",
 ]);
 
 // ── Analysis ───────────────────────────────────────────────────────────

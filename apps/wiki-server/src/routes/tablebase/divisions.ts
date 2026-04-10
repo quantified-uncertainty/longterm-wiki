@@ -6,17 +6,12 @@ import { divisions } from "../../schema.js";
 import {
   paginationQuery,
   noDuplicateIds,
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   notFoundError,
   zv,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 
 // ---- Constants ----
@@ -194,28 +189,14 @@ const divisionsApp = new Hono()
     return c.json(formatRow(rows[0]));
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncDivisionsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "parentOrgId", ids: items.map((i) => i.parentOrgId) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
+  // ---- POST /sync — uses sync-factory (Phase 1 pilot, Tier 2) ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "divisions",
+      table: divisions,
+      batchSchema: SyncDivisionsBatchSchema,
+      toRow: (item) => ({
         id: item.id,
         slug: item.slug ?? null,
         parentOrgId: item.parentOrgId,
@@ -228,69 +209,47 @@ const divisionsApp = new Hono()
         website: item.website ?? null,
         source: item.source ?? null,
         notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(divisions)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: divisions.id,
-          set: {
-            slug: sql`excluded.slug`,
-            parentOrgId: sql`excluded.parent_org_id`,
-            name: sql`excluded.name`,
-            divisionType: sql`excluded.division_type`,
-            // COALESCE: preserve existing values when sync payload sends null
-            lead: sql`COALESCE(excluded.lead, ${divisions.lead})`,
-            status: sql`COALESCE(excluded.status, ${divisions.status})`,
-            startDate: sql`COALESCE(excluded.start_date, ${divisions.startDate})`,
-            endDate: sql`COALESCE(excluded.end_date, ${divisions.endDate})`,
-            website: sql`COALESCE(excluded.website, ${divisions.website})`,
-            source: sql`COALESCE(excluded.source, ${divisions.source})`,
-            notes: sql`COALESCE(excluded.notes, ${divisions.notes})`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Resolve parent org slugs to human-readable titles for search
-      const orgSlugs = [...new Set(items.map((d) => d.parentOrgId))];
-      const titleMap = await resolveEntityTitles(tx, orgSlugs);
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((d) => ({
-          id: d.id,
-          thingType: "division" as const,
-          title: d.name,
-          sourceTable: "divisions",
-          sourceId: d.id,
-          sourceUrl: d.website,
-          parentTitle: titleMap.get(d.parentOrgId) ?? d.parentOrgId,
-          description: d.divisionType || null,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "division",
-          recordId: item.id,
-          entityId: item.parentOrgId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("divisions/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  })
+      }),
+      // COALESCE preservation: preserve existing values when sync payload sends null.
+      // This is the only escape hatch divisions needs (its 1-hook budget per Phase 0 audit).
+      conflictSet: {
+        slug: sql`excluded.slug`,
+        parentOrgId: sql`excluded.parent_org_id`,
+        name: sql`excluded.name`,
+        divisionType: sql`excluded.division_type`,
+        lead: sql`COALESCE(excluded.lead, ${divisions.lead})`,
+        status: sql`COALESCE(excluded.status, ${divisions.status})`,
+        startDate: sql`COALESCE(excluded.start_date, ${divisions.startDate})`,
+        endDate: sql`COALESCE(excluded.end_date, ${divisions.endDate})`,
+        website: sql`COALESCE(excluded.website, ${divisions.website})`,
+        source: sql`COALESCE(excluded.source, ${divisions.source})`,
+        notes: sql`COALESCE(excluded.notes, ${divisions.notes})`,
+        syncedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      },
+      entityRefFields: (items) => [
+        { fieldName: "parentOrgId", ids: items.map((i) => i.parentOrgId) },
+      ],
+      thingsTitleIds: (items) => [...new Set(items.map((d) => d.parentOrgId))],
+      toThing: (item, titleMap) => ({
+        id: item.id,
+        thingType: "division" as const,
+        title: item.name,
+        sourceTable: "divisions",
+        sourceId: item.id,
+        sourceUrl: item.website ?? null,
+        parentTitle: titleMap.get(item.parentOrgId) ?? item.parentOrgId,
+        description: item.divisionType || null,
+      }),
+      toVerdict: (item) => ({
+        recordType: "division",
+        recordId: item.id,
+        entityId: item.parentOrgId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(divisions, "divisions"));
 

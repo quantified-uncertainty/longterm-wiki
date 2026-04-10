@@ -4,18 +4,14 @@ import { eq, and, count, desc, sql } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { logger } from "../../logger.js";
 import { politicalScores, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -215,69 +211,42 @@ const politicalScoresApp = new Hono()
     return c.json({ scores: rows.map(formatRow), total: rows.length });
   })
 
-  // POST /sync
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId) },
-      { fieldName: "scorerEntityId", ids: items.map((i) => i.scorerEntityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
-
-    logger.info(`sync political-scores: upserting ${items.length} scores`);
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(politicalScores)
-          .values({
-            id: item.id,
-            politicianEntityId: item.politicianEntityId,
-            politicianDisplayName: item.politicianDisplayName ?? null,
-            scorerOrg: item.scorerOrg,
-            scorerEntityId: item.scorerEntityId ?? null,
-            score: String(item.score),
-            maxScore: String(item.maxScore),
-            year: item.year,
-            scoreType: item.scoreType ?? null,
-            sourceUrl: item.sourceUrl ?? null,
-            notes: item.notes ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: politicalScores.id,
-            set: {
-              politicianEntityId: item.politicianEntityId,
-              politicianDisplayName: item.politicianDisplayName ?? null,
-              scorerOrg: item.scorerOrg,
-              scorerEntityId: item.scorerEntityId ?? null,
-              score: String(item.score),
-              maxScore: String(item.maxScore),
-              year: item.year,
-              scoreType: item.scoreType ?? null,
-              sourceUrl: item.sourceUrl ?? null,
-              notes: item.notes ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
-        upserted++;
-      }
-    });
-
-    return c.json({ upserted });
-  })
+  // POST /sync — uses sync-factory (Phase 1 pilot, Tier 3)
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "political-scores",
+      table: politicalScores,
+      batchSchema: SyncBatchSchema,
+      toRow: (item, now) => ({
+        id: item.id,
+        politicianEntityId: item.politicianEntityId,
+        politicianDisplayName: item.politicianDisplayName ?? null,
+        scorerOrg: item.scorerOrg,
+        scorerEntityId: item.scorerEntityId ?? null,
+        score: String(item.score),
+        maxScore: String(item.maxScore),
+        year: item.year,
+        scoreType: item.scoreType ?? null,
+        sourceUrl: item.sourceUrl ?? null,
+        notes: item.notes ?? null,
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      entityRefFields: (items) => [
+        {
+          fieldName: "politicianEntityId",
+          ids: items.map((i) => i.politicianEntityId),
+        },
+        {
+          fieldName: "scorerEntityId",
+          ids: items
+            .map((i) => i.scorerEntityId)
+            .filter((id): id is string => id != null),
+        },
+      ],
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(politicalScores, null));
 

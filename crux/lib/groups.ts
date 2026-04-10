@@ -128,6 +128,12 @@ export const GROUPS: Record<string, GroupDef> = {
       'docs',
     ],
   },
+  linear: {
+    shortcut: 'linear',
+    description: 'Linear — issues, workflow states, agent session tracking',
+    domains: ['linear'],
+    flattened: ['linear'],
+  },
 };
 
 /** Build a lookup from shortcut → group name (e.g. 'w' → 'wiki') */
