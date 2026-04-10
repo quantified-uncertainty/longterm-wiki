@@ -141,7 +141,7 @@ if [ -n "$LINEAR_ID" ] && [ -n "$PR_URL" ]; then
 fi
 ```
 
-Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` keeps this best-effort so a missing key doesn't abort the ship flow. Linear → Done happens automatically when the PR merges, via the release workflow.
+Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` keeps this best-effort so a missing key doesn't abort the ship flow. Linear → Done happens automatically when the PR merges, via Linear's native GitHub integration — **but only if** the branch name contains `qua-NNN` or the PR body contains `Fixes QUA-NNN`. `crux gh pr create` auto-injects the latter from the branch name, checklist metadata, and `--linear` flag.
 
 ## Step 6: Session log
 
