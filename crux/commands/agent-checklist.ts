@@ -171,21 +171,11 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   // ── Preserve existing manual checks ────────────────────────────────────────
-  // If a checklist already exists, save its checked/N/A items so they survive
-  // re-initialization. This prevents the "reset on new commit" bug (#3906)
-  // where running init again (via /agent-ship, /agent-init, or hook) would
-  // overwrite manually-verified items and drop the session below 40%.
-  const preservedChecks: Array<{ id: string; marker: 'x' | '~'; reason?: string }> = [];
+  // If a checklist already exists, read its checked/N/A items so they survive
+  // re-initialization. Prevents the "reset on new commit" bug (#3906).
+  let priorItems: ReturnType<typeof parseChecklist>['items'] | null = null;
   if (existsSync(CHECKLIST_PATH)) {
-    const existingMarkdown = readFileSync(CHECKLIST_PATH, 'utf-8');
-    const existingStatus = parseChecklist(existingMarkdown);
-    for (const item of existingStatus.items) {
-      if (item.status === 'checked') {
-        preservedChecks.push({ id: item.id, marker: 'x' });
-      } else if (item.status === 'na') {
-        preservedChecks.push({ id: item.id, marker: '~', reason: item.naReason });
-      }
-    }
+    priorItems = parseChecklist(readFileSync(CHECKLIST_PATH, 'utf-8')).items;
   }
 
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
@@ -196,11 +186,14 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     markdown = naResult.markdown;
   }
 
-  // Reapply preserved checks from prior checklist
-  for (const check of preservedChecks) {
-    const result = checkItems(markdown, [check.id], check.marker, check.reason);
-    if (result.checked.length > 0) {
-      markdown = result.markdown;
+  // Reapply preserved checks from prior checklist in a single pass
+  if (priorItems) {
+    for (const item of priorItems) {
+      const marker = item.status === 'checked' ? 'x' as const : item.status === 'na' ? '~' as const : null;
+      if (marker) {
+        const result = checkItems(markdown, [item.id], marker, item.naReason);
+        if (result.checked.length > 0) markdown = result.markdown;
+      }
     }
   }
 
