@@ -184,3 +184,13 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+
+## Subsystem Maps — Read BEFORE proposing work in these areas
+
+These are "mental model" maps. They list the components, endpoints, helpers, and conventions that already exist in each subsystem so agents don't re-implement things. **Read the relevant map at task-start, not after writing code.**
+
+- `.claude/rules/source-check-system.md` — Source-check, verdict, and coverage scoring (if touching verdict UI, coverage scores, or `/api/source-checks/*`)
+- `.claude/rules/entity-sync-pipeline.md` — TableBase sync infrastructure, shared helpers (`sqlInList`, `validateEntityRefs`, `deleteBatchHandler`, `resolveEntityFKs`)
+- `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase naming and which layer owns what
+- `.claude/rules/id-system.md` — `numericId` vs `stableId` vs `tableId`, allocation, validation
+- `.claude/rules/validation-gate-system.md` — `crux/validate/` 80+ validators, gate wiring, blocking vs advisory
