@@ -100,28 +100,33 @@ async function getBrowser(): Promise<any> {
 
   browserLaunchPromise = (async () => {
     if (!(await isPlaywrightAvailable())) return null;
-    const { chromium } = await import('playwright');
-    const browser = await chromium.launch({
-      headless: true,
-      // Use system Chromium in Docker (set via PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH)
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
-      args: [
-        '--no-sandbox',          // Container is the sandbox boundary
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',  // Avoid /dev/shm issues in Docker
-        '--disable-gpu',
-      ],
-    });
+    try {
+      const { chromium } = await import('playwright');
+      const browser = await chromium.launch({
+        headless: true,
+        // Use system Chromium in Docker (set via PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH)
+        executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,
+        args: [
+          '--no-sandbox',          // Container is the sandbox boundary
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',  // Avoid /dev/shm issues in Docker
+          '--disable-gpu',
+        ],
+      });
 
-    // Reset singleton if the browser process crashes (OOM, segfault)
-    // so the next getBrowser() call relaunches instead of returning a dead instance
-    browser.on('disconnected', () => {
-      browserLaunchPromise = null;
-    });
+      // Reset singleton if the browser process crashes (OOM, segfault)
+      // so the next getBrowser() call relaunches instead of returning a dead instance
+      browser.on('disconnected', () => {
+        browserLaunchPromise = null;
+      });
 
-    ensureCleanupRegistered();
+      ensureCleanupRegistered();
 
-    return browser;
+      return browser;
+    } catch (err) {
+      browserLaunchPromise = null; // Allow retry on next call
+      throw err;
+    }
   })();
 
   return browserLaunchPromise;
