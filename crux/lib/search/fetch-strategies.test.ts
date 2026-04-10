@@ -12,6 +12,7 @@ import {
   getContentFetchStrategy,
   isDeadDomain,
   isFirecrawlPriorityDomain,
+  isPlaywrightPriorityDomain,
   fetchForumContent,
   fetchDoiContent,
   fetchWaybackContent,
@@ -65,6 +66,15 @@ describe('getContentFetchStrategy', () => {
     expect(getContentFetchStrategy('https://medium.com/some-article')).toBe('firecrawl-priority');
   });
 
+  it('returns playwright-priority for JS-heavy domains', () => {
+    expect(getContentFetchStrategy('https://www.crunchbase.com/organization/anthropic')).toBe('playwright-priority');
+    expect(getContentFetchStrategy('https://crunchbase.com/organization/anthropic')).toBe('playwright-priority');
+    expect(getContentFetchStrategy('https://pitchbook.com/profiles/company/1234')).toBe('playwright-priority');
+    expect(getContentFetchStrategy('https://www.cbinsights.com/company/example')).toBe('playwright-priority');
+    expect(getContentFetchStrategy('https://www.statista.com/statistics/1234')).toBe('playwright-priority');
+    expect(getContentFetchStrategy('https://app.dealroom.co/companies/example')).toBe('playwright-priority');
+  });
+
   it('returns default for normal domains', () => {
     expect(getContentFetchStrategy('https://arxiv.org/abs/2301.12345')).toBe('default');
     expect(getContentFetchStrategy('https://en.wikipedia.org/wiki/AI')).toBe('default');
@@ -99,6 +109,21 @@ describe('isFirecrawlPriorityDomain', () => {
   it('returns false for normal domains', () => {
     expect(isFirecrawlPriorityDomain('https://arxiv.org/abs/1234')).toBe(false);
     expect(isFirecrawlPriorityDomain('https://en.wikipedia.org')).toBe(false);
+  });
+});
+
+describe('isPlaywrightPriorityDomain', () => {
+  it('detects JS-heavy domains that need browser rendering', () => {
+    expect(isPlaywrightPriorityDomain('https://www.crunchbase.com/organization/anthropic')).toBe(true);
+    expect(isPlaywrightPriorityDomain('https://crunchbase.com/organization/openai')).toBe(true);
+    expect(isPlaywrightPriorityDomain('https://pitchbook.com/profiles/company/1234')).toBe(true);
+    expect(isPlaywrightPriorityDomain('https://www.statista.com/statistics/1234')).toBe(true);
+  });
+
+  it('returns false for normal domains', () => {
+    expect(isPlaywrightPriorityDomain('https://arxiv.org/abs/1234')).toBe(false);
+    expect(isPlaywrightPriorityDomain('https://en.wikipedia.org')).toBe(false);
+    expect(isPlaywrightPriorityDomain('https://openai.com/blog')).toBe(false);
   });
 });
 

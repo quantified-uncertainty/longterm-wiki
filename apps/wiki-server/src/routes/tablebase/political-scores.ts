@@ -52,7 +52,7 @@ const SyncItemSchema = z.object({
   politicianEntityId: z.string().min(1).max(200),
   politicianDisplayName: z.string().max(500).nullable().optional(),
   scorerOrg: z.string().min(1).max(100),
-  scorerEntityId: z.string().max(200).nullable().optional(),
+  scorerEntityId: z.string().min(1).max(200).nullable().optional(),
   score: z.number().min(0).max(1000),
   maxScore: z.number().min(1).max(1000).default(100),
   year: z.number().int().min(1900).max(2100),
@@ -228,7 +228,7 @@ const politicalScoresApp = new Hono()
 
     const refError = await validateEntityRefs(c, db, [
       { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId) },
-      { fieldName: "scorerEntityId", ids: items.map((i) => i.scorerEntityId).filter((id): id is string => !!id) },
+      { fieldName: "scorerEntityId", ids: items.map((i) => i.scorerEntityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 

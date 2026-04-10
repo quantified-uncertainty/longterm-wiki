@@ -1,11 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBEntities, getKBLatest, getKBRecords, getKBFacts, getKBEntitySlug } from "@/data/factbase";
-import { getTypedEntityById } from "@/data/tablebase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { ProfileStatCard } from "@/components/directory";
 import { PeopleTable, type PersonRow } from "./people-table";
-import { getTypedEntities, getPersonEntityById, isPerson } from "@/data";
+import { getTypedEntities, getPersonEntityById, isPerson, getTypedEntityById, getRecordVerdict } from "@/data";
 import { fetchDetailed } from "@lib/wiki-server";
 import { partitionPersonRows } from "./people-filter";
 import { isAnySid } from "@/lib/stable-id";
@@ -129,6 +128,7 @@ function apiEntityToPersonRow(e: DirectoryEntity): PersonRow {
     topics,
     publicationCount,
     careerHistoryCount,
+    verdictString: getRecordVerdict("entity", entityId)?.verdict ?? null,
 
     searchText: searchParts.join(" ").toLowerCase(),
   };
@@ -245,6 +245,7 @@ function loadFromLocal(): PersonRow[] {
       topics,
       publicationCount: 0,
       careerHistoryCount: getLocalCareerCount(entity.id),
+      verdictString: getRecordVerdict("entity", entity.id)?.verdict ?? null,
       searchText: searchParts.join(" ").toLowerCase(),
     };
   });
@@ -285,6 +286,7 @@ function loadFromLocal(): PersonRow[] {
       topics: [],
       publicationCount: 0,
       careerHistoryCount: 0,
+      verdictString: getRecordVerdict("entity", tp.id)?.verdict ?? null,
       searchText: [tp.title, tp.description ?? ""].join(" ").toLowerCase(),
     });
   }

@@ -92,7 +92,7 @@ const SyncRaceItemSchema = z.object({
   outcomeDetails: z.string().max(5000).nullable().optional(),
   aiAngle: z.string().max(1000).nullable().optional(),
   aiAngleSummary: z.string().max(5000).nullable().optional(),
-  policyEntityId: z.string().max(200).nullable().optional(),
+  policyEntityId: z.string().min(1).max(200).nullable().optional(),
   measureTitle: z.string().max(500).nullable().optional(),
   measureDescription: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
@@ -106,13 +106,13 @@ const SyncRacesBatchSchema = z.object({
 const SyncCandidateItemSchema = z.object({
   id: z.string().length(10),
   raceId: z.string().length(10),
-  candidateEntityId: z.string().max(200).nullable().optional(),
+  candidateEntityId: z.string().min(1).max(200).nullable().optional(),
   candidateDisplayName: z.string().min(1).max(500),
   isIncumbent: z.boolean().default(false),
   isWinner: z.boolean().default(false),
   voteShare: z.number().min(0).max(1).nullable().optional(),
   status: z.enum(VALID_CANDIDATE_STATUSES).default("running"),
-  pacEntityId: z.string().max(200).nullable().optional(),
+  pacEntityId: z.string().min(1).max(200).nullable().optional(),
   pacDisplayName: z.string().max(500).nullable().optional(),
   pacAmount: z.number().nullable().optional(),
   pacPosition: z.enum(VALID_PAC_POSITIONS).nullable().optional(),
@@ -405,7 +405,7 @@ const politicalRacesApp = new Hono()
     const db = getDrizzleDb();
 
     const refError = await validateEntityRefs(c, db, [
-      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId).filter((id): id is string => !!id) },
+      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 
@@ -504,8 +504,8 @@ const politicalRacesApp = new Hono()
     const db = getDrizzleDb();
 
     const candidateRefError = await validateEntityRefs(c, db, [
-      { fieldName: "candidateEntityId", ids: items.map((i) => i.candidateEntityId).filter((id): id is string => !!id) },
-      { fieldName: "pacEntityId", ids: items.map((i) => i.pacEntityId).filter((id): id is string => !!id) },
+      { fieldName: "candidateEntityId", ids: items.map((i) => i.candidateEntityId).filter((id): id is string => id != null) },
+      { fieldName: "pacEntityId", ids: items.map((i) => i.pacEntityId).filter((id): id is string => id != null) },
     ]);
     if (candidateRefError) return candidateRefError;
 

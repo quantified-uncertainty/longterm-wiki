@@ -1815,6 +1815,8 @@ const sourceChecksApp = new Hono()
       UNION ALL
       SELECT 'policy-stakeholder', count(*)::int FROM policy_stakeholders
       UNION ALL
+      SELECT 'citation', count(*)::int FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+      UNION ALL
       SELECT 'wiki-page', count(*)::int FROM wiki_pages
       UNION ALL
       SELECT 'fact', count(DISTINCT fact_id)::int FROM facts
@@ -1829,12 +1831,77 @@ const sourceChecksApp = new Hono()
     }
 
     // 2. Verdict counts grouped by record_type and verdict
+    // 3. Distinct checked records per type
+    //
+    // Both queries filter out orphaned verdicts (verdict rows referencing records
+    // that have been deleted from their source table) by JOINing against a CTE
+    // of all live (record_type, record_id) pairs.
+    //
+    // Note: for 'fact' type, record_id stores fact_id (not the serial PK),
+    // and for 'citation' type, record_id stores citation_quotes.id::text.
+    const liveRecordsCte = sql`
+      live_records AS (
+        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+        UNION ALL
+        SELECT 'division', id::text FROM divisions
+        UNION ALL
+        SELECT 'grant', id::text FROM grants
+        UNION ALL
+        SELECT 'funding-round', id::text FROM funding_rounds
+        UNION ALL
+        SELECT 'investment', id::text FROM investments
+        UNION ALL
+        SELECT 'funding-program', id::text FROM funding_programs
+        UNION ALL
+        SELECT 'publication', id::text FROM publications
+        UNION ALL
+        SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+        UNION ALL
+        SELECT 'equity-position', id::text FROM equity_positions
+        UNION ALL
+        SELECT 'entity-event', id::text FROM entity_events
+        UNION ALL
+        SELECT 'entity-assessment', id::text FROM entity_assessments
+        UNION ALL
+        SELECT 'benchmark-result', id::text FROM benchmark_results
+        UNION ALL
+        SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+        UNION ALL
+        SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+        UNION ALL
+        SELECT 'wiki-page', id::text FROM wiki_pages
+        UNION ALL
+        SELECT 'fact', fact_id FROM facts
+      )
+    `;
+
     const verdictRows = (await db.execute(sql`
-      SELECT record_type, verdict, count(*)::int AS cnt
-      FROM source_check_verdicts
-      GROUP BY record_type, verdict
-      ORDER BY record_type, verdict
+      WITH ${liveRecordsCte}
+      SELECT v.record_type, v.verdict, count(*)::int AS cnt
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      GROUP BY v.record_type, v.verdict
+      ORDER BY v.record_type, v.verdict
     `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
+
+    // Coverage is based on distinct checked records, not verdict row counts.
+    // A record can have multiple verdict rows (one per fieldName), so we use
+    // COUNT(DISTINCT record_id) to avoid exceeding 100%.
+    const checkedRows = (await db.execute(sql`
+      WITH ${liveRecordsCte}
+      SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      WHERE v.verdict != 'unchecked'
+      GROUP BY v.record_type
+    `)) as Array<{ record_type: string; checked_records: number }>;
+
+    const checkedByType: Record<string, number> = {};
+    for (const row of checkedRows) {
+      checkedByType[row.record_type] = row.checked_records;
+    }
 
     // Build per-type verdict maps
     const verdictsByType: Record<string, Record<string, number>> = {};
@@ -1845,13 +1912,14 @@ const sourceChecksApp = new Hono()
       verdictsByType[row.record_type][row.verdict] = row.cnt;
     }
 
-    // 3. Merge into tables array
+    // 4. Merge into tables array
     const allTypes = new Set([
       ...Object.keys(totalsByType),
       ...Object.keys(verdictsByType),
     ]);
 
     let grandTotalRecords = 0;
+    let grandCheckedRecords = 0;
     let grandTotalVerdicts = 0;
     let grandConfirmed = 0;
 
@@ -1859,6 +1927,7 @@ const sourceChecksApp = new Hono()
       .map((recordType) => {
         const totalRecords = totalsByType[recordType] ?? 0;
         const verdicts = verdictsByType[recordType] ?? {};
+        const checkedRecords = checkedByType[recordType] ?? 0;
 
         const confirmed = verdicts["confirmed"] ?? 0;
         const partial = verdicts["partial"] ?? 0;
@@ -1869,11 +1938,11 @@ const sourceChecksApp = new Hono()
 
         const totalVerdicts =
           confirmed + partial + unverifiable + contradicted + outdated + unchecked;
-        const checkedVerdicts = totalVerdicts - unchecked;
 
+        // Coverage is based on distinct checked records, not verdict row counts
         const coveragePercent =
           totalRecords > 0
-            ? Math.round((checkedVerdicts / totalRecords) * 1000) / 10
+            ? Math.round((checkedRecords / totalRecords) * 1000) / 10
             : 0;
         const greenPercent =
           totalVerdicts > 0
@@ -1881,12 +1950,14 @@ const sourceChecksApp = new Hono()
             : 0;
 
         grandTotalRecords += totalRecords;
+        grandCheckedRecords += checkedRecords;
         grandTotalVerdicts += totalVerdicts;
         grandConfirmed += confirmed;
 
         return {
           recordType,
           totalRecords,
+          checkedRecords,
           verdicts: {
             confirmed,
             partial,
@@ -1901,9 +1972,6 @@ const sourceChecksApp = new Hono()
       })
       .sort((a, b) => b.totalRecords - a.totalRecords);
 
-    const grandChecked = grandTotalVerdicts -
-      tables.reduce((s, t) => s + t.verdicts.unchecked, 0);
-
     return c.json({
       tables,
       totals: {
@@ -1915,7 +1983,7 @@ const sourceChecksApp = new Hono()
             : 0,
         coveragePercent:
           grandTotalRecords > 0
-            ? Math.round((grandChecked / grandTotalRecords) * 1000) / 10
+            ? Math.round((grandCheckedRecords / grandTotalRecords) * 1000) / 10
             : 0,
       },
     });
@@ -1927,11 +1995,32 @@ const sourceChecksApp = new Hono()
   .get("/verdict-matrix", async (c) => {
     const db = getDrizzleDb();
 
+    // Exclude orphaned verdicts for deleted records (same CTE pattern as /coverage-matrix)
     const rows = (await db.execute(sql`
-      SELECT record_type, verdict, count(*)::int AS cnt
-      FROM source_check_verdicts
-      GROUP BY record_type, verdict
-      ORDER BY record_type, verdict
+      WITH live_records AS (
+        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+        UNION ALL SELECT 'division', id::text FROM divisions
+        UNION ALL SELECT 'grant', id::text FROM grants
+        UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
+        UNION ALL SELECT 'investment', id::text FROM investments
+        UNION ALL SELECT 'funding-program', id::text FROM funding_programs
+        UNION ALL SELECT 'publication', id::text FROM publications
+        UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+        UNION ALL SELECT 'equity-position', id::text FROM equity_positions
+        UNION ALL SELECT 'entity-event', id::text FROM entity_events
+        UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
+        UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
+        UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+        UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+        UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
+        UNION ALL SELECT 'fact', fact_id FROM facts
+      )
+      SELECT v.record_type, v.verdict, count(*)::int AS cnt
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      GROUP BY v.record_type, v.verdict
+      ORDER BY v.record_type, v.verdict
     `)) as Array<{ record_type: string; verdict: string; cnt: number }>;
 
     // Build the matrix: { recordType: { verdict: count } }

@@ -26,6 +26,7 @@ export type ContentFetchStrategy =
   | 'forum-api'
   | 'doi'
   | 'firecrawl-priority'
+  | 'playwright-priority'
   | 'wayback-only'
   | 'default';
 
@@ -103,6 +104,32 @@ const FORUM_DOMAINS = [
   'www.effectivealtruism.org',
 ];
 
+/**
+ * Domains that require JavaScript rendering to extract content.
+ * These return empty/minimal HTML via plain HTTP because page content
+ * is rendered client-side. Playwright headless browser is used for these.
+ */
+const PLAYWRIGHT_PRIORITY_DOMAINS = [
+  'www.crunchbase.com',
+  'crunchbase.com',
+  'pitchbook.com',
+  'www.pitchbook.com',
+  'www.cbinsights.com',
+  'cbinsights.com',
+  'www.statista.com',
+  'statista.com',
+  'app.dealroom.co',
+  'dealroom.co',
+  'www.owler.com',
+  'owler.com',
+  'tracxn.com',
+  'www.tracxn.com',
+  'www.zoominfo.com',
+  'zoominfo.com',
+  'companiesmarketcap.com',
+  'www.companiesmarketcap.com',
+];
+
 /** Domains known to be permanently dead (site shut down). */
 const DEAD_DOMAINS = [
   'www.fhi.ox.ac.uk',
@@ -126,17 +153,7 @@ const DEAD_DOMAINS = [
 // Domain Classification
 // ---------------------------------------------------------------------------
 
-function getHostname(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return '';
-  }
-}
-
-function matchesDomainList(hostname: string, domains: string[]): boolean {
-  return domains.some(d => hostname === d || hostname.endsWith('.' + d));
-}
+import { getHostname, matchesDomainList } from '../url-utils.ts';
 
 /**
  * Determine the best content-fetch strategy for a URL.
@@ -149,6 +166,7 @@ export function getContentFetchStrategy(url: string): ContentFetchStrategy {
   if (matchesDomainList(hostname, DEAD_DOMAINS)) return 'wayback-only';
   if (matchesDomainList(hostname, DOI_DOMAINS)) return 'doi';
   if (matchesDomainList(hostname, FIRECRAWL_PRIORITY_DOMAINS)) return 'firecrawl-priority';
+  if (matchesDomainList(hostname, PLAYWRIGHT_PRIORITY_DOMAINS)) return 'playwright-priority';
 
   return 'default';
 }
@@ -165,6 +183,13 @@ export function isDeadDomain(url: string): boolean {
  */
 export function isFirecrawlPriorityDomain(url: string): boolean {
   return matchesDomainList(getHostname(url), FIRECRAWL_PRIORITY_DOMAINS);
+}
+
+/**
+ * Check if a domain requires JavaScript rendering (Playwright).
+ */
+export function isPlaywrightPriorityDomain(url: string): boolean {
+  return matchesDomainList(getHostname(url), PLAYWRIGHT_PRIORITY_DOMAINS);
 }
 
 // ---------------------------------------------------------------------------

@@ -75,7 +75,7 @@ const SyncQuestionItemSchema = z.object({
   id: z.string().length(10),
   platform: z.enum(VALID_PLATFORMS),
   platformQuestionId: z.string().min(1).max(200),
-  entityId: z.string().max(200).nullable().optional(),
+  entityId: z.string().min(1).max(200).nullable().optional(),
   entityDisplayName: z.string().max(500).nullable().optional(),
   questionText: z.string().min(1).max(5000),
   questionUrl: z.string().max(2000).nullable().optional(),
@@ -376,7 +376,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     const db = getDrizzleDb();
 
     const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId).filter((id): id is string => !!id) },
+      { fieldName: "entityId", ids: items.map((i) => i.entityId).filter((id): id is string => id != null) },
     ]);
     if (refError) return refError;
 

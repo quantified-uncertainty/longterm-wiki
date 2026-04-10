@@ -38,7 +38,7 @@ const SyncItemSchema = z.object({
   platform: z.enum(VALID_PLATFORMS),
   platformUsername: z.string().min(1).max(500),
   platformUserId: z.string().max(500).nullable().optional(),
-  entityStableId: z.string().max(200).nullable().optional(),
+  entityStableId: z.string().min(1).max(200).nullable().optional(),
   displayName: z.string().max(500).nullable().optional(),
   profileUrl: z.string().max(2000).nullable().optional(),
 });
@@ -159,7 +159,7 @@ const platformAccountsApp = new Hono()
     const { items } = parsed.data;
     const db = getDrizzleDb();
 
-    const entityIds = items.map((i) => i.entityStableId).filter((id): id is string => !!id);
+    const entityIds = items.map((i) => i.entityStableId).filter((id): id is string => id != null);
     if (entityIds.length > 0) {
       const refError = await validateEntityRefs(c, db, [
         { fieldName: "entityStableId", ids: entityIds },
