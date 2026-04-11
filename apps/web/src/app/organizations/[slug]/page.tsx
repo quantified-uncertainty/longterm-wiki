@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 import { getRecordVerdict } from "@data/tablebase";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { isSid } from "@/lib/stable-id";
 import {
   getKBLatest,
@@ -683,11 +683,11 @@ export default async function OrgProfilePage({
                         </div>
                       </td>
                       <td className="py-1.5 px-1">
-                        <SourceCheckDot
+                        <SourcingDot
                           status={recordVerdictToStatus(projectVerdict)}
                           originalVerdict={projectVerdict}
                           size="md"
-                          href={getSourceCheckHref("project", p.id)}
+                          href={getSourcingHref("project", p.id)}
                         />
                       </td>
                     </tr>

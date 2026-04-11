@@ -43,10 +43,10 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
   // Show the source quote if available; otherwise fall back to accuracy issues or a generic label
   const sourceQuoteText = quote.sourceQuote;
 
-  // Build source-check text, but suppress it when it just restates the verdict badge
+  // Build sourcing text, but suppress it when it just restates the verdict badge
   const rawIssues = quote.accuracyIssues;
   const issuesRedundant = rawIssues ? isRedundantIssues(rawIssues, label) : false;
-  const sourceCheckText = (rawIssues && !issuesRedundant) ? rawIssues : (
+  const sourcingText = (rawIssues && !issuesRedundant) ? rawIssues : (
     verdict === "accurate" && !sourceQuoteText ? "Supported by source" :
     quote.quoteVerified && !sourceQuoteText ? "Quote verified" :
     null
@@ -85,9 +85,9 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
         </blockquote>
       )}
       {/* Accuracy issues — only shown when they add info beyond the verdict badge */}
-      {sourceCheckText && (
+      {sourcingText && (
         <p className="text-[11px] text-muted-foreground/70 m-0 mt-1 line-clamp-2">
-          {sourceCheckText}
+          {sourcingText}
         </p>
       )}
     </div>
@@ -96,7 +96,7 @@ function ClaimRow({ quote, pageId }: { quote: CitationQuote; pageId?: string }) 
 
 /**
  * Client component that reads citation quote data from context and renders
- * source-check details for a specific resource URL in the expanded reference.
+ * sourcing details for a specific resource URL in the expanded reference.
  *
  * Stacked layout: each claim shows its text, verdict badge, source quote,
  * and accuracy issues in a clean vertical arrangement.

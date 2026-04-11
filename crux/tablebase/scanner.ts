@@ -442,7 +442,7 @@ interface VerdictRow {
 }
 
 async function scanSourceQuality(): Promise<TableScanResult> {
-  // Fetch all unverifiable verdicts from the source-check API
+  // Fetch all unverifiable verdicts from the sourcing API
   const allVerdicts: VerdictRow[] = [];
   let offset = 0;
   const pageSize = 200;
@@ -450,7 +450,7 @@ async function scanSourceQuality(): Promise<TableScanResult> {
   while (true) {
     const result = await apiRequest<{ verdicts: VerdictRow[]; total: number }>(
       'GET',
-      `/api/source-checks/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
+      `/api/sourcing/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
     );
     if (!result.ok) {
       console.warn(`[tablebase] Failed to fetch unverifiable verdicts: ${result.message}`);
@@ -554,7 +554,7 @@ export async function runFullScan(): Promise<ScanSummary> {
     scanInvestmentsCompleteness(orgEntities),
     scanBenchmarkResultsCompleteness(modelEntities),
     scanSourceQuality().catch((e: unknown) => {
-      // Source quality scanning is best-effort — wiki-server may not have source-check data
+      // Source quality scanning is best-effort — wiki-server may not have sourcing data
       console.warn(`[tablebase] Source quality scan failed: ${e instanceof Error ? e.message : String(e)}`);
       return { table: 'source_quality', totalEntities: 0, entitiesWithRecords: 0, totalRecords: 0, avgCompleteness: 100, profiles: [] } as TableScanResult;
     }),

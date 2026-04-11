@@ -1,7 +1,7 @@
 /**
  * Claims API — wiki-server client module
  *
- * Part of the claims-first source-check architecture (#3253).
+ * Part of the claims-first sourcing architecture (#3253).
  * Response types are inferred from the Hono RPC route type via InferResponseType<>.
  */
 
@@ -28,9 +28,9 @@ export type ClaimVerdictsResult = InferResponseType<RpcClient['verdicts']['$post
 // ---------------------------------------------------------------------------
 
 /**
- * Submit a batch of claims for async source-check.
+ * Submit a batch of claims for async sourcing.
  *
- * Creates proposed_claims rows and dispatches source-check jobs
+ * Creates proposed_claims rows and dispatches sourcing jobs
  * batched by resource. Returns a batchId for polling via getClaimStatus().
  */
 export async function proposeClaims(
@@ -40,7 +40,7 @@ export async function proposeClaims(
 }
 
 /**
- * Poll source-check status for a batch of claims.
+ * Poll sourcing status for a batch of claims.
  */
 export async function getClaimStatus(
   batchId: string,
@@ -92,7 +92,7 @@ export async function getClaimsByEntity(
 }
 
 /**
- * Store source-check verdicts for a batch of claims.
+ * Store sourcing verdicts for a batch of claims.
  * Wraps the raw `/api/claims/verdicts` endpoint with typed response.
  */
 export async function storeClaimVerdicts(

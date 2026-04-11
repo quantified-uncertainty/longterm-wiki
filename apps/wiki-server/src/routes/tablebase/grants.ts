@@ -12,7 +12,7 @@ import {
   formatSourcing,
   fetchFieldVerdicts,
   type VerdictJoinFields,
-} from "../shared/source-check-join.js";
+} from "../shared/sourcing-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -28,9 +28,9 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { writeInlineVerdicts, logSourcingCoverage } from "./write-inline-verdicts.js";
 import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
+import { enforceSourcing } from "../shared/sourcing-enforcement.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
@@ -618,9 +618,9 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
 
     // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
-    // config and client ?requireSourceCheck=true param. See source-check-enforcement.ts.
-    const sourceCheckError = enforceSourceCheck(c, "grants", items);
-    if (sourceCheckError) return sourceCheckError;
+    // config and client ?requireSourcing=true param. See sourcing-enforcement.ts.
+    const sourcingError = enforceSourcing(c, "grants", items);
+    if (sourcingError) return sourcingError;
 
     // Validate entity FK references for organizationId only.
     // granteeId is a LEGACY field that can hold either an entity ID or a
@@ -759,7 +759,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         }))
       );
 
-      // Write inline source-check verdicts atomically within the same transaction
+      // Write inline sourcing verdicts atomically within the same transaction
       verdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -774,7 +774,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       upserted = allVals.length;
     });
 
-    logSourceCheckCoverage("grants/sync", items.length, verdictsResult.written);
+    logSourcingCoverage("grants/sync", items.length, verdictsResult.written);
 
     // Link verified claims to records (best-effort — records already committed)
     let claimsLinked = 0;

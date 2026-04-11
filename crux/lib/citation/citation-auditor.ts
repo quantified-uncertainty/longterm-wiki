@@ -1,5 +1,5 @@
 /**
- * Citation Auditor — independent post-hoc source-check module
+ * Citation Auditor — independent post-hoc sourcing module
  *
  * Stateless, database-free citation checking. Extracts citations from MDX
  * content, fetches source URLs via the source-fetcher module (or uses a
@@ -28,7 +28,7 @@ import { stripFrontmatter } from '../patterns.ts';
 import { getCachedContent } from './citation-content-cache.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 
-/** Minimum source content length (chars) required to attempt LLM source-check. */
+/** Minimum source content length (chars) required to attempt LLM sourcing. */
 export const MIN_SOURCE_CONTENT_LENGTH = 50;
 
 // ---------------------------------------------------------------------------
@@ -130,12 +130,12 @@ export interface CitationAudit {
   /** The URL cited by this footnote. */
   sourceUrl: string;
   /**
-   * Verdict from LLM source-check, or 'unchecked' if no source was available
+   * Verdict from LLM sourcing, or 'unchecked' if no source was available
    * (e.g., URL not in cache and fetchMissing=false, paywall, or unverifiable
    * domain such as social media).
    */
   verdict: AuditVerdict | 'unchecked';
-  /** The passage in the source most relevant to the claim (when LLM source-check ran). */
+  /** The passage in the source most relevant to the claim (when LLM sourcing ran). */
   relevantQuote?: string;
   /** Human-readable explanation of the verdict. */
   explanation: string;
@@ -214,14 +214,14 @@ export interface AuditRequest {
    */
   delayMs?: number;
   /**
-   * Maximum number of concurrent LLM source-check calls.
+   * Maximum number of concurrent LLM sourcing calls.
    * Default: 3.
    */
   concurrency?: number;
 }
 
 // ---------------------------------------------------------------------------
-// LLM source-check
+// LLM sourcing
 // ---------------------------------------------------------------------------
 
 /** Parsed response from the per-citation LLM verifier. */
@@ -287,7 +287,7 @@ export function parseVerifierResponse(raw: string): VerifierResponse {
     return {
       verdict: 'unchecked',
       relevantQuote: '',
-      explanation: 'Failed to parse source-check response.',
+      explanation: 'Failed to parse sourcing response.',
     };
   }
 }
@@ -414,7 +414,7 @@ export function parseBatchVerifierResponse(raw: string, expectedCount: number): 
     return Array.from({ length: expectedCount }, () => ({
       verdict: 'unchecked' as const,
       relevantQuote: '',
-      explanation: 'Failed to parse batch source-check response.',
+      explanation: 'Failed to parse batch sourcing response.',
     }));
   }
 }
@@ -633,7 +633,7 @@ export function detectUnsourcedTableCells(body: string): UnsourcedTableCell[] {
  * 1. Extracts citations (footnote → URL + claim context) from the MDX body.
  * 2. Resolves sources and partitions citations into non-LLM (unchecked/dead)
  *    and LLM-verifiable groups (batched by source URL for efficiency).
- * 3. Runs LLM source-check concurrently with a configurable concurrency limit.
+ * 3. Runs LLM sourcing concurrently with a configurable concurrency limit.
  * 4. Returns AuditResult with per-citation verdicts, summary, and pass/fail gate.
  *
  * Cost estimate: ~$0.01–0.03 per citation at the default model.
@@ -715,7 +715,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
         claim,
         sourceUrl: ext.url,
         verdict: 'unchecked',
-        explanation: 'Source is behind a paywall — content not available for source-check.',
+        explanation: 'Source is behind a paywall — content not available for sourcing.',
       });
       continue;
     }
@@ -745,7 +745,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
       continue;
     }
 
-    // Queue for LLM source-check — group by source URL (#677).
+    // Queue for LLM sourcing — group by source URL (#677).
     const sourceText = source.relevantExcerpts && source.relevantExcerpts.length > 0
       ? source.relevantExcerpts.join('\n\n---\n\n')
       : source.content;
@@ -756,7 +756,7 @@ export async function auditCitations(request: AuditRequest): Promise<AuditResult
     llmGroups.get(ext.url)!.claims.push({ footnoteRef, claim, sourceUrl: ext.url });
   }
 
-  // Phase 2: Run LLM source-check in parallel with concurrency limit (#677).
+  // Phase 2: Run LLM sourcing in parallel with concurrency limit (#677).
   // Each group (same source URL) is a single batched LLM call.
   const limit = pLimit(concurrency);
   const groupTasks = [...llmGroups.entries()].map(([, group]) =>

@@ -10,7 +10,7 @@
 
 import { buildEntityLookupForContent } from '../../lib/entity-lookup.ts';
 import { buildKbContextForPage } from '../../lib/factbase-context.ts';
-import { buildSourceCheckContext } from '../../lib/source-check-context.ts';
+import { buildSourcingContext } from '../../lib/sourcing-context.ts';
 import { resolveTemplate, formatTemplateForPrompt } from '../../lib/content/page-templates.ts';
 import { getPageType } from '../../lib/page-analysis.ts';
 import { IMPROVE_PROMPT } from './phases/prompts.ts';
@@ -29,7 +29,7 @@ export interface ImproveContext {
   /** Objectivity context (alerts + issues) from analysis. */
   objectivityContext: string;
   /** Source-check verdict context (contradicted/outdated claims), or null if unavailable. */
-  sourceCheckContext: string | null;
+  sourcingContext: string | null;
 }
 
 export interface BuildImproveContextOptions {
@@ -68,11 +68,11 @@ export async function buildImproveContext(
   const entityLookupCount = entityLookup.split('\n').filter(Boolean).length;
   log('improve', `  Found ${entityLookupCount} relevant entities for lookup`);
 
-  // Load KB facts and source-check verdicts in parallel (independent I/O)
-  log('improve', 'Loading KB facts and source-check verdicts...');
-  const [kbResult, sourceCheckResult] = await Promise.allSettled([
+  // Load KB facts and sourcing verdicts in parallel (independent I/O)
+  log('improve', 'Loading KB facts and sourcing verdicts...');
+  const [kbResult, sourcingResult] = await Promise.allSettled([
     buildKbContextForPage(page.id, page.path),
-    buildSourceCheckContext(page.id),
+    buildSourcingContext(page.id),
   ]);
 
   let kbContext: string | null = null;
@@ -86,15 +86,15 @@ export async function buildImproveContext(
     log('improve', '  No KB entity found for this page (or entity has no facts)');
   }
 
-  let sourceCheckContext: string | null = null;
-  if (sourceCheckResult.status === 'fulfilled' && sourceCheckResult.value) {
-    sourceCheckContext = sourceCheckResult.value;
-    const lineCount = sourceCheckContext.split('\n').filter(Boolean).length;
-    log('improve', `  Found ${lineCount} source-check warnings for this entity`);
-  } else if (sourceCheckResult.status === 'rejected') {
-    log('improve', `  Source-check context load failed: ${sourceCheckResult.reason instanceof Error ? sourceCheckResult.reason.message : String(sourceCheckResult.reason)} — continuing without`);
+  let sourcingContext: string | null = null;
+  if (sourcingResult.status === 'fulfilled' && sourcingResult.value) {
+    sourcingContext = sourcingResult.value;
+    const lineCount = sourcingContext.split('\n').filter(Boolean).length;
+    log('improve', `  Found ${lineCount} sourcing warnings for this entity`);
+  } else if (sourcingResult.status === 'rejected') {
+    log('improve', `  Source-check context load failed: ${sourcingResult.reason instanceof Error ? sourcingResult.reason.message : String(sourcingResult.reason)} — continuing without`);
   } else {
-    log('improve', '  No actionable source-check verdicts found');
+    log('improve', '  No actionable sourcing verdicts found');
   }
 
   // Resolve template for this page (explicit frontmatter > entity type inference)
@@ -116,7 +116,7 @@ export async function buildImproveContext(
     claimsContext: null,
     gapAnalysisContext: null,
     kbContext, tier, templateContext,
-    sourceCheckContext,
+    sourcingContext,
   });
 
   return {
@@ -125,6 +125,6 @@ export async function buildImproveContext(
     kbContext,
     templateContext,
     objectivityContext,
-    sourceCheckContext,
+    sourcingContext,
   };
 }

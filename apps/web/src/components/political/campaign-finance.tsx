@@ -16,10 +16,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref, formatCompactCurrency } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import type { CampaignFinanceRecord } from "./types";
 import { toNum } from "./utils";
 
@@ -321,11 +321,11 @@ function PreviousCyclesTable({
                   {(() => {
                     const verdict = getRecordVerdict("campaign-finance", String(record.id))?.verdict;
                     return (
-                      <SourceCheckDot
+                      <SourcingDot
                         status={recordVerdictToStatus(verdict)}
                         originalVerdict={verdict}
                         size="md"
-                        href={getSourceCheckHref("campaign-finance", String(record.id))}
+                        href={getSourcingHref("campaign-finance", String(record.id))}
                       />
                     );
                   })()}

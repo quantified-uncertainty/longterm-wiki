@@ -125,7 +125,7 @@ describe('parseVerifierResponse', () => {
   it('handles malformed JSON gracefully as unchecked', () => {
     const result = parseVerifierResponse('not json at all');
     expect(result.verdict).toBe('unchecked');
-    expect(result.explanation).toBe('Failed to parse source-check response.');
+    expect(result.explanation).toBe('Failed to parse sourcing response.');
   });
 
   it('handles missing fields with defaults', () => {
@@ -582,7 +582,7 @@ describe('auditCitations relevantExcerpts', () => {
     const sourceCache: SourceCache = new Map([
       ['https://example.com/source', makeFetchedSource({
         url: 'https://example.com/source',
-        content: 'This is the full source content that should be used when no excerpts are available for source-check.',
+        content: 'This is the full source content that should be used when no excerpts are available for sourcing.',
         relevantExcerpts: [],
       })],
     ]);

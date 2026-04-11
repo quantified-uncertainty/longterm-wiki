@@ -264,7 +264,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const row = {
       // postgres.js returns bigserial as string — simulate that here
       id: String(numericId),
-      type: "claim-source-check",
+      type: "claim-sourcing",
       params: typeof jobParamsJson === "string" ? JSON.parse(jobParamsJson) : jobParamsJson,
     };
     jobStore.push({ id: numericId, type: row.type, params: row.params });
@@ -392,7 +392,7 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(body.claims).toHaveLength(3);
 
     // Verify the two claims with the same sourceUrl share a job ID
-    const jobIds = body.claims.map((c: { sourceCheckJobId: number }) => c.sourceCheckJobId);
+    const jobIds = body.claims.map((c: { sourcingJobId: number }) => c.sourcingJobId);
     // Claims 0 and 2 (both paper-a) should have the same jobId
     expect(jobIds[0]).toBe(jobIds[2]);
     // Claim 1 (paper-b) should have a different jobId
@@ -424,7 +424,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
     // Verify every claim has a job ID assigned
     for (const claim of body.claims) {
-      expect(claim.sourceCheckJobId).not.toBeNull();
+      expect(claim.sourcingJobId).not.toBeNull();
     }
 
     // Check the underlying job params have correct chunk size
@@ -433,7 +433,7 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(jobParams0.claimIds).toHaveLength(claimCount);
   });
 
-  it("estimatedSourceCheckTime is based on claim count, not job count", async () => {
+  it("estimatedSourcingTime is based on claim count, not job count", async () => {
     // Use 3 distinct sourceUrls to create 3 jobs with a small number of claims
     const claims = [
       { claimText: "Claim A1", sourceUrl: "https://example.com/page-a" },
@@ -455,10 +455,10 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(body.jobCount).toBe(3);
     expect(body.claims).toHaveLength(4);
 
-    // estimatedSourceCheckTime should be claimCount * SECONDS_PER_CLAIM (4 * 3 = 12)
+    // estimatedSourcingTime should be claimCount * SECONDS_PER_CLAIM (4 * 3 = 12)
     // NOT jobCount * SECONDS_PER_CLAIM (3 * 3 = 9)
-    expect(body.estimatedSourceCheckTime).toBe(4 * SECONDS_PER_CLAIM_ESTIMATE);
-    expect(body.estimatedSourceCheckTime).not.toBe(body.jobCount * SECONDS_PER_CLAIM_ESTIMATE);
+    expect(body.estimatedSourcingTime).toBe(4 * SECONDS_PER_CLAIM_ESTIMATE);
+    expect(body.estimatedSourcingTime).not.toBe(body.jobCount * SECONDS_PER_CLAIM_ESTIMATE);
   });
 
   it("returns 201 with correct structure for a basic propose request", async () => {
@@ -478,9 +478,9 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(body.batchId.length).toBe(10);
     expect(body.claims).toHaveLength(1);
     expect(body.claims[0].status).toBe("pending");
-    expect(body.claims[0].sourceCheckJobId).toBeDefined();
+    expect(body.claims[0].sourcingJobId).toBeDefined();
     expect(body.jobCount).toBe(1);
-    expect(body.estimatedSourceCheckTime).toBe(SECONDS_PER_CLAIM_ESTIMATE);
+    expect(body.estimatedSourcingTime).toBe(SECONDS_PER_CLAIM_ESTIMATE);
   });
 
   it("stores numeric claimIds in job params (not strings from bigserial)", async () => {
@@ -497,7 +497,7 @@ describe("Claims API — POST /api/claims/propose", () => {
     expect(jobStore).toHaveLength(1);
 
     const jobParams = jobStore[0].params as { claimIds: unknown[] };
-    // claimIds must be numbers, not strings — the claim-source-check handler
+    // claimIds must be numbers, not strings — the claim-sourcing handler
     // validates with z.number() and rejects string IDs.
     for (const id of jobParams.claimIds) {
       expect(typeof id).toBe("number");
@@ -518,7 +518,7 @@ describe("Claims API — POST /api/claims/propose", () => {
 
     // Response IDs should be numbers, not strings
     expect(typeof body.claims[0].id).toBe("number");
-    expect(typeof body.claims[0].sourceCheckJobId).toBe("number");
+    expect(typeof body.claims[0].sourcingJobId).toBe("number");
   });
 
   it("rejects empty claims array", async () => {

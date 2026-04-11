@@ -4,23 +4,22 @@
  * Sourcing lint guard — ratchet validator that prevents new `source-check`
  * references from accumulating while the system is renamed to `sourcing`.
  *
- * The rename is multi-phase (QUA-102, QUA-105..QUA-109) and will take weeks.
- * Until it lands, ~1000 existing references remain in the code. This guard
- * records a baseline count per category and fails if the total count
- * increases beyond the baseline. Refactors that redistribute references
- * within the existing implementation are allowed as long as the overall
- * count doesn't grow.
+ * The rename is multi-phase (QUA-102, QUA-105..QUA-109, QUA-237) and will take weeks.
+ * This guard records a baseline count per category and fails if the total
+ * count of legacy `source-check` references increases beyond the baseline.
+ * Refactors that redistribute references within the existing implementation
+ * are allowed as long as the overall count doesn't grow.
  *
  * Categories tracked:
  *   - hyphenated  — literal `source-check` anywhere in scanned files
  *   - camelCase   — `sourceCheck` identifier-style
  *   - PascalCase  — `SourceCheck` type/class-style
- *   - route       — `/api/source-check` URL path
+ *   - route       — `/api/source-checks` URL path
  *
  * Scope: crux/, apps/web/src/, apps/wiki-server/src/
  * Extensions: .ts, .tsx, .mts, .mjs
  * Excluded: node_modules, __tests__/, *.test.ts, the validator itself,
- *           the baseline file, and validate-source-check-* (existing data-quality
+ *           the baseline file, and validate-sourcing-* (existing data-quality
  *           validators that legitimately name the old pattern).
  *
  * Usage:
@@ -53,9 +52,9 @@ const SCAN_EXTS = ['.ts', '.tsx', '.mts', '.mjs'];
 const SKIP_FILENAMES = [
   'validate-sourcing-lint-guard.ts',
   'validate-sourcing-lint-guard.test.ts',
-  'validate-source-check-names.ts',
-  'validate-source-check-coverage.ts',
-  'validate-source-check-coverage.test.ts',
+  'validate-sourcing-names.ts',
+  'validate-sourcing-coverage.ts',
+  'validate-sourcing-coverage.test.ts',
 ];
 
 /**
@@ -94,16 +93,16 @@ const ZERO_COUNTS: Counts = {
 };
 
 /**
- * Patterns scanned. Route matches are a strict subset of hyphenated matches
+ * Patterns scanned — these detect LEGACY "source-check" terminology.
+ * Route matches are a strict subset of hyphenated matches
  * and are subtracted in `countInText`.
  *
  * The camelCase and PascalCase patterns match either bare identifiers
  * (`sourceCheck`, `SourceCheck`) or extended forms (`sourceCheckClient`,
- * `SourceCheckResult`, `sourceChecker`, `sourceChecking`) — anything that
- * starts with the legacy prefix at a word boundary and continues to a word
- * boundary.
+ * `SourceCheckResult`) — anything that starts with the legacy prefix
+ * at a word boundary and continues to a word boundary.
  */
-const ROUTE_RE = /\/api\/source-check/g;
+const ROUTE_RE = /\/api\/source-checks/g;
 const HYPHEN_RE = /source-check/g;
 const CAMEL_RE = /\bsourceCheck[A-Za-z0-9_]*\b/g;
 const PASCAL_RE = /\bSourceCheck[A-Za-z0-9_]*\b/g;
@@ -111,7 +110,7 @@ const PASCAL_RE = /\bSourceCheck[A-Za-z0-9_]*\b/g;
 export function countInText(text: string): Counts {
   const routeMatches = text.match(ROUTE_RE)?.length ?? 0;
   const hyphenAll = text.match(HYPHEN_RE)?.length ?? 0;
-  // Route matches are a strict subset of hyphenated matches (`/api/source-check`
+  // Route matches are a strict subset of hyphenated matches (`/api/source-checks`
   // contains `source-check`). Subtract to avoid double counting.
   const hyphenated = Math.max(0, hyphenAll - routeMatches);
   const camelCase = text.match(CAMEL_RE)?.length ?? 0;
@@ -251,10 +250,10 @@ export function runCheck(): CheckResult {
       `Total legacy-term count rose from ${baseline.total} to ${counts.total} ` +
       `(+${counts.total - baseline.total}):\n` +
       perCategoryDeltas.join('\n') +
-      '\n\nThe sourcing rename (QUA-102, QUA-105..QUA-109) is in progress. ' +
-      'New code should use "sourcing" terminology. Refactors that redistribute ' +
-      'existing references across categories are allowed as long as the total ' +
-      'stays flat or falls — only the total is enforced.';
+      '\n\nThe source-check → sourcing rename (QUA-102, QUA-237) is in progress. ' +
+      'New code should use "sourcing" terminology, not "source-check". Refactors ' +
+      'that redistribute existing references across categories are allowed as ' +
+      'long as the total stays flat or falls — only the total is enforced.';
     return { passed: false, current: counts, baseline, filesScanned, message };
   }
 
@@ -310,7 +309,7 @@ function main(): void {
 
   if (!result.passed) {
     // On non-main branches, the ratchet is advisory — PRs that add
-    // source-check features naturally increase the count temporarily.
+    // sourcing features naturally increase the count temporarily.
     // The ratchet enforces on main merges. See QUA-238.
     const branch = process.env.GITHUB_HEAD_REF
       || process.env.GITHUB_REF

@@ -845,25 +845,25 @@ function scanContentFreshness(meta: EntityTypeMeta): CellValue {
 
 // --- Quality ---
 
-function scanSourceCheckTables(meta: EntityTypeMeta): CellValue {
+function scanSourcingTables(meta: EntityTypeMeta): CellValue {
   if (!meta.dbTable) return naCell("No DB table");
 
   const schema = getWikiServerSchemaContent();
-  // Check for source-check-related tables (unified source-check system)
-  const hasSourceCheck =
+  // Check for sourcing-related tables (unified sourcing system)
+  const hasSourcing =
     schema.includes(`verificationEvidence`) ||
     schema.includes(`verification_evidence`) ||
     schema.includes(`verificationVerdicts`) ||
     schema.includes(`verification_verdicts`);
 
   return cell(
-    hasSourceCheck,
-    "source_check_tables",
-    hasSourceCheck ? "Has source-check tables" : "No source-check",
+    hasSourcing,
+    "sourcing_tables",
+    hasSourcing ? "Has sourcing tables" : "No sourcing",
   );
 }
 
-function scanSourceCheckCoverage(_meta: EntityTypeMeta): CellValue {
+function scanSourcingCoverage(_meta: EntityTypeMeta): CellValue {
   // Requires API call — return placeholder
   return naCell("Requires wiki-server API");
 }
@@ -972,8 +972,8 @@ const SCANNERS: Record<string, DimensionScanner> = {
   content_freshness: scanContentFreshness,
 
   // Quality
-  source_check_tables: scanSourceCheckTables,
-  source_check_coverage: scanSourceCheckCoverage,
+  sourcing_tables: scanSourcingTables,
+  sourcing_coverage: scanSourcingCoverage,
   hallucination_scored: scanHallucinationScored,
 
   // Testing

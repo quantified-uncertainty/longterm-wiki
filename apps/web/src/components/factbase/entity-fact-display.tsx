@@ -9,7 +9,7 @@ import {
   titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
-import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
+import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
 import { SectionHeader } from "./entity-section-header";
 
@@ -119,7 +119,7 @@ export function CategoryFactSection({
             <details key={propertyId} id={propertyId} className="group scroll-mt-16">
               <summary className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 text-sm select-none transition-colors">
                 <span className="inline-flex items-center gap-1.5 font-semibold min-w-[10rem] text-foreground/90">
-                  <FactSourceCheckDot factId={latestFact.id} sourceUrl={latestFact.source} size="sm" />
+                  <FactSourcingDot factId={latestFact.id} sourceUrl={latestFact.source} size="sm" />
                   {property?.name ?? propertyId}
                 </span>
                 <span className="flex-1 text-muted-foreground truncate font-mono text-[13px]">
@@ -175,7 +175,7 @@ export function CategoryFactSection({
                             </Link>
                           </td>
                           <td className="py-1.5 pl-1">
-                            <FactSourceCheckDot factId={fact.id} sourceUrl={fact.source} size="md" />
+                            <FactSourcingDot factId={fact.id} sourceUrl={fact.source} size="md" />
                           </td>
                         </tr>
                       );

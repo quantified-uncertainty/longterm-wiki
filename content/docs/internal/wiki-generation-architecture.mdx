@@ -141,8 +141,8 @@ The pattern: Researcher -> Writer -> Editor -> Specialist, with each agent optim
 
 **Key results**: F1 0.85 on true claims with GPT-4o, 8.3s per sample (async parallelization), roughly \$0.02-0.05 per claim set.
 
-**Relevance to us**: We already have the claim extraction step (`semantic-diff/claim-extractor.ts`) and per-citation verification (`citation-audit` phase, `fb source-check`). But our existing verification only checks claims against their **already-cited URLs**. The gaps Loki addresses:
-- **Uncited prose claims**: Factual assertions with no footnote that neither `citation-audit` nor `fb source-check` touches
+**Relevance to us**: We already have the claim extraction step (`semantic-diff/claim-extractor.ts`) and per-citation verification (`citation-audit` phase, `fb sourcing`). But our existing verification only checks claims against their **already-cited URLs**. The gaps Loki addresses:
+- **Uncited prose claims**: Factual assertions with no footnote that neither `citation-audit` nor `fb sourcing` touches
 - **Independent corroboration**: Searching the *web* for evidence rather than re-checking the same cited URL (catches stale or misleading sources)
 - **Checkworthiness filtering**: Reducing cost/false positives by skipping subjective or trivially true claims before verification
 

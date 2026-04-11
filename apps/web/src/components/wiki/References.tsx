@@ -124,7 +124,7 @@ function ReferenceEntry({ entry, pageId }: { entry: ResolvedRef; pageId?: string
           {index}
         </a>
       </span>
-      {/* Title + source-check dot + meta */}
+      {/* Title + sourcing dot + meta */}
       <span className="flex-1 min-w-0">
         {resource.id ? (
           <a

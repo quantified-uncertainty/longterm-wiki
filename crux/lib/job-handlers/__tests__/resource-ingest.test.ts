@@ -22,7 +22,7 @@ import type { FetchedSource, FetchedSourceStatus } from '../../search/source-fet
 // Mocks
 // ---------------------------------------------------------------------------
 
-vi.mock('../../source-check/source-fetcher.ts', () => ({
+vi.mock('../../sourcing/source-fetcher.ts', () => ({
   isPrivateHost: (host: string) =>
     host === 'localhost' ||
     host === '127.0.0.1' ||

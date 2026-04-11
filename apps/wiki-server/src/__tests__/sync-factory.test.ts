@@ -5,7 +5,7 @@
  *   1. Parse / invalid JSON
  *   2. Zod schema validation
  *   3. Natural key collision
- *   4. enforceSourceCheck (gated)
+ *   4. enforceSourcing (gated)
  *   5. validateEntityRefs (gated)
  *   6. validateClaimRefs (gated)
  *   7. preValidate hook (Response short-circuit + throw → SyncPhaseError)

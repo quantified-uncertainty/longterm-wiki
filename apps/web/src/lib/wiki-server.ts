@@ -194,7 +194,7 @@ export function dataSourceLabel(source: DataSource): string {
 
 import { hc, type InferResponseType } from "hono/client";
 import type { FactsRoute } from "@wiki-server/facts-route";
-import type { SourceChecksRoute } from "@wiki-server/source-checks-route";
+import type { SourcingRoute } from "@wiki-server/sourcing-route";
 import type { GrantsRoute } from "@wiki-server/grants-route";
 import type { DivisionsRoute } from "@wiki-server/divisions-route";
 import type { FundingProgramsRoute } from "@wiki-server/funding-programs-route";
@@ -252,25 +252,25 @@ export type RpcTimeseriesResult = InferResponseType<FactsClient['timeseries'][':
 // Hono RPC client — Unified Source-Checks API
 // ============================================================================
 
-type SourceChecksClient = ReturnType<typeof hc<SourceChecksRoute>>;
+type SourcingClient = ReturnType<typeof hc<SourcingRoute>>;
 
-/** Inferred response type for GET /api/source-checks/stats */
-export type RpcSourceChecksStatsResult = InferResponseType<SourceChecksClient['stats']['$get'], 200>;
+/** Inferred response type for GET /api/sourcing/stats */
+export type RpcSourcingStatsResult = InferResponseType<SourcingClient['stats']['$get'], 200>;
 
-/** Inferred response type for GET /api/source-checks/verdicts */
-export type RpcSourceChecksVerdictsResult = InferResponseType<SourceChecksClient['verdicts']['$get'], 200>;
+/** Inferred response type for GET /api/sourcing/verdicts */
+export type RpcSourcingVerdictsResult = InferResponseType<SourcingClient['verdicts']['$get'], 200>;
 
 /** A single verdict row from the verdicts list */
-export type RpcSourceCheckVerdictRow = RpcSourceChecksVerdictsResult['verdicts'][number];
+export type RpcSourcingVerdictRow = RpcSourcingVerdictsResult['verdicts'][number];
 
-/** Inferred response type for GET /api/source-checks/verdicts/:recordType/:recordId */
-export type RpcSourceCheckDetailResult = InferResponseType<SourceChecksClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
+/** Inferred response type for GET /api/sourcing/verdicts/:recordType/:recordId */
+export type RpcSourcingDetailResult = InferResponseType<SourcingClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
 
-/** Inferred response type for GET /api/source-checks/resolve-names */
-export type RpcSourceChecksResolveNamesResult = InferResponseType<SourceChecksClient['resolve-names']['$get'], 200>;
+/** Inferred response type for GET /api/sourcing/resolve-names */
+export type RpcSourcingResolveNamesResult = InferResponseType<SourcingClient['resolve-names']['$get'], 200>;
 
-/** Inferred response type for GET /api/source-checks/entity-summary */
-export type RpcEntitySummaryResult = InferResponseType<SourceChecksClient['entity-summary']['$get'], 200>;
+/** Inferred response type for GET /api/sourcing/entity-summary */
+export type RpcEntitySummaryResult = InferResponseType<SourcingClient['entity-summary']['$get'], 200>;
 
 /** A single entity summary row from the entity-summary endpoint */
 export type RpcEntitySummaryRow = RpcEntitySummaryResult['summaries'][number];

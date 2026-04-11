@@ -472,7 +472,7 @@ export function GrantsTable({
                   <RecordStatusDots
                     coverageScore={computeGrantCoverage({ amount: row.amount, recipient: row.recipientName, date: row.date, program: row.program, status: row.status, source: row.source })}
                     verdict={row.verdictString}
-                    sourcingHref={row.verdictString ? `/source-checks/grant/${encodeURIComponent(row.recordKey)}` : undefined}
+                    sourcingHref={row.verdictString ? `/sourcing/grant/${encodeURIComponent(row.recordKey)}` : undefined}
                   />
                 </td>
               </tr>

@@ -89,7 +89,7 @@ export function SourcesOverviewContent() {
         </Link>
 
         <Link
-          href="/source-checks"
+          href="/sourcing"
           className="group block rounded-lg border border-border bg-card p-5 no-underline hover:border-primary/50 transition-colors"
         >
           <h3 className="text-base font-semibold mb-1 group-hover:text-primary transition-colors">

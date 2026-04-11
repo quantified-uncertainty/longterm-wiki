@@ -12,10 +12,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import type { PoliticalOffice } from "./types";
 
 // ── Status styling ───────────────────────────────────────────────────
@@ -196,11 +196,11 @@ export function OfficeHistory({ offices }: OfficeHistoryProps) {
                     {(() => {
                       const verdict = getRecordVerdict("political-office", String(office.id))?.verdict;
                       return (
-                        <SourceCheckDot
+                        <SourcingDot
                           status={recordVerdictToStatus(verdict)}
                           originalVerdict={verdict}
                           size="md"
-                          href={getSourceCheckHref("political-office", String(office.id))}
+                          href={getSourcingHref("political-office", String(office.id))}
                         />
                       );
                     })()}

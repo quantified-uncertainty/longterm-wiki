@@ -60,8 +60,8 @@ describe('validate-prompt-escaping — prompt function detection', () => {
     expect(matchesPromptFunc('const buildPrompt = (claims) => {')).toBe(true);
   });
 
-  it('matches function buildSourceCheckPrompt(...)', () => {
-    expect(matchesPromptFunc('function buildSourceCheckPrompt(entity, facts) {')).toBe(true);
+  it('matches function buildSourcingPrompt(...)', () => {
+    expect(matchesPromptFunc('function buildSourcingPrompt(entity, facts) {')).toBe(true);
   });
 
   it('matches method definition buildPrompt(...) {', () => {

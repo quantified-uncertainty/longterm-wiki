@@ -12,12 +12,12 @@
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactSourceCheck } from "@data/factbase";
+import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactSourcing } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { factbaseVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { factbaseVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 interface FBEntityFactsProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -90,7 +90,7 @@ function TimeSeriesProperty({
       </div>
       <div className="flex flex-col gap-1">
         {sorted.map((item) => {
-          const sourceCheck = getKBFactSourceCheck(item.fact.id);
+          const sourcing = getKBFactSourcing(item.fact.id);
           return (
             <div
               key={item.fact.id}
@@ -104,7 +104,7 @@ function TimeSeriesProperty({
               </span>
               {item.fact.source && isUrl(item.fact.source) && (
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                  {sourceCheck && <SourceCheckDot status={factbaseVerdictToStatus(sourceCheck)} originalVerdict={sourceCheck} size="sm" />}
+                  {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
                   <a
                     href={item.fact.source}
                     className="text-xs text-primary/60 hover:text-primary hover:underline"
@@ -147,7 +147,7 @@ function SingleValueProperty({
 
   if (!fact) return null;
 
-  const sourceCheck = getKBFactSourceCheck(fact.id);
+  const sourcing = getKBFactSourcing(fact.id);
 
   return (
     <div className="flex items-baseline justify-between gap-3 py-1.5 border-b border-border/50 last:border-b-0">
@@ -161,7 +161,7 @@ function SingleValueProperty({
             ({formatKBDate(fact.asOf)})
           </span>
         )}
-        {sourceCheck && <SourceCheckDot status={factbaseVerdictToStatus(sourceCheck)} originalVerdict={sourceCheck} size="sm" />}
+        {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
       </div>
     </div>
   );

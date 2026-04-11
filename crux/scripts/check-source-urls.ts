@@ -68,7 +68,7 @@ async function checkUrl(url: string): Promise<{ status: number | "timeout" | "er
       method: "HEAD",
       signal: controller.signal,
       redirect: "follow",
-      headers: { "User-Agent": "Mozilla/5.0 (Longterm Wiki source-check)" },
+      headers: { "User-Agent": "Mozilla/5.0 (Longterm Wiki sourcing)" },
     });
     clearTimeout(timeout);
     return { status: res.status };

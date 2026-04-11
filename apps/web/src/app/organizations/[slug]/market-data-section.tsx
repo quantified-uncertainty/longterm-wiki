@@ -13,9 +13,9 @@ import {
 } from "@/lib/wiki-server";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { SectionHeader } from "./org-shared";
 
 // ── Data Fetching ────────────────────────────────────────────────────
@@ -183,11 +183,11 @@ function SecondaryMarketSection({
                     )}
                   </td>
                   <td className="py-2 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={getSourceCheckHref("secondary-market-price", String(p.id))}
+                      href={getSourcingHref("secondary-market-price", String(p.id))}
                     />
                   </td>
                 </tr>
@@ -320,11 +320,11 @@ function PredictionMarketSection({
                       {PLATFORM_LABELS[q.platform] ?? q.platform}
                     </td>
                     <td className="py-2 px-1">
-                      <SourceCheckDot
+                      <SourcingDot
                         status={recordVerdictToStatus(verdict)}
                         originalVerdict={verdict}
                         size="md"
-                        href={getSourceCheckHref("prediction-question", String(q.id))}
+                        href={getSourcingHref("prediction-question", String(q.id))}
                       />
                     </td>
                   </tr>
@@ -382,11 +382,11 @@ function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
         {q.resolutionDate ?? "–"}
       </td>
       <td className="py-2.5 px-1">
-        <SourceCheckDot
+        <SourcingDot
           status={recordVerdictToStatus(verdict)}
           originalVerdict={verdict}
           size="md"
-          href={getSourceCheckHref("prediction-question", String(q.id))}
+          href={getSourcingHref("prediction-question", String(q.id))}
         />
       </td>
     </tr>

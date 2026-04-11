@@ -146,11 +146,11 @@ interface ImprovePromptArgs {
   /** Formatted template requirements (from resolveTemplate + formatTemplateForPrompt). */
   templateContext: string | null;
   /** Source-check verdicts (contradicted/outdated) for the page's entity. */
-  sourceCheckContext: string | null;
+  sourcingContext: string | null;
 }
 
 export function IMPROVE_PROMPT(args: ImprovePromptArgs): string {
-  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, kbContext, tier, templateContext, sourceCheckContext } = args;
+  const { page, filePath, importPath, directions, analysis, research, objectivityContext, currentContent, entityLookup, claimsContext, gapAnalysisContext, kbContext, tier, templateContext, sourcingContext } = args;
 
   const isPolish = tier === 'polish';
   const pageType = getPageType(page);
@@ -257,16 +257,16 @@ and contradictions where the page disagrees with verified claims. These are high
 Each missing fact has a source URL -- add it with a footnote citation.
 
 ${gapAnalysisContext}
-` : ''}${sourceCheckContext ? `
+` : ''}${sourcingContext ? `
 ### Source-Check Warnings (PRIORITY -- flagged claims to fix)
 
-The following claims about this entity have been flagged by automated source-checking against primary sources.
+The following claims about this entity have been flagged by automated sourcing against primary sources.
 **Contradicted** claims have evidence that they are wrong. **Outdated** claims have newer data available.
 
 **IMPORTANT: Verify and correct these claims during improvement.** If you cannot find a corrected value in
 the research sources, flag the claim with {/* NEEDS CITATION */} rather than leaving the incorrect value.
 
-${sourceCheckContext}
+${sourcingContext}
 ` : ''}
 ### Quality Standards (Extended)
 - Replace vague claims with specific numbers; use \`<KBF>\` for canonical KB facts and \`<Calc>\` for derived values

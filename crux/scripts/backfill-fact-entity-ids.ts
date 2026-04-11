@@ -2,7 +2,7 @@
  * One-time backfill: populate entityId on source_check_verdicts rows for facts.
  *
  * All 1,911 fact verdicts were created without entityId because the creation
- * code in factbase-source-check.ts did not pass result.entityId to the API.
+ * code in factbase-sourcing.ts did not pass result.entityId to the API.
  * That bug is now fixed. This script backfills existing rows.
  *
  * For each verdict with recordType='fact' and entityId IS NULL, we look up the
@@ -137,7 +137,7 @@ async function fetchNullEntityVerdicts(): Promise<VerdictRow[]> {
   while (rows.length < total) {
     const res = await apiFetch(
       "GET",
-      `/api/source-checks/verdicts?record_type=fact&limit=${PAGE}&offset=${offset}`,
+      `/api/sourcing/verdicts?record_type=fact&limit=${PAGE}&offset=${offset}`,
     );
     if (!res.ok) {
       console.error(`Failed to fetch verdicts: ${res.error}`);
@@ -245,7 +245,7 @@ async function main() {
       sourcesChecked: row.sourcesChecked ?? undefined,
     };
 
-    const res = await apiFetch("POST", "/api/source-checks/verdicts", body);
+    const res = await apiFetch("POST", "/api/sourcing/verdicts", body);
 
     if (res.ok) {
       success++;

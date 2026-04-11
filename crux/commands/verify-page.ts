@@ -50,7 +50,7 @@ interface VerifiedClaim extends ClaimWithCitation {
   reasoning?: string;
 }
 
-interface PageSourceCheckReport {
+interface PageSourcingReport {
   pageId: string;
   title: string;
   totalClaims: number;
@@ -101,7 +101,7 @@ function buildFootnoteMap(rawContent: string): FootnoteMap {
   };
 }
 
-// ── Web source-check ─────────────────────────────────────────────────
+// ── Web sourcing ─────────────────────────────────────────────────
 
 const VERIFY_SYSTEM_PROMPT = `You verify factual claims against web search evidence. For each claim, you will be given search results. Determine whether the evidence supports or contradicts the claim.
 
@@ -185,7 +185,7 @@ After searching, respond with ONLY a JSON object (no other text):
     return {
       ...claim,
       verdict: 'unverifiable',
-      reasoning: `Error during source-check: ${e instanceof Error ? e.message : String(e)}`,
+      reasoning: `Error during sourcing: ${e instanceof Error ? e.message : String(e)}`,
       searchQuery,
     };
   }
@@ -243,7 +243,7 @@ export async function verifyPageCommand(
 
   if (mode === 'quick') {
     // Quick mode: just report the breakdown
-    const report: PageSourceCheckReport = {
+    const report: PageSourcingReport = {
       pageId: page.slug,
       title: page.title,
       totalClaims: claims.length,
@@ -301,7 +301,7 @@ export async function verifyPageCommand(
     if (c.verdict) verdictCounts[c.verdict]++;
   }
 
-  const report: PageSourceCheckReport = {
+  const report: PageSourcingReport = {
     pageId: page.slug,
     title: page.title,
     totalClaims: claims.length,
@@ -320,7 +320,7 @@ export async function verifyPageCommand(
 
 // ── Report formatting ────────────────────────────────────────────────
 
-function formatReport(report: PageSourceCheckReport): string {
+function formatReport(report: PageSourcingReport): string {
   const lines: string[] = [];
 
   lines.push(`\n  Page Source-Check Report: ${report.title}`);
@@ -332,7 +332,7 @@ function formatReport(report: PageSourceCheckReport): string {
 
   if (report.verified > 0) {
     lines.push('');
-    lines.push(`  Web source-check results (${report.verified} claims):`);
+    lines.push(`  Web sourcing results (${report.verified} claims):`);
     lines.push(`    Supported:             ${report.verdicts.supported}`);
     lines.push(`    Contradicted:          ${report.verdicts.contradicted}`);
     lines.push(`    Partially supported:   ${report.verdicts.partially_supported}`);

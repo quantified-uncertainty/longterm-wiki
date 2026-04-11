@@ -30,7 +30,7 @@ import {
 import type { GrantRow } from "@/app/divisions/[slug]/paginated-tables";
 import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 // ── Tabs builder ──────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ function DivisionTabs({ data }: { data: import("@/app/divisions/[slug]/division-
       return {
         ...g,
         sourcingVerdict: verdict?.verdict ?? null,
-        sourcingHref: getSourceCheckHref("grant", String(g.key)),
+        sourcingHref: getSourcingHref("grant", String(g.key)),
       };
     });
     tabs.push({

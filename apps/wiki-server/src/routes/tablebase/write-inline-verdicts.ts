@@ -15,10 +15,10 @@ type DbOrTx =
     >;
 
 /**
- * Write source_check_verdicts for records that include inline source-check data.
+ * Write source_check_verdicts for records that include inline sourcing data.
  * Called within a sync handler's transaction.
  *
- * Uses the same upsert pattern as source-checks.ts verdict writes:
+ * Uses the same upsert pattern as sourcing.ts verdict writes:
  *   - Verdicts keyed on (record_type, record_id, COALESCE(field_name, ''))
  *   - Evidence keyed on (record_type, record_id, COALESCE(source_url, ''), COALESCE(checker_model, ''))
  */
@@ -38,12 +38,12 @@ export async function writeInlineVerdicts(
   for (const record of withSourcing) {
     const v = record.sourcing!;
 
-    // Upsert verdict — same conflict key as source-checks.ts
+    // Upsert verdict — same conflict key as sourcing.ts
     // Note: `reasoning` is the verdict-level summary (not raw evidence text).
     // Raw evidence goes in source_check_evidence.extracted_quote.
     const reasoning = v.evidence
-      ? `Inline source-check: ${v.verdict}. Evidence: ${v.evidence.slice(0, 500)}`
-      : `Inline source-check: ${v.verdict}`;
+      ? `Inline sourcing: ${v.verdict}. Evidence: ${v.evidence.slice(0, 500)}`
+      : `Inline sourcing: ${v.verdict}`;
     await tx.execute(sql`
       INSERT INTO source_check_verdicts (
         record_type, record_id, field_name, entity_id,
@@ -111,25 +111,25 @@ export async function writeInlineVerdicts(
 }
 
 /**
- * Log a warning when records are submitted without source-check data.
- * Call this from sync handlers for visibility into source-check coverage.
+ * Log a warning when records are submitted without sourcing data.
+ * Call this from sync handlers for visibility into sourcing coverage.
  */
-export function logSourceCheckCoverage(
+export function logSourcingCoverage(
   endpoint: string,
   totalItems: number,
   checkedCount: number
 ): void {
   if (checkedCount === 0) {
-    // Debug-level: source-check is optional today, so missing source-check is expected.
-    // Upgrade to warn once source-check is mandatory.
+    // Debug-level: sourcing is optional today, so missing sourcing is expected.
+    // Upgrade to warn once sourcing is mandatory.
     logger.debug(
       { endpoint, totalItems },
-      `${endpoint}: all ${totalItems} records submitted without source-check`
+      `${endpoint}: all ${totalItems} records submitted without sourcing`
     );
   } else if (checkedCount < totalItems) {
     logger.info(
       { endpoint, totalItems, checkedCount },
-      `${endpoint}: ${checkedCount}/${totalItems} records include source-check`
+      `${endpoint}: ${checkedCount}/${totalItems} records include sourcing`
     );
   }
 }

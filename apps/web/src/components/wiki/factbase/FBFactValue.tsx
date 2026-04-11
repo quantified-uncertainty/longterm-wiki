@@ -12,13 +12,13 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { getKBFacts, getKBLatest, getKBProperty, getKBFactSourceCheck } from "@data/factbase";
+import { getKBFacts, getKBLatest, getKBProperty, getKBFactSourcing } from "@data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/factbase/currencies";
 import { formatValue } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { factbaseVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { factbaseVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import styles from "../tooltip.module.css";
 
 interface FBFactValueProps {
@@ -65,7 +65,7 @@ export function FBFactValue({
   const displayValue = formatKBFactValue(fact, prop?.unit, prop?.display);
   const currencyCode = resolveCurrency(fact.currency, prop?.unit);
   const propertyName = prop?.name ?? property;
-  const sourceCheck = getKBFactSourceCheck(fact.id);
+  const sourcing = getKBFactSourcing(fact.id);
   const hasMetadata = propertyName || fact.asOf || fact.source;
 
   if (!hasMetadata) {
@@ -135,19 +135,19 @@ export function FBFactValue({
                 >
                   Link
                 </a>
-                {sourceCheck && <SourceCheckDot status={factbaseVerdictToStatus(sourceCheck)} originalVerdict={sourceCheck} size="sm" />}
+                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
                 Source: {fact.source}
-                {sourceCheck && <SourceCheckDot status={factbaseVerdictToStatus(sourceCheck)} originalVerdict={sourceCheck} size="sm" />}
+                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
               </span>
             )}
           </span>
         )}
-        {sourceCheck && (
+        {sourcing && (
           <span className="block text-muted-foreground/80 mt-0.5">
-            <SourceCheckDot status={factbaseVerdictToStatus(sourceCheck)} originalVerdict={sourceCheck} size="sm" />
+            <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />
           </span>
         )}
         {/* Fact detail link */}

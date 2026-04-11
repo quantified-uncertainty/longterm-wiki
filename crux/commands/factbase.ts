@@ -17,7 +17,7 @@ import { validate } from '../../packages/factbase/src/validate.ts';
 import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
-import { sourceCheckCommand } from './factbase-source-check.ts';
+import { sourcingCommand } from './factbase-sourcing.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
@@ -1109,7 +1109,7 @@ export const commands = {
   'needs-update': needsUpdateCommand,
   migrate: kbMigrateCommands.default,
   'sync-sources': syncSourcesCommand,
-  'source-check': sourceCheckCommand,
+  'sourcing': sourcingCommand,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
@@ -1136,7 +1136,7 @@ Commands:
   import-990 --discover <query>         Search ProPublica by org name
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
-  source-check          Check KB facts against source URLs using LLM
+  sourcing          Check KB facts against source URLs using LLM
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
 
@@ -1146,9 +1146,9 @@ Options:
   --ci                  JSON output (sync-sources: dry-run, lists URLs only)
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
-  --entity=X            (source-check) Check all facts for one entity
-  --fact=X              (source-check) Check a single fact by ID
-  --dry-run             Preview changes without writing (source-check, import-990)
+  --entity=X            (sourcing) Check all facts for one entity
+  --fact=X              (sourcing) Check a single fact by ID
+  --dry-run             Preview changes without writing (sourcing, import-990)
   --ein=XXXXXXXXX       (import-990) Specify EIN directly
   --force               (import-990, add-fact) Overwrite existing facts
   --asOf=YYYY-MM        (add-fact) Temporal anchor date
@@ -1169,7 +1169,7 @@ Examples:
   crux fb import-990 givewell --ein=208625442  Import GiveWell 990 data
   crux fb import-990 --discover "Machine Intelligence Research"  Search ProPublica
   crux fb sync-sources                Sync source URLs to wiki-server resources
-  crux fb source-check --entity=anthropic   Check Anthropic facts against sources
-  crux fb source-check --dry-run --limit=5  Preview 5 facts that would be checked
+  crux fb sourcing --entity=anthropic   Check Anthropic facts against sources
+  crux fb sourcing --dry-run --limit=5  Preview 5 facts that would be checked
 `;
 }

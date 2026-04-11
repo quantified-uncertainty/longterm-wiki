@@ -1,5 +1,5 @@
 /**
- * Shared utilities for page source-check and citation commands.
+ * Shared utilities for page sourcing and citation commands.
  */
 
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';

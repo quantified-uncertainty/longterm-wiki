@@ -6,7 +6,7 @@
  */
 import Link from "next/link";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -204,7 +204,7 @@ export function EquityPositionsSection({
                         filledFieldCount: (pos.stake != null ? 1 : 0) + (pos.source ? 1 : 0) + (pos.notes ? 1 : 0),
                       })}
                       verdict={verdict?.verdict}
-                      sourcingHref={verdict?.verdict ? getSourceCheckHref("equity-position", String(pos.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourcingHref("equity-position", String(pos.key)) : undefined}
                     />
                   </td>
                 </tr>

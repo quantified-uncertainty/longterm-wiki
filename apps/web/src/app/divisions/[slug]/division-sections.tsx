@@ -13,9 +13,9 @@ import {
 } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 // ── Team Members Section ─────────────────────────────────────────────
 
@@ -76,11 +76,11 @@ export function TeamMembersSection({
                     )}
                   </td>
                   <td className="py-1.5 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={verdict ? getSourceCheckHref("personnel", String(p.key)) : undefined}
+                      href={verdict ? getSourcingHref("personnel", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>
@@ -155,11 +155,11 @@ export function FundingProgramsSection({
                     )}
                   </td>
                   <td className="py-1.5 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                      href={verdict ? getSourcingHref("funding-program", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>

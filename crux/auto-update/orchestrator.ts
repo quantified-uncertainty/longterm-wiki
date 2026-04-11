@@ -20,7 +20,7 @@ import { recordAutoUpdateRun, insertAutoUpdateNewsItems } from '../lib/wiki-serv
 import type { AutoUpdateOptions, RunReport, RunResult, NewsDigest, UpdatePlan } from './types.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { executeBatchImprove } from './batch-improve.ts';
-import { filterBySourceCheckVerdicts } from './source-check-filter.ts';
+import { filterBySourcingVerdicts } from './sourcing-filter.ts';
 
 const RUNS_DIR = join(PROJECT_ROOT, 'data/auto-update/runs');
 
@@ -387,11 +387,11 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
   saveRunDetails(startedAt, digest, plan);
 
   // ── Source-Check Pre-Flight ──────────────────────────────────────────────
-  // Skip pages whose entities have contradicted source-check verdicts.
+  // Skip pages whose entities have contradicted sourcing verdicts.
   // Best-effort: if wiki-server is down, all pages pass through.
   if (plan.pageUpdates.length > 0) {
     console.log(`\n── Pre-flight: Source-check verdict filter ──`);
-    const filterResult = await filterBySourceCheckVerdicts(plan.pageUpdates, verbose);
+    const filterResult = await filterBySourcingVerdicts(plan.pageUpdates, verbose);
 
     if (filterResult.skipped.length > 0) {
       // Remove skipped pages from the plan and record them as skipped reasons
@@ -399,13 +399,13 @@ export async function runPipeline(options: AutoUpdateOptions = {}): Promise<Pipe
       for (const { pageUpdate } of filterResult.skipped) {
         plan.skippedReasons.push({
           item: pageUpdate.pageTitle,
-          reason: 'Entity has contradicted source-check verdicts',
+          reason: 'Entity has contradicted sourcing verdicts',
         });
       }
       console.log(`  Removed ${filterResult.skipped.length} page(s) with contradicted verdicts`);
       console.log(`  Remaining: ${plan.pageUpdates.length} page(s)`);
     } else {
-      console.log(`  All ${plan.pageUpdates.length} page(s) passed source-check filter`);
+      console.log(`  All ${plan.pageUpdates.length} page(s) passed sourcing filter`);
     }
   }
 

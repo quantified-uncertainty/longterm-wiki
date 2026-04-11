@@ -26,7 +26,7 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
- *   --force        Override soft-enforcement blocks (e.g., source-check coverage)
+ *   --force        Override soft-enforcement blocks (e.g., sourcing coverage)
  *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
  *                    unified-blocking + yaml-schema (no stamp cache written)
  *
@@ -360,7 +360,7 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'dot-position',
-    name: 'Dot indicator position (SourceCheckDot / RecordStatusDots not in first column)',
+    name: 'Dot indicator position (SourcingDot / RecordStatusDots not in first column)',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-dot-position.ts'],
     cwd: PROJECT_ROOT,
@@ -657,10 +657,10 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
-    id: 'source-check-coverage',
-    name: 'TableBase source-check coverage',
+    id: 'sourcing-coverage',
+    name: 'TableBase sourcing coverage',
     command: 'npx',
-    args: ['tsx', 'crux/validate/validate-source-check-coverage.ts',
+    args: ['tsx', 'crux/validate/validate-sourcing-coverage.ts',
       // Advisory until existing unverified manifests are backfilled (Discussion #3875).
       // Switch to --enforcement=soft after personnel/grants backfill is complete.
       '--enforcement=advisory',

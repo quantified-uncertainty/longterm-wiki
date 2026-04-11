@@ -312,7 +312,7 @@ export async function loadSourceFile(topic: string, sourceFilePath: string, { lo
     timestamp: new Date().toISOString(),
   });
 
-  // Save a compatibility perplexity-research.json so source-check works
+  // Save a compatibility perplexity-research.json so sourcing works
   saveResult(topic, 'perplexity-research.json', {
     topic,
     depth: 'source-file',

@@ -210,7 +210,7 @@ export async function JobsDashboardContent() {
           <p className="text-lg font-medium mb-2">No jobs found</p>
           <p className="text-sm">
             The job queue is empty. Jobs are created by background workers
-            (claim source-check, resource source-check, page improve, auto-update).
+            (claim sourcing, resource sourcing, page improve, auto-update).
           </p>
         </div>
       )}

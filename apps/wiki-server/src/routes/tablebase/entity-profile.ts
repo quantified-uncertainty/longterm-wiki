@@ -92,7 +92,7 @@ const SECTION_ROW_LIMIT = 500;
  */
 const FETCH_LIMIT = SECTION_ROW_LIMIT + 1;
 
-// ---- Record type mapping (for source-check detail page URLs) ----
+// ---- Record type mapping (for sourcing detail page URLs) ----
 
 const SECTION_RECORD_TYPE: Record<string, string> = {
   personnel: "personnel",

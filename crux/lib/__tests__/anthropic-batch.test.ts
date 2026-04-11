@@ -47,7 +47,7 @@ describe('sanitizeBatchCustomId', () => {
     expect(sanitizeBatchCustomId('my-id_123')).toBe('my-id_123');
   });
 
-  it('handles realistic source-check IDs', () => {
+  it('handles realistic sourcing IDs', () => {
     // fact IDs
     expect(sanitizeBatchCustomId('verify-fact:mK9pX3rQ7n')).toBe('verify-fact_mK9pX3rQ7n');
     // record IDs with legacy format

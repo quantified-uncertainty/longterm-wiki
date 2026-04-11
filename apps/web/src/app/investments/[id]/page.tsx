@@ -10,8 +10,8 @@ import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -201,11 +201,11 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
                 {titleCase(investment.instrument)}
               </span>
             )}
-            <SourceCheckDot
+            <SourcingDot
               status={recordVerdictToStatus(investmentVerdict?.verdict)}
               originalVerdict={investmentVerdict?.verdict}
               size="md"
-              href={investmentVerdict?.verdict ? `/source-checks/investment/${encodeURIComponent(String(investment.key))}` : undefined}
+              href={investmentVerdict?.verdict ? `/sourcing/investment/${encodeURIComponent(String(investment.key))}` : undefined}
             />
           </div>
         </div>

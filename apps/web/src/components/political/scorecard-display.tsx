@@ -12,10 +12,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import type { PoliticalScore } from "./types";
 
 // ── Score color logic ────────────────────────────────────────────────
@@ -243,11 +243,11 @@ function ScoreRow({ score }: { score: PoliticalScore }) {
         {(() => {
           const verdict = getRecordVerdict("political-score", String(score.id))?.verdict;
           return (
-            <SourceCheckDot
+            <SourcingDot
               status={recordVerdictToStatus(verdict)}
               originalVerdict={verdict}
               size="md"
-              href={getSourceCheckHref("political-score", String(score.id))}
+              href={getSourcingHref("political-score", String(score.id))}
             />
           );
         })()}

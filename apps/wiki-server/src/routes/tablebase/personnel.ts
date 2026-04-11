@@ -9,7 +9,7 @@ import {
   verdictSelectFields,
   formatSourcing,
   type VerdictJoinFields,
-} from "../shared/source-check-join.js";
+} from "../shared/sourcing-join.js";
 import {
   parseJsonBody,
   validationError,
@@ -347,7 +347,7 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
       name: "personnel",
       table: personnel,
       batchSchema: SyncPersonnelBatchSchema,
-      enforceSourceCheck: true,
+      enforceSourcing: true,
       naturalKey: (item) =>
         `${item.personId}::${item.organizationId}::${item.role}::${item.roleType}`,
       naturalKeyError:

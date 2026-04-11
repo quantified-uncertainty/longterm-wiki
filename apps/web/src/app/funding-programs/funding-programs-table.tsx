@@ -440,7 +440,7 @@ export function FundingProgramsListTable({
                   <RecordStatusDots
                     coverageScore={computeFundingProgramCoverage(row)}
                     verdict={row.verdict?.verdict}
-                    sourcingHref={row.verdict?.verdict ? `/source-checks/funding-program/${encodeURIComponent(row.id)}` : undefined}
+                    sourcingHref={row.verdict?.verdict ? `/sourcing/funding-program/${encodeURIComponent(row.id)}` : undefined}
                   />
                 </td>
               </tr>

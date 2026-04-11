@@ -243,7 +243,7 @@ async function main() {
 
   console.log(`\n${c.dim}Archive saved to data/citation-archive/${pageId}.yaml${c.reset}\n`);
 
-  // Optional content source-check: check if source actually supports each claim
+  // Optional content sourcing: check if source actually supports each claim
   if (contentVerify && verified.length > 0) {
     console.log(`\n${c.bold}${c.blue}Content Source-Check (--content-verify):${c.reset}`);
     console.log(`  Fetching source content and checking claim support...\n`);

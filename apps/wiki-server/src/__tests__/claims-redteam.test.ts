@@ -225,7 +225,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const jobParamsJson = params[0] as string;
     const row = {
       id: nextJobId++,
-      type: "claim-source-check",
+      type: "claim-sourcing",
       params: typeof jobParamsJson === "string" ? JSON.parse(jobParamsJson) : jobParamsJson,
     };
     jobStore.push(row);
@@ -356,7 +356,7 @@ describe("Claims API — adversarial HTTP requests", () => {
     expect(res.status).toBe(201);
     const body = await res.json();
     expect(body.claims).toHaveLength(100);
-    expect(body.estimatedSourceCheckTime).toBe(100 * SECONDS_PER_CLAIM_ESTIMATE);
+    expect(body.estimatedSourcingTime).toBe(100 * SECONDS_PER_CLAIM_ESTIMATE);
   });
 
   it("rejects 101 claims (exceeds max)", async () => {

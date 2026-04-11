@@ -37,13 +37,13 @@ export interface CitationQuote {
   sourceTitle: string | null;
   sourceType: string | null;
   quoteVerified: boolean;
-  sourceCheckScore: number | null;
+  sourcingScore: number | null;
   verifiedAt: string | null;
   accuracyVerdict: AccuracyVerdict | null;
   accuracyScore: number | null;
   accuracyIssues: string | null;
   accuracySupportingQuotes: string | null;
-  sourceCheckDifficulty: string | null;
+  sourcingDifficulty: string | null;
   accuracyCheckedAt: string | null;
 }
 
@@ -70,7 +70,7 @@ function toAccuracyVerdict(value: string | null): AccuracyVerdict | null {
 }
 
 /**
- * Get citation source-check data for a specific page.
+ * Get citation sourcing data for a specific page.
  *
  * Content pages always read from the build-time citation bundle in
  * database.json — zero runtime API calls. This avoids rate-limit
@@ -102,13 +102,13 @@ function getLocalCitationQuotesForPage(pageId: string): CitationQuote[] {
       sourceTitle: q.sourceTitle as string | null,
       sourceType: q.sourceType as string | null,
       quoteVerified: q.quoteVerified as boolean,
-      sourceCheckScore: q.verificationScore as number | null,
+      sourcingScore: q.verificationScore as number | null,
       verifiedAt: q.verifiedAt as string | null,
       accuracyVerdict: toAccuracyVerdict(q.accuracyVerdict as string | null),
       accuracyScore: q.accuracyScore as number | null,
       accuracyIssues: q.accuracyIssues as string | null,
       accuracySupportingQuotes: q.accuracySupportingQuotes as string | null,
-      sourceCheckDifficulty: q.verificationDifficulty as string | null,
+      sourcingDifficulty: q.verificationDifficulty as string | null,
       accuracyCheckedAt: q.accuracyCheckedAt as string | null,
     }));
 }
@@ -126,7 +126,7 @@ export interface CrossPageCitationQuote extends CitationQuote {
  * Source-check verdict for a citation, from the unified source_check_verdicts table.
  * Uses the unified verdict vocabulary (confirmed/contradicted/unverifiable/outdated/partial).
  */
-export interface SourceCheckCitationVerdict {
+export interface SourcingCitationVerdict {
   recordId: string;
   verdict: string;
   confidence: number | null;
@@ -135,7 +135,7 @@ export interface SourceCheckCitationVerdict {
 }
 
 /**
- * Fetch unified source-check verdicts for a page's citations.
+ * Fetch unified sourcing verdicts for a page's citations.
  *
  * Queries the wiki-server for source_check_verdicts with recordType='citation'
  * and recordId prefix matching the page slug.
@@ -147,9 +147,9 @@ export interface SourceCheckCitationVerdict {
  * NOTE: Currently fetches up to 200 citation verdicts and filters client-side.
  * If citation count exceeds 200, add a server-side record_id prefix filter.
  */
-export async function getSourceCheckVerdicts(
+export async function getSourcingVerdicts(
   pageSlug: string,
-): Promise<SourceCheckCitationVerdict[]> {
+): Promise<SourcingCitationVerdict[]> {
   const result = await fetchDetailed<{
     verdicts: Array<{
       recordType: string;
@@ -160,7 +160,7 @@ export async function getSourceCheckVerdicts(
       lastComputedAt: string | null;
     }>;
     total: number;
-  }>(`/api/source-checks/verdicts?record_type=citation&limit=200`);
+  }>(`/api/sourcing/verdicts?record_type=citation&limit=200`);
 
   if (!result.ok) return [];
 
@@ -178,13 +178,13 @@ export async function getSourceCheckVerdicts(
 }
 
 /**
- * Compute citation health summary from unified source-check verdicts.
+ * Compute citation health summary from unified sourcing verdicts.
  *
  * Maps the unified verdict vocabulary back to the CitationHealthSummary shape
  * so the CitationHealthBanner can use either data source.
  */
-export function computeHealthFromSourceCheck(
-  verdicts: SourceCheckCitationVerdict[],
+export function computeHealthFromSourcing(
+  verdicts: SourcingCitationVerdict[],
   totalCitations: number,
 ): CitationHealthSummary {
   let accurate = 0;

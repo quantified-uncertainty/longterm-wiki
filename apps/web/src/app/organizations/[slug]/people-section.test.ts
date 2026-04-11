@@ -202,7 +202,7 @@ describe("pgPersonnelToEntries", () => {
     expect(result.unresolvedCount).toBe(1);
   });
 
-  it("passes through source-check verdict from PG row", () => {
+  it("passes through sourcing verdict from PG row", () => {
     const row = makeRow({
       person: { entityId: "e1", slug: "alice", name: "Alice" },
       sourcing: {
@@ -217,7 +217,7 @@ describe("pgPersonnelToEntries", () => {
     expect(result.entries[0].sourcingVerdict).toBe("confirmed");
   });
 
-  it("sets sourcingVerdict to null when no source-check data", () => {
+  it("sets sourcingVerdict to null when no sourcing data", () => {
     const row = makeRow({
       person: { entityId: "e1", slug: "bob", name: "Bob" },
     });

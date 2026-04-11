@@ -268,7 +268,7 @@ erDiagram
     source_check_verdicts ||--o{ source_check_evidence : "derived from"
 `} />
 
-The source-check system has two layers:
+The sourcing system has two layers:
 1. **Evidence** (`source_check_evidence`): One row per source-claim check. Records what the LLM found. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) verification.
 2. **Verdicts** (`source_check_verdicts`): One row per claim. Aggregated verdict derived from all evidence rows. Verdict options: confirmed, contradicted, unverifiable, outdated, partial, unchecked.
 

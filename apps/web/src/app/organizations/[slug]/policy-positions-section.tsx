@@ -4,7 +4,7 @@ import { getTypedEntities, isPolicy, type PolicyEntity } from "@/data";
 import { STATUS_COLORS, normalizeStatus } from "@/app/legislation/legislation-constants";
 import { deriveStatus } from "@/app/legislation/legislation-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
@@ -86,7 +86,7 @@ export function PolicyPositionsSection({
                 ? getRecordVerdict("policy-stakeholder", stakeholderId)?.verdict
                 : undefined;
               const sourcingHref = stakeholderId
-                ? getSourceCheckHref("policy-stakeholder", stakeholderId)
+                ? getSourcingHref("policy-stakeholder", stakeholderId)
                 : undefined;
 
               return (

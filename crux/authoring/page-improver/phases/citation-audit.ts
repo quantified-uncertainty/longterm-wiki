@@ -50,7 +50,7 @@ export function buildAuditorSourceCache(entries: SourceCacheEntry[]): SourceCach
       relevantExcerpts: [],
       // Infer status from content presence — entries without usable content
       // are marked 'error' so the auditor classifies them as 'unchecked'
-      // rather than attempting LLM source-check on empty text.
+      // rather than attempting LLM sourcing on empty text.
       status: hasContent ? 'ok' : 'error',
       httpStatus: hasContent ? 200 : 0,
     };
@@ -139,7 +139,7 @@ export async function citationAuditPhase(
   }
 
   if (total === 0) {
-    log('citation-audit', 'No citations found \u2014 skipping source-check');
+    log('citation-audit', 'No citations found \u2014 skipping sourcing');
   } else if (result.pass) {
     log('citation-audit', `\u2713 Citation audit passed`);
   } else {

@@ -161,8 +161,8 @@ async function syncCommand(
   }
 
   const result = await syncPersonnel(QURI_PERSONNEL, {
-    forceSkipSourceCheck: true,
-    forceSkipSourceCheckReason: 'bulk-import: curated QURI personnel data',
+    forceSkipSourcing: true,
+    forceSkipSourcingReason: 'bulk-import: curated QURI personnel data',
   });
 
   if (!result.ok) {

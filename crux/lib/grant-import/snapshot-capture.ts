@@ -11,7 +11,7 @@ import { readFileSync, existsSync } from 'fs';
 import { createHash } from 'crypto';
 import { syncDataSource, createSnapshot } from '../wiki-server/data-sources.ts';
 import { getManifest, MANIFESTS } from './manifests/index.ts';
-import { parseCSVContent, parseHTMLTable, parseJSONArray } from '../source-check/source-parsers.ts';
+import { parseCSVContent, parseHTMLTable, parseJSONArray } from '../sourcing/source-parsers.ts';
 
 const RATE_LIMIT_DELAY_MS = 6_000;
 const INTER_SOURCE_DELAY_MS = 2_000;
@@ -86,7 +86,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
           .filter(f => f.internalField)
           .map(f => [f.sourceName, f.internalField!])
       ),
-      verificationConfig: { ...manifest.sourceCheck } satisfies Record<string, unknown>,
+      verificationConfig: { ...manifest.sourcing } satisfies Record<string, unknown>,
     });
 
     if (!dsResult.ok) {
@@ -99,7 +99,7 @@ export async function captureSourceSnapshot(sourceId: string): Promise<{ ok: boo
           accessMethod: manifest.accessMethod, recordType: 'grant', fetchUrl: manifest.fetchUrl,
           publisherEntityId: manifest.publisherEntityId, updateFrequency: manifest.updateFrequency,
           columnMapping: Object.fromEntries(manifest.schema.fields.filter(f => f.internalField).map(f => [f.sourceName, f.internalField!])),
-          verificationConfig: { ...manifest.sourceCheck } satisfies Record<string, unknown>,
+          verificationConfig: { ...manifest.sourcing } satisfies Record<string, unknown>,
         });
       }
     }

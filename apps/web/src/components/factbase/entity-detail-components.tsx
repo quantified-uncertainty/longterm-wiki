@@ -3,7 +3,7 @@
  *
  * This file was split into domain-focused modules:
  *   - entity-detail-shared.ts      — types, constants, helpers
- *   - entity-verdict.tsx            — VerdictBadge, SourceCheckSummary
+ *   - entity-verdict.tsx            — VerdictBadge, SourcingSummary
  *   - entity-fact-display.tsx       — SourceCell, FactValueDisplay, StatCard, CategoryFactSection
  *   - entity-section-header.tsx     — SectionHeader
  *   - entity-person-cards.tsx       — PersonCard
@@ -22,7 +22,7 @@ export {
   sortByDateField,
 } from "./entity-detail-shared";
 
-export { VerdictBadge, SourceCheckSummary } from "./entity-verdict";
+export { VerdictBadge, SourcingSummary } from "./entity-verdict";
 export { SourceCell, FactValueDisplay, StatCard, CategoryFactSection } from "./entity-fact-display";
 export { SectionHeader } from "./entity-section-header";
 export { PersonCard } from "./entity-person-cards";

@@ -5,9 +5,9 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { resolveEntityLink, INSTRUMENT_COLORS } from "@/lib/record-detail-ui";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import {
   formatKBDate,
   titleCase,
@@ -241,11 +241,11 @@ export default function InvestmentsPage() {
                     {row.date ? formatKBDate(row.date) : ""}
                   </td>
                   <td className="py-2 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(row.verdictString)}
                       originalVerdict={row.verdictString}
                       size="md"
-                      href={row.verdictString ? getSourceCheckHref("investment", String(row.key)) : undefined}
+                      href={row.verdictString ? getSourcingHref("investment", String(row.key)) : undefined}
                     />
                   </td>
                 </tr>

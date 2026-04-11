@@ -36,10 +36,10 @@ import { platformAccountsRoute } from "./routes/tablebase/platform-accounts.js";
 import { coverageScansRoute } from "./routes/tablebase/coverage-scans.js";
 import { scannerResultsRoute } from "./routes/tablebase/scanner-results.js";
 
-// Unified source-check system (replaces legacy factbase + record source-checks)
-import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
+// Unified sourcing system (replaces legacy factbase + record sourcing)
+import { sourcingRoute } from "./routes/sourcing/sourcing.js";
 
-// Claims-first source-check system (#3253)
+// Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
 import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
 import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
@@ -201,20 +201,22 @@ export function createApp() {
 
   // FactBase routes — structured facts
   app.route("/api/facts", factsRoute);
-  // Unified source-check system
-  app.route("/api/source-checks", sourceChecksRoute);
+  // Unified sourcing system
+  app.route("/api/sourcing", sourcingRoute);
+  // Backward-compat alias: old /api/source-checks/* → /api/sourcing/*
+  app.route("/api/source-checks", sourcingRoute);
 
   // WikiBase routes — prose content and page metadata
   app.route("/api/pages", pagesRoute);
   app.route("/api/edit-logs", editLogsRoute);
   app.route("/api/references", referencesRoute);
 
-  // Citation & source-check system (operational, not part of a Base)
+  // Citation & sourcing system (operational, not part of a Base)
   app.route("/api/citations", citationsRoute);
   app.route("/api/hallucination-risk", hallucinationRiskRoute);
   app.route("/api/integrity", integrityRoute);
 
-  // Claims-first source-check (#3253)
+  // Claims-first sourcing (#3253)
   app.route("/api/claims", claimsRoute);
 
   // Financial data routes (operational — personnel, grants, funding)

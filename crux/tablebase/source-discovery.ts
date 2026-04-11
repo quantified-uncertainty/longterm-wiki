@@ -12,12 +12,12 @@
 
 import { runResearch } from '../lib/search/research-agent.ts';
 import type { ResearchResult } from '../lib/search/research-agent.ts';
-import { getVerdictsByEntity } from '../lib/wiki-server/source-checks.ts';
+import { getVerdictsByEntity } from '../lib/wiki-server/sourcing.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { getTableConfig } from './table-registry.ts';
-import { buildStableIdNameMap } from './source-check.ts';
+import { buildStableIdNameMap } from './sourcing.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -112,7 +112,7 @@ function contentMentionsPerson(content: string, personName: string): boolean {
   return content.toLowerCase().includes(personName.toLowerCase());
 }
 
-/** Map source-check recordType to table-registry table name */
+/** Map sourcing recordType to table-registry table name */
 function recordTypeToTable(recordType: string): string {
   switch (recordType) {
     case 'personnel': return 'personnel';

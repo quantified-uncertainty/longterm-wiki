@@ -85,7 +85,7 @@ async function verifyQuotesForPage(
 
     if (quoteMatch.verified) {
       result.stillValid++;
-      // Update source-check status
+      // Update sourcing status
       await markQuoteVerified(
         pageId,
         q.footnote,

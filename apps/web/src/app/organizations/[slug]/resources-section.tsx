@@ -280,7 +280,7 @@ function makeColumns(opts: {
             <RecordStatusDots
               coverageScore={score}
               verdict={verdict}
-              sourcingHref={verdict ? `/source-checks/resource/${encodeURIComponent(r.id)}` : undefined}
+              sourcingHref={verdict ? `/sourcing/resource/${encodeURIComponent(r.id)}` : undefined}
               size="md"
             />
           </div>

@@ -13,7 +13,7 @@ import { getResourceIdForFact } from "@/data/resource-fact-links";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBFactValue, formatKBDate, shortDomain, isUrl } from "@/components/wiki/factbase/format";
 import { KVRow, KVTable, Dash } from "@/components/wiki/factbase/factbase-detail-shared";
-import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
+import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
 // ── Rendering mode ───────────────────────────────────────────────────
 // Render on-demand to reduce build output size (~492 pages saved).
@@ -190,7 +190,7 @@ export default async function FactDetailPage({ params }: PageProps) {
       {/* Header */}
       <h1 className="text-2xl font-bold mb-1 flex items-center gap-2">
         <FactValueDisplay fact={fact} unit={property?.unit} display={property?.display} />
-        <FactSourceCheckDot factId={factId} sourceUrl={fact.source} size="md" />
+        <FactSourcingDot factId={factId} sourceUrl={fact.source} size="md" />
       </h1>
       <p className="text-sm text-muted-foreground mb-6">
         <FactLink href={`/factbase/entity/${fact.subjectId}`}>{entityName}</FactLink>
@@ -270,8 +270,8 @@ export default async function FactDetailPage({ params }: PageProps) {
         <KVRow label="Notes">{fact.notes ?? <Dash />}</KVRow>
         <KVRow label="Source Check">
           <span className="inline-flex items-center gap-2">
-            <FactSourceCheckDot factId={factId} sourceUrl={fact.source} size="md" />
-            <FactLink href={`/source-checks/fact/${factId}`}>
+            <FactSourcingDot factId={factId} sourceUrl={fact.source} size="md" />
+            <FactLink href={`/sourcing/fact/${factId}`}>
               view source checks {"\u2192"}
             </FactLink>
           </span>
@@ -369,7 +369,7 @@ export default async function FactDetailPage({ params }: PageProps) {
                         )}
                       </td>
                       <td className="px-3 py-1.5">
-                        <FactSourceCheckDot factId={f.id} sourceUrl={f.source} size="sm" />
+                        <FactSourcingDot factId={f.id} sourceUrl={f.source} size="sm" />
                       </td>
                     </tr>
                   );

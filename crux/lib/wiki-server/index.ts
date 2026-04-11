@@ -225,7 +225,7 @@ export {
   getFailures,
   getStaleVerdicts,
   getContradictedEntityIds,
-} from './source-checks.ts';
+} from './sourcing.ts';
 export type {
   VerdictEntry,
   VerdictsResponse,
@@ -233,7 +233,7 @@ export type {
   ByPageResponse,
   FailuresResponse,
   StaleResponse,
-} from './source-checks.ts';
+} from './sourcing.ts';
 
 // Claims
 export { proposeClaims, getClaimStatus } from './claims.ts';
