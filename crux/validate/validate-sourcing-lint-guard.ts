@@ -29,6 +29,7 @@
  */
 
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'fs';
+import { execSync } from 'child_process';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
@@ -308,12 +309,26 @@ function main(): void {
   const result = runCheck();
 
   if (!result.passed) {
-    console.log(`${c.red}${result.message}${c.reset}`);
-    console.log(`\n  Current: ${result.current.total} total`);
-    if (result.baseline) {
-      console.log(`  Baseline: ${result.baseline.total} total`);
+    // On non-main branches, the ratchet is advisory — PRs that add
+    // source-check features naturally increase the count temporarily.
+    // The ratchet enforces on main merges. See QUA-238.
+    const branch = process.env.GITHUB_HEAD_REF
+      || process.env.GITHUB_REF
+      || execSync('git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown').toString().trim();
+    const isMain = branch === 'main' || branch === 'refs/heads/main';
+
+    if (!isMain) {
+      console.log(`${c.yellow}${result.message} (advisory on branch "${branch}")${c.reset}`);
+      console.log(`  ${c.dim}Ratchet only blocks on main. See QUA-238.${c.reset}`);
+      // Exit 0 so the gate check doesn't block PR pushes
+    } else {
+      console.log(`${c.red}${result.message}${c.reset}`);
+      console.log(`\n  Current: ${result.current.total} total`);
+      if (result.baseline) {
+        console.log(`  Baseline: ${result.baseline.total} total`);
+      }
+      process.exit(1);
     }
-    process.exit(1);
   }
 
   console.log(`${c.green}${result.message}${c.reset}`);
