@@ -1167,8 +1167,8 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
   const apply = !!options.apply;
   const limit = options.limit ? parseInt(options.limit as string, 10) : 10;
   const entityOnly = !!(options as Record<string, unknown>).entityOnly;
-
-  const { discoverSources } = await import('../tablebase/source-discovery.ts');
+  const useV2 = !!(options as Record<string, unknown>).v2;
+  const claimsOnly = !!(options as Record<string, unknown>).claimsOnly;
 
   // Resolve entity name to ID if provided
   let entityId: string | undefined;
@@ -1180,6 +1180,69 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
     entityId = match?.stableId || entityArg;
     entityName = match?.name || entityArg;
   }
+
+  // ── V2: Claims-first agent ──────────────────────────────────────────
+  if (useV2) {
+    if (!entityId) {
+      return { exitCode: 1, output: 'Error: --v2 requires an entity argument (e.g., crux tb source-discover anthropic --v2)' };
+    }
+
+    const { runSourceDiscoverAgent } = await import('../tablebase/source-discover-agent.ts');
+
+    const result = await runSourceDiscoverAgent({
+      entityId,
+      entityName,
+      limit,
+      dryRun: !apply && !claimsOnly,
+      apply,
+      claimsOnly,
+      budgetCap: options.budget ? parseFloat(options.budget) : 1.00,
+    });
+
+    if (options.ci) {
+      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+    }
+
+    // Format summary
+    const lines: string[] = [
+      `Entity: ${result.entityName} (${result.entityId})`,
+      `Unverifiable records: ${result.unverifiableCount} total, ${result.recordsProcessed} processed`,
+      `Sources: ${result.sourcesDiscovered} discovered, ${result.sourcesWithClaims} with claims`,
+      `Claims: ${result.claimsExtracted} extracted, ${result.claimsSubmitted} submitted`,
+      `Cost: $${result.cost.toFixed(4)}, Duration: ${Math.round(result.durationMs / 1000)}s`,
+    ];
+
+    if (result.batchId) {
+      lines.push(`Batch ID: ${result.batchId}`);
+    }
+
+    if (result.verificationStatus) {
+      const v = result.verificationStatus;
+      lines.push(`Verification: ${v.verified} verified, ${v.contradicted} contradicted, ${v.unverifiable} unverifiable, ${v.pending} pending${v.timedOut ? ' (timed out)' : ''}`);
+    }
+
+    if (result.sources.length > 0) {
+      lines.push('', 'Sources with claims:');
+      for (const s of result.sources) {
+        lines.push(`  ${s.title} (${s.claims.length} claims)`);
+        for (const c of s.claims.slice(0, 3)) {
+          lines.push(`    - ${c.claimText.slice(0, 100)}${c.claimText.length > 100 ? '...' : ''}`);
+        }
+        if (s.claims.length > 3) {
+          lines.push(`    ... and ${s.claims.length - 3} more`);
+        }
+      }
+    }
+
+    const mode = apply ? 'apply' : claimsOnly ? 'claims-only' : 'dry-run';
+    return {
+      exitCode: 0,
+      output: `[source-discover-agent v2] ${mode}\n${lines.join('\n')}`,
+    };
+  }
+
+  // ── V1: Legacy string-matching approach ─────────────────────────────
+  const { discoverSources } = await import('../tablebase/source-discovery.ts');
 
   const result = await discoverSources({ entityId, entityName, limit, dryRun, apply, entityOnly });
 
@@ -1328,6 +1391,8 @@ Options:
   --records-file=<path>     JSON file for submit command
   --skip-source-check       Skip source-check before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
+  --v2                      For source-discover: use claims-first agent (extracts + submits claims)
+  --claims-only             For source-discover --v2: submit claims but don't apply results
   --ci                      JSON output
 
 Modes:
@@ -1357,6 +1422,9 @@ Examples:
   crux tb tablebase source-discover anthropic --dry-run       # Preview source suggestions for Anthropic
   crux tb tablebase source-discover --limit=5 --budget=5     # Discover sources for top 5 entities
   crux tb tablebase source-discover anthropic --apply        # Discover + link sources to records
+  crux tb tablebase source-discover anthropic --v2           # Claims-first discovery (dry-run)
+  crux tb tablebase source-discover anthropic --v2 --apply   # Claims-first: extract + submit + verify
+  crux tb tablebase source-discover anthropic --v2 --claims-only  # Submit claims but don't apply
   crux tb tablebase normalize-ids                            # Dry-run: show slug-based IDs
   crux tb tablebase normalize-ids --apply                    # Fix slug-based IDs
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId
